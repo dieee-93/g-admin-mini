@@ -6,12 +6,12 @@ import { useDashboardStats } from "./hooks/useDashboardStats";
 import { LoadingSpinner } from "./components/common/LoadingSpinner";
 import { DashboardView } from "./components/dashboard/DashboardView";
 import { ModuleHeader } from "./components/layout/ModuleHeader";
-import { AppRoute } from "./types/app";
+import { type AppRoute } from "./types/app";
 
 // Lazy loading de módulos
 const ItemsPage = lazy(() => import("./features/items"));
 const StockEntriesPage = lazy(() => import("./features/stock_entries"));
-const UnderDevelopmentPage = lazy(() => import("./components/common/UnderDevelopmentPage"));
+  const UnderDevelopmentPage = lazy(() => import("./components/common/UnderDevelopment"));
 
 const MODULE_CONFIG = {
   items: { title: "Gestión de Insumos", color: "blue" },

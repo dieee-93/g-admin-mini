@@ -1,5 +1,5 @@
 import { Table, Box, Heading, Spinner } from '@chakra-ui/react';
-import { useItems } from '../logic/useItem'; 
+import { useItems } from '../logic/useItems'; 
 
 export function ItemList() {
   const { items, loading } = useItems();
