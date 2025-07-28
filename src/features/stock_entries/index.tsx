@@ -1,3 +1,6 @@
+// ===================================
+
+// 📁 src/features/stock_entries/index.tsx
 import { Box } from '@chakra-ui/react';
 import { StockEntryForm } from './ui/StockEntryForm';
 import { StockEntryList } from './ui/StockEntryList';

@@ -1,3 +1,4 @@
+// 📁 src/features/stock_entries/data/stockEntryApi.ts
 import { supabase } from '@/lib/supabase';
 import { type StockEntry } from '../types';
 
@@ -30,7 +31,7 @@ export async function createStockEntry(entry: Omit<StockEntry, 'id'>) {
   });
 
   if (updateError) {
-    // Si falla la actualización del stock, usamos una consulta manual
+    // Si falla la función RPC, usamos una consulta manual
     const { data: currentItem } = await supabase
       .from('items')
       .select('stock')

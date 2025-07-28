@@ -1,3 +1,6 @@
+// ===================================
+
+// 📁 src/features/stock_entries/logic/useStockEntries.ts
 import { useEffect, useState } from 'react';
 import { type StockEntry } from '../types';
 import { fetchStockEntries, createStockEntry } from '../data/stockEntryApi';

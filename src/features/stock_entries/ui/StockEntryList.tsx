@@ -1,3 +1,6 @@
+// ===================================
+
+// 📁 src/features/stock_entries/ui/StockEntryList.tsx
 import { Table, Box, Heading, Spinner, Badge } from '@chakra-ui/react';
 import { useStockEntries } from '../logic/useStockEntries';
 
