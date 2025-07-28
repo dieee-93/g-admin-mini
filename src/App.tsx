@@ -11,7 +11,8 @@ import { type AppRoute } from "./types/app";
 // Lazy loading de módulos
 const ItemsPage = lazy(() => import("./features/items"));
 const StockEntriesPage = lazy(() => import("./features/stock_entries"));
-  const UnderDevelopmentPage = lazy(() => import("./components/common/UnderDevelopment"));
+const RecipesPage = lazy(() => import("./features/recipes"));
+const UnderDevelopmentPage = lazy(() => import("./components/common/UnderDevelopment"));
 
 const MODULE_CONFIG = {
   items: { title: "Gestión de Insumos", color: "blue" },
@@ -58,9 +59,11 @@ function App() {
         <Suspense fallback={<LoadingSpinner />}>
           {currentView === 'items' && <ItemsPage />}
           {currentView === 'stock' && <StockEntriesPage />}
+          {currentView === 'recipes' && <RecipesPage />}
           {!['items', 'stock'].includes(currentView) && (
             <UnderDevelopmentPage onBack={backToDashboard} />
           )}
+          
         </Suspense>
       </Box>
     );

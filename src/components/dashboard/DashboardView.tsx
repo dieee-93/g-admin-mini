@@ -167,7 +167,6 @@ export function DashboardView({ stats, onNavigate }: DashboardViewProps) {
               description="Crea y gestiona recetas de productos elaborados con costeo automático."
               icon="📝"
               color="purple"
-              disabled={true}
               onNavigate={() => onNavigate('recipes')}
             />
 
