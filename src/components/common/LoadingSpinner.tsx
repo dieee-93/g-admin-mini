@@ -1,4 +1,4 @@
-// src/components/common/LoadingSpinner.tsx
+// src/components/common/LoadingSpinner.tsx - Chakra UI v3
 import { Box, Spinner, Text, VStack } from '@chakra-ui/react';
 
 interface LoadingSpinnerProps {
@@ -18,7 +18,7 @@ export function LoadingSpinner({
       minHeight="200px"
       width="100%"
     >
-      <VStack spacing={4}>
+      <VStack gap="4">
         <Spinner size={size} color="blue.500" thickness="3px" />
         <Text color="gray.600" fontSize="sm">
           {message}

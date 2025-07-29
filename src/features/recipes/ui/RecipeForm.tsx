@@ -1,16 +1,15 @@
-// src/features/recipes/ui/RecipeForm.tsx
+// src/features/recipes/ui/RecipeForm.tsx - Chakra UI v3
 import {
   Box, 
   Button, 
   Input, 
   Select, 
-  Stack, 
+  VStack, 
+  HStack,
   Textarea, 
   Heading,
   Grid,
   Text,
-  VStack,
-  HStack,
   Badge
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
@@ -177,7 +176,7 @@ export function RecipeForm() {
         📝 Nueva Receta
       </Heading>
       
-      <VStack spacing={6} align="stretch">
+      <VStack gap="6" align="stretch">
         {/* Información básica */}
         <Box>
           <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>
@@ -265,12 +264,12 @@ export function RecipeForm() {
             </Text>
           )}
 
-          <VStack spacing={3}>
+          <VStack gap="3">
             {ingredients.map((ingredient, index) => {
               const selectedItem = items.find(item => item.id === ingredient.item_id);
               
               return (
-                <HStack key={index} spacing={3} width="100%">
+                <HStack key={index} gap="3" width="100%">
                   <Select 
                     placeholder="Seleccionar ingrediente"
                     value={ingredient.item_id}
@@ -359,9 +358,10 @@ export function RecipeForm() {
           colorScheme="purple"
           size="lg"
           onClick={handleSubmit}
-          disabled={isSubmitting}
+          loading={isSubmitting}
+          loadingText="Creando receta..."
         >
-          {isSubmitting ? 'Creando receta...' : '✅ Crear Receta'}
+          ✅ Crear Receta
         </Button>
       </VStack>
     </Box>

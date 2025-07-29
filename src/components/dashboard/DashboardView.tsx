@@ -9,7 +9,7 @@ import {
   Button,
   HStack
 } from '@chakra-ui/react';
-import { QuickStatsCard } from './QuickStatCard';
+import { QuickStatsCard } from './QuickStatsCard';
 import { ModuleCard } from './ModuleCard';
 import { type DashboardStats, type AppRoute } from '@/types/app';
 
@@ -29,7 +29,7 @@ export function DashboardView({ stats, onNavigate }: DashboardViewProps) {
 
   return (
     <Box p={6}>
-      <VStack spacing={8} align="stretch">
+      <VStack gap="8" align="stretch">
         {/* Header */}
         <Box>
           <Heading size="xl" color="gray.800" mb={2}>
@@ -103,7 +103,7 @@ export function DashboardView({ stats, onNavigate }: DashboardViewProps) {
           <Heading size="md" mb={4} color="gray.700">
             ⚡ Acciones Rápidas
           </Heading>
-          <HStack spacing={4} flexWrap="wrap">
+          <HStack gap="4" flexWrap="wrap">
             <Button 
               colorScheme="green" 
               size="sm"

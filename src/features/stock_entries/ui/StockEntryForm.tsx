@@ -1,6 +1,6 @@
-// 📁 src/features/stock_entries/ui/StockEntryForm.tsx
+// 📁 src/features/stock_entries/ui/StockEntryForm.tsx - Chakra UI v3
 import {
-  Box, Button, Input, Select, Stack, Textarea, Heading,
+  Box, Button, Input, Select, VStack, Textarea, Heading,
 } from '@chakra-ui/react';
 import { toaster } from '@/components/ui/toaster';
 import { useState, useEffect } from 'react';
@@ -88,7 +88,7 @@ export function StockEntryForm() {
   return (
     <Box borderWidth="1px" rounded="md" p={4} mb={6}>
       <Heading size="md" mb={4}>Registrar Entrada de Stock</Heading>
-      <Stack spacing={3}>
+      <VStack gap="3">
         <Select 
           placeholder="Seleccionar insumo"
           name="item_id" 
@@ -138,8 +138,7 @@ export function StockEntryForm() {
         <Button onClick={handleSubmit} colorScheme="green">
           Registrar Entrada
         </Button>
-      </Stack>
+      </VStack>
     </Box>
   );
 }
-

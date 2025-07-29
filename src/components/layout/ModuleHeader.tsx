@@ -1,4 +1,4 @@
-// src/components/layout/ModuleHeader.tsx
+// src/components/layout/ModuleHeader.tsx - Chakra UI v3
 import { Box, Button, Heading, Flex } from '@chakra-ui/react';
 import { type ModuleHeaderProps } from '@/types/ui';
 

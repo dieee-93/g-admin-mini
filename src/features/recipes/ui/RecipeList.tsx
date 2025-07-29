@@ -1,4 +1,4 @@
-// src/features/recipes/ui/RecipeList.tsx
+// src/features/recipes/ui/RecipeList.tsx - Chakra UI v3
 import { 
   Table, 
   Box, 
@@ -10,8 +10,7 @@ import {
   Text,
   Alert,
   Input,
-  Spinner,
-  Collapsible
+  Spinner
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useRecipes, useRecipeOperations } from '../logic/useRecipes';
@@ -133,8 +132,8 @@ export function RecipeList() {
           </Text>
         </Box>
       ) : (
-        <VStack spacing={4} align="stretch">
-          <Table.Root size="sm" variant="simple" showColumnBorder>
+        <VStack gap="4" align="stretch">
+          <Table.Root size="sm" variant="line" showColumnBorder>
             <Table.Header>
               <Table.Row>
                 <Table.ColumnHeader>Receta</Table.ColumnHeader>
@@ -152,13 +151,13 @@ export function RecipeList() {
               {recipesWithCosts.map((recipe) => (
                 <Table.Row key={recipe.id}>
                   <Table.Cell>
-                    <VStack align="start" spacing={1}>
+                    <VStack align="start" gap="1">
                       <Text fontWeight="medium">{recipe.name}</Text>
                     </VStack>
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <VStack align="start" spacing={0}>
+                    <VStack align="start" gap="0">
                       <Text fontSize="sm" fontWeight="medium">
                         {recipe.output_item?.name}
                       </Text>
@@ -206,7 +205,7 @@ export function RecipeList() {
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <HStack spacing={1}>
+                    <HStack gap="1">
                       <Button
                         size="xs"
                         colorScheme="blue"
@@ -240,7 +239,7 @@ export function RecipeList() {
           {/* Panel de Viabilidad */}
           {showViability && viabilityData && selectedRecipeData && (
             <Box borderWidth="1px" borderRadius="md" p={4} bg="blue.50">
-              <VStack spacing={4} align="stretch">
+              <VStack gap="4" align="stretch">
                 <HStack justify="space-between">
                   <Text fontWeight="bold" color="blue.700">
                     🔍 Viabilidad: {selectedRecipeData.name}
@@ -267,7 +266,7 @@ export function RecipeList() {
                     <Text fontWeight="medium" mb={2}>
                       Ingredientes faltantes:
                     </Text>
-                    <VStack spacing={2} align="stretch">
+                    <VStack gap="2" align="stretch">
                       {viabilityData.missing_ingredients.map((item, index) => (
                         <Box key={index} p={3} bg="red.50" borderRadius="md">
                           <Text fontWeight="medium" color="red.700">
@@ -289,7 +288,7 @@ export function RecipeList() {
           {/* Panel de Ejecución */}
           {showExecuteForm && selectedRecipeData && (
             <Box borderWidth="1px" borderRadius="md" p={4} bg="green.50">
-              <VStack spacing={4} align="stretch">
+              <VStack gap="4" align="stretch">
                 <HStack justify="space-between">
                   <Text fontWeight="bold" color="green.700">
                     ▶️ Ejecutar: {selectedRecipeData.name}
@@ -317,13 +316,14 @@ export function RecipeList() {
                   </Text>
                 </Box>
 
-                <HStack spacing={3}>
+                <HStack gap="3">
                   <Button 
                     colorScheme="green"
                     onClick={confirmExecution}
-                    disabled={operationLoading}
+                    loading={operationLoading}
+                    loadingText="Ejecutando..."
                   >
-                    {operationLoading ? <Spinner size="sm" /> : 'Confirmar Ejecución'}
+                    Confirmar Ejecución
                   </Button>
                   <Button variant="outline" onClick={closeAll}>
                     Cancelar
@@ -336,7 +336,7 @@ export function RecipeList() {
           {/* Panel de Resultado */}
           {showExecutionResult && executionData && (
             <Box borderWidth="1px" borderRadius="md" p={4} bg="green.50">
-              <VStack spacing={4} align="stretch">
+              <VStack gap="4" align="stretch">
                 <HStack justify="space-between">
                   <Text fontWeight="bold" color="green.700">
                     ✅ Resultado de Ejecución
@@ -356,7 +356,7 @@ export function RecipeList() {
                 {executionData.items_consumed.length > 0 && (
                   <Box>
                     <Text fontWeight="medium" mb={2}>Ingredientes consumidos:</Text>
-                    <VStack spacing={1} align="stretch">
+                    <VStack gap="1" align="stretch">
                       {executionData.items_consumed.map((item, index) => (
                         <Text key={index} fontSize="sm" color="red.600">
                           - {item.quantity} de {item.item_name}
@@ -369,7 +369,7 @@ export function RecipeList() {
                 {executionData.items_produced.length > 0 && (
                   <Box>
                     <Text fontWeight="medium" mb={2}>Productos generados:</Text>
-                    <VStack spacing={1} align="stretch">
+                    <VStack gap="1" align="stretch">
                       {executionData.items_produced.map((item, index) => (
                         <Text key={index} fontSize="sm" color="green.600">
                           + {item.quantity} de {item.item_name}

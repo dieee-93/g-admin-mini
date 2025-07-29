@@ -1,4 +1,4 @@
-// src/components/common/UnderDevelopmentPage.tsx
+// src/components/common/UnderDevelopment.tsx - Chakra UI v3
 import { 
   Box, 
   VStack, 
@@ -28,12 +28,12 @@ export default function UnderDevelopmentPage({ onBack }: UnderDevelopmentPagePro
       minHeight="60vh"
       p={8}
     >
-      <VStack spacing={6} textAlign="center" maxWidth="400px">
+      <VStack gap="6" textAlign="center" maxWidth="400px">
         <Box color="orange.400">
           <ConstructionIcon />
         </Box>
         
-        <VStack spacing={3}>
+        <VStack gap="3">
           <Heading size="lg" color="gray.700">
             🚧 En Desarrollo
           </Heading>
@@ -44,7 +44,7 @@ export default function UnderDevelopmentPage({ onBack }: UnderDevelopmentPagePro
           </Text>
         </VStack>
         
-        <VStack spacing={3}>
+        <VStack gap="3">
           <Button 
             colorScheme="blue" 
             size="md"

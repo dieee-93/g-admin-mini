@@ -1,9 +1,9 @@
-// src/features/items/ui/ItemForm.tsx - Versión mejorada
+// src/features/items/ui/ItemForm.tsx - Chakra UI v3
 import {
-  Box, Button, Input, Select, Stack, Text, FormControl, FormErrorMessage
+  Box, Button, Input, Select, VStack, Field
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { useItems } from '../logic/useItems'; // Renombrado de useItem
+import { useItems } from '../logic/useItems';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { type ItemType } from '../types';
 
@@ -107,18 +107,18 @@ export function ItemForm() {
 
   return (
     <Box borderWidth="1px" rounded="md" p={4} mb={6}>
-      <Stack spacing={4}>
-        <FormControl isInvalid={!!errors.name}>
+      <VStack gap="4">
+        <Field.Root invalid={!!errors.name}>
           <Input
             placeholder="Nombre del insumo"
             name="name"
             value={form.name}
             onChange={handleChange}
           />
-          {errors.name && <FormErrorMessage>{errors.name}</FormErrorMessage>}
-        </FormControl>
+          {errors.name && <Field.ErrorText>{errors.name}</Field.ErrorText>}
+        </Field.Root>
 
-        <FormControl isInvalid={!!errors.type}>
+        <Field.Root invalid={!!errors.type}>
           <Select 
             placeholder="Seleccionar tipo"
             name="type" 
@@ -131,20 +131,20 @@ export function ItemForm() {
               </option>
             ))}
           </Select>
-          {errors.type && <FormErrorMessage>{errors.type}</FormErrorMessage>}
-        </FormControl>
+          {errors.type && <Field.ErrorText>{errors.type}</Field.ErrorText>}
+        </Field.Root>
 
-        <FormControl isInvalid={!!errors.unit}>
+        <Field.Root invalid={!!errors.unit}>
           <Input
             placeholder="Unidad (g, ml, u, kg, etc.)"
             name="unit"
             value={form.unit}
             onChange={handleChange}
           />
-          {errors.unit && <FormErrorMessage>{errors.unit}</FormErrorMessage>}
-        </FormControl>
+          {errors.unit && <Field.ErrorText>{errors.unit}</Field.ErrorText>}
+        </Field.Root>
 
-        <FormControl isInvalid={!!errors.unit_cost}>
+        <Field.Root invalid={!!errors.unit_cost}>
           <Input
             placeholder="Costo por unidad (opcional)"
             name="unit_cost"
@@ -154,18 +154,18 @@ export function ItemForm() {
             value={form.unit_cost}
             onChange={handleChange}
           />
-          {errors.unit_cost && <FormErrorMessage>{errors.unit_cost}</FormErrorMessage>}
-        </FormControl>
+          {errors.unit_cost && <Field.ErrorText>{errors.unit_cost}</Field.ErrorText>}
+        </Field.Root>
 
         <Button 
           onClick={handleSubmit} 
           colorScheme="green"
-          isLoading={isSubmitting}
+          loading={isSubmitting}
           loadingText="Creando..."
         >
           Agregar Insumo
         </Button>
-      </Stack>
+      </VStack>
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-// src/components/dashboard/ModuleCard.tsx
+// src/components/dashboard/ModuleCard.tsx - Chakra UI v3
 import { 
   Box, 
   Text, 
@@ -35,13 +35,13 @@ export function ModuleCard({
       } : {}}
       onClick={!disabled ? onNavigate : undefined}
     >
-      <VStack align="start" spacing={4}>
+      <VStack align="start" gap="4">
         {/* Header con icono y título */}
-        <HStack spacing={3}>
+        <HStack gap="3">
           <Text fontSize="2xl" role="img" aria-label={title}>
             {icon}
           </Text>
-          <VStack align="start" spacing={1}>
+          <VStack align="start" gap="1">
             <Text fontWeight="bold" fontSize="lg" color="gray.800">
               {title}
             </Text>
@@ -85,7 +85,7 @@ export function ModuleCard({
           colorScheme={color}
           variant={disabled ? "ghost" : "solid"}
           width="100%"
-          isDisabled={disabled}
+          disabled={disabled}
           onClick={!disabled ? (e) => {
             e.stopPropagation();
             onNavigate();

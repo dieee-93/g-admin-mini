@@ -6,7 +6,7 @@ import { RecipeList } from './ui/RecipeList';
 export default function RecipesPage() {
   return (
     <Box p={4}>
-      <VStack spacing={6} align="stretch">
+      <VStack gap={6} align="stretch">
         <RecipeForm />
         <RecipeList />
       </VStack>

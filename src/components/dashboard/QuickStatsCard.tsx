@@ -1,4 +1,4 @@
-// src/components/dashboard/QuickStatsCard.tsx
+// src/components/dashboard/QuickStatCard.tsx - Chakra UI v3
 import { 
   Box, 
   Text, 
@@ -23,20 +23,22 @@ export function QuickStatsCard({
       shadow="sm"
       borderColor={`${color}.200`}
     >
-      <VStack align="start" spacing={2}>
+      <VStack align="start" gap="2">
         <Text fontSize="sm" color="gray.600" fontWeight="medium">
           {title}
         </Text>
         
-        <Skeleton isLoaded={!loading}>
+        {loading ? (
+          <Skeleton height="8" width="20" />
+        ) : (
           <Text 
             fontSize="2xl" 
             fontWeight="bold" 
             color={`${color}.600`}
           >
-            {loading ? "---" : value}
+            {value}
           </Text>
-        </Skeleton>
+        )}
         
         <Text fontSize="xs" color="gray.500">
           {subtitle}
