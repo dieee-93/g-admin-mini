@@ -38,7 +38,7 @@ export function StockEntryList() {
           No hay entradas de stock registradas
         </Box>
       ) : (
-        <Table.Root size="md" variant="simple" showColumnBorder>
+        <Table.Root size="md" variant="line" showColumnBorder>
           <Table.Header>
             <Table.Row>
               <Table.ColumnHeader>Fecha</Table.ColumnHeader>

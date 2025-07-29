@@ -1,8 +1,8 @@
-// src/features/stock_entries/ui/StockEntryForm.tsx - VERSIÓN FINAL CORREGIDA
+// src/features/stock_entries/ui/StockEntryForm.tsx - VERSIÓN CORREGIDA CON COLLECTION
 import {
-  Box, Button, Input, VStack, Textarea, Heading, Text, Select
+  Box, Button, Input, VStack, Textarea, Heading, Text, Select, createListCollection
 } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useStockEntries } from '../logic/useStockEntries';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { fetchItems } from '../../items/data/itemApi';
@@ -29,6 +29,16 @@ export function StockEntryForm() {
     date: new Date().toISOString().split('T')[0],
     note: '',
   });
+
+  // ✅ CORRECTO - Crear collection dinámicamente a partir de items
+  const itemsCollection = useMemo(() => {
+    return createListCollection({
+      items: items.map(item => ({
+        label: `${item.name} (${item.unit}) - Stock actual: ${item.stock}`,
+        value: item.id,
+      })),
+    });
+  }, [items]);
 
   useEffect(() => {
     loadItems();
@@ -76,8 +86,9 @@ export function StockEntryForm() {
     }
   };
 
-  const handleSelectChange = (value: string[]) => {
-    setForm(prev => ({ ...prev, item_id: value[0] || '' }));
+  // ✅ CORRECTO - Handler para Select con collection
+  const handleSelectChange = (details: { value: string[] }) => {
+    setForm(prev => ({ ...prev, item_id: details.value[0] || '' }));
     
     // Limpiar error del campo
     if (errors.item_id) {
@@ -127,11 +138,12 @@ export function StockEntryForm() {
       </Heading>
       
       <VStack gap="4">
-        {/* Seleccionar Insumo */}
+        {/* Seleccionar Insumo CON COLLECTION */}
         <Box width="100%">
           <Select.Root 
+            collection={itemsCollection}
             value={form.item_id ? [form.item_id] : []}
-            onValueChange={(details) => handleSelectChange(details.value)}
+            onValueChange={handleSelectChange}
           >
             <Select.HiddenSelect />
             <Select.Control>
@@ -144,11 +156,9 @@ export function StockEntryForm() {
             </Select.Control>
             <Select.Positioner>
               <Select.Content>
-                {items.map((item) => (
-                  <Select.Item key={item.id} item={item.id}>
-                    <Select.ItemText>
-                      {item.name} ({item.unit}) - Stock actual: {item.stock}
-                    </Select.ItemText>
+                {itemsCollection.items.map((item) => (
+                  <Select.Item key={item.value} item={item}>
+                    <Select.ItemText>{item.label}</Select.ItemText>
                   </Select.Item>
                 ))}
               </Select.Content>

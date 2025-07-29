@@ -1,4 +1,4 @@
-// src/features/recipes/ui/RecipeForm.tsx - VERSIÓN FINAL CORREGIDA
+// src/features/recipes/ui/RecipeForm.tsx - VERSIÓN CORREGIDA CON COLLECTION
 import {
   Box, 
   Button, 
@@ -10,9 +10,10 @@ import {
   Grid,
   Text,
   Badge,
-  Select
+  Select,
+  createListCollection
 } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRecipes } from '../logic/useRecipes'; 
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { fetchItems } from '../../items/data/itemApi';
@@ -49,6 +50,27 @@ export function RecipeForm() {
   const [ingredients, setIngredients] = useState<RecipeIngredientForm[]>([
     { item_id: '', quantity: '' }
   ]);
+
+  // ✅ CORRECTO - Collections dinámicas basadas en tipos de items
+  const elaboratedItemsCollection = useMemo(() => {
+    const elaboratedItems = items.filter(item => item.type === 'ELABORATED');
+    return createListCollection({
+      items: elaboratedItems.map(item => ({
+        label: `${item.name} (${item.unit})`,
+        value: item.id,
+      })),
+    });
+  }, [items]);
+
+  const ingredientItemsCollection = useMemo(() => {
+    const ingredientItems = items.filter(item => item.type !== 'ELABORATED');
+    return createListCollection({
+      items: ingredientItems.map(item => ({
+        label: `${item.name} (${item.unit}) - Stock: ${item.stock}`,
+        value: item.id,
+      })),
+    });
+  }, [items]);
 
   useEffect(() => {
     loadItems();
@@ -99,17 +121,19 @@ export function RecipeForm() {
     }
   };
 
-  const handleOutputSelectChange = (value: string[]) => {
-    setForm(prev => ({ ...prev, output_item_id: value[0] || '' }));
+  // ✅ CORRECTO - Handler para Select de producto de salida
+  const handleOutputSelectChange = (details: { value: string[] }) => {
+    setForm(prev => ({ ...prev, output_item_id: details.value[0] || '' }));
     
     if (errors.output_item_id) {
       setErrors(prev => ({ ...prev, output_item_id: undefined }));
     }
   };
 
-  const handleIngredientSelectChange = (index: number, value: string[]) => {
+  // ✅ CORRECTO - Handler para Select de ingredientes
+  const handleIngredientSelectChange = (index: number, details: { value: string[] }) => {
     const newIngredients = [...ingredients];
-    newIngredients[index] = { ...newIngredients[index], item_id: value[0] || '' };
+    newIngredients[index] = { ...newIngredients[index], item_id: details.value[0] || '' };
     setIngredients(newIngredients);
     
     if (errors.ingredients) {
@@ -183,8 +207,6 @@ export function RecipeForm() {
   };
 
   const selectedOutputItem = items.find(item => item.id === form.output_item_id);
-  const elaboratedItems = items.filter(item => item.type === 'ELABORATED');
-  const ingredientItems = items.filter(item => item.type !== 'ELABORATED');
 
   return (
     <Box borderWidth="1px" rounded="md" p={6} mb={6} bg="white">
@@ -218,8 +240,9 @@ export function RecipeForm() {
             <Box>
               <Text fontSize="sm" color="gray.600" mb={1}>Producto que genera</Text>
               <Select.Root 
+                collection={elaboratedItemsCollection}
                 value={form.output_item_id ? [form.output_item_id] : []}
-                onValueChange={(details) => handleOutputSelectChange(details.value)}
+                onValueChange={handleOutputSelectChange}
               >
                 <Select.HiddenSelect />
                 <Select.Control>
@@ -232,9 +255,9 @@ export function RecipeForm() {
                 </Select.Control>
                 <Select.Positioner>
                   <Select.Content>
-                    {elaboratedItems.map((item) => (
-                      <Select.Item key={item.id} item={item.id}>
-                        <Select.ItemText>{item.name} ({item.unit})</Select.ItemText>
+                    {elaboratedItemsCollection.items.map((item) => (
+                      <Select.Item key={item.value} item={item}>
+                        <Select.ItemText>{item.label}</Select.ItemText>
                       </Select.Item>
                     ))}
                   </Select.Content>
@@ -273,7 +296,7 @@ export function RecipeForm() {
         {/* Separador visual */}
         <Box height="1px" bg="gray.200" />
 
-        {/* Ingredientes */}
+        {/* Ingredientes CON COLLECTION */}
         <Box>
           <HStack justify="space-between" mb={3}>
             <Text fontSize="sm" fontWeight="medium" color="gray.700">
@@ -298,8 +321,9 @@ export function RecipeForm() {
                 <HStack key={index} gap="3" width="100%">
                   <Box flex={2}>
                     <Select.Root 
+                      collection={ingredientItemsCollection}
                       value={ingredient.item_id ? [ingredient.item_id] : []}
-                      onValueChange={(details) => handleIngredientSelectChange(index, details.value)}
+                      onValueChange={(details) => handleIngredientSelectChange(index, details)}
                     >
                       <Select.HiddenSelect />
                       <Select.Control>
@@ -312,11 +336,9 @@ export function RecipeForm() {
                       </Select.Control>
                       <Select.Positioner>
                         <Select.Content>
-                          {ingredientItems.map((item) => (
-                            <Select.Item key={item.id} item={item.id}>
-                              <Select.ItemText>
-                                {item.name} ({item.unit}) - Stock: {item.stock}
-                              </Select.ItemText>
+                          {ingredientItemsCollection.items.map((item) => (
+                            <Select.Item key={item.value} item={item}>
+                              <Select.ItemText>{item.label}</Select.ItemText>
                             </Select.Item>
                           ))}
                         </Select.Content>

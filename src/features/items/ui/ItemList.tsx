@@ -9,7 +9,7 @@ export function ItemList() {
   return (
     <Box>
       <Heading size="md" mb={3}>Insumos</Heading>
-      <Table.Root size="md" variant="simple" showColumnBorder>
+      <Table.Root size="md" variant="line" showColumnBorder>
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader>Nombre</Table.ColumnHeader>

@@ -1,6 +1,6 @@
-// src/features/items/ui/ItemForm.tsx - VERSIÓN FINAL CORREGIDA
+// src/features/items/ui/ItemForm.tsx - VERSIÓN CORREGIDA CON COLLECTION
 import {
-  Box, Button, Input, VStack, Text, Select
+  Box, Button, Input, VStack, Text, Select, createListCollection
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useItems } from '../logic/useItems';
@@ -21,12 +21,15 @@ interface FormErrors {
   unit_cost?: string;
 }
 
-const ITEM_TYPES: { value: ItemType; label: string }[] = [
-  { value: 'UNIT', label: 'Unidades' },
-  { value: 'WEIGHT', label: 'Peso' },
-  { value: 'VOLUME', label: 'Volumen' },
-  { value: 'ELABORATED', label: 'Elaborado' },
-];
+// ✅ CORRECTO - Crear collection para el Select
+const ITEM_TYPES_COLLECTION = createListCollection({
+  items: [
+    { label: 'Unidades', value: 'UNIT' },
+    { label: 'Peso', value: 'WEIGHT' },
+    { label: 'Volumen', value: 'VOLUME' },
+    { label: 'Elaborado', value: 'ELABORATED' },
+  ],
+});
 
 export function ItemForm() {
   const { addItem } = useItems();
@@ -74,8 +77,9 @@ export function ItemForm() {
     }
   };
 
-  const handleSelectChange = (value: string[]) => {
-    setForm(prev => ({ ...prev, type: value[0] as ItemType }));
+  // ✅ CORRECTO - Handler para Select con collection
+  const handleSelectChange = (details: { value: string[] }) => {
+    setForm(prev => ({ ...prev, type: details.value[0] as ItemType }));
     
     // Limpiar error del campo
     if (errors.type) {
@@ -133,11 +137,12 @@ export function ItemForm() {
           )}
         </Box>
 
-        {/* Campo Tipo - Select Chakra v3 */}
+        {/* Campo Tipo - Select Chakra v3 CON COLLECTION */}
         <Box width="100%">
           <Select.Root 
+            collection={ITEM_TYPES_COLLECTION}
             value={form.type ? [form.type] : []}
-            onValueChange={(details) => handleSelectChange(details.value)}
+            onValueChange={handleSelectChange}
           >
             <Select.HiddenSelect />
             <Select.Control>
@@ -150,9 +155,9 @@ export function ItemForm() {
             </Select.Control>
             <Select.Positioner>
               <Select.Content>
-                {ITEM_TYPES.map((type) => (
-                  <Select.Item key={type.value} item={type.value}>
-                    <Select.ItemText>{type.label}</Select.ItemText>
+                {ITEM_TYPES_COLLECTION.items.map((item) => (
+                  <Select.Item key={item.value} item={item}>
+                    <Select.ItemText>{item.label}</Select.ItemText>
                   </Select.Item>
                 ))}
               </Select.Content>
