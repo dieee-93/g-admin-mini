@@ -1,4 +1,4 @@
-// src/components/dashboard/DashboardView.tsx
+// src/components/dashboard/DashboardView.tsx - VERSIÓN ACTUALIZADA CON SALES
 import { 
   Box, 
   Heading, 
@@ -48,7 +48,7 @@ export function DashboardView({ stats, onNavigate }: DashboardViewProps) {
               <strong>{stats.lowStockItems}</strong> productos tienen stock bajo.{' '}
               <Button 
                 size="sm" 
-                variant="link" 
+                variant="solid" 
                 colorScheme="orange"
                 onClick={() => onNavigate('items')}
               >
@@ -104,6 +104,13 @@ export function DashboardView({ stats, onNavigate }: DashboardViewProps) {
             ⚡ Acciones Rápidas
           </Heading>
           <HStack gap="4" flexWrap="wrap">
+            <Button 
+              colorScheme="teal" 
+              size="sm"
+              onClick={() => onNavigate('sales')}
+            >
+              💰 Nueva Venta
+            </Button>
             <Button 
               colorScheme="green" 
               size="sm"
@@ -171,21 +178,20 @@ export function DashboardView({ stats, onNavigate }: DashboardViewProps) {
             />
 
             <ModuleCard
+              title="Ventas"
+              description="Registra ventas, valida stock automáticamente y gestiona clientes."
+              icon="💰"
+              color="teal"
+              onNavigate={() => onNavigate('sales')}
+            />
+
+            <ModuleCard
               title="Productos Finales"
               description="Define productos para venta y controla disponibilidad según stock."
               icon="🎯"
               color="orange"
               disabled={true}
               onNavigate={() => onNavigate('products')}
-            />
-
-            <ModuleCard
-              title="Ventas"
-              description="Registra ventas, genera comprobantes y analiza rendimiento."
-              icon="💰"
-              color="teal"
-              disabled={true}
-              onNavigate={() => onNavigate('sales')}
             />
 
             <ModuleCard

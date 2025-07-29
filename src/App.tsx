@@ -1,4 +1,4 @@
-// src/App.tsx - Versión refactorizada
+// src/App.tsx - Versión refactorizada CON SALES
 import { Box, Heading, Flex, Button } from "@chakra-ui/react";
 import { Toaster } from "./components/ui/toaster";
 import { useState, lazy, Suspense } from "react";
@@ -12,6 +12,7 @@ import { type AppRoute } from "./types/app";
 const ItemsPage = lazy(() => import("./features/items"));
 const StockEntriesPage = lazy(() => import("./features/stock_entries"));
 const RecipesPage = lazy(() => import("./features/recipes"));
+const SalesPage = lazy(() => import("./features/sales")); // ✅ NUEVO
 const UnderDevelopmentPage = lazy(() => import("./components/common/UnderDevelopment"));
 
 const MODULE_CONFIG = {
@@ -19,7 +20,7 @@ const MODULE_CONFIG = {
   stock: { title: "Entradas de Stock", color: "green" },
   recipes: { title: "Recetas", color: "purple" },
   products: { title: "Productos", color: "orange" },
-  sales: { title: "Ventas", color: "teal" },
+  sales: { title: "Ventas", color: "teal" }, // ✅ NUEVO
   customers: { title: "Clientes", color: "pink" },
 } as const;
 
@@ -60,7 +61,8 @@ function App() {
           {currentView === 'items' && <ItemsPage />}
           {currentView === 'stock' && <StockEntriesPage />}
           {currentView === 'recipes' && <RecipesPage />}
-          {!['items', 'stock'].includes(currentView) && (
+          {currentView === 'sales' && <SalesPage />}
+          {!['items', 'stock', 'recipes', 'sales'].includes(currentView) && (
             <UnderDevelopmentPage onBack={backToDashboard} />
           )}
           
