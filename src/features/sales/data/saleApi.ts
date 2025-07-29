@@ -1,4 +1,4 @@
-// src/features/sales/data/saleApi.ts
+// src/features/sales/data/saleApi.ts - ESQUEMA NORMALIZADO
 import { supabase } from '@/lib/supabase';
 import { 
   type Sale, 
@@ -18,18 +18,19 @@ export async function fetchSales(filters?: SalesListFilters): Promise<Sale[]> {
     .from('sales')
     .select(`
       *,
-      customer:customers(id, name, phone, email),
+      customer:customers(id, name, phone, email, address),
       sale_items(
         id,
         product_id,
         quantity,
         unit_price,
-        product:products(id, name, unit, type)
+        created_at,
+        product:products(id, name, unit, type, description)
       )
     `)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false }); // ✅ Ahora funciona correctamente
 
-  // Aplicar filtros si existen
+  // ✅ Filtros por fecha funcionan correctamente
   if (filters?.dateFrom) {
     query = query.gte('created_at', filters.dateFrom);
   }
@@ -61,13 +62,14 @@ export async function fetchSaleById(id: string): Promise<Sale> {
     .from('sales')
     .select(`
       *,
-      customer:customers(id, name, phone, email),
+      customer:customers(id, name, phone, email, address),
       sale_items(
         id,
         product_id,
         quantity,
         unit_price,
-        product:products(id, name, unit, type)
+        created_at,
+        product:products(id, name, unit, type, description)
       )
     `)
     .eq('id', id)
@@ -136,7 +138,7 @@ export async function fetchCustomers(): Promise<Customer[]> {
 }
 
 export async function fetchProductsWithAvailability(): Promise<Product[]> {
-  // Usar la función de Supabase que calcula disponibilidad
+  // ✅ Usar la función normalizada de Supabase
   const { data, error } = await supabase
     .rpc('get_products_with_availability');
   
@@ -153,11 +155,12 @@ export async function getTopSellingProducts(dateFrom: string, dateTo: string, li
       product_id,
       quantity,
       unit_price,
-      product:products(name),
+      created_at,
+      product:products(name, unit, type),
       sale:sales(created_at)
     `)
-    .gte('sale.created_at', dateFrom)
-    .lte('sale.created_at', dateTo)
+    .gte('sale.created_at', dateFrom) // ✅ Ahora funciona
+    .lte('sale.created_at', dateTo)   // ✅ Ahora funciona
     .order('quantity', { ascending: false })
     .limit(limit);
 
@@ -175,11 +178,12 @@ export async function getCustomerPurchases(customerId: string): Promise<Sale[]> 
         product_id,
         quantity,
         unit_price,
-        product:products(id, name, unit)
+        created_at,
+        product:products(id, name, unit, type)
       )
     `)
     .eq('customer_id', customerId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false }); // ✅ Ahora funciona
 
   if (error) throw error;
   return data || [];

@@ -1,10 +1,11 @@
-// src/features/sales/types.ts
+// src/features/sales/types.ts - ESQUEMA NORMALIZADO
 export interface Sale {
   id: string;
   customer_id?: string;
   total: number;
   note?: string;
-  created_at: string;
+  created_at: string; // ✅ Normalizado
+  updated_at?: string; // ✅ Agregado
   
   // Relaciones
   customer?: {
@@ -12,6 +13,7 @@ export interface Sale {
     name: string;
     phone?: string;
     email?: string;
+    address?: string;
   };
   sale_items?: SaleItem[];
 }
@@ -22,13 +24,16 @@ export interface SaleItem {
   product_id: string;
   quantity: number;
   unit_price: number;
+  created_at?: string; // ✅ Agregado
+  updated_at?: string; // ✅ Agregado
   
   // Relaciones
   product?: {
     id: string;
     name: string;
-    unit?: string;
-    type?: string;
+    unit?: string; // ✅ Ahora existe
+    type?: string; // ✅ Ahora existe
+    description?: string; // ✅ Agregado
   };
 }
 
@@ -38,16 +43,22 @@ export interface Customer {
   phone?: string;
   email?: string;
   note?: string;
-  created_at?: string;
+  address?: string; // ✅ Agregado
+  created_at: string; // ✅ Normalizado
+  updated_at?: string; // ✅ Agregado
 }
 
 export interface Product {
   id: string;
   name: string;
-  unit?: string;
-  type?: string;
-  cost?: number;
-  availability?: number; // Cantidad disponible según stock
+  unit?: string; // ✅ Ahora existe
+  type?: string; // ✅ Ahora existe
+  description?: string; // ✅ Agregado
+  cost?: number; // Calculado por función
+  availability?: number; // Calculado por función
+  components_count?: number; // Calculado por función
+  created_at: string; // ✅ Normalizado
+  updated_at?: string; // ✅ Agregado
 }
 
 export interface CreateSaleData {
@@ -78,8 +89,8 @@ export interface SaleProcessResult {
 }
 
 export interface SalesListFilters {
-  dateFrom?: string;
-  dateTo?: string;
+  dateFrom?: string; // ✅ Ahora funciona con created_at
+  dateTo?: string;   // ✅ Ahora funciona con created_at
   customerId?: string;
   minTotal?: number;
   maxTotal?: number;

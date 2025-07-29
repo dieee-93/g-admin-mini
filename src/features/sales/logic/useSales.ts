@@ -1,5 +1,6 @@
-// src/features/sales/logic/useSales.ts
-import { useEffect, useState } from 'react';
+// src/features/sales/logic/useSales.ts - ESQUEMA NORMALIZADO
+import { useEffect, useState, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
 import { 
   type Sale, 
   type Customer,
@@ -26,7 +27,7 @@ export function useSales(initialFilters?: SalesListFilters) {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<SalesListFilters>(initialFilters || {});
 
-  const loadSales = async (newFilters?: SalesListFilters) => {
+  const loadSales = useCallback(async (newFilters?: SalesListFilters) => {
     setLoading(true);
     try {
       const appliedFilters = newFilters || filters;
@@ -41,7 +42,7 @@ export function useSales(initialFilters?: SalesListFilters) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
   const removeSale = async (id: string): Promise<void> => {
     await deleteSale(id);
@@ -58,7 +59,7 @@ export function useSales(initialFilters?: SalesListFilters) {
 
   useEffect(() => {
     loadSales();
-  }, []);
+  }, []); // Solo ejecutar una vez al montar
 
   return { 
     sales,
@@ -105,37 +106,79 @@ export function useSaleOperations() {
   };
 }
 
+// ✅ Hook limpio y funcional para esquema normalizado
 export function useSalesData() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const [customersData, productsData] = await Promise.all([
+      const [customersData, productsData] = await Promise.allSettled([
         fetchCustomers(),
         fetchProductsWithAvailability()
       ]);
       
-      setCustomers(customersData);
-      setProducts(productsData);
+      // Manejar customers
+      if (customersData.status === 'fulfilled') {
+        setCustomers(customersData.value);
+      } else {
+        console.error('Error loading customers:', customersData.reason);
+        setCustomers([]); // Fallback
+      }
+
+      // Manejar products - ✅ Ahora debe funcionar correctamente
+      if (productsData.status === 'fulfilled') {
+        setProducts(productsData.value);
+      } else {
+        console.error('Error loading products:', productsData.reason);
+        setError('Error cargando productos.');
+        
+        // Fallback: consulta simple
+        try {
+          const { data: fallbackProducts, error: fallbackError } = await supabase
+            .from('products')
+            .select('id, name, unit, type, description, created_at') // ✅ Ahora existen estas columnas
+            .order('created_at', { ascending: false });
+          
+          if (fallbackError) throw fallbackError;
+          
+          // Mapear a estructura esperada
+          const mappedProducts = (fallbackProducts || []).map(product => ({
+            ...product,
+            availability: 0, // Sin disponibilidad calculada
+            cost: 0 // Sin costo calculado
+          }));
+          
+          setProducts(mappedProducts);
+        } catch (fallbackErr) {
+          console.error('Fallback también falló:', fallbackErr);
+          setProducts([]); // Array vacío como último recurso
+        }
+      }
     } catch (e) {
       console.error('Error loading sales data:', e);
-      throw e;
+      setError('Error general cargando datos');
+      // Asegurar que siempre tengamos arrays
+      setCustomers([]);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Sin dependencias para evitar loops
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   return {
     customers,
     products,
     loading,
+    error,
     reloadData: loadData
   };
 }

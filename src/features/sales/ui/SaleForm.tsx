@@ -360,7 +360,10 @@ export function SaleForm() {
                       </Select.Root>
                       {selectedProduct && (
                         <Text fontSize="xs" color="gray.500" mt={1}>
-                          Disponible: {selectedProduct.availability || 0} {selectedProduct.unit}
+                          Disponible: {selectedProduct.availability || 0} {selectedProduct.unit || ''}
+                          {selectedProduct.type && selectedProduct.type !== 'ELABORATED' && (
+                            <Text as="span" ml={2} color="blue.500">• {selectedProduct.type}</Text>
+                          )}
                         </Text>
                       )}
                     </Box>
