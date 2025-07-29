@@ -207,7 +207,7 @@ export function ItemForm() {
 
         <Button 
           onClick={handleSubmit} 
-          colorScheme="green"
+          colorPalette='green'
           loading={isSubmitting}
           loadingText="Creando..."
           width="100%"
