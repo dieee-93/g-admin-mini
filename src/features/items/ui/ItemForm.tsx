@@ -1,6 +1,6 @@
-// src/features/items/ui/ItemForm.tsx - Chakra UI v3
+// src/features/items/ui/ItemForm.tsx - VERSIÓN FINAL CORREGIDA
 import {
-  Box, Button, Input, Select, VStack, Field
+  Box, Button, Input, VStack, Text, Select
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useItems } from '../logic/useItems';
@@ -64,13 +64,22 @@ export function ItemForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const handleSelectChange = (value: string[]) => {
+    setForm(prev => ({ ...prev, type: value[0] as ItemType }));
+    
+    // Limpiar error del campo
+    if (errors.type) {
+      setErrors(prev => ({ ...prev, type: undefined }));
     }
   };
 
@@ -108,43 +117,72 @@ export function ItemForm() {
   return (
     <Box borderWidth="1px" rounded="md" p={4} mb={6}>
       <VStack gap="4">
-        <Field.Root invalid={!!errors.name}>
+        {/* Campo Nombre */}
+        <Box width="100%">
           <Input
             placeholder="Nombre del insumo"
             name="name"
             value={form.name}
             onChange={handleChange}
+            borderColor={errors.name ? 'red.300' : undefined}
           />
-          {errors.name && <Field.ErrorText>{errors.name}</Field.ErrorText>}
-        </Field.Root>
+          {errors.name && (
+            <Text color="red.500" fontSize="sm" mt={1}>
+              {errors.name}
+            </Text>
+          )}
+        </Box>
 
-        <Field.Root invalid={!!errors.type}>
-          <Select 
-            placeholder="Seleccionar tipo"
-            name="type" 
-            value={form.type} 
-            onChange={handleChange}
+        {/* Campo Tipo - Select Chakra v3 */}
+        <Box width="100%">
+          <Select.Root 
+            value={form.type ? [form.type] : []}
+            onValueChange={(details) => handleSelectChange(details.value)}
           >
-            {ITEM_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </Select>
-          {errors.type && <Field.ErrorText>{errors.type}</Field.ErrorText>}
-        </Field.Root>
+            <Select.HiddenSelect />
+            <Select.Control>
+              <Select.Trigger borderColor={errors.type ? 'red.300' : undefined}>
+                <Select.ValueText placeholder="Seleccionar tipo" />
+              </Select.Trigger>
+              <Select.IndicatorGroup>
+                <Select.Indicator />
+              </Select.IndicatorGroup>
+            </Select.Control>
+            <Select.Positioner>
+              <Select.Content>
+                {ITEM_TYPES.map((type) => (
+                  <Select.Item key={type.value} item={type.value}>
+                    <Select.ItemText>{type.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Positioner>
+          </Select.Root>
+          {errors.type && (
+            <Text color="red.500" fontSize="sm" mt={1}>
+              {errors.type}
+            </Text>
+          )}
+        </Box>
 
-        <Field.Root invalid={!!errors.unit}>
+        {/* Campo Unidad */}
+        <Box width="100%">
           <Input
             placeholder="Unidad (g, ml, u, kg, etc.)"
             name="unit"
             value={form.unit}
             onChange={handleChange}
+            borderColor={errors.unit ? 'red.300' : undefined}
           />
-          {errors.unit && <Field.ErrorText>{errors.unit}</Field.ErrorText>}
-        </Field.Root>
+          {errors.unit && (
+            <Text color="red.500" fontSize="sm" mt={1}>
+              {errors.unit}
+            </Text>
+          )}
+        </Box>
 
-        <Field.Root invalid={!!errors.unit_cost}>
+        {/* Campo Costo */}
+        <Box width="100%">
           <Input
             placeholder="Costo por unidad (opcional)"
             name="unit_cost"
@@ -153,15 +191,21 @@ export function ItemForm() {
             min="0"
             value={form.unit_cost}
             onChange={handleChange}
+            borderColor={errors.unit_cost ? 'red.300' : undefined}
           />
-          {errors.unit_cost && <Field.ErrorText>{errors.unit_cost}</Field.ErrorText>}
-        </Field.Root>
+          {errors.unit_cost && (
+            <Text color="red.500" fontSize="sm" mt={1}>
+              {errors.unit_cost}
+            </Text>
+          )}
+        </Box>
 
         <Button 
           onClick={handleSubmit} 
           colorScheme="green"
           loading={isSubmitting}
           loadingText="Creando..."
+          width="100%"
         >
           Agregar Insumo
         </Button>

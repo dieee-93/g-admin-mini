@@ -1,16 +1,16 @@
-// src/features/recipes/ui/RecipeForm.tsx - Chakra UI v3
+// src/features/recipes/ui/RecipeForm.tsx - VERSIÓN FINAL CORREGIDA
 import {
   Box, 
   Button, 
   Input, 
-  Select, 
   VStack, 
   HStack,
   Textarea, 
   Heading,
   Grid,
   Text,
-  Badge
+  Badge,
+  Select
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useRecipes } from '../logic/useRecipes'; 
@@ -90,7 +90,7 @@ export function RecipeForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     
@@ -99,13 +99,27 @@ export function RecipeForm() {
     }
   };
 
-  const handleIngredientChange = (
-    index: number, 
-    field: keyof RecipeIngredientForm, 
-    value: string
-  ) => {
+  const handleOutputSelectChange = (value: string[]) => {
+    setForm(prev => ({ ...prev, output_item_id: value[0] || '' }));
+    
+    if (errors.output_item_id) {
+      setErrors(prev => ({ ...prev, output_item_id: undefined }));
+    }
+  };
+
+  const handleIngredientSelectChange = (index: number, value: string[]) => {
     const newIngredients = [...ingredients];
-    newIngredients[index] = { ...newIngredients[index], [field]: value };
+    newIngredients[index] = { ...newIngredients[index], item_id: value[0] || '' };
+    setIngredients(newIngredients);
+    
+    if (errors.ingredients) {
+      setErrors(prev => ({ ...prev, ingredients: undefined }));
+    }
+  };
+
+  const handleIngredientQuantityChange = (index: number, value: string) => {
+    const newIngredients = [...ingredients];
+    newIngredients[index] = { ...newIngredients[index], quantity: value };
     setIngredients(newIngredients);
     
     if (errors.ingredients) {
@@ -169,6 +183,8 @@ export function RecipeForm() {
   };
 
   const selectedOutputItem = items.find(item => item.id === form.output_item_id);
+  const elaboratedItems = items.filter(item => item.type === 'ELABORATED');
+  const ingredientItems = items.filter(item => item.type !== 'ELABORATED');
 
   return (
     <Box borderWidth="1px" rounded="md" p={6} mb={6} bg="white">
@@ -201,19 +217,29 @@ export function RecipeForm() {
 
             <Box>
               <Text fontSize="sm" color="gray.600" mb={1}>Producto que genera</Text>
-              <Select 
-                placeholder="Seleccionar producto"
-                name="output_item_id" 
-                value={form.output_item_id} 
-                onChange={handleChange}
-                borderColor={errors.output_item_id ? 'red.300' : undefined}
+              <Select.Root 
+                value={form.output_item_id ? [form.output_item_id] : []}
+                onValueChange={(details) => handleOutputSelectChange(details.value)}
               >
-                {items.filter(item => item.type === 'ELABORATED').map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name} ({item.unit})
-                  </option>
-                ))}
-              </Select>
+                <Select.HiddenSelect />
+                <Select.Control>
+                  <Select.Trigger borderColor={errors.output_item_id ? 'red.300' : undefined}>
+                    <Select.ValueText placeholder="Seleccionar producto" />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Select.Positioner>
+                  <Select.Content>
+                    {elaboratedItems.map((item) => (
+                      <Select.Item key={item.id} item={item.id}>
+                        <Select.ItemText>{item.name} ({item.unit})</Select.ItemText>
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Select.Root>
               {errors.output_item_id && (
                 <Text color="red.500" fontSize="sm" mt={1}>
                   {errors.output_item_id}
@@ -270,18 +296,33 @@ export function RecipeForm() {
               
               return (
                 <HStack key={index} gap="3" width="100%">
-                  <Select 
-                    placeholder="Seleccionar ingrediente"
-                    value={ingredient.item_id}
-                    onChange={(e) => handleIngredientChange(index, 'item_id', e.target.value)}
-                    flex={2}
-                  >
-                    {items.filter(item => item.type !== 'ELABORATED').map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name} ({item.unit}) - Stock: {item.stock}
-                      </option>
-                    ))}
-                  </Select>
+                  <Box flex={2}>
+                    <Select.Root 
+                      value={ingredient.item_id ? [ingredient.item_id] : []}
+                      onValueChange={(details) => handleIngredientSelectChange(index, details.value)}
+                    >
+                      <Select.HiddenSelect />
+                      <Select.Control>
+                        <Select.Trigger>
+                          <Select.ValueText placeholder="Seleccionar ingrediente" />
+                        </Select.Trigger>
+                        <Select.IndicatorGroup>
+                          <Select.Indicator />
+                        </Select.IndicatorGroup>
+                      </Select.Control>
+                      <Select.Positioner>
+                        <Select.Content>
+                          {ingredientItems.map((item) => (
+                            <Select.Item key={item.id} item={item.id}>
+                              <Select.ItemText>
+                                {item.name} ({item.unit}) - Stock: {item.stock}
+                              </Select.ItemText>
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Positioner>
+                    </Select.Root>
+                  </Box>
                   
                   <Input
                     placeholder={`Cantidad${selectedItem ? ` (${selectedItem.unit})` : ''}`}
@@ -289,7 +330,7 @@ export function RecipeForm() {
                     step="0.01"
                     min="0"
                     value={ingredient.quantity}
-                    onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
+                    onChange={(e) => handleIngredientQuantityChange(index, e.target.value)}
                     flex={1}
                   />
                   
