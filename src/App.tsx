@@ -4,14 +4,14 @@ import { Toaster } from "./components/ui/toaster";
 import { useState, lazy, Suspense } from "react";
 import { useDashboardStats } from "./hooks/useDashboardStats";
 import { LoadingSpinner } from "./components/common/LoadingSpinner";
-import { DashboardView } from "./components/dashboard/DashboardView";
+import { DashboardPage } from "./components/dashboard/DashboardPage";
 import { ModuleHeader } from "./components/layout/ModuleHeader";
 import { useBreadcrumb, BreadcrumbContext } from "./hooks/useBreadcrumb"; // ✅ NUEVO
 import { type AppRoute } from "./types/app";
 
 // Lazy loading de módulos
 const ItemsPage = lazy(() => import("./features/items"));
-const StockEntriesPage = lazy(() => import("./features/stock_entries"));
+const StockEntriesPage = lazy(() => import("./features/stock"));
 const RecipesPage = lazy(() => import("./features/recipes"));
 const SalesPage = lazy(() => import("./features/sales"));
 const CustomersPage = lazy(() => import("./features/customers"));
@@ -53,7 +53,7 @@ function App() {
     
     if (currentView === 'dashboard') {
       return (
-        <DashboardView 
+        <DashboardPage 
           stats={stats} 
           onNavigate={handleNavigation}
         />
