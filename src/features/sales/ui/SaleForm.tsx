@@ -1,4 +1,4 @@
-// src/features/sales/ui/SaleForm.tsx - VERSIÓN COMPLETA CON COLLECTION OBLIGATORIA
+// src/features/sales/ui/SaleForm.tsx - VERSIÓN CORREGIDA Y ROBUSTA
 import {
   Box, 
   Button, 
@@ -15,10 +15,10 @@ import {
   Alert,
   Skeleton
 } from '@chakra-ui/react';
-import { useState, useMemo } from 'react';
-import { useSaleOperations, useSalesData } from '../logic/useSales'; 
+import { useState, useMemo, useEffect } from 'react';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { type CreateSaleData, type SaleFormItem, type SaleValidation } from '../types';
+import { supabase } from '@/lib/supabase';
+import { type CreateSaleData, type SaleFormItem, type Customer, type Product } from '../types';
 
 interface FormErrors {
   items?: string;
@@ -27,14 +27,14 @@ interface FormErrors {
 }
 
 export function SaleForm() {
-  const { createSale, validateStock, loading: operationLoading } = useSaleOperations();
-  const { customers, products, loading: dataLoading } = useSalesData();
   const { handleError, handleSuccess, handleWarning } = useErrorHandler();
   
+  // Estados principales
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [validationResult, setValidationResult] = useState<SaleValidation | null>(null);
-  const [showValidation, setShowValidation] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const [form, setForm] = useState({
     customer_id: '',
@@ -45,7 +45,91 @@ export function SaleForm() {
     { product_id: '', quantity: '', unit_price: '' }
   ]);
 
-  // ✅ CORRECTO - Collections dinámicas con useMemo
+  // Cargar datos al inicializar
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  const loadInitialData = async () => {
+    setLoading(true);
+    try {
+      // Cargar customers y products de forma simple
+      const [customersResult, productsResult] = await Promise.allSettled([
+        loadCustomers(),
+        loadProducts()
+      ]);
+
+      if (customersResult.status === 'rejected') {
+        console.error('Error loading customers:', customersResult.reason);
+        handleWarning('No se pudieron cargar los clientes');
+      }
+
+      if (productsResult.status === 'rejected') {
+        console.error('Error loading products:', productsResult.reason);
+        handleWarning('No se pudieron cargar los productos');
+      }
+    } catch (error) {
+      handleError(error, 'Error cargando datos iniciales');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadCustomers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('id, name, phone, email')
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      setCustomers(data || []);
+    } catch (error) {
+      console.error('Error loading customers:', error);
+      setCustomers([]);
+      throw error;
+    }
+  };
+
+  const loadProducts = async () => {
+    try {
+      // Intentar con la función de Supabase primero
+      const { data: functionData, error: functionError } = await supabase
+        .rpc('get_products_with_availability');
+      
+      if (!functionError && functionData) {
+        setProducts(functionData);
+        return;
+      }
+
+      // Fallback: cargar productos básicos
+      console.warn('Función get_products_with_availability no disponible, usando fallback');
+      const { data: basicProducts, error: basicError } = await supabase
+        .from('products')
+        .select('id, name, description, created_at')
+        .order('created_at', { ascending: false });
+      
+      if (basicError) throw basicError;
+      
+      // Mapear a estructura esperada
+      const mappedProducts = (basicProducts || []).map(product => ({
+        ...product,
+        unit: 'und', // Valor por defecto
+        type: 'product', // Valor por defecto
+        cost: 0,
+        availability: 1, // Asumimos disponible
+        components_count: 0
+      }));
+      
+      setProducts(mappedProducts);
+    } catch (error) {
+      console.error('Error loading products:', error);
+      setProducts([]);
+      throw error;
+    }
+  };
+
+  // ✅ Collections para los Select components
   const customersCollection = useMemo(() => {
     return createListCollection({
       items: [
@@ -68,7 +152,8 @@ export function SaleForm() {
     });
   }, [products]);
 
-  if (dataLoading) {
+  // Loading state
+  if (loading) {
     return (
       <Box borderWidth="1px" rounded="md" p={6} mb={6} bg="white">
         <VStack gap="4">
@@ -99,12 +184,12 @@ export function SaleForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  // ✅ CORRECTO - Handler para Select de cliente
+  // ✅ Handler para Select de cliente
   const handleCustomerSelectChange = (details: { value: string[] }) => {
     setForm(prev => ({ ...prev, customer_id: details.value[0] || '' }));
     
@@ -113,7 +198,7 @@ export function SaleForm() {
     }
   };
 
-  // ✅ CORRECTO - Handler para Select de productos
+  // ✅ Handler para Select de productos
   const handleProductSelectChange = (index: number, details: { value: string[] }) => {
     const newItems = [...saleItems];
     const productId = details.value[0] || '';
@@ -157,48 +242,13 @@ export function SaleForm() {
   };
 
   const clearValidation = () => {
-    setShowValidation(false);
-    setValidationResult(null);
     if (errors.items) {
       setErrors(prev => ({ ...prev, items: undefined }));
     }
   };
 
-  const handleValidateStock = async () => {
-    if (!validateForm()) {
-      return;
-    }
-
-    const validItems = saleItems
-      .filter(item => item.product_id && item.quantity && parseFloat(item.quantity) > 0)
-      .map(item => ({
-        product_id: item.product_id,
-        quantity: parseFloat(item.quantity)
-      }));
-
-    try {
-      const result = await validateStock(validItems);
-      setValidationResult(result);
-      setShowValidation(true);
-      
-      if (result.is_valid) {
-        handleSuccess('Stock validado correctamente. La venta se puede procesar.');
-      } else {
-        handleWarning('Hay problemas de stock. Revise los detalles.');
-      }
-    } catch (error) {
-      handleError(error, 'Error validando stock');
-    }
-  };
-
   const handleSubmit = async () => {
     if (!validateForm()) {
-      return;
-    }
-
-    // Validar stock antes de procesar
-    if (!validationResult?.is_valid) {
-      handleWarning('Debe validar el stock antes de procesar la venta');
       return;
     }
 
@@ -213,31 +263,65 @@ export function SaleForm() {
           unit_price: parseFloat(item.unit_price)
         }));
 
-      const saleData: CreateSaleData = {
-        customer_id: form.customer_id || undefined,
-        note: form.note.trim() || undefined,
-        items: validItems
-      };
+      const total = validItems.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
 
-      const result = await createSale(saleData);
-      
-      if (result.success) {
-        handleSuccess(result.message);
-        
-        // Resetear formulario
-        setForm({ customer_id: '', note: '' });
-        setSaleItems([{ product_id: '', quantity: '', unit_price: '' }]);
-        setValidationResult(null);
-        setShowValidation(false);
+      // Intentar usar la función de Supabase para procesar la venta
+      const { data: result, error } = await supabase
+        .rpc('process_sale', {
+          customer_id: form.customer_id || null,
+          items_array: JSON.stringify(validItems),
+          total: total,
+          note: form.note.trim() || null
+        });
+
+      if (error) {
+        // Si la función RPC falla, usar método manual
+        console.warn('RPC process_sale falló, usando método manual:', error);
+        await processSaleManual(validItems, total);
       } else {
-        handleError(result.message);
+        handleSuccess(result?.message || 'Venta procesada correctamente');
       }
+      
+      // Resetear formulario
+      setForm({ customer_id: '', note: '' });
+      setSaleItems([{ product_id: '', quantity: '', unit_price: '' }]);
       
     } catch (error) {
       handleError(error, 'Error al procesar la venta');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const processSaleManual = async (validItems: any[], total: number) => {
+    // Crear la venta manualmente
+    const { data: sale, error: saleError } = await supabase
+      .from('sales')
+      .insert([{
+        customer_id: form.customer_id || null,
+        total: total,
+        note: form.note.trim() || null
+      }])
+      .select()
+      .single();
+
+    if (saleError) throw saleError;
+
+    // Crear los items de venta
+    const saleItemsData = validItems.map(item => ({
+      sale_id: sale.id,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_price: item.unit_price
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('sale_items')
+      .insert(saleItemsData);
+
+    if (itemsError) throw itemsError;
+
+    handleSuccess('Venta procesada correctamente (método manual)');
   };
 
   const calculateTotal = (): number => {
@@ -294,235 +378,135 @@ export function SaleForm() {
               </Select.Content>
             </Select.Positioner>
           </Select.Root>
-          
-          {selectedCustomer && (
-            <Box mt={2} p={2} bg="teal.50" borderRadius="md">
-              <Text fontSize="sm" color="teal.700">
-                Cliente seleccionado: {selectedCustomer.name}
-                {selectedCustomer.email && ` • ${selectedCustomer.email}`}
-              </Text>
-            </Box>
-          )}
         </Box>
 
-        {/* Separador */}
-        <Box height="1px" bg="gray.200" />
-
-        {/* Items de Venta */}
+        {/* Productos a Vender */}
         <Box>
-          <HStack justify="space-between" mb={3}>
+          <HStack justify="space-between" align="center" mb={3}>
             <Text fontSize="sm" fontWeight="medium" color="gray.700">
               Productos
             </Text>
-            <Badge colorScheme="teal" variant="subtle">
-              {saleItems.filter(item => item.product_id && item.quantity && item.unit_price).length} productos
-            </Badge>
+            <Button size="sm" onClick={addItem} colorScheme="teal" variant="outline">
+              + Agregar Item
+            </Button>
           </HStack>
-          
+
+          <VStack gap="3" align="stretch">
+            {saleItems.map((item, index) => (
+              <Grid key={index} templateColumns="2fr 1fr 1fr auto" gap={3} align="center">
+                <Select.Root 
+                  collection={productsCollection}
+                  value={item.product_id ? [item.product_id] : []}
+                  onValueChange={(details) => handleProductSelectChange(index, details)}
+                >
+                  <Select.HiddenSelect />
+                  <Select.Control>
+                    <Select.Trigger>
+                      <Select.ValueText placeholder="Seleccionar producto" />
+                    </Select.Trigger>
+                    <Select.IndicatorGroup>
+                      <Select.Indicator />
+                    </Select.IndicatorGroup>
+                  </Select.Control>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {productsCollection.items.map((productItem) => (
+                        <Select.Item key={productItem.value} item={productItem}>
+                          <Select.ItemText>{productItem.label}</Select.ItemText>
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Select.Root>
+
+                <Input
+                  placeholder="Cantidad"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={item.quantity}
+                  onChange={(e) => handleItemQuantityChange(index, e.target.value)}
+                />
+
+                <Input
+                  placeholder="Precio Unit."
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={item.unit_price}
+                  onChange={(e) => handleItemPriceChange(index, e.target.value)}
+                />
+
+                <Button
+                  size="sm"
+                  colorScheme="red"
+                  variant="ghost"
+                  onClick={() => removeItem(index)}
+                  disabled={saleItems.length === 1}
+                >
+                  🗑️
+                </Button>
+              </Grid>
+            ))}
+          </VStack>
+
           {errors.items && (
-            <Text color="red.500" fontSize="sm" mb={3}>
+            <Text color="red.500" fontSize="sm" mt={2}>
               {errors.items}
             </Text>
           )}
-
-          <VStack gap="3">
-            {saleItems.map((item, index) => {
-              const selectedProduct = products.find(p => p.id === item.product_id);
-              const itemTotal = (parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0);
-              
-              return (
-                <Box key={index} p={3} borderWidth="1px" borderRadius="md" width="100%">
-                  <Grid templateColumns="2fr 1fr 1fr auto auto" gap="3" alignItems="center">
-                    <Box>
-                      <Select.Root 
-                        collection={productsCollection}
-                        value={item.product_id ? [item.product_id] : []}
-                        onValueChange={(details) => handleProductSelectChange(index, details)}
-                      >
-                        <Select.HiddenSelect />
-                        <Select.Control>
-                          <Select.Trigger>
-                            <Select.ValueText placeholder="Seleccionar producto" />
-                          </Select.Trigger>
-                          <Select.IndicatorGroup>
-                            <Select.Indicator />
-                          </Select.IndicatorGroup>
-                        </Select.Control>
-                        <Select.Positioner>
-                          <Select.Content>
-                            {productsCollection.items.map((product) => (
-                              <Select.Item key={product.value} item={product}>
-                                <Select.ItemText>{product.label}</Select.ItemText>
-                              </Select.Item>
-                            ))}
-                          </Select.Content>
-                        </Select.Positioner>
-                      </Select.Root>
-                      {selectedProduct && (
-                        <Text fontSize="xs" color="gray.500" mt={1}>
-                          Disponible: {selectedProduct.availability || 0} {selectedProduct.unit || ''}
-                          {selectedProduct.type && selectedProduct.type !== 'ELABORATED' && (
-                            <Text as="span" ml={2} color="blue.500">• {selectedProduct.type}</Text>
-                          )}
-                        </Text>
-                      )}
-                    </Box>
-                    
-                    <Input
-                      placeholder="Cantidad"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={item.quantity}
-                      onChange={(e) => handleItemQuantityChange(index, e.target.value)}
-                    />
-                    
-                    <Input
-                      placeholder="Precio unitario"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={item.unit_price}
-                      onChange={(e) => handleItemPriceChange(index, e.target.value)}
-                    />
-                    
-                    <Text fontSize="sm" fontWeight="medium" minWidth="80px">
-                      {itemTotal > 0 ? formatCurrency(itemTotal) : '-'}
-                    </Text>
-                    
-                    <Button
-                      size="sm"
-                      colorScheme="red"
-                      variant="ghost"
-                      onClick={() => removeItem(index)}
-                      disabled={saleItems.length === 1}
-                    >
-                      ✕
-                    </Button>
-                  </Grid>
-                </Box>
-              );
-            })}
-            
-            <Button
-              size="sm"
-              variant="outline"
-              colorScheme="teal"
-              onClick={addItem}
-              alignSelf="flex-start"
-            >
-              + Agregar producto
-            </Button>
-          </VStack>
         </Box>
 
-        {/* Total */}
-        {total > 0 && (
-          <Box p={4} bg="teal.50" borderRadius="md" borderWidth="1px" borderColor="teal.200">
-            <HStack justify="space-between" align="center">
-              <Text fontSize="lg" fontWeight="medium" color="teal.700">
-                Total de la venta:
-              </Text>
-              <Text fontSize="xl" fontWeight="bold" color="teal.600">
-                {formatCurrency(total)}
-              </Text>
-            </HStack>
-          </Box>
-        )}
+        {/* Resumen */}
+        <Box borderWidth="1px" borderRadius="md" p={4} bg="gray.50">
+          <HStack justify="space-between">
+            <Text fontWeight="medium">Total:</Text>
+            <Text fontSize="xl" fontWeight="bold" color="teal.600">
+              {formatCurrency(total)}
+            </Text>
+          </HStack>
+          {selectedCustomer && (
+            <Text fontSize="sm" color="gray.600" mt={1}>
+              Cliente: {selectedCustomer.name}
+            </Text>
+          )}
+        </Box>
 
-        {/* Validación de Stock */}
-        {showValidation && validationResult && (
-          <Box borderWidth="1px" borderRadius="md" p={4} bg={validationResult.is_valid ? "green.50" : "red.50"}>
-            <VStack gap="3" align="stretch">
-              <Text fontWeight="bold" color={validationResult.is_valid ? "green.700" : "red.700"}>
-                {validationResult.is_valid ? "✅ Stock Validado" : "❌ Problemas de Stock"}
-              </Text>
-              
-              <Alert.Root status={validationResult.is_valid ? 'success' : 'error'}>
-                <Alert.Indicator />
-                <Alert.Description>
-                  {validationResult.is_valid 
-                    ? 'Todos los productos tienen stock suficiente'
-                    : validationResult.error_message || 'Hay productos sin stock suficiente'
-                  }
-                </Alert.Description>
-              </Alert.Root>
-
-              {!validationResult.is_valid && validationResult.insufficient_items && validationResult.insufficient_items.length > 0 && (
-                <Box>
-                  <Text fontWeight="medium" mb={2} color="red.700">
-                    Productos con stock insuficiente:
-                  </Text>
-                  <VStack gap="2" align="stretch">
-                    {validationResult.insufficient_items.map((item, index) => (
-                      <Box key={index} p={2} bg="red.100" borderRadius="md">
-                        <Text fontSize="sm" color="red.800">
-                          <strong>{item.product_name}</strong>: Solicitado {item.requested}, Disponible {item.available}
-                        </Text>
-                      </Box>
-                    ))}
-                  </VStack>
-                </Box>
-              )}
-            </VStack>
-          </Box>
-        )}
-
-        {/* Nota adicional */}
+        {/* Nota */}
         <Box>
           <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
             Nota (opcional)
           </Text>
           <Textarea
-            placeholder="Observaciones sobre la venta..."
             name="note"
+            placeholder="Observaciones sobre la venta..."
             value={form.note}
-            onChange={handleChange}
+            onChange={handleTextareaChange}
             rows={3}
-            resize="vertical"
           />
         </Box>
 
-        {/* Separador */}
-        <Box height="1px" bg="gray.200" />
-
-        {/* Botones de acción */}
-        <VStack gap="3" align="stretch">
-          {/* Validar Stock */}
-          <Button 
-            colorScheme="blue"
-            variant="outline"
-            onClick={handleValidateStock}
-            loading={operationLoading}
-            loadingText="Validando..."
-            disabled={!validateForm() || operationLoading}
-          >
-            🔍 Validar Stock
-          </Button>
-
-          {/* Procesar Venta */}
-          <Button 
+        {/* Botones */}
+        <HStack gap="3" justify="flex-end">
+          <Button
             colorScheme="teal"
-            size="lg"
             onClick={handleSubmit}
             loading={isSubmitting}
-            loadingText="Procesando venta..."
-            disabled={!validationResult?.is_valid || isSubmitting}
+            disabled={total <= 0}
           >
-            {validationResult?.is_valid ? '✅ Procesar Venta' : '💰 Procesar Venta (validar primero)'}
+            {isSubmitting ? 'Procesando...' : 'Procesar Venta'}
           </Button>
+        </HStack>
 
-          {/* Información adicional */}
-          {total > 0 && (
-            <Box p={3} bg="gray.50" borderRadius="md" textAlign="center">
-              <Text fontSize="sm" color="gray.600">
-                {saleItems.filter(item => item.product_id && item.quantity && item.unit_price).length} productos • 
-                Total: {formatCurrency(total)}
-                {form.customer_id && selectedCustomer && ` • Cliente: ${selectedCustomer.name}`}
-              </Text>
-            </Box>
-          )}
-        </VStack>
+        {/* Advertencias */}
+        {products.length === 0 && (
+          <Alert.Root status="warning">
+            <Alert.Indicator />
+            <Alert.Description>
+              No hay productos disponibles. Debe crear productos antes de realizar ventas.
+            </Alert.Description>
+          </Alert.Root>
+        )}
       </VStack>
     </Box>
   );

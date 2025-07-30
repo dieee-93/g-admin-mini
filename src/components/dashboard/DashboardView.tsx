@@ -1,4 +1,4 @@
-// src/components/dashboard/DashboardView.tsx - VERSIÓN ACTUALIZADA CON SALES
+// src/components/dashboard/DashboardView.tsx - VERSIÓN ACTUALIZADA CON CUSTOMERS HABILITADO
 import { 
   Box, 
   Heading, 
@@ -112,6 +112,13 @@ export function DashboardView({ stats, onNavigate }: DashboardViewProps) {
               💰 Nueva Venta
             </Button>
             <Button 
+              colorScheme="pink" 
+              size="sm"
+              onClick={() => onNavigate('customers')}
+            >
+              👥 Nuevo Cliente
+            </Button>
+            <Button 
               colorScheme="green" 
               size="sm"
               onClick={() => onNavigate('stock')}
@@ -186,21 +193,21 @@ export function DashboardView({ stats, onNavigate }: DashboardViewProps) {
             />
 
             <ModuleCard
+              title="Clientes"
+              description="Gestiona base de datos de clientes y su historial de compras."
+              icon="👥"
+              color="pink"
+              disabled={false} // ✅ HABILITADO
+              onNavigate={() => onNavigate('customers')}
+            />
+
+            <ModuleCard
               title="Productos Finales"
               description="Define productos para venta y controla disponibilidad según stock."
               icon="🎯"
               color="orange"
               disabled={true}
               onNavigate={() => onNavigate('products')}
-            />
-
-            <ModuleCard
-              title="Clientes"
-              description="Gestiona base de datos de clientes y su historial de compras."
-              icon="👥"
-              color="pink"
-              disabled={true}
-              onNavigate={() => onNavigate('customers')}
             />
           </Grid>
         </Box>

@@ -41,6 +41,7 @@ export function useDashboardStats() {
         .select('*', { count: 'exact', head: true })
         .lt('stock', 10);
 
+      // ✅ CORREGIDO: Usar 'created_at' en lugar de 'date'
       // Entradas de stock este mes
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
@@ -49,7 +50,7 @@ export function useDashboardStats() {
       const { count: entriesCount } = await supabase
         .from('stock_entries')
         .select('*', { count: 'exact', head: true })
-        .gte('date', startOfMonth.toISOString());
+        .gte('created_at', startOfMonth.toISOString()); // ✅ Cambio 'date' por 'created_at'
 
       setStats({
         totalItems: itemsCount || 0,
