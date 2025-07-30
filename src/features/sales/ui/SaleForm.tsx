@@ -1,368 +1,244 @@
-// src/features/sales/ui/SaleForm.tsx - VERSIÓN CORREGIDA Y ROBUSTA
+// features/sales/ui/SaleForm.tsx
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Box, 
-  Button, 
-  Input, 
-  VStack, 
+  VStack,
   HStack,
-  Textarea, 
-  Heading,
-  Grid,
-  Text,
-  Badge,
+  Button,
   Select,
-  createListCollection,
-  Alert,
-  Skeleton
+  Input,
+  Box,
+  Card,
+  Text,
+  IconButton,
+  createListCollection
 } from '@chakra-ui/react';
-import { useState, useMemo, useEffect } from 'react';
-import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { supabase } from '@/lib/supabase';
-import { type CreateSaleData, type SaleFormItem, type Customer, type Product } from '../types';
+import { Plus, Trash2 } from 'lucide-react';
+import { toaster } from '../../../components/ui/toaster';
+import { useSaleStockValidation, SaleItem } from '../../../hooks/useSaleStockValidation';
+import { StockValidationAlert } from '../../../components/StockValidationAlert';
+import { supabase } from '../../../lib/supabase';
 
-interface FormErrors {
-  items?: string;
+interface Product {
+  id: string;
+  name: string;
+  unit_price: number;
+}
+
+interface SaleFormData {
   customer_id?: string;
-  general?: string;
+  items: Array<{
+    product_id: string;
+    quantity: number;
+    unit_price: number;
+  }>;
+  note?: string;
 }
 
 export function SaleForm() {
-  const { handleError, handleSuccess, handleWarning } = useErrorHandler();
-  
-  // Estados principales
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-  const [form, setForm] = useState({
-    customer_id: '',
-    note: '',
-  });
-
-  const [saleItems, setSaleItems] = useState<SaleFormItem[]>([
-    { product_id: '', quantity: '', unit_price: '' }
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [saleItems, setSaleItems] = useState<SaleFormData['items']>([
+    { product_id: '', quantity: 1, unit_price: 0 }
   ]);
+  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
+  const [note, setNote] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const {
+    validateStock,
+    clearValidation,
+    isValidating,
+    validationResult,
+    hasValidation,
+    isValid
+  } = useSaleStockValidation();
+  
 
-  // Cargar datos al inicializar
-  useEffect(() => {
-    loadInitialData();
-  }, []);
 
-  const loadInitialData = async () => {
-    setLoading(true);
-    try {
-      // Cargar customers y products de forma simple
-      const [customersResult, productsResult] = await Promise.allSettled([
-        loadCustomers(),
-        loadProducts()
-      ]);
-
-      if (customersResult.status === 'rejected') {
-        console.error('Error loading customers:', customersResult.reason);
-        handleWarning('No se pudieron cargar los clientes');
-      }
-
-      if (productsResult.status === 'rejected') {
-        console.error('Error loading products:', productsResult.reason);
-        handleWarning('No se pudieron cargar los productos');
-      }
-    } catch (error) {
-      handleError(error, 'Error cargando datos iniciales');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadCustomers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('customers')
-        .select('id, name, phone, email')
-        .order('name', { ascending: true });
-      
-      if (error) throw error;
-      setCustomers(data || []);
-    } catch (error) {
-      console.error('Error loading customers:', error);
-      setCustomers([]);
-      throw error;
-    }
-  };
-
-  const loadProducts = async () => {
-    try {
-      // Intentar con la función de Supabase primero
-      const { data: functionData, error: functionError } = await supabase
-        .rpc('get_products_with_availability');
-      
-      if (!functionError && functionData) {
-        setProducts(functionData);
-        return;
-      }
-
-      // Fallback: cargar productos básicos
-      console.warn('Función get_products_with_availability no disponible, usando fallback');
-      const { data: basicProducts, error: basicError } = await supabase
-        .from('products')
-        .select('id, name, description, created_at')
-        .order('created_at', { ascending: false });
-      
-      if (basicError) throw basicError;
-      
-      // Mapear a estructura esperada
-      const mappedProducts = (basicProducts || []).map(product => ({
-        ...product,
-        unit: 'und', // Valor por defecto
-        type: 'product', // Valor por defecto
-        cost: 0,
-        availability: 1, // Asumimos disponible
-        components_count: 0
-      }));
-      
-      setProducts(mappedProducts);
-    } catch (error) {
-      console.error('Error loading products:', error);
-      setProducts([]);
-      throw error;
-    }
-  };
-
-  // ✅ Collections para los Select components
+  // Crear collections para los selects
   const customersCollection = useMemo(() => {
     return createListCollection({
-      items: [
-        { label: 'Sin cliente', value: '' },
-        ...customers.map(customer => ({
-          label: `${customer.name}${customer.phone ? ` (${customer.phone})` : ''}`,
-          value: customer.id,
-        }))
-      ],
+      items: customers.map(customer => ({
+        label: customer.name,
+        value: customer.id,
+      })),
     });
   }, [customers]);
 
   const productsCollection = useMemo(() => {
-    const availableProducts = products.filter(product => (product.availability || 0) > 0);
     return createListCollection({
-      items: availableProducts.map(product => ({
-        label: `${product.name}${product.unit ? ` (${product.unit})` : ''} - Disponible: ${product.availability || 0}`,
+      items: products.map(product => ({
+        label: product.name,
         value: product.id,
       })),
     });
   }, [products]);
 
-  // Loading state
-  if (loading) {
-    return (
-      <Box borderWidth="1px" rounded="md" p={6} mb={6} bg="white">
-        <VStack gap="4">
-          <Skeleton height="6" width="200px" />
-          <Skeleton height="10" width="100%" />
-          <Skeleton height="10" width="100%" />
-        </VStack>
-      </Box>
-    );
-  }
+  // Cargar productos y clientes
+  useEffect(() => {
+    loadInitialData();
+  }, []);
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
+  // Validar stock cuando cambian los items
+  useEffect(() => {
     const validItems = saleItems.filter(item => 
-      item.product_id && 
-      item.quantity && 
-      parseFloat(item.quantity) > 0 &&
-      item.unit_price &&
-      parseFloat(item.unit_price) > 0
+      item.product_id && item.quantity > 0
     );
-
-    if (validItems.length === 0) {
-      newErrors.items = 'Debe agregar al menos un producto válido';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  // ✅ Handler para Select de cliente
-  const handleCustomerSelectChange = (details: { value: string[] }) => {
-    setForm(prev => ({ ...prev, customer_id: details.value[0] || '' }));
     
-    if (errors.customer_id) {
-      setErrors(prev => ({ ...prev, customer_id: undefined }));
+    if (validItems.length > 0) {
+      const saleItemsForValidation: SaleItem[] = validItems.map(item => ({
+        product_id: item.product_id,
+        quantity: item.quantity
+      }));
+      
+      // Debounce la validación
+      const timeoutId = setTimeout(() => {
+        validateStock(saleItemsForValidation);
+      }, 500);
+      
+      return () => clearTimeout(timeoutId);
+    } else {
+      clearValidation();
+    }
+  }, [saleItems, validateStock, clearValidation]);
+
+  const loadInitialData = async () => {
+    try {
+      const [productsResponse, customersResponse] = await Promise.all([
+        supabase.from('products').select('id, name, unit_price'),
+        supabase.from('customers').select('id, name')
+      ]);
+
+      if (productsResponse.data) setProducts(productsResponse.data);
+      if (customersResponse.data) setCustomers(customersResponse.data);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toaster.create({
+        title: 'Error',
+        description: 'No se pudieron cargar los datos',
+        status: 'error'
+      });
     }
   };
 
-  // ✅ Handler para Select de productos
-  const handleProductSelectChange = (index: number, details: { value: string[] }) => {
-    const newItems = [...saleItems];
-    const productId = details.value[0] || '';
-    newItems[index] = { ...newItems[index], product_id: productId };
+  const addSaleItem = () => {
+    setSaleItems([...saleItems, { product_id: '', quantity: 1, unit_price: 0 }]);
+  };
+
+  const removeSaleItem = (index: number) => {
+    if (saleItems.length > 1) {
+      setSaleItems(saleItems.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateSaleItem = (index: number, field: keyof SaleFormData['items'][0], value: any) => {
+    const updated = [...saleItems];
+    updated[index] = { ...updated[index], [field]: value };
     
-    // Auto-completar precio si el producto tiene costo
-    if (productId) {
-      const product = products.find(p => p.id === productId);
-      if (product?.cost && !newItems[index].unit_price) {
-        newItems[index].unit_price = product.cost.toString();
+    // Auto-completar precio cuando se selecciona producto
+    if (field === 'product_id') {
+      const product = products.find(p => p.id === value);
+      if (product) {
+        updated[index].unit_price = product.unit_price;
       }
     }
     
-    setSaleItems(newItems);
-    clearValidation();
+    setSaleItems(updated);
   };
 
-  const handleItemQuantityChange = (index: number, value: string) => {
-    const newItems = [...saleItems];
-    newItems[index] = { ...newItems[index], quantity: value };
-    setSaleItems(newItems);
-    clearValidation();
-  };
-
-  const handleItemPriceChange = (index: number, value: string) => {
-    const newItems = [...saleItems];
-    newItems[index] = { ...newItems[index], unit_price: value };
-    setSaleItems(newItems);
-    clearValidation();
-  };
-
-  const addItem = () => {
-    setSaleItems([...saleItems, { product_id: '', quantity: '', unit_price: '' }]);
-  };
-
-  const removeItem = (index: number) => {
-    if (saleItems.length > 1) {
-      setSaleItems(saleItems.filter((_, i) => i !== index));
-      clearValidation();
-    }
-  };
-
-  const clearValidation = () => {
-    if (errors.items) {
-      setErrors(prev => ({ ...prev, items: undefined }));
-    }
+  const calculateTotal = () => {
+    return saleItems.reduce((total, item) => 
+      total + (item.quantity * item.unit_price), 0
+    );
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
+    // Validación final antes de procesar
+    const validItems = saleItems.filter(item => 
+      item.product_id && item.quantity > 0
+    );
+
+    if (validItems.length === 0) {
+      toaster.create({
+        title: 'Error',
+        description: 'Agrega al menos un producto a la venta',
+        status: 'error'
+      });
+      return;
+    }
+
+    // Validar stock una vez más antes de procesar
+    const finalValidation = await validateStock(
+      validItems.map(item => ({
+        product_id: item.product_id,
+        quantity: item.quantity
+      }))
+    );
+
+    if (!finalValidation.is_valid) {
+      toaster.create({
+        title: 'Stock insuficiente',
+        description: 'Verifica el stock antes de continuar',
+        status: 'error'
+      });
       return;
     }
 
     setIsSubmitting(true);
     
     try {
-      const validItems = saleItems
-        .filter(item => item.product_id && item.quantity && item.unit_price)
-        .map(item => ({
-          product_id: item.product_id,
-          quantity: parseFloat(item.quantity),
-          unit_price: parseFloat(item.unit_price)
-        }));
+      const { data, error } = await supabase.rpc('process_sale', {
+        customer_id: selectedCustomer || null,
+        items_array: validItems,
+        total: calculateTotal(),
+        note: note || null
+      });
 
-      const total = validItems.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+      if (error) throw error;
 
-      // Intentar usar la función de Supabase para procesar la venta
-      const { data: result, error } = await supabase
-        .rpc('process_sale', {
-          customer_id: form.customer_id || null,
-          items_array: JSON.stringify(validItems),
-          total: total,
-          note: form.note.trim() || null
-        });
+      toaster.create({
+        title: 'Venta procesada',
+        description: `Venta #${data.sale_id} creada exitosamente`,
+        status: 'success'
+      });
 
-      if (error) {
-        // Si la función RPC falla, usar método manual
-        console.warn('RPC process_sale falló, usando método manual:', error);
-        await processSaleManual(validItems, total);
-      } else {
-        handleSuccess(result?.message || 'Venta procesada correctamente');
-      }
-      
-      // Resetear formulario
-      setForm({ customer_id: '', note: '' });
-      setSaleItems([{ product_id: '', quantity: '', unit_price: '' }]);
+      // Reset form
+      setSaleItems([{ product_id: '', quantity: 1, unit_price: 0 }]);
+      setSelectedCustomer('');
+      setNote('');
+      clearValidation();
       
     } catch (error) {
-      handleError(error, 'Error al procesar la venta');
+      console.error('Error processing sale:', error);
+      toaster.create({
+        title: 'Error',
+        description: 'No se pudo procesar la venta',
+        status: 'error'
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const processSaleManual = async (validItems: any[], total: number) => {
-    // Crear la venta manualmente
-    const { data: sale, error: saleError } = await supabase
-      .from('sales')
-      .insert([{
-        customer_id: form.customer_id || null,
-        total: total,
-        note: form.note.trim() || null
-      }])
-      .select()
-      .single();
-
-    if (saleError) throw saleError;
-
-    // Crear los items de venta
-    const saleItemsData = validItems.map(item => ({
-      sale_id: sale.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      unit_price: item.unit_price
-    }));
-
-    const { error: itemsError } = await supabase
-      .from('sale_items')
-      .insert(saleItemsData);
-
-    if (itemsError) throw itemsError;
-
-    handleSuccess('Venta procesada correctamente (método manual)');
-  };
-
-  const calculateTotal = (): number => {
-    return saleItems.reduce((total, item) => {
-      const quantity = parseFloat(item.quantity) || 0;
-      const price = parseFloat(item.unit_price) || 0;
-      return total + (quantity * price);
-    }, 0);
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
-
-  const total = calculateTotal();
-  const selectedCustomer = customers.find(c => c.id === form.customer_id);
+  const canSubmit = hasValidation && isValid && !isValidating && !isSubmitting;
 
   return (
-    <Box borderWidth="1px" rounded="md" p={6} mb={6} bg="white">
-      <Heading size="md" mb={6} color="teal.600">
-        💰 Nueva Venta
-      </Heading>
-      
+    <Card.Root p={6}>
       <VStack gap="6" align="stretch">
-        {/* Información del Cliente */}
-        <Box>
-          <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>
-            Cliente
-          </Text>
+        <Text fontSize="xl" fontWeight="bold">Nueva Venta</Text>
+
+        {/* Cliente */}
+        <Box width="100%">
+          <Text fontSize="sm" fontWeight="medium" mb={2}>Cliente (opcional)</Text>
           <Select.Root 
             collection={customersCollection}
-            value={form.customer_id ? [form.customer_id] : []}
-            onValueChange={handleCustomerSelectChange}
+            value={selectedCustomer ? [selectedCustomer] : []}
+            onValueChange={(details) => setSelectedCustomer(details.value[0] || '')}
           >
             <Select.HiddenSelect />
             <Select.Control>
               <Select.Trigger>
-                <Select.ValueText placeholder="Seleccionar cliente (opcional)" />
+                <Select.ValueText placeholder="Sin cliente específico" />
               </Select.Trigger>
               <Select.IndicatorGroup>
                 <Select.Indicator />
@@ -370,9 +246,9 @@ export function SaleForm() {
             </Select.Control>
             <Select.Positioner>
               <Select.Content>
-                {customersCollection.items.map((item) => (
-                  <Select.Item key={item.value} item={item}>
-                    <Select.ItemText>{item.label}</Select.ItemText>
+                {customersCollection.items.map((customer) => (
+                  <Select.Item key={customer.value} item={customer}>
+                    <Select.ItemText>{customer.label}</Select.ItemText>
                   </Select.Item>
                 ))}
               </Select.Content>
@@ -380,134 +256,115 @@ export function SaleForm() {
           </Select.Root>
         </Box>
 
-        {/* Productos a Vender */}
+        {/* Items de venta */}
         <Box>
-          <HStack justify="space-between" align="center" mb={3}>
-            <Text fontSize="sm" fontWeight="medium" color="gray.700">
-              Productos
-            </Text>
-            <Button size="sm" onClick={addItem} colorScheme="teal" variant="outline">
-              + Agregar Item
-            </Button>
-          </HStack>
-
-          <VStack gap="3" align="stretch">
+          <Text fontSize="sm" fontWeight="medium" mb={3}>Productos</Text>
+          <VStack gap="3">
             {saleItems.map((item, index) => (
-              <Grid key={index} templateColumns="2fr 1fr 1fr auto" gap={3} align="center">
-                <Select.Root 
-                  collection={productsCollection}
-                  value={item.product_id ? [item.product_id] : []}
-                  onValueChange={(details) => handleProductSelectChange(index, details)}
-                >
-                  <Select.HiddenSelect />
-                  <Select.Control>
-                    <Select.Trigger>
-                      <Select.ValueText placeholder="Seleccionar producto" />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Select.Positioner>
-                    <Select.Content>
-                      {productsCollection.items.map((productItem) => (
-                        <Select.Item key={productItem.value} item={productItem}>
-                          <Select.ItemText>{productItem.label}</Select.ItemText>
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Positioner>
-                </Select.Root>
-
+              <HStack key={index} gap="3" width="full">
+                <Box flex={2}>
+                  <Select.Root
+                    collection={productsCollection}
+                    value={item.product_id ? [item.product_id] : []}
+                    onValueChange={(details) => updateSaleItem(index, 'product_id', details.value[0] || '')}
+                  >
+                    <Select.HiddenSelect />
+                    <Select.Control>
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Seleccionar producto" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Select.Positioner>
+                      <Select.Content>
+                        {productsCollection.items.map((product) => (
+                          <Select.Item key={product.value} item={product}>
+                            <Select.ItemText>{product.label}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Select.Root>
+                </Box>
+                
                 <Input
-                  placeholder="Cantidad"
                   type="number"
-                  step="0.01"
-                  min="0"
                   value={item.quantity}
-                  onChange={(e) => handleItemQuantityChange(index, e.target.value)}
+                  onChange={(e) => updateSaleItem(index, 'quantity', parseInt(e.target.value) || 0)}
+                  placeholder="Cant."
+                  min={1}
+                  width="80px"
                 />
-
+                
                 <Input
-                  placeholder="Precio Unit."
                   type="number"
-                  step="0.01"
-                  min="0"
                   value={item.unit_price}
-                  onChange={(e) => handleItemPriceChange(index, e.target.value)}
+                  onChange={(e) => updateSaleItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                  placeholder="Precio"
+                  width="100px"
+                  step={0.01}
                 />
-
-                <Button
-                  size="sm"
-                  colorScheme="red"
+                
+                <IconButton
+                  onClick={() => removeSaleItem(index)}
                   variant="ghost"
-                  onClick={() => removeItem(index)}
+                  colorPalette="red"
+                  size="sm"
                   disabled={saleItems.length === 1}
                 >
-                  🗑️
-                </Button>
-              </Grid>
+                  <Trash2 size={16} />
+                </IconButton>
+              </HStack>
             ))}
+            
+            <Button
+              onClick={addSaleItem}
+              variant="outline"
+              size="sm"
+            >
+              <Plus size={16} />
+              Agregar producto
+            </Button>
           </VStack>
-
-          {errors.items && (
-            <Text color="red.500" fontSize="sm" mt={2}>
-              {errors.items}
-            </Text>
-          )}
         </Box>
 
-        {/* Resumen */}
-        <Box borderWidth="1px" borderRadius="md" p={4} bg="gray.50">
-          <HStack justify="space-between">
-            <Text fontWeight="medium">Total:</Text>
-            <Text fontSize="xl" fontWeight="bold" color="teal.600">
-              {formatCurrency(total)}
-            </Text>
-          </HStack>
-          {selectedCustomer && (
-            <Text fontSize="sm" color="gray.600" mt={1}>
-              Cliente: {selectedCustomer.name}
-            </Text>
-          )}
-        </Box>
+        {/* Validación de Stock */}
+        {(hasValidation || isValidating) && (
+          <StockValidationAlert 
+            validationResult={validationResult!}
+            isLoading={isValidating}
+          />
+        )}
 
         {/* Nota */}
-        <Box>
-          <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
-            Nota (opcional)
-          </Text>
-          <Textarea
-            name="note"
-            placeholder="Observaciones sobre la venta..."
-            value={form.note}
-            onChange={handleTextareaChange}
-            rows={3}
+        <Box width="100%">
+          <Text fontSize="sm" fontWeight="medium" mb={2}>Nota (opcional)</Text>
+          <Input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Observaciones de la venta"
           />
         </Box>
 
-        {/* Botones */}
-        <HStack gap="3" justify="flex-end">
+        {/* Total y Submit */}
+        <HStack justify="space-between" pt={4} borderTop="1px solid" borderColor="gray.200" gap="4">
+          <Text fontSize="lg" fontWeight="bold">
+            Total: ${calculateTotal().toFixed(2)}
+          </Text>
+          
           <Button
-            colorScheme="teal"
+            colorPalette="blue"
             onClick={handleSubmit}
+            disabled={!canSubmit}
             loading={isSubmitting}
-            disabled={total <= 0}
+            loadingText="Procesando..."
           >
-            {isSubmitting ? 'Procesando...' : 'Procesar Venta'}
+            {!hasValidation ? 'Validando...' : 'Procesar Venta'}
           </Button>
         </HStack>
-
-        {/* Advertencias */}
-        {products.length === 0 && (
-          <Alert.Root status="warning">
-            <Alert.Indicator />
-            <Alert.Description>
-              No hay productos disponibles. Debe crear productos antes de realizar ventas.
-            </Alert.Description>
-          </Alert.Root>
-        )}
       </VStack>
-    </Box>
+    </Card.Root>
   );
 }
