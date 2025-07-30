@@ -1,5 +1,5 @@
-// src/features/sales/components/SalesWithStockView.tsx
-import { useState, useEffect } from 'react';
+// src/features/sales/components/SalesWithStockView.tsx (Enhanced Version)
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   Button, 
@@ -11,20 +11,26 @@ import {
   Dialog,
   Select,
   Input,
-  createListCollection
+  createListCollection,
+  Grid,
+  Alert
 } from '@chakra-ui/react';
 import { 
   ShoppingCartIcon,
   UserIcon,
   CreditCardIcon,
-  TrashIcon,
-  PlusIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
+import { 
+  CheckCircleIcon as CheckSolid
+} from '@heroicons/react/24/solid';
 
 import { ProductWithStock } from './ProductWithStock';
+import { StockValidationAlert } from './StockValidationAlert';
+import { CartValidationSummary, CartQuickAlert } from './CartValidationSummary';
 import { fetchCustomers, processSale } from '../data/saleApi';
-import { useSaleStockValidation } from '@/hooks/useSaleStockValidation';
+import { useSalesCart } from '../logic/useSalesCart';
 import { toaster } from '@/components/ui/toaster';
 
 interface Customer {
@@ -34,35 +40,41 @@ interface Customer {
   email?: string;
 }
 
-interface SaleItem {
-  product_id: string;
-  product_name: string;
-  quantity: number;
-  unit_price: number;
-  max_available: number;
-}
-
-interface SaleData {
-  customer_id?: string;
-  items: Array<{
-    product_id: string;
-    quantity: number;
-    unit_price: number;
-  }>;
-  note?: string;
-}
-
 export function SalesWithStockView() {
-  const [cart, setCart] = useState<SaleItem[]>([]);
+  // Estado del componente
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
   const [note, setNote] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState<'validation' | 'details' | 'confirmation'>('validation');
 
-  const { validateStock, validationResult, isValidating } = useSaleStockValidation();
+  // Hook del carrito con validaciones mejoradas
+  const {
+    cart,
+    summary,
+    cartStats,
+    validationResult,
+    isValidating,
+    canProcessSale,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    updatePrice,
+    clearCart,
+    validateCartStock,
+    suggestMaxQuantity,
+    isInCart,
+    getCartQuantity,
+    getSaleData
+  } = useSalesCart({
+    enableRealTimeValidation: true,
+    validationDebounceMs: 800,
+    enableProactiveWarnings: true,
+    warningThreshold: 0.8
+  });
 
-  // Cargar clientes
+  // Cargar clientes al inicializar
   useEffect(() => {
     loadCustomers();
   }, []);
@@ -73,20 +85,16 @@ export function SalesWithStockView() {
       setCustomers(data);
     } catch (error) {
       console.error('Error loading customers:', error);
+      toaster.create({
+        title: "Error al cargar clientes",
+        description: "No se pudieron cargar los clientes. Intenta recargar la página.",
+        status: "error",
+        duration: 5000,
+      });
     }
   };
 
-  // Validar carrito cuando cambia
-  useEffect(() => {
-    if (cart.length > 0) {
-      const items = cart.map(item => ({
-        product_id: item.product_id,
-        quantity: item.quantity
-      }));
-      validateStock(items);
-    }
-  }, [cart, validateStock]);
-
+  // Collection para el select de clientes
   const customersCollection = createListCollection({
     items: [
       { value: '', label: 'Sin cliente específico' },
@@ -97,70 +105,52 @@ export function SalesWithStockView() {
     ]
   });
 
-  const handleAddToCart = (item: SaleItem) => {
-    // Verificar si el producto ya está en el carrito
-    const existingIndex = cart.findIndex(cartItem => cartItem.product_id === item.product_id);
-    
-    if (existingIndex >= 0) {
-      // Actualizar cantidad si ya existe
-      const updatedCart = [...cart];
-      updatedCart[existingIndex] = {
-        ...updatedCart[existingIndex],
-        quantity: updatedCart[existingIndex].quantity + item.quantity,
-        unit_price: item.unit_price // Actualizar precio
-      };
-      setCart(updatedCart);
-    } else {
-      // Agregar nuevo item
-      setCart(prev => [...prev, item]);
-    }
-  };
-
-  const handleRemoveFromCart = (productId: string) => {
-    setCart(prev => prev.filter(item => item.product_id !== productId));
-  };
-
-  const handleUpdateCartQuantity = (productId: string, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      handleRemoveFromCart(productId);
-      return;
-    }
-
-    setCart(prev => prev.map(item => 
-      item.product_id === productId 
-        ? { ...item, quantity: newQuantity }
-        : item
-    ));
-  };
-
-  const handleUpdateCartPrice = (productId: string, newPrice: number) => {
-    setCart(prev => prev.map(item => 
-      item.product_id === productId 
-        ? { ...item, unit_price: newPrice }
-        : item
-    ));
-  };
-
-  const calculateTotal = () => {
-    return cart.reduce((total, item) => total + (item.quantity * item.unit_price), 0);
-  };
-
-  const handleProcessSale = async () => {
-    if (cart.length === 0) {
+  // Manejar apertura del checkout con validación previa
+  const handleOpenCheckout = useCallback(async () => {
+    if (!summary.hasItems) {
       toaster.create({
         title: "Carrito vacío",
-        description: "Agrega productos antes de procesar la venta",
+        description: "Agrega productos al carrito antes de continuar",
         status: "warning",
+        duration: 3000,
       });
       return;
     }
 
-    // Validación final de stock
-    if (validationResult && !validationResult.is_valid) {
+    // Validación completa antes del checkout
+    setCheckoutStep('validation');
+    setShowCheckout(true);
+    
+    // Trigger validación inmediata
+    await validateCartStock();
+  }, [summary.hasItems, validateCartStock]);
+
+  // Proceder al siguiente paso del checkout
+  const handleProceedToNextStep = useCallback(() => {
+    if (checkoutStep === 'validation') {
+      if (!validationResult?.is_valid) {
+        toaster.create({
+          title: "Validación pendiente",
+          description: "Espera a que se complete la validación de stock",
+          status: "warning",
+          duration: 3000,
+        });
+        return;
+      }
+      setCheckoutStep('details');
+    } else if (checkoutStep === 'details') {
+      setCheckoutStep('confirmation');
+    }
+  }, [checkoutStep, validationResult]);
+
+  // Procesar la venta final
+  const handleProcessSale = useCallback(async () => {
+    if (!canProcessSale) {
       toaster.create({
-        title: "Stock insuficiente",
-        description: "Algunos productos no tienen stock suficiente",
+        title: "No se puede procesar la venta",
+        description: "Verifica que todos los productos tengan stock suficiente",
         status: "error",
+        duration: 4000,
       });
       return;
     }
@@ -168,33 +158,38 @@ export function SalesWithStockView() {
     setIsProcessing(true);
 
     try {
-      const saleData: SaleData = {
-        customer_id: selectedCustomerId || undefined,
-        items: cart.map(item => ({
-          product_id: item.product_id,
-          quantity: item.quantity,
-          unit_price: item.unit_price
-        })),
-        note: note || undefined
-      };
-
-      const result = await processSale(saleData);
-
-      if (result.success) {
+      // Validación final antes de procesar
+      const finalValidation = await validateCartStock();
+      
+      if (finalValidation && !finalValidation.is_valid) {
         toaster.create({
-          title: "¡Venta procesada!",
-          description: `Venta #${result.sale_id} procesada exitosamente`,
-          status: "success",
+          title: "Stock insuficiente",
+          description: "El stock cambió desde la última validación. Revisa tu carrito.",
+          status: "error",
+          duration: 5000,
         });
-
-        // Limpiar formulario
-        setCart([]);
-        setSelectedCustomerId('');
-        setNote('');
-        setShowCheckout(false);
-      } else {
-        throw new Error(result.message || 'Error al procesar la venta');
+        setCheckoutStep('validation');
+        return;
       }
+
+      // Procesar venta
+      const saleData = getSaleData(selectedCustomerId || undefined, note || undefined);
+      await processSale(saleData);
+
+      // Éxito
+      toaster.create({
+        title: "¡Venta procesada!",
+        description: `Venta por $${summary.totalAmount.toFixed(2)} completada exitosamente`,
+        status: "success",
+        duration: 5000,
+      });
+
+      // Reset
+      clearCart();
+      setSelectedCustomerId('');
+      setNote('');
+      setShowCheckout(false);
+      setCheckoutStep('validation');
 
     } catch (error) {
       console.error('Error processing sale:', error);
@@ -202,221 +197,228 @@ export function SalesWithStockView() {
         title: "Error al procesar venta",
         description: error instanceof Error ? error.message : "Error inesperado",
         status: "error",
+        duration: 5000,
       });
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [canProcessSale, validateCartStock, getSaleData, selectedCustomerId, note, summary.totalAmount, clearCart]);
+
+  // Manejar sugerencia de cantidad máxima
+  const handleSuggestMaxQuantity = useCallback((productId: string, maxQuantity: number) => {
+    updateQuantity(productId, maxQuantity);
+    toaster.create({
+      title: "Cantidad ajustada",
+      description: `Cantidad ajustada al máximo disponible: ${maxQuantity}`,
+      status: "info",
+      duration: 3000,
+    });
+  }, [updateQuantity]);
 
   return (
-    <Box>
+    <Box p="6" maxW="7xl" mx="auto">
+      {/* Header */}
       <VStack gap="6" align="stretch">
-        {/* Header */}
         <HStack justify="space-between" align="center">
-          <VStack gap="1" align="start">
+          <VStack align="start" gap="1">
             <Text fontSize="2xl" fontWeight="bold">
-              💰 Ventas con Stock en Tiempo Real
+              Punto de Venta
             </Text>
             <Text color="gray.600">
-              Información de stock integrada para prevenir sobreventa
+              Gestión de ventas con validación de stock en tiempo real
             </Text>
           </VStack>
-
-          {cart.length > 0 && (
+          
+          <HStack gap="3">
+            <Button
+              variant="outline"
+              colorPalette="blue"
+              onClick={() => validateCartStock()}
+              loading={isValidating}
+              loadingText="Validando..."
+              disabled={!summary.hasItems}
+            >
+              <ArrowPathIcon className="w-4 h-4" />
+              Revalidar Stock
+            </Button>
+            
             <Button
               colorPalette="green"
-              size="lg"
-              onClick={() => setShowCheckout(true)}
-              disabled={isValidating}
+              onClick={handleOpenCheckout}
+              disabled={!summary.hasItems || isValidating}
+              loading={isProcessing}
+              loadingText="Procesando..."
             >
-              <ShoppingCartIcon className="w-5 h-5" />
-              Ver Carrito ({cart.length})
+              <CreditCardIcon className="w-4 h-4" />
+              Finalizar Venta ({summary.itemCount})
             </Button>
-          )}
+          </HStack>
         </HStack>
 
-        <Separator />
-
-        {/* Carrito resumen (si hay items) */}
-        {cart.length > 0 && (
-          <Card.Root variant="filled" colorPalette="blue">
-            <Card.Body>
-              <VStack gap="3" align="stretch">
-                <HStack justify="space-between" align="center">
-                  <Text fontWeight="bold">
-                    🛒 Carrito ({cart.length} productos)
-                  </Text>
-                  <Text fontSize="xl" fontWeight="bold" color="blue.600">
-                    Total: ${calculateTotal().toFixed(2)}
-                  </Text>
-                </HStack>
-
-                <HStack gap="2" wrap="wrap">
-                  {cart.map((item, idx) => (
-                    <Box 
-                      key={idx}
-                      bg="white" 
-                      px="3" 
-                      py="2" 
-                      borderRadius="md" 
-                      fontSize="sm"
-                    >
-                      {item.quantity}x {item.product_name} @ ${item.unit_price}
-                    </Box>
-                  ))}
-                </HStack>
-
-                {validationResult && !validationResult.is_valid && (
-                  <Text color="red.600" fontSize="sm" fontWeight="medium">
-                    ⚠️ {validationResult.error_message}
-                  </Text>
-                )}
-              </VStack>
-            </Card.Body>
-          </Card.Root>
-        )}
-
-        {/* Componente principal de productos con stock */}
-        <ProductWithStock
-          onAddToCart={handleAddToCart}
-          currentCart={cart}
-          disabled={isProcessing}
+        {/* Alerta rápida del carrito */}
+        <CartQuickAlert 
+          validationResult={validationResult}
+          isValidating={isValidating}
         />
+
+        {/* Layout principal */}
+        <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap="6">
+          {/* Productos disponibles */}
+          <Box>
+            <VStack gap="4" align="stretch">
+              <Text fontSize="lg" fontWeight="semibold">
+                Productos Disponibles
+              </Text>
+              
+              <ProductWithStock 
+                onAddToCart={addToCart}
+                onQuantityChange={updateQuantity}
+                currentCart={cart}
+                disabled={isProcessing}
+              />
+            </VStack>
+          </Box>
+
+          {/* Resumen del carrito */}
+          <Box>
+            <CartValidationSummary
+              cart={cart}
+              summary={summary}
+              validationResult={validationResult}
+              isValidating={isValidating}
+              onProceedToCheckout={handleOpenCheckout}
+              onValidateCart={() => validateCartStock()}
+              disabled={isProcessing}
+            />
+          </Box>
+        </Grid>
       </VStack>
 
       {/* Dialog de Checkout */}
-      <Dialog.Root open={showCheckout} onOpenChange={(e) => setShowCheckout(e.open)}>
+      <Dialog.Root 
+        open={showCheckout} 
+        onOpenChange={({ open }) => !isProcessing && setShowCheckout(open)}
+        size="lg"
+      >
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content maxW="2xl">
+          <Dialog.Content>
             <Dialog.Header>
               <Dialog.Title>
-                <CreditCardIcon className="w-5 h-5 inline mr-2" />
-                Finalizar Venta
+                {checkoutStep === 'validation' && 'Validación de Stock'}
+                {checkoutStep === 'details' && 'Detalles de Venta'}
+                {checkoutStep === 'confirmation' && 'Confirmar Venta'}
               </Dialog.Title>
-              <Dialog.CloseTrigger />
+              <Dialog.CloseTrigger disabled={isProcessing} />
             </Dialog.Header>
-            
+
             <Dialog.Body>
               <VStack gap="4" align="stretch">
-                {/* Resumen de productos */}
-                <Box>
-                  <Text mb="3" fontWeight="medium">Productos</Text>
-                  <VStack gap="2" align="stretch">
-                    {cart.map((item, idx) => (
-                      <HStack key={idx} justify="space-between" p="3" bg="gray.50" borderRadius="md">
-                        <VStack gap="1" align="start">
-                          <Text fontWeight="medium">{item.product_name}</Text>
-                          <Text fontSize="sm" color="gray.600">
-                            Máximo disponible: {item.max_available}
-                          </Text>
-                        </VStack>
-                        
-                        <HStack gap="2">
-                          <Input
-                            type="number"
-                            min="1"
-                            max={item.max_available}
-                            value={item.quantity}
-                            onChange={(e) => handleUpdateCartQuantity(item.product_id, parseInt(e.target.value) || 0)}
-                            w="80px"
-                            size="sm"
-                          />
-                          <Text fontSize="sm">×</Text>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={item.unit_price}
-                            onChange={(e) => handleUpdateCartPrice(item.product_id, parseFloat(e.target.value) || 0)}
-                            w="100px"
-                            size="sm"
-                          />
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            colorPalette="red"
-                            onClick={() => handleRemoveFromCart(item.product_id)}
-                          >
-                            <TrashIcon className="w-4 h-4" />
-                          </Button>
-                        </HStack>
-                        
-                        <Text fontWeight="bold">
-                          ${(item.quantity * item.unit_price).toFixed(2)}
-                        </Text>
-                      </HStack>
-                    ))}
-                  </VStack>
-                </Box>
-
-                <Separator />
-
-                {/* Cliente */}
-                <Box>
-                  <Text mb="2" fontWeight="medium">Cliente (Opcional)</Text>
-                  <Select.Root 
-                    collection={customersCollection}
-                    value={selectedCustomerId ? [selectedCustomerId] : []}
-                    onValueChange={(details) => setSelectedCustomerId(details.value[0] || '')}
-                  >
-                    <Select.Trigger>
-                      <UserIcon className="w-4 h-4" />
-                      <Select.ValueText placeholder="Seleccionar cliente" />
-                    </Select.Trigger>
-                    <Select.Content>
-                      {customersCollection.items.map((customer) => (
-                        <Select.Item key={customer.value} item={customer}>
-                          {customer.label}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Root>
-                </Box>
-
-                {/* Nota */}
-                <Box>
-                  <Text mb="2" fontWeight="medium">Nota (Opcional)</Text>
-                  <Input
-                    placeholder="Nota adicional para la venta..."
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                  />
-                </Box>
-
-                {/* Validación de stock */}
-                {validationResult && !validationResult.is_valid && (
-                  <Box p="3" bg="red.50" borderRadius="md" borderLeft="4px solid" borderColor="red.500">
-                    <Text color="red.700" fontWeight="medium" mb="1">
-                      Stock Insuficiente
+                {/* Paso 1: Validación */}
+                {checkoutStep === 'validation' && (
+                  <VStack gap="4" align="stretch">
+                    <Text>
+                      Verificando disponibilidad de stock para todos los productos...
                     </Text>
-                    <Text color="red.600" fontSize="sm">
-                      {validationResult.error_message}
-                    </Text>
-                    {validationResult.insufficient_items && (
-                      <VStack gap="1" mt="2" align="start">
-                        {validationResult.insufficient_items.map((item, idx) => (
-                          <Text key={idx} fontSize="sm" color="red.600">
-                            • {item.product_name}: necesitas {item.required}, disponible {item.available}
-                          </Text>
-                        ))}
-                      </VStack>
+                    
+                    <StockValidationAlert
+                      validationResult={validationResult}
+                      isValidating={isValidating}
+                      onSuggestMaxQuantity={handleSuggestMaxQuantity}
+                      onRetryValidation={() => validateCartStock()}
+                      showSuggestions={true}
+                    />
+
+                    {validationResult?.is_valid && (
+                      <Alert.Root status="success">
+                        <Alert.Indicator />
+                        <Alert.Title>Stock confirmado</Alert.Title>
+                        <Alert.Description>
+                          Todos los productos tienen stock disponible. Puedes continuar con la venta.
+                        </Alert.Description>
+                      </Alert.Root>
                     )}
-                  </Box>
+                  </VStack>
                 )}
 
-                {/* Total */}
-                <HStack justify="space-between" p="4" bg="blue.50" borderRadius="md">
-                  <Text fontSize="lg" fontWeight="bold">Total de la Venta:</Text>
-                  <Text fontSize="2xl" fontWeight="bold" color="blue.600">
-                    ${calculateTotal().toFixed(2)}
-                  </Text>
-                </HStack>
+                {/* Paso 2: Detalles */}
+                {checkoutStep === 'details' && (
+                  <VStack gap="4" align="stretch">
+                    {/* Selección de cliente */}
+                    <Box>
+                      <Text mb="2" fontWeight="medium">Cliente</Text>
+                      <Select.Root
+                        collection={customersCollection}
+                        value={selectedCustomerId ? [selectedCustomerId] : []}
+                        onValueChange={(details) => setSelectedCustomerId(details.value[0] || '')}
+                      >
+                        <Select.Trigger>
+                          <UserIcon className="w-4 h-4" />
+                          <Select.ValueText placeholder="Seleccionar cliente (opcional)" />
+                        </Select.Trigger>
+                        <Select.Content>
+                          {customersCollection.items.map((customer) => (
+                            <Select.Item key={customer.value} item={customer}>
+                              {customer.label}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+
+                    {/* Nota */}
+                    <Box>
+                      <Text mb="2" fontWeight="medium">Nota (Opcional)</Text>
+                      <Input
+                        placeholder="Nota adicional para la venta..."
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                      />
+                    </Box>
+                  </VStack>
+                )}
+
+                {/* Paso 3: Confirmación */}
+                {checkoutStep === 'confirmation' && (
+                  <VStack gap="4" align="stretch">
+                    <Alert.Root status="info">
+                      <Alert.Indicator />
+                      <Alert.Title>Confirmar venta</Alert.Title>
+                      <Alert.Description>
+                        ¿Estás seguro de procesar esta venta? Esta acción reducirá el stock automáticamente.
+                      </Alert.Description>
+                    </Alert.Root>
+
+                    {/* Resumen final */}
+                    <Card.Root p="4" bg="gray.50">
+                      <VStack gap="2" align="stretch">
+                        <HStack justify="space-between">
+                          <Text fontWeight="medium">Total de productos:</Text>
+                          <Text>{cartStats.totalItems}</Text>
+                        </HStack>
+                        <HStack justify="space-between">
+                          <Text fontWeight="medium">Monto total:</Text>
+                          <Text fontSize="lg" fontWeight="bold" color="green.600">
+                            ${summary.totalAmount.toFixed(2)}
+                          </Text>
+                        </HStack>
+                        {selectedCustomerId && (
+                          <HStack justify="space-between">
+                            <Text fontWeight="medium">Cliente:</Text>
+                            <Text>
+                              {customers.find(c => c.id === selectedCustomerId)?.name || 'N/A'}
+                            </Text>
+                          </HStack>
+                        )}
+                      </VStack>
+                    </Card.Root>
+                  </VStack>
+                )}
               </VStack>
             </Dialog.Body>
-            
+
             <Dialog.Footer>
-              <HStack gap="3">
+              <HStack gap="3" justify="space-between" w="full">
                 <Button
                   variant="outline"
                   onClick={() => setShowCheckout(false)}
@@ -424,19 +426,47 @@ export function SalesWithStockView() {
                 >
                   Cancelar
                 </Button>
-                <Button
-                  colorPalette="green"
-                  onClick={handleProcessSale}
-                  loading={isProcessing}
-                  disabled={
-                    cart.length === 0 || 
-                    (validationResult && !validationResult.is_valid) ||
-                    isValidating
-                  }
-                >
-                  <CreditCardIcon className="w-4 h-4" />
-                  Procesar Venta (${calculateTotal().toFixed(2)})
-                </Button>
+
+                <HStack gap="2">
+                  {checkoutStep !== 'validation' && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (checkoutStep === 'details') setCheckoutStep('validation');
+                        if (checkoutStep === 'confirmation') setCheckoutStep('details');
+                      }}
+                      disabled={isProcessing}
+                    >
+                      Atrás
+                    </Button>
+                  )}
+
+                  {checkoutStep !== 'confirmation' ? (
+                    <Button
+                      colorPalette="blue"
+                      onClick={handleProceedToNextStep}
+                      disabled={
+                        (checkoutStep === 'validation' && (!validationResult?.is_valid || isValidating)) ||
+                        isProcessing
+                      }
+                      loading={isValidating}
+                      loadingText="Validando..."
+                    >
+                      {checkoutStep === 'validation' ? 'Continuar' : 'Siguiente'}
+                    </Button>
+                  ) : (
+                    <Button
+                      colorPalette="green"
+                      onClick={handleProcessSale}
+                      loading={isProcessing}
+                      loadingText="Procesando..."
+                      disabled={!canProcessSale}
+                    >
+                      <CheckSolid className="w-4 h-4" />
+                      Procesar Venta
+                    </Button>
+                  )}
+                </HStack>
               </HStack>
             </Dialog.Footer>
           </Dialog.Content>
