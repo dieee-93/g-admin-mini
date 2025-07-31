@@ -5,113 +5,90 @@ import {
   HStack,
   Text,
   Button,
-  Grid,
-  Heading,
   Card,
   Badge,
+  Heading,
+  Alert,
+  Skeleton,
   Dialog
 } from '@chakra-ui/react';
 import {
-  PlusIcon,
-  ChartBarIcon,
+  ExclamationTriangleIcon,
   CubeIcon,
-  ShoppingCartIcon,
-  ExclamationTriangleIcon
+  ChartBarIcon,
+  PlusIcon,
+  EyeIcon,
+  CogIcon
 } from '@heroicons/react/24/outline';
-
-// Import existing dashboard components
-import { useDashboardStats } from '@/hooks/useDashboardStats'; 
-
-// Import new stock alerts components
-import { StockAlertsWidget } from '../../features/stock/components/StockAlertsWidget';
-import { StockAlertsList } from '../../features/stock/components/StockAlertsList';
-import { AlertConfigDialog } from '../../features/stock/components/AlertConfigDialog';
-import { AlertsBadge, useAlertsStatus } from '../navigation/AlertsBadge'; 
-
-// Mock components for existing features (replace with actual imports)
-interface AddStockDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  itemId?: string;
-  itemName?: string;
-}
-
-function AddStockDialog({ isOpen, onClose, itemId, itemName }: AddStockDialogProps) {
-  // This should be imported from existing stock management module
-  return (
-    <Dialog.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()}>
-      <Dialog.Backdrop />
-      <Dialog.Positioner>
-        <Dialog.Content>
-          <Dialog.Header>
-            <Dialog.Title>Agregar Stock - {itemName}</Dialog.Title>
-            <Dialog.CloseTrigger />
-          </Dialog.Header>
-          <Dialog.Body>
-            <Text>Modal de agregar stock (implementar con componente existente)</Text>
-          </Dialog.Body>
-          <Dialog.Footer>
-            <Button onClick={onClose}>Cerrar</Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog.Positioner>
-    </Dialog.Root>
-  );
-}
+import { useInventory } from '@/features/inventory';
+import { StockEntryForm } from '@/features/inventory/components/ItemForm';
 
 export function DashboardPage() {
-  const { stats, loading: statsLoading } = useDashboardStats();
-  const { hasCriticalAlerts, totalCount: alertCount } = useAlertsStatus();
+  const {
+    inventoryStats,
+    alertSummary,
+    alerts,
+    loading,
+    error,
+    hasCriticalAlerts,
+    hasAlerts
+  } = useInventory({ alertThreshold: 10 });
 
-  // State for modals and dialogs
-  const [showAllAlerts, setShowAllAlerts] = useState(false);
+  // Estados para dialogs
   const [addStockDialog, setAddStockDialog] = useState<{
-    isOpen: boolean;
-    itemId?: string;
-    itemName?: string;
-  }>({
-    isOpen: false
-  });
-  const [configDialog, setConfigDialog] = useState<{
-    isOpen: boolean;
-    itemId?: string;
-    itemName?: string;
-    currentStock?: number;
-    unit?: string;
-    itemType?: 'UNIT' | 'WEIGHT' | 'VOLUME' | 'ELABORATED';
-  }>({
-    isOpen: false
-  });
+    open: boolean;
+    item?: any;
+  }>({ open: false });
 
-  // Handlers for stock alerts actions
+  // Handlers
   const handleViewAllAlerts = () => {
-    setShowAllAlerts(true);
+    // Navegar a la página de inventory con tab de alerts activo
+    window.location.href = '/inventory?tab=alerts';
   };
 
-  const handleQuickAddStock = (alertId: string, itemName: string) => {
+  const handleQuickAddStock = (alert: any) => {
     setAddStockDialog({
-      isOpen: true,
-      itemId: alertId,
-      itemName
+      open: true,
+      item: {
+        id: alert.item_id,
+        name: alert.item_name,
+        stock: alert.current_stock,
+        unit: alert.unit || 'unidad'
+      }
     });
   };
 
-  const handleConfigureAlert = (alertId: string) => {
-    // In real implementation, fetch item details
-    setConfigDialog({
-      isOpen: true,
-      itemId: alertId,
-      itemName: 'Item Name', // Replace with actual item data
-      currentStock: 10,       // Replace with actual stock
-      unit: 'kg',            // Replace with actual unit
-      itemType: 'WEIGHT'     // Replace with actual type
-    });
+  const handleStockAdded = () => {
+    setAddStockDialog({ open: false });
   };
 
-  const handleMarkOrdered = (alertId: string) => {
-    // Implement mark as ordered logic
-    console.log('Mark ordered:', alertId);
-  };
+  if (loading && !inventoryStats.totalItems) {
+    return (
+      <Box p="6">
+        <VStack gap="6" align="stretch">
+          <Skeleton height="80px" />
+          <HStack gap="4">
+            <Skeleton height="120px" flex="1" />
+            <Skeleton height="120px" flex="1" />
+            <Skeleton height="120px" flex="1" />
+          </HStack>
+          <Skeleton height="300px" />
+        </VStack>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p="6">
+        <Alert.Root status="error">
+          <Alert.Indicator />
+          <Alert.Title>Error al cargar dashboard</Alert.Title>
+          <Alert.Description>{error}</Alert.Description>
+        </Alert.Root>
+      </Box>
+    );
+  }
 
   return (
     <Box p="6">
@@ -125,12 +102,16 @@ export function DashboardPage() {
             </Text>
           </VStack>
 
-          {/* Alerts indicator in header */}
-          {alertCount > 0 && (
+          {/* Indicador de alertas en header */}
+          {hasAlerts && (
             <Card.Root 
               bg={hasCriticalAlerts ? 'red.50' : 'yellow.50'} 
               borderColor={hasCriticalAlerts ? 'red.200' : 'yellow.200'}
               borderWidth="1px"
+              cursor="pointer"
+              onClick={handleViewAllAlerts}
+              _hover={{ transform: 'translateY(-1px)', shadow: 'md' }}
+              transition="all 0.2s"
             >
               <Card.Body p="3">
                 <HStack gap="3">
@@ -149,16 +130,20 @@ export function DashboardPage() {
                       fontSize="xs" 
                       color={hasCriticalAlerts ? 'red.600' : 'yellow.600'}
                     >
-                      {alertCount} item{alertCount > 1 ? 's' : ''} requiere{alertCount > 1 ? 'n' : ''} atención
+                      {alertSummary.total} item{alertSummary.total > 1 ? 's' : ''} requiere{alertSummary.total > 1 ? 'n' : ''} atención
                     </Text>
                   </VStack>
                   <Button
                     size="sm"
                     colorPalette={hasCriticalAlerts ? 'red' : 'yellow'}
-                    variant="outline"
-                    onClick={handleViewAllAlerts}
+                    variant="subtle"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewAllAlerts();
+                    }}
                   >
-                    Ver Todas
+                    <EyeIcon className="w-3 h-3" />
+                    Ver todas
                   </Button>
                 </HStack>
               </Card.Body>
@@ -166,207 +151,236 @@ export function DashboardPage() {
           )}
         </HStack>
 
-        {/* Stats Grid */}
-        <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }} gap="4">
-          <Card.Root>
-            <Card.Body p="4">
-              <HStack gap="3">
-                <Box p="2" bg="blue.100" borderRadius="md">
-                  <CubeIcon className="w-6 h-6 text-blue-600" />
+        {/* Métricas principales */}
+        <HStack gap="6" align="stretch">
+          {/* Items totales */}
+          <Card.Root flex="1">
+            <Card.Body>
+              <HStack gap="4">
+                <Box p="3" bg="blue.100" borderRadius="lg">
+                  <CubeIcon className="w-8 h-8 text-blue-600" />
                 </Box>
-                <VStack align="start" gap="0">
-                  <Text fontSize="lg" fontWeight="bold">
-                    {statsLoading ? '...' : stats?.totalItems || 0}
+                <VStack align="start" gap="1">
+                  <Text fontSize="2xl" fontWeight="bold" color="blue.600">
+                    {inventoryStats.totalItems}
                   </Text>
-                  <Text fontSize="sm" color="gray.600">
-                    Items Registrados
+                  <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                    Items en inventario
+                  </Text>
+                  <Text fontSize="xs" color="gray.500">
+                    {inventoryStats.outOfStockItems} sin stock
                   </Text>
                 </VStack>
               </HStack>
             </Card.Body>
           </Card.Root>
 
-          <Card.Root>
-            <Card.Body p="4">
-              <HStack gap="3">
-                <Box p="2" bg="green.100" borderRadius="md">
-                  <ShoppingCartIcon className="w-6 h-6 text-green-600" />
+          {/* Valor total */}
+          <Card.Root flex="1">
+            <Card.Body>
+              <HStack gap="4">
+                <Box p="3" bg="green.100" borderRadius="lg">
+                  <ChartBarIcon className="w-8 h-8 text-green-600" />
                 </Box>
-                <VStack align="start" gap="0">
-                  <Text fontSize="lg" fontWeight="bold">
-                    {statsLoading ? '...' : stats?.todaySales || 0}
+                <VStack align="start" gap="1">
+                  <Text fontSize="2xl" fontWeight="bold" color="green.600">
+                    ${inventoryStats.totalValue.toLocaleString()}
                   </Text>
-                  <Text fontSize="sm" color="gray.600">
-                    Ventas Hoy
+                  <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                    Valor total del stock
+                  </Text>
+                  <Text fontSize="xs" color="gray.500">
+                    Basado en costos unitarios
                   </Text>
                 </VStack>
               </HStack>
             </Card.Body>
           </Card.Root>
 
-          <Card.Root>
-            <Card.Body p="4">
-              <HStack gap="3">
-                <Box p="2" bg="purple.100" borderRadius="md">
-                  <ChartBarIcon className="w-6 h-6 text-purple-600" />
+          {/* Movimientos recientes */}
+          <Card.Root flex="1">
+            <Card.Body>
+              <HStack gap="4">
+                <Box p="3" bg="purple.100" borderRadius="lg">
+                  <PlusIcon className="w-8 h-8 text-purple-600" />
                 </Box>
-                <VStack align="start" gap="0">
-                  <Text fontSize="lg" fontWeight="bold">
-                    ${statsLoading ? '...' : stats?.monthlyRevenue || 0}
+                <VStack align="start" gap="1">
+                  <Text fontSize="2xl" fontWeight="bold" color="purple.600">
+                    {inventoryStats.recentMovements}
                   </Text>
-                  <Text fontSize="sm" color="gray.600">
-                    Ingresos del Mes
+                  <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                    Movimientos (7 días)
+                  </Text>
+                  <Text fontSize="xs" color="gray.500">
+                    Entradas de stock
                   </Text>
                 </VStack>
               </HStack>
             </Card.Body>
           </Card.Root>
+        </HStack>
 
-          <Card.Root>
-            <Card.Body p="4">
-              <HStack gap="3">
-                <Box p="2" bg="orange.100" borderRadius="md">
-                  <ExclamationTriangleIcon className="w-6 h-6 text-orange-600" />
-                </Box>
-                <VStack align="start" gap="0">
-                  <Text fontSize="lg" fontWeight="bold">
-                    {alertCount}
-                  </Text>
-                  <Text fontSize="sm" color="gray.600">
-                    Alertas de Stock
-                  </Text>
-                </VStack>
-              </HStack>
-            </Card.Body>
-          </Card.Root>
-        </Grid>
-
-        {/* Main Content Grid */}
-        <Grid 
-          templateColumns={{ base: '1fr', lg: 'repeat(3, 1fr)' }} 
-          gap="6"
-          templateRows={{ lg: 'auto' }}
-        >
-          {/* Stock Alerts Widget - Takes full width on mobile, 2 columns on desktop */}
-          <Box gridColumn={{ base: '1', lg: 'span 2' }}>
-            <StockAlertsWidget
-              maxItems={8}
-              onViewAll={handleViewAllAlerts}
-              onQuickAction={handleQuickAddStock}
-            />
-          </Box>
-
-          {/* Quick Actions */}
+        {/* Alertas de stock */}
+        {hasAlerts && (
           <Card.Root>
             <Card.Header>
-              <Text fontSize="lg" fontWeight="semibold">
-                Acciones Rápidas
-              </Text>
+              <HStack justify="space-between">
+                <Card.Title>
+                  <HStack gap="2">
+                    <ExclamationTriangleIcon className="w-5 h-5" />
+                    Alertas de Stock
+                  </HStack>
+                </Card.Title>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleViewAllAlerts}
+                >
+                  Ver todas ({alertSummary.total})
+                </Button>
+              </HStack>
             </Card.Header>
             <Card.Body>
-              <VStack gap="3">
-                <Button 
-                  width="100%" 
-                  colorPalette="blue" 
-                  variant="outline"
-                  justifyContent="start"
-                >
-                  <PlusIcon className="w-4 h-4" />
-                  Nuevo Item
-                </Button>
-                
-                <Button 
-                  width="100%" 
-                  colorPalette="green" 
-                  variant="outline"
-                  justifyContent="start"
-                >
-                  <ShoppingCartIcon className="w-4 h-4" />
-                  Nueva Venta
-                </Button>
-                
-                <Button 
-                  width="100%" 
-                  colorPalette="purple" 
-                  variant="outline"
-                  justifyContent="start"
-                >
-                  <CubeIcon className="w-4 h-4" />
-                  Gestionar Inventario
-                </Button>
+              <VStack gap="3" align="stretch">
+                {/* Resumen por urgencia */}
+                <HStack gap="4" mb="4">
+                  {alertSummary.critical > 0 && (
+                    <HStack gap="2">
+                      <Badge colorPalette="red" size="sm">
+                        {alertSummary.critical} Críticas
+                      </Badge>
+                    </HStack>
+                  )}
+                  {alertSummary.warning > 0 && (
+                    <HStack gap="2">
+                      <Badge colorPalette="yellow" size="sm">
+                        {alertSummary.warning} Advertencias
+                      </Badge>
+                    </HStack>
+                  )}
+                  {alertSummary.info > 0 && (
+                    <HStack gap="2">
+                      <Badge colorPalette="blue" size="sm">
+                        {alertSummary.info} Informativas
+                      </Badge>
+                    </HStack>
+                  )}
+                </HStack>
 
-                {hasCriticalAlerts && (
-                  <Button 
-                    width="100%" 
-                    colorPalette="red" 
-                    variant="solid"
-                    justifyContent="start"
-                    onClick={handleViewAllAlerts}
-                  >
-                    <ExclamationTriangleIcon className="w-4 h-4" />
-                    Revisar Alertas Críticas
-                  </Button>
+                {/* Lista de alertas más urgentes (máximo 5) */}
+                {alerts.slice(0, 5).map((alert) => (
+                  <Card.Root key={alert.id} size="sm" variant="outline">
+                    <Card.Body p="3">
+                      <HStack justify="space-between" align="center">
+                        <HStack gap="3">
+                          <ExclamationTriangleIcon 
+                            className={`w-5 h-5 ${
+                              alert.urgency === 'critical' ? 'text-red-500' :
+                              alert.urgency === 'warning' ? 'text-yellow-500' : 'text-blue-500'
+                            }`}
+                          />
+                          <VStack align="start" gap="0">
+                            <Text fontWeight="medium" fontSize="sm">
+                              {alert.item_name}
+                            </Text>
+                            <Text fontSize="xs" color="gray.600">
+                              Stock: {alert.current_stock} / Mínimo: {alert.min_threshold}
+                            </Text>
+                          </VStack>
+                        </HStack>
+
+                        <HStack gap="2">
+                          <Badge 
+                            colorPalette={
+                              alert.urgency === 'critical' ? 'red' :
+                              alert.urgency === 'warning' ? 'yellow' : 'blue'
+                            }
+                            size="sm"
+                          >
+                            {alert.urgency === 'critical' ? 'Crítica' :
+                             alert.urgency === 'warning' ? 'Advertencia' : 'Info'}
+                          </Badge>
+                          <Button
+                            size="xs"
+                            colorPalette="blue"
+                            variant="outline"
+                            onClick={() => handleQuickAddStock(alert)}
+                          >
+                            <PlusIcon className="w-3 h-3" />
+                            Stock
+                          </Button>
+                        </HStack>
+                      </HStack>
+                    </Card.Body>
+                  </Card.Root>
+                ))}
+
+                {alerts.length > 5 && (
+                  <Text fontSize="sm" color="gray.500" textAlign="center" pt="2">
+                    Y {alerts.length - 5} alertas más...
+                  </Text>
                 )}
               </VStack>
             </Card.Body>
           </Card.Root>
-        </Grid>
+        )}
 
-        {/* Recent Activity placeholder */}
-        <Card.Root>
-          <Card.Header>
-            <Text fontSize="lg" fontWeight="semibold">
-              Actividad Reciente
-            </Text>
-          </Card.Header>
-          <Card.Body>
-            <Text fontSize="sm" color="gray.600">
-              Últimas ventas, movimientos de stock y alertas...
-            </Text>
-          </Card.Body>
-        </Card.Root>
+        {/* Estado cuando no hay alertas */}
+        {!hasAlerts && !loading && (
+          <Card.Root>
+            <Card.Body>
+              <VStack gap="4" p="6" textAlign="center">
+                <Box p="4" bg="green.100" borderRadius="full">
+                  <CubeIcon className="w-12 h-12 text-green-600" />
+                </Box>
+                <VStack gap="2">
+                  <Text fontSize="lg" fontWeight="medium" color="green.600">
+                    ¡Inventario bajo control!
+                  </Text>
+                  <Text fontSize="sm" color="gray.600">
+                    Todos los items tienen stock suficiente
+                  </Text>
+                </VStack>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  colorPalette="blue"
+                  onClick={() => window.location.href = '/inventory'}
+                >
+                  Ver inventario completo
+                </Button>
+              </VStack>
+            </Card.Body>
+          </Card.Root>
+        )}
+
+        {/* Dialog para agregar stock rápidamente */}
+        <Dialog.Root 
+          open={addStockDialog.open} 
+          onOpenChange={(e) => setAddStockDialog(prev => ({ ...prev, open: e.open }))}
+        >
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content maxW="md">
+              <Dialog.Header>
+                <Dialog.Title>
+                  Agregar Stock - {addStockDialog.item?.name}
+                </Dialog.Title>
+                <Dialog.CloseTrigger />
+              </Dialog.Header>
+              <Dialog.Body>
+                {addStockDialog.item && (
+                  <StockEntryForm
+                    item={addStockDialog.item}
+                    onSuccess={handleStockAdded}
+                    onCancel={() => setAddStockDialog({ open: false })}
+                  />
+                )}
+              </Dialog.Body>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Dialog.Root>
       </VStack>
-
-      {/* Modals and Dialogs */}
-      
-      {/* Full Alerts List Dialog */}
-      <Dialog.Root open={showAllAlerts} onOpenChange={(e) => setShowAllAlerts(e.open)}>
-        <Dialog.Backdrop />
-        <Dialog.Positioner>
-          <Dialog.Content maxWidth="1000px" height="80vh">
-            <Dialog.Header>
-              <Dialog.Title>Alertas de Stock</Dialog.Title>
-              <Dialog.CloseTrigger />
-            </Dialog.Header>
-            <Dialog.Body overflow="auto">
-              <StockAlertsList
-                onAddStock={handleQuickAddStock}
-                onConfigure={handleConfigureAlert}
-                onMarkOrdered={handleMarkOrdered}
-              />
-            </Dialog.Body>
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Dialog.Root>
-
-      {/* Add Stock Dialog */}
-      <AddStockDialog
-        isOpen={addStockDialog.isOpen}
-        onClose={() => setAddStockDialog({ isOpen: false })}
-        itemId={addStockDialog.itemId}
-        itemName={addStockDialog.itemName}
-      />
-
-      {/* Alert Configuration Dialog */}
-      <AlertConfigDialog
-        isOpen={configDialog.isOpen}
-        onClose={() => setConfigDialog({ isOpen: false })}
-        itemId={configDialog.itemId || ''}
-        itemName={configDialog.itemName || ''}
-        currentStock={configDialog.currentStock || 0}
-        unit={configDialog.unit || ''}
-        itemType={configDialog.itemType || 'UNIT'}
-      />
     </Box>
   );
 }
