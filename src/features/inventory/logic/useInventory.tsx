@@ -1,5 +1,6 @@
 // src/features/inventory/logic/useInventory.ts
-// Hook unificado que reemplaza useStockAlerts duplicado + funcionalidad de items
+// Hook unificado ADAPTADO al toaster correcto v3.23
+// ✅ CORREGIDO: Cambio de "status" a "type" para Chakra UI v3.23
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -132,6 +133,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
 
       setItems(prev => [...prev, data]);
       
+      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
       toaster.create({
         title: "Item agregado",
         description: `${data.name} fue agregado al inventario`,
@@ -141,6 +143,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
       return data;
     } catch (err) {
       console.error('Error adding item:', err);
+      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
       toaster.create({
         title: "Error al agregar item",
         description: err instanceof Error ? err.message : 'Error desconocido',
@@ -163,6 +166,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
 
       setItems(prev => prev.map(item => item.id === id ? data : item));
       
+      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
       toaster.create({
         title: "Item actualizado",
         description: `${data.name} fue actualizado`,
@@ -172,6 +176,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
       return data;
     } catch (err) {
       console.error('Error updating item:', err);
+      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
       toaster.create({
         title: "Error al actualizar item",
         description: err instanceof Error ? err.message : 'Error desconocido',
@@ -201,6 +206,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
       await fetchItems();
       await fetchAlerts();
       
+      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
       toaster.create({
         title: "Stock agregado",
         description: `Se agregaron ${quantity} unidades`,
@@ -210,6 +216,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
       return data;
     } catch (err) {
       console.error('Error adding stock:', err);
+      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
       toaster.create({
         title: "Error al agregar stock",
         description: err instanceof Error ? err.message : 'Error desconocido',
@@ -225,6 +232,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
       // Mark alert as acknowledged (implementation depends on your needs)
       setAlerts(prev => prev.filter(alert => alert.id !== alertId));
       
+      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
       toaster.create({
         title: "Alerta confirmada",
         description: "La alerta fue marcada como vista",
@@ -246,6 +254,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
         return [...prev, threshold];
       });
 
+      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
       toaster.create({
         title: "Configuración guardada",
         description: "Los umbrales de alerta fueron actualizados",
@@ -253,6 +262,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
       });
     } catch (err) {
       console.error('Error saving threshold:', err);
+      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
       toaster.create({
         title: "Error al guardar configuración",
         description: err instanceof Error ? err.message : 'Error desconocido',

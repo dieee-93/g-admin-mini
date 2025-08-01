@@ -1,93 +1,43 @@
-// src/App.tsx - Versión con Breadcrumb Navigation integrado
-import { Box, Heading, Flex, Button } from "@chakra-ui/react";
-import { Toaster } from "./components/ui/toaster";
-import { useState, lazy, Suspense } from "react";
-import { useDashboardStats } from "./hooks/useDashboardStats";
-import { LoadingSpinner } from "./components/common/LoadingSpinner";
-import { DashboardPage } from "./components/dashboard/DashboardPage";
-import { ModuleHeader } from "./components/layout/ModuleHeader";
-import { useBreadcrumb, BreadcrumbContext } from "./hooks/useBreadcrumb"; // ✅ NUEVO
-import { type AppRoute } from "./types/app";
+// src/App.tsx - VERSIÓN ALTERNATIVA con Provider personalizado
+// App usando Provider personalizado (RECOMENDADO para proyectos complejos)
 
-// Lazy loading de módulos
-const ItemsPage = lazy(() => import("./features/items"));
-const StockEntriesPage = lazy(() => import("./features/stock"));
-const RecipesPage = lazy(() => import("./features/recipes"));
-const SalesPage = lazy(() => import("./features/sales"));
-const CustomersPage = lazy(() => import("./features/customers"));
-const UnderDevelopmentPage = lazy(() => import("./components/common/UnderDevelopment"));
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Provider } from '@/components/ui/provider';
+import { Toaster } from '@/components/ui/toaster';
+import { NavigationProvider } from '@/contexts/NavigationContext';
+import { ResponsiveLayout } from '@/components/layout/ResponsiveLayout';
+import { NavigationBadgeSync } from '@/hooks/useNavigationBadges';
 
-const MODULE_CONFIG = {
-  items: { title: "Gestión de Insumos", color: "blue" },
-  stock: { title: "Entradas de Stock", color: "green" },
-  recipes: { title: "Recetas", color: "purple" },
-  products: { title: "Productos", color: "orange" },
-  sales: { title: "Ventas", color: "teal" },
-  customers: { title: "Clientes", color: "pink" },
-} as const;
+// ✅ Páginas del sistema
+import { Dashboard } from '@/pages/Dashboard';
+import { InventoryPage } from '@/features/inventory/InventoryPage';
+import { ProductionPage } from '@/pages/ProductionPage';
+import { SalesPage } from '@/pages/SalesPage';
+import { CustomersPage } from '@/pages/CustomersPage';
 
 function App() {
-  const [currentView, setCurrentView] = useState<AppRoute>('dashboard');
-  const { stats, reloadStats } = useDashboardStats();
-  
-  // ✅ NUEVO: Hook de breadcrumb
-  const { breadcrumbItems, setBreadcrumbContext } = useBreadcrumb(handleNavigation);
-
-  function handleNavigation(module: AppRoute) {
-    setCurrentView(module);
-    
-    // ✅ NUEVO: Actualizar breadcrumb según el módulo
-    if (module !== 'dashboard') {
-      setBreadcrumbContext(module as BreadcrumbContext);
-    }
-  }
-
-  const backToDashboard = () => {
-    setCurrentView('dashboard');
-    setBreadcrumbContext('dashboard'); // ✅ NUEVO: Reset breadcrumb
-    reloadStats();
-  };
-
-  const renderModule = () => {
-    const moduleConfig = MODULE_CONFIG[currentView as keyof typeof MODULE_CONFIG];
-    
-    if (currentView === 'dashboard') {
-      return (
-        <DashboardPage 
-          stats={stats} 
-          onNavigate={handleNavigation}
-        />
-      );
-    }
-
-    return (
-      <Box>
-        <ModuleHeader 
-          title={moduleConfig?.title || 'Módulo'}
-          color={moduleConfig?.color || 'gray'}
-          onBack={backToDashboard}
-          breadcrumbItems={breadcrumbItems} // ✅ NUEVO: Pasar breadcrumbs
-        />
-        
-        <Suspense fallback={<LoadingSpinner />}>
-          {currentView === 'items' && <ItemsPage />}
-          {currentView === 'stock' && <StockEntriesPage />}
-          {currentView === 'recipes' && <RecipesPage />}
-          {currentView === 'sales' && <SalesPage />}
-          {currentView === 'customers' && <CustomersPage />}
-          {!['items', 'stock', 'recipes', 'sales', 'customers'].includes(currentView) && (
-            <UnderDevelopmentPage onBack={backToDashboard} />
-          )}
-        </Suspense>
-      </Box>
-    );
-  };
-
   return (
-    <Box>
-      <Toaster />
-      {renderModule()}
-    </Box>
+    <Provider>
+      <Router>
+        <NavigationProvider>
+          {/* ✅ Hook para sincronizar badges con alertas */}
+          <NavigationBadgeSync />
+          
+          <ResponsiveLayout>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/inventory" element={<InventoryPage />} />
+              <Route path="/production" element={<ProductionPage />} />
+              <Route path="/sales" element={<SalesPage />} />
+              <Route path="/customers" element={<CustomersPage />} />
+            </Routes>
+          </ResponsiveLayout>
+          
+          {/* ✅ Toaster global */}
+          <Toaster />
+        </NavigationProvider>
+      </Router>
+    </Provider>
   );
 }
 
