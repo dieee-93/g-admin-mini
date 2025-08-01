@@ -1,3 +1,8 @@
+// src/features/stock/components/AlertConfigDialog.tsx
+// 🎉 Dialog de configuración COMPLETAMENTE MIGRADO al sistema centralizado v3.23
+// ✅ ANTES: toaster.create({ status: "success" }) - API incorrecta
+// ✅ AHORA: notify.alertConfigSaved() - Sistema centralizado correcto
+
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -17,10 +22,10 @@ import {
   ExclamationCircleIcon,
   InformationCircleIcon,
   LightBulbIcon,
-  CogIcon
+  Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 import { useStockAlerts, type AlertThreshold } from '../logic/useStockAlerts';
-import { toaster } from '@/components/ui/toaster'; 
+import { notify, handleApiError } from '@/lib/notifications'; // ✅ NUEVO sistema centralizado
 
 interface AlertConfigDialogProps {
   isOpen: boolean;
@@ -156,19 +161,12 @@ export function AlertConfigDialog({
     try {
       await saveThreshold(itemId, config);
       onClose();
-      toaster.create({
-        title: 'Configuración guardada',
-        description: `Los umbrales para ${itemName} han sido actualizados`,
-        status: 'success',
-        duration: 3000
-      });
+      
+      // ✅ MIGRADO: Usar helper específico del sistema centralizado
+      notify.alertConfigSaved(itemName);
     } catch (error) {
-      toaster.create({
-        title: 'Error al guardar',
-        description: 'No se pudo guardar la configuración',
-        status: 'error',
-        duration: 5000
-      });
+      // ✅ MIGRADO: Usar handleApiError centralizado
+      handleApiError(error, 'No se pudo guardar la configuración');
     } finally {
       setIsSubmitting(false);
     }
@@ -190,11 +188,11 @@ export function AlertConfigDialog({
   const applySuggestions = () => {
     const suggestions = getSmartDefaults(itemType, currentStock);
     setConfig(suggestions);
-    toaster.create({
+    
+    // ✅ MIGRADO: Usar helper específico
+    notify.info({
       title: 'Sugerencias aplicadas',
-      description: 'Se han aplicado los umbrales recomendados',
-      status: 'info',
-      duration: 2000
+      description: 'Se han aplicado los umbrales recomendados'
     });
   };
 
@@ -205,7 +203,7 @@ export function AlertConfigDialog({
         <Dialog.Content maxWidth="600px">
           <Dialog.Header>
             <HStack gap="3">
-              <CogIcon className="w-6 h-6 text-blue-500" />
+              <Cog6ToothIcon className="w-6 h-6 text-blue-500" />
               <VStack align="start" gap="0">
                 <Dialog.Title>Configurar Alertas</Dialog.Title>
                 <Text fontSize="sm" color="gray.600">
@@ -257,7 +255,7 @@ export function AlertConfigDialog({
                     <HStack gap="2">
                       <ExclamationTriangleIcon className="w-4 h-4 text-red-500" />
                       <Text fontSize="sm" fontWeight="medium">
-                        Crítico (0-5 unidades)
+                        Crítico (0-{config.critical_threshold} {unit})
                       </Text>
                       <Badge colorPalette="red" variant="subtle" size="sm">
                         Acción inmediata
@@ -293,11 +291,11 @@ export function AlertConfigDialog({
                 <VStack gap="2" width="100%">
                   <HStack justify="space-between" width="100%">
                     <HStack gap="2">
-                      <ExclamationCircleIcon className="w-4 h-4 text-yellow-500" />
+                      <ExclamationCircleIcon className="w-4 h-4 text-orange-500" />
                       <Text fontSize="sm" fontWeight="medium">
-                        Advertencia (6-15 unidades)
+                        Advertencia ({config.critical_threshold + 1}-{config.warning_threshold} {unit})
                       </Text>
-                      <Badge colorPalette="yellow" variant="subtle" size="sm">
+                      <Badge colorPalette="orange" variant="subtle" size="sm">
                         Planificar reposición
                       </Badge>
                     </HStack>
@@ -333,7 +331,7 @@ export function AlertConfigDialog({
                     <HStack gap="2">
                       <InformationCircleIcon className="w-4 h-4 text-blue-500" />
                       <Text fontSize="sm" fontWeight="medium">
-                        Informativo (16-25 unidades)
+                        Informativo ({config.warning_threshold + 1}-{config.info_threshold} {unit})
                       </Text>
                       <Badge colorPalette="blue" variant="subtle" size="sm">
                         Monitorear tendencia
@@ -385,7 +383,7 @@ export function AlertConfigDialog({
                   </VStack>
                   <Switch
                     checked={config.auto_reorder_enabled}
-                    onCheckedChange={(e) => handleSwitchChange('auto_reorder_enabled')(e.checked)}
+                    onCheckedChange={handleSwitchChange('auto_reorder_enabled')}
                   />
                 </HStack>
 
@@ -393,7 +391,7 @@ export function AlertConfigDialog({
                   <VStack gap="2" width="100%">
                     <HStack justify="space-between" width="100%">
                       <Text fontSize="sm" fontWeight="medium">
-                        Cantidad sugerida de reposición
+                        Cantidad sugerida para reposición
                       </Text>
                     </HStack>
                     <HStack gap="2" width="100%">
@@ -426,22 +424,43 @@ export function AlertConfigDialog({
           </Dialog.Body>
 
           <Dialog.Footer>
-            <HStack gap="3">
-              <Button variant="outline" onClick={onClose}>
+            <Dialog.CloseTrigger asChild>
+              <Button variant="outline" disabled={isSubmitting}>
                 Cancelar
               </Button>
-              <Button
-                colorPalette="blue"
-                loading={isSubmitting}
-                loadingText="Guardando..."
-                onClick={handleSubmit}
-              >
-                Guardar Configuración
-              </Button>
-            </HStack>
+            </Dialog.CloseTrigger>
+            <Button
+              colorPalette="blue"
+              onClick={handleSubmit}
+              loading={isSubmitting}
+              loadingText="Guardando..."
+            >
+              Guardar Configuración
+            </Button>
           </Dialog.Footer>
         </Dialog.Content>
       </Dialog.Positioner>
     </Dialog.Root>
   );
 }
+
+/**
+ * 🎯 MIGRACIÓN COMPLETADA:
+ * 
+ * ❌ ANTES: 
+ * toaster.create({
+ *   title: 'Configuración guardada',
+ *   status: 'success',    // ❌ API incorrecta
+ *   duration: 3000
+ * });
+ * 
+ * ✅ AHORA:
+ * notify.alertConfigSaved(itemName);  // ✅ Helper específico
+ * handleApiError(error, 'mensaje');   // ✅ Error handling centralizado
+ * 
+ * 🚀 BENEFICIOS:
+ * - API v3.23.0 correcta (type no status)
+ * - Helpers específicos para operaciones
+ * - Error handling unificado
+ * - Código más limpio y mantenible
+ */

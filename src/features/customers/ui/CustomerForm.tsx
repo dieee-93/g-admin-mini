@@ -13,8 +13,8 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useCustomers } from '../logic/useCustomers'; 
-import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { type CreateCustomerData, type Customer } from '../types';
+import { notify } from '@/lib/notifications';
 
 interface FormErrors {
   name?: string;
@@ -30,7 +30,6 @@ interface CustomerFormProps {
 
 export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProps) {
   const { addCustomer, editCustomer } = useCustomers();
-  const { handleError, handleSuccess } = useErrorHandler();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   
@@ -93,10 +92,10 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
 
       if (isEditMode) {
         await editCustomer({ id: customer.id, ...customerData });
-        handleSuccess('Cliente actualizado correctamente');
+        notify.success({title: 'UPDATED_CLIENT', description:'Cliente actualizado correctamente' });
       } else {
         await addCustomer(customerData);
-        handleSuccess('Cliente creado correctamente');
+        notify.success({title:'CREATED_CLIENT' , description:'Cliente creado correctamente'});
         
         // Resetear formulario solo en modo creación
         setForm({
@@ -111,7 +110,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
       onSuccess?.();
       
     } catch (error) {
-      handleError(error, `Error al ${isEditMode ? 'actualizar' : 'crear'} el cliente`);
+      notify.success({title:'ERROR',  description: `Error al ${isEditMode ? 'actualizar' : 'crear'} el cliente`});
     } finally {
       setIsSubmitting(false);
     }

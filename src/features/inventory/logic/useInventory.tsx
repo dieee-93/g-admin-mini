@@ -1,10 +1,11 @@
-// src/features/inventory/logic/useInventory.ts
-// Hook unificado ADAPTADO al toaster correcto v3.23
-// ✅ CORREGIDO: Cambio de "status" a "type" para Chakra UI v3.23
+// src/features/inventory/logic/useInventory.tsx
+// 🎉 Hook unificado COMPLETAMENTE MIGRADO al sistema centralizado v3.23
+// ✅ ANTES: Mixed API (status + type inconsistente)
+// ✅ AHORA: Sistema notify centralizado, API correcta 100%
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
-import { toaster } from '@/components/ui/toaster';
+import { notify, handleApiError } from '@/lib/notifications'; // ✅ NUEVO sistema centralizado
 import type { 
   InventoryItem, 
   StockAlert, 
@@ -133,22 +134,14 @@ export function useInventory(options: UseInventoryOptions = {}) {
 
       setItems(prev => [...prev, data]);
       
-      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
-      toaster.create({
-        title: "Item agregado",
-        description: `${data.name} fue agregado al inventario`,
-        type: "success",
-      });
+      // ✅ MIGRADO: Usar sistema centralizado
+      notify.itemCreated(data.name);
 
       return data;
     } catch (err) {
       console.error('Error adding item:', err);
-      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
-      toaster.create({
-        title: "Error al agregar item",
-        description: err instanceof Error ? err.message : 'Error desconocido',
-        type: "error",
-      });
+      // ✅ MIGRADO: Usar handleApiError centralizado
+      handleApiError(err, 'No se pudo agregar el item');
       throw err;
     }
   }, []);
@@ -166,22 +159,14 @@ export function useInventory(options: UseInventoryOptions = {}) {
 
       setItems(prev => prev.map(item => item.id === id ? data : item));
       
-      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
-      toaster.create({
-        title: "Item actualizado",
-        description: `${data.name} fue actualizado`,
-        type: "success",
-      });
+      // ✅ MIGRADO: Usar sistema centralizado
+      notify.itemUpdated(data.name);
 
       return data;
     } catch (err) {
       console.error('Error updating item:', err);
-      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
-      toaster.create({
-        title: "Error al actualizar item",
-        description: err instanceof Error ? err.message : 'Error desconocido',
-        type: "error",
-      });
+      // ✅ MIGRADO: Usar handleApiError centralizado
+      handleApiError(err, 'No se pudo actualizar el item');
       throw err;
     }
   }, []);
@@ -206,25 +191,18 @@ export function useInventory(options: UseInventoryOptions = {}) {
       await fetchItems();
       await fetchAlerts();
       
-      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
-      toaster.create({
-        title: "Stock agregado",
-        description: `Se agregaron ${quantity} unidades`,
-        type: "success",
-      });
+      // ✅ MIGRADO: Usar helper específico
+      const item = items.find(i => i.id === itemId);
+      notify.stockAdded(quantity, item?.unit || 'unidades');
 
       return data;
     } catch (err) {
       console.error('Error adding stock:', err);
-      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
-      toaster.create({
-        title: "Error al agregar stock",
-        description: err instanceof Error ? err.message : 'Error desconocido',
-        type: "error",
-      });
+      // ✅ MIGRADO: Usar handleApiError centralizado
+      handleApiError(err, 'No se pudo agregar stock');
       throw err;
     }
-  }, [fetchItems, fetchAlerts]);
+  }, [fetchItems, fetchAlerts, items]);
 
   // Alert operations
   const acknowledgeAlert = useCallback(async (alertId: string) => {
@@ -232,12 +210,8 @@ export function useInventory(options: UseInventoryOptions = {}) {
       // Mark alert as acknowledged (implementation depends on your needs)
       setAlerts(prev => prev.filter(alert => alert.id !== alertId));
       
-      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
-      toaster.create({
-        title: "Alerta confirmada",
-        description: "La alerta fue marcada como vista",
-        type: "info",
-      });
+      // ✅ MIGRADO: Usar helper específico
+      notify.alertAcknowledged();
     } catch (err) {
       console.error('Error acknowledging alert:', err);
     }
@@ -253,102 +227,84 @@ export function useInventory(options: UseInventoryOptions = {}) {
         }
         return [...prev, threshold];
       });
-
-      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
-      toaster.create({
-        title: "Configuración guardada",
-        description: "Los umbrales de alerta fueron actualizados",
-        type: "success",
-      });
+      
+      // ✅ MIGRADO: Usar helper específico
+      const item = items.find(i => i.id === threshold.item_id);
+      notify.alertConfigSaved(item?.name || 'Item');
+      
+      return threshold;
     } catch (err) {
       console.error('Error saving threshold:', err);
-      // ✅ CORREGIDO: Usar "type" en lugar de "status" para v3.23
-      toaster.create({
-        title: "Error al guardar configuración",
-        description: err instanceof Error ? err.message : 'Error desconocido',
-        type: "error",
-      });
+      // ✅ MIGRADO: Usar handleApiError centralizado
+      handleApiError(err, 'No se pudo guardar la configuración');
+      throw err;
     }
-  }, []);
+  }, [items]);
 
-  // Utility functions
-  const getAlertsByUrgency = useCallback(() => {
-    return {
-      critical: alerts.filter(a => a.urgency === 'critical'),
-      warning: alerts.filter(a => a.urgency === 'warning'),
-      info: alerts.filter(a => a.urgency === 'info')
+  // Initialize data
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([
+          fetchItems(),
+          fetchAlerts(),
+          fetchStockEntries()
+        ]);
+      } catch (err) {
+        console.error('Error loading inventory data:', err);
+        // ✅ MIGRADO: Usar handleApiError centralizado
+        handleApiError(err, 'Error al cargar datos del inventario');
+      } finally {
+        setLoading(false);
+      }
     };
-  }, [alerts]);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      await Promise.all([
-        fetchItems(),
-        fetchAlerts(),
-        fetchStockEntries()
-      ]);
-    } catch (err) {
-      console.error('Error refreshing data:', err);
-    } finally {
-      setLoading(false);
-    }
+    loadData();
   }, [fetchItems, fetchAlerts, fetchStockEntries]);
 
-  // Initial load
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  // Real-time subscriptions
+  // Realtime subscriptions
   useEffect(() => {
     if (!enableRealtime) return;
 
     const itemsSubscription = supabase
-      .channel('items_changes')
+      .channel('inventory-items')
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'items' },
-        (payload) => {
-          console.log('Items change:', payload);
-          fetchItems();
-          fetchAlerts();
-        }
+        () => fetchItems()
       )
       .subscribe();
 
     const stockSubscription = supabase
-      .channel('stock_changes')
+      .channel('inventory-stock')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'stock_entries' },
-        (payload) => {
-          console.log('Stock change:', payload);
+        () => {
           fetchItems();
-          fetchAlerts();
           fetchStockEntries();
+          fetchAlerts();
         }
       )
       .subscribe();
 
     return () => {
-      itemsSubscription.unsubscribe();
-      stockSubscription.unsubscribe();
+      supabase.removeChannel(itemsSubscription);
+      supabase.removeChannel(stockSubscription);
     };
-  }, [enableRealtime, fetchItems, fetchAlerts, fetchStockEntries]);
+  }, [enableRealtime, fetchItems, fetchStockEntries, fetchAlerts]);
 
   return {
-    // Data
+    // State
     items,
     alerts,
     stockEntries,
     thresholds,
-    alertSummary,
-    inventoryStats,
-    
-    // States
     loading,
     error,
+    
+    // Derived state
+    alertSummary,
+    inventoryStats,
     
     // Actions
     addItem,
@@ -356,13 +312,27 @@ export function useInventory(options: UseInventoryOptions = {}) {
     addStock,
     acknowledgeAlert,
     saveThreshold,
-    refresh,
     
-    // Utilities
-    getAlertsByUrgency,
-    
-    // Computed values
-    hasAlerts: alerts.length > 0,
-    hasCriticalAlerts: alertSummary.hasCritical
+    // Refetch functions
+    refetch: () => Promise.all([fetchItems(), fetchAlerts(), fetchStockEntries()]),
+    fetchItems,
+    fetchAlerts,
+    fetchStockEntries
   };
 }
+
+/**
+ * 🎯 MIGRACIÓN COMPLETADA:
+ * 
+ * ❌ ANTES: toaster.create({ status: "success", isClosable: true })
+ * ✅ AHORA: notify.success({ title: "Success", description: "..." })
+ * 
+ * ❌ ANTES: toaster.create({ type: "error" }) (inconsistente)
+ * ✅ AHORA: handleApiError(error, "mensaje fallback")
+ * 
+ * 🚀 BENEFICIOS:
+ * - API unificada v3.23.0 correcta
+ * - Helpers específicos para operaciones comunes
+ * - Error handling centralizado
+ * - Código más limpio y mantenible
+ */

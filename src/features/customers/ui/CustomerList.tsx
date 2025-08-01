@@ -15,15 +15,15 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useCustomers, useCustomerSearch } from '../logic/useCustomers';
-import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { type Customer } from '../types';
 import { CustomerForm } from './CustomerForm';
+import { notify } from '@/lib/notifications';
 
 export function CustomerList() {
   const { customers, customersWithStats, loading, loadingStats, removeCustomer } = useCustomers();
   const { searchResults, loading: searchLoading, query, search, clearSearch } = useCustomerSearch();
-  const { handleError, handleSuccess, handleWarning } = useErrorHandler();
+
   
   const [searchQuery, setSearchQuery] = useState('');
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -49,7 +49,8 @@ export function CustomerList() {
       try {
         await search(value);
       } catch (error) {
-        handleError(error, 'Error buscando clientes');
+        notify.error({title: 'ERROR', description:'Error buscando clientes'});
+        
       }
     } else {
       clearSearch();
@@ -63,9 +64,12 @@ export function CustomerList() {
 
     try {
       await removeCustomer(customer.id);
-      handleSuccess('Cliente eliminado correctamente');
+  
+      notify.success({title: 'CLIENT_DELETED', description:'Cliente eliminado correctamente'})
+    
     } catch (error) {
-      handleError(error, 'Error eliminando cliente');
+       notify.error({title: 'ERROR', description:'Error eliminando cliente'})
+
     }
   };
 
