@@ -1,9 +1,10 @@
-// src/components/navigation/BottomNavigation.tsx
-// Navegación inferior para mobile (thumb zone)
-// ✅ CORREGIDO: 5 módulos principales + badges según arquitectura v2.0
+// ====================================
+// src/components/navigation/BottomNavigation.tsx - ICONOS CORREGIDOS
+// ====================================
 
 import { Box, HStack, VStack, Text, Button } from '@chakra-ui/react';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { Icon, ICON_SIZES } from '@/components/ui/Icon';
 
 export function BottomNavigation() {
   const { modules, currentModule, navigate } = useNavigation();
@@ -11,7 +12,7 @@ export function BottomNavigation() {
   return (
     <Box
       as="nav"
-      position="fixed"
+      position="absolute"
       bottom="0"
       left="0"
       right="0"
@@ -21,12 +22,11 @@ export function BottomNavigation() {
       px="2"
       py="2"
       h="70px"
-      zIndex={1000}
+      zIndex={1002}
       shadow="lg"
     >
       <HStack justify="space-around" align="center" h="full">
         {modules.map((module) => {
-          const Icon = module.icon;
           const isActive = currentModule?.id === module.id;
           
           return (
@@ -42,13 +42,11 @@ export function BottomNavigation() {
               position="relative"
             >
               <VStack gap="1">
-                {/* ✅ CORREGIDO: Iconos sin className template literals */}
+                {/* ✅ CORREGIDO: Icono usando className en lugar de style */}
                 <Icon 
-                  style={{ 
-                    width: '20px', 
-                    height: '20px',
-                    color: isActive ? undefined : '#6B7280' 
-                  }} 
+                  icon={module.icon}
+                  size="md"
+                  className={isActive ? undefined : 'text-gray-500'}
                 />
                 <Text 
                   fontSize="xs" 

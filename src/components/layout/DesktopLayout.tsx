@@ -1,6 +1,6 @@
 // src/components/layout/DesktopLayout.tsx  
 // Layout específico para desktop (768px+)
-// ✅ CORREGIDO: Sidebar + Breadcrumb + Toolbar según arquitectura v2.0
+// 🔧 CRÍTICO CORREGIDO: Full width viewport + layout positioning fix
 
 import React from 'react';
 import { Box, HStack, VStack } from '@chakra-ui/react';
@@ -17,42 +17,51 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
   const { sidebarCollapsed } = useNavigation();
 
   return (
-    <HStack gap="0" minH="100vh" bg="gray.50" align="stretch">
-      {/* ✅ Sidebar collapsible */}
+    <Box minH="100vh" bg="gray.50" position="relative">
+      {/* ✅ Sidebar fixed - no necesita estar en el HStack */}
       <Sidebar />
 
-      {/* ✅ Main area - CORREGIDO: margin left sin template literals */}
-      <VStack 
-        flex="1" 
-        align="stretch" 
-        gap="0"
-        ml={sidebarCollapsed ? "60px" : "240px"}
-        transition="margin-left 0.2s ease"
+      {/* 🔧 CRÍTICO CORREGIDO: Main area SIN margin-left, con padding-left dinámico */}
+      <Box
+        pl={sidebarCollapsed ? "60px" : "240px"}
+        transition="padding-left 0.2s ease"
+        minH="100vh"
       >
-        {/* ✅ Breadcrumb navigation */}
-        <Box 
-          bg="white" 
-          borderBottom="1px solid" 
-          borderColor="gray.200"
-          px="6" 
-          py="3"
+        <VStack 
+          align="stretch" 
+          gap="0"
+          minH="100vh"
         >
-          <Breadcrumb />
-        </Box>
+          {/* ✅ Breadcrumb navigation */}
+          <Box 
+            bg="white" 
+            borderBottom="1px solid" 
+            borderColor="gray.200"
+            px="6" 
+            py="3"
+            position="sticky"
+            top="0"
+            zIndex={100}
+          >
+            <Breadcrumb />
+          </Box>
 
-        {/* ✅ Content area */}
-        <Box 
-          as="main"
-          flex="1"
-          overflow="auto"
-          position="relative"
-        >
-          {children}
-        </Box>
+          {/* 🔧 CRÍTICO CORREGIDO: Content area usa flex="1" para ocupar espacio restante */}
+          <Box 
+            as="main"
+            flex="1"
+            px="6"
+            py="6"
+            overflow="auto"
+            w="100%"
+          >
+            {children}
+          </Box>
 
-        {/* ✅ Action toolbar fijo en bottom */}
-        <ActionToolbar />
-      </VStack>
-    </HStack>
+          {/* ✅ Action toolbar fijo en bottom */}
+          <ActionToolbar />
+        </VStack>
+      </Box>
+    </Box>
   );
 }
