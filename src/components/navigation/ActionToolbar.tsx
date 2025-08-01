@@ -1,8 +1,8 @@
 // src/components/navigation/ActionToolbar.tsx
 // Toolbar de acciones para desktop
-// ✅ CORREGIDO: Quick actions contextuales
+// ✅ CORREGIDO: Import de Text + Quick actions contextuales
 
-import { Box, HStack, Button } from '@chakra-ui/react';
+import { Box, HStack, Button, Text } from '@chakra-ui/react';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 export function ActionToolbar() {
