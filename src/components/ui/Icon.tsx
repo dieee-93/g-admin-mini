@@ -3,7 +3,6 @@
 // ✅ SOLUCIÓN: Wrapper que maneja sizes + colores + variants dinámicamente
 
 import React from 'react';
-import { Box } from '@chakra-ui/react';
 
 // ✅ Heroicons imports - Separados por categoría
 // Navigation & Layout
@@ -107,12 +106,17 @@ export function Icon({
   loading = false,
   ...props
 }: IconProps) {
-  // ✅ Determinar qué icono usar
+  // ✅ Determinar qué icono usar - CORREGIDO: Type-safe access
   const ResolvedIcon = React.useMemo(() => {
     if (loading) return ArrowPathIcon;
     if (IconComponent) return IconComponent;
-    if (category && name && ICONS[category] && ICONS[category][name as any]) {
-      return ICONS[category][name as any] as React.ComponentType<{ className?: string }>;
+    
+    // ✅ CORREGIDO: Type-safe icon access
+    if (category && name) {
+      const categoryIcons = ICONS[category];
+      if (categoryIcons && name in categoryIcons) {
+        return categoryIcons[name as keyof typeof categoryIcons] as React.ComponentType<{ className?: string }>;
+      }
     }
     return null;
   }, [category, name, IconComponent, loading]);

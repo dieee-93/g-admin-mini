@@ -1,8 +1,8 @@
-// src/components/navigation/Header.tsx
-// Header móvil FUSIONADO - Lo mejor de ambas versiones
-// ✅ FUSIÓN: Dialog funcional + Badge dinámico + Logo + zIndex corregido
+// ====================================
+// src/components/navigation/Header.tsx - ICONOS CORREGIDOS
+// ====================================
 
-import { useState } from 'react';
+import  { useState } from 'react';
 import { 
   Box, 
   HStack, 
@@ -17,15 +17,14 @@ import {
   Cog6ToothIcon 
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { Icon } from '@/components/ui/Icon';
 
 export function Header() {
   const { currentModule, modules } = useNavigation();
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // ✅ NUEVO: Badge dinámico desde NavigationContext
   const totalBadges = modules.reduce((total, module) => total + (module.badge || 0), 0);
   
-  // ✅ FUSIÓN: Título contextual mejorado
   const getHeaderTitle = () => {
     if (currentModule) {
       return currentModule.title;
@@ -46,13 +45,11 @@ export function Header() {
       px="4"
       py="3"
       h="60px"
-      zIndex={1001} // ✅ CORREGIDO: Mayor que Sidebar para evitar conflictos
+      zIndex={1001}
       shadow="sm"
     >
       <HStack justify="space-between" align="center" h="full">
-        {/* ✅ FUSIÓN: Logo + Título contextual */}
         <HStack gap="3" align="center">
-          {/* ✅ NUEVO: Logo como Box separado */}
           <Box 
             w="8" 
             h="8" 
@@ -65,7 +62,6 @@ export function Header() {
             <Text color="white" fontWeight="bold" fontSize="sm">G</Text>
           </Box>
           
-          {/* ✅ EXISTENTE: Título con módulo actual */}
           <VStack align="start" gap="0">
             <Text fontSize="lg" fontWeight="semibold" color="gray.800" lineHeight="1">
               {getHeaderTitle()}
@@ -78,18 +74,16 @@ export function Header() {
           </VStack>
         </HStack>
 
-        {/* ✅ FUSIÓN: Actions mejoradas */}
         <HStack gap="2">
-          {/* ✅ FUSIÓN: Notifications con badge dinámico */}
+          {/* ✅ CORREGIDO: Notifications con Icon component */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowNotifications(true)}
             position="relative"
           >
-            <BellIcon style={{ width: '20px', height: '20px' }} />
+            <Icon icon={BellIcon} size="md" />
             
-            {/* ✅ MEJORADO: Badge dinámico en lugar de hardcodeado */}
             {totalBadges > 0 && (
               <Badge
                 position="absolute"
@@ -111,21 +105,18 @@ export function Header() {
             )}
           </Button>
 
-          {/* ✅ EXISTENTE: Settings button */}
+          {/* ✅ CORREGIDO: Settings con Icon component */}
           <Button 
             variant="ghost" 
             size="sm"
-            onClick={() => {
-              // TODO: Implementar configuración
-              console.log('Show settings');
-            }}
+            onClick={() => console.log('Show settings')}
           >
-            <Cog6ToothIcon style={{ width: '20px', height: '20px' }} />
+            <Icon icon={Cog6ToothIcon} size="md" />
           </Button>
         </HStack>
       </HStack>
 
-      {/* ✅ EXISTENTE: Notifications Dialog funcional */}
+      {/* ✅ Notifications Dialog */}
       <Dialog.Root 
         open={showNotifications} 
         onOpenChange={(e) => setShowNotifications(e.open)}
@@ -138,7 +129,6 @@ export function Header() {
             </Dialog.Header>
             <Dialog.Body>
               <VStack align="start" gap="3">
-                {/* ✅ MEJORADO: Notificaciones dinámicas desde modules */}
                 {modules
                   .filter(module => module.badge && module.badge > 0)
                   .map(module => (
@@ -152,7 +142,8 @@ export function Header() {
                         alignItems="center"
                         justifyContent="center"
                       >
-                        <module.icon style={{ width: '16px', height: '16px' }} />
+                        {/* ✅ CORREGIDO: Icon component en lugar de createElement */}
+                        <Icon icon={module.icon} size="sm" />
                       </Box>
                       <VStack align="start" gap="0" flex="1">
                         <Text fontSize="sm" fontWeight="semibold">
@@ -169,7 +160,6 @@ export function Header() {
                   ))
                 }
                 
-                {/* ✅ FALLBACK: Si no hay badges, mostrar mensaje */}
                 {totalBadges === 0 && (
                   <Text fontSize="sm" color="gray.500" textAlign="center" w="full">
                     No hay notificaciones pendientes

@@ -4,7 +4,7 @@
 
 import { Box, HStack, VStack, Text, Button } from '@chakra-ui/react';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { Icon, ICON_SIZES } from '@/components/ui/Icon';
+import { Icon } from '@/components/ui/Icon';
 
 export function BottomNavigation() {
   const { modules, currentModule, navigate } = useNavigation();
@@ -12,7 +12,7 @@ export function BottomNavigation() {
   return (
     <Box
       as="nav"
-      position="absolute"
+      position="fixed" // 🔧 CRÍTICO CORREGIDO: fixed para que siempre esté visible
       bottom="0"
       left="0"
       right="0"

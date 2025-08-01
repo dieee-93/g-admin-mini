@@ -1,6 +1,6 @@
-// src/components/navigation/Sidebar.tsx
-// Sidebar para desktop con hover expand
-// ✅ CORREGIDO: Collapsible + modules + badges sin className problems
+// ====================================
+// src/components/navigation/Sidebar.tsx - ICONOS CORREGIDOS
+// ====================================
 
 import { 
   Box, 
@@ -10,6 +10,7 @@ import {
   Button
 } from '@chakra-ui/react';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { Icon } from '@/components/ui/Icon';
 
 export function Sidebar() {
   const { 
@@ -57,10 +58,9 @@ export function Sidebar() {
           </HStack>
         </Box>
 
-        {/* ✅ Navigation items - CORREGIDO: Sin template literals problemáticos */}
+        {/* ✅ Navigation items - ICONOS CORREGIDOS */}
         <VStack gap="1" p="2" flex="1">
           {modules.map((module) => {
-            const Icon = module.icon;
             const isActive = currentModule?.id === module.id;
             
             return (
@@ -77,13 +77,13 @@ export function Sidebar() {
                 h="48px"
               >
                 <HStack gap="3" w="full">
+                  {/* ✅ CORREGIDO: Icon component en lugar de style directo */}
                   <Icon 
-                    style={{ 
-                      width: '20px', 
-                      height: '20px',
-                      color: isActive ? undefined : '#4A5568'
-                    }} 
+                    icon={module.icon}
+                    size="md"
+                    className={isActive ? undefined : 'text-gray-600'}
                   />
+                  
                   {!sidebarCollapsed && (
                     <VStack align="start" gap="0" flex="1">
                       <Text 
