@@ -14,7 +14,7 @@ import {
   CubeIcon
 } from '@heroicons/react/24/outline';
 import { useInventory } from '../logic/useInventory';
-import { ItemType } from '../types';
+import { type ItemType } from '../types';
 
 // ✅ FIX: Definir colecciones fuera del componente para performance
 const ITEM_TYPE_COLLECTION = createListCollection({

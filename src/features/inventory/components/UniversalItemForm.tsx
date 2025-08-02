@@ -1,7 +1,4 @@
-// src/features/inventory/components/UniversalItemForm.tsx
-// 🚀 FORMULARIO UNIVERSAL - CORREGIDO: Eliminado código no utilizado + componentes válidos v3
-
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   VStack,
   HStack,
@@ -17,22 +14,27 @@ import {
   Box,
   Textarea,
   Switch,
-  RadioGroup,
   Collapsible
 } from '@chakra-ui/react';
-// ✅ CORREGIDO: Usar sistema de iconos G-Admin
-import { ActionIcon, StatusIcon } from '@/components/ui/Icon';
+import {
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  InformationCircleIcon
+} from '@heroicons/react/24/outline';
 
+// ✅ IMPORTS REALES
 import { useInventory } from '../logic/useInventory';
-import { notify } from '@/lib/notifications';
 import {
   type ItemFormData,
   type ItemType,
-  type AllUnit
+  type AllUnit,
+  type MeasurableUnit,
+  type WeightUnit,
+  type VolumeUnit,
+  type LengthUnit
 } from '../types';
-// ✅ CORREGIDO: Eliminados imports no utilizados
-// - UNIT_CATEGORIES, isMeasurable, isCountable, isElaborated, type MeasurableUnit
-// - getUnitHelper, validateConversion, validatePackaging, formatQuantity
 
 // ============================================================================
 // 📊 COLECCIONES PARA SELECTS
@@ -66,13 +68,39 @@ const CATEGORY_COLLECTION = createListCollection({
   ]
 });
 
-// ✅ CORREGIDO: Eliminado PACKAGING_DISPLAY_COLLECTION no utilizado
+const WEIGHT_UNITS_COLLECTION = createListCollection({
+  items: [
+    { label: 'Kilogramos (kg)', value: 'kg' },
+    { label: 'Gramos (g)', value: 'g' },
+    { label: 'Toneladas (ton)', value: 'ton' }
+  ]
+});
+
+const VOLUME_UNITS_COLLECTION = createListCollection({
+  items: [
+    { label: 'Litros (L)', value: 'l' },
+    { label: 'Mililitros (ml)', value: 'ml' },
+    { label: 'Centímetros cúbicos (cm³)', value: 'cm3' }
+  ]
+});
+
+const LENGTH_UNITS_COLLECTION = createListCollection({
+  items: [
+    { label: 'Metros (m)', value: 'm' },
+    { label: 'Centímetros (cm)', value: 'cm' },
+    { label: 'Milímetros (mm)', value: 'mm' }
+  ]
+});
 
 // ============================================================================
 // 🔧 COMPONENTES AUXILIARES
 // ============================================================================
 
-function TypeSelector({ value, onChange, errors }: {
+function TypeSelector({ 
+  value, 
+  onChange, 
+  errors 
+}: {
   value: ItemType | '';
   onChange: (type: ItemType) => void;
   errors: Record<string, string>;
@@ -88,30 +116,21 @@ function TypeSelector({ value, onChange, errors }: {
           value={value ? [value] : []}
           onValueChange={(details) => onChange(details.value[0] as ItemType)}
           invalid={!!errors.type}
+          size="lg"
         >
-          <Select.HiddenSelect />
-          <Select.Control>
-            <Select.Trigger>
-              <Select.ValueText placeholder="Selecciona el tipo de item" />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-          </Select.Control>
-          <Select.Positioner>
-            <Select.Content>
-              {ITEM_TYPE_COLLECTION.items.map((item) => (
-                <Select.Item key={item.value} item={item}>
-                  <VStack align="start" gap="1">
-                    <Select.ItemText>{item.label}</Select.ItemText>
-                    <Text fontSize="xs" color="gray.500">
-                      {item.description}
-                    </Text>
-                  </VStack>
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select.Positioner>
+          <Select.Trigger>
+            <Select.ValueText placeholder="Selecciona el tipo de item" />
+          </Select.Trigger>
+          <Select.Content>
+            {ITEM_TYPE_COLLECTION.items.map(item => (
+              <Select.Item key={item.value} item={item}>
+                <VStack align="start" gap="1">
+                  <Text>{item.label}</Text>
+                  <Text fontSize="xs" color="gray.500">{item.description}</Text>
+                </VStack>
+              </Select.Item>
+            ))}
+          </Select.Content>
         </Select.Root>
         {errors.type && (
           <Text color="red.500" fontSize="sm" mt="1">
@@ -119,97 +138,57 @@ function TypeSelector({ value, onChange, errors }: {
           </Text>
         )}
       </Box>
-
-      {/* Explicación del tipo seleccionado */}
-      {value && (
-        <Alert.Root status="info" variant="subtle">
-          <Alert.Indicator>
-            {value === 'MEASURABLE' && <StatusIcon name="info" size="sm" />}
-            {value === 'COUNTABLE' && <ActionIcon name="inventory" size="sm" />}
-            {value === 'ELABORATED' && <ActionIcon name="chef" size="sm" />}
-          </Alert.Indicator>
-          <Alert.Description>
-            {value === 'MEASURABLE' && 'Ejemplo: Harina (kg), Leche (litros), Alambre (metros)'}
-            {value === 'COUNTABLE' && 'Ejemplo: Huevos (unidades), Cajas de pizza (50 unidades/caja)'}
-            {value === 'ELABORATED' && 'Ejemplo: Relleno de empanadas, Masa de pizza (producidos con receta)'}
-          </Alert.Description>
-        </Alert.Root>
-      )}
     </VStack>
   );
 }
 
-function MeasurableFields({ formData, setFormData, errors }: {
+function MeasurableFields({ 
+  formData, 
+  setFormData, 
+  errors 
+}: {
   formData: ItemFormData;
   setFormData: (data: ItemFormData) => void;
   errors: Record<string, string>;
 }) {
-  const categoryCollection = useMemo(() => CATEGORY_COLLECTION, []);
-  
-  // ✅ CORREGIDO: Implementación simple sin getUnitHelper (no utilizado)
-  const unitsCollection = useMemo(() => {
-    if (!formData.category) return createListCollection({ items: [] });
-    
-    const unitsByCategory = {
-      weight: [
-        { label: 'kg', value: 'kg' },
-        { label: 'g', value: 'g' },
-        { label: 'ton', value: 'ton' }
-      ],
-      volume: [
-        { label: 'l', value: 'l' },
-        { label: 'ml', value: 'ml' },
-        { label: 'cm³', value: 'cm³' }
-      ],
-      length: [
-        { label: 'm', value: 'm' },
-        { label: 'cm', value: 'cm' },
-        { label: 'mm', value: 'mm' }
-      ]
-    };
-
-    return createListCollection({
-      items: unitsByCategory[formData.category] || []
-    });
-  }, [formData.category]);
+  const getUnitsCollection = () => {
+    switch (formData.category) {
+      case 'weight': return WEIGHT_UNITS_COLLECTION;
+      case 'volume': return VOLUME_UNITS_COLLECTION;
+      case 'length': return LENGTH_UNITS_COLLECTION;
+      default: return createListCollection({ items: [] });
+    }
+  };
 
   return (
     <VStack align="stretch" gap="4">
       {/* Categoría */}
       <Box>
         <Text fontSize="sm" fontWeight="medium" mb="2">
-          Categoría de Medida *
+          Categoría de Medición *
         </Text>
         <Select.Root
-          collection={categoryCollection}
+          collection={CATEGORY_COLLECTION}
           value={formData.category ? [formData.category] : []}
           onValueChange={(details) => 
             setFormData({ 
               ...formData, 
               category: details.value[0] as 'weight' | 'volume' | 'length',
-              unit: '' as AllUnit // Reset unit cuando cambia categoría
+              unit: '' as MeasurableUnit // Reset unit when category changes
             })
           }
           invalid={!!errors.category}
         >
-          <Select.HiddenSelect />
-          <Select.Control>
-            <Select.Trigger>
-              <Select.ValueText placeholder="Peso, volumen o longitud" />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-          </Select.Control>
-          <Select.Positioner>
-            <Select.Content>
-              {categoryCollection.items.map((item) => (
-                <Select.Item key={item.value} item={item}>
-                  <Select.ItemText>{item.label}</Select.ItemText>
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select.Positioner>
+          <Select.Trigger>
+            <Select.ValueText placeholder="¿Cómo se mide este item?" />
+          </Select.Trigger>
+          <Select.Content>
+            {CATEGORY_COLLECTION.items.map(item => (
+              <Select.Item key={item.value} item={item}>
+                {item.label}
+              </Select.Item>
+            ))}
+          </Select.Content>
         </Select.Root>
         {errors.category && (
           <Text color="red.500" fontSize="sm" mt="1">
@@ -218,38 +197,30 @@ function MeasurableFields({ formData, setFormData, errors }: {
         )}
       </Box>
 
-      {/* Unidad */}
+      {/* Unidad específica */}
       {formData.category && (
         <Box>
           <Text fontSize="sm" fontWeight="medium" mb="2">
-            Unidad de Medida *
+            Unidad Específica *
           </Text>
           <Select.Root
-            collection={unitsCollection}
+            collection={getUnitsCollection()}
             value={formData.unit ? [formData.unit] : []}
             onValueChange={(details) => 
-              setFormData({ ...formData, unit: details.value[0] as AllUnit })
+              setFormData({ ...formData, unit: details.value[0] as MeasurableUnit })
             }
             invalid={!!errors.unit}
           >
-            <Select.HiddenSelect />
-            <Select.Control>
-              <Select.Trigger>
-                <Select.ValueText placeholder="Selecciona la unidad" />
-              </Select.Trigger>
-              <Select.IndicatorGroup>
-                <Select.Indicator />
-              </Select.IndicatorGroup>
-            </Select.Control>
-            <Select.Positioner>
-              <Select.Content>
-                {unitsCollection.items.map((item) => (
-                  <Select.Item key={item.value} item={item}>
-                    <Select.ItemText>{item.label}</Select.ItemText>
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
+            <Select.Trigger>
+              <Select.ValueText placeholder="Selecciona la unidad" />
+            </Select.Trigger>
+            <Select.Content>
+              {getUnitsCollection().items.map(item => (
+                <Select.Item key={item.value} item={item}>
+                  {item.label}
+                </Select.Item>
+              ))}
+            </Select.Content>
           </Select.Root>
           {errors.unit && (
             <Text color="red.500" fontSize="sm" mt="1">
@@ -262,29 +233,40 @@ function MeasurableFields({ formData, setFormData, errors }: {
   );
 }
 
-function CountableFields({ formData, setFormData, errors }: {
+function CountableFields({ 
+  formData, 
+  setFormData, 
+  errors 
+}: {
   formData: ItemFormData;
   setFormData: (data: ItemFormData) => void;
   errors: Record<string, string>;
 }) {
-  const [usePackaging, setUsePackaging] = useState(false);
+  const [usePackaging, setUsePackaging] = useState(!!formData.packaging);
 
-  // ✅ CORREGIDO: Agregado useEffect que faltaba
+  useEffect(() => {
+    // Configurar unidad por defecto para contables
+    if (formData.type === 'COUNTABLE' && !formData.unit) {
+      setFormData({ ...formData, unit: 'unidad' });
+    }
+  }, [formData.type]);
+
   useEffect(() => {
     if (!usePackaging) {
       setFormData({ ...formData, packaging: undefined });
     }
-  }, [usePackaging, formData, setFormData]);
+  }, [usePackaging]);
 
   return (
     <VStack align="stretch" gap="4">
+      {/* Info sobre contables */}
       <Alert.Root status="info" variant="subtle">
         <Alert.Indicator>
-          <StatusIcon name="info" size="sm" />
+          <InformationCircleIcon className="w-4 h-4" />
         </Alert.Indicator>
         <Alert.Description>
-          Items contables siempre se miden en "unidades". Opcionalmente puedes configurar packaging 
-          (ej: cajas de pizza vienen de 50 unidades por caja).
+          Items contables siempre se miden en <strong>unidades</strong>. 
+          Puedes configurar packaging opcional abajo.
         </Alert.Description>
       </Alert.Root>
 
@@ -299,7 +281,6 @@ function CountableFields({ formData, setFormData, errors }: {
                   Para items que vienen empaquetados (cajas, docenas, etc.)
                 </Text>
               </VStack>
-              {/* ✅ CORREGIDO: Switch con estructura v3 correcta */}
               <Switch.Root
                 checked={usePackaging}
                 onCheckedChange={(details) => setUsePackaging(details.checked)}
@@ -312,96 +293,59 @@ function CountableFields({ formData, setFormData, errors }: {
             <Collapsible.Root open={usePackaging}>
               <Collapsible.Content>
                 <VStack align="stretch" gap="3" pt="3" borderTop="1px solid" borderColor="gray.200">
-                  <HStack gap="4">
+                  <HStack gap="3">
                     <Box flex="1">
-                      <Text fontSize="sm" fontWeight="medium" mb="2">
-                        Tamaño del Paquete *
-                      </Text>
+                      <Text fontSize="sm" mb="2">Tamaño del paquete</Text>
                       <NumberInput.Root
                         value={formData.packaging?.package_size?.toString() || ''}
                         onValueChange={(details) => 
-                          setFormData({
-                            ...formData,
+                          setFormData({ 
+                            ...formData, 
                             packaging: {
                               ...formData.packaging,
                               package_size: parseInt(details.value) || 0,
-                              display_mode: 'packaged'
+                              package_unit: formData.packaging?.package_unit || ''
                             }
                           })
                         }
                         min={1}
                       >
                         <NumberInput.Control>
-                          <NumberInput.Input placeholder="50" />
+                          <NumberInput.Input placeholder="ej: 30" />
                           <NumberInput.IncrementTrigger />
                           <NumberInput.DecrementTrigger />
                         </NumberInput.Control>
                       </NumberInput.Root>
                     </Box>
-
+                    
                     <Box flex="1">
-                      <Text fontSize="sm" fontWeight="medium" mb="2">
-                        Unidad del Paquete *
-                      </Text>
+                      <Text fontSize="sm" mb="2">Unidad del paquete</Text>
                       <Input
-                        placeholder="caja, docena, bolsa..."
+                        placeholder="ej: bandeja, caja, docena"
                         value={formData.packaging?.package_unit || ''}
                         onChange={(e) => 
-                          setFormData({
-                            ...formData,
+                          setFormData({ 
+                            ...formData, 
                             packaging: {
                               ...formData.packaging,
-                              package_unit: e.target.value,
-                              display_mode: 'packaged'
+                              package_size: formData.packaging?.package_size || 0,
+                              package_unit: e.target.value
                             }
                           })
                         }
                       />
                     </Box>
                   </HStack>
-
-                  {/* ✅ CORREGIDO: Agregado RadioGroup que faltaba */}
-                  <Box>
-                    <Text fontSize="sm" fontWeight="medium" mb="2">
-                      Modo de Visualización
-                    </Text>
-                    <RadioGroup.Root
-                      value={formData.packaging?.display_mode || 'individual'}
-                      onValueChange={(details) => 
-                        setFormData({
-                          ...formData,
-                          packaging: {
-                            ...formData.packaging,
-                            display_mode: details.value as 'individual' | 'packaged' | 'both'
-                          }
-                        })
-                      }
-                    >
-                      <VStack align="start" gap="2">
-                        <RadioGroup.Item value="individual">
-                          <RadioGroup.ItemHiddenInput />
-                          <RadioGroup.ItemIndicator />
-                          <RadioGroup.ItemText>Solo unidades (ej: 150 unidades)</RadioGroup.ItemText>
-                        </RadioGroup.Item>
-                        <RadioGroup.Item value="packaged">
-                          <RadioGroup.ItemHiddenInput />
-                          <RadioGroup.ItemIndicator />
-                          <RadioGroup.ItemText>Solo paquetes (ej: 3 cajas)</RadioGroup.ItemText>
-                        </RadioGroup.Item>
-                        <RadioGroup.Item value="both">
-                          <RadioGroup.ItemHiddenInput />
-                          <RadioGroup.ItemIndicator />
-                          <RadioGroup.ItemText>Ambos (ej: 3 cajas + 5 unidades)</RadioGroup.ItemText>
-                        </RadioGroup.Item>
-                      </VStack>
-                    </RadioGroup.Root>
-                  </Box>
+                  
+                  <Text fontSize="xs" color="gray.500">
+                    Ejemplo: 30 huevos por bandeja, 12 unidades por docena, etc.
+                  </Text>
 
                   {formData.packaging?.package_size && formData.packaging?.package_unit && (
                     <Alert.Root status="success" variant="subtle">
                       <Alert.Description>
                         Ejemplo: "2 {formData.packaging.package_unit}s + 5 unidades" 
-                        para un total de {(2 * formData.packaging.package_size) + 5} unidades
+                        = {(2 * formData.packaging.package_size) + 5} unidades totales
                       </Alert.Description>
                     </Alert.Root>
                   )}
@@ -415,16 +359,21 @@ function CountableFields({ formData, setFormData, errors }: {
   );
 }
 
-function ElaboratedFields({ formData, setFormData, errors }: {
+function ElaboratedFields({ 
+  formData, 
+  setFormData, 
+  errors 
+}: {
   formData: ItemFormData;
   setFormData: (data: ItemFormData) => void;
   errors: Record<string, string>;
 }) {
   return (
     <VStack align="stretch" gap="4">
+      {/* Info sobre elaborados */}
       <Alert.Root status="warning" variant="subtle">
         <Alert.Indicator>
-          <StatusIcon name="warning" size="sm" />
+          <ExclamationTriangleIcon className="w-4 h-4" />
         </Alert.Indicator>
         <Alert.Title>Items Elaborados</Alert.Title>
         <Alert.Description>
@@ -454,7 +403,7 @@ function ElaboratedFields({ formData, setFormData, errors }: {
         </Text>
       </Box>
 
-      {/* ✅ CORREGIDO: Agregado Textarea que faltaba */}
+      {/* Descripción del proceso */}
       <Box>
         <Text fontSize="sm" fontWeight="medium" mb="2">
           Descripción del Proceso (Opcional)
@@ -484,7 +433,6 @@ function ElaboratedFields({ formData, setFormData, errors }: {
                   Debe producirse antes de usar en otros productos
                 </Text>
               </VStack>
-              {/* ✅ CORREGIDO: Switch con estructura v3 correcta */}
               <Switch.Root
                 checked={formData.requires_production ?? true}
                 onCheckedChange={(details) => 
@@ -503,7 +451,6 @@ function ElaboratedFields({ formData, setFormData, errors }: {
                   El costo se calcula según los ingredientes de la receta
                 </Text>
               </VStack>
-              {/* ✅ CORREGIDO: Switch con estructura v3 correcta */}
               <Switch.Root
                 checked={formData.auto_calculate_cost ?? true}
                 onCheckedChange={(details) => 
@@ -545,9 +492,7 @@ interface UniversalItemFormProps {
 }
 
 export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalItemFormProps) {
-  // ✅ CORREGIDO: Solo usar propiedades necesarias del hook
-  // - alerts, hasAlerts, hasCriticalAlerts: Para mostrar contexto de stock crítico
-  // - stockEntries: NO usado (es para módulo de movimientos de stock)
+  // ✅ Hook real
   const { 
     addItem, 
     updateItem, 
@@ -574,105 +519,93 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // ✅ CORREGIDO: Agregado useEffect que faltaba - limpiar campos al cambiar tipo
-  useEffect(() => {
-    // Limpiar campos específicos cuando cambia el tipo
-    if (formData.type) {
-      setFormData(prev => ({
-        ...prev,
-        unit: '' as AllUnit,
-        category: undefined,
-        packaging: undefined,
-        description: ''
-      }));
-    }
-  }, [formData.type]);
-
-  // ✅ CORREGIDO: Badge con estado del formulario
+  // ✅ Badge con estado del formulario
   const getFormStatusBadge = () => {
-    if (!formData.name || !formData.type || !formData.unit) {
+    if (!formData.name || !formData.type) {
       return <Badge colorPalette="gray" variant="subtle">Incompleto</Badge>;
     }
+    
+    if (formData.type === 'MEASURABLE' && (!formData.category || !formData.unit)) {
+      return <Badge colorPalette="blue" variant="subtle">Configura medición</Badge>;
+    }
+    
+    if (formData.type === 'ELABORATED' && !formData.unit) {
+      return <Badge colorPalette="purple" variant="subtle">Define unidad final</Badge>;
+    }
+    
     if (Object.keys(errors).length > 0) {
       return <Badge colorPalette="red" variant="subtle">Con errores</Badge>;
     }
-    return <Badge colorPalette="green" variant="subtle">Listo para guardar</Badge>;
+    
+    return <Badge colorPalette="green" variant="subtle">✓ Listo para guardar</Badge>;
   };
 
-  // Validación
-  const validate = () => {
+  // ✅ Validación mejorada
+  const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es requerido';
+      newErrors.name = 'El nombre es obligatorio';
     }
-    
+
     if (!formData.type) {
       newErrors.type = 'Debes seleccionar un tipo de item';
     }
-    
-    if (!formData.unit) {
-      newErrors.unit = 'La unidad es requerida';
+
+    if (formData.type === 'MEASURABLE') {
+      if (!formData.category) {
+        newErrors.category = 'Debes seleccionar una categoría de medición';
+      }
+      if (!formData.unit) {
+        newErrors.unit = 'Debes seleccionar una unidad específica';
+      }
     }
-    
-    // Validaciones específicas por tipo
-    if (formData.type === 'MEASURABLE' && !formData.category) {
-      newErrors.category = 'Debes seleccionar una categoría de medida';
+
+    if (formData.type === 'ELABORATED' && !formData.unit) {
+      newErrors.unit = 'Debes especificar la unidad del producto final';
     }
-    
-    if (formData.initial_stock && formData.initial_stock < 0) {
+
+    if (formData.initial_stock < 0) {
       newErrors.initial_stock = 'El stock inicial no puede ser negativo';
     }
-    
-    if (formData.unit_cost && formData.unit_cost < 0) {
+
+    if (formData.unit_cost < 0) {
       newErrors.unit_cost = 'El costo unitario no puede ser negativo';
     }
-    
-    // Validación de packaging
-    if (formData.packaging?.package_size && formData.packaging.package_size <= 0) {
-      newErrors.packaging = 'El tamaño del paquete debe ser mayor a 0';
-    }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // ✅ Submit handler
   const handleSubmit = async () => {
-    if (!validate()) return;
-    
+    if (!validateForm()) return;
+
     setIsSubmitting(true);
     try {
       if (editItem) {
         await updateItem(editItem.id, formData);
-        notify.itemUpdated(formData.name);
+        console.log('Item actualizado:', formData.name);
       } else {
         await addItem(formData);
-        notify.itemCreated(formData.name);
+        console.log('Item creado:', formData.name);
       }
       onSuccess();
     } catch (error) {
-      console.error('Error saving item:', error);
-      notify.error({
-        title: editItem ? 'Error al actualizar' : 'Error al crear',
-        description: 'No se pudo guardar el item. Inténtalo de nuevo.'
-      });
+      console.error('Error al guardar:', error);
+      // TODO: Mostrar notificación de error
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // ✅ CORREGIDO: Función formatQuantity simple (reemplaza import no utilizado)
-  const formatQuantity = (quantity: number, unit: string) => {
-    return `${quantity} ${unit}${quantity !== 1 ? 's' : ''}`;
-  };
-
   return (
     <VStack gap="6" align="stretch" maxW="600px" mx="auto">
-      {/* ✅ AGREGADO: Banner de alertas críticas */}
+      {/* ✅ Banner de alertas críticas */}
       {hasCriticalAlerts && (
-        <Alert.Root status="warning" variant="subtle">
+        <Alert.Root status="error" variant="subtle">
           <Alert.Indicator>
-            <StatusIcon name="warning" size="sm" />
+            <ExclamationTriangleIcon className="w-5 h-5" />
           </Alert.Indicator>
           <Alert.Title>Atención: Stock crítico detectado</Alert.Title>
           <Alert.Description>
@@ -688,7 +621,6 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
           <Text fontSize="lg" fontWeight="bold">
             {editItem ? 'Editar Item' : 'Crear Nuevo Item'}
           </Text>
-          {/* ✅ AGREGADO: Indicador de contexto de alertas */}
           {hasAlerts && !hasCriticalAlerts && (
             <Text fontSize="sm" color="yellow.600">
               💡 {alerts.length} items necesitan reposición
@@ -766,8 +698,8 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
             >
               <Text fontWeight="medium">Configuración Avanzada</Text>
               {showAdvanced ? 
-                <ActionIcon name="chevron-up" size="sm" /> : 
-                <ActionIcon name="chevron-down" size="sm" />
+                <ChevronUpIcon className="w-4 h-4" /> : 
+                <ChevronDownIcon className="w-4 h-4" />
               }
             </HStack>
 
@@ -801,7 +733,7 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
 
                     <Box flex="1">
                       <Text fontSize="sm" fontWeight="medium" mb="2">
-                        Costo Unitario
+                        Costo Unitario ($)
                       </Text>
                       <NumberInput.Root
                         value={formData.unit_cost?.toString() || '0'}
@@ -827,19 +759,6 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
                       )}
                     </Box>
                   </HStack>
-
-                  {formData.unit && (
-                    <Alert.Root status="info" variant="subtle">
-                      <Alert.Description>
-                        {formData.initial_stock > 0 && formData.unit_cost > 0 && (
-                          <>
-                            Stock inicial: {formatQuantity(formData.initial_stock, formData.unit)} 
-                            • Valor total: ${(formData.initial_stock * formData.unit_cost).toLocaleString()}
-                          </>
-                        )}
-                      </Alert.Description>
-                    </Alert.Root>
-                  )}
                 </VStack>
               </Collapsible.Content>
             </Collapsible.Root>
@@ -848,21 +767,30 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
       </Card.Root>
 
       {/* Botones de acción */}
-      <HStack gap="3" justify="end" pt="4">
-        <Button variant="outline" onClick={onCancel}>
+      <HStack gap="3" pt="4">
+        <Button 
+          variant="outline" 
+          onClick={onCancel}
+          flex="1"
+          disabled={isSubmitting}
+        >
           Cancelar
         </Button>
-        <Button
-          colorPalette="blue"
+        
+        <Button 
+          colorPalette="blue" 
           onClick={handleSubmit}
           loading={isSubmitting}
-          loadingText={editItem ? "Actualizando..." : "Creando..."}
-          disabled={!formData.name || !formData.type || !formData.unit}
+          loadingText="Guardando..."
+          flex="2"
+          disabled={!formData.name || !formData.type}
         >
-          <ActionIcon name="save" size="sm" />
-          {editItem ? "Actualizar Item" : "Crear Item"}
+          <CheckCircleIcon className="w-4 h-4" />
+          {editItem ? 'Actualizar Item' : 'Crear Item'}
         </Button>
       </HStack>
     </VStack>
   );
 }
+
+export default UniversalItemForm;
