@@ -1,50 +1,294 @@
 // src/features/inventory/InventoryPage.tsx
-// Módulo unificado que reemplaza ItemsPage y StockPage - COMPLETAMENTE CORREGIDO
+// 🚀 DASHBOARD UNIFICADO MODERNO - CORREGIDO: Sin errores de imports ni convenciones
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   VStack,
   HStack,
   Text,
   Button,
-  Tabs,
-  Card,
-  Badge,
   Input,
   Select,
   createListCollection,
   Dialog,
-  Table,
+  Grid,
+  Card,
+  Badge,
   Skeleton,
-  Alert
+  Alert,
+  IconButton
 } from '@chakra-ui/react';
 import {
   PlusIcon,
   ExclamationTriangleIcon,
   CubeIcon,
-  ArrowRightIcon,
   MagnifyingGlassIcon,
-  AdjustmentsHorizontalIcon
+  AdjustmentsHorizontalIcon,
+  EyeIcon,
+  PencilIcon
 } from '@heroicons/react/24/outline';
-import { useInventory } from './logic/useInventory';
-import { ItemForm, StockEntryForm } from './components/ItemForm';
-import { AlertsTab } from './components/AlertsTab';
-import type { InventoryItem } from './types';
 
-// ✅ FIX: Definir colección fuera del componente para performance
+import { useNavigation } from '@/contexts/NavigationContext';
+import { useInventory } from './logic/useInventory';
+import { GlobalAlerts } from '@/components/alerts/GlobalAlerts';
+import { UniversalItemForm } from './components/UniversalItemForm';
+import { 
+  type InventoryItem,
+  isMeasurable,
+  isCountable,
+  isElaborated
+} from './types';
+import { 
+  formatQuantity,
+  formatWithConversion,
+  formatPackagedQuantity,
+  getSmartDisplayUnit
+} from './utils/conversions';
+
+// ============================================================================
+// 📊 COLECCIONES PARA SELECTS (Siguiendo convenciones ChakraUI v3.23.0)
+// ============================================================================
+
 const TYPE_FILTER_COLLECTION = createListCollection({
   items: [
     { label: 'Todos los tipos', value: 'all' },
-    { label: 'Contables (unidad)', value: 'UNIT' },
-    { label: 'Por peso (kg)', value: 'WEIGHT' },
-    { label: 'Por volumen (lt)', value: 'VOLUME' },
+    { label: 'Conmensurables', value: 'MEASURABLE' },
+    { label: 'Contables', value: 'COUNTABLE' },
     { label: 'Elaborados', value: 'ELABORATED' }
   ]
 });
 
+// ============================================================================
+// 📊 COMPONENTES DEL DASHBOARD
+// ============================================================================
+
+function ExecutiveSummary({ stats, alertSummary }: any) {
+  return (
+    <Card.Root>
+      <Card.Body p="4">
+        <Text fontSize="lg" fontWeight="bold" mb="3">
+          📊 Resumen Ejecutivo
+        </Text>
+        
+        <Grid templateColumns="repeat(4, 1fr)" gap="4">
+          {/* Total Items */}
+          <VStack gap="1">
+            <Text fontSize="2xl" fontWeight="bold" color="blue.500">
+              {stats.totalItems}
+            </Text>
+            <Text fontSize="xs" color="gray.600" textAlign="center">
+              Items Total
+            </Text>
+          </VStack>
+
+          {/* Alertas Críticas */}
+          <VStack gap="1">
+            <Text 
+              fontSize="2xl" 
+              fontWeight="bold" 
+              color={alertSummary.critical > 0 ? "red.500" : "green.500"}
+            >
+              {alertSummary.critical}
+            </Text>
+            <Text fontSize="xs" color="gray.600" textAlign="center">
+              Alertas Críticas
+            </Text>
+          </VStack>
+
+          {/* Valor Total */}
+          <VStack gap="1">
+            <Text fontSize="2xl" fontWeight="bold" color="green.500">
+              ${stats.totalValue?.toLocaleString() || '0'}
+            </Text>
+            <Text fontSize="xs" color="gray.600" textAlign="center">
+              Valor Total
+            </Text>
+          </VStack>
+
+          {/* Movimientos Recientes */}
+          <VStack gap="1">
+            <Text fontSize="2xl" fontWeight="bold" color="purple.500">
+              {stats.recentMovements}
+            </Text>
+            <Text fontSize="xs" color="gray.600" textAlign="center">
+              Movimientos (7d)
+            </Text>
+          </VStack>
+        </Grid>
+      </Card.Body>
+    </Card.Root>
+  );
+}
+
+function QuickActions({ onAddItem, onBulkStock, onQuickStock }: any) {
+  return (
+    <Card.Root>
+      <Card.Body p="4">
+        <HStack justify="space-between" mb="3">
+          <Text fontSize="lg" fontWeight="bold">⚡ Quick Actions</Text>
+          <Badge colorPalette="blue" variant="subtle">Más usados</Badge>
+        </HStack>
+        
+        <HStack gap="3" wrap="wrap">
+          <Button 
+            colorPalette="green" 
+            size="sm"
+            onClick={onQuickStock}
+          >
+            <PlusIcon className="w-4 h-4" />
+            Stock Rápido
+          </Button>
+          
+          <Button 
+            colorPalette="blue" 
+            size="sm"
+            onClick={onBulkStock}
+          >
+            📦 Carga Masiva
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={onAddItem}
+          >
+            <CubeIcon className="w-4 h-4" />
+            Nuevo Item
+          </Button>
+
+          <IconButton size="sm" variant="ghost">
+            <MagnifyingGlassIcon className="w-4 h-4" />
+          </IconButton>
+        </HStack>
+      </Card.Body>
+    </Card.Root>
+  );
+}
+
+function ItemCard({ item, onQuickStock, onEdit, onViewDetails }: {
+  item: InventoryItem;
+  onQuickStock: (item: InventoryItem) => void;
+  onEdit: (item: InventoryItem) => void;
+  onViewDetails: (item: InventoryItem) => void;
+}) {
+  const isLowStock = item.stock <= 10; // TODO: usar threshold real
+  const isCritical = item.stock <= 5;
+  
+  // Formateo inteligente según tipo
+  const formatStock = () => {
+    if (isMeasurable(item)) {
+      const smartUnit = getSmartDisplayUnit(item.stock, item.unit);
+      return formatWithConversion(item.stock, item.unit, smartUnit);
+    }
+    
+    if (isCountable(item) && item.packaging) {
+      return formatPackagedQuantity(
+        item.stock, 
+        item.packaging.package_size || 1, 
+        item.packaging.package_unit || 'paquete'
+      );
+    }
+    
+    return formatQuantity(item.stock, item.unit || 'unidad');
+  };
+
+  const getTypeColor = () => {
+    if (isMeasurable(item)) return 'blue';
+    if (isCountable(item)) return 'green';
+    if (isElaborated(item)) return 'purple';
+    return 'gray';
+  };
+
+  return (
+    <Card.Root 
+      variant="outline"
+      bg={isCritical ? 'red.50' : isLowStock ? 'yellow.50' : 'white'}
+      borderColor={isCritical ? 'red.200' : isLowStock ? 'yellow.200' : 'gray.200'}
+    >
+      <Card.Body p="4">
+        <VStack align="stretch" gap="3">
+          {/* Header */}
+          <HStack justify="space-between" align="start">
+            <VStack align="start" gap="1" flex="1">
+              <Text fontWeight="bold" lineHeight="1.2">
+                {item.name}
+              </Text>
+              <Badge 
+                colorPalette={getTypeColor()} 
+                variant="subtle" 
+                size="xs"
+              >
+                {item.type}
+              </Badge>
+            </VStack>
+            
+            {(isLowStock || isCritical) && (
+              <ExclamationTriangleIcon 
+                className={`w-5 h-5 ${isCritical ? 'text-red-500' : 'text-yellow-500'}`}
+              />
+            )}
+          </HStack>
+
+          {/* Stock Info */}
+          <VStack align="stretch" gap="2">
+            <HStack justify="space-between">
+              <Text fontSize="sm" color="gray.600">Stock:</Text>
+              <Text fontWeight="bold" fontSize="lg">
+                {formatStock()}
+              </Text>
+            </HStack>
+            
+            {item.unit_cost && (
+              <HStack justify="space-between">
+                <Text fontSize="sm" color="gray.600">Costo:</Text>
+                <Text fontSize="sm">
+                  ${item.unit_cost}/{item.unit}
+                </Text>
+              </HStack>
+            )}
+          </VStack>
+
+          {/* Quick Actions */}
+          <HStack gap="2">
+            <Button
+              size="sm"
+              colorPalette="green"
+              flex="1"
+              onClick={() => onQuickStock(item)}
+            >
+              <PlusIcon className="w-3 h-3" />
+              +Stock
+            </Button>
+            
+            <IconButton
+              size="sm"
+              variant="outline"
+              onClick={() => onViewDetails(item)}
+            >
+              <EyeIcon className="w-3 h-3" />
+            </IconButton>
+            
+            <IconButton
+              size="sm"
+              variant="outline"
+              onClick={() => onEdit(item)}
+            >
+              <PencilIcon className="w-3 h-3" />
+            </IconButton>
+          </HStack>
+        </VStack>
+      </Card.Body>
+    </Card.Root>
+  );
+}
+
+// ============================================================================
+// 🏠 COMPONENTE PRINCIPAL
+// ============================================================================
+
 export function InventoryPage() {
-  // ✅ FIX: Solo usar variables necesarias del hook
+  const { setQuickActions } = useNavigation();
   const {
     items,
     alerts,
@@ -57,17 +301,48 @@ export function InventoryPage() {
     hasCriticalAlerts
   } = useInventory();
 
-  // Local state
-  const [activeTab, setActiveTab] = useState('items');
+  // Estados locales
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [showItemDialog, setShowItemDialog] = useState(false);
-  const [showStockDialog, setShowStockDialog] = useState<{
-    open: boolean;
-    item?: InventoryItem;
-  }>({ open: false });
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // ✅ FIX: Usar useMemo correctamente con dependencias
+  // Modals
+  const [showItemDialog, setShowItemDialog] = useState(false);
+  const [showQuickStockDialog, setShowQuickStockDialog] = useState(false);
+  const [showBulkDialog, setShowBulkDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+
+  // ✅ Configurar quick actions para navegación
+  useEffect(() => {
+    const quickActions = [
+      {
+        id: 'quick-stock',
+        label: 'Stock Rápido',
+        icon: PlusIcon,
+        action: () => setShowQuickStockDialog(true),
+        color: 'green'
+      },
+      {
+        id: 'bulk-stock',
+        label: 'Carga Masiva',
+        icon: CubeIcon,
+        action: () => setShowBulkDialog(true),
+        color: 'blue'
+      },
+      {
+        id: 'new-item',
+        label: 'Nuevo Item',
+        icon: CubeIcon,
+        action: () => setShowItemDialog(true),
+        color: 'purple'
+      }
+    ];
+
+    setQuickActions(quickActions);
+    return () => setQuickActions([]);
+  }, [setQuickActions]);
+
+  // Filtrado de items
   const filteredItems = useMemo(() => {
     return items.filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -76,22 +351,22 @@ export function InventoryPage() {
     });
   }, [items, searchTerm, typeFilter]);
 
-  // ✅ FIX: Handlers simplificados
-  const handleAddStock = (item: InventoryItem) => {
-    setShowStockDialog({ open: true, item });
+  // Handlers
+  const handleQuickStock = (item: InventoryItem) => {
+    setSelectedItem(item);
+    setShowQuickStockDialog(true);
   };
 
-  const handleStockAdded = () => {
-    setShowStockDialog({ open: false });
-    // ✅ refresh se maneja automáticamente por el hook useInventory
+  const handleEdit = (item: InventoryItem) => {
+    setSelectedItem(item);
+    // TODO: Abrir modal de edición
   };
 
-  const handleItemAdded = () => {
-    setShowItemDialog(false);
-    // ✅ refresh se maneja automáticamente por el hook useInventory
+  const handleViewDetails = (item: InventoryItem) => {
+    setSelectedItem(item);
+    // TODO: Abrir panel de detalles
   };
 
-  // ✅ FIX: Manejo de errores
   if (error) {
     return (
       <Box p="6">
@@ -104,384 +379,210 @@ export function InventoryPage() {
     );
   }
 
-  // ✅ FIX: Loading state mejorado
-  if (loading && items.length === 0) {
-    return (
-      <Box p="6">
-        <VStack gap="6" align="stretch">
-          <Skeleton height="60px" />
-          <HStack gap="4">
-            <Skeleton height="120px" flex="1" />
-            <Skeleton height="120px" flex="1" />
-            <Skeleton height="120px" flex="1" />
-          </HStack>
-          <Skeleton height="400px" />
-        </VStack>
-      </Box>
-    );
-  }
-
   return (
-    <Box p="6">
-      <VStack gap="6" align="stretch">
-        {/* Header con estadísticas */}
-        <HStack justify="space-between" align="start">
-          <VStack align="start" gap="1">
-            <Text fontSize="2xl" fontWeight="bold">Inventario</Text>
-            <Text color="gray.600">
-              Gestión unificada de items y stock
-            </Text>
-          </VStack>
+    <Box>
+      {/* 🚨 Alertas Globales */}
+      <GlobalAlerts position="top-right" maxAlerts={3} />
+      
+      <VStack gap="6" align="stretch" p="6">
+        {/* 📊 Resumen Ejecutivo */}
+        <ExecutiveSummary stats={inventoryStats} alertSummary={alertSummary} />
 
-          {/* Stats cards */}
-          <HStack gap="4">
-            <Card.Root size="sm" bg="blue.50" borderColor="blue.200">
-              <Card.Body p="3">
-                <HStack gap="2">
-                  <CubeIcon className="w-5 h-5 text-blue-500" />
-                  <VStack align="start" gap="0">
-                    <Text fontSize="lg" fontWeight="bold" color="blue.600">
-                      {inventoryStats.totalItems}
-                    </Text>
-                    <Text fontSize="xs" color="blue.600">Items</Text>
-                  </VStack>
-                </HStack>
-              </Card.Body>
-            </Card.Root>
+        {/* ⚡ Quick Actions */}
+        <QuickActions
+          onAddItem={() => setShowItemDialog(true)}
+          onBulkStock={() => setShowBulkDialog(true)}
+          onQuickStock={() => setShowQuickStockDialog(true)}
+        />
 
-            <Card.Root size="sm" bg="green.50" borderColor="green.200">
-              <Card.Body p="3">
-                <HStack gap="2">
-                  <Text fontSize="sm" fontWeight="bold" color="green.600">$</Text>
-                  <VStack align="start" gap="0">
-                    <Text fontSize="lg" fontWeight="bold" color="green.600">
-                      {inventoryStats.totalValue.toLocaleString()}
-                    </Text>
-                    <Text fontSize="xs" color="green.600">Valor total</Text>
-                  </VStack>
-                </HStack>
-              </Card.Body>
-            </Card.Root>
+        {/* 🚨 Banner de Alertas Críticas (si existen) */}
+        {hasCriticalAlerts && (
+          <Alert.Root status="error">
+            <Alert.Indicator />
+            <Alert.Title>
+              🚨 {alertSummary.critical} items con stock crítico
+            </Alert.Title>
+            <Alert.Description>
+              <Button size="sm" variant="outline" colorPalette="red">
+                Ver detalles
+              </Button>
+            </Alert.Description>
+          </Alert.Root>
+        )}
 
-            {hasAlerts && (
-              <Card.Root 
-                size="sm" 
-                bg={hasCriticalAlerts ? "red.50" : "yellow.50"} 
-                borderColor={hasCriticalAlerts ? "red.200" : "yellow.200"}
-              >
-                <Card.Body p="3">
-                  <HStack gap="2">
-                    <ExclamationTriangleIcon 
-                      className={`w-5 h-5 ${hasCriticalAlerts ? 'text-red-500' : 'text-yellow-500'}`} 
-                    />
-                    <VStack align="start" gap="0">
-                      <Text 
-                        fontSize="lg" 
-                        fontWeight="bold" 
-                        color={hasCriticalAlerts ? "red.600" : "yellow.600"}
-                      >
-                        {alertSummary.total}
-                      </Text>
-                      <Text 
-                        fontSize="xs" 
-                        color={hasCriticalAlerts ? "red.600" : "yellow.600"}
-                      >
-                        Alertas
-                      </Text>
-                    </VStack>
-                  </HStack>
-                </Card.Body>
-              </Card.Root>
-            )}
-          </HStack>
-        </HStack>
+        {/* 🔍 Filtros y Búsqueda */}
+        <Card.Root>
+          <Card.Body p="4">
+            <HStack gap="4" align="end">
+              <Box flex="2">
+                <Text mb="2" fontSize="sm" fontWeight="medium">
+                  Buscar items
+                </Text>
+                <Input
+                  placeholder="Buscar por nombre..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </Box>
 
-        {/* Tabs principales */}
-        <Tabs.Root 
-          value={activeTab} 
-          onValueChange={(details) => setActiveTab(details.value)}
-          variant="enclosed"
-        >
-          <Tabs.List>
-            <Tabs.Trigger value="items">
-              <CubeIcon className="w-4 h-4" />
-              Items ({items.length})
-            </Tabs.Trigger>
-            <Tabs.Trigger value="movements">
-              <ArrowRightIcon className="w-4 h-4" />
-              Movimientos ({stockEntries.length})
-            </Tabs.Trigger>
-            <Tabs.Trigger value="alerts">
-              <ExclamationTriangleIcon className="w-4 h-4" />
-              Alertas
-              {hasAlerts && (
-                <Badge 
-                  size="sm" 
-                  colorPalette={hasCriticalAlerts ? "red" : "yellow"}
-                  ml="2"
+              <Box flex="1">
+                <Text mb="2" fontSize="sm" fontWeight="medium">
+                  Filtro
+                </Text>
+                <Select.Root
+                  collection={TYPE_FILTER_COLLECTION}
+                  value={[typeFilter]}
+                  onValueChange={(details) => setTypeFilter(details.value[0])}
                 >
-                  {alertSummary.total}
-                </Badge>
-              )}
-            </Tabs.Trigger>
-          </Tabs.List>
-
-          {/* Tab Items */}
-          <Tabs.Content value="items">
-            <VStack gap="4" align="stretch">
-              {/* Controles */}
-              <HStack gap="4">
-                <HStack flex="1" gap="3">
-                  <Input
-                    placeholder="Buscar items..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    maxW="300px"
-                  />
-                  <Select.Root
-                    collection={TYPE_FILTER_COLLECTION}
-                    value={typeFilter ? [typeFilter] : []}
-                    onValueChange={(details) => setTypeFilter(details.value[0] || 'all')}
-                    maxW="200px"
-                  >
+                  <Select.HiddenSelect />
+                  <Select.Control>
                     <Select.Trigger>
-                      <Select.ValueText placeholder="Filtrar por tipo" />
+                      <Select.ValueText placeholder="Todos los tipos" />
                     </Select.Trigger>
+                    <Select.IndicatorGroup>
+                      <Select.Indicator />
+                    </Select.IndicatorGroup>
+                  </Select.Control>
+                  <Select.Positioner>
                     <Select.Content>
                       {TYPE_FILTER_COLLECTION.items.map((item) => (
-                        <Select.Item item={item} key={item.value}>
-                          {item.label}
+                        <Select.Item key={item.value} item={item}>
+                          <Select.ItemText>{item.label}</Select.ItemText>
                         </Select.Item>
                       ))}
                     </Select.Content>
-                  </Select.Root>
-                </HStack>
+                  </Select.Positioner>
+                </Select.Root>
+              </Box>
 
-                <Button
-                  colorPalette="blue"
-                  onClick={() => setShowItemDialog(true)}
-                >
-                  <PlusIcon className="w-4 h-4" />
-                  Nuevo Item
-                </Button>
-              </HStack>
+              <IconButton
+                onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+                variant="outline"
+              >
+                <AdjustmentsHorizontalIcon className="w-4 h-4" />
+              </IconButton>
+            </HStack>
+          </Card.Body>
+        </Card.Root>
 
-              {/* Items table */}
-              <Card.Root>
-                <Table.Root>
-                  <Table.Header>
-                    <Table.Row>
-                      <Table.ColumnHeader>Nombre</Table.ColumnHeader>
-                      <Table.ColumnHeader>Tipo</Table.ColumnHeader>
-                      <Table.ColumnHeader>Stock</Table.ColumnHeader>
-                      <Table.ColumnHeader>Costo unitario</Table.ColumnHeader>
-                      <Table.ColumnHeader>Valor total</Table.ColumnHeader>
-                      <Table.ColumnHeader>Acciones</Table.ColumnHeader>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {filteredItems.map((item) => {
-                      const totalValue = item.stock * (item.unit_cost || 0);
-                      // ✅ FIX: Verificar que alerts existe y no esté vacío
-                      const hasLowStock = alerts.length > 0 && alerts.some(alert => alert.item_id === item.id);
-                      
-                      return (
-                        <Table.Row key={item.id}>
-                          <Table.Cell>
-                            <HStack gap="2">
-                              <Text fontWeight="medium">{item.name}</Text>
-                              {hasLowStock && (
-                                <Badge colorPalette="yellow" size="sm">
-                                  Stock bajo
-                                </Badge>
-                              )}
-                            </HStack>
-                          </Table.Cell>
-                          <Table.Cell>
-                            <Badge 
-                              colorPalette={
-                                item.type === 'ELABORATED' ? 'purple' :
-                                item.type === 'WEIGHT' ? 'orange' :
-                                item.type === 'VOLUME' ? 'blue' : 'gray'
-                              }
-                              size="sm"
-                            >
-                              {item.type}
-                            </Badge>
-                          </Table.Cell>
-                          <Table.Cell>
-                            <Text 
-                              color={item.stock === 0 ? 'red.500' : item.stock < 10 ? 'yellow.600' : 'inherit'}
-                              fontWeight={item.stock < 10 ? 'medium' : 'normal'}
-                            >
-                              {item.stock} {item.unit}
-                            </Text>
-                          </Table.Cell>
-                          <Table.Cell>
-                            {item.unit_cost ? `$${item.unit_cost.toLocaleString()}` : '-'}
-                          </Table.Cell>
-                          <Table.Cell fontWeight="medium">
-                            ${totalValue.toLocaleString()}
-                          </Table.Cell>
-                          <Table.Cell>
-                            <HStack gap="2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                colorPalette="blue"
-                                onClick={() => handleAddStock(item)}
-                              >
-                                <PlusIcon className="w-3 h-3" />
-                                Stock
-                              </Button>
-                            </HStack>
-                          </Table.Cell>
-                        </Table.Row>
-                      );
-                    })}
-                  </Table.Body>
-                </Table.Root>
-
-                {filteredItems.length === 0 && (
-                  <Box p="8" textAlign="center">
-                    <VStack gap="3" color="gray.500">
-                      <CubeIcon className="w-12 h-12" />
-                      <Text>No se encontraron items</Text>
-                      {searchTerm && (
-                        <Text fontSize="sm">
-                          Intenta ajustar los filtros de búsqueda
-                        </Text>
-                      )}
-                    </VStack>
-                  </Box>
+        {/* 📦 Grid de Items */}
+        {loading ? (
+          <Grid templateColumns="repeat(auto-fill, minmax(280px, 1fr))" gap="4">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} height="200px" borderRadius="md" />
+            ))}
+          </Grid>
+        ) : filteredItems.length === 0 ? (
+          <Card.Root>
+            <Card.Body>
+              <VStack gap="4" py="8">
+                <CubeIcon className="w-12 h-12 text-gray-400" />
+                <VStack gap="2">
+                  <Text fontSize="lg" fontWeight="medium">
+                    No hay items
+                  </Text>
+                  <Text color="gray.500" textAlign="center">
+                    {searchTerm || typeFilter !== 'all'
+                      ? 'No se encontraron items con los filtros aplicados'
+                      : 'Comienza agregando tu primer item al inventario'
+                    }
+                  </Text>
+                </VStack>
+                {!searchTerm && typeFilter === 'all' && (
+                  <Button 
+                    colorPalette="blue"
+                    onClick={() => setShowItemDialog(true)}
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                    Crear primer item
+                  </Button>
                 )}
-              </Card.Root>
-            </VStack>
-          </Tabs.Content>
-
-          {/* Tab Movements */}
-          <Tabs.Content value="movements">
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Movimientos de Stock Recientes</Card.Title>
-              </Card.Header>
-              <Card.Body>
-                <Table.Root>
-                  <Table.Header>
-                    <Table.Row>
-                      <Table.ColumnHeader>Fecha</Table.ColumnHeader>
-                      <Table.ColumnHeader>Item</Table.ColumnHeader>
-                      <Table.ColumnHeader>Cantidad</Table.ColumnHeader>
-                      <Table.ColumnHeader>Costo unitario</Table.ColumnHeader>
-                      <Table.ColumnHeader>Total</Table.ColumnHeader>
-                      <Table.ColumnHeader>Nota</Table.ColumnHeader>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {stockEntries.slice(0, 20).map((entry) => {
-                      const item = items.find(i => i.id === entry.item_id);
-                      const total = entry.quantity * entry.unit_cost;
-                      
-                      return (
-                        <Table.Row key={entry.id}>
-                          <Table.Cell>
-                            {new Date(entry.created_at).toLocaleDateString()}
-                          </Table.Cell>
-                          <Table.Cell fontWeight="medium">
-                            {item?.name || 'Item eliminado'}
-                          </Table.Cell>
-                          <Table.Cell>
-                            <Text color="green.600" fontWeight="medium">
-                              +{entry.quantity} {item?.unit}
-                            </Text>
-                          </Table.Cell>
-                          <Table.Cell>
-                            ${entry.unit_cost.toLocaleString()}
-                          </Table.Cell>
-                          <Table.Cell fontWeight="medium">
-                            ${total.toLocaleString()}
-                          </Table.Cell>
-                          <Table.Cell>
-                            <Text fontSize="sm" color="gray.600">
-                              {entry.note || '-'}
-                            </Text>
-                          </Table.Cell>
-                        </Table.Row>
-                      );
-                    })}
-                  </Table.Body>
-                </Table.Root>
-
-                {/* ✅ FIX: Manejar estado vacío */}
-                {stockEntries.length === 0 && (
-                  <Box p="8" textAlign="center">
-                    <VStack gap="3" color="gray.500">
-                      <ArrowRightIcon className="w-12 h-12" />
-                      <Text>No hay movimientos registrados</Text>
-                      <Text fontSize="sm">
-                        Los movimientos aparecerán cuando agregues stock
-                      </Text>
-                    </VStack>
-                  </Box>
-                )}
-              </Card.Body>
-            </Card.Root>
-          </Tabs.Content>
-
-          {/* Tab Alerts */}
-          <Tabs.Content value="alerts">
-            <AlertsTab 
-              alerts={alerts}
-              alertSummary={alertSummary}
-              onAddStock={handleAddStock}
-              loading={loading}
-            />
-          </Tabs.Content>
-        </Tabs.Root>
-
-        {/* Dialogs */}
-        <Dialog.Root open={showItemDialog} onOpenChange={(e) => setShowItemDialog(e.open)}>
-          <Dialog.Backdrop />
-          <Dialog.Positioner>
-            <Dialog.Content>
-              <Dialog.Header>
-                <Dialog.Title>Agregar Nuevo Item</Dialog.Title>
-              </Dialog.Header>
-              <Dialog.Body>
-                <ItemForm
-                  onSuccess={handleItemAdded}
-                  onCancel={() => setShowItemDialog(false)}
-                />
-              </Dialog.Body>
-            </Dialog.Content>
-          </Dialog.Positioner>
-        </Dialog.Root>
-
-        <Dialog.Root 
-          open={showStockDialog.open} 
-          onOpenChange={(e) => setShowStockDialog(prev => ({ ...prev, open: e.open }))}
-        >
-          <Dialog.Backdrop />
-          <Dialog.Positioner>
-            <Dialog.Content>
-              <Dialog.Header>
-                <Dialog.Title>
-                  Agregar Stock - {showStockDialog.item?.name}
-                </Dialog.Title>
-              </Dialog.Header>
-              <Dialog.Body>
-                {showStockDialog.item && (
-                  <StockEntryForm
-                    item={showStockDialog.item}
-                    onSuccess={handleStockAdded}
-                    onCancel={() => setShowStockDialog({ open: false })}
-                  />
-                )}
-              </Dialog.Body>
-            </Dialog.Content>
-          </Dialog.Positioner>
-        </Dialog.Root>
+              </VStack>
+            </Card.Body>
+          </Card.Root>
+        ) : (
+          <Grid 
+            templateColumns={{
+              base: "1fr",
+              md: "repeat(2, 1fr)",
+              lg: "repeat(3, 1fr)",
+              xl: "repeat(4, 1fr)"
+            }}
+            gap="4"
+          >
+            {filteredItems.map((item) => (
+              <ItemCard
+                key={item.id}
+                item={item}
+                onQuickStock={handleQuickStock}
+                onEdit={handleEdit}
+                onViewDetails={handleViewDetails}
+              />
+            ))}
+          </Grid>
+        )}
       </VStack>
+
+      {/* 🔧 MODALS - Formularios modernos */}
+      
+      {/* Modal Crear Item */}
+      <Dialog.Root open={showItemDialog} onOpenChange={(details) => setShowItemDialog(details.open)}>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content maxW="700px">
+            <Dialog.Header>
+              <Dialog.Title>🆕 Crear Nuevo Item</Dialog.Title>
+              <Dialog.CloseTrigger />
+            </Dialog.Header>
+            <Dialog.Body p="6">
+              <UniversalItemForm
+                onSuccess={() => setShowItemDialog(false)}
+                onCancel={() => setShowItemDialog(false)}
+              />
+            </Dialog.Body>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
+
+      {/* Modal Quick Stock */}
+      <Dialog.Root open={showQuickStockDialog} onOpenChange={(details) => setShowQuickStockDialog(details.open)}>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header>
+              <Dialog.Title>
+                ⚡ Stock Rápido {selectedItem && `- ${selectedItem.name}`}
+              </Dialog.Title>
+              <Dialog.CloseTrigger />
+            </Dialog.Header>
+            <Dialog.Body>
+              <Text color="gray.600">
+                Formulario rápido con conversiones automáticas...
+              </Text>
+              {/* TODO: Implementar quick stock form */}
+            </Dialog.Body>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
+
+      {/* Modal Bulk Stock */}
+      <Dialog.Root open={showBulkDialog} onOpenChange={(details) => setShowBulkDialog(details.open)}>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content maxW="4xl">
+            <Dialog.Header>
+              <Dialog.Title>📦 Carga Masiva de Stock</Dialog.Title>
+              <Dialog.CloseTrigger />
+            </Dialog.Header>
+            <Dialog.Body>
+              <Text color="gray.600">
+                Formulario para cargar múltiples items (proveedor trae 5+ productos)...
+              </Text>
+              {/* TODO: Implementar bulk stock form */}
+            </Dialog.Body>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
     </Box>
   );
 }
