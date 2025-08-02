@@ -20,14 +20,8 @@ import {
   RadioGroup,
   Collapsible
 } from '@chakra-ui/react';
-import {
-  CubeIcon,
-  ScaleIcon,
-  BeakerIcon,
-  InformationCircleIcon,
-  ChevronDownIcon,
-  ChevronUpIcon
-} from '@heroicons/react/24/outline';
+// ✅ CORREGIDO: Usar sistema de iconos G-Admin
+import { ActionIcon, StatusIcon } from '@/components/ui/Icon';
 
 import { useInventory } from '../logic/useInventory';
 import { notify } from '@/lib/notifications';
@@ -130,9 +124,9 @@ function TypeSelector({ value, onChange, errors }: {
       {value && (
         <Alert.Root status="info" variant="subtle">
           <Alert.Indicator>
-            {value === 'MEASURABLE' && <BeakerIcon className="w-4 h-4" />}
-            {value === 'COUNTABLE' && <CubeIcon className="w-4 h-4" />}
-            {value === 'ELABORATED' && <ScaleIcon className="w-4 h-4" />}
+            {value === 'MEASURABLE' && <StatusIcon name="info" size="sm" />}
+            {value === 'COUNTABLE' && <ActionIcon name="inventory" size="sm" />}
+            {value === 'ELABORATED' && <ActionIcon name="chef" size="sm" />}
           </Alert.Indicator>
           <Alert.Description>
             {value === 'MEASURABLE' && 'Ejemplo: Harina (kg), Leche (litros), Alambre (metros)'}
@@ -286,7 +280,7 @@ function CountableFields({ formData, setFormData, errors }: {
     <VStack align="stretch" gap="4">
       <Alert.Root status="info" variant="subtle">
         <Alert.Indicator>
-          <InformationCircleIcon className="w-4 h-4" />
+          <StatusIcon name="info" size="sm" />
         </Alert.Indicator>
         <Alert.Description>
           Items contables siempre se miden en "unidades". Opcionalmente puedes configurar packaging 
@@ -430,7 +424,7 @@ function ElaboratedFields({ formData, setFormData, errors }: {
     <VStack align="stretch" gap="4">
       <Alert.Root status="warning" variant="subtle">
         <Alert.Indicator>
-          <ScaleIcon className="w-4 h-4" />
+          <StatusIcon name="warning" size="sm" />
         </Alert.Indicator>
         <Alert.Title>Items Elaborados</Alert.Title>
         <Alert.Description>
@@ -551,7 +545,16 @@ interface UniversalItemFormProps {
 }
 
 export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalItemFormProps) {
-  const { addItem, updateItem } = useInventory();
+  // ✅ CORREGIDO: Solo usar propiedades necesarias del hook
+  // - alerts, hasAlerts, hasCriticalAlerts: Para mostrar contexto de stock crítico
+  // - stockEntries: NO usado (es para módulo de movimientos de stock)
+  const { 
+    addItem, 
+    updateItem, 
+    alerts, 
+    hasAlerts, 
+    hasCriticalAlerts 
+  } = useInventory();
   
   const [formData, setFormData] = useState<ItemFormData>({
     name: editItem?.name || '',
@@ -665,11 +668,33 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
 
   return (
     <VStack gap="6" align="stretch" maxW="600px" mx="auto">
+      {/* ✅ AGREGADO: Banner de alertas críticas */}
+      {hasCriticalAlerts && (
+        <Alert.Root status="warning" variant="subtle">
+          <Alert.Indicator>
+            <StatusIcon name="warning" size="sm" />
+          </Alert.Indicator>
+          <Alert.Title>Atención: Stock crítico detectado</Alert.Title>
+          <Alert.Description>
+            Hay {alerts.filter(a => a.urgency === 'critical').length} items con stock crítico. 
+            Considera agregarlos a tu lista de compras.
+          </Alert.Description>
+        </Alert.Root>
+      )}
+
       {/* Header con estado */}
       <HStack justify="space-between" align="center">
-        <Text fontSize="lg" fontWeight="bold">
-          {editItem ? 'Editar Item' : 'Crear Nuevo Item'}
-        </Text>
+        <VStack align="start" gap="1">
+          <Text fontSize="lg" fontWeight="bold">
+            {editItem ? 'Editar Item' : 'Crear Nuevo Item'}
+          </Text>
+          {/* ✅ AGREGADO: Indicador de contexto de alertas */}
+          {hasAlerts && !hasCriticalAlerts && (
+            <Text fontSize="sm" color="yellow.600">
+              💡 {alerts.length} items necesitan reposición
+            </Text>
+          )}
+        </VStack>
         {getFormStatusBadge()}
       </HStack>
 
@@ -741,8 +766,8 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
             >
               <Text fontWeight="medium">Configuración Avanzada</Text>
               {showAdvanced ? 
-                <ChevronUpIcon className="w-4 h-4" /> : 
-                <ChevronDownIcon className="w-4 h-4" />
+                <ActionIcon name="chevron-up" size="sm" /> : 
+                <ActionIcon name="chevron-down" size="sm" />
               }
             </HStack>
 
@@ -834,7 +859,7 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
           loadingText={editItem ? "Actualizando..." : "Creando..."}
           disabled={!formData.name || !formData.type || !formData.unit}
         >
-          <CubeIcon className="w-4 h-4" />
+          <ActionIcon name="save" size="sm" />
           {editItem ? "Actualizar Item" : "Crear Item"}
         </Button>
       </HStack>
