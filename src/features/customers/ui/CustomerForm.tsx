@@ -109,8 +109,8 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
 
       onSuccess?.();
       
-    } catch (error) {
-      notify.success({title:'ERROR',  description: `Error al ${isEditMode ? 'actualizar' : 'crear'} el cliente`});
+    } catch {
+      notify.error({title:'ERROR',  description: `Error al ${isEditMode ? 'actualizar' : 'crear'} el cliente`});
     } finally {
       setIsSubmitting(false);
     }

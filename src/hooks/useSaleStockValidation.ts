@@ -38,9 +38,10 @@ export function useSaleStockValidation() {
 
       if (error) {
         console.error('Error validating stock:', error);
+        const errorMessage = error.message || 'Error al validar stock. Intenta nuevamente.';
         const result = { 
           is_valid: false, 
-          error_message: 'Error al validar stock. Intenta nuevamente.' 
+          error_message: `Error de validación: ${errorMessage}` 
         };
         setValidationResult(result);
         return result;
@@ -52,9 +53,10 @@ export function useSaleStockValidation() {
       
     } catch (error) {
       console.error('Unexpected error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       const result = { 
         is_valid: false, 
-        error_message: 'Error inesperado al validar stock.' 
+        error_message: `Error inesperado: ${errorMessage}` 
       };
       setValidationResult(result);
       return result;

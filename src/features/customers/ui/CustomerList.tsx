@@ -48,7 +48,7 @@ export function CustomerList() {
     if (value.length >= 2) {
       try {
         await search(value);
-      } catch (error) {
+      } catch {
         notify.error({title: 'ERROR', description:'Error buscando clientes'});
         
       }
@@ -67,7 +67,7 @@ export function CustomerList() {
   
       notify.success({title: 'CLIENT_DELETED', description:'Cliente eliminado correctamente'})
     
-    } catch (error) {
+    } catch {
        notify.error({title: 'ERROR', description:'Error eliminando cliente'})
 
     }

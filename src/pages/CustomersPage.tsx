@@ -1,8 +1,4 @@
-// =====================================
-
 // src/pages/CustomersPage.tsx
-// ✅ NUEVO: Página de clientes integrada con NavigationContext
-
 import { useState, useEffect } from 'react';
 import {
   Box,
@@ -24,28 +20,39 @@ import {
   TagIcon
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { CustomerForm } from '@/features/customers/ui/CustomerForm';
+import { CustomerList } from '@/features/customers/ui/CustomerList';
+import { CustomerOrdersHistory } from '@/features/customers/ui/CustomerOrdersHistory';
+import { CustomerAnalytics } from '@/features/customers/ui/CustomerAnalytics';
+import { CustomerSegments } from '@/features/customers/ui/CustomerSegments';
+import { useCustomers } from '@/features/customers/logic/useCustomers';
 
 export function CustomersPage() {
-  // ✅ Integración con NavigationContext
   const { setQuickActions } = useNavigation();
+  const { customers, customersWithStats } = useCustomers();
 
   // Local state
   const [activeTab, setActiveTab] = useState('customers');
-  const [customerStats] = useState({
-    totalCustomers: 0,
-    activeCustomers: 0,
-    avgOrderValue: 0,
-    customerRetention: 0
-  });
+  const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
 
-  // ✅ Configurar quick actions contextuales
+  // Calculate stats from actual data
+  const customerStats = {
+    totalCustomers: customers.length,
+    activeCustomers: customersWithStats.filter(c => c.stats && c.stats.purchase_count > 0).length,
+    avgOrderValue: customersWithStats.reduce((sum, c) => sum + (c.stats?.average_purchase || 0), 0) / Math.max(customersWithStats.length, 1),
+    customerRetention: customers.length > 0 ? Math.round((customersWithStats.filter(c => c.stats && c.stats.purchase_count > 1).length / customers.length) * 100) : 0
+  };
+
   useEffect(() => {
     const quickActions = [
       {
         id: 'new-customer',
         label: 'Nuevo Cliente',
         icon: UserIcon,
-        action: () => setActiveTab('customers'),
+        action: () => {
+          setActiveTab('customers');
+          setShowNewCustomerForm(true);
+        },
         color: 'pink'
       },
       {
@@ -99,7 +106,7 @@ export function CustomersPage() {
 
               <VStack align="center" gap="0">
                 <Text fontSize="2xl" fontWeight="bold" color="blue.500">
-                  ${customerStats.avgOrderValue}
+                  ${Math.round(customerStats.avgOrderValue)}
                 </Text>
                 <Text fontSize="xs" color="gray.500">Ticket Promedio</Text>
               </VStack>
@@ -147,92 +154,54 @@ export function CustomersPage() {
 
           {/* TAB: Clientes */}
           <Tabs.Content value="customers">
-            <Card.Root>
-              <Card.Header>
-                <HStack justify="space-between">
-                  <Text fontSize="lg" fontWeight="bold">Lista de Clientes</Text>
-                  <Button colorPalette="pink">
-                    <PlusIcon className="w-4 h-4" />
-                    Nuevo Cliente
-                  </Button>
-                </HStack>
-              </Card.Header>
-              
-              <Card.Body>
-                <VStack gap="4" py="8">
-                  <UsersIcon className="w-12 h-12 text-gray-400" />
-                  <VStack gap="2">
-                    <Text fontSize="lg" fontWeight="medium">Gestión de clientes en desarrollo</Text>
-                    <Text color="gray.500" textAlign="center">
-                      Aquí podrás gestionar todos tus clientes, sus datos de contacto y preferencias.
-                    </Text>
-                  </VStack>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
+            <VStack gap="6" align="stretch">
+              {/* Formulario de nuevo cliente (condicional) */}
+              {showNewCustomerForm && (
+                <Card.Root>
+                  <Card.Body>
+                    <CustomerForm 
+                      onSuccess={() => setShowNewCustomerForm(false)}
+                      onCancel={() => setShowNewCustomerForm(false)}
+                    />
+                  </Card.Body>
+                </Card.Root>
+              )}
+
+              {/* Lista de clientes */}
+              <Card.Root>
+                <Card.Header>
+                  <HStack justify="space-between">
+                    <Text fontSize="lg" fontWeight="bold">Lista de Clientes</Text>
+                    <Button 
+                      colorPalette="pink"
+                      onClick={() => setShowNewCustomerForm(!showNewCustomerForm)}
+                    >
+                      <PlusIcon className="w-4 h-4" />
+                      {showNewCustomerForm ? 'Cancelar' : 'Nuevo Cliente'}
+                    </Button>
+                  </HStack>
+                </Card.Header>
+                
+                <Card.Body>
+                  <CustomerList />
+                </Card.Body>
+              </Card.Root>
+            </VStack>
           </Tabs.Content>
 
           {/* TAB: Pedidos */}
           <Tabs.Content value="orders">
-            <Card.Root>
-              <Card.Header>
-                <Text fontSize="lg" fontWeight="bold">Historial de Pedidos</Text>
-              </Card.Header>
-              
-              <Card.Body>
-                <VStack gap="4" py="8">
-                  <ClipboardDocumentListIcon className="w-12 h-12 text-gray-400" />
-                  <VStack gap="2">
-                    <Text fontSize="lg" fontWeight="medium">Historial de pedidos en desarrollo</Text>
-                    <Text color="gray.500" textAlign="center">
-                      Aquí podrás ver el historial completo de pedidos por cliente.
-                    </Text>
-                  </VStack>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
+            <CustomerOrdersHistory />
           </Tabs.Content>
 
           {/* TAB: Segmentos */}
           <Tabs.Content value="segments">
-            <Card.Root>
-              <Card.Header>
-                <Text fontSize="lg" fontWeight="bold">Segmentación de Clientes</Text>
-              </Card.Header>
-              
-              <Card.Body>
-                <VStack gap="4" py="8">
-                  <TagIcon className="w-12 h-12 text-gray-400" />
-                  <VStack gap="2">
-                    <Text fontSize="lg" fontWeight="medium">Segmentación en desarrollo</Text>
-                    <Text color="gray.500" textAlign="center">
-                      Aquí podrás crear segmentos de clientes basados en comportamiento y preferencias.
-                    </Text>
-                  </VStack>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
+            <CustomerSegments />
           </Tabs.Content>
 
           {/* TAB: Análisis */}
           <Tabs.Content value="analytics">
-            <Card.Root>
-              <Card.Header>
-                <Text fontSize="lg" fontWeight="bold">Análisis de Clientes</Text>
-              </Card.Header>
-              
-              <Card.Body>
-                <VStack gap="4" py="8">
-                  <ChartBarIcon className="w-12 h-12 text-gray-400" />
-                  <VStack gap="2">
-                    <Text fontSize="lg" fontWeight="medium">Analytics en desarrollo</Text>
-                    <Text color="gray.500" textAlign="center">
-                      Aquí podrás ver métricas detalladas de comportamiento y valor de clientes.
-                    </Text>
-                  </VStack>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
+            <CustomerAnalytics />
           </Tabs.Content>
         </Tabs.Root>
       </VStack>

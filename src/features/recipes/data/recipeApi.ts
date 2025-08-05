@@ -153,8 +153,14 @@ export async function calculateRecipeCost(recipeId: string): Promise<number> {
   const { data, error } = await supabase
     .rpc('calculate_recipe_cost', { recipe_id: recipeId });
   
-  if (error) throw error;
-  return data || 0;
+  if (error) {
+    console.error('Cost calculation error:', error);
+    throw new Error(`Error calculating recipe cost: ${error.message}`);
+  }
+  
+  // Handle null/undefined data from database function
+  const cost = typeof data === 'number' ? data : 0;
+  return Math.max(0, cost); // Ensure non-negative
 }
 
 export async function checkRecipeViability(recipeId: string): Promise<RecipeViability> {

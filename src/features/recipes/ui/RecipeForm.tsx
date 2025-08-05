@@ -51,6 +51,21 @@ export function RecipeForm() {
     { item_id: '', quantity: '' }
   ]);
 
+  // Calculate estimated total cost
+  const estimatedCost = useMemo(() => {
+    return ingredients.reduce((total, ing) => {
+      if (!ing.item_id || !ing.quantity) return total;
+      const item = items.find(i => i.id === ing.item_id);
+      if (!item?.unit_cost) return total;
+      return total + (item.unit_cost * parseFloat(ing.quantity || '0'));
+    }, 0);
+  }, [ingredients, items]);
+
+  const estimatedCostPerUnit = useMemo(() => {
+    const outputQty = parseFloat(form.output_quantity || '0');
+    return outputQty > 0 ? estimatedCost / outputQty : 0;
+  }, [estimatedCost, form.output_quantity]);
+
   // ✅ CORRECTO - Collections dinámicas basadas en tipos de items
   const elaboratedItemsCollection = useMemo(() => {
     const elaboratedItems = items.filter(item => item.type === 'ELABORATED');
@@ -65,10 +80,15 @@ export function RecipeForm() {
   const ingredientItemsCollection = useMemo(() => {
     const ingredientItems = items.filter(item => item.type !== 'ELABORATED');
     return createListCollection({
-      items: ingredientItems.map(item => ({
-        label: `${item.name} (${item.unit}) - Stock: ${item.stock}`,
-        value: item.id,
-      })),
+      items: ingredientItems.map(item => {
+        const hasLowStock = item.stock <= 5;
+        const hasNoCost = !item.unit_cost || item.unit_cost <= 0;
+        const warningLabel = hasLowStock ? ' ⚠️' : hasNoCost ? ' 💰❌' : '';
+        return {
+          label: `${item.name} (${item.unit}) - Stock: ${item.stock}${warningLabel}`,
+          value: item.id,
+        };
+      }),
     });
   }, [items]);
 
@@ -106,6 +126,29 @@ export function RecipeForm() {
 
     if (validIngredients.length === 0) {
       newErrors.ingredients = 'Debe agregar al menos un ingrediente válido';
+    }
+
+    // Validate stock and costs
+    const stockIssues: string[] = [];
+    const costIssues: string[] = [];
+    
+    validIngredients.forEach(ing => {
+      const item = items.find(i => i.id === ing.item_id);
+      if (item) {
+        const requiredQty = parseFloat(ing.quantity);
+        if (item.stock < requiredQty) {
+          stockIssues.push(`${item.name}: necesita ${requiredQty}, disponible ${item.stock}`);
+        }
+        if (!item.unit_cost || item.unit_cost <= 0) {
+          costIssues.push(`${item.name}: sin costo unitario definido`);
+        }
+      }
+    });
+
+    if (stockIssues.length > 0) {
+      newErrors.ingredients = `Stock insuficiente: ${stockIssues.join('; ')}`;
+    } else if (costIssues.length > 0) {
+      newErrors.ingredients = `Costos faltantes: ${costIssues.join('; ')}`;
     }
 
     setErrors(newErrors);
@@ -293,6 +336,36 @@ export function RecipeForm() {
           </Grid>
         </Box>
 
+        {/* Cost Estimation Display */}
+        {estimatedCost > 0 && (
+          <Box p={4} bg="blue.50" borderRadius="md" border="1px solid" borderColor="blue.200">
+            <VStack gap="2" align="stretch">
+              <HStack justify="space-between">
+                <Text fontSize="sm" fontWeight="medium" color="blue.700">
+                  💰 Estimación de Costos
+                </Text>
+                <Badge colorScheme="blue" variant="subtle">
+                  Preliminar
+                </Badge>
+              </HStack>
+              <HStack justify="space-between">
+                <Text fontSize="sm" color="blue.600">Costo total estimado:</Text>
+                <Text fontSize="sm" fontWeight="bold" color="blue.700">
+                  ${estimatedCost.toFixed(2)}
+                </Text>
+              </HStack>
+              {estimatedCostPerUnit > 0 && (
+                <HStack justify="space-between">
+                  <Text fontSize="sm" color="blue.600">Costo por unidad:</Text>
+                  <Text fontSize="sm" fontWeight="bold" color="blue.700">
+                    ${estimatedCostPerUnit.toFixed(2)}
+                  </Text>
+                </HStack>
+              )}
+            </VStack>
+          </Box>
+        )}
+
         {/* Separador visual */}
         <Box height="1px" bg="gray.200" />
 
@@ -316,56 +389,86 @@ export function RecipeForm() {
           <VStack gap="3">
             {ingredients.map((ingredient, index) => {
               const selectedItem = items.find(item => item.id === ingredient.item_id);
+              const requiredQty = parseFloat(ingredient.quantity || '0');
+              const hasStockIssue = selectedItem && requiredQty > selectedItem.stock;
+              const hasNoCost = selectedItem && (!selectedItem.unit_cost || selectedItem.unit_cost <= 0);
+              const ingredientCost = selectedItem?.unit_cost ? selectedItem.unit_cost * requiredQty : 0;
               
               return (
-                <HStack key={index} gap="3" width="100%">
-                  <Box flex={2}>
-                    <Select.Root 
-                      collection={ingredientItemsCollection}
-                      value={ingredient.item_id ? [ingredient.item_id] : []}
-                      onValueChange={(details) => handleIngredientSelectChange(index, details)}
+                <VStack key={index} gap="2" width="100%" align="stretch">
+                  <HStack gap="3" width="100%">
+                    <Box flex={2}>
+                      <Select.Root 
+                        collection={ingredientItemsCollection}
+                        value={ingredient.item_id ? [ingredient.item_id] : []}
+                        onValueChange={(details) => handleIngredientSelectChange(index, details)}
+                      >
+                        <Select.HiddenSelect />
+                        <Select.Control>
+                          <Select.Trigger>
+                            <Select.ValueText placeholder="Seleccionar ingrediente" />
+                          </Select.Trigger>
+                          <Select.IndicatorGroup>
+                            <Select.Indicator />
+                          </Select.IndicatorGroup>
+                        </Select.Control>
+                        <Select.Positioner>
+                          <Select.Content>
+                            {ingredientItemsCollection.items.map((item) => (
+                              <Select.Item key={item.value} item={item}>
+                                <Select.ItemText>{item.label}</Select.ItemText>
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Positioner>
+                      </Select.Root>
+                    </Box>
+                    
+                    <Input
+                      placeholder={`Cantidad${selectedItem ? ` (${selectedItem.unit})` : ''}`}
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={ingredient.quantity}
+                      onChange={(e) => handleIngredientQuantityChange(index, e.target.value)}
+                      flex={1}
+                      borderColor={hasStockIssue ? 'red.300' : undefined}
+                    />
+                    
+                    <Button
+                      size="sm"
+                      colorScheme="red"
+                      variant="ghost"
+                      onClick={() => removeIngredient(index)}
+                      disabled={ingredients.length === 1}
                     >
-                      <Select.HiddenSelect />
-                      <Select.Control>
-                        <Select.Trigger>
-                          <Select.ValueText placeholder="Seleccionar ingrediente" />
-                        </Select.Trigger>
-                        <Select.IndicatorGroup>
-                          <Select.Indicator />
-                        </Select.IndicatorGroup>
-                      </Select.Control>
-                      <Select.Positioner>
-                        <Select.Content>
-                          {ingredientItemsCollection.items.map((item) => (
-                            <Select.Item key={item.value} item={item}>
-                              <Select.ItemText>{item.label}</Select.ItemText>
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Positioner>
-                    </Select.Root>
-                  </Box>
+                      ✕
+                    </Button>
+                  </HStack>
                   
-                  <Input
-                    placeholder={`Cantidad${selectedItem ? ` (${selectedItem.unit})` : ''}`}
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={ingredient.quantity}
-                    onChange={(e) => handleIngredientQuantityChange(index, e.target.value)}
-                    flex={1}
-                  />
-                  
-                  <Button
-                    size="sm"
-                    colorScheme="red"
-                    variant="ghost"
-                    onClick={() => removeIngredient(index)}
-                    disabled={ingredients.length === 1}
-                  >
-                    ✕
-                  </Button>
-                </HStack>
+                  {/* Warnings and cost info for this ingredient */}
+                  {selectedItem && ingredient.quantity && (
+                    <HStack justify="space-between" fontSize="xs" px={2}>
+                      <HStack gap="2">
+                        {hasStockIssue && (
+                          <Badge colorScheme="red" size="sm">
+                            ⚠️ Stock insuficiente
+                          </Badge>
+                        )}
+                        {hasNoCost && (
+                          <Badge colorScheme="orange" size="sm">
+                            💰 Sin costo
+                          </Badge>
+                        )}
+                      </HStack>
+                      {ingredientCost > 0 && (
+                        <Text color="green.600" fontWeight="medium">
+                          ${ingredientCost.toFixed(2)}
+                        </Text>
+                      )}
+                    </HStack>
+                  )}
+                </VStack>
               );
             })}
             

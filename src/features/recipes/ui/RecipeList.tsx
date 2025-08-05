@@ -33,7 +33,10 @@ export function RecipeList() {
 
   if (loadingCosts) return <LoadingSpinner message="Cargando recetas..." />;
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | null | undefined) => {
+    if (amount === null || amount === undefined || isNaN(amount)) {
+      return '$0.00';
+    }
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
       currency: 'USD'
@@ -172,15 +175,29 @@ export function RecipeList() {
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <Text color="green.600" fontWeight="bold">
-                      {formatCurrency(recipe.total_cost)}
-                    </Text>
+                    <VStack align="start" gap="0">
+                      <Text color="green.600" fontWeight="bold">
+                        {formatCurrency(recipe.total_cost)}
+                      </Text>
+                      {(!recipe.total_cost || recipe.total_cost === 0) && (
+                        <Badge size="xs" colorScheme="orange" variant="subtle">
+                          Sin costos
+                        </Badge>
+                      )}
+                    </VStack>
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <Text color="blue.600" fontWeight="medium">
-                      {formatCurrency(recipe.cost_per_unit)}
-                    </Text>
+                    <VStack align="start" gap="0">
+                      <Text color="blue.600" fontWeight="medium">
+                        {formatCurrency(recipe.cost_per_unit)}
+                      </Text>
+                      {(!recipe.cost_per_unit || recipe.cost_per_unit === 0) && (
+                        <Badge size="xs" colorScheme="orange" variant="subtle">
+                          Sin costo
+                        </Badge>
+                      )}
+                    </VStack>
                   </Table.Cell>
                   
                   <Table.Cell>

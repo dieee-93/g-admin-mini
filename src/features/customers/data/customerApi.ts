@@ -1,8 +1,15 @@
 // src/features/customers/data/customerApi.ts
+
+
+
 import { supabase } from '@/lib/supabase';
 import { 
   type Customer, 
   type CreateCustomerData,
+
+
+
+  
   type UpdateCustomerData,
   type CustomerWithStats
 } from '../types';

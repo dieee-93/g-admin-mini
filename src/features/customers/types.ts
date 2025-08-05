@@ -1,14 +1,230 @@
-// src/features/customers/types.ts
+
+// ==========================================
+// G-ADMIN CUSTOMER MODULE - COMPREHENSIVE TYPES
+// Following Screaming Architecture Pattern
+// RFM Analytics + Customer Intelligence + Marketing Automation
+// ==========================================
+
+// ===== CORE CUSTOMER TYPES =====
+
 export interface Customer {
+  // Basic Information (existing)
   id: string;
   name: string;
   phone?: string;
   email?: string;
   address?: string;
   note?: string;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
 }
+
+export interface CustomerProfile extends Customer {
+  // Advanced CRM Features
+  tags: CustomerTag[];
+  notes: CustomerNote[];
+  preferences: CustomerPreferences;
+  special_occasions: SpecialOccasion[];
+  
+  // Engagement Tracking
+  communication_preferences: CommunicationPreferences;
+  
+  // Analytics Data
+  rfm_profile: CustomerRFMProfile;
+  last_visit: Date;
+  total_visits: number;
+  total_spent: number;
+  favorite_items: string[]; // Product IDs most ordered
+  
+  // Status & Flags
+  is_vip: boolean;
+  loyalty_tier: LoyaltyTier;
+  blacklisted: boolean;
+  churn_risk: ChurnRisk;
+}
+
+// ===== RFM ANALYTICS SYSTEM =====
+
+export interface CustomerRFMProfile {
+  // RFM Core Metrics
+  recency_score: number;          // 1-5 (days since last visit)
+  frequency_score: number;        // 1-5 (# visits in period)
+  monetary_score: number;         // 1-5 (total spending/average)
+  rfm_segment: CustomerSegment;   // Calculated segment
+  
+  // Customer Intelligence
+  lifetime_value: number;         // CLV calculated
+  avg_order_value: number;
+  visit_frequency: number;        // visits per month
+  churn_risk: ChurnRisk;
+  
+  // Behavioral Patterns
+  preferred_time_slots: string[]; // lunch, dinner, weekend
+  seasonal_patterns: string[];    // summer, holidays
+  price_sensitivity: PriceSensitivity;
+  
+  // Calculated Metrics
+  recency_days: number;
+  frequency_count: number;
+  monetary_total: number;
+  calculated_at: Date;
+}
+
+export enum CustomerSegment {
+  CHAMPIONS = 'champions',           // 555, 554, 544 - Best customers
+  LOYAL = 'loyal',                  // 543, 444, 435 - Regular buyers
+  POTENTIAL_LOYALISTS = 'potential', // 512, 511 - Recent customers
+  NEW_CUSTOMERS = 'new',            // 5XX with low frequency
+  PROMISING = 'promising',          // 411, 412 - Good potential
+  NEED_ATTENTION = 'attention',     // 512, 412 - Medium value
+  ABOUT_TO_SLEEP = 'sleep',        // 331, 321 - Decreasing
+  AT_RISK = 'at_risk',             // 244, 234 - Important but declining
+  CANNOT_LOSE = 'cannot_lose',     // 155, 144 - High spenders, low freq
+  HIBERNATING = 'hibernating',     // 244, 234 - Lost customers
+  LOST = 'lost'                    // 155, 144, 111 - Gone
+}
+
+export enum ChurnRisk {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high'
+}
+
+export enum PriceSensitivity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high'
+}
+
+export enum LoyaltyTier {
+  BRONZE = 'bronze',
+  SILVER = 'silver',
+  GOLD = 'gold',
+  PLATINUM = 'platinum'
+}
+
+// ===== CUSTOMER ORGANIZATION SYSTEM =====
+
+export interface CustomerTag {
+  id: string;
+  name: string;
+  color: string;
+  category: 'behavior' | 'preference' | 'demographic' | 'custom';
+  description?: string;
+  created_at: Date;
+}
+
+export interface CustomerNote {
+  id: string;
+  customer_id: string;
+  content: string;
+  type: 'general' | 'service' | 'complaint' | 'compliment' | 'dietary';
+  created_by: string;              // Staff member
+  created_at: Date;
+  is_important: boolean;
+  is_private: boolean;             // Internal staff notes
+}
+
+export interface CustomerPreferences {
+  // Dietary Information (CRITICAL for food safety)
+  dietary_restrictions: string[];  // vegan, gluten-free, lactose-free
+  allergies: string[];            // CRITICAL for safety
+  favorite_cuisines: string[];
+  disliked_items: string[];
+  
+  // Dining Preferences
+  preferred_seating: string;       // booth, window, outdoor
+  party_size_usual: number;
+  preferred_server?: string;
+  
+  // Service Preferences
+  service_pace: 'quick' | 'standard' | 'leisurely';
+  special_requests: string[];      // no ice, sauce on side
+  
+  // Marketing Preferences
+  preferred_contact_time: string;  // morning, afternoon, evening
+  contact_frequency: 'weekly' | 'monthly' | 'rarely';
+}
+
+export interface CommunicationPreferences {
+  email_marketing: boolean;
+  sms_marketing: boolean;
+  birthday_offers: boolean;
+  special_events: boolean;
+  feedback_requests: boolean;
+  loyalty_updates: boolean;
+}
+
+export interface SpecialOccasion {
+  id: string;
+  customer_id: string;
+  type: 'birthday' | 'anniversary' | 'custom';
+  date: Date;
+  description?: string;
+  send_reminders: boolean;
+  reminder_days_before: number;
+  last_celebrated?: Date;
+}
+
+// ===== ANALYTICS & INSIGHTS =====
+
+export interface CustomerAnalytics {
+  // Overview Metrics
+  total_customers: number;
+  new_customers_this_month: number;
+  active_customers: number;        // Visited in last 90 days
+  customer_retention_rate: number;
+  
+  // RFM Distribution
+  segment_distribution: {
+    [K in CustomerSegment]: {
+      count: number;
+      percentage: number;
+      avg_lifetime_value: number;
+      revenue_contribution: number;
+    }
+  };
+  
+  // Business Intelligence
+  top_customers: CustomerProfile[];
+  at_risk_customers: CustomerProfile[];
+  customer_acquisition_trends: MonthlyTrend[];
+  
+  // Actionable Insights
+  churn_predictions: ChurnPrediction[];
+  upsell_opportunities: UpsellOpportunity[];
+  
+  calculated_at: Date;
+}
+
+export interface MonthlyTrend {
+  month: string;
+  new_customers: number;
+  returning_customers: number;
+  total_revenue: number;
+  avg_order_value: number;
+}
+
+export interface ChurnPrediction {
+  customer_id: string;
+  customer_name: string;
+  churn_probability: number;
+  days_since_last_visit: number;
+  suggested_action: string;
+  potential_lost_revenue: number;
+}
+
+export interface UpsellOpportunity {
+  customer_id: string;
+  customer_name: string;
+  current_segment: CustomerSegment;
+  recommended_products: string[];
+  estimated_additional_revenue: number;
+  confidence_score: number;
+  based_on: 'purchase_history' | 'similar_customers' | 'seasonal_pattern';
+}
+
+// ===== CRUD & API INTERFACES =====
 
 export interface CreateCustomerData {
   name: string;
@@ -16,6 +232,9 @@ export interface CreateCustomerData {
   email?: string;
   address?: string;
   note?: string;
+  tags?: string[];                 // Tag IDs to assign
+  preferences?: Partial<CustomerPreferences>;
+  communication_preferences?: Partial<CommunicationPreferences>;
 }
 
 export interface UpdateCustomerData extends Partial<CreateCustomerData> {
@@ -28,8 +247,61 @@ export interface CustomerStats {
   last_purchase_date?: string;
   average_purchase: number;
   purchase_count: number;
+  // Extended stats
+  first_purchase_date?: string;
+  days_as_customer: number;
+  purchases_last_30_days: number;
+  spending_last_30_days: number;
 }
 
 export interface CustomerWithStats extends Customer {
   stats?: CustomerStats;
 }
+
+export interface ExtendedCustomerProfile extends CustomerProfile {
+  stats: CustomerStats;
+  recent_orders: RecentOrder[];
+}
+
+export interface RecentOrder {
+  id: string;
+  total: number;
+  items_count: number;
+  created_at: Date;
+  top_items: string[];             // Product names
+}
+
+// ===== SEARCH & FILTERING =====
+
+export interface CustomerFilters {
+  segment?: CustomerSegment[];
+  tags?: string[];
+  loyalty_tier?: LoyaltyTier[];
+  churn_risk?: ChurnRisk[];
+  has_email?: boolean;
+  has_phone?: boolean;
+  created_after?: Date;
+  created_before?: Date;
+  last_visit_after?: Date;
+  last_visit_before?: Date;
+  min_total_spent?: number;
+  max_total_spent?: number;
+  min_visits?: number;
+  max_visits?: number;
+}
+
+export interface CustomerSearchResult {
+  customers: CustomerProfile[];
+  total_count: number;
+  filters_applied: CustomerFilters;
+  segment_counts: {
+    [K in CustomerSegment]: number;
+  };
+}
+
+// ===== LEGACY COMPATIBILITY =====
+// Maintain backward compatibility with existing code
+
+export type { Customer as BasicCustomer };
+export type { CustomerStats as BasicCustomerStats };
+export type { CustomerWithStats as BasicCustomerWithStats };
