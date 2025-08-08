@@ -7,7 +7,6 @@ import {
   HStack,
   Text, 
   Card,
-  Separator,
   Dialog,
   Select,
   Input,
@@ -16,10 +15,8 @@ import {
   Alert
 } from '@chakra-ui/react';
 import { 
-  ShoppingCartIcon,
   UserIcon,
   CreditCardIcon,
-  DocumentTextIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { 
@@ -58,14 +55,9 @@ export function SalesWithStockView() {
     isValidating,
     canProcessSale,
     addToCart,
-    removeFromCart,
     updateQuantity,
-    updatePrice,
     clearCart,
     validateCartStock,
-    suggestMaxQuantity,
-    isInCart,
-    getCartQuantity,
     getSaleData
   } = useSalesCart({
     enableRealTimeValidation: true,

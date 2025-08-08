@@ -21,6 +21,7 @@ import { toaster } from '../../../components/ui/toaster';
 import { useSaleStockValidation, type SaleItem } from '../../../hooks/useSaleStockValidation';
 import { StockValidationAlert } from '../../../components/StockValidationAlert';
 import { supabase } from '../../../lib/supabase';
+import { Customer } from '../types';
 
 interface Product {
   id: string;
@@ -40,7 +41,7 @@ interface SaleFormData {
 
 export function SaleForm() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [customers, setCustomers] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [saleItems, setSaleItems] = useState<SaleFormData['items']>([
     { product_id: '', quantity: 1, unit_price: 0 }
   ]);
@@ -51,7 +52,6 @@ export function SaleForm() {
   const {
     validateStock,
     clearValidation,
-    isValidating,
     validationResult,
     hasValidation,
     isValid
@@ -151,7 +151,7 @@ export function SaleForm() {
     }
   };
 
-  const updateSaleItem = (index: number, field: keyof SaleFormData['items'][0], value: any) => {
+  const updateSaleItem = (index: number, field: keyof SaleFormData['items'][0], value: string | number) => {
     const updatedItems = [...saleItems];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
     

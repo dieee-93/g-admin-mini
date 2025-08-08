@@ -10,10 +10,16 @@ import { NavigationBadgeSync } from '@/hooks/useNavigationBadges';
 import { Dashboard } from '@/pages/Dashboard';
 import { InventoryPage } from '@/features/inventory/InventoryPage'; // ✅ ESTA funciona
 
-// 🚧 TODO: Crear estas páginas nuevas
-// import { ProductionPage } from '@/pages/ProductionPage';
-// import { SalesPage } from '@/pages/SalesPage';  
-// import { CustomersPage } from '@/pages/CustomersPage';
+// ✅ Páginas de módulos
+import { ProductionPage } from '@/pages/ProductionPage';
+import { SalesPage } from '@/pages/SalesPage';  
+import { CustomersPage } from '@/pages/CustomersPage';
+import { RecipesPage } from '@/pages/RecipesPage';
+
+// ✅ Submódulos POS (ahora en features/)
+import { QROrderPage } from '@/features/sales/components/QROrdering/QROrderPage';
+import { TableManagementPage } from '@/features/sales/components/TableManagement/TableManagementPage';
+import { KitchenPage } from '@/features/production/KitchenPage';
 
 function App() {
   return (
@@ -28,10 +34,16 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/inventory" element={<InventoryPage />} />
               
-              {/* 🚧 TODO: Uncomment cuando creemos las páginas */}
-              {/* <Route path="/production" element={<ProductionPage />} /> */}
-              {/* <Route path="/sales" element={<SalesPage />} /> */}
-              {/* <Route path="/customers" element={<CustomersPage />} /> */}
+              {/* ✅ Rutas de módulos */}
+              <Route path="/production" element={<ProductionPage />} />
+              <Route path="/recipes" element={<RecipesPage />} />
+              <Route path="/sales" element={<SalesPage />} />
+              <Route path="/customers" element={<CustomersPage />} />
+              
+              {/* ✅ Submódulos POS */}
+              <Route path="/sales/qr-order" element={<QROrderPage />} />
+              <Route path="/sales/tables" element={<TableManagementPage />} />
+              <Route path="/production/kitchen" element={<KitchenPage />} />
               
               {/* 404 fallback */}
               <Route path="*" element={<div>Página en construcción</div>} />

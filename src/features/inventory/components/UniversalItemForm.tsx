@@ -26,6 +26,7 @@ import {
 
 // ✅ IMPORTS REALES
 import { useInventory } from '../logic/useInventory';
+import { useRecipes } from '@/features/recipes/logic/useRecipes';
 import {
   type ItemFormData,
   type ItemType,
@@ -465,17 +466,132 @@ function ElaboratedFields({
         </Card.Body>
       </Card.Root>
 
-      {/* TODO: Selector de receta */}
+      {/* ✅ Selector de receta funcional */}
       <Box>
         <Text fontSize="sm" fontWeight="medium" mb="2">
-          Receta Asociada
+          Receta Asociada *
         </Text>
-        <Alert.Root status="info" variant="subtle">
-          <Alert.Description>
-            El selector de recetas se implementará cuando el módulo de recetas esté listo.
-            Por ahora, puedes crear el item y asignar la receta después.
-          </Alert.Description>
-        </Alert.Root>
+        
+        {recipesLoading ? (
+          <Alert.Root status="info" variant="subtle">
+            <Alert.Description>
+              Cargando recetas disponibles...
+            </Alert.Description>
+          </Alert.Root>
+        ) : recipes && recipes.length > 0 ? (
+          <VStack align="stretch" gap="3">
+            <Select.Root
+              collection={createListCollection({
+                items: [
+                  { label: 'Seleccionar receta...', value: '', description: 'Elige una receta para este item elaborado' },
+                  ...recipes
+                    .filter(recipe => recipe.is_active)
+                    .map(recipe => ({
+                      label: recipe.name,
+                      value: recipe.id,
+                      description: `${recipe.ingredients?.length || 0} ingredientes - ${recipe.yield_quantity} ${recipe.yield_unit}`
+                    }))
+                ]
+              })}
+              value={formData.recipe_id ? [formData.recipe_id] : []}
+              onValueChange={(details) => 
+                setFormData({ ...formData, recipe_id: details.value[0] || undefined })
+              }
+              invalid={!!errors.recipe_id}
+            >
+              <Select.Trigger>
+                <Select.ValueText placeholder="Seleccionar receta..." />
+              </Select.Trigger>
+              <Select.Content>
+                {[
+                  { label: 'Seleccionar receta...', value: '', description: 'Elige una receta para este item elaborado' },
+                  ...recipes
+                    .filter(recipe => recipe.is_active)
+                    .map(recipe => ({
+                      label: recipe.name,
+                      value: recipe.id,
+                      description: `${recipe.ingredients?.length || 0} ingredientes - ${recipe.yield_quantity} ${recipe.yield_unit}`
+                    }))
+                ].map(item => (
+                  <Select.Item key={item.value} item={item}>
+                    <VStack align="start" gap="1">
+                      <Text>{item.label}</Text>
+                      {item.description && (
+                        <Text fontSize="xs" color="gray.500">{item.description}</Text>
+                      )}
+                    </VStack>
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+            
+            {errors.recipe_id && (
+              <Text color="red.500" fontSize="sm">
+                {errors.recipe_id}
+              </Text>
+            )}
+            
+            {/* Vista previa de receta seleccionada */}
+            {formData.recipe_id && (
+              <Card.Root variant="outline" size="sm">
+                <Card.Body p="3">
+                  {(() => {
+                    const selectedRecipe = recipes.find(r => r.id === formData.recipe_id);
+                    if (!selectedRecipe) return null;
+                    
+                    return (
+                      <VStack align="start" gap="2">
+                        <HStack justify="space-between" w="full">
+                          <Text fontSize="sm" fontWeight="medium" color="purple.600">
+                            📝 {selectedRecipe.name}
+                          </Text>
+                          <Badge colorPalette="purple" variant="subtle" size="xs">
+                            {selectedRecipe.difficulty}
+                          </Badge>
+                        </HStack>
+                        
+                        <Text fontSize="xs" color="gray.600">
+                          Rinde: {selectedRecipe.yield_quantity} {selectedRecipe.yield_unit}
+                        </Text>
+                        
+                        <Text fontSize="xs" color="gray.600">
+                          Tiempo: {selectedRecipe.prep_time_minutes}min prep + {selectedRecipe.cook_time_minutes}min cocción
+                        </Text>
+                        
+                        {selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 && (
+                          <VStack align="start" gap="1" w="full">
+                            <Text fontSize="xs" fontWeight="medium" color="gray.700">
+                              Ingredientes principales:
+                            </Text>
+                            <Text fontSize="xs" color="gray.600">
+                              {selectedRecipe.ingredients.slice(0, 3).map(ing => ing.name).join(', ')}
+                              {selectedRecipe.ingredients.length > 3 && ` +${selectedRecipe.ingredients.length - 3} más...`}
+                            </Text>
+                          </VStack>
+                        )}
+                      </VStack>
+                    );
+                  })()}
+                </Card.Body>
+              </Card.Root>
+            )}
+          </VStack>
+        ) : (
+          <Alert.Root status="warning" variant="subtle">
+            <Alert.Indicator>
+              <ExclamationTriangleIcon className="w-4 h-4" />
+            </Alert.Indicator>
+            <Alert.Title>No hay recetas disponibles</Alert.Title>
+            <Alert.Description>
+              Necesitas crear al menos una receta activa antes de poder asignarla a un item elaborado.
+              Ve a la sección de Recetas para crear una nueva.
+            </Alert.Description>
+          </Alert.Root>
+        )}
+        
+        <Text fontSize="xs" color="gray.500">
+          La receta determina qué ingredientes se consumirán del inventario al producir este item
+        </Text>
       </Box>
     </VStack>
   );
@@ -500,6 +616,8 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
     hasAlerts, 
     hasCriticalAlerts 
   } = useInventory();
+  
+  const { recipes, loading: recipesLoading } = useRecipes();
   
   const [formData, setFormData] = useState<ItemFormData>({
     name: editItem?.name || '',
@@ -529,8 +647,13 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
       return <Badge colorPalette="blue" variant="subtle">Configura medición</Badge>;
     }
     
-    if (formData.type === 'ELABORATED' && !formData.unit) {
-      return <Badge colorPalette="purple" variant="subtle">Define unidad final</Badge>;
+    if (formData.type === 'ELABORATED') {
+      if (!formData.unit) {
+        return <Badge colorPalette="purple" variant="subtle">Define unidad final</Badge>;
+      }
+      if (!formData.recipe_id) {
+        return <Badge colorPalette="purple" variant="subtle">Selecciona receta</Badge>;
+      }
     }
     
     if (Object.keys(errors).length > 0) {
@@ -561,8 +684,13 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
       }
     }
 
-    if (formData.type === 'ELABORATED' && !formData.unit) {
-      newErrors.unit = 'Debes especificar la unidad del producto final';
+    if (formData.type === 'ELABORATED') {
+      if (!formData.unit) {
+        newErrors.unit = 'Debes especificar la unidad del producto final';
+      }
+      if (!formData.recipe_id) {
+        newErrors.recipe_id = 'Debes seleccionar una receta para items elaborados';
+      }
     }
 
     if (formData.initial_stock < 0) {
@@ -657,7 +785,8 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
           type, 
           unit: '' as AllUnit, 
           category: undefined,
-          packaging: undefined 
+          packaging: undefined,
+          recipe_id: undefined
         })}
         errors={errors}
       />

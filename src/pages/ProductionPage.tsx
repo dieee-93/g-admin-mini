@@ -1,5 +1,5 @@
 // src/pages/ProductionPage.tsx
-// ✅ NUEVO: Página de producción integrada con NavigationContext
+// ✅ REDESIGNED: Modern UI with improved navigation and visual hierarchy
 
 import { useState, useEffect } from 'react';
 import {
@@ -11,52 +11,66 @@ import {
   Card,
   Tabs,
   Badge,
-  Grid
+  Grid,
+  Separator
 } from '@chakra-ui/react';
 import {
   CogIcon,
-  PlusIcon,
   DocumentTextIcon,
   ClockIcon,
-  CurrencyDollarIcon
+  CurrencyDollarIcon,
+  ChartBarIcon,
+  BuildingStorefrontIcon,
+  ClipboardDocumentListIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
+
+// ✅ Import individual section components (no nesting)
+import { ProductionActiveTab } from '@/features/products/ui/ProductionActiveTab';
+import { ProductListOnly } from '@/features/products/ui/ProductListOnly';
+import { MenuEngineeringOnly } from '@/features/products/ui/MenuEngineeringOnly';
+import { CostCalculator } from '@/features/products/ui/costs/CostCalculator';
+import { CostAnalysisReports } from '@/features/products/ui/costs/CostAnalysisReports';
+import { PricingScenarios } from '@/features/products/ui/costs/PricingScenarios';
+import { ProductionPlanningOnly } from '@/features/products/ui/ProductionPlanningOnly';
+import { DemandForecastOnly } from '@/features/products/ui/DemandForecastOnly';
+import { ProductionScheduleOnly } from '@/features/products/ui/ProductionScheduleOnly';
 
 export function ProductionPage() {
   // ✅ Integración con NavigationContext
   const { setQuickActions } = useNavigation();
 
-  // Local state
-  const [activeTab, setActiveTab] = useState('recipes');
-  const [productionStats] = useState({
-    totalRecipes: 0,
-    activeProductions: 0,
-    avgCostPerUnit: 0,
-    monthlyProduced: 0
-  });
+  // Local state - navegación completamente plana
+  const [activeSection, setActiveSection] = useState('products-list');
+
+  // ✅ Manejador de navegación completamente plano
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+  };
 
   // ✅ Configurar quick actions contextuales
   useEffect(() => {
     const quickActions = [
       {
-        id: 'new-recipe',
-        label: 'Nueva Receta',
+        id: 'new-product',
+        label: 'Nuevo Producto',
         icon: DocumentTextIcon,
-        action: () => setActiveTab('recipes'),
+        action: () => handleSectionChange('products-list'),
         color: 'purple'
       },
       {
         id: 'start-production',
         label: 'Iniciar Producción',
         icon: CogIcon,
-        action: () => setActiveTab('production'),
+        action: () => handleSectionChange('production-active'),
         color: 'green'
       },
       {
         id: 'cost-calculator',
         label: 'Calcular Costos',
         icon: CurrencyDollarIcon,
-        action: () => setActiveTab('costs'),
+        action: () => handleSectionChange('cost-calculator'),
         color: 'blue'
       }
     ];
@@ -65,172 +79,155 @@ export function ProductionPage() {
     return () => setQuickActions([]);
   }, [setQuickActions]);
 
+  // ✅ Estado para gestionar calculations compartidos
+  const [calculations, setCalculations] = useState([]);
+
+  // ✅ Renderizar contenido según sección activa - NAVEGACIÓN PLANA
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'products-list':
+        return <ProductListOnly />;
+      case 'menu-engineering':
+        return <MenuEngineeringOnly />;
+      case 'production-active':
+        return <ProductionActiveTab />;
+      case 'cost-calculator':
+        return (
+          <CostCalculator 
+            calculations={calculations}
+            onCalculationComplete={(newCalc) => setCalculations(prev => [newCalc, ...prev])}
+          />
+        );
+      case 'cost-analysis':
+        return <CostAnalysisReports calculations={calculations} />;
+      case 'pricing-scenarios':
+        return <PricingScenarios calculations={calculations} />;
+      case 'production-planning':
+        return <ProductionPlanningOnly />;
+      case 'demand-forecast':
+        return <DemandForecastOnly />;
+      case 'production-schedule':
+        return <ProductionScheduleOnly />;
+      default:
+        return <ProductListOnly />;
+    }
+  };
+
   return (
-    <Box p="6">
-      <VStack gap="6" align="stretch">
-        {/* Header con métricas */}
-        <VStack align="start" gap="2">
-          <HStack justify="space-between" w="full">
-            <VStack align="start" gap="1">
-              <Text fontSize="3xl" fontWeight="bold">Producción</Text>
-              <Text color="gray.600">
-                Recetas, costos y planificación de producción
-              </Text>
+    <Box p={{ base: 4, md: 6 }} maxW="full">
+      <VStack gap={6} align="stretch">
+        {/* Modern Header with better visual hierarchy */}
+        <Card.Root bg="gradient-to-r" bgGradient="linear(to-r, blue.50, purple.50)">
+          <Card.Body>
+            <VStack align="start" gap={3}>
+              <HStack gap={3}>
+                <Box 
+                  p={3} 
+                  bg="white" 
+                  borderRadius="xl" 
+                  shadow="sm"
+                >
+                  <BuildingStorefrontIcon className="w-8 h-8 text-blue-600" />
+                </Box>
+                <VStack align="start" gap={1}>
+                  <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="gray.800">
+                    Centro de Producción
+                  </Text>
+                  <Text color="gray.600" fontSize="md">
+                    Gestión inteligente de productos y procesos de producción
+                  </Text>
+                </VStack>
+              </HStack>
+              
+              {/* Quick Stats */}
+              <Grid templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }} gap={4} w="full">
+                <VStack gap={1}>
+                  <Text fontSize="2xl" fontWeight="bold" color="blue.600">24</Text>
+                  <Text fontSize="xs" color="gray.600">Productos Activos</Text>
+                </VStack>
+                <VStack gap={1}>
+                  <Text fontSize="2xl" fontWeight="bold" color="green.600">3</Text>
+                  <Text fontSize="xs" color="gray.600">En Producción</Text>
+                </VStack>
+                <VStack gap={1}>
+                  <Text fontSize="2xl" fontWeight="bold" color="purple.600">94%</Text>
+                  <Text fontSize="xs" color="gray.600">Eficiencia</Text>
+                </VStack>
+                <VStack gap={1}>
+                  <Text fontSize="2xl" fontWeight="bold" color="orange.600">$2,450</Text>
+                  <Text fontSize="xs" color="gray.600">Costos Hoy</Text>
+                </VStack>
+              </Grid>
             </VStack>
+          </Card.Body>
+        </Card.Root>
 
-            {/* Estadísticas */}
-            <Grid templateColumns="repeat(4, 1fr)" gap="6">
-              <VStack align="center" gap="0">
-                <Text fontSize="2xl" fontWeight="bold" color="purple.500">
-                  {productionStats.totalRecipes}
-                </Text>
-                <Text fontSize="xs" color="gray.500">Recetas</Text>
-              </VStack>
-              
-              <VStack align="center" gap="0">
-                <Text fontSize="2xl" fontWeight="bold" color="green.500">
-                  {productionStats.activeProductions}
-                </Text>
-                <Text fontSize="xs" color="gray.500">En Producción</Text>
-              </VStack>
+        <Separator />
 
-              <VStack align="center" gap="0">
-                <Text fontSize="2xl" fontWeight="bold" color="blue.500">
-                  ${productionStats.avgCostPerUnit}
-                </Text>
-                <Text fontSize="xs" color="gray.500">Costo Promedio</Text>
-              </VStack>
-
-              <VStack align="center" gap="0">
-                <Text fontSize="2xl" fontWeight="bold" color="orange.500">
-                  {productionStats.monthlyProduced}
-                </Text>
-                <Text fontSize="xs" color="gray.500">Mes Actual</Text>
-              </VStack>
-            </Grid>
-          </HStack>
-        </VStack>
-
-        {/* Tabs */}
+        {/* NAVEGACIÓN COMPLETAMENTE PLANA - 9 SECCIONES */}
         <Tabs.Root 
-          value={activeTab} 
-          onValueChange={(e) => setActiveTab(e.value)}
-          variant="line"
+          value={activeSection} 
+          onValueChange={(e) => handleSectionChange(e.value)}
+          variant="enclosed"
+          colorPalette="blue"
         >
-          <Tabs.List>
-            <Tabs.Trigger value="recipes">
-              <DocumentTextIcon className="w-4 h-4" />
-              Recetas
-              <Badge colorPalette="purple" variant="subtle">
-                {productionStats.totalRecipes}
-              </Badge>
-            </Tabs.Trigger>
-            
-            <Tabs.Trigger value="production">
-              <CogIcon className="w-4 h-4" />
-              Producción Activa
-            </Tabs.Trigger>
-            
-            <Tabs.Trigger value="costs">
-              <CurrencyDollarIcon className="w-4 h-4" />
-              Análisis de Costos
-            </Tabs.Trigger>
-
-            <Tabs.Trigger value="planning">
-              <ClockIcon className="w-4 h-4" />
-              Planificación
-            </Tabs.Trigger>
-          </Tabs.List>
-
-          {/* TAB: Recetas */}
-          <Tabs.Content value="recipes">
-            <Card.Root>
-              <Card.Header>
-                <HStack justify="space-between">
-                  <Text fontSize="lg" fontWeight="bold">Gestión de Recetas</Text>
-                  <Button colorPalette="purple">
-                    <PlusIcon className="w-4 h-4" />
-                    Nueva Receta
-                  </Button>
-                </HStack>
-              </Card.Header>
+          <Box overflowX="auto">
+            <Tabs.List bg="gray.50" borderRadius="lg" p={1} minW="max-content">
+              <Tabs.Trigger value="products-list" gap={2}>
+                <DocumentTextIcon className="w-4 h-4" />
+                <Text display={{ base: "none", lg: "block" }}>Productos</Text>
+              </Tabs.Trigger>
               
-              <Card.Body>
-                <VStack gap="4" py="8">
-                  <DocumentTextIcon className="w-12 h-12 text-gray-400" />
-                  <VStack gap="2">
-                    <Text fontSize="lg" fontWeight="medium">Módulo en desarrollo</Text>
-                    <Text color="gray.500" textAlign="center">
-                      Aquí podrás crear y gestionar recetas, calcular ingredientes y costos de producción.
-                    </Text>
-                  </VStack>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
-          </Tabs.Content>
-
-          {/* TAB: Producción */}
-          <Tabs.Content value="production">
-            <Card.Root>
-              <Card.Header>
-                <Text fontSize="lg" fontWeight="bold">Producción Activa</Text>
-              </Card.Header>
+              <Tabs.Trigger value="menu-engineering" gap={2}>
+                <ChartBarIcon className="w-4 h-4" />
+                <Text display={{ base: "none", lg: "block" }}>Menu Engineering</Text>
+                <Badge colorPalette="purple" variant="subtle" size="sm">AI</Badge>
+              </Tabs.Trigger>
               
-              <Card.Body>
-                <VStack gap="4" py="8">
-                  <CogIcon className="w-12 h-12 text-gray-400" />
-                  <VStack gap="2">
-                    <Text fontSize="lg" fontWeight="medium">Control de producción en desarrollo</Text>
-                    <Text color="gray.500" textAlign="center">
-                      Aquí podrás monitorear producciones activas, tiempos y cantidades.
-                    </Text>
-                  </VStack>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
-          </Tabs.Content>
-
-          {/* TAB: Costos */}
-          <Tabs.Content value="costs">
-            <Card.Root>
-              <Card.Header>
-                <Text fontSize="lg" fontWeight="bold">Análisis de Costos</Text>
-              </Card.Header>
+              <Tabs.Trigger value="production-active" gap={2}>
+                <CogIcon className="w-4 h-4" />
+                <Text display={{ base: "none", lg: "block" }}>Producción Activa</Text>
+                <Badge colorPalette="green" variant="outline" size="sm">3</Badge>
+              </Tabs.Trigger>
               
-              <Card.Body>
-                <VStack gap="4" py="8">
-                  <CurrencyDollarIcon className="w-12 h-12 text-gray-400" />
-                  <VStack gap="2">
-                    <Text fontSize="lg" fontWeight="medium">Calculadora de costos en desarrollo</Text>
-                    <Text color="gray.500" textAlign="center">
-                      Aquí podrás analizar costos de producción, márgenes y rentabilidad.
-                    </Text>
-                  </VStack>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
-          </Tabs.Content>
-
-          {/* TAB: Planificación */}
-          <Tabs.Content value="planning">
-            <Card.Root>
-              <Card.Header>
-                <Text fontSize="lg" fontWeight="bold">Planificación de Producción</Text>
-              </Card.Header>
+              <Tabs.Trigger value="cost-calculator" gap={2}>
+                <CurrencyDollarIcon className="w-4 h-4" />
+                <Text display={{ base: "none", lg: "block" }}>Calculadora</Text>
+              </Tabs.Trigger>
               
-              <Card.Body>
-                <VStack gap="4" py="8">
-                  <ClockIcon className="w-12 h-12 text-gray-400" />
-                  <VStack gap="2">
-                    <Text fontSize="lg" fontWeight="medium">Sistema de planificación en desarrollo</Text>
-                    <Text color="gray.500" textAlign="center">
-                      Aquí podrás planificar producciones futuras basadas en demanda y stock disponible.
-                    </Text>
-                  </VStack>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
-          </Tabs.Content>
+              <Tabs.Trigger value="cost-analysis" gap={2}>
+                <ChartBarIcon className="w-4 h-4" />
+                <Text display={{ base: "none", lg: "block" }}>Análisis Costos</Text>
+              </Tabs.Trigger>
+              
+              <Tabs.Trigger value="pricing-scenarios" gap={2}>
+                <PlusIcon className="w-4 h-4" />
+                <Text display={{ base: "none", lg: "block" }}>Escenarios</Text>
+              </Tabs.Trigger>
+              
+              <Tabs.Trigger value="production-planning" gap={2}>
+                <ClipboardDocumentListIcon className="w-4 h-4" />
+                <Text display={{ base: "none", lg: "block" }}>Planificación</Text>
+              </Tabs.Trigger>
+              
+              <Tabs.Trigger value="demand-forecast" gap={2}>
+                <ChartBarIcon className="w-4 h-4" />
+                <Text display={{ base: "none", lg: "block" }}>Forecast</Text>
+              </Tabs.Trigger>
+              
+              <Tabs.Trigger value="production-schedule" gap={2}>
+                <ClockIcon className="w-4 h-4" />
+                <Text display={{ base: "none", lg: "block" }}>Calendario</Text>
+              </Tabs.Trigger>
+            </Tabs.List>
+          </Box>
+
+          {/* Content with proper spacing */}
+          <Box mt={6}>
+            <Tabs.Content value={activeSection}>
+              {renderContent()}
+            </Tabs.Content>
+          </Box>
         </Tabs.Root>
       </VStack>
     </Box>

@@ -14,7 +14,9 @@ import {
   Skeleton,
   Alert,
   IconButton,
-  SimpleGrid
+  SimpleGrid,
+  NumberInput,
+  Textarea
 } from '@chakra-ui/react';
 import {
   PlusIcon,
@@ -286,6 +288,14 @@ export function InventoryPage() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [showItemDialog, setShowItemDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [showStockDialog, setShowStockDialog] = useState(false);
+  const [stockDialogItem, setStockDialogItem] = useState<InventoryItem | null>(null);
+  const [stockAdjustment, setStockAdjustment] = useState({
+    quantity: 0,
+    type: 'add' as 'add' | 'subtract' | 'set',
+    reason: '',
+    notes: ''
+  });
 
   // ✅ Filtros optimizados con useMemo
   const filteredItems = useMemo(() => {
@@ -344,13 +354,14 @@ export function InventoryPage() {
 
   // Handlers
   const handleAddStock = (item?: InventoryItem) => {
-    if (item) {
-      console.log('Agregar stock a:', item.name);
-      // TODO: Abrir dialog de stock para item específico
-    } else {
-      console.log('Abrir dialog de stock general');
-      // TODO: Abrir dialog de stock general
-    }
+    setStockDialogItem(item || null);
+    setStockAdjustment({
+      quantity: 0,
+      type: 'add',
+      reason: '',
+      notes: ''
+    });
+    setShowStockDialog(true);
   };
 
   const handleEdit = (item: InventoryItem) => {
@@ -369,8 +380,39 @@ export function InventoryPage() {
   };
 
   const handleViewAlerts = () => {
-    console.log('Mostrar alertas de stock');
-    // TODO: Implementar vista de alertas o scroll a sección de alertas
+    // Scroll to alerts section or switch to alerts tab
+    const alertsSection = document.getElementById('alerts-section');
+    if (alertsSection) {
+      alertsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleStockAdjustment = async () => {
+    if (!stockDialogItem || stockAdjustment.quantity === 0) return;
+    
+    try {
+      // Here you would call your stock adjustment API
+      console.log('Processing stock adjustment:', {
+        item: stockDialogItem.name,
+        adjustment: stockAdjustment
+      });
+      
+      // Close dialog and reset
+      setShowStockDialog(false);
+      setStockDialogItem(null);
+      setStockAdjustment({
+        quantity: 0,
+        type: 'add',
+        reason: '',
+        notes: ''
+      });
+      
+      // Refresh inventory data
+      // await refreshInventory(); // Uncomment when API is ready
+      
+    } catch (error) {
+      console.error('Error adjusting stock:', error);
+    }
   };
 
   // ✅ Handler para cuando se guarda exitosamente
@@ -575,6 +617,135 @@ export function InventoryPage() {
                   onCancel={handleFormCancel}
                 />
               </Dialog.Body>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Dialog.Root>
+
+        {/* Stock Adjustment Dialog */}
+        <Dialog.Root open={showStockDialog} onOpenChange={() => setShowStockDialog(false)}>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>
+                  {stockDialogItem ? `Ajustar Stock: ${stockDialogItem.name}` : 'Ajuste de Stock General'}
+                </Dialog.Title>
+                <Dialog.CloseTrigger />
+              </Dialog.Header>
+              <Dialog.Body>
+                <VStack align="stretch" gap={4}>
+                  {stockDialogItem && (
+                    <Card.Root variant="outline">
+                      <Card.Body p={3}>
+                        <HStack justify="space-between">
+                          <VStack align="start" gap={0}>
+                            <Text fontWeight="medium">{stockDialogItem.name}</Text>
+                            <Text fontSize="sm" color="gray.600">
+                              Stock actual: {formatQuantity(stockDialogItem.current_quantity, stockDialogItem.unit, stockDialogItem)}
+                            </Text>
+                          </VStack>
+                          <Badge colorScheme={stockDialogItem.current_quantity > stockDialogItem.min_stock ? 'green' : 'red'}>
+                            {stockDialogItem.current_quantity > stockDialogItem.min_stock ? 'Normal' : 'Bajo'}
+                          </Badge>
+                        </HStack>
+                      </Card.Body>
+                    </Card.Root>
+                  )}
+
+                  <VStack align="stretch" gap={3}>
+                    <Box>
+                      <Text fontSize="sm" fontWeight="medium" mb={2}>Tipo de Ajuste</Text>
+                      <Select.Root
+                        value={stockAdjustment.type}
+                        onValueChange={(e) => setStockAdjustment({...stockAdjustment, type: e.value as 'add' | 'subtract' | 'set'})}
+                      >
+                        <Select.Trigger>
+                          <Select.ValueText />
+                        </Select.Trigger>
+                        <Select.Content>
+                          <Select.Item value="add">Agregar (+)</Select.Item>
+                          <Select.Item value="subtract">Restar (-)</Select.Item>
+                          <Select.Item value="set">Establecer (=)</Select.Item>
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+
+                    <Box>
+                      <Text fontSize="sm" fontWeight="medium" mb={2}>Cantidad</Text>
+                      <NumberInput.Root
+                        value={stockAdjustment.quantity.toString()}
+                        onValueChange={(details) => setStockAdjustment({
+                          ...stockAdjustment, 
+                          quantity: Number(details.value)
+                        })}
+                        min={0}
+                      >
+                        <NumberInput.Field placeholder="0" />
+                        <NumberInput.Control>
+                          <NumberInput.IncrementTrigger />
+                          <NumberInput.DecrementTrigger />
+                        </NumberInput.Control>
+                      </NumberInput.Root>
+                    </Box>
+
+                    <Box>
+                      <Text fontSize="sm" fontWeight="medium" mb={2}>Razón</Text>
+                      <Select.Root
+                        value={stockAdjustment.reason}
+                        onValueChange={(e) => setStockAdjustment({...stockAdjustment, reason: e.value})}
+                      >
+                        <Select.Trigger>
+                          <Select.ValueText placeholder="Seleccionar razón" />
+                        </Select.Trigger>
+                        <Select.Content>
+                          <Select.Item value="purchase">Compra</Select.Item>
+                          <Select.Item value="sale">Venta</Select.Item>
+                          <Select.Item value="waste">Merma/Desperdicio</Select.Item>
+                          <Select.Item value="damage">Daño/Deterioro</Select.Item>
+                          <Select.Item value="inventory">Inventario físico</Select.Item>
+                          <Select.Item value="transfer">Transferencia</Select.Item>
+                          <Select.Item value="other">Otro</Select.Item>
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+
+                    <Box>
+                      <Text fontSize="sm" fontWeight="medium" mb={2}>Notas (opcional)</Text>
+                      <Textarea
+                        value={stockAdjustment.notes}
+                        onChange={(e) => setStockAdjustment({...stockAdjustment, notes: e.target.value})}
+                        placeholder="Detalles adicionales sobre el ajuste..."
+                        rows={3}
+                      />
+                    </Box>
+
+                    {stockDialogItem && (
+                      <Alert.Root status="info" size="sm">
+                        <Alert.Description>
+                          Stock resultante: {stockAdjustment.type === 'add' 
+                            ? stockDialogItem.current_quantity + stockAdjustment.quantity
+                            : stockAdjustment.type === 'subtract' 
+                            ? Math.max(0, stockDialogItem.current_quantity - stockAdjustment.quantity)
+                            : stockAdjustment.quantity
+                          } {stockDialogItem.unit}
+                        </Alert.Description>
+                      </Alert.Root>
+                    )}
+                  </VStack>
+                </VStack>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button variant="outline" onClick={() => setShowStockDialog(false)}>
+                  Cancelar
+                </Button>
+                <Button 
+                  colorScheme="blue" 
+                  onClick={handleStockAdjustment}
+                  disabled={stockAdjustment.quantity === 0 || !stockAdjustment.reason}
+                >
+                  Aplicar Ajuste
+                </Button>
+              </Dialog.Footer>
             </Dialog.Content>
           </Dialog.Positioner>
         </Dialog.Root>

@@ -23,10 +23,16 @@ import {
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useInventory } from '@/features/inventory/logic/useInventory';
+import { useSales } from '@/features/sales/logic/useSales';
+import { useCustomers } from '@/features/customers/logic/useCustomers';
+import { useRecipes } from '@/features/recipes/logic/useRecipes';
 
 export function Dashboard() {
   const { navigate, quickActions } = useNavigation();
   const { inventoryStats, alertSummary, alerts, loading } = useInventory();
+  const { salesStats } = useSales();
+  const { customersStats } = useCustomers();
+  const { recipes } = useRecipes();
 
   return (
     <Box p="6">
@@ -117,7 +123,7 @@ export function Dashboard() {
             </Card.Body>
           </Card.Root>
 
-          {/* Ventas (placeholder) */}
+          {/* Ventas con datos reales */}
           <Card.Root 
             variant="elevated" 
             cursor="pointer"
@@ -131,15 +137,19 @@ export function Dashboard() {
                   <CurrencyDollarIcon className="w-6 h-6 text-teal-600" />
                 </Box>
                 <VStack align="start" gap="1">
-                  <Text fontSize="2xl" fontWeight="bold">$0</Text>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    ${salesStats?.monthlyRevenue?.toLocaleString() || '0'}
+                  </Text>
                   <Text fontSize="sm" color="gray.600">Ventas del mes</Text>
-                  <Text fontSize="xs" color="teal.600">0 transacciones</Text>
+                  <Text fontSize="xs" color="teal.600">
+                    {salesStats?.monthlyTransactions || 0} transacciones
+                  </Text>
                 </VStack>
               </VStack>
             </Card.Body>
           </Card.Root>
 
-          {/* Clientes (placeholder) */}
+          {/* Clientes con datos reales */}
           <Card.Root 
             variant="elevated" 
             cursor="pointer"
@@ -153,15 +163,19 @@ export function Dashboard() {
                   <UsersIcon className="w-6 h-6 text-pink-600" />
                 </Box>
                 <VStack align="start" gap="1">
-                  <Text fontSize="2xl" fontWeight="bold">0</Text>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    {customersStats?.totalCustomers || 0}
+                  </Text>
                   <Text fontSize="sm" color="gray.600">Clientes activos</Text>
-                  <Text fontSize="xs" color="pink.600">Sin actividad</Text>
+                  <Text fontSize="xs" color="pink.600">
+                    {customersStats?.newThisMonth || 0} nuevos este mes
+                  </Text>
                 </VStack>
               </VStack>
             </Card.Body>
           </Card.Root>
 
-          {/* Producción (placeholder) */}
+          {/* Producción con datos reales */}
           <Card.Root 
             variant="elevated" 
             cursor="pointer"
@@ -175,9 +189,13 @@ export function Dashboard() {
                   <ChartBarIcon className="w-6 h-6 text-purple-600" />
                 </Box>
                 <VStack align="start" gap="1">
-                  <Text fontSize="2xl" fontWeight="bold">0</Text>
-                  <Text fontSize="sm" color="gray.600">Recetas activas</Text>
-                  <Text fontSize="xs" color="purple.600">Sin producción</Text>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    {recipes?.length || 0}
+                  </Text>
+                  <Text fontSize="sm" color="gray.600">Recetas disponibles</Text>
+                  <Text fontSize="xs" color="purple.600">
+                    {recipes?.filter(r => r.is_active).length || 0} activas
+                  </Text>
                 </VStack>
               </VStack>
             </Card.Body>

@@ -16,8 +16,8 @@ import {
 import { useState, useEffect, useMemo } from 'react';
 import { useRecipes } from '../logic/useRecipes'; 
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { fetchItems } from '../../items/data/itemApi';
-import { type Item } from '../../items/types';
+import { inventoryApi } from '../../inventory/data/inventoryApi';
+import { type InventoryItem } from '../../inventory/types';
 import { type CreateRecipeData } from '../types';
 
 interface RecipeIngredientForm {
@@ -37,7 +37,7 @@ export function RecipeForm() {
   const { handleError, handleSuccess } = useErrorHandler();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<InventoryItem[]>([]);
   
   const [form, setForm] = useState({
     name: '',
@@ -98,7 +98,7 @@ export function RecipeForm() {
 
   const loadItems = async () => {
     try {
-      const itemsData = await fetchItems();
+      const itemsData = await inventoryApi.getItems();
       setItems(itemsData);
     } catch (error) {
       handleError(error, 'Error cargando insumos');

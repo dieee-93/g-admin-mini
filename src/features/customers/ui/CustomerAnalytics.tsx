@@ -41,8 +41,8 @@ export function CustomerAnalytics() {
   const [selectedSegment, setSelectedSegment] = useState<CustomerSegment | null>(null);
 
   // Computed analytics
-  const churnRiskCustomers = useMemo(() => getChurnRiskCustomers(), [getChurnRiskCustomers]);
-  const highValueCustomers = useMemo(() => getHighValueCustomers(), [getHighValueCustomers]);
+  const churnRiskCustomers = getChurnRiskCustomers;
+  const highValueCustomers = getHighValueCustomers;
   
   // Overall loading state
   const isLoading = loading || rfmLoading || analyticsLoading;

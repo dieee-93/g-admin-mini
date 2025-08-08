@@ -4,12 +4,12 @@ import {
   VStack,
   HStack,
   Text,
-  Table,
   Badge,
   Input,
   Select,
   Button,
-  Card
+  Card,
+  Table
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { fetchSales } from '@/features/sales/data/saleApi';
@@ -84,11 +84,11 @@ export function CustomerOrdersHistory() {
                 onChange={(e) => setSelectedCustomer(e.target.value)}
                 minWidth="200px"
               >
-                {customers.map(customer => (
+                {customers?.map(customer => (
                   <option key={customer.id} value={customer.id}>
                     {customer.name}
                   </option>
-                ))}
+                )) || []}
               </Select>
             </Box>
 
@@ -156,7 +156,7 @@ export function CustomerOrdersHistory() {
               Historial de Pedidos
               {selectedCustomer && (
                 <Badge colorScheme="blue" ml="2">
-                  {customers.find(c => c.id === selectedCustomer)?.name}
+                  {customers?.find(c => c.id === selectedCustomer)?.name}
                 </Badge>
               )}
             </Text>

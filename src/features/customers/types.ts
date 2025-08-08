@@ -46,28 +46,43 @@ export interface CustomerProfile extends Customer {
 // ===== RFM ANALYTICS SYSTEM =====
 
 export interface CustomerRFMProfile {
-  // RFM Core Metrics
-  recency_score: number;          // 1-5 (days since last visit)
-  frequency_score: number;        // 1-5 (# visits in period)
-  monetary_score: number;         // 1-5 (total spending/average)
-  rfm_segment: CustomerSegment;   // Calculated segment
+  // JSONB RFM metrics structure (matching new schema)
+  rfm_metrics: {
+    recency_score: number;       // 1-5 (days since last visit)
+    frequency_score: number;     // 1-5 (# visits in period)  
+    monetary_score: number;      // 1-5 (total spending/average)
+    segment: CustomerSegment;    // Calculated segment
+  };
   
-  // Customer Intelligence
-  lifetime_value: number;         // CLV calculated
-  avg_order_value: number;
-  visit_frequency: number;        // visits per month
-  churn_risk: ChurnRisk;
+  // JSONB intelligence structure
+  intelligence: {
+    lifetime_value: number;      // CLV calculated
+    avg_order_value: number;
+    visit_frequency: number;     // visits per month
+    churn_risk: ChurnRisk;
+    preferred_time_slots: string[]; // lunch, dinner, weekend
+    seasonal_patterns: string[];    // summer, holidays
+    price_sensitivity: PriceSensitivity;
+  };
   
-  // Behavioral Patterns
-  preferred_time_slots: string[]; // lunch, dinner, weekend
-  seasonal_patterns: string[];    // summer, holidays
-  price_sensitivity: PriceSensitivity;
+  // JSONB status structure
+  status: {
+    is_vip: boolean;
+    loyalty_tier: LoyaltyTier;
+    blacklisted: boolean;
+  };
   
-  // Calculated Metrics
-  recency_days: number;
-  frequency_count: number;
-  monetary_total: number;
+  // JSONB raw data structure
+  raw_data: {
+    recency_days: number;
+    frequency_count: number;
+    monetary_total: number;
+  };
+  
+  // Metadata timestamps
   calculated_at: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export enum CustomerSegment {
@@ -106,44 +121,56 @@ export enum LoyaltyTier {
 // ===== CUSTOMER ORGANIZATION SYSTEM =====
 
 export interface CustomerTag {
-  id: string;
+  id: number;  // Changed to BIGINT from new schema
   name: string;
   color: string;
   category: 'behavior' | 'preference' | 'demographic' | 'custom';
   description?: string;
+  metadata?: Record<string, unknown>; // JSONB metadata field
   created_at: Date;
+  updated_at: Date;
 }
 
 export interface CustomerNote {
-  id: string;
+  id: number;  // Changed to BIGINT from new schema
   customer_id: string;
   content: string;
   type: 'general' | 'service' | 'complaint' | 'compliment' | 'dietary';
   created_by: string;              // Staff member
   created_at: Date;
+  updated_at: Date;                // Added from new schema
   is_important: boolean;
   is_private: boolean;             // Internal staff notes
+  metadata?: Record<string, unknown>; // JSONB metadata field
 }
 
 export interface CustomerPreferences {
-  // Dietary Information (CRITICAL for food safety)
-  dietary_restrictions: string[];  // vegan, gluten-free, lactose-free
-  allergies: string[];            // CRITICAL for safety
-  favorite_cuisines: string[];
-  disliked_items: string[];
+  // JSONB dietary profile structure (matching new schema)
+  dietary_profile: {
+    restrictions: string[];    // vegan, gluten-free, lactose-free
+    allergies: string[];      // CRITICAL for food safety
+    favorite_cuisines: string[];
+    disliked_items: string[];
+  };
   
-  // Dining Preferences
-  preferred_seating: string;       // booth, window, outdoor
-  party_size_usual: number;
-  preferred_server?: string;
+  // JSONB preferences structure
+  preferences: {
+    seating?: string;         // booth, window, outdoor
+    party_size: number;
+    preferred_server?: string;
+    service_pace?: 'quick' | 'standard' | 'leisurely';
+    special_requests: string[]; // no ice, sauce on side
+  };
   
-  // Service Preferences
-  service_pace: 'quick' | 'standard' | 'leisurely';
-  special_requests: string[];      // no ice, sauce on side
+  // JSONB communication structure
+  communication: {
+    preferred_contact_time?: string;  // morning, afternoon, evening
+    contact_frequency?: 'weekly' | 'monthly' | 'rarely';
+  };
   
-  // Marketing Preferences
-  preferred_contact_time: string;  // morning, afternoon, evening
-  contact_frequency: 'weekly' | 'monthly' | 'rarely';
+  // Metadata timestamps
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface CommunicationPreferences {
@@ -232,7 +259,7 @@ export interface CreateCustomerData {
   email?: string;
   address?: string;
   note?: string;
-  tags?: string[];                 // Tag IDs to assign
+  tags?: number[];                 // Tag IDs to assign (now BIGINT)
   preferences?: Partial<CustomerPreferences>;
   communication_preferences?: Partial<CommunicationPreferences>;
 }
@@ -299,9 +326,64 @@ export interface CustomerSearchResult {
   };
 }
 
-// ===== LEGACY COMPATIBILITY =====
+// ===== LEGACY COMPATIBILITY & MIGRATION HELPERS =====
 // Maintain backward compatibility with existing code
 
 export type { Customer as BasicCustomer };
 export type { CustomerStats as BasicCustomerStats };
 export type { CustomerWithStats as BasicCustomerWithStats };
+
+// Helper types for transitioning to new JSONB structure
+export interface LegacyCustomerPreferences {
+  dietary_restrictions: string[];
+  allergies: string[];
+  favorite_cuisines: string[];
+  disliked_items: string[];
+  preferred_seating: string;
+  party_size_usual: number;
+  preferred_server?: string;
+  service_pace: 'quick' | 'standard' | 'leisurely';
+  special_requests: string[];
+  preferred_contact_time: string;
+  contact_frequency: 'weekly' | 'monthly' | 'rarely';
+}
+
+// Utility type for accessing JSONB fields with proper typing
+export type JSONBField<T> = T | null;
+
+// Helper for migration from old to new structure
+export function convertLegacyPreferences(legacy: LegacyCustomerPreferences): CustomerPreferences['dietary_profile'] & CustomerPreferences['preferences'] & CustomerPreferences['communication'] {
+  return {
+    dietary_profile: {
+      restrictions: legacy.dietary_restrictions,
+      allergies: legacy.allergies,
+      favorite_cuisines: legacy.favorite_cuisines,
+      disliked_items: legacy.disliked_items
+    },
+    preferences: {
+      seating: legacy.preferred_seating,
+      party_size: legacy.party_size_usual,
+      preferred_server: legacy.preferred_server,
+      service_pace: legacy.service_pace,
+      special_requests: legacy.special_requests
+    },
+    communication: {
+      preferred_contact_time: legacy.preferred_contact_time,
+      contact_frequency: legacy.contact_frequency
+    }
+  };
+}
+
+// Supabase query helpers for JSONB fields
+export interface SupabaseCustomerPreferencesQuery {
+  dietary_profile: CustomerPreferences['dietary_profile'];
+  preferences: CustomerPreferences['preferences'];
+  communication: CustomerPreferences['communication'];
+}
+
+export interface SupabaseCustomerRFMQuery {
+  rfm_metrics: CustomerRFMProfile['rfm_metrics'];
+  intelligence: CustomerRFMProfile['intelligence'];
+  status: CustomerRFMProfile['status'];
+  raw_data: CustomerRFMProfile['raw_data'];
+}

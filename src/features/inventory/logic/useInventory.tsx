@@ -1,11 +1,9 @@
 // src/features/inventory/logic/useInventory.tsx
-// 🎉 Hook unificado COMPLETAMENTE MIGRADO al sistema centralizado v3.23
-// ✅ ANTES: Mixed API (status + type inconsistente)
-// ✅ AHORA: Sistema notify centralizado, API correcta 100%
+// Inventory management hook with Supabase realtime integration
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { notify, handleApiError } from '@/lib/notifications'; // ✅ NUEVO sistema centralizado
+import { notify, handleApiError } from '@/lib/notifications';
 import type { 
   InventoryItem, 
   StockAlert, 
@@ -14,6 +12,7 @@ import type {
   AlertThreshold,
   InventoryStats 
 } from '../types';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface UseInventoryOptions {
   alertThreshold?: number;
@@ -30,6 +29,9 @@ export function useInventory(options: UseInventoryOptions = {}) {
   const [thresholds, setThresholds] = useState<AlertThreshold[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Realtime subscriptions ref
+  const subscriptionsRef = useRef<RealtimeChannel[]>([]);
 
   // Derived state
   const alertSummary = useMemo<AlertSummary>(() => {
@@ -42,32 +44,28 @@ export function useInventory(options: UseInventoryOptions = {}) {
       critical,
       warning,
       info,
-      hasCritical: critical > 0,
-      hasWarning: warning > 0
+      hasAlerts: alerts.length > 0,
+      hasCriticalAlerts: critical > 0
     };
   }, [alerts]);
 
   const inventoryStats = useMemo<InventoryStats>(() => {
-    const totalValue = items.reduce((sum, item) => 
-      sum + (item.stock * (item.unit_cost || 0)), 0
-    );
-    
+    const totalItems = items.length;
+    const lowStockItems = items.filter(item => item.current_stock <= alertThreshold).length;
+    const outOfStockItems = items.filter(item => item.current_stock === 0).length;
+    const totalValue = items.reduce((sum, item) => sum + (item.current_stock * (item.unit_cost || 0)), 0);
+
     return {
-      totalItems: items.length,
+      totalItems,
+      lowStockItems,
+      outOfStockItems,
       totalValue,
-      lowStockItems: alerts.length,
-      outOfStockItems: items.filter(item => item.stock === 0).length,
-      recentMovements: stockEntries.filter(entry => {
-        const entryDate = new Date(entry.created_at);
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        return entryDate >= weekAgo;
-      }).length
+      averageValue: totalItems > 0 ? totalValue / totalItems : 0
     };
-  }, [items, alerts, stockEntries]);
+  }, [items, alertThreshold]);
 
   // API Functions
-  const fetchItems = useCallback(async () => {
+  const fetchItems = useCallback(async (): Promise<InventoryItem[]> => {
     try {
       const { data, error } = await supabase
         .from('items')
@@ -75,76 +73,79 @@ export function useInventory(options: UseInventoryOptions = {}) {
         .order('name');
 
       if (error) throw error;
+      
       setItems(data || []);
-    } catch (err) {
-      console.error('Error fetching items:', err);
-      setError(err instanceof Error ? err.message : 'Error al cargar items');
+      return data || [];
+    } catch (error) {
+      const message = handleApiError(error);
+      setError(message);
+      throw error;
     }
   }, []);
 
-  const fetchAlerts = useCallback(async () => {
+  const fetchAlerts = useCallback(async (): Promise<StockAlert[]> => {
     try {
-      // ✅ FIX: Corregir parámetro de función Supabase
       const { data, error } = await supabase
-        .rpc('get_low_stock_alert', { p_threshold: alertThreshold });
+        .from('stock_alerts')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
-      }
-
+      if (error) throw error;
+      
       setAlerts(data || []);
-    } catch (err) {
-      console.error('Error fetching alerts:', err);
-      setError(err instanceof Error ? err.message : 'Error al cargar alertas');
+      return data || [];
+    } catch (error) {
+      const message = handleApiError(error);
+      setError(message);
+      throw error;
     }
-  }, [alertThreshold]);
+  }, []);
 
-  const fetchStockEntries = useCallback(async (itemId?: string) => {
+  const fetchStockEntries = useCallback(async (itemId?: string): Promise<StockEntry[]> => {
     try {
       let query = supabase
         .from('stock_entries')
-        .select('*')
+        .select('*, items(name)')
         .order('created_at', { ascending: false });
 
       if (itemId) {
         query = query.eq('item_id', itemId);
       }
 
-      const { data, error } = await query.limit(100);
+      const { data, error } = await query;
       if (error) throw error;
       
       setStockEntries(data || []);
-    } catch (err) {
-      console.error('Error fetching stock entries:', err);
-      setError(err instanceof Error ? err.message : 'Error al cargar movimientos');
+      return data || [];
+    } catch (error) {
+      const message = handleApiError(error);
+      setError(message);
+      throw error;
     }
   }, []);
 
-  // Items operations
-  const addItem = useCallback(async (itemData: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>) => {
+  const addStockEntry = useCallback(async (entry: Omit<StockEntry, 'id' | 'created_at'>) => {
     try {
       const { data, error } = await supabase
-        .from('items')
-        .insert([itemData])
+        .from('stock_entries')
+        .insert([entry])
         .select()
         .single();
 
       if (error) throw error;
-
-      setItems(prev => [...prev, data]);
       
-      // ✅ MIGRADO: Usar sistema centralizado
-      notify.itemCreated(data.name);
-
+      // Update local state
+      await fetchItems();
+      await fetchStockEntries();
+      notify.success('Stock entry added successfully');
+      
       return data;
-    } catch (err) {
-      console.error('Error adding item:', err);
-      // ✅ MIGRADO: Usar handleApiError centralizado
-      handleApiError(err, 'No se pudo agregar el item');
-      throw err;
+    } catch (error) {
+      const message = handleApiError(error);
+      notify.error(`Failed to add stock entry: ${message}`);
+      throw error;
     }
-  }, []);
+  }, [fetchItems, fetchStockEntries]);
 
   const updateItem = useCallback(async (id: string, updates: Partial<InventoryItem>) => {
     try {
@@ -156,105 +157,96 @@ export function useInventory(options: UseInventoryOptions = {}) {
         .single();
 
       if (error) throw error;
-
-      setItems(prev => prev.map(item => item.id === id ? data : item));
       
-      // ✅ MIGRADO: Usar sistema centralizado
-      notify.itemUpdated(data.name);
-
+      // Update local state
+      setItems(prev => prev.map(item => 
+        item.id === id ? { ...item, ...updates } : item
+      ));
+      
+      notify.success('Item updated successfully');
       return data;
-    } catch (err) {
-      console.error('Error updating item:', err);
-      // ✅ MIGRADO: Usar handleApiError centralizado
-      handleApiError(err, 'No se pudo actualizar el item');
-      throw err;
+    } catch (error) {
+      const message = handleApiError(error);
+      notify.error(`Failed to update item: ${message}`);
+      throw error;
     }
   }, []);
 
-  // Stock operations
-  const addStock = useCallback(async (itemId: string, quantity: number, unitCost: number, note?: string) => {
+  const deleteItem = useCallback(async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('items')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      // Update local state
+      setItems(prev => prev.filter(item => item.id !== id));
+      notify.success('Item deleted successfully');
+    } catch (error) {
+      const message = handleApiError(error);
+      notify.error(`Failed to delete item: ${message}`);
+      throw error;
+    }
+  }, []);
+
+  const createItem = useCallback(async (itemData: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const { data, error } = await supabase
-        .from('stock_entries')
-        .insert([{
-          item_id: itemId,
-          quantity,
-          unit_cost: unitCost,
-          note
-        }])
+        .from('items')
+        .insert([itemData])
         .select()
         .single();
 
       if (error) throw error;
-
-      // Refresh items to get updated stock
-      await fetchItems();
-      await fetchAlerts();
       
-      // ✅ MIGRADO: Usar helper específico
-      const item = items.find(i => i.id === itemId);
-      notify.stockAdded(quantity, item?.unit || 'unidades');
-
+      // Update local state
+      setItems(prev => [...prev, data]);
+      notify.success('Item created successfully');
+      
       return data;
-    } catch (err) {
-      console.error('Error adding stock:', err);
-      // ✅ MIGRADO: Usar handleApiError centralizado
-      handleApiError(err, 'No se pudo agregar stock');
-      throw err;
-    }
-  }, [fetchItems, fetchAlerts, items]);
-
-  // Alert operations
-  const acknowledgeAlert = useCallback(async (alertId: string) => {
-    try {
-      // Mark alert as acknowledged (implementation depends on your needs)
-      setAlerts(prev => prev.filter(alert => alert.id !== alertId));
-      
-      // ✅ MIGRADO: Usar helper específico
-      notify.alertAcknowledged();
-    } catch (err) {
-      console.error('Error acknowledging alert:', err);
+    } catch (error) {
+      const message = handleApiError(error);
+      notify.error(`Failed to create item: ${message}`);
+      throw error;
     }
   }, []);
 
-  const saveThreshold = useCallback(async (threshold: AlertThreshold) => {
+  // Alert management
+  const dismissAlert = useCallback(async (alertId: string) => {
     try {
-      // Implementation for saving custom thresholds
-      setThresholds(prev => {
-        const existing = prev.findIndex(t => t.item_id === threshold.item_id);
-        if (existing >= 0) {
-          return prev.map((t, i) => i === existing ? threshold : t);
-        }
-        return [...prev, threshold];
-      });
-      
-      // ✅ MIGRADO: Usar helper específico
-      const item = items.find(i => i.id === threshold.item_id);
-      notify.alertConfigSaved(item?.name || 'Item');
-      
-      return threshold;
-    } catch (err) {
-      console.error('Error saving threshold:', err);
-      // ✅ MIGRADO: Usar handleApiError centralizado
-      handleApiError(err, 'No se pudo guardar la configuración');
-      throw err;
-    }
-  }, [items]);
+      const { error } = await supabase
+        .from('stock_alerts')
+        .update({ status: 'dismissed' })
+        .eq('id', alertId);
 
-  // Initialize data
+      if (error) throw error;
+      
+      // Update local state
+      setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+      notify.success('Alert dismissed');
+    } catch (error) {
+      const message = handleApiError(error);
+      notify.error(`Failed to dismiss alert: ${message}`);
+      throw error;
+    }
+  }, []);
+
+  // Initial data load
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
       try {
+        setLoading(true);
+        setError(null);
+        
         await Promise.all([
           fetchItems(),
           fetchAlerts(),
           fetchStockEntries()
         ]);
-      } catch (err) {
-        console.error('Error loading inventory data:', err);
-        // ✅ MIGRADO: Usar handleApiError centralizado
-        handleApiError(err, 'Error al cargar datos del inventario');
+      } catch (error) {
+        console.error('Failed to load inventory data:', error);
       } finally {
         setLoading(false);
       }
@@ -265,33 +257,66 @@ export function useInventory(options: UseInventoryOptions = {}) {
 
   // Realtime subscriptions
   useEffect(() => {
-    if (!enableRealtime) return;
+  if (!enableRealtime) return;
 
-    const itemsSubscription = supabase
+  // Add error handling and logging
+  const handleSubscriptionError = (error: any) => {
+    console.error('Realtime Subscription Error:', error);
+  };
+
+  let itemsSubscription: any;
+  let stockSubscription: any;
+
+  try {
+    itemsSubscription = supabase
       .channel('inventory-items')
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'items' },
-        () => fetchItems()
+        (payload) => {
+          console.log('Items Change Payload:', payload);
+          fetchItems();
+        }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) handleSubscriptionError(err);
+        console.log('Items Subscription Status:', status);
+      });
 
-    const stockSubscription = supabase
+    stockSubscription = supabase
       .channel('inventory-stock')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'stock_entries' },
-        () => {
+        (payload) => {
+          console.log('Stock Entries Change Payload:', payload);
           fetchItems();
           fetchStockEntries();
           fetchAlerts();
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) handleSubscriptionError(err);
+        console.log('Stock Subscription Status:', status);
+      });
 
-    return () => {
-      supabase.removeChannel(itemsSubscription);
-      supabase.removeChannel(stockSubscription);
-    };
-  }, [enableRealtime, fetchItems, fetchStockEntries, fetchAlerts]);
+    // Store subscriptions for cleanup
+    subscriptionsRef.current = [itemsSubscription, stockSubscription];
+  } catch (error) {
+    console.error('Realtime Subscription Setup Error:', error);
+  }
+
+  return () => {
+    if (subscriptionsRef.current) {
+      subscriptionsRef.current.forEach(subscription => {
+        try {
+          supabase.removeChannel(subscription);
+        } catch (error) {
+          console.error('Error removing channel:', error);
+        }
+      });
+      subscriptionsRef.current = [];
+    }
+  };
+}, [enableRealtime, fetchItems, fetchStockEntries, fetchAlerts]);
 
   return {
     // State
@@ -302,37 +327,27 @@ export function useInventory(options: UseInventoryOptions = {}) {
     loading,
     error,
     
-    // Derived state
+    // Computed state
     alertSummary,
     inventoryStats,
     
     // Actions
-    addItem,
-    updateItem,
-    addStock,
-    acknowledgeAlert,
-    saveThreshold,
-    
-    // Refetch functions
-    refetch: () => Promise.all([fetchItems(), fetchAlerts(), fetchStockEntries()]),
     fetchItems,
     fetchAlerts,
-    fetchStockEntries
+    fetchStockEntries,
+    addStockEntry,
+    updateItem,
+    deleteItem,
+    createItem,
+    dismissAlert,
+    
+    // Utilities
+    refresh: useCallback(async () => {
+      await Promise.all([
+        fetchItems(),
+        fetchAlerts(),
+        fetchStockEntries()
+      ]);
+    }, [fetchItems, fetchAlerts, fetchStockEntries])
   };
 }
-
-/**
- * 🎯 MIGRACIÓN COMPLETADA:
- * 
- * ❌ ANTES: toaster.create({ status: "success", isClosable: true })
- * ✅ AHORA: notify.success({ title: "Success", description: "..." })
- * 
- * ❌ ANTES: toaster.create({ type: "error" }) (inconsistente)
- * ✅ AHORA: handleApiError(error, "mensaje fallback")
- * 
- * 🚀 BENEFICIOS:
- * - API unificada v3.23.0 correcta
- * - Helpers específicos para operaciones comunes
- * - Error handling centralizado
- * - Código más limpio y mantenible
- */

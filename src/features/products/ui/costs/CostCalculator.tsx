@@ -1,0 +1,324 @@
+// src/features/products/ui/costs/CostCalculator.tsx
+// Calculadora de costos como componente independiente
+
+import React, { useState } from 'react';
+import {
+  Box,
+  Card,
+  VStack,
+  HStack,
+  Text,
+  Button,
+  Badge,
+  Grid,
+  Input,
+  NumberInput,
+  Separator
+} from '@chakra-ui/react';
+import {
+  CurrencyDollarIcon,
+  CalculatorIcon,
+  DocumentTextIcon
+} from '@heroicons/react/24/outline';
+import { notify } from '@/lib/notifications';
+
+interface CostCalculation {
+  id: string;
+  product_name: string;
+  batch_size: number;
+  materials_cost: number;
+  materials_per_unit: number;
+  labor_hours: number;
+  labor_rate_per_hour: number;
+  labor_cost: number;
+  equipment_cost: number;
+  utility_cost: number;
+  facility_cost: number;
+  overhead_total: number;
+  total_cost: number;
+  cost_per_unit: number;
+  suggested_price: number;
+  profit_margin: number;
+  markup_percentage: number;
+  industry_benchmark: number;
+  competitor_price: number;
+  created_at: string;
+}
+
+interface CostCalculatorProps {
+  calculations: CostCalculation[];
+  onCalculationComplete: (calculation: CostCalculation) => void;
+}
+
+export function CostCalculator({ calculations, onCalculationComplete }: CostCalculatorProps) {
+  const [currentCalculation, setCurrentCalculation] = useState<Partial<CostCalculation>>({
+    batch_size: 1,
+    labor_rate_per_hour: 15.00
+  });
+  const [loading, setLoading] = useState(false);
+
+  const calculateCosts = () => {
+    const calc = currentCalculation;
+    
+    if (!calc.materials_cost || !calc.labor_hours || !calc.batch_size) {
+      notify.error('Please fill in all required fields');
+      return;
+    }
+
+    setLoading(true);
+
+    // Calculate derived values
+    const materials_per_unit = calc.materials_cost / calc.batch_size;
+    const labor_cost = calc.labor_hours * (calc.labor_rate_per_hour || 15);
+    const overhead_total = (calc.equipment_cost || 0) + (calc.utility_cost || 0) + (calc.facility_cost || 0);
+    const total_cost = calc.materials_cost + labor_cost + overhead_total;
+    const cost_per_unit = total_cost / calc.batch_size;
+    
+    // Pricing calculations (80% markup as default)
+    const markup_percentage = 80;
+    const suggested_price = cost_per_unit * (1 + markup_percentage / 100);
+    const profit_margin = ((suggested_price - cost_per_unit) / suggested_price) * 100;
+
+    const newCalculation: CostCalculation = {
+      id: Date.now().toString(),
+      product_name: calc.product_name || 'Unnamed Product',
+      batch_size: calc.batch_size,
+      materials_cost: calc.materials_cost,
+      materials_per_unit,
+      labor_hours: calc.labor_hours,
+      labor_rate_per_hour: calc.labor_rate_per_hour || 15,
+      labor_cost,
+      equipment_cost: calc.equipment_cost || 0,
+      utility_cost: calc.utility_cost || 0,
+      facility_cost: calc.facility_cost || 0,
+      overhead_total,
+      total_cost,
+      cost_per_unit,
+      suggested_price,
+      profit_margin,
+      markup_percentage,
+      industry_benchmark: suggested_price * 0.95,
+      competitor_price: suggested_price * 1.05,
+      created_at: new Date().toISOString()
+    };
+
+    onCalculationComplete(newCalculation);
+    setCurrentCalculation({ batch_size: 1, labor_rate_per_hour: 15.00 });
+    setLoading(false);
+    notify.success('Cost calculation completed successfully');
+  };
+
+  const exportCalculation = (calc: CostCalculation) => {
+    const data = JSON.stringify(calc, null, 2);
+    console.log('Exporting calculation:', data);
+    notify.success('Calculation exported to console');
+  };
+
+  return (
+    <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap={6}>
+      {/* Input Form */}
+      <Card.Root>
+        <Card.Header>
+          <HStack>
+            <CalculatorIcon className="w-5 h-5 text-blue-600" />
+            <Text fontSize="lg" fontWeight="semibold">Cost Calculation Input</Text>
+          </HStack>
+        </Card.Header>
+        <Card.Body>
+          <VStack gap={4} align="stretch">
+            {/* Product Info */}
+            <Box>
+              <Text fontSize="sm" fontWeight="medium" mb={2}>Product Name</Text>
+              <Input
+                value={currentCalculation.product_name || ''}
+                onChange={(e) => setCurrentCalculation(prev => ({ ...prev, product_name: e.target.value }))}
+                placeholder="Enter product name"
+              />
+            </Box>
+
+            <Box>
+              <Text fontSize="sm" fontWeight="medium" mb={2}>Batch Size (units)</Text>
+              <NumberInput.Root
+                value={currentCalculation.batch_size?.toString()}
+                onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, batch_size: parseInt(details.value) }))}
+                min={1}
+              >
+                <NumberInput.Input />
+              </NumberInput.Root>
+            </Box>
+
+            <Separator />
+
+            {/* Material Costs */}
+            <Text fontSize="md" fontWeight="semibold" color="blue.600">Material Costs</Text>
+            
+            <Box>
+              <Text fontSize="sm" fontWeight="medium" mb={2}>Total Materials Cost ($)</Text>
+              <NumberInput.Root
+                value={currentCalculation.materials_cost?.toString()}
+                onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, materials_cost: parseFloat(details.value) }))}
+                min={0}
+                precision={2}
+              >
+                <NumberInput.Input />
+              </NumberInput.Root>
+            </Box>
+
+            <Separator />
+
+            {/* Labor Costs */}
+            <Text fontSize="md" fontWeight="semibold" color="green.600">Labor Costs</Text>
+            
+            <Grid templateColumns="1fr 1fr" gap={3}>
+              <Box>
+                <Text fontSize="sm" fontWeight="medium" mb={2}>Labor Hours</Text>
+                <NumberInput.Root
+                  value={currentCalculation.labor_hours?.toString()}
+                  onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, labor_hours: parseFloat(details.value) }))}
+                  min={0}
+                  precision={2}
+                >
+                  <NumberInput.Input />
+                </NumberInput.Root>
+              </Box>
+              
+              <Box>
+                <Text fontSize="sm" fontWeight="medium" mb={2}>Rate/Hour ($)</Text>
+                <NumberInput.Root
+                  value={currentCalculation.labor_rate_per_hour?.toString()}
+                  onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, labor_rate_per_hour: parseFloat(details.value) }))}
+                  min={0}
+                  precision={2}
+                >
+                  <NumberInput.Input />
+                </NumberInput.Root>
+              </Box>
+            </Grid>
+
+            <Separator />
+
+            {/* Overhead Costs */}
+            <Text fontSize="md" fontWeight="semibold" color="orange.600">Overhead Costs</Text>
+            
+            <Grid templateColumns="1fr 1fr" gap={3}>
+              <Box>
+                <Text fontSize="sm" fontWeight="medium" mb={2}>Equipment ($)</Text>
+                <NumberInput.Root
+                  value={currentCalculation.equipment_cost?.toString()}
+                  onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, equipment_cost: parseFloat(details.value) }))}
+                  min={0}
+                  precision={2}
+                >
+                  <NumberInput.Input />
+                </NumberInput.Root>
+              </Box>
+              
+              <Box>
+                <Text fontSize="sm" fontWeight="medium" mb={2}>Utilities ($)</Text>
+                <NumberInput.Root
+                  value={currentCalculation.utility_cost?.toString()}
+                  onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, utility_cost: parseFloat(details.value) }))}
+                  min={0}
+                  precision={2}
+                >
+                  <NumberInput.Input />
+                </NumberInput.Root>
+              </Box>
+            </Grid>
+
+            <Box>
+              <Text fontSize="sm" fontWeight="medium" mb={2}>Facility Cost ($)</Text>
+              <NumberInput.Root
+                value={currentCalculation.facility_cost?.toString()}
+                onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, facility_cost: parseFloat(details.value) }))}
+                min={0}
+                precision={2}
+              >
+                <NumberInput.Input />
+              </NumberInput.Root>
+            </Box>
+
+            <Button
+              colorPalette="blue"
+              size="lg"
+              onClick={calculateCosts}
+              loading={loading}
+            >
+              <CalculatorIcon className="w-4 h-4" />
+              Calculate Costs
+            </Button>
+          </VStack>
+        </Card.Body>
+      </Card.Root>
+
+      {/* Latest Calculation Results */}
+      {calculations.length > 0 && (
+        <Card.Root>
+          <Card.Header>
+            <HStack justify="space-between">
+              <HStack>
+                <CurrencyDollarIcon className="w-5 h-5 text-green-600" />
+                <Text fontSize="lg" fontWeight="semibold">Latest Calculation</Text>
+              </HStack>
+              <Badge colorPalette="green">
+                {calculations[0].product_name}
+              </Badge>
+            </HStack>
+          </Card.Header>
+          <Card.Body>
+            <VStack gap={4} align="stretch">
+              {/* Cost Summary */}
+              <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                <Box textAlign="center" p={3} bg="blue.50" borderRadius="md">
+                  <Text fontSize="xs" color="gray.600">Total Cost</Text>
+                  <Text fontSize="xl" fontWeight="bold" color="blue.600">
+                    ${calculations[0].total_cost.toFixed(2)}
+                  </Text>
+                </Box>
+                
+                <Box textAlign="center" p={3} bg="green.50" borderRadius="md">
+                  <Text fontSize="xs" color="gray.600">Cost per Unit</Text>
+                  <Text fontSize="xl" fontWeight="bold" color="green.600">
+                    ${calculations[0].cost_per_unit.toFixed(2)}
+                  </Text>
+                </Box>
+              </Grid>
+
+              {/* Pricing Analysis */}
+              <Box>
+                <Text fontSize="sm" fontWeight="semibold" mb={2}>Pricing Analysis</Text>
+                <Grid templateColumns="repeat(2, 1fr)" gap={3} fontSize="sm">
+                  <HStack justify="space-between">
+                    <Text>Suggested Price:</Text>
+                    <Text fontWeight="bold">${calculations[0].suggested_price.toFixed(2)}</Text>
+                  </HStack>
+                  <HStack justify="space-between">
+                    <Text>Profit Margin:</Text>
+                    <Text fontWeight="bold" color="green.600">{calculations[0].profit_margin.toFixed(1)}%</Text>
+                  </HStack>
+                  <HStack justify="space-between">
+                    <Text>Industry Benchmark:</Text>
+                    <Text>${calculations[0].industry_benchmark.toFixed(2)}</Text>
+                  </HStack>
+                  <HStack justify="space-between">
+                    <Text>Competitor Price:</Text>
+                    <Text>${calculations[0].competitor_price.toFixed(2)}</Text>
+                  </HStack>
+                </Grid>
+              </Box>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => exportCalculation(calculations[0])}
+              >
+                <DocumentTextIcon className="w-4 h-4" />
+                Export Report
+              </Button>
+            </VStack>
+          </Card.Body>
+        </Card.Root>
+      )}
+    </Grid>
+  );
+}

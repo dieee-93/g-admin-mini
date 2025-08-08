@@ -12,7 +12,9 @@ import {
   Grid,
   Select,
   createListCollection,
-  Alert
+  Alert,
+  Dialog,
+  Card
 } from '@chakra-ui/react';
 import { useState, useMemo } from 'react';
 import { useSales, useSalesData } from '../logic/useSales';
@@ -26,6 +28,8 @@ export function SaleList() {
   const { handleError, handleSuccess } = useErrorHandler();
   
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedSale, setSelectedSale] = useState<any>(null);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [localFilters, setLocalFilters] = useState<SalesListFilters>({
     dateFrom: '',
     dateTo: '',
@@ -352,8 +356,8 @@ export function SaleList() {
                       colorScheme="blue"
                       variant="ghost"
                       onClick={() => {
-                        // TODO: Implementar vista detallada
-                        console.log('Ver detalle de venta:', sale.id);
+                        setSelectedSale(sale);
+                        setShowDetailDialog(true);
                       }}
                     >
                       👁️
@@ -374,6 +378,117 @@ export function SaleList() {
           </Table.Body>
         </Table.Root>
       )}
+
+      {/* Sale Detail Dialog */}
+      <Dialog.Root open={showDetailDialog} onOpenChange={() => setShowDetailDialog(false)}>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header>
+              <Dialog.Title>Detalle de Venta #{selectedSale?.id}</Dialog.Title>
+              <Dialog.CloseTrigger />
+            </Dialog.Header>
+            <Dialog.Body>
+              {selectedSale && (
+                <VStack align="stretch" gap={4}>
+                  {/* Sale Info */}
+                  <Card.Root>
+                    <Card.Header>
+                      <Text fontWeight="bold">Información de la Venta</Text>
+                    </Card.Header>
+                    <Card.Body>
+                      <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                        <Box>
+                          <Text fontSize="sm" color="gray.600">Fecha</Text>
+                          <Text fontWeight="medium">
+                            {new Date(selectedSale.sale_date).toLocaleDateString('es-ES', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Text fontSize="sm" color="gray.600">Total</Text>
+                          <Text fontWeight="bold" fontSize="lg" color="green.600">
+                            ${selectedSale.total_amount.toFixed(2)}
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Text fontSize="sm" color="gray.600">Cliente</Text>
+                          <Text fontWeight="medium">
+                            {selectedSale.customer_name || 'Cliente anónimo'}
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Text fontSize="sm" color="gray.600">Estado</Text>
+                          <Badge colorScheme="green">Completada</Badge>
+                        </Box>
+                      </Grid>
+                    </Card.Body>
+                  </Card.Root>
+
+                  {/* Sale Items */}
+                  <Card.Root>
+                    <Card.Header>
+                      <Text fontWeight="bold">Productos Vendidos</Text>
+                    </Card.Header>
+                    <Card.Body>
+                      {selectedSale.items && selectedSale.items.length > 0 ? (
+                        <Table.Root size="sm">
+                          <Table.Header>
+                            <Table.Row>
+                              <Table.ColumnHeader>Producto</Table.ColumnHeader>
+                              <Table.ColumnHeader>Cantidad</Table.ColumnHeader>
+                              <Table.ColumnHeader>Precio Unit.</Table.ColumnHeader>
+                              <Table.ColumnHeader>Subtotal</Table.ColumnHeader>
+                            </Table.Row>
+                          </Table.Header>
+                          <Table.Body>
+                            {selectedSale.items.map((item: any, index: number) => (
+                              <Table.Row key={index}>
+                                <Table.Cell fontWeight="medium">{item.name}</Table.Cell>
+                                <Table.Cell>{item.quantity}</Table.Cell>
+                                <Table.Cell>${item.price.toFixed(2)}</Table.Cell>
+                                <Table.Cell fontWeight="bold">
+                                  ${(item.quantity * item.price).toFixed(2)}
+                                </Table.Cell>
+                              </Table.Row>
+                            ))}
+                          </Table.Body>
+                        </Table.Root>
+                      ) : (
+                        <Text color="gray.500" textAlign="center" py={4}>
+                          No hay detalles de productos disponibles
+                        </Text>
+                      )}
+                    </Card.Body>
+                  </Card.Root>
+
+                  {/* Notes */}
+                  {selectedSale.notes && (
+                    <Card.Root>
+                      <Card.Header>
+                        <Text fontWeight="bold">Notas</Text>
+                      </Card.Header>
+                      <Card.Body>
+                        <Text>{selectedSale.notes}</Text>
+                      </Card.Body>
+                    </Card.Root>
+                  )}
+                </VStack>
+              )}
+            </Dialog.Body>
+            <Dialog.Footer>
+              <Button variant="outline" onClick={() => setShowDetailDialog(false)}>
+                Cerrar
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
     </Box>
   );
 }

@@ -38,6 +38,9 @@ importers:
       react-router-dom:
         specifier: ^7.7.1
         version: 7.7.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      typecheck:
+        specifier: ^0.1.2
+        version: 0.1.2
     devDependencies:
       '@eslint/js':
         specifier: ^9.30.1
@@ -1934,6 +1937,9 @@ packages:
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
+
+  typecheck@0.1.2:
+    resolution: {integrity: sha512-noA7T++dtHFemmk++XgotLp47kcu8ezbvN3hUUljZvntPGDWi9Ci0c24x6onS92PxOUNZFYChH8KPXRaoCcjgQ==}
 
   typescript-eslint@8.38.0:
     resolution: {integrity: sha512-FsZlrYK6bPDGoLeZRuvx2v6qrM03I0U0SnfCLPs/XCCPCFD80xU9Pg09H/K+XFa68uJuZo7l/Xhs+eDRg2l3hg==}
@@ -4230,6 +4236,8 @@ snapshots:
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
+
+  typecheck@0.1.2: {}
 
   typescript-eslint@8.38.0(eslint@9.32.0)(typescript@5.8.3):
     dependencies:

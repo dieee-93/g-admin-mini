@@ -6,7 +6,8 @@ import {
   CogIcon, 
   CurrencyDollarIcon, 
   UsersIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  BookOpenIcon
 } from '@heroicons/react/24/outline';
 
 // ✅ Types definidos según arquitectura v2.0
@@ -89,6 +90,14 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     icon: CogIcon,
     color: 'purple',
     path: '/production',
+    description: 'Planificación de producción'
+  },
+  {
+    id: 'recipes',
+    title: 'Recetas',
+    icon: BookOpenIcon,
+    color: 'orange',
+    path: '/recipes',
     description: 'Recetas y costos'
   },
   {

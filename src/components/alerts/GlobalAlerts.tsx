@@ -11,7 +11,8 @@ import {
   Alert,
   IconButton,
   Collapsible,
-  Badge
+  Badge,
+  Card
 } from '@chakra-ui/react';
 import {
   ExclamationTriangleIcon,
@@ -61,10 +62,11 @@ export function GlobalAlerts({
 
   const handleQuickStock = async (itemId: string, itemName: string) => {
     try {
-      // TODO: Implementar quick stock modal
-      notify.info({
-        title: 'Quick Stock',
-        description: `Agregando stock para ${itemName}...`
+      // Open inventory page with specific item for stock adjustment
+      window.location.href = `/inventory?action=add-stock&itemId=${itemId}`;
+      notify.success({
+        title: 'Navegando a Stock',
+        description: `Abriendo ajuste de stock para ${itemName}`
       });
     } catch (error) {
       notify.error({
@@ -188,8 +190,8 @@ export function GlobalAlerts({
                 variant="outline"
                 colorPalette="red"
                 onClick={() => {
-                  // TODO: Navegar a página de inventario tab alertas
-                  window.location.href = '/inventory?tab=alerts';
+                  // Navigate to inventory page alerts section
+                  window.location.href = '/inventory#alerts-section';
                 }}
               >
                 Ver todas las alertas ({alertSummary.total})
@@ -270,13 +272,61 @@ export function AlertsConfig({ onSave }: AlertsConfigProps) {
     criticalOnly: true
   });
 
-  // TODO: Implementar UI de configuración
   return (
     <Box p="4">
-      <Text fontSize="lg" fontWeight="bold" mb="4">
-        Configuración de Alertas Globales
-      </Text>
-      {/* Aquí va el formulario de configuración */}
+      <VStack align="stretch" gap="4">
+        <Text fontSize="lg" fontWeight="bold">
+          Configuración de Alertas Globales
+        </Text>
+
+        <Card.Root>
+          <Card.Header>
+            <Text fontWeight="semibold">Configuración de Notificaciones</Text>
+          </Card.Header>
+          <Card.Body>
+            <VStack align="stretch" gap="4">
+              <HStack justify="space-between">
+                <VStack align="start" gap="0">
+                  <Text fontWeight="medium">Solo alertas críticas</Text>
+                  <Text fontSize="sm" color="gray.600">
+                    Mostrar únicamente alertas de stock crítico
+                  </Text>
+                </VStack>
+                <Badge colorScheme={config.criticalOnly ? 'red' : 'gray'}>
+                  {config.criticalOnly ? 'Activado' : 'Desactivado'}
+                </Badge>
+              </HStack>
+
+              <HStack justify="space-between">
+                <VStack align="start" gap="0">
+                  <Text fontWeight="medium">Posición de alertas</Text>
+                  <Text fontSize="sm" color="gray.600">
+                    Ubicación de las alertas en pantalla
+                  </Text>
+                </VStack>
+                <Badge colorScheme="blue">Esquina superior derecha</Badge>
+              </HStack>
+
+              <HStack justify="space-between">
+                <VStack align="start" gap="0">
+                  <Text fontWeight="medium">Auto-dismiss</Text>
+                  <Text fontSize="sm" color="gray.600">
+                    Ocultar alertas automáticamente después de 5 segundos
+                  </Text>
+                </VStack>
+                <Badge colorScheme="green">Activado</Badge>
+              </HStack>
+            </VStack>
+          </Card.Body>
+        </Card.Root>
+
+        <Alert.Root status="info" size="sm">
+          <Alert.Description>
+            La configuración se guarda automáticamente. Las alertas globales aparecen 
+            cuando hay items con stock bajo el mínimo establecido.
+          </Alert.Description>
+        </Alert.Root>
+      </VStack>
     </Box>
   );
 }
