@@ -1,7 +1,14 @@
-// Refactored Customers Page with improved navigation
+// Refactored Customers Page with UNIFIED navigation pattern
 import { useState, useEffect } from 'react';
-import { Box, VStack, Text, Tabs, Badge } from '@chakra-ui/react';
-import { UsersIcon, ChartBarIcon, DocumentTextIcon, CreditCardIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Box, VStack, HStack, Text, Tabs, Badge, Card } from '@chakra-ui/react';
+import { 
+  UsersIcon, 
+  ChartBarIcon, 
+  DocumentTextIcon, 
+  CreditCardIcon, 
+  PlusIcon,
+  UserGroupIcon
+} from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 // Import existing components
@@ -9,17 +16,10 @@ import { CustomerForm } from './ui/CustomerForm';
 import { CustomerList } from './ui/CustomerList';
 import { CustomerAnalytics } from './ui/CustomerAnalytics';
 import { CustomerOrdersHistory } from './ui/CustomerOrdersHistory';
-import { CustomerNavigation } from './components/CustomerNavigation';
 
 export default function CustomersPageRefactored() {
   const { setQuickActions } = useNavigation();
   const [activeSection, setActiveSection] = useState('management');
-  const [activeSubSection, setActiveSubSection] = useState<string | undefined>();
-
-  const handleSectionChange = (section: string, subSection?: string) => {
-    setActiveSection(section);
-    setActiveSubSection(subSection);
-  };
 
   useEffect(() => {
     const quickActions = [
@@ -27,14 +27,14 @@ export default function CustomersPageRefactored() {
         id: 'new-customer',
         label: 'Nuevo Cliente',
         icon: PlusIcon,
-        action: () => handleSectionChange('management'),
+        action: () => setActiveSection('management'),
         color: 'pink'
       },
       {
         id: 'analytics',
         label: 'Ver Analytics',
         icon: ChartBarIcon,
-        action: () => handleSectionChange('analytics', 'rfm'),
+        action: () => setActiveSection('analytics'),
         color: 'blue'
       }
     ];
@@ -56,6 +56,16 @@ export default function CustomersPageRefactored() {
         return <CustomerAnalytics />;
       case 'orders':
         return <CustomerOrdersHistory />;
+      case 'loyalty':
+        return (
+          <Card.Root>
+            <Card.Body p="8" textAlign="center">
+              <CreditCardIcon className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+              <Text fontSize="lg" fontWeight="semibold" mb="2">Programa de Lealtad</Text>
+              <Text color="gray.600">Próximamente - Gestión de puntos y recompensas</Text>
+            </Card.Body>
+          </Card.Root>
+        );
       default:
         return (
           <VStack gap={6} align="stretch">
@@ -67,22 +77,39 @@ export default function CustomersPageRefactored() {
   };
 
   return (
-    <Box p="6">
+    <Box p="6" maxW="7xl" mx="auto">
       <VStack gap="6" align="stretch">
-        <VStack align="start" gap="2">
-          <Text fontSize="3xl" fontWeight="bold">Clientes</Text>
-          <Text color="gray.600">Gestión avanzada de clientes con análisis RFM</Text>
-        </VStack>
+        {/* UNIFIED PATTERN: Header with icon, badges, KPIs */}
+        <Card.Root>
+          <Card.Body>
+            <HStack gap="4">
+              <Box p="2" bg="pink.100" borderRadius="md">
+                <UserGroupIcon className="w-8 h-8 text-pink-600" />
+              </Box>
+              <VStack align="start" gap="1">
+                <HStack>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    Gestión de Clientes
+                  </Text>
+                  <Badge colorPalette="pink" variant="subtle">
+                    RFM Analytics
+                  </Badge>
+                  <Badge colorPalette="blue" variant="subtle">
+                    v2.0
+                  </Badge>
+                </HStack>
+                <Text color="gray.600" fontSize="sm">
+                  Gestión avanzada de clientes con análisis RFM y segmentación inteligente
+                </Text>
+              </VStack>
+            </HStack>
+          </Card.Body>
+        </Card.Root>
 
-        <CustomerNavigation
-          currentSection={activeSection}
-          currentSubSection={activeSubSection}
-          onSectionChange={handleSectionChange}
-        />
-
+        {/* UNIFIED PATTERN: Tabs (max 4) */}
         <Tabs.Root 
           value={activeSection} 
-          onValueChange={(e) => handleSectionChange(e.value)}
+          onValueChange={(e) => setActiveSection(e.value)}
           variant="line"
         >
           <Tabs.List>
@@ -105,6 +132,7 @@ export default function CustomersPageRefactored() {
             </Tabs.Trigger>
           </Tabs.List>
 
+          {/* UNIFIED PATTERN: Content area */}
           <Tabs.Content value={activeSection}>
             {renderContent()}
           </Tabs.Content>
@@ -113,3 +141,4 @@ export default function CustomersPageRefactored() {
     </Box>
   );
 }
+EOF < /dev/null

@@ -15,6 +15,8 @@ import { ProductionPage } from '@/pages/ProductionPage';
 import { SalesPage } from '@/pages/SalesPage';  
 import { CustomersPage } from '@/pages/CustomersPage';
 import { RecipesPage } from '@/pages/RecipesPage';
+import { OperationsPage } from "@/features/operations/OperationsPage";
+import { StaffPage } from '@/features/staff';
 
 // ✅ Submódulos POS (ahora en features/)
 import { QROrderPage } from '@/features/sales/components/QROrdering/QROrderPage';
@@ -39,6 +41,8 @@ function App() {
               <Route path="/recipes" element={<RecipesPage />} />
               <Route path="/sales" element={<SalesPage />} />
               <Route path="/customers" element={<CustomersPage />} />
+              <Route path="/operations" element={<OperationsPage />} />
+              <Route path="/staff" element={<StaffPage />} />
               
               {/* ✅ Submódulos POS */}
               <Route path="/sales/qr-order" element={<QROrderPage />} />

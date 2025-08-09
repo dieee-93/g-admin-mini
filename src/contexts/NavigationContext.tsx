@@ -7,7 +7,9 @@ import {
   CurrencyDollarIcon, 
   UsersIcon,
   Cog6ToothIcon,
-  BookOpenIcon
+  BookOpenIcon,
+  ChartBarIcon,
+  UserGroupIcon
 } from '@heroicons/react/24/outline';
 
 // ✅ Types definidos según arquitectura v2.0
@@ -115,6 +117,22 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     color: 'pink',
     path: '/customers',
     description: 'Gestión de clientes'
+  },
+  {
+    id: 'operations',
+    title: 'Operaciones',
+    icon: ChartBarIcon,
+    color: 'cyan',
+    path: '/operations',
+    description: 'Cocina + Mesas + Monitoreo'
+  },
+  {
+    id: 'staff',
+    title: 'Personal',
+    icon: UserGroupIcon,
+    color: 'indigo',
+    path: '/staff',
+    description: 'Gestión de empleados y HR'
   }
 ];
 
@@ -233,6 +251,52 @@ const QUICK_ACTIONS_BY_MODULE: Record<string, QuickAction[]> = {
       icon: UsersIcon,
       action: () => console.log('Contact'),
       color: 'blue'
+    }
+  ],
+  operations: [
+    {
+      id: 'planning-view',
+      label: 'Planificación',
+      icon: ChartBarIcon,
+      action: () => console.log('View planning'),
+      color: 'cyan'
+    },
+    {
+      id: 'kitchen-view',
+      label: 'Vista Cocina',
+      icon: CogIcon,
+      action: () => console.log('Kitchen view'),
+      color: 'purple'
+    },
+    {
+      id: 'tables-view',
+      label: 'Gestión Mesas',
+      icon: UsersIcon,
+      action: () => console.log('Tables view'),
+      color: 'blue'
+    }
+  ],
+  staff: [
+    {
+      id: 'new-employee',
+      label: 'Nuevo Empleado',
+      icon: UserGroupIcon,
+      action: () => console.log('New employee'),
+      color: 'indigo'
+    },
+    {
+      id: 'performance-review',
+      label: 'Nueva Evaluación',
+      icon: ChartBarIcon,
+      action: () => console.log('New performance review'),
+      color: 'purple'
+    },
+    {
+      id: 'schedule-training',
+      label: 'Programar Entrenamiento',
+      icon: BookOpenIcon,
+      action: () => console.log('Schedule training'),
+      color: 'orange'
     }
   ]
 };

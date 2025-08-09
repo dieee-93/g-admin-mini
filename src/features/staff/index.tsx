@@ -1,15 +1,15 @@
-// src/features/staff/index.tsx
-// Exportaciones del módulo de gestión de personal
+// Staff Management Module - Main exports
+// Security compliant staff management system
 
 export * from './types';
-// TODO: Implementar componentes UI
-// export * from './ui/StaffForm';
-// export * from './ui/StaffList';
-// export * from './ui/StaffCard';
+export { default as StaffPageRefactored } from './StaffPageRefactored';
 
-// TODO: Implementar hooks
-// export * from './logic/useStaff';
-// export * from './logic/useStaffPermissions';
+// Section components
+export { DirectorySection } from './components/sections/DirectorySection';
+export { PerformanceSection } from './components/sections/PerformanceSection';
+export { TrainingSection } from './components/sections/TrainingSection';
+export { ManagementSection } from './components/sections/ManagementSection';
 
-// TODO: Implementar API
-// export * from './data/staffApi';
+// Re-export main page as default for routing
+export { default as StaffPage } from './StaffPageRefactored';
+export { default } from './StaffPageRefactored';

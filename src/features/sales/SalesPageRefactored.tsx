@@ -1,7 +1,14 @@
-// Refactored Sales Page with improved navigation
+// Refactored Sales Page with UNIFIED navigation pattern
 import { useState, useEffect } from 'react';
-import { Box, VStack, Text, Tabs, Badge } from '@chakra-ui/react';
-import { CreditCardIcon, TableCellsIcon, ChartBarIcon, QrCodeIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import { Box, VStack, HStack, Text, Tabs, Badge, Card } from '@chakra-ui/react';
+import { 
+  CreditCardIcon, 
+  TableCellsIcon, 
+  ChartBarIcon, 
+  QrCodeIcon, 
+  ClipboardDocumentListIcon,
+  ComputerDesktopIcon
+} from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 // Import existing components
@@ -10,7 +17,6 @@ import { TableFloorPlan } from './components/TableManagement/TableFloorPlan';
 import { QRCodeGenerator } from './components/QROrdering/QRCodeGenerator';
 import { KitchenDisplaySystem } from './components/OrderManagement/KitchenDisplaySystem';
 import { SalesIntelligenceDashboard } from './components/Analytics/SalesIntelligenceDashboard';
-import { SalesNavigation } from './components/Navigation/SalesNavigation';
 
 // Mock data
 const mockTables = [{
@@ -28,43 +34,30 @@ const mockTables = [{
   is_active: true
 }];
 
-const mockAnalytics = {
-  daily_revenue: 2500,
-  monthly_revenue: 75000,
-  average_order_value: 35.50,
-  sales_per_labor_hour: 125,
-  food_cost_percentage: 28,
-  gross_profit_margin: 72,
-  average_covers: 120,
-  covers_trend: 'up' as const,
-  table_utilization: 85,
-  table_turnover_rate: 2.3,
-  average_service_time: 35,
-  customer_acquisition_cost: 15,
-  repeat_customer_rate: 65,
-  customer_lifetime_value: 450,
-  peak_hours_analysis: [],
-  seasonal_trends: [],
-  menu_item_performance: [],
-  current_day_metrics: {
-    current_revenue: 850,
-    orders_in_progress: 5,
-    tables_occupied: 8,
-    average_wait_time: 12,
-    kitchen_backlog: 3
-  },
-  alerts_and_insights: []
-};
+const mockOrders = [{
+  id: '1',
+  order_number: 'ORD-001',
+  table_number: '1',
+  status: 'preparing' as const,
+  items: [{
+    id: '1',
+    product_name: 'Pizza Margherita',
+    quantity: 2,
+    price: 12.99,
+    notes: 'Extra cheese',
+    category: 'Main Course'
+  }],
+  subtotal: 25.98,
+  tax: 2.60,
+  total: 28.58,
+  estimated_time: 15,
+  created_at: '2024-01-15T10:30:00Z',
+  updated_at: '2024-01-15T10:35:00Z'
+}];
 
 export default function SalesPageRefactored() {
   const { setQuickActions } = useNavigation();
   const [activeSection, setActiveSection] = useState('pos');
-  const [activeSubSection, setActiveSubSection] = useState<string | undefined>();
-
-  const handleSectionChange = (section: string, subSection?: string) => {
-    setActiveSection(section);
-    setActiveSubSection(subSection);
-  };
 
   useEffect(() => {
     const quickActions = [
@@ -72,22 +65,15 @@ export default function SalesPageRefactored() {
         id: 'new-sale',
         label: 'Nueva Venta',
         icon: CreditCardIcon,
-        action: () => handleSectionChange('pos'),
+        action: () => setActiveSection('pos'),
         color: 'blue'
       },
       {
-        id: 'table-management',
-        label: 'Gestionar Mesas',
-        icon: TableCellsIcon,
-        action: () => handleSectionChange('tables'),
-        color: 'green'
-      },
-      {
-        id: 'analytics',
-        label: 'Ver Analytics',
-        icon: ChartBarIcon,
-        action: () => handleSectionChange('analytics', 'dashboard'),
-        color: 'teal'
+        id: 'kitchen-view',
+        label: 'Ver Cocina',
+        icon: ClipboardDocumentListIcon,
+        action: () => setActiveSection('kitchen'),
+        color: 'orange'
       }
     ];
 
@@ -100,58 +86,13 @@ export default function SalesPageRefactored() {
       case 'pos':
         return <SalesWithStockView />;
       case 'tables':
-        return (
-          <TableFloorPlan
-            tables={mockTables}
-            onTableSelect={(table) => console.log('Selected table:', table)}
-            onSeatParty={(tableId, partySize, customerName) => 
-              console.log('Seating party:', { tableId, partySize, customerName })
-            }
-            onUpdateTableStatus={(tableId, status) => 
-              console.log('Update table status:', { tableId, status })
-            }
-            onProcessPayment={(tableId) => 
-              console.log('Process payment for table:', tableId)
-            }
-          />
-        );
+        return <TableFloorPlan tables={mockTables} onTableSelect={() => {}} />;
       case 'kitchen':
-        return (
-          <KitchenDisplaySystem
-            orders={[]}
-            onUpdateItemStatus={(orderId, itemId, status) => 
-              console.log('Update item status:', { orderId, itemId, status })
-            }
-            onCompleteOrder={(orderId) => 
-              console.log('Complete order:', orderId)
-            }
-            onPriorityChange={(orderId, priority) => 
-              console.log('Priority change:', { orderId, priority })
-            }
-          />
-        );
+        return <KitchenDisplaySystem orders={mockOrders} />;
       case 'qr':
-        return (
-          <QRCodeGenerator
-            tables={mockTables}
-            onQRGenerated={(tableId, qrCode) => 
-              console.log('QR generated:', { tableId, qrCode })
-            }
-            onQRRevoked={(tableId) => 
-              console.log('QR revoked:', tableId)
-            }
-          />
-        );
+        return <QRCodeGenerator />;
       case 'analytics':
-        return (
-          <SalesIntelligenceDashboard
-            analytics={mockAnalytics}
-            onDateRangeChange={(dateFrom, dateTo) => 
-              console.log('Date range change:', { dateFrom, dateTo })
-            }
-            onRefresh={() => console.log('Refresh analytics')}
-          />
-        );
+        return <SalesIntelligenceDashboard />;
       default:
         return <SalesWithStockView />;
     }
@@ -161,22 +102,37 @@ export default function SalesPageRefactored() {
     <Box minH="100vh" bg="gray.50">
       <Box bg="white" borderBottom="1px solid" borderColor="gray.200" p="4">
         <VStack gap="4" align="stretch">
-          <VStack align="start" gap="2">
-            <Text fontSize="2xl" fontWeight="bold">G-Admin POS System</Text>
-            <Text color="gray.600" fontSize="sm">
-              Modern restaurant point-of-sale and management system
-            </Text>
-          </VStack>
+          {/* UNIFIED PATTERN: Header with icon, badges, KPIs */}
+          <Card.Root>
+            <Card.Body>
+              <HStack gap="4">
+                <Box p="2" bg="blue.100" borderRadius="md">
+                  <ComputerDesktopIcon className="w-8 h-8 text-blue-600" />
+                </Box>
+                <VStack align="start" gap="1">
+                  <HStack>
+                    <Text fontSize="2xl" fontWeight="bold">
+                      G-Admin POS System
+                    </Text>
+                    <Badge colorPalette="green" variant="subtle">
+                      Live
+                    </Badge>
+                    <Badge colorPalette="teal" variant="subtle">
+                      v3.0
+                    </Badge>
+                  </HStack>
+                  <Text color="gray.600" fontSize="sm">
+                    Modern restaurant point-of-sale and management system with real-time analytics
+                  </Text>
+                </VStack>
+              </HStack>
+            </Card.Body>
+          </Card.Root>
 
-          <SalesNavigation
-            currentSection={activeSection}
-            currentSubSection={activeSubSection}
-            onSectionChange={handleSectionChange}
-          />
-
+          {/* UNIFIED PATTERN: Tabs (max 4, but we have 5 - need to reduce) */}
           <Tabs.Root 
             value={activeSection} 
-            onValueChange={(e) => handleSectionChange(e.value)}
+            onValueChange={(e) => setActiveSection(e.value)}
             variant="line"
           >
             <Tabs.List>
@@ -192,23 +148,23 @@ export default function SalesPageRefactored() {
                 <ClipboardDocumentListIcon className="w-4 h-4" />
                 Cocina
               </Tabs.Trigger>
-              <Tabs.Trigger value="qr">
-                <QrCodeIcon className="w-4 h-4" />
-                QR Orders
-              </Tabs.Trigger>
               <Tabs.Trigger value="analytics">
                 <ChartBarIcon className="w-4 h-4" />
                 Analytics
                 <Badge colorPalette="teal" variant="subtle">v3.0</Badge>
               </Tabs.Trigger>
             </Tabs.List>
+
+            {/* UNIFIED PATTERN: Content area */}
+            <Tabs.Content value={activeSection}>
+              <Box p="6">
+                {renderContent()}
+              </Box>
+            </Tabs.Content>
           </Tabs.Root>
         </VStack>
-      </Box>
-
-      <Box p="6">
-        {renderContent()}
       </Box>
     </Box>
   );
 }
+EOF < /dev/null

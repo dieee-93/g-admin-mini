@@ -1,7 +1,14 @@
-// Refactored Recipes Page with improved navigation
+// Refactored Recipes Page with UNIFIED navigation pattern
 import { useState, useEffect } from 'react';
-import { Box, VStack, Text, Tabs, Badge } from '@chakra-ui/react';
-import { BookOpenIcon, ChartBarIcon, BeakerIcon, CurrencyDollarIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Box, VStack, HStack, Text, Tabs, Badge, Card } from '@chakra-ui/react';
+import { 
+  BookOpenIcon, 
+  ChartBarIcon, 
+  BeakerIcon, 
+  CurrencyDollarIcon, 
+  PlusIcon,
+  ChefHatIcon
+} from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useRecipes } from './logic/useRecipes';
 
@@ -11,41 +18,34 @@ import { RecipeList } from './ui/RecipeList';
 import { RecipeIntelligenceDashboard } from './components/RecipeIntelligenceDashboard/RecipeIntelligenceDashboard';
 import { SmartCostCalculator } from './components/SmartCostCalculator/SmartCostCalculator';
 import { QuickRecipeBuilder } from './components/MiniBuilders/QuickRecipeBuilder';
-import { RecipesNavigation } from './components/Navigation/RecipesNavigation';
 
 export default function RecipesPageRefactored() {
   const { setQuickActions } = useNavigation();
   const { recipes, loading } = useRecipes();
   
   const [activeSection, setActiveSection] = useState('intelligence');
-  const [activeSubSection, setActiveSubSection] = useState<string | undefined>('dashboard');
-
-  const handleSectionChange = (section: string, subSection?: string) => {
-    setActiveSection(section);
-    setActiveSubSection(subSection);
-  };
 
   useEffect(() => {
     const quickActions = [
       {
-        id: 'new-recipe',
-        label: 'Nueva Receta',
-        icon: PlusIcon,
-        action: () => handleSectionChange('classic'),
-        color: 'green'
-      },
-      {
-        id: 'ai-builder',
-        label: 'Constructor AI',
+        id: 'quick-builder',
+        label: 'Quick Builder',
         icon: BeakerIcon,
-        action: () => handleSectionChange('builder'),
+        action: () => setActiveSection('builder'),
         color: 'purple'
       },
       {
+        id: 'new-recipe',
+        label: 'Nueva Receta',
+        icon: PlusIcon,
+        action: () => setActiveSection('classic'),
+        color: 'green'
+      },
+      {
         id: 'cost-calculator',
-        label: 'Calcular Costos',
+        label: 'Calculadora',
         icon: CurrencyDollarIcon,
-        action: () => handleSectionChange('calculator'),
+        action: () => setActiveSection('calculator'),
         color: 'orange'
       }
     ];
@@ -57,22 +57,9 @@ export default function RecipesPageRefactored() {
   const renderContent = () => {
     switch (activeSection) {
       case 'intelligence':
-        return <RecipeIntelligenceDashboard recipes={recipes} />;
-      
+        return <RecipeIntelligenceDashboard recipes={recipes} loading={loading} />;
       case 'builder':
-        return (
-          <VStack align="stretch" gap={6}>
-            <QuickRecipeBuilder 
-              onRecipeCreated={(recipe) => {
-                console.log('New recipe created with AI:', recipe);
-              }}
-            />
-            <Text fontSize="sm" color="gray.600" textAlign="center">
-              AI-powered recipe builder with automatic cost calculation and menu engineering
-            </Text>
-          </VStack>
-        );
-      
+        return <QuickRecipeBuilder />;
       case 'classic':
         return (
           <VStack gap={6} align="stretch">
@@ -80,50 +67,63 @@ export default function RecipesPageRefactored() {
             <RecipeList />
           </VStack>
         );
-      
       case 'calculator':
         return <SmartCostCalculator />;
-      
       default:
-        return <RecipeIntelligenceDashboard recipes={recipes} />;
+        return <RecipeIntelligenceDashboard recipes={recipes} loading={loading} />;
     }
   };
 
   return (
-    <Box p="6">
+    <Box p="6" maxW="7xl" mx="auto">
       <VStack gap="6" align="stretch">
-        <VStack align="start" gap="2">
-          <Text fontSize="3xl" fontWeight="bold">Recipe Intelligence System</Text>
-          <Text color="gray.600">
-            Transform from basic recipe builder to Recipe Intelligence System
-          </Text>
-        </VStack>
+        {/* UNIFIED PATTERN: Header with icon, badges, KPIs */}
+        <Card.Root>
+          <Card.Body>
+            <HStack gap="4">
+              <Box p="2" bg="green.100" borderRadius="md">
+                <ChefHatIcon className="w-8 h-8 text-green-600" />
+              </Box>
+              <VStack align="start" gap="1">
+                <HStack>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    Recipe Intelligence
+                  </Text>
+                  <Badge colorPalette="green" variant="subtle">
+                    v3.0
+                  </Badge>
+                  <Badge colorPalette="purple" variant="subtle">
+                    AI
+                  </Badge>
+                </HStack>
+                <Text color="gray.600" fontSize="sm">
+                  Smart cost calculation + Menu engineering + AI-powered recipe creation
+                </Text>
+              </VStack>
+            </HStack>
+          </Card.Body>
+        </Card.Root>
 
-        <RecipesNavigation
-          currentSection={activeSection}
-          currentSubSection={activeSubSection}
-          onSectionChange={handleSectionChange}
-        />
-
+        {/* UNIFIED PATTERN: Tabs (exactly 4) */}
         <Tabs.Root 
           value={activeSection} 
-          onValueChange={(e) => handleSectionChange(e.value)}
+          onValueChange={(e) => setActiveSection(e.value)}
           variant="line"
         >
           <Tabs.List>
             <Tabs.Trigger value="intelligence">
               <ChartBarIcon className="w-4 h-4" />
               Intelligence
-              <Badge colorPalette="green" variant="subtle">v3.0</Badge>
+              <Badge colorPalette="blue" variant="subtle">v3.0</Badge>
             </Tabs.Trigger>
             <Tabs.Trigger value="builder">
               <BeakerIcon className="w-4 h-4" />
-              AI Builder
+              Quick Builder
               <Badge colorPalette="purple" variant="subtle">AI</Badge>
             </Tabs.Trigger>
             <Tabs.Trigger value="classic">
               <BookOpenIcon className="w-4 h-4" />
-              Gestión
+              Gestión Clásica
             </Tabs.Trigger>
             <Tabs.Trigger value="calculator">
               <CurrencyDollarIcon className="w-4 h-4" />
@@ -131,26 +131,13 @@ export default function RecipesPageRefactored() {
             </Tabs.Trigger>
           </Tabs.List>
 
+          {/* UNIFIED PATTERN: Content area */}
           <Tabs.Content value={activeSection}>
             {renderContent()}
           </Tabs.Content>
         </Tabs.Root>
-
-        {/* Intelligence Features Showcase */}
-        <Box>
-          <Text fontSize="md" fontWeight="semibold" mb={3} color="gray.700">
-            Recipe Intelligence Features
-          </Text>
-          <VStack gap={2} align="stretch">
-            <Badge colorPalette="green" size="sm">✓ Real-time Cost Calculation</Badge>
-            <Badge colorPalette="green" size="sm">✓ Yield & Shrinkage Analysis</Badge>
-            <Badge colorPalette="green" size="sm">✓ Menu Engineering Matrix</Badge>
-            <Badge colorPalette="green" size="sm">✓ Profitability Intelligence</Badge>
-            <Badge colorPalette="yellow" size="sm">⏳ Nutritional Analysis</Badge>
-            <Badge colorPalette="yellow" size="sm">⏳ Kitchen Automation</Badge>
-          </VStack>
-        </Box>
       </VStack>
     </Box>
   );
 }
+EOF < /dev/null
