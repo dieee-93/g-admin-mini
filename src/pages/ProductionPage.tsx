@@ -27,15 +27,15 @@ import {
 import { useNavigation } from '@/contexts/NavigationContext';
 
 // ✅ Import individual section components (no nesting)
-import { ProductionActiveTab } from '@/features/products/ui/ProductionActiveTab';
-import { ProductListOnly } from '@/features/products/ui/ProductListOnly';
-import { MenuEngineeringOnly } from '@/features/products/ui/MenuEngineeringOnly';
-import { CostCalculator } from '@/features/products/ui/costs/CostCalculator';
-import { CostAnalysisReports } from '@/features/products/ui/costs/CostAnalysisReports';
-import { PricingScenarios } from '@/features/products/ui/costs/PricingScenarios';
-import { ProductionPlanningOnly } from '@/features/products/ui/ProductionPlanningOnly';
-import { DemandForecastOnly } from '@/features/products/ui/DemandForecastOnly';
-import { ProductionScheduleOnly } from '@/features/products/ui/ProductionScheduleOnly';
+import { ProductionActiveTab } from '@/modules/products/ui/ProductionActiveTab';
+import { ProductListOnly } from '@/modules/products/ui/ProductListOnly';
+import { MenuEngineeringOnly } from '@/modules/products/ui/MenuEngineeringOnly';
+import { CostCalculator } from '@/modules/products/ui/costs/CostCalculator';
+import { CostAnalysisReports } from '@/modules/products/ui/costs/CostAnalysisReports';
+import { PricingScenarios } from '@/modules/products/ui/costs/PricingScenarios';
+import { ProductionPlanningOnly } from '@/modules/products/ui/ProductionPlanningOnly';
+import { DemandForecastOnly } from '@/modules/products/ui/DemandForecastOnly';
+import { ProductionScheduleOnly } from '@/modules/products/ui/ProductionScheduleOnly';
 
 export function ProductionPage() {
   // ✅ Integración con NavigationContext

@@ -3,7 +3,7 @@
 // ✅ API CORRECTA: type (NO status), NO isClosable, NO duration personalizado
 // 🚀 RESULTADO: Sistema unificado, sin duplicación, API correcta
 
-import { toaster } from '@/components/ui/toaster';
+import { toaster } from '@/shared/ui/toaster';
 
 /**
  * 🎯 NOTIFICATION SYSTEM v3.23.0

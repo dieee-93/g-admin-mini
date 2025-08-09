@@ -23,7 +23,7 @@ import {
 import { useNavigation } from '@/contexts/NavigationContext';
 
 // ✅ INTEGRADO: Usar componentes existentes de features/sales
-import { SalesWithStockView } from '@/features/sales/components/SaleWithStockView';
+import { SalesWithStockView } from '@/modules/sales/components/SaleWithStockView';
 
 export function SalesPage() {
   // ✅ NUEVO: Integración con NavigationContext

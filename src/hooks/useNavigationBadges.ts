@@ -4,7 +4,7 @@
 
 import { useEffect } from 'react';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { useInventory } from '@/features/inventory/logic/useInventory';
+import { useInventory } from '@/modules/materials/logic/useInventory';
 
 export function NavigationBadgeSync() {
   const { updateModuleBadge } = useNavigation();

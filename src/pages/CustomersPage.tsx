@@ -20,12 +20,12 @@ import {
   TagIcon
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { CustomerForm } from '@/features/customers/ui/CustomerForm';
-import { CustomerList } from '@/features/customers/ui/CustomerList';
-import { CustomerOrdersHistory } from '@/features/customers/ui/CustomerOrdersHistory';
-import { CustomerAnalytics } from '@/features/customers/ui/CustomerAnalytics';
-import { CustomerSegments } from '@/features/customers/ui/CustomerSegments';
-import { useCustomers } from '@/features/customers/logic/useCustomers';
+import { CustomerForm } from '@/modules/customers/ui/CustomerForm';
+import { CustomerList } from '@/modules/customers/ui/CustomerList';
+import { CustomerOrdersHistory } from '@/modules/customers/ui/CustomerOrdersHistory';
+import { CustomerAnalytics } from '@/modules/customers/ui/CustomerAnalytics';
+import { CustomerSegments } from '@/modules/customers/ui/CustomerSegments';
+import { useCustomers } from '@/modules/customers/logic/useCustomers';
 
 export function CustomersPage() {
   const { setQuickActions } = useNavigation();

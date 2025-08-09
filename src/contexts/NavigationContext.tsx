@@ -9,7 +9,8 @@ import {
   Cog6ToothIcon,
   BookOpenIcon,
   ChartBarIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  WrenchScrewdriverIcon
 } from '@heroicons/react/24/outline';
 
 // ✅ Types definidos según arquitectura v2.0
@@ -133,6 +134,14 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     color: 'indigo',
     path: '/staff',
     description: 'Gestión de empleados y HR'
+  },
+  {
+    id: 'settings',
+    title: 'Configuración',
+    icon: WrenchScrewdriverIcon,
+    color: 'gray',
+    path: '/settings',
+    description: 'Configuración del negocio y sistema'
   }
 ];
 
@@ -297,6 +306,29 @@ const QUICK_ACTIONS_BY_MODULE: Record<string, QuickAction[]> = {
       icon: BookOpenIcon,
       action: () => console.log('Schedule training'),
       color: 'orange'
+    }
+  ],
+  settings: [
+    {
+      id: 'business-profile',
+      label: 'Perfil del Negocio',
+      icon: CogIcon,
+      action: () => console.log('Edit business profile'),
+      color: 'gray'
+    },
+    {
+      id: 'tax-config',
+      label: 'Configurar Impuestos',
+      icon: WrenchScrewdriverIcon,
+      action: () => console.log('Configure taxes'),
+      color: 'yellow'
+    },
+    {
+      id: 'user-permissions',
+      label: 'Gestionar Usuarios',
+      icon: UserGroupIcon,
+      action: () => console.log('Manage users'),
+      color: 'purple'
     }
   ]
 };

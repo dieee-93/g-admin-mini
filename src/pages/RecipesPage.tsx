@@ -16,7 +16,7 @@ import {
   SparklesIcon
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
-import RecipesModule from '@/features/recipes';
+import RecipesModule from '@/tools/intelligence';
 
 export function RecipesPage() {
   const { setQuickActions } = useNavigation();

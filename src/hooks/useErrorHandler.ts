@@ -1,5 +1,5 @@
 // src/hooks/useErrorHandler.ts
-import { toaster } from '@/components/ui/toaster';
+import { toaster } from '@/shared/ui/toaster';
 import { type ApiError } from '@/types/app';
 
 export function useErrorHandler() {
@@ -21,9 +21,8 @@ export function useErrorHandler() {
     toaster.create({
       title: 'Error',
       description: message,
-      status: 'error',
+      type: 'error',
       duration: 5000,
-      isClosable: true,
     });
 
     // Log del error para debugging
@@ -34,9 +33,8 @@ export function useErrorHandler() {
     toaster.create({
       title,
       description: message,
-      status: 'success',
+      type: 'success',
       duration: 3000,
-      isClosable: true,
     });
   };
 
@@ -44,9 +42,8 @@ export function useErrorHandler() {
     toaster.create({
       title,
       description: message,
-      status: 'warning',
+      type: 'warning',
       duration: 4000,
-      isClosable: true,
     });
   };
 
