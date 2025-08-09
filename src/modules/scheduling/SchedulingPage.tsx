@@ -46,7 +46,7 @@ interface SchedulingViewState {
   viewMode: 'week' | 'day' | 'month';
 }
 
-export default function SchedulingPageRefactored() {
+export default function SchedulingPage() {
   const { setQuickActions } = useNavigation();
   const [viewState, setViewState] = useState<SchedulingViewState>({
     activeTab: 'schedule',

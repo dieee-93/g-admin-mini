@@ -9,7 +9,7 @@ import {
   ExclamationTriangleIcon,
   BellIcon
 } from '@heroicons/react/24/outline';
-import { useStockAlerts } from '@/features/stock/logic/useStockAlerts';
+import { useStockAlerts } from @/modules/stock/logic/useStockAlerts';
 
 interface AlertsBadgeProps {
   variant?: 'minimal' | 'detailed';

@@ -10,12 +10,25 @@ import {
   Button,
   HStack,
   VStack,
-  Modal,
+  DialogRoot,
+  DialogBackdrop,
+  DialogPositioner,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogCloseTrigger,
+  DialogBody,
+  DialogFooter,
   Alert,
   Select,
   Input,
   createListCollection
 } from '@chakra-ui/react';
+import {
+  StatusIcon,
+  ActionIcon,
+  Icon
+} from '@/shared/ui/Icon';
 import {
   UserGroupIcon,
   ClockIcon,
@@ -49,7 +62,7 @@ export function TableFloorPlan({
   realTimeUpdates = true
 }: TableFloorPlanProps) {
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
-  const [showSeatPartyModal, setShowSeatPartyModal] = useState(false);
+  const [showSeatPartyDialog, setShowSeatPartyDialog] = useState(false);
   const [partySize, setPartySize] = useState<number>(2);
   const [customerName, setCustomerName] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<TableStatus | 'all'>('all');
@@ -163,14 +176,14 @@ export function TableFloorPlan({
   // Handle seating a party
   const handleSeatParty = (table: Table) => {
     setSelectedTable(table);
-    setShowSeatPartyModal(true);
+    setShowSeatPartyDialog(true);
   };
 
   // Confirm seating
   const confirmSeatParty = () => {
     if (selectedTable && partySize > 0) {
       onSeatParty(selectedTable.id, partySize, customerName || undefined);
-      setShowSeatPartyModal(false);
+      setShowSeatPartyDialog(false);
       setPartySize(2);
       setCustomerName('');
       setSelectedTable(null);
@@ -269,7 +282,7 @@ export function TableFloorPlan({
       >
         {filteredTables.map((table) => {
           const statusInfo = getTableStatusInfo(table);
-          const StatusIcon = statusInfo.icon;
+          const StatusIconComponent = statusInfo.icon;
           
           return (
             <Card.Root
@@ -305,7 +318,7 @@ export function TableFloorPlan({
                     size="sm"
                     variant="subtle"
                   >
-                    <StatusIcon className="w-3 h-3 mr-1" />
+                    <Icon icon={StatusIconComponent} size="xs" className="mr-1" />
                     {statusInfo.label}
                   </Badge>
                 </HStack>
@@ -345,7 +358,7 @@ export function TableFloorPlan({
                         handleSeatParty(table);
                       }}
                     >
-                      <UserGroupIcon className="w-4 h-4" />
+                      <Icon icon={UserGroupIcon} size="sm" />
                       Seat Party
                     </Button>
                   )}
@@ -386,7 +399,7 @@ export function TableFloorPlan({
       {filteredTables.length === 0 && (
         <Card.Root p="8" textAlign="center">
           <VStack gap="3">
-            <ExclamationTriangleIcon className="w-12 h-12 text-gray-400" />
+            <Icon icon={ExclamationTriangleIcon} size="2xl" color="gray.400" />
             <Text color="gray.600">
               No tables found matching the current filter
             </Text>
@@ -401,25 +414,25 @@ export function TableFloorPlan({
         </Card.Root>
       )}
 
-      {/* Seat Party Modal */}
-      <Modal.Root 
-        open={showSeatPartyModal} 
-        onOpenChange={({ open }) => setShowSeatPartyModal(open)}
+      {/* Seat Party Dialog */}
+      <DialogRoot 
+        open={showSeatPartyDialog} 
+        onOpenChange={(details) => setShowSeatPartyDialog(details.open)}
       >
-        <Modal.Backdrop />
-        <Modal.Positioner>
-          <Modal.Content>
-            <Modal.Header>
-              <Modal.Title>
+        <DialogBackdrop />
+        <DialogPositioner>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
                 Seat Party - Table {selectedTable?.number}
-              </Modal.Title>
-              <Modal.CloseTrigger />
-            </Modal.Header>
+              </DialogTitle>
+              <DialogCloseTrigger />
+            </DialogHeader>
 
-            <Modal.Body>
+            <DialogBody>
               <VStack gap="4" align="stretch">
                 <Alert.Root status="info">
-                  <Alert.Indicator />
+                  <StatusIcon name="info" color="blue.500" />
                   <Alert.Title>Seating New Party</Alert.Title>
                   <Alert.Description>
                     Table capacity: {selectedTable?.capacity} people
@@ -447,13 +460,13 @@ export function TableFloorPlan({
                   />
                 </Box>
               </VStack>
-            </Modal.Body>
+            </DialogBody>
 
-            <Modal.Footer>
+            <DialogFooter>
               <HStack gap="3" justify="space-between" w="full">
                 <Button 
                   variant="outline" 
-                  onClick={() => setShowSeatPartyModal(false)}
+                  onClick={() => setShowSeatPartyDialog(false)}
                 >
                   Cancel
                 </Button>
@@ -462,13 +475,14 @@ export function TableFloorPlan({
                   onClick={confirmSeatParty}
                   disabled={partySize < 1 || partySize > (selectedTable?.capacity || 8)}
                 >
+                  <ActionIcon name="add" size="sm" />
                   Seat Party
                 </Button>
               </HStack>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal.Positioner>
-      </Modal.Root>
+            </DialogFooter>
+          </DialogContent>
+        </DialogPositioner>
+      </DialogRoot>
     </VStack>
   );
 }

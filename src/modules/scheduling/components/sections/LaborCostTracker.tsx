@@ -17,8 +17,8 @@ import {
 import { 
   CurrencyDollarIcon,
   ChartBarIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   ExclamationTriangleIcon,
   CalendarIcon,
   ClockIcon,
@@ -192,8 +192,8 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
   };
 
   const getTrendIcon = (current: number, previous: number) => {
-    if (current > previous) return TrendingUpIcon;
-    if (current < previous) return TrendingDownIcon;
+    if (current > previous) return ArrowTrendingUpIcon;
+    if (current < previous) return ArrowTrendingDownIcon;
     return null;
   };
 

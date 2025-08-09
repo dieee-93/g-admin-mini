@@ -55,7 +55,7 @@ const mockOrders = [{
   updated_at: '2024-01-15T10:35:00Z'
 }];
 
-export default function SalesPageRefactored() {
+export default function SalesPage() {
   const { setQuickActions } = useNavigation();
   const [activeSection, setActiveSection] = useState('pos');
 

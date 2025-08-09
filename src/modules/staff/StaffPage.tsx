@@ -21,7 +21,7 @@ import { PerformanceSection } from './components/sections/PerformanceSection';
 import { TrainingSection } from './components/sections/TrainingSection';
 import { ManagementSection } from './components/sections/ManagementSection';
 
-export default function StaffPageRefactored() {
+export default function StaffPage() {
   const { setQuickActions } = useNavigation();
   const [viewState, setViewState] = useState<StaffViewState>({
     activeTab: 'directory',

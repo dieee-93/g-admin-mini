@@ -10,7 +10,8 @@ import {
   BookOpenIcon,
   ChartBarIcon,
   UserGroupIcon,
-  WrenchScrewdriverIcon
+  WrenchScrewdriverIcon,
+  CalendarDaysIcon
 } from '@heroicons/react/24/outline';
 
 // ✅ Types definidos según arquitectura v2.0
@@ -80,28 +81,28 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     description: 'Centro de comando'
   },
   {
-    id: 'inventory',
-    title: 'Inventario',
+    id: 'materials',
+    title: 'Materials',
     icon: CubeIcon,
     color: 'green',
-    path: '/inventory',
-    description: 'Items, stock y alertas'
+    path: '/materials',
+    description: 'Raw materials & supplies'
   },
   {
-    id: 'production',
-    title: 'Producción',
+    id: 'products',
+    title: 'Products',
     icon: CogIcon,
     color: 'purple',
-    path: '/production',
-    description: 'Planificación de producción'
+    path: '/products',
+    description: 'Menu items & pricing'
   },
   {
     id: 'recipes',
-    title: 'Recetas',
+    title: 'Recipes',
     icon: BookOpenIcon,
     color: 'orange',
     path: '/recipes',
-    description: 'Recetas y costos'
+    description: 'Recipe intelligence'
   },
   {
     id: 'sales',
@@ -129,11 +130,19 @@ const NAVIGATION_MODULES: NavigationModule[] = [
   },
   {
     id: 'staff',
-    title: 'Personal',
+    title: 'Staff',
     icon: UserGroupIcon,
     color: 'indigo',
     path: '/staff',
-    description: 'Gestión de empleados y HR'
+    description: 'Employee management'
+  },
+  {
+    id: 'scheduling',
+    title: 'Scheduling',
+    icon: CalendarDaysIcon,
+    color: 'violet',
+    path: '/scheduling',
+    description: 'Shifts & schedules'
   },
   {
     id: 'settings',
@@ -170,7 +179,7 @@ const QUICK_ACTIONS_BY_MODULE: Record<string, QuickAction[]> = {
       color: 'blue'
     }
   ],
-  inventory: [
+  materials: [
     {
       id: 'add-stock',
       label: 'Agregar Stock',
@@ -193,7 +202,7 @@ const QUICK_ACTIONS_BY_MODULE: Record<string, QuickAction[]> = {
       color: 'blue'
     }
   ],
-  production: [
+  products: [
     {
       id: 'calculate-cost',
       label: 'Calcular Costo',

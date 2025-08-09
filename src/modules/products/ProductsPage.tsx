@@ -1,0 +1,91 @@
+import { useState, useEffect } from 'react';
+import {
+  Box,
+  VStack,
+  HStack,
+  Text,
+  Button,
+  Tabs,
+  Card
+} from '@chakra-ui/react';
+import { CogIcon, PlusIcon } from '@heroicons/react/24/outline';
+
+// Import components
+import { useNavigation } from '@/contexts/NavigationContext';
+import { ProductList } from './ui/ProductList';
+import { ProductForm } from './ui/ProductForm';
+import { MenuEngineeringOnly } from './ui/MenuEngineeringOnly';
+import { CostAnalysisModule } from './ui/CostAnalysisModule';
+
+export function ProductsPage() {
+  const { setQuickActions } = useNavigation();
+  const [activeTab, setActiveTab] = useState('products');
+
+  // Set up quick actions
+  useEffect(() => {
+    const quickActions = [
+      {
+        id: 'new-product',
+        label: 'Nuevo Producto',
+        icon: PlusIcon,
+        action: () => console.log('New product'),
+        color: 'purple'
+      },
+      {
+        id: 'menu-analysis',
+        label: 'Análisis de Menú',
+        icon: CogIcon,
+        action: () => setActiveTab('menu-engineering'),
+        color: 'blue'
+      }
+    ];
+
+    setQuickActions(quickActions);
+    return () => setQuickActions([]);
+  }, [setQuickActions]);
+
+  return (
+    <Box p="6" maxW="7xl" mx="auto">
+      <VStack gap="6" align="stretch">
+        {/* Header */}
+        <HStack justify="space-between">
+          <VStack align="start" gap="1">
+            <Text fontSize="3xl" fontWeight="bold">Products</Text>
+            <Text color="gray.600">Menu items, pricing & analytics</Text>
+          </VStack>
+          <Button 
+            colorPalette="purple"
+            leftIcon={<PlusIcon className="w-4 h-4" />}
+          >
+            New Product
+          </Button>
+        </HStack>
+
+        {/* Main Content */}
+        <Tabs.Root value={activeTab} onValueChange={(e) => setActiveTab(e.value)}>
+          <Tabs.List>
+            <Tabs.Trigger value="products">Products</Tabs.Trigger>
+            <Tabs.Trigger value="menu-engineering">Menu Engineering</Tabs.Trigger>
+            <Tabs.Trigger value="cost-analysis">Cost Analysis</Tabs.Trigger>
+          </Tabs.List>
+
+          <Box mt="6">
+            <Tabs.Content value="products">
+              <ProductList />
+            </Tabs.Content>
+
+            <Tabs.Content value="menu-engineering">
+              <MenuEngineeringOnly />
+            </Tabs.Content>
+
+            <Tabs.Content value="cost-analysis">
+              <CostAnalysisModule />
+            </Tabs.Content>
+          </Box>
+        </Tabs.Root>
+      </VStack>
+    </Box>
+  );
+}
+
+export default ProductsPage;

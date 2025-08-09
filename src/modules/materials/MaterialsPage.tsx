@@ -268,7 +268,7 @@ function ModernItemCard({
 }
 
 // ✅ Componente principal
-export function InventoryPage() {
+export function MaterialsPage() {
   // ✅ HOOKS REALES
   const { setQuickActions } = useNavigation();
   const {
@@ -755,4 +755,4 @@ export function InventoryPage() {
 }
 
 // ✅ Exportación adicional para compatibilidad
-export default InventoryPage;
+export default MaterialsPage;

@@ -1,5 +1,5 @@
-// src/App.tsx - Updated with new modular structure
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// src/App.tsx - Clean modular structure aligned with Architecture v2.0
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from '@/shared/ui/provider';
 import { Toaster } from '@/shared/ui/toaster';
 import { NavigationProvider } from '@/contexts/NavigationContext';
@@ -10,21 +10,19 @@ import { NavigationBadgeSync } from '@/hooks/useNavigationBadges';
 import { Dashboard } from '@/modules/dashboard/Dashboard';
 
 // Core Modules
-import { InventoryPage } from '@/modules/materials/InventoryPage';
-import { OperationsPage } from "@/modules/operations/OperationsPage";
-import { StaffPage } from '@/modules/staff';
-import SalesPageRefactored from '@/modules/sales/SalesPageRefactored';
-import CustomersPageRefactored from '@/modules/customers/CustomersPageRefactored';
-import { SchedulingPageRefactored } from '@/modules/scheduling';
-import { SettingsPage } from '@/modules/settings';
+import { MaterialsPage } from '@/modules/materials/MaterialsPage';
+import { ProductsPage } from '@/modules/products/ProductsPage';
+import { OperationsPage } from '@/modules/operations/OperationsPage';
+import SalesPage from '@/modules/sales/SalesPage';
+import CustomersPage from '@/modules/customers/CustomersPage';
+import StaffPage from '@/modules/staff/StaffPage';
+import SchedulingPage from '@/modules/scheduling/SchedulingPage';
+import { SettingsPage } from '@/modules/settings/SettingsPage';
 
 // Tools
-import { RecipesPageRefactored } from '@/tools/intelligence/exports';
+import RecipesPage from '@/tools/intelligence/RecipesPage';
 
-// Legacy page imports (to be phased out)
-import { ProductionPage } from '@/pages/ProductionPage';
-
-// Submódulos POS
+// Customer-facing components
 import { QROrderPage } from '@/modules/sales/components/QROrdering/QROrderPage';
 
 function App() {
@@ -32,37 +30,39 @@ function App() {
     <Provider>
       <Router>
         <NavigationProvider>
-          {/* ✅ Hook para sincronizar badges con alertas */}
           <NavigationBadgeSync />
           
           <ResponsiveLayout>
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/inventory" element={<InventoryPage />} />
               
-              {/* ✅ Rutas de módulos */}
-              <Route path="/production" element={<ProductionPage />} />
-              <Route path="/recipes" element={<RecipesPageRefactored />} />
-              <Route path="/sales" element={<SalesPageRefactored />} />
-              <Route path="/customers" element={<CustomersPageRefactored />} />
+              {/* Core Modules - Following Architecture Final Definitiva */}
+              <Route path="/materials" element={<MaterialsPage />} />
+              <Route path="/products" element={<ProductsPage />} />
               <Route path="/operations" element={<OperationsPage />} />
+              <Route path="/sales" element={<SalesPage />} />
+              <Route path="/customers" element={<CustomersPage />} />
               <Route path="/staff" element={<StaffPage />} />
-              <Route path="/scheduling" element={<SchedulingPageRefactored />} />
+              <Route path="/scheduling" element={<SchedulingPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               
-              {/* ✅ Submódulos POS */}
+              {/* Tools - Intelligence Tier */}
+              <Route path="/recipes" element={<RecipesPage />} />
+              
+              {/* Customer-facing sub-routes */}
               <Route path="/sales/qr-order" element={<QROrderPage />} />
               
-              {/* Legacy routes - redirect to Operations module */}
-              <Route path="/sales/tables" element={<OperationsPage />} />
-              <Route path="/production/kitchen" element={<OperationsPage />} />
+              {/* Legacy redirects for backward compatibility */}
+              <Route path="/inventory" element={<Navigate to="/materials" replace />} />
+              <Route path="/sales/tables" element={<Navigate to="/operations" replace />} />
+              <Route path="/production/kitchen" element={<Navigate to="/operations" replace />} />
+              <Route path="/production" element={<Navigate to="/operations" replace />} />
               
               {/* 404 fallback */}
-              <Route path="*" element={<div>Página en construcción</div>} />
+              <Route path="*" element={<div>Página no encontrada - Módulo en desarrollo</div>} />
             </Routes>
           </ResponsiveLayout>
           
-          {/* ✅ Toaster global */}
           <Toaster />
         </NavigationProvider>
       </Router>

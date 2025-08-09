@@ -10,7 +10,7 @@ import {
   Button,
   HStack,
   VStack,
-  Switch,
+  Switch
 } from "@chakra-ui/react";
 import { 
   CurrencyDollarIcon, 
@@ -87,9 +87,10 @@ export function TaxConfigurationSection() {
                   </Text>
                 </VStack>
                 <Switch.Root defaultChecked={taxSettings.includeTaxInPrices}>
-                  <Switch.Track>
+                  <Switch.HiddenInput />
+                  <Switch.Control>
                     <Switch.Thumb />
-                  </Switch.Track>
+                  </Switch.Control>
                 </Switch.Root>
               </HStack>
             </VStack>

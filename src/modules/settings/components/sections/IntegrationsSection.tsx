@@ -125,9 +125,10 @@ export function IntegrationsSection() {
                             {integration.status === "connected" ? "Conectado" : "Error"}
                           </Badge>
                           <Switch.Root defaultChecked={integration.status === "connected"}>
-                            <Switch.Track>
+                            <Switch.HiddenInput />
+                            <Switch.Control>
                               <Switch.Thumb />
-                            </Switch.Track>
+                            </Switch.Control>
                           </Switch.Root>
                         </HStack>
                       </HStack>

@@ -63,7 +63,7 @@ export function GlobalAlerts({
   const handleQuickStock = async (itemId: string, itemName: string) => {
     try {
       // Open inventory page with specific item for stock adjustment
-      window.location.href = `/inventory?action=add-stock&itemId=${itemId}`;
+      window.location.href = `/materials?action=add-stock&itemId=${itemId}`;
       notify.success({
         title: 'Navegando a Stock',
         description: `Abriendo ajuste de stock para ${itemName}`
@@ -191,7 +191,7 @@ export function GlobalAlerts({
                 colorPalette="red"
                 onClick={() => {
                   // Navigate to inventory page alerts section
-                  window.location.href = '/inventory#alerts-section';
+                  window.location.href = '/materials#alerts-section';
                 }}
               >
                 Ver todas las alertas ({alertSummary.total})

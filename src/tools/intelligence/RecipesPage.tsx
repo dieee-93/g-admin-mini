@@ -19,7 +19,7 @@ import { RecipeIntelligenceDashboard } from './components/RecipeIntelligenceDash
 import { SmartCostCalculator } from './components/SmartCostCalculator/SmartCostCalculator';
 import { QuickRecipeBuilder } from './components/MiniBuilders/QuickRecipeBuilder';
 
-export default function RecipesPageRefactored() {
+export default function RecipesPage() {
   const { setQuickActions } = useNavigation();
   const { recipes, loading } = useRecipes();
   

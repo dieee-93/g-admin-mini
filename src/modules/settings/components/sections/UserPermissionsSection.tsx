@@ -10,7 +10,6 @@ import {
   Button,
   HStack,
   VStack,
-  Avatar,
   Switch,
 } from "@chakra-ui/react";
 import { 
@@ -113,7 +112,7 @@ export function UserPermissionsSection() {
                           {role.name}
                         </Badge>
                         <Text fontSize="sm" color="gray.500">
-                          {role.users} usuario{role.users \!== 1 ? "s" : ""}
+                          {role.users} usuario{role.users !== 1 ? "s" : ""}
                         </Text>
                       </HStack>
                       <Button size="xs" variant="ghost">
@@ -153,7 +152,20 @@ export function UserPermissionsSection() {
                   <Card.Body>
                     <HStack justify="space-between" mb={2}>
                       <HStack gap={3}>
-                        <Avatar size="sm" name={user.name} />
+                        <Box
+                          w="8"
+                          h="8"
+                          borderRadius="full"
+                          bg="blue.500"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          color="white"
+                          fontSize="sm"
+                          fontWeight="bold"
+                        >
+                          {user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                        </Box>
                         <VStack align="start" gap={0}>
                           <Text fontSize="sm" fontWeight="medium">
                             {user.name}
@@ -164,9 +176,10 @@ export function UserPermissionsSection() {
                         </VStack>
                       </HStack>
                       <Switch.Root defaultChecked={user.status === "active"}>
-                        <Switch.Track>
+                        <Switch.HiddenInput />
+                        <Switch.Control>
                           <Switch.Thumb />
-                        </Switch.Track>
+                        </Switch.Control>
                       </Switch.Root>
                     </HStack>
                     <HStack justify="space-between">

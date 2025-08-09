@@ -17,7 +17,7 @@ import { CustomerList } from './ui/CustomerList';
 import { CustomerAnalytics } from './ui/CustomerAnalytics';
 import { CustomerOrdersHistory } from './ui/CustomerOrdersHistory';
 
-export default function CustomersPageRefactored() {
+export default function CustomersPage() {
   const { setQuickActions } = useNavigation();
   const [activeSection, setActiveSection] = useState('management');
 

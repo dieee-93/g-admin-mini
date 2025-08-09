@@ -43,7 +43,7 @@ export function DashboardPage() {
   // Handlers
   const handleViewAllAlerts = () => {
     // Navegar a la página de inventory con tab de alerts activo
-    window.location.href = '/inventory?tab=alerts';
+    window.location.href = '/materials?tab=alerts';
   };
 
   const handleQuickAddStock = (alert: any) => {
@@ -345,7 +345,7 @@ export function DashboardPage() {
                   size="sm"
                   variant="outline"
                   colorPalette="blue"
-                  onClick={() => window.location.href = '/inventory'}
+                  onClick={() => window.location.href = '/materials'}
                 >
                   Ver inventario completo
                 </Button>
