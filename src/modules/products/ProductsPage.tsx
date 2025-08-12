@@ -8,7 +8,7 @@ import {
   Tabs,
   Card
 } from '@chakra-ui/react';
-import { CogIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { CogIcon, PlusIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 // Import components
 import { useNavigation } from '@/contexts/NavigationContext';
@@ -53,12 +53,24 @@ export function ProductsPage() {
             <Text fontSize="3xl" fontWeight="bold">Products</Text>
             <Text color="gray.600">Menu items, pricing & analytics</Text>
           </VStack>
-          <Button 
-            colorPalette="purple"
-            leftIcon={<PlusIcon className="w-4 h-4" />}
-          >
-            New Product
-          </Button>
+          <HStack gap="2">
+            <Button 
+              variant="outline"
+              colorPalette="blue" 
+              onClick={() => window.open('/tools/intelligence/menu-engineering', '_blank')}
+              
+              size="sm"
+            >
+              📊 Menu Engineering
+            </Button>
+            <Button 
+              colorPalette="purple"
+              
+            >
+              <PlusIcon className="w-4 h-4" />
+              New Product
+            </Button>
+          </HStack>
         </HStack>
 
         {/* Main Content */}

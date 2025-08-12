@@ -303,31 +303,43 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                     <Text fontSize="sm">Productividad</Text>
                     <Text fontSize="sm" fontWeight="medium">{performance.productivity}%</Text>
                   </HStack>
-                  <Progress 
+                  <Progress.Root 
                     value={performance.productivity} 
                     colorPalette={getScoreColor(performance.productivity)}
                     size="sm"
-                  />
+                  >
+                    <Progress.Track>
+                      <Progress.Range />
+                    </Progress.Track>
+                  </Progress.Root>
 
                   <HStack justify="space-between">
                     <Text fontSize="sm">Calidad</Text>
                     <Text fontSize="sm" fontWeight="medium">{performance.quality}%</Text>
                   </HStack>
-                  <Progress 
+                  <Progress.Root 
                     value={performance.quality} 
                     colorPalette={getScoreColor(performance.quality)}
                     size="sm"
-                  />
+                  >
+                    <Progress.Track>
+                      <Progress.Range />
+                    </Progress.Track>
+                  </Progress.Root>
 
                   <HStack justify="space-between">
                     <Text fontSize="sm">Asistencia</Text>
                     <Text fontSize="sm" fontWeight="medium">{performance.attendance}%</Text>
                   </HStack>
-                  <Progress 
+                  <Progress.Root 
                     value={performance.attendance} 
                     colorPalette={getScoreColor(performance.attendance)}
                     size="sm"
-                  />
+                  >
+                    <Progress.Track>
+                      <Progress.Range />
+                    </Progress.Track>
+                  </Progress.Root>
                 </VStack>
 
                 {/* Goals Progress */}
@@ -342,11 +354,15 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                     {Math.round((performance.goals_met / performance.total_goals) * 100)}%
                   </Text>
                 </HStack>
-                <Progress 
+                <Progress.Root 
                   value={(performance.goals_met / performance.total_goals) * 100}
                   colorPalette="blue"
                   size="sm"
-                />
+                >
+                  <Progress.Track>
+                    <Progress.Range />
+                  </Progress.Track>
+                </Progress.Root>
 
                 {/* Feedback */}
                 {performance.feedback && (
@@ -442,7 +458,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                         {goal.current_value} / {goal.target_value} {goal.unit}
                       </Text>
                     </HStack>
-                    <Progress 
+                    <Progress.Root 
                       value={calculateGoalProgress(goal.current_value, goal.target_value)}
                       colorPalette={
                         goal.status === 'completed' ? 'green' :
@@ -450,7 +466,11 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                         calculateGoalProgress(goal.current_value, goal.target_value) > 50 ? 'orange' : 'red'
                       }
                       size="sm"
-                    />
+                    >
+                      <Progress.Track>
+                        <Progress.Range />
+                      </Progress.Track>
+                    </Progress.Root>
                     <Text fontSize="xs" color="gray.500" mt="1">
                       {calculateGoalProgress(goal.current_value, goal.target_value)}% completado
                     </Text>

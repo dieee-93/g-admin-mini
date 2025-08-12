@@ -408,7 +408,11 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                                   <Text fontSize="sm">Progreso</Text>
                                   <Text fontSize="sm">65%</Text>
                                 </HStack>
-                                <Progress value={65} colorPalette="blue" size="sm" />
+                                <Progress.Root value={65} colorPalette="blue" size="sm">
+                                  <Progress.Track>
+                                    <Progress.Range />
+                                  </Progress.Track>
+                                </Progress.Root>
                               </Box>
                             )}
 

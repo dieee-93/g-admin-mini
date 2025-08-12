@@ -247,6 +247,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
         ]);
       } catch (error) {
         console.error('Failed to load inventory data:', error);
+        setError(error instanceof Error ? error.message : 'Error loading inventory data');
       } finally {
         setLoading(false);
       }

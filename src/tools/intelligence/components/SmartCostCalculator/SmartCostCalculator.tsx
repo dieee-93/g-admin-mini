@@ -84,12 +84,12 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
           ],
           laborCost: (laborRate / 60) * 30, // 30 minutes prep time
           overheadCost: 0,
-          totalCost: result.total_cost || 3.65,
-          costPerPortion: result.cost_per_portion || 0.91,
+          totalCost: (result && typeof result === 'object') ? result.total_cost || 3.65 : (result || 3.65),
+          costPerPortion: (result && typeof result === 'object') ? result.cost_per_portion || 0.91 : ((result || 3.65) / 4),
           profitabilityMetrics: {
-            suggestedPrice: (result.cost_per_portion || 0.91) / (1 - targetProfitMargin / 100),
+            suggestedPrice: ((result && typeof result === 'object') ? result.cost_per_portion || 0.91 : ((result || 3.65) / 4)) / (1 - targetProfitMargin / 100),
             profitMargin: targetProfitMargin,
-            foodCostPercentage: ((result.cost_per_portion || 0.91) / ((result.cost_per_portion || 0.91) / (1 - targetProfitMargin / 100))) * 100
+            foodCostPercentage: (((result && typeof result === 'object') ? result.cost_per_portion || 0.91 : ((result || 3.65) / 4)) / (((result && typeof result === 'object') ? result.cost_per_portion || 0.91 : ((result || 3.65) / 4)) / (1 - targetProfitMargin / 100))) * 100
           }
         };
 

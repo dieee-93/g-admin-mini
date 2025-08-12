@@ -7,11 +7,11 @@ import {
   CurrencyDollarIcon, 
   UsersIcon,
   Cog6ToothIcon,
-  BookOpenIcon,
   ChartBarIcon,
   UserGroupIcon,
   WrenchScrewdriverIcon,
-  CalendarDaysIcon
+  CalendarDaysIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline';
 
 // ✅ Types definidos según arquitectura v2.0
@@ -70,8 +70,9 @@ export interface NavigationContextType {
   setQuickActions: (actions: QuickAction[]) => void;
 }
 
-// ✅ Navigation configuration siguiendo especificaciones arquitectura v2.0
+// ✅ Módulos principales - Organizados por dominios arquitectónicos según ARCHITECTURE_ROADMAP.md
 const NAVIGATION_MODULES: NavigationModule[] = [
+  // 🏢 BUSINESS OPERATIONS DOMAIN
   {
     id: 'dashboard',
     title: 'Dashboard',
@@ -81,44 +82,12 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     description: 'Centro de comando'
   },
   {
-    id: 'materials',
-    title: 'Materials',
-    icon: CubeIcon,
-    color: 'green',
-    path: '/materials',
-    description: 'Raw materials & supplies'
-  },
-  {
-    id: 'products',
-    title: 'Products',
-    icon: CogIcon,
-    color: 'purple',
-    path: '/products',
-    description: 'Menu items & pricing'
-  },
-  {
-    id: 'recipes',
-    title: 'Recipes',
-    icon: BookOpenIcon,
-    color: 'orange',
-    path: '/recipes',
-    description: 'Recipe intelligence'
-  },
-  {
     id: 'sales',
     title: 'Ventas',
     icon: CurrencyDollarIcon,
     color: 'teal',
     path: '/sales',
-    description: 'Ventas y clientes'
-  },
-  {
-    id: 'customers',
-    title: 'Clientes',
-    icon: UsersIcon,
-    color: 'pink',
-    path: '/customers',
-    description: 'Gestión de clientes'
+    description: 'POS + QR Ordering + Payments'
   },
   {
     id: 'operations',
@@ -129,12 +98,50 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     description: 'Cocina + Mesas + Monitoreo'
   },
   {
+    id: 'customers',
+    title: 'Clientes',
+    icon: UsersIcon,
+    color: 'pink',
+    path: '/customers',
+    description: 'RFM Analytics + Segmentación'
+  },
+  
+  // 🏭 SUPPLY CHAIN DOMAIN  
+  {
+    id: 'materials',
+    title: 'Materials',
+    icon: CubeIcon,
+    color: 'green',
+    path: '/materials',
+    description: 'Inventario + Supply Chain Intelligence'
+  },
+  {
+    id: 'products',
+    title: 'Products',
+    icon: CogIcon,
+    color: 'purple',
+    path: '/products',
+    description: 'Menu Engineering + Cost Analysis'
+  },
+  
+  // 💰 FINANCIAL DOMAIN
+  {
+    id: 'fiscal',
+    title: 'Fiscal',
+    icon: DocumentTextIcon,
+    color: 'red',
+    path: '/fiscal',
+    description: 'Facturación AFIP + Impuestos'
+  },
+  
+  // 👨‍💼 WORKFORCE DOMAIN
+  {
     id: 'staff',
     title: 'Staff',
     icon: UserGroupIcon,
     color: 'indigo',
     path: '/staff',
-    description: 'Employee management'
+    description: 'Gestión de personal'
   },
   {
     id: 'scheduling',
@@ -142,20 +149,30 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     icon: CalendarDaysIcon,
     color: 'violet',
     path: '/scheduling',
-    description: 'Shifts & schedules'
+    description: 'Horarios + Coverage Planning'
+  },
+  
+  // 🔧 INTELLIGENCE & TOOLS
+  {
+    id: 'tools',
+    title: 'Tools',
+    icon: WrenchScrewdriverIcon,
+    color: 'amber',
+    path: '/tools',
+    description: 'Intelligence + Diagnostics + Admin'
   },
   {
     id: 'settings',
     title: 'Configuración',
-    icon: WrenchScrewdriverIcon,
+    icon: Cog6ToothIcon,
     color: 'gray',
     path: '/settings',
-    description: 'Configuración del negocio y sistema'
+    description: 'Business Profile + Integraciones'
   }
 ];
 
-// ✅ Quick actions por contexto según arquitectura
-const QUICK_ACTIONS_BY_MODULE: Record<string, QuickAction[]> = {
+// ✅ Quick actions por contexto según arquitectura - moved to inside NavigationProvider for navigate access
+/* const QUICK_ACTIONS_BY_MODULE: Record<string, QuickAction[]> = {
   dashboard: [
     {
       id: 'add-stock',
@@ -312,8 +329,38 @@ const QUICK_ACTIONS_BY_MODULE: Record<string, QuickAction[]> = {
     {
       id: 'schedule-training',
       label: 'Programar Entrenamiento',
-      icon: BookOpenIcon,
+      icon: CalendarDaysIcon,
       action: () => console.log('Schedule training'),
+      color: 'orange'
+    }
+  ],
+  fiscal: [
+    {
+      id: 'generate-invoice',
+      label: 'Nueva Factura',
+      icon: DocumentTextIcon,
+      action: () => console.log('Generate invoice'),
+      color: 'red'
+    },
+    {
+      id: 'afip-status',
+      label: 'Estado AFIP',
+      icon: CogIcon,
+      action: () => console.log('Check AFIP status'),
+      color: 'green'
+    },
+    {
+      id: 'tax-report',
+      label: 'Reporte Impuestos',
+      icon: ChartBarIcon,
+      action: () => console.log('Generate tax report'),
+      color: 'purple'
+    },
+    {
+      id: 'financial-reports',
+      label: 'Reportes Financieros',
+      icon: CurrencyDollarIcon,
+      action: () => console.log('View financial reports'),
       color: 'orange'
     }
   ],
@@ -339,8 +386,31 @@ const QUICK_ACTIONS_BY_MODULE: Record<string, QuickAction[]> = {
       action: () => console.log('Manage users'),
       color: 'purple'
     }
+  ],
+  tools: [
+    {
+      id: 'recipe-intelligence',
+      label: 'Recipe Intelligence',
+      icon: CogIcon,
+      action: () => console.log('Recipe intelligence'),
+      color: 'orange'
+    },
+    {
+      id: 'business-analytics',
+      label: 'Business Analytics',
+      icon: ChartBarIcon,
+      action: () => console.log('Business analytics'),
+      color: 'purple'
+    },
+    {
+      id: 'diagnostics',
+      label: 'Diagnósticos',
+      icon: WrenchScrewdriverIcon,
+      action: () => console.log('System diagnostics'),
+      color: 'yellow'
+    }
   ]
-};
+}; */
 
 // ✅ Context creation
 const NavigationContext = createContext<NavigationContextType | null>(null);
@@ -387,6 +457,110 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
 
   // ✅ Derived state
   const showBottomNav = isMobile;
+
+  // ✅ Quick actions with real navigation
+  const getQuickActionsForModule = (moduleId: string): QuickAction[] => {
+    switch (moduleId) {
+      case 'tools':
+        return [
+          {
+            id: 'recipe-intelligence',
+            label: 'Recipe Intelligence',
+            icon: CogIcon,
+            action: () => navigate('/tools/intelligence/recipes'),
+            color: 'orange'
+          },
+          {
+            id: 'business-analytics',
+            label: 'Business Analytics',
+            icon: ChartBarIcon,
+            action: () => navigate('/tools/intelligence/analytics'),
+            color: 'purple'
+          },
+          {
+            id: 'menu-engineering',
+            label: 'Menu Engineering',
+            icon: WrenchScrewdriverIcon,
+            action: () => navigate('/tools/intelligence/menu-engineering'),
+            color: 'blue'
+          },
+          {
+            id: 'diagnostics',
+            label: 'Diagnósticos',
+            icon: WrenchScrewdriverIcon,
+            action: () => navigate('/tools/operational/diagnostics'),
+            color: 'yellow'
+          }
+        ];
+      case 'sales':
+        return [
+          {
+            id: 'new-sale',
+            label: 'Nueva Venta',
+            icon: CurrencyDollarIcon,
+            action: () => navigate('/sales'),
+            color: 'teal'
+          },
+          {
+            id: 'add-customer',
+            label: 'Agregar Cliente',
+            icon: UsersIcon,
+            action: () => navigate('/customers'),
+            color: 'pink'
+          },
+          {
+            id: 'check-stock',
+            label: 'Verificar Stock',
+            icon: CubeIcon,
+            action: () => navigate('/materials'),
+            color: 'green'
+          }
+        ];
+      case 'materials':
+        return [
+          {
+            id: 'add-stock',
+            label: 'Agregar Stock',
+            icon: CubeIcon,
+            action: () => navigate('/materials'),
+            color: 'green'
+          },
+          {
+            id: 'adjust-stock',
+            label: 'Ajustar Stock',
+            icon: Cog6ToothIcon,
+            action: () => navigate('/materials'),
+            color: 'yellow'
+          },
+          {
+            id: 'abc-analysis',
+            label: 'ABC Analysis',
+            icon: ChartBarIcon,
+            action: () => navigate('/tools/intelligence/abc-analysis'),
+            color: 'blue'
+          }
+        ];
+      case 'products':
+        return [
+          {
+            id: 'new-recipe',
+            label: 'Nueva Receta',
+            icon: CogIcon,
+            action: () => navigate('/tools/intelligence/recipes'),
+            color: 'purple'
+          },
+          {
+            id: 'menu-engineering',
+            label: 'Menu Engineering',
+            icon: ChartBarIcon,
+            action: () => navigate('/tools/intelligence/menu-engineering'),
+            color: 'blue'
+          }
+        ];
+      default:
+        return [];
+    }
+  };
   const showSidebar = !isMobile;
   const canNavigateBack = navigationHistory.length > 1;
 
@@ -407,7 +581,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     setCurrentModule(foundModule);
 
     // ✅ Update quick actions based on current module
-    const moduleActions = QUICK_ACTIONS_BY_MODULE[foundModule.id] || [];
+    const moduleActions = getQuickActionsForModule(foundModule.id);
     setQuickActions(moduleActions);
 
     // ✅ Update breadcrumbs
@@ -539,4 +713,4 @@ export function useNavigation(): NavigationContextType {
 }
 
 // ✅ Export navigation config for external use
-export { NAVIGATION_MODULES, QUICK_ACTIONS_BY_MODULE };
+export { NAVIGATION_MODULES };

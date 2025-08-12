@@ -57,6 +57,7 @@ interface CartValidationSummaryProps {
   onProceedToCheckout?: () => void;
   onValidateCart?: () => void;
   disabled?: boolean;
+  isOffline?: boolean;
 }
 
 export function CartValidationSummary({
@@ -66,7 +67,8 @@ export function CartValidationSummary({
   isValidating,
   onProceedToCheckout,
   onValidateCart,
-  disabled = false
+  disabled = false,
+  isOffline = false
 }: CartValidationSummaryProps) {
 
   // Determinar el estado general del carrito
@@ -271,11 +273,24 @@ export function CartValidationSummary({
 // Componente para mostrar alertas rápidas en el carrito
 export function CartQuickAlert({ 
   validationResult, 
-  isValidating 
+  isValidating,
+  isOffline = false
 }: { 
   validationResult: StockValidationResult | null;
   isValidating: boolean;
+  isOffline?: boolean;
 }) {
+  if (isOffline) {
+    return (
+      <HStack gap="2" p="2" bg="orange.50" borderRadius="md">
+        <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" />
+        <Text fontSize="sm" color="orange.700">
+          Modo Offline: Las ventas se guardarán localmente para sincronización posterior
+        </Text>
+      </HStack>
+    );
+  }
+
   if (isValidating) {
     return (
       <HStack gap="2" p="2" bg="blue.50" borderRadius="md">

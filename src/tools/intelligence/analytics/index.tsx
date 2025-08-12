@@ -1,6 +1,3 @@
-// Business Analytics - Advanced analytics for business insights
-// TODO: Implement business analytics components
+// Business Analytics - Cross-module analytics and strategic insights
+export { default as default } from './BusinessAnalyticsPage';
 export * from './types';
-// export { BusinessAnalyticsDashboard } from './BusinessAnalyticsDashboard';
-// export { SalesAnalytics } from './SalesAnalytics';
-// export { CustomerInsights } from './CustomerInsights';

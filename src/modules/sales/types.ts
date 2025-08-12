@@ -9,10 +9,15 @@ export interface Sale {
   table_id?: string; // 🚀 NEW: Table management integration
   order_id?: string; // 🚀 NEW: Order lifecycle tracking
   total: number;
-  subtotal: number; // 🚀 NEW: Before taxes/tips
-  taxes: number; // 🚀 NEW: Tax calculation
+  subtotal: number; // 🚀 NEW: Before taxes/tips (calculated by fiscal service)
+  taxes: number; // 🚀 NEW: Tax calculation (IVA + other taxes from fiscal service)
   tips: number; // 🚀 NEW: Digital tip management
   discounts: number; // 🚀 NEW: Discount tracking
+  
+  // 🚀 NEW: Detailed tax breakdown (from fiscal service)
+  iva_amount?: number;
+  ingresos_brutos_amount?: number;
+  effective_tax_rate?: number;
   note?: string;
   
   // 🚀 NEW: Advanced order properties

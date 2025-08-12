@@ -1,5 +1,6 @@
 // src/test/setup.ts
 import '@testing-library/jest-dom'
+import { vi } from 'vitest'
 
 // Mock Supabase
 const mockSupabase = {
@@ -43,8 +44,18 @@ vi.mock('@heroicons/react/24/outline', () => ({
   ArrowTrendingUpIcon: 'ArrowTrendingUpIcon',
   ArrowPathIcon: 'ArrowPathIcon',
   FireIcon: 'FireIcon',
-  ShieldCheckIcon: 'ShieldCheckIcon'
+  ShieldCheckIcon: 'ShieldCheckIcon',
+  PlusIcon: 'PlusIcon',
+  MagnifyingGlassIcon: 'MagnifyingGlassIcon',
+  AdjustmentsHorizontalIcon: 'AdjustmentsHorizontalIcon',
+  HomeIcon: 'HomeIcon'
 }))
+
+// Mock window and document for component tests
+Object.defineProperty(window, 'alert', {
+  value: vi.fn(),
+  writable: true
+})
 
 // Global test utilities
 global.mockSupabase = mockSupabase

@@ -16,6 +16,7 @@ import {
   createListCollection,
   Separator
 } from '@chakra-ui/react';
+import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
 import {
   ClockIcon,
   FireIcon,
@@ -25,8 +26,8 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import {
-  KitchenOrder,
-  KitchenOrderItem,
+  type KitchenOrder,
+  type KitchenOrderItem,
   KitchenItemStatus,
   PriorityLevel,
   KITCHEN_STATIONS,
@@ -61,7 +62,7 @@ export function KitchenDisplaySystem({
   const [selectedStation, setSelectedStation] = useState<string>(currentStation);
   const [sortBy, setSortBy] = useState<'priority' | 'time' | 'table'>('priority');
   const [showCompleted, setShowCompleted] = useState(false);
-
+  console.log(orders)
   // Filter orders based on station
   const filteredOrders = useMemo(() => {
     let filtered = orders;
@@ -72,7 +73,7 @@ export function KitchenDisplaySystem({
         order.items.some(item => item.station === selectedStation)
       );
     }
-
+  
     // Filter completed orders
     if (!showCompleted) {
       filtered = filtered.filter(order => 
@@ -331,7 +332,7 @@ export function KitchenDisplaySystem({
                         Order #{order.order_number}
                       </Text>
                       <Badge colorPalette={priorityColor} size="sm">
-                        {order.priority.toUpperCase()}
+                        {order.priority && order.priority.toUpperCase()}
                       </Badge>
                     </HStack>
                     {order.table_number && (
@@ -359,7 +360,7 @@ export function KitchenDisplaySystem({
 
                 {/* Progress Bar */}
                 <Box>
-                  <Progress 
+                  <Progress.Root 
                     value={timing.progressPercentage} 
                     size="sm"
                     colorPalette={timing.isOverdue ? 'red' : 'blue'}

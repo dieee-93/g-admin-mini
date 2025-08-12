@@ -14,6 +14,7 @@ import {
   Alert,
   Grid
 } from "@chakra-ui/react";
+import { VirtualizedList } from "@/lib/performance/virtualization/VirtualizedList";
 import { type ProductWithIntelligence } from "../types";
 
 interface ProductListProps {
@@ -76,6 +77,147 @@ export function ProductList({
     if (availability <= 5) return "Stock Bajo";
     return "Disponible";
   };
+
+  // Use virtualization for large product lists (>30 products)
+  if (products.length > 30) {
+    return (
+      <VStack align="stretch" gap={4}>
+        <Box>
+          <Text fontSize="lg" fontWeight="semibold" mb={2}>
+            Productos ({products.length})
+          </Text>
+          <Text fontSize="sm" color="gray.600">
+            Lista de productos con información de costos y disponibilidad
+          </Text>
+        </Box>
+
+        <Box h="calc(100vh - 200px)">
+          <VirtualizedList
+            items={products}
+            itemHeight={320}
+            containerHeight={window.innerHeight - 200}
+            renderItem={(product, index, style) => (
+              <Box px={2} pb={4}>
+                <Card.Root p={4} shadow="sm">
+                  <VStack align="stretch" gap={3}>
+                    {/* Header */}
+                    <HStack justify="space-between" align="flex-start">
+                      <VStack align="stretch" gap={1} flex={1}>
+                        <Text fontSize="md" fontWeight="semibold">
+                          {product.name}
+                        </Text>
+                        {product.unit && (
+                          <Text fontSize="xs" color="gray.500">
+                            Unidad: {product.unit}
+                          </Text>
+                        )}
+                      </VStack>
+                      <Badge colorPalette="blue" size="sm">
+                        {product.type}
+                      </Badge>
+                    </HStack>
+
+                    {/* Description */}
+                    {product.description && (
+                      <Text fontSize="sm" color="gray.600" noOfLines={2}>
+                        {product.description}
+                      </Text>
+                    )}
+
+                    {/* Intelligence Metrics */}
+                    <VStack align="stretch" gap={2}>
+                      {/* Cost */}
+                      <HStack justify="space-between">
+                        <Text fontSize="sm" color="gray.600">Costo:</Text>
+                        <Text fontSize="sm" fontWeight="medium">
+                          ${product.cost.toFixed(2)}
+                        </Text>
+                      </HStack>
+
+                      {/* Availability */}
+                      <HStack justify="space-between">
+                        <Text fontSize="sm" color="gray.600">Disponibilidad:</Text>
+                        <HStack gap={2}>
+                          <Text fontSize="sm" fontWeight="medium">
+                            {product.availability}
+                          </Text>
+                          <Badge 
+                            colorPalette={getAvailabilityColor(product.availability)} 
+                            size="xs"
+                          >
+                            {getAvailabilityLabel(product.availability)}
+                          </Badge>
+                        </HStack>
+                      </HStack>
+
+                      {/* Components */}
+                      <HStack justify="space-between">
+                        <Text fontSize="sm" color="gray.600">Componentes:</Text>
+                        <Text fontSize="sm" fontWeight="medium">
+                          {product.components_count}
+                        </Text>
+                      </HStack>
+
+                      {/* Production Status */}
+                      <HStack justify="space-between">
+                        <Text fontSize="sm" color="gray.600">Estado:</Text>
+                        <Badge 
+                          colorPalette={product.production_ready ? "green" : "gray"}
+                          size="xs"
+                        >
+                          {product.production_ready ? "Listo para producir" : "Requiere configuración"}
+                        </Badge>
+                      </HStack>
+                    </VStack>
+
+                    {/* Actions */}
+                    <VStack align="stretch" gap={2} pt={2}>
+                      {onManageComponents && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => onManageComponents(product)}
+                        >
+                          Gestionar Componentes ({product.components_count})
+                        </Button>
+                      )}
+                      
+                      <HStack gap={2}>
+                        {onEdit && (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            flex={1}
+                            onClick={() => onEdit(product)}
+                          >
+                            Editar
+                          </Button>
+                        )}
+                        {onDelete && (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            colorPalette="red"
+                            flex={1}
+                            onClick={() => onDelete(product.id)}
+                          >
+                            Eliminar
+                          </Button>
+                        )}
+                      </HStack>
+                    </VStack>
+                  </VStack>
+                </Card.Root>
+              </Box>
+            )}
+            overscan={3}
+            hasMore={false}
+            loading={false}
+          />
+        </Box>
+      </VStack>
+    );
+  }
 
   return (
     <VStack align="stretch" gap={4}>

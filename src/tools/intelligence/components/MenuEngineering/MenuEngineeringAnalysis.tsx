@@ -32,8 +32,9 @@ export const MenuEngineeringAnalysis: React.FC<MenuEngineeringAnalysisProps> = (
   };
 
   return (
-    <Card p={4}>
-      <Text fontWeight='bold' mb={3}>Menu Engineering Analysis</Text>
+    <Card.Root p={4}>
+      <Card.Body>
+        <Text fontWeight='bold' mb={3}>Menu Engineering Analysis</Text>
       <HStack justify='space-between' align='center'>
         <Box>
           <Badge colorPalette={getCategoryColor(category)} size='lg'>
@@ -47,6 +48,7 @@ export const MenuEngineeringAnalysis: React.FC<MenuEngineeringAnalysisProps> = (
           Recipe: {recipeId}
         </Text>
       </HStack>
-    </Card>
+      </Card.Body>
+    </Card.Root>
   );
 };

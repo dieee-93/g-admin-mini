@@ -29,6 +29,8 @@ import { CartValidationSummary, CartQuickAlert } from './CartValidationSummary';
 import { fetchCustomers, processSale } from '../data/saleApi';
 import { useSalesCart } from '../logic/useSalesCart';
 import { toaster } from '@/shared/ui/toaster';
+import { EventBus } from '@/lib/events/EventBus';
+import { RestaurantEvents, type OrderPlacedEvent } from '@/lib/events/RestaurantEvents';
 
 interface Customer {
   id: string;
@@ -166,7 +168,24 @@ export function SalesWithStockView() {
 
       // Procesar venta
       const saleData = getSaleData(selectedCustomerId || undefined, note || undefined);
-      await processSale(saleData);
+      const saleResult = await processSale(saleData);
+
+      // Emitir evento ORDER_PLACED después del procesamiento exitoso
+      const orderPlacedEvent: OrderPlacedEvent = {
+        orderId: saleResult.sale_id || `sale_${Date.now()}`,
+        customerId: selectedCustomerId || undefined,
+        tableId: undefined, // TODO: Add table support in future
+        items: cart.map(item => ({
+          productId: item.product_id,
+          quantity: item.quantity,
+          specialInstructions: note || undefined
+        })),
+        totalAmount: summary.totalAmount,
+        orderType: 'dine_in', // Default for POS sales
+        timestamp: new Date().toISOString()
+      };
+
+      await EventBus.emit(RestaurantEvents.ORDER_PLACED, orderPlacedEvent, 'SalesModule');
 
       // Éxito
       toaster.create({

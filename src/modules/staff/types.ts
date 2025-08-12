@@ -145,9 +145,51 @@ export interface StaffSortOptions {
   direction: 'asc' | 'desc';
 }
 
+// Time tracking types
+export interface TimeEntry {
+  id: string;
+  employee_id: string;
+  entry_type: 'clock_in' | 'clock_out' | 'break_start' | 'break_end';
+  timestamp: number;
+  location?: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
+  notes?: string;
+  is_offline: boolean;
+  sync_status: 'pending' | 'syncing' | 'synced' | 'failed';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TimeSheet {
+  id: string;
+  employee_id: string;
+  date: string; // YYYY-MM-DD
+  clock_in?: TimeEntry;
+  clock_out?: TimeEntry;
+  breaks: TimeEntry[];
+  total_hours: number;
+  overtime_hours: number;
+  status: 'draft' | 'submitted' | 'approved' | 'rejected';
+  notes?: string;
+  is_offline: boolean;
+  sync_status: 'pending' | 'syncing' | 'synced' | 'failed';
+}
+
+export interface TimeTrackingStats {
+  today_total_hours: number;
+  week_total_hours: number;
+  active_employees: number;
+  on_break: number;
+  overtime_this_week: number;
+  pending_approvals: number;
+}
+
 // UI State types
 export interface StaffViewState {
-  activeTab: 'directory' | 'performance' | 'training' | 'management';
+  activeTab: 'directory' | 'performance' | 'training' | 'management' | 'timetracking';
   selectedEmployee?: Employee;
   filters: StaffFilters;
   sortBy: StaffSortOptions;

@@ -36,6 +36,9 @@ import {
   DEFAULT_TIP_PERCENTAGES,
   PAYMENT_PROCESSING_TIMES
 } from '../../types';
+import { EventBus } from '@/lib/events/EventBus';
+import { RestaurantEvents, type PaymentCompletedEvent } from '@/lib/events/RestaurantEvents';
+import { useTaxCalculation } from '@/modules/fiscal/hooks/useTaxCalculation';
 
 interface ModernPaymentProcessorProps {
   saleId: string;
@@ -68,6 +71,12 @@ export function ModernPaymentProcessor({
   tipConfiguration,
   customerCount = 1
 }: ModernPaymentProcessorProps) {
+  // Use centralized tax calculation for consistency
+  const { helpers } = useTaxCalculation();
+  
+  // Recalculate using fiscal service for consistency (fallback to props if service unavailable)
+  const calculatedTaxes = helpers.getTaxAmount(totalAmount) || taxes;
+  const calculatedSubtotal = helpers.getSubtotal(totalAmount) || subtotal;
   // Payment state
   const [selectedPayments, setSelectedPayments] = useState<PaymentSelection[]>([]);
   const [tipPercentage, setTipPercentage] = useState<number>(18);
@@ -80,8 +89,8 @@ export function ModernPaymentProcessor({
   // Calculate tip amount
   const tipAmount = useMemo(() => {
     if (customTipAmount > 0) return customTipAmount;
-    return Math.round((subtotal * tipPercentage / 100) * 100) / 100;
-  }, [subtotal, tipPercentage, customTipAmount]);
+    return Math.round((calculatedSubtotal * tipPercentage / 100) * 100) / 100;
+  }, [calculatedSubtotal, tipPercentage, customTipAmount]);
 
   // Calculate final total with tip
   const finalTotal = useMemo(() => {
@@ -152,7 +161,7 @@ export function ModernPaymentProcessor({
       items: [
         ...percentages.map(percentage => ({
           value: percentage.toString(),
-          label: `${percentage}% ($${((subtotal * percentage / 100)).toFixed(2)})`
+          label: `${percentage}% ($${((calculatedSubtotal * percentage / 100)).toFixed(2)})`
         })),
         { value: 'custom', label: 'Custom Amount' },
         ...(tipConfiguration?.allow_no_tip ? [{ value: '0', label: 'No Tip' }] : [])
@@ -239,6 +248,20 @@ export function ModernPaymentProcessor({
         };
         
         paymentMethods.push(paymentMethod);
+
+        // Emitir evento PAYMENT_COMPLETED para cada método de pago
+        const paymentCompletedEvent: PaymentCompletedEvent = {
+          paymentId: paymentMethod.id,
+          orderId: undefined, // Will be set by higher-level component
+          saleId: saleId,
+          amount: payment.amount + payment.tipAmount,
+          paymentMethod: payment.type,
+          customerId: undefined, // Will be set by higher-level component if available
+          timestamp: new Date().toISOString(),
+          reference: paymentMethod.id
+        };
+
+        await EventBus.emit(RestaurantEvents.PAYMENT_COMPLETED, paymentCompletedEvent, 'PaymentModule');
       }
       
       setProcessingStep('Finalizing transaction...');
@@ -261,11 +284,11 @@ export function ModernPaymentProcessor({
         <VStack gap="3" align="stretch">
           <HStack justify="space-between">
             <Text fontWeight="medium">Subtotal:</Text>
-            <Text>${subtotal.toFixed(2)}</Text>
+            <Text>${calculatedSubtotal.toFixed(2)}</Text>
           </HStack>
           <HStack justify="space-between">
             <Text fontWeight="medium">Tax:</Text>
-            <Text>${taxes.toFixed(2)}</Text>
+            <Text>${calculatedTaxes.toFixed(2)}</Text>
           </HStack>
           <HStack justify="space-between">
             <Text fontWeight="medium" color={tipAmount > 0 ? "green.600" : "gray.600"}>
@@ -513,7 +536,11 @@ export function ModernPaymentProcessor({
           <VStack align="start" flex="1" gap="2">
             <Alert.Title>Processing Payment...</Alert.Title>
             <Alert.Description>{processingStep}</Alert.Description>
-            <Progress value={33} size="sm" w="full" />
+            <Progress.Root value={33} size="sm" w="full">
+              <Progress.Track>
+                <Progress.Range />
+              </Progress.Track>
+            </Progress.Root>
           </VStack>
         </Alert.Root>
       )}

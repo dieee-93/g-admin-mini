@@ -18,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { Icon } from '@/shared/ui/Icon';
+import { RealtimeStatusIndicator } from '@/lib/websocket';
 
 export function Header() {
   const { currentModule, modules } = useNavigation();
@@ -75,6 +76,9 @@ export function Header() {
         </HStack>
 
         <HStack gap="2">
+          {/* Real-time Status Indicator */}
+          <RealtimeStatusIndicator size="sm" showDetails={false} />
+
           {/* ✅ CORREGIDO: Notifications con Icon component */}
           <Button
             variant="ghost"

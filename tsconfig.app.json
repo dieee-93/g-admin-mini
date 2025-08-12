@@ -18,12 +18,19 @@
     "jsx": "react-jsx",
     
     /* Linting */
-    // "strict": true, // Temporarily disabled to allow build after reorganization
-    // "noUnusedLocals": true, // Temporarily disabled to allow build
-    // "noUnusedParameters": true, // Temporarily disabled to allow build
-    // "erasableSyntaxOnly": true, // Temporarily disabled for enum compatibility
+    "strict": false, // Enabling gradually - start with false for now
+    "noImplicitAny": true, // Enable first strict check
+    "strictNullChecks": false, // Will enable in next iteration
+    "strictFunctionTypes": true, // Safe to enable
+    "strictBindCallApply": true, // Safe to enable
+    "strictPropertyInitialization": false, // Will enable later
+    "noImplicitReturns": true, // Logical check
+    "noImplicitThis": true, // Safe to enable
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+    // "noUnusedLocals": true, // Will enable after fixing imports
+    // "noUnusedParameters": true, // Will enable after cleanup
+    // "erasableSyntaxOnly": true, // Will enable after enum fixes
     
   },
   "include": ["src"]

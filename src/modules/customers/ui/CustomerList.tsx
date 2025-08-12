@@ -13,6 +13,7 @@ import {
   Spinner,
   Alert
 } from '@chakra-ui/react';
+import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
 import { useState } from 'react';
 import { useCustomers, useCustomerSearch } from '../logic/useCustomers';
 import { LoadingSpinner } from '@/modules/dashboard/common/LoadingSpinner';

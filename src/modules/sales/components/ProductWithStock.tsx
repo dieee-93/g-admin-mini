@@ -54,13 +54,15 @@ interface ProductWithStockProps {
   onQuantityChange?: (productId: string, quantity: number) => void;
   currentCart?: SaleItem[];
   disabled?: boolean;
+  offlineMode?: boolean;
 }
 
 export function ProductWithStock({ 
   onAddToCart,
   onQuantityChange,
   currentCart = [],
-  disabled = false 
+  disabled = false,
+  offlineMode = false
 }: ProductWithStockProps) {
   const [products, setProducts] = useState<ProductWithAvailability[]>([]);
   const [loading, setLoading] = useState(true);

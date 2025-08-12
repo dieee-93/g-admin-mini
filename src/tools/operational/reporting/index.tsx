@@ -1,6 +1,3 @@
 // Advanced Reporting - Comprehensive reporting tools
-// TODO: Implement advanced reporting components
+export { default as default } from './ReportingPage';
 export * from './types';
-// export { AdvancedReportDashboard } from './AdvancedReportDashboard';
-// export { CustomReportBuilder } from './CustomReportBuilder';
-// export { ReportScheduler } from './ReportScheduler';
