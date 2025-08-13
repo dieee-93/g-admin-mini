@@ -17,17 +17,17 @@ import {
   ExclamationTriangleIcon,
   CubeIcon
 } from '@heroicons/react/24/outline';
-import { useInventory } from '@/hooks/useZustandStores';
-import { InventoryItem } from '@/store/inventoryStore';
+import { useMaterials } from '@/hooks/useZustandStores';
+import { MaterialItem } from '@/store/materialsStore';
 import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
 
 interface MaterialsGridProps {
-  onEdit: (item: InventoryItem) => void;
-  onView: (item: InventoryItem) => void;
-  onDelete: (item: InventoryItem) => void;
+  onEdit: (item: MaterialItem) => void;
+  onView: (item: MaterialItem) => void;
+  onDelete: (item: MaterialItem) => void;
 }
 
-const getStatusColor = (status: InventoryItem['stock_status']) => {
+const getStatusColor = (status: MaterialItem['stock_status']) => {
   switch (status) {
     case 'ok': return 'green';
     case 'low': return 'orange';
@@ -48,7 +48,7 @@ const getStatusLabel = (status: InventoryItem['stock_status']) => {
 };
 
 export const MaterialsGrid = ({ onEdit, onView, onDelete }: MaterialsGridProps) => {
-  const { getFilteredItems, loading } = useInventory();
+  const { getFilteredItems, loading } = useMaterials();
   
   const items = getFilteredItems();
 

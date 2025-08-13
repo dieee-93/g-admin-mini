@@ -17,7 +17,7 @@ export const LazySalesPage = createLazyComponent(
 
 // Lazy-loaded Operations Module (includes Kitchen, Tables, Planning, Monitoring)
 export const LazyOperationsPage = createLazyComponent(
-  () => import('../operations/OperationsPage'),
+  () => import('@/modules/operations/OperationsPage'),
   'operations',
   {
     chunkName: 'operations-module',

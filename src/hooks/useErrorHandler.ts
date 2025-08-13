@@ -26,7 +26,8 @@ export function useErrorHandler() {
     });
 
     // Log del error para debugging
-    console.error('Error handled:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error handled: ${errorMessage}`);
   };
 
   const handleSuccess = (message: string, title = 'Éxito') => {

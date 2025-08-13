@@ -23,8 +23,8 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 
       {/* 🔧 CRÍTICO CORREGIDO: Main area SIN margin-left, con padding-left dinámico */}
       <Box
-        pl={sidebarCollapsed ? "60px" : "240px"}
-        transition="padding-left 0.2s ease"
+        pl={sidebarCollapsed ? "60px" : "280px"}
+        transition="padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
         minH="100vh"
       >
         <VStack 

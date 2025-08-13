@@ -22,17 +22,19 @@ import {
   ArrowRightIcon
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { useInventory } from '@/modules/materials/logic/useInventory';
+import { useNavigate } from 'react-router-dom';
+import { useMaterials } from '../materials/logic/useMaterials'; 
 import { useSales } from '@/modules/sales/logic/useSales';
 import { useCustomers } from '@/modules/customers/logic/useCustomers';
-import { useRecipes } from '@/tools/intelligence/logic/useRecipes';
+//import { useRecipes } from '@/tools/intelligence/logic/useRecipes';
 
 export function Dashboard() {
-  const { navigate, quickActions } = useNavigation();
-  const { inventoryStats, alertSummary, alerts, loading } = useInventory();
+  const { quickActions } = useNavigation();
+  const navigate = useNavigate();
+  const { inventoryStats, alertSummary, alerts, loading } = useMaterials();
   const { salesStats } = useSales();
   const { customersStats } = useCustomers();
-  const { recipes } = useRecipes();
+  //const { recipes } = useRecipes();
 
   return (
     <Box p="6">
@@ -72,7 +74,7 @@ export function Dashboard() {
                 size="sm"
                 variant="outline"
                 colorPalette={alertSummary.critical > 0 ? "red" : "orange"}
-                onClick={() => navigate('inventory')}
+                onClick={() => navigate('/materials')}
               >
                 Ver Inventario
                 <ArrowRightIcon className="w-4 h-4 ml-2" />
@@ -127,7 +129,7 @@ export function Dashboard() {
           <Card.Root 
             variant="elevated" 
             cursor="pointer"
-            onClick={() => navigate('sales')}
+            onClick={() => navigate('/sales')}
             _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
             transition="all 0.2s"
           >
@@ -153,7 +155,7 @@ export function Dashboard() {
           <Card.Root 
             variant="elevated" 
             cursor="pointer"
-            onClick={() => navigate('customers')}
+            onClick={() => navigate('/customers')}
             _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
             transition="all 0.2s"
           >
@@ -179,11 +181,11 @@ export function Dashboard() {
           <Card.Root 
             variant="elevated" 
             cursor="pointer"
-            onClick={() => navigate('production')}
+            onClick={() => navigate('/products')}
             _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
             transition="all 0.2s"
           >
-            <Card.Body>
+   {/*<Card.Body>
               <VStack align="start" gap="3">
                 <Box p="2" bg="purple.100" borderRadius="md">
                   <ChartBarIcon className="w-6 h-6 text-purple-600" />
@@ -198,7 +200,8 @@ export function Dashboard() {
                   </Text>
                 </VStack>
               </VStack>
-            </Card.Body>
+            </Card.Body> */}
+            
           </Card.Root>
         </Grid>
 
@@ -238,6 +241,98 @@ export function Dashboard() {
           </Card.Body>
         </Card.Root>
 
+        {/* 🧠 BUSINESS INTELLIGENCE - Expandable Navigation */}
+        <Card.Root>
+          <Card.Header>
+            <Text fontSize="lg" fontWeight="semibold">🧠 Business Intelligence</Text>
+          </Card.Header>
+          <Card.Body>
+            <Grid 
+              templateColumns={{ 
+                base: "1fr", 
+                md: "repeat(2, 1fr)", 
+                lg: "repeat(3, 1fr)" 
+              }} 
+              gap="4"
+            >
+              <Card.Root 
+                variant="outline" 
+                cursor="pointer"
+                onClick={() => navigate('/dashboard/executive')}
+                _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
+                transition="all 0.2s"
+              >
+                <Card.Body p="4">
+                  <VStack align="start" gap="3">
+                    <HStack gap="3">
+                      <Box p="2" bg="purple.100" borderRadius="md">
+                        <ChartBarIcon className="w-5 h-5 text-purple-600" />
+                      </Box>
+                      <VStack align="start" gap="0">
+                        <Text fontWeight="bold">Executive Dashboard</Text>
+                        <Text fontSize="sm" color="gray.600">Strategic KPIs and insights</Text>
+                      </VStack>
+                    </HStack>
+                    <Button size="sm" variant="outline" colorPalette="purple" w="full">
+                      Open Analysis
+                    </Button>
+                  </VStack>
+                </Card.Body>
+              </Card.Root>
+
+              <Card.Root 
+                variant="outline" 
+                cursor="pointer"
+                onClick={() => navigate('/dashboard/cross-analytics')}
+                _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
+                transition="all 0.2s"
+              >
+                <Card.Body p="4">
+                  <VStack align="start" gap="3">
+                    <HStack gap="3">
+                      <Box p="2" bg="blue.100" borderRadius="md">
+                        <ChartBarIcon className="w-5 h-5 text-blue-600" />
+                      </Box>
+                      <VStack align="start" gap="0">
+                        <Text fontWeight="bold">Cross-Module Analytics</Text>
+                        <Text fontSize="sm" color="gray.600">Holistic business correlations</Text>
+                      </VStack>
+                    </HStack>
+                    <Button size="sm" variant="outline" colorPalette="blue" w="full">
+                      Open Analysis
+                    </Button>
+                  </VStack>
+                </Card.Body>
+              </Card.Root>
+
+              <Card.Root 
+                variant="outline" 
+                cursor="pointer"
+                onClick={() => navigate('/dashboard/predictive-analytics')}
+                _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
+                transition="all 0.2s"
+              >
+                <Card.Body p="4">
+                  <VStack align="start" gap="3">
+                    <HStack gap="3">
+                      <Box p="2" bg="green.100" borderRadius="md">
+                        <ChartBarIcon className="w-5 h-5 text-green-600" />
+                      </Box>
+                      <VStack align="start" gap="0">
+                        <Text fontWeight="bold">Predictive Analytics</Text>
+                        <Text fontSize="sm" color="gray.600">AI-powered forecasting</Text>
+                      </VStack>
+                    </HStack>
+                    <Button size="sm" variant="outline" colorPalette="green" w="full">
+                      Open Analysis
+                    </Button>
+                  </VStack>
+                </Card.Body>
+              </Card.Root>
+            </Grid>
+          </Card.Body>
+        </Card.Root>
+
         {/* ✅ ALERTAS DETALLADAS - Solo si hay alertas críticas */}
         {alertSummary.critical > 0 && (
           <Card.Root>
@@ -250,7 +345,7 @@ export function Dashboard() {
                   size="sm" 
                   variant="outline" 
                   colorPalette="red"
-                  onClick={() => navigate('inventory')}
+                  onClick={() => navigate('/materials')}
                 >
                   Ver todos
                 </Button>

@@ -1,5 +1,5 @@
 import { BusinessRule } from './types';
-import { useInventoryStore } from '@/store/inventoryStore';
+import { useMaterialsStore } from '@/store/materialsStore';
 import { useSalesStore } from '@/store/salesStore';
 import { useCustomersStore } from '@/store/customersStore';
 import { useStaffStore } from '@/store/staffStore';
@@ -87,7 +87,7 @@ export const salesRules: BusinessRule[] = [
     name: 'sufficient_stock',
     description: 'Debe haber suficiente stock para la venta',
     validate: async (data) => {
-      const { items: inventoryItems } = useInventoryStore.getState();
+      const { items: inventoryItems } = useMaterialsStore.getState();
       
       for (const item of data.items) {
         const inventoryItem = inventoryItems.find(inv => inv.id === item.product_id);

@@ -44,31 +44,32 @@ export const lazyComponents = {
   
   // Analytics module (56KB split into chunks) 
   CrossModuleAnalytics: createLazyRoute(
-    () => import('@/tools/intelligence/business/LazyCrossModuleAnalytics'),
+    () => import('@/modules/dashboard/components/business/LazyCrossModuleAnalytics'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
   ),
   
   CorrelationsView: createLazyFeature(
-    () => import('@/tools/intelligence/business/components/CorrelationsView'),
+    () => import('@/modules/dashboard/components/business/components/CorrelationsView'),
     'analytics-correlations'
   ),
   
   BottlenecksView: createLazyFeature(
-    () => import('@/tools/intelligence/business/components/BottlenecksView'),
+    () => import('@/modules/dashboard/components/business/components/BottlenecksView'),
     'analytics-bottlenecks'
   ),
   
   // Executive dashboard (54KB split into chunks)
   ExecutiveDashboard: createLazyRoute(
-    () => import('@/tools/intelligence/business/LazyExecutiveDashboard'),
+    () => import('@/modules/dashboard/components/business/LazyExecutiveDashboard'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.EXECUTIVE
   ),
   
   ExecutiveKPIGrid: createLazyFeature(
-    () => import('@/tools/intelligence/business/components/ExecutiveKPIGrid'),
+    () => import('@/modules/dashboard/components/business/components/ExecutiveKPIGrid'),
     'executive-kpis'
   ),
   
+/*  
   // Recipe form (50KB split into chunks)
   RecipeForm: createLazyRoute(
     () => import('@/tools/intelligence/ui/LazyRecipeForm'),
@@ -83,7 +84,7 @@ export const lazyComponents = {
   RecipeAISuggestions: createLazyFeature(
     () => import('@/tools/intelligence/ui/components/RecipeAISuggestions'),
     'recipe-ai-suggestions'
-  )
+  ) */
 };
 
 // Performance monitoring for code splitting

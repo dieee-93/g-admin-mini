@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Box,
   VStack,
   HStack,
   Text,
   Button,
-  Tabs,
-  Card
+  Card,
+  Grid,
+  SimpleGrid,
+  Heading
 } from '@chakra-ui/react';
 import { CogIcon, PlusIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
@@ -19,7 +21,6 @@ import { CostAnalysisModule } from './ui/CostAnalysisModule';
 
 export function ProductsPage() {
   const { setQuickActions } = useNavigation();
-  const [activeTab, setActiveTab] = useState('products');
 
   // Set up quick actions
   useEffect(() => {
@@ -35,7 +36,7 @@ export function ProductsPage() {
         id: 'menu-analysis',
         label: 'Análisis de Menú',
         icon: CogIcon,
-        action: () => setActiveTab('menu-engineering'),
+        action: () => console.log('Menu analysis'),
         color: 'blue'
       }
     ];
@@ -73,28 +74,77 @@ export function ProductsPage() {
           </HStack>
         </HStack>
 
-        {/* Main Content */}
-        <Tabs.Root value={activeTab} onValueChange={(e) => setActiveTab(e.value)}>
-          <Tabs.List>
-            <Tabs.Trigger value="products">Products</Tabs.Trigger>
-            <Tabs.Trigger value="menu-engineering">Menu Engineering</Tabs.Trigger>
-            <Tabs.Trigger value="cost-analysis">Cost Analysis</Tabs.Trigger>
-          </Tabs.List>
+        {/* Products Dashboard - No nested tabs */}
+        <VStack gap={6} align="stretch">
+          {/* Products Overview Cards */}
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+            <Card.Root>
+              <Card.Body>
+                <VStack align="start" gap={2}>
+                  <CogIcon className="w-8 h-8 text-purple-600" />
+                  <Heading size="sm">Product Management</Heading>
+                  <Text fontSize="sm" color="gray.600">
+                    Manage menu items and pricing
+                  </Text>
+                </VStack>
+              </Card.Body>
+            </Card.Root>
 
-          <Box mt="6">
-            <Tabs.Content value="products">
-              <ProductList />
-            </Tabs.Content>
+            <Card.Root>
+              <Card.Body>
+                <VStack align="start" gap={2}>
+                  <ChartBarIcon className="w-8 h-8 text-blue-600" />
+                  <Heading size="sm">Menu Engineering</Heading>
+                  <Text fontSize="sm" color="gray.600">
+                    Optimize menu performance
+                  </Text>
+                </VStack>
+              </Card.Body>
+            </Card.Root>
 
-            <Tabs.Content value="menu-engineering">
-              <MenuEngineeringOnly />
-            </Tabs.Content>
+            <Card.Root>
+              <Card.Body>
+                <VStack align="start" gap={2}>
+                  <ChartBarIcon className="w-8 h-8 text-green-600" />
+                  <Heading size="sm">Cost Analysis</Heading>
+                  <Text fontSize="sm" color="gray.600">
+                    Track product costs and margins
+                  </Text>
+                </VStack>
+              </Card.Body>
+            </Card.Root>
+          </SimpleGrid>
 
-            <Tabs.Content value="cost-analysis">
-              <CostAnalysisModule />
-            </Tabs.Content>
-          </Box>
-        </Tabs.Root>
+          {/* All sections displayed together */}
+          <Grid templateColumns={{ base: "1fr", xl: "1fr 1fr" }} gap={6}>
+            <Card.Root>
+              <Card.Header>
+                <Heading size="md">Product Management</Heading>
+              </Card.Header>
+              <Card.Body>
+                <ProductList />
+              </Card.Body>
+            </Card.Root>
+
+            <Card.Root>
+              <Card.Header>
+                <Heading size="md">Menu Engineering</Heading>
+              </Card.Header>
+              <Card.Body>
+                <MenuEngineeringOnly />
+              </Card.Body>
+            </Card.Root>
+
+            <Card.Root gridColumn={{ base: "1", xl: "1 / -1" }}>
+              <Card.Header>
+                <Heading size="md">Cost Analysis</Heading>
+              </Card.Header>
+              <Card.Body>
+                <CostAnalysisModule />
+              </Card.Body>
+            </Card.Root>
+          </Grid>
+        </VStack>
       </VStack>
     </Box>
   );

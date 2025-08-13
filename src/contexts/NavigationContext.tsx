@@ -11,10 +11,19 @@ import {
   UserGroupIcon,
   WrenchScrewdriverIcon,
   CalendarDaysIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline';
 
 // ✅ Types definidos según arquitectura v2.0
+export interface NavigationSubModule {
+  id: string;
+  title: string;
+  path: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description?: string;
+}
+
 export interface NavigationModule {
   id: string;
   title: string;
@@ -24,6 +33,9 @@ export interface NavigationModule {
   description?: string;
   badge?: number;
   isActive?: boolean;
+  isExpandable?: boolean;
+  isExpanded?: boolean;
+  subModules?: NavigationSubModule[];
 }
 
 export interface QuickAction {
@@ -50,6 +62,7 @@ export interface NavigationContextType {
   // Navigation methods
   navigate: (moduleId: string, subPath?: string) => void;
   navigateBack: () => void;
+  toggleModuleExpansion: (moduleId: string) => void;
   
   // Navigation state
   canNavigateBack: boolean;
@@ -78,8 +91,47 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Dashboard',
     icon: HomeIcon,
     color: 'blue',
-    path: '/',
-    description: 'Centro de comando'
+    path: '/dashboard',
+    description: 'Business Intelligence + Analytics',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'executive',
+        title: 'Executive Dashboard',
+        path: '/dashboard/executive',
+        icon: ChartBarIcon,
+        description: 'Strategic KPIs and insights'
+      },
+      {
+        id: 'cross-analytics',
+        title: 'Cross-Module Analytics',
+        path: '/dashboard/cross-analytics',
+        icon: ChartBarIcon,
+        description: 'Holistic business correlations'
+      },
+      {
+        id: 'predictive-analytics',
+        title: 'Predictive Analytics',
+        path: '/dashboard/predictive-analytics',
+        icon: ChartBarIcon,
+        description: 'AI-powered forecasting'
+      },
+      {
+        id: 'competitive-intelligence',
+        title: 'Competitive Intelligence',
+        path: '/dashboard/competitive-intelligence',
+        icon: ChartBarIcon,
+        description: 'Market analysis and trends'
+      },
+      {
+        id: 'custom-reporting',
+        title: 'Custom Reporting',
+        path: '/dashboard/custom-reporting',
+        icon: DocumentTextIcon,
+        description: 'Generate custom reports'
+      }
+    ]
   },
   {
     id: 'sales',
@@ -113,7 +165,39 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     icon: CubeIcon,
     color: 'green',
     path: '/materials',
-    description: 'Inventario + Supply Chain Intelligence'
+    description: 'Inventario + Supply Chain Intelligence',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'inventory-management',
+        title: 'Inventory Management',
+        path: '/materials/inventory',
+        icon: CubeIcon,
+        description: 'Stock control and management'
+      },
+      {
+        id: 'abc-analysis',
+        title: 'ABC Analysis',
+        path: '/materials/abc-analysis',
+        icon: ChartBarIcon,
+        description: 'Product classification analysis'
+      },
+      {
+        id: 'supply-chain',
+        title: 'Supply Chain Intelligence',
+        path: '/materials/supply-chain',
+        icon: ChartBarIcon,
+        description: 'Supply chain optimization'
+      },
+      {
+        id: 'procurement',
+        title: 'Procurement Intelligence',
+        path: '/materials/procurement',
+        icon: ChartBarIcon,
+        description: 'Smart procurement decisions'
+      }
+    ]
   },
   {
     id: 'products',
@@ -121,7 +205,32 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     icon: CogIcon,
     color: 'purple',
     path: '/products',
-    description: 'Menu Engineering + Cost Analysis'
+    description: 'Menu Engineering + Cost Analysis',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'menu-engineering',
+        title: 'Menu Engineering',
+        path: '/products/menu-engineering',
+        icon: CogIcon,
+        description: 'Menu optimization and analysis'
+      },
+      {
+        id: 'cost-analysis',
+        title: 'Cost Analysis',
+        path: '/products/cost-analysis',
+        icon: ChartBarIcon,
+        description: 'Product cost management'
+      },
+      {
+        id: 'production-planning',
+        title: 'Production Planning',
+        path: '/products/production-planning',
+        icon: CalendarDaysIcon,
+        description: 'Production scheduling and planning'
+      }
+    ]
   },
   
   // 💰 FINANCIAL DOMAIN
@@ -134,14 +243,39 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     description: 'Facturación AFIP + Impuestos'
   },
   
-  // 👨‍💼 WORKFORCE DOMAIN
+  // 👨‍💼 HUMAN RESOURCES
   {
     id: 'staff',
     title: 'Staff',
     icon: UserGroupIcon,
     color: 'indigo',
     path: '/staff',
-    description: 'Gestión de personal'
+    description: 'Gestión de personal',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'staff-management',
+        title: 'Staff Management',
+        path: '/staff/management',
+        icon: UserGroupIcon,
+        description: 'Employee management'
+      },
+      {
+        id: 'time-tracking',
+        title: 'Time Tracking',
+        path: '/staff/time-tracking',
+        icon: ClockIcon,
+        description: 'Work time management'
+      },
+      {
+        id: 'training',
+        title: 'Training & Development',
+        path: '/staff/training',
+        icon: WrenchScrewdriverIcon,
+        description: 'Employee training programs'
+      }
+    ]
   },
   {
     id: 'scheduling',
@@ -152,22 +286,46 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     description: 'Horarios + Coverage Planning'
   },
   
-  // 🔧 INTELLIGENCE & TOOLS
-  {
-    id: 'tools',
-    title: 'Tools',
-    icon: WrenchScrewdriverIcon,
-    color: 'amber',
-    path: '/tools',
-    description: 'Intelligence + Diagnostics + Admin'
-  },
+  // Tools module removed - functionality distributed to respective modules
   {
     id: 'settings',
     title: 'Configuración',
     icon: Cog6ToothIcon,
     color: 'gray',
     path: '/settings',
-    description: 'Business Profile + Integraciones'
+    description: 'Business Profile + Integraciones',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'business-profile',
+        title: 'Business Profile',
+        path: '/settings/profile',
+        icon: Cog6ToothIcon,
+        description: 'Company information and settings'
+      },
+      {
+        id: 'integrations',
+        title: 'Integrations',
+        path: '/settings/integrations',
+        icon: WrenchScrewdriverIcon,
+        description: 'External service integrations'
+      },
+      {
+        id: 'diagnostics',
+        title: 'System Diagnostics',
+        path: '/settings/diagnostics',
+        icon: ChartBarIcon,
+        description: 'System health and diagnostics'
+      },
+      {
+        id: 'reporting',
+        title: 'Custom Reporting',
+        path: '/settings/reporting',
+        icon: DocumentTextIcon,
+        description: 'Report configuration'
+      }
+    ]
   }
 ];
 
@@ -387,29 +545,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
       color: 'purple'
     }
   ],
-  tools: [
-    {
-      id: 'recipe-intelligence',
-      label: 'Recipe Intelligence',
-      icon: CogIcon,
-      action: () => console.log('Recipe intelligence'),
-      color: 'orange'
-    },
-    {
-      id: 'business-analytics',
-      label: 'Business Analytics',
-      icon: ChartBarIcon,
-      action: () => console.log('Business analytics'),
-      color: 'purple'
-    },
-    {
-      id: 'diagnostics',
-      label: 'Diagnósticos',
-      icon: WrenchScrewdriverIcon,
-      action: () => console.log('System diagnostics'),
-      color: 'yellow'
-    }
-  ]
+  // tools section removed - functionality distributed
 }; */
 
 // ✅ Context creation
@@ -458,38 +594,38 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   // ✅ Derived state
   const showBottomNav = isMobile;
 
-  // ✅ Quick actions with real navigation
+  // ✅ Quick actions with new navigation structure
   const getQuickActionsForModule = (moduleId: string): QuickAction[] => {
     switch (moduleId) {
-      case 'tools':
+      case 'dashboard':
         return [
           {
-            id: 'recipe-intelligence',
-            label: 'Recipe Intelligence',
-            icon: CogIcon,
-            action: () => navigate('/tools/intelligence/recipes'),
-            color: 'orange'
-          },
-          {
-            id: 'business-analytics',
-            label: 'Business Analytics',
+            id: 'executive-dashboard',
+            label: 'Executive Dashboard',
             icon: ChartBarIcon,
-            action: () => navigate('/tools/intelligence/analytics'),
+            action: () => navigate('/dashboard/executive'),
             color: 'purple'
           },
           {
-            id: 'menu-engineering',
-            label: 'Menu Engineering',
-            icon: WrenchScrewdriverIcon,
-            action: () => navigate('/tools/intelligence/menu-engineering'),
+            id: 'cross-analytics',
+            label: 'Cross Analytics',
+            icon: CogIcon,
+            action: () => navigate('/dashboard/cross-analytics'),
             color: 'blue'
           },
           {
-            id: 'diagnostics',
-            label: 'Diagnósticos',
+            id: 'predictive-analytics',
+            label: 'Predictive Analytics',
             icon: WrenchScrewdriverIcon,
-            action: () => navigate('/tools/operational/diagnostics'),
-            color: 'yellow'
+            action: () => navigate('/dashboard/predictive-analytics'),
+            color: 'orange'
+          },
+          {
+            id: 'custom-reports',
+            label: 'Custom Reports',
+            icon: DocumentTextIcon,
+            action: () => navigate('/dashboard/custom-reports'),
+            color: 'green'
           }
         ];
       case 'sales':
@@ -536,7 +672,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             id: 'abc-analysis',
             label: 'ABC Analysis',
             icon: ChartBarIcon,
-            action: () => navigate('/tools/intelligence/abc-analysis'),
+            action: () => navigate('/materials/abc-analysis'),
             color: 'blue'
           }
         ];
@@ -546,14 +682,14 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             id: 'new-recipe',
             label: 'Nueva Receta',
             icon: CogIcon,
-            action: () => navigate('/tools/intelligence/recipes'),
+            action: () => navigate('/dashboard/recipes'),
             color: 'purple'
           },
           {
             id: 'menu-engineering',
             label: 'Menu Engineering',
             icon: ChartBarIcon,
-            action: () => navigate('/tools/intelligence/menu-engineering'),
+            action: () => navigate('/products'),
             color: 'blue'
           }
         ];
@@ -657,6 +793,15 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     }
   }, [canNavigateBack, navigate]);
 
+  // ✅ Toggle module expansion
+  const toggleModuleExpansion = useCallback((moduleId: string) => {
+    setModules(prev => prev.map(module => 
+      module.id === moduleId 
+        ? { ...module, isExpanded: !module.isExpanded }
+        : module
+    ));
+  }, []);
+
   // ✅ Update module badge
   const updateModuleBadge = useCallback((moduleId: string, count: number) => {
     setModules(prev => prev.map(module => 
@@ -676,6 +821,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     // Navigation methods
     navigate: handleNavigate,
     navigateBack: handleNavigateBack,
+    toggleModuleExpansion,
     
     // Navigation state
     canNavigateBack,

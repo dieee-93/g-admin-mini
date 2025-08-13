@@ -4,23 +4,23 @@
 
 import { useEffect } from 'react';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { useInventory } from '@/modules/materials/logic/useInventory';
+import { useMaterials } from '@/hooks/useZustandStores';
 
-export function NavigationBadgeSync() {
+export function NavigationBadgeSync(): null {
   const { updateModuleBadge } = useNavigation();
-  const { alertSummary, loading } = useInventory();
+  const { stats, loading } = useMaterials();
 
   useEffect(() => {
-    if (!loading && alertSummary) {
+    if (!loading && stats) {
       // ✅ Actualizar badge de inventario con alertas críticas + warning
-      const inventoryBadgeCount = alertSummary.critical + alertSummary.warning;
-      updateModuleBadge('inventory', inventoryBadgeCount);
+      const materialsBadgeCount = stats.criticalStockCount + stats.lowStockCount;
+      updateModuleBadge('materials', materialsBadgeCount);
 
       // ✅ TODO: Agregar badges para otros módulos según se implementen
       // updateModuleBadge('sales', pendingSalesCount);
       // updateModuleBadge('production', productionIssuesCount);
     }
-  }, [alertSummary, loading, updateModuleBadge]);
+  }, [stats, loading, updateModuleBadge]);
 
   return null; // Este componente no renderiza nada
 }

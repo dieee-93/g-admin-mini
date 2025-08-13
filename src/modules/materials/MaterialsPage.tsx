@@ -8,12 +8,12 @@ import { MaterialsGrid } from './components/MaterialsGrid';
 import { MaterialFormModal } from './components/MaterialFormModal';
 
 // Hooks
-import { useInventory } from '@/hooks/useZustandStores';
+import { useMaterials } from '@/hooks/useZustandStores';
 import { useApp } from '@/hooks/useZustandStores';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 // Types
-import { InventoryItem } from '@/store/inventoryStore';
+import { MaterialItem } from '@/store/materialsStore';
 
 export const MaterialsPage = () => {
   const navigation = useNavigation();
@@ -27,7 +27,7 @@ export const MaterialsPage = () => {
     deleteItem,
     setItems,
     refreshStats
-  } = useInventory();
+  } = useMaterials();
 
   // Initialize navigation badges
   useEffect(() => {

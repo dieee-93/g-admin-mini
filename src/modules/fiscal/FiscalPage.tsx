@@ -158,7 +158,8 @@ export function FiscalPage() {
         }
 
       } catch (error) {
-        console.error('Error auto-generating invoice for sale:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`Error auto-generating invoice for sale: ${errorMessage}`);
         notify.error('Error al generar factura automática para la venta');
       }
     };

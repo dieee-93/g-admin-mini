@@ -1,6 +1,6 @@
-// Refactored Sales Page with UNIFIED navigation pattern
-import { useState, useEffect } from 'react';
-import { Box, VStack, HStack, Text, Tabs, Badge, Card } from '@chakra-ui/react';
+// Sales Page - Unified dashboard without nested tabs  
+import { useEffect } from 'react';
+import { Box, VStack, HStack, Text, Badge, Card, Grid, SimpleGrid, Heading } from '@chakra-ui/react';
 import { 
   CreditCardIcon, 
   TableCellsIcon, 
@@ -58,7 +58,6 @@ const mockOrders = [{
 
 export default function SalesPage() {
   const { setQuickActions } = useNavigation();
-  const [activeSection, setActiveSection] = useState('pos');
 
   useEffect(() => {
     const quickActions = [
@@ -66,36 +65,21 @@ export default function SalesPage() {
         id: 'new-sale',
         label: 'Nueva Venta',
         icon: CreditCardIcon,
-        action: () => setActiveSection('pos'),
+        action: () => console.log('New sale'),
         color: 'blue'
       },
       {
-        id: 'kitchen-view',
-        label: 'Ver Cocina',
-        icon: ClipboardDocumentListIcon,
-        action: () => setActiveSection('kitchen'),
-        color: 'orange'
+        id: 'view-qr',
+        label: 'Códigos QR',
+        icon: QrCodeIcon,
+        action: () => console.log('QR codes'),
+        color: 'green'
       }
     ];
 
     setQuickActions(quickActions);
     return () => setQuickActions([]);
   }, [setQuickActions]);
-
-  const renderContent = () => {
-    switch (activeSection) {
-      case 'pos':
-        return <SalesView showConnectionStatus={true} />;
-      case 'tables':
-        return <TableFloorPlan tables={mockTables} onTableSelect={() => {}} />;
-      case 'kitchen':
-        return <KitchenDisplaySystem orders={mockOrders} />;
-      case 'analytics':
-        return <SalesIntelligenceDashboard />;
-      default:
-        return <SalesView showConnectionStatus={true} />;
-    }
-  };
 
   return (
     <Box minH="100vh" bg="gray.50">
@@ -128,40 +112,100 @@ export default function SalesPage() {
             </Card.Body>
           </Card.Root>
 
-          {/* UNIFIED PATTERN: Single POS Interface */}
-          <Tabs.Root 
-            value={activeSection} 
-            onValueChange={(e) => setActiveSection(e.value)}
-            variant="line"
-          >
-            <Tabs.List>
-              <Tabs.Trigger value="pos">
-                <CreditCardIcon className="w-4 h-4" />
-                POS
-                <Badge colorPalette="green" variant="subtle">Smart</Badge>
-              </Tabs.Trigger>
-              <Tabs.Trigger value="tables">
-                <TableCellsIcon className="w-4 h-4" />
-                Mesas
-              </Tabs.Trigger>
-              <Tabs.Trigger value="kitchen">
-                <ClipboardDocumentListIcon className="w-4 h-4" />
-                Cocina
-              </Tabs.Trigger>
-              <Tabs.Trigger value="analytics">
-                <ChartBarIcon className="w-4 h-4" />
-                Analytics
-                <Badge colorPalette="teal" variant="subtle">v3.0</Badge>
-              </Tabs.Trigger>
-            </Tabs.List>
+        {/* Sales Dashboard - No nested tabs */}
+        <VStack gap={6} align="stretch">
+          {/* Sales Overview Cards */}
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={4}>
+            <Card.Root>
+              <Card.Body>
+                <VStack align="start" gap={2}>
+                  <CreditCardIcon className="w-8 h-8 text-green-600" />
+                  <Heading size="sm">POS Sistema</Heading>
+                  <Text fontSize="sm" color="gray.600">
+                    Punto de venta inteligente
+                  </Text>
+                  <Badge colorPalette="green" variant="subtle">Smart</Badge>
+                </VStack>
+              </Card.Body>
+            </Card.Root>
 
-            {/* UNIFIED PATTERN: Content area */}
-            <Tabs.Content value={activeSection}>
-              <Box p="6">
-                {renderContent()}
-              </Box>
-            </Tabs.Content>
-          </Tabs.Root>
+            <Card.Root>
+              <Card.Body>
+                <VStack align="start" gap={2}>
+                  <TableCellsIcon className="w-8 h-8 text-blue-600" />
+                  <Heading size="sm">Gestión de Mesas</Heading>
+                  <Text fontSize="sm" color="gray.600">
+                    Control de ocupación
+                  </Text>
+                </VStack>
+              </Card.Body>
+            </Card.Root>
+
+            <Card.Root>
+              <Card.Body>
+                <VStack align="start" gap={2}>
+                  <ClipboardDocumentListIcon className="w-8 h-8 text-orange-600" />
+                  <Heading size="sm">Sistema de Cocina</Heading>
+                  <Text fontSize="sm" color="gray.600">
+                    Órdenes en tiempo real
+                  </Text>
+                </VStack>
+              </Card.Body>
+            </Card.Root>
+
+            <Card.Root>
+              <Card.Body>
+                <VStack align="start" gap={2}>
+                  <ChartBarIcon className="w-8 h-8 text-purple-600" />
+                  <Heading size="sm">Analytics</Heading>
+                  <Text fontSize="sm" color="gray.600">
+                    Inteligencia de ventas
+                  </Text>
+                  <Badge colorPalette="teal" variant="subtle">v3.0</Badge>
+                </VStack>
+              </Card.Body>
+            </Card.Root>
+          </SimpleGrid>
+
+          {/* All sections displayed together */}
+          <Grid templateColumns={{ base: "1fr", xl: "1fr 1fr" }} gap={6}>
+            <Card.Root>
+              <Card.Header>
+                <Heading size="md">Sistema POS</Heading>
+              </Card.Header>
+              <Card.Body>
+                <SalesView showConnectionStatus={true} />
+              </Card.Body>
+            </Card.Root>
+
+            <Card.Root>
+              <Card.Header>
+                <Heading size="md">Gestión de Mesas</Heading>
+              </Card.Header>
+              <Card.Body>
+                <TableFloorPlan tables={mockTables} onTableSelect={() => {}} />
+              </Card.Body>
+            </Card.Root>
+
+            <Card.Root>
+              <Card.Header>
+                <Heading size="md">Display de Cocina</Heading>
+              </Card.Header>
+              <Card.Body>
+                <KitchenDisplaySystem orders={mockOrders} />
+              </Card.Body>
+            </Card.Root>
+
+            <Card.Root>
+              <Card.Header>
+                <Heading size="md">Analytics de Ventas</Heading>
+              </Card.Header>
+              <Card.Body>
+                <SalesIntelligenceDashboard />
+              </Card.Body>
+            </Card.Root>
+          </Grid>
+        </VStack>
         </VStack>
       </Box>
     </Box>

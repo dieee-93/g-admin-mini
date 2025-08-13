@@ -12,8 +12,8 @@ import {
   createListCollection
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { useInventory } from '@/hooks/useZustandStores';
-import { InventoryItem } from '@/store/inventoryStore';
+import { useMaterials } from '@/hooks/useZustandStores';
+import { MaterialItem } from '@/store/materialsStore';
 import { useApp } from '@/hooks/useZustandStores';
 import { createValidationSchema, validateData } from '@/lib/validation';
 import { secureApiCall } from '@/lib/validation/security';
@@ -63,7 +63,7 @@ export const MaterialFormModal = () => {
     closeModal,
     addItem,
     updateItem 
-  } = useInventory();
+  } = useMaterials();
   
   const { handleError } = useApp();
   

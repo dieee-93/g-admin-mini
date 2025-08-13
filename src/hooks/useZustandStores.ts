@@ -1,7 +1,8 @@
 // Custom hooks for accessing Zustand stores with better TypeScript support
 
+import { useCallback } from 'react';
 import { useAppStore } from '@/store/appStore';
-import { useMaterialsStore, useInventoryStore } from '@/store/materialsStore';
+import { useMaterialsStore } from '@/store/materialsStore';
 import { useSalesStore } from '@/store/salesStore';
 import { useCustomersStore } from '@/store/customersStore';
 import { useStaffStore } from '@/store/staffStore';
@@ -49,31 +50,29 @@ export const useMaterials = () => {
   const modalMode = useMaterialsStore(state => state.modalMode);
   const currentItem = useMaterialsStore(state => state.currentItem);
   
-  const actions = useMaterialsStore(state => ({
-    setItems: state.setItems,
-    addItem: state.addItem,
-    updateItem: state.updateItem,
-    deleteItem: state.deleteItem,
-    bulkUpdateStock: state.bulkUpdateStock,
-    setLoading: state.setLoading,
-    setError: state.setError,
-    setFilters: state.setFilters,
-    resetFilters: state.resetFilters,
-    selectItem: state.selectItem,
-    deselectItem: state.deselectItem,
-    selectAll: state.selectAll,
-    deselectAll: state.deselectAll,
-    openModal: state.openModal,
-    closeModal: state.closeModal,
-    refreshStats: state.refreshStats
-  }));
+  // Individual action selectors to avoid object recreation
+  const setItems = useMaterialsStore(state => state.setItems);
+  const addItem = useMaterialsStore(state => state.addItem);
+  const updateItem = useMaterialsStore(state => state.updateItem);
+  const deleteItem = useMaterialsStore(state => state.deleteItem);
+  const bulkUpdateStock = useMaterialsStore(state => state.bulkUpdateStock);
+  const setLoading = useMaterialsStore(state => state.setLoading);
+  const setError = useMaterialsStore(state => state.setError);
+  const setFilters = useMaterialsStore(state => state.setFilters);
+  const resetFilters = useMaterialsStore(state => state.resetFilters);
+  const selectItem = useMaterialsStore(state => state.selectItem);
+  const deselectItem = useMaterialsStore(state => state.deselectItem);
+  const selectAll = useMaterialsStore(state => state.selectAll);
+  const deselectAll = useMaterialsStore(state => state.deselectAll);
+  const openModal = useMaterialsStore(state => state.openModal);
+  const closeModal = useMaterialsStore(state => state.closeModal);
+  const refreshStats = useMaterialsStore(state => state.refreshStats);
 
-  const selectors = useMaterialsStore(state => ({
-    getFilteredItems: state.getFilteredItems,
-    getLowStockItems: state.getLowStockItems,
-    getCriticalStockItems: state.getCriticalStockItems,
-    getItemsByCategory: state.getItemsByCategory
-  }));
+  // Individual selector functions
+  const getFilteredItems = useMaterialsStore(state => state.getFilteredItems);
+  const getLowStockItems = useMaterialsStore(state => state.getLowStockItems);
+  const getCriticalStockItems = useMaterialsStore(state => state.getCriticalStockItems);
+  const getItemsByCategory = useMaterialsStore(state => state.getItemsByCategory);
 
   return {
     items,
@@ -86,65 +85,31 @@ export const useMaterials = () => {
     isModalOpen,
     modalMode,
     currentItem,
-    ...actions,
-    ...selectors
+    // Actions
+    setItems,
+    addItem,
+    updateItem,
+    deleteItem,
+    bulkUpdateStock,
+    setLoading,
+    setError,
+    setFilters,
+    resetFilters,
+    selectItem,
+    deselectItem,
+    selectAll,
+    deselectAll,
+    openModal,
+    closeModal,
+    refreshStats,
+    // Selectors
+    getFilteredItems,
+    getLowStockItems,
+    getCriticalStockItems,
+    getItemsByCategory
   };
 };
 
-// Legacy Inventory Store Hook (backwards compatibility)
-export const useInventory = () => {
-  const items = useInventoryStore(state => state.items);
-  const categories = useInventoryStore(state => state.categories);
-  const loading = useInventoryStore(state => state.loading);
-  const error = useInventoryStore(state => state.error);
-  const filters = useInventoryStore(state => state.filters);
-  const stats = useInventoryStore(state => state.stats);
-  const selectedItems = useInventoryStore(state => state.selectedItems);
-  const isModalOpen = useInventoryStore(state => state.isModalOpen);
-  const modalMode = useInventoryStore(state => state.modalMode);
-  const currentItem = useInventoryStore(state => state.currentItem);
-  
-  const actions = useInventoryStore(state => ({
-    setItems: state.setItems,
-    addItem: state.addItem,
-    updateItem: state.updateItem,
-    deleteItem: state.deleteItem,
-    bulkUpdateStock: state.bulkUpdateStock,
-    setLoading: state.setLoading,
-    setError: state.setError,
-    setFilters: state.setFilters,
-    resetFilters: state.resetFilters,
-    selectItem: state.selectItem,
-    deselectItem: state.deselectItem,
-    selectAll: state.selectAll,
-    deselectAll: state.deselectAll,
-    openModal: state.openModal,
-    closeModal: state.closeModal,
-    refreshStats: state.refreshStats
-  }));
-
-  const selectors = useInventoryStore(state => ({
-    getFilteredItems: state.getFilteredItems,
-    getLowStockItems: state.getLowStockItems,
-    getCriticalStockItems: state.getCriticalStockItems,
-    getItemsByCategory: state.getItemsByCategory
-  }));
-
-  return {
-    items,
-    categories,
-    loading,
-    error,
-    filters,
-    stats,
-    selectedItems,
-    isModalOpen,
-    modalMode,
-    currentItem,
-    ...actions,
-    ...selectors
-  };
-};
 
 // Sales Store Hook
 export const useSales = () => {
