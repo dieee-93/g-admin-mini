@@ -3,4 +3,4 @@ export { MaterialsHeader } from './MaterialsHeader';
 export { MaterialsFilters } from './MaterialsFilters';
 export { MaterialsGrid } from './MaterialsGrid';
 export { MaterialFormModal } from './MaterialFormModal';
-export { ABCAnalysisPage } from './ABCAnalysisPage';
+export { default as ABCAnalysisPage } from './ABCAnalysisPage';

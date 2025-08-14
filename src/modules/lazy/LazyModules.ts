@@ -75,17 +75,8 @@ export const LazySchedulingPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Intelligence/Recipes Module
-export const LazyRecipesPage = createLazyComponent(
-  () => import('../../tools/intelligence/RecipesPage'),
-  'recipes',
-  {
-    chunkName: 'recipes-module',
-    preload: false,
-    priority: 'low',
-    cacheStrategy: 'memory'
-  }
-);
+// NOTE: Recipes functionality migrated to services/recipe and dashboard
+// LazyRecipesPage removed - use RecipeForm from services/recipe instead
 
 // Lazy-loaded Fiscal Module (TIER 1 - Critical)
 export const LazyFiscalPage = createLazyComponent(
@@ -95,6 +86,18 @@ export const LazyFiscalPage = createLazyComponent(
     chunkName: 'fiscal-module',
     preload: false,
     priority: 'high', // Critical for compliance and invoicing
+    cacheStrategy: 'both'
+  }
+);
+
+// Lazy-loaded Products Module
+export const LazyProductsPage = createLazyComponent(
+  () => import('../products/ProductsPage'),
+  'products',
+  {
+    chunkName: 'products-module',
+    preload: false,
+    priority: 'medium',
     cacheStrategy: 'both'
   }
 );
@@ -132,15 +135,13 @@ export const modulePreloadingConfig = {
   // When user is on operations, preload related modules
   operations: [
     { module: 'sales', priority: 'high' as const },
-    { module: 'materials', priority: 'medium' as const },
-    { module: 'recipes', priority: 'low' as const }
+    { module: 'materials', priority: 'medium' as const }
   ],
   
   // When user is on materials, preload related modules
   materials: [
     { module: 'sales', priority: 'high' as const },
-    { module: 'operations', priority: 'medium' as const },
-    { module: 'recipes', priority: 'low' as const }
+    { module: 'operations', priority: 'medium' as const }
   ],
   
   // When user is on staff, preload scheduling
@@ -198,17 +199,17 @@ export const moduleMetadata = {
     criticality: 'low',
     description: 'Staff scheduling and shift management'
   },
-  recipes: {
-    estimatedSize: '~130KB',
-    dependencies: ['events'],
-    criticality: 'low',
-    description: 'Recipe management and intelligence tools'
-  },
   fiscal: {
     estimatedSize: '~160KB',
     dependencies: ['offline', 'events'],
     criticality: 'high',
     description: 'Fiscal compliance, invoicing, and AFIP integration'
+  },
+  products: {
+    estimatedSize: '~150KB',
+    dependencies: ['offline', 'events'],
+    criticality: 'medium',
+    description: 'Product catalog, menu engineering, and production planning'
   },
   settings: {
     estimatedSize: '~90KB',
@@ -223,10 +224,10 @@ export const lazyModules = {
   LazySalesPage,
   LazyOperationsPage,
   LazyMaterialsPage,
+  LazyProductsPage,
   LazyStaffPage,
   LazyCustomersPage,
   LazySchedulingPage,
-  LazyRecipesPage,
   LazyFiscalPage,
   LazySettingsPage
 };

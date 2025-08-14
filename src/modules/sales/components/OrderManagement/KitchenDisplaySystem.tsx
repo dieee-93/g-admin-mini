@@ -371,24 +371,24 @@ export function KitchenDisplaySystem({
                 </Box>
 
                 {/* Special Instructions & Allergies */}
-                {(order.special_instructions.length > 0 || order.allergy_warnings.length > 0) && (
+                {((order.special_instructions?.length || 0) > 0 || (order.allergy_warnings?.length || 0) > 0) && (
                   <VStack gap="2" align="stretch">
-                    {order.special_instructions.length > 0 && (
+                    {(order.special_instructions?.length || 0) > 0 && (
                       <Alert.Root status="info" size="sm">
                         <Alert.Indicator />
                         <Alert.Title>Special Instructions</Alert.Title>
                         <Alert.Description>
-                          {order.special_instructions.join(', ')}
+                          {order.special_instructions?.join(', ') || ''}
                         </Alert.Description>
                       </Alert.Root>
                     )}
                     
-                    {order.allergy_warnings.length > 0 && (
+                    {(order.allergy_warnings?.length || 0) > 0 && (
                       <Alert.Root status="warning" size="sm">
                         <Alert.Indicator />
                         <Alert.Title>Allergy Warnings</Alert.Title>
                         <Alert.Description>
-                          {order.allergy_warnings.join(', ')}
+                          {order.allergy_warnings?.join(', ') || ''}
                         </Alert.Description>
                       </Alert.Root>
                     )}
@@ -416,15 +416,15 @@ export function KitchenDisplaySystem({
                               </VStack>
                               
                               <Badge colorPalette={statusColor} size="sm">
-                                {item.status.replace('_', ' ')}
+                                {item.status?.replace('_', ' ') || 'Unknown'}
                               </Badge>
                             </HStack>
 
                             {/* Item Modifications */}
-                            {item.modifications.length > 0 && (
+                            {(item.modifications?.length || 0) > 0 && (
                               <Box p="2" bg="gray.50" borderRadius="sm">
                                 <Text fontSize="xs" fontWeight="medium" mb="1">Modifications:</Text>
-                                {item.modifications.map((mod, idx) => (
+                                {(item.modifications || []).map((mod, idx) => (
                                   <Text key={idx} fontSize="xs" color="gray.600">
                                     • {mod.description}
                                   </Text>
@@ -440,11 +440,11 @@ export function KitchenDisplaySystem({
                             )}
 
                             {/* Allergy Warnings */}
-                            {item.allergy_warnings.length > 0 && (
+                            {(item.allergy_warnings?.length || 0) > 0 && (
                               <HStack gap="1" wrap="wrap">
                                 <ExclamationTriangleIcon className="w-3 h-3 text-red-500" />
                                 <Text fontSize="xs" color="red.600" fontWeight="medium">
-                                  Allergies: {item.allergy_warnings.join(', ')}
+                                  Allergies: {item.allergy_warnings?.join(', ') || ''}
                                 </Text>
                               </HStack>
                             )}

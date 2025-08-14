@@ -1,6 +1,6 @@
 import { Box, HStack, VStack, Text, Button, Badge } from '@chakra-ui/react';
 import { PlusIcon, ChartBarIcon } from '@heroicons/react/24/outline';
-import { useInventory } from '@/hooks/useZustandStores';
+import { useMaterials } from '@/hooks/useZustandStores';
 
 interface MaterialsHeaderProps {
   onAddItem: () => void;
@@ -8,7 +8,7 @@ interface MaterialsHeaderProps {
 }
 
 export const MaterialsHeader = ({ onAddItem, onShowAnalytics }: MaterialsHeaderProps) => {
-  const { stats } = useInventory();
+  const { stats } = useMaterials();
 
   return (
     <Box p={6} borderBottomWidth={1} borderColor="gray.200">

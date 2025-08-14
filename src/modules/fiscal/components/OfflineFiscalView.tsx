@@ -15,7 +15,6 @@ import {
   Tabs,
   SimpleGrid,
   Stat,
-  Tooltip,
   Switch
 } from '@chakra-ui/react';
 import {
@@ -266,7 +265,7 @@ export function OfflineFiscalView() {
   return (
     <Box>
       {/* Offline Status Header */}
-      <Card mb={6} p={4}>
+      <Card.Root mb={6} p={4}>
         <HStack justify="space-between" align="center">
           <HStack spacing={4}>
             <Badge 
@@ -319,12 +318,12 @@ export function OfflineFiscalView() {
             </Button>
           </HStack>
         </HStack>
-      </Card>
+      </Card.Root>
 
       {/* Offline Fiscal Stats */}
       {fiscalStats && (
         <SimpleGrid columns={{ base: 2, md: 4 }} gap={4} mb={6}>
-          <Card p={4}>
+          <Card.Root p={4}>
             <Stat.Root>
               <Stat.Label fontSize="sm">Facturas Pendientes</Stat.Label>
               <Stat.ValueText fontSize="2xl" color="yellow.500">
@@ -335,9 +334,9 @@ export function OfflineFiscalView() {
                 Esperando AFIP
               </Stat.HelpText>
             </Stat.Root>
-          </Card>
+          </Card.Root>
 
-          <Card p={4}>
+          <Card.Root p={4}>
             <Stat.Root>
               <Stat.Label fontSize="sm">En Cola Sync</Stat.Label>
               <Stat.ValueText fontSize="2xl" color="blue.500">
@@ -348,9 +347,9 @@ export function OfflineFiscalView() {
                 Para sincronizar
               </Stat.HelpText>
             </Stat.Root>
-          </Card>
+          </Card.Root>
 
-          <Card p={4}>
+          <Card.Root p={4}>
             <Stat.Root>
               <Stat.Label fontSize="sm">Total Offline</Stat.Label>
               <Stat.ValueText fontSize="2xl" color="green.500">
@@ -361,9 +360,9 @@ export function OfflineFiscalView() {
                 Monto acumulado
               </Stat.HelpText>
             </Stat.Root>
-          </Card>
+          </Card.Root>
 
-          <Card p={4}>
+          <Card.Root p={4}>
             <Stat.Root>
               <Stat.Label fontSize="sm">Errores Sync</Stat.Label>
               <Stat.ValueText fontSize="2xl" color={fiscalStats.syncErrors > 0 ? "red.500" : "gray.500"}>
@@ -374,7 +373,7 @@ export function OfflineFiscalView() {
                 Requieren atención
               </Stat.HelpText>
             </Stat.Root>
-          </Card>
+          </Card.Root>
         </SimpleGrid>
       )}
 
@@ -394,7 +393,7 @@ export function OfflineFiscalView() {
 
       {/* Sync Progress */}
       {isSyncing && (
-        <Card mb={4} p={4} bg="blue.50" borderColor="blue.200" borderWidth="1px">
+        <Card.Root mb={4} p={4} bg="blue.50" borderColor="blue.200" borderWidth="1px">
           <VStack spacing={3}>
             <HStack justify="space-between" w="full">
               <Text fontSize="sm" fontWeight="medium" color="blue.700">
@@ -411,11 +410,11 @@ export function OfflineFiscalView() {
               Sincronización automática en progreso. No cerrar la aplicación.
             </Text>
           </VStack>
-        </Card>
+        </Card.Root>
       )}
 
       {/* Offline Invoice Management */}
-      <Card p={6}>
+      <Card.Root p={6}>
         <VStack spacing={6} align="stretch">
           <HStack justify="space-between">
             <Text fontSize="lg" fontWeight="semibold">Gestión Fiscal Offline</Text>
@@ -447,7 +446,7 @@ export function OfflineFiscalView() {
               const syncProps = getSyncStatusBadgeProps(invoice.syncStatus);
               
               return (
-                <Card key={invoice.id} p={4} variant="outline">
+                <Card.Root key={invoice.id} p={4} variant="outline">
                   <HStack justify="space-between">
                     <VStack align="start" spacing={2}>
                       <HStack spacing={3}>
@@ -487,16 +486,15 @@ export function OfflineFiscalView() {
 
                     <VStack spacing={2}>
                       {invoice.syncStatus === 'failed' && (
-                        <Tooltip label="Reintentar sincronización con AFIP">
-                          <Button
-                            size="xs"
-                            colorPalette="orange"
-                            onClick={() => handleSyncInvoice(invoice)}
-                            leftIcon={<CloudArrowUpIcon className="w-3 h-3" />}
-                          >
-                            Reintentar
-                          </Button>
-                        </Tooltip>
+                        <Button
+                          size="xs"
+                          colorPalette="orange"
+                          onClick={() => handleSyncInvoice(invoice)}
+                          leftIcon={<CloudArrowUpIcon className="w-3 h-3" />}
+                          title="Reintentar sincronización con AFIP"
+                        >
+                          Reintentar
+                        </Button>
                       )}
 
                       {invoice.syncStatus === 'queued' && (
@@ -514,7 +512,7 @@ export function OfflineFiscalView() {
                       )}
                     </VStack>
                   </HStack>
-                </Card>
+                </Card.Root>
               );
             })}
           </VStack>
@@ -527,7 +525,7 @@ export function OfflineFiscalView() {
             </Box>
           )}
         </VStack>
-      </Card>
+      </Card.Root>
     </Box>
   );
 }

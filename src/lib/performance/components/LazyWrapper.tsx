@@ -429,8 +429,16 @@ export function LazyLoadingMonitor() {
   }, []);
 
   return (
-    <Card.Root>
-      <Card.Body p="4">
+    <Box
+      position="fixed"
+      bottom="4"
+      right="4"
+      zIndex={9999}
+      maxW="320px"
+      shadow="lg"
+    >
+      <Card.Root>
+        <Card.Body p="4">
         <VStack gap="4" align="stretch">
           <HStack justify="space-between" align="center">
             <Text fontWeight="semibold">Lazy Loading Performance</Text>
@@ -508,6 +516,7 @@ export function LazyLoadingMonitor() {
         </VStack>
       </Card.Body>
     </Card.Root>
+    </Box>
   );
 }
 

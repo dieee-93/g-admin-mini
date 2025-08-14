@@ -13,7 +13,7 @@ import {
   AdjustmentsHorizontalIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
-import { useInventory } from '@/hooks/useZustandStores';
+import { useMaterials } from '@/hooks/useZustandStores';
 
 const statusOptions = createListCollection({
   items: [
@@ -47,7 +47,7 @@ export const MaterialsFilters = () => {
     categories, 
     setFilters, 
     resetFilters 
-  } = useInventory();
+  } = useMaterials();
 
   const categoryOptions = createListCollection({
     items: [

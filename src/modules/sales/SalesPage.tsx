@@ -201,7 +201,11 @@ export default function SalesPage() {
                 <Heading size="md">Analytics de Ventas</Heading>
               </Card.Header>
               <Card.Body>
-                <SalesIntelligenceDashboard />
+                <SalesIntelligenceDashboard 
+                  analytics={{} as any}
+                  onDateRangeChange={() => {}}
+                  onRefresh={() => {}}
+                />
               </Card.Body>
             </Card.Root>
           </Grid>

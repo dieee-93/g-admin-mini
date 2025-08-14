@@ -110,7 +110,7 @@ export function SalesIntelligenceDashboard({
         return [
           {
             title: 'Daily Revenue',
-            value: analytics.daily_revenue,
+            value: analytics?.daily_revenue || 0,
             format: 'currency',
             icon: CurrencyDollarIcon,
             color: 'green',
@@ -118,7 +118,7 @@ export function SalesIntelligenceDashboard({
           },
           {
             title: 'Average Order Value',
-            value: analytics.average_order_value,
+            value: analytics?.average_order_value || 0,
             format: 'currency',
             icon: ChartBarIcon,
             color: 'blue',
@@ -126,7 +126,7 @@ export function SalesIntelligenceDashboard({
           },
           {
             title: 'Gross Profit Margin',
-            value: analytics.gross_profit_margin,
+            value: analytics?.gross_profit_margin || 0,
             format: 'percentage',
             icon: ArrowTrendingUpIcon,
             color: 'purple',
@@ -134,10 +134,10 @@ export function SalesIntelligenceDashboard({
           },
           {
             title: 'Food Cost %',
-            value: analytics.food_cost_percentage,
+            value: analytics?.food_cost_percentage || 0,
             format: 'percentage',
             icon: ChartBarIcon,
-            color: analytics.food_cost_percentage > 30 ? 'red' : 'green',
+            color: (analytics?.food_cost_percentage || 0) > 30 ? 'red' : 'green',
             target: 30
           }
         ];
@@ -146,29 +146,29 @@ export function SalesIntelligenceDashboard({
         return [
           {
             title: 'Table Utilization',
-            value: analytics.table_utilization,
+            value: analytics?.table_utilization || 0,
             format: 'percentage',
             icon: UsersIcon,
             color: 'orange'
           },
           {
             title: 'Average Service Time',
-            value: analytics.average_service_time,
+            value: analytics?.average_service_time || 0,
             format: 'time',
             icon: ClockIcon,
-            color: analytics.average_service_time > 45 ? 'red' : 'green',
+            color: (analytics?.average_service_time || 0) > 45 ? 'red' : 'green',
             target: 30
           },
           {
             title: 'Table Turnover Rate',
-            value: analytics.table_turnover_rate,
+            value: analytics?.table_turnover_rate || 0,
             format: 'number',
             icon: ArrowTrendingUpIcon,
             color: 'blue'
           },
           {
             title: 'Average Covers',
-            value: analytics.average_covers,
+            value: analytics?.average_covers || 0,
             format: 'number',
             icon: UsersIcon,
             color: 'cyan'
@@ -179,14 +179,14 @@ export function SalesIntelligenceDashboard({
         return [
           {
             title: 'Customer Acquisition Cost',
-            value: analytics.customer_acquisition_cost,
+            value: analytics?.customer_acquisition_cost || 0,
             format: 'currency',
             icon: UsersIcon,
             color: 'purple'
           },
           {
             title: 'Repeat Customer Rate',
-            value: analytics.repeat_customer_rate,
+            value: analytics?.repeat_customer_rate || 0,
             format: 'percentage',
             icon: ArrowTrendingUpIcon,
             color: 'green',
@@ -194,14 +194,14 @@ export function SalesIntelligenceDashboard({
           },
           {
             title: 'Customer Lifetime Value',
-            value: analytics.customer_lifetime_value,
+            value: analytics?.customer_lifetime_value || 0,
             format: 'currency',
             icon: CurrencyDollarIcon,
             color: 'gold'
           },
           {
             title: 'Sales per Labor Hour',
-            value: analytics.sales_per_labor_hour,
+            value: analytics?.sales_per_labor_hour || 0,
             format: 'currency',
             icon: ClockIcon,
             color: 'blue'
@@ -397,35 +397,35 @@ export function SalesIntelligenceDashboard({
             <Stat.Root>
               <Stat.Label>Current Revenue</Stat.Label>
               <Stat.ValueText>
-                ${analytics.current_day_metrics.current_revenue.toLocaleString()}
+                ${(analytics?.current_day_metrics?.current_revenue || 0).toLocaleString()}
               </Stat.ValueText>
             </Stat.Root>
             
             <Stat.Root>
               <Stat.Label>Orders in Progress</Stat.Label>
               <Stat.ValueText>
-                {analytics.current_day_metrics.orders_in_progress}
+                {analytics?.current_day_metrics?.orders_in_progress || 0}
               </Stat.ValueText>
             </Stat.Root>
             
             <Stat.Root>
               <Stat.Label>Tables Occupied</Stat.Label>
               <Stat.ValueText>
-                {analytics.current_day_metrics.tables_occupied}
+                {analytics?.current_day_metrics?.tables_occupied || 0}
               </Stat.ValueText>
             </Stat.Root>
             
             <Stat.Root>
               <Stat.Label>Avg Wait Time</Stat.Label>
               <Stat.ValueText>
-                {Math.round(analytics.current_day_metrics.average_wait_time)}m
+                {Math.round(analytics?.current_day_metrics?.average_wait_time || 0)}m
               </Stat.ValueText>
             </Stat.Root>
             
             <Stat.Root>
               <Stat.Label>Kitchen Backlog</Stat.Label>
-              <Stat.ValueText color={analytics.current_day_metrics.kitchen_backlog > 10 ? 'red.500' : 'green.500'}>
-                {analytics.current_day_metrics.kitchen_backlog}
+              <Stat.ValueText color={(analytics?.current_day_metrics?.kitchen_backlog || 0) > 10 ? 'red.500' : 'green.500'}>
+                {analytics?.current_day_metrics?.kitchen_backlog || 0}
               </Stat.ValueText>
             </Stat.Root>
           </Grid>
@@ -433,7 +433,7 @@ export function SalesIntelligenceDashboard({
       </Card.Root>
 
       {/* Business Alerts & Insights */}
-      {analytics.alerts_and_insights.length > 0 && (
+      {(analytics?.alerts_and_insights?.length || 0) > 0 && (
         <Card.Root>
           <Card.Header>
             <HStack gap="2">
@@ -443,7 +443,7 @@ export function SalesIntelligenceDashboard({
           </Card.Header>
           <Card.Body>
             <VStack gap="3" align="stretch">
-              {analytics.alerts_and_insights.map((alert, index) => (
+              {(analytics?.alerts_and_insights || []).map((alert, index) => (
                 <Alert.Root
                   key={index}
                   status={
@@ -485,7 +485,7 @@ export function SalesIntelligenceDashboard({
         </Card.Header>
         <Card.Body>
           <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }} gap="4">
-            {analytics.menu_item_performance.slice(0, 6).map((item, index) => (
+            {(analytics?.menu_item_performance || []).slice(0, 6).map((item, index) => (
               <Card.Root key={index} p="3" variant="outline">
                 <HStack justify="space-between" align="center">
                   <VStack align="start" gap="1">
@@ -529,7 +529,7 @@ export function SalesIntelligenceDashboard({
         </Card.Header>
         <Card.Body>
           <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap="3">
-            {analytics.peak_hours_analysis.map((hour, index) => (
+            {(analytics?.peak_hours_analysis || []).map((hour, index) => (
               <Card.Root key={index} p="3" variant="outline">
                 <VStack gap="2" align="center">
                   <Text fontWeight="bold" fontSize="lg">{hour.time_slot}</Text>

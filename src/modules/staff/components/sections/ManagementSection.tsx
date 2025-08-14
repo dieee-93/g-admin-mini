@@ -19,7 +19,8 @@ import {
   Alert,
   Separator,
   CheckboxGroup,
-  Flex
+  Flex,
+  createListCollection
 } from '@chakra-ui/react';
 import { 
   ShieldCheckIcon,
@@ -230,7 +231,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
               ) : (
                 <EyeIcon className="w-5 h-5 text-gray-500" />
               )}
-              <Switch
+              <Switch.Root
                 checked={showSensitiveData}
                 onCheckedChange={(details) => setShowSensitiveData(details.checked)}
                 size="lg"
@@ -274,10 +275,10 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                     <HStack justify="space-between">
                       <Text fontSize="lg" fontWeight="semibold">Gestión de Nómina</Text>
                       <Button 
-                        leftIcon={<PlusIcon className="w-4 h-4" />} 
                         colorPalette="green"
                         size="sm"
                       >
+                        <PlusIcon className="w-4 h-4 mr-2" />
                         Procesar Nómina
                       </Button>
                     </HStack>
@@ -299,7 +300,9 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                           <Table.Row key={payroll.employee_id}>
                             <Table.Cell>
                               <HStack gap="2">
-                                <Avatar size="xs" name={payroll.employee_id} />
+                                <Avatar.Root size="xs"  >
+                                  <Avatar.Fallback name={payroll.employee_id}/>
+                                </Avatar.Root>
                                 <Text fontSize="sm">{payroll.employee_id}</Text>
                               </HStack>
                             </Table.Cell>
@@ -372,10 +375,10 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                   <HStack justify="space-between">
                     <Text fontSize="lg" fontWeight="semibold">Gestión de Permisos</Text>
                     <Button 
-                      leftIcon={<UserPlusIcon className="w-4 h-4" />} 
                       colorPalette="blue"
                       size="sm"
                     >
+                      <UserPlusIcon className="w-4 h-4 mr-2" />
                       Nuevo Rol
                     </Button>
                   </HStack>
@@ -570,16 +573,23 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                   <HStack justify="space-between">
                     <Text fontSize="lg" fontWeight="semibold">Registro de Auditoría</Text>
                     <HStack gap="2">
-                      <Select.Root defaultValue={["today"]} size="sm" width="150px">
+                      <Select.Root 
+                        collection={createListCollection({
+                          items: [
+                            { value: "today", label: "Hoy" },
+                            { value: "week", label: "Esta semana" },
+                            { value: "month", label: "Este mes" },
+                            { value: "all", label: "Todo" }
+                          ]
+                        })}
+                        defaultValue={["today"]} 
+                        size="sm" 
+                        width="150px"
+                      >
                         <Select.Trigger>
                           <Select.ValueText />
                         </Select.Trigger>
-                        <Select.Content>
-                          <Select.Item value="today">Hoy</Select.Item>
-                          <Select.Item value="week">Esta semana</Select.Item>
-                          <Select.Item value="month">Este mes</Select.Item>
-                          <Select.Item value="all">Todo</Select.Item>
-                        </Select.Content>
+                        <Select.Content />
                       </Select.Root>
                       <Button size="sm" variant="outline">
                         Exportar
@@ -652,7 +662,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 <Text fontSize="sm" fontWeight="medium">Autenticación de 2 Factores</Text>
                                 <Text fontSize="xs" color="gray.600">Requerida para acceso HR</Text>
                               </VStack>
-                              <Switch defaultChecked size="sm" />
+                              <Switch.Root defaultChecked size="sm" />
                             </HStack>
 
                             <HStack justify="space-between">
@@ -660,7 +670,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 <Text fontSize="sm" fontWeight="medium">Enmascarar Datos Sensibles</Text>
                                 <Text fontSize="xs" color="gray.600">Por defecto ocultar salarios</Text>
                               </VStack>
-                              <Switch defaultChecked size="sm" />
+                              <Switch.Root defaultChecked size="sm" />
                             </HStack>
 
                             <HStack justify="space-between">
@@ -668,7 +678,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 <Text fontSize="sm" fontWeight="medium">Registro de Auditoría</Text>
                                 <Text fontSize="xs" color="gray.600">Auditar todas las acciones</Text>
                               </VStack>
-                              <Switch defaultChecked size="sm" />
+                              <Switch.Root defaultChecked size="sm" />
                             </HStack>
 
                             <HStack justify="space-between">
@@ -676,15 +686,22 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 <Text fontSize="sm" fontWeight="medium">Timeout de Sesión</Text>
                                 <Text fontSize="xs" color="gray.600">Auto-logout por inactividad</Text>
                               </VStack>
-                              <Select.Root defaultValue={["30"]} size="sm" width="100px">
+                              <Select.Root 
+                                collection={createListCollection({
+                                  items: [
+                                    { value: "15", label: "15 min" },
+                                    { value: "30", label: "30 min" },
+                                    { value: "60", label: "1 hora" }
+                                  ]
+                                })}
+                                defaultValue={["30"]} 
+                                size="sm" 
+                                width="100px"
+                              >
                                 <Select.Trigger>
                                   <Select.ValueText />
                                 </Select.Trigger>
-                                <Select.Content>
-                                  <Select.Item value="15">15 min</Select.Item>
-                                  <Select.Item value="30">30 min</Select.Item>
-                                  <Select.Item value="60">1 hora</Select.Item>
-                                </Select.Content>
+                                <Select.Content />
                               </Select.Root>
                             </HStack>
                           </VStack>
@@ -704,16 +721,23 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 <Text fontSize="sm" fontWeight="medium">Logs de Auditoría</Text>
                                 <Text fontSize="xs" color="gray.600">Tiempo de retención</Text>
                               </VStack>
-                              <Select.Root defaultValue={["365"]} size="sm" width="120px">
+                              <Select.Root 
+                                collection={createListCollection({
+                                  items: [
+                                    { value: "90", label: "90 días" },
+                                    { value: "180", label: "180 días" },
+                                    { value: "365", label: "1 año" },
+                                    { value: "730", label: "2 años" }
+                                  ]
+                                })}
+                                defaultValue={["365"]} 
+                                size="sm" 
+                                width="120px"
+                              >
                                 <Select.Trigger>
                                   <Select.ValueText />
                                 </Select.Trigger>
-                                <Select.Content>
-                                  <Select.Item value="90">90 días</Select.Item>
-                                  <Select.Item value="180">180 días</Select.Item>
-                                  <Select.Item value="365">1 año</Select.Item>
-                                  <Select.Item value="730">2 años</Select.Item>
-                                </Select.Content>
+                                <Select.Content />
                               </Select.Root>
                             </HStack>
 
@@ -722,16 +746,23 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 <Text fontSize="sm" fontWeight="medium">Datos de Performance</Text>
                                 <Text fontSize="xs" color="gray.600">Historial de evaluaciones</Text>
                               </VStack>
-                              <Select.Root defaultValue={["1825"]} size="sm" width="120px">
+                              <Select.Root 
+                                collection={createListCollection({
+                                  items: [
+                                    { value: "365", label: "1 año" },
+                                    { value: "730", label: "2 años" },
+                                    { value: "1825", label: "5 años" },
+                                    { value: "permanent", label: "Permanente" }
+                                  ]
+                                })}
+                                defaultValue={["1825"]} 
+                                size="sm" 
+                                width="120px"
+                              >
                                 <Select.Trigger>
                                   <Select.ValueText />
                                 </Select.Trigger>
-                                <Select.Content>
-                                  <Select.Item value="365">1 año</Select.Item>
-                                  <Select.Item value="730">2 años</Select.Item>
-                                  <Select.Item value="1825">5 años</Select.Item>
-                                  <Select.Item value="permanent">Permanente</Select.Item>
-                                </Select.Content>
+                                <Select.Content />
                               </Select.Root>
                             </HStack>
 
@@ -740,15 +771,22 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 <Text fontSize="sm" fontWeight="medium">Registros de Nómina</Text>
                                 <Text fontSize="xs" color="gray.600">Historial de pagos</Text>
                               </VStack>
-                              <Select.Root defaultValue={["2555"]} size="sm" width="120px">
+                              <Select.Root 
+                                collection={createListCollection({
+                                  items: [
+                                    { value: "1825", label: "5 años" },
+                                    { value: "2555", label: "7 años" },
+                                    { value: "permanent", label: "Permanente" }
+                                  ]
+                                })}
+                                defaultValue={["2555"]} 
+                                size="sm" 
+                                width="120px"
+                              >
                                 <Select.Trigger>
                                   <Select.ValueText />
                                 </Select.Trigger>
-                                <Select.Content>
-                                  <Select.Item value="1825">5 años</Select.Item>
-                                  <Select.Item value="2555">7 años</Select.Item>
-                                  <Select.Item value="permanent">Permanente</Select.Item>
-                                </Select.Content>
+                                <Select.Content />
                               </Select.Root>
                             </HStack>
 

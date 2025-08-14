@@ -1,4 +1,4 @@
-// CoveragePlanner - Analyze and manage shift coverage gaps and staffing needs
+// r - Analyze and manage shift coverage gaps and staffing needs
 import { useState, useEffect } from 'react';
 import { 
   Box, 
@@ -26,7 +26,7 @@ import {
   ShieldExclamationIcon
 } from '@heroicons/react/24/outline';
 
-interface CoveragePlannerProps {
+interface rProps {
   understaffedShifts: number;
   coveragePercentage: number;
 }
@@ -64,7 +64,7 @@ interface CoverageAnalytics {
 type CoverageFilter = 'all' | 'critical' | 'high' | 'medium' | 'low';
 type TimeSlot = 'all' | 'morning' | 'afternoon' | 'evening' | 'night';
 
-export function CoveragePlanner({ understaffedShifts, coveragePercentage }: CoveragePlannerProps) {
+export function r({ understaffedShifts, coveragePercentage }: rProps) {
   const [loading, setLoading] = useState(true);
   const [coverageGaps, setCoverageGaps] = useState<CoverageGap[]>([]);
   const [staffingRequirements, setStaffingRequirements] = useState<StaffingRequirement[]>([]);

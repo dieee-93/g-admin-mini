@@ -24,7 +24,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 // Import existing predictive components
-import { PredictiveAnalytics } from './ai/PredictiveAnalytics';
+import { PredictiveAnalytics } from './business/PredictiveAnalytics';
 
 const PredictiveAnalyticsPage: React.FC = () => {
   const [activeModel, setActiveModel] = useState('demand');

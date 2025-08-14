@@ -5,3 +5,6 @@ export { CustomReporting } from './business/CustomReporting';
 export { CompetitiveIntelligence } from './business/CompetitiveIntelligence';
 export { PredictiveAnalytics } from './business/PredictiveAnalytics';
 export { default as PredictiveAnalyticsPage } from './PredictiveAnalyticsPage';
+
+// Recipe Analytics (migrated from tools)
+export { RecipeIntelligenceDashboard } from './recipes/RecipeIntelligenceDashboard';

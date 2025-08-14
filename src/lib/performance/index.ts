@@ -70,10 +70,10 @@ export {
   LazySalesPage,
   LazyOperationsPage,
   LazyMaterialsPage,
+  LazyProductsPage,
   LazyStaffPage,
   LazyCustomersPage,
   LazySchedulingPage,
-  LazyRecipesPage,
   LazyFiscalPage,
   LazySettingsPage
 } from '../../modules/lazy/LazyModules';

@@ -182,7 +182,8 @@ export class LazyLoadingManager {
       console.log(`Module ${moduleName} preloaded successfully`);
       
     } catch (error) {
-      console.error(`Failed to preload module ${moduleName}:`, error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Failed to preload module ${moduleName}: ${errorMessage}`);
     }
   }
 
@@ -228,9 +229,15 @@ export class LazyLoadingManager {
     const stats = this.loadingStats;
     const successfulLoads = stats.filter(s => s.success);
     
+    // Count unique modules that have been successfully loaded at least once
+    const uniqueLoadedModules = new Set(successfulLoads.map(s => s.module)).size;
+    
+    // Count unique modules that have been registered (should match LazyModules.ts exports)
+    const totalRegisteredModules = this.moduleStates.size;
+    
     return {
-      totalModules: this.moduleStates.size,
-      loadedModules: successfulLoads.length,
+      totalModules: totalRegisteredModules,
+      loadedModules: uniqueLoadedModules,
       averageLoadTime: successfulLoads.reduce((sum, s) => sum + s.loadTime, 0) / successfulLoads.length || 0,
       totalChunkSize: stats.reduce((sum, s) => sum + (s.chunkSize || 0), 0),
       cacheHitRate: this.calculateCacheHitRate(),
@@ -333,7 +340,8 @@ export class LazyLoadingManager {
       try {
         this.performanceObserver.observe({ entryTypes: ['navigation', 'resource'] });
       } catch (error) {
-        console.warn('Performance observer initialization failed:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.warn(`Performance observer initialization failed: ${errorMessage}`);
       }
     }
   }

@@ -149,6 +149,33 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
+ // Create collections for Select components (ChakraUI v3.23.0 requirement)
+  const departmentItems = [
+    { value: '', label: 'Todos' },
+    { value: 'Administración', label: 'Administración' },
+    { value: 'Cocina', label: 'Cocina' },
+    { value: 'Servicio', label: 'Servicio' },
+    { value: 'Limpieza', label: 'Limpieza' }
+  ];
+  const departmentCollection = createListCollection({ items: departmentItems });
+
+  const statusItems = [
+    { value: '', label: 'Todos' },
+    { value: 'active', label: 'Activo' },
+    { value: 'inactive', label: 'Inactivo' },
+    { value: 'on_leave', label: 'En Licencia' },
+    { value: 'terminated', label: 'Terminado' }
+  ];
+  const statusCollection = createListCollection({ items: statusItems });
+
+  const roleItems = [
+    { value: '', label: 'Todos' },
+    { value: 'admin', label: 'Administrador' },
+    { value: 'manager', label: 'Gerente' },
+    { value: 'supervisor', label: 'Supervisor' },
+    { value: 'employee', label: 'Empleado' }
+  ];
+  const roleCollection = createListCollection({ items: roleItems });
   const filteredEmployees = mockEmployees.filter(employee => {
     const matchesSearch = searchTerm === '' || 
       `${employee.first_name} ${employee.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -259,6 +286,15 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
               <Box>
                 <Text fontSize="sm" fontWeight="medium" mb="2">Departamento</Text>
                 <Select.Root
+                  collection={createListCollection({ 
+                    items: [
+                      { value: '', label: 'Todos' },
+                      { value: 'Administración', label: 'Administración' },
+                      { value: 'Cocina', label: 'Cocina' },
+                      { value: 'Servicio', label: 'Servicio' },
+                      { value: 'Limpieza', label: 'Limpieza' }
+                    ]
+                  })}
                   value={[viewState.filters.department || '']}
                   onValueChange={(e) => onViewStateChange({
                     ...viewState,
@@ -268,19 +304,22 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                   <Select.Trigger>
                     <Select.ValueText placeholder="Todos" />
                   </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value="">Todos</Select.Item>
-                    <Select.Item value="Administración">Administración</Select.Item>
-                    <Select.Item value="Cocina">Cocina</Select.Item>
-                    <Select.Item value="Servicio">Servicio</Select.Item>
-                    <Select.Item value="Limpieza">Limpieza</Select.Item>
-                  </Select.Content>
+                  <Select.Content />
                 </Select.Root>
               </Box>
 
               <Box>
                 <Text fontSize="sm" fontWeight="medium" mb="2">Estado</Text>
                 <Select.Root
+                  collection={createListCollection({ 
+                    items: [
+                      { value: '', label: 'Todos' },
+                      { value: 'active', label: 'Activo' },
+                      { value: 'inactive', label: 'Inactivo' },
+                      { value: 'on_leave', label: 'En Licencia' },
+                      { value: 'terminated', label: 'Terminado' }
+                    ]
+                  })}
                   value={[viewState.filters.employment_status || '']}
                   onValueChange={(e) => onViewStateChange({
                     ...viewState,
@@ -290,19 +329,22 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                   <Select.Trigger>
                     <Select.ValueText placeholder="Todos" />
                   </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value="">Todos</Select.Item>
-                    <Select.Item value="active">Activo</Select.Item>
-                    <Select.Item value="inactive">Inactivo</Select.Item>
-                    <Select.Item value="on_leave">En Licencia</Select.Item>
-                    <Select.Item value="terminated">Terminado</Select.Item>
-                  </Select.Content>
+                  <Select.Content />
                 </Select.Root>
               </Box>
 
               <Box>
                 <Text fontSize="sm" fontWeight="medium" mb="2">Rol</Text>
                 <Select.Root
+                  collection={createListCollection({ 
+                    items: [
+                      { value: '', label: 'Todos' },
+                      { value: 'admin', label: 'Administrador' },
+                      { value: 'manager', label: 'Gerente' },
+                      { value: 'supervisor', label: 'Supervisor' },
+                      { value: 'employee', label: 'Empleado' }
+                    ]
+                  })}
                   value={[viewState.filters.role || '']}
                   onValueChange={(e) => onViewStateChange({
                     ...viewState,
@@ -312,13 +354,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                   <Select.Trigger>
                     <Select.ValueText placeholder="Todos" />
                   </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value="">Todos</Select.Item>
-                    <Select.Item value="admin">Administrador</Select.Item>
-                    <Select.Item value="manager">Gerente</Select.Item>
-                    <Select.Item value="supervisor">Supervisor</Select.Item>
-                    <Select.Item value="employee">Empleado</Select.Item>
-                  </Select.Content>
+                  <Select.Content />
                 </Select.Root>
               </Box>
             </HStack>
@@ -344,11 +380,12 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
               <Card.Body>
                 <VStack align="stretch" gap="3">
                   <HStack gap="3">
-                    <Avatar
+                    <Avatar.Root
                       size="md"
-                      name={`${employee.first_name} ${employee.last_name}`}
-                      src={employee.avatar_url}
-                    />
+                    >
+                      <Avatar.Fallback name={`${employee.first_name} ${employee.last_name}`} />
+                      <Avatar.Image src={employee.avatar_url} />
+                    </Avatar.Root>
                     <VStack align="start" gap="1" flex="1">
                       <HStack justify="space-between" w="full">
                         <Text fontWeight="semibold" fontSize="sm">
@@ -459,11 +496,12 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
               <Card.Body>
                 <HStack justify="space-between" gap="4">
                   <HStack gap="4">
-                    <Avatar
+                    <Avatar.Root
                       size="sm"
-                      name={`${employee.first_name} ${employee.last_name}`}
-                      src={employee.avatar_url}
-                    />
+                    >
+                      <Avatar.Fallback name={`${employee.first_name} ${employee.last_name}`}/>
+                      <Avatar.Image src={employee.avatar_url}/>
+                    </Avatar.Root>
                     <VStack align="start" gap="1">
                       <HStack gap="2">
                         <Text fontWeight="semibold">

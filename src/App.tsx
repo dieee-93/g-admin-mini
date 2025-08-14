@@ -1,4 +1,5 @@
-// src/App.tsx - Reorganized by architectural domains following ARCHITECTURE_ROADMAP.md
+// App.tsx - Performance-optimized App with lazy loading and expandable navigation
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from '@/shared/ui/provider';
 import { Toaster } from '@/shared/ui/toaster';
@@ -6,29 +7,36 @@ import { NavigationProvider } from '@/contexts/NavigationContext';
 import { ResponsiveLayout } from '@/shared/layout/ResponsiveLayout';
 import { NavigationBadgeSync } from '@/hooks/useNavigationBadges';
 import { ErrorBoundary } from '@/lib/error-handling';
-import { initializePerformanceSystem } from '@/lib/performance';
+import { useRouteBasedPreloading } from '@/hooks/useRouteBasedPreloading';
+import { PerformanceProvider, initializePerformanceSystem, LazyLoadingMonitor } from '@/lib/performance';
 
-// Dashboard Module - Now expandable with business intelligence
+// Dashboard Module - Critical, not lazy loaded
 import { Dashboard } from '@/modules/dashboard/Dashboard';
 import { 
   ExecutiveDashboard,
   CrossModuleAnalytics,
   CustomReporting,
   CompetitiveIntelligence,
-  PredictiveAnalyticsPage
+  PredictiveAnalytics as PredictiveAnalyticsComponent
 } from '@/modules/dashboard/components';
 
-// Core Modules
-import { MaterialsPage } from '@/modules/materials';
+// Lazy-loaded modules for performance
+import {
+  LazySalesPage,
+  LazyOperationsPage,
+  LazyMaterialsPage,
+  LazyProductsPage,
+  LazyStaffPage,
+  LazyCustomersPage,
+  LazySchedulingPage,
+  LazyFiscalPage,
+  LazySettingsPage
+} from '@/modules/lazy/LazyModules';
+
+// Materials sub-modules
 import { ABCAnalysisPage } from '@/modules/materials/components';
-import { ProductsPage } from '@/modules/products/ProductsPage';
-import { OperationsPage } from '@/modules/operations/OperationsPage';
-import SalesPage from '@/modules/sales/SalesPage';
-import CustomersPage from '@/modules/customers/CustomersPage';
-import StaffPage from '@/modules/staff/StaffPage';
-import SchedulingPage from '@/modules/scheduling/SchedulingPage';
-import { SettingsPage } from '@/modules/settings/SettingsPage';
-// Settings expanded components
+
+// Settings sub-modules
 import { 
   DiagnosticsPage,
   ReportingPage,
@@ -36,96 +44,144 @@ import {
   IntegrationsPage
 } from '@/modules/settings/components';
 
-// Tools - REMOVED
-import FiscalPage from '@/modules/fiscal/FiscalPage';
-
-// Customer-facing components
+// Customer-facing components (keep immediate loading for better UX)
 import { QROrderPage } from '@/modules/sales/components/QROrdering/QROrderPage';
 
-function App() {
-  // Initialize performance monitoring system
-  initializePerformanceSystem({
-    lazyLoading: {
-      enabled: true,
-      preloadStrategy: 'smart',
-      cacheStrategy: 'both',
-      retryCount: 3,
-      timeout: 10000
-    },
-    runtime: {
-      memoization: true,
-      eventDelegation: true,
-      virtualization: true,
-      performanceMonitoring: process.env.NODE_ENV === 'development'
-    }
-  });
+// Performance monitoring component
+function PerformanceWrapper({ children }: { children: React.ReactNode }) {
+  useRouteBasedPreloading();
+  
+  // Initialize performance system on app startup
+  React.useEffect(() => {
+    initializePerformanceSystem({
+      lazyLoading: {
+        enabled: true,
+        preloadStrategy: 'smart',
+        cacheStrategy: 'both',
+        retryCount: 3,
+        timeout: 10000
+      },
+      bundleOptimization: {
+        treeshaking: true,
+        codeSplitting: true,
+        minification: true,
+        compression: true
+      },
+      runtime: {
+        memoization: true,
+        eventDelegation: true,
+        virtualization: true,
+        performanceMonitoring: process.env.NODE_ENV === 'development'
+      }
+    });
+  }, []);
 
+  return <>{children}</>;
+}
+
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div style={{
+      minHeight: '50vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#666',
+      fontSize: '14px'
+    }}>
+      Cargando módulo...
+    </div>
+  );
+}
+
+function App() {
   return (
     <ErrorBoundary>
-      <Provider>
-        <Router>
-          <NavigationProvider>
-            <NavigationBadgeSync />
-            
-            <ResponsiveLayout>
-              <Routes>
-              {/* 🏠 DASHBOARD - Now expandable */}
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/dashboard/executive" element={<ExecutiveDashboard />} />
-              <Route path="/dashboard/cross-analytics" element={<CrossModuleAnalytics />} />
-              <Route path="/dashboard/custom-reports" element={<CustomReporting />} />
-              <Route path="/dashboard/competitive-intelligence" element={<CompetitiveIntelligence />} />
-              <Route path="/dashboard/predictive-analytics" element={<PredictiveAnalyticsPage />} />
+      <PerformanceProvider>
+        <Provider>
+          <Router>
+            <NavigationProvider>
+              <NavigationBadgeSync />
               
-              {/* 🏢 BUSINESS OPERATIONS DOMAIN */}
-              <Route path="/sales" element={<SalesPage />} />
-              <Route path="/operations" element={<OperationsPage />} />
-              <Route path="/customers" element={<CustomersPage />} />
+              <PerformanceWrapper>
+                <ResponsiveLayout>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Routes>
+                      {/* 🏠 DASHBOARD - Critical, not lazy loaded */}
+                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/dashboard/executive" element={<ExecutiveDashboard />} />
+                      <Route path="/dashboard/cross-analytics" element={<CrossModuleAnalytics />} />
+                      <Route path="/dashboard/custom-reports" element={<CustomReporting />} />
+                      <Route path="/dashboard/competitive-intelligence" element={<CompetitiveIntelligence />} />
+                      <Route path="/dashboard/predictive-analytics" element={<PredictiveAnalyticsComponent />} />
+                      
+                      {/* 🏢 BUSINESS OPERATIONS DOMAIN - Lazy loaded */}
+                      <Route path="/sales" element={<LazySalesPage />} />
+                      <Route path="/operations" element={<LazyOperationsPage />} />
+                      <Route path="/customers" element={<LazyCustomersPage />} />
+                      
+                      {/* 🏭 SUPPLY CHAIN DOMAIN - Materials expandable + lazy */}
+                      <Route path="/materials" element={<LazyMaterialsPage />} />
+                      <Route path="/materials/inventory" element={<LazyMaterialsPage />} />
+                      <Route path="/materials/abc-analysis" element={<ABCAnalysisPage />} />
+                      <Route path="/materials/supply-chain" element={<LazyMaterialsPage />} />
+                      <Route path="/materials/procurement" element={<LazyMaterialsPage />} />
+                      
+                      {/* 🍕 PRODUCTS DOMAIN - Expandable + lazy */}
+                      <Route path="/products" element={<LazyProductsPage />} />
+                      <Route path="/products/menu-engineering" element={<LazyProductsPage />} />
+                      <Route path="/products/cost-analysis" element={<LazyProductsPage />} />
+                      <Route path="/products/production-planning" element={<LazyProductsPage />} />
+                      
+                      {/* 💰 FINANCIAL DOMAIN */}
+                      <Route path="/fiscal" element={<LazyFiscalPage />} />
+                      
+                      {/* 👨‍💼 HUMAN RESOURCES - Staff expandable + lazy */}
+                      <Route path="/staff" element={<LazyStaffPage />} />
+                      <Route path="/staff/management" element={<LazyStaffPage />} />
+                      <Route path="/staff/time-tracking" element={<LazyStaffPage />} />
+                      <Route path="/staff/training" element={<LazyStaffPage />} />
+                      <Route path="/scheduling" element={<LazySchedulingPage />} />
+                      
+                      {/* 🔧 SETTINGS - Expandable + lazy */}
+                      <Route path="/settings" element={<LazySettingsPage />} />
+                      <Route path="/settings/profile" element={<LazySettingsPage />} />
+                      <Route path="/settings/integrations" element={<IntegrationsPage />} />
+                      <Route path="/settings/diagnostics" element={<DiagnosticsPage />} />
+                      <Route path="/settings/reporting" element={<ReportingPage />} />
+                      <Route path="/settings/enterprise" element={<EnterprisePage />} />
+                      
+                      {/* Customer-facing sub-routes */}
+                      <Route path="/sales/qr-order" element={<QROrderPage />} />
+                      
+                      {/* 404 fallback */}
+                      <Route path="*" element={
+                        <div style={{
+                          minHeight: '50vh',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#666',
+                          fontSize: '14px'
+                        }}>
+                          Página no encontrada - Módulo en desarrollo
+                        </div>
+                      } />
+                    </Routes>
+                  </Suspense>
+                </ResponsiveLayout>
+              </PerformanceWrapper>
               
-              {/* 🏭 SUPPLY CHAIN DOMAIN - Materials now expandable */}
-              <Route path="/materials" element={<MaterialsPage />} />
-              <Route path="/materials/inventory" element={<MaterialsPage />} />
-              <Route path="/materials/abc-analysis" element={<ABCAnalysisPage />} />
-              <Route path="/materials/supply-chain" element={<MaterialsPage />} />
-              <Route path="/materials/procurement" element={<MaterialsPage />} />
+              {/* Performance monitoring widget - floating bottom right */}
+              {process.env.NODE_ENV === 'development' && <LazyLoadingMonitor />}
               
-              {/* Products expandable routes */}
-              <Route path="/products" element={<ProductsPage />} />
-              <Route path="/products/menu-engineering" element={<ProductsPage />} />
-              <Route path="/products/cost-analysis" element={<ProductsPage />} />
-              <Route path="/products/production-planning" element={<ProductsPage />} />
-              
-              {/* 💰 FINANCIAL DOMAIN */}
-              <Route path="/fiscal" element={<FiscalPage />} />
-              
-              {/* 👨‍💼 HUMAN RESOURCES - Staff expandable */}
-              <Route path="/staff" element={<StaffPage />} />
-              <Route path="/staff/management" element={<StaffPage />} />
-              <Route path="/staff/time-tracking" element={<StaffPage />} />
-              <Route path="/staff/training" element={<StaffPage />} />
-              <Route path="/scheduling" element={<SchedulingPage />} />
-              
-              {/* 🔧 SETTINGS - Now expandable */}
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/settings/profile" element={<SettingsPage />} />
-              <Route path="/settings/integrations" element={<IntegrationsPage />} />
-              <Route path="/settings/diagnostics" element={<DiagnosticsPage />} />
-              <Route path="/settings/reporting" element={<ReportingPage />} />
-              <Route path="/settings/enterprise" element={<EnterprisePage />} />
-              
-              {/* Customer-facing sub-routes */}
-              <Route path="/sales/qr-order" element={<QROrderPage />} />
-          
-              {/* 404 fallback */}
-              <Route path="*" element={<div>Página no encontrada - Módulo en desarrollo</div>} />
-            </Routes>
-          </ResponsiveLayout>
-          
-          <Toaster />
-        </NavigationProvider>
-      </Router>
-    </Provider>
+              <Toaster />
+            </NavigationProvider>
+          </Router>
+        </Provider>
+      </PerformanceProvider>
     </ErrorBoundary>
   );
 }

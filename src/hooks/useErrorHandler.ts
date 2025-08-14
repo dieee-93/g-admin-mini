@@ -26,7 +26,11 @@ export function useErrorHandler() {
     });
 
     // Log del error para debugging
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : typeof error === 'string' 
+        ? error 
+        : 'Unknown error';
     console.error(`Error handled: ${errorMessage}`);
   };
 

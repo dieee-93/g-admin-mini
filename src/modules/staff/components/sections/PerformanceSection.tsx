@@ -14,7 +14,8 @@ import {
   Avatar,
   Flex,
   IconButton,
-  Stat
+  Stat,
+  createListCollection
 } from '@chakra-ui/react';
 import { 
   ChartBarIcon,
@@ -243,6 +244,13 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
         <Text fontSize="lg" fontWeight="semibold">Rendimiento del Equipo</Text>
         <HStack gap="4">
           <Select.Root
+            collection={createListCollection({
+              items: [
+                { value: "weekly", label: "Semanal" },
+                { value: "monthly", label: "Mensual" },
+                { value: "quarterly", label: "Trimestral" }
+              ]
+            })}
             value={[selectedPeriod]}
             onValueChange={(e) => setSelectedPeriod(e.value[0] as any)}
             width="150px"
@@ -250,11 +258,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
             <Select.Trigger>
               <Select.ValueText />
             </Select.Trigger>
-            <Select.Content>
-              <Select.Item value="weekly">Semanal</Select.Item>
-              <Select.Item value="monthly">Mensual</Select.Item>
-              <Select.Item value="quarterly">Trimestral</Select.Item>
-            </Select.Content>
+            <Select.Content />
           </Select.Root>
           <Button
             size="sm"
@@ -275,7 +279,9 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                 {/* Employee Header */}
                 <HStack justify="space-between">
                   <HStack gap="3">
-                    <Avatar size="sm" name="Employee" />
+                    <Avatar.Root>
+                      <Avatar.Fallback name="Employee"/> 
+                    </Avatar.Root>
                     <VStack align="start" gap="0">
                       <Text fontWeight="semibold">
                         Empleado {performance.employee_id}

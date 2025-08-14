@@ -569,7 +569,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
             variant="subtle"
             p={2}
           >
-            <HStack spacing={1}>
+            <HStack gap={1}>
               {isOnline ? 
                 <WifiIcon className="w-3 h-3" /> : 
                 <NoSymbolIcon className="w-3 h-3" />
@@ -586,7 +586,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
         <HStack gap="2">
           {/* Offline Operations Indicator */}
           {offlineOperations.length > 0 && (
-            <Tooltip label={`${offlineOperations.length} operations pending sync`}>
+            <Tooltip.Root aria-label={`${offlineOperations.length} operations pending sync` }>
               <Button
                 variant="outline"
                 colorPalette="orange"
@@ -596,7 +596,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                 <CircleStackIcon className="w-4 h-4" />
                 {offlineOperations.length} Offline
               </Button>
-            </Tooltip>
+            </Tooltip.Root>
           )}
 
           {/* Sync Progress */}
@@ -750,7 +750,10 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                           <Card.Body>
                             <VStack align="stretch" gap="3">
                               <HStack gap="3">
-                                <Avatar size="sm" name={`${employee.first_name} ${employee.last_name}`} />
+                                <Avatar.Root size='sm'>
+                                  <Avatar.Fallback name={`${employee.first_name} ${employee.last_name}`}/>
+                                </Avatar.Root>
+                        
                                 <VStack align="start" gap="0" flex="1">
                                   <Text fontWeight="medium" fontSize="sm">
                                     {employee.first_name} {employee.last_name}

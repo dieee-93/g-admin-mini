@@ -10,8 +10,7 @@ import {
   SimpleGrid,
   Badge,
   Alert,
-  Switch,
-  Tooltip
+  Switch
 } from '@chakra-ui/react';
 import { 
   DocumentTextIcon, 
@@ -231,7 +230,8 @@ export function FiscalPage() {
             </HStack>
 
             <HStack gap={2}>
-              <Tooltip label="Modo de funcionamiento fiscal">
+              <VStack gap={1} align="start">
+                <Text fontSize="xs" color="gray.600">Modo de funcionamiento fiscal</Text>
                 <Switch.Root
                   checked={fiscalMode === 'offline-first'}
                   onCheckedChange={(details) => setFiscalMode(details.checked ? 'offline-first' : 'online-first')}
@@ -244,7 +244,7 @@ export function FiscalPage() {
                     <Text fontSize="sm">Offline First</Text>
                   </Switch.Label>
                 </Switch.Root>
-              </Tooltip>
+              </VStack>
             </HStack>
           </HStack>
           </Card.Body>

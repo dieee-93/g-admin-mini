@@ -251,7 +251,7 @@ export function preventSqlInjection(query: string, params: any[]): { query: stri
   // Validate parameters
   const sanitizedParams = params.map(param => {
     if (typeof param === 'string') {
-      return param.replace(/['"\\;--]/g, ''); // Remove dangerous characters
+      return param.replace(/['"\\;-]/g, ''); // Remove dangerous characters
     }
     return param;
   });

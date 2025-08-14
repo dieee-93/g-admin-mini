@@ -166,16 +166,22 @@ export function useRouteBasedPreloading() {
     // Update navigation history
     updateNavigationHistory(currentModule);
     
-    // Trigger preloading with predicted modules
-    lazyLoadingManager.preloadPredictedModules(location.pathname);
+    // TEMPORARILY DISABLED: Too aggressive preloading
+    // lazyLoadingManager.preloadPredictedModules(location.pathname);
     
     // Apply multiple preloading strategies with debouncing
     const preloadTimeout = setTimeout(() => {
-      preloadByConfiguration(currentModule);
-      preloadByAffinity(currentModule);
-      preloadBySequencePattern(currentModule);
-      preloadByRecentHistory();
-      preloadByTimePattern();
+      // TEMPORARILY DISABLED: Too aggressive preloading
+      // preloadByConfiguration(currentModule);
+      // preloadByAffinity(currentModule);
+      // preloadBySequencePattern(currentModule);
+      // preloadByRecentHistory();
+      // preloadByTimePattern();
+      
+      // Only preload if explicitly configured
+      if (currentModule === 'sales') {
+        preloadByConfiguration(currentModule);
+      }
     }, 100); // Debounce rapid navigation changes
     
     return () => clearTimeout(preloadTimeout);
@@ -185,11 +191,9 @@ export function useRouteBasedPreloading() {
   // Preload critical modules on app startup
   useEffect(() => {
     const startupPreload = setTimeout(() => {
-      // Always preload sales module (most critical for POS)
-      lazyLoadingManager.preloadModule('sales', 'high');
-      
-      // Preload based on current time
-      preloadByTimePattern();
+      // TEMPORARILY DISABLED: Only preload sales if explicitly needed
+      // lazyLoadingManager.preloadModule('sales', 'high');
+      // preloadByTimePattern();
     }, 500); // Wait for initial render
     
     return () => clearTimeout(startupPreload);

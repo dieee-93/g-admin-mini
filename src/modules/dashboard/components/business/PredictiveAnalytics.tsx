@@ -9,6 +9,8 @@ import {
   Badge,
   SimpleGrid,
   Progress,
+  ProgressTrack,
+  ProgressRange,
   Alert,
   Skeleton,
   Select,
@@ -342,7 +344,8 @@ export function PredictiveAnalytics() {
         setMaterials(mockData);
         setSelectedMaterial(mockData[0]);
       } catch (error) {
-        console.error('Error loading predictive analytics data:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`Error loading predictive analytics data: ${errorMessage}`);
       } finally {
         setLoading(false);
       }
@@ -425,7 +428,8 @@ export function PredictiveAnalytics() {
       }, 'PredictiveAnalytics');
       
     } catch (error) {
-      console.error('Error running predictive analysis:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Error running predictive analysis: ${errorMessage}`);
     } finally {
       setIsRunningAnalysis(false);
     }
@@ -682,14 +686,18 @@ export function PredictiveAnalytics() {
                                   {Math.round(material.prediction.accuracy)}%
                                 </Text>
                               </HStack>
-                              <Progress 
+                              <Progress.Root 
                                 value={material.prediction.accuracy} 
                                 colorPalette={
                                   material.prediction.accuracy > 80 ? 'green' : 
                                   material.prediction.accuracy > 60 ? 'yellow' : 'red'
                                 }
                                 size="sm"
-                              />
+                              >
+                                <ProgressTrack>
+                                  <ProgressRange />
+                                </ProgressTrack>
+                              </Progress.Root>
                             </VStack>
 
                             {/* Trend Info */}

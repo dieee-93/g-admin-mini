@@ -53,7 +53,7 @@ export function ProductList({
     );
   }
 
-  if (products.length === 0) {
+  if (!products || products.length === 0) {
     return (
       <Box textAlign="center" py={12}>
         <Text fontSize="lg" color="gray.500" mb={4}>
@@ -79,12 +79,12 @@ export function ProductList({
   };
 
   // Use virtualization for large product lists (>30 products)
-  if (products.length > 30) {
+  if (products && products.length > 30) {
     return (
       <VStack align="stretch" gap={4}>
         <Box>
           <Text fontSize="lg" fontWeight="semibold" mb={2}>
-            Productos ({products.length})
+            Productos ({products?.length || 0})
           </Text>
           <Text fontSize="sm" color="gray.600">
             Lista de productos con información de costos y disponibilidad
@@ -223,7 +223,7 @@ export function ProductList({
     <VStack align="stretch" gap={4}>
       <Box>
         <Text fontSize="lg" fontWeight="semibold" mb={2}>
-          Productos ({products.length})
+          Productos ({products?.length || 0})
         </Text>
         <Text fontSize="sm" color="gray.600">
           Lista de productos con información de costos y disponibilidad
@@ -231,7 +231,7 @@ export function ProductList({
       </Box>
 
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap={4}>
-        {products.map((product) => (
+        {(products || []).map((product) => (
           <Card.Root key={product.id} p={4} shadow="sm">
             <VStack align="stretch" gap={3}>
               {/* Header */}

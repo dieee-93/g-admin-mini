@@ -13,7 +13,8 @@ import {
   IconButton,
   Select,
   Stack,
-  Input
+  Input,
+  createListCollection
 } from '@chakra-ui/react';
 import { 
   CheckIcon, 
@@ -242,7 +243,7 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
         </Table.Cell>
         
         <Table.Cell>
-          <Text fontSize="sm" maxW="200px" isTruncated>
+          <Text fontSize="sm" maxW="200px">
             {request.reason}
           </Text>
         </Table.Cell>
@@ -335,37 +336,43 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
               <Box>
                 <Text fontSize="sm" mb="1" fontWeight="medium">Status</Text>
                 <Select.Root 
+                  collection={createListCollection({
+                    items: [
+                      { value: "all", label: "All Status" },
+                      { value: "pending", label: "Pending" },
+                      { value: "approved", label: "Approved" },
+                      { value: "denied", label: "Denied" }
+                    ]
+                  })}
                   value={filters.status} 
                   onValueChange={(e) => setFilters(prev => ({...prev, status: e.value as RequestFilter}))}
                 >
                   <Select.Trigger width="150px">
                     <Select.ValueText />
                   </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value="all">All Status</Select.Item>
-                    <Select.Item value="pending">Pending</Select.Item>
-                    <Select.Item value="approved">Approved</Select.Item>
-                    <Select.Item value="denied">Denied</Select.Item>
-                  </Select.Content>
+                  <Select.Content />
                 </Select.Root>
               </Box>
 
               <Box>
                 <Text fontSize="sm" mb="1" fontWeight="medium">Type</Text>
                 <Select.Root 
+                  collection={createListCollection({
+                    items: [
+                      { value: "all", label: "All Types" },
+                      { value: "vacation", label: "Vacation" },
+                      { value: "sick", label: "Sick Leave" },
+                      { value: "personal", label: "Personal" },
+                      { value: "emergency", label: "Emergency" }
+                    ]
+                  })}
                   value={filters.type}
                   onValueChange={(e) => setFilters(prev => ({...prev, type: e.value as RequestType}))}
                 >
                   <Select.Trigger width="150px">
                     <Select.ValueText />
                   </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value="all">All Types</Select.Item>
-                    <Select.Item value="vacation">Vacation</Select.Item>
-                    <Select.Item value="sick">Sick Leave</Select.Item>
-                    <Select.Item value="personal">Personal</Select.Item>
-                    <Select.Item value="emergency">Emergency</Select.Item>
-                  </Select.Content>
+                  <Select.Content />
                 </Select.Root>
               </Box>
 

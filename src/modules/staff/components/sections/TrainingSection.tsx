@@ -15,7 +15,8 @@ import {
   IconButton,
   Tabs,
   Input,
-  Textarea
+  Textarea,
+  createListCollection
 } from '@chakra-ui/react';
 import { 
   AcademicCapIcon,
@@ -327,6 +328,15 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                     <Box>
                       <Text fontSize="sm" fontWeight="medium" mb="1">Empleado</Text>
                       <Select.Root
+                        collection={createListCollection({
+                          items: [
+                            { value: "all", label: "Todos" },
+                            { value: "EMP001", label: "EMP001 - Ana García" },
+                            { value: "EMP002", label: "EMP002 - Carlos Rodriguez" },
+                            { value: "EMP003", label: "EMP003 - María López" },
+                            { value: "EMP004", label: "EMP004 - Diego Martín" }
+                          ]
+                        })}
                         value={[selectedEmployee]}
                         onValueChange={(e) => setSelectedEmployee(e.value[0])}
                         width="200px"
@@ -334,19 +344,21 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                         <Select.Trigger>
                           <Select.ValueText />
                         </Select.Trigger>
-                        <Select.Content>
-                          <Select.Item value="all">Todos</Select.Item>
-                          <Select.Item value="EMP001">EMP001 - Ana García</Select.Item>
-                          <Select.Item value="EMP002">EMP002 - Carlos Rodriguez</Select.Item>
-                          <Select.Item value="EMP003">EMP003 - María López</Select.Item>
-                          <Select.Item value="EMP004">EMP004 - Diego Martín</Select.Item>
-                        </Select.Content>
+                        <Select.Content />
                       </Select.Root>
                     </Box>
 
                     <Box>
                       <Text fontSize="sm" fontWeight="medium" mb="1">Estado</Text>
                       <Select.Root
+                        collection={createListCollection({
+                          items: [
+                            { value: "all", label: "Todos" },
+                            { value: "completed", label: "Completado" },
+                            { value: "in_progress", label: "En Progreso" },
+                            { value: "expired", label: "Expirado" }
+                          ]
+                        })}
                         value={[selectedStatus]}
                         onValueChange={(e) => setSelectedStatus(e.value[0])}
                         width="150px"
@@ -354,12 +366,7 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                         <Select.Trigger>
                           <Select.ValueText />
                         </Select.Trigger>
-                        <Select.Content>
-                          <Select.Item value="all">Todos</Select.Item>
-                          <Select.Item value="completed">Completado</Select.Item>
-                          <Select.Item value="in_progress">En Progreso</Select.Item>
-                          <Select.Item value="expired">Expirado</Select.Item>
-                        </Select.Content>
+                        <Select.Content />
                       </Select.Root>
                     </Box>
                   </HStack>
@@ -533,33 +540,38 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                         <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                           <Box>
                             <Text fontSize="sm" fontWeight="medium" mb="2">Curso</Text>
-                            <Select.Root>
+                            <Select.Root
+                              collection={createListCollection({
+                                items: courseCatalog.map(course => ({
+                                  value: course.id,
+                                  label: course.name
+                                }))
+                              })}
+                            >
                               <Select.Trigger>
                                 <Select.ValueText placeholder="Seleccionar curso" />
                               </Select.Trigger>
-                              <Select.Content>
-                                {courseCatalog.map(course => (
-                                  <Select.Item key={course.id} value={course.id}>
-                                    {course.name}
-                                  </Select.Item>
-                                ))}
-                              </Select.Content>
+                              <Select.Content />
                             </Select.Root>
                           </Box>
 
                           <Box>
                             <Text fontSize="sm" fontWeight="medium" mb="2">Empleado(s)</Text>
-                            <Select.Root>
+                            <Select.Root
+                              collection={createListCollection({
+                                items: [
+                                  { value: "EMP001", label: "EMP001 - Ana García" },
+                                  { value: "EMP002", label: "EMP002 - Carlos Rodriguez" },
+                                  { value: "EMP003", label: "EMP003 - María López" },
+                                  { value: "EMP004", label: "EMP004 - Diego Martín" },
+                                  { value: "all", label: "Todos los empleados" }
+                                ]
+                              })}
+                            >
                               <Select.Trigger>
                                 <Select.ValueText placeholder="Seleccionar empleado" />
                               </Select.Trigger>
-                              <Select.Content>
-                                <Select.Item value="EMP001">EMP001 - Ana García</Select.Item>
-                                <Select.Item value="EMP002">EMP002 - Carlos Rodriguez</Select.Item>
-                                <Select.Item value="EMP003">EMP003 - María López</Select.Item>
-                                <Select.Item value="EMP004">EMP004 - Diego Martín</Select.Item>
-                                <Select.Item value="all">Todos los empleados</Select.Item>
-                              </Select.Content>
+                              <Select.Content />
                             </Select.Root>
                           </Box>
 

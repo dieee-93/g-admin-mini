@@ -9,6 +9,8 @@ import {
   Badge,
   SimpleGrid,
   Progress,
+  ProgressTrack,
+  ProgressRange,
   Alert,
   Skeleton,
   Select,
@@ -573,7 +575,8 @@ export function ExecutiveDashboard() {
         setInsights(mockInsights);
         setSummary(mockSummary);
       } catch (error) {
-        console.error('Error loading executive dashboard data:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`Error loading executive dashboard data: ${errorMessage}`);
       } finally {
         setLoading(false);
       }
@@ -645,7 +648,8 @@ export function ExecutiveDashboard() {
       }, 'ExecutiveDashboard');
       
     } catch (error) {
-      console.error('Error refreshing dashboard:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Error refreshing dashboard: ${errorMessage}`);
     } finally {
       setIsRefreshing(false);
     }
@@ -1142,11 +1146,15 @@ export function ExecutiveDashboard() {
                                     {progressValue.toFixed(0)}%
                                   </Text>
                                 </HStack>
-                                <Progress 
+                                <Progress.Root 
                                   value={Math.min(progressValue, 100)} 
                                   colorPalette={progressValue >= 100 ? 'green' : progressValue >= 80 ? 'yellow' : 'red'}
                                   size="sm"
-                                />
+                                >
+                                  <ProgressTrack>
+                                    <ProgressRange />
+                                  </ProgressTrack>
+                                </Progress.Root>
                               </VStack>
                             )}
 

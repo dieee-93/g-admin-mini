@@ -806,7 +806,7 @@ export function CrossModuleAnalytics() {
                     </Text>
                   </VStack>
                   
-                  <Progress 
+                  <Progress.Root
                     value={analyticsSummary.overallSystemHealth} 
                     colorPalette={getHealthColor(analyticsSummary.healthStatus)}
                     size="lg"
@@ -933,7 +933,7 @@ export function CrossModuleAnalytics() {
                                 </Text>
                               </HStack>
                               
-                              <Progress 
+                              <Progress.Root 
                                 value={metric.unit === 's' ? Math.max(0, 100 - (metric.value / metric.target * 100)) : (metric.value / metric.target * 100)} 
                                 colorPalette={getHealthColor(metric.status)}
                                 size="sm"
@@ -1074,7 +1074,7 @@ export function CrossModuleAnalytics() {
                       width="80px"
                       size="sm"
                     >
-                      <NumberInput.Field />
+                      
                     </NumberInput.Root>
                   </HStack>
                 </HStack>
