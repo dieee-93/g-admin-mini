@@ -1,46 +1,14 @@
-// src/features/inventory/types.ts
-// 🚀 SISTEMA EXPANDIDO - Soporte para 3 tipos de items con precisión total
+// Materials module types - Simplified and focused
+// Clean, maintainable type system for inventory management
 
 // ============================================================================
-// 📏 SISTEMA DE UNIDADES Y CONVERSIONES
+// 🎯 CORE TYPES - Simplified
 // ============================================================================
 
-export type WeightUnit = 'kg' | 'g' | 'ton';
-export type VolumeUnit = 'l' | 'ml' | 'cm3';
-export type LengthUnit = 'm' | 'cm' | 'mm';
-export type CountUnit = 'unidad' | 'docena' | 'caja' | 'paquete' | 'bolsa';
-
-export type MeasurableUnit = WeightUnit | VolumeUnit | LengthUnit;
+// Common units (keep it simple)
+export type MeasurableUnit = 'kg' | 'g' | 'l' | 'ml' | 'cm' | 'm';
+export type CountUnit = 'unidad' | 'docena' | 'caja' | 'paquete';
 export type AllUnit = MeasurableUnit | CountUnit;
-
-// Conversiones a unidad base (gramos para peso, ml para volumen, mm para longitud)
-export const UNIT_CONVERSIONS = {
-  // Peso → gramos
-  weight: {
-    g: 1,
-    kg: 1000,
-    ton: 1000000
-  },
-  // Volumen → ml
-  volume: {
-    ml: 1,
-    cm3: 1,
-    l: 1000
-  },
-  // Longitud → mm
-  length: {
-    mm: 1,
-    cm: 10,
-    m: 1000
-  }
-} as const;
-
-export const UNIT_CATEGORIES = {
-  weight: ['g', 'kg', 'ton'] as WeightUnit[],
-  volume: ['ml', 'cm3', 'l'] as VolumeUnit[],
-  length: ['mm', 'cm', 'm'] as LengthUnit[],
-  count: ['unidad', 'docena', 'caja', 'paquete', 'bolsa'] as CountUnit[]
-} as const;
 
 // ============================================================================
 // 🎯 TIPOS DE ITEMS (3 categorías)
@@ -55,22 +23,19 @@ export interface BaseItem {
   type: ItemType;
   stock: number;           // Cantidad actual en stock
   unit_cost?: number;      // Costo por unidad base
+  category: string;        // Business category (e.g., "Lácteos", "Carnes", "Verduras")
   created_at: string;
   updated_at: string;
 }
 
 // ============================================================================
-// 📐 1. ITEMS CONMENSURABLES (peso, volumen, longitud)
+// 📐 1. ITEMS CONMENSURABLES (peso, volumen, longitud) - Simplified
 // ============================================================================
 
 export interface MeasurableItem extends BaseItem {
   type: 'MEASURABLE';
   unit: MeasurableUnit;
-  category: 'weight' | 'volume' | 'length';
-  
-  // Para conversiones y display
-  preferred_display_unit?: MeasurableUnit;  // ej: mostrar en kg aunque se almacene en g
-  precision?: number;                       // decimales para display (default: 0)
+  precision?: number;  // decimales para display (default: 2)
 }
 
 // ============================================================================
@@ -87,14 +52,7 @@ export interface PackagingInfo {
 export interface CountableItem extends BaseItem {
   type: 'COUNTABLE';
   unit: 'unidad';
-  
-  // Packaging info (opcional)
-  packaging?: PackagingInfo;
-  
-  // Para casos como "6 docenas = 72 unidades"
-  base_quantity?: number;     // 72 (unidades individuales)
-  display_quantity?: number;  // 6 (docenas)
-  display_unit?: string;      // "docena"
+  packaging?: PackagingInfo;  // Packaging info (opcional)
 }
 
 // ============================================================================
@@ -120,16 +78,19 @@ export interface ElaboratedItem extends BaseItem {
 // 📊 UNION TYPE Y UTILIDADES
 // ============================================================================
 
-export type InventoryItem = MeasurableItem | CountableItem | ElaboratedItem;
+export type MaterialItem = MeasurableItem | CountableItem | ElaboratedItem;
+
+// Legacy alias for compatibility
+export type InventoryItem = MaterialItem;
 
 // Type guards para distinguir tipos
-export const isMeasurable = (item: InventoryItem): item is MeasurableItem => 
+export const isMeasurable = (item: MaterialItem): item is MeasurableItem => 
   item.type === 'MEASURABLE';
 
-export const isCountable = (item: InventoryItem): item is CountableItem => 
+export const isCountable = (item: MaterialItem): item is CountableItem => 
   item.type === 'COUNTABLE';
 
-export const isElaborated = (item: InventoryItem): item is ElaboratedItem => 
+export const isElaborated = (item: MaterialItem): item is ElaboratedItem => 
   item.type === 'ELABORATED';
 
 // ============================================================================
@@ -159,17 +120,8 @@ export interface StockEntry {
 }
 
 // ============================================================================
-// 🚨 ALERTAS Y THRESHOLDS
+// 🚨 ALERTAS - Essential only
 // ============================================================================
-
-export interface AlertThreshold {
-  id: string;
-  item_id: string;
-  min_stock: number;
-  critical_stock: number;
-  auto_reorder?: boolean;
-  reorder_quantity?: number;
-}
 
 export interface StockAlert {
   id: string;
@@ -218,7 +170,7 @@ export interface InventoryStats {
 }
 
 // ============================================================================
-// 🔧 UTILIDADES DE CONVERSIÓN
+// 🔧 CONVERSIONS - Keep minimal for existing utils
 // ============================================================================
 
 export interface ConversionResult {
@@ -229,15 +181,82 @@ export interface ConversionResult {
   conversionFactor: number;
 }
 
+// Types for conversion system
+export type WeightUnit = 'kg' | 'g';
+export type VolumeUnit = 'l' | 'ml';
+export type LengthUnit = 'cm' | 'm';
+
 export interface UnitHelper {
-  category: 'weight' | 'volume' | 'length' | 'count';
-  availableUnits: string[];
+  category: 'weight' | 'volume' | 'length';
+  availableUnits: readonly string[];
   baseUnit: string;
   displayFormat: (value: number, unit: string) => string;
 }
 
+// Unit categories for conversions
+export const UNIT_CATEGORIES = {
+  weight: ['kg', 'g'] as const,
+  volume: ['l', 'ml'] as const,
+  length: ['cm', 'm'] as const,
+} as const;
+
+// Conversion factors to base units (g, ml, mm)
+export const UNIT_CONVERSIONS = {
+  weight: {
+    g: 1,      // base unit
+    kg: 1000,  // 1 kg = 1000 g
+  },
+  volume: {
+    ml: 1,     // base unit
+    l: 1000,   // 1 l = 1000 ml
+  },
+  length: {
+    cm: 1,     // treating cm as base for simplicity
+    m: 100,    // 1 m = 100 cm
+  },
+} as const;
+
 // ============================================================================
-// 📝 FORM DATA TYPES
+// 🏢 SUPPLIER DATA - Para integración con compras
+// ============================================================================
+
+export interface Supplier {
+  id: string;
+  name: string;
+  contact_person?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  tax_id?: string;
+  payment_terms?: string;
+  rating?: number;
+  notes?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SupplierFormData {
+  supplier_id?: string;
+  purchase_date?: string;
+  invoice_number?: string;
+  delivery_date?: string;
+  quality_rating?: number;
+  
+  // Para crear nuevo supplier
+  new_supplier?: {
+    name: string;
+    contact_person?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    tax_id?: string;
+    notes?: string;
+  };
+}
+
+// ============================================================================
+// 📝 FORM DATA - Essential types only
 // ============================================================================
 
 export interface ItemFormData {
@@ -246,35 +265,14 @@ export interface ItemFormData {
   unit: AllUnit;
   initial_stock?: number;
   unit_cost?: number;
+  category?: string;                           // Business category for all item types
   
   // Campos específicos por tipo
-  category?: 'weight' | 'volume' | 'length';  // Para MEASURABLE
   packaging?: Partial<PackagingInfo>;          // Para COUNTABLE
   recipe_id?: string;                          // Para ELABORATED
   requires_production?: boolean;               // Para ELABORATED
-}
-
-export interface StockEntryFormData {
-  item_id: string;
-  quantity: number;
-  unit_cost: number;
-  note?: string;
-  entry_type?: 'purchase' | 'production' | 'adjustment';
-  supplier?: string;
-  batch_number?: string;
-}
-
-export interface BulkStockEntry {
-  item_id: string;
-  item_name: string;
-  quantity: number;
-  unit_cost: number;
-  note?: string;
-}
-
-export interface BulkStockFormData {
-  supplier?: string;
-  purchase_date?: string;
-  entries: BulkStockEntry[];
-  total_cost?: number;
+  auto_calculate_cost?: boolean;               // Para ELABORATED
+  
+  // Datos del proveedor (opcional)
+  supplier?: SupplierFormData;
 }

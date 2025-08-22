@@ -483,7 +483,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                 <VStack gap="4" align="stretch">
                   <HStack justify="space-between">
                     <Text fontSize="lg" fontWeight="semibold">Catálogo de Cursos</Text>
-                    <Button leftIcon={<PlusIcon className="w-4 h-4" />} colorPalette="blue">
+                    <Button colorPalette="blue">
+                      <PlusIcon className="w-4 h-4 mr-2" />
                       Nuevo Curso
                     </Button>
                   </HStack>

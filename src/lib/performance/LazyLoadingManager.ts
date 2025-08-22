@@ -144,8 +144,9 @@ export class LazyLoadingManager {
       }
     };
 
-    // Store enhanced import for potential preloading
-    this.preloadCache.set(moduleName, enhancedImport().then(result => result.default));
+    // Store import function for potential preloading (NOT executed immediately)
+    const preloadPromise = () => enhancedImport().then(result => result.default);
+    this.preloadCache.set(moduleName, preloadPromise);
 
     // Preload if requested
     if (preload) {
@@ -160,9 +161,16 @@ export class LazyLoadingManager {
    * Preload a module without rendering
    */
   public async preloadModule(moduleName: string, priority: 'high' | 'medium' | 'low' = 'medium'): Promise<void> {
-    const cachedPromise = this.preloadCache.get(moduleName);
-    if (!cachedPromise) {
+    const preloadFunction = this.preloadCache.get(moduleName);
+    if (!preloadFunction) {
       console.warn(`Module ${moduleName} not found in preload cache`);
+      return;
+    }
+
+    // Check if module is already loaded
+    const moduleState = this.moduleStates.get(moduleName);
+    if (moduleState && moduleState.state === 'loaded') {
+      console.log(`Module ${moduleName} already loaded`);
       return;
     }
 
@@ -171,14 +179,14 @@ export class LazyLoadingManager {
       if (priority === 'low' && 'requestIdleCallback' in window) {
         return new Promise((resolve) => {
           requestIdleCallback(async () => {
-            await cachedPromise;
+            await (preloadFunction as () => Promise<any>)();
             resolve();
           });
         });
       }
       
       // For high/medium priority, load immediately
-      await cachedPromise;
+      await (preloadFunction as () => Promise<any>)();
       console.log(`Module ${moduleName} preloaded successfully`);
       
     } catch (error) {
@@ -258,6 +266,18 @@ export class LazyLoadingManager {
   public clearPerformanceData(): void {
     this.loadingStats = [];
     this.moduleStates.clear();
+    this.preloadCache.clear();
+  }
+
+  /**
+   * Reset module state to allow fresh loading
+   */
+  public resetModuleState(moduleName: string): void {
+    this.moduleStates.delete(moduleName);
+    this.preloadCache.delete(moduleName);
+    
+    // Remove old stats for this module
+    this.loadingStats = this.loadingStats.filter(stat => stat.module !== moduleName);
   }
 
   /**
@@ -340,7 +360,7 @@ export class LazyLoadingManager {
       try {
         this.performanceObserver.observe({ entryTypes: ['navigation', 'resource'] });
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.warn(`Performance observer initialization failed: ${errorMessage}`);
       }
     }
@@ -417,6 +437,15 @@ export class LazyLoadingManager {
     success: boolean,
     error?: string
   ): void {
+    // Check if we already have a recent successful load for this module
+    const recentStats = this.loadingStats
+      .filter(stat => stat.module === module && stat.success && stat.timestamp > Date.now() - 5000);
+    
+    // Don't record duplicate successful loads within 5 seconds
+    if (success && recentStats.length > 0) {
+      return;
+    }
+
     this.loadingStats.push({
       module,
       loadTime,

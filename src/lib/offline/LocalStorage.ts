@@ -12,7 +12,7 @@ const STORES_CONFIG = {
   schedules: { keyPath: 'id', indexes: ['employeeId', 'date', 'shift'] },
   sync_queue: { keyPath: 'id', indexes: ['entity', 'timestamp', 'priority'] },
   conflicts: { keyPath: 'id', indexes: ['operationId', 'timestamp', 'resolved'] },
-  settings: { keyPath: 'key', indexes: [] },
+  settings: { keyPath: 'key', indexes: [] as string[] },
   cache: { keyPath: 'url', indexes: ['timestamp', 'expires'] },
   analytics: { keyPath: 'id', indexes: ['type', 'timestamp', 'module'] }
 };
@@ -451,7 +451,7 @@ class LocalStorageManager {
 
   public async importData(data: Record<string, any[]>): Promise<void> {
     for (const [storeName, items] of Object.entries(data)) {
-      if (STORES_CONFIG[storeName]) {
+      if (this.isValidStoreName(storeName)) {
         try {
           // Clear existing data
           await this.clear(storeName);
@@ -469,6 +469,11 @@ class LocalStorageManager {
         }
       }
     }
+  }
+
+  // Type guard for store names
+  private isValidStoreName(name: string): name is keyof typeof STORES_CONFIG {
+    return name in STORES_CONFIG;
   }
 
   // Calculate simple checksum for data integrity

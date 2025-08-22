@@ -1,12 +1,12 @@
 **********************
 PowerShell transcript start
-Start time: 20250812142219
+Start time: 20250820164209
 Username: Robocop\Diego
 RunAs User: Robocop\Diego
 Configuration Name: 
 Machine: ROBOCOP (Microsoft Windows NT 10.0.26100.0)
 Host Application: C:\Program Files\WindowsApps\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe\pwsh.dll
-Process ID: 12920
+Process ID: 23264
 PSVersion: 7.5.2
 PSEdition: Core
 GitCommitId: 7.5.2
@@ -20,27 +20,44 @@ WSManStackVersion: 3.0
 Transcript started, output file is inventario.md
 ├─📂 assets
 │   └─  📄 react.svg                                (   1 lines)
+├─📂 components
+│   └─📂 auth
+│       ├─  📄 AuthPage.tsx                             (  55 lines)
+│       ├─  📄 AuthPage.tsx.backup                      (  61 lines)
+│       ├─  📄 index.ts                                 (   5 lines)
+│       ├─  📄 LoginForm.tsx                            ( 165 lines)
+│       ├─  📄 LoginForm.tsx.backup                     ( 158 lines) → Login successful - auth service will handle navigation
+│       ├─  📄 ProtectedRoute.tsx                       (  69 lines) → /** Component that protects routes requiring authentication Shows login page if user is not authenticated Shows fallback message if user lacks required permissions /
+│       ├─  📄 RegisterForm.tsx                         ( 187 lines)
+│       ├─  📄 RegisterForm.tsx.backup                  ( 188 lines) → Validation
+│       ├─  📄 ResetPasswordForm.tsx                    ( 170 lines)
+│       └─  📄 ResetPasswordForm.tsx.backup             ( 179 lines)
 ├─📂 contexts
-│   └─⭐ 📄 NavigationContext.tsx                    ( 716 lines) → ✅ Types definidos según arquitectura v2.0
+│   └─⭐ 📄 NavigationContext.tsx                    ( 908 lines) → ✅ Types definidos según arquitectura v2.0
 ├─📂 hooks
-│   ├─  📄 useBreadcrumb.ts                         ( 247 lines) → ============================================== 📁 src/hooks/useBreadcrumb.ts ==============================================
+│   ├─  📄 index.ts                                 (   2 lines) → Main hooks exports
 │   ├─  📄 useDashboardStats.ts                     (  82 lines) → ✅ OPCIÓN 1: Usar get_dashboard_stats si existe
-│   ├─  📄 useErrorHandler.ts                       (  55 lines) → src/hooks/useErrorHandler.ts
-│   ├─  📄 useNavigationBadges.ts                   (  26 lines) → src/hooks/useNavigationBadges.tsx Hook para sincronizar badges de navegación con alertas del sistema ✅ Conecta alertas de inventario con badges de módulos
+│   ├─  📄 useErrorHandler.ts                       (  60 lines) → src/hooks/useErrorHandler.ts
+│   ├─  📄 useMaterialValidation.ts                 ( 220 lines) → Simple field validators
+│   ├─  📄 useNavigationBadges.ts                   (  63 lines) → src/hooks/useNavigationBadges.tsx 🚨 SISTEMA UNIFICADO DE BADGES DE NAVEGACIÓN ✅ Conecta el nuevo sistema de alertas con badges de módulos
 │   ├─  📄 useRecipeStockValidation.ts              (  96 lines) → hooks/useRecipeStockValidation.ts
-│   ├─  📄 useRouteBasedPreloading.ts               ( 261 lines) → useRouteBasedPreloading.ts - Intelligent route-based module preloading Preloads modules based on current location and navigation patterns
+│   ├─  📄 useRouteBasedPreloading.ts               ( 295 lines) → useRouteBasedPreloading.ts - Intelligent route-based module preloading Preloads modules based on current location and navigation patterns
 │   ├─  📄 useSaleStockValidation.ts                (  80 lines) → hooks/useSaleStockValidation.ts
 │   ├─  📄 useValidation.ts                         ( 120 lines) → Set errors and warnings in state
-│   └─⭐ 📄 useZustandStores.ts                      ( 358 lines) → Custom hooks for accessing Zustand stores with better TypeScript support
+│   └─⭐ 📄 useZustandStores.ts                      ( 435 lines) → Custom hooks for accessing Zustand stores with better TypeScript support
 ├─📂 lib
+│   ├─📂 auth
+│   │   ├─⭐ 📄 authService.ts                           ( 315 lines) → /** Initialize auth service and set up session listener /
+│   │   ├─  📄 index.ts                                 (   7 lines)
+│   │   └─  📄 useAuth.ts                               ( 231 lines) → State
 │   ├─📂 error-handling
 │   │   ├─📂 __tests__
 │   │   │   ├─  📄 ErrorBoundary.test.tsx                   ( 180 lines) → Component that throws an error for testing
 │   │   │   └─  📄 ErrorHandler.test.ts                     ( 127 lines) → Mock console methods
-│   │   ├─  📄 ErrorBoundary.tsx                        ( 128 lines) → Call custom error handler if provided
+│   │   ├─  📄 ErrorBoundary.tsx                        ( 129 lines) → Call custom error handler if provided
 │   │   ├─  📄 ErrorHandler.ts                          ( 205 lines) → Add to queue for batch processing
 │   │   ├─  📄 index.ts                                 (  14 lines)
-│   │   └─  📄 useErrorHandler.ts                       (  60 lines)
+│   │   └─  📄 useErrorHandler.ts                       (  61 lines)
 │   ├─📂 events
 │   │   ├─⭐ 📄 EventBus.ts                              ( 382 lines) → EventBus - Central Event Management System
 │   │   └─⭐ 📄 RestaurantEvents.ts                      ( 462 lines) → Restaurant Events - Event-Driven Architecture for G-Admin Based on architecture-plan.md event-driven patterns
@@ -57,34 +74,34 @@ Transcript started, output file is inventario.md
 │   ├─📂 offline
 │   │   ├─⭐ 📄 ConflictResolution.ts                    ( 797 lines) → ConflictResolution.ts - Advanced Conflict Resolution for G-Admin Mini Handles complex data conflicts with intelligent resolution strategies
 │   │   ├─⭐ 📄 index.ts                                 ( 318 lines) → index.ts - Offline Library Exports for G-Admin Mini Central export point for all offline functionality
-│   │   ├─⭐ 📄 LocalStorage.ts                          ( 610 lines) → LocalStorage.ts - IndexedDB Management for G-Admin Mini Provides robust local storage with schema versioning and data migrations
+│   │   ├─⭐ 📄 LocalStorage.ts                          ( 615 lines) → LocalStorage.ts - IndexedDB Management for G-Admin Mini Provides robust local storage with schema versioning and data migrations
 │   │   ├─⭐ 📄 OfflineMonitor.tsx                       ( 673 lines) → OfflineMonitor.tsx - Connection and Sync Status Monitoring for G-Admin Mini Provides real-time offline status, sync progress, and queue monitoring
-│   │   ├─⭐ 📄 OfflineSync.ts                           ( 965 lines) → OfflineSync.ts - Intelligent Data Synchronization for G-Admin Mini Handles conflict resolution, data merging, and optimistic updates
-│   │   ├─⭐ 📄 ServiceWorker.ts                         ( 559 lines) → ServiceWorker.ts - PWA Implementation for G-Admin Mini Provides offline-first capabilities with intelligent caching and sync
+│   │   ├─⭐ 📄 OfflineSync.ts                           ( 966 lines) → OfflineSync.ts - Intelligent Data Synchronization for G-Admin Mini Handles conflict resolution, data merging, and optimistic updates
+│   │   ├─⭐ 📄 ServiceWorker.ts                         ( 561 lines) → ServiceWorker.ts - PWA Implementation for G-Admin Mini Provides offline-first capabilities with intelligent caching and sync
 │   │   └─⭐ 📄 useOfflineStatus.ts                      ( 455 lines) → useOfflineStatus.ts - React Hook for Offline Status Management Provides comprehensive offline status, sync monitoring, and queue management
 │   ├─📂 performance
 │   │   ├─📂 __tests__
 │   │   │   └─  📄 codeSplitting.test.tsx                   ( 142 lines) → codeSplitting.test.tsx - Tests for code splitting functionality
 │   │   ├─📂 components
 │   │   │   ├─⭐ 📄 CodeSplittingReport.tsx                  ( 327 lines) → CodeSplittingReport.tsx - Performance monitoring for code splitting
-│   │   │   ├─⭐ 📄 LazyWrapper.tsx                          ( 514 lines) → LazyWrapper.tsx - Advanced Lazy Loading Components with Suspense Provides intelligent loading states and error boundaries for lazy components
+│   │   │   ├─⭐ 📄 LazyWrapper.tsx                          ( 558 lines) → LazyWrapper.tsx - Advanced Lazy Loading Components with Suspense Provides intelligent loading states and error boundaries for lazy components
 │   │   │   └─⭐ 📄 PerformanceDashboard.tsx                 ( 598 lines) → PerformanceDashboard.tsx - Comprehensive performance monitoring dashboard Provides real-time insights into application performance metrics
 │   │   ├─📂 virtualization
 │   │   │   └─  📄 VirtualizedList.tsx                      ( 256 lines) → VirtualizedList.tsx - High-performance virtualized list component Handles large datasets with minimal memory footprint
 │   │   ├─⭐ 📄 BundleOptimizer.ts                       ( 350 lines) → BundleOptimizer.ts - Advanced bundle optimization and analysis Provides build-time and runtime optimization recommendations
-│   │   ├─  📄 codeSplitting.ts                         ( 178 lines) → codeSplitting.ts - Centralized code splitting configuration
+│   │   ├─  📄 codeSplitting.ts                         ( 179 lines) → codeSplitting.ts - Centralized code splitting configuration
 │   │   ├─⭐ 📄 index.ts                                 ( 378 lines) → Performance Library Index - Advanced performance optimization suite Centralized exports for all performance-related utilities and components
 │   │   ├─  📄 lazyLoading.tsx                          ( 290 lines) → /** Enhanced lazy loading wrapper with error boundaries and retries /
-│   │   ├─⭐ 📄 LazyLoadingManager.ts                    ( 495 lines) → LazyLoadingManager.ts - Advanced Performance Management for G-Admin Mini Provides intelligent code splitting, lazy loading, and performance optimization
+│   │   ├─⭐ 📄 LazyLoadingManager.ts                    ( 532 lines) → LazyLoadingManager.ts - Advanced Performance Management for G-Admin Mini Provides intelligent code splitting, lazy loading, and performance optimization
 │   │   ├─⭐ 📄 memoization.ts                           ( 335 lines) → /** Enhanced useCallback with dependency comparison and performance monitoring /
-│   │   ├─⭐ 📄 RuntimeOptimizations.tsx                 ( 470 lines) → RuntimeOptimizations.tsx - Advanced runtime performance optimizations Provides memoization, event delegation, and performance monitoring utilities
+│   │   ├─⭐ 📄 RuntimeOptimizations.tsx                 ( 481 lines) → RuntimeOptimizations.tsx - Advanced runtime performance optimizations Provides memoization, event delegation, and performance monitoring utilities
 │   │   └─  📄 types.ts                                 (  79 lines) → Performance optimization types
 │   ├─📂 validation
 │   │   ├─📂 __tests__
 │   │   │   └─⭐ 📄 validators.test.ts                       ( 307 lines)
 │   │   ├─⭐ 📄 businessRules.ts                         ( 396 lines) → /** Inventory business rules /
 │   │   ├─  📄 index.ts                                 (  15 lines) → Centralized validation system
-│   │   ├─⭐ 📄 permissions.ts                           ( 314 lines) → Permission constants
+│   │   ├─⭐ 📄 permissions.tsx                          ( 314 lines) → Permission constants
 │   │   ├─  📄 sanitization.ts                          ( 196 lines) → /** Sanitizes a string by removing/escaping potentially harmful content /
 │   │   ├─⭐ 📄 security.ts                              ( 365 lines) → Rate limiting store (in production, use Redis or similar)
 │   │   ├─  📄 types.ts                                 (  79 lines) → Validation system types
@@ -131,8 +148,43 @@ Transcript started, output file is inventario.md
 │   │   ├─📂 common
 │   │   │   ├─  📄 LoadingSpinner.tsx                       (  29 lines) → src/components/common/LoadingSpinner.tsx - Chakra UI v3
 │   │   │   └─  📄 UnderDevelopment.tsx                     (  63 lines) → src/components/common/UnderDevelopment.tsx - Chakra UI v3
-│   │   ├─  📄 Dashboard.tsx                            ( 284 lines) → src/pages/Dashboard.tsx Dashboard como centro de comando funcional ✅ Elimina alertas duplicadas + navegación funcional
-│   │   ├─⭐ 📄 DashboardPage.tsx                        ( 386 lines) → Estados para dialogs
+│   │   ├─📂 components
+│   │   │   ├─📂 business
+│   │   │   │   ├─📂 components
+│   │   │   │   │   ├─  📄 BottlenecksView.tsx                      ( 170 lines) → BottlenecksView.tsx - Business bottlenecks analysis component
+│   │   │   │   │   ├─  📄 CorrelationsView.tsx                     ( 219 lines) → CorrelationsView.tsx - Focused correlations analysis component
+│   │   │   │   │   └─  📄 ExecutiveKPIGrid.tsx                     ( 189 lines) → ExecutiveKPIGrid.tsx - KPI display grid with performance indicators
+│   │   │   │   ├─⭐ 📄 CompetitiveIntelligence.tsx              (1252 lines) → Competitive Intelligence - Market Analysis & Strategic Positioning Advanced market intelligence for competitive advantage and strategic positioning
+│   │   │   │   ├─⭐ 📄 CrossModuleAnalytics.tsx                 (1409 lines) → Import event system
+│   │   │   │   ├─⭐ 📄 CustomReporting.tsx                      (1258 lines) → Import event system
+│   │   │   │   ├─⭐ 📄 ExecutiveDashboard.tsx                   (1391 lines) → Import event system
+│   │   │   │   ├─  📄 LazyCrossModuleAnalytics.tsx             (  64 lines) → LazyCrossModuleAnalytics.tsx - Lazy-loaded analytics with code splitting
+│   │   │   │   ├─  📄 LazyExecutiveDashboard.tsx               (  45 lines) → LazyExecutiveDashboard.tsx - Lazy-loaded executive dashboard with code splitting
+│   │   │   │   ├─⭐ 📄 PredictiveAnalytics.tsx                  (1094 lines) → Import event system
+│   │   │   │   └─⭐ 📄 PredictiveAnalytics.tsx.backup           (1086 lines) → Import event system
+│   │   │   ├─📂 recipes
+│   │   │   │   ├─  📄 RecipeIntelligenceDashboard.test.tsx     (  78 lines) → RecipeIntelligenceDashboard Component Tests
+│   │   │   │   └─⭐ 📄 RecipeIntelligenceDashboard.tsx          ( 374 lines)
+│   │   │   ├─⭐ 📄 CrossModuleSection.tsx                   ( 350 lines) → CrossModuleSection.tsx - Cross-module analytics integration (migrated from tools)
+│   │   │   ├─  📄 DashboardAnalytics.tsx                   ( 274 lines) → DashboardAnalytics.tsx - Cross-module analytics and insights (migrated from tools)
+│   │   │   ├─⭐ 📄 DashboardExecutive.tsx                   ( 475 lines) → DashboardExecutive.tsx - Executive Dashboard with strategic KPIs (migrated from tools)
+│   │   │   ├─⭐ 📄 DashboardForecasting.tsx                 ( 319 lines) → DashboardForecasting.tsx - Predictive Analytics with ML (migrated from tools)
+│   │   │   ├─  📄 DashboardOverview.tsx                    ( 260 lines) → DashboardOverview.tsx - Modern dashboard overview inspired by Shopify/Stripe
+│   │   │   ├─⭐ 📄 DashboardReports.tsx                     ( 392 lines) → DashboardReports.tsx - Custom Reporting and Advanced Reports (migrated from tools)
+│   │   │   ├─  📄 index.ts                                 (  10 lines) → Dashboard Components - Business Intelligence exports from organized folders
+│   │   │   └─⭐ 📄 PredictiveAnalyticsPage.tsx              ( 328 lines) → PredictiveAnalyticsPage.tsx - ML-powered forecasting and predictions
+│   │   ├─📂 hooks
+│   │   │   ├─  📄 index.ts                                 (   3 lines)
+│   │   │   ├─  📄 useDashboardData.ts                      (  68 lines)
+│   │   │   ├─  📄 useDashboardMetrics.ts                   (  67 lines)
+│   │   │   └─  📄 useModernDashboard.ts                    ( 170 lines) → Hero Metric (Revenue) - Métrica principal
+│   │   ├─📂 types
+│   │   │   └─  📄 dashboard.types.ts                       (  83 lines) → Dashboard types and interfaces
+│   │   ├─📂 utils
+│   │   │   ├─⭐ 📄 mockData.ts                              ( 448 lines) → Financial KPIs
+│   │   │   └─  📄 mockData.types.ts                        ( 105 lines) → Executive Dashboard Interfaces
+│   │   ├─  📄 Dashboard.tsx                            ( 185 lines) → Dashboard Moderno 2025 - Diseño basado en mejores prácticas ✅ Jerarquía visual + Sin duplicación + Responsive + Operacional
+│   │   ├─  📄 index.ts                                 (  13 lines) → Dashboard module exports
 │   │   ├─  📄 ModuleCard.tsx                           (  99 lines) → src/components/dashboard/ModuleCard.tsx - Chakra UI v3
 │   │   └─  📄 QuickStatsCard.tsx                       (  49 lines) → src/components/dashboard/QuickStatCard.tsx - Chakra UI v3
 │   ├─📂 fiscal
@@ -142,7 +194,7 @@ Transcript started, output file is inventario.md
 │   │   │   │   ├─⭐ 📄 FinancialReporting.tsx                   ( 604 lines)
 │   │   │   │   ├─⭐ 📄 InvoiceGeneration.tsx                    ( 621 lines)
 │   │   │   │   └─⭐ 📄 TaxCompliance.tsx                        ( 540 lines)
-│   │   │   ├─⭐ 📄 OfflineFiscalView.tsx                    ( 535 lines) → OfflineFiscalView.tsx - Robust Offline Fiscal Operations for G-Admin Mini Handles invoice generation, tax calculations, and AFIP queue management offline
+│   │   │   ├─⭐ 📄 OfflineFiscalView.tsx                    ( 533 lines) → OfflineFiscalView.tsx - Robust Offline Fiscal Operations for G-Admin Mini Handles invoice generation, tax calculations, and AFIP queue management offline
 │   │   │   ├─⭐ 📄 OfflineFiscalView.tsx.v2-backup          ( 535 lines) → OfflineFiscalView.tsx - Robust Offline Fiscal Operations for G-Admin Mini Handles invoice generation, tax calculations, and AFIP queue management offline
 │   │   │   └─  📄 TaxSummary.tsx                           ( 289 lines) → TaxSummary Component - Reusable tax breakdown display Shows detailed tax calculations in a consistent format
 │   │   ├─📂 data
@@ -154,51 +206,105 @@ Transcript started, output file is inventario.md
 │   │   ├─📂 services
 │   │   │   └─⭐ 📄 taxCalculationService.ts                 ( 342 lines) → Tax Calculation Service - Centralized Tax Logic for Argentina Extracted from Sales module for better separation of concerns
 │   │   ├─📂 ui
-│   │   ├─⭐ 📄 FiscalPage.tsx                           ( 427 lines) → Import components
+│   │   ├─⭐ 📄 FiscalPage.tsx                           ( 428 lines) → Import components
 │   │   ├─  📄 index.ts                                 (  58 lines) → Fiscal Module - Centralized Tax and Compliance Management Entry point for all fiscal-related functionality
 │   │   ├─  📄 index.tsx                                (   4 lines)
 │   │   └─  📄 types.ts                                 ( 250 lines) → Fiscal Module Types - Argentine Tax Compliance & AFIP Integration Based on architecture-plan.md requirements
 │   ├─📂 lazy
-│   │   └─  📄 LazyModules.ts                           ( 234 lines) → LazyModules.ts - Lazy-loaded module definitions with intelligent preloading Provides optimized code splitting for all major G-Admin Mini modules
+│   │   └─  📄 LazyModules.ts                           ( 239 lines) → LazyModules.ts - Lazy-loaded module definitions with intelligent preloading Provides optimized code splitting for all major G-Admin Mini modules
 │   ├─📂 materials
 │   │   ├─📂 __tests__
-│   │   │   └─  📄 MaterialsPage.test.tsx                   ( 228 lines) → Mock the inventory hook
+│   │   │   └─  📄 MaterialsPage.test.tsx                   ( 168 lines) → Mock data for tests
 │   │   ├─📂 components
+│   │   │   ├─📂 __tests__
+│   │   │   │   └─  📄 MaterialsGrid.test.tsx                   ( 235 lines) → 🎯 Mock data que simula materials reales
+│   │   │   ├─📂 analytics
+│   │   │   │   └─⭐ 📄 ABCAnalysisSection.tsx                   ( 312 lines) → ABCAnalysisSection.tsx - Advanced ABC Analysis for Materials Inventory Management
+│   │   │   ├─📂 MaterialFormModalComplete
+│   │   │   │   ├─📂 components
+│   │   │   │   │   ├─📂 CountableFields
+│   │   │   │   │   │   ├─  📄 CountableFields.tsx                      ( 207 lines)
+│   │   │   │   │   │   ├─⭐ 📄 CountableStockFields.tsx                 ( 550 lines)
+│   │   │   │   │   │   └─  📄 index.tsx                                (   1 lines)
+│   │   │   │   │   ├─📂 ElaboratedFields
+│   │   │   │   │   │   └─  📄 ElaboratedFields.tsx                     (  72 lines)
+│   │   │   │   │   ├─📂 FormSections
+│   │   │   │   │   │   ├─  📄 CommonFields.tsx                         (  52 lines)
+│   │   │   │   │   │   └─  📄 ValidatedField.tsx                       ( 131 lines)
+│   │   │   │   │   ├─📂 MeasurableFields
+│   │   │   │   │   │   ├─  📄 index.tsx                                (   1 lines)
+│   │   │   │   │   │   ├─  📄 MeasurableFields.tsx                     (  75 lines)
+│   │   │   │   │   │   └─⭐ 📄 MeasurableStockFields.tsx                ( 487 lines) → Estado local para el precio total (independiente de unit_cost)
+│   │   │   │   │   ├─📂 SupplierFields
+│   │   │   │   │   │   ├─  📄 index.ts                                 (   1 lines)
+│   │   │   │   │   │   └─⭐ 📄 SupplierFields.tsx                       ( 396 lines) → Para crear nuevo supplier
+│   │   │   │   │   ├─  📄 CountableFields.tsx                      ( 293 lines) → Tipos de configuración de stock
+│   │   │   │   │   ├─  📄 ElaboratedFields.tsx                     (  72 lines)
+│   │   │   │   │   ├─  📄 index.ts                                 (   6 lines)
+│   │   │   │   │   ├─  📄 MeasurableFields.tsx                     (  78 lines)
+│   │   │   │   │   └─  📄 TypeSelector.tsx                         (  41 lines)
+│   │   │   │   ├─  📄 constants.ts                             (  69 lines) → Common type for all select options with labels
+│   │   │   │   ├─  📄 index.tsx                                (   8 lines)
+│   │   │   │   ├─⭐ 📄 MaterialFormDialog.tsx                   ( 597 lines) → Components
+│   │   │   │   └─  📄 types.ts                                 (  12 lines)
+│   │   │   ├─⭐ 📄 ABCAnalysisPage.tsx                      ( 371 lines) → ABCAnalysisPage.tsx - Advanced ABC Analysis for Inventory Management
 │   │   │   ├─  📄 AlertsTab.tsx                            ( 204 lines) → src/features/inventory/components/AlertsTab.tsx Tab de alertas de stock - CORREGIDO
-│   │   │   ├─  📄 index.ts                                 (   5 lines) → Export all refactored components
+│   │   │   ├─  📄 index.ts                                 (   8 lines) → Export all refactored components
 │   │   │   ├─⭐ 📄 ItemForm.tsx                             ( 400 lines) → ✅ FIX: Definir colecciones fuera del componente para performance
+│   │   │   ├─  📄 LazyAnalytics.tsx                        (  46 lines) → Lazy load analytics components
+│   │   │   ├─  📄 LazyMaterialFormModal.tsx                (  47 lines) → Lazy load the heavy modal component
 │   │   │   ├─  📄 LazyOfflineMaterialsPage.tsx             (  55 lines) → LazyOfflineMaterialsPage.tsx - Lazy-loaded materials page with code splitting
-│   │   │   ├─⭐ 📄 MaterialFormModal.tsx                    ( 415 lines)
-│   │   │   ├─  📄 MaterialsFilters.tsx                     ( 198 lines)
-│   │   │   ├─⭐ 📄 MaterialsGrid.tsx                        ( 355 lines)
-│   │   │   ├─  📄 MaterialsHeader.tsx                      ( 106 lines)
+│   │   │   ├─  📄 MaterialFormModalComplete.tsx            (   2 lines) → Re-export the refactored MaterialFormDialog component
+│   │   │   ├─  📄 MaterialsFilters.tsx                     ( 137 lines)
+│   │   │   ├─  📄 MaterialsGrid.tsx                        ( 156 lines) → 🎯 Using centralized utilities for all calculations
+│   │   │   ├─  📄 MaterialsHeader.tsx                      (  93 lines)
 │   │   │   ├─⭐ 📄 MaterialsInventoryGrid.tsx               ( 384 lines) → MaterialsInventoryGrid.tsx - Virtualized inventory grid with smart filtering
 │   │   │   ├─  📄 MaterialsView.tsx                        ( 155 lines) → UnifiedMaterialsView.tsx - Smart Materials View with Automatic Online/Offline Detection Intelligently switches between MaterialsPage and OfflineMaterialsPage based on connection
-│   │   │   ├─⭐ 📄 OfflineMaterialsPage.tsx                 (1431 lines) → OfflineMaterialsPage.tsx - Offline-First Materials Management for G-Admin Mini Provides seamless offline inventory management with intelligent sync Now using code splitting for better performance
+│   │   │   ├─  📄 OfflineMaterialsPage.tsx                 (  17 lines)
 │   │   │   ├─  📄 OfflineMaterialsPageHeader.tsx           ( 165 lines) → OfflineMaterialsPageHeader.tsx - Focused header component with connection status
 │   │   │   ├─  📄 OfflineMaterialsStats.tsx                (  98 lines) → OfflineMaterialsStats.tsx - Statistics grid component
-│   │   │   └─⭐ 📄 UniversalItemForm.tsx                    ( 925 lines) → ✅ IMPORTS REALES
+│   │   │   ├─  📄 StockLabHeader.tsx                       (  98 lines)
+│   │   │   └─⭐ 📄 UniversalItemForm.tsx                    ( 981 lines) → ✅ IMPORTS REALES
 │   │   ├─📂 data
-│   │   │   └─  📄 inventoryApi.ts                          (  86 lines) → src/features/inventory/data/inventoryApi.ts API functions para el módulo inventory
+│   │   │   ├─  📄 inventoryApi.ts                          ( 125 lines) → src/features/inventory/data/inventoryApi.ts API functions para el módulo inventory
+│   │   │   └─  📄 suppliersApi.ts                          (  98 lines) → API functions para el módulo suppliers
 │   │   ├─📂 intelligence
 │   │   │   ├─⭐ 📄 ABCAnalysisEngine.tsx                    ( 937 lines) → ABC Analysis Engine - Supply Chain Intelligence Advanced inventory classification and optimization system
 │   │   │   ├─⭐ 📄 AlertingSystem.tsx                       (1334 lines) → Alerting System - Smart Notifications and Supply Chain Alerts Real-time monitoring with intelligent alerting capabilities
+│   │   │   ├─⭐ 📄 AlertingSystemReal.tsx                   ( 410 lines) → /** Alerting System - Real Data Version Connected to actual stock alerts and materials data /
 │   │   │   ├─⭐ 📄 InventoryOptimization.tsx                (1260 lines) → Inventory Optimization - Demand Forecasting Engine AI-powered inventory planning with predictive analytics
 │   │   │   ├─⭐ 📄 ProcurementIntelligence.tsx              (1017 lines) → Procurement Intelligence - Smart Reordering & Supplier Management Advanced purchasing optimization and automated procurement system
 │   │   │   ├─⭐ 📄 SupplierScoring.tsx                      (1152 lines) → Supplier Scoring System - Advanced Supplier Performance Analytics Automated scoring, risk assessment, and supplier optimization
-│   │   │   └─⭐ 📄 SupplyChainReporting.tsx                 (1347 lines) → Supply Chain Reporting - Comprehensive Business Intelligence Dashboard Advanced analytics and reporting for supply chain operations
+│   │   │   ├─⭐ 📄 SupplyChainReporting.tsx                 (1347 lines) → Supply Chain Reporting - Comprehensive Business Intelligence Dashboard Advanced analytics and reporting for supply chain operations
+│   │   │   └─⭐ 📄 SupplyChainReportingReal.tsx             ( 432 lines) → /** Supply Chain Reporting - Real Data Version Connected to actual Supabase functions instead of mock data /
 │   │   ├─📂 logic
-│   │   │   └─⭐ 📄 useInventory.tsx                         ( 354 lines) → src/features/inventory/logic/useInventory.tsx Inventory management hook with Supabase realtime integration
+│   │   │   └─⭐ 📄 useMaterials.tsx                         ( 354 lines) → src/features/materials/logic/useMaterials.tsx Materials management hook with Supabase realtime integration
+│   │   ├─📂 services
+│   │   │   ├─📂 __tests__
+│   │   │   │   └─  📄 materialsNormalizer.test.ts              ( 288 lines)
+│   │   │   ├─  📄 index.ts                                 (   1 lines)
+│   │   │   ├─  📄 materialsNormalizer.ts                   ( 274 lines) → /** Service responsible for normalizing API data into consistent MaterialItem objects. Handles type-specific transformations and provides default values for missing properties. /
+│   │   │   └─⭐ 📄 supplyChainDataService.ts                ( 310 lines) → /** Supply Chain Data Service Replaces mock data with real Supabase functions for Supply Chain Intelligence /
+│   │   ├─📂 types
+│   │   │   └─  📄 abc-analysis.ts                          (  33 lines) → ABC Analysis Types for Materials Module
 │   │   ├─📂 utils
-│   │   │   └─  📄 conversions.ts                           ( 284 lines) → src/features/inventory/utils/conversions.ts 🧮 SISTEMA DE CONVERSIONES PRECISAS - Sin decimales, máxima precisión
+│   │   │   ├─📂 __tests__
+│   │   │   │   └─  📄 stockCalculations.test.ts                ( 259 lines)
+│   │   │   ├─  📄 conversions.ts                           ( 284 lines) → src/features/inventory/utils/conversions.ts 🧮 SISTEMA DE CONVERSIONES PRECISAS - Sin decimales, máxima precisión
+│   │   │   ├─  📄 formCalculations.ts                      ( 255 lines) → /** Utility functions for material form calculations Handles cost calculations, conversions, and formatting for the form UI /
+│   │   │   ├─  📄 index.ts                                 (   4 lines)
+│   │   │   ├─  📄 measurementTypes.ts                      ( 196 lines) → /** Measurement type detection utilities Separates measurement logic from business categorization /
+│   │   │   └─  📄 stockCalculations.ts                     ( 239 lines) → /** Stock status levels /
 │   │   ├─  📄 index.tsx                                (   3 lines)
-│   │   ├─  📄 MaterialsPage.tsx                        ( 195 lines) → New components
-│   │   ├─⭐ 📄 MaterialsPage.tsx.bak                    ( 990 lines) → ✅ IMPORTS REALES
-│   │   ├─⭐ 📄 MaterialsPage.tsx.pre-lefticon           ( 990 lines) → ✅ IMPORTS REALES
-│   │   ├─⭐ 📄 MaterialsPage.tsx.v2-backup              ( 990 lines) → ✅ IMPORTS REALES
-│   │   ├─⭐ 📄 MaterialsPageOld.tsx                     ( 990 lines) → ✅ IMPORTS REALES
+│   │   ├─  📄 LazyProcurementPage.tsx                  (   9 lines)
+│   │   ├─  📄 LazySupplyChainPage.tsx                  (   9 lines)
+│   │   ├─  📄 MaterialsPage.tsx                        ( 165 lines) → Shared components
+│   │   ├─  📄 MaterialsPageNew.tsx                     (   0 lines)
+│   │   ├─  📄 ProcurementPage.tsx                      ( 120 lines) → Shared components
 │   │   ├─  📄 README.md                                (  96 lines)
-│   │   └─  📄 types.ts                                 ( 280 lines) → src/features/inventory/types.ts 🚀 SISTEMA EXPANDIDO - Soporte para 3 tipos de items con precisión total
+│   │   ├─  📄 StockLab.tsx                             (   0 lines)
+│   │   ├─  📄 SupplyChainPage.tsx                      ( 123 lines) → Shared components
+│   │   └─  📄 types.ts                                 ( 278 lines) → Materials module types - Simplified and focused Clean, maintainable type system for inventory management
 │   ├─📂 operations
 │   │   ├─📂 components
 │   │   │   ├─📂 kitchen
@@ -211,7 +317,7 @@ Transcript started, output file is inventario.md
 │   │   │   │   └─⭐ 📄 TableManagementPage.tsx                  ( 446 lines)
 │   │   │   └─  📄 OperationsHeader.tsx                     (  97 lines) → OperationsHeader with KPIs and quick actions
 │   │   ├─  📄 index.ts                                 (   7 lines) → Operations module exports
-│   │   └─  📄 OperationsPage.tsx                       (  86 lines) → Operations Page - Main hub for Kitchen + Tables + Production + Monitoring
+│   │   └─  📄 OperationsPage.tsx                       ( 141 lines) → Operations Page - Unified dashboard without nested tabs
 │   ├─📂 products
 │   │   ├─📂 analytics
 │   │   │   ├─⭐ 📄 MenuEngineeringMatrix.tsx                ( 519 lines)
@@ -219,6 +325,8 @@ Transcript started, output file is inventario.md
 │   │   ├─📂 components
 │   │   ├─📂 data
 │   │   │   └─  📄 productApi.ts                            ( 243 lines) → src/features/products/data/productApi.ts G-Admin Products API - Leveraging Database Functions for Intelligence
+│   │   ├─📂 hooks
+│   │   │   └─  📄 useProducts.ts                           ( 102 lines) → Transform store products to ProductWithIntelligence for compatibility
 │   │   ├─📂 logic
 │   │   │   ├─⭐ 📄 menuEngineeringCalculations.ts           ( 459 lines) → Menu Engineering Matrix Calculations Strategic Business Intelligence Engine for G-Admin Mini
 │   │   │   ├─⭐ 📄 useMenuEngineering.ts                    ( 361 lines) → Data
@@ -237,6 +345,7 @@ Transcript started, output file is inventario.md
 │   │   │   ├─  📄 DemandForecastOnly.tsx                   ( 184 lines) → src/features/products/ui/DemandForecastOnly.tsx Demand Forecast como sección independiente
 │   │   │   ├─  📄 MenuEngineeringOnly.tsx                  (  49 lines) → src/features/products/ui/MenuEngineeringOnly.tsx Menu Engineering Matrix como sección independiente
 │   │   │   ├─  📄 ProductForm.tsx                          ( 233 lines) → src/features/products/ui/ProductForm.tsx Product Creation and Editing Form with ChakraUI v3
+│   │   │   ├─  📄 ProductFormModal.tsx                     ( 142 lines) → Update existing product
 │   │   │   ├─⭐ 📄 ProductionActiveTab.tsx                  ( 512 lines) → src/features/products/ui/ProductionActiveTab.tsx Control de Producciones Activas - Real-time Production Management
 │   │   │   ├─⭐ 📄 ProductionPlanningOnly.tsx               ( 431 lines) → src/features/products/ui/ProductionPlanningOnly.tsx Production Planning como sección independiente
 │   │   │   ├─⭐ 📄 ProductionPlanningTab.tsx                ( 917 lines) → src/features/products/ui/ProductionPlanningTab.tsx Production Planning & Demand Forecasting System
@@ -244,8 +353,7 @@ Transcript started, output file is inventario.md
 │   │   │   ├─⭐ 📄 ProductList.tsx                          ( 349 lines) → src/features/products/ui/ProductList.tsx Product List with Intelligence Display
 │   │   │   └─  📄 ProductListOnly.tsx                      ( 129 lines) → src/features/products/ui/ProductListOnly.tsx Gestión de productos sin sub-pestañas
 │   │   ├─  📄 index.tsx                                (   2 lines)
-│   │   ├─  📄 ProductsPage.tsx                         ( 103 lines) → Import components
-│   │   ├─  📄 ProductsPage.tsx.v2-backup               ( 102 lines) → Import components
+│   │   ├─  📄 ProductsPage.tsx                         ( 162 lines) → Import components
 │   │   └─  📄 types.ts                                 ( 109 lines) → ========================================== G-ADMIN PRODUCTS MODULE - PRODUCT INTELLIGENCE SYSTEM v1.0 Following Screaming Architecture Pattern Product Assembly Engine + Component Tracking + Cost Intelligence ==========================================
 │   ├─📂 sales
 │   │   ├─📂 __tests__
@@ -257,14 +365,14 @@ Transcript started, output file is inventario.md
 │   │   │   │   ├─⭐ 📄 SalesIntelligenceDashboard.tsx           ( 557 lines) → src/features/sales/components/Analytics/SalesIntelligenceDashboard.tsx 🚀 SALES INTELLIGENCE - Advanced Analytics Dashboard
 │   │   │   │   └─⭐ 📄 SalesPerformanceInsights.tsx             ( 650 lines)
 │   │   │   ├─📂 OrderManagement
-│   │   │   │   └─⭐ 📄 KitchenDisplaySystem.tsx                 ( 522 lines) → src/features/sales/components/OrderManagement/KitchenDisplaySystem.tsx 🚀 KITCHEN DISPLAY SYSTEM - Real-time Order Management for Kitchen Staff
+│   │   │   │   └─⭐ 📄 KitchenDisplaySystem.tsx                 ( 526 lines) → src/features/sales/components/OrderManagement/KitchenDisplaySystem.tsx 🚀 KITCHEN DISPLAY SYSTEM - Real-time Order Management for Kitchen Staff
 │   │   │   ├─📂 Payment
 │   │   │   │   └─⭐ 📄 ModernPaymentProcessor.tsx               ( 575 lines) → src/features/sales/components/Payment/ModernPaymentProcessor.tsx 🚀 PAYMENT REVOLUTION - Modern Payment Processing System
 │   │   │   ├─📂 QROrdering
 │   │   │   │   ├─⭐ 📄 QRCodeGenerator.tsx                      ( 500 lines) → src/features/sales/components/QROrdering/QRCodeGenerator.tsx 🚀 QR CODE ORDERING - Tableside Digital Menu System
 │   │   │   │   └─⭐ 📄 QROrderPage.tsx                          ( 659 lines)
 │   │   │   ├─📂 TableManagement
-│   │   │   │   └─⭐ 📄 TableFloorPlan.tsx                       ( 488 lines) → src/features/sales/components/TableManagement/TableFloorPlan.tsx 🚀 MODERN TABLE MANAGEMENT - Visual Floor Plan Component
+│   │   │   │   └─⭐ 📄 TableFloorPlan.tsx                       ( 505 lines) → src/features/sales/components/TableManagement/TableFloorPlan.tsx 🚀 MODERN TABLE MANAGEMENT - Visual Floor Plan Component
 │   │   │   ├─⭐ 📄 CartValidationSummary.tsx                ( 328 lines) → src/features/sales/components/CartValidationSummary.tsx
 │   │   │   ├─⭐ 📄 OfflineSalesView.tsx                     (1030 lines) → OfflineSalesView.tsx - Offline-First POS System for G-Admin Mini Provides seamless offline sales processing with intelligent sync
 │   │   │   ├─⭐ 📄 ProductWithStock.tsx                     ( 412 lines) → src/features/sales/components/ProductWithStock.tsx
@@ -282,15 +390,15 @@ Transcript started, output file is inventario.md
 │   │   │   ├─⭐ 📄 SaleForm.tsx                             ( 440 lines) → features/sales/ui/SaleForm.tsx ✅ CORREGIDO: Heroicons + Chakra v3.23 + Select collections
 │   │   │   └─⭐ 📄 SaleList.tsx                             ( 494 lines) → src/features/sales/ui/SaleList.tsx - Chakra UI v3
 │   │   ├─  📄 index.tsx                                ( 218 lines) → src/features/sales/index.tsx - MODERN POS SYSTEM v3.0
-│   │   ├─  📄 SalesPage.tsx                            ( 169 lines) → Refactored Sales Page with UNIFIED navigation pattern
+│   │   ├─⭐ 📄 SalesPage.tsx                            ( 372 lines) → Sales Page - Redesigned with prioritized actions and better organization
 │   │   ├─  📄 SalesPage.tsx.v2-backup                  ( 169 lines) → Refactored Sales Page with UNIFIED navigation pattern
 │   │   └─⭐ 📄 types.ts                                 ( 817 lines) → src/features/sales/types.ts - MODERN POS ARCHITECTURE v3.0 ======================================================== CORE SALES & ORDER MANAGEMENT ========================================================
 │   ├─📂 scheduling
 │   │   ├─📂 components
 │   │   │   └─📂 sections
-│   │   │       ├─⭐ 📄 CoveragePlanner.tsx                      ( 563 lines) → CoveragePlanner - Analyze and manage shift coverage gaps and staffing needs
+│   │   │       ├─⭐ 📄 CoveragePlanner.tsx                      ( 563 lines) → r - Analyze and manage shift coverage gaps and staffing needs
 │   │   │       ├─⭐ 📄 LaborCostTracker.tsx                     ( 547 lines) → LaborCostTracker - Track and analyze labor costs, overtime, and budget performance
-│   │   │       ├─⭐ 📄 TimeOffManager.tsx                       ( 476 lines) → TimeOffManager - Manage time-off requests, approvals, and PTO tracking
+│   │   │       ├─⭐ 📄 TimeOffManager.tsx                       ( 483 lines) → TimeOffManager - Manage time-off requests, approvals, and PTO tracking
 │   │   │       └─⭐ 📄 WeeklyScheduleView.tsx                   ( 372 lines) → WeeklyScheduleView - Main calendar interface with drag & drop scheduling
 │   │   ├─📂 data
 │   │   │   └─⭐ 📄 schedulingApi.ts                         ( 652 lines) → schedulingApi - Supabase API integration for scheduling module
@@ -304,16 +412,23 @@ Transcript started, output file is inventario.md
 │   │   ├─📂 components
 │   │   │   ├─📂 sections
 │   │   │   │   ├─  📄 BusinessProfileSection.tsx               ( 127 lines) → Business Profile Section - Company info, location, hours
+│   │   │   │   ├─⭐ 📄 EnterpriseSection.tsx                    ( 314 lines) → EnterpriseSection.tsx - Enterprise Management Tools (migrated from tools)
 │   │   │   │   ├─  📄 IntegrationsSection.tsx                  ( 225 lines) → Integrations Section - APIs, webhooks, external services
+│   │   │   │   ├─  📄 SystemSection.tsx                        ( 296 lines) → SystemSection.tsx - System Diagnostics and Performance Monitoring (migrated from tools)
 │   │   │   │   ├─  📄 TaxConfigurationSection.tsx              ( 168 lines) → Tax Configuration Section - Tax settings and fiscal configuration
 │   │   │   │   └─  📄 UserPermissionsSection.tsx               ( 208 lines) → User Permissions Section - Roles and access management
+│   │   │   ├─  📄 DiagnosticsPage.tsx                      (  92 lines) → DiagnosticsPage.tsx - System Diagnostics and Performance Monitoring
+│   │   │   ├─  📄 EnterprisePage.tsx                       ( 134 lines) → EnterprisePage.tsx - Enterprise Management Tools
+│   │   │   ├─  📄 index.ts                                 (   5 lines) → Settings expanded components - Former tools functionality
+│   │   │   ├─  📄 IntegrationsPage.tsx                     ( 171 lines) → IntegrationsPage.tsx - API Integrations and External Services
+│   │   │   ├─  📄 ReportingPage.tsx                        ( 129 lines) → ReportingPage.tsx - Advanced Reporting Tools
 │   │   │   └─  📄 SettingsHeader.tsx                       (  97 lines) → SettingsHeader with configuration status and quick actions
 │   │   ├─📂 data
 │   │   │   └─⭐ 📄 settingsApi.ts                           ( 553 lines) → Settings API - Business configuration database functions
 │   │   ├─📂 logic
 │   │   ├─📂 ui
 │   │   ├─  📄 index.tsx                                (  21 lines) → src/modules/settings/index.tsx Exportaciones del módulo de configuraciones del negocio
-│   │   ├─  📄 SettingsPage.tsx                         (  86 lines) → Settings Page - Main hub for Business Profile + Tax Config + Permissions + Integrations
+│   │   ├─  📄 SettingsPage.tsx                         ( 141 lines) → Settings Page - Unified dashboard without nested tabs
 │   │   └─  📄 types.ts                                 (  82 lines) → src/features/settings/types.ts Tipos para configuraciones del negocio
 │   └─📂 staff
 │       ├─📂 __tests__
@@ -321,11 +436,12 @@ Transcript started, output file is inventario.md
 │       │   └─⭐ 📄 staffApi.test.ts                         ( 307 lines) → Staff Management API Tests
 │       ├─📂 components
 │       │   └─📂 sections
-│       │       ├─⭐ 📄 DirectorySection.tsx                     ( 564 lines) → Staff Directory Section - Employee list and profiles
-│       │       ├─⭐ 📄 ManagementSection.tsx                    ( 792 lines) → Staff Management Section - HR functions and permissions with security compliance
-│       │       ├─⭐ 📄 PerformanceSection.tsx                   ( 521 lines) → Staff Performance Section - Metrics and scoring system
-│       │       ├─⭐ 📄 TimeTrackingSection.tsx                  (1077 lines) → OfflineTimeTrackingSection.tsx - Offline-First Time Tracking for G-Admin Mini Provides seamless offline time tracking with intelligent sync
-│       │       └─⭐ 📄 TrainingSection.tsx                      ( 600 lines) → Staff Training Section - Records and certifications management
+│       │       ├─⭐ 📄 DirectorySection.tsx                     ( 602 lines) → Staff Directory Section - Employee list and profiles
+│       │       ├─⭐ 📄 DirectorySection.tsx.backup              ( 590 lines) → Staff Directory Section - Employee list and profiles
+│       │       ├─⭐ 📄 ManagementSection.tsx                    ( 830 lines) → Staff Management Section - HR functions and permissions with security compliance
+│       │       ├─⭐ 📄 PerformanceSection.tsx                   ( 527 lines) → Staff Performance Section - Metrics and scoring system
+│       │       ├─⭐ 📄 TimeTrackingSection.tsx                  (1080 lines) → OfflineTimeTrackingSection.tsx - Offline-First Time Tracking for G-Admin Mini Provides seamless offline time tracking with intelligent sync
+│       │       └─⭐ 📄 TrainingSection.tsx                      ( 613 lines) → Staff Training Section - Records and certifications management
 │       ├─📂 data
 │       │   └─⭐ 📄 staffApi.ts                              ( 503 lines) → Staff Management API - Database functions with security compliance
 │       ├─📂 logic
@@ -334,12 +450,73 @@ Transcript started, output file is inventario.md
 │       ├─⭐ 📄 StaffPage.tsx                            ( 319 lines) → Staff Management Module - Main Page with UNIFIED navigation pattern
 │       ├─⭐ 📄 StaffPage.tsx.v2-backup                  ( 319 lines) → Staff Management Module - Main Page with UNIFIED navigation pattern
 │       └─  📄 types.ts                                 ( 243 lines) → Staff Management Module - Types Definition Security compliant types for employee data management
+├─📂 services
+│   └─📂 recipe
+│       ├─📂 api
+│       │   ├─  📄 recipeApi.test.ts                        ( 169 lines) → Enhanced Recipe API Tests - Comprehensive Test Suite
+│       │   └─⭐ 📄 recipeApi.ts                             ( 383 lines) → src/features/recipes/data/recipeApi.ts
+│       ├─📂 components
+│       │   ├─📂 components
+│       │   │   ├─⭐ 📄 RecipeAISuggestions.tsx                  ( 389 lines) → RecipeAISuggestions.tsx - AI-powered recipe optimization suggestions
+│       │   │   └─  📄 RecipeBasicForm.tsx                      ( 167 lines) → RecipeBasicForm.tsx - Basic recipe information form
+│       │   ├─  📄 index.ts                                 (   7 lines) → Clean Recipe Components - Unified exports
+│       │   ├─  📄 LazyRecipeForm.tsx                       (  62 lines) → LazyRecipeForm.tsx - Lazy-loaded recipe form with code splitting
+│       │   ├─⭐ 📄 RecipeForm.tsx                           (1268 lines) → src/features/recipes/ui/RecipeForm.tsx - ENHANCED WITH AI SUGGESTIONS
+│       │   ├─⭐ 📄 RecipeFormClean.tsx                      ( 513 lines) → Clean Recipe Form - Optimized for G-Admin Mini
+│       │   ├─⭐ 📄 RecipeList.tsx                           ( 405 lines) → src/features/recipes/ui/RecipeList.tsx - Chakra UI v3
+│       │   └─  📄 RecipeListClean.tsx                      ( 243 lines) → Clean Recipe List - Optimized for G-Admin Mini
+│       ├─📂 engines
+│       │   ├─  📄 costCalculationEngine.test.ts            ( 137 lines) → src/features/recipes/data/engines/costCalculationEngine.test.ts
+│       │   ├─  📄 costCalculationEngine.ts                 (  22 lines) → Smart Cost Calculation Engine
+│       │   ├─  📄 menuEngineeringEngine.test.ts            ( 172 lines) → Menu Engineering Engine Tests - Comprehensive Test Suite
+│       │   └─  📄 menuEngineeringEngine.ts                 (  24 lines) → Menu Engineering Engine
+│       ├─📂 hooks
+│       │   ├─  📄 useRecipes.test.ts                       ( 247 lines) → Enhanced useRecipes Hook Tests - Comprehensive Test Suite
+│       │   └─  📄 useRecipes.ts                            ( 142 lines) → src/features/recipes/logic/useRecipes.ts
+│       ├─  📄 index.ts                                 (  19 lines) → Recipe Service - Public exports
+│       ├─  📄 RecipeAPI.ts                             ( 113 lines) → Recipe Service - API layer for recipe operations
+│       ├─  📄 RecipeService.ts                         ( 199 lines) → Recipe Service - Business logic layer
+│       └─⭐ 📄 types.ts                                 ( 430 lines) → ========================================== G-ADMIN RECIPES MODULE - RECIPE INTELLIGENCE SYSTEM v3.0 Following Screaming Architecture Pattern Smart Cost Calculation + Menu Engineering + Production Intelligence + Kitchen Automation ==========================================
 ├─📂 shared
+│   ├─📂 alerts
+│   │   ├─📂 components
+│   │   │   ├─⭐ 📄 AlertBadge.tsx                           ( 304 lines) → src/shared/alerts/components/AlertBadge.tsx 🎯 COMPONENTE UNIFICADO DE BADGE DE ALERTAS Reemplaza AlertsBadge y todas sus variantes
+│   │   │   ├─⭐ 📄 AlertDisplay.tsx                         ( 401 lines) → src/shared/alerts/components/AlertDisplay.tsx 🎯 COMPONENTE BASE UNIFICADO PARA MOSTRAR ALERTAS Reemplaza AlertCard y otros componentes similares
+│   │   │   └─⭐ 📄 GlobalAlertsDisplay.tsx                  ( 318 lines) → src/shared/alerts/components/GlobalAlertsDisplay.tsx 🎯 DISPLAY AUTOMÁTICO DE ALERTAS GLOBALES Reemplaza GlobalAlerts con arquitectura más limpia
+│   │   ├─📂 hooks
+│   │   │   └─  📄 useAlerts.ts                             ( 261 lines) → src/shared/alerts/hooks/useAlerts.ts 🎯 HOOK PRINCIPAL DEL SISTEMA DE ALERTAS API simplificada para usar las alertas desde cualquier componente
+│   │   ├─⭐ 📄 AlertsProvider.tsx                       ( 463 lines) → src/shared/alerts/AlertsProvider.tsx 🎯 PROVIDER CENTRAL DEL SISTEMA DE ALERTAS Maneja el estado global de todas las alertas de la aplicación
+│   │   ├─  📄 index.ts                                 ( 192 lines) → src/shared/alerts/index.ts 🎯 EXPORTACIONES CENTRALIZADAS DEL SISTEMA DE ALERTAS Punto único de entrada para todo el sistema de alertas
+│   │   └─  📄 types.ts                                 ( 200 lines) → src/shared/alerts/types.ts 🎯 SISTEMA UNIFICADO DE ALERTAS Tipos y interfaces centralizadas para todo el sistema de alertas
 │   ├─📂 charts
 │   │   ├─  📄 index.ts                                 (  11 lines) → src/components/charts/index.ts Chart components for analytics and KPIs
 │   │   ├─  📄 KPIChart.tsx                             (  83 lines) → src/components/charts/KPIChart.tsx KPI metrics chart component
 │   │   ├─  📄 RevenueChart.tsx                         (  44 lines) → src/components/charts/RevenueChart.tsx Revenue analytics chart component
 │   │   └─  📄 SalesAnalyticsChart.tsx                  ( 123 lines) → src/components/charts/SalesAnalyticsChart.tsx Sales analytics and trends chart component
+│   ├─📂 components
+│   │   ├─📂 recipe
+│   │   │   ├─📂 hooks
+│   │   │   │   ├─  📄 useRecipeAPI.ts                          ( 189 lines) → useRecipeAPI - API operations hook
+│   │   │   │   └─  📄 useRecipeBuilder.ts                      ( 192 lines) → useRecipeBuilder - Shared logic for recipe building
+│   │   │   ├─  📄 index.ts                                 (   7 lines) → Recipe Components - Public exports
+│   │   │   ├─  📄 RecipeBuilderClean.tsx                   ( 144 lines) → Clean Recipe Builder - Simplified version using clean components
+│   │   │   └─⭐ 📄 RecipeBuilderLite.tsx                    ( 510 lines) → Unified Recipe Builder Lite - Works for both products and materials
+│   │   ├─📂 SmartCostCalculator
+│   │   │   ├─  📄 SmartCostCalculator.test.tsx             (  41 lines) → SmartCostCalculator Component Tests
+│   │   │   └─⭐ 📄 SmartCostCalculator.tsx                  ( 454 lines)
+│   │   ├─📂 widgets
+│   │   │   ├─  📄 AlertCard.tsx                            (  47 lines)
+│   │   │   ├─  📄 BusinessIntelligenceCard.tsx             (  58 lines)
+│   │   │   ├─  📄 HeroMetricCard.tsx                       ( 183 lines)
+│   │   │   ├─  📄 index.ts                                 (   6 lines)
+│   │   │   ├─  📄 MetricCard.tsx                           (  81 lines)
+│   │   │   ├─  📄 QuickActionCard.tsx                      (  38 lines)
+│   │   │   └─  📄 SummaryPanel.tsx                         ( 184 lines)
+│   │   ├─  📄 ErrorBoundary.tsx                        ( 100 lines) → TODO: Send error to monitoring service reportError(error, { moduleName: this.props.moduleName, errorInfo });
+│   │   ├─  📄 index.ts                                 (   7 lines) → Shared Components exports
+│   │   ├─  📄 LazyWithErrorBoundary.tsx                (  42 lines)
+│   │   ├─  📄 MaterialSelector.tsx                     ( 237 lines) → MaterialSelector - Clean component for selecting materials with stock validation
+│   │   └─  📄 ThemeToggle.tsx                          (  60 lines)
 │   ├─📂 forms
 │   │   ├─  📄 FormInput.tsx                            (  68 lines) → src/components/forms/FormInput.tsx Reusable form input component with validation
 │   │   ├─  📄 FormNumberInput.tsx                      (  82 lines) → src/components/forms/FormNumberInput.tsx Reusable form number input component with validation
@@ -347,10 +524,13 @@ Transcript started, output file is inventario.md
 │   │   ├─  📄 FormTextarea.tsx                         (  82 lines) → src/components/forms/FormTextarea.tsx Reusable form textarea component with validation
 │   │   ├─  📄 FormValidation.tsx                       ( 152 lines) → src/components/forms/FormValidation.tsx Form validation utilities and helpers
 │   │   └─  📄 index.ts                                 (  15 lines) → src/components/forms/index.ts Form components with validation
+│   ├─📂 hooks
+│   │   ├─  📄 index.ts                                 (   2 lines) → Shared Hooks exports
+│   │   └─  📄 useDebounce.ts                           (  27 lines) → /** Custom hook for debouncing values to prevent excessive API calls or computations @param value - The value to debounce @param delay - Delay in milliseconds @returns The debounced value /
 │   ├─📂 layout
-│   │   ├─  📄 DesktopLayout.tsx                        (  67 lines) → src/components/layout/DesktopLayout.tsx Layout específico para desktop (768px+) 🔧 CRÍTICO CORREGIDO: Full width viewport + layout positioning fix
+│   │   ├─  📄 DesktopLayout.tsx                        (  68 lines) → src/components/layout/DesktopLayout.tsx Layout específico para desktop (768px+) 🔧 CRÍTICO CORREGIDO: Full width viewport + layout positioning fix
 │   │   ├─  📄 MobileLayout.tsx                         (  51 lines) → src/components/layout/MobileLayout.tsx Layout específico para mobile (320px-767px) 🔧 CRÍTICO CORREGIDO: Bottom nav SIEMPRE fija + Z-index consistente + Scroll behavior
-│   │   ├─  📄 ModuleHeader.tsx                         (  74 lines) → ============================================== 📁 src/components/layout/ModuleHeader.tsx ==============================================
+│   │   ├─  📄 ModuleHeader.tsx                         (  70 lines) → ============================================== 📁 src/components/layout/ModuleHeader.tsx ==============================================
 │   │   └─  📄 ResponsiveLayout.tsx                     (  24 lines) → src/components/layout/ResponsiveLayout.tsx ResponsiveLayout - Container adaptativo mobile/desktop que usa NavigationContext ✅ CORREGIDO: Imports limpiados + errores solucionados
 │   ├─📂 navigation
 │   │   ├─  📄 ActionToolbar.tsx                        (  43 lines) → src/components/navigation/ActionToolbar.tsx Toolbar de acciones para desktop ✅ CORREGIDO: Import de Text + Quick actions contextuales
@@ -358,150 +538,54 @@ Transcript started, output file is inventario.md
 │   │   ├─  📄 BottomNavigation.tsx                     (  87 lines) → ==================================== src/components/navigation/BottomNavigation.tsx - ICONOS CORREGIDOS ====================================
 │   │   ├─  📄 Breadcrumb.tsx                           (  51 lines) → src/components/navigation/Breadcrumb.tsx Breadcrumb contextual para desktop ✅ CORREGIDO: Clickeable navigation
 │   │   ├─  📄 FloatingActionButton.tsx                 (  38 lines) → ==================================== src/components/navigation/FloatingActionButton.tsx - CORREGIDO ====================================
-│   │   ├─  📄 Header.tsx                               ( 184 lines) → ==================================== src/components/navigation/Header.tsx - ICONOS CORREGIDOS ====================================
-│   │   └─  📄 Sidebar.tsx                              ( 130 lines) → ==================================== src/components/navigation/Sidebar.tsx - ICONOS CORREGIDOS ====================================
+│   │   ├─  📄 Header.tsx                               ( 230 lines) → ==================================== src/components/navigation/Header.tsx - ICONOS CORREGIDOS ====================================
+│   │   └─  📄 Sidebar.tsx                              ( 298 lines) → ==================================== src/shared/navigation/Sidebar.tsx - DISEÑO VISUAL OPTIMIZADO ====================================
 │   └─📂 ui
+│       ├─  📄 AppContainer.tsx                         (  12 lines)
+│       ├─  📄 Button.tsx                               (  41 lines)
+│       ├─  📄 Card.tsx                                 (  71 lines)
 │       ├─  📄 CircularProgress.tsx                     ( 117 lines) → src/components/ui/CircularProgress.tsx Functional Circular Progress for ChakraUI v3.23.0
-│       ├─  📄 color-theme.tsx                          (  14 lines)
 │       ├─  📄 ConnectionBadge.tsx                      ( 137 lines) → ConnectionBadge.tsx - Universal Connection Status Indicator ChakraUI v3.23.0 Compatible - G-Admin Mini Provides consistent connection status across all modules
 │       ├─  📄 ConnectionBadge.tsx.backup               ( 237 lines) → ConnectionBadge.tsx - Universal Connection Status Indicator Provides consistent connection status across all modules
 │       ├─  📄 Icon.tsx                                 ( 216 lines) → src/components/ui/Icon.tsx Sistema de iconos moderno con Heroicons + tamaños estandarizados ✅ SOLUCIÓN: Wrapper que maneja sizes + colores + variants dinámicamente
-│       ├─  📄 index.ts                                 (  13 lines) → Shared UI Components Index
+│       ├─  📄 index.ts                                 (  27 lines) → Shared UI Components Index - Sistema de Diseño G-Admin Mini
+│       ├─  📄 InputField.tsx                           (  56 lines)
+│       ├─  📄 NumberField.tsx                          (  58 lines)
 │       ├─  📄 ProductionCalendar.tsx                   ( 191 lines) → src/components/ui/ProductionCalendar.tsx Functional Production Calendar Component for ChakraUI v3.23.0
-│       ├─  📄 provider.tsx                             (  11 lines)
+│       ├─  📄 provider.tsx                             (  16 lines)
+│       ├─  📄 SelectField.tsx                          ( 158 lines) → Tipo para opciones simples
 │       └─  📄 toaster.tsx                              (  43 lines) → ✅ CORRECTO: Crear toaster instance con configuración
 ├─📂 store
 │   ├─📂 __tests__
 │   │   └─  📄 appStore.test.ts                         ( 227 lines) → Mock crypto.randomUUID
 │   ├─  📄 appStore.ts                              ( 231 lines) → User session
 │   ├─⭐ 📄 customersStore.ts                        ( 440 lines) → Customer analytics
-│   ├─⭐ 📄 fiscalStore.ts                           ( 674 lines) → Invoice Types
+│   ├─  📄 fiscalStore.ts                           (  12 lines) → Basic fiscal state
 │   ├─  📄 index.ts                                 (  13 lines) → Main store exports
-│   ├─⭐ 📄 inventoryStore.ts                        ( 363 lines) → Computed fields
-│   ├─⭐ 📄 materialsStore.ts                        ( 378 lines) → Computed fields
-│   ├─⭐ 📄 operationsStore.ts                       ( 531 lines) → Kitchen Operations Types
-│   ├─⭐ 📄 productsStore.ts                         ( 727 lines) → Product Types
+│   ├─⭐ 📄 materialsStore.ts                        ( 589 lines) → Import types from materials module
+│   ├─⭐ 📄 materialsStore.ts.backup                 ( 369 lines) → Computed fields
+│   ├─  📄 operationsStore.ts                       (  12 lines) → Basic operations state
+│   ├─  📄 productsStore.ts                         (  12 lines) → Basic products state
 │   ├─⭐ 📄 salesStore.ts                            ( 604 lines) → Kitchen/Operations
-│   └─⭐ 📄 staffStore.ts                            ( 675 lines) → Performance metrics
+│   ├─⭐ 📄 staffStore.ts                            ( 675 lines) → Performance metrics
+│   └─  📄 themeStore.ts                            (  91 lines) → Update Chakra UI color mode
+├─📂 styles
+│   └─  📄 block-tailwind-vars.css                  (  72 lines) → /* Bloqueo preventivo de variables CSS de Tailwind */
 ├─📂 test
 │   └─  📄 setup.ts                                 (  61 lines) → src/test/setup.ts
 ├─📂 theme
-│   └─  📄 system.ts                                (  47 lines) → ✅ Configuraciones específicas del proyecto
-├─📂 tools
-│   ├─📂 admin
-│   │   ├─📂 enterprise
-│   │   │   ├─  📄 EnterprisePage.tsx                       ( 133 lines) → EnterprisePage.tsx - Enterprise Management Tools
-│   │   │   ├─  📄 index.tsx                                (   3 lines) → Enterprise Tools - Multi-location and enterprise features
-│   │   │   └─  📄 types.ts                                 (  49 lines) → Enterprise Tools Types
-│   │   ├─📂 integrations
-│   │   │   ├─  📄 index.tsx                                (   3 lines) → API Integrations - External API integrations and webhooks
-│   │   │   ├─  📄 IntegrationsPage.tsx                     ( 170 lines) → IntegrationsPage.tsx - API Integrations and External Services
-│   │   │   └─  📄 types.ts                                 (  44 lines) → API Integrations Types
-│   │   └─  📄 index.tsx                                (   3 lines) → Admin Tools - Enterprise and administrative tools
-│   ├─📂 intelligence
-│   │   ├─📂 __tests__
-│   │   │   ├─  📄 integration.test.tsx                     ( 199 lines) → Recipe Integration Tests
-│   │   │   └─  📄 performance.test.ts                      ( 184 lines) → Recipe Performance Benchmarks
-│   │   ├─📂 abc-analysis
-│   │   │   ├─⭐ 📄 ABCAnalysisPage.tsx                      ( 371 lines) → ABCAnalysisPage.tsx - Advanced ABC Analysis for Inventory Management
-│   │   │   ├─  📄 index.tsx                                (   3 lines) → ABC Analysis - Advanced inventory classification and optimization
-│   │   │   └─  📄 types.ts                                 (  33 lines) → ABC Analysis Types
-│   │   ├─📂 ai
-│   │   │   ├─⭐ 📄 AIRecipeOptimizer.tsx                    (1294 lines) → AI Recipe Optimizer - Advanced Recipe Intelligence Enhancement AI-powered ingredient substitution, cost optimization, and yield analysis
-│   │   │   ├─⭐ 📄 CompetitiveIntelligence.tsx              (1252 lines) → Competitive Intelligence - Market Analysis & Strategic Positioning Advanced market intelligence for competitive advantage and strategic positioning
-│   │   │   └─⭐ 📄 PredictiveAnalytics.tsx                  (1086 lines) → Import event system
-│   │   ├─📂 analytics
-│   │   │   ├─⭐ 📄 BusinessAnalyticsPage.tsx                ( 331 lines) → BusinessAnalyticsPage.tsx - Cross-module analytics and insights
-│   │   │   ├─  📄 index.tsx                                (   3 lines) → Business Analytics - Cross-module analytics and strategic insights
-│   │   │   └─  📄 types.ts                                 (  44 lines) → Business Analytics Types
-│   │   ├─📂 business
-│   │   │   ├─📂 components
-│   │   │   │   ├─  📄 BottlenecksView.tsx                      ( 170 lines) → BottlenecksView.tsx - Business bottlenecks analysis component
-│   │   │   │   ├─  📄 CorrelationsView.tsx                     ( 219 lines) → CorrelationsView.tsx - Focused correlations analysis component
-│   │   │   │   └─  📄 ExecutiveKPIGrid.tsx                     ( 189 lines) → ExecutiveKPIGrid.tsx - KPI display grid with performance indicators
-│   │   │   ├─⭐ 📄 CrossModuleAnalytics.tsx                 (1409 lines) → Import event system
-│   │   │   ├─⭐ 📄 CustomReporting.tsx                      (1258 lines) → Import event system
-│   │   │   ├─⭐ 📄 ExecutiveDashboard.tsx                   (1381 lines) → Import event system
-│   │   │   ├─  📄 LazyCrossModuleAnalytics.tsx             (  64 lines) → LazyCrossModuleAnalytics.tsx - Lazy-loaded analytics with code splitting
-│   │   │   └─  📄 LazyExecutiveDashboard.tsx               (  45 lines) → LazyExecutiveDashboard.tsx - Lazy-loaded executive dashboard with code splitting
-│   │   ├─📂 components
-│   │   │   ├─📂 MenuEngineering
-│   │   │   │   ├─  📄 MenuEngineeringAnalysis.test.tsx         ( 217 lines) → MenuEngineeringAnalysis Component - Comprehensive Test Suite
-│   │   │   │   └─  📄 MenuEngineeringAnalysis.tsx              (  54 lines)
-│   │   │   ├─📂 MenuEngineeringMatrix
-│   │   │   │   └─⭐ 📄 MenuEngineeringMatrix.tsx                ( 384 lines)
-│   │   │   ├─📂 MiniBuilders
-│   │   │   │   ├─📂 __tests__
-│   │   │   │   ├─  📄 QuickRecipeBuilder.test.tsx              ( 109 lines) → QuickRecipeBuilder Component Tests
-│   │   │   │   └─  📄 QuickRecipeBuilder.tsx                   ( 150 lines)
-│   │   │   ├─📂 RecipeIntelligenceDashboard
-│   │   │   │   ├─📂 __tests__
-│   │   │   │   ├─  📄 RecipeIntelligenceDashboard.test.tsx     (  78 lines) → RecipeIntelligenceDashboard Component Tests
-│   │   │   │   └─⭐ 📄 RecipeIntelligenceDashboard.tsx          ( 374 lines)
-│   │   │   └─📂 SmartCostCalculator
-│   │   │       ├─📂 __tests__
-│   │   │       ├─  📄 SmartCostCalculator.test.tsx             (  41 lines) → SmartCostCalculator Component Tests
-│   │   │       └─⭐ 📄 SmartCostCalculator.tsx                  ( 454 lines)
-│   │   ├─📂 data
-│   │   │   ├─📂 __tests__
-│   │   │   ├─📂 engines
-│   │   │   │   ├─📂 __tests__
-│   │   │   │   ├─  📄 costCalculationEngine.test.ts            ( 137 lines) → src/features/recipes/data/engines/costCalculationEngine.test.ts
-│   │   │   │   ├─  📄 costCalculationEngine.ts                 (  22 lines) → Smart Cost Calculation Engine
-│   │   │   │   ├─  📄 menuEngineeringEngine.test.ts            ( 172 lines) → Menu Engineering Engine Tests - Comprehensive Test Suite
-│   │   │   │   └─  📄 menuEngineeringEngine.ts                 (  24 lines) → Menu Engineering Engine
-│   │   │   ├─  📄 recipeApi.test.ts                        ( 169 lines) → Enhanced Recipe API Tests - Comprehensive Test Suite
-│   │   │   └─⭐ 📄 recipeApi.ts                             ( 383 lines) → src/features/recipes/data/recipeApi.ts
-│   │   ├─📂 logic
-│   │   │   ├─📂 __tests__
-│   │   │   ├─  📄 useRecipes.test.ts                       ( 247 lines) → Enhanced useRecipes Hook Tests - Comprehensive Test Suite
-│   │   │   └─  📄 useRecipes.ts                            ( 142 lines) → src/features/recipes/logic/useRecipes.ts
-│   │   ├─📂 menu-engineering
-│   │   │   ├─  📄 index.tsx                                (   3 lines) → Menu Engineering - Strategic menu analysis and optimization tools
-│   │   │   ├─  📄 MenuEngineeringPage.tsx                  ( 251 lines) → MenuEngineeringPage.tsx - Strategic Menu Analysis and Optimization
-│   │   │   └─  📄 types.ts                                 (  19 lines) → Menu Engineering Types
-│   │   ├─📂 predictive
-│   │   │   ├─  📄 index.tsx                                (   3 lines) → Predictive Analytics - ML-powered forecasting and predictions
-│   │   │   ├─⭐ 📄 PredictiveAnalyticsPage.tsx              ( 328 lines) → PredictiveAnalyticsPage.tsx - ML-powered forecasting and predictions
-│   │   │   └─  📄 types.ts                                 (  27 lines) → Predictive Analytics Types
-│   │   ├─📂 ui
-│   │   │   ├─📂 components
-│   │   │   │   ├─⭐ 📄 RecipeAISuggestions.tsx                  ( 389 lines) → RecipeAISuggestions.tsx - AI-powered recipe optimization suggestions
-│   │   │   │   └─  📄 RecipeBasicForm.tsx                      ( 167 lines) → RecipeBasicForm.tsx - Basic recipe information form
-│   │   │   ├─  📄 LazyRecipeForm.tsx                       (  62 lines) → LazyRecipeForm.tsx - Lazy-loaded recipe form with code splitting
-│   │   │   ├─⭐ 📄 RecipeForm.tsx                           (1267 lines) → src/features/recipes/ui/RecipeForm.tsx - ENHANCED WITH AI SUGGESTIONS
-│   │   │   └─⭐ 📄 RecipeList.tsx                           ( 405 lines) → src/features/recipes/ui/RecipeList.tsx - Chakra UI v3
-│   │   ├─  📄 exports.tsx                              (  11 lines) → Phase 3: AI Intelligence Components
-│   │   ├─  📄 index.test.tsx                           ( 109 lines) → Enhanced RecipesModule Component Tests
-│   │   ├─  📄 index.tsx                                ( 286 lines) → G-Admin Intelligence System v3.0 - Complete Intelligence Suite
-│   │   ├─  📄 README.md                                ( 170 lines)
-│   │   ├─  📄 RecipesPage.tsx                          ( 142 lines) → Refactored Recipes Page with UNIFIED navigation pattern
-│   │   ├─  📄 TEST_SUMMARY.md                          (  50 lines)
-│   │   └─⭐ 📄 types.ts                                 ( 408 lines) → ========================================== G-ADMIN RECIPES MODULE - RECIPE INTELLIGENCE SYSTEM v3.0 Following Screaming Architecture Pattern Smart Cost Calculation + Menu Engineering + Production Intelligence + Kitchen Automation ==========================================
-│   ├─📂 operational
-│   │   ├─📂 diagnostics
-│   │   │   ├─  📄 DiagnosticsPage.tsx                      (  91 lines) → DiagnosticsPage.tsx - System Diagnostics and Performance Monitoring
-│   │   │   ├─  📄 index.tsx                                (   3 lines) → System Diagnostics - System health and performance monitoring
-│   │   │   └─  📄 types.ts                                 (  41 lines) → System Diagnostics Types
-│   │   ├─📂 reporting
-│   │   │   ├─  📄 index.tsx                                (   3 lines) → Advanced Reporting - Comprehensive reporting tools
-│   │   │   ├─  📄 ReportingPage.tsx                        ( 128 lines) → ReportingPage.tsx - Advanced Reporting Tools
-│   │   │   └─  📄 types.ts                                 (  41 lines) → Advanced Reporting Types
-│   │   └─  📄 index.tsx                                (   3 lines) → Operational Tools - Advanced operational tools for system management
-│   ├─  📄 index.tsx                                (  69 lines) → Tools - Stratified tools organization following G-Admin Mini architecture TIER 1: Intelligence Tools - Recipe Intelligence, Menu Engineering, Business Analytics TIER 2: Operational Tools - Advanced Reporting, System Diagnostics TIER 3: Admin Tools - Enterprise Management, API Integrations
-│   ├─  📄 TestTools.tsx                            (  14 lines) → TestTools.tsx - Simple test component to verify routing
-│   └─⭐ 📄 ToolsPage.tsx                            ( 335 lines) → ToolsPage.tsx - Comprehensive Tools Hub for G-Admin Mini 3-Tier Architecture: Intelligence + Operational + Admin
+│   └─  📄 index.ts                                 ( 150 lines)
 ├─📂 types
 │   ├─  📄 app.ts                                   (  38 lines) → src/types/app.ts
-│   ├─  📄 navigation.ts                            (  29 lines) → ============================================== 📁 src/types/navigation.ts - Types compartidos ==============================================
 │   └─  📄 ui.ts                                    (  29 lines) → src/types/ui.ts
-├─  📄 App.css                                  (  50 lines) → /* 🔧 CRÍTICO CORREGIDO: #root sin limitaciones de ancho */
-├─  📄 App.tsx                                  (  96 lines) → src/App.tsx - Reorganized by architectural domains following ARCHITECTURE_ROADMAP.md
-├─  📄 AppLazy.tsx                              ( 270 lines) → AppLazy.tsx - Performance-optimized App with lazy loading and code splitting Replaces App.tsx with intelligent module loading and preloading strategies
-├─  📄 index.css                                (  55 lines) → /* 🔧 CRÍTICO CORREGIDO: body sin flex center */
-├─  📄 main.tsx                                 (  13 lines)
+├─  📄 App.css                                  (  46 lines) → /* App específicos - Utilidades que no interfieren con Chakra */
+├─  📄 App.tsx                                  ( 227 lines) → App.tsx - Performance-optimized App with lazy loading and expandable navigation
+├─  📄 debug-suppliers.ts                       (  55 lines) → Debug script to test suppliers migration
+├─  📄 index.css                                (  29 lines) → /* Estilos mínimos base - Chakra UI maneja el resto */
+├─  📄 main.tsx                                 (  18 lines) → Limpiar variables CSS problemáticas de Tailwind que causan layout shifts
+├─  📄 setupTests.ts                            ( 159 lines) → Setup global para todos los tests
 └─  📄 vite-env.d.ts                            (   1 lines) → / <reference types="vite/client" />
 **********************
 PowerShell transcript end
-End time: 20250812142228
+End time: 20250820164211
 **********************

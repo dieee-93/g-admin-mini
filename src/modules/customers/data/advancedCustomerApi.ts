@@ -1,5 +1,5 @@
 // src/features/customers/data/advancedCustomerApi.ts
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import type { 
   CustomerRFMProfile, 
   CustomerAnalytics, 

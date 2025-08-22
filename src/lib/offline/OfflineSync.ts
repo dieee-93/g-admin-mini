@@ -201,6 +201,7 @@ interface SyncConflict {
   conflictType: 'data_conflict' | 'version_conflict' | 'dependency_conflict';
   resolution?: 'resolved' | 'pending' | 'manual_required';
   resolvedData?: any;
+  timestamp?: number;
 }
 
 interface SyncStatus {
@@ -639,14 +640,14 @@ class OfflineSync {
         } else {
           // Add timestamp for persistence
           if (!conflict.timestamp) {
-            (conflict as any).timestamp = Date.now();
+            conflict.timestamp = Date.now();
           }
           unresolvedConflicts.push(conflict);
         }
       } catch (error) {
         console.error(`[OfflineSync] Failed to resolve conflict ${conflict.id}:`, error);
         if (!conflict.timestamp) {
-          (conflict as any).timestamp = Date.now();
+          conflict.timestamp = Date.now();
         }
         unresolvedConflicts.push(conflict);
       }

@@ -1,5 +1,5 @@
 // Smart Cost Calculation Engine
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 
 export class SmartCostCalculationEngine {
   static async calculateRecipeCostWithYield(recipeId: string) {

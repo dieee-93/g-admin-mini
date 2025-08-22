@@ -335,8 +335,8 @@ export function KitchenSection() {
                   colorScheme={emergencyMode ? "red" : "orange"}
                   variant={emergencyMode ? "solid" : "outline"}
                   onClick={handleEmergencyToggle}
-                  leftIcon={<ExclamationTriangleIcon className="w-4 h-4" />}
                 >
+                  <ExclamationTriangleIcon className="w-4 h-4 mr-2" />
                   {emergencyMode ? "Emergency" : "Emergency"}
                 </Button>
               </Tooltip>
@@ -347,8 +347,8 @@ export function KitchenSection() {
               size="sm"
               variant="outline"
               onClick={() => setShowConfigModal(true)}
-              leftIcon={<CogIcon className="w-4 h-4" />}
             >
+              <CogIcon className="w-4 h-4 mr-2" />
               Config
             </Button>
           </HStack>

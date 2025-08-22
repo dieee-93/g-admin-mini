@@ -15,7 +15,7 @@ import {
   UserGroupIcon,
   CogIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
+// import { Icon } from '@/shared/ui/Icon'; // Temporalmente comentado para evitar errores
 import { useNavigation } from '@/contexts/NavigationContext';
 
 // Components
@@ -25,7 +25,7 @@ import { TaxConfigurationSection } from './components/sections/TaxConfigurationS
 import { UserPermissionsSection } from './components/sections/UserPermissionsSection';
 import { IntegrationsSection } from './components/sections/IntegrationsSection';
 
-export function SettingsPage() {
+export default function SettingsPage() {
   const { setQuickActions } = useNavigation();
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function SettingsPage() {
   }, [setQuickActions]);
 
   return (
-    <Box p={{ base: 2, md: 6 }} pb={{ base: '90px', md: 6 }}>
+  <Box p={{ base: 2, md: 6 }} pb={{ base: '90px', md: 6 }} maxW="container.xl" mx="auto">
       <SettingsHeader />
 
       {/* Settings Dashboard - No nested tabs */}
@@ -51,7 +51,7 @@ export function SettingsPage() {
           <Card.Root>
             <Card.Body>
               <VStack align="start" gap={2}>
-                <Icon icon={BuildingOfficeIcon} size="lg" className="text-blue-600" />
+                <BuildingOfficeIcon style={{ width: '24px', height: '24px', color: 'var(--chakra-colors-blue-600)' }} />
                 <Heading size="sm">Perfil Empresarial</Heading>
                 <Text fontSize="sm" color="gray.600">
                   Información de la empresa
@@ -63,7 +63,7 @@ export function SettingsPage() {
           <Card.Root>
             <Card.Body>
               <VStack align="start" gap={2}>
-                <Icon icon={CurrencyDollarIcon} size="lg" className="text-green-600" />
+                <CurrencyDollarIcon style={{ width: '24px', height: '24px', color: 'var(--chakra-colors-green-600)' }} />
                 <Heading size="sm">Configuración Fiscal</Heading>
                 <Text fontSize="sm" color="gray.600">
                   AFIP y configuraciones impositivas
@@ -75,7 +75,7 @@ export function SettingsPage() {
           <Card.Root>
             <Card.Body>
               <VStack align="start" gap={2}>
-                <Icon icon={UserGroupIcon} size="lg" className="text-purple-600" />
+                <UserGroupIcon style={{ width: '24px', height: '24px', color: 'var(--chakra-colors-purple-600)' }} />
                 <Heading size="sm">Permisos de Usuario</Heading>
                 <Text fontSize="sm" color="gray.600">
                   Control de acceso y roles
@@ -87,7 +87,7 @@ export function SettingsPage() {
           <Card.Root>
             <Card.Body>
               <VStack align="start" gap={2}>
-                <Icon icon={CogIcon} size="lg" className="text-orange-600" />
+                <CogIcon style={{ width: '24px', height: '24px', color: 'var(--chakra-colors-orange-600)' }} />
                 <Heading size="sm">Integraciones</Heading>
                 <Text fontSize="sm" color="gray.600">
                   Servicios externos y APIs

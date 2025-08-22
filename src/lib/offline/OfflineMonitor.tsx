@@ -90,30 +90,33 @@ export const ConnectionStatus = () => {
                         (navigator as any).mozConnection || 
                         (navigator as any).webkitConnection;
 
-      const wasOffline = !connectionStatus.isOnline;
       const isNowOnline = navigator.onLine;
       
-      setConnectionStatus({
-        isOnline: isNowOnline,
-        lastOnline: isNowOnline ? Date.now() : connectionStatus.lastOnline,
-        connectionType: connection?.type || 'unknown',
-        effectiveType: connection?.effectiveType || 'unknown',
-        downlink: connection?.downlink || 0,
-        rtt: connection?.rtt || 0
+      setConnectionStatus(prevStatus => {
+        const wasOffline = !prevStatus.isOnline;
+        
+        // Trigger automatic sync when coming back online
+        if (wasOffline && isNowOnline) {
+          console.log('[OfflineMonitor] Network restored, triggering automatic sync');
+          // Wait 2 seconds for connection to stabilize before syncing
+          setTimeout(() => {
+            const currentSyncStatus = offlineSync.getSyncStatus();
+            if (currentSyncStatus.queueSize > 0 && !currentSyncStatus.isSyncing) {
+              console.log(`[OfflineMonitor] Auto-syncing ${currentSyncStatus.queueSize} pending operations`);
+              offlineSync.forcSync();
+            }
+          }, 2000);
+        }
+        
+        return {
+          isOnline: isNowOnline,
+          lastOnline: isNowOnline ? Date.now() : prevStatus.lastOnline,
+          connectionType: connection?.type || 'unknown',
+          effectiveType: connection?.effectiveType || 'unknown',
+          downlink: connection?.downlink || 0,
+          rtt: connection?.rtt || 0
+        };
       });
-
-      // Trigger automatic sync when coming back online
-      if (wasOffline && isNowOnline) {
-        console.log('[OfflineMonitor] Network restored, triggering automatic sync');
-        // Wait 2 seconds for connection to stabilize before syncing
-        setTimeout(() => {
-          const currentSyncStatus = offlineSync.getSyncStatus();
-          if (currentSyncStatus.queueSize > 0 && !currentSyncStatus.isSyncing) {
-            console.log(`[OfflineMonitor] Auto-syncing ${currentSyncStatus.queueSize} pending operations`);
-            offlineSync.forcSync();
-          }
-        }, 2000);
-      }
     };
 
     // Update sync status
@@ -147,7 +150,7 @@ export const ConnectionStatus = () => {
     offlineSync.on('networkOffline', updateConnectionStatus);
     offlineSync.on('syncStarted', updateSyncStatus);
     offlineSync.on('syncCompleted', updateSyncStatus);
-    offlineSync.on('initialized', (data) => {
+    offlineSync.on('initialized', (data: { queueSize: number }) => {
       console.log(`[OfflineMonitor] OfflineSync initialized with ${data.queueSize} operations`);
       updateSyncStatus();
     });
@@ -170,7 +173,7 @@ export const ConnectionStatus = () => {
       offlineSync.off('syncCompleted', updateSyncStatus);
       offlineSync.off('initialized', updateSyncStatus);
     };
-  }, [connectionStatus.lastOnline]);
+  }, []);
 
   const getConnectionBadgeProps = () => {
     if (connectionStatus.isOnline) {
@@ -191,34 +194,53 @@ export const ConnectionStatus = () => {
   const badgeProps = getConnectionBadgeProps();
 
   return (
-    <HStack gap={2} p={2} bg="white" borderRadius="md" border="1px" borderColor="gray.200">
-      <Box>
-        <Badge colorScheme={badgeProps.colorScheme} variant="subtle">
-          <HStack gap={1}>
-            <badgeProps.icon className="w-3 h-3" />
-            <Text fontSize="xs">{badgeProps.text}</Text>
-          </HStack>
-        </Badge>
+    <HStack gap={1} align="center">
+      {/* Icono principal de conexión - más discreto */}
+      <Box 
+        w="6" 
+        h="6" 
+        display="flex" 
+        alignItems="center" 
+        justifyContent="center"
+        borderRadius="full"
+        bg={connectionStatus.isOnline ? "green.50" : "red.50"}
+        color={connectionStatus.isOnline ? "green.600" : "red.600"}
+        transition="all 0.2s ease"
+      >
+        <badgeProps.icon style={{ width: '14px', height: '14px' }} />
       </Box>
 
+      {/* Badge sutil solo si hay operaciones pendientes */}
       {syncStatus && syncStatus.queueSize > 0 && (
-        <Box>
-          <Badge colorScheme="yellow" variant="subtle">
-            <HStack gap={1}>
-              <ClockIcon className="w-3 h-3" />
-              <Text fontSize="xs">{syncStatus.queueSize}</Text>
-            </HStack>
-          </Badge>
+        <Box
+          minW="5"
+          h="5"
+          bg="yellow.500"
+          color="white"
+          borderRadius="full"
+          fontSize="xs"
+          fontWeight="bold"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          ml="-2"
+          border="2px solid"
+          borderColor={{ base: "white", _dark: "gray.800" }}
+        >
+          {syncStatus.queueSize > 9 ? '9+' : syncStatus.queueSize}
         </Box>
       )}
 
+      {/* Indicador de sincronización activa */}
       {syncStatus?.isSyncing && (
-        <Badge colorScheme="blue" variant="subtle">
-          <HStack gap={1}>
-            <ArrowPathIcon className="w-3 h-3 animate-spin" />
-            <Text fontSize="xs">Syncing</Text>
-          </HStack>
-        </Badge>
+        <Box
+          w="3"
+          h="3"
+          bg="blue.500"
+          borderRadius="full"
+          ml="-1"
+          animation="pulse 2s infinite"
+        />
       )}
     </HStack>
   );
@@ -502,8 +524,8 @@ export const OfflineStatusBar = () => {
       top="0" 
       left="0" 
       right="0" 
-      zIndex="banner"
-      bg="white"
+      zIndex={1002}
+      bg="green.100"
       borderBottom="1px"
       borderColor="gray.200"
       p={2}

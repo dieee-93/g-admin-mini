@@ -1,6 +1,6 @@
 // src/features/sales/data/tableApi.ts
 // 🚀 TABLE MANAGEMENT API - Modern Restaurant Operations
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { 
   Table, 
   Party, 

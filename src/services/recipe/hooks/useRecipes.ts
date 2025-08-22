@@ -16,7 +16,7 @@ import {
   calculateRecipeCost,
   checkRecipeViability,
   executeRecipe
-} from '../data/recipeApi';
+} from '../api/recipeApi';
 
 export function useRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);

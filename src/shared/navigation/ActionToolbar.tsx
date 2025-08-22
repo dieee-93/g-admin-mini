@@ -12,9 +12,9 @@ export function ActionToolbar() {
 
   return (
     <Box
-      bg="white"
+      bg={{ base: "white", _dark: "gray.800" }}
       borderTop="1px solid"
-      borderColor="gray.200"
+      borderColor={{ base: "gray.200", _dark: "gray.700" }}
       px="6"
       py="3"
     >

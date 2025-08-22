@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   HomeIcon, 
@@ -12,8 +12,13 @@ import {
   WrenchScrewdriverIcon,
   CalendarDaysIcon,
   DocumentTextIcon,
-  ClockIcon
+  ClockIcon,
+  ShoppingBagIcon,
+  UserIcon,
+  ListBulletIcon
 } from '@heroicons/react/24/outline';
+import { useRoleAccess } from '@/lib/auth/useRoleAccess';
+import type { ModuleName } from '@/lib/auth/types';
 
 // ✅ Types definidos según arquitectura v2.0
 export interface NavigationSubModule {
@@ -91,7 +96,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Dashboard',
     icon: HomeIcon,
     color: 'blue',
-    path: '/dashboard',
+    path: '/admin/dashboard',
     description: 'Business Intelligence + Analytics',
     isExpandable: true,
     isExpanded: false,
@@ -99,21 +104,21 @@ const NAVIGATION_MODULES: NavigationModule[] = [
       {
         id: 'executive',
         title: 'Executive Dashboard',
-        path: '/dashboard/executive',
+        path: '/admin/dashboard/executive',
         icon: ChartBarIcon,
         description: 'Strategic KPIs and insights'
       },
       {
         id: 'cross-analytics',
         title: 'Cross-Module Analytics',
-        path: '/dashboard/cross-analytics',
+        path: '/admin/dashboard/cross-analytics',
         icon: ChartBarIcon,
         description: 'Holistic business correlations'
       },
       {
         id: 'predictive-analytics',
         title: 'Predictive Analytics',
-        path: '/dashboard/predictive-analytics',
+        path: '/admin/dashboard/predictive-analytics',
         icon: ChartBarIcon,
         description: 'AI-powered forecasting'
       },
@@ -138,7 +143,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Ventas',
     icon: CurrencyDollarIcon,
     color: 'teal',
-    path: '/sales',
+    path: '/admin/sales',
     description: 'POS + QR Ordering + Payments'
   },
   {
@@ -146,7 +151,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Operaciones',
     icon: ChartBarIcon,
     color: 'cyan',
-    path: '/operations',
+    path: '/admin/operations',
     description: 'Cocina + Mesas + Monitoreo'
   },
   {
@@ -154,7 +159,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Clientes',
     icon: UsersIcon,
     color: 'pink',
-    path: '/customers',
+    path: '/admin/customers',
     description: 'RFM Analytics + Segmentación'
   },
   
@@ -164,7 +169,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Materials',
     icon: CubeIcon,
     color: 'green',
-    path: '/materials',
+    path: '/admin/materials',
     description: 'Inventario + Supply Chain Intelligence',
     isExpandable: true,
     isExpanded: false,
@@ -172,7 +177,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
       {
         id: 'inventory-management',
         title: 'Inventory Management',
-        path: '/materials/inventory',
+        path: '/materials/',
         icon: CubeIcon,
         description: 'Stock control and management'
       },
@@ -204,7 +209,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Products',
     icon: CogIcon,
     color: 'purple',
-    path: '/products',
+    path: '/admin/products',
     description: 'Menu Engineering + Cost Analysis',
     isExpandable: true,
     isExpanded: false,
@@ -239,7 +244,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Fiscal',
     icon: DocumentTextIcon,
     color: 'red',
-    path: '/fiscal',
+    path: '/admin/fiscal',
     description: 'Facturación AFIP + Impuestos'
   },
   
@@ -249,7 +254,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Staff',
     icon: UserGroupIcon,
     color: 'indigo',
-    path: '/staff',
+    path: '/admin/staff',
     description: 'Gestión de personal',
     isExpandable: true,
     isExpanded: false,
@@ -282,7 +287,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Scheduling',
     icon: CalendarDaysIcon,
     color: 'violet',
-    path: '/scheduling',
+    path: '/admin/scheduling',
     description: 'Horarios + Coverage Planning'
   },
   
@@ -292,7 +297,7 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     title: 'Configuración',
     icon: Cog6ToothIcon,
     color: 'gray',
-    path: '/settings',
+    path: '/admin/settings',
     description: 'Business Profile + Integraciones',
     isExpandable: true,
     isExpanded: false,
@@ -326,6 +331,42 @@ const NAVIGATION_MODULES: NavigationModule[] = [
         description: 'Report configuration'
       }
     ]
+  }
+];
+
+// ✅ Módulos específicos para CLIENTE - Experiencia tipo web/app customer-friendly
+const CLIENT_NAVIGATION_MODULES: NavigationModule[] = [
+  {
+    id: 'customer-portal',
+    title: 'Mi Portal',
+    icon: HomeIcon,
+    color: 'teal',
+    path: '/app/portal',
+    description: 'Tu espacio personalizado'
+  },
+  {
+    id: 'customer-menu',
+    title: 'Menú',
+    icon: ShoppingBagIcon,
+    color: 'orange',
+    path: '/app/menu',
+    description: 'Explora nuestros productos'
+  },
+  {
+    id: 'my-orders',
+    title: 'Mis Pedidos',
+    icon: ListBulletIcon,
+    color: 'blue',
+    path: '/app/orders',
+    description: 'Historial y seguimiento'
+  },
+  {
+    id: 'customer-settings',
+    title: 'Mi Perfil',
+    icon: UserIcon,
+    color: 'purple',
+    path: '/app/settings',
+    description: 'Configuración personal'
   }
 ];
 
@@ -577,14 +618,60 @@ interface NavigationProviderProps {
 export function NavigationProvider({ children }: NavigationProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { canAccessModule, isAuthenticated, isCliente } = useRoleAccess();
   
   // ✅ Responsive state - Mobile-first approach según arquitectura
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
+  // ✅ Filter modules based on user role - CLIENTE gets different experience
+  const accessibleModules = useMemo(() => {
+    if (!isAuthenticated) return [];
+    
+    // ✅ CLIENTE gets customer-friendly navigation (web/app style)
+    if (isCliente()) {
+      return CLIENT_NAVIGATION_MODULES.filter(module => {
+        // Map client module IDs to ModuleName enum
+        const clientModuleNameMap: Record<string, ModuleName> = {
+          'customer-portal': 'customer_portal',
+          'customer-menu': 'customer_menu', 
+          'my-orders': 'my_orders',
+          'customer-settings': 'settings'
+        };
+        
+        const moduleName = clientModuleNameMap[module.id];
+        if (!moduleName) return false; // SECURITY: deny unmapped modules
+        
+        return canAccessModule(moduleName);
+      });
+    }
+    
+    // ✅ Staff/Admin users get admin navigation
+    return NAVIGATION_MODULES.filter(module => {
+      // Map admin module IDs to ModuleName enum
+      const adminModuleNameMap: Record<string, ModuleName> = {
+        'dashboard': 'dashboard',
+        'sales': 'sales',
+        'operations': 'operations',
+        'materials': 'materials',
+        'products': 'products',
+        'staff': 'staff',
+        'scheduling': 'scheduling',
+        'fiscal': 'fiscal',
+        'settings': 'settings',
+        'customers': 'sales' // Customers is part of sales workflow
+      };
+      
+      const moduleName = adminModuleNameMap[module.id];
+      if (!moduleName) return false; // SECURITY: deny unmapped modules
+      
+      return canAccessModule(moduleName);
+    });
+  }, [canAccessModule, isAuthenticated, isCliente]);
+
   // ✅ Navigation state
-  const [modules, setModules] = useState<NavigationModule[]>(NAVIGATION_MODULES);
+  const [modules, setModules] = useState<NavigationModule[]>(accessibleModules);
   const [currentModule, setCurrentModule] = useState<NavigationModule | null>(null);
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
@@ -714,14 +801,87 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
       foundModule = modules.find(module => module.id === 'dashboard') || modules[0];
     }
 
-    setCurrentModule(foundModule);
+    // Safety check: if still no module found, exit early
+    if (!foundModule) {
+      console.warn('No navigation module found for path:', path);
+      return;
+    }
 
-    // ✅ Update quick actions based on current module
-    const moduleActions = getQuickActionsForModule(foundModule.id);
-    setQuickActions(moduleActions);
+    // Only update states if module actually changed
+    setCurrentModule(prev => {
+      if (prev?.id !== foundModule.id) {
+        // Update quick actions when module changes
+        const moduleActions = getQuickActionsForModule(foundModule.id);
+        setQuickActions(moduleActions);
+        
+        // Update breadcrumbs when module changes
+        const crumbs: BreadcrumbItem[] = [];
 
-    // ✅ Update breadcrumbs
-    updateBreadcrumbs(foundModule, path);
+        // Always add dashboard as root (unless we're on dashboard)
+        if (foundModule.id !== 'dashboard') {
+          crumbs.push({
+            label: 'Dashboard',
+            path: '/',
+            isActive: false
+          });
+        }
+
+        // Add current module
+        crumbs.push({
+          label: foundModule.title,
+          path: foundModule.path,
+          isActive: true
+        });
+
+        // Add sub-path if exists
+        if (path !== foundModule.path && path.startsWith(foundModule.path)) {
+          const subPath = path.replace(foundModule.path, '').replace(/^\//, '');
+          if (subPath) {
+            crumbs.push({
+              label: subPath.charAt(0).toUpperCase() + subPath.slice(1),
+              isActive: true
+            });
+          }
+        }
+
+        setBreadcrumbs(crumbs);
+        
+        return foundModule;
+      }
+      
+      // Even if module didn't change, update breadcrumbs if sub-path changed
+      if (prev && path !== prev.path) {
+        const crumbs: BreadcrumbItem[] = [];
+
+        if (prev.id !== 'dashboard') {
+          crumbs.push({
+            label: 'Dashboard',
+            path: '/',
+            isActive: false
+          });
+        }
+
+        crumbs.push({
+          label: prev.title,
+          path: prev.path,
+          isActive: true
+        });
+
+        if (path !== prev.path && path.startsWith(prev.path)) {
+          const subPath = path.replace(prev.path, '').replace(/^\//, '');
+          if (subPath) {
+            crumbs.push({
+              label: subPath.charAt(0).toUpperCase() + subPath.slice(1),
+              isActive: true
+            });
+          }
+        }
+
+        setBreadcrumbs(crumbs);
+      }
+      
+      return prev;
+    });
 
     // ✅ Update navigation history
     setNavigationHistory(prev => {
@@ -733,7 +893,12 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
       }
       return newHistory;
     });
-  }, [location.pathname, modules]);
+  }, [location.pathname]); // Only depend on pathname to prevent infinite loops
+
+  // ✅ Update modules when accessible modules change
+  useEffect(() => {
+    setModules(accessibleModules);
+  }, [accessibleModules]);
 
   // ✅ Auto-collapse sidebar on tablet
   useEffect(() => {
@@ -744,48 +909,17 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     }
   }, [isTablet, isDesktop]);
 
-  // ✅ Update breadcrumbs function
-  const updateBreadcrumbs = useCallback((module: NavigationModule, path: string) => {
-    const crumbs: BreadcrumbItem[] = [];
-
-    // Always add dashboard as root (unless we're on dashboard)
-    if (module.id !== 'dashboard') {
-      crumbs.push({
-        label: 'Dashboard',
-        path: '/',
-        isActive: false
-      });
-    }
-
-    // Add current module
-    crumbs.push({
-      label: module.title,
-      path: module.path,
-      isActive: true
-    });
-
-    // Add sub-path if exists
-    if (path !== module.path && path.startsWith(module.path)) {
-      const subPath = path.replace(module.path, '').replace(/^\//, '');
-      if (subPath) {
-        crumbs.push({
-          label: subPath.charAt(0).toUpperCase() + subPath.slice(1),
-          isActive: true
-        });
-      }
-    }
-
-    setBreadcrumbs(crumbs);
-  }, []);
 
   // ✅ Navigation methods
   const handleNavigate = useCallback((moduleId: string, subPath?: string) => {
-    const module = modules.find(m => m.id === moduleId);
+    // Use appropriate modules based on user role
+    const availableModules = isCliente() ? CLIENT_NAVIGATION_MODULES : NAVIGATION_MODULES;
+    const module = availableModules.find(m => m.id === moduleId);
     if (module) {
       const targetPath = subPath ? `${module.path}${subPath}` : module.path;
       navigate(targetPath);
     }
-  }, [modules, navigate]);
+  }, [navigate, isCliente]);
 
   const handleNavigateBack = useCallback(() => {
     if (canNavigateBack) {
@@ -802,13 +936,24 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     ));
   }, []);
 
-  // ✅ Update module badge
+  // ✅ Update module badge - Optimized to prevent infinite loops
   const updateModuleBadge = useCallback((moduleId: string, count: number) => {
-    setModules(prev => prev.map(module => 
-      module.id === moduleId 
-        ? { ...module, badge: count > 0 ? count : undefined }
-        : module
-    ));
+    setModules(prev => {
+      const moduleIndex = prev.findIndex(module => module.id === moduleId);
+      if (moduleIndex === -1) return prev;
+      
+      const currentModule = prev[moduleIndex];
+      const newBadgeValue = count > 0 ? count : undefined;
+      
+      // Only update if badge value actually changed
+      if (currentModule.badge === newBadgeValue) {
+        return prev;
+      }
+      
+      const newModules = [...prev];
+      newModules[moduleIndex] = { ...currentModule, badge: newBadgeValue };
+      return newModules;
+    });
   }, []);
 
   // ✅ Context value

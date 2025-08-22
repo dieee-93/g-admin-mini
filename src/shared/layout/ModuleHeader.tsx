@@ -5,33 +5,28 @@
 import { Box, Heading, Button, HStack, Separator } from '@chakra-ui/react';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Breadcrumb } from '../navigation/Breadcrumb';
-import type { BreadcrumbItem } from '../../types/navigation';
+import { useNavigation } from '@/contexts/NavigationContext';
 
 interface ModuleHeaderProps {
   title: string;
   color?: string;
   onBack?: () => void;
-  breadcrumbItems?: BreadcrumbItem[];
   rightActions?: React.ReactNode;
 }
 
 export function ModuleHeader({ 
   title, 
   color = 'gray', 
-  onBack, 
-  breadcrumbItems,
+  onBack,
   rightActions 
 }: ModuleHeaderProps) {
+  const { breadcrumbs, navigateBack, canNavigateBack } = useNavigation();
+  
   return (
     <Box>
-      {/* Breadcrumb Navigation - Solo mostrar si hay más de 1 item */}
-      {breadcrumbItems && breadcrumbItems.length > 1 && (
-        <Breadcrumb items={breadcrumbItems} />
-      )}
-
-      {/* Header Principal */}
+      {/* Header Principal - Breadcrumb removed to avoid duplication */}
       <Box 
-        bg={`${color}.50`} 
+        bg={{ base: `${color}.50`, _dark: "gray.800" }}
         borderLeft={`4px solid`} 
         borderColor={`${color}.400`}
         p={4} 
@@ -39,11 +34,12 @@ export function ModuleHeader({
       >
         <HStack justify="space-between" align="center">
           <HStack gap={3}>
-            {onBack && (
+            {/* Usar navegación unificada si no se proporciona onBack personalizado */}
+            {(onBack || canNavigateBack) && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onBack}
+                onClick={onBack || navigateBack}
                 color={`${color}.600`}
                 _hover={{ bg: `${color}.100` }}
               >
@@ -52,11 +48,11 @@ export function ModuleHeader({
               </Button>
             )}
             
-            {onBack && <Separator orientation="vertical" h="6" />}
+            {(onBack || canNavigateBack) && <Separator orientation="vertical" h="6" />}
             
             <Heading 
               size="lg" 
-              color={`${color}.700`}
+              color={{ base: `${color}.700`, _dark: "gray.100" }}
               fontWeight="bold"
             >
               {title}

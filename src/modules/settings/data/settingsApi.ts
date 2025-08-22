@@ -79,7 +79,7 @@ interface UserRole {
   users_count: number;
 }
 
-let mockUserRoles: UserRole[] = [
+const mockUserRoles: UserRole[] = [
   {
     id: '1',
     name: 'Administrador',
@@ -121,7 +121,7 @@ interface Integration {
   last_sync?: string;
 }
 
-let mockIntegrations: Integration[] = [
+const mockIntegrations: Integration[] = [
   {
     id: '1',
     name: 'Stripe',

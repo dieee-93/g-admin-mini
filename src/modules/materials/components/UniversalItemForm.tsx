@@ -31,10 +31,7 @@ import {
   type ItemFormData,
   type ItemType,
   type AllUnit,
-  type MeasurableUnit,
-  type WeightUnit,
-  type VolumeUnit,
-  type LengthUnit
+  type MeasurableUnit
 } from '../types';
 
 // ============================================================================
@@ -63,35 +60,17 @@ const ITEM_TYPE_COLLECTION = createListCollection({
 
 const CATEGORY_COLLECTION = createListCollection({
   items: [
-    { label: '⚖️ Peso (kg, g, ton)', value: 'weight' },
-    { label: '🧪 Volumen (l, ml, cm³)', value: 'volume' },
-    { label: '📏 Longitud (m, cm, mm)', value: 'length' }
+    { label: 'Sin categoría', value: 'Sin categoría' },
+    { label: '🥛 Lácteos', value: 'Lácteos' },
+    { label: '🥩 Carnes', value: 'Carnes' },
+    { label: '🥬 Verduras', value: 'Verduras' },
+    { label: '🍎 Frutas', value: 'Frutas' },
+    { label: '🧂 Condimentos', value: 'Condimentos' },
+    { label: '🥤 Bebidas', value: 'Bebidas' },
+    { label: '🍞 Panadería', value: 'Panadería' }
   ]
 });
 
-const WEIGHT_UNITS_COLLECTION = createListCollection({
-  items: [
-    { label: 'Kilogramos (kg)', value: 'kg' },
-    { label: 'Gramos (g)', value: 'g' },
-    { label: 'Toneladas (ton)', value: 'ton' }
-  ]
-});
-
-const VOLUME_UNITS_COLLECTION = createListCollection({
-  items: [
-    { label: 'Litros (L)', value: 'l' },
-    { label: 'Mililitros (ml)', value: 'ml' },
-    { label: 'Centímetros cúbicos (cm³)', value: 'cm3' }
-  ]
-});
-
-const LENGTH_UNITS_COLLECTION = createListCollection({
-  items: [
-    { label: 'Metros (m)', value: 'm' },
-    { label: 'Centímetros (cm)', value: 'cm' },
-    { label: 'Milímetros (mm)', value: 'mm' }
-  ]
-});
 
 // ============================================================================
 // 🔧 COMPONENTES AUXILIARES
@@ -152,21 +131,28 @@ function MeasurableFields({
   setFormData: (data: ItemFormData) => void;
   errors: Record<string, string>;
 }) {
-  const getUnitsCollection = () => {
-    switch (formData.category) {
-      case 'weight': return WEIGHT_UNITS_COLLECTION;
-      case 'volume': return VOLUME_UNITS_COLLECTION;
-      case 'length': return LENGTH_UNITS_COLLECTION;
-      default: return createListCollection({ items: [] });
-    }
+  const getMeasurableUnitsCollection = () => {
+    return createListCollection({
+      items: [
+        // Weight units
+        { label: 'Kilogramos (kg)', value: 'kg' },
+        { label: 'Gramos (g)', value: 'g' },
+        // Volume units  
+        { label: 'Litros (L)', value: 'l' },
+        { label: 'Mililitros (ml)', value: 'ml' },
+        // Length units
+        { label: 'Metros (m)', value: 'm' },
+        { label: 'Centímetros (cm)', value: 'cm' }
+      ]
+    });
   };
 
   return (
     <VStack align="stretch" gap="4">
-      {/* Categoría */}
+      {/* Business Category */}
       <Box>
         <Text fontSize="sm" fontWeight="medium" mb="2">
-          Categoría de Medición *
+          Categoría del Producto *
         </Text>
         <Select.Root
           collection={CATEGORY_COLLECTION}
@@ -174,14 +160,13 @@ function MeasurableFields({
           onValueChange={(details) => 
             setFormData({ 
               ...formData, 
-              category: details.value[0] as 'weight' | 'volume' | 'length',
-              unit: '' as MeasurableUnit // Reset unit when category changes
+              category: details.value[0]
             })
           }
           invalid={!!errors.category}
         >
-          <Select.Trigger>
-            <Select.ValueText placeholder="¿Cómo se mide este item?" />
+          <Select.Trigger w="full">
+            <Select.ValueText placeholder="¿A qué categoría pertenece?" />
           </Select.Trigger>
           <Select.Content>
             {CATEGORY_COLLECTION.items.map(item => (
@@ -198,38 +183,39 @@ function MeasurableFields({
         )}
       </Box>
 
-      {/* Unidad específica */}
-      {formData.category && (
-        <Box>
-          <Text fontSize="sm" fontWeight="medium" mb="2">
-            Unidad Específica *
+      {/* Measurement Unit */}
+      <Box>
+        <Text fontSize="sm" fontWeight="medium" mb="2">
+          Unidad de Medición *
+        </Text>
+        <Select.Root
+          collection={getMeasurableUnitsCollection()}
+          value={formData.unit ? [formData.unit] : []}
+          onValueChange={(details) => 
+            setFormData({ ...formData, unit: details.value[0] as MeasurableUnit })
+          }
+          invalid={!!errors.unit}
+        >
+          <Select.Trigger w="full">
+            <Select.ValueText placeholder="Selecciona la unidad de medición" />
+          </Select.Trigger>
+          <Select.Content>
+            {getMeasurableUnitsCollection().items.map(item => (
+              <Select.Item key={item.value} item={item}>
+                {item.label}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Root>
+        {errors.unit && (
+          <Text color="red.500" fontSize="sm" mt="1">
+            {errors.unit}
           </Text>
-          <Select.Root
-            collection={getUnitsCollection()}
-            value={formData.unit ? [formData.unit] : []}
-            onValueChange={(details) => 
-              setFormData({ ...formData, unit: details.value[0] as MeasurableUnit })
-            }
-            invalid={!!errors.unit}
-          >
-            <Select.Trigger>
-              <Select.ValueText placeholder="Selecciona la unidad" />
-            </Select.Trigger>
-            <Select.Content>
-              {getUnitsCollection().items.map(item => (
-                <Select.Item key={item.value} item={item}>
-                  {item.label}
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select.Root>
-          {errors.unit && (
-            <Text color="red.500" fontSize="sm" mt="1">
-              {errors.unit}
-            </Text>
-          )}
-        </Box>
-      )}
+        )}
+        <Text fontSize="xs" color="gray.500" mt="1">
+          La unidad determina cómo se mide este producto (peso, volumen o longitud)
+        </Text>
+      </Box>
     </VStack>
   );
 }
@@ -260,6 +246,40 @@ function CountableFields({
 
   return (
     <VStack align="stretch" gap="4">
+      {/* Business Category */}
+      <Box>
+        <Text fontSize="sm" fontWeight="medium" mb="2">
+          Categoría del Producto *
+        </Text>
+        <Select.Root
+          collection={CATEGORY_COLLECTION}
+          value={formData.category ? [formData.category] : []}
+          onValueChange={(details) => 
+            setFormData({ 
+              ...formData, 
+              category: details.value[0]
+            })
+          }
+          invalid={!!errors.category}
+        >
+          <Select.Trigger w="full">
+            <Select.ValueText placeholder="¿A qué categoría pertenece?" />
+          </Select.Trigger>
+          <Select.Content>
+            {CATEGORY_COLLECTION.items.map(item => (
+              <Select.Item key={item.value} item={item}>
+                {item.label}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Root>
+        {errors.category && (
+          <Text color="red.500" fontSize="sm" mt="1">
+            {errors.category}
+          </Text>
+        )}
+      </Box>
+
       {/* Info sobre contables */}
       <Alert.Root status="info" variant="subtle">
         <Alert.Indicator>
@@ -371,6 +391,40 @@ function ElaboratedFields({
 }) {
   return (
     <VStack align="stretch" gap="4">
+      {/* Business Category */}
+      <Box>
+        <Text fontSize="sm" fontWeight="medium" mb="2">
+          Categoría del Producto *
+        </Text>
+        <Select.Root
+          collection={CATEGORY_COLLECTION}
+          value={formData.category ? [formData.category] : []}
+          onValueChange={(details) => 
+            setFormData({ 
+              ...formData, 
+              category: details.value[0]
+            })
+          }
+          invalid={!!errors.category}
+        >
+          <Select.Trigger w="full">
+            <Select.ValueText placeholder="¿A qué categoría pertenece?" />
+          </Select.Trigger>
+          <Select.Content>
+            {CATEGORY_COLLECTION.items.map(item => (
+              <Select.Item key={item.value} item={item}>
+                {item.label}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Root>
+        {errors.category && (
+          <Text color="red.500" fontSize="sm" mt="1">
+            {errors.category}
+          </Text>
+        )}
+      </Box>
+
       {/* Info sobre elaborados */}
       <Alert.Root status="warning" variant="subtle">
         <Alert.Indicator>
@@ -675,10 +729,12 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
       newErrors.type = 'Debes seleccionar un tipo de item';
     }
 
+    // Category is required for all item types
+    if (!formData.category) {
+      newErrors.category = 'Debes seleccionar una categoría';
+    }
+
     if (formData.type === 'MEASURABLE') {
-      if (!formData.category) {
-        newErrors.category = 'Debes seleccionar una categoría de medición';
-      }
       if (!formData.unit) {
         newErrors.unit = 'Debes seleccionar una unidad específica';
       }

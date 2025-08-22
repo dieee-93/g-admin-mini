@@ -1,10 +1,11 @@
 import { Box, HStack, VStack, Text, Button, Badge } from '@chakra-ui/react';
 import { PlusIcon, ChartBarIcon } from '@heroicons/react/24/outline';
-import { useMaterials } from '@/hooks/useZustandStores';
+import { useMaterials } from '@/store/materialsStore';
 
 interface MaterialsHeaderProps {
   onAddItem: () => void;
-  onShowAnalytics: () => void;
+  onShowAnalytics?: () => void;
+  itemCount?: number;
 }
 
 export const MaterialsHeader = ({ onAddItem, onShowAnalytics }: MaterialsHeaderProps) => {
@@ -13,36 +14,22 @@ export const MaterialsHeader = ({ onAddItem, onShowAnalytics }: MaterialsHeaderP
   return (
     <Box p={6} borderBottomWidth={1} borderColor="gray.200">
       <VStack align="stretch" gap={4}>
-        {/* Title and Actions */}
-        <HStack justify="space-between" align="flex-start">
-          <VStack align="flex-start" gap={1}>
-            <Text fontSize="2xl" fontWeight="bold" color="gray.800">
-              Gestión de Materiales
-            </Text>
-            <Text fontSize="md" color="gray.600">
-              Controla el inventario de materias primas y productos
-            </Text>
-          </VStack>
-
-          <HStack gap={3}>
+        {/* Analytics Action Only - Title moved to ModuleHeader */}
+        {onShowAnalytics && (
+          <HStack justify="flex-end">
             <Button
               variant="outline"
-              size="sm"
+              size="md"
+              minH="44px"
+              minW="44px"
+              gap="2"
               onClick={onShowAnalytics}
             >
               <ChartBarIcon className="w-4 h-4" />
               Analytics
             </Button>
-            
-            <Button
-              colorPalette="blue"
-              onClick={onAddItem}
-            >
-              <PlusIcon className="w-4 h-4" />
-              Nuevo Material
-            </Button>
           </HStack>
-        </HStack>
+        )}
 
         {/* Stats Overview */}
         <HStack gap={6}>

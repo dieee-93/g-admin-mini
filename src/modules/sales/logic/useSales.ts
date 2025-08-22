@@ -1,6 +1,6 @@
 // src/features/sales/logic/useSales.ts - ESQUEMA NORMALIZADO
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { 
   type Sale, 
   type Customer,

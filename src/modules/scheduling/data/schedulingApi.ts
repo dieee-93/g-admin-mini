@@ -1,5 +1,5 @@
 // schedulingApi - Supabase API integration for scheduling module
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import type { 
   Shift, 
   Schedule, 

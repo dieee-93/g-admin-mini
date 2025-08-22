@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>G-Admin Mini - Modo Offline</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    
+    .offline-container {
+      text-align: center;
+      max-width: 400px;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .offline-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+    
+    .retry-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 1rem;
+      transition: background 0.3s ease;
+    }
+    
+    .retry-btn:hover {
+      background: #45a049;
+    }
+    
+    .features-list {
+      text-align: left;
+      margin-top: 2rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+    
+    .features-list li {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+    }
+    
+    .sync-status {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      background: rgba(255, 193, 7, 0.2);
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">
+      📱
+    </div>
+    
+    <h1>G-Admin Mini</h1>
+    <h2>Modo Offline Activo</h2>
+    
+    <p>Sin conexión a internet, pero puedes seguir trabajando.</p>
+    
+    <div class="features-list">
+      <h3>✅ Funcionalidades Disponibles Offline:</h3>
+      <ul>
+        <li>🛒 Procesar ventas (se sincronizarán cuando vuelva la conexión)</li>
+        <li>📦 Consultar inventario en caché</li>
+        <li>👥 Ver información de personal</li>
+        <li>⏰ Registrar entrada/salida de empleados</li>
+        <li>🧾 Generar facturas (pendientes de envío a AFIP)</li>
+        <li>📊 Ver dashboards con datos locales</li>
+      </ul>
+    </div>
+    
+    <div class="sync-status">
+      <strong>🔄 Sincronización automática:</strong><br>
+      Los datos se sincronizarán automáticamente cuando se restablezca la conexión.
+    </div>
+    
+    <button class="retry-btn" onclick="checkConnection()">
+      🔄 Verificar Conexión
+    </button>
+    
+    <script>
+      // Check connection and redirect back to app
+      function checkConnection() {
+        if (navigator.onLine) {
+          window.location.href = '/';
+        } else {
+          alert('Aún sin conexión. G-Admin Mini seguirá funcionando en modo offline.');
+        }
+      }
+      
+      // Auto-check connection every 30 seconds
+      setInterval(() => {
+        if (navigator.onLine) {
+          console.log('[Offline Page] Connection restored, redirecting...');
+          window.location.href = '/';
+        }
+      }, 30000);
+      
+      // Show current queue size if available
+      if ('localStorage' in window) {
+        try {
+          const queueData = localStorage.getItem('g-admin-offline-queue');
+          if (queueData) {
+            const queue = JSON.parse(queueData);
+            const queueSize = Array.isArray(queue) ? queue.length : 0;
+            if (queueSize > 0) {
+              document.querySelector('.sync-status').innerHTML += 
+                `<br><small>📋 ${queueSize} operaciones en cola para sincronizar</small>`;
+            }
+          }
+        } catch (e) {
+          console.warn('[Offline Page] Could not read queue data');
+        }
+      }
+    </script>
+  </div>
+</body>
+</html>

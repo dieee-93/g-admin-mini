@@ -6,6 +6,7 @@ import { useMaterialsStore } from '@/store/materialsStore';
 import { useSalesStore } from '@/store/salesStore';
 import { useCustomersStore } from '@/store/customersStore';
 import { useStaffStore } from '@/store/staffStore';
+import { useThemeStore } from '@/store/themeStore';
 
 // App Store Hook
 export const useApp = () => {
@@ -13,27 +14,38 @@ export const useApp = () => {
   const ui = useAppStore(state => state.ui);
   const network = useAppStore(state => state.network);
   const settings = useAppStore(state => state.settings);
-  const actions = useAppStore(state => ({
-    setUser: state.setUser,
-    logout: state.logout,
-    toggleSidebar: state.toggleSidebar,
-    setTheme: state.setTheme,
-    setLoading: state.setLoading,
-    addNotification: state.addNotification,
-    removeNotification: state.removeNotification,
-    setNetworkStatus: state.setNetworkStatus,
-    updateLastSync: state.updateLastSync,
-    setPendingSyncs: state.setPendingSyncs,
-    updateSettings: state.updateSettings,
-    handleError: state.handleError
-  }));
+  
+  // Individual action selectors to avoid object recreation
+  const setUser = useAppStore(state => state.setUser);
+  const logout = useAppStore(state => state.logout);
+  const toggleSidebar = useAppStore(state => state.toggleSidebar);
+  const setTheme = useAppStore(state => state.setTheme);
+  const setLoading = useAppStore(state => state.setLoading);
+  const addNotification = useAppStore(state => state.addNotification);
+  const removeNotification = useAppStore(state => state.removeNotification);
+  const setNetworkStatus = useAppStore(state => state.setNetworkStatus);
+  const updateLastSync = useAppStore(state => state.updateLastSync);
+  const setPendingSyncs = useAppStore(state => state.setPendingSyncs);
+  const updateSettings = useAppStore(state => state.updateSettings);
+  const handleError = useAppStore(state => state.handleError);
 
   return {
     user,
     ui,
     network,
     settings,
-    ...actions
+    setUser,
+    logout,
+    toggleSidebar,
+    setTheme,
+    setLoading,
+    addNotification,
+    removeNotification,
+    setNetworkStatus,
+    updateLastSync,
+    setPendingSyncs,
+    updateSettings,
+    handleError
   };
 };
 
@@ -72,7 +84,6 @@ export const useMaterials = () => {
   const getFilteredItems = useMaterialsStore(state => state.getFilteredItems);
   const getLowStockItems = useMaterialsStore(state => state.getLowStockItems);
   const getCriticalStockItems = useMaterialsStore(state => state.getCriticalStockItems);
-  const getItemsByCategory = useMaterialsStore(state => state.getItemsByCategory);
 
   return {
     items,
@@ -105,8 +116,7 @@ export const useMaterials = () => {
     // Selectors
     getFilteredItems,
     getLowStockItems,
-    getCriticalStockItems,
-    getItemsByCategory
+    getCriticalStockItems
   };
 };
 
@@ -123,46 +133,43 @@ export const useSales = () => {
   const kitchenOrders = useSalesStore(state => state.kitchenOrders);
   const activeKitchenOrder = useSalesStore(state => state.activeKitchenOrder);
   
-  const modalStates = useSalesStore(state => ({
-    isCheckoutModalOpen: state.isCheckoutModalOpen,
-    isReceiptModalOpen: state.isReceiptModalOpen,
-    isRefundModalOpen: state.isRefundModalOpen,
-    currentReceipt: state.currentReceipt
-  }));
+  // Individual modal state selectors
+  const isCheckoutModalOpen = useSalesStore(state => state.isCheckoutModalOpen);
+  const isReceiptModalOpen = useSalesStore(state => state.isReceiptModalOpen);
+  const isRefundModalOpen = useSalesStore(state => state.isRefundModalOpen);
+  const currentReceipt = useSalesStore(state => state.currentReceipt);
 
-  const actions = useSalesStore(state => ({
-    setSales: state.setSales,
-    addSale: state.addSale,
-    updateSale: state.updateSale,
-    deleteSale: state.deleteSale,
-    addToCart: state.addToCart,
-    updateCartItem: state.updateCartItem,
-    removeFromCart: state.removeFromCart,
-    clearCart: state.clearCart,
-    startCheckout: state.startCheckout,
-    completeSale: state.completeSale,
-    updateKitchenStatus: state.updateKitchenStatus,
-    setActiveKitchenOrder: state.setActiveKitchenOrder,
-    setLoading: state.setLoading,
-    setError: state.setError,
-    setFilters: state.setFilters,
-    resetFilters: state.resetFilters,
-    openCheckoutModal: state.openCheckoutModal,
-    closeCheckoutModal: state.closeCheckoutModal,
-    openReceiptModal: state.openReceiptModal,
-    closeReceiptModal: state.closeReceiptModal,
-    openRefundModal: state.openRefundModal,
-    closeRefundModal: state.closeRefundModal,
-    refreshStats: state.refreshStats
-  }));
+  // Individual action selectors
+  const setSales = useSalesStore(state => state.setSales);
+  const addSale = useSalesStore(state => state.addSale);
+  const updateSale = useSalesStore(state => state.updateSale);
+  const deleteSale = useSalesStore(state => state.deleteSale);
+  const addToCart = useSalesStore(state => state.addToCart);
+  const updateCartItem = useSalesStore(state => state.updateCartItem);
+  const removeFromCart = useSalesStore(state => state.removeFromCart);
+  const clearCart = useSalesStore(state => state.clearCart);
+  const startCheckout = useSalesStore(state => state.startCheckout);
+  const completeSale = useSalesStore(state => state.completeSale);
+  const updateKitchenStatus = useSalesStore(state => state.updateKitchenStatus);
+  const setActiveKitchenOrder = useSalesStore(state => state.setActiveKitchenOrder);
+  const setSalesLoading = useSalesStore(state => state.setLoading);
+  const setSalesError = useSalesStore(state => state.setError);
+  const setSalesFilters = useSalesStore(state => state.setFilters);
+  const resetSalesFilters = useSalesStore(state => state.resetFilters);
+  const openCheckoutModal = useSalesStore(state => state.openCheckoutModal);
+  const closeCheckoutModal = useSalesStore(state => state.closeCheckoutModal);
+  const openReceiptModal = useSalesStore(state => state.openReceiptModal);
+  const closeReceiptModal = useSalesStore(state => state.closeReceiptModal);
+  const openRefundModal = useSalesStore(state => state.openRefundModal);
+  const closeRefundModal = useSalesStore(state => state.closeRefundModal);
+  const refreshSalesStats = useSalesStore(state => state.refreshStats);
 
-  const selectors = useSalesStore(state => ({
-    getFilteredSales: state.getFilteredSales,
-    getCartTotal: state.getCartTotal,
-    getCartItemCount: state.getCartItemCount,
-    getTodaySales: state.getTodaySales,
-    getPendingKitchenOrders: state.getPendingKitchenOrders
-  }));
+  // Individual selector functions
+  const getFilteredSales = useSalesStore(state => state.getFilteredSales);
+  const getCartTotal = useSalesStore(state => state.getCartTotal);
+  const getCartItemCount = useSalesStore(state => state.getCartItemCount);
+  const getTodaySales = useSalesStore(state => state.getTodaySales);
+  const getPendingKitchenOrders = useSalesStore(state => state.getPendingKitchenOrders);
 
   return {
     sales,
@@ -174,9 +181,38 @@ export const useSales = () => {
     stats,
     kitchenOrders,
     activeKitchenOrder,
-    ...modalStates,
-    ...actions,
-    ...selectors
+    isCheckoutModalOpen,
+    isReceiptModalOpen,
+    isRefundModalOpen,
+    currentReceipt,
+    setSales,
+    addSale,
+    updateSale,
+    deleteSale,
+    addToCart,
+    updateCartItem,
+    removeFromCart,
+    clearCart,
+    startCheckout,
+    completeSale,
+    updateKitchenStatus,
+    setActiveKitchenOrder,
+    setLoading: setSalesLoading,
+    setError: setSalesError,
+    setFilters: setSalesFilters,
+    resetFilters: resetSalesFilters,
+    openCheckoutModal,
+    closeCheckoutModal,
+    openReceiptModal,
+    closeReceiptModal,
+    openRefundModal,
+    closeRefundModal,
+    refreshStats: refreshSalesStats,
+    getFilteredSales,
+    getCartTotal,
+    getCartItemCount,
+    getTodaySales,
+    getPendingKitchenOrders
   };
 };
 
@@ -189,38 +225,35 @@ export const useCustomers = () => {
   const stats = useCustomersStore(state => state.stats);
   const selectedCustomers = useCustomersStore(state => state.selectedCustomers);
   
-  const modalStates = useCustomersStore(state => ({
-    isModalOpen: state.isModalOpen,
-    modalMode: state.modalMode,
-    currentCustomer: state.currentCustomer
-  }));
+  // Individual modal state selectors
+  const isModalOpen = useCustomersStore(state => state.isModalOpen);
+  const modalMode = useCustomersStore(state => state.modalMode);
+  const currentCustomer = useCustomersStore(state => state.currentCustomer);
 
-  const actions = useCustomersStore(state => ({
-    setCustomers: state.setCustomers,
-    addCustomer: state.addCustomer,
-    updateCustomer: state.updateCustomer,
-    deleteCustomer: state.deleteCustomer,
-    updateCustomerStats: state.updateCustomerStats,
-    calculateLoyaltyTier: state.calculateLoyaltyTier,
-    setLoading: state.setLoading,
-    setError: state.setError,
-    setFilters: state.setFilters,
-    resetFilters: state.resetFilters,
-    selectCustomer: state.selectCustomer,
-    deselectCustomer: state.deselectCustomer,
-    selectAllCustomers: state.selectAllCustomers,
-    deselectAllCustomers: state.deselectAllCustomers,
-    openModal: state.openModal,
-    closeModal: state.closeModal,
-    refreshStats: state.refreshStats
-  }));
+  // Individual action selectors
+  const setCustomers = useCustomersStore(state => state.setCustomers);
+  const addCustomer = useCustomersStore(state => state.addCustomer);
+  const updateCustomer = useCustomersStore(state => state.updateCustomer);
+  const deleteCustomer = useCustomersStore(state => state.deleteCustomer);
+  const updateCustomerStats = useCustomersStore(state => state.updateCustomerStats);
+  const calculateLoyaltyTier = useCustomersStore(state => state.calculateLoyaltyTier);
+  const setCustomersLoading = useCustomersStore(state => state.setLoading);
+  const setCustomersError = useCustomersStore(state => state.setError);
+  const setCustomersFilters = useCustomersStore(state => state.setFilters);
+  const resetCustomersFilters = useCustomersStore(state => state.resetFilters);
+  const selectCustomer = useCustomersStore(state => state.selectCustomer);
+  const deselectCustomer = useCustomersStore(state => state.deselectCustomer);
+  const selectAllCustomers = useCustomersStore(state => state.selectAllCustomers);
+  const deselectAllCustomers = useCustomersStore(state => state.deselectAllCustomers);
+  const openCustomerModal = useCustomersStore(state => state.openModal);
+  const closeCustomerModal = useCustomersStore(state => state.closeModal);
+  const refreshCustomersStats = useCustomersStore(state => state.refreshStats);
 
-  const selectors = useCustomersStore(state => ({
-    getFilteredCustomers: state.getFilteredCustomers,
-    getTopCustomers: state.getTopCustomers,
-    getCustomersByTier: state.getCustomersByTier,
-    getInactiveCustomers: state.getInactiveCustomers
-  }));
+  // Individual selector functions
+  const getFilteredCustomers = useCustomersStore(state => state.getFilteredCustomers);
+  const getTopCustomers = useCustomersStore(state => state.getTopCustomers);
+  const getCustomersByTier = useCustomersStore(state => state.getCustomersByTier);
+  const getInactiveCustomers = useCustomersStore(state => state.getInactiveCustomers);
 
   return {
     customers,
@@ -229,9 +262,30 @@ export const useCustomers = () => {
     filters,
     stats,
     selectedCustomers,
-    ...modalStates,
-    ...actions,
-    ...selectors
+    isModalOpen,
+    modalMode,
+    currentCustomer,
+    setCustomers,
+    addCustomer,
+    updateCustomer,
+    deleteCustomer,
+    updateCustomerStats,
+    calculateLoyaltyTier,
+    setLoading: setCustomersLoading,
+    setError: setCustomersError,
+    setFilters: setCustomersFilters,
+    resetFilters: resetCustomersFilters,
+    selectCustomer,
+    deselectCustomer,
+    selectAllCustomers,
+    deselectAllCustomers,
+    openModal: openCustomerModal,
+    closeModal: closeCustomerModal,
+    refreshStats: refreshCustomersStats,
+    getFilteredCustomers,
+    getTopCustomers,
+    getCustomersByTier,
+    getInactiveCustomers
   };
 };
 
@@ -246,65 +300,61 @@ export const useStaff = () => {
   const stats = useStaffStore(state => state.stats);
   const selectedStaff = useStaffStore(state => state.selectedStaff);
   
-  const modalStates = useStaffStore(state => ({
-    isStaffModalOpen: state.isStaffModalOpen,
-    isScheduleModalOpen: state.isScheduleModalOpen,
-    isTimeTrackingModalOpen: state.isTimeTrackingModalOpen,
-    modalMode: state.modalMode,
-    currentStaff: state.currentStaff,
-    currentSchedule: state.currentSchedule
-  }));
+  // Individual modal state selectors
+  const isStaffModalOpen = useStaffStore(state => state.isStaffModalOpen);
+  const isScheduleModalOpen = useStaffStore(state => state.isScheduleModalOpen);
+  const isTimeTrackingModalOpen = useStaffStore(state => state.isTimeTrackingModalOpen);
+  const modalMode = useStaffStore(state => state.modalMode);
+  const currentStaff = useStaffStore(state => state.currentStaff);
+  const currentSchedule = useStaffStore(state => state.currentSchedule);
 
-  const calendarStates = useStaffStore(state => ({
-    calendarDate: state.calendarDate,
-    calendarView: state.calendarView
-  }));
+  // Individual calendar state selectors
+  const calendarDate = useStaffStore(state => state.calendarDate);
+  const calendarView = useStaffStore(state => state.calendarView);
 
-  const actions = useStaffStore(state => ({
-    setStaff: state.setStaff,
-    addStaffMember: state.addStaffMember,
-    updateStaffMember: state.updateStaffMember,
-    deleteStaffMember: state.deleteStaffMember,
-    setSchedules: state.setSchedules,
-    addSchedule: state.addSchedule,
-    updateSchedule: state.updateSchedule,
-    deleteSchedule: state.deleteSchedule,
-    setTimeEntries: state.setTimeEntries,
-    clockIn: state.clockIn,
-    clockOut: state.clockOut,
-    startBreak: state.startBreak,
-    endBreak: state.endBreak,
-    setLoading: state.setLoading,
-    setError: state.setError,
-    setFilters: state.setFilters,
-    resetFilters: state.resetFilters,
-    selectStaff: state.selectStaff,
-    deselectStaff: state.deselectStaff,
-    selectAllStaff: state.selectAllStaff,
-    deselectAllStaff: state.deselectAllStaff,
-    openStaffModal: state.openStaffModal,
-    closeStaffModal: state.closeStaffModal,
-    openScheduleModal: state.openScheduleModal,
-    closeScheduleModal: state.closeScheduleModal,
-    openTimeTrackingModal: state.openTimeTrackingModal,
-    closeTimeTrackingModal: state.closeTimeTrackingModal,
-    setCalendarDate: state.setCalendarDate,
-    setCalendarView: state.setCalendarView,
-    refreshStats: state.refreshStats,
-    updatePerformance: state.updatePerformance,
-    addTraining: state.addTraining,
-    addCertification: state.addCertification
-  }));
+  // Individual action selectors
+  const setStaff = useStaffStore(state => state.setStaff);
+  const addStaffMember = useStaffStore(state => state.addStaffMember);
+  const updateStaffMember = useStaffStore(state => state.updateStaffMember);
+  const deleteStaffMember = useStaffStore(state => state.deleteStaffMember);
+  const setSchedules = useStaffStore(state => state.setSchedules);
+  const addSchedule = useStaffStore(state => state.addSchedule);
+  const updateSchedule = useStaffStore(state => state.updateSchedule);
+  const deleteSchedule = useStaffStore(state => state.deleteSchedule);
+  const setTimeEntries = useStaffStore(state => state.setTimeEntries);
+  const clockIn = useStaffStore(state => state.clockIn);
+  const clockOut = useStaffStore(state => state.clockOut);
+  const startBreak = useStaffStore(state => state.startBreak);
+  const endBreak = useStaffStore(state => state.endBreak);
+  const setStaffLoading = useStaffStore(state => state.setLoading);
+  const setStaffError = useStaffStore(state => state.setError);
+  const setStaffFilters = useStaffStore(state => state.setFilters);
+  const resetStaffFilters = useStaffStore(state => state.resetFilters);
+  const selectStaff = useStaffStore(state => state.selectStaff);
+  const deselectStaff = useStaffStore(state => state.deselectStaff);
+  const selectAllStaff = useStaffStore(state => state.selectAllStaff);
+  const deselectAllStaff = useStaffStore(state => state.deselectAllStaff);
+  const openStaffModal = useStaffStore(state => state.openStaffModal);
+  const closeStaffModal = useStaffStore(state => state.closeStaffModal);
+  const openScheduleModal = useStaffStore(state => state.openScheduleModal);
+  const closeScheduleModal = useStaffStore(state => state.closeScheduleModal);
+  const openTimeTrackingModal = useStaffStore(state => state.openTimeTrackingModal);
+  const closeTimeTrackingModal = useStaffStore(state => state.closeTimeTrackingModal);
+  const setCalendarDate = useStaffStore(state => state.setCalendarDate);
+  const setCalendarView = useStaffStore(state => state.setCalendarView);
+  const refreshStaffStats = useStaffStore(state => state.refreshStats);
+  const updatePerformance = useStaffStore(state => state.updatePerformance);
+  const addTraining = useStaffStore(state => state.addTraining);
+  const addCertification = useStaffStore(state => state.addCertification);
 
-  const selectors = useStaffStore(state => ({
-    getFilteredStaff: state.getFilteredStaff,
-    getActiveStaff: state.getActiveStaff,
-    getScheduleForDate: state.getScheduleForDate,
-    getScheduleForStaff: state.getScheduleForStaff,
-    getCurrentShifts: state.getCurrentShifts,
-    getActiveTimeEntries: state.getActiveTimeEntries,
-    getStaffOnBreak: state.getStaffOnBreak
-  }));
+  // Individual selector functions
+  const getFilteredStaff = useStaffStore(state => state.getFilteredStaff);
+  const getActiveStaff = useStaffStore(state => state.getActiveStaff);
+  const getScheduleForDate = useStaffStore(state => state.getScheduleForDate);
+  const getScheduleForStaff = useStaffStore(state => state.getScheduleForStaff);
+  const getCurrentShifts = useStaffStore(state => state.getCurrentShifts);
+  const getActiveTimeEntries = useStaffStore(state => state.getActiveTimeEntries);
+  const getStaffOnBreak = useStaffStore(state => state.getStaffOnBreak);
 
   return {
     staff,
@@ -315,9 +365,71 @@ export const useStaff = () => {
     filters,
     stats,
     selectedStaff,
-    ...modalStates,
-    ...calendarStates,
-    ...actions,
-    ...selectors
+    isStaffModalOpen,
+    isScheduleModalOpen,
+    isTimeTrackingModalOpen,
+    modalMode,
+    currentStaff,
+    currentSchedule,
+    calendarDate,
+    calendarView,
+    setStaff,
+    addStaffMember,
+    updateStaffMember,
+    deleteStaffMember,
+    setSchedules,
+    addSchedule,
+    updateSchedule,
+    deleteSchedule,
+    setTimeEntries,
+    clockIn,
+    clockOut,
+    startBreak,
+    endBreak,
+    setLoading: setStaffLoading,
+    setError: setStaffError,
+    setFilters: setStaffFilters,
+    resetFilters: resetStaffFilters,
+    selectStaff,
+    deselectStaff,
+    selectAllStaff,
+    deselectAllStaff,
+    openStaffModal,
+    closeStaffModal,
+    openScheduleModal,
+    closeScheduleModal,
+    openTimeTrackingModal,
+    closeTimeTrackingModal,
+    setCalendarDate,
+    setCalendarView,
+    refreshStats: refreshStaffStats,
+    updatePerformance,
+    addTraining,
+    addCertification,
+    getFilteredStaff,
+    getActiveStaff,
+    getScheduleForDate,
+    getScheduleForStaff,
+    getCurrentShifts,
+    getActiveTimeEntries,
+    getStaffOnBreak
+  };
+};
+
+// Theme Store Hook
+export const useTheme = () => {
+  const theme = useThemeStore(state => state.theme);
+  const resolvedTheme = useThemeStore(state => state.resolvedTheme);
+  const setTheme = useThemeStore(state => state.setTheme);
+  const toggleTheme = useThemeStore(state => state.toggleTheme);
+
+  return {
+    theme,
+    resolvedTheme,
+    setTheme,
+    toggleTheme,
+    isDark: resolvedTheme === 'dark',
+    isLight: resolvedTheme === 'light',
+    isSystem: theme === 'system'
   };
 };

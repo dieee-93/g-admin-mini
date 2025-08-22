@@ -19,7 +19,7 @@ interface OfflineStatusHook {
   queueSize: number;
   
   // Operations
-  queueOperation: (operation: any) => string;
+  queueOperation: (operation: any) => Promise<string>;
   forceSync: () => Promise<void>;
   clearQueue: () => void;
   
@@ -190,15 +190,15 @@ export const useOfflineStatus = (): OfflineStatusHook => {
   }, []);
 
   // Queue operation wrapper
-  const queueOperation = useCallback((operation: any): string => {
-    return offlineSync.queueOperation(operation);
+  const queueOperation = useCallback(async (operation: any): Promise<string> => {
+    return await offlineSync.queueOperation(operation);
   }, []);
 
   // Force sync wrapper
   const forceSync = useCallback(async (): Promise<void> => {
     setIsConnecting(true);
     try {
-      await offlineSync.forcSync();
+      await offlineSync.syncPendingOperations(); // Fixed typo: was forcSync
     } finally {
       setIsConnecting(false);
     }

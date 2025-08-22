@@ -12,7 +12,7 @@ import {
   type ProductSalesData
 } from '../logic/menuEngineeringCalculations';
 import { notify } from '@/lib/notifications';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 
 interface UseMenuEngineeringOptions {
   configuration?: MatrixConfiguration;

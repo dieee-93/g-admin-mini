@@ -26,7 +26,7 @@ export function Breadcrumb() {
                   window.location.href = crumb.path;
                 }
               }}
-              color={crumb.isActive ? 'gray.800' : 'gray.600'}
+              color={crumb.isActive ? { base: 'gray.800', _dark: 'gray.100' } : { base: 'gray.600', _dark: 'gray.300' }}
               fontWeight={crumb.isActive ? 'semibold' : 'normal'}
             >
               {crumb.label}
@@ -34,7 +34,7 @@ export function Breadcrumb() {
           ) : (
             <Text
               fontSize="sm"
-              color={crumb.isActive ? 'gray.800' : 'gray.600'}
+              color={crumb.isActive ? { base: 'gray.800', _dark: 'gray.100' } : { base: 'gray.600', _dark: 'gray.300' }}
               fontWeight={crumb.isActive ? 'semibold' : 'normal'}
             >
               {crumb.label}

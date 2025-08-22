@@ -142,7 +142,7 @@ export const useAppStore = create<AppState>()(
           set((state) => ({
             ui: {
               ...state.ui,
-              notifications: [...state.ui.notifications, newNotification]
+              notifications: [...(state.ui.notifications || []), newNotification]
             }
           }), false, 'addNotification');
 
@@ -158,7 +158,7 @@ export const useAppStore = create<AppState>()(
           set((state) => ({
             ui: {
               ...state.ui,
-              notifications: state.ui.notifications.filter(n => n.id !== id)
+              notifications: (state.ui.notifications || []).filter(n => n.id !== id)
             }
           }), false, 'removeNotification');
         },

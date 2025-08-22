@@ -1,5 +1,5 @@
 // Fiscal API - AFIP Integration and Tax Management
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { 
   type Invoice, 
   type AFIPConfiguration, 

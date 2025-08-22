@@ -1,378 +1,184 @@
-// src/pages/Dashboard.tsx
-// Dashboard como centro de comando funcional
-// ✅ Elimina alertas duplicadas + navegación funcional
+// Dashboard Moderno 2025 - Diseño basado en mejores prácticas
+// ✅ Jerarquía visual + Sin duplicación + Responsive + Operacional
 
 import {
   Box,
   VStack,
-  HStack,
   Text,
   Grid,
-  Card,
-  Button,
-  Alert,
-  Badge
+  HStack
 } from '@chakra-ui/react';
+
+// Componentes modernos
 import {
-  CubeIcon,
-  CurrencyDollarIcon,
-  UsersIcon,
-  ChartBarIcon,
-  ExclamationTriangleIcon,
-  ArrowRightIcon
-} from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
-import { useNavigate } from 'react-router-dom';
-import { useMaterials } from '../materials/logic/useMaterials'; 
-import { useSales } from '@/modules/sales/logic/useSales';
-import { useCustomers } from '@/modules/customers/logic/useCustomers';
-//import { useRecipes } from '@/tools/intelligence/logic/useRecipes';
+  HeroMetricCard,
+  MetricCard,
+  SummaryPanel,
+  QuickActionCard
+} from '@/shared/components/widgets';
+import { useModernDashboard } from './hooks';
 
 export function Dashboard() {
-  const { quickActions } = useNavigation();
-  const navigate = useNavigate();
-  const { inventoryStats, alertSummary, alerts, loading } = useMaterials();
-  const { salesStats } = useSales();
-  const { customersStats } = useCustomers();
-  //const { recipes } = useRecipes();
+  const {
+    heroMetric,
+    secondaryMetrics,
+    summaryMetrics,
+    summaryStatus,
+    operationalActions,
+    onConfigure
+  } = useModernDashboard();
 
   return (
-    <Box p="6">
-      <VStack gap="6" align="stretch">
-        {/* ✅ Header */}
-        <VStack align="start" gap="2">
-          <Text fontSize="3xl" fontWeight="bold">Dashboard</Text>
-          <Text color="gray.600">
-            Centro de comando de tu negocio
-          </Text>
-        </VStack>
+    <Box p={{ base: "4", md: "6" }} bg={{ base: "gray.50", _dark: "gray.900" }} minH="100vh">
+  <VStack gap="4" align="stretch" maxW="container.xl" mx="auto">
+        {/* Header compacto */}
+        <HStack justify="space-between" align="end">
+          <VStack align="start" gap="0">
+            <Text fontSize="2xl" fontWeight="bold" color={{ base: "gray.900", _dark: "gray.50" }}>
+              🏠 Dashboard
+            </Text>
+            <Text color={{ base: "gray.600", _dark: "gray.300" }} fontSize="md">
+              Centro de comando · G-Admin
+            </Text>
+          </VStack>
+        </HStack>
 
-        {/* ✅ ALERTAS UNIFICADAS - Solo aquí, no duplicadas */}
-        {alertSummary.total > 0 && (
-          <Alert.Root 
-            status={alertSummary.critical > 0 ? "error" : "warning"}
-            variant="surface"
-          >
-            <Alert.Indicator />
-            <VStack align="start" gap="2" flex="1">
-              <Alert.Title>
-                {alertSummary.critical > 0 ? "Alertas Críticas" : "Alertas de Stock"}
-              </Alert.Title>
-              <Alert.Description>
-                {alertSummary.critical > 0 && (
-                  <Text color="red.600" fontWeight="semibold">
-                    {alertSummary.critical} items con stock crítico
-                  </Text>
-                )}
-                {alertSummary.warning > 0 && (
-                  <Text color="orange.600">
-                    {alertSummary.warning} items con stock bajo
-                  </Text>
-                )}
-              </Alert.Description>
-              <Button
-                size="sm"
-                variant="outline"
-                colorPalette={alertSummary.critical > 0 ? "red" : "orange"}
-                onClick={() => navigate('/materials')}
-              >
-                Ver Inventario
-                <ArrowRightIcon className="w-4 h-4 ml-2" />
-              </Button>
-            </VStack>
-          </Alert.Root>
-        )}
-
-        {/* ✅ MÉTRICAS PRINCIPALES - Con navegación funcional */}
+        {/* MÉTRICAS EN FORMATO HORIZONTAL COMPACTO */}
         <Grid 
           templateColumns={{ 
             base: "1fr", 
-            md: "repeat(2, 1fr)", 
-            lg: "repeat(4, 1fr)" 
+            md: "1.5fr 1fr 1fr", 
+            lg: "2fr 1fr 1fr 1fr" 
           }} 
-          gap="6"
+          gap="4"
+          alignItems="stretch"
         >
-          {/* Inventario */}
-          <Card.Root 
-            variant="elevated" 
-            cursor="pointer"
-            onClick={() => navigate('inventory')}
-            _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
-            transition="all 0.2s"
-          >
-            <Card.Body>
-              <VStack align="start" gap="3">
-                <HStack justify="space-between" w="full">
-                  <Box p="2" bg="green.100" borderRadius="md">
-                    <CubeIcon className="w-6 h-6 text-green-600" />
-                  </Box>
-                  {alertSummary.total > 0 && (
-                    <Badge colorPalette="red" variant="solid">
-                      {alertSummary.total}
-                    </Badge>
-                  )}
-                </HStack>
-                <VStack align="start" gap="1">
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {inventoryStats.totalItems}
-                  </Text>
-                  <Text fontSize="sm" color="gray.600">Items en inventario</Text>
-                  <Text fontSize="xs" color="green.600">
-                    Valor: ${inventoryStats.totalValue.toLocaleString()}
-                  </Text>
-                </VStack>
-              </VStack>
-            </Card.Body>
-          </Card.Root>
-
-          {/* Ventas con datos reales */}
-          <Card.Root 
-            variant="elevated" 
-            cursor="pointer"
-            onClick={() => navigate('/sales')}
-            _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
-            transition="all 0.2s"
-          >
-            <Card.Body>
-              <VStack align="start" gap="3">
-                <Box p="2" bg="teal.100" borderRadius="md">
-                  <CurrencyDollarIcon className="w-6 h-6 text-teal-600" />
-                </Box>
-                <VStack align="start" gap="1">
-                  <Text fontSize="2xl" fontWeight="bold">
-                    ${salesStats?.monthlyRevenue?.toLocaleString() || '0'}
-                  </Text>
-                  <Text fontSize="sm" color="gray.600">Ventas del mes</Text>
-                  <Text fontSize="xs" color="teal.600">
-                    {salesStats?.monthlyTransactions || 0} transacciones
-                  </Text>
-                </VStack>
-              </VStack>
-            </Card.Body>
-          </Card.Root>
-
-          {/* Clientes con datos reales */}
-          <Card.Root 
-            variant="elevated" 
-            cursor="pointer"
-            onClick={() => navigate('/customers')}
-            _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
-            transition="all 0.2s"
-          >
-            <Card.Body>
-              <VStack align="start" gap="3">
-                <Box p="2" bg="pink.100" borderRadius="md">
-                  <UsersIcon className="w-6 h-6 text-pink-600" />
-                </Box>
-                <VStack align="start" gap="1">
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {customersStats?.totalCustomers || 0}
-                  </Text>
-                  <Text fontSize="sm" color="gray.600">Clientes activos</Text>
-                  <Text fontSize="xs" color="pink.600">
-                    {customersStats?.newThisMonth || 0} nuevos este mes
-                  </Text>
-                </VStack>
-              </VStack>
-            </Card.Body>
-          </Card.Root>
-
-          {/* Producción con datos reales */}
-          <Card.Root 
-            variant="elevated" 
-            cursor="pointer"
-            onClick={() => navigate('/products')}
-            _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
-            transition="all 0.2s"
-          >
-   {/*<Card.Body>
-              <VStack align="start" gap="3">
-                <Box p="2" bg="purple.100" borderRadius="md">
-                  <ChartBarIcon className="w-6 h-6 text-purple-600" />
-                </Box>
-                <VStack align="start" gap="1">
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {recipes?.length || 0}
-                  </Text>
-                  <Text fontSize="sm" color="gray.600">Recetas disponibles</Text>
-                  <Text fontSize="xs" color="purple.600">
-                    {recipes?.filter(r => r.is_active).length || 0} activas
-                  </Text>
-                </VStack>
-              </VStack>
-            </Card.Body> */}
-            
-          </Card.Root>
+          {/* Hero Metric - Más compacto */}
+          <Box>
+            <HeroMetricCard {...heroMetric} />
+          </Box>
+          
+          {/* Secondary Metrics - Horizontales */}
+          {secondaryMetrics.map((metric) => (
+            <MetricCard key={metric.title} {...metric} />
+          ))}
         </Grid>
 
-        {/* ✅ QUICK ACTIONS - Centralizadas */}
-        <Card.Root>
-          <Card.Header>
-            <Text fontSize="lg" fontWeight="semibold">Acciones Rápidas</Text>
-          </Card.Header>
-          <Card.Body>
-            <Grid 
-              templateColumns={{ 
-                base: "1fr", 
-                md: "repeat(3, 1fr)" 
-              }} 
-              gap="4"
-            >
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <Button
-                    key={action.id}
-                    variant="outline"
-                    size="lg"
-                    onClick={action.action}
-                    colorPalette={action.color || 'gray'}
-                    h="auto"
-                    py="4"
-                  >
-                    <VStack gap="2">
-                      <Icon className="w-6 h-6" />
-                      <Text fontSize="sm">{action.label}</Text>
-                    </VStack>
-                  </Button>
-                );
-              })}
-            </Grid>
-          </Card.Body>
-        </Card.Root>
+        {/* RESUMEN OPERACIONAL - Expandido por defecto y más compacto */}
+        <SummaryPanel
+          title="Resumen Operacional"
+          metrics={summaryMetrics}
+          status={summaryStatus}
+          onConfigure={onConfigure}
+          defaultExpanded={true}
+        />
 
-        {/* 🧠 BUSINESS INTELLIGENCE - Expandable Navigation */}
-        <Card.Root>
-          <Card.Header>
-            <Text fontSize="lg" fontWeight="semibold">🧠 Business Intelligence</Text>
-          </Card.Header>
-          <Card.Body>
-            <Grid 
-              templateColumns={{ 
-                base: "1fr", 
-                md: "repeat(2, 1fr)", 
-                lg: "repeat(3, 1fr)" 
-              }} 
-              gap="4"
-            >
-              <Card.Root 
-                variant="outline" 
-                cursor="pointer"
-                onClick={() => navigate('/dashboard/executive')}
-                _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
-                transition="all 0.2s"
-              >
-                <Card.Body p="4">
-                  <VStack align="start" gap="3">
-                    <HStack gap="3">
-                      <Box p="2" bg="purple.100" borderRadius="md">
-                        <ChartBarIcon className="w-5 h-5 text-purple-600" />
-                      </Box>
-                      <VStack align="start" gap="0">
-                        <Text fontWeight="bold">Executive Dashboard</Text>
-                        <Text fontSize="sm" color="gray.600">Strategic KPIs and insights</Text>
-                      </VStack>
-                    </HStack>
-                    <Button size="sm" variant="outline" colorPalette="purple" w="full">
-                      Open Analysis
-                    </Button>
-                  </VStack>
-                </Card.Body>
-              </Card.Root>
+        {/* ACCIONES RÁPIDAS - Más compactas */}
+        <VStack align="start" gap="3">
+          <Text fontSize="md" fontWeight="semibold" color={{ base: "gray.700", _dark: "gray.200" }}>
+            ⚡ Acciones Rápidas
+          </Text>
+          
+          <Grid 
+            templateColumns={{ 
+              base: "repeat(3, 1fr)", 
+              md: "repeat(5, 1fr)", 
+              lg: "repeat(5, 1fr)" 
+            }} 
+            gap="2"
+            w="full"
+          >
+            {operationalActions.map((action) => (
+              <QuickActionCard
+                key={action.id}
+                title={action.title}
+                description={action.description}
+                icon={action.icon}
+                colorPalette={action.colorPalette}
+                onClick={action.onClick}
+              />
+            ))}
+          </Grid>
+        </VStack>
 
-              <Card.Root 
-                variant="outline" 
-                cursor="pointer"
-                onClick={() => navigate('/dashboard/cross-analytics')}
-                _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
-                transition="all 0.2s"
-              >
-                <Card.Body p="4">
-                  <VStack align="start" gap="3">
-                    <HStack gap="3">
-                      <Box p="2" bg="blue.100" borderRadius="md">
-                        <ChartBarIcon className="w-5 h-5 text-blue-600" />
-                      </Box>
-                      <VStack align="start" gap="0">
-                        <Text fontWeight="bold">Cross-Module Analytics</Text>
-                        <Text fontSize="sm" color="gray.600">Holistic business correlations</Text>
-                      </VStack>
-                    </HStack>
-                    <Button size="sm" variant="outline" colorPalette="blue" w="full">
-                      Open Analysis
-                    </Button>
-                  </VStack>
-                </Card.Body>
-              </Card.Root>
-
-              <Card.Root 
-                variant="outline" 
-                cursor="pointer"
-                onClick={() => navigate('/dashboard/predictive-analytics')}
-                _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
-                transition="all 0.2s"
-              >
-                <Card.Body p="4">
-                  <VStack align="start" gap="3">
-                    <HStack gap="3">
-                      <Box p="2" bg="green.100" borderRadius="md">
-                        <ChartBarIcon className="w-5 h-5 text-green-600" />
-                      </Box>
-                      <VStack align="start" gap="0">
-                        <Text fontWeight="bold">Predictive Analytics</Text>
-                        <Text fontSize="sm" color="gray.600">AI-powered forecasting</Text>
-                      </VStack>
-                    </HStack>
-                    <Button size="sm" variant="outline" colorPalette="green" w="full">
-                      Open Analysis
-                    </Button>
-                  </VStack>
-                </Card.Body>
-              </Card.Root>
-            </Grid>
-          </Card.Body>
-        </Card.Root>
-
-        {/* ✅ ALERTAS DETALLADAS - Solo si hay alertas críticas */}
-        {alertSummary.critical > 0 && (
-          <Card.Root>
-            <Card.Header>
-              <HStack justify="space-between">
-                <Text fontSize="lg" fontWeight="semibold" color="red.600">
-                  Items con Stock Crítico
-                </Text>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  colorPalette="red"
-                  onClick={() => navigate('/materials')}
-                >
-                  Ver todos
-                </Button>
-              </HStack>
-            </Card.Header>
-            <Card.Body>
-              <VStack gap="3" align="stretch">
-                {alerts
-                  .filter(alert => alert.urgency === 'critical')
-                  .slice(0, 5)
-                  .map((alert) => (
-                    <HStack key={alert.id} justify="space-between" p="3" bg="red.50" borderRadius="md">
-                      <VStack align="start" gap="1">
-                        <Text fontWeight="semibold">{alert.item_name}</Text>
-                        <Text fontSize="sm" color="gray.600">
-                          Stock actual: {alert.current_stock} {alert.unit}
-                        </Text>
-                      </VStack>
-                      <Badge colorPalette="red" variant="solid">
-                        CRÍTICO
-                      </Badge>
-                    </HStack>
-                  ))}
+        {/* SECCIÓN ADICIONAL - Actividad y Rendimiento */}
+        <Grid 
+          templateColumns={{ 
+            base: "1fr", 
+            md: "1fr 1fr", 
+            lg: "1fr 1fr 1fr" 
+          }} 
+          gap="4"
+        >
+          {/* Actividad Reciente */}
+          <Box bg={{ base: "white", _dark: "gray.800" }} p="4" borderRadius="lg" border="1px solid" borderColor={{ base: "gray.200", _dark: "gray.700" }} shadow="sm">
+            <VStack align="start" gap="3">
+              <Text fontSize="md" fontWeight="semibold" color={{ base: "gray.700", _dark: "gray.200" }}>
+                📈 Tendencias Hoy
+              </Text>
+              <VStack align="stretch" gap="2" w="full">
+                <HStack justify="space-between">
+                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>Ventas</Text>
+                  <Text fontSize="sm" fontWeight="medium" color="green.600">+12%</Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>Inventario</Text>
+                  <Text fontSize="sm" fontWeight="medium" color="blue.600">Estable</Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>Personal</Text>
+                  <Text fontSize="sm" fontWeight="medium" color="orange.600">85%</Text>
+                </HStack>
               </VStack>
-            </Card.Body>
-          </Card.Root>
-        )}
+            </VStack>
+          </Box>
+
+          {/* Alertas */}
+          <Box bg={{ base: "white", _dark: "gray.800" }} p="4" borderRadius="lg" border="1px solid" borderColor={{ base: "gray.200", _dark: "gray.700" }} shadow="sm">
+            <VStack align="start" gap="3">
+              <Text fontSize="md" fontWeight="semibold" color={{ base: "gray.700", _dark: "gray.200" }}>
+                🔔 Notificaciones
+              </Text>
+              <VStack align="stretch" gap="2" w="full">
+                <HStack>
+                  <Box w="2" h="2" bg="orange.500" borderRadius="full" />
+                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>Stock bajo: 3 productos</Text>
+                </HStack>
+                <HStack>
+                  <Box w="2" h="2" bg="green.500" borderRadius="full" />
+                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>Turno completo</Text>
+                </HStack>
+                <HStack>
+                  <Box w="2" h="2" bg="blue.500" borderRadius="full" />
+                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>2 pedidos pendientes</Text>
+                </HStack>
+              </VStack>
+            </VStack>
+          </Box>
+
+          {/* Performance */}
+          <Box bg={{ base: "white", _dark: "gray.800" }} p="4" borderRadius="lg" border="1px solid" borderColor={{ base: "gray.200", _dark: "gray.700" }} shadow="sm">
+            <VStack align="start" gap="3">
+              <Text fontSize="md" fontWeight="semibold" color={{ base: "gray.700", _dark: "gray.200" }}>
+                ⚡ Rendimiento
+              </Text>
+              <VStack align="stretch" gap="2" w="full">
+                <HStack justify="space-between">
+                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>Sistema</Text>
+                  <Text fontSize="sm" fontWeight="medium" color="green.600">Óptimo</Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>Carga</Text>
+                  <Text fontSize="sm" fontWeight="medium" color="blue.600">Normal</Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>Respuesta</Text>
+                  <Text fontSize="sm" fontWeight="medium" color="green.600">&lt; 100ms</Text>
+                </HStack>
+              </VStack>
+            </VStack>
+          </Box>
+        </Grid>
       </VStack>
     </Box>
   );

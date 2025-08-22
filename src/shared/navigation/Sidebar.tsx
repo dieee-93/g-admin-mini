@@ -15,6 +15,7 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { Icon } from '@/shared/ui/Icon';
+import { QuickThemeToggle } from '@/shared/components/ThemeToggle';
 
 export function Sidebar() {
   const location = useLocation();
@@ -37,23 +38,30 @@ export function Sidebar() {
       top="0"
       h="100vh"
       w={sidebarCollapsed ? "60px" : "280px"}
-      bg="white"
+      bg={{ base: "white", _dark: "gray.900" }}
       borderRight="1px solid"
-      borderColor="gray.200"
+      borderColor={{ base: "gray.200", _dark: "gray.700" }}
       boxShadow="lg"
       transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
       zIndex={1001}
+      display={{ base: "none", md: "block" }}
       style={{
-        backdropFilter: 'blur(8px)',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)'
+        backdropFilter: 'blur(8px)'
       }}
       onMouseEnter={() => !isMobile && setSidebarCollapsed(false)}
       onMouseLeave={() => !isMobile && setSidebarCollapsed(true)}
     >
       <VStack gap="0" align="stretch" h="full">
-        {/* ✅ Header Optimizado */}
-        <Box p="4" borderBottom="1px solid" borderColor="gray.200">
-          <HStack gap="3" align="center">
+        {/* ✅ Header Optimizado - Misma altura que header principal (60px) */}
+        <Box 
+          h="60px" 
+          px="4" 
+          borderBottom="1px solid" 
+          borderColor={{ base: "gray.200", _dark: "gray.700" }}
+          display="flex"
+          alignItems="center"
+        >
+          <HStack gap="3" align="center" w="full">
             <Box 
               w="9" 
               h="9" 
@@ -69,10 +77,10 @@ export function Sidebar() {
             </Box>
             {!sidebarCollapsed && (
               <VStack align="start" gap="0" spacing="0">
-                <Text fontSize="lg" fontWeight="bold" color="gray.800" lineHeight="1.2">
+                <Text fontSize="lg" fontWeight="bold" color={{ base: "gray.800", _dark: "gray.100" }} lineHeight="1.2">
                   G-Admin
                 </Text>
-                <Text fontSize="xs" color="gray.500" lineHeight="1.2">
+                <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }} lineHeight="1.2">
                   Mini Dashboard
                 </Text>
               </VStack>
@@ -101,7 +109,7 @@ export function Sidebar() {
                   colorPalette={isActive ? module.color : 'gray'}
                   bg={isActive ? `${module.color}.50` : 'transparent'}
                   _hover={{
-                    bg: isActive ? `${module.color}.100` : 'gray.100',
+                    bg: isActive ? `${module.color}.100` : { base: 'gray.100', _dark: 'gray.700' },
                     transform: 'translateX(2px)',
                     transition: 'all 0.2s ease'
                   }}
@@ -140,14 +148,14 @@ export function Sidebar() {
                         <Text 
                           fontSize="sm" 
                           fontWeight={isActive ? 'semibold' : 'medium'}
-                          color={isActive ? `${module.color}.700` : 'gray.700'}
+                          color={isActive ? `${module.color}.700` : { base: 'gray.700', _dark: 'gray.200' }}
                           lineHeight="1.2"
                         >
                           {module.title}
                         </Text>
                         <Text 
                           fontSize="xs" 
-                          color={isActive ? `${module.color}.500` : 'gray.500'}
+                          color={isActive ? `${module.color}.500` : { base: 'gray.500', _dark: 'gray.400' }}
                           lineHeight="1.2"
                           noOfLines={1}
                         >
@@ -216,7 +224,7 @@ export function Sidebar() {
                               borderRadius="md"
                               pl="3"
                               _hover={{
-                                bg: isSubModuleActive ? `${module.color}.100` : 'gray.50',
+                                bg: isSubModuleActive ? `${module.color}.100` : { base: 'gray.50', _dark: 'gray.800' },
                                 borderLeftColor: `${module.color}.300`,
                                 transform: 'translateX(2px)',
                                 transition: 'all 0.2s ease'
@@ -247,7 +255,7 @@ export function Sidebar() {
                                   <Text 
                                     fontSize="xs" 
                                     fontWeight={isSubModuleActive ? 'medium' : 'normal'}
-                                    color={isSubModuleActive ? `${module.color}.700` : 'gray.600'}
+                                    color={isSubModuleActive ? `${module.color}.700` : { base: 'gray.600', _dark: 'gray.300' }}
                                     lineHeight="1.2"
                                   >
                                     {subModule.title}
@@ -255,7 +263,7 @@ export function Sidebar() {
                                   {subModule.description && (
                                     <Text 
                                       fontSize="2xs" 
-                                      color={isSubModuleActive ? `${module.color}.500` : 'gray.400'}
+                                      color={isSubModuleActive ? `${module.color}.500` : { base: 'gray.400', _dark: 'gray.500' }}
                                       lineHeight="1.1"
                                       noOfLines={1}
                                     >
@@ -276,6 +284,22 @@ export function Sidebar() {
             );
           })}
         </VStack>
+
+        {/* Theme Toggle Footer */}
+        <Box mt="auto" p="4" borderTop="1px solid" borderColor={{ base: "gray.200", _dark: "gray.700" }}>
+          {!sidebarCollapsed ? (
+            <HStack justify="space-between" align="center">
+              <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }} fontWeight="medium">
+                Tema
+              </Text>
+              <QuickThemeToggle />
+            </HStack>
+          ) : (
+            <Box display="flex" justifyContent="center">
+              <QuickThemeToggle />
+            </Box>
+          )}
+        </Box>
       </VStack>
     </Box>
   );

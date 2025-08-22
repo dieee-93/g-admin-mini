@@ -1,6 +1,18 @@
-// Sales Page - Unified dashboard without nested tabs  
-import { useEffect } from 'react';
-import { Box, VStack, HStack, Text, Badge, Card, Grid, SimpleGrid, Heading } from '@chakra-ui/react';
+// Sales Page - Redesigned with prioritized actions and better organization
+import { useEffect, useState } from 'react';
+import { 
+  Box, 
+  VStack, 
+  HStack, 
+  Text, 
+  Badge, 
+  Card, 
+  Heading, 
+  Button, 
+  Center,
+  Skeleton,
+  Collapsible
+} from '@chakra-ui/react';
 import { 
   CreditCardIcon, 
   TableCellsIcon, 
@@ -8,14 +20,17 @@ import {
   QrCodeIcon, 
   ClipboardDocumentListIcon,
   ComputerDesktopIcon,
-  CloudIcon
+  PlusIcon,
+  ArrowPathIcon,
+  PlayIcon,
+  EyeIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 // Import existing components
 import { SalesView } from './components/SalesView';
 import { TableFloorPlan } from './components/TableManagement/TableFloorPlan';
-import { QRCodeGenerator } from './components/QROrdering/QRCodeGenerator';
 import { KitchenDisplaySystem } from './components/OrderManagement/KitchenDisplaySystem';
 import { SalesIntelligenceDashboard } from './components/Analytics/SalesIntelligenceDashboard';
 
@@ -56,8 +71,46 @@ const mockOrders = [{
   updated_at: '2024-01-15T10:35:00Z'
 }];
 
+// Loading skeleton component
+const LoadingSkeleton = () => (
+  <VStack gap={4}>
+    <Skeleton height="60px" />
+    <Skeleton height="40px" />
+    <Skeleton height="80px" />
+  </VStack>
+);
+
+// Empty state component
+const EmptyState = ({ title, description, icon: Icon }: { 
+  title: string; 
+  description: string; 
+  icon: React.ComponentType<{ className?: string }> 
+}) => (
+  <Center minH="200px">
+    <VStack gap={4} textAlign="center">
+      <Icon className="w-12 h-12 text-gray-400" />
+      <VStack gap={2}>
+        <Text fontWeight="semibold" color="gray.600">{title}</Text>
+        <Text fontSize="sm" color="gray.500">{description}</Text>
+      </VStack>
+    </VStack>
+  </Center>
+);
+
 export default function SalesPage() {
   const { setQuickActions } = useNavigation();
+  const [isLoading, setIsLoading] = useState(true);
+  const [sectionsExpanded, setSectionsExpanded] = useState({
+    tables: false,
+    kitchen: false,
+    analytics: false
+  });
+
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const quickActions = [
@@ -66,7 +119,7 @@ export default function SalesPage() {
         label: 'Nueva Venta',
         icon: CreditCardIcon,
         action: () => console.log('New sale'),
-        color: 'blue'
+        color: 'teal'
       },
       {
         id: 'view-qr',
@@ -74,6 +127,13 @@ export default function SalesPage() {
         icon: QrCodeIcon,
         action: () => console.log('QR codes'),
         color: 'green'
+      },
+      {
+        id: 'refresh-data',
+        label: 'Actualizar',
+        icon: ArrowPathIcon,
+        action: () => window.location.reload(),
+        color: 'blue'
       }
     ];
 
@@ -81,137 +141,232 @@ export default function SalesPage() {
     return () => setQuickActions([]);
   }, [setQuickActions]);
 
+  const toggleSection = (section: keyof typeof sectionsExpanded) => {
+    setSectionsExpanded(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   return (
     <Box minH="100vh" bg="gray.50">
-      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" p="4">
-        <VStack gap="4" align="stretch">
-          {/* UNIFIED PATTERN: Header with icon, badges, KPIs */}
-          <Card.Root>
-            <Card.Body>
-              <HStack gap="4">
-                <Box p="2" bg="blue.100" borderRadius="md">
-                  <ComputerDesktopIcon className="w-8 h-8 text-blue-600" />
+      <VStack gap={6} p={4} maxW="container.xl" mx="auto">
+        {/* MAIN HEADER with Primary CTA */}
+        <Card.Root>
+          <Card.Body>
+            <HStack justify="space-between" align="center">
+              <HStack gap={4}>
+                <Box p={3} bg="teal.100" borderRadius="lg">
+                  <ComputerDesktopIcon className="w-8 h-8 text-teal-600" />
                 </Box>
-                <VStack align="start" gap="1">
+                <VStack align="start" gap={1}>
                   <HStack>
-                    <Text fontSize="2xl" fontWeight="bold">
-                      G-Admin POS System
-                    </Text>
-                    <Badge colorPalette="green" variant="subtle">
-                      Live
-                    </Badge>
-                    <Badge colorPalette="teal" variant="subtle">
-                      v3.0
-                    </Badge>
+                    <Text fontSize="2xl" fontWeight="bold">Sistema de Ventas</Text>
+                    <Badge colorPalette="green" variant="subtle">Live</Badge>
                   </HStack>
                   <Text color="gray.600" fontSize="sm">
-                    Modern restaurant point-of-sale and management system with real-time analytics
+                    POS inteligente con gestión completa de ventas
                   </Text>
                 </VStack>
               </HStack>
-            </Card.Body>
+              
+              {/* PRIMARY CTA - Highlighted */}
+              <Button 
+                size="lg" 
+                colorPalette="teal" 
+                variant="solid"
+                leftIcon={<PlusIcon className="w-5 h-5" />}
+                onClick={() => console.log('New sale')}
+              >
+                Nueva Venta
+              </Button>
+            </HStack>
+          </Card.Body>
+        </Card.Root>
+
+        {/* FEATURED SECTION - POS System (Always Visible) */}
+        <Card.Root>
+          <Card.Header>
+            <HStack justify="space-between">
+              <HStack gap={3}>
+                <CreditCardIcon className="w-6 h-6 text-teal-600" />
+                <Heading size="lg">Sistema POS</Heading>
+                <Badge colorPalette="teal" variant="subtle">Principal</Badge>
+              </HStack>
+              <Button variant="ghost" size="sm" leftIcon={<EyeIcon className="w-4 h-4" />}>
+                Vista Completa
+              </Button>
+            </HStack>
+          </Card.Header>
+          <Card.Body>
+            {isLoading ? (
+              <LoadingSkeleton />
+            ) : (
+              <SalesView showConnectionStatus={true} />
+            )}
+          </Card.Body>
+        </Card.Root>
+
+        {/* COLLAPSIBLE SECONDARY SECTIONS */}
+        <VStack gap={4} align="stretch" width="100%">
+          
+          {/* Table Management */}
+          <Card.Root>
+            <Card.Header 
+              as="button" 
+              onClick={() => toggleSection('tables')}
+              cursor="pointer"
+              _hover={{ bg: 'gray.50' }}
+              transition="background 0.2s"
+            >
+              <HStack justify="space-between" w="100%">
+                <HStack gap={3}>
+                  <TableCellsIcon className="w-6 h-6 text-blue-600" />
+                  <Heading size="md">Gestión de Mesas</Heading>
+                  <Badge colorPalette="blue" variant="outline">
+                    {mockTables.length} mesas
+                  </Badge>
+                </HStack>
+                <ChevronDownIcon 
+                  className={`w-5 h-5 transition-transform ${sectionsExpanded.tables ? 'rotate-180' : ''}`}
+                />
+              </HStack>
+            </Card.Header>
+            <Collapsible.Root open={sectionsExpanded.tables}>
+              <Collapsible.Content>
+                <Card.Body>
+                  {isLoading ? (
+                    <LoadingSkeleton />
+                  ) : mockTables.length > 0 ? (
+                    <TableFloorPlan tables={mockTables} onTableSelect={() => {}} />
+                  ) : (
+                    <EmptyState 
+                      title="No hay mesas configuradas"
+                      description="Configura las mesas de tu restaurante para comenzar"
+                      icon={TableCellsIcon}
+                    />
+                  )}
+                </Card.Body>
+              </Collapsible.Content>
+            </Collapsible.Root>
           </Card.Root>
 
-        {/* Sales Dashboard - No nested tabs */}
-        <VStack gap={6} align="stretch">
-          {/* Sales Overview Cards */}
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={4}>
-            <Card.Root>
-              <Card.Body>
-                <VStack align="start" gap={2}>
-                  <CreditCardIcon className="w-8 h-8 text-green-600" />
-                  <Heading size="sm">POS Sistema</Heading>
-                  <Text fontSize="sm" color="gray.600">
-                    Punto de venta inteligente
-                  </Text>
-                  <Badge colorPalette="green" variant="subtle">Smart</Badge>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
-
-            <Card.Root>
-              <Card.Body>
-                <VStack align="start" gap={2}>
-                  <TableCellsIcon className="w-8 h-8 text-blue-600" />
-                  <Heading size="sm">Gestión de Mesas</Heading>
-                  <Text fontSize="sm" color="gray.600">
-                    Control de ocupación
-                  </Text>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
-
-            <Card.Root>
-              <Card.Body>
-                <VStack align="start" gap={2}>
-                  <ClipboardDocumentListIcon className="w-8 h-8 text-orange-600" />
-                  <Heading size="sm">Sistema de Cocina</Heading>
-                  <Text fontSize="sm" color="gray.600">
-                    Órdenes en tiempo real
-                  </Text>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
-
-            <Card.Root>
-              <Card.Body>
-                <VStack align="start" gap={2}>
-                  <ChartBarIcon className="w-8 h-8 text-purple-600" />
-                  <Heading size="sm">Analytics</Heading>
-                  <Text fontSize="sm" color="gray.600">
-                    Inteligencia de ventas
-                  </Text>
-                  <Badge colorPalette="teal" variant="subtle">v3.0</Badge>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
-          </SimpleGrid>
-
-          {/* All sections displayed together */}
-          <Grid templateColumns={{ base: "1fr", xl: "1fr 1fr" }} gap={6}>
-            <Card.Root>
-              <Card.Header>
-                <Heading size="md">Sistema POS</Heading>
-              </Card.Header>
-              <Card.Body>
-                <SalesView showConnectionStatus={true} />
-              </Card.Body>
-            </Card.Root>
-
-            <Card.Root>
-              <Card.Header>
-                <Heading size="md">Gestión de Mesas</Heading>
-              </Card.Header>
-              <Card.Body>
-                <TableFloorPlan tables={mockTables} onTableSelect={() => {}} />
-              </Card.Body>
-            </Card.Root>
-
-            <Card.Root>
-              <Card.Header>
-                <Heading size="md">Display de Cocina</Heading>
-              </Card.Header>
-              <Card.Body>
-                <KitchenDisplaySystem orders={mockOrders} />
-              </Card.Body>
-            </Card.Root>
-
-            <Card.Root>
-              <Card.Header>
-                <Heading size="md">Analytics de Ventas</Heading>
-              </Card.Header>
-              <Card.Body>
-                <SalesIntelligenceDashboard 
-                  analytics={{} as any}
-                  onDateRangeChange={() => {}}
-                  onRefresh={() => {}}
+          {/* Kitchen Display */}
+          <Card.Root>
+            <Card.Header 
+              as="button" 
+              onClick={() => toggleSection('kitchen')}
+              cursor="pointer"
+              _hover={{ bg: 'gray.50' }}
+              transition="background 0.2s"
+            >
+              <HStack justify="space-between" w="100%">
+                <HStack gap={3}>
+                  <ClipboardDocumentListIcon className="w-6 h-6 text-orange-600" />
+                  <Heading size="md">Display de Cocina</Heading>
+                  <Badge colorPalette="orange" variant="outline">
+                    {mockOrders.length} órdenes
+                  </Badge>
+                </HStack>
+                <ChevronDownIcon 
+                  className={`w-5 h-5 transition-transform ${sectionsExpanded.kitchen ? 'rotate-180' : ''}`}
                 />
-              </Card.Body>
-            </Card.Root>
-          </Grid>
+              </HStack>
+            </Card.Header>
+            <Collapsible.Root open={sectionsExpanded.kitchen}>
+              <Collapsible.Content>
+                <Card.Body>
+                  {isLoading ? (
+                    <LoadingSkeleton />
+                  ) : mockOrders.length > 0 ? (
+                    <KitchenDisplaySystem orders={mockOrders} />
+                  ) : (
+                    <EmptyState 
+                      title="No hay órdenes pendientes"
+                      description="Las órdenes aparecerán aquí cuando se realicen ventas"
+                      icon={ClipboardDocumentListIcon}
+                    />
+                  )}
+                </Card.Body>
+              </Collapsible.Content>
+            </Collapsible.Root>
+          </Card.Root>
+
+          {/* Sales Analytics */}
+          <Card.Root>
+            <Card.Header 
+              as="button" 
+              onClick={() => toggleSection('analytics')}
+              cursor="pointer"
+              _hover={{ bg: 'gray.50' }}
+              transition="background 0.2s"
+            >
+              <HStack justify="space-between" w="100%">
+                <HStack gap={3}>
+                  <ChartBarIcon className="w-6 h-6 text-purple-600" />
+                  <Heading size="md">Analytics de Ventas</Heading>
+                  <Badge colorPalette="purple" variant="outline">v3.0</Badge>
+                </HStack>
+                <ChevronDownIcon 
+                  className={`w-5 h-5 transition-transform ${sectionsExpanded.analytics ? 'rotate-180' : ''}`}
+                />
+              </HStack>
+            </Card.Header>
+            <Collapsible.Root open={sectionsExpanded.analytics}>
+              <Collapsible.Content>
+                <Card.Body>
+                  {isLoading ? (
+                    <LoadingSkeleton />
+                  ) : (
+                    <SalesIntelligenceDashboard 
+                      analytics={{}}
+                      onDateRangeChange={() => {}}
+                      onRefresh={() => {}}
+                    />
+                  )}
+                </Card.Body>
+              </Collapsible.Content>
+            </Collapsible.Root>
+          </Card.Root>
         </VStack>
-        </VStack>
-      </Box>
+
+        {/* QUICK ACCESS FOOTER */}
+        <Card.Root>
+          <Card.Body>
+            <VStack gap={3}>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
+                Accesos Rápidos
+              </Text>
+              <HStack gap={3} justify="center" wrap="wrap">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  leftIcon={<QrCodeIcon className="w-4 h-4" />}
+                  onClick={() => console.log('QR codes')}
+                >
+                  Códigos QR
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  leftIcon={<ArrowPathIcon className="w-4 h-4" />}
+                  onClick={() => window.location.reload()}
+                >
+                  Actualizar
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  leftIcon={<PlayIcon className="w-4 h-4" />}
+                  onClick={() => console.log('Quick sale')}
+                >
+                  Venta Rápida
+                </Button>
+              </HStack>
+            </VStack>
+          </Card.Body>
+        </Card.Root>
+      </VStack>
     </Box>
   );
 }

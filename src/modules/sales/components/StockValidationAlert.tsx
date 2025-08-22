@@ -7,7 +7,7 @@ import {
   Text,
   Badge
 } from '@chakra-ui/react';
-import { type StockValidationResult } from '../hooks/useSaleStockValidation';
+import { type StockValidationResult } from '@/hooks/useSaleStockValidation';
 
 interface StockValidationAlertProps {
   validationResult: StockValidationResult;

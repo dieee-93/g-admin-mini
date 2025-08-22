@@ -1,0 +1,170 @@
+/* Temas personalizados para G-Admin Mini */
+
+/* Corporate Theme */
+.corporate {
+  --chakra-colors-brand-500: #1e40af;
+  --chakra-colors-brand-600: #1d4ed8;
+  --chakra-colors-accent-500: #059669;
+  --chakra-colors-bg-canvas: #f8fafc;
+  --chakra-colors-bg-surface: #ffffff;
+  --chakra-colors-text-primary: #1e293b;
+  --chakra-colors-text-secondary: #475569;
+  --chakra-colors-border-subtle: #e2e8f0;
+}
+
+.corporate [data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Nature Theme */
+.nature {
+  --chakra-colors-brand-500: #16a34a;
+  --chakra-colors-brand-600: #15803d;
+  --chakra-colors-accent-500: #ca8a04;
+  --chakra-colors-bg-canvas: #f0fdf4;
+  --chakra-colors-bg-surface: #ffffff;
+  --chakra-colors-text-primary: #14532d;
+  --chakra-colors-text-secondary: #166534;
+  --chakra-colors-border-subtle: #bbf7d0;
+  --chakra-colors-success-500: #22c55e;
+  --chakra-colors-warning-500: #eab308;
+}
+
+.nature [data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Sunset Theme */
+.sunset {
+  --chakra-colors-brand-500: #ea580c;
+  --chakra-colors-brand-600: #dc2626;
+  --chakra-colors-accent-500: #eab308;
+  --chakra-colors-bg-canvas: #fff7ed;
+  --chakra-colors-bg-surface: #ffffff;
+  --chakra-colors-text-primary: #9a3412;
+  --chakra-colors-text-secondary: #c2410c;
+  --chakra-colors-border-subtle: #fed7aa;
+  --chakra-colors-warning-500: #f59e0b;
+  --chakra-colors-error-500: #dc2626;
+}
+
+.sunset [data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Ocean Theme */
+.ocean {
+  --chakra-colors-brand-500: #0891b2;
+  --chakra-colors-brand-600: #0e7490;
+  --chakra-colors-accent-500: #06b6d4;
+  --chakra-colors-bg-canvas: #ecfeff;
+  --chakra-colors-bg-surface: #ffffff;
+  --chakra-colors-text-primary: #164e63;
+  --chakra-colors-text-secondary: #0e7490;
+  --chakra-colors-border-subtle: #a5f3fc;
+  --chakra-colors-info-500: #0891b2;
+  --chakra-colors-success-500: #059669;
+}
+
+.ocean [data-theme="light"] {
+  color-scheme: light;
+}
+
+/* High Contrast Theme */
+.high-contrast {
+  --chakra-colors-brand-500: #000000;
+  --chakra-colors-brand-600: #000000;
+  --chakra-colors-accent-500: #0066cc;
+  --chakra-colors-bg-canvas: #ffffff;
+  --chakra-colors-bg-surface: #f5f5f5;
+  --chakra-colors-text-primary: #000000;
+  --chakra-colors-text-secondary: #333333;
+  --chakra-colors-border-subtle: #000000;
+  --chakra-colors-success-500: #008000;
+  --chakra-colors-warning-500: #ff8c00;
+  --chakra-colors-error-500: #cc0000;
+  --chakra-colors-info-500: #0066cc;
+}
+
+.high-contrast [data-theme="light"] {
+  color-scheme: light;
+}
+
+.high-contrast * {
+  border-color: #000000 !important;
+}
+
+.high-contrast button {
+  border: 2px solid #000000 !important;
+  font-weight: bold !important;
+}
+
+.high-contrast input, 
+.high-contrast select, 
+.high-contrast textarea {
+  border: 2px solid #000000 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.high-contrast a {
+  color: #0066cc !important;
+  text-decoration: underline !important;
+  font-weight: bold !important;
+}
+
+/* Custom CSS Variables Integration */
+.corporate,
+.nature,
+.sunset,
+.ocean,
+.high-contrast {
+  --theme-primary: var(--chakra-colors-brand-500);
+  --theme-accent: var(--chakra-colors-accent-500);
+  --theme-background: var(--chakra-colors-bg-canvas);
+  --theme-surface: var(--chakra-colors-bg-surface);
+  --theme-text: var(--chakra-colors-text-primary);
+}
+
+/* Theme Preview Swatches */
+.theme-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid;
+}
+
+.theme-preview.corporate {
+  background: #f8fafc;
+  border-color: #1e40af;
+  color: #1e293b;
+}
+
+.theme-preview.nature {
+  background: #f0fdf4;
+  border-color: #16a34a;
+  color: #14532d;
+}
+
+.theme-preview.sunset {
+  background: #fff7ed;
+  border-color: #ea580c;
+  color: #9a3412;
+}
+
+.theme-preview.ocean {
+  background: #ecfeff;
+  border-color: #0891b2;
+  color: #164e63;
+}
+
+.theme-preview.high-contrast {
+  background: #ffffff;
+  border-color: #000000;
+  color: #000000;
+  border-width: 2px;
+  font-weight: bold;
+}

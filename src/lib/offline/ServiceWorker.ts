@@ -352,6 +352,8 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
       if (self.clients.openWindow) {
         return self.clients.openWindow(targetUrl);
       }
+      // Return undefined if openWindow is not available
+      return undefined;
     })
   );
 });

@@ -228,7 +228,11 @@ export class LazyErrorBoundary extends React.Component<
     });
 
     // Log error to monitoring service
-    console.error(`Lazy loading error in ${this.props.moduleName}:`, error, errorInfo);
+    console.error(`Lazy loading error in ${this.props.moduleName}:`, {
+      message: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack
+    });
   }
 
   componentWillUnmount() {
@@ -311,8 +315,11 @@ export function LazyWrapper({
 
   // Update loading state based on performance metrics
   React.useEffect(() => {
+    let hasCompleted = false;
+    
     const updateLoadingProgress = () => {
-      const metrics = lazyLoadingManager.getPerformanceMetrics();
+      if (hasCompleted) return;
+      
       const moduleStats = lazyLoadingManager.getLoadingStats()
         .filter(stat => stat.module === moduleName);
 
@@ -320,12 +327,14 @@ export function LazyWrapper({
         const latestStat = moduleStats[moduleStats.length - 1];
         
         if (latestStat.success) {
+          hasCompleted = true;
           setLoadingState({
             isLoading: false,
             progress: 100,
             stage: 'Loaded'
           });
-        } else {
+        } else if (latestStat.error) {
+          hasCompleted = true;
           setLoadingState({
             isLoading: false,
             error: new Error(latestStat.error || 'Load failed')
@@ -339,6 +348,8 @@ export function LazyWrapper({
     // Simulate loading progress for better UX
     let progress = 0;
     const progressInterval = setInterval(() => {
+      if (hasCompleted) return;
+      
       progress += Math.random() * 15;
       if (progress < 90) {
         setLoadingState(prev => ({
@@ -422,7 +433,14 @@ export function LazyLoadingMonitor() {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      setMetrics(lazyLoadingManager.getPerformanceMetrics());
+      const newMetrics = lazyLoadingManager.getPerformanceMetrics();
+      setMetrics(prevMetrics => {
+        // Solo actualizar si realmente cambió para evitar re-renders innecesarios
+        if (JSON.stringify(newMetrics) !== JSON.stringify(prevMetrics)) {
+          return newMetrics;
+        }
+        return prevMetrics;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
@@ -493,23 +511,40 @@ export function LazyLoadingMonitor() {
 
           {showDetails && (
             <VStack gap="2" align="stretch" pt="4" borderTop="1px solid" borderColor="gray.200">
-              <Text fontSize="sm" fontWeight="medium">Recent Loading Stats</Text>
+              <Text fontSize="sm" fontWeight="medium">Module Loading Status</Text>
               <Box maxH="200px" overflowY="auto">
-                {lazyLoadingManager.getLoadingStats().slice(-10).map((stat, index) => (
-                  <HStack key={index} justify="space-between" fontSize="xs" py="1">
-                    <Text>{stat.module}</Text>
-                    <HStack gap="2">
-                      <Badge colorScheme={stat.success ? 'green' : 'red'} size="xs">
-                        {stat.loadTime}ms
-                      </Badge>
-                      {stat.success ? (
-                        <CheckCircleIcon className="w-3 h-3 text-green-500" />
-                      ) : (
-                        <ExclamationTriangleIcon className="w-3 h-3 text-red-500" />
-                      )}
-                    </HStack>
-                  </HStack>
-                ))}
+                {(() => {
+                  // Get unique modules and their latest stats
+                  const allStats = lazyLoadingManager.getLoadingStats();
+                  const uniqueModules = new Map<string, typeof allStats[0]>();
+                  
+                  // Keep only the latest stat for each module
+                  allStats.forEach(stat => {
+                    const existing = uniqueModules.get(stat.module);
+                    if (!existing || stat.timestamp > existing.timestamp) {
+                      uniqueModules.set(stat.module, stat);
+                    }
+                  });
+                  
+                  return Array.from(uniqueModules.values())
+                    .sort((a, b) => b.timestamp - a.timestamp)
+                    .slice(0, 10)
+                    .map((stat, index) => (
+                      <HStack key={`${stat.module}-${stat.timestamp}`} justify="space-between" fontSize="xs" py="1">
+                        <Text>{stat.module}</Text>
+                        <HStack gap="2">
+                          <Badge colorScheme={stat.success ? 'green' : 'red'} size="xs">
+                            {stat.loadTime}ms
+                          </Badge>
+                          {stat.success ? (
+                            <CheckCircleIcon className="w-3 h-3 text-green-500" />
+                          ) : (
+                            <ExclamationTriangleIcon className="w-3 h-3 text-red-500" />
+                          )}
+                        </HStack>
+                      </HStack>
+                    ));
+                })()}
               </Box>
             </VStack>
           )}

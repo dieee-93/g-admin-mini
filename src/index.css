@@ -1,55 +1,32 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* Estilos mínimos base - Chakra UI maneja el resto */
+/* Solo configuraciones que no interfieren con el sistema de diseño */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/* Importar bloqueo de variables problemáticas de Tailwind */
+@import './styles/block-tailwind-vars.css';
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+/* Importar temas personalizados */
+@import './styles/themes.css';
+
+/* Optimizaciones básicas de rendering */
+html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
+/* Estilos para links que no usa Chakra por defecto */
 a {
-  font-weight: 500;
-  color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
-  color: #535bf2;
+  text-decoration: underline;
 }
 
-/* 🔧 CRÍTICO CORREGIDO: body sin flex center */
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  
-  /* ✅ NUEVO: Configuración para app full-screen */
-  width: 100%;
-  overflow-x: hidden; /* Prevenir scroll horizontal */
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-/* 🚨 REMOVIDO COMPLETAMENTE: Estilos de button globales que interfieren con Chakra */
-/* ❌ ELIMINADO: Todos los estilos de button {} */
-/* ❌ ELIMINADO: @media (prefers-color-scheme: light) button {} */
-
-/* ✅ CONSERVADO: Solo estilos que NO interfieren con Chakra UI */
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* Print styles para mejor legibilidad */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
   }
-  a:hover {
-    color: #747bff;
-  }
-  /* 🚨 REMOVIDO: button { background-color: #f9f9f9; } */
 }

@@ -2,7 +2,7 @@
 // Reusable form select component with validation
 
 import React from 'react';
-import { Select, VStack, Text, createListCollection } from '@chakra-ui/react';
+import { Select, VStack, Text, createListCollection, Portal } from '@chakra-ui/react';
 
 interface SelectOption {
   value: string;

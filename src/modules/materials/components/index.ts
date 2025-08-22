@@ -2,5 +2,7 @@
 export { MaterialsHeader } from './MaterialsHeader';
 export { MaterialsFilters } from './MaterialsFilters';
 export { MaterialsGrid } from './MaterialsGrid';
-export { MaterialFormModal } from './MaterialFormModal';
+export { MaterialFormModalComplete } from './MaterialFormModalComplete';
+export { LazyMaterialFormModal } from './LazyMaterialFormModal';
+export { LazyABCAnalysisPage, LazyABCAnalysisSection } from './LazyAnalytics';
 export { default as ABCAnalysisPage } from './ABCAnalysisPage';

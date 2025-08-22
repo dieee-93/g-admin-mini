@@ -257,12 +257,16 @@ export function PerformanceProvider({ children }: { children: React.ReactNode })
 
     componentStats.current.set(componentName, stats);
 
-    // Update global metrics
-    setMetrics(prev => ({
-      ...prev,
-      renderCount: prev.renderCount + 1,
-      averageRenderTime: (prev.averageRenderTime * (prev.renderCount - 1) + renderTime) / prev.renderCount
-    }));
+    // Update global metrics - throttled to prevent infinite loops
+    if (stats.renders % 5 === 0 || renderTime > 100) {
+      setMetrics(prev => ({
+        ...prev,
+        renderCount: prev.renderCount + 1,
+        averageRenderTime: prev.renderCount > 0 
+          ? (prev.averageRenderTime * (prev.renderCount - 1) + renderTime) / prev.renderCount
+          : renderTime
+      }));
+    }
   }, []);
 
   const getComponentStats = useCallback((componentName: string) => {
@@ -278,17 +282,24 @@ export function PerformanceProvider({ children }: { children: React.ReactNode })
 
   // Monitor memory usage periodically
   useEffect(() => {
+    let lastMemoryUsage = 0;
+    
     const interval = setInterval(() => {
       const nav = performance as any;
       const memory = nav.memory;
       
       if (memory) {
-        setMetrics(prev => ({
-          ...prev,
-          memoryUsage: memory.usedJSHeapSize
-        }));
+        const currentMemory = memory.usedJSHeapSize;
+        // Only update if significant change (>1MB) to prevent infinite loops
+        if (Math.abs(currentMemory - lastMemoryUsage) > 1024 * 1024) {
+          lastMemoryUsage = currentMemory;
+          setMetrics(prev => ({
+            ...prev,
+            memoryUsage: currentMemory
+          }));
+        }
       }
-    }, 10000); // Every 10 seconds
+    }, 15000); // Every 15 seconds
 
     return () => clearInterval(interval);
   }, []);

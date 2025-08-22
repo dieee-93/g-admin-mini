@@ -4,7 +4,9 @@
 // ✅ CORREGIDO: Imports limpiados + errores solucionados
 
 import React from 'react';
+import { Box } from '@chakra-ui/react';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { Header } from '../navigation/Header';
 import { MobileLayout } from './MobileLayout';
 import { DesktopLayout } from './DesktopLayout';
 
@@ -15,10 +17,17 @@ interface ResponsiveLayoutProps {
 export function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
   const { isMobile } = useNavigation();
 
-  // ✅ Mobile-first approach - renderizar layout según breakpoint
-  if (isMobile) {
-    return <MobileLayout>{children}</MobileLayout>;
-  }
-
-  return <DesktopLayout>{children}</DesktopLayout>;
+  return (
+    <Box w="100%" minH="100vh" bg={{ base: "gray.50", _dark: "gray.900" }}>
+      {/* ✅ Header universal - aparece en ambos layouts */}
+      <Header />
+      
+      {/* ✅ Layout específico sin header duplicado */}
+      {isMobile ? (
+        <MobileLayout>{children}</MobileLayout>
+      ) : (
+        <DesktopLayout>{children}</DesktopLayout>
+      )}
+    </Box>
+  );
 }

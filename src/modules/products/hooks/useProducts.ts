@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { useProductsStore, type Product } from '@/store/productsStore';
 import type { ProductWithIntelligence, ProductsWithAvailabilityResponse } from '../types';
 

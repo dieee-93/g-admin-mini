@@ -271,14 +271,18 @@ export function TableFloorPlan({
         </HStack>
       </Card.Root>
 
-      {/* Tables Grid */}
+      {/* Tables Grid with responsive design and touch-friendly sizing */}
       <Grid 
         templateColumns={{ 
-          base: "repeat(2, 1fr)", 
-          md: "repeat(4, 1fr)", 
-          lg: "repeat(6, 1fr)" 
+          base: "repeat(1, 1fr)", // Single column on very small screens
+          sm: "repeat(2, 1fr)", 
+          md: "repeat(3, 1fr)", 
+          lg: "repeat(4, 1fr)",
+          xl: "repeat(5, 1fr)"
         }} 
-        gap="4"
+        gap={{ base: "3", md: "4" }}
+        role="grid"
+        aria-label="Restaurant floor plan with table statuses"
       >
         {filteredTables.map((table) => {
           const statusInfo = getTableStatusInfo(table);
@@ -287,7 +291,7 @@ export function TableFloorPlan({
           return (
             <Card.Root
               key={table.id}
-              p="4"
+              p={{ base: "3", md: "4" }}
               cursor="pointer"
               onClick={() => handleTableClick(table)}
               borderWidth={selectedTable?.id === table.id ? "2px" : "1px"}
@@ -297,9 +301,22 @@ export function TableFloorPlan({
                 shadow: "md",
                 transform: "translateY(-2px)"
               }}
+              _active={{
+                transform: "scale(0.98)"
+              }}
               transition="all 0.2s"
               bg={statusInfo.urgency === 'high' ? 'red.50' : 
                   statusInfo.urgency === 'medium' ? 'yellow.50' : 'white'}
+              minH={{ base: "140px", md: "160px" }}
+              role="gridcell"
+              aria-label={`Table ${table.number}, ${statusInfo.label}, capacity ${table.capacity}`}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleTableClick(table);
+                }
+              }}
             >
               <VStack gap="3" align="stretch">
                 {/* Table Header */}

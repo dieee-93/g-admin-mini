@@ -39,6 +39,9 @@ export const LazyMaterialsPage = createLazyComponent(
   }
 );
 
+// Legacy alias - use LazyMaterialsPage instead
+export const LazyStockLab = LazyMaterialsPage;
+
 // Lazy-loaded Staff Module
 export const LazyStaffPage = createLazyComponent(
   () => import('../staff/StaffPage'),
@@ -165,56 +168,56 @@ export const modulePreloadingConfig = {
 export const moduleMetadata = {
   sales: {
     estimatedSize: '~180KB',
-    dependencies: ['offline', 'websocket', 'events'],
-    criticality: 'high',
+    dependencies: ['offline', 'websocket', 'events'] as const,
+    criticality: 'high' as const,
     description: 'Point of Sale system with offline capabilities'
   },
   operations: {
     estimatedSize: '~200KB',
-    dependencies: ['websocket', 'events', 'offline'],
-    criticality: 'high',
+    dependencies: ['websocket', 'events', 'offline'] as const,
+    criticality: 'high' as const,
     description: 'Operations hub: Kitchen, Tables, Planning, and Monitoring'
   },
   materials: {
     estimatedSize: '~140KB',
-    dependencies: ['offline', 'websocket'],
-    criticality: 'medium',
+    dependencies: ['offline', 'websocket'] as const,
+    criticality: 'medium' as const,
     description: 'Inventory and materials management'
   },
   staff: {
     estimatedSize: '~120KB',
-    dependencies: ['offline'],
-    criticality: 'medium', 
+    dependencies: ['offline'] as const,
+    criticality: 'medium' as const, 
     description: 'Staff management and time tracking'
   },
   customers: {
     estimatedSize: '~100KB',
-    dependencies: ['offline'],
-    criticality: 'low',
+    dependencies: ['offline'] as const,
+    criticality: 'low' as const,
     description: 'Customer relationship management'
   },
   scheduling: {
     estimatedSize: '~110KB',
-    dependencies: ['events'],
-    criticality: 'low',
+    dependencies: ['events'] as const,
+    criticality: 'low' as const,
     description: 'Staff scheduling and shift management'
   },
   fiscal: {
     estimatedSize: '~160KB',
-    dependencies: ['offline', 'events'],
-    criticality: 'high',
+    dependencies: ['offline', 'events'] as const,
+    criticality: 'high' as const,
     description: 'Fiscal compliance, invoicing, and AFIP integration'
   },
   products: {
     estimatedSize: '~150KB',
-    dependencies: ['offline', 'events'],
-    criticality: 'medium',
+    dependencies: ['offline', 'events'] as const,
+    criticality: 'medium' as const,
     description: 'Product catalog, menu engineering, and production planning'
   },
   settings: {
     estimatedSize: '~90KB',
-    dependencies: [],
-    criticality: 'low',
+    dependencies: [] as const,
+    criticality: 'low' as const,
     description: 'Application settings and configuration'
   }
 };
@@ -224,6 +227,7 @@ export const lazyModules = {
   LazySalesPage,
   LazyOperationsPage,
   LazyMaterialsPage,
+  LazyStockLab,
   LazyProductsPage,
   LazyStaffPage,
   LazyCustomersPage,

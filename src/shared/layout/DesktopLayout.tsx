@@ -17,50 +17,42 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
   const { sidebarCollapsed } = useNavigation();
 
   return (
-    <Box minH="100vh" bg="gray.50" position="relative">
+    <Box 
+      minH="100vh" 
+      bg={{ base: "gray.50", _dark: "gray.900" }} 
+      position="relative"
+      w="100%"
+      overflow="hidden"
+    >
       {/* ✅ Sidebar fixed - no necesita estar en el HStack */}
       <Sidebar />
 
-      {/* 🔧 CRÍTICO CORREGIDO: Main area SIN margin-left, con padding-left dinámico */}
+      {/* 🔧 CRÍTICO CORREGIDO: Main area con positioning absoluto para evitar conflictos */}
       <Box
-        pl={sidebarCollapsed ? "60px" : "280px"}
-        transition="padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-        minH="100vh"
+        position="absolute"
+        top="60px"
+        left={{ base: "0", md: sidebarCollapsed ? "60px" : "280px" }}
+        right="0"
+        bottom="0"
+        transition="left 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+        overflow="auto"
+        bg={{ base: "gray.50", _dark: "gray.900" }}
       >
-        <VStack 
-          align="stretch" 
-          gap="0"
-          minH="100vh"
+        {/* 🔧 CRÍTICO CORREGIDO: Content area con scroll interno - sin breadcrumb duplicado */}
+        <Box 
+          as="main"
+          flex="1"
+          px={{ base: "4", md: "6" }}
+          py={{ base: "4", md: "6" }}
+          overflow="visible"
+          w="100%"
+          bg={{ base: "gray.50", _dark: "gray.900" }}
         >
-          {/* ✅ Breadcrumb navigation */}
-          <Box 
-            bg="white" 
-            borderBottom="1px solid" 
-            borderColor="gray.200"
-            px="6" 
-            py="3"
-            position="sticky"
-            top="0"
-            zIndex={100}
-          >
-            <Breadcrumb />
-          </Box>
+          {children}
+        </Box>
 
-          {/* 🔧 CRÍTICO CORREGIDO: Content area usa flex="1" para ocupar espacio restante */}
-          <Box 
-            as="main"
-            flex="1"
-            px="6"
-            py="6"
-            overflow="auto"
-            w="100%"
-          >
-            {children}
-          </Box>
-
-          {/* ✅ Action toolbar fijo en bottom */}
-          <ActionToolbar />
-        </VStack>
+        {/* ✅ Action toolbar fijo en bottom */}
+        <ActionToolbar />
       </Box>
     </Box>
   );

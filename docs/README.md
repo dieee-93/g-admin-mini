@@ -1,64 +1,62 @@
-# G-Admin Mini Documentation
+# Project Overview
 
-This directory contains comprehensive documentation for the G-Admin Mini project.
+This project is a Vite + React + TypeScript single-page application (SPA) designed to manage and analyze materials within a supply chain context. The application integrates with Supabase for backend services, including authentication and database management.
 
-## 📁 Documentation Structure
+## Table of Contents
 
+- [Installation](#installation)
+- [Development](#development)
+- [Audit](#audit)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Installation
+
+To get started with the project, follow these steps:
+
+1. Clone the repository:
+   ```
+   git clone <repository-url>
+   cd <repository-name>
+   ```
+
+2. Install dependencies using pnpm:
+   ```
+   pnpm install
+   ```
+
+## Development
+
+To run the development server, use the following command:
 ```
-docs/
-├── README.md                    # This file - documentation overview
-├── ARCHITECTURE.md              # System architecture and design patterns
-├── API_REFERENCE.md            # API endpoints and usage
-├── DEPLOYMENT.md               # Deployment guides and configurations
-├── DEVELOPMENT.md              # Development setup and guidelines
-├── database/                   # Database documentation
-│   ├── README.md              # Database overview
-│   ├── SCHEMA.md              # Database schema documentation
-│   ├── migrations/            # Database migration files
-│   └── functions/             # Database function definitions
-├── features/                  # Feature-specific documentation
-│   ├── customers/             # Customer management documentation
-│   ├── inventory/             # Inventory system documentation
-│   ├── production/            # Production management documentation
-│   ├── recipes/               # Recipe intelligence documentation
-│   └── sales/                 # Sales and POS documentation
-└── guides/                    # User and developer guides
-    ├── USER_GUIDE.md          # End-user manual
-    ├── DEVELOPER_GUIDE.md     # Developer onboarding guide
-    └── CONTRIBUTING.md        # Contribution guidelines
+pnpm dev
 ```
 
-## 📖 Quick Links
+This will start the Vite development server, allowing you to view the application in your browser.
 
-- [**Architecture Overview**](ARCHITECTURE.md) - System design and patterns
-- [**API Reference**](API_REFERENCE.md) - Complete API documentation
-- [**Development Guide**](DEVELOPMENT.md) - Setup and development workflow
-- [**Deployment Guide**](DEPLOYMENT.md) - Production deployment instructions
-- [**Database Schema**](database/SCHEMA.md) - Database structure and relationships
+### Running Tests
 
-## 🚀 Getting Started
+To run the type checks and linting, use:
+```
+pnpm -s exec tsc --noEmit
+pnpm -s exec eslint .
+```
 
-1. **New Developers**: Start with [DEVELOPMENT.md](DEVELOPMENT.md)
-2. **System Architects**: Review [ARCHITECTURE.md](ARCHITECTURE.md)  
-3. **DevOps Engineers**: Check [DEPLOYMENT.md](DEPLOYMENT.md)
-4. **End Users**: Read [guides/USER_GUIDE.md](guides/USER_GUIDE.md)
+## Audit
 
-## 📝 Contributing to Documentation
+The audit directory contains several documents that outline various aspects of the project's code quality and architecture. Each document focuses on specific areas of concern:
 
-Documentation is maintained alongside code. When making changes:
+- **Errors**: Identifies runtime and type errors that may affect application functionality.
+- **Bad Practices**: Highlights coding practices that do not adhere to best practices.
+- **Architectural Issues**: Discusses concerns related to module separation and component coupling.
+- **Business Logic Errors**: Focuses on discrepancies in business logic and data flows.
+- **Duplicated Functionality**: Identifies instances of duplicated code that may require refactoring.
+- **Gaps**: Captures any missing integrations or unimplemented features.
 
-1. Update relevant documentation files
-2. Follow the established documentation style
-3. Include code examples where helpful
-4. Keep documentation current with code changes
+## Contributing
 
-## 🔍 Finding Documentation
+Contributions are welcome! Please follow the standard pull request process and ensure that your changes adhere to the project's coding standards.
 
-- **Feature-specific docs**: Check `features/[module-name]/`
-- **API changes**: Update `API_REFERENCE.md`
-- **Database changes**: Update `database/SCHEMA.md`
-- **Deployment changes**: Update `DEPLOYMENT.md`
+## License
 
----
-
-> **Note**: This documentation is continuously updated. If you notice outdated information or missing details, please contribute improvements!
+This project is licensed under the MIT License. See the LICENSE file for more details.

@@ -25,7 +25,7 @@ import { KitchenSection } from './components/sections/KitchenSection';
 import { TablesSection } from './components/sections/TablesSection';
 import { MonitoringSection } from './components/sections/MonitoringSection';
 
-export function OperationsPage() {
+export default function OperationsPage() {
   const { setQuickActions } = useNavigation();
 
   useEffect(() => {

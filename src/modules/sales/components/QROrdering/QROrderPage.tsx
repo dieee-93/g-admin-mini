@@ -34,7 +34,7 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { notify } from '@/lib/notifications';
 
 interface Product {

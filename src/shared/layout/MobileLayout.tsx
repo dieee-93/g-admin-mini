@@ -4,7 +4,6 @@
 
 import React from 'react';
 import { Box } from '@chakra-ui/react';
-import { Header } from '../navigation/Header';
 import { BottomNavigation } from '../navigation/BottomNavigation';
 import { FloatingActionButton } from '../navigation/FloatingActionButton';
 
@@ -16,27 +15,26 @@ export function MobileLayout({ children }: MobileLayoutProps) {
   return (
     <Box 
       w="100%"
-      h="100vh" 
-      bg="gray.50"
+      minH="100vh"
+      maxH="100vh"
+      bg={{ base: "gray.50", _dark: "gray.900" }}
       position="relative"
-      overflow="hidden" // 🔧 CORREGIDO: Prevenir overflow del container
+      overflow="hidden"
+      display="flex"
+      flexDirection="column"
     >
-      {/* ✅ Header fijo - Z-index más alto */}
-      <Header />
-      
-      {/* 🔧 CRÍTICO CORREGIDO: Main content con scroll interno controlado */}
+      {/* 🔧 CRÍTICO CORREGIDO: Main content con flex y scroll controlado */}
       <Box 
         as="main"
-        position="absolute"
-        top="60px"    // Altura del header
-        left="0"
-        right="0"
-        bottom="0"    // 🔧 CORREGIDO: bottom=0 porque nav es fixed ahora
+        flex="1"
+        position="relative"
+        mt="60px"
         overflow="auto"
         px="4"
         py="4"
-        pb="90px"     // 🔧 NUEVO: Padding bottom para que contenido no se oculte
-        bg="gray.50"
+        pb="90px"
+        bg={{ base: "gray.50", _dark: "gray.900" }}
+        w="100%"
       >
         {children}
       </Box>

@@ -13,17 +13,38 @@ export interface Recipe {
   output_item_id: string;
   output_quantity: number;
   preparation_time?: number; // en minutos
-  instructions?: string;
+  instructions?: string; // CRITICAL: Now properly typed to match database schema
   created_at?: string;
   updated_at?: string;
   
-  // Enhanced Recipe Intelligence
+  // Enhanced Recipe Intelligence (industry-standard fields)
   description?: string;
   difficulty_level?: DifficultyLevel;
   recipe_category?: RecipeCategory;
-  dietary_flags?: DietaryFlag[];
-  allergen_warnings?: AllergenInfo[];
+  menu_category?: string;
+  serving_size?: number;
+  allergens?: string[];
+  dietary_tags?: string[];
+  image_url?: string;
   kitchen_station?: KitchenStation;
+  
+  // Advanced Cost Management
+  base_cost?: number;
+  labor_cost?: number;
+  overhead_cost?: number;
+  waste_percentage?: number;
+  packaging_cost?: number;
+  yield_percentage?: number;
+  
+  // Quality & Safety
+  nutritional_info?: Record<string, any>;
+  temperature_requirements?: Record<string, any>;
+  shelf_life?: string; // Interval as string
+  quality_checks?: string[];
+  
+  // Performance Metrics
+  popularity_score?: number;
+  profitability_score?: number;
   
   // Nutritional Intelligence
   nutritional_profile?: NutritionalProfile;
@@ -68,17 +89,18 @@ export interface RecipeIngredient {
   item_id: string;
   quantity: number;
   
-  // Enhanced Ingredient Intelligence
+  // Enhanced Ingredient Intelligence (industry-standard fields)
+  conversion_factor?: number; // NEW: Database field for unit conversions
+  yield_percentage?: number; // NEW: Database field for ingredient-specific yields
+  waste_percentage?: number; // NEW: Database field for ingredient-specific waste
+  unit_cost_override?: number; // NEW: Database field for recipe-specific pricing
+  
+  // Extended Intelligence Features
   ingredient_role?: IngredientRole;
   preparation_method?: PreparationMethod;
   substitution_options?: IngredientSubstitution[];
   quality_requirements?: QualityRequirement;
-  
-  // Yield Management
-  yield_percentage?: number;
-  waste_percentage?: number;
   shrinkage_factor?: number;
-  conversion_factor?: number;
   
   // Cost Intelligence
   unit_cost?: number;

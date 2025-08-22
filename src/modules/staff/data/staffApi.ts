@@ -11,7 +11,7 @@ import type {
 } from '../types';
 
 // Mock data store - in production this would connect to Supabase/database
-let mockEmployees: Employee[] = [
+const mockEmployees: Employee[] = [
   {
     id: '1',
     employee_id: 'EMP001',
@@ -117,7 +117,7 @@ export async function getEmployees(
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 100));
   
-  let filteredEmployees = mockEmployees.filter(employee => {
+  const filteredEmployees = mockEmployees.filter(employee => {
     const matchesSearch = !filters.search || 
       `${employee.first_name} ${employee.last_name}`.toLowerCase().includes(filters.search.toLowerCase()) ||
       employee.position.toLowerCase().includes(filters.search.toLowerCase()) ||

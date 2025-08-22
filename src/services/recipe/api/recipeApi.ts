@@ -1,5 +1,5 @@
 // src/features/recipes/data/recipeApi.ts
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { 
   type Recipe, 
   type RecipeWithCost, 

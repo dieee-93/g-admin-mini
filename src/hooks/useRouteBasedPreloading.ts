@@ -6,8 +6,18 @@ import { useLocation } from 'react-router-dom';
 import { lazyLoadingManager } from '@/lib/performance/LazyLoadingManager';
 import { modulePreloadingConfig } from '@/modules/lazy/LazyModules';
 
+// Types for navigation patterns
+type ModuleId = 'dashboard' | 'sales' | 'operations' | 'materials' | 'customers' | 'staff' | 'scheduling' | 'fiscal' | 'recipes' | 'settings';
+type AffinityMap = Record<ModuleId, Record<string, number>>;
+type PreloadPriority = 'high' | 'medium' | 'low';
+
+interface NavigationPatterns {
+  sequences: string[][];
+  affinity: AffinityMap;
+}
+
 // Navigation patterns for predictive preloading
-const NAVIGATION_PATTERNS = {
+const NAVIGATION_PATTERNS: NavigationPatterns = {
   // Common navigation flows
   sequences: [
     ['dashboard', 'sales', 'operations'],
@@ -30,7 +40,7 @@ const NAVIGATION_PATTERNS = {
     recipes: { materials: 0.6, operations: 0.5 },
     settings: { staff: 0.3, materials: 0.2, fiscal: 0.4 }
   }
-};
+} as const;
 
 // Convert path to module ID
 function pathToModuleId(path: string): string {
@@ -68,6 +78,9 @@ export function useRouteBasedPreloading() {
   }, []);
   
   const preloadByAffinity = useCallback((currentModule: string) => {
+    // Type guard to ensure currentModule is a valid ModuleId
+    if (!isValidModuleId(currentModule)) return;
+    
     const affinityMap = NAVIGATION_PATTERNS.affinity[currentModule];
     if (!affinityMap) return;
     
@@ -83,6 +96,11 @@ export function useRouteBasedPreloading() {
       }
     });
   }, []);
+
+  // Type guard function
+  function isValidModuleId(module: string): module is ModuleId {
+    return module in NAVIGATION_PATTERNS.affinity;
+  }
   
   const preloadBySequencePattern = useCallback((currentModule: string) => {
     // Find sequences that contain the current module
@@ -102,13 +120,21 @@ export function useRouteBasedPreloading() {
   }, []);
   
   const preloadByConfiguration = useCallback((currentModule: string) => {
+    // Type guard for modulePreloadingConfig
+    if (!isValidConfigKey(currentModule)) return;
+    
     const config = modulePreloadingConfig[currentModule];
     if (!config) return;
     
-    config.forEach(({ module, priority }) => {
+    config.forEach(({ module, priority }: { module: string; priority: PreloadPriority }) => {
       lazyLoadingManager.preloadModule(module, priority);
     });
   }, []);
+
+  // Type guard for modulePreloadingConfig
+  function isValidConfigKey(key: string): key is keyof typeof modulePreloadingConfig {
+    return key in modulePreloadingConfig;
+  }
   
   const preloadByRecentHistory = useCallback(() => {
     // Analyze recent navigation patterns
@@ -216,30 +242,34 @@ export function useRouteBasedPreloading() {
       const recommendations: Array<{module: string; reason: string; priority: string}> = [];
       
       // Add affinity-based recommendations
-      const affinityMap = NAVIGATION_PATTERNS.affinity[currentModule];
-      if (affinityMap) {
-        Object.entries(affinityMap).forEach(([module, score]) => {
-          const numScore = Number(score);
-          if (numScore > 0.4) {
-            recommendations.push({
-              module,
-              reason: `High user transition probability (${Math.round(numScore * 100)}%)`,
-              priority: numScore > 0.6 ? 'high' : 'medium'
-            });
-          }
-        });
+      if (isValidModuleId(currentModule)) {
+        const affinityMap = NAVIGATION_PATTERNS.affinity[currentModule];
+        if (affinityMap) {
+          Object.entries(affinityMap).forEach(([module, score]) => {
+            const numScore = Number(score);
+            if (numScore > 0.4) {
+              recommendations.push({
+                module,
+                reason: `High user transition probability (${Math.round(numScore * 100)}%)`,
+                priority: numScore > 0.6 ? 'high' : 'medium'
+              });
+            }
+          });
+        }
       }
       
       // Add configuration-based recommendations
-      const config = modulePreloadingConfig[currentModule];
-      if (config) {
-        config.forEach(({ module, priority }) => {
-          recommendations.push({
-            module,
-            reason: 'Configured preload relationship',
-            priority
+      if (isValidConfigKey(currentModule)) {
+        const config = modulePreloadingConfig[currentModule];
+        if (config) {
+          config.forEach(({ module, priority }) => {
+            recommendations.push({
+              module,
+              reason: 'Configured preload relationship',
+              priority
+            });
           });
-        });
+        }
       }
       
       return recommendations;

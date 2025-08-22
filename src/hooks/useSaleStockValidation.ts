@@ -1,6 +1,6 @@
 // hooks/useSaleStockValidation.ts
 import { useState, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase/client';
 
 export interface SaleItem {
   product_id: string;

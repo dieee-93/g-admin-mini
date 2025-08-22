@@ -1,26 +1,63 @@
 // src/hooks/useNavigationBadges.tsx
-// Hook para sincronizar badges de navegación con alertas del sistema
-// ✅ Conecta alertas de inventario con badges de módulos
+// 🚨 SISTEMA UNIFICADO DE BADGES DE NAVEGACIÓN
+// ✅ Conecta el nuevo sistema de alertas con badges de módulos
 
 import { useEffect } from 'react';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { useMaterials } from '@/hooks/useZustandStores';
+import { useContextAlerts } from '@/shared/alerts';
 
 export function NavigationBadgeSync(): null {
+  // TODO: Temporalmente deshabilitado para evitar bucles infinitos
+  // El sistema de alertas necesita optimización para evitar re-renders
+  
+  /* 
   const { updateModuleBadge } = useNavigation();
-  const { stats, loading } = useMaterials();
+  
+  // 🚨 NUEVO: Usar sistema unificado de alertas
+  const materialsAlerts = useContextAlerts('materials');
+  const salesAlerts = useContextAlerts('sales');
+  const operationsAlerts = useContextAlerts('operations');
+  const staffAlerts = useContextAlerts('staff');
+  const fiscalAlerts = useContextAlerts('fiscal');
+  const customersAlerts = useContextAlerts('customers');
 
   useEffect(() => {
-    if (!loading && stats) {
-      // ✅ Actualizar badge de inventario con alertas críticas + warning
-      const materialsBadgeCount = stats.criticalStockCount + stats.lowStockCount;
-      updateModuleBadge('materials', materialsBadgeCount);
+    // ✅ Actualizar badges usando el nuevo sistema de alertas
+    
+    // Materials/Inventory - alertas activas + reconocidas
+    const materialsCount = materialsAlerts.activeCount + materialsAlerts.acknowledgedCount;
+    updateModuleBadge('materials', materialsCount);
 
-      // ✅ TODO: Agregar badges para otros módulos según se implementen
-      // updateModuleBadge('sales', pendingSalesCount);
-      // updateModuleBadge('production', productionIssuesCount);
-    }
-  }, [stats, loading, updateModuleBadge]);
+    // Sales - alertas de ventas
+    const salesCount = salesAlerts.activeCount + salesAlerts.acknowledgedCount; 
+    updateModuleBadge('sales', salesCount);
+
+    // Operations - alertas operacionales
+    const operationsCount = operationsAlerts.activeCount + operationsAlerts.acknowledgedCount;
+    updateModuleBadge('operations', operationsCount);
+
+    // Staff - alertas de personal
+    const staffCount = staffAlerts.activeCount + staffAlerts.acknowledgedCount;
+    updateModuleBadge('staff', staffCount);
+
+    // Fiscal - alertas fiscales
+    const fiscalCount = fiscalAlerts.activeCount + fiscalAlerts.acknowledgedCount;
+    updateModuleBadge('fiscal', fiscalCount);
+
+    // Customers - alertas de clientes
+    const customersCount = customersAlerts.activeCount + customersAlerts.acknowledgedCount;
+    updateModuleBadge('customers', customersCount);
+
+  }, [
+    materialsAlerts.activeCount, materialsAlerts.acknowledgedCount,
+    salesAlerts.activeCount, salesAlerts.acknowledgedCount,
+    operationsAlerts.activeCount, operationsAlerts.acknowledgedCount,
+    staffAlerts.activeCount, staffAlerts.acknowledgedCount,
+    fiscalAlerts.activeCount, fiscalAlerts.acknowledgedCount,
+    customersAlerts.activeCount, customersAlerts.acknowledgedCount,
+    updateModuleBadge
+  ]);
+  */
 
   return null; // Este componente no renderiza nada
 }

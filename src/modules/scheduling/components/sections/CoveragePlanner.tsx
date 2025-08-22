@@ -561,3 +561,5 @@ export function r({ understaffedShifts, coveragePercentage }: rProps) {
     </VStack>
   );
 }
+
+export { CoveragePlanner };

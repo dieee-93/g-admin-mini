@@ -1,6 +1,6 @@
 // src/features/sales/components/OrderManagement/KitchenDisplaySystem.tsx
 // 🚀 KITCHEN DISPLAY SYSTEM - Real-time Order Management for Kitchen Staff
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Box,
   Card,
@@ -16,22 +16,17 @@ import {
   createListCollection,
   Separator
 } from '@chakra-ui/react';
-import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
 import {
-  ClockIcon,
   FireIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
-  PlayIcon,
-  XMarkIcon
+  PlayIcon
 } from '@heroicons/react/24/outline';
 import {
   type KitchenOrder,
-  type KitchenOrderItem,
   KitchenItemStatus,
   PriorityLevel,
-  KITCHEN_STATIONS,
-  OrderStatus
+  KITCHEN_STATIONS
 } from '../../types';
 
 interface KitchenDisplaySystemProps {
@@ -84,9 +79,10 @@ export function KitchenDisplaySystem({
     // Sort orders
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'priority':
+        case 'priority': {
           const priorityOrder = { [PriorityLevel.VIP]: 3, [PriorityLevel.RUSH]: 2, [PriorityLevel.NORMAL]: 1 };
           return priorityOrder[b.priority] - priorityOrder[a.priority];
+        }
         case 'time':
           return new Date(a.order_time).getTime() - new Date(b.order_time).getTime();
         case 'table':
@@ -258,7 +254,7 @@ export function KitchenDisplaySystem({
             <Select.Root
               collection={sortCollection}
               value={[sortBy]}
-              onValueChange={(details) => setSortBy(details.value[0] as any)}
+              onValueChange={(details) => setSortBy(details.value[0] as 'priority' | 'time' | 'table')}
               size="sm"
               width="120px"
             >
@@ -310,7 +306,12 @@ export function KitchenDisplaySystem({
       )}
 
       {/* Kitchen Orders */}
-      <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" }} gap="4">
+      <Grid 
+        templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" }} 
+        gap={{ base: "3", md: "4" }}
+        role="grid"
+        aria-label="Kitchen orders display"
+      >
         {filteredOrders.map((order) => {
           const timing = getOrderTiming(order);
           const priorityColor = getPriorityColor(order.priority);
@@ -318,10 +319,12 @@ export function KitchenDisplaySystem({
           return (
             <Card.Root
               key={order.order_id}
-              p="4"
+              p={{ base: "3", md: "4" }}
               borderWidth="2px"
               borderColor={timing.isOverdue ? 'red.300' : 'gray.200'}
               bg={timing.isOverdue ? 'red.50' : 'white'}
+              role="gridcell"
+              aria-label={`Order ${order.order_number}, ${timing.isOverdue ? 'overdue' : 'on time'}, ${order.items.length} items`}
             >
               <VStack gap="4" align="stretch">
                 {/* Order Header */}
@@ -452,7 +455,7 @@ export function KitchenDisplaySystem({
                             {/* Action Button */}
                             {item.status !== KitchenItemStatus.SERVED && (
                               <Button
-                                size="sm"
+                                size={{ base: "md", md: "sm" }}
                                 colorPalette={
                                   item.status === KitchenItemStatus.PENDING ? 'blue' :
                                   item.status === KitchenItemStatus.IN_PROGRESS ? 'green' :
@@ -460,6 +463,7 @@ export function KitchenDisplaySystem({
                                 }
                                 onClick={() => handleItemAction(order.order_id, item.item_id, item.status)}
                                 variant={item.status === KitchenItemStatus.READY ? 'solid' : 'outline'}
+                                aria-label={`${getActionButtonText(item.status)} ${item.product_name}`}
                               >
                                 {item.status === KitchenItemStatus.PENDING && <PlayIcon className="w-3 h-3" />}
                                 {item.status === KitchenItemStatus.IN_PROGRESS && <CheckCircleIcon className="w-3 h-3" />}

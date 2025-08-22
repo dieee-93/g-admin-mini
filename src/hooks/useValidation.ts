@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import { 
   createValidationSchema, 
-  validateData, 
-  ValidationResult 
+  validateData
 } from '@/lib/validation';
+import type { ValidationResult } from '@/lib/validation';
 import { secureApiCall } from '@/lib/validation/security';
 import { useApp } from '@/hooks/useZustandStores';
 

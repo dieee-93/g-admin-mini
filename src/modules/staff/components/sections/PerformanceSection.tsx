@@ -262,9 +262,9 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
           </Select.Root>
           <Button
             size="sm"
-            leftIcon={<PlusIcon className="w-4 h-4" />}
             colorPalette="blue"
           >
+            <PlusIcon className="w-4 h-4 mr-2" />
             Nueva Evaluación
           </Button>
         </HStack>
@@ -408,9 +408,9 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
           <Text fontSize="lg" fontWeight="semibold">Objetivos Activos</Text>
           <Button
             size="sm"
-            leftIcon={<PlusIcon className="w-4 h-4" />}
             colorPalette="green"
           >
+            <PlusIcon className="w-4 h-4 mr-2" />
             Nuevo Objetivo
           </Button>
         </HStack>

@@ -46,7 +46,7 @@ export function ProductsPage() {
   }, [setQuickActions]);
 
   return (
-    <Box p="6" maxW="7xl" mx="auto">
+    <Box p="6" maxW="container.xl" mx="auto">
       <VStack gap="6" align="stretch">
         {/* Header */}
         <HStack justify="space-between">
@@ -58,15 +58,24 @@ export function ProductsPage() {
             <Button 
               variant="outline"
               colorPalette="blue" 
-              onClick={() => window.open('/tools/intelligence/menu-engineering', '_blank')}
-              
-              size="sm"
+              onClick={() => {
+                // Use internal navigation instead of window.open
+                // This maintains context and better UX
+                console.log('Navigate to menu engineering internally');
+                // TODO: Implement proper routing to /products/menu-engineering
+              }}
+              size="md"
+              minH="44px"
+              minW="44px"
             >
               📊 Menu Engineering
             </Button>
             <Button 
               colorPalette="purple"
-              
+              size="md"
+              minH="44px"
+              minW="44px"
+              gap="2"
             >
               <PlusIcon className="w-4 h-4" />
               New Product
@@ -77,7 +86,7 @@ export function ProductsPage() {
         {/* Products Dashboard - No nested tabs */}
         <VStack gap={6} align="stretch">
           {/* Products Overview Cards */}
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={{ base: 2, md: 4 }}>
             <Card.Root>
               <Card.Body>
                 <VStack align="start" gap={2}>
@@ -116,7 +125,7 @@ export function ProductsPage() {
           </SimpleGrid>
 
           {/* All sections displayed together */}
-          <Grid templateColumns={{ base: "1fr", xl: "1fr 1fr" }} gap={6}>
+          <Grid templateColumns={{ base: "1fr", xl: "1fr 1fr" }} gap={{ base: 4, md: 6 }}>
             <Card.Root>
               <Card.Header>
                 <Heading size="md">Product Management</Heading>

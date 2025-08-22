@@ -4,14 +4,17 @@ import {
   Box, 
   Button, 
   Text, 
-  HStack, 
-  VStack,
+  Stack,
+  Flex,
   Badge,
   Input,
   NumberInput,
   Select,
   Card,
-  IconButton
+  IconButton,
+  Field,
+  Textarea,
+  createListCollection
 } from '@chakra-ui/react';
 import { 
   ArrowTopRightOnSquareIcon, 
@@ -22,6 +25,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { recipeService, type Recipe, type RecipeIngredient } from '@/services/recipe';
+import { MaterialSelector } from '../MaterialSelector';
+import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
 
 interface RecipeBuilderLiteProps {
   mode: 'product' | 'material';
@@ -47,38 +52,188 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
   
   const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
   const [isCalculating, setIsCalculating] = useState(false);
+  
+  // Estado para el flujo guiado de ingredientes
+  const [currentIngredient, setCurrentIngredient] = useState<{
+    material: MaterialItem | null;
+    quantity: number;
+    isComplete: boolean;
+  }>({
+    material: null,
+    quantity: 0,
+    isComplete: false
+  });
 
-  // Auto-calculate costs when ingredients change
+  // Auto-calculate costs and portions when ingredients change
   useEffect(() => {
     if (ingredients.length > 0) {
       setIsCalculating(true);
       const totalCost = ingredients.reduce(
-        (sum, ing) => sum + (ing.cost * ing.quantity), 
+        (sum, ing) => sum + ing.cost, 
         0
       );
+      
+      // Calculate portions automatically (each ingredient = 1 portion, or custom logic)
+      const calculatedPortions = Math.max(1, ingredients.length);
       
       setRecipe(prev => ({ 
         ...prev, 
         totalCost,
-        costPerServing: prev.servingSize ? totalCost / prev.servingSize : totalCost
+        servingSize: calculatedPortions,
+        costPerServing: totalCost / calculatedPortions
       }));
       
       onCostChange?.(totalCost);
       setIsCalculating(false);
+    } else {
+      // Reset when no ingredients
+      setRecipe(prev => ({ 
+        ...prev, 
+        totalCost: 0,
+        servingSize: 1,
+        costPerServing: 0
+      }));
+      onCostChange?.(0);
     }
-  }, [ingredients, recipe.servingSize, onCostChange]);
+  }, [ingredients, onCostChange]);
 
-  const addIngredient = () => {
+  const handleMaterialSelected = (material: MaterialItem) => {
+    setCurrentIngredient({
+      material,
+      quantity: 0,
+      isComplete: false
+    });
+  };
+
+  const handleQuantitySet = (quantity: number) => {
+    if (!currentIngredient.material) return;
+
+    // Calcular costo según el tipo de material
+    let cost = 0;
+    const material = currentIngredient.material;
+    
+    if (material.unit_cost) {
+      cost = material.unit_cost * quantity;
+    }
+
     const newIngredient: RecipeIngredient = {
       id: `ing-${Date.now()}`,
-      name: '',
-      quantity: 1,
-      unit: mode === 'product' ? 'porción' : 'kg',
-      cost: 0,
-      notes: ''
+      name: material.name,
+      quantity,
+      unit: getUnitFromMaterial(material),
+      cost,
+      notes: `Material ID: ${material.id}`
     };
     
     setIngredients(prev => [...prev, newIngredient]);
+    
+    // Reset current ingredient
+    setCurrentIngredient({
+      material: null,
+      quantity: 0,
+      isComplete: false
+    });
+  };
+
+  const getUnitFromMaterial = (material: MaterialItem): string => {
+    if (material.type === 'MEASURABLE') {
+      return (material as MeasurableItem).unit;
+    } else if (material.type === 'COUNTABLE') {
+      return 'unidad';
+    } else {
+      return 'porción';
+    }
+  };
+
+  const startNewIngredient = () => {
+    setCurrentIngredient({
+      material: null,
+      quantity: 0,
+      isComplete: false
+    });
+  };
+
+  const renderQuantityInput = () => {
+    if (!currentIngredient.material) return null;
+
+    const material = currentIngredient.material;
+    const unit = getUnitFromMaterial(material);
+
+    return (
+      <Card.Root variant="outline" bg="blue.50" borderColor="blue.200">
+        <Card.Body p="4">
+          <Stack gap="3">
+            <Text fontSize="sm" fontWeight="semibold" color="blue.800">
+              📏 Cantidad necesaria de {material.name}
+            </Text>
+            
+            <Flex gap="4" align="end">
+              <Box flex="1">
+                <Text fontSize="sm" fontWeight="medium" mb="2">
+                  Cantidad a usar
+                </Text>
+                <Flex>
+                  <NumberInput.Root
+                    value={currentIngredient.quantity.toString()}
+                    onValueChange={(details) => 
+                      setCurrentIngredient(prev => ({
+                        ...prev,
+                        quantity: parseFloat(details.value) || 0
+                      }))
+                    }
+                    min={0}
+                    allowDecimal={material.type === 'MEASURABLE'}
+                    width="full"
+                  >
+                    <NumberInput.Control>
+                      <NumberInput.IncrementTrigger />
+                      <NumberInput.DecrementTrigger />
+                    </NumberInput.Control>
+                    <NumberInput.Input 
+                      height="44px"
+                      fontSize="md"
+                      px="3"
+                      borderRadius="md"
+                      borderRightRadius="0"
+                    />
+                  </NumberInput.Root>
+                  <Box 
+                    height="44px"
+                    px="3"
+                    bg="gray.50"
+                    border="1px solid"
+                    borderColor="border"
+                    borderLeft="0"
+                    borderRightRadius="md"
+                    display="flex"
+                    alignItems="center"
+                    fontSize="sm"
+                    color="fg.muted"
+                    fontWeight="medium"
+                  >
+                    {unit}
+                  </Box>
+                </Flex>
+              </Box>
+
+              <Button
+                colorPalette="blue"
+                onClick={() => handleQuantitySet(currentIngredient.quantity)}
+                disabled={currentIngredient.quantity <= 0}
+                height="44px"
+              >
+                ✓ Confirmar
+              </Button>
+            </Flex>
+
+            {/* Mostrar stock disponible */}
+            <Text fontSize="xs" color="blue.600">
+              💡 Stock disponible: {material.stock} {unit}
+            </Text>
+          </Stack>
+        </Card.Body>
+      </Card.Root>
+    );
   };
 
   const updateIngredient = (index: number, field: keyof RecipeIngredient, value: any) => {
@@ -121,14 +276,14 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
 
   const getIcon = () => {
     return mode === 'product' 
-      ? <CurrencyDollarIcon className="w-5 h-5 text-blue-600" />
-      : <BeakerIcon className="w-5 h-5 text-green-600" />;
+      ? '🍔'
+      : '🧪';
   };
 
   const getTitle = () => {
     return mode === 'product' 
-      ? 'Recipe Builder - Product Context'
-      : 'Recipe Builder - Material Context';
+      ? 'Constructor de Recetas - Productos'
+      : 'Constructor de Recetas - Materiales';
   };
 
   const calculations = recipe.totalCost 
@@ -138,179 +293,199 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
   return (
     <Box className={className}>
       <Card.Root variant="outline">
-        <Card.Header>
-          <HStack justify="space-between">
-            <HStack gap={2}>
-              {getIcon()}
-              <VStack align="start" gap={0}>
-                <Text fontSize="lg" fontWeight="semibold">
+        <Card.Header p="4">
+          <Flex justify="space-between" align="center">
+            <Flex gap="3" align="center">
+              <Box fontSize="2xl">
+                {getIcon()}
+              </Box>
+              <Stack gap="1">
+                <Text fontSize="md" fontWeight="semibold">
                   {getTitle()}
                 </Text>
                 {context && (
-                  <Badge colorPalette={mode === 'product' ? 'blue' : 'green'} size="sm">
+                  <Badge colorPalette={mode === 'product' ? 'blue' : 'green'} size="sm" variant="subtle">
                     {context}
                   </Badge>
                 )}
-              </VStack>
-            </HStack>
+              </Stack>
+            </Flex>
             <Button
               size="sm"
-              variant="outline"
-              colorPalette="orange"
+              variant="ghost"
+              colorPalette="gray"
               onClick={openFullRecipeBuilder}
               rightIcon={<ArrowTopRightOnSquareIcon className="w-4 h-4" />}
             >
-              Generador Completo
+              Avanzado
             </Button>
-          </HStack>
+          </Flex>
         </Card.Header>
 
         <Card.Body>
-          <VStack gap={4} align="stretch">
+          <Stack gap="4">
             {/* Basic Recipe Info */}
-            <HStack gap={4}>
-              <Box flex="2">
-                <Text fontSize="sm" fontWeight="medium" mb={1}>
-                  Nombre de la receta
-                </Text>
-                <Input
-                  value={recipe.name || ''}
-                  onChange={(e) => setRecipe(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder={mode === 'product' ? 'ej. Hamburguesa Clásica' : 'ej. Masa para Pizza'}
-                />
-              </Box>
-              
-              <Box flex="1">
-                <Text fontSize="sm" fontWeight="medium" mb={1}>
-                  Porciones
-                </Text>
-                <NumberInput.Root
-                  value={recipe.servingSize?.toString() || '1'}
-                  onValueChange={(details) => 
-                    setRecipe(prev => ({ ...prev, servingSize: parseInt(details.value) || 1 }))
-                  }
-                  min={1}
+            <Stack gap="4">
+              <Flex gap="4">
+                <Box flex="2">
+                  <Text fontSize="sm" fontWeight="medium" mb={1}>
+                    Nombre de la receta
+                  </Text>
+                  <Input
+                    value={recipe.name || ''}
+                    onChange={(e) => setRecipe(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder={mode === 'product' ? 'ej. Hamburguesa Clásica' : 'ej. Masa para Pizza'}
+                    height="44px"
+                    fontSize="md"
+                    px="3"
+                    borderRadius="md"
+                  />
+                </Box>
+                
+                <Box flex="1">
+                  <Text fontSize="sm" fontWeight="medium" mb={1}>
+                    Porciones (calculado automáticamente)
+                  </Text>
+                  <Box
+                    height="44px"
+                    px="3"
+                    bg="gray.50"
+                    border="1px solid"
+                    borderColor="border"
+                    borderRadius="md"
+                  display="flex"
+                  alignItems="center"
+                  fontSize="md"
+                  color="fg.muted"
                 >
-                  <NumberInput.Field />
-                </NumberInput.Root>
+                  {ingredients.length > 0 ? `${ingredients.length} porción${ingredients.length === 1 ? '' : 'es'}` : 'Se calculará según ingredientes'}
+                </Box>
               </Box>
-            </HStack>
-
-            {/* Ingredients Section */}
+            </Flex>
+            
+            {/* Instructions Field */}
             <Box>
-              <HStack justify="space-between" mb={3}>
-                <Text fontSize="md" fontWeight="medium">
-                  Ingredientes
-                </Text>
-                <Button
-                  size="sm"
-                  onClick={addIngredient}
-                  leftIcon={<PlusIcon className="w-4 h-4" />}
-                >
-                  Agregar
-                </Button>
-              </HStack>
+              <Text fontSize="sm" fontWeight="medium" mb={1}>
+                Instrucciones de preparación
+              </Text>
+              <Textarea
+                value={recipe.instructions || ''}
+                onChange={(e) => setRecipe(prev => ({ ...prev, instructions: e.target.value }))}
+                placeholder={mode === 'product' ? 'ej. 1. Formar la hamburguesa, 2. Cocinar por 5 min...' : 'ej. 1. Mezclar ingredientes secos, 2. Agregar líquidos...'}
+                fontSize="md"
+                rows={3}
+                resize="vertical"
+              />
+            </Box>
+            </Stack>
 
-              <VStack gap={2} align="stretch">
-                {ingredients.map((ingredient, index) => (
-                  <Card.Root key={ingredient.id} variant="subtle" size="sm">
-                    <Card.Body p={3}>
-                      <HStack gap={2}>
-                        <Box flex="2">
-                          <Input
-                            size="sm"
-                            value={ingredient.name}
-                            onChange={(e) => updateIngredient(index, 'name', e.target.value)}
-                            placeholder="Nombre del ingrediente"
-                          />
-                        </Box>
-                        
-                        <Box flex="1">
-                          <NumberInput.Root
-                            size="sm"
-                            value={ingredient.quantity.toString()}
-                            onValueChange={(details) => 
-                              updateIngredient(index, 'quantity', parseFloat(details.value) || 0)
-                            }
-                          >
-                            <NumberInput.Field />
-                          </NumberInput.Root>
-                        </Box>
-                        
-                        <Box flex="1">
-                          <Input
-                            size="sm"
-                            value={ingredient.unit}
-                            onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
-                            placeholder="Unidad"
-                          />
-                        </Box>
-                        
-                        <Box flex="1">
-                          <NumberInput.Root
-                            size="sm"
-                            value={ingredient.cost.toString()}
-                            onValueChange={(details) => 
-                              updateIngredient(index, 'cost', parseFloat(details.value) || 0)
-                            }
-                            formatOptions={{
-                              style: 'currency',
-                              currency: 'USD'
-                            }}
-                          >
-                            <NumberInput.Field />
-                          </NumberInput.Root>
-                        </Box>
-                        
-                        <IconButton
-                          size="sm"
-                          variant="ghost"
-                          colorPalette="red"
-                          onClick={() => removeIngredient(index)}
-                        >
-                          <TrashIcon className="w-4 h-4" />
-                        </IconButton>
-                      </HStack>
-                    </Card.Body>
-                  </Card.Root>
-                ))}
-              </VStack>
+            {/* Ingredients Section - Smart Material Selection */}
+            <Box>
+              <Text fontSize="md" fontWeight="medium" mb="4">
+                🥘 Ingredientes de la receta
+              </Text>
+
+              {/* Current Ingredient Workflow */}
+              {!currentIngredient.material ? (
+                <Stack gap="3">
+                  <Text fontSize="sm" color="fg.muted">
+                    Selecciona una materia prima para agregar:
+                  </Text>
+                  <MaterialSelector
+                    onMaterialSelected={handleMaterialSelected}
+                    placeholder="Buscar materia prima en stock..."
+                    filterByStock={true}
+                    excludeIds={ingredients.map(ing => ing.notes?.replace('Material ID: ', '') || '')}
+                  />
+                </Stack>
+              ) : (
+                renderQuantityInput()
+              )}
+
+              {/* Added Ingredients List */}
+              {ingredients.length > 0 && (
+                <Stack gap="3" mt="6">
+                  <Flex justify="space-between" align="center">
+                    <Text fontSize="sm" fontWeight="semibold">
+                      ✅ Ingredientes agregados ({ingredients.length})
+                    </Text>
+                    {!currentIngredient.material && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={startNewIngredient}
+                        leftIcon={<PlusIcon className="w-4 h-4" />}
+                      >
+                        Agregar otro
+                      </Button>
+                    )}
+                  </Flex>
+
+                  <Stack gap="2">
+                    {ingredients.map((ingredient, index) => (
+                      <Card.Root key={ingredient.id} variant="outline" size="sm">
+                        <Card.Body p="3">
+                          <Flex justify="space-between" align="center">
+                            <Stack gap="0" flex="1">
+                              <Text fontSize="sm" fontWeight="medium">
+                                {ingredient.name}
+                              </Text>
+                              <Text fontSize="xs" color="fg.muted">
+                                {ingredient.quantity} {ingredient.unit} • ${ingredient.cost.toFixed(2)} ARS
+                              </Text>
+                            </Stack>
+                            
+                            <IconButton
+                              variant="ghost"
+                              colorPalette="red"
+                              size="sm"
+                              onClick={() => removeIngredient(index)}
+                            >
+                              <TrashIcon className="w-4 h-4" />
+                            </IconButton>
+                          </Flex>
+                        </Card.Body>
+                      </Card.Root>
+                    ))}
+                  </Stack>
+                </Stack>
+              )}
             </Box>
 
             {/* Cost Summary */}
             {calculations && (
               <Card.Root variant="subtle" bg={mode === 'product' ? 'blue.50' : 'green.50'}>
                 <Card.Body p={3}>
-                  <HStack justify="space-between">
-                    <VStack align="start" gap={0}>
+                  <Flex justify="space-between">
+                    <Stack gap="0">
                       <Text fontSize="sm" color="gray.600">
                         Costo Total
                       </Text>
                       <Text fontSize="lg" fontWeight="bold">
                         ${calculations.totalCost.toFixed(2)}
                       </Text>
-                    </VStack>
+                    </Stack>
                     
-                    <VStack align="center" gap={0}>
+                    <Stack gap="0" textAlign="center">
                       <Text fontSize="sm" color="gray.600">
                         Por Porción
                       </Text>
                       <Text fontSize="lg" fontWeight="bold">
                         ${calculations.costPerServing.toFixed(2)}
                       </Text>
-                    </VStack>
+                    </Stack>
                     
                     {mode === 'product' && calculations.profitPercentage !== undefined && (
-                      <VStack align="end" gap={0}>
+                      <Stack gap="0" textAlign="end">
                         <Text fontSize="sm" color="gray.600">
                           Margen Potencial
                         </Text>
                         <Text fontSize="lg" fontWeight="bold" color="green.600">
                           {calculations.profitPercentage.toFixed(1)}%
                         </Text>
-                      </VStack>
+                      </Stack>
                     )}
-                  </HStack>
+                  </Flex>
                 </Card.Body>
               </Card.Root>
             )}
@@ -325,7 +500,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
             >
               {mode === 'product' ? 'Crear Receta de Producto' : 'Crear Receta de Material'}
             </Button>
-          </VStack>
+          </Stack>
         </Card.Body>
       </Card.Root>
     </Box>

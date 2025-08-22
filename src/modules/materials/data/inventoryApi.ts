@@ -1,7 +1,7 @@
 // src/features/inventory/data/inventoryApi.ts
 // API functions para el módulo inventory
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import type { InventoryItem, StockEntry, StockAlert } from '../types';
 
 export const inventoryApi = {
@@ -66,10 +66,10 @@ export const inventoryApi = {
     return data;
   },
 
-  // Stock alerts - FIX: Usar parámetro correcto
+  // Stock alerts
   async getStockAlerts(threshold: number = 10): Promise<StockAlert[]> {
     const { data, error } = await supabase
-      .rpc('get_low_stock_alert', { p_threshold: threshold });
+      .rpc('get_low_stock_alerts', { p_threshold: threshold });
 
     if (error) throw error;
     return data || [];
@@ -78,9 +78,48 @@ export const inventoryApi = {
   // Dashboard stats
   async getDashboardStats(): Promise<any> {
     const { data, error } = await supabase
-      .rpc('get_dashboard_stats');
+      .rpc('get_inventory_dashboard_stats');
 
     if (error) throw error;
     return data;
+  },
+
+  // Delete item with proper transaction handling
+  async deleteItem(id: string): Promise<void> {
+    try {
+      // First, check if item exists and get its info
+      const { data: itemData, error: itemError } = await supabase
+        .from('items')
+        .select('id, name')
+        .eq('id', id)
+        .single();
+
+      if (itemError || !itemData) {
+        throw new Error('Item no encontrado');
+      }
+
+      // Delete all stock_entries for this item first (to avoid trigger conflicts)
+      const { error: stockError } = await supabase
+        .from('stock_entries')
+        .delete()
+        .eq('item_id', id);
+
+      if (stockError) {
+        console.warn('Warning cleaning stock entries:', stockError);
+        // Continue anyway, the item deletion might still work
+      }
+
+      // Now delete the item itself
+      const { error: deleteError } = await supabase
+        .from('items')
+        .delete()
+        .eq('id', id);
+
+      if (deleteError) throw deleteError;
+
+    } catch (error) {
+      console.error('Error in deleteItem:', error);
+      throw error;
+    }
   }
 };

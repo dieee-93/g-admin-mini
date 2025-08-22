@@ -20,7 +20,7 @@
 2. **MaterialsHeader.tsx** - Stats overview and actions
 3. **MaterialsFilters.tsx** - Search and filtering controls
 4. **MaterialsGrid.tsx** - Materials display grid
-5. **MaterialFormModal.tsx** - Add/Edit/View modal
+5. **MaterialFormModalComplete.tsx** - Advanced Add/Edit/View modal with three item types
 
 ### Key Improvements
 

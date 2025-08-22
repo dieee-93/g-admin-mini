@@ -146,7 +146,7 @@ export default function StaffPage() {
   };
 
   return (
-    <Box p="6" maxW="7xl" mx="auto">
+    <Box p="6" maxW="container.xl" mx="auto">
       <VStack gap="6" align="stretch">
         {/* UNIFIED PATTERN: Header with icon, badges, KPIs */}
         <Card.Root>

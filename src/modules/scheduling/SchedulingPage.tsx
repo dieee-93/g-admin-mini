@@ -18,7 +18,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 // Import section components (will be implemented)
 import { WeeklyScheduleView } from './components/sections/WeeklyScheduleView';
 import { TimeOffManager } from './components/sections/TimeOffManager';
-import { CoveragePlanner } from './components/sections/CoveragePlanner';
+// import { CoveragePlanner } from './components/sections/CoveragePlanner';
 import { LaborCostTracker } from './components/sections/LaborCostTracker';
 
 // Types
@@ -145,7 +145,7 @@ export default function SchedulingPage() {
   };
 
   return (
-    <Box p="6" maxW="7xl" mx="auto">
+  <Box p="6" maxW="container.xl" mx="auto">
       <VStack gap="6" align="stretch">
         {/* UNIFIED PATTERN: Header with icon, badges, KPIs */}
         <Card.Root>
@@ -287,10 +287,11 @@ export default function SchedulingPage() {
                 </Tabs.Content>
 
                 <Tabs.Content value="coverage">
-                  <CoveragePlanner 
+                  {/* <CoveragePlanner 
                     understaffedShifts={schedulingStats.understaffed_shifts}
                     coveragePercentage={schedulingStats.coverage_percentage}
-                  />
+                  /> */}
+                  <div>Coverage Planner - En desarrollo</div>
                 </Tabs.Content>
 
                 <Tabs.Content value="costs">

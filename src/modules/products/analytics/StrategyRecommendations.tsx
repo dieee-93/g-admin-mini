@@ -256,8 +256,8 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
                   colorScheme="brand" 
                   size="sm"
                   onClick={() => onImplement(recommendation)}
-                  leftIcon={<CheckCircleIcon className="w-4 h-4" />}
                 >
+                  <CheckCircleIcon className="w-4 h-4 mr-2" />
                   Implementar
                 </Button>
                 <Button variant="outline" size="sm">

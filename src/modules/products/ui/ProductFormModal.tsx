@@ -7,7 +7,7 @@ import {
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ProductForm } from './ProductForm';
 import { useProductsStore } from '@/store/productsStore';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import type { CreateProductData, UpdateProductData } from '../types';
 
 export function ProductFormModal() {

@@ -2,7 +2,7 @@
 // Materials management hook with Supabase realtime integration
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { notify, handleApiError } from '@/lib/notifications';
 import type { 
   InventoryItem, 
