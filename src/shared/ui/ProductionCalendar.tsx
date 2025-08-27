@@ -67,7 +67,7 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
   return (
     <VStack gap={4} align="stretch">
       {/* Calendar Header */}
-      <HStack justify="space-between" p={3} bg="gray.50" borderRadius="md">
+      <HStack justify="space-between" p={3} bg="bg.subtle" borderRadius="md">
         <Button size="sm" variant="ghost" onClick={handlePrevMonth}>
           ←
         </Button>
@@ -88,7 +88,7 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
       <Grid templateColumns="repeat(7, 1fr)" gap={2}>
         {/* Day Headers */}
         {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
-          <Box key={day} p={2} textAlign="center" fontWeight="semibold" fontSize="sm" color="gray.600">
+          <Box key={day} p={2} textAlign="center" fontWeight="semibold" fontSize="sm" color="text.secondary">
             {day}
           </Box>
         ))}
@@ -122,8 +122,8 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
               flexDirection="column"
               gap={1}
               onClick={() => onDateChange(date)}
-              bg={isSelected ? "blue.500" : undefined}
-              color={isSelected ? "white" : undefined}
+              bg={isSelected ? "brand.500" : undefined}
+              color={isSelected ? "white" : "text.primary"}
               _hover={{
                 bg: isSelected ? "blue.600" : "gray.100"
               }}
@@ -163,7 +163,7 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
       </Grid>
       
       {/* Calendar Legend */}
-      <Box p={3} bg="gray.50" borderRadius="md">
+      <Box p={3} borderRadius="md">
         <VStack gap={2} align="start">
           <Text fontSize="sm" fontWeight="semibold">Leyenda</Text>
           <HStack gap={4} flexWrap="wrap">

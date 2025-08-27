@@ -1,7 +1,8 @@
 import { Button as ChakraButton } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import type { InteractiveAccessibilityProps } from './types/accessibility'
 
-interface ButtonProps {
+interface ButtonProps extends InteractiveAccessibilityProps {
   children: ReactNode
   variant?: 'solid' | 'outline' | 'ghost' | 'subtle'
   colorPalette?: 'gray' | 'brand' | 'success' | 'warning' | 'error' | 'info'
@@ -16,13 +17,21 @@ interface ButtonProps {
 export function Button({
   children,
   variant = 'solid',
-  colorPalette = 'brand',
+  colorPalette,
   size = 'md',
   loading = false,
   disabled = false,
   onClick,
   type = 'button',
   fullWidth = false,
+  // Accessibility props
+  'aria-label': ariaLabel,
+  'aria-describedby': ariaDescribedby,
+  'aria-pressed': ariaPressed,
+  'aria-expanded': ariaExpanded,
+  'aria-haspopup': ariaHaspopup,
+  tabIndex,
+  ...accessibilityProps
 }: ButtonProps) {
   return (
     <ChakraButton
@@ -34,6 +43,14 @@ export function Button({
       onClick={onClick}
       type={type}
       width={fullWidth ? 'full' : 'auto'}
+      // Accessibility props
+      aria-label={ariaLabel}
+      aria-describedby={ariaDescribedby}
+      aria-pressed={ariaPressed}
+      aria-expanded={ariaExpanded}
+      aria-haspopup={ariaHaspopup}
+      tabIndex={tabIndex}
+      {...accessibilityProps}
     >
       {children}
     </ChakraButton>

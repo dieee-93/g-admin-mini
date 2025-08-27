@@ -61,7 +61,7 @@ export const adminRoutes: RouteConfig[] = [
     children: [
       {
         path: '/admin/materials/abc-analysis',
-        component: 'ABCAnalysisPage',
+        component: 'ABCAnalysisView',
         title: 'Análisis ABC',
         requiredModule: 'materials'
       },
@@ -121,29 +121,37 @@ export const adminRoutes: RouteConfig[] = [
     children: [
       {
         path: '/admin/settings/integrations',
-        component: 'IntegrationsPage',
+        component: 'IntegrationsView',
         title: 'Integraciones',
         requiredRoles: ['ADMINISTRADOR', 'SUPER_ADMIN']
       },
       {
         path: '/admin/settings/diagnostics',
-        component: 'DiagnosticsPage',
+        component: 'DiagnosticsView',
         title: 'Diagnósticos',
         requiredRoles: ['ADMINISTRADOR', 'SUPER_ADMIN']
       },
       {
         path: '/admin/settings/reporting',
-        component: 'ReportingPage',
+        component: 'ReportingView',
         title: 'Reportes',
         requiredRoles: ['ADMINISTRADOR', 'SUPER_ADMIN']
       },
       {
         path: '/admin/settings/enterprise',
-        component: 'EnterprisePage',
+        component: 'EnterpriseView',
         title: 'Enterprise',
         requiredRoles: ['SUPER_ADMIN']
       }
     ]
+  },
+  {
+    path: '/admin/debug/theme-test',
+    component: 'ThemeTestPage',
+    title: 'Theme Test',
+    icon: 'SwatchIcon',
+    requiredRoles: ['SUPER_ADMIN'],
+    showInNav: false // Hidden from navigation, accessible via direct URL
   }
 ];
 

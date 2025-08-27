@@ -1,38 +1,51 @@
-import {
-  VStack,
-  Text,
-  Button
-} from '@chakra-ui/react';
-import type { QuickActionCardProps } from '@/modules/dashboard/types/dashboard.types';
+import { Stack, Typography, Button, Icon } from '@/shared/ui';
+
+// Quick Action Card Props
+interface QuickActionCardProps {
+  title: string;
+  description?: string;
+  icon: React.ComponentType<any>;
+  colorPalette: 'gray' | 'brand' | 'success' | 'warning' | 'error' | 'info';
+  onClick: () => void;
+}
 
 export function QuickActionCard({
   title,
   description,
-  icon: Icon,
+  icon,
   colorPalette,
   onClick
 }: QuickActionCardProps) {
   return (
-    <Button
-      variant="outline"
-      size="md"
-      onClick={onClick}
-      colorPalette={colorPalette}
-      h="auto"
-      py="3"
-      px="3"
+    <div
+      style={{
+        height: 'auto',
+        padding: '0.75rem'
+      }}
     >
-      <VStack gap="1">
-        <Icon style={{ width: '20px', height: '20px' }} />
-        <VStack gap="0">
-          <Text fontSize="xs" fontWeight="semibold">{title}</Text>
-          {description && (
-            <Text fontSize="2xs" color={{ base: "gray.600", _dark: "gray.300" }} textAlign="center">
-              {description}
-            </Text>
-          )}
-        </VStack>
-      </VStack>
-    </Button>
+      <Button
+        variant="outline"
+        size="md"
+        onClick={onClick}
+        colorPalette={colorPalette}
+      >
+        <Stack direction="column" gap="xs" align="center">
+          <Icon icon={icon} size="md" />
+          <Stack direction="column" gap="none" align="center">
+            <Typography variant="body" size="xs" fontWeight="semibold">{title}</Typography>
+            {description && (
+              <Typography 
+                variant="body" 
+                size="xs" 
+                color="secondary" 
+                textAlign="center"
+              >
+                {description}
+              </Typography>
+            )}
+          </Stack>
+        </Stack>
+      </Button>
+    </div>
   );
 }

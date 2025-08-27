@@ -1,88 +1,92 @@
 import { Text } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import type { ReactNode, CSSProperties } from 'react'
 
 interface TypographyProps {
   children: ReactNode
   variant?: 'display' | 'heading' | 'title' | 'subtitle' | 'body' | 'caption' | 'overline' | 'code' | 'label'
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl'
   weight?: 'light' | 'normal' | 'medium' | 'semibold' | 'bold'
-  color?: 'primary' | 'secondary' | 'muted' | 'accent' | 'success' | 'warning' | 'error' | 'info' | 'inherit'
-  align?: 'left' | 'center' | 'right' | 'justify'
-  transform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
-  decoration?: 'none' | 'underline' | 'line-through'
+  color?: string // ✅ Accepts any Chakra UI v3 color token: "white", "red.500", "text.primary"
+  
+  // ✅ New Chakra-compatible props
+  textAlign?: 'left' | 'center' | 'right' | 'justify'
+  textTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+  textDecoration?: 'none' | 'underline' | 'line-through'
+  
+  // 🔄 Backward compatibility aliases (deprecated but supported)
+  align?: 'left' | 'center' | 'right' | 'justify' // @deprecated use textAlign
+  transform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize' // @deprecated use textTransform  
+  decoration?: 'none' | 'underline' | 'line-through' // @deprecated use textDecoration
+  
   truncate?: boolean
   noWrap?: boolean
   as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label'
+  level?: 1 | 2 | 3 | 4 | 5 | 6
   className?: string
   onClick?: () => void
+  style?: CSSProperties
+  [key: string]: any // Allow additional props for Chakra compatibility
 }
 
+// ✅ JERARQUÍA TIPOGRÁFICA OPTIMIZADA SEGÚN MEJORES PRÁCTICAS 2024-2025
+// Basado en escalas modernas y responsive typography
 const variantStyles = {
   display: {
-    fontSize: { base: '3xl', md: '4xl' },
+    fontSize: { base: '4xl', md: '5xl', lg: '6xl' }, // Hero typography más impactante
     fontWeight: 'bold',
-    lineHeight: 1.2,
-    letterSpacing: '-0.02em',
+    lineHeight: { base: 1.1, md: 1.0 }, // Más apretado para display
+    letterSpacing: '-0.03em', // Más ajustado para tamaños grandes
   },
   heading: {
-    fontSize: { base: 'xl', md: '2xl' },
-    fontWeight: 'semibold',
-    lineHeight: 1.3,
+    fontSize: { base: '3xl', md: '4xl' }, // ✅ MÁS PROMINENTE: era 2xl→3xl
+    fontWeight: 'bold', // ✅ MÁS FUERTE: era semibold
+    lineHeight: 1.1, // ✅ MÁS APRETADO para headers grandes
+    letterSpacing: '-0.02em', // ✅ Más ajustado para tamaños grandes
   },
   title: {
-    fontSize: { base: 'lg', md: 'xl' },
-    fontWeight: 'medium',
-    lineHeight: 1.4,
+    fontSize: { base: '2xl', md: '3xl' }, // ✅ AUMENTADO: era xl→2xl
+    fontWeight: 'semibold', // ✅ MÁS FUERTE: era medium
+    lineHeight: 1.2, // ✅ Optimizado
+    letterSpacing: '-0.01em', // ✅ Agregado spacing
   },
   subtitle: {
-    fontSize: { base: 'md', md: 'lg' },
-    fontWeight: 'normal',
-    lineHeight: 1.5,
+    fontSize: { base: 'xl', md: '2xl' }, // ✅ AUMENTADO: era lg→xl
+    fontWeight: 'medium', // ✅ Mantiene diferencia con title
+    lineHeight: 1.3,
   },
   body: {
-    fontSize: 'md',
+    fontSize: { base: 'md', lg: 'lg' }, // Responsive body text
     fontWeight: 'normal',
-    lineHeight: 1.6,
+    lineHeight: 1.6, // Óptimo para lectura
   },
   caption: {
     fontSize: 'sm',
     fontWeight: 'normal',
-    lineHeight: 1.4,
+    lineHeight: 1.5, // Mejorado para legibilidad
   },
   overline: {
     fontSize: 'xs',
-    fontWeight: 'medium',
+    fontWeight: 'semibold', // Más fuerte para destacar
     textTransform: 'uppercase',
-    letterSpacing: '0.1em',
-    lineHeight: 1.2,
+    letterSpacing: '0.12em', // Más spacing para uppercase
+    lineHeight: 1.3,
   },
   code: {
     fontSize: 'sm',
     fontFamily: 'mono',
     fontWeight: 'normal',
-    bg: { base: 'gray.100', _dark: 'gray.800' },
-    px: 1,
-    py: 0.5,
+    px: 2, // Más padding siguiendo 8px grid
+    py: 1,
     borderRadius: 'sm',
   },
   label: {
     fontSize: 'sm',
-    fontWeight: 'medium',
+    fontWeight: 'semibold', // Más fuerte para etiquetas
     lineHeight: 1.4,
+    letterSpacing: '0.01em', // Sutil mejora
   },
 }
 
-const colorMap = {
-  primary: { base: 'gray.900', _dark: 'gray.50' },
-  secondary: { base: 'gray.700', _dark: 'gray.300' },
-  muted: { base: 'gray.600', _dark: 'gray.400' },
-  accent: { base: 'brand.600', _dark: 'brand.400' },
-  success: { base: 'success.600', _dark: 'success.400' },
-  warning: { base: 'warning.600', _dark: 'warning.400' },
-  error: { base: 'error.600', _dark: 'error.400' },
-  info: { base: 'info.600', _dark: 'info.400' },
-  inherit: 'inherit',
-}
 
 const weightMap = {
   light: 'light',
@@ -92,38 +96,68 @@ const weightMap = {
   bold: 'bold',
 }
 
+// ✅ MAPPING DE NIVELES DE HEADING SEGÚN MEJORES PRÁCTICAS
+// Asegura jerarquía semántica correcta
+const headingLevelMap = {
+  1: { as: 'h1', variant: 'display' },
+  2: { as: 'h2', variant: 'heading' },
+  3: { as: 'h3', variant: 'title' },
+  4: { as: 'h4', variant: 'subtitle' },
+  5: { as: 'h5', variant: 'body', weight: 'semibold' },
+  6: { as: 'h6', variant: 'caption', weight: 'semibold' },
+} as const
+
 export function Typography({
   children,
   variant = 'body',
   size,
   weight,
-  color = 'primary',
+  color, // ✅ Now accepts any Chakra color token
+  textAlign,
+  textTransform,
+  textDecoration,
+  // 🔄 Backward compatibility props
   align,
   transform,
   decoration,
   truncate,
   noWrap,
   as,
+  level,
   className,
   onClick,
+  style,
   ...rest
 }: TypographyProps & Record<string, any>) {
-  const variantProps = variantStyles[variant] || {}
+  // ✅ Manejo inteligente de niveles de heading
+  let resolvedVariant = variant
+  let resolvedAs = as
+  let resolvedWeight = weight
+  
+  if (level) {
+    const levelConfig = headingLevelMap[level]
+    resolvedVariant = levelConfig.variant as typeof variant
+    resolvedAs = levelConfig.as as typeof as
+    resolvedWeight = weight || levelConfig.weight || undefined
+  }
+  
+  const variantProps = variantStyles[resolvedVariant] || {}
   
   return (
     <Text
-      as={as}
+      as={resolvedAs}
       {...variantProps}
       fontSize={size || variantProps.fontSize}
-      fontWeight={weight ? weightMap[weight] : variantProps.fontWeight}
-      color={colorMap[color]}
-      textAlign={align}
-      textTransform={transform}
-      textDecoration={decoration}
+      fontWeight={resolvedWeight ? weightMap[resolvedWeight] : variantProps.fontWeight}
+      color={color} // ✅ Pass directly to Chakra - accepts any token
+      textAlign={textAlign || align} // 🔄 Backward compatibility
+      textTransform={textTransform || transform} // 🔄 Backward compatibility
+      textDecoration={textDecoration || decoration} // 🔄 Backward compatibility
       truncate={truncate}
-      noOfLines={noWrap ? 1 : undefined}
+      lineClamp={noWrap ? 1 : undefined}
       className={className}
       onClick={onClick}
+      style={style}
       {...rest}
     >
       {children}
@@ -153,5 +187,5 @@ export function Label({ children, ...props }: Omit<TypographyProps, 'variant'>) 
 }
 
 export function Code({ children, ...props }: Omit<TypographyProps, 'variant'>) {
-  return <Typography variant="code" as="code" {...props}>{children}</Typography>
+  return <Typography variant="code" as="span" {...props}>{children}</Typography>
 }

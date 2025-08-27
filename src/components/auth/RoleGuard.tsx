@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
-import { Card } from '@/shared/ui/Card';
-import { useRoleAccess } from '@/lib/auth/useRoleAccess';
-import type { UserRole, ModuleName, PermissionAction } from '@/lib/auth/types';
+import { CardWrapper } from '@/shared/ui/CardWrapper';
+import { useAuth } from '@/contexts/AuthContext';
+import type { UserRole, ModuleName, PermissionAction } from '@/contexts/AuthContext';
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -22,7 +22,7 @@ export function RoleGuard({
   requiredAction,
   fallback
 }: RoleGuardProps) {
-  const { hasRole, canAccessModule, canPerformAction, isAuthenticated } = useRoleAccess();
+  const { hasRole, canAccessModule, canPerformAction, isAuthenticated } = useAuth();
 
   // If user is not authenticated, show nothing (handled by ProtectedRoute)
   if (!isAuthenticated) {
@@ -54,7 +54,7 @@ export function RoleGuard({
 function AccessDenied({ reason }: { reason: string }) {
   return (
     <Box p={8}>
-      <Card>
+      <CardWrapper>
         <VStack gap={4} p={8}>
           <Text fontSize="6xl">🔒</Text>
           <Text fontSize="xl" fontWeight="bold" color="red.500">
@@ -64,7 +64,7 @@ function AccessDenied({ reason }: { reason: string }) {
             {reason}. Contacta a tu administrador si necesitas acceso.
           </Text>
         </VStack>
-      </Card>
+      </CardWrapper>
     </Box>
   );
 }
@@ -77,7 +77,7 @@ export function useRoleGuard(
   requiredModule?: ModuleName,
   requiredAction?: PermissionAction
 ) {
-  const { hasRole, canAccessModule, canPerformAction, isAuthenticated } = useRoleAccess();
+  const { hasRole, canAccessModule, canPerformAction, isAuthenticated } = useAuth();
 
   if (!isAuthenticated) return false;
 

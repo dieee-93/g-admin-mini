@@ -525,7 +525,7 @@ export const OfflineStatusBar = () => {
       left="0" 
       right="0" 
       zIndex={1002}
-      bg="green.100"
+      
       borderBottom="1px"
       borderColor="gray.200"
       p={2}

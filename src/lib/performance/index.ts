@@ -76,7 +76,7 @@ export {
   LazySchedulingPage,
   LazyFiscalPage,
   LazySettingsPage
-} from '../../modules/lazy/LazyModules';
+} from '../lazy';
 
 // ===== PERFORMANCE TYPES =====
 export interface PerformanceConfig {

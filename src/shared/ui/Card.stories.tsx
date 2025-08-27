@@ -68,23 +68,23 @@ export const Variants: Story = {
       <Card variant="elevated">
         <Typography variant="title">Elevated</Typography>
         <Typography variant="body" color="secondary">Con sombra elevada</Typography>
-      </Card>
+      </CardWrapper>
       <Card variant="outline">
         <Typography variant="title">Outline</Typography>
         <Typography variant="body" color="secondary">Con borde visible</Typography>
-      </Card>
+      </CardWrapper>
       <Card variant="subtle">
         <Typography variant="title">Subtle</Typography>
         <Typography variant="body" color="secondary">Fondo sutil</Typography>
-      </Card>
+      </CardWrapper>
       <Card variant="filled">
         <Typography variant="title">Filled</Typography>
         <Typography variant="body" color="secondary">Fondo relleno</Typography>
-      </Card>
+      </CardWrapper>
       <Card variant="ghost">
         <Typography variant="title">Ghost</Typography>
         <Typography variant="body" color="secondary">Sin fondo</Typography>
-      </Card>
+      </CardWrapper>
     </div>
   ),
 }
@@ -98,7 +98,7 @@ export const Sizes: Story = {
           <Typography variant="body" color="secondary">
             Esta tarjeta usa el tamaño {size}
           </Typography>
-        </Card>
+        </CardWrapper>
       ))}
     </Stack>
   ),
@@ -115,7 +115,7 @@ export const ColorPalettes: Story = {
           <Typography variant="body">
             Paleta de color {palette}
           </Typography>
-        </Card>
+        </CardWrapper>
       ))}
     </div>
   ),
@@ -141,7 +141,7 @@ export const CompoundPattern: Story = {
             <Button size="sm" variant="solid">Guardar</Button>
           </HStack>
         </Card.Footer>
-      </Card>
+      </CardWrapper>
 
       <Card variant="outline" padding="none">
         <Card.Header align="center">
@@ -159,7 +159,7 @@ export const CompoundPattern: Story = {
         <Card.Footer justify="center">
           <Button size="sm">Ver más</Button>
         </Card.Footer>
-      </Card>
+      </CardWrapper>
     </div>
   ),
 }
@@ -174,12 +174,12 @@ export const InteractiveCards: Story = {
       >
         <Typography variant="title">Tarjeta Interactiva</Typography>
         <Typography variant="body" color="secondary">Pasa el mouse por encima</Typography>
-      </Card>
+      </CardWrapper>
 
       <Card disabled variant="elevated">
         <Typography variant="title">Tarjeta Deshabilitada</Typography>
         <Typography variant="body" color="secondary">No se puede interactuar</Typography>
-      </Card>
+      </CardWrapper>
 
       <Card loading variant="elevated" />
     </div>
@@ -203,7 +203,7 @@ export const RealWorldExamples: Story = {
           </Typography>
           <HStack justify="space-between" style={{ marginTop: '12px' }}>
             <Typography variant="heading" color="accent">$99.99</Typography>
-            <Typography variant="caption" color="success">En stock</Typography>
+            <Typography variant="caption" >En stock</Typography>
           </HStack>
         </Card.Body>
         <Card.Footer>
@@ -211,7 +211,7 @@ export const RealWorldExamples: Story = {
             Agregar al carrito
           </Button>
         </Card.Footer>
-      </Card>
+      </CardWrapper>
 
       {/* Tarjeta de estadística */}
       <Card variant="filled" colorPalette="success">
@@ -233,7 +233,7 @@ export const RealWorldExamples: Story = {
           <Typography variant="display" color="inherit">1,247</Typography>
           <Typography variant="caption" color="inherit">+12% vs mes anterior</Typography>
         </Card.Body>
-      </Card>
+      </CardWrapper>
 
       {/* Tarjeta de perfil */}
       <Card variant="outline" padding="none">
@@ -267,7 +267,7 @@ export const RealWorldExamples: Story = {
           <Button size="sm" variant="outline">Ver perfil</Button>
           <Button size="sm" variant="ghost" colorPalette="error">Desactivar</Button>
         </Card.Footer>
-      </Card>
+      </CardWrapper>
     </div>
   ),
 }

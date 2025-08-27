@@ -26,65 +26,14 @@ export const CODE_SPLITTING_CONFIG = {
 
 // Lazy-loaded large components with proper chunking
 export const lazyComponents = {
-  // Materials module (52KB split into chunks)
+  // Materials module - Updated paths for route-based architecture v4.0
   OfflineMaterialsPage: createLazyRoute(
-    () => import('@/modules/materials/components/LazyOfflineMaterialsPage'),
+    () => import('@/pages/admin/materials/components/LazyOfflineMaterialsPage'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.MATERIALS
   ),
   
-  MaterialsHeader: createLazyFeature(
-    () => import('@/modules/materials/components/OfflineMaterialsPageHeader'),
-    'materials-header'
-  ),
-  
-  MaterialsGrid: createLazyFeature(
-    () => import('@/modules/materials/components/MaterialsInventoryGrid'),
-    'materials-grid'
-  ),
-  
-  // Analytics module (56KB split into chunks) 
-  CrossModuleAnalytics: createLazyRoute(
-    () => import('@/modules/dashboard/components/business/LazyCrossModuleAnalytics'),
-    CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
-  ),
-  
-  CorrelationsView: createLazyFeature(
-    () => import('@/modules/dashboard/components/business/components/CorrelationsView'),
-    'analytics-correlations'
-  ),
-  
-  BottlenecksView: createLazyFeature(
-    () => import('@/modules/dashboard/components/business/components/BottlenecksView'),
-    'analytics-bottlenecks'
-  ),
-  
-  // Executive dashboard (54KB split into chunks)
-  ExecutiveDashboard: createLazyRoute(
-    () => import('@/modules/dashboard/components/business/LazyExecutiveDashboard'),
-    CODE_SPLITTING_CONFIG.CHUNK_NAMES.EXECUTIVE
-  ),
-  
-  ExecutiveKPIGrid: createLazyFeature(
-    () => import('@/modules/dashboard/components/business/components/ExecutiveKPIGrid'),
-    'executive-kpis'
-  ),
-  
-/*  
-  // Recipe form (50KB split into chunks)
-  RecipeForm: createLazyRoute(
-    () => import('@/tools/intelligence/ui/LazyRecipeForm'),
-    CODE_SPLITTING_CONFIG.CHUNK_NAMES.RECIPES
-  ),
-  
-  RecipeBasicForm: createLazyFeature(
-    () => import('@/tools/intelligence/ui/components/RecipeBasicForm'),
-    'recipe-basic-form'
-  ),
-  
-  RecipeAISuggestions: createLazyFeature(
-    () => import('@/tools/intelligence/ui/components/RecipeAISuggestions'),
-    'recipe-ai-suggestions'
-  ) */
+  // Note: Other components temporarily disabled during migration
+  // TODO: Update remaining components to new route-based paths
 };
 
 // Performance monitoring for code splitting

@@ -18,7 +18,7 @@ export function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
   const { isMobile } = useNavigation();
 
   return (
-    <Box w="100%" minH="100vh" bg={{ base: "gray.50", _dark: "gray.900" }}>
+    <Box w="100%" minH="100vh" >
       {/* ✅ Header universal - aparece en ambos layouts */}
       <Header />
       

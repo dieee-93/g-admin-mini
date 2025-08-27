@@ -1,107 +1,119 @@
-import { VStack as ChakraVStack, HStack as ChakraHStack, Box } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import { 
+  VStack as ChakraVStack, 
+  HStack as ChakraHStack, 
+  Stack as ChakraStack 
+} from '@chakra-ui/react'
+import type { ReactNode, CSSProperties } from 'react'
+
+// Responsive types for Chakra UI v3 - based on official documentation
+type ResponsiveValue<T> = T | { base?: T; sm?: T; md?: T; lg?: T; xl?: T; '2xl'?: T }
 
 interface StackProps {
   children: ReactNode
-  direction?: 'row' | 'column' | 'row-reverse' | 'column-reverse'
+  direction?: ResponsiveValue<'row' | 'column' | 'row-reverse' | 'column-reverse'>
+  gap?: ResponsiveValue<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>
+  align?: ResponsiveValue<'start' | 'center' | 'end' | 'stretch' | 'baseline'>
+  justify?: ResponsiveValue<'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly'>
+  wrap?: boolean
+  className?: string
+  width?: string
+  height?: string
+  style?: CSSProperties
+  [key: string]: any // Allow additional props
+}
+
+interface VStackProps {
+  children: ReactNode
+  gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
+  className?: string
+  width?: string
+  height?: string
+  style?: CSSProperties
+  [key: string]: any // Allow additional props
+}
+
+interface HStackProps {
+  children: ReactNode
   gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
   align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
   justify?: 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly'
   wrap?: boolean
-  divider?: ReactNode
-  spacing?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' // Legacy support
-  width?: 'auto' | 'full' | 'fit'
-  height?: 'auto' | 'full' | 'fit'
   className?: string
+  width?: string
+  height?: string
+  style?: CSSProperties
+  [key: string]: any // Allow additional props
 }
 
-const gapMap = {
-  none: 0,
-  xs: 'xs',
-  sm: 'sm',
-  md: 'md',
-  lg: 'lg',
-  xl: 'xl',
-  '2xl': '2xl',
+interface ClusterProps {
+  children: ReactNode
+  gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  align?: 'start' | 'center' | 'end' | 'stretch'
+  justify?: 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly'
+  className?: string
+  style?: CSSProperties
+  [key: string]: any // Allow additional props
 }
 
-const alignMap = {
-  start: 'flex-start',
-  center: 'center',
-  end: 'flex-end',
-  stretch: 'stretch',
-  baseline: 'baseline',
+interface CenterProps {
+  children: ReactNode
+  className?: string
+  style?: CSSProperties
+  [key: string]: any // Allow additional props
 }
 
-const justifyMap = {
-  start: 'flex-start',
-  center: 'center',
-  end: 'flex-end',
-  'space-between': 'space-between',
-  'space-around': 'space-around',
-  'space-evenly': 'space-evenly',
-}
-
-const widthMap = {
-  auto: 'auto',
-  full: 'full',
-  fit: 'fit-content',
-}
-
-const heightMap = {
-  auto: 'auto',
-  full: 'full',
-  fit: 'fit-content',
-}
-
+// Main Stack component with responsive direction support
 export function Stack({
   children,
   direction = 'column',
-  gap = 'md',
+  gap = 'md', // ✅ MEJORADO: 16px → 24px para mejor respiración
   align = 'stretch',
   justify = 'start',
   wrap = false,
-  divider,
-  spacing, // Legacy support - maps to gap
+  className,
   width,
   height,
-  className,
+  style,
   ...rest
-}: StackProps & Record<string, any>) {
-  const actualGap = spacing || gap // Legacy support
-  
-  // Si direction es row o row-reverse, usar HStack
-  if (direction === 'row' || direction === 'row-reverse') {
-    return (
-      <ChakraHStack
-        gap={gapMap[actualGap]}
-        align={alignMap[align]}
-        justify={justifyMap[justify]}
-        wrap={wrap ? 'wrap' : 'nowrap'}
-        flexDirection={direction}
-        separator={divider}
-        width={width ? widthMap[width] : undefined}
-        height={height ? heightMap[height] : undefined}
-        className={className}
-        {...rest}
-      >
-        {children}
-      </ChakraHStack>
-    )
-  }
-  
-  // Si direction es column o column-reverse, usar VStack
+}: StackProps) {
+  return (
+    <ChakraStack
+      direction={direction}
+      gap={gap}
+      align={align}
+      justify={justify}
+      wrap={wrap ? 'wrap' : 'nowrap'}
+      className={className}
+      w={width}
+      h={height}
+      style={style}
+      {...rest}
+    >
+      {children}
+    </ChakraStack>
+  )
+}
+
+// VStack component
+export function VStack({
+  children,
+  gap = 'md', // ✅ MEJORADO: 16px → 24px para mejor respiración
+  align = 'stretch',
+  className,
+  width,
+  height,
+  style,
+  ...rest
+}: VStackProps) {
   return (
     <ChakraVStack
-      gap={gapMap[actualGap]}
-      align={alignMap[align]}
-      justify={justifyMap[justify]}
-      wrap={wrap ? 'wrap' : 'nowrap'}
-      flexDirection={direction}
-      separator={divider}
-      width={width ? widthMap[width] : undefined}
-      height={height ? heightMap[height] : undefined}
+      gap={gap}
+      align={align}
       className={className}
+      w={width}
+      h={height}
+      style={style}
       {...rest}
     >
       {children}
@@ -109,58 +121,77 @@ export function Stack({
   )
 }
 
-// Componentes de conveniencia para casos específicos
-export function VStack({ children, ...props }: Omit<StackProps, 'direction'>) {
-  return <Stack direction="column" {...props}>{children}</Stack>
-}
-
-export function HStack({ children, ...props }: Omit<StackProps, 'direction'>) {
-  return <Stack direction="row" {...props}>{children}</Stack>
-}
-
-// Componente especializado para layouts complejos
-export function Cluster({
+// HStack component
+export function HStack({
   children,
-  gap = 'md',
-  justify = 'start',
+  gap = 'md', // ✅ MEJORADO: 16px → 24px para mejor respiración
   align = 'center',
+  justify = 'start',
+  wrap = false,
+  className,
+  width,
+  height,
+  style,
   ...rest
-}: Omit<StackProps, 'direction' | 'wrap'>) {
+}: HStackProps) {
   return (
-    <Box
-      display="flex"
-      flexWrap="wrap"
-      gap={gapMap[gap]}
-      justifyContent={justifyMap[justify]}
-      alignItems={alignMap[align]}
+    <ChakraHStack
+      gap={gap}
+      align={align}
+      justify={justify}
+      wrap={wrap ? 'wrap' : 'nowrap'}
+      className={className}
+      w={width}
+      h={height}
+      style={style}
       {...rest}
     >
       {children}
-    </Box>
+    </ChakraHStack>
   )
 }
 
-// Componente para centrar contenido
-export function Center({
+// Cluster for wrapping layouts
+export function Cluster({
   children,
-  width = 'full',
-  height = 'full',
+  gap = 'md', // ✅ MEJORADO: 16px → 24px para mejor respiración
+  align = 'center',
+  justify = 'start',
+  className,
+  style,
   ...rest
-}: {
-  children: ReactNode
-  width?: 'auto' | 'full' | 'fit'
-  height?: 'auto' | 'full' | 'fit'
-} & Record<string, any>) {
+}: ClusterProps) {
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      width={widthMap[width]}
-      height={heightMap[height]}
+    <ChakraHStack
+      gap={gap}
+      align={align}
+      justify={justify}
+      wrap="wrap"
+      className={className}
+      style={style}
       {...rest}
     >
       {children}
-    </Box>
+    </ChakraHStack>
+  )
+}
+
+// Center component
+export function Center({
+  children,
+  className,
+  style,
+  ...rest
+}: CenterProps) {
+  return (
+    <ChakraVStack
+      justify="center"
+      align="center"
+      className={className}
+      style={style}
+      {...rest}
+    >
+      {children}
+    </ChakraVStack>
   )
 }

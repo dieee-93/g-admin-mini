@@ -16,10 +16,10 @@ import {
   isMeasurable,
   isCountable,
   isElaborated
-} from '../modules/materials/types';
+} from '../pages/admin/materials/types';
 
 // Import centralized utilities
-import { StockCalculations } from '../modules/materials/utils/stockCalculations';
+import { StockCalculations } from '../pages/admin/materials/utils/stockCalculations';
 
 export interface MaterialsFilters {
   type: 'all' | ItemType;
@@ -159,7 +159,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             set({ loading: true, error: null });
 
             // Import normalizer for type mapping
-            const { MaterialsNormalizer } = await import('../modules/materials/services/materialsNormalizer');
+            const { MaterialsNormalizer } = await import('../pages/admin/materials/services/materialsNormalizer');
 
             // Map TypeScript type to API type
             const apiType = MaterialsNormalizer.mapItemTypeToApiType(itemData.type, itemData.category);
@@ -197,12 +197,12 @@ export const useMaterialsStore = create<MaterialsState>()(
             };
 
             // Add to database using inventoryApi
-            const { inventoryApi } = await import('../modules/materials/data/inventoryApi');
+            const { inventoryApi } = await import('../pages/admin/materials/services/inventoryApi');
             const createdItem = await inventoryApi.createItem(apiItem);
 
             // Handle supplier and stock entry creation if supplier data provided
             if (itemData.supplier && (itemData.initial_stock || 0) > 0) {
-              const { suppliersApi } = await import('../modules/materials/data/suppliersApi');
+              const { suppliersApi } = await import('../pages/admin/materials/services/suppliersApi');
               
               let supplierId: string | undefined = itemData.supplier.supplier_id;
               

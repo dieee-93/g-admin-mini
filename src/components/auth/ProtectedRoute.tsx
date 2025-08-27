@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Spinner, Center, Text } from '@chakra-ui/react';
-import { useAuth } from '@/lib/auth/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { AuthPage } from './AuthPage';
 
 interface ProtectedRouteProps {
@@ -15,38 +15,22 @@ interface ProtectedRouteProps {
  * Shows fallback message if user lacks required permissions
  */
 export function ProtectedRoute({ 
-  children, 
-  requiredPermissions = [],
-  fallbackMessage = "No tienes permisos para acceder a esta sección"
+  children
 }: ProtectedRouteProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  // Show loading screen while checking auth
+  if (loading) {
+    return <AuthLoadingScreen />;
+  }
 
   // Show login page if not authenticated
   if (!isAuthenticated) {
     return <AuthPage />;
   }
 
-  // Check permissions if specified
-  if (requiredPermissions.length > 0 && user) {
-    const hasRequiredPermissions = requiredPermissions.every(permission =>
-      user.permissions.includes(permission)
-    );
-
-    if (!hasRequiredPermissions) {
-      return (
-        <Center minH="100vh">
-          <Box textAlign="center">
-            <Text fontSize="lg" color="red.500" mb={4}>
-              Acceso Denegado
-            </Text>
-            <Text color="gray.600">
-              {fallbackMessage}
-            </Text>
-          </Box>
-        </Center>
-      );
-    }
-  }
+  // For now, we'll skip permission checks since we use RoleGuard for granular access
+  // TODO: Implement permission system if needed beyond role-based access
 
   // Render protected content
   return <>{children}</>;

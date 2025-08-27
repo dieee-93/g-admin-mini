@@ -1,12 +1,11 @@
 import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Card,
+  Stack,
+  Typography,
+  CardWrapper,
   Button,
-  Badge
-} from '@chakra-ui/react';
+  Badge,
+  Icon
+} from '@/shared/ui';
 import { 
   ArrowTrendingUpIcon, 
   ArrowTrendingDownIcon,
@@ -23,11 +22,11 @@ interface HeroMetricCardProps {
     type: 'increase' | 'decrease' | 'neutral';
   };
   icon: React.ComponentType<any>;
-  iconColor: string;
-  iconBg: string;
+  iconColor?: string;
+  iconBg?: string;
   status?: {
     text: string;
-    color: string;
+    color: 'gray' | 'brand' | 'success' | 'warning' | 'error' | 'info';
   };
   actions?: {
     primary?: {
@@ -46,7 +45,7 @@ export function HeroMetricCard({
   title,
   value,
   change,
-  icon: Icon,
+  icon: IconComponent,
   iconColor,
   iconBg,
   status,
@@ -63,121 +62,115 @@ export function HeroMetricCard({
   const getTrendIcon = () => {
     if (!change) return null;
     
-    return change.type === 'increase' ? (
-      <ArrowTrendingUpIcon style={{ width: '20px', height: '20px' }} />
-    ) : change.type === 'decrease' ? (
-      <ArrowTrendingDownIcon style={{ width: '20px', height: '20px' }} />
-    ) : null;
+    return change.type === 'increase' ? ArrowTrendingUpIcon : 
+           change.type === 'decrease' ? ArrowTrendingDownIcon : null;
   };
 
-  const getTrendColor = () => {
-    if (!change) return 'gray.600';
-    return change.type === 'increase' ? 'green.600' : 
-           change.type === 'decrease' ? 'red.600' : 'gray.600';
+  const getTrendColorPalette = () => {
+    if (!change) return 'secondary';
+    return change.type === 'increase' ? 'success' : 
+           change.type === 'decrease' ? 'error' : 'secondary';
   };
 
   return (
-    <Card.Root 
-      variant="elevated" 
-      bg={{ base: "white", _dark: "gray.800" }}
-      border="1px solid"
-      borderColor={{ base: "gray.200", _dark: "gray.700" }}
-      shadow="lg"
-      h="auto"
-      minH="140px"
-      maxH="180px"
-      _hover={{ shadow: "xl" }}
-      transition="all 0.2s"
-    >
-      <Card.Body p="4">
-        <VStack align="stretch" gap="3" h="full">
-          {/* Header con ícono y título */}
-          <HStack justify="space-between" align="start">
-            <VStack align="start" gap="1">
-              <HStack gap="3" align="center">
-                <Box p="3" bg={iconBg} borderRadius="lg" shadow="sm">
-                  <Icon style={{ width: '28px', height: '28px', color: iconColor }} />
-                </Box>
-                <Text fontSize="lg" fontWeight="semibold" color={{ base: "gray.700", _dark: "gray.200" }}>
-                  {title}
-                </Text>
-              </HStack>
-            </VStack>
-            
-            {status && (
-              <Badge 
-                colorPalette={status.color} 
-                variant="surface"
-                fontSize="xs"
-              >
-                {status.text}
-              </Badge>
-            )}
-          </HStack>
-
-          {/* Valor principal */}
-          <VStack align="start" gap="2" flex="1">
-            <Text 
-              fontSize="3xl" 
-              fontWeight="bold" 
-              color={{ base: "gray.900", _dark: "gray.50" }}
-              lineHeight="1"
+    <CardWrapper>
+      <Stack gap="md" align="stretch">
+        {/* Header con ícono y título */}
+        <Stack direction="row" justify="space-between" align="start">
+          <Stack gap="xs" align="start">
+            <Stack direction="row" gap="sm" align="center">
+              <Icon 
+                icon={IconComponent} 
+                size="lg" 
+                color={iconColor || "theme.500"} 
+              />
+              <Typography variant="heading" size="lg" weight="semibold" color="primary">
+                {title}
+              </Typography>
+            </Stack>
+          </Stack>
+          
+          {status && (
+            <Badge 
+              colorPalette={status.color} 
+              variant="surface"
             >
-              {formatValue(value)}
-            </Text>
-            
-            {/* Cambio/Tendencia */}
-            {change && (
-              <HStack gap="2" align="center">
-                <HStack gap="1" color={getTrendColor()}>
-                  {getTrendIcon()}
-                  <Text fontSize="sm" fontWeight="medium">
-                    {change.type === 'increase' ? '+' : change.type === 'decrease' ? '-' : ''}
-                    {Math.abs(change.value)}%
-                  </Text>
-                </HStack>
-                <Text fontSize="sm" color={{ base: "gray.500", _dark: "gray.400" }}>
-                  vs {change.period}
-                </Text>
-              </HStack>
-            )}
-          </VStack>
-
-          {/* Acciones */}
-          {actions && (
-            <HStack gap="2" mt="auto" flexWrap="wrap">
-              {actions.primary && (
-                <Button
-                  variant="solid"
-                  size="xs"
-                  colorPalette="blue"
-                  onClick={actions.primary.onClick}
-                  minH="6"
-                  px="2"
-                  fontSize="xs"
-                >
-                  <EyeIcon style={{ width: '14px', height: '14px' }} />
-                  <Text ml="1">{actions.primary.label}</Text>
-                </Button>
-              )}
-              {actions.secondary && (
-                <Button
-                  variant="outline"
-                  size="xs"
-                  colorPalette="gray"
-                  onClick={actions.secondary.onClick}
-                  minH="6"
-                  px="2"
-                  fontSize="xs"
-                >
-                  <ChartBarIcon style={{ width: '14px', height: '14px' }} />
-                  <Text ml="1">{actions.secondary.label}</Text>
-                </Button>
-              )}
-            </HStack>
+              {status.text}
+            </Badge>
           )}
-        </VStack>
-      </Card.Body>
-    </Card.Root>
+        </Stack>
+
+        {/* Valor principal */}
+        <Stack gap="sm" align="start">
+          <Typography 
+            variant="heading" 
+            size="3xl" 
+            weight="bold" 
+            color="primary"
+          >
+            {formatValue(value)}
+          </Typography>
+          
+          {/* Cambio/Tendencia */}
+          {change && (
+            <Stack direction="row" gap="sm" align="center">
+              <Stack direction="row" gap="xs" align="center">
+                {getTrendIcon() && (
+                  <Icon 
+                    icon={getTrendIcon()!} 
+                    size="sm" 
+                    color={`${getTrendColorPalette()}.500`} 
+                  />
+                )}
+                <Typography 
+                  variant="body" 
+                  size="sm" 
+                  weight="medium" 
+                  color={getTrendColorPalette()}
+                >
+                  {change.type === 'increase' ? '+' : change.type === 'decrease' ? '-' : ''}
+                  {Math.abs(change.value)}%
+                </Typography>
+              </Stack>
+              <Typography variant="body" size="sm" color="secondary">
+                vs {change.period}
+              </Typography>
+            </Stack>
+          )}
+        </Stack>
+
+        {/* Acciones */}
+        {actions && (
+          <Stack direction="row" gap="sm" wrap>
+            {actions.primary && (
+              <Button
+                variant="solid"
+                size="sm"
+                colorPalette="info"
+                onClick={actions.primary.onClick}
+              >
+                <Stack direction="row" align="center" gap="xs">
+                  <Icon icon={EyeIcon} size="xs" />
+                  <Typography variant="body" size="xs">{actions.primary.label}</Typography>
+                </Stack>
+              </Button>
+            )}
+            {actions.secondary && (
+              <Button
+                variant="outline"
+                size="sm"
+                colorPalette="gray"
+                onClick={actions.secondary.onClick}
+              >
+                <Stack direction="row" align="center" gap="xs">
+                  <Icon icon={ChartBarIcon} size="xs" />
+                  <Typography variant="body" size="xs">{actions.secondary.label}</Typography>
+                </Stack>
+              </Button>
+            )}
+          </Stack>
+        )}
+      </Stack>
+    </CardWrapper>
   );
 }

@@ -4,6 +4,7 @@
 import React from 'react';
 import { Box, Text } from '@chakra-ui/react';
 
+
 interface CircularProgressProps {
   value: number;
   size?: string | number;
@@ -13,40 +14,30 @@ interface CircularProgressProps {
   children?: React.ReactNode;
   showValueText?: boolean;
   valueText?: string;
+  colorPalette?: 'blue' | 'green' | 'red' | 'yellow' | 'purple' | 'orange' | 'pink';
 }
 
 export function CircularProgress({
   value,
   size = "60px",
-  color = "blue.500",
-  trackColor = "gray.200",
+  color,
+  trackColor,
   strokeWidth = 4,
   children,
   showValueText = false,
-  valueText
+  valueText,
+  colorPalette = 'blue'
 }: CircularProgressProps) {
+
   const normalizedValue = Math.min(Math.max(value, 0), 100);
   const sizeValue = typeof size === 'string' ? parseInt(size) : size;
   const radius = (sizeValue - strokeWidth * 2) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (normalizedValue / 100) * circumference;
   
-  // Convert color to actual CSS value
-  const getColorValue = (colorProp: string) => {
-    if (colorProp.includes('.')) {
-      // Handle Chakra colors like 'blue.500'
-      const [colorName, shade] = colorProp.split('.');
-      const colorMap: Record<string, Record<string, string>> = {
-        blue: { '500': '#3182ce' },
-        green: { '500': '#38a169' },
-        red: { '500': '#e53e3e' },
-        yellow: { '500': '#d69e2e' },
-        gray: { '200': '#e2e8f0', '500': '#718096' },
-      };
-      return colorMap[colorName]?.[shade] || '#3182ce';
-    }
-    return colorProp;
-  };
+  // ✅ Use explicit colors - let Chakra's colorPalette handle theming automatically if provided
+  const progressColor = color || 'var(--chakra-colors-blue-500)' // Default fallback
+  const resolvedTrackColor = trackColor || 'var(--chakra-colors-gray-200)'
 
   return (
     <Box position="relative" display="inline-flex" alignItems="center" justifyContent="center">
@@ -60,7 +51,7 @@ export function CircularProgress({
           cx={sizeValue / 2}
           cy={sizeValue / 2}
           r={radius}
-          stroke={getColorValue(trackColor)}
+          stroke={resolvedTrackColor}
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -70,7 +61,7 @@ export function CircularProgress({
           cx={sizeValue / 2}
           cy={sizeValue / 2}
           r={radius}
-          stroke={getColorValue(color)}
+          stroke={progressColor}
           strokeWidth={strokeWidth}
           fill="none"
           strokeLinecap="round"
@@ -91,7 +82,7 @@ export function CircularProgress({
         textAlign="center"
       >
         {children || (showValueText && (
-          <Text fontSize="sm" fontWeight="bold">
+          <Text fontSize="sm" fontWeight="bold" color={themeTextColor}>
             {valueText || `${Math.round(normalizedValue)}%`}
           </Text>
         ))}
@@ -103,15 +94,27 @@ export function CircularProgress({
 // Compatibility components for drop-in replacement
 export const CircularProgressRoot = CircularProgress;
 
-export const CircularProgressValueText: React.FC<{ children?: React.ReactNode; fontSize?: string; fontWeight?: string; color?: string }> = ({ 
+export const CircularProgressValueText: React.FC<{ 
+  children?: React.ReactNode; 
+  fontSize?: string; 
+  fontWeight?: string; 
+  color?: string;
+  useTheme?: boolean; // 🆕 Option to use theme colors
+}> = ({ 
   children, 
   fontSize = "sm", 
   fontWeight = "bold",
-  color = "inherit" 
-}) => (
-  <Text fontSize={fontSize} fontWeight={fontWeight} color={color}>
-    {children}
-  </Text>
-);
+  color = "inherit",
+  useTheme = false
+}) => {
+
+  const resolvedColor = useTheme ? 'inherit' : color
+  
+  return (
+    <Text fontSize={fontSize} fontWeight={fontWeight} color={resolvedColor}>
+      {children}
+    </Text>
+  )
+}
 
 export const CircularProgressCircle: React.FC<{ stroke?: string }> = () => null; // Placeholder for compatibility

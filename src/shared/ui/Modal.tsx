@@ -1,5 +1,6 @@
 import { DialogRoot, DialogTrigger, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle, DialogDescription, DialogCloseTrigger, Portal } from '@chakra-ui/react'
 import { ReactNode } from 'react'
+import { withDisplayName } from './utils/compoundUtils'
 
 interface ModalProps {
   children: ReactNode
@@ -245,7 +246,6 @@ export function ModalDescription({
 }: ModalDescriptionProps) {
   return (
     <DialogDescription 
-      color={{ base: 'gray.600', _dark: 'gray.400' }}
       fontSize="sm"
       className={className}
       {...rest}
@@ -269,6 +269,16 @@ export function ModalClose({
     </DialogCloseTrigger>
   )
 }
+
+// Apply displayNames for compound detection
+withDisplayName(ModalTrigger, 'ModalTrigger')
+withDisplayName(ModalContent, 'ModalContent')
+withDisplayName(ModalHeader, 'ModalHeader')
+withDisplayName(ModalBody, 'ModalBody')
+withDisplayName(ModalFooter, 'ModalFooter')
+withDisplayName(ModalTitle, 'ModalTitle')
+withDisplayName(ModalDescription, 'ModalDescription')
+withDisplayName(ModalClose, 'ModalClose')
 
 // Compound component pattern
 Modal.Trigger = ModalTrigger

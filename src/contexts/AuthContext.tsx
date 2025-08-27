@@ -6,6 +6,44 @@ import type { User, Session } from '@supabase/supabase-js';
 // User role type
 export type UserRole = 'CLIENTE' | 'OPERADOR' | 'SUPERVISOR' | 'ADMINISTRADOR' | 'SUPER_ADMIN';
 
+// Module names for access control
+export type ModuleName = 
+  | 'dashboard'
+  | 'operations' 
+  | 'sales'
+  | 'materials'
+  | 'products'
+  | 'staff'
+  | 'scheduling'
+  | 'fiscal'
+  | 'settings'
+  | 'customer_portal'
+  | 'customer_menu'
+  | 'my_orders';
+
+// Permission actions
+export type PermissionAction = 
+  | 'read'
+  | 'create' 
+  | 'update'
+  | 'delete'
+  | 'manage';
+
+// Role hierarchy and permissions (embedded directly for self-contained context)
+const MODULE_PERMISSIONS: Record<UserRole, ModuleName[]> = {
+  'CLIENTE': ['customer_portal', 'customer_menu', 'my_orders', 'settings'],
+  'OPERADOR': ['dashboard', 'sales', 'operations', 'materials', 'products'],
+  'SUPERVISOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling'],
+  'ADMINISTRADOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings'],
+  'SUPER_ADMIN': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings']
+};
+
+// Permission utilities (embedded for self-contained context)
+const canAccessModule = (userRole: UserRole | undefined, module: ModuleName): boolean => {
+  if (!userRole) return false;
+  return MODULE_PERMISSIONS[userRole]?.includes(module) ?? false;
+};
+
 // JWT Custom Claims interface
 interface CustomClaims {
   user_role?: UserRole;
@@ -37,6 +75,19 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isRole: (role: UserRole | UserRole[]) => boolean;
   hasRole: (roles: UserRole[]) => boolean;
+  // Role access methods (migrated from useRoleAccess)
+  canAccessModule: (module: ModuleName) => boolean;
+  canPerformAction: (module: ModuleName, action: PermissionAction) => boolean;
+  isCliente: () => boolean;
+  isOperador: () => boolean;
+  isSupervisor: () => boolean;
+  isAdministrador: () => boolean;
+  isSuperAdmin: () => boolean;
+  canManageUsers: () => boolean;
+  canManageSettings: () => boolean;
+  canViewReports: () => boolean;
+  canManageInventory: () => boolean;
+  canManageStaff: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -303,6 +354,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return isRole(roles);
   };
 
+  // Role access methods implementation
+  const canAccessModuleImpl = (module: ModuleName): boolean => {
+    return canAccessModule(user?.role, module);
+  };
+
+  const canPerformActionImpl = (module: ModuleName): boolean => {
+    // For now, if user can access module, they can perform basic actions
+    // This can be expanded later for granular permissions
+    return canAccessModule(user?.role, module);
+  };
+
+  const isClienteImpl = (): boolean => user?.role === 'CLIENTE';
+  const isOperadorImpl = (): boolean => user?.role === 'OPERADOR';
+  const isSupervisorImpl = (): boolean => user?.role === 'SUPERVISOR';
+  const isAdministradorImpl = (): boolean => user?.role === 'ADMINISTRADOR';
+  const isSuperAdminImpl = (): boolean => user?.role === 'SUPER_ADMIN';
+
+  const canManageUsersImpl = (): boolean => hasRole(['SUPER_ADMIN']);
+  const canManageSettingsImpl = (): boolean => hasRole(['ADMINISTRADOR', 'SUPER_ADMIN']);
+  const canViewReportsImpl = (): boolean => hasRole(['SUPERVISOR', 'ADMINISTRADOR', 'SUPER_ADMIN']);
+  const canManageInventoryImpl = (): boolean => hasRole(['SUPERVISOR', 'ADMINISTRADOR', 'SUPER_ADMIN']);
+  const canManageStaffImpl = (): boolean => hasRole(['SUPERVISOR', 'ADMINISTRADOR', 'SUPER_ADMIN']);
+
   const contextValue: AuthContextType = {
     user,
     session,
@@ -314,6 +388,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated,
     isRole,
     hasRole,
+    // Role access methods
+    canAccessModule: canAccessModuleImpl,
+    canPerformAction: canPerformActionImpl,
+    isCliente: isClienteImpl,
+    isOperador: isOperadorImpl,
+    isSupervisor: isSupervisorImpl,
+    isAdministrador: isAdministradorImpl,
+    isSuperAdmin: isSuperAdminImpl,
+    canManageUsers: canManageUsersImpl,
+    canManageSettings: canManageSettingsImpl,
+    canViewReports: canViewReportsImpl,
+    canManageInventory: canManageInventoryImpl,
+    canManageStaff: canManageStaffImpl,
   };
 
   return (

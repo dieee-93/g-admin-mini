@@ -15,7 +15,6 @@ import {
 import { useState } from 'react';
 import { useRecipes, useRecipeOperations } from '../hooks/useRecipes';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { LoadingSpinner } from '@/modules/dashboard/common/LoadingSpinner';
 import { type RecipeViability, type RecipeExecution } from '../types';
 
 export function RecipeList() {
@@ -31,7 +30,7 @@ export function RecipeList() {
   const [showExecuteForm, setShowExecuteForm] = useState(false);
   const [showExecutionResult, setShowExecutionResult] = useState(false);
 
-  if (loadingCosts) return <LoadingSpinner message="Cargando recetas..." />;
+  if (loadingCosts) return <Spinner />;
 
   const formatCurrency = (amount: number | null | undefined) => {
     if (amount === null || amount === undefined || isNaN(amount)) {
@@ -304,7 +303,7 @@ export function RecipeList() {
 
           {/* Panel de Ejecución */}
           {showExecuteForm && selectedRecipeData && (
-            <Box borderWidth="1px" borderRadius="md" p={4} bg="green.50">
+            <Box borderWidth="1px" borderRadius="md" p={4} >
               <VStack gap="4" align="stretch">
                 <HStack justify="space-between">
                   <Text fontWeight="bold" color="green.700">
@@ -352,7 +351,7 @@ export function RecipeList() {
 
           {/* Panel de Resultado */}
           {showExecutionResult && executionData && (
-            <Box borderWidth="1px" borderRadius="md" p={4} bg="green.50">
+            <Box borderWidth="1px" borderRadius="md" p={4} >
               <VStack gap="4" align="stretch">
                 <HStack justify="space-between">
                   <Text fontWeight="bold" color="green.700">

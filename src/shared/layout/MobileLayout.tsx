@@ -17,7 +17,8 @@ export function MobileLayout({ children }: MobileLayoutProps) {
       w="100%"
       minH="100vh"
       maxH="100vh"
-      bg={{ base: "gray.50", _dark: "gray.900" }}
+      bg="bg.canvas"
+      color="text.primary"
       position="relative"
       overflow="hidden"
       display="flex"
@@ -33,7 +34,8 @@ export function MobileLayout({ children }: MobileLayoutProps) {
         px="4"
         py="4"
         pb="90px"
-        bg={{ base: "gray.50", _dark: "gray.900" }}
+        bg="bg.surface"
+        color="text.primary"
         w="100%"
       >
         {children}

@@ -7,10 +7,10 @@ import {
   Separator,
   Heading,
 } from '@chakra-ui/react';
-import { Card } from '@/shared/ui/Card';
+import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { Button } from '@/shared/ui/Button';
 import { InputField } from '@/shared/ui/InputField';
-import { useAuth } from '@/lib/auth/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface RegisterFormProps {
   onSwitchToLogin?: () => void;
@@ -80,7 +80,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   };
 
   return (
-    <Card>
+    <CardWrapper>
       <Box maxW="md" mx="auto" mt={8}>
         <VStack gap={6}>
           <VStack gap={2}>
@@ -182,6 +182,6 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
           </form>
         </VStack>
       </Box>
-    </Card>
+    </CardWrapper>
   );
 }

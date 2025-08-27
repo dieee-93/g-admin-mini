@@ -3,11 +3,11 @@ import { Box, VStack, HStack, Text, Button, Grid } from '@chakra-ui/react';
 import { ShoppingCartIcon, ClockIcon, HeartIcon, UserIcon } from '@heroicons/react/24/outline';
 import { Card } from '@/shared/ui/Card';
 import { RoleGuard } from '@/components/auth/RoleGuard';
-import { useRoleAccess } from '@/lib/auth/useRoleAccess';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 export function CustomerPortal() {
-  const { currentUser, canPlaceOrders, canViewOwnOrders } = useRoleAccess();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -15,51 +15,47 @@ export function CustomerPortal() {
       <Box p={6}>
         <VStack gap={6} align="stretch">
           {/* Bienvenida */}
-          <Card>
+          <CardWrapper>
             <VStack gap={4} p={6}>
               <UserIcon style={{ width: '64px', height: '64px', color: 'var(--colors-blue-500)' }} />
               <VStack gap={2}>
                 <Text fontSize="2xl" fontWeight="bold">
-                  ¡Bienvenido, {currentUser?.full_name || 'Cliente'}!
+                  ¡Bienvenido, {user?.user_metadata?.full_name || user?.email || 'Cliente'}!
                 </Text>
                 <Text color="gray.600" textAlign="center">
                   Explora nuestro menú, realiza pedidos y mantente al tanto de tus órdenes
                 </Text>
               </VStack>
             </VStack>
-          </Card>
+          </CardWrapper>
 
           {/* Acciones Rápidas */}
           <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={4}>
-            {canPlaceOrders() && (
-              <Card>
-                <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('/menu')}>
-                  <ShoppingCartIcon style={{ width: '48px', height: '48px', color: 'var(--colors-green-500)' }} />
-                  <VStack gap={2}>
-                    <Text fontSize="lg" fontWeight="bold">Ver Menú</Text>
-                    <Text fontSize="sm" color="gray.600" textAlign="center">
-                      Explora nuestros productos y realiza tu pedido
-                    </Text>
-                  </VStack>
+            <CardWrapper>
+              <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('/menu')}>
+                <ShoppingCartIcon style={{ width: '48px', height: '48px', color: 'var(--colors-green-500)' }} />
+                <VStack gap={2}>
+                  <Text fontSize="lg" fontWeight="bold">Ver Menú</Text>
+                  <Text fontSize="sm" color="gray.600" textAlign="center">
+                    Explora nuestros productos y realiza tu pedido
+                  </Text>
                 </VStack>
-              </Card>
-            )}
+              </VStack>
+            </CardWrapper>
 
-            {canViewOwnOrders() && (
-              <Card>
-                <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('/my-orders')}>
-                  <ClockIcon style={{ width: '48px', height: '48px', color: 'var(--colors-teal-500)' }} />
-                  <VStack gap={2}>
-                    <Text fontSize="lg" fontWeight="bold">Mis Pedidos</Text>
-                    <Text fontSize="sm" color="gray.600" textAlign="center">
-                      Revisa el estado de tus pedidos actuales e historial
-                    </Text>
-                  </VStack>
+            <CardWrapper>
+              <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('/my-orders')}>
+                <ClockIcon style={{ width: '48px', height: '48px', color: 'var(--colors-teal-500)' }} />
+                <VStack gap={2}>
+                  <Text fontSize="lg" fontWeight="bold">Mis Pedidos</Text>
+                  <Text fontSize="sm" color="gray.600" textAlign="center">
+                    Revisa el estado de tus pedidos actuales e historial
+                  </Text>
                 </VStack>
-              </Card>
-            )}
+              </VStack>
+            </CardWrapper>
 
-            <Card>
+            <CardWrapper>
               <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('/settings')}>
                 <HeartIcon style={{ width: '48px', height: '48px', color: 'var(--colors-pink-500)' }} />
                 <VStack gap={2}>
@@ -69,11 +65,11 @@ export function CustomerPortal() {
                   </Text>
                 </VStack>
               </VStack>
-            </Card>
+            </CardWrapper>
           </Grid>
 
           {/* Estadísticas del Cliente */}
-          <Card>
+          <CardWrapper>
             <VStack gap={4} p={6}>
               <Text fontSize="xl" fontWeight="bold">Tu Actividad</Text>
               <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={6} w="full">
@@ -91,10 +87,10 @@ export function CustomerPortal() {
                 </VStack>
               </Grid>
             </VStack>
-          </Card>
+          </CardWrapper>
 
           {/* Pedidos Recientes */}
-          <Card>
+          <CardWrapper>
             <VStack gap={4} p={6} align="stretch">
               <HStack justify="space-between">
                 <Text fontSize="xl" fontWeight="bold">Pedidos Recientes</Text>
@@ -132,7 +128,7 @@ export function CustomerPortal() {
                 </Box>
               </VStack>
             </VStack>
-          </Card>
+          </CardWrapper>
         </VStack>
       </Box>
     </RoleGuard>

@@ -17,8 +17,8 @@ import {
   UserIcon,
   ListBulletIcon
 } from '@heroicons/react/24/outline';
-import { useRoleAccess } from '@/lib/auth/useRoleAccess';
-import type { ModuleName } from '@/lib/auth/types';
+import { useAuth } from '@/contexts/AuthContext';
+import type { ModuleName } from '@/contexts/AuthContext';
 
 // ✅ Types definidos según arquitectura v2.0
 export interface NavigationSubModule {
@@ -66,6 +66,7 @@ export interface NavigationContextType {
   
   // Navigation methods
   navigate: (moduleId: string, subPath?: string) => void;
+  navigateToModule: (moduleId: string) => void; // ✅ Nueva función para navegación directa a páginas principales
   navigateBack: () => void;
   toggleModuleExpansion: (moduleId: string) => void;
   
@@ -125,14 +126,14 @@ const NAVIGATION_MODULES: NavigationModule[] = [
       {
         id: 'competitive-intelligence',
         title: 'Competitive Intelligence',
-        path: '/dashboard/competitive-intelligence',
+        path: '/admin/dashboard/competitive-intelligence',
         icon: ChartBarIcon,
         description: 'Market analysis and trends'
       },
       {
         id: 'custom-reporting',
         title: 'Custom Reporting',
-        path: '/dashboard/custom-reporting',
+        path: '/admin/dashboard/custom-reporting',
         icon: DocumentTextIcon,
         description: 'Generate custom reports'
       }
@@ -177,28 +178,28 @@ const NAVIGATION_MODULES: NavigationModule[] = [
       {
         id: 'inventory-management',
         title: 'Inventory Management',
-        path: '/materials/',
+        path: '/admin/materials/',
         icon: CubeIcon,
         description: 'Stock control and management'
       },
       {
         id: 'abc-analysis',
         title: 'ABC Analysis',
-        path: '/materials/abc-analysis',
+        path: '/admin/materials/abc-analysis',
         icon: ChartBarIcon,
         description: 'Product classification analysis'
       },
       {
         id: 'supply-chain',
         title: 'Supply Chain Intelligence',
-        path: '/materials/supply-chain',
+        path: '/admin/materials/supply-chain',
         icon: ChartBarIcon,
         description: 'Supply chain optimization'
       },
       {
         id: 'procurement',
         title: 'Procurement Intelligence',
-        path: '/materials/procurement',
+        path: '/admin/materials/procurement',
         icon: ChartBarIcon,
         description: 'Smart procurement decisions'
       }
@@ -217,21 +218,21 @@ const NAVIGATION_MODULES: NavigationModule[] = [
       {
         id: 'menu-engineering',
         title: 'Menu Engineering',
-        path: '/products/menu-engineering',
+        path: '/admin/products/menu-engineering',
         icon: CogIcon,
         description: 'Menu optimization and analysis'
       },
       {
         id: 'cost-analysis',
         title: 'Cost Analysis',
-        path: '/products/cost-analysis',
+        path: '/admin/products/cost-analysis',
         icon: ChartBarIcon,
         description: 'Product cost management'
       },
       {
         id: 'production-planning',
         title: 'Production Planning',
-        path: '/products/production-planning',
+        path: '/admin/products/production-planning',
         icon: CalendarDaysIcon,
         description: 'Production scheduling and planning'
       }
@@ -262,21 +263,21 @@ const NAVIGATION_MODULES: NavigationModule[] = [
       {
         id: 'staff-management',
         title: 'Staff Management',
-        path: '/staff/management',
+        path: '/admin/staff/management',
         icon: UserGroupIcon,
         description: 'Employee management'
       },
       {
         id: 'time-tracking',
         title: 'Time Tracking',
-        path: '/staff/time-tracking',
+        path: '/admin/staff/time-tracking',
         icon: ClockIcon,
         description: 'Work time management'
       },
       {
         id: 'training',
         title: 'Training & Development',
-        path: '/staff/training',
+        path: '/admin/staff/training',
         icon: WrenchScrewdriverIcon,
         description: 'Employee training programs'
       }
@@ -305,28 +306,28 @@ const NAVIGATION_MODULES: NavigationModule[] = [
       {
         id: 'business-profile',
         title: 'Business Profile',
-        path: '/settings/profile',
+        path: '/admin/settings/profile',
         icon: Cog6ToothIcon,
         description: 'Company information and settings'
       },
       {
         id: 'integrations',
         title: 'Integrations',
-        path: '/settings/integrations',
+        path: '/admin/settings/integrations',
         icon: WrenchScrewdriverIcon,
         description: 'External service integrations'
       },
       {
         id: 'diagnostics',
         title: 'System Diagnostics',
-        path: '/settings/diagnostics',
+        path: '/admin/settings/diagnostics',
         icon: ChartBarIcon,
         description: 'System health and diagnostics'
       },
       {
         id: 'reporting',
         title: 'Custom Reporting',
-        path: '/settings/reporting',
+        path: '/admin/settings/reporting',
         icon: DocumentTextIcon,
         description: 'Report configuration'
       }
@@ -618,7 +619,7 @@ interface NavigationProviderProps {
 export function NavigationProvider({ children }: NavigationProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { canAccessModule, isAuthenticated, isCliente } = useRoleAccess();
+  const { canAccessModule, isAuthenticated, isCliente } = useAuth();
   
   // ✅ Responsive state - Mobile-first approach según arquitectura
   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -676,7 +677,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(isTablet);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // ✅ Empezar colapsado por defecto
 
   // ✅ Derived state
   const showBottomNav = isMobile;
@@ -690,28 +691,28 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             id: 'executive-dashboard',
             label: 'Executive Dashboard',
             icon: ChartBarIcon,
-            action: () => navigate('/dashboard/executive'),
+            action: () => navigate('/admin/dashboard/executive'),
             color: 'purple'
           },
           {
             id: 'cross-analytics',
             label: 'Cross Analytics',
             icon: CogIcon,
-            action: () => navigate('/dashboard/cross-analytics'),
+            action: () => navigate('/admin/dashboard/cross-analytics'),
             color: 'blue'
           },
           {
             id: 'predictive-analytics',
             label: 'Predictive Analytics',
             icon: WrenchScrewdriverIcon,
-            action: () => navigate('/dashboard/predictive-analytics'),
+            action: () => navigate('/admin/dashboard/predictive-analytics'),
             color: 'orange'
           },
           {
             id: 'custom-reports',
             label: 'Custom Reports',
             icon: DocumentTextIcon,
-            action: () => navigate('/dashboard/custom-reports'),
+            action: () => navigate('/admin/dashboard/custom-reports'),
             color: 'green'
           }
         ];
@@ -721,21 +722,21 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             id: 'new-sale',
             label: 'Nueva Venta',
             icon: CurrencyDollarIcon,
-            action: () => navigate('/sales'),
+            action: () => navigate('/admin/sales'),
             color: 'teal'
           },
           {
             id: 'add-customer',
             label: 'Agregar Cliente',
             icon: UsersIcon,
-            action: () => navigate('/customers'),
+            action: () => navigate('/admin/customers'),
             color: 'pink'
           },
           {
             id: 'check-stock',
             label: 'Verificar Stock',
             icon: CubeIcon,
-            action: () => navigate('/materials'),
+            action: () => navigate('/admin/materials'),
             color: 'green'
           }
         ];
@@ -745,21 +746,21 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             id: 'add-stock',
             label: 'Agregar Stock',
             icon: CubeIcon,
-            action: () => navigate('/materials'),
+            action: () => navigate('/admin/materials'),
             color: 'green'
           },
           {
             id: 'adjust-stock',
             label: 'Ajustar Stock',
             icon: Cog6ToothIcon,
-            action: () => navigate('/materials'),
+            action: () => navigate('/admin/materials'),
             color: 'yellow'
           },
           {
             id: 'abc-analysis',
             label: 'ABC Analysis',
             icon: ChartBarIcon,
-            action: () => navigate('/materials/abc-analysis'),
+            action: () => navigate('/admin/materials/abc-analysis'),
             color: 'blue'
           }
         ];
@@ -769,14 +770,14 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             id: 'new-recipe',
             label: 'Nueva Receta',
             icon: CogIcon,
-            action: () => navigate('/dashboard/recipes'),
+            action: () => navigate('/admin/products/recipes'),
             color: 'purple'
           },
           {
             id: 'menu-engineering',
             label: 'Menu Engineering',
             icon: ChartBarIcon,
-            action: () => navigate('/products'),
+            action: () => navigate('/admin/products'),
             color: 'blue'
           }
         ];
@@ -912,14 +913,25 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
 
   // ✅ Navigation methods
   const handleNavigate = useCallback((moduleId: string, subPath?: string) => {
-    // Use appropriate modules based on user role
-    const availableModules = isCliente() ? CLIENT_NAVIGATION_MODULES : NAVIGATION_MODULES;
-    const module = availableModules.find(m => m.id === moduleId);
+    // Use current modules state to ensure updated paths
+    const module = modules.find(m => m.id === moduleId);
+    console.log('🔍 Navigation Debug:', { moduleId, module: module?.path, subPath });
     if (module) {
       const targetPath = subPath ? `${module.path}${subPath}` : module.path;
+      console.log('🔍 Navigating to:', targetPath);
       navigate(targetPath);
     }
-  }, [navigate, isCliente]);
+  }, [navigate, modules]);
+
+  // ✅ Navigate directly to module main page (for dual-click pattern)
+  const handleNavigateToModule = useCallback((moduleId: string) => {
+    const module = modules.find(m => m.id === moduleId);
+    console.log('🔍 Direct Module Navigation:', { moduleId, module: module?.path });
+    if (module) {
+      console.log('🔍 Navigating directly to:', module.path);
+      navigate(module.path);
+    }
+  }, [navigate, modules]);
 
   const handleNavigateBack = useCallback(() => {
     if (canNavigateBack) {
@@ -965,6 +977,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     
     // Navigation methods
     navigate: handleNavigate,
+    navigateToModule: handleNavigateToModule, // ✅ Nueva función para navegación directa
     navigateBack: handleNavigateBack,
     toggleModuleExpansion,
     

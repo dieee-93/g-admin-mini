@@ -1,5 +1,5 @@
 import { Tabs as ChakraTabs, Box, HStack } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 interface TabsProps {
   children: ReactNode
@@ -9,7 +9,7 @@ interface TabsProps {
   orientation?: 'horizontal' | 'vertical'
   variant?: 'line' | 'enclosed' | 'soft-rounded' | 'solid-rounded' | 'plain'
   size?: 'sm' | 'md' | 'lg'
-  colorPalette?: 'gray' | 'brand' | 'accent' | 'success' | 'warning' | 'error' | 'info'
+  colorPalette?: 'gray' | 'blue' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
   fitted?: boolean
   isLazy?: boolean
   lazyBehavior?: 'keepMounted' | 'unmountOnExit'
@@ -91,6 +91,7 @@ export function Tabs({
   className,
   ...rest
 }: TabsProps) {
+  
   return (
     <ChakraTabs.Root
       value={value}
@@ -140,11 +141,17 @@ export function Tab({
   className,
   ...rest
 }: TabProps) {
+  
+  
+  // 🎨 Get theme-aware text color from parent Tabs context
+  // We need to check if the parent is using theme colors
+
   return (
     <ChakraTabs.Trigger
       value={value}
       disabled={disabled}
       className={className}
+
       {...rest}
     >
       <HStack gap={2} align="center">
@@ -170,9 +177,9 @@ export function TabPanels({
   ...rest
 }: TabPanelsProps) {
   return (
-    <Box className={className} {...rest}>
+    <ChakraTabs.Content className={className} {...rest}>
       {children}
-    </Box>
+    </ChakraTabs.Content>
   )
 }
 
@@ -183,11 +190,16 @@ export function TabPanel({
   className,
   ...rest
 }: TabPanelProps) {
+  
+  
+  // 🎨 Apply theme text color to panel content
+
   return (
     <ChakraTabs.Content
       value={value}
       p={paddingMap[padding]}
       className={className}
+
       {...rest}
     >
       {children}
@@ -231,14 +243,13 @@ export function ModuleTabs({
             icon={module.icon}
             badge={showBadges && module.badge ? (
               <Box
-                bg="red.500"
-                color="white"
                 borderRadius="full"
                 px={2}
                 py={1}
                 fontSize="xs"
                 minWidth="20px"
                 textAlign="center"
+                style={{ backgroundColor: 'var(--chakra-colors-error-500)', color: 'white' }}
               >
                 {module.badge}
               </Box>
@@ -291,7 +302,7 @@ export function SettingsTabs({
             <Box>
               <Box fontWeight="medium">{section.label}</Box>
               {section.description && (
-                <Box fontSize="xs" color="gray.500" mt={1}>
+                <Box fontSize="xs" mt={1}>
                   {section.description}
                 </Box>
               )}
@@ -338,8 +349,6 @@ export function DataTabs({
               icon={view.icon}
               badge={itemCount ? (
                 <Box
-                  bg="gray.100"
-                  color="gray.600"
                   borderRadius="full"
                   px={2}
                   fontSize="xs"

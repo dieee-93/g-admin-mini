@@ -4,7 +4,7 @@
 import { useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { lazyLoadingManager } from '@/lib/performance/LazyLoadingManager';
-import { modulePreloadingConfig } from '@/modules/lazy/LazyModules';
+import { modulePreloadingConfig } from '@/lib/lazy';
 
 // Types for navigation patterns
 type ModuleId = 'dashboard' | 'sales' | 'operations' | 'materials' | 'customers' | 'staff' | 'scheduling' | 'fiscal' | 'recipes' | 'settings';

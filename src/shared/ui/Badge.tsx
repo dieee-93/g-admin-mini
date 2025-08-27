@@ -1,5 +1,5 @@
 import { Badge as ChakraBadge, HStack, Box } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 interface BadgeProps {
   children: ReactNode
@@ -79,6 +79,7 @@ export function Badge({
   className,
   ...rest
 }: BadgeProps) {
+
   const badgeContent = (
     <HStack gap={1} align="center">
       {dot && (
@@ -86,7 +87,6 @@ export function Badge({
           width="6px"
           height="6px"
           borderRadius="full"
-          bg="currentColor"
           animation={pulse ? 'pulse 2s infinite' : undefined}
         />
       )}
@@ -106,8 +106,8 @@ export function Badge({
 
   return (
     <ChakraBadge
-      variant={variant}
-      size={sizeMap[size]}
+      variant={variant as any}
+      size={sizeMap[size] as any}
       colorPalette={colorPalette}
       borderRadius={rounded ? 'full' : 'md'}
       cursor={clickable || onClick ? 'pointer' : 'default'}
@@ -215,10 +215,10 @@ export function InventoryBadge({
   return (
     <StockBadge 
       level={level}
+      value={current}
+      showValue={true}
       {...props}
-    >
-      {displayText}
-    </StockBadge>
+    />
   )
 }
 
@@ -245,7 +245,6 @@ export function RoleBadge({
     <Badge
       colorPalette={config.colorPalette as any}
       startIcon={<span>{config.icon}</span>}
-      title={title}
       {...props}
     >
       {config.text}

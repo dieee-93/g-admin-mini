@@ -1,11 +1,20 @@
 import {
-  VStack,
-  Text,
+  Stack,
+  Typography,
   Button,
-  Alert
-} from '@chakra-ui/react';
+  Alert,
+  Icon
+} from '@/shared/ui';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import type { AlertCardProps } from '@/modules/dashboard/types/dashboard.types';
+
+interface AlertCardProps {
+  title: string;
+  description: string;
+  status: 'success' | 'warning' | 'error' | 'info';
+  actionLabel?: string;
+  onAction?: () => void;
+  showAlert?: boolean;
+}
 
 export function AlertCard({
   title,
@@ -17,31 +26,41 @@ export function AlertCard({
 }: AlertCardProps) {
   if (!showAlert) return null;
 
+  const getColorPalette = (status: string): 'success' | 'warning' | 'error' | 'info' => {
+    switch (status) {
+      case 'error': return 'error';
+      case 'warning': return 'warning';
+      case 'success': return 'success';
+      default: return 'info';
+    }
+  };
+
   return (
-    <Alert.Root 
+    <Alert 
       status={status}
-      variant="surface"
+      variant="subtle"
     >
-      <Alert.Indicator />
-      <VStack align="start" gap="2" flex="1">
-        <Alert.Title>
+      <Stack gap="sm" align="start">
+        <Typography variant="heading" size="sm" weight="semibold" color="primary">
           {title}
-        </Alert.Title>
-        <Alert.Description>
-          <Text>{description}</Text>
-        </Alert.Description>
+        </Typography>
+        <Typography variant="body" size="sm" color="secondary">
+          {description}
+        </Typography>
         {actionLabel && onAction && (
           <Button
             size="sm"
             variant="outline"
-            colorPalette={status === 'error' ? 'red' : status === 'warning' ? 'orange' : 'blue'}
+            colorPalette={getColorPalette(status)}
             onClick={onAction}
           >
-            <ArrowRightIcon style={{ width: '16px', height: '16px', marginRight: '6px' }} />
-            {actionLabel}
+            <Stack direction="row" align="center" gap="xs">
+              <Icon icon={ArrowRightIcon} size="xs" />
+              <Typography variant="body" size="sm">{actionLabel}</Typography>
+            </Stack>
           </Button>
         )}
-      </VStack>
-    </Alert.Root>
+      </Stack>
+    </Alert>
   );
 }

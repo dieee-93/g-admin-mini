@@ -2,24 +2,8 @@
 
 // Providers & Context
 export { Provider } from './provider';
-export { 
-  SmartDefaultsProvider,
-  useSmartDefaults,
-  useContextualProps,
-  withSmartDefaults,
-  ContextArea,
-  DashboardArea,
-  FormArea,
-  TableArea,
-  ModalArea,
-  SidebarArea,
-  HeaderArea,
-  useDashboardDefaults,
-  useFormDefaults,
-  useTableDefaults,
-  useModalDefaults,
-  useAutoContext
-} from './context/SmartDefaults';
+
+// 🎨 Theme Hooks (REMOVED - dynamic system with recipes handles everything automatically)
 
 // Layout Components
 export { Layout } from './Layout';
@@ -30,6 +14,12 @@ export {
   Cluster, 
   Center 
 } from './Stack';
+export { 
+  Grid, 
+  SimpleGrid 
+} from './Grid';
+
+// Grid Presets - REMOVED (use Chakra Grid directly)
 
 // Typography Components
 export { 
@@ -49,7 +39,8 @@ export { SelectField, createListCollection } from './SelectField';
 
 // Base Components
 export { Button } from './Button';
-export { Card } from './Card';
+export { CardWrapper } from './CardWrapper';
+export { Table } from './Table';
 
 // Advanced Components
 export {
@@ -92,17 +83,7 @@ export {
   DataTabs
 } from './Tabs';
 
-// Business Components
-export { RecipeCostCard } from './business/RecipeCostCard';
-export { 
-  InventoryAlertBadge,
-  InventoryStatusSummary,
-  InventoryHeaderBadge
-} from './business/InventoryAlertBadge';
-export { 
-  SalesMetricChart,
-  QuickMetricCard
-} from './business/SalesMetricChart';
+// Business Components - REMOVED (move to specific modules if needed)
 
 // Feedback Components
 export { CircularProgress } from './CircularProgress';
@@ -115,5 +96,21 @@ export {
 export { toaster, Toaster } from './toaster';
 
 // Display Components
-export { Icon } from './Icon';
+export { Icon, ActionIcon, StatusIcon, NavIcon, HeaderIcon, HeroIcon } from './Icon';
+export { Avatar, AvatarGroup, UserAvatar } from './Avatar';
+export { Switch, SwitchGroup, StatusSwitch, PermissionSwitch } from './Switch';
 export { ProductionCalendar } from './ProductionCalendar';
+
+// 🎯 SIMPLE WRAPPERS - REMOVED (duplicated Layout functionality)
+
+// 📄 PAGE TEMPLATES - REMOVED (use SimpleWrappers + recipes)
+
+// ⚡ QUICK COMPONENTS - Componentes instantáneos
+export {
+  MetricCard,
+  QuickStatus,
+  PageTitle,
+  ActionBar,
+  ListItem,
+  EmptyState
+} from './QuickComponents';

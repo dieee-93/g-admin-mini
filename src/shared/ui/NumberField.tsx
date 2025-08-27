@@ -13,8 +13,9 @@ interface NumberFieldProps {
   error?: string
   required?: boolean
   disabled?: boolean
-  size?: 'sm' | 'md' | 'lg'
-  variant?: 'outline' | 'filled' | 'flushed'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
+  variant?: 'outline' | 'flushed' | 'subtle'
+  colorScheme?: 'theme' | 'default' // 🆕 Added theme support
 }
 
 export function NumberField({
@@ -32,9 +33,18 @@ export function NumberField({
   disabled = false,
   size = 'md',
   variant = 'outline',
+  colorScheme = 'default',
 }: NumberFieldProps) {
+  // ✅ Recipes handle all theming automatically - no manual logic needed
+
   return (
-    <Field label={label} required={required} invalid={!!error} errorText={error}>
+    <Field.Root invalid={!!error} required={required} disabled={disabled}>
+      {label && (
+        <Field.Label {...themeLabelProps}>
+          {label}
+          <Field.RequiredIndicator />
+        </Field.Label>
+      )}
       <NumberInput.Root
         value={value?.toString()}
         defaultValue={defaultValue?.toString()}
@@ -46,13 +56,15 @@ export function NumberField({
         size={size}
         variant={variant}
         disabled={disabled}
+        {...themeProps}
       >
-        <NumberInput.Field placeholder={placeholder} />
+        <NumberInput.Input placeholder={placeholder} />
         <NumberInput.Control>
           <NumberInput.IncrementTrigger />
           <NumberInput.DecrementTrigger />
         </NumberInput.Control>
       </NumberInput.Root>
-    </Field>
+      {error && <Field.ErrorText {...themeLabelProps}>{error}</Field.ErrorText>}
+    </Field.Root>
   )
 }

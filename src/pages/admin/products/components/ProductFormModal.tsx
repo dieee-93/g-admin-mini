@@ -1,0 +1,158 @@
+import React from 'react';
+import { 
+  Modal,
+  ModalContent,
+  ModalHeader, 
+  ModalBody,
+  ModalFooter,
+  ModalTitle,
+  ModalClose
+} from '@/shared/ui';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+// import { ProductForm } from './ProductForm'; // TODO: Fix ProductForm export
+import { useProductsStore } from '@/store/productsStore';
+import { supabase } from '@/lib/supabase/client';
+import type { CreateProductData, UpdateProductData } from '../types';
+
+export function ProductFormModal() {
+  // NOTA: Este componente necesita que el store useProductsStore tenga las propiedades:
+  // isModalOpen, modalMode, currentProduct, closeModal
+  // Estas propiedades están ausentes del store actual y necesitan ser añadidas
+  const { 
+    // isModalOpen, 
+    // modalMode, 
+    // currentProduct, 
+    // closeModal, 
+    addProduct, 
+    updateProduct,
+    setError,
+    setLoading 
+  } = useProductsStore();
+
+  // Estados temporales hasta que se arregle el store
+  const [isModalOpen] = React.useState(false);
+  const [modalMode] = React.useState<'create' | 'edit'>('create');
+  const [currentProduct] = React.useState(null);
+  const closeModal = () => {
+    // TODO: Implementar cuando se arregle el store
+  };
+
+  const handleSubmit = async (data: CreateProductData | UpdateProductData & { recipe?: any; estimated_cost?: number }) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (modalMode === 'edit' && currentProduct && 'id' in data) {
+        // Update existing product
+        const { error } = await supabase
+          .from('products')
+          .update({
+            name: data.name,
+            unit: data.unit || 'unit',
+            type: data.type || 'ELABORATED',
+            description: data.description,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', data.id);
+
+        if (error) throw error;
+
+        // If recipe data exists, handle it separately
+        if ('recipe' in data && data.recipe) {
+          // TODO: Save recipe to recipes table and link to product
+          
+        }
+
+        // Update in store
+        updateProduct(data.id, {
+          name: data.name,
+          description: data.description || '',
+          category: 'General', // TODO: handle categories
+          cost: ('estimated_cost' in data ? data.estimated_cost : 0) || 0,
+          updated_at: new Date().toISOString()
+        });
+
+      } else {
+        // Create new product
+        const { data: newProduct, error } = await supabase
+          .from('products')
+          .insert({
+            name: data.name,
+            unit: data.unit || 'unit',
+            type: data.type || 'ELABORATED',
+            description: data.description
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // If recipe data exists, handle it separately
+        if ('recipe' in data && data.recipe && newProduct) {
+          // TODO: Save recipe to recipes table and link to product
+          
+        }
+
+        // Add to store
+        addProduct({
+          name: data.name,
+          description: data.description || '',
+          category: 'General', // TODO: handle categories
+          price: (('estimated_cost' in data ? data.estimated_cost : 0) || 0) * 2.5, // Default markup
+          cost: ('estimated_cost' in data ? data.estimated_cost : 0) || 0,
+          margin: 60, // Will be recalculated
+          prep_time: 15,
+          active: true,
+          popularity_score: 0,
+          profitability_score: 0,
+          menu_classification: 'dog',
+          components: [],
+          sales_count: 0,
+          revenue_total: 0
+        });
+      }
+
+      closeModal();
+    } catch (error) {
+      
+      setError(error instanceof Error ? error.message : 'Error saving product');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    closeModal();
+  };
+
+  return (
+    <Modal isOpen={isModalOpen} onClose={closeModal}>
+      <ModalContent className="max-w-2xl mx-4">
+        <ModalHeader>
+          <ModalTitle className="text-lg font-semibold">
+            {modalMode === 'edit' ? 'Editar Producto' : 'Nuevo Producto'}
+          </ModalTitle>
+          <ModalClose>
+            <button className="p-1 hover:bg-accent rounded-md transition-colors">
+              <XMarkIcon className="w-5 h-5" />
+            </button>
+          </ModalClose>
+        </ModalHeader>
+
+        <ModalBody className="p-0">
+          <div className="p-6">
+            {/* NOTA: ProductForm necesita ser corregido para exportar correctamente */}
+            {/* <ProductForm
+                product={currentProduct || undefined}
+                onSubmit={handleSubmit}
+                onCancel={handleCancel}
+              /> */}
+            <div className="text-center text-muted-foreground py-8">
+              ProductForm component needs to be properly exported
+            </div>
+          </div>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
+}

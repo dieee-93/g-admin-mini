@@ -67,10 +67,10 @@ export const ColorVariants: Story = {
       <Typography color="secondary">Secondary - Color secundario</Typography>
       <Typography color="muted">Muted - Color atenuado</Typography>
       <Typography color="accent">Accent - Color de acento</Typography>
-      <Typography color="success">Success - Color de éxito</Typography>
-      <Typography color="warning">Warning - Color de advertencia</Typography>
+      <Typography >Success - Color de éxito</Typography>
+      <Typography >Warning - Color de advertencia</Typography>
       <Typography color="error">Error - Color de error</Typography>
-      <Typography color="info">Info - Color informativo</Typography>
+      <Typography >Info - Color informativo</Typography>
     </div>
   ),
 }

@@ -1,11 +1,8 @@
-/* Estilos mínimos base - Chakra UI maneja el resto */
-/* Solo configuraciones que no interfieren con el sistema de diseño */
+/* Estilos mínimos base - Chakra UI v3 maneja todo el theming */
+/* Solo configuraciones esenciales que no interfieren con el sistema de diseño */
 
-/* Importar bloqueo de variables problemáticas de Tailwind */
-@import './styles/block-tailwind-vars.css';
-
-/* Importar temas personalizados */
-@import './styles/themes.css';
+/* Iconos heroicons: Use Chakra Box with explicit width/height props */
+/* Reemplazar clases .w-X .h-X por <Box w="4" h="4"> o iconSize prop */
 
 /* Optimizaciones básicas de rendering */
 html {
@@ -14,7 +11,7 @@ html {
   text-rendering: optimizeLegibility;
 }
 
-/* Estilos para links que no usa Chakra por defecto */
+/* Enlaces básicos - Chakra Link component maneja el resto */
 a {
   text-decoration: inherit;
 }
@@ -23,10 +20,22 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Print styles para mejor legibilidad */
+/* Utility classes */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Print styles */
 @media print {
   body {
     background: white !important;
     color: black !important;
   }
 }
+
+/* 
+MIGRACIÓN PENDIENTE: 
+- Reemplazar todas las clases .w-X .h-X por props de Chakra: <Box w="4" h="4">
+- Usar color props en lugar de clases .text-color-X: <Text color="blue.500">
+- Usar spacing props en lugar de .mr-X .mb-X: <Box mr="1" mb="4">
+*/

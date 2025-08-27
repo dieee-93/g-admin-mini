@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { EyeIcon, EyeSlashIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, Button, InputField } from '@/shared/ui';
+import { CardWrapper, Button, InputField } from '@/shared/ui';
 
 export function LoginPageNew() {
   const [email, setEmail] = useState('');
@@ -122,17 +122,16 @@ export function LoginPageNew() {
         animationName={{ _open: "scale-fade-in", _closed: "scale-fade-out" }}
         animationDuration="moderate"
       >
-        <Card 
-          variant="elevated" 
+        <CardWrapper variant="elevated" 
           padding="lg"
           maxW="md" 
           w="full"
         >
-            <Card.Header>
+            <CardWrapper.Header>
               <VStack gap="lg" textAlign="center">
                 <Box
                   p="md"
-                  bg="brand.500"
+                  
                   borderRadius="full"
                   color="white"
                 >
@@ -147,9 +146,9 @@ export function LoginPageNew() {
                   </Text>
                 </VStack>
               </VStack>
-            </Card.Header>
+            </CardWrapper.Header>
         
-            <Card.Body>
+            <CardWrapper.Body>
               <form onSubmit={handleSubmit}>
                 <VStack gap="lg">
                   <Presence
@@ -246,9 +245,9 @@ export function LoginPageNew() {
                   </Button>
                 </VStack>
               </form>
-            </Card.Body>
+            </CardWrapper.Body>
             
-            <Card.Footer>
+            <CardWrapper.Footer>
               <VStack gap="sm" w="full" textAlign="center">
                 <Text fontSize="sm" colorPalette="gray">
                   ¿Problemas para acceder? Contacta al administrador
@@ -259,8 +258,8 @@ export function LoginPageNew() {
                   <Text fontWeight="medium">G-Admin Security</Text>
                 </HStack>
               </VStack>
-            </Card.Footer>
-        </Card>
+            </CardWrapper.Footer>
+        </CardWrapper>
       </Presence>
     </Box>
   );

@@ -1,5 +1,5 @@
 import { Alert as ChakraAlert, Box, HStack } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { 
   CheckCircleIcon, 
   ExclamationTriangleIcon, 
@@ -90,9 +90,9 @@ export function Alert({
   return (
     <ChakraAlert.Root
       status={status}
-      variant={variant}
-      size={sizeMap[size]}
-      colorPalette={statusColorMap[status]}
+      variant={variant === 'top-accent' || variant === 'left-accent' ? 'subtle' : variant}
+      size={sizeMap[size] as any}
+      colorPalette={statusColorMap[status as keyof typeof statusColorMap]}
       width={widthMap[width]}
       className={className}
       {...rest}

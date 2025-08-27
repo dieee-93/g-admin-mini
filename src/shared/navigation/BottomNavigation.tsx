@@ -2,86 +2,84 @@
 // src/components/navigation/BottomNavigation.tsx - ICONOS CORREGIDOS
 // ====================================
 
-import { Box, HStack, VStack, Text, Button } from '@chakra-ui/react';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, Button, Stack, Typography, Badge } from '@/shared/ui';
 
 export function BottomNavigation() {
   const { modules, currentModule, navigate } = useNavigation();
 
   return (
-    <Box
-      as="nav"
-      position="fixed" // 🔧 CRÍTICO CORREGIDO: fixed para que siempre esté visible
-      bottom="0"
-      left="0"
-      right="0"
-      bg="white"
-      borderTop="1px solid"
-      borderColor="gray.200"
-      px="2"
-      py="2"
-      h="70px"
-      zIndex={1002}
-      shadow="lg"
+    <nav
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'var(--colors-bg-canvas)',
+        borderTop: '1px solid var(--colors-border-subtle)',
+        padding: '0.5rem',
+        height: '70px',
+        zIndex: 1002,
+        boxShadow: 'var(--shadows-lg)'
+      }}
     >
-      <HStack justify="space-around" align="center" h="full">
+      <Stack direction="row" justify="space-around" align="center" height="100%">
         {modules.map((module) => {
           const isActive = currentModule?.id === module.id;
           
           return (
-            <Button
-              key={module.id}
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(module.id)}
-              colorPalette={isActive ? module.color : 'gray'}
-              bg={isActive ? `${module.color}.50` : 'transparent'}
-              minW="60px"
-              h="54px"
-              position="relative"
-            >
-              <VStack gap="1">
-                {/* ✅ CORREGIDO: Icono usando className en lugar de style */}
+            <div style={{ position: 'relative', minWidth: '60px', height: '54px' }}>
+              <Button
+                key={module.id}
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(module.id)}
+                colorPalette="gray"
+              >
+              <Stack gap="xs" align="center">
                 <Icon 
                   icon={module.icon}
                   size="md"
-                  className={isActive ? undefined : 'text-gray-500'}
+                  color={isActive ? 'accent' : 'secondary'}
                 />
-                <Text 
-                  fontSize="xs" 
-                  color={isActive ? `${module.color}.600` : 'gray.500'}
+                <Typography 
+                  variant="body"
+                  size="xs" 
+                  color={isActive ? 'accent' : 'secondary'}
                   fontWeight={isActive ? 'semibold' : 'normal'}
                 >
                   {module.title}
-                </Text>
-              </VStack>
+                </Typography>
+              </Stack>
 
               {/* ✅ Badge para alertas/notificaciones */}
               {module.badge && (
-                <Box
-                  position="absolute"
-                  top="4px"
-                  right="4px"
-                  bg="red.500"
-                  color="white"
-                  borderRadius="full"
-                  fontSize="xs"
-                  fontWeight="bold"
-                  minW="18px"
-                  h="18px"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  border="2px solid white"
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '4px',
+                    right: '4px',
+                    background: 'var(--colors-error-500)',
+                    color: 'white',
+                    borderRadius: '50%',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    minWidth: '18px',
+                    height: '18px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid white'
+                  }}
                 >
                   {module.badge}
-                </Box>
+                </div>
               )}
-            </Button>
+              </Button>
+            </div>
           );
         })}
-      </HStack>
-    </Box>
+      </Stack>
+    </nav>
   );
 }

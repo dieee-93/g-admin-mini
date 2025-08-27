@@ -2,7 +2,7 @@
 // Revenue analytics chart component
 
 import React from 'react';
-import { Box, Card, Text, VStack } from '@chakra-ui/react';
+import { Box, CardWrapper, Text, VStack } from '@chakra-ui/react';
 
 interface RevenueChartProps {
   data?: number[];

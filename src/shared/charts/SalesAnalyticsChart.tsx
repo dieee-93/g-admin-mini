@@ -2,7 +2,7 @@
 // Sales analytics and trends chart component
 
 import React from 'react';
-import { Box, Card, Text, VStack, HStack, Badge } from '@chakra-ui/react';
+import { Box, CardWrapper, Text, VStack, HStack, Badge } from '@chakra-ui/react';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 
 interface SalesData {

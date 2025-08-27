@@ -157,7 +157,7 @@ export function AlertsBadge({
           </Badge>
         )}
 
-        <Text fontSize="sm" color="gray.600">
+        <Text fontSize="sm" color="text.secondary">
           alertas
         </Text>
       </HStack>

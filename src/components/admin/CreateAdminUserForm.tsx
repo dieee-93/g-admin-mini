@@ -16,7 +16,7 @@ import {
   ExclamationTriangleIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { Card, Button, InputField, Typography, SelectField } from '@/shared/ui';
+import { CardWrapper, Button, InputField, Typography, SelectField } from '@/shared/ui';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 
 interface CreateAdminUserFormProps {
@@ -127,7 +127,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
   };
 
   return (
-    <Card variant="elevated" padding="xl" maxW="2xl">
+    <CardWrapper variant="elevated" padding="xl" maxW="2xl">
       <form onSubmit={handleSubmit}>
         <VStack gap="lg" align="stretch">
           {/* Header */}
@@ -226,7 +226,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
 
             {/* Password Strength Indicator */}
             {formData.password && (
-              <Card variant="outline" padding="md">
+              <CardWrapper variant="outline" padding="md">
                 <VStack gap="sm" align="stretch">
                   <HStack justify="space-between" align="center">
                     <Typography variant="label" color="secondary">
@@ -280,7 +280,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
                     ))}
                   </VStack>
                 </VStack>
-              </Card>
+              </CardWrapper>
             )}
 
             {/* Confirm Password */}
@@ -341,7 +341,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
           </HStack>
 
           {/* Security Notice */}
-          <Card variant="subtle" padding="md">
+          <CardWrapper variant="subtle" padding="md">
             <HStack gap="sm" align="start">
               <ShieldCheckIcon style={{ width: '16px', height: '16px', color: '#3182ce', marginTop: '2px' }} />
               <VStack gap="xs" align="start">
@@ -354,9 +354,9 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
                 </Typography>
               </VStack>
             </HStack>
-          </Card>
+          </CardWrapper>
         </VStack>
       </form>
-    </Card>
+    </CardWrapper>
   );
 }

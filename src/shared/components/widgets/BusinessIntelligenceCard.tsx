@@ -1,58 +1,63 @@
 import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Card,
-  Button
-} from '@chakra-ui/react';
-import type { BusinessIntelligenceCardProps } from '@/modules/dashboard/types/dashboard.types';
+  Stack,
+  Typography,
+  CardWrapper,
+  Button,
+  Icon
+} from '@/shared/ui';
+
+interface BusinessIntelligenceCardProps {
+  title: string;
+  description: string;
+  icon: React.ComponentType<any>;
+  colorPalette: 'success' | 'warning' | 'error' | 'info' | 'brand';
+  onClick: () => void;
+  actionLabel?: string;
+}
 
 export function BusinessIntelligenceCard({
   title,
   description,
-  icon: Icon,
+  icon: IconComponent,
   colorPalette,
   onClick,
   actionLabel = "Open Analysis"
 }: BusinessIntelligenceCardProps) {
   return (
-    <Card.Root 
-      variant="outline" 
-      cursor="pointer"
-      onClick={onClick}
-      _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
-      transition="all 0.2s"
-    >
-      <Card.Body p="4">
-        <VStack align="start" gap="3">
-          <HStack gap="3">
-            <Box p="2" bg={`${colorPalette}.100`} borderRadius="md">
-              <Icon style={{ 
-                width: '20px', 
-                height: '20px', 
-                color: `var(--chakra-colors-${colorPalette}-600)` 
-              }} />
-            </Box>
-            <VStack align="start" gap="0">
-              <Text fontWeight="bold">{title}</Text>
-              <Text fontSize="sm" color="gray.600">{description}</Text>
-            </VStack>
-          </HStack>
-          <Button 
-            size="sm" 
-            variant="outline" 
-            colorPalette={colorPalette} 
-            w="full"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClick();
-            }}
-          >
-            {actionLabel}
-          </Button>
-        </VStack>
-      </Card.Body>
-    </Card.Root>
+    <div style={{cursor: 'pointer'}} onClick={onClick}>
+      <CardWrapper variant="outline">
+        <Stack gap="md" align="start">
+          <Stack direction="row" gap="md" align="center">
+            <div 
+              style={{
+                padding: '0.5rem',
+                backgroundColor: 'var(--colors-bg-subtle)',
+                borderRadius: '0.375rem'
+              }}
+            >
+              <Icon icon={IconComponent} size="md" color={colorPalette} />
+            </div>
+            <Stack gap="xs" align="start">
+              <Typography variant="heading" size="md" weight="bold" color="primary">
+                {title}
+              </Typography>
+              <Typography variant="body" size="sm" color="secondary">
+                {description}
+              </Typography>
+            </Stack>
+          </Stack>
+          <div style={{width: '100%'}}>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              colorPalette={colorPalette}
+              onClick={() => onClick()}
+            >
+              <Typography variant="body" size="sm">{actionLabel}</Typography>
+            </Button>
+          </div>
+        </Stack>
+      </CardWrapper>
+    </div>
   );
 }

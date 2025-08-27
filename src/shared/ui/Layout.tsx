@@ -1,9 +1,9 @@
 import { Box } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 interface LayoutProps {
   children: ReactNode
-  variant?: 'container' | 'section' | 'panel' | 'sidebar' | 'content' | 'header' | 'footer'
+  variant?: 'container' | 'section' | 'panel' | 'sidebar' | 'content' | 'header' | 'footer' | 'page'
   padding?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   margin?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   width?: 'auto' | 'full' | 'fit' | 'container'
@@ -16,6 +16,7 @@ interface LayoutProps {
   border?: boolean
   className?: string
   onClick?: () => void
+  colorPalette?: string  // Add colorPalette support
 }
 
 const variantStyles = {
@@ -28,18 +29,13 @@ const variantStyles = {
     py: { base: 'lg', lg: 'xl' },
   },
   panel: {
-    bg: { base: 'white', _dark: 'gray.800' },
     borderRadius: 'md',
-    shadow: 'sm',
     border: '1px solid',
-    borderColor: { base: 'gray.200', _dark: 'gray.700' },
   },
   sidebar: {
     width: { base: 'full', lg: '280px' },
     height: 'full',
-    bg: { base: 'white', _dark: 'gray.900' },
     borderRight: '1px solid',
-    borderColor: { base: 'gray.200', _dark: 'gray.700' },
   },
   content: {
     flex: 1,
@@ -48,9 +44,7 @@ const variantStyles = {
   header: {
     py: 'md',
     px: { base: 'md', lg: 'lg' },
-    bg: { base: 'white', _dark: 'gray.800' },
     borderBottom: '1px solid',
-    borderColor: { base: 'gray.200', _dark: 'gray.700' },
     position: 'sticky' as const,
     top: 0,
     zIndex: 10,
@@ -58,9 +52,11 @@ const variantStyles = {
   footer: {
     py: 'md',
     px: { base: 'md', lg: 'lg' },
-    bg: { base: 'gray.50', _dark: 'gray.900' },
     borderTop: '1px solid',
-    borderColor: { base: 'gray.200', _dark: 'gray.700' },
+  },
+  page: {
+    minHeight: '100vh',
+    width: 'full',
   },
 }
 
@@ -102,12 +98,17 @@ export function Layout({
   border,
   className,
   onClick,
+  colorPalette,
   ...rest
 }: LayoutProps & Record<string, any>) {
   const variantProps = variant ? variantStyles[variant] : {}
   
+  // ✅ CLEAN: No hardcoded colors - let Chakra handle defaults
+  // Dynamic theme system should override default values automatically
+  
   return (
     <Box
+      colorPalette={colorPalette}
       {...variantProps}
       p={padding ? sizeMap[padding] : undefined}
       m={margin ? sizeMap[margin] : undefined}
@@ -117,9 +118,8 @@ export function Layout({
       overflow={overflow}
       bg={bg}
       borderRadius={borderRadius ? sizeMap[borderRadius] : undefined}
-      shadow={shadow ? sizeMap[shadow] : undefined}
       border={border ? '1px solid' : undefined}
-      borderColor={border ? { base: 'gray.200', _dark: 'gray.700' } : undefined}
+      boxShadow={shadow ? sizeMap[shadow] : undefined}
       className={className}
       onClick={onClick}
       {...rest}

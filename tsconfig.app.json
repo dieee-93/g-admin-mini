@@ -17,10 +17,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
     
-    /* Linting */
-    "strict": false, // Enabling gradually - start with false for now
+    /* Linting - Optimized for Copilot suggestions */
+    "strict": true, // Enable for better Copilot type inference
     "noImplicitAny": true, // Enable first strict check
-    "strictNullChecks": false, // Will enable in next iteration
+    "strictNullChecks": true, // Better null safety suggestions
     "strictFunctionTypes": true, // Safe to enable
     "strictBindCallApply": true, // Safe to enable
     "strictPropertyInitialization": false, // Will enable later

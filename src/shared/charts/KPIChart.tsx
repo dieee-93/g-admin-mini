@@ -2,7 +2,7 @@
 // KPI metrics chart component
 
 import React from 'react';
-import { Box, Card, Text, VStack, Grid, Badge } from '@chakra-ui/react';
+import { Box, CardWrapper, Text, VStack, Grid, Badge } from '@chakra-ui/react';
 
 interface KPIMetric {
   label: string;

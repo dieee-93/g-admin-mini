@@ -13,7 +13,7 @@
     
     <!-- Theme initialization script -->
     <script>
-      // Prevent flash of unstyled content
+      // Prevent flash of unstyled content - Simplified for light/dark only
       try {
         const stored = localStorage.getItem('g-admin-theme');
         let theme = 'light';
@@ -27,11 +27,14 @@
           theme = 'dark';
         }
         
+        // Add theme class for Chakra UI
         document.documentElement.classList.add(theme);
-        document.documentElement.setAttribute('data-theme', theme);
+        
+        // Set color mode for Chakra UI _dark condition
+        document.documentElement.setAttribute('data-color-mode', theme);
       } catch (e) {
         document.documentElement.classList.add('light');
-        document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-color-mode', 'light');
       }
     </script>
   </head>

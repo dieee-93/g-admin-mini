@@ -1,11 +1,10 @@
 // ====================================
-// src/components/navigation/FloatingActionButton.tsx - CORREGIDO
+// src/components/navigation/FloatingActionButton.tsx - MIGRADO AL DESIGN SYSTEM
 // ====================================
 
-import { Box, Button } from '@chakra-ui/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { Icon } from '@/shared/ui/Icon';
+import { Button, Icon } from '@/shared/ui';
 
 export function FloatingActionButton() {
   const { quickActions, currentModule } = useNavigation();
@@ -14,25 +13,47 @@ export function FloatingActionButton() {
   
   if (!primaryAction) return null;
 
+  // Mapear color del módulo a color palette válido
+  const getColorPalette = (color?: string) => {
+    switch (color) {
+      case 'blue': return 'brand';
+      case 'green': return 'success';
+      case 'red': return 'error';
+      case 'orange': return 'warning';
+      case 'purple': return 'info';
+      default: return 'brand';
+    }
+  };
+
   return (
-    <Box
-      position="fixed" // 🔧 CORREGIDO: fixed para consistencia
-      bottom="90px"
-      right="16px"
-      zIndex={1003}
+    <div
+      style={{
+        position: 'fixed',
+        bottom: '90px',
+        right: '16px',
+        zIndex: 1003
+      }}
     >
-      <Button
-        colorPalette={currentModule?.color || 'blue'}
-        size="lg"
-        borderRadius="full"
-        w="56px"
-        h="56px"
-        shadow="lg"
-        onClick={primaryAction.action}
+      <div
+        style={{
+          borderRadius: '50%',
+          width: '56px',
+          height: '56px',
+          boxShadow: 'var(--shadows-lg)',
+          overflow: 'hidden'
+        }}
       >
-        {/* ✅ CORREGIDO: Icon component en lugar de style directo */}
-        <Icon icon={PlusIcon} size="lg" />
-      </Button>
-    </Box>
+        <div style={{ width: '100%', height: '100%' }}>
+          <Button
+            colorPalette={getColorPalette(currentModule?.color)}
+            size="lg"
+            variant="solid"
+            onClick={primaryAction.action}
+          >
+            <Icon icon={PlusIcon} size="lg" />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

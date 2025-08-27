@@ -7,10 +7,10 @@ import {
   Separator,
   Heading,
 } from '@chakra-ui/react';
-import { Card } from '@/shared/ui/Card';
+import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { Button } from '@/shared/ui/Button';
 import { InputField } from '@/shared/ui/InputField';
-import { useAuth } from '@/lib/auth/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginFormProps {
   onSwitchToRegister?: () => void;
@@ -22,7 +22,9 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const { signIn, isLoading, error, clearError } = useAuth();
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
 
   const validateForm = () => {
     let isValid = true;
@@ -47,22 +49,24 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
+    setError('');
+    setIsLoading(true);
     
     if (!validateForm()) {
+      setIsLoading(false);
       return;
     }
 
-    const success = await signIn({ email, password });
+    const result = await signIn(email, password);
     
-    if (success) {
-      // Login successful - auth service handles the rest
-      console.log('Login successful');
+    if (result.error) {
+      setError(result.error);
     }
+    setIsLoading(false);
   };
 
   return (
-    <Card>
+    <CardWrapper>
       <Box maxW="md" mx="auto" mt={8}>
         <VStack gap={6}>
           <VStack gap={2}>
@@ -160,6 +164,6 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
           </form>
         </VStack>
       </Box>
-    </Card>
+    </CardWrapper>
   );
 }

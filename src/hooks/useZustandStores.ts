@@ -422,12 +422,14 @@ export const useTheme = () => {
   const resolvedTheme = useThemeStore(state => state.resolvedTheme);
   const setTheme = useThemeStore(state => state.setTheme);
   const toggleTheme = useThemeStore(state => state.toggleTheme);
+  const getThemeColors = useThemeStore(state => state.getThemeColors);
 
   return {
     theme,
     resolvedTheme,
     setTheme,
     toggleTheme,
+    getThemeColors,
     isDark: resolvedTheme === 'dark',
     isLight: resolvedTheme === 'light',
     isSystem: theme === 'system'

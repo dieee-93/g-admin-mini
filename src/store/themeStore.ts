@@ -1,168 +1,132 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-type Theme = 'light' | 'dark' | 'system' | 'corporate' | 'nature' | 'sunset' | 'ocean' | 'high-contrast'
+// Simplified theme store - Cache bust v1.0
+type Theme = 'light' | 'dark' | 'system'
+
+// ✅ CLEAN: Simplified theme definitions - colors handled by dynamicTheming.ts
+export const availableThemes = [
+  // Base themes
+  { id: 'light', name: 'Light', category: 'base' },
+  { id: 'dark', name: 'Dark', category: 'base' },
+  { id: 'system', name: 'System', category: 'base' },
+  
+  // Professional Light themes
+  { id: 'corporate', name: 'Corporate', category: 'professional-light' },
+  { id: 'nature', name: 'Nature', category: 'professional-light' },
+  { id: 'sunset', name: 'Sunset', category: 'professional-light' },
+  { id: 'ocean', name: 'Ocean', category: 'professional-light' },
+  
+  // Professional Dark themes
+  { id: 'corporate-dark', name: 'Corporate Dark', category: 'professional-dark' },
+  { id: 'nature-dark', name: 'Nature Dark', category: 'professional-dark' },
+  { id: 'sunset-dark', name: 'Sunset Dark', category: 'professional-dark' },
+  { id: 'ocean-dark', name: 'Ocean Dark', category: 'professional-dark' },
+  
+  // VSCode inspired themes
+  { id: 'dracula', name: 'Dracula', category: 'vscode' },
+  { id: 'tokyo-night', name: 'Tokyo Night', category: 'vscode' },
+  { id: 'synthwave-84', name: 'Synthwave \'84', category: 'vscode' },
+  { id: 'monokai-pro', name: 'Monokai Pro', category: 'vscode' },
+  
+  // Material Theme variations
+  { id: 'material-oceanic', name: 'Material Oceanic', category: 'material' },
+  { id: 'material-darker', name: 'Material Darker', category: 'material' },
+  { id: 'material-palenight', name: 'Material Palenight', category: 'material' },
+  { id: 'material-deep-ocean', name: 'Material Deep Ocean', category: 'material' },
+  
+  // Popular VSCode themes
+  { id: 'atom-one-dark', name: 'Atom One Dark', category: 'vscode' },
+  
+  // Accessibility
+  { id: 'high-contrast', name: 'High Contrast', category: 'accessibility' },
+] as const
+
+// ✅ CLEAN: Standard color palettes for colorPalette props
+export const availableColorPalettes = [
+  'gray', 'blue', 'green', 'red', 'purple', 'orange', 'cyan', 'teal', 'pink', 'yellow'
+] as const
+
+export type ColorPalette = typeof availableColorPalettes[number]
 
 interface ThemeState {
   theme: Theme
-  resolvedTheme: 'light' | 'dark' | 'corporate' | 'nature' | 'sunset' | 'ocean' | 'high-contrast'
+  currentTheme: typeof availableThemes[number] | null
+  currentColorPalette: ColorPalette
   setTheme: (theme: Theme) => void
   toggleTheme: () => void
-  getThemeColors: () => ThemeColors
+  applyTheme: (themeId: string) => void
+  setColorPalette: (palette: ColorPalette) => void
 }
 
-interface ThemeColors {
-  name: string
-  primary: string
-  secondary: string
-  accent: string
-  background: string
-  surface: string
-  text: string
-}
-
-const themeColors: Record<string, ThemeColors> = {
-  light: {
-    name: 'Light',
-    primary: '#0ea5ff',
-    secondary: '#64748b',
-    accent: '#06b6d4',
-    background: '#ffffff',
-    surface: '#f8fafc',
-    text: '#0f172a',
-  },
-  dark: {
-    name: 'Dark',
-    primary: '#0ea5ff',
-    secondary: '#94a3b8',
-    accent: '#22d3ee',
-    background: '#0f172a',
-    surface: '#1e293b',
-    text: '#f8fafc',
-  },
-  corporate: {
-    name: 'Corporate',
-    primary: '#1e40af',
-    secondary: '#475569',
-    accent: '#059669',
-    background: '#f8fafc',
-    surface: '#ffffff',
-    text: '#1e293b',
-  },
-  nature: {
-    name: 'Nature',
-    primary: '#16a34a',
-    secondary: '#65a30d',
-    accent: '#ca8a04',
-    background: '#f0fdf4',
-    surface: '#ffffff',
-    text: '#14532d',
-  },
-  sunset: {
-    name: 'Sunset',
-    primary: '#ea580c',
-    secondary: '#dc2626',
-    accent: '#eab308',
-    background: '#fff7ed',
-    surface: '#ffffff',
-    text: '#9a3412',
-  },
-  ocean: {
-    name: 'Ocean',
-    primary: '#0891b2',
-    secondary: '#0e7490',
-    accent: '#06b6d4',
-    background: '#ecfeff',
-    surface: '#ffffff',
-    text: '#164e63',
-  },
-  'high-contrast': {
-    name: 'High Contrast',
-    primary: '#000000',
-    secondary: '#333333',
-    accent: '#0066cc',
-    background: '#ffffff',
-    surface: '#f5f5f5',
-    text: '#000000',
-  },
-}
-
+// Helper to detect system theme preference
 const getSystemTheme = (): 'light' | 'dark' => {
   if (typeof window === 'undefined') return 'light'
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-const resolveTheme = (theme: Theme): 'light' | 'dark' | 'corporate' | 'nature' | 'sunset' | 'ocean' | 'high-contrast' => {
-  if (theme === 'system') return getSystemTheme()
-  return theme as any
-}
-
-const applyThemeToDOM = (resolvedTheme: 'light' | 'dark' | 'corporate' | 'nature' | 'sunset' | 'ocean' | 'high-contrast') => {
+// Apply the base theme (light/dark) to the DOM via data attributes
+const applyThemeToDOM = (theme: Theme) => {
   if (typeof document === 'undefined') return
   
-  const root = document.documentElement
-  
-  // Remove all theme classes
-  root.classList.remove('light', 'dark', 'corporate', 'nature', 'sunset', 'ocean', 'high-contrast')
-  root.classList.add(resolvedTheme)
-  
-  // Update Chakra UI color mode (for system themes, use light/dark)
-  const colorMode = ['light', 'corporate', 'nature', 'sunset', 'ocean', 'high-contrast'].includes(resolvedTheme) ? 'light' : 'dark'
-  root.setAttribute('data-theme', colorMode)
-  
-  // Apply custom CSS variables for custom themes
-  if (resolvedTheme !== 'light' && resolvedTheme !== 'dark') {
-    const colors = themeColors[resolvedTheme]
-    if (colors) {
-      root.style.setProperty('--theme-primary', colors.primary)
-      root.style.setProperty('--theme-secondary', colors.secondary)
-      root.style.setProperty('--theme-accent', colors.accent)
-      root.style.setProperty('--theme-background', colors.background)
-      root.style.setProperty('--theme-surface', colors.surface)
-      root.style.setProperty('--theme-text', colors.text)
-    }
-  } else {
-    // Remove custom variables for system themes
-    root.style.removeProperty('--theme-primary')
-    root.style.removeProperty('--theme-secondary')
-    root.style.removeProperty('--theme-accent')
-    root.style.removeProperty('--theme-background')
-    root.style.removeProperty('--theme-surface')
-    root.style.removeProperty('--theme-text')
-  }
+  const resolvedTheme = theme === 'system' ? getSystemTheme() : theme
+  document.documentElement.setAttribute('data-theme', resolvedTheme)
+  document.documentElement.style.colorScheme = resolvedTheme
 }
 
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
       theme: 'system',
-      resolvedTheme: getSystemTheme(),
+      currentTheme: null,
+      currentColorPalette: 'blue' as ColorPalette,
       
       setTheme: (theme: Theme) => {
-        const resolvedTheme = resolveTheme(theme)
-        applyThemeToDOM(resolvedTheme)
-        set({ theme, resolvedTheme })
+        applyThemeToDOM(theme)
+        set({ theme })
       },
       
       toggleTheme: () => {
-        const { resolvedTheme } = get()
-        const newTheme = resolvedTheme === 'light' ? 'dark' : 'light'
+        const { theme } = get()
+        const newTheme = theme === 'light' ? 'dark' : 'light'
         applyThemeToDOM(newTheme)
-        set({ theme: newTheme, resolvedTheme: newTheme })
+        set({ theme: newTheme })
       },
       
-      getThemeColors: () => {
-        const { resolvedTheme } = get()
-        return themeColors[resolvedTheme] || themeColors.light
+      setColorPalette: (palette: ColorPalette) => {
+        set({ currentColorPalette: palette })
+      },
+      
+      applyTheme: (themeId: string) => {
+        const selectedTheme = availableThemes.find(t => t.id === themeId)
+        if (selectedTheme) {
+          // ✅ NO mapear a light/dark automáticamente
+          // Cada tema es fijo - Dracula siempre oscuro, Corporate siempre claro
+          
+          // Solo aplicar light/dark para los temas básicos
+          if (['light', 'dark', 'system'].includes(themeId as Theme)) {
+            const baseTheme = themeId as Theme
+            applyThemeToDOM(baseTheme)
+            set({ 
+              theme: baseTheme, 
+              currentTheme: selectedTheme 
+            })
+          } else {
+            // ✅ Para temas personalizados, NO cambiar data-theme
+            // El tema se maneja completamente por createSystem()
+            set({ 
+              theme: themeId as Theme, // Mantener el ID del tema actual
+              currentTheme: selectedTheme 
+            })
+          }
+        }
       },
     }),
     {
       name: 'g-admin-theme',
       onRehydrateStorage: () => (state) => {
         if (state) {
-          const resolvedTheme = resolveTheme(state.theme)
-          applyThemeToDOM(resolvedTheme)
-          state.resolvedTheme = resolvedTheme
+          applyThemeToDOM(state.theme)
         }
       },
     }
@@ -171,27 +135,17 @@ export const useThemeStore = create<ThemeState>()(
 
 // Initialize theme on import
 if (typeof window !== 'undefined') {
-  const stored = localStorage.getItem('g-admin-theme')
-  if (stored) {
-    try {
-      const { state } = JSON.parse(stored)
-      const resolvedTheme = resolveTheme(state.theme)
-      applyThemeToDOM(resolvedTheme)
-    } catch {
-      // Fallback to system theme
-      applyThemeToDOM(getSystemTheme())
-    }
-  } else {
-    applyThemeToDOM(getSystemTheme())
+  // Initialize with system theme
+  const currentState = useThemeStore.getState()
+  if (!currentState.theme) {
+    applyThemeToDOM('system')
   }
   
   // Listen for system theme changes
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    const { theme, setTheme } = useThemeStore.getState()
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    const { theme } = useThemeStore.getState()
     if (theme === 'system') {
-      const systemTheme = e.matches ? 'dark' : 'light'
-      applyThemeToDOM(systemTheme)
-      useThemeStore.setState({ resolvedTheme: systemTheme })
+      applyThemeToDOM('system')
     }
   })
 }

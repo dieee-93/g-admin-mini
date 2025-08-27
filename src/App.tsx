@@ -24,47 +24,48 @@ import {
   CustomerLoginPage, 
   AdminLoginPage, 
   AdminPortalPage 
-} from '@/pages';
+} from '@/pages/public';
 
 // 📱 SISTEMA OFFLINE-FIRST
 import { initializeOffline } from '@/lib/offline';
 
-// Dashboard Module - Critical, not lazy loaded
-import { Dashboard } from '@/modules/dashboard/Dashboard';
+// Dashboard Module - Critical, not lazy loaded  
+import { Dashboard } from '@/pages/admin/dashboard/page';
 import { 
   ExecutiveDashboard,
   CrossModuleAnalytics,
   CustomReporting,
   CompetitiveIntelligence,
   PredictiveAnalytics as PredictiveAnalyticsComponent
-} from '@/modules/dashboard/components';
+} from '@/pages/admin/dashboard/components';
 
 // Lazy-loaded modules for performance
 import {
   LazySalesPage,
   LazyOperationsPage,
-  LazyMaterialsPage,
   LazyStockLab,
   LazyProductsPage,
   LazyStaffPage,
   LazyCustomersPage,
   LazySchedulingPage,
   LazyFiscalPage,
-  LazySettingsPage
-} from '@/modules/lazy/LazyModules';
+  LazySettingsPage,
+  LazyThemeTestPage,
+  LazySupplyChainPage,
+  LazyProcurementPage
+} from '@/lib/lazy';
 
 // Materials sub-modules
-import { ABCAnalysisPage } from '@/modules/materials/components';
-import { LazySupplyChainPage } from '@/modules/materials/LazySupplyChainPage';
-import { LazyProcurementPage } from '@/modules/materials/LazyProcurementPage';
+import { default as ABCAnalysisView } from '@/pages/admin/materials/abc-analysis';
+// LazySupplyChainPage and LazyProcurementPage now imported from central LazyModules
 
 // Settings sub-modules
 import { 
-  DiagnosticsPage,
-  ReportingPage,
-  EnterprisePage,
-  IntegrationsPage
-} from '@/modules/settings/components';
+  DiagnosticsView,
+  ReportingView,
+  EnterpriseView,
+  IntegrationsView
+} from '@/pages/admin/settings';
 
 // Customer modules - Experiencia específica para usuarios CLIENTE
 import { 
@@ -72,7 +73,7 @@ import {
   CustomerMenu, 
   MyOrders, 
   CustomerSettings 
-} from '@/modules/customer';
+} from '@/pages/app';
 
 // Performance monitoring component
 function PerformanceWrapper({ children }: { children: React.ReactNode }) {
@@ -271,7 +272,7 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="materials">
                               <ResponsiveLayout>
-                                <ABCAnalysisPage />
+                                <ABCAnalysisView />
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -355,7 +356,7 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
                               <ResponsiveLayout>
-                                <IntegrationsPage />
+                                <IntegrationsView />
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -364,7 +365,7 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
                               <ResponsiveLayout>
-                                <DiagnosticsPage />
+                                <DiagnosticsView />
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -373,7 +374,7 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
                               <ResponsiveLayout>
-                                <ReportingPage />
+                                <ReportingView />
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -382,13 +383,24 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['SUPER_ADMIN']}>
                               <ResponsiveLayout>
-                                <EnterprisePage />
+                                <EnterpriseView />
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
                         
-                        {/* 📱 CUSTOMER APP - Para usuarios CLIENTE */}
+                        {/* � DEBUG ROUTES - Development only */}
+                        <Route path="/admin/debug/theme-test" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyThemeTestPage />
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        
+                        {/* �📱 CUSTOMER APP - Para usuarios CLIENTE */}
                         <Route path="/app/portal" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>

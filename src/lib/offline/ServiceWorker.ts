@@ -383,7 +383,7 @@ async function getOfflineData(pathname: string): Promise<any> {
   };
   
   switch (true) {
-    case pathname.includes('/sales'):
+    case pathname.includes('/admin/sales'):
       return {
         ...baseResponse,
         data: {
@@ -391,7 +391,7 @@ async function getOfflineData(pathname: string): Promise<any> {
           summary: { total: 0, count: 0 }
         }
       };
-    case pathname.includes('/materials'):
+    case pathname.includes('/admin/materials'):
       return {
         ...baseResponse,
         data: {
@@ -399,7 +399,7 @@ async function getOfflineData(pathname: string): Promise<any> {
           alerts: []
         }
       };
-    case pathname.includes('/staff'):
+    case pathname.includes('/admin/staff'):
       return {
         ...baseResponse,
         data: {

@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useRoleAccess } from '@/lib/auth/useRoleAccess';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DashboardRoleRouterProps {
   children: React.ReactNode;
@@ -11,7 +11,7 @@ interface DashboardRoleRouterProps {
  * a su portal personalizado
  */
 export function DashboardRoleRouter({ children }: DashboardRoleRouterProps) {
-  const { isCliente } = useRoleAccess();
+  const { isCliente } = useAuth();
 
   // Si es usuario CLIENTE, redirigir a customer-portal
   if (isCliente()) {

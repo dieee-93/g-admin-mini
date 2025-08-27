@@ -26,7 +26,7 @@ export function ModuleHeader({
     <Box>
       {/* Header Principal - Breadcrumb removed to avoid duplication */}
       <Box 
-        bg={{ base: `${color}.50`, _dark: "gray.800" }}
+        bg="bg.surface"
         borderLeft={`4px solid`} 
         borderColor={`${color}.400`}
         p={4} 
@@ -52,7 +52,7 @@ export function ModuleHeader({
             
             <Heading 
               size="lg" 
-              color={{ base: `${color}.700`, _dark: "gray.100" }}
+              color="text.primary"
               fontWeight="bold"
             >
               {title}

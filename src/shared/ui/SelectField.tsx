@@ -1,5 +1,5 @@
 import { Select, createListCollection, Portal } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 // Tipo para opciones simples
 interface SimpleOption {
@@ -34,6 +34,7 @@ interface SelectFieldProps {
   disabled?: boolean
   size?: 'sm' | 'md' | 'lg'
   variant?: 'outline' | 'filled' | 'flushed'
+  colorScheme?: 'theme' | 'default' // 🆕 Added theme support
   
   // Estilos del trigger
   height?: string
@@ -61,25 +62,24 @@ export function SelectField({
   disabled = false,
   size = 'md',
   variant = 'outline',
+  colorScheme = 'default',
   height = 'auto',
   width = 'full',
   children,
   renderItem,
   noPortal = false,
 }: SelectFieldProps) {
+  // ✅ Recipes handle theming automatically
   
-  // Convertir value a array para compatibilidad con Chakra
-  const valueArray = Array.isArray(value) ? value : value ? [value.toString()] : []
-  const defaultValueArray = Array.isArray(defaultValue) ? defaultValue : defaultValue ? [defaultValue.toString()] : []
+  // Convert value to array format for Chakra
+  const valueArray = Array.isArray(value) ? value.map(String) : value ? [String(value)] : []
+  const defaultValueArray = Array.isArray(defaultValue) ? defaultValue.map(String) : defaultValue ? [String(defaultValue)] : []
   
-  // Handler unificado para cambios
+  // Handle value change
   const handleValueChange = (details: { value: string[] }) => {
-    if (onValueChange) {
-      onValueChange(details)
-    } else if (onChange) {
-      // Para compatibilidad con API simple
-      onChange(details.value[0] || '')
-    }
+    const newValue = details.value
+    onValueChange?.(details)
+    onChange?.(newValue.length === 1 ? newValue[0] : newValue)
   }
   
   // Si se pasan opciones simples, crear colección

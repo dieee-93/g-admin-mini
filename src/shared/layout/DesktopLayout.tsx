@@ -15,11 +15,13 @@ interface DesktopLayoutProps {
 
 export function DesktopLayout({ children }: DesktopLayoutProps) {
   const { sidebarCollapsed } = useNavigation();
+  const [sidebarHovered, setSidebarHovered] = React.useState(false);
 
   return (
     <Box 
       minH="100vh" 
-      bg={{ base: "gray.50", _dark: "gray.900" }} 
+      bg="bg.canvas"
+      color="text.primary"
       position="relative"
       w="100%"
       overflow="hidden"
@@ -27,16 +29,16 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
       {/* ✅ Sidebar fixed - no necesita estar en el HStack */}
       <Sidebar />
 
-      {/* 🔧 CRÍTICO CORREGIDO: Main area con positioning absoluto para evitar conflictos */}
+      {/* 🔧 OVERLAY SIDEBAR: Main area with left margin to avoid sidebar overlap */}
       <Box
         position="absolute"
         top="60px"
-        left={{ base: "0", md: sidebarCollapsed ? "60px" : "280px" }}
+        left="3rem"
         right="0"
         bottom="0"
-        transition="left 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
         overflow="auto"
-        bg={{ base: "gray.50", _dark: "gray.900" }}
+        bg="bg.surface"
+        color="text.primary"
       >
         {/* 🔧 CRÍTICO CORREGIDO: Content area con scroll interno - sin breadcrumb duplicado */}
         <Box 
@@ -46,7 +48,8 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
           py={{ base: "4", md: "6" }}
           overflow="visible"
           w="100%"
-          bg={{ base: "gray.50", _dark: "gray.900" }}
+          
+          color="text.primary"
         >
           {children}
         </Box>

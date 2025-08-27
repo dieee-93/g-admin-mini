@@ -36,8 +36,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRecipes } from '../hooks/useRecipes'; 
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { inventoryApi } from '@/modules/materials/data/inventoryApi';
-import { type InventoryItem } from '@/modules/materials/types';
+import { inventoryApi } from '@/pages/admin/materials/services/inventoryApi';
+import { type InventoryItem } from '@/pages/admin/materials/types';
 import { type CreateRecipeData } from '../types';
 
 // Import event system
@@ -745,7 +745,7 @@ export function RecipeForm() {
             
             {/* AI-Optimized Cost */}
             {aiSuggestions && optimizedCost < estimatedCost && (
-              <Card.Root variant="outline" bg="green.50">
+              <Card.Root variant="outline" >
                 <Card.Body p={4}>
                   <VStack gap={2} align="stretch">
                     <HStack justify="space-between">

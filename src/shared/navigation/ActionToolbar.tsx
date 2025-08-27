@@ -1,9 +1,9 @@
 // src/components/navigation/ActionToolbar.tsx
 // Toolbar de acciones para desktop
-// ✅ CORREGIDO: Import de Text + Quick actions contextuales
+// ✅ MIGRADO AL DESIGN SYSTEM
 
-import { Box, HStack, Button, Text } from '@chakra-ui/react';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { Stack, Button, Typography, Icon } from '@/shared/ui';
 
 export function ActionToolbar() {
   const { quickActions } = useNavigation();
@@ -11,33 +11,38 @@ export function ActionToolbar() {
   if (quickActions.length === 0) return null;
 
   return (
-    <Box
-      bg={{ base: "white", _dark: "gray.800" }}
-      borderTop="1px solid"
-      borderColor={{ base: "gray.200", _dark: "gray.700" }}
-      px="6"
-      py="3"
+    <div
+      style={{
+        padding: '0.75rem 1.5rem'
+      }}
     >
-      <HStack gap="3">
+      <Stack direction="row" gap="sm">
         {quickActions.map((action) => {
-          const Icon = action.icon;
-          
+          // ✅ Map to valid Chakra colorPalette values only
+          const colorPalette = action.color === 'blue' ? 'blue' : 
+                              action.color === 'green' ? 'green' :
+                              action.color === 'red' ? 'red' :
+                              action.color === 'orange' ? 'orange' :
+                              action.color === 'purple' ? 'purple' : 'gray';
+
           return (
             <Button
               key={action.id}
               variant="outline"
               size="sm"
               onClick={action.action}
-              colorPalette={action.color || 'gray'}
+              colorPalette={colorPalette}
             >
-              <HStack gap="2">
-                <Icon style={{ width: '16px', height: '16px' }} />
-                <Text>{action.label}</Text>
-              </HStack>
+              <Stack direction="row" gap="xs" align="center">
+                <Icon icon={action.icon} size="sm" />
+                <Typography variant="body" size="sm">
+                  {action.label}
+                </Typography>
+              </Stack>
             </Button>
           );
         })}
-      </HStack>
-    </Box>
+      </Stack>
+    </div>
   );
 }

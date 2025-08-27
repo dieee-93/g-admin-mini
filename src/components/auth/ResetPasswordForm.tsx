@@ -6,10 +6,10 @@ import {
   Link,
   Heading,
 } from '@chakra-ui/react';
-import { Card } from '@/shared/ui/Card';
+import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { Button } from '@/shared/ui/Button';
 import { InputField } from '@/shared/ui/InputField';
-import { useAuth } from '@/lib/auth/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ResetPasswordFormProps {
   onSwitchToLogin?: () => void;
@@ -46,7 +46,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
 
   if (submitted) {
     return (
-      <Card>
+      <CardWrapper>
         <Box maxW="md" mx="auto" mt={8}>
           <VStack gap={6}>
             <Heading size="lg" color="green.500">
@@ -57,7 +57,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
               <Box 
                 w="full" 
                 p={4} 
-                bg="green.50" 
+                 
                 border="1px solid" 
                 borderColor="green.200" 
                 borderRadius="md"
@@ -95,12 +95,12 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
             </VStack>
           </VStack>
         </Box>
-      </Card>
+      </CardWrapper>
     );
   }
 
   return (
-    <Card>
+    <CardWrapper>
       <Box maxW="md" mx="auto" mt={8}>
         <VStack gap={6}>
           <VStack gap={2}>
@@ -165,6 +165,6 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
           </form>
         </VStack>
       </Box>
-    </Card>
+    </CardWrapper>
   );
 }

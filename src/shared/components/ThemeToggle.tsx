@@ -1,76 +1,55 @@
-import { Button, HStack, Text, Select } from '@chakra-ui/react'
+import { SelectField, Stack, Typography, Button } from '@/shared/ui'
 import { SunIcon, MoonIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline'
-import { useTheme } from '@/hooks/useZustandStores'
-
-const themeOptions = [
-  { value: 'system', label: 'Sistema', icon: ComputerDesktopIcon },
-  { value: 'light', label: 'Claro', icon: SunIcon },
-  { value: 'dark', label: 'Oscuro', icon: MoonIcon },
-  { value: 'corporate', label: 'Corporativo' },
-  { value: 'nature', label: 'Natural' },
-  { value: 'sunset', label: 'Atardecer' },
-  { value: 'ocean', label: 'Océano' },
-  { value: 'high-contrast', label: 'Alto Contraste' },
-]
+import { useThemeStore, availableThemes } from '@/store/themeStore'
 
 export function ThemeToggle() {
-  const { theme, setTheme, getThemeColors } = useTheme()
-  const currentColors = getThemeColors()
+  const { currentTheme, applyTheme } = useThemeStore()
+
+  // Create options from our availableThemes
+  const themeOptions = availableThemes.map(theme => ({
+    value: theme.id,
+    label: theme.name,
+    ...(theme.id === 'system' && { icon: ComputerDesktopIcon }),
+    ...(theme.id === 'light' && { icon: SunIcon }),
+    ...(theme.id === 'dark' && { icon: MoonIcon }),
+  }))
+
+  const handleThemeChange = (value: string | string[]) => {
+    const selectedTheme = Array.isArray(value) ? value[0] : value
+    applyTheme(selectedTheme)
+  }
 
   return (
-    <HStack gap={3}>
-      <Text fontSize="sm" fontWeight="medium">
-        Tema:
-      </Text>
-      <Select.Root 
-        value={theme}
-        onValueChange={(value) => setTheme(value.value as any)}
-        size="sm"
-        width="180px"
-      >
-        <Select.Trigger>
-          <Select.ValueText>{themeOptions.find(opt => opt.value === theme)?.label || 'Sistema'}</Select.ValueText>
-        </Select.Trigger>
-        <Select.Content>
-          {themeOptions.map((option) => {
-            const Icon = option.icon
-            return (
-              <Select.Item key={option.value} item={option}>
-                <HStack gap={2}>
-                  {Icon && <Icon className="w-4 h-4" />}
-                  <Text>{option.label}</Text>
-                  {['corporate', 'nature', 'sunset', 'ocean', 'high-contrast'].includes(option.value) && (
-                    <div
-                      style={{
-                        width: '12px',
-                        height: '12px',
-                        borderRadius: '2px',
-                        backgroundColor: option.value === theme ? currentColors.primary : '#ccc',
-                        marginLeft: 'auto',
-                      }}
-                    />
-                  )}
-                </HStack>
-              </Select.Item>
-            )
-          })}
-        </Select.Content>
-      </Select.Root>
-    </HStack>
+    <Stack direction="column" gap="sm">
+      <Stack direction="row" gap="sm" align="center">
+        <Typography variant="label">
+          Tema Activo: {currentTheme?.name || 'System Default'}
+        </Typography>
+        <SelectField 
+          value={currentTheme?.id || 'system'}
+          onChange={handleThemeChange}
+          placeholder="Selecciona un tema"
+          width="220px"
+          options={themeOptions}
+        />
+      </Stack>
+      <Typography variant="caption" color="muted">
+        {availableThemes.length} themes únicos disponibles con paletas profesionales y VSCode auténticas.
+      </Typography>
+    </Stack>
   )
 }
 
 export function QuickThemeToggle() {
-  const { toggleTheme, resolvedTheme } = useTheme()
+  const { theme, toggleTheme } = useThemeStore()
 
   return (
     <Button
       size="sm"
       variant="ghost"
       onClick={toggleTheme}
-      px={2}
     >
-      {resolvedTheme === 'dark' ? (
+      {theme === 'dark' ? (
         <SunIcon className="w-4 h-4" />
       ) : (
         <MoonIcon className="w-4 h-4" />
