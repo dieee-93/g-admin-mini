@@ -6,6 +6,7 @@
 import { useMemo } from 'react';
 import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
 import type { BusinessCapabilities } from '@/types/businessCapabilities';
+import { MILESTONES, type Milestone } from '@/config/milestones';
 
 // Configuración de módulos por capacidad
 const MODULE_CONFIG = {
@@ -127,10 +128,14 @@ interface PersonalizedTutorial {
   isRelevant: boolean;
 }
 
+interface PersonalizedMilestone extends Milestone {
+  isCompleted: boolean;
+}
+
 export function usePersonalizedExperience() {
-  const { 
-    profile, 
-    hasCapability, 
+  const {
+    profile,
+    hasCapability,
     shouldShowModule,
     shouldShowTutorial,
     getOperationalTier,
@@ -141,14 +146,14 @@ export function usePersonalizedExperience() {
   // Obtener módulos personalizados
   const personalizedModules = useMemo((): PersonalizedModule[] => {
     const modules: PersonalizedModule[] = [];
-    
+
     // Agregar módulos base
     modules.push(...MODULE_CONFIG.base.map(module => ({
       ...module,
       isEnabled: true,
       category: 'base' as const
     })));
-    
+
     // Agregar módulos por capacidad
     if (hasCapability('has_physical_presence')) {
       modules.push(...MODULE_CONFIG.physical_presence.map(module => ({
@@ -157,7 +162,7 @@ export function usePersonalizedExperience() {
         category: 'capability' as const
       })));
     }
-    
+
     if (hasCapability('has_delivery_logistics')) {
       modules.push(...MODULE_CONFIG.delivery_logistics.map(module => ({
         ...module,
@@ -165,7 +170,7 @@ export function usePersonalizedExperience() {
         category: 'capability' as const
       })));
     }
-    
+
     if (hasCapability('has_online_store')) {
       modules.push(...MODULE_CONFIG.online_store.map(module => ({
         ...module,
@@ -173,7 +178,7 @@ export function usePersonalizedExperience() {
         category: 'capability' as const
       })));
     }
-    
+
     if (hasCapability('has_scheduling_system')) {
       modules.push(...MODULE_CONFIG.scheduling_system.map(module => ({
         ...module,
@@ -181,53 +186,53 @@ export function usePersonalizedExperience() {
         category: 'capability' as const
       })));
     }
-    
+
     return modules;
   }, [hasCapability]);
 
   // Obtener widgets personalizados para dashboard
   const personalizedDashboardWidgets = useMemo((): string[] => {
     let widgets = [...DASHBOARD_WIDGETS.base];
-    
+
     if (hasCapability('has_physical_presence')) {
       widgets.push(...DASHBOARD_WIDGETS.physical_presence);
     }
-    
+
     if (hasCapability('has_delivery_logistics')) {
       widgets.push(...DASHBOARD_WIDGETS.delivery_logistics);
     }
-    
+
     if (hasCapability('has_online_store')) {
       widgets.push(...DASHBOARD_WIDGETS.online_store);
     }
-    
+
     if (hasCapability('has_scheduling_system')) {
       widgets.push(...DASHBOARD_WIDGETS.scheduling_system);
     }
-    
+
     return widgets;
   }, [hasCapability]);
 
   // Obtener tutoriales personalizados
   const personalizedTutorials = useMemo((): PersonalizedTutorial[] => {
     let tutorials = [...TUTORIAL_CONFIG.base];
-    
+
     if (hasCapability('has_physical_presence')) {
       tutorials.push(...TUTORIAL_CONFIG.physical_presence);
     }
-    
+
     if (hasCapability('has_delivery_logistics')) {
       tutorials.push(...TUTORIAL_CONFIG.delivery_logistics);
     }
-    
+
     if (hasCapability('has_online_store')) {
       tutorials.push(...TUTORIAL_CONFIG.online_store);
     }
-    
+
     if (hasCapability('has_scheduling_system')) {
       tutorials.push(...TUTORIAL_CONFIG.scheduling_system);
     }
-    
+
     return tutorials
       .sort((a, b) => a.priority - b.priority)
       .map(tutorial => ({
@@ -237,6 +242,28 @@ export function usePersonalizedExperience() {
       }));
   }, [hasCapability, profile]);
 
+  // Obtener logros (milestones) personalizados
+  const personalizedMilestones = useMemo((): PersonalizedMilestone[] => {
+    if (!profile?.capabilities) {
+      return [];
+    }
+
+    const activeCapabilities = (Object.keys(profile.capabilities) as (keyof BusinessCapabilities)[])
+      .filter(key => profile.capabilities[key]);
+
+    if (activeCapabilities.length === 0) {
+      return [];
+    }
+
+    const relevantMilestones = MILESTONES.filter(m => activeCapabilities.includes(m.capability));
+
+    return relevantMilestones.map(milestone => ({
+      ...milestone,
+      isCompleted: profile?.customizations.milestonesCompleted?.includes(milestone.id) ?? false,
+    }));
+  }, [profile]);
+
+
   // Helper functions para componentes
   const getNavigationItems = () => {
     return personalizedModules.filter(module => module.isEnabled);
@@ -245,7 +272,7 @@ export function usePersonalizedExperience() {
   const getDashboardLayout = () => {
     // Diferentes layouts basados en tier operativo
     const tier = getOperationalTier();
-    
+
     switch (tier) {
       case 'Base Operativa':
         return 'single-column'; // Layout simple
@@ -261,7 +288,14 @@ export function usePersonalizedExperience() {
   };
 
   const getOnboardingFlow = () => {
-    return personalizedTutorials.filter(tutorial => !tutorial.isCompleted).slice(0, 5);
+    // Prioritize incomplete milestones over tutorials
+    const incompleteMilestones = personalizedMilestones.filter(m => !m.isCompleted);
+    if (incompleteMilestones.length > 0) {
+      return incompleteMilestones.slice(0, 5).map(m => ({ id: m.id, title: m.title, isCompleted: false, type: 'milestone' }));
+    }
+
+    const incompleteTutorials = personalizedTutorials.filter(tutorial => !tutorial.isCompleted);
+    return incompleteTutorials.slice(0, 5).map(t => ({ id: t.id, title: t.title, isCompleted: false, type: 'tutorial' }));
   };
 
   const shouldShowFeature = (featureId: string) => {
@@ -271,7 +305,7 @@ export function usePersonalizedExperience() {
   const getContextualHelp = (currentPage: string) => {
     // Retorna ayuda contextual basada en la página actual y capacidades
     const helpItems = [];
-    
+
     if (currentPage === '/admin/sales' && hasCapability('has_physical_presence')) {
       helpItems.push({
         title: 'Gestión de Mesas',
@@ -279,7 +313,7 @@ export function usePersonalizedExperience() {
         action: 'Ver Tutorial'
       });
     }
-    
+
     if (currentPage === '/admin/products' && hasCapability('has_online_store')) {
       helpItems.push({
         title: 'Catálogo Online',
@@ -287,42 +321,48 @@ export function usePersonalizedExperience() {
         action: 'Configurar'
       });
     }
-    
+
     return helpItems;
   };
+
+  const completedMilestones = personalizedMilestones.filter(m => m.isCompleted).length;
+  const totalMilestones = personalizedMilestones.length;
 
   return {
     // Estado principal
     profile,
     tier: getOperationalTier(),
-    
+
     // Módulos y navegación
     modules: personalizedModules,
     navigationItems: getNavigationItems(),
-    
+
     // Dashboard personalizado
     dashboardWidgets: personalizedDashboardWidgets,
     dashboardLayout: getDashboardLayout(),
-    
-    // Sistema de tutoriales
+
+    // Sistema de tutoriales y logros
     tutorials: personalizedTutorials,
+    milestones: personalizedMilestones,
     onboardingFlow: getOnboardingFlow(),
-    
+
     // Helper functions
     hasCapability,
     shouldShowModule,
     shouldShowFeature,
     getContextualHelp,
-    
+
     // Features habilitadas
     enabledFeatures,
-    
+
     // Estadísticas de personalización
     stats: {
       totalModules: personalizedModules.length,
       activeCapabilities: Object.values(profile?.capabilities || {}).filter(Boolean).length,
       completedTutorials: personalizedTutorials.filter(t => t.isCompleted).length,
-      totalTutorials: personalizedTutorials.length
+      totalTutorials: personalizedTutorials.length,
+      completedMilestones,
+      totalMilestones,
     }
   };
 }

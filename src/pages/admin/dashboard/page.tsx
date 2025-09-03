@@ -21,6 +21,8 @@ import {
   BoltIcon
 } from '@heroicons/react/24/outline';
 
+import { MilestoneTracker } from './components/MilestoneTracker';
+
 export function Dashboard() {
   const {
     heroMetric,
@@ -52,6 +54,8 @@ export function Dashboard() {
         subtitle="Centro de comando · G-Admin"
         icon={HomeIcon}
       />
+
+      <MilestoneTracker />
 
       <StatsSection>
         <CardGrid 
