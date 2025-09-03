@@ -127,7 +127,7 @@ export function SetupWizard() {
                       ease: "easeInOut"
                     }}
                   >
-                    {getStepComponent()}
+                    {renderStepComponent()}
                   </motion.div>
                 </AnimatePresence>
               </Box>
