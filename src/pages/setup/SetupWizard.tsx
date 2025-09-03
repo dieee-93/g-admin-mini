@@ -1,142 +1,67 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
-import { BusinessModelStep } from './steps/business-setup/business-model/BusinessModelStep';
-import { DatabaseSetupStep } from './steps/database-setup/DatabaseSetupStep';
-import { SupabaseConnectionStep } from './steps/infrastructure/supabase-connection';
-import { WelcomeScreen } from './steps/welcome/WelcomeScreen';
-import { AdminUserCreationStep } from './steps/system-setup/admin-user-creation';
-import { SystemVerification } from './steps/system-verification/SystemVerification';
-import { BasicSystemConfig } from './steps/basic-system-config/BasicSystemConfig';
-import { SetupSummary } from './steps/setup-summary/SetupSummary';
 import { SetupHeader } from './layout/SetupHeader';
 import { SetupSidebar } from './layout/SetupSidebar';
 import { SetupProgressBar } from './layout/SetupProgressBar';
-import { useSetupState } from './hooks/useSetupState';
-import { useSetupNavigation } from './hooks/useSetupNavigation';
-import { useSetupHealth } from './hooks/useSetupHealth';
-import { createSetupSteps } from './config/setupSteps';
+import { useSetupStore } from '../../store/setupStore';
+import { createSetupSteps, STEP_GROUPS } from './config/setupSteps';
+import { STEP_COMPONENTS } from './config/stepComponents';
 import '../../styles/setup-animations.css';
 
 export function SetupWizard() {
+  const {
+    currentGroup,
+    currentSubStep,
+    userName,
+    adminUserData,
+    setUserName,
+    setAdminUserData,
+    setSupabaseCredentials,
+    nextStep,
+    prevStep,
+    jumpToStep,
+    reset,
+    fillWithTestData
+  } = useSetupStore();
+
   // Connection state
   const [isConnecting] = useState(false);
 
-  // Custom hooks
-  const setupState = useSetupState();
-  const systemHealth = useSetupHealth(
-    setupState.userName,
-    setupState.supabaseCredentials,
-    setupState.adminUserData
-  );
-  const navigation = useSetupNavigation(
-    setupState.currentGroup,
-    setupState.currentSubStep,
-    setupState.setCurrentGroup,
-    setupState.setCurrentSubStep,
-    setupState.saveProgress,
-    setupState.supabaseCredentials,
-    setupState.userName,
-    setupState.adminUserData
-  );
+  // Memoize setup steps UI data
+  const setupSteps = React.useMemo(() => createSetupSteps(currentGroup), [currentGroup]);
 
-  // Create setup steps for UI
-  const setupSteps = createSetupSteps(setupState.currentGroup);
+  // Derive current component from state and render it
+  const renderStepComponent = () => {
+    const group = STEP_GROUPS[currentGroup];
+    const componentId = group?.subSteps[currentSubStep]?.component || 'welcome';
+    const Component = STEP_COMPONENTS[componentId];
 
-
-  // Step components
-  const getStepComponent = () => {
-    const component = navigation.getCurrentComponent();
-    console.log('🎯 Current component:', component, { currentGroup: setupState.currentGroup, currentSubStep: setupState.currentSubStep });
-    
-    switch (component) {
-      case 'welcome':
-        return <WelcomeScreen onComplete={(name: string) => {
-          console.log('👋 Welcome screen completed with name:', name);
-          setupState.setUserName(name);
-          console.log('📝 Username saved, navigating...');
-          navigation.nextSubStep();
-        }} />;
-      
-      case 'admin-user':
-        return <AdminUserCreationStep 
-          onComplete={(userData) => {
-            setupState.setAdminUserData(userData);
-            navigation.nextSubStep();
-          }}
-          onBack={navigation.prevSubStep}
-        />;
-      
-      case 'supabase':
-        return <SupabaseConnectionStep 
-          onConnectionSuccess={(url: string, anonKey: string) => {
-            console.log('🎉 Supabase connection success callback triggered!', { url, anonKey: anonKey.substring(0, 20) + '...' });
-            const credentials = { url, anonKey };
-            setupState.setSupabaseCredentials(credentials);
-            console.log('💾 Credentials saved, navigating to next step...');
-            navigation.nextSubStep();
-          }}
-          isConnecting={isConnecting}
-        />;
-      
-      case 'database':
-        return <DatabaseSetupStep onNext={navigation.nextSubStep} />;
-      
-      case 'verification':
-        return <SystemVerification 
-          onNext={navigation.nextSubStep} 
-          onBack={navigation.prevSubStep} 
-          onSkip={navigation.skipCurrentStep}
-        />;
-      
-      case 'business-model':
-        return <BusinessModelStep 
-          onComplete={navigation.nextSubStep}
-          onBack={navigation.prevSubStep}
-        />;
-      
-      case 'basic-config':
-        return <BasicSystemConfig 
-          onComplete={navigation.nextSubStep}
-          onBack={navigation.prevSubStep}
-          onSkip={navigation.skipCurrentStep}
-        />;
-      
-      case 'summary':
-        return <SetupSummary 
-          userName={setupState.userName}
-          adminUser={setupState.adminUserData}
-          onComplete={navigation.nextSubStep}
-          onBack={navigation.prevSubStep}
-        />;
-      
-      case 'finish':
-        return (
-          <Box textAlign="center" p={8}>
-            <Stack gap={6} align="center">
-              <Text fontSize="3xl" color="gray.700">
-                ¡Todo listo! 🎉
-              </Text>
-              <Text fontSize="md" color="gray.600">
-                {setupState.userName ? `${setupState.userName}, tu negocio` : 'Tu negocio'} ha sido configurado exitosamente. Ya podés empezar a operar.
-              </Text>
-              <Button 
-                size="lg"
-                bg="gray.800"
-                color="gray.50"
-                _hover={{ bg: 'gray.900' }}
-                onClick={() => window.location.href = '/admin'}
-                className="setup-interactive"
-              >
-                Ir al Dashboard →
-              </Button>
-            </Stack>
-          </Box>
-        );
-      default:
-        return null;
+    if (!Component) {
+      return <Box>Error: Componente no encontrado</Box>;
     }
+
+    const props = {
+      onComplete: (data: any) => {
+        if (componentId === 'welcome') setUserName(data);
+        if (componentId === 'admin-user') setAdminUserData(data);
+        nextStep();
+      },
+      onConnectionSuccess: (url: string, anonKey: string) => {
+        setSupabaseCredentials({ url, anonKey });
+        nextStep();
+      },
+      onNext: nextStep,
+      onBack: prevStep,
+      onSkip: nextStep,
+      isConnecting,
+      userName,
+      adminUser: adminUserData,
+    };
+
+    return <Component {...props} />;
   };
+  const progressPercentage = (currentGroup / (STEP_GROUPS.length -1)) * 100;
 
   return (
     <motion.div
@@ -153,14 +78,13 @@ export function SetupWizard() {
           {/* Sidebar */}
           <SetupSidebar
             setupSteps={setupSteps}
-            currentGroup={setupState.currentGroup}
-            currentSubStep={setupState.currentSubStep}
-            systemHealth={systemHealth}
-            onStepClick={navigation.jumpToGroup}
-            onFillTestData={setupState.fillTestData}
-            onResetAll={setupState.resetState}
-            onJumpToGroup={navigation.jumpToGroup}
-            onJumpToSubStep={navigation.jumpToSubStep}
+            currentGroup={currentGroup}
+            currentSubStep={currentSubStep}
+            onStepClick={(group, subStep) => jumpToStep(group, subStep)}
+            onFillTestData={fillWithTestData}
+            onResetAll={reset}
+            onJumpToGroup={(group) => jumpToStep(group)}
+            onJumpToSubStep={(subStep) => jumpToStep(currentGroup, subStep)}
           />
 
           {/* Main Content Area */}
@@ -185,8 +109,8 @@ export function SetupWizard() {
             >
               {/* Mobile Progress Bar */}
               <SetupProgressBar
-                progressPercentage={navigation.getProgressPercentage()}
-                currentStep={setupState.currentGroup + 1}
+                progressPercentage={progressPercentage}
+                currentStep={currentGroup + 1}
                 totalSteps={setupSteps.length}
               />
 
@@ -194,7 +118,7 @@ export function SetupWizard() {
               <Box>
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={`${setupState.currentGroup}-${setupState.currentSubStep}`}
+                    key={`${currentGroup}-${currentSubStep}`}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}

@@ -12,15 +12,14 @@ import {
   InformationCircleIcon,
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
+import { useSetupStore } from '../../../store/setupStore';
 import { SetupStep } from '../../config/setupSteps';
-import { SystemHealth } from '../../hooks/useSetupHealth';
 import { DeveloperControls } from '../dev/DeveloperControls';
 
 interface SetupSidebarProps {
   setupSteps: SetupStep[];
   currentGroup: number;
   currentSubStep: number;
-  systemHealth: SystemHealth;
   onStepClick: (stepIndex: number) => void;
   onFillTestData: () => void;
   onResetAll: () => void;
@@ -32,13 +31,19 @@ export function SetupSidebar({
   setupSteps,
   currentGroup,
   currentSubStep,
-  systemHealth,
   onStepClick,
   onFillTestData,
   onResetAll,
   onJumpToGroup,
   onJumpToSubStep,
 }: SetupSidebarProps) {
+  const { supabaseCredentials, adminUserData } = useSetupStore();
+
+  const systemHealth = {
+    isSupabaseConnected: !!supabaseCredentials,
+    isAdminUserCreated: !!adminUserData,
+  };
+
   return (
     <motion.div
       initial={{ x: -20, opacity: 0 }}
