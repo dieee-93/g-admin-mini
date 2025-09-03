@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Box,
   Text,
@@ -5,16 +6,13 @@ import {
   Flex,
   Separator,
 } from '@chakra-ui/react';
-import { STEP_GROUPS } from '../config/setupSteps';
+import { STEP_GROUPS } from '../config/setupSteps'; 
 
 
 interface DeveloperControlsProps {
   currentGroup: number;
   currentSubStep: number;
-  systemHealth: {
-    isSupabaseConnected: boolean;
-    isAdminUserCreated: boolean;
-  };
+  systemHealth: SystemHealth;
   onFillTestData: () => void;
   onResetAll: () => void;
   onJumpToGroup: (groupIndex: number) => void;
@@ -79,7 +77,7 @@ export function DeveloperControls({
         🔍 System Health
       </Text>
       
-      <Box
+    { /* <Box
         p={2}
         bg="gray.100"
         borderRadius="md"
@@ -96,7 +94,7 @@ export function DeveloperControls({
             {check.status ? '✅' : '❌'} {check.label}
           </Text>
         ))}
-      </Box>
+      </Box> */}
       
       {/* Navigation Controls */}
       <Text

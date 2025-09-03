@@ -13,7 +13,7 @@ import {
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import { useSetupStore } from '../../../store/setupStore';
-import { type SetupStep } from '../../config/setupSteps';
+import { type SetupStep } from '../config/setupSteps'; 
 import { DeveloperControls } from '../dev/DeveloperControls';
 
 interface SetupSidebarProps {
