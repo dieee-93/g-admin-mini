@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Box, Flex, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton, useToast } from '@chakra-ui/react';
+import { Box, Flex, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
 import { SetupHeader } from './layout/SetupHeader';
 import { SetupSidebar } from './layout/SetupSidebar';
 import { SetupProgressBar } from './layout/SetupProgressBar';
@@ -8,6 +8,7 @@ import { useSetupStore } from '../../store/setupStore';
 import { createSetupSteps, STEP_GROUPS } from './config/setupSteps';
 import { STEP_COMPONENTS } from './config/stepComponents';
 import '../../styles/setup-animations.css';
+import { notify } from '@/lib/notifications';
 
 export function SetupWizard() {
   const {
@@ -27,20 +28,17 @@ export function SetupWizard() {
     fillWithTestData
   } = useSetupStore();
 
-  const toast = useToast();
 
   useEffect(() => {
     if (error) {
-      toast({
+      notify.error({
         title: "Acción no permitida",
         description: error,
-        status: "warning",
         duration: 5000,
-        isClosable: true,
         onCloseComplete: () => setError(null),
       });
     }
-  }, [error, toast, setError]);
+  }, [error, setError]);
 
   // Connection state
   const [isConnecting] = useState(false);
