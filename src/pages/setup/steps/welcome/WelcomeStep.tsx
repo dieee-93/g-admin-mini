@@ -7,20 +7,20 @@ import {
   InputField
 } from '@/shared/ui';
 
-interface WelcomeScreenProps {
-  onComplete: (userName: string) => void;
+interface WelcomeStepProps {
+  onStepComplete: (userName: string) => void;
 }
 
-export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
+export function WelcomeStep({ onStepComplete }: WelcomeStepProps) {
   const [userName, setUserName] = useState('');
 
   const handleStart = () => {
     if (userName.trim()) {
-      console.log('👋 WelcomeScreen: calling onComplete with:', userName.trim());
-      onComplete(userName.trim());
-      console.log('👋 WelcomeScreen: onComplete called');
+      console.log('👋 WelcomeStep: calling onStepComplete with:', userName.trim());
+      onStepComplete(userName.trim());
+      console.log('👋 WelcomeStep: onStepComplete called');
     } else {
-      console.warn('👋 WelcomeScreen: userName is empty, cannot proceed');
+      console.warn('👋 WelcomeStep: userName is empty, cannot proceed');
     }
   };
 

@@ -19,6 +19,7 @@ interface SetupState {
   userName: string;
   supabaseCredentials: SupabaseCredentials | null;
   adminUserData: AdminUserData | null;
+  error: string | null;
   timestamp: number;
 }
 
@@ -26,6 +27,7 @@ interface SetupActions {
   setUserName: (name: string) => void;
   setSupabaseCredentials: (credentials: SupabaseCredentials) => void;
   setAdminUserData: (data: AdminUserData) => void;
+  setError: (error: string | null) => void;
 
   nextStep: () => void;
   prevStep: () => void;
@@ -43,6 +45,7 @@ const initialState: SetupState = {
   userName: '',
   supabaseCredentials: null,
   adminUserData: null,
+  error: null,
   timestamp: Date.now(),
 };
 
@@ -76,17 +79,19 @@ export const useSetupStore = create<SetupStore>()(
         setUserName: (name) => set({ userName: name, timestamp: Date.now() }, false, 'setUserName'),
         setSupabaseCredentials: (credentials) => set({ supabaseCredentials: credentials, timestamp: Date.now() }, false, 'setSupabaseCredentials'),
         setAdminUserData: (data) => set({ adminUserData: data, timestamp: Date.now() }, false, 'setAdminUserData'),
+        setError: (error) => set({ error }, false, 'setError'),
 
         nextStep: () => {
-          const { currentGroup, currentSubStep } = get();
+          const { currentGroup, currentSubStep, setError } = get();
           const currentGroupData = STEP_GROUPS[currentGroup];
 
           if (currentSubStep < currentGroupData.subSteps.length - 1) {
             set({ currentSubStep: currentSubStep + 1, timestamp: Date.now() }, false, 'nextSubStep');
           } else if (currentGroup < STEP_GROUPS.length - 1) {
             if (canProceedToStep(get(), currentGroup + 1)) {
-              set({ currentGroup: currentGroup + 1, currentSubStep: 0, timestamp: Date.now() }, false, 'nextGroup');
+              set({ currentGroup: currentGroup + 1, currentSubStep: 0, error: null, timestamp: Date.now() }, false, 'nextGroup');
             } else {
+              setError('Faltan completar pasos previos para poder avanzar.');
               console.warn('Cannot proceed to next group, prerequisites not met.');
             }
           }
@@ -109,8 +114,9 @@ export const useSetupStore = create<SetupStore>()(
 
         jumpToStep: (groupIndex, subStepIndex = 0) => {
             if (canProceedToStep(get(), groupIndex)) {
-                set({ currentGroup: groupIndex, currentSubStep: subStepIndex, timestamp: Date.now() }, false, 'jumpToStep');
+                set({ currentGroup: groupIndex, currentSubStep: subStepIndex, error: null, timestamp: Date.now() }, false, 'jumpToStep');
             } else {
+                get().setError(`No puedes saltar a este paso, te faltan datos previos.`);
                 console.warn(`Cannot jump to group ${groupIndex}, prerequisites not met.`);
             }
         },

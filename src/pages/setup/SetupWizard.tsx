@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
+import { Box, Flex, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton, useToast } from '@chakra-ui/react';
 import { SetupHeader } from './layout/SetupHeader';
 import { SetupSidebar } from './layout/SetupSidebar';
 import { SetupProgressBar } from './layout/SetupProgressBar';
@@ -15,6 +15,8 @@ export function SetupWizard() {
     currentSubStep,
     userName,
     adminUserData,
+    error,
+    setError,
     setUserName,
     setAdminUserData,
     setSupabaseCredentials,
@@ -25,11 +27,43 @@ export function SetupWizard() {
     fillWithTestData
   } = useSetupStore();
 
+  const toast = useToast();
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Acción no permitida",
+        description: error,
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        onCloseComplete: () => setError(null),
+      });
+    }
+  }, [error, toast, setError]);
+
   // Connection state
   const [isConnecting] = useState(false);
 
   // Memoize setup steps UI data
   const setupSteps = React.useMemo(() => createSetupSteps(currentGroup), [currentGroup]);
+
+  const handleStepComplete = (componentId: string, data: any) => {
+    switch (componentId) {
+      case 'welcome':
+        setUserName(data as string);
+        break;
+      case 'admin-user':
+        setAdminUserData(data as any); // Replace 'any' with the actual type
+        break;
+      case 'supabase-connection':
+        setSupabaseCredentials(data as { url: string; anonKey: string });
+        break;
+      default:
+        console.warn(`No action defined for componentId: ${componentId}`);
+    }
+    nextStep();
+  };
 
   // Derive current component from state and render it
   const renderStepComponent = () => {
@@ -42,15 +76,7 @@ export function SetupWizard() {
     }
 
     const props = {
-      onComplete: (data: any) => {
-        if (componentId === 'welcome') setUserName(data);
-        if (componentId === 'admin-user') setAdminUserData(data);
-        nextStep();
-      },
-      onConnectionSuccess: (url: string, anonKey: string) => {
-        setSupabaseCredentials({ url, anonKey });
-        nextStep();
-      },
+      onStepComplete: (data: any) => handleStepComplete(componentId, data),
       onNext: nextStep,
       onBack: prevStep,
       onSkip: nextStep,
@@ -122,7 +148,7 @@ export function SetupWizard() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    transition={{ 
+                    transition={{
                       duration: 0.3,
                       ease: "easeInOut"
                     }}
