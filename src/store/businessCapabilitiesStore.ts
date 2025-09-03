@@ -32,6 +32,7 @@ interface BusinessCapabilitiesState {
   setCapability: (capability: keyof BusinessCapabilities, value: boolean) => void;
   updateBasicInfo: (info: Partial<BusinessProfile>) => void;
   completeSetup: () => void;
+  completeMilestone: (milestoneId: string) => void;
   resetProfile: () => void;
   
   // Helpers para personalización de UI
@@ -141,6 +142,30 @@ export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
               ...state.profile,
               setupCompleted: true,
               onboardingStep: 1,
+            },
+          };
+        });
+      },
+
+      completeMilestone: (milestoneId) => {
+        set((state) => {
+          if (!state.profile) return state;
+
+          const completed = state.profile.customizations.milestonesCompleted || [];
+          if (completed.includes(milestoneId)) {
+            return state; // Milestone already completed, no change needed
+          }
+
+          const updatedCustomizations = {
+            ...state.profile.customizations,
+            milestonesCompleted: [...completed, milestoneId],
+          };
+
+          return {
+            ...state,
+            profile: {
+              ...state.profile,
+              customizations: updatedCustomizations,
             },
           };
         });

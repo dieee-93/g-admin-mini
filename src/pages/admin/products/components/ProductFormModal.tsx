@@ -11,6 +11,7 @@ import {
 import { XMarkIcon } from '@heroicons/react/24/outline';
 // import { ProductForm } from './ProductForm'; // TODO: Fix ProductForm export
 import { useProductsStore } from '@/store/productsStore';
+import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore'; // Import for milestones
 import { supabase } from '@/lib/supabase/client';
 import type { CreateProductData, UpdateProductData } from '../types';
 
@@ -28,6 +29,7 @@ export function ProductFormModal() {
     setError,
     setLoading 
   } = useProductsStore();
+  const { completeMilestone } = useBusinessCapabilities();
 
   // Estados temporales hasta que se arregle el store
   const [isModalOpen] = React.useState(false);
@@ -86,6 +88,20 @@ export function ProductFormModal() {
           .single();
 
         if (error) throw error;
+
+        // Milestone Completion Logic
+        // After a new product is successfully created, we check its type
+        // and complete the corresponding milestone.
+        switch (data.type) {
+          case 'ELABORATED':
+          case 'SUPPLY': // Assuming 'SUPPLY' is a standard physical product as well
+            completeMilestone('create-first-product-local');
+            break;
+          case 'DIGITAL':
+            completeMilestone('create-digital-product');
+            break;
+          // Add other product types for other milestones as needed
+        }
 
         // If recipe data exists, handle it separately
         if ('recipe' in data && data.recipe && newProduct) {

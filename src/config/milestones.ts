@@ -1,6 +1,35 @@
 import type { BusinessCapabilities } from '@/types/businessCapabilities';
 
 /**
+ * @fileoverview Master list of all application milestones.
+ *
+ * @description
+ * This file defines the master list of "Milestones" that guide the user through the
+ * initial setup and advanced features of the application. The system is data-driven;
+ * to add a new milestone, simply add a new object to the `MILESTONES` array.
+ *
+ * @category_criteria
+ * To ensure consistency, milestones are categorized based on the following criteria:
+ *
+ * 1. `Configuración Esencial`: Foundational, one-time setup tasks. These are things
+ *    a user MUST do to enable a whole area of functionality.
+ *    - Litmus Test: "Can I even start using this part of the app without doing this first?"
+ *      If the answer is no, it's `Configuración Esencial`.
+ *
+ * 2. `Primeros Pasos`: The first operational actions a user takes after the essential
+ *    setup is complete. This is about creating the first piece of content or data
+ *    within a module (e.g., first product, first client).
+ *    - Litmus Test: "Is this the action of creating the first 'thing' in a module?"
+ *      If yes, it's `Primeros Pasos`.
+ *
+ * 3. `Optimización`: Actions that are not strictly necessary to operate, but that
+ *    improve or enhance the user's business. These are about using more advanced
+ *    features or refining the setup.
+ *    - Litmus Test: "Can I run my business without this, but would doing it make my
+ *      business better/more efficient?" If yes, it's `Optimización`.
+ */
+
+/**
  * @interface Milestone
  * Define la estructura de un logro o hito que el usuario debe completar.
  * Estos hitos se activan según las capacidades del negocio y guían al usuario
@@ -38,7 +67,7 @@ export const MILESTONES: Milestone[] = [
     id: 'setup-pos',
     title: 'Configurar Punto de Venta (POS)',
     description: 'Personaliza tu terminal de ventas para agilizar las operaciones en tu local.',
-    capability: 'has_physical_presence',
+    capability: 'sells_products_for_onsite_consumption',
     link: '/admin/settings/pos',
     category: 'Configuración Esencial',
   },
@@ -46,7 +75,7 @@ export const MILESTONES: Milestone[] = [
     id: 'create-first-product-local',
     title: 'Crear tu primer producto',
     description: 'Añade un producto o servicio para empezar a vender en tu local.',
-    capability: 'has_physical_presence',
+    capability: 'sells_products_for_onsite_consumption',
     link: '/admin/products?action=new',
     category: 'Primeros Pasos',
   },
@@ -56,7 +85,7 @@ export const MILESTONES: Milestone[] = [
     id: 'configure-delivery-zones',
     title: 'Configurar Zonas de Reparto',
     description: 'Define las áreas geográficas a las que tu negocio realiza entregas.',
-    capability: 'has_delivery_logistics',
+    capability: 'sells_products_with_delivery',
     link: '/admin/settings/delivery',
     category: 'Configuración Esencial',
   },
@@ -64,7 +93,7 @@ export const MILESTONES: Milestone[] = [
     id: 'set-shipping-rates',
     title: 'Establecer Tarifas de Envío',
     description: 'Define los costos de envío para tus diferentes zonas de reparto.',
-    capability: 'has_delivery_logistics',
+    capability: 'sells_products_with_delivery',
     link: '/admin/settings/delivery-rates',
     category: 'Primeros Pasos',
   },
@@ -92,7 +121,7 @@ export const MILESTONES: Milestone[] = [
     id: 'define-business-hours',
     title: 'Definir Horarios de Atención',
     description: 'Establece los horarios en los que tu negocio acepta reservas o citas.',
-    capability: 'has_scheduling_system',
+    capability: 'sells_services_by_appointment',
     link: '/admin/settings/scheduling',
     category: 'Configuración Esencial',
   },
@@ -100,8 +129,58 @@ export const MILESTONES: Milestone[] = [
     id: 'setup-first-service',
     title: 'Configurar tu Primer Servicio',
     description: 'Crea un servicio que tus clientes puedan reservar (ej: "Corte de pelo", "Consulta inicial").',
-    capability: 'has_scheduling_system',
+    capability: 'sells_services_by_appointment',
     link: '/admin/scheduling/services?action=new',
+    category: 'Primeros Pasos',
+  },
+
+  // Hitos para: Retiro en Tienda (Pickup)
+  {
+    id: 'enable-pickup',
+    title: 'Habilitar Retiro en Tienda',
+    description: 'Configura los ajustes para que los clientes puedan comprar online y retirar sus productos en tu local.',
+    capability: 'sells_products_for_pickup',
+    link: '/admin/settings/shipping', // Placeholder link
+    category: 'Configuración Esencial',
+  },
+
+  // Hitos para: Productos Digitales
+  {
+    id: 'create-digital-product',
+    title: 'Crear tu Primer Producto Digital',
+    description: 'Añade tu primer producto no físico, como un e-book, un curso o software.',
+    capability: 'sells_digital_products',
+    link: '/admin/products?action=new&type=digital',
+    category: 'Primeros Pasos',
+  },
+
+  // Hitos para: Alquileres
+  {
+    id: 'add-rental-item',
+    title: 'Añadir un Artículo para Alquilar',
+    description: 'Define tu primer artículo disponible para alquiler, estableciendo sus tarifas y condiciones.',
+    capability: 'manages_rentals',
+    link: '/admin/products', // Placeholder link
+    category: 'Primeros Pasos',
+  },
+
+  // Hitos para: Membresías
+  {
+    id: 'create-membership-plan',
+    title: 'Crear tu Primera Membresía',
+    description: 'Define un plan de membresía con su precio, beneficios y ciclo de renovación.',
+    capability: 'manages_memberships',
+    link: '/admin/customers/memberships', // Placeholder link
+    category: 'Configuración Esencial',
+  },
+
+  // Hitos para: B2B
+  {
+    id: 'create-b2b-customer',
+    title: 'Crear un Perfil de Cliente Corporativo',
+    description: 'Añade tu primera empresa cliente para gestionar ventas y facturación B2B.',
+    capability: 'is_b2b_focused',
+    link: '/admin/customers?action=new&type=b2b',
     category: 'Primeros Pasos',
   },
 ];

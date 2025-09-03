@@ -24,9 +24,6 @@ export function calculateOperationalTier(
 ): string {
   if (
     businessStructure === 'multi_location' ||
-    capabilities.manages_rentals ||
-    capabilities.manages_memberships ||
-    capabilities.manages_subscriptions ||
     getMainOffersCount(capabilities) >= 4 ||
     (getMainOffersCount(capabilities) >= 3 && capabilities.has_online_store)
   ) {
