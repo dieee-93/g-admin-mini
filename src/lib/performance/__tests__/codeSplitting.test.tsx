@@ -3,21 +3,26 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { lazyComponents, CodeSplittingMonitor, createMonitoredLazyComponent } from '../codeSplitting';
 
+import { vi } from 'vitest';
+
 // Mock React.lazy to avoid actual imports during testing
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  lazy: jest.fn((importFn) => {
-    const MockComponent = () => <div data-testid="lazy-component">Lazy Component Loaded</div>;
-    MockComponent.displayName = 'MockLazyComponent';
-    return MockComponent;
-  }),
-  Suspense: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
-}));
+vi.mock('react', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    lazy: vi.fn((importFn) => {
+      const MockComponent = () => <div data-testid="lazy-component">Lazy Component Loaded</div>;
+      MockComponent.displayName = 'MockLazyComponent';
+      return MockComponent;
+    }),
+    Suspense: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  };
+});
 
 // Mock the performance API
 Object.defineProperty(window, 'performance', {
   value: {
-    now: jest.fn(() => Date.now())
+    now: vi.fn(() => Date.now())
   },
   writable: true
 });
@@ -85,7 +90,7 @@ describe('Code Splitting', () => {
 
   describe('createMonitoredLazyComponent', () => {
     it('should create a lazy component that records load time', async () => {
-      const mockImport = jest.fn().mockResolvedValue({
+      const mockImport = vi.fn().mockResolvedValue({
         default: () => <div>Mock Component</div>
       });
 
@@ -100,7 +105,7 @@ describe('Code Splitting', () => {
 
     it('should handle import errors gracefully', async () => {
       const mockError = new Error('Import failed');
-      const mockImport = jest.fn().mockRejectedValue(mockError);
+      const mockImport = vi.fn().mockRejectedValue(mockError);
 
       const LazyComponent = createMonitoredLazyComponent(
         mockImport,
