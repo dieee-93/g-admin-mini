@@ -54,7 +54,11 @@ export function SetupWizard() {
         setUserName(data as string);
         break;
       case 'admin-user':
-        setAdminUserData(data as any); // Replace 'any' with the actual type
+        // Ensure we only store non-sensitive data
+        setAdminUserData({
+          email: data.email,
+          fullName: data.fullName,
+        });
         break;
       case 'supabase-connection':
         setSupabaseCredentials(data as { url: string; anonKey: string });

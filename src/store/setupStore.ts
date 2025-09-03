@@ -9,7 +9,6 @@ export interface SupabaseCredentials {
 
 export interface AdminUserData {
   email: string;
-  password: string;
   fullName: string;
 }
 
@@ -130,7 +129,6 @@ export const useSetupStore = create<SetupStore>()(
             },
             adminUserData: {
                 email: 'test@test.com',
-                password: 'password',
                 fullName: 'Test Admin'
             },
             timestamp: Date.now(),
