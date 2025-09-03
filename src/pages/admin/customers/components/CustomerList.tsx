@@ -120,7 +120,7 @@ export function CustomerList() {
       {/* Header con búsqueda */}
       <Stack direction="row" justify="space-between" align="center" mb="lg" flexWrap="wrap" gap="md">
         <Stack direction="column" align="start" gap="xs">
-          <Typography variant="heading" size="md" color="accent">
+          <Typography variant="heading" size="md" color="text.primary">
             👥 Gestión de Clientes
           </Typography>
           <Stack direction="row" gap="md">
@@ -179,7 +179,7 @@ export function CustomerList() {
         </Stack>
         
         {query && (
-          <Typography size="sm" color="muted" mt="xs">
+          <Typography size="sm" color="text.muted" mt="xs">
             Mostrando {searchResults.length} resultado(s) para "{query}"
           </Typography>
         )}
@@ -187,7 +187,7 @@ export function CustomerList() {
 
       {/* Lista de clientes */}
       {displayCustomers.length === 0 ? (
-        <Stack p="xl" direction="column" align="center" color="muted">
+        <Stack p="xl" direction="column" align="center" color="text.muted">
           {query ? (
             <>
               <Typography>No se encontraron clientes que coincidan con "{query}"</Typography>
@@ -230,7 +230,7 @@ export function CustomerList() {
                   <Table.Cell>
                     <Stack direction="column" align="start" gap="xs">
                       <Typography fontWeight="medium">{customer.name}</Typography>
-                      <Typography size="xs" color="muted">
+                      <Typography size="xs" color="text.muted">
                         Cliente desde {formatDate(customer.created_at)}
                       </Typography>
                     </Stack>
@@ -245,7 +245,7 @@ export function CustomerList() {
                         <Typography size="sm">✉️ {customer.email}</Typography>
                       )}
                       {!customer.phone && !customer.email && (
-                        <Typography size="sm" color="muted">Sin contacto</Typography>
+                        <Typography size="sm" color="text.muted">Sin contacto</Typography>
                       )}
                     </Stack>
                   </Table.Cell>
@@ -263,7 +263,7 @@ export function CustomerList() {
                           <Typography fontWeight="medium">
                             {customerWithStats?.stats?.purchase_count || 0}
                           </Typography>
-                          <Typography size="xs" color="muted">
+                          <Typography size="xs" color="text.muted">
                             compras
                           </Typography>
                         </Stack>
@@ -274,7 +274,7 @@ export function CustomerList() {
                           <Typography fontWeight="medium" >
                             {formatCurrency(customerWithStats?.stats?.total_spent || 0)}
                           </Typography>
-                          <Typography size="xs" color="muted">
+                          <Typography size="xs" color="text.muted">
                             total
                           </Typography>
                         </Stack>

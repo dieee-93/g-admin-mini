@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { 
-  Layout, Stack, Typography, CardWrapper, Button, Modal, Alert, Badge, Tabs
+  ContentLayout, PageHeader, Section, Button, Tabs
 } from '@/shared/ui';
 import { 
   TruckIcon, 
@@ -46,70 +46,55 @@ function SupplyChainPage() {
     switch (activeTab) {
       case 'reporting':
         return (
-          <Card variant="elevated">
-            <Card.Body>
-              <Typography variant="heading" size="lg">Supply Chain Reporting</Typography>
-              <Typography color="muted">Comprehensive analytics and KPIs for supply chain management</Typography>
-            </Card.Body>
-          </CardWrapper>
+          <Section variant="elevated" title="Supply Chain Reporting" subtitle="Comprehensive analytics and KPIs for supply chain management">
+            <div>Content coming soon...</div>
+          </Section>
         );
       case 'optimization':
         return (
-          <Card variant="elevated">
-            <Card.Body>
-              <Typography variant="heading" size="lg">Inventory Optimization</Typography>
-              <Typography color="muted">AI-powered demand forecasting and optimization</Typography>
-            </Card.Body>
-          </CardWrapper>
+          <Section variant="elevated" title="Inventory Optimization" subtitle="AI-powered demand forecasting and optimization">
+            <div>Content coming soon...</div>
+          </Section>
         );
       case 'suppliers':
         return (
-          <Card variant="elevated">
-            <Card.Body>
-              <Typography variant="heading" size="lg">Supplier Management</Typography>
-              <Typography color="muted">Supplier scoring and performance tracking</Typography>
-            </Card.Body>
-          </CardWrapper>
+          <Section variant="elevated" title="Supplier Management" subtitle="Supplier scoring and performance tracking">
+            <div>Content coming soon...</div>
+          </Section>
         );
       default:
         return (
-          <Card variant="elevated">
-            <Card.Body>
-              <Typography variant="heading" size="lg">Supply Chain Reporting</Typography>
-              <Typography color="muted">Comprehensive analytics and KPIs</Typography>
-            </Card.Body>
-          </CardWrapper>
+          <Section variant="elevated" title="Supply Chain Reporting" subtitle="Comprehensive analytics and KPIs">
+            <div>Content coming soon...</div>
+          </Section>
         );
     }
   };
 
   return (
-    <Layout variant="panel">
-      {/* Page Header */}
-      <Stack direction="row" justify="space-between" align="center" p="lg">
-        <Stack direction="row" align="center" gap="md">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBackToMaterials}
-          >
-            ← Volver a Materiales
-          </Button>
-          <Typography variant="heading" size="xl">
-            Supply Chain Intelligence
-          </Typography>
-        </Stack>
-        
-        <Button variant="outline" size="sm">
-          <ArrowPathIcon className="w-4 h-4 mr-2" />
-          Actualizar Datos
-        </Button>
-      </Stack>
+    <ContentLayout>
+      <PageHeader 
+        title="Supply Chain Intelligence"
+        subtitle="Advanced supply chain management and optimization"
+        icon={TruckIcon}
+        actions={
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBackToMaterials}
+            >
+              ← Volver a Materiales
+            </Button>
+            <Button variant="outline" size="sm">
+              <ArrowPathIcon className="w-4 h-4" />
+              Actualizar Datos
+            </Button>
+          </div>
+        }
+      />
 
-      {/* Main Content */}
-      <Stack direction="column" gap="lg" p="lg">
-        
-        {/* Tab Navigation */}
+      <Section variant="default">
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
@@ -120,17 +105,17 @@ function SupplyChainPage() {
               const Icon = tab.icon;
               return (
                 <Tabs.Tab key={tab.id} value={tab.id}>
-                  <Stack direction="row" align="center" gap="sm">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Icon className="w-4 h-4" />
-                    <Stack direction="column" align="start" gap="xs">
-                      <Typography variant="body" size="sm" weight="medium">
+                    <div>
+                      <div style={{ fontSize: '0.875rem', fontWeight: 500 }}>
                         {tab.label}
-                      </Typography>
-                      <Typography variant="body" size="xs" color="muted">
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--colors-text-muted)' }}>
                         {tab.description}
-                      </Typography>
-                    </Stack>
-                  </Stack>
+                      </div>
+                    </div>
+                  </div>
                 </Tabs.Tab>
               );
             })}
@@ -148,9 +133,8 @@ function SupplyChainPage() {
             </Tabs.Panel>
           </Tabs.Panels>
         </Tabs>
-
-      </Stack>
-    </Layout>
+      </Section>
+    </ContentLayout>
   );
 }
 

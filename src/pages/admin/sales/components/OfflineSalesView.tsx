@@ -546,7 +546,7 @@ export function OfflineSalesView() {
                 </Stack>
               </Badge>
             </Stack>
-            <Typography variant="body" size="md" color="muted">
+            <Typography variant="body" size="md" color="text.muted">
               Sistema de ventas con capacidad offline completa
             </Typography>
           </Stack>
@@ -883,7 +883,7 @@ const OfflineSalesStatusModal = ({
 
         <ModalBody>
             <Stack gap="lg" direction="column" align="stretch">
-              <Typography color="muted">
+              <Typography color="text.muted">
                 {offlineSales.length} venta(s) pendiente(s) de sincronización
               </Typography>
 
@@ -896,7 +896,7 @@ const OfflineSalesStatusModal = ({
                           <Typography fontWeight="medium">
                             ${sale.totalAmount.toFixed(2)}
                           </Typography>
-                          <Typography fontSize="sm" color="muted">
+                          <Typography fontSize="sm" color="text.muted">
                             {new Date(sale.timestamp).toLocaleString()}
                           </Typography>
                         </Stack>
@@ -914,7 +914,7 @@ const OfflineSalesStatusModal = ({
                         </Badge>
                       </Stack>
                       
-                      <Typography fontSize="sm" color="muted">
+                      <Typography fontSize="sm" color="text.muted">
                         {sale.items.length} producto(s)
                         {sale.customer && ` • ${sale.customer.name}`}
                         {sale.note && ` • ${sale.note}`}

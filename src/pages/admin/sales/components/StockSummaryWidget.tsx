@@ -171,31 +171,31 @@ export function StockSummaryWidget({
           {/* Estadísticas generales */}
           <Stack gap="sm">
             <Stack direction="row" justify="space-between" align="center">
-              <Typography variant="body" size="sm" color="secondary">Total Productos:</Typography>
+              <Typography variant="body" size="sm" color="text.secondary">Total Productos:</Typography>
               <Badge size="sm">{stats.totalProducts}</Badge>
             </Stack>
             
             <Stack direction="row" justify="space-between" align="center">
-              <Typography variant="body" size="sm" color="secondary">Disponibles:</Typography>
+              <Typography variant="body" size="sm" color="text.secondary">Disponibles:</Typography>
               <Badge colorPalette="success" size="sm">{stats.availableProducts}</Badge>
             </Stack>
             
             {stats.lowStockProducts > 0 && (
               <Stack direction="row" justify="space-between" align="center">
-                <Typography variant="body" size="sm" color="secondary">Stock Bajo:</Typography>
+                <Typography variant="body" size="sm" color="text.secondary">Stock Bajo:</Typography>
                 <Badge colorPalette="warning" size="sm">{stats.lowStockProducts}</Badge>
               </Stack>
             )}
             
             {stats.outOfStockProducts > 0 && (
               <Stack direction="row" justify="space-between" align="center">
-                <Typography variant="body" size="sm" color="secondary">Sin Stock:</Typography>
+                <Typography variant="body" size="sm" color="text.secondary">Sin Stock:</Typography>
                 <Badge colorPalette="error" size="sm">{stats.outOfStockProducts}</Badge>
               </Stack>
             )}
             
             <Stack direction="row" justify="space-between" align="center">
-              <Typography variant="body" size="sm" color="secondary">Valor Total:</Typography>
+              <Typography variant="body" size="sm" color="text.secondary">Valor Total:</Typography>
               <Typography variant="body" size="sm" weight="bold" >
                 ${stats.totalValue.toFixed(2)}
               </Typography>
@@ -228,7 +228,7 @@ export function StockSummaryWidget({
           {/* Lista de productos (limitada) */}
           {products.length > 0 && (
             <Stack gap="sm">
-              <Typography variant="body" size="sm" weight="medium" color="primary">
+              <Typography variant="body" size="sm" weight="medium" color="text.primary">
                 Productos Recientes:
               </Typography>
               
@@ -261,7 +261,7 @@ export function StockSummaryWidget({
                               </Typography>
                             </Stack>
                           </Badge>
-                          <Typography variant="body" size="xs" color="secondary">
+                          <Typography variant="body" size="xs" color="text.secondary">
                             ${product.cost.toFixed(2)}/u
                           </Typography>
                         </Stack>
@@ -272,7 +272,7 @@ export function StockSummaryWidget({
               })}
               
               {products.length > maxItems && (
-                <Typography variant="body" size="xs" color="secondary" style={{textAlign: 'center'}}>
+                <Typography variant="body" size="xs" color="text.secondary" style={{textAlign: 'center'}}>
                   y {products.length - maxItems} productos más...
                 </Typography>
               )}

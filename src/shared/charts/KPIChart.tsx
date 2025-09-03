@@ -2,7 +2,7 @@
 // KPI metrics chart component
 
 import React from 'react';
-import { Box, CardWrapper, Text, VStack, Grid, Badge } from '@chakra-ui/react';
+import { Box, Card, Text, VStack, Grid, Badge } from '@chakra-ui/react';
 
 interface KPIMetric {
   label: string;
@@ -50,7 +50,7 @@ export default function KPIChart({
             <Box
               key={index}
               p={4}
-              bg="gray.50"
+              bg="bg.canvas"
               borderRadius="md"
               textAlign="center"
             >

@@ -1,8 +1,10 @@
 // SystemSection.tsx - System Settings with Theme Configuration
 import React from 'react';
 import { 
-  Layout, Stack, Typography, CardWrapper, Badge, SimpleGrid, Icon
+  Layout, Stack, Typography, CardWrapper, Section, Badge, SimpleGrid, Icon,
+  Button
 } from '@/shared/ui';
+import { Button as ChakraButton } from '@chakra-ui/react';
 import { 
   PaintBrushIcon,
   ComputerDesktopIcon,
@@ -22,14 +24,7 @@ export const SystemSection: React.FC = () => {
   };
 
   return (
-    <CardWrapper variant="elevated" >
-      <CardWrapper.Header>
-        <Stack direction="row" gap="sm" align="center">
-          <HeaderIcon icon={CogIcon}  />
-          <Typography variant="heading" level={3}>Configuraciones del Sistema</Typography>
-        </Stack>
-      </CardWrapper.Header>
-      <CardWrapper.Body>
+    <Section variant="elevated" title="Configuraciones del Sistema" icon={CogIcon}>
         <Stack direction="column" gap="xl">
           {/* Theme Configuration */}
           <CardWrapper variant="outline" >
@@ -41,14 +36,18 @@ export const SystemSection: React.FC = () => {
             </CardWrapper.Header>
             <CardWrapper.Body>
               <Stack direction="column" gap="md">
-                <Typography variant="body" color="secondary">
+                <Typography variant="body" color="text.secondary">
                   Personaliza la apariencia con {availableThemes.length} themes disponibles.
                 </Typography>
                 <ThemeToggle />
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Los cambios se aplican instantáneamente.
                 </Typography>
               </Stack>
+              <ChakraButton size="md" variant={'subtle'}>
+                <Icon icon={CogIcon} size="sm" />
+                Guardar Cambios
+              </ChakraButton>
             </CardWrapper.Body>
           </CardWrapper>
 
@@ -64,19 +63,19 @@ export const SystemSection: React.FC = () => {
             <CardWrapper.Body>
               <SimpleGrid columns={{ base: 2, md: 4 }} gap="md">
                 <Stack align="center" gap="xs">
-                  <Typography variant="caption" color="secondary">Uptime</Typography>
+                  <Typography variant="caption" color="text.secondary">Uptime</Typography>
                   <Typography variant="body" weight="bold">{systemInfo.uptime}</Typography>
                 </Stack>
                 <Stack align="center" gap="xs">
-                  <Typography variant="caption" color="secondary">Version</Typography>
+                  <Typography variant="caption" color="text.secondary">Version</Typography>
                   <Typography variant="body" weight="bold">{systemInfo.version}</Typography>
                 </Stack>
                 <Stack align="center" gap="xs">
-                  <Typography variant="caption" color="secondary">Environment</Typography>
+                  <Typography variant="caption" color="text.secondary">Environment</Typography>
                   <Typography variant="body" weight="bold">{systemInfo.environment}</Typography>
                 </Stack>
                 <Stack align="center" gap="xs">
-                  <Typography variant="caption" color="secondary">Build</Typography>
+                  <Typography variant="caption" color="text.secondary">Build</Typography>
                   <Typography variant="body" weight="bold">{systemInfo.build}</Typography>
                 </Stack>
               </SimpleGrid>
@@ -97,11 +96,11 @@ export const SystemSection: React.FC = () => {
                   <Typography variant="body" weight="medium">Application</Typography>
                   <Stack gap="xs">
                     <Stack direction="row" justify="space-between">
-                      <Typography variant="caption" color="secondary">Database</Typography>
+                      <Typography variant="caption" color="text.secondary">Database</Typography>
                       <Typography variant="caption">PostgreSQL 15.2</Typography>
                     </Stack>
                     <Stack direction="row" justify="space-between">
-                      <Typography variant="caption" color="secondary">Storage</Typography>
+                      <Typography variant="caption" color="text.secondary">Storage</Typography>
                       <Typography variant="caption">120GB / 280GB</Typography>
                     </Stack>
                   </Stack>
@@ -111,11 +110,11 @@ export const SystemSection: React.FC = () => {
                   <Typography variant="body" weight="medium">Framework</Typography>
                   <Stack gap="xs">
                     <Stack direction="row" justify="space-between">
-                      <Typography variant="caption" color="secondary">React</Typography>
+                      <Typography variant="caption" color="text.secondary">React</Typography>
                       <Typography variant="caption">v18.2.0</Typography>
                     </Stack>
                     <Stack direction="row" justify="space-between">
-                      <Typography variant="caption" color="secondary">Chakra UI</Typography>
+                      <Typography variant="caption" color="text.secondary">Chakra UI</Typography>
                       <Typography variant="caption">v3.23.0</Typography>
                     </Stack>
                   </Stack>
@@ -124,7 +123,6 @@ export const SystemSection: React.FC = () => {
             </CardWrapper.Body>
           </CardWrapper>
         </Stack>
-      </CardWrapper.Body>
-    </CardWrapper>
+    </Section>
   );
 };

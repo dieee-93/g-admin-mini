@@ -38,6 +38,12 @@ export const availableThemes = [
   // Popular VSCode themes
   { id: 'atom-one-dark', name: 'Atom One Dark', category: 'vscode' },
   
+  // New Popular themes
+  { id: 'nord', name: 'Nord', category: 'vscode' },
+  { id: 'gruvbox', name: 'Gruvbox', category: 'vscode' },
+  { id: 'cyberpunk', name: 'Cyberpunk', category: 'futuristic' },
+  { id: 'pastel', name: 'Pastel', category: 'modern' },
+  
   // Accessibility
   { id: 'high-contrast', name: 'High Contrast', category: 'accessibility' },
 ] as const

@@ -76,7 +76,7 @@ export function CustomerOrdersHistory() {
         <Card.Body>
           <Stack direction="row" gap="md" className="flex-wrap">
             <div>
-              <Typography size="sm" color="muted" className="mb-1">Cliente</Typography>
+              <Typography size="sm" color="text.muted" className="mb-1">Cliente</Typography>
               <select
                 value={selectedCustomer}
                 onChange={(e) => setSelectedCustomer(e.target.value)}
@@ -92,7 +92,7 @@ export function CustomerOrdersHistory() {
             </div>
 
             <div>
-              <Typography size="sm" color="muted" className="mb-1">Fecha</Typography>
+              <Typography size="sm" color="text.muted" className="mb-1">Fecha</Typography>
               <input
                 type="date"
                 value={dateFilter}
@@ -123,7 +123,7 @@ export function CustomerOrdersHistory() {
             <Typography size="2xl" weight="bold" className="text-blue-600">
               {sales.length}
             </Typography>
-            <Typography size="sm" color="muted">Total Pedidos</Typography>
+            <Typography size="sm" color="text.muted">Total Pedidos</Typography>
           </Card.Body>
         </CardWrapper>
 
@@ -132,7 +132,7 @@ export function CustomerOrdersHistory() {
             <Typography size="2xl" weight="bold" className="text-green-600">
               {formatCurrency(sales.reduce((sum, sale) => sum + sale.total, 0))}
             </Typography>
-            <Typography size="sm" color="muted">Revenue Total</Typography>
+            <Typography size="sm" color="text.muted">Revenue Total</Typography>
           </Card.Body>
         </CardWrapper>
 
@@ -141,7 +141,7 @@ export function CustomerOrdersHistory() {
             <Typography size="2xl" weight="bold" className="text-purple-600">
               {sales.length > 0 ? formatCurrency(sales.reduce((sum, sale) => sum + sale.total, 0) / sales.length) : '$0'}
             </Typography>
-            <Typography size="sm" color="muted">Ticket Promedio</Typography>
+            <Typography size="sm" color="text.muted">Ticket Promedio</Typography>
           </Card.Body>
         </CardWrapper>
       </Grid>
@@ -198,7 +198,7 @@ export function CustomerOrdersHistory() {
                           {sale.customer?.name || 'Cliente sin nombre'}
                         </Typography>
                         {sale.customer?.phone && (
-                          <Typography size="xs" color="muted">
+                          <Typography size="xs" color="text.muted">
                             📞 {sale.customer.phone}
                           </Typography>
                         )}
@@ -213,12 +213,12 @@ export function CustomerOrdersHistory() {
                           </Typography>
                         ))}
                         {sale.sale_items && sale.sale_items.length > 2 && (
-                          <Typography size="xs" color="muted">
+                          <Typography size="xs" color="text.muted">
                             +{sale.sale_items.length - 2} más...
                           </Typography>
                         )}
                         {!sale.sale_items?.length && (
-                          <Typography size="sm" color="muted">Sin items</Typography>
+                          <Typography size="sm" color="text.muted">Sin items</Typography>
                         )}
                       </Stack>
                     </Table.Cell>
@@ -230,7 +230,7 @@ export function CustomerOrdersHistory() {
                     </Table.Cell>
 
                     <Table.Cell>
-                      <Typography size="sm" color="muted">
+                      <Typography size="sm" color="text.muted">
                         {sale.note || '-'}
                       </Typography>
                     </Table.Cell>

@@ -3,21 +3,15 @@
 
 import React, { useEffect } from 'react';
 import { 
-  Stack, 
-  Typography, 
-  Grid, 
-  MetricCard,
-  CardWrapper,
-  Badge,
-  Icon,
+  ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
+  Stack, Typography, Badge, Icon
 } from '@/shared/ui';
 
 // Componentes modernos - migraremos estos también
 import {
-  HeroMetricCard,
-  SummaryPanel,
-  QuickActionCard
+  SummaryPanel
 } from '@/shared/components/widgets';
+import { ActionButton } from '@/shared/ui';
 import { useModernDashboard } from './hooks';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { 
@@ -52,185 +46,144 @@ export function Dashboard() {
   }, [setQuickActions]);
 
   return (
-    <CardWrapper>
-        <Stack gap="xl" align="stretch">
-          
-          {/* Header elegante con design system */}
-          <Stack direction="row" justify="space-between" align="end">
-            <Stack gap="xs">
-              <Stack direction="row" align="center" gap="sm">
-                <Icon icon={HomeIcon} size="lg"  />
-                <Typography variant="heading" size="2xl" weight="bold" >
-                  Dashboard
-                </Typography>
-              </Stack>
-              <Typography variant="body" color="secondary" size="md">
-                Centro de comando · G-Admin
-              </Typography>
-            </Stack>
-          </Stack>
+    <ContentLayout spacing="loose">
+      <PageHeader 
+        title="Dashboard"
+        subtitle="Centro de comando · G-Admin"
+        icon={HomeIcon}
+      />
 
-          {/* MÉTRICAS EN FORMATO HORIZONTAL COMPACTO */}
-          <Grid 
-            templateColumns={{ 
-              base: "1fr", 
-              md: "1.5fr 1fr 1fr", 
-              lg: "2fr 1fr 1fr 1fr" 
-            }} 
-            gap="md"
-          >
-            {/* Hero Metric - Más compacto */}
-            <CardWrapper>
-              <HeroMetricCard {...heroMetric} />
-            </CardWrapper>
-
-            {/* Secondary Metrics - Horizontales */}
-            {secondaryMetrics.map((metric) => (
-              <MetricCard key={metric.title} {...metric} />
-            ))}
-          </Grid>
-
-          {/* RESUMEN OPERACIONAL - Expandido por defecto y más compacto */}
-          <SummaryPanel
-            title="Resumen Operacional"
-            metrics={summaryMetrics}
-            status={summaryStatus}
-            onConfigure={onConfigure}
-            defaultExpanded={true}
+      <StatsSection>
+        <CardGrid 
+          columns={{ 
+            base: 1, 
+            md: 2,
+            lg: 4 
+          }} 
+        >
+          {/* Hero Metric convertido a MetricCard normal */}
+          <MetricCard 
+            title={heroMetric.title}
+            value={heroMetric.value}
+            subtitle={heroMetric.subtitle}
+            icon={heroMetric.icon}
+            colorPalette={heroMetric.colorPalette}
           />
 
-          {/* ACCIONES RÁPIDAS - Con design system */}
-          <Stack gap="sm" align="start">
-            <Stack direction="row" align="center" gap="sm">
-              <Icon icon={BoltIcon} size="md"  />
-              <Typography variant="body" weight="semibold" color="primary">
-                Acciones Rápidas
-              </Typography>
+          {/* Secondary Metrics */}
+          {secondaryMetrics.map((metric) => (
+            <MetricCard key={metric.title} {...metric} />
+          ))}
+        </CardGrid>
+      </StatsSection>
+
+      <Section variant="elevated" title="Resumen Operacional" icon={ChartBarIcon}>
+        <SummaryPanel
+          metrics={summaryMetrics}
+          status={summaryStatus}
+          onConfigure={onConfigure}
+          defaultExpanded={true}
+        />
+      </Section>
+
+      <Section variant="default" title="Acciones Rápidas" icon={BoltIcon}>
+        <CardGrid 
+          columns={{ 
+            base: 2, 
+            md: 3, 
+            lg: 5 
+          }} 
+         
+        >
+          {operationalActions.map((action) => {
+            // Mapear colorPalette a valores válidos del design system
+            const mappedColorPalette = (() => {
+              switch (action.colorPalette) {
+                case 'blue': return 'blue';
+                case 'green': return 'green';
+                case 'purple': return 'purple';
+                case 'red': return 'red';
+                case 'orange': return 'orange';
+                default: return 'gray';
+              }
+            })();
+
+            return (
+              <ActionButton
+                key={action.id}
+                title={action.title}
+                description={action.description}
+                icon={action.icon}
+                colorPalette={mappedColorPalette}
+                onClick={action.onClick}
+              />
+            );
+          })}
+        </CardGrid>
+      </Section>
+
+      <CardGrid 
+        columns={{ 
+          base: 1, 
+          md: 2, 
+          lg: 3 
+        }} 
+   
+      >
+        {/* Tendencias Hoy */}
+        <Section variant="elevated" title="Tendencias Hoy" icon={ChartBarIcon}>
+          <Stack gap="sm">
+            <Stack direction="row" justify="space-between" align="center" py="2">
+              <Typography variant="body" size="md" color="text.primary">Ventas</Typography>
+              <Badge colorPalette="green" variant="subtle">+12%</Badge>
             </Stack>
-            
-            <Grid 
-              templateColumns={{ 
-                base: "repeat(3, 1fr)", 
-                md: "repeat(5, 1fr)", 
-                lg: "repeat(5, 1fr)" 
-              }} 
-              gap="sm"
-            >
-              {operationalActions.map((action) => {
-                // Mapear colorPalette a valores válidos del design system
-                const mappedColorPalette = (() => {
-                  switch (action.colorPalette) {
-                    case 'blue': return 'info';
-                    case 'green': return 'success';
-                    case 'purple': return 'brand';
-                    case 'red': return 'error';
-                    case 'orange': return 'warning';
-                    default: return 'gray';
-                  }
-                })();
-
-                return (
-                  <QuickActionCard
-                    key={action.id}
-                    title={action.title}
-                    description={action.description}
-                    icon={action.icon}
-                    colorPalette={mappedColorPalette}
-                    onClick={action.onClick}
-                  />
-                );
-              })}
-            </Grid>
+            <Stack direction="row" justify="space-between" align="center" py="2">
+              <Typography variant="body" size="md" color="text.primary">Inventario</Typography>
+              <Badge colorPalette="blue" variant="subtle">Estable</Badge>
+            </Stack>
+            <Stack direction="row" justify="space-between" align="center" py="2">
+              <Typography variant="body" size="md" color="text.primary">Personal</Typography>
+              <Badge colorPalette="orange" variant="subtle">85%</Badge>
+            </Stack>
           </Stack>
+        </Section>
 
-          {/* SECCIÓN ADICIONAL - Actividad y Rendimiento con design system */}
-          <Grid 
-            templateColumns={{ 
-              base: "1fr", 
-              md: "1fr 1fr", 
-              lg: "1fr 1fr 1fr" 
-            }} 
-            gap="md"
-          >
-            {/* Actividad Reciente */}
-            <CardWrapper>
-              <Stack gap="sm" align="start">
-                <Stack direction="row" align="center" gap="sm">
-                  <Icon icon={ChartBarIcon} size="md"  />
-                  <Typography variant="body" weight="semibold" color="primary">
-                    Tendencias Hoy
-                  </Typography>
-                </Stack>
-                <Stack gap="xs" align="stretch" width="full">
-                  <Stack direction="row" justify="space-between">
-                    <Typography variant="body" size="sm" color="secondary">Ventas</Typography>
-                    <Badge colorPalette="success">+12%</Badge>
-                  </Stack>
-                  <Stack direction="row" justify="space-between">
-                    <Typography variant="body" size="sm" color="secondary">Inventario</Typography>
-                    <Badge colorPalette="info">Estable</Badge>
-                  </Stack>
-                  <Stack direction="row" justify="space-between">
-                    <Typography variant="body" size="sm" color="secondary">Personal</Typography>
-                    <Badge colorPalette="warning">85%</Badge>
-                  </Stack>
-                </Stack>
-              </Stack>
-            </CardWrapper>
+        {/* Notificaciones */}
+        <Section variant="elevated" title="Notificaciones" icon={BellIcon}>
+          <Stack gap="sm">
+            <Stack direction="row" align="center" gap="sm" py="2">
+              <Badge colorPalette="orange" size="sm" dot>Stock bajo</Badge>
+              <Typography variant="body" size="sm" color="text.muted">3 productos</Typography>
+            </Stack>
+            <Stack direction="row" align="center" gap="sm" py="2">
+              <Badge colorPalette="green" size="sm" dot>Turno</Badge>
+              <Typography variant="body" size="sm" color="text.muted">Completo</Typography>
+            </Stack>
+            <Stack direction="row" align="center" gap="sm" py="2">
+              <Badge colorPalette="blue" size="sm" dot>Pedidos</Badge>
+              <Typography variant="body" size="sm" color="text.muted">2 pendientes</Typography>
+            </Stack>
+          </Stack>
+        </Section>
 
-            {/* Alertas */}
-            <CardWrapper>
-              <Stack gap="sm" align="start">
-                <Stack direction="row" align="center" gap="sm">
-                  <Icon icon={BellIcon} size="md"  />
-                  <Typography variant="body" weight="semibold" color="primary">
-                    Notificaciones
-                  </Typography>
-                </Stack>
-                <Stack gap="xs" align="stretch" width="full">
-                  <Stack direction="row" align="center" gap="sm">
-                    <Badge colorPalette="warning" size="sm">●</Badge>
-                    <Typography variant="body" size="sm" color="secondary">Stock bajo: 3 productos</Typography>
-                  </Stack>
-                  <Stack direction="row" align="center" gap="sm">
-                    <Badge colorPalette="success" size="sm">●</Badge>
-                    <Typography variant="body" size="sm" color="secondary">Turno completo</Typography>
-                  </Stack>
-                  <Stack direction="row" align="center" gap="sm">
-                    <Badge colorPalette="info" size="sm">●</Badge>
-                    <Typography variant="body" size="sm" color="secondary">2 pedidos pendientes</Typography>
-                  </Stack>
-                </Stack>
-              </Stack>
-            </CardWrapper>
-
-            {/* Performance */}
-            <CardWrapper>
-              <Stack gap="sm" align="start">
-                <Stack direction="row" align="center" gap="sm">
-                  <Icon icon={BoltIcon} size="md"  />
-                  <Typography variant="body" weight="semibold" color="primary">
-                    Rendimiento
-                  </Typography>
-                </Stack>
-                <Stack gap="xs" align="stretch" width="full">
-                  <Stack direction="row" justify="space-between">
-                    <Typography variant="body" size="sm" color="secondary">Sistema</Typography>
-                    <Badge colorPalette="success">Óptimo</Badge>
-                  </Stack>
-                  <Stack direction="row" justify="space-between">
-                    <Typography variant="body" size="sm" color="secondary">Carga</Typography>
-                    <Badge colorPalette="info">Normal</Badge>
-                  </Stack>
-                  <Stack direction="row" justify="space-between">
-                    <Typography variant="body" size="sm" color="secondary">Respuesta</Typography>
-                    <Badge colorPalette="success">&lt; 100ms</Badge>
-                  </Stack>
-                </Stack>
-              </Stack>
-            </CardWrapper>
-          </Grid>
-        </Stack>
-    </CardWrapper>  
+        {/* Rendimiento */}
+        <Section variant="elevated" title="Rendimiento" icon={BoltIcon}>
+          <Stack gap="sm">
+            <Stack direction="row" justify="space-between" align="center" py="2">
+              <Typography variant="body" size="md" color="text.primary">Sistema</Typography>
+              <Badge colorPalette="green" variant="subtle">Óptimo</Badge>
+            </Stack>
+            <Stack direction="row" justify="space-between" align="center" py="2">
+              <Typography variant="body" size="md" color="text.primary">Carga</Typography>
+              <Badge colorPalette="blue" variant="subtle">Normal</Badge>
+            </Stack>
+            <Stack direction="row" justify="space-between" align="center" py="2">
+              <Typography variant="body" size="md" color="text.primary">Respuesta</Typography>
+              <Badge colorPalette="green" variant="subtle">&lt; 100ms</Badge>
+            </Stack>
+          </Stack>
+        </Section>
+      </CardGrid>
+    </ContentLayout>  
   );
 }

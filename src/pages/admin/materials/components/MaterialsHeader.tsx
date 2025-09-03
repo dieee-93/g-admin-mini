@@ -1,5 +1,5 @@
-import { Box, HStack, VStack, Text, Button, Badge } from '@chakra-ui/react';
-import { PlusIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import { StatsSection, CardGrid, MetricCard, Button, Badge, Section } from '@/shared/ui';
+import { PlusIcon, ChartBarIcon, CubeIcon, ExclamationTriangleIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import { useMaterials } from '@/store/materialsStore';
 
 interface MaterialsHeaderProps {
@@ -12,82 +12,67 @@ export const MaterialsHeader = ({ onAddItem, onShowAnalytics }: MaterialsHeaderP
   const { stats } = useMaterials();
 
   return (
-    <Box p={6} borderBottomWidth={1} borderColor="gray.200">
-      <VStack align="stretch" gap={4}>
-        {/* Analytics Action Only - Title moved to ModuleHeader */}
-        {onShowAnalytics && (
-          <HStack justify="flex-end">
-            <Button
-              variant="outline"
-              size="md"
-              minH="44px"
-              minW="44px"
-              gap="2"
-              onClick={onShowAnalytics}
-            >
-              <ChartBarIcon className="w-4 h-4" />
-              Analytics
-            </Button>
-          </HStack>
-        )}
+    <Section variant="flat">
+      {onShowAnalytics && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+          <Button
+            variant="outline"
+            size="md"
+            onClick={onShowAnalytics}
+          >
+            <ChartBarIcon className="w-4 h-4" />
+            Analytics
+          </Button>
+        </div>
+      )}
 
-        {/* Stats Overview */}
-        <HStack gap={6}>
-          <VStack align="flex-start" gap={1}>
-            <Text fontSize="sm" color="gray.500">Total Items</Text>
-            <Text fontSize="lg" fontWeight="semibold">{stats.totalItems}</Text>
-          </VStack>
-
-          <VStack align="flex-start" gap={1}>
-            <Text fontSize="sm" color="gray.500">Valor Total</Text>
-            <Text fontSize="lg" fontWeight="semibold">
-              ${stats.totalValue.toLocaleString()}
-            </Text>
-          </VStack>
-
-          <VStack align="flex-start" gap={1}>
-            <HStack gap={2}>
-              <Text fontSize="sm" color="gray.500">Stock Bajo</Text>
-              {stats.lowStockCount > 0 && (
-                <Badge colorPalette="orange" size="sm">
-                  {stats.lowStockCount}
-                </Badge>
-              )}
-            </HStack>
-            <Text fontSize="lg" fontWeight="semibold" color="orange.600">
-              {stats.lowStockCount}
-            </Text>
-          </VStack>
-
-          <VStack align="flex-start" gap={1}>
-            <HStack gap={2}>
-              <Text fontSize="sm" color="gray.500">Stock Crítico</Text>
-              {stats.criticalStockCount > 0 && (
-                <Badge colorPalette="red" size="sm">
-                  {stats.criticalStockCount}
-                </Badge>
-              )}
-            </HStack>
-            <Text fontSize="lg" fontWeight="semibold" color="red.600">
-              {stats.criticalStockCount}
-            </Text>
-          </VStack>
-
-          <VStack align="flex-start" gap={1}>
-            <HStack gap={2}>
-              <Text fontSize="sm" color="gray.500">Sin Stock</Text>
-              {stats.outOfStockCount > 0 && (
-                <Badge colorPalette="red" size="sm">
-                  {stats.outOfStockCount}
-                </Badge>
-              )}
-            </HStack>
-            <Text fontSize="lg" fontWeight="semibold" color="red.700">
-              {stats.outOfStockCount}
-            </Text>
-          </VStack>
-        </HStack>
-      </VStack>
-    </Box>
+      <StatsSection>
+        <CardGrid columns={{ base: 1, md: 5 }}>
+          <MetricCard 
+            title="Total Items"
+            value={stats.totalItems.toString()}
+            icon={CubeIcon}
+          />
+          <MetricCard 
+            title="Valor Total"
+            value={`$${stats.totalValue.toLocaleString()}`}
+            icon={CurrencyDollarIcon}
+          />
+          <MetricCard 
+            title="Stock Bajo"
+            value={stats.lowStockCount.toString()}
+            icon={ExclamationTriangleIcon}
+            colorPalette={stats.lowStockCount > 0 ? "orange" : undefined}
+            badge={stats.lowStockCount > 0 ? (
+              <Badge colorPalette="orange" size="sm">
+                {stats.lowStockCount}
+              </Badge>
+            ) : undefined}
+          />
+          <MetricCard 
+            title="Stock Crítico"
+            value={stats.criticalStockCount.toString()}
+            icon={ExclamationTriangleIcon}
+            colorPalette={stats.criticalStockCount > 0 ? "red" : undefined}
+            badge={stats.criticalStockCount > 0 ? (
+              <Badge colorPalette="red" size="sm">
+                {stats.criticalStockCount}
+              </Badge>
+            ) : undefined}
+          />
+          <MetricCard 
+            title="Sin Stock"
+            value={stats.outOfStockCount.toString()}
+            icon={ExclamationTriangleIcon}
+            colorPalette={stats.outOfStockCount > 0 ? "red" : undefined}
+            badge={stats.outOfStockCount > 0 ? (
+              <Badge colorPalette="red" size="sm">
+                {stats.outOfStockCount}
+              </Badge>
+            ) : undefined}
+          />
+        </CardGrid>
+      </StatsSection>
+    </Section>
   );
 };

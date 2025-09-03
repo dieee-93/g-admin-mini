@@ -115,11 +115,11 @@ export function CustomerAnalytics() {
           <Stack direction="column" align="start" gap="xs">
             <Stack direction="row" gap="sm" align="center">
               <ChartBarIcon width={24} height={24} color="#D53F8C" />
-              <Typography variant="heading" size="lg" color="accent">
+              <Typography variant="heading" size="lg" color="text.primary">
                 Customer Intelligence Dashboard
               </Typography>
             </Stack>
-            <Typography color="muted" size="sm">
+            <Typography color="text.muted" size="sm">
               Análisis RFM • Segmentación • Predicción de Churn • Insights Accionables
             </Typography>
           </Stack>
@@ -140,7 +140,7 @@ export function CustomerAnalytics() {
           <Stack direction="column" align="start" gap="sm" p="md">
             <Stack direction="row" gap="xs" align="center">
               <UsersIcon width={20} height={20} color="#3182CE" />
-              <Typography size="sm" color="muted" fontWeight="medium">
+              <Typography size="sm" color="text.muted" fontWeight="medium">
                 Total Clientes
               </Typography>
             </Stack>
@@ -157,7 +157,7 @@ export function CustomerAnalytics() {
           <Stack direction="column" align="start" gap="sm" p="md">
             <Stack direction="row" gap="xs" align="center">
               <ArrowTrendingUpIcon width={20} height={20} color="#38A169" />
-              <Typography size="sm" color="muted" fontWeight="medium">
+              <Typography size="sm" color="text.muted" fontWeight="medium">
                 Nuevos (30d)
               </Typography>
             </Stack>
@@ -174,7 +174,7 @@ export function CustomerAnalytics() {
           <Stack direction="column" align="start" gap="sm" p="md">
             <Stack direction="row" gap="xs" align="center">
               <TrophyIcon width={20} height={20} color="#D69E2E" />
-              <Typography size="sm" color="muted" fontWeight="medium">
+              <Typography size="sm" color="text.muted" fontWeight="medium">
                 VIP Customers
               </Typography>
             </Stack>
@@ -191,7 +191,7 @@ export function CustomerAnalytics() {
           <Stack direction="column" align="start" gap="sm" p="md">
             <Stack direction="row" gap="xs" align="center">
               <ExclamationTriangleIcon width={20} height={20} color="#E53E3E" />
-              <Typography size="sm" color="muted" fontWeight="medium">
+              <Typography size="sm" color="text.muted" fontWeight="medium">
                 En Riesgo
               </Typography>
             </Stack>
@@ -208,7 +208,7 @@ export function CustomerAnalytics() {
           <Stack direction="column" align="start" gap="sm" p="md">
             <Stack direction="row" gap="xs" align="center">
               <ShieldCheckIcon width={20} height={20} color="#805AD5" />
-              <Typography size="sm" color="muted" fontWeight="medium">
+              <Typography size="sm" color="text.muted" fontWeight="medium">
                 Retención
               </Typography>
             </Stack>
@@ -227,10 +227,10 @@ export function CustomerAnalytics() {
         <Stack direction="column" align="stretch" gap="lg" p="lg">
           <Stack direction="row" justify="space-between" align="center">
             <Stack direction="column" align="start" gap="xs">
-              <Typography variant="heading" size="md" color="accent">
+              <Typography variant="heading" size="md" color="text.primary">
                 🎯 Segmentación RFM
               </Typography>
-              <Typography size="sm" color="muted">
+              <Typography size="sm" color="text.muted">
                 Recency (Días) • Frequency (Visitas) • Monetary (Gasto)
               </Typography>
             </Stack>
@@ -263,7 +263,7 @@ export function CustomerAnalytics() {
                         >
                           {getSegmentLabel(stat.segment)}
                         </Badge>
-                        <Typography fontWeight="bold" color="primary">
+                        <Typography fontWeight="bold" color="text.primary">
                           {stat.count}
                         </Typography>
                       </Stack>
@@ -289,7 +289,7 @@ export function CustomerAnalytics() {
                       
                       <Stack direction="column" align="stretch" gap="xs">
                         <Stack direction="row" justify="space-between">
-                          <Typography color="muted" size="sm">
+                          <Typography color="text.muted" size="sm">
                             {stat.percentage.toFixed(1)}% del total
                           </Typography>
                           <Typography  fontWeight="medium" size="sm">
@@ -299,11 +299,11 @@ export function CustomerAnalytics() {
                         
                         {selectedSegment === stat.segment && (
                           <Stack direction="column" align="stretch" gap="xs" pt="xs" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-                            <Typography fontWeight="medium" color="primary" size="xs">
+                            <Typography fontWeight="medium" color="text.primary" size="xs">
                               💡 Acciones Recomendadas:
                             </Typography>
                             {recommendations.slice(0, 2).map((rec, idx) => (
-                              <Typography key={idx} size="xs" color="muted">
+                              <Typography key={idx} size="xs" color="text.muted">
                                 • {rec}
                               </Typography>
                             ))}
@@ -347,9 +347,9 @@ export function CustomerAnalytics() {
                     <Stack direction="column" align="start" gap="xs">
                       <Typography fontWeight="medium" size="sm">{customer.name}</Typography>
                       <Stack direction="row" gap="xs" align="center">
-                        <Typography size="xs" color="muted">{customer.total_visits} visitas</Typography>
-                        <Typography size="xs" color="muted">•</Typography>
-                        <Typography size="xs" color="muted">{getLoyaltyTierIcon(customer.loyalty_tier)} {customer.loyalty_tier}</Typography>
+                        <Typography size="xs" color="text.muted">{customer.total_visits} visitas</Typography>
+                        <Typography size="xs" color="text.muted">•</Typography>
+                        <Typography size="xs" color="text.muted">{getLoyaltyTierIcon(customer.loyalty_tier)} {customer.loyalty_tier}</Typography>
                       </Stack>
                     </Stack>
                   </Stack>
@@ -388,9 +388,9 @@ export function CustomerAnalytics() {
                   <Stack direction="column" align="start" gap="xs">
                     <Typography fontWeight="medium" size="sm">{customer.name}</Typography>
                     <Stack direction="row" gap="xs" align="center">
-                      <Typography size="xs" color="muted">{customer.total_visits} visitas</Typography>
-                      <Typography size="xs" color="muted">•</Typography>
-                      <Typography size="xs" color="muted">{formatCurrency(customer.total_spent)}</Typography>
+                      <Typography size="xs" color="text.muted">{customer.total_visits} visitas</Typography>
+                      <Typography size="xs" color="text.muted">•</Typography>
+                      <Typography size="xs" color="text.muted">{formatCurrency(customer.total_spent)}</Typography>
                     </Stack>
                   </Stack>
                   <Stack direction="column" align="end" gap="xs">
@@ -428,7 +428,7 @@ export function CustomerAnalytics() {
             <Alert variant="subtle">
               <Stack direction="column" gap="xs" p="md">
                 <Typography size="sm" fontWeight="medium" >🏆 Revenue Champions</Typography>
-                <Typography size="sm" color="muted">
+                <Typography size="sm" color="text.muted">
                   Los top 20% de clientes generan el 80% de los ingresos. 
                 </Typography>
                 <Typography fontWeight="medium"  size="sm">
@@ -441,7 +441,7 @@ export function CustomerAnalytics() {
             <Alert variant="subtle">
               <Stack direction="column" gap="xs" p="md">
                 <Typography size="sm" fontWeight="medium" >⚠️ Retención Urgente</Typography>
-                <Typography size="sm" color="muted">
+                <Typography size="sm" color="text.muted">
                   {churnRiskCustomers.length} clientes de alto valor en riesgo.
                 </Typography>
                 <Typography fontWeight="medium"  size="sm">
@@ -454,7 +454,7 @@ export function CustomerAnalytics() {
             <Alert variant="subtle">
               <Stack direction="column" gap="xs" p="md">
                 <Typography size="sm" fontWeight="medium" >📈 Oportunidad Crecimiento</Typography>
-                <Typography size="sm" color="muted">
+                <Typography size="sm" color="text.muted">
                   {segmentStats.find(s => s.segment === CustomerSegment.NEW_CUSTOMERS)?.count || 0} nuevos clientes necesitan onboarding.
                 </Typography>
                 <Typography fontWeight="medium"  size="sm">

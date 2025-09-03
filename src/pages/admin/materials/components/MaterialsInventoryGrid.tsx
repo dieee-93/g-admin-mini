@@ -1,20 +1,8 @@
 // MaterialsInventoryGrid.tsx - Virtualized inventory grid with smart filtering
 import React, { useState, useMemo } from 'react';
 import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Input,
-  Select,
-  createListCollection,
-  Card,
-  SimpleGrid,
-  Alert,
-  Badge,
-  Button,
-  IconButton
-} from '@chakra-ui/react';
+  Section, Stack, Typography, Input, SelectField, CardGrid, Alert, Badge, Button, createListCollection
+} from '@/shared/ui';
 import {
   MagnifyingGlassIcon,
   ExclamationTriangleIcon,
@@ -40,14 +28,12 @@ interface MaterialsInventoryGridProps {
   onViewDetails: (item: InventoryItem) => void;
 }
 
-const TYPE_FILTER_COLLECTION = createListCollection({
-  items: [
-    { label: 'Todos los tipos', value: 'all' },
-    { label: 'Conmensurables', value: 'MEASURABLE' },
-    { label: 'Contables', value: 'COUNTABLE' },
-    { label: 'Elaborados', value: 'ELABORATED' }
-  ]
-});
+const typeFilterOptions = [
+  { label: 'Todos los tipos', value: 'all' },
+  { label: 'Conmensurables', value: 'MEASURABLE' },
+  { label: 'Contables', value: 'COUNTABLE' },
+  { label: 'Elaborados', value: 'ELABORATED' }
+];
 
 export function MaterialsInventoryGrid({
   items,
@@ -149,68 +135,48 @@ export function MaterialsInventoryGrid({
   );
 
   return (
-    <VStack gap="6" align="stretch">
+    <Stack gap="lg" align="stretch">
       {/* Critical alerts */}
       {criticalItems.length > 0 && (
-        <Alert.Root status="error" variant="subtle">
-          <Alert.Indicator>
-            <ExclamationTriangleIcon className="w-5 h-5" />
-          </Alert.Indicator>
-          <Alert.Title>Stock crítico detectado</Alert.Title>
-          <Alert.Description>
-            {criticalItems.length} item{criticalItems.length !== 1 ? 's' : ''} con stock crítico: {criticalItems.map(item => item.name).join(', ')}
-          </Alert.Description>
-        </Alert.Root>
+        <Alert status="error" title="Stock crítico detectado">
+          {criticalItems.length} item{criticalItems.length !== 1 ? 's' : ''} con stock crítico: {criticalItems.map(item => item.name).join(', ')}
+        </Alert>
       )}
 
       {/* Filters */}
-      <HStack gap="4" flexWrap="wrap">
-        <Box flex="1" minW="250px">
+      <Stack direction="row" gap="md" wrap="wrap">
+        <div style={{ flex: 1, minWidth: '250px' }}>
           <Input
             placeholder="Buscar items..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            leftElement={<MagnifyingGlassIcon className="w-4 h-4 text-gray-400" />}
           />
-        </Box>
+        </div>
         
-        <Select.Root
-          collection={TYPE_FILTER_COLLECTION}
-          value={[typeFilter]}
-          onValueChange={(details) => onTypeFilterChange(details.value[0])}
-          width="200px"
-        >
-          <Select.Trigger>
-            <Select.ValueText placeholder="Tipo de item" />
-          </Select.Trigger>
-          <Select.Content>
-            {TYPE_FILTER_COLLECTION.items.map(item => (
-              <Select.Item key={item.value} item={item}>
-                {item.label}
-              </Select.Item>
-            ))}
-          </Select.Content>
-        </Select.Root>
-      </HStack>
+        <div style={{ width: '200px' }}>
+          <SelectField
+            options={typeFilterOptions}
+            value={typeFilter}
+            onChange={onTypeFilterChange}
+            placeholder="Tipo de item"
+          />
+        </div>
+      </Stack>
 
       {/* Items Grid */}
-      <Box>
-        <Text fontSize="lg" fontWeight="semibold" mb="4">
-          Items ({filteredItems.length})
-        </Text>
-        
+      <Section variant="default" title={`Items (${filteredItems.length})`}>
         {filteredItems.length === 0 ? (
-          <Card.Root>
-            <Card.Body p="8" textAlign="center">
-              <CubeIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <Text color="gray.600" mb="2">No se encontraron items</Text>
-              <Text fontSize="sm" color="gray.500">
+          <div style={{ padding: '2rem', textAlign: 'center' }}>
+            <Stack align="center" gap="md">
+              <CubeIcon className="w-12 h-12 text-gray-400" />
+              <Typography variant="body" color="text.muted">No se encontraron items</Typography>
+              <Typography variant="body" size="sm" color="text.muted">
                 {searchTerm || typeFilter !== 'all' 
                   ? 'Prueba ajustando los filtros' 
                   : 'Comienza agregando tu primer item'}
-              </Text>
-            </Card.Body>
-          </Card.Root>
+              </Typography>
+            </Stack>
+          </div>
         ) : (
           <VirtualizedList
             items={filteredItems}
@@ -221,8 +187,8 @@ export function MaterialsInventoryGrid({
             className="inventory-grid"
           />
         )}
-      </Box>
-    </VStack>
+      </Section>
+    </Stack>
   );
 }
 
@@ -251,131 +217,135 @@ const ModernItemCard = React.memo(({
   const typeColor = getTypeColor(item.type);
   
   return (
-    <Card.Root 
-      variant="outline"
-      bg={stockStatus.severity === 'critical' ? 'red.50' : 
-          stockStatus.severity === 'warning' ? 'yellow.50' : 
-          item.isOfflineItem ? 'blue.50' : 'white'}
-      borderColor={stockStatus.severity === 'critical' ? 'red.200' : 
-                  stockStatus.severity === 'warning' ? 'yellow.200' : 
-                  item.isOfflineItem ? 'blue.200' : 'gray.200'}
-      transition="all 0.2s"
-      _hover={{ 
-        transform: 'translateY(-2px)', 
-        shadow: 'md',
-        borderColor: typeColor === 'blue' ? 'blue.300' : 
-                    typeColor === 'green' ? 'green.300' : 'purple.300'
+    <div 
+      style={{
+        padding: '1rem',
+        borderRadius: '8px',
+        border: '1px solid var(--colors-border-subtle)',
+        backgroundColor: stockStatus.severity === 'critical' ? 'var(--colors-red-50)' : 
+                        stockStatus.severity === 'warning' ? 'var(--colors-yellow-50)' : 
+                        item.isOfflineItem ? 'var(--colors-blue-50)' : 'var(--colors-bg-surface)',
+        transition: 'all 0.2s',
+        cursor: 'pointer'
       }}
     >
-      <Card.Body p="4">
-        <VStack align="stretch" gap="3">
-          <HStack justify="space-between" align="start">
-            <HStack gap="2" flex="1">
-              <Box p="1" bg={`${typeColor}.100`} borderRadius="md">
-                <TypeIcon className={`w-4 h-4 text-${typeColor}-600`} />
-              </Box>
-              <VStack align="start" gap="0" flex="1">
-                <HStack>
-                  <Text fontWeight="bold" lineHeight="1.2" fontSize="sm">
-                    {item.name}
-                  </Text>
-                  {item.isOfflineItem && (
-                    <Badge colorScheme="blue" size="xs">
-                      OFFLINE
-                    </Badge>
-                  )}
-                  {item.syncStatus === 'modified' && (
-                    <Badge colorScheme="yellow" size="xs">
-                      MODIFIED
-                    </Badge>
-                  )}
-                </HStack>
-                <Badge 
-                  colorPalette={typeColor} 
-                  variant="subtle" 
-                  size="xs"
-                >
-                  {item.type === 'MEASURABLE' ? 'Conmensurable' : 
-                   item.type === 'COUNTABLE' ? 'Contable' : 'Elaborado'}
-                </Badge>
-              </VStack>
-            </HStack>
-            
-            {stockStatus.severity !== 'ok' && (
-              <ExclamationTriangleIcon 
-                className={`w-4 h-4 ${stockStatus.severity === 'critical' ? 'text-red-500' : 'text-yellow-500'}`}
-              />
-            )}
-          </HStack>
-
-          <VStack align="start" gap="1">
-            <HStack justify="space-between" w="full">
-              <Text fontSize="xs" color="gray.600">Stock actual:</Text>
+      <Stack gap="sm">
+        <Stack direction="row" justify="space-between" align="flex-start">
+          <Stack direction="row" gap="sm" style={{ flex: 1 }}>
+            <div style={{ 
+              padding: '4px', 
+              borderRadius: '6px', 
+              backgroundColor: `var(--colors-${typeColor}-100)` 
+            }}>
+              <TypeIcon className={`w-4 h-4 text-${typeColor}-600`} />
+            </div>
+            <Stack style={{ flex: 1 }} gap="xs">
+              <Stack direction="row" align="center" gap="xs">
+                <Typography variant="body" weight="bold" size="sm">
+                  {item.name}
+                </Typography>
+                {item.isOfflineItem && (
+                  <Badge colorPalette="blue" size="xs">
+                    OFFLINE
+                  </Badge>
+                )}
+                {item.syncStatus === 'modified' && (
+                  <Badge colorPalette="yellow" size="xs">
+                    MODIFIED
+                  </Badge>
+                )}
+              </Stack>
               <Badge 
-                colorPalette={stockStatus.color} 
+                colorPalette={typeColor} 
                 variant="subtle" 
                 size="xs"
               >
-                {stockStatus.label}
+                {item.type === 'MEASURABLE' ? 'Conmensurable' : 
+                 item.type === 'COUNTABLE' ? 'Contable' : 'Elaborado'}
               </Badge>
-            </HStack>
-            
-            <Text fontSize="lg" fontWeight="bold" color={
-              stockStatus.color === 'red' ? 'red.600' : 
-              stockStatus.color === 'yellow' ? 'yellow.600' : 'gray.800'
-            }>
-              {formatQuantity(item.stock, item.unit, item)}
-            </Text>
-            
-            {item.unit_cost && (
-              <Text fontSize="xs" color="gray.500">
-                ${item.unit_cost.toFixed(2)} por {item.unit}
-              </Text>
-            )}
-          </VStack>
-
-          {/* Local modifications indicator */}
-          {item.localModifications && item.localModifications.length > 0 && (
-            <Badge colorScheme="blue" size="xs">
-              {item.localModifications.length} local changes
-            </Badge>
+            </Stack>
+          </Stack>
+          
+          {stockStatus.severity !== 'ok' && (
+            <ExclamationTriangleIcon 
+              className={`w-4 h-4 ${stockStatus.severity === 'critical' ? 'text-red-500' : 'text-yellow-500'}`}
+            />
           )}
+        </Stack>
 
-          <HStack gap="2" pt="2" borderTop="1px solid" borderColor="gray.100">
-            <Button 
-              size="xs" 
-              variant="ghost" 
-              colorPalette="green"
-              onClick={() => onAddStock(item)}
-              flex="1"
+        <Stack gap="xs">
+          <Stack direction="row" justify="space-between">
+            <Typography variant="body" size="xs" color="text.muted">Stock actual:</Typography>
+            <Badge 
+              colorPalette={stockStatus.color} 
+              variant="subtle" 
+              size="xs"
             >
-              <PlusIcon className="w-3 h-3" />
-              Stock
-            </Button>
-            
-            <Button 
-              size="xs" 
-              variant="ghost" 
-              colorPalette="blue"
-              onClick={() => onEdit(item)}
-              flex="1"
-            >
-              <PencilIcon className="w-3 h-3" />
-              Editar
-            </Button>
-            
-            <IconButton 
-              size="xs" 
-              variant="ghost" 
-              colorPalette="gray"
-              onClick={() => onViewDetails(item)}
-            >
-              <EyeIcon className="w-3 h-3" />
-            </IconButton>
-          </HStack>
-        </VStack>
-      </Card.Body>
-    </Card.Root>
+              {stockStatus.label}
+            </Badge>
+          </Stack>
+          
+          <Typography 
+            variant="heading" 
+            size="lg" 
+            colorPalette={stockStatus.color === 'red' ? 'red' : stockStatus.color === 'yellow' ? 'yellow' : undefined}
+          >
+            {formatQuantity(item.stock, item.unit, item)}
+          </Typography>
+          
+          {item.unit_cost && (
+            <Typography variant="body" size="xs" color="text.muted">
+              ${item.unit_cost.toFixed(2)} por {item.unit}
+            </Typography>
+          )}
+        </Stack>
+
+        {/* Local modifications indicator */}
+        {item.localModifications && item.localModifications.length > 0 && (
+          <Badge colorPalette="blue" size="xs">
+            {item.localModifications.length} local changes
+          </Badge>
+        )}
+
+        <div style={{ 
+          display: 'flex', 
+          gap: '0.5rem', 
+          paddingTop: '0.5rem', 
+          borderTop: '1px solid var(--colors-border-subtle)' 
+        }}>
+          <Button 
+            size="xs" 
+            variant="ghost" 
+            colorPalette="green"
+            onClick={() => onAddStock(item)}
+            style={{ flex: 1 }}
+          >
+            <PlusIcon className="w-3 h-3" />
+            Stock
+          </Button>
+          
+          <Button 
+            size="xs" 
+            variant="ghost" 
+            colorPalette="blue"
+            onClick={() => onEdit(item)}
+            style={{ flex: 1 }}
+          >
+            <PencilIcon className="w-3 h-3" />
+            Editar
+          </Button>
+          
+          <Button 
+            size="xs" 
+            variant="ghost" 
+            colorPalette="gray"
+            onClick={() => onViewDetails(item)}
+          >
+            <EyeIcon className="w-3 h-3" />
+          </Button>
+        </div>
+      </Stack>
+    </div>
   );
 });
 

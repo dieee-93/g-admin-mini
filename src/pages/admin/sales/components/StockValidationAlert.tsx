@@ -30,7 +30,7 @@ export function StockValidationAlert({ validationResult, isLoading }: StockValid
           <Typography variant="body" size="sm" weight="semibold">
             Stock disponible
           </Typography>
-          <Typography variant="body" size="xs" color="secondary">
+          <Typography variant="body" size="xs" color="text.secondary">
             Todos los productos tienen stock suficiente para esta venta.
           </Typography>
         </Stack>
@@ -46,7 +46,7 @@ export function StockValidationAlert({ validationResult, isLoading }: StockValid
             Stock insuficiente
           </Typography>
           {validationResult.error_message && (
-            <Typography variant="body" size="xs" color="secondary">
+            <Typography variant="body" size="xs" color="text.secondary">
               {validationResult.error_message}
             </Typography>
           )}
@@ -87,7 +87,7 @@ export function StockValidationAlert({ validationResult, isLoading }: StockValid
                     <Typography variant="body" size="sm" weight="medium" color="error">
                       {item.product_name}
                     </Typography>
-                    <Typography variant="body" size="xs" color="secondary">
+                    <Typography variant="body" size="xs" color="text.secondary">
                       Necesitas {item.required}, disponible: {item.available}
                     </Typography>
                   </Stack>

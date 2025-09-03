@@ -293,7 +293,7 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
                   <Box
                     height="40px"
                     px="3"
-                    bg="gray.50"
+                    bg="bg.canvas"
                     border="1px solid"
                     borderColor="border"
                     borderRadius="md"

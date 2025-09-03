@@ -105,7 +105,7 @@ export const CountableFields = ({
             <Flex justify="space-between" align="center">
               <Stack gap="1">
                 <Text fontWeight="semibold">¿Viene empaquetado?</Text>
-                <Text fontSize="sm" color="fg.muted">
+                <Text fontSize="sm" color="text.muted">
                   Activa si el item viene en cajas, bandejas, docenas, etc.
                 </Text>
               </Stack>

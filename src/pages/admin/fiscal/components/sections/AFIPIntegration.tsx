@@ -263,7 +263,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
           
           <Grid templateColumns="repeat(2, 1fr)" gap="sm">
             <VStack gap="xs">
-              <Typography variant="caption" color="muted">
+              <Typography variant="caption" color="text.muted">
                 Pendientes
               </Typography>
               <Typography variant="body" fontWeight="bold" color="warning">
@@ -271,7 +271,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
               </Typography>
             </VStack>
             <VStack gap="xs">
-              <Typography variant="caption" color="muted">
+              <Typography variant="caption" color="text.muted">
                 Fallidos
               </Typography>
               <Typography variant="body" fontWeight="bold" color="error">
@@ -323,7 +323,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
               </Typography>
             </HStack>
             {getConnectionBadge(afipStatus.connection)}
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               Última sincronización: {formatDate(afipStatus.last_sync)}
             </Typography>
             <Button
@@ -347,7 +347,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
             </HStack>
             {getServiceBadge(afipStatus.service_status)}
             <HStack justify="space-between">
-              <Typography variant="caption" color="muted">
+              <Typography variant="caption" color="text.muted">
                 Token válido
               </Typography>
               <Badge colorPalette={afipStatus.certificate_valid ? 'success' : 'error'}>
@@ -377,7 +377,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
             <Typography variant="display" size="lg" color="warning">
               {afipStatus.pending_requests}
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               facturas en cola
             </Typography>
             <Button
@@ -402,7 +402,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
             <Typography variant="display" size="lg" color="error">
               {afipStatus.failed_requests}
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               requieren atención
             </Typography>
           </VStack>
@@ -432,7 +432,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
             <Typography variant="heading" size="sm">
               Facturas Pendientes de CAE
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               {pendingInvoices.length} facturas en cola
             </Typography>
           </HStack>

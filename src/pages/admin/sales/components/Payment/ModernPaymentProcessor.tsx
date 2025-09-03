@@ -280,7 +280,7 @@ export function ModernPaymentProcessor({
   return (
     <VStack gap="6" align="stretch">
       {/* Payment Summary */}
-      <Card.Root p="4" bg="gray.50">
+      <Card.Root p="4" bg="bg.canvas">
         <VStack gap="3" align="stretch">
           <HStack justify="space-between">
             <Text fontWeight="medium">Subtotal:</Text>
@@ -456,7 +456,7 @@ export function ModernPaymentProcessor({
                 const Icon = method?.icon || CreditCardIcon;
                 
                 return (
-                  <HStack key={index} gap="3" p="3" bg="gray.50" borderRadius="md">
+                  <HStack key={index} gap="3" p="3" bg="bg.canvas" borderRadius="md">
                     <Icon className="w-5 h-5" />
                     <VStack align="start" flex="1" gap="1">
                       <Text fontWeight="medium">{method?.label}</Text>

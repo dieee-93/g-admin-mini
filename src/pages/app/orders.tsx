@@ -157,19 +157,19 @@ function OrderProgress({ order }: { order: Order }) {
       </HStack>
       
       <Progress.Root value={order.progress || 0} colorPalette="blue" size="md">
-        <Progress.Track bg={{ base: "gray.100", _dark: "gray.700" }}>
+        <Progress.Track bg="bg.muted">
           <Progress.Range />
         </Progress.Track>
       </Progress.Root>
       
       <HStack justify="space-between">
-        <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }}>
+        <Text fontSize="xs" color="text.muted">
           Recibido
         </Text>
-        <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }}>
+        <Text fontSize="xs" color="text.muted">
           Preparando
         </Text>
-        <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }}>
+        <Text fontSize="xs" color="text.muted">
           Listo
         </Text>
       </HStack>
@@ -188,7 +188,7 @@ function OrderCard({ order, onViewDetails, onReorder }: {
   return (
     <Card.Root 
       variant="elevated" 
-      bg={{ base: "white", _dark: "gray.800" }}
+      bg="bg.surface"
       _hover={{ shadow: "md" }}
       transition="all 0.2s"
     >
@@ -208,7 +208,7 @@ function OrderCard({ order, onViewDetails, onReorder }: {
                   </HStack>
                 </Badge>
               </HStack>
-              <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>
+              <Text fontSize="sm" color="text.secondary">
                 {new Date(order.date).toLocaleDateString('es-ES', {
                   day: '2-digit',
                   month: 'long',
@@ -216,7 +216,7 @@ function OrderCard({ order, onViewDetails, onReorder }: {
                   minute: '2-digit'
                 })}
               </Text>
-              <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }}>
+              <Text fontSize="xs" color="text.muted">
                 {getOrderTypeText(order.orderType)}
                 {order.deliveryAddress && ` • ${order.deliveryAddress}`}
               </Text>
@@ -237,7 +237,7 @@ function OrderCard({ order, onViewDetails, onReorder }: {
                   </Text>
                   <Text fontSize="sm">{item.name}</Text>
                 </HStack>
-                <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>
+                <Text fontSize="sm" color="text.secondary">
                   ${(item.price * item.quantity).toFixed(2)}
                 </Text>
               </HStack>
@@ -322,44 +322,44 @@ export function MyOrders() {
       <VStack align="stretch" gap="8">
         {/* Header */}
         <VStack align="start" gap="2">
-          <Text fontSize="3xl" fontWeight="bold" color={{ base: "gray.800", _dark: "gray.100" }}>
+          <Text fontSize="3xl" fontWeight="bold" color="text.primary">
             Mis Pedidos
           </Text>
-          <Text fontSize="lg" color={{ base: "gray.600", _dark: "gray.300" }}>
+          <Text fontSize="lg" color="text.secondary">
             Historial completo y seguimiento en tiempo real
           </Text>
         </VStack>
         
         {/* Stats Cards */}
         <Grid templateColumns={{ base: "repeat(3, 1fr)" }} gap="4">
-          <Card.Root variant="elevated" bg={{ base: "blue.50", _dark: "blue.900" }}>
+          <Card.Root variant="elevated" bg="blue.50">
             <Card.Body textAlign="center">
               <Text fontSize="2xl" fontWeight="bold" color="blue.600">
                 {stats.total}
               </Text>
-              <Text fontSize="sm" color={{ base: "blue.700", _dark: "blue.200" }}>
+              <Text fontSize="sm" color="blue.600">
                 Total
               </Text>
             </Card.Body>
           </Card.Root>
           
-          <Card.Root variant="elevated" bg={{ base: "orange.50", _dark: "orange.900" }}>
+          <Card.Root variant="elevated" bg="orange.50">
             <Card.Body textAlign="center">
               <Text fontSize="2xl" fontWeight="bold" color="orange.600">
                 {stats.active}
               </Text>
-              <Text fontSize="sm" color={{ base: "orange.700", _dark: "orange.200" }}>
+              <Text fontSize="sm" color="orange.600">
                 Activos
               </Text>
             </Card.Body>
           </Card.Root>
           
-          <Card.Root variant="elevated" bg={{ base: "green.50", _dark: "green.900" }}>
+          <Card.Root variant="elevated" bg="green.50">
             <Card.Body textAlign="center">
               <Text fontSize="2xl" fontWeight="bold" color="green.600">
                 {stats.completed}
               </Text>
-              <Text fontSize="sm" color={{ base: "green.700", _dark: "green.200" }}>
+              <Text fontSize="sm" color="green.600">
                 Completados
               </Text>
             </Card.Body>
@@ -368,7 +368,7 @@ export function MyOrders() {
         
         {/* Tabs */}
         <Tabs.Root value={selectedTab} onValueChange={(e) => setSelectedTab(e.value as string)}>
-          <Tabs.List bg={{ base: "gray.50", _dark: "gray.800" }} borderRadius="xl" p="1">
+          <Tabs.List bg="bg.surface" borderRadius="xl" p="1">
             <Tabs.Trigger value="all" flex="1" borderRadius="lg">
               <Text fontSize="sm" fontWeight="medium">
                 Todos ({stats.total})
@@ -402,12 +402,12 @@ export function MyOrders() {
             <Card.Root variant="outline">
               <Card.Body>
                 <VStack gap="4" py="8">
-                  <Icon icon={ListBulletIcon} size="2xl" color="gray.300" />
+                  <Icon icon={ListBulletIcon} size="2xl" color="text.muted" />
                   <VStack gap="2">
-                    <Text fontSize="lg" fontWeight="medium" color={{ base: "gray.600", _dark: "gray.300" }}>
+                    <Text fontSize="lg" fontWeight="medium" color="text.secondary">
                       No hay pedidos en esta categoría
                     </Text>
-                    <Text fontSize="md" color={{ base: "gray.500", _dark: "gray.400" }}>
+                    <Text fontSize="md" color="text.muted">
                       Cuando hagas un pedido, aparecerá aquí
                     </Text>
                   </VStack>

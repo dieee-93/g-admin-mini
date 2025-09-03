@@ -72,7 +72,7 @@ export function MonitoringSection() {
           {metrics.map((metric) => (
             <Card key={metric.title}>
               <Stack p="lg" align="start" gap="md">
-                <Typography fontSize="sm" color="muted">
+                <Typography fontSize="sm" color="text.muted">
                   {metric.title}
                 </Typography>
                 <Stack direction="row" justify="space-between" w="full">
@@ -89,7 +89,7 @@ export function MonitoringSection() {
                     {metric.target}
                   </Badge>
                 </Stack>
-                <Typography fontSize="sm" color="muted">
+                <Typography fontSize="sm" color="text.muted">
                   {metric.trend}
                 </Typography>
               </Stack>
@@ -115,7 +115,7 @@ export function MonitoringSection() {
                     />
                     <Stack direction="column" align="start" gap="xs" flex={1}>
                       <Typography fontSize="sm">{alert.message}</Typography>
-                      <Typography fontSize="xs" color="muted">
+                      <Typography fontSize="xs" color="text.muted">
                         {alert.time}
                       </Typography>
                     </Stack>
@@ -126,7 +126,7 @@ export function MonitoringSection() {
               {alerts.length === 0 && (
                 <Stack textAlign="center" py="xl">
                   <Icon icon={CheckCircleIcon} size="lg" className="text-green-500" />
-                  <Typography mt="sm" color="muted">
+                  <Typography mt="sm" color="text.muted">
                     No hay alertas activas
                   </Typography>
                 </Stack>

@@ -22,13 +22,13 @@ function HeroSection() {
       <Stack direction="row" align="center" justify="space-between" gap="xl">
         <Stack gap="xl" width="50%">
           <Stack gap="md">
-            <Typography variant="display" color="primary">
+            <Typography variant="display" color="text.primary">
               Bienvenido a La Gigante
             </Typography>
-            <Typography variant="title" color="secondary">
+            <Typography variant="title" color="text.secondary">
               Las mejores pizzas de la ciudad, ahora con pedidos online
             </Typography>
-            <Typography variant="body" color="muted">
+            <Typography variant="body" color="text.muted">
               Disfruta de nuestras especialidades artesanales preparadas con 
               ingredientes frescos y la receta tradicional de siempre.
             </Typography>
@@ -118,10 +118,10 @@ function FeaturedMenu() {
     <Layout variant="container" padding="xl">
       <Stack gap="xl">
         <Stack gap="sm" align="center">
-          <Typography variant="heading" color="primary" textAlign="center">
+          <Typography variant="heading" color="text.primary" textAlign="center">
             Nuestras Especialidades
           </Typography>
-          <Typography variant="body" color="muted" textAlign="center">
+          <Typography variant="body" color="text.muted" textAlign="center">
             Los platos más pedidos por nuestros clientes
           </Typography>
         </Stack>
@@ -145,13 +145,13 @@ function FeaturedMenu() {
                 </HStack>
                 
                 <Stack gap="sm">
-                  <Typography variant="title" color="primary">
+                  <Typography variant="title" color="text.primary">
                     {item.name}
                   </Typography>
-                  <Typography variant="body" color="muted" size="sm">
+                  <Typography variant="body" color="text.muted" size="sm">
                     {item.description}
                   </Typography>
-                  <Typography variant="title" color="accent" size="lg">
+                  <Typography variant="title" color="text.primary" size="lg">
                     {item.price}
                   </Typography>
                 </Stack>
@@ -171,16 +171,16 @@ function AboutSection() {
       <CardWrapper variant="subtle" padding="xl">
         <Stack direction="row" align="center" gap="xl">
           <Stack gap="lg" width="60%">
-            <Typography variant="heading" color="primary">
+            <Typography variant="heading" color="text.primary">
               Tradición y Sabor desde 1985
             </Typography>
             <Stack gap="md">
-              <Typography variant="body" color="secondary">
+              <Typography variant="body" color="text.secondary">
                 En La Gigante combinamos la tradición familiar con la innovación tecnológica. 
                 Nuestras recetas han pasado de generación en generación, manteniendo ese 
                 sabor auténtico que nos caracteriza.
               </Typography>
-              <Typography variant="body" color="secondary">
+              <Typography variant="body" color="text.secondary">
                 Ahora con nuestro sistema de pedidos online, puedes disfrutar de nuestras 
                 especialidades desde la comodidad de tu hogar, manteniendo la misma calidad 
                 y frescura de siempre.
@@ -192,8 +192,8 @@ function AboutSection() {
                 <HStack gap="sm" align="center">
                   <ClockIcon style={{ width: '20px', height: '20px', color: '#f7931e' }} />
                   <Stack gap="xs">
-                    <Typography variant="label" color="primary">Entrega</Typography>
-                    <Typography variant="body" size="sm" color="muted">30-45 min</Typography>
+                    <Typography variant="label" color="text.primary">Entrega</Typography>
+                    <Typography variant="body" size="sm" color="text.muted">30-45 min</Typography>
                   </Stack>
                 </HStack>
               </CardWrapper>
@@ -202,8 +202,8 @@ function AboutSection() {
                 <HStack gap="sm" align="center">
                   <StarIcon style={{ width: '20px', height: '20px', color: '#f7931e' }} />
                   <Stack gap="xs">
-                    <Typography variant="label" color="primary">Rating</Typography>
-                    <Typography variant="body" size="sm" color="muted">4.8/5 ⭐</Typography>
+                    <Typography variant="label" color="text.primary">Rating</Typography>
+                    <Typography variant="body" size="sm" color="text.muted">4.8/5 ⭐</Typography>
                   </Stack>
                 </HStack>
               </CardWrapper>
@@ -262,10 +262,10 @@ function TestimonialsSection() {
     <Layout variant="container" padding="xl">
       <Stack gap="xl">
         <Stack gap="sm" align="center">
-          <Typography variant="heading" color="primary" textAlign="center">
+          <Typography variant="heading" color="text.primary" textAlign="center">
             Lo que dicen nuestros clientes
           </Typography>
-          <Typography variant="body" color="muted" textAlign="center">
+          <Typography variant="body" color="text.muted" textAlign="center">
             Testimonios reales de quienes ya probaron nuestros sabores
           </Typography>
         </Stack>
@@ -281,7 +281,7 @@ function TestimonialsSection() {
                 <HStack justify="space-between" align="center">
                   <HStack gap="sm" align="center">
                     <div style={{ fontSize: '32px' }}>{testimonial.avatar}</div>
-                    <Typography variant="title" color="primary">
+                    <Typography variant="title" color="text.primary">
                       {testimonial.name}
                     </Typography>
                   </HStack>
@@ -292,7 +292,7 @@ function TestimonialsSection() {
                   </HStack>
                 </HStack>
                 
-                <Typography variant="body" color="secondary">
+                <Typography variant="body" color="text.secondary">
                   "{testimonial.comment}"
                 </Typography>
               </Stack>
@@ -311,7 +311,7 @@ function ContactSection() {
       <CardWrapper variant="subtle" padding="xl">
         <Stack direction="row" justify="space-between" gap="xl">
           <Stack gap="lg" width="50%">
-            <Typography variant="heading" color="primary">
+            <Typography variant="heading" color="text.primary">
               Visitanos o pedí online
             </Typography>
             
@@ -319,8 +319,8 @@ function ContactSection() {
               <HStack gap="sm" align="start">
                 <MapPinIcon style={{ width: '20px', height: '20px', color: '#f7931e', marginTop: '4px' }} />
                 <Stack gap="xs">
-                  <Typography variant="label" color="primary">Dirección</Typography>
-                  <Typography variant="body" color="secondary">
+                  <Typography variant="label" color="text.primary">Dirección</Typography>
+                  <Typography variant="body" color="text.secondary">
                     Av. Principal 1234, Ciudad<br />
                     Provincia, Argentina
                   </Typography>
@@ -330,8 +330,8 @@ function ContactSection() {
               <HStack gap="sm" align="start">
                 <PhoneIcon style={{ width: '20px', height: '20px', color: '#f7931e', marginTop: '4px' }} />
                 <Stack gap="xs">
-                  <Typography variant="label" color="primary">Teléfono</Typography>
-                  <Typography variant="body" color="secondary">
+                  <Typography variant="label" color="text.primary">Teléfono</Typography>
+                  <Typography variant="body" color="text.secondary">
                     (011) 4567-8900<br />
                     WhatsApp: (011) 1234-5678
                   </Typography>
@@ -341,8 +341,8 @@ function ContactSection() {
               <HStack gap="sm" align="start">
                 <ClockIcon style={{ width: '20px', height: '20px', color: '#f7931e', marginTop: '4px' }} />
                 <Stack gap="xs">
-                  <Typography variant="label" color="primary">Horarios</Typography>
-                  <Typography variant="body" color="secondary">
+                  <Typography variant="label" color="text.primary">Horarios</Typography>
+                  <Typography variant="body" color="text.secondary">
                     Lun a Dom: 18:00 - 00:00<br />
                     Pedidos online 24/7
                   </Typography>
@@ -352,7 +352,7 @@ function ContactSection() {
           </Stack>
           
           <Stack gap="lg" width="50%" align="center">
-            <Typography variant="title" color="primary" textAlign="center">
+            <Typography variant="title" color="text.primary" textAlign="center">
               ¿Listo para ordenar?
             </Typography>
             
@@ -369,7 +369,7 @@ function ContactSection() {
               </Button>
               
               <HStack gap="sm" justify="center">
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   ¿Sos parte del equipo?
                 </Typography>
                 <Button 

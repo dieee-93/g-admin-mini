@@ -1,8 +1,9 @@
 import { Input, Field } from '@chakra-ui/react'
 import type { ChangeEvent, ReactNode } from 'react'
+import type { InputProps as ChakraInputProps } from '@chakra-ui/react'
 import { Typography } from './Typography' // Usar nuestro Typography wrapper
 
-interface InputFieldProps {
+interface InputFieldProps extends Omit<ChakraInputProps, 'size' | 'variant'> {
   label?: string
   placeholder?: string
   value?: string | number
@@ -34,6 +35,7 @@ export function InputField({
   startElement,
   endElement,
   colorScheme = 'default',
+  ...inputProps // ✅ Spread todas las demás props de Chakra Input
 }: InputFieldProps) {
   // ✅ Recipes handle all theming automatically - no manual props needed
   
@@ -54,8 +56,7 @@ export function InputField({
         size={size}
         variant={variant}
         disabled={disabled}
-        startElement={startElement}
-        endElement={endElement}
+        {...inputProps} // ✅ Spread props adicionales como borderColor, focusBorderColor, etc.
       />
       {error && (
         <Field.ErrorText fontSize="sm">

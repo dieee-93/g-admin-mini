@@ -1,12 +1,6 @@
 import { 
-  Box, 
-  HStack, 
-  VStack, 
-  Input, 
-  Button, 
-  Text
-} from '@chakra-ui/react';
-import { SelectField } from '@/shared/ui';
+  Section, Stack, Input, Button, SelectField 
+} from '@/shared/ui';
 import { 
   MagnifyingGlassIcon,
   AdjustmentsHorizontalIcon,
@@ -55,27 +49,28 @@ export const MaterialsFilters = () => {
     filters.sortOrder !== 'asc';
 
   return (
-    <Box p={4} bg="gray.50" borderBottomWidth={1}>
-      <VStack gap={4}>
+    <Section variant="flat">
+      <Stack gap="md">
         {/* Search and Reset */}
-        <HStack w="full" gap={4}>
-          <Box flex={1} position="relative">
+        <Stack direction="row" gap="md">
+          <div style={{ flex: 1, position: 'relative' }}>
             <Input
               placeholder="Buscar materiales..."
               value={filters.search}
               onChange={(e) => setFilters({ search: e.target.value })}
-              bg="white"
             />
-            <Box 
-              position="absolute" 
-              right={3} 
-              top="50%" 
-              transform="translateY(-50%)"
-              pointerEvents="none"
+            <div 
+              style={{
+                position: 'absolute',
+                right: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none'
+              }}
             >
               <MagnifyingGlassIcon className="w-4 h-4 text-gray-400" />
-            </Box>
-          </Box>
+            </div>
+          </div>
 
           {hasActiveFilters && (
             <Button
@@ -87,11 +82,11 @@ export const MaterialsFilters = () => {
               Limpiar
             </Button>
           )}
-        </HStack>
+        </Stack>
 
         {/* Filters Row */}
-        <HStack w="full" gap={4} wrap="wrap">
-          <Box minW="200px">
+        <Stack direction="row" gap="md" wrap="wrap">
+          <div style={{ minWidth: '200px' }}>
             <SelectField
               label="Categoría"
               options={categoryOptions}
@@ -99,9 +94,9 @@ export const MaterialsFilters = () => {
               onChange={(value) => setFilters({ category: value })}
               size="sm"
             />
-          </Box>
+          </div>
 
-          <Box minW="180px">
+          <div style={{ minWidth: '180px' }}>
             <SelectField
               label="Estado de Stock"
               options={statusOptions}
@@ -109,9 +104,9 @@ export const MaterialsFilters = () => {
               onChange={(value) => setFilters({ status: value as any })}
               size="sm"
             />
-          </Box>
+          </div>
 
-          <Box minW="150px">
+          <div style={{ minWidth: '150px' }}>
             <SelectField
               label="Ordenar por"
               options={sortOptions}
@@ -119,9 +114,9 @@ export const MaterialsFilters = () => {
               onChange={(value) => setFilters({ sortBy: value as any })}
               size="sm"
             />
-          </Box>
+          </div>
 
-          <Box minW="140px">
+          <div style={{ minWidth: '140px' }}>
             <SelectField
               label="Orden"
               options={orderOptions}
@@ -129,9 +124,9 @@ export const MaterialsFilters = () => {
               onChange={(value) => setFilters({ sortOrder: value as any })}
               size="sm"
             />
-          </Box>
-        </HStack>
-      </VStack>
-    </Box>
+          </div>
+        </Stack>
+      </Stack>
+    </Section>
   );
 };

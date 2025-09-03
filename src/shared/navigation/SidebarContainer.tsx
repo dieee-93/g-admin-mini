@@ -3,7 +3,8 @@
 // ====================================
 
 import React from 'react';
-import { Box, Stack } from '@chakra-ui/react';
+import { Stack } from '@/shared/ui';
+import { Box } from '@chakra-ui/react';
 
 interface SidebarContainerProps {
   children: React.ReactNode;
@@ -20,17 +21,18 @@ export function SidebarContainer({
     <Box
       width={isExpanded ? "15rem" : "3rem"}
       height="100vh"
-
+      bg="bg.surface"
       borderRight="1px solid"
+      borderColor="border.default"
       position="fixed"
-      left={0}
-      top={0}
-      zIndex={9999}
+      left="0"
+      top="0"
+      zIndex="9999"
       transition="width 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
       overflow="hidden"
       boxShadow={isExpanded ? "2xl" : "lg"}
     >
-      <Stack direction="column" gap="none" align="stretch" height="100%">
+      <Stack direction="column" gap="0" align="stretch" height="100%">
         {children}
       </Stack>
     </Box>
@@ -50,49 +52,65 @@ export function NavItemContainer({
   onClick?: () => void;
 }) {
   return (
-    <Box
-      as="button"
-      width="100%"
-      px="xs"
-      py="xxs"
-      minH="28px"
-      borderRadius="sm"
-      bg={isActive ? 'primary.500' : 'transparent'}
-      color={isActive ? 'white' : 'text.secondary'}
-      textAlign="left"
-      cursor="pointer"
-      position="relative"
-      transition="all 0.12s ease"
-      _hover={{
-        bg: isActive ? 'primary.600' : 'bg.surface'
+    <button
+      style={{
+        width: "100%",
+        padding: "4px 8px", // xs padding
+        minHeight: "28px",
+        borderRadius: "4px", // sm
+        backgroundColor: isActive ? "var(--chakra-colors-gray-600)" : "transparent", // 🎨 Estado activo
+        color: isActive ? "var(--chakra-colors-gray-50)" : "var(--chakra-colors-gray-600)", // 🎨 Colores consistentes
+        textAlign: "left",
+        cursor: "pointer",
+        position: "relative",
+        transition: "all 0.12s ease",
+        border: "none",
+        outline: "none"
       }}
-      _focus={{
-        outline: '1px solid',
-        outlineColor: 'primary.500',
-        outlineOffset: '1px'
+      onMouseEnter={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = "var(--chakra-colors-gray-200)"; // 🎨 Hover consistente
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = "transparent";
+        }
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.outline = "1px solid var(--chakra-colors-gray-500)";
+        e.currentTarget.style.outlineOffset = "1px";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.outline = "none";
       }}
       onClick={onClick}
-      _before={isActive ? {
-        content: '""',
-        position: 'absolute',
-        left: '-4px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        width: '3px',
-        height: '16px',
-        bg: 'primary.500',
-        borderRadius: '0 2px 2px 0'
-      } : {}}
     >
+      {/* Indicador de estado activo */}
+      {isActive && (
+        <div 
+          style={{
+            position: "absolute",
+            left: "-4px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: "3px",
+            height: "16px",
+            backgroundColor: "var(--chakra-colors-gray-600)", // 🎨 Indicador activo
+            borderRadius: "0 2px 2px 0"
+          }}
+        />
+      )}
+      
       <Stack 
         direction="row" 
         align="center" 
-        gap={isExpanded ? "sm" : "none"}
+        gap={isExpanded ? "4" : "0"}
         justify={isExpanded ? "flex-start" : "center"}
-        width="100%"
+        style={{ width: "100%" }}
       >
         {children}
       </Stack>
-    </Box>
+    </button>
   );
 }

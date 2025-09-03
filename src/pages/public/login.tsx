@@ -164,10 +164,10 @@ export default function CustomerLoginPage() {
                 <ShoppingBagIcon style={{ width: '40px', height: '40px' }} />
               </Box>
               <VStack gap="sm">
-                <Typography variant="heading" color="primary">
+                <Typography variant="heading" color="text.primary">
                   ¡Bienvenido de vuelta!
                 </Typography>
-                <Typography variant="body" color="muted" textAlign="center">
+                <Typography variant="body" color="text.muted" textAlign="center">
                   Inicia sesión para hacer tu pedido favorito
                 </Typography>
               </VStack>
@@ -282,7 +282,7 @@ export default function CustomerLoginPage() {
           <CardWrapper.Footer>
             <VStack gap="md" w="full" textAlign="center">
               <Stack gap="sm" align="center">
-                <Typography variant="body" color="muted">
+                <Typography variant="body" color="text.muted">
                   ¿Primera vez en La Gigante?
                 </Typography>
                 <Button 
@@ -297,7 +297,7 @@ export default function CustomerLoginPage() {
               </Stack>
               
               <HStack gap="sm" justify="center">
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   ¿Problemas para acceder?
                 </Typography>
                 <Button 
@@ -312,7 +312,7 @@ export default function CustomerLoginPage() {
               
               <HStack gap="xs" fontSize="sm" color="gray.500" justify="center">
                 <Text>🍕</Text>
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Protegido y seguro
                 </Typography>
                 <Text>🔒</Text>

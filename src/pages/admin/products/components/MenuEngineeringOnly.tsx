@@ -91,7 +91,7 @@ export function MenuEngineeringOnly() {
                   <ChartBarIcon className="w-6 h-6 text-blue-600" />
                   <Typography variant="title">Menu Engineering Matrix</Typography>
                 </HStack>
-                <Typography variant="body" color="muted">
+                <Typography variant="body" color="text.muted">
                   Strategic analysis of menu profitability and popularity using real sales data
                 </Typography>
               </VStack>
@@ -169,7 +169,7 @@ export function MenuEngineeringOnly() {
                 <Card.Body>
                   {loading ? (
                     <Stack gap="md" align="center" minH="400px" justify="center">
-                      <Typography variant="body" color="muted">
+                      <Typography variant="body" color="text.muted">
                         Loading menu engineering data...
                       </Typography>
                     </Stack>
@@ -237,7 +237,7 @@ export function MenuEngineeringOnly() {
                             <HStack justify="space-between">
                               <VStack align="start" gap="xs">
                                 <Typography variant="label">{product.productName}</Typography>
-                                <Typography variant="caption" color="muted">
+                                <Typography variant="caption" color="text.muted">
                                   Popularity: {product.popularityIndex.toFixed(1)}% | 
                                   Profitability: {product.profitabilityIndex.toFixed(1)}%
                                 </Typography>
@@ -256,7 +256,7 @@ export function MenuEngineeringOnly() {
                         ))}
                       </Stack>
                     ) : (
-                      <Typography variant="body" color="muted">
+                      <Typography variant="body" color="text.muted">
                         Select a category above to view products
                       </Typography>
                     )}
@@ -279,7 +279,7 @@ export function MenuEngineeringOnly() {
                           <HStack justify="space-between" align="start">
                             <VStack align="start" gap="xs">
                               <Typography variant="label">{recommendation.action || 'Strategy Action'}</Typography>
-                              <Typography variant="body" color="muted">
+                              <Typography variant="body" color="text.muted">
                                 {recommendation.description}
                               </Typography>
                               <HStack gap="sm">
@@ -336,7 +336,7 @@ export function MenuEngineeringOnly() {
                       </VStack>
                       <VStack align="start" gap="xs">
                         <Typography variant="label">Average Margin</Typography>
-                        <Typography variant="title" color="accent">
+                        <Typography variant="title" color="text.primary">
                           {performanceMetrics.averageMargin.toFixed(1)}%
                         </Typography>
                       </VStack>

@@ -1,21 +1,10 @@
 // ABCAnalysisPage.tsx - Advanced ABC Analysis for Inventory Management
 import React, { useState } from 'react';
 import { 
-  Box, 
-  VStack, 
-  HStack, 
-  Text, 
-  Heading, 
-  Card, 
-  SimpleGrid, 
-  Badge, 
-  Tabs,
-  Button,
-  Table,
-  Progress,
-  ProgressTrack,
-  ProgressRange
-} from '@chakra-ui/react';
+  ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
+  Stack, Typography, Badge, Tabs, Button
+} from '@/shared/ui';
+import { Progress } from '@chakra-ui/react';
 import {
   ChartBarIcon,
   CircleStackIcon,
@@ -102,269 +91,236 @@ const ABCAnalysisPage: React.FC = () => {
   ];
 
   return (
-    <Box p="6">
-      <VStack align="start" gap="6">
-        {/* Header */}
-        <Box>
-          <Heading size="xl" mb="2">ABC Analysis</Heading>
-          <Text color="gray.600" fontSize="lg">
-            Advanced inventory classification and optimization using Pareto principle
-          </Text>
-        </Box>
+    <ContentLayout>
+      <PageHeader 
+        title="ABC Analysis"
+        subtitle="Advanced inventory classification using Pareto principle"
+        icon={ChartBarIcon}
+      />
 
-        {/* Quick Metrics */}
-        <SimpleGrid columns={{ base: 2, md: 4 }} gap="4" w="full">
+      <StatsSection>
+        <CardGrid columns={{ base: 2, md: 4 }}>
           {metrics.map((metric, index) => (
-            <Card.Root key={index}>
-              <Card.Body>
-                <HStack gap="3">
-                  <Box p="2" bg={`${metric.color}.50`} borderRadius="md">
-                    <metric.icon className={`w-5 h-5 text-${metric.color}-600`} />
-                  </Box>
-                  <VStack align="start" gap="1">
-                    <Text fontSize="sm" color="gray.600">{metric.title}</Text>
-                    <Text fontSize="lg" fontWeight="bold">{metric.value}</Text>
-                  </VStack>
-                </HStack>
-              </Card.Body>
-            </Card.Root>
+            <MetricCard 
+              key={index}
+              title={metric.title}
+              value={metric.value}
+              icon={metric.icon}
+              colorPalette={metric.color}
+            />
           ))}
-        </SimpleGrid>
+        </CardGrid>
+      </StatsSection>
 
-        {/* ABC Categories Overview */}
-        <Box w="full">
-          <Text fontSize="lg" fontWeight="semibold" mb="4">ABC Categories</Text>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap="4">
-            {categoryData.map((category) => (
-              <Card.Root key={category.category} variant="outline">
-                <Card.Body>
-                  <VStack align="start" gap="4">
-                    <HStack justify="space-between" w="full">
-                      <VStack align="start" gap="1">
-                        <HStack gap="2">
-                          <Badge 
-                            colorPalette={category.color}
-                            size="lg"
-                            fontWeight="bold"
-                          >
-                            {category.category}
-                          </Badge>
-                          <Text fontWeight="semibold">{category.title.split(' - ')[1]}</Text>
-                        </HStack>
-                        <Text fontSize="sm" color="gray.600">
-                          {category.description}
-                        </Text>
-                      </VStack>
-                    </HStack>
-
-                    {/* Category Metrics */}
-                    <SimpleGrid columns={2} gap="4" w="full">
-                      <VStack align="start" gap="1">
-                        <Text fontSize="xs" color="gray.500">Items</Text>
-                        <Text fontSize="xl" fontWeight="bold" color={`${category.color}.600`}>
-                          {category.items}
-                        </Text>
-                      </VStack>
-                      <VStack align="start" gap="1">
-                        <Text fontSize="xs" color="gray.500">Revenue %</Text>
-                        <Text fontSize="xl" fontWeight="bold" color={`${category.color}.600`}>
-                          {category.percentage.toFixed(1)}%
-                        </Text>
-                      </VStack>
-                    </SimpleGrid>
-
-                    {/* Progress Bar */}
-                    <Box w="full">
-                      <Progress.Root 
-                        value={category.percentage} 
-                        size="sm" 
+      <Section variant="default" title="ABC Categories">
+        <CardGrid columns={{ base: 1, md: 3 }}>
+          {categoryData.map((category) => (
+            <Section key={category.category} variant="elevated">
+              <Stack gap="md">
+                <Stack direction="row" justify="space-between">
+                  <Stack gap="xs">
+                    <Stack direction="row" align="center" gap="sm">
+                      <Badge 
                         colorPalette={category.color}
+                        size="lg"
                       >
-                        <ProgressTrack>
-                          <ProgressRange />
-                        </ProgressTrack>
-                      </Progress.Root>
-                    </Box>
+                        {category.category}
+                      </Badge>
+                      <Typography variant="body" weight="semibold">
+                        {category.title.split(' - ')[1]}
+                      </Typography>
+                    </Stack>
+                    <Typography variant="body" size="sm" color="text.muted">
+                      {category.description}
+                    </Typography>
+                  </Stack>
+                </Stack>
 
-                    {/* Revenue */}
-                    <HStack justify="space-between" w="full">
-                      <Text fontSize="sm" color="gray.600">Revenue:</Text>
-                      <Text fontSize="sm" fontWeight="medium">
-                        ${category.revenue.toLocaleString()}
-                      </Text>
-                    </HStack>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <Stack gap="xs">
+                    <Typography variant="body" size="xs" color="text.muted">Items</Typography>
+                    <Typography variant="heading" size="xl" colorPalette={category.color}>
+                      {category.items}
+                    </Typography>
+                  </Stack>
+                  <Stack gap="xs">
+                    <Typography variant="body" size="xs" color="text.muted">Revenue %</Typography>
+                    <Typography variant="heading" size="xl" colorPalette={category.color}>
+                      {category.percentage.toFixed(1)}%
+                    </Typography>
+                  </Stack>
+                </div>
 
-                    {/* Strategy */}
-                    <Box 
-                      p="3" 
-                      bg={`${category.color}.50`} 
-                      borderRadius="md" 
-                      w="full"
-                      border="1px solid"
-                      borderColor={`${category.color}.200`}
-                    >
-                      <Text fontSize="xs" color={`${category.color}.700`}>
-                        <strong>Estrategia:</strong> {category.strategy}
-                      </Text>
-                    </Box>
-                  </VStack>
-                </Card.Body>
-              </Card.Root>
-            ))}
-          </SimpleGrid>
-        </Box>
+                <Progress.Root 
+                  value={category.percentage} 
+                  size="sm" 
+                  colorPalette={category.color}
+                >
+                  <Progress.Track>
+                    <Progress.Range />
+                  </Progress.Track>
+                </Progress.Root>
 
-        {/* Main Analysis Interface */}
-        <Card.Root w="full">
-          <Card.Header>
-            <HStack justify="space-between">
-              <Heading size="md">Detailed ABC Analysis</Heading>
-              <HStack gap="2">
-                <Button size="sm" variant="outline" leftIcon={<DocumentChartBarIcon className="w-4 h-4" />}>
-                  Export Report
-                </Button>
-                <Button size="sm" variant="outline" leftIcon={<ArrowTrendingUpIcon className="w-4 h-4" />}>
-                  Refresh Analysis
-                </Button>
-              </HStack>
-            </HStack>
-          </Card.Header>
-          
-          <Card.Body>
-            <Tabs.Root value={analysisType} onValueChange={(details) => setAnalysisType(details.value)}>
-              <Tabs.List>
-                <Tabs.Trigger value="revenue">
-                  <HStack gap="2">
-                    <BanknotesIcon className="w-4 h-4" />
-                    <Text>By Revenue</Text>
-                  </HStack>
-                </Tabs.Trigger>
-                <Tabs.Trigger value="quantity">
-                  <HStack gap="2">
-                    <CircleStackIcon className="w-4 h-4" />
-                    <Text>By Quantity</Text>
-                  </HStack>
-                </Tabs.Trigger>
-                <Tabs.Trigger value="frequency">
-                  <HStack gap="2">
-                    <ChartBarIcon className="w-4 h-4" />
-                    <Text>By Frequency</Text>
-                  </HStack>
-                </Tabs.Trigger>
-                <Tabs.Trigger value="engine">
-                  <HStack gap="2">
-                    <DocumentChartBarIcon className="w-4 h-4" />
-                    <Text>Analysis Engine</Text>
-                  </HStack>
-                </Tabs.Trigger>
-              </Tabs.List>
+                <Stack direction="row" justify="space-between">
+                  <Typography variant="body" size="sm" color="text.muted">Revenue:</Typography>
+                  <Typography variant="body" size="sm" weight="medium">
+                    ${category.revenue.toLocaleString()}
+                  </Typography>
+                </Stack>
 
-              <Tabs.Content value="revenue" mt="4">
-                <Box p="4">
-                  <VStack gap="4">
-                    <Text color="gray.600" textAlign="center">
-                      ABC Analysis based on revenue contribution (80/20 Pareto principle)
-                    </Text>
-                    {/* Revenue-based analysis charts would go here */}
-                    <SimpleGrid columns={{ base: 1, md: 2 }} gap="4" w="full">
-                      <Card.Root variant="subtle">
-                        <Card.Body>
-                          <Text fontWeight="medium" mb="2">Revenue Distribution</Text>
-                          <Text fontSize="sm" color="gray.600">
-                            Class A items generate 73% of total revenue with only 12.5% of items
-                          </Text>
-                        </Card.Body>
-                      </Card.Root>
-                      <Card.Root variant="subtle">
-                        <Card.Body>
-                          <Text fontWeight="medium" mb="2">Optimization Opportunity</Text>
-                          <Text fontSize="sm" color="gray.600">
-                            Focus inventory control on 25 high-value items for maximum impact
-                          </Text>
-                        </Card.Body>
-                      </Card.Root>
-                    </SimpleGrid>
-                  </VStack>
-                </Box>
-              </Tabs.Content>
+                <div 
+                  style={{
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid',
+                    backgroundColor: 'var(--colors-bg-subtle)'
+                  }}
+                >
+                  <Typography variant="body" size="xs">
+                    <strong>Estrategia:</strong> {category.strategy}
+                  </Typography>
+                </div>
+              </Stack>
+            </Section>
+          ))}
+        </CardGrid>
+      </Section>
 
-              <Tabs.Content value="quantity" mt="4">
-                <Box p="4">
-                  <VStack gap="4">
-                    <Text color="gray.600" textAlign="center">
-                      ABC Analysis based on consumption quantity and movement frequency
-                    </Text>
-                    <Card.Root variant="subtle">
-                      <Card.Body>
-                        <Text fontWeight="medium" mb="2">Quantity-Based Insights</Text>
-                        <Text fontSize="sm" color="gray.600">
-                          High-volume items may require different management strategy than high-value items
-                        </Text>
-                      </Card.Body>
-                    </Card.Root>
-                  </VStack>
-                </Box>
-              </Tabs.Content>
+      <Section 
+        variant="elevated" 
+        title="Detailed ABC Analysis"
+        actions={
+          <Stack direction="row" gap="sm">
+            <Button size="sm" variant="outline">
+              <DocumentChartBarIcon className="w-4 h-4" />
+              Export Report
+            </Button>
+            <Button size="sm" variant="outline">
+              <ArrowTrendingUpIcon className="w-4 h-4" />
+              Refresh Analysis
+            </Button>
+          </Stack>
+        }
+      >
+        <Tabs.Root value={analysisType} onValueChange={(details) => setAnalysisType(details.value)}>
+          <Tabs.List>
+            <Tabs.Trigger value="revenue">
+              <Stack direction="row" align="center" gap="sm">
+                <BanknotesIcon className="w-4 h-4" />
+                <Typography variant="body">By Revenue</Typography>
+              </Stack>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="quantity">
+              <Stack direction="row" align="center" gap="sm">
+                <CircleStackIcon className="w-4 h-4" />
+                <Typography variant="body">By Quantity</Typography>
+              </Stack>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="frequency">
+              <Stack direction="row" align="center" gap="sm">
+                <ChartBarIcon className="w-4 h-4" />
+                <Typography variant="body">By Frequency</Typography>
+              </Stack>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="engine">
+              <Stack direction="row" align="center" gap="sm">
+                <DocumentChartBarIcon className="w-4 h-4" />
+                <Typography variant="body">Analysis Engine</Typography>
+              </Stack>
+            </Tabs.Trigger>
+          </Tabs.List>
 
-              <Tabs.Content value="frequency" mt="4">
-                <Box p="4">
-                  <VStack gap="4">
-                    <Text color="gray.600" textAlign="center">
-                      ABC Analysis based on order frequency and transaction patterns
-                    </Text>
-                    <Card.Root variant="subtle">
-                      <Card.Body>
-                        <Text fontWeight="medium" mb="2">Frequency-Based Strategy</Text>
-                        <Text fontSize="sm" color="gray.600">
-                          Fast-moving items require frequent monitoring regardless of value
-                        </Text>
-                      </Card.Body>
-                    </Card.Root>
-                  </VStack>
-                </Box>
-              </Tabs.Content>
+          <Tabs.Content value="revenue">
+            <Stack gap="md" style={{ padding: '1rem' }}>
+              <Typography variant="body" color="text.muted" textAlign="center">
+                ABC Analysis based on revenue contribution (80/20 Pareto principle)
+              </Typography>
+              <CardGrid columns={{ base: 1, md: 2 }}>
+                <Section variant="flat">
+                  <Stack gap="sm">
+                    <Typography variant="body" weight="medium">Revenue Distribution</Typography>
+                    <Typography variant="body" size="sm" color="text.muted">
+                      Class A items generate 73% of total revenue with only 12.5% of items
+                    </Typography>
+                  </Stack>
+                </Section>
+                <Section variant="flat">
+                  <Stack gap="sm">
+                    <Typography variant="body" weight="medium">Optimization Opportunity</Typography>
+                    <Typography variant="body" size="sm" color="text.muted">
+                      Focus inventory control on 25 high-value items for maximum impact
+                    </Typography>
+                  </Stack>
+                </Section>
+              </CardGrid>
+            </Stack>
+          </Tabs.Content>
 
-              <Tabs.Content value="engine" mt="4">
-                <Box p="6" textAlign="center">
-                  <VStack gap="4">
-                    <CircleStackIcon className="w-16 h-16 text-orange-500 mx-auto" />
-                    <Heading size="md">ABC Analysis Engine</Heading>
-                    <Text color="gray.600">
-                      Advanced ABC classification engine coming soon...
-                    </Text>
-                  </VStack>
-                </Box>
-              </Tabs.Content>
-            </Tabs.Root>
-          </Card.Body>
-        </Card.Root>
+          <Tabs.Content value="quantity">
+            <Stack gap="md" style={{ padding: '1rem' }}>
+              <Typography variant="body" color="text.muted" textAlign="center">
+                ABC Analysis based on consumption quantity and movement frequency
+              </Typography>
+              <Section variant="flat">
+                <Stack gap="sm">
+                  <Typography variant="body" weight="medium">Quantity-Based Insights</Typography>
+                  <Typography variant="body" size="sm" color="text.muted">
+                    High-volume items may require different management strategy than high-value items
+                  </Typography>
+                </Stack>
+              </Section>
+            </Stack>
+          </Tabs.Content>
 
-        {/* Strategic Recommendations */}
-        <Card.Root w="full" variant="subtle">
-          <Card.Body>
-            <HStack justify="space-between">
-              <VStack align="start" gap="1">
-                <Text fontWeight="semibold">Strategic Recommendations</Text>
-                <Text fontSize="sm" color="gray.600">
-                  Optimization opportunities based on ABC analysis
-                </Text>
-              </VStack>
-              <VStack align="end" gap="2">
-                <Badge colorPalette="red" size="sm">
-                  Focus on A-Items
-                </Badge>
-                <Badge colorPalette="yellow" size="sm">
-                  Monitor B-Items
-                </Badge>
-                <Badge colorPalette="green" size="sm">
-                  Automate C-Items
-                </Badge>
-              </VStack>
-            </HStack>
-          </Card.Body>
-        </Card.Root>
-      </VStack>
-    </Box>
+          <Tabs.Content value="frequency">
+            <Stack gap="md" style={{ padding: '1rem' }}>
+              <Typography variant="body" color="text.muted" textAlign="center">
+                ABC Analysis based on order frequency and transaction patterns
+              </Typography>
+              <Section variant="flat">
+                <Stack gap="sm">
+                  <Typography variant="body" weight="medium">Frequency-Based Strategy</Typography>
+                  <Typography variant="body" size="sm" color="text.muted">
+                    Fast-moving items require frequent monitoring regardless of value
+                  </Typography>
+                </Stack>
+              </Section>
+            </Stack>
+          </Tabs.Content>
+
+          <Tabs.Content value="engine">
+            <div style={{ padding: '2rem', textAlign: 'center' }}>
+              <Stack align="center" gap="md">
+                <CircleStackIcon className="w-16 h-16 text-orange-500" />
+                <Typography variant="heading" size="md">ABC Analysis Engine</Typography>
+                <Typography variant="body" color="text.muted">
+                  Advanced ABC classification engine coming soon...
+                </Typography>
+              </Stack>
+            </div>
+          </Tabs.Content>
+        </Tabs.Root>
+      </Section>
+
+      <Section variant="flat" title="Strategic Recommendations" subtitle="Optimization opportunities based on ABC analysis">
+        <Stack direction="row" justify="space-between" align="center">
+          <Typography variant="body" color="text.muted">
+            Recommended actions for each category
+          </Typography>
+          <Stack gap="sm">
+            <Badge colorPalette="red" size="sm">
+              Focus on A-Items
+            </Badge>
+            <Badge colorPalette="yellow" size="sm">
+              Monitor B-Items
+            </Badge>
+            <Badge colorPalette="green" size="sm">
+              Automate C-Items
+            </Badge>
+          </Stack>
+        </Stack>
+      </Section>
+    </ContentLayout>
   );
 };
 

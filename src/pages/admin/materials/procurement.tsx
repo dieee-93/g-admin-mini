@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { 
-  Layout, Stack, Typography, CardWrapper, Button, Modal, Alert, Badge, Tabs
+  ContentLayout, PageHeader, Section, Button, Tabs
 } from '@/shared/ui';
 import { 
   ShoppingCartIcon, 
@@ -40,67 +40,53 @@ function ProcurementPage() {
     switch (activeTab) {
       case 'procurement':
         return (
-          <Card variant="elevated">
-            <Card.Body>
-              <Typography variant="heading" size="lg">Smart Procurement</Typography>
-              <Typography color="muted">Automated reordering and purchase optimization system</Typography>
-            </Card.Body>
-          </CardWrapper>
+          <Section variant="elevated" title="Smart Procurement" subtitle="Automated reordering and purchase optimization system">
+            <div>Content coming soon...</div>
+          </Section>
         );
       case 'alerts':
         return (
-          <Card variant="elevated">
-            <Card.Body>
-              <Typography variant="heading" size="lg">Alert Management</Typography>
-              <Typography color="muted">Real-time notifications and monitoring dashboard</Typography>
-            </Card.Body>
-          </CardWrapper>
+          <Section variant="elevated" title="Alert Management" subtitle="Real-time notifications and monitoring dashboard">
+            <div>Content coming soon...</div>
+          </Section>
         );
       default:
         return (
-          <Card variant="elevated">
-            <Card.Body>
-              <Typography variant="heading" size="lg">Smart Procurement</Typography>
-              <Typography color="muted">Automated reordering and purchase optimization</Typography>
-            </Card.Body>
-          </CardWrapper>
+          <Section variant="elevated" title="Smart Procurement" subtitle="Automated reordering and purchase optimization">
+            <div>Content coming soon...</div>
+          </Section>
         );
     }
   };
 
   return (
-    <Layout variant="panel">
-      {/* Page Header */}
-      <Stack direction="row" justify="space-between" align="center" p="lg">
-        <Stack direction="row" align="center" gap="md">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBackToMaterials}
-          >
-            ← Volver a Materiales
-          </Button>
-          <Typography variant="heading" size="xl">
-            Procurement Intelligence
-          </Typography>
-        </Stack>
-        
-        <Stack direction="row" gap="sm">
-          <Button variant="outline" size="sm">
-            <TruckIcon className="w-4 h-4 mr-2" />
-            Órdenes Activas
-          </Button>
-          <Button variant="outline" size="sm">
-            <ArrowPathIcon className="w-4 h-4 mr-2" />
-            Sincronizar
-          </Button>
-        </Stack>
-      </Stack>
+    <ContentLayout>
+      <PageHeader 
+        title="Procurement Intelligence"
+        subtitle="Smart procurement and alert management system"
+        icon={ShoppingCartIcon}
+        actions={
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBackToMaterials}
+            >
+              ← Volver a Materiales
+            </Button>
+            <Button variant="outline" size="sm">
+              <TruckIcon className="w-4 h-4" />
+              Órdenes Activas
+            </Button>
+            <Button variant="outline" size="sm">
+              <ArrowPathIcon className="w-4 h-4" />
+              Sincronizar
+            </Button>
+          </div>
+        }
+      />
 
-      {/* Main Content */}
-      <Stack direction="column" gap="lg" p="lg">
-        
-        {/* Tab Navigation */}
+      <Section variant="default">
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
@@ -111,17 +97,17 @@ function ProcurementPage() {
               const Icon = tab.icon;
               return (
                 <Tabs.Tab key={tab.id} value={tab.id}>
-                  <Stack direction="row" align="center" gap="sm">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Icon className="w-4 h-4" />
-                    <Stack direction="column" align="start" gap="xs">
-                      <Typography variant="body" size="sm" weight="medium">
+                    <div>
+                      <div style={{ fontSize: '0.875rem', fontWeight: 500 }}>
                         {tab.label}
-                      </Typography>
-                      <Typography variant="body" size="xs" color="muted">
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--colors-text-muted)' }}>
                         {tab.description}
-                      </Typography>
-                    </Stack>
-                  </Stack>
+                      </div>
+                    </div>
+                  </div>
                 </Tabs.Tab>
               );
             })}
@@ -136,9 +122,8 @@ function ProcurementPage() {
             </Tabs.Panel>
           </Tabs.Panels>
         </Tabs>
-
-      </Stack>
-    </Layout>
+      </Section>
+    </ContentLayout>
   );
 }
 

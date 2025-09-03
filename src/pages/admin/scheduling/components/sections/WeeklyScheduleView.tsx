@@ -281,11 +281,11 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
                 {/* Shifts Column */}
                 <Box 
                   minH="300px" 
-                  bg="gray.50" 
+                  bg="bg.canvas" 
                   borderRadius="md" 
                   p="2"
                   border="2px dashed"
-                  borderColor="gray.200"
+                  borderColor="border.default"
                   _hover={{ borderColor: 'blue.300', bg: 'blue.50' }}
                 >
                   {day.shifts.map(shift => (

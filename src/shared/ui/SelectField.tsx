@@ -33,9 +33,8 @@ interface SelectFieldProps {
   required?: boolean
   disabled?: boolean
   size?: 'sm' | 'md' | 'lg'
-  variant?: 'outline' | 'filled' | 'flushed'
-  colorScheme?: 'theme' | 'default' // 🆕 Added theme support
-  
+  variant?: 'outline' | 'subtle' 
+  colorPalette?: 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'cyan' | 'purple' | 'pink'
   // Estilos del trigger
   height?: string
   width?: string
@@ -61,8 +60,8 @@ export function SelectField({
   required = false,
   disabled = false,
   size = 'md',
+  colorPalette,
   variant = 'outline',
-  colorScheme = 'default',
   height = 'auto',
   width = 'full',
   children,
@@ -106,6 +105,8 @@ export function SelectField({
         variant={variant}
         disabled={disabled}
         width={width}
+        
+        colorPalette={colorPalette}
       >
         <Select.HiddenSelect />
         {label && <Select.Label>{label}{required && ' *'}</Select.Label>}

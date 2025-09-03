@@ -16,14 +16,14 @@ const EnterprisePage: React.FC = () => {
       <Stack gap="xl">
         <Stack gap="sm">
           <Typography variant="heading" size="xl">Enterprise Management</Typography>
-          <Typography variant="body" color="secondary">
+          <Typography variant="body" color="text.secondary">
             Multi-location and enterprise-level features
           </Typography>
         </Stack>
 
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="md">
           <CardWrapper variant="elevated" >
-            <CardWrapper>
+            <CardWrapper.Body>
               <Stack direction="row" gap="sm" align="center">
                 <Icon icon={BuildingOfficeIcon} size="lg"/>
                 <Stack gap="xs">
@@ -31,47 +31,47 @@ const EnterprisePage: React.FC = () => {
                   <Badge colorPalette="info" size="sm">5 Active</Badge>
                 </Stack>
               </Stack>
+            </CardWrapper.Body>
             </CardWrapper>
-          </CardWrapper>
           
-          <CardWrapper variant="elevated" >
-            <CardWrapper>
+          <CardWrapper variant="elevated">
+            <CardWrapper.Body>
               <Stack direction="row" gap="sm" align="center">
-                <Icon icon={UsersIcon} size="lg"  />
+                <Icon icon={UsersIcon} size="lg" />
                 <Stack gap="xs">
                   <Typography variant="body" size="sm" fontWeight="semibold">Franchise</Typography>
                   <Badge colorPalette="success" size="sm">3 Partners</Badge>
                 </Stack>
               </Stack>
+            </CardWrapper.Body>
             </CardWrapper>
-          </CardWrapper>
 
           <CardWrapper variant="elevated" >
-            <CardWrapper>
+            <CardWrapper.Body>
               <Stack direction="row" gap="sm" align="center">
-                <Icon icon={GlobeAltIcon} size="lg"  />
+                <Icon icon={GlobeAltIcon} size="lg" />
                 <Stack gap="xs">
                   <Typography variant="body" size="sm" fontWeight="semibold">Regions</Typography>
-                  <Badge  size="sm">2 Zones</Badge>
+                  <Badge size="sm">2 Zones</Badge>
                 </Stack>
               </Stack>
-            </CardWrapper>
+            </CardWrapper.Body>
           </CardWrapper>
 
           <CardWrapper variant="elevated" >
-            <CardWrapper>
+            <CardWrapper.Body>
               <Stack direction="row" gap="sm" align="center">
-                <Icon icon={GlobeAltIcon} size="lg"  />
+                <Icon icon={GlobeAltIcon} size="lg" />
                 <Stack gap="xs">
                   <Typography variant="body" size="sm" fontWeight="semibold">Regions</Typography>
-                  <Badge  size="sm">2 Zones</Badge>
+                  <Badge size="sm">2 Zones</Badge>
                 </Stack>
               </Stack>
-            </CardWrapper>
+            </CardWrapper.Body>
           </CardWrapper>
 
           <CardWrapper variant="elevated" >
-            <CardWrapper>
+            <CardWrapper.Body>
               <Stack direction="row" gap="sm" align="center">
                 <Icon icon={ChartBarIcon} size="lg" color="warning.500" />
                 <Stack gap="xs">
@@ -79,16 +79,16 @@ const EnterprisePage: React.FC = () => {
                   <Badge colorPalette="warning" size="sm">Consolidated</Badge>
                 </Stack>
               </Stack>
+            </CardWrapper.Body>
             </CardWrapper>
-          </CardWrapper>
         </SimpleGrid>
 
         <SimpleGrid columns={{ base: 1, md: 2 }} gap="xl">
           <CardWrapper variant="elevated" >
-            <CardWrapper>
+            <CardWrapper.Header>
               <Typography variant="body" fontWeight="semibold">Multi-Location Features</Typography>
-            </CardWrapper>
-            <CardWrapper>
+            </CardWrapper.Header>
+            <CardWrapper.Body>
               <Stack gap="sm">
                 <Typography variant="body" size="sm">🏢 Location Management</Typography>
                 <Typography variant="body" size="sm">📊 Consolidated Reporting</Typography>
@@ -96,14 +96,14 @@ const EnterprisePage: React.FC = () => {
                 <Typography variant="body" size="sm">📦 Centralized Inventory</Typography>
                 <Typography variant="body" size="sm">💰 Unified Pricing</Typography>
               </Stack>
-            </CardWrapper>
+            </CardWrapper.Body>
           </CardWrapper>
 
           <CardWrapper variant="elevated" >
-            <CardWrapper>
+            <CardWrapper.Header>
               <Typography variant="body" fontWeight="semibold">Franchise Management</Typography>
-            </CardWrapper>
-            <CardWrapper>
+            </CardWrapper.Header>
+            <CardWrapper.Body>
               <Stack gap="sm">
                 <Typography variant="body" size="sm">🤝 Partner Onboarding</Typography>
                 <Typography variant="body" size="sm">📈 Performance Monitoring</Typography>
@@ -111,35 +111,35 @@ const EnterprisePage: React.FC = () => {
                 <Typography variant="body" size="sm">📋 Standards Enforcement</Typography>
                 <Typography variant="body" size="sm">💡 Best Practice Sharing</Typography>
               </Stack>
-            </CardWrapper>
+            </CardWrapper.Body>
           </CardWrapper>
         </SimpleGrid>
 
         <CardWrapper variant="elevated" >
-          <CardWrapper>
+          <CardWrapper.Header>
             <Typography variant="heading" size="md">Enterprise Analytics</Typography>
-          </CardWrapper>
-          <CardWrapper>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <Stack gap="md">
-              <Typography variant="body" color="secondary">
+              <Typography variant="body" color="text.secondary">
                 Comprehensive analytics across all locations and franchise partners
               </Typography>
               <SimpleGrid columns={{ base: 1, md: 3 }} gap="md">
                 <Stack gap="xs">
                   <Typography variant="body" fontWeight="medium">Performance Metrics</Typography>
-                  <Typography variant="body" size="sm" color="secondary">Cross-location KPIs</Typography>
+                  <Typography variant="body" size="sm" color="text.secondary">Cross-location KPIs</Typography>
                 </Stack>
                 <Stack gap="xs">
                   <Typography variant="body" fontWeight="medium">Benchmarking</Typography>
-                  <Typography variant="body" size="sm" color="secondary">Location comparisons</Typography>
+                  <Typography variant="body" size="sm" color="text.secondary">Location comparisons</Typography>
                 </Stack>
                 <Stack gap="xs">
                   <Typography variant="body" fontWeight="medium">Forecasting</Typography>
-                  <Typography variant="body" size="sm" color="secondary">Enterprise predictions</Typography>
+                  <Typography variant="body" size="sm" color="text.secondary">Enterprise predictions</Typography>
                 </Stack>
               </SimpleGrid>
             </Stack>
-          </CardWrapper>
+          </CardWrapper.Body>
         </CardWrapper>
       </Stack>
     </Layout>

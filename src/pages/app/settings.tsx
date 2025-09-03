@@ -70,7 +70,7 @@ function ProfileSection() {
               <Badge colorPalette="blue" variant="subtle">
                 Cliente
               </Badge>
-              <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>
+              <Text fontSize="sm" color="text.secondary">
                 Miembro desde Enero 2024
               </Text>
             </VStack>
@@ -187,7 +187,7 @@ function NotificationPreferences() {
                 <Text fontSize="md" fontWeight="medium">
                   {option.title}
                 </Text>
-                <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>
+                <Text fontSize="sm" color="text.secondary">
                   {option.description}
                 </Text>
               </VStack>
@@ -256,10 +256,10 @@ function AddressesSection() {
                           </Badge>
                         )}
                       </HStack>
-                      <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>
+                      <Text fontSize="sm" color="text.secondary">
                         {address.address}
                       </Text>
-                      <Text fontSize="sm" color={{ base: "gray.500", _dark: "gray.400" }}>
+                      <Text fontSize="sm" color="text.muted">
                         {address.city}
                       </Text>
                     </VStack>
@@ -336,7 +336,7 @@ function PaymentMethods() {
                             </Badge>
                           )}
                         </HStack>
-                        <Text fontSize="sm" color={{ base: "gray.500", _dark: "gray.400" }}>
+                        <Text fontSize="sm" color="text.muted">
                           Vence {method.expiry}
                         </Text>
                       </VStack>
@@ -380,7 +380,7 @@ function SecuritySection() {
                   <Text fontSize="md" fontWeight="medium">
                     Cambiar Contraseña
                   </Text>
-                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>
+                  <Text fontSize="sm" color="text.secondary">
                     Actualiza tu contraseña regularmente
                   </Text>
                 </VStack>
@@ -397,7 +397,7 @@ function SecuritySection() {
                   <Text fontSize="md" fontWeight="medium">
                     Autenticación de 2 Factores
                   </Text>
-                  <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }}>
+                  <Text fontSize="sm" color="text.secondary">
                     Agregar una capa extra de seguridad
                   </Text>
                 </VStack>
@@ -477,10 +477,10 @@ export function CustomerSettings() {
       <VStack align="stretch" gap="8">
         {/* Header */}
         <VStack align="start" gap="2">
-          <Text fontSize="3xl" fontWeight="bold" color={{ base: "gray.800", _dark: "gray.100" }}>
+          <Text fontSize="3xl" fontWeight="bold" color="text.primary">
             Mi Perfil
           </Text>
-          <Text fontSize="lg" color={{ base: "gray.600", _dark: "gray.300" }}>
+          <Text fontSize="lg" color="text.secondary">
             Administra tu información personal y preferencias
           </Text>
         </VStack>
@@ -490,7 +490,7 @@ export function CustomerSettings() {
         
         {/* Tabs */}
         <Tabs.Root value={selectedTab} onValueChange={(e) => setSelectedTab(e.value as string)}>
-          <Tabs.List bg={{ base: "gray.50", _dark: "gray.800" }} borderRadius="xl" p="1">
+          <Tabs.List bg="bg.surface" borderRadius="xl" p="1">
             <Tabs.Trigger value="profile" flex="1" borderRadius="lg">
               <HStack gap="2" align="center">
                 <UserIcon style={{ width: '16px', height: '16px' }} />

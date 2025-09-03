@@ -63,7 +63,7 @@ export default function OperationsPage() {
                   <CalendarIcon className="w-6 h-6 text-blue-600" />
                   <Typography variant="title">Planificación</Typography>
                 </HStack>
-                <Typography variant="body" color="muted">
+                <Typography variant="body" color="text.muted">
                   Gestión de horarios y recursos
                 </Typography>
               </VStack>
@@ -77,7 +77,7 @@ export default function OperationsPage() {
                   <CogIcon className="w-6 h-6 text-green-600" />
                   <Typography variant="title">Cocina</Typography>
                 </HStack>
-                <Typography variant="body" color="muted">
+                <Typography variant="body" color="text.muted">
                   Estado y órdenes activas
                 </Typography>
               </VStack>
@@ -91,7 +91,7 @@ export default function OperationsPage() {
                   <ChartBarIcon className="w-6 h-6 text-purple-600" />
                   <Typography variant="title">Mesas</Typography>
                 </HStack>
-                <Typography variant="body" color="muted">
+                <Typography variant="body" color="text.muted">
                   Ocupación y reservas
                 </Typography>
               </VStack>
@@ -105,7 +105,7 @@ export default function OperationsPage() {
                   <ClockIcon className="w-6 h-6 text-orange-600" />
                   <Typography variant="title">Monitoreo</Typography>
                 </HStack>
-                <Typography variant="body" color="muted">
+                <Typography variant="body" color="text.muted">
                   Métricas en tiempo real
                 </Typography>
               </VStack>

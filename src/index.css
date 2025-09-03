@@ -12,18 +12,13 @@ html {
 }
 
 /* Enlaces básicos - Chakra Link component maneja el resto */
-a {
-  text-decoration: inherit;
-}
-
-a:hover {
-  text-decoration: underline;
-}
+/* Removed text-decoration: inherit to avoid interference with Chakra components */
 
 /* Utility classes */
 .cursor-pointer {
   cursor: pointer;
 }
+
 
 /* Print styles */
 @media print {
@@ -32,7 +27,6 @@ a:hover {
     color: black !important;
   }
 }
-
 /* 
 MIGRACIÓN PENDIENTE: 
 - Reemplazar todas las clases .w-X .h-X por props de Chakra: <Box w="4" h="4">

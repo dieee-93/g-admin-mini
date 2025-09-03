@@ -16,50 +16,50 @@ const DiagnosticsPage: React.FC = () => {
       <Stack gap="xl">
         <Stack gap="sm">
           <Typography variant="heading" size="xl">System Diagnostics</Typography>
-          <Typography variant="body" color="secondary">
+          <Typography variant="body" color="text.secondary">
             Performance monitoring and system health checks
           </Typography>
         </Stack>
 
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="md">
-          <Card variant="elevated" >
-            <Card.Body>
+          <CardWrapper variant="elevated">
+            <CardWrapper.Body>
               <Stack direction="row" gap="sm" align="center">
-                <Icon icon={CheckCircleIcon} size="lg"  />
+                <Icon icon={CheckCircleIcon} size="lg" />
                 <Stack gap="xs">
                   <Typography variant="body" size="sm" fontWeight="semibold">System Status</Typography>
                   <Badge colorPalette="success" size="sm">Healthy</Badge>
                 </Stack>
               </Stack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
           
-          <Card variant="elevated" >
-            <Card.Body>
+          <CardWrapper variant="elevated">
+            <CardWrapper.Body>
               <Stack direction="row" gap="sm" align="center">
-                <Icon icon={CpuChipIcon} size="lg"/>
+                <Icon icon={CpuChipIcon} size="lg" />
                 <Stack gap="xs">
                   <Typography variant="body" size="sm" fontWeight="semibold">Performance</Typography>
                   <Badge colorPalette="info" size="sm">Optimal</Badge>
                 </Stack>
               </Stack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
           
-          <Card variant="elevated" >
-            <Card.Body>
+          <CardWrapper variant="elevated">
+            <CardWrapper.Body>
               <Stack direction="row" gap="sm" align="center">
-                <Icon icon={ServerIcon} size="lg"  />
+                <Icon icon={ServerIcon} size="lg" />
                 <Stack gap="xs">
                   <Typography variant="body" size="sm" fontWeight="semibold">Database</Typography>
-                  <Badge  size="sm">Connected</Badge>
+                  <Badge size="sm">Connected</Badge>
                 </Stack>
               </Stack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
           
-          <Card variant="elevated" >
-            <Card.Body>
+          <CardWrapper variant="elevated">
+            <CardWrapper.Body>
               <Stack direction="row" gap="sm" align="center">
                 <Icon icon={ExclamationTriangleIcon} size="lg" color="warning.500" />
                 <Stack gap="xs">
@@ -67,15 +67,15 @@ const DiagnosticsPage: React.FC = () => {
                   <Badge colorPalette="warning" size="sm">2 Minor</Badge>
                 </Stack>
               </Stack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
         </SimpleGrid>
 
-        <Card variant="elevated" >
-          <Card.Header>
+        <CardWrapper variant="elevated">
+          <CardWrapper.Header>
             <Typography variant="heading" size="md">Diagnostics Features (In Development)</Typography>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <Stack gap="sm">
               <Typography variant="body">🔧 Performance Monitoring</Typography>
               <Typography variant="body">⚡ Real-time Health Checks</Typography>
@@ -83,7 +83,7 @@ const DiagnosticsPage: React.FC = () => {
               <Typography variant="body">🚨 Automated Alert System</Typography>
               <Typography variant="body">📈 Historical Performance Trends</Typography>
             </Stack>
-          </Card.Body>
+          </CardWrapper.Body>
         </CardWrapper>
       </Stack>
     </Layout>

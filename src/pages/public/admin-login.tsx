@@ -130,7 +130,7 @@ export default function AdminLoginPage() {
       display="flex" 
       alignItems="center" 
       justifyContent="center"
-      bg={{ base: "gray.50", _dark: "gray.900" }}
+      bg="bg.canvas"
       p="md"
       position="relative"
     >
@@ -180,10 +180,10 @@ export default function AdminLoginPage() {
                 <ComputerDesktopIcon style={{ width: '40px', height: '40px' }} />
               </Box>
               <VStack gap="sm">
-                <Typography variant="heading" color="primary">
+                <Typography variant="heading" color="text.primary">
                   G-Admin Sistema
                 </Typography>
-                <Typography variant="body" color="muted" textAlign="center">
+                <Typography variant="body" color="text.muted" textAlign="center">
                   Panel de administración y gestión empresarial
                 </Typography>
               </VStack>
@@ -293,12 +293,12 @@ export default function AdminLoginPage() {
           <CardWrapper.Footer>
             <VStack gap="md" w="full" textAlign="center">
               <Stack gap="sm" align="center">
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Solo personal autorizado. Sesiones monitoreadas.
                 </Typography>
                 
                 <HStack gap="sm">
-                  <Typography variant="caption" color="muted">
+                  <Typography variant="caption" color="text.muted">
                     ¿Problemas de acceso?
                   </Typography>
                   <Button 
@@ -314,7 +314,7 @@ export default function AdminLoginPage() {
               
               <HStack gap="xs" fontSize="sm" color="gray.500" justify="center">
                 <ShieldCheckIcon style={{ width: '16px', height: '16px' }} />
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Conexión segura SSL/TLS
                 </Typography>
                 <Text>🔒</Text>

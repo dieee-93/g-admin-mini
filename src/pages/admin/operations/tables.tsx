@@ -205,7 +205,7 @@ export default function TableManagement() {
       <Stack direction="row" justify="space-between" align="center" mb="lg">
         <Stack direction="column" align="start" gap="xs">
           <Typography variant="heading" size="lg">Table Management</Typography>
-          <Typography color="muted">
+          <Typography color="text.muted">
             Real-time table status and restaurant operations
           </Typography>
         </Stack>
@@ -235,7 +235,7 @@ export default function TableManagement() {
             <CardWrapper>
               <Stack direction="column" align="start">
                 <Stack direction="row" justify="space-between" w="full">
-                  <Typography size="sm" color="muted">Available Tables</Typography>
+                  <Typography size="sm" color="text.muted">Available Tables</Typography>
                   <Badge colorPalette="success">{stats.available_tables}</Badge>
                 </Stack>
                 <Typography size="2xl" fontWeight="bold" >
@@ -247,7 +247,7 @@ export default function TableManagement() {
             <CardWrapper>
               <Stack direction="column" align="start">
                 <Stack direction="row" justify="space-between" w="full">
-                  <Typography size="sm" color="muted">Occupancy Rate</Typography>
+                  <Typography size="sm" color="text.muted">Occupancy Rate</Typography>
                   <Badge colorPalette="info">{stats.average_occupancy.toFixed(1)}%</Badge>
                 </Stack>
                 <Typography size="2xl" fontWeight="bold" >
@@ -259,10 +259,10 @@ export default function TableManagement() {
             <CardWrapper>
               <Stack direction="column" align="start">
                 <Stack direction="row" justify="space-between" w="full">
-                  <Typography size="sm" color="muted">Today's Revenue</Typography>
+                  <Typography size="sm" color="text.muted">Today's Revenue</Typography>
                   <Badge colorPalette="accent">${stats.total_revenue.toFixed(0)}</Badge>
                 </Stack>
-                <Typography size="2xl" fontWeight="bold" color="accent">
+                <Typography size="2xl" fontWeight="bold" color="text.primary">
                   ${stats.total_revenue.toLocaleString()}
                 </Typography>
               </Stack>
@@ -271,7 +271,7 @@ export default function TableManagement() {
             <CardWrapper>
               <Stack direction="column" align="start">
                 <Stack direction="row" justify="space-between" w="full">
-                  <Typography size="sm" color="muted">Avg Wait Time</Typography>
+                  <Typography size="sm" color="text.muted">Avg Wait Time</Typography>
                   <Badge colorPalette="warning">
                     {waitTimeData?.estimated_wait_minutes || 0} min
                   </Badge>
@@ -337,11 +337,11 @@ export default function TableManagement() {
                     <Stack direction="row" justify="space-between" w="full">
                       <Stack direction="row">
                         <Icon icon={UsersIcon} size="sm" />
-                        <Typography size="sm" color="muted">
+                        <Typography size="sm" color="text.muted">
                           Capacity: {table.capacity}
                         </Typography>
                       </Stack>
-                      <Typography size="sm" color="muted" textTransform="capitalize">
+                      <Typography size="sm" color="text.muted" textTransform="capitalize">
                         {table.location.replace('_', ' ')}
                       </Typography>
                     </Stack>
@@ -355,13 +355,13 @@ export default function TableManagement() {
                             <Typography size="sm" fontWeight="medium">
                               Party of {table.current_party.size}
                             </Typography>
-                            <Typography size="sm" color="muted">
+                            <Typography size="sm" color="text.muted">
                               ${table.current_party.total_spent.toFixed(2)}
                             </Typography>
                           </Stack>
                           
                           {table.current_party.primary_customer_name && (
-                            <Typography size="sm" color="muted">
+                            <Typography size="sm" color="text.muted">
                               {table.current_party.primary_customer_name}
                             </Typography>
                           )}
@@ -369,7 +369,7 @@ export default function TableManagement() {
                           <Stack direction="row" justify="space-between" w="full">
                             <Stack direction="row">
                               <Icon icon={ClockIcon} size="sm" />
-                              <Typography size="sm" color="muted">
+                              <Typography size="sm" color="text.muted">
                                 {formatDuration(
                                   Math.floor(
                                     (new Date().getTime() - new Date(table.current_party.seated_at).getTime()) / 60000
@@ -377,7 +377,7 @@ export default function TableManagement() {
                                 )}
                               </Typography>
                             </Stack>
-                            <Typography size="sm" color="muted">
+                            <Typography size="sm" color="text.muted">
                               Est: {formatDuration(table.current_party.estimated_duration)}
                             </Typography>
                           </Stack>
@@ -387,7 +387,7 @@ export default function TableManagement() {
 
                     {/* Performance Stats */}
                     <hr />
-                    <Stack direction="row" justify="space-between" w="full" fontSize="sm" color="muted">
+                    <Stack direction="row" justify="space-between" w="full" fontSize="sm" color="text.muted">
                       <Typography>Turns: {table.turn_count}</Typography>
                       <Typography>Revenue: ${table.daily_revenue.toFixed(0)}</Typography>
                     </Stack>

@@ -1,6 +1,6 @@
 import { DynamicThemeTest } from '@/components/debug/DynamicThemeTest'
 import { Layout, Stack, Typography, Button, CardWrapper } from '@/shared/ui'
-import { Box } from '@chakra-ui/react'
+import { Box, Grid } from '@chakra-ui/react'
 
 export function ThemeTestPage() {
   return (
@@ -10,7 +10,7 @@ export function ThemeTestPage() {
           🎨 Theme System Test Page
         </Typography>
         
-        <Typography variant="body" color="secondary" textAlign="center">
+        <Typography variant="body" color="text.secondary" textAlign="center">
           Testing automatic theme switching with default components and colorPalette overrides.
         </Typography>
         
@@ -27,12 +27,12 @@ export function ThemeTestPage() {
                 Estos son Box de Chakra directos - deberían cambiar si gray.* funciona:
               </Typography>
               
-              <Box bg="gray.800" color="gray.50" p={4} borderRadius="md">
-                <Typography variant="body">Box con bg="gray.800" - Debería cambiar</Typography>
+              <Box bg="bg.surface" color="text.primary" p={4} borderRadius="md">
+                <Typography variant="body">Box con bg="bg.surface" - Debería cambiar</Typography>
               </Box>
               
-              <Box bg="gray.700" color="gray.100" p={4} borderRadius="md">
-                <Typography variant="body">Box con bg="gray.700" - Debería cambiar</Typography>
+              <Box bg="bg.subtle" color="text.primary" p={4} borderRadius="md">
+                <Typography variant="body">Box con bg="bg.subtle" - Debería cambiar</Typography>
               </Box>
               
               <Box bg="blue.500" color="white" p={4} borderRadius="md">
@@ -40,7 +40,7 @@ export function ThemeTestPage() {
               </Box>
               
               {/* 🔍 SEMANTIC TOKENS TEST */}
-              <Typography variant="body" weight="semibold" color="secondary" mt={4}>
+              <Typography variant="body" weight="semibold" color="text.secondary" mt={4}>
                 Semantic Tokens Test (deberían cambiar si funcionan):
               </Typography>
               
@@ -57,6 +57,43 @@ export function ThemeTestPage() {
 
         {/* NEW Compact Dynamic Theme Test */}
         <DynamicThemeTest />
+        
+        {/* Gray Palette Visualization */}
+        <CardWrapper variant="elevated" padding="md">
+          <CardWrapper.Header>
+            <Typography variant="heading" level={3}>
+              🎨 Gray Palette Test (All gray.* tokens)
+            </Typography>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
+            <Stack direction="column" gap="md">
+              <Typography variant="body">
+                Complete gray palette visualization - should change with theme:
+              </Typography>
+              
+              <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap="sm">
+                {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((shade) => (
+                  <Box
+                    key={shade}
+                    bg={`gray.${shade}`}
+                    p={4}
+                    borderRadius="md"
+                    border="1px solid"
+                    borderColor="border.default"
+                    textAlign="center"
+                  >
+                    <Typography variant="body" fontWeight="semibold">
+                      gray.{shade}
+                    </Typography>
+                    <Typography variant="body" size="sm" opacity={0.8}>
+                      Background test
+                    </Typography>
+                  </Box>
+                ))}
+              </Grid>
+            </Stack>
+          </CardWrapper.Body>
+        </CardWrapper>
         
         {/* Component behavior tests */}
         <CardWrapper variant="elevated" padding="md">

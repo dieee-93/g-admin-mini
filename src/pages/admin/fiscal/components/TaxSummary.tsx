@@ -260,13 +260,13 @@ export function TaxSummary({
                 </Typography>
                 <Grid templateColumns="repeat(2, 1fr)" gap="md">
                   <div className="p-3 bg-gray-50 rounded">
-                    <Typography variant="body" className="text-xs" color="muted">IVA</Typography>
+                    <Typography variant="body" className="text-xs" color="text.muted">IVA</Typography>
                     <Typography variant="body" className="font-semibold">
                       {(config.ivaRate * 100).toFixed(1)}%
                     </Typography>
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
-                    <Typography variant="body" className="text-xs" color="muted">Ingresos Brutos</Typography>
+                    <Typography variant="body" className="text-xs" color="text.muted">Ingresos Brutos</Typography>
                     <Typography variant="body" className="font-semibold">
                       {(config.ingresosBrutosRate * 100).toFixed(2)}%
                     </Typography>
@@ -286,7 +286,7 @@ export function TaxSummary({
                     <HStack key={item.id} justify="space-between" className="py-2 px-3 bg-gray-50 rounded">
                       <VStack align="start" gap="xs">
                         <Typography variant="body" className="text-sm font-medium">{item.name}</Typography>
-                        <Typography variant="body" className="text-xs" color="muted">
+                        <Typography variant="body" className="text-xs" color="text.muted">
                           {item.quantity} x {formatCurrency(item.price)}
                         </Typography>
                       </VStack>
@@ -296,7 +296,7 @@ export function TaxSummary({
                     </HStack>
                   ))}
                   {items.length > 3 && (
-                    <Typography variant="body" className="text-xs text-center" color="muted">
+                    <Typography variant="body" className="text-xs text-center" color="text.muted">
                       +{items.length - 3} items más
                     </Typography>
                   )}

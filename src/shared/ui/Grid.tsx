@@ -1,16 +1,15 @@
 import { SimpleGrid as ChakraSimpleGrid, Grid as ChakraGrid } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
-
-// Responsive types for Chakra UI v3
-type ResponsiveValue<T> = T | { base?: T; sm?: T; md?: T; lg?: T; xl?: T; '2xl'?: T }
+import type { ResponsiveValue, SpacingProp } from './types'
+import { getSpacingToken } from './types'
 
 interface SimpleGridProps {
   children: ReactNode
   columns?: ResponsiveValue<number>
   minChildWidth?: ResponsiveValue<string>
-  gap?: ResponsiveValue<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>
-  rowGap?: ResponsiveValue<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>
-  columnGap?: ResponsiveValue<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>
+  gap?: SpacingProp
+  rowGap?: SpacingProp
+  columnGap?: SpacingProp
   className?: string
 }
 
@@ -19,9 +18,9 @@ interface GridProps {
   templateColumns?: ResponsiveValue<string>
   templateRows?: ResponsiveValue<string>
   templateAreas?: ResponsiveValue<string>
-  gap?: ResponsiveValue<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>
-  rowGap?: ResponsiveValue<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>
-  columnGap?: ResponsiveValue<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>
+  gap?: SpacingProp
+  rowGap?: SpacingProp
+  columnGap?: SpacingProp
   className?: string
 }
 
@@ -30,7 +29,7 @@ export function SimpleGrid({
   children,
   columns,
   minChildWidth,
-  gap = 'md',
+  gap = 'md', // Default semantic token
   rowGap,
   columnGap,
   className,
@@ -39,9 +38,9 @@ export function SimpleGrid({
     <ChakraSimpleGrid
       columns={columns}
       minChildWidth={minChildWidth}
-      gap={gap}
-      rowGap={rowGap}
-      columnGap={columnGap}
+      gap={getSpacingToken(gap)}
+      rowGap={rowGap ? getSpacingToken(rowGap) : undefined}
+      columnGap={columnGap ? getSpacingToken(columnGap) : undefined}
       className={className}
     >
       {children}
@@ -55,7 +54,7 @@ export function Grid({
   templateColumns,
   templateRows,
   templateAreas,
-  gap = 'md',
+  gap = 'md', // Default semantic token
   rowGap,
   columnGap,
   className,
@@ -65,9 +64,9 @@ export function Grid({
       templateColumns={templateColumns}
       templateRows={templateRows}
       templateAreas={templateAreas}
-      gap={gap}
-      rowGap={rowGap}
-      columnGap={columnGap}
+      gap={getSpacingToken(gap)}
+      rowGap={rowGap ? getSpacingToken(rowGap) : undefined}
+      columnGap={columnGap ? getSpacingToken(columnGap) : undefined}
       className={className}
     >
       {children}

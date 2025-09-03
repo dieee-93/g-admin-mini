@@ -245,7 +245,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
       <Card.Root>
         <Card.Body p="0">
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
-            <Tabs.List bg="gray.50" p="1" borderRadius="lg">
+            <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="payroll" gap="2" flex="1" minH="44px">
                 <BanknotesIcon className="w-5 h-5" />
                 <Text display={{ base: "none", sm: "block" }}>Nómina</Text>

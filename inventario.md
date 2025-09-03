@@ -851,13 +851,10 @@ Transcript started, output file is inventario.md
 │       │   └─⭐ 📄 SalesMetricChart.tsx                     ( 444 lines)
 │       ├─📂 context
 │       │   └─  📄 SmartDefaults.tsx                        ( 288 lines) → Layout defaults
-│       ├─  📄 Alert.stories.tsx                        ( 177 lines)
 │       ├─  📄 Alert.tsx                                ( 284 lines)
 │       ├─  📄 AppContainer.tsx                         (  12 lines)
-│       ├─  📄 Badge.stories.tsx                        ( 241 lines)
 │       ├─  📄 Badge.tsx                                ( 261 lines)
 │       ├─  📄 Button.tsx                               (  41 lines)
-│       ├─  📄 Card.stories.tsx                         ( 273 lines)
 │       ├─  📄 Card.tsx                                 ( 211 lines)
 │       ├─  📄 CircularProgress.tsx                     ( 117 lines) → src/components/ui/CircularProgress.tsx Functional Circular Progress for ChakraUI v3.23.0
 │       ├─  📄 ConnectionBadge.tsx                      ( 137 lines) → ConnectionBadge.tsx - Universal Connection Status Indicator ChakraUI v3.23.0 Compatible - G-Admin Mini Provides consistent connection status across all modules
@@ -866,7 +863,6 @@ Transcript started, output file is inventario.md
 │       ├─  📄 Icon.tsx                                 ( 216 lines) → src/components/ui/Icon.tsx Sistema de iconos moderno con Heroicons + tamaños estandarizados ✅ SOLUCIÓN: Wrapper que maneja sizes + colores + variants dinámicamente
 │       ├─  📄 index.ts                                 ( 123 lines) → Shared UI Components Index - Sistema de Diseño G-Admin Mini v2.0
 │       ├─  📄 InputField.tsx                           (  62 lines)
-│       ├─  📄 Layout.stories.tsx                       ( 118 lines)
 │       ├─  📄 Layout.tsx                               ( 130 lines)
 │       ├─  📄 Modal.tsx                                ( 281 lines)
 │       ├─  📄 NumberField.tsx                          (  65 lines)
@@ -874,11 +870,9 @@ Transcript started, output file is inventario.md
 │       ├─  📄 provider.tsx                             (  16 lines)
 │       ├─  📄 SelectField.tsx                          ( 158 lines) → Tipo para opciones simples
 │       ├─  📄 Stack.new.tsx                            (   0 lines)
-│       ├─  📄 Stack.stories.tsx                        ( 261 lines)
 │       ├─  📄 Stack.tsx                                ( 167 lines) → Responsive types for Chakra UI v3 - based on official documentation
 │       ├─⭐ 📄 Tabs.tsx                                 ( 370 lines)
 │       ├─  📄 toaster.tsx                              (  43 lines) → ✅ CORRECTO: Crear toaster instance con configuración
-│       ├─  📄 Typography.stories.tsx                   ( 118 lines)
 │       └─  📄 Typography.tsx                           ( 157 lines)
 ├─📂 store
 │   ├─📂 __tests__
@@ -895,34 +889,6 @@ Transcript started, output file is inventario.md
 │   ├─⭐ 📄 staffStore.ts                            ( 675 lines) → Performance metrics
 │   ├─  📄 themeStore.new.ts                        (  98 lines) → Simple light/dark toggle for debugging
 │   └─  📄 themeStore.ts                            (   0 lines)
-├─📂 stories
-│   ├─📂 assets
-│   │   ├─  📄 accessibility.png                        ( 297 lines)
-│   │   ├─  📄 accessibility.svg                        (   1 lines)
-│   │   ├─⭐ 📄 addon-library.png                        (3766 lines)
-│   │   ├─  📄 assets.png                               (  33 lines)
-│   │   ├─  📄 avif-test-image.avif                     (   7 lines)
-│   │   ├─  📄 context.png                              (  55 lines)
-│   │   ├─  📄 discord.svg                              (   1 lines)
-│   │   ├─  📄 docs.png                                 ( 185 lines)
-│   │   ├─  📄 figma-plugin.png                         ( 297 lines)
-│   │   ├─  📄 github.svg                               (   1 lines)
-│   │   ├─  📄 share.png                                ( 294 lines)
-│   │   ├─  📄 styling.png                              (  49 lines)
-│   │   ├─⭐ 📄 testing.png                              ( 320 lines)
-│   │   ├─  📄 theming.png                              ( 287 lines)
-│   │   ├─  📄 tutorials.svg                            (   1 lines)
-│   │   └─  📄 youtube.svg                              (   1 lines)
-│   ├─  📄 button.css                               (  30 lines)
-│   ├─  📄 Button.stories.ts                        (  54 lines) → More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
-│   ├─  📄 Button.tsx                               (  37 lines) → /** Is this the principal call to action on the page? */
-│   ├─⭐ 📄 Configure.mdx                            ( 364 lines)
-│   ├─  📄 header.css                               (  32 lines)
-│   ├─  📄 Header.stories.ts                        (  34 lines) → This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-│   ├─  📄 Header.tsx                               (  56 lines)
-│   ├─  📄 page.css                                 (  68 lines)
-│   ├─  📄 Page.stories.ts                          (  33 lines) → More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
-│   └─  📄 Page.tsx                                 (  73 lines)
 ├─📂 styles
 │   ├─⭐ 📄 themes.css                               ( 819 lines) → /* Temas personalizados para G-Admin Mini */
 │   └─  📄 themes.css.backup                        ( 242 lines) → /* Temas personalizados para G-Admin Mini */

@@ -84,7 +84,7 @@ export function HeroMetricCard({
                 size="lg" 
                 color={iconColor || "theme.500"} 
               />
-              <Typography variant="heading" size="lg" weight="semibold" color="primary">
+              <Typography variant="heading" size="lg" weight="semibold" color="text.primary">
                 {title}
               </Typography>
             </Stack>
@@ -106,7 +106,7 @@ export function HeroMetricCard({
             variant="heading" 
             size="3xl" 
             weight="bold" 
-            color="primary"
+            color="text.primary"
           >
             {formatValue(value)}
           </Typography>
@@ -132,7 +132,7 @@ export function HeroMetricCard({
                   {Math.abs(change.value)}%
                 </Typography>
               </Stack>
-              <Typography variant="body" size="sm" color="secondary">
+              <Typography variant="body" size="sm" color="text.secondary">
                 vs {change.period}
               </Typography>
             </Stack>

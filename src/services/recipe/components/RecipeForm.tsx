@@ -1078,7 +1078,7 @@ export function RecipeForm() {
         )}
 
         {/* Separador visual */}
-        <Box height="1px" bg="gray.200" />
+        <Box height="1px" bg="bg.subtle" />
 
         {/* Ingredientes CON COLLECTION */}
         <Box>
@@ -1196,7 +1196,7 @@ export function RecipeForm() {
         </Box>
 
         {/* Separador visual */}
-        <Box height="1px" bg="gray.200" />
+        <Box height="1px" bg="bg.subtle" />
 
         {/* Información adicional */}
         <Box>

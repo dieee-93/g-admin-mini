@@ -26,7 +26,7 @@ export function ModuleHeader({
     <Box>
       {/* Header Principal - Breadcrumb removed to avoid duplication */}
       <Box 
-        bg="bg.surface"
+        bg="bg.canvas"
         borderLeft={`4px solid`} 
         borderColor={`${color}.400`}
         p={4} 

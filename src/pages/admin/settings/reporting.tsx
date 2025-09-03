@@ -16,7 +16,7 @@ const ReportingPage: React.FC = () => {
       <Stack gap="xl">
         <Stack gap="sm">
           <Typography variant="heading" size="xl">Advanced Reporting</Typography>
-          <Typography variant="body" color="secondary">
+          <Typography variant="body" color="text.secondary">
             Custom reports and data visualization tools
           </Typography>
         </Stack>
@@ -31,7 +31,7 @@ const ReportingPage: React.FC = () => {
             </CardWrapper.Header>
             <CardWrapper.Body>
               <Stack gap="md">
-                <Typography variant="body" size="sm" color="secondary">
+                <Typography variant="body" size="sm" color="text.secondary">
                   Comprehensive sales analytics and performance reports
                 </Typography>
                 <Button size="sm" variant="outline" >
@@ -50,7 +50,7 @@ const ReportingPage: React.FC = () => {
             </CardWrapper.Header>
             <CardWrapper.Body>
               <Stack gap="md">
-                <Typography variant="body" size="sm" color="secondary">
+                <Typography variant="body" size="sm" color="text.secondary">
                   Stock levels, movements, and inventory analytics
                 </Typography>
                 <Button size="sm" variant="outline" >
@@ -69,7 +69,7 @@ const ReportingPage: React.FC = () => {
             </CardWrapper.Header>
             <CardWrapper.Body  >
               <Stack gap="md">
-                <Typography variant="body" size="sm" color="secondary">
+                <Typography variant="body" size="sm" color="text.secondary">
                   P&L, balance sheets, and financial analytics
                 </Typography>
                 <Button size="sm" variant="outline" >
@@ -88,7 +88,7 @@ const ReportingPage: React.FC = () => {
             </CardWrapper.Header>
             <CardWrapper.Body>
               <Stack gap="md">
-                <Typography variant="body" size="sm" color="secondary">
+                <Typography variant="body" size="sm" color="text.secondary">
                   Build custom reports with flexible parameters
                 </Typography>
                 <Button size="sm" variant="outline" >

@@ -72,7 +72,6 @@ ehthumbs.db
 .claude/
 
 # Local development
-storybook-static/
 .local/
 
 # Database (keep our custom database folder available for reference)

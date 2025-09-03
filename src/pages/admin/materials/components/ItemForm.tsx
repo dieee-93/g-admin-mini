@@ -1,30 +1,20 @@
 import React, { useState } from 'react';
 import {
-  VStack,
-  HStack,
-  Text,
-  Input,
-  Select,
-  NumberInput,
-  Button,
-  createListCollection,
-  Alert
-} from '@chakra-ui/react';
+  Stack, Typography, Input, SelectField, NumberField, Button, Alert, createListCollection
+} from '@/shared/ui';
 import {
   CubeIcon
 } from '@heroicons/react/24/outline';
 import { useInventory } from '../logic/useInventory';
 import { type ItemType } from '../types';
 
-// ✅ FIX: Definir colecciones fuera del componente para performance
-const ITEM_TYPE_COLLECTION = createListCollection({
-  items: [
-    { label: 'Contable (unidades)', value: 'UNIT' },
-    { label: 'Por peso (kg, g)', value: 'WEIGHT' },
-    { label: 'Por volumen (lt, ml)', value: 'VOLUME' },
-    { label: 'Elaborado', value: 'ELABORATED' }
-  ]
-});
+// ✅ FIX: Definir opciones fuera del componente para performance
+const itemTypeOptions = [
+  { label: 'Contable (unidades)', value: 'UNIT' },
+  { label: 'Por peso (kg, g)', value: 'WEIGHT' },
+  { label: 'Por volumen (lt, ml)', value: 'VOLUME' },
+  { label: 'Elaborado', value: 'ELABORATED' }
+];
 
 // ✅ FIX: Definir tipos de unidades con tipo consistente
 const unitsByType: Record<ItemType, Array<{label: string; value: string}>> = {

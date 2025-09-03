@@ -149,7 +149,7 @@ export function CustomerSegments() {
                     >
                       {segment.name}
                     </Badge>
-                    <Typography size="sm" color="muted">
+                    <Typography size="sm" color="text.muted">
                       {segment.description}
                     </Typography>
                   </Stack>
@@ -228,7 +228,7 @@ export function CustomerSegments() {
           </Stack>
 
           {filteredCustomers.length === 0 ? (
-            <Stack direction="column" align="center" p="xl" color="muted">
+            <Stack direction="column" align="center" p="xl" color="text.muted">
               <Typography>No se encontraron clientes en este segmento</Typography>
               <Typography size="sm" mt="xs">
                 {searchTerm ? 'Prueba ajustando el término de búsqueda' : 'Este segmento está vacío'}
@@ -251,7 +251,7 @@ export function CustomerSegments() {
                     <Table.Cell>
                       <Stack direction="column" align="start" gap="xs">
                         <Typography fontWeight="medium">{customer.name}</Typography>
-                        <Typography size="xs" color="muted">
+                        <Typography size="xs" color="text.muted">
                           Cliente desde {formatDate(customer.created_at)}
                         </Typography>
                       </Stack>
@@ -266,7 +266,7 @@ export function CustomerSegments() {
                           <Typography size="sm">✉️ {customer.email}</Typography>
                         )}
                         {!customer.phone && !customer.email && (
-                          <Typography size="sm" color="muted">Sin contacto</Typography>
+                          <Typography size="sm" color="text.muted">Sin contacto</Typography>
                         )}
                       </Stack>
                     </Table.Cell>
@@ -276,7 +276,7 @@ export function CustomerSegments() {
                         <Typography fontWeight="medium">
                           {customer.stats?.purchase_count || 0}
                         </Typography>
-                        <Typography size="xs" color="muted">
+                        <Typography size="xs" color="text.muted">
                           compras
                         </Typography>
                       </Stack>
@@ -287,7 +287,7 @@ export function CustomerSegments() {
                         <Typography fontWeight="medium" >
                           {formatCurrency(customer.stats?.total_spent || 0)}
                         </Typography>
-                        <Typography size="xs" color="muted">
+                        <Typography size="xs" color="text.muted">
                           total
                         </Typography>
                       </Stack>

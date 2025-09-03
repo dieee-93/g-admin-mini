@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Icon } from "@/shared/ui/Icon";
 import { Typography } from "@/shared/ui/Typography";
-import { Card } from "@/shared/ui/Card";
+import { CardWrapper } from "@/shared/ui/CardWrapper";
 import { Stack } from "@/shared/ui/Stack";
 import { SimpleGrid } from "@/shared/ui/Grid";
 import { Button } from "@/shared/ui/Button";
@@ -124,23 +124,26 @@ const EnterpriseSection: React.FC = () => {
       {/* Header */}
       <Stack gap="sm">
         <Typography variant="heading" size="lg">Enterprise Management</Typography>
-        <Typography variant="body" color="secondary">
+        <Typography variant="body" color="text.secondary">
           Multi-location and enterprise-level features
         </Typography>
       </Stack>
 
       {/* Enterprise Overview */}
-      <Card >
-        <Stack gap="md">
+      <CardWrapper>
+        <CardWrapper.Header>
           <Stack direction="row" align="center" gap="sm">
             <Icon icon={BuildingOfficeIcon} size="md" />
             <Typography variant="heading" size="md">Enterprise Overview</Typography>
           </Stack>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
+          <Stack gap="md">
           
           <SimpleGrid columns={{ base: 2, md: 4 }} gap="xl">
             {franchiseMetrics.map((metric) => (
               <Stack key={metric.name} align="center" gap="sm">
-                <Typography variant="body" size="sm" color="secondary" textAlign="center">{metric.name}</Typography>
+                <Typography variant="body" size="sm" color="text.secondary" textAlign="center">{metric.name}</Typography>
                 <Typography variant="body" size="2xl" fontWeight="bold">{metric.value}</Typography>
                 <Badge 
                   colorPalette={getStatusColor(metric.status)}
@@ -152,12 +155,12 @@ const EnterpriseSection: React.FC = () => {
               </Stack>
             ))}
           </SimpleGrid>
-        </Stack>
+        </CardWrapper.Body>
       </CardWrapper>
 
       {/* Locations Management */}
-      <Card >
-        <Stack gap="md">
+      <CardWrapper>
+        <CardWrapper.Header>
           <Stack direction="row" justify="space-between" align="center">
             <Typography variant="heading" size="md">Locations</Typography>
             <Button size="sm" colorPalette="brand">
@@ -165,10 +168,13 @@ const EnterpriseSection: React.FC = () => {
               Add Location
             </Button>
           </Stack>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
+          <Stack gap="md">
           
           <Stack gap="md">
             {locations.map((location) => (
-              <Card key={location.id} variant="subtle" size="sm" >
+              <CardWrapper key={location.id} variant="subtle" size="sm">
                 <Stack gap="md">
                   <Stack direction="row" justify="space-between" align="center">
                     <Stack direction="row" align="center" gap="md">
@@ -177,22 +183,22 @@ const EnterpriseSection: React.FC = () => {
                         <Typography variant="body" size="md" fontWeight="semibold">{location.name}</Typography>
                         <Stack direction="row" align="center" gap="xs">
                           <Icon icon={MapPinIcon} size="xs" />
-                          <Typography variant="body" size="sm" color="secondary">{location.address}</Typography>
+                          <Typography variant="body" size="sm" color="text.secondary">{location.address}</Typography>
                         </Stack>
                       </Stack>
                     </Stack>
                     
                     <Stack direction="row" gap="xl">
                       <Stack align="center" gap="xs">
-                        <Typography variant="body" size="sm" color="secondary">Revenue</Typography>
+                        <Typography variant="body" size="sm" color="text.secondary">Revenue</Typography>
                         <Typography variant="body" size="md" fontWeight="bold">{location.revenue}</Typography>
                       </Stack>
                       <Stack align="center" gap="xs">
-                        <Typography variant="body" size="sm" color="secondary">Orders</Typography>
+                        <Typography variant="body" size="sm" color="text.secondary">Orders</Typography>
                         <Typography variant="body" size="md" fontWeight="bold">{location.orders}</Typography>
                       </Stack>
                       <Stack align="center" gap="xs">
-                        <Typography variant="body" size="sm" color="secondary">Staff</Typography>
+                        <Typography variant="body" size="sm" color="text.secondary">Staff</Typography>
                         <Typography variant="body" size="md" fontWeight="bold">{location.staff}</Typography>
                       </Stack>
                       <Badge colorPalette={getStatusColor(location.status)} size="sm">
@@ -204,17 +210,20 @@ const EnterpriseSection: React.FC = () => {
               </CardWrapper>
             ))}
           </Stack>
-        </Stack>
+        </CardWrapper.Body>
       </CardWrapper>
 
       {/* Enterprise Tools */}
-      <Card >
-        <Stack gap="md">
+      <CardWrapper>
+        <CardWrapper.Header>
           <Typography variant="heading" size="md">Enterprise Tools</Typography>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
+          <Stack gap="md">
           
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="md">
             {enterpriseTools.map((tool) => (
-              <Card key={tool.id} variant="subtle" size="sm" >
+              <CardWrapper key={tool.id} variant="subtle" size="sm">
                 <Stack gap="sm">
                   <Stack direction="row" justify="space-between" align="center">
                     <Icon icon={tool.icon} size="md" />
@@ -228,7 +237,7 @@ const EnterpriseSection: React.FC = () => {
                   
                   <Stack gap="sm">
                     <Typography variant="body" size="md" fontWeight="semibold">{tool.name}</Typography>
-                    <Typography variant="body" size="sm" color="secondary">{tool.description}</Typography>
+                    <Typography variant="body" size="sm" color="text.secondary">{tool.description}</Typography>
                   </Stack>
                   
                   <Button 
@@ -243,16 +252,19 @@ const EnterpriseSection: React.FC = () => {
               </CardWrapper>
             ))}
           </SimpleGrid>
-        </Stack>
+        </CardWrapper.Body>
       </CardWrapper>
 
       {/* Franchise Configuration */}
-      <Card >
-        <Stack gap="md">
+      <CardWrapper>
+        <CardWrapper.Header>
           <Typography variant="heading" size="md">Franchise Configuration</Typography>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
+          <Stack gap="md">
           
           <Stack gap="md">
-            <Typography variant="body" size="sm" color="secondary">
+            <Typography variant="body" size="sm" color="text.secondary">
               Configure enterprise-wide settings, policies, and operational standards across all locations.
             </Typography>
             
@@ -265,7 +277,7 @@ const EnterpriseSection: React.FC = () => {
               <Button variant="outline" colorPalette="error">Quality Controls</Button>
             </SimpleGrid>
           </Stack>
-        </Stack>
+        </CardWrapper.Body>
       </CardWrapper>
     </Stack>
   );

@@ -334,7 +334,7 @@ export function ProductionPlanningOnly() {
                   <Typography variant="heading" className="text-lg font-medium">
                     No production plans scheduled
                   </Typography>
-                  <Typography variant="body" color="muted">
+                  <Typography variant="body" color="text.muted">
                     Create your first production plan to get started
                   </Typography>
                 </VStack>
@@ -357,14 +357,14 @@ export function ProductionPlanningOnly() {
                             <Badge colorPalette="error" size="xs">SHORTAGES</Badge>
                           )}
                         </HStack>
-                        <Typography variant="body" className="text-sm" color="muted">
+                        <Typography variant="body" className="text-sm" color="text.muted">
                           Plan ID: {plan.id}
                         </Typography>
                       </VStack>
                       
                       <VStack align="end" gap="xs">
                         {getStatusBadge(plan.status)}
-                        <Typography variant="body" className="text-xs" color="muted">
+                        <Typography variant="body" className="text-xs" color="text.muted">
                           Created: {new Date(plan.created_at).toLocaleDateString()}
                         </Typography>
                       </VStack>
@@ -372,21 +372,21 @@ export function ProductionPlanningOnly() {
                     
                     <Grid templateColumns="repeat(3, 1fr)" gap="md" className="mb-4">
                       <VStack align="start" gap="xs">
-                        <Typography variant="body" className="text-xs" color="muted">Quantity</Typography>
+                        <Typography variant="body" className="text-xs" color="text.muted">Quantity</Typography>
                         <Typography variant="body" className="font-semibold">
                           {plan.planned_quantity} units
                         </Typography>
                       </VStack>
                       
                       <VStack align="start" gap="xs">
-                        <Typography variant="body" className="text-xs" color="muted">Date</Typography>
+                        <Typography variant="body" className="text-xs" color="text.muted">Date</Typography>
                         <Typography variant="body" className="font-semibold">
                           {new Date(plan.planned_date).toLocaleDateString()}
                         </Typography>
                       </VStack>
                       
                       <VStack align="start" gap="xs">
-                        <Typography variant="body" className="text-xs" color="muted">Duration</Typography>
+                        <Typography variant="body" className="text-xs" color="text.muted">Duration</Typography>
                         <Typography variant="body" className="font-semibold">
                           {plan.estimated_duration}h
                         </Typography>
@@ -406,7 +406,7 @@ export function ProductionPlanningOnly() {
                                 <Typography variant="body" className="text-sm font-medium">
                                   {material.material_name}
                                 </Typography>
-                                <Typography variant="body" className="text-xs" color="muted">
+                                <Typography variant="body" className="text-xs" color="text.muted">
                                   {material.quantity_needed} {material.unit}
                                 </Typography>
                               </HStack>

@@ -130,7 +130,7 @@ export const SupplierFields = ({
                 <Text fontWeight="semibold" color="blue.700">
                   Información del Proveedor
                 </Text>
-                <Text fontSize="sm" color="fg.muted">
+                <Text fontSize="sm" color="text.muted">
                   Opcional - Para un mejor control de stock y compras
                 </Text>
               </Stack>
@@ -172,7 +172,7 @@ export const SupplierFields = ({
                             <Select.ItemText>
                               {supplier.name}
                               {supplier.rating && (
-                                <Text as="span" fontSize="xs" color="fg.muted" ml="2">
+                                <Text as="span" fontSize="xs" color="text.muted" ml="2">
                                   ({supplier.rating.toFixed(1)} ⭐)
                                 </Text>
                               )}
@@ -382,7 +382,7 @@ export const SupplierFields = ({
               {/* Información útil */}
               <Card variant="subtle" padding="sm">
                 <Card.Body>
-                  <Text fontSize="xs" color="fg.muted">
+                  <Text fontSize="xs" color="text.muted">
                     💡 <strong>Tip:</strong> Esta información te ayudará a rastrear compras, evaluar proveedores y mantener un historial completo de tu inventario.
                   </Text>
                 </Card.Body>

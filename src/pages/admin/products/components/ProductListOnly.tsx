@@ -165,7 +165,7 @@ export function ProductListOnly() {
             <Typography variant="heading" className="text-2xl font-bold mb-2">
               Product Management
             </Typography>
-            <Typography variant="body" color="muted">
+            <Typography variant="body" color="text.muted">
               Manage your product catalog with real-time cost tracking
             </Typography>
           </div>
@@ -181,7 +181,7 @@ export function ProductListOnly() {
             <div className="p-4">
               <HStack justify="space-between">
                 <VStack align="start" gap="xs">
-                  <Typography variant="body" className="text-sm" color="muted">Total Products</Typography>
+                  <Typography variant="body" className="text-sm" color="text.muted">Total Products</Typography>
                   <Typography variant="heading" className="text-2xl font-bold text-blue-600">
                     {products.length}
                   </Typography>
@@ -195,7 +195,7 @@ export function ProductListOnly() {
             <div className="p-4">
               <HStack justify="space-between">
                 <VStack align="start" gap="xs">
-                  <Typography variant="body" className="text-sm" color="muted">Active Products</Typography>
+                  <Typography variant="body" className="text-sm" color="text.muted">Active Products</Typography>
                   <Typography variant="heading" className="text-2xl font-bold text-green-600">
                     {products.filter(p => p.status === 'active').length}
                   </Typography>
@@ -209,7 +209,7 @@ export function ProductListOnly() {
             <div className="p-4">
               <HStack justify="space-between">
                 <VStack align="start" gap="xs">
-                  <Typography variant="body" className="text-sm" color="muted">Avg Margin</Typography>
+                  <Typography variant="body" className="text-sm" color="text.muted">Avg Margin</Typography>
                   <Typography variant="heading" className="text-2xl font-bold text-purple-600">
                     {Math.round(products.reduce((sum, p) => sum + p.margin, 0) / products.length)}%
                   </Typography>
@@ -223,7 +223,7 @@ export function ProductListOnly() {
             <div className="p-4">
               <HStack justify="space-between">
                 <VStack align="start" gap="xs">
-                  <Typography variant="body" className="text-sm" color="muted">Out of Stock</Typography>
+                  <Typography variant="body" className="text-sm" color="text.muted">Out of Stock</Typography>
                   <Typography variant="heading" className="text-2xl font-bold text-red-600">
                     {products.filter(p => p.status === 'out_of_stock').length}
                   </Typography>
@@ -267,7 +267,7 @@ export function ProductListOnly() {
                   <Typography variant="heading" className="text-lg font-medium">
                     {searchQuery ? 'No products found' : 'No products available'}
                   </Typography>
-                  <Typography variant="body" color="muted">
+                  <Typography variant="body" color="text.muted">
                     {searchQuery 
                       ? `No products match "${searchQuery}"`
                       : 'Add your first product to get started'
@@ -298,28 +298,28 @@ export function ProductListOnly() {
                           
                           <Grid templateColumns="repeat(4, 1fr)" gap="md" className="text-sm">
                             <VStack align="start" gap="xs">
-                              <Typography variant="body" className="text-xs" color="muted">Price</Typography>
+                              <Typography variant="body" className="text-xs" color="text.muted">Price</Typography>
                               <Typography variant="body" className="font-semibold text-green-600">
                                 ${product.price.toFixed(2)}
                               </Typography>
                             </VStack>
                             
                             <VStack align="start" gap="xs">
-                              <Typography variant="body" className="text-xs" color="muted">Cost</Typography>
+                              <Typography variant="body" className="text-xs" color="text.muted">Cost</Typography>
                               <Typography variant="body" className="font-semibold">
                                 ${product.cost.toFixed(2)}
                               </Typography>
                             </VStack>
                             
                             <VStack align="start" gap="xs">
-                              <Typography variant="body" className="text-xs" color="muted">Margin</Typography>
+                              <Typography variant="body" className="text-xs" color="text.muted">Margin</Typography>
                               <Typography variant="body" className={`font-semibold ${getMarginColor(product.margin)}`}>
                                 {product.margin.toFixed(1)}%
                               </Typography>
                             </VStack>
                             
                             <VStack align="start" gap="xs">
-                              <Typography variant="body" className="text-xs" color="muted">Components</Typography>
+                              <Typography variant="body" className="text-xs" color="text.muted">Components</Typography>
                               <Typography variant="body" className="font-semibold">
                                 {product.components_count} items
                               </Typography>
@@ -327,7 +327,7 @@ export function ProductListOnly() {
                           </Grid>
                           
                           {product.total_quantity !== undefined && (
-                            <Typography variant="body" className="text-xs" color="muted">
+                            <Typography variant="body" className="text-xs" color="text.muted">
                               Available: {product.total_quantity} units • Updated: {new Date(product.last_updated).toLocaleDateString()}
                             </Typography>
                           )}

@@ -224,7 +224,7 @@ export function SalesWithStockView() {
             <Typography variant="heading" size="xl" weight="bold">
               Punto de Venta
             </Typography>
-            <Typography variant="body" size="md" color="muted">
+            <Typography variant="body" size="md" color="text.muted">
               Gestión de ventas con validación de stock en tiempo real
             </Typography>
           </Stack>

@@ -372,7 +372,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
 
                 {/* Feedback */}
                 {performance.feedback && (
-                  <Box bg="gray.50" p="3" borderRadius="md">
+                  <Box bg="bg.canvas" p="3" borderRadius="md">
                     <HStack gap="2" mb="2">
                       <DocumentTextIcon className="w-4 h-4 text-gray-500" />
                       <Text fontSize="sm" fontWeight="medium" color="gray.700">

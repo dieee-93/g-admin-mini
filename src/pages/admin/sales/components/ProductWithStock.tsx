@@ -281,7 +281,7 @@ export function ProductWithStock({
                       {product.name}
                     </Typography>
                     {product.description && (
-                      <Typography variant="body" size="sm" color="muted">
+                      <Typography variant="body" size="sm" color="text.muted">
                         {product.description}
                       </Typography>
                     )}

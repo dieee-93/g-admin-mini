@@ -425,7 +425,7 @@ export function KitchenDisplaySystem({
 
                             {/* Item Modifications */}
                             {(item.modifications?.length || 0) > 0 && (
-                              <Box p="2" bg="gray.50" borderRadius="sm">
+                              <Box p="2" bg="bg.canvas" borderRadius="sm">
                                 <Text fontSize="xs" fontWeight="medium" mb="1">Modifications:</Text>
                                 {(item.modifications || []).map((mod, idx) => (
                                   <Text key={idx} fontSize="xs" color="gray.600">

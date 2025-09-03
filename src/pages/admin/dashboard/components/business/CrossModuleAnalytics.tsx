@@ -1107,7 +1107,7 @@ export function CrossModuleAnalytics() {
                               {correlation.metric1.metricName} ↔ {correlation.metric2.metricName}
                             </Text>
                             
-                            <HStack justify="space-between" bg="gray.50" p={2} borderRadius="sm" fontSize="sm">
+                            <HStack justify="space-between" bg="bg.canvas" p={2} borderRadius="sm" fontSize="sm">
                               <VStack align="start" gap={0}>
                                 <Text color="gray.600">Coeficiente:</Text>
                                 <Text fontWeight="bold" color={correlation.correlationType === 'positive' ? 'green.600' : 'red.600'}>
@@ -1201,7 +1201,7 @@ export function CrossModuleAnalytics() {
                         </VStack>
 
                         {/* Impact */}
-                        <SimpleGrid columns={3} gap={4} bg="gray.50" p={3} borderRadius="md">
+                        <SimpleGrid columns={3} gap={4} bg="bg.canvas" p={3} borderRadius="md">
                           <VStack>
                             <Text fontSize="xs" color="gray.600">Impacto Financiero</Text>
                             <Text fontSize="sm" fontWeight="bold" color="red.600">

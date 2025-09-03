@@ -572,7 +572,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
         <Card.Root>
           <Card.Body py="12" textAlign="center">
             <VStack gap="4">
-              <Box p="4" bg="gray.100" borderRadius="full">
+              <Box p="4" bg="bg.surface" borderRadius="full">
                 <MagnifyingGlassIcon className="w-8 h-8 text-gray-400" />
               </Box>
               <VStack gap="2">

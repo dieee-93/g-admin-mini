@@ -7,6 +7,11 @@ export { Provider } from './provider';
 
 // Layout Components
 export { Layout } from './Layout';
+export { ContentLayout } from './ContentLayout';
+export { Section } from './Section';
+export { FormSection } from './FormSection';
+export { StatsSection } from './StatsSection';
+export { PageHeader } from './PageHeader';
 export { 
   Stack, 
   VStack, 
@@ -16,7 +21,8 @@ export {
 } from './Stack';
 export { 
   Grid, 
-  SimpleGrid 
+  SimpleGrid,
+  SimpleGrid as CardGrid  // Semantic alias for common dashboard layouts
 } from './Grid';
 
 // Grid Presets - REMOVED (use Chakra Grid directly)
@@ -39,7 +45,10 @@ export { SelectField, createListCollection } from './SelectField';
 
 // Base Components
 export { Button } from './Button';
-export { CardWrapper } from './CardWrapper';
+export { ActionButton } from './ActionButton';
+export { CardWrapper, CardHeader, CardBody, CardFooter } from './CardWrapper';
+export { MetricCard } from './MetricCard';
+export { FeatureCard } from './FeatureCard';
 export { Table } from './Table';
 
 // Advanced Components
@@ -83,6 +92,8 @@ export {
   DataTabs
 } from './Tabs';
 
+// Collapsible components are imported directly from @chakra-ui/react when needed
+
 // Business Components - REMOVED (move to specific modules if needed)
 
 // Feedback Components
@@ -107,7 +118,6 @@ export { ProductionCalendar } from './ProductionCalendar';
 
 // ⚡ QUICK COMPONENTS - Componentes instantáneos
 export {
-  MetricCard,
   QuickStatus,
   PageTitle,
   ActionBar,

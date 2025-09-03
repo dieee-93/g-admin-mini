@@ -225,7 +225,7 @@ export const ConnectionStatus = () => {
           justifyContent="center"
           ml="-2"
           border="2px solid"
-          borderColor={{ base: "white", _dark: "gray.800" }}
+          borderColor="border.default"
         >
           {syncStatus.queueSize > 9 ? '9+' : syncStatus.queueSize}
         </Box>
@@ -450,7 +450,7 @@ export const QueueMonitor = () => {
   }
 
   return (
-    <Box bg="gray.50" borderRadius="md" p={3} border="1px" borderColor="gray.200">
+    <Box bg="bg.canvas" borderRadius="md" p={3} border="1px" borderColor="border.default">
       <HStack justify="space-between" mb={2} cursor="pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <HStack>
           <CircleStackIcon className="w-4 h-4" />
@@ -527,7 +527,7 @@ export const OfflineStatusBar = () => {
       zIndex={1002}
       
       borderBottom="1px"
-      borderColor="gray.200"
+      borderColor="border.default"
       p={2}
     >
       <Flex justify="space-between" align="center" maxW="container.xl" mx="auto">

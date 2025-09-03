@@ -445,7 +445,7 @@ export function QRCodeGenerator({
                   bg="white" 
                   borderRadius="md" 
                   border="1px solid" 
-                  borderColor="gray.200"
+                  borderColor="border.default"
                   id="qr-display"
                 >
                   {/* QR code will be rendered here */}
@@ -460,7 +460,7 @@ export function QRCodeGenerator({
                     value={currentQR}
                     readOnly
                     fontSize="sm"
-                    bg="gray.50"
+                    bg="bg.canvas"
                   />
                 </VStack>
               </VStack>

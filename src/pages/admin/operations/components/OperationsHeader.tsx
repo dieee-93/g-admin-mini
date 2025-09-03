@@ -66,7 +66,7 @@ export function OperationsHeader() {
               <Stack p="md">
                 <Stack direction="row" justify="space-between">
                   <Stack direction="column" align="start" gap="xs">
-                    <Typography fontSize="sm" color="muted">
+                    <Typography fontSize="sm" color="text.muted">
                       {kpi.label}
                     </Typography>
                     <Typography fontSize="xl" weight="bold">

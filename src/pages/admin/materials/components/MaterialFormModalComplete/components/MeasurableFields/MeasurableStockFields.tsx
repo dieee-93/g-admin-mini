@@ -54,7 +54,7 @@ export const MeasurableStockFields = ({
           <Flex justify="space-between" align="center">
             <Stack gap="1">
               <Text fontWeight="semibold">Agregar al inventario ahora</Text>
-              <Text fontSize="sm" color="fg.muted">
+              <Text fontSize="sm" color="text.muted">
                 Si está marcado, se agregará stock inmediatamente al crear el item
               </Text>
             </Stack>
@@ -108,7 +108,7 @@ export const MeasurableStockFields = ({
                         <Box 
                           height="44px"
                           px="3"
-                          bg="gray.50"
+                          bg="bg.canvas"
                           border="1px solid"
                           borderColor="border"
                           borderLeft="0"
@@ -116,7 +116,7 @@ export const MeasurableStockFields = ({
                           display="flex"
                           alignItems="center"
                           fontSize="sm"
-                          color="fg.muted"
+                          color="text.muted"
                           fontWeight="medium"
                         >
                           {formData.unit}
@@ -136,7 +136,7 @@ export const MeasurableStockFields = ({
                       <Box 
                         height="44px"
                         px="3"
-                        bg="gray.50"
+                        bg="bg.canvas"
                         border="1px solid"
                         borderColor="border"
                         borderRight="0"
@@ -144,7 +144,7 @@ export const MeasurableStockFields = ({
                         display="flex"
                         alignItems="center"
                         fontSize="sm"
-                        color="fg.muted"
+                        color="text.muted"
                         fontWeight="medium"
                       >
                         $
@@ -175,7 +175,7 @@ export const MeasurableStockFields = ({
                       <Box 
                         height="44px"
                         px="3"
-                        bg="gray.50"
+                        bg="bg.canvas"
                         border="1px solid"
                         borderColor="border"
                         borderLeft="0"
@@ -183,7 +183,7 @@ export const MeasurableStockFields = ({
                         display="flex"
                         alignItems="center"
                         fontSize="sm"
-                        color="fg.muted"
+                        color="text.muted"
                         fontWeight="medium"
                       >
                         ARS

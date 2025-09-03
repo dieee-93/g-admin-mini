@@ -192,7 +192,7 @@ export function PerformanceDashboard() {
         </HStack>
 
         {/* Performance Score Overview */}
-        <Card.Root p="4" bg="gray.50">
+        <Card.Root p="4" bg="bg.canvas">
           <HStack justify="space-between" align="center">
             <VStack align="start" gap="1">
               <Text fontSize="lg" fontWeight="semibold">
@@ -399,7 +399,7 @@ export function PerformanceDashboard() {
                   <Box maxH="300px" overflowY="auto">
                     <VStack gap="2" align="stretch">
                       {lazyLoadingManager.getLoadingStats().slice(-10).map((stat, index) => (
-                        <HStack key={index} justify="space-between" p="2" bg="gray.50" borderRadius="md">
+                        <HStack key={index} justify="space-between" p="2" bg="bg.canvas" borderRadius="md">
                           <Text fontSize="sm" fontWeight="medium">
                             {stat.module}
                           </Text>
@@ -489,7 +489,7 @@ export function PerformanceDashboard() {
                         <Text fontWeight="semibold">Largest Modules</Text>
                         <VStack gap="2" align="stretch">
                           {bundleAnalysis.largestModules.slice(0, 5).map((module: any, index: number) => (
-                            <HStack key={index} justify="space-between" p="2" bg="gray.50" borderRadius="md">
+                            <HStack key={index} justify="space-between" p="2" bg="bg.canvas" borderRadius="md">
                               <Text fontSize="sm" fontWeight="medium">
                                 {module.name}
                               </Text>

@@ -33,7 +33,7 @@ export function ProductList({
     return (
       <div className="text-center py-8">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <Typography className="mt-4" color="muted">Cargando productos...</Typography>
+        <Typography className="mt-4" color="text.muted">Cargando productos...</Typography>
       </div>
     );
   }
@@ -50,10 +50,10 @@ export function ProductList({
   if (!products || products.length === 0) {
     return (
       <div className="text-center py-12">
-        <Typography size="lg" color="muted" className="mb-4">
+        <Typography size="lg" color="text.muted" className="mb-4">
           No hay productos registrados
         </Typography>
-        <Typography color="muted">
+        <Typography color="text.muted">
           Comienza creando tu primer producto
         </Typography>
       </div>
@@ -80,7 +80,7 @@ export function ProductList({
           <Typography size="lg" weight="semibold" className="mb-2">
             Productos ({products?.length || 0})
           </Typography>
-          <Typography size="sm" color="muted">
+          <Typography size="sm" color="text.muted">
             Lista de productos con información de costos y disponibilidad
           </Typography>
         </div>
@@ -101,7 +101,7 @@ export function ProductList({
                           {product.name}
                         </Typography>
                         {product.unit && (
-                          <Typography size="xs" color="muted">
+                          <Typography size="xs" color="text.muted">
                             Unidad: {product.unit}
                           </Typography>
                         )}
@@ -113,7 +113,7 @@ export function ProductList({
 
                     {/* Description */}
                     {product.description && (
-                      <Typography size="sm" color="muted" className="line-clamp-2">
+                      <Typography size="sm" color="text.muted" className="line-clamp-2">
                         {product.description}
                       </Typography>
                     )}
@@ -122,7 +122,7 @@ export function ProductList({
                     <Stack direction="column" gap="xs">
                       {/* Cost */}
                       <Stack direction="row" justify="space-between">
-                        <Typography size="sm" color="muted">Costo:</Typography>
+                        <Typography size="sm" color="text.muted">Costo:</Typography>
                         <Typography size="sm" weight="medium">
                           ${product.cost.toFixed(2)}
                         </Typography>
@@ -130,7 +130,7 @@ export function ProductList({
 
                       {/* Availability */}
                       <Stack direction="row" justify="space-between">
-                        <Typography size="sm" color="muted">Disponibilidad:</Typography>
+                        <Typography size="sm" color="text.muted">Disponibilidad:</Typography>
                         <Stack direction="row" gap="xs">
                           <Typography size="sm" weight="medium">
                             {product.availability}
@@ -146,7 +146,7 @@ export function ProductList({
 
                       {/* Components */}
                       <Stack direction="row" justify="space-between">
-                        <Typography size="sm" color="muted">Componentes:</Typography>
+                        <Typography size="sm" color="text.muted">Componentes:</Typography>
                         <Typography size="sm" weight="medium">
                           {product.components_count}
                         </Typography>
@@ -154,7 +154,7 @@ export function ProductList({
 
                       {/* Production Status */}
                       <Stack direction="row" justify="space-between">
-                        <Typography size="sm" color="muted">Estado:</Typography>
+                        <Typography size="sm" color="text.muted">Estado:</Typography>
                         <Badge 
                           colorPalette={product.production_ready ? "success" : "gray"}
                           size="sm"
@@ -213,7 +213,7 @@ export function ProductList({
         <Typography size="lg" weight="semibold" className="mb-2">
           Productos ({products?.length || 0})
         </Typography>
-        <Typography size="sm" color="muted">
+        <Typography size="sm" color="text.muted">
           Lista de productos con información de costos y disponibilidad
         </Typography>
       </div>
@@ -229,7 +229,7 @@ export function ProductList({
                     {product.name}
                   </Typography>
                   {product.unit && (
-                    <Typography size="xs" color="muted">
+                    <Typography size="xs" color="text.muted">
                       Unidad: {product.unit}
                     </Typography>
                   )}
@@ -241,7 +241,7 @@ export function ProductList({
 
               {/* Description */}
               {product.description && (
-                <Typography size="sm" color="muted" className="line-clamp-2">
+                <Typography size="sm" color="text.muted" className="line-clamp-2">
                   {product.description}
                 </Typography>
               )}
@@ -250,7 +250,7 @@ export function ProductList({
               <Stack direction="column" gap="xs">
                 {/* Cost */}
                 <Stack direction="row" justify="space-between">
-                  <Typography size="sm" color="muted">Costo:</Typography>
+                  <Typography size="sm" color="text.muted">Costo:</Typography>
                   <Typography size="sm" weight="medium">
                     ${product.cost.toFixed(2)}
                   </Typography>
@@ -258,7 +258,7 @@ export function ProductList({
 
                 {/* Availability */}
                 <Stack direction="row" justify="space-between">
-                  <Typography size="sm" color="muted">Disponibilidad:</Typography>
+                  <Typography size="sm" color="text.muted">Disponibilidad:</Typography>
                   <Stack direction="row" gap="xs">
                     <Typography size="sm" weight="medium">
                       {product.availability}
@@ -274,7 +274,7 @@ export function ProductList({
 
                 {/* Components */}
                 <Stack direction="row" justify="space-between">
-                  <Typography size="sm" color="muted">Componentes:</Typography>
+                  <Typography size="sm" color="text.muted">Componentes:</Typography>
                   <Typography size="sm" weight="medium">
                     {product.components_count}
                   </Typography>
@@ -282,7 +282,7 @@ export function ProductList({
 
                 {/* Production Status */}
                 <Stack direction="row" justify="space-between">
-                  <Typography size="sm" color="muted">Estado:</Typography>
+                  <Typography size="sm" color="text.muted">Estado:</Typography>
                   <Badge 
                     colorPalette={product.production_ready ? "success" : "gray"}
                     size="sm"

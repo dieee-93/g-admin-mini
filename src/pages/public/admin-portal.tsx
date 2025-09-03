@@ -30,10 +30,10 @@ function AdminHeader() {
             <ShieldCheckIcon style={{ width: '24px', height: '24px' }} />
           </div>
           <Stack gap="xs">
-            <Typography variant="title" color="primary">
+            <Typography variant="title" color="text.primary">
               G-Admin Sistema
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               Portal de Acceso Administrativo
             </Typography>
           </Stack>
@@ -71,10 +71,10 @@ function LoginSection() {
             </div>
             
             <Stack gap="sm" align="center">
-              <Typography variant="heading" color="primary" textAlign="center">
+              <Typography variant="heading" color="text.primary" textAlign="center">
                 Acceso del Personal
               </Typography>
-              <Typography variant="body" color="muted" textAlign="center">
+              <Typography variant="body" color="text.muted" textAlign="center">
                 Inicie sesión con sus credenciales corporativas para acceder 
                 al sistema de gestión empresarial.
               </Typography>
@@ -97,7 +97,7 @@ function LoginSection() {
                 </HStack>
               </Button>
               
-              <Typography variant="caption" color="muted" textAlign="center">
+              <Typography variant="caption" color="text.muted" textAlign="center">
                 Solo personal autorizado. Acceso monitoreado y registrado.
               </Typography>
             </Stack>
@@ -110,26 +110,26 @@ function LoginSection() {
             <Stack gap="md">
               <HStack gap="sm" align="center">
                 <UserGroupIcon style={{ width: '20px', height: '20px', color: '#3182ce' }} />
-                <Typography variant="title" color="primary">
+                <Typography variant="title" color="text.primary">
                   Roles de Acceso
                 </Typography>
               </HStack>
               
               <Stack gap="sm">
                 <HStack justify="space-between" align="center">
-                  <Typography variant="body" color="secondary">Operador</Typography>
+                  <Typography variant="body" color="text.secondary">Operador</Typography>
                   <Badge colorPalette="blue" size="sm">Básico</Badge>
                 </HStack>
                 <HStack justify="space-between" align="center">
-                  <Typography variant="body" color="secondary">Supervisor</Typography>
+                  <Typography variant="body" color="text.secondary">Supervisor</Typography>
                   <Badge colorPalette="green" size="sm">Intermedio</Badge>
                 </HStack>
                 <HStack justify="space-between" align="center">
-                  <Typography variant="body" color="secondary">Administrador</Typography>
+                  <Typography variant="body" color="text.secondary">Administrador</Typography>
                   <Badge colorPalette="orange" size="sm">Avanzado</Badge>
                 </HStack>
                 <HStack justify="space-between" align="center">
-                  <Typography variant="body" color="secondary">Super Admin</Typography>
+                  <Typography variant="body" color="text.secondary">Super Admin</Typography>
                   <Badge colorPalette="red" size="sm">Completo</Badge>
                 </HStack>
               </Stack>
@@ -140,19 +140,19 @@ function LoginSection() {
             <Stack gap="md">
               <HStack gap="sm" align="center">
                 <CogIcon style={{ width: '20px', height: '20px', color: '#3182ce' }} />
-                <Typography variant="title" color="primary">
+                <Typography variant="title" color="text.primary">
                   Módulos Disponibles
                 </Typography>
               </HStack>
               
               <Stack gap="xs">
-                <Typography variant="body" color="secondary" size="sm">• Dashboard y Métricas</Typography>
-                <Typography variant="body" color="secondary" size="sm">• Gestión de Ventas</Typography>
-                <Typography variant="body" color="secondary" size="sm">• Inventario y Materiales</Typography>
-                <Typography variant="body" color="secondary" size="sm">• Productos y Menú</Typography>
-                <Typography variant="body" color="secondary" size="sm">• Personal y Horarios</Typography>
-                <Typography variant="body" color="secondary" size="sm">• Reportes Fiscales</Typography>
-                <Typography variant="body" color="secondary" size="sm">• Configuraciones</Typography>
+                <Typography variant="body" color="text.secondary" size="sm">• Dashboard y Métricas</Typography>
+                <Typography variant="body" color="text.secondary" size="sm">• Gestión de Ventas</Typography>
+                <Typography variant="body" color="text.secondary" size="sm">• Inventario y Materiales</Typography>
+                <Typography variant="body" color="text.secondary" size="sm">• Productos y Menú</Typography>
+                <Typography variant="body" color="text.secondary" size="sm">• Personal y Horarios</Typography>
+                <Typography variant="body" color="text.secondary" size="sm">• Reportes Fiscales</Typography>
+                <Typography variant="body" color="text.secondary" size="sm">• Configuraciones</Typography>
               </Stack>
             </Stack>
           </CardWrapper>
@@ -178,7 +178,7 @@ function SystemStatus() {
           <HStack justify="space-between" align="center">
             <HStack gap="sm" align="center">
               <ChartBarIcon style={{ width: '20px', height: '20px', color: '#3182ce' }} />
-              <Typography variant="title" color="primary">
+              <Typography variant="title" color="text.primary">
                 Estado del Sistema
               </Typography>
             </HStack>
@@ -195,7 +195,7 @@ function SystemStatus() {
           }}>
             {systemMetrics.map((metric, index) => (
               <HStack key={index} justify="space-between" align="center">
-                <Typography variant="body" color="secondary" size="sm">
+                <Typography variant="body" color="text.secondary" size="sm">
                   {metric.label}
                 </Typography>
                 <Badge 
@@ -222,12 +222,12 @@ function SupportContact() {
         <Stack gap="md" align="center">
           <HStack gap="sm" align="center">
             <ExclamationTriangleIcon style={{ width: '20px', height: '20px', color: '#d69e2e' }} />
-            <Typography variant="title" color="primary">
+            <Typography variant="title" color="text.primary">
               Soporte Técnico
             </Typography>
           </HStack>
           
-          <Typography variant="body" color="muted" textAlign="center">
+          <Typography variant="body" color="text.muted" textAlign="center">
             ¿Problemas de acceso o funcionamiento del sistema?
           </Typography>
           
@@ -241,7 +241,7 @@ function SupportContact() {
               </Button>
             </HStack>
             
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               Soporte disponible: Lunes a Viernes 9:00 - 18:00
             </Typography>
           </Stack>
@@ -261,24 +261,24 @@ function AdminFooter() {
     }}>
       <Stack gap="sm" align="center">
         <HStack gap="md" justify="center">
-          <Typography variant="caption" color="muted">
+          <Typography variant="caption" color="text.muted">
             © 2025 G-Admin Sistema
           </Typography>
-          <Typography variant="caption" color="muted">
+          <Typography variant="caption" color="text.muted">
             •
           </Typography>
-          <Typography variant="caption" color="muted">
+          <Typography variant="caption" color="text.muted">
             Versión 2.0.1
           </Typography>
-          <Typography variant="caption" color="muted">
+          <Typography variant="caption" color="text.muted">
             •
           </Typography>
-          <Typography variant="caption" color="muted">
+          <Typography variant="caption" color="text.muted">
             Seguridad SSL/TLS
           </Typography>
         </HStack>
         
-        <Typography variant="caption" color="muted" textAlign="center">
+        <Typography variant="caption" color="text.muted" textAlign="center">
           Sistema de gestión empresarial para restaurantes y servicios gastronómicos
         </Typography>
       </Stack>

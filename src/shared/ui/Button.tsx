@@ -5,8 +5,10 @@ import type { InteractiveAccessibilityProps } from './types/accessibility'
 interface ButtonProps extends InteractiveAccessibilityProps {
   children: ReactNode
   variant?: 'solid' | 'outline' | 'ghost' | 'subtle'
-  colorPalette?: 'gray' | 'brand' | 'success' | 'warning' | 'error' | 'info'
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  colorPalette?: 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'cyan' | 'purple' | 'pink'
+  spinner?: ReactNode | undefined
+  spinnerPlacement?: 'start' | 'end' | undefined
+  size?: '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
   loading?: boolean
   disabled?: boolean
   onClick?: () => void
@@ -19,8 +21,10 @@ export function Button({
   variant = 'solid',
   colorPalette,
   size = 'md',
-  loading = false,
-  disabled = false,
+  spinner,
+  spinnerPlacement,
+  loading,
+  disabled,
   onClick,
   type = 'button',
   fullWidth = false,
@@ -39,6 +43,8 @@ export function Button({
       colorPalette={colorPalette}
       size={size}
       loading={loading}
+      spinner={spinner}
+      spinnerPlacement={spinnerPlacement}
       disabled={disabled}
       onClick={onClick}
       type={type}

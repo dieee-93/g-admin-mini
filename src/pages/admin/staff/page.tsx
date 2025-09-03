@@ -219,7 +219,7 @@ export default function StaffPage() {
                 setViewState(prev => ({ ...prev, activeTab: details.value as any }))
               }
             >
-              <Tabs.List bg="gray.50" p="1" borderRadius="lg">
+              <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
                 <Tabs.Trigger 
                   value="directory" 
                   gap="2" 

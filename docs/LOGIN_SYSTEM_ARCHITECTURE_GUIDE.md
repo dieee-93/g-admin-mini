@@ -560,7 +560,6 @@ export function logAdminAction(action: string, data: any, user: User) {
 - **Hybrid Systems**: Square POS, Toast
 
 ### Herramientas de Desarrollo
-- **Design System**: Storybook para componentes
 - **Testing**: Cypress para E2E, React Testing Library
 - **Performance**: Lighthouse, Web Vitals
 - **Security**: OWASP guidelines, security headers

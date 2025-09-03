@@ -59,7 +59,7 @@ export function PlanningSection() {
                     <Stack direction="row" justify="space-between">
                       <Stack direction="column" align="start" gap="xs">
                         <Typography weight="bold">{plan.item}</Typography>
-                        <Typography fontSize="sm" color="muted">
+                        <Typography fontSize="sm" color="text.muted">
                           {plan.quantity} unidades
                         </Typography>
                         <Stack direction="row" gap="sm">
@@ -96,10 +96,10 @@ export function PlanningSection() {
             <Typography variant="subtitle" size="sm">Resumen del Día</Typography>
             <Stack gap="lg" align="stretch">
               <Stack textAlign="center">
-                <Typography fontSize="2xl" weight="bold" color="accent">
+                <Typography fontSize="2xl" weight="bold" color="text.primary">
                   6
                 </Typography>
-                <Typography fontSize="sm" color="muted">
+                <Typography fontSize="sm" color="text.muted">
                   Planificaciones Hoy
                 </Typography>
               </Stack>
@@ -107,7 +107,7 @@ export function PlanningSection() {
                 <Typography fontSize="2xl" weight="bold" >
                   4h 30m
                 </Typography>
-                <Typography fontSize="sm" color="muted">
+                <Typography fontSize="sm" color="text.muted">
                   Tiempo Total Estimado
                 </Typography>
               </Stack>
@@ -115,7 +115,7 @@ export function PlanningSection() {
                 <Typography fontSize="2xl" weight="bold" >
                   85%
                 </Typography>
-                <Typography fontSize="sm" color="muted">
+                <Typography fontSize="sm" color="text.muted">
                   Cumplimiento Semanal
                 </Typography>
               </Stack>

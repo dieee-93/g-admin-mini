@@ -33,7 +33,7 @@ export function ThemeToggle() {
           options={themeOptions}
         />
       </Stack>
-      <Typography variant="caption" color="muted">
+      <Typography variant="caption" color="text.muted">
         {availableThemes.length} themes únicos disponibles con paletas profesionales y VSCode auténticas.
       </Typography>
     </Stack>

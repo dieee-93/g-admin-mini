@@ -68,11 +68,13 @@ export function Header() {
       top={0}
       right={0}
       left="3rem"
+      bg="bg.surface"
       borderBottom="1px solid"
+      borderColor="border.default"
       px="6"
       py="3"
       height="60px"
-      zIndex={1}
+      zIndex={1000}
       boxShadow="sm"
       width="auto"
       transition="opacity 0.2s ease"
@@ -81,12 +83,12 @@ export function Header() {
       }}
     >
       <Stack direction="row" justify="space-between" align="center" height="100%">
-        <Stack direction="row" align="center" gap="sm">
+        <Stack direction="row" align="center" gap="4">
           {/* Breadcrumb contextual inteligente - fades when sidebar expands */}
           <Stack 
             direction="row" 
             align="center" 
-            gap="sm"
+            gap="4"
             opacity={isSidebarHovered ? 0.3 : 1}
             transform={isSidebarHovered ? 'translateX(8px)' : 'translateX(0px)'}
             transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
@@ -95,7 +97,7 @@ export function Header() {
               variant="body"
               size="sm" 
               fontWeight="medium" 
-              color="secondary"
+              color="text.secondary"
               cursor="pointer"
               transition="color 0.2s ease"
               display={{ base: 'none', sm: 'block' }}
@@ -106,14 +108,14 @@ export function Header() {
             <Typography 
               variant="body"
               size="sm"
-              color="muted"
+              color="text.muted"
               display={{ base: 'none', sm: 'block' }}
             >/</Typography>
             <Typography 
               variant="body"
               size="sm" 
               fontWeight="semibold" 
-              color="primary"
+              color="text.primary"
             >
               {getHeaderTitle()}
             </Typography>
@@ -122,13 +124,13 @@ export function Header() {
                 <Typography 
                   variant="body"
                   size="sm"
-                  color="muted"
+                  color="text.muted"
                   display={{ base: 'none', md: 'block' }}
                 >·</Typography>
                 <Typography 
                   variant="body"
                   size="xs" 
-                  color="secondary"
+                  color="text.secondary"
                   fontStyle="italic"
                   display={{ base: 'none', md: 'block' }}
                   maxWidth={{ base: '150px', lg: '300px' }}
@@ -143,7 +145,7 @@ export function Header() {
           </Stack>
         </Stack>
 
-        <Stack direction="row" gap="sm">
+        <Stack direction="row" gap="4">
           {/* ✅ Connection Status integrado */}
           <ConnectionStatus />
 
@@ -182,7 +184,7 @@ export function Header() {
           <Menu.Root>
             <Menu.Trigger asChild>
               <Button variant="ghost" size="sm">
-                <Stack direction="row" gap="sm">
+                <Stack direction="row" gap="4">
                   <Avatar.Root size="sm">
                     <Avatar.Fallback name={(user as any)?.email || 'Usuario'} />
                   </Avatar.Root>
@@ -191,10 +193,10 @@ export function Header() {
                     flexDirection="column"
                     gap="none"
                   >
-                    <Typography variant="body" size="xs" fontWeight="medium" color="primary">
+                    <Typography variant="body" size="xs" fontWeight="medium" color="text.primary">
                       {(user as any)?.email || 'Usuario'}
                     </Typography>
-                    <Typography variant="body" size="xs" color="secondary">
+                    <Typography variant="body" size="xs" color="text.secondary">
                       {user?.role || 'Usuario'}
                     </Typography>
                   </Box>
@@ -266,7 +268,7 @@ export function Header() {
                           <Typography variant="body" size="sm" fontWeight="semibold">
                             {module.title}
                           </Typography>
-                          <Typography variant="body" size="xs" color="secondary">
+                          <Typography variant="body" size="xs" color="text.secondary">
                             {module.badge || 0} {(module.badge || 0) === 1 ? 'alerta' : 'alertas'} pendiente{(module.badge || 0) > 1 ? 's' : ''}
                           </Typography>
                         </Stack>
@@ -279,7 +281,7 @@ export function Header() {
                 }
                 
                 {totalBadges === 0 && (
-                  <Typography variant="body" size="sm" color="muted" textAlign="center" width="100%">
+                  <Typography variant="body" size="sm" color="text.muted" textAlign="center" width="100%">
                     No hay notificaciones pendientes
                   </Typography>
                 )}

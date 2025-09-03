@@ -104,15 +104,15 @@ export default function SalesPage() {
               Sistema de Ventas
             </Typography>
             <Stack direction="row" gap="sm">
-              <Badge variant="solid" >Live</Badge>
-              <Typography variant="body" size="sm" color="muted">
+              <Badge variant="solid">Live</Badge>
+              <Typography variant="body" size="sm" color="text.muted">
                 POS inteligente con gestión completa
               </Typography>
             </Stack>
           </Stack>
         </Stack>
         
-        <Button variant="solid" color="accent" size="lg">
+        <Button variant="solid" color="text.primary" size="lg">
           <PlusIcon className="w-5 h-5 mr-2" />
           Nueva Venta
         </Button>
@@ -121,21 +121,21 @@ export default function SalesPage() {
       {/* Module Content */}
       <Stack direction="column" gap="lg" p="lg">
         {/* POS System Card */}
-        <Card variant="elevated">
-          <Card.Header>
+        <CardWrapper variant="elevated">
+          <CardWrapper.Header>
             <Stack direction="row" align="center" gap="sm">
               <CreditCardIcon className="w-6 h-6 text-teal-600" />
               <Typography variant="heading" size="lg">Sistema POS</Typography>
-              <Badge variant="subtle" color="accent">Principal</Badge>
+              <Badge variant="subtle" color="text.primary">Principal</Badge>
             </Stack>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <Stack direction="column" gap="md">
               <Typography variant="body">
                 Sistema de punto de venta integrado con gestión de inventario en tiempo real.
               </Typography>
               <Stack direction="row" gap="md">
-                <Button variant="solid" >
+                <Button variant="solid">
                   Procesar Venta
                 </Button>
                 <Button variant="outline">
@@ -143,36 +143,36 @@ export default function SalesPage() {
                 </Button>
               </Stack>
             </Stack>
-          </Card.Body>
+          </CardWrapper.Body>
         </CardWrapper>
 
         {/* Quick Actions */}
         <Stack direction="row" gap="md">
-          <Card variant="outline" flex="1">
-            <Card.Body>
+          <CardWrapper variant="outline" flex="1">
+            <CardWrapper.Body>
               <Stack direction="row" align="center" gap="sm">
                 <TableCellsIcon className="w-5 h-5 text-blue-600" />
                 <Typography variant="body" weight="medium">Gestión de Mesas</Typography>
               </Stack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
-          <Card variant="outline" flex="1">
-            <Card.Body>
+          <CardWrapper variant="outline" flex="1">
+            <CardWrapper.Body>
               <Stack direction="row" align="center" gap="sm">
                 <QrCodeIcon className="w-5 h-5 text-green-600" />
                 <Typography variant="body" weight="medium">Códigos QR</Typography>
               </Stack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
-          <Card variant="outline" flex="1">
-            <Card.Body>
+          <CardWrapper variant="outline" flex="1">
+            <CardWrapper.Body>
               <Stack direction="row" align="center" gap="sm">
                 <ChartBarIcon className="w-5 h-5 text-purple-600" />
                 <Typography variant="body" weight="medium">Analytics</Typography>
               </Stack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
         </Stack>
       </Stack>

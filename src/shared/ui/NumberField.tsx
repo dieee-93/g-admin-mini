@@ -40,9 +40,9 @@ export function NumberField({
   return (
     <Field.Root invalid={!!error} required={required} disabled={disabled}>
       {label && (
-        <Field.Label {...themeLabelProps}>
+        <Field.Label fontSize="sm" fontWeight="medium">
           {label}
-          <Field.RequiredIndicator />
+          {required && <span style={{ marginLeft: '4px', color: 'var(--chakra-colors-error-500)' }}>*</span>}
         </Field.Label>
       )}
       <NumberInput.Root
@@ -56,7 +56,6 @@ export function NumberField({
         size={size}
         variant={variant}
         disabled={disabled}
-        {...themeProps}
       >
         <NumberInput.Input placeholder={placeholder} />
         <NumberInput.Control>
@@ -64,7 +63,7 @@ export function NumberField({
           <NumberInput.DecrementTrigger />
         </NumberInput.Control>
       </NumberInput.Root>
-      {error && <Field.ErrorText {...themeLabelProps}>{error}</Field.ErrorText>}
+      {error && <Field.ErrorText fontSize="sm" color="error.500">{error}</Field.ErrorText>}
     </Field.Root>
   )
 }

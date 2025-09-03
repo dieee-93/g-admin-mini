@@ -16,7 +16,7 @@
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-@keyframes logo-spin {
+@keyframes logo-spin {  
   from {
     transform: rotate(0deg);
   }
@@ -36,11 +36,4 @@
   padding: 2em;
 }
 
-.docs-text {
-  color: #888;
-}
-
-/* Clase para override puntual en casos especiales */
-.chakra-override {
-  /* Usar solo cuando sea absolutamente necesario */
-}
+/* Removed .docs-text color override - let Chakra handle colors */

@@ -115,7 +115,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
   return (
     <Card padding="lg" variant="outline">
       <Stack direction="row" justify="space-between" align="center" mb="lg">
-        <Typography variant="heading" size="md" color="accent">
+        <Typography variant="heading" size="md" color="text.primary">
           {isEditMode ? '✏️ Editar Cliente' : '👥 Nuevo Cliente'}
         </Typography>
         {isEditMode && (
@@ -128,12 +128,12 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
       <Stack direction="column" gap="lg" align="stretch">
         {/* Información básica */}
         <Stack direction="column" gap="sm">
-          <Typography size="sm" fontWeight="medium" color="muted">
+          <Typography size="sm" fontWeight="medium" color="text.muted">
             Información Básica
           </Typography>
           <Grid templateColumns={{ base: "1fr", md: "2fr 1fr" }} gap="md">
             <Stack direction="column" gap="xs">
-              <Typography size="sm" color="muted">Nombre completo *</Typography>
+              <Typography size="sm" color="text.muted">Nombre completo *</Typography>
               <input
                 type="text"
                 placeholder="Ej: Juan Pérez"
@@ -157,7 +157,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
             </Stack>
 
             <Stack direction="column" gap="xs">
-              <Typography size="sm" color="muted">Teléfono</Typography>
+              <Typography size="sm" color="text.muted">Teléfono</Typography>
               <input
                 type="text"
                 placeholder="Ej: +54 11 1234-5678"
@@ -184,12 +184,12 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
 
         {/* Contacto */}
         <Stack direction="column" gap="sm">
-          <Typography size="sm" fontWeight="medium" color="muted">
+          <Typography size="sm" fontWeight="medium" color="text.muted">
             Información de Contacto
           </Typography>
           <Stack direction="column" gap="md" align="stretch">
             <Stack direction="column" gap="xs">
-              <Typography size="sm" color="muted">Email</Typography>
+              <Typography size="sm" color="text.muted">Email</Typography>
               <input
                 type="email"
                 placeholder="Ej: juan@email.com"
@@ -213,7 +213,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
             </Stack>
             
             <Stack direction="column" gap="xs">
-              <Typography size="sm" color="muted">Dirección</Typography>
+              <Typography size="sm" color="text.muted">Dirección</Typography>
               <input
                 type="text"
                 placeholder="Ej: Av. Corrientes 1234, CABA"
@@ -238,11 +238,11 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
 
         {/* Notas adicionales */}
         <Stack direction="column" gap="sm">
-          <Typography size="sm" fontWeight="medium" color="muted">
+          <Typography size="sm" fontWeight="medium" color="text.muted">
             Información Adicional
           </Typography>
           <Stack direction="column" gap="xs">
-            <Typography size="sm" color="muted">Notas</Typography>
+            <Typography size="sm" color="text.muted">Notas</Typography>
             <textarea
               placeholder="Información adicional sobre el cliente..."
               name="note"

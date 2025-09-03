@@ -41,27 +41,27 @@ const sizeMap = {
 }
 
 const statusConfig = {
-  active: { colorPalette: 'success', text: 'Activo' },
+  active: { colorPalette: 'green', text: 'Activo' },
   inactive: { colorPalette: 'gray', text: 'Inactivo' },
-  pending: { colorPalette: 'warning', text: 'Pendiente' },
-  approved: { colorPalette: 'success', text: 'Aprobado' },
-  rejected: { colorPalette: 'error', text: 'Rechazado' },
+  pending: { colorPalette: 'orange', text: 'Pendiente' },
+  approved: { colorPalette: 'green', text: 'Aprobado' },
+  rejected: { colorPalette: 'red', text: 'Rechazado' },
   draft: { colorPalette: 'gray', text: 'Borrador' },
 }
 
 const stockConfig = {
-  good: { colorPalette: 'success', text: 'En Stock' },
-  low: { colorPalette: 'warning', text: 'Stock Bajo' },
-  critical: { colorPalette: 'error', text: 'Stock Crítico' },
-  out: { colorPalette: 'error', text: 'Agotado' },
-  excess: { colorPalette: 'info', text: 'Exceso' },
+  good: { colorPalette: 'green', text: 'En Stock' },
+  low: { colorPalette: 'orange', text: 'Stock Bajo' },
+  critical: { colorPalette: 'red', text: 'Stock Crítico' },
+  out: { colorPalette: 'red', text: 'Agotado' },
+  excess: { colorPalette: 'blue', text: 'Exceso' },
 }
 
 const priorityConfig = {
   low: { colorPalette: 'gray', text: 'Baja', icon: '⬇️' },
-  medium: { colorPalette: 'warning', text: 'Media', icon: '➡️' },
-  high: { colorPalette: 'error', text: 'Alta', icon: '⬆️' },
-  urgent: { colorPalette: 'error', text: 'Urgente', icon: '🔥' },
+  medium: { colorPalette: 'orange', text: 'Media', icon: '➡️' },
+  high: { colorPalette: 'red', text: 'Alta', icon: '⬆️' },
+  urgent: { colorPalette: 'red', text: 'Urgente', icon: '🔥' },
 }
 
 export function Badge({
@@ -231,9 +231,9 @@ export function RoleBadge({
   permissions?: string[]
 } & Omit<BadgeProps, 'colorPalette' | 'children'>) {
   const roleConfig = {
-    admin: { colorPalette: 'error', text: 'Administrador', icon: '👑' },
-    manager: { colorPalette: 'warning', text: 'Gerente', icon: '👨‍💼' },
-    employee: { colorPalette: 'info', text: 'Empleado', icon: '👷' },
+    admin: { colorPalette: 'red', text: 'Administrador', icon: '👑' },
+    manager: { colorPalette: 'orange', text: 'Gerente', icon: '👨‍💼' },
+    employee: { colorPalette: 'blue', text: 'Empleado', icon: '👷' },
     viewer: { colorPalette: 'gray', text: 'Visualizador', icon: '👁️' },
     guest: { colorPalette: 'gray', text: 'Invitado', icon: '👤' },
   }

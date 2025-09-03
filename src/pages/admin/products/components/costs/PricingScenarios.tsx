@@ -101,7 +101,7 @@ export function PricingScenarios({ calculations }: PricingScenariosProps) {
             </Card.Header>
             <Card.Body>
               <VStack gap={3} align="stretch">
-                <Box textAlign="center" p={3} bg="gray.50" borderRadius="md">
+                <Box textAlign="center" p={3} bg="bg.canvas" borderRadius="md">
                   <Text fontSize="xs" color="gray.600">Selling Price</Text>
                   <Text fontSize="2xl" fontWeight="bold">
                     ${scenario.price.toFixed(2)}

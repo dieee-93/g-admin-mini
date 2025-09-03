@@ -41,6 +41,7 @@ import {
 
 // Lazy-loaded modules for performance
 import {
+  LazySetupWizard,
   LazySalesPage,
   LazyOperationsPage,
   LazyStockLab,
@@ -174,6 +175,9 @@ function App() {
                             <AdminLoginPage />
                           </PublicOnlyRoute>
                         } />
+                        
+                        {/* 🔧 SETUP WIZARD - Configuration inicial del sistema */}
+                        <Route path="/setup" element={<LazySetupWizard />} />
                         
                         {/* 🏠 ADMIN - DASHBOARD */}
                         <Route path="/admin/dashboard" element={
@@ -451,7 +455,9 @@ function App() {
                   <AutoGlobalAlertsDisplay />
                   
                   {/* Performance monitoring widget */}
-                  {process.env.NODE_ENV === 'development' && <LazyLoadingMonitor />}
+                  {
+                  //process.env.NODE_ENV === 'development' && <LazyLoadingMonitor />
+                  }
                   
                   <Toaster />
                 </NavigationProvider>

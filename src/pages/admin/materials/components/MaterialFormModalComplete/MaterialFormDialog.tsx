@@ -389,8 +389,8 @@ export const MaterialFormDialog = () => {
       <Box w="full" mt="4">
         <Stack gap="2">
           <Flex justify="space-between" align="center">
-            <Text fontSize="sm" color="fg.muted">{currentStep}</Text>
-            <Text fontSize="sm" color="fg.muted">{progress}%</Text>
+            <Text fontSize="sm" color="text.muted">{currentStep}</Text>
+            <Text fontSize="sm" color="text.muted">{progress}%</Text>
           </Flex>
           <Progress.Root value={progress} size="sm" colorPalette="blue">
             <Progress.Track>
@@ -453,7 +453,7 @@ export const MaterialFormDialog = () => {
                       {isEditMode ? 'Editar Item' : 'Crear Nuevo Item'}
                     </Text>
                     {alertSummary.hasWarning && !alertSummary.hasCritical && (
-                      <Text fontSize="sm" color="fg.warning">
+                      <Text fontSize="sm" color="warning.500">
                         💡 {alerts.length} items necesitan reposición
                       </Text>
                     )}

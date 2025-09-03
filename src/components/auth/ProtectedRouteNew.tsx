@@ -30,11 +30,11 @@ export function ProtectedRouteNew({
         display="flex" 
         alignItems="center" 
         justifyContent="center"
-        bg={{ base: "gray.50", _dark: "gray.900" }}
+        bg="bg.canvas"
       >
         <VStack gap="4">
           <Spinner size="xl" color="blue.500" thickness="3px" />
-          <Text color={{ base: "gray.600", _dark: "gray.300" }}>
+          <Text color="text.secondary">
             Verificando autenticación...
           </Text>
         </VStack>
@@ -61,13 +61,13 @@ export function ProtectedRouteNew({
           <Text fontSize="xl" fontWeight="bold" color="red.500">
             Acceso Denegado
           </Text>
-          <Text color={{ base: "gray.600", _dark: "gray.300" }}>
+          <Text color="text.secondary">
             No tienes permisos suficientes para acceder a esta página.
           </Text>
-          <Text fontSize="sm" color={{ base: "gray.500", _dark: "gray.400" }}>
+          <Text fontSize="sm" color="text.muted">
             Tu rol: {user?.role || 'Sin rol asignado'}
           </Text>
-          <Text fontSize="sm" color={{ base: "gray.500", _dark: "gray.400" }}>
+          <Text fontSize="sm" color="text.muted">
             Roles requeridos: {requiredRoles?.join(', ')}
           </Text>
         </VStack>

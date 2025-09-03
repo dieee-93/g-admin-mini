@@ -242,7 +242,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 {!loading && analytics?.topPerformingRecipes.length ? (
                   <VStack align="stretch" gap={2}>
                     {analytics.topPerformingRecipes.slice(0, 3).map((recipe) => (
-                      <HStack key={recipe.id} justify="space-between" p={2} bg="gray.50" borderRadius="md">
+                      <HStack key={recipe.id} justify="space-between" p={2} bg="bg.canvas" borderRadius="md">
                         <VStack align="start" gap={0}>
                           <Text fontSize="sm" fontWeight="medium" css={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {recipe.name}
@@ -341,7 +341,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
         </Card.Root>
 
         {/* Action Center */}
-        <Card.Root bg="gray.50">
+        <Card.Root bg="bg.canvas">
           <Card.Body p={4}>
             <HStack justify="center" gap={4}>
               <Button 

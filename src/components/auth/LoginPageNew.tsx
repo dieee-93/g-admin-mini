@@ -113,7 +113,7 @@ export function LoginPageNew() {
       display="flex" 
       alignItems="center" 
       justifyContent="center"
-      bg={{ base: "brand.50", _dark: "gray.900" }}
+      bg="bg.canvas"
       p="md"
       position="relative"
     >        

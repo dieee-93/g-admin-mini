@@ -1,7 +1,14 @@
 import { useEffect } from 'react';
 import { 
-  Layout, Stack, Typography, CardWrapper, Button, Modal, Alert, Badge 
+  ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
+  Button, Alert, Badge 
 } from '@/shared/ui';
+import { 
+  CubeIcon, 
+  ExclamationTriangleIcon, 
+  CurrencyDollarIcon, 
+  BuildingStorefrontIcon 
+} from '@heroicons/react/24/outline';
 
 // Module components - Temporariamente comentados para evitar errores de compilación
 // import { MaterialsHeader } from './components/MaterialsHeader';
@@ -107,77 +114,78 @@ function MaterialsPage() {
 
   if (error) {
     return (
-      <Layout variant="panel">
-        <Stack direction="column" gap="md" p="lg">
-          <Alert status="error" title="Error de carga">
-            {error}
-          </Alert>
-          <Button onClick={() => window.location.reload()}>
-            Recargar página
-          </Button>
-        </Stack>
-      </Layout>
+      <ContentLayout>
+        <Alert status="error" title="Error de carga">
+          {error}
+        </Alert>
+        <Button onClick={() => window.location.reload()}>
+          Recargar página
+        </Button>
+      </ContentLayout>
     );
   }
 
   return (
-    <Layout variant="panel">
-      {/* Page Header */}
-      <Stack direction="row" justify="space-between" align="center" p="lg">
-        <Typography variant="heading" size="xl">
-          Gestión de Materiales
-        </Typography>
-        <Button variant="solid" color="accent" onClick={handleAddItem}>
-          Nuevo Material
-        </Button>
-      </Stack>
+    <ContentLayout>
+      <PageHeader 
+        title="Gestión de Materiales"
+        subtitle="Control de inventario y materias primas"
+        icon={CubeIcon}
+        actions={<Button variant="solid" onClick={handleAddItem}>Nuevo Material</Button>}
+      />
 
-      {/* Module Content */}
-      <Stack direction="column" gap="lg" p="lg">
-        {/* Temporary simplified content */}
-        <Card variant="elevated">
-          <Card.Header>
-            <Typography variant="heading" size="lg">
-              Materials Overview
-            </Typography>
-          </Card.Header>
-          <Card.Body>
-            <Stack direction="column" gap="md">
-              <Typography variant="body">
-                Items en inventario: {items.length}
-              </Typography>
-              <Typography variant="body" color="muted">
-                Sistema de gestión de materiales funcionando correctamente.
-              </Typography>
-              {loading && (
-                <Alert status="info" title="Cargando datos">
-                  Cargando información del inventario...
-                </Alert>
-              )}
-            </Stack>
-          </Card.Body>
-        </CardWrapper>
+      <StatsSection>
+        <CardGrid columns={{ base: 1, md: 4 }}>
+          <MetricCard 
+            title="Total Items"
+            value={items.length.toString()}
+            subtitle="en inventario"
+            icon={CubeIcon}
+          />
+          <MetricCard 
+            title="Stock Bajo"
+            value="-"
+            subtitle="requiere atención"
+            icon={ExclamationTriangleIcon}
+          />
+          <MetricCard 
+            title="Valor Total"
+            value="-"
+            subtitle="del inventario"
+            icon={CurrencyDollarIcon}
+          />
+          <MetricCard 
+            title="Proveedores"
+            value="-"
+            subtitle="activos"
+            icon={BuildingStorefrontIcon}
+          />
+        </CardGrid>
+      </StatsSection>
 
-        {/* Quick Actions */}
-        <Card variant="elevated">
-          <Card.Header>
-            <Typography variant="heading" size="md">
-              Acciones Rápidas
-            </Typography>
-          </Card.Header>
-          <Card.Body>
-            <Stack direction="row" gap="md">
-              <Button variant="solid" color="accent" onClick={handleAddItem}>
-                Agregar Material
-              </Button>
-              <Button variant="outline" onClick={() => loadInventoryData()}>
-                Actualizar Datos
-              </Button>
-            </Stack>
-          </Card.Body>
-        </CardWrapper>
-      </Stack>
-    </Layout>
+      <Section variant="elevated" title="Inventario de Materiales">
+        <div>
+          <p>Items en inventario: {items.length}</p>
+          <p>Sistema de gestión de materiales funcionando correctamente.</p>
+          {loading && (
+            <Alert status="info" title="Cargando datos">
+              Cargando información del inventario...
+            </Alert>
+          )}
+        </div>
+      </Section>
+
+      <Section variant="default" title="Acciones Rápidas">
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <Button variant="solid" onClick={handleAddItem}>
+            Agregar Material
+          </Button>
+          <Button variant="outline" onClick={() => loadInventoryData()}>
+            Actualizar Datos
+          </Button>
+        </div>
+      </Section>
+    </ContentLayout>
   );
 }
 

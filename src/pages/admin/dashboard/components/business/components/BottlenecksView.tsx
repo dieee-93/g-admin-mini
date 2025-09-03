@@ -102,7 +102,7 @@ export function BottlenecksView({ bottlenecks }: BottlenecksViewProps) {
               </VStack>
 
               {/* Impact */}
-              <SimpleGrid columns={3} gap={4} bg="gray.50" p={3} borderRadius="md">
+              <SimpleGrid columns={3} gap={4} bg="bg.canvas" p={3} borderRadius="md">
                 <VStack>
                   <Text fontSize="xs" color="gray.600">Impacto Financiero</Text>
                   <Text fontSize="sm" fontWeight="bold" color="red.600">

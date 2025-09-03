@@ -32,7 +32,7 @@ export const TypeSelector = ({
         renderItem={(item) => (
           <Stack gap="1">
             <Text>{item.label}</Text>
-            <Text fontSize="xs" color="fg.muted">{item.description}</Text>
+            <Text fontSize="xs" color="text.muted">{item.description}</Text>
           </Stack>
         )}
       />

@@ -306,7 +306,7 @@ const OfflineFiscalView: React.FC = () => {
                 </HStack>
               </Badge>
 
-              <Typography variant="body" color="muted">
+              <Typography variant="body" color="text.muted">
                 Sistema fiscal funcionando offline. Las facturas se sincronizarán automáticamente.
               </Typography>
 
@@ -355,7 +355,7 @@ const OfflineFiscalView: React.FC = () => {
                 <Typography variant="title">
                   {fiscalStats.pendingInvoices}
                 </Typography>
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Facturas Pendientes
                 </Typography>
               </VStack>
@@ -369,7 +369,7 @@ const OfflineFiscalView: React.FC = () => {
                 <Typography variant="title">
                   {fiscalStats.queuedForAfip}
                 </Typography>
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Cola AFIP
                 </Typography>
               </VStack>
@@ -383,7 +383,7 @@ const OfflineFiscalView: React.FC = () => {
                 <Typography variant="title">
                   ${fiscalStats.totalAmount.toLocaleString()}
                 </Typography>
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Total Pendiente
                 </Typography>
               </VStack>
@@ -397,7 +397,7 @@ const OfflineFiscalView: React.FC = () => {
                 <Typography variant="title">
                   {fiscalStats.syncErrors}
                 </Typography>
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Errores de Sync
                 </Typography>
               </VStack>
@@ -461,13 +461,13 @@ const OfflineFiscalView: React.FC = () => {
                           </HStack>
                           
                           <HStack gap="sm">
-                            <Typography variant="caption" color="muted">{invoice.client.name}</Typography>
-                            <Typography variant="caption" color="muted">•</Typography>
-                            <Typography variant="caption" color="muted">{invoice.type}</Typography>
-                            <Typography variant="caption" color="muted">•</Typography>
-                            <Typography variant="caption" color="muted">${invoice.amounts.total.toLocaleString()}</Typography>
-                            <Typography variant="caption" color="muted">•</Typography>
-                            <Typography variant="caption" color="muted">{new Date(invoice.timestamp).toLocaleString()}</Typography>
+                            <Typography variant="caption" color="text.muted">{invoice.client.name}</Typography>
+                            <Typography variant="caption" color="text.muted">•</Typography>
+                            <Typography variant="caption" color="text.muted">{invoice.type}</Typography>
+                            <Typography variant="caption" color="text.muted">•</Typography>
+                            <Typography variant="caption" color="text.muted">${invoice.amounts.total.toLocaleString()}</Typography>
+                            <Typography variant="caption" color="text.muted">•</Typography>
+                            <Typography variant="caption" color="text.muted">{new Date(invoice.timestamp).toLocaleString()}</Typography>
                           </HStack>
 
                           {invoice.errorMessage && (
@@ -478,9 +478,9 @@ const OfflineFiscalView: React.FC = () => {
 
                           {showAdvanced && (
                             <VStack align="start" gap="xs">
-                              <Typography variant="caption" color="muted">Subtotal: ${invoice.amounts.subtotal.toFixed(2)}</Typography>
-                              <Typography variant="caption" color="muted">IVA: ${invoice.amounts.ivaAmount.toFixed(2)}</Typography>
-                              <Typography variant="caption" color="muted">Intentos AFIP: {invoice.afipAttempts}</Typography>
+                              <Typography variant="caption" color="text.muted">Subtotal: ${invoice.amounts.subtotal.toFixed(2)}</Typography>
+                              <Typography variant="caption" color="text.muted">IVA: ${invoice.amounts.ivaAmount.toFixed(2)}</Typography>
+                              <Typography variant="caption" color="text.muted">Intentos AFIP: {invoice.afipAttempts}</Typography>
                             </VStack>
                           )}
                         </VStack>
@@ -521,8 +521,8 @@ const OfflineFiscalView: React.FC = () => {
             {offlineInvoices.length === 0 && (
               <VStack gap="md" align="center">
                 <DocumentTextIcon className="w-12 h-12 opacity-50" />
-                <Typography variant="body" color="muted">No hay facturas offline disponibles</Typography>
-                <Typography variant="caption" color="muted">Las facturas aparecerán aquí cuando se generen sin conexión</Typography>
+                <Typography variant="body" color="text.muted">No hay facturas offline disponibles</Typography>
+                <Typography variant="caption" color="text.muted">Las facturas aparecerán aquí cuando se generen sin conexión</Typography>
               </VStack>
             )}
           </VStack>

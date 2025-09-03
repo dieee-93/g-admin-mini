@@ -101,7 +101,7 @@ export function CustomerPortal() {
               
               <VStack gap={3} align="stretch">
                 {/* Ejemplo de pedido reciente */}
-                <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="md">
+                <Box p={4} border="1px solid" borderColor="border.default" borderRadius="md">
                   <HStack justify="space-between">
                     <VStack align="start" gap={1}>
                       <Text fontWeight="medium">#ORD-2024-001</Text>
@@ -114,7 +114,7 @@ export function CustomerPortal() {
                   </HStack>
                 </Box>
                 
-                <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="md">
+                <Box p={4} border="1px solid" borderColor="border.default" borderRadius="md">
                   <HStack justify="space-between">
                     <VStack align="start" gap={1}>
                       <Text fontWeight="medium">#ORD-2024-002</Text>

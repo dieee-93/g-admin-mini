@@ -707,7 +707,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
       <Card.Root>
         <Card.Body p="0">
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
-            <Tabs.List bg="gray.50" p="1" borderRadius="lg">
+            <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="clock" gap="2" flex="1" minH="44px">
                 <ClockIcon className="w-5 h-5" />
                 <Text display={{ base: "none", sm: "block" }}>Clock</Text>

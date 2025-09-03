@@ -17,6 +17,41 @@ export interface RouteConfig {
   showInNav?: boolean;
 }
 
+// 🔧 RUTAS DE CONFIGURACIÓN INICIAL
+export const setupRoutes: RouteConfig[] = [
+  {
+    path: '/setup',
+    component: 'SetupWizard',
+    title: 'Configuración Inicial',
+    icon: 'CogIcon',
+    showInNav: false
+  },
+  {
+    path: '/setup/company',
+    component: 'CompanyConfigurationStep',
+    title: 'Configuración de Empresa',
+    showInNav: false
+  },
+  {
+    path: '/setup/admin',
+    component: 'AdminUserCreationStep',
+    title: 'Crear Usuario Administrador',
+    showInNav: false
+  },
+  {
+    path: '/setup/data',
+    component: 'BasicDataImportStep',
+    title: 'Importar Datos Básicos',
+    showInNav: false
+  },
+  {
+    path: '/setup/tutorial',
+    component: 'OnboardingTutorialStep',
+    title: 'Tutorial de Introducción',
+    showInNav: false
+  }
+];
+
 // 🔧 RUTAS ADMINISTRATIVAS
 export const adminRoutes: RouteConfig[] = [
   {
@@ -238,6 +273,7 @@ export const getAllRoutes = (): RouteConfig[] => {
 
   return [
     ...publicRoutes,
+    ...setupRoutes,
     ...flattenRoutes(adminRoutes),
     ...flattenRoutes(appRoutes)
   ];

@@ -1,17 +1,17 @@
 import React from 'react';
-import { Box, VStack, Text } from '@chakra-ui/react';
+import { Section, Stack, Typography } from '@/shared/ui';
 
 export function OfflineMaterialsPage() {
   return (
-    <Box p={6}>
-      <VStack gap={4} align="start">
-        <Text fontSize="2xl" fontWeight="bold">
+    <Section variant="default">
+      <Stack gap="md" align="start">
+        <Typography variant="heading" size="2xl" weight="bold">
           Materials - Offline Mode
-        </Text>
-        <Text color="gray.600">
+        </Typography>
+        <Typography variant="body" color="text.muted">
           You are currently offline. Basic materials functionality is available.
-        </Text>
-      </VStack>
-    </Box>
+        </Typography>
+      </Stack>
+    </Section>
   );
 }

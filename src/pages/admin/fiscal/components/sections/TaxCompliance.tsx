@@ -279,7 +279,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
                 <VStack gap="xs">
                   <Typography variant="body" size="sm">{period.period}</Typography>
                   {getStatusBadge(period.status)}
-                  <Typography variant="caption" color="muted">
+                  <Typography variant="caption" color="text.muted">
                     Vence: {formatDate(period.dueDate)}
                   </Typography>
                 </VStack>
@@ -336,7 +336,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
             <Typography variant="display" size="lg" color="success">
               {taxPeriods.filter(p => p.status === 'presentado').length}
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               de {taxPeriods.length} períodos
             </Typography>
           </VStack>
@@ -353,7 +353,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
             <Typography variant="display" size="lg" color="warning">
               {taxPeriods.filter(p => p.status === 'pendiente').length}
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               próximos vencimientos
             </Typography>
           </VStack>
@@ -370,7 +370,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
             <Typography variant="display" size="lg" color="error">
               {taxPeriods.filter(p => p.status === 'vencido').length}
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               requieren atención
             </Typography>
           </VStack>
@@ -391,7 +391,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
                   .reduce((sum, r) => sum + (r.saldo_a_pagar || 0), 0)
               )}
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               este año
             </Typography>
           </VStack>
@@ -448,7 +448,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
                           </Badge>
                         </Table.Cell>
                         <Table.Cell>
-                          <Typography variant="body" color="muted">
+                          <Typography variant="body" color="text.muted">
                             {formatDate(period.dueDate)}
                           </Typography>
                         </Table.Cell>
@@ -524,7 +524,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
                           {getStatusBadge(report.presentado ? 'presentado' : 'pendiente')}
                         </Table.Cell>
                         <Table.Cell>
-                          <Typography variant="body" color="muted">
+                          <Typography variant="body" color="text.muted">
                             {report.fecha_presentacion ? formatDate(report.fecha_presentacion) : '-'}
                           </Typography>
                         </Table.Cell>

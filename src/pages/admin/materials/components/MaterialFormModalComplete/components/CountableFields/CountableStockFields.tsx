@@ -51,7 +51,7 @@ export const CountableStockFields = ({
             <Text fontWeight="semibold" color="green.700">
               💰 Configuración de Stock y Precios
             </Text>
-            <Text fontSize="sm" color="fg.muted">
+            <Text fontSize="sm" color="text.muted">
               {usePackaging ? 
                 'Ingresa la cantidad de paquetes y el precio total de tu compra' :
                 'Ingresa la cantidad de unidades y el precio total de tu compra'
@@ -102,7 +102,7 @@ export const CountableStockFields = ({
                         <Box 
                           height="44px"
                           px="3"
-                          bg="gray.50"
+                          bg="bg.canvas"
                           border="1px solid"
                           borderColor="border"
                           borderLeft="0"
@@ -110,13 +110,13 @@ export const CountableStockFields = ({
                           display="flex"
                           alignItems="center"
                           fontSize="sm"
-                          color="fg.muted"
+                          color="text.muted"
                           fontWeight="medium"
                         >
                           {formData.packaging.package_unit}s
                         </Box>
                       </Flex>
-                      <Text fontSize="xs" color="fg.muted" mt="1">
+                      <Text fontSize="xs" color="text.muted" mt="1">
                         = {(packageQuantity * (formData.packaging?.package_size || 0)).toLocaleString()} unidades totales
                       </Text>
                     </Field.Root>
@@ -129,7 +129,7 @@ export const CountableStockFields = ({
                         <Box 
                           height="44px"
                           px="3"
-                          bg="gray.50"
+                          bg="bg.canvas"
                           border="1px solid"
                           borderColor="border"
                           borderRight="0"
@@ -137,7 +137,7 @@ export const CountableStockFields = ({
                           display="flex"
                           alignItems="center"
                           fontSize="sm"
-                          color="fg.muted"
+                          color="text.muted"
                           fontWeight="medium"
                         >
                           $
@@ -167,7 +167,7 @@ export const CountableStockFields = ({
                         <Box 
                           height="44px"
                           px="3"
-                          bg="gray.50"
+                          bg="bg.canvas"
                           border="1px solid"
                           borderColor="border"
                           borderLeft="0"
@@ -175,13 +175,13 @@ export const CountableStockFields = ({
                           display="flex"
                           alignItems="center"
                           fontSize="sm"
-                          color="fg.muted"
+                          color="text.muted"
                           fontWeight="medium"
                         >
                           ARS
                         </Box>
                       </Flex>
-                      <Text fontSize="xs" color="fg.muted" mt="1">
+                      <Text fontSize="xs" color="text.muted" mt="1">
                         ≈ ${FormCalculations.formatCurrency((formData.unit_cost || 0) / packageQuantity)} por {formData.packaging.package_unit}
                       </Text>
                       <Field.ErrorText>{errors.unit_cost}</Field.ErrorText>
@@ -230,7 +230,7 @@ export const CountableStockFields = ({
                         <Box 
                           height="44px"
                           px="3"
-                          bg="gray.50"
+                          bg="bg.canvas"
                           border="1px solid"
                           borderColor="border"
                           borderLeft="0"
@@ -238,7 +238,7 @@ export const CountableStockFields = ({
                           display="flex"
                           alignItems="center"
                           fontSize="sm"
-                          color="fg.muted"
+                          color="text.muted"
                           fontWeight="medium"
                         >
                           unidades
@@ -255,7 +255,7 @@ export const CountableStockFields = ({
                         <Box 
                           height="44px"
                           px="3"
-                          bg="gray.50"
+                          bg="bg.canvas"
                           border="1px solid"
                           borderColor="border"
                           borderRight="0"
@@ -263,7 +263,7 @@ export const CountableStockFields = ({
                           display="flex"
                           alignItems="center"
                           fontSize="sm"
-                          color="fg.muted"
+                          color="text.muted"
                           fontWeight="medium"
                         >
                           $
@@ -293,7 +293,7 @@ export const CountableStockFields = ({
                         <Box 
                           height="44px"
                           px="3"
-                          bg="gray.50"
+                          bg="bg.canvas"
                           border="1px solid"
                           borderColor="border"
                           borderLeft="0"
@@ -301,13 +301,13 @@ export const CountableStockFields = ({
                           display="flex"
                           alignItems="center"
                           fontSize="sm"
-                          color="fg.muted"
+                          color="text.muted"
                           fontWeight="medium"
                         >
                           ARS
                         </Box>
                       </Flex>
-                      <Text fontSize="xs" color="fg.muted" mt="1">
+                      <Text fontSize="xs" color="text.muted" mt="1">
                         ≈ ${FormCalculations.formatCurrency((formData.unit_cost || 0) / (formData.initial_stock || 1))} por unidad
                       </Text>
                       <Field.ErrorText>{errors.unit_cost}</Field.ErrorText>

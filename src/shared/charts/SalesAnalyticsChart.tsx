@@ -2,7 +2,7 @@
 // Sales analytics and trends chart component
 
 import React from 'react';
-import { Box, CardWrapper, Text, VStack, HStack, Badge } from '@chakra-ui/react';
+import { Box, Card, Text, VStack, HStack, Badge } from '@chakra-ui/react';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 
 interface SalesData {
@@ -85,7 +85,7 @@ export default function SalesAnalyticsChart({
             alignItems="center" 
             justifyContent="center"
             border="2px dashed"
-            borderColor="gray.200"
+            borderColor="border.default"
             borderRadius="md"
           >
             <VStack gap={2}>

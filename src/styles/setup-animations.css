@@ -1,0 +1,230 @@
+/* Setup Wizard Animation Keyframes */
+
+@keyframes fadeInShake {
+  0% { 
+    opacity: 0; 
+    transform: translateX(-10px); 
+  }
+  60% { 
+    transform: translateX(5px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes fadeInLeft {
+  from { 
+    opacity: 0; 
+    transform: translateX(-10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes fadeInScale {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes slideInRight {
+  from { 
+    opacity: 0; 
+    transform: translateX(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.02); 
+  }
+}
+
+@keyframes shimmer {
+  0% { 
+    background-position: -200px 0; 
+  }
+  100% { 
+    background-position: calc(200px + 100%) 0; 
+  }
+}
+
+/* Utility classes for setup components */
+.setup-fade-in {
+  animation: fadeInUp 0.5s ease both;
+}
+
+.setup-slide-in {
+  animation: slideInRight 0.4s ease both;
+}
+
+.setup-scale-in {
+  animation: fadeInScale 0.3s ease both;
+}
+
+.setup-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.setup-loading-shimmer {
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.2) 50%, 
+    rgba(255,255,255,0) 100%
+  );
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Smooth transitions for interactive elements */
+.setup-interactive {
+  transition: all 0.2s ease;
+}
+
+.setup-interactive:hover {
+  transform: translateY(-2px);
+}
+
+.setup-interactive:active {
+  transform: translateY(0);
+}
+
+/* Loading states */
+.setup-loading {
+  opacity: 0.6;
+  pointer-events: none;
+  filter: blur(0.5px);
+  transition: all 0.3s ease;
+}
+
+/* Form field animations */
+.setup-form-field {
+  transition: all 0.2s ease;
+}
+
+.setup-form-field:focus-within {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* Step transition animations */
+.setup-step-enter {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.setup-step-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+
+.setup-step-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.setup-step-exit-active {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.3s ease;
+}
+
+/* Progress bar animations */
+.setup-progress-bar {
+  transition: width 0.4s ease;
+}
+
+.setup-progress-step {
+  transition: all 0.3s ease;
+}
+
+.setup-progress-step.active {
+  transform: scale(1.05);
+}
+
+/* Button hover effects */
+.setup-button-primary {
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.setup-button-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255,255,255,0.2), 
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.setup-button-primary:hover::before {
+  left: 100%;
+}
+
+/* Error animations */
+.setup-error {
+  animation: fadeInShake 0.5s ease;
+}
+
+/* Success animations */
+.setup-success {
+  animation: fadeInScale 0.4s ease;
+}
+
+/* Card hover effects */
+.setup-card {
+  transition: all 0.2s ease;
+}
+
+.setup-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+/* Developer controls animations */
+.setup-dev-controls {
+  animation: slideInRight 0.3s ease;
+}
+
+.setup-dev-button {
+  transition: all 0.15s ease;
+}
+
+.setup-dev-button:hover {
+  transform: scale(1.05);
+}

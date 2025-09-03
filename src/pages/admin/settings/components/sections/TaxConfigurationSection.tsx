@@ -5,15 +5,16 @@ import {
   CurrencyDollarIcon, 
   DocumentTextIcon,
   CalculatorIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  BanknotesIcon,
+  ChartBarIcon,
+  DocumentCheckIcon,
+  CogIcon
 } from "@heroicons/react/24/outline";
 import { Icon } from "@/shared/ui/Icon";
-import { Typography } from "@/shared/ui/Typography";
-import { CardWrapper } from "@/shared/ui/CardWrapper";
-import { Stack } from "@/shared/ui/Stack";
-import { SimpleGrid } from "@/shared/ui/Grid";
-import { Button } from "@/shared/ui/Button";
-import { Badge } from "@/shared/ui/Badge";
+import { Typography, CardWrapper, Section, Stack, SimpleGrid, Button, Badge, MetricCard, ActionButton, Alert } from "@/shared/ui";
 
 export function TaxConfigurationSection() {
   const taxSettings = {
@@ -34,9 +35,9 @@ export function TaxConfigurationSection() {
   ];
 
   return (
-    <Stack gap="xl">
-      <Stack direction={{ base: "column", sm: "row" }} justify="space-between" align={{ base: "stretch", sm: "center" }} gap="md">
-        <Typography variant="heading" size="lg">Configuración Fiscal</Typography>
+    <Section variant="elevated" title="Configuración Fiscal">
+      <Stack direction={{ base: "column", sm: "row" }} justify="space-between" align={{ base: "stretch", sm: "center" }} gap="md" mb="xl">
+        <div />
         <Button colorPalette="success" size="sm">
           <Icon icon={DocumentTextIcon} size="sm" />
           Generar Reporte Fiscal
@@ -47,46 +48,70 @@ export function TaxConfigurationSection() {
         {/* Tax Configuration */}
         <CardWrapper>
           <CardWrapper.Header>
-            <Stack direction="row" align="center" gap="sm">
-              <Icon icon={CurrencyDollarIcon} size="md" />
-              <Typography variant="heading" size="md">Configuración de Impuestos</Typography>
+            <Stack direction="row" justify="space-between" align="center">
+              <CardWrapper.Title>Configuración de Impuestos</CardWrapper.Title>
+              <Badge variant="solid" colorPalette="blue">
+                <Icon icon={CheckCircleIcon} size="xs" />
+                Configurado
+              </Badge>
             </Stack>
           </CardWrapper.Header>
           <CardWrapper.Body>
-            <Stack gap="md">
-            
-            <Stack gap="md">
-              <Stack direction="row" justify="space-between" align="center">
-                <Typography variant="body" size="sm">Tipo de Impuesto Principal</Typography>
-                <Badge colorPalette="info" size="lg">
-                  {taxSettings.taxName} {taxSettings.mainTaxRate}%
-                </Badge>
-              </Stack>
+            <Stack gap="lg">
+              {/* Main Tax Rate - Featured */}
+              <MetricCard
+                title="IVA Principal"
+                value={`${taxSettings.mainTaxRate}%`}
+                subtitle="Tasa aplicada por defecto"
+                icon={CurrencyDollarIcon}
+                colorPalette="green"
+                badge={{
+                  value: "Activo",
+                  colorPalette: "green"
+                }}
+              />
               
-              <Stack direction="row" justify="space-between" align="center">
-                <Typography variant="body" size="sm">Número de Identificación Fiscal</Typography>
-                <Typography variant="body" size="sm" fontWeight="medium">{taxSettings.taxNumber}</Typography>
-              </Stack>
+              {/* Tax Details */}
+              <Stack direction="column" gap="md">
+                <Typography variant="subtitle" weight="semibold" color="text.muted">Detalles Fiscales</Typography>
+                
+                <Stack direction="column" gap="sm">
+                  {/* Tax ID */}
+                  <Stack direction="row" align="center" gap="sm" p="sm" bg="blue.50" borderRadius="md">
+                    <Icon icon={DocumentCheckIcon} size="md" color="blue.500" />
+                    <Stack gap="xs">
+                      <Typography variant="caption" color="text.secondary">Número de Identificación Fiscal</Typography>
+                      <Typography variant="body" weight="medium">{taxSettings.taxNumber}</Typography>
+                    </Stack>
+                  </Stack>
 
-              <Stack direction="row" justify="space-between" align="center">
-                <Typography variant="body" size="sm">Moneda Base</Typography>
-                <Stack direction="row" align="center" gap="sm">
-                  <Typography variant="body" size="sm" fontWeight="medium">{taxSettings.currency}</Typography>
-                  <Badge colorPalette="gray">{taxSettings.currencySymbol}</Badge>
-                </Stack>
-              </Stack>
+                  {/* Currency */}
+                  <Stack direction="row" align="center" gap="sm" p="sm" bg="purple.50" borderRadius="md">
+                    <Icon icon={BanknotesIcon} size="md" color="purple.500" />
+                    <Stack gap="xs" flex="1">
+                      <Typography variant="caption" color="text.secondary">Moneda Base</Typography>
+                      <Stack direction="row" align="center" gap="sm">
+                        <Typography variant="body" weight="medium">{taxSettings.currency}</Typography>
+                        <Badge colorPalette="purple" variant="outline">{taxSettings.currencySymbol}</Badge>
+                      </Stack>
+                    </Stack>
+                  </Stack>
 
-              <Stack direction="row" justify="space-between" align="center">
-                <Stack gap="none">
-                  <Typography variant="body" size="sm">Incluir Impuestos en Precios</Typography>
-                  <Typography variant="body" size="xs" color="secondary">
-                    Los precios mostrados incluyen impuestos
-                  </Typography>
+                  {/* Tax Inclusion Setting */}
+                  <Stack direction="row" align="center" gap="sm" p="sm" bg="bg.surface" borderRadius="md">
+                    <Icon icon={CogIcon} size="md" color="text.secondary" />
+                    <Stack gap="xs" flex="1">
+                      <Typography variant="body" size="sm" weight="medium">Incluir Impuestos en Precios</Typography>
+                      <Typography variant="body" size="xs" color="text.secondary">
+                        Los precios mostrados incluyen impuestos
+                      </Typography>
+                    </Stack>
+                    <Switch 
+                      checked={taxSettings.includeTaxInPrices}
+                      colorPalette={taxSettings.includeTaxInPrices ? "green" : "gray"}
+                    />
+                  </Stack>
                 </Stack>
-                <Switch 
-                  checked={taxSettings.includeTaxInPrices}
-                  
-                />
               </Stack>
             </Stack>
           </CardWrapper.Body>
@@ -95,61 +120,193 @@ export function TaxConfigurationSection() {
         {/* Tax Categories */}
         <CardWrapper>
           <CardWrapper.Header>
-            <Stack direction="row" align="center" gap="sm">
-              <Icon icon={CalculatorIcon} size="md" />
-              <Typography variant="heading" size="md">Categorías Fiscales</Typography>
+            <Stack direction="row" justify="space-between" align="center">
+              <CardWrapper.Title>Categorías Fiscales</CardWrapper.Title>
+              <Badge variant="subtle" colorPalette="orange">
+                <Icon icon={ChartBarIcon} size="xs" />
+                {taxCategories.length} tipos
+              </Badge>
             </Stack>
           </CardWrapper.Header>
           <CardWrapper.Body>
             <Stack gap="md">
-            
-            <Stack gap="sm">
-              {taxCategories.map((category, index) => (
-                <CardWrapper key={index} variant="subtle" size="sm" >
-                  <Stack direction="row" justify="space-between" align="center">
-                    <Stack gap="none">
-                      <Typography variant="body" size="sm" fontWeight="medium">
-                        {category.name}
-                      </Typography>
-                      <Typography variant="body" size="xs" color="secondary">
-                        {category.items} productos
-                      </Typography>
+              {/* Categories Stats */}
+              <SimpleGrid columns={2} gap="sm">
+                <MetricCard
+                  title="Productos Total"
+                  value={taxCategories.reduce((sum, cat) => sum + cat.items, 0)}
+                  subtitle="en todas las categorías"
+                  icon={ChartBarIcon}
+                  colorPalette="blue"
+                />
+                <MetricCard
+                  title="Tasa Promedio"
+                  value={`${Math.round(taxCategories.reduce((sum, cat) => sum + cat.rate, 0) / taxCategories.length)}%`}
+                  subtitle="impuesto aplicado"
+                  icon={CalculatorIcon}
+                  colorPalette="purple"
+                />
+              </SimpleGrid>
+              
+              {/* Category List */}
+              <Stack direction="column" gap="xs">
+                <Typography variant="subtitle" weight="semibold" color="text.muted">Detalle por Categoría</Typography>
+                {taxCategories.map((category, index) => (
+                  <Stack 
+                    key={index}
+                    direction="row" 
+                    justify="space-between" 
+                    align="center"
+                    p="sm"
+                    bg={category.rate === 21 ? "red.50" : "green.50"}
+                    borderRadius="md"
+                    borderLeft="4px solid"
+                    borderColor={category.rate === 21 ? "red.400" : "green.400"}
+                  >
+                    <Stack direction="row" align="center" gap="sm">
+                      <Icon 
+                        icon={category.rate === 21 ? ExclamationTriangleIcon : CheckCircleIcon} 
+                        size="sm" 
+                        color={category.rate === 21 ? "red.500" : "green.500"}
+                      />
+                      <Stack gap="xs">
+                        <Typography variant="body" size="sm" fontWeight="medium">
+                          {category.name}
+                        </Typography>
+                        <Typography variant="body" size="xs" color="text.secondary">
+                          {category.items} productos
+                        </Typography>
+                      </Stack>
                     </Stack>
-                    <Badge 
-                      colorPalette={category.rate === 21 ? "error" : "success"}
-                      size="sm"
-                    >
-                      {category.rate}%
-                    </Badge>
+                    <Stack direction="row" align="center" gap="sm">
+                      <Typography 
+                        variant="body" 
+                        weight="bold"
+                        color={category.rate === 21 ? "red.700" : "green.700"}
+                      >
+                        {category.rate}%
+                      </Typography>
+                      <Badge 
+                        variant="solid"
+                        colorPalette={category.rate === 21 ? "red" : "green"}
+                        size="sm"
+                      >
+                        {category.rate === 21 ? "Alto" : "Reducido"}
+                      </Badge>
+                    </Stack>
                   </Stack>
-                </CardWrapper>
-              ))}
+                ))}
+              </Stack>
+              
+              {/* Quick Actions */}
+              <Stack direction="row" gap="sm" mt="sm">
+                <ActionButton size="sm" colorPalette="blue" variant="outline">
+                  <Icon icon={CalculatorIcon} size="xs" />
+                  Agregar Categoría
+                </ActionButton>
+                <ActionButton size="sm" colorPalette="gray" variant="ghost">
+                  <Icon icon={DocumentTextIcon} size="xs" />
+                  Ver Productos
+                </ActionButton>
+              </Stack>
             </Stack>
-          </Stack>
+          </CardWrapper.Body>
         </CardWrapper>
       </SimpleGrid>
 
       {/* Fiscal Compliance Status */}
       <CardWrapper>
-        <Stack gap="md">
-          <Stack direction="row" align="center" gap="sm">
-            <Icon icon={ShieldCheckIcon} size="md" />
-            <Typography variant="heading" size="md">Estado de Cumplimiento Fiscal</Typography>
+        <CardWrapper.Header>
+          <Stack direction="row" justify="space-between" align="center">
+            <CardWrapper.Title>Estado de Cumplimiento Fiscal</CardWrapper.Title>
+            <Badge variant="subtle" colorPalette="orange">
+              <Icon icon={ExclamationTriangleIcon} size="xs" />
+              1 Pendiente
+            </Badge>
           </Stack>
-          
-          <SimpleGrid columns={{ base: 2, md: 4 }} gap="md">
-            <Stack align="center" gap="xs">
-              <Typography variant="body" size="2xl" fontWeight="bold" >✓</Typography>
-              <Typography variant="body" size="sm" color="secondary">Configuración IVA</Typography>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
+          <Stack gap="lg">
+            {/* Overall Status Alert */}
+            <Alert status="warning" variant="subtle">
+              <Icon icon={ExclamationTriangleIcon} />
+              <Stack gap="xs">
+                <Typography variant="body" weight="semibold">Acción requerida</Typography>
+                <Typography variant="body" size="sm">
+                  Tienes reportes fiscales pendientes de envío
+                </Typography>
+              </Stack>
+            </Alert>
+            
+            {/* Compliance Metrics */}
+            <SimpleGrid columns={{ base: 2, md: 4 }} gap="md">
+              <MetricCard
+                title="IVA"
+                value="✓"
+                subtitle="Configurado"
+                icon={CheckCircleIcon}
+                colorPalette="green"
+                badge={{
+                  value: "OK",
+                  colorPalette: "green"
+                }}
+              />
+              
+              <MetricCard
+                title="Fiscal"
+                value="✓"
+                subtitle="Número válido"
+                icon={DocumentCheckIcon}
+                colorPalette="green"
+                badge={{
+                  value: "OK",
+                  colorPalette: "green"
+                }}
+              />
+              
+              <MetricCard
+                title="Reportes"
+                value="⚠"
+                subtitle="Pendientes"
+                icon={ExclamationTriangleIcon}
+                colorPalette="orange"
+                badge={{
+                  value: "2",
+                  colorPalette: "orange"
+                }}
+              />
+              
+              <MetricCard
+                title="Categorías"
+                value="✓"
+                subtitle="Completas"
+                icon={ChartBarIcon}
+                colorPalette="blue"
+                badge={{
+                  value: `${taxCategories.length}`,
+                  colorPalette: "blue"
+                }}
+              />
+            </SimpleGrid>
+            
+            {/* Quick Actions for Compliance */}
+            <Stack direction="row" gap="sm">
+              <ActionButton size="sm" colorPalette="orange">
+                <Icon icon={DocumentTextIcon} size="xs" />
+                Enviar Reportes Pendientes
+              </ActionButton>
+              <ActionButton size="sm" colorPalette="green" variant="outline">
+                <Icon icon={CheckCircleIcon} size="xs" />
+                Verificar Configuración
+              </ActionButton>
+              <ActionButton size="sm" colorPalette="gray" variant="ghost">
+                <Icon icon={ShieldCheckIcon} size="xs" />
+                Historial de Cumplimiento
+              </ActionButton>
             </Stack>
-            <Stack align="center" gap="xs">
-              <Typography variant="body" size="2xl" fontWeight="bold" >✓</Typography>
-              <Typography variant="body" size="sm" color="secondary">Número Fiscal</Typography>
-            </Stack>
-            <Stack align="center" gap="xs">
-              <Typography variant="body" size="2xl" fontWeight="bold" >⚠</Typography>
-              <Typography variant="body" size="sm" color="secondary">Reportes Pendientes</Typography>
-            </Stack>
-            <Stack align="center" gap="xs">
-              <Typography variant="body" size="2xl" fontWeight="bold" >✓</Typography>
-              <Typography variant="body" size="sm" color="secondary">Categorías</Typography
+          </Stack>
+        </CardWrapper.Body>
+      </CardWrapper>
+    </Section>
+  );
+}

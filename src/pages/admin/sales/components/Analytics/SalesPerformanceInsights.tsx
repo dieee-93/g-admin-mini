@@ -459,7 +459,7 @@ export const SalesPerformanceInsights: React.FC = () => {
                             </Badge>
                           </HStack>
 
-                          <Box p={3} bg="gray.50" borderRadius="md">
+                          <Box p={3} bg="bg.canvas" borderRadius="md">
                             <Text fontSize="sm" fontWeight="medium" color="blue.600">
                               💡 {insight.recommendation}
                             </Text>
@@ -631,7 +631,7 @@ export const SalesPerformanceInsights: React.FC = () => {
         ) : null}
 
         {/* Status */}
-        <Card.Root bg="gray.50">
+        <Card.Root bg="bg.canvas">
           <Card.Body p={3}>
             <HStack justify="center" gap={4}>
               <HStack gap={2}>

@@ -246,7 +246,7 @@ export function TableFloorPlan({
       </HStack>
 
       {/* Status Legend */}
-      <Card.Root p="4" bg="gray.50">
+      <Card.Root p="4" bg="bg.canvas">
         <HStack gap="6" wrap="wrap">
           <HStack gap="2">
             <Box w="3" h="3"  borderRadius="full" />
@@ -342,7 +342,7 @@ export function TableFloorPlan({
 
                 {/* Party Info (if occupied) */}
                 {table.current_party && table.status === TableStatus.OCCUPIED && (
-                  <VStack align="stretch" gap="2" p="2" bg="gray.50" borderRadius="md">
+                  <VStack align="stretch" gap="2" p="2" bg="bg.canvas" borderRadius="md">
                     <HStack justify="space-between">
                       <Text fontSize="sm" fontWeight="medium">
                         Party of {table.current_party.size}
@@ -416,7 +416,7 @@ export function TableFloorPlan({
       {filteredTables.length === 0 && (
         <Card.Root p="8" textAlign="center">
           <VStack gap="3">
-            <Icon icon={ExclamationTriangleIcon} size="2xl" color="gray.400" />
+            <Icon icon={ExclamationTriangleIcon} size="2xl" color="text.muted" />
             <Text color="gray.600">
               No tables found matching the current filter
             </Text>

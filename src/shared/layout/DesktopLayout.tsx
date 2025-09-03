@@ -37,7 +37,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
         right="0"
         bottom="0"
         overflow="auto"
-        bg="bg.surface"
+        bg="bg.canvas"
         color="text.primary"
       >
         {/* 🔧 CRÍTICO CORREGIDO: Content area con scroll interno - sin breadcrumb duplicado */}

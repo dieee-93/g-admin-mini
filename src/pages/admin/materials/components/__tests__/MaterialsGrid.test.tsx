@@ -131,7 +131,7 @@ describe('MaterialsGrid', () => {
     );
 
     // Verificar que se muestran skeletons de loading
-    // Los skeletons tienen bg="gray.50" y se generan 6 items
+    // Los skeletons tienen bg="bg.canvas" y se generan 6 items
     const skeletons = screen.getAllByRole('generic'); // Box elements
     expect(skeletons.length).toBeGreaterThan(0);
   });

@@ -4,10 +4,17 @@ import {
   UserGroupIcon, 
   ShieldCheckIcon,
   PlusIcon,
-  KeyIcon
+  KeyIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  ClockIcon,
+  CogIcon,
+  LockClosedIcon,
+  UserIcon,
+  ChartBarIcon
 } from "@heroicons/react/24/outline";
 import { 
-  Stack, Typography, CardWrapper, Button, Badge, Avatar, Switch, Grid
+  Stack, Typography, CardWrapper, Section, Button, Badge, Avatar, Switch, SimpleGrid, MetricCard, ActionButton, Alert
 } from "@/shared/ui";
 import { Icon, HeaderIcon } from "@/shared/ui/Icon";
 
@@ -76,125 +83,334 @@ export function UserPermissionsSection() {
     }
   };
 
+  const totalUsers = users.length;
+  const activeUsers = users.filter(u => u.status === 'active').length;
+  const totalRoles = roles.length;
+  const totalPermissions = [...new Set(roles.flatMap(r => r.permissions))].length;
+
   return (
-    <CardWrapper variant="elevated" >
-      <CardWrapper>
-        <Stack direction="row" justify="space-between" align="center">
-          <Stack direction="row" align="center" gap="sm">
-            <HeaderIcon icon={UserGroupIcon}  />
-            <Typography variant="heading" level={3}>Permisos de Usuario</Typography>
-          </Stack>
-          <Stack direction="row" gap="sm">
-            <Button  size="sm">
-              <Icon icon={PlusIcon} size="sm" />
-              Nuevo Rol
-            </Button>
-            <Button colorPalette="info" size="sm">
-              <Icon icon={UserGroupIcon} size="sm" />
-              Invitar Usuario
-            </Button>
-          </Stack>
-        </Stack>
-      </CardWrapper>
-      <CardWrapper>
-        <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap="xl">
-          {/* Roles and Permissions */}
-          <CardWrapper variant="outline" >
-            <CardWrapper>
-              <Stack direction="row" align="center" gap="sm">
-                <HeaderIcon icon={ShieldCheckIcon}  />
-                <Typography variant="heading" level={4}>Roles del Sistema</Typography>
-              </Stack>
-            </CardWrapper>
-            <CardWrapper>
-              <Stack direction="column" gap="md">
+    <Section variant="elevated" title="Permisos de Usuario">
+      <Stack direction={{ base: "column", sm: "row" }} justify="space-between" align={{ base: "stretch", sm: "center" }} gap="md" mb="xl">
+        <div />
+        <Button colorPalette="success" size="sm">
+          <Icon icon={UserGroupIcon} size="sm" />
+          Invitar Usuario
+        </Button>
+      </Stack>
+
+      <SimpleGrid columns={{ base: 1, lg: 2 }} gap="xl">
+        {/* Roles Configuration */}
+        <CardWrapper>
+          <CardWrapper.Header>
+            <Stack direction="row" justify="space-between" align="center">
+              <CardWrapper.Title>Gestión de Roles</CardWrapper.Title>
+              <Badge variant="solid" colorPalette="blue">
+                <Icon icon={ShieldCheckIcon} size="xs" />
+                {totalRoles} roles
+              </Badge>
+            </Stack>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
+            <Stack gap="lg">
+              {/* Roles Stats */}
+              <MetricCard
+                title="Total de Permisos"
+                value={`${totalPermissions}`}
+                subtitle="módulos configurados"
+                icon={LockClosedIcon}
+                colorPalette="blue"
+                badge={{
+                  value: "Sistema",
+                  colorPalette: "blue"
+                }}
+              />
+              
+              {/* Roles List */}
+              <Stack direction="column" gap="sm">
+                <Typography variant="subtitle" weight="semibold" color="text.muted">Roles Configurados</Typography>
                 {roles.map((role, index) => (
-                  <CardWrapper key={index} variant="subtle" >
-                    <CardWrapper>
-                      <Stack direction="column" gap="sm">
-                        <Stack direction="row" justify="space-between" align="center">
-                          <Stack direction="row" align="center" gap="sm">
-                            <Badge colorPalette={role.color} variant="subtle">
-                              {role.name}
-                            </Badge>
-                            <Typography variant="caption" color="secondary">
-                              {role.users} usuario{role.users !== 1 ? "s" : ""}
-                            </Typography>
-                          </Stack>
-                          <Button size="sm" variant="ghost" >
-                            <Icon icon={KeyIcon} size="sm" />
-                            Editar
-                          </Button>
+                  <Stack 
+                    key={index}
+                    direction="row" 
+                    justify="space-between" 
+                    align="center"
+                    p="sm"
+                    bg={role.color === 'error' ? "red.50" : 
+                        role.color === 'info' ? "blue.50" : 
+                        role.color === 'success' ? "green.50" : "orange.50"}
+                    borderRadius="md"
+                    borderLeft="4px solid"
+                    borderColor={role.color === 'error' ? "red.400" : 
+                               role.color === 'info' ? "blue.400" : 
+                               role.color === 'success' ? "green.400" : "orange.400"}
+                  >
+                    <Stack direction="row" align="center" gap="sm">
+                      <Icon 
+                        icon={role.color === 'error' ? ShieldCheckIcon : 
+                              role.color === 'info' ? CogIcon : 
+                              role.color === 'success' ? UserIcon : KeyIcon} 
+                        size="sm" 
+                        color={role.color === 'error' ? "red.500" : 
+                               role.color === 'info' ? "blue.500" : 
+                               role.color === 'success' ? "green.500" : "orange.500"}
+                      />
+                      <Stack gap="xs">
+                        <Stack direction="row" align="center" gap="sm">
+                          <Typography variant="body" size="sm" fontWeight="medium">
+                            {role.name}
+                          </Typography>
+                          <Badge 
+                            variant="solid"
+                            colorPalette={role.color}
+                            size="sm"
+                          >
+                            {role.users} usuario{role.users !== 1 ? "s" : ""}
+                          </Badge>
                         </Stack>
-                        <Typography variant="body" color="secondary">
+                        <Typography variant="body" size="xs" color="text.secondary">
                           {role.description}
                         </Typography>
-                        <Stack direction="row" gap="xs" wrap="wrap">
-                          {role.permissions.map((permission) => (
-                            <Badge key={permission} size="sm" variant="outline" colorPalette="gray">
-                              {permission}
-                            </Badge>
-                          ))}
-                        </Stack>
                       </Stack>
-                    </CardWrapper>
-                  </CardWrapper>
+                    </Stack>
+                    <Stack direction="row" align="center" gap="sm">
+                      <Typography 
+                        variant="body" 
+                        weight="bold"
+                        color={role.color === 'error' ? "red.700" : 
+                               role.color === 'info' ? "blue.700" : 
+                               role.color === 'success' ? "green.700" : "orange.700"}
+                      >
+                        {role.permissions.length} permisos
+                      </Typography>
+                    </Stack>
+                  </Stack>
                 ))}
               </Stack>
-            </CardWrapper>
-          </CardWrapper>
-
-          {/* Active Users */}
-          <CardWrapper variant="outline" >
-            <CardWrapper >
-              <Stack direction="row" align="center" gap="sm">
-                <HeaderIcon icon={UserGroupIcon}  />
-                <Typography variant="heading" level={4}>Usuarios Activos</Typography>
+              
+              {/* Quick Actions */}
+              <Stack direction="row" gap="sm" mt="sm">
+                <ActionButton size="sm" colorPalette="blue" variant="outline">
+                  <Icon icon={PlusIcon} size="xs" />
+                  Nuevo Rol
+                </ActionButton>
+                <ActionButton size="sm" colorPalette="gray" variant="ghost">
+                  <Icon icon={KeyIcon} size="xs" />
+                  Configurar Permisos
+                </ActionButton>
               </Stack>
-            </CardWrapper>
-            <CardWrapper>
-              <Stack direction="column" gap="md">
+            </Stack>
+          </CardWrapper.Body>
+        </CardWrapper>
+
+        {/* Users Management */}
+        <CardWrapper>
+          <CardWrapper.Header>
+            <Stack direction="row" justify="space-between" align="center">
+              <CardWrapper.Title>Usuarios del Sistema</CardWrapper.Title>
+              <Badge variant="subtle" colorPalette="green">
+                <Icon icon={CheckCircleIcon} size="xs" />
+                {activeUsers}/{totalUsers} activos
+              </Badge>
+            </Stack>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
+            <Stack gap="lg">
+              {/* Users Stats */}
+              <SimpleGrid columns={2} gap="sm">
+                <MetricCard
+                  title="Usuarios Activos"
+                  value={`${activeUsers}`}
+                  subtitle="conectados"
+                  icon={CheckCircleIcon}
+                  colorPalette="green"
+                  badge={{
+                    value: `${Math.round((activeUsers/totalUsers)*100)}%`,
+                    colorPalette: "green"
+                  }}
+                />
+                <MetricCard
+                  title="Total Usuarios"
+                  value={`${totalUsers}`}
+                  subtitle="registrados"
+                  icon={UserGroupIcon}
+                  colorPalette="blue"
+                />
+              </SimpleGrid>
+              
+              {/* Users List */}
+              <Stack direction="column" gap="sm">
+                <Typography variant="subtitle" weight="semibold" color="text.muted">Usuarios Registrados</Typography>
                 {users.map((user, index) => (
-                  <CardWrapper key={index} variant="subtle" >
-                    <CardWrapper>
-                      <Stack direction="column" gap="sm">
-                        <Stack direction="row" justify="space-between" align="center">
-                          <Stack direction="row" align="center" gap="sm">
-                            <Avatar 
-                              name={user.name}
-                              size="sm"
-                            />
-                            <Stack direction="column" gap="xs">
-                              <Typography variant="body" weight="medium">
-                                {user.name}
-                              </Typography>
-                              <Typography variant="caption" color="secondary">
-                                {user.email}
-                              </Typography>
-                            </Stack>
-                          </Stack>
-                          <Switch 
-                            checked={user.status === "active"}
-                            colorPalette={user.status === "active" ? "success" : "gray"}
-                          />
-                        </Stack>
-                        <Stack direction="row" justify="space-between" align="center">
-                          <Badge colorPalette={getRoleColor(user.role)} variant="subtle">
+                  <Stack 
+                    key={index}
+                    direction="row" 
+                    justify="space-between" 
+                    align="center"
+                    p="sm"
+                    bg={user.status === 'active' ? "green.50" : "gray.50"}
+                    borderRadius="md"
+                    borderLeft="4px solid"
+                    borderColor={user.status === 'active' ? "green.400" : "gray.300"}
+                  >
+                    <Stack direction="row" align="center" gap="sm">
+                      <Icon 
+                        icon={user.status === 'active' ? CheckCircleIcon : ExclamationTriangleIcon} 
+                        size="sm" 
+                        color={user.status === 'active' ? "green.500" : "gray.400"}
+                      />
+                      <Avatar 
+                        name={user.name}
+                        size="sm"
+                      />
+                      <Stack gap="xs">
+                        <Stack direction="row" align="center" gap="sm">
+                          <Typography variant="body" size="sm" fontWeight="medium">
+                            {user.name}
+                          </Typography>
+                          <Badge 
+                            variant="solid"
+                            colorPalette={getRoleColor(user.role)}
+                            size="sm"
+                          >
                             {user.role}
                           </Badge>
-                          <Typography variant="caption" color="secondary">
-                            {user.lastLogin}
-                          </Typography>
                         </Stack>
+                        <Typography variant="body" size="xs" color="text.secondary">
+                          {user.email}
+                        </Typography>
                       </Stack>
-                    </CardWrapper>
-                  </CardWrapper>
+                    </Stack>
+                    <Stack direction="row" align="center" gap="sm">
+                      <Stack direction="column" align="end" gap="xs">
+                        <Badge 
+                          variant="solid" 
+                          colorPalette={user.status === 'active' ? "green" : "gray"}
+                          size="sm"
+                        >
+                          {user.status === 'active' ? "Activo" : "Inactivo"}
+                        </Badge>
+                        <Typography variant="body" size="xs" color="text.secondary">
+                          {user.lastLogin}
+                        </Typography>
+                      </Stack>
+                      <Switch 
+                        checked={user.status === "active"}
+                        colorPalette={user.status === "active" ? "green" : "gray"}
+                      />
+                    </Stack>
+                  </Stack>
                 ))}
               </Stack>
-            </CardWrapper>
-          </CardWrapper>
-        </Grid>
+              
+              {/* Quick Actions */}
+              <Stack direction="row" gap="sm" mt="sm">
+                <ActionButton size="sm" colorPalette="green" variant="outline">
+                  <Icon icon={PlusIcon} size="xs" />
+                  Nuevo Usuario
+                </ActionButton>
+                <ActionButton size="sm" colorPalette="gray" variant="ghost">
+                  <Icon icon={ClockIcon} size="xs" />
+                  Ver Actividad
+                </ActionButton>
+              </Stack>
+            </Stack>
+          </CardWrapper.Body>
+        </CardWrapper>
+      </SimpleGrid>
+
+      {/* Security Status */}
+      <CardWrapper>
+        <CardWrapper.Header>
+          <Stack direction="row" justify="space-between" align="center">
+            <CardWrapper.Title>Estado de Seguridad</CardWrapper.Title>
+            <Badge variant="subtle" colorPalette="orange">
+              <Icon icon={ExclamationTriangleIcon} size="xs" />
+              1 Recomendación
+            </Badge>
+          </Stack>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
+          <Stack gap="lg">
+            {/* Security Alert */}
+            <Alert status="warning" variant="subtle">
+              <Icon icon={ExclamationTriangleIcon} />
+              <Stack gap="xs">
+                <Typography variant="body" weight="semibold">Revisión recomendada</Typography>
+                <Typography variant="body" size="sm">
+                  Algunos usuarios no han iniciado sesión recientemente
+                </Typography>
+              </Stack>
+            </Alert>
+            
+            {/* Security Metrics */}
+            <SimpleGrid columns={{ base: 2, md: 4 }} gap="md">
+              <MetricCard
+                title="Autenticación"
+                value="✓"
+                subtitle="Configurada"
+                icon={CheckCircleIcon}
+                colorPalette="green"
+                badge={{
+                  value: "OK",
+                  colorPalette: "green"
+                }}
+              />
+              
+              <MetricCard
+                title="Roles"
+                value="✓"
+                subtitle="Definidos"
+                icon={ShieldCheckIcon}
+                colorPalette="blue"
+                badge={{
+                  value: `${totalRoles}`,
+                  colorPalette: "blue"
+                }}
+              />
+              
+              <MetricCard
+                title="Usuarios"
+                value="⚠"
+                subtitle="Revisar inactivos"
+                icon={ExclamationTriangleIcon}
+                colorPalette="orange"
+                badge={{
+                  value: `${totalUsers - activeUsers}`,
+                  colorPalette: "orange"
+                }}
+              />
+              
+              <MetricCard
+                title="Permisos"
+                value="✓"
+                subtitle="Asignados"
+                icon={LockClosedIcon}
+                colorPalette="purple"
+                badge={{
+                  value: `${totalPermissions}`,
+                  colorPalette: "purple"
+                }}
+              />
+            </SimpleGrid>
+            
+            {/* Security Actions */}
+            <Stack direction="row" gap="sm">
+              <ActionButton size="sm" colorPalette="orange">
+                <Icon icon={ClockIcon} size="xs" />
+                Revisar Usuarios Inactivos
+              </ActionButton>
+              <ActionButton size="sm" colorPalette="blue" variant="outline">
+                <Icon icon={ShieldCheckIcon} size="xs" />
+                Auditar Permisos
+              </ActionButton>
+              <ActionButton size="sm" colorPalette="gray" variant="ghost">
+                <Icon icon={ChartBarIcon} size="xs" />
+                Reporte de Seguridad
+              </ActionButton>
+            </Stack>
+          </Stack>
+        </CardWrapper.Body>
       </CardWrapper>
-    </CardWrapper>
+    </Section>
   );
 }

@@ -147,7 +147,7 @@ export const CountableFields = ({
                     <RadioGroup.ItemText>
                       <Stack gap="1">
                         <Text fontWeight="medium">Solo crear el item (sin stock inicial)</Text>
-                        <Text fontSize="sm" color="fg.muted">
+                        <Text fontSize="sm" color="text.muted">
                           Crea el item en el catálogo sin agregar stock al inventario
                         </Text>
                       </Stack>
@@ -160,7 +160,7 @@ export const CountableFields = ({
                     <RadioGroup.ItemText>
                       <Stack gap="1">
                         <Text fontWeight="medium">Agregar por unidades individuales</Text>
-                        <Text fontSize="sm" color="fg.muted">
+                        <Text fontSize="sm" color="text.muted">
                           Ideal para items sueltos o cuando no vienen empaquetados
                         </Text>
                       </Stack>
@@ -173,7 +173,7 @@ export const CountableFields = ({
                     <RadioGroup.ItemText>
                       <Stack gap="1">
                         <Text fontWeight="medium">Agregar por paquetes/cajas</Text>
-                        <Text fontSize="sm" color="fg.muted">
+                        <Text fontSize="sm" color="text.muted">
                           Para items que vienen empaquetados (cajas, bandejas, docenas, etc.)
                         </Text>
                       </Stack>

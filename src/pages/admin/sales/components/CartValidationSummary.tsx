@@ -125,7 +125,7 @@ export function CartValidationSummary({
         {/* Progreso de validación */}
         <Stack gap="xs">
           <Stack direction="row" justify="space-between" align="center">
-            <Typography variant="body" size="sm" color="secondary">Estado de validación</Typography>
+            <Typography variant="body" size="sm" color="text.secondary">Estado de validación</Typography>
             <Typography variant="body" size="sm" weight="medium">{validationProgress}%</Typography>
           </Stack>
           <div style={{
@@ -174,7 +174,7 @@ export function CartValidationSummary({
 
             {/* Lista resumida de productos */}
             <Stack gap="sm">
-              <Typography variant="body" size="sm" weight="medium" color="primary">
+              <Typography variant="body" size="sm" weight="medium" color="text.primary">
                 Productos seleccionados:
               </Typography>
               <Stack gap="xs">
@@ -213,7 +213,7 @@ export function CartValidationSummary({
                         >
                           {item.quantity}
                         </Badge>
-                        <Typography variant="body" size="sm" color="secondary">
+                        <Typography variant="body" size="sm" color="text.secondary">
                           ${(item.quantity * item.unit_price).toFixed(2)}
                         </Typography>
                       </Stack>
@@ -283,9 +283,9 @@ export function CartValidationSummary({
         {!summary.hasItems && (
           <div style={{textAlign: 'center', padding: '3rem 0'}}>
             <div style={{marginBottom: '0.5rem'}}>
-              <Icon icon={ShoppingCartIcon} size="xl" color="muted" />
+              <Icon icon={ShoppingCartIcon} size="xl" color="text.muted" />
             </div>
-            <Typography variant="body" size="sm" color="muted">
+            <Typography variant="body" size="sm" color="text.muted">
               Agrega productos al carrito para continuar
             </Typography>
           </div>

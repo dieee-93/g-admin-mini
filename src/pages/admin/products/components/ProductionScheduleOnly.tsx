@@ -216,7 +216,7 @@ export function ProductionScheduleOnly() {
           <Typography variant="heading" className="text-2xl font-bold mb-2">
             Production Schedule
           </Typography>
-          <Typography variant="body" color="muted" className="mb-4">
+          <Typography variant="body" color="text.muted" className="mb-4">
             Manage and optimize your production timeline and capacity
           </Typography>
         </div>
@@ -271,7 +271,7 @@ export function ProductionScheduleOnly() {
                       <Typography variant="heading" className="text-lg font-medium">
                         No production scheduled
                       </Typography>
-                      <Typography variant="body" color="muted">
+                      <Typography variant="body" color="text.muted">
                         Schedule your first production plan to see the timeline
                       </Typography>
                     </VStack>
@@ -289,7 +289,7 @@ export function ProductionScheduleOnly() {
                                 day: 'numeric' 
                               })}
                             </Typography>
-                            <Typography variant="body" className="text-sm" color="muted">
+                            <Typography variant="body" className="text-sm" color="text.muted">
                               Time Slot: {slot.time_slot}
                             </Typography>
                           </VStack>
@@ -298,7 +298,7 @@ export function ProductionScheduleOnly() {
                             <Typography variant="body" className={`text-sm font-semibold ${getUtilizationColor((slot.utilized / slot.capacity) * 100)}`}>
                               {Math.round((slot.utilized / slot.capacity) * 100)}% Utilized
                             </Typography>
-                            <Typography variant="body" className="text-xs" color="muted">
+                            <Typography variant="body" className="text-xs" color="text.muted">
                               {slot.available} units available
                             </Typography>
                           </VStack>
@@ -342,13 +342,13 @@ export function ProductionScheduleOnly() {
                                         {plan.product_name}
                                       </Typography>
                                       <HStack gap="xs">
-                                        <Typography variant="body" className="text-xs" color="muted">
+                                        <Typography variant="body" className="text-xs" color="text.muted">
                                           {plan.start_time} - {plan.end_time}
                                         </Typography>
-                                        <Typography variant="body" className="text-xs" color="muted">
+                                        <Typography variant="body" className="text-xs" color="text.muted">
                                           • {plan.planned_quantity} units
                                         </Typography>
-                                        <Typography variant="body" className="text-xs" color="muted">
+                                        <Typography variant="body" className="text-xs" color="text.muted">
                                           • {plan.required_staff} staff
                                         </Typography>
                                       </HStack>
@@ -392,28 +392,28 @@ export function ProductionScheduleOnly() {
                 
                 <VStack gap="md" align="stretch">
                   <VStack align="start" gap="xs">
-                    <Typography variant="body" className="text-sm" color="muted">Total Planned</Typography>
+                    <Typography variant="body" className="text-sm" color="text.muted">Total Planned</Typography>
                     <Typography variant="heading" className="text-xl font-bold text-blue-600">
                       {plans.filter(p => p.status === 'scheduled').length} plans
                     </Typography>
                   </VStack>
                   
                   <VStack align="start" gap="xs">
-                    <Typography variant="body" className="text-sm" color="muted">In Progress</Typography>
+                    <Typography variant="body" className="text-sm" color="text.muted">In Progress</Typography>
                     <Typography variant="heading" className="text-xl font-bold text-yellow-600">
                       {plans.filter(p => p.status === 'in_progress').length} active
                     </Typography>
                   </VStack>
                   
                   <VStack align="start" gap="xs">
-                    <Typography variant="body" className="text-sm" color="muted">Completed Today</Typography>
+                    <Typography variant="body" className="text-sm" color="text.muted">Completed Today</Typography>
                     <Typography variant="heading" className="text-xl font-bold text-green-600">
                       {plans.filter(p => p.status === 'completed').length} done
                     </Typography>
                   </VStack>
                   
                   <VStack align="start" gap="xs">
-                    <Typography variant="body" className="text-sm" color="muted">High Priority</Typography>
+                    <Typography variant="body" className="text-sm" color="text.muted">High Priority</Typography>
                     <Typography variant="heading" className="text-xl font-bold text-red-600">
                       {plans.filter(p => p.priority === 'high' || p.priority === 'urgent').length} urgent
                     </Typography>

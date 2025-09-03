@@ -1,13 +1,80 @@
 ## Copilot instructions for g-mini (g-admin-mini)
 
-Purpose: help AI coding agents be productive immediately in this repository by documenting the project's structure, conventions, build/test workflows, and integration points — focused on discoverable, actionable patterns.
+**PRIMARY MISSION: System Installation & User Onboarding Flow Design**
 
-- Big picture
-  - Frontend: a Vite + React + TypeScript SPA in `src/` (entry: `main.tsx`, root `App.tsx`). UI components live under `src/modules/*` (e.g. `src/modules/materials/components/*`) and `src/shared/ui`.
-  - Data layer: SQL and migrations under `database/` and `database-updates/` (functions, triggers, views). Many stored procedures handle business logic (recipe cost, viability, analytics).
-  - Backend/integration: Supabase is wired in `src/lib/supabase.ts` — treat the Supabase client as the primary backend for auth, DB, and realtime.
+Focus exclusively on designing and implementing the complete user journey from "fresh installation" to "productive daily use" of the g-admin system. This includes database setup, initial configuration, first-time user experience, and connecting existing modules into a cohesive workflow.
 
-- Developer workflows (how to run, build, lint, test)
+- **Current Challenge**: The system has 40+ database tables, extensive UI modules, and business logic, but lacks a unified installation/onboarding experience
+- **Goal**: Create a step-by-step installation wizard and initial user flow that guides new users through system setup and introduces them to core functionality
+- **Approach**: Start from user perspective, identify gaps in user journey, then connect existing pieces
+
+- System Architecture Context (for reference only)
+  - Frontend: Vite + React + TypeScript SPA. UI components in `src/modules/*` and `src/shared/ui`
+  - Backend: Supabase (auth, DB, realtime) via `src/lib/supabase.ts`
+  - Database: 40+ tables with business logic in SQL functions (`database/functions/*`)
+  - Existing modules: materials, inventory, recipes, sales, customers, suppliers, analytics
+
+- **Installation & Onboarding Priorities**
+  - **Phase 1**: System Requirements Check & Database Setup
+    - Verify Supabase connection and project configuration
+    - Run database migrations and seed initial data
+    - Test core authentication flows
+  
+  - **Phase 2**: Administrative Setup Wizard
+    - Company/business information setup
+    - Initial user account creation (admin user)
+    - Basic system configuration (currency, units, etc.)
+    - Security settings and user roles definition
+  
+  - **Phase 3**: Core Data Setup
+    - Import/create initial materials catalog
+    - Set up supplier information
+    - Configure basic recipes/products
+    - Initialize inventory locations and stock
+  
+  - **Phase 4**: User Onboarding Flow
+    - Interactive tutorial for key features
+    - Sample data creation for training
+    - Dashboard customization
+    - Notification and alert preferences
+
+- **User Journey Mapping Focus**
+  - **Day 0**: Fresh installation experience
+  - **Day 1**: First productive tasks (create material, recipe, sale)
+  - **Week 1**: Understanding reports and analytics
+  - **Month 1**: Advanced features and customization
+
+- **Key Research Areas** (investigate existing codebase for)
+  - Auth flow: How users currently log in and access features
+  - Database initialization: What tables need initial data vs can be empty
+  - Permission system: How roles and access control work
+  - Data dependencies: Which entities must exist before others can be created
+  - UI/UX patterns: Existing wizard or multi-step form components
+  - Error handling: How the system behaves with incomplete setup
+
+- **Investigation Approach for Installation Design**
+  - **Audit Existing Features**: Map what's already built vs what's missing for complete workflows
+  - **Database Schema Analysis**: Understand required vs optional data for system operation
+  - **User Role Dependencies**: Identify what permissions/roles are needed for each feature
+  - **Integration Points**: Find where modules need to communicate for seamless experience
+  - **Error States**: Document what happens when required data is missing
+  - **Performance Considerations**: Identify heavy operations that need optimization for first-time setup
+
+- **Task Breakdown Strategy**
+  - **Start Small**: Design one complete micro-flow (e.g., "create first material")
+  - **Map Dependencies**: Document what needs to exist before each action
+  - **Identify Gaps**: Find missing connections between existing components
+  - **Design Transitions**: Create smooth handoffs between setup phases
+  - **Test Edge Cases**: Handle scenarios where setup is incomplete
+
+- **Research Questions to Answer**
+  - What's the current "blank slate" experience? (new user, empty database)
+  - Which features can work independently vs require setup dependencies?
+  - How do existing users currently set up the system for the first time?
+  - What are the most common user tasks in the first week of usage?
+  - Where do users get stuck or confused in the current experience?
+
+- Developer workflows (for reference only)
   - Package manager: pnpm (see `pnpm-lock.yaml`). Use `pnpm` for installs and scripts.
   - Typical commands:
     - `pnpm install`

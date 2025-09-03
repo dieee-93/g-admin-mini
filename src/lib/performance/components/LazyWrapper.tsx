@@ -510,7 +510,7 @@ export function LazyLoadingMonitor() {
           </SimpleGrid>
 
           {showDetails && (
-            <VStack gap="2" align="stretch" pt="4" borderTop="1px solid" borderColor="gray.200">
+            <VStack gap="2" align="stretch" pt="4" borderTop="1px solid" borderColor="border.default">
               <Text fontSize="sm" fontWeight="medium">Module Loading Status</Text>
               <Box maxH="200px" overflowY="auto">
                 {(() => {

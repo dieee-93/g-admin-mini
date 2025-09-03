@@ -207,7 +207,7 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
       <HStack justify="space-between" align="center">
         <VStack gap="xs" align="start">
           <Typography variant="heading">Generación de Facturas</Typography>
-          <Typography variant="body" color="muted">
+          <Typography variant="body" color="text.muted">
             Crear y gestionar facturas electrónicas - Modo: {mode}
           </Typography>
         </VStack>
@@ -331,7 +331,7 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
                             />
                           </HStack>
 
-                          <Typography variant="caption" color="muted">
+                          <Typography variant="caption" color="text.muted">
                             Subtotal: ${(item.cantidad * item.precio_unitario).toFixed(2)}
                           </Typography>
                         </VStack>
@@ -409,12 +409,12 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
         <Card.Body>
           {isLoading ? (
             <VStack gap="md">
-              <Typography variant="body" color="muted">Cargando facturas...</Typography>
+              <Typography variant="body" color="text.muted">Cargando facturas...</Typography>
             </VStack>
           ) : invoices.length === 0 ? (
             <VStack gap="md">
-              <Typography variant="body" color="muted">No hay facturas generadas</Typography>
-              <Typography variant="caption" color="muted">
+              <Typography variant="body" color="text.muted">No hay facturas generadas</Typography>
+              <Typography variant="caption" color="text.muted">
                 Crea tu primera factura usando el botón "Nueva Factura"
               </Typography>
             </VStack>
@@ -432,7 +432,7 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
                           {getStatusBadge(invoice)}
                         </HStack>
                         <Typography variant="body">{invoice.denominacion_cliente}</Typography>
-                        <Typography variant="caption" color="muted">
+                        <Typography variant="caption" color="text.muted">
                           {new Date(invoice.fecha_emision).toLocaleDateString('es-AR')}
                         </Typography>
                       </VStack>

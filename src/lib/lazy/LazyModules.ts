@@ -4,6 +4,18 @@
 
 import { createLazyComponent } from '@/lib/performance/LazyLoadingManager';
 
+// Lazy-loaded Setup Wizard (pages/setup/SetupWizard.tsx)
+export const LazySetupWizard = createLazyComponent(
+  () => import('../../pages/setup/SetupWizard'),
+  'setup',
+  {
+    chunkName: 'setup-wizard',
+    preload: false, // Only load when needed
+    priority: 'high', // Important for first-time setup
+    cacheStrategy: 'memory'
+  }
+);
+
 // Lazy-loaded Sales Page (pages/admin/sales/page.tsx)
 export const LazySalesPage = createLazyComponent(
   () => import('../../pages/admin/sales/page'),

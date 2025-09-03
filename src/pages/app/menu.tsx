@@ -101,22 +101,22 @@ function MenuFilters({ searchTerm, onSearchChange, selectedCategory, onCategoryC
           pl="40px"
           size="lg"
           borderRadius="xl"
-          bg={{ base: "white", _dark: "gray.800" }}
+          bg="bg.surface"
           border="2px solid"
-          borderColor={{ base: "gray.200", _dark: "gray.600" }}
+          borderColor="border.default"
           _focus={{
             borderColor: "orange.400",
             boxShadow: "0 0 0 1px orange.400"
           }}
         />
         <Box position="absolute" left="3" top="50%" transform="translateY(-50%)">
-          <Icon icon={MagnifyingGlassIcon} size="md" color="gray.400" />
+          <Icon icon={MagnifyingGlassIcon} size="md" color="text.muted" />
         </Box>
       </Box>
 
       {/* Tabs de categorías */}
       <Tabs.Root value={selectedCategory} onValueChange={(e) => onCategoryChange(e.value as string)}>
-        <Tabs.List bg={{ base: "gray.50", _dark: "gray.800" }} borderRadius="xl" p="1">
+        <Tabs.List bg="bg.surface" borderRadius="xl" p="1">
           {CATEGORIES.map((category) => (
             <Tabs.Trigger key={category} value={category} flex="1" borderRadius="lg">
               <Text fontSize="sm" fontWeight="medium">
@@ -143,7 +143,7 @@ function ProductCard({ product, onAddToCart }: {
       overflow="hidden" 
       _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
       transition="all 0.2s"
-      bg={{ base: "white", _dark: "gray.800" }}
+      bg="bg.surface"
     >
       {/* Imagen placeholder */}
       <Box 
@@ -204,7 +204,7 @@ function ProductCard({ product, onAddToCart }: {
               </Text>
             </HStack>
             
-            <Text fontSize="sm" color={{ base: "gray.600", _dark: "gray.300" }} noOfLines={2}>
+            <Text fontSize="sm" color="text.secondary" noOfLines={2}>
               {product.description}
             </Text>
           </VStack>
@@ -217,7 +217,7 @@ function ProductCard({ product, onAddToCart }: {
                 {product.rating}
               </Text>
             </HStack>
-            <Text fontSize="sm" color={{ base: "gray.500", _dark: "gray.400" }}>
+            <Text fontSize="sm" color="text.muted">
               {product.preparationTime}
             </Text>
           </HStack>
@@ -265,10 +265,10 @@ export function CustomerMenu() {
       <VStack align="stretch" gap="8">
         {/* Header */}
         <VStack align="start" gap="2">
-          <Text fontSize="3xl" fontWeight="bold" color={{ base: "gray.800", _dark: "gray.100" }}>
+          <Text fontSize="3xl" fontWeight="bold" color="text.primary">
             Nuestro Menú
           </Text>
-          <Text fontSize="lg" color={{ base: "gray.600", _dark: "gray.300" }}>
+          <Text fontSize="lg" color="text.secondary">
             Descubre nuestros deliciosos platos preparados con los mejores ingredientes
           </Text>
         </VStack>
@@ -284,7 +284,7 @@ export function CustomerMenu() {
         {/* Resultados */}
         <Box>
           <HStack justify="space-between" align="center" mb="6">
-            <Text fontSize="lg" color={{ base: "gray.700", _dark: "gray.200" }}>
+            <Text fontSize="lg" color="text.primary">
               {filteredProducts.length} productos encontrados
             </Text>
             {cartItems.length > 0 && (
@@ -318,12 +318,12 @@ export function CustomerMenu() {
           
           {filteredProducts.length === 0 && (
             <VStack gap="4" py="12">
-              <Icon icon={ShoppingBagIcon} size="2xl" color="gray.300" />
+              <Icon icon={ShoppingBagIcon} size="2xl" color="text.muted" />
               <VStack gap="2">
-                <Text fontSize="lg" fontWeight="medium" color={{ base: "gray.600", _dark: "gray.300" }}>
+                <Text fontSize="lg" fontWeight="medium" color="text.secondary">
                   No encontramos productos
                 </Text>
-                <Text fontSize="md" color={{ base: "gray.500", _dark: "gray.400" }}>
+                <Text fontSize="md" color="text.muted">
                   Intenta con otros términos de búsqueda o categoría
                 </Text>
               </VStack>

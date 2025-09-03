@@ -68,7 +68,7 @@ export function SummaryPanel({
       >
         <Stack direction="row" justify="space-between" align="center">
           <Stack direction="row" gap="sm" align="center">
-            <Typography variant="heading" size="lg" weight="semibold" color="primary">
+            <Typography variant="heading" size="lg" weight="semibold" color="text.primary">
               🎯 {title}
             </Typography>
             {status && (
@@ -133,12 +133,12 @@ export function SummaryPanel({
                   <Stack gap="sm" align="start">
                     <Stack direction="row" gap="sm" align="center">
                       {metric.icon && (
-                        <Icon icon={metric.icon} size="sm" color="secondary" />
+                        <Icon icon={metric.icon} size="sm" color="text.secondary" />
                       )}
                       <Typography 
                         variant="body" 
                         size="sm" 
-                        color="secondary" 
+                        color="text.secondary" 
                         weight="medium"
                       >
                         {metric.label}
@@ -158,13 +158,13 @@ export function SummaryPanel({
                       variant="heading" 
                       size="xl" 
                       weight="bold" 
-                      color="primary"
+                      color="text.primary"
                     >
                       {formatValue(metric.value)}
                     </Typography>
                     
                     {metric.subtitle && (
-                      <Typography variant="body" size="xs" color="muted">
+                      <Typography variant="body" size="xs" color="text.muted">
                         {metric.subtitle}
                       </Typography>
                     )}

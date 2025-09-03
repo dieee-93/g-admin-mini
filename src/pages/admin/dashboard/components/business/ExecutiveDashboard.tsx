@@ -1293,7 +1293,7 @@ export function ExecutiveDashboard() {
                         )}
 
                         {/* Timeline */}
-                        <HStack justify="space-between" bg="gray.50" p={3} borderRadius="md">
+                        <HStack justify="space-between" bg="bg.canvas" p={3} borderRadius="md">
                           <Text fontSize="sm" color="gray.600">
                             <CalendarIcon className="w-4 h-4 inline mr-1" />
                             Timeline esperado: {insight.timeline}

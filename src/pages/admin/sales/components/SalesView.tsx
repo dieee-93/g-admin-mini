@@ -70,7 +70,7 @@ export function SalesView({
       {showConnectionStatus && (
         <CardWrapper>
           <Stack direction="row" justify="space-between" align="center">
-            <Typography variant="body" size="sm" color="secondary">
+            <Typography variant="body" size="sm" color="text.secondary">
               {getStatusDescription()}
             </Typography>
             <POSConnectionBadge 

@@ -1,7 +1,7 @@
-// Settings Page - Dashboard-style with Dynamic Theming
+// Settings Page - Semantic Layout with New Design System
 import React, { useEffect } from 'react';
 import { 
-  Stack, Typography, MetricCard, CardGrid, Button, Icon
+  ContentLayout, PageHeader, StatsSection, CardGrid, MetricCard, Button, Icon
 } from '@/shared/ui';
 import { 
   CogIcon,
@@ -16,7 +16,8 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { BusinessProfileSection } from './components/sections/BusinessProfileSection';
 import { TaxConfigurationSection } from './components/sections/TaxConfigurationSection';
 import { UserPermissionsSection } from './components/sections/UserPermissionsSection';
-import { IntegrationsSection } from './components/sections/IntegrationsSection';
+// IntegrationsSection moved to integrations/page.tsx - no longer needed here
+// EnterpriseSection moved to enterprise/page.tsx - no longer needed here
 import { SystemSection } from './components/sections/SystemSection';
 
 export default function SettingsPage() {
@@ -35,71 +36,56 @@ export default function SettingsPage() {
   }, [setQuickActions]);
 
   return (
-    <Stack gap="xl" align="stretch" maxW="7xl" mx="auto" p={{ base: "md", md: "xl" }}>
-        
-        {/* 🎨 HEADER ELEGANTE - Dashboard Style + Dynamic Theming */}
-        <Stack direction="row" justify="space-between" align="end" pb="md">
-          <Stack gap="xs">
-            <Stack direction="row" align="center" gap="sm">
-              <Icon icon={CogIcon} size="lg"  />
-              <Typography variant="heading" size="2xl" weight="bold" >
-                Configuración
-              </Typography>
-            </Stack>
-            <Typography variant="body" color="secondary" size="md" pl="3xl">
-              Centro de comando · G-Admin
-            </Typography>
-          </Stack>
-          <Button  size="md">
+    <ContentLayout>
+      {/* 🎨 PAGE HEADER - Semantic, clean, with all functionality */}
+      <PageHeader 
+        title="Configuración"
+        subtitle="Centro de comando · G-Admin"
+        icon={CogIcon}
+        actions={
+          <Button size="md">
             <Icon icon={CogIcon} size="sm" />
             Guardar Cambios
           </Button>
-        </Stack>
+        }
+      />
 
-        {/* 📊 MÉTRICAS COMPACTAS - Horizontal Layout like Dashboard */}
-        <Stack 
-          direction={{ base: "column", md: "row" }} 
-          gap="md" 
-          align="stretch"
-          width="100%"
-        >
+      {/* 📊 METRICS SECTION - Semantic wrapper for dashboard stats */}
+      <StatsSection>
+        <CardGrid columns={{ base: 1, md: 4 }}>
           <MetricCard 
             title="Perfil Empresarial"
             value="Completo"
             subtitle="Información actualizada"
-            
             icon={BuildingOfficeIcon}
           />
           <MetricCard 
             title="Configuración Fiscal"
             value="IVA 21%"
             subtitle="Configurado correctamente"
-            
             icon={CurrencyDollarIcon}
           />
           <MetricCard 
             title="Permisos"
             value="3 Roles"
             subtitle="Activos en el sistema"
-            
             icon={UserGroupIcon}
           />
           <MetricCard 
             title="Integraciones"
             value="2 Activas"
             subtitle="APIs funcionando"
-            
             icon={LinkIcon}
           />
-        </Stack>
+        </CardGrid>
+      </StatsSection>
 
-        {/* 📋 SECCIONES PRINCIPALES */}
-        <BusinessProfileSection />
-        <TaxConfigurationSection />
-        <UserPermissionsSection />
-        <IntegrationsSection />
-        <SystemSection />
-        
-    </Stack>
+      {/* 📋 SECCIONES PRINCIPALES - Some sections moved to independent pages */}
+      <BusinessProfileSection />
+      <TaxConfigurationSection />
+      <UserPermissionsSection />
+      {/* IntegrationsSection moved to /integrations page */}
+      <SystemSection />
+    </ContentLayout>
   );
 }

@@ -5,64 +5,9 @@
 
 import { ReactNode } from 'react'
 import { HStack, VStack } from '@chakra-ui/react'
-import { Typography, Button, Badge, Icon, CardWrapper, Layout } from './index'
+import { Typography, Button, Badge, Icon, Layout } from './index'
 
 // 📊 METRIC CARD - CardWrapper de métrica instantáneo con iconos (Dashboard-style)
-export function MetricCard({ 
-  title, 
-  value, 
-  subtitle,
-  color = "brand",
-  icon
-}: { 
-  title: string
-  value: string | number
-  subtitle?: string
-  color?: "brand" | "success" | "warning" | "error" | "info" | "theme"
-  icon?: any // HeroIcon component
-}) {
-  return (
-    <CardWrapper 
-      variant="elevated" 
-       
-      padding="lg"
-      width="100%"
-      flex="1"
-      minWidth="0"
-    >
-      <HStack gap="md" align="center" justify="space-between" width="100%">
-        {/* Left side - Content */}
-        <VStack gap="xs" align="start" flex={1} minWidth="0">
-          <Typography variant="caption" color="secondary">
-            {title}
-          </Typography>
-          <Typography variant="heading" level={3} color={color} noWrap>
-            {value}
-          </Typography>
-          {subtitle && (
-            <Typography variant="caption" color="muted" size="xs">
-              {subtitle}
-            </Typography>
-          )}
-        </VStack>
-        
-        {/* Right side - Icon */}
-        {icon && (
-          <Icon 
-            icon={icon} 
-            size="lg" 
-            color={`${color}.500`}
-            bg={`${color}.50`}
-            p="sm"
-            borderRadius="md"
-            flexShrink={0}
-          />
-        )}
-      </HStack>
-    </CardWrapper>
-  )
-}
-
 // 🏷️ QUICK STATUS - Badge de estado instantáneo  
 export function QuickStatus({ 
   status, 
@@ -102,7 +47,7 @@ export function PageTitle({
           {title}
         </Typography>
         {subtitle && (
-          <Typography variant="body" color="secondary">
+          <Typography variant="body" color="text.secondary">
             {subtitle}
           </Typography>
         )}
@@ -157,7 +102,7 @@ export function ListItem({
           {title}
         </Typography>
         {subtitle && (
-          <Typography variant="caption" color="secondary">
+          <Typography variant="caption" color="text.secondary">
             {subtitle}
           </Typography>
         )}
@@ -184,11 +129,11 @@ export function EmptyState({
   return (
     <VStack gap={4} align="center" py={12}>
       <VStack gap={2} align="center">
-        <Typography variant="heading" level={3} color="muted">
+        <Typography variant="heading" level={3} color="text.muted">
           {title}
         </Typography>
         {description && (
-          <Typography variant="body" color="secondary" textAlign="center">
+          <Typography variant="body" color="text.secondary" textAlign="center">
             {description}
           </Typography>
         )}

@@ -372,7 +372,7 @@ export function QROrderPage() {
   }
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box minH="100vh" bg="bg.canvas">
       {/* Header */}
       <Box bg="white" shadow="sm" p={4} position="sticky" top={0} zIndex={10}>
         <VStack gap={2}>
@@ -437,7 +437,7 @@ export function QROrderPage() {
                     ) : (
                       <Box 
                         h="120px" 
-                        bg="gray.100" 
+                        bg="bg.surface" 
                         borderRadius="md" 
                         display="flex" 
                         alignItems="center" 
@@ -594,7 +594,7 @@ export function QROrderPage() {
           shadow="lg"
           p={4}
           borderTop="1px solid"
-          borderColor="gray.200"
+          borderColor="border.default"
         >
           <VStack gap={3}>
             {/* Order Summary */}

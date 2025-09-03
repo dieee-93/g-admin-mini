@@ -26,7 +26,7 @@ export function Breadcrumb() {
                   window.location.href = crumb.path;
                 }
               }}
-              color={crumb.isActive ? { base: 'gray.800', _dark: 'gray.100' } : { base: 'gray.600', _dark: 'gray.300' }}
+              color={crumb.isActive ? "text.primary" : "text.secondary"}
               fontWeight={crumb.isActive ? 'semibold' : 'normal'}
             >
               {crumb.label}
@@ -34,7 +34,7 @@ export function Breadcrumb() {
           ) : (
             <Text
               fontSize="sm"
-              color={crumb.isActive ? { base: 'gray.800', _dark: 'gray.100' } : { base: 'gray.600', _dark: 'gray.300' }}
+              color={crumb.isActive ? "text.primary" : "text.secondary"}
               fontWeight={crumb.isActive ? 'semibold' : 'normal'}
             >
               {crumb.label}
@@ -42,7 +42,7 @@ export function Breadcrumb() {
           )}
           
           {index < breadcrumbs.length - 1 && (
-            <ChevronRightIcon style={{ width: '16px', height: '16px', color: '#9CA3AF' }} />
+            <ChevronRightIcon style={{ width: '16px', height: '16px', color: 'var(--chakra-colors-text-muted)' }} />
           )}
         </HStack>
       ))}

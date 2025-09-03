@@ -1,4 +1,4 @@
-import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
+import { createSystem, defaultConfig, defineConfig, mergeConfigs } from '@chakra-ui/react'
 import { availableThemes } from '@/store/themeStore'
 
 /**
@@ -7,126 +7,139 @@ import { availableThemes } from '@/store/themeStore'
  */
 const getThemeColors = (themeId: string) => {
   const themeColors: Record<string, any> = {
-    // ✅ Light theme - Professional light color palette
+    // ✅ Light theme - Paleta gris estándar (como Chakra original)
     'light': {
-      50: { value: "#ffffff" }, // Pure white text
-      100: { value: "#f8fafc" }, // Very light background
-      200: { value: "#e2e8f0" }, // Light borders
-      300: { value: "#cbd5e1" }, // Subtle borders
-      400: { value: "#94a3b8" }, // Muted text
-      500: { value: "#3b82f6" }, // Primary blue
-      600: { value: "#2563eb" }, // Strong blue
-      700: { value: "#1d4ed8" }, // Dark blue borders
-      800: { value: "#f1f5f9" }, // Light surface background
-      900: { value: "#ffffff" }, // Canvas background (white)
+      50: { value: "#f9fafb" },   // Fondo claro
+      100: { value: "#f3f4f6" },  // Superficie clara
+      200: { value: "#e5e7eb" },  // Bordes claros
+      300: { value: "#d1d5db" },  // Elementos claros
+      400: { value: "#9ca3af" },  // Texto muted
+      500: { value: "#6b7280" },  // Primary gris
+      600: { value: "#4b5563" },  // Hover
+      700: { value: "#374151" },  // Divisores
+      800: { value: "#1f2937" },  // Superficie secundaria
+      900: { value: "#111827" },  // Texto negro
+    },
+    // ✅ Dark theme - Paleta gris oscura estándar (invertida de light)
+    'dark': {
+      50: { value: "#111827" },   // Fondo muy oscuro
+      100: { value: "#1f2937" },  // Superficie oscura
+      200: { value: "#374151" },  // Bordes oscuros
+      300: { value: "#4b5563" },  // Elementos oscuros
+      400: { value: "#6b7280" },  // Texto muted
+      500: { value: "#9ca3af" },  // Primary gris
+      600: { value: "#d1d5db" },  // Hover
+      700: { value: "#e5e7eb" },  // Divisores claros
+      800: { value: "#f3f4f6" },  // Superficie clara
+      900: { value: "#f9fafb" },  // Texto blanco
     },
     'synthwave-84': {
-      50: { value: "#fede5d" },
-      100: { value: "#ff7edb" }, 
-      200: { value: "#36f9f6" },
-      300: { value: "#72f1b8" },
-      400: { value: "#f97e72" },
-      500: { value: "#ff7edb" }, // Primary
-      600: { value: "#b084eb" },
-      700: { value: "#495495" },
-      800: { value: "#34294f" },
-      900: { value: "#241b2f" }, // Dark background
+      50: { value: "#241b2f" },   // Fondo principal - el más oscuro del tema original
+      100: { value: "#34294f" },  // Superficie - un poco más claro
+      200: { value: "#495495" },  // Bordes - color intermedio
+      300: { value: "#6d5aa6" },  // Elementos - progresión natural
+      400: { value: "#b084eb" },  // Elementos activos - púrpura intermedio
+      500: { value: "#ff7edb" },  // Primary - el rosa característico de synthwave
+      600: { value: "#72f1b8" },  // Acento fuerte - verde synthwave
+      700: { value: "#36f9f6" },  // Divisores brillantes - cyan synthwave
+      800: { value: "#fede5d" },  // Superficie destacada - amarillo synthwave
+      900: { value: "#f8f8f2" },  // Texto principal - blanco/claro
     },
     'monokai-pro': {
-      50: { value: "#fcfcfa" },
-      100: { value: "#f8f8f2" },
-      200: { value: "#e6db74" },
-      300: { value: "#a6e22e" }, 
-      400: { value: "#66d9ef" },
-      500: { value: "#fd971f" }, // Orange primary
-      600: { value: "#f92672" },
-      700: { value: "#ae81ff" },
-      800: { value: "#49483e" },
-      900: { value: "#272822" }, // Dark background
+      50: { value: "#272822" },   // Fondo principal - el característico verde oscuro de Monokai
+      100: { value: "#3c3d37" },  // Superficie - un poco más claro
+      200: { value: "#49483e" },  // Bordes - color característico de comentarios
+      300: { value: "#6a6b5d" },  // Elementos - progresión natural
+      400: { value: "#8b8c7d" },  // Elementos activos 
+      500: { value: "#fd971f" },  // Primary - el naranja característico de Monokai
+      600: { value: "#f92672" },  // Acento fuerte - rosa de Monokai
+      700: { value: "#a6e22e" },  // Acento verde - verde de Monokai
+      800: { value: "#e6db74" },  // Superficie destacada - amarillo de Monokai
+      900: { value: "#f8f8f2" },  // Texto principal - blanco característico
     },
     'dracula': {
-      50: { value: "#f8f8f2" },
-      100: { value: "#6272a4" },
-      200: { value: "#8be9fd" },
-      300: { value: "#50fa7b" },
-      400: { value: "#ffb86c" },
-      500: { value: "#bd93f9" }, // Purple primary
-      600: { value: "#ff79c6" },
-      700: { value: "#ff5555" },
-      800: { value: "#44475a" },
-      900: { value: "#282a36" }, // Dark background
+      50: { value: "#282a36" },   // Fondo principal - el característico fondo oscuro de Dracula
+      100: { value: "#44475a" },  // Superficie - color de comentarios/UI elements
+      200: { value: "#6272a4" },  // Bordes - un azul más claro
+      300: { value: "#7d8cc4" },  // Elementos - progresión hacia texto
+      400: { value: "#9fb1d4" },  // Elementos activos
+      500: { value: "#bd93f9" },  // Primary - el púrpura característico de Dracula
+      600: { value: "#ff79c6" },  // Acento fuerte - rosa de Dracula
+      700: { value: "#50fa7b" },  // Acento verde - verde de Dracula
+      800: { value: "#ffb86c" },  // Superficie destacada - naranja de Dracula
+      900: { value: "#f8f8f2" },  // Texto principal - blanco característico
     },
     'tokyo-night': {
-      50: { value: "#c0caf5" }, // Light foreground text
-      100: { value: "#a9b1d6" }, // Secondary text
-      200: { value: "#9aa5ce" }, // Muted text
-      300: { value: "#787c99" }, // Medium contrast
-      400: { value: "#565f89" }, // UI elements
-      500: { value: "#414868" }, // Primary accent
-      600: { value: "#33467c" }, // Darker accent
-      700: { value: "#293e75" }, // Border/divider
-      800: { value: "#1a1b26" }, // Surface background
-      900: { value: "#16161e" }, // Canvas background
+      50: { value: "#16161e" },   // Fondo principal - el más oscuro
+      100: { value: "#1a1b26" },  // Superficie - fondo de superficie 
+      200: { value: "#24253a" },  // Bordes - un poco más claro
+      300: { value: "#414868" },  // Elementos - accent color original
+      400: { value: "#565f89" },  // Elementos activos
+      500: { value: "#7aa2f7" },  // Primary - azul característico de Tokyo Night
+      600: { value: "#bb9af7" },  // Acento púrpura
+      700: { value: "#9aa5ce" },  // Texto secundario
+      800: { value: "#a9b1d6" },  // Superficie clara
+      900: { value: "#c0caf5" },  // Texto principal - el más claro
     },
     'material-oceanic': {
-      50: { value: "#eeffff" }, // White text
-      100: { value: "#b2ebf2" }, // Light cyan
-      200: { value: "#80deea" }, // Bright cyan
-      300: { value: "#4dd0e1" }, // Medium cyan
-      400: { value: "#26c6da" }, // Active cyan
-      500: { value: "#00acc1" }, // Primary cyan
-      600: { value: "#00838f" }, // Dark cyan
-      700: { value: "#006064" }, // Border/divider
-      800: { value: "#004d5c" }, // Surface background
-      900: { value: "#0e1419" }, // Dark canvas
+      50: { value: "#0e1419" },   // Fondo principal - canvas oscuro
+      100: { value: "#1e2329" },  // Superficie - un poco más claro
+      200: { value: "#004d5c" },  // Bordes - azul oscuro
+      300: { value: "#006064" },  // Elementos 
+      400: { value: "#00838f" },  // Elementos activos
+      500: { value: "#00acc1" },  // Primary - cyan característico
+      600: { value: "#26c6da" },  // Acento activo
+      700: { value: "#4dd0e1" },  // Acento medio
+      800: { value: "#80deea" },  // Superficie destacada
+      900: { value: "#eeffff" },  // Texto principal - blanco
     },
     'material-darker': {
-      50: { value: "#ffffff" }, // Pure white text
-      100: { value: "#eeffff" }, // Off-white
-      200: { value: "#b2dfdb" }, // Light teal
-      300: { value: "#80cbc4" }, // Medium teal
-      400: { value: "#4db6ac" }, // Active teal
-      500: { value: "#26a69a" }, // Primary teal
-      600: { value: "#009688" }, // Strong teal
-      700: { value: "#00796b" }, // Dark teal
-      800: { value: "#212121" }, // Dark surface
-      900: { value: "#171717" }, // Darker canvas
+      50: { value: "#171717" },   // Fondo principal - darker canvas
+      100: { value: "#212121" },  // Superficie - dark surface
+      200: { value: "#2d2d2d" },  // Bordes - un poco más claro
+      300: { value: "#424242" },  // Elementos 
+      400: { value: "#616161" },  // Elementos activos
+      500: { value: "#26a69a" },  // Primary - teal característico
+      600: { value: "#009688" },  // Teal fuerte
+      700: { value: "#4db6ac" },  // Teal activo
+      800: { value: "#80cbc4" },  // Superficie destacada - teal claro
+      900: { value: "#ffffff" },  // Texto principal - blanco puro
     },
     'material-palenight': {
-      50: { value: "#ffffff" }, // White text
-      100: { value: "#959dcb" }, // Light purple-gray
-      200: { value: "#89ddff" }, // Bright cyan
-      300: { value: "#82aaff" }, // Blue accent
-      400: { value: "#c792ea" }, // Purple accent
-      500: { value: "#ff9cac" }, // Pink primary
-      600: { value: "#ffcb6b" }, // Yellow accent
-      700: { value: "#a3f7bf" }, // Green accent
-      800: { value: "#3c435e" }, // Surface background
-      900: { value: "#292d3e" }, // Canvas background
+      50: { value: "#292d3e" },   // Fondo principal - canvas oscuro
+      100: { value: "#3c435e" },  // Superficie 
+      200: { value: "#4a5167" },  // Bordes
+      300: { value: "#676e95" },  // Elementos
+      400: { value: "#8087a2" },  // Elementos activos
+      500: { value: "#c792ea" },  // Primary - púrpura característico
+      600: { value: "#82aaff" },  // Azul accent
+      700: { value: "#89ddff" },  // Cyan accent
+      800: { value: "#a3f7bf" },  // Verde accent (superficie destacada)
+      900: { value: "#ffffff" },  // Texto principal - blanco
     },
     'material-deep-ocean': {
-      50: { value: "#ffffff" }, // White text
-      100: { value: "#8f93a2" }, // Muted text
-      200: { value: "#84ffff" }, // Bright cyan
-      300: { value: "#82aaff" }, // Blue accent
-      400: { value: "#c792ea" }, // Purple accent
-      500: { value: "#ff9cac" }, // Pink primary
-      600: { value: "#ffcc02" }, // Yellow accent
-      700: { value: "#85e89d" }, // Green accent
-      800: { value: "#2e3c43" }, // Surface background
-      900: { value: "#0f111a" }, // Deep canvas
+      50: { value: "#0f111a" },   // Fondo principal - deep canvas
+      100: { value: "#1a1d26" },  // Superficie 
+      200: { value: "#2e3c43" },  // Bordes
+      300: { value: "#4a5862" },  // Elementos
+      400: { value: "#6b7785" },  // Elementos activos
+      500: { value: "#82aaff" },  // Primary - azul característico
+      600: { value: "#c792ea" },  // Púrpura accent
+      700: { value: "#84ffff" },  // Cyan brillante accent
+      800: { value: "#85e89d" },  // Verde accent (superficie destacada)
+      900: { value: "#ffffff" },  // Texto principal - blanco
     },
     'atom-one-dark': {
-      50: { value: "#abb2bf" }, // Light foreground
-      100: { value: "#828997" }, // Muted text
-      200: { value: "#61afef" }, // Blue accent
-      300: { value: "#c678dd" }, // Purple accent
-      400: { value: "#e06c75" }, // Red accent
-      500: { value: "#98c379" }, // Green primary
-      600: { value: "#e5c07b" }, // Yellow accent
-      700: { value: "#d19a66" }, // Orange accent
-      800: { value: "#3e4451" }, // Surface background
-      900: { value: "#282c34" }, // Canvas background
+      50: { value: "#282c34" },   // Fondo principal - canvas oscuro
+      100: { value: "#3e4451" },  // Superficie
+      200: { value: "#4b5263" },  // Bordes 
+      300: { value: "#636d83" },  // Elementos
+      400: { value: "#828997" },  // Elementos activos (texto muted original)
+      500: { value: "#61afef" },  // Primary - azul característico
+      600: { value: "#c678dd" },  // Púrpura accent
+      700: { value: "#98c379" },  // Verde accent
+      800: { value: "#e5c07b" },  // Amarillo accent (superficie destacada)
+      900: { value: "#abb2bf" },  // Texto principal - foreground claro
     },
     'high-contrast': {
       50: { value: "#ffffff" }, // Pure white
@@ -142,16 +155,16 @@ const getThemeColors = (themeId: string) => {
     },
     // Professional light themes
     'corporate': {
-      50: { value: "#eff6ff" }, // Very light blue
-      100: { value: "#dbeafe" }, // Light blue
-      200: { value: "#bfdbfe" }, // Soft blue
-      300: { value: "#93c5fd" }, // Medium blue
-      400: { value: "#60a5fa" }, // Active blue
+      50: { value: "#eff6ff" }, // Very light blue - fondo principal
+      100: { value: "#dbeafe" }, // Light blue - superficie
+      200: { value: "#bfdbfe" }, // Soft blue - bordes
+      300: { value: "#93c5fd" }, // Medium blue - elementos
+      400: { value: "#60a5fa" }, // Active blue - elementos activos
       500: { value: "#1e40af" }, // Primary corporate blue
-      600: { value: "#1d4ed8" }, // Strong blue
-      700: { value: "#1e3a8a" }, // Dark blue border
-      800: { value: "#1e40af" }, // Surface blue
-      900: { value: "#1e3a8a" }, // Canvas blue
+      600: { value: "#1d4ed8" }, // Strong blue - hover
+      700: { value: "#1e3a8a" }, // Dark blue - divisores
+      800: { value: "#1e293b" }, // Superficie secundaria (más sutil)
+      900: { value: "#0f172a" }, // Texto principal (dark slate)
     },
     'nature': {
       50: { value: "#f0fdf4" }, // Very light green
@@ -189,54 +202,106 @@ const getThemeColors = (themeId: string) => {
       800: { value: "#164e63" }, // Surface blue
       900: { value: "#083344" }, // Canvas blue
     },
-    // Professional dark themes
+    // Professional dark themes - INVERTIDOS de sus contrapartes light
     'corporate-dark': {
-      50: { value: "#f0f9ff" }, // Light text
-      100: { value: "#e0f2fe" }, // Secondary text
-      200: { value: "#bae6fd" }, // Accent text
-      300: { value: "#7dd3fc" }, // Medium elements
-      400: { value: "#38bdf8" }, // Active elements
-      500: { value: "#0ea5e9" }, // Primary corporate
-      600: { value: "#0284c7" }, // Strong accent
-      700: { value: "#0369a1" }, // Border/divider
-      800: { value: "#075985" }, // Surface background
-      900: { value: "#0c4a6e" }, // Dark canvas
+      50: { value: "#0f172a" },   // Fondo oscuro (texto de corporate)
+      100: { value: "#1e293b" },  // Superficie oscura (superficie secundaria de corporate)
+      200: { value: "#1e3a8a" },  // Bordes oscuros (divisores de corporate)
+      300: { value: "#1d4ed8" },  // Elementos oscuros (hover de corporate)
+      400: { value: "#1e40af" },  // Activos oscuros (primary de corporate)
+      500: { value: "#60a5fa" },  // Primary invertido (elementos activos de corporate)
+      600: { value: "#93c5fd" },  // Acento fuerte (elementos de corporate)
+      700: { value: "#bfdbfe" },  // Divisores claros (bordes de corporate)
+      800: { value: "#dbeafe" },  // Superficie clara (superficie de corporate)
+      900: { value: "#eff6ff" },  // Texto claro (fondo de corporate)
     },
     'nature-dark': {
-      50: { value: "#ecfdf5" }, // Light text
-      100: { value: "#d1fae5" }, // Secondary text
-      200: { value: "#a7f3d0" }, // Accent text
-      300: { value: "#6ee7b7" }, // Medium elements
-      400: { value: "#34d399" }, // Active elements
-      500: { value: "#10b981" }, // Primary nature
-      600: { value: "#059669" }, // Strong accent
-      700: { value: "#047857" }, // Border/divider
-      800: { value: "#065f46" }, // Surface background
-      900: { value: "#064e3b" }, // Dark canvas
+      50: { value: "#0f3d1a" }, // Fondo oscuro (era 900 de nature)
+      100: { value: "#14532d" }, // Superficie oscura (era 800 de nature)
+      200: { value: "#166534" }, // Bordes oscuros (era 700 de nature)
+      300: { value: "#15803d" }, // Elementos oscuros (era 600 de nature)
+      400: { value: "#16a34a" }, // Activos oscuros (era 500 de nature)
+      500: { value: "#4ade80" }, // Primary invertido (era 400 de nature)
+      600: { value: "#86efac" }, // Acento fuerte (era 300 de nature)
+      700: { value: "#bbf7d0" }, // Divisores claros (era 200 de nature)
+      800: { value: "#dcfce7" }, // Superficie clara (era 100 de nature)
+      900: { value: "#f0fdf4" }, // Texto claro (era 50 de nature)
     },
     'sunset-dark': {
-      50: { value: "#fef2f2" }, // Light text
-      100: { value: "#fee2e2" }, // Secondary text
-      200: { value: "#fecaca" }, // Accent text
-      300: { value: "#fca5a5" }, // Medium elements
-      400: { value: "#f87171" }, // Active elements
-      500: { value: "#ef4444" }, // Primary sunset red
-      600: { value: "#dc2626" }, // Strong accent
-      700: { value: "#b91c1c" }, // Border/divider
-      800: { value: "#991b1b" }, // Surface background
-      900: { value: "#7f1d1d" }, // Dark canvas
+      50: { value: "#7c2d12" }, // Fondo oscuro (era 900 de sunset)
+      100: { value: "#9a3412" }, // Superficie oscura (era 800 de sunset)
+      200: { value: "#c2410c" }, // Bordes oscuros (era 700 de sunset)
+      300: { value: "#dc2626" }, // Elementos oscuros (era 600 de sunset)
+      400: { value: "#ea580c" }, // Activos oscuros (era 500 de sunset)
+      500: { value: "#fb923c" }, // Primary invertido (era 400 de sunset)
+      600: { value: "#fdba74" }, // Acento fuerte (era 300 de sunset)
+      700: { value: "#fed7aa" }, // Divisores claros (era 200 de sunset)
+      800: { value: "#ffedd5" }, // Superficie clara (era 100 de sunset)
+      900: { value: "#fff7ed" }, // Texto claro (era 50 de sunset)
     },
     'ocean-dark': {
-      50: { value: "#f0fdfa" }, // Light text
-      100: { value: "#ccfbf1" }, // Secondary text
-      200: { value: "#99f6e4" }, // Accent text
-      300: { value: "#5eead4" }, // Medium elements
-      400: { value: "#2dd4bf" }, // Active elements
-      500: { value: "#14b8a6" }, // Primary ocean teal
-      600: { value: "#0d9488" }, // Strong accent
-      700: { value: "#0f766e" }, // Border/divider
-      800: { value: "#115e59" }, // Surface background
-      900: { value: "#134e4a" }, // Dark canvas
+      50: { value: "#083344" }, // Fondo oscuro (era 900 de ocean)
+      100: { value: "#164e63" }, // Superficie oscura (era 800 de ocean)
+      200: { value: "#155e75" }, // Bordes oscuros (era 700 de ocean)
+      300: { value: "#0e7490" }, // Elementos oscuros (era 600 de ocean)
+      400: { value: "#0891b2" }, // Activos oscuros (era 500 de ocean)
+      500: { value: "#22d3ee" }, // Primary invertido (era 400 de ocean)
+      600: { value: "#67e8f9" }, // Acento fuerte (era 300 de ocean)
+      700: { value: "#a5f3fc" }, // Divisores claros (era 200 de ocean)
+      800: { value: "#cffafe" }, // Superficie clara (era 100 de ocean)
+      900: { value: "#ecfeff" }, // Texto claro (era 50 de ocean)
+    },
+    // 🌌 Nord Theme - Popular Scandinavian palette
+    'nord': {
+      50: { value: "#2e3440" },   // Polar Night darkest
+      100: { value: "#3b4252" },  // Polar Night 
+      200: { value: "#434c5e" },  // Polar Night
+      300: { value: "#4c566a" },  // Polar Night lightest
+      400: { value: "#5e81ac" },  // Frost blue
+      500: { value: "#81a1c1" },  // Primary frost blue
+      600: { value: "#88c0d0" },  // Frost cyan
+      700: { value: "#8fbcbb" },  // Frost aqua
+      800: { value: "#d8dee9" },  // Snow Storm
+      900: { value: "#eceff4" },  // Snow Storm lightest
+    },
+    // 🟤 Gruvbox - Classic retro-groove theme
+    'gruvbox': {
+      50: { value: "#282828" },   // bg0_h (hard background)
+      100: { value: "#3c3836" },  // bg1
+      200: { value: "#504945" },  // bg2
+      300: { value: "#665c54" },  // bg3
+      400: { value: "#7c6f64" },  // bg4
+      500: { value: "#d79921" },  // Primary yellow
+      600: { value: "#fe8019" },  // Orange accent
+      700: { value: "#8ec07c" },  // Green accent
+      800: { value: "#fabd2f" },  // Bright yellow
+      900: { value: "#ebdbb2" },  // fg0 (foreground)
+    },
+    // 🤖 Cyberpunk - Futuristic neon theme
+    'cyberpunk': {
+      50: { value: "#0d1117" },   // Ultra dark with blue tint
+      100: { value: "#161b22" },  // Dark surface
+      200: { value: "#21262d" },  // Medium dark
+      300: { value: "#30363d" },  // Elements
+      400: { value: "#484f58" },  // Active elements
+      500: { value: "#ff007f" },  // Primary hot pink/magenta
+      600: { value: "#00ff9f" },  // Neon green accent
+      700: { value: "#00d4ff" },  // Electric cyan
+      800: { value: "#ff6b35" },  // Neon orange
+      900: { value: "#f0f6fc" },  // Bright white text
+    },
+    // 🌸 Pastel - Soft and modern theme
+    'pastel': {
+      50: { value: "#fef7ff" },   // Very light lavender
+      100: { value: "#f3e8ff" },  // Light lavender
+      200: { value: "#e9d5ff" },  // Soft lavender
+      300: { value: "#d8b4fe" },  // Medium lavender
+      400: { value: "#c084fc" },  // Active lavender
+      500: { value: "#a855f7" },  // Primary vibrant purple
+      600: { value: "#9333ea" },  // Deep purple
+      700: { value: "#7c3aed" },  // Rich purple
+      800: { value: "#6b21a8" },  // Dark purple
+      900: { value: "#581c87" },  // Very dark purple
     }
   }
   
@@ -255,9 +320,9 @@ export const createThemeSystem = (themeId: string) => {
     return createSystem(defaultConfig)
   }
 
-  // Handle system and dark themes
-  if (['dark', 'system'].includes(themeId)) {
-    return createSystem(defaultConfig) // Use default for basic themes
+  // Handle system theme only (dark now has its own palette)
+  if (themeId === 'system') {
+    return createSystem(defaultConfig) // Use default for system theme only
   }
 
   const themeColors = getThemeColors(themeId)
@@ -267,24 +332,65 @@ export const createThemeSystem = (themeId: string) => {
     return createSystem(defaultConfig)
   }
   
-  // 🎯 ENFOQUE CORRECTO: Solo mapear gray.* con los colores del tema
+  // 🎯 ENFOQUE UNIFICADO: Solo mapear gray.* con los colores del tema
+  // Los semantic tokens se adaptan automáticamente porque referencian gray.*
   // Todos los componentes por defecto usan gray.* automáticamente
   const config = defineConfig({
-    theme: {
+  // 🎨 Estilos globales para barras de scroll adaptadas a cada tema
+  globalCss: {
+    // Webkit browsers (Chrome, Safari, Edge)
+    '::-webkit-scrollbar': {
+      width: '10px',                   // Aumentamos el ancho para mejor visibilidad
+      height: '10px',
+    },
+    '::-webkit-scrollbar-track': {
+      bg: '{colors.bg.muted}',         // Fondo más oscuro para mayor contraste
+      borderRadius: '6px',
+      border: '1px solid {colors.border.subtle}',
+    },
+    '::-webkit-scrollbar-thumb': {
+      bg: '{colors.fg.muted}',         // Thumb más contrastado
+      borderRadius: '6px',
+      border: '2px solid {colors.bg.muted}',  // Borde más grueso
+      _hover: {
+        bg: '{colors.fg.default}',     // Hover más visible
+        border: '2px solid {colors.bg.subtle}',
+      },
+    },
+    '::-webkit-scrollbar-thumb:active': {
+      bg: '{colors.accent.default}',   // Activo con color de acento para máximo contraste
+      border: '2px solid {colors.bg.default}',
+    },
+    '::-webkit-scrollbar-corner': {
+      bg: '{colors.bg.muted}',         // Esquina igual al track
+    },
+    
+    // Firefox - mayor contraste también
+    html: {
+      scrollbarWidth: 'thin',
+      scrollbarColor: '{colors.fg.muted} {colors.bg.muted}',  // Thumb y track más contrastados
+    },
+    
+    // Estilos adicionales para elementos con scroll personalizado
+    '.custom-scrollbar': {
+      scrollbarWidth: 'thin',
+      scrollbarColor: '{colors.fg.muted} {colors.bg.muted}',
+    },
+  },    theme: {
       tokens: {
         colors: {
           // ✅ CLAVE: Mapear SOLO gray.* con nuestros colores de tema  
           gray: {
-            50: { value: themeColors[50].value },   // Light text
-            100: { value: themeColors[100].value }, // Secondary light  
-            200: { value: themeColors[200].value }, // Secondary text
-            300: { value: themeColors[300].value }, // Muted elements
-            400: { value: themeColors[400].value }, // Disabled/muted
-            500: { value: themeColors[500].value }, // Primary color (botones default)
+            50: { value: themeColors[50].value },   // Fondo (light) / Fondo (dark)
+            100: { value: themeColors[100].value }, // Superficie (light) / Superficie (dark)
+            200: { value: themeColors[200].value }, // Bordes (light) / Bordes (dark)
+            300: { value: themeColors[300].value }, // Elementos (light) / Elementos (dark)
+            400: { value: themeColors[400].value }, // Activos (light) / Activos (dark)
+            500: { value: themeColors[500].value }, // Primary color
             600: { value: themeColors[600].value }, // Hover states
-            700: { value: themeColors[700].value }, // Borders/dividers  
-            800: { value: themeColors[800].value }, // Surface backgrounds
-            900: { value: themeColors[900].value }, // Canvas/main background
+            700: { value: themeColors[700].value }, // Divisores
+            800: { value: themeColors[800].value }, // Superficie secundaria
+            900: { value: themeColors[900].value }, // Texto (light) / Texto (dark)
           },
 
           // ✅ Mantener paletas estándar para colorPalette props
@@ -338,71 +444,67 @@ export const createThemeSystem = (themeId: string) => {
           },
         },
       },
-      
-      // ✅ Semantic tokens con sintaxis CORRECTA referenciando gray.* 
+
+      // ✅ Semantic tokens UNIFICADOS - Referencian gray.* que se auto-adapta al tema
       semanticTokens: {
         colors: {
-          'bg.canvas': { 
-            value: "{colors.gray.900}"
-          },
-          'bg.surface': { 
-            value: "{colors.gray.800}"
-          },
-          'bg.subtle': {
-            value: "{colors.gray.700}"
-          },
-          'bg.muted': {
-            value: "{colors.gray.600}"
+          // Fondos - Estructura anidada según documentación Chakra UI v3
+          'bg': {
+            'DEFAULT': { value: "{colors.gray.50}" },    // Fondo principal (claro en light, oscuro en dark)
+            'canvas': { value: "{colors.gray.50}" },     // Alias para fondo principal
+            'surface': { value: "{colors.gray.50}" },    // Superficie (cards, modales)
+            'panel': { value: "{colors.gray.100}" },         // Paneles/dropdowns - se adapta a cada tema
+            'subtle': { value: "{colors.gray.200}" },    // Superficie sutil
+            'muted': { value: "{colors.gray.300}" },     // Superficie muted
           },
           
-          'text.primary': { 
-            value: "{colors.gray.50}"
-          },
-          'text.secondary': {
-            value: "{colors.gray.100}"
-          },
-          'text.muted': {
-            value: "{colors.gray.300}"
+          // Texto - Referencian gray.* tokens (se adaptan automáticamente al tema)
+          'text': {
+            'primary': { value: "{colors.gray.900}" },   // Texto principal (oscuro en light, claro en dark)
+            'secondary': { value: "{colors.gray.800}" }, // Texto secundario
+            'muted': { value: "{colors.gray.600}" },     // Texto muted
           },
           
-          'border.subtle': { 
-            value: "{colors.gray.700}"
+          // Foreground - Token que usan muchos componentes de Chakra para texto
+          'fg': {
+            'DEFAULT': { value: "{colors.gray.900}" },   // Foreground principal = text.primary
+            'muted': { value: "{colors.gray.600}" },     // Foreground muted = text.muted
+            'subtle': { value: "{colors.gray.700}" },    // Foreground sutil
           },
-          'border.default': {
-            value: "{colors.gray.600}"
+          
+          // Bordes - Referencian gray.* tokens (se adaptan automáticamente al tema)
+          'border': {
+            'subtle': { value: "{colors.gray.200}" },    // Bordes sutiles
+            'default': { value: "{colors.gray.300}" },   // Bordes default
           },
         },
       },
 
       // 🎨 RECIPES según documento: Solo estructura, let Chakra handle colors
       recipes: {
-        // ✅ Button Recipe - Según Phase 2: Remove color overrides
-        button: {
-          base: {
-            fontWeight: 'medium',
-            borderRadius: 'md',
-          },
-          // NO variant overrides - let Chakra handle colorPalette
-        },
+        // Button recipe removed - let Chakra use 100% default behavior
 
-        // ✅ Card Recipe - Use gray.* tokens (our dynamic theme colors)
+        // ✅ Card Recipe - CONTRASTE CORRECTO con nuestro sistema gray.*
         card: {
           base: {
-            bg: 'gray.800',           // Surface background
-            color: 'gray.50',         // Text color
-            borderColor: 'gray.700',  // Border color
+            bg: 'gray.100',           // Superficie (claro en light, oscuro en dark)
+            color: 'gray.900',        // Texto (oscuro en light, claro en dark)
+            borderColor: 'gray.300',  // Border sutil
             borderRadius: 'md',
           },
           variants: {
             elevated: {
               shadow: 'md',
+              bg: 'gray.100',         // Mantener superficie consistente
+              borderColor: 'gray.200', // Border más sutil para elevated
             },
             outline: {
               border: '1px solid',
-              borderColor: 'gray.700',
+              borderColor: 'gray.300',
+              bg: 'transparent',
             },
             subtle: {
-              bg: 'gray.700',
+              bg: 'gray.200',         // Superficie ligeramente diferente
             },
           },
         },
@@ -435,23 +537,46 @@ export const createThemeSystem = (themeId: string) => {
             },
           },
         },
+
+        // ✅ Select Recipe - CONTRASTE CORRECTO para inputs/selects
+        select: {
+          base: {
+            bg: 'bg.panel',           // Fondo de panel (gray.100)
+            color: 'text.primary',    // Texto principal (gray.900 en light, gray.50 en dark)
+            borderColor: 'border.default', // Border default (gray.300)
+            borderRadius: 'md',
+          },
+          variants: {
+            outline: {
+              border: '1px solid',
+              borderColor: 'border.default',
+              bg: 'bg.panel',
+              color: 'text.primary',
+              _hover: {
+                borderColor: 'gray.400',
+              },
+              _focus: {
+                borderColor: 'gray.500',
+                boxShadow: '0 0 0 1px {colors.gray.500}',
+              },
+            },
+            filled: {
+              bg: 'bg.subtle',
+              color: 'text.primary',
+              border: 'none',
+              _hover: {
+                bg: 'bg.muted',
+              },
+            },
+          },
+        },
       },
     },
   })
 
-  console.log(`🎨 Creating system for theme: ${themeId}`, {
-    themeColors,
-    recipes: Object.keys(config.theme.recipes),
-    grayTokens: config.theme.tokens.colors.gray,
-    semanticTokens: config.theme.semanticTokens.colors
-  })
-  
-  // ✅ RESTORE: Merge with defaultConfig to maintain base functionality
-  const system = createSystem(defaultConfig, config)
-  console.log('🔍 System created:', {
-    hasSemanticTokens: !!system._config.theme.semanticTokens,
-    bgSurface: system._config.theme.semanticTokens?.colors?.['bg.surface']
-  })
+  // ✅ CORRECT: Use mergeConfigs explicitly before createSystem
+  const mergedConfig = mergeConfigs(defaultConfig, config)
+  const system = createSystem(mergedConfig)
   return system
 }
 

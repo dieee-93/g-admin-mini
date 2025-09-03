@@ -200,7 +200,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
                   <Box 
                     height="44px"
                     px="3"
-                    bg="gray.50"
+                    bg="bg.canvas"
                     border="1px solid"
                     borderColor="border"
                     borderLeft="0"
@@ -208,7 +208,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
                     display="flex"
                     alignItems="center"
                     fontSize="sm"
-                    color="fg.muted"
+                    color="text.muted"
                     fontWeight="medium"
                   >
                     {unit}
@@ -349,14 +349,14 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
                   <Box
                     height="44px"
                     px="3"
-                    bg="gray.50"
+                    bg="bg.canvas"
                     border="1px solid"
                     borderColor="border"
                     borderRadius="md"
                   display="flex"
                   alignItems="center"
                   fontSize="md"
-                  color="fg.muted"
+                  color="text.muted"
                 >
                   {ingredients.length > 0 ? `${ingredients.length} porción${ingredients.length === 1 ? '' : 'es'}` : 'Se calculará según ingredientes'}
                 </Box>
@@ -388,7 +388,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
               {/* Current Ingredient Workflow */}
               {!currentIngredient.material ? (
                 <Stack gap="3">
-                  <Text fontSize="sm" color="fg.muted">
+                  <Text fontSize="sm" color="text.muted">
                     Selecciona una materia prima para agregar:
                   </Text>
                   <MaterialSelector
@@ -430,7 +430,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
                               <Text fontSize="sm" fontWeight="medium">
                                 {ingredient.name}
                               </Text>
-                              <Text fontSize="xs" color="fg.muted">
+                              <Text fontSize="xs" color="text.muted">
                                 {ingredient.quantity} {ingredient.unit} • ${ingredient.cost.toFixed(2)} ARS
                               </Text>
                             </Stack>

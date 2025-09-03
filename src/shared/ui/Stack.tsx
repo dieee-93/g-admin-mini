@@ -4,14 +4,13 @@ import {
   Stack as ChakraStack 
 } from '@chakra-ui/react'
 import type { ReactNode, CSSProperties } from 'react'
-
-// Responsive types for Chakra UI v3 - based on official documentation
-type ResponsiveValue<T> = T | { base?: T; sm?: T; md?: T; lg?: T; xl?: T; '2xl'?: T }
+import type { ResponsiveValue, SpacingProp } from './types'
+import { getSpacingToken } from './types'
 
 interface StackProps {
   children: ReactNode
   direction?: ResponsiveValue<'row' | 'column' | 'row-reverse' | 'column-reverse'>
-  gap?: ResponsiveValue<'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>
+  gap?: SpacingProp
   align?: ResponsiveValue<'start' | 'center' | 'end' | 'stretch' | 'baseline'>
   justify?: ResponsiveValue<'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly'>
   wrap?: boolean
@@ -24,7 +23,7 @@ interface StackProps {
 
 interface VStackProps {
   children: ReactNode
-  gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  gap?: SpacingProp
   align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
   className?: string
   width?: string
@@ -35,7 +34,7 @@ interface VStackProps {
 
 interface HStackProps {
   children: ReactNode
-  gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  gap?: SpacingProp
   align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
   justify?: 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly'
   wrap?: boolean
@@ -48,7 +47,7 @@ interface HStackProps {
 
 interface ClusterProps {
   children: ReactNode
-  gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  gap?: SpacingProp
   align?: 'start' | 'center' | 'end' | 'stretch'
   justify?: 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly'
   className?: string
@@ -67,7 +66,7 @@ interface CenterProps {
 export function Stack({
   children,
   direction = 'column',
-  gap = 'md', // ✅ MEJORADO: 16px → 24px para mejor respiración
+  gap = 'md', // Default semantic token
   align = 'stretch',
   justify = 'start',
   wrap = false,
@@ -80,7 +79,7 @@ export function Stack({
   return (
     <ChakraStack
       direction={direction}
-      gap={gap}
+      gap={getSpacingToken(gap)}
       align={align}
       justify={justify}
       wrap={wrap ? 'wrap' : 'nowrap'}
@@ -98,7 +97,7 @@ export function Stack({
 // VStack component
 export function VStack({
   children,
-  gap = 'md', // ✅ MEJORADO: 16px → 24px para mejor respiración
+  gap = 'md', // Default semantic token
   align = 'stretch',
   className,
   width,
@@ -108,7 +107,7 @@ export function VStack({
 }: VStackProps) {
   return (
     <ChakraVStack
-      gap={gap}
+      gap={getSpacingToken(gap)}
       align={align}
       className={className}
       w={width}
@@ -124,7 +123,7 @@ export function VStack({
 // HStack component
 export function HStack({
   children,
-  gap = 'md', // ✅ MEJORADO: 16px → 24px para mejor respiración
+  gap = 'md', // Default semantic token
   align = 'center',
   justify = 'start',
   wrap = false,
@@ -136,7 +135,7 @@ export function HStack({
 }: HStackProps) {
   return (
     <ChakraHStack
-      gap={gap}
+      gap={getSpacingToken(gap)}
       align={align}
       justify={justify}
       wrap={wrap ? 'wrap' : 'nowrap'}
@@ -154,7 +153,7 @@ export function HStack({
 // Cluster for wrapping layouts
 export function Cluster({
   children,
-  gap = 'md', // ✅ MEJORADO: 16px → 24px para mejor respiración
+  gap = 'md', // Default semantic token
   align = 'center',
   justify = 'start',
   className,
@@ -163,7 +162,7 @@ export function Cluster({
 }: ClusterProps) {
   return (
     <ChakraHStack
-      gap={gap}
+      gap={getSpacingToken(gap)}
       align={align}
       justify={justify}
       wrap="wrap"

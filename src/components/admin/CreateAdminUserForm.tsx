@@ -141,10 +141,10 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
               <UserPlusIcon style={{ width: '24px', height: '24px' }} />
             </div>
             <VStack gap="xs" align="start">
-              <Typography variant="heading" color="primary">
+              <Typography variant="heading" color="text.primary">
                 Crear Usuario Administrativo
               </Typography>
-              <Typography variant="caption" color="muted">
+              <Typography variant="caption" color="text.muted">
                 Usuario con acceso al panel de administración
               </Typography>
             </VStack>
@@ -229,7 +229,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
               <CardWrapper variant="outline" padding="md">
                 <VStack gap="sm" align="stretch">
                   <HStack justify="space-between" align="center">
-                    <Typography variant="label" color="secondary">
+                    <Typography variant="label" color="text.secondary">
                       Nivel de Seguridad:
                     </Typography>
                     <HStack gap="xs">
@@ -345,10 +345,10 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
             <HStack gap="sm" align="start">
               <ShieldCheckIcon style={{ width: '16px', height: '16px', color: '#3182ce', marginTop: '2px' }} />
               <VStack gap="xs" align="start">
-                <Typography variant="label" color="primary" size="sm">
+                <Typography variant="label" color="text.primary" size="sm">
                   Política de Seguridad
                 </Typography>
-                <Typography variant="caption" color="muted" size="sm">
+                <Typography variant="caption" color="text.muted" size="sm">
                   Los usuarios administrativos requieren contraseñas seguras y serán monitoreados.
                   El usuario recibirá un email de confirmación para activar su cuenta.
                 </Typography>

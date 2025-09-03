@@ -59,7 +59,7 @@ export const MeasurableFields = ({
           height="44px"
           noPortal={true}
         />
-        <Text fontSize="xs" color="fg.muted" mt="1">
+        <Text fontSize="xs" color="text.muted" mt="1">
           La unidad determina cómo se mide este producto (peso, volumen o longitud)
         </Text>
       </Box>

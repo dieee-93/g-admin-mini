@@ -148,7 +148,7 @@ export function FiscalPage() {
         {/* Header */}
         <VStack gap="sm" align="stretch">
           <Typography variant="heading">Gestión Fiscal</Typography>
-          <Typography variant="body" color="muted">
+          <Typography variant="body" color="text.muted">
             Control de facturación, impuestos y cumplimiento normativo
           </Typography>
         </VStack>
@@ -214,7 +214,7 @@ export function FiscalPage() {
                 >
                   <VStack gap="xs">
                     <Typography variant="label">Offline First</Typography>
-                    <Typography variant="caption" color="muted">
+                    <Typography variant="caption" color="text.muted">
                       Prioriza confiabilidad local
                     </Typography>
                   </VStack>
@@ -228,7 +228,7 @@ export function FiscalPage() {
                 >
                   <VStack gap="xs">
                     <Typography variant="label">Automático</Typography>
-                    <Typography variant="caption" color="muted">
+                    <Typography variant="caption" color="text.muted">
                       Adapta según condiciones
                     </Typography>
                   </VStack>
@@ -242,7 +242,7 @@ export function FiscalPage() {
                 >
                   <VStack gap="xs">
                     <Typography variant="label">Online First</Typography>
-                    <Typography variant="caption" color="muted">
+                    <Typography variant="caption" color="text.muted">
                       Prioriza sincronización
                     </Typography>
                   </VStack>
@@ -264,7 +264,7 @@ export function FiscalPage() {
                       ? fiscalStats.facturacion_mes_actual.toLocaleString('es-AR') 
                       : '0'}
                   </Typography>
-                  <Typography variant="caption" color="muted">
+                  <Typography variant="caption" color="text.muted">
                     Facturación del mes
                   </Typography>
                 </VStack>
@@ -280,7 +280,7 @@ export function FiscalPage() {
                       ? fiscalStats.facturas_emitidas_mes 
                       : 0}
                   </Typography>
-                  <Typography variant="caption" color="muted">
+                  <Typography variant="caption" color="text.muted">
                     Facturas generadas
                   </Typography>
                 </VStack>
@@ -296,7 +296,7 @@ export function FiscalPage() {
                       ? fiscalStats.cae_pendientes 
                       : 0}
                   </Typography>
-                  <Typography variant="caption" color="muted">
+                  <Typography variant="caption" color="text.muted">
                     Obligaciones pendientes
                   </Typography>
                 </VStack>
@@ -312,7 +312,7 @@ export function FiscalPage() {
                       ? fiscalStats.proxima_presentacion 
                       : 'N/A'}
                   </Typography>
-                  <Typography variant="caption" color="muted">
+                  <Typography variant="caption" color="text.muted">
                     Próximo vencimiento
                   </Typography>
                 </VStack>

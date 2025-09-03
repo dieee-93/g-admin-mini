@@ -224,7 +224,7 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
                         fontSize="sm" 
                         color="gray.600" 
                         noOfLines={2}
-                        bg="gray.50"
+                        bg="bg.canvas"
                         p="2"
                         borderRadius="md"
                       >

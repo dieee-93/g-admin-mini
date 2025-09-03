@@ -293,7 +293,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
             {financialKPIs.slice(0, 4).map((kpi, index) => (
               <Card key={index} variant="outline" size="sm">
                 <VStack gap="xs">
-                  <Typography variant="caption" color="muted">
+                  <Typography variant="caption" color="text.muted">
                     {kpi.label}
                   </Typography>
                   <Typography variant="body" fontWeight="bold">
@@ -365,11 +365,11 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
                 </Typography>
                 {getTrendIcon(kpi.trend)}
               </HStack>
-              <Typography variant="display" size="lg" color="primary">
+              <Typography variant="display" size="lg" color="text.primary">
                 {formatValue(kpi.value, kpi.format)}
               </Typography>
               <HStack gap="xs">
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Cambio vs período anterior:
                 </Typography>
                 <Typography variant="caption" color={getTrendColor(kpi.trend)} fontWeight="medium">
@@ -453,7 +453,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
                           </Typography>
                         </Table.Cell>
                         <Table.Cell>
-                          <Typography variant="body" color="muted">
+                          <Typography variant="body" color="text.muted">
                             {formatDate(report.generated_at)}
                           </Typography>
                         </Table.Cell>
@@ -559,37 +559,37 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
                   
                   <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap="md">
                     <VStack align="stretch" gap="sm">
-                      <Typography variant="body" fontWeight="medium" color="muted">
+                      <Typography variant="body" fontWeight="medium" color="text.muted">
                         Liquidez Corriente
                       </Typography>
                       <Typography variant="display" size="md" color="success">
                         2.45
                       </Typography>
-                      <Typography variant="caption" color="muted">
+                      <Typography variant="caption" color="text.muted">
                         Ratio saludable ({'>'}2.0)
                       </Typography>
                     </VStack>
                     
                     <VStack align="stretch" gap="sm">
-                      <Typography variant="body" fontWeight="medium" color="muted">
+                      <Typography variant="body" fontWeight="medium" color="text.muted">
                         ROE (Return on Equity)
                       </Typography>
                       <Typography variant="display" size="md" color="success">
                         18.5%
                       </Typography>
-                      <Typography variant="caption" color="muted">
+                      <Typography variant="caption" color="text.muted">
                         Excelente rendimiento
                       </Typography>
                     </VStack>
                     
                     <VStack align="stretch" gap="sm">
-                      <Typography variant="body" fontWeight="medium" color="muted">
+                      <Typography variant="body" fontWeight="medium" color="text.muted">
                         Endeudamiento
                       </Typography>
                       <Typography variant="display" size="md" color="warning">
                         45.2%
                       </Typography>
-                      <Typography variant="caption" color="muted">
+                      <Typography variant="caption" color="text.muted">
                         Nivel moderado
                       </Typography>
                     </VStack>

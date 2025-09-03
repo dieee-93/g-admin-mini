@@ -97,7 +97,7 @@ const BasicKitchenDisplay = ({ mode }: { mode: EffectiveMode }) => {
           >
             {mode.replace('-active', '').replace('-', ' ').toUpperCase()} MODE
           </Badge>
-          <Typography variant="body" color="muted" style={{ textAlign: 'center' }}>
+          <Typography variant="body" color="text.muted" style={{ textAlign: 'center' }}>
             Kitchen display system is running in {mode.replace('-active', '').replace('-', ' ')} mode.
             {mode.includes('offline') && ' All operations are stored locally and will sync when connection is restored.'}
             {mode.includes('hybrid') && ' Using mixed online/offline operations for optimal performance.'}
@@ -269,10 +269,10 @@ export function KitchenSection() {
         </Card.Header>
         <Card.Body>
           <Stack gap="sm">
-            <Typography variant="body" color="muted">
+            <Typography variant="body" color="text.muted">
               Current mode: {config.mode.charAt(0).toUpperCase() + config.mode.slice(1)}
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               {KITCHEN_MODE_DESCRIPTIONS[config.mode].description}
             </Typography>
           </Stack>

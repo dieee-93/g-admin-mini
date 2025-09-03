@@ -207,7 +207,7 @@ const AFIPIntegration: React.FC = () => {
                 <Typography variant="title">
                   {afipStatus.authenticated ? 'Conectado' : 'Desconectado'}
                 </Typography>
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Estado de Autenticación
                 </Typography>
               </VStack>
@@ -223,7 +223,7 @@ const AFIPIntegration: React.FC = () => {
                 <Typography variant="title">
                   {afipStatus.certificateValid ? 'Válido' : 'Por Vencer'}
                 </Typography>
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Certificado
                 </Typography>
               </VStack>
@@ -237,7 +237,7 @@ const AFIPIntegration: React.FC = () => {
                 <Typography variant="title">
                   {afipServices.filter(s => s.status === 'active').length}
                 </Typography>
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Servicios Activos
                 </Typography>
               </VStack>
@@ -251,7 +251,7 @@ const AFIPIntegration: React.FC = () => {
                 <Typography variant="title">
                   {afipStatus.environment === 'production' ? 'Producción' : 'Testing'}
                 </Typography>
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Ambiente
                 </Typography>
               </VStack>
@@ -319,7 +319,7 @@ const AFIPIntegration: React.FC = () => {
                       <SimpleGrid columns={{ base: 1, md: 2 }} gap="md">
                         <VStack align="start" gap="sm">
                           <Typography variant="body" fontWeight="medium">Información de Conexión</Typography>
-                          <VStack align="start" gap="xs" color="muted">
+                          <VStack align="start" gap="xs" color="text.muted">
                             <Typography variant="caption">
                               Estado: {afipStatus.authenticated ? 'Autenticado' : 'No autenticado'}
                             </Typography>
@@ -334,7 +334,7 @@ const AFIPIntegration: React.FC = () => {
 
                         <VStack align="start" gap="sm">
                           <Typography variant="body" fontWeight="medium">Certificado</Typography>
-                          <VStack align="start" gap="xs" color="muted">
+                          <VStack align="start" gap="xs" color="text.muted">
                             <Typography variant="caption">
                               Estado: {afipStatus.certificateValid ? 'Válido' : 'Requiere renovación'}
                             </Typography>
@@ -391,7 +391,7 @@ const AFIPIntegration: React.FC = () => {
                           readOnly
                         />
                         
-                        <Typography variant="caption" color="muted">
+                        <Typography variant="caption" color="text.muted">
                           Última actualización: {new Date(afipConfig.lastUpdate).toLocaleString()}
                         </Typography>
                       </VStack>
@@ -436,7 +436,7 @@ const AFIPIntegration: React.FC = () => {
                                 </Badge>
                               </TableCell>
                               <TableCell>
-                                <Typography variant="caption" color="muted">
+                                <Typography variant="caption" color="text.muted">
                                   {service.endpoint}
                                 </Typography>
                               </TableCell>
@@ -446,7 +446,7 @@ const AFIPIntegration: React.FC = () => {
                                 </Typography>
                               </TableCell>
                               <TableCell>
-                                <Typography variant="caption" color="muted">
+                                <Typography variant="caption" color="text.muted">
                                   {new Date(service.lastCheck).toLocaleString()}
                                 </Typography>
                               </TableCell>
@@ -489,14 +489,14 @@ const AFIPIntegration: React.FC = () => {
 
                         <SimpleGrid columns={{ base: 1, md: 2 }} gap="md">
                           <VStack align="start" gap="xs">
-                            <Typography variant="caption" color="muted">Fecha de Vencimiento</Typography>
+                            <Typography variant="caption" color="text.muted">Fecha de Vencimiento</Typography>
                             <Typography variant="body">
                               {new Date(afipStatus.certificateExpiry).toLocaleDateString()}
                             </Typography>
                           </VStack>
                           
                           <VStack align="start" gap="xs">
-                            <Typography variant="caption" color="muted">Días Restantes</Typography>
+                            <Typography variant="caption" color="text.muted">Días Restantes</Typography>
                             <Typography variant="body">
                               {Math.ceil((new Date(afipStatus.certificateExpiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} días
                             </Typography>

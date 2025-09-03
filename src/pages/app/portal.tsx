@@ -19,7 +19,7 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
-import { MetricCard } from '@/shared/components/widgets/MetricCard';
+import { MetricCard } from '@/shared/ui';
 
 // Componente de bienvenida personalizado
 function WelcomeHero() {
@@ -114,7 +114,7 @@ function QuickActions() {
           cursor="pointer"
           _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
           transition="all 0.2s"
-          bg={{ base: "white", _dark: "gray.800" }}
+          bg="bg.surface"
         >
           <Card.Body>
             <VStack align="center" gap="3" py="2">
@@ -130,7 +130,7 @@ function QuickActions() {
                 <Text fontSize="md" fontWeight="semibold" textAlign="center">
                   {action.title}
                 </Text>
-                <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }} textAlign="center">
+                <Text fontSize="xs" color="text.muted" textAlign="center">
                   {action.description}
                 </Text>
               </VStack>
@@ -147,7 +147,7 @@ function OrdersSummary() {
   return (
     <VStack align="stretch" gap="4">
       <HStack justify="space-between" align="center">
-        <Text fontSize="lg" fontWeight="semibold" color={{ base: "gray.800", _dark: "gray.100" }}>
+        <Text fontSize="lg" fontWeight="semibold" color="text.primary">
           Mi Actividad
         </Text>
         <Button variant="ghost" size="sm" color="blue.600">
@@ -216,7 +216,7 @@ function RecentOrders() {
   return (
     <VStack align="stretch" gap="4">
       <HStack justify="space-between" align="center">
-        <Text fontSize="lg" fontWeight="semibold" color={{ base: "gray.800", _dark: "gray.100" }}>
+        <Text fontSize="lg" fontWeight="semibold" color="text.primary">
           Pedidos Recientes
         </Text>
         <Button variant="ghost" size="sm" color="blue.600">
@@ -233,7 +233,7 @@ function RecentOrders() {
                   <Text fontSize="sm" fontWeight="medium">
                     {order.id} - {order.date}
                   </Text>
-                  <Text fontSize="xs" color={{ base: "gray.600", _dark: "gray.300" }}>
+                  <Text fontSize="xs" color="text.secondary">
                     {order.items.join(', ')}
                   </Text>
                 </VStack>
@@ -241,7 +241,7 @@ function RecentOrders() {
                   <Text fontSize="sm" fontWeight="semibold" color="green.600">
                     {order.total}
                   </Text>
-                  <Text fontSize="xs" color={{ base: "gray.500", _dark: "gray.400" }}>
+                  <Text fontSize="xs" color="text.muted">
                     {order.status}
                   </Text>
                 </VStack>
@@ -263,7 +263,7 @@ export function CustomerPortal() {
         
         {/* Quick Actions */}
         <VStack align="stretch" gap="4">
-          <Text fontSize="xl" fontWeight="semibold" color={{ base: "gray.800", _dark: "gray.100" }}>
+          <Text fontSize="xl" fontWeight="semibold" color="text.primary">
             Acciones Rápidas
           </Text>
           <QuickActions />

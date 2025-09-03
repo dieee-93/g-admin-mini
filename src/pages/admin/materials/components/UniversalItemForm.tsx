@@ -313,7 +313,7 @@ function CountableFields({
 
             <Collapsible.Root open={usePackaging}>
               <Collapsible.Content>
-                <VStack align="stretch" gap="3" pt="3" borderTop="1px solid" borderColor="gray.200">
+                <VStack align="stretch" gap="3" pt="3" borderTop="1px solid" borderColor="border.default">
                   <HStack gap="3">
                     <Box flex="1">
                       <Text fontSize="sm" mb="2">Tamaño del paquete</Text>
@@ -890,7 +890,7 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
 
             <Collapsible.Root open={showAdvanced}>
               <Collapsible.Content>
-                <VStack align="stretch" gap="4" pt="3" borderTop="1px solid" borderColor="gray.200">
+                <VStack align="stretch" gap="4" pt="3" borderTop="1px solid" borderColor="border.default">
                   <HStack gap="4">
                     <Box flex="1">
                       <Text fontSize="sm" fontWeight="medium" mb="2">

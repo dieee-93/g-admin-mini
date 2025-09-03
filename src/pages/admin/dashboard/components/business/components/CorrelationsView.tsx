@@ -171,7 +171,7 @@ export function CorrelationsView({
                     {correlation.metric1.metricName} ↔ {correlation.metric2.metricName}
                   </Text>
                   
-                  <HStack justify="space-between" bg="gray.50" p={2} borderRadius="sm" fontSize="sm">
+                  <HStack justify="space-between" bg="bg.canvas" p={2} borderRadius="sm" fontSize="sm">
                     <VStack align="start" gap={0}>
                       <Text color="gray.600">Coeficiente:</Text>
                       <Text fontWeight="bold" color={correlation.correlationType === 'positive' ? 'green.600' : 'red.600'}>

@@ -439,7 +439,7 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
               ))}
               
               {/* Totals Row */}
-              <Table.Row bg="gray.50">
+              <Table.Row bg="bg.canvas">
                 <Table.Cell>
                   <Text fontWeight="bold">Total</Text>
                 </Table.Cell>

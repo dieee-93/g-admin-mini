@@ -2,7 +2,7 @@
 // Intelligently switches between MaterialsPage and OfflineMaterialsPage based on connection
 
 import React, { useEffect, useMemo } from 'react';
-import { Box, HStack, Badge, Spinner, Text, Alert } from '@chakra-ui/react';
+import { ContentLayout, Section, Badge, Alert, Icon } from '@/shared/ui';
 import { 
   WifiIcon, 
   CloudIcon, 
@@ -52,7 +52,7 @@ export function MaterialsView({
   const getConnectionStatus = () => {
     if (isSyncing) {
       return {
-        icon: Spinner,
+        icon: CloudIcon,
         color: 'yellow',
         text: `Sincronizando inventario${queueSize > 0 ? ` (${queueSize} operaciones)` : ''}`,
         description: 'Actualizando datos de inventario...'
@@ -105,50 +105,42 @@ export function MaterialsView({
   }, [effectiveMode, isOnline, lastOnline]);
 
   return (
-    <Box>
+    <div>
       {/* Connection Status Header */}
       {showConnectionStatus && (
-        <Box mb="4">
-          <Alert.Root 
-            status={status.color === 'red' ? 'destructive' : 
+        <Section variant="flat" style={{ marginBottom: '1rem' }}>
+          <Alert 
+            status={status.color === 'red' ? 'error' : 
                    status.color === 'yellow' ? 'warning' : 
                    status.color === 'green' ? 'success' : 'info'}
-            variant="subtle"
+            title={
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Icon icon={CubeIcon} size="sm" />
+                <span>{status.text}</span>
+                <Badge 
+                  colorPalette={status.color} 
+                  variant="outline" 
+                  size="sm"
+                >
+                  {effectiveMode === 'online' ? 'Tiempo Real' : 'Seguro Local'}
+                </Badge>
+              </div>
+            }
           >
-            <Alert.Indicator>
-              <status.icon className="w-4 h-4" />
-            </Alert.Indicator>
-            <Alert.Content>
-              <Alert.Title>
-                <HStack>
-                  <CubeIcon className="w-4 h-4" />
-                  <Text>{status.text}</Text>
-                  <Badge 
-                    colorPalette={status.color} 
-                    variant="outline" 
-                    size="sm"
-                  >
-                    {effectiveMode === 'online' ? 'Tiempo Real' : 'Seguro Local'}
-                  </Badge>
-                </HStack>
-              </Alert.Title>
-              <Alert.Description>
-                {status.description}
-              </Alert.Description>
-            </Alert.Content>
-          </Alert.Root>
-        </Box>
+            {status.description}
+          </Alert>
+        </Section>
       )}
 
       {/* Render appropriate implementation */}
-      <Box>
+      <div>
         {effectiveMode === 'offline' ? (
           <OfflineMaterialsPage />
         ) : (
           <MaterialsPage />
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 

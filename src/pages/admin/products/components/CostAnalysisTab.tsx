@@ -142,7 +142,7 @@ export function CostAnalysisTab() {
         {/* Header con Design System */}
         <Stack align="start" gap="xs">
           <Typography variant="heading">Advanced Cost Analysis</Typography>
-          <Typography variant="body" color="muted">
+          <Typography variant="body" color="text.muted">
             Calculate comprehensive production costs including materials, labor, overhead, and profit margins using real inventory data.
           </Typography>
         </Stack>
@@ -320,7 +320,7 @@ export function CostAnalysisTab() {
                                 <Typography variant="body" weight="medium">
                                   {latest.product_name}
                                 </Typography>
-                                <Typography variant="caption" color="muted">
+                                <Typography variant="caption" color="text.muted">
                                   Batch size: {latest.batch_size} units
                                 </Typography>
                               </Stack>
@@ -341,7 +341,7 @@ export function CostAnalysisTab() {
                               <Card variant="outline" padding="md">
                                 <HStack justify="space-between" align="center">
                                   <Typography variant="title">Total Cost</Typography>
-                                  <Typography variant="heading" color="primary">
+                                  <Typography variant="heading" color="text.primary">
                                     ${latest.total_cost.toFixed(2)}
                                   </Typography>
                                 </HStack>
@@ -390,7 +390,7 @@ export function CostAnalysisTab() {
                     ) : (
                       <Stack align="center" gap="md" padding="xl">
                         <CalculatorIcon className="w-16 h-16 text-gray-400" />
-                        <Typography variant="body" color="muted" align="center">
+                        <Typography variant="body" color="text.muted" align="center">
                           Select a product and calculate costs to see results
                         </Typography>
                       </Stack>
@@ -417,19 +417,19 @@ export function CostAnalysisTab() {
                               <Typography variant="body" weight="medium">
                                 {calc.product_name}
                               </Typography>
-                              <Typography variant="caption" color="muted">
+                              <Typography variant="caption" color="text.muted">
                                 {calc.batch_size} units • ${calc.cost_per_unit.toFixed(2)}/unit
                               </Typography>
                             </Stack>
                             <HStack gap="md">
                               <Stack align="end" gap="xs">
-                                <Typography variant="caption" color="muted">Total Cost</Typography>
+                                <Typography variant="caption" color="text.muted">Total Cost</Typography>
                                 <Typography variant="body" weight="semibold">
                                   ${calc.total_cost.toFixed(2)}
                                 </Typography>
                               </Stack>
                               <Stack align="end" gap="xs">
-                                <Typography variant="caption" color="muted">Suggested Price</Typography>
+                                <Typography variant="caption" color="text.muted">Suggested Price</Typography>
                                 <Typography variant="body" weight="semibold" >
                                   ${calc.suggested_price.toFixed(2)}
                                 </Typography>
@@ -445,7 +445,7 @@ export function CostAnalysisTab() {
                   ) : (
                     <Stack align="center" gap="md" padding="xl">
                       <ChartBarIcon className="w-16 h-16 text-gray-400" />
-                      <Typography variant="body" color="muted" align="center">
+                      <Typography variant="body" color="text.muted" align="center">
                         No cost analyses performed yet
                       </Typography>
                     </Stack>
@@ -464,7 +464,7 @@ export function CostAnalysisTab() {
                 <Card.Body>
                   <Stack align="center" gap="md" padding="xl">
                     <DocumentTextIcon className="w-16 h-16 text-gray-400" />
-                    <Typography variant="body" color="muted" align="center">
+                    <Typography variant="body" color="text.muted" align="center">
                       Pricing scenarios feature coming soon
                     </Typography>
                   </Stack>

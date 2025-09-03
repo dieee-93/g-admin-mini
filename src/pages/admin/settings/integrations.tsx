@@ -63,15 +63,15 @@ const IntegrationsPage: React.FC = () => {
       <Stack gap="xl">
         <Stack gap="sm">
           <Typography variant="heading" size="xl">API Integrations</Typography>
-          <Typography variant="body" color="secondary">
+          <Typography variant="body" color="text.secondary">
             Manage third-party integrations and external services
           </Typography>
         </Stack>
 
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="md">
           {integrations.map((integration, index) => (
-            <CardWrapper key={index} variant="outline" >
-              <CardWrapper>
+            <CardWrapper key={index} variant="outline">
+              <CardWrapper.Body>
                 <Stack gap="md">
                   <Stack direction="row" justify="space-between" align="start">
                     <Stack direction="row" gap="sm" align="center">
@@ -91,7 +91,7 @@ const IntegrationsPage: React.FC = () => {
                     </Badge>
                   </Stack>
                   
-                  <Typography variant="body" size="sm" color="secondary">
+                  <Typography variant="body" size="sm" color="text.secondary">
                     {integration.description}
                   </Typography>
                   
@@ -99,17 +99,17 @@ const IntegrationsPage: React.FC = () => {
                     Configure
                   </Button>
                 </Stack>
-              </CardWrapper>
+              </CardWrapper.Body>
             </CardWrapper>
           ))}
         </SimpleGrid>
 
         <SimpleGrid columns={{ base: 1, md: 2 }} gap="xl">
           <CardWrapper variant="elevated" >
-            <CardWrapper>
+            <CardWrapper.Header>
               <Typography variant="body" fontWeight="semibold">API Management</Typography>
-            </CardWrapper>
-            <CardWrapper>
+            </CardWrapper.Header>
+            <CardWrapper.Body>
               <Stack gap="sm">
                 <Typography variant="body" size="sm">🔑 API Key Management</Typography>
                 <Typography variant="body" size="sm">🔒 Authentication Setup</Typography>
@@ -118,14 +118,14 @@ const IntegrationsPage: React.FC = () => {
                 <Typography variant="body" size="sm">🔄 Retry Logic Setup</Typography>
                 <Typography variant="body" size="sm">📝 Request/Response Logging</Typography>
               </Stack>
-            </CardWrapper>
-          </CardWrapper>
+            </CardWrapper.Body>
+        </CardWrapper>
 
           <CardWrapper variant="elevated" >
-            <CardWrapper>
+            <CardWrapper.Header>
               <Typography variant="body" fontWeight="semibold">Webhook Management</Typography>
-            </CardWrapper>
-            <CardWrapper>
+            </CardWrapper.Header>
+            <CardWrapper.Body>
               <Stack gap="sm">
                 <Typography variant="body" size="sm">🎯 Event Subscriptions</Typography>
                 <Typography variant="body" size="sm">🔐 Signature Verification</Typography>
@@ -134,15 +134,15 @@ const IntegrationsPage: React.FC = () => {
                 <Typography variant="body" size="sm">🚨 Failure Notifications</Typography>
                 <Typography variant="body" size="sm">🧪 Testing Tools</Typography>
               </Stack>
-            </CardWrapper>
+            </CardWrapper.Body>
           </CardWrapper>
         </SimpleGrid>
 
         <CardWrapper variant="elevated" >
-          <CardWrapper>
+          <CardWrapper.Header>
             <Typography variant="heading" size="md">Integration Capabilities</Typography>
-          </CardWrapper>
-          <CardWrapper>
+          </CardWrapper.Header>
+            <CardWrapper.Body>
             <SimpleGrid columns={{ base: 1, md: 3 }} gap="xl">
               <Stack gap="sm">
                 <Typography variant="body" fontWeight="medium">
@@ -174,7 +174,7 @@ const IntegrationsPage: React.FC = () => {
                 <Typography variant="body" size="sm">ML Model APIs</Typography>
               </Stack>
             </SimpleGrid>
-          </CardWrapper>
+          </CardWrapper.Body>
         </CardWrapper>
       </Stack>
     </Layout>

@@ -51,7 +51,7 @@ export const DynamicThemeTest = () => {
             <Typography variant="heading" level={2}>
               🚀 G-Admin Theme Studio
             </Typography>
-            <Typography variant="body" color="secondary">
+            <Typography variant="body" color="text.secondary">
               Testing {availableThemes.length} themes using gray.* token mapping approach
             </Typography>
           </Stack>
@@ -88,7 +88,7 @@ export const DynamicThemeTest = () => {
                 options={themeOptions}
                 width="300px"
               />
-              <Typography variant="caption" color="secondary">
+              <Typography variant="caption" color="text.secondary">
                 Each theme maps colors to gray.* tokens for automatic component theming
               </Typography>
             </Stack>
@@ -105,7 +105,7 @@ export const DynamicThemeTest = () => {
           </CardWrapper.Header>
           <CardWrapper.Body>
             <Stack direction="column" gap="md">
-              <Typography variant="body" color="secondary">
+              <Typography variant="body" color="text.secondary">
                 Click any theme below to see instant color changes:
               </Typography>
               
@@ -123,7 +123,7 @@ export const DynamicThemeTest = () => {
               </Stack>
               
               {availableThemes.length > 12 && (
-                <Typography variant="caption" color="muted">
+                <Typography variant="caption" color="text.muted">
                   Showing first 12 themes. Use dropdown above for full list.
                 </Typography>
               )}
@@ -137,10 +137,10 @@ export const DynamicThemeTest = () => {
             <Typography variant="body" weight="medium">
               🎯 System Status
             </Typography>
-            <Typography variant="body" color="secondary">
+            <Typography variant="body" color="text.secondary">
               Current approach: Dynamic createSystem() with gray.* token override
             </Typography>
-            <Typography variant="caption" color="muted">
+            <Typography variant="caption" color="text.muted">
               Expected behavior: All default components should change colors automatically when switching themes
             </Typography>
           </Stack>

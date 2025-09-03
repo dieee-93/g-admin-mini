@@ -139,8 +139,8 @@ export function DashboardOverview() {
                   </Stack>
                   
                   <Stack gap="xs" align="start">
-                    <Typography variant="body" size="sm" color="secondary">{metric.title}</Typography>
-                    <Typography variant="heading" size="2xl" weight="bold" color="primary">{metric.value}</Typography>
+                    <Typography variant="body" size="sm" color="text.secondary">{metric.title}</Typography>
+                    <Typography variant="heading" size="2xl" weight="bold" color="text.primary">{metric.value}</Typography>
                     <Badge 
                       colorPalette={metric.trend === 'up' ? 'success' : 
                                   metric.trend === 'down' ? 'error' : 'gray'}
@@ -159,12 +159,12 @@ export function DashboardOverview() {
           {/* Recent Activity */}
           <CardWrapper>
             <Stack gap="md">
-              <Typography variant="heading" size="lg" weight="semibold" color="primary">Recent Activity</Typography>
+              <Typography variant="heading" size="lg" weight="semibold" color="text.primary">Recent Activity</Typography>
               <Stack gap="md">
                 <Stack direction="row" justify="space-between" width="full">
                   <Stack gap="xs" align="start">
                     <Typography variant="body" size="sm" weight="medium">Last sale processed</Typography>
-                    <Typography variant="body" size="xs" color="secondary">2 minutes ago</Typography>
+                    <Typography variant="body" size="xs" color="text.secondary">2 minutes ago</Typography>
                   </Stack>
                   <Badge colorPalette="success">+$45.50</Badge>
                 </Stack>
@@ -172,7 +172,7 @@ export function DashboardOverview() {
                 <Stack direction="row" justify="space-between" width="full">
                   <Stack gap="xs" align="start">
                     <Typography variant="body" size="sm" weight="medium">Inventory updated</Typography>
-                    <Typography variant="body" size="xs" color="secondary">15 minutes ago</Typography>
+                    <Typography variant="body" size="xs" color="text.secondary">15 minutes ago</Typography>
                   </Stack>
                   <Badge colorPalette="info">+12 items</Badge>
                 </Stack>
@@ -180,7 +180,7 @@ export function DashboardOverview() {
                 <Stack direction="row" justify="space-between" width="full">
                   <Stack gap="xs" align="start">
                     <Typography variant="body" size="sm" weight="medium">New customer registered</Typography>
-                    <Typography variant="body" size="xs" color="secondary">1 hour ago</Typography>
+                    <Typography variant="body" size="xs" color="text.secondary">1 hour ago</Typography>
                   </Stack>
                   <Badge colorPalette="brand">Customer</Badge>
                 </Stack>
@@ -191,7 +191,7 @@ export function DashboardOverview() {
           {/* Quick Actions */}
           <CardWrapper>
             <Stack gap="md">
-              <Typography variant="heading" size="lg" weight="semibold" color="primary">Quick Actions</Typography>
+              <Typography variant="heading" size="lg" weight="semibold" color="text.primary">Quick Actions</Typography>
               <Stack gap="sm">
                 {quickActions.map((action) => (
                   <Button
@@ -204,7 +204,7 @@ export function DashboardOverview() {
                     <Stack direction="row" justify="space-between" width="full" align="center">
                       <Stack gap="xs" align="start">
                         <Typography variant="body" size="sm" weight="medium">{action.title}</Typography>
-                        <Typography variant="body" size="xs" color="secondary">{action.description}</Typography>
+                        <Typography variant="body" size="xs" color="text.secondary">{action.description}</Typography>
                       </Stack>
                       <Icon icon={ArrowRightIcon} size="sm" />
                     </Stack>
@@ -219,29 +219,29 @@ export function DashboardOverview() {
         <CardWrapper>
           <Stack gap="md">
             <Stack direction="row" justify="space-between" align="center">
-              <Typography variant="heading" size="lg" weight="semibold" color="primary">Today's Performance</Typography>
+              <Typography variant="heading" size="lg" weight="semibold" color="text.primary">Today's Performance</Typography>
               <Badge colorPalette="success">On Track</Badge>
             </Stack>
             <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap="md">
               <Stack gap="sm" align="start">
-                <Typography variant="body" size="sm" color="secondary">Sales Target</Typography>
-                <Typography variant="heading" size="xl" weight="bold" color="primary">85%</Typography>
+                <Typography variant="body" size="sm" color="text.secondary">Sales Target</Typography>
+                <Typography variant="heading" size="xl" weight="bold" color="text.primary">85%</Typography>
                 <CircularProgress value={85}  />
-                <Typography variant="body" size="xs" color="secondary">$2,847 of $3,350 daily goal</Typography>
+                <Typography variant="body" size="xs" color="text.secondary">$2,847 of $3,350 daily goal</Typography>
               </Stack>
               
               <Stack gap="sm" align="start">
-                <Typography variant="body" size="sm" color="secondary">Order Volume</Typography>
-                <Typography variant="heading" size="xl" weight="bold" color="primary">94%</Typography>
+                <Typography variant="body" size="sm" color="text.secondary">Order Volume</Typography>
+                <Typography variant="heading" size="xl" weight="bold" color="text.primary">94%</Typography>
                 <CircularProgress value={94}  />
-                <Typography variant="body" size="xs" color="secondary">47 of 50 orders goal</Typography>
+                <Typography variant="body" size="xs" color="text.secondary">47 of 50 orders goal</Typography>
               </Stack>
               
               <Stack gap="sm" align="start">
-                <Typography variant="body" size="sm" color="secondary">Customer Satisfaction</Typography>
-                <Typography variant="heading" size="xl" weight="bold" color="primary">98%</Typography>
+                <Typography variant="body" size="sm" color="text.secondary">Customer Satisfaction</Typography>
+                <Typography variant="heading" size="xl" weight="bold" color="text.primary">98%</Typography>
                 <CircularProgress value={98} color="brand.500" />
-                <Typography variant="body" size="xs" color="secondary">Based on recent feedback</Typography>
+                <Typography variant="body" size="xs" color="text.secondary">Based on recent feedback</Typography>
               </Stack>
             </Grid>
           </Stack>
