@@ -1,4 +1,4 @@
-import { SanitizationOptions } from './types';
+import { type SanitizationOptions } from './types';
 
 /**
  * Sanitizes a string by removing/escaping potentially harmful content
@@ -15,7 +15,10 @@ export function sanitizeInput(input: string, options: SanitizationOptions = {}):
     sanitized = sanitized.trim();
   }
 
-  // Remove HTML tags
+  // Remove script tags and their content to prevent XSS
+  sanitized = sanitized.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi, '');
+
+  // Remove remaining HTML tags
   if (options.removeHtmlTags) {
     sanitized = sanitized.replace(/<[^>]*>/g, '');
   }

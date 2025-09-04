@@ -3,7 +3,7 @@ import {
   Stack,
   Typography,
   Badge,
-  Card,
+  CardWrapper,
   Grid,
   Button,
   Alert
@@ -124,8 +124,7 @@ export function CustomerAnalytics() {
             </Typography>
           </Stack>
           
-          <Button 
-            colorPalette="brand" 
+          <Button  
             size="sm"
             onClick={() => window.location.reload()}
           >
@@ -181,7 +180,7 @@ export function CustomerAnalytics() {
             <Typography variant="heading" size="xl" >
               {highValueCustomers.length}
             </Typography>
-            <Badge colorPalette="warning" variant="subtle" size="sm">
+            <Badge colorPalette="orange" variant="subtle" size="sm">
               👑 Champions
             </Badge>
           </Stack>
@@ -198,7 +197,7 @@ export function CustomerAnalytics() {
             <Typography variant="heading" size="xl" color="error">
               {churnRiskCustomers.length}
             </Typography>
-            <Badge colorPalette="error" variant="subtle" size="sm">
+            <Badge colorPalette="red" variant="subtle" size="sm">
               ⚠️ Atención
             </Badge>
           </Stack>
@@ -249,7 +248,7 @@ export function CustomerAnalytics() {
                 
                 return (
                   <div style={{ cursor: 'pointer' }}>
-                    <Card 
+                    <CardWrapper 
                       key={stat.segment} 
                       variant={selectedSegment === stat.segment ? "filled" : "outline"} 
                       onClick={() => setSelectedSegment(selectedSegment === stat.segment ? null : stat.segment)}
@@ -332,7 +331,7 @@ export function CustomerAnalytics() {
                   Top Customers
                 </Typography>
               </Stack>
-              <Badge colorPalette="success" variant="subtle">
+              <Badge colorPalette="green" variant="subtle">
                 {highValueCustomers.length} VIP
               </Badge>
             </Stack>
@@ -341,7 +340,7 @@ export function CustomerAnalytics() {
               {highValueCustomers.slice(0, 5).map((customer, index) => (
                 <Stack key={customer.id} direction="row" justify="space-between" p="md" style={{ borderRadius: '6px', backgroundColor: 'var(--colors-success-50)', border: '1px solid var(--colors-success-100)' }}>
                   <Stack direction="row" gap="sm">
-                    <Badge colorPalette="success" variant="solid" size="sm">
+                    <Badge colorPalette="green" variant="solid" size="sm">
                       #{index + 1}
                     </Badge>
                     <Stack direction="column" align="start" gap="xs">
@@ -357,7 +356,7 @@ export function CustomerAnalytics() {
                     <Typography fontWeight="bold"  size="sm">
                       {formatCurrency(customer.total_spent)}
                     </Typography>
-                    <Badge colorPalette="success" variant="outline" size="xs">
+                    <Badge colorPalette="green" variant="outline" size="xs">
                       CLV Alto
                     </Badge>
                   </Stack>
@@ -377,7 +376,7 @@ export function CustomerAnalytics() {
                   Riesgo de Churn
                 </Typography>
               </Stack>
-              <Badge colorPalette="error" variant="subtle">
+              <Badge colorPalette="red" variant="subtle">
                 {churnRiskCustomers.length} críticos
               </Badge>
             </Stack>
@@ -402,7 +401,7 @@ export function CustomerAnalytics() {
                       {customer.churn_risk === ChurnRisk.HIGH ? '🔴 Alto' : 
                        customer.churn_risk === ChurnRisk.MEDIUM ? '🟡 Medio' : '🟢 Bajo'}
                     </Badge>
-                    <Button size="xs" colorPalette="error" variant="outline">
+                    <Button size="xs" colorPalette="red" variant="outline">
                       📧 Win-back
                     </Button>
                   </Stack>

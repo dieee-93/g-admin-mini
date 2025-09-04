@@ -63,10 +63,7 @@ interface Notification {
   autoClose?: boolean;
 }
 
-export const useAppStore = create<AppState>()(
-  devtools(
-    persist(
-      (set, get) => ({
+export const appStoreInitializer = (set, get) => ({
         // Initial state
         user: {
           id: null,
@@ -200,7 +197,12 @@ export const useAppStore = create<AppState>()(
             autoClose: appError.severity === 'low'
           });
         }
-      }),
+      });
+
+export const useAppStore = create<AppState>()(
+  devtools(
+    persist(
+      appStoreInitializer,
       {
         name: 'g-mini-app-storage',
         partialize: (state) => ({

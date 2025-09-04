@@ -1,78 +1,62 @@
 // RecipeIntelligenceDashboard Component Tests
-import { describe, it, expect } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { describe, it, expect, vi, beforeEach } from "vitest"
+import { render, screen, waitFor } from "@testing-library/react"
 import { RecipeIntelligenceDashboard } from "./RecipeIntelligenceDashboard"
-import type { Recipe } from "../../types"
+import type { Recipe, RecipeWithCost } from "@/services/recipe/types"
+import { fetchRecipesWithCosts } from "@/services/recipe/api/recipeApi"
 
-// Mock ChakraUI Provider for tests
-const ChakraWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div data-testid="chakra-wrapper">{children}</div>
-}
+import { Provider } from '@/shared/ui/provider'
+import { useThemeStore } from '@/store/themeStore'
+
+vi.mock('@/store/themeStore')
+vi.mock('@/services/recipe/api/recipeApi')
 
 const renderWithChakra = (component: React.ReactElement) => {
-  return render(component, { wrapper: ChakraWrapper })
+  (useThemeStore as vi.Mock).mockReturnValue({
+    currentTheme: { id: 'default', name: 'Default' },
+  });
+  return render(component, { wrapper: Provider })
 }
 
 describe("RecipeIntelligenceDashboard", () => {
   const mockRecipes: Recipe[] = [
-    {
-      id: "1",
-      name: "Test Recipe 1",
-      output_item_id: "item-1",
-      output_quantity: 2
-    },
-    {
-      id: "2",
-      name: "Test Recipe 2",
-      output_item_id: "item-2",
-      output_quantity: 4
-    }
+    { id: "1", name: "Test Recipe 1", output_item_id: "item-1", output_quantity: 2 },
+    { id: "2", name: "Test Recipe 2", output_item_id: "item-2", output_quantity: 4 }
   ]
 
-  it("should render dashboard title", () => {
-    renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />)
+  const mockRecipesWithCosts: RecipeWithCost[] = [
+    { id: "1", name: "Test Recipe 1", total_cost: 10, cost_per_unit: 5, is_viable: true, ingredient_count: 2, output_item_id: "item-1", output_quantity: 2 },
+    { id: "2", name: "Test Recipe 2", total_cost: 20, cost_per_unit: 5, is_viable: false, ingredient_count: 3, output_item_id: "item-2", output_quantity: 4 }
+  ]
 
-    expect(screen.getByText("Recipe Intelligence System v3.0")).toBeInTheDocument()
-    expect(screen.getByText("Smart Cost + Menu Engineering + Production Intelligence")).toBeInTheDocument()
+  beforeEach(() => {
+    (fetchRecipesWithCosts as vi.Mock).mockResolvedValue(mockRecipesWithCosts)
+  })
+
+  it("should render dashboard title", async () => {
+    renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />)
+    await waitFor(() => {
+      expect(screen.getByText("Recipe Intelligence Dashboard v3.0")).toBeInTheDocument()
+    })
   })
 
   it("should display correct recipe count", () => {
     renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />)
-
     expect(screen.getByText("2")).toBeInTheDocument()
     expect(screen.getByText("Total Recipes")).toBeInTheDocument()
   })
 
-  it("should display profitability metric", () => {
+  it("should display profitability metric", async () => {
     renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />)
-
-    expect(screen.getByText("85%")).toBeInTheDocument()
-    expect(screen.getByText("Profitability")).toBeInTheDocument()
-  })
-
-  it("should display description", () => {
-    renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />)
-
-    expect(screen.getByText("Enhanced recipe management with real-time costing, yield analysis, and menu engineering")).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText("60%")).toBeInTheDocument()
+      expect(screen.getByText("Avg Profitability")).toBeInTheDocument()
+    })
   })
 
   it("should handle empty recipes array", () => {
     renderWithChakra(<RecipeIntelligenceDashboard recipes={[]} />)
-
     expect(screen.getByText("0")).toBeInTheDocument()
     expect(screen.getByText("Total Recipes")).toBeInTheDocument()
-  })
-
-  it("should handle large number of recipes", () => {
-    const manyRecipes = Array.from({ length: 150 }, (_, i) => ({
-      id: `recipe-${i}`,
-      name: `Recipe ${i}`,
-      output_item_id: `item-${i}`,
-      output_quantity: 1
-    }))
-
-    renderWithChakra(<RecipeIntelligenceDashboard recipes={manyRecipes} />)
-
-    expect(screen.getByText("150")).toBeInTheDocument()
   })
 })

@@ -2,31 +2,54 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import * as recipeApi from "./recipeApi"
 import type { Recipe, CreateRecipeData } from "../types"
+import { supabase } from "@/lib/supabase/client"
 
-// Mock Supabase with comprehensive chain methods
-const mockSupabaseChain = {
-  select: vi.fn().mockReturnThis(),
-  insert: vi.fn().mockReturnThis(), 
-  update: vi.fn().mockReturnThis(),
-  delete: vi.fn().mockReturnThis(),
-  eq: vi.fn().mockReturnThis(),
-  order: vi.fn().mockReturnThis(),
-  single: vi.fn().mockReturnThis()
-}
+vi.mock("@/lib/supabase/client", () => {
+  const createQueryBuilder = (initialData = { data: [], error: null }) => {
+    let query = Promise.resolve(initialData);
+    const builder = {
+      select: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn(() => {
+        query = Promise.resolve({ data: {}, error: null });
+        return builder;
+      }),
+      then: (...args) => query.then(...args),
+      catch: (...args) => query.catch(...args),
+      finally: (...args) => query.finally(...args),
+    };
+    return builder;
+  };
 
-const mockSupabase = {
-  from: vi.fn(() => mockSupabaseChain),
-  rpc: vi.fn()
-}
+  const supabase = {
+    from: vi.fn(() => createQueryBuilder()),
+    rpc: vi.fn().mockResolvedValue({ data: [], error: null }),
+    auth: {
+      signInWithPassword: vi.fn().mockResolvedValue({ data: { user: {} }, error: null }),
+      signUp: vi.fn().mockResolvedValue({ data: { user: {} }, error: null }),
+      signOut: vi.fn().mockResolvedValue({ error: null }),
+      onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
+    },
+    storage: {
+      from: vi.fn(() => ({
+        upload: vi.fn(),
+        download: vi.fn(),
+        remove: vi.fn(),
+        getPublicUrl: vi.fn(() => ({ data: { publicUrl: 'http://example.com/avatar.png' } })),
+      })),
+    },
+  };
 
-vi.mock("@/lib/supabase", () => ({
-  supabase: mockSupabase
-}))
+  return { supabase };
+})
 
 describe("Recipe API - Enhanced Test Suite", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    Object.values(mockSupabaseChain).forEach(mock => mock.mockReturnThis())
   })
 
   describe("fetchRecipes", () => {
@@ -40,25 +63,34 @@ describe("Recipe API - Enhanced Test Suite", () => {
     ]
 
     it("should fetch recipes successfully", async () => {
-      mockSupabaseChain.order.mockResolvedValue({ data: mockRecipes, error: null })
+      (supabase.from as vi.Mock).mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        order: vi.fn().mockResolvedValue({ data: mockRecipes, error: null }),
+      });
 
       const result = await recipeApi.fetchRecipes()
 
-      expect(mockSupabase.from).toHaveBeenCalledWith("recipes")
+      expect(supabase.from).toHaveBeenCalledWith("recipes")
       expect(result).toEqual(mockRecipes)
     })
 
     it("should handle fetch error", async () => {
-      mockSupabaseChain.order.mockResolvedValue({ 
-        data: null, 
-        error: { message: "Database error" } 
-      })
+      (supabase.from as vi.Mock).mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        order: vi.fn().mockResolvedValue({ 
+          data: null, 
+          error: { message: "Database error" } 
+        }),
+      });
 
       await expect(recipeApi.fetchRecipes()).rejects.toThrow()
     })
 
     it("should handle empty result", async () => {
-      mockSupabaseChain.order.mockResolvedValue({ data: null, error: null })
+      (supabase.from as vi.Mock).mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        order: vi.fn().mockResolvedValue({ data: null, error: null }),
+      });
 
       const result = await recipeApi.fetchRecipes()
       expect(result).toEqual([])
@@ -81,21 +113,24 @@ describe("Recipe API - Enhanced Test Suite", () => {
     }
 
     it("should create recipe successfully", async () => {
-      mockSupabaseChain.single.mockResolvedValueOnce({ data: createdRecipe, error: null })
-      mockSupabaseChain.insert.mockResolvedValueOnce({ error: null })
-      vi.spyOn(recipeApi, 'fetchRecipeById').mockResolvedValue(createdRecipe)
+      (supabase.from as vi.Mock).mockReturnValue({
+        insert: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: createdRecipe, error: null }),
+      });
 
       const result = await recipeApi.createRecipe(newRecipeData)
 
-      expect(mockSupabase.from).toHaveBeenCalledWith("recipes")
+      expect(supabase.from).toHaveBeenCalledWith("recipes")
       expect(result).toEqual(createdRecipe)
     })
 
     it("should handle creation error", async () => {
-      mockSupabaseChain.single.mockResolvedValue({ 
-        data: null, 
-        error: { message: "Creation failed" } 
-      })
+      (supabase.from as vi.Mock).mockReturnValue({
+        insert: vi.fn().mockReturnThis(),
+        select: vi.fn().mockResolvedValue({ data: null, error: { message: "Creation failed" } }),
+        single: vi.fn().mockResolvedValue({ data: null, error: { message: "Creation failed" } }),
+      });
 
       await expect(recipeApi.createRecipe(newRecipeData)).rejects.toThrow()
     })
@@ -103,30 +138,30 @@ describe("Recipe API - Enhanced Test Suite", () => {
 
   describe("calculateRecipeCost", () => {
     it("should calculate cost successfully", async () => {
-      mockSupabase.rpc.mockResolvedValue({ data: 15.75, error: null })
+      (supabase.rpc as vi.Mock).mockResolvedValue({ data: 15.75, error: null })
 
       const result = await recipeApi.calculateRecipeCost("recipe-1")
 
-      expect(mockSupabase.rpc).toHaveBeenCalledWith("calculate_recipe_cost", { recipe_id: "recipe-1" })
+      expect(supabase.rpc).toHaveBeenCalledWith("calculate_recipe_cost", { recipe_id: "recipe-1" })
       expect(result).toBe(15.75)
     })
 
     it("should handle null cost data", async () => {
-      mockSupabase.rpc.mockResolvedValue({ data: null, error: null })
+      (supabase.rpc as vi.Mock).mockResolvedValue({ data: null, error: null })
 
       const result = await recipeApi.calculateRecipeCost("recipe-1")
       expect(result).toBe(0)
     })
 
     it("should handle negative costs", async () => {
-      mockSupabase.rpc.mockResolvedValue({ data: -5.25, error: null })
+      (supabase.rpc as vi.Mock).mockResolvedValue({ data: -5.25, error: null })
 
       const result = await recipeApi.calculateRecipeCost("recipe-1")
       expect(result).toBe(0)
     })
 
     it("should handle cost calculation error", async () => {
-      mockSupabase.rpc.mockResolvedValue({ 
+      (supabase.rpc as vi.Mock).mockResolvedValue({ 
         data: null, 
         error: { message: "Calculation failed" } 
       })
@@ -138,18 +173,24 @@ describe("Recipe API - Enhanced Test Suite", () => {
 
   describe("deleteRecipe", () => {
     it("should delete recipe successfully", async () => {
-      mockSupabaseChain.delete.mockResolvedValue({ error: null })
+      const mockEq = vi.fn().mockResolvedValue({ error: null });
+      (supabase.from as vi.Mock).mockReturnValue({
+        delete: vi.fn().mockReturnThis(),
+        eq: mockEq,
+      });
 
       await recipeApi.deleteRecipe("recipe-1")
 
-      expect(mockSupabase.from).toHaveBeenCalledWith("recipes")
-      expect(mockSupabaseChain.eq).toHaveBeenCalledWith("id", "recipe-1")
+      expect(supabase.from).toHaveBeenCalledWith("recipes")
+      expect(mockEq).toHaveBeenCalledWith("id", "recipe-1")
     })
 
     it("should handle delete error", async () => {
-      mockSupabaseChain.delete.mockResolvedValue({ 
-        error: { message: "Delete failed" } 
-      })
+      const mockEq = vi.fn().mockResolvedValue({ error: { message: "Delete failed" } });
+      (supabase.from as vi.Mock).mockReturnValue({
+        delete: vi.fn().mockReturnThis(),
+        eq: mockEq,
+      });
 
       await expect(recipeApi.deleteRecipe("recipe-1")).rejects.toThrow()
     })
@@ -157,13 +198,16 @@ describe("Recipe API - Enhanced Test Suite", () => {
 
   describe("Performance Tests", () => {
     it("should handle multiple concurrent calls", async () => {
-      mockSupabaseChain.order.mockResolvedValue({ data: [], error: null })
+      (supabase.from as vi.Mock).mockReturnValue({
+        select: vi.fn().mockReturnThis(),
+        order: vi.fn().mockResolvedValue({ data: [], error: null }),
+      });
 
       const calls = Array.from({ length: 5 }, () => recipeApi.fetchRecipes())
       const results = await Promise.all(calls)
 
       expect(results).toHaveLength(5)
-      expect(mockSupabase.from).toHaveBeenCalledTimes(5)
+      expect(supabase.from).toHaveBeenCalledTimes(5)
     })
   })
 })

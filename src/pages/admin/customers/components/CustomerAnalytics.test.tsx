@@ -5,29 +5,31 @@ import userEvent from '@testing-library/user-event'
 import { CustomerAnalytics } from './CustomerAnalytics'
 import { CustomerSegment, ChurnRisk, LoyaltyTier } from '../types'
 
-// Mock hooks
-const mockUseCustomers = vi.fn()
-const mockUseCustomerRFM = vi.fn()
-const mockUseCustomerAnalytics = vi.fn()
-const mockUseCustomerSegmentation = vi.fn()
+import { Provider } from '@/shared/ui/provider'
+import { useThemeStore } from '@/store/themeStore'
+
+const mockUseCustomers = vi.fn();
+const mockUseCustomerRFM = vi.fn();
+const mockUseCustomerAnalytics = vi.fn();
+const mockUseCustomerSegmentation = vi.fn();
 
 vi.mock('../hooks/useCustomers', () => ({
-  useCustomers: mockUseCustomers
-}))
+  useCustomers: mockUseCustomers,
+}));
 
 vi.mock('../hooks/useCustomerRFM', () => ({
   useCustomerRFM: mockUseCustomerRFM,
   useCustomerAnalytics: mockUseCustomerAnalytics,
-  useCustomerSegmentation: mockUseCustomerSegmentation
-}))
+  useCustomerSegmentation: mockUseCustomerSegmentation,
+}));
 
-// Mock Design System Provider for tests
-const DesignSystemWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div data-testid="design-system-wrapper">{children}</div>
-}
+vi.mock('@/store/themeStore')
 
 const renderWithDesignSystem = (component: React.ReactElement) => {
-  return render(component, { wrapper: DesignSystemWrapper })
+  (useThemeStore as vi.Mock).mockReturnValue({
+    currentTheme: { id: 'default', name: 'Default' },
+  });
+  return render(component, { wrapper: Provider })
 }
 
 describe('CustomerAnalytics', () => {

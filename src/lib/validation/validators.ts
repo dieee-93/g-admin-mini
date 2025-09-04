@@ -1,4 +1,4 @@
-import { ValidationSchema, ValidationResult, ValidationRule, ValidationError } from './types';
+import { type ValidationSchema, type ValidationResult, type ValidationRule, type ValidationError } from './types';
 import { sanitizeObject } from './sanitization';
 
 // Email validation regex (RFC 5322 compliant)
@@ -282,7 +282,7 @@ export function createValidationSchema(type: 'inventory' | 'customer' | 'sale' |
 /**
  * Validates data against a schema
  */
-export function validateData(data: any, schema: ValidationSchema): ValidationResult {
+export async function validateData(data: any, schema: ValidationSchema): Promise<ValidationResult> {
   const errors: ValidationError[] = [];
   const warnings: ValidationError[] = [];
   let sanitizedData = data;
@@ -315,7 +315,7 @@ export function validateData(data: any, schema: ValidationSchema): ValidationRes
   if (schema.businessRules) {
     for (const businessRule of schema.businessRules) {
       try {
-        const result = businessRule.validate(sanitizedData);
+        const result = await businessRule.validate(sanitizedData);
         if (result !== true) {
           const error: ValidationError = {
             field: 'business_rule',

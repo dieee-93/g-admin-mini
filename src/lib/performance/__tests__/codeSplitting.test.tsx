@@ -1,22 +1,18 @@
 // codeSplitting.test.tsx - Tests for code splitting functionality
-import { render, screen, waitFor } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
 import { lazyComponents, CodeSplittingMonitor, createMonitoredLazyComponent } from '../codeSplitting';
-
-import { vi } from 'vitest';
+import vi from 'vitest';
 
 // Mock React.lazy to avoid actual imports during testing
-vi.mock('react', async (importOriginal) => {
-  const actual = await importOriginal();
+vi.mock('react', async () => {
+  const actual = await vi.importActual('react');
   return {
     ...actual,
     lazy: vi.fn((importFn) => {
-      const MockComponent = () => <div data-testid="lazy-component">Lazy Component Loaded</div>;
-      MockComponent.displayName = 'MockLazyComponent';
-      return MockComponent;
-    }),
-    Suspense: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  };
+    const MockComponent = () => <div data-testid="lazy-component">Lazy Component Loaded</div>;
+    MockComponent.displayName = 'MockLazyComponent';
+    return MockComponent;
+  }),
+  Suspense: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
 });
 
 // Mock the performance API

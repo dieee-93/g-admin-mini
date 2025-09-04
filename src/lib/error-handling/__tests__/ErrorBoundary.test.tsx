@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { Provider } from '@/shared/ui/provider';
 
@@ -80,30 +80,45 @@ describe('ErrorBoundary', () => {
     expect(screen.queryByText('¡Oops! Algo salió mal')).not.toBeInTheDocument();
   });
 
-  it('should handle retry functionality', () => {
-    const { rerender } = render(
+  it('should handle retry functionality', async () => {
+    let renderAttempts = 0;
+
+    // This component will throw an error on its first two render attempts,
+    // which accounts for React's Strict Mode double-rendering in tests.
+    // On the third attempt (triggered by the retry button), it will succeed.
+    const ComponentThatThrowsInStrictMode = () => {
+      renderAttempts += 1;
+      if (renderAttempts <= 2) {
+        throw new Error('Failing during initial render');
+      }
+      return <div>Success!</div>;
+    };
+
+    // Reset counter for this specific test
+    renderAttempts = 0;
+
+    render(
       <TestWrapper>
         <ErrorBoundary>
-          <ThrowError shouldThrow={true} />
+          <ComponentThatThrowsInStrictMode />
         </ErrorBoundary>
       </TestWrapper>
     );
 
+    // After the initial render (which includes a strict mode re-render),
+    // the error boundary should be displayed.
     expect(screen.getByText('¡Oops! Algo salió mal')).toBeInTheDocument();
 
     const retryButton = screen.getByRole('button', { name: /intentar de nuevo/i });
     fireEvent.click(retryButton);
 
-    // After retry, render with no error
-    rerender(
-      <TestWrapper>
-        <ErrorBoundary>
-          <ThrowError shouldThrow={false} />
-        </ErrorBoundary>
-      </TestWrapper>
-    );
+    // After clicking retry, the component should render successfully on the 3rd attempt.
+    await waitFor(() => {
+      expect(screen.getByText('Success!')).toBeInTheDocument();
+    });
 
-    expect(screen.getByText('No error')).toBeInTheDocument();
+    // The error UI should now be gone.
+    expect(screen.queryByText('¡Oops! Algo salió mal')).not.toBeInTheDocument();
   });
 
   it('should handle error reporting', () => {

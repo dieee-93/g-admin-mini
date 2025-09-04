@@ -1,4 +1,3 @@
-// Setup global para todos los tests
 import '@testing-library/jest-dom'
 import { vi } from 'vitest'
 
@@ -24,12 +23,73 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }))
 
-// Mock de IntersectionObserver
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}))
+// Mock de supabase
+vi.mock('@/lib/supabase/client', () => {
+  const createQueryBuilder = (initialData = { data: [], error: null }) => {
+    let query = Promise.resolve(initialData);
+    const builder = {
+      select: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn(() => {
+        query = Promise.resolve({ data: {}, error: null });
+        return builder;
+      }),
+      then: (...args) => query.then(...args),
+      catch: (...args) => query.catch(...args),
+      finally: (...args) => query.finally(...args),
+    };
+    return builder;
+  };
+
+  const supabase = {
+    from: vi.fn(() => createQueryBuilder()),
+    rpc: vi.fn().mockResolvedValue({ data: [], error: null }),
+    auth: {
+      signInWithPassword: vi.fn().mockResolvedValue({ data: { user: {} }, error: null }),
+      signUp: vi.fn().mockResolvedValue({ data: { user: {} }, error: null }),
+      signOut: vi.fn().mockResolvedValue({ error: null }),
+      onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
+    },
+    storage: {
+      from: vi.fn(() => ({
+        upload: vi.fn(),
+        download: vi.fn(),
+        remove: vi.fn(),
+        getPublicUrl: vi.fn(() => ({ data: { publicUrl: 'http://example.com/avatar.png' } })),
+      })),
+    },
+  };
+
+  return { supabase };
+});
+
+// Mock de heroicons
+vi.mock('@heroicons/react/24/outline', async (importOriginal) => {
+  const actual = await importOriginal()
+  const React = await import('react');
+  const createMockIcon = (displayName) => {
+    const MockIcon = (props) => React.createElement('svg', { ...props, 'data-testid': `${displayName}-icon` });
+    MockIcon.displayName = displayName;
+    return MockIcon;
+  }
+  const mockedIcons = Object.keys(actual).reduce((acc, key) => {
+    acc[key] = createMockIcon(key);
+    return acc;
+  }, {});
+
+  return {
+    ...mockedIcons
+  };
+});
+
+// Mock de Zustand store
+vi.mock('@/store/materialsStore', () => ({
+  useMaterials: vi.fn()
+}));
 
 // Mock de IndexedDB para tests offline
 const mockIDBDatabase = {
@@ -60,100 +120,3 @@ global.indexedDB = {
   deleteDatabase: vi.fn(() => mockIDBRequest),
   databases: vi.fn(() => Promise.resolve([]))
 } as any
-
-// Mock básico de heroicons - Usando React.createElement para evitar JSX
-vi.mock('@heroicons/react/24/outline', () => {
-  const React = require('react');
-  return {
-    HomeIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'home-icon', className }),
-    PlusIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'plus-icon', className }),
-    MagnifyingGlassIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'search-icon', className }),
-    AdjustmentsHorizontalIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'filter-icon', className }),
-    PencilIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'pencil-icon', className }),
-    TrashIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'trash-icon', className }),
-    EyeIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'eye-icon', className }),
-    ChartBarIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'chart-bar-icon', className }),
-    CogIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'cog-icon', className }),
-    UsersIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'users-icon', className }),
-    BuildingStorefrontIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'storefront-icon', className }),
-    CubeIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'cube-icon', className }),
-    DocumentTextIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'document-icon', className }),
-    CalendarIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'calendar-icon', className }),
-    CurrencyDollarIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'dollar-icon', className }),
-    Cog6ToothIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'cog6tooth-icon', className }),
-    BellIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'bell-icon', className }),
-    ArrowPathIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'refresh-icon', className }),
-    DocumentArrowDownIcon: ({ className }: { className?: string }) => 
-      React.createElement('div', { 'data-testid': 'download-icon', className }),
-  }
-})
-
-// Mock de react-router-dom
-vi.mock('react-router-dom', () => {
-  const React = require('react');
-  return {
-    useNavigate: () => vi.fn(),
-    useLocation: () => ({ pathname: '/' }),
-    Link: ({ children, to }: { children: React.ReactNode, to: string }) => 
-      React.createElement('a', { href: to }, children),
-    NavLink: ({ children, to }: { children: React.ReactNode, to: string }) => 
-      React.createElement('a', { href: to }, children),
-  }
-})
-
-// Mock de zustand stores
-vi.mock('@/store/appStore', () => ({
-  useAppStore: () => ({
-    user: null,
-    isLoading: false,
-    error: null,
-  }),
-}))
-
-vi.mock('@/store/materialsStore', () => ({
-  useMaterials: () => ({
-    items: [],
-    loading: false,
-    error: null,
-    addItem: vi.fn(),
-    updateItem: vi.fn(),
-    deleteItem: vi.fn(),
-    refreshInventory: vi.fn(),
-  }),
-}))
-
-// Supress console warnings during tests
-const originalError = console.error
-beforeAll(() => {
-  console.error = (...args: any[]) => {
-    if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render is no longer supported')
-    ) {
-      return
-    }
-    originalError.call(console, ...args)
-  }
-})
-
-afterAll(() => {
-  console.error = originalError
-})

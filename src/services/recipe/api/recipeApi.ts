@@ -58,38 +58,30 @@ export async function fetchRecipeById(id: string): Promise<Recipe> {
 }
 
 export async function createRecipe(recipeData: CreateRecipeData): Promise<Recipe> {
-  // Crear la receta principal
-  const { data: recipe, error: recipeError } = await supabase
+  const { ingredients, ...recipeDetails } = recipeData;
+
+  const { data, error } = await supabase
     .from('recipes')
-    .insert([{
-      name: recipeData.name,
-      output_item_id: recipeData.output_item_id,
-      output_quantity: recipeData.output_quantity,
-      preparation_time: recipeData.preparation_time,
-      instructions: recipeData.instructions,
-    }])
-    .select()
+    .insert([
+      {
+        ...recipeDetails,
+        recipe_ingredients: ingredients,
+      },
+    ])
+    .select(`
+      *,
+      output_item:items(id, name, unit, type),
+      recipe_ingredients(
+        id,
+        item_id,
+        quantity,
+        item:items(id, name, unit, type, stock, unit_cost)
+      )
+    `)
     .single();
 
-  if (recipeError) throw recipeError;
-
-  // Crear los ingredientes
-  if (recipeData.ingredients.length > 0) {
-    const ingredients = recipeData.ingredients.map(ingredient => ({
-      recipe_id: recipe.id,
-      item_id: ingredient.item_id,
-      quantity: ingredient.quantity,
-    }));
-
-    const { error: ingredientsError } = await supabase
-      .from('recipe_ingredients')
-      .insert(ingredients);
-
-    if (ingredientsError) throw ingredientsError;
-  }
-
-  // Retornar la receta completa
-  return await fetchRecipeById(recipe.id);
+  if (error) throw error;
+  return data;
 }
 
 export async function updateRecipe(

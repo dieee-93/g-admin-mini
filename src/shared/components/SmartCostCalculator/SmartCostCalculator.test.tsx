@@ -1,41 +1,52 @@
 // SmartCostCalculator Component Tests
-import { describe, it, expect, vi } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { describe, it, expect, vi, beforeEach } from "vitest"
+import { render, screen, waitFor } from "@testing-library/react"
 import { SmartCostCalculator } from "./SmartCostCalculator"
+import { calculateRecipeCost } from "@/services/recipe/api/recipeApi"
+import type { Recipe } from "@/services/recipe/types"
 
-// Mock ChakraUI Provider for tests
-const ChakraWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div data-testid="chakra-wrapper">{children}</div>
-}
+import { Provider } from '@/shared/ui/provider'
+import { useThemeStore } from '@/store/themeStore'
+
+vi.mock('@/store/themeStore')
+vi.mock('@/services/recipe/api/recipeApi')
 
 const renderWithChakra = (component: React.ReactElement) => {
-  return render(component, { wrapper: ChakraWrapper })
+  (useThemeStore as vi.Mock).mockReturnValue({
+    currentTheme: { id: 'default', name: 'Default' },
+  });
+  return render(component, { wrapper: Provider })
 }
 
 describe("SmartCostCalculator", () => {
-  it("should render with recipe ID", () => {
-    renderWithChakra(<SmartCostCalculator recipeId="test-recipe-123" />)
+  const mockRecipe: Recipe = {
+    id: "recipe-1",
+    name: "Test Recipe",
+    output_item_id: "item-1",
+    output_quantity: 4,
+  }
 
-    expect(screen.getByText("Smart Cost Calculator")).toBeInTheDocument()
-    expect(screen.getByText(/Recipe: test-recipe-123/)).toBeInTheDocument()
+  beforeEach(() => {
+    (calculateRecipeCost as vi.Mock).mockResolvedValue(10)
   })
 
-  it("should display cost analysis description", () => {
-    renderWithChakra(<SmartCostCalculator recipeId="recipe-1" />)
-
-    expect(screen.getByText("Real-time costing with yield analysis for Recipe: recipe-1")).toBeInTheDocument()
+  it("should render with a recipe", async () => {
+    renderWithChakra(<SmartCostCalculator recipe={mockRecipe} />)
+    await waitFor(() => {
+      expect(screen.getByText("Smart Cost Calculator")).toBeInTheDocument()
+    })
   })
 
-  it("should handle empty recipe ID", () => {
-    renderWithChakra(<SmartCostCalculator recipeId="" />)
-
-    expect(screen.getByText("Smart Cost Calculator")).toBeInTheDocument()
-    expect(screen.getByText(/Recipe:/)).toBeInTheDocument()
+  it("should display the calculated cost", async () => {
+    renderWithChakra(<SmartCostCalculator recipe={mockRecipe} />)
+    await waitFor(() => {
+      expect(screen.getByText("$10.00")).toBeInTheDocument()
+    })
   })
 
-  it("should render card container", () => {
-    renderWithChakra(<SmartCostCalculator recipeId="recipe-1" />)
-
-    expect(screen.getByTestId("chakra-wrapper")).toBeInTheDocument()
+  it("should be disabled if no recipe is provided", () => {
+    renderWithChakra(<SmartCostCalculator />)
+    const calculateButton = screen.getByText("Calculate Cost").closest('button')
+    expect(calculateButton).toBeDisabled()
   })
 })
