@@ -59,17 +59,17 @@ export function CustomerAnalytics() {
     }).format(amount);
   };
 
-  const getSegmentColor = (segment: CustomerSegment): "gray" | "brand" | "success" | "warning" | "error" | "info" | "theme" | "accent" => {
-    const colors: Record<CustomerSegment, "gray" | "brand" | "success" | "warning" | "error" | "info" | "theme" | "accent"> = {
-      [CustomerSegment.CHAMPIONS]: 'success',
-      [CustomerSegment.LOYAL]: 'info',
-      [CustomerSegment.POTENTIAL_LOYALISTS]: 'brand',
-      [CustomerSegment.NEW_CUSTOMERS]: 'theme',
-      [CustomerSegment.PROMISING]: 'info',
-      [CustomerSegment.NEED_ATTENTION]: 'warning',
-      [CustomerSegment.ABOUT_TO_SLEEP]: 'warning',
-      [CustomerSegment.AT_RISK]: 'error',
-      [CustomerSegment.CANNOT_LOSE]: 'error',
+  const getSegmentColor = (segment: CustomerSegment): "gray" | "red" | "orange" | "yellow" | "green" | "teal" | "blue" | "cyan" | "purple" | "pink" => {
+    const colors: Record<CustomerSegment, "gray" | "red" | "orange" | "yellow" | "green" | "teal" | "blue" | "cyan" | "purple" | "pink"> = {
+      [CustomerSegment.CHAMPIONS]: 'green',
+      [CustomerSegment.LOYAL]: 'blue',
+      [CustomerSegment.POTENTIAL_LOYALISTS]: 'purple',
+      [CustomerSegment.NEW_CUSTOMERS]: 'cyan',
+      [CustomerSegment.PROMISING]: 'teal',
+      [CustomerSegment.NEED_ATTENTION]: 'orange',
+      [CustomerSegment.ABOUT_TO_SLEEP]: 'yellow',
+      [CustomerSegment.AT_RISK]: 'red',
+      [CustomerSegment.CANNOT_LOSE]: 'red',
       [CustomerSegment.HIBERNATING]: 'gray',
       [CustomerSegment.LOST]: 'gray'
     };
@@ -93,8 +93,8 @@ export function CustomerAnalytics() {
     return labels[segment];
   };
 
-  const getChurnRiskColor = (risk: ChurnRisk): "gray" | "brand" | "success" | "warning" | "error" | "info" | "theme" | "accent" => {
-    return risk === ChurnRisk.HIGH ? 'error' : risk === ChurnRisk.MEDIUM ? 'warning' : 'success';
+  const getChurnRiskColor = (risk: ChurnRisk): "gray" | "red" | "orange" | "yellow" | "green" | "teal" | "blue" | "cyan" | "purple" | "pink" => {
+    return risk === ChurnRisk.HIGH ? 'red' : risk === ChurnRisk.MEDIUM ? 'orange' : 'green';
   };
 
   const getLoyaltyTierIcon = (tier: LoyaltyTier): string => {
@@ -146,7 +146,7 @@ export function CustomerAnalytics() {
             <Typography variant="heading" size="xl" >
               {analytics?.total_customers || customers.length}
             </Typography>
-            <Badge colorPalette="info" variant="subtle" size="sm">
+            <Badge colorPalette="blue" variant="subtle" size="sm">
               📊 Activos
             </Badge>
           </Stack>
@@ -163,7 +163,7 @@ export function CustomerAnalytics() {
             <Typography variant="heading" size="xl" >
               {analytics?.new_customers_this_month || Math.floor(customers.length * 0.15)}
             </Typography>
-            <Badge colorPalette="success" variant="subtle" size="sm">
+            <Badge colorPalette="green" variant="subtle" size="sm">
               ➕ Crecimiento
             </Badge>
           </Stack>
@@ -214,7 +214,7 @@ export function CustomerAnalytics() {
             <Typography variant="heading" size="xl" >
               {analytics?.customer_retention_rate ? `${analytics.customer_retention_rate.toFixed(0)}%` : '87%'}
             </Typography>
-            <Badge  variant="subtle" size="sm">
+            <Badge colorPalette="purple" variant="subtle" size="sm">
               📈 Estable
             </Badge>
           </Stack>
@@ -233,7 +233,7 @@ export function CustomerAnalytics() {
                 Recency (Días) • Frequency (Visitas) • Monetary (Gasto)
               </Typography>
             </Stack>
-            <Badge  variant="subtle">
+            <Badge colorPalette="gray" variant="subtle">
               {segmentStats.length} segmentos activos
             </Badge>
           </Stack>
@@ -424,7 +424,7 @@ export function CustomerAnalytics() {
           
           <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap="md">
             {/* Revenue Concentration */}
-            <Alert variant="subtle">
+            <Alert variant="subtle" status="info">
               <Stack direction="column" gap="xs" p="md">
                 <Typography size="sm" fontWeight="medium" >🏆 Revenue Champions</Typography>
                 <Typography size="sm" color="text.muted">
@@ -437,30 +437,34 @@ export function CustomerAnalytics() {
             </Alert>
 
             {/* Churn Prevention */}
-            <Alert variant="subtle">
-              <Stack direction="column" gap="xs" p="md">
-                <Typography size="sm" fontWeight="medium" >⚠️ Retención Urgente</Typography>
-                <Typography size="sm" color="text.muted">
-                  {churnRiskCustomers.length} clientes de alto valor en riesgo.
-                </Typography>
-                <Typography fontWeight="medium"  size="sm">
-                  Campaña win-back inmediata
-                </Typography>
-              </Stack>
-            </Alert>
+            <Alert.Root variant="subtle">
+              <Alert.Content>
+                <Stack direction="column" gap="xs" p="md">
+                  <Typography size="sm" fontWeight="medium" >⚠️ Retención Urgente</Typography>
+                  <Typography size="sm" color="text.muted">
+                    {churnRiskCustomers.length} clientes de alto valor en riesgo.
+                  </Typography>
+                  <Typography fontWeight="medium"  size="sm">
+                    Campaña win-back inmediata
+                  </Typography>
+                </Stack>
+              </Alert.Content>
+            </Alert.Root>
 
             {/* Growth Opportunity */}
-            <Alert variant="subtle">
-              <Stack direction="column" gap="xs" p="md">
-                <Typography size="sm" fontWeight="medium" >📈 Oportunidad Crecimiento</Typography>
-                <Typography size="sm" color="text.muted">
-                  {segmentStats.find(s => s.segment === CustomerSegment.NEW_CUSTOMERS)?.count || 0} nuevos clientes necesitan onboarding.
-                </Typography>
-                <Typography fontWeight="medium"  size="sm">
-                  Programa de bienvenida
-                </Typography>
-              </Stack>
-            </Alert>
+            <Alert.Root variant="subtle">
+              <Alert.Content>
+                <Stack direction="column" gap="xs" p="md">
+                  <Typography size="sm" fontWeight="medium" >📈 Oportunidad Crecimiento</Typography>
+                  <Typography size="sm" color="text.muted">
+                    {segmentStats.find(s => s.segment === CustomerSegment.NEW_CUSTOMERS)?.count || 0} nuevos clientes necesitan onboarding.
+                  </Typography>
+                  <Typography fontWeight="medium"  size="sm">
+                    Programa de bienvenida
+                  </Typography>
+                </Stack>
+              </Alert.Content>
+            </Alert.Root>
           </Grid>
         </Stack>
       </CardWrapper>

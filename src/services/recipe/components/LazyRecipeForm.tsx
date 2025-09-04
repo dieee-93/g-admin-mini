@@ -11,22 +11,9 @@ const RecipeAISuggestions = lazy(() =>
   import('./components/RecipeAISuggestions').then(module => ({ default: module.RecipeAISuggestions }))
 );
 
-// Main form component
+// Main form component - lazy loaded from correct path
 export const LazyRecipeForm = lazy(() => 
-  import('./RecipeForm').then(module => ({ 
-    default: ({ ...props }) => {
-      const OriginalComponent = module.RecipeForm;
-      return (
-        <LazyWrapper 
-          moduleName="RecipeForm"
-          fallbackVariant="skeleton"
-          showProgress={true}
-        >
-          <OriginalComponent {...props} />
-        </LazyWrapper>
-      );
-    }
-  }))
+  import('./RecipeForm/RecipeForm')
 );
 
 // Export individual lazy components

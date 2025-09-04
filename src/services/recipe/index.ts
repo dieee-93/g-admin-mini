@@ -4,7 +4,7 @@ export { recipeAPI } from './RecipeAPI';
 export { recipeService } from './RecipeService';
 
 // Advanced Recipe Components (migrated from tools)
-export { RecipeForm } from './components/RecipeForm';
+export { RecipeForm } from './components';
 export { RecipeList } from './components/RecipeList';
 export { LazyRecipeForm } from './components/LazyRecipeForm';
 
