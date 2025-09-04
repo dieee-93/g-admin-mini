@@ -2,7 +2,7 @@
 // 🎯 PROVIDER CENTRAL DEL SISTEMA DE ALERTAS
 // Maneja el estado global de todas las alertas de la aplicación
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from 'react';
 import { 
   Alert, 
   AlertsContextValue, 
@@ -17,6 +17,7 @@ import {
   ALERT_EVENTS
 } from './types';
 import { EventBus } from '@/lib/events/EventBus';
+import { useDebouncedCallback } from '@/shared/hooks/useDebouncedCallback';
 
 // Default configuration
 const DEFAULT_CONFIG: AlertsConfiguration = {
@@ -128,7 +129,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
   };
 
   // Create new alert
-  const create = useCallback(async (input: CreateAlertInput): Promise<string> => {
+  const createLogic = useCallback(async (input: CreateAlertInput): Promise<string> => {
     const now = new Date();
     const alertId = generateId();
 
@@ -193,6 +194,8 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
 
     return alertId;
   }, [alerts, generateId]);
+
+  const create = useDebouncedCallback(createLogic, 300);
 
   // Acknowledge alert
   const acknowledge = useCallback(async (id: string, notes?: string) => {
@@ -422,10 +425,10 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     }
   }, [config]);
 
-  // Calculate current stats
-  const stats = getStats();
+  // Memoize stats calculation
+  const stats = useMemo(() => getStats(), [getStats]);
 
-  const contextValue: AlertsContextValue = {
+  const contextValue: AlertsContextValue = useMemo(() => ({
     alerts,
     stats,
     config,
@@ -444,7 +447,11 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     bulkResolve,
     bulkDismiss,
     clearAll
-  };
+  }), [
+    alerts, stats, config, loading, create, acknowledge, resolve, dismiss,
+    update, getByContext, getBySeverity, getFiltered, getStats,
+    updateConfig, bulkAcknowledge, bulkResolve, bulkDismiss, clearAll
+  ]);
 
   return (
     <AlertsContext.Provider value={contextValue}>

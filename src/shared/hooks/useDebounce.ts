@@ -1,27 +1,37 @@
-import { useState, useEffect } from 'react';
+// src/shared/hooks/useDebouncedCallback.ts
+import { useEffect, useRef, useCallback } from 'react';
 
-/**
- * Custom hook for debouncing values to prevent excessive API calls or computations
- * @param value - The value to debounce
- * @param delay - Delay in milliseconds
- * @returns The debounced value
- */
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+type AnyFunction = (...args: any[]) => any;
+
+export function useDebouncedCallback<T extends AnyFunction>(
+  callback: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  const callbackRef = useRef(callback);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Set up the timeout
-    const timeoutId = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
+    callbackRef.current = callback;
+  }, [callback]);
 
-    // Cleanup timeout on value change or unmount
+  useEffect(() => {
+    // Cleanup the timeout on unmount
     return () => {
-      clearTimeout(timeoutId);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
-  }, [value, delay]);
+  }, []);
 
-  return debouncedValue;
+  const debouncedCallback = useCallback((...args: Parameters<T>) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      callbackRef.current(...args);
+    }, delay);
+  }, [delay]);
+
+  return debouncedCallback;
 }
-
-export default useDebounce;

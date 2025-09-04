@@ -3,17 +3,19 @@
 // ====================================
 
 import React, { Fragment } from 'react';
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationBadges } from '@/hooks/useNavigationBadges'; // ✅ IMPORTAR NUEVO HOOK
 import { 
-  Layout, Stack, Typography, CardWrapper, Button, Badge
+  Stack, Typography, Badge
 } from '@/shared/ui';
 import { Box } from '@chakra-ui/react';
 import { Collapsible } from '@chakra-ui/react';
-import { Icon, HeaderIcon } from '@/shared/ui/Icon';
+import { Icon } from '@/shared/ui/Icon';
 import { QuickThemeToggle } from '@/shared/components/ThemeToggle';
 import { SidebarContainer, NavItemContainer } from './SidebarContainer';
+import { Button } from '@/shared/ui/Button';
 
 export function Sidebar() {
   const location = useLocation();
@@ -22,13 +24,12 @@ export function Sidebar() {
   const { 
     modules, 
     currentModule, 
-    navigate, 
     navigateToModule,
-    sidebarCollapsed, 
-    setSidebarCollapsed,
     toggleModuleExpansion,
-    isMobile 
   } = useNavigation();
+  
+  // ✅ OBTENER RECUENTOS DE BADGES DE FORMA CENTRALIZADA
+  const badgeCounts = useNavigationBadges();
 
   // Handler para toggle de expansión
   const handleToggleExpansion = (moduleId: string) => {
@@ -188,8 +189,8 @@ export function Sidebar() {
                       )}
                     </Stack>
 
-                    {/* Module Badge - Ultra minimal positioning */}
-                    {module.badge && (
+                    {/* ✅ Module Badge - Conectado al nuevo hook */}
+                    {badgeCounts[module.id] > 0 && (
                       <div
                         style={{
                           position: "absolute",
@@ -210,7 +211,7 @@ export function Sidebar() {
                             fontWeight: "500"
                           }}
                         >
-                          {module.badge}
+                          {badgeCounts[module.id]}
                         </Badge>
                       </div>
                     )}
