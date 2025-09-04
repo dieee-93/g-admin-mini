@@ -8,12 +8,12 @@ import { ActionButtons } from './components/ActionButtons';
 import type { AdminUserData } from './config/constants';
 
 interface AdminUserCreationStepProps {
-  onStepComplete: (userData: AdminUserData) => void;
+  onComplete: (userData: AdminUserData) => void;
   onBack: () => void;
 }
 
-export function AdminUserCreationStep({ onStepComplete, onBack }: AdminUserCreationStepProps) {
-  const form = useAdminUserForm({ onStepComplete });
+export function AdminUserCreationStep({ onComplete, onBack }: AdminUserCreationStepProps) {
+  const form = useAdminUserForm({ onComplete });
 
   return (
     <Box maxW="500px" mx="auto" p={6}>

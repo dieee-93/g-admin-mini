@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { ADMIN_USER_CONFIG, AdminUserData, FormErrors } from '../config/constants';
 
 export interface UseAdminUserFormReturn {
@@ -32,10 +32,10 @@ export interface UseAdminUserFormReturn {
 }
 
 interface UseAdminUserFormProps {
-  onStepComplete: (userData: AdminUserData) => void;
+  onComplete: (userData: AdminUserData) => void;
 }
 
-export function useAdminUserForm({ onStepComplete }: UseAdminUserFormProps): UseAdminUserFormReturn {
+export function useAdminUserForm({ onComplete }: UseAdminUserFormProps): UseAdminUserFormReturn {
   const [email, setEmailState] = useState('');
   const [password, setPasswordState] = useState('');
   const [confirmPassword, setConfirmPasswordState] = useState('');
@@ -140,16 +140,11 @@ export function useAdminUserForm({ onStepComplete }: UseAdminUserFormProps): Use
     if (errors.email) validateEmail(value);
   }, [errors.email, validateEmail]);
 
-  useEffect(() => {
-    if (confirmPassword) {
-      validateConfirmPassword(confirmPassword);
-    }
-  }, [password, confirmPassword, validateConfirmPassword]);
-
   const setPassword = useCallback((value: string) => {
     setPasswordState(value);
     if (errors.password) validatePassword(value);
-  }, [errors.password, validatePassword]);
+    if (confirmPassword) validateConfirmPassword(confirmPassword);
+  }, [errors.password, confirmPassword, validatePassword, validateConfirmPassword]);
 
   const setConfirmPassword = useCallback((value: string) => {
     setConfirmPasswordState(value);
@@ -172,7 +167,7 @@ export function useAdminUserForm({ onStepComplete }: UseAdminUserFormProps): Use
       // Simulate processing delay for better UX
       await new Promise(resolve => setTimeout(resolve, ADMIN_USER_CONFIG.PROCESSING_DELAY));
       
-      onStepComplete({
+      onComplete({
         email: email.trim(),
         password,
         fullName: fullName.trim()
@@ -182,7 +177,7 @@ export function useAdminUserForm({ onStepComplete }: UseAdminUserFormProps): Use
     } finally {
       setIsCreating(false);
     }
-  }, [email, password, fullName, validateAllFields, onStepComplete]);
+  }, [email, password, fullName, validateAllFields, onComplete]);
 
   const canProceed = Boolean(
     email.trim() && 

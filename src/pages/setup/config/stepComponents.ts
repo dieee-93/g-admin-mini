@@ -1,4 +1,4 @@
-import { WelcomeStep } from '../steps/welcome/WelcomeStep';
+import { WelcomeScreen } from '../steps/welcome/WelcomeScreen';
 import { AdminUserCreationStep } from '../steps/system-setup/admin-user-creation';
 import { SupabaseConnectionStep } from '../steps/infrastructure/supabase-connection';
 import { DatabaseSetupStep } from '../steps/database-setup/DatabaseSetupStep';
@@ -9,7 +9,7 @@ import { SetupSummary } from '../steps/setup-summary/SetupSummary';
 import { FinishStep } from '../steps/FinishStep';
 
 export const STEP_COMPONENTS: Record<string, React.ComponentType<any>> = {
-  welcome: WelcomeStep,
+  welcome: WelcomeScreen,
   'admin-user': AdminUserCreationStep,
   supabase: SupabaseConnectionStep,
   database: DatabaseSetupStep,

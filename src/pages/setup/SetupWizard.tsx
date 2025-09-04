@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Box, Flex, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
+import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
 import { SetupHeader } from './layout/SetupHeader';
 import { SetupSidebar } from './layout/SetupSidebar';
 import { SetupProgressBar } from './layout/SetupProgressBar';
@@ -8,7 +8,6 @@ import { useSetupStore } from '../../store/setupStore';
 import { createSetupSteps, STEP_GROUPS } from './config/setupSteps';
 import { STEP_COMPONENTS } from './config/stepComponents';
 import '../../styles/setup-animations.css';
-import { notify } from '@/lib/notifications';
 
 export function SetupWizard() {
   const {
@@ -16,8 +15,6 @@ export function SetupWizard() {
     currentSubStep,
     userName,
     adminUserData,
-    error,
-    setError,
     setUserName,
     setAdminUserData,
     setSupabaseCredentials,
@@ -28,44 +25,11 @@ export function SetupWizard() {
     fillWithTestData
   } = useSetupStore();
 
-
-  useEffect(() => {
-    if (error) {
-      notify.error({
-        title: "Acción no permitida",
-        description: error,
-        duration: 5000,
-        onCloseComplete: () => setError(null),
-      });
-    }
-  }, [error, setError]);
-
   // Connection state
   const [isConnecting] = useState(false);
 
   // Memoize setup steps UI data
   const setupSteps = React.useMemo(() => createSetupSteps(currentGroup), [currentGroup]);
-
-  const handleStepComplete = (componentId: string, data: any) => {
-    switch (componentId) {
-      case 'welcome':
-        setUserName(data as string);
-        break;
-      case 'admin-user':
-        // Ensure we only store non-sensitive data
-        setAdminUserData({
-          email: data.email,
-          fullName: data.fullName,
-        });
-        break;
-      case 'supabase-connection':
-        setSupabaseCredentials(data as { url: string; anonKey: string });
-        break;
-      default:
-        console.warn(`No action defined for componentId: ${componentId}`);
-    }
-    nextStep();
-  };
 
   // Derive current component from state and render it
   const renderStepComponent = () => {
@@ -78,7 +42,15 @@ export function SetupWizard() {
     }
 
     const props = {
-      onStepComplete: (data: any) => handleStepComplete(componentId, data),
+      onComplete: (data: any) => {
+        if (componentId === 'welcome') setUserName(data);
+        if (componentId === 'admin-user') setAdminUserData(data);
+        nextStep();
+      },
+      onConnectionSuccess: (url: string, anonKey: string) => {
+        setSupabaseCredentials({ url, anonKey });
+        nextStep();
+      },
       onNext: nextStep,
       onBack: prevStep,
       onSkip: nextStep,

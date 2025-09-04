@@ -1,16 +1,7 @@
 import { useMemo } from 'react';
 import { usePersonalizedExperience } from '@/hooks/usePersonalizedExperience';
-import { 
-  Section, 
-  Stack, 
-  Typography, 
-  MetricCard,
-  Badge,
-  Icon
-} from '@/shared/ui';
-import { Progress, Flex, Box, Text, Heading, Link as ChakraLink } from '@chakra-ui/react';
-import { CheckCircleIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
+import { Box, Stack, Text, Heading, Link as ChakraLink, Icon, Flex, Progress } from '@chakra-ui/react';
+import { CheckCircle, ArrowRight, Circle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function MilestoneTracker() {
@@ -41,127 +32,78 @@ export function MilestoneTracker() {
   const categoryOrder: (keyof typeof groupedMilestones)[] = ['Configuración Esencial', 'Primeros Pasos', 'Optimización'];
 
   return (
-    <Section 
-      variant="elevated" 
-      title="Guía de Inicio Rápido"
-      subtitle="Completa estos pasos para configurar tu negocio y sacarle el máximo provecho a la aplicación"
-      icon={CheckCircleIcon}
-    >
+    <Box p={6} bg="white" borderRadius="lg" shadow="sm" borderWidth="1px">
+      <Heading as="h3" size="md" mb={1}>
+        Guía de Inicio Rápido
+      </Heading>
+      <Text color="gray.500" mb={4}>
+        Completa estos pasos para configurar tu negocio y sacarle el máximo provecho a la aplicación.
+      </Text>
 
-      <Stack gap="6">
-        <MetricCard
-          title="Progreso de Configuración"
-          value={`${completedMilestones} / ${totalMilestones}`}
-          subtitle="pasos completados"
-          icon={CheckCircleIcon}
-          colorPalette="blue"
-          badge={{
-            value: `${Math.round(progressPercent)}%`,
-            colorPalette: progressPercent >= 75 ? "green" : progressPercent >= 50 ? "orange" : "blue"
-          }}
-        />
-        
-        <Stack gap="2">
-          <Progress.Root 
-            value={progressPercent} 
-            size="md" 
-            colorPalette={progressPercent >= 75 ? "green" : "blue"}
-          >
-            <Progress.Track>
-              <Progress.Range />
-            </Progress.Track>
-          </Progress.Root>
-          <Typography variant="body" size="sm" color="fg.muted" textAlign="center">
-            {progressPercent >= 100 
-              ? "¡Configuración completa! Tu negocio está listo para operar."
-              : `${Math.round(progressPercent)}% completado - ${totalMilestones - completedMilestones} pasos restantes`
-            }
-          </Typography>
-        </Stack>
+      <Flex align="center" mb={6}>
+        <Text fontWeight="bold" color="blue.600" mr={3}>
+          {completedMilestones} / {totalMilestones} completados
+        </Text>
+        <Progress value={progressPercent} size="sm" flex="1" borderRadius="md" />
+      </Flex>
 
-        <Stack gap="6">
+      <Stack spacing={6}>
         {categoryOrder
           .filter(category => groupedMilestones[category]) // Solo mostrar categorías que tienen hitos
           .map((category) => (
           <Box key={category}>
-            <Typography variant="heading" size="md" weight="semibold" color="fg.default" mb={3}>
+            <Heading as="h4" size="sm" mb={3} color="gray.700" fontWeight="semibold">
               {category}
-            </Typography>
-            <Stack gap={3}>
+            </Heading>
+            <Stack spacing={3}>
               {groupedMilestones[category].map((milestone) =>
                 milestone.isCompleted ? (
-                  <Box
+                  <Flex
                     key={milestone.id}
                     p={4}
-                    bg="green.50"
-                    borderLeft="4px solid"
-                    borderColor="green.400"
+                    borderWidth="1px"
                     borderRadius="md"
+                    align="center"
+                    bg="green.50"
                     opacity={0.8}
                   >
-                    <Flex align="center" gap={3}>
-                      <Icon as={CheckCircleIcon} color="green.500" boxSize={5} />
-                      <Box flex="1">
-                        <Typography 
-                          variant="body" 
-                          size="md" 
-                          weight="medium" 
-                          color="green.700"
-                          textDecoration="line-through"
-                        >
-                          {milestone.title}
-                        </Typography>
-                      </Box>
-                      <Badge colorPalette="green" variant="subtle">
-                        Completado
-                      </Badge>
-                    </Flex>
-                  </Box>
+                    <Icon as={CheckCircle} color="green.500" mr={4} boxSize={5} />
+                    <Box>
+                      <Text fontWeight="medium" textDecoration="line-through" color="gray.500">
+                        {milestone.title}
+                      </Text>
+                    </Box>
+                  </Flex>
                 ) : (
                   <Link to={milestone.link} key={milestone.id} style={{ textDecoration: 'none' }}>
-                    <Box
-                      p={4}
-                      bg="blue.50"
-                      borderLeft="4px solid"
-                      borderColor="blue.400"
-                      borderRadius="md"
-                      _hover={{ 
-                        bg: 'blue.100', 
-                        transform: 'translateY(-2px)',
-                        shadow: 'md'
-                      }}
-                      transition="all 0.2s ease"
-                      cursor="pointer"
-                    >
-                      <Flex justify="space-between" align="center">
-                        <Flex align="center" gap={3}>
-                          <Icon as={EllipsisHorizontalIcon} color="blue.500" boxSize={5} />
+                    <ChakraLink as="div" _hover={{ textDecoration: 'none' }}>
+                      <Flex
+                        p={4}
+                        borderWidth="1px"
+                        borderRadius="md"
+                        align="center"
+                        justify="space-between"
+                        _hover={{ bg: 'gray.50', shadow: 'md', transform: 'translateY(-2px)' }}
+                        transition="all 0.2s"
+                      >
+                        <Flex align="center">
+                          <Icon as={Circle} color="gray.300" mr={4} boxSize={5} />
                           <Box>
-                            <Typography variant="body" size="md" weight="semibold" color="fg.default">
-                              {milestone.title}
-                            </Typography>
-                            <Typography variant="body" size="sm" color="fg.muted">
-                              {milestone.description}
-                            </Typography>
+                            <Text fontWeight="medium" color="gray.800">{milestone.title}</Text>
+                            <Text fontSize="sm" color="gray.600">{milestone.description}</Text>
                           </Box>
                         </Flex>
-                        <Flex align="center" gap={2}>
-                          <Badge colorPalette="blue" variant="outline">
-                            Pendiente
-                          </Badge>
-                          <Icon as={ArrowRightIcon} color="blue.500" boxSize={4} />
-                        </Flex>
+                        <Icon as={ArrowRight} color="blue.500" />
                       </Flex>
-                    </Box>
+                    </ChakraLink>
                   </Link>
                 )
               )}
             </Stack>
           </Box>
         ))}
-        </Stack>
       </Stack>
-    </Section>
+    </Box>
   );
 }
 
