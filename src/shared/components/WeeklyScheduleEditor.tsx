@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Box, HStack, VStack, Button, Input, Text, IconButton, Divider, Tag } from '@chakra-ui/react';
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
+import { Box, Stack, Button, Input, IconButton, Separator, Tag } from '@chakra-ui/react';
+import { Typography } from '@/shared/ui';
+import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { Schedule, DailyRule, TimeBlock } from '@/types/schedule';
 
 const dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
@@ -73,21 +74,21 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
 
   return (
     <Box borderWidth="1px" borderRadius="lg" p={4} bg="gray.50">
-      <VStack spacing={4} align="stretch">
-        <VStack align="stretch">
-            <Text fontWeight="medium">Nombre del Horario:</Text>
+      <Stack direction="column" gap={4} align="stretch">
+        <Stack direction="column" align="stretch">
+            <Typography variant="body" fontWeight="medium">Nombre del Horario:</Typography>
             <Input
                 placeholder="Ej: Horario de Tienda Principal"
                 value={schedule.name || ''}
                 onChange={handleNameChange}
                 bg="white"
             />
-        </VStack>
+        </Stack>
 
-        <Divider />
+        <Separator />
 
-        <Text fontWeight="medium">Selecciona los días para editar el horario:</Text>
-        <HStack spacing={2}>
+        <Typography variant="body" fontWeight="medium">Selecciona los días para editar el horario:</Typography>
+        <Stack direction="row" gap={2}>
           {dayMap.map((day, index) => (
             <Button
               key={day}
@@ -101,51 +102,51 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
               {dayNames[index]}
             </Button>
           ))}
-        </HStack>
+        </Stack>
 
-        <Divider />
+        <Separator />
 
         <Box>
-          <HStack mb={2} justifyContent="space-between">
-            <Text fontWeight="medium">Bloques de Horario:</Text>
-            <Button leftIcon={<AddIcon />} size="xs" variant="solid" colorScheme="blue" onClick={handleAddTimeBlock} isDisabled={selectedDays.size === 0}>
+          <Stack direction="row" mb={2} justify="space-between">
+            <Typography variant="body" fontWeight="medium">Bloques de Horario:</Typography>
+            <Button leftIcon={<PlusIcon width={16} height={16} />} size="xs" variant="solid" colorScheme="blue" onClick={handleAddTimeBlock} isDisabled={selectedDays.size === 0}>
               Añadir Bloque
             </Button>
-          </HStack>
-          <Text fontSize="xs" color="gray.500" mb={3}>
+          </Stack>
+          <Typography variant="body" fontSize="xs" color="gray.500" mb={3}>
             {selectedDays.size > 0
                 ? `Editando para: ${Array.from(selectedDays).join(', ')}`
                 : "Selecciona uno o más días para añadir bloques de horario."}
-          </Text>
+          </Typography>
 
-          <VStack spacing={4} align="stretch">
+          <Stack direction="column" gap={4} align="stretch">
             {dayMap.map(day => {
               const blocks = getBlocksForDay(day);
               return (
-                <HStack key={day} spacing={3} align="center">
-                  <Tag colorScheme={blocks.length > 0 ? 'green' : 'gray'} width="90px" justifyContent="center">{day.substring(0, 3)}</Tag>
-                  <VStack align="stretch" width="100%">
+                <Stack direction="row" key={day} gap={3} align="center">
+                  <Tag colorScheme={blocks.length > 0 ? 'green' : 'gray'} width="90px" justify="center">{day.substring(0, 3)}</Tag>
+                  <Stack direction="column" align="stretch" width="100%">
                     {blocks.length > 0 ? blocks.map((block, index) => (
-                       <HStack key={index} spacing={2}>
+                       <Stack direction="row" key={index} gap={2}>
                          <Input type="time" value={block.startTime} onChange={(e) => handleTimeChange(day, index, 'startTime', e.target.value)} bg="white"/>
-                         <Text>-</Text>
+                         <Typography variant="body">-</Typography>
                          <Input type="time" value={block.endTime} onChange={(e) => handleTimeChange(day, index, 'endTime', e.target.value)} bg="white"/>
                          <IconButton
                            aria-label="Remove time block"
-                           icon={<DeleteIcon />}
+                           icon={<TrashIcon width={16} height={16} />}
                            size="sm"
                            variant="ghost"
                            onClick={() => handleRemoveTimeBlock(day, index)}
                          />
-                       </HStack>
-                    )) : <Text fontSize="sm" color="gray.400">Cerrado</Text>}
-                  </VStack>
-                </HStack>
+                       </Stack>
+                    )) : <Typography variant="body" fontSize="sm" color="gray.400">Cerrado</Typography>}
+                  </Stack>
+                </Stack>
               )
             })}
-          </VStack>
+          </Stack>
         </Box>
-      </VStack>
+      </Stack>
     </Box>
   );
 }

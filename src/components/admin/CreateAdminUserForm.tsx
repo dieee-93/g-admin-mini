@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import {
   Box,
-  VStack,
-  HStack,
-  Text,
+  Stack,
   Progress,
   IconButton,
   Alert
 } from '@chakra-ui/react';
+import { Typography } from '@/shared/ui';
 import { 
   EyeIcon, 
   EyeSlashIcon, 
@@ -129,9 +128,9 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
   return (
     <CardWrapper variant="elevated" padding="xl" maxW="2xl">
       <form onSubmit={handleSubmit}>
-        <VStack gap="lg" align="stretch">
+        <Stack direction="column" gap="lg" align="stretch">
           {/* Header */}
-          <HStack gap="sm" justify="center">
+          <Stack direction="row" gap="sm" justify="center">
             <div style={{
               padding: '12px',
               background: '#3182ce',
@@ -140,15 +139,15 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
             }}>
               <UserPlusIcon style={{ width: '24px', height: '24px' }} />
             </div>
-            <VStack gap="xs" align="start">
+            <Stack direction="column" gap="xs" align="start">
               <Typography variant="heading" color="text.primary">
                 Crear Usuario Administrativo
               </Typography>
               <Typography variant="caption" color="text.muted">
                 Usuario con acceso al panel de administración
               </Typography>
-            </VStack>
-          </HStack>
+            </Stack>
+          </Stack>
 
           {/* Error Display */}
           {error && (
@@ -158,7 +157,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
           )}
 
           {/* Form Fields */}
-          <VStack gap="md" align="stretch">
+          <Stack direction="column" gap="md" align="stretch">
             <InputField
               label="Nombre Completo"
               type="text"
@@ -193,7 +192,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
                 { label: 'Supervisor', value: 'SUPERVISOR' },
                 { label: 'Administrador', value: 'ADMINISTRADOR' }
               ]}
-              helperText={getRoleDescription(formData.role)}
+              helperTypography variant="body"={getRoleDescription(formData.role)}
             />
 
             {/* Password with strict validation */}
@@ -227,12 +226,12 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
             {/* Password Strength Indicator */}
             {formData.password && (
               <CardWrapper variant="outline" padding="md">
-                <VStack gap="sm" align="stretch">
-                  <HStack justify="space-between" align="center">
+                <Stack direction="column" gap="sm" align="stretch">
+                  <Stack direction="row" justify="space-between" align="center">
                     <Typography variant="label" color="text.secondary">
                       Nivel de Seguridad:
                     </Typography>
-                    <HStack gap="xs">
+                    <Stack direction="row" gap="xs">
                       {passwordValidation.strengthColor === 'green' ? 
                         <CheckCircleIcon style={{ width: '16px', height: '16px', color: '#22c55e' }} /> :
                         <ExclamationTriangleIcon style={{ width: '16px', height: '16px', color: '#f59e0b' }} />
@@ -247,8 +246,8 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
                       >
                         {passwordValidation.strengthLabel}
                       </Typography>
-                    </HStack>
-                  </HStack>
+                    </Stack>
+                  </Stack>
                   
                   <Progress.Root 
                     value={passwordValidation.strength} 
@@ -260,9 +259,9 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
                     </Progress.Track>
                   </Progress.Root>
                   
-                  <VStack gap="xs" align="stretch">
+                  <Stack direction="column" gap="xs" align="stretch">
                     {passwordValidation.requirements.map((req, index) => (
-                      <HStack key={index} gap="xs" align="center">
+                      <Stack direction="row" key={index} gap="xs" align="center">
                         <Box
                           width="4px"
                           height="4px"
@@ -276,10 +275,10 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
                         >
                           {req.label}
                         </Typography>
-                      </HStack>
+                      </Stack>
                     ))}
-                  </VStack>
-                </VStack>
+                  </Stack>
+                </Stack>
               </CardWrapper>
             )}
 
@@ -310,10 +309,10 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
                 </IconButton>
               </Box>
             </Box>
-          </VStack>
+          </Stack>
 
           {/* Actions */}
-          <HStack gap="md" justify="end">
+          <Stack direction="row" gap="md" justify="end">
             {onCancel && (
               <Button
                 variant="outline"
@@ -331,20 +330,20 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
               colorPalette="blue"
               disabled={isLoading || !passwordValidation.isValid || !formData.email || !formData.fullName}
               loading={isLoading}
-              loadingText="Creando usuario..."
+              loadingTypography variant="body"="Creando usuario..."
             >
-              <HStack gap="sm">
+              <Stack direction="row" gap="sm">
                 <ShieldCheckIcon style={{ width: '16px', height: '16px' }} />
-                <Text>Crear Usuario</Text>
-              </HStack>
+                <Typography variant="body">Crear Usuario</Typography>
+              </Stack>
             </Button>
-          </HStack>
+          </Stack>
 
           {/* Security Notice */}
           <CardWrapper variant="subtle" padding="md">
-            <HStack gap="sm" align="start">
+            <Stack direction="row" gap="sm" align="start">
               <ShieldCheckIcon style={{ width: '16px', height: '16px', color: '#3182ce', marginTop: '2px' }} />
-              <VStack gap="xs" align="start">
+              <Stack direction="column" gap="xs" align="start">
                 <Typography variant="label" color="text.primary" size="sm">
                   Política de Seguridad
                 </Typography>
@@ -352,10 +351,10 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
                   Los usuarios administrativos requieren contraseñas seguras y serán monitoreados.
                   El usuario recibirá un email de confirmación para activar su cuenta.
                 </Typography>
-              </VStack>
-            </HStack>
+              </Stack>
+            </Stack>
           </CardWrapper>
-        </VStack>
+        </Stack>
       </form>
     </CardWrapper>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Spinner, Center, Text } from '@chakra-ui/react';
+import { Box, Spinner, Center } from '@chakra-ui/react';
+import { Typography } from '@/shared/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthPage } from './AuthPage';
 
@@ -44,9 +45,9 @@ export function AuthLoadingScreen() {
     <Center minH="100vh">
       <Box textAlign="center">
         <Spinner size="xl" color="blue.500" mb={4} />
-        <Text color="gray.600">
+        <Typography variant="body" color="gray.600">
           Cargando...
-        </Text>
+        </Typography>
       </Box>
     </Center>
   );

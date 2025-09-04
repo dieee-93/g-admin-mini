@@ -5,7 +5,7 @@ interface ActionButtonProps {
   title: string;
   description?: string;
   icon: React.ComponentType<any>;
-  colorPalette: 'gray' | 'brand' | 'success' | 'warning' | 'error' | 'info' | 'blue' | 'green' | 'orange' | 'red';
+  colorPalette: "green" | "blue" | "red" | "gray" | "orange" | "purple" | "cyan" | "pink";
   onClick: () => void;
 }
 

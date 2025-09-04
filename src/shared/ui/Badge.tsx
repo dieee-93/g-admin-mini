@@ -5,7 +5,7 @@ interface BadgeProps {
   children: ReactNode
   variant?: 'solid' | 'subtle' | 'outline' | 'surface'
   size?: 'xs' | 'sm' | 'md' | 'lg'
-  colorPalette?: 'gray' | 'brand' | 'accent' | 'success' | 'warning' | 'error' | 'info'
+  colorPalette?: 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'cyan' | 'purple' | 'pink'
   startIcon?: ReactNode
   endIcon?: ReactNode
   dot?: boolean

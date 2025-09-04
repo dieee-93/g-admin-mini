@@ -2,7 +2,8 @@
 // Breadcrumb contextual para desktop
 // ✅ CORREGIDO: Clickeable navigation
 
-import { HStack, Text, Button } from '@chakra-ui/react';
+import { Stack, Button } from '@chakra-ui/react';
+import { Typography } from '@/shared/ui';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 
@@ -12,9 +13,9 @@ export function Breadcrumb() {
   if (breadcrumbs.length === 0) return null;
 
   return (
-    <HStack gap="2" align="center">
+    <Stack direction="row" gap="2" align="center">
       {breadcrumbs.map((crumb, index) => (
-        <HStack key={index} gap="2" align="center">
+        <Stack direction="row" key={index} gap="2" align="center">
           {crumb.path ? (
             <Button
               variant="ghost"
@@ -32,20 +33,20 @@ export function Breadcrumb() {
               {crumb.label}
             </Button>
           ) : (
-            <Text
+            <Typography variant="body"
               fontSize="sm"
               color={crumb.isActive ? "text.primary" : "text.secondary"}
               fontWeight={crumb.isActive ? 'semibold' : 'normal'}
             >
               {crumb.label}
-            </Text>
+            </Typography>
           )}
           
           {index < breadcrumbs.length - 1 && (
             <ChevronRightIcon style={{ width: '16px', height: '16px', color: 'var(--chakra-colors-text-muted)' }} />
           )}
-        </HStack>
+        </Stack>
       ))}
-    </HStack>
+    </Stack>
   );
 }

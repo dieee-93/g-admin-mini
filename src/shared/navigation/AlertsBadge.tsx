@@ -1,10 +1,10 @@
 import {
-  HStack,
+  Stack,
   Badge,
-  Text,
   Box,
   Skeleton
 } from '@chakra-ui/react';
+import { Typography } from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   BellIcon
@@ -116,7 +116,7 @@ export function AlertsBadge({
 
   // Detailed variant - full information
   return (
-    <HStack
+    <Stack direction="row"
       gap="2"
       cursor={onClick ? 'pointer' : 'default'}
       onClick={onClick}
@@ -135,7 +135,7 @@ export function AlertsBadge({
         </Box>
       )}
 
-      <HStack gap="1">
+      <Stack direction="row" gap="1">
         {/* Critical alerts */}
         {criticalCount > 0 && (
           <Badge colorPalette="red" variant="solid" size="sm">
@@ -157,11 +157,11 @@ export function AlertsBadge({
           </Badge>
         )}
 
-        <Text fontSize="sm" color="text.secondary">
+        <Typography variant="body" fontSize="sm" color="text.secondary">
           alertas
-        </Text>
-      </HStack>
-    </HStack>
+        </Typography>
+      </Stack>
+    </Stack>
   );
 }
 
@@ -187,7 +187,7 @@ export function useAlertsStatus() {
     warningCount: alertsByUrgency.warning.length,
     infoCount: alertsByUrgency.info.length,
     statusColor: criticalCount > 0 ? 'red' : totalCount > 0 ? 'yellow' : 'green',
-    statusText: criticalCount > 0 
+    statusTypography variant="body": criticalCount > 0 
       ? `${criticalCount} críticas`
       : totalCount > 0 
         ? `${totalCount} alertas`

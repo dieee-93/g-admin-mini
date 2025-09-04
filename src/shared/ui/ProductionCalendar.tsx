@@ -5,12 +5,11 @@ import React from 'react';
 import {
   Box,
   Button,
-  VStack,
-  HStack,
-  Text,
+  Stack,
   Badge,
   Grid
 } from '@chakra-ui/react';
+import { Typography } from '@/shared/ui';
 
 interface ProductionPlan {
   id: string;
@@ -65,24 +64,24 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
   };
   
   return (
-    <VStack gap={4} align="stretch">
+    <Stack direction="column" gap={4} align="stretch">
       {/* Calendar Header */}
-      <HStack justify="space-between" p={3} bg="bg.subtle" borderRadius="md">
+      <Stack direction="row" justify="space-between" p={3} bg="bg.subtle" borderRadius="md">
         <Button size="sm" variant="ghost" onClick={handlePrevMonth}>
           ←
         </Button>
         
-        <Text fontSize="lg" fontWeight="semibold">
+        <Typography variant="body" fontSize="lg" fontWeight="semibold">
           {selectedDate.toLocaleDateString('es-ES', { 
             month: 'long', 
             year: 'numeric' 
           })}
-        </Text>
+        </Typography>
         
         <Button size="sm" variant="ghost" onClick={handleNextMonth}>
           →
         </Button>
-      </HStack>
+      </Stack>
       
       {/* Calendar Grid */}
       <Grid templateColumns="repeat(7, 1fr)" gap={2}>
@@ -128,13 +127,13 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
                 bg: isSelected ? "blue.600" : "gray.100"
               }}
             >
-              <Text fontSize="sm" fontWeight={isToday ? "bold" : "normal"}>
+              <Typography variant="body" fontSize="sm" fontWeight={isToday ? "bold" : "normal"}>
                 {date.getDate()}
-              </Text>
+              </Typography>
               
               {/* Production indicators */}
               {dayPlans.length > 0 && (
-                <HStack gap={1} wrap="wrap" justify="center">
+                <Stack direction="row" gap={1} wrap="wrap" justify="center">
                   {statusCounts.completed && (
                     <Badge size="xs" colorPalette="green" borderRadius="full">
                       {statusCounts.completed}
@@ -155,7 +154,7 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
                       {statusCounts.delayed}
                     </Badge>
                   )}
-                </HStack>
+                </Stack>
               )}
             </Button>
           );
@@ -164,28 +163,28 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
       
       {/* Calendar Legend */}
       <Box p={3} borderRadius="md">
-        <VStack gap={2} align="start">
-          <Text fontSize="sm" fontWeight="semibold">Leyenda</Text>
-          <HStack gap={4} flexWrap="wrap">
-            <HStack gap={1}>
+        <Stack direction="column" gap={2} align="start">
+          <Typography variant="body" fontSize="sm" fontWeight="semibold">Leyenda</Typography>
+          <Stack direction="row" gap={4} flexWrap="wrap">
+            <Stack direction="row" gap={1}>
               <Badge size="xs" colorPalette="gray" borderRadius="full">1</Badge>
-              <Text fontSize="xs">Programado</Text>
-            </HStack>
-            <HStack gap={1}>
+              <Typography variant="body" fontSize="xs">Programado</Typography>
+            </Stack>
+            <Stack direction="row" gap={1}>
               <Badge size="xs" colorPalette="blue" borderRadius="full">1</Badge>
-              <Text fontSize="xs">En Progreso</Text>
-            </HStack>
-            <HStack gap={1}>
+              <Typography variant="body" fontSize="xs">En Progreso</Typography>
+            </Stack>
+            <Stack direction="row" gap={1}>
               <Badge size="xs" colorPalette="green" borderRadius="full">1</Badge>
-              <Text fontSize="xs">Completado</Text>
-            </HStack>
-            <HStack gap={1}>
+              <Typography variant="body" fontSize="xs">Completado</Typography>
+            </Stack>
+            <Stack direction="row" gap={1}>
               <Badge size="xs" colorPalette="red" borderRadius="full">1</Badge>
-              <Text fontSize="xs">Retrasado</Text>
-            </HStack>
-          </HStack>
-        </VStack>
+              <Typography variant="body" fontSize="xs">Retrasado</Typography>
+            </Stack>
+          </Stack>
+        </Stack>
       </Box>
-    </VStack>
+    </Stack>
   );
 }

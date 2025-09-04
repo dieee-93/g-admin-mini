@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  Stack, Typography, CardWrapper, Section, Button, Badge, SimpleGrid, MetricCard, ActionButton, HStack
+  Stack, Typography, CardWrapper, Section, Button, Badge, SimpleGrid, MetricCard, ActionButton
 } from "@/shared/ui";
 import { 
   BuildingOfficeIcon, 
@@ -113,24 +113,24 @@ export function BusinessProfileSection() {
             </CardWrapper.Header>
             <CardWrapper.Body>
               {isEditingHours ? (
-                <Stack spacing={4}>
+                <Stack gap={4}>
                   <WeeklyScheduleEditor schedule={businessHours} onChange={setBusinessHours} />
-                  <HStack justifyContent="flex-end">
+                  <Stack direction="row" justify="flex-end">
                     <Button variant="ghost" onClick={() => setIsEditingHours(false)}>Cancelar</Button>
                     <Button colorScheme="blue" onClick={handleSaveHours}>Guardar Horarios</Button>
-                  </HStack>
+                  </Stack>
                 </Stack>
               ) : (
                 <Stack direction="column" gap={2}>
                   {sortedRules?.map((rule) => {
                     const isOpen = rule.timeBlocks.length > 0;
                     return (
-                        <HStack key={rule.dayOfWeek} justifyContent="space-between" p={2} bg={isOpen ? "green.50" : "gray.100"} borderRadius="md">
-                            <Text fontWeight="medium" width="100px">{rule.dayOfWeek}</Text>
-                            <Text fontSize="sm" color={isOpen ? "green.700" : "gray.500"}>
+                        <Stack key={rule.dayOfWeek} direction="row" justify="space-between" p={2} bg={isOpen ? "green.50" : "gray.100"} borderRadius="md">
+                            <Typography variant="body" weight="medium" width="100px">{rule.dayOfWeek}</Typography>
+                            <Typography variant="body" size="sm" color={isOpen ? "green.700" : "gray.500"}>
                                 {isOpen ? rule.timeBlocks.map(b => `${b.startTime} - ${b.endTime}`).join(', ') : 'Cerrado'}
-                            </Text>
-                        </HStack>
+                            </Typography>
+                        </Stack>
                     )
                   })}
                   <ActionButton mt={2} size="sm" colorPalette="blue" variant="outline" onClick={() => setIsEditingHours(true)}>

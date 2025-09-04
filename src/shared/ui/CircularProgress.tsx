@@ -2,7 +2,8 @@
 // Functional Circular Progress for ChakraUI v3.23.0
 
 import React from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
+import { Typography } from '@/shared/ui';
 
 
 interface CircularProgressProps {
@@ -82,9 +83,9 @@ export function CircularProgress({
         textAlign="center"
       >
         {children || (showValueText && (
-          <Text fontSize="sm" fontWeight="bold" color={themeTextColor}>
+          <Typography variant="body" size="sm" weight="bold" color={themeTextColor}>
             {valueText || `${Math.round(normalizedValue)}%`}
-          </Text>
+          </Typography>
         ))}
       </Box>
     </Box>
@@ -111,9 +112,9 @@ export const CircularProgressValueText: React.FC<{
   const resolvedColor = useTheme ? 'inherit' : color
   
   return (
-    <Text fontSize={fontSize} fontWeight={fontWeight} color={resolvedColor}>
+    <Typography variant="body" fontSize={fontSize} fontWeight={fontWeight} color={resolvedColor}>
       {children}
-    </Text>
+    </Typography>
   )
 }
 

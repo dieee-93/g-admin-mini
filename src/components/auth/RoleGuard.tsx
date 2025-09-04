@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Text, VStack } from '@chakra-ui/react';
+import { Box, Stack } from '@chakra-ui/react';
+import { Typography } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserRole, ModuleName, PermissionAction } from '@/contexts/AuthContext';
@@ -55,15 +56,15 @@ function AccessDenied({ reason }: { reason: string }) {
   return (
     <Box p={8}>
       <CardWrapper>
-        <VStack gap={4} p={8}>
-          <Text fontSize="6xl">🔒</Text>
-          <Text fontSize="xl" fontWeight="bold" color="red.500">
+        <Stack direction="column" gap={4} p={8}>
+          <Typography variant="heading" size="6xl">🔒</Typography>
+          <Typography variant="heading" size="xl" weight="bold" color="red.500">
             Acceso Denegado
-          </Text>
-          <Text color="gray.600" textAlign="center">
+          </Typography>
+          <Typography variant="body" color="gray.600" textAlign="center">
             {reason}. Contacta a tu administrador si necesitas acceso.
-          </Text>
-        </VStack>
+          </Typography>
+        </Stack>
       </CardWrapper>
     </Box>
   );

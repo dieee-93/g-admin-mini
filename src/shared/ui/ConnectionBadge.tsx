@@ -6,11 +6,11 @@ import {
   Badge,
   Box,
   Spinner,
-  Text,
   TooltipRoot,
   TooltipTrigger,
   TooltipContent
 } from '@chakra-ui/react';
+import { Typography } from '@/shared/ui';
 import {
   WifiIcon,
   CloudIcon,
@@ -108,13 +108,13 @@ export function ConnectionBadge({
       </TooltipTrigger>
       <TooltipContent>
         <Box maxWidth="250px">
-          <Text fontSize="sm">
+          <Typography variant="body" size="sm">
             {isSyncing ? 'Sincronizando datos...' :
              !isOnline ? 'Sin conexión a internet' :
              connectionQuality === 'excellent' ? 'Conexión excelente' :
              connectionQuality === 'good' ? 'Conexión buena' :
              connectionQuality === 'poor' ? 'Conexión lenta' : 'Detectando conexión'}
-          </Text>
+          </Typography>
         </Box>
       </TooltipContent>
     </TooltipRoot>
