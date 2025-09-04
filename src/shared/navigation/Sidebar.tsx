@@ -3,33 +3,31 @@
 // ====================================
 
 import React, { Fragment } from 'react';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { useLocation } from 'react-router-dom';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { useNavigationBadges } from '@/hooks/useNavigationBadges'; // ✅ IMPORTAR NUEVO HOOK
 import { 
-  Stack, Typography, Badge
+  Layout, Stack, Typography, CardWrapper, Button, Badge
 } from '@/shared/ui';
 import { Box } from '@chakra-ui/react';
 import { Collapsible } from '@chakra-ui/react';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, HeaderIcon } from '@/shared/ui/Icon';
 import { QuickThemeToggle } from '@/shared/components/ThemeToggle';
 import { SidebarContainer, NavItemContainer } from './SidebarContainer';
-import { Button } from '@/shared/ui/Button';
 
 export function Sidebar() {
   const location = useLocation();
-  const reactNavigate = useNavigate();
   const [isHovering, setIsHovering] = React.useState(false);
   const { 
     modules, 
     currentModule, 
+    navigate, 
     navigateToModule,
+    sidebarCollapsed, 
+    setSidebarCollapsed,
     toggleModuleExpansion,
+    isMobile 
   } = useNavigation();
-  
-  // ✅ OBTENER RECUENTOS DE BADGES DE FORMA CENTRALIZADA
-  const badgeCounts = useNavigationBadges();
 
   // Handler para toggle de expansión
   const handleToggleExpansion = (moduleId: string) => {
@@ -150,7 +148,7 @@ export function Sidebar() {
                             variant="body"
                             weight={isActive ? 'medium' : 'normal'}
                             color={isActive ? 'white' : undefined}
-                            textAlign="start"
+                            textAlign="right"
                             size="sm"
                             lineHeight="1.2"
                             noWrap
@@ -189,8 +187,8 @@ export function Sidebar() {
                       )}
                     </Stack>
 
-                    {/* ✅ Module Badge - Conectado al nuevo hook */}
-                    {badgeCounts[module.id] > 0 && (
+                    {/* Module Badge - Ultra minimal positioning */}
+                    {module.badge && (
                       <div
                         style={{
                           position: "absolute",
@@ -211,7 +209,7 @@ export function Sidebar() {
                             fontWeight: "500"
                           }}
                         >
-                          {badgeCounts[module.id]}
+                          {module.badge}
                         </Badge>
                       </div>
                     )}
@@ -257,7 +255,7 @@ export function Sidebar() {
                                         e.currentTarget.style.backgroundColor = "transparent";
                                       }
                                     }}
-                                    onClick={() => reactNavigate(subModule.path)}
+                                    onClick={() => navigate(module.id, subModule.path.replace(module.path, ''))}
                                   >
                                     <Stack direction="row" align="center" gap="2" width="100%">
                                       <Icon 

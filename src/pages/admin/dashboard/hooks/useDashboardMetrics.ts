@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   CubeIcon,
   CurrencyDollarIcon,
@@ -7,10 +6,11 @@ import {
   ChartBarIcon
 } from '@heroicons/react/24/outline';
 import { useDashboardData } from './useDashboardData';
-import type { MetricCardProps } from '../types/dashboard.types';
+import type { MetricCardProps } from '../types';
+import { useNavigation } from '@/contexts/NavigationContext';
 
 export function useDashboardMetrics() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigation();
   const { dashboardStats, isLoading } = useDashboardData();
 
   const metricCards: MetricCardProps[] = useMemo(() => [
@@ -21,7 +21,7 @@ export function useDashboardMetrics() {
       icon: CubeIcon,
       iconColor: "var(--chakra-colors-green-600)",
       iconBg: "var(--chakra-colors-green-100)",
-      onClick: () => navigate('/materials'),
+      onClick: () => navigate('materials'),
       badge: dashboardStats.inventory.alerts.total > 0 ? {
         value: dashboardStats.inventory.alerts.total,
         colorPalette: "red"
@@ -35,7 +35,7 @@ export function useDashboardMetrics() {
       icon: CurrencyDollarIcon,
       iconColor: "var(--chakra-colors-teal-600)",
       iconBg: "var(--chakra-colors-teal-100)",
-      onClick: () => navigate('/sales'),
+      onClick: () => navigate('sales'),
       isLoading
     },
     {
@@ -45,7 +45,7 @@ export function useDashboardMetrics() {
       icon: UsersIcon,
       iconColor: "var(--chakra-colors-pink-600)",
       iconBg: "var(--chakra-colors-pink-100)",
-      onClick: () => navigate('/customers'),
+      onClick: () => navigate('customers'),
       isLoading
     },
     {
@@ -55,7 +55,7 @@ export function useDashboardMetrics() {
       icon: ChartBarIcon,
       iconColor: "var(--chakra-colors-purple-600)",
       iconBg: "var(--chakra-colors-purple-100)",
-      onClick: () => navigate('/products'),
+      onClick: () => navigate('products'),
       isLoading
     }
   ], [dashboardStats, navigate, isLoading]);

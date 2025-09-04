@@ -198,7 +198,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
   const forceSync = useCallback(async (): Promise<void> => {
     setIsConnecting(true);
     try {
-      await offlineSync.syncPendingOperations(); // Fixed typo: was forcSync
+      await offlineSync.forceSync(); // Fixed typo: was forcSync
     } finally {
       setIsConnecting(false);
     }

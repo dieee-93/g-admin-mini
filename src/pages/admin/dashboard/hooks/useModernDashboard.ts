@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   CurrencyDollarIcon,
   CubeIcon,
@@ -10,9 +9,10 @@ import {
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
 import { useDashboardData } from './useDashboardData';
+import { useNavigation } from '@/contexts/NavigationContext';
 
 export function useModernDashboard() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigation();
   const { dashboardStats, isLoading } = useDashboardData();
 
   // Hero Metric (Revenue) - Métrica principal
@@ -34,11 +34,11 @@ export function useModernDashboard() {
     actions: {
       primary: {
         label: "Ver Detalles",
-        onClick: () => navigate('/admin/sales')
+        onClick: () => navigate('sales')
       },
       secondary: {
         label: "Tendencia",
-        onClick: () => navigate('/sales?view=analytics')
+        onClick: () => navigate('sales', undefined, 'view=analytics')
       }
     },
     isLoading
@@ -53,7 +53,7 @@ export function useModernDashboard() {
       icon: CubeIcon,
       iconColor: "var(--chakra-colors-blue-600)",
       iconBg: "var(--chakra-colors-blue-100)",
-      onClick: () => navigate('/materials'),
+      onClick: () => navigate('materials'),
       badge: dashboardStats.inventory.alerts.total > 0 ? {
         value: dashboardStats.inventory.alerts.total,
         colorPalette: "red"
@@ -67,7 +67,7 @@ export function useModernDashboard() {
       icon: UsersIcon,
       iconColor: "var(--chakra-colors-purple-600)",
       iconBg: "var(--chakra-colors-purple-100)",
-      onClick: () => navigate('/customers'),
+      onClick: () => navigate('customers'),
       isLoading
     }
   ], [dashboardStats, navigate, isLoading]);
@@ -121,7 +121,7 @@ export function useModernDashboard() {
       description: 'Agregar inventario',
       icon: CubeIcon,
       colorPalette: 'blue',
-      onClick: () => navigate('/materials?action=add')
+      onClick: () => navigate('materials', undefined, 'action=add')
     },
     {
       id: 'add-sale',
@@ -129,7 +129,7 @@ export function useModernDashboard() {
       description: 'Nueva transacción',
       icon: CurrencyDollarIcon,
       colorPalette: 'green',
-      onClick: () => navigate('/sales?action=add')
+      onClick: () => navigate('sales', undefined, 'action=add')
     },
     {
       id: 'add-customer',
@@ -137,7 +137,7 @@ export function useModernDashboard() {
       description: 'Registrar cliente',
       icon: UsersIcon,
       colorPalette: 'purple',
-      onClick: () => navigate('/customers?action=add')
+      onClick: () => navigate('customers', undefined, 'action=add')
     },
     {
       id: 'view-reports',
@@ -145,7 +145,7 @@ export function useModernDashboard() {
       description: 'Business Intelligence',
       icon: ChartBarIcon,
       colorPalette: 'gray',
-      onClick: () => navigate('/dashboard/executive')
+      onClick: () => navigate('dashboard', '/executive')
     },
     {
       id: 'settings',
@@ -153,7 +153,7 @@ export function useModernDashboard() {
       description: 'Ajustes sistema',
       icon: CheckCircleIcon,
       colorPalette: 'gray',
-      onClick: () => navigate('/settings')
+      onClick: () => navigate('settings')
     }
   ], [navigate]);
 
@@ -165,6 +165,6 @@ export function useModernDashboard() {
     operationalActions,
     isLoading,
     // Helper para configuración
-    onConfigure: () => navigate('/settings/dashboard')
+    onConfigure: () => navigate('settings', '/dashboard')
   };
 }

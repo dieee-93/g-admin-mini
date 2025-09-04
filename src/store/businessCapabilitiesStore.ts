@@ -43,10 +43,24 @@ interface BusinessCapabilitiesState {
 }
 
 const defaultCapabilities: BusinessCapabilities = {
-  has_physical_presence: false,
-  has_delivery_logistics: false,
+  sells_products: false,
+  sells_services: false,
+  manages_events: false,
+  manages_recurrence: false,
+  sells_products_for_onsite_consumption: false,
+  sells_products_for_pickup: false,
+  sells_products_with_delivery: false,
+  sells_digital_products: false,
+  sells_services_by_appointment: false,
+  sells_services_by_class: false,
+  sells_space_by_reservation: false,
+  manages_offsite_catering: false,
+  hosts_private_events: false,
+  manages_rentals: false,
+  manages_memberships: false,
+  manages_subscriptions: false,
   has_online_store: false,
-  has_scheduling_system: false,
+  is_b2b_focused: false,
 };
 
 export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
@@ -69,6 +83,7 @@ export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
             currency: 'ARS',
             capabilities: defaultCapabilities,
             operationalTier: 'Sin Configurar',
+            businessStructure: 'single_location',
             setupCompleted: false,
             onboardingStep: 0,
             customizations: {
@@ -101,7 +116,7 @@ export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
           const updatedProfile = {
             ...state.profile,
             capabilities: updatedCapabilities,
-            operationalTier: calculateOperationalTier(updatedCapabilities),
+            operationalTier: calculateOperationalTier(updatedCapabilities, state.profile.businessStructure),
             customizations: {
               ...state.profile.customizations,
               enabledModules: getDashboardModules(updatedCapabilities),

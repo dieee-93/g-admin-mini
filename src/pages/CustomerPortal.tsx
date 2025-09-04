@@ -1,14 +1,14 @@
 import React from 'react';
 import { Box, VStack, HStack, Text, Button, Grid } from '@chakra-ui/react';
 import { ShoppingCartIcon, ClockIcon, HeartIcon, UserIcon } from '@heroicons/react/24/outline';
-import { Card } from '@/shared/ui/Card';
+import { CardWrapper } from '@/shared/ui/Card';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigation } from '@/contexts/NavigationContext';
 
 export function CustomerPortal() {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const { navigate } = useNavigation();
 
   return (
     <RoleGuard requiredModule="customer_portal">
@@ -32,7 +32,7 @@ export function CustomerPortal() {
           {/* Acciones Rápidas */}
           <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={4}>
             <CardWrapper>
-              <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('/menu')}>
+              <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('customer-menu')}>
                 <ShoppingCartIcon style={{ width: '48px', height: '48px', color: 'var(--colors-green-500)' }} />
                 <VStack gap={2}>
                   <Text fontSize="lg" fontWeight="bold">Ver Menú</Text>
@@ -44,7 +44,7 @@ export function CustomerPortal() {
             </CardWrapper>
 
             <CardWrapper>
-              <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('/my-orders')}>
+              <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('my-orders')}>
                 <ClockIcon style={{ width: '48px', height: '48px', color: 'var(--colors-teal-500)' }} />
                 <VStack gap={2}>
                   <Text fontSize="lg" fontWeight="bold">Mis Pedidos</Text>
@@ -56,7 +56,7 @@ export function CustomerPortal() {
             </CardWrapper>
 
             <CardWrapper>
-              <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('/settings')}>
+              <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('customer-settings')}>
                 <HeartIcon style={{ width: '48px', height: '48px', color: 'var(--colors-pink-500)' }} />
                 <VStack gap={2}>
                   <Text fontSize="lg" fontWeight="bold">Favoritos</Text>
@@ -94,7 +94,7 @@ export function CustomerPortal() {
             <VStack gap={4} p={6} align="stretch">
               <HStack justify="space-between">
                 <Text fontSize="xl" fontWeight="bold">Pedidos Recientes</Text>
-                <Button variant="outline" size="sm" onClick={() => navigate('/my-orders')}>
+                <Button variant="outline" size="sm" onClick={() => navigate('my-orders')}>
                   Ver Todos
                 </Button>
               </HStack>

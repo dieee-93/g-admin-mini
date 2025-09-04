@@ -50,6 +50,15 @@ export interface Milestone {
 
   /** Enlace de la aplicación (ruta) a la página donde se puede completar el hito */
   link: string;
+  
+  /** ID del módulo de navegación al que pertenece el hito */
+  moduleId: string;
+
+  /** Sub-ruta opcional dentro del módulo */
+  subPath?: string;
+
+  /** Query string opcional */
+  query?: string;
 
   /** Categoría para agrupar los hitos en la UI (opcional) */
   category: 'Configuración Esencial' | 'Primeros Pasos' | 'Optimización';
@@ -69,6 +78,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Personaliza tu terminal de ventas para agilizar las operaciones en tu local.',
     capability: 'sells_products_for_onsite_consumption',
     link: '/admin/settings/pos',
+    moduleId: 'settings',
+    subPath: '/pos',
     category: 'Configuración Esencial',
   },
   {
@@ -77,6 +88,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Añade un producto o servicio para empezar a vender en tu local.',
     capability: 'sells_products_for_onsite_consumption',
     link: '/admin/products?action=new',
+    moduleId: 'products',
+    query: 'action=new',
     category: 'Primeros Pasos',
   },
 
@@ -87,6 +100,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Define las áreas geográficas a las que tu negocio realiza entregas.',
     capability: 'sells_products_with_delivery',
     link: '/admin/settings/delivery',
+    moduleId: 'settings',
+    subPath: '/delivery',
     category: 'Configuración Esencial',
   },
   {
@@ -95,6 +110,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Define los costos de envío para tus diferentes zonas de reparto.',
     capability: 'sells_products_with_delivery',
     link: '/admin/settings/delivery-rates',
+    moduleId: 'settings',
+    subPath: '/delivery-rates',
     category: 'Primeros Pasos',
   },
 
@@ -105,6 +122,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Integra un proveedor de pagos (como Mercado Pago) para aceptar pagos online.',
     capability: 'has_online_store',
     link: '/admin/settings/integrations',
+    moduleId: 'settings',
+    subPath: '/integrations',
     category: 'Configuración Esencial',
   },
   {
@@ -113,6 +132,7 @@ export const MILESTONES: Milestone[] = [
     description: 'Haz que uno de tus productos sea visible en tu tienda online.',
     capability: 'has_online_store',
     link: '/admin/products',
+    moduleId: 'products',
     category: 'Primeros Pasos',
   },
 
@@ -123,6 +143,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Establece los horarios en los que tu negocio acepta reservas o citas.',
     capability: 'sells_services_by_appointment',
     link: '/admin/settings/scheduling',
+    moduleId: 'settings',
+    subPath: '/scheduling',
     category: 'Configuración Esencial',
   },
   {
@@ -131,6 +153,9 @@ export const MILESTONES: Milestone[] = [
     description: 'Crea un servicio que tus clientes puedan reservar (ej: "Corte de pelo", "Consulta inicial").',
     capability: 'sells_services_by_appointment',
     link: '/admin/scheduling/services?action=new',
+    moduleId: 'scheduling',
+    subPath: '/services',
+    query: 'action=new',
     category: 'Primeros Pasos',
   },
 
@@ -141,6 +166,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Configura los ajustes para que los clientes puedan comprar online y retirar sus productos en tu local.',
     capability: 'sells_products_for_pickup',
     link: '/admin/settings/shipping', // Placeholder link
+    moduleId: 'settings',
+    subPath: '/shipping',
     category: 'Configuración Esencial',
   },
 
@@ -151,6 +178,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Añade tu primer producto no físico, como un e-book, un curso o software.',
     capability: 'sells_digital_products',
     link: '/admin/products?action=new&type=digital',
+    moduleId: 'products',
+    query: 'action=new&type=digital',
     category: 'Primeros Pasos',
   },
 
@@ -161,6 +190,7 @@ export const MILESTONES: Milestone[] = [
     description: 'Define tu primer artículo disponible para alquiler, estableciendo sus tarifas y condiciones.',
     capability: 'manages_rentals',
     link: '/admin/products', // Placeholder link
+    moduleId: 'products',
     category: 'Primeros Pasos',
   },
 
@@ -171,6 +201,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Define un plan de membresía con su precio, beneficios y ciclo de renovación.',
     capability: 'manages_memberships',
     link: '/admin/customers/memberships', // Placeholder link
+    moduleId: 'customers',
+    subPath: '/memberships',
     category: 'Configuración Esencial',
   },
 
@@ -181,6 +213,8 @@ export const MILESTONES: Milestone[] = [
     description: 'Añade tu primera empresa cliente para gestionar ventas y facturación B2B.',
     capability: 'is_b2b_focused',
     link: '/admin/customers?action=new&type=b2b',
+    moduleId: 'customers',
+    query: 'action=new&type=b2b',
     category: 'Primeros Pasos',
   },
 ];

@@ -65,7 +65,7 @@ export interface NavigationContextType {
   quickActions: QuickAction[];
   
   // Navigation methods
-  navigate: (moduleId: string, subPath?: string) => void;
+  navigate: (moduleId: string, subPath?: string, query?: string) => void;
   navigateToModule: (moduleId: string) => void; // ✅ Nueva función para navegación directa a páginas principales
   navigateBack: () => void;
   toggleModuleExpansion: (moduleId: string) => void;
@@ -912,12 +912,15 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
 
 
   // ✅ Navigation methods
-  const handleNavigate = useCallback((moduleId: string, subPath?: string) => {
+  const handleNavigate = useCallback((moduleId: string, subPath?: string, query?: string) => {
     // Use current modules state to ensure updated paths
     const module = modules.find(m => m.id === moduleId);
-    console.log('🔍 Navigation Debug:', { moduleId, module: module?.path, subPath });
+    console.log('🔍 Navigation Debug:', { moduleId, module: module?.path, subPath, query });
     if (module) {
-      const targetPath = subPath ? `${module.path}${subPath}` : module.path;
+      let targetPath = subPath ? `${module.path}${subPath}` : module.path;
+      if (query) {
+        targetPath += `?${query.replace(/^\?/, '')}`; // Ensure single '?'
+      }
       console.log('🔍 Navigating to:', targetPath);
       navigate(targetPath);
     }

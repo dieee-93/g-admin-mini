@@ -8,19 +8,20 @@ import { CustomerSegment, ChurnRisk, LoyaltyTier } from '../types'
 import { Provider } from '@/shared/ui/provider'
 import { useThemeStore } from '@/store/themeStore'
 
+// Define mock functions globally to be used in tests
 const mockUseCustomers = vi.fn();
 const mockUseCustomerRFM = vi.fn();
 const mockUseCustomerAnalytics = vi.fn();
 const mockUseCustomerSegmentation = vi.fn();
 
 vi.mock('../hooks/useCustomers', () => ({
-  useCustomers: mockUseCustomers,
+  useCustomers: vi.fn(),
 }));
 
 vi.mock('../hooks/useCustomerRFM', () => ({
-  useCustomerRFM: mockUseCustomerRFM,
-  useCustomerAnalytics: mockUseCustomerAnalytics,
-  useCustomerSegmentation: mockUseCustomerSegmentation,
+  useCustomerRFM: vi.fn(),
+  useCustomerAnalytics: vi.fn(),
+  useCustomerSegmentation: vi.fn(),
 }));
 
 vi.mock('@/store/themeStore')
@@ -79,28 +80,32 @@ describe('CustomerAnalytics', () => {
     customer_retention_rate: 87.5
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
     
-    mockUseCustomers.mockReturnValue({
+    // Get the mocked functions directly from the modules
+    const { useCustomers } = await import('../hooks/useCustomers')
+    const { useCustomerRFM, useCustomerAnalytics, useCustomerSegmentation } = await import('../hooks/useCustomerRFM')
+    
+    ;(useCustomers as vi.Mock).mockReturnValue({
       customers: mockCustomers,
       loading: false
     })
 
-    mockUseCustomerRFM.mockReturnValue({
+    ;(useCustomerRFM as vi.Mock).mockReturnValue({
       rfmProfiles: [],
       loading: false,
       segmentStats: mockSegmentStats
     })
 
-    mockUseCustomerAnalytics.mockReturnValue({
+    ;(useCustomerAnalytics as vi.Mock).mockReturnValue({
       analytics: mockAnalytics,
       loading: false,
-      getChurnRiskCustomers: () => mockChurnRiskCustomers,
-      getHighValueCustomers: () => mockHighValueCustomers
+      getChurnRiskCustomers: mockChurnRiskCustomers,
+      getHighValueCustomers: mockHighValueCustomers
     })
 
-    mockUseCustomerSegmentation.mockReturnValue({
+    ;(useCustomerSegmentation as vi.Mock).mockReturnValue({
       getSegmentPerformance: vi.fn(() => ({
         count: 10,
         totalRevenue: 5000,
@@ -125,19 +130,21 @@ describe('CustomerAnalytics', () => {
     expect(screen.getByText('Total Clientes')).toBeInTheDocument()
     expect(screen.getByText('50')).toBeInTheDocument() // total customers
     expect(screen.getByText('8')).toBeInTheDocument() // new customers
-    expect(screen.getByText('87%')).toBeInTheDocument() // retention rate
+    expect(screen.getByText('88%')).toBeInTheDocument() // retention rate (87.5 rounded)
   })
 
-  it('should display loading state correctly', () => {
-    mockUseCustomers.mockReturnValue({
+  it('should display loading state correctly', async () => {
+    const { useCustomers } = await import('../hooks/useCustomers')
+    ;(useCustomers as vi.Mock).mockReturnValue({
       customers: [],
       loading: true
     })
 
-    renderWithDesignSystem(<CustomerAnalytics />)
+    const { container } = renderWithDesignSystem(<CustomerAnalytics />)
 
-    // Should show loading state
-    expect(screen.getByTestId('design-system-wrapper')).toBeInTheDocument()
+    // Should show loading skeleton
+    const skeletonElements = container.querySelectorAll('div[style*="background-color: var(--bg-subtle)"]')
+    expect(skeletonElements.length).toBeGreaterThan(0)
   })
 
   it('should render RFM segmentation section', async () => {
@@ -218,7 +225,7 @@ describe('CustomerAnalytics', () => {
 
     renderWithDesignSystem(<CustomerAnalytics />)
 
-    const refreshButton = await screen.findByText('Actualizar')
+    const refreshButton = await screen.findByText('🔄 Actualizar')
     await user.click(refreshButton)
 
     expect(mockReload).toHaveBeenCalled()
@@ -228,8 +235,8 @@ describe('CustomerAnalytics', () => {
     renderWithDesignSystem(<CustomerAnalytics />)
 
     await waitFor(() => {
-      // Should display formatted currency for customer spending
-      expect(screen.getByText(/1\.500/)).toBeInTheDocument() // $1,500 formatted
+      // Should display formatted currency for customer spending (Spanish locale: $1.500)
+      expect(screen.getByText(/\$1\.500/)).toBeInTheDocument() // $1.500 formatted
     })
   })
 
@@ -241,17 +248,20 @@ describe('CustomerAnalytics', () => {
     })
   })
 
-  it('should handle empty data gracefully', () => {
-    mockUseCustomers.mockReturnValue({
+  it('should handle empty data gracefully', async () => {
+    const { useCustomers } = await import('../hooks/useCustomers')
+    const { useCustomerAnalytics } = await import('../hooks/useCustomerRFM')
+    
+    ;(useCustomers as vi.Mock).mockReturnValue({
       customers: [],
       loading: false
     })
 
-    mockUseCustomerAnalytics.mockReturnValue({
+    ;(useCustomerAnalytics as vi.Mock).mockReturnValue({
       analytics: null,
       loading: false,
-      getChurnRiskCustomers: () => [],
-      getHighValueCustomers: () => []
+      getChurnRiskCustomers: [],
+      getHighValueCustomers: []
     })
 
     renderWithDesignSystem(<CustomerAnalytics />)

@@ -81,43 +81,43 @@ describe('ErrorBoundary', () => {
   });
 
   it('should handle retry functionality', async () => {
-    let renderAttempts = 0;
+    let hasBeenRetried = false;
 
-    // This component will throw an error on its first two render attempts,
-    // which accounts for React's Strict Mode double-rendering in tests.
-    // On the third attempt (triggered by the retry button), it will succeed.
-    const ComponentThatThrowsInStrictMode = () => {
-      renderAttempts += 1;
-      if (renderAttempts <= 2) {
+    // Component that throws initially but succeeds after retry
+    const ComponentThatFailsThenSucceeds = () => {
+      if (!hasBeenRetried) {
         throw new Error('Failing during initial render');
       }
       return <div>Success!</div>;
     };
 
-    // Reset counter for this specific test
-    renderAttempts = 0;
-
     render(
       <TestWrapper>
         <ErrorBoundary>
-          <ComponentThatThrowsInStrictMode />
+          <ComponentThatFailsThenSucceeds />
         </ErrorBoundary>
       </TestWrapper>
     );
 
-    // After the initial render (which includes a strict mode re-render),
-    // the error boundary should be displayed.
-    expect(screen.getByText('¡Oops! Algo salió mal')).toBeInTheDocument();
+    // Wait for error boundary to catch the error and display error UI
+    await waitFor(() => {
+      expect(screen.getByText('¡Oops! Algo salió mal')).toBeInTheDocument();
+    });
 
+    // Find and click the retry button
     const retryButton = screen.getByRole('button', { name: /intentar de nuevo/i });
+    
+    // Mark that we've been retried so component will succeed
+    hasBeenRetried = true;
+    
     fireEvent.click(retryButton);
 
-    // After clicking retry, the component should render successfully on the 3rd attempt.
+    // After clicking retry, the component should render successfully
     await waitFor(() => {
       expect(screen.getByText('Success!')).toBeInTheDocument();
     });
 
-    // The error UI should now be gone.
+    // The error UI should now be gone
     expect(screen.queryByText('¡Oops! Algo salió mal')).not.toBeInTheDocument();
   });
 

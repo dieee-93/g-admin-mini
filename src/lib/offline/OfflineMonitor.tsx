@@ -103,7 +103,7 @@ export const ConnectionStatus = () => {
             const currentSyncStatus = offlineSync.getSyncStatus();
             if (currentSyncStatus.queueSize > 0 && !currentSyncStatus.isSyncing) {
               console.log(`[OfflineMonitor] Auto-syncing ${currentSyncStatus.queueSize} pending operations`);
-              offlineSync.forcSync();
+              offlineSync.forceSync();
             }
           }, 2000);
         }
@@ -354,7 +354,7 @@ export const SyncProgress = () => {
             <Button 
               size="xs" 
               colorScheme="blue" 
-              onClick={() => offlineSync.forcSync()}
+              onClick={() => offlineSync.forceSync()}
               
             >
               <ArrowPathIcon className="w-3 h-3 mr-1" />
@@ -553,7 +553,7 @@ const SyncDetailsModal = ({
   syncProgress: SyncProgress;
 }) => {
   const handleForcSync = useCallback(async () => {
-    await offlineSync.forcSync();
+    await offlineSync.forceSync();
   }, []);
 
   const handleClearQueue = useCallback(async () => {

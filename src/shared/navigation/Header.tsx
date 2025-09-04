@@ -13,10 +13,9 @@ import {
 import { 
   BellIcon, 
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon,
+  ArrowRightEndOnRectangleIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
-import { useNavigate } from 'react-router-dom';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { Icon } from '@/shared/ui/Icon';
 import { Typography } from '@/shared/ui/Typography';
@@ -27,8 +26,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ConnectionStatus } from '@/lib/offline/OfflineMonitor';
 
 export function Header() {
-  const navigate = useNavigate();
-  const { currentModule, modules } = useNavigation();
+  const { currentModule, modules, navigate } = useNavigation();
   const { user, signOut } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
@@ -101,7 +99,7 @@ export function Header() {
               cursor="pointer"
               transition="color 0.2s ease"
               display={{ base: 'none', sm: 'block' }}
-              onClick={() => navigate('/admin/dashboard')}
+              onClick={() => navigate('dashboard')}
             >
               G-Admin
             </Typography>
@@ -208,14 +206,14 @@ export function Header() {
                 <Menu.Content>
                   <Menu.Item 
                     value="profile" 
-                    onClick={() => navigate('/admin/settings/profile')}
+                    onClick={() => navigate('settings', '/profile')}
                   >
                     <Icon icon={UserIcon} size="sm" />
                     <Typography variant="body" size="sm">Perfil</Typography>
                   </Menu.Item>
                   <Menu.Item 
                     value="settings"
-                    onClick={() => navigate('/admin/settings')}
+                    onClick={() => navigate('settings')}
                   >
                     <Icon icon={Cog6ToothIcon} size="sm" />
                     <Typography variant="body" size="sm">Configuración</Typography>
@@ -225,7 +223,7 @@ export function Header() {
                     value="logout" 
                     onClick={handleSignOut}
                   >
-                    <Icon icon={ArrowRightOnRectangleIcon} size="sm" color="error.500" />
+                    <Icon icon={ArrowRightEndOnRectangleIcon} size="sm" color="error.500" />
                     <Typography variant="body" size="sm" color="error">Cerrar Sesión</Typography>
                   </Menu.Item>
                 </Menu.Content>
@@ -273,7 +271,7 @@ export function Header() {
                           </Typography>
                         </Stack>
                       </Box>
-                      <Badge colorPalette="accent" size="sm">
+                      <Badge colorPalette="green" size="sm">
                         {module.badge}
                       </Badge>
                     </Stack>

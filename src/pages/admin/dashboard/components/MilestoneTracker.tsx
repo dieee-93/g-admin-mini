@@ -11,7 +11,7 @@ import {
 import { Box, Flex, Progress } from '@chakra-ui/react';
 import { CheckCircleIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
+import { Link } from '@/shared/navigation/Link';
 
 export function MilestoneTracker() {
   const { milestones, stats } = usePersonalizedExperience();
@@ -118,7 +118,7 @@ export function MilestoneTracker() {
                     </Flex>
                   </Box>
                 ) : (
-                  <Link to={milestone.link} key={milestone.id} style={{ textDecoration: 'none' }}>
+                  <Link moduleId={milestone.moduleId} subPath={milestone.subPath} query={milestone.query} key={milestone.id} style={{ textDecoration: 'none' }}>
                     <Box
                       p={4}
                       bg="blue.50"

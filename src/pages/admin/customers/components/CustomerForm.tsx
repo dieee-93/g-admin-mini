@@ -1,7 +1,7 @@
 // src/features/customers/ui/CustomerForm.tsx - Design System v2.0
 import {
   Stack,
-  Card,
+  CardWrapper,
   Typography,
   Button,
   Badge,
@@ -113,13 +113,13 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
   };
 
   return (
-    <Card padding="lg" variant="outline">
+    <CardWrapper padding="lg" variant="outline">
       <Stack direction="row" justify="space-between" align="center" mb="lg">
         <Typography variant="heading" size="md" color="text.primary">
           {isEditMode ? '✏️ Editar Cliente' : '👥 Nuevo Cliente'}
         </Typography>
         {isEditMode && (
-          <Badge colorPalette="accent" variant="subtle">
+          <Badge colorPalette="cyan" variant="subtle">
             Modo edición
           </Badge>
         )}
@@ -266,7 +266,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
         <Stack direction="row" gap="sm" pt="sm">
           <div style={{ flex: 1 }}>
             <Button 
-              colorPalette="brand"
+              colorPalette="blue"
               size="lg"
               onClick={handleSubmit}
               loading={isSubmitting}

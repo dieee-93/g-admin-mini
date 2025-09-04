@@ -82,14 +82,18 @@ describe("useRecipes Hook", () => {
     it("should handle loading errors gracefully", async () => {
       const error = new Error("Failed to load recipes");
       (fetchRecipes as vi.Mock).mockRejectedValue(error);
+      (fetchRecipesWithCosts as vi.Mock).mockRejectedValue(error);
 
       const { result } = renderHook(() => useRecipes())
 
+      // Wait for both loading states to complete with longer timeout
       await waitFor(() => {
         expect(result.current.loading).toBe(false)
-      })
+        expect(result.current.loadingCosts).toBe(false)
+      }, { timeout: 3000 })
 
       expect(result.current.recipes).toEqual([])
+      expect(result.current.recipesWithCosts).toEqual([])
     })
   })
 

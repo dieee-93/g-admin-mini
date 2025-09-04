@@ -3,7 +3,7 @@
 // Maneja el estado global de todas las alertas de la aplicación
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from 'react';
-import { 
+import type { 
   Alert, 
   AlertsContextValue, 
   CreateAlertInput, 
@@ -13,11 +13,11 @@ import {
   AlertStatus,
   AlertSeverity,
   AlertContext,
-  AlertType,
-  ALERT_EVENTS
+  AlertType, 
 } from './types';
+import { ALERT_EVENTS } from './types';
 import { EventBus } from '@/lib/events/EventBus';
-import { useDebouncedCallback } from '@/shared/hooks/useDebouncedCallback';
+import { useDebouncedCallback } from '../hooks';
 
 // Default configuration
 const DEFAULT_CONFIG: AlertsConfiguration = {

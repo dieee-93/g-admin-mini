@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider, Toaster } from '@/shared/ui';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { ResponsiveLayout } from '@/shared/layout/ResponsiveLayout';
-import { NavigationBadgeSync } from '@/hooks/useNavigationBadges';
 import { ErrorBoundary } from '@/lib/error-handling';
 import { LazyWithErrorBoundary } from '@/shared/components';
 import { useRouteBasedPreloading } from '@/hooks/useRouteBasedPreloading';
@@ -27,7 +26,7 @@ import {
 } from '@/pages/public';
 
 // 📱 SISTEMA OFFLINE-FIRST
-import { initializeOffline } from '@/lib/offline';
+import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
 
 // Dashboard Module - Critical, not lazy loaded  
 import { Dashboard } from '@/pages/admin/dashboard/page';
@@ -148,10 +147,11 @@ function App() {
           <AlertsProvider>
             <Router>
               <AuthProvider>
-                <NavigationProvider>
-                  <NavigationBadgeSync />
-                  
-                  <PerformanceWrapper>
+                <OfflineMonitorProvider>
+                  <NavigationProvider>
+     
+                    
+                    <PerformanceWrapper>
                     <Suspense fallback={<LoadingFallback />}>
                       <Routes>
                         {/* 🌐 RUTAS PÚBLICAS */}
@@ -460,7 +460,8 @@ function App() {
                   }
                   
                   <Toaster />
-                </NavigationProvider>
+                  </NavigationProvider>
+                </OfflineMonitorProvider>
               </AuthProvider>
             </Router>
           </AlertsProvider>

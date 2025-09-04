@@ -1,7 +1,7 @@
 import { VStack, HStack, Box } from '@chakra-ui/react'
 import { 
   Button, 
-  Card, 
+  CardWrapper, 
   Typography, 
   Badge, 
   InputField,
@@ -32,14 +32,14 @@ export const FullDesignSystemDemo = () => {
   const { currentTheme, applyTheme } = useThemeStore()
 
   return (
-    <Card variant="elevated" padding="lg" >
+    <CardWrapper variant="elevated" padding="lg" >
       <VStack gap={8} align="start">
         <Typography variant="heading" level={1} >
           🎨 Full Design System Demo
         </Typography>
 
         {/* Theme Selector */}
-        <Card  padding="md" width="full">
+        <CardWrapper  padding="md" width="full">
           <VStack gap={4} align="start">
             <Typography variant="heading" level={3} >
               Theme Selector
@@ -65,7 +65,7 @@ export const FullDesignSystemDemo = () => {
         </CardWrapper>
 
         {/* Typography Showcase */}
-        <Card  padding="md" width="full">
+        <CardWrapper  padding="md" width="full">
           <VStack gap={3} align="start">
             <Typography variant="heading" level={3} >
               Typography with Dynamic Themes
@@ -83,7 +83,7 @@ export const FullDesignSystemDemo = () => {
         </CardWrapper>
 
         {/* Buttons & Actions */}
-        <Card  padding="md" width="full">
+        <CardWrapper  padding="md" width="full">
           <VStack gap={4} align="start">
             <Typography variant="heading" level={3} >
               Buttons & Actions
@@ -98,17 +98,17 @@ export const FullDesignSystemDemo = () => {
               </HStack>
               
               <HStack gap={2}>
-                <Button colorPalette="success" size="sm">Success</Button>
-                <Button colorPalette="warning" size="sm">Warning</Button>
-                <Button colorPalette="error" size="sm">Error</Button>
-                <Button colorPalette="info" size="sm">Info</Button>
+                <Button colorPalette="green" size="sm">Success</Button>
+                <Button colorPalette="orange" size="sm">Warning</Button>
+                <Button colorPalette="red" size="sm">Error</Button>
+                <Button colorPalette="blue" size="sm">Info</Button>
               </HStack>
             </VStack>
           </VStack>
         </CardWrapper>
 
         {/* Badges */}
-        <Card  padding="md" w="full">
+        <CardWrapper  padding="md" w="full">
           <VStack gap={3} align="start">
             <Typography variant="heading" level={3} >
               Badges
@@ -125,7 +125,7 @@ export const FullDesignSystemDemo = () => {
         </CardWrapper>
 
         {/* Form Elements */}
-        <Card  padding="md" w="full">
+        <CardWrapper  padding="md" w="full">
           <VStack gap={4} align="start">
             <Typography variant="heading" level={3} >
               Form Elements
@@ -161,13 +161,13 @@ export const FullDesignSystemDemo = () => {
         </CardWrapper>
 
         {/* Nested Cards */}
-        <Card  padding="md" w="full">
+        <CardWrapper  padding="md" w="full">
           <VStack gap={4} align="start">
             <Typography variant="heading" level={3} >
               Nested Components
             </Typography>
             
-            <Card  padding="sm" variant="outline" w="full">
+            <CardWrapper  padding="sm" variant="outline" w="full">
               <HStack justify="space-between" align="center">
                 <VStack align="start" gap={1}>
                   <Typography variant="label" >Nested Card Example</Typography>
@@ -178,8 +178,8 @@ export const FullDesignSystemDemo = () => {
                 <Button  size="sm">Action</Button>
               </HStack>
             </CardWrapper>
-            
-            <Card  padding="sm" variant="subtle" w="full">
+
+            <CardWrapper  padding="sm" variant="subtle" w="full">
               <HStack justify="space-between" align="center">
                 <Typography variant="body" >Subtle variant card</Typography>
                 <Badge  dot pulse>Live</Badge>
@@ -189,7 +189,7 @@ export const FullDesignSystemDemo = () => {
         </CardWrapper>
 
         {/* New Theme Components */}
-        <Card  padding="md" width="full">
+        <CardWrapper  padding="md" width="full">
           <VStack gap={4} align="start">
             <Typography variant="heading" level={3} >
               New Theme Components
@@ -254,7 +254,7 @@ export const FullDesignSystemDemo = () => {
 
         {/* Color Debug Visualization */}
         {currentTheme?.id === 'atom-one-dark' && (
-          <Card padding="md" variant="outline"  width="full">
+          <CardWrapper padding="md" variant="outline"  width="full">
             <VStack gap={4} align="start">
               <Typography variant="heading" level={3} >
                 🔍 Atom One Dark - Color Debug
@@ -322,15 +322,13 @@ export const FullDesignSystemDemo = () => {
         )}
 
         {/* Theme Debug Info */}
-        <Card padding="sm" variant="outline"  w="full">
+        <CardWrapper padding="sm" variant="outline"  w="full">
           <VStack gap={2} align="start">
             <Typography variant="label" >Theme Debug Info:</Typography>
             <Typography variant="caption" >
               ID: {currentTheme?.id || 'system'} • 
               Name: {currentTheme?.name || 'System Default'} • 
               Palette: {currentTheme?.palette || 'brand'}
-            </Typography>
-            <Typography variant="caption" >
             </Typography>
           </VStack>
         </CardWrapper>

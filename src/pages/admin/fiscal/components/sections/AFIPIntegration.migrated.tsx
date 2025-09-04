@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 
 // DESIGN SYSTEM IMPORTS - Following our conventions
 import {
-  Card,
+  CardWrapper,
   VStack,
   HStack,
   Typography,
@@ -36,7 +36,7 @@ import {
   ClockIcon
 } from '@heroicons/react/24/outline';
 
-import { fiscalApi } from '../../data/fiscalApi';
+import { fiscalApi } from '../../services/fiscalApi'; 
 import { notify } from '@/lib/notifications';
 
 // AFIP Integration Types
@@ -83,8 +83,8 @@ const AFIPIntegration: React.FC = () => {
     try {
       setIsLoading(true);
       const [status, config] = await Promise.all([
-        fiscalApi.getAfipStatus(),
-        fiscalApi.getAfipConfiguration()
+        fiscalApi.getAFIPStatus,
+        fiscalApi.getAFIPConfiguration()
       ]);
       
       setAfipStatus(status);
@@ -198,8 +198,8 @@ const AFIPIntegration: React.FC = () => {
       {/* AFIP Status Overview */}
       {afipStatus && (
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="md">
-          <Card variant="outline" padding="md">
-            <Card.Body>
+          <CardWrapper variant="outline" padding="md">
+            <CardWrapper.Body>
               <VStack gap="sm">
                 <ShieldCheckIcon 
                   className={`w-8 h-8 ${afipStatus.authenticated ? 'text-green-500' : 'text-red-500'}`} 
@@ -211,11 +211,11 @@ const AFIPIntegration: React.FC = () => {
                   Estado de Autenticación
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
-          <Card variant="outline" padding="md">
-            <Card.Body>
+          <CardWrapper variant="outline" padding="md">
+            <CardWrapper.Body>
               <VStack gap="sm">
                 <DocumentTextIcon 
                   className={`w-8 h-8 ${afipStatus.certificateValid ? 'text-green-500' : 'text-yellow-500'}`} 
@@ -227,11 +227,11 @@ const AFIPIntegration: React.FC = () => {
                   Certificado
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
-          <Card variant="outline" padding="md">
-            <Card.Body>
+          <CardWrapper variant="outline" padding="md">
+            <CardWrapper.Body>
               <VStack gap="sm">
                 <ServerIcon className="w-8 h-8 text-blue-500" />
                 <Typography variant="title">
@@ -241,11 +241,11 @@ const AFIPIntegration: React.FC = () => {
                   Servicios Activos
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
-          <Card variant="outline" padding="md">
-            <Card.Body>
+          <CardWrapper variant="outline" padding="md">
+            <CardWrapper.Body>
               <VStack gap="sm">
                 <CogIcon className="w-8 h-8 text-purple-500" />
                 <Typography variant="title">
@@ -255,7 +255,7 @@ const AFIPIntegration: React.FC = () => {
                   Ambiente
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
         </SimpleGrid>
       )}
@@ -288,8 +288,8 @@ const AFIPIntegration: React.FC = () => {
           {/* Status Tab */}
           <TabPanel value="status">
             <VStack gap="md">
-              <Card variant="outline" padding="md">
-                <Card.Body>
+              <CardWrapper variant="outline" padding="md">
+                <CardWrapper.Body>
                   <VStack gap="md">
                     <HStack justify="space-between" align="center">
                       <Typography variant="title">Estado de Conexión</Typography>
@@ -346,7 +346,7 @@ const AFIPIntegration: React.FC = () => {
                       </SimpleGrid>
                     )}
                   </VStack>
-                </Card.Body>
+                </CardWrapper.Body>
               </CardWrapper>
             </VStack>
           </TabPanel>
@@ -354,8 +354,8 @@ const AFIPIntegration: React.FC = () => {
           {/* Configuration Tab */}
           <TabPanel value="configuration">
             <VStack gap="md">
-              <Card variant="outline" padding="md">
-                <Card.Body>
+              <CardWrapper variant="outline" padding="md">
+                <CardWrapper.Body>
                   <VStack gap="md">
                     <Typography variant="title">Configuración AFIP</Typography>
                     
@@ -397,7 +397,7 @@ const AFIPIntegration: React.FC = () => {
                       </VStack>
                     )}
                   </VStack>
-                </Card.Body>
+                </CardWrapper.Body>
               </CardWrapper>
             </VStack>
           </TabPanel>
@@ -405,8 +405,8 @@ const AFIPIntegration: React.FC = () => {
           {/* Services Tab */}
           <TabPanel value="services">
             <VStack gap="md">
-              <Card variant="outline" padding="md">
-                <Card.Body>
+              <CardWrapper variant="outline" padding="md">
+                <CardWrapper.Body>
                   <VStack gap="md">
                     <Typography variant="title">Servicios AFIP</Typography>
                     
@@ -456,7 +456,7 @@ const AFIPIntegration: React.FC = () => {
                       </TableBody>
                     </Table.Root>
                   </VStack>
-                </Card.Body>
+                </CardWrapper.Body>
               </CardWrapper>
             </VStack>
           </TabPanel>
@@ -464,8 +464,8 @@ const AFIPIntegration: React.FC = () => {
           {/* Certificates Tab */}
           <TabPanel value="certificates">
             <VStack gap="md">
-              <Card variant="outline" padding="md">
-                <Card.Body>
+              <CardWrapper variant="outline" padding="md">
+                <CardWrapper.Body>
                   <VStack gap="md">
                     <Typography variant="title">Gestión de Certificados</Typography>
                     
@@ -516,7 +516,7 @@ const AFIPIntegration: React.FC = () => {
                       </VStack>
                     )}
                   </VStack>
-                </Card.Body>
+                </CardWrapper.Body>
               </CardWrapper>
             </VStack>
           </TabPanel>

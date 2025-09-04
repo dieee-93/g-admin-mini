@@ -22,7 +22,7 @@ export function useRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [recipesWithCosts, setRecipesWithCosts] = useState<RecipeWithCost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadingCosts, setLoadingCosts] = useState(false);
+  const [loadingCosts, setLoadingCosts] = useState(true);
 
   const loadRecipes = async () => {
     setLoading(true);
@@ -31,7 +31,8 @@ export function useRecipes() {
       setRecipes(data);
     } catch (e) {
       console.error('Error loading recipes:', e);
-      throw e;
+      // Don't re-throw error in useEffect context - handle gracefully
+      setRecipes([]);
     } finally {
       setLoading(false);
     }
@@ -44,7 +45,8 @@ export function useRecipes() {
       setRecipesWithCosts(data);
     } catch (e) {
       console.error('Error loading recipes with costs:', e);
-      throw e;
+      // Don't re-throw error in useEffect context - handle gracefully
+      setRecipesWithCosts([]);
     } finally {
       setLoadingCosts(false);
     }

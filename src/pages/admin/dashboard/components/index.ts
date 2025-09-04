@@ -1,6 +1,6 @@
 // Dashboard Components - Business Intelligence exports from organized folders
-export { ExecutiveDashboard } from './business/ExecutiveDashboard';
-export { CrossModuleAnalytics } from './business/CrossModuleAnalytics'; 
+export { LazyExecutiveDashboard as ExecutiveDashboard } from './business/ExecutiveDashboard/LazyExecutiveDashboard';
+export { LazyCrossModuleAnalytics as CrossModuleAnalytics } from './business/CrossModuleAnalytics/LazyCrossModuleAnalytics';
 export { CustomReporting } from './business/CustomReporting';
 export { CompetitiveIntelligence } from './business/CompetitiveIntelligence';
 export { PredictiveAnalytics } from './business/PredictiveAnalytics';

@@ -1,4 +1,5 @@
 // Clean Recipe Components - Unified exports
+export { LazyRecipeForm as RecipeForm } from './LazyRecipeForm';
 export { RecipeFormClean } from './RecipeFormClean';
 export { RecipeListClean } from './RecipeListClean';
 

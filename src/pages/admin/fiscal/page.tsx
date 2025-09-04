@@ -13,7 +13,7 @@ import {
   Typography,
   
   // Components
-  Card,
+  CardWrapper,
   Button,
   Badge,
   
@@ -154,9 +154,9 @@ export function FiscalPage() {
         </VStack>
 
         {/* Status Header */}
-        <Card variant="elevated" padding="md">
-          <Card.Body>
-            <HStack justify="space-between" align="center">
+        <CardWrapper variant="elevated" padding="md">
+            <CardWrapper.Body>
+              <HStack justify="space-between" align="center">
               <HStack gap="md">
                 <Typography variant="title">Estado Fiscal</Typography>
                 <Badge 
@@ -195,20 +195,20 @@ export function FiscalPage() {
                 )}
               </HStack>
             </HStack>
-          </Card.Body>
+          </CardWrapper.Body>
         </CardWrapper>
 
         {/* Fiscal Mode Selector */}
-        <Card variant="outline" padding="md">
-          <Card.Header>
+        <CardWrapper variant="outline" padding="md">
+          <CardWrapper.Header>
             <Typography variant="title">Configuración del Modo Fiscal</Typography>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <Stack gap="md">
               <SimpleGrid columns={{ base: 1, md: 3 }} gap="md">
                 <Button
                   variant={fiscalMode === 'offline-first' ? 'solid' : 'outline'}
-                  colorPalette="info"
+                  colorPalette="blue"
                   onClick={() => handleFiscalModeChange('offline-first')}
                   size="lg"
                 >
@@ -222,7 +222,7 @@ export function FiscalPage() {
 
                 <Button
                   variant={fiscalMode === 'auto' ? 'solid' : 'outline'}
-                  colorPalette="info"
+                  colorPalette="blue"
                   onClick={() => handleFiscalModeChange('auto')}
                   size="lg"
                 >
@@ -236,7 +236,7 @@ export function FiscalPage() {
 
                 <Button
                   variant={fiscalMode === 'online-first' ? 'solid' : 'outline'}
-                  colorPalette="success"
+                  colorPalette="green"
                   onClick={() => handleFiscalModeChange('online-first')}
                   size="lg"
                 >
@@ -249,14 +249,14 @@ export function FiscalPage() {
                 </Button>
               </SimpleGrid>
             </Stack>
-          </Card.Body>
+          </CardWrapper.Body>
         </CardWrapper>
 
         {/* Quick Stats */}
         {fiscalStats && !isLoading && (
           <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="md">
-            <Card variant="outline" padding="md">
-              <Card.Body>
+            <CardWrapper variant="outline" padding="md">
+              <CardWrapper.Body>
                 <VStack gap="sm">
                   <BanknotesIcon className="w-8 h-8 text-green-500" />
                   <Typography variant="title">
@@ -268,11 +268,11 @@ export function FiscalPage() {
                     Facturación del mes
                   </Typography>
                 </VStack>
-              </Card.Body>
+              </CardWrapper.Body>
             </CardWrapper>
 
-            <Card variant="outline" padding="md">
-              <Card.Body>
+            <CardWrapper variant="outline" padding="md">
+              <CardWrapper.Body>
                 <VStack gap="sm">
                   <DocumentTextIcon className="w-8 h-8 text-blue-500" />
                   <Typography variant="title">
@@ -284,11 +284,11 @@ export function FiscalPage() {
                     Facturas generadas
                   </Typography>
                 </VStack>
-              </Card.Body>
+              </CardWrapper.Body>
             </CardWrapper>
 
-            <Card variant="outline" padding="md">
-              <Card.Body>
+            <CardWrapper variant="outline" padding="md">
+              <CardWrapper.Body>
                 <VStack gap="sm">
                   <ExclamationTriangleIcon className="w-8 h-8 text-orange-500" />
                   <Typography variant="title">
@@ -300,11 +300,11 @@ export function FiscalPage() {
                     Obligaciones pendientes
                   </Typography>
                 </VStack>
-              </Card.Body>
+              </CardWrapper.Body>
             </CardWrapper>
 
-            <Card variant="outline" padding="md">
-              <Card.Body>
+            <CardWrapper variant="outline" padding="md">
+              <CardWrapper.Body>
                 <VStack gap="sm">
                   <CalendarDaysIcon className="w-8 h-8 text-purple-500" />
                   <Typography variant="title">
@@ -316,7 +316,7 @@ export function FiscalPage() {
                     Próximo vencimiento
                   </Typography>
                 </VStack>
-              </Card.Body>
+              </CardWrapper.Body>
             </CardWrapper>
           </SimpleGrid>
         )}

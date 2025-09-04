@@ -19,27 +19,23 @@ const MODULE_CONFIG = {
   ],
   
   // Módulos por capacidad
-  physical_presence: [
+  sells_products: [
     { id: 'sales', name: 'Ventas', icon: '💰', path: '/admin/sales' },
-    { id: 'tables', name: 'Mesas', icon: '🪑', path: '/admin/operations/tables' },
-    { id: 'pos', name: 'Punto de Venta', icon: '🏪', path: '/admin/sales/pos' }
   ],
-  
-  delivery_logistics: [
-    { id: 'delivery', name: 'Entregas', icon: '🚚', path: '/admin/delivery' },
-    { id: 'logistics', name: 'Logística', icon: '📍', path: '/admin/operations/logistics' }
-  ],
-  
-  online_store: [
-    { id: 'ecommerce', name: 'Tienda Online', icon: '🛒', path: '/admin/ecommerce' },
-    { id: 'catalog', name: 'Catálogo Web', icon: '📋', path: '/admin/catalog' },
-    { id: 'orders', name: 'Pedidos Online', icon: '📱', path: '/admin/orders' }
-  ],
-  
-  scheduling_system: [
-    { id: 'scheduling', name: 'Turnos', icon: '📅', path: '/admin/scheduling' },
-    { id: 'appointments', name: 'Citas', icon: '🗓️', path: '/admin/appointments' },
+  sells_services: [
     { id: 'staff', name: 'Personal', icon: '👥', path: '/admin/staff' }
+  ],
+  manages_events: [
+    { id: 'operations', name: 'Operaciones', icon: '📊', path: '/admin/operations' }
+  ],
+  manages_recurrence: [
+    { id: 'customers', name: 'Clientes', icon: '👥', path: '/admin/customers' }
+  ],
+  sells_services_by_appointment: [
+      { id: 'scheduling', name: 'Turnos', icon: '📅', path: '/admin/scheduling' },
+  ],
+  has_online_store: [
+    { id: 'ecommerce', name: 'Tienda Online', icon: '🛒', path: '/admin/ecommerce' },
   ]
 };
 
@@ -51,29 +47,27 @@ const DASHBOARD_WIDGETS = {
     'inventory_alerts',
     'quick_actions'
   ],
-  
-  physical_presence: [
+  sells_products: [
     'daily_sales',
-    'table_status',
     'pos_summary',
+  ],
+  sells_products_for_onsite_consumption: [
+    'table_status',
     'local_performance'
   ],
-  
-  delivery_logistics: [
+  sells_products_with_delivery: [
     'delivery_status',
     'pending_deliveries',
     'delivery_zones_performance',
     'driver_activity'
   ],
-  
-  online_store: [
+  has_online_store: [
     'online_orders',
     'catalog_performance',
     'conversion_rate',
     'abandoned_carts'
   ],
-  
-  scheduling_system: [
+  sells_services_by_appointment: [
     'today_appointments',
     'staff_schedule',
     'booking_calendar',
@@ -88,24 +82,20 @@ const TUTORIAL_CONFIG = {
     { id: 'inventory_basics', title: 'Gestión de Inventario', priority: 2 },
     { id: 'product_setup', title: 'Configurar Productos', priority: 3 }
   ],
-  
-  physical_presence: [
+  sells_products_for_onsite_consumption: [
     { id: 'pos_setup', title: 'Configurar Punto de Venta', priority: 4 },
     { id: 'table_management', title: 'Gestión de Mesas', priority: 5 },
     { id: 'local_sales_flow', title: 'Flujo de Ventas Locales', priority: 6 }
   ],
-  
-  delivery_logistics: [
+  sells_products_with_delivery: [
     { id: 'delivery_zones', title: 'Configurar Zonas de Entrega', priority: 7 },
     { id: 'shipping_rates', title: 'Tarifas de Envío', priority: 8 }
   ],
-  
-  online_store: [
+  has_online_store: [
     { id: 'online_catalog', title: 'Catálogo Online', priority: 9 },
     { id: 'payment_gateway', title: 'Métodos de Pago', priority: 10 }
   ],
-  
-  scheduling_system: [
+  sells_services_by_appointment: [
     { id: 'calendar_setup', title: 'Configurar Calendario', priority: 11 },
     { id: 'appointment_flow', title: 'Flujo de Turnos', priority: 12 }
   ]
@@ -155,36 +145,47 @@ export function usePersonalizedExperience() {
     })));
 
     // Agregar módulos por capacidad
-    if (hasCapability('has_physical_presence')) {
-      modules.push(...MODULE_CONFIG.physical_presence.map(module => ({
+    if (hasCapability('sells_products')) {
+      modules.push(...MODULE_CONFIG.sells_products.map(module => ({
         ...module,
         isEnabled: true,
         category: 'capability' as const
       })));
     }
-
-    if (hasCapability('has_delivery_logistics')) {
-      modules.push(...MODULE_CONFIG.delivery_logistics.map(module => ({
+    if (hasCapability('sells_services')) {
+      modules.push(...MODULE_CONFIG.sells_services.map(module => ({
         ...module,
         isEnabled: true,
         category: 'capability' as const
       })));
     }
-
+    if (hasCapability('manages_events')) {
+      modules.push(...MODULE_CONFIG.manages_events.map(module => ({
+        ...module,
+        isEnabled: true,
+        category: 'capability' as const
+      })));
+    }
+    if (hasCapability('manages_recurrence')) {
+      modules.push(...MODULE_CONFIG.manages_recurrence.map(module => ({
+        ...module,
+        isEnabled: true,
+        category: 'capability' as const
+      })));
+    }
+    if (hasCapability('sells_services_by_appointment')) {
+        modules.push(...MODULE_CONFIG.sells_services_by_appointment.map(module => ({
+            ...module,
+            isEnabled: true,
+            category: 'capability' as const
+        })));
+    }
     if (hasCapability('has_online_store')) {
-      modules.push(...MODULE_CONFIG.online_store.map(module => ({
-        ...module,
-        isEnabled: true,
-        category: 'capability' as const
-      })));
-    }
-
-    if (hasCapability('has_scheduling_system')) {
-      modules.push(...MODULE_CONFIG.scheduling_system.map(module => ({
-        ...module,
-        isEnabled: true,
-        category: 'capability' as const
-      })));
+        modules.push(...MODULE_CONFIG.has_online_store.map(module => ({
+            ...module,
+            isEnabled: true,
+            category: 'capability' as const
+        })));
     }
 
     return modules;
@@ -194,20 +195,20 @@ export function usePersonalizedExperience() {
   const personalizedDashboardWidgets = useMemo((): string[] => {
     let widgets = [...DASHBOARD_WIDGETS.base];
 
-    if (hasCapability('has_physical_presence')) {
-      widgets.push(...DASHBOARD_WIDGETS.physical_presence);
+    if (hasCapability('sells_products')) {
+      widgets.push(...DASHBOARD_WIDGETS.sells_products);
     }
-
-    if (hasCapability('has_delivery_logistics')) {
-      widgets.push(...DASHBOARD_WIDGETS.delivery_logistics);
+    if (hasCapability('sells_products_for_onsite_consumption')) {
+        widgets.push(...DASHBOARD_WIDGETS.sells_products_for_onsite_consumption);
     }
-
+    if (hasCapability('sells_products_with_delivery')) {
+        widgets.push(...DASHBOARD_WIDGETS.sells_products_with_delivery);
+    }
     if (hasCapability('has_online_store')) {
-      widgets.push(...DASHBOARD_WIDGETS.online_store);
+      widgets.push(...DASHBOARD_WIDGETS.has_online_store);
     }
-
-    if (hasCapability('has_scheduling_system')) {
-      widgets.push(...DASHBOARD_WIDGETS.scheduling_system);
+    if (hasCapability('sells_services_by_appointment')) {
+      widgets.push(...DASHBOARD_WIDGETS.sells_services_by_appointment);
     }
 
     return widgets;
@@ -217,20 +218,17 @@ export function usePersonalizedExperience() {
   const personalizedTutorials = useMemo((): PersonalizedTutorial[] => {
     let tutorials = [...TUTORIAL_CONFIG.base];
 
-    if (hasCapability('has_physical_presence')) {
-      tutorials.push(...TUTORIAL_CONFIG.physical_presence);
+    if (hasCapability('sells_products_for_onsite_consumption')) {
+      tutorials.push(...TUTORIAL_CONFIG.sells_products_for_onsite_consumption);
     }
-
-    if (hasCapability('has_delivery_logistics')) {
-      tutorials.push(...TUTORIAL_CONFIG.delivery_logistics);
+    if (hasCapability('sells_products_with_delivery')) {
+      tutorials.push(...TUTORIAL_CONFIG.sells_products_with_delivery);
     }
-
     if (hasCapability('has_online_store')) {
-      tutorials.push(...TUTORIAL_CONFIG.online_store);
+      tutorials.push(...TUTORIAL_CONFIG.has_online_store);
     }
-
-    if (hasCapability('has_scheduling_system')) {
-      tutorials.push(...TUTORIAL_CONFIG.scheduling_system);
+    if (hasCapability('sells_services_by_appointment')) {
+      tutorials.push(...TUTORIAL_CONFIG.sells_services_by_appointment);
     }
 
     return tutorials
@@ -306,7 +304,7 @@ export function usePersonalizedExperience() {
     // Retorna ayuda contextual basada en la página actual y capacidades
     const helpItems = [];
 
-    if (currentPage === '/admin/sales' && hasCapability('has_physical_presence')) {
+    if (currentPage === '/admin/sales' && hasCapability('sells_products_for_onsite_consumption')) {
       helpItems.push({
         title: 'Gestión de Mesas',
         description: 'Configura y gestiona las mesas de tu local',

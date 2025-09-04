@@ -30,7 +30,9 @@ export async function calculateCustomerRFM(): Promise<CustomerRFMProfile[]> {
       return generateFallbackRFMData();
     }
     
-    return data && data.length > 0 ? data : generateFallbackRFMData();
+    // Validate data integrity before returning
+    const validData = data && data.length > 0 ? validateRFMData(data) : null;
+    return validData || generateFallbackRFMData();
   } catch (error) {
     console.warn('RFM calculation completely failed, using fallback:', error);
     return generateFallbackRFMData();
@@ -50,6 +52,34 @@ export async function getCustomerAnalyticsDashboard(): Promise<CustomerAnalytics
   } catch (error) {
     console.warn('Analytics dashboard completely failed, using fallback:', error);
     return generateFallbackAnalytics();
+  }
+}
+
+// ===== DATA VALIDATION HELPERS =====
+
+function validateRFMData(data: any[]): CustomerRFMProfile[] | null {
+  try {
+    const validatedData = data.filter(item => {
+      return item && 
+             typeof item === 'object' &&
+             typeof item.customer_id === 'string' && 
+             item.customer_id &&
+             typeof item.customer_name === 'string' &&
+             typeof item.monetary === 'number' && 
+             item.monetary >= 0;
+    });
+
+    // If more than 50% of data is corrupted, use fallback
+    const corruptionRatio = (data.length - validatedData.length) / data.length;
+    if (corruptionRatio > 0.5) {
+      console.warn('High data corruption detected, using fallback data');
+      return null;
+    }
+
+    return validatedData.length > 0 ? validatedData as CustomerRFMProfile[] : null;
+  } catch (error) {
+    console.warn('Data validation failed:', error);
+    return null;
   }
 }
 

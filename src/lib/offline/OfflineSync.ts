@@ -905,7 +905,7 @@ class OfflineSync {
   }
 
   // Force sync now
-  public async forcSync(): Promise<void> {
+  public async forceSync(): Promise<void> {
     if (this.isSyncing) {
       console.log('[OfflineSync] Sync already in progress');
       return;
