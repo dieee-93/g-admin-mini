@@ -1,7 +1,7 @@
 // Sales Page - Redesigned with prioritized actions and better organization
 import { useEffect, useState } from 'react';
 import { 
-  Layout, Stack, Typography, CardWrapper, Button, Modal, Alert, Badge 
+  Layout, Stack, Typography, CardWrapper, Button, Modal, Alert, Badge, Box
 } from '@/shared/ui';
 import { 
   CreditCardIcon, 
@@ -14,13 +14,14 @@ import {
   ArrowPathIcon,
   PlayIcon,
   EyeIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  InformationCircleIcon
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 // Import existing components - Temporarily commented to avoid compilation errors
 // import { SalesView } from './components/SalesView';
-// import { TableFloorPlan } from './components/TableManagement/TableFloorPlan';
+import { TableFloorPlan } from './components/TableManagement/TableFloorPlan';
 // import { KitchenDisplaySystem } from './components/OrderManagement/KitchenDisplaySystem';
 // import { SalesIntelligenceDashboard } from './components/Analytics/SalesIntelligenceDashboard';
 
@@ -146,17 +147,31 @@ export default function SalesPage() {
           </CardWrapper.Body>
         </CardWrapper>
 
-        {/* Quick Actions */}
-        <Stack direction="row" gap="md">
-          <CardWrapper variant="outline" flex="1">
-            <CardWrapper.Body>
+        {/* Table Management */}
+        <CardWrapper variant="elevated">
+          <CardWrapper.Header>
+            <Stack direction="row" justify="space-between" align="center">
               <Stack direction="row" align="center" gap="sm">
-                <TableCellsIcon className="w-5 h-5 text-blue-600" />
-                <Typography variant="body" weight="medium">Gestión de Mesas</Typography>
+                <TableCellsIcon className="w-6 h-6 text-blue-600" />
+                <Typography variant="heading" size="lg">Gestión de Mesas</Typography>
               </Stack>
-            </CardWrapper.Body>
-          </CardWrapper>
+              <Button variant="ghost" size="sm">Ver Todas</Button>
+            </Stack>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
+            <Alert
+              variant="subtle"
+              icon={<InformationCircleIcon className="w-5 h-5" />}
+              title="Seleccione una mesa para iniciar una nueva venta."
+            />
+            <Box mt={4}>
+              <TableFloorPlan />
+            </Box>
+          </CardWrapper.Body>
+        </CardWrapper>
 
+        {/* Other Actions */}
+        <Stack direction="row" gap="md">
           <CardWrapper variant="outline" flex="1">
             <CardWrapper.Body>
               <Stack direction="row" align="center" gap="sm">
