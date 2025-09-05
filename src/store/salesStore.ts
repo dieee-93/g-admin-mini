@@ -87,8 +87,12 @@ export interface SalesState {
   // Stats
   stats: SalesStats;
 
+  // Table Management
+  selectedTableId: string | null;
+
   // Actions
   setSales: (sales: Sale[]) => void;
+  setSelectedTableId: (tableId: string | null) => void;
   addSale: (sale: Omit<Sale, 'id' | 'created_at' | 'updated_at'>) => void;
   updateSale: (id: string, updates: Partial<Sale>) => void;
   deleteSale: (id: string) => void;
@@ -176,6 +180,8 @@ export const useSalesStore = create<SalesState>()(
           topProducts: []
         },
 
+        selectedTableId: null,
+
         // Actions
         setSales: (sales) => {
           set((state) => {
@@ -185,6 +191,12 @@ export const useSalesStore = create<SalesState>()(
             );
           });
           get().refreshStats();
+        },
+
+        setSelectedTableId: (tableId) => {
+          set((state) => {
+            state.selectedTableId = tableId;
+          });
         },
 
         addSale: (saleData) => {
