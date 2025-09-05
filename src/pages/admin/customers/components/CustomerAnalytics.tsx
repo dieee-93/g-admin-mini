@@ -247,8 +247,9 @@ export function CustomerAnalytics() {
                 const recommendations = getSegmentRecommendations(stat.segment);
                 
                 return (
-                  <div key={stat.segment} style={{ cursor: 'pointer' }}>
+                  <div style={{ cursor: 'pointer' }}>
                     <CardWrapper 
+                      key={stat.segment} 
                       variant={selectedSegment === stat.segment ? "filled" : "outline"} 
                       onClick={() => setSelectedSegment(selectedSegment === stat.segment ? null : stat.segment)}
                     >

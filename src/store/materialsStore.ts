@@ -19,7 +19,7 @@ import {
 } from '../pages/admin/materials/types';
 
 // Import centralized utilities
-import { StockCalculations } from '../pages/admin/materials/utils/stockCalculations';
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation'; 
 
 export interface MaterialsFilters {
   type: 'all' | ItemType;
@@ -477,15 +477,15 @@ export const useMaterialsStore = create<MaterialsState>()(
 
 // Helper functions - now delegating to centralized utilities
 function getStockStatus(item: MaterialItem): 'ok' | 'low' | 'critical' | 'out' {
-  return StockCalculations.getStockStatus(item);
+  return StockCalculation.getStockStatus(item);
 }
 
 function getMinStock(item: MaterialItem): number {
-  return StockCalculations.getMinStock(item);
+  return StockCalculation.getMinStock(item);
 }
 
 function getItemUnit(item: MaterialItem): string {
-  return StockCalculations.getDisplayUnit(item);
+  return StockCalculation.getDisplayUnit(item);
 }
 
 // ============================================================================

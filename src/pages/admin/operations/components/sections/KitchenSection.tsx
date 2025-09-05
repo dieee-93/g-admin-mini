@@ -14,7 +14,7 @@ import {
   Typography,
   
   // Components
-  Card,
+  CardWrapper,
   Button,
   Badge,
   
@@ -88,8 +88,8 @@ const KITCHEN_MODE_DESCRIPTIONS = {
 // Fixed Basic Kitchen Implementation - Design System Compliant
 const BasicKitchenDisplay = ({ mode }: { mode: EffectiveMode }) => {
   return (
-    <Card variant="elevated" padding="lg">
-      <Card.Body>
+    <CardWrapper variant="elevated" padding="lg">
+      <CardWrapper.Body>
         <VStack gap="md">
           <Typography variant="title">Kitchen Display</Typography>
           <Badge 
@@ -110,7 +110,7 @@ const BasicKitchenDisplay = ({ mode }: { mode: EffectiveMode }) => {
             </Alert>
           )}
         </VStack>
-      </Card.Body>
+      </CardWrapper.Body>
     </CardWrapper>
   );
 };
@@ -207,8 +207,8 @@ export function KitchenSection() {
   return (
     <VStack gap="md" align="stretch">
       {/* Mode Status Bar */}
-      <Card variant="outline" padding="sm">
-        <Card.Body>
+      <CardWrapper variant="outline" padding="sm">
+        <CardWrapper.Body>
           <HStack justify="space-between" align="center">
             <HStack gap="sm">
               <Typography variant="label">Current Mode:</Typography>
@@ -246,7 +246,7 @@ export function KitchenSection() {
               </Button>
             </HStack>
           </HStack>
-        </Card.Body>
+        </CardWrapper.Body>
       </CardWrapper>
 
       {/* Emergency Mode Alert */}
@@ -263,11 +263,11 @@ export function KitchenSection() {
       {renderKitchenComponent()}
 
       {/* Configuration Panel - Simplified for now */}
-      <Card variant="outline" padding="md">
-        <Card.Header>
+      <CardWrapper variant="outline" padding="md">
+        <CardWrapper.Header>
           <Typography variant="title">Kitchen Settings</Typography>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
           <Stack gap="sm">
             <Typography variant="body" color="text.muted">
               Current mode: {config.mode.charAt(0).toUpperCase() + config.mode.slice(1)}
@@ -276,7 +276,7 @@ export function KitchenSection() {
               {KITCHEN_MODE_DESCRIPTIONS[config.mode].description}
             </Typography>
           </Stack>
-        </Card.Body>
+        </CardWrapper.Body>
       </CardWrapper>
     </VStack>
   );

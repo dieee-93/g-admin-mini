@@ -4,7 +4,7 @@
 
 import { useMemo } from 'react';
 import { useAlertsContext } from '../AlertsProvider';
-import {
+import type {
   AlertFilters,
   AlertContext,
   AlertSeverity,
@@ -78,37 +78,44 @@ export interface UseAlertsReturn {
  */
 export function useAlerts(options: UseAlertsOptions = {}): UseAlertsReturn {
   const context = useAlertsContext();
+  const {
+    context: contextOpt,
+    severity,
+    type,
+    status,
+    autoFilter,
+  } = options;
   
   // Construir filtros basado en opciones
   const filters = useMemo<AlertFilters>(() => {
     const result: AlertFilters = {};
     
-    if (options.context) {
-      result.context = options.context;
+    if (contextOpt) {
+      result.context = contextOpt;
     }
     
-    if (options.severity) {
-      result.severity = options.severity;
+    if (severity) {
+      result.severity = severity;
     }
     
-    if (options.type) {
-      result.type = options.type;
+    if (type) {
+      result.type = type;
     }
     
-    if (options.status) {
-      result.status = options.status;
+    if (status) {
+      result.status = status;
     }
     
     return result;
-  }, [options]);
+  }, [contextOpt, severity, type, status]);
   
   // Alertas filtradas
   const alerts = useMemo(() => {
-    if (options.autoFilter !== false && Object.keys(filters).length > 0) {
+    if (autoFilter !== false && Object.keys(filters).length > 0) {
       return context.getFiltered(filters);
     }
     return context.alerts;
-  }, [context.alerts, context.getFiltered, filters, options.autoFilter]);
+  }, [context.alerts, context.getFiltered, filters, autoFilter]);
   
   // Estadísticas calculadas
   const stats = useMemo(() => {

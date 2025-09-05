@@ -14,7 +14,12 @@ import {
   Typography,
   
   // Components
-  Card
+  CardWrapper,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel
 } from '@/shared/ui';
 
 // Icons
@@ -54,10 +59,10 @@ export default function OperationsPage() {
       <Stack gap="lg" align="stretch">
         <OperationsHeader />
 
-        {/* Operations Overview Cards - Design System Pattern */}
+        {/* Operations Overview CardWrappers - Design System Pattern */}
         <Stack direction={{ base: 'column', lg: 'row' }} gap="md">
-          <Card variant="elevated" padding="md" width="full">
-            <Card.Body>
+          <CardWrapper variant="elevated" padding="md" width="full">
+            <CardWrapper.Body>
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
                   <CalendarIcon className="w-6 h-6 text-blue-600" />
@@ -67,11 +72,11 @@ export default function OperationsPage() {
                   Gestión de horarios y recursos
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
-          <Card variant="elevated" padding="md" width="full">
-            <Card.Body>
+          <CardWrapper variant="elevated" padding="md" width="full">
+            <CardWrapper.Body>
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
                   <CogIcon className="w-6 h-6 text-green-600" />
@@ -81,11 +86,11 @@ export default function OperationsPage() {
                   Estado y órdenes activas
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
-          <Card variant="elevated" padding="md" width="full">
-            <Card.Body>
+          <CardWrapper variant="elevated" padding="md" width="full">
+            <CardWrapper.Body>
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
                   <ChartBarIcon className="w-6 h-6 text-purple-600" />
@@ -95,11 +100,11 @@ export default function OperationsPage() {
                   Ocupación y reservas
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
-          <Card variant="elevated" padding="md" width="full">
-            <Card.Body>
+          <CardWrapper variant="elevated" padding="md" width="full">
+            <CardWrapper.Body>
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
                   <ClockIcon className="w-6 h-6 text-orange-600" />
@@ -109,50 +114,33 @@ export default function OperationsPage() {
                   Métricas en tiempo real
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper.Body>
           </CardWrapper>
         </Stack>
 
-        {/* All sections displayed together - Design System Grid */}
-        <Stack direction={{ base: 'column', xl: 'row' }} gap="lg">
-          <Card variant="elevated" padding="lg" width="full">
-            <Card.Header>
-              <Typography variant="title">Planificación de Operaciones</Typography>
-            </Card.Header>
-            <Card.Body>
+        {/* Tabbed Layout for Sections */}
+        <Tabs>
+          <TabList>
+            <Tab>Planificación</Tab>
+            <Tab>Cocina</Tab>
+            <Tab>Mesas</Tab>
+            <Tab>Monitoreo</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
               <PlanningSection />
-            </Card.Body>
-          </CardWrapper>
-
-          <Card variant="elevated" padding="lg" width="full">
-            <Card.Header>
-              <Typography variant="title">Estado de Cocina</Typography>
-            </Card.Header>
-            <Card.Body>
+            </TabPanel>
+            <TabPanel>
               <KitchenSection />
-            </Card.Body>
-          </CardWrapper>
-        </Stack>
-
-        <Stack direction={{ base: 'column', xl: 'row' }} gap="lg">
-          <Card variant="elevated" padding="lg" width="full">
-            <Card.Header>
-              <Typography variant="title">Gestión de Mesas</Typography>
-            </Card.Header>
-            <Card.Body>
+            </TabPanel>
+            <TabPanel>
               <TablesSection />
-            </Card.Body>
-          </CardWrapper>
-
-          <Card variant="elevated" padding="lg" width="full">
-            <Card.Header>
-              <Typography variant="title">Monitoreo en Tiempo Real</Typography>
-            </Card.Header>
-            <Card.Body>
+            </TabPanel>
+            <TabPanel>
               <MonitoringSection />
-            </Card.Body>
-          </CardWrapper>
-        </Stack>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
     </Stack>
   );
 }

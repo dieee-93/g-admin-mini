@@ -2,7 +2,7 @@
 // 🎯 PROVIDER CENTRAL DEL SISTEMA DE ALERTAS
 // Maneja el estado global de todas las alertas de la aplicación
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo, useRef } from 'react';
 import type { 
   Alert, 
   AlertsContextValue, 
@@ -50,6 +50,8 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     ...initialConfig
   });
   const [loading, setLoading] = useState(false);
+  const alertsRef = useRef(alerts);
+  alertsRef.current = alerts;
 
   // Generate unique IDs
   const generateId = useCallback(() => {
@@ -151,7 +153,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
 
     // Check for recurring alerts
     if (input.isRecurring) {
-      const existingRecurring = alerts.find(alert => 
+      const existingRecurring = alertsRef.current.find(alert => 
         alert.type === input.type &&
         alert.context === input.context &&
         alert.title === input.title &&
@@ -193,7 +195,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     }, 'AlertsProvider');
 
     return alertId;
-  }, [alerts, generateId]);
+  }, [generateId]);
 
   const create = useDebouncedCallback(createLogic, 300);
 
@@ -273,15 +275,15 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
 
   // Query helpers
   const getByContext = useCallback((context: AlertContext) => {
-    return alerts.filter(alert => alert.context === context);
-  }, [alerts]);
+    return alertsRef.current.filter(alert => alert.context === context);
+  }, []);
 
   const getBySeverity = useCallback((severity: AlertSeverity) => {
-    return alerts.filter(alert => alert.severity === severity);
-  }, [alerts]);
+    return alertsRef.current.filter(alert => alert.severity === severity);
+  }, []);
 
   const getFiltered = useCallback((filters: AlertFilters) => {
-    return alerts.filter(alert => {
+    return alertsRef.current.filter(alert => {
       if (filters.status) {
         const statuses = Array.isArray(filters.status) ? filters.status : [filters.status];
         if (!statuses.includes(alert.status)) return false;
@@ -316,11 +318,11 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
       
       return true;
     });
-  }, [alerts]);
+  }, []);
 
   // Calculate stats
   const getStats = useCallback((filters?: AlertFilters): AlertStats => {
-    const filteredAlerts = filters ? getFiltered(filters) : alerts;
+    const filteredAlerts = filters ? getFiltered(filters) : alertsRef.current;
     
     const byStatus = {
       active: 0,
@@ -393,7 +395,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
       escalatedCount,
       recurringCount
     };
-  }, [alerts, getFiltered]);
+  }, [getFiltered]);
 
   // Bulk operations
   const bulkAcknowledge = useCallback(async (ids: string[]) => {
@@ -409,9 +411,9 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
   }, [dismiss]);
 
   const clearAll = useCallback(async (filters?: AlertFilters) => {
-    const alertsToRemove = filters ? getFiltered(filters) : alerts.filter(a => a.status !== 'active');
+    const alertsToRemove = filters ? getFiltered(filters) : alertsRef.current.filter(a => a.status !== 'active');
     await bulkDismiss(alertsToRemove.map(a => a.id));
-  }, [alerts, getFiltered, bulkDismiss]);
+  }, [getFiltered, bulkDismiss]);
 
   // Update configuration
   const updateConfig = useCallback(async (newConfig: Partial<AlertsConfiguration>) => {

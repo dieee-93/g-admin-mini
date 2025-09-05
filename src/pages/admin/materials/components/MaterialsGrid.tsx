@@ -5,7 +5,7 @@ import {
 import { PencilIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { CubeIcon } from '@heroicons/react/24/outline';
 import { useMaterials } from '@/store/materialsStore';
-import { StockCalculations } from '../utils/stockCalculations';
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
 import type { MaterialItem } from '../types';
 import { isMeasurable } from '../types';
 
@@ -25,10 +25,10 @@ export const MaterialsGrid: React.FC<MaterialsGridProps> = ({ onEdit, onView, on
   // 🚀 Calculate status for each item (removed memo for better reactivity)
   const itemsWithStatus = items.map(item => ({
     item,
-    status: StockCalculations.getStockStatus(item),
-    displayUnit: StockCalculations.getDisplayUnit(item),
-    minStock: StockCalculations.getMinStock(item),
-    totalValue: StockCalculations.getTotalValue(item)
+    status: StockCalculation.getStockStatus(item),
+    displayUnit: StockCalculation.getDisplayUnit(item),
+    minStock: StockCalculation.getMinStock(item),
+    totalValue: StockCalculation.getTotalValue(item)
   }));
 
   if (loading) {
@@ -93,7 +93,7 @@ export const MaterialsGrid: React.FC<MaterialsGridProps> = ({ onEdit, onView, on
                     colorPalette={status === 'critical' || status === 'out' ? 'red' : status === 'low' ? 'orange' : 'green'} 
                     size="sm"
                   >
-                    {StockCalculations.getStatusLabel(status)}
+                    {StockCalculation.getStatusLabel(status)}
                   </Badge>
                 </Stack>
 

@@ -248,6 +248,55 @@ export const CAPABILITY_DEFINITIONS: CapabilityDefinition[] = [
 
 export type BusinessStructure = 'single_location' | 'multi_location' | 'mobile';
 
+// Tipo para los datos del modelo de negocio completo
+export interface BusinessModelData extends BusinessCapabilities {
+  business_structure: BusinessStructure;
+  operationalTier: OperationalTier;
+}
+
+// Capacidades por defecto
+export const defaultCapabilities: BusinessCapabilities = {
+  sells_products: false,
+  sells_services: false,
+  manages_events: false,
+  manages_recurrence: false,
+  sells_products_for_onsite_consumption: false,
+  sells_products_for_pickup: false,
+  sells_products_with_delivery: false,
+  sells_digital_products: false,
+  sells_services_by_appointment: false,
+  sells_services_by_class: false,
+  sells_space_by_reservation: false,
+  hosts_private_events: false,
+  manages_offsite_catering: false,
+  manages_rentals: false,
+  manages_memberships: false,
+  manages_subscriptions: false,
+  has_online_store: false,
+  is_b2b_focused: false,
+};
+
+// Reglas de validación
+export const validationRules = {
+  requiresAtLeastOneMainCapability: (capabilities: BusinessCapabilities): boolean => {
+    const mainCapabilities = [
+      capabilities.sells_products_for_onsite_consumption,
+      capabilities.sells_products_for_pickup,
+      capabilities.sells_products_with_delivery,
+      capabilities.sells_digital_products,
+      capabilities.sells_services_by_appointment,
+      capabilities.sells_services_by_class,
+      capabilities.sells_space_by_reservation,
+      capabilities.manages_offsite_catering,
+      capabilities.hosts_private_events,
+      capabilities.manages_rentals,
+      capabilities.manages_memberships,
+      capabilities.manages_subscriptions,
+    ];
+    return mainCapabilities.some(Boolean);
+  },
+};
+
 function getMainOffersCount(capabilities: BusinessCapabilities): number {
   const mainOffers = [
     capabilities.sells_products_for_onsite_consumption,

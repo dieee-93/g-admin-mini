@@ -2,7 +2,7 @@ import React from 'react';
 import { supabase } from '@/lib/supabase/client';
 import {
   Stack,
-  Card,
+  CardWrapper,
   Grid,
   Typography,
   Badge,
@@ -314,7 +314,7 @@ export default function TableManagement() {
             <Stack mt="md">
               <Grid templateColumns="repeat(auto-fill, minmax(280px, 1fr))" gap="md">
               {tables.map((table) => (
-                <Card
+                <CardWrapper
                   key={table.id}
                 >
                   <Stack direction="column" align="start" gap="sm">

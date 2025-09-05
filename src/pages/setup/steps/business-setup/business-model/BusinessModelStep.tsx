@@ -27,7 +27,7 @@ import { BusinessPreviewPanel } from './components/BusinessPreviewPanel';
 import { ChannelOption } from './components/ChannelOption';
 import { StructureOption } from './components/StructureOption';
 import { useBusinessCapabilities } from './hooks/useBusinessCapabilities';
-import { BusinessModelData } from './config/businessCapabilities';
+import { BusinessModelData } from './config/businessCapabilities'
 
 interface BusinessModelStepProps {
   onComplete: (data: BusinessModelData) => void;

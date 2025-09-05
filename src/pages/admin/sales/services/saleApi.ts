@@ -12,7 +12,7 @@ import {
 } from '../types';
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents, type SaleCompletedEvent } from '@/lib/events/RestaurantEvents';
-import { taxService } from '@/pages/admin/fiscal/services/taxCalculationService';
+import { taxService } from '@/business-logic/fiscal/taxCalculationService';
 import { errorHandler, createNetworkError, createBusinessError } from '@/lib/error-handling';
 
 // ===== CRUD BÁSICO DE VENTAS =====

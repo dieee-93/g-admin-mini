@@ -1,4 +1,4 @@
-import type { BusinessCapabilities } from '@/types/businessCapabilities';
+import type { BusinessCapabilities } from '@/pages/setup/steps/business-setup/business-model/config/businessCapabilities';
 
 /**
  * @fileoverview Master list of all application milestones.

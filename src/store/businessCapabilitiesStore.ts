@@ -9,13 +9,13 @@ import type {
   BusinessCapabilities, 
   BusinessProfile, 
   OperationalTier 
-} from '@/types/businessCapabilities';
+} from '@/pages/setup/steps/business-setup/business-model/config/businessCapabilities';
 import { 
   calculateOperationalTier, 
   getEnabledFeatures, 
   getDashboardModules,
   getRelevantTutorials 
-} from '@/types/businessCapabilities';
+} from '@/pages/setup/steps/business-setup/business-model/config/businessCapabilities';
 
 interface BusinessCapabilitiesState {
   // Estado principal
