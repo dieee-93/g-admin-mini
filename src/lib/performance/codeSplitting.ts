@@ -32,8 +32,48 @@ export const lazyComponents = {
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.MATERIALS
   ),
   
-  // Note: Other components temporarily disabled during migration
-  // TODO: Update remaining components to new route-based paths
+  CrossModuleAnalytics: createLazyRoute(
+    () => import('@/pages/admin/dashboard/components/business/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
+    CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
+  ),
+  ExecutiveDashboard: createLazyRoute(
+    () => import('@/pages/admin/dashboard/components/business/ExecutiveDashboard/LazyExecutiveDashboard'),
+    CODE_SPLITTING_CONFIG.CHUNK_NAMES.EXECUTIVE
+  ),
+  RecipeForm: createLazyRoute(
+    () => import('@/services/recipe/components/LazyRecipeForm'),
+    CODE_SPLITTING_CONFIG.CHUNK_NAMES.RECIPES
+  ),
+
+  // Sub-components
+  MaterialsHeader: createLazyFeature(
+    () => import('@/pages/admin/materials/components/MaterialsHeader'),
+    'MaterialsHeader'
+  ),
+  MaterialsGrid: createLazyFeature(
+    () => import('@/pages/admin/materials/components/MaterialsGrid'),
+    'MaterialsGrid'
+  ),
+  CorrelationsView: createLazyFeature(
+    () => import('@/pages/admin/dashboard/components/business/components/CorrelationsView'),
+    'CorrelationsView'
+  ),
+  BottlenecksView: createLazyFeature(
+    () => import('@/pages/admin/dashboard/components/business/components/BottlenecksView'),
+    'BottlenecksView'
+  ),
+  ExecutiveKPIGrid: createLazyFeature(
+    () => import('@/pages/admin/dashboard/components/business/components/ExecutiveKPIGrid'),
+    'ExecutiveKPIGrid'
+  ),
+  RecipeBasicForm: createLazyFeature(
+    () => import('@/services/recipe/components/components/RecipeBasicForm'),
+    'RecipeBasicForm'
+  ),
+  RecipeAISuggestions: createLazyFeature(
+    () => import('@/services/recipe/components/components/RecipeAISuggestions'),
+    'RecipeAISuggestions'
+  ),
 };
 
 // Performance monitoring for code splitting

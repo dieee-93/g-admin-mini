@@ -1,6 +1,6 @@
 // RecipeIntelligenceDashboard Component Tests
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor, act } from "@testing-library/react"
 import { RecipeIntelligenceDashboard } from "./RecipeIntelligenceDashboard"
 import type { Recipe, RecipeWithCost } from "@/services/recipe/types"
 import { fetchRecipesWithCosts } from "@/services/recipe/api/recipeApi"
@@ -13,7 +13,7 @@ vi.mock('@/services/recipe/api/recipeApi')
 
 const renderWithChakra = (component: React.ReactElement) => {
   (useThemeStore as vi.Mock).mockReturnValue({
-    currentTheme: { id: 'default', name: 'Default' },
+    currentTheme: { id: 'light', name: 'Light' },
   });
   return render(component, { wrapper: Provider })
 }
@@ -34,28 +34,34 @@ describe("RecipeIntelligenceDashboard", () => {
   })
 
   it("should render dashboard title", async () => {
-    renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />)
-    await waitFor(() => {
-      expect(screen.getByText("Recipe Intelligence Dashboard v3.0")).toBeInTheDocument()
-    })
+    await act(async () => {
+      renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />);
+    });
+    expect(screen.getByText("Recipe Intelligence Dashboard v3.0")).toBeInTheDocument()
   })
 
-  it("should display correct recipe count", () => {
-    renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />)
+  it("should display correct recipe count", async () => {
+    await act(async () => {
+      renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />);
+    });
     expect(screen.getByText("2")).toBeInTheDocument()
     expect(screen.getByText("Total Recipes")).toBeInTheDocument()
   })
 
   it("should display profitability metric", async () => {
-    renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />)
+    await act(async () => {
+      renderWithChakra(<RecipeIntelligenceDashboard recipes={mockRecipes} />);
+    });
     await waitFor(() => {
       expect(screen.getByText("60%")).toBeInTheDocument()
-      expect(screen.getByText("Avg Profitability")).toBeInTheDocument()
-    })
+    });
+    expect(screen.getByText("Avg Profitability")).toBeInTheDocument()
   })
 
-  it("should handle empty recipes array", () => {
-    renderWithChakra(<RecipeIntelligenceDashboard recipes={[]} />)
+  it("should handle empty recipes array", async () => {
+    await act(async () => {
+      renderWithChakra(<RecipeIntelligenceDashboard recipes={[]} />);
+    });
     expect(screen.getByText("0")).toBeInTheDocument()
     expect(screen.getByText("Total Recipes")).toBeInTheDocument()
   })

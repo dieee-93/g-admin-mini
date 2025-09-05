@@ -13,7 +13,7 @@ vi.mock('@/services/recipe/api/recipeApi')
 
 const renderWithChakra = (component: React.ReactElement) => {
   (useThemeStore as vi.Mock).mockReturnValue({
-    currentTheme: { id: 'default', name: 'Default' },
+    currentTheme: { id: 'light', name: 'Light' },
   });
   return render(component, { wrapper: Provider })
 }

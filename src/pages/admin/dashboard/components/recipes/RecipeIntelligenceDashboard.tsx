@@ -176,7 +176,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 {!loading && analytics && (
                   <>
                     <Progress.Root 
-                      value={(analytics.totalViableRecipes / recipes.length) * 100} 
+                      value={recipes.length > 0 ? (analytics.totalViableRecipes / recipes.length) * 100 : 0}
                       colorPalette="green" 
                       size="sm" 
                     >
@@ -185,7 +185,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                       </Progress.Track>
                     </Progress.Root>
                     <Text fontSize="sm" color="gray.600">
-                      {Math.round((analytics.totalViableRecipes / recipes.length) * 100)}% of recipes are viable
+                      {recipes.length > 0 ? Math.round((analytics.totalViableRecipes / recipes.length) * 100) : 0}% of recipes are viable
                     </Text>
                   </>
                 )}

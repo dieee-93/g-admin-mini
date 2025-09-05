@@ -28,7 +28,7 @@ vi.mock('@/store/themeStore')
 
 const renderWithDesignSystem = (component: React.ReactElement) => {
   (useThemeStore as vi.Mock).mockReturnValue({
-    currentTheme: { id: 'default', name: 'Default' },
+    currentTheme: { id: 'light', name: 'Light' },
   });
   return render(component, { wrapper: Provider })
 }

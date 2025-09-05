@@ -247,9 +247,8 @@ export function CustomerAnalytics() {
                 const recommendations = getSegmentRecommendations(stat.segment);
                 
                 return (
-                  <div style={{ cursor: 'pointer' }}>
+                  <div key={stat.segment} style={{ cursor: 'pointer' }}>
                     <CardWrapper 
-                      key={stat.segment} 
                       variant={selectedSegment === stat.segment ? "filled" : "outline"} 
                       onClick={() => setSelectedSegment(selectedSegment === stat.segment ? null : stat.segment)}
                     >
@@ -437,34 +436,30 @@ export function CustomerAnalytics() {
             </Alert>
 
             {/* Churn Prevention */}
-            <Alert.Root variant="subtle">
-              <Alert.Content>
-                <Stack direction="column" gap="xs" p="md">
-                  <Typography size="sm" fontWeight="medium" >⚠️ Retención Urgente</Typography>
-                  <Typography size="sm" color="text.muted">
-                    {churnRiskCustomers.length} clientes de alto valor en riesgo.
-                  </Typography>
-                  <Typography fontWeight="medium"  size="sm">
-                    Campaña win-back inmediata
-                  </Typography>
-                </Stack>
-              </Alert.Content>
-            </Alert.Root>
+            <Alert variant="subtle">
+              <Stack direction="column" gap="xs" p="md">
+                <Typography size="sm" fontWeight="medium" >⚠️ Retención Urgente</Typography>
+                <Typography size="sm" color="text.muted">
+                  {churnRiskCustomers.length} clientes de alto valor en riesgo.
+                </Typography>
+                <Typography fontWeight="medium"  size="sm">
+                  Campaña win-back inmediata
+                </Typography>
+              </Stack>
+            </Alert>
 
             {/* Growth Opportunity */}
-            <Alert.Root variant="subtle">
-              <Alert.Content>
-                <Stack direction="column" gap="xs" p="md">
-                  <Typography size="sm" fontWeight="medium" >📈 Oportunidad Crecimiento</Typography>
-                  <Typography size="sm" color="text.muted">
-                    {segmentStats.find(s => s.segment === CustomerSegment.NEW_CUSTOMERS)?.count || 0} nuevos clientes necesitan onboarding.
-                  </Typography>
-                  <Typography fontWeight="medium"  size="sm">
-                    Programa de bienvenida
-                  </Typography>
-                </Stack>
-              </Alert.Content>
-            </Alert.Root>
+            <Alert variant="subtle">
+              <Stack direction="column" gap="xs" p="md">
+                <Typography size="sm" fontWeight="medium" >📈 Oportunidad Crecimiento</Typography>
+                <Typography size="sm" color="text.muted">
+                  {segmentStats.find(s => s.segment === CustomerSegment.NEW_CUSTOMERS)?.count || 0} nuevos clientes necesitan onboarding.
+                </Typography>
+                <Typography fontWeight="medium"  size="sm">
+                  Programa de bienvenida
+                </Typography>
+              </Stack>
+            </Alert>
           </Grid>
         </Stack>
       </CardWrapper>
