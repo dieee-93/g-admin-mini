@@ -32,10 +32,10 @@ import {
 import { ProductWithStock } from './ProductWithStock';
 import { StockValidationAlert } from './StockValidationAlert';
 import { CartValidationSummary, CartQuickAlert } from './CartValidationSummary';
-import { fetchCustomers, processSale } from '../services/saleApi';
+import { fetchCustomers } from '../services/saleApi';
 import { useSalesCart } from '../hooks/useSalesCart';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents, type OrderPlacedEvent } from '@/lib/events/RestaurantEvents';
+import { useSalesStore } from '@/store/salesStore';
+import { supabase } from '@/lib/supabase/client';
 
 interface Customer {
   id: string;
@@ -53,6 +53,12 @@ export function SalesWithStockView() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'validation' | 'details' | 'confirmation'>('validation');
 
+  // Zustand Store
+  const { selectedTableId, setSelectedTableId } = useSalesStore(state => ({
+    selectedTableId: state.selectedTableId,
+    setSelectedTableId: state.setSelectedTableId,
+  }));
+
   // Hook del carrito con validaciones mejoradas
   const {
     cart,
@@ -69,8 +75,6 @@ export function SalesWithStockView() {
   } = useSalesCart({
     enableRealTimeValidation: true,
     validationDebounceMs: 800,
-    enableProactiveWarnings: true,
-    warningThreshold: 0.8
   });
 
   // Cargar clientes al inicializar
@@ -112,21 +116,29 @@ export function SalesWithStockView() {
       return;
     }
 
+    if (!selectedTableId) {
+      notify.warning({
+        title: "No hay mesa seleccionada",
+        description: "Por favor, selecciona una mesa para la venta.",
+      });
+      return;
+    }
+
     // Validación completa antes del checkout
     setCheckoutStep('validation');
     setShowCheckout(true);
     
     // Trigger validación inmediata
     await validateCartStock();
-  }, [summary.hasItems, validateCartStock]);
+  }, [summary.hasItems, validateCartStock, selectedTableId]);
 
   // Proceder al siguiente paso del checkout
   const handleProceedToNextStep = useCallback(() => {
     if (checkoutStep === 'validation') {
-      if (!validationResult?.is_valid) {
+      if (validationResult && !validationResult.is_valid) {
         notify.warning({
-          title: "Validación pendiente",
-          description: "Espera a que se complete la validación de stock",
+          title: "Hay problemas con el stock",
+          description: "Revisa los productos en el carrito antes de continuar.",
         });
         return;
       }
@@ -141,7 +153,15 @@ export function SalesWithStockView() {
     if (!canProcessSale) {
       notify.error({
         title: "No se puede procesar la venta",
-        description: "Verifica que todos los productos tengan stock suficiente",
+        description: "Verifica que todos los productos tengan stock suficiente.",
+      });
+      return;
+    }
+
+    if (!selectedTableId) {
+      notify.error({
+        title: "Error Crítico: No hay mesa seleccionada",
+        description: "La venta no puede ser procesada sin una mesa.",
       });
       return;
     }
@@ -149,38 +169,18 @@ export function SalesWithStockView() {
     setIsProcessing(true);
 
     try {
-      // Validación final antes de procesar
-      const finalValidation = await validateCartStock();
-      
-      if (finalValidation && !finalValidation.is_valid) {
-        notify.error({
-          title: "Stock insuficiente",
-          description: "El stock cambió desde la última validación. Revisa tu carrito.",
-        });
-        setCheckoutStep('validation');
-        return;
-      }
-
-      // Procesar venta
       const saleData = getSaleData(selectedCustomerId || undefined, note || undefined);
-      const saleResult = await processSale(saleData);
 
-      // Emitir evento ORDER_PLACED después del procesamiento exitoso
-      const orderPlacedEvent: OrderPlacedEvent = {
-        orderId: saleResult.sale_id || `sale_${Date.now()}`,
-        customerId: selectedCustomerId || undefined,
-        tableId: undefined, // TODO: Add table support in future
-        items: cart.map(item => ({
-          productId: item.product_id,
-          quantity: item.quantity,
-          specialInstructions: note || undefined
-        })),
-        totalAmount: summary.totalAmount,
-        orderType: 'dine_in', // Default for POS sales
-        timestamp: new Date().toISOString()
-      };
+      const { error } = await supabase.rpc('pos_process_sale_with_order', {
+        p_table_id: selectedTableId,
+        p_customer_id: saleData.customer_id,
+        p_items: saleData.items,
+        p_note: saleData.note
+      });
 
-      await EventBus.emit(RestaurantEvents.ORDER_PLACED, orderPlacedEvent, 'SalesModule');
+      if (error) {
+        throw new Error(error.message);
+      }
 
       // Éxito
       notify.success({
@@ -192,6 +192,7 @@ export function SalesWithStockView() {
       clearCart();
       setSelectedCustomerId('');
       setNote('');
+      setSelectedTableId(null); // Limpiar la mesa seleccionada
       setShowCheckout(false);
       setCheckoutStep('validation');
 
@@ -204,16 +205,16 @@ export function SalesWithStockView() {
     } finally {
       setIsProcessing(false);
     }
-  }, [canProcessSale, validateCartStock, getSaleData, selectedCustomerId, note, summary.totalAmount, clearCart]);
-
-  // Manejar sugerencia de cantidad máxima
-  const handleSuggestMaxQuantity = useCallback((productId: string, maxQuantity: number) => {
-    updateQuantity(productId, maxQuantity);
-    notify.info({
-      title: "Cantidad ajustada",
-      description: `Cantidad ajustada al máximo disponible: ${maxQuantity}`,
-    });
-  }, [updateQuantity]);
+  }, [
+    canProcessSale,
+    getSaleData,
+    selectedCustomerId,
+    note,
+    summary.totalAmount,
+    clearCart,
+    selectedTableId,
+    setSelectedTableId
+  ]);
 
   return (
     <Stack direction="column" gap="lg" p="lg" maxW="7xl" mx="auto">
@@ -244,7 +245,7 @@ export function SalesWithStockView() {
             <Button
               colorPalette="success"
               onClick={handleOpenCheckout}
-              disabled={!summary.hasItems || isValidating}
+              disabled={!summary.hasItems || isValidating || !selectedTableId}
               loading={isProcessing}
             >
               <CreditCardIcon className="w-4 h-4" />
@@ -252,6 +253,15 @@ export function SalesWithStockView() {
             </Button>
           </Stack>
         </Stack>
+
+        {!selectedTableId && (
+          <Alert status='warning'>
+            <Alert.Title>No hay mesa seleccionada</Alert.Title>
+            <Alert.Description>
+              Por favor, selecciona una mesa para poder iniciar una venta.
+            </Alert.Description>
+          </Alert>
+        )}
 
         {/* Alerta rápida del carrito */}
         <CartQuickAlert 
@@ -271,7 +281,7 @@ export function SalesWithStockView() {
               onAddToCart={addToCart}
               onQuantityChange={updateQuantity}
               currentCart={cart}
-              disabled={isProcessing}
+              disabled={isProcessing || !selectedTableId}
             />
           </Stack>
 
@@ -284,7 +294,7 @@ export function SalesWithStockView() {
               isValidating={isValidating}
               onProceedToCheckout={handleOpenCheckout}
               onValidateCart={() => validateCartStock()}
-              disabled={isProcessing}
+              disabled={isProcessing || !selectedTableId}
             />
           </Stack>
         </Grid>
@@ -391,8 +401,16 @@ export function SalesWithStockView() {
                             </Typography>
                           </Stack>
                         )}
+                         {selectedTableId && (
+                          <Stack direction="row" justify="space-between">
+                            <Typography variant="body" size="md" weight="medium">Mesa:</Typography>
+                            <Typography variant="body" size="md">
+                              {selectedTableId}
+                            </Typography>
+                          </Stack>
+                        )}
                       </Stack>
-                    </CardWrapper>
+                    </Card>
                   </Stack>
                 )}
               </Stack>

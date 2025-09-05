@@ -122,49 +122,6 @@ export async function validateSaleStock(items: { product_id: string; quantity: n
   return data;
 }
 
-export async function processSale(saleData: CreateSaleData): Promise<SaleProcessResult> {
-  const { data, error } = await supabase
-    .rpc('process_sale', {
-      customer_id: saleData.customer_id || null,
-      items_array: JSON.stringify(saleData.items),
-      total: saleData.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0),
-      note: saleData.note || null
-    });
-  
-  if (error) throw error;
-
-  // Emitir evento SALE_COMPLETED después del procesamiento exitoso
-  const totalAmount = saleData.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
-  
-  // Use centralized tax calculation service
-  const taxCalculation = taxService.reverseTaxCalculation(totalAmount);
-  const subtotal = taxCalculation.subtotal;
-  const taxes = taxCalculation.totalTaxes;
-
-  const saleCompletedEvent: SaleCompletedEvent = {
-    saleId: data.sale_id || `sale_${Date.now()}`,
-    orderId: undefined, // Could be linked to order system in the future
-    customerId: saleData.customer_id || undefined,
-    tableId: undefined, // Table management integration pending
-    totalAmount,
-    subtotal,
-    taxes,
-    tips: 0, // POS sales don't include tips by default
-    paymentMethods: [], // Will be populated when payment processing is integrated
-    items: saleData.items.map(item => ({
-      productId: item.product_id,
-      quantity: item.quantity,
-      unitPrice: item.unit_price,
-      totalPrice: item.quantity * item.unit_price
-    })),
-    timestamp: new Date().toISOString()
-  };
-
-  await EventBus.emit(RestaurantEvents.SALE_COMPLETED, saleCompletedEvent, 'SalesAPI');
-
-  return data;
-}
-
 export async function getSalesSummary(dateFrom: string, dateTo: string): Promise<SalesSummary> {
   const { data, error } = await supabase
     .rpc('get_sales_summary', {

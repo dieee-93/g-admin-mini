@@ -1,14 +1,14 @@
 // src/features/sales/logic/useSalesCart.ts (Enhanced Version)
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { useSaleStockValidation } from '@/hooks/useSaleStockValidation';
 import { toaster } from '@/shared/ui/toaster';
+import { supabase } from '@/lib/supabase/client';
 
 export interface SaleItem {
   product_id: string;
   product_name: string;
   quantity: number;
   unit_price: number;
-  max_available: number;
+  // max_available is removed as we now rely on backend validation
 }
 
 export interface CartSummary {
@@ -22,25 +22,91 @@ export interface CartSummary {
 export interface CartValidationOptions {
   enableRealTimeValidation?: boolean;
   validationDebounceMs?: number;
-  enableProactiveWarnings?: boolean;
-  warningThreshold?: number; // Porcentaje del stock disponible para mostrar warnings
 }
 
 const DEFAULT_OPTIONS: CartValidationOptions = {
   enableRealTimeValidation: true,
   validationDebounceMs: 800,
-  enableProactiveWarnings: true,
-  warningThreshold: 0.8 // Alertar cuando se use más del 80% del stock
 };
+
+// Types from the old useSaleStockValidation hook
+export interface ValidationSaleItem {
+  product_id: string;
+  quantity: number;
+}
+
+export interface StockValidationResult {
+  is_valid: boolean;
+  error_message?: string;
+  insufficient_items?: Array<{
+    product_id: string;
+    product_name: string;
+    required: number;
+    available: number;
+    missing: number;
+  }>;
+}
+
 
 export function useSalesCart(options: CartValidationOptions = {}) {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const [cart, setCart] = useState<SaleItem[]>([]);
-  const { validateStock, validationResult, isValidating, clearValidation } = useSaleStockValidation();
   
+  // State from useSaleStockValidation is now here
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<StockValidationResult | null>(null);
+
+
   // Referencias para debouncing y control
   const validationTimeoutRef = useRef<NodeJS.Timeout>();
   const lastValidationRef = useRef<string>('');
+
+  // The validateStock function from useSaleStockValidation is now here
+  const validateStock = useCallback(async (saleItems: ValidationSaleItem[]) => {
+    if (!saleItems.length) {
+      setValidationResult({ is_valid: true });
+      return { is_valid: true };
+    }
+
+    setIsValidating(true);
+
+    try {
+      const { data, error } = await supabase.rpc('validate_sale_stock', {
+        items_array: saleItems
+      });
+
+      if (error) {
+        console.error('Error validating stock:', error);
+        const errorMessage = error.message || 'Error al validar stock. Intenta nuevamente.';
+        const result = {
+          is_valid: false,
+          error_message: `Error de validación: ${errorMessage}`
+        };
+        setValidationResult(result);
+        return result;
+      }
+
+      const result = data as StockValidationResult;
+      setValidationResult(result);
+      return result;
+
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const result = {
+        is_valid: false,
+        error_message: `Error inesperado: ${errorMessage}`
+      };
+      setValidationResult(result);
+      return result;
+    } finally {
+      setIsValidating(false);
+    }
+  }, []);
+
+  const clearValidation = useCallback(() => {
+    setValidationResult(null);
+  }, []);
 
   // Función para generar hash del carrito para evitar validaciones duplicadas
   const getCartHash = useCallback((cartItems: SaleItem[]) => {
@@ -91,31 +157,8 @@ export function useSalesCart(options: CartValidationOptions = {}) {
     };
   }, [triggerValidation]);
 
-  // Función para mostrar warnings proactivos
-  const checkProactiveWarnings = useCallback((item: SaleItem) => {
-    if (!opts.enableProactiveWarnings) return;
-
-    const usagePercentage = item.quantity / item.max_available;
-    
-    if (usagePercentage >= 1) {
-      toaster.create({
-        title: "Stock agotado",
-        description: `${item.product_name}: No puedes agregar más, stock máximo: ${item.max_available}`,
-        status: "error",
-        duration: 4000,
-      });
-    } else if (usagePercentage >= (opts.warningThreshold || 0.8)) {
-      toaster.create({
-        title: "Stock limitado",
-        description: `${item.product_name}: Quedan solo ${item.max_available - item.quantity} unidades disponibles`,
-        status: "warning",
-        duration: 3000,
-      });
-    }
-  }, [opts.enableProactiveWarnings, opts.warningThreshold]);
-
-  // Agregar producto al carrito con validaciones
-  const addToCart = useCallback((item: SaleItem) => {
+  // Agregar producto al carrito (sin validaciones de stock frontales)
+  const addToCart = useCallback((item: Omit<SaleItem, 'max_available'>) => {
     setCart(prevCart => {
       const existingIndex = prevCart.findIndex(cartItem => cartItem.product_id === item.product_id);
       
@@ -124,48 +167,22 @@ export function useSalesCart(options: CartValidationOptions = {}) {
         const existingItem = prevCart[existingIndex];
         const newQuantity = existingItem.quantity + item.quantity;
         
-        // Validar contra stock disponible
-        if (newQuantity > item.max_available) {
-          toaster.create({
-            title: "Cantidad excedida",
-            description: `${item.product_name}: Stock disponible: ${item.max_available}, intentando agregar: ${newQuantity}`,
-            status: "error",
-            duration: 4000,
-          });
-          return prevCart; // No agregar si excede stock
-        }
-
         const updatedCart = [...prevCart];
         updatedCart[existingIndex] = {
           ...existingItem,
           quantity: newQuantity,
           unit_price: item.unit_price, // Actualizar precio
-          max_available: item.max_available // Actualizar disponibilidad
         };
-
-        // Verificar warnings
-        checkProactiveWarnings(updatedCart[existingIndex]);
         
         return updatedCart;
       } else {
-        // Validar antes de agregar nuevo item
-        if (item.quantity > item.max_available) {
-          toaster.create({
-            title: "Stock insuficiente",
-            description: `${item.product_name}: Solo hay ${item.max_available} unidades disponibles`,
-            status: "error",
-            duration: 4000,
-          });
-          return prevCart;
-        }
-
         // Agregar nuevo item
         const newCart = [...prevCart, item];
-        checkProactiveWarnings(item);
         return newCart;
       }
     });
-  }, [checkProactiveWarnings]);
+  }, []);
+
 
   // Remover producto del carrito
   const removeFromCart = useCallback((productId: string) => {
@@ -183,7 +200,7 @@ export function useSalesCart(options: CartValidationOptions = {}) {
     });
   }, []);
 
-  // Actualizar cantidad con validaciones
+  // Actualizar cantidad (sin validaciones de stock frontales)
   const updateQuantity = useCallback((productId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
       removeFromCart(productId);
@@ -192,24 +209,12 @@ export function useSalesCart(options: CartValidationOptions = {}) {
 
     setCart(prevCart => prevCart.map(item => {
       if (item.product_id === productId) {
-        // Validar contra stock disponible
-        if (newQuantity > item.max_available) {
-          toaster.create({
-            title: "Cantidad no disponible",
-            description: `${item.product_name}: Stock máximo disponible: ${item.max_available}`,
-            status: "warning",
-            duration: 3000,
-          });
-          return { ...item, quantity: item.max_available }; // Ajustar al máximo disponible
-        }
-
-        const updatedItem = { ...item, quantity: newQuantity };
-        checkProactiveWarnings(updatedItem);
-        return updatedItem;
+        return { ...item, quantity: newQuantity };
       }
       return item;
     }));
-  }, [removeFromCart, checkProactiveWarnings]);
+  }, [removeFromCart]);
+
 
   // Actualizar precio de un producto
   const updatePrice = useCallback((productId: string, newPrice: number) => {
@@ -228,22 +233,6 @@ export function useSalesCart(options: CartValidationOptions = {}) {
         ? { ...item, unit_price: newPrice }
         : item
     ));
-  }, []);
-
-  // Sugerir cantidad máxima disponible
-  const suggestMaxQuantity = useCallback((productId: string) => {
-    setCart(prevCart => prevCart.map(item => {
-      if (item.product_id === productId && item.max_available > 0) {
-        toaster.create({
-          title: "Cantidad ajustada",
-          description: `${item.product_name}: Ajustado a máximo disponible (${item.max_available})`,
-          status: "info",
-          duration: 3000,
-        });
-        return { ...item, quantity: item.max_available };
-      }
-      return item;
-    }));
   }, []);
 
   // Limpiar carrito con confirmación
@@ -292,9 +281,8 @@ export function useSalesCart(options: CartValidationOptions = {}) {
     const totalAmount = cart.reduce((total, item) => total + (item.quantity * item.unit_price), 0);
     const hasItems = itemCount > 0;
     
-    // Determinar si es válido basado en validación y stock local
-    const hasLocalStockIssues = cart.some(item => item.quantity > item.max_available);
-    const isValid = !hasLocalStockIssues && (!validationResult || validationResult.is_valid);
+    // La validez ahora depende únicamente del resultado de la validación del backend
+    const isValid = !validationResult || validationResult.is_valid;
     
     return {
       itemCount,
@@ -327,8 +315,7 @@ export function useSalesCart(options: CartValidationOptions = {}) {
       !isValidating &&
       cart.every(item => 
         item.quantity > 0 && 
-        item.unit_price > 0 && 
-        item.quantity <= item.max_available
+        item.unit_price >= 0 // unit_price can be 0
       )
     );
   }, [cart, summary.isValid, isValidating]);
@@ -336,13 +323,11 @@ export function useSalesCart(options: CartValidationOptions = {}) {
   // Obtener estadísticas del carrito
   const cartStats = useMemo(() => {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const averagePrice = cart.length > 0 ? summary.totalAmount / totalItems : 0;
-    const stockUtilization = cart.reduce((sum, item) => sum + (item.quantity / item.max_available), 0) / cart.length;
+    const averagePrice = cart.length > 0 && totalItems > 0 ? summary.totalAmount / totalItems : 0;
     
     return {
       totalItems,
       averagePrice,
-      stockUtilization: isNaN(stockUtilization) ? 0 : stockUtilization
     };
   }, [cart, summary.totalAmount]);
 
@@ -362,10 +347,7 @@ export function useSalesCart(options: CartValidationOptions = {}) {
     updatePrice,
     clearCart,
     validateCartStock,
-    
-    // Acciones de UX
-    suggestMaxQuantity,
-    
+
     // Helpers
     isInCart,
     getCartQuantity,
