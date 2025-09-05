@@ -7,11 +7,9 @@ import {
   validationRules
 } from '../config/businessCapabilities';
 import { 
-  calculateOperationalTier, 
+  determineBusinessArchetype,
+  getOperationalProfile,
   getInsightMessage,
-  getTierColor,
-  getTierDescription,
-  getMainOffersCount
 } from '../config/businessLogic';
 
 export interface UseBusinessCapabilitiesReturn {
@@ -21,11 +19,9 @@ export interface UseBusinessCapabilitiesReturn {
   expandedCards: Record<string, boolean>;
   
   // Computed values
-  operationalTier: string;
-  tierColor: string;
-  tierDescription: string;
+  archetype: string;
+  operationalProfile: string[];
   insightMessage: string | null;
-  mainOffersCount: number;
   canSubmit: boolean;
   
   // Actions
@@ -116,21 +112,20 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
   }, []);
 
   // Computed values
-  const operationalTier = useMemo(() => 
-    calculateOperationalTier(capabilities, businessStructure), 
-    [capabilities, businessStructure]
+  const archetype = useMemo(() =>
+    determineBusinessArchetype(capabilities),
+    [capabilities]
   );
 
-  const tierColor = useMemo(() => getTierColor(operationalTier), [operationalTier]);
-  
-  const tierDescription = useMemo(() => getTierDescription(operationalTier), [operationalTier]);
+  const operationalProfile = useMemo(() =>
+    getOperationalProfile(capabilities, businessStructure),
+    [capabilities, businessStructure]
+  );
   
   const insightMessage = useMemo(() => 
     getInsightMessage(capabilities, businessStructure), 
     [capabilities, businessStructure]
   );
-  
-  const mainOffersCount = useMemo(() => getMainOffersCount(capabilities), [capabilities]);
   
   const canSubmit = useMemo(() => 
     validationRules.requiresAtLeastOneMainCapability(capabilities), 
@@ -141,8 +136,7 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
   const getBusinessModelData = useCallback((): BusinessModelData => ({
     ...capabilities,
     business_structure: businessStructure,
-    operationalTier,
-  }), [capabilities, businessStructure, operationalTier]);
+  }), [capabilities, businessStructure]);
 
   return {
     // State
@@ -151,11 +145,9 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
     expandedCards,
     
     // Computed values
-    operationalTier,
-    tierColor,
-    tierDescription,
+    archetype,
+    operationalProfile,
     insightMessage,
-    mainOffersCount,
     canSubmit,
     
     // Actions

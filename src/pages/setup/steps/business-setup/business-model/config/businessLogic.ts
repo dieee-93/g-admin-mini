@@ -1,63 +1,40 @@
 import { BusinessCapabilities, BusinessStructure } from './businessCapabilities';
 
-export function getMainOffersCount(capabilities: BusinessCapabilities): number {
-  const mainOffers = [
-    capabilities.sells_products_for_onsite_consumption,
-    capabilities.sells_products_for_pickup,
-    capabilities.sells_products_with_delivery,
-    capabilities.sells_digital_products,
-    capabilities.sells_services_by_appointment,
-    capabilities.sells_services_by_class,
-    capabilities.sells_space_by_reservation,
-    capabilities.manages_offsite_catering,
-    capabilities.hosts_private_events,
-    capabilities.manages_rentals,
-    capabilities.manages_memberships,
-    capabilities.manages_subscriptions,
-  ];
-  return mainOffers.filter(Boolean).length;
+export function determineBusinessArchetype(capabilities: BusinessCapabilities): string {
+  if (capabilities.sells_products_for_onsite_consumption) return 'Restaurante';
+  if (capabilities.sells_digital_products || capabilities.manages_subscriptions) return 'Negocio Digital';
+  if (capabilities.sells_services_by_appointment || capabilities.sells_services_by_class) return 'Proveedor de Servicios';
+  if (capabilities.hosts_private_events && capabilities.sells_services_by_class) return 'Centro de Experiencias';
+  if (capabilities.sells_products_for_pickup || capabilities.sells_products_with_delivery) return 'Tienda Minorista';
+  // ... otras reglas y un arquetipo por defecto
+  return 'Negocio';
 }
 
-export function calculateOperationalTier(
+export function getOperationalProfile(
   capabilities: BusinessCapabilities,
-  businessStructure: BusinessStructure,
-): string {
-  if (
-    businessStructure === 'multi_location' ||
-    getMainOffersCount(capabilities) >= 4 ||
-    (getMainOffersCount(capabilities) >= 3 && capabilities.has_online_store)
-  ) {
-    return 'Sistema Consolidado';
+  businessStructure: BusinessStructure
+): string[] {
+  const profile = [];
+
+  // Dimensión de Escala
+  if (businessStructure === 'multi_location') profile.push('Multi-Sucursal');
+  else if (businessStructure === 'mobile') profile.push('Móvil');
+  else profile.push('Local Único');
+
+  // Dimensión de Canal
+  if (capabilities.sells_products_with_delivery || capabilities.sells_products_for_pickup) {
+    profile.push('Canal Digital Sincrónico');
+  }
+  if (capabilities.has_online_store) {
+    profile.push('E-commerce Asincrónico');
   }
 
-  if (
-    capabilities.has_online_store &&
-    (capabilities.sells_digital_products || capabilities.manages_subscriptions) &&
-    getMainOffersCount(capabilities) <= 2
-  ) {
-    return 'Negocio Digital';
+  // Dimensión de Cliente
+  if (capabilities.is_b2b_focused) {
+    profile.push('Enfoque B2B');
   }
 
-  if (capabilities.hosts_private_events && capabilities.sells_services_by_class) {
-    return 'Centro de Experiencias';
-  }
-
-  if (getMainOffersCount(capabilities) === 3) {
-    return 'Negocio Integrado';
-  }
-
-  if (
-    getMainOffersCount(capabilities) === 2 ||
-    (getMainOffersCount(capabilities) === 1 && capabilities.has_online_store)
-  ) {
-    return 'Estructura Funcional';
-  }
-
-  if (getMainOffersCount(capabilities) === 1) {
-    return 'Base Operativa';
-  }
-
-  return 'Sin Configurar';
+  return profile;
 }
 
 export function getInsightMessage(
@@ -90,42 +67,4 @@ export function getInsightMessage(
   }
   
   return null;
-}
-
-export function getTierColor(tier: string): string {
-  switch (tier) {
-    case 'Sistema Consolidado':
-      return 'purple';
-    case 'Negocio Digital':
-      return 'blue';
-    case 'Centro de Experiencias':
-      return 'green';
-    case 'Negocio Integrado':
-      return 'orange';
-    case 'Estructura Funcional':
-      return 'teal';
-    case 'Base Operativa':
-      return 'gray';
-    default:
-      return 'gray';
-  }
-}
-
-export function getTierDescription(tier: string): string {
-  switch (tier) {
-    case 'Sistema Consolidado':
-      return 'Negocio complejo con múltiples canales y modelos de ingresos';
-    case 'Negocio Digital':
-      return 'Enfocado en productos/servicios digitales con presencia online';
-    case 'Centro de Experiencias':
-      return 'Especializado en experiencias personalizadas y eventos';
-    case 'Negocio Integrado':
-      return 'Múltiples ofertas bien integradas';
-    case 'Estructura Funcional':
-      return 'Operaciones estables con dos líneas principales';
-    case 'Base Operativa':
-      return 'Negocio enfocado en una línea principal';
-    default:
-      return 'Define tu modelo de negocio para obtener recomendaciones';
-  }
 }
