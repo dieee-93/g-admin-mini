@@ -1,6 +1,8 @@
-// Recipe Service - Business logic layer
+// Recipe Service - Business logic layer with Decimal.js precision
 import type { Recipe, RecipeIngredient, RecipeValidationResult, RecipeCalculations, RecipeBuilderConfig } from './types';
 import { recipeAPI } from './RecipeAPI';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { RecipeDecimal } from '@/config/decimal-config';
 
 class RecipeService {
   // Recipe validation
@@ -56,29 +58,45 @@ class RecipeService {
     };
   }
 
-  // Cost calculations
+  // Cost calculations with Decimal.js precision
   calculateRecipeCosts(recipe: Recipe): RecipeCalculations {
-    const totalCost = recipe.ingredients.reduce(
-      (sum, ingredient) => sum + (ingredient.cost * ingredient.quantity), 
-      0
+    // Usar Decimal.js para cálculos de precisión crítica
+    const totalCostDec = recipe.ingredients.reduce(
+      (sum, ingredient) => {
+        const ingredientCostDec = DecimalUtils.fromValue(ingredient.cost, 'recipe');
+        const quantityDec = DecimalUtils.fromValue(ingredient.quantity, 'recipe');
+        const ingredientTotalDec = DecimalUtils.multiply(ingredientCostDec, quantityDec, 'recipe');
+        return DecimalUtils.add(sum, ingredientTotalDec, 'recipe');
+      }, 
+      DecimalUtils.fromValue(0, 'recipe')
     );
 
-    const costPerServing = recipe.servingSize > 0 
-      ? totalCost / recipe.servingSize 
-      : totalCost;
+    const costPerServingDec = recipe.servingSize > 0 
+      ? DecimalUtils.divide(totalCostDec, recipe.servingSize, 'recipe')
+      : totalCostDec;
 
     const calculations: RecipeCalculations = {
-      totalCost,
-      costPerServing
+      totalCost: DecimalUtils.toNumber(totalCostDec),
+      costPerServing: DecimalUtils.toNumber(costPerServingDec)
     };
 
-    // Product-specific calculations
+    // Product-specific calculations with precision
     if (recipe.type === 'product' && recipe.suggestedPrice) {
-      calculations.marginAmount = recipe.suggestedPrice - costPerServing;
-      calculations.profitPercentage = costPerServing > 0 
-        ? ((recipe.suggestedPrice - costPerServing) / costPerServing) * 100 
+      const suggestedPriceDec = DecimalUtils.fromValue(recipe.suggestedPrice, 'recipe');
+      
+      // Margen absoluto
+      const marginAmountDec = DecimalUtils.subtract(suggestedPriceDec, costPerServingDec, 'recipe');
+      calculations.marginAmount = DecimalUtils.toNumber(marginAmountDec);
+      
+      // Porcentaje de ganancia (profit percentage)
+      calculations.profitPercentage = DecimalUtils.isPositive(costPerServingDec)
+        ? DecimalUtils.toNumber(DecimalUtils.calculateProfitMargin(suggestedPriceDec, costPerServingDec))
         : 0;
-      calculations.breakEvenPrice = costPerServing * 1.1; // 10% minimum margin
+      
+      // Precio de punto de equilibrio con 10% de margen mínimo
+      const minMarginFactor = DecimalUtils.fromValue(1.1, 'recipe'); // 10% minimum margin
+      const breakEvenPriceDec = DecimalUtils.multiply(costPerServingDec, minMarginFactor, 'recipe');
+      calculations.breakEvenPrice = DecimalUtils.toNumber(breakEvenPriceDec);
     }
 
     return calculations;
@@ -144,34 +162,45 @@ class RecipeService {
     }
   }
 
-  // Recipe scaling
+  // Recipe scaling with Decimal.js precision
   scaleRecipe(recipe: Recipe, scaleFactor: number): Recipe {
     if (scaleFactor <= 0) {
       throw new Error('El factor de escala debe ser mayor a 0');
     }
 
+    const scaleFactorDec = DecimalUtils.fromValue(scaleFactor, 'recipe');
+    
     return {
       ...recipe,
-      servingSize: recipe.servingSize * scaleFactor,
+      servingSize: DecimalUtils.toNumber(
+        DecimalUtils.multiply(recipe.servingSize, scaleFactorDec, 'recipe')
+      ),
       ingredients: recipe.ingredients.map(ingredient => ({
         ...ingredient,
-        quantity: ingredient.quantity * scaleFactor
+        quantity: DecimalUtils.toNumber(
+          DecimalUtils.scaleRecipe(ingredient.quantity, scaleFactorDec)
+        )
       })),
       steps: recipe.steps.map(step => ({
         ...step,
-        duration: step.duration ? Math.round(step.duration * scaleFactor) : undefined
+        duration: step.duration 
+          ? Math.round(DecimalUtils.toNumber(
+              DecimalUtils.multiply(step.duration, scaleFactorDec, 'recipe')
+            )) 
+          : undefined
       }))
     };
   }
 
-  // Recipe comparison
+  // Recipe comparison with Decimal.js precision
   compareRecipes(recipe1: Recipe, recipe2: Recipe): {
     costDifference: number;
     ingredientsDifference: string[];
     similarityScore: number;
   } {
-    const costDifference = this.calculateRecipeCosts(recipe1).totalCost - 
-                          this.calculateRecipeCosts(recipe2).totalCost;
+    const cost1Dec = DecimalUtils.fromValue(this.calculateRecipeCosts(recipe1).totalCost, 'recipe');
+    const cost2Dec = DecimalUtils.fromValue(this.calculateRecipeCosts(recipe2).totalCost, 'recipe');
+    const costDifferenceDec = DecimalUtils.subtract(cost1Dec, cost2Dec, 'recipe');
 
     const ingredients1 = new Set(recipe1.ingredients.map(i => i.name.toLowerCase()));
     const ingredients2 = new Set(recipe2.ingredients.map(i => i.name.toLowerCase()));
@@ -186,12 +215,18 @@ class RecipeService {
 
     const intersection = [...ingredients1].filter(x => ingredients2.has(x));
     const union = new Set([...ingredients1, ...ingredients2]);
-    const similarityScore = intersection.length / union.size;
+    
+    // Calcular similaridad con precisión decimal
+    const intersectionSizeDec = DecimalUtils.fromValue(intersection.length, 'recipe');
+    const unionSizeDec = DecimalUtils.fromValue(union.size, 'recipe');
+    const similarityScoreDec = DecimalUtils.divide(intersectionSizeDec, unionSizeDec, 'recipe');
 
     return {
-      costDifference,
+      costDifference: DecimalUtils.toNumber(costDifferenceDec),
       ingredientsDifference,
-      similarityScore: Math.round(similarityScore * 100) / 100
+      similarityScore: DecimalUtils.toNumber(
+        DecimalUtils.fromValue(similarityScoreDec, 'recipe').toDecimalPlaces(2)
+      )
     };
   }
 }

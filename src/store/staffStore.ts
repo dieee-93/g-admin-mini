@@ -2,6 +2,15 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
+// Import real Supabase API
+import staffApi, { 
+  type Employee, 
+  employeeToStaffMember, 
+  scheduleToStoreFormat, 
+  timeEntryToStoreFormat 
+} from '@/services/staff/staffApi';
+import { notify } from '@/lib/notifications';
+
 export interface StaffMember {
   id: string;
   name: string;
@@ -104,24 +113,27 @@ export interface StaffState {
   // Stats
   stats: StaffStats;
 
-  // Actions
+  // Actions - Enhanced with Supabase integration
   setStaff: (staff: StaffMember[]) => void;
-  addStaffMember: (staff: Omit<StaffMember, 'id' | 'created_at' | 'updated_at' | 'performance_score' | 'attendance_rate' | 'completed_tasks' | 'training_completed' | 'certifications'>) => void;
-  updateStaffMember: (id: string, updates: Partial<StaffMember>) => void;
-  deleteStaffMember: (id: string) => void;
+  loadStaff: () => Promise<void>; // Load from Supabase
+  addStaffMember: (staff: Omit<StaffMember, 'id' | 'created_at' | 'updated_at' | 'performance_score' | 'attendance_rate' | 'completed_tasks' | 'training_completed' | 'certifications'>) => Promise<void>;
+  updateStaffMember: (id: string, updates: Partial<StaffMember>) => Promise<void>;
+  deleteStaffMember: (id: string) => Promise<void>;
   
-  // Schedule management
+  // Schedule management - Enhanced with Supabase
   setSchedules: (schedules: ShiftSchedule[]) => void;
-  addSchedule: (schedule: Omit<ShiftSchedule, 'id'>) => void;
-  updateSchedule: (id: string, updates: Partial<ShiftSchedule>) => void;
-  deleteSchedule: (id: string) => void;
+  loadSchedules: (startDate?: string, endDate?: string) => Promise<void>;
+  addSchedule: (schedule: Omit<ShiftSchedule, 'id'>) => Promise<void>;
+  updateSchedule: (id: string, updates: Partial<ShiftSchedule>) => Promise<void>;
+  deleteSchedule: (id: string) => Promise<void>;
   
-  // Time tracking
+  // Time tracking - Enhanced with Supabase
   setTimeEntries: (entries: TimeEntry[]) => void;
-  clockIn: (staffId: string) => void;
-  clockOut: (staffId: string) => void;
-  startBreak: (staffId: string) => void;
-  endBreak: (staffId: string) => void;
+  loadTimeEntries: (startDate?: string, endDate?: string) => Promise<void>;
+  clockIn: (staffId: string, location?: { latitude: number; longitude: number }, notes?: string) => Promise<void>;
+  clockOut: (staffId: string, location?: { latitude: number; longitude: number }, notes?: string) => Promise<void>;
+  startBreak: (staffId: string, notes?: string) => Promise<void>;
+  endBreak: (staffId: string, notes?: string) => Promise<void>;
   
   // UI actions
   setLoading: (loading: boolean) => void;
@@ -214,7 +226,7 @@ export const useStaffStore = create<StaffState>()(
           upcomingReviews: []
         },
 
-        // Actions
+        // Actions - Real Supabase implementation
         setStaff: (staff) => {
           set((state) => {
             state.staff = staff;
@@ -222,47 +234,197 @@ export const useStaffStore = create<StaffState>()(
           get().refreshStats();
         },
 
-        addStaffMember: (staffData) => {
-          set((state) => {
-            const newStaff: StaffMember = {
-              ...staffData,
-              id: crypto.randomUUID(),
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              performance_score: 85, // Default score
-              attendance_rate: 95, // Default rate
+        loadStaff: async () => {
+          try {
+            set((state) => {
+              state.loading = true;
+              state.error = null;
+            });
+
+            const { filters } = get();
+            const employees = await staffApi.getEmployees(filters);
+            const staffMembers = employees.map(employeeToStaffMember);
+
+            set((state) => {
+              state.staff = staffMembers;
+              state.loading = false;
+            });
+
+            get().refreshStats();
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to load staff';
+            set((state) => {
+              state.loading = false;
+              state.error = errorMessage;
+            });
+            
+            notify.error({
+              title: 'Error Loading Staff',
+              description: errorMessage
+            });
+          }
+        },
+
+        addStaffMember: async (staffData) => {
+          try {
+            set((state) => {
+              state.loading = true;
+              state.error = null;
+            });
+
+            // Convert StaffMember format to Employee format
+            const employeeData = {
+              employee_id: '', // Will be generated
+              first_name: staffData.name.split(' ')[0],
+              last_name: staffData.name.split(' ').slice(1).join(' '),
+              email: staffData.email,
+              phone: staffData.phone,
+              position: staffData.position,
+              department: staffData.department,
+              hire_date: staffData.hire_date,
+              employment_status: staffData.status,
+              employment_type: 'full_time' as const,
+              role: 'employee' as const,
+              salary: staffData.salary,
+              avatar_url: staffData.avatar,
+              notes: staffData.notes,
+              performance_score: 85,
+              attendance_rate: 95,
               completed_tasks: 0,
-              training_completed: [],
-              certifications: []
+              weekly_hours: staffData.weekly_hours,
+              shift_preference: staffData.shift_preference,
+              available_days: staffData.available_days,
+              permissions: []
             };
-            state.staff.push(newStaff);
-          });
-          get().refreshStats();
+
+            const newEmployee = await staffApi.createEmployee(employeeData);
+            const newStaffMember = employeeToStaffMember(newEmployee);
+
+            set((state) => {
+              state.staff.push(newStaffMember);
+              state.loading = false;
+            });
+
+            get().refreshStats();
+            
+            notify.success({
+              title: 'Staff Member Added',
+              description: `${newStaffMember.name} has been added to the team`
+            });
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to add staff member';
+            set((state) => {
+              state.loading = false;
+              state.error = errorMessage;
+            });
+            
+            notify.error({
+              title: 'Error Adding Staff Member',
+              description: errorMessage
+            });
+          }
         },
 
-        updateStaffMember: (id, updates) => {
-          set((state) => {
-            const staffIndex = state.staff.findIndex(staff => staff.id === id);
-            if (staffIndex >= 0) {
-              state.staff[staffIndex] = {
-                ...state.staff[staffIndex],
-                ...updates,
-                updated_at: new Date().toISOString()
-              };
+        updateStaffMember: async (id, updates) => {
+          try {
+            set((state) => {
+              state.loading = true;
+              state.error = null;
+            });
+
+            // Convert updates to Employee format
+            const employeeUpdates: any = {};
+            if (updates.name) {
+              const nameParts = updates.name.split(' ');
+              employeeUpdates.first_name = nameParts[0];
+              employeeUpdates.last_name = nameParts.slice(1).join(' ');
             }
-          });
-          get().refreshStats();
+            if (updates.email) employeeUpdates.email = updates.email;
+            if (updates.phone) employeeUpdates.phone = updates.phone;
+            if (updates.position) employeeUpdates.position = updates.position;
+            if (updates.department) employeeUpdates.department = updates.department;
+            if (updates.hire_date) employeeUpdates.hire_date = updates.hire_date;
+            if (updates.status) employeeUpdates.employment_status = updates.status;
+            if (updates.salary) employeeUpdates.salary = updates.salary;
+            if (updates.avatar) employeeUpdates.avatar_url = updates.avatar;
+            if (updates.notes) employeeUpdates.notes = updates.notes;
+            if (updates.performance_score) employeeUpdates.performance_score = updates.performance_score;
+            if (updates.attendance_rate) employeeUpdates.attendance_rate = updates.attendance_rate;
+            if (updates.completed_tasks) employeeUpdates.completed_tasks = updates.completed_tasks;
+            if (updates.weekly_hours) employeeUpdates.weekly_hours = updates.weekly_hours;
+            if (updates.shift_preference) employeeUpdates.shift_preference = updates.shift_preference;
+            if (updates.available_days) employeeUpdates.available_days = updates.available_days;
+
+            const updatedEmployee = await staffApi.updateEmployee(id, employeeUpdates);
+            const updatedStaffMember = employeeToStaffMember(updatedEmployee);
+
+            set((state) => {
+              const staffIndex = state.staff.findIndex(staff => staff.id === id);
+              if (staffIndex >= 0) {
+                state.staff[staffIndex] = updatedStaffMember;
+              }
+              state.loading = false;
+            });
+
+            get().refreshStats();
+            
+            notify.success({
+              title: 'Staff Member Updated',
+              description: `${updatedStaffMember.name} has been updated`
+            });
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update staff member';
+            set((state) => {
+              state.loading = false;
+              state.error = errorMessage;
+            });
+            
+            notify.error({
+              title: 'Error Updating Staff Member',
+              description: errorMessage
+            });
+          }
         },
 
-        deleteStaffMember: (id) => {
-          set((state) => {
-            state.staff = state.staff.filter(staff => staff.id !== id);
-            state.selectedStaff = state.selectedStaff.filter(selectedId => selectedId !== id);
-            // Also remove related schedules and time entries
-            state.schedules = state.schedules.filter(schedule => schedule.staff_id !== id);
-            state.timeEntries = state.timeEntries.filter(entry => entry.staff_id !== id);
-          });
-          get().refreshStats();
+        deleteStaffMember: async (id) => {
+          try {
+            set((state) => {
+              state.loading = true;
+              state.error = null;
+            });
+
+            await staffApi.deleteEmployee(id);
+
+            set((state) => {
+              const staffMember = state.staff.find(s => s.id === id);
+              state.staff = state.staff.filter(staff => staff.id !== id);
+              state.selectedStaff = state.selectedStaff.filter(selectedId => selectedId !== id);
+              // Also remove related schedules and time entries
+              state.schedules = state.schedules.filter(schedule => schedule.staff_id !== id);
+              state.timeEntries = state.timeEntries.filter(entry => entry.staff_id !== id);
+              state.loading = false;
+              
+              if (staffMember) {
+                notify.success({
+                  title: 'Staff Member Removed',
+                  description: `${staffMember.name} has been removed from the team`
+                });
+              }
+            });
+
+            get().refreshStats();
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete staff member';
+            set((state) => {
+              state.loading = false;
+              state.error = errorMessage;
+            });
+            
+            notify.error({
+              title: 'Error Removing Staff Member',
+              description: errorMessage
+            });
+          }
         },
 
         // Schedule management

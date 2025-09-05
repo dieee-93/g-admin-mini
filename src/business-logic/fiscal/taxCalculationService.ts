@@ -3,7 +3,7 @@
 
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
-import Decimal from '@/config/decimal-config';
+import { TaxDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 
 // ============================================================================
 // TAX RATES AND CONSTANTS
@@ -108,9 +108,9 @@ class TaxCalculationService {
   calculateTaxesForAmount(amount: number, config?: Partial<TaxConfiguration>): TaxCalculationResult {
     const effectiveConfig = { ...this.config, ...config };
     
-    const amountDec = new Decimal(amount);
-    const ivaRateDec = new Decimal(effectiveConfig.ivaRate);
-    const ingresosBrutosRateDec = new Decimal(effectiveConfig.includeIngresosBrutos ? effectiveConfig.ingresosBrutosRate || 0 : 0);
+    const amountDec = new TaxDecimal(amount);
+    const ivaRateDec = new TaxDecimal(effectiveConfig.ivaRate);
+    const ingresosBrutosRateDec = new TaxDecimal(effectiveConfig.includeIngresosBrutos ? effectiveConfig.ingresosBrutosRate || 0 : 0);
 
     let subtotalDec: Decimal;
     let ivaAmountDec: Decimal;
@@ -120,7 +120,7 @@ class TaxCalculationService {
       // Argentine system: prices include taxes
       const totalRateDec = ivaRateDec.plus(ingresosBrutosRateDec);
       
-      subtotalDec = amountDec.dividedBy(new Decimal(1).plus(totalRateDec));
+      subtotalDec = amountDec.dividedBy(DECIMAL_CONSTANTS.ONE.plus(totalRateDec));
       ivaAmountDec = subtotalDec.times(ivaRateDec);
       ingresosBrutosAmountDec = subtotalDec.times(ingresosBrutosRateDec);
     } else {
@@ -153,7 +153,7 @@ class TaxCalculationService {
         basePrice: subtotal,
         ivaRate: effectiveConfig.ivaRate,
         ingresosBrutosRate: effectiveConfig.ingresosBrutosRate || 0,
-        effectiveTaxRate: subtotal > 0 ? new Decimal(totalTaxes).dividedBy(subtotal).toNumber() : 0,
+        effectiveTaxRate: subtotal > 0 ? new TaxDecimal(totalTaxes).dividedBy(subtotal).toNumber() : 0,
       }
     };
   }
@@ -164,12 +164,12 @@ class TaxCalculationService {
   calculateTaxesForItems(items: SaleItem[], config?: Partial<TaxConfiguration>): TaxCalculationResult {
     const effectiveConfig = { ...this.config, ...config };
     
-    let totalSubtotalDec = new Decimal(0);
-    let totalIvaAmountDec = new Decimal(0);
-    let totalIngresosBrutosAmountDec = new Decimal(0);
+    let totalSubtotalDec = DECIMAL_CONSTANTS.ZERO;
+    let totalIvaAmountDec = DECIMAL_CONSTANTS.ZERO;
+    let totalIngresosBrutosAmountDec = DECIMAL_CONSTANTS.ZERO;
 
     for (const item of items) {
-      const itemTotalDec = new Decimal(item.quantity).times(item.unitPrice);
+      const itemTotalDec = new TaxDecimal(item.quantity).times(item.unitPrice);
       
       // Get IVA rate based on item category
       let itemIvaRate = effectiveConfig.ivaRate;
@@ -211,7 +211,7 @@ class TaxCalculationService {
         basePrice: totalSubtotal,
         ivaRate: effectiveConfig.ivaRate,
         ingresosBrutosRate: effectiveConfig.ingresosBrutosRate || 0,
-        effectiveTaxRate: totalSubtotal > 0 ? new Decimal(totalTaxes).dividedBy(totalSubtotal).toNumber() : 0,
+        effectiveTaxRate: totalSubtotal > 0 ? new TaxDecimal(totalTaxes).dividedBy(totalSubtotal).toNumber() : 0,
       }
     };
   }
@@ -229,12 +229,12 @@ class TaxCalculationService {
     }
 
     // For tax-included prices, reverse the calculation
-    const finalAmountDec = new Decimal(finalAmount);
-    const ivaRateDec = new Decimal(effectiveConfig.ivaRate);
-    const ingresosBrutosRateDec = new Decimal(effectiveConfig.includeIngresosBrutos ? effectiveConfig.ingresosBrutosRate || 0 : 0);
+    const finalAmountDec = new TaxDecimal(finalAmount);
+    const ivaRateDec = new TaxDecimal(effectiveConfig.ivaRate);
+    const ingresosBrutosRateDec = new TaxDecimal(effectiveConfig.includeIngresosBrutos ? effectiveConfig.ingresosBrutosRate || 0 : 0);
     const totalTaxRateDec = ivaRateDec.plus(ingresosBrutosRateDec);
     
-    const subtotalDec = finalAmountDec.dividedBy(new Decimal(1).plus(totalTaxRateDec));
+    const subtotalDec = finalAmountDec.dividedBy(DECIMAL_CONSTANTS.ONE.plus(totalTaxRateDec));
     const ivaAmountDec = subtotalDec.times(ivaRateDec);
     const ingresosBrutosAmountDec = subtotalDec.times(ingresosBrutosRateDec);
 
@@ -242,7 +242,7 @@ class TaxCalculationService {
     const ivaAmount = effectiveConfig.roundTaxes ? ivaAmountDec.toDecimalPlaces(2).toNumber() : ivaAmountDec.toNumber();
     const ingresosBrutosAmount = effectiveConfig.roundTaxes ? ingresosBrutosAmountDec.toDecimalPlaces(2).toNumber() : ingresosBrutosAmountDec.toNumber();
     
-    const totalTaxes = new Decimal(ivaAmount).plus(ingresosBrutosAmount).toNumber();
+    const totalTaxes = new TaxDecimal(ivaAmount).plus(ingresosBrutosAmount).toNumber();
 
     return {
       subtotal,
@@ -290,10 +290,10 @@ class TaxCalculationService {
     averageTaxRate: number;
     salesCount: number;
   } {
-    let totalSalesDec = new Decimal(0);
-    let totalSubtotalDec = new Decimal(0);
-    let totalIVADec = new Decimal(0);
-    let totalIngresosBrutosDec = new Decimal(0);
+    let totalSalesDec = DECIMAL_CONSTANTS.ZERO;
+    let totalSubtotalDec = DECIMAL_CONSTANTS.ZERO;
+    let totalIVADec = DECIMAL_CONSTANTS.ZERO;
+    let totalIngresosBrutosDec = DECIMAL_CONSTANTS.ZERO;
 
     for (const sale of salesData) {
       const calculation = this.calculateTaxesForItems(sale.items);

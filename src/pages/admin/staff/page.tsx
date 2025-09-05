@@ -1,6 +1,6 @@
 // Staff Management Module - Main Page with UNIFIED navigation pattern
 import { useState, useEffect } from 'react';
-import { Box, VStack, HStack, Text, Tabs, Badge, CardWrapper, SimpleGrid } from '@chakra-ui/react';
+import { Box, VStack, HStack, Text, Badge, SimpleGrid, CardWrapper, Tabs } from '@/shared/ui';
 import { 
   UsersIcon, 
   ChartBarIcon, 
@@ -13,7 +13,8 @@ import {
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
-import type { StaffViewState, StaffStats } from './types';
+import { useStaffWithLoader } from '@/hooks/useStaffData';
+import type { StaffViewState } from './types';
 
 // Import tab sections
 import { DirectorySection } from './components/sections/DirectorySection';
@@ -24,6 +25,7 @@ import { TimeTrackingSection } from './components/sections/TimeTrackingSection';
 
 export default function StaffPage() {
   const { setQuickActions } = useNavigation();
+  const { staff, loading, error, isReady, getStaffStats } = useStaffWithLoader();
   const [viewState, setViewState] = useState<StaffViewState>({
     activeTab: 'directory',
     filters: {},
@@ -31,17 +33,8 @@ export default function StaffPage() {
     viewMode: 'grid'
   });
 
-  // Mock staff stats - will be replaced with API call
-  const [staffStats] = useState<StaffStats>({
-    total_employees: 24,
-    active_employees: 22,
-    on_shift: 8,
-    avg_performance: 87.5,
-    pending_reviews: 3,
-    training_due: 5,
-    new_hires_this_month: 2,
-    turnover_rate: 8.3
-  });
+  // Get real staff stats from store
+  const staffStats = getStaffStats();
 
   useEffect(() => {
     // Set context-aware quick actions based on active tab
@@ -149,8 +142,8 @@ export default function StaffPage() {
     <Box p="6" maxW="container.xl" mx="auto">
       <VStack gap="6" align="stretch">
         {/* UNIFIED PATTERN: Header with icon, badges, KPIs */}
-        <Card.Root>
-          <Card.Body>
+        <CardWrapper variant="elevated" padding="md">
+          <CardWrapper.Body>
             <HStack gap="4">
               <Box p="2" bg="blue.100" borderRadius="md">
                 <UserGroupIcon className="w-8 h-8 text-blue-600" />
@@ -164,7 +157,7 @@ export default function StaffPage() {
                     Security Compliant
                   </Badge>
                   <Badge colorPalette="green" variant="subtle">
-                    {staffStats.active_employees} Activos
+                    {staffStats.activeStaff} Activos
                   </Badge>
                 </HStack>
                 <Text color="gray.600">
@@ -175,44 +168,44 @@ export default function StaffPage() {
 
             {/* KPI Cards - Mobile responsive */}
             <SimpleGrid columns={{ base: 2, md: 4 }} gap="4" mt="6">
-              <Card.Root size="sm">
-                <Card.Body textAlign="center">
+              <CardWrapper variant="flat" padding="sm">
+                <CardWrapper.Body textAlign="center">
                   <UsersIcon className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                  <Text fontSize="2xl" fontWeight="bold">{staffStats.total_employees}</Text>
+                  <Text fontSize="2xl" fontWeight="bold">{staffStats.totalStaff}</Text>
                   <Text fontSize="sm" color="gray.600">Total Empleados</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
 
-              <Card.Root size="sm">
-                <Card.Body textAlign="center">
+              <CardWrapper variant="flat" padding="sm">
+                <CardWrapper.Body textAlign="center">
                   <ClockIcon className="w-6 h-6 text-green-500 mx-auto mb-2" />
-                  <Text fontSize="2xl" fontWeight="bold">{staffStats.on_shift}</Text>
+                  <Text fontSize="2xl" fontWeight="bold">{staff.filter(s => s.status === 'active').length}</Text>
                   <Text fontSize="sm" color="gray.600">En Turno</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
 
-              <Card.Root size="sm">
-                <Card.Body textAlign="center">
+              <CardWrapper variant="flat" padding="sm">
+                <CardWrapper.Body textAlign="center">
                   <TrophyIcon className="w-6 h-6 text-purple-500 mx-auto mb-2" />
-                  <Text fontSize="2xl" fontWeight="bold">{staffStats.avg_performance}%</Text>
+                  <Text fontSize="2xl" fontWeight="bold">{staffStats.avgPerformance}%</Text>
                   <Text fontSize="sm" color="gray.600">Rendimiento Prom.</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
 
-              <Card.Root size="sm">
-                <Card.Body textAlign="center">
+              <CardWrapper variant="flat" padding="sm">
+                <CardWrapper.Body textAlign="center">
                   <AcademicCapIcon className="w-6 h-6 text-orange-500 mx-auto mb-2" />
-                  <Text fontSize="2xl" fontWeight="bold">{staffStats.training_due}</Text>
-                  <Text fontSize="sm" color="gray.600">Entrenamientos Pendientes</Text>
-                </Card.Body>
-              </Card.Root>
+                  <Text fontSize="2xl" fontWeight="bold">{staffStats.upcomingReviews.length}</Text>
+                  <Text fontSize="sm" color="gray.600">Evaluaciones Pendientes</Text>
+                </CardWrapper.Body>
+              </CardWrapper>
             </SimpleGrid>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
         {/* UNIFIED PATTERN: 5-Tab Structure with Time Tracking */}
-        <Card.Root>
-          <Card.Body p="0">
+        <CardWrapper variant="elevated" padding="none">
+          <CardWrapper.Body>
             <Tabs.Root 
               value={viewState.activeTab} 
               onValueChange={(details) => 
@@ -241,7 +234,7 @@ export default function StaffPage() {
                   <ClockIcon className="w-5 h-5" />
                   <Text display={{ base: "none", sm: "block" }}>Tiempo</Text>
                   <Badge colorPalette="blue" variant="solid" size="xs">
-                    {staffStats.on_shift}
+                    {staff.filter(s => s.status === 'active').length}
                   </Badge>
                 </Tabs.Trigger>
                 
@@ -254,9 +247,9 @@ export default function StaffPage() {
                 >
                   <ChartBarIcon className="w-5 h-5" />
                   <Text display={{ base: "none", sm: "block" }}>Rendimiento</Text>
-                  {staffStats.pending_reviews > 0 && (
+                  {staffStats.upcomingReviews.length > 0 && (
                     <Badge colorPalette="red" variant="solid" size="xs">
-                      {staffStats.pending_reviews}
+                      {staffStats.upcomingReviews.length}
                     </Badge>
                   )}
                 </Tabs.Trigger>
@@ -270,9 +263,9 @@ export default function StaffPage() {
                 >
                   <AcademicCapIcon className="w-5 h-5" />
                   <Text display={{ base: "none", sm: "block" }}>Entrenamiento</Text>
-                  {staffStats.training_due > 0 && (
+                  {staff.filter(s => s.training_completed.length === 0).length > 0 && (
                     <Badge colorPalette="orange" variant="solid" size="xs">
-                      {staffStats.training_due}
+                      {staff.filter(s => s.training_completed.length === 0).length}
                     </Badge>
                   )}
                 </Tabs.Trigger>
@@ -311,8 +304,8 @@ export default function StaffPage() {
                 </Tabs.Content>
               </Box>
             </Tabs.Root>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       </VStack>
     </Box>
   );

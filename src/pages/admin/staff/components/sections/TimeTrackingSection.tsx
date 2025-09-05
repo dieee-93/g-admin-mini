@@ -174,8 +174,10 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
   useEffect(() => {
     loadTimeTrackingData();
     loadOfflineOperations();
-    setupTimeTrackingEventListeners();
+    const cleanup = setupTimeTrackingEventListeners();
     calculateTimeStats();
+    
+    return cleanup;
   }, [isOnline]);
 
   // Sync progress monitoring

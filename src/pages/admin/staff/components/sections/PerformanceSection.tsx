@@ -1,527 +1,447 @@
-// Staff Performance Section - Metrics and scoring system
-import { useState } from 'react';
+// Staff Performance Section - Real Analytics with Interactive Charts
+import { useState, useEffect } from 'react';
 import { 
   Box, 
   VStack, 
   HStack, 
   Text, 
-  Select, 
   Badge, 
-  Card, 
   SimpleGrid,
-  Progress,
   Button,
   Avatar,
-  Flex,
-  IconButton,
-  Stat,
-  createListCollection
-} from '@chakra-ui/react';
+  CardWrapper,
+  Spinner,
+  Alert,
+  Progress,
+  Tabs,
+  Select
+} from '@/shared/ui';
 import { 
   ChartBarIcon,
   TrophyIcon,
   ClockIcon,
   CheckCircleIcon,
-  ExclamationTriangleIcon,
-  EyeIcon,
-  DocumentTextIcon,
-  PlusIcon,
   ArrowTrendingUpIcon,
-  StarIcon
+  ArrowTrendingDownIcon,
+  StarIcon,
+  UserGroupIcon,
+  CalendarIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
-import type { Employee, StaffViewState, PerformanceMetrics, Goal } from '../../types';
+import { useStaffWithLoader } from '@/hooks/useStaffData';
+import staffApi from '@/services/staff/staffApi';
+import type { StaffViewState } from '../../types';
 
 interface PerformanceSectionProps {
   viewState: StaffViewState;
   onViewStateChange: (state: StaffViewState) => void;
 }
 
-// Mock performance data
-const mockPerformanceData: PerformanceMetrics[] = [
-  {
-    employee_id: 'EMP001',
-    period: 'monthly',
-    score: 95,
-    productivity: 98,
-    quality: 92,
-    attendance: 100,
-    goals_met: 8,
-    total_goals: 10,
-    feedback: 'Excelente liderazgo y gestión del equipo. Superó expectativas en todas las áreas.',
-    created_at: '2024-01-01T00:00:00Z'
-  },
-  {
-    employee_id: 'EMP002',
-    period: 'monthly',
-    score: 88,
-    productivity: 90,
-    quality: 95,
-    attendance: 96,
-    goals_met: 7,
-    total_goals: 9,
-    feedback: 'Consistente en calidad de cocina. Área de mejora: puntualidad.',
-    created_at: '2024-01-01T00:00:00Z'
-  },
-  {
-    employee_id: 'EMP003',
-    period: 'monthly',
-    score: 92,
-    productivity: 94,
-    quality: 88,
-    attendance: 94,
-    goals_met: 6,
-    total_goals: 8,
-    feedback: 'Excelente atención al cliente. Mejorando en upselling.',
-    created_at: '2024-01-01T00:00:00Z'
-  },
-  {
-    employee_id: 'EMP004',
-    period: 'monthly',
-    score: 78,
-    productivity: 75,
-    quality: 80,
-    attendance: 85,
-    goals_met: 4,
-    total_goals: 7,
-    feedback: 'Progreso constante. Necesita foco en tiempo de preparación.',
-    created_at: '2024-01-01T00:00:00Z'
-  }
-];
+// Simple chart components (since we don't have a chart library installed)
+function MiniBarChart({ data, color = 'blue' }: { data: number[], color?: string }) {
+  const max = Math.max(...data);
+  return (
+    <HStack gap="1" align="end" h="40px">
+      {data.map((value, index) => (
+        <Box
+          key={index}
+          w="8px"
+          h={`${(value / max) * 100}%`}
+          bg={`${color}.500`}
+          borderRadius="sm"
+          minH="4px"
+        />
+      ))}
+    </HStack>
+  );
+}
 
-const mockGoals: Goal[] = [
-  {
-    id: '1',
-    employee_id: 'EMP001',
-    title: 'Reducir tiempo promedio de servicio',
-    description: 'Optimizar procesos para reducir tiempo de servicio a 15 minutos',
-    category: 'performance',
-    target_value: 15,
-    current_value: 12,
-    unit: 'minutos',
-    due_date: '2024-02-01',
-    status: 'completed',
-    priority: 'high',
-    created_by: 'HR001',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-15T00:00:00Z'
-  },
-  {
-    id: '2',
-    employee_id: 'EMP002',
-    title: 'Aumentar satisfacción del cliente',
-    category: 'quality',
-    target_value: 95,
-    current_value: 88,
-    unit: '%',
-    due_date: '2024-02-15',
-    status: 'active',
-    priority: 'high',
-    created_by: 'HR001',
-    created_at: '2024-01-05T00:00:00Z',
-    updated_at: '2024-01-08T00:00:00Z'
-  },
-  {
-    id: '3',
-    employee_id: 'EMP003',
-    title: 'Completar certificación de vinos',
-    category: 'skills',
-    target_value: 1,
-    current_value: 0.7,
-    unit: 'certificación',
-    due_date: '2024-03-01',
-    status: 'active',
-    priority: 'medium',
-    created_by: 'HR001',
-    created_at: '2024-01-10T00:00:00Z',
-    updated_at: '2024-01-15T00:00:00Z'
-  }
-];
+function SimpleLineChart({ data, label }: { data: any[], label: string }) {
+  return (
+    <VStack gap="2" align="stretch">
+      <Text fontSize="sm" fontWeight="medium" color="gray.600">{label}</Text>
+      <Box h="120px" bg="gray.50" borderRadius="md" p="3" position="relative">
+        <HStack justify="space-between" align="end" h="full">
+          {data.slice(-6).map((item, index) => (
+            <VStack key={index} gap="1" align="center" flex="1">
+              <Box
+                w="20px"
+                bg="blue.500"
+                borderRadius="sm"
+                h={`${Math.max(10, item.avgPerformance)}%`}
+              />
+              <Text fontSize="xs" color="gray.600">{item.month}</Text>
+            </VStack>
+          ))}
+        </HStack>
+      </Box>
+    </VStack>
+  );
+}
 
 export function PerformanceSection({ viewState, onViewStateChange }: PerformanceSectionProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState<'weekly' | 'monthly' | 'quarterly'>('monthly');
-  const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
+  const { staff, loading: staffLoading } = useStaffWithLoader();
+  const [loading, setLoading] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState('6');
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  // Analytics data
+  const [departmentPerformance, setDepartmentPerformance] = useState<any[]>([]);
+  const [performanceTrends, setPerformanceTrends] = useState<any[]>([]);
+  const [topPerformers, setTopPerformers] = useState<any[]>([]);
 
-  const getScoreColor = (score: number) => {
-    if (score >= 90) return 'green';
-    if (score >= 80) return 'blue';
-    if (score >= 70) return 'orange';
-    return 'red';
-  };
+  // Load analytics data
+  useEffect(() => {
+    loadAnalytics();
+  }, [selectedPeriod]);
 
-  const getGoalStatusColor = (status: Goal['status']) => {
-    switch (status) {
-      case 'completed': return 'green';
-      case 'active': return 'blue';
-      case 'overdue': return 'red';
-      case 'cancelled': return 'gray';
-      default: return 'gray';
+  const loadAnalytics = async () => {
+    setLoading(true);
+    try {
+      const [deptData, trendData, topData] = await Promise.all([
+        staffApi.getDepartmentPerformance(),
+        staffApi.getPerformanceTrends(parseInt(selectedPeriod)),
+        staffApi.getTopPerformers(5)
+      ]);
+
+      setDepartmentPerformance(deptData);
+      setPerformanceTrends(trendData);
+      setTopPerformers(topData);
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getPriorityColor = (priority: Goal['priority']) => {
-    switch (priority) {
-      case 'high': return 'red';
-      case 'medium': return 'orange';
-      case 'low': return 'green';
-      default: return 'gray';
-    }
+  // Calculate overall metrics
+  const overallMetrics = {
+    avgPerformance: staff.length > 0 
+      ? Math.round(staff.reduce((sum, s) => sum + s.performance_score, 0) / staff.length) 
+      : 0,
+    avgAttendance: staff.length > 0 
+      ? Math.round(staff.reduce((sum, s) => sum + s.attendance_rate, 0) / staff.length) 
+      : 0,
+    topPerformerCount: staff.filter(s => s.performance_score >= 90).length,
+    needsImprovementCount: staff.filter(s => s.performance_score < 75).length
   };
 
-  const calculateGoalProgress = (current: number, target: number) => {
-    return Math.min(Math.round((current / target) * 100), 100);
-  };
-
-  const getTeamAverages = () => {
-    const total = mockPerformanceData.length;
-    const avgScore = mockPerformanceData.reduce((sum, p) => sum + p.score, 0) / total;
-    const avgProductivity = mockPerformanceData.reduce((sum, p) => sum + p.productivity, 0) / total;
-    const avgQuality = mockPerformanceData.reduce((sum, p) => sum + p.quality, 0) / total;
-    const avgAttendance = mockPerformanceData.reduce((sum, p) => sum + p.attendance, 0) / total;
-    
+  // Get performance trend
+  const getPerformanceTrend = (current: number, previous: number) => {
+    const diff = current - previous;
     return {
-      score: Math.round(avgScore),
-      productivity: Math.round(avgProductivity),
-      quality: Math.round(avgQuality),
-      attendance: Math.round(avgAttendance)
+      direction: diff > 0 ? 'up' : diff < 0 ? 'down' : 'stable',
+      value: Math.abs(diff),
+      color: diff > 0 ? 'green' : diff < 0 ? 'red' : 'gray'
     };
   };
 
-  const teamAverages = getTeamAverages();
+  if (staffLoading || loading) {
+    return (
+      <VStack gap="4" py="8">
+        <Spinner size="lg" />
+        <Text>Cargando analytics de rendimiento...</Text>
+      </VStack>
+    );
+  }
 
   return (
     <VStack gap="6" align="stretch">
-      {/* Performance Overview Cards */}
-      <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
-        <Card.Root>
-          <Card.Body textAlign="center">
-            <VStack gap="2">
-              <TrophyIcon className="w-8 h-8 text-yellow-500 mx-auto" />
-              <Text fontSize="2xl" fontWeight="bold">{teamAverages.score}%</Text>
-              <Text fontSize="sm" color="gray.600">Puntuación Promedio</Text>
-              <Badge colorPalette={getScoreColor(teamAverages.score)} size="sm">
-                Excelente
-              </Badge>
-            </VStack>
-          </Card.Body>
-        </Card.Root>
-
-        <Card.Root>
-          <Card.Body textAlign="center">
-            <VStack gap="2">
-              <ArrowTrendingUpIcon className="w-8 h-8 text-blue-500 mx-auto" />
-              <Text fontSize="2xl" fontWeight="bold">{teamAverages.productivity}%</Text>
-              <Text fontSize="sm" color="gray.600">Productividad</Text>
-              <Badge colorPalette="blue" size="sm">+5% vs mes anterior</Badge>
-            </VStack>
-          </Card.Body>
-        </Card.Root>
-
-        <Card.Root>
-          <Card.Body textAlign="center">
-            <VStack gap="2">
-              <StarIcon className="w-8 h-8 text-purple-500 mx-auto" />
-              <Text fontSize="2xl" fontWeight="bold">{teamAverages.quality}%</Text>
-              <Text fontSize="sm" color="gray.600">Calidad</Text>
-              <Badge colorPalette="purple" size="sm">Estable</Badge>
-            </VStack>
-          </Card.Body>
-        </Card.Root>
-
-        <Card.Root>
-          <Card.Body textAlign="center">
-            <VStack gap="2">
-              <ClockIcon className="w-8 h-8 text-green-500 mx-auto" />
-              <Text fontSize="2xl" fontWeight="bold">{teamAverages.attendance}%</Text>
-              <Text fontSize="sm" color="gray.600">Asistencia</Text>
-              <Badge colorPalette="green" size="sm">+2% vs mes anterior</Badge>
-            </VStack>
-          </Card.Body>
-        </Card.Root>
-      </SimpleGrid>
-
-      {/* Period Selector */}
-      <HStack justify="space-between" align="center">
-        <Text fontSize="lg" fontWeight="semibold">Rendimiento del Equipo</Text>
+      {/* Header Controls */}
+      <HStack justify="space-between" align="center" flexWrap="wrap">
+        <Text fontSize="lg" fontWeight="semibold">
+          Analytics de Rendimiento
+        </Text>
         <HStack gap="4">
-          <Select.Root
-            collection={createListCollection({
-              items: [
-                { value: "weekly", label: "Semanal" },
-                { value: "monthly", label: "Mensual" },
-                { value: "quarterly", label: "Trimestral" }
-              ]
-            })}
-            value={[selectedPeriod]}
-            onValueChange={(e) => setSelectedPeriod(e.value[0] as any)}
-            width="150px"
-          >
-            <Select.Trigger>
-              <Select.ValueText />
-            </Select.Trigger>
-            <Select.Content />
-          </Select.Root>
-          <Button
-            size="sm"
-            colorPalette="blue"
-          >
-            <PlusIcon className="w-4 h-4 mr-2" />
-            Nueva Evaluación
+          <HStack gap="2">
+            <Text fontSize="sm" color="gray.600">Período:</Text>
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              className="px-3 py-1 border rounded-md text-sm"
+            >
+              <option value="3">3 meses</option>
+              <option value="6">6 meses</option>
+              <option value="12">12 meses</option>
+            </select>
+          </HStack>
+          <Button size="sm" variant="outline" onClick={loadAnalytics}>
+            Actualizar
           </Button>
         </HStack>
       </HStack>
 
-      {/* Employee Performance Cards */}
-      <SimpleGrid columns={{ base: 1, lg: 2 }} gap="4">
-        {mockPerformanceData.map((performance) => (
-          <Card.Root key={performance.employee_id} size="sm">
-            <Card.Body>
-              <VStack align="stretch" gap="4">
-                {/* Employee Header */}
-                <HStack justify="space-between">
-                  <HStack gap="3">
-                    <Avatar.Root>
-                      <Avatar.Fallback name="Employee"/> 
-                    </Avatar.Root>
-                    <VStack align="start" gap="0">
-                      <Text fontWeight="semibold">
-                        Empleado {performance.employee_id}
-                      </Text>
-                      <Text fontSize="sm" color="gray.600">
-                        Evaluación {selectedPeriod}
-                      </Text>
-                    </VStack>
-                  </HStack>
-                  <VStack align="end" gap="0">
-                    <Text fontSize="2xl" fontWeight="bold" color={`${getScoreColor(performance.score)}.500`}>
-                      {performance.score}%
-                    </Text>
-                    <Badge colorPalette={getScoreColor(performance.score)} size="sm">
-                      {performance.score >= 90 ? 'Excelente' : 
-                       performance.score >= 80 ? 'Bueno' :
-                       performance.score >= 70 ? 'Regular' : 'Necesita mejora'}
-                    </Badge>
-                  </VStack>
-                </HStack>
-
-                {/* Performance Metrics */}
-                <VStack gap="3" align="stretch">
-                  <HStack justify="space-between">
-                    <Text fontSize="sm">Productividad</Text>
-                    <Text fontSize="sm" fontWeight="medium">{performance.productivity}%</Text>
-                  </HStack>
-                  <Progress.Root 
-                    value={performance.productivity} 
-                    colorPalette={getScoreColor(performance.productivity)}
-                    size="sm"
-                  >
-                    <Progress.Track>
-                      <Progress.Range />
-                    </Progress.Track>
-                  </Progress.Root>
-
-                  <HStack justify="space-between">
-                    <Text fontSize="sm">Calidad</Text>
-                    <Text fontSize="sm" fontWeight="medium">{performance.quality}%</Text>
-                  </HStack>
-                  <Progress.Root 
-                    value={performance.quality} 
-                    colorPalette={getScoreColor(performance.quality)}
-                    size="sm"
-                  >
-                    <Progress.Track>
-                      <Progress.Range />
-                    </Progress.Track>
-                  </Progress.Root>
-
-                  <HStack justify="space-between">
-                    <Text fontSize="sm">Asistencia</Text>
-                    <Text fontSize="sm" fontWeight="medium">{performance.attendance}%</Text>
-                  </HStack>
-                  <Progress.Root 
-                    value={performance.attendance} 
-                    colorPalette={getScoreColor(performance.attendance)}
-                    size="sm"
-                  >
-                    <Progress.Track>
-                      <Progress.Range />
-                    </Progress.Track>
-                  </Progress.Root>
-                </VStack>
-
-                {/* Goals Progress */}
-                <HStack justify="space-between" align="center">
-                  <HStack gap="2">
-                    <CheckCircleIcon className="w-4 h-4 text-gray-500" />
-                    <Text fontSize="sm" color="gray.600">
-                      Objetivos: {performance.goals_met}/{performance.total_goals}
-                    </Text>
-                  </HStack>
-                  <Text fontSize="sm" fontWeight="medium">
-                    {Math.round((performance.goals_met / performance.total_goals) * 100)}%
-                  </Text>
-                </HStack>
-                <Progress.Root 
-                  value={(performance.goals_met / performance.total_goals) * 100}
-                  colorPalette="blue"
-                  size="sm"
-                >
-                  <Progress.Track>
-                    <Progress.Range />
-                  </Progress.Track>
-                </Progress.Root>
-
-                {/* Feedback */}
-                {performance.feedback && (
-                  <Box bg="bg.canvas" p="3" borderRadius="md">
-                    <HStack gap="2" mb="2">
-                      <DocumentTextIcon className="w-4 h-4 text-gray-500" />
-                      <Text fontSize="sm" fontWeight="medium" color="gray.700">
-                        Feedback
-                      </Text>
-                    </HStack>
-                    <Text fontSize="sm" color="gray.600">
-                      {performance.feedback}
-                    </Text>
-                  </Box>
+      {/* Overall KPI Cards */}
+      <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
+        <CardWrapper variant="flat" padding="md">
+          <CardWrapper.Body textAlign="center">
+            <TrophyIcon className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
+            <Text fontSize="2xl" fontWeight="bold">{overallMetrics.avgPerformance}%</Text>
+            <Text fontSize="sm" color="gray.600">Rendimiento Promedio</Text>
+            {performanceTrends.length > 1 && (
+              <HStack gap="1" justify="center" mt="1">
+                {getPerformanceTrend(
+                  performanceTrends[performanceTrends.length - 1]?.avgPerformance || 0,
+                  performanceTrends[performanceTrends.length - 2]?.avgPerformance || 0
+                ).direction === 'up' ? (
+                  <ArrowTrendingUpIcon className="w-3 h-3 text-green-500" />
+                ) : (
+                  <ArrowTrendingDownIcon className="w-3 h-3 text-red-500" />
                 )}
+                <Text fontSize="xs" color="gray.500">vs mes anterior</Text>
+              </HStack>
+            )}
+          </CardWrapper.Body>
+        </CardWrapper>
 
-                {/* Actions */}
-                <HStack gap="2" justify="space-between">
-                  <Button size="sm" variant="outline" flex="1">
-                    <EyeIcon className="w-4 h-4 mr-2" />
-                    Ver Detalles
-                  </Button>
-                  <Button size="sm" variant="outline" flex="1">
-                    <DocumentTextIcon className="w-4 h-4 mr-2" />
-                    Nueva Evaluación
-                  </Button>
-                </HStack>
-              </VStack>
-            </Card.Body>
-          </Card.Root>
-        ))}
+        <CardWrapper variant="flat" padding="md">
+          <CardWrapper.Body textAlign="center">
+            <ClockIcon className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+            <Text fontSize="2xl" fontWeight="bold">{overallMetrics.avgAttendance}%</Text>
+            <Text fontSize="sm" color="gray.600">Asistencia Promedio</Text>
+          </CardWrapper.Body>
+        </CardWrapper>
+
+        <CardWrapper variant="flat" padding="md">
+          <CardWrapper.Body textAlign="center">
+            <StarIcon className="w-6 h-6 text-purple-500 mx-auto mb-2" />
+            <Text fontSize="2xl" fontWeight="bold">{overallMetrics.topPerformerCount}</Text>
+            <Text fontSize="sm" color="gray.600">Top Performers</Text>
+            <Text fontSize="xs" color="gray.500">(≥90% rendimiento)</Text>
+          </CardWrapper.Body>
+        </CardWrapper>
+
+        <CardWrapper variant="flat" padding="md">
+          <CardWrapper.Body textAlign="center">
+            <CheckCircleIcon className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+            <Text fontSize="2xl" fontWeight="bold">{overallMetrics.needsImprovementCount}</Text>
+            <Text fontSize="sm" color="gray.600">Necesita Mejora</Text>
+            <Text fontSize="xs" color="gray.500">(&lt;75% rendimiento)</Text>
+          </CardWrapper.Body>
+        </CardWrapper>
       </SimpleGrid>
 
-      {/* Active Goals Section */}
-      <Box>
-        <HStack justify="space-between" align="center" mb="4">
-          <Text fontSize="lg" fontWeight="semibold">Objetivos Activos</Text>
-          <Button
-            size="sm"
-            colorPalette="green"
-          >
-            <PlusIcon className="w-4 h-4 mr-2" />
-            Nuevo Objetivo
-          </Button>
-        </HStack>
+      {/* Analytics Tabs */}
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value || 'overview')}>
+        <Tabs.List>
+          <Tabs.Trigger value="overview">Resumen</Tabs.Trigger>
+          <Tabs.Trigger value="departments">Departamentos</Tabs.Trigger>
+          <Tabs.Trigger value="trends">Tendencias</Tabs.Trigger>
+          <Tabs.Trigger value="top-performers">Top Performers</Tabs.Trigger>
+        </Tabs.List>
 
-        <VStack gap="3" align="stretch">
-          {mockGoals
-            .filter(goal => goal.status !== 'cancelled')
-            .map((goal) => (
-            <Card.Root key={goal.id} size="sm">
-              <Card.Body>
-                <VStack align="stretch" gap="3">
-                  <HStack justify="space-between" align="start">
-                    <VStack align="start" gap="1" flex="1">
-                      <HStack gap="2">
-                        <Text fontWeight="semibold">{goal.title}</Text>
-                        <Badge colorPalette={getPriorityColor(goal.priority)} size="xs">
-                          {goal.priority}
-                        </Badge>
-                      </HStack>
-                      {goal.description && (
-                        <Text fontSize="sm" color="gray.600">
-                          {goal.description}
-                        </Text>
-                      )}
-                      <HStack gap="4" fontSize="sm" color="gray.500">
-                        <Text>Empleado: {goal.employee_id}</Text>
-                        <Text>Vence: {new Date(goal.due_date).toLocaleDateString()}</Text>
-                      </HStack>
-                    </VStack>
-                    
-                    <VStack align="end" gap="1">
-                      <Badge colorPalette={getGoalStatusColor(goal.status)} size="sm">
-                        {goal.status === 'completed' ? 'Completado' :
-                         goal.status === 'active' ? 'Activo' :
-                         goal.status === 'overdue' ? 'Vencido' : 'Cancelado'}
-                      </Badge>
-                      {goal.status === 'completed' && (
-                        <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                      )}
-                      {goal.status === 'overdue' && (
-                        <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />
-                      )}
-                    </VStack>
+        <Tabs.Content value="overview">
+          <VStack gap="6" align="stretch">
+            {/* Performance Trends Chart */}
+            <CardWrapper variant="elevated" padding="md">
+              <CardWrapper.Body>
+                <SimpleLineChart data={performanceTrends} label="Tendencia de Rendimiento" />
+              </CardWrapper.Body>
+            </CardWrapper>
+
+            {/* Recent Performance Summary */}
+            <CardWrapper variant="elevated" padding="md">
+              <CardWrapper.Body>
+                <Text fontSize="lg" fontWeight="semibold" mb="4">Empleados por Rango de Rendimiento</Text>
+                <VStack gap="3" align="stretch">
+                  <HStack justify="space-between" align="center">
+                    <HStack gap="2">
+                      <Box w="3" h="3" bg="green.500" borderRadius="full" />
+                      <Text>Excelente (90-100%)</Text>
+                    </HStack>
+                    <HStack gap="2">
+                      <Text fontWeight="medium">{staff.filter(s => s.performance_score >= 90).length}</Text>
+                      <Progress 
+                        value={(staff.filter(s => s.performance_score >= 90).length / staff.length) * 100}
+                        size="sm"
+                        w="100px"
+                        colorPalette="green"
+                      />
+                    </HStack>
                   </HStack>
 
-                  {/* Goal Progress */}
-                  <Box>
-                    <HStack justify="space-between" mb="1">
-                      <Text fontSize="sm">Progreso</Text>
-                      <Text fontSize="sm" fontWeight="medium">
-                        {goal.current_value} / {goal.target_value} {goal.unit}
-                      </Text>
+                  <HStack justify="space-between" align="center">
+                    <HStack gap="2">
+                      <Box w="3" h="3" bg="blue.500" borderRadius="full" />
+                      <Text>Bueno (75-89%)</Text>
                     </HStack>
-                    <Progress.Root 
-                      value={calculateGoalProgress(goal.current_value, goal.target_value)}
-                      colorPalette={
-                        goal.status === 'completed' ? 'green' :
-                        calculateGoalProgress(goal.current_value, goal.target_value) > 75 ? 'blue' :
-                        calculateGoalProgress(goal.current_value, goal.target_value) > 50 ? 'orange' : 'red'
-                      }
-                      size="sm"
-                    >
-                      <Progress.Track>
-                        <Progress.Range />
-                      </Progress.Track>
-                    </Progress.Root>
-                    <Text fontSize="xs" color="gray.500" mt="1">
-                      {calculateGoalProgress(goal.current_value, goal.target_value)}% completado
-                    </Text>
-                  </Box>
-                </VStack>
-              </Card.Body>
-            </Card.Root>
-          ))}
-        </VStack>
-      </Box>
+                    <HStack gap="2">
+                      <Text fontWeight="medium">{staff.filter(s => s.performance_score >= 75 && s.performance_score < 90).length}</Text>
+                      <Progress 
+                        value={(staff.filter(s => s.performance_score >= 75 && s.performance_score < 90).length / staff.length) * 100}
+                        size="sm"
+                        w="100px"
+                        colorPalette="blue"
+                      />
+                    </HStack>
+                  </HStack>
 
-      {/* Performance Insights */}
-      <Card.Root>
-        <Card.Body>
-          <VStack align="stretch" gap="4">
-            <Text fontSize="lg" fontWeight="semibold">Insights de Rendimiento</Text>
-            
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-              <Box>
-                <HStack gap="2" mb="2">
-                  <ArrowTrendingUpIcon className="w-5 h-5 text-green-500" />
-                  <Text fontWeight="medium" color="green.600">Tendencias Positivas</Text>
-                </HStack>
-                <VStack align="start" gap="1" pl="7">
-                  <Text fontSize="sm">• Productividad aumentó 5% este mes</Text>
-                  <Text fontSize="sm">• 3 empleados superaron sus objetivos</Text>
-                  <Text fontSize="sm">• Asistencia mejoró en todos los departamentos</Text>
+                  <HStack justify="space-between" align="center">
+                    <HStack gap="2">
+                      <Box w="3" h="3" bg="orange.500" borderRadius="full" />
+                      <Text>Necesita Mejora (&lt;75%)</Text>
+                    </HStack>
+                    <HStack gap="2">
+                      <Text fontWeight="medium">{staff.filter(s => s.performance_score < 75).length}</Text>
+                      <Progress 
+                        value={(staff.filter(s => s.performance_score < 75).length / staff.length) * 100}
+                        size="sm"
+                        w="100px"
+                        colorPalette="orange"
+                      />
+                    </HStack>
+                  </HStack>
                 </VStack>
-              </Box>
-
-              <Box>
-                <HStack gap="2" mb="2">
-                  <ExclamationTriangleIcon className="w-5 h-5 text-orange-500" />
-                  <Text fontWeight="medium" color="orange.600">Áreas de Mejora</Text>
-                </HStack>
-                <VStack align="start" gap="1" pl="7">
-                  <Text fontSize="sm">• 2 empleados necesitan entrenamiento adicional</Text>
-                  <Text fontSize="sm">• Tiempo de servicio puede optimizarse</Text>
-                  <Text fontSize="sm">• 5 objetivos próximos a vencer</Text>
-                </VStack>
-              </Box>
-            </SimpleGrid>
+              </CardWrapper.Body>
+            </CardWrapper>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </Tabs.Content>
+
+        <Tabs.Content value="departments">
+          <CardWrapper variant="elevated" padding="md">
+            <CardWrapper.Body>
+              <Text fontSize="lg" fontWeight="semibold" mb="4">Rendimiento por Departamento</Text>
+              <VStack gap="4" align="stretch">
+                {departmentPerformance.map((dept, index) => (
+                  <CardWrapper key={index} variant="flat" padding="sm">
+                    <CardWrapper.Body>
+                      <HStack justify="space-between" align="center">
+                        <VStack align="start" gap="1">
+                          <Text fontWeight="medium" textTransform="capitalize">{dept.department}</Text>
+                          <Text fontSize="sm" color="gray.600">{dept.employees} empleados</Text>
+                        </VStack>
+                        <VStack gap="2" align="end">
+                          <HStack gap="4">
+                            <VStack gap="0" align="center">
+                              <Text fontSize="sm" fontWeight="medium">{dept.avgPerformance}%</Text>
+                              <Text fontSize="xs" color="gray.500">Rendimiento</Text>
+                            </VStack>
+                            <VStack gap="0" align="center">
+                              <Text fontSize="sm" fontWeight="medium">{dept.avgAttendance}%</Text>
+                              <Text fontSize="xs" color="gray.500">Asistencia</Text>
+                            </VStack>
+                            <VStack gap="0" align="center">
+                              <Text fontSize="sm" fontWeight="medium">{dept.efficiency}%</Text>
+                              <Text fontSize="xs" color="gray.500">Eficiencia</Text>
+                            </VStack>
+                          </HStack>
+                          <Progress 
+                            value={dept.efficiency} 
+                            size="sm" 
+                            w="200px"
+                            colorPalette={dept.efficiency >= 85 ? 'green' : dept.efficiency >= 70 ? 'blue' : 'orange'}
+                          />
+                        </VStack>
+                      </HStack>
+                    </CardWrapper.Body>
+                  </CardWrapper>
+                ))}
+              </VStack>
+            </CardWrapper.Body>
+          </CardWrapper>
+        </Tabs.Content>
+
+        <Tabs.Content value="trends">
+          <CardWrapper variant="elevated" padding="md">
+            <CardWrapper.Body>
+              <Text fontSize="lg" fontWeight="semibold" mb="4">Tendencias de Rendimiento</Text>
+              <Box overflowX="auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-2">Mes</th>
+                      <th className="text-left p-2">Rendimiento Promedio</th>
+                      <th className="text-left p-2">Asistencia</th>
+                      <th className="text-left p-2">Empleados</th>
+                      <th className="text-left p-2">Rotación</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {performanceTrends.slice(-6).map((trend, index) => (
+                      <tr key={index} className="border-b hover:bg-gray-50">
+                        <td className="p-2">{trend.month}</td>
+                        <td className="p-2">
+                          <HStack gap="2">
+                            <Text>{trend.avgPerformance}%</Text>
+                            <Progress value={trend.avgPerformance} size="sm" w="60px" />
+                          </HStack>
+                        </td>
+                        <td className="p-2">
+                          <HStack gap="2">
+                            <Text>{trend.avgAttendance}%</Text>
+                            <Progress value={trend.avgAttendance} size="sm" w="60px" />
+                          </HStack>
+                        </td>
+                        <td className="p-2">{trend.employeeCount}</td>
+                        <td className="p-2">{trend.turnoverRate}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Box>
+            </CardWrapper.Body>
+          </CardWrapper>
+        </Tabs.Content>
+
+        <Tabs.Content value="top-performers">
+          <CardWrapper variant="elevated" padding="md">
+            <CardWrapper.Body>
+              <Text fontSize="lg" fontWeight="semibold" mb="4">Top 5 Empleados</Text>
+              <VStack gap="4" align="stretch">
+                {topPerformers.map((performer, index) => (
+                  <CardWrapper key={performer.id} variant="flat" padding="md">
+                    <CardWrapper.Body>
+                      <HStack justify="space-between" align="center">
+                        <HStack gap="3">
+                          <Badge colorPalette={index === 0 ? 'yellow' : index === 1 ? 'gray' : 'orange'} size="lg">
+                            #{performer.rank}
+                          </Badge>
+                          <Avatar name={performer.name} size="md" />
+                          <VStack align="start" gap="1">
+                            <Text fontWeight="semibold">{performer.name}</Text>
+                            <Text fontSize="sm" color="gray.600">{performer.position}</Text>
+                            <Badge size="sm" colorPalette="blue">
+                              {performer.department}
+                            </Badge>
+                          </VStack>
+                        </HStack>
+                        <VStack gap="2" align="end">
+                          <HStack gap="4">
+                            <VStack gap="0" align="center">
+                              <Text fontSize="lg" fontWeight="bold" color="green.600">
+                                {performer.performance_score}%
+                              </Text>
+                              <Text fontSize="xs" color="gray.500">Rendimiento</Text>
+                            </VStack>
+                            <VStack gap="0" align="center">
+                              <Text fontSize="sm" fontWeight="medium">
+                                {performer.attendance_rate}%
+                              </Text>
+                              <Text fontSize="xs" color="gray.500">Asistencia</Text>
+                            </VStack>
+                            <VStack gap="0" align="center">
+                              <Text fontSize="sm" fontWeight="medium">
+                                {performer.tenure_months}m
+                              </Text>
+                              <Text fontSize="xs" color="gray.500">Antigüedad</Text>
+                            </VStack>
+                          </HStack>
+                          <Progress 
+                            value={performer.efficiency} 
+                            size="sm" 
+                            w="150px"
+                            colorPalette="green"
+                          />
+                        </VStack>
+                      </HStack>
+                    </CardWrapper.Body>
+                  </CardWrapper>
+                ))}
+              </VStack>
+            </CardWrapper.Body>
+          </CardWrapper>
+        </Tabs.Content>
+      </Tabs>
     </VStack>
   );
 }

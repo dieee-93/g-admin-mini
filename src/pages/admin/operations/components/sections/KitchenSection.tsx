@@ -34,56 +34,11 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { useOfflineStatus } from '@/lib/offline';
-import { notify } from '@/lib/notifications';
-
-// Kitchen mode configuration
-type KitchenMode = 'auto' | 'online-first' | 'offline-first' | 'offline-only';
-type EffectiveMode = 'online-active' | 'offline-active' | 'hybrid-active' | 'emergency-offline';
-
-interface KitchenConfig {
-  mode: KitchenMode;
-  autoFallback: boolean;
-  emergencyOverride: boolean;
-  showConnectionIndicator: boolean;
-  lastChanged: number;
-  userPreference: string;
-}
-
-const DEFAULT_CONFIG: KitchenConfig = {
-  mode: 'offline-first', // Most reliable default
-  autoFallback: true,
-  emergencyOverride: true,
-  showConnectionIndicator: true,
-  lastChanged: Date.now(),
-  userPreference: 'reliable-offline-first'
-};
-
-const KITCHEN_MODE_DESCRIPTIONS = {
-  'auto': {
-    label: 'Auto (Smart Detection)',
-    description: 'Automatically adapts based on connection quality and workload',
-    icon: BoltIcon,
-    reliability: 'adaptive'
-  },
-  'online-first': {
-    label: 'Online First',
-    description: 'Prioritizes real-time features, falls back to offline when needed',
-    icon: CloudIcon,
-    reliability: 'high-when-connected'
-  },
-  'offline-first': {
-    label: 'Offline First (Recommended)',
-    description: 'Prioritizes reliability, syncs when connection is stable',
-    icon: ShieldCheckIcon,
-    reliability: 'very-high'
-  },
-  'offline-only': {
-    label: 'Offline Only',
-    description: 'Local operations only, no network dependency',
-    icon: ComputerDesktopIcon,
-    reliability: 'maximum'
-  }
-};
+import { 
+  useKitchenConfig,
+  KITCHEN_MODE_DESCRIPTIONS,
+  type EffectiveMode
+} from '../../hooks/useKitchenConfig';
 
 // Fixed Basic Kitchen Implementation - Design System Compliant
 const BasicKitchenDisplay = ({ mode }: { mode: EffectiveMode }) => {
@@ -119,15 +74,8 @@ export function KitchenSection() {
   // Offline status monitoring
   const { isOnline, connectionQuality } = useOfflineStatus();
   
-  // Kitchen configuration state
-  const [config] = useState<KitchenConfig>(() => {
-    try {
-      const saved = localStorage.getItem('kitchen_config');
-      return saved ? { ...DEFAULT_CONFIG, ...JSON.parse(saved) } : DEFAULT_CONFIG;
-    } catch {
-      return DEFAULT_CONFIG;
-    }
-  });
+  // Kitchen configuration state - now using Supabase instead of localStorage
+  const { config, isLoading: configLoading } = useKitchenConfig();
 
   // Emergency override state
   const [emergencyMode, setEmergencyMode] = useState(false);
@@ -174,9 +122,10 @@ export function KitchenSection() {
     };
   }, [config.mode, effectiveMode]);
 
-  // Track mode changes and notify user
+  // Track mode changes and notify user (without sessionStorage dependency)
+  const [previousMode, setPreviousMode] = useState<string | null>(null);
+  
   useEffect(() => {
-    const previousMode = sessionStorage.getItem('last_effective_mode');
     const currentModeStr = effectiveMode;
     
     if (previousMode && previousMode !== currentModeStr) {
@@ -194,8 +143,8 @@ export function KitchenSection() {
       }
     }
     
-    sessionStorage.setItem('last_effective_mode', currentModeStr);
-  }, [effectiveMode, getCurrentModeInfo]);
+    setPreviousMode(currentModeStr);
+  }, [effectiveMode, getCurrentModeInfo, previousMode]);
 
   const currentModeInfo = getCurrentModeInfo();
 
@@ -203,6 +152,19 @@ export function KitchenSection() {
   const renderKitchenComponent = () => {
     return <BasicKitchenDisplay mode={effectiveMode} />;
   };
+
+  // Show loading state while config loads
+  if (configLoading) {
+    return (
+      <CardWrapper variant="elevated" padding="lg">
+        <CardWrapper.Body>
+          <VStack gap="md" align="center">
+            <Typography variant="title">Loading Kitchen Configuration...</Typography>
+          </VStack>
+        </CardWrapper.Body>
+      </CardWrapper>
+    );
+  }
 
   return (
     <VStack gap="md" align="stretch">

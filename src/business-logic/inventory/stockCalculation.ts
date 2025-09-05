@@ -1,5 +1,5 @@
 import { type MaterialItem, isMeasurable, isCountable, isElaborated } from '@/pages/admin/materials/types';
-import Decimal from '@/config/decimal-config';
+import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 
 /**
  * Stock status levels
@@ -33,7 +33,7 @@ export class StockCalculation {
    * Gets critical stock threshold (30% of minimum)
    */
   static getCriticalStock(item: MaterialItem): number {
-    const minStock = new Decimal(this.getMinStock(item));
+    const minStock = new InventoryDecimal(this.getMinStock(item));
     return minStock.times(0.3).ceil().toNumber();
   }
 
@@ -84,8 +84,8 @@ export class StockCalculation {
    * Calculates total value for an item (stock * unit_cost)
    */
   static getTotalValue(item: MaterialItem): number {
-    const stock = new Decimal(item.stock ?? 0);
-    const cost = new Decimal(item.unit_cost ?? 0);
+    const stock = new InventoryDecimal(item.stock ?? 0);
+    const cost = new InventoryDecimal(item.unit_cost ?? 0);
     return stock.times(cost).toNumber();
   }
 
@@ -93,12 +93,12 @@ export class StockCalculation {
    * Calculates suggested reorder quantity
    */
   static getSuggestedReorderQuantity(item: MaterialItem): number {
-    const minStock = new Decimal(this.getMinStock(item));
-    const currentStock = new Decimal(item.stock ?? 0);
+    const minStock = new InventoryDecimal(this.getMinStock(item));
+    const currentStock = new InventoryDecimal(item.stock ?? 0);
     
     // Suggest enough to reach 2x minimum stock
     const targetStock = minStock.times(2);
-    const needed = Decimal.max(0, targetStock.minus(currentStock));
+    const needed = InventoryDecimal.max(DECIMAL_CONSTANTS.ZERO, targetStock.minus(currentStock));
     
     if (needed.isZero()) return 0;
 
@@ -110,7 +110,7 @@ export class StockCalculation {
     
     if (isCountable(item) && item.packaging?.package_size) {
       // Countable with packaging: round to full packages
-      const packageSize = new Decimal(item.packaging.package_size);
+      const packageSize = new InventoryDecimal(item.packaging.package_size);
       if (packageSize.isZero()) return needed.ceil().toNumber();
       return needed.dividedBy(packageSize).ceil().times(packageSize).toNumber();
     }
@@ -203,8 +203,8 @@ export class StockCalculation {
       averageStock: 0
     };
 
-    let totalStockDec = new Decimal(0);
-    let totalValueDec = new Decimal(0);
+    let totalStockDec = new InventoryDecimal(0);
+    let totalValueDec = new InventoryDecimal(0);
 
     items.forEach(item => {
       const status = this.getStockStatus(item);

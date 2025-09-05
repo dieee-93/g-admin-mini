@@ -1,5 +1,5 @@
 import { type ItemFormData, type MeasurableUnit, type PackagingInfo } from '@/pages/admin/materials/types';
-import Decimal from '@/config/decimal-config';
+import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 
 /**
  * Utility functions for material form calculations
@@ -16,8 +16,8 @@ export class FormCalculations {
    * IMPORTANT: Determines if unit_cost represents total cost or unit cost based on context
    */
   static calculateUnitCost(totalCost: number, quantity: number): number {
-    const totalCostDec = new Decimal(totalCost);
-    const quantityDec = new Decimal(quantity);
+    const totalCostDec = new InventoryDecimal(totalCost);
+    const quantityDec = new InventoryDecimal(quantity);
     if (quantityDec.isZero() || quantityDec.isNegative()) return 0;
     return totalCostDec.dividedBy(quantityDec).toNumber();
   }
@@ -27,7 +27,7 @@ export class FormCalculations {
    * unit_cost should represent cost per unit, quantity is the amount purchased
    */
   static calculateTotalCost(unitCost: number, quantity: number): number {
-    return new Decimal(unitCost).times(quantity).toNumber();
+    return new InventoryDecimal(unitCost).times(quantity).toNumber();
   }
   
   /**
@@ -60,25 +60,25 @@ export class FormCalculations {
    * Calculates cost per package
    */
   static calculateCostPerPackage(unitCost: number, packageSize: number): number {
-    return new Decimal(unitCost).times(packageSize).toNumber();
+    return new InventoryDecimal(unitCost).times(packageSize).toNumber();
   }
   
   /**
    * Calculates how many complete packages from total units
    */
   static calculateCompletePackages(totalUnits: number, packageSize: number): number {
-    const packageSizeDec = new Decimal(packageSize);
+    const packageSizeDec = new InventoryDecimal(packageSize);
     if (packageSizeDec.isZero() || packageSizeDec.isNegative()) return 0;
-    return new Decimal(totalUnits).dividedBy(packageSizeDec).floor().toNumber();
+    return new InventoryDecimal(totalUnits).dividedBy(packageSizeDec).floor().toNumber();
   }
   
   /**
    * Calculates remaining loose units after complete packages
    */
   static calculateLooseUnits(totalUnits: number, packageSize: number): number {
-    const packageSizeDec = new Decimal(packageSize);
+    const packageSizeDec = new InventoryDecimal(packageSize);
     if (packageSizeDec.isZero() || packageSizeDec.isNegative()) return totalUnits;
-    return new Decimal(totalUnits).modulo(packageSizeDec).toNumber();
+    return new InventoryDecimal(totalUnits).modulo(packageSizeDec).toNumber();
   }
   
   /**
@@ -113,7 +113,7 @@ export class FormCalculations {
    */
   static convertWeight(amount: number, fromUnit: 'kg' | 'g', toUnit: 'kg' | 'g'): number {
     if (fromUnit === toUnit) return amount;
-    const amountDec = new Decimal(amount);
+    const amountDec = new InventoryDecimal(amount);
     
     if (fromUnit === 'kg' && toUnit === 'g') {
       return amountDec.times(1000).toNumber();
@@ -131,7 +131,7 @@ export class FormCalculations {
    */
   static convertVolume(amount: number, fromUnit: 'l' | 'ml', toUnit: 'l' | 'ml'): number {
     if (fromUnit === toUnit) return amount;
-    const amountDec = new Decimal(amount);
+    const amountDec = new InventoryDecimal(amount);
     
     if (fromUnit === 'l' && toUnit === 'ml') {
       return amountDec.times(1000).toNumber();
@@ -148,7 +148,7 @@ export class FormCalculations {
    * Gets weight conversion display info
    */
   static getWeightConversion(amount: number, unit: 'kg' | 'g') {
-    const unitCost = new Decimal(1); // This should come from formData context
+    const unitCost = new InventoryDecimal(1); // This should come from formData context
     
     if (unit === 'kg') {
       const grams = this.convertWeight(amount, 'kg', 'g');
@@ -171,7 +171,7 @@ export class FormCalculations {
    * Gets volume conversion display info
    */
   static getVolumeConversion(amount: number, unit: 'l' | 'ml') {
-    const unitCost = new Decimal(1); // This should come from formData context
+    const unitCost = new InventoryDecimal(1); // This should come from formData context
     
     if (unit === 'l') {
       const milliliters = this.convertVolume(amount, 'l', 'ml');
@@ -198,7 +198,7 @@ export class FormCalculations {
    * Formats currency with appropriate decimal places
    */
   static formatCurrency(amount: number, decimals: number = 2): string {
-    return new Decimal(amount).toFixed(decimals);
+    return new InventoryDecimal(amount).toFixed(decimals);
   }
   
   /**
@@ -212,7 +212,7 @@ export class FormCalculations {
    * Formats quantity with appropriate decimal places
    */
   static formatQuantity(amount: number, decimals: number = 0): string {
-    return new Decimal(amount).toLocaleString(undefined, { 
+    return new InventoryDecimal(amount).toLocaleString(undefined, { 
       minimumFractionDigits: 0,
       maximumFractionDigits: decimals 
     });

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import Decimal from '@/config/decimal-config';
+import { FinancialDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 
 /**
  * Centralized hook for all cost calculation logic
@@ -48,13 +48,13 @@ export function useCostCalculation() {
    * Core cost calculation logic - centralized from duplicated components
    */
   const calculateCosts = useMemo(() => (input: BaseCostInput, markup_percentage = 80): CostCalculationResult => {
-    const materialsCostDec = new Decimal(input.materials_cost);
-    const batchSizeDec = new Decimal(input.batch_size);
-    const laborHoursDec = new Decimal(input.labor_hours);
-    const laborRateDec = new Decimal(input.labor_rate_per_hour || 15);
-    const equipmentCostDec = new Decimal(input.equipment_cost || 0);
-    const utilityCostDec = new Decimal(input.utility_cost || 0);
-    const facilityCostDec = new Decimal(input.facility_cost || 0);
+    const materialsCostDec = new FinancialDecimal(input.materials_cost);
+    const batchSizeDec = new FinancialDecimal(input.batch_size);
+    const laborHoursDec = new FinancialDecimal(input.labor_hours);
+    const laborRateDec = new FinancialDecimal(input.labor_rate_per_hour || 15);
+    const equipmentCostDec = new FinancialDecimal(input.equipment_cost || 0);
+    const utilityCostDec = new FinancialDecimal(input.utility_cost || 0);
+    const facilityCostDec = new FinancialDecimal(input.facility_cost || 0);
 
     if (batchSizeDec.isZero() || batchSizeDec.isNegative()) {
       // Return a zeroed-out result if batch size is invalid
@@ -73,10 +73,10 @@ export function useCostCalculation() {
     const costPerUnitDec = totalCostDec.dividedBy(batchSizeDec);
     
     // Pricing calculations
-    const markupFactor = new Decimal(1).plus(new Decimal(markup_percentage).dividedBy(100));
+    const markupFactor = new FinancialDecimal(1).plus(new FinancialDecimal(markup_percentage).dividedBy(100));
     const suggestedPriceDec = costPerUnitDec.times(markupFactor);
     
-    let profitMarginDec = new Decimal(0);
+    let profitMarginDec = new FinancialDecimal(0);
     if (suggestedPriceDec.isPositive()) {
       profitMarginDec = suggestedPriceDec.minus(costPerUnitDec).dividedBy(suggestedPriceDec).times(100);
     }
@@ -97,14 +97,14 @@ export function useCostCalculation() {
    * Generate pricing scenarios - centralized from PricingScenarios component
    */
   const generatePricingScenarios = useMemo(() => (cost_per_unit: number, overhead_total: number, batch_size: number): PricingScenario[] => {
-    const costPerUnitDec = new Decimal(cost_per_unit);
-    const overheadTotalDec = new Decimal(overhead_total);
-    const batchSizeDec = new Decimal(batch_size);
+    const costPerUnitDec = new FinancialDecimal(cost_per_unit);
+    const overheadTotalDec = new FinancialDecimal(overhead_total);
+    const batchSizeDec = new FinancialDecimal(batch_size);
 
     const createScenario = (name: string, multiplier: number, margin: number) => {
       const priceDec = costPerUnitDec.times(multiplier);
       const profitPerUnit = priceDec.minus(costPerUnitDec);
-      let unitsToBreakeven = new Decimal(0);
+      let unitsToBreakeven = new FinancialDecimal(0);
       if (profitPerUnit.isPositive()) {
         unitsToBreakeven = overheadTotalDec.dividedBy(profitPerUnit).ceil();
       }
@@ -129,14 +129,14 @@ export function useCostCalculation() {
    * Calculate cost breakdown percentages - centralized logic
    */
   const calculateCostBreakdown = useMemo(() => (calculation: CostCalculationResult, materials_cost: number): CostBreakdown => {
-    const totalCostDec = new Decimal(calculation.total_cost);
+    const totalCostDec = new FinancialDecimal(calculation.total_cost);
     if (totalCostDec.isZero()) {
       return { materials_percentage: 0, labor_percentage: 0, overhead_percentage: 0, profit_percentage: 0 };
     }
     
-    const materialsPercentage = new Decimal(materials_cost).dividedBy(totalCostDec).times(100);
-    const laborPercentage = new Decimal(calculation.labor_cost).dividedBy(totalCostDec).times(100);
-    const overheadPercentage = new Decimal(calculation.overhead_total).dividedBy(totalCostDec).times(100);
+    const materialsPercentage = new FinancialDecimal(materials_cost).dividedBy(totalCostDec).times(100);
+    const laborPercentage = new FinancialDecimal(calculation.labor_cost).dividedBy(totalCostDec).times(100);
+    const overheadPercentage = new FinancialDecimal(calculation.overhead_total).dividedBy(totalCostDec).times(100);
     
     return {
       materials_percentage: materialsPercentage.toDecimalPlaces(2).toNumber(),
@@ -157,22 +157,22 @@ export function useCostCalculation() {
    * Calculate total revenue from sales data - for Menu Engineering
    */
   const calculateTotalRevenue = useMemo(() => (quantity: number, unit_price: number): number => {
-    return new Decimal(quantity).times(unit_price).toNumber();
+    return new FinancialDecimal(quantity).times(unit_price).toNumber();
   }, []);
 
   /**
    * Calculate total cost from quantity and unit cost - for Menu Engineering
    */
   const calculateTotalCost = useMemo(() => (quantity: number, unit_cost: number): number => {
-    return new Decimal(quantity).times(unit_cost).toNumber();
+    return new FinancialDecimal(quantity).times(unit_cost).toNumber();
   }, []);
 
   /**
    * Calculate average price from total revenue and quantity
    */
   const calculateAveragePrice = useMemo(() => (total_revenue: number, quantity: number): number => {
-    const quantityDec = new Decimal(quantity);
-    return quantityDec.isPositive() ? new Decimal(total_revenue).dividedBy(quantityDec).toNumber() : 0;
+    const quantityDec = new FinancialDecimal(quantity);
+    return quantityDec.isPositive() ? new FinancialDecimal(total_revenue).dividedBy(quantityDec).toNumber() : 0;
   }, []);
 
   return {
@@ -196,17 +196,17 @@ export function useMenuEngineeringCalculations() {
    * Calculate product profit from sales data
    */
   const calculateProductProfit = useMemo(() => (total_revenue: number, total_cost: number): number => {
-    return new Decimal(total_revenue).minus(total_cost).toNumber();
+    return new FinancialDecimal(total_revenue).minus(total_cost).toNumber();
   }, []);
 
   /**
    * Calculate profit margin percentage
    */
   const calculateProfitMargin = useMemo(() => (total_revenue: number, total_cost: number): number => {
-    const totalRevenueDec = new Decimal(total_revenue);
+    const totalRevenueDec = new FinancialDecimal(total_revenue);
     if (totalRevenueDec.isZero() || totalRevenueDec.isNegative()) return 0;
     
-    const totalCostDec = new Decimal(total_cost);
+    const totalCostDec = new FinancialDecimal(total_cost);
     const profit = totalRevenueDec.minus(totalCostDec);
     return profit.dividedBy(totalRevenueDec).times(100).toDecimalPlaces(2).toNumber();
   }, []);

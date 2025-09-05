@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 interface DashboardStats {
   totalItems: number;
@@ -56,13 +57,20 @@ export function useDashboardStats() {
         supabase.rpc('get_low_stock_alert', { p_threshold: 10 })
       ]);
 
+      // Calcular valor total del stock con precisión Decimal.js
       const totalStockValue = itemsWithStock.data?.reduce((total, item) => {
-        return total + (item.stock * (item.unit_cost || 0));
-      }, 0) || 0;
+        const stockValue = DecimalUtils.calculateStockValue(
+          item.stock || 0, 
+          item.unit_cost || 0
+        );
+        return DecimalUtils.add(total, stockValue, 'inventory');
+      }, DecimalUtils.fromValue(0, 'inventory')) || DecimalUtils.fromValue(0, 'inventory');
+
+      const totalStockValueNumber = DecimalUtils.toNumber(totalStockValue);
 
       setStats({
         totalItems: itemsCount.count || 0,
-        totalStockValue,
+        totalStockValue: totalStockValueNumber,
         stockEntriesThisMonth: entriesCount.count || 0,
         lowStockItems: alertsData.data?.length || 0, // ✅ Contar alertas
         loading: false,

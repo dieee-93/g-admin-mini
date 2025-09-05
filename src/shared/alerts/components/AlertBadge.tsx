@@ -1,8 +1,8 @@
 // src/shared/alerts/components/AlertBadge.tsx
-// 🎯 COMPONENTE UNIFICADO DE BADGE DE ALERTAS
+// 🎯 COMPONENTE UNIFICADO DE BADGE DE ALERTAS - OPTIMIZED FOR PERFORMANCE
 // Reemplaza AlertsBadge y todas sus variantes
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   HStack,
   Badge,
@@ -28,7 +28,14 @@ export interface AlertBadgeProps extends UseAlertsOptions {
   className?: string;
 }
 
-export function AlertBadge({
+// CSS-in-JS optimized animations - defined once, reused
+const PULSE_ANIMATION_STYLE = {
+  animation: 'pulse 2s infinite'
+} as const;
+
+const EMPTY_STYLE = {} as const;
+
+export const AlertBadge = memo(function AlertBadge({
   variant = 'minimal',
   size = 'sm',
   showIcon = true,
@@ -48,13 +55,8 @@ export function AlertBadge({
     hasCritical
   } = useAlertsBadge(alertOptions);
 
-  // Si no hay alertas, no mostrar nada (a menos que sea explícitamente forzado)
-  if (!shouldShow) {
-    return null;
-  }
-
-  // Determinar el icono a usar
-  const getIcon = () => {
+  // Memoize expensive calculations
+  const icon = useMemo(() => {
     if (hasCritical) {
       return <FireIcon className="w-4 h-4" />;
     }
@@ -62,10 +64,9 @@ export function AlertBadge({
       return <ExclamationTriangleIcon className="w-4 h-4" />;
     }
     return <BellIcon className="w-4 h-4" />;
-  };
+  }, [hasCritical, criticalCount]);
 
-  // Determinar el tamaño del badge
-  const getBadgeSize = () => {
+  const badgeSize = useMemo(() => {
     switch (size) {
       case 'xs': return 'xs';
       case 'sm': return 'sm';
@@ -73,12 +74,18 @@ export function AlertBadge({
       case 'lg': return 'lg';
       default: return 'sm';
     }
-  };
+  }, [size]);
 
-  // Estilos de animación para críticas
-  const pulseAnimation = showAnimation && hasCritical ? {
-    animation: 'pulse 2s infinite'
-  } : {};
+  // Optimized animation style - only recalculate when needed
+  const pulseAnimation = useMemo(() => 
+    showAnimation && hasCritical ? PULSE_ANIMATION_STYLE : EMPTY_STYLE,
+    [showAnimation, hasCritical]
+  );
+
+  // Si no hay alertas, no mostrar nada (a menos que sea explícitamente forzado)
+  if (!shouldShow) {
+    return null;
+  }
 
   // Variant: counter-only
   if (variant === 'counter-only') {
@@ -86,7 +93,7 @@ export function AlertBadge({
       <Badge
         colorPalette={color}
         variant="solid"
-        size={getBadgeSize()}
+        size={badgeSize}
         cursor={onClick ? 'pointer' : 'default'}
         onClick={onClick}
         className={className}
@@ -106,7 +113,7 @@ export function AlertBadge({
         onClick={onClick}
         className={className}
       >
-        {getIcon()}
+        {icon}
         
         {count > 0 && (
           <Badge
@@ -143,14 +150,14 @@ export function AlertBadge({
       >
         {showIcon && (
           <Box color={`${color}.500`}>
-            {getIcon()}
+            {icon}
           </Box>
         )}
         
         <Badge
           colorPalette={color}
           variant="solid"
-          size={getBadgeSize()}
+          size={badgeSize}
           style={pulseAnimation}
         >
           {count}
@@ -179,7 +186,7 @@ export function AlertBadge({
     >
       {showIcon && (
         <Box color={hasCritical ? 'red.500' : activeCount > 0 ? 'orange.500' : 'gray.500'}>
-          {getIcon()}
+          {icon}
         </Box>
       )}
 
@@ -189,8 +196,8 @@ export function AlertBadge({
           <Badge 
             colorPalette="red" 
             variant="solid" 
-            size={getBadgeSize()}
-            style={showAnimation ? { animation: 'pulse 2s infinite' } : {}}
+            size={badgeSize}
+            style={pulseAnimation}
           >
             {criticalCount}
           </Badge>
@@ -198,14 +205,14 @@ export function AlertBadge({
 
         {/* Active alerts (non-critical) */}
         {activeCount - criticalCount > 0 && (
-          <Badge colorPalette="orange" variant="solid" size={getBadgeSize()}>
+          <Badge colorPalette="orange" variant="solid" size={badgeSize}>
             {activeCount - criticalCount}
           </Badge>
         )}
 
         {/* Acknowledged alerts */}
         {count - activeCount > 0 && (
-          <Badge colorPalette="yellow" variant="outline" size={getBadgeSize()}>
+          <Badge colorPalette="yellow" variant="outline" size={badgeSize}>
             {count - activeCount}
           </Badge>
         )}
@@ -218,14 +225,18 @@ export function AlertBadge({
       </HStack>
     </HStack>
   );
-}
+});
 
-// Wrapper components for common use cases
+// Wrapper components for common use cases - Memoized for performance
 
 /**
- * 🎯 Badge para navegación principal
+ * 🎯 Badge para navegación principal - OPTIMIZED
  */
-export function NavAlertBadge({ onClick }: { onClick?: () => void }) {
+export const NavAlertBadge = memo(function NavAlertBadge({ 
+  onClick 
+}: { 
+  onClick?: () => void 
+}) {
   return (
     <AlertBadge 
       variant="icon-only"
@@ -234,12 +245,16 @@ export function NavAlertBadge({ onClick }: { onClick?: () => void }) {
       showAnimation={true}
     />
   );
-}
+});
 
 /**
- * 🎯 Badge para sidebar
+ * 🎯 Badge para sidebar - OPTIMIZED
  */
-export function SidebarAlertBadge({ onClick }: { onClick?: () => void }) {
+export const SidebarAlertBadge = memo(function SidebarAlertBadge({ 
+  onClick 
+}: { 
+  onClick?: () => void 
+}) {
   return (
     <AlertBadge 
       variant="minimal"
@@ -249,12 +264,16 @@ export function SidebarAlertBadge({ onClick }: { onClick?: () => void }) {
       onClick={onClick}
     />
   );
-}
+});
 
 /**
- * 🎯 Badge específico para stock
+ * 🎯 Badge específico para stock - OPTIMIZED
  */
-export function StockAlertBadge({ onClick }: { onClick?: () => void }) {
+export const StockAlertBadge = memo(function StockAlertBadge({ 
+  onClick 
+}: { 
+  onClick?: () => void 
+}) {
   return (
     <AlertBadge 
       variant="detailed"
@@ -264,12 +283,16 @@ export function StockAlertBadge({ onClick }: { onClick?: () => void }) {
       onClick={onClick}
     />
   );
-}
+});
 
 /**
- * 🎯 Badge para alertas críticas solamente
+ * 🎯 Badge para alertas críticas solamente - OPTIMIZED
  */
-export function CriticalAlertBadge({ onClick }: { onClick?: () => void }) {
+export const CriticalAlertBadge = memo(function CriticalAlertBadge({ 
+  onClick 
+}: { 
+  onClick?: () => void 
+}) {
   return (
     <AlertBadge 
       variant="minimal"
@@ -280,7 +303,7 @@ export function CriticalAlertBadge({ onClick }: { onClick?: () => void }) {
       onClick={onClick}
     />
   );
-}
+});
 
 /**
  * 🎯 Skeleton loader para cuando se está cargando
