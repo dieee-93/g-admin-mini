@@ -192,7 +192,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
                 { label: 'Supervisor', value: 'SUPERVISOR' },
                 { label: 'Administrador', value: 'ADMINISTRADOR' }
               ]}
-              helperTypography variant="body"={getRoleDescription(formData.role)}
+              helperText={getRoleDescription(formData.role)}
             />
 
             {/* Password with strict validation */}
@@ -330,7 +330,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
               colorPalette="blue"
               disabled={isLoading || !passwordValidation.isValid || !formData.email || !formData.fullName}
               loading={isLoading}
-              loadingTypography variant="body"="Creando usuario..."
+              loadingText="Creando usuario..."
             >
               <Stack direction="row" gap="sm">
                 <ShieldCheckIcon style={{ width: '16px', height: '16px' }} />

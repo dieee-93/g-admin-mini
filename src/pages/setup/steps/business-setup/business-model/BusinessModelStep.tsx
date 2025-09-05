@@ -234,13 +234,12 @@ export function BusinessModelStep({
       {/* RIGHT COLUMN: PREVIEW & INSIGHTS */}
       <GridItem>
         <BusinessPreviewPanel
-          operationalTier={businessModel.operationalTier}
-          tierColor={businessModel.tierColor}
-          tierDescription={businessModel.tierDescription}
+          archetype={businessModel.archetype}
+          operationalProfile={businessModel.operationalProfile}
           insightMessage={businessModel.insightMessage}
-          mainOffersCount={businessModel.mainOffersCount}
           capabilities={businessModel.capabilities}
           businessStructure={businessModel.businessStructure}
+          completedMilestones={[]}
         />
       </GridItem>
     </Grid>
