@@ -45,13 +45,6 @@ export interface CapabilityDefinition {
   enabledFeatures: string[]; // Lista de features que esta capacidad activa
 }
 
-export type OperationalTier = 
-  | 'Sin Configurar'
-  | 'Base Operativa' 
-  | 'Estructura Funcional'
-  | 'Negocio Integrado' 
-  | 'Sistema Consolidado';
-
 export interface BusinessProfile {
   // Datos básicos
   businessName: string;
@@ -63,7 +56,6 @@ export interface BusinessProfile {
   
   // Sistema de capacidades
   capabilities: BusinessCapabilities;
-  operationalTier: OperationalTier;
   businessStructure: BusinessStructure;
   
   // Metadatos para personalización
@@ -251,7 +243,6 @@ export type BusinessStructure = 'single_location' | 'multi_location' | 'mobile';
 // Tipo para los datos del modelo de negocio completo
 export interface BusinessModelData extends BusinessCapabilities {
   business_structure: BusinessStructure;
-  operationalTier: OperationalTier;
 }
 
 // Capacidades por defecto
@@ -297,56 +288,6 @@ export const validationRules = {
   },
 };
 
-function getMainOffersCount(capabilities: BusinessCapabilities): number {
-  const mainOffers = [
-    capabilities.sells_products_for_onsite_consumption,
-    capabilities.sells_products_for_pickup,
-    capabilities.sells_products_with_delivery,
-    capabilities.sells_digital_products,
-    capabilities.sells_services_by_appointment,
-    capabilities.sells_services_by_class,
-    capabilities.sells_space_by_reservation,
-    capabilities.manages_offsite_catering,
-    capabilities.hosts_private_events,
-    capabilities.manages_rentals,
-    capabilities.manages_memberships,
-    capabilities.manages_subscriptions,
-  ];
-  return mainOffers.filter(Boolean).length;
-}
-
-// Función para calcular tier operativo
-export function calculateOperationalTier(
-  capabilities: BusinessCapabilities,
-  businessStructure: BusinessStructure,
-): OperationalTier {
-  if (
-    businessStructure === 'multi_location' ||
-    getMainOffersCount(capabilities) >= 4 ||
-    (getMainOffersCount(capabilities) >= 3 && capabilities.has_online_store)
-  ) {
-    return 'Sistema Consolidado';
-  }
-
-  if (
-    getMainOffersCount(capabilities) === 3
-  ) {
-    return 'Negocio Integrado';
-  }
-
-  if (
-    getMainOffersCount(capabilities) === 2 ||
-    (getMainOffersCount(capabilities) === 1 && capabilities.has_online_store)
-  ) {
-    return 'Estructura Funcional';
-  }
-
-  if (getMainOffersCount(capabilities) === 1) {
-    return 'Base Operativa';
-  }
-
-  return 'Sin Configurar';
-}
 
 // Función para obtener features habilitadas
 export function getEnabledFeatures(capabilities: BusinessCapabilities): string[] {

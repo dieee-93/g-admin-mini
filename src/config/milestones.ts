@@ -218,3 +218,17 @@ export const MILESTONES: Milestone[] = [
     category: 'Primeros Pasos',
   },
 ];
+
+/**
+ * @const operationalProfileMilestones
+ * Maps an operational profile "planet" to the primary milestone that unlocks it.
+ * This is used by the Business Constellation to determine if a planet is "unlocked".
+ * Note: Not all planets need a milestone. 'Escala Local' is a default state.
+ */
+export const operationalProfileMilestones: { [key: string]: string } = {
+  'E-commerce Asincrónico': 'setup-payment-gateway',
+  'Canal Digital Sincrónico': 'configure-delivery-zones',
+  'Enfoque B2B': 'create-b2b-customer',
+  'Multi-Sucursal': 'setup-pos', // Placeholder: This would ideally be a dedicated "add second location" milestone
+  'Móvil / Nómada': 'enable-pickup', // Placeholder: This would ideally be a dedicated "setup mobile business" milestone
+};
