@@ -16,7 +16,7 @@ import { BusinessConstellation } from './constellation/BusinessConstellation';
 import { operationalProfileMilestones } from '@/config/milestones';
 
 interface BusinessPreviewPanelProps {
-  archetype: string;
+  archetypes: string[];
   operationalProfile: string[];
   insightMessage: string | null;
   completedMilestones: string[];
@@ -31,8 +31,20 @@ const profileIcons = {
   'Escala Local': '🏠',
 };
 
+const formatArchetypesTitle = (archetypes: string[]): string => {
+  if (!archetypes || archetypes.length === 0 || archetypes[0] === 'Negocio') {
+    return 'Define tu Negocio';
+  }
+  if (archetypes.length === 1) {
+    return archetypes[0];
+  }
+  const last = archetypes[archetypes.length - 1];
+  const rest = archetypes.slice(0, -1);
+  return `${rest.join(', ')} y ${last}`;
+};
+
 export function BusinessPreviewPanel({
-  archetype,
+  archetypes,
   operationalProfile,
   insightMessage,
   completedMilestones,
@@ -47,8 +59,8 @@ export function BusinessPreviewPanel({
     };
   });
 
-  const scale = operationalProfile.find(p => p.includes('Escala') || p.includes('Multi') || p.includes('Móvil'));
-  const dynamicTitle = `${archetype} de ${scale || 'Escala Local'}`;
+  const title = formatArchetypesTitle(archetypes);
+  const showHelpBox = archetypes.length === 1 && archetypes[0] === 'Negocio';
 
   return (
     <Stack gap={5} position="sticky" top="24px">
@@ -67,11 +79,11 @@ export function BusinessPreviewPanel({
 
         <VStack p={{ base: 4, md: 6 }} gap={4}>
           <BusinessConstellation
-            archetype={archetype}
+            archetype={archetypes[0]} // Pass the primary archetype for visualization
             operationalProfile={profileWithStatus}
           />
           <VStack textAlign="center" mt={2}>
-            <Heading size="md" color="gray.800">{dynamicTitle}</Heading>
+            <Heading size="md" color="gray.800">{title}</Heading>
             <Text fontSize="sm" color="gray.600" maxW="80%">
               Esta es la constelación que representa tu negocio.
             </Text>
@@ -99,7 +111,7 @@ export function BusinessPreviewPanel({
       )}
 
       {/* Help Box - Only shown when needed */}
-      {archetype === 'Negocio' && (
+      {showHelpBox && (
         <Box
           bg="blue.50"
           borderRadius="xl"
