@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Grid,
   GridItem,
@@ -21,6 +21,10 @@ import {
   HomeIcon,
   BuildingStorefrontIcon,
   TruckIcon,
+  CubeIcon,
+  UsersIcon,
+  CalendarIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 import { CapabilitySelector } from './components/CapabilitySelector';
 import { BusinessPreviewPanel } from './components/BusinessPreviewPanel';
@@ -39,6 +43,34 @@ export function BusinessModelStep({
   onBack,
 }: BusinessModelStepProps) {
   const businessModel = useBusinessCapabilities();
+  const [selectedCompetencies, setSelectedCompetencies] = useState({
+    products: false,
+    services: false,
+    events: false,
+    recurrence: false,
+  });
+
+  const handleCompetencyChange = (competency: keyof typeof selectedCompetencies) => {
+    const isSelected = !selectedCompetencies[competency];
+    setSelectedCompetencies(prev => ({ ...prev, [competency]: isSelected }));
+
+    // This is a key part of the logic: when a competency is toggled,
+    // we also toggle the corresponding "main capability" in the hook.
+    // The hook's internal logic will then handle resetting sub-capabilities if it's being turned off.
+    const competencyToCapabilityMap: Record<keyof typeof selectedCompetencies, keyof import('./config/businessCapabilities').BusinessCapabilities> = {
+      products: 'sells_products',
+      services: 'sells_services',
+      events: 'manages_events',
+      recurrence: 'manages_recurrence',
+    };
+
+    const mainCapability = competencyToCapabilityMap[competency];
+
+    // We only want to toggle it if the state is not already aligned
+    if (businessModel.capabilities[mainCapability] !== isSelected) {
+      businessModel.toggleMainCapability(mainCapability);
+    }
+  };
 
   const handleSubmit = () => {
     console.log('🔥 handleSubmit called!');
@@ -89,16 +121,56 @@ export function BusinessModelStep({
           {/* Main Form Section */}
           <Box p={6}>
             <Stack gap={8}>
-              {/* Core Capabilities Section */}
+              {/* Phase 1: Core Competencies */}
+              <Stack gap={4}>
+                <Stack gap={1}>
+                  <Text fontWeight="medium" fontSize="md" display="flex" alignItems="center">
+                    <BoltIcon width={16} height={16} color="gray.600" style={{ marginRight: 8 }} />
+                    ¿Cuáles son las competencias clave de tu negocio?
+                  </Text>
+                  <Text fontSize="sm" color="gray.600">
+                    Activa las grandes áreas de tu negocio. Esto nos ayudará a configurar la plataforma para ti.
+                  </Text>
+                </Stack>
+                <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                  <CompetencyButton
+                    icon={<CubeIcon width={20} height={20} />}
+                    title="Venta de Productos"
+                    isSelected={selectedCompetencies.products}
+                    onClick={() => handleCompetencyChange('products')}
+                  />
+                  <CompetencyButton
+                    icon={<UsersIcon width={20} height={20} />}
+                    title="Venta de Servicios"
+                    isSelected={selectedCompetencies.services}
+                    onClick={() => handleCompetencyChange('services')}
+                  />
+                  <CompetencyButton
+                    icon={<CalendarIcon width={20} height={20} />}
+                    title="Gestión de Eventos"
+                    isSelected={selectedCompetencies.events}
+                    onClick={() => handleCompetencyChange('events')}
+                  />
+                  <CompetencyButton
+                    icon={<ArrowPathIcon width={20} height={20} />}
+                    title="Gestión de Recurrencia"
+                    isSelected={selectedCompetencies.recurrence}
+                    onClick={() => handleCompetencyChange('recurrence')}
+                  />
+                </SimpleGrid>
+              </Stack>
+
+              {/* Phase 2: Detailed Capabilities */}
               <CapabilitySelector
                 capabilities={businessModel.capabilities}
                 expandedCards={businessModel.expandedCards}
+                selectedCompetencies={selectedCompetencies}
                 onToggleMain={businessModel.toggleMainCapability}
                 onToggleSub={businessModel.toggleSubCapability}
                 onToggleCard={businessModel.toggleCard}
               />
 
-              {/* Channels & Structure Section */}
+              {/* Phase 3: Operational Profile */}
               <Stack gap={4}>
                 <Stack gap={1}>
                   <Text
@@ -234,14 +306,41 @@ export function BusinessModelStep({
       {/* RIGHT COLUMN: PREVIEW & INSIGHTS */}
       <GridItem>
         <BusinessPreviewPanel
-          archetype={businessModel.archetype}
+          archetypes={businessModel.archetypes}
           operationalProfile={businessModel.operationalProfile}
           insightMessage={businessModel.insightMessage}
-          capabilities={businessModel.capabilities}
-          businessStructure={businessModel.businessStructure}
           completedMilestones={[]}
         />
       </GridItem>
     </Grid>
   );
 }
+
+// A local component for the competency buttons to keep this file self-contained.
+const CompetencyButton = ({ icon, title, isSelected, onClick }) => (
+  <Box
+    as="button"
+    p={5}
+    bg={isSelected ? 'gray.800' : 'gray.100'}
+    color={isSelected ? 'gray.50' : 'gray.800'}
+    borderRadius="lg"
+    boxShadow={isSelected ? 'lg' : 'sm'}
+    border="1px solid"
+    borderColor={isSelected ? 'gray.800' : 'gray.200'}
+    onClick={onClick}
+    transition="all 0.2s ease-in-out"
+    _hover={{
+      transform: 'translateY(-2px)',
+      boxShadow: 'md',
+    }}
+  >
+    <HStack gap={4}>
+      <Circle bg={isSelected ? 'yellow.400' : 'gray.200'} size="40px" color="gray.800">
+        {icon}
+      </Circle>
+      <Text fontWeight="semibold" fontSize="md">
+        {title}
+      </Text>
+    </HStack>
+  </Box>
+);

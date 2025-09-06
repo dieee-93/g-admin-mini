@@ -7,7 +7,7 @@ import {
   validationRules
 } from '../config/businessCapabilities';
 import { 
-  determineBusinessArchetype,
+  determineBusinessArchetypes,
   getOperationalProfile,
   getInsightMessage,
 } from '../config/businessLogic';
@@ -19,7 +19,7 @@ export interface UseBusinessCapabilitiesReturn {
   expandedCards: Record<string, boolean>;
   
   // Computed values
-  archetype: string;
+  archetypes: string[];
   operationalProfile: string[];
   insightMessage: string | null;
   canSubmit: boolean;
@@ -112,8 +112,8 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
   }, []);
 
   // Computed values
-  const archetype = useMemo(() =>
-    determineBusinessArchetype(capabilities),
+  const archetypes = useMemo(() =>
+    determineBusinessArchetypes(capabilities),
     [capabilities]
   );
 
@@ -145,7 +145,7 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
     expandedCards,
     
     // Computed values
-    archetype,
+    archetypes,
     operationalProfile,
     insightMessage,
     canSubmit,

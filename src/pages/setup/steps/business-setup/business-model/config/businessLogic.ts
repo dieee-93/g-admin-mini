@@ -1,12 +1,34 @@
 import { BusinessCapabilities, BusinessStructure } from './businessCapabilities';
 
-export function determineBusinessArchetype(capabilities: BusinessCapabilities): string {
-  if (capabilities.sells_products_for_onsite_consumption) return 'Restaurante/Bar';
-  if (capabilities.sells_digital_products || capabilities.manages_subscriptions) return 'Negocio Digital';
-  if (capabilities.hosts_private_events && capabilities.sells_services_by_class) return 'Centro de Experiencias';
-  if (capabilities.sells_services_by_appointment || capabilities.sells_services_by_class) return 'Proveedor de Servicios';
-  if (capabilities.sells_products_for_pickup || capabilities.sells_products_with_delivery) return 'Tienda Minorista';
-  return 'Negocio';
+export function determineBusinessArchetypes(capabilities: BusinessCapabilities): string[] {
+  const archetypes = new Set<string>();
+
+  // Arquetipos basados en PRODUCTOS
+  if (capabilities.sells_products_for_onsite_consumption) archetypes.add('Restaurante');
+  else if (capabilities.sells_products_for_pickup || capabilities.sells_products_with_delivery) {
+    archetypes.add('Tienda Minorista');
+  }
+
+  // Arquetipos basados en SERVICIOS
+  if (capabilities.sells_services_by_appointment) archetypes.add('Servicios por Cita');
+  if (capabilities.sells_services_by_class) archetypes.add('Centro de Formación');
+  if (capabilities.sells_space_by_reservation) archetypes.add('Gestor de Espacios');
+
+  // Arquetipos basados en EVENTOS
+  if (capabilities.hosts_private_events || capabilities.manages_offsite_catering) {
+    archetypes.add('Organizador de Eventos');
+  }
+
+  // Arquetipos basados en RECURRENCIA (estos pueden ser también modelos de ingreso)
+  if (capabilities.manages_subscriptions || capabilities.sells_digital_products) {
+    archetypes.add('Negocio Digital');
+  }
+  if (capabilities.manages_memberships) archetypes.add('Club de Membresías');
+  if (capabilities.manages_rentals) archetypes.add('Centro de Alquileres');
+
+  if (archetypes.size === 0) return ['Negocio'];
+
+  return Array.from(archetypes);
 }
 
 export function getOperationalProfile(
