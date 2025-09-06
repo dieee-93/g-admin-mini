@@ -27,6 +27,17 @@ export const inventoryApi = {
     return data;
   },
 
+  async getItem(id: string): Promise<InventoryItem> {
+    const { data, error } = await supabase
+      .from('items')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
   async updateItem(id: string, updates: Partial<InventoryItem>): Promise<InventoryItem> {
     const { data, error } = await supabase
       .from('items')

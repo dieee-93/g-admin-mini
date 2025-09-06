@@ -52,6 +52,7 @@ export interface MaterialsState {
   stats: InventoryStats;
   alerts: StockAlert[];
   alertSummary: AlertSummary;
+  alertThreshold: number;
   
   // Actions
   setItems: (items: MaterialItem[]) => void;
@@ -61,6 +62,7 @@ export interface MaterialsState {
   bulkUpdateStock: (updates: Array<{ id: string; stock: number }>) => void;
   
   // UI Actions
+  setAlertThreshold: (threshold: number) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setFilters: (filters: Partial<MaterialsFilters>) => void;
@@ -141,8 +143,10 @@ export const useMaterialsStore = create<MaterialsState>()(
         stats: initialStats,
         alerts: [] as StockAlert[],
         alertSummary: initialAlertSummary,
+        alertThreshold: 10, // Default threshold
 
         // Actions
+        setAlertThreshold: (threshold) => set({ alertThreshold: threshold }),
         setItems: (items) => {
           set(produce((state: MaterialsState) => {
             state.items = items.map(item => ({
@@ -254,19 +258,64 @@ export const useMaterialsStore = create<MaterialsState>()(
           }
         },
 
-        updateItem: (id, updates) => {
-          set(produce((state: MaterialsState) => {
-            const index = state.items.findIndex(item => item.id === id);
-            if (index !== -1) {
-              state.items[index] = {
-                ...state.items[index],
-                ...updates,
-                updated_at: new Date().toISOString()
-              };
+        updateItem: async (id, updates) => {
+          const { items } = get();
+          const originalItem = items.find(item => item.id === id);
+
+          if (!originalItem) {
+            const error = new Error('Item no encontrado para actualizar.');
+            console.error(error);
+            set({ error: error.message });
+            throw error;
+          }
+
+          set({ loading: true, error: null });
+
+          try {
+            const { stock: newStock, initial_stock: formStock, ...otherUpdates } = updates as any;
+            const actualNewStock = newStock ?? formStock;
+            const oldStock = originalItem.stock;
+            const stockDifference = (actualNewStock !== undefined && actualNewStock !== null) ? actualNewStock - oldStock : 0;
+
+            const { supabase } = await import('@/lib/supabase/client');
+            const { inventoryApi } = await import('../pages/admin/materials/services/inventoryApi');
+
+            if (Object.keys(otherUpdates).length > 0) {
+              await inventoryApi.updateItem(id, otherUpdates);
             }
-          }));
-          get().refreshStats();
-          get().refreshAlerts();
+
+            if (stockDifference !== 0) {
+              const { error: rpcError } = await supabase.rpc('update_item_stock', {
+                p_item_id: id,
+                p_quantity_to_add: stockDifference,
+              });
+
+              if (rpcError) {
+                throw new Error(`Error en RPC al actualizar stock: ${rpcError.message}`);
+              }
+            }
+
+            // Re-fetch the item to ensure state consistency
+            const updatedItem = await inventoryApi.getItem(id);
+            const normalizedItem = MaterialsNormalizer.normalizeApiItem(updatedItem);
+
+            set(produce((state: MaterialsState) => {
+              const index = state.items.findIndex(item => item.id === id);
+              if (index !== -1) {
+                state.items[index] = normalizedItem;
+              }
+              state.loading = false;
+            }));
+
+            get().refreshStats();
+            get().refreshAlerts(); // This will now fetch alerts from the backend
+
+          } catch (error) {
+            console.error('Error updating item:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Error al actualizar el material.';
+            set({ loading: false, error: errorMessage });
+            throw error;
+          }
         },
 
         deleteItem: (id) => {
@@ -349,38 +398,34 @@ export const useMaterialsStore = create<MaterialsState>()(
           set({ stats });
         },
 
-        refreshAlerts: () => {
-          const { items } = get();
-          const alerts: StockAlert[] = [];
-          
-          items.forEach(item => {
-            const status = getStockStatus(item);
-            if (status !== 'ok') {
-              alerts.push({
-                id: `alert-${item.id}`,
-                item_id: item.id,
-                item_name: item.name,
-                item_type: item.type,
-                item_unit: getItemUnit(item),
-                current_stock: item.stock,
-                min_stock: getMinStock(item),
-                urgency: status === 'out' ? 'critical' : status === 'critical' ? 'critical' : 'warning',
-                suggested_order: Math.max(getMinStock(item) * 2 - item.stock, 0),
-                created_at: new Date().toISOString()
-              });
+        refreshAlerts: async () => {
+          set({ loading: true });
+          try {
+            const { alertThreshold } = get();
+            const { supabase } = await import('@/lib/supabase/client');
+            const { data: alerts, error } = await supabase.rpc('get_low_stock_alert', {
+              p_threshold: alertThreshold,
+            });
+
+            if (error) {
+              throw new Error(`Error al obtener alertas de stock: ${error.message}`);
             }
-          });
-          
-          const alertSummary: AlertSummary = {
-            total: alerts.length,
-            critical: alerts.filter(a => a.urgency === 'critical').length,
-            warning: alerts.filter(a => a.urgency === 'warning').length,
-            info: alerts.filter(a => a.urgency === 'info').length,
-            hasCritical: alerts.some(a => a.urgency === 'critical'),
-            hasWarning: alerts.some(a => a.urgency === 'warning')
-          };
-          
-          set({ alerts, alertSummary });
+
+            const alertSummary: AlertSummary = {
+              total: alerts.length,
+              critical: alerts.filter((a: StockAlert) => a.urgency === 'critical').length,
+              warning: alerts.filter((a: StockAlert) => a.urgency === 'warning').length,
+              info: alerts.filter((a: StockAlert) => a.urgency === 'info').length,
+              hasCritical: alerts.some((a: StockAlert) => a.urgency === 'critical'),
+              hasWarning: alerts.some((a: StockAlert) => a.urgency === 'warning'),
+            };
+
+            set({ alerts: alerts || [], alertSummary, loading: false });
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Error desconocido al refrescar alertas.';
+            console.error('refreshAlerts error:', errorMessage);
+            set({ error: errorMessage, loading: false });
+          }
         },
 
         getFilteredItems: () => {
