@@ -3,7 +3,6 @@ import {
   Box,
   VStack,
   HStack,
-  Card,
   Text,
   Badge,
   Button,
@@ -27,11 +26,13 @@ import {
 } from '@heroicons/react/24/outline';
 import { calculateRecipeCost } from '@/services/recipe/api/recipeApi';
 import type { Recipe } from '@/services/recipe/types';
+import { CardWrapper } from '@/shared/ui';
 
 interface SmartCostCalculatorProps {
   recipe?: Recipe;
   onCostCalculated?: (cost: number) => void;
 }
+
 
 interface CostBreakdown {
   ingredientCosts: Array<{
@@ -118,8 +119,8 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
     <Box>
       <VStack align="stretch" gap={6}>
         {/* Header */}
-        <Card.Root>
-          <Card.Body p={6}>
+        <CardWrapper>
+          <CardWrapper.Body p={6}>
             <VStack align="stretch" gap={4}>
               <HStack align="center" gap={3}>
                 <CalculatorIcon className="w-8 h-8 text-blue-500" />
@@ -161,8 +162,8 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                 Calculate Cost
               </Button>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
         {/* Error Display */}
         {error && (
@@ -196,46 +197,46 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
               <VStack align="stretch" gap={4}>
                 {/* Summary Cards */}
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={4}>
-                  <Card.Root borderTop="4px solid" borderTopColor="blue.400">
-                    <Card.Body p={4}>
+                  <CardWrapper borderTop="4px solid" borderTopColor="blue.400">
+                    <CardWrapper.Body p={4}>
                       <VStack gap={2}>
                         <Text fontSize="sm" color="gray.600">Total Cost</Text>
                         <Text fontSize="2xl" fontWeight="bold" color="blue.500">
                           ${costBreakdown.totalCost.toFixed(2)}
                         </Text>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
 
-                  <Card.Root borderTop="4px solid" borderTopColor="green.400">
-                    <Card.Body p={4}>
+                  <CardWrapper borderTop="4px solid" borderTopColor="green.400">
+                    <CardWrapper.Body p={4}>
                       <VStack gap={2}>
                         <Text fontSize="sm" color="gray.600">Cost Per Portion</Text>
                         <Text fontSize="2xl" fontWeight="bold" color="green.500">
                           ${costBreakdown.costPerPortion.toFixed(2)}
                         </Text>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
 
-                  <Card.Root borderTop="4px solid" borderTopColor="purple.400">
-                    <Card.Body p={4}>
+                  <CardWrapper borderTop="4px solid" borderTopColor="purple.400">
+                    <CardWrapper.Body p={4}>
                       <VStack gap={2}>
                         <Text fontSize="sm" color="gray.600">Suggested Price</Text>
                         <Text fontSize="2xl" fontWeight="bold" color="purple.500">
                           ${costBreakdown.profitabilityMetrics.suggestedPrice.toFixed(2)}
                         </Text>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 </Grid>
 
                 {/* Ingredient Breakdown */}
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper>
+                  <CardWrapper.Header>
                     <Text fontSize="lg" fontWeight="semibold">Ingredient Cost Breakdown</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper.Body>
                     <Table.Root size="sm">
                       <Table.Header>
                         <Table.Row>
@@ -265,15 +266,15 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                         ))}
                       </Table.Body>
                     </Table.Root>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
 
                 {/* Cost Composition */}
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper>
+                  <CardWrapper.Header>
                     <Text fontSize="lg" fontWeight="semibold">Cost Composition</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper.Header>
+                  <CardWrapper.Body>
                     <VStack align="stretch" gap={4}>
                       <HStack justify="space-between">
                         <Text>Ingredients</Text>
@@ -319,18 +320,18 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                         </Progress.Track>
                       </Progress.Root>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
               </VStack>
             </Tabs.Content>
 
             <Tabs.Content value="analysis">
               <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6}>
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper>
+                  <CardWrapper.Header>
                     <Text fontSize="lg" fontWeight="semibold">Profitability Metrics</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper.Header>
+                  <CardWrapper.Body>
                     <VStack align="stretch" gap={4}>
                       <HStack justify="space-between">
                         <Text>Food Cost %</Text>
@@ -360,14 +361,14 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                         </Text>
                       </HStack>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
 
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper>
+                  <CardWrapper.Header>
                     <Text fontSize="lg" fontWeight="semibold">Menu Engineering Category</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper.Header>
+                  <CardWrapper.Body>
                     <VStack align="center" gap={4}>
                       <Text fontSize="4xl">⭐</Text>
                       <Text fontSize="xl" fontWeight="bold" color="yellow.600">STAR</Text>
@@ -376,8 +377,8 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                       </Text>
                       <Badge colorPalette="yellow" size="lg">Promote This Item</Badge>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
               </Grid>
             </Tabs.Content>
 
@@ -390,39 +391,39 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                 </Alert.Root>
 
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
-                  <Card.Root>
-                    <Card.Header>
+                  <CardWrapper>
+                    <CardWrapper.Header>
                       <Text fontSize="md" fontWeight="semibold" color="green.600">
                         💡 Ingredient Optimization
                       </Text>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper.Header>
+                    <CardWrapper.Body>
                       <VStack align="stretch" gap={3}>
                         <Text fontSize="sm">• Consider bulk purchasing for 15% cost reduction</Text>
                         <Text fontSize="sm">• Seasonal sourcing can reduce costs by 8-12%</Text>
                         <Text fontSize="sm">• Improve yield factors through better prep techniques</Text>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
 
-                  <Card.Root>
-                    <Card.Header>
+                  <CardWrapper>
+                    <CardWrapper.Header>
                       <Text fontSize="md" fontWeight="semibold" color="blue.600">
                         ⚡ Efficiency Improvements
                       </Text>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper.Header>
+                    <CardWrapper.Body>
                       <VStack align="stretch" gap={3}>
                         <Text fontSize="sm">• Reduce prep time by 10 minutes = $2.50 savings</Text>
                         <Text fontSize="sm">• Batch production can reduce labor costs by 20%</Text>
                         <Text fontSize="sm">• Cross-training reduces overhead allocation</Text>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 </Grid>
 
-                <Card.Root bg="blue.50">
-                  <Card.Body p={4}>
+                <CardWrapper bg="blue.50">
+                  <CardWrapper.Body p={4}>
                     <HStack gap={4}>
                       <CheckCircleIcon className="w-6 h-6 text-blue-500" />
                       <VStack align="start" gap={1}>
@@ -433,8 +434,8 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                         </Text>
                       </VStack>
                     </HStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
               </VStack>
             </Tabs.Content>
           </Tabs.Root>

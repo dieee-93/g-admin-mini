@@ -5,7 +5,7 @@ import {
   Text,
   Input,
   Switch,
-  Card,
+  CardWrapper ,
   Alert,
   Flex
 } from '@chakra-ui/react';
@@ -99,8 +99,8 @@ export const CountableFields = ({
       </Alert.Root>
 
       {/* Packaging */}
-      <Card.Root variant="outline" w="full">
-        <Card.Body>
+      <CardWrapper .Root variant="outline" w="full">
+        <CardWrapper .Body>
           <Stack gap="4">
             <Flex justify="space-between" align="center">
               <Stack gap="1">
@@ -185,8 +185,8 @@ export const CountableFields = ({
               </Stack>
             )}
           </Stack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Stock Fields */}
       <CountableStockFields

@@ -1,6 +1,6 @@
 // Refactored Customers Page with UNIFIED navigation pattern
 import { useState, useEffect } from 'react';
-import { Box, VStack, HStack, Text, Tabs, Badge, Card } from '@chakra-ui/react';
+import { Box, VStack, HStack, Text, Tabs, Badge, CardWrapper  } from '@chakra-ui/react';
 import { 
   UsersIcon, 
   ChartBarIcon, 
@@ -58,13 +58,13 @@ export default function CustomersPage() {
         return <CustomerOrdersHistory />;
       case 'loyalty':
         return (
-          <Card.Root>
-            <Card.Body p="8" textAlign="center">
+          <CardWrapper .Root>
+            <CardWrapper .Body p="8" textAlign="center">
               <CreditCardIcon className="w-12 h-12 text-purple-400 mx-auto mb-4" />
               <Text fontSize="lg" fontWeight="semibold" mb="2">Programa de Lealtad</Text>
               <Text color="gray.600">Próximamente - Gestión de puntos y recompensas</Text>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper .Body>
+          </CardWrapper .Root>
         );
       default:
         return (
@@ -80,8 +80,8 @@ export default function CustomersPage() {
     <Box p="6" maxW="7xl" mx="auto">
       <VStack gap="6" align="stretch">
         {/* UNIFIED PATTERN: Header with icon, badges, KPIs */}
-        <Card.Root>
-          <Card.Body>
+        <CardWrapper .Root>
+          <CardWrapper .Body>
             <HStack gap="4">
               <Box p="2" bg="pink.100" borderRadius="md">
                 <UserGroupIcon className="w-8 h-8 text-pink-600" />
@@ -103,8 +103,8 @@ export default function CustomersPage() {
                 </Text>
               </VStack>
             </HStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
         {/* UNIFIED PATTERN: Tabs (max 4) */}
         <Tabs.Root 

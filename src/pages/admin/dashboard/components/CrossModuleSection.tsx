@@ -5,7 +5,7 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
+  CardWrapper ,
   Button,
   Badge,
   SimpleGrid,
@@ -160,33 +160,33 @@ const CrossModuleSection: React.FC = () => {
 
   if (loading) {
     return (
-      <Card.Root>
-        <Card.Body>
+      <CardWrapper .Root>
+        <CardWrapper .Body>
           <Text>Loading cross-module analytics...</Text>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     );
   }
 
   return (
     <VStack gap="6" align="stretch">
       {/* Cross-Module Health Overview */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <HStack gap="2">
             <PuzzlePieceIcon className="w-5 h-5 text-blue-500" />
             <Text fontSize="lg" fontWeight="semibold">Module Health Overview</Text>
           </HStack>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <SimpleGrid columns={{ base: 1, md: 3, lg: 5 }} gap="4">
             {moduleHealth.map((module) => {
               const TrendIcon = module.trend === 'up' ? ArrowTrendingUpIcon : 
                                module.trend === 'down' ? ArrowTrendingDownIcon : null;
               
               return (
-                <Card.Root key={module.module} variant="outline">
-                  <Card.Body>
+                <CardWrapper .Root key={module.module} variant="outline">
+                  <CardWrapper .Body>
                     <VStack align="center" gap="3">
                       <Text fontSize="sm" fontWeight="medium">{module.module}</Text>
                       <VStack gap="1">
@@ -204,17 +204,17 @@ const CrossModuleSection: React.FC = () => {
                         )}
                       </HStack>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               );
             })}
           </SimpleGrid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Cross-Module Correlations */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <HStack justify="space-between">
             <HStack gap="2">
               <ArrowsRightLeftIcon className="w-5 h-5 text-purple-500" />
@@ -222,12 +222,12 @@ const CrossModuleSection: React.FC = () => {
             </HStack>
             <Badge colorPalette="purple" variant="subtle">AI-Powered Insights</Badge>
           </HStack>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <VStack gap="4">
             {correlations.map((correlation) => (
-              <Card.Root key={correlation.id} variant="outline" w="full">
-                <Card.Body>
+              <CardWrapper .Root key={correlation.id} variant="outline" w="full">
+                <CardWrapper .Body>
                   <VStack align="start" gap="4">
                     {/* Correlation Header */}
                     <HStack justify="space-between" w="full">
@@ -311,19 +311,19 @@ const CrossModuleSection: React.FC = () => {
                       </HStack>
                     </HStack>
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             ))}
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Action Items */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontSize="lg" fontWeight="semibold">Recommended Actions</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <VStack gap="3">
             <HStack justify="space-between" w="full" p="3" bg="blue.50" borderRadius="md">
               <VStack align="start" gap="1">
@@ -341,8 +341,8 @@ const CrossModuleSection: React.FC = () => {
               <Button size="sm" colorPalette="green">Plan</Button>
             </HStack>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 };

@@ -166,7 +166,7 @@ export default function EnterprisePage() {
           
           <Stack gap="md">
             {locations.map((location) => (
-              <Card key={location.id} variant="subtle" size="sm" >
+              <CardWrapper key={location.id} variant="subtle" size="sm" >
                 <Stack gap="md">
                   <Stack direction="row" justify="space-between" align="center">
                     <Stack direction="row" align="center" gap="md">
@@ -212,7 +212,7 @@ export default function EnterprisePage() {
           
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="md">
             {enterpriseTools.map((tool) => (
-              <Card key={tool.id} variant="subtle" size="sm" >
+              <CardWrapper key={tool.id} variant="subtle" size="sm" >
                 <Stack gap="sm">
                   <Stack direction="row" justify="space-between" align="center">
                     <Icon icon={tool.icon} size="md" />

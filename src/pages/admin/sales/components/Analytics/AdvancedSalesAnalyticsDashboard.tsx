@@ -3,7 +3,7 @@ import {
   Box,
   VStack,
   HStack,
-  Card,
+  CardWrapper ,
   Text,
   Badge,
   Button,
@@ -273,8 +273,8 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
     <Box>
       <VStack align="stretch" gap={6}>
         {/* Header */}
-        <Card.Root bg="gradient-to-r from-blue-600 to-purple-700" color="white">
-          <Card.Body p={6}>
+        <CardWrapper .Root bg="gradient-to-r from-blue-600 to-purple-700" color="white">
+          <CardWrapper .Body p={6}>
             <VStack align="stretch" gap={4}>
               <HStack justify="space-between" align="center">
                 <HStack gap={3}>
@@ -330,8 +330,8 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                 </HStack>
               )}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
         {loading && !analytics ? (
           <VStack gap={4}>
@@ -368,8 +368,8 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
               <VStack align="stretch" gap={6}>
                 {/* KPI Cards */}
                 <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={4}>
-                  <Card.Root borderTop="4px solid" borderTopColor="green.400">
-                    <Card.Body p={4}>
+                  <CardWrapper .Root borderTop="4px solid" borderTopColor="green.400">
+                    <CardWrapper .Body p={4}>
                       <VStack gap={3}>
                         <HStack justify="space-between" width="full">
                           <CurrencyDollarIcon className="w-6 h-6 text-green-500" />
@@ -384,11 +384,11 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                           </Text>
                         </VStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
 
-                  <Card.Root borderTop="4px solid" borderTopColor="blue.400">
-                    <Card.Body p={4}>
+                  <CardWrapper .Root borderTop="4px solid" borderTopColor="blue.400">
+                    <CardWrapper .Body p={4}>
                       <VStack gap={3}>
                         <HStack justify="space-between" width="full">
                           <ClockIcon className="w-6 h-6 text-blue-500" />
@@ -403,11 +403,11 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                           </Text>
                         </VStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
 
-                  <Card.Root borderTop="4px solid" borderTopColor="purple.400">
-                    <Card.Body p={4}>
+                  <CardWrapper .Root borderTop="4px solid" borderTopColor="purple.400">
+                    <CardWrapper .Body p={4}>
                       <VStack gap={3}>
                         <HStack justify="space-between" width="full">
                           <UsersIcon className="w-6 h-6 text-purple-500" />
@@ -425,11 +425,11 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                           </Text>
                         </VStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
 
-                  <Card.Root borderTop="4px solid" borderTopColor="orange.400">
-                    <Card.Body p={4}>
+                  <CardWrapper .Root borderTop="4px solid" borderTopColor="orange.400">
+                    <CardWrapper .Body p={4}>
                       <VStack gap={3}>
                         <HStack justify="space-between" width="full">
                           <TrophyIcon className="w-6 h-6 text-orange-500" />
@@ -444,17 +444,17 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                           </Text>
                         </VStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 </SimpleGrid>
 
                 {/* Revenue Breakdown */}
                 <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>
-                  <Card.Root>
-                    <Card.Header>
+                  <CardWrapper .Root>
+                    <CardWrapper .Header>
                       <Text fontSize="lg" fontWeight="semibold">Revenue Breakdown</Text>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper .Header>
+                    <CardWrapper .Body>
                       <VStack align="stretch" gap={4}>
                         <HStack justify="space-between">
                           <Text>Today</Text>
@@ -486,14 +486,14 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                           </Progress.Track>
                         </Progress.Root>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
 
-                  <Card.Root>
-                    <Card.Header>
+                  <CardWrapper .Root>
+                    <CardWrapper .Header>
                       <Text fontSize="lg" fontWeight="semibold">Key Metrics</Text>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper .Header>
+                    <CardWrapper .Body>
                       <VStack align="stretch" gap={4}>
                         <HStack justify="space-between">
                           <Text>Conversion Rate</Text>
@@ -515,8 +515,8 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                           <Badge colorPalette="orange">{analytics.performance.efficiency_score}/100</Badge>
                         </HStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 </Grid>
               </VStack>
             </Tabs.Content>
@@ -524,11 +524,11 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
             <Tabs.Content value="performance">
               <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>
                 {/* Top Selling Items */}
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper .Root>
+                  <CardWrapper .Header>
                     <Text fontSize="lg" fontWeight="semibold">Top Selling Items</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <VStack align="stretch" gap={3}>
                       {analytics.performance.top_selling_items.map((item, index) => (
                         <HStack key={item.name} justify="space-between" p={3} bg="bg.canvas" borderRadius="md">
@@ -545,15 +545,15 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                         </HStack>
                       ))}
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
 
                 {/* Peak Hours */}
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper .Root>
+                  <CardWrapper .Header>
                     <Text fontSize="lg" fontWeight="semibold">Peak Hours</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <VStack align="stretch" gap={3}>
                       {analytics.performance.peak_hours.map((hour, index) => (
                         <HStack key={hour.hour} justify="space-between" p={3} bg="bg.canvas" borderRadius="md">
@@ -572,52 +572,52 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                         </HStack>
                       ))}
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               </Grid>
             </Tabs.Content>
 
             <Tabs.Content value="customers">
               <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
-                <Card.Root borderTop="4px solid" borderTopColor="green.400">
-                  <Card.Body p={4} textAlign="center">
+                <CardWrapper .Root borderTop="4px solid" borderTopColor="green.400">
+                  <CardWrapper .Body p={4} textAlign="center">
                     <VStack gap={3}>
                       <UsersIcon className="w-12 h-12 text-green-500" />
                       <Text fontSize="2xl" fontWeight="bold">{analytics.customers.total_unique}</Text>
                       <Text color="gray.600">Total Unique Customers</Text>
                       <Badge colorPalette="green">Active</Badge>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
 
-                <Card.Root borderTop="4px solid" borderTopColor="blue.400">
-                  <Card.Body p={4} textAlign="center">
+                <CardWrapper .Root borderTop="4px solid" borderTopColor="blue.400">
+                  <CardWrapper .Body p={4} textAlign="center">
                     <VStack gap={3}>
                       <TrophyIcon className="w-12 h-12 text-blue-500" />
                       <Text fontSize="2xl" fontWeight="bold">{analytics.customers.returning_customers}</Text>
                       <Text color="gray.600">Returning Customers</Text>
                       <Badge colorPalette="blue">Loyal</Badge>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
 
-                <Card.Root borderTop="4px solid" borderTopColor="purple.400">
-                  <Card.Body p={4} textAlign="center">
+                <CardWrapper .Root borderTop="4px solid" borderTopColor="purple.400">
+                  <CardWrapper .Body p={4} textAlign="center">
                     <VStack gap={3}>
                       <FireIcon className="w-12 h-12 text-purple-500" />
                       <Text fontSize="2xl" fontWeight="bold">{analytics.customers.new_customers}</Text>
                       <Text color="gray.600">New Customers</Text>
                       <Badge colorPalette="purple">Growing</Badge>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               </SimpleGrid>
             </Tabs.Content>
 
             <Tabs.Content value="predictions">
               <VStack align="stretch" gap={6}>
-                <Card.Root bg="gradient-to-r from-purple-500 to-pink-500" color="white">
-                  <Card.Body p={6}>
+                <CardWrapper .Root bg="gradient-to-r from-purple-500 to-pink-500" color="white">
+                  <CardWrapper .Body p={6}>
                     <VStack align="center" gap={4}>
                       <BoltIcon className="w-12 h-12" />
                       <Text fontSize="2xl" fontWeight="bold" textAlign="center">
@@ -627,18 +627,18 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                         AI-powered insights for strategic business decisions
                       </Text>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
 
                 <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-                  <Card.Root>
-                    <Card.Header>
+                  <CardWrapper .Root>
+                    <CardWrapper .Header>
                       <HStack gap={2}>
                         <ArrowTrendingUpIcon className="w-5 h-5 text-green-500" />
                         <Text fontSize="lg" fontWeight="semibold" color="green.600">Revenue Forecast</Text>
                       </HStack>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper .Header>
+                    <CardWrapper .Body>
                       <VStack align="stretch" gap={4}>
                         <HStack justify="space-between">
                           <Text>Next Week Projected</Text>
@@ -660,17 +660,17 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                           </Alert.Description>
                         </Alert.Root>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
 
-                  <Card.Root>
-                    <Card.Header>
+                  <CardWrapper .Root>
+                    <CardWrapper .Header>
                       <HStack gap={2}>
                         <LightBulbIcon className="w-5 h-5 text-yellow-500" />
                         <Text fontSize="lg" fontWeight="semibold" color="yellow.600">Smart Insights</Text>
                       </HStack>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper .Header>
+                    <CardWrapper .Body>
                       <VStack align="stretch" gap={4}>
                         <Alert.Root status="warning" size="sm">
                           <Alert.Description>
@@ -690,15 +690,15 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                           </Alert.Description>
                         </Alert.Root>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 </SimpleGrid>
 
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper .Root>
+                  <CardWrapper .Header>
                     <Text fontSize="lg" fontWeight="semibold">Strategic Recommendations</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6}>
                       <VStack align="stretch" gap={3}>
                         <Text fontWeight="medium" color="green.600">🚀 Revenue Optimization</Text>
@@ -714,16 +714,16 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                         <Text fontSize="sm">• Personalized recommendations for new customers</Text>
                       </VStack>
                     </Grid>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               </VStack>
             </Tabs.Content>
           </Tabs.Root>
         ) : null}
 
         {/* Real-time Status */}
-        <Card.Root bg="bg.canvas">
-          <Card.Body p={3}>
+        <CardWrapper .Root bg="bg.canvas">
+          <CardWrapper .Body p={3}>
             <HStack justify="center" gap={4}>
               <HStack gap={2}>
                 <Box width="8px" height="8px"  borderRadius="50%" />
@@ -735,8 +735,8 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
                 {refreshInterval ? 'Stop Auto-refresh' : 'Enable Auto-refresh'}
               </Button>
             </HStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </VStack>
     </Box>
   );

@@ -9,7 +9,6 @@ import {
   Text,
   Button,
   Badge,
-  Card,
   SimpleGrid,
   Table,
   Progress,
@@ -40,7 +39,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
-
+import { CardWrapper } from '@/shared/ui';
 // ============================================================================
 // TYPES AND INTERFACES
 // ============================================================================
@@ -525,8 +524,8 @@ export function CompetitiveIntelligence() {
   return (
     <VStack gap="6" align="stretch">
       {/* Header with Controls */}
-      <Card.Root>
-        <Card.Body>
+      <CardWrapper>
+        <CardWrapper.Body>
           <VStack gap="4" align="stretch">
             <HStack justify="space-between" align="start">
               <VStack align="start" gap="1">
@@ -555,76 +554,76 @@ export function CompetitiveIntelligence() {
             {/* Market Overview Cards */}
             {marketOverview && (
               <SimpleGrid columns={{ base: 2, md: 6 }} gap="4">
-                <Card.Root variant="subtle" bg="blue.50">
-                  <Card.Body p="4" textAlign="center">
+                <CardWrapper variant="subtle" bg="blue.50">
+                  <CardWrapper.Body p="4" textAlign="center">
                     <VStack gap="1">
                       <Text fontSize="2xl" fontWeight="bold" color="blue.600">
                         ${(marketOverview.totalMarketSize / 1000000).toFixed(1)}M
                       </Text>
                       <Text fontSize="sm" color="gray.600">Tamaño Mercado</Text>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
 
-                <Card.Root variant="subtle" bg="red.50">
-                  <Card.Body p="4" textAlign="center">
+                <CardWrapper variant="subtle" bg="red.50">
+                  <CardWrapper.Body p="4" textAlign="center">
                     <VStack gap="1">
                       <Text fontSize="2xl" fontWeight="bold" color="red.600">
                         {marketOverview.directCompetitors}
                       </Text>
                       <Text fontSize="sm" color="gray.600">Comp. Directos</Text>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
 
-                <Card.Root variant="subtle" bg="yellow.50">
-                  <Card.Body p="4" textAlign="center">
+                <CardWrapper variant="subtle" bg="yellow.50">
+                  <CardWrapper.Body p="4" textAlign="center">
                     <VStack gap="1">
                       <Text fontSize="2xl" fontWeight="bold" color="yellow.600">
                         {marketOverview.averageRating.toFixed(1)}⭐
                       </Text>
                       <Text fontSize="sm" color="gray.600">Rating Promedio</Text>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
 
-                <Card.Root variant="subtle" >
-                  <Card.Body p="4" textAlign="center">
+                <CardWrapper variant="subtle" bg="green.50">
+                  <CardWrapper.Body p="4" textAlign="center">
                     <VStack gap="1">
                       <Text fontSize="2xl" fontWeight="bold" color="green.600">
                         {marketOverview.growingTrends}
                       </Text>
                       <Text fontSize="sm" color="gray.600">Tendencias ↗</Text>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
 
-                <Card.Root variant="subtle" bg="purple.50">
-                  <Card.Body p="4" textAlign="center">
+                <CardWrapper variant="subtle" bg="purple.50">
+                  <CardWrapper.Body p="4" textAlign="center">
                     <VStack gap="1">
                       <Text fontSize="2xl" fontWeight="bold" color="purple.600">
                         {marketOverview.criticalInsights}
                       </Text>
                       <Text fontSize="sm" color="gray.600">Insights Críticos</Text>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
 
-                <Card.Root variant="subtle" bg="orange.50">
-                  <Card.Body p="4" textAlign="center">
+                <CardWrapper variant="subtle" bg="orange.50">
+                  <CardWrapper.Body p="4" textAlign="center">
                     <VStack gap="1">
                       <Text fontSize="2xl" fontWeight="bold" color="orange.600">
                         {marketOverview.totalCompetitors}
                       </Text>
                       <Text fontSize="sm" color="gray.600">Total Competidores</Text>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
               </SimpleGrid>
             )}
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper.Body>
+      </CardWrapper>
 
       {/* Main Content Tabs */}
       <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
@@ -771,11 +770,11 @@ function MarketOverviewDashboard({ competitors, trends, insights }: MarketOvervi
     <VStack gap="6" align="stretch">
       {/* Quick Market Insights */}
       <SimpleGrid columns={{ base: 1, lg: 2 }} gap="6">
-        <Card.Root>
-          <Card.Header>
+        <CardWrapper>
+          <CardWrapper.Header>
             <Text fontWeight="bold">Top Competidores por Rating</Text>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <VStack gap="3" align="stretch">
               {competitors
                 .sort((a, b) => b.performance.customerRating - a.performance.customerRating)
@@ -800,14 +799,14 @@ function MarketOverviewDashboard({ competitors, trends, insights }: MarketOvervi
                   </HStack>
                 ))}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
-        <Card.Root>
-          <Card.Header>
+        <CardWrapper>
+          <CardWrapper.Header>
             <Text fontWeight="bold">Tendencias de Mercado Principales</Text>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <VStack gap="3" align="stretch">
               {trends.slice(0, 5).map((trend) => (
                 <HStack key={trend.id} justify="space-between">
@@ -836,8 +835,8 @@ function MarketOverviewDashboard({ competitors, trends, insights }: MarketOvervi
                 </HStack>
               ))}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       </SimpleGrid>
 
       {/* Critical Insights Alert */}
@@ -881,25 +880,25 @@ function CompetitorsTable({ competitors }: CompetitorsTableProps) {
 
   if (competitors.length === 0) {
     return (
-      <Card.Root>
-        <Card.Body p="8" textAlign="center">
+      <CardWrapper>
+        <CardWrapper.Body p="8" textAlign="center">
           <VStack gap="2">
             <UserGroupIcon className="w-8 h-8 text-gray-400" />
             <Text color="gray.500">No se encontraron competidores</Text>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     );
   }
 
   return (
-    <Card.Root>
-      <Card.Header>
+    <CardWrapper>
+      <CardWrapper.Header>
         <Text fontWeight="bold">
           Análisis de Competidores - {competitors.length} encontrados
         </Text>
-      </Card.Header>
-      <Card.Body>
+      </CardWrapper.Header>
+      <CardWrapper.Body>
         <Table.Root size="sm">
           <Table.Header>
             <Table.Row>
@@ -976,8 +975,8 @@ function CompetitorsTable({ competitors }: CompetitorsTableProps) {
             Mostrando 10 de {competitors.length} competidores. Use filtros para refinar la búsqueda.
           </Text>
         )}
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper.Body>
+    </CardWrapper>
   );
 }
 
@@ -1016,11 +1015,11 @@ function PricingAnalysisPanel({ competitors }: PricingAnalysisPanelProps) {
 
   return (
     <VStack gap="6" align="stretch">
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper>
+        <CardWrapper.Header>
           <Text fontWeight="bold">Análisis Comparativo de Precios</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
           <Table.Root size="sm">
             <Table.Header>
               <Table.Row>
@@ -1083,8 +1082,8 @@ function PricingAnalysisPanel({ competitors }: PricingAnalysisPanelProps) {
               ))}
             </Table.Body>
           </Table.Root>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     </VStack>
   );
 }
@@ -1097,8 +1096,8 @@ function MarketTrendsPanel({ trends }: MarketTrendsPanelProps) {
   return (
     <VStack gap="4" align="stretch">
       {trends.map((trend) => (
-        <Card.Root key={trend.id} variant="outline">
-          <Card.Body p="4">
+        <CardWrapper key={trend.id} variant="outline">
+          <CardWrapper.Body p="4">
             <VStack gap="3" align="stretch">
               <HStack justify="space-between" align="start">
                 <VStack align="start" gap="1">
@@ -1144,8 +1143,8 @@ function MarketTrendsPanel({ trends }: MarketTrendsPanelProps) {
                 </VStack>
               )}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       ))}
     </VStack>
   );
@@ -1181,8 +1180,8 @@ function MarketInsightsPanel({ insights }: MarketInsightsPanelProps) {
       {insights.map((insight) => {
         const TypeIcon = getTypeIcon(insight.type);
         return (
-          <Card.Root key={insight.id} variant="outline">
-            <Card.Body p="4">
+          <CardWrapper key={insight.id} variant="outline">
+            <CardWrapper.Body p="4">
               <VStack gap="3" align="stretch">
                 <HStack justify="space-between" align="start">
                   <HStack gap="3">
@@ -1241,8 +1240,8 @@ function MarketInsightsPanel({ insights }: MarketInsightsPanelProps) {
                   </Alert.Root>
                 )}
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
         );
       })}
     </VStack>

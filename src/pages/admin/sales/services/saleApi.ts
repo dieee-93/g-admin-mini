@@ -196,3 +196,81 @@ export async function getCustomerPurchases(customerId: string): Promise<Sale[]> 
   if (error) throw error;
   return data || [];
 }
+
+// ===== PROCESAMIENTO DE VENTAS =====
+
+export async function processSale(saleData: CreateSaleData): Promise<SaleProcessResult> {
+  try {
+    // Validar stock antes del procesamiento
+    const stockValidation = await validateSaleStock(saleData.items);
+    
+    if (!stockValidation.is_valid) {
+      return {
+        success: false,
+        sale: null,
+        error: 'Stock insuficiente para algunos productos',
+        validation: stockValidation
+      };
+    }
+
+    // Calcular impuestos
+    const subtotal = saleData.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+    const taxResult = taxService.calculateTaxes(subtotal, saleData.tax_rate || 0.21);
+
+    // Preparar datos de venta
+    const saleToCreate = {
+      customer_id: saleData.customer_id,
+      total: taxResult.total,
+      subtotal: taxResult.subtotal,
+      tax_amount: taxResult.taxAmount,
+      tax_rate: taxResult.taxRate,
+      payment_method: saleData.payment_method || 'cash',
+      notes: saleData.notes || '',
+      created_at: new Date().toISOString()
+    };
+
+    // Crear venta usando RPC para transacción atómica
+    const { data: processedSale, error } = await supabase
+      .rpc('process_complete_sale', {
+        sale_data: JSON.stringify(saleToCreate),
+        items_data: JSON.stringify(saleData.items)
+      });
+
+    if (error) {
+      errorHandler.handle(createBusinessError(`Error procesando venta: ${error.message}`, { error, saleData }));
+      return {
+        success: false,
+        sale: null,
+        error: error.message,
+        validation: stockValidation
+      };
+    }
+
+    // Emitir evento de venta completada
+    const saleEvent: SaleCompletedEvent = {
+      saleId: processedSale.id,
+      customerId: saleData.customer_id,
+      total: taxResult.total,
+      items: saleData.items,
+      timestamp: new Date().toISOString()
+    };
+
+    EventBus.emit(RestaurantEvents.SALE_COMPLETED, saleEvent);
+
+    return {
+      success: true,
+      sale: processedSale,
+      error: null,
+      validation: stockValidation
+    };
+
+  } catch (error) {
+    errorHandler.handle(error as Error, { operation: 'processSale', saleData });
+    return {
+      success: false,
+      sale: null,
+      error: (error as Error).message,
+      validation: null
+    };
+  }
+}

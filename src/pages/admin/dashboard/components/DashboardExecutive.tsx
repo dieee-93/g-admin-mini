@@ -5,7 +5,7 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
+  CardWrapper ,
   Button,
   Badge,
   SimpleGrid,
@@ -263,11 +263,11 @@ const DashboardExecutive: React.FC = () => {
       <VStack gap="6">
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="4" w="full">
           {[1, 2, 3, 4].map(i => (
-            <Card.Root key={i}>
-              <Card.Body>
+            <CardWrapper .Root key={i}>
+              <CardWrapper .Body>
                 <Skeleton height="100px" />
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           ))}
         </SimpleGrid>
       </VStack>
@@ -317,8 +317,8 @@ const DashboardExecutive: React.FC = () => {
                                       kpi.trend === 'down' ? ArrowTrendingDownIcon : null;
             
             return (
-              <Card.Root key={kpi.id}>
-                <Card.Body>
+              <CardWrapper .Root key={kpi.id}>
+                <CardWrapper .Body>
                   <VStack align="start" gap="3">
                     <HStack justify="space-between" w="full">
                       <IconComponent className="w-6 h-6 text-blue-500" />
@@ -371,25 +371,25 @@ const DashboardExecutive: React.FC = () => {
                       )}
                     </VStack>
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             );
           })}
         </SimpleGrid>
 
         {/* Strategic Insights */}
-        <Card.Root w="full">
-          <Card.Header>
+        <CardWrapper .Root w="full">
+          <CardWrapper .Header>
             <HStack justify="space-between">
               <Text fontSize="lg" fontWeight="semibold">Strategic Insights</Text>
               <Badge colorPalette="purple" variant="subtle">AI-Powered</Badge>
             </HStack>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <VStack gap="6">
               {strategicInsights.map((insight) => (
-                <Card.Root key={insight.id} variant="outline" w="full">
-                  <Card.Body>
+                <CardWrapper .Root key={insight.id} variant="outline" w="full">
+                  <CardWrapper .Body>
                     <VStack align="start" gap="4">
                       <HStack justify="space-between" w="full">
                         <VStack align="start" gap="1">
@@ -461,12 +461,12 @@ const DashboardExecutive: React.FC = () => {
                         </VStack>
                       </SimpleGrid>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               ))}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </VStack>
     </Box>
   );

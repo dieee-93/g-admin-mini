@@ -5,7 +5,7 @@ import {
   HStack,
   Text,
   Button,
-  Card,
+  CardWrapper ,
   Grid,
   SimpleGrid,
   Heading
@@ -87,8 +87,8 @@ export function ProductsPage() {
         <VStack gap={6} align="stretch">
           {/* Products Overview Cards */}
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={{ base: 2, md: 4 }}>
-            <Card.Root>
-              <Card.Body>
+            <CardWrapper .Root>
+              <CardWrapper .Body>
                 <VStack align="start" gap={2}>
                   <CogIcon className="w-8 h-8 text-purple-600" />
                   <Heading size="sm">Product Management</Heading>
@@ -96,11 +96,11 @@ export function ProductsPage() {
                     Manage menu items and pricing
                   </Text>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
 
-            <Card.Root>
-              <Card.Body>
+            <CardWrapper .Root>
+              <CardWrapper .Body>
                 <VStack align="start" gap={2}>
                   <ChartBarIcon className="w-8 h-8 text-blue-600" />
                   <Heading size="sm">Menu Engineering</Heading>
@@ -108,11 +108,11 @@ export function ProductsPage() {
                     Optimize menu performance
                   </Text>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
 
-            <Card.Root>
-              <Card.Body>
+            <CardWrapper .Root>
+              <CardWrapper .Body>
                 <VStack align="start" gap={2}>
                   <ChartBarIcon className="w-8 h-8 text-green-600" />
                   <Heading size="sm">Cost Analysis</Heading>
@@ -120,38 +120,38 @@ export function ProductsPage() {
                     Track product costs and margins
                   </Text>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           </SimpleGrid>
 
           {/* All sections displayed together */}
           <Grid templateColumns={{ base: "1fr", xl: "1fr 1fr" }} gap={{ base: 4, md: 6 }}>
-            <Card.Root>
-              <Card.Header>
+            <CardWrapper .Root>
+              <CardWrapper .Header>
                 <Heading size="md">Product Management</Heading>
-              </Card.Header>
-              <Card.Body>
+              </CardWrapper .Header>
+              <CardWrapper .Body>
                 <ProductListOnly />
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
 
-            <Card.Root>
-              <Card.Header>
+            <CardWrapper .Root>
+              <CardWrapper .Header>
                 <Heading size="md">Menu Engineering</Heading>
-              </Card.Header>
-              <Card.Body>
+              </CardWrapper .Header>
+              <CardWrapper .Body>
                 <MenuEngineeringOnly />
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
 
-            <Card.Root gridColumn={{ base: "1", xl: "1 / -1" }}>
-              <Card.Header>
+            <CardWrapper .Root gridColumn={{ base: "1", xl: "1 / -1" }}>
+              <CardWrapper .Header>
                 <Heading size="md">Cost Analysis</Heading>
-              </Card.Header>
-              <Card.Body>
+              </CardWrapper .Header>
+              <CardWrapper .Body>
                 <CostAnalysisModule />
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           </Grid>
         </VStack>
       </VStack>

@@ -4,7 +4,7 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
+  CardWrapper ,
   Badge,
   SimpleGrid,
   Select,
@@ -110,13 +110,13 @@ export function ExecutiveKPIGrid({
           const progressValue = kpi.target ? (kpi.value / kpi.target) * 100 : 0;
           
           return (
-            <Card.Root 
+            <CardWrapper .Root 
               key={kpi.id}
               variant="outline"
               bg={kpi.priority === 'critical' ? 'red.25' : 'white'}
               borderColor={kpi.priority === 'critical' ? 'red.200' : 'gray.200'}
             >
-              <Card.Body p={4}>
+              <CardWrapper .Body p={4}>
                 <VStack align="stretch" gap={3}>
                   {/* Header */}
                   <HStack justify="space-between">
@@ -177,8 +177,8 @@ export function ExecutiveKPIGrid({
                     {kpi.description}
                   </Text>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           );
         })}
       </SimpleGrid>

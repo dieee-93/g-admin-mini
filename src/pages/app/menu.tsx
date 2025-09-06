@@ -9,7 +9,6 @@ import {
   Text,
   Button,
   Grid,
-  Card,
   Badge,
   Input,
   Tabs
@@ -22,7 +21,7 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
-
+import { CardWrapper } from '@/shared/ui';
 // Tipos para productos
 interface Product {
   id: string;
@@ -138,7 +137,7 @@ function ProductCard({ product, onAddToCart }: {
   const [isFavorite, setIsFavorite] = useState(product.isFavorite || false);
 
   return (
-    <Card.Root 
+    <CardWrapper 
       variant="elevated" 
       overflow="hidden" 
       _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
@@ -191,7 +190,7 @@ function ProductCard({ product, onAddToCart }: {
         </Button>
       </Box>
       
-      <Card.Body>
+      <CardWrapper.Body>
         <VStack align="start" gap="3">
           {/* Header del producto */}
           <VStack align="start" gap="1" w="full">
@@ -235,8 +234,8 @@ function ProductCard({ product, onAddToCart }: {
             Agregar al Carrito
           </Button>
         </VStack>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper.Body>
+    </CardWrapper>
   );
 }
 

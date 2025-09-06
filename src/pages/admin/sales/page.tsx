@@ -121,7 +121,7 @@ export default function SalesPage() {
 
       {/* Module Content */}
       <Stack direction="column" gap="lg" p="lg">
-        {/* POS System Card */}
+        {/* POS System CardWrapper  */}
         <CardWrapper variant="elevated">
           <CardWrapper.Header>
             <Stack direction="row" align="center" gap="sm">

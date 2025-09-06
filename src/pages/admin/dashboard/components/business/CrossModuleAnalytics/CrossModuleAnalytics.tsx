@@ -4,7 +4,7 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
+  CardWrapper ,
   Button,
   Badge,
   SimpleGrid,
@@ -430,8 +430,8 @@ export function CrossModuleAnalytics() {
 
           {/* System Health Banner */}
           {analyticsSummary && (
-            <Card.Root variant="outline" bg={`${getHealthColor(analyticsSummary.healthStatus)}.50`} w="full">
-              <Card.Body p={4}>
+            <CardWrapper .Root variant="outline" bg={`${getHealthColor(analyticsSummary.healthStatus)}.50`} w="full">
+              <CardWrapper .Body p={4}>
                 <HStack justify="space-between">
                   <VStack align="start" gap={1}>
                     <HStack gap={2}>
@@ -456,48 +456,48 @@ export function CrossModuleAnalytics() {
                     width="200px"
                   />
                 </HStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           )}
 
           {/* Quick Stats */}
           {analyticsSummary && (
             <SimpleGrid columns={{ base: 2, md: 4 }} gap={4} w="full">
-              <Card.Root variant="subtle" bg="blue.50">
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper .Root variant="subtle" bg="blue.50">
+                <CardWrapper .Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="blue.600">
                     {analyticsSummary.totalMetrics}
                   </Text>
                   <Text fontSize="sm" color="gray.600">Métricas Cross-Module</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
 
-              <Card.Root variant="subtle" bg="purple.50">
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper .Root variant="subtle" bg="purple.50">
+                <CardWrapper .Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="purple.600">
                     {analyticsSummary.activeCorrelations}
                   </Text>
                   <Text fontSize="sm" color="gray.600">Correlaciones Activas</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
 
-              <Card.Root variant="subtle" bg="orange.50">
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper .Root variant="subtle" bg="orange.50">
+                <CardWrapper .Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="orange.600">
                     {bottlenecks.length}
                   </Text>
                   <Text fontSize="sm" color="gray.600">Cuellos de Botella</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
 
-              <Card.Root variant="subtle" >
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper .Root variant="subtle" >
+                <CardWrapper .Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="green.600">
                     {analyticsSummary.highImpactInsights}
                   </Text>
                   <Text fontSize="sm" color="gray.600">Insights Alto Impacto</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             </SimpleGrid>
           )}
         </VStack>
@@ -546,15 +546,15 @@ export function CrossModuleAnalytics() {
             <Tabs.Content value="overview">
               <VStack gap={6} align="stretch">
                 {/* System Health Grid */}
-                <Card.Root variant="outline">
-                  <Card.Header>
+                <CardWrapper .Root variant="outline">
+                  <CardWrapper .Header>
                     <Text fontSize="lg" fontWeight="bold">📊 Salud del Sistema por Categoría</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
                       {systemHealth.map((metric, index) => (
-                        <Card.Root key={index} variant="subtle" size="sm">
-                          <Card.Body p={4}>
+                        <CardWrapper .Root key={index} variant="subtle" size="sm">
+                          <CardWrapper .Body p={4}>
                             <VStack gap={2} align="stretch">
                               <HStack justify="space-between">
                                 <Text fontSize="sm" fontWeight="medium">
@@ -591,23 +591,23 @@ export function CrossModuleAnalytics() {
                                 </Text>
                               </HStack>
                             </VStack>
-                          </Card.Body>
-                        </Card.Root>
+                          </CardWrapper .Body>
+                        </CardWrapper .Root>
                       ))}
                     </SimpleGrid>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
 
                 {/* Top Correlations Summary */}
-                <Card.Root variant="outline">
-                  <Card.Header>
+                <CardWrapper .Root variant="outline">
+                  <CardWrapper .Header>
                     <Text fontSize="lg" fontWeight="bold">🔗 Top Correlaciones Cross-Module</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <VStack gap={3} align="stretch">
                       {filteredCorrelations.slice(0, 5).map((correlation) => (
-                        <Card.Root key={correlation.id} variant="subtle" size="sm">
-                          <Card.Body p={3}>
+                        <CardWrapper .Root key={correlation.id} variant="subtle" size="sm">
+                          <CardWrapper .Body p={3}>
                             <HStack justify="space-between" align="start">
                               <VStack align="start" gap={1} flex="1">
                                 <HStack gap={2}>
@@ -636,20 +636,20 @@ export function CrossModuleAnalytics() {
                                 </Text>
                               </VStack>
                             </HStack>
-                          </Card.Body>
-                        </Card.Root>
+                          </CardWrapper .Body>
+                        </CardWrapper .Root>
                       ))}
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
 
                 {/* Critical Bottlenecks */}
                 {bottlenecks.filter(b => b.severity === 'critical' || b.severity === 'high').length > 0 && (
-                  <Card.Root variant="outline">
-                    <Card.Header>
+                  <CardWrapper .Root variant="outline">
+                    <CardWrapper .Header>
                       <Text fontSize="lg" fontWeight="bold">⚠️ Cuellos de Botella Críticos</Text>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper .Header>
+                    <CardWrapper .Body>
                       <VStack gap={3} align="stretch">
                         {bottlenecks.filter(b => b.severity === 'critical' || b.severity === 'high').map((bottleneck) => (
                           <Alert.Root key={bottleneck.id} status="warning" variant="subtle">
@@ -674,8 +674,8 @@ export function CrossModuleAnalytics() {
                           </Alert.Root>
                         ))}
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 )}
               </VStack>
             </Tabs.Content>
@@ -725,8 +725,8 @@ export function CrossModuleAnalytics() {
                 {/* Correlations Grid */}
                 <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
                   {filteredCorrelations.map((correlation) => (
-                    <Card.Root key={correlation.id} variant="outline">
-                      <Card.Body p={4}>
+                    <CardWrapper .Root key={correlation.id} variant="outline">
+                      <CardWrapper .Body p={4}>
                         <VStack gap={3} align="stretch">
                           {/* Header */}
                           <HStack justify="space-between">
@@ -774,21 +774,21 @@ export function CrossModuleAnalytics() {
                               {correlation.businessInsight}
                             </Text>
                             {correlation.actionableRecommendation && (
-                              <Card.Root variant="subtle" size="sm">
-                                <Card.Body p={2}>
+                              <CardWrapper .Root variant="subtle" size="sm">
+                                <CardWrapper .Body p={2}>
                                   <HStack gap={2}>
                                     <LightBulbIcon className="w-4 h-4 text-blue-500 flex-shrink-0" />
                                     <Text fontSize="xs" color="blue.700">
                                       {correlation.actionableRecommendation}
                                     </Text>
                                   </HStack>
-                                </Card.Body>
-                              </Card.Root>
+                                </CardWrapper .Body>
+                              </CardWrapper .Root>
                             )}
                           </VStack>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
                   ))}
                 </SimpleGrid>
               </VStack>
@@ -798,8 +798,8 @@ export function CrossModuleAnalytics() {
             <Tabs.Content value="bottlenecks">
               <VStack gap={4} align="stretch">
                 {bottlenecks.map((bottleneck) => (
-                  <Card.Root key={bottleneck.id} variant="outline">
-                    <Card.Header>
+                  <CardWrapper .Root key={bottleneck.id} variant="outline">
+                    <CardWrapper .Header>
                       <HStack justify="space-between">
                         <HStack gap={3}>
                           <Box p={2} bg={`${getBottleneckColor(bottleneck.severity)}.100`} borderRadius="md">
@@ -821,9 +821,9 @@ export function CrossModuleAnalytics() {
                           </VStack>
                         </HStack>
                       </HStack>
-                    </Card.Header>
+                    </CardWrapper .Header>
                     
-                    <Card.Body>
+                    <CardWrapper .Body>
                       <VStack gap={4} align="stretch">
                         {/* Description */}
                         <Text fontSize="sm" color="gray.700" lineHeight={1.5}>
@@ -882,8 +882,8 @@ export function CrossModuleAnalytics() {
                           <Text fontSize="sm" fontWeight="medium" color="gray.700">Recomendaciones:</Text>
                           <VStack gap={2} align="stretch">
                             {bottleneck.recommendations.map((rec, index) => (
-                              <Card.Root key={index} variant="subtle" size="sm">
-                                <Card.Body p={3}>
+                              <CardWrapper .Root key={index} variant="subtle" size="sm">
+                                <CardWrapper .Body p={3}>
                                   <VStack gap={2} align="stretch">
                                     <Text fontSize="sm" fontWeight="medium">{rec.action}</Text>
                                     <HStack gap={4} fontSize="xs" color="gray.600">
@@ -896,14 +896,14 @@ export function CrossModuleAnalytics() {
                                       </Badge>
                                     </HStack>
                                   </VStack>
-                                </Card.Body>
-                              </Card.Root>
+                                </CardWrapper .Body>
+                              </CardWrapper .Root>
                             ))}
                           </VStack>
                         </VStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 ))}
               </VStack>
             </Tabs.Content>
@@ -912,8 +912,8 @@ export function CrossModuleAnalytics() {
             <Tabs.Content value="insights">
               <VStack gap={4} align="stretch">
                 {insights.map((insight) => (
-                  <Card.Root key={insight.id} variant="outline">
-                    <Card.Header>
+                  <CardWrapper .Root key={insight.id} variant="outline">
+                    <CardWrapper .Header>
                       <HStack justify="space-between">
                         <HStack gap={3}>
                           <Box p={2} bg="purple.100" borderRadius="md">
@@ -947,9 +947,9 @@ export function CrossModuleAnalytics() {
                           </Text>
                         </VStack>
                       </HStack>
-                    </Card.Header>
+                    </CardWrapper .Header>
                     
-                    <Card.Body>
+                    <CardWrapper .Body>
                       <VStack gap={4} align="stretch">
                         <Text fontSize="sm" color="gray.700" lineHeight={1.5}>
                           {insight.description}
@@ -980,8 +980,8 @@ export function CrossModuleAnalytics() {
                         </HStack>
 
                         {/* Implementation Details */}
-                        <Card.Root variant="subtle" size="sm">
-                          <Card.Body p={3}>
+                        <CardWrapper .Root variant="subtle" size="sm">
+                          <CardWrapper .Body p={3}>
                             <VStack gap={3} align="stretch">
                               <HStack justify="space-between">
                                 <Text fontSize="sm" fontWeight="medium">Plan de Implementación</Text>
@@ -1018,19 +1018,19 @@ export function CrossModuleAnalytics() {
                                 </VStack>
                               )}
                             </VStack>
-                          </Card.Body>
-                        </Card.Root>
+                          </CardWrapper .Body>
+                        </CardWrapper .Root>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 ))}
               </VStack>
             </Tabs.Content>
 
             {/* Optimization Tab */}
             <Tabs.Content value="optimization">
-              <Card.Root variant="subtle">
-                <Card.Body p={8} textAlign="center">
+              <CardWrapper .Root variant="subtle">
+                <CardWrapper .Body p={8} textAlign="center">
                   <ArrowTrendingUpIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <Text fontSize="lg" fontWeight="medium" mb={2}>
                     Optimización Avanzada
@@ -1041,8 +1041,8 @@ export function CrossModuleAnalytics() {
                   <Text fontSize="sm" color="gray.500" mt={2}>
                     * Funcionalidad avanzada disponible en versión completa
                   </Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             </Tabs.Content>
           </Box>
         </Tabs.Root>

@@ -2,7 +2,7 @@
 // Eliminates duplicate POS tabs by intelligently switching between implementations
 
 import React, { useEffect, useMemo } from 'react';
-import { Stack, Typography, Card } from '@/shared/ui';
+import { Stack, Typography, CardWrapper  } from '@/shared/ui';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { notify } from '@/lib/notifications';
 import { POSConnectionBadge } from '@/shared/ui/ConnectionBadge';

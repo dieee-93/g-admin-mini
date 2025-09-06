@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Typography,
@@ -274,7 +274,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
 
   if (variant === 'compact') {
     return (
-      <Card colorPalette="brand">
+      <CardWrapper colorPalette="brand">
         <VStack gap="md" align="stretch">
           <HStack justify="space-between">
             <Typography variant="heading" size="sm">
@@ -291,7 +291,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
           
           <Grid templateColumns="repeat(2, 1fr)" gap="sm">
             {financialKPIs.slice(0, 4).map((kpi, index) => (
-              <Card key={index} variant="outline" size="sm">
+              <CardWrapper key={index} variant="outline" size="sm">
                 <VStack gap="xs">
                   <Typography variant="caption" color="text.muted">
                     {kpi.label}
@@ -317,7 +317,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
   return (
     <VStack gap="lg" align="stretch">
       {/* Header */}
-      <Card colorPalette="brand">
+      <CardWrapper colorPalette="brand">
         <VStack align="stretch" gap="md">
           <HStack justify="space-between">
             <Typography variant="heading" size="lg">Reportes Financieros</Typography>
@@ -357,7 +357,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
       {/* Financial KPIs */}
       <Grid templateColumns="repeat(auto-fit, minmax(280px, 1fr))" gap="md">
         {financialKPIs.map((kpi, index) => (
-          <Card key={index} colorPalette="brand">
+          <CardWrapper key={index} colorPalette="brand">
             <VStack align="stretch" gap="md">
               <HStack justify="space-between">
                 <Typography variant="heading" size="sm">
@@ -401,7 +401,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
         <TabPanels>
           {/* Reports Tab */}
           <TabPanel value="reports">
-            <Card colorPalette="brand">
+            <CardWrapper colorPalette="brand">
               <VStack align="stretch" gap="md">
                 <HStack justify="space-between">
                   <Typography variant="heading" size="sm">
@@ -489,7 +489,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
 
           {/* Generator Tab */}
           <TabPanel value="generator">
-            <Card colorPalette="brand">
+            <CardWrapper colorPalette="brand">
               <VStack align="stretch" gap="md">
                 <Typography variant="heading" size="sm">
                   Generar Nuevo Reporte
@@ -551,7 +551,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
           {/* Analytics Tab */}
           <TabPanel value="analytics">
             <VStack gap="md" align="stretch">
-              <Card colorPalette="brand">
+              <CardWrapper colorPalette="brand">
                 <VStack align="stretch" gap="md">
                   <Typography variant="heading" size="sm">
                     Análisis Financiero

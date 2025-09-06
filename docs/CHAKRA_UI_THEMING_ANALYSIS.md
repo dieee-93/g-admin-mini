@@ -326,7 +326,7 @@ After implementation:
 ```jsx
 // These will use current theme colors (gray.* override)
 <Button variant="solid">Primary Action</Button>
-<Card variant="elevated">Theme Card</Card>
+<CardWrapper variant="elevated">Theme Card</Card>
 
 // These will use standard Chakra colors
 <Button colorPalette="blue">Always Blue</Button>

@@ -6,7 +6,7 @@ import {
   HStack, 
   Text, 
   Heading, 
-  Card, 
+  CardWrapper , 
   SimpleGrid, 
   Badge, 
   Tabs,
@@ -131,8 +131,8 @@ const PredictiveAnalyticsPage: React.FC = () => {
         {/* Forecast Overview Cards */}
         <SimpleGrid columns={{ base: 2, md: 4 }} gap="4" w="full">
           {forecastCards.map((forecast, index) => (
-            <Card.Root key={index}>
-              <Card.Body>
+            <CardWrapper .Root key={index}>
+              <CardWrapper .Body>
                 <VStack align="start" gap="2">
                   <HStack justify="space-between" w="full">
                     <Text fontSize="sm" color="gray.600" fontWeight="medium">
@@ -153,8 +153,8 @@ const PredictiveAnalyticsPage: React.FC = () => {
                     {forecast.trend}
                   </Text>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           ))}
         </SimpleGrid>
 
@@ -163,13 +163,13 @@ const PredictiveAnalyticsPage: React.FC = () => {
           <Text fontSize="lg" fontWeight="semibold" mb="4">Machine Learning Models</Text>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
             {mlModels.map((model) => (
-              <Card.Root 
+              <CardWrapper .Root 
                 key={model.id}
                 variant="outline"
                 cursor="pointer"
                 _hover={{ shadow: 'md', borderColor: 'purple.200' }}
               >
-                <Card.Body>
+                <CardWrapper .Body>
                   <VStack align="start" gap="4">
                     <HStack justify="space-between" w="full">
                       <HStack gap="3">
@@ -206,15 +206,15 @@ const PredictiveAnalyticsPage: React.FC = () => {
                       ))}
                     </VStack>
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             ))}
           </SimpleGrid>
         </Box>
 
         {/* Main Analytics Interface */}
-        <Card.Root w="full">
-          <Card.Header>
+        <CardWrapper .Root w="full">
+          <CardWrapper .Header>
             <HStack justify="space-between">
               <Heading size="md">Predictive Models Dashboard</Heading>
               <HStack gap="2">
@@ -228,9 +228,9 @@ const PredictiveAnalyticsPage: React.FC = () => {
                 </Button>
               </HStack>
             </HStack>
-          </Card.Header>
+          </CardWrapper .Header>
           
-          <Card.Body>
+          <CardWrapper .Body>
             <Tabs.Root value={activeModel} onValueChange={(details) => setActiveModel(details.value)}>
               <Tabs.List>
                 <Tabs.Trigger value="demand">
@@ -290,12 +290,12 @@ const PredictiveAnalyticsPage: React.FC = () => {
                 <PredictiveAnalytics />
               </Tabs.Content>
             </Tabs.Root>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
         {/* Model Performance Summary */}
-        <Card.Root w="full" variant="subtle">
-          <Card.Body>
+        <CardWrapper .Root w="full" variant="subtle">
+          <CardWrapper .Body>
             <HStack justify="space-between">
               <VStack align="start" gap="1">
                 <Text fontWeight="semibold">Model Performance</Text>
@@ -318,8 +318,8 @@ const PredictiveAnalyticsPage: React.FC = () => {
                 </VStack>
               </HStack>
             </HStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </VStack>
     </Box>
   );

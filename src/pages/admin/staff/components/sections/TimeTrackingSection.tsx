@@ -8,7 +8,7 @@ import {
   HStack,
   Text,
   Button,
-  Card,
+  CardWrapper ,
   Badge,
   Alert,
   SimpleGrid,
@@ -644,70 +644,70 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
 
       {/* Time Tracking Stats */}
       <SimpleGrid columns={{ base: 2, md: 4, lg: 6 }} gap="4">
-        <Card.Root size="sm">
-          <Card.Body textAlign="center">
+        <CardWrapper .Root size="sm">
+          <CardWrapper .Body textAlign="center">
             <VStack gap="1">
               <TimeIcon className="w-5 h-5 text-blue-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.today_total_hours.toFixed(1)}</Text>
               <Text fontSize="xs" color="gray.600">Hours Today</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root size="sm">
-          <Card.Body textAlign="center">
+        <CardWrapper .Root size="sm">
+          <CardWrapper .Body textAlign="center">
             <VStack gap="1">
               <CalendarIcon className="w-5 h-5 text-green-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.week_total_hours.toFixed(1)}</Text>
               <Text fontSize="xs" color="gray.600">Hours This Week</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root size="sm">
-          <Card.Body textAlign="center">
+        <CardWrapper .Root size="sm">
+          <CardWrapper .Body textAlign="center">
             <VStack gap="1">
               <PlayIcon className="w-5 h-5 text-purple-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.active_employees}</Text>
               <Text fontSize="xs" color="gray.600">Active Now</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root size="sm">
-          <Card.Body textAlign="center">
+        <CardWrapper .Root size="sm">
+          <CardWrapper .Body textAlign="center">
             <VStack gap="1">
               <PauseIcon className="w-5 h-5 text-orange-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.on_break}</Text>
               <Text fontSize="xs" color="gray.600">On Break</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root size="sm">
-          <Card.Body textAlign="center">
+        <CardWrapper .Root size="sm">
+          <CardWrapper .Body textAlign="center">
             <VStack gap="1">
               <ArrowTrendingUpIcon className="w-5 h-5 text-red-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.overtime_this_week.toFixed(1)}</Text>
               <Text fontSize="xs" color="gray.600">Overtime Week</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root size="sm">
-          <Card.Body textAlign="center">
+        <CardWrapper .Root size="sm">
+          <CardWrapper .Body textAlign="center">
             <VStack gap="1">
               <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.pending_approvals}</Text>
               <Text fontSize="xs" color="gray.600">Pending Approval</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </SimpleGrid>
 
       {/* Time Tracking Tabs */}
-      <Card.Root>
-        <Card.Body p="0">
+      <CardWrapper .Root>
+        <CardWrapper .Body p="0">
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="clock" gap="2" flex="1" minH="44px">
@@ -748,8 +748,8 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                       const shiftHours = getShiftHours(employee.id);
                       
                       return (
-                        <Card.Root key={employee.id}>
-                          <Card.Body>
+                        <CardWrapper .Root key={employee.id}>
+                          <CardWrapper .Body>
                             <VStack align="stretch" gap="3">
                               <HStack gap="3">
                                 <Avatar.Root size='sm'>
@@ -843,8 +843,8 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                                 </Button>
                               )}
                             </VStack>
-                          </Card.Body>
-                        </Card.Root>
+                          </CardWrapper .Body>
+                        </CardWrapper .Root>
                       );
                     })}
                   </SimpleGrid>
@@ -861,13 +861,13 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                     </Button>
                   </HStack>
 
-                  <Card.Root>
-                    <Card.Body>
+                  <CardWrapper .Root>
+                    <CardWrapper .Body>
                       <Text color="gray.600" textAlign="center" py="8">
                         Timesheet management coming soon...
                       </Text>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 </VStack>
               </Tabs.Content>
 
@@ -876,13 +876,13 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                 <VStack gap="4" align="stretch">
                   <Text fontSize="lg" fontWeight="semibold">Time Tracking Reports</Text>
 
-                  <Card.Root>
-                    <Card.Body>
+                  <CardWrapper .Root>
+                    <CardWrapper .Body>
                       <Text color="gray.600" textAlign="center" py="8">
                         Advanced reporting features coming soon...
                       </Text>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 </VStack>
               </Tabs.Content>
 
@@ -891,19 +891,19 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                 <VStack gap="4" align="stretch">
                   <Text fontSize="lg" fontWeight="semibold">Time Tracking Settings</Text>
 
-                  <Card.Root>
-                    <Card.Body>
+                  <CardWrapper .Root>
+                    <CardWrapper .Body>
                       <Text color="gray.600" textAlign="center" py="8">
                         Configuration settings coming soon...
                       </Text>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 </VStack>
               </Tabs.Content>
             </Box>
           </Tabs.Root>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Clock Action Dialog */}
       <Dialog.Root open={showClockDialog} onOpenChange={({ open }) => !open && handleClockDialogClose()}>
@@ -1020,7 +1020,7 @@ const OfflineTimeOperationsModal = ({
               <Box maxH="400px" overflowY="auto">
                 <VStack gap="3" align="stretch">
                   {operations.map((operation) => (
-                    <Card.Root key={operation.id} p="4">
+                    <CardWrapper .Root key={operation.id} p="4">
                       <HStack justify="space-between" mb="2">
                         <VStack align="start" spacing="1">
                           <Text fontWeight="medium" textTransform="capitalize">
@@ -1049,7 +1049,7 @@ const OfflineTimeOperationsModal = ({
                           {operation.retryCount} retry attempts
                         </Text>
                       )}
-                    </Card.Root>
+                    </CardWrapper .Root>
                   ))}
                 </VStack>
               </Box>

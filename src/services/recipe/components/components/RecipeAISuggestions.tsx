@@ -1,7 +1,7 @@
 // RecipeAISuggestions.tsx - AI-powered recipe optimization suggestions
 import { useState } from 'react';
 import {
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Text,
@@ -90,8 +90,8 @@ export function RecipeAISuggestions({
   const [activeTab, setActiveTab] = useState<'substitutions' | 'optimization' | 'yield' | 'nutrition'>('substitutions');
 
   return (
-    <Card.Root variant="outline" bg="gradient(to-br, purple.25, blue.25)">
-      <Card.Header>
+    <CardWrapper .Root variant="outline" bg="gradient(to-br, purple.25, blue.25)">
+      <CardWrapper .Header>
         <HStack justify="space-between">
           <HStack gap={2}>
             <LightBulbIcon className="w-5 h-5 text-purple-500" />
@@ -107,8 +107,8 @@ export function RecipeAISuggestions({
             ✕
           </Button>
         </HStack>
-      </Card.Header>
-      <Card.Body>
+      </CardWrapper .Header>
+      <CardWrapper .Body>
         <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
           <Tabs.List>
             <Tabs.Trigger value="substitutions">
@@ -159,8 +159,8 @@ export function RecipeAISuggestions({
                     const isApplied = appliedSuggestions.has(suggestionId);
                     
                     return (
-                      <Card.Root key={index} variant="subtle" size="sm">
-                        <Card.Body p={3}>
+                      <CardWrapper .Root key={index} variant="subtle" size="sm">
+                        <CardWrapper .Body p={3}>
                           <VStack gap={2} align="stretch">
                             <HStack justify="space-between">
                               <VStack align="start" gap={0}>
@@ -208,8 +208,8 @@ export function RecipeAISuggestions({
                               </VStack>
                             </SimpleGrid>
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
                     );
                   })
                 ) : (
@@ -224,8 +224,8 @@ export function RecipeAISuggestions({
             <Tabs.Content value="optimization">
               <VStack gap={3} align="stretch">
                 {suggestions.costOptimizations.map((opt, index) => (
-                  <Card.Root key={index} variant="subtle" size="sm">
-                    <Card.Body p={3}>
+                  <CardWrapper .Root key={index} variant="subtle" size="sm">
+                    <CardWrapper .Body p={3}>
                       <VStack gap={2} align="stretch">
                         <HStack justify="space-between">
                           <VStack align="start" gap={0}>
@@ -259,8 +259,8 @@ export function RecipeAISuggestions({
                           </VStack>
                         </SimpleGrid>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 ))}
               </VStack>
             </Tabs.Content>
@@ -268,8 +268,8 @@ export function RecipeAISuggestions({
             {/* Yield Tab */}
             <Tabs.Content value="yield">
               {suggestions.yieldOptimization ? (
-                <Card.Root variant="subtle" size="sm">
-                  <Card.Body p={4}>
+                <CardWrapper .Root variant="subtle" size="sm">
+                  <CardWrapper .Body p={4}>
                     <VStack gap={3} align="stretch">
                       <HStack justify="space-between">
                         <Text fontSize="sm" fontWeight="medium">
@@ -322,8 +322,8 @@ export function RecipeAISuggestions({
                         </VStack>
                       )}
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               ) : (
                 <Text fontSize="sm" color="gray.600" textAlign="center" py={4}>
                   No se detectaron oportunidades de optimización de rendimiento.
@@ -335,8 +335,8 @@ export function RecipeAISuggestions({
             <Tabs.Content value="nutrition">
               <SimpleGrid columns={{ base: 1, md: 2 }} gap={3}>
                 {suggestions.nutritionalInsights.map((insight, index) => (
-                  <Card.Root key={index} variant="subtle" size="sm">
-                    <Card.Body p={3}>
+                  <CardWrapper .Root key={index} variant="subtle" size="sm">
+                    <CardWrapper .Body p={3}>
                       <VStack gap={2} align="stretch">
                         <HStack justify="space-between">
                           <Text fontSize="sm" fontWeight="medium" textTransform="capitalize">
@@ -374,15 +374,15 @@ export function RecipeAISuggestions({
                           </VStack>
                         )}
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 ))}
               </SimpleGrid>
             </Tabs.Content>
           </VStack>
         </Tabs.Root>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper .Body>
+    </CardWrapper .Root>
   );
 }
 

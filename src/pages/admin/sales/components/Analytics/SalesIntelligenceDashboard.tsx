@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   Box,
-  Card,
+  CardWrapper ,
   Text,
   Button,
   VStack,
@@ -263,7 +263,7 @@ export function SalesIntelligenceDashboard({
   return (
     <VStack gap="6" align="stretch">
       {/* Header & Controls */}
-      <Card.Root p="4">
+      <CardWrapper .Root p="4">
         <HStack justify="space-between" align="center" wrap="wrap" gap="4">
           <VStack align="start" gap="1">
             <HStack gap="2">
@@ -329,7 +329,7 @@ export function SalesIntelligenceDashboard({
             </Button>
           </HStack>
         </HStack>
-      </Card.Root>
+      </CardWrapper .Root>
 
       {/* Key Metrics Grid */}
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap="4">
@@ -340,7 +340,7 @@ export function SalesIntelligenceDashboard({
           const progressValue = metric.target ? (Number(metric.value) / metric.target) * 100 : undefined;
           
           return (
-            <Card.Root key={index} p="4">
+            <CardWrapper .Root key={index} p="4">
               <VStack gap="3" align="stretch">
                 <HStack justify="space-between" align="center">
                   <MetricIcon className={`w-5 h-5 text-${metric.color}-500`} />
@@ -379,20 +379,20 @@ export function SalesIntelligenceDashboard({
                   </VStack>
                 )}
               </VStack>
-            </Card.Root>
+            </CardWrapper .Root>
           );
         })}
       </Grid>
 
       {/* Real-time Metrics */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <HStack justify="space-between" align="center">
             <Text fontWeight="bold">Real-time Performance</Text>
             <Badge colorPalette="blue" size="sm">Live Updates</Badge>
           </HStack>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <Grid templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(5, 1fr)" }} gap="4">
             <Stat.Root>
               <Stat.Label>Current Revenue</Stat.Label>
@@ -429,19 +429,19 @@ export function SalesIntelligenceDashboard({
               </Stat.ValueText>
             </Stat.Root>
           </Grid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Business Alerts & Insights */}
       {(analytics?.alerts_and_insights?.length || 0) > 0 && (
-        <Card.Root>
-          <Card.Header>
+        <CardWrapper .Root>
+          <CardWrapper .Header>
             <HStack gap="2">
               <LightBulbIcon className="w-5 h-5 text-yellow-500" />
               <Text fontWeight="bold">Business Insights & Alerts</Text>
             </HStack>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <VStack gap="3" align="stretch">
               {(analytics?.alerts_and_insights || []).map((alert, index) => (
                 <Alert.Root
@@ -474,19 +474,19 @@ export function SalesIntelligenceDashboard({
                 </Alert.Root>
               ))}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       )}
 
       {/* Menu Performance */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontWeight="bold">Top Performing Menu Items</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }} gap="4">
             {(analytics?.menu_item_performance || []).slice(0, 6).map((item, index) => (
-              <Card.Root key={index} p="3" variant="outline">
+              <CardWrapper .Root key={index} p="3" variant="outline">
                 <HStack justify="space-between" align="center">
                   <VStack align="start" gap="1">
                     <Text fontWeight="medium">{item.item_name}</Text>
@@ -516,21 +516,21 @@ export function SalesIntelligenceDashboard({
                     </Text>
                   </VStack>
                 </HStack>
-              </Card.Root>
+              </CardWrapper .Root>
             ))}
           </Grid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Peak Hours Analysis */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontWeight="bold">Peak Hours Analysis</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap="3">
             {(analytics?.peak_hours_analysis || []).map((hour, index) => (
-              <Card.Root key={index} p="3" variant="outline">
+              <CardWrapper .Root key={index} p="3" variant="outline">
                 <VStack gap="2" align="center">
                   <Text fontWeight="bold" fontSize="lg">{hour.time_slot}</Text>
                   <VStack gap="1" align="center">
@@ -547,11 +547,11 @@ export function SalesIntelligenceDashboard({
                     Staff: {hour.staffing_recommendation}
                   </Text>
                 </VStack>
-              </Card.Root>
+              </CardWrapper .Root>
             ))}
           </Grid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 }

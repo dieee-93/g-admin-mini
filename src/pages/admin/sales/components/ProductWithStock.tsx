@@ -7,7 +7,7 @@ import {
   Badge,
   InputField,
   NumberField,
-  Card,
+  CardWrapper ,
   Alert,
   Icon
 } from '@/shared/ui';
@@ -271,7 +271,7 @@ export function ProductWithStock({
         const StatusIcon = stockStatus.icon;
 
         return (
-          <Card key={product.id} variant="outline">
+          <CardWrapper key={product.id} variant="outline">
             <div style={{ padding: '1rem' }}>
               <Stack direction="column" gap="md">
                 {/* Header con nombre y badge de stock */}

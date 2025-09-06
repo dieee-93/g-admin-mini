@@ -2,7 +2,7 @@
 // Shows detailed tax calculations in a consistent format
 
 import {
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Typography,

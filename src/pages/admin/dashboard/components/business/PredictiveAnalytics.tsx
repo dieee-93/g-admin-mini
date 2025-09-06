@@ -4,7 +4,6 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
   Button,
   Badge,
   SimpleGrid,
@@ -33,6 +32,8 @@ import {
   ArrowPathIcon,
   BeakerIcon
 } from '@heroicons/react/24/outline';
+
+import { CardWrapper } from '@/shared/ui';
 
 // Import event system
 import { EventBus } from '@/lib/events/EventBus';
@@ -511,35 +512,35 @@ export function PredictiveAnalytics() {
           {/* Overview Stats */}
           {analyticsOverview && (
             <SimpleGrid columns={{ base: 2, md: 4 }} gap={4} w="full">
-              <Card.Root variant="subtle" bg="blue.50">
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper variant="subtle" bg="blue.50">
+                <CardWrapper.Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="blue.600">
                     {analyticsOverview.totalMaterials}
                   </Text>
                   <Text fontSize="sm" color="gray.600">Materiales Analizados</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
 
-              <Card.Root variant="subtle" >
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper variant="subtle">
+                <CardWrapper.Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="green.600">
                     {analyticsOverview.averageAccuracy}%
                   </Text>
                   <Text fontSize="sm" color="gray.600">Precisión Promedio</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
 
-              <Card.Root variant="subtle" bg="purple.50">
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper variant="subtle" bg="purple.50">
+                <CardWrapper.Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="purple.600">
                     {analyticsOverview.seasonalMaterials}
                   </Text>
                   <Text fontSize="sm" color="gray.600">Con Estacionalidad</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
 
-              <Card.Root variant="subtle" bg={analyticsOverview.criticalAlerts > 0 ? "red.50" : "gray.50"}>
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper variant="subtle" bg={analyticsOverview.criticalAlerts > 0 ? "red.50" : "gray.50"}>
+                <CardWrapper.Body p={4} textAlign="center">
                   <Text 
                     fontSize="2xl" 
                     fontWeight="bold" 
@@ -548,8 +549,8 @@ export function PredictiveAnalytics() {
                     {analyticsOverview.criticalAlerts}
                   </Text>
                   <Text fontSize="sm" color="gray.600">Alertas Críticas</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
             </SimpleGrid>
           )}
         </VStack>
@@ -646,7 +647,7 @@ export function PredictiveAnalytics() {
                     const TrendIcon = trend.icon;
                     
                     return (
-                      <Card.Root 
+                      <CardWrapper 
                         key={material.materialId}
                         variant="outline"
                         cursor="pointer"
@@ -656,7 +657,7 @@ export function PredictiveAnalytics() {
                         bg={selectedMaterial?.materialId === material.materialId ? 'blue.50' : 'white'}
                         borderColor={selectedMaterial?.materialId === material.materialId ? 'blue.300' : 'gray.200'}
                       >
-                        <Card.Body p={4}>
+                        <CardWrapper.Body p={4}>
                           <VStack align="stretch" gap={3}>
                             {/* Header */}
                             <HStack justify="space-between">
@@ -721,8 +722,8 @@ export function PredictiveAnalytics() {
                               </VStack>
                             )}
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper.Body>
+                      </CardWrapper>
                     );
                   })}
                 </SimpleGrid>
@@ -734,13 +735,13 @@ export function PredictiveAnalytics() {
               <VStack gap={6} align="stretch">
                 {selectedMaterial && (
                   <>
-                    <Card.Root variant="outline">
-                      <Card.Header>
+                    <CardWrapper variant="outline">
+                      <CardWrapper.Header>
                         <Text fontSize="lg" fontWeight="bold">
                           Predicción de Demanda - {selectedMaterial.materialName}
                         </Text>
-                      </Card.Header>
-                      <Card.Body>
+                      </CardWrapper.Header>
+                      <CardWrapper.Body>
                         <VStack gap={4} align="stretch">
                           {/* Forecast Summary */}
                           <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
@@ -771,8 +772,8 @@ export function PredictiveAnalytics() {
                           </SimpleGrid>
 
                           {/* Forecast Chart (Mock) */}
-                          <Card.Root variant="subtle">
-                            <Card.Body p={6} textAlign="center">
+                          <CardWrapper variant="subtle">
+                            <CardWrapper.Body p={6} textAlign="center">
                               <Text fontSize="4xl" mb={4}>📈</Text>
                               <Text fontWeight="medium" mb={2}>Gráfico de Predicciones</Text>
                               <Text fontSize="sm" color="gray.600">
@@ -781,8 +782,8 @@ export function PredictiveAnalytics() {
                               <Text fontSize="xs" color="gray.500" mt={2}>
                                 * Gráfico interactivo disponible en versión completa
                               </Text>
-                            </Card.Body>
-                          </Card.Root>
+                            </CardWrapper.Body>
+                          </CardWrapper>
 
                           {/* Forecast Table */}
                           <Box>
@@ -791,8 +792,8 @@ export function PredictiveAnalytics() {
                             </Text>
                             <VStack gap={2} align="stretch">
                               {selectedMaterial.prediction.predictions.map((prediction, index) => (
-                                <Card.Root key={index} variant="outline" size="sm">
-                                  <Card.Body p={3}>
+                                <CardWrapper key={index} variant="outline" size="sm">
+                                  <CardWrapper.Body p={3}>
                                     <HStack justify="space-between">
                                       <VStack align="start" gap={0}>
                                         <Text fontSize="sm" fontWeight="medium">
@@ -812,14 +813,14 @@ export function PredictiveAnalytics() {
                                         </Text>
                                       </VStack>
                                     </HStack>
-                                  </Card.Body>
-                                </Card.Root>
+                                  </CardWrapper.Body>
+                                </CardWrapper>
                               ))}
                             </VStack>
                           </Box>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper.Body>
+                    </CardWrapper>
                   </>
                 )}
               </VStack>
@@ -829,13 +830,13 @@ export function PredictiveAnalytics() {
             <Tabs.Content value="seasonality">
               <VStack gap={6} align="stretch">
                 {selectedMaterial && (
-                  <Card.Root variant="outline">
-                    <Card.Header>
+                  <CardWrapper variant="outline">
+                    <CardWrapper.Header>
                       <Text fontSize="lg" fontWeight="bold">
                         Análisis de Estacionalidad - {selectedMaterial.materialName}
                       </Text>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper.Header>
+                    <CardWrapper.Body>
                       <VStack gap={4} align="stretch">
                         {selectedMaterial.seasonality.detected ? (
                           <>
@@ -867,8 +868,8 @@ export function PredictiveAnalytics() {
                               </Text>
                               <VStack gap={2} align="stretch">
                                 {selectedMaterial.seasonality.peakPeriods.map((period, index) => (
-                                  <Card.Root key={index} variant="subtle">
-                                    <Card.Body p={3}>
+                                  <CardWrapper key={index} variant="subtle">
+                                    <CardWrapper.Body p={3}>
                                       <HStack justify="space-between">
                                         <VStack align="start" gap={0}>
                                           <Text fontSize="sm" fontWeight="medium">
@@ -887,8 +888,8 @@ export function PredictiveAnalytics() {
                                           </Badge>
                                         </VStack>
                                       </HStack>
-                                    </Card.Body>
-                                  </Card.Root>
+                                    </CardWrapper.Body>
+                                  </CardWrapper>
                                 ))}
                               </VStack>
                             </Box>
@@ -899,8 +900,8 @@ export function PredictiveAnalytics() {
                               </Text>
                               <VStack gap={2} align="stretch">
                                 {selectedMaterial.seasonality.adjustments.map((adjustment, index) => (
-                                  <Card.Root key={index} variant="outline" size="sm">
-                                    <Card.Body p={3}>
+                                  <CardWrapper key={index} variant="outline" size="sm">
+                                    <CardWrapper.Body p={3}>
                                       <HStack justify="space-between">
                                         <VStack align="start" gap={0}>
                                           <Text fontSize="sm" fontWeight="medium">
@@ -914,15 +915,15 @@ export function PredictiveAnalytics() {
                                           +{adjustment.adjustment}%
                                         </Text>
                                       </HStack>
-                                    </Card.Body>
-                                  </Card.Root>
+                                    </CardWrapper.Body>
+                                  </CardWrapper>
                                 ))}
                               </VStack>
                             </Box>
                           </>
                         ) : (
-                          <Card.Root variant="subtle">
-                            <Card.Body p={8} textAlign="center">
+                          <CardWrapper variant="subtle">
+                            <CardWrapper.Body p={8} textAlign="center">
                               <CalendarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                               <Text fontSize="lg" fontWeight="medium" mb={2}>
                                 No se detectó estacionalidad
@@ -930,12 +931,12 @@ export function PredictiveAnalytics() {
                               <Text color="gray.600">
                                 Los patrones de demanda para este material son relativamente constantes a lo largo del tiempo.
                               </Text>
-                            </Card.Body>
-                          </Card.Root>
+                            </CardWrapper.Body>
+                          </CardWrapper>
                         )}
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 )}
               </VStack>
             </Tabs.Content>
@@ -945,8 +946,8 @@ export function PredictiveAnalytics() {
               <VStack gap={4} align="stretch">
                 {materials.filter(m => m.alerts.length > 0).length > 0 ? (
                   materials.filter(m => m.alerts.length > 0).map((material) => (
-                    <Card.Root key={material.materialId} variant="outline">
-                      <Card.Header>
+                    <CardWrapper key={material.materialId} variant="outline">
+                      <CardWrapper.Header>
                         <HStack justify="space-between">
                           <Text fontSize="md" fontWeight="bold">
                             {material.materialName}
@@ -955,8 +956,8 @@ export function PredictiveAnalytics() {
                             {material.alerts.length} alerta{material.alerts.length !== 1 ? 's' : ''}
                           </Badge>
                         </HStack>
-                      </Card.Header>
-                      <Card.Body>
+                      </CardWrapper.Header>
+                      <CardWrapper.Body>
                         <VStack gap={3} align="stretch">
                           {material.alerts.map((alert) => (
                             <Alert.Root 
@@ -988,12 +989,12 @@ export function PredictiveAnalytics() {
                             </Alert.Root>
                           ))}
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper.Body>
+                    </CardWrapper>
                   ))
                 ) : (
-                  <Card.Root variant="subtle">
-                    <Card.Body p={8} textAlign="center">
+                  <CardWrapper variant="subtle">
+                    <CardWrapper.Body p={8} textAlign="center">
                       <CheckCircleIcon className="w-12 h-12 text-green-500 mx-auto mb-4" />
                       <Text fontSize="lg" fontWeight="medium" mb={2} color="green.600">
                         No hay alertas activas
@@ -1001,8 +1002,8 @@ export function PredictiveAnalytics() {
                       <Text color="gray.600">
                         Todos los materiales están dentro de los parámetros normales de predicción.
                       </Text>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 )}
               </VStack>
             </Tabs.Content>
@@ -1011,8 +1012,8 @@ export function PredictiveAnalytics() {
             <Tabs.Content value="recommendations">
               <VStack gap={4} align="stretch">
                 {materials.map((material) => (
-                  <Card.Root key={material.materialId} variant="outline">
-                    <Card.Header>
+                  <CardWrapper key={material.materialId} variant="outline">
+                    <CardWrapper.Header>
                       <HStack justify="space-between">
                         <Text fontSize="md" fontWeight="bold">
                           {material.materialName}
@@ -1027,8 +1028,8 @@ export function PredictiveAnalytics() {
                           {material.prediction.recommendedAction.priority}
                         </Badge>
                       </HStack>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper.Header>
+                    <CardWrapper.Body>
                       <VStack gap={3} align="stretch">
                         <HStack gap={4}>
                           <BoltIcon className="w-5 h-5 text-blue-500 flex-shrink-0" />
@@ -1081,8 +1082,8 @@ export function PredictiveAnalytics() {
                           </Button>
                         </HStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 ))}
               </VStack>
             </Tabs.Content>

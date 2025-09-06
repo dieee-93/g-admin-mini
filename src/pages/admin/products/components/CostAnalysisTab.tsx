@@ -9,7 +9,7 @@ import {
   Stack, HStack,
   
   // Components del Design System
-  Card,
+  CardWrapper ,
   Typography, 
   Alert, AlertDescription,
   Badge,
@@ -169,12 +169,12 @@ export function CostAnalysisTab() {
             <TabPanel value="calculator">
               <HStack gap="lg" align="start">
                 {/* Left Panel - Input Form */}
-                <Card variant="elevated" padding="lg" width="full">
-                  <Card.Header>
+                <CardWrapper variant="elevated" padding="lg" width="full">
+                  <CardWrapper .Header>
                     <Typography variant="title">Cost Calculation Input</Typography>
-                  </Card.Header>
+                  </CardWrapper .Header>
 
-                  <Card.Body>
+                  <CardWrapper .Body>
                     <Stack gap="md" align="stretch">
                       {/* Product Selection */}
                       <Stack gap="xs">
@@ -297,16 +297,16 @@ export function CostAnalysisTab() {
                         {loading ? 'Calculating...' : 'Calculate Real Costs'}
                       </Button>
                     </Stack>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
 
                 {/* Right Panel - Latest Result */}
-                <Card variant="elevated" padding="lg" width="full">
-                  <Card.Header>
+                <CardWrapper variant="elevated" padding="lg" width="full">
+                  <CardWrapper .Header>
                     <Typography variant="title">Latest Cost Analysis</Typography>
-                  </Card.Header>
+                  </CardWrapper .Header>
 
-                  <Card.Body>
+                  <CardWrapper .Body>
                     {calculations.length > 0 ? (
                       <Stack gap="md" align="stretch">
                         {(() => {
@@ -338,7 +338,7 @@ export function CostAnalysisTab() {
                               </Stack>
 
                               {/* Total Cost */}
-                              <Card variant="outline" padding="md">
+                              <CardWrapper variant="outline" padding="md">
                                 <HStack justify="space-between" align="center">
                                   <Typography variant="title">Total Cost</Typography>
                                   <Typography variant="heading" color="text.primary">
@@ -395,23 +395,23 @@ export function CostAnalysisTab() {
                         </Typography>
                       </Stack>
                     )}
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
               </HStack>
             </TabPanel>
 
             {/* Analysis Results Tab */}
             <TabPanel value="analysis">
-              <Card variant="elevated" padding="lg">
-                <Card.Header>
+              <CardWrapper variant="elevated" padding="lg">
+                <CardWrapper .Header>
                   <Typography variant="title">Historical Cost Analysis</Typography>
-                </Card.Header>
+                </CardWrapper .Header>
 
-                <Card.Body>
+                <CardWrapper .Body>
                   {calculations.length > 0 ? (
                     <Stack gap="md">
                       {calculations.map((calc, index) => (
-                        <Card key={index} variant="outline" padding="md">
+                        <CardWrapper key={index} variant="outline" padding="md">
                           <HStack justify="space-between" align="center">
                             <Stack gap="xs">
                               <Typography variant="body" weight="medium">
@@ -450,25 +450,25 @@ export function CostAnalysisTab() {
                       </Typography>
                     </Stack>
                   )}
-                </Card.Body>
+                </CardWrapper .Body>
               </CardWrapper>
             </TabPanel>
 
             {/* Pricing Scenarios Tab */}
             <TabPanel value="scenarios">
-              <Card variant="elevated" padding="lg">
-                <Card.Header>
+              <CardWrapper variant="elevated" padding="lg">
+                <CardWrapper .Header>
                   <Typography variant="title">Pricing Scenarios</Typography>
-                </Card.Header>
+                </CardWrapper .Header>
 
-                <Card.Body>
+                <CardWrapper .Body>
                   <Stack align="center" gap="md" padding="xl">
                     <DocumentTextIcon className="w-16 h-16 text-gray-400" />
                     <Typography variant="body" color="text.muted" align="center">
                       Pricing scenarios feature coming soon
                     </Typography>
                   </Stack>
-                </Card.Body>
+                </CardWrapper .Body>
               </CardWrapper>
             </TabPanel>
           </TabPanels>

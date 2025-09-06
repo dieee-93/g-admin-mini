@@ -7,7 +7,7 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
-  Card,
+  CardWrapper ,
   Badge,
   SelectField,
   NumberField,
@@ -119,7 +119,7 @@ export function ComponentManager({ product, onClose }: ComponentManagerProps) {
   };
 
   return (
-    <Card className="p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+    <CardWrapper className="p-6 bg-white rounded-lg shadow-sm border border-gray-200">
       <VStack align="stretch" gap="md">
         {/* Header */}
         <HStack justify="space-between" align="start">
@@ -166,7 +166,7 @@ export function ComponentManager({ product, onClose }: ComponentManagerProps) {
         ) : (
           <VStack align="stretch" gap="sm">
             {components.map((component) => (
-              <Card key={component.id} className="p-3">
+              <CardWrapper key={component.id} className="p-3">
                 <HStack justify="space-between" align="center">
                   <VStack align="stretch" gap="xs" className="flex-1">
                     <HStack gap="sm">
@@ -211,7 +211,7 @@ export function ComponentManager({ product, onClose }: ComponentManagerProps) {
 
         {/* Add Component Form */}
         {showAddForm && (
-          <Card className="p-4 bg-blue-50 border-blue-200">
+          <CardWrapper className="p-4 bg-blue-50 border-blue-200">
             <VStack align="stretch" gap="sm">
               <Typography variant="heading" className="text-md font-semibold">
                 Agregar Componente

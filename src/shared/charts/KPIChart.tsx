@@ -2,7 +2,7 @@
 // KPI metrics chart component
 
 import React from 'react';
-import { Box, Card, Text, VStack, Grid, Badge } from '@chakra-ui/react';
+import { Box, CardWrapper , Text, VStack, Grid, Badge } from '@chakra-ui/react';
 
 interface KPIMetric {
   label: string;
@@ -38,13 +38,13 @@ export default function KPIChart({
   };
 
   return (
-    <Card.Root>
-      <Card.Header>
+    <CardWrapper .Root>
+      <CardWrapper .Header>
         <Text fontSize="lg" fontWeight="semibold">
           {title}
         </Text>
-      </Card.Header>
-      <Card.Body>
+      </CardWrapper .Header>
+      <CardWrapper .Body>
         <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap={4}>
           {metrics.map((metric, index) => (
             <Box
@@ -74,8 +74,8 @@ export default function KPIChart({
             </Box>
           ))}
         </Grid>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper .Body>
+    </CardWrapper .Root>
   );
 }
 

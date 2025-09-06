@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
   Stack,
   Typography,
-  Card,
+  CardWrapper ,
   Grid,
   Badge,
   Tabs,
@@ -127,8 +127,8 @@ const DashboardAnalytics: React.FC = () => {
         {/* KPI Summary Cards */}
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="4" w="full">
           {kpiCards.map((kpi) => (
-            <Card.Root key={kpi.title}>
-              <Card.Body>
+            <CardWrapper .Root key={kpi.title}>
+              <CardWrapper .Body>
                 <VStack align="start" gap="2">
                   <Text fontSize="sm" color="gray.600">{kpi.title}</Text>
                   <Text fontSize="2xl" fontWeight="bold">{kpi.value}</Text>
@@ -143,25 +143,25 @@ const DashboardAnalytics: React.FC = () => {
                     <Text fontSize="xs" color="gray.500">{kpi.period}</Text>
                   </HStack>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           ))}
         </SimpleGrid>
 
         {/* Analytics Modules */}
-        <Card.Root w="full">
-          <Card.Header>
+        <CardWrapper .Root w="full">
+          <CardWrapper .Header>
             <HStack justify="space-between">
               <Heading size="lg">Analytics Modules</Heading>
               <Badge colorPalette="blue" variant="subtle">Cross-Module Insights</Badge>
             </HStack>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
               {analyticsModules.map((module) => {
                 const Icon = module.icon;
                 return (
-                  <Card.Root 
+                  <CardWrapper .Root 
                     key={module.id} 
                     variant="outline"
                     cursor="pointer"
@@ -173,7 +173,7 @@ const DashboardAnalytics: React.FC = () => {
                     transition="all 0.2s"
                     onClick={() => setActiveModule(module.id)}
                   >
-                    <Card.Body>
+                    <CardWrapper .Body>
                       <VStack align="start" gap="4">
                         <HStack justify="space-between" w="full">
                           <Icon className={`w-8 h-8 text-${module.color}-500`} />
@@ -219,21 +219,21 @@ const DashboardAnalytics: React.FC = () => {
                           {module.status === 'active' ? 'View Analytics' : 'Coming Soon'}
                         </Button>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 );
               })}
             </SimpleGrid>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
         {/* Cross-Module Analytics Section */}
         <CrossModuleSection />
 
         {/* Module Detail View */}
         {activeModule !== 'overview' && (
-          <Card.Root w="full">
-            <Card.Header>
+          <CardWrapper .Root w="full">
+            <CardWrapper .Header>
               <HStack justify="space-between">
                 <Heading size="lg">
                   {analyticsModules.find(m => m.id === activeModule)?.title} - Detailed View
@@ -246,8 +246,8 @@ const DashboardAnalytics: React.FC = () => {
                   Back to Overview
                 </Button>
               </HStack>
-            </Card.Header>
-            <Card.Body>
+            </CardWrapper .Header>
+            <CardWrapper .Body>
               <Box p="8" textAlign="center">
                 <VStack gap="4">
                   <DocumentChartBarIcon className="w-16 h-16 text-gray-400" />
@@ -262,8 +262,8 @@ const DashboardAnalytics: React.FC = () => {
                   </Text>
                 </VStack>
               </Box>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper .Body>
+          </CardWrapper .Root>
         )}
       </VStack>
     </Box>

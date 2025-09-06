@@ -2,7 +2,7 @@
 import React from "react";
 import {
   Stack,
-  Card,
+  CardWrapper ,
   Grid,
   Typography,
   Badge,
@@ -54,7 +54,7 @@ export function PlanningSection() {
             <Typography variant="subtitle" size="sm">Calendario de Hoy</Typography>
             <Stack gap="lg" align="stretch">
               {todayPlans.map((plan) => (
-                <Card key={plan.id}>
+                <CardWrapper key={plan.id}>
                   <Stack p="md">
                     <Stack direction="row" justify="space-between">
                       <Stack direction="column" align="start" gap="xs">

@@ -8,8 +8,7 @@ import {
   HStack,
   Text,
   Button,
-  Grid,
-  Card
+  Grid, 
 } from '@chakra-ui/react';
 import {
   HomeIcon,
@@ -19,13 +18,13 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
-import { MetricCard } from '@/shared/ui';
+import { MetricCard, CardWrapper } from '@/shared/ui';
 
 // Componente de bienvenida personalizado
 function WelcomeHero() {
   return (
-    <Card.Root variant="elevated" bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)" color="white">
-      <Card.Body>
+    <CardWrapper variant="elevated" bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)" color="white">
+      <CardWrapper.Body>
         <VStack align="start" gap="4" py="4">
           <HStack gap="3" align="center">
             <Box p="3" bg="rgba(255,255,255,0.2)" borderRadius="xl">
@@ -63,8 +62,8 @@ function WelcomeHero() {
             </Button>
           </HStack>
         </VStack>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper.Body>
+    </CardWrapper>
   );
 }
 
@@ -108,7 +107,7 @@ function QuickActions() {
   return (
     <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap="4">
       {actions.map((action) => (
-        <Card.Root
+        <CardWrapper
           key={action.id}
           variant="elevated"
           cursor="pointer"
@@ -116,7 +115,7 @@ function QuickActions() {
           transition="all 0.2s"
           bg="bg.surface"
         >
-          <Card.Body>
+          <CardWrapper.Body>
             <VStack align="center" gap="3" py="2">
               <Box 
                 p="3" 
@@ -135,8 +134,8 @@ function QuickActions() {
                 </Text>
               </VStack>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       ))}
     </Grid>
   );
@@ -226,8 +225,8 @@ function RecentOrders() {
       
       <VStack align="stretch" gap="3">
         {recentOrders.map((order) => (
-          <Card.Root key={order.id} variant="outline" size="sm">
-            <Card.Body>
+          <CardWrapper key={order.id} variant="outline" size="sm">
+            <CardWrapper.Body>
               <HStack justify="space-between" align="center">
                 <VStack align="start" gap="1">
                   <Text fontSize="sm" fontWeight="medium">
@@ -246,8 +245,8 @@ function RecentOrders() {
                   </Text>
                 </VStack>
               </HStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
         ))}
       </VStack>
     </VStack>

@@ -12,7 +12,6 @@ import {
   Badge,
   Portal,
   Collapsible,
-  Card
 } from '@chakra-ui/react';
 import {
   ChevronUpIcon,
@@ -23,7 +22,7 @@ import {
 import { AlertDisplay } from './AlertDisplay';
 import { useAlerts } from '../hooks/useAlerts';
 import { useAlertsContext } from '../AlertsProvider';
-
+import { CardWrapper } from '@/shared/ui';
 export interface GlobalAlertsDisplayProps {
   maxVisible?: number;
   position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
@@ -119,12 +118,12 @@ export function GlobalAlertsDisplay({
       >
         <VStack gap="2" align="stretch">
           {/* Header */}
-          <Card.Root
+          <CardWrapper
             bg={`${headerColor}.500`}
             color="white"
             size="sm"
           >
-            <Card.Body p="3">
+            <CardWrapper.Body p="3">
               <HStack justify="space-between" align="center">
                 <HStack gap="2" flex="1">
                   <Text fontSize="sm" fontWeight="bold">
@@ -181,8 +180,8 @@ export function GlobalAlertsDisplay({
                   </IconButton>
                 </HStack>
               </HStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
 
           {/* Alerts List */}
           <Collapsible.Root open={!isCollapsed}>
@@ -222,8 +221,8 @@ export function GlobalAlertsDisplay({
 
                 {/* View All Button */}
                 {hasMoreAlerts && (
-                  <Card.Root variant="outline" size="sm">
-                    <Card.Body p="3" textAlign="center">
+                  <CardWrapper variant="outline" size="sm">
+                    <CardWrapper.Body p="3" textAlign="center">
                       <Text
                         fontSize="sm"
                         color="blue.600"
@@ -236,14 +235,14 @@ export function GlobalAlertsDisplay({
                       >
                         Ver todas las alertas ({alerts.length})
                       </Text>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 )}
 
                 {/* Quick Actions */}
                 {alerts.length > 1 && (
-                  <Card.Root variant="outline" size="sm">
-                    <Card.Body p="2">
+                  <CardWrapper variant="outline" size="sm">
+                    <CardWrapper.Body p="2">
                       <HStack justify="center" gap="2">
                         <Text
                           fontSize="xs"
@@ -279,8 +278,8 @@ export function GlobalAlertsDisplay({
                           Descartar todas
                         </Text>
                       </HStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 )}
               </VStack>
             </Collapsible.Content>

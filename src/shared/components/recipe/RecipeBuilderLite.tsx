@@ -10,7 +10,6 @@ import {
   Input,
   NumberInput,
   Select,
-  Card,
   IconButton,
   Field,
   Textarea,
@@ -27,7 +26,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { recipeService, type Recipe, type RecipeIngredient } from '@/services/recipe';
 import { MaterialSelector } from '../MaterialSelector';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
-
+import { CardWrapper } from '@/shared/ui';
 interface RecipeBuilderLiteProps {
   mode: 'product' | 'material';
   onRecipeCreated?: (recipe: Recipe) => void;
@@ -160,8 +159,8 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
     const unit = getUnitFromMaterial(material);
 
     return (
-      <Card.Root variant="outline" bg="blue.50" borderColor="blue.200">
-        <Card.Body p="4">
+      <CardWrapper variant="outline" bg="blue.50" borderColor="blue.200">
+        <CardWrapper.Body p="4">
           <Stack gap="3">
             <Text fontSize="sm" fontWeight="semibold" color="blue.800">
               📏 Cantidad necesaria de {material.name}
@@ -231,8 +230,8 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
               💡 Stock disponible: {material.stock} {unit}
             </Text>
           </Stack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     );
   };
 
@@ -292,8 +291,8 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
 
   return (
     <Box className={className}>
-      <Card.Root variant="outline">
-        <Card.Header p="4">
+      <CardWrapper variant="outline">
+        <CardWrapper.Header p="4">
           <Flex justify="space-between" align="center">
             <Flex gap="3" align="center">
               <Box fontSize="2xl">
@@ -320,9 +319,9 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
               Avanzado
             </Button>
           </Flex>
-        </Card.Header>
+        </CardWrapper.Header>
 
-        <Card.Body>
+        <CardWrapper.Body>
           <Stack gap="4">
             {/* Basic Recipe Info */}
             <Stack gap="4">
@@ -423,8 +422,8 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
 
                   <Stack gap="2">
                     {ingredients.map((ingredient, index) => (
-                      <Card.Root key={ingredient.id} variant="outline" size="sm">
-                        <Card.Body p="3">
+                      <CardWrapper key={ingredient.id} variant="outline" size="sm">
+                        <CardWrapper.Body p="3">
                           <Flex justify="space-between" align="center">
                             <Stack gap="0" flex="1">
                               <Text fontSize="sm" fontWeight="medium">
@@ -444,8 +443,8 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
                               <TrashIcon className="w-4 h-4" />
                             </IconButton>
                           </Flex>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper.Body>
+                      </CardWrapper>
                     ))}
                   </Stack>
                 </Stack>
@@ -454,8 +453,8 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
 
             {/* Cost Summary */}
             {calculations && (
-              <Card.Root variant="subtle" bg={mode === 'product' ? 'blue.50' : 'green.50'}>
-                <Card.Body p={3}>
+              <CardWrapper variant="subtle" bg={mode === 'product' ? 'blue.50' : 'green.50'}>
+                <CardWrapper.Body p={3}>
                   <Flex justify="space-between">
                     <Stack gap="0">
                       <Text fontSize="sm" color="gray.600">
@@ -486,8 +485,8 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
                       </Stack>
                     )}
                   </Flex>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
             )}
 
             {/* Create Button */}
@@ -501,8 +500,8 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
               {mode === 'product' ? 'Crear Receta de Producto' : 'Crear Receta de Material'}
             </Button>
           </Stack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     </Box>
   );
 };

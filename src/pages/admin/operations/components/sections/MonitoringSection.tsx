@@ -2,7 +2,7 @@
 import React from "react";
 import {
   Stack,
-  Card,
+  CardWrapper ,
   Grid,
   Typography,
   Badge
@@ -70,7 +70,7 @@ export function MonitoringSection() {
         {/* Metrics Grid */}
         <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="lg">
           {metrics.map((metric) => (
-            <Card key={metric.title}>
+            <CardWrapper key={metric.title}>
               <Stack p="lg" align="start" gap="md">
                 <Typography fontSize="sm" color="text.muted">
                   {metric.title}
@@ -106,7 +106,7 @@ export function MonitoringSection() {
             </Stack>
             <Stack gap="md" align="stretch">
               {alerts.map((alert) => (
-                <Card key={alert.id}>
+                <CardWrapper key={alert.id}>
                   <Stack p="md" direction="row" gap="md">
                     <Icon 
                       icon={alert.type === "warning" ? ExclamationTriangleIcon : ChartBarIcon}

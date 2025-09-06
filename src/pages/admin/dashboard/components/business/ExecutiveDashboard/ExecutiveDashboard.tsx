@@ -4,7 +4,7 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
+  CardWrapper ,
   Button,
   Badge,
   SimpleGrid,
@@ -377,8 +377,8 @@ export function ExecutiveDashboard() {
 
           {/* Performance Summary Banner */}
           {summary && (
-            <Card.Root variant="outline" bg={`${getPerformanceColor(summary.overallPerformance)}.50`} w="full">
-              <Card.Body p={4}>
+            <CardWrapper .Root variant="outline" bg={`${getPerformanceColor(summary.overallPerformance)}.50`} w="full">
+              <CardWrapper .Body p={4}>
                 <HStack justify="space-between">
                   <VStack align="start" gap={1}>
                     <HStack gap={2}>
@@ -419,48 +419,48 @@ export function ExecutiveDashboard() {
                     </VStack>
                   </SimpleGrid>
                 </HStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           )}
 
           {/* Quick Stats */}
           {dashboardMetrics && (
             <SimpleGrid columns={{ base: 2, md: 4 }} gap={4} w="full">
-              <Card.Root variant="subtle" bg="blue.50">
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper .Root variant="subtle" bg="blue.50">
+                <CardWrapper .Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="blue.600">
                     {kpis.length}
                   </Text>
                   <Text fontSize="sm" color="gray.600">KPIs Monitoreados</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
 
-              <Card.Root variant="subtle" >
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper .Root variant="subtle" >
+                <CardWrapper .Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="green.600">
                     {dashboardMetrics.improvingKPIs}
                   </Text>
                   <Text fontSize="sm" color="gray.600">Mejorando</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
 
-              <Card.Root variant="subtle" bg="red.50">
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper .Root variant="subtle" bg="red.50">
+                <CardWrapper .Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="red.600">
                     {dashboardMetrics.criticalKPIs}
                   </Text>
                   <Text fontSize="sm" color="gray.600">Críticos</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
 
-              <Card.Root variant="subtle" bg="purple.50">
-                <Card.Body p={4} textAlign="center">
+              <CardWrapper .Root variant="subtle" bg="purple.50">
+                <CardWrapper .Body p={4} textAlign="center">
                   <Text fontSize="2xl" fontWeight="bold" color="purple.600">
                     {Math.round(dashboardMetrics.targetAchievementRate)}%
                   </Text>
                   <Text fontSize="sm" color="gray.600">Objetivos Alcanzados</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             </SimpleGrid>
           )}
         </VStack>
@@ -511,11 +511,11 @@ export function ExecutiveDashboard() {
                 {summary && (
                   <>
                     {/* Key Highlights */}
-                    <Card.Root variant="outline">
-                      <Card.Header>
+                    <CardWrapper .Root variant="outline">
+                      <CardWrapper .Header>
                         <Text fontSize="lg" fontWeight="bold">🌟 Logros Destacados</Text>
-                      </Card.Header>
-                      <Card.Body>
+                      </CardWrapper .Header>
+                      <CardWrapper .Body>
                         <VStack gap={2} align="stretch">
                           {summary.keyHighlights.map((highlight, index) => (
                             <HStack key={index} gap={3}>
@@ -524,16 +524,16 @@ export function ExecutiveDashboard() {
                             </HStack>
                           ))}
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
 
                     {/* Key Concerns */}
                     {summary.keyConcerns.length > 0 && (
-                      <Card.Root variant="outline">
-                        <Card.Header>
+                      <CardWrapper .Root variant="outline">
+                        <CardWrapper .Header>
                           <Text fontSize="lg" fontWeight="bold">⚠️ Áreas de Atención</Text>
-                        </Card.Header>
-                        <Card.Body>
+                        </CardWrapper .Header>
+                        <CardWrapper .Body>
                           <VStack gap={2} align="stretch">
                             {summary.keyConcerns.map((concern, index) => (
                               <HStack key={index} gap={3}>
@@ -542,16 +542,16 @@ export function ExecutiveDashboard() {
                               </HStack>
                             ))}
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
                     )}
 
                     {/* Strategic Recommendations */}
-                    <Card.Root variant="outline">
-                      <Card.Header>
+                    <CardWrapper .Root variant="outline">
+                      <CardWrapper .Header>
                         <Text fontSize="lg" fontWeight="bold">🎯 Recomendaciones Estratégicas</Text>
-                      </Card.Header>
-                      <Card.Body>
+                      </CardWrapper .Header>
+                      <CardWrapper .Body>
                         <VStack gap={2} align="stretch">
                           {summary.strategicRecommendations.map((recommendation, index) => (
                             <HStack key={index} gap={3}>
@@ -560,22 +560,22 @@ export function ExecutiveDashboard() {
                             </HStack>
                           ))}
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
 
                     {/* Health Scores Grid */}
                     <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
                       {/* Financial Health */}
-                      <Card.Root variant="outline">
-                        <Card.Header pb={2}>
+                      <CardWrapper .Root variant="outline">
+                        <CardWrapper .Header pb={2}>
                           <HStack justify="space-between">
                             <Text fontSize="md" fontWeight="bold">💰 Salud Financiera</Text>
                             <Badge colorPalette={summary.financialHealth.score > 80 ? 'green' : summary.financialHealth.score > 60 ? 'yellow' : 'red'}>
                               {summary.financialHealth.score}/100
                             </Badge>
                           </HStack>
-                        </Card.Header>
-                        <Card.Body pt={0}>
+                        </CardWrapper .Header>
+                        <CardWrapper .Body pt={0}>
                           <VStack gap={2} align="stretch">
                             {[
                               { label: 'Ingresos', data: summary.financialHealth.revenue, prefix: '$', suffix: 'K' },
@@ -601,20 +601,20 @@ export function ExecutiveDashboard() {
                               );
                             })}
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
 
                       {/* Operational Health */}
-                      <Card.Root variant="outline">
-                        <Card.Header pb={2}>
+                      <CardWrapper .Root variant="outline">
+                        <CardWrapper .Header pb={2}>
                           <HStack justify="space-between">
                             <Text fontSize="md" fontWeight="bold">⚙️ Eficiencia Operacional</Text>
                             <Badge colorPalette={summary.operationalEfficiency.score > 80 ? 'green' : summary.operationalEfficiency.score > 60 ? 'yellow' : 'red'}>
                               {summary.operationalEfficiency.score}/100
                             </Badge>
                           </HStack>
-                        </Card.Header>
-                        <Card.Body pt={0}>
+                        </CardWrapper .Header>
+                        <CardWrapper .Body pt={0}>
                           <VStack gap={2} align="stretch">
                             {[
                               { label: 'Eficiencia', data: summary.operationalEfficiency.efficiency },
@@ -638,20 +638,20 @@ export function ExecutiveDashboard() {
                               );
                             })}
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
 
                       {/* Market Health */}
-                      <Card.Root variant="outline">
-                        <Card.Header pb={2}>
+                      <CardWrapper .Root variant="outline">
+                        <CardWrapper .Header pb={2}>
                           <HStack justify="space-between">
                             <Text fontSize="md" fontWeight="bold">🏪 Posición de Mercado</Text>
                             <Badge colorPalette={summary.marketPosition.score > 80 ? 'green' : summary.marketPosition.score > 60 ? 'yellow' : 'red'}>
                               {summary.marketPosition.score}/100
                             </Badge>
                           </HStack>
-                        </Card.Header>
-                        <Card.Body pt={0}>
+                        </CardWrapper .Header>
+                        <CardWrapper .Body pt={0}>
                           <VStack gap={2} align="stretch">
                             {[
                               { label: 'Satisfacción Cliente', data: summary.marketPosition.customerSatisfaction, scale: 5 },
@@ -677,8 +677,8 @@ export function ExecutiveDashboard() {
                               );
                             })}
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
                     </SimpleGrid>
                   </>
                 )}
@@ -717,13 +717,13 @@ export function ExecutiveDashboard() {
                     const progressValue = kpi.target ? (kpi.value / kpi.target) * 100 : 0;
                     
                     return (
-                      <Card.Root 
+                      <CardWrapper .Root 
                         key={kpi.id}
                         variant="outline"
                         bg={kpi.priority === 'critical' ? 'red.25' : 'white'}
                         borderColor={kpi.priority === 'critical' ? 'red.200' : 'gray.200'}
                       >
-                        <Card.Body p={4}>
+                        <CardWrapper .Body p={4}>
                           <VStack align="stretch" gap={3}>
                             {/* Header */}
                             <HStack justify="space-between">
@@ -788,8 +788,8 @@ export function ExecutiveDashboard() {
                               {kpi.description}
                             </Text>
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
                     );
                   })}
                 </SimpleGrid>
@@ -800,8 +800,8 @@ export function ExecutiveDashboard() {
             <Tabs.Content value="insights">
               <VStack gap={4} align="stretch">
                 {insights.map((insight) => (
-                  <Card.Root key={insight.id} variant="outline">
-                    <Card.Header>
+                  <CardWrapper .Root key={insight.id} variant="outline">
+                    <CardWrapper .Header>
                       <HStack justify="space-between">
                         <HStack gap={3}>
                           <Box p={2} bg={`${getPriorityColor(insight.priority)}.100`} borderRadius="md">
@@ -837,9 +837,9 @@ export function ExecutiveDashboard() {
                           </Text>
                         </VStack>
                       </HStack>
-                    </Card.Header>
+                    </CardWrapper .Header>
                     
-                    <Card.Body>
+                    <CardWrapper .Body>
                       <VStack gap={4} align="stretch">
                         <Text fontSize="sm" color="gray.700" lineHeight={1.5}>
                           {insight.description}
@@ -848,8 +848,8 @@ export function ExecutiveDashboard() {
                         {/* Metrics */}
                         <SimpleGrid columns={{ base: 1, md: 3 }} gap={3}>
                           {insight.metrics.map((metric, index) => (
-                            <Card.Root key={index} variant="subtle" size="sm">
-                              <Card.Body p={3} textAlign="center">
+                            <CardWrapper .Root key={index} variant="subtle" size="sm">
+                              <CardWrapper .Body p={3} textAlign="center">
                                 <Text fontSize="xs" color="gray.600" mb={1}>
                                   {metric.name}
                                 </Text>
@@ -868,8 +868,8 @@ export function ExecutiveDashboard() {
                                     {metric.change}
                                   </Text>
                                 )}
-                              </Card.Body>
-                            </Card.Root>
+                              </CardWrapper .Body>
+                            </CardWrapper .Root>
                           ))}
                         </SimpleGrid>
 
@@ -880,8 +880,8 @@ export function ExecutiveDashboard() {
                               Plan de Acción:
                             </Text>
                             {insight.actionItems.map((action) => (
-                              <Card.Root key={action.id} variant="outline" size="sm">
-                                <Card.Body p={3}>
+                              <CardWrapper .Root key={action.id} variant="outline" size="sm">
+                                <CardWrapper .Body p={3}>
                                   <HStack justify="space-between" align="start">
                                     <VStack align="start" gap={1} flex="1">
                                       <Text fontSize="sm" fontWeight="medium">
@@ -911,8 +911,8 @@ export function ExecutiveDashboard() {
                                       </Badge>
                                     </VStack>
                                   </HStack>
-                                </Card.Body>
-                              </Card.Root>
+                                </CardWrapper .Body>
+                              </CardWrapper .Root>
                             ))}
                           </VStack>
                         )}
@@ -928,16 +928,16 @@ export function ExecutiveDashboard() {
                           </Button>
                         </HStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 ))}
               </VStack>
             </Tabs.Content>
 
             {/* Correlations Tab */}
             <Tabs.Content value="correlations">
-              <Card.Root variant="subtle">
-                <Card.Body p={8} textAlign="center">
+              <CardWrapper .Root variant="subtle">
+                <CardWrapper .Body p={8} textAlign="center">
                   <ChartBarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <Text fontSize="lg" fontWeight="medium" mb={2}>
                     Análisis de Correlaciones
@@ -948,16 +948,16 @@ export function ExecutiveDashboard() {
                   <Text fontSize="sm" color="gray.500" mt={2}>
                     * Funcionalidad avanzada disponible en versión completa
                   </Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             </Tabs.Content>
 
             {/* Action Plans Tab */}
             <Tabs.Content value="actions">
               <VStack gap={4} align="stretch">
                 {insights.flatMap(insight => insight.actionItems).map((action) => (
-                  <Card.Root key={action.id} variant="outline">
-                    <Card.Body p={4}>
+                  <CardWrapper .Root key={action.id} variant="outline">
+                    <CardWrapper .Body p={4}>
                       <HStack justify="space-between" align="start">
                         <VStack align="start" gap={2} flex="1">
                           <Text fontSize="md" fontWeight="bold">
@@ -1003,8 +1003,8 @@ export function ExecutiveDashboard() {
                           </Button>
                         </VStack>
                       </HStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 ))}
               </VStack>
             </Tabs.Content>

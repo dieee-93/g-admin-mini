@@ -7,10 +7,6 @@ import {
   VStack,
   HStack,
   Text,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
   Input,
   Switch,
   Tabs,
@@ -28,7 +24,7 @@ import {
   StarIcon,
   GiftIcon
 } from '@heroicons/react/24/outline';
-import { CardWrapper } from '@/shared/ui';
+import { CardWrapper, Button } from '@/shared/ui';
 
 // Componente de sección del perfil
 function ProfileSection() {

@@ -13,7 +13,7 @@ import {
   Typography,
   
   // Components
-  Card,
+  CardWrapper ,
   Button,
   Badge,
   
@@ -291,8 +291,8 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
                   </HStack>
 
                   {formData.items.map((item, index) => (
-                    <Card key={index} variant="outline" padding="md">
-                      <Card.Body>
+                    <CardWrapper key={index} variant="outline" padding="md">
+                      <CardWrapper .Body>
                         <VStack gap="sm">
                           <HStack justify="space-between" align="center">
                             <Typography variant="label">Item {index + 1}</Typography>
@@ -335,14 +335,14 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
                             Subtotal: ${(item.cantidad * item.precio_unitario).toFixed(2)}
                           </Typography>
                         </VStack>
-                      </Card.Body>
+                      </CardWrapper .Body>
                     </CardWrapper>
                   ))}
                 </VStack>
 
                 {/* Totales */}
-                <Card variant="elevated" padding="md">
-                  <Card.Body>
+                <CardWrapper variant="elevated" padding="md">
+                  <CardWrapper .Body>
                     <VStack gap="sm">
                       <Typography variant="title">Totales</Typography>
                       <HStack justify="space-between">
@@ -370,7 +370,7 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
                         </Typography>
                       </HStack>
                     </VStack>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
               </VStack>
             </ModalBody>
@@ -402,11 +402,11 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
       )}
 
       {/* Invoices List */}
-      <Card variant="elevated" padding="md">
-        <Card.Header>
+      <CardWrapper variant="elevated" padding="md">
+        <CardWrapper .Header>
           <Typography variant="title">Facturas Recientes</Typography>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           {isLoading ? (
             <VStack gap="md">
               <Typography variant="body" color="text.muted">Cargando facturas...</Typography>
@@ -421,8 +421,8 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
           ) : (
             <VStack gap="sm" align="stretch">
               {invoices.slice(0, 10).map((invoice) => (
-                <Card key={invoice.id} variant="outline" padding="sm">
-                  <Card.Body>
+                <CardWrapper key={invoice.id} variant="outline" padding="sm">
+                  <CardWrapper .Body>
                     <HStack justify="space-between" align="center">
                       <VStack gap="xs" align="start">
                         <HStack gap="sm">
@@ -451,12 +451,12 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
                         </HStack>
                       </VStack>
                     </HStack>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
               ))}
             </VStack>
           )}
-        </Card.Body>
+        </CardWrapper .Body>
       </CardWrapper>
     </VStack>
   );

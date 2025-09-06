@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Text,
@@ -117,14 +117,14 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
   return (
     <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap={6}>
       {/* Input Form */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <HStack>
             <CalculatorIcon className="w-5 h-5 text-blue-600" />
             <Text fontSize="lg" fontWeight="semibold">Cost Calculation Input</Text>
           </HStack>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <VStack gap={4} align="stretch">
             {/* Product Info */}
             <Box>
@@ -248,13 +248,13 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
               Calculate Costs
             </Button>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Latest Calculation Results */}
       {calculations.length > 0 && (
-        <Card.Root>
-          <Card.Header>
+        <CardWrapper .Root>
+          <CardWrapper .Header>
             <HStack justify="space-between">
               <HStack>
                 <CurrencyDollarIcon className="w-5 h-5 text-green-600" />
@@ -264,8 +264,8 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
                 {calculations[0].product_name}
               </Badge>
             </HStack>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <VStack gap={4} align="stretch">
               {/* Cost Summary */}
               <Grid templateColumns="repeat(2, 1fr)" gap={4}>
@@ -316,8 +316,8 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
                 Export Report
               </Button>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       )}
     </Grid>
   );

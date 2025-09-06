@@ -7,7 +7,6 @@ import {
   Flex,
   Text,
   Badge,
-  Card,
   Spinner
 } from '@chakra-ui/react';
 import {
@@ -16,7 +15,7 @@ import {
 import { useMaterials } from '@/store/materialsStore';
 import { useDebounce } from '@/shared/hooks';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
-
+import { CardWrapper } from '../ui';
 export interface MaterialSelectorProps {
   onMaterialSelected: (material: MaterialItem) => void;
   placeholder?: string;
@@ -130,7 +129,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
 
       {/* Results Dropdown */}
       {isOpen && filteredMaterials.length > 0 && (
-        <Card.Root
+        <CardWrapper
           position="absolute"
           top="100%"
           left="0"
@@ -141,7 +140,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
           overflowY="auto"
           variant="elevated"
         >
-          <Card.Body p="2">
+          <CardWrapper.Body p="2">
             <Stack gap="1">
               {filteredMaterials.map((material) => (
                 <Flex
@@ -176,13 +175,13 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
                 </Flex>
               ))}
             </Stack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       )}
 
       {/* No Results */}
       {isOpen && debouncedQuery.trim() && filteredMaterials.length === 0 && (
-        <Card.Root
+        <CardWrapper
           position="absolute"
           top="100%"
           left="0"
@@ -191,15 +190,15 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
           mt="1"
           variant="elevated"
         >
-          <Card.Body p="4" textAlign="center">
+          <CardWrapper.Body p="4" textAlign="center">
             <Text fontSize="sm" color="gray.600">
               {filterByStock 
                 ? 'No se encontraron materiales con stock disponible'
                 : 'No se encontraron materiales'
               }
             </Text>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       )}
     </Box>
   );

@@ -8,10 +8,10 @@ import {
   Flex,
   Select,
   IconButton,
-  Card as ChakraCard,
+  CardWrapper  as ChakraCard,
   Collapsible
 } from '@chakra-ui/react';
-import { Card } from '@/shared/ui';
+import { CardWrapper  } from '@/shared/ui';
 import { PlusIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 interface Supplier {
@@ -196,8 +196,8 @@ export const SupplierFields = ({
 
               {/* Formulario de Nuevo Proveedor */}
               {showNewSupplierForm && (
-                <Card variant="subtle" padding="md">
-                  <Card.Body>
+                <CardWrapper variant="subtle" padding="md">
+                  <CardWrapper .Body>
                     <Stack gap="4">
                       <Text fontWeight="semibold" fontSize="sm" color="blue.700">
                         Crear Nuevo Proveedor
@@ -286,7 +286,7 @@ export const SupplierFields = ({
                         </Box>
                       </Flex>
                     </Stack>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
               )}
 
@@ -380,12 +380,12 @@ export const SupplierFields = ({
               </Stack>
 
               {/* Información útil */}
-              <Card variant="subtle" padding="sm">
-                <Card.Body>
+              <CardWrapper variant="subtle" padding="sm">
+                <CardWrapper .Body>
                   <Text fontSize="xs" color="text.muted">
                     💡 <strong>Tip:</strong> Esta información te ayudará a rastrear compras, evaluar proveedores y mantener un historial completo de tu inventario.
                   </Text>
-                </Card.Body>
+                </CardWrapper .Body>
               </CardWrapper>
             </Stack>
           </Collapsible.Content>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, VStack, HStack, Text, Button, Grid } from '@chakra-ui/react';
 import { ShoppingCartIcon, ClockIcon, HeartIcon, UserIcon } from '@heroicons/react/24/outline';
-import { CardWrapper } from '@/shared/ui/Card';
+import { CardWrapper } from '@/shared/ui/CardWrapper ';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/contexts/NavigationContext';

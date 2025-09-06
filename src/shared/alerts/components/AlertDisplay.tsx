@@ -12,7 +12,6 @@ import {
   IconButton,
   Badge,
   Box,
-  Card
 } from '@chakra-ui/react';
 import {
   ExclamationTriangleIcon,
@@ -28,6 +27,7 @@ import {
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 import type { Alert as AlertType, AlertSeverity, AlertType as AlertTypeEnum } from '../types';
+import { CardWrapper } from '@/shared/ui';
 
 export interface AlertDisplayProps {
   alert: AlertType;
@@ -338,8 +338,8 @@ export function AlertDisplay({
 
   // Default: card variant
   return (
-    <Card.Root size={size} variant="outline" borderColor={`${severityColor}.200`}>
-      <Card.Body>
+    <CardWrapper size={size} variant="outline" borderColor={`${severityColor}.200`}>
+      <CardWrapper.Body>
         <VStack align="stretch" gap="3">
           {/* Header */}
           <HStack justify="space-between" align="start">
@@ -395,7 +395,7 @@ export function AlertDisplay({
           {/* Actions */}
           {renderActions()}
         </VStack>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper.Body>
+    </CardWrapper>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Typography,
@@ -258,7 +258,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
 
   if (variant === 'compact') {
     return (
-      <Card colorPalette="brand">
+      <CardWrapper colorPalette="brand">
         <VStack gap="md" align="stretch">
           <HStack justify="space-between">
             <Typography variant="heading" size="sm">
@@ -275,7 +275,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
           
           <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap="sm">
             {taxPeriods.slice(0, 3).map((period) => (
-              <Card key={period.id} variant="outline" size="sm">
+              <CardWrapper key={period.id} variant="outline" size="sm">
                 <VStack gap="xs">
                   <Typography variant="body" size="sm">{period.period}</Typography>
                   {getStatusBadge(period.status)}
@@ -294,7 +294,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
   return (
     <VStack gap="lg" align="stretch">
       {/* Header */}
-      <Card colorPalette="brand">
+      <CardWrapper colorPalette="brand">
         <VStack align="stretch" gap="md">
           <HStack justify="space-between">
             <Typography variant="heading" size="lg">Gestión de Impuestos</Typography>
@@ -325,7 +325,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
 
       {/* Compliance Overview */}
       <Grid templateColumns="repeat(auto-fit, minmax(280px, 1fr))" gap="md">
-        <Card colorPalette="brand">
+        <CardWrapper colorPalette="brand">
           <VStack align="stretch" gap="md">
             <HStack>
               <CheckCircleIcon className="w-5 h-5 text-green-600" />
@@ -342,7 +342,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
           </VStack>
         </CardWrapper>
 
-        <Card colorPalette="brand">
+        <CardWrapper colorPalette="brand">
           <VStack align="stretch" gap="md">
             <HStack>
               <ExclamationTriangleIcon className="w-5 h-5 text-orange-600" />
@@ -359,7 +359,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
           </VStack>
         </CardWrapper>
 
-        <Card colorPalette="brand">
+        <CardWrapper colorPalette="brand">
           <VStack align="stretch" gap="md">
             <HStack>
               <ClockIcon className="w-5 h-5 text-red-600" />
@@ -376,7 +376,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
           </VStack>
         </CardWrapper>
 
-        <Card colorPalette="brand">
+        <CardWrapper colorPalette="brand">
           <VStack align="stretch" gap="md">
             <HStack>
               <BanknotesIcon className="w-5 h-5 text-blue-600" />
@@ -418,7 +418,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
         <TabPanels>
           {/* Periods Tab */}
           <TabPanel value="periods">
-            <Card colorPalette="brand">
+            <CardWrapper colorPalette="brand">
               <VStack align="stretch" gap="md">
                 <Typography variant="heading" size="sm">
                   Períodos Fiscales 2024
@@ -486,7 +486,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
 
           {/* Reports Tab */}
           <TabPanel value="reports">
-            <Card colorPalette="brand">
+            <CardWrapper colorPalette="brand">
               <VStack align="stretch" gap="md">
                 <Typography variant="heading" size="sm">
                   Reportes de Impuestos
@@ -540,7 +540,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
           <TabPanel value="actions">
             <VStack gap="md" align="stretch">
               {/* Generate Reports Section */}
-              <Card colorPalette="brand">
+              <CardWrapper colorPalette="brand">
                 <VStack align="stretch" gap="md">
                   <Typography variant="heading" size="sm">
                     Generar Reportes

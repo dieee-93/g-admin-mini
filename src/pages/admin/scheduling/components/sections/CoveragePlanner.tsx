@@ -6,7 +6,7 @@ import {
   VStack, 
   HStack, 
   Text, 
-  Card, 
+  CardWrapper , 
   Button, 
   Badge,
   SimpleGrid,
@@ -167,8 +167,8 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
     <VStack align="stretch" spacing={6}>
       {/* Coverage Overview Cards */}
       <SimpleGrid columns={{ base: 1, md: 4 }} spacing={4}>
-        <Card>
-          <Card.Body>
+        <CardWrapper >
+          <CardWrapper .Body>
             <VStack align="stretch">
               <HStack justify="space-between">
                 <UsersIcon width={20} height={20} />
@@ -178,11 +178,11 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               </HStack>
               <Text fontSize="sm" color="gray.600">Critical Gaps</Text>
             </VStack>
-          </Card.Body>
-        </Card>
+          </CardWrapper .Body>
+        </CardWrapper >
         
-        <Card>
-          <Card.Body>
+        <CardWrapper >
+          <CardWrapper .Body>
             <VStack align="stretch">
               <HStack justify="space-between">
                 <CalendarIcon width={20} height={20} />
@@ -192,11 +192,11 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               </HStack>
               <Text fontSize="sm" color="gray.600">Understaffed Shifts</Text>
             </VStack>
-          </Card.Body>
-        </Card>
+          </CardWrapper .Body>
+        </CardWrapper >
         
-        <Card>
-          <Card.Body>
+        <CardWrapper >
+          <CardWrapper .Body>
             <VStack align="stretch">
               <HStack justify="space-between">
                 <CheckCircleIcon width={20} height={20} />
@@ -206,11 +206,11 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               </HStack>
               <Text fontSize="sm" color="gray.600">Coverage Rate</Text>
             </VStack>
-          </Card.Body>
-        </Card>
+          </CardWrapper .Body>
+        </CardWrapper >
         
-        <Card>
-          <Card.Body>
+        <CardWrapper >
+          <CardWrapper .Body>
             <VStack align="stretch">
               <HStack justify="space-between">
                 <ClockIcon width={20} height={20} />
@@ -220,13 +220,13 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               </HStack>
               <Text fontSize="sm" color="gray.600">Trend</Text>
             </VStack>
-          </Card.Body>
-        </Card>
+          </CardWrapper .Body>
+        </CardWrapper >
       </SimpleGrid>
 
       {/* Filters */}
-      <Card>
-        <Card.Body>
+      <CardWrapper >
+        <CardWrapper .Body>
           <HStack spacing={4} wrap="wrap">
             <Box>
               <Text fontSize="sm" mb={1}>Priority</Text>
@@ -270,18 +270,18 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               </Select>
             </Box>
           </HStack>
-        </Card.Body>
-      </Card>
+        </CardWrapper .Body>
+      </CardWrapper >
 
       {/* Coverage Gaps Table */}
-      <Card>
-        <Card.Header>
+      <CardWrapper >
+        <CardWrapper .Header>
           <HStack justify="space-between">
             <Text fontSize="lg" fontWeight="semibold">Coverage Gaps</Text>
             <Badge>{filteredGaps.length} gaps found</Badge>
           </HStack>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           {filteredGaps.length === 0 ? (
             <Alert status="success">
               <Alert.Indicator />
@@ -336,15 +336,15 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               </Table.Body>
             </Table.Root>
           )}
-        </Card.Body>
-      </Card>
+        </CardWrapper .Body>
+      </CardWrapper >
 
       {/* Staffing Requirements */}
-      <Card>
-        <Card.Header>
+      <CardWrapper >
+        <CardWrapper .Header>
           <Text fontSize="lg" fontWeight="semibold">Staffing Requirements</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <Table.Root>
             <Table.Header>
               <Table.Row>
@@ -381,8 +381,8 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               ))}
             </Table.Body>
           </Table.Root>
-        </Card.Body>
-      </Card>
+        </CardWrapper .Body>
+      </CardWrapper >
     </VStack>
   );
 }

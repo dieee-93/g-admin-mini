@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Typography,
@@ -243,7 +243,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
 
   if (variant === 'compact') {
     return (
-      <Card colorPalette="brand">
+      <CardWrapper colorPalette="brand">
         <VStack gap="md" align="stretch">
           <HStack justify="space-between">
             <Typography variant="heading" size="sm">
@@ -287,7 +287,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
   return (
     <VStack gap="lg" align="stretch">
       {/* Connection Status */}
-      <Card colorPalette="brand">
+      <CardWrapper colorPalette="brand">
         <VStack align="stretch" gap="md">
           <HStack justify="space-between">
             <Typography variant="heading" size="lg">Integración AFIP</Typography>
@@ -314,7 +314,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
 
       {/* Status Overview */}
       <Grid templateColumns="repeat(auto-fit, minmax(280px, 1fr))" gap="md">
-        <Card colorPalette="brand">
+        <CardWrapper colorPalette="brand">
           <VStack align="stretch" gap="md">
             <HStack>
               <WifiIcon className="w-5 h-5 text-blue-600" />
@@ -337,7 +337,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
           </VStack>
         </CardWrapper>
 
-        <Card colorPalette="brand">
+        <CardWrapper colorPalette="brand">
           <VStack align="stretch" gap="md">
             <HStack>
               <CogIcon className="w-5 h-5 text-green-600" />
@@ -366,7 +366,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
           </VStack>
         </CardWrapper>
 
-        <Card colorPalette="brand">
+        <CardWrapper colorPalette="brand">
           <VStack align="stretch" gap="md">
             <HStack>
               <ExclamationTriangleIcon className="w-5 h-5 text-orange-600" />
@@ -391,7 +391,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
           </VStack>
         </CardWrapper>
 
-        <Card colorPalette="brand">
+        <CardWrapper colorPalette="brand">
           <VStack align="stretch" gap="md">
             <HStack>
               <XCircleIcon className="w-5 h-5 text-red-600" />
@@ -426,7 +426,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
       )}
 
       {/* Pending Invoices */}
-      <Card colorPalette="brand">
+      <CardWrapper colorPalette="brand">
         <VStack align="stretch" gap="md">
           <HStack justify="space-between">
             <Typography variant="heading" size="sm">
@@ -526,7 +526,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
       </CardWrapper>
 
       {/* Configuration */}
-      <Card colorPalette="brand">
+      <CardWrapper colorPalette="brand">
         <VStack align="stretch" gap="md">
           <Typography variant="heading" size="sm">
             Configuración AFIP

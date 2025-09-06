@@ -350,3 +350,58 @@ export function getRelevantTutorials(capabilities: BusinessCapabilities): string
   
   return [...new Set(tutorials)];
 }
+
+// Tipo para los tiers operacionales
+export type OperationalTier = 
+  | 'Sin Configurar' 
+  | 'Básico' 
+  | 'Intermedio' 
+  | 'Avanzado' 
+  | 'Empresa';
+
+// Función para calcular el tier operacional basado en capacidades
+export function calculateOperationalTier(
+  capabilities: BusinessCapabilities, 
+  businessStructure: BusinessStructure = 'single_location'
+): OperationalTier {
+  // Contar capacidades habilitadas
+  const enabledCapabilities = Object.values(capabilities).filter(Boolean).length;
+  
+  // Si no hay capacidades, está sin configurar
+  if (enabledCapabilities === 0) {
+    return 'Sin Configurar';
+  }
+  
+  // Factores que aumentan la complejidad
+  const complexityFactors = {
+    multiLocation: businessStructure === 'multi_location',
+    hasOnlineStore: capabilities.has_online_store,
+    hasDelivery: capabilities.sells_products_with_delivery,
+    isB2BFocused: capabilities.is_b2b_focused,
+    hasRecurrence: capabilities.manages_recurrence,
+    hasEvents: capabilities.manages_events,
+    hasMultipleProductChannels: [
+      capabilities.sells_products_for_onsite_consumption,
+      capabilities.sells_products_for_pickup,
+      capabilities.sells_products_with_delivery
+    ].filter(Boolean).length > 1,
+    hasMultipleServiceTypes: [
+      capabilities.sells_services_by_appointment,
+      capabilities.sells_services_by_class,
+      capabilities.sells_space_by_reservation
+    ].filter(Boolean).length > 1
+  };
+  
+  const complexityScore = Object.values(complexityFactors).filter(Boolean).length;
+  
+  // Determinar tier basado en capacidades y complejidad
+  if (businessStructure === 'multi_location' || complexityScore >= 4) {
+    return 'Empresa';
+  } else if (enabledCapabilities >= 6 || complexityScore >= 3) {
+    return 'Avanzado';
+  } else if (enabledCapabilities >= 3 || complexityScore >= 2) {
+    return 'Intermedio';
+  } else {
+    return 'Básico';
+  }
+}

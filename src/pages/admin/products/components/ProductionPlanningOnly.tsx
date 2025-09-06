@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
 import {
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Typography,
@@ -343,7 +343,7 @@ export function ProductionPlanningOnly() {
           ) : (
             <VStack gap="md">
               {plans.map((plan) => (
-                <Card key={plan.id}>
+                <CardWrapper key={plan.id}>
                   <div className="p-4">
                     <HStack justify="space-between" align="start" className="mb-4">
                       <VStack align="stretch" gap="xs" className="flex-1">

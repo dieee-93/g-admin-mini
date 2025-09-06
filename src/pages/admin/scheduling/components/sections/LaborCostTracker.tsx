@@ -5,7 +5,7 @@ import {
   VStack, 
   HStack, 
   Text, 
-  Card, 
+  CardWrapper , 
   Button, 
   Badge,
   SimpleGrid,
@@ -212,8 +212,8 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
     <VStack gap="6" align="stretch">
       {/* Key Metrics */}
       <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} gap="4">
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="green.500">
                 ${weeklyTotal.toLocaleString()}
@@ -232,22 +232,22 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                 </HStack>
               )}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="orange.500">
                 {metrics.labor_cost_percentage}%
               </Text>
               <Text fontSize="xs" color="gray.600">of Revenue</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="red.500">
                 {overtimeHours}h
@@ -257,47 +257,47 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                 {metrics.overtime_percentage}% of total
               </Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="blue.500">
                 {metrics.budget_utilization}%
               </Text>
               <Text fontSize="xs" color="gray.600">Budget Used</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="purple.500">
                 ${metrics.avg_cost_per_shift}
               </Text>
               <Text fontSize="xs" color="gray.600">Avg per Shift</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="teal.500">
                 ${metrics.cost_per_customer_served}
               </Text>
               <Text fontSize="xs" color="gray.600">per Customer</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </SimpleGrid>
 
       {/* Budget Status Alert */}
       {metrics.budget_utilization > 95 && (
-        <Card.Root bg="red.50" borderColor="red.200">
-          <Card.Body>
+        <CardWrapper .Root bg="red.50" borderColor="red.200">
+          <CardWrapper .Body>
             <HStack gap="3">
               <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />
               <VStack align="start" gap="1">
@@ -309,13 +309,13 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                 </Text>
               </VStack>
             </HStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       )}
 
       {/* View Controls */}
-      <Card.Root>
-        <Card.Body>
+      <CardWrapper .Root>
+        <CardWrapper .Body>
           <HStack justify="space-between">
             <HStack gap="4">
               <Box>
@@ -358,15 +358,15 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
               Export Report
             </Button>
           </HStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Cost Breakdown by Position */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontSize="lg" fontWeight="semibold">Labor Cost Breakdown by Position</Text>
-        </Card.Header>
-        <Card.Body p="0">
+        </CardWrapper .Header>
+        <CardWrapper .Body p="0">
           <Table.Root size="sm">
             <Table.Header>
               <Table.Row>
@@ -479,19 +479,19 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
               </Table.Row>
             </Table.Body>
           </Table.Root>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Weekly Trends */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontSize="lg" fontWeight="semibold">Weekly Cost Trends</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
             {weeklySummary.map(week => (
-              <Card.Root key={week.week_ending} size="sm">
-                <Card.Body>
+              <CardWrapper .Root key={week.week_ending} size="sm">
+                <CardWrapper .Body>
                   <VStack gap="3" align="stretch">
                     <HStack justify="space-between">
                       <VStack align="start" gap="0">
@@ -536,12 +536,12 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                       />
                     </Box>
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             ))}
           </SimpleGrid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 }

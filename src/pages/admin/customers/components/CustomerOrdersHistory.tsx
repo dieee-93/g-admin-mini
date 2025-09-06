@@ -4,7 +4,7 @@ import {
   Stack,
   Typography,
   Badge,
-  Card,
+  CardWrapper ,
   Table,
   Grid
 } from '@/shared/ui';
@@ -70,10 +70,10 @@ export function CustomerOrdersHistory() {
     <Stack direction="column" gap="lg">
       {/* Filtros */}
       <CardWrapper>
-        <Card.Header>
+        <CardWrapper .Header>
           <Typography variant="heading">Filtros de Búsqueda</Typography>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <Stack direction="row" gap="md" className="flex-wrap">
             <div>
               <Typography size="sm" color="text.muted" className="mb-1">Cliente</Typography>
@@ -113,42 +113,42 @@ export function CustomerOrdersHistory() {
               </button>
             </div>
           </Stack>
-        </Card.Body>
+        </CardWrapper .Body>
       </CardWrapper>
 
       {/* Resumen */}
       <Grid className="grid-cols-3 gap-4">
         <CardWrapper>
-          <Card.Body className="text-center">
+          <CardWrapper .Body className="text-center">
             <Typography size="2xl" weight="bold" className="text-blue-600">
               {sales.length}
             </Typography>
             <Typography size="sm" color="text.muted">Total Pedidos</Typography>
-          </Card.Body>
+          </CardWrapper .Body>
         </CardWrapper>
 
         <CardWrapper>
-          <Card.Body className="text-center">
+          <CardWrapper .Body className="text-center">
             <Typography size="2xl" weight="bold" className="text-green-600">
               {formatCurrency(sales.reduce((sum, sale) => sum + sale.total, 0))}
             </Typography>
             <Typography size="sm" color="text.muted">Revenue Total</Typography>
-          </Card.Body>
+          </CardWrapper .Body>
         </CardWrapper>
 
         <CardWrapper>
-          <Card.Body className="text-center">
+          <CardWrapper .Body className="text-center">
             <Typography size="2xl" weight="bold" className="text-purple-600">
               {sales.length > 0 ? formatCurrency(sales.reduce((sum, sale) => sum + sale.total, 0) / sales.length) : '$0'}
             </Typography>
             <Typography size="sm" color="text.muted">Ticket Promedio</Typography>
-          </Card.Body>
+          </CardWrapper .Body>
         </CardWrapper>
       </Grid>
 
       {/* Lista de pedidos */}
       <CardWrapper>
-        <Card.Header>
+        <CardWrapper .Header>
           <Stack direction="row" justify="space-between">
             <Typography variant="heading">
               Historial de Pedidos
@@ -162,9 +162,9 @@ export function CustomerOrdersHistory() {
               {sales.length} pedidos
             </Badge>
           </Stack>
-        </Card.Header>
+        </CardWrapper .Header>
 
-        <Card.Body>
+        <CardWrapper .Body>
           {sales.length === 0 ? (
             <div className="p-8 text-center text-muted">
               <Typography>No se encontraron pedidos</Typography>
@@ -239,7 +239,7 @@ export function CustomerOrdersHistory() {
               </Table.Body>
             </Table.Root>
           )}
-        </Card.Body>
+        </CardWrapper .Body>
       </CardWrapper>
     </Stack>
   );

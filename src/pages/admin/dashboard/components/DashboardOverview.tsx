@@ -3,7 +3,7 @@ import React from 'react';
 import {
   Stack,
   Typography,
-  Card,
+  CardWrapper ,
   Grid,
   Badge,
   Button,
@@ -125,7 +125,7 @@ export function DashboardOverview() {
                              metric.trend === 'down' ? ArrowTrendingDownIcon : null;
             
             return (
-              <Card key={metric.id}>
+              <CardWrapper key={metric.id}>
                 <Stack gap="md" align="start">
                   <Stack direction="row" justify="space-between" width="full">
                     <Icon icon={metric.icon} size="lg"  />

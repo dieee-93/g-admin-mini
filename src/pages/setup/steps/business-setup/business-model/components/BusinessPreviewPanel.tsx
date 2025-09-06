@@ -52,7 +52,7 @@ export function BusinessPreviewPanel({
 
   return (
     <Stack gap={5} position="sticky" top="24px">
-      {/* Main Identity Card */}
+      {/* Main Identity CardWrapper  */}
       <Box bg="gray.50" borderRadius="xl" overflow="hidden" boxShadow="md">
         <Box
           bg="gray.700"

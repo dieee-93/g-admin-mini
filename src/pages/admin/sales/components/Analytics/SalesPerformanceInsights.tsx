@@ -3,7 +3,7 @@ import {
   Box,
   VStack,
   HStack,
-  Card,
+  CardWrapper ,
   Text,
   Badge,
   Button,
@@ -255,8 +255,8 @@ export const SalesPerformanceInsights: React.FC = () => {
     <Box>
       <VStack align="stretch" gap={6}>
         {/* Header */}
-        <Card.Root bg="gradient-to-r from-green-600 to-teal-700" color="white">
-          <Card.Body p={6}>
+        <CardWrapper .Root bg="gradient-to-r from-green-600 to-teal-700" color="white">
+          <CardWrapper .Body p={6}>
             <VStack align="stretch" gap={4}>
               <HStack justify="space-between" align="center">
                 <HStack gap={3}>
@@ -300,8 +300,8 @@ export const SalesPerformanceInsights: React.FC = () => {
                 </HStack>
               )}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
         {loading && !performance ? (
           <VStack gap={4}>
@@ -339,12 +339,12 @@ export const SalesPerformanceInsights: React.FC = () => {
                 {/* Category Scores */}
                 <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
                   {Object.entries(performance.category_scores).map(([category, score]) => (
-                    <Card.Root 
+                    <CardWrapper .Root 
                       key={category}
                       borderTop="4px solid" 
                       borderTopColor={`${getCategoryColor(category)}.400`}
                     >
-                      <Card.Body p={4} textAlign="center">
+                      <CardWrapper .Body p={4} textAlign="center">
                         <VStack gap={3}>
                           <Text fontSize="sm" color="gray.600" textTransform="capitalize">
                             {category}
@@ -362,17 +362,17 @@ export const SalesPerformanceInsights: React.FC = () => {
                             {score >= 90 ? 'Excellent' : score >= 80 ? 'Good' : score >= 70 ? 'Average' : 'Needs Improvement'}
                           </Badge>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
                   ))}
                 </SimpleGrid>
 
                 {/* Critical Insights */}
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper .Root>
+                  <CardWrapper .Header>
                     <Text fontSize="lg" fontWeight="semibold">Critical Insights</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <VStack align="stretch" gap={4}>
                       {performance.insights
                         .filter(insight => insight.type === 'critical' || insight.action_required)
@@ -401,8 +401,8 @@ export const SalesPerformanceInsights: React.FC = () => {
                           </Alert.Root>
                         ))}
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               </VStack>
             </Tabs.Content>
 
@@ -428,8 +428,8 @@ export const SalesPerformanceInsights: React.FC = () => {
 
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
                   {filteredInsights.map((insight, index) => (
-                    <Card.Root key={index} variant="outline">
-                      <Card.Body p={4}>
+                    <CardWrapper .Root key={index} variant="outline">
+                      <CardWrapper .Body p={4}>
                         <VStack align="stretch" gap={3}>
                           <HStack justify="space-between">
                             <Badge colorPalette={getTypeColor(insight.type)} size="sm">
@@ -471,8 +471,8 @@ export const SalesPerformanceInsights: React.FC = () => {
                             </Badge>
                           )}
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
                   ))}
                 </Grid>
               </VStack>
@@ -480,11 +480,11 @@ export const SalesPerformanceInsights: React.FC = () => {
 
             <Tabs.Content value="benchmarks">
               <VStack align="stretch" gap={6}>
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper .Root>
+                  <CardWrapper .Header>
                     <Text fontSize="lg" fontWeight="semibold">Industry Benchmarks</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <VStack align="stretch" gap={4}>
                       <HStack justify="space-between">
                         <Text>Your Performance</Text>
@@ -516,14 +516,14 @@ export const SalesPerformanceInsights: React.FC = () => {
                         </Progress.Track>
                       </Progress.Root>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
 
-                <Card.Root>
-                  <Card.Header>
+                <CardWrapper .Root>
+                  <CardWrapper .Header>
                     <Text fontSize="lg" fontWeight="semibold">Competitive Position</Text>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <VStack align="center" gap={4}>
                       <ShieldCheckIcon className="w-16 h-16 text-green-500" />
                       <Text fontSize="2xl" fontWeight="bold" color="green.600" textTransform="capitalize">
@@ -536,15 +536,15 @@ export const SalesPerformanceInsights: React.FC = () => {
                         +{performance.overall_score - performance.benchmarks.industry_average} points above average
                       </Badge>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               </VStack>
             </Tabs.Content>
 
             <Tabs.Content value="recommendations">
               <VStack align="stretch" gap={6}>
-                <Card.Root bg="gradient-to-r from-blue-500 to-purple-600" color="white">
-                  <Card.Body p={6}>
+                <CardWrapper .Root bg="gradient-to-r from-blue-500 to-purple-600" color="white">
+                  <CardWrapper .Body p={6}>
                     <VStack align="center" gap={4}>
                       <BoltIcon className="w-12 h-12" />
                       <Text fontSize="2xl" fontWeight="bold" textAlign="center">
@@ -554,18 +554,18 @@ export const SalesPerformanceInsights: React.FC = () => {
                         Prioritized recommendations to optimize your business performance
                       </Text>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
 
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={6}>
-                  <Card.Root borderTop="4px solid" borderTopColor="red.400">
-                    <Card.Header>
+                  <CardWrapper .Root borderTop="4px solid" borderTopColor="red.400">
+                    <CardWrapper .Header>
                       <HStack gap={2}>
                         <FireIcon className="w-5 h-5 text-red-500" />
                         <Text fontWeight="semibold" color="red.600">Immediate Actions</Text>
                       </HStack>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper .Header>
+                    <CardWrapper .Body>
                       <VStack align="stretch" gap={3}>
                         {performance.recommendations.immediate_actions.map((action, index) => (
                           <HStack key={index} gap={3} align="start">
@@ -574,17 +574,17 @@ export const SalesPerformanceInsights: React.FC = () => {
                           </HStack>
                         ))}
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
 
-                  <Card.Root borderTop="4px solid" borderTopColor="blue.400">
-                    <Card.Header>
+                  <CardWrapper .Root borderTop="4px solid" borderTopColor="blue.400">
+                    <CardWrapper .Header>
                       <HStack gap={2}>
                         <ChartBarIcon className="w-5 h-5 text-blue-500" />
                         <Text fontWeight="semibold" color="blue.600">Strategic Initiatives</Text>
                       </HStack>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper .Header>
+                    <CardWrapper .Body>
                       <VStack align="stretch" gap={3}>
                         {performance.recommendations.strategic_initiatives.map((initiative, index) => (
                           <HStack key={index} gap={3} align="start">
@@ -593,17 +593,17 @@ export const SalesPerformanceInsights: React.FC = () => {
                           </HStack>
                         ))}
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
 
-                  <Card.Root borderTop="4px solid" borderTopColor="green.400">
-                    <Card.Header>
+                  <CardWrapper .Root borderTop="4px solid" borderTopColor="green.400">
+                    <CardWrapper .Header>
                       <HStack gap={2}>
                         <TrophyIcon className="w-5 h-5 text-green-500" />
                         <Text fontWeight="semibold" color="green.600">Long-term Goals</Text>
                       </HStack>
-                    </Card.Header>
-                    <Card.Body>
+                    </CardWrapper .Header>
+                    <CardWrapper .Body>
                       <VStack align="stretch" gap={3}>
                         {performance.recommendations.long_term_goals.map((goal, index) => (
                           <HStack key={index} gap={3} align="start">
@@ -612,8 +612,8 @@ export const SalesPerformanceInsights: React.FC = () => {
                           </HStack>
                         ))}
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 </Grid>
 
                 <Alert.Root status="info">
@@ -631,8 +631,8 @@ export const SalesPerformanceInsights: React.FC = () => {
         ) : null}
 
         {/* Status */}
-        <Card.Root bg="bg.canvas">
-          <Card.Body p={3}>
+        <CardWrapper .Root bg="bg.canvas">
+          <CardWrapper .Body p={3}>
             <HStack justify="center" gap={4}>
               <HStack gap={2}>
                 <Box width="8px" height="8px"  borderRadius="50%" />
@@ -642,8 +642,8 @@ export const SalesPerformanceInsights: React.FC = () => {
               </HStack>
               <Badge colorPalette="green" size="sm">Analysis Engine Active</Badge>
             </HStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </VStack>
     </Box>
   );

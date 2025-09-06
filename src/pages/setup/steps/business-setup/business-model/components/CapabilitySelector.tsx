@@ -51,7 +51,7 @@ export function CapabilitySelector({
         }}
         gap={4}
       >
-        {/* Products Card */}
+        {/* Products CardWrapper  */}
         <CapabilityCard
           icon={<CubeIcon width={20} height={20} />}
           title="Productos"
@@ -96,7 +96,7 @@ export function CapabilitySelector({
           </SimpleGrid>
         </CapabilityCard>
 
-        {/* Services Card */}
+        {/* Services CardWrapper  */}
         <CapabilityCard
           icon={<UsersIcon width={20} height={20} />}
           title="Servicios"
@@ -136,7 +136,7 @@ export function CapabilitySelector({
           </SimpleGrid>
         </CapabilityCard>
 
-        {/* Events Card */}
+        {/* Events CardWrapper  */}
         <CapabilityCard
           icon={<CalendarIcon width={20} height={20} />}
           title="Eventos"
@@ -171,7 +171,7 @@ export function CapabilitySelector({
           </SimpleGrid>
         </CapabilityCard>
 
-        {/* Recurrence/Assets Card */}
+        {/* Recurrence/Assets CardWrapper  */}
         <CapabilityCard
           icon={<ArrowPathIcon width={20} height={20} />}
           title="Recurrencia"

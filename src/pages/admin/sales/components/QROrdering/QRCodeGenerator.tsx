@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   Box,
-  Card,
+  CardWrapper ,
   Text,
   Button,
   VStack,
@@ -232,8 +232,8 @@ export function QRCodeGenerator({
   return (
     <VStack gap="6" align="stretch">
       {/* Header */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <HStack justify="space-between" align="center">
             <VStack align="start" gap="1">
               <Text fontSize="xl" fontWeight="bold">QR Code Management</Text>
@@ -243,15 +243,15 @@ export function QRCodeGenerator({
             </VStack>
             <QrCodeIcon className="w-8 h-8 text-blue-500" />
           </HStack>
-        </Card.Header>
-      </Card.Root>
+        </CardWrapper .Header>
+      </CardWrapper .Root>
 
       {/* QR Generation Form */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontWeight="bold">Generate New QR Code</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <VStack gap="4" align="stretch">
             <Grid templateColumns={{ base: "1fr", md: "2fr 1fr 1fr" }} gap="4">
               <Box>
@@ -309,15 +309,15 @@ export function QRCodeGenerator({
               </Alert.Description>
             </Alert.Root>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Active QR Codes */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontWeight="bold">Active QR Codes ({qrConfigs.length})</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           {qrConfigs.length === 0 ? (
             <Text color="gray.600" textAlign="center" py="4">
               No QR codes generated yet. Create one above to get started.
@@ -330,7 +330,7 @@ export function QRCodeGenerator({
                 const qrUrl = `${baseUrl}/order/${config.qrCode}`;
                 
                 return (
-                  <Card.Root key={config.tableId} p="4" variant="outline">
+                  <CardWrapper .Root key={config.tableId} p="4" variant="outline">
                     <VStack gap="3" align="stretch">
                       <HStack justify="space-between" align="center">
                         <VStack align="start" gap="0">
@@ -413,13 +413,13 @@ export function QRCodeGenerator({
                         </Button>
                       )}
                     </VStack>
-                  </Card.Root>
+                  </CardWrapper .Root>
                 );
               })}
             </Grid>
           )}
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* QR Code Display Modal */}
       <Dialog.Root 

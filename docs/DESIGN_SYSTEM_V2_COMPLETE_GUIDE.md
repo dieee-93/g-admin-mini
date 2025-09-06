@@ -475,12 +475,12 @@ export default function SettingsPage() {
 
 ```tsx
 // ❌ INCORRECTO - Tags mixtos
-<Card variant="elevated">
+<CardWrapper variant="elevated">
   <Stack>...</Stack>
 </CardWrapper>
 
 // ✅ CORRECTO - Tags consistentes
-<Card variant="elevated">
+<CardWrapper variant="elevated">
   <Stack>...</Stack>
 </Card>
 ```

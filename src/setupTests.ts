@@ -34,6 +34,14 @@ vi.mock('@/lib/supabase/client', () => {
       delete: vi.fn().mockReturnThis(),
       order: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
+      gte: vi.fn().mockReturnThis(),
+      lte: vi.fn().mockReturnThis(),
+      gt: vi.fn().mockReturnThis(),
+      lt: vi.fn().mockReturnThis(),
+      in: vi.fn().mockReturnThis(),
+      neq: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      range: vi.fn().mockReturnThis(),
       single: vi.fn(() => {
         query = Promise.resolve({ data: {}, error: null });
         return builder;
@@ -67,6 +75,29 @@ vi.mock('@/lib/supabase/client', () => {
   return { supabase };
 });
 
+// Mock de ChakraProvider con configuración básica
+vi.mock('@chakra-ui/react', async (importOriginal) => {
+  const actual = await importOriginal();
+  const React = await import('react');
+  
+  return {
+    ...actual,
+    ChakraProvider: ({ children }: { children: React.ReactNode }) => 
+      React.createElement('div', { 'data-testid': 'chakra-provider' }, children),
+    useColorMode: vi.fn(() => ({
+      colorMode: 'light',
+      toggleColorMode: vi.fn(),
+      setColorMode: vi.fn(),
+    })),
+    useColorModeValue: vi.fn((light, dark) => light),
+    useTheme: vi.fn(() => ({
+      colors: {},
+      space: {},
+      sizes: {},
+    })),
+  };
+});
+
 // Mock de heroicons
 vi.mock('@heroicons/react/24/outline', async (importOriginal) => {
   const actual = await importOriginal()
@@ -86,9 +117,30 @@ vi.mock('@heroicons/react/24/outline', async (importOriginal) => {
   };
 });
 
+// Mock de Navigation Context
+vi.mock('@/contexts/NavigationContext', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    NavigationProvider: ({ children, value }: any) => children,
+    useNavigation: vi.fn(() => ({
+      currentModule: 'staff',
+      setCurrentModule: vi.fn(),
+      quickActions: [],
+      setQuickActions: vi.fn(),
+      breadcrumbs: [],
+      setBreadcrumbs: vi.fn(),
+    }))
+  };
+});
+
 // Mock de Zustand store
 vi.mock('@/store/materialsStore', () => ({
   useMaterials: vi.fn()
+}));
+
+vi.mock('@/store/staffStore', () => ({
+  useStaffStore: vi.fn()
 }));
 
 // Mock de IndexedDB para tests offline

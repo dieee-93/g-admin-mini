@@ -2,7 +2,7 @@
 import React from "react";
 import {
   Stack,
-  Card,
+  CardWrapper ,
   Grid,
   Typography,
   Badge,
@@ -62,7 +62,7 @@ export function OperationsHeader() {
 
         <Grid templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }} gap="lg">
           {kpis.map((kpi) => (
-            <Card key={kpi.label}>
+            <CardWrapper key={kpi.label}>
               <Stack p="md">
                 <Stack direction="row" justify="space-between">
                   <Stack direction="column" align="start" gap="xs">

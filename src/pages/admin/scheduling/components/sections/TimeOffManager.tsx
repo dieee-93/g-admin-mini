@@ -5,7 +5,7 @@ import {
   VStack, 
   HStack, 
   Text, 
-  Card, 
+  CardWrapper , 
   Button, 
   Badge,
   Table,
@@ -283,54 +283,54 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
     <VStack gap="6" align="stretch">
       {/* Stats Cards */}
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
-        <Card.Root>
-          <Card.Body textAlign="center" py="4">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="4">
             <VStack gap="1">
               <Text fontSize="2xl" fontWeight="bold" color="orange.500">
                 {stats.pending_requests}
               </Text>
               <Text fontSize="sm" color="gray.600">Pending Requests</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="4">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="4">
             <VStack gap="1">
               <Text fontSize="2xl" fontWeight="bold" color="green.500">
                 {stats.approved_requests}
               </Text>
               <Text fontSize="sm" color="gray.600">Approved This Month</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="4">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="4">
             <VStack gap="1">
               <Text fontSize="2xl" fontWeight="bold" color="blue.500">
                 {stats.avg_approval_time}d
               </Text>
               <Text fontSize="sm" color="gray.600">Avg Approval Time</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="4">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="4">
             <VStack gap="1">
               <Text fontSize="2xl" fontWeight="bold" color="purple.500">
                 {stats.total_requests_this_month}
               </Text>
               <Text fontSize="sm" color="gray.600">Total This Month</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </SimpleGrid>
 
       {/* Filters */}
-      <Card.Root>
-        <Card.Body>
+      <CardWrapper .Root>
+        <CardWrapper .Body>
           <Stack direction={{ base: 'column', md: 'row' }} gap="4" align="end">
             <HStack gap="4" flex="1">
               <Box>
@@ -390,12 +390,12 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
               Filter
             </Button>
           </Stack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Requests Table */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <HStack justify="space-between">
             <Text fontSize="lg" fontWeight="semibold">
               Time Off Requests ({filteredRequests.length})
@@ -406,8 +406,8 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
               </Badge>
             )}
           </HStack>
-        </Card.Header>
-        <Card.Body p="0">
+        </CardWrapper .Header>
+        <CardWrapper .Body p="0">
           <Table.Root size="sm">
             <Table.Header>
               <Table.Row>
@@ -436,19 +436,19 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
               )}
             </Table.Body>
           </Table.Root>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Employee PTO Balances */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontSize="lg" fontWeight="semibold">Employee PTO Balances</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
             {employees.map(employee => (
-              <Card.Root key={employee.id} size="sm">
-                <Card.Body>
+              <CardWrapper .Root key={employee.id} size="sm">
+                <CardWrapper .Body>
                   <VStack gap="3" align="stretch">
                     <HStack justify="space-between">
                       <VStack align="start" gap="0">
@@ -472,12 +472,12 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
                       </VStack>
                     </SimpleGrid>
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             ))}
           </SimpleGrid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 }

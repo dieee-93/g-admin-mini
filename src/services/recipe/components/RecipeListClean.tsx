@@ -3,7 +3,6 @@ import {
   Box,
   Text,
   Stack,
-  Card,
   Flex,
   Badge,
   Button,
@@ -23,6 +22,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRecipes } from '../hooks/useRecipes';
 import type { Recipe } from '../types';
+import { CardWrapper } from '@/shared/ui';
 
 interface RecipeListProps {
   onEdit?: (recipe: Recipe) => void;
@@ -131,8 +131,8 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
 
         {/* Recipes Grid */}
         {filteredRecipes.length === 0 ? (
-          <Card.Root>
-            <Card.Body textAlign="center" py="12">
+          <CardWrapper>
+            <CardWrapper.Body textAlign="center" py="12">
               <BeakerIcon className="w-12 h-12 mx-auto mb-4 text-gray-400" />
               <Text fontSize="lg" fontWeight="medium" mb="2">
                 {searchQuery ? 'No se encontraron recetas' : 'No hay recetas'}
@@ -143,19 +143,19 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
                   : 'Crea tu primera receta para comenzar'
                 }
               </Text>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
         ) : (
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
             {filteredRecipes.map((recipe) => (
-              <Card.Root 
+              <CardWrapper 
                 key={recipe.id} 
                 variant="outline"
                 cursor="pointer"
                 _hover={{ borderColor: 'blue.300', shadow: 'md' }}
                 onClick={() => onSelect?.(recipe)}
               >
-                <Card.Body p="4">
+                <CardWrapper.Body p="4">
                   <Stack gap="3">
                     {/* Header */}
                     <Flex justify="space-between" align="start">
@@ -232,8 +232,8 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
                       </Text>
                     )}
                   </Stack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
             ))}
           </SimpleGrid>
         )}

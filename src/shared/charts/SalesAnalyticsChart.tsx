@@ -2,7 +2,7 @@
 // Sales analytics and trends chart component
 
 import React from 'react';
-import { Box, Card, Text, VStack, HStack, Badge } from '@chakra-ui/react';
+import { Box, CardWrapper , Text, VStack, HStack, Badge } from '@chakra-ui/react';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 
 interface SalesData {
@@ -40,8 +40,8 @@ export default function SalesAnalyticsChart({
   const avgOrderValue = totalSales / totalOrders;
 
   return (
-    <Card.Root>
-      <Card.Header>
+    <CardWrapper .Root>
+      <CardWrapper .Header>
         <HStack justify="space-between">
           <HStack gap={2}>
             <ChartBarIcon className="w-5 h-5 text-blue-600" />
@@ -53,8 +53,8 @@ export default function SalesAnalyticsChart({
             {period}
           </Badge>
         </HStack>
-      </Card.Header>
-      <Card.Body>
+      </CardWrapper .Header>
+      <CardWrapper .Body>
         <VStack gap={4} align="stretch">
           {/* Summary Stats */}
           <HStack justify="space-around" p={4} bg="blue.50" borderRadius="md">
@@ -114,8 +114,8 @@ export default function SalesAnalyticsChart({
             ))}
           </Box>
         </VStack>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper .Body>
+    </CardWrapper .Root>
   );
 }
 

@@ -5,8 +5,6 @@ import {
   Input,
   Textarea,
   Text,
-  Stack,
-  Card,
   NumberInput,
   IconButton,
   Flex,
@@ -26,7 +24,7 @@ import { useRecipes } from '../hooks/useRecipes';
 import { MaterialSelector } from '@/shared/components/MaterialSelector';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
 import type { Recipe } from '../types';
-
+import { CardWrapper, Stack } from '@/shared/ui';
 interface RecipeFormProps {
   recipe?: Recipe;
   onSave?: (recipe: Recipe) => void;
@@ -214,8 +212,8 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
     const material = currentMaterial;
     
     return (
-      <Card.Root variant="outline" bg="blue.50" borderColor="blue.200">
-        <Card.Body p="4">
+      <CardWrapper variant="outline" bg="blue.50" borderColor="blue.200">
+        <CardWrapper.Body p="4">
           <Stack gap="4">
             <Flex justify="space-between" align="start">
               <Stack gap="1">
@@ -339,24 +337,24 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
               </Alert.Root>
             )}
           </Stack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     );
   };
 
   return (
     <Box maxW="2xl" mx="auto">
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper>
+        <CardWrapper.Header>
           <Flex align="center" gap="3">
             <BeakerIcon className="w-6 h-6" />
             <Text fontSize="lg" fontWeight="semibold">
               {recipe ? 'Editar Receta' : 'Nueva Receta'}
             </Text>
           </Flex>
-        </Card.Header>
+        </CardWrapper.Header>
 
-        <Card.Body>
+        <CardWrapper.Body>
           <Stack gap="6">
             {/* Basic Info */}
             <Stack gap="4">
@@ -452,8 +450,8 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
                   </Text>
                   
                   {ingredients.map((ingredient, index) => (
-                    <Card.Root key={ingredient.id} variant="outline" size="sm">
-                      <Card.Body p="3">
+                    <CardWrapper key={ingredient.id} variant="outline" size="sm">
+                      <CardWrapper.Body p="3">
                         <Flex justify="space-between" align="center">
                           <Stack gap="0" flex="1">
                             <Text fontSize="sm" fontWeight="medium">
@@ -478,8 +476,8 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
                             <TrashIcon className="w-4 h-4" />
                           </IconButton>
                         </Flex>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper.Body>
+                    </CardWrapper>
                   ))}
                 </Stack>
               )}
@@ -506,8 +504,8 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
               </Button>
             </Flex>
           </Stack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     </Box>
   );
 };

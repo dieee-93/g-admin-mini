@@ -4,8 +4,6 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
-  Button,
   Badge,
   SimpleGrid,
   Progress,
@@ -43,7 +41,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
-
+import { CardWrapper, Button } from '@/shared/ui';
 // Import event system
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
@@ -666,59 +664,59 @@ export function CustomReporting() {
 
           {/* Summary Stats */}
           <SimpleGrid columns={{ base: 2, md: 6 }} gap={4} w="full">
-            <Card.Root variant="subtle" bg="blue.50">
-              <Card.Body p={4} textAlign="center">
+            <CardWrapper variant="subtle" bg="blue.50">
+              <CardWrapper.Body p={4} textAlign="center">
                 <Text fontSize="2xl" fontWeight="bold" color="blue.600">
                   {reportingSummary.totalTemplates}
                 </Text>
                 <Text fontSize="sm" color="gray.600">Plantillas</Text>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper.Body>
+            </CardWrapper>
 
-            <Card.Root variant="subtle" >
-              <Card.Body p={4} textAlign="center">
+            <CardWrapper variant="subtle" >
+              <CardWrapper.Body p={4} textAlign="center">
                 <Text fontSize="2xl" fontWeight="bold" color="green.600">
                   {reportingSummary.activeTemplates}
                 </Text>
                 <Text fontSize="sm" color="gray.600">Activas</Text>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper.Body>
+            </CardWrapper>
 
-            <Card.Root variant="subtle" bg="purple.50">
-              <Card.Body p={4} textAlign="center">
+            <CardWrapper variant="subtle" bg="purple.50">
+              <CardWrapper.Body p={4} textAlign="center">
                 <Text fontSize="2xl" fontWeight="bold" color="purple.600">
                   {reportingSummary.scheduledReports}
                 </Text>
                 <Text fontSize="sm" color="gray.600">Programados</Text>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper.Body>
+            </CardWrapper>
 
-            <Card.Root variant="subtle" bg="orange.50">
-              <Card.Body p={4} textAlign="center">
+            <CardWrapper variant="subtle" bg="orange.50">
+              <CardWrapper.Body p={4} textAlign="center">
                 <Text fontSize="2xl" fontWeight="bold" color="orange.600">
                   {reportingSummary.totalGenerated}
                 </Text>
                 <Text fontSize="sm" color="gray.600">Generados</Text>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper.Body>
+            </CardWrapper>
 
-            <Card.Root variant="subtle" bg="pink.50">
-              <Card.Body p={4} textAlign="center">
+            <CardWrapper variant="subtle" bg="pink.50">
+              <CardWrapper.Body p={4} textAlign="center">
                 <Text fontSize="2xl" fontWeight="bold" color="pink.600">
                   {reportingSummary.activeAutomations}
                 </Text>
                 <Text fontSize="sm" color="gray.600">Automatizaciones</Text>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper.Body>
+            </CardWrapper>
 
-            <Card.Root variant="subtle" bg="yellow.50">
-              <Card.Body p={4} textAlign="center">
+            <CardWrapper variant="subtle" bg="yellow.50">
+              <CardWrapper.Body p={4} textAlign="center">
                 <Text fontSize="2xl" fontWeight="bold" color="yellow.600">
                   {reportingSummary.totalInsights}
                 </Text>
                 <Text fontSize="sm" color="gray.600">Insights</Text>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper.Body>
+            </CardWrapper>
           </SimpleGrid>
         </VStack>
 
@@ -789,8 +787,8 @@ export function CustomReporting() {
                 {/* Templates Grid */}
                 <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
                   {filteredTemplates.map((template) => (
-                    <Card.Root key={template.id} variant="outline">
-                      <Card.Body p={4}>
+                    <CardWrapper key={template.id} variant="outline">
+                      <CardWrapper.Body p={4}>
                         <VStack align="stretch" gap={3}>
                           {/* Header */}
                           <HStack justify="space-between">
@@ -872,8 +870,8 @@ export function CustomReporting() {
                             </IconButton>
                           </HStack>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper.Body>
+                    </CardWrapper>
                   ))}
                 </SimpleGrid>
               </VStack>
@@ -883,8 +881,8 @@ export function CustomReporting() {
             <Tabs.Content value="generated">
               <VStack gap={4} align="stretch">
                 {generatedReports.map((report) => (
-                  <Card.Root key={report.id} variant="outline">
-                    <Card.Body p={4}>
+                  <CardWrapper key={report.id} variant="outline">
+                    <CardWrapper.Body p={4}>
                       <HStack justify="space-between" align="start">
                         <VStack align="start" gap={2} flex="1">
                           <HStack gap={2}>
@@ -923,7 +921,7 @@ export function CustomReporting() {
                         
                         <VStack gap={2}>
                           {report.status === 'generating' && (
-                            <Progress colorPalette="blue" size="sm" width="100px" indeterminate />
+                            <Progress.Root colorPalette="blue" size="sm" width="100px" indeterminate />
                           )}
                           
                           {report.status === 'completed' && report.downloadUrl && (
@@ -941,8 +939,8 @@ export function CustomReporting() {
                           )}
                         </VStack>
                       </HStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 ))}
               </VStack>
             </Tabs.Content>
@@ -951,15 +949,15 @@ export function CustomReporting() {
             <Tabs.Content value="automation">
               <VStack gap={4} align="stretch">
                 {automations.map((automation) => (
-                  <Card.Root key={automation.id} variant="outline">
-                    <Card.Body p={4}>
+                  <CardWrapper key={automation.id} variant="outline">
+                    <CardWrapper.Body p={4}>
                       <HStack justify="space-between" align="start">
                         <VStack align="start" gap={2} flex="1">
                           <HStack gap={2}>
                             <Text fontSize="md" fontWeight="bold">
                               {automation.name}
                             </Text>
-                            <Switch
+                            <Switch.Root
                               checked={automation.isEnabled}
                               onCheckedChange={() => toggleAutomation(automation.id)}
                               colorPalette="green"
@@ -1024,8 +1022,8 @@ export function CustomReporting() {
                           </IconButton>
                         </VStack>
                       </HStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 ))}
               </VStack>
             </Tabs.Content>
@@ -1034,8 +1032,8 @@ export function CustomReporting() {
             <Tabs.Content value="insights">
               <VStack gap={4} align="stretch">
                 {insights.map((insight) => (
-                  <Card.Root key={insight.id} variant="outline">
-                    <Card.Body p={4}>
+                  <CardWrapper key={insight.id} variant="outline">
+                    <CardWrapper.Body p={4}>
                       <VStack align="stretch" gap={3}>
                         {/* Header */}
                         <HStack justify="space-between">
@@ -1081,16 +1079,16 @@ export function CustomReporting() {
                           </Text>
                         </HStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 ))}
               </VStack>
             </Tabs.Content>
 
             {/* Report Builder Tab */}
             <Tabs.Content value="builder">
-              <Card.Root variant="outline">
-                <Card.Header>
+              <CardWrapper variant="outline">
+                <CardWrapper.Header>
                   <HStack justify="space-between">
                     <Text fontSize="lg" fontWeight="bold">🏗️ Constructor de Reportes</Text>
                     <HStack gap={2}>
@@ -1107,9 +1105,9 @@ export function CustomReporting() {
                       ))}
                     </HStack>
                   </HStack>
-                </Card.Header>
+                </CardWrapper.Header>
                 
-                <Card.Body p={6}>
+                <CardWrapper.Body p={6}>
                   {builderStep === 'basic' && (
                     <VStack gap={4} align="stretch">
                       <Text fontSize="md" fontWeight="medium" mb={2}>
@@ -1209,8 +1207,8 @@ export function CustomReporting() {
                   
                   {/* Other builder steps would be implemented here */}
                   {builderStep !== 'basic' && (
-                    <Card.Root variant="subtle">
-                      <Card.Body p={8} textAlign="center">
+                    <CardWrapper variant="subtle">
+                      <CardWrapper.Body p={8} textAlign="center">
                         <PlusIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <Text fontSize="lg" fontWeight="medium" mb={2}>
                           Constructor de Reportes - {builderStep}
@@ -1244,11 +1242,11 @@ export function CustomReporting() {
                             Siguiente
                           </Button>
                         </HStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper.Body>
+                    </CardWrapper>
                   )}
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper.Body>
+              </CardWrapper>
             </Tabs.Content>
           </Box>
         </Tabs.Root>

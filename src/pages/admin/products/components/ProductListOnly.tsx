@@ -8,7 +8,7 @@ import {
   Button, 
   Typography, 
   Badge, 
-  Card,
+  CardWrapper ,
   Grid,
   InputField,
   Alert,
@@ -284,7 +284,7 @@ export function ProductListOnly() {
             ) : (
               <VStack gap="md" align="stretch">
                 {filteredProducts.map((product) => (
-                  <Card key={product.id}>
+                  <CardWrapper key={product.id}>
                     <div className="p-4">
                       <HStack justify="space-between" align="start">
                         <VStack align="stretch" gap="sm" className="flex-1">

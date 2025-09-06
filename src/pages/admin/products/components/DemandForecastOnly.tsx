@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Typography,
@@ -113,7 +113,7 @@ export function DemandForecastOnly() {
 
         <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" }} gap="md">
           {forecasts.map((forecast) => (
-            <Card key={forecast.product_id}>
+            <CardWrapper key={forecast.product_id}>
               <div className="p-4">
                 <HStack justify="space-between" className="mb-4">
                   <Typography variant="heading" className="text-lg font-bold">

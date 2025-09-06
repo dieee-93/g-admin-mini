@@ -3,7 +3,7 @@ import {
   Stack,
   Typography, 
   Button,
-  Card,
+  CardWrapper ,
   Badge,
   Alert,
   Icon
@@ -103,7 +103,7 @@ export function CartValidationSummary({
   const validationProgress = getValidationProgress();
 
   return (
-    <Card variant="elevated">
+    <CardWrapper variant="elevated">
       <Stack gap="lg">
         {/* Header del resumen */}
         <Stack direction="row" justify="space-between" align="center">

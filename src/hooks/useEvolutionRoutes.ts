@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { MILESTONES, Milestone, operationalProfileMilestones } from '../config/milestones';
-import { useBusinessProfile } from '../store/useBusinessProfile';
+import { MILESTONES, type Milestone, operationalProfileMilestones } from '../config/milestones';
+import { useBusinessProfile } from '@/store/businessCapabilitiesStore'; 
 import { getOperationalProfile } from '../pages/setup/steps/business-setup/business-model/config/businessLogic';
 
 /**

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   Box,
-  Card,
+  CardWrapper ,
   Text,
   Button,
   VStack,
@@ -118,7 +118,7 @@ export function ModernPaymentProcessor({
     },
     {
       type: PaymentType.CREDIT_CARD,
-      label: 'Credit Card',
+      label: 'Credit CardWrapper ',
       icon: CreditCardIcon,
       color: 'blue',
       processingTime: PAYMENT_PROCESSING_TIMES[PaymentType.CREDIT_CARD],
@@ -280,7 +280,7 @@ export function ModernPaymentProcessor({
   return (
     <VStack gap="6" align="stretch">
       {/* Payment Summary */}
-      <Card.Root p="4" bg="bg.canvas">
+      <CardWrapper .Root p="4" bg="bg.canvas">
         <VStack gap="3" align="stretch">
           <HStack justify="space-between">
             <Text fontWeight="medium">Subtotal:</Text>
@@ -314,14 +314,14 @@ export function ModernPaymentProcessor({
             </HStack>
           )}
         </VStack>
-      </Card.Root>
+      </CardWrapper .Root>
 
       {/* Tip Configuration */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontWeight="bold">Tip Amount</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <VStack gap="4" align="stretch">
             <Select.Root
               collection={tipOptions}
@@ -363,16 +363,16 @@ export function ModernPaymentProcessor({
               </Box>
             )}
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Split Bill Options */}
       {allowSplitBill && customerCount > 1 && !splitBillMode && (
-        <Card.Root>
-          <Card.Header>
+        <CardWrapper .Root>
+          <CardWrapper .Header>
             <Text fontWeight="bold">Split Bill ({customerCount} customers)</Text>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <HStack gap="3">
               <Button
                 variant="outline"
@@ -389,14 +389,14 @@ export function ModernPaymentProcessor({
                 Custom Split
               </Button>
             </HStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       )}
 
       {/* Split Bill Setup */}
       {splitBillMode && (
-        <Card.Root>
-          <Card.Header>
+        <CardWrapper .Root>
+          <CardWrapper .Header>
             <HStack justify="space-between">
               <Text fontWeight="bold">
                 {splitBillMode === SplitBillType.EVEN ? 'Even Split' : 'Custom Split'}
@@ -413,8 +413,8 @@ export function ModernPaymentProcessor({
                 Cancel Split
               </Button>
             </HStack>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <VStack gap="3" align="stretch">
               {splitAmounts.map((amount, index) => (
                 <HStack key={index} gap="3">
@@ -439,17 +439,17 @@ export function ModernPaymentProcessor({
                 Total split: ${splitAmounts.reduce((sum, amount) => sum + amount, 0).toFixed(2)}
               </Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       )}
 
       {/* Selected Payment Methods */}
       {selectedPayments.length > 0 && (
-        <Card.Root>
-          <Card.Header>
+        <CardWrapper .Root>
+          <CardWrapper .Header>
             <Text fontWeight="bold">Selected Payment Methods</Text>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <VStack gap="3" align="stretch">
               {selectedPayments.map((payment, index) => {
                 const method = paymentMethods.find(m => m.type === payment.type);
@@ -480,16 +480,16 @@ export function ModernPaymentProcessor({
                 );
               })}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       )}
 
       {/* Payment Method Selection */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontWeight="bold">Payment Methods</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="3">
             {paymentMethods.map((method) => {
               const Icon = method.icon;
@@ -524,8 +524,8 @@ export function ModernPaymentProcessor({
               );
             })}
           </Grid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Processing Status */}
       {isProcessing && (

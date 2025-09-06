@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Typography,
@@ -278,7 +278,7 @@ export function ProductionScheduleOnly() {
                   </div>
                 ) : (
                   schedule.map((slot) => (
-                    <Card key={slot.id}>
+                    <CardWrapper key={slot.id}>
                       <div className="p-4">
                         <HStack justify="space-between" className="mb-4">
                           <VStack align="start" gap="xs">

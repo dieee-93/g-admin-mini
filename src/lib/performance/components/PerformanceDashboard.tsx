@@ -7,8 +7,6 @@ import {
   VStack,
   HStack,
   Text,
-  Button,
-  Card,
   SimpleGrid,
   Progress,
   Badge,
@@ -25,6 +23,7 @@ import {
   ArrowPathIcon,
   DocumentArrowDownIcon
 } from '@heroicons/react/24/outline';
+import { CardWrapper, Button } from '@/shared/ui';
 
 // Performance utilities
 import { lazyLoadingManager, getPerformanceMetrics } from '../LazyLoadingManager';
@@ -148,7 +147,7 @@ export function PerformanceDashboard() {
   };
 
   return (
-    <Card.Root maxW="6xl" mx="auto" p="6">
+    <CardWrapper maxW="6xl" mx="auto" p="6">
       <VStack gap="6" align="stretch">
         {/* Header */}
         <HStack justify="space-between" align="center">
@@ -192,7 +191,7 @@ export function PerformanceDashboard() {
         </HStack>
 
         {/* Performance Score Overview */}
-        <Card.Root p="4" bg="bg.canvas">
+        <CardWrapper p="4" bg="bg.canvas">
           <HStack justify="space-between" align="center">
             <VStack align="start" gap="1">
               <Text fontSize="lg" fontWeight="semibold">
@@ -232,7 +231,7 @@ export function PerformanceDashboard() {
               <Progress.Range />
             </Progress.Track>
           </Progress.Root>
-        </Card.Root>
+        </CardWrapper>
 
         {/* Tabs */}
         <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value)}>
@@ -251,7 +250,7 @@ export function PerformanceDashboard() {
           <Tabs.Content value="overview">
             <VStack gap="6" align="stretch" mt="4">
               <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="4">
-                <Card.Root p="4" textAlign="center">
+                <CardWrapper p="4" textAlign="center">
                   <VStack gap="2">
                     <Text fontSize="2xl" fontWeight="bold" color="blue.500">
                       {lazyLoadingMetrics.loadedModules}/{lazyLoadingMetrics.totalModules}
@@ -260,9 +259,9 @@ export function PerformanceDashboard() {
                       Modules Loaded
                     </Text>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
 
-                <Card.Root p="4" textAlign="center">
+                <CardWrapper p="4" textAlign="center">
                   <VStack gap="2">
                     <Text fontSize="2xl" fontWeight="bold" color="green.500">
                       {formatTime(lazyLoadingMetrics.averageLoadTime)}
@@ -271,9 +270,9 @@ export function PerformanceDashboard() {
                       Avg Load Time
                     </Text>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
 
-                <Card.Root p="4" textAlign="center">
+                <CardWrapper p="4" textAlign="center">
                   <VStack gap="2">
                     <Text fontSize="2xl" fontWeight="bold" color="purple.500">
                       {formatBytes(runtimeMetrics.memoryUsage)}
@@ -282,9 +281,9 @@ export function PerformanceDashboard() {
                       Memory Usage
                     </Text>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
 
-                <Card.Root p="4" textAlign="center">
+                <CardWrapper p="4" textAlign="center">
                   <VStack gap="2">
                     <Text fontSize="2xl" fontWeight="bold" color="orange.500">
                       {Math.round(lazyLoadingMetrics.cacheHitRate * 100)}%
@@ -293,7 +292,7 @@ export function PerformanceDashboard() {
                       Cache Hit Rate
                     </Text>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
               </SimpleGrid>
 
               {/* Performance Alerts */}
@@ -319,7 +318,7 @@ export function PerformanceDashboard() {
           <Tabs.Content value="lazy-loading">
             <VStack gap="4" align="stretch" mt="4">
               <SimpleGrid columns={{ base: 1, md: 3 }} gap="4">
-                <Card.Root p="4">
+                <CardWrapper p="4">
                   <VStack align="start" gap="3">
                     <Text fontWeight="semibold">Load Performance</Text>
                     <VStack align="start" gap="2" w="full">
@@ -343,9 +342,9 @@ export function PerformanceDashboard() {
                       </HStack>
                     </VStack>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
 
-                <Card.Root p="4">
+                <CardWrapper p="4">
                   <VStack align="start" gap="3">
                     <Text fontWeight="semibold">Module Status</Text>
                     <VStack align="start" gap="2" w="full">
@@ -369,9 +368,9 @@ export function PerformanceDashboard() {
                       </HStack>
                     </VStack>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
 
-                <Card.Root p="4">
+                <CardWrapper p="4">
                   <VStack align="start" gap="3">
                     <Text fontWeight="semibold">Bundle Size</Text>
                     <VStack align="start" gap="2" w="full">
@@ -389,11 +388,11 @@ export function PerformanceDashboard() {
                       </HStack>
                     </VStack>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
               </SimpleGrid>
 
               {/* Recent Loading Stats */}
-              <Card.Root p="4">
+              <CardWrapper p="4">
                 <VStack align="stretch" gap="3">
                   <Text fontWeight="semibold">Recent Loading Activity</Text>
                   <Box maxH="300px" overflowY="auto">
@@ -419,7 +418,7 @@ export function PerformanceDashboard() {
                     </VStack>
                   </Box>
                 </VStack>
-              </Card.Root>
+              </CardWrapper>
             </VStack>
           </Tabs.Content>
 
@@ -429,7 +428,7 @@ export function PerformanceDashboard() {
               {bundleAnalysis ? (
                 <>
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-                    <Card.Root p="4">
+                    <CardWrapper p="4">
                       <VStack align="start" gap="3">
                         <Text fontWeight="semibold">Bundle Overview</Text>
                         <VStack align="start" gap="2" w="full">
@@ -453,9 +452,9 @@ export function PerformanceDashboard() {
                           </HStack>
                         </VStack>
                       </VStack>
-                    </Card.Root>
+                    </CardWrapper>
 
-                    <Card.Root p="4">
+                    <CardWrapper p="4">
                       <VStack align="start" gap="3">
                         <Text fontWeight="semibold">Optimization Status</Text>
                         <VStack align="start" gap="2" w="full">
@@ -479,12 +478,12 @@ export function PerformanceDashboard() {
                           </HStack>
                         </VStack>
                       </VStack>
-                    </Card.Root>
+                    </CardWrapper>
                   </SimpleGrid>
 
                   {/* Largest Modules */}
                   {bundleAnalysis.largestModules.length > 0 && (
-                    <Card.Root p="4">
+                    <CardWrapper p="4">
                       <VStack align="stretch" gap="3">
                         <Text fontWeight="semibold">Largest Modules</Text>
                         <VStack gap="2" align="stretch">
@@ -505,12 +504,12 @@ export function PerformanceDashboard() {
                           ))}
                         </VStack>
                       </VStack>
-                    </Card.Root>
+                    </CardWrapper>
                   )}
 
                   {/* Recommendations */}
                   {bundleAnalysis.recommendations.length > 0 && (
-                    <Card.Root p="4">
+                    <CardWrapper p="4">
                       <VStack align="stretch" gap="3">
                         <Text fontWeight="semibold">Optimization Recommendations</Text>
                         <VStack gap="1" align="stretch">
@@ -521,7 +520,7 @@ export function PerformanceDashboard() {
                           ))}
                         </VStack>
                       </VStack>
-                    </Card.Root>
+                    </CardWrapper>
                   )}
                 </>
               ) : (
@@ -540,7 +539,7 @@ export function PerformanceDashboard() {
           <Tabs.Content value="runtime">
             <VStack gap="4" align="stretch" mt="4">
               <SimpleGrid columns={{ base: 1, md: 3 }} gap="4">
-                <Card.Root p="4" textAlign="center">
+                <CardWrapper p="4" textAlign="center">
                   <VStack gap="2">
                     <Text fontSize="2xl" fontWeight="bold" color="blue.500">
                       {performance.metrics.renderCount}
@@ -549,9 +548,9 @@ export function PerformanceDashboard() {
                       Total Renders
                     </Text>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
 
-                <Card.Root p="4" textAlign="center">
+                <CardWrapper p="4" textAlign="center">
                   <VStack gap="2">
                     <Text fontSize="2xl" fontWeight="bold" color="green.500">
                       {formatTime(performance.metrics.averageRenderTime)}
@@ -560,9 +559,9 @@ export function PerformanceDashboard() {
                       Avg Render Time
                     </Text>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
 
-                <Card.Root p="4" textAlign="center">
+                <CardWrapper p="4" textAlign="center">
                   <VStack gap="2">
                     <Text fontSize="2xl" fontWeight="bold" color="purple.500">
                       {formatBytes(performance.metrics.memoryUsage)}
@@ -571,7 +570,7 @@ export function PerformanceDashboard() {
                       Memory Usage
                     </Text>
                   </VStack>
-                </Card.Root>
+                </CardWrapper>
               </SimpleGrid>
 
               {/* Memory Usage Alert */}
@@ -591,7 +590,7 @@ export function PerformanceDashboard() {
           </Tabs.Content>
         </Tabs.Root>
       </VStack>
-    </Card.Root>
+    </CardWrapper>
   );
 }
 

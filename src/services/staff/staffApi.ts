@@ -1,7 +1,7 @@
 // staffApi.ts - Staff Management API with Supabase Integration
 // Replaces mock data with real database operations
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import type { 
   StaffMember, 
   ShiftSchedule, 

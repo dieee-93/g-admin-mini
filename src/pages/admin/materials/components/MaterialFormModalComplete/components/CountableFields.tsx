@@ -5,7 +5,7 @@ import {
   Text,
   Input,
   Alert,
-  Card,
+  CardWrapper ,
   Field,
   Switch,
   Flex,
@@ -130,8 +130,8 @@ export const CountableFields = ({
       </Alert.Root>
 
       {/* Nueva configuración unificada */}
-      <Card.Root variant="outline" w="full">
-        <Card.Body>
+      <CardWrapper .Root variant="outline" w="full">
+        <CardWrapper .Body>
           <Stack gap="4">
             <Box>
               <Text fontWeight="semibold" mb="3">Configuración de Stock Inicial</Text>
@@ -269,8 +269,8 @@ export const CountableFields = ({
               </Stack>
             )}
           </Stack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Stock Fields - Solo cuando se selecciona agregar stock */}
       {stockConfigType !== 'none' && (

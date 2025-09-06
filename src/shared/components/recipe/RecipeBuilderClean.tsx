@@ -6,7 +6,7 @@ import {
   Stack,
   Flex,
   Badge,
-  Card,
+  CardWrapper ,
   Button
 } from '@chakra-ui/react';
 import { 
@@ -82,8 +82,8 @@ export const RecipeBuilderClean: React.FC<RecipeBuilderCleanProps> = ({
 
   return (
     <Box className={className}>
-      <Card.Root variant="outline">
-        <Card.Header p="4">
+      <CardWrapper .Root variant="outline">
+        <CardWrapper .Header p="4">
           <Flex justify="space-between" align="center">
             <Flex gap="3" align="center">
               <Box fontSize="2xl">
@@ -126,17 +126,17 @@ export const RecipeBuilderClean: React.FC<RecipeBuilderCleanProps> = ({
               </Button>
             </Flex>
           </Flex>
-        </Card.Header>
+        </CardWrapper .Header>
 
-        <Card.Body p="4">
+        <CardWrapper .Body p="4">
           {showList && (
             <RecipeListClean
               onEdit={handleEditRecipe}
               onSelect={handleEditRecipe}
             />
           )}
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </Box>
   );
 };

@@ -2,7 +2,7 @@
 import {
   Stack,
   Typography,
-  Card,
+  CardWrapper ,
   Badge,
   Table,
   Grid

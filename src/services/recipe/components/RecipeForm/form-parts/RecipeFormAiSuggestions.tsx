@@ -5,7 +5,7 @@ import {
   HStack,
   Text,
   Badge,
-  Card,
+  CardWrapper ,
   Tabs,
   Switch,
   Progress,
@@ -59,8 +59,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
 }) => {
   return (
     <>
-      <Card.Root variant="outline" bg="gradient(to-r, purple.50, blue.50)">
-        <Card.Body p={4}>
+      <CardWrapper .Root variant="outline" bg="gradient(to-r, purple.50, blue.50)">
+        <CardWrapper .Body p={4}>
           <HStack justify="space-between">
             <HStack gap={3}>
               <SparklesIcon className="w-5 h-5 text-purple-500" />
@@ -127,13 +127,13 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
               </Badge>
             </HStack>
           )}
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {estimatedCost > 0 && (
         <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-          <Card.Root variant="outline" bg="blue.50">
-            <Card.Body p={4}>
+          <CardWrapper .Root variant="outline" bg="blue.50">
+            <CardWrapper .Body p={4}>
               <VStack gap={2} align="stretch">
                 <HStack justify="space-between">
                   <Text fontSize="sm" fontWeight="medium" color="blue.700">
@@ -158,12 +158,12 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                   </HStack>
                 )}
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper .Body>
+          </CardWrapper .Root>
 
           {aiSuggestions && optimizedCost < estimatedCost && (
-            <Card.Root variant="outline" >
-              <Card.Body p={4}>
+            <CardWrapper .Root variant="outline" >
+              <CardWrapper .Body p={4}>
                 <VStack gap={2} align="stretch">
                   <HStack justify="space-between">
                     <Text fontSize="sm" fontWeight="medium" color="green.700">
@@ -191,15 +191,15 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                     Ahorro: ${(estimatedCost - optimizedCost).toFixed(2)}
                   </Text>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           )}
         </SimpleGrid>
       )}
 
       {aiSuggestions && showAISuggestions && (
-        <Card.Root variant="outline" bg="gradient(to-br, purple.25, blue.25)">
-          <Card.Header>
+        <CardWrapper .Root variant="outline" bg="gradient(to-br, purple.25, blue.25)">
+          <CardWrapper .Header>
             <HStack justify="space-between">
               <HStack gap={2}>
                 <LightBulbIcon className="w-5 h-5 text-purple-500" />
@@ -215,8 +215,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 ✕
               </Button>
             </HStack>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <Tabs.Root value={activeAITab} onValueChange={(details) => setActiveAITab(details.value as any)}>
               <Tabs.List>
                 <Tabs.Trigger value="substitutions">
@@ -266,8 +266,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                         const isApplied = appliedSuggestions.has(suggestionId);
 
                         return (
-                          <Card.Root key={index} variant="subtle" size="sm">
-                            <Card.Body p={3}>
+                          <CardWrapper .Root key={index} variant="subtle" size="sm">
+                            <CardWrapper .Body p={3}>
                               <VStack gap={2} align="stretch">
                                 <HStack justify="space-between">
                                   <VStack align="start" gap={0}>
@@ -315,8 +315,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                                   </VStack>
                                 </SimpleGrid>
                               </VStack>
-                            </Card.Body>
-                          </Card.Root>
+                            </CardWrapper .Body>
+                          </CardWrapper .Root>
                         );
                       })
                     ) : (
@@ -330,8 +330,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 <Tabs.Content value="optimization">
                   <VStack gap={3} align="stretch">
                     {aiSuggestions.costOptimizations.map((opt, index) => (
-                      <Card.Root key={index} variant="subtle" size="sm">
-                        <Card.Body p={3}>
+                      <CardWrapper .Root key={index} variant="subtle" size="sm">
+                        <CardWrapper .Body p={3}>
                           <VStack gap={2} align="stretch">
                             <HStack justify="space-between">
                               <VStack align="start" gap={0}>
@@ -365,16 +365,16 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                               </VStack>
                             </SimpleGrid>
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
                     ))}
                   </VStack>
                 </Tabs.Content>
 
                 <Tabs.Content value="yield">
                   {aiSuggestions.yieldOptimization ? (
-                    <Card.Root variant="subtle" size="sm">
-                      <Card.Body p={4}>
+                    <CardWrapper .Root variant="subtle" size="sm">
+                      <CardWrapper .Body p={4}>
                         <VStack gap={3} align="stretch">
                           <HStack justify="space-between">
                             <Text fontSize="sm" fontWeight="medium">
@@ -427,8 +427,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                             </VStack>
                           )}
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
                   ) : (
                     <Text fontSize="sm" color="gray.600" textAlign="center" py={4}>
                       No se detectaron oportunidades de optimización de rendimiento.
@@ -439,8 +439,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 <Tabs.Content value="nutrition">
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap={3}>
                     {aiSuggestions.nutritionalInsights.map((insight, index) => (
-                      <Card.Root key={index} variant="subtle" size="sm">
-                        <Card.Body p={3}>
+                      <CardWrapper .Root key={index} variant="subtle" size="sm">
+                        <CardWrapper .Body p={3}>
                           <VStack gap={2} align="stretch">
                             <HStack justify="space-between">
                               <Text fontSize="sm" fontWeight="medium" textTransform="capitalize">
@@ -478,15 +478,15 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                               </VStack>
                             )}
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
                     ))}
                   </SimpleGrid>
                 </Tabs.Content>
               </Box>
             </Tabs.Root>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       )}
     </>
   );

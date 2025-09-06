@@ -6,7 +6,7 @@ import {
   HStack, 
   Text, 
   Heading, 
-  Card, 
+  CardWrapper , 
   SimpleGrid, 
   Badge, 
   Button,
@@ -145,8 +145,8 @@ const DashboardForecasting: React.FC = () => {
         {/* Quick Predictions */}
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="4" w="full">
           {predictions.map((prediction) => (
-            <Card.Root key={prediction.title}>
-              <Card.Body>
+            <CardWrapper .Root key={prediction.title}>
+              <CardWrapper .Body>
                 <VStack align="start" gap="3">
                   <Text fontSize="sm" color="gray.600">{prediction.title}</Text>
                   <Text fontSize="2xl" fontWeight="bold">{prediction.predicted}</Text>
@@ -162,25 +162,25 @@ const DashboardForecasting: React.FC = () => {
                     </Progress.Track>
                   </Progress.Root>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           ))}
         </SimpleGrid>
 
         {/* ML Models */}
-        <Card.Root w="full">
-          <Card.Header>
+        <CardWrapper .Root w="full">
+          <CardWrapper .Header>
             <HStack justify="space-between">
               <Heading size="lg">Machine Learning Models</Heading>
               <Badge colorPalette="purple" variant="subtle">AI-Powered</Badge>
             </HStack>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
               {mlModels.map((model) => {
                 const Icon = model.icon;
                 return (
-                  <Card.Root 
+                  <CardWrapper .Root 
                     key={model.id} 
                     variant="outline"
                     cursor="pointer"
@@ -192,7 +192,7 @@ const DashboardForecasting: React.FC = () => {
                     transition="all 0.2s"
                     onClick={() => setActiveModel(model.id)}
                   >
-                    <Card.Body>
+                    <CardWrapper .Body>
                       <VStack align="start" gap="4">
                         <HStack justify="space-between" w="full">
                           <Icon className="w-8 h-8 text-purple-500" />
@@ -248,23 +248,23 @@ const DashboardForecasting: React.FC = () => {
                            model.status === 'training' ? 'Training...' : 'Coming Soon'}
                         </Button>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 );
               })}
             </SimpleGrid>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
         {/* Model Performance */}
-        <Card.Root w="full">
-          <Card.Header>
+        <CardWrapper .Root w="full">
+          <CardWrapper .Header>
             <HStack gap="2">
               <CpuChipIcon className="w-5 h-5 text-blue-500" />
               <Text fontSize="lg" fontWeight="semibold">Model Performance Overview</Text>
             </HStack>
-          </Card.Header>
-          <Card.Body>
+          </CardWrapper .Header>
+          <CardWrapper .Body>
             <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
               <VStack align="start" gap="4">
                 <Text fontSize="md" fontWeight="medium">Accuracy Trends</Text>
@@ -309,8 +309,8 @@ const DashboardForecasting: React.FC = () => {
                 </VStack>
               </VStack>
             </SimpleGrid>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </VStack>
     </Box>
   );

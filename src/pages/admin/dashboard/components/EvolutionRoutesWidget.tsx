@@ -1,8 +1,9 @@
 import React from 'react';
-import { Box, Stack, Heading, Text, SimpleGrid, Card, CardBody, HStack, Circle, Button, Spinner, Center } from '@chakra-ui/react';
+import { Box, Stack, Heading, Text, SimpleGrid, HStack, Circle, Button, Spinner, Center } from '@chakra-ui/react';
 import { useEvolutionRoutes } from '@/hooks/useEvolutionRoutes';
-import { ArrowRightIcon } from '@chakra-ui/icons';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
+import { CardWrapper } from '@/shared/ui';
 
 const planetIcons: { [key: string]: string } = {
   'E-commerce Asincrónico': '🛒',
@@ -39,7 +40,7 @@ export const EvolutionRoutesWidget = () => {
         </Stack>
         <SimpleGrid columns={{ base: 1, md: suggestedRoutes.length }} gap={5}>
           {suggestedRoutes.map(({ planetName, milestone }) => (
-            <Card
+            <CardWrapper 
               key={milestone.id}
               bg="white"
               shadow="sm"
@@ -48,7 +49,7 @@ export const EvolutionRoutesWidget = () => {
               _hover={{ shadow: 'md', borderColor: 'blue.200' }}
               transition="all 0.2s"
             >
-              <CardBody>
+              <CardWrapper.Body>
                 <Stack gap={4} h="100%">
                   <HStack>
                     <Circle bg="blue.100" color="blue.600" size="40px">
@@ -64,14 +65,14 @@ export const EvolutionRoutesWidget = () => {
                     size="sm"
                     variant="solid"
                     colorScheme="blue"
-                    rightIcon={<ArrowRightIcon boxSize={3} />}
+                    rightIcon={<ArrowRightIcon className="w-3 h-3" />}
                     onClick={() => navigate(milestone.link)}
                   >
                     Comenzar
                   </Button>
                 </Stack>
-              </CardBody>
-            </Card>
+              </CardWrapper.Body>
+            </CardWrapper >
           ))}
         </SimpleGrid>
       </Stack>

@@ -5,7 +5,7 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
+  CardWrapper ,
   Button,
   Badge,
   SimpleGrid,
@@ -206,8 +206,8 @@ const DashboardReports: React.FC = () => {
           <Tabs.Content value="custom">
             <VStack gap="4" align="stretch">
               {customReports.map((report) => (
-                <Card.Root key={report.id} variant="outline">
-                  <Card.Body>
+                <CardWrapper .Root key={report.id} variant="outline">
+                  <CardWrapper .Body>
                     <HStack justify="space-between">
                       <VStack align="start" gap="3" flex="1">
                         <HStack gap="3">
@@ -268,8 +268,8 @@ const DashboardReports: React.FC = () => {
                         </HStack>
                       </VStack>
                     </HStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               ))}
             </VStack>
           </Tabs.Content>
@@ -280,7 +280,7 @@ const DashboardReports: React.FC = () => {
               {quickReports.map((report) => {
                 const Icon = report.icon;
                 return (
-                  <Card.Root 
+                  <CardWrapper .Root 
                     key={report.id} 
                     variant="outline"
                     cursor="pointer"
@@ -291,7 +291,7 @@ const DashboardReports: React.FC = () => {
                     }}
                     transition="all 0.2s"
                   >
-                    <Card.Body>
+                    <CardWrapper .Body>
                       <VStack align="start" gap="4">
                         <HStack gap="3">
                           <Icon className="w-8 h-8 text-blue-500" />
@@ -311,8 +311,8 @@ const DashboardReports: React.FC = () => {
                           </Button>
                         </HStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 );
               })}
             </SimpleGrid>
@@ -322,8 +322,8 @@ const DashboardReports: React.FC = () => {
           <Tabs.Content value="templates">
             <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
               {reportTemplates.map((template) => (
-                <Card.Root key={template.id} variant="outline">
-                  <Card.Body>
+                <CardWrapper .Root key={template.id} variant="outline">
+                  <CardWrapper .Body>
                     <VStack align="start" gap="4">
                       <HStack justify="space-between" w="full">
                         <VStack align="start" gap="1">
@@ -369,8 +369,8 @@ const DashboardReports: React.FC = () => {
                         Use Template
                       </Button>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper .Body>
+                </CardWrapper .Root>
               ))}
             </SimpleGrid>
           </Tabs.Content>

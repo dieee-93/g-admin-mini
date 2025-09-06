@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import {
   Box,
-  Card,
+  CardWrapper ,
   Text,
   Button,
   VStack,
@@ -220,7 +220,7 @@ export function KitchenDisplaySystem({
   return (
     <VStack gap="6" align="stretch">
       {/* Header & Controls */}
-      <Card.Root p="4">
+      <CardWrapper .Root p="4">
         <HStack justify="space-between" align="center" wrap="wrap" gap="4">
           <VStack align="start" gap="1">
             <Text fontSize="xl" fontWeight="bold">Kitchen Display System</Text>
@@ -279,13 +279,13 @@ export function KitchenDisplaySystem({
             </Button>
           </HStack>
         </HStack>
-      </Card.Root>
+      </CardWrapper .Root>
 
       {/* Station Statistics */}
       {showAllStations && (
         <Grid templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(3, 1fr)", lg: "repeat(6, 1fr)" }} gap="3">
           {stationStats.map((stat) => (
-            <Card.Root key={stat.station} p="3" size="sm">
+            <CardWrapper .Root key={stat.station} p="3" size="sm">
               <VStack gap="2" align="center">
                 <Text fontWeight="bold" fontSize="sm" textTransform="capitalize">
                   {stat.station}
@@ -300,7 +300,7 @@ export function KitchenDisplaySystem({
                   </Badge>
                 </VStack>
               </VStack>
-            </Card.Root>
+            </CardWrapper .Root>
           ))}
         </Grid>
       )}
@@ -317,7 +317,7 @@ export function KitchenDisplaySystem({
           const priorityColor = getPriorityColor(order.priority);
           
           return (
-            <Card.Root
+            <CardWrapper .Root
               key={order.order_id}
               p={{ base: "3", md: "4" }}
               borderWidth="2px"
@@ -406,7 +406,7 @@ export function KitchenDisplaySystem({
                       const statusColor = getItemStatusColor(item.status);
                       
                       return (
-                        <Card.Root key={item.item_id} p="3" variant="outline" size="sm">
+                        <CardWrapper .Root key={item.item_id} p="3" variant="outline" size="sm">
                           <VStack gap="2" align="stretch">
                             <HStack justify="space-between" align="center">
                               <VStack align="start" gap="0">
@@ -472,7 +472,7 @@ export function KitchenDisplaySystem({
                               </Button>
                             )}
                           </VStack>
-                        </Card.Root>
+                        </CardWrapper .Root>
                       );
                     })}
                 </VStack>
@@ -504,14 +504,14 @@ export function KitchenDisplaySystem({
                   )}
                 </HStack>
               </VStack>
-            </Card.Root>
+            </CardWrapper .Root>
           );
         })}
       </Grid>
 
       {/* Empty State */}
       {filteredOrders.length === 0 && (
-        <Card.Root p="8" textAlign="center">
+        <CardWrapper .Root p="8" textAlign="center">
           <VStack gap="3">
             <CheckCircleIcon className="w-12 h-12 text-green-500" />
             <Text fontSize="lg" fontWeight="medium">All caught up!</Text>
@@ -519,7 +519,7 @@ export function KitchenDisplaySystem({
               {showCompleted ? 'No orders to display' : 'No pending orders in the kitchen'}
             </Text>
           </VStack>
-        </Card.Root>
+        </CardWrapper .Root>
       )}
     </VStack>
   );

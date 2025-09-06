@@ -4,12 +4,12 @@ import {
   Stack,
   Text,
   Switch,
-  Card as ChakraCard,
+  CardWrapper  as ChakraCard,
   Field,
   NumberInput,
   Flex
 } from '@chakra-ui/react';
-import { Card } from '@/shared/ui';
+import { CardWrapper  } from '@/shared/ui';
 import { FormCalculations } from '../../../../utils';
 import { type ItemFormData } from '../../../../types';
 
@@ -242,8 +242,8 @@ const StockSummaryCard = ({
   const unitCost = stockQuantity > 0 ? totalPurchasePrice / stockQuantity : 0;
   
   return (
-    <Card variant="elevated" padding="md">
-      <Card.Body>
+    <CardWrapper variant="elevated" padding="md">
+      <CardWrapper .Body>
         <Stack gap="3">
           <Flex align="center" gap="2">
             <Box 
@@ -266,8 +266,8 @@ const StockSummaryCard = ({
             gap="4" 
             justify="space-between"
           >
-            <Card variant="outline" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="outline" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="green.600" fontWeight="medium">
                   COSTO UNITARIO
                 </Text>
@@ -277,11 +277,11 @@ const StockSummaryCard = ({
                 <Text fontSize="xs" color="green.600">
                   por {formData.unit}
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
             
-            <Card variant="outline" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="outline" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="green.600" fontWeight="medium">
                   STOCK INICIAL
                 </Text>
@@ -291,11 +291,11 @@ const StockSummaryCard = ({
                 <Text fontSize="xs" color="green.600">
                   {formData.unit}
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
             
-            <Card variant="outline" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="outline" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="green.600" fontWeight="medium">
                   INVERSIÓN TOTAL
                 </Text>
@@ -305,11 +305,11 @@ const StockSummaryCard = ({
                 <Text fontSize="xs" color="green.600">
                   ARS
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
           </Flex>
         </Stack>
-      </Card.Body>
+      </CardWrapper .Body>
     </CardWrapper>
   );
 };
@@ -331,8 +331,8 @@ const WeightStatisticsCard = ({
   const costPer1kg = unit === 'kg' ? unitCost : unitCost * 1000;            // 1kg = 1000g
   
   return (
-    <Card variant="outline" padding="md">
-      <Card.Body>
+    <CardWrapper variant="outline" padding="md">
+      <CardWrapper .Body>
         <Stack gap="3">
           <Flex align="center" gap="2">
             <Box 
@@ -355,41 +355,41 @@ const WeightStatisticsCard = ({
             gap="3" 
             justify="space-between"
           >
-            <Card variant="subtle" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="subtle" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="blue.600" fontWeight="medium" textAlign="center">
                   COSTO POR 100g
                 </Text>
                 <Text fontSize="lg" fontWeight="bold" color="blue.800" textAlign="center">
                   ${FormCalculations.formatCurrency(costPer100g)}
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
             
-            <Card variant="subtle" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="subtle" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="blue.600" fontWeight="medium" textAlign="center">
                   COSTO POR 500g
                 </Text>
                 <Text fontSize="lg" fontWeight="bold" color="blue.800" textAlign="center">
                   ${FormCalculations.formatCurrency(costPer500g)}
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
             
-            <Card variant="subtle" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="subtle" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="blue.600" fontWeight="medium" textAlign="center">
                   COSTO POR 1kg
                 </Text>
                 <Text fontSize="lg" fontWeight="bold" color="blue.800" textAlign="center">
                   ${FormCalculations.formatCurrency(costPer1kg)}
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
           </Flex>
         </Stack>
-      </Card.Body>
+      </CardWrapper .Body>
     </CardWrapper>
   );
 };
@@ -412,8 +412,8 @@ const VolumeStatisticsCard = ({
   const costPer1l = unit === 'l' ? unitCost : unitCost * 1000;              // 1L = 1000ml
   
   return (
-    <Card variant="outline" padding="md">
-      <Card.Body>
+    <CardWrapper variant="outline" padding="md">
+      <CardWrapper .Body>
         <Stack gap="3">
           <Flex align="center" gap="2">
             <Box 
@@ -436,52 +436,52 @@ const VolumeStatisticsCard = ({
             gap="3" 
             justify="space-between"
           >
-            <Card variant="subtle" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="subtle" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="purple.600" fontWeight="medium" textAlign="center">
                   COSTO POR 100ml
                 </Text>
                 <Text fontSize="lg" fontWeight="bold" color="purple.800" textAlign="center">
                   ${FormCalculations.formatCurrency(costPer100ml)}
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
             
-            <Card variant="subtle" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="subtle" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="purple.600" fontWeight="medium" textAlign="center">
                   COSTO POR 250ml
                 </Text>
                 <Text fontSize="lg" fontWeight="bold" color="purple.800" textAlign="center">
                   ${FormCalculations.formatCurrency(costPer250ml)}
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
             
-            <Card variant="subtle" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="subtle" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="purple.600" fontWeight="medium" textAlign="center">
                   COSTO POR 500ml
                 </Text>
                 <Text fontSize="lg" fontWeight="bold" color="purple.800" textAlign="center">
                   ${FormCalculations.formatCurrency(costPer500ml)}
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
             
-            <Card variant="subtle" padding="sm">
-              <Card.Body>
+            <CardWrapper variant="subtle" padding="sm">
+              <CardWrapper .Body>
                 <Text fontSize="xs" color="purple.600" fontWeight="medium" textAlign="center">
                   COSTO POR 1L
                 </Text>
                 <Text fontSize="lg" fontWeight="bold" color="purple.800" textAlign="center">
                   ${FormCalculations.formatCurrency(costPer1l)}
                 </Text>
-              </Card.Body>
+              </CardWrapper .Body>
             </CardWrapper>
           </Flex>
         </Stack>
-      </Card.Body>
+      </CardWrapper .Body>
     </CardWrapper>
   );
 };

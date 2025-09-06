@@ -12,7 +12,7 @@ import {
   Badge,
   Select,
   createListCollection,
-  Card,
+  CardWrapper ,
   Alert,
   IconButton,
   Tabs,

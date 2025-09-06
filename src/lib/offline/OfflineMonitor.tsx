@@ -20,7 +20,7 @@ import {
   DialogBody,
   DialogFooter,
   Flex,
-  Card,
+  CardWrapper ,
   Progress,
   createListCollection
 } from '@chakra-ui/react';

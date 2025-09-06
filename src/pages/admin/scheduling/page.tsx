@@ -15,11 +15,14 @@ import {
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 
-// Import section components (will be implemented)
+// Import section components
 import { WeeklyScheduleView } from './components/sections/WeeklyScheduleView';
 import { TimeOffManager } from './components/sections/TimeOffManager';
-// import { CoveragePlanner } from './components/sections/CoveragePlanner';
+import { CoveragePlanner } from './components/sections/CoveragePlanner';
 import { LaborCostTracker } from './components/sections/LaborCostTracker';
+import { RealTimeLaborTracker } from './components/sections/RealTimeLaborTracker';
+import { AutoSchedulingModal } from './components/AutoSchedulingModal';
+import type { SchedulingSolution } from '@/services/scheduling/autoSchedulingEngine';
 
 // Types
 interface SchedulingStats {
@@ -33,7 +36,7 @@ interface SchedulingStats {
   approved_requests: number;
 }
 
-type SchedulingTab = 'schedule' | 'timeoff' | 'coverage' | 'costs';
+type SchedulingTab = 'schedule' | 'timeoff' | 'coverage' | 'costs' | 'realtime';
 
 interface SchedulingViewState {
   activeTab: SchedulingTab;
@@ -54,6 +57,9 @@ export default function SchedulingPage() {
     filters: {},
     viewMode: 'week'
   });
+  
+  // Auto-scheduling modal state
+  const [isAutoSchedulingOpen, setIsAutoSchedulingOpen] = useState(false);
 
   // Mock scheduling stats - will be replaced with API call
   const [schedulingStats] = useState<SchedulingStats>({
@@ -90,7 +96,7 @@ export default function SchedulingPage() {
               id: 'auto-schedule',
               label: 'Auto Schedule',
               icon: Cog6ToothIcon,
-              action: () => console.log('Auto-scheduling shifts')
+              action: () => setIsAutoSchedulingOpen(true)
             },
             {
               id: 'copy-week',
@@ -132,6 +138,21 @@ export default function SchedulingPage() {
               action: () => console.log('Exporting cost report')
             }
           ];
+        case 'realtime':
+          return [
+            {
+              id: 'force-refresh',
+              label: 'Force Refresh',
+              icon: ClockIcon,
+              action: () => console.log('Force refreshing real-time data')
+            },
+            {
+              id: 'export-live-data',
+              label: 'Export Live Data',
+              icon: ChartBarIcon,
+              action: () => console.log('Exporting live data')
+            }
+          ];
         default:
           return baseActions;
       }
@@ -144,12 +165,19 @@ export default function SchedulingPage() {
     setViewState(prev => ({ ...prev, activeTab: tab }));
   };
 
+  const handleScheduleGenerated = (solution: SchedulingSolution) => {
+    console.log('Schedule generated:', solution);
+    // TODO: Apply the generated schedule to the database
+    // For now, just log the solution and refresh the view
+    setIsAutoSchedulingOpen(false);
+  };
+
   return (
   <Box p="6" maxW="container.xl" mx="auto">
       <VStack gap="6" align="stretch">
         {/* UNIFIED PATTERN: Header with icon, badges, KPIs */}
-        <Card.Root>
-          <Card.Body>
+        <CardWrapper .Root>
+          <CardWrapper .Body>
             <HStack gap="4">
               <Box p="2" bg="blue.100" borderRadius="md">
                 <CalendarIcon className="w-8 h-8 text-blue-600" />
@@ -176,48 +204,48 @@ export default function SchedulingPage() {
 
             {/* KPI Row */}
             <SimpleGrid columns={{ base: 2, md: 4 }} gap="4" mt="4">
-              <Card.Root size="sm">
-                <Card.Body textAlign="center" py="3">
+              <CardWrapper .Root size="sm">
+                <CardWrapper .Body textAlign="center" py="3">
                   <Text fontSize="2xl" fontWeight="bold" color="blue.500">
                     {schedulingStats.total_shifts_this_week}
                   </Text>
                   <Text fontSize="xs" color="gray.600">Shifts This Week</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
               
-              <Card.Root size="sm">
-                <Card.Body textAlign="center" py="3">
+              <CardWrapper .Root size="sm">
+                <CardWrapper .Body textAlign="center" py="3">
                   <Text fontSize="2xl" fontWeight="bold" color="green.500">
                     {schedulingStats.coverage_percentage}%
                   </Text>
                   <Text fontSize="xs" color="gray.600">Coverage Rate</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
               
-              <Card.Root size="sm">
-                <Card.Body textAlign="center" py="3">
+              <CardWrapper .Root size="sm">
+                <CardWrapper .Body textAlign="center" py="3">
                   <Text fontSize="2xl" fontWeight="bold" color="orange.500">
                     {schedulingStats.pending_time_off}
                   </Text>
                   <Text fontSize="xs" color="gray.600">Pending Requests</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
               
-              <Card.Root size="sm">
-                <Card.Body textAlign="center" py="3">
+              <CardWrapper .Root size="sm">
+                <CardWrapper .Body textAlign="center" py="3">
                   <Text fontSize="2xl" fontWeight="bold" color="purple.500">
                     ${schedulingStats.labor_cost_this_week.toLocaleString()}
                   </Text>
                   <Text fontSize="xs" color="gray.600">Labor Cost</Text>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             </SimpleGrid>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
         {/* UNIFIED PATTERN: Tab Navigation */}
-        <Card.Root>
-          <Card.Body p="0">
+        <CardWrapper .Root>
+          <CardWrapper .Body p="0">
             <Tabs.Root 
               value={viewState.activeTab}
               onValueChange={(e) => handleTabChange(e.value as SchedulingTab)}
@@ -268,6 +296,16 @@ export default function SchedulingPage() {
                     )}
                   </HStack>
                 </Tabs.Trigger>
+
+                <Tabs.Trigger value="realtime">
+                  <HStack gap="2">
+                    <ClockIcon className="w-4 h-4" />
+                    <Text>Real-Time</Text>
+                    <Badge size="xs" colorPalette="green" variant="subtle">
+                      LIVE
+                    </Badge>
+                  </HStack>
+                </Tabs.Trigger>
               </Tabs.List>
 
               {/* Tab Content */}
@@ -287,11 +325,10 @@ export default function SchedulingPage() {
                 </Tabs.Content>
 
                 <Tabs.Content value="coverage">
-                  {/* <CoveragePlanner 
+                  <CoveragePlanner 
                     understaffedShifts={schedulingStats.understaffed_shifts}
                     coveragePercentage={schedulingStats.coverage_percentage}
-                  /> */}
-                  <div>Coverage Planner - En desarrollo</div>
+                  />
                 </Tabs.Content>
 
                 <Tabs.Content value="costs">
@@ -300,11 +337,27 @@ export default function SchedulingPage() {
                     overtimeHours={schedulingStats.overtime_hours}
                   />
                 </Tabs.Content>
+
+                <Tabs.Content value="realtime">
+                  <RealTimeLaborTracker 
+                    selectedDate={new Date().toISOString().split('T')[0]}
+                    showAlerts={true}
+                    compactMode={false}
+                  />
+                </Tabs.Content>
               </Box>
             </Tabs.Root>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </VStack>
+      
+      {/* Auto-Scheduling Modal */}
+      <AutoSchedulingModal
+        isOpen={isAutoSchedulingOpen}
+        onClose={() => setIsAutoSchedulingOpen(false)}
+        onScheduleGenerated={handleScheduleGenerated}
+        currentWeek={viewState.selectedWeek}
+      />
     </Box>
   );
 }

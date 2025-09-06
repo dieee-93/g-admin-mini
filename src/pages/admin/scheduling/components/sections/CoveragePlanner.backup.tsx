@@ -6,7 +6,7 @@ import {
   VStack, 
   HStack, 
   Text, 
-  Card, 
+  CardWrapper , 
   Button, 
   Badge,
   SimpleGrid,
@@ -231,71 +231,71 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
     <VStack gap="6" align="stretch">
       {/* Coverage Analytics */}
       <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} gap="4">
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="blue.500">
                 {analytics.weekly_coverage_avg}%
               </Text>
               <Text fontSize="xs" color="gray.600">Weekly Avg</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="orange.500">
                 {analytics.peak_hours_coverage}%
               </Text>
               <Text fontSize="xs" color="gray.600">Peak Hours</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="purple.500">
                 {analytics.weekend_coverage}%
               </Text>
               <Text fontSize="xs" color="gray.600">Weekends</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="red.500">
                 {analytics.critical_gaps}
               </Text>
               <Text fontSize="xs" color="gray.600">Critical Gaps</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="green.500">
                 {analytics.auto_coverage_success_rate}%
               </Text>
               <Text fontSize="xs" color="gray.600">Auto Success</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
         
-        <Card.Root>
-          <Card.Body textAlign="center" py="3">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="lg" fontWeight="bold" color="gray.700">
                 {analytics.most_difficult_position}
               </Text>
               <Text fontSize="xs" color="gray.600">Hardest to Fill</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </SimpleGrid>
 
       {/* Critical Alerts */}
@@ -313,8 +313,8 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
       )}
 
       {/* Filters */}
-      <Card.Root>
-        <Card.Body>
+      <CardWrapper .Root>
+        <CardWrapper .Body>
           <Stack direction={{ base: 'column', md: 'row' }} gap="4" align="end">
             <HStack gap="4" flex="1">
               <Box>
@@ -379,12 +379,12 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               Apply Filters
             </Button>
           </Stack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Coverage Gaps Table */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <HStack justify="space-between">
             <Text fontSize="lg" fontWeight="semibold">
               Coverage Gaps ({filteredGaps.length})
@@ -393,8 +393,8 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               {filteredGaps.filter(gap => gap.priority === 'critical').length} critical
             </Badge>
           </HStack>
-        </Card.Header>
-        <Card.Body p="0">
+        </CardWrapper .Header>
+        <CardWrapper .Body p="0">
           <Table.Root size="sm">
             <Table.Header>
               <Table.Row>
@@ -479,19 +479,19 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
               })}
             </Table.Body>
           </Table.Root>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Staffing Requirements Analysis */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontSize="lg" fontWeight="semibold">Staffing Requirements Analysis</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <SimpleGrid columns={{ base: 1, lg: 2 }} gap="6">
             {staffingRequirements.map((req, index) => (
-              <Card.Root key={index} size="sm">
-                <Card.Body>
+              <CardWrapper .Root key={index} size="sm">
+                <CardWrapper .Body>
                   <VStack gap="3" align="stretch">
                     <HStack justify="space-between">
                       <VStack align="start" gap="0">
@@ -530,12 +530,12 @@ export function CoveragePlanner({ understaffedShifts, coveragePercentage }: Cove
                       />
                     </Box>
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             ))}
           </SimpleGrid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 }

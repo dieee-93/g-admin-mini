@@ -4,7 +4,7 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
+  CardWrapper ,
   Badge,
   SimpleGrid,
   Select,
@@ -146,8 +146,8 @@ export function CorrelationsView({
       {/* Correlations Grid */}
       <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
         {filteredCorrelations.map((correlation) => (
-          <Card.Root key={correlation.id} variant="outline">
-            <Card.Body p={4}>
+          <CardWrapper .Root key={correlation.id} variant="outline">
+            <CardWrapper .Body p={4}>
               <VStack gap={3} align="stretch">
                 {/* Header */}
                 <HStack justify="space-between">
@@ -195,21 +195,21 @@ export function CorrelationsView({
                     {correlation.businessInsight}
                   </Text>
                   {correlation.actionableRecommendation && (
-                    <Card.Root variant="subtle" size="sm">
-                      <Card.Body p={2}>
+                    <CardWrapper .Root variant="subtle" size="sm">
+                      <CardWrapper .Body p={2}>
                         <HStack gap={2}>
                           <LightBulbIcon className="w-4 h-4 text-blue-500 flex-shrink-0" />
                           <Text fontSize="xs" color="blue.700">
                             {correlation.actionableRecommendation}
                           </Text>
                         </HStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
                   )}
                 </VStack>
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper .Body>
+          </CardWrapper .Root>
         ))}
       </SimpleGrid>
     </VStack>

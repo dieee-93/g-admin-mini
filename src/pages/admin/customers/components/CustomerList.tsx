@@ -1,7 +1,7 @@
 // src/features/customers/ui/CustomerList.tsx - Design System v2.0
 import { 
   Stack,
-  Card,
+  CardWrapper ,
   Typography,
   Button,
   Badge,
@@ -105,7 +105,7 @@ export function CustomerList() {
           justify="center"
           p={4}
         >
-          <Card padding="md" width="full">
+          <CardWrapper padding="md" width="full">
             <div style={{ maxWidth: '600px', maxHeight: '90vh', overflow: 'auto' }}>
               <CustomerForm 
                 customer={editingCustomer}

@@ -8,7 +8,6 @@ import {
   HStack,
   Text,
   Button,
-  Card,
   Badge,
   Tabs,
   Progress,
@@ -24,7 +23,7 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
-
+import { CardWrapper } from '@/shared/ui';
 // Tipos para pedidos
 interface OrderItem {
   id: string;
@@ -186,13 +185,13 @@ function OrderCard({ order, onViewDetails, onReorder }: {
   const StatusIcon = getStatusIcon(order.status);
   
   return (
-    <Card.Root 
+    <CardWrapper 
       variant="elevated" 
       bg="bg.surface"
       _hover={{ shadow: "md" }}
       transition="all 0.2s"
     >
-      <Card.Body>
+      <CardWrapper.Body>
         <VStack align="stretch" gap="4">
           {/* Header */}
           <HStack justify="space-between" align="start">
@@ -284,8 +283,8 @@ function OrderCard({ order, onViewDetails, onReorder }: {
             )}
           </HStack>
         </VStack>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper.Body>
+    </CardWrapper>
   );
 }
 
@@ -332,38 +331,38 @@ export function MyOrders() {
         
         {/* Stats Cards */}
         <Grid templateColumns={{ base: "repeat(3, 1fr)" }} gap="4">
-          <Card.Root variant="elevated" bg="blue.50">
-            <Card.Body textAlign="center">
+          <CardWrapper variant="elevated" bg="blue.50">
+            <CardWrapper.Body textAlign="center">
               <Text fontSize="2xl" fontWeight="bold" color="blue.600">
                 {stats.total}
               </Text>
               <Text fontSize="sm" color="blue.600">
                 Total
               </Text>
-            </Card.Body>
-          </Card.Root>
-          
-          <Card.Root variant="elevated" bg="orange.50">
-            <Card.Body textAlign="center">
+            </CardWrapper.Body>
+          </CardWrapper>
+
+          <CardWrapper variant="elevated" bg="orange.50">
+            <CardWrapper.Body textAlign="center">
               <Text fontSize="2xl" fontWeight="bold" color="orange.600">
                 {stats.active}
               </Text>
               <Text fontSize="sm" color="orange.600">
                 Activos
               </Text>
-            </Card.Body>
-          </Card.Root>
-          
-          <Card.Root variant="elevated" bg="green.50">
-            <Card.Body textAlign="center">
+            </CardWrapper.Body>
+          </CardWrapper>
+
+          <CardWrapper variant="elevated" bg="green.50">
+            <CardWrapper.Body textAlign="center">
               <Text fontSize="2xl" fontWeight="bold" color="green.600">
                 {stats.completed}
               </Text>
               <Text fontSize="sm" color="green.600">
                 Completados
               </Text>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
         </Grid>
         
         {/* Tabs */}
@@ -399,8 +398,8 @@ export function MyOrders() {
               />
             ))
           ) : (
-            <Card.Root variant="outline">
-              <Card.Body>
+            <CardWrapper variant="outline">
+              <CardWrapper.Body>
                 <VStack gap="4" py="8">
                   <Icon icon={ListBulletIcon} size="2xl" color="text.muted" />
                   <VStack gap="2">
@@ -415,8 +414,8 @@ export function MyOrders() {
                     Explorar Menú
                   </Button>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper.Body>
+            </CardWrapper>
           )}
         </VStack>
       </VStack>

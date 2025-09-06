@@ -8,7 +8,7 @@ import {
   createListCollection,
   NumberInput,
   Button,
-  Card,
+  CardWrapper ,
   Badge,
   Alert,
   Box,
@@ -292,8 +292,8 @@ function CountableFields({
       </Alert.Root>
 
       {/* Packaging opcional */}
-      <Card.Root variant="outline">
-        <Card.Body p="4">
+      <CardWrapper .Root variant="outline">
+        <CardWrapper .Body p="4">
           <VStack align="stretch" gap="3">
             <HStack justify="space-between">
               <VStack align="start" gap="1">
@@ -374,8 +374,8 @@ function CountableFields({
               </Collapsible.Content>
             </Collapsible.Root>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 }
@@ -476,8 +476,8 @@ function ElaboratedFields({
       </Box>
 
       {/* Configuración de producción */}
-      <Card.Root variant="outline">
-        <Card.Body p="4">
+      <CardWrapper .Root variant="outline">
+        <CardWrapper .Body p="4">
           <VStack align="stretch" gap="3">
             <Text fontWeight="medium">Configuración de Producción</Text>
             
@@ -517,8 +517,8 @@ function ElaboratedFields({
               </Switch.Root>
             </HStack>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* ✅ Selector de receta funcional */}
       <Box>
@@ -587,8 +587,8 @@ function ElaboratedFields({
             
             {/* Vista previa de receta seleccionada */}
             {formData.recipe_id && (
-              <Card.Root variant="outline" size="sm">
-                <Card.Body p="3">
+              <CardWrapper .Root variant="outline" size="sm">
+                <CardWrapper .Body p="3">
                   {(() => {
                     const selectedRecipe = recipes.find(r => r.id === formData.recipe_id);
                     if (!selectedRecipe) return null;
@@ -626,8 +626,8 @@ function ElaboratedFields({
                       </VStack>
                     );
                   })()}
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             )}
           </VStack>
         ) : (
@@ -873,8 +873,8 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
       )}
 
       {/* Configuración avanzada */}
-      <Card.Root variant="outline">
-        <Card.Body p="4">
+      <CardWrapper .Root variant="outline">
+        <CardWrapper .Body p="4">
           <VStack align="stretch" gap="3">
             <HStack 
               justify="space-between" 
@@ -948,8 +948,8 @@ export function UniversalItemForm({ onSuccess, onCancel, editItem }: UniversalIt
               </Collapsible.Content>
             </Collapsible.Root>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Botones de acción */}
       <HStack gap="3" pt="4">

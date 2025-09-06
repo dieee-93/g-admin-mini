@@ -5,13 +5,13 @@ import {
   Text,
   Input,
   Switch,
-  Card as ChakraCard,
+  CardWrapper  as ChakraCard,
   Alert,
   Field,
   NumberInput,
   Flex
 } from '@chakra-ui/react';
-import { Card } from '@/shared/ui';
+import { CardWrapper  } from '@/shared/ui';
 import { FormCalculations } from '../../../../utils';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { type ItemFormData } from '../../../../types';
@@ -344,8 +344,8 @@ const CostSummaryCard = ({
     <Box mt="6">
       <Stack gap="4">
         {/* Resumen principal */}
-        <Card variant="elevated" padding="md">
-          <Card.Body>
+        <CardWrapper variant="elevated" padding="md">
+          <CardWrapper .Body>
             <Stack gap="3">
               <Flex align="center" gap="2">
                 <Box 
@@ -368,8 +368,8 @@ const CostSummaryCard = ({
                 gap="4" 
                 justify="space-between"
               >
-                <Card variant="outline" padding="sm">
-                  <Card.Body>
+                <CardWrapper variant="outline" padding="sm">
+                  <CardWrapper .Body>
                     <Text fontSize="xs" color="green.600" fontWeight="medium">
                       COSTO POR UNIDAD
                     </Text>
@@ -379,11 +379,11 @@ const CostSummaryCard = ({
                     <Text fontSize="xs" color="green.600">
                       ARS por unidad
                     </Text>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
                 
-                <Card variant="outline" padding="sm">
-                  <Card.Body>
+                <CardWrapper variant="outline" padding="sm">
+                  <CardWrapper .Body>
                     <Text fontSize="xs" color="green.600" fontWeight="medium">
                       STOCK INICIAL
                     </Text>
@@ -393,11 +393,11 @@ const CostSummaryCard = ({
                     <Text fontSize="xs" color="green.600">
                       unidades
                     </Text>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
                 
-                <Card variant="outline" padding="sm">
-                  <Card.Body>
+                <CardWrapper variant="outline" padding="sm">
+                  <CardWrapper .Body>
                     <Text fontSize="xs" color="green.600" fontWeight="medium">
                       INVERSIÓN TOTAL
                     </Text>
@@ -407,11 +407,11 @@ const CostSummaryCard = ({
                     <Text fontSize="xs" color="green.600">
                       ARS
                     </Text>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
               </Flex>
             </Stack>
-          </Card.Body>
+          </CardWrapper .Body>
         </CardWrapper>
 
         {/* Estadísticas de packaging */}
@@ -451,8 +451,8 @@ const PackagingStatisticsCard = ({
   const costPer25Units = costPerUnit * 25;
   
   return (
-    <Card variant="outline" padding="md">
-      <Card.Body>
+    <CardWrapper variant="outline" padding="md">
+      <CardWrapper .Body>
         <Stack gap="4">
           <Flex align="center" gap="2">
             <Box 
@@ -471,8 +471,8 @@ const PackagingStatisticsCard = ({
           </Flex>
           
           {/* Resumen del packaging */}
-          <Card variant="subtle" padding="sm">
-            <Card.Body>
+          <CardWrapper variant="subtle" padding="sm">
+            <CardWrapper .Body>
               <Text fontSize="sm" color="cyan.700" fontWeight="medium" textAlign="center">
                 <strong>{FormCalculations.formatQuantity(stockQuantity)} unidades</strong> = 
                 {completePackages > 0 && (
@@ -482,7 +482,7 @@ const PackagingStatisticsCard = ({
                   <> + {looseUnits} unidad{looseUnits > 1 ? 'es' : ''} suelta{looseUnits > 1 ? 's' : ''}</>
                 )}
               </Text>
-            </Card.Body>
+            </CardWrapper .Body>
           </CardWrapper>
           
           {/* Estadísticas de costos por cantidad */}
@@ -495,41 +495,41 @@ const PackagingStatisticsCard = ({
               gap="3" 
               justify="space-between"
             >
-              <Card variant="subtle" padding="sm">
-                <Card.Body>
+              <CardWrapper variant="subtle" padding="sm">
+                <CardWrapper .Body>
                   <Text fontSize="xs" color="cyan.600" fontWeight="medium" textAlign="center">
                     COSTO POR UNIDAD
                   </Text>
                   <Text fontSize="lg" fontWeight="bold" color="cyan.800" textAlign="center">
                     ${FormCalculations.formatCurrency(costPerUnit)}
                   </Text>
-                </Card.Body>
+                </CardWrapper .Body>
               </CardWrapper>
               
-              <Card variant="subtle" padding="sm">
-                <Card.Body>
+              <CardWrapper variant="subtle" padding="sm">
+                <CardWrapper .Body>
                   <Text fontSize="xs" color="cyan.600" fontWeight="medium" textAlign="center">
                     COSTO POR 5 UNIDADES
                   </Text>
                   <Text fontSize="lg" fontWeight="bold" color="cyan.800" textAlign="center">
                     ${FormCalculations.formatCurrency(costPer5Units)}
                   </Text>
-                </Card.Body>
+                </CardWrapper .Body>
               </CardWrapper>
               
-              <Card variant="subtle" padding="sm">
-                <Card.Body>
+              <CardWrapper variant="subtle" padding="sm">
+                <CardWrapper .Body>
                   <Text fontSize="xs" color="cyan.600" fontWeight="medium" textAlign="center">
                     COSTO POR 10 UNIDADES
                   </Text>
                   <Text fontSize="lg" fontWeight="bold" color="cyan.800" textAlign="center">
                     ${FormCalculations.formatCurrency(costPer10Units)}
                   </Text>
-                </Card.Body>
+                </CardWrapper .Body>
               </CardWrapper>
               
-              <Card variant="subtle" padding="sm">
-                <Card.Body>
+              <CardWrapper variant="subtle" padding="sm">
+                <CardWrapper .Body>
                   <Text fontSize="xs" color="cyan.600" fontWeight="medium" textAlign="center">
                     COSTO POR {packageUnit.toUpperCase()}
                   </Text>
@@ -539,12 +539,12 @@ const PackagingStatisticsCard = ({
                   <Text fontSize="xs" color="cyan.600" textAlign="center">
                     ({packageSize} unidades)
                   </Text>
-                </Card.Body>
+                </CardWrapper .Body>
               </CardWrapper>
             </Flex>
           </Stack>
         </Stack>
-      </Card.Body>
+      </CardWrapper .Body>
     </CardWrapper>
   );
 };

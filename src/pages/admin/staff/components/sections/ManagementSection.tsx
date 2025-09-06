@@ -7,7 +7,7 @@ import {
   Text, 
   Select, 
   Badge, 
-  Card, 
+  CardWrapper , 
   SimpleGrid,
   Button,
   Avatar,
@@ -37,9 +37,11 @@ import {
   PlusIcon,
   PencilIcon,
   TrashIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline';
 import type { Employee, StaffViewState, UserRole, Permission } from '../../types';
+import { LaborCostDashboard } from '../LaborCostDashboard';
 
 interface ManagementSectionProps {
   viewState: StaffViewState;
@@ -121,7 +123,7 @@ const mockAuditLog = [
 ];
 
 export function ManagementSection({ viewState, onViewStateChange }: ManagementSectionProps) {
-  const [activeTab, setActiveTab] = useState<'payroll' | 'permissions' | 'audit' | 'settings'>('payroll');
+  const [activeTab, setActiveTab] = useState<'payroll' | 'labor-costs' | 'permissions' | 'audit' | 'settings'>('payroll');
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
 
@@ -172,8 +174,8 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
 
       {/* Quick Stats */}
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
-        <Card.Root>
-          <Card.Body textAlign="center">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center">
             <VStack gap="2">
               <BanknotesIcon className="w-6 h-6 text-green-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">
@@ -181,43 +183,43 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
               </Text>
               <Text fontSize="sm" color="gray.600">Nómina Total/Mes</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root>
-          <Card.Body textAlign="center">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center">
             <VStack gap="2">
               <ShieldCheckIcon className="w-6 h-6 text-blue-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">24</Text>
               <Text fontSize="sm" color="gray.600">Usuarios Activos</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root>
-          <Card.Body textAlign="center">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center">
             <VStack gap="2">
               <ClockIcon className="w-6 h-6 text-orange-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">3</Text>
               <Text fontSize="sm" color="gray.600">Revisiones Pendientes</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root>
-          <Card.Body textAlign="center">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center">
             <VStack gap="2">
               <DocumentTextIcon className="w-6 h-6 text-purple-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">156</Text>
               <Text fontSize="sm" color="gray.600">Acciones Auditadas</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </SimpleGrid>
 
       {/* Data Visibility Control */}
-      <Card.Root>
-        <Card.Body>
+      <CardWrapper .Root>
+        <CardWrapper .Body>
           <HStack justify="space-between" align="center">
             <VStack align="start" gap="1">
               <Text fontWeight="semibold">Mostrar Datos Sensibles</Text>
@@ -238,17 +240,22 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
               />
             </HStack>
           </HStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Management Tabs */}
-      <Card.Root>
-        <Card.Body p="0">
+      <CardWrapper .Root>
+        <CardWrapper .Body p="0">
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="payroll" gap="2" flex="1" minH="44px">
                 <BanknotesIcon className="w-5 h-5" />
                 <Text display={{ base: "none", sm: "block" }}>Nómina</Text>
+              </Tabs.Trigger>
+              
+              <Tabs.Trigger value="labor-costs" gap="2" flex="1" minH="44px">
+                <ChartBarIcon className="w-5 h-5" />
+                <Text display={{ base: "none", sm: "block" }}>Costos</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="permissions" gap="2" flex="1" minH="44px">
@@ -353,8 +360,8 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                     </Table.Root>
                   </VStack>
                 ) : (
-                  <Card.Root>
-                    <Card.Body py="12" textAlign="center">
+                  <CardWrapper .Root>
+                    <CardWrapper .Body py="12" textAlign="center">
                       <VStack gap="4">
                         <LockClosedIcon className="w-12 h-12 text-gray-400 mx-auto" />
                         <VStack gap="2">
@@ -364,8 +371,29 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                           </Text>
                         </VStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
+                )}
+              </Tabs.Content>
+
+              {/* Labor Costs Tab */}
+              <Tabs.Content value="labor-costs">
+                {hasPermission('payroll', 'read') ? (
+                  <LaborCostDashboard />
+                ) : (
+                  <CardWrapper .Root>
+                    <CardWrapper .Body py="12" textAlign="center">
+                      <VStack gap="4">
+                        <LockClosedIcon className="w-12 h-12 text-gray-400 mx-auto" />
+                        <VStack gap="2">
+                          <Text fontSize="lg" fontWeight="semibold">Acceso Restringido</Text>
+                          <Text color="gray.600">
+                            No tienes permisos para ver información de costos laborales
+                          </Text>
+                        </VStack>
+                      </VStack>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 )}
               </Tabs.Content>
 
@@ -385,8 +413,8 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                     {/* Admin Role */}
-                    <Card.Root>
-                      <Card.Body>
+                    <CardWrapper .Root>
+                      <CardWrapper .Body>
                         <VStack align="stretch" gap="4">
                           <HStack justify="space-between">
                             <VStack align="start" gap="1">
@@ -426,12 +454,12 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                             Editar Permisos
                           </Button>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
 
                     {/* Manager Role */}
-                    <Card.Root>
-                      <Card.Body>
+                    <CardWrapper .Root>
+                      <CardWrapper .Body>
                         <VStack align="stretch" gap="4">
                           <HStack justify="space-between">
                             <VStack align="start" gap="1">
@@ -471,12 +499,12 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                             Editar Permisos
                           </Button>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
 
                     {/* Supervisor Role */}
-                    <Card.Root>
-                      <Card.Body>
+                    <CardWrapper .Root>
+                      <CardWrapper .Body>
                         <VStack align="stretch" gap="4">
                           <HStack justify="space-between">
                             <VStack align="start" gap="1">
@@ -516,12 +544,12 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                             Editar Permisos
                           </Button>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
 
                     {/* Employee Role */}
-                    <Card.Root>
-                      <Card.Body>
+                    <CardWrapper .Root>
+                      <CardWrapper .Body>
                         <VStack align="stretch" gap="4">
                           <HStack justify="space-between">
                             <VStack align="start" gap="1">
@@ -561,8 +589,8 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                             Editar Permisos
                           </Button>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
                   </SimpleGrid>
                 </VStack>
               </Tabs.Content>
@@ -599,8 +627,8 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
 
                   <VStack gap="2" align="stretch">
                     {mockAuditLog.map((log) => (
-                      <Card.Root key={log.id} size="sm">
-                        <Card.Body>
+                      <CardWrapper .Root key={log.id} size="sm">
+                        <CardWrapper .Body>
                           <HStack justify="space-between" gap="4">
                             <HStack gap="4" flex="1">
                               <Box>
@@ -637,8 +665,8 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                               </Text>
                             </VStack>
                           </HStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
                     ))}
                   </VStack>
                 </VStack>
@@ -651,8 +679,8 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
                     {/* Security Settings */}
-                    <Card.Root>
-                      <Card.Body>
+                    <CardWrapper .Root>
+                      <CardWrapper .Body>
                         <VStack align="stretch" gap="4">
                           <Text fontWeight="semibold">Configuración de Seguridad</Text>
                           
@@ -706,12 +734,12 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                             </HStack>
                           </VStack>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
 
                     {/* Data Retention */}
-                    <Card.Root>
-                      <Card.Body>
+                    <CardWrapper .Root>
+                      <CardWrapper .Body>
                         <VStack align="stretch" gap="4">
                           <Text fontWeight="semibold">Retención de Datos</Text>
                           
@@ -795,13 +823,13 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                             </Button>
                           </VStack>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
                   </SimpleGrid>
 
                   {/* GDPR Compliance */}
-                  <Card.Root>
-                    <Card.Body>
+                  <CardWrapper .Root>
+                    <CardWrapper .Body>
                       <VStack align="stretch" gap="4">
                         <Text fontWeight="semibold">Cumplimiento GDPR/Privacidad</Text>
                         
@@ -817,14 +845,14 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                           </Button>
                         </SimpleGrid>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 </VStack>
               </Tabs.Content>
             </Box>
           </Tabs.Root>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 }

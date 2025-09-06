@@ -5,7 +5,7 @@ import {
   VStack, 
   HStack, 
   Text, 
-  Card, 
+  CardWrapper , 
   Button, 
   Grid, 
   Badge,
@@ -145,8 +145,8 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
   };
 
   const ShiftCard = ({ shift }: { shift: Shift }) => (
-    <Card.Root size="sm" mb="2" bg={`${getShiftColor(shift.status)}.50`}>
-      <Card.Body p="2">
+    <CardWrapper .Root size="sm" mb="2" bg={`${getShiftColor(shift.status)}.50`}>
+      <CardWrapper .Body p="2">
         <VStack gap="1" align="stretch">
           <HStack justify="space-between">
             <Text fontSize="xs" fontWeight="semibold">
@@ -166,8 +166,8 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
             {shift.position}
           </Text>
         </VStack>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper .Body>
+    </CardWrapper .Root>
   );
 
   if (loading) {
@@ -186,8 +186,8 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
   return (
     <VStack gap="6" align="stretch">
       {/* Week Navigation & Controls */}
-      <Card.Root>
-        <Card.Body>
+      <CardWrapper .Root>
+        <CardWrapper .Body>
           <HStack justify="space-between">
             <HStack gap="4">
               <HStack>
@@ -251,12 +251,12 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
               </Button>
             </HStack>
           </HStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Weekly Calendar Grid */}
-      <Card.Root>
-        <Card.Body p="4">
+      <CardWrapper .Root>
+        <CardWrapper .Body p="4">
           <Grid templateColumns="repeat(7, 1fr)" gap="4">
             {weekSchedule.map((day, index) => (
               <VStack key={day.date} gap="2" align="stretch">
@@ -301,34 +301,34 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
 
                   {/* Coverage Warning */}
                   {day.coverage < 60 && (
-                    <Card.Root size="sm" bg="red.50" borderColor="red.200">
-                      <Card.Body p="2">
+                    <CardWrapper .Root size="sm" bg="red.50" borderColor="red.200">
+                      <CardWrapper .Body p="2">
                         <HStack gap="1">
                           <ExclamationTriangleIcon className="w-3 h-3 text-red-500" />
                           <Text fontSize="xs" color="red.600">
                             Understaffed
                           </Text>
                         </HStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
                   )}
                 </Box>
               </VStack>
             ))}
           </Grid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
 
       {/* Employee Availability Panel */}
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <Text fontSize="md" fontWeight="semibold">Staff Availability</Text>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap="4">
             {employees.map(employee => (
-              <Card.Root key={employee.id} size="sm">
-                <Card.Body>
+              <CardWrapper .Root key={employee.id} size="sm">
+                <CardWrapper .Body>
                   <VStack gap="2" align="start">
                     <HStack gap="2">
                       <Box w="8" h="8" bg="blue.100" borderRadius="full" display="flex" alignItems="center" justifyContent="center">
@@ -361,12 +361,12 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
                       ))}
                     </HStack>
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             ))}
           </Grid>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 }

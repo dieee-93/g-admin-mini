@@ -3,7 +3,6 @@ import {
   Box, 
   VStack, 
   HStack, 
-  Card, 
   Text, 
   Badge, 
   Grid,
@@ -22,6 +21,7 @@ import {
 } from '@heroicons/react/24/outline';
 import type { Recipe, RecipeWithCost } from '@/services/recipe/types';
 import { fetchRecipesWithCosts } from '@/services/recipe/api/recipeApi';
+import { CardWrapper } from '@/shared/ui/CardWrapper';
 
 interface RecipeIntelligenceDashboardProps {
   recipes: Recipe[];
@@ -103,8 +103,8 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
     <Box>
       <VStack align="stretch" gap={6}>
         {/* Enhanced Header */}
-        <Card.Root p={6} bg="blue.500" color="white">
-          <Card.Body>
+        <CardWrapper p={6} bg="blue.500" color="white">
+          <CardWrapper.Body>
             <VStack align="center" gap={3}>
               <HStack gap={2} align="center">
                 <ChartBarIcon className="w-8 h-8" />
@@ -158,14 +158,14 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 </VStack>
               </HStack>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
         {/* Analytics Cards */}
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={4}>
           {/* Recipe Viability */}
-          <Card.Root borderTop="4px solid" borderTopColor="green.400">
-            <Card.Body p={4}>
+          <CardWrapper borderTop="4px solid" borderTopColor="green.400">
+            <CardWrapper.Body p={4}>
               <VStack align="stretch" gap={3}>
                 <HStack justify="space-between">
                   <Text fontWeight="semibold" color="gray.700">Recipe Viability</Text>
@@ -190,12 +190,12 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                   </>
                 )}
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
 
           {/* Cost Analysis */}
-          <Card.Root borderTop="4px solid" borderTopColor="blue.400">
-            <Card.Body p={4}>
+          <CardWrapper borderTop="4px solid" borderTopColor="blue.400">
+            <CardWrapper.Body p={4}>
               <VStack align="stretch" gap={3}>
                 <Text fontWeight="semibold" color="gray.700">Cost Analysis</Text>
                 {loading ? (
@@ -208,12 +208,12 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 <Text fontSize="sm" color="gray.600">Average recipe cost</Text>
                 <Badge colorPalette="blue" size="sm">Stable trend</Badge>
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
 
           {/* Performance Score */}
-          <Card.Root borderTop="4px solid" borderTopColor="purple.400">
-            <Card.Body p={4}>
+          <CardWrapper borderTop="4px solid" borderTopColor="purple.400">
+            <CardWrapper.Body p={4}>
               <VStack align="stretch" gap={3}>
                 <Text fontWeight="semibold" color="gray.700">Menu Health</Text>
                 <CircularProgress 
@@ -231,12 +231,12 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                   Overall optimization score
                 </Text>
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
 
           {/* Top Performers */}
-          <Card.Root borderTop="4px solid" borderTopColor="orange.400">
-            <Card.Body p={4}>
+          <CardWrapper borderTop="4px solid" borderTopColor="orange.400">
+            <CardWrapper.Body p={4}>
               <VStack align="stretch" gap={3}>
                 <Text fontWeight="semibold" color="gray.700">Top Performers</Text>
                 {!loading && analytics?.topPerformingRecipes.length ? (
@@ -263,13 +263,13 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                   </Text>
                 )}
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
         </SimpleGrid>
 
         {/* Menu Engineering Preview */}
-        <Card.Root>
-          <Card.Body p={6}>
+        <CardWrapper>
+          <CardWrapper.Body p={6}>
             <VStack align="stretch" gap={4}>
               <HStack justify="space-between" align="center">
                 <Text fontSize="lg" fontWeight="semibold">Menu Engineering Categories</Text>
@@ -277,8 +277,8 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
               </HStack>
               
               <Grid templateColumns="repeat(4, 1fr)" gap={4}>
-                <Card.Root bg="yellow.50" borderColor="yellow.200" borderWidth="1px">
-                  <Card.Body p={4}>
+                <CardWrapper bg="yellow.50" borderColor="yellow.200" borderWidth="1px">
+                  <CardWrapper.Body p={4}>
                     <VStack gap={2}>
                       <Text fontSize="2xl">⭐</Text>
                       <Text fontWeight="bold" color="yellow.700">Stars</Text>
@@ -287,11 +287,11 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                       </Text>
                       <Badge colorPalette="yellow" size="sm">Promote</Badge>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
                 
-                <Card.Root bg="blue.50" borderColor="blue.200" borderWidth="1px">
-                  <Card.Body p={4}>
+                <CardWrapper bg="blue.50" borderColor="blue.200" borderWidth="1px">
+                  <CardWrapper.Body p={4}>
                     <VStack gap={2}>
                       <Text fontSize="2xl">🐎</Text>
                       <Text fontWeight="bold" color="blue.700">Plowhorses</Text>
@@ -300,11 +300,11 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                       </Text>
                       <Badge colorPalette="blue" size="sm">Optimize</Badge>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
                 
-                <Card.Root bg="orange.50" borderColor="orange.200" borderWidth="1px">
-                  <Card.Body p={4}>
+                <CardWrapper bg="orange.50" borderColor="orange.200" borderWidth="1px">
+                  <CardWrapper.Body p={4}>
                     <VStack gap={2}>
                       <Text fontSize="2xl">🧩</Text>
                       <Text fontWeight="bold" color="orange.700">Puzzles</Text>
@@ -313,11 +313,11 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                       </Text>
                       <Badge colorPalette="orange" size="sm">Reposition</Badge>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
-                
-                <Card.Root bg="red.50" borderColor="red.200" borderWidth="1px">
-                  <Card.Body p={4}>
+                  </CardWrapper.Body>
+                </CardWrapper>
+
+                <CardWrapper bg="red.50" borderColor="red.200" borderWidth="1px">
+                  <CardWrapper.Body p={4}>
                     <VStack gap={2}>
                       <Text fontSize="2xl">🐕</Text>
                       <Text fontWeight="bold" color="red.700">Dogs</Text>
@@ -326,8 +326,8 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                       </Text>
                       <Badge colorPalette="red" size="sm">Remove</Badge>
                     </VStack>
-                  </Card.Body>
-                </Card.Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
               </Grid>
               
               <Alert.Root status="info" variant="subtle">
@@ -337,12 +337,12 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 </Alert.Description>
               </Alert.Root>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
         {/* Action Center */}
-        <Card.Root bg="bg.canvas">
-          <Card.Body p={4}>
+        <CardWrapper bg="bg.canvas">
+          <CardWrapper.Body p={4}>
             <HStack justify="center" gap={4}>
               <Button 
                 variant="outline" 
@@ -360,8 +360,8 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 Optimize Menu
               </Button>
             </HStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
         {/* Status Footer */}
         <Text fontSize="sm" color="gray.500" textAlign="center" fontStyle="italic">

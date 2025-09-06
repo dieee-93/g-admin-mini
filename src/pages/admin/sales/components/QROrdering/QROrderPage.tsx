@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Box,
-  Card,
+  CardWrapper ,
   Flex,
   Grid,
   Heading,
@@ -327,7 +327,7 @@ export function QROrderPage() {
             </Text>
           </VStack>
 
-          <Card.Root w="full" p={4} >
+          <CardWrapper .Root w="full" p={4} >
             <VStack gap={3}>
               <HStack justify="space-between" w="full">
                 <Text fontWeight="bold">Order Number:</Text>
@@ -346,7 +346,7 @@ export function QROrderPage() {
                 <Text>{Math.ceil(orderSummary.estimated_prep_time)} minutes</Text>
               </HStack>
             </VStack>
-          </Card.Root>
+          </CardWrapper .Root>
 
           <VStack gap={2} textAlign="center">
             <Text fontSize="sm" color="gray.600">
@@ -418,12 +418,12 @@ export function QROrderPage() {
             const inCart = !!cartItem;
 
             return (
-              <Card.Root 
+              <CardWrapper .Root 
                 key={product.id} 
                 _hover={{ transform: 'translateY(-2px)', shadow: 'md' }}
                 transition="all 0.2s"
               >
-                <Card.Body>
+                <CardWrapper .Body>
                   <VStack align="stretch" gap={3}>
                     {/* Product Image Placeholder */}
                     {product.image_url ? (
@@ -530,19 +530,19 @@ export function QROrderPage() {
                       </Button>
                     )}
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             );
           })}
         </Grid>
 
         {/* Customer Information Form */}
         {cart.length > 0 && (
-          <Card.Root mb={4}>
-            <Card.Header>
+          <CardWrapper .Root mb={4}>
+            <CardWrapper .Header>
               <Text fontWeight="bold" fontSize="lg">Your Information</Text>
-            </Card.Header>
-            <Card.Body>
+            </CardWrapper .Header>
+            <CardWrapper .Body>
               <VStack gap={4} align="stretch">
                 <Box>
                   <Text mb={2} fontSize="sm" fontWeight="medium">
@@ -578,8 +578,8 @@ export function QROrderPage() {
                   />
                 </Box>
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper .Body>
+          </CardWrapper .Root>
         )}
       </Box>
 

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { 
   Stack, 
   Typography, 
-  Card,
+  CardWrapper ,
   Badge,
   Button,
   Alert,

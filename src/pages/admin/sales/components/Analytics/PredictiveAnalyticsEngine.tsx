@@ -3,7 +3,7 @@ import {
   Box,
   VStack,
   HStack,
-  Card,
+  CardWrapper ,
   Text,
   Badge,
   Button,
@@ -219,8 +219,8 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
     <Box>
       <VStack align="stretch" gap={6}>
         {/* Header */}
-        <Card.Root bg="gradient-to-r from-indigo-600 to-purple-700" color="white">
-          <Card.Body p={6}>
+        <CardWrapper .Root bg="gradient-to-r from-indigo-600 to-purple-700" color="white">
+          <CardWrapper .Body p={6}>
             <VStack align="stretch" gap={4}>
               <HStack justify="space-between" align="center">
                 <HStack gap={3}>
@@ -275,8 +275,8 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
                 </HStack>
               )}
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
         {loading && !analytics ? (
           <VStack gap={4}>
@@ -290,14 +290,14 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
         ) : analytics ? (
           <VStack align="stretch" gap={6}>
             {/* Revenue Forecasting */}
-            <Card.Root>
-              <Card.Header>
+            <CardWrapper .Root>
+              <CardWrapper .Header>
                 <HStack gap={2}>
                   <CurrencyDollarIcon className="w-6 h-6 text-green-500" />
                   <Text fontSize="lg" fontWeight="semibold">Revenue Forecasting</Text>
                 </HStack>
-              </Card.Header>
-              <Card.Body>
+              </CardWrapper .Header>
+              <CardWrapper .Body>
                 <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
                   <VStack align="center" gap={3} p={4}  borderRadius="md">
                     <Text fontSize="sm" color="gray.600">Next 7 Days</Text>
@@ -323,18 +323,18 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
                     <Badge colorPalette="purple">+25.7%</Badge>
                   </VStack>
                 </SimpleGrid>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
 
             {/* Demand Forecasting */}
-            <Card.Root>
-              <Card.Header>
+            <CardWrapper .Root>
+              <CardWrapper .Header>
                 <HStack gap={2}>
                   <ChartBarIcon className="w-6 h-6 text-blue-500" />
                   <Text fontSize="lg" fontWeight="semibold">Demand Forecasting</Text>
                 </HStack>
-              </Card.Header>
-              <Card.Body>
+              </CardWrapper .Header>
+              <CardWrapper .Body>
                 <Table.Root size="sm">
                   <Table.Header>
                     <Table.Row>
@@ -359,16 +359,16 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
                     ))}
                   </Table.Body>
                 </Table.Root>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
 
             {/* Customer Intelligence */}
             <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>
-              <Card.Root>
-                <Card.Header>
+              <CardWrapper .Root>
+                <CardWrapper .Header>
                   <Text fontSize="lg" fontWeight="semibold">Churn Prediction</Text>
-                </Card.Header>
-                <Card.Body>
+                </CardWrapper .Header>
+                <CardWrapper .Body>
                   <VStack align="stretch" gap={4}>
                     <HStack justify="space-between">
                       <Text>At-Risk Customers</Text>
@@ -397,14 +397,14 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
                       </Alert.Description>
                     </Alert.Root>
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
 
-              <Card.Root>
-                <Card.Header>
+              <CardWrapper .Root>
+                <CardWrapper .Header>
                   <Text fontSize="lg" fontWeight="semibold">Customer Lifetime Value</Text>
-                </Card.Header>
-                <Card.Body>
+                </CardWrapper .Header>
+                <CardWrapper .Body>
                   <VStack align="stretch" gap={4}>
                     <HStack justify="space-between">
                       <Text>Average CLV</Text>
@@ -433,19 +433,19 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
                       </Alert.Description>
                     </Alert.Root>
                   </VStack>
-                </Card.Body>
-              </Card.Root>
+                </CardWrapper .Body>
+              </CardWrapper .Root>
             </Grid>
 
             {/* Operational Intelligence */}
-            <Card.Root>
-              <Card.Header>
+            <CardWrapper .Root>
+              <CardWrapper .Header>
                 <HStack gap={2}>
                   <ClockIcon className="w-6 h-6 text-orange-500" />
                   <Text fontSize="lg" fontWeight="semibold">Operational Intelligence</Text>
                 </HStack>
-              </Card.Header>
-              <Card.Body>
+              </CardWrapper .Header>
+              <CardWrapper .Body>
                 <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>
                   <VStack align="stretch" gap={4}>
                     <Text fontWeight="medium" color="orange.600">Peak Times Prediction</Text>
@@ -483,18 +483,18 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
                     ))}
                   </VStack>
                 </Grid>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
 
             {/* Market Intelligence */}
-            <Card.Root>
-              <Card.Header>
+            <CardWrapper .Root>
+              <CardWrapper .Header>
                 <HStack gap={2}>
                   <FireIcon className="w-6 h-6 text-purple-500" />
                   <Text fontSize="lg" fontWeight="semibold">Market Intelligence</Text>
                 </HStack>
-              </Card.Header>
-              <Card.Body>
+              </CardWrapper .Header>
+              <CardWrapper .Body>
                 <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>
                   <VStack align="stretch" gap={4}>
                     <Text fontWeight="medium" color="purple.600">Seasonal Patterns</Text>
@@ -538,12 +538,12 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
                     </VStack>
                   </VStack>
                 </Grid>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
 
             {/* AI Recommendations */}
-            <Card.Root bg="gradient-to-r from-teal-500 to-cyan-600" color="white">
-              <Card.Body p={6}>
+            <CardWrapper .Root bg="gradient-to-r from-teal-500 to-cyan-600" color="white">
+              <CardWrapper .Body p={6}>
                 <VStack align="stretch" gap={4}>
                   <HStack gap={3}>
                     <LightBulbIcon className="w-8 h-8" />
@@ -573,14 +573,14 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
                     </VStack>
                   </Grid>
                 </VStack>
-              </Card.Body>
-            </Card.Root>
+              </CardWrapper .Body>
+            </CardWrapper .Root>
           </VStack>
         ) : null}
 
         {/* Status */}
-        <Card.Root bg="bg.canvas">
-          <Card.Body p={3}>
+        <CardWrapper .Root bg="bg.canvas">
+          <CardWrapper .Body p={3}>
             <HStack justify="center" gap={4}>
               <HStack gap={2}>
                 <Box width="8px" height="8px" bg="indigo.500" borderRadius="50%" />
@@ -590,8 +590,8 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
               </HStack>
               <Badge colorPalette="indigo" size="sm">AI Engine Active</Badge>
             </HStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </VStack>
     </Box>
   );

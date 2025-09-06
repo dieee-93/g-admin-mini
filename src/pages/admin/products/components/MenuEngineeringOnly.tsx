@@ -9,7 +9,7 @@ import {
   VStack,
   HStack,
   Typography,
-  Card,
+  CardWrapper ,
   Tabs,
   TabList,
   Tab,
@@ -83,8 +83,8 @@ export function MenuEngineeringOnly() {
     
       <Stack gap="lg" align="stretch">
         {/* Header Section - Design System Pattern */}
-        <Card variant="elevated" padding="lg">
-          <Card.Header>
+        <CardWrapper variant="elevated" padding="lg">
+          <CardWrapper .Header>
             <HStack justify="space-between" align="start">
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
@@ -105,9 +105,9 @@ export function MenuEngineeringOnly() {
                 Refresh Data
               </Button>
             </HStack>
-          </Card.Header>
+          </CardWrapper .Header>
 
-          <Card.Body>
+          <CardWrapper .Body>
             {/* Performance Overview */}
             <Stack gap="md">
               <Typography variant="label">Menu Performance Overview</Typography>
@@ -126,7 +126,7 @@ export function MenuEngineeringOnly() {
                 </Badge>
               </HStack>
             </Stack>
-          </Card.Body>
+          </CardWrapper .Body>
         </CardWrapper>
 
         {/* Error State */}
@@ -162,11 +162,11 @@ export function MenuEngineeringOnly() {
           <TabPanels>
             {/* Matrix Analysis Tab */}
             <TabPanel value="matrix">
-              <Card variant="elevated" padding="lg">
-                <Card.Header>
+              <CardWrapper variant="elevated" padding="lg">
+                <CardWrapper .Header>
                   <Typography variant="title">Four-Quadrant Matrix</Typography>
-                </Card.Header>
-                <Card.Body>
+                </CardWrapper .Header>
+                <CardWrapper .Body>
                   {loading ? (
                     <Stack gap="md" align="center" minH="400px" justify="center">
                       <Typography variant="body" color="text.muted">
@@ -187,7 +187,7 @@ export function MenuEngineeringOnly() {
                       </AlertDescription>
                     </Alert>
                   )}
-                </Card.Body>
+                </CardWrapper .Body>
               </CardWrapper>
             </TabPanel>
 
@@ -195,8 +195,8 @@ export function MenuEngineeringOnly() {
             <TabPanel value="categories">
               <VStack gap="md" align="stretch">
                 {/* Category Filters */}
-                <Card variant="outline" padding="md">
-                  <Card.Body>
+                <CardWrapper variant="outline" padding="md">
+                  <CardWrapper .Body>
                     <HStack gap="sm" wrap={true}>
                       <Typography variant="label">Filter by Category:</Typography>
                       {(['stars', 'plowhorses', 'puzzles', 'dogs'] as MenuCategory[]).map((category) => (
@@ -216,24 +216,24 @@ export function MenuEngineeringOnly() {
                         </Button>
                       ))}
                     </HStack>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
 
                 {/* Products by Category */}
-                <Card variant="elevated" padding="lg">
-                  <Card.Header>
+                <CardWrapper variant="elevated" padding="lg">
+                  <CardWrapper .Header>
                     <Typography variant="title">
                       {selectedCategory ? 
                         `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Products` : 
                         'All Products'
                       }
                     </Typography>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     {selectedCategory ? (
                       <Stack gap="sm">
                         {getProductsByCategory(selectedCategory).map((product) => (
-                          <Card key={product.productId} variant="outline" padding="md">
+                          <CardWrapper key={product.productId} variant="outline" padding="md">
                             <HStack justify="space-between">
                               <VStack align="start" gap="xs">
                                 <Typography variant="label">{product.productName}</Typography>
@@ -260,22 +260,22 @@ export function MenuEngineeringOnly() {
                         Select a category above to view products
                       </Typography>
                     )}
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
               </VStack>
             </TabPanel>
 
             {/* Strategic Recommendations Tab */}
             <TabPanel value="recommendations">
-              <Card variant="elevated" padding="lg">
-                <Card.Header>
+              <CardWrapper variant="elevated" padding="lg">
+                <CardWrapper .Header>
                   <Typography variant="title">Top Strategic Recommendations</Typography>
-                </Card.Header>
-                <Card.Body>
+                </CardWrapper .Header>
+                <CardWrapper .Body>
                   <Stack gap="md">
                     {topRecommendations.length > 0 ? (
                       topRecommendations.map((recommendation, index) => (
-                        <Card key={index} variant="outline" padding="md">
+                        <CardWrapper key={index} variant="outline" padding="md">
                           <HStack justify="space-between" align="start">
                             <VStack align="start" gap="xs">
                               <Typography variant="label">{recommendation.action || 'Strategy Action'}</Typography>
@@ -309,18 +309,18 @@ export function MenuEngineeringOnly() {
                       </Alert>
                     )}
                   </Stack>
-                </Card.Body>
+                </CardWrapper .Body>
               </CardWrapper>
             </TabPanel>
 
             {/* Performance Metrics Tab */}
             <TabPanel value="performance">
               <VStack gap="md" align="stretch">
-                <Card variant="elevated" padding="lg">
-                  <Card.Header>
+                <CardWrapper variant="elevated" padding="lg">
+                  <CardWrapper .Header>
                     <Typography variant="title">Menu Performance Metrics</Typography>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <HStack gap="lg">
                       <VStack align="start" gap="xs">
                         <Typography variant="label">Total Revenue</Typography>
@@ -347,15 +347,15 @@ export function MenuEngineeringOnly() {
                         </Typography>
                       </VStack>
                     </HStack>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
 
                 {/* Category Distribution */}
-                <Card variant="elevated" padding="lg">
-                  <Card.Header>
+                <CardWrapper variant="elevated" padding="lg">
+                  <CardWrapper .Header>
                     <Typography variant="title">Category Distribution</Typography>
-                  </Card.Header>
-                  <Card.Body>
+                  </CardWrapper .Header>
+                  <CardWrapper .Body>
                     <Stack gap="md">
                       {Object.entries(categoryMetrics).map(([category, count]) => (
                         <HStack key={category} justify="space-between">
@@ -379,7 +379,7 @@ export function MenuEngineeringOnly() {
                         </HStack>
                       ))}
                     </Stack>
-                  </Card.Body>
+                  </CardWrapper .Body>
                 </CardWrapper>
               </VStack>
             </TabPanel>

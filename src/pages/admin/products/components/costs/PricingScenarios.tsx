@@ -4,7 +4,7 @@
 import React from 'react';
 import {
   Box,
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Text,
@@ -67,15 +67,15 @@ export function PricingScenarios({ calculations }: PricingScenariosProps) {
 
   if (calculations.length === 0) {
     return (
-      <Card.Root>
-        <Card.Body>
+      <CardWrapper .Root>
+        <CardWrapper .Body>
           <VStack gap={4} py={8}>
             <ArrowTrendingUpIcon className="w-12 h-12 text-gray-400" />
             <Text fontSize="lg" fontWeight="medium">No pricing scenarios available</Text>
             <Text color="gray.500">Complete a cost calculation to see pricing scenarios</Text>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     );
   }
 
@@ -90,16 +90,16 @@ export function PricingScenarios({ calculations }: PricingScenariosProps) {
 
       <Grid templateColumns={{ base: "1fr", lg: "repeat(3, 1fr)" }} gap={4}>
         {getPricingScenarios(calculations[0]).map((scenario, index) => (
-          <Card.Root key={index}>
-            <Card.Header>
+          <CardWrapper .Root key={index}>
+            <CardWrapper .Header>
               <HStack justify="space-between">
                 <Text fontSize="lg" fontWeight="semibold">{scenario.name}</Text>
                 <Badge colorPalette={scenario.name === 'Conservative' ? 'blue' : scenario.name === 'Standard' ? 'green' : 'purple'}>
                   {scenario.margin.toFixed(1)}% margin
                 </Badge>
               </HStack>
-            </Card.Header>
-            <Card.Body>
+            </CardWrapper .Header>
+            <CardWrapper .Body>
               <VStack gap={3} align="stretch">
                 <Box textAlign="center" p={3} bg="bg.canvas" borderRadius="md">
                   <Text fontSize="xs" color="gray.600">Selling Price</Text>
@@ -125,8 +125,8 @@ export function PricingScenarios({ calculations }: PricingScenariosProps) {
                   </HStack>
                 </VStack>
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper .Body>
+          </CardWrapper .Root>
         ))}
       </Grid>
     </VStack>

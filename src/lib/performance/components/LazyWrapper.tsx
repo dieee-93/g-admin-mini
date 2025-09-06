@@ -8,7 +8,6 @@ import {
   HStack,
   Text,
   Button,
-  Card,
   Progress,
   Alert,
   Spinner,
@@ -23,7 +22,7 @@ import {
   ClockIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-
+import { CardWrapper } from '@/shared/ui';
 import { lazyLoadingManager } from '../LazyLoadingManager';
 
 // Loading state types
@@ -94,8 +93,8 @@ export function LazyFallback({
   // Error state
   if (error) {
     return (
-      <Card.Root maxW="500px" mx="auto" mt="8">
-        <Card.Body p="6" textAlign="center">
+      <CardWrapper .Root maxW="500px" mx="auto" mt="8">
+        <CardWrapper .Body p="6" textAlign="center">
           <VStack gap="4">
             <ExclamationTriangleIcon className="w-12 h-12 text-red-500" />
             
@@ -134,15 +133,15 @@ export function LazyFallback({
               </Button>
             </HStack>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     );
   }
 
   // Detailed loading state
   return (
-    <Card.Root maxW="500px" mx="auto" mt="8">
-      <Card.Body p="6">
+    <CardWrapper .Root maxW="500px" mx="auto" mt="8">
+      <CardWrapper .Body p="6">
         <VStack gap="4" align="stretch">
           {/* Loading header */}
           <HStack justify="center" gap="3">
@@ -194,8 +193,8 @@ export function LazyFallback({
             </Alert.Root>
           )}
         </VStack>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper .Body>
+    </CardWrapper .Root>
   );
 }
 
@@ -455,8 +454,8 @@ export function LazyLoadingMonitor() {
       maxW="320px"
       shadow="lg"
     >
-      <Card.Root>
-        <Card.Body p="4">
+      <CardWrapper .Root>
+        <CardWrapper .Body p="4">
         <VStack gap="4" align="stretch">
           <HStack justify="space-between" align="center">
             <Text fontWeight="semibold">Lazy Loading Performance</Text>
@@ -549,8 +548,8 @@ export function LazyLoadingMonitor() {
             </VStack>
           )}
         </VStack>
-      </Card.Body>
-    </Card.Root>
+      </CardWrapper .Body>
+    </CardWrapper .Root>
     </Box>
   );
 }

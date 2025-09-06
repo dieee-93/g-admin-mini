@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 // DESIGN SYSTEM IMPORTS - Following our conventions
 import {
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Typography,
@@ -286,8 +286,8 @@ const OfflineFiscalView: React.FC = () => {
   return (
     <VStack gap="lg">
       {/* Offline Status Header */}
-      <Card variant="outline" padding="md">
-        <Card.Body>
+      <CardWrapper variant="outline" padding="md">
+        <CardWrapper .Body>
           <HStack justify="space-between" align="center">
             <HStack gap="md">
               <Badge 
@@ -342,14 +342,14 @@ const OfflineFiscalView: React.FC = () => {
               </Button>
             </HStack>
           </HStack>
-        </Card.Body>
+        </CardWrapper .Body>
       </CardWrapper>
 
       {/* Quick Stats */}
       {fiscalStats && (
         <SimpleGrid columns={{ base: 2, md: 4 }} gap="md">
-          <Card variant="outline" padding="md">
-            <Card.Body>
+          <CardWrapper variant="outline" padding="md">
+            <CardWrapper .Body>
               <VStack gap="sm">
                 <DocumentTextIcon className="w-8 h-8 text-blue-500" />
                 <Typography variant="title">
@@ -359,11 +359,11 @@ const OfflineFiscalView: React.FC = () => {
                   Facturas Pendientes
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper .Body>
           </CardWrapper>
 
-          <Card variant="outline" padding="md">
-            <Card.Body>
+          <CardWrapper variant="outline" padding="md">
+            <CardWrapper .Body>
               <VStack gap="sm">
                 <CloudArrowUpIcon className="w-8 h-8 text-yellow-500" />
                 <Typography variant="title">
@@ -373,11 +373,11 @@ const OfflineFiscalView: React.FC = () => {
                   Cola AFIP
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper .Body>
           </CardWrapper>
 
-          <Card variant="outline" padding="md">
-            <Card.Body>
+          <CardWrapper variant="outline" padding="md">
+            <CardWrapper .Body>
               <VStack gap="sm">
                 <BanknotesIcon className="w-8 h-8 text-green-500" />
                 <Typography variant="title">
@@ -387,11 +387,11 @@ const OfflineFiscalView: React.FC = () => {
                   Total Pendiente
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper .Body>
           </CardWrapper>
 
-          <Card variant="outline" padding="md">
-            <Card.Body>
+          <CardWrapper variant="outline" padding="md">
+            <CardWrapper .Body>
               <VStack gap="sm">
                 <ExclamationTriangleIcon className="w-8 h-8 text-red-500" />
                 <Typography variant="title">
@@ -401,7 +401,7 @@ const OfflineFiscalView: React.FC = () => {
                   Errores de Sync
                 </Typography>
               </VStack>
-            </Card.Body>
+            </CardWrapper .Body>
           </CardWrapper>
         </SimpleGrid>
       )}
@@ -416,8 +416,8 @@ const OfflineFiscalView: React.FC = () => {
       )}
 
       {/* Invoice Management */}
-      <Card variant="outline" padding="md">
-        <Card.Body>
+      <CardWrapper variant="outline" padding="md">
+        <CardWrapper .Body>
           <VStack gap="md">
             <HStack justify="space-between" align="center">
               <HStack gap="md">
@@ -446,8 +446,8 @@ const OfflineFiscalView: React.FC = () => {
                 const syncProps = getSyncStatusBadgeProps(invoice.syncStatus);
                 
                 return (
-                  <Card key={invoice.id} variant="outline" padding="sm">
-                    <Card.Body>
+                  <CardWrapper key={invoice.id} variant="outline" padding="sm">
+                    <CardWrapper .Body>
                       <HStack justify="space-between">
                         <VStack align="start" gap="xs">
                           <HStack gap="sm">
@@ -512,7 +512,7 @@ const OfflineFiscalView: React.FC = () => {
                           )}
                         </VStack>
                       </HStack>
-                    </Card.Body>
+                    </CardWrapper .Body>
                   </CardWrapper>
                 );
               })}
@@ -526,7 +526,7 @@ const OfflineFiscalView: React.FC = () => {
               </VStack>
             )}
           </VStack>
-        </Card.Body>
+        </CardWrapper .Body>
       </CardWrapper>
     </VStack>
   );

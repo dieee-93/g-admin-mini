@@ -4,7 +4,7 @@ import {
   Stack, 
   Button, 
   Typography, 
-  Card,
+  CardWrapper ,
   Modal,
   ModalContent,
   ModalHeader,
@@ -381,7 +381,7 @@ export function SalesWithStockView() {
                     </Alert>
 
                     {/* Resumen final */}
-                    <Card padding="md">
+                    <CardWrapper padding="md">
                       <Stack direction="column" gap="sm" align="stretch">
                         <Stack direction="row" justify="space-between">
                           <Typography variant="body" size="md" weight="medium">Total de productos:</Typography>
@@ -410,7 +410,7 @@ export function SalesWithStockView() {
                           </Stack>
                         )}
                       </Stack>
-                    </Card>
+                    </CardWrapper >
                   </Stack>
                 )}
               </Stack>

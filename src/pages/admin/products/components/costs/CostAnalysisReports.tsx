@@ -4,7 +4,7 @@
 import React from 'react';
 import {
   Box,
-  Card,
+  CardWrapper ,
   VStack,
   HStack,
   Text,
@@ -33,28 +33,28 @@ interface CostAnalysisReportsProps {
 export function CostAnalysisReports({ calculations }: CostAnalysisReportsProps) {
   if (calculations.length === 0) {
     return (
-      <Card.Root>
-        <Card.Body>
+      <CardWrapper .Root>
+        <CardWrapper .Body>
           <VStack gap={4} py={8}>
             <ChartBarIcon className="w-12 h-12 text-gray-400" />
             <Text fontSize="lg" fontWeight="medium">No calculations to analyze</Text>
             <Text color="gray.500">Create some cost calculations to see analysis here</Text>
           </VStack>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     );
   }
 
   return (
     <VStack gap={6} align="stretch">
-      <Card.Root>
-        <Card.Header>
+      <CardWrapper .Root>
+        <CardWrapper .Header>
           <HStack>
             <ChartBarIcon className="w-5 h-5 text-blue-600" />
             <Text fontSize="lg" fontWeight="semibold">Calculation History</Text>
           </HStack>
-        </Card.Header>
-        <Card.Body>
+        </CardWrapper .Header>
+        <CardWrapper .Body>
           <Table.Root>
             <Table.Header>
               <Table.Row>
@@ -87,8 +87,8 @@ export function CostAnalysisReports({ calculations }: CostAnalysisReportsProps) 
               ))}
             </Table.Body>
           </Table.Root>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 }

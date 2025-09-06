@@ -3,7 +3,7 @@ import {
   VStack,
   HStack,
   Text,
-  Card,
+  CardWrapper ,
   Badge,
   SimpleGrid,
   Box
@@ -56,8 +56,8 @@ export function BottlenecksView({ bottlenecks }: BottlenecksViewProps) {
   return (
     <VStack gap={4} align="stretch">
       {bottlenecks.map((bottleneck) => (
-        <Card.Root key={bottleneck.id} variant="outline">
-          <Card.Header>
+        <CardWrapper .Root key={bottleneck.id} variant="outline">
+          <CardWrapper .Header>
             <HStack justify="space-between">
               <HStack gap={3}>
                 <Box p={2} bg={`${getBottleneckColor(bottleneck.severity)}.100`} borderRadius="md">
@@ -79,9 +79,9 @@ export function BottlenecksView({ bottlenecks }: BottlenecksViewProps) {
                 </VStack>
               </HStack>
             </HStack>
-          </Card.Header>
+          </CardWrapper .Header>
           
-          <Card.Body>
+          <CardWrapper .Body>
             <VStack gap={4} align="stretch">
               {/* Description */}
               <Text fontSize="sm" color="gray.700" lineHeight={1.5}>
@@ -140,8 +140,8 @@ export function BottlenecksView({ bottlenecks }: BottlenecksViewProps) {
                 <Text fontSize="sm" fontWeight="medium" color="gray.700">Recomendaciones:</Text>
                 <VStack gap={2} align="stretch">
                   {bottleneck.recommendations.map((rec, index) => (
-                    <Card.Root key={index} variant="subtle" size="sm">
-                      <Card.Body p={3}>
+                    <CardWrapper .Root key={index} variant="subtle" size="sm">
+                      <CardWrapper .Body p={3}>
                         <VStack gap={2} align="stretch">
                           <Text fontSize="sm" fontWeight="medium">{rec.action}</Text>
                           <HStack gap={4} fontSize="xs" color="gray.600">
@@ -154,14 +154,14 @@ export function BottlenecksView({ bottlenecks }: BottlenecksViewProps) {
                             </Badge>
                           </HStack>
                         </VStack>
-                      </Card.Body>
-                    </Card.Root>
+                      </CardWrapper .Body>
+                    </CardWrapper .Root>
                   ))}
                 </VStack>
               </VStack>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       ))}
     </VStack>
   );

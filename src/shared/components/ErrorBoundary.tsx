@@ -1,6 +1,7 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Box, VStack, Text, Button, CardWrapper, Alert } from '@chakra-ui/react';
+import React, { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Box, VStack, Text, Button, Alert } from '@chakra-ui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { CardWrapper } from '../ui';
 
 interface Props {
   children: ReactNode;
@@ -50,8 +51,8 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <Box p="6" maxW="600px" mx="auto" mt="8">
-          <Card.Root>
-            <Card.Body>
+          <CardWrapper>
+            <CardWrapper.Body>
               <VStack gap="6" textAlign="center">
                 <ExclamationTriangleIcon className="w-16 h-16 text-red-500 mx-auto" />
                 
@@ -89,8 +90,8 @@ export class ErrorBoundary extends Component<Props, State> {
                   </Button>
                 </VStack>
               </VStack>
-            </Card.Body>
-          </Card.Root>
+            </CardWrapper.Body>
+          </CardWrapper>
         </Box>
       );
     }

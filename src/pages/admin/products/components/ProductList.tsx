@@ -6,7 +6,7 @@ import {
   Stack,
   Typography,
   Badge,
-  Card,
+  CardWrapper ,
   Grid
 } from "@/shared/ui";
 import { VirtualizedList } from "@/lib/performance/virtualization/VirtualizedList";
@@ -92,7 +92,7 @@ export function ProductList({
             containerHeight={window.innerHeight - 200}
             renderItem={(product, index, style) => (
               <div className="px-2 pb-4">
-                <Card className="p-4 shadow-sm">
+                <CardWrapper className="p-4 shadow-sm">
                   <Stack direction="column" gap="sm">
                     {/* Header */}
                     <Stack direction="row" justify="space-between" align="start">
@@ -220,7 +220,7 @@ export function ProductList({
 
       <Grid className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {(products || []).map((product) => (
-          <Card key={product.id} className="p-4 shadow-sm">
+          <CardWrapper key={product.id} className="p-4 shadow-sm">
             <Stack direction="column" gap="sm">
               {/* Header */}
               <Stack direction="row" justify="space-between" align="start">

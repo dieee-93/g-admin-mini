@@ -7,7 +7,7 @@ import {
   Text, 
   Select, 
   Badge, 
-  Card, 
+  CardWrapper , 
   SimpleGrid,
   Progress,
   Button,
@@ -257,50 +257,50 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
     <VStack gap="6" align="stretch">
       {/* Training Overview Cards */}
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
-        <Card.Root>
-          <Card.Body textAlign="center">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center">
             <VStack gap="2">
               <BookOpenIcon className="w-6 h-6 text-blue-500 mx-auto" />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.total}</Text>
               <Text fontSize="sm" color="gray.600">Total Entrenamientos</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root>
-          <Card.Body textAlign="center">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center">
             <VStack gap="2">
               <CheckCircleIcon className="w-6 h-6 text-green-500 mx-auto" />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.completed}</Text>
               <Text fontSize="sm" color="gray.600">Completados</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root>
-          <Card.Body textAlign="center">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center">
             <VStack gap="2">
               <ClockIcon className="w-6 h-6 text-blue-500 mx-auto" />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.inProgress}</Text>
               <Text fontSize="sm" color="gray.600">En Progreso</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
 
-        <Card.Root>
-          <Card.Body textAlign="center">
+        <CardWrapper .Root>
+          <CardWrapper .Body textAlign="center">
             <VStack gap="2">
               <ExclamationTriangleIcon className="w-6 h-6 text-red-500 mx-auto" />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.expired + trainingStats.expiringSoon}</Text>
               <Text fontSize="sm" color="gray.600">Requiere Atención</Text>
             </VStack>
-          </Card.Body>
-        </Card.Root>
+          </CardWrapper .Body>
+        </CardWrapper .Root>
       </SimpleGrid>
 
       {/* Training Management Tabs */}
-      <Card.Root>
-        <Card.Body p="0">
+      <CardWrapper .Root>
+        <CardWrapper .Body p="0">
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="records" gap="2" flex="1" minH="44px">
@@ -374,8 +374,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                   {/* Training Records List */}
                   <VStack gap="3" align="stretch">
                     {filteredRecords.map((record) => (
-                      <Card.Root key={record.id} size="sm">
-                        <Card.Body>
+                      <CardWrapper .Root key={record.id} size="sm">
+                        <CardWrapper .Body>
                           <VStack align="stretch" gap="3">
                             <HStack justify="space-between" align="start">
                               <VStack align="start" gap="1" flex="1">
@@ -471,8 +471,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                               )}
                             </HStack>
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
                     ))}
                   </VStack>
                 </VStack>
@@ -491,8 +491,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                     {courseCatalog.map((course) => (
-                      <Card.Root key={course.id} size="sm">
-                        <Card.Body>
+                      <CardWrapper .Root key={course.id} size="sm">
+                        <CardWrapper .Body>
                           <VStack align="stretch" gap="3">
                             <HStack justify="space-between" align="start">
                               <VStack align="start" gap="1" flex="1">
@@ -523,8 +523,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                               Asignar a Empleados
                             </Button>
                           </VStack>
-                        </Card.Body>
-                      </Card.Root>
+                        </CardWrapper .Body>
+                      </CardWrapper .Root>
                     ))}
                   </SimpleGrid>
                 </VStack>
@@ -535,8 +535,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                 <VStack gap="4" align="stretch">
                   <Text fontSize="lg" fontWeight="semibold">Programar Nuevo Entrenamiento</Text>
                   
-                  <Card.Root>
-                    <Card.Body>
+                  <CardWrapper .Root>
+                    <CardWrapper .Body>
                       <VStack gap="4" align="stretch">
                         <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                           <Box>
@@ -600,14 +600,14 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                           <Button colorPalette="blue">Programar Entrenamiento</Button>
                         </HStack>
                       </VStack>
-                    </Card.Body>
-                  </Card.Root>
+                    </CardWrapper .Body>
+                  </CardWrapper .Root>
                 </VStack>
               </Tabs.Content>
             </Box>
           </Tabs.Root>
-        </Card.Body>
-      </Card.Root>
+        </CardWrapper .Body>
+      </CardWrapper .Root>
     </VStack>
   );
 }

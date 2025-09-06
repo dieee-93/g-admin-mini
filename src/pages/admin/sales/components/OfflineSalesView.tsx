@@ -6,7 +6,7 @@ import {
   Stack, 
   Button, 
   Typography, 
-  Card,
+  CardWrapper ,
   Modal,
   ModalContent,
   ModalHeader,
@@ -890,7 +890,7 @@ const OfflineSalesStatusModal = ({
               <Stack maxH="400px" overflowY="auto">
                 <Stack gap="md" direction="column" align="stretch">
                   {offlineSales.map((sale) => (
-                    <Card key={sale.id}>
+                    <CardWrapper key={sale.id}>
                       <Stack direction="row" justify="space-between" mb="2">
                         <Stack direction="column" align="start">
                           <Typography fontWeight="medium">
