@@ -798,7 +798,7 @@ export class ProcurementRecommendationsEngine {
       
       totalRecommendedInvestment,
       estimatedTotalSavings,
-      averageConf confidence,
+      averageConfidence,
       
       metricsByClass,
       

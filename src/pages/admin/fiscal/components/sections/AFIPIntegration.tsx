@@ -27,6 +27,7 @@ import {
   DocumentTextIcon
 } from '@heroicons/react/24/outline';
 import { notify } from '@/lib/notifications';
+import { supabase } from '@/lib/supabase/client';
 
 interface AFIPStatus {
   connection: 'connected' | 'disconnected' | 'error';
@@ -166,17 +167,25 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
   const retryInvoice = async (invoiceId: string) => {
     setLoading(true);
     try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Call the generate_afip_invoice RPC function
+      const { data, error } = await supabase.rpc('generate_afip_invoice', {
+        sale_id: invoiceId,
+        invoice_type: 'B' // Default invoice type, could be dynamic
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
       notify.success({
-        title: 'Reintentando obtener CAE...',
-        description: 'La factura está siendo procesada nuevamente'
+        title: 'Factura AFIP generada exitosamente',
+        description: `CAE: ${data?.cae || 'Generado'}. Factura procesada correctamente.`
       });
       loadAFIPStatus();
-    } catch (error) {
+    } catch (error: any) {
       notify.error({
-        title: 'Error al reintentar CAE',
-        description: 'No se pudo procesar la factura'
+        title: 'Error al generar factura AFIP',
+        description: error.message || 'No se pudo procesar la factura con AFIP'
       });
     } finally {
       setLoading(false);
@@ -186,17 +195,44 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
   const retryAllPending = async () => {
     setLoading(true);
     try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      notify.success({
-        title: 'Reintentando todas las facturas pendientes...',
-        description: 'Procesando facturas en cola'
-      });
+      let successCount = 0;
+      let errorCount = 0;
+      
+      // Process all pending invoices
+      for (const invoice of pendingInvoices) {
+        try {
+          const { data, error } = await supabase.rpc('generate_afip_invoice', {
+            sale_id: invoice.id,
+            invoice_type: invoice.tipo
+          });
+
+          if (error) {
+            errorCount++;
+            continue;
+          }
+          successCount++;
+        } catch {
+          errorCount++;
+        }
+      }
+
+      if (successCount > 0) {
+        notify.success({
+          title: `${successCount} facturas procesadas exitosamente`,
+          description: errorCount > 0 ? `${errorCount} facturas tuvieron errores` : 'Todas las facturas fueron procesadas'
+        });
+      } else {
+        notify.error({
+          title: 'Error al procesar facturas pendientes',
+          description: 'No se pudieron procesar ninguna de las facturas pendientes'
+        });
+      }
+      
       loadAFIPStatus();
-    } catch (error) {
+    } catch (error: any) {
       notify.error({
         title: 'Error al reintentar CAEs pendientes',
-        description: 'No se pudieron procesar las facturas pendientes'
+        description: error.message || 'No se pudieron procesar las facturas pendientes'
       });
     } finally {
       setLoading(false);
