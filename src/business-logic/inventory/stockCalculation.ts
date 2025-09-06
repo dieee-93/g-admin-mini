@@ -1,5 +1,6 @@
 import { type MaterialItem, isMeasurable, isCountable, isElaborated } from '@/pages/admin/materials/types';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 /**
  * Stock status levels
@@ -82,11 +83,26 @@ export class StockCalculation {
 
   /**
    * Calculates total value for an item (stock * unit_cost)
+   * ENHANCED: with validation for NaN/Infinity safety
    */
   static getTotalValue(item: MaterialItem): number {
-    const stock = new InventoryDecimal(item.stock ?? 0);
-    const cost = new InventoryDecimal(item.unit_cost ?? 0);
-    return stock.times(cost).toNumber();
+    try {
+      const stock = DecimalUtils.safeFromValue(item.stock ?? 0, 'inventory', `getTotalValue(${item.name || item.id})`);
+      const cost = DecimalUtils.safeFromValue(item.unit_cost ?? 0, 'inventory', `getTotalValue(${item.name || item.id})`);
+      
+      const result = stock.times(cost);
+      
+      // Additional safety check on result
+      if (!DecimalUtils.isFiniteDecimal(result)) {
+        console.warn(`StockCalculation.getTotalValue: Invalid result for item ${item.id}:`, { stock: item.stock, cost: item.unit_cost });
+        return 0;
+      }
+      
+      return result.toNumber();
+    } catch (error: any) {
+      console.error(`StockCalculation.getTotalValue: Error calculating value for item ${item.id}:`, error.message);
+      return 0; // Safe fallback
+    }
   }
 
   /**

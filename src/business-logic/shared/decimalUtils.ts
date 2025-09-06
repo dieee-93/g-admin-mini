@@ -375,4 +375,218 @@ export class DecimalUtils {
   static toFixed(value: DecimalInput, decimals: number): string {
     return this.fromValue(value).toFixed(decimals);
   }
+
+  // ============================================================================
+  // ROUNDING AT THE END PATTERNS - Banking-Grade Precision
+  // ============================================================================
+
+  /**
+   * Banker's rounding for financial calculations
+   * Implements "round half to even" to eliminate statistical bias
+   */
+  static bankerRound(value: DecimalInput, decimals: number = 2, domain: 'tax' | 'inventory' | 'financial' | 'recipe' = 'financial'): DecimalType {
+    const dec = this.fromValue(value, domain);
+    return dec.toDecimalPlaces(decimals, DECIMAL_CONSTANTS.ROUNDING_MODES.HALF_EVEN);
+  }
+
+  /**
+   * Batch calculation with rounding at the end
+   * Performs all calculations at full precision, then rounds final results
+   */
+  static calculateWithFinalRounding<T extends Record<string, DecimalInput>>(
+    calculations: T,
+    decimals: number = 2,
+    domain: 'tax' | 'inventory' | 'financial' | 'recipe' = 'financial'
+  ): Record<keyof T, DecimalType> {
+    const result: Partial<Record<keyof T, DecimalType>> = {};
+    
+    // Perform all calculations with full precision first
+    for (const [key, value] of Object.entries(calculations)) {
+      const fullPrecisionValue = this.fromValue(value, domain);
+      // Round only at the very end
+      result[key as keyof T] = fullPrecisionValue.toDecimalPlaces(decimals);
+    }
+    
+    return result as Record<keyof T, DecimalType>;
+  }
+
+  /**
+   * Multi-step calculation helper that maintains precision until the end
+   * Example: tax calculations, cost analysis, profit calculations
+   */
+  static multiStepCalculation(
+    steps: Array<{
+      operation: 'add' | 'subtract' | 'multiply' | 'divide';
+      operand: DecimalInput;
+    }>,
+    initialValue: DecimalInput,
+    finalDecimals: number = 2,
+    domain: 'tax' | 'inventory' | 'financial' | 'recipe' = 'financial'
+  ): DecimalType {
+    let result = this.fromValue(initialValue, domain);
+    
+    // Perform all operations with full precision
+    for (const step of steps) {
+      const operand = this.fromValue(step.operand, domain);
+      
+      switch (step.operation) {
+        case 'add':
+          result = result.plus(operand);
+          break;
+        case 'subtract':
+          result = result.minus(operand);
+          break;
+        case 'multiply':
+          result = result.times(operand);
+          break;
+        case 'divide':
+          if (operand.isZero()) {
+            throw new Error('Division by zero in multi-step calculation');
+          }
+          result = result.dividedBy(operand);
+          break;
+      }
+    }
+    
+    // Round only at the very end
+    return result.toDecimalPlaces(finalDecimals);
+  }
+
+  // ============================================================================
+  // VALIDATION & ERROR HANDLING - Production Safety
+  // ============================================================================
+
+  /**
+   * Validates that a decimal value is finite and safe for calculations
+   */
+  static isFiniteDecimal(value: DecimalInput): boolean {
+    try {
+      const dec = this.fromValue(value);
+      return dec.isFinite() && !dec.isNaN();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Validates that a decimal value is positive and finite
+   */
+  static isPositiveFinite(value: DecimalInput): boolean {
+    try {
+      const dec = this.fromValue(value);
+      return dec.isFinite() && !dec.isNaN() && dec.isPositive();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Validates that a decimal value is safe for financial calculations
+   * Rejects NaN, Infinity, and extreme values that could cause issues
+   */
+  static isFinanciallyValid(value: DecimalInput): boolean {
+    if (!this.isFiniteDecimal(value)) return false;
+    
+    const dec = this.fromValue(value, 'financial');
+    
+    // Check for reasonable financial bounds (adjust as needed)
+    const MAX_FINANCIAL_VALUE = new FinancialDecimal('999999999999.99'); // ~1 trillion
+    const MIN_FINANCIAL_VALUE = new FinancialDecimal('-999999999999.99');
+    
+    return dec.lte(MAX_FINANCIAL_VALUE) && dec.gte(MIN_FINANCIAL_VALUE);
+  }
+
+  /**
+   * Safe conversion with validation - throws meaningful errors
+   */
+  static safeFromValue(
+    value: DecimalInput, 
+    domain: 'tax' | 'inventory' | 'financial' | 'recipe' = 'financial',
+    context?: string
+  ): DecimalType {
+    if (!this.isFiniteDecimal(value)) {
+      const contextStr = context ? ` in ${context}` : '';
+      throw new Error(`Invalid decimal value${contextStr}: ${value} (NaN or Infinity detected)`);
+    }
+    
+    const result = this.fromValue(value, domain);
+    
+    if (!result.isFinite()) {
+      const contextStr = context ? ` in ${context}` : '';
+      throw new Error(`Calculation resulted in invalid value${contextStr}: ${result}`);
+    }
+    
+    return result;
+  }
+
+  /**
+   * Safe division with zero-check
+   */
+  static safeDivide(
+    dividend: DecimalInput, 
+    divisor: DecimalInput, 
+    domain: 'tax' | 'inventory' | 'financial' | 'recipe' = 'financial',
+    context?: string
+  ): DecimalType {
+    const divisorDec = this.safeFromValue(divisor, domain, context);
+    
+    if (divisorDec.isZero()) {
+      const contextStr = context ? ` in ${context}` : '';
+      throw new Error(`Division by zero${contextStr}`);
+    }
+    
+    const dividendDec = this.safeFromValue(dividend, domain, context);
+    return dividendDec.dividedBy(divisorDec);
+  }
+
+  /**
+   * Batch validation for arrays of values
+   */
+  static validateBatch(
+    values: DecimalInput[], 
+    validationFn: (value: DecimalInput) => boolean = this.isFiniteDecimal
+  ): { isValid: boolean; invalidIndices: number[]; errors: string[] } {
+    const invalidIndices: number[] = [];
+    const errors: string[] = [];
+    
+    values.forEach((value, index) => {
+      if (!validationFn(value)) {
+        invalidIndices.push(index);
+        errors.push(`Invalid value at index ${index}: ${value}`);
+      }
+    });
+    
+    return {
+      isValid: invalidIndices.length === 0,
+      invalidIndices,
+      errors
+    };
+  }
+
+  /**
+   * Assert finite value - throws if not valid (for critical operations)
+   */
+  static assertFinite(value: DecimalInput, context?: string): DecimalType {
+    if (!this.isFiniteDecimal(value)) {
+      const contextStr = context ? ` in ${context}` : '';
+      throw new Error(`Assertion failed: Expected finite decimal${contextStr}, got: ${value}`);
+    }
+    
+    return this.fromValue(value);
+  }
+
+  /**
+   * Clamp to safe financial bounds
+   */
+  static clampToFinancialBounds(value: DecimalInput): DecimalType {
+    if (!this.isFiniteDecimal(value)) {
+      return DECIMAL_CONSTANTS.ZERO;
+    }
+    
+    const dec = this.fromValue(value, 'financial');
+    const MAX_SAFE = new FinancialDecimal('999999999999.99');
+    const MIN_SAFE = new FinancialDecimal('-999999999999.99');
+    
+    return FinancialDecimal.max(MIN_SAFE, FinancialDecimal.min(MAX_SAFE, dec));
+  }
 }

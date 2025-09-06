@@ -1,5 +1,6 @@
 // OfflineMaterialsStats.tsx - Statistics grid component
 import { useMemo } from 'react';
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
 import {
   SimpleGrid,
   CardWrapper ,
@@ -19,38 +20,34 @@ interface InventoryStats {
 }
 
 export function OfflineMaterialsStats({ items }: OfflineMaterialsStatsProps) {
-  const getStockStatus = (stock: number, type: string) => {
-    if (stock <= 0) return { severity: 'critical' };
-    
-    const threshold = type === 'ELABORATED' ? 5 : type === 'MEASURABLE' ? 3 : 20;
-    const criticalThreshold = threshold / 2;
-    
-    if (stock <= criticalThreshold) return { severity: 'critical' };
-    if (stock <= threshold) return { severity: 'warning' };
-    return { severity: 'ok' };
+  const getStockSeverity = (item: any) => {
+    const status = StockCalculation.getStockStatus(item);
+    if (status === 'out' || status === 'critical') return 'critical';
+    if (status === 'low') return 'warning';
+    return 'ok';
   };
 
   const inventoryStats: InventoryStats = useMemo(() => {
     const totalItems = items.length;
     const totalValue = items.reduce((sum, item) => 
-      sum + (item.stock * (item.unit_cost || 0)), 0
+      sum + StockCalculation.getTotalValue(item), 0
     );
     
     return {
       totalItems,
       totalValue,
-      lowStockItems: items.filter(item => getStockStatus(item.stock, item.type).severity === 'warning').length,
-      criticalItems: items.filter(item => getStockStatus(item.stock, item.type).severity === 'critical').length
+      lowStockItems: items.filter(item => getStockSeverity(item) === 'warning').length,
+      criticalItems: items.filter(item => getStockSeverity(item) === 'critical').length
     };
   }, [items]);
 
   const lowStockItems = useMemo(() => 
-    items.filter(item => getStockStatus(item.stock, item.type).severity === 'warning'),
+    items.filter(item => getStockSeverity(item) === 'warning'),
     [items]
   );
   
   const criticalItems = useMemo(() => 
-    items.filter(item => getStockStatus(item.stock, item.type).severity === 'critical'),
+    items.filter(item => getStockSeverity(item) === 'critical'),
     [items]
   );
 

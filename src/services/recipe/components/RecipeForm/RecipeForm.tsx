@@ -37,6 +37,7 @@ import {
 import { useRecipes } from '@/shared/components'; 
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { inventoryApi } from '@/pages/admin/materials/services/inventoryApi';
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
 import { type InventoryItem } from '@/pages/admin/materials/types';
 import { type CreateRecipeData } from '@/shared/components'; 
 import { RecipeFormBasicInfo } from './form-parts/RecipeFormBasicInfo';
@@ -137,7 +138,8 @@ export function RecipeForm() {
     const ingredientItems = items.filter(item => item.type !== 'ELABORATED');
     return createListCollection({
       items: ingredientItems.map(item => {
-        const hasLowStock = item.stock <= 5;
+        const stockStatus = StockCalculation.getStockStatus(item);
+        const hasLowStock = stockStatus === 'low' || stockStatus === 'critical' || stockStatus === 'out';
         const hasNoCost = !item.unit_cost || item.unit_cost <= 0;
         const warningLabel = hasLowStock ? ' ⚠️' : hasNoCost ? ' 💰❌' : '';
         return {

@@ -15,6 +15,7 @@ import {
 import { useMaterials } from '@/store/materialsStore';
 import { useDebounce } from '@/shared/hooks';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
 import { CardWrapper } from '../ui';
 export interface MaterialSelectorProps {
   onMaterialSelected: (material: MaterialItem) => void;
@@ -37,12 +38,9 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
   
   const debouncedQuery = useDebounce(query, 300);
 
-  // Helper functions (moved before useMemo to prevent hoisting issues)
-  const getStockStatus = useCallback((material: MaterialItem): 'ok' | 'low' | 'critical' | 'out' => {
-    if (!material.stock || material.stock <= 0) return 'out';
-    if (material.stock < 5) return 'critical';
-    if (material.stock < 20) return 'low';
-    return 'ok';
+  // Helper functions - now using centralized StockCalculation
+  const getStockStatus = useCallback((material: MaterialItem) => {
+    return StockCalculation.getStockStatus(material);
   }, []);
 
   const getDisplayText = useCallback((material: MaterialItem): string => {
@@ -170,7 +168,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
                     colorPalette={getStockBadgeColor(getStockStatus(material))}
                     size="sm"
                   >
-                    {getStockStatus(material).toUpperCase()}
+                    {StockCalculation.getStatusLabel(getStockStatus(material))}
                   </Badge>
                 </Flex>
               ))}

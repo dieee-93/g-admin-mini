@@ -381,9 +381,9 @@ export const useMaterialsStore = create<MaterialsState>()(
           
           const stats: InventoryStats = {
             totalItems: items.length,
-            totalValue: items.reduce((sum, item) => sum + (item.stock * (item.unit_cost || 0)), 0),
+            totalValue: items.reduce((sum, item) => sum + StockCalculation.getTotalValue(item), 0),
             lowStockItems: items.filter(item => getStockStatus(item) === 'low').length,
-            outOfStockItems: items.filter(item => item.stock <= 0).length,
+            outOfStockItems: StockCalculation.getOutOfStockItems(items).length,
             recentMovements: 0, // TODO: Implement when we have movement tracking
             measurableItems: items.filter(isMeasurable).length,
             countableItems: items.filter(isCountable).length,

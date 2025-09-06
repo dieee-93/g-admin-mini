@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { type InventoryItem } from '../types';
 import { VirtualizedList } from '@/lib/performance';
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
 
 interface MaterialsInventoryGridProps {
   items: InventoryItem[];
@@ -55,19 +56,19 @@ export function MaterialsInventoryGrid({
   }, [items, searchTerm, typeFilter]);
 
   const criticalItems = useMemo(() => 
-    filteredItems.filter(item => getStockStatus(item.stock, item.type).severity === 'critical'),
+    filteredItems.filter(item => getStockStatusForDisplay(item).severity === 'critical'),
     [filteredItems]
   );
 
-  const getStockStatus = (stock: number, type: string) => {
-    if (stock <= 0) return { color: 'red', label: 'Sin stock', severity: 'critical' };
-    
-    const threshold = type === 'ELABORATED' ? 5 : type === 'MEASURABLE' ? 3 : 20;
-    const criticalThreshold = threshold / 2;
-    
-    if (stock <= criticalThreshold) return { color: 'red', label: 'Crítico', severity: 'critical' };
-    if (stock <= threshold) return { color: 'yellow', label: 'Bajo', severity: 'warning' };
-    return { color: 'green', label: 'Disponible', severity: 'ok' };
+  const getStockStatusForDisplay = (item: InventoryItem) => {
+    const status = StockCalculation.getStockStatus(item);
+    const colorMap = { 'green': 'green', 'yellow': 'yellow', 'orange': 'red', 'red': 'red' };
+    const rawColor = StockCalculation.getStatusColor(status);
+    const color = colorMap[rawColor.split('.')[0] as keyof typeof colorMap] || 'green';
+    const label = StockCalculation.getStatusLabel(status);
+    const severity = status === 'out' || status === 'critical' ? 'critical' : 
+                    status === 'low' ? 'warning' : 'ok';
+    return { color, label, severity };
   };
 
   const formatQuantity = (quantity: number, unit: string, item: InventoryItem): string => {
@@ -128,7 +129,7 @@ export function MaterialsInventoryGrid({
       onAddStock={onAddStock}
       onViewDetails={onViewDetails}
       formatQuantity={formatQuantity}
-      getStockStatus={getStockStatus}
+      getStockStatus={getStockStatusForDisplay}
       getTypeIcon={getTypeIcon}
       getTypeColor={getTypeColor}
     />
@@ -208,12 +209,12 @@ const ModernItemCard = React.memo(({
   onAddStock: (item: InventoryItem) => void;
   onViewDetails: (item: InventoryItem) => void;
   formatQuantity: (quantity: number, unit: string, item: InventoryItem) => string;
-  getStockStatus: (stock: number, type: string) => { color: string; label: string; severity: string };
+  getStockStatus: (item: InventoryItem) => { color: string; label: string; severity: string };
   getTypeIcon: (type: string) => any;
   getTypeColor: (type: string) => string;
 }) => {
   const TypeIcon = getTypeIcon(item.type);
-  const stockStatus = getStockStatus(item.stock, item.type);
+  const stockStatus = getStockStatus(item);
   const typeColor = getTypeColor(item.type);
   
   return (

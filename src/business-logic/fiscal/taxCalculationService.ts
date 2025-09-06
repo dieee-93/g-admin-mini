@@ -4,6 +4,7 @@
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
 import { TaxDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 // ============================================================================
 // TAX RATES AND CONSTANTS
@@ -108,13 +109,24 @@ class TaxCalculationService {
   calculateTaxesForAmount(amount: number, config?: Partial<TaxConfiguration>): TaxCalculationResult {
     const effectiveConfig = { ...this.config, ...config };
     
-    const amountDec = new TaxDecimal(amount);
-    const ivaRateDec = new TaxDecimal(effectiveConfig.ivaRate);
-    const ingresosBrutosRateDec = new TaxDecimal(effectiveConfig.includeIngresosBrutos ? effectiveConfig.ingresosBrutosRate || 0 : 0);
+    // ENHANCED: Validate inputs for production safety
+    if (!DecimalUtils.isFinanciallyValid(amount)) {
+      console.warn('TaxCalculationService: Invalid amount provided:', amount);
+      return this.getZeroTaxResult();
+    }
+    
+    try {
+      const amountDec = DecimalUtils.safeFromValue(amount, 'tax', 'calculateTaxesForAmount');
+      const ivaRateDec = DecimalUtils.safeFromValue(effectiveConfig.ivaRate, 'tax', 'IVA rate');
+      const ingresosBrutosRateDec = DecimalUtils.safeFromValue(
+        effectiveConfig.includeIngresosBrutos ? effectiveConfig.ingresosBrutosRate || 0 : 0, 
+        'tax', 
+        'Ingresos Brutos rate'
+      );
 
-    let subtotalDec: Decimal;
-    let ivaAmountDec: Decimal;
-    let ingresosBrutosAmountDec: Decimal;
+    let subtotalDec: TaxDecimal;
+    let ivaAmountDec: TaxDecimal;
+    let ingresosBrutosAmountDec: TaxDecimal;
 
     if (effectiveConfig.taxIncludedInPrice) {
       // Argentine system: prices include taxes
@@ -130,46 +142,82 @@ class TaxCalculationService {
       ingresosBrutosAmountDec = amountDec.times(ingresosBrutosRateDec);
     }
 
-    // Round if configured
-    if (effectiveConfig.roundTaxes) {
-      subtotalDec = subtotalDec.toDecimalPlaces(2);
-      ivaAmountDec = ivaAmountDec.toDecimalPlaces(2);
-      ingresosBrutosAmountDec = ingresosBrutosAmountDec.toDecimalPlaces(2);
-    }
-
+    // DON'T ROUND intermediates - calculate full precision totals first
     const totalTaxesDec = ivaAmountDec.plus(ingresosBrutosAmountDec);
     const totalAmountDec = subtotalDec.plus(totalTaxesDec);
+    
+    // ROUND AT THE END - all values rounded consistently 
+    const finalSubtotal = effectiveConfig.roundTaxes ? subtotalDec.toDecimalPlaces(2) : subtotalDec;
+    const finalIvaAmount = effectiveConfig.roundTaxes ? ivaAmountDec.toDecimalPlaces(2) : ivaAmountDec;
+    const finalIngresosBrutosAmount = effectiveConfig.roundTaxes ? ingresosBrutosAmountDec.toDecimalPlaces(2) : ingresosBrutosAmountDec;
+    const finalTotalTaxes = effectiveConfig.roundTaxes ? totalTaxesDec.toDecimalPlaces(2) : totalTaxesDec;
+    const finalTotalAmount = effectiveConfig.roundTaxes ? totalAmountDec.toDecimalPlaces(2) : totalAmountDec;
 
-    const subtotal = subtotalDec.toNumber();
-    const totalTaxes = totalTaxesDec.toNumber();
+    const subtotal = finalSubtotal.toNumber();
+    const totalTaxes = finalTotalTaxes.toNumber();
 
     return {
       subtotal,
-      ivaAmount: ivaAmountDec.toNumber(),
-      ingresosBrutosAmount: ingresosBrutosAmountDec.toNumber(),
+      ivaAmount: finalIvaAmount.toNumber(),
+      ingresosBrutosAmount: finalIngresosBrutosAmount.toNumber(),
       totalTaxes,
-      totalAmount: totalAmountDec.toNumber(),
+      totalAmount: finalTotalAmount.toNumber(),
       breakdown: {
         basePrice: subtotal,
         ivaRate: effectiveConfig.ivaRate,
         ingresosBrutosRate: effectiveConfig.ingresosBrutosRate || 0,
-        effectiveTaxRate: subtotal > 0 ? new TaxDecimal(totalTaxes).dividedBy(subtotal).toNumber() : 0,
+        effectiveTaxRate: subtotal > 0 ? DecimalUtils.safeDivide(totalTaxes, subtotal, 'tax', 'effective tax rate').toNumber() : 0,
+      }
+    };
+    } catch (error: any) {
+      console.error('TaxCalculationService.calculateTaxesForAmount:', error.message);
+      return this.getZeroTaxResult();
+    }
+  }
+  
+  /**
+   * Safe fallback for invalid tax calculations
+   */
+  private getZeroTaxResult(): TaxCalculationResult {
+    return {
+      subtotal: 0,
+      ivaAmount: 0,
+      ingresosBrutosAmount: 0,
+      totalTaxes: 0,
+      totalAmount: 0,
+      breakdown: {
+        basePrice: 0,
+        ivaRate: this.config.ivaRate,
+        ingresosBrutosRate: this.config.ingresosBrutosRate || 0,
+        effectiveTaxRate: 0,
       }
     };
   }
 
   /**
    * Calculate taxes for multiple items (shopping cart)
+   * IMPROVED: Implements "rounding at the end" pattern for maximum accuracy
    */
   calculateTaxesForItems(items: SaleItem[], config?: Partial<TaxConfiguration>): TaxCalculationResult {
     const effectiveConfig = { ...this.config, ...config };
     
-    let totalSubtotalDec = DECIMAL_CONSTANTS.ZERO;
-    let totalIvaAmountDec = DECIMAL_CONSTANTS.ZERO;
-    let totalIngresosBrutosAmountDec = DECIMAL_CONSTANTS.ZERO;
+    let totalSubtotalDec = new TaxDecimal(0);
+    let totalIvaAmountDec = new TaxDecimal(0);
+    let totalIngresosBrutosAmountDec = new TaxDecimal(0);
+    const ingresosBrutosRateDec = new TaxDecimal(effectiveConfig.includeIngresosBrutos ? effectiveConfig.ingresosBrutosRate || 0 : 0);
 
+    // Calculate each item with FULL PRECISION - no intermediate rounding
     for (const item of items) {
-      const itemTotalDec = new TaxDecimal(item.quantity).times(item.unitPrice);
+      try {
+        // ENHANCED: Validate each item's inputs
+        if (!DecimalUtils.isFinanciallyValid(item.quantity) || !DecimalUtils.isFinanciallyValid(item.unitPrice)) {
+          console.warn(`TaxCalculationService: Invalid item data:`, item);
+          continue; // Skip invalid items
+        }
+        
+        const itemQuantityDec = DecimalUtils.safeFromValue(item.quantity, 'tax', `item ${item.productId} quantity`);
+        const itemPriceDec = DecimalUtils.safeFromValue(item.unitPrice, 'tax', `item ${item.productId} price`);
+        const itemTotalDec = itemQuantityDec.times(itemPriceDec);
       
       // Get IVA rate based on item category
       let itemIvaRate = effectiveConfig.ivaRate;
@@ -178,40 +226,61 @@ class TaxCalculationService {
       } else if (item.ivaCategory === 'EXENTO') {
         itemIvaRate = TAX_RATES.IVA.EXENTO;
       }
+      
+      const itemIvaRateDec = new TaxDecimal(itemIvaRate);
+      
+      let itemSubtotalDec: TaxDecimal;
+      let itemIvaAmountDec: TaxDecimal;
+      let itemIngresosBrutosAmountDec: TaxDecimal;
 
-      // Calculate taxes for this item
-      const itemTaxConfig = { ...effectiveConfig, ivaRate: itemIvaRate };
-      const itemResult = this.calculateTaxesForAmount(itemTotalDec.toNumber(), itemTaxConfig);
+      if (effectiveConfig.taxIncludedInPrice) {
+        // Argentine system: prices include taxes
+        const totalItemRateDec = itemIvaRateDec.plus(ingresosBrutosRateDec);
+        itemSubtotalDec = itemTotalDec.dividedBy(DECIMAL_CONSTANTS.ONE.plus(totalItemRateDec));
+        itemIvaAmountDec = itemSubtotalDec.times(itemIvaRateDec);
+        itemIngresosBrutosAmountDec = itemSubtotalDec.times(ingresosBrutosRateDec);
+      } else {
+        // US system: prices exclude taxes
+        itemSubtotalDec = itemTotalDec;
+        itemIvaAmountDec = itemTotalDec.times(itemIvaRateDec);
+        itemIngresosBrutosAmountDec = itemTotalDec.times(ingresosBrutosRateDec);
+      }
 
-      totalSubtotalDec = totalSubtotalDec.plus(itemResult.subtotal);
-      totalIvaAmountDec = totalIvaAmountDec.plus(itemResult.ivaAmount);
-      totalIngresosBrutosAmountDec = totalIngresosBrutosAmountDec.plus(itemResult.ingresosBrutosAmount);
+        // Accumulate with FULL PRECISION
+        totalSubtotalDec = totalSubtotalDec.plus(itemSubtotalDec);
+        totalIvaAmountDec = totalIvaAmountDec.plus(itemIvaAmountDec);
+        totalIngresosBrutosAmountDec = totalIngresosBrutosAmountDec.plus(itemIngresosBrutosAmountDec);
+      } catch (error: any) {
+        console.error(`TaxCalculationService: Error processing item ${item.productId}:`, error.message);
+        // Continue processing other items
+      }
     }
 
-    // Round totals if configured
-    if (effectiveConfig.roundTaxes) {
-      totalSubtotalDec = totalSubtotalDec.toDecimalPlaces(2);
-      totalIvaAmountDec = totalIvaAmountDec.toDecimalPlaces(2);
-      totalIngresosBrutosAmountDec = totalIngresosBrutosAmountDec.toDecimalPlaces(2);
-    }
-
+    // Calculate totals with full precision
     const totalTaxesDec = totalIvaAmountDec.plus(totalIngresosBrutosAmountDec);
     const totalAmountDec = totalSubtotalDec.plus(totalTaxesDec);
 
-    const totalSubtotal = totalSubtotalDec.toNumber();
-    const totalTaxes = totalTaxesDec.toNumber();
+    // ROUND AT THE END - Banking-grade final rounding
+    const finalSubtotal = effectiveConfig.roundTaxes ? totalSubtotalDec.toDecimalPlaces(2) : totalSubtotalDec;
+    const finalIvaAmount = effectiveConfig.roundTaxes ? totalIvaAmountDec.toDecimalPlaces(2) : totalIvaAmountDec;
+    const finalIngresosBrutosAmount = effectiveConfig.roundTaxes ? totalIngresosBrutosAmountDec.toDecimalPlaces(2) : totalIngresosBrutosAmountDec;
+    const finalTotalTaxes = effectiveConfig.roundTaxes ? totalTaxesDec.toDecimalPlaces(2) : totalTaxesDec;
+    const finalTotalAmount = effectiveConfig.roundTaxes ? totalAmountDec.toDecimalPlaces(2) : totalAmountDec;
+
+    const totalSubtotal = finalSubtotal.toNumber();
+    const totalTaxes = finalTotalTaxes.toNumber();
 
     return {
       subtotal: totalSubtotal,
-      ivaAmount: totalIvaAmountDec.toNumber(),
-      ingresosBrutosAmount: totalIngresosBrutosAmountDec.toNumber(),
+      ivaAmount: finalIvaAmount.toNumber(),
+      ingresosBrutosAmount: finalIngresosBrutosAmount.toNumber(),
       totalTaxes,
-      totalAmount: totalAmountDec.toNumber(),
+      totalAmount: finalTotalAmount.toNumber(),
       breakdown: {
         basePrice: totalSubtotal,
         ivaRate: effectiveConfig.ivaRate,
         ingresosBrutosRate: effectiveConfig.ingresosBrutosRate || 0,
-        effectiveTaxRate: totalSubtotal > 0 ? new TaxDecimal(totalTaxes).dividedBy(totalSubtotal).toNumber() : 0,
+        effectiveTaxRate: totalSubtotal > 0 ? DecimalUtils.safeDivide(totalTaxes, totalSubtotal, 'tax', 'effective tax rate calculation').toNumber() : 0,
       }
     };
   }
