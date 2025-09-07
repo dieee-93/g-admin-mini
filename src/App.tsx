@@ -7,7 +7,7 @@ import { ResponsiveLayout } from '@/shared/layout/ResponsiveLayout';
 import { ErrorBoundary } from '@/lib/error-handling';
 import { LazyWithErrorBoundary } from '@/shared/components';
 import { useRouteBasedPreloading } from '@/hooks/useRouteBasedPreloading';
-import { PerformanceProvider, initializePerformanceSystem, LazyLoadingMonitor } from '@/lib/performance';
+import { PerformanceProvider, initializePerformanceSystem } from '@/lib/performance';
 
 // 🚨 SISTEMA UNIFICADO DE ALERTAS
 import { AlertsProvider, AutoGlobalAlertsDisplay } from '@/shared/alerts';

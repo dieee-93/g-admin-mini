@@ -193,7 +193,7 @@ export function usePersonalizedExperience() {
 
   // Obtener widgets personalizados para dashboard
   const personalizedDashboardWidgets = useMemo((): string[] => {
-    let widgets = [...DASHBOARD_WIDGETS.base];
+    const widgets = [...DASHBOARD_WIDGETS.base];
 
     if (hasCapability('sells_products')) {
       widgets.push(...DASHBOARD_WIDGETS.sells_products);
@@ -216,7 +216,7 @@ export function usePersonalizedExperience() {
 
   // Obtener tutoriales personalizados
   const personalizedTutorials = useMemo((): PersonalizedTutorial[] => {
-    let tutorials = [...TUTORIAL_CONFIG.base];
+    const tutorials = [...TUTORIAL_CONFIG.base];
 
     if (hasCapability('sells_products_for_onsite_consumption')) {
       tutorials.push(...TUTORIAL_CONFIG.sells_products_for_onsite_consumption);

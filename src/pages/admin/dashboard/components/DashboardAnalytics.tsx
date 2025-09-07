@@ -159,7 +159,7 @@ const DashboardAnalytics: React.FC = () => {
           <CardWrapper .Body>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
               {analyticsModules.map((module) => {
-                const Icon = module.icon;
+                const IconComponent = module.icon;
                 return (
                   <CardWrapper .Root 
                     key={module.id} 
@@ -176,7 +176,7 @@ const DashboardAnalytics: React.FC = () => {
                     <CardWrapper .Body>
                       <VStack align="start" gap="4">
                         <HStack justify="space-between" w="full">
-                          <Icon className={`w-8 h-8 text-${module.color}-500`} />
+                          <Icon icon={IconComponent} size="2xl" color={`var(--chakra-colors-${module.color}-500)`} />
                           <Badge 
                             colorPalette={module.status === 'active' ? 'green' : 'yellow'}
                             variant="subtle"
@@ -250,7 +250,7 @@ const DashboardAnalytics: React.FC = () => {
             <CardWrapper .Body>
               <Box p="8" textAlign="center">
                 <VStack gap="4">
-                  <DocumentChartBarIcon className="w-16 h-16 text-gray-400" />
+                  <Icon icon={DocumentChartBarIcon} size="3xl" color="var(--chakra-colors-gray-400)" style={{ width: "64px", height: "64px" }} />
                   <Text fontSize="lg" fontWeight="semibold" color="gray.600">
                     {analyticsModules.find(m => m.id === activeModule)?.title} Dashboard
                   </Text>

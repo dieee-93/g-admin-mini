@@ -279,8 +279,7 @@ export class BundleOptimizer {
     }
 
     return {
-      memoryUsage,
-      renderTime,
+      memoryUsageTime,
       jsHeapSize,
       recommendations
     };

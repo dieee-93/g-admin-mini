@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { Box, CardWrapper , Text, VStack, HStack, Badge } from '@chakra-ui/react';
+import { Icon } from '@/shared/ui';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 
 interface SalesData {
@@ -44,7 +45,7 @@ export default function SalesAnalyticsChart({
       <CardWrapper .Header>
         <HStack justify="space-between">
           <HStack gap={2}>
-            <ChartBarIcon className="w-5 h-5 text-blue-600" />
+            <Icon icon={ChartBarIcon} size="lg" color="blue.600" />
             <Text fontSize="lg" fontWeight="semibold">
               {title}
             </Text>
@@ -89,7 +90,7 @@ export default function SalesAnalyticsChart({
             borderRadius="md"
           >
             <VStack gap={2}>
-              <ChartBarIcon className="w-12 h-12 text-gray-400" />
+              <Icon icon={ChartBarIcon} size="3xl" color="gray.400" />
               <Text fontSize="sm" color="gray.600" textAlign="center">
                 Sales trend chart placeholder
               </Text>

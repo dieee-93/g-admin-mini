@@ -183,7 +183,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
       
       setFinancialReports(prev => [newReport, ...prev]);
       setCurrentReport(newReport);
-    } catch (error: any) {
+    } catch (error: unknown) {
       notify.error({
         title: 'Error al generar reporte',
         description: error.message || 'No se pudo generar el reporte financiero'

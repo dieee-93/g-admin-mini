@@ -4,7 +4,7 @@ import {
   Box,
   Skeleton
 } from '@chakra-ui/react';
-import { Typography } from '@/shared/ui';
+import { Typography, Icon } from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   BellIcon
@@ -56,7 +56,7 @@ export function AlertsBadge({
       >
         {showIcon && (
           <Box position="relative">
-            <BellIcon className="w-5 h-5 text-gray-600" />
+            <Icon icon={BellIcon} size="md" color="gray.600" />
             
             {/* Critical alerts indicator */}
             {criticalCount > 0 && (
@@ -128,9 +128,9 @@ export function AlertsBadge({
       {showIcon && (
         <Box position="relative">
           {criticalCount > 0 ? (
-            <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />
+            <Icon icon={ExclamationTriangleIcon} size="md" color="red.500" />
           ) : (
-            <BellIcon className="w-5 h-5 text-yellow-500" />
+            <Icon icon={BellIcon} size="md" color="yellow.500" />
           )}
         </Box>
       )}

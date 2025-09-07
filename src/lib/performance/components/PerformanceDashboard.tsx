@@ -23,7 +23,7 @@ import {
   ArrowPathIcon,
   DocumentArrowDownIcon
 } from '@heroicons/react/24/outline';
-import { CardWrapper, Button } from '@/shared/ui';
+import { CardWrapper, Button, Icon } from '@/shared/ui';
 
 // Performance utilities
 import { lazyLoadingManager, getPerformanceMetrics } from '../LazyLoadingManager';
@@ -166,7 +166,7 @@ export function PerformanceDashboard() {
               size="sm"
               onClick={() => setAutoRefresh(!autoRefresh)}
             >
-              <ArrowPathIcon className="w-4 h-4" />
+              <Icon icon={ArrowPathIcon} size="sm" />
               {autoRefresh ? 'Auto ON' : 'Auto OFF'}
             </Button>
             
@@ -175,7 +175,7 @@ export function PerformanceDashboard() {
               size="sm"
               onClick={refreshData}
             >
-              <ArrowPathIcon className="w-4 h-4" />
+              <Icon icon={ArrowPathIcon} size="sm" />
               Refresh
             </Button>
 
@@ -184,7 +184,7 @@ export function PerformanceDashboard() {
               size="sm" 
               onClick={exportReport}
             >
-              <DocumentArrowDownIcon className="w-4 h-4" />
+              <Icon icon={DocumentArrowDownIcon} size="sm" />
               Export Report
             </Button>
           </HStack>
@@ -239,7 +239,7 @@ export function PerformanceDashboard() {
             {performanceTabs.map(tab => (
               <Tabs.Trigger key={tab.id} value={tab.id}>
                 <HStack gap="2">
-                  <tab.icon className="w-4 h-4" />
+                  <Icon icon={tab.icon} size="sm" />
                   <Text>{tab.label}</Text>
                 </HStack>
               </Tabs.Trigger>
@@ -299,7 +299,7 @@ export function PerformanceDashboard() {
               {runtimeMetrics.recommendations.length > 0 && (
                 <Alert.Root status="warning">
                   <Alert.Indicator>
-                    <ExclamationTriangleIcon className="w-5 h-5" />
+                    <Icon icon={ExclamationTriangleIcon} size="lg" />
                   </Alert.Indicator>
                   <Alert.Title>Performance Recommendations</Alert.Title>
                   <Alert.Description>
@@ -577,7 +577,7 @@ export function PerformanceDashboard() {
               {runtimeMetrics.memoryUsage > 50 * 1024 * 1024 && (
                 <Alert.Root status="warning">
                   <Alert.Indicator>
-                    <ExclamationTriangleIcon className="w-5 h-5" />
+                    <Icon icon={ExclamationTriangleIcon} size="lg" />
                   </Alert.Indicator>
                   <Alert.Title>High Memory Usage</Alert.Title>
                   <Alert.Description>

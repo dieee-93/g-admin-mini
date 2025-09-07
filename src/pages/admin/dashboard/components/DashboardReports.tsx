@@ -5,7 +5,6 @@ import {
   VStack,
   HStack,
   Text,
-  CardWrapper ,
   Button,
   Badge,
   SimpleGrid,
@@ -32,6 +31,7 @@ import {
   CurrencyDollarIcon,
   UsersIcon
 } from '@heroicons/react/24/outline';
+import { Icon, CardWrapper } from '@/shared/ui';
 
 const DashboardReports: React.FC = () => {
   const [activeTab, setActiveTab] = useState('custom');
@@ -174,7 +174,7 @@ const DashboardReports: React.FC = () => {
               Create, schedule, and manage business reports
             </Text>
           </VStack>
-          <Button colorPalette="blue" leftIcon={<PlusIcon className="w-4 h-4" />}>
+          <Button colorPalette="blue" leftIcon={<Icon icon={PlusIcon} size="sm" />}>
             New Report
           </Button>
         </HStack>
@@ -184,19 +184,19 @@ const DashboardReports: React.FC = () => {
           <Tabs.List>
             <Tabs.Trigger value="custom">
               <HStack gap={2}>
-                <DocumentChartBarIcon className="w-4 h-4" />
+                <Icon icon={DocumentChartBarIcon} size="sm" />
                 <Text>Custom Reports</Text>
               </HStack>
             </Tabs.Trigger>
             <Tabs.Trigger value="quick">
               <HStack gap={2}>
-                <ChartBarIcon className="w-4 h-4" />
+                <Icon icon={ChartBarIcon} size="sm" />
                 <Text>Quick Reports</Text>
               </HStack>
             </Tabs.Trigger>
             <Tabs.Trigger value="templates">
               <HStack gap={2}>
-                <DocumentTextIcon className="w-4 h-4" />
+                <Icon icon={DocumentTextIcon} size="sm" />
                 <Text>Templates</Text>
               </HStack>
             </Tabs.Trigger>
@@ -211,7 +211,7 @@ const DashboardReports: React.FC = () => {
                     <HStack justify="space-between">
                       <VStack align="start" gap="3" flex="1">
                         <HStack gap="3">
-                          <DocumentChartBarIcon className="w-6 h-6 text-blue-500" />
+                          <Icon icon={DocumentChartBarIcon} size="lg" color="var(--chakra-colors-blue-500)" />
                           <VStack align="start" gap="1">
                             <Text fontSize="lg" fontWeight="semibold">{report.name}</Text>
                             <Text fontSize="sm" color="gray.600">{report.description}</Text>
@@ -229,11 +229,11 @@ const DashboardReports: React.FC = () => {
                             {report.format}
                           </Badge>
                           <HStack gap="1">
-                            <ClockIcon className="w-3 h-3 text-gray-500" />
+                            <Icon icon={ClockIcon} size="xs" color="var(--chakra-colors-gray-500)" />
                             <Text fontSize="xs" color="gray.500">{report.schedule}</Text>
                           </HStack>
                           <HStack gap="1">
-                            <CalendarIcon className="w-3 h-3 text-gray-500" />
+                            <Icon icon={CalendarIcon} size="xs" color="var(--chakra-colors-gray-500)" />
                             <Text fontSize="xs" color="gray.500">Last: {report.lastRun}</Text>
                           </HStack>
                         </HStack>
@@ -248,21 +248,21 @@ const DashboardReports: React.FC = () => {
                       
                       <VStack gap="2">
                         <HStack gap="2">
-                          <Button size="sm" variant="outline" leftIcon={<EyeIcon className="w-3 h-3" />}>
+                          <Button size="sm" variant="outline" leftIcon={<Icon icon={EyeIcon} size="xs" />}>
                             View
                           </Button>
-                          <Button size="sm" variant="outline" leftIcon={<PencilIcon className="w-3 h-3" />}>
+                          <Button size="sm" variant="outline" leftIcon={<Icon icon={PencilIcon} size="xs" />}>
                             Edit
                           </Button>
-                          <Button size="sm" variant="outline" leftIcon={<ArrowDownTrayIcon className="w-3 h-3" />}>
+                          <Button size="sm" variant="outline" leftIcon={<Icon icon={ArrowDownTrayIcon} size="xs" />}>
                             Export
                           </Button>
                         </HStack>
                         <HStack gap="2">
-                          <Button size="sm" colorPalette="green" leftIcon={<PlayIcon className="w-3 h-3" />}>
+                          <Button size="sm" colorPalette="green" leftIcon={<Icon icon={PlayIcon} size="xs" />}>
                             Run Now
                           </Button>
-                          <Button size="sm" variant="outline" leftIcon={<CogIcon className="w-3 h-3" />}>
+                          <Button size="sm" variant="outline" leftIcon={<Icon icon={CogIcon} size="xs" />}>
                             Settings
                           </Button>
                         </HStack>
@@ -278,7 +278,7 @@ const DashboardReports: React.FC = () => {
           <Tabs.Content value="quick">
             <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
               {quickReports.map((report) => {
-                const Icon = report.icon;
+                const IconComponent = report.icon;
                 return (
                   <CardWrapper .Root 
                     key={report.id} 
@@ -294,7 +294,7 @@ const DashboardReports: React.FC = () => {
                     <CardWrapper .Body>
                       <VStack align="start" gap="4">
                         <HStack gap="3">
-                          <Icon className="w-8 h-8 text-blue-500" />
+                          <Icon icon={IconComponent} size="2xl" color="var(--chakra-colors-blue-500)" />
                           <VStack align="start" gap="1">
                             <Text fontSize="lg" fontWeight="semibold">{report.title}</Text>
                             <Text fontSize="sm" color="gray.600">{report.description}</Text>
@@ -303,7 +303,7 @@ const DashboardReports: React.FC = () => {
                         
                         <HStack justify="space-between" w="full">
                           <HStack gap="1">
-                            <ClockIcon className="w-3 h-3 text-gray-500" />
+                            <Icon icon={ClockIcon} size="xs" color="var(--chakra-colors-gray-500)" />
                             <Text fontSize="xs" color="gray.500">{report.estimatedTime}</Text>
                           </HStack>
                           <Button size="sm" colorPalette="blue">
@@ -364,7 +364,7 @@ const DashboardReports: React.FC = () => {
                         size="sm" 
                         colorPalette="blue" 
                         w="full"
-                        leftIcon={<PlusIcon className="w-3 h-3" />}
+                        leftIcon={<Icon icon={PlusIcon} size="xs" />}
                       >
                         Use Template
                       </Button>
@@ -378,7 +378,7 @@ const DashboardReports: React.FC = () => {
 
         {/* Report Builder Hint */}
         <Alert.Root status="info">
-          <DocumentChartBarIcon className="w-4 h-4" />
+          <Icon icon={DocumentChartBarIcon} size="sm" />
           <Alert.Title>Report Builder</Alert.Title>
           <Alert.Description>
             Use our drag-and-drop report builder to create custom reports with real-time data from all modules.

@@ -15,6 +15,7 @@ import {
   Table,
   Skeleton
 } from '@chakra-ui/react';
+import { Icon } from '@/shared/ui';
 import {
   ChartBarIcon,
   ClockIcon,
@@ -103,7 +104,7 @@ export function CodeSplittingReport({
       <CardWrapper .Header>
         <HStack justify="space-between">
           <HStack gap={2}>
-            <ChartBarIcon className="w-5 h-5 text-blue-500" />
+            <Icon icon={ChartBarIcon} size="lg" color="blue.500" />
             <Text fontSize="lg" fontWeight="bold">Code Splitting Performance</Text>
           </HStack>
           <HStack gap={2}>
@@ -118,7 +119,7 @@ export function CodeSplittingReport({
               onClick={refreshReport}
               loading={loading}
             >
-              <ArrowPathIcon className="w-4 h-4" />
+              <Icon icon={ArrowPathIcon} size="sm" />
               Refresh
             </Button>
           </HStack>
@@ -142,8 +143,8 @@ export function CodeSplittingReport({
                 <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
                   <CardWrapper .Root variant="subtle">
                     <CardWrapper .Body p={4} textAlign="center">
-                      <ClockIcon className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                      <Text fontSize="sm" color="gray.600">Avg Load Time</Text>
+                      <Icon icon={ClockIcon} size="xl" color="blue.500" />
+                      <Text fontSize="sm" color="gray.600" mt={2}>Avg Load Time</Text>
                       <Text fontSize="xl" fontWeight="bold">
                         {report?.averageLoadTimes && Object.keys(report.averageLoadTimes).length > 0
                           ? `${Math.round(
@@ -159,8 +160,8 @@ export function CodeSplittingReport({
 
                   <CardWrapper .Root variant="subtle">
                     <CardWrapper .Body p={4} textAlign="center">
-                      <CubeIcon className="w-6 h-6 text-green-500 mx-auto mb-2" />
-                      <Text fontSize="sm" color="gray.600">Total Chunks</Text>
+                      <Icon icon={CubeIcon} size="xl" color="green.500" />
+                      <Text fontSize="sm" color="gray.600" mt={2}>Total Chunks</Text>
                       <Text fontSize="xl" fontWeight="bold">
                         {Object.keys(report?.chunkSizes || {}).length}
                       </Text>
@@ -169,8 +170,8 @@ export function CodeSplittingReport({
 
                   <CardWrapper .Root variant="subtle">
                     <CardWrapper .Body p={4} textAlign="center">
-                      <ChartBarIcon className="w-6 h-6 text-purple-500 mx-auto mb-2" />
-                      <Text fontSize="sm" color="gray.600">Components</Text>
+                      <Icon icon={ChartBarIcon} size="xl" color="purple.500" />
+                      <Text fontSize="sm" color="gray.600" mt={2}>Components</Text>
                       <Text fontSize="xl" fontWeight="bold">
                         {Object.keys(report?.loadTimes || {}).length}
                       </Text>
@@ -180,11 +181,11 @@ export function CodeSplittingReport({
                   <CardWrapper .Root variant="subtle">
                     <CardWrapper .Body p={4} textAlign="center">
                       {report?.recommendations?.length > 0 ? (
-                        <ExclamationTriangleIcon className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+                        <Icon icon={ExclamationTriangleIcon} size="xl" color="orange.500" />
                       ) : (
-                        <CheckCircleIcon className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                        <Icon icon={CheckCircleIcon} size="xl" color="green.500" />
                       )}
-                      <Text fontSize="sm" color="gray.600">Issues</Text>
+                      <Text fontSize="sm" color="gray.600" mt={2}>Issues</Text>
                       <Text fontSize="xl" fontWeight="bold" color={
                         report?.recommendations?.length > 0 ? 'orange.600' : 'green.600'
                       }>
@@ -198,7 +199,7 @@ export function CodeSplittingReport({
                 {report?.recommendations?.length > 0 && (
                   <Alert.Root status="warning">
                     <Alert.Indicator>
-                      <ExclamationTriangleIcon className="w-5 h-5" />
+                      <Icon icon={ExclamationTriangleIcon} size="lg" />
                     </Alert.Indicator>
                     <Alert.Title>Performance Issues Detected</Alert.Title>
                     <Alert.Description>
@@ -299,7 +300,7 @@ export function CodeSplittingReport({
                   report.recommendations.map((recommendation: string, index: number) => (
                     <Alert.Root key={index} status="warning">
                       <Alert.Indicator>
-                        <ExclamationTriangleIcon className="w-5 h-5" />
+                        <Icon icon={ExclamationTriangleIcon} size="lg" />
                       </Alert.Indicator>
                       <Alert.Description>{recommendation}</Alert.Description>
                     </Alert.Root>
@@ -307,7 +308,7 @@ export function CodeSplittingReport({
                 ) : (
                   <Alert.Root status="success">
                     <Alert.Indicator>
-                      <CheckCircleIcon className="w-5 h-5" />
+                      <Icon icon={CheckCircleIcon} size="lg" />
                     </Alert.Indicator>
                     <Alert.Title>All Good!</Alert.Title>
                     <Alert.Description>

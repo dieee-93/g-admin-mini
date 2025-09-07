@@ -1,7 +1,7 @@
 // Sales Page - Redesigned with prioritized actions and better organization
 import { useEffect, useState } from 'react';
 import { 
-  Layout, Stack, Typography, CardWrapper, Button, Modal, Alert, Badge, Box
+  Layout, Stack, Typography, CardWrapper, Button, Modal, Alert, Badge, Box, Icon
 } from '@/shared/ui';
 import { 
   CreditCardIcon, 
@@ -99,7 +99,7 @@ export default function SalesPage() {
       {/* Page Header */}
       <Stack direction="row" justify="space-between" align="center" p="lg">
         <Stack direction="row" align="center" gap="md">
-          <ComputerDesktopIcon className="w-8 h-8 text-teal-600" />
+          <Icon icon={ComputerDesktopIcon} size="2xl" color="teal.600" />
           <Stack direction="column" gap="xs">
             <Typography variant="heading" size="xl">
               Sistema de Ventas
@@ -114,7 +114,7 @@ export default function SalesPage() {
         </Stack>
         
         <Button variant="solid" color="text.primary" size="lg">
-          <PlusIcon className="w-5 h-5 mr-2" />
+          <Icon icon={PlusIcon} size="sm" />
           Nueva Venta
         </Button>
       </Stack>
@@ -125,7 +125,7 @@ export default function SalesPage() {
         <CardWrapper variant="elevated">
           <CardWrapper.Header>
             <Stack direction="row" align="center" gap="sm">
-              <CreditCardIcon className="w-6 h-6 text-teal-600" />
+              <Icon icon={CreditCardIcon} size="lg" color="teal.600" />
               <Typography variant="heading" size="lg">Sistema POS</Typography>
               <Badge variant="subtle" color="text.primary">Principal</Badge>
             </Stack>
@@ -152,7 +152,7 @@ export default function SalesPage() {
           <CardWrapper.Header>
             <Stack direction="row" justify="space-between" align="center">
               <Stack direction="row" align="center" gap="sm">
-                <TableCellsIcon className="w-6 h-6 text-blue-600" />
+                <Icon icon={TableCellsIcon} size="lg" color="blue.600" />
                 <Typography variant="heading" size="lg">Gestión de Mesas</Typography>
               </Stack>
               <Button variant="ghost" size="sm">Ver Todas</Button>
@@ -161,7 +161,7 @@ export default function SalesPage() {
           <CardWrapper.Body>
             <Alert
               variant="subtle"
-              icon={<InformationCircleIcon className="w-5 h-5" />}
+              icon={<Icon icon={InformationCircleIcon} size="sm" />}
               title="Seleccione una mesa para iniciar una nueva venta."
             />
             <Box mt={4}>
@@ -175,7 +175,7 @@ export default function SalesPage() {
           <CardWrapper variant="outline" flex="1">
             <CardWrapper.Body>
               <Stack direction="row" align="center" gap="sm">
-                <QrCodeIcon className="w-5 h-5 text-green-600" />
+                <Icon icon={QrCodeIcon} size="sm" color="green.600" />
                 <Typography variant="body" weight="medium">Códigos QR</Typography>
               </Stack>
             </CardWrapper.Body>
@@ -184,7 +184,7 @@ export default function SalesPage() {
           <CardWrapper variant="outline" flex="1">
             <CardWrapper.Body>
               <Stack direction="row" align="center" gap="sm">
-                <ChartBarIcon className="w-5 h-5 text-purple-600" />
+                <Icon icon={ChartBarIcon} size="sm" color="purple.600" />
                 <Typography variant="body" weight="medium">Analytics</Typography>
               </Stack>
             </CardWrapper.Body>

@@ -23,6 +23,7 @@ import {
   NumberInput
 } from '@chakra-ui/react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Icon } from '@/shared/ui';
 import {
   LightBulbIcon,
   SparklesIcon,
@@ -507,7 +508,7 @@ export function RecipeForm() {
           >
             {aiSuggestions ? (
               <>
-                <SparklesIcon className="w-4 h-4 mr-2" />
+                <Icon icon={SparklesIcon} size="sm" style={{ marginRight: '8px' }} />
                 🤖 Crear Receta Optimizada
               </>
             ) : (

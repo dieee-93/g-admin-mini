@@ -38,6 +38,7 @@ import {
   ShoppingCartIcon,
   UsersIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 
 // Executive Dashboard Interfaces
 interface ExecutiveKPI {
@@ -321,7 +322,7 @@ const DashboardExecutive: React.FC = () => {
                 <CardWrapper .Body>
                   <VStack align="start" gap="3">
                     <HStack justify="space-between" w="full">
-                      <IconComponent className="w-6 h-6 text-blue-500" />
+                      <Icon icon={IconComponent} size="lg" color="var(--chakra-colors-blue-500)" />
                       <Badge 
                         colorPalette={getPriorityColor(kpi.priority)}
                         variant="subtle"
@@ -339,7 +340,7 @@ const DashboardExecutive: React.FC = () => {
                           {kpi.unit !== '$' ? kpi.unit : ''}
                         </Text>
                         {TrendIconComponent && (
-                          <TrendIconComponent className={`w-4 h-4 ${kpi.trend === 'up' ? 'text-green-500' : 'text-red-500'}`} />
+                          <Icon icon={TrendIconComponent} size="sm" color={kpi.trend === 'up' ? 'var(--chakra-colors-green-500)' : 'var(--chakra-colors-red-500)'} />
                         )}
                       </HStack>
                       

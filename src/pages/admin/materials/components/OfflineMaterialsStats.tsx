@@ -20,7 +20,7 @@ interface InventoryStats {
 }
 
 export function OfflineMaterialsStats({ items }: OfflineMaterialsStatsProps) {
-  const getStockSeverity = (item: any) => {
+  const getStockSeverity = (item: unknown) => {
     const status = StockCalculation.getStockStatus(item);
     if (status === 'out' || status === 'critical') return 'critical';
     if (status === 'low') return 'warning';

@@ -644,7 +644,7 @@ export async function getDepartmentPerformance(): Promise<any[]> {
   }, {} as Record<string, any>);
 
   // Calculate averages and format for charts
-  return Object.values(departmentStats).map((dept: any) => ({
+  return Object.values(departmentStats).map((dept: unknown) => ({
     department: dept.department,
     employees: dept.employees,
     avgPerformance: Math.round(dept.performanceSum / dept.employees),
@@ -962,7 +962,7 @@ export async function getCostPerHourAnalysis(): Promise<any[]> {
     return acc;
   }, {} as Record<string, any>);
 
-  return Object.values(departmentAnalysis).map((dept: any) => ({
+  return Object.values(departmentAnalysis).map((dept: unknown) => ({
     department: dept.department,
     employees: dept.employees,
     avg_hourly_cost: Math.round((dept.total_hourly_cost / dept.employees) * 100) / 100,

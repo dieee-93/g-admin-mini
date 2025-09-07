@@ -45,7 +45,7 @@ export function RoleGuard({
     return fallback || <AccessDenied reason="Sin permisos para esta acción" />;
   }
 
-  // All checks passed, render children
+  // All checks passed children
   return <>{children}</>;
 }
 

@@ -8,7 +8,7 @@ import {
   createListCollection,
   NumberInput,
   Button,
-  CardWrapper ,
+  CardWrapper,
   Badge,
   Alert,
   Box,

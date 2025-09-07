@@ -1,4 +1,5 @@
 // src/features/customers/ui/CustomerAnalytics.tsx - Enhanced RFM Analytics Dashboard - Design System v2.0
+// MIGRATED: Now uses centralized financial calculations
 import {
   Stack,
   Typography,
@@ -8,6 +9,7 @@ import {
   Button,
   Alert
 } from '@/shared/ui';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { 
   ChartBarIcon, 
   UsersIcon, 
@@ -51,13 +53,9 @@ export function CustomerAnalytics() {
     );
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0
-    }).format(amount);
-  };
+  // MIGRATED: Use centralized currency formatting
+  // const formatCurrency = (amount: number) => QuickCalculations.formatCurrency(amount);
+  // Replaced with direct calls to QuickCalculations.formatCurrency
 
   const getSegmentColor = (segment: CustomerSegment): "gray" | "red" | "orange" | "yellow" | "green" | "teal" | "blue" | "cyan" | "purple" | "pink" => {
     const colors: Record<CustomerSegment, "gray" | "red" | "orange" | "yellow" | "green" | "teal" | "blue" | "cyan" | "purple" | "pink"> = {
@@ -292,7 +290,7 @@ export function CustomerAnalytics() {
                             {stat.percentage.toFixed(1)}% del total
                           </Typography>
                           <Typography  fontWeight="medium" size="sm">
-                            {formatCurrency(performance.avgLifetimeValue)}
+                            {QuickCalculations.formatCurrency(performance.avgLifetimeValue)}
                           </Typography>
                         </Stack>
                         
@@ -354,7 +352,7 @@ export function CustomerAnalytics() {
                   </Stack>
                   <Stack direction="column" align="end" gap="xs">
                     <Typography fontWeight="bold"  size="sm">
-                      {formatCurrency(customer.total_spent)}
+                      {QuickCalculations.formatCurrency(customer.total_spent)}
                     </Typography>
                     <Badge colorPalette="green" variant="outline" size="xs">
                       CLV Alto
@@ -389,7 +387,7 @@ export function CustomerAnalytics() {
                     <Stack direction="row" gap="xs" align="center">
                       <Typography size="xs" color="text.muted">{customer.total_visits} visitas</Typography>
                       <Typography size="xs" color="text.muted">•</Typography>
-                      <Typography size="xs" color="text.muted">{formatCurrency(customer.total_spent)}</Typography>
+                      <Typography size="xs" color="text.muted">{QuickCalculations.formatCurrency(customer.total_spent)}</Typography>
                     </Stack>
                   </Stack>
                   <Stack direction="column" align="end" gap="xs">

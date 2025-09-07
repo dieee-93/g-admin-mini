@@ -23,7 +23,7 @@ export function CustomerOrdersHistory() {
     const loadSales = async () => {
       setLoading(true);
       try {
-        const filters: any = selectedCustomer ? { customerId: selectedCustomer } : {};
+        const filters: unknown = selectedCustomer ? { customerId: selectedCustomer } : {};
         if (dateFilter) {
           const date = new Date(dateFilter);
           date.setDate(date.getDate() + 1);

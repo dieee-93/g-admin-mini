@@ -26,7 +26,8 @@ import {
   
   // Advanced
   Alert,
-  AlertDescription
+  AlertDescription,
+  Icon
 } from '@/shared/ui';
 
 import { 
@@ -172,24 +173,24 @@ export function FiscalPage() {
               <HStack gap="sm">
                 {/* Connection Status */}
                 <Badge 
-                  colorPalette={isOnline ? 'success' : 'error'}
+                  colorPalette={isOnline ? 'green' : 'red'}
                   variant="subtle"
                 >
-                  {isOnline ? <WifiIcon className="w-4 h-4" /> : <NoSymbolIcon className="w-4 h-4" />}
+                  {isOnline ? <Icon icon={WifiIcon} size="sm" /> : <Icon icon={NoSymbolIcon} size="sm" />}
                   {isOnline ? 'Online' : 'Offline'}
                 </Badge>
 
                 {/* Sync Status */}
                 {isSyncing && (
-                  <Badge colorPalette="info" variant="subtle">
-                    <CloudIcon className="w-4 h-4" />
+                  <Badge colorPalette="blue" variant="subtle">
+                    <Icon icon={CloudIcon} size="sm" />
                     Sincronizando
                   </Badge>
                 )}
 
                 {/* Queue Size */}
                 {queueSize > 0 && (
-                  <Badge colorPalette="warning" variant="subtle">
+                  <Badge colorPalette="orange" variant="subtle">
                     {queueSize} pendientes
                   </Badge>
                 )}
@@ -258,7 +259,7 @@ export function FiscalPage() {
             <CardWrapper variant="outline" padding="md">
               <CardWrapper.Body>
                 <VStack gap="sm">
-                  <BanknotesIcon className="w-8 h-8 text-green-500" />
+                  <Icon icon={BanknotesIcon} size="2xl" color="green.500" />
                   <Typography variant="title">
                     ${(fiscalStats.facturacion_mes_actual && typeof fiscalStats.facturacion_mes_actual === 'number') 
                       ? fiscalStats.facturacion_mes_actual.toLocaleString('es-AR') 
@@ -274,7 +275,7 @@ export function FiscalPage() {
             <CardWrapper variant="outline" padding="md">
               <CardWrapper.Body>
                 <VStack gap="sm">
-                  <DocumentTextIcon className="w-8 h-8 text-blue-500" />
+                  <Icon icon={DocumentTextIcon} size="2xl" color="blue.500" />
                   <Typography variant="title">
                     {(fiscalStats.facturas_emitidas_mes && typeof fiscalStats.facturas_emitidas_mes === 'number') 
                       ? fiscalStats.facturas_emitidas_mes 
@@ -290,7 +291,7 @@ export function FiscalPage() {
             <CardWrapper variant="outline" padding="md">
               <CardWrapper.Body>
                 <VStack gap="sm">
-                  <ExclamationTriangleIcon className="w-8 h-8 text-orange-500" />
+                  <Icon icon={ExclamationTriangleIcon} size="2xl" color="orange.500" />
                   <Typography variant="title">
                     {(fiscalStats.cae_pendientes && typeof fiscalStats.cae_pendientes === 'number') 
                       ? fiscalStats.cae_pendientes 
@@ -306,7 +307,7 @@ export function FiscalPage() {
             <CardWrapper variant="outline" padding="md">
               <CardWrapper.Body>
                 <VStack gap="sm">
-                  <CalendarDaysIcon className="w-8 h-8 text-purple-500" />
+                  <Icon icon={CalendarDaysIcon} size="2xl" color="purple.500" />
                   <Typography variant="title">
                     {(fiscalStats.proxima_presentacion && typeof fiscalStats.proxima_presentacion === 'string') 
                       ? fiscalStats.proxima_presentacion 
@@ -337,16 +338,16 @@ export function FiscalPage() {
           /* Main Content Tabs */
           <Tabs value={activeTab} onValueChange={handleTabChange} variant="enclosed">
             <TabList>
-              <Tab value="invoicing" icon={<DocumentTextIcon className="w-4 h-4" />}>
+              <Tab value="invoicing" icon={<Icon icon={DocumentTextIcon} size="sm" />}>
                 Facturación
               </Tab>
-              <Tab value="afip" icon={<CogIcon className="w-4 h-4" />}>
+              <Tab value="afip" icon={<Icon icon={CogIcon} size="sm" />}>
                 AFIP
               </Tab>
-              <Tab value="compliance" icon={<ExclamationTriangleIcon className="w-4 h-4" />}>
+              <Tab value="compliance" icon={<Icon icon={ExclamationTriangleIcon} size="sm" />}>
                 Cumplimiento
               </Tab>
-              <Tab value="reporting" icon={<ChartBarIcon className="w-4 h-4" />}>
+              <Tab value="reporting" icon={<Icon icon={ChartBarIcon} size="sm" />}>
                 Reportes
               </Tab>
             </TabList>

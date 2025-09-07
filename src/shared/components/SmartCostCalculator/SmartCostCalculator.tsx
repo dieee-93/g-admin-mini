@@ -26,7 +26,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { calculateRecipeCost } from '@/services/recipe/api/recipeApi';
 import type { Recipe } from '@/services/recipe/types';
-import { CardWrapper } from '@/shared/ui';
+import { CardWrapper, Icon } from '@/shared/ui';
 
 interface SmartCostCalculatorProps {
   recipe?: Recipe;
@@ -123,7 +123,7 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
           <CardWrapper.Body p={6}>
             <VStack align="stretch" gap={4}>
               <HStack align="center" gap={3}>
-                <CalculatorIcon className="w-8 h-8 text-blue-500" />
+                <Icon icon={CalculatorIcon} size="2xl" color="blue.500" />
                 <VStack align="start" gap={0}>
                   <Text fontSize="2xl" fontWeight="bold">Smart Cost Calculator</Text>
                   <Text color="gray.600">Real-time cost analysis with yield optimization</Text>
@@ -158,7 +158,7 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                 loading={loading}
                 disabled={!selectedRecipeId}
               >
-                <CalculatorIcon className="w-4 h-4" />
+                <Icon icon={CalculatorIcon} size="sm" />
                 Calculate Cost
               </Button>
             </VStack>
@@ -169,7 +169,7 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
         {error && (
           <Alert.Root status="error">
             <Alert.Indicator>
-              <ExclamationTriangleIcon className="w-5 h-5" />
+              <Icon icon={ExclamationTriangleIcon} size="sm" />
             </Alert.Indicator>
             <Alert.Description>{error}</Alert.Description>
           </Alert.Root>
@@ -180,15 +180,15 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
           <Tabs.Root defaultValue="breakdown">
             <Tabs.List>
               <Tabs.Trigger value="breakdown">
-                <ChartBarIcon className="w-4 h-4" />
+                <Icon icon={ChartBarIcon} size="sm" />
                 Cost Breakdown
               </Tabs.Trigger>
               <Tabs.Trigger value="analysis">
-                <CheckCircleIcon className="w-4 h-4" />
+                <Icon icon={CheckCircleIcon} size="sm" />
                 Profitability Analysis
               </Tabs.Trigger>
               <Tabs.Trigger value="optimization">
-                <ClockIcon className="w-4 h-4" />
+                <Icon icon={ClockIcon} size="sm" />
                 Optimization Tips
               </Tabs.Trigger>
             </Tabs.List>
@@ -425,7 +425,7 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                 <CardWrapper bg="blue.50">
                   <CardWrapper.Body p={4}>
                     <HStack gap={4}>
-                      <CheckCircleIcon className="w-6 h-6 text-blue-500" />
+                      <Icon icon={CheckCircleIcon} size="lg" color="blue.500" />
                       <VStack align="start" gap={1}>
                         <Text fontWeight="bold" color="blue.700">Optimization Recommendation</Text>
                         <Text fontSize="sm" color="blue.600">

@@ -20,6 +20,7 @@ import {
   ExclamationTriangleIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 
 interface RealtimeStatusIndicatorProps {
   connectionState?: 'connected' | 'connecting' | 'disconnected' | 'error';
@@ -48,14 +49,14 @@ export function RealtimeStatusIndicator({
   const getStatusIcon = () => {
     switch (connectionState) {
       case 'connected':
-        return <CheckCircleIcon className="w-4 h-4" />;
+        return <Icon icon={CheckCircleIcon} size="sm" />;
       case 'connecting':
-        return <WifiIcon className="w-4 h-4" />;
+        return <Icon icon={WifiIcon} size="sm" />;
       case 'disconnected':
       case 'error':
-        return <ExclamationTriangleIcon className="w-4 h-4" />;
+        return <Icon icon={ExclamationTriangleIcon} size="sm" />;
       default:
-        return <WifiIcon className="w-4 h-4" />;
+        return <Icon icon={WifiIcon} size="sm" />;
     }
   };
 

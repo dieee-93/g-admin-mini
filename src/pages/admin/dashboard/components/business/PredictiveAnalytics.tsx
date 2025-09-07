@@ -32,6 +32,7 @@ import {
   ArrowPathIcon,
   BeakerIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui';
 
 import { CardWrapper } from '@/shared/ui';
 
@@ -495,7 +496,7 @@ export function PredictiveAnalytics() {
                 loadingText="Analizando..."
                 size="sm"
               >
-                <ArrowPathIcon className="w-4 h-4" />
+                <Icon icon={ArrowPathIcon} size="sm" />
                 Ejecutar Análisis
               </Button>
               <Button 
@@ -503,7 +504,7 @@ export function PredictiveAnalytics() {
                 onClick={() => window.open('/tools/intelligence/recipes', '_blank')}
                 size="sm"
               >
-                <BeakerIcon className="w-4 h-4" />
+                <Icon icon={BeakerIcon} size="sm" />
                 Recipe Intelligence
               </Button>
             </HStack>
@@ -560,35 +561,35 @@ export function PredictiveAnalytics() {
           <Tabs.List>
             <Tabs.Trigger value="overview">
               <HStack gap={2}>
-                <ChartBarIcon className="w-4 h-4" />
+                <Icon icon={ChartBarIcon} size="sm" />
                 <Text>Resumen</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="forecasting">
               <HStack gap={2}>
-                <ArrowTrendingUpIcon className="w-4 h-4" />
+                <Icon icon={ArrowTrendingUpIcon} size="sm" />
                 <Text>Predicciones</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="seasonality">
               <HStack gap={2}>
-                <CalendarIcon className="w-4 h-4" />
+                <Icon icon={CalendarIcon} size="sm" />
                 <Text>Estacionalidad</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="alerts">
               <HStack gap={2}>
-                <ExclamationTriangleIcon className="w-4 h-4" />
+                <Icon icon={ExclamationTriangleIcon} size="sm" />
                 <Text>Alertas</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="recommendations">
               <HStack gap={2}>
-                <LightBulbIcon className="w-4 h-4" />
+                <Icon icon={LightBulbIcon} size="sm" />
                 <Text>Recomendaciones</Text>
               </HStack>
             </Tabs.Trigger>
@@ -670,7 +671,7 @@ export function PredictiveAnalytics() {
                                 </Text>
                               </VStack>
                               <HStack gap={1}>
-                                <TrendIcon className={`w-4 h-4 text-${trend.color}-500`} />
+                                <Icon icon={TrendIcon} size="sm" color={`var(--chakra-colors-${trend.color}-500)`} />
                                 {material.alerts.length > 0 && (
                                   <Badge colorPalette="red" size="xs">
                                     {material.alerts.length}
@@ -924,7 +925,7 @@ export function PredictiveAnalytics() {
                         ) : (
                           <CardWrapper variant="subtle">
                             <CardWrapper.Body p={8} textAlign="center">
-                              <CalendarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                              <Icon icon={CalendarIcon} size="3xl" color="var(--chakra-colors-gray-400)" style={{ margin: "0 auto 16px auto" }} />
                               <Text fontSize="lg" fontWeight="medium" mb={2}>
                                 No se detectó estacionalidad
                               </Text>
@@ -967,8 +968,8 @@ export function PredictiveAnalytics() {
                             >
                               <Alert.Indicator>
                                 {alert.severity === 'critical' ? 
-                                  <ExclamationTriangleIcon className="w-5 h-5" /> : 
-                                  <ClockIcon className="w-5 h-5" />
+                                  <Icon icon={ExclamationTriangleIcon} size="md" /> : 
+                                  <Icon icon={ClockIcon} size="md" />
                                 }
                               </Alert.Indicator>
                               <VStack align="start" gap={1} flex="1">
@@ -995,7 +996,7 @@ export function PredictiveAnalytics() {
                 ) : (
                   <CardWrapper variant="subtle">
                     <CardWrapper.Body p={8} textAlign="center">
-                      <CheckCircleIcon className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                      <Icon icon={CheckCircleIcon} size="3xl" color="var(--chakra-colors-green-500)" style={{ margin: "0 auto 16px auto" }} />
                       <Text fontSize="lg" fontWeight="medium" mb={2} color="green.600">
                         No hay alertas activas
                       </Text>
@@ -1032,7 +1033,7 @@ export function PredictiveAnalytics() {
                     <CardWrapper.Body>
                       <VStack gap={3} align="stretch">
                         <HStack gap={4}>
-                          <BoltIcon className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                          <Icon icon={BoltIcon} size="md" color="var(--chakra-colors-blue-500)" style={{ flexShrink: "0" }} />
                           <VStack align="start" gap={1} flex="1">
                             <Text fontSize="sm" fontWeight="medium">
                               Acción Recomendada

@@ -1,7 +1,7 @@
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Box, VStack, Text, Button, Alert } from '@chakra-ui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { CardWrapper } from '../ui';
+import { CardWrapper, Icon } from '../ui';
 
 interface Props {
   children: ReactNode;
@@ -54,7 +54,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <CardWrapper>
             <CardWrapper.Body>
               <VStack gap="6" textAlign="center">
-                <ExclamationTriangleIcon className="w-16 h-16 text-red-500 mx-auto" />
+                <Icon icon={ExclamationTriangleIcon} size="2xl" color="red.500" />
                 
                 <VStack gap="2">
                   <Text fontSize="xl" fontWeight="bold" color="red.500">

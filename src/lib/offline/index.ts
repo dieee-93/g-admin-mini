@@ -96,7 +96,7 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
 };
 
 // Service Worker Communication
-export const sendMessageToSW = async (message: any): Promise<any> => {
+export const sendMessageToSW = async (message: unknown): Promise<any> => {
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     return new Promise((resolve, reject) => {
       const messageChannel = new MessageChannel();
@@ -129,7 +129,7 @@ export const installPWA = (): Promise<boolean> => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       
-      deferredPrompt.userChoice.then((choiceResult: any) => {
+      deferredPrompt.userChoice.then((choiceResult: unknown) => {
         console.log('[PWA] User choice:', choiceResult.outcome);
         (window as any).deferredPrompt = null;
         resolve(choiceResult.outcome === 'accepted');

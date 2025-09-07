@@ -33,6 +33,7 @@ import {
   PlayCircleIcon,
   PauseCircleIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 import type { Employee, StaffViewState, TrainingRecord } from '../../types';
 
 interface TrainingSectionProps {
@@ -260,7 +261,7 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
         <CardWrapper .Root>
           <CardWrapper .Body textAlign="center">
             <VStack gap="2">
-              <BookOpenIcon className="w-6 h-6 text-blue-500 mx-auto" />
+              <Icon icon={BookOpenIcon} size="lg" color="var(--chakra-colors-blue-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.total}</Text>
               <Text fontSize="sm" color="gray.600">Total Entrenamientos</Text>
             </VStack>
@@ -270,7 +271,7 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
         <CardWrapper .Root>
           <CardWrapper .Body textAlign="center">
             <VStack gap="2">
-              <CheckCircleIcon className="w-6 h-6 text-green-500 mx-auto" />
+              <Icon icon={CheckCircleIcon} size="lg" color="var(--chakra-colors-green-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.completed}</Text>
               <Text fontSize="sm" color="gray.600">Completados</Text>
             </VStack>
@@ -280,7 +281,7 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
         <CardWrapper .Root>
           <CardWrapper .Body textAlign="center">
             <VStack gap="2">
-              <ClockIcon className="w-6 h-6 text-blue-500 mx-auto" />
+              <Icon icon={ClockIcon} size="lg" color="var(--chakra-colors-blue-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.inProgress}</Text>
               <Text fontSize="sm" color="gray.600">En Progreso</Text>
             </VStack>
@@ -290,7 +291,7 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
         <CardWrapper .Root>
           <CardWrapper .Body textAlign="center">
             <VStack gap="2">
-              <ExclamationTriangleIcon className="w-6 h-6 text-red-500 mx-auto" />
+              <Icon icon={ExclamationTriangleIcon} size="lg" color="var(--chakra-colors-red-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.expired + trainingStats.expiringSoon}</Text>
               <Text fontSize="sm" color="gray.600">Requiere Atención</Text>
             </VStack>
@@ -304,17 +305,17 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="records" gap="2" flex="1" minH="44px">
-                <DocumentTextIcon className="w-5 h-5" />
+                <Icon icon={DocumentTextIcon} size="md" />
                 <Text display={{ base: "none", sm: "block" }}>Registros</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="catalog" gap="2" flex="1" minH="44px">
-                <BookOpenIcon className="w-5 h-5" />
+                <Icon icon={BookOpenIcon} size="md" />
                 <Text display={{ base: "none", sm: "block" }}>Catálogo</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="schedule" gap="2" flex="1" minH="44px">
-                <CalendarDaysIcon className="w-5 h-5" />
+                <Icon icon={CalendarDaysIcon} size="md" />
                 <Text display={{ base: "none", sm: "block" }}>Programar</Text>
               </Tabs.Trigger>
             </Tabs.List>
@@ -435,10 +436,10 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                               {record.expiry_date && (
                                 <HStack gap="1">
                                   {isExpiringSoon(record.expiry_date) && (
-                                    <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" />
+                                    <Icon icon={ExclamationTriangleIcon} size="sm" color="var(--chakra-colors-orange-500)" />
                                   )}
                                   {isExpired(record.expiry_date) && (
-                                    <ExclamationTriangleIcon className="w-4 h-4 text-red-500" />
+                                    <Icon icon={ExclamationTriangleIcon} size="sm" color="var(--chakra-colors-red-500)" />
                                   )}
                                   <Text color={
                                     isExpired(record.expiry_date) ? 'red.500' :
@@ -454,13 +455,13 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                             <HStack gap="2">
                               {record.certificate_url && (
                                 <Button size="sm" variant="outline" colorPalette="green">
-                                  <TrophyIcon className="w-4 h-4 mr-2" />
+                                  <Icon icon={TrophyIcon} size="sm" style={{marginRight: '8px'}} />
                                   Ver Certificado
                                 </Button>
                               )}
                               {record.status === 'in_progress' && (
                                 <Button size="sm" variant="outline" colorPalette="blue">
-                                  <PlayCircleIcon className="w-4 h-4 mr-2" />
+                                  <Icon icon={PlayCircleIcon} size="sm" style={{marginRight: '8px'}} />
                                   Continuar
                                 </Button>
                               )}
@@ -484,7 +485,7 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                   <HStack justify="space-between">
                     <Text fontSize="lg" fontWeight="semibold">Catálogo de Cursos</Text>
                     <Button colorPalette="blue">
-                      <PlusIcon className="w-4 h-4 mr-2" />
+                      <Icon icon={PlusIcon} size="sm" style={{marginRight: '8px'}} />
                       Nuevo Curso
                     </Button>
                   </HStack>
@@ -519,7 +520,7 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                             </HStack>
 
                             <Button size="sm" colorPalette="blue" w="full">
-                              <UserGroupIcon className="w-4 h-4 mr-2" />
+                              <Icon icon={UserGroupIcon} size="sm" style={{marginRight: '8px'}} />
                               Asignar a Empleados
                             </Button>
                           </VStack>

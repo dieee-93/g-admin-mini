@@ -7,6 +7,7 @@ import {
   InformationCircleIcon,
   XMarkIcon 
 } from '@heroicons/react/24/outline'
+import { Icon } from './Icon'
 
 interface AlertProps {
   children: ReactNode
@@ -100,7 +101,7 @@ export function Alert({
       <HStack gap="md" width="full" align="start">
         {showIcon && (
           <AlertIcon>
-            {customIcon || <StatusIcon style={{ width: '20px', height: '20px' }} />}
+            {customIcon || <Icon icon={StatusIcon} size="md" />}
           </AlertIcon>
         )}
         
@@ -135,7 +136,7 @@ export function Alert({
               alignItems="center"
               justifyContent="center"
             >
-              <XMarkIcon style={{ width: '16px', height: '16px' }} />
+              <Icon icon={XMarkIcon} size="sm" />
             </Box>
           </AlertAction>
         )}

@@ -6,7 +6,6 @@ import {
   HStack, 
   Text, 
   Heading, 
-  CardWrapper , 
   SimpleGrid, 
   Badge, 
   Button,
@@ -22,6 +21,7 @@ import {
   CurrencyDollarIcon,
   ShoppingCartIcon
 } from '@heroicons/react/24/outline';
+import { Icon, CardWrapper } from '@/shared/ui';
 
 const DashboardForecasting: React.FC = () => {
   const [activeModel, setActiveModel] = useState('demand');
@@ -178,7 +178,7 @@ const DashboardForecasting: React.FC = () => {
           <CardWrapper .Body>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
               {mlModels.map((model) => {
-                const Icon = model.icon;
+                const IconComponent = model.icon;
                 return (
                   <CardWrapper .Root 
                     key={model.id} 
@@ -195,7 +195,7 @@ const DashboardForecasting: React.FC = () => {
                     <CardWrapper .Body>
                       <VStack align="start" gap="4">
                         <HStack justify="space-between" w="full">
-                          <Icon className="w-8 h-8 text-purple-500" />
+                          <Icon icon={IconComponent} size="2xl" color="var(--chakra-colors-purple-500)" />
                           <VStack align="end" gap="1">
                             <Badge 
                               colorPalette={getStatusColor(model.status)}
@@ -260,7 +260,7 @@ const DashboardForecasting: React.FC = () => {
         <CardWrapper .Root w="full">
           <CardWrapper .Header>
             <HStack gap="2">
-              <CpuChipIcon className="w-5 h-5 text-blue-500" />
+              <Icon icon={CpuChipIcon} size="md" color="var(--chakra-colors-blue-500)" />
               <Text fontSize="lg" fontWeight="semibold">Model Performance Overview</Text>
             </HStack>
           </CardWrapper .Header>

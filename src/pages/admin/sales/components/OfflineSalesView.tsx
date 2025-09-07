@@ -244,11 +244,11 @@ export function OfflineSalesView() {
 
   const setupSyncEventListeners = () => {
     // Listen for sync events
-    offlineSync.on('syncStarted', (data: any) => {
+    offlineSync.on('syncStarted', (data: unknown) => {
       setSyncProgress(0);
     });
 
-    offlineSync.on('syncCompleted', (data: any) => {
+    offlineSync.on('syncCompleted', (data: unknown) => {
       setSyncProgress(100);
       loadOfflineSales(); // Refresh offline sales after sync
       notify.success({
@@ -257,7 +257,7 @@ export function OfflineSalesView() {
       });
     });
 
-    offlineSync.on('syncFailed', (data: any) => {
+    offlineSync.on('syncFailed', (data: unknown) => {
       notify.error({
         title: "Error de sincronización",
         description: "Algunas ventas no se pudieron sincronizar. Se reintentará automáticamente.",
@@ -371,7 +371,7 @@ export function OfflineSalesView() {
     }
   }, [canProcessSale, isOnline, validateCartStock, getSaleData, selectedCustomerId, note]);
 
-  const processOfflineSale = async (saleData: any) => {
+  const processOfflineSale = async (saleData: unknown) => {
     try {
       const offlineSale: OfflineSale = {
         id: `offline_sale_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -739,7 +739,7 @@ export function OfflineSalesView() {
                         <input 
                           placeholder="Nota adicional para la venta..."
                           value={note}
-                          onChange={(e: any) => setNote(e.target.value)}
+                          onChange={(e: unknown) => setNote(e.target.value)}
                           style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
                         />
                     </Stack>

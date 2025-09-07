@@ -1,8 +1,15 @@
 import { supabase } from '@/lib/supabase/client';
+import { 
+  calculateProductMaterialsCost,
+  analyzeProductionViability,
+  type MaterialCost as MaterialCostEngine,
+  type ProductCostBreakdown as ProductCostBreakdownEngine,
+  type ProductionViability
+} from '@/business-logic/products/productMaterialsCostEngine';
 
 /**
  * Service for connecting Products cost analysis with real Materials data
- * Eliminates hardcoded mock data in CostAnalysisTab
+ * Now uses centralized business logic with decimal precision
  */
 
 export interface MaterialCost {
@@ -26,6 +33,7 @@ export class ProductCostAnalysisService {
   
   /**
    * Get real materials cost for a product based on its recipe
+   * Now uses centralized calculation engine with decimal precision
    */
   static async getProductMaterialsCost(productId: string): Promise<ProductCostBreakdown | null> {
     try {
@@ -70,51 +78,64 @@ export class ProductCostAnalysisService {
       );
 
       if (!recipeComponent?.recipes) {
-        // No recipe found - product doesn't have material costs
-        return {
+        // No recipe found - return empty cost structure
+        const emptyResult = calculateProductMaterialsCost({
           product_id: productId,
           product_name: productData.name,
-          total_materials_cost: 0,
-          materials_breakdown: [],
           recipe_yield: 1,
-          cost_per_unit: 0
+          ingredients: []
+        });
+
+        return {
+          product_id: emptyResult.product_id,
+          product_name: emptyResult.product_name,
+          total_materials_cost: emptyResult.total_materials_cost,
+          materials_breakdown: emptyResult.materials_breakdown.map(item => ({
+            item_id: item.item_id,
+            item_name: item.item_name,
+            unit_cost: item.unit_cost,
+            unit: item.unit,
+            available_quantity: item.available_quantity
+          })),
+          recipe_yield: emptyResult.recipe_yield,
+          cost_per_unit: emptyResult.cost_per_unit
         };
       }
 
       const recipe = recipeComponent.recipes;
 
-      // Calculate materials costs
-      const materialsBreakdown: MaterialCost[] = [];
-      let totalMaterialsCost = 0;
+      // Prepare ingredients data for centralized calculation
+      const ingredients = recipe.recipe_ingredients ? recipe.recipe_ingredients.map((ingredient: any) => ({
+        item_id: ingredient.items.id,
+        item_name: ingredient.items.name,
+        quantity: ingredient.quantity,
+        item_cost: ingredient.items.cost || 0,
+        unit: ingredient.items.unit || 'unidad',
+        available_quantity: ingredient.items.stock_quantity || 0
+      })) : [];
 
-      if (recipe.recipe_ingredients) {
-        for (const ingredient of recipe.recipe_ingredients) {
-          const item = ingredient.items;
-          if (item) {
-            const lineCost = ingredient.quantity * (item.cost || 0);
-            totalMaterialsCost += lineCost;
-
-            materialsBreakdown.push({
-              item_id: item.id,
-              item_name: item.name,
-              unit_cost: item.cost || 0,
-              unit: item.unit || 'unidad',
-              available_quantity: item.stock_quantity || 0
-            });
-          }
-        }
-      }
-
-      const recipeYield = recipe.output_quantity || 1;
-      const costPerUnit = totalMaterialsCost / recipeYield;
-
-      return {
+      // Use centralized calculation engine with decimal precision
+      const costResult = calculateProductMaterialsCost({
         product_id: productId,
         product_name: productData.name,
-        total_materials_cost: totalMaterialsCost,
-        materials_breakdown: materialsBreakdown,
-        recipe_yield: recipeYield,
-        cost_per_unit: costPerUnit
+        recipe_yield: recipe.output_quantity || 1,
+        ingredients
+      });
+
+      // Convert to service interface format
+      return {
+        product_id: costResult.product_id,
+        product_name: costResult.product_name,
+        total_materials_cost: costResult.total_materials_cost,
+        materials_breakdown: costResult.materials_breakdown.map(item => ({
+          item_id: item.item_id,
+          item_name: item.item_name,
+          unit_cost: item.unit_cost,
+          unit: item.unit,
+          available_quantity: item.available_quantity
+        })),
+        recipe_yield: costResult.recipe_yield,
+        cost_per_unit: costResult.cost_per_unit
       };
 
     } catch (error) {
@@ -157,6 +178,7 @@ export class ProductCostAnalysisService {
 
   /**
    * Validate if product can be produced with current inventory
+   * Now uses centralized production viability analysis with decimal precision
    */
   static async validateProductionViability(productId: string, batchSize: number = 1): Promise<{
     can_produce: boolean;
@@ -174,28 +196,66 @@ export class ProductCostAnalysisService {
         };
       }
 
-      const insufficientMaterials: string[] = [];
-      let maxPossibleBatches = 999;
+      // Prepare data for centralized analysis
+      const materialsRequired = costBreakdown.materials_breakdown.map(material => ({
+        item_id: material.item_id,
+        item_name: material.item_name,
+        required_quantity: batchSize, // Simplified - should use actual recipe quantities
+        available_quantity: material.available_quantity,
+        unit_cost: material.unit_cost
+      }));
 
-      for (const material of costBreakdown.materials_breakdown) {
-        const requiredQuantity = batchSize; // Simplified - should use recipe quantities
-        
-        if (material.available_quantity < requiredQuantity) {
-          insufficientMaterials.push(material.item_name);
-        }
+      // Use centralized production viability analysis with decimal precision
+      const viabilityResult = analyzeProductionViability({
+        product_id: productId,
+        product_name: costBreakdown.product_name,
+        materials_required: materialsRequired,
+        batch_size: batchSize
+      });
 
-        const possibleBatches = Math.floor(material.available_quantity / requiredQuantity);
-        maxPossibleBatches = Math.min(maxPossibleBatches, possibleBatches);
-      }
+      // Extract insufficient materials from detailed analysis
+      const insufficientMaterials = viabilityResult.required_materials
+        .filter(material => material.shortage !== undefined)
+        .map(material => material.item_name);
 
       return {
-        can_produce: insufficientMaterials.length === 0,
+        can_produce: viabilityResult.can_produce,
         insufficient_materials: insufficientMaterials,
-        max_possible_batches: Math.max(0, maxPossibleBatches)
+        max_possible_batches: viabilityResult.max_possible_batches
       };
 
     } catch (error) {
       console.error('Error validating production viability:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get detailed production analysis (new method using centralized engine)
+   */
+  static async getDetailedProductionAnalysis(productId: string, batchSize: number = 1): Promise<ProductionViability | null> {
+    try {
+      const costBreakdown = await this.getProductMaterialsCost(productId);
+      
+      if (!costBreakdown) return null;
+
+      const materialsRequired = costBreakdown.materials_breakdown.map(material => ({
+        item_id: material.item_id,
+        item_name: material.item_name,
+        required_quantity: batchSize,
+        available_quantity: material.available_quantity,
+        unit_cost: material.unit_cost
+      }));
+
+      return analyzeProductionViability({
+        product_id: productId,
+        product_name: costBreakdown.product_name,
+        materials_required: materialsRequired,
+        batch_size: batchSize
+      });
+
+    } catch (error) {
+      console.error('Error getting detailed production analysis:', error);
       throw error;
     }
   }

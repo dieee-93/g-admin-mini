@@ -1,4 +1,5 @@
 // src/features/customers/ui/CustomerList.tsx - Design System v2.0
+// MIGRATED: Now uses centralized financial calculations
 import { 
   Stack,
   CardWrapper ,
@@ -8,6 +9,7 @@ import {
   Alert,
   Table
 } from '@/shared/ui';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
 import { useState } from 'react';
 import { useCustomers, useCustomerSearch } from '../hooks/useCustomers';
@@ -30,12 +32,7 @@ export function CustomerList() {
     </Stack>
   );
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
+  // MIGRATED: Use centralized currency formatting
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
@@ -272,7 +269,7 @@ export function CustomerList() {
                       <Table.Cell>
                         <Stack direction="column" align="start" gap="none">
                           <Typography fontWeight="medium" >
-                            {formatCurrency(customerWithStats?.stats?.total_spent || 0)}
+                            {QuickCalculations.formatCurrency(customerWithStats?.stats?.total_spent || 0)}
                           </Typography>
                           <Typography size="xs" color="text.muted">
                             total

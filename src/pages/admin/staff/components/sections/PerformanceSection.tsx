@@ -1,21 +1,23 @@
 // Staff Performance Section - Real Analytics with Interactive Charts
 import { useState, useEffect } from 'react';
 import { 
-  Box, 
   VStack, 
   HStack, 
-  Text, 
-  Badge, 
   SimpleGrid,
-  Button,
+  Badge,
   Avatar,
   CardWrapper,
-  Spinner,
   Alert,
-  Progress,
-  Tabs,
-  Select
+  Tabs
 } from '@/shared/ui';
+import { 
+  Box, 
+  Text,
+  Button,
+  Spinner,
+  Progress,
+  Select
+} from '@chakra-ui/react';
 import { 
   ChartBarIcon,
   TrophyIcon,
@@ -28,6 +30,7 @@ import {
   CalendarIcon,
   EyeIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 import { useStaffWithLoader } from '@/hooks/useStaffData';
 import staffApi from '@/services/staff/staffApi';
 import type { StaffViewState } from '../../types';
@@ -175,7 +178,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
         <CardWrapper variant="flat" padding="md">
           <CardWrapper.Body textAlign="center">
-            <TrophyIcon className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
+            <Icon icon={TrophyIcon} size="lg" color="var(--chakra-colors-yellow-500)" style={{marginLeft: 'auto', marginRight: 'auto', marginBottom: '8px'}} />
             <Text fontSize="2xl" fontWeight="bold">{overallMetrics.avgPerformance}%</Text>
             <Text fontSize="sm" color="gray.600">Rendimiento Promedio</Text>
             {performanceTrends.length > 1 && (
@@ -184,9 +187,9 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                   performanceTrends[performanceTrends.length - 1]?.avgPerformance || 0,
                   performanceTrends[performanceTrends.length - 2]?.avgPerformance || 0
                 ).direction === 'up' ? (
-                  <ArrowTrendingUpIcon className="w-3 h-3 text-green-500" />
+                  <Icon icon={ArrowTrendingUpIcon} size="xs" color="var(--chakra-colors-green-500)" />
                 ) : (
-                  <ArrowTrendingDownIcon className="w-3 h-3 text-red-500" />
+                  <Icon icon={ArrowTrendingDownIcon} size="xs" color="var(--chakra-colors-red-500)" />
                 )}
                 <Text fontSize="xs" color="gray.500">vs mes anterior</Text>
               </HStack>
@@ -196,7 +199,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
 
         <CardWrapper variant="flat" padding="md">
           <CardWrapper.Body textAlign="center">
-            <ClockIcon className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+            <Icon icon={ClockIcon} size="lg" color="var(--chakra-colors-blue-500)" style={{marginLeft: 'auto', marginRight: 'auto', marginBottom: '8px'}} />
             <Text fontSize="2xl" fontWeight="bold">{overallMetrics.avgAttendance}%</Text>
             <Text fontSize="sm" color="gray.600">Asistencia Promedio</Text>
           </CardWrapper.Body>
@@ -204,7 +207,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
 
         <CardWrapper variant="flat" padding="md">
           <CardWrapper.Body textAlign="center">
-            <StarIcon className="w-6 h-6 text-purple-500 mx-auto mb-2" />
+            <Icon icon={StarIcon} size="lg" color="var(--chakra-colors-purple-500)" style={{marginLeft: 'auto', marginRight: 'auto', marginBottom: '8px'}} />
             <Text fontSize="2xl" fontWeight="bold">{overallMetrics.topPerformerCount}</Text>
             <Text fontSize="sm" color="gray.600">Top Performers</Text>
             <Text fontSize="xs" color="gray.500">(≥90% rendimiento)</Text>
@@ -213,7 +216,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
 
         <CardWrapper variant="flat" padding="md">
           <CardWrapper.Body textAlign="center">
-            <CheckCircleIcon className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+            <Icon icon={CheckCircleIcon} size="lg" color="var(--chakra-colors-orange-500)" style={{marginLeft: 'auto', marginRight: 'auto', marginBottom: '8px'}} />
             <Text fontSize="2xl" fontWeight="bold">{overallMetrics.needsImprovementCount}</Text>
             <Text fontSize="sm" color="gray.600">Necesita Mejora</Text>
             <Text fontSize="xs" color="gray.500">(&lt;75% rendimiento)</Text>

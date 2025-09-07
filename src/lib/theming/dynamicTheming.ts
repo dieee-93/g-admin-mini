@@ -583,7 +583,7 @@ export const createThemeSystem = (themeId: string) => {
 /**
  * Get the current theme system based on store state
  */
-export const getCurrentThemeSystem = (currentTheme: any) => {
+export const getCurrentThemeSystem = (currentTheme: unknown) => {
   if (!currentTheme) {
     return createSystem(defaultConfig) // ✅ DefaultConfig para fallback
   }

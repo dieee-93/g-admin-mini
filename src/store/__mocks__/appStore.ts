@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import { createStore } from 'zustand/vanilla';
 
 const appStore = createStore(() => ({

@@ -1,4 +1,5 @@
 // LaborCostTracker - Track and analyze labor costs, overtime, and budget performance
+// MIGRATED: Now uses centralized business logic for precise calculations
 import { useState, useEffect } from 'react';
 import { 
   Box, 
@@ -14,6 +15,11 @@ import {
   Select,
   Stack
 } from '@chakra-ui/react';
+import { 
+  QuickCalculations,
+  DecimalUtils
+} from '@/business-logic/shared/FinancialCalculations';
+import * as TableOperations from '@/business-logic/operations/tableOperations';
 import { 
   CurrencyDollarIcon,
   ChartBarIcon,
@@ -445,7 +451,11 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                 </Table.Cell>
                 <Table.Cell>
                   <Text fontWeight="semibold">
-                    {costBreakdown.reduce((sum, item) => sum + item.regular_hours + item.overtime_hours, 0)}h
+                    {QuickCalculations.formatNumber(
+                      costBreakdown.reduce((sum, item) => 
+                        DecimalUtils.financial.add(sum, DecimalUtils.financial.add(item.regular_hours, item.overtime_hours)), 0
+                      )
+                    )}h
                   </Text>
                 </Table.Cell>
                 <Table.Cell>
@@ -516,7 +526,11 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                       </HStack>
                       <HStack justify="space-between">
                         <Text fontSize="sm">Total Hours</Text>
-                        <Text fontSize="sm">{week.regular_hours + week.overtime_hours}h</Text>
+                        <Text fontSize="sm">
+                          {QuickCalculations.formatNumber(
+                            DecimalUtils.financial.add(week.regular_hours, week.overtime_hours)
+                          )}h
+                        </Text>
                       </HStack>
                       <HStack justify="space-between">
                         <Text fontSize="sm">Avg Rate</Text>

@@ -24,7 +24,7 @@ import { useRecipes } from '../hooks/useRecipes';
 import { MaterialSelector } from '@/shared/components/MaterialSelector';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
 import type { Recipe } from '../types';
-import { CardWrapper, Stack } from '@/shared/ui';
+import { CardWrapper, Stack, Icon } from '@/shared/ui';
 interface RecipeFormProps {
   recipe?: Recipe;
   onSave?: (recipe: Recipe) => void;
@@ -311,8 +311,8 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
                 onClick={addIngredient}
                 disabled={currentQuantity <= 0 || (material.type === 'ELABORATED' && !stockValidation.isValid)}
                 height="40px"
-                leftIcon={<PlusIcon className="w-4 h-4" />}
               >
+                <Icon icon={PlusIcon} size="sm" />
                 Agregar
               </Button>
               
@@ -347,7 +347,7 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
       <CardWrapper>
         <CardWrapper.Header>
           <Flex align="center" gap="3">
-            <BeakerIcon className="w-6 h-6" />
+            <Icon icon={BeakerIcon} size="lg" />
             <Text fontSize="lg" fontWeight="semibold">
               {recipe ? 'Editar Receta' : 'Nueva Receta'}
             </Text>
@@ -473,7 +473,7 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
                             size="sm"
                             onClick={() => removeIngredient(index)}
                           >
-                            <TrashIcon className="w-4 h-4" />
+                            <Icon icon={TrashIcon} size="sm" />
                           </IconButton>
                         </Flex>
                       </CardWrapper.Body>

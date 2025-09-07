@@ -83,7 +83,7 @@ export const RecipeFormIngredients: React.FC<RecipeFormIngredientsProps> = ({
                     </Select.Control>
                     <Select.Positioner>
                       <Select.Content>
-                        {ingredientItemsCollection.items.map((item: any) => (
+                        {ingredientItemsCollection.items.map((item: unknown) => (
                           <Select.Item key={item.value} item={item}>
                             <Select.ItemText>{item.label}</Select.ItemText>
                           </Select.Item>

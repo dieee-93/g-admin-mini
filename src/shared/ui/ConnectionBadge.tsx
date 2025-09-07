@@ -6,11 +6,12 @@ import {
   Badge,
   Box,
   Spinner,
+  Text,
   TooltipRoot,
   TooltipTrigger,
   TooltipContent
 } from '@chakra-ui/react';
-import { Typography } from '@/shared/ui';
+import { Typography, Icon } from '@/shared/ui';
 import {
   WifiIcon,
   CloudIcon,
@@ -71,8 +72,7 @@ export function ConnectionBadge({
   // Build display text
   const displayText = showText ? (text + (showQueueSize && queueSize > 0 ? ' (' + queueSize + ')' : '')) : null;
 
-  // Icon and spinner sizes
-  const iconClass = size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4';
+  // Spinner sizes
   const spinnerSize = size === 'sm' ? 'xs' : size === 'lg' ? 'md' : 'sm';
 
   return (
@@ -92,7 +92,10 @@ export function ConnectionBadge({
               {showSpinner ? (
                 <Spinner size={spinnerSize} color="current" />
               ) : (
-                <IconComponent className={iconClass} />
+                <Icon 
+                  icon={IconComponent} 
+                  size={size === 'sm' ? 'xs' : size === 'lg' ? 'lg' : 'sm'} 
+                />
               )}
             </Box>
           )}

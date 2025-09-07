@@ -11,6 +11,7 @@ import {
   Skeleton,
   IconButton
 } from '@chakra-ui/react';
+import { Icon } from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   BellIcon,
@@ -58,12 +59,12 @@ export const AlertBadge = memo(function AlertBadge({
   // Memoize expensive calculations
   const icon = useMemo(() => {
     if (hasCritical) {
-      return <FireIcon className="w-4 h-4" />;
+      return <Icon icon={FireIcon} size="sm" />;
     }
     if (criticalCount > 0) {
-      return <ExclamationTriangleIcon className="w-4 h-4" />;
+      return <Icon icon={ExclamationTriangleIcon} size="sm" />;
     }
-    return <BellIcon className="w-4 h-4" />;
+    return <Icon icon={BellIcon} size="sm" />;
   }, [hasCritical, criticalCount]);
 
   const badgeSize = useMemo(() => {

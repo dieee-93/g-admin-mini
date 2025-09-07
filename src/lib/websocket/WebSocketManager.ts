@@ -73,7 +73,7 @@ interface PendingAck {
   messageId: string;
   timestamp: number;
   timeout: number;
-  resolve: (value: any) => void;
+  resolve: (value: unknown) => void;
   reject: (error: Error) => void;
 }
 
@@ -98,7 +98,7 @@ export class WebSocketManager {
   };
 
   // Event listeners
-  private listeners = new Map<string, Set<(data: any) => void>>();
+  private listeners = new Map<string, Set<(data: unknown) => void>>();
   
   // Enhanced reconnection management
   private lastHeartbeatResponse = 0;
@@ -326,7 +326,7 @@ export class WebSocketManager {
   /**
    * Subscribe to specific message types
    */
-  public subscribe(messageType: WSMessageType, callback: (data: any) => void): () => void {
+  public subscribe(messageType: WSMessageType, callback: (data: unknown) => void): () => void {
     if (!this.listeners.has(messageType)) {
       this.listeners.set(messageType, new Set());
     }
@@ -493,7 +493,7 @@ export class WebSocketManager {
     });
   }
 
-  private handleConnectionError(error: any): void {
+  private handleConnectionError(error: unknown): void {
     console.error('WebSocket connection error:', error);
     this.setState('failed');
     this.stats.failedConnections++;
@@ -755,7 +755,7 @@ export class WebSocketManager {
     }
   }
 
-  private handleNotificationMessage(data: any): void {
+  private handleNotificationMessage(data: unknown): void {
     const { type, title, message, priority } = data;
     
     switch (priority) {

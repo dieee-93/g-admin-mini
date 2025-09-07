@@ -19,6 +19,7 @@ import {
   BeakerIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 
 // AI Suggestions Interfaces
 interface IngredientSubstitution {
@@ -94,7 +95,7 @@ export function RecipeAISuggestions({
       <CardWrapper .Header>
         <HStack justify="space-between">
           <HStack gap={2}>
-            <LightBulbIcon className="w-5 h-5 text-purple-500" />
+            <Icon icon={LightBulbIcon} size="md" color="var(--chakra-colors-purple-500)" />
             <Text fontSize="md" fontWeight="bold" color="purple.700">
               🧠 Sugerencias de IA
             </Text>
@@ -113,7 +114,7 @@ export function RecipeAISuggestions({
           <Tabs.List>
             <Tabs.Trigger value="substitutions">
               <HStack gap={1}>
-                <ArrowPathIcon className="w-3 h-3" />
+                <Icon icon={ArrowPathIcon} size="xs" />
                 <Text fontSize="sm">Sustituciones</Text>
                 {suggestions.substitutions.length > 0 && (
                   <Badge size="sm" colorPalette="purple">{suggestions.substitutions.length}</Badge>
@@ -123,7 +124,7 @@ export function RecipeAISuggestions({
             
             <Tabs.Trigger value="optimization">
               <HStack gap={1}>
-                <CurrencyDollarIcon className="w-3 h-3" />
+                <Icon icon={CurrencyDollarIcon} size="xs" />
                 <Text fontSize="sm">Optimización</Text>
                 {suggestions.costOptimizations.length > 0 && (
                   <Badge size="sm" colorPalette="green">{suggestions.costOptimizations.length}</Badge>
@@ -133,14 +134,14 @@ export function RecipeAISuggestions({
             
             <Tabs.Trigger value="yield">
               <HStack gap={1}>
-                <ScaleIcon className="w-3 h-3" />
+                <Icon icon={ScaleIcon} size="xs" />
                 <Text fontSize="sm">Rendimiento</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="nutrition">
               <HStack gap={1}>
-                <BeakerIcon className="w-3 h-3" />
+                <Icon icon={BeakerIcon} size="xs" />
                 <Text fontSize="sm">Nutrición</Text>
                 {suggestions.nutritionalInsights.length > 0 && (
                   <Badge size="sm" colorPalette="orange">{suggestions.nutritionalInsights.length}</Badge>
@@ -173,7 +174,7 @@ export function RecipeAISuggestions({
                               </VStack>
                               {isApplied ? (
                                 <Badge colorPalette="green" size="sm">
-                                  <CheckCircleIcon className="w-3 h-3 mr-1" />
+                                  <Icon icon={CheckCircleIcon} size="xs" style={{marginRight: '4px'}} />
                                   Aplicado
                                 </Badge>
                               ) : (

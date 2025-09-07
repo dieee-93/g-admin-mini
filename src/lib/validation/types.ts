@@ -9,7 +9,7 @@ export interface ValidationRule {
     min?: number;
     max?: number;
     pattern?: RegExp;
-    custom?: (value: any) => boolean | string;
+    custom?: (value: unknown) => boolean | string;
     type?: 'string' | 'number' | 'email' | 'phone' | 'currency' | 'date';
   };
   message?: string;

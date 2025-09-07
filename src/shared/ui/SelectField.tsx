@@ -64,8 +64,7 @@ export function SelectField({
   variant = 'outline',
   height = 'auto',
   width = 'full',
-  children,
-  renderItem,
+  childrenItem,
   noPortal = false,
 }: SelectFieldProps) {
   // ✅ Recipes handle theming automatically
@@ -121,7 +120,7 @@ export function SelectField({
 {noPortal ? (
           <Select.Positioner>
             <Select.Content>
-              {finalCollection.items.map((item: any) => (
+              {finalCollection.items.map((item: unknown) => (
                 <Select.Item item={item} key={item.value}>
                   {renderItem ? renderItem(item) : item.label}
                   <Select.ItemIndicator />
@@ -134,7 +133,7 @@ export function SelectField({
           <Portal>
             <Select.Positioner>
               <Select.Content>
-                {finalCollection.items.map((item: any) => (
+                {finalCollection.items.map((item: unknown) => (
                   <Select.Item item={item} key={item.value}>
                     {renderItem ? renderItem(item) : item.label}
                     <Select.ItemIndicator />

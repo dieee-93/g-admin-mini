@@ -3,8 +3,8 @@
 // ============================================================================
 // Tests de auditoría pre-testing según FASE 0 del masterplan
 
-import { describe, test, expect, beforeAll } from 'vitest';
-import { AlertUtils, type Alert, type CreateAlertInput } from '@/shared/alerts';
+import { describe, test, expect } from 'vitest';
+import { AlertUtils } from '@/shared/alerts';
 import { SmartAlertsEngine, type SmartAlert } from '@/business-logic/inventory/smartAlertsEngine';
 import { SmartAlertsAdapter } from '@/business-logic/inventory/smartAlertsAdapter';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
@@ -130,7 +130,7 @@ describe('🚨 ALERTS SYSTEM INTEGRATION AUDIT', () => {
         'abc_reclassification': 'business'
       };
 
-      Object.entries(typeMapping).forEach(([smartType, expectedUnifiedType]) => {
+      Object.entries(typeMapping).forEach(([, expectedUnifiedType]) => {
         // This would be tested in the actual adapter
         expect(expectedUnifiedType).toMatch(/^(stock|business|operational)$/);
       });
@@ -144,7 +144,7 @@ describe('🚨 ALERTS SYSTEM INTEGRATION AUDIT', () => {
         'info': 'low'
       };
 
-      Object.entries(severityMapping).forEach(([smartSeverity, expectedUnifiedSeverity]) => {
+      Object.entries(severityMapping).forEach(([, expectedUnifiedSeverity]) => {
         expect(expectedUnifiedSeverity).toMatch(/^(critical|high|medium|low)$/);
       });
     });
@@ -319,37 +319,7 @@ describe('🔗 INTEGRATION POINTS MAPPING AUDIT', () => {
       // This would be a more complex integration test in a real environment
       // For now, verify the hook structure and dependencies
       
-      // Mock the expected interface
-      interface UseSmartInventoryAlertsReturn {
-        materialsLoading: boolean;
-        alertsLoading: boolean;
-        isGeneratingAlerts: boolean;
-        materials: MaterialABC[];
-        activeAlerts: Alert[];
-        criticalAlerts: Alert[];
-        alertsCount: number;
-        refreshAlerts: () => Promise<void>;
-        resolveOutdatedAlerts: () => Promise<void>;
-        generateAndUpdateAlerts: () => Promise<void>;
-        analytics: {
-          totalItemsMonitored: number;
-          itemsWithAlerts: number;
-          alertsByClass: Record<'A' | 'B' | 'C', number>;
-          mostCriticalItems: Array<{
-            id: string;
-            name: string;
-            abcClass: 'A' | 'B' | 'C';
-            alertCount: number;
-            maxSeverity: string;
-          }>;
-        };
-        ui: {
-          badgeCount: number;
-          badgeColor: 'red' | 'orange' | 'yellow' | 'blue' | 'gray';
-          statusText: string;
-          shouldShowBadge: boolean;
-        };
-      }
+      // Mock interface would be defined here when implemented
 
       // Verify the interface structure is well-defined
       const expectedKeys = [

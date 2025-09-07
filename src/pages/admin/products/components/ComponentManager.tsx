@@ -54,7 +54,7 @@ const useProductComponents = (productId: string) => ({
   components: [] as Component[],
   loading: false,
   error: null,
-  addComponent: async (data: any) => {},
+  addComponent: async (data: unknown) => {},
   removeComponent: async (id: string) => {}
 });
 
@@ -245,11 +245,11 @@ export function ComponentManager({ product, onClose }: ComponentManagerProps) {
                   placeholder="Seleccionar item..."
                   disabled={itemsLoading || recipesLoading}
                   options={componentType === "inventory" 
-                    ? inventoryItems.map((item: any) => ({
+                    ? inventoryItems.map((item: unknown) => ({
                         value: item.id,
                         label: `${item.name} (${item.stock} ${item.unit} - $${item.unit_cost?.toFixed(2) || '0.00'})`
                       }))
-                    : elaboratedItems.map((recipe: any) => ({
+                    : elaboratedItems.map((recipe: unknown) => ({
                         value: recipe.output_item_id,
                         label: `${recipe.name} (Elaborado) - Cantidad: ${recipe.output_quantity}`
                       }))

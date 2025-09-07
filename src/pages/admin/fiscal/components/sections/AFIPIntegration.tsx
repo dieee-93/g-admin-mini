@@ -182,7 +182,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
         description: `CAE: ${data?.cae || 'Generado'}. Factura procesada correctamente.`
       });
       loadAFIPStatus();
-    } catch (error: any) {
+    } catch (error: unknown) {
       notify.error({
         title: 'Error al generar factura AFIP',
         description: error.message || 'No se pudo procesar la factura con AFIP'
@@ -229,7 +229,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
       }
       
       loadAFIPStatus();
-    } catch (error: any) {
+    } catch (error: unknown) {
       notify.error({
         title: 'Error al reintentar CAEs pendientes',
         description: error.message || 'No se pudieron procesar las facturas pendientes'

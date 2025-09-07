@@ -203,7 +203,7 @@ interface PerformanceContextType {
   metrics: PerformanceMetrics;
   startMeasurement: (name: string) => void;
   endMeasurement: (name: string) => number;
-  recordRender: (componentName: string, renderTime: number) => void;
+  recordRender: (componentName: string, time: number) => void;
   getComponentStats: (componentName: string) => {
     renders: number;
     averageTime: number;
@@ -244,7 +244,7 @@ export function PerformanceProvider({ children }: { children: React.ReactNode })
     return duration;
   }, []);
 
-  const recordRender = useCallback((componentName: string, renderTime: number) => {
+  const recordRender = useCallback((componentName: string, time: number) => {
     const stats = componentStats.current.get(componentName) || {
       renders: 0,
       totalTime: 0,
@@ -252,19 +252,19 @@ export function PerformanceProvider({ children }: { children: React.ReactNode })
     };
 
     stats.renders++;
-    stats.totalTime += renderTime;
-    stats.lastRenderTime = renderTime;
+    stats.totalTime += time;
+    stats.lastRenderTime = time;
 
     componentStats.current.set(componentName, stats);
 
     // Update global metrics - throttled to prevent infinite loops
-    if (stats.renders % 5 === 0 || renderTime > 100) {
+    if (stats.renders % 5 === 0 || time > 100) {
       setMetrics(prev => ({
         ...prev,
         renderCount: prev.renderCount + 1,
         averageRenderTime: prev.renderCount > 0 
-          ? (prev.averageRenderTime * (prev.renderCount - 1) + renderTime) / prev.renderCount
-          : renderTime
+          ? (prev.averageRenderTime * (prev.renderCount - 1) + time) / prev.renderCount
+          : time
       }));
     }
   }, []);
@@ -456,7 +456,7 @@ export function withPerformance<P extends object>(
     useEffect(() => {
       if (enableProfiling && renderStartTime.current) {
         const renderTime = window.performance.now() - renderStartTime.current;
-        performance.recordRender(componentName || Component.name, renderTime);
+        performance.recordRender(componentName || Component.name || 'Unknown', renderTime);
       }
     });
 

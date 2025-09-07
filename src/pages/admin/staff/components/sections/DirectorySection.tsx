@@ -13,7 +13,8 @@ import {
   CardWrapper,
   Input,
   Spinner,
-  Alert
+  Alert,
+  Icon
 } from '@/shared/ui';
 import { 
   MagnifyingGlassIcon,
@@ -48,7 +49,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
 
   // Apply filters and refresh data when they change
   useEffect(() => {
-    const filters: any = {};
+    const filters: unknown = {};
     
     if (searchTerm) filters.search = searchTerm;
     if (selectedDepartment !== 'all') filters.department = selectedDepartment;
@@ -129,17 +130,17 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
     return (
       <VStack gap="6" py="12" textAlign="center">
         <Box p="4" bg="gray.100" borderRadius="full">
-          <PlusIcon className="w-12 h-12 text-gray-400" />
+          <Icon icon={PlusIcon} size="xl" color="gray.400" />
         </Box>
         <VStack gap="2">
           <Text fontSize="lg" fontWeight="semibold">No hay empleados registrados</Text>
           <Text color="gray.600">Comienza agregando tu primer empleado</Text>
         </VStack>
         <Button 
-          leftIcon={<PlusIcon className="w-4 h-4" />} 
           colorPalette="blue"
           onClick={() => setShowEmployeeForm(true)}
         >
+          <Icon icon={PlusIcon} size="sm" />
           Agregar Empleado
         </Button>
       </VStack>
@@ -156,27 +157,27 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
               placeholder="Buscar por nombre, email o posición..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              startElement={<MagnifyingGlassIcon className="w-4 h-4" />}
+              startElement={<Icon icon={MagnifyingGlassIcon} size="sm" />}
             />
           </Box>
           <Button
             variant={showFilters ? 'solid' : 'outline'}
-            leftIcon={<FunnelIcon className="w-4 h-4" />}
             onClick={() => setShowFilters(!showFilters)}
           >
+            <Icon icon={FunnelIcon} size="sm" />
             Filtros
           </Button>
           <IconButton
             variant={viewState.viewMode === 'grid' ? 'solid' : 'outline'}
             onClick={() => onViewStateChange({ ...viewState, viewMode: 'grid' })}
           >
-            <Squares2X2Icon className="w-4 h-4" />
+            <Icon icon={Squares2X2Icon} size="sm" />
           </IconButton>
           <IconButton
             variant={viewState.viewMode === 'list' ? 'solid' : 'outline'}
             onClick={() => onViewStateChange({ ...viewState, viewMode: 'list' })}
           >
-            <ListBulletIcon className="w-4 h-4" />
+            <Icon icon={ListBulletIcon} size="sm" />
           </IconButton>
         </HStack>
 
@@ -269,19 +270,19 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                     </HStack>
 
                     <HStack gap="2" fontSize="sm" color="gray.600">
-                      <EnvelopeIcon className="w-4 h-4" />
+                      <Icon icon={EnvelopeIcon} size="sm" />
                       <Text>{employee.email}</Text>
                     </HStack>
 
                     {employee.phone && (
                       <HStack gap="2" fontSize="sm" color="gray.600">
-                        <PhoneIcon className="w-4 h-4" />
+                        <Icon icon={PhoneIcon} size="sm" />
                         <Text>{employee.phone}</Text>
                       </HStack>
                     )}
 
                     <HStack gap="2" fontSize="sm" color="gray.600">
-                      <ClockIcon className="w-4 h-4" />
+                      <Icon icon={ClockIcon} size="sm" />
                       <Text>Desde {new Date(employee.hire_date).toLocaleDateString()}</Text>
                     </HStack>
                   </VStack>
@@ -300,7 +301,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                           // TODO: View employee details
                         }}
                       >
-                        <EyeIcon className="w-4 h-4" />
+                        <Icon icon={EyeIcon} size="sm" />
                       </IconButton>
                       <IconButton 
                         size="sm" 
@@ -310,7 +311,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                           setShowEmployeeForm(true);
                         }}
                       >
-                        <PencilIcon className="w-4 h-4" />
+                        <Icon icon={PencilIcon} size="sm" />
                       </IconButton>
                     </HStack>
                   </HStack>
@@ -352,7 +353,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                         // TODO: View employee details
                       }}
                     >
-                      <EyeIcon className="w-4 h-4" />
+                      <Icon icon={EyeIcon} size="sm" />
                     </IconButton>
                     <IconButton 
                       size="sm" 
@@ -362,7 +363,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                         setShowEmployeeForm(true);
                       }}
                     >
-                      <PencilIcon className="w-4 h-4" />
+                      <Icon icon={PencilIcon} size="sm" />
                     </IconButton>
                   </HStack>
                 </HStack>

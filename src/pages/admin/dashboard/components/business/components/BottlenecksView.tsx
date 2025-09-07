@@ -3,7 +3,6 @@ import {
   VStack,
   HStack,
   Text,
-  CardWrapper ,
   Badge,
   SimpleGrid,
   Box
@@ -11,6 +10,7 @@ import {
 import {
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import { Icon, CardWrapper } from '@/shared/ui';
 
 interface BottleneckRecommendation {
   action: string;
@@ -61,7 +61,7 @@ export function BottlenecksView({ bottlenecks }: BottlenecksViewProps) {
             <HStack justify="space-between">
               <HStack gap={3}>
                 <Box p={2} bg={`${getBottleneckColor(bottleneck.severity)}.100`} borderRadius="md">
-                  <ExclamationTriangleIcon className={`w-5 h-5 text-${getBottleneckColor(bottleneck.severity)}-600`} />
+                  <Icon icon={ExclamationTriangleIcon} size="md" color={`var(--chakra-colors-${getBottleneckColor(bottleneck.severity)}-600)`} />
                 </Box>
                 <VStack align="start" gap={0}>
                   <Text fontSize="lg" fontWeight="bold">{bottleneck.name}</Text>

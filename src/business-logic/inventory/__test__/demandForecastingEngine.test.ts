@@ -36,7 +36,7 @@ describe('DemandForecastingEngine - Complete Test Suite', () => {
   let performanceStart: number;
 
   // Helper function to create MaterialABC objects
-  const createMaterial = (overrides: any = {}): MaterialABC => {
+  const createMaterial = (overrides: unknown = {}): MaterialABC => {
     return {
       id: 'test-material',
       name: 'Test Material',

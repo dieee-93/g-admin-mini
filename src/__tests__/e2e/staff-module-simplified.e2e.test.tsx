@@ -4,9 +4,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders, mockSupabaseData, clearMockData, performanceTracker } from '../utils/testUtils';
+import { renderWithProviders, clearMockData, performanceTracker } from '../utils/testUtils';
 
 // Import components to test
 import StaffPage from '@/pages/admin/staff/page';

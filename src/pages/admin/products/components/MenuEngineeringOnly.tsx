@@ -29,6 +29,7 @@ import {
   PuzzlePieceIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 
 // Business Logic
 import { MenuEngineeringMatrix } from '../analytics/MenuEngineeringMatrix';
@@ -88,7 +89,7 @@ export function MenuEngineeringOnly() {
             <HStack justify="space-between" align="start">
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
-                  <ChartBarIcon className="w-6 h-6 text-blue-600" />
+                  <Icon icon={ChartBarIcon} size="lg" color="var(--chakra-colors-blue-600)" />
                   <Typography variant="title">Menu Engineering Matrix</Typography>
                 </HStack>
                 <Typography variant="body" color="text.muted">
@@ -142,19 +143,19 @@ export function MenuEngineeringOnly() {
         <Tabs defaultValue="matrix" variant="line">
           <TabList>
             <Tab value="matrix">
-              <ChartBarIcon className="w-4 h-4" />
+              <Icon icon={ChartBarIcon} size="sm" />
               Matrix Analysis
             </Tab>
             <Tab value="categories">
-              <StarIcon className="w-4 h-4" />
+              <Icon icon={StarIcon} size="sm" />
               Category Details
             </Tab>
             <Tab value="recommendations">
-              <CogIcon className="w-4 h-4" />
+              <Icon icon={CogIcon} size="sm" />
               Strategic Actions
             </Tab>
             <Tab value="performance">
-              <PuzzlePieceIcon className="w-4 h-4" />
+              <Icon icon={PuzzlePieceIcon} size="sm" />
               Performance Metrics
             </Tab>
           </TabList>

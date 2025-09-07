@@ -1,6 +1,7 @@
 // Staff Management Module - Main Page with UNIFIED navigation pattern
 import { useState, useEffect } from 'react';
-import { Box, VStack, HStack, Text, Badge, SimpleGrid, CardWrapper, Tabs } from '@/shared/ui';
+import { VStack, HStack, Badge, SimpleGrid, CardWrapper, Tabs, Icon } from '@/shared/ui';
+import { Box, Text } from '@chakra-ui/react';
 import { 
   UsersIcon, 
   ChartBarIcon, 
@@ -146,7 +147,7 @@ export default function StaffPage() {
           <CardWrapper.Body>
             <HStack gap="4">
               <Box p="2" bg="blue.100" borderRadius="md">
-                <UserGroupIcon className="w-8 h-8 text-blue-600" />
+                <Icon icon={UserGroupIcon} size="xl" color="blue.600" />
               </Box>
               <VStack align="start" gap="1">
                 <HStack>
@@ -170,7 +171,7 @@ export default function StaffPage() {
             <SimpleGrid columns={{ base: 2, md: 4 }} gap="4" mt="6">
               <CardWrapper variant="flat" padding="sm">
                 <CardWrapper.Body textAlign="center">
-                  <UsersIcon className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+                  <Icon icon={UsersIcon} size="lg" color="blue.500" />
                   <Text fontSize="2xl" fontWeight="bold">{staffStats.totalStaff}</Text>
                   <Text fontSize="sm" color="gray.600">Total Empleados</Text>
                 </CardWrapper.Body>
@@ -178,7 +179,7 @@ export default function StaffPage() {
 
               <CardWrapper variant="flat" padding="sm">
                 <CardWrapper.Body textAlign="center">
-                  <ClockIcon className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                  <Icon icon={ClockIcon} size="lg" color="green.500" />
                   <Text fontSize="2xl" fontWeight="bold">{staff.filter(s => s.status === 'active').length}</Text>
                   <Text fontSize="sm" color="gray.600">En Turno</Text>
                 </CardWrapper.Body>
@@ -186,7 +187,7 @@ export default function StaffPage() {
 
               <CardWrapper variant="flat" padding="sm">
                 <CardWrapper.Body textAlign="center">
-                  <TrophyIcon className="w-6 h-6 text-purple-500 mx-auto mb-2" />
+                  <Icon icon={TrophyIcon} size="lg" color="purple.500" />
                   <Text fontSize="2xl" fontWeight="bold">{staffStats.avgPerformance}%</Text>
                   <Text fontSize="sm" color="gray.600">Rendimiento Prom.</Text>
                 </CardWrapper.Body>
@@ -194,7 +195,7 @@ export default function StaffPage() {
 
               <CardWrapper variant="flat" padding="sm">
                 <CardWrapper.Body textAlign="center">
-                  <AcademicCapIcon className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+                  <Icon icon={AcademicCapIcon} size="lg" color="orange.500" />
                   <Text fontSize="2xl" fontWeight="bold">{staffStats.upcomingReviews.length}</Text>
                   <Text fontSize="sm" color="gray.600">Evaluaciones Pendientes</Text>
                 </CardWrapper.Body>
@@ -220,7 +221,7 @@ export default function StaffPage() {
                   minH="44px"
                   fontSize={{ base: "sm", md: "md" }}
                 >
-                  <UsersIcon className="w-5 h-5" />
+                  <Icon icon={UsersIcon} size="md" />
                   <Text display={{ base: "none", sm: "block" }}>Directorio</Text>
                 </Tabs.Trigger>
                 
@@ -231,7 +232,7 @@ export default function StaffPage() {
                   minH="44px"
                   fontSize={{ base: "sm", md: "md" }}
                 >
-                  <ClockIcon className="w-5 h-5" />
+                  <Icon icon={ClockIcon} size="md" />
                   <Text display={{ base: "none", sm: "block" }}>Tiempo</Text>
                   <Badge colorPalette="blue" variant="solid" size="xs">
                     {staff.filter(s => s.status === 'active').length}
@@ -245,7 +246,7 @@ export default function StaffPage() {
                   minH="44px"
                   fontSize={{ base: "sm", md: "md" }}
                 >
-                  <ChartBarIcon className="w-5 h-5" />
+                  <Icon icon={ChartBarIcon} size="sm" />
                   <Text display={{ base: "none", sm: "block" }}>Rendimiento</Text>
                   {staffStats.upcomingReviews.length > 0 && (
                     <Badge colorPalette="red" variant="solid" size="xs">
@@ -261,7 +262,7 @@ export default function StaffPage() {
                   minH="44px"
                   fontSize={{ base: "sm", md: "md" }}
                 >
-                  <AcademicCapIcon className="w-5 h-5" />
+                  <Icon icon={AcademicCapIcon} size="md" />
                   <Text display={{ base: "none", sm: "block" }}>Entrenamiento</Text>
                   {staff.filter(s => s.training_completed.length === 0).length > 0 && (
                     <Badge colorPalette="orange" variant="solid" size="xs">
@@ -277,7 +278,7 @@ export default function StaffPage() {
                   minH="44px"
                   fontSize={{ base: "sm", md: "md" }}
                 >
-                  <ShieldCheckIcon className="w-5 h-5" />
+                  <Icon icon={ShieldCheckIcon} size="sm" />
                   <Text display={{ base: "none", sm: "block" }}>Admin</Text>
                 </Tabs.Trigger>
               </Tabs.List>

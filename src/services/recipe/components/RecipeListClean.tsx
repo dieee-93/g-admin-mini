@@ -22,7 +22,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRecipes } from '../hooks/useRecipes';
 import type { Recipe } from '../types';
-import { CardWrapper } from '@/shared/ui';
+import { CardWrapper, Icon } from '@/shared/ui';
 
 interface RecipeListProps {
   onEdit?: (recipe: Recipe) => void;
@@ -117,8 +117,9 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             pl="10"
           />
-          <MagnifyingGlassIcon 
-            className="w-4 h-4" 
+          <Icon 
+            icon={MagnifyingGlassIcon}
+            size="sm"
             style={{
               position: 'absolute',
               left: '12px',
@@ -133,7 +134,7 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
         {filteredRecipes.length === 0 ? (
           <CardWrapper>
             <CardWrapper.Body textAlign="center" py="12">
-              <BeakerIcon className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <Icon icon={BeakerIcon} size="xl" color="gray.400" style={{ margin: '0 auto 16px auto' }} />
               <Text fontSize="lg" fontWeight="medium" mb="2">
                 {searchQuery ? 'No se encontraron recetas' : 'No hay recetas'}
               </Text>
@@ -182,7 +183,7 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
                             onEdit?.(recipe);
                           }}
                         >
-                          <PencilIcon className="w-4 h-4" />
+                          <Icon icon={PencilIcon} size="sm" />
                         </IconButton>
                         <IconButton
                           variant="ghost"
@@ -193,7 +194,7 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
                             handleDelete(recipe.id);
                           }}
                         >
-                          <TrashIcon className="w-4 h-4" />
+                          <Icon icon={TrashIcon} size="sm" />
                         </IconButton>
                       </Flex>
                     </Flex>
@@ -201,19 +202,19 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
                     {/* Stats */}
                     <Stack gap="2">
                       <Flex align="center" gap="2" fontSize="sm" color="gray.600">
-                        <ClockIcon className="w-4 h-4" />
+                        <Icon icon={ClockIcon} size="sm" />
                         <Text>{formatTime(recipe.preparation_time)}</Text>
                       </Flex>
 
                       <Flex align="center" gap="2" fontSize="sm" color="gray.600">
-                        <BeakerIcon className="w-4 h-4" />
+                        <Icon icon={BeakerIcon} size="sm" />
                         <Text>
                           {recipe.recipe_ingredients?.length || 0} ingredientes
                         </Text>
                       </Flex>
 
                       <Flex align="center" gap="2" fontSize="sm" color="gray.600">
-                        <CurrencyDollarIcon className="w-4 h-4" />
+                        <Icon icon={CurrencyDollarIcon} size="sm" />
                         <Text>{formatCost(recipe.total_cost)}</Text>
                       </Flex>
                     </Stack>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, VStack, HStack, Text, Button, Grid } from '@chakra-ui/react';
 import { ShoppingCartIcon, ClockIcon, HeartIcon, UserIcon } from '@heroicons/react/24/outline';
-import { CardWrapper } from '@/shared/ui/CardWrapper ';
+import { CardWrapper, Icon } from '@/shared/ui';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/contexts/NavigationContext';
@@ -17,7 +17,7 @@ export function CustomerPortal() {
           {/* Bienvenida */}
           <CardWrapper>
             <VStack gap={4} p={6}>
-              <UserIcon style={{ width: '64px', height: '64px', color: 'var(--colors-blue-500)' }} />
+              <Icon icon={UserIcon} size="2xl" color="blue.500" />
               <VStack gap={2}>
                 <Text fontSize="2xl" fontWeight="bold">
                   ¡Bienvenido, {user?.user_metadata?.full_name || user?.email || 'Cliente'}!
@@ -33,7 +33,7 @@ export function CustomerPortal() {
           <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={4}>
             <CardWrapper>
               <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('customer-menu')}>
-                <ShoppingCartIcon style={{ width: '48px', height: '48px', color: 'var(--colors-green-500)' }} />
+                <Icon icon={ShoppingCartIcon} size="xl" color="green.500" />
                 <VStack gap={2}>
                   <Text fontSize="lg" fontWeight="bold">Ver Menú</Text>
                   <Text fontSize="sm" color="gray.600" textAlign="center">
@@ -45,7 +45,7 @@ export function CustomerPortal() {
 
             <CardWrapper>
               <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('my-orders')}>
-                <ClockIcon style={{ width: '48px', height: '48px', color: 'var(--colors-teal-500)' }} />
+                <Icon icon={ClockIcon} size="xl" color="teal.500" />
                 <VStack gap={2}>
                   <Text fontSize="lg" fontWeight="bold">Mis Pedidos</Text>
                   <Text fontSize="sm" color="gray.600" textAlign="center">
@@ -57,7 +57,7 @@ export function CustomerPortal() {
 
             <CardWrapper>
               <VStack gap={4} p={6} cursor="pointer" _hover={{ transform: 'translateY(-2px)' }} onClick={() => navigate('customer-settings')}>
-                <HeartIcon style={{ width: '48px', height: '48px', color: 'var(--colors-pink-500)' }} />
+                <Icon icon={HeartIcon} size="xl" color="pink.500" />
                 <VStack gap={2}>
                   <Text fontSize="lg" fontWeight="bold">Favoritos</Text>
                   <Text fontSize="sm" color="gray.600" textAlign="center">

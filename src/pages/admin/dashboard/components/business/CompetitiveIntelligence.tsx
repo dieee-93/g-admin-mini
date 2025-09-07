@@ -39,7 +39,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
-import { CardWrapper } from '@/shared/ui';
+import { CardWrapper, Icon } from '@/shared/ui';
 // ============================================================================
 // TYPES AND INTERFACES
 // ============================================================================
@@ -530,7 +530,7 @@ export function CompetitiveIntelligence() {
             <HStack justify="space-between" align="start">
               <VStack align="start" gap="1">
                 <HStack gap="2">
-                  <PresentationChartLineIcon className="w-6 h-6 text-green-600" />
+                  <Icon icon={PresentationChartLineIcon} size="lg" color="var(--chakra-colors-green-600)" />
                   <Text fontSize="xl" fontWeight="bold">Inteligencia Competitiva</Text>
                   <Badge colorPalette="green" size="sm">Market Intelligence</Badge>
                 </HStack>
@@ -543,7 +543,7 @@ export function CompetitiveIntelligence() {
                 <Button
                   colorPalette="green"
                   onClick={refreshIntelligence}
-                  leftIcon={<ArrowPathIcon className="w-4 h-4" />}
+                  leftIcon={<Icon icon={ArrowPathIcon} size="sm" />}
                   size="sm"
                 >
                   Actualizar Inteligencia
@@ -630,14 +630,14 @@ export function CompetitiveIntelligence() {
         <Tabs.List>
           <Tabs.Trigger value="overview">
             <HStack gap={2}>
-              <GlobeAltIcon className="w-4 h-4" />
+              <Icon icon={GlobeAltIcon} size="sm" />
               <Text>Overview</Text>
             </HStack>
           </Tabs.Trigger>
           
           <Tabs.Trigger value="competitors">
             <HStack gap={2}>
-              <UserGroupIcon className="w-4 h-4" />
+              <Icon icon={UserGroupIcon} size="sm" />
               <Text>Competidores</Text>
               <Badge colorPalette="blue" size="sm">{competitors.length}</Badge>
             </HStack>
@@ -645,14 +645,14 @@ export function CompetitiveIntelligence() {
           
           <Tabs.Trigger value="pricing">
             <HStack gap={2}>
-              <CurrencyDollarIcon className="w-4 h-4" />
+              <Icon icon={CurrencyDollarIcon} size="sm" />
               <Text>Análisis Precios</Text>
             </HStack>
           </Tabs.Trigger>
           
           <Tabs.Trigger value="trends">
             <HStack gap={2}>
-              <ArrowTrendingUpIcon className="w-4 h-4" />
+              <Icon icon={ArrowTrendingUpIcon} size="sm" />
               <Text>Tendencias</Text>
               <Badge colorPalette="green" size="sm">{marketTrends.length}</Badge>
             </HStack>
@@ -660,7 +660,7 @@ export function CompetitiveIntelligence() {
           
           <Tabs.Trigger value="insights">
             <HStack gap={2}>
-              <BellIcon className="w-4 h-4" />
+              <Icon icon={BellIcon} size="sm" />
               <Text>Insights</Text>
               {marketInsights.filter(i => i.urgency === 'immediate').length > 0 && (
                 <Badge colorPalette="red" size="sm">{marketInsights.filter(i => i.urgency === 'immediate').length}</Badge>
@@ -817,11 +817,11 @@ function MarketOverviewDashboard({ competitors, trends, insights }: MarketOvervi
                   <VStack align="end" gap="0">
                     <HStack gap="1">
                       {trend.trend === 'growing' ? (
-                        <ArrowTrendingUpIcon className="w-4 h-4 text-green-500" />
+                        <Icon icon={ArrowTrendingUpIcon} size="sm" color="var(--chakra-colors-green-500)" />
                       ) : trend.trend === 'declining' ? (
-                        <ArrowTrendingDownIcon className="w-4 h-4 text-red-500" />
+                        <Icon icon={ArrowTrendingDownIcon} size="sm" color="var(--chakra-colors-red-500)" />
                       ) : (
-                        <ChartBarIcon className="w-4 h-4 text-gray-500" />
+                        <Icon icon={ChartBarIcon} size="sm" color="var(--chakra-colors-gray-500)" />
                       )}
                       <Text fontSize="sm" fontWeight="bold" 
                         color={trend.trend === 'growing' ? 'green.600' : trend.trend === 'declining' ? 'red.600' : 'gray.600'}>
@@ -842,7 +842,7 @@ function MarketOverviewDashboard({ competitors, trends, insights }: MarketOvervi
       {/* Critical Insights Alert */}
       {insights.filter(i => i.urgency === 'immediate').length > 0 && (
         <Alert.Root status="warning" variant="subtle">
-          <ExclamationTriangleIcon className="w-5 h-5" />
+          <Icon icon={ExclamationTriangleIcon} size="md" />
           <Alert.Title>Insights Críticos Detectados</Alert.Title>
           <Alert.Description>
             Hay {insights.filter(i => i.urgency === 'immediate').length} insights que requieren atención inmediata. 
@@ -883,7 +883,7 @@ function CompetitorsTable({ competitors }: CompetitorsTableProps) {
       <CardWrapper>
         <CardWrapper.Body p="8" textAlign="center">
           <VStack gap="2">
-            <UserGroupIcon className="w-8 h-8 text-gray-400" />
+            <Icon icon={UserGroupIcon} size="2xl" color="var(--chakra-colors-gray-400)" />
             <Text color="gray.500">No se encontraron competidores</Text>
           </VStack>
         </CardWrapper.Body>
@@ -962,7 +962,7 @@ function CompetitorsTable({ competitors }: CompetitorsTableProps) {
                     variant="ghost"
                     aria-label="Ver detalles"
                   >
-                    <EyeIcon className="w-3 h-3" />
+                    <Icon icon={EyeIcon} size="xs" />
                   </IconButton>
                 </Table.Cell>
               </Table.Row>
@@ -1103,11 +1103,11 @@ function MarketTrendsPanel({ trends }: MarketTrendsPanelProps) {
                 <VStack align="start" gap="1">
                   <HStack gap="2">
                     {trend.trend === 'growing' ? (
-                      <ArrowTrendingUpIcon className="w-5 h-5 text-green-500" />
+                      <Icon icon={ArrowTrendingUpIcon} size="md" color="var(--chakra-colors-green-500)" />
                     ) : trend.trend === 'declining' ? (
-                      <ArrowTrendingDownIcon className="w-5 h-5 text-red-500" />
+                      <Icon icon={ArrowTrendingDownIcon} size="md" color="var(--chakra-colors-red-500)" />
                     ) : (
-                      <ChartBarIcon className="w-5 h-5 text-gray-500" />
+                      <Icon icon={ChartBarIcon} size="md" color="var(--chakra-colors-gray-500)" />
                     )}
                     <Text fontWeight="bold">{trend.category}</Text>
                   </HStack>
@@ -1135,7 +1135,7 @@ function MarketTrendsPanel({ trends }: MarketTrendsPanelProps) {
                   <VStack align="start" gap="1">
                     {trend.recommendedActions.slice(0, 3).map((action, index) => (
                       <HStack key={index} gap="2">
-                        <CheckCircleIcon className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <Icon icon={CheckCircleIcon} size="sm" color="var(--chakra-colors-green-500)" style={{ flexShrink: "0" }} />
                         <Text fontSize="sm">{action}</Text>
                       </HStack>
                     ))}
@@ -1186,7 +1186,7 @@ function MarketInsightsPanel({ insights }: MarketInsightsPanelProps) {
                 <HStack justify="space-between" align="start">
                   <HStack gap="3">
                     <Box p="2" bg={`${getUrgencyColor(insight.urgency)}.100`} borderRadius="md">
-                      <TypeIcon className={`w-5 h-5 text-${getUrgencyColor(insight.urgency)}-600`} />
+                      <Icon icon={TypeIcon} size="md" color={`var(--chakra-colors-${getUrgencyColor(insight.urgency)}-600)`} />
                     </Box>
                     <VStack align="start" gap="1">
                       <Text fontWeight="bold">{insight.title}</Text>

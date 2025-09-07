@@ -19,6 +19,7 @@ import {
   ClockIcon,
   FireIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 import type { Recipe, RecipeWithCost } from '@/services/recipe/types';
 import { fetchRecipesWithCosts } from '@/services/recipe/api/recipeApi';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
@@ -107,7 +108,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
           <CardWrapper.Body>
             <VStack align="center" gap={3}>
               <HStack gap={2} align="center">
-                <ChartBarIcon className="w-8 h-8" />
+                <Icon icon={ChartBarIcon} size="2xl" />
                 <Text fontSize="2xl" fontWeight="bold">
                   Recipe Intelligence Dashboard v3.0
                 </Text>
@@ -350,13 +351,13 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 onClick={loadRecipeAnalytics}
                 loading={loading}
               >
-                <ClockIcon className="w-4 h-4" />
+                <Icon icon={ClockIcon} size="sm" />
                 Refresh Analytics
               </Button>
               <Button 
                 colorPalette="blue"
               >
-                <FireIcon className="w-4 h-4" />
+                <Icon icon={FireIcon} size="sm" />
                 Optimize Menu
               </Button>
             </HStack>

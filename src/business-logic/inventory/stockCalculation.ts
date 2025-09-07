@@ -99,7 +99,7 @@ export class StockCalculation {
       }
       
       return result.toNumber();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`StockCalculation.getTotalValue: Error calculating value for item ${item.id}:`, error.message);
       return 0; // Safe fallback
     }

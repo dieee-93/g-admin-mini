@@ -107,7 +107,7 @@ export {
 export { toaster, Toaster } from './toaster';
 
 // Display Components
-export { Icon, ActionIcon, StatusIcon, NavIcon, HeaderIcon, HeroIcon } from './Icon';
+export { Icon } from './Icon';
 export { Avatar, AvatarGroup, UserAvatar } from './Avatar';
 export { Switch, SwitchGroup, StatusSwitch, PermissionSwitch } from './Switch';
 export { ProductionCalendar } from './ProductionCalendar';

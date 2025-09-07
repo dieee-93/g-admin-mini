@@ -3,7 +3,7 @@
 // ✅ CORREGIDO: Clickeable navigation
 
 import { Stack, Button } from '@chakra-ui/react';
-import { Typography } from '@/shared/ui';
+import { Typography, Icon } from '@/shared/ui';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 
@@ -43,7 +43,11 @@ export function Breadcrumb() {
           )}
           
           {index < breadcrumbs.length - 1 && (
-            <ChevronRightIcon style={{ width: '16px', height: '16px', color: 'var(--chakra-colors-text-muted)' }} />
+            <Icon 
+              icon={ChevronRightIcon} 
+              size="sm" 
+              color="text.muted" 
+            />
           )}
         </Stack>
       ))}

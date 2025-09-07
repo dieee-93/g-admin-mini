@@ -1,4 +1,5 @@
 // src/features/customers/ui/CustomerSegments.tsx - Design System v2.0
+// MIGRATED: Now uses centralized financial calculations
 import {
   Stack,
   Typography,
@@ -7,6 +8,7 @@ import {
   Table,
   Grid
 } from '@/shared/ui';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { useState, useMemo } from 'react';
 import { useCustomers } from '../hooks/useCustomers';
 import type { CustomerWithStats } from '../types';
@@ -116,12 +118,7 @@ export function CustomerSegments() {
     );
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
+  // MIGRATED: Use centralized currency formatting
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
@@ -285,7 +282,7 @@ export function CustomerSegments() {
                     <Table.Cell>
                       <Stack direction="column" align="start" gap="none">
                         <Typography fontWeight="medium" >
-                          {formatCurrency(customer.stats?.total_spent || 0)}
+                          {QuickCalculations.formatCurrency(customer.stats?.total_spent || 0)}
                         </Typography>
                         <Typography size="xs" color="text.muted">
                           total

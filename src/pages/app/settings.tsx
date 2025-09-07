@@ -24,7 +24,7 @@ import {
   StarIcon,
   GiftIcon
 } from '@heroicons/react/24/outline';
-import { CardWrapper, Button } from '@/shared/ui';
+import { CardWrapper, Button, Icon } from '@/shared/ui';
 
 // Componente de sección del perfil
 function ProfileSection() {
@@ -231,7 +231,7 @@ function AddressesSection() {
             <Text fontSize="lg" fontWeight="semibold">
               Direcciones de Entrega
             </Text>
-            <Button leftIcon={<MapPinIcon style={{ width: '16px', height: '16px' }} />} size="sm" variant="outline">
+            <Button leftIcon={<Icon icon={MapPinIcon} size="sm" />} size="sm" variant="outline">
               Agregar Dirección
             </Button>
           </HStack>
@@ -307,7 +307,7 @@ function PaymentMethods() {
             <Text fontSize="lg" fontWeight="semibold">
               Métodos de Pago
             </Text>
-            <Button leftIcon={<CreditCardIcon style={{ width: '16px', height: '16px' }} />} size="sm" variant="outline">
+            <Button leftIcon={<Icon icon={CreditCardIcon} size="sm" />} size="sm" variant="outline">
               Agregar Tarjeta
             </Button>
           </HStack>
@@ -319,7 +319,7 @@ function PaymentMethods() {
                   <HStack justify="space-between" align="center">
                     <HStack gap="3" align="center">
                       <Box p="2" bg="blue.50" borderRadius="md">
-                        <CreditCardIcon style={{ width: '20px', height: '20px', color: '#2563eb' }} />
+                        <Icon icon={CreditCardIcon} size="md" color="blue.600" />
                       </Box>
                       <VStack align="start" gap="1">
                         <HStack gap="2" align="center">
@@ -371,7 +371,7 @@ function SecuritySection() {
           <VStack align="stretch" gap="3">
             <HStack justify="space-between" align="center" py="2">
               <HStack gap="3" align="center">
-                <KeyIcon style={{ width: '20px', height: '20px', color: '#2563eb' }} />
+                <Icon icon={KeyIcon} size="md" color="blue.600" />
                 <VStack align="start" gap="0">
                   <Text fontSize="md" fontWeight="medium">
                     Cambiar Contraseña
@@ -388,7 +388,7 @@ function SecuritySection() {
             
             <HStack justify="space-between" align="center" py="2">
               <HStack gap="3" align="center">
-                <ShieldCheckIcon style={{ width: '20px', height: '20px', color: '#16a34a' }} />
+                <Icon icon={ShieldCheckIcon} size="md" color="green.600" />
                 <VStack align="start" gap="0">
                   <Text fontSize="md" fontWeight="medium">
                     Autenticación de 2 Factores
@@ -418,7 +418,7 @@ function LoyaltyProgram() {
       <CardBody>
         <VStack align="stretch" gap="4">
           <HStack gap="3" align="center">
-            <StarIcon style={{ width: '24px', height: '24px' }} />
+            <Icon icon={StarIcon} size="lg" />
             <Text fontSize="lg" fontWeight="semibold">
               Programa de Lealtad
             </Text>
@@ -452,7 +452,7 @@ function LoyaltyProgram() {
           </Grid>
           
           <Button
-            leftIcon={<GiftIcon style={{ width: '16px', height: '16px' }} />}
+            leftIcon={<Icon icon={GiftIcon} size="sm" />}
             bg="white"
             color="purple.600"
             _hover={{ bg: "gray.50" }}
@@ -489,31 +489,31 @@ export function CustomerSettings() {
           <Tabs.List bg="bg.surface" borderRadius="xl" p="1">
             <Tabs.Trigger value="profile" flex="1" borderRadius="lg">
               <HStack gap="2" align="center">
-                <UserIcon style={{ width: '16px', height: '16px' }} />
+                <Icon icon={UserIcon} size="sm" />
                 <Text fontSize="sm" fontWeight="medium">Perfil</Text>
               </HStack>
             </Tabs.Trigger>
             <Tabs.Trigger value="notifications" flex="1" borderRadius="lg">
               <HStack gap="2" align="center">
-                <BellIcon style={{ width: '16px', height: '16px' }} />
+                <Icon icon={BellIcon} size="sm" />
                 <Text fontSize="sm" fontWeight="medium">Notificaciones</Text>
               </HStack>
             </Tabs.Trigger>
             <Tabs.Trigger value="addresses" flex="1" borderRadius="lg">
               <HStack gap="2" align="center">
-                <MapPinIcon style={{ width: '16px', height: '16px' }} />
+                <Icon icon={MapPinIcon} size="sm" />
                 <Text fontSize="sm" fontWeight="medium">Direcciones</Text>
               </HStack>
             </Tabs.Trigger>
             <Tabs.Trigger value="payment" flex="1" borderRadius="lg">
               <HStack gap="2" align="center">
-                <CreditCardIcon style={{ width: '16px', height: '16px' }} />
+                <Icon icon={CreditCardIcon} size="sm" />
                 <Text fontSize="sm" fontWeight="medium">Pagos</Text>
               </HStack>
             </Tabs.Trigger>
             <Tabs.Trigger value="security" flex="1" borderRadius="lg">
               <HStack gap="2" align="center">
-                <ShieldCheckIcon style={{ width: '16px', height: '16px' }} />
+                <Icon icon={ShieldCheckIcon} size="sm" />
                 <Text fontSize="sm" fontWeight="medium">Seguridad</Text>
               </HStack>
             </Tabs.Trigger>

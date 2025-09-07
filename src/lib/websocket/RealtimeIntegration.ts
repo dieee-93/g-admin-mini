@@ -427,7 +427,7 @@ export class RealtimeIntegration {
     EventBus.emit(RestaurantEvents.NOTIFICATION_RECEIVED_REALTIME, data);
   }
 
-  private async handleSyncRequest(data: any): Promise<void> {
+  private async handleSyncRequest(data: unknown): Promise<void> {
     console.log('Real-time sync request received:', data);
     
     // Trigger offline sync if we have pending operations
@@ -451,7 +451,7 @@ export class RealtimeIntegration {
     return remote.timestamp > local.timestamp ? remote : local;
   }
 
-  private async broadcastSyncedOperation(operation: any): Promise<void> {
+  private async broadcastSyncedOperation(operation: unknown): Promise<void> {
     const messageType = this.getMessageTypeForOperation(operation);
     if (messageType) {
       await this.broadcastUpdate(messageType, {
@@ -464,7 +464,7 @@ export class RealtimeIntegration {
     }
   }
 
-  private getMessageTypeForOperation(operation: any): WSMessageType | null {
+  private getMessageTypeForOperation(operation: unknown): WSMessageType | null {
     switch (operation.entity) {
       case 'orders':
         return operation.type === 'CREATE' ? 'ORDER_CREATED' : 'ORDER_UPDATED';

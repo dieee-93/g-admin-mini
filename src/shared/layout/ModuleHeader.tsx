@@ -6,6 +6,7 @@ import { Box, Heading, Button, HStack, Separator } from '@chakra-ui/react';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Breadcrumb } from '../navigation/Breadcrumb';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { Icon } from '../ui';
 
 interface ModuleHeaderProps {
   title: string;
@@ -43,7 +44,7 @@ export function ModuleHeader({
                 color={`${color}.600`}
                 _hover={{ bg: `${color}.100` }}
               >
-                <ArrowLeftIcon className="w-4 h-4" />
+                <Icon icon={ArrowLeftIcon} size="sm" />
                 Volver
               </Button>
             )}

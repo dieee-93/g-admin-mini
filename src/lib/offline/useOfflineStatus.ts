@@ -19,7 +19,7 @@ interface OfflineStatusHook {
   queueSize: number;
   
   // Operations
-  queueOperation: (operation: any) => Promise<string>;
+  queueOperation: (operation: unknown) => Promise<string>;
   forceSync: () => Promise<void>;
   clearQueue: () => void;
   
@@ -34,7 +34,7 @@ interface OfflineStatusHook {
   // Events
   onOnline: (callback: () => void) => void;
   onOffline: (callback: () => void) => void;
-  onSyncComplete: (callback: (result: any) => void) => void;
+  onSyncComplete: (callback: (result: unknown) => void) => void;
 }
 
 interface NetworkInfo {
@@ -70,7 +70,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
   const eventCallbacks = useRef<{
     online: (() => void)[];
     offline: (() => void)[];
-    syncComplete: ((result: any) => void)[];
+    syncComplete: ((result: unknown) => void)[];
   }>({
     online: [],
     offline: [],
@@ -153,7 +153,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
       const stats = await localStorage.getStorageStats();
       let totalItems = 0;
       
-      Object.values(stats).forEach((storeStat: any) => {
+      Object.values(stats).forEach((storeStat: unknown) => {
         if (typeof storeStat === 'object' && storeStat.count) {
           totalItems += storeStat.count;
         }
@@ -190,7 +190,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
   }, []);
 
   // Queue operation wrapper
-  const queueOperation = useCallback(async (operation: any): Promise<string> => {
+  const queueOperation = useCallback(async (operation: unknown): Promise<string> => {
     return await offlineSync.queueOperation(operation);
   }, []);
 
@@ -228,7 +228,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
     eventCallbacks.current.offline.push(callback);
   }, []);
 
-  const onSyncComplete = useCallback((callback: (result: any) => void): void => {
+  const onSyncComplete = useCallback((callback: (result: unknown) => void): void => {
     eventCallbacks.current.syncComplete.push(callback);
   }, []);
 
@@ -258,7 +258,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
     }
 
     // Sync event listeners
-    const handleSyncComplete = (result: any) => {
+    const handleSyncComplete = (result: unknown) => {
       eventCallbacks.current.syncComplete.forEach(callback => {
         try {
           callback(result);

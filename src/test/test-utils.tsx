@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
-import { vi } from 'vitest';
 import { useThemeStore } from '@/store/themeStore';
 import { getCurrentThemeSystem } from '@/lib/theming/dynamicTheming';
 

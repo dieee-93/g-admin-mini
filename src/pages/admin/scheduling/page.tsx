@@ -13,6 +13,7 @@ import {
   UserMinusIcon,
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 // Import section components
@@ -253,7 +254,7 @@ export default function SchedulingPage() {
               <Tabs.List px="6" pt="4">
                 <Tabs.Trigger value="schedule">
                   <HStack gap="2">
-                    <CalendarIcon className="w-4 h-4" />
+                    <Icon icon={CalendarIcon} size="sm" />
                     <Text>Weekly Schedule</Text>
                     <Badge size="xs" colorPalette="blue">
                       {schedulingStats.employees_scheduled}
@@ -263,7 +264,7 @@ export default function SchedulingPage() {
 
                 <Tabs.Trigger value="timeoff">
                   <HStack gap="2">
-                    <UserMinusIcon className="w-4 h-4" />
+                    <Icon icon={UserMinusIcon} size="sm" />
                     <Text>Time Off</Text>
                     {schedulingStats.pending_time_off > 0 && (
                       <Badge size="xs" colorPalette="orange">
@@ -275,7 +276,7 @@ export default function SchedulingPage() {
 
                 <Tabs.Trigger value="coverage">
                   <HStack gap="2">
-                    <UsersIcon className="w-4 h-4" />
+                    <Icon icon={UsersIcon} size="sm" />
                     <Text>Coverage Planning</Text>
                     {schedulingStats.understaffed_shifts > 0 && (
                       <Badge size="xs" colorPalette="red">
@@ -287,7 +288,7 @@ export default function SchedulingPage() {
 
                 <Tabs.Trigger value="costs">
                   <HStack gap="2">
-                    <CurrencyDollarIcon className="w-4 h-4" />
+                    <Icon icon={CurrencyDollarIcon} size="sm" />
                     <Text>Labor Costs</Text>
                     {schedulingStats.overtime_hours > 0 && (
                       <Badge size="xs" colorPalette="yellow">
@@ -299,7 +300,7 @@ export default function SchedulingPage() {
 
                 <Tabs.Trigger value="realtime">
                   <HStack gap="2">
-                    <ClockIcon className="w-4 h-4" />
+                    <Icon icon={ClockIcon} size="sm" />
                     <Text>Real-Time</Text>
                     <Badge size="xs" colorPalette="green" variant="subtle">
                       LIVE

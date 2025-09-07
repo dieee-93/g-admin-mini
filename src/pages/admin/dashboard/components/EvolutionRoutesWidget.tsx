@@ -3,7 +3,7 @@ import { Box, Stack, Heading, Text, SimpleGrid, HStack, Circle, Button, Spinner,
 import { useEvolutionRoutes } from '@/hooks/useEvolutionRoutes';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
-import { CardWrapper } from '@/shared/ui';
+import { CardWrapper, Icon } from '@/shared/ui';
 
 const planetIcons: { [key: string]: string } = {
   'E-commerce Asincrónico': '🛒',
@@ -65,7 +65,7 @@ export const EvolutionRoutesWidget = () => {
                     size="sm"
                     variant="solid"
                     colorScheme="blue"
-                    rightIcon={<ArrowRightIcon className="w-3 h-3" />}
+                    rightIcon={<Icon icon={ArrowRightIcon} size="xs" />}
                     onClick={() => navigate(milestone.link)}
                   >
                     Comenzar

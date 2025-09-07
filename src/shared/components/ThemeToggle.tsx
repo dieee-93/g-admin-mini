@@ -1,4 +1,4 @@
-import { SelectField, Stack, Typography, Button } from '@/shared/ui'
+import { SelectField, Stack, Typography, Button, Icon } from '@/shared/ui'
 import { SunIcon, MoonIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline'
 import { useThemeStore, availableThemes } from '@/store/themeStore'
 
@@ -50,9 +50,9 @@ export function QuickThemeToggle() {
       onClick={toggleTheme}
     >
       {theme === 'dark' ? (
-        <SunIcon className="w-4 h-4" />
+        <Icon icon={SunIcon} size="sm" />
       ) : (
-        <MoonIcon className="w-4 h-4" />
+        <Icon icon={MoonIcon} size="sm" />
       )}
     </Button>
   )

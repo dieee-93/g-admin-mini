@@ -36,6 +36,7 @@ import {
   CircleStackIcon,
   BoltIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 import offlineSync, { type SyncStatus } from './OfflineSync';
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
@@ -272,7 +273,7 @@ export const SyncProgress = () => {
       }
     };
 
-    const handleSyncStarted = (data: any) => {
+    const handleSyncStarted = (data: unknown) => {
       setSyncProgress({
         current: 0,
         total: data.queueSize,
@@ -281,7 +282,7 @@ export const SyncProgress = () => {
       });
     };
 
-    const handleBatchProcessed = (data: any) => {
+    const handleBatchProcessed = (data: unknown) => {
       setSyncProgress(prev => ({
         ...prev,
         current: prev.current + data.results.length,
@@ -312,7 +313,7 @@ export const SyncProgress = () => {
       <Box p={3} bg="blue.50" borderRadius="md" border="1px" borderColor="blue.200">
         <HStack justify="space-between" mb={2}>
           <HStack>
-            <BoltIcon className="w-4 h-4 text-blue-500" />
+            <Icon icon={BoltIcon} size="sm" color="var(--chakra-colors-blue-500)" />
             <Text fontSize="sm" fontWeight="medium" color="blue.700">
               {syncStatus?.isSyncing ? 'Synchronizing...' : 'Queued for sync'}
             </Text>
@@ -357,7 +358,7 @@ export const SyncProgress = () => {
               onClick={() => offlineSync.forceSync()}
               
             >
-              <ArrowPathIcon className="w-3 h-3 mr-1" />
+              <Icon icon={ArrowPathIcon} size="xs" style={{marginRight: '4px'}} />
               Sync Now
             </Button>
           </HStack>
@@ -408,7 +409,7 @@ export const OfflineAlert = () => {
   return (
     <Alert.Root status={isOffline ? "warning" : "info"}>
       <Alert.Indicator>
-        {isOffline ? <NoSymbolIcon className="w-4 h-4" /> : <ClockIcon className="w-4 h-4" />}
+        {isOffline ? <Icon icon={NoSymbolIcon} size="sm" /> : <Icon icon={ClockIcon} size="sm" />}
       </Alert.Indicator>
       <Box flex="1">
         <Alert.Title fontSize="sm">
@@ -453,12 +454,12 @@ export const QueueMonitor = () => {
     <Box bg="bg.canvas" borderRadius="md" p={3} border="1px" borderColor="border.default">
       <HStack justify="space-between" mb={2} cursor="pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <HStack>
-          <CircleStackIcon className="w-4 h-4" />
+          <Icon icon={CircleStackIcon} size="sm" />
           <Text fontSize="sm" fontWeight="medium">
             Operation Queue ({queueOperations.length})
           </Text>
         </HStack>
-        {isExpanded ? <XCircleIcon className="w-4 h-4" /> : <CheckCircleIcon className="w-4 h-4" />}
+        {isExpanded ? <Icon icon={XCircleIcon} size="sm" /> : <Icon icon={CheckCircleIcon} size="sm" />}
       </HStack>
 
       {isExpanded && (
@@ -498,7 +499,7 @@ const OperationItem = ({ operation }: { operation: QueuedOperation }) => {
 
   return (
     <HStack gap={3} p={2} bg="white" borderRadius="sm" fontSize="sm">
-      <statusProps.icon className={`w-4 h-4 text-gray-500`} />
+      <Icon icon={statusProps.icon} size="sm" color="var(--chakra-colors-gray-500)" />
       <VStack gap={0} align="start" flex="1">
         <Text fontWeight="medium">
           {operation.type} {operation.entity}
@@ -656,7 +657,7 @@ const SyncDetailsModal = ({
               onClick={handleForcSync}
               loading={syncStatus?.isSyncing}
             >
-              <ArrowPathIcon className="w-4 h-4 mr-2" />
+              <Icon icon={ArrowPathIcon} size="sm" style={{marginRight: '8px'}} />
               Force Sync
             </Button>
           </HStack>

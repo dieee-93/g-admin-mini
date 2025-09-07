@@ -7,6 +7,17 @@ import { supabase } from '@/lib/supabase/client';
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
 import { errorHandler, createBusinessError } from '@/lib/error-handling';
+import { 
+  calculateShiftHours, 
+  calculateShiftCost, 
+  calculateStaffingMetrics,
+  calculateEmployeeWorkloads,
+  calculateEmployeeSatisfactionScore,
+  calculateEmployeeScore,
+  calculateConfidenceScore,
+  type StaffingMetrics,
+  type EmployeeWorkload
+} from '@/business-logic/scheduling/schedulingCalculations';
 
 export interface SchedulingConstraints {
   // Availability constraints
@@ -281,7 +292,7 @@ class AutoSchedulingEngine {
       }
 
       // Check maximum hours constraint
-      const shiftHours = this.calculateShiftHours(startTime, endTime);
+      const shiftHours = calculateShiftHours(startTime, endTime);
       const currentEmployeeHours = currentHours[employee.employee_id] || 0;
       
       if (currentEmployeeHours + shiftHours > employee.max_hours_per_week) {
@@ -358,7 +369,7 @@ class AutoSchedulingEngine {
     requirement: ShiftRequirement
   ): GeneratedShift {
     const [startTime, endTime] = requirement.time_slot.split('-');
-    const hours = this.calculateShiftHours(startTime, endTime);
+    const hours = calculateShiftHours(startTime, endTime);
 
     return {
       employee_id: employee.employee_id,
@@ -370,7 +381,7 @@ class AutoSchedulingEngine {
       hours,
       hourly_rate: employee.hourly_rate,
       estimated_cost: hours * employee.hourly_rate,
-      confidence_score: this.calculateConfidenceScore(employee, requirement)
+      confidence_score: calculateConfidenceScore(employee, requirement)
     };
   }
 
@@ -414,8 +425,8 @@ class AutoSchedulingEngine {
       total_cost: totalCost,
       coverage_rate: Math.min(100, coverageRate),
       overtime_hours: overtimeHours,
-      employee_satisfaction_score: this.calculateSatisfactionScore(schedule),
-      cost_efficiency_score: this.calculateCostEfficiency(schedule),
+      employee_satisfaction_score: calculateEmployeeSatisfactionScore(calculateEmployeeWorkloads(schedule.map(s => ({ employeeId: s.employee_id, hours: s.hours, hourlyRate: s.hourly_rate })))),
+      cost_efficiency_score: calculateStaffingMetrics(schedule.map(s => ({ employeeId: s.employee_id, hours: s.hours, hourlyRate: s.hourly_rate }))).costEfficiencyScore,
       position_coverage: positionCoverage,
       gaps_filled: schedule.length,
       conflicts_resolved: requirements.length - criticalConflicts,
@@ -423,16 +434,7 @@ class AutoSchedulingEngine {
     };
   }
 
-  // Helper methods
-  private calculateShiftHours(startTime: string, endTime: string): number {
-    const [startHour, startMin] = startTime.split(':').map(Number);
-    const [endHour, endMin] = endTime.split(':').map(Number);
-    
-    const startMinutes = startHour * 60 + startMin;
-    const endMinutes = endHour * 60 + endMin;
-    
-    return (endMinutes - startMinutes) / 60;
-  }
+  // Helper methods - using centralized calculations
 
   private getTimeSlotFromShift(timeSlot: string): string {
     const [startTime] = timeSlot.split('-');
@@ -444,55 +446,6 @@ class AutoSchedulingEngine {
     return 'night';
   }
 
-  private calculateConfidenceScore(employee: EmployeeAvailability, requirement: ShiftRequirement): number {
-    let confidence = 70; // Base confidence
-    
-    // Boost for experience
-    if (employee.experience_level === 'senior') confidence += 15;
-    else if (employee.experience_level === 'mid') confidence += 10;
-    
-    // Boost for position match
-    if (employee.position === requirement.position) confidence += 10;
-    
-    // Boost for high reliability
-    if (employee.reliability_score > 90) confidence += 5;
-    
-    return Math.min(100, confidence);
-  }
-
-  private calculateSatisfactionScore(schedule: GeneratedShift[]): number {
-    // Simplified satisfaction calculation based on workload balance
-    const employeeHours: Record<string, number> = {};
-    schedule.forEach(shift => {
-      if (!employeeHours[shift.employee_id]) {
-        employeeHours[shift.employee_id] = 0;
-      }
-      employeeHours[shift.employee_id] += shift.hours;
-    });
-
-    const hoursList = Object.values(employeeHours);
-    if (hoursList.length === 0) return 0;
-
-    const average = hoursList.reduce((a, b) => a + b, 0) / hoursList.length;
-    const variance = hoursList.reduce((sum, hours) => sum + Math.pow(hours - average, 2), 0) / hoursList.length;
-    
-    // Lower variance = higher satisfaction (better balance)
-    return Math.max(0, 100 - variance);
-  }
-
-  private calculateCostEfficiency(schedule: GeneratedShift[]): number {
-    if (schedule.length === 0) return 0;
-    
-    const avgHourlyRate = schedule.reduce((sum, shift) => sum + shift.hourly_rate, 0) / schedule.length;
-    const totalCost = schedule.reduce((sum, shift) => sum + shift.estimated_cost, 0);
-    const totalHours = schedule.reduce((sum, shift) => sum + shift.hours, 0);
-    
-    // Efficiency is higher when we achieve more coverage with lower relative cost
-    const costPerHour = totalHours > 0 ? totalCost / totalHours : 0;
-    const efficiency = Math.max(0, 100 - (costPerHour / avgHourlyRate) * 100);
-    
-    return Math.min(100, efficiency);
-  }
 
   private generateRecommendations(
     schedule: GeneratedShift[],
@@ -599,7 +552,7 @@ class AutoSchedulingEngine {
     }));
   }
 
-  private parseAvailabilityToTimeWindows(availability: any): TimeWindow[] {
+  private parseAvailabilityToTimeWindows(availability: unknown): TimeWindow[] {
     // Parse database availability format to TimeWindow objects
     // Implementation would depend on your availability data structure
     return [
@@ -609,7 +562,7 @@ class AutoSchedulingEngine {
     ];
   }
 
-  private calculateExperienceLevel(employee: any): 'junior' | 'mid' | 'senior' {
+  private calculateExperienceLevel(employee: unknown): 'junior' | 'mid' | 'senior' {
     // Calculate based on hire date, performance, certifications, etc.
     const performance = employee.performance_metrics?.overall || 0;
     if (performance >= 85) return 'senior';

@@ -22,6 +22,7 @@ import {
   PuzzlePieceIcon,
   LightBulbIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 
 // Cross-Module Analytics Interfaces
 interface ModuleMetric {
@@ -174,7 +175,7 @@ const CrossModuleSection: React.FC = () => {
       <CardWrapper .Root>
         <CardWrapper .Header>
           <HStack gap="2">
-            <PuzzlePieceIcon className="w-5 h-5 text-blue-500" />
+            <Icon icon={PuzzlePieceIcon} size="md" color="var(--chakra-colors-blue-500)" />
             <Text fontSize="lg" fontWeight="semibold">Module Health Overview</Text>
           </HStack>
         </CardWrapper .Header>
@@ -200,7 +201,7 @@ const CrossModuleSection: React.FC = () => {
                           {module.status}
                         </Badge>
                         {TrendIcon && (
-                          <TrendIcon className={`w-3 h-3 ${module.trend === 'up' ? 'text-green-500' : 'text-red-500'}`} />
+                          <Icon icon={TrendIcon} size="xs" color={module.trend === 'up' ? 'var(--chakra-colors-green-500)' : 'var(--chakra-colors-red-500)'} />
                         )}
                       </HStack>
                     </VStack>
@@ -217,7 +218,7 @@ const CrossModuleSection: React.FC = () => {
         <CardWrapper .Header>
           <HStack justify="space-between">
             <HStack gap="2">
-              <ArrowsRightLeftIcon className="w-5 h-5 text-purple-500" />
+              <Icon icon={ArrowsRightLeftIcon} size="md" color="var(--chakra-colors-purple-500)" />
               <Text fontSize="lg" fontWeight="semibold">Cross-Module Correlations</Text>
             </HStack>
             <Badge colorPalette="purple" variant="subtle">AI-Powered Insights</Badge>
@@ -240,7 +241,7 @@ const CrossModuleSection: React.FC = () => {
                           </Text>
                         </VStack>
                         
-                        <ArrowsRightLeftIcon className="w-6 h-6 text-gray-400" />
+                        <Icon icon={ArrowsRightLeftIcon} size="lg" color="var(--chakra-colors-gray-400)" />
                         
                         <VStack align="center" gap="1">
                           <Text fontSize="sm" fontWeight="medium">{correlation.metric2.moduleName}</Text>
@@ -269,7 +270,7 @@ const CrossModuleSection: React.FC = () => {
 
                     {/* Business Insight */}
                     <Alert.Root status="info" variant="subtle">
-                      <LightBulbIcon className="w-4 h-4" />
+                      <Icon icon={LightBulbIcon} size="sm" />
                       <Alert.Title>Business Insight</Alert.Title>
                       <Alert.Description>
                         {correlation.businessInsight}
@@ -287,7 +288,7 @@ const CrossModuleSection: React.FC = () => {
                         w="full"
                       >
                         <HStack gap="2">
-                          <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                          <Icon icon={CheckCircleIcon} size="sm" color="var(--chakra-colors-green-600)" />
                           <Text fontSize="sm" color="green.800" fontWeight="medium">
                             Recommendation
                           </Text>

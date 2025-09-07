@@ -7,6 +7,7 @@ import {
   Text,
   Separator,
 } from '@chakra-ui/react';
+import { Icon } from '@/shared/ui';
 import {
   CheckIcon,
   InformationCircleIcon,
@@ -131,7 +132,7 @@ export function SetupSidebar({
                 fontSize="xs"
                 mr={3}
               >
-                {step.completed ? <CheckIcon width={12} height={12} /> : idx + 1}
+                {step.completed ? <Icon icon={CheckIcon} size="xs" /> : idx + 1}
               </Box>
               <Text
                 fontSize="sm"
@@ -177,13 +178,7 @@ export function SetupSidebar({
             }}
             cursor="pointer"
           >
-            <InformationCircleIcon
-              width={18}
-              height={18}
-              style={{
-                marginRight: '12px',
-              }}
-            />
+            <Icon icon={InformationCircleIcon} size="md" style={{ marginRight: '12px' }} />
             <Text
               fontSize="sm"
               display={{
@@ -205,13 +200,7 @@ export function SetupSidebar({
             }}
             cursor="pointer"
           >
-            <Cog6ToothIcon
-              width={18}
-              height={18}
-              style={{
-                marginRight: '12px',
-              }}
-            />
+            <Icon icon={Cog6ToothIcon} size="md" style={{ marginRight: '12px' }} />
             <Text
               fontSize="sm"
               display={{

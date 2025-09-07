@@ -27,7 +27,7 @@ import {
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 import type { Alert as AlertType, AlertSeverity, AlertType as AlertTypeEnum } from '../types';
-import { CardWrapper } from '@/shared/ui';
+import { CardWrapper, Icon } from '@/shared/ui';
 
 export interface AlertDisplayProps {
   alert: AlertType;
@@ -124,7 +124,7 @@ export function AlertDisplay({
           onClick={() => onAcknowledge(alert.id)}
           aria-label="Reconocer alerta"
         >
-          <CheckCircleIcon className="w-3 h-3" />
+          <Icon icon={CheckCircleIcon} size="xs" />
         </IconButton>
       );
     }
@@ -139,7 +139,7 @@ export function AlertDisplay({
           onClick={() => onResolve(alert.id)}
           aria-label="Resolver alerta"
         >
-          <CheckCircleIcon className="w-3 h-3" />
+          <Icon icon={CheckCircleIcon} size="xs" />
         </IconButton>
       );
     }
@@ -154,7 +154,7 @@ export function AlertDisplay({
           onClick={() => onDismiss(alert.id)}
           aria-label="Descartar alerta"
         >
-          <XMarkIcon className="w-3 h-3" />
+          <Icon icon={XMarkIcon} size="xs" />
         </IconButton>
       );
     }
@@ -168,7 +168,7 @@ export function AlertDisplay({
           onClick={() => onView(alert.id)}
           aria-label="Ver detalles"
         >
-          <EyeIcon className="w-3 h-3" />
+          <Icon icon={EyeIcon} size="xs" />
         </IconButton>
       );
     }
@@ -253,7 +253,7 @@ export function AlertDisplay({
   if (variant === 'minimal') {
     return (
       <HStack gap="2" p="2" bg={`${severityColor}.50`} borderRadius="md" border="1px solid" borderColor={`${severityColor}.200`}>
-        <SeverityIcon className={`w-4 h-4 text-${severityColor}-500`} />
+        <Icon icon={SeverityIcon} size="sm" color={`var(--chakra-colors-${severityColor}-500)`} />
         <Text fontSize="sm" fontWeight="medium" flex="1">
           {alert.title}
         </Text>
@@ -268,7 +268,7 @@ export function AlertDisplay({
     return (
       <Alert.Root status={alert.severity === 'critical' ? 'error' : alert.severity === 'high' ? 'warning' : 'info'}>
         <Alert.Indicator>
-          <SeverityIcon className="w-4 h-4" />
+          <Icon icon={SeverityIcon} size="sm" />
         </Alert.Indicator>
         
         <VStack align="start" gap="2" flex="1">
@@ -301,7 +301,7 @@ export function AlertDisplay({
       <Box p="3" bg={`${severityColor}.50`} borderLeft="4px solid" borderColor={`${severityColor}.400`} borderRadius="md">
         <HStack justify="space-between" align="start">
           <HStack gap="3" align="start" flex="1">
-            <SeverityIcon className={`w-5 h-5 text-${severityColor}-500 mt-0.5`} />
+            <Icon icon={SeverityIcon} size="md" color={`var(--chakra-colors-${severityColor}-500)`} style={{marginTop: '2px'}} />
             <VStack align="start" gap="1" flex="1">
               <HStack gap="2" align="center">
                 <Text fontWeight="medium" fontSize="sm">
@@ -345,7 +345,7 @@ export function AlertDisplay({
           <HStack justify="space-between" align="start">
             <HStack gap="3" align="start" flex="1">
               <Box mt="0.5">
-                <SeverityIcon className={`w-5 h-5 text-${severityColor}-500`} />
+                <Icon icon={SeverityIcon} size="md" color={`var(--chakra-colors-${severityColor}-500)`} />
               </Box>
               
               <VStack align="start" gap="1" flex="1">
@@ -381,7 +381,7 @@ export function AlertDisplay({
                 {getRelativeTime(alert.createdAt)}
               </Text>
               <HStack gap="1">
-                <TypeIcon className="w-4 h-4 text-gray-400" />
+                <Icon icon={TypeIcon} size="sm" color="gray.400" />
                 <Text fontSize="xs" color="gray.500" textTransform="capitalize">
                   {alert.context}
                 </Text>

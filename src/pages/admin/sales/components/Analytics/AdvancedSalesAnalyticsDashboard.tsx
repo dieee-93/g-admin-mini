@@ -104,7 +104,7 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
     // Performance calculations  
     const topItems = salesData
       .reduce((acc: any[], sale) => {
-        sale.items?.forEach((item: any) => {
+        sale.items?.forEach((item: unknown) => {
           const existing = acc.find(i => i.name === item.name);
           if (existing) {
             existing.quantity += item.quantity;

@@ -51,7 +51,7 @@ export function useRecipeStockValidation() {
       // Transform the viability data to our validation format
       const result: RecipeStockValidationResult = {
         is_valid: data?.is_viable || false,
-        missing_ingredients: data?.missing_ingredients?.map((item: any) => ({
+        missing_ingredients: data?.missing_ingredients?.map((item: unknown) => ({
           item_id: item.item_id,
           item_name: item.item_name,
           required: item.required * batches,

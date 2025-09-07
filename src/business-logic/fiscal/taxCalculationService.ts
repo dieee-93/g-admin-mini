@@ -169,8 +169,8 @@ class TaxCalculationService {
         effectiveTaxRate: subtotal > 0 ? DecimalUtils.safeDivide(totalTaxes, subtotal, 'tax', 'effective tax rate').toNumber() : 0,
       }
     };
-    } catch (error: any) {
-      console.error('TaxCalculationService.calculateTaxesForAmount:', error.message);
+    } catch (error: unknown) {
+      console.error('TaxCalculationService.calculateTaxesForAmount:', error instanceof Error ? error.message : error);
       return this.getZeroTaxResult();
     }
   }
@@ -250,7 +250,7 @@ class TaxCalculationService {
         totalSubtotalDec = totalSubtotalDec.plus(itemSubtotalDec);
         totalIvaAmountDec = totalIvaAmountDec.plus(itemIvaAmountDec);
         totalIngresosBrutosAmountDec = totalIngresosBrutosAmountDec.plus(itemIngresosBrutosAmountDec);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(`TaxCalculationService: Error processing item ${item.productId}:`, error.message);
         // Continue processing other items
       }

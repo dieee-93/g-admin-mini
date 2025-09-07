@@ -4,7 +4,6 @@ import {
   VStack,
   HStack,
   Text,
-  CardWrapper ,
   Badge,
   SimpleGrid,
   Select,
@@ -15,6 +14,7 @@ import {
   ArrowsRightLeftIcon,
   LightBulbIcon
 } from '@heroicons/react/24/outline';
+import { Icon, CardWrapper } from '@/shared/ui';
 
 // Import shared types
 interface ModuleMetric {
@@ -155,7 +155,7 @@ export function CorrelationsView({
                     <Badge colorPalette="blue" size="sm">
                       {correlation.metric1.moduleName}
                     </Badge>
-                    <ArrowsRightLeftIcon className="w-4 h-4 text-gray-400" />
+                    <Icon icon={ArrowsRightLeftIcon} size="sm" color="var(--chakra-colors-gray-400)" />
                     <Badge colorPalette="purple" size="sm">
                       {correlation.metric2.moduleName}
                     </Badge>
@@ -198,7 +198,7 @@ export function CorrelationsView({
                     <CardWrapper .Root variant="subtle" size="sm">
                       <CardWrapper .Body p={2}>
                         <HStack gap={2}>
-                          <LightBulbIcon className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                          <Icon icon={LightBulbIcon} size="sm" color="var(--chakra-colors-blue-500)" style={{ flexShrink: "0" }} />
                           <Text fontSize="xs" color="blue.700">
                             {correlation.actionableRecommendation}
                           </Text>

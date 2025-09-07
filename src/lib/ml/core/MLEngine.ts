@@ -446,7 +446,7 @@ export class MLEngine {
   /**
    * Process sales data for ML training
    */
-  private async processSaleData(saleData: any): Promise<void> {
+  private async processSaleData(saleData: unknown): Promise<void> {
     try {
       const timeSeries: TimeSeries = {
         id: 'daily_sales',
@@ -473,7 +473,7 @@ export class MLEngine {
   /**
    * Process inventory data for ML training
    */
-  private async processInventoryData(inventoryData: any): Promise<void> {
+  private async processInventoryData(inventoryData: unknown): Promise<void> {
     try {
       const timeSeries: TimeSeries = {
         id: `inventory_${inventoryData.itemId}`,
@@ -500,10 +500,10 @@ export class MLEngine {
   /**
    * Process order data for demand forecasting
    */
-  private async processOrderData(orderData: any): Promise<void> {
+  private async processOrderData(orderData: unknown): Promise<void> {
     try {
       // Process each item in the order
-      orderData.items?.forEach((item: any) => {
+      orderData.items?.forEach((item: unknown) => {
         const timeSeries: TimeSeries = {
           id: `demand_${item.productId}`,
           name: `Demand: ${item.productId}`,

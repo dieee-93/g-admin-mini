@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Stack, Button, Input, IconButton, Separator, Tag } from '@chakra-ui/react';
-import { Typography } from '@/shared/ui';
+import { Typography, Icon } from '@/shared/ui';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { Schedule, DailyRule, TimeBlock } from '@/types/schedule';
 
@@ -109,7 +109,7 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
         <Box>
           <Stack direction="row" mb={2} justify="space-between">
             <Typography variant="body" fontWeight="medium">Bloques de Horario:</Typography>
-            <Button leftIcon={<PlusIcon width={16} height={16} />} size="xs" variant="solid" colorScheme="blue" onClick={handleAddTimeBlock} isDisabled={selectedDays.size === 0}>
+            <Button leftIcon={<Icon icon={PlusIcon} size="sm" />} size="xs" variant="solid" colorScheme="blue" onClick={handleAddTimeBlock} isDisabled={selectedDays.size === 0}>
               Añadir Bloque
             </Button>
           </Stack>
@@ -133,7 +133,7 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
                          <Input type="time" value={block.endTime} onChange={(e) => handleTimeChange(day, index, 'endTime', e.target.value)} bg="white"/>
                          <IconButton
                            aria-label="Remove time block"
-                           icon={<TrashIcon width={16} height={16} />}
+                           icon={<Icon icon={TrashIcon} size="sm" />}
                            size="sm"
                            variant="ghost"
                            onClick={() => handleRemoveTimeBlock(day, index)}

@@ -4,7 +4,6 @@ import {
   VStack,
   HStack,
   Text,
-  CardWrapper ,
   Badge,
   SimpleGrid,
   Select,
@@ -16,6 +15,7 @@ import {
   ArrowTrendingDownIcon,
   ChartBarIcon
 } from '@heroicons/react/24/outline';
+import { Icon, CardWrapper } from '@/shared/ui';
 
 interface ExecutiveKPI {
   id: string;
@@ -129,7 +129,7 @@ export function ExecutiveKPIGrid({
                         {kpi.priority}
                       </Badge>
                     </VStack>
-                    <TrendIcon className={`w-4 h-4 text-${trend.color}-500`} />
+                    <Icon icon={TrendIcon} size="sm" color={`var(--chakra-colors-${trend.color}-500)`} />
                   </HStack>
 
                   {/* Value */}

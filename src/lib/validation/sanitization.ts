@@ -66,7 +66,7 @@ export function sanitizeObject(obj: any, options: SanitizationOptions = {}): any
   }
 
   if (typeof obj === 'object') {
-    const sanitized: any = {};
+    const sanitized: unknown = {};
     
     for (const [key, value] of Object.entries(obj)) {
       // Convert to number if specified

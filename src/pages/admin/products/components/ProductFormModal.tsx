@@ -9,10 +9,15 @@ import {
   ModalClose
 } from '@/shared/ui';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 // import { ProductForm } from './ProductForm'; // TODO: Fix ProductForm export
 import { useProductsStore } from '@/store/productsStore';
 import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore'; // Import for milestones
 import { supabase } from '@/lib/supabase/client';
+import { 
+  FinancialCalculations, 
+  QuickCalculations 
+} from '@/business-logic/shared/FinancialCalculations';
 import type { CreateProductData, UpdateProductData } from '../types';
 
 export function ProductFormModal() {
@@ -65,12 +70,13 @@ export function ProductFormModal() {
           
         }
 
-        // Update in store
+        // Update in store with centralized calculations
+        const estimatedCost = ('estimated_cost' in data ? data.estimated_cost : 0) || 0;
         updateProduct(data.id, {
           name: data.name,
           description: data.description || '',
           category: 'General', // TODO: handle categories
-          cost: ('estimated_cost' in data ? data.estimated_cost : 0) || 0,
+          cost: estimatedCost,
           updated_at: new Date().toISOString()
         });
 
@@ -109,18 +115,27 @@ export function ProductFormModal() {
           
         }
 
-        // Add to store
+        // Add to store with centralized financial calculations
+        const estimatedCost = ('estimated_cost' in data ? data.estimated_cost : 0) || 0;
+        const recommendedPrice = QuickCalculations.sellingPriceFromMarkup(estimatedCost, 150); // 2.5x markup = 150% markup
+        const profitMargin = QuickCalculations.profitMargin(recommendedPrice, estimatedCost);
+        const profitabilityAnalysis = FinancialCalculations.analyzeProfitability(
+          recommendedPrice, 
+          estimatedCost, 
+          0 // no operating expenses for basic analysis
+        );
+
         addProduct({
           name: data.name,
           description: data.description || '',
           category: 'General', // TODO: handle categories
-          price: (('estimated_cost' in data ? data.estimated_cost : 0) || 0) * 2.5, // Default markup
-          cost: ('estimated_cost' in data ? data.estimated_cost : 0) || 0,
-          margin: 60, // Will be recalculated
+          price: recommendedPrice,
+          cost: estimatedCost,
+          margin: profitMargin, // Calculated with precision
           prep_time: 15,
           active: true,
           popularity_score: 0,
-          profitability_score: 0,
+          profitability_score: profitabilityAnalysis.return_on_cost,
           menu_classification: 'dog',
           components: [],
           sales_count: 0,
@@ -150,7 +165,7 @@ export function ProductFormModal() {
           </ModalTitle>
           <ModalClose>
             <button className="p-1 hover:bg-accent rounded-md transition-colors">
-              <XMarkIcon className="w-5 h-5" />
+              <Icon icon={XMarkIcon} size="md" />
             </button>
           </ModalClose>
         </ModalHeader>

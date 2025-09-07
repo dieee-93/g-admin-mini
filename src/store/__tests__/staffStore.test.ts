@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { act, renderHook } from '@testing-library/react';
+import { actHook } from '@testing-library/react';
 import { useStaffStore } from '../staffStore';
 import type { Employee, Schedule, TimeEntry } from '../staffStore';
 
@@ -96,7 +96,7 @@ describe('Staff Store', () => {
     });
 
     it('should handle loading state during staff fetch', async () => {
-      let resolvePromise: (value: any) => void;
+      let resolvePromise: (value: unknown) => void;
       const promise = new Promise(resolve => {
         resolvePromise = resolve;
       });
@@ -200,7 +200,7 @@ describe('Staff Store', () => {
       const newEmployeeData = { name: 'Test Employee' };
       
       // Make API call take time
-      let resolvePromise: (value: any) => void;
+      let resolvePromise: (value: unknown) => void;
       const promise = new Promise(resolve => {
         resolvePromise = resolve;
       });

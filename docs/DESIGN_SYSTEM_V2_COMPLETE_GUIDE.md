@@ -188,6 +188,73 @@ src/shared/ui/
 </StatsSection>
 ```
 
+---
+
+## 🧩 **Componentes Base**
+
+### **Icon - Wrapper Universal**
+
+**Wrapper simplificado** que actúa como envoltorio del `Icon` de Chakra UI, optimizado para uso con **Heroicons** y cualquier biblioteca de iconos.
+
+**Reemplaza**: Import directo de Chakra UI Icon + configuración manual de tamaños
+
+```tsx
+// ❌ ANTES (múltiples imports, tamaños inconsistentes)
+import { Icon as ChakraIcon } from '@chakra-ui/react';
+import { HomeIcon } from '@heroicons/react/24/outline';
+<ChakraIcon as={HomeIcon} size="5" />
+
+// ✅ DESPUÉS (simple y consistente)
+import { Icon } from '@/shared/ui/Icon';  
+import { HomeIcon } from '@heroicons/react/24/outline';
+<Icon icon={HomeIcon} size="md" />
+```
+
+**Props**: `icon`, `size`, `asChild`, `children`, + todas las props del Icon de Chakra UI
+
+**Tamaños disponibles**:
+- `xs` (`3`) - Botones pequeños, badges
+- `sm` (`4`) - Inputs, texto  
+- `md` (`5`) - **Default**, navegación
+- `lg` (`6`) - Headers, elementos destacados
+- `xl` (`8`) - Hero sections
+- `2xl` (`10`) - Extra large contexts
+
+**Casos de Uso**:
+- ✅ **Heroicons** (recomendado para el proyecto)
+- ✅ **React Icons** (compatibilidad)
+- ✅ **SVG components** personalizados
+- ✅ **Patrón asChild** (Chakra UI v3)
+
+```tsx
+// Con Heroicons (uso principal)
+import { HomeIcon, UserIcon } from '@heroicons/react/24/outline';
+<Icon icon={HomeIcon} size="md" />
+<Icon icon={UserIcon} size="lg" color="blue.500" />
+
+// Con React Icons
+import { FiHome } from 'react-icons/fi';
+<Icon icon={FiHome} size="lg" />
+
+// Con SVG personalizado
+const CustomIcon = () => <svg>...</svg>;
+<Icon icon={CustomIcon} size="xl" />
+
+// Patrón asChild (Chakra UI v3)
+<Icon asChild>
+  <CustomSvgIcon />
+</Icon>
+
+// Con props adicionales de Chakra UI
+<Icon icon={UserIcon} size="sm" color="red.400" _hover={{ color: 'red.600' }} />
+```
+
+**Ventajas del wrapper**:
+- ✅ **Consistencia en tamaños** semánticos en todo el proyecto
+- ✅ **Sintaxis simplificada** para uso diario
+- ✅ **Compatibilidad futura** si cambias de biblioteca de iconos
+- ✅ **Mantiene toda la potencia** de Chakra UI (color, _hover, etc.)
+
 ### **6. Grid Components - Layout Responsivo**
 
 **Grid y SimpleGrid** con props corregidas según Chakra UI v3:

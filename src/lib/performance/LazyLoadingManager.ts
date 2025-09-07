@@ -425,7 +425,7 @@ export class LazyLoadingManager {
     }
   }
 
-  private estimateChunkSize(moduleExport: any): number {
+  private estimateChunkSize(moduleExport: unknown): number {
     // Simple estimation - in real implementation, this would use build-time data
     return JSON.stringify(moduleExport).length;
   }

@@ -22,7 +22,7 @@ import {
   ClockIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { CardWrapper } from '@/shared/ui';
+import { CardWrapper, Icon } from '@/shared/ui';
 import { lazyLoadingManager } from '../LazyLoadingManager';
 
 // Loading state types
@@ -96,7 +96,7 @@ export function LazyFallback({
       <CardWrapper .Root maxW="500px" mx="auto" mt="8">
         <CardWrapper .Body p="6" textAlign="center">
           <VStack gap="4">
-            <ExclamationTriangleIcon className="w-12 h-12 text-red-500" />
+            <Icon icon={ExclamationTriangleIcon} size="xl" color="red.500" />
             
             <VStack gap="2">
               <Text fontSize="lg" fontWeight="semibold" color="red.600">
@@ -119,7 +119,7 @@ export function LazyFallback({
                   onClick={onRetry}
                   size="sm"
                 >
-                  <ArrowPathIcon className="w-4 h-4 mr-2" />
+                  <Icon icon={ArrowPathIcon} size="sm" />
                   Retry
                 </Button>
               )}
@@ -172,7 +172,7 @@ export function LazyFallback({
                 <Text>{Math.round(progress)}% complete</Text>
                 {estimatedTime && (
                   <HStack gap="1">
-                    <ClockIcon className="w-3 h-3" />
+                    <Icon icon={ClockIcon} size="xs" />
                     <Text>{estimatedTime}s remaining</Text>
                   </HStack>
                 )}
@@ -184,7 +184,7 @@ export function LazyFallback({
           {showDetails && (
             <Alert.Root status="info" size="sm">
               <Alert.Indicator>
-                <WifiIcon className="w-4 h-4" />
+                <Icon icon={WifiIcon} size="sm" />
               </Alert.Indicator>
               <Alert.Title>Performance Mode</Alert.Title>
               <Alert.Description>
@@ -205,7 +205,7 @@ export class LazyErrorBoundary extends React.Component<
 > {
   private retryTimeouts: NodeJS.Timeout[] = [];
 
-  constructor(props: any) {
+  constructor(props: unknown) {
     super(props);
     this.state = {
       hasError: false,
@@ -536,9 +536,9 @@ export function LazyLoadingMonitor() {
                             {stat.loadTime}ms
                           </Badge>
                           {stat.success ? (
-                            <CheckCircleIcon className="w-3 h-3 text-green-500" />
+                            <Icon icon={CheckCircleIcon} size="xs" color="green.500" />
                           ) : (
-                            <ExclamationTriangleIcon className="w-3 h-3 text-red-500" />
+                            <Icon icon={ExclamationTriangleIcon} size="xs" color="red.500" />
                           )}
                         </HStack>
                       </HStack>

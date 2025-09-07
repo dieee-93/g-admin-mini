@@ -33,6 +33,7 @@ import {
   EyeIcon,
   BellIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 import { useLiveCostDashboard, useOvertimeMonitoring, useBudgetMonitoring } from '@/hooks/useRealTimeLaborCosts';
 
 interface RealTimeLaborTrackerProps {
@@ -115,7 +116,7 @@ export function RealTimeLaborTracker({
   if (error) {
     return (
       <Alert.Root status="error">
-        <ExclamationTriangleIcon className="w-5 h-5" />
+        <Icon icon={ExclamationTriangleIcon} size="md" />
         <Alert.Title>Error de Monitoreo</Alert.Title>
         <Alert.Description>{error}</Alert.Description>
       </Alert.Root>
@@ -166,8 +167,8 @@ export function RealTimeLaborTracker({
                 variant="outline"
                 onClick={forceUpdate}
                 disabled={loading}
-                leftIcon={<ArrowPathIcon className="w-4 h-4" />}
               >
+                <Icon icon={ArrowPathIcon} size="sm" style={{marginRight: '8px'}} />
                 Actualizar
               </Button>
 
@@ -175,8 +176,8 @@ export function RealTimeLaborTracker({
                 size="sm"
                 colorPalette={isMonitoring ? 'red' : 'green'}
                 onClick={isMonitoring ? stopMonitoring : startMonitoring}
-                leftIcon={isMonitoring ? <PauseIcon className="w-4 h-4" /> : <PlayIcon className="w-4 h-4" />}
               >
+                {isMonitoring ? <Icon icon={PauseIcon} size="sm" style={{marginRight: '8px'}} /> : <Icon icon={PlayIcon} size="sm" style={{marginRight: '8px'}} />}
                 {isMonitoring ? 'Pausar' : 'Iniciar'}
               </Button>
             </HStack>
@@ -189,7 +190,7 @@ export function RealTimeLaborTracker({
         <Stack gap="2">
           {criticalAlerts.map(alert => (
             <Alert.Root key={alert.id} status="error">
-              <ExclamationTriangleIcon className="w-5 h-5" />
+              <Icon icon={ExclamationTriangleIcon} size="md" />
               <Alert.Title>Alerta Crítica</Alert.Title>
               <Alert.Description>{alert.message}</Alert.Description>
             </Alert.Root>
@@ -197,7 +198,7 @@ export function RealTimeLaborTracker({
           
           {budgetAlerts.map(alert => (
             <Alert.Root key={alert.id} status="warning">
-              <BellIcon className="w-5 h-5" />
+              <Icon icon={BellIcon} size="md" />
               <Alert.Title>Alerta de Presupuesto</Alert.Title>
               <Alert.Description>{alert.message}</Alert.Description>
             </Alert.Root>
@@ -215,7 +216,7 @@ export function RealTimeLaborTracker({
               </Text>
               <Text fontSize="xs" color="gray.600">Costo Actual</Text>
               <HStack gap="1" justify="center">
-                <BoltIcon className="w-3 h-3 text-blue-500" />
+                <Icon icon={BoltIcon} size="xs" color="var(--chakra-colors-blue-500)" />
                 <Text fontSize="xs" color="blue.500">En vivo</Text>
               </HStack>
             </VStack>
@@ -312,22 +313,22 @@ export function RealTimeLaborTracker({
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="overview" gap="2" flex="1">
-                <ChartBarIcon className="w-4 h-4" />
+                <Icon icon={ChartBarIcon} size="sm" />
                 <Text display={{ base: "none", sm: "block" }}>Resumen</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="employees" gap="2" flex="1">
-                <ClockIcon className="w-4 h-4" />
+                <Icon icon={ClockIcon} size="sm" />
                 <Text display={{ base: "none", sm: "block" }}>Empleados</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="departments" gap="2" flex="1">
-                <CurrencyDollarIcon className="w-4 h-4" />
+                <Icon icon={CurrencyDollarIcon} size="sm" />
                 <Text display={{ base: "none", sm: "block" }}>Departamentos</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="alerts" gap="2" flex="1">
-                <BellIcon className="w-4 h-4" />
+                <Icon icon={BellIcon} size="sm" />
                 <Text display={{ base: "none", sm: "block" }}>
                   Alertas
                   {(criticalAlerts.length + overtimeAlerts.length) > 0 && (
@@ -578,7 +579,7 @@ export function RealTimeLaborTracker({
                     <VStack gap="2" align="stretch">
                       {[...criticalAlerts, ...overtimeAlerts, ...budgetAlerts].map(alert => (
                         <Alert.Root key={alert.id} status={alert.severity === 'critical' ? 'error' : 'warning'}>
-                          <ExclamationTriangleIcon className="w-5 h-5" />
+                          <Icon icon={ExclamationTriangleIcon} size="md" />
                           <Alert.Title>
                             {alert.employee_name || 'Sistema'}
                             {alert.department && ` - ${alert.department}`}

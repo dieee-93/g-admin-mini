@@ -1,4 +1,5 @@
 import { DynamicThemeTest } from '@/components/debug/DynamicThemeTest'
+import { TestCrudOperations } from '@/components/test/TestCrudOperations'
 import { Layout, Stack, Typography, Button, CardWrapper } from '@/shared/ui'
 import { Box, Grid } from '@chakra-ui/react'
 
@@ -150,6 +151,21 @@ export function ThemeTestPage() {
         <Typography variant="body" size="sm" textAlign="center">
           ✅ Expected: Default components change colors, colorPalette components stay fixed colors
         </Typography>
+        
+        {/* 🧪 CRUD OPERATIONS TEST */}
+        <CardWrapper variant="elevated" padding="md">
+          <CardWrapper.Header>
+            <Typography variant="heading" level={3}>
+              🧪 useCrudOperations Hook Test
+            </Typography>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
+            <Typography variant="body" color="text.secondary" marginBottom="md">
+              Testing the fixed useCrudOperations hook for infinite render loops and stability.
+            </Typography>
+            <TestCrudOperations />
+          </CardWrapper.Body>
+        </CardWrapper>
       </Stack>
     </Layout>
   )

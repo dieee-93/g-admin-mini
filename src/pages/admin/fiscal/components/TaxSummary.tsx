@@ -1,5 +1,6 @@
 // TaxSummary Component - Reusable tax breakdown display - Design System v2.0
 // Shows detailed tax calculations in a consistent format
+// MIGRATED: Now uses centralized financial calculations
 
 import {
   CardWrapper ,
@@ -9,6 +10,7 @@ import {
   Badge,
   Grid
 } from '@/shared/ui';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { Separator } from '@chakra-ui/react';
 import { 
   DocumentTextIcon,
@@ -112,12 +114,7 @@ export function TaxSummary({
     return calculateTaxes(totalWithTax);
   };
 
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(amount);
-  };
+  // MIGRATED: Use centralized currency formatting
 
   // Determine calculation method and get results
   const result = (() => {
@@ -138,10 +135,10 @@ export function TaxSummary({
   })();
 
   const formatted = {
-    subtotal: formatCurrency(result.subtotal),
-    ivaAmount: formatCurrency(result.ivaAmount),
-    ingresosBrutosAmount: formatCurrency(result.ingresosBrutosAmount),
-    total: formatCurrency(result.total),
+    subtotal: QuickCalculations.formatCurrency(result.subtotal),
+    ivaAmount: QuickCalculations.formatCurrency(result.ivaAmount),
+    ingresosBrutosAmount: QuickCalculations.formatCurrency(result.ingresosBrutosAmount),
+    total: QuickCalculations.formatCurrency(result.total),
     effectiveRate: `${result.effectiveRate.toFixed(2)}%`
   };
 
@@ -287,11 +284,11 @@ export function TaxSummary({
                       <VStack align="start" gap="xs">
                         <Typography variant="body" className="text-sm font-medium">{item.name}</Typography>
                         <Typography variant="body" className="text-xs" color="text.muted">
-                          {item.quantity} x {formatCurrency(item.price)}
+                          {item.quantity} x {QuickCalculations.formatCurrency(item.price)}
                         </Typography>
                       </VStack>
                       <Typography variant="body" className="text-sm font-medium">
-                        {formatCurrency(item.price * item.quantity)}
+                        {QuickCalculations.formatCurrency(item.price * item.quantity)}
                       </Typography>
                     </HStack>
                   ))}

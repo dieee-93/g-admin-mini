@@ -96,7 +96,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
       const stored = localStorage.getItem('g-mini-alerts');
       if (stored) {
         const parsed = JSON.parse(stored);
-        const deserializedAlerts = parsed.map((alert: any) => ({
+        const deserializedAlerts = parsed.map((alert: unknown) => ({
           ...alert,
           createdAt: new Date(alert.createdAt),
           updatedAt: new Date(alert.updatedAt),

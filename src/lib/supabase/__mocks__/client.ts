@@ -1,5 +1,3 @@
-import { vi } from 'vitest';
-
 const mockFrom = {
   select: vi.fn().mockReturnThis(),
   insert: vi.fn().mockReturnThis(),

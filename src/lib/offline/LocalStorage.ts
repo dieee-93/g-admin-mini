@@ -477,7 +477,7 @@ class LocalStorageManager {
   }
 
   // Calculate simple checksum for data integrity
-  private calculateChecksum(data: any): string {
+  private calculateChecksum(data: unknown): string {
     const str = JSON.stringify(data);
     let hash = 0;
     

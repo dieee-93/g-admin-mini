@@ -261,7 +261,7 @@ export function useMaterials(options: UseMaterialsOptions = {}) {
   if (!enableRealtime) return;
 
   // Add error handling and logging
-  const handleSubscriptionError = (error: any) => {
+  const handleSubscriptionError = (error: unknown) => {
     
   };
 

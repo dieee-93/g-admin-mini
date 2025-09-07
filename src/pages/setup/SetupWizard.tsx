@@ -42,7 +42,7 @@ export function SetupWizard() {
     }
 
     const props = {
-      onComplete: (data: any) => {
+      onComplete: (data: unknown) => {
         if (componentId === 'welcome') setUserName(data);
         if (componentId === 'admin-user') setAdminUserData(data);
         nextStep();

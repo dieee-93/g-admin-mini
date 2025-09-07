@@ -19,6 +19,7 @@ import {
   Switch,
   IconButton
 } from '@chakra-ui/react';
+import { Icon } from '@/shared/ui';
 import {
   ChartBarIcon,
   CurrencyDollarIcon,
@@ -366,11 +367,11 @@ export function ExecutiveDashboard() {
                 loading={isRefreshing}
                 loadingText="Actualizando..."
               >
-                <ArrowPathIcon className="w-4 h-4" />
+                <Icon icon={ArrowPathIcon} size="sm" />
               </Button>
               
               <IconButton size="sm" variant="outline">
-                <CogIcon className="w-4 h-4" />
+                <Icon icon={CogIcon} size="sm" />
               </IconButton>
             </HStack>
           </HStack>
@@ -470,35 +471,35 @@ export function ExecutiveDashboard() {
           <Tabs.List>
             <Tabs.Trigger value="overview">
               <HStack gap={2}>
-                <ChartBarIcon className="w-4 h-4" />
+                <Icon icon={ChartBarIcon} size="sm" />
                 <Text>Resumen</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="kpis">
               <HStack gap={2}>
-                <DocumentChartBarIcon className="w-4 h-4" />
+                <Icon icon={DocumentChartBarIcon} size="sm" />
                 <Text>KPIs</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="insights">
               <HStack gap={2}>
-                <LightBulbIcon className="w-4 h-4" />
+                <Icon icon={LightBulbIcon} size="sm" />
                 <Text>Insights Estratégicos</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="correlations">
               <HStack gap={2}>
-                <ArrowTrendingUpIcon className="w-4 h-4" />
+                <Icon icon={ArrowTrendingUpIcon} size="sm" />
                 <Text>Correlaciones</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="actions">
               <HStack gap={2}>
-                <CheckCircleIcon className="w-4 h-4" />
+                <Icon icon={CheckCircleIcon} size="sm" />
                 <Text>Plan de Acción</Text>
               </HStack>
             </Tabs.Trigger>
@@ -519,7 +520,7 @@ export function ExecutiveDashboard() {
                         <VStack gap={2} align="stretch">
                           {summary.keyHighlights.map((highlight, index) => (
                             <HStack key={index} gap={3}>
-                              <CheckCircleIcon className="w-4 h-4 text-green-500 flex-shrink-0" />
+                              <Icon icon={CheckCircleIcon} size="sm" color="green.500" />
                               <Text fontSize="sm">{highlight}</Text>
                             </HStack>
                           ))}
@@ -537,7 +538,7 @@ export function ExecutiveDashboard() {
                           <VStack gap={2} align="stretch">
                             {summary.keyConcerns.map((concern, index) => (
                               <HStack key={index} gap={3}>
-                                <ExclamationTriangleIcon className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                                <Icon icon={ExclamationTriangleIcon} size="sm" color="yellow.500" />
                                 <Text fontSize="sm">{concern}</Text>
                               </HStack>
                             ))}
@@ -555,7 +556,7 @@ export function ExecutiveDashboard() {
                         <VStack gap={2} align="stretch">
                           {summary.strategicRecommendations.map((recommendation, index) => (
                             <HStack key={index} gap={3}>
-                              <ArrowUpIcon className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                              <Icon icon={ArrowUpIcon} size="sm" color="blue.500" />
                               <Text fontSize="sm">{recommendation}</Text>
                             </HStack>
                           ))}
@@ -592,7 +593,7 @@ export function ExecutiveDashboard() {
                                     <Text fontWeight="medium">
                                       {item.prefix}{(item.data.value / (item.suffix === 'K' ? 1000 : 1)).toFixed(item.suffix === '%' ? 1 : 0)}{item.suffix}
                                     </Text>
-                                    <TrendIcon className={`w-3 h-3 text-${trend.color}-500`} />
+                                    <Icon icon={TrendIcon} size="xs" color={`${trend.color}.500`} />
                                     <Text fontSize="xs" color={`${trend.color}.600`}>
                                       {item.data.change > 0 ? '+' : ''}{item.data.change.toFixed(1)}%
                                     </Text>
@@ -629,7 +630,7 @@ export function ExecutiveDashboard() {
                                   <Text color="gray.600">{item.label}:</Text>
                                   <HStack gap={1}>
                                     <Text fontWeight="medium">{item.data.value.toFixed(1)}%</Text>
-                                    <TrendIcon className={`w-3 h-3 text-${trend.color}-500`} />
+                                    <Icon icon={TrendIcon} size="xs" color={`${trend.color}.500`} />
                                     <Text fontSize="xs" color={`${trend.color}.600`}>
                                       {item.data.change > 0 ? '+' : ''}{item.data.change.toFixed(1)}%
                                     </Text>
@@ -668,7 +669,7 @@ export function ExecutiveDashboard() {
                                     <Text fontWeight="medium">
                                       {item.data.value.toFixed(1)}{item.scale === 5 ? '/5' : item.scale === 10 ? '/10' : '%'}
                                     </Text>
-                                    <TrendIcon className={`w-3 h-3 text-${trend.color}-500`} />
+                                    <Icon icon={TrendIcon} size="xs" color={`${trend.color}.500`} />
                                     <Text fontSize="xs" color={`${trend.color}.600`}>
                                       {item.data.change > 0 ? '+' : ''}{item.data.change.toFixed(1)}%
                                     </Text>
@@ -736,7 +737,7 @@ export function ExecutiveDashboard() {
                                   {kpi.priority}
                                 </Badge>
                               </VStack>
-                              <TrendIcon className={`w-4 h-4 text-${trend.color}-500`} />
+                              <Icon icon={TrendIcon} size="sm" color={`${trend.color}.500`} />
                             </HStack>
 
                             {/* Value */}
@@ -805,10 +806,10 @@ export function ExecutiveDashboard() {
                       <HStack justify="space-between">
                         <HStack gap={3}>
                           <Box p={2} bg={`${getPriorityColor(insight.priority)}.100`} borderRadius="md">
-                            {insight.type === 'opportunity' && <ArrowTrendingUpIcon className={`w-5 h-5 text-${getPriorityColor(insight.priority)}-600`} />}
-                            {insight.type === 'risk' && <ExclamationTriangleIcon className={`w-5 h-5 text-${getPriorityColor(insight.priority)}-600`} />}
-                            {insight.type === 'recommendation' && <LightBulbIcon className={`w-5 h-5 text-${getPriorityColor(insight.priority)}-600`} />}
-                            {insight.type === 'trend' && <ChartBarIcon className={`w-5 h-5 text-${getPriorityColor(insight.priority)}-600`} />}
+                            {insight.type === 'opportunity' && <Icon icon={ArrowTrendingUpIcon} size="lg" color={`${getPriorityColor(insight.priority)}.600`} />}
+                            {insight.type === 'risk' && <Icon icon={ExclamationTriangleIcon} size="lg" color={`${getPriorityColor(insight.priority)}.600`} />}
+                            {insight.type === 'recommendation' && <Icon icon={LightBulbIcon} size="lg" color={`${getPriorityColor(insight.priority)}.600`} />}
+                            {insight.type === 'trend' && <Icon icon={ChartBarIcon} size="lg" color={`${getPriorityColor(insight.priority)}.600`} />}
                           </Box>
                           <VStack align="start" gap={0}>
                             <Text fontSize="lg" fontWeight="bold">{insight.title}</Text>
@@ -920,7 +921,7 @@ export function ExecutiveDashboard() {
                         {/* Timeline */}
                         <HStack justify="space-between" bg="bg.canvas" p={3} borderRadius="md">
                           <Text fontSize="sm" color="gray.600">
-                            <CalendarIcon className="w-4 h-4 inline mr-1" />
+                            <Icon icon={CalendarIcon} size="sm" style={{ display: 'inline', marginRight: '4px' }} />
                             Timeline esperado: {insight.timeline}
                           </Text>
                           <Button size="sm" variant="outline" colorPalette="blue">
@@ -938,7 +939,7 @@ export function ExecutiveDashboard() {
             <Tabs.Content value="correlations">
               <CardWrapper .Root variant="subtle">
                 <CardWrapper .Body p={8} textAlign="center">
-                  <ChartBarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <Icon icon={ChartBarIcon} size="3xl" color="gray.400" />
                   <Text fontSize="lg" fontWeight="medium" mb={2}>
                     Análisis de Correlaciones
                   </Text>
@@ -966,20 +967,20 @@ export function ExecutiveDashboard() {
                           
                           <HStack gap={6} fontSize="sm" color="gray.600">
                             <HStack gap={1}>
-                              <UsersIcon className="w-4 h-4" />
+                              <Icon icon={UsersIcon} size="sm" />
                               <Text>{action.owner}</Text>
                             </HStack>
                             <HStack gap={1}>
-                              <CurrencyDollarIcon className="w-4 h-4" />
+                              <Icon icon={CurrencyDollarIcon} size="sm" />
                               <Text>{action.estimatedImpact}</Text>
                             </HStack>
                             <HStack gap={1}>
-                              <ClockIcon className="w-4 h-4" />
+                              <Icon icon={ClockIcon} size="sm" />
                               <Text>{action.estimatedEffort}</Text>
                             </HStack>
                             {action.deadline && (
                               <HStack gap={1}>
-                                <CalendarIcon className="w-4 h-4" />
+                                <Icon icon={CalendarIcon} size="sm" />
                                 <Text>{action.deadline}</Text>
                               </HStack>
                             )}

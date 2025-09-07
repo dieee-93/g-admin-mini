@@ -264,7 +264,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
 
   const setupTimeTrackingEventListeners = () => {
     // Listen for employee clock events
-    const handleTimeEvent = async (event: any) => {
+    const handleTimeEvent = async (event: unknown) => {
       if (event.isOffline) {
         await processOfflineTimeEntry(event);
       }
@@ -369,7 +369,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
     });
   };
 
-  const processOfflineTimeEntry = async (entryData: any) => {
+  const processOfflineTimeEntry = async (entryData: unknown) => {
     const timeEntry: TimeEntry = {
       id: `offline_time_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       employee_id: entryData.employee_id,

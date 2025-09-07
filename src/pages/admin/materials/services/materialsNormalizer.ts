@@ -74,7 +74,7 @@ export class MaterialsNormalizer {
   /**
    * Normalizes a single item from API format to MaterialItem format
    */
-  static normalizeApiItem(apiItem: any): MaterialItem {
+  static normalizeApiItem(apiItem: unknown): MaterialItem {
     // Validate required fields
     if (!apiItem.id || !apiItem.name || !apiItem.type) {
       throw new Error('Invalid API item: missing required fields (id, name, type)');
@@ -211,7 +211,7 @@ export class MaterialsNormalizer {
   /**
    * Validates and normalizes precision for measurable items
    */
-  private static validatePrecision(precision: any): number {
+  private static validatePrecision(precision: unknown): number {
     const num = Number(precision);
     if (Number.isInteger(num) && num >= 0 && num <= 6) {
       return num;

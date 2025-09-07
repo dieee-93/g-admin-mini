@@ -11,7 +11,8 @@ import {
   Button,
   Spinner,
   Alert,
-  Tabs
+  Tabs,
+  Icon
 } from '@/shared/ui';
 import {
   CurrencyDollarIcon,
@@ -159,18 +160,18 @@ export function LaborCostDashboard({
 
       {/* Key Metrics */}
       <SimpleGrid columns={{ base: 2, md: compact ? 2 : 4 }} gap="4">
-        <CardWrapper variant="flat" padding="md">
+        <CardWrapper variant="elevated" padding="md">
           <CardWrapper.Body textAlign="center">
-            <CurrencyDollarIcon className="w-6 h-6 text-green-500 mx-auto mb-2" />
+            <Icon icon={CurrencyDollarIcon} size="lg" color="green.500" />
             <Text fontSize="xl" fontWeight="bold">
               {formatCurrency(costSummary.total_actual_cost)}
             </Text>
             <Text fontSize="sm" color="gray.600">Costo Total</Text>
             <HStack gap="1" justify="center" mt="1">
               {costSummary.variance_percentage > 0 ? (
-                <ArrowTrendingUpIcon className="w-3 h-3 text-red-500" />
+                <Icon icon={ArrowTrendingUpIcon} size="xs" color="red.500" />
               ) : (
-                <ArrowTrendingDownIcon className="w-3 h-3 text-green-500" />
+                <Icon icon={ArrowTrendingDownIcon} size="xs" color="green.500" />
               )}
               <Text fontSize="xs" color={getVarianceColor(costSummary.variance_percentage)}>
                 {costSummary.variance_percentage > 0 ? '+' : ''}{costSummary.variance_percentage.toFixed(1)}%
@@ -179,9 +180,9 @@ export function LaborCostDashboard({
           </CardWrapper.Body>
         </CardWrapper>
 
-        <CardWrapper variant="flat" padding="md">
+        <CardWrapper variant="elevated" padding="md">
           <CardWrapper.Body textAlign="center">
-            <ClockIcon className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+            <Icon icon={ClockIcon} size="lg" color="blue.500" />
             <Text fontSize="xl" fontWeight="bold">
               {costSummary.total_hours_worked.toFixed(0)}h
             </Text>
@@ -194,9 +195,9 @@ export function LaborCostDashboard({
 
         {!compact && (
           <>
-            <CardWrapper variant="flat" padding="md">
+            <CardWrapper variant="elevated" padding="md">
               <CardWrapper.Body textAlign="center">
-                <ExclamationTriangleIcon className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+                <Icon icon={ExclamationTriangleIcon} size="lg" color="orange.500" />
                 <Text fontSize="xl" fontWeight="bold">
                   {formatCurrency(Math.abs(costSummary.variance))}
                 </Text>
@@ -209,9 +210,9 @@ export function LaborCostDashboard({
               </CardWrapper.Body>
             </CardWrapper>
 
-            <CardWrapper variant="flat" padding="md">
+            <CardWrapper variant="elevated" padding="md">
               <CardWrapper.Body textAlign="center">
-                <CalculatorIcon className="w-6 h-6 text-purple-500 mx-auto mb-2" />
+                <Icon icon={CalculatorIcon} size="lg" color="purple.500" />
                 <Text fontSize="xl" fontWeight="bold">
                   {costSummary.cost_efficiency_score}
                 </Text>

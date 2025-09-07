@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
-import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { act } from 'react';
 
@@ -15,7 +15,6 @@ import { mockStaffData, mockScheduleData, mockTimeEntryData } from '../mocks/sta
 // Components to test
 import StaffPage from '@/pages/admin/staff/page';
 import SchedulingPage from '@/pages/admin/scheduling/page';
-import { App } from '@/App';
 
 // Services
 import { realTimeLaborCosts } from '@/services/staff/realTimeLaborCosts';
@@ -76,7 +75,7 @@ describe('Staff Module E2E Tests', () => {
 
   describe('Complete Employee Management Workflow', () => {
     it('should complete full CRUD workflow for employee management', async () => {
-      const { container } = renderWithProviders(<StaffPage />);
+      renderWithProviders(<StaffPage />);
 
       // Step 1: Load staff directory and verify initial state
       await waitFor(() => {
@@ -309,16 +308,6 @@ describe('Staff Module E2E Tests', () => {
     });
 
     it('should handle overtime alerts and notifications', async () => {
-      // Mock an overtime scenario
-      const overtimeData = [{
-        employee_id: '1',
-        employee_name: 'Juan Pérez',
-        current_hours: 8.5,
-        overtime_status: 'in_overtime',
-        current_cost: 225.0,
-        department: 'Cocina'
-      }];
-
       // Simulate real-time data update with overtime
       act(() => {
         realTimeLaborCosts.forceUpdate();
@@ -531,7 +520,8 @@ describe('Staff Module E2E Tests', () => {
       });
 
       // Measure initial memory
-      const initialMemory = (performance as any).memory?.usedJSHeapSize || 0;
+      const performanceWithMemory = performance as Performance & { memory?: { usedJSHeapSize: number } };
+      const initialMemory = performanceWithMemory.memory?.usedJSHeapSize || 0;
 
       // Perform multiple operations
       for (let i = 0; i < 10; i++) {
@@ -546,7 +536,7 @@ describe('Staff Module E2E Tests', () => {
       unmount();
 
       // Check memory didn't grow excessively
-      const finalMemory = (performance as any).memory?.usedJSHeapSize || 0;
+      const finalMemory = performanceWithMemory.memory?.usedJSHeapSize || 0;
       const memoryIncrease = finalMemory - initialMemory;
 
       // Memory increase should be reasonable (less than 10MB)

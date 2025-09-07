@@ -10,7 +10,7 @@ import {
   calculateMenuEngineeringMatrix,
   DEFAULT_MATRIX_CONFIG,
   type ProductSalesData
-} from '../logic/menuEngineeringCalculations';
+} from '@/business-logic/menuengineering/menuEngineeringCalculations';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';
 
@@ -125,7 +125,7 @@ export const useMenuEngineering = (
 
       // Aggregate sales data by product
       sales?.forEach(sale => {
-        sale.sale_items?.forEach((item: any) => {
+        sale.sale_items?.forEach((item: unknown) => {
           const productData = productSalesMap.get(item.product_id);
           if (productData) {
             productData.unitsSold += item.quantity;

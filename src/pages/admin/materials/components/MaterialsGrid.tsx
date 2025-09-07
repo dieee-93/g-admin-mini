@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  CardGrid, Stack, Typography, Badge, Button, Alert, Section
+  CardGrid, Stack, Typography, Badge, Button, Alert, Section, Icon
 } from '@/shared/ui';
 import { PencilIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { CubeIcon } from '@heroicons/react/24/outline';
@@ -53,7 +53,7 @@ export const MaterialsGrid: React.FC<MaterialsGridProps> = ({ onEdit, onView, on
       <Section variant="flat">
         <div style={{ padding: '2rem', textAlign: 'center' }}>
           <Stack align="center" gap="md">
-            <CubeIcon className="w-12 h-12 text-gray-400" />
+            <Icon icon={CubeIcon} size="xl" color="gray.400" />
             <Stack align="center" gap="sm">
               <Typography variant="body" size="lg" weight="semibold" color="text.muted">No se encontraron materiales</Typography>
               <Typography variant="body" size="sm" color="text.muted">Intenta ajustar los filtros o agregar nuevos materiales</Typography>
@@ -136,17 +136,17 @@ export const MaterialsGrid: React.FC<MaterialsGridProps> = ({ onEdit, onView, on
                   borderTop: '1px solid var(--colors-border-subtle)' 
                 }}>
                   <Button size="xs" variant="outline" onClick={() => onView(item)} style={{ flex: 1 }} aria-label={`Ver ${item.name}`}>
-                    <EyeIcon className="w-3 h-3" />
+                    <Icon icon={EyeIcon} size="xs" />
                     Ver
                   </Button>
 
                   <Button size="xs" variant="outline" onClick={() => onEdit(item)} style={{ flex: 1 }} aria-label={`Editar ${item.name}`}>
-                    <PencilIcon className="w-3 h-3" />
+                    <Icon icon={PencilIcon} size="xs" />
                     Editar
                   </Button>
 
                   <Button size="xs" variant="outline" colorPalette="red" onClick={() => onDelete(item)} aria-label={`Eliminar ${item.name}`}>
-                    <TrashIcon className="w-3 h-3" />
+                    <Icon icon={TrashIcon} size="xs" />
                   </Button>
                 </div>
               </Stack>

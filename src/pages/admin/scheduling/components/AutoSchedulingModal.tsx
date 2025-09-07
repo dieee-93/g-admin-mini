@@ -31,8 +31,10 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   ChartBarIcon,
-  LightBulbIcon
+  LightBulbIcon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 
 import { autoSchedulingEngine, type SchedulingConstraints, type SchedulingSolution } from '@/services/scheduling/autoSchedulingEngine';
 import { notify } from '@/lib/notifications';
@@ -168,7 +170,7 @@ export function AutoSchedulingModal({
       <CardWrapper>
         <CardWrapper.Header>
           <HStack>
-            <CalendarIcon className="w-5 h-5" />
+            <Icon icon={CalendarIcon} size="md" />
             <Text fontWeight="medium">Date Range</Text>
           </HStack>
         </CardWrapper.Header>
@@ -202,7 +204,7 @@ export function AutoSchedulingModal({
       <CardWrapper>
         <CardWrapper.Header>
           <HStack>
-            <UsersIcon className="w-5 h-5" />
+            <Icon icon={UsersIcon} size="md" />
             <Text fontWeight="medium">Labor Constraints</Text>
           </HStack>
         </CardWrapper.Header>
@@ -247,7 +249,7 @@ export function AutoSchedulingModal({
       <CardWrapper>
         <CardWrapper.Header>
           <HStack>
-            <CurrencyDollarIcon className="w-5 h-5" />
+            <Icon icon={CurrencyDollarIcon} size="md" />
             <Text fontWeight="medium">Budget Constraints</Text>
           </HStack>
         </CardWrapper.Header>
@@ -268,7 +270,7 @@ export function AutoSchedulingModal({
       <CardWrapper>
         <CardWrapper.Header>
           <HStack>
-            <ChartBarIcon className="w-5 h-5" />
+            <Icon icon={ChartBarIcon} size="md" />
             <Text fontWeight="medium">Optimization Preferences</Text>
           </HStack>
         </CardWrapper.Header>
@@ -384,7 +386,7 @@ export function AutoSchedulingModal({
           <CardWrapper>
             <CardWrapper.Header>
               <HStack>
-                <ExclamationTriangleIcon className="w-5 h-5" />
+                <Icon icon={ExclamationTriangleIcon} size="md" />
                 <Text fontWeight="medium">Conflicts & Issues</Text>
                 <Badge colorScheme="orange">{solution.conflicts.length}</Badge>
               </HStack>
@@ -415,7 +417,7 @@ export function AutoSchedulingModal({
           <CardWrapper>
             <CardWrapper.Header>
               <HStack>
-                <LightBulbIcon className="w-5 h-5" />
+                <Icon icon={LightBulbIcon} size="md" />
                 <Text fontWeight="medium">Recommendations</Text>
               </HStack>
             </CardWrapper.Header>
@@ -437,7 +439,7 @@ export function AutoSchedulingModal({
 
   const renderCompleteStep = () => (
     <VStack align="stretch" spacing={6} textAlign="center">
-      <CheckCircleIcon className="w-16 h-16 mx-auto text-green-500" />
+      <Icon icon={CheckCircleIcon} size="3xl" color="var(--chakra-colors-green-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
       <Text fontSize="xl" fontWeight="semibold">Schedule Applied Successfully!</Text>
       <Text color="gray.600">
         Your optimized schedule has been generated and applied. 
@@ -469,7 +471,7 @@ export function AutoSchedulingModal({
       <Modal.Content>
         <Modal.Header>
           <HStack>
-            <Cog6ToothIcon className="w-6 h-6" />
+            <Icon icon={Cog6ToothIcon} size="lg" />
             <Text>Auto-Schedule Generator</Text>
           </HStack>
         </Modal.Header>

@@ -333,7 +333,7 @@ export const useStaffStore = create<StaffState>()(
             });
 
             // Convert updates to Employee format
-            const employeeUpdates: any = {};
+            const employeeUpdates: unknown = {};
             if (updates.name) {
               const nameParts = updates.name.split(' ');
               employeeUpdates.first_name = nameParts[0];

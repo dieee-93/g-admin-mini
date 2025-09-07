@@ -153,7 +153,7 @@ export function QROrderPage() {
       if (productsError) throw productsError;
 
       // Filter only available products for customer ordering
-      const availableProducts = productsData?.filter((product: any) => 
+      const availableProducts = productsData?.filter((product: unknown) => 
         product.availability > 0 && product.is_available !== false
       ) || [];
 

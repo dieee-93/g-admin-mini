@@ -19,6 +19,20 @@ html {
   cursor: pointer;
 }
 
+/* Icon animations */
+@keyframes icon-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.icon-wrapper {
+  position: relative;
+}
+
+.icon-component {
+  display: block;
+}
+
 
 /* Print styles */
 @media print {

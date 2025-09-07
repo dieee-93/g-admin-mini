@@ -18,6 +18,7 @@ import {
   IconButton,
   NumberInput
 } from '@chakra-ui/react';
+import { Icon } from '@/shared/ui';
 import {
   ChartBarIcon,
   ArrowsRightLeftIcon,
@@ -418,12 +419,12 @@ export function CrossModuleAnalytics() {
                 loading={isAnalyzing}
                 loadingText="Analizando..."
               >
-                <MagnifyingGlassIcon className="w-4 h-4" />
+                <Icon icon={MagnifyingGlassIcon} size="sm" />
                 Análisis Profundo
               </Button>
               
               <IconButton size="sm" variant="outline">
-                <CogIcon className="w-4 h-4" />
+                <Icon icon={CogIcon} size="sm" />
               </IconButton>
             </HStack>
           </HStack>
@@ -507,35 +508,35 @@ export function CrossModuleAnalytics() {
           <Tabs.List>
             <Tabs.Trigger value="overview">
               <HStack gap={2}>
-                <PuzzlePieceIcon className="w-4 h-4" />
+                <Icon icon={PuzzlePieceIcon} size="sm" />
                 <Text>Resumen</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="correlations">
               <HStack gap={2}>
-                <ArrowsRightLeftIcon className="w-4 h-4" />
+                <Icon icon={ArrowsRightLeftIcon} size="sm" />
                 <Text>Correlaciones</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="bottlenecks">
               <HStack gap={2}>
-                <ExclamationTriangleIcon className="w-4 h-4" />
+                <Icon icon={ExclamationTriangleIcon} size="sm" />
                 <Text>Cuellos de Botella</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="insights">
               <HStack gap={2}>
-                <LightBulbIcon className="w-4 h-4" />
+                <Icon icon={LightBulbIcon} size="sm" />
                 <Text>Insights Holísticos</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="optimization">
               <HStack gap={2}>
-                <ArrowTrendingUpIcon className="w-4 h-4" />
+                <Icon icon={ArrowTrendingUpIcon} size="sm" />
                 <Text>Optimización</Text>
               </HStack>
             </Tabs.Trigger>
@@ -614,7 +615,7 @@ export function CrossModuleAnalytics() {
                                   <Badge colorPalette="blue" size="xs">
                                     {correlation.metric1.moduleName}
                                   </Badge>
-                                  <ArrowsRightLeftIcon className="w-3 h-3 text-gray-400" />
+                                  <Icon icon={ArrowsRightLeftIcon} size="xs" color="gray.400" />
                                   <Badge colorPalette="purple" size="xs">
                                     {correlation.metric2.moduleName}
                                   </Badge>
@@ -654,7 +655,7 @@ export function CrossModuleAnalytics() {
                         {bottlenecks.filter(b => b.severity === 'critical' || b.severity === 'high').map((bottleneck) => (
                           <Alert.Root key={bottleneck.id} status="warning" variant="subtle">
                             <Alert.Indicator>
-                              <ExclamationTriangleIcon className="w-5 h-5" />
+                              <Icon icon={ExclamationTriangleIcon} size="lg" />
                             </Alert.Indicator>
                             <VStack align="start" gap={1} flex="1">
                               <Alert.Title>
@@ -734,7 +735,7 @@ export function CrossModuleAnalytics() {
                               <Badge colorPalette="blue" size="sm">
                                 {correlation.metric1.moduleName}
                               </Badge>
-                              <ArrowsRightLeftIcon className="w-4 h-4 text-gray-400" />
+                              <Icon icon={ArrowsRightLeftIcon} size="sm" color="gray.400" />
                               <Badge colorPalette="purple" size="sm">
                                 {correlation.metric2.moduleName}
                               </Badge>
@@ -777,7 +778,7 @@ export function CrossModuleAnalytics() {
                               <CardWrapper .Root variant="subtle" size="sm">
                                 <CardWrapper .Body p={2}>
                                   <HStack gap={2}>
-                                    <LightBulbIcon className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                    <Icon icon={LightBulbIcon} size="sm" color="blue.500" />
                                     <Text fontSize="xs" color="blue.700">
                                       {correlation.actionableRecommendation}
                                     </Text>
@@ -803,7 +804,7 @@ export function CrossModuleAnalytics() {
                       <HStack justify="space-between">
                         <HStack gap={3}>
                           <Box p={2} bg={`${getBottleneckColor(bottleneck.severity)}.100`} borderRadius="md">
-                            <ExclamationTriangleIcon className={`w-5 h-5 text-${getBottleneckColor(bottleneck.severity)}-600`} />
+                            <Icon icon={ExclamationTriangleIcon} size="lg" color={`${getBottleneckColor(bottleneck.severity)}.600`} />
                           </Box>
                           <VStack align="start" gap={0}>
                             <Text fontSize="lg" fontWeight="bold">{bottleneck.name}</Text>
@@ -917,7 +918,7 @@ export function CrossModuleAnalytics() {
                       <HStack justify="space-between">
                         <HStack gap={3}>
                           <Box p={2} bg="purple.100" borderRadius="md">
-                            <LightBulbIcon className="w-5 h-5 text-purple-600" />
+                            <Icon icon={LightBulbIcon} size="lg" color="purple.600" />
                           </Box>
                           <VStack align="start" gap={0}>
                             <Text fontSize="lg" fontWeight="bold">{insight.title}</Text>
@@ -1031,7 +1032,7 @@ export function CrossModuleAnalytics() {
             <Tabs.Content value="optimization">
               <CardWrapper .Root variant="subtle">
                 <CardWrapper .Body p={8} textAlign="center">
-                  <ArrowTrendingUpIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <Icon icon={ArrowTrendingUpIcon} size="3xl" color="gray.400" />
                   <Text fontSize="lg" fontWeight="medium" mb={2}>
                     Optimización Avanzada
                   </Text>

@@ -142,7 +142,7 @@ export class PredictiveInventoryManager {
   /**
    * Update item stock level
    */
-  private async updateItemStock(stockData: any): Promise<void> {
+  private async updateItemStock(stockData: unknown): Promise<void> {
     const item = this.items.get(stockData.itemId);
     if (!item) return;
 
@@ -162,14 +162,14 @@ export class PredictiveInventoryManager {
   /**
    * Handle stock low events
    */
-  private async handleStockLowEvent(stockData: any): Promise<void> {
+  private async handleStockLowEvent(stockData: unknown): Promise<void> {
     await this.generateReorderRecommendation(stockData.itemId);
   }
 
   /**
    * Update demand patterns from orders
    */
-  private async updateDemandFromOrder(orderData: any): Promise<void> {
+  private async updateDemandFromOrder(orderData: unknown): Promise<void> {
     if (!orderData.items) return;
 
     for (const orderItem of orderData.items) {

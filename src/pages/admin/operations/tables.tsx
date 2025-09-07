@@ -92,9 +92,9 @@ export default function TableManagement() {
 
       if (error) throw error;
 
-      const formattedTables = data.map((table: any) => ({
+      const formattedTables = data.map((table: unknown) => ({
         ...table,
-        current_party: table.parties?.find((p: any) => 
+        current_party: table.parties?.find((p: unknown) => 
           p.status === 'seated' || p.status === 'active'
         ) || null
       }));
@@ -117,10 +117,10 @@ export default function TableManagement() {
 
       const stats = {
         total_tables: data.length,
-        available_tables: data.filter((t: any) => t.status === 'available').length,
-        occupied_tables: data.filter((t: any) => t.status === 'occupied').length,
-        reserved_tables: data.filter((t: any) => t.status === 'reserved').length,
-        average_occupancy: (data.filter((t: any) => t.status === 'occupied').length / data.length) * 100,
+        available_tables: data.filter((t: unknown) => t.status === 'available').length,
+        occupied_tables: data.filter((t: unknown) => t.status === 'occupied').length,
+        reserved_tables: data.filter((t: unknown) => t.status === 'reserved').length,
+        average_occupancy: (data.filter((t: unknown) => t.status === 'occupied').length / data.length) * 100,
         total_revenue: data.reduce((sum: number, t: any) => sum + (t.daily_revenue || 0), 0),
         average_turn_time: data.reduce((sum: number, t: any) => sum + (t.turn_count || 0), 0) / data.length
       };

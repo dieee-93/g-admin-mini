@@ -22,6 +22,7 @@ import {
   CurrencyDollarIcon,
   ShoppingCartIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 
 // Import existing predictive components
 import { PredictiveAnalytics } from './business/PredictiveAnalytics';
@@ -174,7 +175,7 @@ const PredictiveAnalyticsPage: React.FC = () => {
                     <HStack justify="space-between" w="full">
                       <HStack gap="3">
                         <Box p="2" bg="purple.50" borderRadius="md">
-                          <model.icon className="w-5 h-5 text-purple-600" />
+                          <Icon icon={model.icon} size="md" color="var(--chakra-colors-purple-600)" />
                         </Box>
                         <Text fontWeight="semibold">{model.title}</Text>
                       </HStack>
@@ -219,11 +220,11 @@ const PredictiveAnalyticsPage: React.FC = () => {
               <Heading size="md">Predictive Models Dashboard</Heading>
               <HStack gap="2">
                 <Button size="sm" variant="outline">
-                  <ChartBarIcon className="w-4 h-4" style={{marginRight: '8px'}} />
+                  <Icon icon={ChartBarIcon} size="sm" style={{marginRight: '8px'}} />
                   View Details
                 </Button>
                 <Button size="sm" variant="outline">
-                  <CpuChipIcon className="w-4 h-4" style={{marginRight: '8px'}} />
+                  <Icon icon={CpuChipIcon} size="sm" style={{marginRight: '8px'}} />
                   Train Models
                 </Button>
               </HStack>
@@ -235,25 +236,25 @@ const PredictiveAnalyticsPage: React.FC = () => {
               <Tabs.List>
                 <Tabs.Trigger value="demand">
                   <HStack gap="2">
-                    <ArrowTrendingUpIcon className="w-4 h-4" />
+                    <Icon icon={ArrowTrendingUpIcon} size="sm" />
                     <Text>Demand</Text>
                   </HStack>
                 </Tabs.Trigger>
                 <Tabs.Trigger value="sales">
                   <HStack gap="2">
-                    <CurrencyDollarIcon className="w-4 h-4" />
+                    <Icon icon={CurrencyDollarIcon} size="sm" />
                     <Text>Sales</Text>
                   </HStack>
                 </Tabs.Trigger>
                 <Tabs.Trigger value="inventory">
                   <HStack gap="2">
-                    <ShoppingCartIcon className="w-4 h-4" />
+                    <Icon icon={ShoppingCartIcon} size="sm" />
                     <Text>Inventory</Text>
                   </HStack>
                 </Tabs.Trigger>
                 <Tabs.Trigger value="advanced">
                   <HStack gap="2">
-                    <CpuChipIcon className="w-4 h-4" />
+                    <Icon icon={CpuChipIcon} size="sm" />
                     <Text>Advanced</Text>
                   </HStack>
                 </Tabs.Trigger>

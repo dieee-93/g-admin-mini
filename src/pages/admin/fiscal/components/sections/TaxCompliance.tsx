@@ -209,7 +209,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
       };
       
       setTaxReports(prev => [newTaxReport, ...prev]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       notify.error({ 
         title: 'Error al generar reporte de IVA',
         description: error.message || 'No se pudo generar el reporte solicitado'
@@ -262,7 +262,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
       });
       
       loadTaxData(); // Reload data
-    } catch (error: any) {
+    } catch (error: unknown) {
       notify.error({ 
         title: 'Error al presentar declaración',
         description: error.message || 'No se pudo enviar la declaración a AFIP'

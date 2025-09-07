@@ -3,13 +3,12 @@
 // ============================================================================
 // Tests de rendimiento y escalabilidad para grandes volúmenes de datos
 
-import { describe, test, expect, beforeAll, afterAll } from 'vitest';
+import { describe, test, expect, afterAll } from 'vitest';
 import { performance } from 'perf_hooks';
 import { ABCAnalysisEngine } from '@/business-logic/inventory/abcAnalysisEngine';
 import { ProcurementRecommendationsEngine } from '@/business-logic/inventory/procurementRecommendationsEngine';
 import { DemandForecastingEngine } from '@/business-logic/inventory/demandForecastingEngine';
 import { SmartAlertsEngine } from '@/business-logic/inventory/smartAlertsEngine';
-import { SupplierAnalysisEngine } from '@/business-logic/inventory/supplierAnalysisEngine';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import type { MaterialItem } from '@/pages/admin/materials/types';
 import type { MaterialABC } from '@/pages/admin/materials/types/abc-analysis';
@@ -166,6 +165,10 @@ describe('⚡ LARGE DATASET PERFORMANCE TESTS', () => {
         () => ABCAnalysisEngine.analyzeInventory(materials),
         materials.length
       );
+
+      // Verify performance results
+      expect(result).toBeDefined();
+      expect(metrics.duration).toBeGreaterThan(0);
 
       clearInterval(memoryMonitor);
       
@@ -340,7 +343,7 @@ describe('🔀 CONCURRENT OPERATIONS STRESS TESTS', () => {
     
     // All results should be consistent
     const firstResult = results[0];
-    results.forEach((result, index) => {
+    results.forEach((result) => {
       expect(result.length).toBe(firstResult.length);
       
       // Check that same items generated same types of alerts

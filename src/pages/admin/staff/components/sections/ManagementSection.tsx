@@ -40,6 +40,7 @@ import {
   CheckCircleIcon,
   ChartBarIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
 import type { Employee, StaffViewState, UserRole, Permission } from '../../types';
 import { LaborCostDashboard } from '../LaborCostDashboard';
 
@@ -165,7 +166,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
     <VStack gap="6" align="stretch">
       {/* Security Alert */}
       <Alert.Root status="warning" variant="subtle">
-        <ExclamationTriangleIcon className="w-5 h-5" />
+        <Icon icon={ExclamationTriangleIcon} size="md" />
         <Alert.Title>Área de Administración Segura</Alert.Title>
         <Alert.Description>
           Esta sección contiene datos sensibles. Todos los accesos son registrados y monitoreados.
@@ -177,7 +178,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
         <CardWrapper .Root>
           <CardWrapper .Body textAlign="center">
             <VStack gap="2">
-              <BanknotesIcon className="w-6 h-6 text-green-500 mx-auto" />
+              <Icon icon={BanknotesIcon} size="lg" color="var(--chakra-colors-green-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="lg" fontWeight="bold">
                 {showSensitiveData ? '$127,350' : '$***,***'}
               </Text>
@@ -189,7 +190,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
         <CardWrapper .Root>
           <CardWrapper .Body textAlign="center">
             <VStack gap="2">
-              <ShieldCheckIcon className="w-6 h-6 text-blue-500 mx-auto" />
+              <Icon icon={ShieldCheckIcon} size="lg" color="var(--chakra-colors-blue-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="lg" fontWeight="bold">24</Text>
               <Text fontSize="sm" color="gray.600">Usuarios Activos</Text>
             </VStack>
@@ -199,7 +200,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
         <CardWrapper .Root>
           <CardWrapper .Body textAlign="center">
             <VStack gap="2">
-              <ClockIcon className="w-6 h-6 text-orange-500 mx-auto" />
+              <Icon icon={ClockIcon} size="lg" color="var(--chakra-colors-orange-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="lg" fontWeight="bold">3</Text>
               <Text fontSize="sm" color="gray.600">Revisiones Pendientes</Text>
             </VStack>
@@ -209,7 +210,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
         <CardWrapper .Root>
           <CardWrapper .Body textAlign="center">
             <VStack gap="2">
-              <DocumentTextIcon className="w-6 h-6 text-purple-500 mx-auto" />
+              <Icon icon={DocumentTextIcon} size="lg" color="var(--chakra-colors-purple-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="lg" fontWeight="bold">156</Text>
               <Text fontSize="sm" color="gray.600">Acciones Auditadas</Text>
             </VStack>
@@ -229,9 +230,9 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
             </VStack>
             <HStack gap="2">
               {showSensitiveData ? (
-                <EyeSlashIcon className="w-5 h-5 text-gray-500" />
+                <Icon icon={EyeSlashIcon} size="md" color="var(--chakra-colors-gray-500)" />
               ) : (
-                <EyeIcon className="w-5 h-5 text-gray-500" />
+                <Icon icon={EyeIcon} size="md" color="var(--chakra-colors-gray-500)" />
               )}
               <Switch.Root
                 checked={showSensitiveData}
@@ -249,27 +250,27 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="payroll" gap="2" flex="1" minH="44px">
-                <BanknotesIcon className="w-5 h-5" />
+                <Icon icon={BanknotesIcon} size="md" />
                 <Text display={{ base: "none", sm: "block" }}>Nómina</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="labor-costs" gap="2" flex="1" minH="44px">
-                <ChartBarIcon className="w-5 h-5" />
+                <Icon icon={ChartBarIcon} size="md" />
                 <Text display={{ base: "none", sm: "block" }}>Costos</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="permissions" gap="2" flex="1" minH="44px">
-                <KeyIcon className="w-5 h-5" />
+                <Icon icon={KeyIcon} size="md" />
                 <Text display={{ base: "none", sm: "block" }}>Permisos</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="audit" gap="2" flex="1" minH="44px">
-                <DocumentTextIcon className="w-5 h-5" />
+                <Icon icon={DocumentTextIcon} size="md" />
                 <Text display={{ base: "none", sm: "block" }}>Auditoría</Text>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="settings" gap="2" flex="1" minH="44px">
-                <CogIcon className="w-5 h-5" />
+                <Icon icon={CogIcon} size="md" />
                 <Text display={{ base: "none", sm: "block" }}>Configuración</Text>
               </Tabs.Trigger>
             </Tabs.List>
@@ -285,7 +286,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                         colorPalette="green"
                         size="sm"
                       >
-                        <PlusIcon className="w-4 h-4 mr-2" />
+                        <Icon icon={PlusIcon} size="sm" style={{marginRight: '8px'}} />
                         Procesar Nómina
                       </Button>
                     </HStack>
@@ -350,7 +351,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                   aria-label="Edit payroll"
                                   onClick={() => setSelectedEmployee(payroll.employee_id)}
                                 >
-                                  <PencilIcon className="w-3 h-3" />
+                                  <Icon icon={PencilIcon} size="xs" />
                                 </IconButton>
                               </HStack>
                             </Table.Cell>

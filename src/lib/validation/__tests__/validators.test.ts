@@ -229,7 +229,7 @@ describe('Validation System', () => {
           {
             field: 'custom_field',
             rules: {
-              custom: (value: any) => {
+              custom: (value: unknown) => {
                 if (value === 'invalid') {
                   return 'Custom validation failed';
                 }

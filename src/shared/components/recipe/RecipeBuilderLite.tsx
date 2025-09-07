@@ -26,7 +26,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { recipeService, type Recipe, type RecipeIngredient } from '@/services/recipe';
 import { MaterialSelector } from '../MaterialSelector';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
-import { CardWrapper } from '@/shared/ui';
+import { CardWrapper, Icon } from '@/shared/ui';
 interface RecipeBuilderLiteProps {
   mode: 'product' | 'material';
   onRecipeCreated?: (recipe: Recipe) => void;
@@ -314,9 +314,9 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
               variant="ghost"
               colorPalette="gray"
               onClick={openFullRecipeBuilder}
-              rightIcon={<ArrowTopRightOnSquareIcon className="w-4 h-4" />}
             >
               Avanzado
+              <Icon icon={ArrowTopRightOnSquareIcon} size="sm" />
             </Button>
           </Flex>
         </CardWrapper.Header>
@@ -413,8 +413,8 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
                         size="sm"
                         variant="outline"
                         onClick={startNewIngredient}
-                        leftIcon={<PlusIcon className="w-4 h-4" />}
                       >
+                        <Icon icon={PlusIcon} size="sm" />
                         Agregar otro
                       </Button>
                     )}
@@ -440,7 +440,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
                               size="sm"
                               onClick={() => removeIngredient(index)}
                             >
-                              <TrashIcon className="w-4 h-4" />
+                              <Icon icon={TrashIcon} size="sm" />
                             </IconButton>
                           </Flex>
                         </CardWrapper.Body>

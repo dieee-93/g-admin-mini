@@ -271,14 +271,26 @@ export async function generatePerformanceReport(): Promise<{
   }
 
   const metrics: PerformanceMetrics = {
-    ...lazyMetrics,
-    renderCount: 0, // Would be populated by runtime monitoring
-    averageRenderTime: 0,
-    memoryUsage: runtimeAnalysis.memoryUsage,
-    overallScore: Math.max(0, overallScore),
-    recommendations: recommendations.map(r => r.title),
+    // Loading metrics
+    loadedModules: 0, // Would be populated by runtime monitoring
+    totalModules: 0,
+    averageLoadTime: 0,
+    cacheHitRate: 0,
+    errorRate: 0,
+    
+    // Bundle metrics
+    totalChunkSize: bundleAnalysis.totalSize,
     chunkCount: bundleAnalysis.chunkCount,
-    compressionRatio: bundleAnalysis.gzippedSize / bundleAnalysis.totalSize
+    compressionRatio: bundleAnalysis.gzippedSize / bundleAnalysis.totalSize,
+    
+    // Runtime metrics
+    renderCount: 0,
+    averageRenderTime: runtimeAnalysis.renderTime,
+    memoryUsage: runtimeAnalysis.memoryUsage,
+    
+    // Performance score
+    overallScore: Math.max(0, overallScore),
+    recommendations: recommendations.map(r => r.title)
   };
 
   return {

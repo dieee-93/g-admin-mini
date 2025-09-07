@@ -38,7 +38,7 @@ export function getSpacingToken(value: string | ResponsiveValue<string>): any {
   
   // Handle responsive values
   if (typeof value === 'object' && value !== null) {
-    const result: any = {};
+    const result: unknown = {};
     Object.keys(value).forEach(key => {
       const v = (value as any)[key];
       result[key] = typeof v === 'string' ? (SEMANTIC_SPACING[v] || v) : v;

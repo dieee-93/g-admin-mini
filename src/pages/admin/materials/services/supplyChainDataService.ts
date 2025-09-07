@@ -112,7 +112,7 @@ export class SupplyChainDataService {
       if (error) throw error;
 
       // Transform to ItemPerformance format and add calculated fields
-      return data?.map((item: any) => ({
+      return data?.map((item: unknown) => ({
         item_id: item.item_id,
         item_name: item.item_name,
         item_type: item.item_type,

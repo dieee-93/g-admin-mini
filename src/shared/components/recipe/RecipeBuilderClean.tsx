@@ -9,6 +9,7 @@ import {
   CardWrapper ,
   Button
 } from '@chakra-ui/react';
+import { Icon } from '@/shared/ui';
 import { 
   ArrowTopRightOnSquareIcon,
   BeakerIcon
@@ -110,7 +111,7 @@ export const RecipeBuilderClean: React.FC<RecipeBuilderCleanProps> = ({
                 size="sm"
                 colorPalette={mode === 'product' ? 'blue' : 'green'}
                 onClick={handleNewRecipe}
-                leftIcon={<BeakerIcon className="w-4 h-4" />}
+                leftIcon={<Icon icon={BeakerIcon} size="sm" />}
               >
                 Nueva Receta
               </Button>
@@ -120,7 +121,7 @@ export const RecipeBuilderClean: React.FC<RecipeBuilderCleanProps> = ({
                 variant="ghost"
                 colorPalette="gray"
                 onClick={openFullRecipeBuilder}
-                rightIcon={<ArrowTopRightOnSquareIcon className="w-4 h-4" />}
+                rightIcon={<Icon icon={ArrowTopRightOnSquareIcon} size="sm" />}
               >
                 Avanzado
               </Button>

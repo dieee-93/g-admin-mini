@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { render, RenderOptions } from '@testing-library/react';
-import { vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 
 // Test providers wrapper

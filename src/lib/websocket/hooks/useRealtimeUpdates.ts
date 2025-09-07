@@ -20,7 +20,7 @@ interface UseRealtimeUpdatesReturn {
   broadcast: (type: WSMessageType, data: any, priority?: 'low' | 'medium' | 'high' | 'critical') => Promise<void>;
   
   // Subscription management
-  subscribe: (messageType: WSMessageType, callback: (data: any) => void) => () => void;
+  subscribe: (messageType: WSMessageType, callback: (data: unknown) => void) => () => void;
   
   // Statistics
   stats: {
@@ -35,30 +35,30 @@ interface UseRealtimeUpdatesReturn {
 
 // Module-specific hooks
 interface UseRealtimeOrdersReturn extends UseRealtimeUpdatesReturn {
-  onOrderCreated: (callback: (order: any) => void) => () => void;
-  onOrderUpdated: (callback: (order: any) => void) => () => void;
-  onOrderStatusChanged: (callback: (order: any) => void) => () => void;
-  createOrder: (orderData: any) => Promise<void>;
+  onOrderCreated: (callback: (order: unknown) => void) => () => void;
+  onOrderUpdated: (callback: (order: unknown) => void) => () => void;
+  onOrderStatusChanged: (callback: (order: unknown) => void) => () => void;
+  createOrder: (orderData: unknown) => Promise<void>;
   updateOrder: (orderId: string, updates: any) => Promise<void>;
   changeOrderStatus: (orderId: string, status: string) => Promise<void>;
 }
 
 interface UseRealtimeInventoryReturn extends UseRealtimeUpdatesReturn {
-  onInventoryUpdated: (callback: (item: any) => void) => () => void;
+  onInventoryUpdated: (callback: (item: unknown) => void) => () => void;
   updateInventory: (itemId: string, field: string, value: any) => Promise<void>;
-  onStockLevelChanged: (callback: (item: any) => void) => () => void;
+  onStockLevelChanged: (callback: (item: unknown) => void) => () => void;
 }
 
 interface UseRealtimeStaffReturn extends UseRealtimeUpdatesReturn {
-  onStaffClockAction: (callback: (action: any) => void) => () => void;
-  onStaffUpdate: (callback: (update: any) => void) => () => void;
+  onStaffClockAction: (callback: (action: unknown) => void) => () => void;
+  onStaffUpdate: (callback: (update: unknown) => void) => () => void;
   clockAction: (employeeId: string, action: 'clock_in' | 'clock_out' | 'break_start' | 'break_end', notes?: string) => Promise<void>;
 }
 
 interface UseRealtimeKitchenReturn extends UseRealtimeUpdatesReturn {
-  onKitchenUpdate: (callback: (update: any) => void) => () => void;
+  onKitchenUpdate: (callback: (update: unknown) => void) => () => void;
   sendKitchenUpdate: (type: string, data: any, priority?: 'low' | 'medium' | 'high' | 'critical') => Promise<void>;
-  onOrderReceived: (callback: (order: any) => void) => () => void;
+  onOrderReceived: (callback: (order: unknown) => void) => () => void;
 }
 
 // Base hook for real-time updates
@@ -145,7 +145,7 @@ export function useRealtimeUpdates(): UseRealtimeUpdatesReturn {
 
   const subscribe = useCallback((
     messageType: WSMessageType, 
-    callback: (data: any) => void
+    callback: (data: unknown) => void
   ) => {
     const unsubscribe = wsManager.subscribe(messageType, callback);
     subscriptionsRef.current.push(unsubscribe);
@@ -176,19 +176,19 @@ export function useRealtimeUpdates(): UseRealtimeUpdatesReturn {
 export function useRealtimeOrders(): UseRealtimeOrdersReturn {
   const base = useRealtimeUpdates();
 
-  const onOrderCreated = useCallback((callback: (order: any) => void) => {
+  const onOrderCreated = useCallback((callback: (order: unknown) => void) => {
     return base.subscribe('ORDER_CREATED', callback);
   }, [base]);
 
-  const onOrderUpdated = useCallback((callback: (order: any) => void) => {
+  const onOrderUpdated = useCallback((callback: (order: unknown) => void) => {
     return base.subscribe('ORDER_UPDATED', callback);
   }, [base]);
 
-  const onOrderStatusChanged = useCallback((callback: (order: any) => void) => {
+  const onOrderStatusChanged = useCallback((callback: (order: unknown) => void) => {
     return base.subscribe('ORDER_STATUS_CHANGED', callback);
   }, [base]);
 
-  const createOrder = useCallback(async (orderData: any) => {
+  const createOrder = useCallback(async (orderData: unknown) => {
     return base.broadcast('ORDER_CREATED', {
       orderId: orderData.id || `order_${Date.now()}`,
       orderData,
@@ -228,11 +228,11 @@ export function useRealtimeOrders(): UseRealtimeOrdersReturn {
 export function useRealtimeInventory(): UseRealtimeInventoryReturn {
   const base = useRealtimeUpdates();
 
-  const onInventoryUpdated = useCallback((callback: (item: any) => void) => {
+  const onInventoryUpdated = useCallback((callback: (item: unknown) => void) => {
     return base.subscribe('INVENTORY_UPDATED', callback);
   }, [base]);
 
-  const onStockLevelChanged = useCallback((callback: (item: any) => void) => {
+  const onStockLevelChanged = useCallback((callback: (item: unknown) => void) => {
     // Filter for stock-specific updates
     return base.subscribe('INVENTORY_UPDATED', (data) => {
       if (data.field === 'stock') {
@@ -263,11 +263,11 @@ export function useRealtimeInventory(): UseRealtimeInventoryReturn {
 export function useRealtimeStaff(): UseRealtimeStaffReturn {
   const base = useRealtimeUpdates();
 
-  const onStaffClockAction = useCallback((callback: (action: any) => void) => {
+  const onStaffClockAction = useCallback((callback: (action: unknown) => void) => {
     return base.subscribe('STAFF_CLOCK_ACTION', callback);
   }, [base]);
 
-  const onStaffUpdate = useCallback((callback: (update: any) => void) => {
+  const onStaffUpdate = useCallback((callback: (update: unknown) => void) => {
     return base.subscribe('STAFF_CLOCK_ACTION', callback);
   }, [base]);
 
@@ -317,11 +317,11 @@ export function useRealtimeStaff(): UseRealtimeStaffReturn {
 export function useRealtimeKitchen(): UseRealtimeKitchenReturn {
   const base = useRealtimeUpdates();
 
-  const onKitchenUpdate = useCallback((callback: (update: any) => void) => {
+  const onKitchenUpdate = useCallback((callback: (update: unknown) => void) => {
     return base.subscribe('KITCHEN_UPDATE', callback);
   }, [base]);
 
-  const onOrderReceived = useCallback((callback: (order: any) => void) => {
+  const onOrderReceived = useCallback((callback: (order: unknown) => void) => {
     // Filter for order_received updates
     return base.subscribe('KITCHEN_UPDATE', (data) => {
       if (data.type === 'order_received') {

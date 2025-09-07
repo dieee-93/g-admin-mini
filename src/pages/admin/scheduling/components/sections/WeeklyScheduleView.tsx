@@ -35,7 +35,7 @@ interface WeeklyScheduleViewProps {
     };
     viewMode: 'week' | 'day' | 'month';
   };
-  onViewStateChange: (viewState: any) => void;
+  onViewStateChange: (viewState: unknown) => void;
 }
 
 interface Employee {

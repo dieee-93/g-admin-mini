@@ -18,7 +18,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 interface AlertsTabProps {
   alerts: any[];
   alertSummary: any;
-  onAddStock: (item: any) => void;
+  onAddStock: (item: unknown) => void;
   loading: boolean;
 }
 

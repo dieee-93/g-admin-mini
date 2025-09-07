@@ -9,7 +9,8 @@ import {
   CardWrapper,
   Progress,
   Avatar,
-  Spinner
+  Spinner,
+  Icon
 } from '@/shared/ui';
 import {
   TrophyIcon,
@@ -117,17 +118,17 @@ export function PerformanceDashboard({ compact = false, showDetails = true }: Pe
     <VStack gap="4" align="stretch">
       {/* Performance Metrics */}
       <SimpleGrid columns={{ base: 2, md: compact ? 2 : 4 }} gap="4">
-        <CardWrapper variant="flat" padding="sm">
+        <CardWrapper variant="elevated" padding="sm">
           <CardWrapper.Body textAlign="center">
-            <TrophyIcon className="w-5 h-5 text-yellow-500 mx-auto mb-2" />
+            <Icon icon={TrophyIcon} size="sm" color="yellow.500" />
             <Text fontSize="xl" fontWeight="bold">{metrics.avgPerformance}%</Text>
             <Text fontSize="xs" color="gray.600">Rendimiento</Text>
           </CardWrapper.Body>
         </CardWrapper>
 
-        <CardWrapper variant="flat" padding="sm">
+        <CardWrapper variant="elevated" padding="sm">
           <CardWrapper.Body textAlign="center">
-            <ClockIcon className="w-5 h-5 text-blue-500 mx-auto mb-2" />
+            <Icon icon={ClockIcon} size="sm" color="blue.500" />
             <Text fontSize="xl" fontWeight="bold">{metrics.avgAttendance}%</Text>
             <Text fontSize="xs" color="gray.600">Asistencia</Text>
           </CardWrapper.Body>
@@ -135,17 +136,17 @@ export function PerformanceDashboard({ compact = false, showDetails = true }: Pe
 
         {!compact && (
           <>
-            <CardWrapper variant="flat" padding="sm">
+            <CardWrapper variant="elevated" padding="sm">
               <CardWrapper.Body textAlign="center">
-                <ArrowTrendingUpIcon className="w-5 h-5 text-green-500 mx-auto mb-2" />
+                <Icon icon={ArrowTrendingUpIcon} size="sm" color="green.500" />
                 <Text fontSize="xl" fontWeight="bold">{metrics.topPerformerCount}</Text>
                 <Text fontSize="xs" color="gray.600">Top Performers</Text>
               </CardWrapper.Body>
             </CardWrapper>
 
-            <CardWrapper variant="flat" padding="sm">
+            <CardWrapper variant="elevated" padding="sm">
               <CardWrapper.Body textAlign="center">
-                <ExclamationTriangleIcon className="w-5 h-5 text-orange-500 mx-auto mb-2" />
+                <Icon icon={ExclamationTriangleIcon} size="sm" color="orange.500" />
                 <Text fontSize="xl" fontWeight="bold">{metrics.needsAttentionCount}</Text>
                 <Text fontSize="xs" color="gray.600">Requiere Atención</Text>
               </CardWrapper.Body>

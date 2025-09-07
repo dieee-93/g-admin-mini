@@ -22,6 +22,7 @@ import {
   TabPanel
 } from '@/shared/ui';
 
+import { Icon } from '@/shared/ui';
 import {
   ShieldCheckIcon,
   DocumentTextIcon,
@@ -187,7 +188,7 @@ const AFIPIntegration: React.FC = () => {
   if (isLoading) {
     return (
       <VStack gap="md" align="center" padding="lg">
-        <ArrowPathIcon className="w-8 h-8 animate-spin" />
+        <Icon icon={ArrowPathIcon} size="2xl" color="blue.500" style={{ animation: 'spin 1s linear infinite' }} />
         <Typography variant="body">Cargando configuración AFIP...</Typography>
       </VStack>
     );
@@ -201,8 +202,10 @@ const AFIPIntegration: React.FC = () => {
           <CardWrapper variant="outline" padding="md">
             <CardWrapper.Body>
               <VStack gap="sm">
-                <ShieldCheckIcon 
-                  className={`w-8 h-8 ${afipStatus.authenticated ? 'text-green-500' : 'text-red-500'}`} 
+                <Icon 
+                  icon={ShieldCheckIcon}
+                  size="2xl" 
+                  color={afipStatus.authenticated ? 'var(--chakra-colors-green-500)' : 'var(--chakra-colors-red-500)'} 
                 />
                 <Typography variant="title">
                   {afipStatus.authenticated ? 'Conectado' : 'Desconectado'}
@@ -217,8 +220,10 @@ const AFIPIntegration: React.FC = () => {
           <CardWrapper variant="outline" padding="md">
             <CardWrapper.Body>
               <VStack gap="sm">
-                <DocumentTextIcon 
-                  className={`w-8 h-8 ${afipStatus.certificateValid ? 'text-green-500' : 'text-yellow-500'}`} 
+                <Icon
+                  icon={DocumentTextIcon} 
+                  size="2xl" 
+                  color={afipStatus.certificateValid ? 'var(--chakra-colors-green-500)' : 'var(--chakra-colors-yellow-500)'} 
                 />
                 <Typography variant="title">
                   {afipStatus.certificateValid ? 'Válido' : 'Por Vencer'}
@@ -233,7 +238,7 @@ const AFIPIntegration: React.FC = () => {
           <CardWrapper variant="outline" padding="md">
             <CardWrapper.Body>
               <VStack gap="sm">
-                <ServerIcon className="w-8 h-8 text-blue-500" />
+                <Icon icon={ServerIcon} size="2xl" color="blue.500" />
                 <Typography variant="title">
                   {afipServices.filter(s => s.status === 'active').length}
                 </Typography>
@@ -247,7 +252,7 @@ const AFIPIntegration: React.FC = () => {
           <CardWrapper variant="outline" padding="md">
             <CardWrapper.Body>
               <VStack gap="sm">
-                <CogIcon className="w-8 h-8 text-purple-500" />
+                <Icon icon={CogIcon} size="2xl" color="purple.500" />
                 <Typography variant="title">
                   {afipStatus.environment === 'production' ? 'Producción' : 'Testing'}
                 </Typography>
@@ -300,7 +305,7 @@ const AFIPIntegration: React.FC = () => {
                           onClick={handleTestConnection}
                           loading={isConnecting}
                         >
-                          <CloudIcon className="w-4 h-4" />
+                          <Icon icon={CloudIcon} size="sm" />
                           Probar Conexión
                         </Button>
                         <Button
@@ -309,7 +314,7 @@ const AFIPIntegration: React.FC = () => {
                           onClick={handleRenewToken}
                           loading={isRenewingToken}
                         >
-                          <KeyIcon className="w-4 h-4" />
+                          <Icon icon={KeyIcon} size="sm" />
                           Renovar Token
                         </Button>
                       </HStack>
@@ -505,11 +510,11 @@ const AFIPIntegration: React.FC = () => {
 
                         <HStack gap="sm">
                           <Button variant="outline" size="sm">
-                            <DocumentTextIcon className="w-4 h-4" />
+                            <Icon icon={DocumentTextIcon} size="sm" />
                             Descargar Certificado
                           </Button>
                           <Button variant="outline" size="sm">
-                            <KeyIcon className="w-4 h-4" />
+                            <Icon icon={KeyIcon} size="sm" />
                             Generar Nueva Clave
                           </Button>
                         </HStack>

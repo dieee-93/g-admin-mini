@@ -22,7 +22,7 @@ import {
 import { AlertDisplay } from './AlertDisplay';
 import { useAlerts } from '../hooks/useAlerts';
 import { useAlertsContext } from '../AlertsProvider';
-import { CardWrapper } from '@/shared/ui';
+import { CardWrapper, Icon } from '@/shared/ui';
 export interface GlobalAlertsDisplayProps {
   maxVisible?: number;
   position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
@@ -152,7 +152,7 @@ export function GlobalAlertsDisplay({
                       }}
                       aria-label="Configurar alertas"
                     >
-                      <CogIcon className="w-3 h-3" />
+                      <Icon icon={CogIcon} size="xs" />
                     </IconButton>
                   )}
 
@@ -164,8 +164,8 @@ export function GlobalAlertsDisplay({
                     aria-label={isCollapsed ? 'Expandir alertas' : 'Colapsar alertas'}
                   >
                     {isCollapsed ? 
-                      <ChevronDownIcon className="w-3 h-3" /> : 
-                      <ChevronUpIcon className="w-3 h-3" />
+                      <Icon icon={ChevronDownIcon} size="xs" /> : 
+                      <Icon icon={ChevronUpIcon} size="xs" />
                     }
                   </IconButton>
 
@@ -176,7 +176,7 @@ export function GlobalAlertsDisplay({
                     onClick={() => setIsDismissed(true)}
                     aria-label="Cerrar panel de alertas"
                   >
-                    <XMarkIcon className="w-3 h-3" />
+                    <Icon icon={XMarkIcon} size="xs" />
                   </IconButton>
                 </HStack>
               </HStack>

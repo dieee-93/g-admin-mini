@@ -2,6 +2,13 @@
 // 🚀 TABLE MANAGEMENT API - Modern Restaurant Operations
 import { supabase } from '@/lib/supabase/client';
 import { 
+  calculateEstimatedDuration,
+  calculateActualDuration,
+  calculateTableUtilization,
+  calculateServiceEfficiency,
+  calculateWaitTime
+} from '@/business-logic/operations/tableOperations';
+import { 
   Table, 
   Party, 
   TableStatus, 
@@ -183,7 +190,7 @@ export async function clearTable(
     .update({
       status: PartyStatus.COMPLETED,
       total_spent: totalSpent,
-      actual_duration: await calculateActualDuration(partyId),
+      actual_duration: await getActualDurationFromDB(partyId),
       updated_at: new Date().toISOString()
     })
     .eq('id', partyId);
@@ -403,13 +410,8 @@ export async function getTodayReservations() {
 // 🚀 HELPER FUNCTIONS
 // ========================================================
 
-async function calculateEstimatedDuration(partySize: number, averageTurnTime: number): Promise<number> {
-  // Adjust based on party size (larger parties typically stay longer)
-  const sizeMultiplier = Math.min(1 + (partySize - 2) * 0.1, 1.5);
-  return Math.round(averageTurnTime * sizeMultiplier);
-}
-
-async function calculateActualDuration(partyId: string): Promise<number> {
+// Using centralized business logic - renamed to avoid conflict
+async function getActualDurationFromDB(partyId: string): Promise<number> {
   const { data: party } = await supabase
     .from('parties')
     .select('seated_at')
@@ -418,9 +420,7 @@ async function calculateActualDuration(partyId: string): Promise<number> {
 
   if (!party) return 0;
 
-  const seatedTime = new Date(party.seated_at);
-  const now = new Date();
-  return Math.round((now.getTime() - seatedTime.getTime()) / (1000 * 60));
+  return calculateActualDuration(new Date(party.seated_at));
 }
 
 async function checkIfVIPCustomers(customerIds: string[]): Promise<boolean> {

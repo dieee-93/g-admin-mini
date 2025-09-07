@@ -1,241 +1,131 @@
-// src/components/ui/Icon.tsx
-// Sistema de iconos moderno con Heroicons + tamaños estandarizados
-// ✅ SOLUCIÓN: Wrapper que maneja sizes + colores + variants dinámicamente
+import { Icon as ChakraIcon } from '@chakra-ui/react';
+import type { IconProps as ChakraIconProps } from '@chakra-ui/react';
+import type { ElementType, ReactElement } from 'react';
 
-import React from 'react';
-
-// ✅ Heroicons imports - Separados por categoría
-// Navigation & Layout
-import { 
-  HomeIcon, 
-  CubeIcon, 
-  Cog6ToothIcon,
-  UsersIcon,
-  CurrencyDollarIcon
-} from '@heroicons/react/24/outline';
-
-// Actions
-import { 
-  PlusIcon,
-  PencilIcon,
-  TrashIcon,
-  MagnifyingGlassIcon,
-  DocumentArrowDownIcon,
-  ArrowPathIcon
-} from '@heroicons/react/24/outline';
-
-// Status & Alerts  
-import { 
-  CheckCircleIcon,
-  XCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon
-} from '@heroicons/react/24/solid';
-
-// ✅ SISTEMA DE TAMAÑOS SIGUIENDO ESTÁNDARES MODERNOS 2024-2025
-// Usando tokens de Chakra UI en lugar de Tailwind
-export const ICON_SIZES = {
-  xs: { width: '16px', height: '16px' },    // 16px - Dense layouts, pequeños botones
-  sm: { width: '20px', height: '20px' },    // 20px - Text pairing, badges, inputs  
-  md: { width: '24px', height: '24px' },    // 24px - Default size, navegación, cards
-  lg: { width: '32px', height: '32px' },    // 32px - Headers, elementos destacados
-  xl: { width: '40px', height: '40px' },    // 40px - Hero elements, iconografía principal
-  '2xl': { width: '48px', height: '48px' }  // 48px - Extra large contexts, dashboard highlights
+// Tamaños estándar usando el sistema de Chakra UI
+const sizeMap = {
+  xs: '3',
+  sm: '4', 
+  md: '5',
+  lg: '6',
+  xl: '8',
+  '2xl': '10',
 } as const;
 
-export type IconSize = keyof typeof ICON_SIZES;
+type IconSize = keyof typeof sizeMap;
 
-// ✅ REGISTRO DE ICONOS POR CATEGORÍA
-export const ICONS = {
-  // Navegación y módulos
-  navigation: {
-    home: HomeIcon,
-    inventory: CubeIcon,
-    users: UsersIcon,
-    sales: CurrencyDollarIcon,
-    settings: Cog6ToothIcon,
-  },
-  
-  // Acciones comunes
-  actions: {
-    add: PlusIcon,
-    edit: PencilIcon,
-    delete: TrashIcon,
-    search: MagnifyingGlassIcon,
-    save: DocumentArrowDownIcon,
-    loading: ArrowPathIcon,
-  },
-  
-  // Estados y alertas
-  status: {
-    success: CheckCircleIcon,
-    error: XCircleIcon,
-    warning: ExclamationTriangleIcon,
-    info: InformationCircleIcon,
-  }
-} as const;
-
-// ✅ Types para el sistema
-export type IconCategory = keyof typeof ICONS;
-export type IconName<T extends IconCategory> = keyof typeof ICONS[T];
-
-// ✅ COMPONENTE WRAPPER PRINCIPAL
-interface IconProps {
-  // Opción 1: Usar sistema de iconos (recomendado)
-  category?: IconCategory;
-  name?: string;
-  
-  // Opción 2: Pasar componente directamente  
-  icon?: React.ComponentType<{ className?: string }>;
-  
-  // Configuración visual
-  size?: IconSize;
-  color?: string;
-  className?: string;
-  
-  // Loading state
-  loading?: boolean;
+interface IconProps extends Omit<ChakraIconProps, 'children' | 'as' | 'size'> {
+  /** El componente de ícono a renderizar (ej: de heroicons, react-icons, etc.) */
+  icon?: ElementType;
+  /** Tamaño predefinido del ícono */
+  size?: IconSize | string;
+  /** Para compatibilidad con asChild pattern */
+  asChild?: boolean;
+  /** Children para el patrón asChild */
+  children?: ReactElement;
 }
 
-export function Icon({
-  category,
-  name,
-  icon: IconComponent,
-  size = 'md',
-  color,
-  className = '',
-  loading = false,
-  ...props
-}: IconProps) {
-  // ✅ Determinar qué icono usar - CORREGIDO: Type-safe access
-  const ResolvedIcon = React.useMemo(() => {
-    if (loading) return ArrowPathIcon;
-    if (IconComponent) return IconComponent;
-    
-    // ✅ CORREGIDO: Type-safe icon access
-    if (category && name) {
-      const categoryIcons = ICONS[category];
-      if (categoryIcons && name in categoryIcons) {
-        return categoryIcons[name as keyof typeof categoryIcons] as React.ComponentType<{ className?: string }>;
-      }
-    }
-    return null;
-  }, [category, name, IconComponent, loading]);
+/**
+ * Componente Icon universal - Wrapper simple para Chakra UI Icon
+ * Compatible con Heroicons, React Icons y cualquier SVG component
+ * 
+ * @example
+ * // Con heroicons
+ * import { HomeIcon } from '@heroicons/react/24/outline'
+ * <Icon icon={HomeIcon} size="md" />
+ * 
+ * // Con react-icons
+ * import { FiHome } from 'react-icons/fi'
+ * <Icon icon={FiHome} size="lg" />
+ * 
+ * // Con tamaño custom
+ * <Icon icon={UserIcon} size="8" />
+ * 
+ * // Patrón asChild (compatible con Chakra UI v3)
+ * <Icon asChild>
+ *   <CustomSvgIcon />
+ * </Icon>
+ */
+export const Icon = ({ 
+  icon: IconComponent, 
+  size = 'md', 
+  asChild, 
+  children,
+  ...props 
+}: IconProps) => {
+  // Determinar el tamaño final - asegurar compatibilidad con Chakra UI
+  const finalSize = typeof size === 'string' && size in sizeMap 
+    ? sizeMap[size as IconSize] 
+    : size;
 
-  if (!ResolvedIcon) {
-    console.warn(`Icon not found: ${category}.${name}`);
-    return null;
+  // Si usamos el patrón asChild, renderizamos el children directamente
+  if (asChild && children) {
+    return (
+      <ChakraIcon size={finalSize as ChakraIconProps['size']} {...props} asChild>
+        {children}
+      </ChakraIcon>
+    );
   }
 
-  // ✅ Aplicar estilos usando props de Chakra UI - SIN TAILWIND
-  const sizeStyles = ICON_SIZES[size];
-  const loadingStyles = loading ? {
-    animation: 'spin 1s linear infinite',
-    '@keyframes spin': {
-      '0%': { transform: 'rotate(0deg)' },
-      '100%': { transform: 'rotate(360deg)' }
-    }
-  } : {};
-  
-  const combinedStyles = { ...sizeStyles, ...loadingStyles };
+  // Si tenemos un componente de ícono, lo renderizamos
+  if (IconComponent) {
+    return (
+      <ChakraIcon 
+        as={IconComponent} 
+        size={finalSize as ChakraIconProps['size']}
+        {...props}
+      />
+    );
+  }
 
+  // Fallback - renderizar ChakraIcon sin contenido
   return (
-    <ResolvedIcon 
-      style={combinedStyles} 
-      color={color}
-      className={className} 
-      {...props} 
+    <ChakraIcon 
+      size={finalSize as ChakraIconProps['size']}
+      {...props}
     />
   );
-}
+};
 
-// ✅ COMPONENTES DE CONVENIENCIA CON CONVENCIONES ESTABLECIDAS
-export function ActionIcon({ 
-  name, 
-  size = 'xs', // 16px - Botones pequeños, controles inline
-  ...props 
-}: Omit<IconProps, 'category'> & { name: IconName<'actions'> }) {
-  return <Icon category="actions" name={name} size={size} {...props} />;
-}
-
-export function StatusIcon({ 
-  name, 
-  size = 'sm', // 20px - Status badges, text pairing
-  ...props 
-}: Omit<IconProps, 'category'> & { name: IconName<'status'> }) {
-  return <Icon category="status" name={name} size={size} {...props} />;
-}
-
-export function NavIcon({ 
-  name, 
-  size = 'md', // 24px - Navegación principal, sidebar
-  ...props 
-}: Omit<IconProps, 'category'> & { name: IconName<'navigation'> }) {
-  return <Icon category="navigation" name={name} size={size} {...props} />;
-}
-
-// ✅ NUEVOS: Componentes por contexto siguiendo mejores prácticas
-export function HeaderIcon({
-  icon,
-  size = 'lg', // 32px - Headers de cards, secciones principales
-  ...props
-}: Omit<IconProps, 'category' | 'name'>) {
-  return <Icon icon={icon} size={size} {...props} />;
-}
-
-export function HeroIcon({
-  icon, 
-  size = 'xl', // 40px - Overview cards, elementos destacados
-  ...props
-}: Omit<IconProps, 'category' | 'name'>) {
-  return <Icon icon={icon} size={size} {...props} />;
-}
-
-// ✅ HOOK PARA ICONOS DINÁMICOS (Para NavigationContext)
-export function useDynamicIcon(iconComponent: React.ComponentType<{ className?: string }>) {
-  return React.useCallback((props: { size?: IconSize; color?: string; className?: string }) => {
-    return <Icon icon={iconComponent} {...props} />;
-  }, [iconComponent]);
-}
-
-// ✅ EJEMPLOS DE USO
-export const IconExamples = () => (
-  <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', padding: '1rem' }}>
-    {/* Tamaños diferentes */}
-    <Icon category="actions" name="add" size="xs" />
-    <Icon category="actions" name="add" size="sm" />
-    <Icon category="actions" name="add" size="md" />
-    <Icon category="actions" name="add" size="lg" />
-    <Icon category="actions" name="add" size="xl" />
-    
-    {/* Con colores */}
-    <Icon category="status" name="success"  />
-    <Icon category="status" name="error" color="error.500" />
-    <Icon category="status" name="warning" color="warning.500" />
-    
-    {/* Loading state */}
-    <Icon category="actions" name="save" loading />
-    
-    {/* Componentes de conveniencia */}
-    <ActionIcon name="edit" size="sm" />
-    <StatusIcon name="success"  />
-    <NavIcon name="home" size="lg" />
-  </div>
+// Variantes especializadas para diferentes contextos
+/**
+ * ButtonIcon - Variante optimizada para botones
+ * Tamaño fijo: xs (16px)
+ */
+export const ButtonIcon = ({ size = 'xs', ...props }: IconProps) => (
+  <Icon size={size} {...props} />
 );
 
-// ✅ EXPORTS PARA FACILITAR USO
-export {
-  HomeIcon,
-  CubeIcon,
-  PlusIcon,
-  PencilIcon,
-  TrashIcon,
-  CheckCircleIcon,
-  XCircleIcon
-} from '@heroicons/react/24/outline';
+/**
+ * InputIcon - Variante optimizada para inputs y campos de formulario
+ * Tamaño fijo: sm (20px)
+ */
+export const InputIcon = ({ size = 'sm', ...props }: IconProps) => (
+  <Icon size={size} {...props} />
+);
 
-export { 
-  CheckCircleIcon as CheckSolid,
-  XCircleIcon as XSolid,
-  ExclamationTriangleIcon as WarningSolid 
-} from '@heroicons/react/24/solid';
+/**
+ * NavIcon - Variante optimizada para navegación
+ * Tamaño fijo: md (24px)
+ */
+export const NavIcon = ({ size = 'md', ...props }: IconProps) => (
+  <Icon size={size} {...props} />
+);
+
+/**
+ * HeaderIcon - Variante optimizada para headers de cards y secciones
+ * Tamaño fijo: lg (32px)
+ */
+export const HeaderIcon = ({ size = 'lg', ...props }: IconProps) => (
+  <Icon size={size} {...props} />
+);
+
+/**
+ * HeroIcon - Variante optimizada para elementos hero y destacados
+ * Tamaño fijo: xl (40px)
+ */
+export const HeroIcon = ({ size = 'xl', ...props }: IconProps) => (
+  <Icon size={size} {...props} />
+);
+
+export default Icon;

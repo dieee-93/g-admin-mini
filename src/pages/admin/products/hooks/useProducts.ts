@@ -53,9 +53,9 @@ export function useProducts() {
 
       if (productsError) throw productsError;
 
-      const transformedProducts: ProductWithIntelligence[] = (productsData || []).map((product: any) => {
+      const transformedProducts: ProductWithIntelligence[] = (productsData || []).map((product: unknown) => {
         // Extract recipe information if exists - REAL RECIPE INTEGRATION
-        const recipeComponent = product.product_components?.find((comp: any) => comp.component_type === 'recipe');
+        const recipeComponent = product.product_components?.find((comp: unknown) => comp.component_type === 'recipe');
         const recipe = recipeComponent?.recipes;
         
         // Calculate REAL cost from recipe ingredients - NO MORE MOCK DATA

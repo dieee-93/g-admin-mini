@@ -23,7 +23,7 @@ export function useValidation(
   const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
   const { handleError } = useApp();
 
-  const validate = useCallback(async (data: any): Promise<ValidationResult> => {
+  const validate = useCallback(async (data: unknown): Promise<ValidationResult> => {
     setValidating(true);
     setValidationErrors([]);
     setValidationWarnings([]);
@@ -65,7 +65,7 @@ export function useValidation(
 
   const validateAndExecute = useCallback(async <T>(
     data: any,
-    operation: (sanitizedData: any) => Promise<T>,
+    operation: (sanitizedData: unknown) => Promise<T>,
     securityOptions: {
       requiredPermissions?: string[];
       rateLimit?: { maxRequests: number; windowMs: number };

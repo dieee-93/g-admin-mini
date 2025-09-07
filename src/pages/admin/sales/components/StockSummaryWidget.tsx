@@ -67,7 +67,7 @@ export function StockSummaryWidget({
       const data = await fetchProductsWithAvailability();
       
       // Transform data to match our interface
-      const transformedData: ProductSummary[] = data.map((product: any) => ({
+      const transformedData: ProductSummary[] = data.map((product: unknown) => ({
         id: product.id,
         name: product.name,
         availability: product.availability || 0,

@@ -33,7 +33,7 @@ export class LazyComponentWrapper {
     }
 
     // Return wrapped component
-    return (props: any) => {
+    return (props: unknown) => {
       const [showFallback, setShowFallback] = useState(delay > 0);
 
       useEffect(() => {

@@ -255,7 +255,7 @@ function handleNonGetRequest(event: FetchEvent): void {
 }
 
 // Background Sync Event
-self.addEventListener('sync', (event: any) => {
+self.addEventListener('sync', (event: unknown) => {
   console.log('[ServiceWorker] Background sync triggered:', event.tag);
   
   if (event.tag === SYNC_TAG) {
@@ -484,7 +484,7 @@ async function getQueuedRequests(): Promise<any[]> {
   return [];
 }
 
-async function removeQueuedRequest(requestData: any): Promise<void> {
+async function removeQueuedRequest(requestData: unknown): Promise<void> {
   // This would be implemented with proper IndexedDB operations
   console.log('[ServiceWorker] Removing synced request from queue');
 }

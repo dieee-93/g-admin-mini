@@ -3,7 +3,7 @@
  * Tests performance characteristics under production-like conditions
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { performanceTracker } from '../utils/testUtils';
 
@@ -25,6 +25,8 @@ const MockProductionStaffModule = ({ dataSize = 100, simulateLoad = false }) => 
     for (let i = 0; i < 10000; i++) {
       computation += Math.sqrt(i);
     }
+    // Use computation result to prevent optimization
+    if (computation < 0) console.log('Computation result:', computation);
   }
 
   return (

@@ -76,7 +76,7 @@ export function ProtectedRouteNew({
     );
   }
 
-  // All checks passed, render children
+  // All checks passed children
   return <>{children}</>;
 }
 

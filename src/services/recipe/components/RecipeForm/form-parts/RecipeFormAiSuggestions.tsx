@@ -11,6 +11,7 @@ import {
   Progress,
   SimpleGrid,
 } from '@chakra-ui/react';
+import { Icon } from '@/shared/ui';
 import {
   LightBulbIcon,
   SparklesIcon,
@@ -63,7 +64,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
         <CardWrapper .Body p={4}>
           <HStack justify="space-between">
             <HStack gap={3}>
-              <SparklesIcon className="w-5 h-5 text-purple-500" />
+              <Icon icon={SparklesIcon} size="lg" color="purple.500" />
               <VStack align="start" gap={0}>
                 <Text fontSize="sm" fontWeight="medium" color="purple.700">
                   🤖 AI Recipe Assistant
@@ -104,7 +105,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                   colorPalette="purple"
                   onClick={generateAISuggestions}
                 >
-                  <ArrowPathIcon className="w-3 h-3 mr-2" />
+                  <Icon icon={ArrowPathIcon} size="xs" style={{ marginRight: '8px' }} />
                   Generar Sugerencias
                 </Button>
               )}
@@ -202,7 +203,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
           <CardWrapper .Header>
             <HStack justify="space-between">
               <HStack gap={2}>
-                <LightBulbIcon className="w-5 h-5 text-purple-500" />
+                <Icon icon={LightBulbIcon} size="lg" color="purple.500" />
                 <Text fontSize="md" fontWeight="bold" color="purple.700">
                   🧠 Sugerencias de IA
                 </Text>
@@ -221,7 +222,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
               <Tabs.List>
                 <Tabs.Trigger value="substitutions">
                   <HStack gap={1}>
-                    <ArrowPathIcon className="w-3 h-3" />
+                    <Icon icon={ArrowPathIcon} size="xs" />
                     <Text fontSize="sm">Sustituciones</Text>
                     {aiSuggestions.substitutions.length > 0 && (
                       <Badge size="sm" colorPalette="purple">{aiSuggestions.substitutions.length}</Badge>
@@ -231,7 +232,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
 
                 <Tabs.Trigger value="optimization">
                   <HStack gap={1}>
-                    <CurrencyDollarIcon className="w-3 h-3" />
+                    <Icon icon={CurrencyDollarIcon} size="xs" />
                     <Text fontSize="sm">Optimización</Text>
                     {aiSuggestions.costOptimizations.length > 0 && (
                       <Badge size="sm" colorPalette="green">{aiSuggestions.costOptimizations.length}</Badge>
@@ -241,14 +242,14 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
 
                 <Tabs.Trigger value="yield">
                   <HStack gap={1}>
-                    <ScaleIcon className="w-3 h-3" />
+                    <Icon icon={ScaleIcon} size="xs" />
                     <Text fontSize="sm">Rendimiento</Text>
                   </HStack>
                 </Tabs.Trigger>
 
                 <Tabs.Trigger value="nutrition">
                   <HStack gap={1}>
-                    <BeakerIcon className="w-3 h-3" />
+                    <Icon icon={BeakerIcon} size="xs" />
                     <Text fontSize="sm">Nutrición</Text>
                     {aiSuggestions.nutritionalInsights.length > 0 && (
                       <Badge size="sm" colorPalette="orange">{aiSuggestions.nutritionalInsights.length}</Badge>
@@ -280,7 +281,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                                   </VStack>
                                   {isApplied ? (
                                     <Badge colorPalette="green" size="sm">
-                                      <CheckCircleIcon className="w-3 h-3 mr-1" />
+                                      <Icon icon={CheckCircleIcon} size="xs" style={{ marginRight: '4px' }} />
                                       Aplicado
                                     </Badge>
                                   ) : (

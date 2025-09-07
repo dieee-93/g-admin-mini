@@ -312,13 +312,19 @@ export class StaffPerformanceAnalyticsEngine {
     const periodStart = new Date(now.getTime() - (fullConfig.analysisMonths * 30 * 24 * 60 * 60 * 1000)).toISOString();
     
     // Filter data to analysis period
-    const filteredTimeEntries = timeEntries.filter(entry => 
-      entry.created_at >= periodStart && entry.created_at <= periodEnd
-    );
+    const filteredTimeEntries = timeEntries.filter(entry => {
+      const entryDate = new Date(entry.created_at);
+      const startDate = new Date(periodStart);
+      const endDate = new Date(periodEnd);
+      return entryDate >= startDate && entryDate <= endDate;
+    });
     
-    const filteredSchedules = schedules.filter(schedule => 
-      schedule.start_time >= periodStart && schedule.start_time <= periodEnd
-    );
+    const filteredSchedules = schedules.filter(schedule => {
+      const scheduleDate = new Date(schedule.start_time);
+      const startDate = new Date(periodStart);
+      const endDate = new Date(periodEnd);
+      return scheduleDate >= startDate && scheduleDate <= endDate;
+    });
     
     // 1. Calculate individual employee metrics
     const employeeMetrics = await Promise.all(
@@ -1020,8 +1026,8 @@ export class StaffPerformanceAnalyticsEngine {
 
   private static calculateWeightedAverage(
     items: any[], 
-    valueSelector: (item: any) => number, 
-    weightSelector: (item: any) => number
+    valueSelector: (item: unknown) => number, 
+    weightSelector: (item: unknown) => number
   ): number {
     if (items.length === 0) return 0;
     

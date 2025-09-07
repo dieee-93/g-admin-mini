@@ -23,6 +23,7 @@ import {
   AlertDescription
 } from '@/shared/ui';
 
+import { Icon } from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   ShieldCheckIcon,
@@ -191,7 +192,7 @@ export function KitchenSection() {
                   colorPalette={isOnline ? 'success' : 'error'}
                   variant="subtle"
                 >
-                  {isOnline ? <WifiIcon className="w-4 h-4" /> : <NoSymbolIcon className="w-4 h-4" />}
+                  {isOnline ? <Icon icon={WifiIcon} size="sm" /> : <Icon icon={NoSymbolIcon} size="sm" />}
                   {isOnline ? 'Online' : 'Offline'}
                 </Badge>
               )}
@@ -203,7 +204,7 @@ export function KitchenSection() {
                 size="sm"
                 onClick={() => setEmergencyMode(!emergencyMode)}
               >
-                <ExclamationTriangleIcon className="w-4 h-4" />
+                <Icon icon={ExclamationTriangleIcon} size="sm" />
                 {emergencyMode ? 'Exit Emergency' : 'Emergency'}
               </Button>
             </HStack>

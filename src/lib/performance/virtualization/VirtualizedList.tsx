@@ -39,8 +39,7 @@ interface VirtualizedListState {
 export function VirtualizedList<T>({
   items,
   itemHeight,
-  containerHeight,
-  renderItem,
+  containerHeightItem,
   overscan = 5,
   scrollToIndex,
   onScroll,

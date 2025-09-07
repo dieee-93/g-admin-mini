@@ -8,7 +8,8 @@ import {
   CardWrapper,
   Input,
   Modal,
-  Alert
+  Alert,
+  Icon
 } from '@/shared/ui';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useStaffWithLoader } from '@/hooks/useStaffData';
@@ -116,7 +117,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
             {isEditing ? 'Editar Empleado' : 'Nuevo Empleado'}
           </Modal.Title>
           <Modal.CloseTrigger>
-            <XMarkIcon className="w-5 h-5" />
+            <Icon icon={XMarkIcon} size="sm" />
           </Modal.CloseTrigger>
         </Modal.Header>
 

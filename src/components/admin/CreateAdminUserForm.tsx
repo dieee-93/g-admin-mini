@@ -20,7 +20,7 @@ import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 
 interface CreateAdminUserFormProps {
   onCancel?: () => void;
-  onSuccess?: (user: any) => void;
+  onSuccess?: (user: unknown) => void;
 }
 
 export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserFormProps) {

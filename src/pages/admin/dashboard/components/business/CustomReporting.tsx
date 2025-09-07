@@ -41,7 +41,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
-import { CardWrapper, Button } from '@/shared/ui';
+import { CardWrapper, Button, Icon } from '@/shared/ui';
 // Import event system
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
@@ -651,7 +651,7 @@ export function CustomReporting() {
             <HStack gap={2}>
               <Button 
                 colorPalette="blue"
-                leftIcon={<PlusIcon className="w-4 h-4" />}
+                leftIcon={<Icon icon={PlusIcon} size="sm" />}
                 onClick={() => {
                   setActiveTab('builder');
                   setBuilderStep('basic');
@@ -725,35 +725,35 @@ export function CustomReporting() {
           <Tabs.List>
             <Tabs.Trigger value="templates">
               <HStack gap={2}>
-                <DocumentChartBarIcon className="w-4 h-4" />
+                <Icon icon={DocumentChartBarIcon} size="sm" />
                 <Text>Plantillas</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="generated">
               <HStack gap={2}>
-                <ArrowDownTrayIcon className="w-4 h-4" />
+                <Icon icon={ArrowDownTrayIcon} size="sm" />
                 <Text>Reportes Generados</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="automation">
               <HStack gap={2}>
-                <CogIcon className="w-4 h-4" />
+                <Icon icon={CogIcon} size="sm" />
                 <Text>Automatización</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="insights">
               <HStack gap={2}>
-                <ChartBarIcon className="w-4 h-4" />
+                <Icon icon={ChartBarIcon} size="sm" />
                 <Text>Insights</Text>
               </HStack>
             </Tabs.Trigger>
             
             <Tabs.Trigger value="builder">
               <HStack gap={2}>
-                <PlusIcon className="w-4 h-4" />
+                <Icon icon={PlusIcon} size="sm" />
                 <Text>Constructor</Text>
               </HStack>
             </Tabs.Trigger>
@@ -837,7 +837,7 @@ export function CustomReporting() {
                           {/* Schedule Info */}
                           {template.schedule?.isEnabled && (
                             <HStack gap={2} fontSize="xs" color="blue.600" bg="blue.50" p={2} borderRadius="sm">
-                              <CalendarIcon className="w-3 h-3" />
+                              <Icon icon={CalendarIcon} size="xs" />
                               <Text>
                                 Programado: {template.schedule.frequency} a las {template.schedule.time}
                               </Text>
@@ -853,20 +853,20 @@ export function CustomReporting() {
                               loading={isGenerating === template.id}
                               loadingText="Generando..."
                             >
-                              <PlayIcon className="w-3 h-3 mr-1" />
+                              <Icon icon={PlayIcon} size="xs" style={{ marginRight: "4px" }} />
                               Generar
                             </Button>
                             
                             <IconButton size="sm" variant="outline">
-                              <EyeIcon className="w-3 h-3" />
+                              <Icon icon={EyeIcon} size="xs" />
                             </IconButton>
                             
                             <IconButton size="sm" variant="outline">
-                              <PencilIcon className="w-3 h-3" />
+                              <Icon icon={PencilIcon} size="xs" />
                             </IconButton>
                             
                             <IconButton size="sm" variant="outline" colorPalette="red">
-                              <TrashIcon className="w-3 h-3" />
+                              <Icon icon={TrashIcon} size="xs" />
                             </IconButton>
                           </HStack>
                         </VStack>
@@ -900,11 +900,11 @@ export function CustomReporting() {
                           
                           <HStack gap={4} fontSize="sm" color="gray.600">
                             <HStack gap={1}>
-                              <CalendarIcon className="w-4 h-4" />
+                              <Icon icon={CalendarIcon} size="sm" />
                               <Text>{new Date(report.generatedAt).toLocaleString()}</Text>
                             </HStack>
                             <HStack gap={1}>
-                              <ClockIcon className="w-4 h-4" />
+                              <Icon icon={ClockIcon} size="sm" />
                               <Text>{(report.executionTime / 1000).toFixed(1)}s</Text>
                             </HStack>
                             {report.fileSize && (
@@ -926,14 +926,14 @@ export function CustomReporting() {
                           
                           {report.status === 'completed' && report.downloadUrl && (
                             <Button size="sm" variant="outline" colorPalette="green">
-                              <ArrowDownTrayIcon className="w-3 h-3 mr-1" />
+                              <Icon icon={ArrowDownTrayIcon} size="xs" style={{ marginRight: "4px" }} />
                               Descargar
                             </Button>
                           )}
                           
                           {report.status === 'failed' && (
                             <Button size="sm" variant="outline" colorPalette="red">
-                              <ExclamationTriangleIcon className="w-3 h-3 mr-1" />
+                              <Icon icon={ExclamationTriangleIcon} size="xs" style={{ marginRight: "4px" }} />
                               Error
                             </Button>
                           )}
@@ -1014,11 +1014,11 @@ export function CustomReporting() {
                         
                         <VStack gap={2}>
                           <IconButton size="sm" variant="outline">
-                            <PencilIcon className="w-3 h-3" />
+                            <Icon icon={PencilIcon} size="xs" />
                           </IconButton>
                           
                           <IconButton size="sm" variant="outline" colorPalette="red">
-                            <TrashIcon className="w-3 h-3" />
+                            <Icon icon={TrashIcon} size="xs" />
                           </IconButton>
                         </VStack>
                       </HStack>
@@ -1209,7 +1209,7 @@ export function CustomReporting() {
                   {builderStep !== 'basic' && (
                     <CardWrapper variant="subtle">
                       <CardWrapper.Body p={8} textAlign="center">
-                        <PlusIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <Icon icon={PlusIcon} size="3xl" color="var(--chakra-colors-gray-400)" style={{ margin: "0 auto 16px auto" }} />
                         <Text fontSize="lg" fontWeight="medium" mb={2}>
                           Constructor de Reportes - {builderStep}
                         </Text>

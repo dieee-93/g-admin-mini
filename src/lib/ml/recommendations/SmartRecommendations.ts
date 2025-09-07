@@ -208,7 +208,7 @@ export class SmartRecommendationEngine {
   /**
    * Process order for analysis
    */
-  private processOrderForAnalysis(orderData: any): void {
+  private processOrderForAnalysis(orderData: unknown): void {
     if (!orderData.items) return;
 
     const timestamp = Date.now();
@@ -259,7 +259,7 @@ export class SmartRecommendationEngine {
   /**
    * Process sale completion for analysis
    */
-  private processSaleForAnalysis(saleData: any): void {
+  private processSaleForAnalysis(saleData: unknown): void {
     // This adds additional context to sales data
     const lastSales = this.salesHistory.slice(-10);
     lastSales.forEach(sale => {
@@ -286,11 +286,11 @@ export class SmartRecommendationEngine {
   /**
    * Update menu item usage from recipe events
    */
-  private updateMenuItemUsage(recipeData: any): void {
+  private updateMenuItemUsage(recipeData: unknown): void {
     const menuItem = this.menuItems.get(recipeData.recipeId);
     if (menuItem && recipeData.ingredients) {
       // Update ingredient usage patterns
-      recipeData.ingredients.forEach((ingredient: any) => {
+      recipeData.ingredients.forEach((ingredient: unknown) => {
         const existing = menuItem.ingredients.find(i => i.itemId === ingredient.itemId);
         if (existing && recipeData.actualYield && recipeData.expectedYield) {
           // Adjust quantities based on actual vs expected yield
@@ -304,7 +304,7 @@ export class SmartRecommendationEngine {
   /**
    * Update customer profile based on order
    */
-  private updateCustomerProfile(orderData: any): void {
+  private updateCustomerProfile(orderData: unknown): void {
     let profile = this.customerProfiles.get(orderData.customerId);
     
     if (!profile) {
@@ -330,7 +330,7 @@ export class SmartRecommendationEngine {
     // Add to order history
     profile.orderHistory.push({
       orderId: orderData.orderId,
-      items: orderData.items.map((item: any) => item.productId),
+      items: orderData.items.map((item: unknown) => item.productId),
       timestamp: Date.now(),
       totalAmount: orderData.totalAmount
     });

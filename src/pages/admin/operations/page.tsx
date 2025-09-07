@@ -29,6 +29,7 @@ import {
   CogIcon,
   CalendarIcon
 } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui';
 
 // Hooks
 import { useNavigation } from '@/contexts/NavigationContext';
@@ -65,7 +66,7 @@ export default function OperationsPage() {
             <CardWrapper.Body>
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
-                  <CalendarIcon className="w-6 h-6 text-blue-600" />
+                  <Icon icon={CalendarIcon} size="lg" color="blue.600" />
                   <Typography variant="title">Planificación</Typography>
                 </HStack>
                 <Typography variant="body" color="text.muted">
@@ -79,7 +80,7 @@ export default function OperationsPage() {
             <CardWrapper.Body>
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
-                  <CogIcon className="w-6 h-6 text-green-600" />
+                  <Icon icon={CogIcon} size="lg" color="green.600" />
                   <Typography variant="title">Cocina</Typography>
                 </HStack>
                 <Typography variant="body" color="text.muted">
@@ -93,7 +94,7 @@ export default function OperationsPage() {
             <CardWrapper.Body>
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
-                  <ChartBarIcon className="w-6 h-6 text-purple-600" />
+                  <Icon icon={ChartBarIcon} size="lg" color="purple.600" />
                   <Typography variant="title">Mesas</Typography>
                 </HStack>
                 <Typography variant="body" color="text.muted">
@@ -107,7 +108,7 @@ export default function OperationsPage() {
             <CardWrapper.Body>
               <VStack align="start" gap="xs">
                 <HStack gap="sm">
-                  <ClockIcon className="w-6 h-6 text-orange-600" />
+                  <Icon icon={ClockIcon} size="lg" color="orange.600" />
                   <Typography variant="title">Monitoreo</Typography>
                 </HStack>
                 <Typography variant="body" color="text.muted">
