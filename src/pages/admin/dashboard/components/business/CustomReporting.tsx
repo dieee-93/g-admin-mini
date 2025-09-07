@@ -1,3 +1,4 @@
+export { default } from './CustomReporting';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
