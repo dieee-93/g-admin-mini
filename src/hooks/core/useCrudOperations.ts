@@ -4,7 +4,7 @@
  * Integrates perfectly with Zustand stores and React Hook Form
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, type UseFormReturn, type FieldValues, type DefaultValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -195,33 +195,43 @@ export function useCrudOperations<T extends FieldValues>(
     };
   }, [cacheKey, cacheTime]);
 
-  // Error handler - ✅ FIXED: Stable dependencies
+  // Error handler - ✅ OPTIMIZED: Stable dependencies using useRef for callbacks
+  const onErrorRef = useRef(onError);
+  const onSuccessRef = useRef(onSuccess);
+  onErrorRef.current = onError;
+  onSuccessRef.current = onSuccess;
+
   const handleError = useCallback((action: 'create' | 'read' | 'update' | 'delete', error: Error) => {
     const errorMessage = error.message || 'Ha ocurrido un error inesperado';
     setError(errorMessage);
-    onError?.(action, error);
+    onErrorRef.current?.(action, error);
     console.error(`CRUD ${action} error:`, error);
-  }, [setError]); // ✅ Removed onError from dependencies to prevent instability
+  }, [setError]);
 
-  // Success handler - ✅ FIXED: Stable dependencies  
+  // Success handler - ✅ OPTIMIZED: Stable dependencies using useRef for callbacks  
   const handleSuccess = useCallback((action: 'create' | 'read' | 'update' | 'delete', data: T | T[]) => {
     setError(null);
-    onSuccess?.(action, data);
-  }, [setError]); // ✅ Removed onSuccess from dependencies to prevent instability
+    onSuccessRef.current?.(action, data);
+  }, [setError]);
 
-  // Data transformers
+  // Data transformers - ✅ OPTIMIZED: Stable using useRef
+  const transformAfterLoadRef = useRef(transformAfterLoad);
+  const transformBeforeSaveRef = useRef(transformBeforeSave);
+  transformAfterLoadRef.current = transformAfterLoad;
+  transformBeforeSaveRef.current = transformBeforeSave;
+
   const applyTransformAfterLoad = useCallback((data: T | T[]): T | T[] => {
-    if (!transformAfterLoad) return data;
+    if (!transformAfterLoadRef.current) return data;
     
     if (Array.isArray(data)) {
-      return data.map(transformAfterLoad);
+      return data.map(transformAfterLoadRef.current);
     }
-    return transformAfterLoad(data);
-  }, [transformAfterLoad]);
+    return transformAfterLoadRef.current(data);
+  }, []); // ✅ No dependencies
 
   const applyTransformBeforeSave = useCallback((data: T): T => {
-    return transformBeforeSave ? transformBeforeSave(data) : data;
-  }, [transformBeforeSave]);
+    return transformBeforeSaveRef.current ? transformBeforeSaveRef.current(data) : data;
+  }, []); // ✅ No dependencies
 
   // Fetch all items
   const fetchAll = useCallback(async (): Promise<T[]> => {
@@ -608,10 +618,15 @@ export function useCrudOperations<T extends FieldValues>(
     };
   }, [enableRealtime, tableName, realtimeFilter, refresh]);
 
-  // Initial data load
+  // Initial data load - ✅ OPTIMIZED: Stable dependency using useRef
+  const hasFetchedInitialData = useRef(false);
+  
   useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
+    if (!hasFetchedInitialData.current) {
+      hasFetchedInitialData.current = true;
+      fetchAll();
+    }
+  }, []); // ✅ Empty dependency - only run once on mount
 
   return {
     // Data state

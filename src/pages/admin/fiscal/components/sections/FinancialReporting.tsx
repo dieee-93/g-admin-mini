@@ -33,6 +33,7 @@ import {
 import { type FinancialReport } from '../../types';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 
 interface FinancialKPI {
   label: string;
@@ -217,12 +218,8 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(amount);
-  };
+  // MIGRATED: Use centralized currency formatting
+  // const formatCurrency = (amount: number) => QuickCalculations.QuickCalculations.formatCurrency(amount);
 
   const formatPercentage = (value: number) => {
     return `${value.toFixed(1)}%`;
@@ -235,7 +232,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
   const formatValue = (value: number, format: string) => {
     switch (format) {
       case 'currency':
-        return formatCurrency(value);
+        return QuickCalculations.formatCurrency(value);
       case 'percentage':
         return formatPercentage(value);
       case 'number':

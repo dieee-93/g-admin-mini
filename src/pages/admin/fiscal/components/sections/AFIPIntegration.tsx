@@ -28,6 +28,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 
 interface AFIPStatus {
   connection: 'connected' | 'disconnected' | 'error';
@@ -259,12 +260,8 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
     return <Badge {...statusConfig[status as keyof typeof statusConfig]} />;
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(amount);
-  };
+  // MIGRATED: Use centralized currency formatting
+  // const formatCurrency = (amount: number) => QuickCalculations.QuickCalculations.formatCurrency(amount);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('es-AR');
@@ -505,7 +502,7 @@ export const AFIPIntegration = ({ variant = 'default' }: AFIPIntegrationProps) =
                     </Table.Cell>
                     <Table.Cell>
                       <Typography variant="body" fontWeight="medium">
-                        {formatCurrency(invoice.total)}
+                        {QuickCalculations.formatCurrency(invoice.total)}
                       </Typography>
                     </Table.Cell>
                     <Table.Cell>

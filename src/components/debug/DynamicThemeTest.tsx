@@ -80,14 +80,7 @@ export const DynamicThemeTest = () => {
           </CardWrapper.Header>
           <CardWrapper.Body>
             <Stack direction="column" gap="md">
-              <SelectField 
-                label="Choose Theme"
-                value={currentTheme?.id || 'system'}
-                onChange={handleThemeChange}
-                placeholder="Select a theme..."
-                options={themeOptions}
-                width="300px"
-              />
+    
               <Typography variant="caption" color="text.secondary">
                 Each theme maps colors to gray.* tokens for automatic component theming
               </Typography>

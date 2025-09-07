@@ -5,7 +5,7 @@
  * y que useCrudOperations se comporta correctamente sin ciclos infinitos.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { z } from 'zod';
 
@@ -17,7 +17,7 @@ interface TestItem {
   created_at?: string;
 }
 
-// Schema simple para testing
+// Schema simple para testing - ✅ MOVIDO FUERA para evitar recreación
 const testSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, 'Name is required'),
@@ -25,14 +25,32 @@ const testSchema = z.object({
   created_at: z.string().optional()
 });
 
+// ✅ Default values estables
+const defaultValues = {
+  name: '',
+  description: ''
+};
+
 export function TestCrudOperations() {
-  const [renderCount, setRenderCount] = useState(0);
+  const renderCountRef = useRef(0);
+  const renderReasonsRef = useRef<string[]>([]);
+  const previousValuesRef = useRef<any>({});
   const [status, setStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
 
-  // Incrementar contador de renders para detectar ciclos infinitos
-  useEffect(() => {
-    setRenderCount(prev => prev + 1);
-  });
+  // ✅ Incrementar contador de renders sin causar re-renders
+  renderCountRef.current += 1;
+  
+  // 🔍 Log cada render para debugging
+  console.log(`🔄 TestCrudOperations render #${renderCountRef.current}`);
+
+  // ✅ Stable callbacks to prevent hook from recreating functions
+  const onSuccess = useCallback((action: string, data: any) => {
+    console.log('✅ CRUD Success:', action, data);
+  }, []);
+
+  const onError = useCallback((action: string, error: any) => {
+    console.log('❌ CRUD Error:', action, error);
+  }, []);
 
   // Test del hook useCrudOperations
   const {
@@ -56,40 +74,63 @@ export function TestCrudOperations() {
   } = useCrudOperations<TestItem>({
     tableName: 'test_items', // Tabla que no existe, pero eso está bien para testing
     selectQuery: '*',
-    schema: testSchema, // Schema simple para testing
+    schema: testSchema, // Schema simple para testing - ahora estable
+    defaultValues, // ✅ Valores por defecto estables
     enableRealtime: false, // Deshabilitamos realtime para evitar errores de conexión
     cacheKey: 'test-crud',
     cacheTime: 60000,
+    onSuccess,
+    onError
+  });
+
+  // 🔍 Track what changed between renders
+  const currentValues = {
+    items: items.length,
+    loading,
+    error,
+    isSubscribed,
+    status
+  };
+
+  // Check what changed
+  useEffect(() => {
+    const previous = previousValuesRef.current;
+    const changes: string[] = [];
     
-    onSuccess: (action, data) => {
-      console.log('✅ CRUD Success:', action, data);
-    },
+    Object.keys(currentValues).forEach(key => {
+      if (previous[key] !== (currentValues as any)[key]) {
+        changes.push(`${key}: ${previous[key]} → ${(currentValues as any)[key]}`);
+      }
+    });
     
-    onError: (action, error) => {
-      console.log('❌ CRUD Error:', action, error);
+    if (changes.length > 0) {
+      console.log(`🔍 Render #${renderCountRef.current} caused by:`, changes);
     }
+    
+    previousValuesRef.current = { ...currentValues };
   });
 
   // Test que el hook no causa bucles infinitos
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (renderCount > 10) {
+      const currentRenderCount = renderCountRef.current;
+      if (currentRenderCount > 10) {
         setStatus('error');
-        console.error('❌ INFINITE RENDER LOOP DETECTED! Render count:', renderCount);
-      } else if (renderCount >= 3 && status === 'idle') {
+        console.error('❌ INFINITE RENDER LOOP DETECTED! Render count:', currentRenderCount);
+      } else if (currentRenderCount >= 3 && status === 'idle') {
         setStatus('testing');
         // Dar tiempo para que se estabilice
         setTimeout(() => {
-          if (renderCount < 10) {
+          if (renderCountRef.current < 10) {
             setStatus('success');
-            console.log('✅ Hook stable after', renderCount, 'renders');
+            console.log('✅ Hook stable after', renderCountRef.current, 'renders');
           }
         }, 2000);
       }
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [renderCount, status]);
+  }, [status]); // ✅ Solo depende de status, no de renderCount
 
   const handleTestBasicOperations = async () => {
     try {
@@ -155,7 +196,7 @@ export function TestCrudOperations() {
       }}>
         <strong>Test Status:</strong> {getStatusMessage()}
         <br />
-        <strong>Render Count:</strong> {renderCount}
+        <strong>Render Count:</strong> {renderCountRef.current}
         <br />
         <strong>Loading:</strong> {loading ? 'Yes' : 'No'}
         <br />
@@ -221,11 +262,11 @@ export function TestCrudOperations() {
       }}>
         <strong>Performance Log:</strong>
         <br />
-        Component rendered {renderCount} times
+        Component rendered {renderCountRef.current} times
         <br />
-        {renderCount > 5 && '⚠️ High render count - check for infinite loops'}
+        {renderCountRef.current > 5 && '⚠️ High render count - check for infinite loops'}
         <br />
-        {renderCount <= 3 && '✅ Normal render count'}
+        {renderCountRef.current <= 3 && '✅ Normal render count'}
       </div>
     </div>
   );

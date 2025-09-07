@@ -35,6 +35,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
 import { useLiveCostDashboard, useOvertimeMonitoring, useBudgetMonitoring } from '@/hooks/useRealTimeLaborCosts';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 
 interface RealTimeLaborTrackerProps {
   selectedDate?: string;
@@ -88,13 +89,8 @@ export function RealTimeLaborTracker({
     }
   }, [autoRefresh, isMonitoring, startMonitoring, stopMonitoring]);
 
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', { 
-      style: 'currency', 
-      currency: 'EUR' 
-    }).format(amount);
-  };
+  // MIGRATED: Use centralized currency formatting
+  // const formatCurrency = (amount: number) => QuickCalculations.QuickCalculations.formatCurrency(amount);
 
   // Format time
   const formatHours = (hours: number) => {
@@ -212,7 +208,7 @@ export function RealTimeLaborTracker({
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="blue.500">
-                {formatCurrency(totalActiveCost)}
+                {QuickCalculations.formatCurrency(totalActiveCost)}
               </Text>
               <Text fontSize="xs" color="gray.600">Costo Actual</Text>
               <HStack gap="1" justify="center">
@@ -227,11 +223,11 @@ export function RealTimeLaborTracker({
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="green.500">
-                {formatCurrency(totalProjectedCost)}
+                {QuickCalculations.formatCurrency(totalProjectedCost)}
               </Text>
               <Text fontSize="xs" color="gray.600">Proyectado</Text>
               <Text fontSize="xs" color="green.600">
-                +{formatCurrency(totalProjectedCost - totalActiveCost)}
+                +{QuickCalculations.formatCurrency(totalProjectedCost - totalActiveCost)}
               </Text>
             </VStack>
           </CardWrapper.Body>
@@ -356,13 +352,13 @@ export function RealTimeLaborTracker({
                               <HStack justify="space-between">
                                 <Text fontSize="sm">Actual</Text>
                                 <Text fontSize="sm" fontWeight="bold">
-                                  {formatCurrency(dailySummary.total_current_cost)}
+                                  {QuickCalculations.formatCurrency(dailySummary.total_current_cost)}
                                 </Text>
                               </HStack>
                               <HStack justify="space-between">
                                 <Text fontSize="sm">Proyectado</Text>
                                 <Text fontSize="sm">
-                                  {formatCurrency(dailySummary.total_projected_cost)}
+                                  {QuickCalculations.formatCurrency(dailySummary.total_projected_cost)}
                                 </Text>
                               </HStack>
                               <HStack justify="space-between">
@@ -373,7 +369,7 @@ export function RealTimeLaborTracker({
                                   fontWeight="semibold"
                                 >
                                   {dailySummary.cost_variance > 0 ? '+' : ''}
-                                  {formatCurrency(dailySummary.cost_variance)}
+                                  {QuickCalculations.formatCurrency(dailySummary.cost_variance)}
                                 </Text>
                               </HStack>
                             </VStack>
@@ -478,13 +474,13 @@ export function RealTimeLaborTracker({
                           
                           <Table.Cell>
                             <Text fontSize="sm" fontWeight="bold">
-                              {formatCurrency(employee.current_cost)}
+                              {QuickCalculations.formatCurrency(employee.current_cost)}
                             </Text>
                           </Table.Cell>
                           
                           <Table.Cell>
                             <Text fontSize="sm">
-                              {formatCurrency(employee.projected_cost)}
+                              {QuickCalculations.formatCurrency(employee.projected_cost)}
                             </Text>
                           </Table.Cell>
                           
@@ -532,13 +528,13 @@ export function RealTimeLaborTracker({
                               <HStack justify="space-between">
                                 <Text fontSize="sm">Costo Actual</Text>
                                 <Text fontSize="sm" fontWeight="bold">
-                                  {formatCurrency(data.current_cost)}
+                                  {QuickCalculations.formatCurrency(data.current_cost)}
                                 </Text>
                               </HStack>
                               <HStack justify="space-between">
                                 <Text fontSize="sm">Proyectado</Text>
                                 <Text fontSize="sm">
-                                  {formatCurrency(data.projected_cost)}
+                                  {QuickCalculations.formatCurrency(data.projected_cost)}
                                 </Text>
                               </HStack>
                               {data.overtime_count > 0 && (

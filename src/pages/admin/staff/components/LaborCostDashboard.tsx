@@ -25,6 +25,7 @@ import {
   CalculatorIcon
 } from '@heroicons/react/24/outline';
 import staffApi, { type LaborCostData, type LaborCostSummary } from '@/services/staff/staffApi';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 
 interface LaborCostDashboardProps {
   compact?: boolean;
@@ -83,14 +84,8 @@ export function LaborCostDashboard({
     }
   };
 
-  // Helper functions
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 0
-    }).format(amount);
-  };
+  // MIGRATED: Use centralized currency formatting
+  // const formatCurrency = (amount: number) => QuickCalculations.QuickCalculations.formatCurrency(amount);
 
   const getVarianceColor = (percentage: number) => {
     if (percentage > 10) return 'red';
@@ -164,7 +159,7 @@ export function LaborCostDashboard({
           <CardWrapper.Body textAlign="center">
             <Icon icon={CurrencyDollarIcon} size="lg" color="green.500" />
             <Text fontSize="xl" fontWeight="bold">
-              {formatCurrency(costSummary.total_actual_cost)}
+              {QuickCalculations.formatCurrency(costSummary.total_actual_cost)}
             </Text>
             <Text fontSize="sm" color="gray.600">Costo Total</Text>
             <HStack gap="1" justify="center" mt="1">
@@ -188,7 +183,7 @@ export function LaborCostDashboard({
             </Text>
             <Text fontSize="sm" color="gray.600">Horas Trabajadas</Text>
             <Text fontSize="xs" color="gray.500" mt="1">
-              {formatCurrency(costSummary.average_hourly_cost)}/hora prom.
+              {QuickCalculations.formatCurrency(costSummary.average_hourly_cost)}/hora prom.
             </Text>
           </CardWrapper.Body>
         </CardWrapper>
@@ -199,7 +194,7 @@ export function LaborCostDashboard({
               <CardWrapper.Body textAlign="center">
                 <Icon icon={ExclamationTriangleIcon} size="lg" color="orange.500" />
                 <Text fontSize="xl" fontWeight="bold">
-                  {formatCurrency(Math.abs(costSummary.variance))}
+                  {QuickCalculations.formatCurrency(Math.abs(costSummary.variance))}
                 </Text>
                 <Text fontSize="sm" color="gray.600">
                   {costSummary.variance > 0 ? 'Sobrecosto' : 'Ahorro'}
@@ -251,7 +246,7 @@ export function LaborCostDashboard({
                     <VStack align="start" gap="1">
                       <Text fontSize="sm" color="gray.600">Presupuestado</Text>
                       <Text fontSize="lg" fontWeight="medium">
-                        {formatCurrency(costSummary.total_scheduled_cost)}
+                        {QuickCalculations.formatCurrency(costSummary.total_scheduled_cost)}
                       </Text>
                     </VStack>
                     <VStack align="center" gap="1">
@@ -263,7 +258,7 @@ export function LaborCostDashboard({
                     <VStack align="end" gap="1">
                       <Text fontSize="sm" color="gray.600">Real</Text>
                       <Text fontSize="lg" fontWeight="medium">
-                        {formatCurrency(costSummary.total_actual_cost)}
+                        {QuickCalculations.formatCurrency(costSummary.total_actual_cost)}
                       </Text>
                     </VStack>
                   </HStack>
@@ -291,7 +286,7 @@ export function LaborCostDashboard({
                         </VStack>
                         <VStack align="end" gap="1">
                           <Text fontWeight="medium">
-                            {formatCurrency(data.actual_cost)}
+                            {QuickCalculations.formatCurrency(data.actual_cost)}
                           </Text>
                           <Progress 
                             value={data.avg_efficiency * 100} 
@@ -325,7 +320,7 @@ export function LaborCostDashboard({
                               <VStack align="start" gap="0">
                                 <Text fontSize="sm" color="gray.600">Costo/Hora</Text>
                                 <Text fontSize="sm" fontWeight="medium">
-                                  {formatCurrency(dept.avg_hourly_cost)}
+                                  {QuickCalculations.formatCurrency(dept.avg_hourly_cost)}
                                 </Text>
                               </VStack>
                               <VStack align="start" gap="0">
@@ -343,7 +338,7 @@ export function LaborCostDashboard({
                               {dept.employees} empleado{dept.employees > 1 ? 's' : ''}
                             </Badge>
                             <Text fontSize="sm" color="gray.600">
-                              {formatCurrency(dept.cost_per_performance_point)}/punto rendimiento
+                              {QuickCalculations.formatCurrency(dept.cost_per_performance_point)}/punto rendimiento
                             </Text>
                           </VStack>
                         </HStack>
@@ -393,7 +388,7 @@ export function LaborCostDashboard({
                           </td>
                           <td className="p-2">
                             <Text fontSize="sm" fontWeight="medium">
-                              {formatCurrency(emp.total_cost)}
+                              {QuickCalculations.formatCurrency(emp.total_cost)}
                             </Text>
                           </td>
                           <td className="p-2">
@@ -406,7 +401,7 @@ export function LaborCostDashboard({
                           </td>
                           <td className="p-2">
                             <Text fontSize="sm">
-                              {formatCurrency(emp.cost_per_performance_point)}
+                              {QuickCalculations.formatCurrency(emp.cost_per_performance_point)}
                             </Text>
                           </td>
                         </tr>

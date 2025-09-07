@@ -1,106 +1,96 @@
-// src/features/customers/logic/useCustomerTags.ts
-import { useState, useEffect, useCallback } from 'react';
+// MIGRATED: Using centralized useCrudOperations system
+import { useCallback } from 'react';
+import { z } from 'zod';
+import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { CustomerTag, CustomerProfile } from '../types';
 import {
-  getCustomerTags,
-  createCustomerTag,
-  updateCustomerTag,
-  deleteCustomerTag,
   assignTagToCustomer,
   removeTagFromCustomer,
   getCustomersWithTag
-} from '../services/advancedCustomerApi';export function useCustomerTags() {
-  const [tags, setTags] = useState<CustomerTag[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+} from '../services/advancedCustomerApi';
 
-  // Load all available tags
-  const loadTags = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const data = await getCustomerTags();
-      setTags(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading tags');
-      console.error('Error loading customer tags:', err);
-    } finally {
-      setLoading(false);
+// Schema for CustomerTag validation
+const CustomerTagSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().min(1, 'Name is required'),
+  color: z.string().min(1, 'Color is required'),
+  category: z.enum(['behavior', 'preference', 'demographic', 'custom']),
+  description: z.string().optional(),
+  metadata: z.record(z.unknown()).optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional()
+});
+
+export function useCustomerTags() {
+  // MIGRATED: Use unified CRUD system instead of manual state management
+  const crud = useCrudOperations<CustomerTag>({
+    tableName: 'customer_intelligence.customer_tags',
+    schema: CustomerTagSchema,
+    enableRealtime: true,
+    cacheKey: 'customer-tags',
+    defaultValues: {
+      name: '',
+      color: '#FF6B6B',
+      category: 'custom' as const,
+      description: ''
     }
-  };
+  });
 
-  // Create a new tag
-  const createTag = async (tagData: Omit<CustomerTag, 'id' | 'created_at'>) => {
-    try {
-      const newTag = await createCustomerTag(tagData);
-      await loadTags(); // Reload to get updated list
-      return newTag;
-    } catch (err) {
-      console.error('Error creating tag:', err);
-      throw err;
-    }
-  };
+  // MIGRATED: Map unified interface to original public interface
+  const tags = crud.items;
+  const loading = crud.loading;
+  const error = crud.error;
+  const loadTags = crud.refresh;
+  
+  // MIGRATED: Use unified operations with original method names
+  const createTag = useCallback(async (tagData: Omit<CustomerTag, 'id' | 'created_at' | 'updated_at'>) => {
+    return await crud.create(tagData as CustomerTag);
+  }, [crud]);
 
-  // Update an existing tag
-  const updateTag = async (id: string, tagData: Partial<CustomerTag>) => {
-    try {
-      const updatedTag = await updateCustomerTag(id, tagData);
-      await loadTags(); // Reload to get updated list
-      return updatedTag;
-    } catch (err) {
-      console.error('Error updating tag:', err);
-      throw err;
-    }
-  };
+  const updateTag = useCallback(async (id: string, tagData: Partial<CustomerTag>) => {
+    return await crud.update(id, tagData);
+  }, [crud]);
 
-  // Delete a tag
-  const deleteTag = async (id: string) => {
-    try {
-      await deleteCustomerTag(id);
-      await loadTags(); // Reload to get updated list
-    } catch (err) {
-      console.error('Error deleting tag:', err);
-      throw err;
-    }
-  };
+  const deleteTag = useCallback(async (id: string) => {
+    await crud.remove(id);
+  }, [crud]);
 
-  // Assign tag to customer
-  const assignTag = async (customerId: string, tagId: string) => {
+  // Assign tag to customer - keeping original specialized logic
+  const assignTag = useCallback(async (customerId: string, tagId: string) => {
     try {
       await assignTagToCustomer(customerId, tagId);
     } catch (err) {
       console.error('Error assigning tag to customer:', err);
       throw err;
     }
-  };
+  }, []);
 
-  // Remove tag from customer
-  const removeTag = async (customerId: string, tagId: string) => {
+  // Remove tag from customer - keeping original specialized logic  
+  const removeTag = useCallback(async (customerId: string, tagId: string) => {
     try {
       await removeTagFromCustomer(customerId, tagId);
     } catch (err) {
       console.error('Error removing tag from customer:', err);
       throw err;
     }
-  };
+  }, []);
 
-  // Get customers with specific tag
-  const getCustomersWithTagId = async (tagId: string): Promise<CustomerProfile[]> => {
+  // Get customers with specific tag - keeping original specialized logic
+  const getCustomersWithTagId = useCallback(async (tagId: string): Promise<CustomerProfile[]> => {
     try {
       return await getCustomersWithTag(tagId);
     } catch (err) {
       console.error('Error getting customers with tag:', err);
       throw err;
     }
-  };
+  }, []);
 
-  // Filter tags by category
+  // MIGRATED: Use unified utilities instead of manual filtering
   const getTagsByCategory = useCallback((category: CustomerTag['category']) => {
-    return tags.filter(tag => tag.category === category);
-  }, [tags]);
+    return crud.filterItems(tag => tag.category === category);
+  }, [crud]);
 
-  // Get predefined tag colors
+  // Get predefined tag colors - keeping original logic
   const getTagColors = useCallback(() => ([
     '#FF6B6B', // Red
     '#4ECDC4', // Teal
@@ -114,7 +104,7 @@ import {
     '#85C1E9', // Light Blue
   ]), []);
 
-  // Get next available color for new tags
+  // Get next available color for new tags - keeping original logic
   const getNextColor = useCallback(() => {
     const colors = getTagColors();
     const usedColors = tags.map(tag => tag.color);
@@ -128,7 +118,7 @@ import {
     return colors[Math.floor(Math.random() * colors.length)];
   }, [tags, getTagColors]);
 
-  // Get tag statistics
+  // Get tag statistics - keeping original logic
   const getTagStats = useCallback(() => {
     const categoryStats = tags.reduce((acc, tag) => {
       acc[tag.category] = (acc[tag.category] || 0) + 1;
@@ -141,11 +131,10 @@ import {
     };
   }, [tags]);
 
-  useEffect(() => {
-    loadTags();
-  }, []);
-
+  // MIGRATED: Automatic loading via useCrudOperations (no manual useEffect needed)
+  
   return {
+    // MIGRATED: Maintain exact same public interface
     tags,
     loading,
     error,
