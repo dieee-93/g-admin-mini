@@ -20,6 +20,7 @@ import {
   CalculatorIcon,
   DocumentTextIcon
 } from '@heroicons/react/24/outline';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 
 interface CostCalculation {
@@ -67,17 +68,58 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
 
     setLoading(true);
 
-    // Calculate derived values
-    const materials_per_unit = calc.materials_cost / calc.batch_size;
-    const labor_cost = calc.labor_hours * (calc.labor_rate_per_hour || 15);
-    const overhead_total = (calc.equipment_cost || 0) + (calc.utility_cost || 0) + (calc.facility_cost || 0);
-    const total_cost = calc.materials_cost + labor_cost + overhead_total;
-    const cost_per_unit = total_cost / calc.batch_size;
+    // Calculate derived values - MIGRATED TO DECIMAL PRECISION
+    const materials_per_unit = DecimalUtils.divide(
+      (calc.materials_cost || 0).toString(),
+      (calc.batch_size || 1).toString(),
+      'financial'
+    ).toNumber();
     
-    // Pricing calculations (80% markup as default)
+    const labor_cost = DecimalUtils.multiply(
+      (calc.labor_hours || 0).toString(),
+      (calc.labor_rate_per_hour || 15).toString(),
+      'financial'
+    ).toNumber();
+    
+    const overhead_total = DecimalUtils.add(
+      DecimalUtils.add(
+        (calc.equipment_cost || 0).toString(),
+        (calc.utility_cost || 0).toString(),
+        'financial'
+      ).toString(),
+      (calc.facility_cost || 0).toString(),
+      'financial'
+    ).toNumber();
+    
+    const total_cost = DecimalUtils.add(
+      DecimalUtils.add(
+        (calc.materials_cost || 0).toString(),
+        labor_cost.toString(),
+        'financial'
+      ).toString(),
+      overhead_total.toString(),
+      'financial'
+    ).toNumber();
+    
+    const cost_per_unit = DecimalUtils.divide(
+      total_cost.toString(),
+      (calc.batch_size || 1).toString(),
+      'financial'
+    ).toNumber();
+    
+    // Pricing calculations (80% markup as default) - MIGRATED TO DECIMAL PRECISION
     const markup_percentage = 80;
-    const suggested_price = cost_per_unit * (1 + markup_percentage / 100);
-    const profit_margin = ((suggested_price - cost_per_unit) / suggested_price) * 100;
+    const markupFactor = DecimalUtils.divide(markup_percentage.toString(), '100', 'financial');
+    const suggested_price = DecimalUtils.multiply(
+      cost_per_unit.toString(),
+      DecimalUtils.add('1', markupFactor.toString(), 'financial').toString(),
+      'financial'
+    ).toNumber();
+    
+    const profit_margin = DecimalUtils.calculatePercentage(
+      DecimalUtils.subtract(suggested_price.toString(), cost_per_unit.toString(), 'financial').toString(),
+      suggested_price.toString()
+    ).toNumber();
 
     const newCalculation: CostCalculation = {
       id: Date.now().toString(),

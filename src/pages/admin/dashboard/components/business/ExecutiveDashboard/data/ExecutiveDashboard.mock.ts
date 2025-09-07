@@ -1,7 +1,4 @@
-import {
-  createListCollection,
-} from '@chakra-ui/react';
-import type { ExecutiveKPI, StrategicInsight, ExecutiveSummary } from './ExecutiveDashboard';
+import type { ExecutiveKPI, StrategicInsight, ExecutiveSummary } from '../types';
 
 // Mock data generators
 export const generateMockExecutiveKPIs = (): ExecutiveKPI[] => {
@@ -367,22 +364,3 @@ export const generateMockExecutiveSummary = (): ExecutiveSummary => {
   };
 };
 
-// Collections
-export const PERIOD_COLLECTION = createListCollection({
-  items: [
-    { label: 'Última semana', value: 'weekly' },
-    { label: 'Último mes', value: 'monthly' },
-    { label: 'Último trimestre', value: 'quarterly' },
-    { label: 'Año actual', value: 'yearly' }
-  ]
-});
-
-export const KPI_CATEGORY_COLLECTION = createListCollection({
-  items: [
-    { label: 'Todas las categorías', value: 'all' },
-    { label: 'Financiero', value: 'financial' },
-    { label: 'Operacional', value: 'operational' },
-    { label: 'Cliente', value: 'customer' },
-    { label: 'Estratégico', value: 'strategic' }
-  ]
-});

@@ -11,6 +11,7 @@ import {
   DEFAULT_MATRIX_CONFIG,
   type ProductSalesData
 } from '@/business-logic/menuengineering/menuEngineeringCalculations';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';
 
@@ -155,8 +156,16 @@ export const useMenuEngineering = (
           }
 
           const productCost = costData || 0;
-          const totalCost = salesInfo.unitsSold * productCost;
-          const averagePrice = salesInfo.totalRevenue / salesInfo.unitsSold;
+          const totalCost = DecimalUtils.multiply(
+            salesInfo.unitsSold.toString(), 
+            productCost.toString(), 
+            'financial'
+          ).toNumber();
+          const averagePrice = DecimalUtils.divide(
+            salesInfo.totalRevenue.toString(), 
+            salesInfo.unitsSold.toString(), 
+            'financial'
+          ).toNumber();
 
           salesData.push({
             productId: product.id,
@@ -170,8 +179,16 @@ export const useMenuEngineering = (
         } catch (err) {
           console.warn(`Error processing product ${product.name}:`, err);
           // Continue with estimated cost if database function fails
-          const estimatedCost = salesInfo.totalRevenue * 0.3; // Assume 30% cost ratio
-          const averagePrice = salesInfo.totalRevenue / salesInfo.unitsSold;
+          const estimatedCost = DecimalUtils.multiply(
+            salesInfo.totalRevenue.toString(), 
+            '0.3', 
+            'financial'
+          ).toNumber(); // Assume 30% cost ratio
+          const averagePrice = DecimalUtils.divide(
+            salesInfo.totalRevenue.toString(), 
+            salesInfo.unitsSold.toString(), 
+            'financial'
+          ).toNumber();
 
           salesData.push({
             productId: product.id,
@@ -315,8 +332,12 @@ export const useMenuEngineering = (
     
     const { performanceMetrics } = matrix;
     const totalRevenue = matrix.totalRevenue;
-    const totalProfit = Object.values(performanceMetrics.profitByCategory).reduce((sum, profit) => sum + profit, 0);
-    const averageMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+    const totalProfit = Object.values(performanceMetrics.profitByCategory).reduce((sum, profit) => 
+      DecimalUtils.add(sum.toString(), profit.toString(), 'financial').toNumber(), 0
+    );
+    const averageMargin = totalRevenue > 0 
+      ? DecimalUtils.calculatePercentage(totalProfit.toString(), totalRevenue.toString()).toNumber()
+      : 0;
     
     return {
       totalRevenue,

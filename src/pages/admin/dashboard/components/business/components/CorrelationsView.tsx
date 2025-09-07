@@ -15,6 +15,7 @@ import {
   LightBulbIcon
 } from '@heroicons/react/24/outline';
 import { Icon, CardWrapper } from '@/shared/ui';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 // Import shared types
 interface ModuleMetric {
@@ -77,10 +78,10 @@ export function CorrelationsView({
 }: CorrelationsViewProps) {
   // Filtered correlations
   const filteredCorrelations = useMemo(() => {
-    let filtered = correlations.filter(corr => 
-      Math.abs(corr.correlationCoefficient) >= config.correlationThreshold &&
-      corr.significance >= config.significanceLevel
-    );
+    let filtered = correlations.filter(corr => {
+      const absCorrelation = DecimalUtils.abs(corr.correlationCoefficient).toNumber();
+      return absCorrelation >= config.correlationThreshold && corr.significance >= config.significanceLevel;
+    });
     
     if (selectedModule !== 'all') {
       filtered = filtered.filter(corr => 
@@ -89,7 +90,11 @@ export function CorrelationsView({
       );
     }
     
-    return filtered.sort((a, b) => Math.abs(b.correlationCoefficient) - Math.abs(a.correlationCoefficient));
+    return filtered.sort((a, b) => {
+      const absA = DecimalUtils.abs(a.correlationCoefficient).toNumber();
+      const absB = DecimalUtils.abs(b.correlationCoefficient).toNumber();
+      return absB - absA;
+    });
   }, [correlations, config.correlationThreshold, config.significanceLevel, selectedModule]);
 
   const getCorrelationColor = (strength: string) => {
@@ -175,7 +180,7 @@ export function CorrelationsView({
                     <VStack align="start" gap={0}>
                       <Text color="gray.600">Coeficiente:</Text>
                       <Text fontWeight="bold" color={correlation.correlationType === 'positive' ? 'green.600' : 'red.600'}>
-                        {correlation.correlationCoefficient.toFixed(3)}
+                        {DecimalUtils.formatQuantity(correlation.correlationCoefficient, '', 3)}
                       </Text>
                     </VStack>
                     <VStack align="center" gap={0}>

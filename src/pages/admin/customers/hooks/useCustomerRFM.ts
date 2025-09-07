@@ -1,5 +1,6 @@
 // src/features/customers/logic/useCustomerRFM.ts
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { 
   CustomerRFMProfile, 
   CustomerSegment, 
@@ -10,7 +11,9 @@ import {
   calculateCustomerRFM,
   getCustomerAnalyticsDashboard,
   getCustomerProfileWithRFM
-} from '../services/advancedCustomerApi';export function useCustomerRFM() {
+} from '../services/advancedCustomerApi';
+
+export function useCustomerRFM() {
   const [rfmProfiles, setRFMProfiles] = useState<CustomerRFMProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +21,12 @@ import {
   // RFM Calculation Logic (client-side for real-time updates)
   const calculateRFMScores = useMemo(() => ({
     recency: (lastVisit: Date): number => {
-      const days = Math.floor((Date.now() - lastVisit.getTime()) / (1000 * 60 * 60 * 24));
+      const nowMs = DecimalUtils.fromValue(Date.now(), 'financial');
+      const visitMs = DecimalUtils.fromValue(lastVisit.getTime(), 'financial');
+      const diffMs = DecimalUtils.subtract(nowMs.toString(), visitMs.toString(), 'financial');
+      const msPerDay = DecimalUtils.fromValue(1000 * 60 * 60 * 24, 'financial');
+      const days = Math.floor(DecimalUtils.divide(diffMs.toString(), msPerDay.toString(), 'financial').toNumber());
+      
       if (days <= 30) return 5;
       if (days <= 60) return 4;
       if (days <= 90) return 3;
@@ -125,7 +133,17 @@ import {
     visitFrequency: number, 
     customerLifespan: number = 12 // months
   ): number => {
-    return avgOrderValue * visitFrequency * customerLifespan;
+    const orderValue = DecimalUtils.fromValue(avgOrderValue, 'financial');
+    const frequency = DecimalUtils.fromValue(visitFrequency, 'financial');
+    const lifespan = DecimalUtils.fromValue(customerLifespan, 'financial');
+    
+    const clv = DecimalUtils.multiply(
+      DecimalUtils.multiply(orderValue.toString(), frequency.toString(), 'financial').toString(),
+      lifespan.toString(),
+      'financial'
+    );
+    
+    return clv.toNumber();
   }, []);
 
   // Load RFM profiles from database
@@ -193,7 +211,9 @@ import {
     return Object.entries(segmentCounts).map(([segment, count]) => ({
       segment: segment as CustomerSegment,
       count,
-      percentage: total > 0 ? (count / total) * 100 : 0
+      percentage: total > 0 
+        ? DecimalUtils.calculatePercentage(count.toString(), total.toString()).toNumber() 
+        : 0
     }));
   }, [rfmProfiles]);
 

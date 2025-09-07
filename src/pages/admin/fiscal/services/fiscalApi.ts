@@ -1,5 +1,6 @@
 // Fiscal API - AFIP Integration and Tax Management
 import { supabase } from '@/lib/supabase/client';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { 
   type Invoice, 
   type AFIPConfiguration, 
@@ -469,9 +470,9 @@ class FiscalAPI {
       
       periods.push({
         periodo: period,
-        iva_ventas: 125000 + Math.random() * 50000,
-        iva_compras: 45000 + Math.random() * 20000,
-        saldo: 80000 + Math.random() * 40000,
+        iva_ventas: DecimalUtils.add('125000', DecimalUtils.multiply(Math.random().toString(), '50000', 'financial').toString(), 'financial').toNumber(),
+        iva_compras: DecimalUtils.add('45000', DecimalUtils.multiply(Math.random().toString(), '20000', 'financial').toString(), 'financial').toNumber(),
+        saldo: DecimalUtils.add('80000', DecimalUtils.multiply(Math.random().toString(), '40000', 'financial').toString(), 'financial').toNumber(),
         estado: i === 0 ? 'pendiente' : 'presentado',
         vencimiento: `${year}-${String(month + 2).padStart(2, '0')}-15`
       });
@@ -575,10 +576,12 @@ class FiscalAPI {
 
       if (error) throw error;
       
-      return data && data.length > 0 ? data[0].numero + 1 : 1;
+      return data && data.length > 0 
+        ? DecimalUtils.add(data[0].numero.toString(), '1', 'financial').toNumber() 
+        : 1;
     } catch (error) {
       console.error('Error getting next invoice number:', error);
-      return Math.floor(Math.random() * 100000) + 1;
+      return Math.floor(DecimalUtils.add(DecimalUtils.multiply(Math.random().toString(), '100000', 'financial').toString(), '1', 'financial').toNumber());
     }
   }
 

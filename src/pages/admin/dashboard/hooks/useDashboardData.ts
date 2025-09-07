@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useMaterials } from '../../materials/hooks/useMaterials';
 import { useSales } from '../../sales/hooks/useSales';
 import { useCustomers } from '../../customers/hooks/useCustomers';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import type { DashboardStats, AlertItem } from '../types';
 
 export function useDashboardData() {
@@ -20,7 +21,12 @@ export function useDashboardData() {
       }
     },
     sales: {
-      monthlyRevenue: sales?.reduce((total, sale) => total + (sale.total || 0), 0) || 0,
+      monthlyRevenue: sales?.length 
+        ? sales.reduce((total, sale) => {
+            const saleTotal = sale.total || 0;
+            return DecimalUtils.add(total.toString(), saleTotal.toString(), 'financial').toNumber();
+          }, 0)
+        : 0,
       monthlyTransactions: sales?.length || 0,
     },
     customers: {

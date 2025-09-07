@@ -16,6 +16,7 @@ import {
   ChartBarIcon
 } from '@heroicons/react/24/outline';
 import { Icon, CardWrapper } from '@/shared/ui';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 interface ExecutiveKPI {
   id: string;
@@ -107,7 +108,9 @@ export function ExecutiveKPIGrid({
         {filteredKPIs.map((kpi) => {
           const trend = getTrendDisplay(kpi.trend, kpi.changeType);
           const TrendIcon = trend.icon;
-          const progressValue = kpi.target ? (kpi.value / kpi.target) * 100 : 0;
+          const progressValue = kpi.target 
+            ? DecimalUtils.calculatePercentage(kpi.value.toString(), kpi.target.toString()).toNumber()
+            : 0;
           
           return (
             <CardWrapper .Root 
@@ -136,7 +139,10 @@ export function ExecutiveKPIGrid({
                   <HStack justify="space-between" align="end">
                     <VStack align="start" gap={0}>
                       <Text fontSize="2xl" fontWeight="bold" color={trend.color === 'green' ? 'green.600' : trend.color === 'red' ? 'red.600' : 'blue.600'}>
-                        {kpi.unit === '$' ? '$' : ''}{kpi.value.toLocaleString()}{kpi.unit !== '$' ? kpi.unit : ''}
+                        {kpi.unit === '$' 
+                          ? DecimalUtils.formatCurrency(kpi.value)
+                          : `${kpi.value.toLocaleString()}${kpi.unit !== '$' ? kpi.unit : ''}`
+                        }
                       </Text>
                       <Text fontSize="xs" color="gray.500">
                         Actualizado: {new Date(kpi.lastUpdated).toLocaleDateString()}
@@ -149,7 +155,7 @@ export function ExecutiveKPIGrid({
                         fontWeight="medium" 
                         color={kpi.changeType === 'increase' ? 'green.600' : 'red.600'}
                       >
-                        {kpi.changeType === 'increase' ? '+' : ''}{kpi.change.toFixed(1)}%
+                        {kpi.changeType === 'increase' ? '+' : ''}{DecimalUtils.formatPercentage(kpi.change, 1).replace('%', '')}%
                       </Text>
                       <Text fontSize="xs" color="gray.500">vs anterior</Text>
                     </VStack>
@@ -159,9 +165,14 @@ export function ExecutiveKPIGrid({
                   {kpi.target && (
                     <VStack align="stretch" gap={1}>
                       <HStack justify="space-between" fontSize="xs">
-                        <Text color="gray.600">Objetivo: {kpi.unit === '$' ? '$' : ''}{kpi.target.toLocaleString()}{kpi.unit !== '$' ? kpi.unit : ''}</Text>
+                        <Text color="gray.600">
+                          Objetivo: {kpi.unit === '$' 
+                            ? DecimalUtils.formatCurrency(kpi.target)
+                            : `${kpi.target.toLocaleString()}${kpi.unit !== '$' ? kpi.unit : ''}`
+                          }
+                        </Text>
                         <Text color={progressValue >= 100 ? 'green.600' : progressValue >= 80 ? 'yellow.600' : 'red.600'}>
-                          {progressValue.toFixed(0)}%
+                          {DecimalUtils.formatPercentage(progressValue, 0)}
                         </Text>
                       </HStack>
                       <Progress 

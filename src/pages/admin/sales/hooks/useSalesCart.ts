@@ -2,6 +2,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { toaster } from '@/shared/ui/toaster';
 import { supabase } from '@/lib/supabase/client';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 export interface SaleItem {
   product_id: string;
@@ -278,7 +279,14 @@ export function useSalesCart(options: CartValidationOptions = {}) {
   // Resumen del carrito con validaciones
   const summary: CartSummary = useMemo(() => {
     const itemCount = cart.length;
-    const totalAmount = cart.reduce((total, item) => total + (item.quantity * item.unit_price), 0);
+    const totalAmount = cart.reduce((total, item) => {
+      const itemTotal = DecimalUtils.multiply(
+        item.quantity.toString(), 
+        item.unit_price.toString(), 
+        'financial'
+      );
+      return DecimalUtils.add(total.toString(), itemTotal.toString(), 'financial').toNumber();
+    }, 0);
     const hasItems = itemCount > 0;
     
     // La validez ahora depende únicamente del resultado de la validación del backend
@@ -322,8 +330,16 @@ export function useSalesCart(options: CartValidationOptions = {}) {
 
   // Obtener estadísticas del carrito
   const cartStats = useMemo(() => {
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const averagePrice = cart.length > 0 && totalItems > 0 ? summary.totalAmount / totalItems : 0;
+    const totalItems = cart.reduce((sum, item) => 
+      DecimalUtils.add(sum.toString(), item.quantity.toString(), 'financial').toNumber(), 0
+    );
+    const averagePrice = cart.length > 0 && totalItems > 0 
+      ? DecimalUtils.divide(
+          summary.totalAmount.toString(), 
+          totalItems.toString(), 
+          'financial'
+        ).toNumber() 
+      : 0;
     
     return {
       totalItems,

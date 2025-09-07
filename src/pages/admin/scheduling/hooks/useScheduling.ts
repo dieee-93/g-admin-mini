@@ -1,5 +1,7 @@
 // useScheduling - Main hook for scheduling module business logic
 import { useState, useEffect, useCallback } from 'react';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { calculateShiftHours } from '@/business-logic/scheduling/schedulingCalculations';
 import type { 
   Shift, 
   Schedule, 
@@ -168,7 +170,7 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     try {
       // TODO: Replace with actual API call
       const newShift: Shift = {
-        id: `shift_${Date.now()}`,
+        id: `shift_${DecimalUtils.fromValue(Date.now(), 'financial').toFixed(0)}`,
         employee_id: shiftData.employee_id,
         employee_name: 'Employee Name', // Would be fetched from employee data
         date: shiftData.date,
@@ -224,7 +226,7 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     try {
       // TODO: Replace with actual API call
       const newShifts = shiftsData.map((shiftData, index) => ({
-        id: `shift_${Date.now()}_${index}`,
+        id: `shift_${DecimalUtils.fromValue(Date.now(), 'financial').toFixed(0)}_${index}`,
         employee_id: shiftData.employee_id,
         employee_name: 'Employee Name',
         date: shiftData.date,
@@ -286,7 +288,7 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     try {
       const newRequest: TimeOffRequest = {
         ...request,
-        id: `request_${Date.now()}`,
+        id: `request_${DecimalUtils.fromValue(Date.now(), 'financial').toFixed(0)}`,
         requested_at: new Date().toISOString()
       };
 
@@ -349,7 +351,10 @@ export function useScheduling(): SchedulingState & SchedulingActions {
   const navigateWeek = useCallback((direction: 'prev' | 'next') => {
     setState(prev => {
       const newDate = new Date(prev.selectedWeek);
-      newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
+      const daysToAdd = direction === 'next' ? 7 : -7;
+      const currentDay = newDate.getDate();
+      const newDay = DecimalUtils.add(currentDay.toString(), daysToAdd.toString(), 'financial').toNumber();
+      newDate.setDate(newDay);
       return { ...prev, selectedWeek: newDate };
     });
   }, []);

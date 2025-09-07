@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useDashboardData } from './useDashboardData';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 export function useModernDashboard() {
   const { navigate } = useNavigation();
@@ -18,7 +19,7 @@ export function useModernDashboard() {
   // Hero Metric (Revenue) - Métrica principal
   const heroMetric = useMemo(() => ({
     title: "Revenue",
-    value: `$${dashboardStats.sales.monthlyRevenue.toLocaleString()}`,
+    value: DecimalUtils.formatCurrency(dashboardStats.sales.monthlyRevenue),
     change: {
       value: 15.2, // TODO: Calcular cambio real
       period: "mes anterior",
@@ -49,7 +50,7 @@ export function useModernDashboard() {
     {
       title: "Items en inventario",
       value: dashboardStats.inventory.totalItems,
-      additionalInfo: `Valor: $${dashboardStats.inventory.totalValue.toLocaleString()}`,
+      additionalInfo: `Valor: ${DecimalUtils.formatCurrency(dashboardStats.inventory.totalValue)}`,
       icon: CubeIcon,
       iconColor: "var(--chakra-colors-blue-600)",
       iconBg: "var(--chakra-colors-blue-100)",

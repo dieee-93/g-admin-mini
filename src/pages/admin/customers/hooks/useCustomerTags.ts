@@ -1,7 +1,8 @@
 // MIGRATED: Using centralized useCrudOperations system
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { z } from 'zod';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { CustomerTag, CustomerProfile } from '../types';
 import {
   assignTagToCustomer,
@@ -115,13 +116,15 @@ export function useCustomerTags() {
     }
     
     // If all colors are used, return a random one
-    return colors[Math.floor(Math.random() * colors.length)];
+    const randomIndex = Math.floor(DecimalUtils.multiply(Math.random().toString(), colors.length.toString(), 'financial').toNumber());
+    return colors[randomIndex];
   }, [tags, getTagColors]);
 
   // Get tag statistics - keeping original logic
   const getTagStats = useCallback(() => {
     const categoryStats = tags.reduce((acc, tag) => {
-      acc[tag.category] = (acc[tag.category] || 0) + 1;
+      const currentCount = acc[tag.category] || 0;
+      acc[tag.category] = DecimalUtils.add(currentCount.toString(), '1', 'financial').toNumber();
       return acc;
     }, {} as Record<CustomerTag['category'], number>);
 

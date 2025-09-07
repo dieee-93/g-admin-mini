@@ -6,6 +6,7 @@ import {
   ChartBarIcon
 } from '@heroicons/react/24/outline';
 import { useDashboardData } from './useDashboardData';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import type { MetricCardProps } from '../types';
 import { useNavigation } from '@/contexts/NavigationContext';
 
@@ -17,7 +18,7 @@ export function useDashboardMetrics() {
     {
       title: "Items en inventario",
       value: dashboardStats.inventory.totalItems,
-      additionalInfo: `Valor: $${dashboardStats.inventory.totalValue.toLocaleString()}`,
+      additionalInfo: `Valor: ${DecimalUtils.formatCurrency(dashboardStats.inventory.totalValue)}`,
       icon: CubeIcon,
       iconColor: "var(--chakra-colors-green-600)",
       iconBg: "var(--chakra-colors-green-100)",
@@ -30,7 +31,7 @@ export function useDashboardMetrics() {
     },
     {
       title: "Ventas del mes",
-      value: `$${dashboardStats.sales.monthlyRevenue.toLocaleString()}`,
+      value: DecimalUtils.formatCurrency(dashboardStats.sales.monthlyRevenue),
       additionalInfo: `${dashboardStats.sales.monthlyTransactions} transacciones`,
       icon: CurrencyDollarIcon,
       iconColor: "var(--chakra-colors-teal-600)",

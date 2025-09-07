@@ -1,12 +1,15 @@
 // src/features/customers/logic/useCustomerNotes.ts
 import { useState, useEffect, useCallback } from 'react';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { CustomerNote } from '../types';
 import {
   getCustomerNotes,
   createCustomerNote,
   updateCustomerNote,
   deleteCustomerNote
-} from '../services/advancedCustomerApi';export function useCustomerNotes(customerId?: string) {
+} from '../services/advancedCustomerApi';
+
+export function useCustomerNotes(customerId?: string) {
   const [notes, setNotes] = useState<CustomerNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,18 +80,25 @@ import {
   // Get recent notes
   const getRecentNotes = useCallback((days: number = 30) => {
     const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - days);
+    const currentDay = cutoff.getDate();
+    const newDay = DecimalUtils.subtract(currentDay.toString(), days.toString(), 'financial').toNumber();
+    cutoff.setDate(newDay);
     
     return notes.filter(note => {
       const noteDate = new Date(note.created_at);
       return noteDate >= cutoff;
-    }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }).sort((a, b) => {
+      const timeA = DecimalUtils.fromValue(new Date(b.created_at).getTime(), 'financial');
+      const timeB = DecimalUtils.fromValue(new Date(a.created_at).getTime(), 'financial');
+      return DecimalUtils.subtract(timeA.toString(), timeB.toString(), 'financial').toNumber();
+    });
   }, [notes]);
 
   // Get notes statistics
   const getNotesStats = useCallback(() => {
     const typeStats = notes.reduce((acc, note) => {
-      acc[note.type] = (acc[note.type] || 0) + 1;
+      const currentCount = acc[note.type] || 0;
+      acc[note.type] = DecimalUtils.add(currentCount.toString(), '1', 'financial').toNumber();
       return acc;
     }, {} as Record<CustomerNote['type'], number>);
 
@@ -229,7 +239,12 @@ export function useAllCustomerNotes() {
       complaints,
       compliments,
       service: serviceNotes30Days,
-      satisfaction: compliments > 0 ? (compliments / (complaints + compliments)) * 100 : 0
+      satisfaction: compliments > 0 
+        ? DecimalUtils.calculatePercentage(
+            compliments.toString(), 
+            DecimalUtils.add(complaints.toString(), compliments.toString(), 'financial').toString()
+          ).toNumber() 
+        : 0
     };
   }, [allNotes]);
 
