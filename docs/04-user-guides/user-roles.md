@@ -1,7 +1,14 @@
 # 👥 Sistema de Roles y Permisos - G-Admin Mini
 
 > **Última actualización**: 2025-09-08  
-> **Autor**: Consolidación de USER_ROLES_DESIGN.md + USER_ROLES_WITH_CUSTOMERS.md  
+> **Autor**: Consolidación de USER_ROLES_DE// Enum de roles
+CREATE TYPE user_role AS ENUM (
+    'CLIENTE',
+    'OPERADOR', 
+    'SUPERVISOR',
+    'ADMINISTRADOR',
+    'SUPER_ADMIN'
+);+ USER_ROLES_WITH_CUSTOMERS.md  
 > **Estado**: Documento unificado
 
 ## 🎯 Visión General
@@ -128,7 +135,7 @@ CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role user_role NOT NULL DEFAULT 'operador',
+    role user_role NOT NULL DEFAULT 'CLIENTE',
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
@@ -158,11 +165,11 @@ CREATE TABLE user_permissions (
 
 ```typescript
 export type UserRole = 
-  | 'cliente'
-  | 'operador' 
-  | 'supervisor'
-  | 'administrador'
-  | 'super_admin';
+  | 'CLIENTE'
+  | 'OPERADOR' 
+  | 'SUPERVISOR'
+  | 'ADMINISTRADOR'
+  | 'SUPER_ADMIN';
 
 export interface User {
   id: string;
@@ -196,7 +203,7 @@ export interface UserProfile {
 ```typescript
 // Sistema de permisos basado en roles
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  cliente: [
+  CLIENTE: [
     { module: 'customer-portal', action: 'read', granted: true },
     { module: 'customer-portal', action: 'write', granted: true },
     { module: 'products', action: 'read', granted: true },
@@ -205,7 +212,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     { module: 'profile', action: 'write', granted: true }
   ],
   
-  operador: [
+  OPERADOR: [
     { module: 'operations', action: 'read', granted: true },
     { module: 'operations', action: 'write', granted: true },
     { module: 'sales', action: 'read', granted: true },
@@ -215,7 +222,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     { module: 'scheduling', action: 'read_own', granted: true }
   ],
   
-  supervisor: [
+  SUPERVISOR: [
     // ... incluye todos los permisos de operador +
     { module: 'materials', action: 'write', granted: true },
     { module: 'products', action: 'write', granted: true },
@@ -225,7 +232,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     { module: 'reports', action: 'read_daily', granted: true }
   ],
   
-  administrador: [
+  ADMINISTRADOR: [
     // ... incluye todos los permisos de supervisor +
     { module: 'staff', action: 'write_full', granted: true },
     { module: 'fiscal', action: 'read', granted: true },
@@ -235,7 +242,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     { module: 'suppliers', action: 'write', granted: true }
   ],
   
-  super_admin: [
+  SUPER_ADMIN: [
     // ... incluye todos los permisos +
     { module: 'system', action: 'read', granted: true },
     { module: 'system', action: 'write', granted: true },
@@ -278,7 +285,7 @@ export function useAuth() {
     if (!user) return false;
     
     const roleHierarchy: UserRole[] = [
-      'cliente', 'operador', 'supervisor', 'administrador', 'super_admin'
+      'CLIENTE', 'OPERADOR', 'SUPERVISOR', 'ADMINISTRADOR', 'SUPER_ADMIN'
     ];
     
     const userRoleIndex = roleHierarchy.indexOf(user.role);
@@ -307,48 +314,44 @@ export function useAuth() {
 // Componente para proteger rutas
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: UserRole;
-  requiredPermission?: string;
+  requiredRoles?: UserRole[];
   fallback?: React.ReactNode;
+  redirectTo?: string;
 }
 
-export function ProtectedRoute({ 
+export function ProtectedRouteNew({ 
   children, 
-  requiredRole, 
-  requiredPermission,
-  fallback = <UnauthorizedPage />
+  requiredRoles,
+  fallback,
+  redirectTo = '/login'
 }: ProtectedRouteProps) {
-  const { user, isAtLeastRole, canAccess } = useAuth();
+  const { user, isAuthenticated, hasRole } = useAuth();
   
-  if (!user) {
-    return <LoginPage />;
+  if (!isAuthenticated) {
+    return <Navigate to={redirectTo} />;
   }
   
-  if (requiredRole && !isAtLeastRole(requiredRole)) {
-    return fallback;
-  }
-  
-  if (requiredPermission && !canAccess(requiredPermission)) {
-    return fallback;
+  if (requiredRoles && !requiredRoles.some(role => hasRole(role))) {
+    return fallback || <UnauthorizedPage />;
   }
   
   return <>{children}</>;
 }
 
 // Componente para mostrar contenido condicionalmente
-interface RoleGateProps {
+interface RoleGuardProps {
   children: React.ReactNode;
-  role?: UserRole;
-  permission?: string;
-  minRole?: UserRole;
+  requiredRoles?: UserRole[];
+  requiredModule?: ModuleName;
+  requiredAction?: PermissionAction;
 }
 
-export function RoleGate({ children, role, permission, minRole }: RoleGateProps) {
-  const { isRole, canAccess, isAtLeastRole } = useAuth();
+export function RoleGuard({ children, requiredRoles, requiredModule, requiredAction }: RoleGuardProps) {
+  const { hasRole, canAccessModule, canPerformAction } = useAuth();
   
-  if (role && !isRole(role)) return null;
-  if (minRole && !isAtLeastRole(minRole)) return null;
-  if (permission && !canAccess(permission)) return null;
+  if (requiredRoles && !requiredRoles.some(role => hasRole(role))) return null;
+  if (requiredModule && !canAccessModule(requiredModule)) return null;
+  if (requiredAction && requiredModule && !canPerformAction(requiredModule, requiredAction)) return null;
   
   return <>{children}</>;
 }
@@ -375,16 +378,16 @@ function CustomerDashboard() {
 ```typescript
 function OperatorDashboard() {
   return (
-    <ProtectedRoute requiredRole="operador">
+    <ProtectedRouteNew requiredRoles={['OPERADOR']}>
       <div>
         <KitchenDisplay />
         <ActiveOrders />
-        <RoleGate permission="sales:write">
+        <RoleGuard requiredModule="sales" requiredAction="create">
           <BasicPOS />
-        </RoleGate>
+        </RoleGuard>
         <MySchedule />
       </div>
-    </ProtectedRoute>
+    </ProtectedRouteNew>
   );
 }
 ```
@@ -393,17 +396,17 @@ function OperatorDashboard() {
 ```typescript
 function SupervisorDashboard() {
   return (
-    <ProtectedRoute requiredRole="supervisor">
+    <ProtectedRouteNew requiredRoles={['SUPERVISOR']}>
       <div>
         <DailyOperations />
         <TeamPerformance />
-        <RoleGate permission="materials:write">
+        <RoleGuard requiredModule="materials" requiredAction="update">
           <InventoryAlerts />
-        </RoleGate>
+        </RoleGuard>
         <MenuManagement />
         <TeamScheduling />
       </div>
-    </ProtectedRoute>
+    </ProtectedRouteNew>
   );
 }
 ```
@@ -412,17 +415,17 @@ function SupervisorDashboard() {
 ```typescript
 function AdminDashboard() {
   return (
-    <ProtectedRoute requiredRole="administrador">
+    <ProtectedRouteNew requiredRoles={['ADMINISTRADOR']}>
       <div>
         <BusinessAnalytics />
         <FinancialReports />
-        <RoleGate permission="staff:write_full">
+        <RoleGuard requiredModule="staff" requiredAction="manage">
           <StaffManagement />
-        </RoleGate>
+        </RoleGuard>
         <SupplierManagement />
         <BusinessSettings />
       </div>
-    </ProtectedRoute>
+    </ProtectedRouteNew>
   );
 }
 ```
@@ -431,7 +434,7 @@ function AdminDashboard() {
 ```typescript
 function SuperAdminDashboard() {
   return (
-    <ProtectedRoute requiredRole="super_admin">
+    <ProtectedRouteNew requiredRoles={['SUPER_ADMIN']}>
       <div>
         <SystemHealth />
         <UserManagement />
@@ -440,7 +443,7 @@ function SuperAdminDashboard() {
         <FeatureFlags />
         <AuditLogs />
       </div>
-    </ProtectedRoute>
+    </ProtectedRouteNew>
   );
 }
 ```
@@ -525,8 +528,8 @@ export function logUserAction(userId: string, action: string, resource: string) 
 
 ## 🔗 Referencias
 
-- **Authentication Service**: `src/lib/auth.ts`
-- **Permission Definitions**: `src/types/permissions.ts`
-- **Role Guards**: `src/components/auth/RoleGate.tsx`
-- **Database Schema**: `database/migrations/001_user_roles.sql`
-- **API Middleware**: `src/middleware/auth.ts`
+- **Authentication Context**: `src/contexts/AuthContext.tsx`
+- **Role Guards**: `src/components/auth/RoleGuard.tsx`
+- **Protected Routes**: `src/components/auth/ProtectedRouteNew.tsx`
+- **Database Schema**: `database/complete_setup.sql`
+- **User Roles Migration**: `database/migrations/create_user_roles_table.sql`

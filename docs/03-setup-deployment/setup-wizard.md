@@ -19,18 +19,27 @@ El sistema está **100% funcional** y listo para producción. Los usuarios puede
 ```
 src/pages/setup/
 ├── SetupWizard.tsx                       ✅ INTEGRADO (orquestador principal)
-├── components/
-│   ├── SupabaseConnectionSetup.tsx       ✅ ACTIVO (entrada credenciales)
-│   ├── DatabaseAutoSetup.tsx             ✅ ACTIVO (configuración automática)
-│   ├── BusinessModelDefinitionStep.tsx   ✅ ACTUALIZADO (nuevo diseño)
-│   ├── BusinessSetupWizard.tsx           ✅ NUEVO (para uso futuro)
-│   └── [otros componentes existentes]
-├── backup/                               ✅ ORGANIZADO
-│   ├── BusinessModelDefinitionStep.backup.tsx  
-│   ├── TestNewComponents.tsx
-│   └── WelcomeScreen.new.tsx
-└── services/
-    └── DatabaseSetupService.ts           ✅ MOTOR (ejecuta SQL completo)
+├── config/
+│   ├── setupSteps.ts                     ✅ ACTIVO (configuración de pasos)
+│   └── stepComponents.ts                 ✅ ACTIVO (mapeo de componentes)
+├── layout/
+│   ├── SetupHeader.tsx                   ✅ ACTIVO (header del wizard)
+│   ├── SetupSidebar.tsx                  ✅ ACTIVO (navegación lateral)
+│   └── SetupProgressBar.tsx              ✅ ACTIVO (barra de progreso)
+├── steps/
+│   ├── welcome/WelcomeScreen.tsx         ✅ ACTIVO (pantalla de bienvenida)
+│   ├── infrastructure/supabase-connection/
+│   │   └── SupabaseConnectionStep.tsx    ✅ ACTIVO (conexión Supabase)
+│   ├── database-setup/DatabaseSetupStep.tsx ✅ ACTIVO (configuración DB)
+│   ├── system-verification/SystemVerification.tsx ✅ ACTIVO (verificación)
+│   ├── system-setup/admin-user-creation/
+│   │   └── AdminUserCreationStep.tsx     ✅ ACTIVO (creación admin)
+│   ├── business-setup/business-model/
+│   │   └── BusinessModelStep.tsx         ✅ ACTIVO (modelo de negocio)
+│   ├── basic-system-config/BasicSystemConfig.tsx ✅ ACTIVO (config básica)
+│   ├── setup-summary/SetupSummary.tsx   ✅ ACTIVO (resumen)
+│   └── FinishStep.tsx                    ✅ ACTIVO (finalización)
+└── store/setupStore.ts                   ✅ MOTOR (state management)
 ```
 
 ## 🛡️ Sistema de Bloqueo y Verificación
@@ -71,8 +80,16 @@ src/pages/setup/
 
 ## 📋 Flujo del Setup Wizard
 
-### **Fase 1: Conexión a Supabase**
-- **Componente**: `SupabaseConnectionSetup.tsx`
+### **Fase 1: Bienvenida**
+- **Componente**: `WelcomeScreen.tsx`
+- **Función**: Introducción al sistema y recolección de nombre de usuario
+- **Características**: 
+  - Pantalla de bienvenida personalizada
+  - Introducción a las características del sistema
+  - Recolección de nombre para personalización
+
+### **Fase 2: Infraestructura - Conexión Supabase**
+- **Componente**: `SupabaseConnectionStep.tsx`
 - **Función**: Interface para ingresar credenciales de Supabase
 - **Características**: 
   - Validación de URL del proyecto
@@ -80,8 +97,8 @@ src/pages/setup/
   - Instrucciones claras
   - Manejo de errores de conexión
 
-### **Fase 2: Auto-configuración de Base de Datos**
-- **Componente**: `DatabaseAutoSetup.tsx`
+### **Fase 3: Configuración de Base de Datos**
+- **Componente**: `DatabaseSetupStep.tsx`
 - **Función**: Ejecuta y muestra progreso de configuración de DB
 - **Pasos**: 8 pasos visuales con feedback en tiempo real
 
@@ -96,8 +113,21 @@ src/pages/setup/
 7. **🔄 Triggers automáticos** - Actualizaciones en tiempo real
 8. **📝 Datos iniciales** - Configuración básica del sistema
 
-### **Fase 3: Definición del Modelo de Negocio**
-- **Componente**: `BusinessModelDefinitionStep.tsx` (v2.0)
+### **Fase 4: Verificación del Sistema**
+- **Componente**: `SystemVerification.tsx`
+- **Función**: Verifica que todos los componentes estén funcionando correctamente
+- **Verificaciones**: Conexión, tablas, roles, políticas RLS
+
+### **Fase 5: Creación de Usuario Administrador**
+- **Componente**: `AdminUserCreationStep.tsx`
+- **Función**: Creación del primer usuario administrador del sistema
+- **Características**: 
+  - Validación de contraseña
+  - Configuración de perfil
+  - Asignación automática de rol SUPER_ADMIN
+
+### **Fase 6: Definición del Modelo de Negocio**
+- **Componente**: `BusinessModelStep.tsx` (v2.0)
 - **Función**: Configuración interactiva del modelo de negocio
 - **Características**: 
   - Layout de dos columnas
@@ -105,8 +135,16 @@ src/pages/setup/
   - Sistema de clasificación automática
   - Cards expandibles mejoradas
 
-### **Fase 4: Finalización**
-- **Componente**: Integrado en `SetupWizard.tsx`
+### **Fase 7: Configuración Básica del Sistema** (Opcional)
+- **Componente**: `BasicSystemConfig.tsx`
+- **Función**: Configuraciones avanzadas del sistema
+- **Características**:
+  - Configuración de moneda
+  - Preferencias regionales
+  - Configuraciones de sistema avanzadas
+
+### **Fase 8: Resumen y Finalización**
+- **Componente**: `SetupSummary.tsx` + `FinishStep.tsx`
 - **Función**: Confirmación y activación del sistema
 - **Resultado**: Sistema completamente configurado y listo para usar
 
@@ -376,13 +414,13 @@ export function validateSetupStep(step: string) {
 
 ## 🧪 Testing y Desarrollo
 
-### Componente de Prueba
+### Componentes de Desarrollo
 ```typescript
-// Para probar los nuevos componentes
-import { TestNewComponents } from './TestNewComponents'
+// Para desarrollo y debugging
+import { DeveloperControls } from './dev/DeveloperControls'
 
-// Incluye toggle entre vista completa y solo step
-// Ubicado en: src/pages/setup/TestNewComponents.tsx
+// Controles de desarrollo para testing del wizard
+// Ubicado en: src/pages/setup/dev/DeveloperControls.tsx
 ```
 
 ### Verificaciones de Desarrollo

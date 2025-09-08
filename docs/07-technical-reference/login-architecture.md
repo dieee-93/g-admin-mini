@@ -2,7 +2,9 @@
 
 ## 📋 Resumen Ejecutivo
 
-Esta guía documenta la arquitectura mejorada del sistema de autenticación y experiencia de usuario para G-Admin Mini, diseñada para separar claramente las experiencias entre **clientes finales** y **personal administrativo**, siguiendo las mejores prácticas de UX/UI modernas.
+Esta guía documenta la **arquitectura propuesta mejorada** del sistema de autenticación y experiencia de usuario para G-Admin Mini, diseñada para separar claramente las experiencias entre **clientes finales** y **personal administrativo**, siguiendo las mejores prácticas de UX/UI modernas.
+
+> **⚠️ Nota:** Esta es una **propuesta de arquitectura**. Actualmente existe un `CustomerPortal.tsx` básico pero la mayoría de componentes descritos están **por implementar**.
 
 ## 🎯 Objetivos del Rediseño
 
@@ -91,9 +93,9 @@ graph TD
 
 ### 3. Componentes Nuevos Requeridos
 
-#### Landing Page Comercial (`/`)
+#### Landing Page Comercial (`/`) **[POR IMPLEMENTAR]**
 ```typescript
-// src/pages/LandingPage.tsx
+// src/pages/LandingPage.tsx [PROPUESTO]
 interface LandingPageProps {
   companyInfo: CompanyInfo;
   featuredProducts: Product[];
@@ -114,9 +116,9 @@ export function LandingPage() {
 }
 ```
 
-#### Portal de Acceso Administrativo (`/admin`)
+#### Portal de Acceso Administrativo (`/admin`) **[POR IMPLEMENTAR]**
 ```typescript
-// src/pages/AdminPortal.tsx
+// src/pages/AdminPortal.tsx [PROPUESTO]
 export function AdminPortal() {
   return (
     <div>
@@ -129,15 +131,15 @@ export function AdminPortal() {
 }
 ```
 
-#### Separación de Componentes de Login
+#### Separación de Componentes de Login **[POR IMPLEMENTAR]**
 ```typescript
-// src/components/auth/CustomerLogin.tsx - Para clientes
+// src/components/auth/CustomerLogin.tsx [PROPUESTO] - Para clientes
 export function CustomerLogin() {
   // Diseño comercial, colores cálidos, branding
   // Redirige a /app/dashboard
 }
 
-// src/components/auth/AdminLogin.tsx - Para staff
+// src/components/auth/AdminLogin.tsx [PROPUESTO] - Para staff
 export function AdminLogin() {
   // Diseño profesional, colores corporativos
   // Redirige a /panel/dashboard

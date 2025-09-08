@@ -9,7 +9,7 @@ import {
   Grid,
   SimpleGrid,
   Heading
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { CogIcon, PlusIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 // Import components

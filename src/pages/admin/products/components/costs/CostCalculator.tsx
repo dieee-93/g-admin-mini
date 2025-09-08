@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import {
   Box,
-  CardWrapper ,
+  CardWrapper,
   VStack,
   HStack,
   Text,
@@ -14,7 +14,7 @@ import {
   Input,
   NumberInput,
   Separator
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import {
   CurrencyDollarIcon,
   CalculatorIcon,

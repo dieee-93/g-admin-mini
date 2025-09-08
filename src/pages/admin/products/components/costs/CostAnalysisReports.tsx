@@ -4,13 +4,13 @@
 import React from 'react';
 import {
   Box,
-  CardWrapper ,
+  CardWrapper,
   VStack,
   HStack,
   Text,
   Badge,
   Table
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import {
   ChartBarIcon
 } from '@heroicons/react/24/outline';

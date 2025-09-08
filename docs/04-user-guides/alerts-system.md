@@ -27,16 +27,25 @@ src/shared/alerts/
 
 ### 🔔 **TOASTS** - Feedback Inmediato (3-5s)
 ```typescript
-import { notify } from '@/shared/notifications';
+import { notify } from '@/lib/notifications';
 
 // Éxito
-notify.success('Operación completada');
+notify.success({
+  title: 'Operación completada',
+  description: 'La operación se realizó exitosamente'
+});
 
 // Error
-notify.error('Error en la operación');
+notify.error({
+  title: 'Error en la operación',
+  description: 'Descripción del error'
+});
 
 // Información
-notify.info('Información importante');
+notify.info({
+  title: 'Información importante',
+  description: 'Detalles adicionales'
+});
 ```
 
 ### 🚨 **ALERTS** - Estados Persistentes
@@ -57,9 +66,23 @@ actions.create({
 
 ### ✅ **VALIDATIONS** - Alertas Contextuales
 ```typescript
-// En formularios, usando componentes específicos
-<FormErrorAlert message="Campo requerido" />
-<ValidationAlert type="warning" message="Valor fuera de rango" />
+// En formularios, usando el componente Alert del design system
+import { Alert } from '@/shared/ui';
+
+// Error de validación
+<Alert status="error" title="Campo requerido">
+  Este campo es obligatorio
+</Alert>
+
+// Advertencia de validación
+<Alert status="warning" title="Valor fuera de rango">
+  El valor debe estar entre 1 y 100
+</Alert>
+
+// Información contextual
+<Alert status="info" title="Formato requerido">
+  Use el formato DD/MM/YYYY para fechas
+</Alert>
 ```
 
 ## ⚡ Helpers Rápidos
@@ -175,7 +198,10 @@ function SalesModule() {
   const processSale = async (saleData) => {
     try {
       await createSale(saleData);
-      notify.success('Venta procesada exitosamente');
+      notify.success({
+        title: 'Venta procesada exitosamente',
+        description: 'La venta se ha registrado correctamente'
+      });
     } catch (error) {
       actions.create(AlertUtils.createBusinessAlert(
         'Error en venta',

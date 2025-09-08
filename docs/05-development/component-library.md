@@ -31,9 +31,12 @@ import {
   // Business Components
   Icon,
   
-  // Hooks & Context
-  useSmartDefaults
+  // Hooks para theming
+  // (useThemeStore se importa desde @/store/themeStore)
 } from '@/shared/ui'
+
+// Para theming dinámico
+import { useThemeStore } from '@/store/themeStore'
 
 // ❌ INCORRECTO - Import directo de Chakra
 import { Box, Text, HStack, VStack } from '@chakra-ui/react'
@@ -43,19 +46,21 @@ import { Box, Text, HStack, VStack } from '@chakra-ui/react'
 ```
 src/shared/ui/
 ├── index.ts                    # Export centralizado
-├── semantic/                   # Componentes semánticos v2.0
-│   ├── ContentLayout.tsx       # Layout principal de páginas
-│   ├── PageHeader.tsx          # Headers complejos con icons/actions
-│   ├── Section.tsx             # Wrapper semántico (3 variantes)  
-│   ├── FormSection.tsx         # Secciones de formularios
-│   └── StatsSection.tsx        # Wrapper para métricas
-├── base/                       # Componentes base
-│   ├── Layout.tsx
-│   ├── Typography.tsx
-│   ├── Stack.tsx
-│   └── ...
-└── business/                   # Componentes de negocio
-    └── ...
+├── ContentLayout.tsx           # Layout principal de páginas
+├── PageHeader.tsx              # Headers complejos con icons/actions
+├── Section.tsx                 # Wrapper semántico (3 variantes)  
+├── FormSection.tsx             # Secciones de formularios
+├── StatsSection.tsx            # Wrapper para métricas
+├── Layout.tsx                  # Layout base
+├── Typography.tsx              # Sistema tipográfico
+├── Stack.tsx                   # Stack semántico
+├── Button.tsx                  # Button wrapper
+├── Modal.tsx                   # Modal components
+├── Alert.tsx                   # Alert components
+├── Badge.tsx                   # Badge variants
+├── Icon.tsx                    # Icon system
+├── provider.tsx                # Chakra Provider con theming dinámico
+└── ...                         # Otros componentes
 ```
 
 ---
@@ -296,11 +301,18 @@ const CustomIcon = () => <svg>...</svg>;
 <Section colorPalette="red">Always Red</Section>
 
 // ✅ Cambio dinámico
-const { setTheme } = useTheme()
-setTheme('dracula') // Actualiza todos los componentes
+const { applyTheme } = useThemeStore()
+applyTheme('dracula') // Actualiza todos los componentes
 ```
 
-**Temas disponibles**: `dracula`, `synthwave`, `light`, `corporate`, `sunset`, `ocean`, etc.
+**Temas disponibles**: 
+- **Base**: `light`, `dark`, `system`
+- **Professional Light**: `corporate`, `nature`, `sunset`, `ocean`
+- **Professional Dark**: `corporate-dark`, `nature-dark`, `sunset-dark`, `ocean-dark` 
+- **VSCode**: `dracula`, `tokyo-night`, `synthwave-84`, `monokai-pro`, `atom-one-dark`, `nord`, `gruvbox`
+- **Material**: `material-oceanic`, `material-darker`, `material-palenight`, `material-deep-ocean`
+- **Modern**: `cyberpunk`, `pastel`
+- **Accessibility**: `high-contrast`
 
 ---
 
@@ -365,37 +377,6 @@ El módulo Settings fue migrado completamente usando estos patterns:
 - ✅ Consistencia visual automática
 - ✅ Theming dinámico funcionando
 - ✅ Mantenibilidad mejorada
-
----
-
-## 🛠️ **Herramientas y Utilities**
-
-### **useSmartDefaults Hook**
-
-Automatically adapts component props based on context:
-
-```tsx
-const smartProps = useSmartDefaults({
-  component: 'Button',
-  context: 'FormArea',  // Detected automatically
-  props: { size: 'md' }
-})
-
-// Returns optimized props for form buttons
-```
-
-### **Design System Inspector** (Desarrollo)
-
-```tsx
-// Add to any component during development
-<ComponentInspector component="Section" variant="elevated" />
-
-// Shows:
-// - Applied design tokens
-// - Theme-specific colors  
-// - Spacing and typography scales
-// - Accessibility compliance
-```
 
 ---
 
@@ -673,7 +654,8 @@ Elementos que transforman interfaces planas:
 
 - `src/shared/ui/index.ts` - Exports centralizados
 - `src/pages/admin/settings/` - Ejemplo completo migrado
-- `src/theme/` - Configuración de theming
+- `src/lib/theming/dynamicTheming.ts` - Configuración de theming dinámico
+- `src/store/themeStore.ts` - Store de temas y paletas
 
 ### **Herramientas de Desarrollo**
 

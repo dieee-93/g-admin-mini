@@ -11,7 +11,8 @@
 
 ```sql
 -- Ejecutar el hook personalizado
--- Copia y pega el contenido completo de: database/hooks/custom_access_token_hook.sql
+-- Nota: El archivo de configuración debe crearse en database/hooks/custom_access_token_hook.sql
+-- (Actualmente no existe en el proyecto)
 ```
 
 4. Ve a **Authentication > Hooks** (NO Authentication > Settings)
@@ -29,7 +30,8 @@
 #### En SQL Editor, ejecutar verificaciones:
 ```sql
 -- Ejecutar verificaciones y pruebas
--- Copia y pega el contenido completo de: database/hooks/setup_hook_configuration.sql
+-- Nota: El archivo de configuración debe crearse en database/hooks/setup_hook_configuration.sql
+-- (Actualmente no existe en el proyecto)
 ```
 
 Este paso te permitirá:
@@ -43,7 +45,7 @@ Este paso te permitirá:
 #### En SQL Editor:
 ```sql
 -- Ejecutar políticas RLS completas
--- Copia y pega el contenido completo de: rls_policies.sql
+-- ✅ Archivo disponible en: rls_policies.sql (en la raíz del proyecto)
 ```
 
 ### 4. Verificar Configuración Completa
@@ -86,7 +88,8 @@ SELECT public.test_custom_access_token_hook('tu-user-id-aqui');
 Si no tienes usuarios SUPER_ADMIN, ejecuta:
 ```sql
 -- Reemplaza 'tu-email@example.com' con tu email real
--- Ejecutar el contenido de: CREATE_FIRST_SUPERADMIN.sql
+-- Nota: El archivo CREATE_FIRST_SUPERADMIN.sql debe crearse
+-- (Actualmente no existe en el proyecto)
 ```
 
 ## ✅ Lista de Verificación
@@ -154,14 +157,14 @@ await refreshRole(); // Fuerza actualización del token
 ## 📁 Archivos de Configuración
 
 ### **📋 Configuración Básica:**
-- `database/hooks/custom_access_token_hook.sql` - Función del hook
-- `database/hooks/setup_hook_configuration.sql` - Verificaciones y pruebas
-- `rls_policies.sql` - Políticas RLS completas
-- `CREATE_FIRST_SUPERADMIN.sql` - Script para crear primer admin
-- `src/contexts/AuthContext.tsx` - AuthContext con soporte JWT
+- `database/hooks/custom_access_token_hook.sql` - **[POR CREAR]** Función del hook
+- `database/hooks/setup_hook_configuration.sql` - **[POR CREAR]** Verificaciones y pruebas
+- `rls_policies.sql` - **[EXISTENTE]** Políticas RLS completas (en raíz del proyecto)
+- `CREATE_FIRST_SUPERADMIN.sql` - **[POR CREAR]** Script para crear primer admin
+- `src/contexts/AuthContext.tsx` - **[EXISTENTE]** AuthContext con soporte JWT
 
 ### **🚀 Mejoras Avanzadas (Recomendaciones IA Supabase):**
-- `database/rls_enhancements.sql` - **NUEVO**: Mejoras empresariales
+- `database/rls_enhancements.sql` - **[POR CREAR]** Mejoras empresariales
   - ✅ **Sistema de auditoría detallado**: Logs de seguridad completos
   - ✅ **Revisión periódica de roles**: Governance automático
   - ✅ **Manejo robusto de errores**: Funciones mejoradas

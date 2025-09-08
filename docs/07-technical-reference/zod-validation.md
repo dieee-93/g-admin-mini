@@ -6,8 +6,9 @@ Zod v4 es una actualización mayor que introduce cambios significativos de rendi
 
 ## Información de Versión
 
-- **Versión Actual**: 4.1.5 (publicada hace 10 días)
-- **Instalación**: `npm install zod@^4.0.0`
+- **Versión Actual en Proyecto**: 4.1.5 ✅ (instalada y configurada)
+- **@hookform/resolvers**: v5.2.1 ✅ (instalada y en uso)
+- **Instalación**: `pnpm add zod@^4.0.0` (ya realizada)
 - **Migración Oficial**: [Migration Guide](https://zod.dev/v4/changelog)
 - **Soporte TypeScript**: v5.5+ (obligatorio modo `strict`)
 
@@ -15,11 +16,11 @@ Zod v4 es una actualización mayor que introduce cambios significativos de rendi
 
 ### ⚠️ DEPENDENCIA OBLIGATORIA: @hookform/resolvers
 
-Para usar Zod con React Hook Form, **@hookform/resolvers es requerido**:
+Para usar Zod con React Hook Form, **@hookform/resolvers es requerido** ✅ **[YA INSTALADO EN PROYECTO]**:
 
 ```bash
-# OBLIGATORIO - No es opcional
-pnpm add @hookform/resolvers
+# ✅ YA INSTALADO - pnpm add @hookform/resolvers v5.2.1
+pnpm list @hookform/resolvers  # Para verificar versión
 ```
 
 ### Evidencia de Práctica Estándar
@@ -28,37 +29,35 @@ pnpm add @hookform/resolvers
 - **Oficialmente mantenido** - Por el equipo de React Hook Form
 - **Soporte para 18+ librerías** - Zod, Yup, Joi, Vest, etc.
 
-### Patrón Oficial Recomendado
+### ✅ Implementación Actual en G-Admin Mini
+El proyecto ya utiliza correctamente el patrón oficial:
+
 ```typescript
-// ✅ CORRECTO - Patrón oficial de React Hook Form
+// ✅ IMPLEMENTADO - Ejemplo de src/pages/admin/customers/components/CustomerForm.tsx
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
 
-const schema = z.object({
-  name: z.string().min(1, { message: 'Required' }),
-  age: z.number().min(10),
-});
-
-const MyForm = () => {
+const CustomerForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema), // ← Esto requiere @hookform/resolvers
+    resolver: zodResolver(EntitySchemas.customer), // ✅ Ya implementado
   });
 
-  return (
-    <form onSubmit={handleSubmit((data) => console.log(data))}>
-      <input {...register('name')} />
-      {errors.name?.message && <p>{errors.name?.message}</p>}
-      <input type="number" {...register('age', { valueAsNumber: true })} />
-      {errors.age?.message && <p>{errors.age?.message}</p>}
-      <input type="submit" />
-    </form>
-  );
+  // ... resto del componente
 };
+```
+
+### 📁 Archivos con Implementación Confirmada:
+- ✅ `src/hooks/core/useCrudOperations.ts` - Hook central con zodResolver
+- ✅ `src/pages/admin/customers/components/CustomerForm.tsx`
+- ✅ `src/pages/admin/materials/components/ItemFormMigrated.tsx`
+- ✅ `src/pages/admin/products/components/ProductFormModalMigrated.tsx`
+- ✅ `src/hooks/useMaterialValidation.ts`
+- ✅ `src/lib/validation/zod/CommonSchemas.ts` - Esquemas centralizados
 ```
 
 ### ❌ Error Común - Dependencia Faltante

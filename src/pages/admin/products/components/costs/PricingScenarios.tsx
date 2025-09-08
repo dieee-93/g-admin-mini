@@ -4,13 +4,13 @@
 import React from 'react';
 import {
   Box,
-  CardWrapper ,
+  CardWrapper,
   VStack,
   HStack,
   Text,
   Badge,
   Grid
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import {
   ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';

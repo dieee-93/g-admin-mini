@@ -28,7 +28,7 @@ const validateEmail = (email) => {
 
 ### ✅ **DESPUÉS (Centralizado)**
 ```tsx
-import { EntitySchemas, useFormValidation } from '@/lib/validation';
+import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -87,7 +87,7 @@ const fetchItems = useCallback(async () => {
 ### ✅ **DESPUÉS (Una sola implementación)**
 ```tsx
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
-import { EntitySchemas } from '@/lib/validation';
+import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
 import { useCustomersStore } from '@/store/customersStore';
 
 // Hook universal que funciona con cualquier entidad
@@ -148,7 +148,8 @@ const markup = ((sellingPrice - cost) / cost) * 100;
 
 ### ✅ **DESPUÉS (Centralizado con precisión)**
 ```tsx
-import { FinancialCalculations, QuickCalculations } from '@/business-logic';
+import { FinancialCalculations } from '@/business-logic/shared/FinancialCalculations';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 
 // Todas las calculaciones financieras en un lugar
 const CostAnalysis = ({ cost, sellingPrice }) => {
@@ -219,6 +220,7 @@ import {
   analyzeOvertimePattern
 } from '@/business-logic';
 ```
+```
 
 ---
 
@@ -228,7 +230,7 @@ import {
 ```tsx
 // Para componentes nuevos, usar directamente los sistemas centralizados
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
-import { EntitySchemas } from '@/lib/validation';
+import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
 ```
 
 ### **Fase 2: Migración de Validación**
@@ -298,7 +300,8 @@ const CustomersList = () => {
 ### **Componente DESPUÉS:**
 ```tsx
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
-import { EntitySchemas, QuickCalculations } from '@/lib';
+import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
+import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 
 const CustomersList = () => {
   const {

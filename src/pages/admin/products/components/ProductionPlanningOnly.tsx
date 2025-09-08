@@ -19,7 +19,7 @@ import {
   AlertTitle,
   AlertDescription
 } from '@/shared/ui';
-import { Textarea } from '@chakra-ui/react';
+import { Textarea } from '@/shared/ui';
 import {
   ClockIcon,
   ChartBarIcon,

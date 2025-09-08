@@ -2,8 +2,8 @@
 
 ## 🎯 PROJECT OVERVIEW
 
-**Objetivo**: Implementar analytics avanzados en el módulo Staff usando Claude Code  
-**Enfoque**: MVP sin costo con algorithms predictivos básicos  
+**Objetivo**: Especificación técnica para implementar analytics avanzados en el módulo Staff  
+**Enfoque**: MVP predictivo con algoritmos básicos **[POR IMPLEMENTAR]**  
 **Timeline**: 4-6 semanas de desarrollo  
 **ROI Esperado**: 150-200% en primer año  
 
@@ -12,28 +12,33 @@
 ## 🏗️ ARCHITECTURE OVERVIEW
 
 ```
-Staff Module Enhancement Structure:
+Staff Module Enhancement Structure (PROPUESTA):
 ├── /src/pages/admin/staff/
-│   ├── analytics/                    [NEW - Core algorithms]
+│   ├── analytics/                    [NUEVO - Algoritmos core]
 │   │   ├── PredictiveScheduler.ts   
 │   │   ├── TurnoverAnalytics.ts     
 │   │   ├── PerformanceAnalytics.ts  
 │   │   └── types.ts                 
 │   ├── components/
-│   │   ├── analytics/               [NEW - UI components]
+│   │   ├── analytics/               [NUEVO - Componentes UI]
 │   │   │   ├── AnalyticsDashboard.tsx
 │   │   │   ├── PredictionChart.tsx
 │   │   │   ├── RiskAlertCard.tsx
 │   │   │   └── PerformanceWidget.tsx
 │   │   └── sections/
-│   │       └── AnalyticsSection.tsx [NEW - 6th tab]
-│   ├── hooks/                       [NEW - Data management]
+│   │       ├── AnalyticsSection.tsx [NUEVO - 6ta pestaña]
+│   │       ├── DirectorySection.tsx [EXISTENTE]
+│   │       ├── PerformanceSection.tsx [EXISTENTE]
+│   │       ├── TrainingSection.tsx [EXISTENTE]
+│   │       ├── ManagementSection.tsx [EXISTENTE]
+│   │       └── TimeTrackingSection.tsx [EXISTENTE]
+│   ├── hooks/                       [NUEVO - Gestión de datos]
 │   │   ├── useStaffAnalytics.ts
 │   │   ├── usePredictiveScheduling.ts
 │   │   └── usePerformanceMetrics.ts
 │   └── services/
-│       ├── staffApi.ts              [EXTEND - Add analytics endpoints]
-│       └── analyticsCalculations.ts [NEW - Business logic]
+│       ├── staffApi.ts              [EXISTENTE - Extender endpoints]
+│       └── analyticsCalculations.ts [NUEVO - Lógica de negocio]
 ```
 
 ---
