@@ -145,8 +145,8 @@ const DashboardForecasting: React.FC = () => {
         {/* Quick Predictions */}
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="4" w="full">
           {predictions.map((prediction) => (
-            <CardWrapper .Root key={prediction.title}>
-              <CardWrapper .Body>
+            <CardWrapper key={prediction.title}>
+              <CardWrapper.Body>
                 <VStack align="start" gap="3">
                   <Text fontSize="sm" color="gray.600">{prediction.title}</Text>
                   <Text fontSize="2xl" fontWeight="bold">{prediction.predicted}</Text>
@@ -162,25 +162,25 @@ const DashboardForecasting: React.FC = () => {
                     </Progress.Track>
                   </Progress.Root>
                 </VStack>
-              </CardWrapper .Body>
-            </CardWrapper .Root>
+              </CardWrapper.Body>
+            </CardWrapper>
           ))}
         </SimpleGrid>
 
         {/* ML Models */}
-        <CardWrapper .Root w="full">
-          <CardWrapper .Header>
+        <CardWrapper w="full">
+          <CardWrapper.Header>
             <HStack justify="space-between">
               <Heading size="lg">Machine Learning Models</Heading>
               <Badge colorPalette="purple" variant="subtle">AI-Powered</Badge>
             </HStack>
-          </CardWrapper .Header>
-          <CardWrapper .Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
               {mlModels.map((model) => {
                 const IconComponent = model.icon;
                 return (
-                  <CardWrapper .Root 
+                  <CardWrapper 
                     key={model.id} 
                     variant="outline"
                     cursor="pointer"
@@ -192,7 +192,7 @@ const DashboardForecasting: React.FC = () => {
                     transition="all 0.2s"
                     onClick={() => setActiveModel(model.id)}
                   >
-                    <CardWrapper .Body>
+                    <CardWrapper.Body>
                       <VStack align="start" gap="4">
                         <HStack justify="space-between" w="full">
                           <Icon icon={IconComponent} size="2xl" color="var(--chakra-colors-purple-500)" />
@@ -248,23 +248,23 @@ const DashboardForecasting: React.FC = () => {
                            model.status === 'training' ? 'Training...' : 'Coming Soon'}
                         </Button>
                       </VStack>
-                    </CardWrapper .Body>
-                  </CardWrapper .Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 );
               })}
             </SimpleGrid>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
         {/* Model Performance */}
-        <CardWrapper .Root w="full">
-          <CardWrapper .Header>
+        <CardWrapper w="full">
+          <CardWrapper.Header>
             <HStack gap="2">
               <Icon icon={CpuChipIcon} size="md" color="var(--chakra-colors-blue-500)" />
               <Text fontSize="lg" fontWeight="semibold">Model Performance Overview</Text>
             </HStack>
-          </CardWrapper .Header>
-          <CardWrapper .Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
               <VStack align="start" gap="4">
                 <Text fontSize="md" fontWeight="medium">Accuracy Trends</Text>
@@ -309,8 +309,8 @@ const DashboardForecasting: React.FC = () => {
                 </VStack>
               </VStack>
             </SimpleGrid>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       </VStack>
     </Box>
   );

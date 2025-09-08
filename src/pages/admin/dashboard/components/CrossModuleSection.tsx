@@ -5,7 +5,6 @@ import {
   VStack,
   HStack,
   Text,
-  CardWrapper ,
   Button,
   Badge,
   SimpleGrid,
@@ -22,7 +21,7 @@ import {
   PuzzlePieceIcon,
   LightBulbIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, CardWrapper } from '@/shared/ui/Icon';
 
 // Cross-Module Analytics Interfaces
 interface ModuleMetric {
@@ -161,33 +160,33 @@ const CrossModuleSection: React.FC = () => {
 
   if (loading) {
     return (
-      <CardWrapper .Root>
-        <CardWrapper .Body>
+      <CardWrapper>
+        <CardWrapper.Body>
           <Text>Loading cross-module analytics...</Text>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     );
   }
 
   return (
     <VStack gap="6" align="stretch">
       {/* Cross-Module Health Overview */}
-      <CardWrapper .Root>
-        <CardWrapper .Header>
+      <CardWrapper>
+        <CardWrapper.Header>
           <HStack gap="2">
             <Icon icon={PuzzlePieceIcon} size="md" color="var(--chakra-colors-blue-500)" />
             <Text fontSize="lg" fontWeight="semibold">Module Health Overview</Text>
           </HStack>
-        </CardWrapper .Header>
-        <CardWrapper .Body>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
           <SimpleGrid columns={{ base: 1, md: 3, lg: 5 }} gap="4">
             {moduleHealth.map((module) => {
               const TrendIcon = module.trend === 'up' ? ArrowTrendingUpIcon : 
                                module.trend === 'down' ? ArrowTrendingDownIcon : null;
               
               return (
-                <CardWrapper .Root key={module.module} variant="outline">
-                  <CardWrapper .Body>
+                <CardWrapper key={module.module} variant="outline">
+                  <CardWrapper.Body>
                     <VStack align="center" gap="3">
                       <Text fontSize="sm" fontWeight="medium">{module.module}</Text>
                       <VStack gap="1">
@@ -205,17 +204,17 @@ const CrossModuleSection: React.FC = () => {
                         )}
                       </HStack>
                     </VStack>
-                  </CardWrapper .Body>
-                </CardWrapper .Root>
+                  </CardWrapper.Body>
+                </CardWrapper>
               );
             })}
           </SimpleGrid>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
 
       {/* Cross-Module Correlations */}
-      <CardWrapper .Root>
-        <CardWrapper .Header>
+      <CardWrapper>
+        <CardWrapper.Header>
           <HStack justify="space-between">
             <HStack gap="2">
               <Icon icon={ArrowsRightLeftIcon} size="md" color="var(--chakra-colors-purple-500)" />
@@ -223,12 +222,12 @@ const CrossModuleSection: React.FC = () => {
             </HStack>
             <Badge colorPalette="purple" variant="subtle">AI-Powered Insights</Badge>
           </HStack>
-        </CardWrapper .Header>
-        <CardWrapper .Body>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
           <VStack gap="4">
             {correlations.map((correlation) => (
-              <CardWrapper .Root key={correlation.id} variant="outline" w="full">
-                <CardWrapper .Body>
+              <CardWrapper key={correlation.id} variant="outline" w="full">
+                <CardWrapper.Body>
                   <VStack align="start" gap="4">
                     {/* Correlation Header */}
                     <HStack justify="space-between" w="full">
@@ -312,19 +311,19 @@ const CrossModuleSection: React.FC = () => {
                       </HStack>
                     </HStack>
                   </VStack>
-                </CardWrapper .Body>
-              </CardWrapper .Root>
+                </CardWrapper.Body>
+              </CardWrapper>
             ))}
           </VStack>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
 
       {/* Action Items */}
-      <CardWrapper .Root>
-        <CardWrapper .Header>
+      <CardWrapper>
+        <CardWrapper.Header>
           <Text fontSize="lg" fontWeight="semibold">Recommended Actions</Text>
-        </CardWrapper .Header>
-        <CardWrapper .Body>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
           <VStack gap="3">
             <HStack justify="space-between" w="full" p="3" bg="blue.50" borderRadius="md">
               <VStack align="start" gap="1">
@@ -342,8 +341,8 @@ const CrossModuleSection: React.FC = () => {
               <Button size="sm" colorPalette="green">Plan</Button>
             </HStack>
           </VStack>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     </VStack>
   );
 };
