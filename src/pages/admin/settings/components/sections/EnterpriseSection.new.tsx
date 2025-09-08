@@ -155,6 +155,7 @@ const EnterpriseSection: React.FC = () => {
               </Stack>
             ))}
           </SimpleGrid>
+          </Stack>
         </CardWrapper.Body>
       </CardWrapper>
 
@@ -210,6 +211,7 @@ const EnterpriseSection: React.FC = () => {
               </CardWrapper>
             ))}
           </Stack>
+          </Stack>
         </CardWrapper.Body>
       </CardWrapper>
 
@@ -252,6 +254,7 @@ const EnterpriseSection: React.FC = () => {
               </CardWrapper>
             ))}
           </SimpleGrid>
+          </Stack>
         </CardWrapper.Body>
       </CardWrapper>
 
@@ -276,6 +279,7 @@ const EnterpriseSection: React.FC = () => {
               <Button variant="outline" colorPalette="info">Menu Standards</Button>
               <Button variant="outline" colorPalette="error">Quality Controls</Button>
             </SimpleGrid>
+          </Stack>
           </Stack>
         </CardWrapper.Body>
       </CardWrapper>

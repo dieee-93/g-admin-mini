@@ -199,7 +199,7 @@ export default function EnterprisePage() {
                     </Stack>
                   </Stack>
                 </Stack>
-              </Section>
+              </CardWrapper>
             ))}
           </Stack>
         </Stack>
@@ -238,7 +238,7 @@ export default function EnterprisePage() {
                      tool.status === 'development' ? 'Coming Soon' : 'Setup'}
                   </Button>
                 </Stack>
-              </Section>
+              </CardWrapper>
             ))}
           </SimpleGrid>
         </Stack>

@@ -267,12 +267,14 @@ export const useMaterialForm = () => {
       );
     }
     return (
-      <>
+      <HStack>
         <CheckCircleIcon style={{ width: '16px', height: '16px' }} />
+        <Text>
         {isEditMode ? 'Actualizar Item' : 
           addToStockNow ? 'Crear y Agregar a Stock' : 'Crear Item'
         }
-      </>
+        </Text>
+      </HStack>
     );
   }, [loadingStates, isSubmitting, successStates, isEditMode, addToStockNow]);
 
