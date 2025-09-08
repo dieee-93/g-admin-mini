@@ -12,7 +12,7 @@ import {
   SummaryPanel
 } from '@/shared/components/widgets';
 import { ActionButton } from '@/shared/ui';
-import { useModernDashboard } from './hooks';
+import { useDashboard } from './hooks';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { 
   HomeIcon,
@@ -32,7 +32,7 @@ export function Dashboard() {
     summaryStatus,
     operationalActions,
     onConfigure
-  } = useModernDashboard();
+  } = useDashboard();
 
   const { setQuickActions } = useNavigation();
 

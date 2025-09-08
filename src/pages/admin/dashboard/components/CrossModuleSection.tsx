@@ -21,7 +21,7 @@ import {
   PuzzlePieceIcon,
   LightBulbIcon
 } from '@heroicons/react/24/outline';
-import { Icon, CardWrapper } from '@/shared/ui/Icon';
+import { Icon, CardWrapper } from '@/shared/ui/';
 
 // Cross-Module Analytics Interfaces
 interface ModuleMetric {

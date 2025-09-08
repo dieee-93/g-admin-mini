@@ -22,61 +22,37 @@ El **Sistema de Capacidades Operativas** permite personalizar completamente la e
 
 ```
 src/
-├── types/
-│   └── businessCapabilities.ts     # Tipado y configuración
+├── pages/setup/steps/business-setup/business-model/
+│   ├── BusinessModelStep.tsx               # Componente principal del paso
+│   ├── config/
+│   │   └── businessCapabilities.ts        # Tipado y configuración
+│   └── components/
+│       ├── BusinessPreviewPanel.tsx       # Panel de preview
+│       ├── CapabilityCard.tsx              # Card individual
+│       ├── CapabilitySelector.tsx          # Selector principal
+│       ├── ChannelOption.tsx               # Opciones de canal
+│       ├── StructureOption.tsx             # Opciones de estructura
+│       ├── SubCapabilityOption.tsx         # Sub-capacidades
+│       └── constellation/
+│           ├── BusinessConstellation.tsx   # Visualización principal
+│           ├── ArchetypeStar.tsx           # Estrella central
+│           └── OperationalPlanet.tsx       # Planetas operacionales
 ├── store/
-│   └── businessCapabilitiesStore.ts # Estado global (Zustand)
+│   └── businessCapabilitiesStore.ts       # Estado global (Zustand)
 ├── hooks/
-│   └── usePersonalizedExperience.ts # Hook principal
-├── components/
-│   ├── setup/
-│   │   ├── BusinessCapabilitiesForm.tsx    # Pantalla principal
-│   │   ├── CapabilityCard.tsx              # Card individual
-│   │   └── BusinessConstellation.tsx       # Visualización
-│   └── reports/
-│       ├── DnaReportConstellation.tsx      # Reporte visual
-│       ├── ComparativeInsightCard.tsx      # Insights comparativos
-│       └── PrintReportButton.tsx           # Funcionalidad de impresión
-└── pages/admin/reports/dna/
-    └── page.tsx                            # Página de reporte DNA
+│   └── usePersonalizedExperience.ts       # Hook principal
+└── components/personalization/
+    └── CapabilityGate.tsx                  # Renderizado condicional
 ```
 
 ### Flujo High-Level
 
-1. **Setup Inicial**: Usuario configura capacidades de su negocio
-2. **Personalización Automática**: Sistema adapta UI/funcionalidades
-3. **Análisis Comparativo**: Generación de insights vs cohort similar
-4. **Reporte DNA**: Visualización completa del perfil de negocio
+1. **Setup Inicial**: Usuario configura capacidades de su negocio via wizard
+2. **Personalización Automática**: Sistema adapta UI/funcionalidades según capacidades
+3. **Cálculo de Tier**: Determina tier operacional basado en complejidad
+4. **Personalización Continua**: Dashboard y tutoriales se adaptan dinámicamente
 
-## 🧬 Business DNA Report - Diseño Técnico
-
-### Backend API
-
-**Endpoint:** `POST /api/reports/business-dna`
-
-**Autenticación:** Requiere sesión de usuario autenticada
-
-**Request Body:**
-```json
-{
-  "userId": "string"
-}
-```
-
-**Lógica del Backend:**
-
-1. **Fetch User DNA**: Obtener `archetype` y `operationalProfile` del userId
-2. **Análisis de Cohort**: Query de base de datos para cohort anónimo
-   - **Cohort Primario**: Negocios con mismo `archetype`
-   - **Cohort Secundario**: Negocios con al menos un `operationalProfile` superpuesto
-3. **Generar Insights Comparativos**: Calcular métricas clave
-   - % de negocios del cohort que tienen cierta "capacidad" desbloqueada
-   - Combinación más común de capacidades para el arquetipo
-   - Promedio de capacidades desbloqueadas por arquetipo
-4. **Generar Insights Contextuales**: Proveer consejo accionable
-5. **Construir Respuesta**: Ensamblar data en response JSON
-
-**Response Body:**
+## 🎯 Tipos de Capacidades (Según Código Real)
 ```json
 {
   "userDna": {
@@ -135,100 +111,108 @@ src/
 - Stylesheet específico para impresión (`@media print`)
 - Formato limpio para papel
 
-## 🎯 Tipos de Capacidades
+## 🎯 Tipos de Capacidades (Según Código Real)
 
-### Arquetipos Base
+### Capacidades Principales
 ```typescript
-type BusinessArchetype = 
-  | "Restaurante/Bar"
-  | "Cafetería/Panadería" 
-  | "Food Truck"
-  | "Catering"
-  | "Delivery Kitchen"
-  | "Retail Food"
-  | "Cloud Kitchen";
-```
+interface BusinessCapabilities {
+  // Ofertas Principales
+  sells_products: boolean;
+  sells_services: boolean;
+  manages_events: boolean;
+  manages_recurrence: boolean;
 
-### Capacidades Operativas
-```typescript
-interface OperationalCapability {
-  id: string;
-  name: string;
-  icon: string;
-  category: CapabilityCategory;
-  isUnlocked: boolean;
-  dependencies?: string[];
-  businessImpact: {
-    revenue: number;
-    efficiency: number;
-    customerSatisfaction: number;
-  };
+  // Sub-opciones de Productos
+  sells_products_for_onsite_consumption: boolean;
+  sells_products_for_pickup: boolean;
+  sells_products_with_delivery: boolean;
+  sells_digital_products: boolean;
+
+  // Sub-opciones de Servicios
+  sells_services_by_appointment: boolean;
+  sells_services_by_class: boolean;
+  sells_space_by_reservation: boolean;
+
+  // Sub-opciones de Eventos
+  hosts_private_events: boolean;
+  manages_offsite_catering: boolean;
+
+  // Sub-opciones de Recurrencia
+  manages_rentals: boolean;
+  manages_memberships: boolean;
+  manages_subscriptions: boolean;
+
+  // Capacidades Independientes
+  has_online_store: boolean;
+  is_b2b_focused: boolean;
 }
-
-type CapabilityCategory = 
-  | "Escala" 
-  | "Canal"
-  | "Especialización"
-  | "Tecnología"
-  | "Operaciones";
 ```
 
-### Ejemplos de Capacidades
+### Estructura de Negocio
+```typescript
+type BusinessStructure = 'single_location' | 'multi_location' | 'mobile';
+```
 
-#### **Escala**
-- 🏠 **Escala Local**: Operación en una ubicación fija
-- 🌆 **Multi-Ubicación**: Múltiples sucursales o ubicaciones
-- 🌍 **Escala Regional**: Operación en múltiples ciudades/regiones
-
-#### **Canal**
-- 🍽️ **Dine-In**: Servicio en mesa tradicional
-- 🥡 **Take-Away**: Pedidos para llevar
-- 🚚 **Delivery**: Entrega a domicilio
-- 🌐 **Canal Digital Sincrónico**: Pedidos online en tiempo real
-- 📱 **Canal Digital Asíncrono**: Pedidos con anticipación
-
-#### **Especialización**
-- 🎂 **Eventos**: Catering para eventos especiales
-- ☕ **Café Premium**: Especialización en café de especialidad
-- 🥗 **Healthy Food**: Enfoque en comida saludable
-- 🍕 **Fast Food**: Comida rápida estandarizada
-
-#### **Tecnología**
-- 💳 **POS Avanzado**: Sistema de punto de venta integrado
-- 📊 **Analytics**: Análisis de datos avanzado
-- 🤖 **Automatización**: Procesos automatizados
-- 📱 **App Móvil**: Aplicación móvil propia
-
-#### **Operaciones**
-- 👨‍🍳 **Cocina Compartida**: Uso de cocinas de terceros
-- 📦 **Gestión de Inventario**: Control avanzado de stock
-- 👥 **Gestión de Staff**: Manejo de equipos grandes
-- 💰 **Multi-Payment**: Múltiples métodos de pago
+### Tiers Operacionales
+```typescript
+type OperationalTier = 
+  | 'Sin Configurar' 
+  | 'Básico' 
+  | 'Intermedio' 
+  | 'Avanzado' 
+  | 'Empresa';
+```
 
 ## 🔧 Implementación del Store
 
 ### BusinessCapabilitiesStore (Zustand)
 
+**Ubicación**: `src/store/businessCapabilitiesStore.ts`
+
 ```typescript
 interface BusinessCapabilitiesState {
-  // Estado
-  capabilities: OperationalCapability[];
-  archetype: BusinessArchetype | null;
+  // Estado principal
+  profile: BusinessProfile | null;
   isLoading: boolean;
   
-  // Acciones
-  setArchetype: (archetype: BusinessArchetype) => void;
-  toggleCapability: (capabilityId: string) => void;
-  setCapabilities: (capabilities: OperationalCapability[]) => void;
-  loadCapabilities: () => Promise<void>;
-  saveCapabilities: () => Promise<void>;
+  // Computed values para personalización
+  enabledFeatures: string[];
+  dashboardModules: string[];
+  relevantTutorials: string[];
   
-  // Selectores
-  getActiveCapabilities: () => OperationalCapability[];
-  getCapabilitiesByCategory: (category: CapabilityCategory) => OperationalCapability[];
-  canAccess: (feature: string) => boolean;
+  // Actions principales
+  initializeProfile: (basicData: Partial<BusinessProfile>) => void;
+  setCapability: (capability: keyof BusinessCapabilities, value: boolean) => void;
+  updateBasicInfo: (info: Partial<BusinessProfile>) => void;
+  completeSetup: () => void;
+  completeMilestone: (milestoneId: string) => void;
+  resetProfile: () => void;
+  
+  // Helpers para personalización de UI
+  hasCapability: (capability: keyof BusinessCapabilities) => boolean;
+  shouldShowModule: (moduleId: string) => boolean;
+  shouldShowTutorial: (tutorialId: string) => boolean;
+  getOperationalTier: () => OperationalTier;
 }
 ```
+
+### Funciones Clave del Store
+
+#### **setCapability**: Actualiza capacidad y recalcula dependencias
+- Actualiza la capacidad específica
+- Recalcula tier operacional automáticamente  
+- Actualiza módulos habilitados del dashboard
+- Recalcula tutoriales relevantes
+
+#### **initializeProfile**: Configura perfil inicial
+- Inicializa con capacidades por defecto (todas false)
+- Establece módulos básicos del dashboard
+- Configura país y moneda por defecto (Argentina, ARS)
+
+#### **Personalización Automática**:
+- `enabledFeatures`: Features del sistema habilitadas según capacidades
+- `dashboardModules`: Módulos del dashboard a mostrar
+- `relevantTutorials`: Tutoriales contextuales según setup
 
 ### Hook Principal
 
@@ -237,63 +221,256 @@ function usePersonalizedExperience() {
   const store = useBusinessCapabilitiesStore();
   
   return {
-    // Estado
-    capabilities: store.capabilities,
-    archetype: store.archetype,
-    isLoading: store.isLoading,
+    // Estado principal
+    profile: store.profile,
+    tier: store.getOperationalTier(),
+
+    // Módulos y navegación
+    modules: personalizedModules,
+    navigationItems: getNavigationItems(),
+
+    // Dashboard personalizado
+    dashboardWidgets: personalizedDashboardWidgets,
+    dashboardLayout: getDashboardLayout(),
+
+    // Sistema de tutoriales y logros
+    tutorials: personalizedTutorials,
+    milestones: personalizedMilestones,
+    onboardingFlow: getOnboardingFlow(),
+
+    // Helper functions
+    hasCapability: store.hasCapability,
+    shouldShowModule: store.shouldShowModule,
+    shouldShowFeature,
     
-    // Funciones de acceso
-    canAccess: store.canAccess,
-    getActiveCapabilities: store.getActiveCapabilities,
-    
-    // Acciones
-    toggleCapability: store.toggleCapability,
-    saveCapabilities: store.saveCapabilities,
-    
-    // Computed values
-    completionPercentage: computed(() => {
-      const active = store.getActiveCapabilities().length;
-      const total = store.capabilities.length;
-      return Math.round((active / total) * 100);
-    }),
-    
-    nextRecommendedCapability: computed(() => {
-      // Lógica para recomendar siguiente capacidad
-    })
+    // Progreso y métricas
+    setupProgress: {
+      completed: completedMilestones,
+      total: totalMilestones,
+      percentage: Math.round((completedMilestones / totalMilestones) * 100)
+    }
   };
 }
 ```
 
 ## 🎨 Componentes UI
 
-### BusinessCapabilitiesForm
+### BusinessModelStep (Componente Principal)
+
+**Ubicación**: `src/pages/setup/steps/business-setup/business-model/BusinessModelStep.tsx`
 
 ```typescript
-function BusinessCapabilitiesForm() {
-  const { capabilities, archetype, toggleCapability, saveCapabilities } = usePersonalizedExperience();
+function BusinessModelStep() {
+  const { profile, setCapability, completeSetup } = useBusinessCapabilitiesStore();
   
   return (
-    <VStack spacing={8}>
-      <ArchetypeSelector />
-      <SimpleGrid columns={3} spacing={6}>
-        {capabilities.map(capability => (
-          <CapabilityCard
-            key={capability.id}
-            capability={capability}
-            onToggle={() => toggleCapability(capability.id)}
-          />
-        ))}
-      </SimpleGrid>
-      <BusinessConstellation capabilities={capabilities} />
-      <Button onClick={saveCapabilities}>Guardar Configuración</Button>
-    </VStack>
+    <HStack spacing={8} align="start">
+      <VStack flex={1} spacing={6}>
+        <CapabilitySelector />
+        <BusinessPreviewPanel />
+      </VStack>
+      <Box flex={1}>
+        <BusinessConstellation capabilities={profile?.capabilities} />
+      </Box>
+    </HStack>
   );
 }
 ```
 
 ### CapabilityCard
 
+**Ubicación**: `src/pages/setup/steps/business-setup/business-model/components/CapabilityCard.tsx`
+
 ```typescript
+interface CapabilityCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  isSelected: boolean;
+  isExpanded: boolean;
+  onSelect: () => void;
+  onToggle: () => void;
+  children: React.ReactNode;
+}
+
+function CapabilityCard({
+  icon,
+  title,
+  description,
+  isSelected,
+  isExpanded,
+  onSelect,
+  onToggle,
+  children,
+}: CapabilityCardProps) {
+  return (
+    <Box>
+      <Box
+        borderWidth="1px"
+        borderColor={isSelected ? 'gray.400' : 'gray.200'}
+        borderRadius="lg"
+        bg={isSelected ? 'gray.100' : 'transparent'}
+        transition="all 0.2s"
+        _hover={{
+          borderColor: isSelected ? 'gray.400' : 'gray.300',
+          bg: isSelected ? 'gray.200' : 'gray.100',
+          transform: 'translateY(-1px)',
+          boxShadow: 'sm',
+        }}
+        overflow="hidden"
+      >
+        <Flex p={4} align="center" justify="space-between" onClick={onSelect} cursor="pointer">
+          <HStack gap={3}>
+            <Circle
+              size="36px"
+              bg={isSelected ? 'gray.700' : 'gray.100'}
+              color={isSelected ? 'gray.50' : 'gray.600'}
+            >
+              {icon}
+            </Circle>
+            <Stack gap={0}>
+              <Text fontWeight="medium" fontSize="sm">{title}</Text>
+              <Text fontSize="xs" color="gray.600">{description}</Text>
+            </Stack>
+          </HStack>
+          {isSelected && (
+            <Box onClick={(e) => { e.stopPropagation(); onToggle(); }} cursor="pointer">
+              {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            </Box>
+          )}
+        </Flex>
+
+        <AnimatePresence>
+          {isSelected && isExpanded && (
+            <Collapsible.Root open={isExpanded}>
+              <Collapsible.Content>
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Box p={4} pt={0} borderTop="1px solid" borderColor="gray.200">
+                    {children}
+                  </Box>
+                </motion.div>
+              </Collapsible.Content>
+            </Collapsible.Root>
+          )}
+        </AnimatePresence>
+      </Box>
+    </Box>
+  );
+}
+```
+
+### Otros Componentes Relacionados
+
+**CapabilitySelector**: `src/pages/setup/steps/business-setup/business-model/components/CapabilitySelector.tsx`
+
+**BusinessConstellation**: `src/pages/setup/steps/business-setup/business-model/components/BusinessConstellation.tsx`
+
+**BusinessPreviewPanel**: `src/pages/setup/steps/business-setup/business-model/components/BusinessPreviewPanel.tsx`
+
+## 📊 Ejemplo de Uso Completo
+
+```typescript
+// En BusinessModelStep.tsx
+function BusinessModelStep({ onComplete, onBack }: BusinessModelStepProps) {
+  const businessModel = useBusinessCapabilities();
+  const [selectedCompetencies, setSelectedCompetencies] = useState({
+    products: false,
+    services: false,
+    events: false,
+    recurrence: false,
+  });
+
+  const handleCompetencyChange = (competency: keyof typeof selectedCompetencies) => {
+    const isSelected = !selectedCompetencies[competency];
+    setSelectedCompetencies(prev => ({ ...prev, [competency]: isSelected }));
+
+    // Mapeo de competencias a capacidades principales
+    const competencyToCapabilityMap = {
+      products: 'sells_products',
+      services: 'sells_services', 
+      events: 'manages_events',
+      recurrence: 'manages_recurrence',
+    };
+
+    const mainCapability = competencyToCapabilityMap[competency];
+    
+    if (businessModel.capabilities[mainCapability] !== isSelected) {
+      businessModel.toggleMainCapability(mainCapability);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!businessModel.canSubmit) {
+      console.log('❌ Cannot submit - validation failed');
+      return;
+    }
+    
+    const finalData = businessModel.getBusinessModelData();
+    console.log('✅ Business model defined:', finalData);
+    onComplete(finalData);
+  };
+
+  return (
+    <Grid templateColumns={{ base: '1fr', lg: '3fr 1.2fr' }} gap={8}>
+      <GridItem>
+        {/* Configuración interactiva */}
+        <CapabilitySelector
+          capabilities={businessModel.capabilities}
+          expandedCards={businessModel.expandedCards}
+          selectedCompetencies={selectedCompetencies}
+          onToggleMain={businessModel.toggleMainCapability}
+          onToggleSub={businessModel.toggleSubCapability}
+          onToggleCard={businessModel.toggleCard}
+        />
+      </GridItem>
+      
+      <GridItem>
+        {/* Panel de preview del negocio */}
+        <BusinessPreviewPanel 
+          capabilities={businessModel.capabilities}
+          profile={businessModel.operationalProfile}
+        />
+      </GridItem>
+    </Grid>
+  );
+}
+```
+
+## 🔄 Flujo de Datos
+
+1. **Inicialización**: Se carga el store con capacidades por defecto
+2. **Selección de Competencias**: Usuario activa competencias principales (productos, servicios, eventos, recurrencia)
+3. **Configuración Detallada**: Se expanden sub-capacidades específicas para cada competencia
+4. **Perfil Operacional**: Se define estructura organizacional y canales de venta
+5. **Validación**: El sistema verifica consistencia de la configuración
+6. **Persistencia**: Se guarda el modelo de negocio completo en Supabase
+
+## 🎯 Estados del Sistema
+
+- **Inicial**: Sin capacidades seleccionadas
+- **Configurando**: Seleccionando capacidades principales y sub-capacidades
+- **Validando**: Verificando consistencia del modelo
+- **Completo**: Modelo validado y listo para usar
+- **Guardado**: Configuración persistida en base de datos
+
+## 🚀 Integración con Otros Módulos
+
+El sistema de capacidades de negocio se integra con:
+
+- **Setup Wizard**: Determina qué pasos mostrar según capacidades
+- **Dashboard**: Personaliza widgets según el modelo de negocio
+- **Navegación**: Filtra módulos disponibles
+- **Análisis**: Adapta métricas y reportes al tipo de negocio
+- **Tutoriales**: Personaliza onboarding según capacidades
+
+---
+
+✅ **Documentación actualizada** - Todas las rutas, componentes e interfaces ahora reflejan la implementación actual del código.
 interface CapabilityCardProps {
   capability: OperationalCapability;
   onToggle: () => void;

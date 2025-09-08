@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CompetitorData, MarketTrend, MarketInsight } from '../types';
-import { generateMockCompetitors, generateMockMarketTrends, generateMockMarketInsights } from '../data/mockData';
+import { generateMockCompetitiveData } from '../../../../data/mockData';
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
 
@@ -28,9 +28,10 @@ export const useCompetitiveIntelligence = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      const mockCompetitors = generateMockCompetitors();
-      const mockTrends = generateMockMarketTrends();
-      const mockInsights = generateMockMarketInsights();
+      const mockData = generateMockCompetitiveData();
+      const mockCompetitors = mockData.competitors;
+      const mockTrends = mockData.marketTrends;
+      const mockInsights = [];
 
       setCompetitors(mockCompetitors);
       setMarketTrends(mockTrends);

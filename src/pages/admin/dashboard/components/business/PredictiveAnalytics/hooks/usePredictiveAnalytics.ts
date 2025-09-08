@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MaterialDemand, PredictiveAnalyticsConfig } from '../types';
-import { generateMockMaterialDemand } from '../data/mockData';
+import { generateMockPredictiveData } from '../../../../data/mockData';
 import { EventBus } from '@/lib/events/EventBus';
 import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
 
@@ -33,9 +33,21 @@ export const usePredictiveAnalytics = () => {
       try {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1500));
-        const mockData = generateMockMaterialDemand();
-        setMaterials(mockData);
-        setSelectedMaterial(mockData[0]);
+        const mockData = generateMockPredictiveData();
+        const mockMaterials = mockData.inventoryOptimization.reorderRecommendations.map(item => ({
+          id: `material_${item.item.toLowerCase()}`,
+          materialName: item.item,
+          currentStock: item.currentStock,
+          prediction: {
+            accuracy: 85,
+            confidenceLevel: 80,
+            trendDirection: 'stable' as const
+          },
+          alerts: item.urgency === 'high' ? [{ severity: 'critical' as const, message: 'Low stock' }] : [],
+          seasonality: { detected: false }
+        }));
+        setMaterials(mockMaterials);
+        setSelectedMaterial(mockMaterials[0]);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         console.error(`Error loading predictive analytics data: ${errorMessage}`);

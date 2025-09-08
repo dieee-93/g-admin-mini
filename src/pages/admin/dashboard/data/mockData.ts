@@ -1,11 +1,14 @@
+// Centralized mock data for all dashboard modules
+// This consolidates all mock data previously scattered across multiple files
+
 import type {
   ExecutiveKPI,
   StrategicInsight,
   ExecutiveSummary,
-  PerformanceCorrelation,
-  ExecutiveDashboardConfig
-} from './mockData.types';
+  PerformanceCorrelation
+} from '../types';
 
+// === EXECUTIVE DASHBOARD MOCK DATA ===
 export const generateMockExecutiveKPIs = (): ExecutiveKPI[] => {
   const baseDate = new Date().toISOString();
   
@@ -292,41 +295,13 @@ export const generateMockStrategicInsights = (): StrategicInsight[] => {
       timeline: '1-3 months',
       category: 'customer',
       aiGenerated: true
-    },
-    {
-      id: 'insight_4',
-      title: 'Competitive Positioning Risk',
-      type: 'risk',
-      priority: 'medium',
-      impact: 'medium',
-      confidence: 76,
-      description: 'Market analysis shows increased competitive pressure in premium segment. Need to strengthen differentiation to maintain market position.',
-      metrics: [
-        { name: 'Competitive Pressure Index', value: '7.2/10', trend: 'negative' },
-        { name: 'Price Competitiveness', value: '92%', trend: 'neutral' },
-        { name: 'Brand Differentiation', value: '6.8/10', trend: 'neutral' }
-      ],
-      actionItems: [
-        {
-          id: 'action_6',
-          description: 'Develop unique value proposition strategy',
-          owner: 'Marketing Manager',
-          priority: 'medium',
-          estimatedImpact: 'Brand strength +20%',
-          estimatedEffort: '8 weeks',
-          status: 'pending'
-        }
-      ],
-      timeline: '6-12 months',
-      category: 'market',
-      aiGenerated: true
     }
   ];
 };
 
 export const generateMockExecutiveSummary = (): ExecutiveSummary => {
   return {
-    period: 'August 2025',
+    period: 'September 2025',
     overallPerformance: 'good',
     keyHighlights: [
       'Revenue increased 15.2% compared to previous period',
@@ -398,50 +373,105 @@ export const generateMockPerformanceCorrelations = (): PerformanceCorrelation[] 
   ];
 };
 
-export const getDefaultExecutiveDashboardConfig = (): ExecutiveDashboardConfig => {
+// === PREDICTIVE ANALYTICS MOCK DATA ===
+export const generateMockPredictiveData = () => {
   return {
-    refreshInterval: 30,
-    aiInsightsEnabled: true,
-    alertThresholds: {
-      revenue: -5,
-      profitability: -3,
-      customerSatisfaction: -0.2,
-      operationalEfficiency: -5
+    demandForecasting: {
+      nextWeekPrediction: {
+        totalOrders: 287,
+        peakHours: '18:00-20:00',
+        confidence: 87,
+        topProducts: [
+          { name: 'Pizza Margherita', predictedDemand: 45, confidence: 92 },
+          { name: 'Pasta Bolognese', predictedDemand: 38, confidence: 89 },
+          { name: 'Caesar Salad', predictedDemand: 32, confidence: 85 }
+        ]
+      },
+      seasonalTrends: [
+        { period: 'Weekend', multiplier: 1.4, confidence: 94 },
+        { period: 'Lunch Hours', multiplier: 0.8, confidence: 91 },
+        { period: 'Holidays', multiplier: 2.1, confidence: 76 }
+      ]
     },
-    displayPeriod: 'monthly',
-    kpiTargets: {
-      revenue: 130000,
-      profit_margin: 20,
-      costs: 80000,
-      efficiency: 90,
-      customer_satisfaction: 4.8,
-      customer_retention: 75,
-      market_share: 20
+    inventoryOptimization: {
+      reorderRecommendations: [
+        { item: 'Tomatoes', currentStock: 12, recommendedOrder: 50, urgency: 'high' },
+        { item: 'Mozzarella', currentStock: 8, recommendedOrder: 25, urgency: 'medium' },
+        { item: 'Basil', currentStock: 5, recommendedOrder: 15, urgency: 'low' }
+      ],
+      wasteReduction: {
+        potentialSavings: 1240,
+        topWasteItems: ['Lettuce', 'Bread', 'Milk'],
+        optimizationScore: 78
+      }
     }
   };
 };
 
-// Simple business intelligence mock data for the main dashboard
-export const getSimpleDashboardMockData = () => {
+// === COMPETITIVE INTELLIGENCE MOCK DATA ===
+export const generateMockCompetitiveData = () => {
   return {
-    businessIntelligenceCards: [
+    competitors: [
       {
-        title: 'Executive Dashboard',
-        description: 'Strategic KPIs and insights',
-        colorPalette: 'purple',
-        route: '/dashboard/executive'
+        id: 'comp_1',
+        name: 'Restaurant A',
+        marketShare: 12.3,
+        avgRating: 4.2,
+        priceRange: 'medium',
+        strengths: ['Location', 'Speed'],
+        weaknesses: ['Quality', 'Variety']
       },
       {
-        title: 'Cross-Module Analytics',
-        description: 'Holistic business correlations',
-        colorPalette: 'blue',
-        route: '/dashboard/cross-analytics'
+        id: 'comp_2', 
+        name: 'Restaurant B',
+        marketShare: 8.7,
+        avgRating: 4.5,
+        priceRange: 'high',
+        strengths: ['Quality', 'Ambiance'],
+        weaknesses: ['Price', 'Speed']
+      }
+    ],
+    marketTrends: [
+      { trend: 'Plant-based options', growth: '+23%', opportunity: 'high' },
+      { trend: 'Delivery optimization', growth: '+18%', opportunity: 'medium' },
+      { trend: 'Sustainability focus', growth: '+15%', opportunity: 'high' }
+    ]
+  };
+};
+
+// === CUSTOM REPORTING MOCK DATA ===
+export const generateMockReportingData = () => {
+  return {
+    templates: [
+      {
+        id: 'template_1',
+        name: 'Monthly Performance Report',
+        category: 'financial',
+        usage: 23,
+        lastUsed: '2025-09-06'
       },
       {
-        title: 'Predictive Analytics',
-        description: 'AI-powered forecasting',
-        colorPalette: 'green',
-        route: '/dashboard/predictive-analytics'
+        id: 'template_2',
+        name: 'Inventory Status Report',
+        category: 'operational',
+        usage: 31,
+        lastUsed: '2025-09-08'
+      }
+    ],
+    generatedReports: [
+      {
+        id: 'report_1',
+        title: 'Q3 Sales Analysis',
+        createdDate: '2025-09-01',
+        status: 'completed',
+        format: 'PDF'
+      },
+      {
+        id: 'report_2',
+        title: 'Weekly Inventory Report',
+        createdDate: '2025-09-08',
+        status: 'processing',
+        format: 'Excel'
       }
     ]
   };

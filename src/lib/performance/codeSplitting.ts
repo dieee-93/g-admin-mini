@@ -55,15 +55,15 @@ export const lazyComponents = {
     'MaterialsGrid'
   ),
   CorrelationsView: createLazyFeature(
-    () => import('@/pages/admin/dashboard/components/business/components/CorrelationsView'),
+    () => import('@/pages/admin/dashboard/components/business/CrossModuleAnalytics/components/CorrelationsView'),
     'CorrelationsView'
   ),
   BottlenecksView: createLazyFeature(
-    () => import('@/pages/admin/dashboard/components/business/components/BottlenecksView'),
+    () => import('@/pages/admin/dashboard/components/business/CrossModuleAnalytics/components/BottlenecksView'),
     'BottlenecksView'
   ),
   ExecutiveKPIGrid: createLazyFeature(
-    () => import('@/pages/admin/dashboard/components/business/components/ExecutiveKPIGrid'),
+    () => import('@/pages/admin/dashboard/components/business/ExecutiveDashboard/components/ExecutiveKPIGrid'),
     'ExecutiveKPIGrid'
   ),
   RecipeBasicForm: createLazyFeature(

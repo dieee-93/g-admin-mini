@@ -6,11 +6,8 @@ import {
   type ReportInsight,
 } from '../types';
 import {
-  generateMockReportTemplates,
-  generateMockGeneratedReports,
-  generateMockReportAutomations,
-  generateMockReportInsights,
-} from '../data/mockData';
+  generateMockReportingData
+} from '../../../../data/mockData';
 
 export function useReportingData() {
   const [templates, setTemplates] = useState<ReportTemplate[]>([]);
@@ -26,10 +23,11 @@ export function useReportingData() {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        const mockTemplates = generateMockReportTemplates();
-        const mockGenerated = generateMockGeneratedReports();
-        const mockAutomations = generateMockReportAutomations();
-        const mockInsights = generateMockReportInsights();
+        const mockData = generateMockReportingData();
+        const mockTemplates = mockData.templates;
+        const mockGenerated = mockData.generatedReports;
+        const mockAutomations = [];
+        const mockInsights = [];
 
         setTemplates(mockTemplates);
         setGeneratedReports(mockGenerated);

@@ -54,11 +54,11 @@
 - **[📱 Sistema Offline](06-features/offline-system.md)** - Funcionalidad sin conexión
 - **[⚡ Edge Functions](06-features/edge-functions.md)** - Funciones del lado servidor
 
-### 🔧 **07 - Referencia Técnica**
-- **[🔐 Autenticación JWT](07-technical-reference/jwt-authentication.md)** - Sistema de auth
-- **[🏛️ Arquitectura de Login](07-technical-reference/login-architecture.md)** - Flujo de autenticación
-- **[✅ Validación Zod](07-technical-reference/zod-validation.md)** - Esquemas de validación
-- **[📡 Referencia de APIs](07-technical-reference/api-reference.md)** - Endpoints y funciones
+### 🔧 **07 - Características del Sistema**
+- **[� Sistema de Alertas](07-system-features/alerts-system.md)** - Alertas unificadas
+- **[� Capacidades de Negocio](07-system-features/business-capabilities.md)** - Sistema de capacidades
+- **[📱 Sistema Offline](07-system-features/offline-system.md)** - Funcionalidad sin conexión
+- **[⚡ Edge Functions](07-system-features/edge-functions.md)** - Funciones del lado servidor
 
 ### 🛠️ **08 - Mantenimiento**
 - **[📋 Reportes de Auditoría](08-maintenance/audit-reports.md)** - Análisis de calidad
@@ -71,6 +71,9 @@
 - **[📊 Plantillas de Análisis](09-ai-integration/analysis-templates.md)** - Templates para análisis
 - **[🔍 Analizador de Flujos](09-ai-integration/business-flow-analyzer.md)** - Análisis de arquitectura
 - **[📋 Referencia de Patrones](09-ai-integration/patterns-reference.md)** - Patrones conocidos
+
+### 📁 **99 - Archivo**
+- **[🗃️ Documentos Originales](99-archive/original-files/README.md)** - Archivos fusionados históricos
 
 ## 🎯 Casos de Uso Comunes
 
