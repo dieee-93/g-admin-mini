@@ -1,6 +1,6 @@
 import { VStack, HStack, Text, Badge, Button } from '@chakra-ui/react';
 import { CardWrapper, Icon } from '@/shared/ui';
-import { MaterialDemand } from '../types';
+import type { MaterialDemand } from '../types';
 import { BoltIcon } from '@heroicons/react/24/outline';
 
 interface RecommendationsTabProps {
@@ -8,9 +8,21 @@ interface RecommendationsTabProps {
 }
 
 export function RecommendationsTab({ materials }: RecommendationsTabProps) {
+  if (!materials || materials.length === 0) {
+    return (
+      <CardWrapper variant="outline">
+        <CardWrapper.Body p={8} textAlign="center">
+          <Text color="gray.500">No hay recomendaciones disponibles</Text>
+        </CardWrapper.Body>
+      </CardWrapper>
+    );
+  }
+
   return (
     <VStack gap={4} align="stretch">
-      {materials.map((material) => (
+      {materials
+        .filter(material => material && material.prediction?.recommendedAction)
+        .map((material) => (
         <CardWrapper key={material.materialId} variant="outline">
           <CardWrapper.Header>
             <HStack justify="space-between">

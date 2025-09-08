@@ -8,7 +8,7 @@ import {
   ChartBarIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { useMaterials } from '../../materials/hooks/useMaterials';
+import { useMaterials } from '@/store/materialsStore';
 import { useSales } from '../../sales/hooks/useSales';
 import { useCustomers } from '../../customers/hooks/useCustomers';
 import { useNavigation } from '@/contexts/NavigationContext';

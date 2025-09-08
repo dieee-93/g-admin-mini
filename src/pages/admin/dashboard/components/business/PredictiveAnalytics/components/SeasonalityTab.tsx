@@ -1,6 +1,6 @@
 import { VStack, HStack, Text, SimpleGrid, Badge, Box } from '@chakra-ui/react';
 import { CardWrapper, Icon } from '@/shared/ui';
-import { MaterialDemand } from '../types';
+import type { MaterialDemand } from '../types';
 import { CalendarIcon } from '@heroicons/react/24/outline';
 
 interface SeasonalityTabProps {
@@ -57,11 +57,12 @@ export function SeasonalityTab({ selectedMaterial }: SeasonalityTabProps) {
                     Períodos de Demanda Alta
                   </Text>
                   <VStack gap={2} align="stretch">
-                    {selectedMaterial.seasonality.peakPeriods.map((period, index) => (
-                      <CardWrapper key={index} variant="subtle">
-                        <CardWrapper.Body p={3}>
-                          <HStack justify="space-between">
-                            <VStack align="start" gap={0}>
+                    {selectedMaterial.seasonality?.peakPeriods && selectedMaterial.seasonality.peakPeriods.length > 0 ? (
+                      selectedMaterial.seasonality.peakPeriods.map((period, index) => (
+                        <CardWrapper key={index} variant="subtle">
+                          <CardWrapper.Body p={3}>
+                            <HStack justify="space-between">
+                              <VStack align="start" gap={0}>
                               <Text fontSize="sm" fontWeight="medium">
                                 {period.name}
                               </Text>
@@ -80,7 +81,10 @@ export function SeasonalityTab({ selectedMaterial }: SeasonalityTabProps) {
                           </HStack>
                         </CardWrapper.Body>
                       </CardWrapper>
-                    ))}
+                    ))
+                    ) : (
+                      <Text fontSize="sm" color="gray.500">No hay períodos de demanda alta definidos</Text>
+                    )}
                   </VStack>
                 </Box>
 
@@ -89,11 +93,12 @@ export function SeasonalityTab({ selectedMaterial }: SeasonalityTabProps) {
                     Ajustes Estacionales
                   </Text>
                   <VStack gap={2} align="stretch">
-                    {selectedMaterial.seasonality.adjustments.map((adjustment, index) => (
-                      <CardWrapper key={index} variant="outline" size="sm">
-                        <CardWrapper.Body p={3}>
-                          <HStack justify="space-between">
-                            <VStack align="start" gap={0}>
+                    {selectedMaterial.seasonality?.adjustments && selectedMaterial.seasonality.adjustments.length > 0 ? (
+                      selectedMaterial.seasonality.adjustments.map((adjustment, index) => (
+                        <CardWrapper key={index} variant="outline" size="sm">
+                          <CardWrapper.Body p={3}>
+                            <HStack justify="space-between">
+                              <VStack align="start" gap={0}>
                               <Text fontSize="sm" fontWeight="medium">
                                 {adjustment.period}
                               </Text>
@@ -107,14 +112,17 @@ export function SeasonalityTab({ selectedMaterial }: SeasonalityTabProps) {
                           </HStack>
                         </CardWrapper.Body>
                       </CardWrapper>
-                    ))}
+                    ))
+                    ) : (
+                      <Text fontSize="sm" color="gray.500">No hay ajustes estacionales definidos</Text>
+                    )}
                   </VStack>
                 </Box>
               </>
             ) : (
               <CardWrapper variant="subtle">
                 <CardWrapper.Body p={8} textAlign="center">
-                  <Icon icon={CalendarIcon} size="3xl" color="var(--chakra-colors-gray-400)" style={{ margin: "0 auto 16px auto" }} />
+                  <Icon icon={CalendarIcon} size="2xl" color="var(--chakra-colors-gray-400)" style={{ margin: "0 auto 16px auto" }} />
                   <Text fontSize="lg" fontWeight="medium" mb={2}>
                     No se detectó estacionalidad
                   </Text>

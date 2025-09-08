@@ -1,8 +1,8 @@
 # 📚 G-Admin Mini - Documentación Completa
 
 > **Sistema de gestión integral para restaurantes y negocios de alimentos**  
-> **Versión**: 3.0  
-> **Última actualización**: 2025-09-07
+> **Versión**: 3.1 - EventBus V2.0 Enterprise  
+> **Última actualización**: 2025-09-08
 
 ## 🚀 Inicio Rápido
 
@@ -51,14 +51,15 @@
 - **[💰 Módulo de Ventas](06-features/sales-module.md)** - Sistema POS y ventas
 - **[👥 Analytics de Personal](06-features/staff-analytics.md)** - Gestión de empleados
 - **[🔮 Analytics Predictivos](06-features/predictive-analytics.md)** - Inteligencia de negocio
-- **[📱 Sistema Offline](06-features/offline-system.md)** - Funcionalidad sin conexión
+- **[📱 Sistema Offline](06-features/offline-system.md)** - Funcionalidad sin conexión y sync
+- **[🚀 EventBus Enterprise](06-features/eventbus-system.md)** - Sistema de eventos V2.0 con gestión modular
 - **[⚡ Edge Functions](06-features/edge-functions.md)** - Funciones del lado servidor
 
-### 🔧 **07 - Características del Sistema**
-- **[� Sistema de Alertas](07-system-features/alerts-system.md)** - Alertas unificadas
-- **[� Capacidades de Negocio](07-system-features/business-capabilities.md)** - Sistema de capacidades
-- **[📱 Sistema Offline](07-system-features/offline-system.md)** - Funcionalidad sin conexión
-- **[⚡ Edge Functions](07-system-features/edge-functions.md)** - Funciones del lado servidor
+### 🔧 **07 - Referencia Técnica**
+- **[🔐 JWT Authentication](07-technical-reference/jwt-authentication.md)** - Sistema de autenticación
+- **[🏗️ Login Architecture](07-technical-reference/login-architecture.md)** - Arquitectura de login
+- **[✅ Zod Validation](07-technical-reference/zod-validation.md)** - Validación de datos
+- **[🎨 Sistema de Theming](02-technical-reference/theming-system.md)** - Gestión de temas
 
 ### 🛠️ **08 - Mantenimiento**
 - **[📋 Reportes de Auditoría](08-maintenance/audit-reports.md)** - Análisis de calidad
@@ -79,7 +80,8 @@
 
 ### Para Desarrolladores Nuevos
 1. [📋 Instalación](01-getting-started/installation-guide.md) → [💻 Requisitos](01-getting-started/system-requirements.md) → [⚡ Tutorial](01-getting-started/quick-start.md)
-2. [🏗️ Arquitectura](02-architecture/overview.md) → [📏 Estándares](05-development/coding-standards.md) → [🧪 Testing](05-development/testing-guide.md)
+2. [🏗️ Arquitectura](02-architecture/overview.md) → [🚀 EventBus](06-features/eventbus-system.md) → [📱 Offline System](06-features/offline-system.md)
+3. [📏 Estándares](05-development/coding-standards.md) → [🧪 Testing](05-development/testing-guide.md) → [🎨 Componentes](05-development/component-library.md)
 
 ### Para Administradores de Sistema
 1. [🗄️ Database Setup](03-setup-deployment/database-setup.md) → [🧙‍♂️ Wizard](03-setup-deployment/setup-wizard.md) → [👤 Usuarios](04-user-guides/user-roles.md)

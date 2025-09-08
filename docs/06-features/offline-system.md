@@ -381,6 +381,151 @@ interface FiscalOfflineStats {
 
 ---
 
+## 🚀 **INTEGRACIÓN EVENTBUS V2.0 ENTERPRISE**
+
+### **✅ EVENTBUS OFFLINE-FIRST INTEGRATION**
+
+El EventBus V2.0 Enterprise está **completamente integrado** con el sistema offline-first:
+
+#### **🔄 QUEUE AUTOMÁTICO PARA EVENTOS PERSISTENTES**
+```typescript
+// Eventos automáticamente encolados para sync
+await eventBusV2.emit('sales.order.completed', orderData, {
+  persistent: true,      // Auto-queue en OfflineSync
+  priority: 'high'       // Prioridad en cola de sync
+});
+
+// Integración transparente con OfflineSync existente
+private async queueForOfflineSync(event: NamespacedEvent): Promise<void> {
+  const syncOperation: SyncOperation = {
+    type: 'CREATE',
+    entity: 'events',
+    data: event,
+    priority: this.getPriorityScore(event.metadata.priority)
+  };
+  
+  await offlineSync.queueOperation(syncOperation);
+}
+```
+
+#### **💾 PERSISTENCIA INDEXEDDB AVANZADA**
+```typescript
+// Event Store con persistencia robusta
+interface StoredEvent extends NamespacedEvent {
+  stored: Date;                      // Timestamp de almacenamiento
+  processed: boolean;                // Procesado por handlers
+  synced: boolean;                   // Sincronizado con servidor
+  retryCount: number;                // Intentos de reintento
+  lastError?: string;                // Último error de procesamiento
+}
+
+// Indexes optimizados para consultas offline
+eventsStore.createIndex('pattern_timestamp', ['pattern', 'timestamp']);
+eventsStore.createIndex('processed_synced', ['processed', 'synced']);
+```
+
+#### **🔍 DEDUPLICACIÓN ENTERPRISE OFFLINE**
+```typescript
+// Sistema de deduplicación multi-layer
+interface DeduplicationMetadata {
+  contentHash: string;               // SHA-256 del payload normalizado
+  operationId: string;               // ID único de operación
+  clientId: string;                  // ID persistente del cliente
+  semanticKey: string;               // Clave semántica business-logic
+  windowMs: number;                  // Ventana de deduplicación
+}
+
+// Estrategias de deduplicación:
+// 1. Content-based: Hash exacto del payload
+// 2. Operation-based: ID único de operación  
+// 3. Semantic: Misma entidad + acción + ventana temporal
+```
+
+#### **⚡ EVENT SOURCING OFFLINE**
+```typescript
+// Replay de eventos para recovery
+const events = await eventBusV2.replay(
+  'sales.order.created',
+  '2024-01-01T00:00:00Z',    // Desde
+  '2024-01-31T23:59:59Z'     // Hasta
+);
+
+// Procesamiento histórico al volver online
+for (const event of events) {
+  await processHistoricalEvent(event);
+}
+```
+
+#### **🔗 SYNC BIDIRECCIONAL**
+```typescript
+// EventBus → OfflineSync (automático)
+await eventBusV2.emit('inventory.stock.updated', stockData, {
+  persistent: true  // Auto-encolado en OfflineSync
+});
+
+// OfflineSync → EventBus (callback en success)
+await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+  type: 'offline_sync_operation_completed',
+  operationId: operation.id,
+  operationType: operation.type,
+  entity: operation.entity,
+  success: true
+}, 'OfflineSync');
+```
+
+#### **📊 MÉTRICAS OFFLINE**
+```typescript
+// Métricas específicas offline
+interface OfflineMetrics {
+  queueSize: number;                 // Eventos pendientes de sync
+  unsyncedEvents: number;            // Eventos no sincronizados
+  lastSync: number;                  // Último sync exitoso
+  offlineDuration: number;           // Tiempo total offline
+  conflictsResolved: number;         // Conflictos resueltos
+  deduplicatedEvents: number;        // Eventos duplicados evitados
+}
+```
+
+#### **🛡️ CONFLICT RESOLUTION INTEGRADO**
+```typescript
+// Resolución de conflictos automática
+private async resolveConflict(conflict: SyncConflict): Promise<boolean> {
+  switch (this.config.conflictResolution) {
+    case 'server_wins':
+      conflict.resolvedData = serverData;
+      break;
+    case 'client_wins': 
+      conflict.resolvedData = clientData;
+      break;
+    case 'merge':
+      conflict.resolvedData = this.mergeData(serverData, clientData);
+      break;
+  }
+}
+```
+
+### **🔧 CONFIGURACIÓN OFFLINE ESPECÍFICA**
+```typescript
+const eventBusV2 = new EventBusV2({
+  // Integración offline
+  offlineSyncEnabled: true,          // Habilitar integración con OfflineSync
+  persistenceEnabled: true,          // Persistir eventos en IndexedDB
+  
+  // Deduplicación offline
+  deduplicationEnabled: true,        // Anti-duplicación inteligente
+  defaultDeduplicationWindow: 300000, // 5 minutos ventana
+  
+  // Configuración de persistencia
+  maxStorageSize: 50 * 1024 * 1024, // 50MB max storage
+  maxEventHistorySize: 10000,        // 10k eventos max
+  
+  // Limpieza automática
+  cleanupIntervalMs: 60000,          // Cleanup cada minuto
+});
+```
+
+---
+
 ## 🔄 **CAMBIO AUTOMÁTICO DE VISTAS**
 
 ### **🎯 SalesView.tsx - IMPLEMENTACIÓN INTELIGENTE**

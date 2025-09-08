@@ -3,7 +3,7 @@ import { lazy } from 'react';
 import { LazyWrapper } from '@/lib/performance';
 
 export const LazyExecutiveDashboard = lazy(() =>
-  import('./ExecutiveDashboard').then(module => ({
+  import('./index.tsx').then(module => ({
     default: ({ ...props }) => {
       const OriginalComponent = module.ExecutiveDashboard;
       return (

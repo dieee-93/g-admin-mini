@@ -1,6 +1,6 @@
 import { VStack, HStack, Text, SimpleGrid, Badge, Box } from '@chakra-ui/react';
 import { CardWrapper } from '@/shared/ui';
-import { MaterialDemand } from '../types';
+import type { MaterialDemand } from '../types';
 import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
@@ -92,11 +92,12 @@ export function ForecastingTab({ selectedMaterial, forecastHorizon }: Forecastin
                 Predicciones Detalladas
               </Text>
               <VStack gap={2} align="stretch">
-                {selectedMaterial.prediction.predictions.map((prediction, index) => (
-                  <CardWrapper key={index} variant="outline" size="sm">
-                    <CardWrapper.Body p={3}>
-                      <HStack justify="space-between">
-                        <VStack align="start" gap={0}>
+                {selectedMaterial.prediction?.predictions && selectedMaterial.prediction.predictions.length > 0 ? (
+                  selectedMaterial.prediction.predictions.map((prediction, index) => (
+                    <CardWrapper key={index} variant="outline" size="sm">
+                      <CardWrapper.Body p={3}>
+                        <HStack justify="space-between">
+                          <VStack align="start" gap={0}>
                           <Text fontSize="sm" fontWeight="medium">
                             {new Date(prediction.date).toLocaleDateString('es-ES')}
                           </Text>
@@ -116,7 +117,16 @@ export function ForecastingTab({ selectedMaterial, forecastHorizon }: Forecastin
                       </HStack>
                     </CardWrapper.Body>
                   </CardWrapper>
-                ))}
+                ))
+                ) : (
+                  <CardWrapper variant="outline" size="sm">
+                    <CardWrapper.Body p={3} textAlign="center">
+                      <Text fontSize="sm" color="gray.500">
+                        No hay predicciones disponibles
+                      </Text>
+                    </CardWrapper.Body>
+                  </CardWrapper>
+                )}
               </VStack>
             </Box>
           </VStack>

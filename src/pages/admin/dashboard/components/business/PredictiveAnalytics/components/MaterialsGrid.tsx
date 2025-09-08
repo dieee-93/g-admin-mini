@@ -1,6 +1,6 @@
 import { SimpleGrid, VStack, HStack, Text, Progress, Badge } from '@chakra-ui/react';
 import { CardWrapper, Icon } from '@/shared/ui';
-import { MaterialDemand } from '../types';
+import type { MaterialDemand } from '../types';
 import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
@@ -25,13 +25,20 @@ export function MaterialsGrid({ materials, selectedMaterial, onSelectMaterial }:
     }
   };
 
+  // Guard against undefined materials
+  if (!materials || !Array.isArray(materials)) {
+    return <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4} />;
+  }
+
   return (
     <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
-      {materials.map((material) => {
-        const trend = getTrendDisplay(material.prediction.trendDirection);
-        const TrendIcon = trend.icon;
+      {materials
+        .filter((material) => material != null)
+        .map((material) => {
+          const trend = getTrendDisplay(material.prediction?.trendDirection || 'stable');
+          const TrendIcon = trend.icon;
 
-        return (
+          return (
           <CardWrapper
             key={material.materialId}
             variant="outline"
@@ -56,7 +63,7 @@ export function MaterialsGrid({ materials, selectedMaterial, onSelectMaterial }:
                   </VStack>
                   <HStack gap={1}>
                     <Icon icon={TrendIcon} size="sm" color={`var(--chakra-colors-${trend.color}-500)`} />
-                    {material.alerts.length > 0 && (
+                    {material.alerts && material.alerts.length > 0 && (
                       <Badge colorPalette="red" size="xs">
                         {material.alerts.length}
                       </Badge>
@@ -65,26 +72,28 @@ export function MaterialsGrid({ materials, selectedMaterial, onSelectMaterial }:
                 </HStack>
 
                 {/* Prediction Accuracy */}
-                <VStack align="stretch" gap={1}>
-                  <HStack justify="space-between">
-                    <Text fontSize="xs" color="gray.600">Precisión:</Text>
-                    <Text fontSize="xs" fontWeight="medium">
-                      {Math.round(material.prediction.accuracy)}%
-                    </Text>
-                  </HStack>
-                  <Progress.Root
-                    value={material.prediction.accuracy}
-                    colorPalette={
-                      material.prediction.accuracy > 80 ? 'green' :
-                      material.prediction.accuracy > 60 ? 'yellow' : 'red'
-                    }
-                    size="sm"
-                  >
-                    <Progress.Track>
-                      <Progress.Range />
-                    </Progress.Track>
-                  </Progress.Root>
-                </VStack>
+                {material.prediction?.accuracy !== undefined && (
+                  <VStack align="stretch" gap={1}>
+                    <HStack justify="space-between">
+                      <Text fontSize="xs" color="gray.600">Precisión:</Text>
+                      <Text fontSize="xs" fontWeight="medium">
+                        {Math.round(material.prediction.accuracy)}%
+                      </Text>
+                    </HStack>
+                    <Progress.Root
+                      value={material.prediction.accuracy}
+                      colorPalette={
+                        material.prediction.accuracy > 80 ? 'green' :
+                        material.prediction.accuracy > 60 ? 'yellow' : 'red'
+                      }
+                      size="sm"
+                    >
+                      <Progress.Track>
+                        <Progress.Range />
+                      </Progress.Track>
+                    </Progress.Root>
+                  </VStack>
+                )}
 
                 {/* Trend Info */}
                 <HStack justify="space-between">
@@ -95,7 +104,7 @@ export function MaterialsGrid({ materials, selectedMaterial, onSelectMaterial }:
                 </HStack>
 
                 {/* Next Prediction */}
-                {material.prediction.predictions.length > 0 && (
+                {material.prediction?.predictions && material.prediction.predictions.length > 0 && (
                   <VStack align="stretch" gap={1}>
                     <Text fontSize="xs" color="gray.600">Próxima demanda:</Text>
                     <Text fontSize="sm" fontWeight="bold" color="blue.600">

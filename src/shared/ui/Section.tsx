@@ -73,7 +73,7 @@ export function Section({
           {IconComponent && (
             <Icon 
               icon={IconComponent} 
-              size="" 
+              size="lg" 
               color="text.muted"
             />
           )}

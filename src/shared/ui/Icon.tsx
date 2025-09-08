@@ -1,24 +1,13 @@
 import { Icon as ChakraIcon } from '@chakra-ui/react';
-import type { IconProps as ChakraIconProps } from '@chakra-ui/react';
+import type { IconProps as ChakraIconProps, ConditionalValue } from '@chakra-ui/react';
 import type { ElementType, ReactElement } from 'react';
 
-// Tamaños estándar usando el sistema de Chakra UI
-const sizeMap = {
-  xs: '3',
-  sm: '4', 
-  md: '5',
-  lg: '6',
-  xl: '8',
-  '2xl': '10',
-} as const;
-
-type IconSize = keyof typeof sizeMap;
 
 interface IconProps extends Omit<ChakraIconProps, 'children' | 'as' | 'size'> {
   /** El componente de ícono a renderizar (ej: de heroicons, react-icons, etc.) */
   icon?: ElementType;
   /** Tamaño predefinido del ícono */
-  size?: IconSize | string;
+  size?: ConditionalValue<"sm" | "md" | "lg" | "xl" | "2xl" | "xs" | "inherit" | undefined>;
   /** Para compatibilidad con asChild pattern */
   asChild?: boolean;
   /** Children para el patrón asChild */
@@ -37,7 +26,7 @@ interface IconProps extends Omit<ChakraIconProps, 'children' | 'as' | 'size'> {
  * // Con react-icons
  * import { FiHome } from 'react-icons/fi'
  * <Icon icon={FiHome} size="lg" />
- * 
+ *  
  * // Con tamaño custom
  * <Icon icon={UserIcon} size="8" />
  * 
@@ -54,25 +43,23 @@ export const Icon = ({
   ...props 
 }: IconProps) => {
   // Determinar el tamaño final - asegurar compatibilidad con Chakra UI
-  const finalSize = typeof size === 'string' && size in sizeMap 
-    ? sizeMap[size as IconSize] 
-    : size;
+
 
   // Si usamos el patrón asChild, renderizamos el children directamente
   if (asChild && children) {
     return (
-      <ChakraIcon size={finalSize as ChakraIconProps['size']} {...props} asChild>
+      <ChakraIcon size={size} {...props} asChild>
         {children}
       </ChakraIcon>
     );
   }
 
   // Si tenemos un componente de ícono, lo renderizamos
-  if (IconComponent) {
+    if (IconComponent) {
     return (
       <ChakraIcon 
         as={IconComponent} 
-        size={finalSize as ChakraIconProps['size']}
+        size={size}
         {...props}
       />
     );
@@ -81,7 +68,7 @@ export const Icon = ({
   // Fallback - renderizar ChakraIcon sin contenido
   return (
     <ChakraIcon 
-      size={finalSize as ChakraIconProps['size']}
+      size={size}
       {...props}
     />
   );

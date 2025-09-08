@@ -57,7 +57,7 @@ export const SystemSection: React.FC = () => {
               <Stack direction="row" gap="sm" align="center">
                 <HeaderIcon icon={ComputerDesktopIcon}  />
                 <Typography variant="heading" level={4}>System Status</Typography>
-                <Badge variant="solid" colorPalette="success" size="sm">Operativo</Badge>
+                <Badge variant="solid" colorPalette="green" size="sm">Operativo</Badge>
               </Stack>
             </CardWrapper.Header>
             <CardWrapper.Body>

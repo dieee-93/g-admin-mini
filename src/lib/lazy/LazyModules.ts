@@ -6,7 +6,7 @@ import { createLazyComponent } from '@/lib/performance/LazyLoadingManager';
 
 // Lazy-loaded Setup Wizard (pages/setup/SetupWizard.tsx)
 export const LazySetupWizard = createLazyComponent(
-  () => import('../../pages/setup/SetupWizard'),
+  () => import('../../pages/setup/SetupWizard').then(module => ({ default: module.SetupWizard })),
   'setup',
   {
     chunkName: 'setup-wizard',

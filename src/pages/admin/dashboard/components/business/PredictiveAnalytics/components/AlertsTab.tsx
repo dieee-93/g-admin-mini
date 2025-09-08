@@ -1,6 +1,6 @@
 import { VStack, HStack, Text, Badge, Alert } from '@chakra-ui/react';
 import { CardWrapper, Icon } from '@/shared/ui';
-import { MaterialDemand } from '../types';
+import type { MaterialDemand } from '../types';
 import {
   ExclamationTriangleIcon,
   ClockIcon,
@@ -23,8 +23,8 @@ export function AlertsTab({ materials }: AlertsTabProps) {
 
   return (
     <VStack gap={4} align="stretch">
-      {materials.filter(m => m.alerts.length > 0).length > 0 ? (
-        materials.filter(m => m.alerts.length > 0).map((material) => (
+      {materials && materials.filter(m => m.alerts && m.alerts.length > 0).length > 0 ? (
+        materials.filter(m => m.alerts && m.alerts.length > 0).map((material) => (
           <CardWrapper key={material.materialId} variant="outline">
             <CardWrapper.Header>
               <HStack justify="space-between">
@@ -32,13 +32,13 @@ export function AlertsTab({ materials }: AlertsTabProps) {
                   {material.materialName}
                 </Text>
                 <Badge colorPalette="blue">
-                  {material.alerts.length} alerta{material.alerts.length !== 1 ? 's' : ''}
+                  {material.alerts?.length || 0} alerta{(material.alerts?.length || 0) !== 1 ? 's' : ''}
                 </Badge>
               </HStack>
             </CardWrapper.Header>
             <CardWrapper.Body>
               <VStack gap={3} align="stretch">
-                {material.alerts.map((alert) => (
+                {material.alerts?.map((alert) => (
                   <Alert.Root
                     key={alert.id}
                     status={alert.severity === 'critical' ? 'error' : 'warning'}
@@ -74,7 +74,7 @@ export function AlertsTab({ materials }: AlertsTabProps) {
       ) : (
         <CardWrapper variant="subtle">
           <CardWrapper.Body p={8} textAlign="center">
-            <Icon icon={CheckCircleIcon} size="3xl" color="var(--chakra-colors-green-500)" style={{ margin: "0 auto 16px auto" }} />
+            <Icon icon={CheckCircleIcon} size="2xl" color="var(--chakra-colors-green-500)" style={{ margin: "0 auto 16px auto" }} />
             <Text fontSize="lg" fontWeight="medium" mb={2} color="green.600">
               No hay alertas activas
             </Text>

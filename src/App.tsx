@@ -38,9 +38,11 @@ import {
   PredictiveAnalytics as PredictiveAnalyticsComponent
 } from '@/pages/admin/dashboard/components';
 
+// Setup Wizard - Direct import to avoid lazy loading issues temporarily
+import { SetupWizard } from '@/pages/setup/SetupWizard';
+
 // Lazy-loaded modules for performance
 import {
-  LazySetupWizard,
   LazySalesPage,
   LazyOperationsPage,
   LazyStockLab,
@@ -177,7 +179,7 @@ function App() {
                         } />
                         
                         {/* 🔧 SETUP WIZARD - Configuration inicial del sistema */}
-                        <Route path="/setup" element={<LazySetupWizard />} />
+                        <Route path="/setup" element={<SetupWizard />} />
                         
                         {/* 🏠 ADMIN - DASHBOARD */}
                         <Route path="/admin/dashboard" element={

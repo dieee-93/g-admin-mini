@@ -53,7 +53,7 @@ export function PageHeader({
     >
       <Stack gap="1">
         <Stack direction="row" align="center" gap="2">
-          {icon && <Icon icon={icon} size="lg" color={`${color}.500`} />}
+          {icon && <Icon icon={icon} size={'2xl'} color={`${color}.500`} />}
           <Typography variant="heading" size="2xl" weight="bold">
             {title}
           </Typography>
