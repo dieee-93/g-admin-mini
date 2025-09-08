@@ -33,7 +33,7 @@ export function determineBusinessArchetypes(capabilities: BusinessCapabilities):
 
 export function getOperationalProfile(
   capabilities: BusinessCapabilities,
-  businessStructure: BusinessStructure
+  businessStructure: BusinessStructure[]
 ): string[] {
   const profile = [];
 
@@ -46,12 +46,14 @@ export function getOperationalProfile(
   }
 
   // Dimensión de la Escala
-  if (businessStructure === 'multi_location') {
+  if (businessStructure.includes('multi_location')) {
     profile.push('Multi-Sucursal');
-  } else if (businessStructure === 'mobile') {
-    profile.push('Móvil / Nómada');
-  } else {
+  } else if (businessStructure.includes('single_location')) {
     profile.push('Escala Local');
+  }
+
+  if (businessStructure.includes('mobile')) {
+    profile.push('Móvil / Nómada');
   }
 
   // Dimensión del Cliente
@@ -64,13 +66,13 @@ export function getOperationalProfile(
 
 export function getInsightMessage(
   capabilities: BusinessCapabilities,
-  businessStructure: BusinessStructure,
+  businessStructure: BusinessStructure[],
 ): string | null {
   if (capabilities.manages_memberships || capabilities.manages_subscriptions) {
     return 'Tu modelo de ingresos recurrentes permite una mayor previsibilidad financiera y relaciones duraderas con clientes.';
   }
   
-  if (businessStructure === 'multi_location') {
+  if (businessStructure.includes('multi_location')) {
     return 'La gestión multi-sucursal requiere sistemas robustos de inventario y reportes centralizados que facilitaremos para ti.';
   }
   

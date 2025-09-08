@@ -15,29 +15,33 @@ import {
 export interface UseBusinessCapabilitiesReturn {
   // State
   capabilities: BusinessCapabilities;
-  businessStructure: BusinessStructure;
+  businessStructure: Record<BusinessStructure, boolean>;
   expandedCards: Record<string, boolean>;
-  
+
   // Computed values
   archetypes: string[];
   operationalProfile: string[];
   insightMessage: string | null;
   canSubmit: boolean;
-  
+
   // Actions
   toggleMainCapability: (key: keyof BusinessCapabilities) => void;
   toggleSubCapability: (key: keyof BusinessCapabilities) => void;
-  setBusinessStructure: (structure: BusinessStructure) => void;
+  toggleBusinessStructure: (structure: BusinessStructure) => void;
   toggleCard: (cardName: string) => void;
   resetCapabilities: () => void;
-  
+
   // Data export
   getBusinessModelData: () => BusinessModelData;
 }
 
 export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
   const [capabilities, setCapabilities] = useState<BusinessCapabilities>(defaultCapabilities);
-  const [businessStructure, setBusinessStructureState] = useState<BusinessStructure>('single_location');
+  const [businessStructure, setBusinessStructureState] = useState({
+    single_location: true,
+    multi_location: false,
+    mobile: false,
+  });
   const [expandedCards, setExpandedCards] = useState({
     products: false,
     services: false,
@@ -45,16 +49,10 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
     assets: false,
   });
 
-  // Toggle main capability and handle sub-capabilities
   const toggleMainCapability = useCallback((key: keyof BusinessCapabilities) => {
     setCapabilities((prev) => {
       const newValue = !prev[key];
-      const newCapabilities = {
-        ...prev,
-        [key]: newValue,
-      };
-
-      // If a main capability is deactivated, also deactivate its sub-options
+      const newCapabilities = { ...prev, [key]: newValue };
       if (!newValue) {
         if (key === 'sells_products') {
           newCapabilities.sells_products_for_onsite_consumption = false;
@@ -78,53 +76,50 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
     });
   }, []);
 
-  // Toggle sub-capability
   const toggleSubCapability = useCallback((key: keyof BusinessCapabilities) => {
-    setCapabilities((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
+    setCapabilities((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
-  // Set business structure
-  const setBusinessStructure = useCallback((structure: BusinessStructure) => {
-    setBusinessStructureState(structure);
-  }, []);
-
-  // Toggle card expansion
-  const toggleCard = useCallback((cardName: string) => {
-    setExpandedCards((prev) => ({
-      ...prev,
-      [cardName]: !prev[cardName],
-    }));
-  }, []);
-
-  // Reset all capabilities
-  const resetCapabilities = useCallback(() => {
-    setCapabilities(defaultCapabilities);
-    setBusinessStructureState('single_location');
-    setExpandedCards({
-      products: false,
-      services: false,
-      events: false,
-      assets: false,
+  const toggleBusinessStructure = useCallback((structure: BusinessStructure) => {
+    setBusinessStructureState(prev => {
+      const newState = { ...prev, [structure]: !prev[structure] };
+      if (structure === 'single_location' && newState.single_location) {
+        newState.multi_location = false;
+      } else if (structure === 'multi_location' && newState.multi_location) {
+        newState.single_location = false;
+      }
+      return newState;
     });
   }, []);
 
-  // Computed values
-  const archetypes = useMemo(() =>
-    determineBusinessArchetypes(capabilities),
-    [capabilities]
-  );
+  const toggleCard = useCallback((cardName: string) => {
+    setExpandedCards((prev) => ({ ...prev, [cardName]: !prev[cardName] }));
+  }, []);
+
+  const resetCapabilities = useCallback(() => {
+    setCapabilities(defaultCapabilities);
+    setBusinessStructureState({
+      single_location: true,
+      multi_location: false,
+      mobile: false,
+    });
+    setExpandedCards({ products: false, services: false, events: false, assets: false });
+  }, []);
+
+  const getActiveStructures = useCallback(() => {
+    return Object.keys(businessStructure).filter(k => businessStructure[k as BusinessStructure]) as BusinessStructure[];
+  }, [businessStructure]);
+
+  const archetypes = useMemo(() => determineBusinessArchetypes(capabilities), [capabilities]);
 
   const operationalProfile = useMemo(() =>
-    getOperationalProfile(capabilities, businessStructure),
-    [capabilities, businessStructure]
+    getOperationalProfile(capabilities, getActiveStructures()),
+    [capabilities, getActiveStructures]
   );
   
   const insightMessage = useMemo(() => 
-    getInsightMessage(capabilities, businessStructure), 
-    [capabilities, businessStructure]
+    getInsightMessage(capabilities, getActiveStructures()),
+    [capabilities, getActiveStructures]
   );
   
   const canSubmit = useMemo(() => 
@@ -132,32 +127,24 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
     [capabilities]
   );
 
-  // Export complete business model data
   const getBusinessModelData = useCallback((): BusinessModelData => ({
     ...capabilities,
-    business_structure: businessStructure,
-  }), [capabilities, businessStructure]);
+    business_structure: getActiveStructures(),
+  }), [capabilities, getActiveStructures]);
 
   return {
-    // State
     capabilities,
     businessStructure,
     expandedCards,
-    
-    // Computed values
     archetypes,
     operationalProfile,
     insightMessage,
     canSubmit,
-    
-    // Actions
     toggleMainCapability,
     toggleSubCapability,
-    setBusinessStructure,
+    toggleBusinessStructure,
     toggleCard,
     resetCapabilities,
-    
-    // Data export
     getBusinessModelData,
   };
 }

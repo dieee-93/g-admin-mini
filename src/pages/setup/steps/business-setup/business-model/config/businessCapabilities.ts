@@ -242,7 +242,7 @@ export type BusinessStructure = 'single_location' | 'multi_location' | 'mobile';
 
 // Tipo para los datos del modelo de negocio completo
 export interface BusinessModelData extends BusinessCapabilities {
-  business_structure: BusinessStructure;
+  business_structure: BusinessStructure[];
 }
 
 // Capacidades por defecto
@@ -362,7 +362,7 @@ export type OperationalTier =
 // Función para calcular el tier operacional basado en capacidades
 export function calculateOperationalTier(
   capabilities: BusinessCapabilities, 
-  businessStructure: BusinessStructure = 'single_location'
+  businessStructure: BusinessStructure[] = ['single_location']
 ): OperationalTier {
   // Contar capacidades habilitadas
   const enabledCapabilities = Object.values(capabilities).filter(Boolean).length;
@@ -374,7 +374,7 @@ export function calculateOperationalTier(
   
   // Factores que aumentan la complejidad
   const complexityFactors = {
-    multiLocation: businessStructure === 'multi_location',
+    multiLocation: businessStructure.includes('multi_location'),
     hasOnlineStore: capabilities.has_online_store,
     hasDelivery: capabilities.sells_products_with_delivery,
     isB2BFocused: capabilities.is_b2b_focused,
@@ -395,7 +395,7 @@ export function calculateOperationalTier(
   const complexityScore = Object.values(complexityFactors).filter(Boolean).length;
   
   // Determinar tier basado en capacidades y complejidad
-  if (businessStructure === 'multi_location' || complexityScore >= 4) {
+  if (businessStructure.includes('multi_location') || complexityScore >= 4) {
     return 'Empresa';
   } else if (enabledCapabilities >= 6 || complexityScore >= 3) {
     return 'Avanzado';

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box } from '@chakra-ui/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArchetypeStar } from './ArchetypeStar';
 import { OperationalPlanet } from './OperationalPlanet';
 
@@ -15,7 +16,6 @@ interface BusinessConstellationProps {
 }
 
 export const BusinessConstellation: React.FC<BusinessConstellationProps> = ({ archetype, operationalProfile }) => {
-  // Filter out the 'Escala Local' profile from the planets
   const planets = operationalProfile.filter(p => p.name !== 'Escala Local');
 
   return (
@@ -28,25 +28,38 @@ export const BusinessConstellation: React.FC<BusinessConstellationProps> = ({ ar
       justifyContent="center"
     >
       <ArchetypeStar name={archetype} />
-      {planets.map((planet, index) => {
-        const angle = (index / planets.length) * 2 * Math.PI - Math.PI / 2; // Start from top
-        const radius = { base: 140, md: 160 };
-        const x = `calc(${radius.md}px * ${Math.cos(angle)})`;
-        const y = `calc(${radius.md}px * ${Math.sin(angle)})`;
+      <AnimatePresence>
+        {planets.map((planet, index) => {
+          const angle = (index / planets.length) * 2 * Math.PI - Math.PI / 2;
+          const radius = 160;
+          const x = `calc(${radius}px * ${Math.cos(angle)})`;
+          const y = `calc(${radius}px * ${Math.sin(angle)})`;
 
-        return (
-          <Box
-            key={planet.name}
-            position="absolute"
-            top="50%"
-            left="50%"
-            transform={`translate(-50%, -50%) translate(${x}, ${y})`}
-            transition="transform 0.5s ease-out"
-          >
-            <OperationalPlanet {...planet} />
-          </Box>
-        );
-      })}
+          return (
+            <motion.div
+              key={planet.name}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{
+                scale: 1,
+                opacity: 1,
+                x: x,
+                y: y,
+                transition: { type: 'spring', stiffness: 100, damping: 15 },
+              }}
+              exit={{ scale: 0, opacity: 0, transition: { duration: 0.3 } }}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: '-35px', // half of planet height
+                marginLeft: '-35px', // half of planet width
+              }}
+            >
+              <OperationalPlanet {...planet} />
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
     </Box>
   );
 };
