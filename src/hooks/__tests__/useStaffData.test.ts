@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { useStaffData, useStaffDataRange, useStaffWithLoader, usePerformanceAnalytics } from '../useStaffData';
 import { useStaffStore } from '@/store/staffStore';
 
@@ -246,11 +246,16 @@ describe('usePerformanceAnalytics', () => {
     expect(result.current.loading).toBe(false);
 
     // Start loading
-    const promise = result.current.loadEmployeePerformance('1');
+    let promise: Promise<any>;
+    act(() => {
+      promise = result.current.loadEmployeePerformance('1');
+    });
 
     expect(result.current.loading).toBe(true);
 
-    await promise;
+    await act(async () => {
+      await promise;
+    });
 
     expect(result.current.loading).toBe(false);
   });
@@ -261,7 +266,9 @@ describe('usePerformanceAnalytics', () => {
 
     const { result } = renderHook(() => usePerformanceAnalytics());
 
-    await result.current.loadEmployeePerformance('1');
+    await act(async () => {
+      await result.current.loadEmployeePerformance('1');
+    });
 
     expect(result.current.error).toBe('API Error');
   });
@@ -273,13 +280,17 @@ describe('usePerformanceAnalytics', () => {
     const { getEmployeePerformance } = await import('@/services/staff/staffApi');
     vi.mocked(getEmployeePerformance).mockRejectedValueOnce(new Error('API Error'));
     
-    await result.current.loadEmployeePerformance('1');
+    await act(async () => {
+      await result.current.loadEmployeePerformance('1');
+    });
     expect(result.current.error).toBe('API Error');
 
     // Then succeed
     vi.mocked(getEmployeePerformance).mockResolvedValueOnce([]);
     
-    await result.current.loadEmployeePerformance('1');
+    await act(async () => {
+      await result.current.loadEmployeePerformance('1');
+    });
     expect(result.current.error).toBe(null);
   });
 
@@ -290,7 +301,10 @@ describe('usePerformanceAnalytics', () => {
 
     const { result } = renderHook(() => usePerformanceAnalytics());
 
-    const data = await result.current.loadEmployeePerformance('1', 6);
+    let data: any;
+    await act(async () => {
+      data = await result.current.loadEmployeePerformance('1', 6);
+    });
 
     expect(data).toEqual(mockData);
     expect(getEmployeePerformance).toHaveBeenCalledWith('1', 6);

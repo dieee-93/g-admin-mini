@@ -24,6 +24,7 @@ import {
   ChartBarIcon,
   CalculatorIcon
 } from '@heroicons/react/24/outline';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import staffApi, { type LaborCostData, type LaborCostSummary } from '@/services/staff/staffApi';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 
@@ -50,9 +51,15 @@ export function LaborCostDashboard({
   const [costSummary, setCostSummary] = useState<LaborCostSummary | null>(null);
   const [costAnalysis, setCostAnalysis] = useState<any[]>([]);
 
-  // Default date range (current week)
+  // Default date range (current week) - MIGRATED TO DECIMAL PRECISION  
   const defaultDateRange = {
-    start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    start: new Date(
+      DecimalUtils.subtract(
+        DecimalUtils.fromValue(Date.now(), 'financial').toString(),
+        DecimalUtils.multiply('7', DecimalUtils.multiply('24', DecimalUtils.multiply('60', DecimalUtils.multiply('60', '1000', 'financial'), 'financial'), 'financial'), 'financial').toString(),
+        'financial'
+      ).toNumber()
+    ).toISOString().split('T')[0],
     end: new Date().toISOString().split('T')[0]
   };
 
@@ -194,7 +201,7 @@ export function LaborCostDashboard({
               <CardWrapper.Body textAlign="center">
                 <Icon icon={ExclamationTriangleIcon} size="lg" color="orange.500" />
                 <Text fontSize="xl" fontWeight="bold">
-                  {QuickCalculations.formatCurrency(Math.abs(costSummary.variance))}
+                  {QuickCalculations.formatCurrency(DecimalUtils.abs(costSummary.variance).toNumber())}
                 </Text>
                 <Text fontSize="sm" color="gray.600">
                   {costSummary.variance > 0 ? 'Sobrecosto' : 'Ahorro'}
@@ -263,7 +270,13 @@ export function LaborCostDashboard({
                     </VStack>
                   </HStack>
                   <Progress 
-                    value={Math.min(100, (costSummary.total_actual_cost / costSummary.total_scheduled_cost) * 100)}
+                    value={DecimalUtils.min(
+                      DecimalUtils.fromValue(100, 'financial'),
+                      DecimalUtils.calculatePercentage(
+                        costSummary.total_actual_cost.toString(),
+                        costSummary.total_scheduled_cost.toString()
+                      )
+                    ).toNumber()}
                     colorPalette={getVarianceColor(costSummary.variance_percentage)}
                   />
                 </CardWrapper.Body>

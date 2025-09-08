@@ -19,6 +19,7 @@ import {
 } from '@/shared/ui';
 import { EyeIcon, ClockIcon, UsersIcon, PlusIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 
 interface Table {
@@ -120,9 +121,21 @@ export default function TableManagement() {
         available_tables: data.filter((t: unknown) => t.status === 'available').length,
         occupied_tables: data.filter((t: unknown) => t.status === 'occupied').length,
         reserved_tables: data.filter((t: unknown) => t.status === 'reserved').length,
-        average_occupancy: (data.filter((t: unknown) => t.status === 'occupied').length / data.length) * 100,
-        total_revenue: data.reduce((sum: number, t: any) => sum + (t.daily_revenue || 0), 0),
-        average_turn_time: data.reduce((sum: number, t: any) => sum + (t.turn_count || 0), 0) / data.length
+        average_occupancy: DecimalUtils.multiply(
+          DecimalUtils.divide(
+            data.filter((t: unknown) => t.status === 'occupied').length.toString(),
+            data.length.toString(),
+            'financial'
+          ).toString(),
+          '100',
+          'financial'
+        ).toNumber(),
+        total_revenue: data.reduce((sum: number, t: any) => DecimalUtils.add(sum.toString(), (t.daily_revenue || 0).toString(), 'financial').toNumber(), 0),
+        average_turn_time: DecimalUtils.divide(
+          data.reduce((sum: number, t: any) => DecimalUtils.add(sum.toString(), (t.turn_count || 0).toString(), 'financial').toNumber(), 0).toString(),
+          data.length.toString(),
+          'financial'
+        ).toNumber()
       };
       
       setStats(stats);
@@ -176,8 +189,8 @@ export default function TableManagement() {
   };
 
   const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
+    const hours = DecimalUtils.divide(minutes.toString(), '60', 'financial').floor().toNumber();
+    const mins = DecimalUtils.modulo(minutes.toString(), '60', 'financial').toNumber();
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
@@ -248,7 +261,7 @@ export default function TableManagement() {
               <Stack direction="column" align="start">
                 <Stack direction="row" justify="space-between" w="full">
                   <Typography size="sm" color="text.muted">Occupancy Rate</Typography>
-                  <Badge colorPalette="info">{stats.average_occupancy.toFixed(1)}%</Badge>
+                  <Badge colorPalette="info">{DecimalUtils.fromValue(stats.average_occupancy, 'financial').toFixed(1)}%</Badge>
                 </Stack>
                 <Typography size="2xl" fontWeight="bold" >
                   {stats.occupied_tables} Occupied
@@ -260,7 +273,7 @@ export default function TableManagement() {
               <Stack direction="column" align="start">
                 <Stack direction="row" justify="space-between" w="full">
                   <Typography size="sm" color="text.muted">Today's Revenue</Typography>
-                  <Badge colorPalette="accent">${stats.total_revenue.toFixed(0)}</Badge>
+                  <Badge colorPalette="accent">{DecimalUtils.formatCurrency(stats.total_revenue)}</Badge>
                 </Stack>
                 <Typography size="2xl" fontWeight="bold" color="text.primary">
                   ${stats.total_revenue.toLocaleString()}
@@ -356,7 +369,7 @@ export default function TableManagement() {
                               Party of {table.current_party.size}
                             </Typography>
                             <Typography size="sm" color="text.muted">
-                              ${table.current_party.total_spent.toFixed(2)}
+                              {DecimalUtils.formatCurrency(table.current_party.total_spent)}
                             </Typography>
                           </Stack>
                           
@@ -389,7 +402,7 @@ export default function TableManagement() {
                     <hr />
                     <Stack direction="row" justify="space-between" w="full" fontSize="sm" color="text.muted">
                       <Typography>Turns: {table.turn_count}</Typography>
-                      <Typography>Revenue: ${table.daily_revenue.toFixed(0)}</Typography>
+                      <Typography>Revenue: {DecimalUtils.formatCurrency(table.daily_revenue)}</Typography>
                     </Stack>
 
                     {/* Action Buttons */}

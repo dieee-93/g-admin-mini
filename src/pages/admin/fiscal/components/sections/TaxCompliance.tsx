@@ -31,6 +31,7 @@ import {
   ClockIcon,
   BanknotesIcon
 } from '@heroicons/react/24/outline';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { type TaxReport } from '../../types';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';
@@ -283,10 +284,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(amount);
+    return DecimalUtils.formatCurrency(amount);
   };
 
   const formatDate = (dateString: string) => {
@@ -446,7 +444,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
               {formatCurrency(
                 taxReports
                   .filter(r => r.presentado)
-                  .reduce((sum, r) => sum + (r.saldo_a_pagar || 0), 0)
+                  .reduce((sum, r) => DecimalUtils.add(sum.toString(), (r.saldo_a_pagar || 0).toString(), 'financial').toNumber(), 0)
               )}
             </Typography>
             <Typography variant="caption" color="text.muted">

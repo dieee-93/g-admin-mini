@@ -94,7 +94,7 @@ export class SmartCostCalculationEngine {
     } catch (error) {
       console.error('Error calculating recipe cost:', error);
       // Retornar estructura vacía en caso de error
-      return this.getEmptyResult();
+      return SmartCostCalculationEngine.getEmptyResult();
     }
   }
 

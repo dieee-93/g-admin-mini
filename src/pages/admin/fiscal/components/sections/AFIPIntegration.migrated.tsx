@@ -21,6 +21,7 @@ import {
   TabPanels,
   TabPanel
 } from '@/shared/ui';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 import { Icon } from '@/shared/ui';
 import {
@@ -503,7 +504,23 @@ const AFIPIntegration: React.FC = () => {
                           <VStack align="start" gap="xs">
                             <Typography variant="caption" color="text.muted">Días Restantes</Typography>
                             <Typography variant="body">
-                              {Math.ceil((new Date(afipStatus.certificateExpiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} días
+                              {DecimalUtils.divide(
+                                DecimalUtils.subtract(
+                                  new Date(afipStatus.certificateExpiry).getTime().toString(),
+                                  Date.now().toString(),
+                                  'financial'
+                                ).toString(),
+                                DecimalUtils.multiply(
+                                  DecimalUtils.multiply(
+                                    DecimalUtils.multiply('1000', '60', 'financial').toString(),
+                                    '60',
+                                    'financial'
+                                  ).toString(),
+                                  '24',
+                                  'financial'
+                                ).toString(),
+                                'financial'
+                              ).ceil().toNumber()} días
                             </Typography>
                           </VStack>
                         </SimpleGrid>

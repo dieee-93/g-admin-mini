@@ -232,7 +232,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
   const formatValue = (value: number, format: string) => {
     switch (format) {
       case 'currency':
-        return QuickCalculations.formatCurrency(value);
+        return DecimalUtils.formatCurrency(value);
       case 'percentage':
         return formatPercentage(value);
       case 'number':

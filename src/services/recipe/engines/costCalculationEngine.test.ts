@@ -3,11 +3,36 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { SmartCostCalculationEngine, calculateRecipeCost } from './costCalculationEngine'
 
 // Mock Supabase
+const mockRecipeData = {
+  id: 'recipe-1',
+  name: 'Test Recipe',
+  recipe_ingredients: [
+    {
+      material_id: 'mat-1',
+      quantity: 2,
+      unit: 'kg',
+      materials: {
+        name: 'Flour',
+        unit_cost: 5.50
+      }
+    },
+    {
+      material_id: 'mat-2',
+      quantity: 1,
+      unit: 'L',
+      materials: {
+        name: 'Milk',
+        unit_cost: 3.20
+      }
+    }
+  ]
+};
+
 const mockSupabase = {
   from: vi.fn(() => ({
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
-    single: vi.fn().mockResolvedValue({ data: null, error: null })
+    single: vi.fn().mockResolvedValue({ data: mockRecipeData, error: null })
   })),
   rpc: vi.fn()
 }
@@ -31,11 +56,19 @@ describe('SmartCostCalculationEngine', () => {
           cost_per_unit: 0,
           cost_per_portion: 0,
           ingredient_breakdown: [],
-          yield_analysis: {},
+          yield_analysis: expect.objectContaining({
+            actual_yield: 0,
+            theoretical_yield: 0,
+            yield_percentage: 0,
+            waste_factor: 0,
+            efficiency_score: 0
+          }),
           profitability_metrics: expect.objectContaining({
             suggested_selling_price: 0,
             profit_margin: 0,
-            food_cost_percentage: 30
+            food_cost_percentage: 30,
+            target_food_cost_percentage: 30,
+            break_even_price: 0
           })
         })
       )

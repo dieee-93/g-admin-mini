@@ -20,6 +20,7 @@ import {
   TabPanel,
   SimpleGrid
 } from '@/shared/ui';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 import {
   DocumentTextIcon,
@@ -152,7 +153,7 @@ const OfflineFiscalView: React.FC = () => {
     const stats: FiscalOfflineStats = {
       pendingInvoices: invoices.filter((inv: OfflineInvoice) => inv.status === 'pending_afip').length,
       queuedForAfip: invoices.filter((inv: OfflineInvoice) => inv.syncStatus === 'queued').length,
-      totalAmount: invoices.reduce((sum: number, inv: OfflineInvoice) => sum + inv.amounts.total, 0),
+      totalAmount: invoices.reduce((sum: number, inv: OfflineInvoice) => DecimalUtils.add(sum.toString(), inv.amounts.total.toString(), 'financial').toNumber(), 0),
       lastSync: Date.now() - 900000, // 15 minutes ago
       syncErrors: invoices.filter((inv: OfflineInvoice) => inv.syncStatus === 'failed').length
     };

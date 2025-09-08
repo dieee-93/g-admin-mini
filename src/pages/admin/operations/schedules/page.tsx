@@ -1,5 +1,16 @@
 import React, { useMemo } from 'react';
-import { Box, Heading, Text, VStack, HStack, Tag, Divider, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
+import {
+  CardWrapper,
+  Typography,
+  VStack,
+  HStack,
+  Badge,
+  Stack,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription
+} from '@/shared/ui';
 import { Schedule } from '@/types/schedule';
 import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
 
@@ -19,27 +30,27 @@ const ScheduleDisplayCard = ({ schedule }: { schedule: Schedule }) => {
     [schedule.weeklyRules]);
 
     return (
-        <Box borderWidth="1px" borderRadius="lg" p={4} width="100%" bg="white">
+        <CardWrapper variant="outline">
             <HStack justifyContent="space-between" mb={3}>
-                <Heading size="md">{schedule.name}</Heading>
-                <Tag colorScheme={typeColors[schedule.type]}>{schedule.type.replace('_', ' ')}</Tag>
+                <Typography variant="heading" size="md">{schedule.name}</Typography>
+                <Badge colorPalette={typeColors[schedule.type]}>{schedule.type.replace('_', ' ')}</Badge>
             </HStack>
-            <Text fontSize="sm" color="gray.500" mb={4}>
+            <Typography variant="body" size="sm" color="text.muted" mb="4">
                 Válido desde {schedule.validFrom || 'N/A'} hasta {schedule.validUntil || 'N/A'}
-            </Text>
-            <VStack spacing={2} align="stretch">
+            </Typography>
+            <VStack gap="sm" align="stretch">
                 {sortedRules.map(rule => (
-                    <HStack key={rule.dayOfWeek} justifyContent="space-between" p={2} bg="gray.50" borderRadius="md">
-                        <Text fontWeight="medium" width="100px">{rule.dayOfWeek.substring(0,3)}</Text>
-                        <Text fontSize="sm">
+                    <HStack key={rule.dayOfWeek} justify="space-between" p="2" bg="gray.50" borderRadius="md">
+                        <Typography variant="body" fontWeight="medium" width="100px">{rule.dayOfWeek.substring(0,3)}</Typography>
+                        <Typography variant="body" size="sm">
                             {rule.timeBlocks.length > 0
                                 ? rule.timeBlocks.map(b => `${b.startTime} - ${b.endTime}`).join(', ')
                                 : 'Cerrado'}
-                        </Text>
+                        </Typography>
                     </HStack>
                 ))}
             </VStack>
-        </Box>
+        </CardWrapper>
     );
 };
 
@@ -82,14 +93,14 @@ export default function SchedulesDashboardPage() {
   }, [profile]);
 
   return (
-    <Box p={6} bg="gray.100" minH="100vh">
-      <VStack spacing={6} align="stretch" maxWidth="4xl" mx="auto">
-        <Box>
-          <Heading as="h1" size="lg">Dashboard de Horarios</Heading>
-          <Text color="gray.600">
+    <CardWrapper bg="gray.100" minH="100vh" p="6">
+      <VStack gap="lg" align="stretch" maxWidth="4xl" mx="auto">
+        <Stack gap="xs">
+          <Typography variant="heading" size="lg">Dashboard de Horarios</Typography>
+          <Typography variant="body" color="text.muted">
             Vista consolidada de todos los horarios operativos del negocio.
-          </Text>
-        </Box>
+          </Typography>
+        </Stack>
 
         {allSchedules.length > 0 ? (
             allSchedules.map(schedule => (
@@ -98,15 +109,15 @@ export default function SchedulesDashboardPage() {
         ) : (
             <Alert status="info" borderRadius="lg">
                 <AlertIcon />
-                <Box>
+                <Stack gap="xs">
                     <AlertTitle>No hay horarios configurados.</AlertTitle>
                     <AlertDescription>
                         Ve a la sección de configuración de cada módulo (ej: Perfil de Negocio, Entregas) para definir sus horarios.
                     </AlertDescription>
-                </Box>
+                </Stack>
             </Alert>
         )}
       </VStack>
-    </Box>
+    </CardWrapper>
   );
 }
