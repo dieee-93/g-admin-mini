@@ -1,4 +1,4 @@
 // Barrel export for useMaterials hook
-// Re-export from materials module for easier importing
+// Re-export from materials store (cleaned from legacy alerts)
 
-export { useMaterials } from '@/pages/admin/materials/hooks/useMaterials';
+export { useMaterials } from '@/store/materialsStore';

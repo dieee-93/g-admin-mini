@@ -120,32 +120,6 @@ export interface StockEntry {
 }
 
 // ============================================================================
-// 🚨 ALERTAS - Essential only
-// ============================================================================
-
-export interface StockAlert {
-  id: string;
-  item_id: string;
-  item_name: string;
-  item_type: ItemType;
-  item_unit: string;
-  current_stock: number;
-  min_stock: number;
-  urgency: 'info' | 'warning' | 'critical';
-  suggested_order?: number;
-  created_at: string;
-}
-
-export interface AlertSummary {
-  total: number;
-  critical: number;
-  warning: number;
-  info: number;
-  hasCritical: boolean;
-  hasWarning: boolean;
-}
-
-// ============================================================================
 // 📊 ESTADÍSTICAS Y MÉTRICAS
 // ============================================================================
 

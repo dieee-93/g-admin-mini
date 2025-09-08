@@ -2,7 +2,7 @@
 // API functions para el módulo inventory
 
 import { supabase } from '@/lib/supabase/client';
-import type { InventoryItem, StockEntry, StockAlert } from '../types';
+import type { InventoryItem, StockEntry } from '../types';
 
 export const inventoryApi = {
   // Items
@@ -77,14 +77,6 @@ export const inventoryApi = {
     return data;
   },
 
-  // Stock alerts
-  async getStockAlerts(threshold: number = 10): Promise<StockAlert[]> {
-    const { data, error } = await supabase
-      .rpc('get_low_stock_alerts', { p_threshold: threshold });
-
-    if (error) throw error;
-    return data || [];
-  },
 
   // Dashboard stats
   async getDashboardStats(): Promise<any> {

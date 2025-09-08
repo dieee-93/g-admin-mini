@@ -10,8 +10,6 @@ import {
   type ElaboratedItem,
   type ItemType,
   type ItemFormData,
-  type StockAlert,
-  type AlertSummary,
   type InventoryStats,
   isMeasurable,
   isCountable,
@@ -50,9 +48,6 @@ export interface MaterialsState {
   
   // Stats & Alerts
   stats: InventoryStats;
-  alerts: StockAlert[];
-  alertSummary: AlertSummary;
-  alertThreshold: number;
   
   // Actions
   setItems: (items: MaterialItem[]) => void;
@@ -62,7 +57,6 @@ export interface MaterialsState {
   bulkUpdateStock: (updates: Array<{ id: string; stock: number }>) => void;
   
   // UI Actions
-  setAlertThreshold: (threshold: number) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setFilters: (filters: Partial<MaterialsFilters>) => void;
@@ -76,7 +70,6 @@ export interface MaterialsState {
   
   // Computed
   refreshStats: () => void;
-  refreshAlerts: () => void;
   getFilteredItems: () => MaterialItem[];
   getLowStockItems: () => MaterialItem[];
   getCriticalStockItems: () => MaterialItem[];
@@ -114,14 +107,6 @@ const initialStats: InventoryStats = {
   }
 };
 
-const initialAlertSummary: AlertSummary = {
-  total: 0,
-  critical: 0,
-  warning: 0,
-  info: 0,
-  hasCritical: false,
-  hasWarning: false
-};
 
 export const useMaterialsStore = create<MaterialsState>()(
   devtools(
@@ -141,12 +126,8 @@ export const useMaterialsStore = create<MaterialsState>()(
         currentItem: null,
         
         stats: initialStats,
-        alerts: [] as StockAlert[],
-        alertSummary: initialAlertSummary,
-        alertThreshold: 10, // Default threshold
 
         // Actions
-        setAlertThreshold: (threshold) => set({ alertThreshold: threshold }),
         setItems: (items) => {
           set(produce((state: MaterialsState) => {
             state.items = items.map(item => ({
@@ -155,7 +136,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             }));
           }));
           get().refreshStats();
-          get().refreshAlerts();
+          
         },
 
         addItem: async (itemData) => {
@@ -246,7 +227,7 @@ export const useMaterialsStore = create<MaterialsState>()(
 
             // Refresh stats and alerts
             get().refreshStats();
-            get().refreshAlerts();
+            
 
           } catch (error) {
             console.error('Error adding item:', error);
@@ -308,7 +289,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             }));
 
             get().refreshStats();
-            get().refreshAlerts(); // This will now fetch alerts from the backend
+             // This will now fetch alerts from the backend
 
           } catch (error) {
             console.error('Error updating item:', error);
@@ -324,7 +305,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             state.selectedItems = state.selectedItems.filter(selectedId => selectedId !== id);
           }));
           get().refreshStats();
-          get().refreshAlerts();
+          
         },
 
         bulkUpdateStock: (updates) => {
@@ -338,7 +319,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             });
           }));
           get().refreshStats();
-          get().refreshAlerts();
+          
         },
 
         // UI Actions
@@ -398,35 +379,6 @@ export const useMaterialsStore = create<MaterialsState>()(
           set({ stats });
         },
 
-        refreshAlerts: async () => {
-          set({ loading: true });
-          try {
-            const { alertThreshold } = get();
-            const { supabase } = await import('@/lib/supabase/client');
-            const { data: alerts, error } = await supabase.rpc('get_low_stock_alert', {
-              p_threshold: alertThreshold,
-            });
-
-            if (error) {
-              throw new Error(`Error al obtener alertas de stock: ${error.message}`);
-            }
-
-            const alertSummary: AlertSummary = {
-              total: alerts.length,
-              critical: alerts.filter((a: StockAlert) => a.urgency === 'critical').length,
-              warning: alerts.filter((a: StockAlert) => a.urgency === 'warning').length,
-              info: alerts.filter((a: StockAlert) => a.urgency === 'info').length,
-              hasCritical: alerts.some((a: StockAlert) => a.urgency === 'critical'),
-              hasWarning: alerts.some((a: StockAlert) => a.urgency === 'warning'),
-            };
-
-            set({ alerts: alerts || [], alertSummary, loading: false });
-          } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Error desconocido al refrescar alertas.';
-            console.error('refreshAlerts error:', errorMessage);
-            set({ error: errorMessage, loading: false });
-          }
-        },
 
         getFilteredItems: () => {
           const { items, filters } = get();
@@ -558,14 +510,6 @@ export const useMaterialsError = () => useMaterialsStore(state => state.error);
 export const useMaterialsStats = () => useMaterialsStore(state => state.stats);
 
 /**
- * Hook for components that only need alerts
- */
-export const useMaterialsAlerts = () => useMaterialsStore(state => ({
-  alerts: state.alerts,
-  alertSummary: state.alertSummary
-}));
-
-/**
  * Hook for components that only need modal state
  */
 export const useMaterialsModal = () => useMaterialsStore(state => ({
@@ -594,8 +538,7 @@ export const useMaterialsActions = () => useMaterialsStore(state => ({
   deleteItem: state.deleteItem,
   bulkUpdateStock: state.bulkUpdateStock,
   setItems: state.setItems,
-  refreshStats: state.refreshStats,
-  refreshAlerts: state.refreshAlerts
+  refreshStats: state.refreshStats
 }));
 
 /**
@@ -605,16 +548,6 @@ export const useMaterialsByType = () => useMaterialsStore(state => ({
   measurable: state.getMeasurableItems(),
   countable: state.getCountableItems(),
   elaborated: state.getElaboratedItems()
-}));
-
-/**
- * Hook for components that need stock alerts
- */
-export const useStockAlerts = () => useMaterialsStore(state => ({
-  lowStock: state.getLowStockItems(),
-  criticalStock: state.getCriticalStockItems(),
-  alerts: state.alerts,
-  summary: state.alertSummary
 }));
 
 /**
