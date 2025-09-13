@@ -1,8 +1,8 @@
 // AnomalyDetection.ts - Advanced anomaly detection and self-healing system
 // Monitors system health, detects issues, and applies automated fixes
 
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 import { mlEngine } from '../core/MLEngine';
 import { bundleOptimizer } from '@/lib/performance/BundleOptimizer';
 
@@ -416,12 +416,12 @@ export class AnomalyDetectionEngine {
     });
 
     // Listen for WebSocket events
-    EventBus.on(RestaurantEvents.WEBSOCKET_DISCONNECTED, () => {
+    EventBus.on('websocket.disconnected', () => {
       this.incrementMetric('websocket_disconnections');
     });
 
     // Listen for ML prediction failures
-    EventBus.on(RestaurantEvents.ALERT_GENERATED, (event) => {
+    EventBus.on('alerts.generated', (event) => {
       if (event.payload.alertType === 'system' && 
           event.payload.description.includes('prediction')) {
         this.incrementMetric('failed_predictions');
@@ -429,7 +429,7 @@ export class AnomalyDetectionEngine {
     });
 
     // Listen for sync events
-    EventBus.on(RestaurantEvents.SYNC_FAILED, () => {
+    EventBus.on('system.sync_failed', () => {
       // Sync failures might indicate queue issues
       this.checkOfflineSyncQueue();
     });
@@ -638,7 +638,7 @@ export class AnomalyDetectionEngine {
     currentAnomalies
       .filter(anomaly => anomaly.severity === 'critical')
       .forEach(anomaly => {
-        EventBus.emit(RestaurantEvents.ALERT_GENERATED, {
+        EventBus.emit('alerts.generated', {
           alertId: anomaly.id,
           alertType: 'system',
           severity: 'critical',
@@ -792,7 +792,7 @@ export class AnomalyDetectionEngine {
             console.log(`✅ Healing action ${actionId} completed successfully`);
             
             // Emit healing event
-            await EventBus.emit(RestaurantEvents.AUTOMATED_ACTION_EXECUTED, {
+            await EventBus.emit('alerts.automated_action_executed', {
               actionId: action.id,
               alertId: anomaly.id,
               actionType: action.type,

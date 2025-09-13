@@ -1,7 +1,7 @@
 # 📚 G-Admin Mini - Documentación Completa
 
 > **Sistema de gestión integral para restaurantes y negocios de alimentos**  
-> **Versión**: 3.1 - EventBus V2.0 Enterprise  
+> **Versión**: 3.1 - EventBus Enterprise Edition  
 > **Última actualización**: 2025-09-08
 
 ## 🚀 Inicio Rápido
@@ -52,7 +52,7 @@
 - **[👥 Analytics de Personal](06-features/staff-analytics.md)** - Gestión de empleados
 - **[🔮 Analytics Predictivos](06-features/predictive-analytics.md)** - Inteligencia de negocio
 - **[📱 Sistema Offline](06-features/offline-system.md)** - Funcionalidad sin conexión y sync
-- **[🚀 EventBus Enterprise](06-features/eventbus-system.md)** - Sistema de eventos V2.0 con gestión modular
+- **[🚀 EventBus Enterprise](06-features/eventbus-system.md)** - Sistema de eventos enterprise con gestión modular
 - **[⚡ Edge Functions](06-features/edge-functions.md)** - Funciones del lado servidor
 
 ### 🔧 **07 - Referencia Técnica**

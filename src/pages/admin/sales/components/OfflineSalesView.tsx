@@ -40,8 +40,21 @@ import { StockValidationAlert } from './StockValidationAlert';
 import { CartValidationSummary, CartQuickAlert } from './CartValidationSummary';
 import { fetchCustomers, processSale } from '../services/saleApi';
 import { useSalesCart } from '../hooks/useSalesCart';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents, type OrderPlacedEvent } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+// Event payload type for order placement
+interface OrderPlacedEvent {
+  orderId: string;
+  customerId?: string;
+  tableId?: string;
+  items: Array<{
+    productId: string;
+    quantity: number;
+    specialInstructions?: string;
+  }>;
+  totalAmount: number;
+  orderType: 'dine_in' | 'takeaway' | 'delivery';
+  timestamp: string;
+}
 
 // Offline functionality
 import { 
@@ -442,7 +455,7 @@ export function OfflineSalesView() {
         timestamp: new Date().toISOString()
       } as any;
 
-      await EventBus.emit(RestaurantEvents.ORDER_PLACED, orderPlacedEvent, 'OfflineSales');
+      await EventBus.emit('sales.order.placed', orderPlacedEvent, 'OfflineSales');
 
       notify.success({
         title: "¡Venta guardada offline!",
@@ -474,7 +487,7 @@ export function OfflineSalesView() {
       timestamp: new Date().toISOString()
     };
 
-    await EventBus.emit(RestaurantEvents.ORDER_PLACED, orderPlacedEvent, 'SalesModule');
+    await EventBus.emit('sales.order.placed', orderPlacedEvent, 'SalesModule');
 
     notify.success({
       title: "¡Venta procesada!",

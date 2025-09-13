@@ -36,8 +36,18 @@ import {
   DEFAULT_TIP_PERCENTAGES,
   PAYMENT_PROCESSING_TIMES
 } from '../../types';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents, type PaymentCompletedEvent } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+// Event payload type for payment completion
+interface PaymentCompletedEvent {
+  paymentId: string;
+  orderId?: string;
+  saleId?: string;
+  amount: number;
+  paymentMethod: string;
+  customerId?: string;
+  timestamp: string;
+  reference?: string;
+}
 import { useTaxCalculation } from '@/modules/fiscal/hooks/useTaxCalculation';
 
 interface ModernPaymentProcessorProps {
@@ -261,7 +271,7 @@ export function ModernPaymentProcessor({
           reference: paymentMethod.id
         };
 
-        await EventBus.emit(RestaurantEvents.PAYMENT_COMPLETED, paymentCompletedEvent, 'PaymentModule');
+        await EventBus.emit('sales.payment.completed', paymentCompletedEvent, 'PaymentModule');
       }
       
       setProcessingStep('Finalizing transaction...');

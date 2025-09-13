@@ -5,12 +5,12 @@ import {
   SimpleGrid,
   Switch,
   VStack,
-  Collapse,
-  Divider,
+  HStack,
+  Collapsible,
+  Separator,
   Box,
 } from '@chakra-ui/react';
 import {
-  BoltIcon,
   CubeIcon,
   UsersIcon,
   CalendarIcon,
@@ -30,7 +30,15 @@ interface CapabilitiesStepProps {
   handleCompetencyChange: (competency: keyof CapabilitiesStepProps['selectedCompetencies']) => void;
 }
 
-const CompetencySection = ({ title, icon, isEnabled, onToggle, children }) => (
+interface CompetencySectionProps {
+  title: string;
+  icon: React.ReactElement;
+  isEnabled: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}
+
+const CompetencySection = ({ title, icon, isEnabled, onToggle, children }: CompetencySectionProps) => (
   <Box>
     <Stack>
       <HStack justify="space-between">
@@ -38,16 +46,21 @@ const CompetencySection = ({ title, icon, isEnabled, onToggle, children }) => (
           {icon}
           <Text fontWeight="medium">{title}</Text>
         </HStack>
-        <Switch isChecked={isEnabled} onChange={onToggle} />
+        <Switch.Root checked={isEnabled} onCheckedChange={() => onToggle()}>
+          <Switch.HiddenInput />
+          <Switch.Control />
+        </Switch.Root>
       </HStack>
-      <Collapse in={isEnabled} animateOpacity>
-        <Box pl={8} pt={4}>
-          <Divider />
-          <Box pt={4}>
-            {children}
+      <Collapsible.Root open={isEnabled}>
+        <Collapsible.Content>
+          <Box pl={8} pt={4}>
+            <Separator />
+            <Box pt={4}>
+              {children}
+            </Box>
           </Box>
-        </Box>
-      </Collapse>
+        </Collapsible.Content>
+      </Collapsible.Root>
     </Stack>
   </Box>
 );
@@ -60,7 +73,7 @@ export const CapabilitiesStep: React.FC<CapabilitiesStepProps> = ({
   const { capabilities, toggleSubCapability } = businessModel;
 
   return (
-    <VStack spacing={6} align="stretch">
+    <VStack gap={6} align="stretch">
       <CompetencySection
         title="Venta de Productos"
         icon={<CubeIcon width={20} height={20} />}

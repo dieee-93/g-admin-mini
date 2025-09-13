@@ -38,8 +38,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 // Import event system
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 
 import {
   generateMockModuleMetrics,
@@ -315,7 +315,7 @@ export function CrossModuleAnalytics() {
       setInsights(newInsights);
       
       // Emit analysis event
-      await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+      await EventBus.emit('system.data_synced', {
         type: 'cross_module_analysis_completed',
         metricsAnalyzed: metrics.length,
         correlationsFound: filteredCorrelations.length,

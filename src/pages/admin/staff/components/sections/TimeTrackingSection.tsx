@@ -53,8 +53,8 @@ import {
   localStorage,
   type SyncOperation 
 } from '@/lib/offline';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 import { notify } from '@/lib/notifications';
 
 // Staff imports
@@ -270,12 +270,12 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
       }
     };
 
-    EventBus.on(RestaurantEvents.EMPLOYEE_CLOCK_IN, handleTimeEvent);
-    EventBus.on(RestaurantEvents.EMPLOYEE_CLOCK_OUT, handleTimeEvent);
+    EventBus.on('staff.clock_in', handleTimeEvent);
+    EventBus.on('staff.clock_out', handleTimeEvent);
 
     return () => {
-      EventBus.off(RestaurantEvents.EMPLOYEE_CLOCK_IN, handleTimeEvent);
-      EventBus.off(RestaurantEvents.EMPLOYEE_CLOCK_OUT, handleTimeEvent);
+      EventBus.off('staff.clock_in', handleTimeEvent);
+      EventBus.off('staff.clock_out', handleTimeEvent);
     };
   };
 

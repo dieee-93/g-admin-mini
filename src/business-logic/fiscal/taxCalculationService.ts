@@ -1,8 +1,7 @@
 // Tax Calculation Service - Centralized Tax Logic for Argentina
 // Extracted from Sales module for better separation of concerns
 
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
 import { TaxDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
@@ -90,7 +89,7 @@ class TaxCalculationService {
     
     // Emit configuration change event
     EventBus.emit(
-      RestaurantEvents.DATA_SYNCED, 
+      'system.data_synced', 
       { type: 'tax_configuration', config: this.config },
       'TaxCalculationService'
     );

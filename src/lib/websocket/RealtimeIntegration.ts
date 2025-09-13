@@ -2,8 +2,8 @@
 // Connects WebSocket updates to module-specific functionality
 
 import { wsManager, type WSMessageType } from './WebSocketManager';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 import { notify } from '@/lib/notifications';
 import { offlineSync, localStorage } from '@/lib/offline';
 
@@ -154,7 +154,7 @@ export class RealtimeIntegration {
 
   private setupOfflineIntegration(): void {
     // When offline operations are synced, broadcast updates
-    EventBus.on(RestaurantEvents.SYNC_COMPLETED, async (event) => {
+    EventBus.on('system.sync_completed', async (event) => {
       if (wsManager.isConnected()) {
         // Inform other clients about synchronized operations
         for (const operation of event.payload.operations) {
@@ -164,7 +164,7 @@ export class RealtimeIntegration {
     });
 
     // When going online, request sync from server
-    EventBus.on(RestaurantEvents.WEBSOCKET_CONNECTED, async () => {
+    EventBus.on('websocket.connected', async () => {
       const pendingOperations = await offlineSync.syncPendingOperations();
       if (pendingOperations.length > 0) {
         await this.broadcastUpdate('SYNC_REQUEST', {
@@ -178,7 +178,7 @@ export class RealtimeIntegration {
 
   private setupModuleIntegrations(): void {
     // Sales module integration
-    EventBus.on(RestaurantEvents.ORDER_PLACED, async (data) => {
+    EventBus.on('sales.order.placed', async (data) => {
       if (!data.isOffline) {
         await this.broadcastUpdate('ORDER_CREATED', {
           orderId: data.orderId,
@@ -189,7 +189,7 @@ export class RealtimeIntegration {
       }
     });
 
-    EventBus.on(RestaurantEvents.ORDER_UPDATED, async (data) => {
+    EventBus.on('sales.order.updated', async (data) => {
       if (!data.isOffline) {
         await this.broadcastUpdate('ORDER_UPDATED', {
           orderId: data.orderId,
@@ -200,7 +200,7 @@ export class RealtimeIntegration {
     });
 
     // Kitchen module integration
-    EventBus.on(RestaurantEvents.ORDER_STATUS_CHANGED, async (data) => {
+    EventBus.on('sales.order.status_changed', async (data) => {
       await this.broadcastUpdate('ORDER_STATUS_CHANGED', {
         orderId: data.orderId,
         oldStatus: data.oldStatus,
@@ -211,7 +211,7 @@ export class RealtimeIntegration {
     });
 
     // Inventory module integration
-    EventBus.on(RestaurantEvents.INVENTORY_UPDATED, async (event) => {
+    EventBus.on('inventory.updated', async (event) => {
       if (!event.payload?.isOffline) {
         await this.broadcastUpdate('INVENTORY_UPDATED', {
           itemId: event.payload.itemId,
@@ -225,7 +225,7 @@ export class RealtimeIntegration {
     });
 
     // Staff module integration
-    EventBus.on(RestaurantEvents.EMPLOYEE_CLOCK_IN, async (event) => {
+    EventBus.on('staff.clock_in', async (event) => {
       if (!event.payload?.isOffline) {
         await this.broadcastUpdate('STAFF_CLOCK_ACTION', {
           employeeId: event.payload.employeeId,
@@ -237,7 +237,7 @@ export class RealtimeIntegration {
       }
     });
 
-    EventBus.on(RestaurantEvents.EMPLOYEE_CLOCK_OUT, async (event) => {
+    EventBus.on('staff.clock_out', async (event) => {
       if (!event.payload?.isOffline) {
         await this.broadcastUpdate('STAFF_CLOCK_ACTION', {
           employeeId: event.payload.employeeId,
@@ -299,7 +299,7 @@ export class RealtimeIntegration {
     }
 
     // Emit to interested modules
-    EventBus.emit(RestaurantEvents.ORDER_CREATED_REALTIME, data);
+    EventBus.emit('realtime.order.created', data);
     
     // Show notification if order is for current station
     if (data.updatedBy !== await this.getCurrentUserId()) {
@@ -319,7 +319,7 @@ export class RealtimeIntegration {
       await localStorage.set('offline_orders', data.orderId, resolved);
     }
 
-    EventBus.emit(RestaurantEvents.ORDER_UPDATED_REALTIME, data);
+    EventBus.emit('sales.order.updated'_REALTIME, data);
   }
 
   private async handleOrderStatusChanged(data: OrderUpdate): Promise<void> {
@@ -333,7 +333,7 @@ export class RealtimeIntegration {
       await localStorage.set('offline_orders', data.orderId, localOrder);
     }
 
-    EventBus.emit(RestaurantEvents.ORDER_STATUS_CHANGED_REALTIME, data);
+    EventBus.emit('sales.order.status_changed'_REALTIME, data);
     
     // Show status change notification
     const statusLabels = {
@@ -360,7 +360,7 @@ export class RealtimeIntegration {
       await localStorage.set('offline_inventory_items', data.itemId, resolved);
     }
 
-    EventBus.emit(RestaurantEvents.INVENTORY_UPDATED_REALTIME, data);
+    EventBus.emit('inventory.updated'_REALTIME, data);
     
     // Show critical stock alerts
     if (data.field === 'stock' && data.newValue <= 5) {
@@ -389,13 +389,13 @@ export class RealtimeIntegration {
 
     await localStorage.set('offline_time_entries', timeEntry.id, timeEntry);
     
-    EventBus.emit(RestaurantEvents.STAFF_TIME_UPDATED_REALTIME, data);
+    EventBus.emit('realtime.staff.time_updated', data);
   }
 
   private async handleKitchenUpdate(data: KitchenUpdate): Promise<void> {
     console.log('Real-time kitchen update:', data.type);
     
-    EventBus.emit(RestaurantEvents.KITCHEN_UPDATED_REALTIME, data);
+    EventBus.emit('realtime.kitchen.updated', data);
     
     // Show critical kitchen alerts
     if (data.priority === 'critical') {
@@ -424,7 +424,7 @@ export class RealtimeIntegration {
         break;
     }
     
-    EventBus.emit(RestaurantEvents.NOTIFICATION_RECEIVED_REALTIME, data);
+    EventBus.emit('realtime.notification.received', data);
   }
 
   private async handleSyncRequest(data: unknown): Promise<void> {
@@ -436,7 +436,7 @@ export class RealtimeIntegration {
       await offlineSync.forceSync();
     }
     
-    EventBus.emit(RestaurantEvents.SYNC_REQUESTED_REALTIME, data);
+    EventBus.emit('realtime.sync.requested', data);
   }
 
   // Utility methods

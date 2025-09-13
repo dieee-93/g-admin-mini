@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 import { type ReportTemplate, type GeneratedReport } from '../types';
 
 interface UseReportGenerationParams {
@@ -50,7 +50,7 @@ export function useReportGeneration({
       ));
 
       // Emit generation event
-      await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+      await EventBus.emit('system.data_synced', {
         type: 'custom_report_generated',
         templateId,
         templateName: template.name,

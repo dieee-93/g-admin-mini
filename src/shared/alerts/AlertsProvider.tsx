@@ -16,7 +16,7 @@ import type {
   AlertType, 
 } from './types';
 import { ALERT_EVENTS } from './types';
-import { EventBus } from '@/lib/events/EventBus';
+import { EventBus } from '@/lib/events';
 import { useDebouncedCallback } from '../hooks';
 
 // Default configuration

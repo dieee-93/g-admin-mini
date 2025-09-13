@@ -16,7 +16,7 @@ import {
   Progress,
   Alert,
   CardWrapper,
-  Divider,
+  Separator,
   Badge,
   SimpleGrid,
   Modal,
@@ -309,7 +309,7 @@ export function AutoSchedulingModal({
               />
             </HStack>
 
-            <Divider />
+            <Separator />
             
             <HStack justify="space-between">
               <VStack align="start" spacing={0}>

@@ -261,7 +261,7 @@ class MLSystemManager {
       const { EventBus } = await import('@/lib/events/EventBus');
       const { RestaurantEvents } = await import('@/lib/events/RestaurantEvents');
       
-      await EventBus.emit(RestaurantEvents.ALERT_GENERATED, {
+      await EventBus.emit('alerts.generated', {
         alertId: `ml_system_init_${Date.now()}`,
         alertType: 'system',
         severity: 'info',

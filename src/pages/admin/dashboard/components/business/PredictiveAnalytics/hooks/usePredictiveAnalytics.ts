@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MaterialDemand, PredictiveAnalyticsConfig } from '../types';
 import { generateMockPredictiveData } from '../../../../data/mockData';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 
 export const usePredictiveAnalytics = () => {
   // State
@@ -123,7 +123,7 @@ export const usePredictiveAnalytics = () => {
       setMaterials(updatedMaterials);
 
       // Emit analytics event
-      await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+      await EventBus.emit('system.data_synced', {
         type: 'predictive_analysis_completed',
         materialsAnalyzed: materials.length,
         averageAccuracy: analyticsOverview?.averageAccuracy || 0,

@@ -38,8 +38,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
 import offlineSync, { type SyncStatus } from './OfflineSync';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 
 // Connection status types
 interface ConnectionStatus {

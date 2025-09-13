@@ -1,8 +1,7 @@
 // WebSocketManager.ts - Real-time WebSocket Management for G-Admin Mini
 // Provides robust WebSocket connections with automatic reconnection and offline graceful degradation
 
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
 import { notify } from '@/lib/notifications';
 import { localStorage } from '@/lib/offline';
 
@@ -157,7 +156,7 @@ export class WebSocketManager {
     });
 
     // Listen for offline sync completion to trigger real-time sync
-    EventBus.on(RestaurantEvents.SYNC_COMPLETED, (data) => {
+    EventBus.on('system.sync_completed', (data) => {
       if (this.isConnected()) {
         this.sendMessage({
           type: 'SYNC_REQUEST',
@@ -421,7 +420,7 @@ export class WebSocketManager {
     notify.success('Real-time updates connected');
     
     // Emit connection event
-    EventBus.emit(RestaurantEvents.WEBSOCKET_CONNECTED, {
+    EventBus.emit('websocket.connected', {
       timestamp: Date.now(),
       stats: this.getStats()
     });
@@ -475,7 +474,7 @@ export class WebSocketManager {
       this.setState('failed');
       notify.warning('Real-time updates disconnected');
       
-      EventBus.emit(RestaurantEvents.WEBSOCKET_DISCONNECTED, {
+      EventBus.emit('websocket.disconnected', {
         timestamp: Date.now(),
         reason: event.reason,
         code: event.code
@@ -487,7 +486,7 @@ export class WebSocketManager {
     console.error('WebSocket error:', error);
     this.stats.failedConnections++;
     
-    EventBus.emit(RestaurantEvents.WEBSOCKET_ERROR, {
+    EventBus.emit('websocket.error', {
       timestamp: Date.now(),
       error: error
     });
@@ -551,7 +550,7 @@ export class WebSocketManager {
       
       console.log(`WebSocket state changed: ${oldState} -> ${newState}`);
       
-      EventBus.emit(RestaurantEvents.WEBSOCKET_STATE_CHANGED, {
+      EventBus.emit('websocket.state_changed', {
         oldState,
         newState,
         timestamp: Date.now()
@@ -730,19 +729,19 @@ export class WebSocketManager {
       case 'ORDER_CREATED':
       case 'ORDER_UPDATED':
       case 'ORDER_STATUS_CHANGED':
-        EventBus.emit(RestaurantEvents.ORDER_UPDATED_REALTIME, message.data);
+        EventBus.emit('realtime.order.updated', message.data);
         break;
         
       case 'INVENTORY_UPDATED':
-        EventBus.emit(RestaurantEvents.INVENTORY_UPDATED_REALTIME, message.data);
+        EventBus.emit('realtime.inventory.updated', message.data);
         break;
         
       case 'STAFF_CLOCK_ACTION':
-        EventBus.emit(RestaurantEvents.STAFF_TIME_UPDATED_REALTIME, message.data);
+        EventBus.emit('realtime.staff.time_updated', message.data);
         break;
         
       case 'KITCHEN_UPDATE':
-        EventBus.emit(RestaurantEvents.KITCHEN_UPDATED_REALTIME, message.data);
+        EventBus.emit('realtime.kitchen.updated', message.data);
         break;
         
       case 'NOTIFICATION':
@@ -750,7 +749,7 @@ export class WebSocketManager {
         break;
         
       case 'SYNC_REQUEST':
-        EventBus.emit(RestaurantEvents.SYNC_REQUESTED_REALTIME, message.data);
+        EventBus.emit('realtime.sync.requested', message.data);
         break;
     }
   }

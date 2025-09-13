@@ -17,7 +17,7 @@ import {
   Button,
   Tabs,
   Alert,
-  Divider,
+  Separator,
   Stack,
   StatRoot,
   StatLabel,

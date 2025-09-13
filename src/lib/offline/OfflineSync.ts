@@ -1,8 +1,8 @@
 // OfflineSync.ts - Intelligent Data Synchronization for G-Admin Mini
 // Handles conflict resolution, data merging, and optimistic updates
 
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 
 // IndexedDB utilities for persistent queue storage
 class OfflineSyncDB {
@@ -515,7 +515,7 @@ class OfflineSync {
         const conflicts = await this.detectConflicts(operation, serverData);
         
         // Emit sync success event
-        await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+        await EventBus.emit('system.data_synced', {
           type: 'offline_sync_operation_completed',
           operationId: operation.id,
           operationType: operation.type,

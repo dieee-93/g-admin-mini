@@ -117,7 +117,7 @@ SALE_COMPLETED → [
    // AFTER: Event emission
    completeSale: async (saleData) => {
      const sale = await createSale(saleData);
-     await EventBus.emit(RestaurantEvents.SALE_COMPLETED, {
+     await EventBus.emit(eventos tipados.SALE_COMPLETED, {
        saleId: sale.id,
        customerId: sale.customer_id,
        items: sale.items,
@@ -129,7 +129,7 @@ SALE_COMPLETED → [
 2. **Implementar Event Listeners cross-module**
    ```typescript
    // Auto-integration con módulos existentes
-   EventBus.on(RestaurantEvents.SALE_COMPLETED, async (event) => {
+   EventBus.on(eventos tipados.SALE_COMPLETED, async (event) => {
      // Kitchen Display System integration
      kitchenDisplayStore.addOrder({
        orderId: event.payload.saleId,
@@ -219,7 +219,7 @@ const createSale = async (saleData: CreateSaleData) => {
   });
   
   // 5. Emit events for automatic integrations
-  await EventBus.emit(RestaurantEvents.SALE_COMPLETED, {
+  await EventBus.emit(eventos tipados.SALE_COMPLETED, {
     saleId: sale.id,
     customerId: sale.customer_id,
     items: sale.items,
@@ -254,7 +254,7 @@ const POSWorkflow = {
 // QROrderPage.tsx y QRCodeGenerator.tsx ya implementados
 // Solo conectar con EventBus pattern
 
-EventBus.on(RestaurantEvents.QR_ORDER_PLACED, async (event) => {
+EventBus.on(eventos tipados.QR_ORDER_PLACED, async (event) => {
   // Same workflow as POS but different source
   await createSale({
     ...event.payload,
@@ -281,7 +281,7 @@ EventBus.on(RestaurantEvents.QR_ORDER_PLACED, async (event) => {
 #### 2.1 KITCHEN → SALES STATUS UPDATES
 ```typescript
 // Kitchen staff updates order status → Sales reflects in real-time
-EventBus.on(RestaurantEvents.KITCHEN_ITEM_READY, (event) => {
+EventBus.on(eventos tipados.KITCHEN_ITEM_READY, (event) => {
   // Auto-update sale kitchen status
   salesStore.updateKitchenStatus(event.payload.orderId, 'ready');
   
@@ -342,7 +342,7 @@ app.post('/webhook/rappi', async (req, res) => {
 #### 3.2 FISCAL COMPLIANCE AUTOMÁTICO
 ```typescript
 // AFIP integration using existing fiscal services
-EventBus.on(RestaurantEvents.SALE_COMPLETED, async (event) => {
+EventBus.on(eventos tipados.SALE_COMPLETED, async (event) => {
   // Auto-generate invoice
   const invoice = await fiscalApi.generateInvoice({
     saleId: event.payload.saleId,
@@ -358,12 +358,12 @@ EventBus.on(RestaurantEvents.SALE_COMPLETED, async (event) => {
 #### 3.3 CUSTOMER EXPERIENCE AUTOMATION
 ```typescript
 // Basado en RFM analytics del módulo Customers
-EventBus.on(RestaurantEvents.CUSTOMER_RFM_UPDATED, async (event) => {
+EventBus.on(eventos tipados.CUSTOMER_RFM_UPDATED, async (event) => {
   const { customerId, newSegment, churnRisk } = event.payload;
   
   if (churnRisk === 'HIGH') {
     // Auto-trigger retention campaign
-    EventBus.emit(RestaurantEvents.RETENTION_CAMPAIGN_TRIGGERED, {
+    EventBus.emit(eventos tipados.RETENTION_CAMPAIGN_TRIGGERED, {
       customerId,
       offerType: 'comeback_discount',
       discountPercentage: 15
@@ -408,7 +408,7 @@ describe('Event-driven Sales Integration', () => {
     await salesStore.completeSale(mockSale);
     
     expect(EventBus.emit).toHaveBeenCalledWith(
-      RestaurantEvents.SALE_COMPLETED,
+      eventos tipados.SALE_COMPLETED,
       expect.objectContaining({
         saleId: mockSale.id,
         customerId: mockSale.customer_id

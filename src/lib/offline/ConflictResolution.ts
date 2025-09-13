@@ -1,8 +1,8 @@
 // ConflictResolution.ts - Advanced Conflict Resolution for G-Admin Mini
 // Handles complex data conflicts with intelligent resolution strategies
 
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 import localStorage from './LocalStorage';
 
 // Conflict types and resolution strategies
@@ -228,7 +228,7 @@ class ConflictResolutionEngine {
             }
             
             // Emit resolution event
-            await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+            await EventBus.emit('system.data_synced', {
               type: 'conflict_resolved',
               conflictId: conflict.id,
               strategy: result.strategy,
@@ -774,7 +774,7 @@ class ConflictResolutionEngine {
     this.resolutionHistory.set(conflictId, result);
     this.activeConflicts.delete(conflictId);
     
-    await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+    await EventBus.emit('system.data_synced', {
       type: 'conflict_manually_resolved',
       conflictId,
       resolvedValue

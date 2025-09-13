@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 import {
   ExecutiveKPI,
   StrategicInsight,
@@ -115,7 +115,7 @@ export const useExecutiveData = () => {
       setKpis(updatedKPIs);
 
       // Emit refresh event
-      await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+      await EventBus.emit('system.data_synced', {
         type: 'executive_dashboard_refreshed',
         kpisUpdated: updatedKPIs.length,
         insightsCount: insights.length,

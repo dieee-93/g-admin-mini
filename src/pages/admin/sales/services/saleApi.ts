@@ -10,8 +10,30 @@ import {
   type SalesListFilters,
   type SalesSummary
 } from '../types';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents, type SaleCompletedEvent } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+
+// Event payload type for sale completion
+interface SaleCompletedEvent {
+  saleId: string;
+  orderId?: string;
+  customerId?: string;
+  tableId?: string;
+  totalAmount: number;
+  subtotal: number;
+  taxes: number;
+  tips?: number;
+  paymentMethods: Array<{
+    method: string;
+    amount: number;
+  }>;
+  items: Array<{
+    productId: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+  }>;
+  timestamp: string;
+}
 import { taxService } from '@/business-logic/fiscal/taxCalculationService';
 import { errorHandler, createNetworkError, createBusinessError } from '@/lib/error-handling';
 
@@ -255,7 +277,7 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
       timestamp: new Date().toISOString()
     };
 
-    EventBus.emit(RestaurantEvents.SALE_COMPLETED, saleEvent);
+    EventBus.emit('sales.completed', saleEvent);
 
     return {
       success: true,

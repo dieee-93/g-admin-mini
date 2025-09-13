@@ -3,8 +3,8 @@
 
 import { mlEngine } from '../core/MLEngine';
 import type { ForecastResult } from '../core/MLEngine';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 
 // ===== INTERFACES =====
 
@@ -159,17 +159,17 @@ export class SmartRecommendationEngine {
    */
   private initializeEventListeners(): void {
     // Listen for completed orders
-    EventBus.on(RestaurantEvents.ORDER_PLACED, (event) => {
+    EventBus.on('sales.order.placed', (event) => {
       this.processOrderForAnalysis(event.payload);
     });
 
     // Listen for menu changes
-    EventBus.on(RestaurantEvents.RECIPE_USED, (event) => {
+    EventBus.on('recipes.used', (event) => {
       this.updateMenuItemUsage(event.payload);
     });
 
     // Listen for sales completions
-    EventBus.on(RestaurantEvents.SALE_COMPLETED, (event) => {
+    EventBus.on('sales.completed', (event) => {
       this.processSaleForAnalysis(event.payload);
     });
   }

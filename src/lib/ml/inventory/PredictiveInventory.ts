@@ -3,8 +3,8 @@
 
 import { mlEngine } from '../core/MLEngine';
 import type { ForecastResult } from '../core/MLEngine';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 import { offlineSync } from '@/lib/offline';
 
 // ===== INTERFACES =====
@@ -99,17 +99,17 @@ export class PredictiveInventoryManager {
    */
   private initializeEventListeners(): void {
     // Listen for inventory changes
-    EventBus.on(RestaurantEvents.STOCK_ADJUSTED, async (event) => {
+    EventBus.on('inventory.stock_adjusted', async (event) => {
       await this.updateItemStock(event.payload);
     });
 
     // Listen for stock low events
-    EventBus.on(RestaurantEvents.STOCK_LOW, async (event) => {
+    EventBus.on('inventory.stock_low', async (event) => {
       await this.handleStockLowEvent(event.payload);
     });
 
     // Listen for new orders to update demand patterns
-    EventBus.on(RestaurantEvents.ORDER_PLACED, async (event) => {
+    EventBus.on('sales.order.placed', async (event) => {
       await this.updateDemandFromOrder(event.payload);
     });
   }
@@ -401,7 +401,7 @@ export class PredictiveInventoryManager {
 
     // Emit event for critical items
     if (urgency === 'critical') {
-      await EventBus.emit(RestaurantEvents.REORDER_POINT_TRIGGERED, {
+      await EventBus.emit('supply_chain.reorder_point_triggered', {
         materialId: item.id,
         materialName: item.name,
         currentStock: item.currentStock,
@@ -623,7 +623,7 @@ export class PredictiveInventoryManager {
       });
 
       // Emit procurement event
-      await EventBus.emit(RestaurantEvents.PROCUREMENT_ORDER_GENERATED, {
+      await EventBus.emit('supply_chain.procurement_order_generated', {
         orderId: procurementOrder.id,
         supplierId: item.supplierId || 'unknown',
         supplierName: item.supplierName || 'Unknown Supplier',

@@ -46,8 +46,8 @@ import { RecipeFormAISuggestions } from './form-parts/RecipeFormAISuggestions';
 import { RecipeFormIngredients } from './form-parts/RecipeFormIngredients';
 
 // Import event system
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 
 interface FormErrors {
   name?: string;
@@ -292,7 +292,7 @@ export function RecipeForm() {
       setShowAISuggestions(true);
       
       // Emit AI suggestions event
-      await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+      await EventBus.emit('system.data_synced', {
         type: 'ai_recipe_suggestions_generated',
         recipeName: form.name,
         ingredientsCount: validIngredients.length,

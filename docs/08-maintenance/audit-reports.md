@@ -50,7 +50,7 @@ G-Admin Mini es un proyecto empresarial sofisticado con arquitectura avanzada y 
 ##### **C) Arquitectura Dirigida por Eventos**
 ```typescript
 // Sistema EventBus sofisticado
-export enum RestaurantEvents {
+export enum eventos tipados {
   ORDER_PLACED = 'order.placed',
   STOCK_LOW = 'inventory.stock_low',
   ABC_ANALYSIS_COMPLETED = 'supply_chain.abc_analysis_completed',

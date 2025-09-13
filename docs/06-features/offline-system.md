@@ -385,12 +385,12 @@ interface FiscalOfflineStats {
 
 ### **✅ EVENTBUS OFFLINE-FIRST INTEGRATION**
 
-El EventBus V2.0 Enterprise está **completamente integrado** con el sistema offline-first:
+El EventBus Enterprise Enterprise está **completamente integrado** con el sistema offline-first:
 
 #### **🔄 QUEUE AUTOMÁTICO PARA EVENTOS PERSISTENTES**
 ```typescript
 // Eventos automáticamente encolados para sync
-await eventBusV2.emit('sales.order.completed', orderData, {
+await eventBus.emit('sales.order.completed', orderData, {
   persistent: true,      // Auto-queue en OfflineSync
   priority: 'high'       // Prioridad en cola de sync
 });
@@ -444,7 +444,7 @@ interface DeduplicationMetadata {
 #### **⚡ EVENT SOURCING OFFLINE**
 ```typescript
 // Replay de eventos para recovery
-const events = await eventBusV2.replay(
+const events = await eventBus.replay(
   'sales.order.created',
   '2024-01-01T00:00:00Z',    // Desde
   '2024-01-31T23:59:59Z'     // Hasta
@@ -459,12 +459,12 @@ for (const event of events) {
 #### **🔗 SYNC BIDIRECCIONAL**
 ```typescript
 // EventBus → OfflineSync (automático)
-await eventBusV2.emit('inventory.stock.updated', stockData, {
+await eventBus.emit('inventory.stock.updated', stockData, {
   persistent: true  // Auto-encolado en OfflineSync
 });
 
 // OfflineSync → EventBus (callback en success)
-await EventBus.emit(RestaurantEvents.DATA_SYNCED, {
+await EventBus.emit(eventos tipados.DATA_SYNCED, {
   type: 'offline_sync_operation_completed',
   operationId: operation.id,
   operationType: operation.type,
@@ -506,7 +506,7 @@ private async resolveConflict(conflict: SyncConflict): Promise<boolean> {
 
 ### **🔧 CONFIGURACIÓN OFFLINE ESPECÍFICA**
 ```typescript
-const eventBusV2 = new EventBusV2({
+const eventBus = new EventBus({
   // Integración offline
   offlineSyncEnabled: true,          // Habilitar integración con OfflineSync
   persistenceEnabled: true,          // Persistir eventos en IndexedDB

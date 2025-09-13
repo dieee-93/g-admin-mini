@@ -1,8 +1,8 @@
 // MLEngine.ts - Advanced Machine Learning Engine for G-Admin Mini
 // Provides demand forecasting, pattern recognition, and predictive analytics
 
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 
 // ===== CORE ML INTERFACES =====
 
@@ -426,17 +426,17 @@ export class MLEngine {
    */
   private initializeEventListeners(): void {
     // Listen for sales data
-    const salesListener = EventBus.on(RestaurantEvents.SALE_COMPLETED, async (event) => {
+    const salesListener = EventBus.on('sales.completed', async (event) => {
       await this.processSaleData(event.payload);
     });
 
     // Listen for inventory updates
-    const inventoryListener = EventBus.on(RestaurantEvents.STOCK_ADJUSTED, async (event) => {
+    const inventoryListener = EventBus.on('inventory.stock_adjusted', async (event) => {
       await this.processInventoryData(event.payload);
     });
 
     // Listen for order events
-    const orderListener = EventBus.on(RestaurantEvents.ORDER_PLACED, async (event) => {
+    const orderListener = EventBus.on('sales.order.placed', async (event) => {
       await this.processOrderData(event.payload);
     });
 

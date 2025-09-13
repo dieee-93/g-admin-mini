@@ -4,8 +4,8 @@
  */
 
 import { realTimeLaborCosts, type CostAlert } from './realTimeLaborCosts';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 
 interface NotificationConfig {
   overtimeWarningEnabled: boolean;
@@ -185,7 +185,7 @@ class LaborCostNotificationService {
     }
 
     // Emit event to EventBus
-    EventBus.emit(RestaurantEvents.STAFF_ALERT, {
+    EventBus.emit('staff.alert', {
       type: 'labor_cost_notification',
       notification
     });

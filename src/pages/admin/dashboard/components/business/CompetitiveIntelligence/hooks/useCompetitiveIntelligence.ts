@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CompetitorData, MarketTrend, MarketInsight } from '../types';
 import { generateMockCompetitiveData } from '../../../../data/mockData';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 
 export const useCompetitiveIntelligence = () => {
   // State management
@@ -50,7 +50,7 @@ export const useCompetitiveIntelligence = () => {
 
     // Emit refresh event
     await EventBus.emit(
-      RestaurantEvents.DATA_SYNCED,
+      'system.data_synced',
       {
         type: 'competitive_intelligence_updated',
         competitorsCount: competitors.length,

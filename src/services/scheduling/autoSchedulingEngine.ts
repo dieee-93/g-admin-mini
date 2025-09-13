@@ -4,8 +4,8 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
+import { EventBus } from '@/lib/events';
 import { errorHandler, createBusinessError } from '@/lib/error-handling';
 import { 
   calculateShiftHours, 
@@ -156,7 +156,7 @@ class AutoSchedulingEngine {
       const validatedSolution = await this.validateSolution(solution, constraints);
 
       // Step 4: Emit scheduling event
-      EventBus.emit(RestaurantEvents.SCHEDULE_GENERATED, {
+      EventBus.emit('staff.schedule_generated', {
         solution: validatedSolution,
         timestamp: new Date().toISOString()
       });

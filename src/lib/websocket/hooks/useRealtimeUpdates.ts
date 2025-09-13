@@ -4,8 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { wsManager, type WSMessageType } from '../WebSocketManager';
 import { realtimeIntegration } from '../RealtimeIntegration';
-import { EventBus } from '@/lib/events/EventBus';
-import { RestaurantEvents } from '@/lib/events/RestaurantEvents';
+import { EventBus } from '@/lib/events';
 
 // Hook return type
 interface UseRealtimeUpdatesReturn {
@@ -71,18 +70,18 @@ export function useRealtimeUpdates(): UseRealtimeUpdatesReturn {
 
   useEffect(() => {
     // Update state when connection changes
-    const unsubscribeState = EventBus.on(RestaurantEvents.WEBSOCKET_STATE_CHANGED, (data) => {
+    const unsubscribeState = EventBus.on('websocket.state_changed', (data) => {
       setConnectionState(data.payload.newState);
       setStats(wsManager.getStats());
     });
 
-    const unsubscribeConnected = EventBus.on(RestaurantEvents.WEBSOCKET_CONNECTED, () => {
+    const unsubscribeConnected = EventBus.on('websocket.connected', () => {
       setConnectionState('connected');
       setStats(wsManager.getStats());
       measureLatency();
     });
 
-    const unsubscribeDisconnected = EventBus.on(RestaurantEvents.WEBSOCKET_DISCONNECTED, () => {
+    const unsubscribeDisconnected = EventBus.on('websocket.disconnected', () => {
       setStats(wsManager.getStats());
     });
 
@@ -380,17 +379,17 @@ export function useRealtimeConnectionStatus() {
   const [isConnected, setIsConnected] = useState(wsManager.isConnected());
 
   useEffect(() => {
-    const unsubscribeState = EventBus.on(RestaurantEvents.WEBSOCKET_STATE_CHANGED, (data) => {
+    const unsubscribeState = EventBus.on('websocket.state_changed', (data) => {
       setConnectionState(data.payload.newState);
       setIsConnected(data.payload.newState === 'connected');
     });
 
-    const unsubscribeConnected = EventBus.on(RestaurantEvents.WEBSOCKET_CONNECTED, () => {
+    const unsubscribeConnected = EventBus.on('websocket.connected', () => {
       setConnectionState('connected');
       setIsConnected(true);
     });
 
-    const unsubscribeDisconnected = EventBus.on(RestaurantEvents.WEBSOCKET_DISCONNECTED, () => {
+    const unsubscribeDisconnected = EventBus.on('websocket.disconnected', () => {
       setIsConnected(false);
     });
 
