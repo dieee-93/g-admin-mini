@@ -5,7 +5,7 @@ import { EventStoreIndexedDB } from './EventStore';
 import { DeduplicationManager } from './DeduplicationManager';
 import { ModuleRegistry } from './ModuleRegistry';
 import { createTestEventHandlers } from './__tests__/helpers/test-modules';
-import { EventBusLogger, SecurityLogger } from './utils/SecureLogger';
+import SecureLogger, { EventBusLogger, SecurityLogger } from './utils/SecureLogger';
 import SecureEventProcessor from './utils/SecureEventProcessor';
 import PayloadValidator from './utils/PayloadValidator';
 import WeakSubscriptionManager from './utils/WeakSubscriptionManager';
@@ -176,7 +176,8 @@ class EventBus implements IEventBus {
     // Initialize components
     this.eventStore = new EventStoreIndexedDB(this.config);
     this.deduplicationManager = new DeduplicationManager(this.config);
-    this.moduleRegistry = new ModuleRegistry(this.config);
+    this.moduleRegistry = new ModuleRegistry();
+    this.moduleRegistry.setEventBus(this as any);
     this.metricsCollector = new MetricsCollector();
     this.weakSubscriptionManager = new WeakSubscriptionManager();
     this.patternCache = PatternCache.getInstance({
@@ -754,6 +755,14 @@ class EventBus implements IEventBus {
   /**
    * Get comprehensive security metrics
    */
+  /**
+   * Get the current configuration of the EventBus.
+   * @returns {EventBusConfig} The current configuration object.
+   */
+  getConfig(): EventBusConfig {
+    return this.config;
+  }
+
   async getSecurityMetrics(): Promise<{
     rateLimiting: any;
     encryption: any;
@@ -1099,14 +1108,21 @@ class EventBus implements IEventBus {
         } as any);
       }
       
-      // Emit handler error event
-      await this.emit('global.eventbus.handler-error', {
+      // Create the error payload
+      const errorPayload = {
         subscriptionId: subscription.id,
         moduleId: subscription.moduleId,
         pattern: event.pattern,
         error: error.message,
-        processingTime
-      }, { persistent: false });
+        processingTime,
+        originalEvent: event
+      };
+
+      // Sanitize the entire payload before emitting
+      const sanitizedPayload = SecureLogger.sanitizeObject(errorPayload);
+
+      // Emit handler error event
+      await this.emit('global.eventbus.handler-error', sanitizedPayload, { persistent: false });
     }
   }
 

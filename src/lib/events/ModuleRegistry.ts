@@ -47,6 +47,7 @@ export class ModuleRegistry {
   private modules = new Map<ModuleId, RegisteredModule>();
   private dependencyGraph = new Map<ModuleId, DependencyNode>();
   private activationOrder: ModuleId[] = [];
+  private eventBusInstance: IEventBusV2;
   private config: EventBusConfig;
   private eventListeners = new Map<string, Function[]>();
   
@@ -54,8 +55,13 @@ export class ModuleRegistry {
   private globalHealthTimer?: number;
   private isShuttingDown = false;
   
-  constructor(config: EventBusConfig) {
-    this.config = config;
+  constructor() {
+    // Constructor is now empty
+  }
+
+  public setEventBus(eventBus: IEventBusV2): void {
+    this.eventBusInstance = eventBus;
+    this.config = eventBus.getConfig();
     this.startGlobalHealthMonitoring();
   }
 
@@ -515,7 +521,14 @@ export class ModuleRegistry {
     try {
       // Call module's onActivate hook if exists
       if (module.descriptor.onActivate) {
-        await module.descriptor.onActivate();
+        const context = {
+          emit: (pattern: any, payload: any, options: any = {}) => {
+            // Force the source to be the module's ID
+            const newOptions = { ...options, source: moduleId };
+            return this.eventBusInstance.emit(pattern, payload, newOptions);
+          }
+        };
+        await module.descriptor.onActivate(context);
       }
       
       // Register event subscriptions

@@ -92,7 +92,7 @@ export class SecureLogger {
     if (!this.shouldLog(level)) return;
 
     // Sanitize data before logging
-    const sanitizedData = data !== undefined ? this.sanitizeData(data) : undefined;
+    const sanitizedData = data !== undefined ? this.sanitizeObject(data) : undefined;
     
     // Create log entry
     const logEntry: LogEntry = {
@@ -133,7 +133,7 @@ export class SecureLogger {
   /**
    * Sanitize sensitive data from payloads
    */
-  private static sanitizeData(data: any, visited = new WeakSet()): any {
+  public static sanitizeObject(data: any, visited = new WeakSet()): any {
     if (data === null || data === undefined) return data;
 
     // Handle primitive types
@@ -173,7 +173,7 @@ export class SecureLogger {
 
       // Recursively sanitize nested objects
       if (typeof value === 'object' && value !== null) {
-        sanitized[key] = this.sanitizeData(value, visited);
+        sanitized[key] = this.sanitizeObject(value, visited);
       } else {
         sanitized[key] = this.sanitizeString(String(value));
       }
@@ -186,31 +186,19 @@ export class SecureLogger {
    * Check if a field name indicates sensitive data
    */
   private static isSensitiveField(fieldName: string): boolean {
-    const lowerKey = fieldName.toLowerCase();
+    const normalizedFieldName = fieldName.toLowerCase().replace(/_|-/g, '');
+
     return this.config.sensitiveFields.some(sensitiveField => {
-      const pattern = sensitiveField.toLowerCase();
+      const normalizedSensitiveField = sensitiveField.toLowerCase().replace(/_|-/g, '');
       
-      // Exact match
-      if (lowerKey === pattern) return true;
+      // For short sensitive fields (e.g., 'ssn', 'tin', 'cvv'), require an exact match
+      // to avoid redacting fields like 'assistanTINg' or 'proceSSNumber'.
+      if (normalizedSensitiveField.length <= 4) {
+        return normalizedFieldName === normalizedSensitiveField;
+      }
       
-      // Pattern with common suffixes/prefixes (case-insensitive word boundaries)
-      const commonVariations = [
-        pattern + 'number',
-        pattern + 'data', 
-        pattern + 'info',
-        pattern + 'field',
-        'user' + pattern,
-        'client' + pattern,
-        pattern + '_',
-        '_' + pattern
-      ];
-      
-      if (commonVariations.some(variation => lowerKey === variation)) return true;
-      
-      // Only match if pattern appears as a complete word (not as substring)
-      // Use word boundary regex to avoid partial matches like "ein" in "safeInput"
-      const wordBoundaryRegex = new RegExp(`\\b${pattern}\\b`, 'i');
-      return wordBoundaryRegex.test(lowerKey);
+      // For longer fields, an `includes` check is safer and handles camelCase well.
+      return normalizedFieldName.includes(normalizedSensitiveField);
     });
   }
 
@@ -239,8 +227,8 @@ export class SecureLogger {
 
     // Check for potential secrets (basic patterns)
     const secretPatterns = [
-      /sk_(test_|live_)?[a-zA-Z0-9]{20,}/, // Stripe secret keys (test/live)
-      /pk_(test_|live_)?[a-zA-Z0-9]{20,}/, // Stripe public keys (test/live)
+      /sk_(test_|live_)?[a-zA-Z0-9_]{20,}/, // Stripe secret keys (test/live)
+      /pk_(test_|live_)?[a-zA-Z0-9_]{20,}/, // Stripe public keys (test/live)
       /^[A-Za-z0-9+/]{40,}={0,2}$/, // Base64 encoded secrets
       /^[a-f0-9]{32,}$/i, // Hex encoded secrets
       /bearer\s+[a-zA-Z0-9._-]+/i, // Bearer tokens

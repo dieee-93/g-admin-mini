@@ -296,44 +296,70 @@ export class PatternCache {
 
   private performValidation(pattern: EventPattern): { isValid: boolean; result?: any } {
     try {
-      // Pattern validation logic
+      const MAX_PATTERN_LENGTH = 256;
+      const MAX_SEGMENT_LENGTH = 64;
+      // Segments must be lowercase alphanumeric with optional single underscores in between.
+      // Cannot start or end with an underscore.
+      const SEGMENT_REGEX = /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/;
+
+      if (typeof pattern !== 'string' || pattern.length === 0 || pattern.length > MAX_PATTERN_LENGTH) {
+        return { isValid: false };
+      }
+
+      if (pattern.includes('..') || pattern.startsWith('.') || pattern.endsWith('.')) {
+        return { isValid: false };
+      }
+
       const parts = pattern.split('.');
-      
+
       if (parts.length < 2) {
         return { isValid: false };
       }
-      
-      const [namespace, action] = parts;
-      const isGlobal = namespace === 'global';
-      const hasWildcard = pattern.includes('*');
-      
+
+      const [namespace, ...actionParts] = parts;
+      const action = actionParts.join('.');
+
       // Validate namespace
-      if (!isGlobal && !/^[a-z][a-z0-9_]*$/.test(namespace)) {
-        return { isValid: false };
+      const isGlobal = namespace === 'global';
+      if (!isGlobal) {
+        if (namespace.length > MAX_SEGMENT_LENGTH || !SEGMENT_REGEX.test(namespace)) {
+            return { isValid: false };
+        }
       }
       
-      // Validate action
+      // Validate action segments
+      if (actionParts.length === 0) {
+          return { isValid: false };
+      }
+      
+      // Disallow wildcard as a full action, e.g. `users.*`
       if (action === '*') {
-        // Wildcard action is valid
-      } else if (!/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$/.test(action)) {
-        return { isValid: false };
+           return { isValid: false };
       }
-      
+
+      for (const segment of actionParts) {
+          if (segment.length > MAX_SEGMENT_LENGTH || (segment !== '*' && !SEGMENT_REGEX.test(segment))) {
+              return { isValid: false };
+          }
+      }
+
+      const hasWildcard = pattern.includes('*');
+
       const result = {
-        namespace,
-        action,
-        isGlobal,
-        hasWildcard
+          namespace,
+          action,
+          isGlobal,
+          hasWildcard
       };
-      
+
       return { isValid: true, result };
-      
+
     } catch (error) {
       SecurityLogger.threat('Pattern validation error', {
         pattern,
-        error: error.message
+        error: (error as Error).message
       });
-      
+
       return { isValid: false };
     }
   }

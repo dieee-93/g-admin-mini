@@ -376,14 +376,50 @@ describe('EventBus Core Functionality', () => {
       unsubscribeError();
     });
 
-    it('should validate event patterns', async () => {
-      await expect(
-        eventBus.emit('' as EventPattern, {})
-      ).rejects.toThrow();
+    describe('Pattern Validation', () => {
+      const invalidPatterns: EventPattern[] = [
+        '',
+        ' ',
+        'invalid pattern with spaces',
+        'invalid..pattern',
+        '.invalid.pattern',
+        'invalid.pattern.',
+        'users.*',
+        'a',
+        'a_very_long_namespace_segment_that_is_definitely_over_the_sixty_four_character_limit.action',
+        'namespace.a_very_long_action_segment_that_is_definitely_over_the_sixty_four_character_limit',
+        'namespace.action_with_UPPERCASE',
+        'global.a_very_long_action_segment_that_is_definitely_over_the_sixty_four_character_limit_and_another_one_for_good_measure_and_then_some_more_to_make_sure_we_exceed_the_total_length_limit_of_256_characters_in_the_event_bus_pattern_validation_logic_so_that_we_can_test_it_properly',
+      ];
 
-      await expect(
-        eventBus.emit('invalid pattern with spaces' as EventPattern, {})
-      ).rejects.toThrow();
+      invalidPatterns.forEach(pattern => {
+        it(`should reject invalid pattern: "${pattern}"`, async () => {
+          await expect(
+            eventBus.emit(pattern, {})
+          ).rejects.toThrow();
+        });
+      });
+
+      const validPatterns: EventPattern[] = [
+        'test.basic',
+        'inventory.item_updated',
+        'global.system_shutdown',
+        'global.eventbus.handler-error',
+        'module.action.sub_action',
+        'module.action.with_numbers123',
+        'module.action_with_underscores',
+        'namespace.action-with-hyphens',
+        'a.b',
+        'namespace.action_with_wildcard.*'
+      ];
+
+      validPatterns.forEach(pattern => {
+        it(`should accept valid pattern: "${pattern}"`, async () => {
+          await expect(
+            eventBus.emit(pattern, {})
+          ).resolves.not.toThrow();
+        });
+      });
     });
 
     it('should handle large payloads', async () => {
