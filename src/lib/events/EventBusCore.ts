@@ -12,7 +12,7 @@ import WeakSubscriptionManager from './utils/WeakSubscriptionManager';
 import PatternCache from './utils/PatternCache';
 import SecureRandomGenerator from './utils/SecureRandomGenerator';
 import type {
-  IEventBus,
+  IEventBusV2,
   NamespacedEvent,
   EventPattern,
   EventHandler,
@@ -124,7 +124,7 @@ class MetricsCollector {
  * Core EventBus implementation - instantiable for factory pattern
  * No longer a singleton, designed for multiple isolated instances
  */
-export class EventBus implements IEventBus {
+export class EventBus implements IEventBusV2 {
   // Core components (instance-specific)
   private eventStore: EventStoreIndexedDB;
   private deduplicationManager: DeduplicationManager;
@@ -169,10 +169,8 @@ export class EventBus implements IEventBus {
       storagePrefix: `${this.config.storagePrefix || 'dedup'}_${this.instanceId}`
     });
     
-    this.moduleRegistry = new ModuleRegistry({
-      ...this.config,
-      storagePrefix: `${this.config.storagePrefix || 'modules'}_${this.instanceId}`
-    });
+    this.moduleRegistry = new ModuleRegistry();
+    this.moduleRegistry.setEventBus(this);
     
     this.metricsCollector = new MetricsCollector();
     this.weakSubscriptionManager = new WeakSubscriptionManager();

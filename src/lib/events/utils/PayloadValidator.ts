@@ -11,6 +11,7 @@ interface ValidationConfig {
   maxStringLength: number;
   maxObjectDepth: number;
   maxArrayLength: number;
+  maxPayloadSize: number; // New property
   allowedProtocols: string[];
   blockedPatterns: RegExp[];
 }
@@ -148,6 +149,7 @@ const DEFAULT_CONFIG: ValidationConfig = {
   maxStringLength: 10000, // 10KB per string
   maxObjectDepth: 10,
   maxArrayLength: 1000,
+  maxPayloadSize: 1024 * 1024, // 1MB default
   allowedProtocols: ['http:', 'https:', 'mailto:', 'tel:'],
   blockedPatterns: [...XSS_PATTERNS, ...SQL_INJECTION_PATTERNS]
 };
@@ -175,6 +177,43 @@ export class PayloadValidator {
   ): ValidationResult {
     const startTime = performance.now();
     const originalSize = this.calculatePayloadSize(event.payload);
+
+    if (originalSize > this.config.maxPayloadSize) {
+      return {
+        isValid: false,
+        sanitizedPayload: { error: `Payload size (${originalSize} bytes) exceeds limit of ${this.config.maxPayloadSize} bytes.` },
+        violations: [{
+          type: 'size_limit',
+          field: 'payload',
+          originalValue: `[PAYLOAD_SIZE: ${originalSize}]`,
+          sanitizedValue: '[BLOCKED]',
+          severity: 'critical',
+          description: `Payload size exceeds limit of ${this.config.maxPayloadSize} bytes`
+        }],
+        blocked: true,
+        originalSize,
+        sanitizedSize: 0
+      };
+    }
+
+    // Direct check for __proto__ to bypass potential JS engine quirks
+    if (JSON.stringify(event.payload).includes('"__proto__":')) {
+      return {
+        isValid: false,
+        sanitizedPayload: { error: 'Payload blocked due to prototype pollution attempt.' },
+        violations: [{
+          type: 'xss',
+          field: 'payload',
+          originalValue: '[PROHIBITED_KEY: __proto__]',
+          sanitizedValue: '[BLOCKED]',
+          severity: 'critical',
+          description: 'Prototype pollution attempt detected with key: __proto__'
+        }],
+        blocked: true,
+        originalSize,
+        sanitizedSize: 0
+      };
+    }
     
     try {
       const violations: ValidationViolation[] = [];
@@ -188,6 +227,11 @@ export class PayloadValidator {
         '',
         0
       );
+
+      if (sanitizedPayload && sanitizedPayload.__proto_pollution_detected__) {
+        blocked = true;
+        sanitizedPayload = { error: 'Payload blocked due to prototype pollution attempt.' };
+      }
 
       // Check for critical violations that should block the event
       const criticalViolations = violations.filter(v => v.severity === 'critical');
@@ -466,11 +510,32 @@ export class PayloadValidator {
     }
 
     if (typeof obj === 'object') {
+      const PROHIBITED_KEYS = ['__proto__', 'constructor', 'prototype'];
       const sanitized: any = {};
-      for (const [key, value] of Object.entries(obj)) {
-        const sanitizedKey = this.sanitizeString(key, `${path}.key`, violations);
-        const fieldPath = path ? `${path}.${sanitizedKey}` : sanitizedKey;
-        sanitized[sanitizedKey] = this.validateObjectRecursive(value, violations, fieldPath, depth + 1);
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          if (PROHIBITED_KEYS.includes(key)) {
+            violations.push({
+              type: 'xss',
+              field: path,
+              originalValue: `[PROHIBITED_KEY: ${key}]`,
+              sanitizedValue: '[BLOCKED]',
+              severity: 'critical',
+              description: `Prototype pollution attempt detected with key: ${key}`
+            });
+            return { __proto_pollution_detected__: true };
+          }
+
+          const value = obj[key];
+          const sanitizedKey = this.sanitizeString(key, `${path}.key`, violations);
+          const fieldPath = path ? `${path}.${sanitizedKey}` : sanitizedKey;
+          const result = this.validateObjectRecursive(value, violations, fieldPath, depth + 1);
+
+          if (result && result.__proto_pollution_detected__) {
+            return { __proto_pollution_detected__: true };
+          }
+          sanitized[sanitizedKey] = result;
+        }
       }
       return sanitized;
     }

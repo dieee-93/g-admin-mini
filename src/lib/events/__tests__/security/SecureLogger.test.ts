@@ -87,6 +87,55 @@ describe('SecureLogger Security Tests', () => {
       expect(loggedData.user.session.jwt).toBe('[REDACTED]');
       expect(loggedData.user.session.preferences.theme).toBe('dark');
     });
+
+    describe('CamelCase and Other Naming Conventions', () => {
+      it('should redact camelCase and PascalCase sensitive fields', () => {
+        const sensitiveData = {
+          userPassword: 'password123',
+          AuthToken: 'token-abc',
+          sessionID: 'session-xyz'
+        };
+
+        SecureLogger.info('EventBus', 'CamelCase Test', sensitiveData);
+
+        const history = SecureLogger.getHistory(1);
+        const loggedData = history[0].data;
+
+        expect(loggedData.userPassword).toBe('[REDACTED]');
+        expect(loggedData.AuthToken).toBe('[REDACTED]');
+        expect(loggedData.sessionID).toBe('[REDACTED]');
+      });
+
+      it('should redact snake_case sensitive fields', () => {
+        const sensitiveData = {
+          api_key: 'api-key-123',
+          refresh_token: 'refresh-token-abc',
+        };
+
+        SecureLogger.info('EventBus', 'snake_case Test', sensitiveData);
+
+        const history = SecureLogger.getHistory(1);
+        const loggedData = history[0].data;
+
+        expect(loggedData.api_key).toBe('[REDACTED]');
+        expect(loggedData.refresh_token).toBe('[REDACTED]');
+      });
+
+      it('should not redact partial matches in non-sensitive fields', () => {
+        const nonSensitiveData = {
+          document: 'This is a document about something.',
+          training: 'Training session for new employees.'
+        };
+
+        SecureLogger.info('EventBus', 'Partial Match Test', nonSensitiveData);
+
+        const history = SecureLogger.getHistory(1);
+        const loggedData = history[0].data;
+
+        expect(loggedData.document).not.toBe('[REDACTED]');
+        expect(loggedData.training).not.toBe('[REDACTED]');
+      });
+    });
   });
 
   describe('XSS Pattern Detection', () => {
