@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useProductsStore } from '@/store/productsStore';
 import { useMaterialsStore } from '@/store/materialsStore';
-import { useCostCalculations } from './useCostCalculations';
+// import { useCostCalculations } from './useCostCalculations'; // Hook not found after refactor
 
 /**
  * Hook that connects CostAnalysisTab with REAL data from MaterialsStore and ProductsStore
@@ -56,10 +56,10 @@ export interface RealCostAnalysisResult {
   max_possible_batches: number;
 }
 
-export function useRealCostAnalysis() {
+export function useCostAnalysis() {
   const { getProductById, getProductsWithRecipes } = useProductsStore();
   const { items: materialItems } = useMaterialsStore();
-  const { calculateCosts } = useCostCalculations();
+  // const { calculateCosts } = useCostCalculations(); // Hook not found after refactor
 
   /**
    * Get available products that have recipes (can calculate real costs)

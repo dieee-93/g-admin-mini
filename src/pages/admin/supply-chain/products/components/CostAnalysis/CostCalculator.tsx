@@ -2,18 +2,16 @@
 // Calculadora de costos como componente independiente
 
 import React, { useState } from 'react';
+import { Box, Separator, Text } from '@chakra-ui/react'; // Import Box directly from Chakra
 import {
-  Box,
   CardWrapper,
   VStack,
   HStack,
-  Text,
   Button,
   Badge,
   Grid,
-  Input,
-  NumberInput,
-  Separator
+  InputField,
+  NumberField,
 } from '@/shared/ui';
 import {
   CurrencyDollarIcon,
@@ -171,7 +169,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
             {/* Product Info */}
             <Box>
               <Text fontSize="sm" fontWeight="medium" mb={2}>Product Name</Text>
-              <Input
+              <InputField
                 value={currentCalculation.product_name || ''}
                 onChange={(e) => setCurrentCalculation(prev => ({ ...prev, product_name: e.target.value }))}
                 placeholder="Enter product name"
@@ -180,13 +178,12 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
 
             <Box>
               <Text fontSize="sm" fontWeight="medium" mb={2}>Batch Size (units)</Text>
-              <NumberInput.Root
-                value={currentCalculation.batch_size?.toString()}
-                onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, batch_size: parseInt(details.value) }))}
+              <NumberField
+                value={currentCalculation.batch_size}
+                onChange={(value) => setCurrentCalculation(prev => ({ ...prev, batch_size: value }))}
                 min={1}
-              >
-                <NumberInput.Input />
-              </NumberInput.Root>
+                placeholder="Enter batch size"
+              />
             </Box>
 
             <Separator />
@@ -196,14 +193,13 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
             
             <Box>
               <Text fontSize="sm" fontWeight="medium" mb={2}>Total Materials Cost ($)</Text>
-              <NumberInput.Root
-                value={currentCalculation.materials_cost?.toString()}
-                onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, materials_cost: parseFloat(details.value) }))}
+              <NumberField
+                value={currentCalculation.materials_cost}
+                onChange={(value) => setCurrentCalculation(prev => ({ ...prev, materials_cost: value }))}
                 min={0}
                 precision={2}
-              >
-                <NumberInput.Input />
-              </NumberInput.Root>
+                placeholder="Enter materials cost"
+              />
             </Box>
 
             <Separator />

@@ -32,15 +32,15 @@ import {
 import { Icon } from '@/shared/ui/Icon';
 
 // Business Logic
-import { MenuEngineeringMatrix } from '../analytics/MenuEngineeringMatrix';
-import { useMenuEngineering } from '../logic/useMenuEngineering';
+// import { MenuEngineeringMatrix } from '../analytics/MenuEngineeringMatrix'; // File not found after refactor
+import { useMenuEngineering } from '../../hooks/useMenuEngineering';
 import type { 
   MenuEngineeringData, 
   StrategyRecommendation,
   MenuCategory 
-} from '../types/menuEngineering';
+} from '../../types';
 
-export function MenuEngineeringOnly() {
+export function MenuEngineeringMatrix() {
   // States
   const [activeTab, setActiveTab] = useState('matrix');
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory | null>(null);

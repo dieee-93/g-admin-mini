@@ -14,10 +14,12 @@ import { CogIcon, PlusIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 // Import components
 import { useNavigation } from '@/contexts/NavigationContext';
-import { ProductListOnly } from './components/ProductListOnly';
-import { ProductFormModal } from './components/ProductFormModal';
-import { MenuEngineeringOnly } from './components/MenuEngineeringOnly';
-import { CostAnalysisModule } from './components/CostAnalysisModule';
+import {
+  ProductList,
+  ProductFormModal,
+  MenuEngineeringMatrix,
+  CostAnalysisTab
+} from './components';
 
 export function ProductsPage() {
   const { setQuickActions } = useNavigation();
@@ -131,7 +133,7 @@ export function ProductsPage() {
                 <Heading size="md">Product Management</Heading>
               </CardWrapper .Header>
               <CardWrapper .Body>
-                <ProductListOnly />
+                <ProductList />
               </CardWrapper .Body>
             </CardWrapper .Root>
 
@@ -140,7 +142,7 @@ export function ProductsPage() {
                 <Heading size="md">Menu Engineering</Heading>
               </CardWrapper .Header>
               <CardWrapper .Body>
-                <MenuEngineeringOnly />
+                <MenuEngineeringMatrix />
               </CardWrapper .Body>
             </CardWrapper .Root>
 
@@ -149,7 +151,7 @@ export function ProductsPage() {
                 <Heading size="md">Cost Analysis</Heading>
               </CardWrapper .Header>
               <CardWrapper .Body>
-                <CostAnalysisModule />
+                <CostAnalysisTab />
               </CardWrapper .Body>
             </CardWrapper .Root>
           </Grid>

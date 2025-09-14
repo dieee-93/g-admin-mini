@@ -14,7 +14,7 @@ import {
   type TrendAnalysis,
   type MatrixConfiguration,
   type StrategyRecommendation
-} from '@/pages/admin/supply-chain/products/types/menuEngineering';
+} from '@/pages/admin/supply-chain/products/types';
 
 // Default configuration for matrix calculations
 export const DEFAULT_MATRIX_CONFIG: MatrixConfiguration = {

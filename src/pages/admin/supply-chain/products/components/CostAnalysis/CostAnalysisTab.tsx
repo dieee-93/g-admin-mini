@@ -36,8 +36,8 @@ import {
 import { notify } from '@/lib/notifications';
 
 // Import REAL data connections - NO MORE MOCK DATA
-import { useRealCostAnalysis, type RealCostAnalysisResult, type RealCostCalculationInput } from '../hooks/useRealCostAnalysis';
-import { useCostCalculations } from '../hooks/useCostCalculations';
+import { useCostAnalysis, type RealCostAnalysisResult, type RealCostCalculationInput } from '../../hooks/useCostAnalysis';
+// import { useCostCalculations } from '../hooks/useCostCalculations'; // Commented out - hook not found
 
 export function CostAnalysisTab() {
   // REAL data hooks - connected to MaterialsStore and ProductsStore
@@ -45,8 +45,8 @@ export function CostAnalysisTab() {
     availableProducts, 
     performRealCostAnalysis, 
     validateMaterialsAvailability 
-  } = useRealCostAnalysis();
-  const { generatePricingScenarios } = useCostCalculations();
+  } = useCostAnalysis();
+  // const { generatePricingScenarios } = useCostCalculations(); // Commented out - hook not found
 
   // State for real calculations
   const [calculations, setCalculations] = useState<RealCostAnalysisResult[]>([]);
