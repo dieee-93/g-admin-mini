@@ -3,8 +3,8 @@
 // ============================================================================
 // Sistema inteligente de alertas basado en patrones ABC y machine learning
 
-import { type MaterialItem } from '@/pages/admin/materials/types';
-import { type MaterialABC, type ABCClass } from '@/pages/admin/materials/types/abc-analysis';
+import { type MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+import { type MaterialABC, type ABCClass } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 

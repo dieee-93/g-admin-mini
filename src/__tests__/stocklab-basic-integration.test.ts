@@ -10,7 +10,7 @@ import { ProcurementRecommendationsEngine } from '@/business-logic/inventory/pro
 import { DemandForecastingEngine } from '@/business-logic/inventory/demandForecastingEngine';
 import { SupplierAnalysisEngine } from '@/business-logic/inventory/supplierAnalysisEngine';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import type { MaterialItem } from '@/pages/admin/materials/types';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 
 describe('🔧 STOCKLAB BASIC INTEGRATION', () => {
   

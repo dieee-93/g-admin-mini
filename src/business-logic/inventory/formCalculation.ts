@@ -1,4 +1,4 @@
-import { type ItemFormData, type MeasurableUnit, type PackagingInfo } from '@/pages/admin/materials/types';
+import { type ItemFormData, type MeasurableUnit, type PackagingInfo } from '@/pages/admin/supply-chain/materials/types';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 
 /**

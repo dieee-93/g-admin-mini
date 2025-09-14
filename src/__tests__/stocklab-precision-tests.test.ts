@@ -10,8 +10,8 @@ import { ProcurementRecommendationsEngine } from '@/business-logic/inventory/pro
 import { DemandForecastingEngine } from '@/business-logic/inventory/demandForecastingEngine';
 import { SupplierAnalysisEngine } from '@/business-logic/inventory/supplierAnalysisEngine';
 import { InventoryDecimal, FinancialDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
-import type { MaterialItem } from '@/pages/admin/materials/types';
-import type { MaterialABC } from '@/pages/admin/materials/types/abc-analysis';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 
 // ============================================================================
 // FASE 1.A: MATHEMATICAL PRECISION TESTS

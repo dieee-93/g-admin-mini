@@ -28,16 +28,16 @@ export const CODE_SPLITTING_CONFIG = {
 export const lazyComponents = {
   // Materials module - Updated paths for route-based architecture v4.0
   OfflineMaterialsPage: createLazyRoute(
-    () => import('@/pages/admin/materials/components/LazyOfflineMaterialsPage'),
+    () => import('@/pages/admin/supply-chain/materials/components/LazyOfflineMaterialsPage'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.MATERIALS
   ),
   
   CrossModuleAnalytics: createLazyRoute(
-    () => import('@/pages/admin/dashboard/components/business/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
+    () => import('@/pages/admin/core/dashboard/components/business/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
   ),
   ExecutiveDashboard: createLazyRoute(
-    () => import('@/pages/admin/dashboard/components/business/ExecutiveDashboard/LazyExecutiveDashboard'),
+    () => import('@/pages/admin/core/dashboard/components/business/ExecutiveDashboard/LazyExecutiveDashboard'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.EXECUTIVE
   ),
   RecipeForm: createLazyRoute(
@@ -47,23 +47,23 @@ export const lazyComponents = {
 
   // Sub-components
   MaterialsHeader: createLazyFeature(
-    () => import('@/pages/admin/materials/components/MaterialsHeader'),
+    () => import('@/pages/admin/supply-chain/materials/components/MaterialsHeader'),
     'MaterialsHeader'
   ),
   MaterialsGrid: createLazyFeature(
-    () => import('@/pages/admin/materials/components/MaterialsGrid'),
+    () => import('@/pages/admin/supply-chain/materials/components/MaterialsGrid'),
     'MaterialsGrid'
   ),
   CorrelationsView: createLazyFeature(
-    () => import('@/pages/admin/dashboard/components/business/CrossModuleAnalytics/components/CorrelationsView'),
+    () => import('@/pages/admin/core/dashboard/components/business/CrossModuleAnalytics/components/CorrelationsView'),
     'CorrelationsView'
   ),
   BottlenecksView: createLazyFeature(
-    () => import('@/pages/admin/dashboard/components/business/CrossModuleAnalytics/components/BottlenecksView'),
+    () => import('@/pages/admin/core/dashboard/components/business/CrossModuleAnalytics/components/BottlenecksView'),
     'BottlenecksView'
   ),
   ExecutiveKPIGrid: createLazyFeature(
-    () => import('@/pages/admin/dashboard/components/business/ExecutiveDashboard/components/ExecutiveKPIGrid'),
+    () => import('@/pages/admin/core/dashboard/components/business/ExecutiveDashboard/components/ExecutiveKPIGrid'),
     'ExecutiveKPIGrid'
   ),
   RecipeBasicForm: createLazyFeature(

@@ -5,7 +5,6 @@
 
 import { supabase } from '@/lib/supabase/client';
 import { EventBus } from '@/lib/events';
-import { EventBus } from '@/lib/events';
 import { errorHandler, createBusinessError } from '@/lib/error-handling';
 import { 
   calculateShiftHours, 

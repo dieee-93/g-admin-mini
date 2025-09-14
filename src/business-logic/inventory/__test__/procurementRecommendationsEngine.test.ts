@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ProcurementRecommendationsEngine } from '../procurementRecommendationsEngine';
-import { type MaterialABC, type ABCClass } from '@/pages/admin/materials/types/abc-analysis';
+import { type MaterialABC, type ABCClass } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import { type ProcurementEngineConfig, type ProcurementAnalysisResult, type RecommendationType } from '../procurementRecommendationsEngine';
 import { type SmartAlert } from '../smartAlertsEngine';
 

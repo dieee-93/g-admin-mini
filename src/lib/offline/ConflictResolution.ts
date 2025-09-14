@@ -2,7 +2,6 @@
 // Handles complex data conflicts with intelligent resolution strategies
 
 import { EventBus } from '@/lib/events';
-import { EventBus } from '@/lib/events';
 import localStorage from './LocalStorage';
 
 // Conflict types and resolution strategies

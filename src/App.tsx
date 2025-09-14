@@ -28,15 +28,15 @@ import {
 // 📱 SISTEMA OFFLINE-FIRST
 import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
 
-// Dashboard Module - Critical, not lazy loaded  
-import { Dashboard } from '@/pages/admin/dashboard/page';
-import { 
+// Dashboard Module - Critical, not lazy loaded
+import { Dashboard } from '@/pages/admin/core/dashboard/page';
+import {
   ExecutiveDashboard,
   CrossModuleAnalytics,
   CustomReporting,
   CompetitiveIntelligence,
   PredictiveAnalytics as PredictiveAnalyticsComponent
-} from '@/pages/admin/dashboard/components';
+} from '@/pages/admin/core/dashboard/components';
 
 // Setup Wizard - Direct import to avoid lazy loading issues temporarily
 import { SetupWizard } from '@/pages/setup/SetupWizard';
@@ -58,16 +58,16 @@ import {
 } from '@/lib/lazy';
 
 // Materials sub-modules
-import { default as ABCAnalysisView } from '@/pages/admin/materials/abc-analysis';
+import { default as ABCAnalysisView } from '@/pages/admin/supply-chain/materials/abc-analysis';
 // LazySupplyChainPage and LazyProcurementPage now imported from central LazyModules
 
 // Settings sub-modules
-import { 
+import {
   DiagnosticsView,
   ReportingView,
   EnterpriseView,
   IntegrationsView
-} from '@/pages/admin/settings';
+} from '@/pages/admin/core/settings';
 
 // Customer modules - Experiencia específica para usuarios CLIENTE
 import { 

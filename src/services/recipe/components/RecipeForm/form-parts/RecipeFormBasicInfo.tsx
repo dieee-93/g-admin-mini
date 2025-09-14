@@ -6,7 +6,7 @@ import {
   Select,
 } from '@chakra-ui/react';
 import type { ChangeEvent } from 'react';
-import type { InventoryItem } from '@/pages/admin/materials/types';
+import type { InventoryItem } from '@/pages/admin/supply-chain/materials/types';
 
 interface RecipeFormBasicInfoProps {
   form: {

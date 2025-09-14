@@ -1,1 +1,0 @@
-export { SupplierFields } from './SupplierFields';

@@ -1,4 +1,4 @@
-import type { InventoryItem } from '@/pages/admin/materials/types';
+import type { InventoryItem } from '@/pages/admin/supply-chain/materials/types';
 
 // AI Suggestions Interfaces
 export interface IngredientSubstitution {

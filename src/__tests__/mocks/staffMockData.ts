@@ -4,7 +4,7 @@
  */
 
 import type { Employee, Schedule, TimeEntry } from '@/store/staffStore';
-import type { Shift, ShiftTemplate } from '@/pages/admin/scheduling/types';
+import type { Shift, ShiftTemplate } from '@/pages/admin/resources/scheduling/types';
 
 // Mock Staff Data
 export const mockStaffData: Employee[] = [

@@ -4,7 +4,7 @@
 // Algoritmo avanzado de clasificación ABC para gestión inteligente de inventario
 // Utiliza decimal.js para precisión matemática en análisis financiero
 
-import { type MaterialItem } from '@/pages/admin/materials/types';
+import { type MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 import { 
   type ABCAnalysisConfig, 
   type ABCAnalysisResult, 
@@ -17,7 +17,7 @@ import {
   DEFAULT_CONTROL_STRATEGIES,
   getClassColor,
   getClassImportance
-} from '@/pages/admin/materials/types/abc-analysis';
+} from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 

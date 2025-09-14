@@ -1,4 +1,4 @@
-import { type MaterialItem, isMeasurable, isCountable, isElaborated } from '@/pages/admin/materials/types';
+import { type MaterialItem, isMeasurable, isCountable, isElaborated } from '@/pages/admin/supply-chain/materials/types';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 

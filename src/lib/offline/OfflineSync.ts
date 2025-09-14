@@ -2,7 +2,6 @@
 // Handles conflict resolution, data merging, and optimistic updates
 
 import { EventBus } from '@/lib/events';
-import { EventBus } from '@/lib/events';
 
 // IndexedDB utilities for persistent queue storage
 class OfflineSyncDB {

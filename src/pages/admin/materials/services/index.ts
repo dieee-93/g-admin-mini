@@ -1,1 +1,0 @@
-export { MaterialsNormalizer } from './materialsNormalizer';

@@ -14,7 +14,7 @@ import {
   isMeasurable,
   isCountable,
   isElaborated
-} from '../pages/admin/materials/types';
+} from '@/pages/admin/supply-chain/materials/types';
 
 // Import centralized utilities
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation'; 
@@ -144,7 +144,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             set({ loading: true, error: null });
 
             // Import normalizer for type mapping
-            const { MaterialsNormalizer } = await import('../pages/admin/materials/services/materialsNormalizer');
+            const { MaterialsNormalizer } = await import('@/pages/admin/supply-chain/materials/services/materialsNormalizer');
 
             // Map TypeScript type to API type
             const apiType = MaterialsNormalizer.mapItemTypeToApiType(itemData.type, itemData.category);
@@ -182,12 +182,12 @@ export const useMaterialsStore = create<MaterialsState>()(
             };
 
             // Add to database using inventoryApi
-            const { inventoryApi } = await import('../pages/admin/materials/services/inventoryApi');
+            const { inventoryApi } = await import('@/pages/admin/supply-chain/materials/services/inventoryApi');
             const createdItem = await inventoryApi.createItem(apiItem);
 
             // Handle supplier and stock entry creation if supplier data provided
             if (itemData.supplier && (itemData.initial_stock || 0) > 0) {
-              const { suppliersApi } = await import('../pages/admin/materials/services/suppliersApi');
+              const { suppliersApi } = await import('@/pages/admin/supply-chain/materials/services/suppliersApi');
               
               let supplierId: string | undefined = itemData.supplier.supplier_id;
               
@@ -259,7 +259,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             const stockDifference = (actualNewStock !== undefined && actualNewStock !== null) ? actualNewStock - oldStock : 0;
 
             const { supabase } = await import('@/lib/supabase/client');
-            const { inventoryApi } = await import('../pages/admin/materials/services/inventoryApi');
+            const { inventoryApi } = await import('@/pages/admin/supply-chain/materials/services/inventoryApi');
 
             if (Object.keys(otherUpdates).length > 0) {
               await inventoryApi.updateItem(id, otherUpdates);

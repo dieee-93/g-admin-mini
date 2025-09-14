@@ -6,7 +6,7 @@ export { default as EventBus, EventBus as EventBusClass } from './EventBus';
 
 // Factory Pattern for multiple instances
 export { default as EventBusFactory } from './EventBusFactory';
-export { EventBusCore } from './EventBusCore';
+export { default as EventBusCore } from './EventBusCore';
 
 // Core components (for advanced usage)
 export { EventStoreIndexedDB } from './EventStore';

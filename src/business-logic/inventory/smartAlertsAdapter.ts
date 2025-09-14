@@ -4,7 +4,7 @@
 // Adaptador para integrar Smart Alerts Engine con el sistema de alertas unificado
 
 import { SmartAlertsEngine, type SmartAlert } from './smartAlertsEngine';
-import { type MaterialABC } from '@/pages/admin/materials/types/abc-analysis';
+import { type MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import type { 
   CreateAlertInput, 
   Alert, 

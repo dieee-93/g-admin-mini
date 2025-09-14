@@ -8,7 +8,7 @@ import {
   Input,
   Select,
 } from '@chakra-ui/react';
-import type { InventoryItem } from '@/pages/admin/materials/types';
+import type { InventoryItem } from '@/pages/admin/supply-chain/materials/types';
 
 interface RecipeIngredientForm {
   item_id: string;

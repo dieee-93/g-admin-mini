@@ -16,9 +16,9 @@ export const LazySetupWizard = createLazyComponent(
   }
 );
 
-// Lazy-loaded Sales Page (pages/admin/sales/page.tsx)
+// Lazy-loaded Sales Page (pages/admin/operations/sales/page.tsx)
 export const LazySalesPage = createLazyComponent(
-  () => import('../../pages/admin/sales/page'),
+  () => import('../../pages/admin/operations/sales/page'),
   'sales',
   {
     chunkName: 'sales-module',
@@ -28,9 +28,9 @@ export const LazySalesPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Operations Page (pages/admin/operations/page.tsx)
+// Lazy-loaded Operations Page (pages/admin/operations/hub/page.tsx)
 export const LazyOperationsPage = createLazyComponent(
-  () => import('../../pages/admin/operations/page'),
+  () => import('../../pages/admin/operations/hub/page'),
   'operations',
   {
     chunkName: 'operations-module',
@@ -40,9 +40,9 @@ export const LazyOperationsPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Materials Page (pages/admin/materials/page.tsx)
+// Lazy-loaded Materials Page (pages/admin/supply-chain/materials/page.tsx)
 export const LazyMaterialsPage = createLazyComponent(
-  () => import('../../pages/admin/materials/page'),
+  () => import('../../pages/admin/supply-chain/materials/page'),
   'materials',
   {
     chunkName: 'materials-module', 
@@ -55,9 +55,9 @@ export const LazyMaterialsPage = createLazyComponent(
 // Legacy alias - use LazyMaterialsPage instead
 export const LazyStockLab = LazyMaterialsPage;
 
-// Lazy-loaded Staff Page (pages/admin/staff/page.tsx)
+// Lazy-loaded Staff Page (pages/admin/resources/staff/page.tsx)
 export const LazyStaffPage = createLazyComponent(
-  () => import('../../pages/admin/staff/page'),
+  () => import('../../pages/admin/resources/staff/page'),
   'staff',
   {
     chunkName: 'staff-module',
@@ -67,9 +67,9 @@ export const LazyStaffPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Customers Page (pages/admin/customers/page.tsx)
+// Lazy-loaded Customers Page (pages/admin/core/crm/page.tsx)
 export const LazyCustomersPage = createLazyComponent(
-  () => import('../../pages/admin/customers/page'),
+  () => import('../../pages/admin/core/crm/page'),
   'customers',
   {
     chunkName: 'customers-module',
@@ -79,9 +79,9 @@ export const LazyCustomersPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Scheduling Page (pages/admin/scheduling/page.tsx)
+// Lazy-loaded Scheduling Page (pages/admin/resources/scheduling/page.tsx)
 export const LazySchedulingPage = createLazyComponent(
-  () => import('../../pages/admin/scheduling/page'),
+  () => import('../../pages/admin/resources/scheduling/page'),
   'scheduling',
   {
     chunkName: 'scheduling-module',
@@ -94,9 +94,9 @@ export const LazySchedulingPage = createLazyComponent(
 // NOTE: Recipes functionality migrated to services/recipe and dashboard
 // LazyRecipesPage removed - use RecipeForm from services/recipe instead
 
-// Lazy-loaded Fiscal Page (pages/admin/fiscal/page.tsx)
+// Lazy-loaded Fiscal Page (pages/admin/finance/fiscal/page.tsx)
 export const LazyFiscalPage = createLazyComponent(
-  () => import('../../pages/admin/fiscal/page'),
+  () => import('../../pages/admin/finance/fiscal/page'),
   'fiscal',
   {
     chunkName: 'fiscal-module',
@@ -106,9 +106,9 @@ export const LazyFiscalPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Products Page (pages/admin/products/page.tsx)
+// Lazy-loaded Products Page (pages/admin/supply-chain/products/page.tsx)
 export const LazyProductsPage = createLazyComponent(
-  () => import('../../pages/admin/products/page'),
+  () => import('../../pages/admin/supply-chain/products/page'),
   'products',
   {
     chunkName: 'products-module',
@@ -118,9 +118,9 @@ export const LazyProductsPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Settings Page (pages/admin/settings/page.tsx)
+// Lazy-loaded Settings Page (pages/admin/core/settings/page.tsx)
 export const LazySettingsPage = createLazyComponent(
-  () => import('../../pages/admin/settings/page'),
+  () => import('../../pages/admin/core/settings/page'),
   'settings',
   {
     chunkName: 'settings-module',
@@ -141,9 +141,9 @@ export const LazyThemeTestPage = createLazyComponent(
   }
 );
 
-// Materials Sub-Pages (pages/admin/materials/*)
+// Materials Sub-Pages (pages/admin/supply-chain/materials/*)
 export const LazySupplyChainPage = createLazyComponent(
-  () => import('../../pages/admin/materials/supply-chain'),
+  () => import('../../pages/admin/supply-chain/materials/supply-chain'),
   'supply-chain',
   {
     chunkName: 'supply-chain-module',
@@ -154,7 +154,7 @@ export const LazySupplyChainPage = createLazyComponent(
 );
 
 export const LazyProcurementPage = createLazyComponent(
-  () => import('../../pages/admin/materials/procurement'),
+  () => import('../../pages/admin/supply-chain/materials/procurement'),
   'procurement',
   {
     chunkName: 'procurement-module',

@@ -10,8 +10,8 @@ import { SmartAlertsAdapter } from '@/business-logic/inventory/smartAlertsAdapte
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
 import { ABCAnalysisEngine } from '@/business-logic/inventory/abcAnalysisEngine';
-import type { MaterialABC } from '@/pages/admin/materials/types/abc-analysis';
-import type { MaterialItem } from '@/pages/admin/materials/types';
+import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 
 // ============================================================================
 // FASE 0.1: ALERTS SYSTEM INTEGRATION AUDIT TESTS

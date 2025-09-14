@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { StockCalculation } from '../stockCalculation';
-import { type MaterialItem, type CountableItem } from '@/pages/admin/materials/types';
+import { type MaterialItem, type CountableItem } from '@/pages/admin/supply-chain/materials/types';
 
 /**
  * ⚡ COMPREHENSIVE TEST SUITE: Stock Calculation Engine

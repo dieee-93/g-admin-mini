@@ -3,8 +3,8 @@
 // ============================================================================
 // Sistema inteligente de análisis y rating de proveedores integrado con procurement
 
-import { type Supplier, type MaterialItem } from '@/pages/admin/materials/types';
-import { type MaterialABC } from '@/pages/admin/materials/types/abc-analysis';
+import { type Supplier, type MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+import { type MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import { type ProcurementRecommendation } from './procurementRecommendationsEngine';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';

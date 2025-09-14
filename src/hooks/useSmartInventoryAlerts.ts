@@ -9,7 +9,7 @@ import { useStockAlerts } from '@/shared/alerts/hooks/useAlerts';
 import { useAlertsContext } from '@/shared/alerts/AlertsProvider';
 import { ABCAnalysisEngine } from '@/business-logic/inventory/abcAnalysisEngine';
 import { SmartAlertsAdapter } from '@/business-logic/inventory/smartAlertsAdapter';
-import type { MaterialABC } from '@/pages/admin/materials/types/abc-analysis';
+import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import type { Alert } from '@/shared/alerts/types';
 
 interface UseSmartInventoryAlertsOptions {

@@ -9,8 +9,8 @@ import { ProcurementRecommendationsEngine } from '@/business-logic/inventory/pro
 import { DemandForecastingEngine } from '@/business-logic/inventory/demandForecastingEngine';
 import { SmartAlertsEngine } from '@/business-logic/inventory/smartAlertsEngine';
 import { SupplierAnalysisEngine } from '@/business-logic/inventory/supplierAnalysisEngine';
-import type { MaterialItem } from '@/pages/admin/materials/types';
-import type { MaterialABC } from '@/pages/admin/materials/types/abc-analysis';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 
 // ============================================================================
 // REAL-WORLD TEST DATA SETS

@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { renderWithProviders, clearMockData, performanceTracker } from '../utils/testUtils';
 
 // Import components to test
-import StaffPage from '@/pages/admin/staff/page';
+import StaffPage from '@/pages/admin/resources/staff/page';
 import { staffApi } from '@/services/staff/staffApi';
 
 // Mock the staff API

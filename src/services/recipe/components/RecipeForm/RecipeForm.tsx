@@ -37,9 +37,9 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRecipes } from '@/shared/components'; 
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { inventoryApi } from '@/pages/admin/materials/services/inventoryApi';
+import { inventoryApi } from '@/pages/admin/supply-chain/materials/services/inventoryApi';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
-import { type InventoryItem } from '@/pages/admin/materials/types';
+import { type InventoryItem } from '@/pages/admin/supply-chain/materials/types';
 import { type CreateRecipeData } from '@/shared/components'; 
 import { RecipeFormBasicInfo } from './form-parts/RecipeFormBasicInfo';
 import { RecipeFormAISuggestions } from './form-parts/RecipeFormAISuggestions';

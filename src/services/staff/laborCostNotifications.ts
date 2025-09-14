@@ -5,7 +5,6 @@
 
 import { realTimeLaborCosts, type CostAlert } from './realTimeLaborCosts';
 import { EventBus } from '@/lib/events';
-import { EventBus } from '@/lib/events';
 
 interface NotificationConfig {
   overtimeWarningEnabled: boolean;

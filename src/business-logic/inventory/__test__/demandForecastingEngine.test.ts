@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { DemandForecastingEngine } from '../demandForecastingEngine';
-import { type MaterialABC } from '@/pages/admin/materials/types/abc-analysis';
+import { type MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import { 
   type ForecastingConfig, 
   type DemandDataPoint, 

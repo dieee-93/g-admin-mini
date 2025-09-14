@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ABCAnalysisEngine } from '../abcAnalysisEngine';
-import { type MaterialItem } from '@/pages/admin/materials/types';
-import { type ABCAnalysisConfig, type ABCAnalysisResult } from '@/pages/admin/materials/types/abc-analysis';
+import { type MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+import { type ABCAnalysisConfig, type ABCAnalysisResult } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 
 /**
  * ⚡ COMPREHENSIVE TEST SUITE: ABC Analysis Engine

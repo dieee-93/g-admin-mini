@@ -42,6 +42,7 @@ export {
 export { InputField } from './InputField';
 export { NumberField } from './NumberField';
 export { SelectField, createListCollection } from './SelectField';
+export { TextareaField, Textarea } from './TextareaField';
 
 // Base Components
 export { Button } from './Button';

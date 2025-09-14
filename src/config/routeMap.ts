@@ -26,36 +26,36 @@ export const domainRouteMap = {
   'dashboard': '/admin/dashboard'
 } as const;
 
-// Route-to-File mapping automático con types  
+// Route-to-File mapping automático con types
 export const routeToFileMap = {
   // Admin main pages
-  '/admin/sales': 'pages/admin/sales/page',
-  '/admin/operations': 'pages/admin/operations/page',
-  '/admin/customers': 'pages/admin/customers/page',
-  '/admin/materials': 'pages/admin/materials/page',
-  '/admin/products': 'pages/admin/products/page',
-  '/admin/fiscal': 'pages/admin/fiscal/page',
-  '/admin/staff': 'pages/admin/staff/page',
-  '/admin/scheduling': 'pages/admin/scheduling/page',
-  '/admin/settings': 'pages/admin/settings/page',
-  '/admin/dashboard': 'pages/admin/dashboard/page',
+  '/admin/sales': 'pages/admin/operations/sales/page',
+  '/admin/operations': 'pages/admin/operations/hub/page',
+  '/admin/customers': 'pages/admin/core/crm/page',
+  '/admin/materials': 'pages/admin/supply-chain/materials/page',
+  '/admin/products': 'pages/admin/supply-chain/products/page',
+  '/admin/fiscal': 'pages/admin/finance/fiscal/page',
+  '/admin/staff': 'pages/admin/resources/staff/page',
+  '/admin/scheduling': 'pages/admin/resources/scheduling/page',
+  '/admin/settings': 'pages/admin/core/settings/page',
+  '/admin/dashboard': 'pages/admin/core/dashboard/page',
 
   // Materials sub-views
-  '/admin/materials/abc-analysis': 'pages/admin/materials/abc-analysis',
-  '/admin/materials/supply-chain': 'pages/admin/materials/supply-chain',
-  '/admin/materials/procurement': 'pages/admin/materials/procurement',
+  '/admin/materials/abc-analysis': 'pages/admin/supply-chain/materials/abc-analysis',
+  '/admin/materials/supply-chain': 'pages/admin/supply-chain/materials/supply-chain',
+  '/admin/materials/procurement': 'pages/admin/supply-chain/materials/procurement',
 
   // Settings sub-views
-  '/admin/settings/integrations': 'pages/admin/settings/integrations',
-  '/admin/settings/diagnostics': 'pages/admin/settings/diagnostics', 
-  '/admin/settings/reporting': 'pages/admin/settings/reporting',
-  '/admin/settings/enterprise': 'pages/admin/settings/enterprise',
+  '/admin/settings/integrations': 'pages/admin/core/settings/integrations',
+  '/admin/settings/diagnostics': 'pages/admin/core/settings/diagnostics',
+  '/admin/settings/reporting': 'pages/admin/core/settings/reporting',
+  '/admin/settings/enterprise': 'pages/admin/core/settings/enterprise',
   
   // Operations sub-views
-  '/admin/operations/tables': 'pages/admin/operations/tables',
+  '/admin/operations/tables': 'pages/admin/operations/hub/tables',
 
   // Dashboard sub-views
-  '/admin/dashboard/predictive': 'pages/admin/dashboard/predictive',
+  '/admin/dashboard/predictive': 'pages/admin/core/dashboard/predictive',
 
   // Customer App routes
   '/app/portal': 'pages/app/portal',

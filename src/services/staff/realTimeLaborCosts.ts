@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
-import type { Shift } from '@/pages/admin/scheduling/types';
+import type { Shift } from '@/pages/admin/resources/scheduling/types';
 import type { Employee, TimeEntry } from '@/store/staffStore';
 import { calculateLaborCosts, getLaborCostSummary } from './staffApi';
 
