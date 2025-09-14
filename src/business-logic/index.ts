@@ -31,11 +31,7 @@ export * from './staff/staffPerformanceAnalyticsEngine';
 // Recipe calculations (NEW)
 export * from './recipes/recipeCostCalculationEngine';
 
-// Product cost analysis (NEW)
-export * from './products/productCostAnalysisService';
-
-// Menu engineering (NEW)
-export * from './menuengineering/menuEngineeringCalculations';
+// Product cost analysis and menu engineering moved to products/services/
 
 // Scheduling calculations (NEW)
 export * from './scheduling/schedulingCalculations';
@@ -51,8 +47,7 @@ export * from './operations/capacityManagement';
 // Financial planning (NEW)
 export * from './financial/financialPlanningEngine';
 
-// Product materials cost engine (NEW)
-export * from './products/productMaterialsCostEngine';
+// Product materials cost engine moved to products/services/
 
 // Real-time labor cost engine (NEW)
 export * from './staff/realTimeLaborCostEngine';

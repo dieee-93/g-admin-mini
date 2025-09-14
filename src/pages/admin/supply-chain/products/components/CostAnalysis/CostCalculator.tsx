@@ -157,14 +157,14 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
   return (
     <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap={6}>
       {/* Input Form */}
-      <CardWrapper .Root>
-        <CardWrapper .Header>
+      <CardWrapper>
+        <CardWrapper.Header>
           <HStack>
             <CalculatorIcon className="w-5 h-5 text-blue-600" />
             <Text fontSize="lg" fontWeight="semibold">Cost Calculation Input</Text>
           </HStack>
-        </CardWrapper .Header>
-        <CardWrapper .Body>
+        </CardWrapperHeader>
+        <CardWrapper.Body>
           <VStack gap={4} align="stretch">
             {/* Product Info */}
             <Box>
@@ -286,13 +286,13 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
               Calculate Costs
             </Button>
           </VStack>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
 
       {/* Latest Calculation Results */}
       {calculations.length > 0 && (
-        <CardWrapper .Root>
-          <CardWrapper .Header>
+        <CardWrapper>
+          <CardWrapper.Header>
             <HStack justify="space-between">
               <HStack>
                 <CurrencyDollarIcon className="w-5 h-5 text-green-600" />
@@ -302,8 +302,8 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
                 {calculations[0].product_name}
               </Badge>
             </HStack>
-          </CardWrapper .Header>
-          <CardWrapper .Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <VStack gap={4} align="stretch">
               {/* Cost Summary */}
               <Grid templateColumns="repeat(2, 1fr)" gap={4}>
@@ -354,8 +354,8 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
                 Export Report
               </Button>
             </VStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       )}
     </Grid>
   );
