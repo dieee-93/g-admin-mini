@@ -1,7 +1,15 @@
-// Export all refactored components
-export { MaterialsHeader } from './MaterialsHeader';
-export { MaterialsFilters } from './MaterialsFilters';
-export { MaterialsGrid } from './MaterialsGrid';
-export { MaterialFormModalComplete } from './MaterialFormModalComplete';
-export { LazyMaterialFormModal } from './LazyMaterialFormModal';
-export { LazyABCAnalysisPage, LazyABCAnalysisSection } from './LazyAnalytics';
+// Materials Components - Feature-based exports
+export * from './MaterialsList';
+export * from './Overview';
+export * from './Alerts';
+export * from './SmartAlerts';
+export * from './OfflineMode';
+export * from './MaterialsView';
+export * from './Analytics';
+export * from './MaterialManagement';
+export * from './Procurement';
+
+// Standalone legacy components (to be cleaned up)
+export { default as LazyAnalytics } from './LazyAnalytics';
+export { default as LazyMaterialFormModal } from './LazyMaterialFormModal';
+export { default as LazyOfflineMaterialsPage } from './LazyOfflineMaterialsPage';

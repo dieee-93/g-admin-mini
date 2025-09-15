@@ -28,12 +28,20 @@ src/pages/admin/finance/fiscal/
 │
 ├── components/                 # 🧩 Componentes UI específicos del módulo
 │   ├── index.ts               # 📦 Barrel exports
-│   ├── sections/              # 📋 Secciones especializadas
-│   │   ├── InvoiceGeneration/ # 🧾 Generación de facturas
-│   │   ├── AFIPIntegration/   # 🏛️ Integración AFIP
-│   │   ├── TaxCompliance/     # ✅ Cumplimiento fiscal
-│   │   └── FinancialReporting/ # 📊 Reportes financieros
-│   └── OfflineFiscalView/     # 📱 Vista offline especializada
+│   ├── AFIPIntegration/       # 🏛️ Integración AFIP
+│   │   ├── AFIPIntegration.tsx
+│   │   └── index.ts
+│   ├── FinancialReporting/    # 📊 Reportes financieros
+│   │   ├── FinancialReporting.tsx
+│   │   └── index.ts
+│   ├── InvoiceGeneration/     # 🧾 Generación de facturas
+│   │   ├── InvoiceGeneration.tsx
+│   │   └── index.ts
+│   ├── TaxCompliance/         # ✅ Cumplimiento fiscal
+│   │   ├── TaxCompliance.tsx
+│   │   └── index.ts
+│   ├── OfflineFiscalView.tsx  # 📱 Vista offline especializada
+│   └── TaxSummary.tsx         # 📋 Resumen de impuestos
 │
 ├── hooks/                     # 🪝 Hooks de negocio y página
 │   ├── index.ts              # 📦 Barrel exports
@@ -47,7 +55,10 @@ src/pages/admin/finance/fiscal/
 │   ├── taxCalculationService.ts # 🧮 Cálculos de impuestos (migrado de business-logic)
 │   └── financialPlanningEngine.ts # 📊 Motor de planificación financiera (migrado de business-logic)
 │
-├── types.ts                  # 🏷️ Definiciones TypeScript (existente)
+├── types/                    # 🏷️ Definiciones TypeScript
+│   ├── index.ts             # 📦 Barrel exports
+│   └── fiscalTypes.ts       # 💰 Tipos de facturación e impuestos
+│
 └── __tests__/               # 🧪 Tests del módulo
     ├── page.test.tsx        # Tests del componente principal
     ├── hooks/              # Tests de hooks

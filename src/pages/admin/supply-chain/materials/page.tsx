@@ -12,12 +12,14 @@ import {
   ClipboardDocumentListIcon
 } from '@heroicons/react/24/outline';
 
-// Import components - to be implemented
-// import { MaterialsList } from './components';
-// import { ABCAnalysisPanel } from './components';
-// import { ProcurementPanel } from './components';
-// import { SupplyChainPanel } from './components';
-// import { MaterialFormModal } from './components';
+// Import components
+import {
+  MaterialsList,
+  Overview,
+  AlertsTab,
+  SmartAlertsTab,
+  MaterialsView
+} from './components';
 
 // Page orchestration hook
 import { useMaterialsPage } from './hooks';
@@ -114,19 +116,14 @@ function MaterialsPage() {
         </CardGrid>
       </StatsSection>
 
-      {/* Inventory Management Section */}
-      <Section variant="elevated" title="Inventory Management">
-        {/* MaterialsList component will go here */}
-        <div>
-          <p>Items in inventory: {metrics.totalItems}</p>
-          <p>Materials management system running correctly.</p>
-          {loading && (
-            <Alert status="info" title="Loading data">
-              Loading inventory information...
-            </Alert>
-          )}
-        </div>
-      </Section>
+      {/* Overview Section */}
+      <Overview
+        onAddItem={actions.handleNewMaterial}
+        onShowAnalytics={actions.handleABCAnalysis}
+      />
+
+      {/* Materials List Section */}
+      <MaterialsList />
 
       {/* Conditional ABC Analysis Section */}
       {pageState.showABCAnalysis && (

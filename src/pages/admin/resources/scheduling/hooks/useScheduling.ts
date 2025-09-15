@@ -2,13 +2,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { calculateShiftHours } from '@/business-logic/scheduling/schedulingCalculations';
-import type { 
-  Shift, 
-  Schedule, 
-  TimeOffRequest, 
-  ShiftTemplate, 
+import type {
+  Shift,
+  Schedule,
+  TimeOffRequest,
+  ShiftTemplate,
   ShiftFormData,
-  ShiftStatus 
+  ShiftStatus
 } from '../types';
 
 interface SchedulingState {

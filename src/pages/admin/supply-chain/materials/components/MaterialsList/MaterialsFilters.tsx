@@ -1,5 +1,5 @@
 import { 
-  Section, Stack, InputField, Button, SelectField 
+  Section, Stack, Input, Button, SelectField 
 } from '@/shared/ui';
 import { 
   MagnifyingGlassIcon,
@@ -54,7 +54,7 @@ export const MaterialsFilters = () => {
         {/* Search and Reset */}
         <Stack direction="row" gap="md">
           <div style={{ flex: 1, position: 'relative' }}>
-            <InputField
+            <Input
               placeholder="Buscar materiales..."
               value={filters.search}
               onChange={(e) => setFilters({ search: e.target.value })}

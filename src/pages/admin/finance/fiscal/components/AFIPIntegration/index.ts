@@ -1,0 +1,1 @@
+export { default as AFIPIntegration } from './AFIPIntegration';

@@ -1,18 +1,18 @@
-// OperationsPage.tsx - Redesigned with Design System Patterns
-// Following same conventions as CostAnalysisTab.tsx and MenuEngineeringOnly.tsx
+// OperationsPage.tsx - Pure Orchestrator Pattern
+// Following G-Admin Mini architecture standards
 
-import React, { useEffect } from 'react';
+import React from 'react';
 
-// SOLO Design System Components - SIGUIENDO LAS REGLAS
+// Design System Components
 import {
   // Layout & Structure
   Stack,
   VStack,
   HStack,
-  
+
   // Typography
   Typography,
-  
+
   // Components
   CardWrapper,
   Tabs,
@@ -22,123 +22,63 @@ import {
   TabPanel
 } from '@/shared/ui';
 
-// Icons
-import { 
-  ClockIcon, 
-  ChartBarIcon, 
-  CogIcon,
-  CalendarIcon
-} from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui';
 
 // Hooks
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useHubPage } from './hooks';
 
 // Components
-import { OperationsHeader } from './components/OperationsHeader';
-import { PlanningSection } from './components/sections/PlanningSection';
-import { KitchenSection } from './components/sections/KitchenSection';
-import { TablesSection } from './components/sections/TablesSection';
-import { MonitoringSection } from './components/sections/MonitoringSection';
+import { OperationsHeader, Planning, Kitchen, Tables, Monitoring } from './components';
 
 export default function OperationsPage() {
-  const { setQuickActions } = useNavigation();
-
-  useEffect(() => {
-    setQuickActions([
-      {
-        id: 'new-recipe',
-        label: 'Nueva Receta',
-        icon: CogIcon,
-        action: () => console.log('New recipe'),
-        color: 'orange'
-      }
-    ]);
-  }, [setQuickActions]);
+  // All logic delegated to the orchestrator hook
+  const {
+    overviewCards,
+    tabs
+  } = useHubPage();
 
   return (
       <Stack gap="lg" align="stretch">
         <OperationsHeader />
 
-        {/* Operations Overview CardWrappers - Design System Pattern */}
+        {/* Operations Overview CardWrappers - Using hook data */}
         <Stack direction={{ base: 'column', lg: 'row' }} gap="md">
-          <CardWrapper variant="elevated" padding="md" width="full">
-            <CardWrapper.Body>
-              <VStack align="start" gap="xs">
-                <HStack gap="sm">
-                  <Icon icon={CalendarIcon} size="lg" color="blue.600" />
-                  <Typography variant="title">Planificación</Typography>
-                </HStack>
-                <Typography variant="body" color="text.muted">
-                  Gestión de horarios y recursos
-                </Typography>
-              </VStack>
-            </CardWrapper.Body>
-          </CardWrapper>
-
-          <CardWrapper variant="elevated" padding="md" width="full">
-            <CardWrapper.Body>
-              <VStack align="start" gap="xs">
-                <HStack gap="sm">
-                  <Icon icon={CogIcon} size="lg" color="green.600" />
-                  <Typography variant="title">Cocina</Typography>
-                </HStack>
-                <Typography variant="body" color="text.muted">
-                  Estado y órdenes activas
-                </Typography>
-              </VStack>
-            </CardWrapper.Body>
-          </CardWrapper>
-
-          <CardWrapper variant="elevated" padding="md" width="full">
-            <CardWrapper.Body>
-              <VStack align="start" gap="xs">
-                <HStack gap="sm">
-                  <Icon icon={ChartBarIcon} size="lg" color="purple.600" />
-                  <Typography variant="title">Mesas</Typography>
-                </HStack>
-                <Typography variant="body" color="text.muted">
-                  Ocupación y reservas
-                </Typography>
-              </VStack>
-            </CardWrapper.Body>
-          </CardWrapper>
-
-          <CardWrapper variant="elevated" padding="md" width="full">
-            <CardWrapper.Body>
-              <VStack align="start" gap="xs">
-                <HStack gap="sm">
-                  <Icon icon={ClockIcon} size="lg" color="orange.600" />
-                  <Typography variant="title">Monitoreo</Typography>
-                </HStack>
-                <Typography variant="body" color="text.muted">
-                  Métricas en tiempo real
-                </Typography>
-              </VStack>
-            </CardWrapper.Body>
-          </CardWrapper>
+          {overviewCards.map((card) => (
+            <CardWrapper key={card.id} variant="elevated" padding="md" width="full">
+              <CardWrapper.Body>
+                <VStack align="start" gap="xs">
+                  <HStack gap="sm">
+                    <Icon icon={card.icon} size="lg" color={card.color} />
+                    <Typography variant="title">{card.title}</Typography>
+                  </HStack>
+                  <Typography variant="body" color="text.muted">
+                    {card.description}
+                  </Typography>
+                </VStack>
+              </CardWrapper.Body>
+            </CardWrapper>
+          ))}
         </Stack>
 
         {/* Tabbed Layout for Sections */}
         <Tabs>
           <TabList>
-            <Tab>Planificación</Tab>
-            <Tab>Cocina</Tab>
-            <Tab>Mesas</Tab>
-            <Tab>Monitoreo</Tab>
+            {tabs.map((tab) => (
+              <Tab key={tab.id}>{tab.label}</Tab>
+            ))}
           </TabList>
           <TabPanels>
             <TabPanel>
-              <PlanningSection />
+              <Planning />
             </TabPanel>
             <TabPanel>
-              <KitchenSection />
+              <Kitchen />
             </TabPanel>
             <TabPanel>
-              <TablesSection />
+              <Tables />
             </TabPanel>
             <TabPanel>
-              <MonitoringSection />
+              <Monitoring />
             </TabPanel>
           </TabPanels>
         </Tabs>

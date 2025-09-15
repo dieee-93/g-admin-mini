@@ -1,0 +1,1 @@
+export { WeeklyScheduleView } from './WeeklyScheduleView';

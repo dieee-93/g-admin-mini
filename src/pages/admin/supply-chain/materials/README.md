@@ -27,11 +27,33 @@ src/pages/admin/supply-chain/materials/
 ├── components/                 # 🧩 Componentes UI específicos del módulo
 │   ├── index.ts               # 📦 Barrel exports
 │   ├── MaterialsList/         # 📋 Lista de materiales con filtros
-│   ├── MaterialFormModal/     # ➕ Modal para crear/editar materiales
-│   ├── ABCAnalysisPanel/      # 📊 Panel de análisis ABC
-│   ├── ProcurementPanel/      # 💰 Panel de recomendaciones de compra
-│   ├── SupplyChainPanel/      # 🚚 Panel de análisis de cadena de suministro
-│   ├── StockAlertsWidget/     # ⚠️ Widget de alertas de stock
+│   │   ├── MaterialsList.tsx       # 🎯 Componente principal
+│   │   ├── MaterialsFilters.tsx    # 🔧 Sub-componente de filtros
+│   │   ├── MaterialsInventoryGrid.tsx # 🔧 Sub-componente de grilla
+│   │   └── index.ts               # 📦 Solo exporta MaterialsList
+│   ├── Overview/              # 📊 Vista general y métricas
+│   │   ├── Overview.tsx           # 🎯 Componente principal
+│   │   ├── MaterialsHeader.tsx    # 🔧 Sub-componente de header
+│   │   ├── StockLabHeader.tsx     # 🔧 Sub-componente de lab
+│   │   └── index.ts               # 📦 Solo exporta Overview
+│   ├── Alerts/                # ⚠️ Alertas de stock
+│   │   ├── AlertsTab.tsx          # 🎯 Componente principal
+│   │   └── index.ts               # 📦 Solo exporta AlertsTab
+│   ├── SmartAlerts/           # 🤖 Alertas inteligentes
+│   │   ├── SmartAlertsTab.tsx     # 🎯 Componente principal
+│   │   └── index.ts               # 📦 Solo exporta SmartAlertsTab
+│   ├── OfflineMode/           # 📱 Modo offline
+│   │   ├── OfflineMode.tsx        # 🎯 Componente principal
+│   │   ├── OfflineMaterialsPage.tsx # 🔧 Sub-componente de página
+│   │   ├── OfflineMaterialsPageHeader.tsx # 🔧 Sub-componente de header
+│   │   ├── OfflineMaterialsStats.tsx # 🔧 Sub-componente de stats
+│   │   └── index.ts               # 📦 Solo exporta OfflineMode
+│   ├── MaterialsView/         # 🎭 Coordinador principal
+│   │   ├── MaterialsView.tsx      # 🎯 Wrapper inteligente online/offline
+│   │   └── index.ts               # 📦 Solo exporta MaterialsView
+│   ├── Analytics/             # 📊 Ya organizado correctamente
+│   ├── MaterialManagement/    # 📝 Ya organizado correctamente
+│   ├── Procurement/           # 💰 Ya organizado correctamente
 │   └── [otros componentes]/   # 🔧 Componentes adicionales
 │
 ├── hooks/                     # 🪝 Hooks de negocio y página
@@ -67,6 +89,32 @@ src/pages/admin/supply-chain/materials/
     ├── index.ts            # 📦 Barrel exports
     └── [utilidades]/       # 🔧 Helper functions
 ```
+
+---
+
+## 🔧 Convención para Sub-componentes
+
+Los componentes que son **partes internas** de otros deben organizarse así:
+
+```
+ComponentePrincipal/
+├── ComponentePrincipal.tsx    # 🎯 Componente principal exportable
+├── SubComponente1.tsx         # 🔧 Sub-componente interno
+├── SubComponente2.tsx         # 🔧 Sub-componente interno
+└── index.ts                   # 📦 Solo exporta el principal
+```
+
+### Reglas para Sub-componentes:
+1. **✅ Solo el componente principal se exporta** - los sub-componentes son implementación interna
+2. **✅ Sub-componentes viven en la misma carpeta** que el componente principal
+3. **✅ Imports relativos** - los sub-componentes se importan con `./`
+4. **❌ No exportar sub-componentes** en el `index.ts` del feature
+5. **✅ Nomenclatura clara** - prefijo que indique relación con el principal
+
+### Ejemplos de Agrupación:
+- **MaterialsList** agrupa: `MaterialsFilters`, `MaterialsInventoryGrid`
+- **Overview** agrupa: `MaterialsHeader`, `StockLabHeader`
+- **OfflineMode** agrupa: `OfflineMaterialsPage`, `OfflineMaterialsPageHeader`, `OfflineMaterialsStats`
 
 ---
 

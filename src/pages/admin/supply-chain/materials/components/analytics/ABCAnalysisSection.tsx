@@ -28,7 +28,7 @@ import {
 import { CardWrapper, ContentLayout, PageHeader, Section } from '@/shared/ui';
 
 // Business Logic Imports
-import { ABCAnalysisEngine } from '@/business-logic/inventory/abcAnalysisEngine';
+import { ABCAnalysisEngine } from '../../services/abcAnalysisEngine';
 import { useMaterials } from '@/hooks/useMaterials';
 import type { 
   ABCCategory, 
