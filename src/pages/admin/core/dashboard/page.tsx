@@ -21,8 +21,7 @@ import {
   BoltIcon
 } from '@heroicons/react/24/outline';
 
-import { MilestoneTracker } from './components/MilestoneTracker';
-import { EvolutionRoutesWidget } from './components/EvolutionRoutesWidget';
+import { MilestoneTracker, EvolutionRoutesWidget } from './components/widgets';
 
 export function Dashboard() {
   const {

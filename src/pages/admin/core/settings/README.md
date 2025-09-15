@@ -48,6 +48,12 @@ src/pages/admin/core/settings/
 │   ├── system.ts            # ⚙️ Tipos de configuración del sistema
 │   └── permissions.ts       # 👥 Tipos de roles y permisos
 │
+├── pages/                   # 📄 Sub-páginas especializadas
+│   ├── diagnostics/         # 🔍 Diagnósticos del sistema
+│   ├── enterprise/          # 🏢 Funcionalidades empresariales
+│   ├── integrations/        # 🔗 Integraciones con servicios externos
+│   └── reporting/           # 📊 Configuración de reportes
+│
 └── utils/                   # 🛠️ Utilidades específicas del módulo
     ├── index.ts            # 📦 Barrel exports
     └── [utilidades]/       # 🔧 Helper functions
