@@ -87,7 +87,7 @@ describe('Advanced EventBus Security Tests', () => {
 
       const result = PayloadValidator.validateAndSanitize(event as any);
 
-      expect(result.blocked).toBe(false); // The event is not blocked, but truncated
+      expect(result.blocked).toBe(true);
       expect(result.violations.some(v => v.type === 'depth_limit')).toBe(true);
     });
   });

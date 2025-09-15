@@ -149,7 +149,7 @@ export class SecureLogger {
 
     // Handle arrays
     if (Array.isArray(data)) {
-      return data.map(item => this.sanitizeData(item, visited));
+      return data.map(item => this.sanitizeObject(item, visited));
     }
 
     // Handle objects
