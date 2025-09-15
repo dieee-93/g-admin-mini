@@ -21,7 +21,7 @@ import {
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import { useState, useEffect, useMemo } from 'react';
-import { CustomerSegment, ChurnRisk, LoyaltyTier, type CustomerProfile } from '../types';
+import { CustomerSegment, ChurnRisk, LoyaltyTier, type CustomerProfile } from '../../types';
 import { useCustomers } from '../hooks/useCustomers'; 
 import { useCustomerRFM, useCustomerAnalytics, useCustomerSegmentation } from '../hooks/useCustomerRFM';
 

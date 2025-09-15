@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EntitySchemas, type SchemaType } from '@/lib/validation/zod/CommonSchemas';
 import { useCustomers } from '../hooks/useCustomers'; 
-import { type CreateCustomerData, type Customer } from '../types';
+import { type CreateCustomerData, type Customer } from '../../types';
 import { notify } from '@/lib/notifications';
 
 // Type inference from Zod schema - eliminates manual interface

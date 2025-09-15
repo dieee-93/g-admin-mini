@@ -11,7 +11,7 @@ import {
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { useState, useMemo } from 'react';
 import { useCustomers } from '../hooks/useCustomers';
-import type { CustomerWithStats } from '../types';
+import type { CustomerWithStats } from '../../types';
 
 interface CustomerSegment {
   id: string;

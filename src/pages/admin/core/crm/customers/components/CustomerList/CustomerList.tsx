@@ -13,7 +13,7 @@ import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations
 import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
 import { useState } from 'react';
 import { useCustomers, useCustomerSearch } from '../hooks/useCustomers';
-import { type Customer } from '../types';
+import { type Customer } from '../../types';
 import { CustomerForm } from './CustomerForm';
 import { notify } from '@/lib/notifications';
 

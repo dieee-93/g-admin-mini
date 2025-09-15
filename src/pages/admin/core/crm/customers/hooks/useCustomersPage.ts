@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { CustomerAnalyticsEngine, CustomerRFMAnalytics } from '../services';
-import type { Customer, Sale, SaleItem, CustomerAnalyticsResult, CustomerRFMProfile } from '../services';
+import type { Customer, Sale, SaleItem, CustomerAnalyticsResult, CustomerRFMProfile } from '../types';
 
 export type CustomerPageSection = 'management' | 'analytics' | 'orders' | 'loyalty';
 

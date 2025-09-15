@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CustomerAnalytics } from './CustomerAnalytics'
-import { CustomerSegment, ChurnRisk, LoyaltyTier } from '../types'
+import { CustomerSegment, ChurnRisk, LoyaltyTier } from '../../types'
 
 import { Provider } from '@/shared/ui/provider'
 import { useThemeStore } from '@/store/themeStore'
