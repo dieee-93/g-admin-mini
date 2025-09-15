@@ -247,7 +247,9 @@ export class PatternCache {
     }
     
     this.clear();
-    PatternCache.instance = null;
+    if (PatternCache.instance === this) {
+      PatternCache.instance = null;
+    }
     
     SecurityLogger.anomaly('PatternCache destroyed');
   }
@@ -296,6 +298,18 @@ export class PatternCache {
 
   private performValidation(pattern: EventPattern): { isValid: boolean; result?: any } {
     try {
+      // Allow global wildcard patterns that are essential for security validation
+      if (pattern === '*' || pattern === '**') {
+        return {
+          isValid: true,
+          result: {
+            namespace: pattern,
+            action: '',
+            isGlobal: true,
+            hasWildcard: true,
+          },
+        };
+      }
       const MAX_PATTERN_LENGTH = 256;
       const MAX_SEGMENT_LENGTH = 64;
       // Segments must be lowercase alphanumeric with optional single underscores in between.
@@ -311,10 +325,6 @@ export class PatternCache {
       }
 
       const parts = pattern.split('.');
-
-      if (parts.length < 2) {
-        return { isValid: false };
-      }
 
       const [namespace, ...actionParts] = parts;
       const action = actionParts.join('.');
@@ -332,11 +342,6 @@ export class PatternCache {
           return { isValid: false };
       }
       
-      // Disallow wildcard as a full action, e.g. `users.*`
-      if (action === '*') {
-           return { isValid: false };
-      }
-
       for (const segment of actionParts) {
           if (segment.length > MAX_SEGMENT_LENGTH || (segment !== '*' && !SEGMENT_REGEX.test(segment))) {
               return { isValid: false };

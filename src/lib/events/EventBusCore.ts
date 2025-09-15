@@ -303,11 +303,11 @@ export class EventBus implements IEventBusV2 {
     // Validate pattern
     this.validateEventPattern(pattern);
 
-    // Create event with instance-specific ID
-    const event: NamespacedEvent = {
+    // 1. Create event object with the RAW payload
+    let event: NamespacedEvent = {
       id: options.eventId || this.generateEventId(),
       pattern,
-      payload: await PayloadValidator.validateAndSanitize(payload),
+      payload: payload, // Use raw payload for now
       timestamp: new Date(),
       priority: options.priority || EventPriority.NORMAL,
       metadata: {
@@ -326,6 +326,30 @@ export class EventBus implements IEventBusV2 {
         }
       }
     };
+
+    // 2. Validate the complete event object
+    const validationResult = PayloadValidator.validateAndSanitize(event);
+
+    // 3. Check if blocked and throw an error if so
+    if (validationResult.blocked) {
+      SecurityLogger.threat('Event blocked by PayloadValidator', {
+        eventId: event.id,
+        pattern: event.pattern,
+        violations: validationResult.violations,
+      });
+      // Throw an error to stop processing
+      throw new EventBusError(
+        `Event [${event.id}] on pattern [${event.pattern}] blocked due to security violations.`,
+        EventBusErrorCode.VALIDATION_ERROR,
+        {
+          eventId: event.id,
+          violations: validationResult.violations.map(v => v.type),
+        }
+      );
+    }
+
+    // 4. Update the event with the sanitized payload
+    event.payload = validationResult.sanitizedPayload;
 
     // Process deduplication
     if (event.metadata.deduplication?.enabled) {
