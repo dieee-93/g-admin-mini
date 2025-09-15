@@ -1,5 +1,6 @@
-// src/features/settings/types.ts
-// Tipos para configuraciones del negocio
+// Business profile and company information types
+import type { TaxSettings, CurrencySettings } from './tax';
+import type { NotificationSettings } from './system';
 
 export interface BusinessSettings {
   id: string;
@@ -49,34 +50,4 @@ export interface OperatingHours {
   open_time?: string;
   close_time?: string;
   is_24_hours?: boolean;
-}
-
-export interface TaxSettings {
-  tax_rate: number;
-  tax_name: string;
-  include_tax_in_prices: boolean;
-  tax_number?: string;
-}
-
-export interface CurrencySettings {
-  code: string; // 'USD', 'EUR', etc.
-  symbol: string;
-  decimal_places: number;
-  position: 'before' | 'after';
-}
-
-export interface NotificationSettings {
-  email_notifications: boolean;
-  sms_notifications: boolean;
-  low_stock_alerts: boolean;
-  order_notifications: boolean;
-  employee_notifications: boolean;
-}
-
-export interface SystemSettings {
-  theme: 'light' | 'dark' | 'auto';
-  language: string;
-  timezone: string;
-  date_format: string;
-  time_format: '12h' | '24h';
 }

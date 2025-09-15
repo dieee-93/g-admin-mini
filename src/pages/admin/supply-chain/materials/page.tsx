@@ -1,120 +1,41 @@
-import { useEffect } from 'react';
-import { 
+import {
   ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
-  Button, Alert, Badge 
+  Button, Alert
 } from '@/shared/ui';
-import { 
-  CubeIcon, 
-  ExclamationTriangleIcon, 
-  CurrencyDollarIcon, 
-  BuildingStorefrontIcon 
+import {
+  CubeIcon,
+  ExclamationTriangleIcon,
+  CurrencyDollarIcon,
+  BuildingStorefrontIcon,
+  PlusIcon,
+  ChartBarIcon,
+  ClipboardDocumentListIcon
 } from '@heroicons/react/24/outline';
 
-// Module components - Temporariamente comentados para evitar errores de compilación
-// import { MaterialsHeader } from './components/MaterialsHeader';
-// import { MaterialsFilters } from './components/MaterialsFilters';
-// import { MaterialsGrid } from './components/MaterialsGrid';
-// import { LazyMaterialFormModal } from './components/LazyMaterialFormModal';
+// Import components - to be implemented
+// import { MaterialsList } from './components';
+// import { ABCAnalysisPanel } from './components';
+// import { ProcurementPanel } from './components';
+// import { SupplyChainPanel } from './components';
+// import { MaterialFormModal } from './components';
 
-// Hooks
-import { 
-  useMaterials
-} from '@/store/materialsStore';
-import { useApp } from '@/hooks/useZustandStores';
-import { useNavigation } from '@/contexts/NavigationContext';
-
-// API
-import { inventoryApi } from './services/inventoryApi';
-import { MaterialsNormalizer } from './services';
-
-// Types
-import type { MaterialItem } from './types';
-
-// Debug - temporal
-import { debugSuppliers } from '@/debug-suppliers';
+// Page orchestration hook
+import { useMaterialsPage } from './hooks';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 function MaterialsPage() {
-  const navigation = useNavigation();
-  const { handleError } = useApp();
-  
-  // 🎯 Use main hook to avoid infinite loop issues
-  const { 
-    getFilteredItems, 
-    loading, 
-    error, 
-    openModal, 
-    deleteItem, 
-    setItems, 
-    refreshStats 
-  } = useMaterials();
-  const items = getFilteredItems();
-
-  // Initialize navigation badges
-  useEffect(() => {
-    if (navigation?.updateModuleBadge) {
-      navigation.updateModuleBadge('materials', items.length);
-    }
-  }, [items.length, navigation]);
-
-  // Load initial data
-  useEffect(() => {
-    loadInventoryData();
-    
-    // Debug suppliers - temporal
-    debugSuppliers().then(result => {
-      console.log('Debug suppliers result:', result);
-    });
-  }, []);
-
-  const loadInventoryData = async () => {
-    try {
-      setItems([]);
-      const apiItems = await inventoryApi.getItems();
-      
-      // 🎯 Use centralized normalizer service
-      const normalizedItems = MaterialsNormalizer.normalizeApiItems(apiItems);
-
-      setItems(normalizedItems);
-      if (refreshStats) refreshStats();
-    } catch (error) {
-      console.error('Error loading inventory data:', error);
-      handleError(error as Error, { operation: 'loadInventory' });
-    }
-  };
-
-  const handleAddItem = () => {
-    openModal('add');
-  };
-
-  const handleEditItem = (item: MaterialItem) => {
-    openModal('edit', item);
-  };
-
-  const handleViewItem = (item: MaterialItem) => {
-    openModal('view', item);
-  };
-
-  const handleDeleteItem = async (item: MaterialItem) => {
-    try {
-      if (window.confirm(`¿Estás seguro de que quieres eliminar "${item.name}"?`)) {
-        // First delete from API (this handles all DB constraints and triggers)
-        await inventoryApi.deleteItem(item.id);
-        
-        // Force refresh from database to ensure UI is perfectly synchronized
-        await loadInventoryData();
-      }
-    } catch (error) {
-      console.error('Error deleting item:', error);
-      handleError(error as Error, { operation: 'deleteItem', itemName: item.name });
-      
-      // Refresh data anyway to ensure UI is in sync with DB
-      await loadInventoryData();
-    }
-  };
+  // Page orchestration logic
+  const {
+    pageState,
+    metrics,
+    actions,
+    loading,
+    error
+  } = useMaterialsPage();
 
   if (error) {
     return (
-      <ContentLayout>
+      <ContentLayout spacing="normal">
         <Alert status="error" title="Error de carga">
           {error}
         </Alert>
@@ -126,65 +47,119 @@ function MaterialsPage() {
   }
 
   return (
-    <ContentLayout>
-      <PageHeader 
-        title="Gestión de Materiales"
-        subtitle="Control de inventario y materias primas"
-        icon={CubeIcon}
-        actions={<Button variant="solid" onClick={handleAddItem}>Nuevo Material</Button>}
+    <ContentLayout spacing="normal">
+      <PageHeader
+        title="Materials"
+        subtitle="Inventory control & raw materials management"
+        actions={
+          <>
+            <Button
+              variant="outline"
+              colorPalette="blue"
+              onClick={actions.handleABCAnalysis}
+              size="md"
+            >
+              <ChartBarIcon className="w-4 h-4" />
+              ABC Analysis
+            </Button>
+            <Button
+              variant="outline"
+              colorPalette="green"
+              onClick={actions.handleProcurement}
+              size="md"
+            >
+              <ClipboardDocumentListIcon className="w-4 h-4" />
+              Procurement
+            </Button>
+            <Button
+              colorPalette="purple"
+              onClick={actions.handleNewMaterial}
+              size="md"
+            >
+              <PlusIcon className="w-4 h-4" />
+              New Material
+            </Button>
+          </>
+        }
       />
 
+      {/* Metrics Overview Section */}
       <StatsSection>
         <CardGrid columns={{ base: 1, md: 4 }}>
-          <MetricCard 
+          <MetricCard
             title="Total Items"
-            value={items.length.toString()}
-            subtitle="en inventario"
+            value={metrics.totalItems.toString()}
+            subtitle="in inventory"
             icon={CubeIcon}
           />
-          <MetricCard 
-            title="Stock Bajo"
-            value="-"
-            subtitle="requiere atención"
+          <MetricCard
+            title="Low Stock"
+            value={metrics.lowStockItems.toString()}
+            subtitle="need attention"
             icon={ExclamationTriangleIcon}
+            colorPalette={metrics.criticalStockItems > 0 ? "red" : "yellow"}
           />
-          <MetricCard 
-            title="Valor Total"
-            value="-"
-            subtitle="del inventario"
+          <MetricCard
+            title="Total Value"
+            value={DecimalUtils.formatCurrency(metrics.totalValue)}
+            subtitle="inventory value"
             icon={CurrencyDollarIcon}
           />
-          <MetricCard 
-            title="Proveedores"
-            value="-"
-            subtitle="activos"
+          <MetricCard
+            title="Suppliers"
+            value={metrics.supplierCount.toString()}
+            subtitle="active suppliers"
             icon={BuildingStorefrontIcon}
           />
         </CardGrid>
       </StatsSection>
 
-      <Section variant="elevated" title="Inventario de Materiales">
+      {/* Inventory Management Section */}
+      <Section variant="elevated" title="Inventory Management">
+        {/* MaterialsList component will go here */}
         <div>
-          <p>Items en inventario: {items.length}</p>
-          <p>Sistema de gestión de materiales funcionando correctamente.</p>
+          <p>Items in inventory: {metrics.totalItems}</p>
+          <p>Materials management system running correctly.</p>
           {loading && (
-            <Alert status="info" title="Cargando datos">
-              Cargando información del inventario...
+            <Alert status="info" title="Loading data">
+              Loading inventory information...
             </Alert>
           )}
         </div>
       </Section>
 
-      <Section variant="default" title="Acciones Rápidas">
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <Button variant="solid" onClick={handleAddItem}>
-            Agregar Material
-          </Button>
-          <Button variant="outline" onClick={() => loadInventoryData()}>
-            Actualizar Datos
-          </Button>
-        </div>
-      </Section>
+      {/* Conditional ABC Analysis Section */}
+      {pageState.showABCAnalysis && (
+        <Section variant="elevated" title="ABC Analysis">
+          {/* ABCAnalysisPanel component will go here */}
+          <div>
+            <p>ABC Analysis panel - showing classification of materials by value and usage.</p>
+          </div>
+        </Section>
+      )}
+
+      {/* Conditional Procurement Section */}
+      {pageState.showProcurement && (
+        <Section variant="elevated" title="Procurement Recommendations">
+          {/* ProcurementPanel component will go here */}
+          <div>
+            <p>Procurement recommendations based on stock levels and demand forecasting.</p>
+          </div>
+        </Section>
+      )}
+
+      {/* Conditional Supply Chain Section */}
+      {pageState.showSupplyChain && (
+        <Section variant="elevated" title="Supply Chain Analysis">
+          {/* SupplyChainPanel component will go here */}
+          <div>
+            <p>Supply chain analysis and supplier performance metrics.</p>
+          </div>
+        </Section>
+      )}
+
+      {/* Material Form Modal */}
+      {/* <MaterialFormModal /> */}
     </ContentLayout>
   );
 }

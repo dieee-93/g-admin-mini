@@ -1,39 +1,20 @@
 // Settings Page - Semantic Layout with New Design System
-import React, { useEffect } from 'react';
+import React from 'react';
 import { 
   ContentLayout, PageHeader, StatsSection, CardGrid, MetricCard, Button, Icon
 } from '@/shared/ui';
-import { 
-  CogIcon,
-  BuildingOfficeIcon, 
-  CurrencyDollarIcon, 
-  UserGroupIcon,
-  LinkIcon
-} from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useSettingsPage } from './hooks';
 
 // Components  
-import { BusinessProfileSection } from './components/sections/BusinessProfileSection';
-import { TaxConfigurationSection } from './components/sections/TaxConfigurationSection';
-import { UserPermissionsSection } from './components/sections/UserPermissionsSection';
-// IntegrationsSection moved to integrations/page.tsx - no longer needed here
-// EnterpriseSection moved to enterprise/page.tsx - no longer needed here
-import { SystemSection } from './components/sections/SystemSection';
+import { 
+  BusinessProfileSection,
+  TaxConfigurationSection,
+  UserPermissionsSection,
+  SystemSection
+} from './components';
 
 export default function SettingsPage() {
-  const { setQuickActions } = useNavigation();
-
-  useEffect(() => {
-    setQuickActions([
-      {
-        id: 'save-settings',
-        label: 'Guardar Configuración',
-        icon: CogIcon,
-        action: () => console.log('Save settings'),
-        color: 'blue'
-      }
-    ]);
-  }, [setQuickActions]);
+  const { metrics, handlers, icons } = useSettingsPage();
 
   return (
     <ContentLayout>
@@ -41,10 +22,10 @@ export default function SettingsPage() {
       <PageHeader 
         title="Configuración"
         subtitle="Centro de comando · G-Admin"
-        icon={CogIcon}
+        icon={icons.CogIcon}
         actions={
-          <Button size="md">
-            <Icon icon={CogIcon} size="sm" />
+          <Button size="md" onClick={handlers.handleSaveSettings}>
+            <Icon icon={icons.CogIcon} size="sm" />
             Guardar Cambios
           </Button>
         }
@@ -53,30 +34,15 @@ export default function SettingsPage() {
       {/* 📊 METRICS SECTION - Semantic wrapper for dashboard stats */}
       <StatsSection>
         <CardGrid columns={{ base: 1, md: 4 }}>
-          <MetricCard 
-            title="Perfil Empresarial"
-            value="Completo"
-            subtitle="Información actualizada"
-            icon={BuildingOfficeIcon}
-          />
-          <MetricCard 
-            title="Configuración Fiscal"
-            value="IVA 21%"
-            subtitle="Configurado correctamente"
-            icon={CurrencyDollarIcon}
-          />
-          <MetricCard 
-            title="Permisos"
-            value="3 Roles"
-            subtitle="Activos en el sistema"
-            icon={UserGroupIcon}
-          />
-          <MetricCard 
-            title="Integraciones"
-            value="2 Activas"
-            subtitle="APIs funcionando"
-            icon={LinkIcon}
-          />
+          {metrics.map((metric, index) => (
+            <MetricCard 
+              key={index}
+              title={metric.title}
+              value={metric.value}
+              subtitle={metric.subtitle}
+              icon={metric.icon}
+            />
+          ))}
         </CardGrid>
       </StatsSection>
 

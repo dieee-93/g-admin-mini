@@ -1,377 +1,408 @@
-// FiscalPage.tsx - Migrated to Design System
-import { useState, useEffect, useMemo } from 'react';
-
-// DESIGN SYSTEM IMPORTS - Following our conventions
 import {
-  // Layout & Structure
-  Stack,
-  VStack,
-  HStack,
-  SimpleGrid,
-  
-  // Typography
-  Typography,
-  
-  // Components
-  CardWrapper,
-  Button,
-  Badge,
-  
-  // Navigation
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  
-  // Advanced
-  Alert,
-  AlertDescription,
-  Icon
+  ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
+  Button, Alert, Badge, Icon, Stack, Typography
 } from '@/shared/ui';
-
-import { 
-  DocumentTextIcon, 
-  CogIcon, 
+import {
+  DocumentTextIcon,
+  CogIcon,
   ChartBarIcon,
   ExclamationTriangleIcon,
   BanknotesIcon,
   CalendarDaysIcon,
   WifiIcon,
   NoSymbolIcon,
-  CloudIcon
+  CloudIcon,
+  CurrencyDollarIcon,
+  BuildingLibraryIcon,
+  ReceiptTaxIcon,
+  ArrowTrendingUpIcon,
+  CheckCircleIcon
 } from '@heroicons/react/24/outline';
-
-// Import components
-import { useNavigation } from '@/contexts/NavigationContext';
-import { InvoiceGeneration } from './components/sections/InvoiceGeneration';
-import { AFIPIntegration } from './components/sections/AFIPIntegration';
-import { TaxCompliance } from './components/sections/TaxCompliance';
-import { FinancialReporting } from './components/sections/FinancialReporting';
-import OfflineFiscalView from './components/OfflineFiscalView';
-import { useFiscal } from './hooks/useFiscal';
-import { notify } from '@/lib/notifications';
-import { useOfflineStatus } from '@/lib/offline';
-
-// Fiscal mode types
-type FiscalMode = 'auto' | 'online-first' | 'offline-first';
-type EffectiveFiscalMode = 'online' | 'offline' | 'hybrid';
+import { useFiscalPage } from './hooks';
 
 export function FiscalPage() {
-  const { setQuickActions } = useNavigation();
-  const [activeTab, setActiveTab] = useState('invoicing');
-  const { fiscalStats, isLoading, error } = useFiscal();
-  
-  // Offline status monitoring
-  const { isOnline, connectionQuality, isSyncing, queueSize } = useOfflineStatus();
-  
-  // Fiscal mode management
-  const [fiscalMode, setFiscalMode] = useState<FiscalMode>(() => {
-    const stored = localStorage.getItem('fiscal_mode');
-    return (stored as FiscalMode) || 'offline-first';
-  });
+  const {
+    pageState,
+    metrics,
+    isOnline,
+    connectionQuality,
+    isSyncing,
+    queueSize,
+    loading,
+    error,
+    actions,
+    shouldShowOfflineView,
+    alertsData
+  } = useFiscalPage();
 
-  // Calculate effective fiscal mode
-  const effectiveFiscalMode: EffectiveFiscalMode = useMemo(() => {
-    switch (fiscalMode) {
-      case 'online-first':
-        return isOnline ? 'online' : 'offline';
-      case 'offline-first':
-        return isOnline && connectionQuality !== 'poor' ? 'hybrid' : 'offline';
-      case 'auto':
-        if (!isOnline) return 'offline';
-        if (connectionQuality === 'poor' || queueSize > 3) return 'hybrid';
-        return 'online';
-      default:
-        return 'offline';
-    }
-  }, [fiscalMode, isOnline, connectionQuality, queueSize]);
+  if (loading) {
+    return (
+      <ContentLayout spacing="normal">
+        <PageHeader
+          title="Gestión Fiscal"
+          subtitle="Cargando datos fiscales..."
+          icon={BuildingLibraryIcon}
+        />
+      </ContentLayout>
+    );
+  }
 
-  // Save fiscal mode preference
-  useEffect(() => {
-    localStorage.setItem('fiscal_mode', fiscalMode);
-  }, [fiscalMode]);
-
-  // Show offline view for critical fiscal operations when offline
-  const shouldShowOfflineView = effectiveFiscalMode === 'offline' || 
-    (effectiveFiscalMode === 'hybrid' && (activeTab === 'afip' || activeTab === 'invoicing'));
-
-  // Set up quick actions
-  useEffect(() => {
-    const quickActions = [
-      {
-        id: 'generate-invoice',
-        label: 'Nueva Factura',
-        icon: DocumentTextIcon,
-        action: () => setActiveTab('invoicing'),
-        color: 'blue'
-      },
-      {
-        id: 'afip-status',
-        label: 'Estado AFIP',
-        icon: CogIcon,
-        action: () => setActiveTab('afip'),
-        color: 'green'
-      },
-      {
-        id: 'tax-report',
-        label: 'Reporte Fiscal',
-        icon: ChartBarIcon,
-        action: () => setActiveTab('reporting'),
-        color: 'purple'
-      }
-    ];
-
-    setQuickActions(quickActions);
-
-    return () => {
-      setQuickActions([]);
-    };
-  }, [setQuickActions]);
-
-  // Handle tab changes
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-  };
-
-  // Handle fiscal mode change
-  const handleFiscalModeChange = (newMode: FiscalMode) => {
-    setFiscalMode(newMode);
-    
-    notify.info({
-      title: 'Modo Fiscal Actualizado',
-      description: `Cambiado a: ${newMode.replace('-', ' ')}`
-    });
-  };
+  if (error) {
+    return (
+      <ContentLayout spacing="normal">
+        <PageHeader
+          title="Gestión Fiscal"
+          subtitle="Error al cargar datos"
+          icon={BuildingLibraryIcon}
+        />
+        <Alert variant="subtle" title={error} />
+      </ContentLayout>
+    );
+  }
 
   return (
-    <VStack gap="lg" align="stretch">
-        {/* Header */}
-        <VStack gap="sm" align="stretch">
-          <Typography variant="heading">Gestión Fiscal</Typography>
-          <Typography variant="body" color="text.muted">
-            Control de facturación, impuestos y cumplimiento normativo
-          </Typography>
-        </VStack>
+    <ContentLayout spacing="normal">
+      <PageHeader
+        title="Gestión Fiscal"
+        subtitle={
+          <Stack direction="row" gap="sm" align="center">
+            <Badge
+              variant="solid"
+              colorPalette={
+                pageState.effectiveFiscalMode === 'online' ? 'green' :
+                pageState.effectiveFiscalMode === 'hybrid' ? 'orange' : 'blue'
+              }
+            >
+              {pageState.effectiveFiscalMode.toUpperCase()}
+            </Badge>
+            <Badge variant="solid" colorPalette={isOnline ? 'green' : 'red'}>
+              {isOnline ? 'Online' : 'Offline'}
+            </Badge>
+            <Typography variant="body" size="sm" color="text.muted">
+              Control de facturación, impuestos y cumplimiento normativo
+            </Typography>
+          </Stack>
+        }
+        icon={BuildingLibraryIcon}
+        actions={
+          <Button variant="solid" onClick={actions.handleNewInvoice} size="lg">
+            <Icon icon={DocumentTextIcon} size="sm" />
+            Nueva Factura
+          </Button>
+        }
+      />
 
-        {/* Status Header */}
-        <CardWrapper variant="elevated" padding="md">
-            <CardWrapper.Body>
-              <HStack justify="space-between" align="center">
-              <HStack gap="md">
-                <Typography variant="title">Estado Fiscal</Typography>
-                <Badge 
-                  colorPalette={
-                    effectiveFiscalMode === 'online' ? 'success' :
-                    effectiveFiscalMode === 'hybrid' ? 'warning' : 'info'
-                  }
-                >
-                  {effectiveFiscalMode.toUpperCase()}
-                </Badge>
-              </HStack>
+      {/* Connection & Sync Status */}
+      {(isSyncing || queueSize > 0) && (
+        <Section variant="elevated" title="Estado de Sincronización">
+          <Stack direction="row" gap="sm" align="center">
+            {isSyncing && (
+              <Badge colorPalette="blue" variant="subtle">
+                <Icon icon={CloudIcon} size="sm" />
+                Sincronizando
+              </Badge>
+            )}
+            {queueSize > 0 && (
+              <Badge colorPalette="orange" variant="subtle">
+                {queueSize} pendientes
+              </Badge>
+            )}
+            <Typography variant="body" color="text.muted">
+              Conexión: {connectionQuality}
+            </Typography>
+          </Stack>
+        </Section>
+      )}
 
-              <HStack gap="sm">
-                {/* Connection Status */}
-                <Badge 
-                  colorPalette={isOnline ? 'green' : 'red'}
-                  variant="subtle"
-                >
-                  {isOnline ? <Icon icon={WifiIcon} size="sm" /> : <Icon icon={NoSymbolIcon} size="sm" />}
-                  {isOnline ? 'Online' : 'Offline'}
-                </Badge>
+      {/* Fiscal Metrics Dashboard */}
+      <StatsSection>
+        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
+          <MetricCard
+            title="Facturación Mes"
+            value={`$${metrics.facturacionMesActual.toLocaleString('es-AR')}`}
+            icon={BanknotesIcon}
+            colorPalette="green"
+            trend={{ value: metrics.crecimientoFacturacion, isPositive: metrics.crecimientoFacturacion > 0 }}
+          />
+          <MetricCard
+            title="Facturas Generadas"
+            value={metrics.facturasEmitidasMes}
+            icon={DocumentTextIcon}
+            colorPalette="blue"
+          />
+          <MetricCard
+            title="IVA Recaudado"
+            value={`$${metrics.totalIVARecaudado.toFixed(2)}`}
+            icon={ReceiptTaxIcon}
+            colorPalette="purple"
+          />
+          <MetricCard
+            title="Próximo Vencimiento"
+            value={metrics.proximoVencimiento}
+            icon={CalendarDaysIcon}
+            colorPalette="orange"
+          />
+        </CardGrid>
+      </StatsSection>
 
-                {/* Sync Status */}
-                {isSyncing && (
-                  <Badge colorPalette="blue" variant="subtle">
-                    <Icon icon={CloudIcon} size="sm" />
-                    Sincronizando
-                  </Badge>
-                )}
+      {/* AFIP Integration Metrics */}
+      <StatsSection>
+        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
+          <MetricCard
+            title="Estado AFIP"
+            value={metrics.afipConnectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
+            icon={CogIcon}
+            colorPalette={metrics.afipConnectionStatus === 'connected' ? 'green' : 'red'}
+          />
+          <MetricCard
+            title="CAE Generados"
+            value={metrics.caeGenerados}
+            icon={CheckCircleIcon}
+            colorPalette="green"
+          />
+          <MetricCard
+            title="CAE Pendientes"
+            value={metrics.caePendientes}
+            icon={ExclamationTriangleIcon}
+            colorPalette={metrics.caePendientes > 0 ? 'orange' : 'green'}
+          />
+          <MetricCard
+            title="Cumplimiento Fiscal"
+            value={`${metrics.cumplimientoFiscal}%`}
+            icon={BuildingLibraryIcon}
+            colorPalette={metrics.cumplimientoFiscal >= 90 ? 'green' : 'orange'}
+            trend={{ value: metrics.cumplimientoFiscal, isPositive: metrics.cumplimientoFiscal >= 90 }}
+          />
+        </CardGrid>
+      </StatsSection>
 
-                {/* Queue Size */}
-                {queueSize > 0 && (
-                  <Badge colorPalette="orange" variant="subtle">
-                    {queueSize} pendientes
-                  </Badge>
-                )}
-              </HStack>
-            </HStack>
-          </CardWrapper.Body>
-        </CardWrapper>
+      {/* Financial Analysis Metrics */}
+      <StatsSection>
+        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
+          <MetricCard
+            title="Flujo Efectivo Mensual"
+            value={`$${metrics.flujoEfectivoMensual.toFixed(2)}`}
+            icon={CurrencyDollarIcon}
+            colorPalette="teal"
+            trend={{ value: metrics.flujoEfectivoMensual, isPositive: metrics.flujoEfectivoMensual > 0 }}
+          />
+          <MetricCard
+            title="Posición Efectivo"
+            value={`$${metrics.posicionEfectivo.toFixed(2)}`}
+            icon={ArrowTrendingUpIcon}
+            colorPalette="cyan"
+          />
+          <MetricCard
+            title="Ratio Liquidez"
+            value={metrics.ratioLiquidez.toFixed(2)}
+            icon={CheckCircleIcon}
+            colorPalette={metrics.ratioLiquidez >= 1.5 ? 'green' : 'orange'}
+          />
+          <MetricCard
+            title="Margen Operativo"
+            value={`${(metrics.margenOperativo * 100).toFixed(1)}%`}
+            icon={ArrowTrendingUpIcon}
+            colorPalette="purple"
+            trend={{ value: metrics.margenOperativo, isPositive: metrics.margenOperativo > 0.15 }}
+          />
+        </CardGrid>
+      </StatsSection>
 
-        {/* Fiscal Mode Selector */}
-        <CardWrapper variant="outline" padding="md">
-          <CardWrapper.Header>
-            <Typography variant="title">Configuración del Modo Fiscal</Typography>
-          </CardWrapper.Header>
-          <CardWrapper.Body>
-            <Stack gap="md">
-              <SimpleGrid columns={{ base: 1, md: 3 }} gap="md">
-                <Button
-                  variant={fiscalMode === 'offline-first' ? 'solid' : 'outline'}
-                  colorPalette="blue"
-                  onClick={() => handleFiscalModeChange('offline-first')}
-                  size="lg"
-                >
-                  <VStack gap="xs">
-                    <Typography variant="label">Offline First</Typography>
-                    <Typography variant="caption" color="text.muted">
-                      Prioriza confiabilidad local
-                    </Typography>
-                  </VStack>
-                </Button>
+      {/* Alerts Section */}
+      {alertsData.length > 0 && (
+        <Section variant="elevated" title="Alertas y Notificaciones">
+          <Stack direction="column" gap="sm">
+            {alertsData.map((alert, index) => (
+              <Alert
+                key={index}
+                variant="subtle"
+                title={alert.message}
+                icon={<Icon icon={ExclamationTriangleIcon} size="sm" />}
+              >
+                {alert.action}
+              </Alert>
+            ))}
+          </Stack>
+        </Section>
+      )}
 
-                <Button
-                  variant={fiscalMode === 'auto' ? 'solid' : 'outline'}
-                  colorPalette="blue"
-                  onClick={() => handleFiscalModeChange('auto')}
-                  size="lg"
-                >
-                  <VStack gap="xs">
-                    <Typography variant="label">Automático</Typography>
-                    <Typography variant="caption" color="text.muted">
-                      Adapta según condiciones
-                    </Typography>
-                  </VStack>
-                </Button>
+      {/* Fiscal Mode Configuration */}
+      <Section variant="elevated" title="Configuración del Modo Fiscal">
+        <Typography variant="body" color="text.muted" mb="md">
+          Configura cómo el sistema maneja las operaciones fiscales según la conectividad
+        </Typography>
+        <Stack direction="row" gap="md" flexWrap="wrap">
+          <Button
+            variant={pageState.fiscalMode === 'offline-first' ? 'solid' : 'outline'}
+            colorPalette="blue"
+            onClick={() => actions.setFiscalMode('offline-first')}
+            flex="1"
+            minW="200px"
+          >
+            Offline First
+          </Button>
+          <Button
+            variant={pageState.fiscalMode === 'auto' ? 'solid' : 'outline'}
+            colorPalette="blue"
+            onClick={() => actions.setFiscalMode('auto')}
+            flex="1"
+            minW="200px"
+          >
+            Automático
+          </Button>
+          <Button
+            variant={pageState.fiscalMode === 'online-first' ? 'solid' : 'outline'}
+            colorPalette="green"
+            onClick={() => actions.setFiscalMode('online-first')}
+            flex="1"
+            minW="200px"
+          >
+            Online First
+          </Button>
+        </Stack>
+      </Section>
 
-                <Button
-                  variant={fiscalMode === 'online-first' ? 'solid' : 'outline'}
-                  colorPalette="green"
-                  onClick={() => handleFiscalModeChange('online-first')}
-                  size="lg"
-                >
-                  <VStack gap="xs">
-                    <Typography variant="label">Online First</Typography>
-                    <Typography variant="caption" color="text.muted">
-                      Prioriza sincronización
-                    </Typography>
-                  </VStack>
-                </Button>
-              </SimpleGrid>
-            </Stack>
-          </CardWrapper.Body>
-        </CardWrapper>
+      {/* Invoice Management Section */}
+      <Section variant="elevated" title="Gestión de Facturas">
+        <Stack direction="row" gap="md" flexWrap="wrap">
+          <Button
+            variant="outline"
+            onClick={actions.handleNewInvoice}
+            flex="1"
+            minW="200px"
+          >
+            <Icon icon={DocumentTextIcon} size="sm" />
+            Nueva Factura
+          </Button>
+          <Button
+            variant="outline"
+            onClick={actions.handleBulkInvoicing}
+            flex="1"
+            minW="200px"
+          >
+            <Icon icon={DocumentTextIcon} size="sm" />
+            Facturación Masiva
+          </Button>
+        </Stack>
+      </Section>
 
-        {/* Quick Stats */}
-        {fiscalStats && !isLoading && (
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="md">
-            <CardWrapper variant="outline" padding="md">
-              <CardWrapper.Body>
-                <VStack gap="sm">
-                  <Icon icon={BanknotesIcon} size="2xl" color="green.500" />
-                  <Typography variant="title">
-                    ${(fiscalStats.facturacion_mes_actual && typeof fiscalStats.facturacion_mes_actual === 'number') 
-                      ? fiscalStats.facturacion_mes_actual.toLocaleString('es-AR') 
-                      : '0'}
-                  </Typography>
-                  <Typography variant="caption" color="text.muted">
-                    Facturación del mes
-                  </Typography>
-                </VStack>
-              </CardWrapper.Body>
-            </CardWrapper>
+      {/* AFIP Integration Section */}
+      <Section variant="elevated" title="Integración AFIP">
+        <Stack direction="row" gap="md" flexWrap="wrap">
+          <Button
+            variant="outline"
+            onClick={actions.handleAFIPSync}
+            disabled={!isOnline}
+            flex="1"
+            minW="200px"
+          >
+            <Icon icon={CloudIcon} size="sm" />
+            Sincronizar AFIP
+          </Button>
+          <Button
+            variant="outline"
+            onClick={actions.handleAFIPStatusCheck}
+            flex="1"
+            minW="200px"
+          >
+            <Icon icon={CogIcon} size="sm" />
+            Estado AFIP
+          </Button>
+        </Stack>
+      </Section>
 
-            <CardWrapper variant="outline" padding="md">
-              <CardWrapper.Body>
-                <VStack gap="sm">
-                  <Icon icon={DocumentTextIcon} size="2xl" color="blue.500" />
-                  <Typography variant="title">
-                    {(fiscalStats.facturas_emitidas_mes && typeof fiscalStats.facturas_emitidas_mes === 'number') 
-                      ? fiscalStats.facturas_emitidas_mes 
-                      : 0}
-                  </Typography>
-                  <Typography variant="caption" color="text.muted">
-                    Facturas generadas
-                  </Typography>
-                </VStack>
-              </CardWrapper.Body>
-            </CardWrapper>
+      {/* Compliance & Reporting Section */}
+      <Section variant="flat" title="Cumplimiento y Reportes">
+        <Stack direction="row" gap="md" flexWrap="wrap">
+          <Button
+            variant="outline"
+            onClick={actions.handleComplianceCheck}
+            flex="1"
+            minW="200px"
+          >
+            <Icon icon={ExclamationTriangleIcon} size="sm" />
+            Verificar Cumplimiento
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => actions.handleGenerateReport('tax', 'month')}
+            flex="1"
+            minW="200px"
+          >
+            <Icon icon={ChartBarIcon} size="sm" />
+            Reporte Fiscal
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => actions.handleExportData('pdf')}
+            flex="1"
+            minW="200px"
+          >
+            <Icon icon={DocumentTextIcon} size="sm" />
+            Exportar Datos
+          </Button>
+        </Stack>
+      </Section>
 
-            <CardWrapper variant="outline" padding="md">
-              <CardWrapper.Body>
-                <VStack gap="sm">
-                  <Icon icon={ExclamationTriangleIcon} size="2xl" color="orange.500" />
-                  <Typography variant="title">
-                    {(fiscalStats.cae_pendientes && typeof fiscalStats.cae_pendientes === 'number') 
-                      ? fiscalStats.cae_pendientes 
-                      : 0}
-                  </Typography>
-                  <Typography variant="caption" color="text.muted">
-                    Obligaciones pendientes
-                  </Typography>
-                </VStack>
-              </CardWrapper.Body>
-            </CardWrapper>
+      {/* Financial Analysis Section */}
+      {pageState.showAnalytics && (
+        <Section variant="elevated" title="Análisis Financiero">
+          <Stack direction="row" gap="md" flexWrap="wrap">
+            <Button
+              variant="outline"
+              onClick={actions.handleCashFlowAnalysis}
+              flex="1"
+              minW="200px"
+            >
+              <Icon icon={CurrencyDollarIcon} size="sm" />
+              Análisis Flujo de Efectivo
+            </Button>
+            <Button
+              variant="outline"
+              onClick={actions.handleProfitabilityAnalysis}
+              flex="1"
+              minW="200px"
+            >
+              <Icon icon={ArrowTrendingUpIcon} size="sm" />
+              Análisis Rentabilidad
+            </Button>
+            <Button
+              variant="outline"
+              onClick={actions.handleBudgetVarianceAnalysis}
+              flex="1"
+              minW="200px"
+            >
+              <Icon icon={ChartBarIcon} size="sm" />
+              Análisis Presupuesto
+            </Button>
+          </Stack>
+        </Section>
+      )}
 
-            <CardWrapper variant="outline" padding="md">
-              <CardWrapper.Body>
-                <VStack gap="sm">
-                  <Icon icon={CalendarDaysIcon} size="2xl" color="purple.500" />
-                  <Typography variant="title">
-                    {(fiscalStats.proxima_presentacion && typeof fiscalStats.proxima_presentacion === 'string') 
-                      ? fiscalStats.proxima_presentacion 
-                      : 'N/A'}
-                  </Typography>
-                  <Typography variant="caption" color="text.muted">
-                    Próximo vencimiento
-                  </Typography>
-                </VStack>
-              </CardWrapper.Body>
-            </CardWrapper>
-          </SimpleGrid>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <Alert status="error" title="Error en datos fiscales">
-            <AlertDescription>
-              {error}. Verifica tu conexión y configuración fiscal.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Show offline view when necessary */}
-        {shouldShowOfflineView ? (
-          <OfflineFiscalView />
-        ) : (
-          /* Main Content Tabs */
-          <Tabs value={activeTab} onValueChange={handleTabChange} variant="enclosed">
-            <TabList>
-              <Tab value="invoicing" icon={<Icon icon={DocumentTextIcon} size="sm" />}>
-                Facturación
-              </Tab>
-              <Tab value="afip" icon={<Icon icon={CogIcon} size="sm" />}>
-                AFIP
-              </Tab>
-              <Tab value="compliance" icon={<Icon icon={ExclamationTriangleIcon} size="sm" />}>
-                Cumplimiento
-              </Tab>
-              <Tab value="reporting" icon={<Icon icon={ChartBarIcon} size="sm" />}>
-                Reportes
-              </Tab>
-            </TabList>
-
-            <TabPanels>
-              <TabPanel value="invoicing">
-                <InvoiceGeneration />
-              </TabPanel>
-
-              <TabPanel value="afip">
-                <AFIPIntegration />
-              </TabPanel>
-
-              <TabPanel value="compliance">
-                <TaxCompliance />
-              </TabPanel>
-
-              <TabPanel value="reporting">
-                <FinancialReporting />
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        )}
-    </VStack>
+      {/* Quick Actions */}
+      <Section variant="flat" title="Acciones Rápidas">
+        <Stack direction="row" gap="md" flexWrap="wrap">
+          <Button
+            variant="outline"
+            onClick={actions.toggleAnalytics}
+            flex="1"
+            minW="200px"
+          >
+            <Icon icon={ChartBarIcon} size="sm" />
+            {pageState.showAnalytics ? 'Ocultar' : 'Ver'} Analytics
+          </Button>
+          <Button
+            variant="outline"
+            onClick={actions.handleBulkTaxUpdate}
+            flex="1"
+            minW="200px"
+          >
+            <Icon icon={ReceiptTaxIcon} size="sm" />
+            Actualizar Impuestos
+          </Button>
+        </Stack>
+      </Section>
+    </ContentLayout>
   );
 }
 
