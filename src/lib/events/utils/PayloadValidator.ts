@@ -473,7 +473,7 @@ export class PayloadValidator {
         field: path,
         originalValue: '[DEEP_OBJECT]',
         sanitizedValue: '[TRUNCATED]',
-        severity: 'medium',
+        severity: 'critical',
         description: `Object depth exceeds limit of ${this.config.maxObjectDepth}`
       });
       return '[TRUNCATED]';
@@ -786,7 +786,7 @@ export class PayloadValidator {
 
     const cloned = {} as T;
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         cloned[key] = this.deepClone(obj[key]);
       }
     }
