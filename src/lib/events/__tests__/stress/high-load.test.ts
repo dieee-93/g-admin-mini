@@ -498,7 +498,7 @@ describe('EventBus - High Load Stress Tests', () => {
       const recoveryEventCount = 100;
       
       let successfulEvents = 0;
-      let failedEvents = 0;
+      const failedEvents = 0;
       const errorEvents: any[] = [];
 
       // Handler that tracks errors

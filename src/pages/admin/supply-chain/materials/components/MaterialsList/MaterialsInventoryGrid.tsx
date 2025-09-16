@@ -1,7 +1,7 @@
 // MaterialsInventoryGrid.tsx - Virtualized inventory grid with smart filtering
 import React, { useState, useMemo } from 'react';
 import {
-  Section, Stack, Typography, Input, SelectField, CardGrid, Alert, Badge, Button, createListCollection
+  Section, Stack, Typography, InputField, SelectField, CardGrid, Alert, Badge, Button, createListCollection
 } from '@/shared/ui';
 import {
   MagnifyingGlassIcon,
@@ -14,10 +14,9 @@ import {
   HashtagIcon,
   BeakerIcon
 } from '@heroicons/react/24/outline';
-import { type InventoryItem } from '../types';
+import { type InventoryItem } from '@/lib/ml/inventory/PredictiveInventory'; 
 import { VirtualizedList } from '@/lib/performance';
-import { StockCalculation } from '@/pages/admin/supply-chain/inventory/stockCalculation';
-
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
 interface MaterialsInventoryGridProps {
   items: InventoryItem[];
   searchTerm: string;
@@ -147,7 +146,7 @@ export function MaterialsInventoryGrid({
       {/* Filters */}
       <Stack direction="row" gap="md" wrap="wrap">
         <div style={{ flex: 1, minWidth: '250px' }}>
-          <Input
+          <InputField
             placeholder="Buscar items..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}

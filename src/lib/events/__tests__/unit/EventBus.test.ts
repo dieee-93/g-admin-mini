@@ -245,7 +245,7 @@ describe('EventBus Core Functionality', () => {
 
   describe('Event Filtering', () => {
     it('should support wildcard patterns', async () => {
-      let receivedEvents: NamespacedEvent[] = [];
+      const receivedEvents: NamespacedEvent[] = [];
 
       const unsubscribe = eventBus.on('test.wildcard.*', async (event) => {
         receivedEvents.push(event);
@@ -266,7 +266,7 @@ describe('EventBus Core Functionality', () => {
 
     it('should support event filters in subscriptions', async () => {
       const pattern: EventPattern = 'test.filtered.events';
-      let filteredEvents: NamespacedEvent[] = [];
+      const filteredEvents: NamespacedEvent[] = [];
 
       const unsubscribe = eventBus.on(
         pattern,
@@ -477,12 +477,12 @@ describe('EventBus Core Functionality', () => {
       const module = createInventoryTestModule();
       await eventBus.registerModule(module);
 
-      let healthBefore = await eventBus.getModuleHealth('test-inventory');
+      const healthBefore = await eventBus.getModuleHealth('test-inventory');
       expect(healthBefore['test-inventory'].status).toBe('active');
 
       await eventBus.deactivateModule('test-inventory');
 
-      let healthAfter = await eventBus.getModuleHealth('test-inventory');
+      const healthAfter = await eventBus.getModuleHealth('test-inventory');
       expect(healthAfter['test-inventory'].status).toBe('inactive');
     });
   });

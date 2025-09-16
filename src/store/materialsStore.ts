@@ -17,8 +17,7 @@ import {
 } from '@/pages/admin/supply-chain/materials/types';
 
 // Import centralized utilities
-import { StockCalculation } from '@/pages/admin/supply-chain/inventory/stockCalculation';
-
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation'; 
 export interface MaterialsFilters {
   type: 'all' | ItemType;
   category: 'all' | string; // Business category filter (e.g., "Lácteos", "Carnes")

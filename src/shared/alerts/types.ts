@@ -6,9 +6,9 @@ export type AlertStatus = 'active' | 'acknowledged' | 'resolved' | 'dismissed';
 
 export type AlertSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
 
-export type AlertType = 'stock' | 'system' | 'validation' | 'business' | 'security' | 'operational';
+export type AlertType = 'stock' | 'system' | 'validation' | 'business' | 'security' | 'operational' | 'achievement';
 
-export type AlertContext = 'materials' | 'sales' | 'operations' | 'dashboard' | 'global' | 'customers' | 'staff' | 'fiscal';
+export type AlertContext = 'materials' | 'sales' | 'operations' | 'dashboard' | 'global' | 'customers' | 'staff' | 'fiscal' | 'gamification';
 
 // Acción que puede ejecutar el usuario en una alerta
 export interface AlertAction {
@@ -40,6 +40,13 @@ export interface AlertMetadata {
   // Para alertas de validación
   fieldName?: string;
   validationRule?: string;
+
+  // Para alertas de logros/achievements
+  achievementId?: string;
+  achievementType?: 'capability' | 'mastery';
+  achievementIcon?: string;
+  achievementDomain?: string;
+  experiencePoints?: number;
 
   // URLs relacionadas
   relatedUrl?: string;

@@ -28,9 +28,12 @@ import {
 // 📱 SISTEMA OFFLINE-FIRST
 import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
 
+// 🎮 SISTEMA DE LOGROS Y GAMIFICACIÓN
+import { AchievementSystemProvider } from '@/lib/achievements/AchievementSystemIntegration';
+
 // Dashboard Module - Critical, not lazy loaded
 import { Dashboard } from '@/pages/admin/core/dashboard/page';
-import { CrossModuleAnalytics } from '@/pages/admin/core/dashboard/components/CrossModuleAnalytics';
+import { CrossModuleAnalytics } from './pages/admin/core/dashboard/components/CrossModuleAnalytics/CrossModuleAnalytics';
 import { PredictiveAnalytics as PredictiveAnalyticsComponent } from '@/pages/admin/supply-chain/materials/components/PredictiveAnalytics';
 import CustomReporting from '@/pages/admin/core/reporting/page';
 import CompetitiveIntelligence from '@/pages/admin/core/intelligence/page';
@@ -147,7 +150,8 @@ function App() {
             <Router>
               <AuthProvider>
                 <OfflineMonitorProvider>
-                  <NavigationProvider>
+                  <AchievementSystemProvider>
+                    <NavigationProvider>
      
                     
                     <PerformanceWrapper>
@@ -453,7 +457,8 @@ function App() {
                   
                   <Toaster />
                   </NavigationProvider>
-                </OfflineMonitorProvider>
+                </AchievementSystemProvider>
+              </OfflineMonitorProvider>
               </AuthProvider>
             </Router>
           </AlertsProvider>

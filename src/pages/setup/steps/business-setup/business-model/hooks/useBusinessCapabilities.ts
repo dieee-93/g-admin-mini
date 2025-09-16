@@ -1,38 +1,38 @@
 import { useState, useCallback, useMemo } from 'react';
-import { 
+import type { 
   BusinessCapabilities, 
   BusinessStructure, 
   BusinessModelData,
-  defaultCapabilities,
-  validationRules
 } from '../config/businessCapabilities';
-import { 
-  determineBusinessArchetypes,
-  getOperationalProfile,
-  getInsightMessage,
-} from '../config/businessLogic';
+import { defaultCapabilities, validationRules } from '../config/businessCapabilities';
+
+// Nuevo modelo: Estructura simplificada para composición de ADN
+export interface BusinessDNACapability {
+  id: string;
+  status: 'latent';
+  subCapabilities?: string[];
+}
 
 export interface UseBusinessCapabilitiesReturn {
-  // State
+  // State - Modelo compositivo simplificado
   capabilities: BusinessCapabilities;
+  selectedCapabilities: string[];
   businessStructure: Record<BusinessStructure, boolean>;
   expandedCards: Record<string, boolean>;
 
-  // Computed values
-  archetypes: string[];
-  operationalProfile: string[];
-  insightMessage: string | null;
+  // Computed values - Sin arquetipos
+  activeCapabilitiesCount: number;
   canSubmit: boolean;
 
-  // Actions
+  // Actions - Modelo compositivo
   toggleMainCapability: (key: keyof BusinessCapabilities) => void;
   toggleSubCapability: (key: keyof BusinessCapabilities) => void;
   toggleBusinessStructure: (structure: BusinessStructure) => void;
   toggleCard: (cardName: string) => void;
   resetCapabilities: () => void;
 
-  // Data export
-  getBusinessModelData: () => BusinessModelData;
+  // Data export - Nuevo formato de salida
+  getBusinessModelData: () => BusinessModelData & { businessDNA: Record<string, { status: 'latent' }> };
 }
 
 export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
@@ -42,7 +42,7 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
     multi_location: false,
     mobile: false,
   });
-  const [expandedCards, setExpandedCards] = useState({
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({
     products: false,
     services: false,
     events: false,
@@ -110,35 +110,41 @@ export function useBusinessCapabilities(): UseBusinessCapabilitiesReturn {
     return Object.keys(businessStructure).filter(k => businessStructure[k as BusinessStructure]) as BusinessStructure[];
   }, [businessStructure]);
 
-  const archetypes = useMemo(() => determineBusinessArchetypes(capabilities), [capabilities]);
+  // Nuevo modelo compositivo: contar capacidades activas en lugar de arquetipos
+  const selectedCapabilities = useMemo(() => {
+    return Object.keys(capabilities).filter(key => capabilities[key as keyof BusinessCapabilities]);
+  }, [capabilities]);
 
-  const operationalProfile = useMemo(() =>
-    getOperationalProfile(capabilities, getActiveStructures()),
-    [capabilities, getActiveStructures]
-  );
-  
-  const insightMessage = useMemo(() => 
-    getInsightMessage(capabilities, getActiveStructures()),
-    [capabilities, getActiveStructures]
-  );
+  const activeCapabilitiesCount = useMemo(() => {
+    const mainCapabilities = ['sells_products', 'sells_services', 'manages_events', 'manages_recurrence'];
+    return mainCapabilities.filter(cap => capabilities[cap as keyof BusinessCapabilities]).length;
+  }, [capabilities]);
   
   const canSubmit = useMemo(() => 
     validationRules.requiresAtLeastOneMainCapability(capabilities), 
     [capabilities]
   );
 
-  const getBusinessModelData = useCallback((): BusinessModelData => ({
-    ...capabilities,
-    business_structure: getActiveStructures(),
-  }), [capabilities, getActiveStructures]);
+  const getBusinessModelData = useCallback(() => {
+    // Crear el objeto DNA con todas las capacidades seleccionadas
+    const businessDNA = selectedCapabilities.reduce((acc, capability) => {
+      acc[capability] = { status: 'latent' as const };
+      return acc;
+    }, {} as Record<string, { status: 'latent' }>);
+
+    return {
+      ...capabilities,
+      business_structure: getActiveStructures(),
+      businessDNA,
+    };
+  }, [capabilities, getActiveStructures, selectedCapabilities]);
 
   return {
     capabilities,
+    selectedCapabilities,
     businessStructure,
     expandedCards,
-    archetypes,
-    operationalProfile,
-    insightMessage,
+    activeCapabilitiesCount,
     canSubmit,
     toggleMainCapability,
     toggleSubCapability,

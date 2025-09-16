@@ -1,18 +1,17 @@
 // src/features/customers/ui/CustomerForm.tsx - Design System v2.0 + Zod Validation
 import {
+  FormSection,
   Stack,
-  CardWrapper,
   Typography,
   Button,
   Badge,
   Grid
 } from '@/shared/ui';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { EntitySchemas, type SchemaType } from '@/lib/validation/zod/CommonSchemas';
-import { useCustomers } from '../hooks/useCustomers'; 
+import { useCustomers } from '../hooks/useCustomers';
 import { type CreateCustomerData, type Customer } from '../../types';
-import { notify } from '@/lib/notifications';
+import { useFormManager } from '@/shared/hooks/business';
+import { CRUDHandlers } from '@/shared/utils/errorHandling';
 
 // Type inference from Zod schema - eliminates manual interface
 type CustomerFormData = SchemaType<typeof EntitySchemas.customer>;
@@ -27,26 +26,17 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
   const { addCustomer, editCustomer } = useCustomers();
   const isEditMode = !!customer;
 
-  // React Hook Form with Zod validation - eliminates manual state + validation
-  const form = useForm<CustomerFormData>({
-    resolver: zodResolver(EntitySchemas.customer),
+  // Use generic form manager with standardized error handling
+  const { register, errors, submit, isSubmitting } = useFormManager({
+    schema: EntitySchemas.customer,
     defaultValues: {
       name: customer?.name || '',
       phone: customer?.phone || '',
       email: customer?.email || '',
       address: customer?.address || '',
       note: customer?.note || ''
-    }
-  });
-
-  const { handleSubmit, register, formState: { errors, isSubmitting }, reset } = form;
-
-  // Validation is now handled automatically by Zod schema
-
-  // Form handling is now managed by React Hook Form
-
-  const onSubmit = async (data: CustomerFormData) => {
-    try {
+    },
+    onSubmit: async (data: CustomerFormData) => {
       const customerData: CreateCustomerData = {
         name: data.name.trim(),
         phone: data.phone?.trim() || undefined,
@@ -56,43 +46,40 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
       };
 
       if (isEditMode) {
-        await editCustomer({ id: customer.id, ...customerData });
-        notify.success({title: 'UPDATED_CLIENT', description:'Cliente actualizado correctamente' });
+        await CRUDHandlers.update(
+          () => editCustomer({ id: customer.id, ...customerData }),
+          'Cliente',
+          onSuccess
+        );
       } else {
-        await addCustomer(customerData);
-        notify.success({title:'CREATED_CLIENT' , description:'Cliente creado correctamente'});
-        
-        // Resetear formulario solo en modo creación
-        reset();
+        await CRUDHandlers.create(
+          () => addCustomer(customerData),
+          'Cliente',
+          onSuccess
+        );
       }
-
-      onSuccess?.();
-      
-    } catch {
-      notify.error({title:'ERROR',  description: `Error al ${isEditMode ? 'actualizar' : 'crear'} el cliente`});
-    }
-  };
+    },
+    successMessage: {
+      title: isEditMode ? 'UPDATED_CLIENT' : 'CREATED_CLIENT',
+      description: `Cliente ${isEditMode ? 'actualizado' : 'creado'} correctamente`
+    },
+    resetOnSuccess: !isEditMode
+  });
 
   return (
-    <CardWrapper padding="lg" variant="outline">
-      <Stack direction="row" justify="space-between" align="center" mb="lg">
-        <Typography variant="heading" size="md" color="text.primary">
-          {isEditMode ? '✏️ Editar Cliente' : '👥 Nuevo Cliente'}
-        </Typography>
-        {isEditMode && (
-          <Badge colorPalette="cyan" variant="subtle">
-            Modo edición
-          </Badge>
-        )}
-      </Stack>
-      
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <FormSection
+      title={isEditMode ? '✏️ Editar Cliente' : '👥 Nuevo Cliente'}
+      description="Gestiona la información del cliente"
+      actions={isEditMode && (
+        <Badge colorPalette="cyan" variant="subtle">
+          Modo edición
+        </Badge>
+      )}
+    >
+      <form onSubmit={submit}>
         <Stack direction="column" gap="lg" align="stretch">
         {/* Información básica */}
         <Stack direction="column" gap="sm">
-          <Typography size="sm" fontWeight="medium" color="text.muted">
-            Información Básica
-          </Typography>
           <Grid templateColumns={{ base: "1fr", md: "2fr 1fr" }} gap="md">
             <Stack direction="column" gap="xs">
               <Typography size="sm" color="text.muted">Nombre completo *</Typography>
@@ -241,6 +228,6 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
         </Stack>
         </Stack>
       </form>
-    </CardWrapper>
+    </FormSection>
   );
 }

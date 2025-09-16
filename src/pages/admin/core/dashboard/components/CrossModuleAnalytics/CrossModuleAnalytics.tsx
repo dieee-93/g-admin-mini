@@ -11,34 +11,22 @@ import {
   Alert,
   Skeleton,
   Select,
-  createListCollection,
   Tabs,
-  Switch,
   IconButton,
   NumberInput
 } from '@chakra-ui/react';
 import { Icon, CardWrapper } from '@/shared/ui';
 import {
-  ChartBarIcon,
-  ArrowsRightLeftIcon,
   MagnifyingGlassIcon,
   ExclamationTriangleIcon,
-  CheckCircleIcon,
   ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
   PuzzlePieceIcon,
   LightBulbIcon,
-  ArrowPathIcon,
   CogIcon,
-  EyeIcon,
-  DocumentChartBarIcon,
-  BellIcon,
-  CalendarIcon,
-  ClockIcon
+  ArrowsRightLeftIcon
 } from '@heroicons/react/24/outline';
 
 // Import event system
-import { EventBus } from '@/lib/events';
 import { EventBus } from '@/lib/events';
 
 import {
@@ -50,6 +38,7 @@ import {
   TIMEFRAME_COLLECTION,
   MODULE_COLLECTION,
 } from './CrossModuleAnalytics.mock';
+
 
 // Cross-Module Analytics Interfaces
 export interface ModuleMetric {
@@ -322,7 +311,7 @@ export function CrossModuleAnalytics() {
         bottlenecksDetected: bottlenecks.length,
         insightsGenerated: newInsights.length - insights.length,
         systemHealthScore: analyticsSummary?.overallSystemHealth || 0
-      }, 'CrossModuleAnalytics');
+      });
       
     } catch (error) {
       console.error('Error running deep analysis:', error);
@@ -403,7 +392,7 @@ export function CrossModuleAnalytics() {
                   <Select.ValueText placeholder="Período" />
                 </Select.Trigger>
                 <Select.Content>
-                  {TIMEFRAME_COLLECTION.items.map(item => (
+                  {TIMEFRAME_COLLECTION.items.map((item: { label: string; value: string }) => (
                     <Select.Item key={item.value} item={item}>
                       {item.label}
                     </Select.Item>
@@ -503,7 +492,7 @@ export function CrossModuleAnalytics() {
         </VStack>
 
         {/* Main Content Tabs */}
-        <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
+                    <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as 'overview' | 'correlations' | 'bottlenecks' | 'insights' | 'optimization')}>
           <Tabs.List>
             <Tabs.Trigger value="overview">
               <HStack gap={2}>
@@ -695,7 +684,7 @@ export function CrossModuleAnalytics() {
                       <Select.ValueText placeholder="Módulo" />
                     </Select.Trigger>
                     <Select.Content>
-                      {MODULE_COLLECTION.items.map(item => (
+                      {MODULE_COLLECTION.items.map((item: { label: string; value: string }) => (
                         <Select.Item key={item.value} item={item}>
                           {item.label}
                         </Select.Item>
@@ -1031,7 +1020,7 @@ export function CrossModuleAnalytics() {
             <Tabs.Content value="optimization">
               <CardWrapper variant="subtle">
                 <CardWrapper.Body p={8} textAlign="center">
-                  <Icon icon={ArrowTrendingUpIcon} size="3xl" color="gray.400" />
+                  <Icon icon={ArrowTrendingUpIcon} size="2xl" color="gray.400" />
                   <Text fontSize="lg" fontWeight="medium" mb={2}>
                     Optimización Avanzada
                   </Text>

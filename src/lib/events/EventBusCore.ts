@@ -304,7 +304,7 @@ export class EventBus implements IEventBusV2 {
     this.validateEventPattern(pattern);
 
     // 1. Create event object with the RAW payload
-    let event: NamespacedEvent = {
+    const event: NamespacedEvent = {
       id: options.eventId || this.generateEventId(),
       pattern,
       payload: payload, // Use raw payload for now

@@ -6,7 +6,7 @@ import {
 } from '@chakra-ui/react';
 import { TemplateCard } from './TemplateCard';
 import { type ReportTemplate } from '../types';
-import { CATEGORY_COLLECTION } from '../constants/collections';
+import { CATEGORY_COLLECTION } from './constants/collections'; 
 
 interface TemplatesTabProps {
   templates: ReportTemplate[];

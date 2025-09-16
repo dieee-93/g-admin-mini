@@ -493,19 +493,21 @@ export const createThemeSystem = (themeId: string) => {
             borderRadius: 'md',
           },
           variants: {
-            elevated: {
-              shadow: 'md',
-              bg: 'gray.100',         // Mantener superficie consistente
-              borderColor: 'gray.200', // Border más sutil para elevated
-            },
-            outline: {
-              border: '1px solid',
-              borderColor: 'gray.300',
-              bg: 'transparent',
-            },
-            subtle: {
-              bg: 'gray.200',         // Superficie ligeramente diferente
-            },
+            variant: {
+              elevated: {
+                boxShadow: 'md',
+                bg: 'gray.100',         // Mantener superficie consistente
+                borderColor: 'gray.200', // Border más sutil para elevated
+              },
+              outline: {
+                border: '1px solid',
+                borderColor: 'gray.300',
+                bg: 'transparent',
+              },
+              subtle: {
+                bg: 'gray.200',         // Superficie ligeramente diferente
+              },
+            }
           },
         },
 
@@ -515,26 +517,28 @@ export const createThemeSystem = (themeId: string) => {
             borderRadius: 'md',
           },
           variants: {
-            info: {
-              bg: 'blue.50',
-              borderColor: 'blue.200',
-              color: 'blue.800',
-            },
-            success: {
-              bg: 'green.50',
-              borderColor: 'green.200',
-              color: 'green.800',
-            },
-            warning: {
-              bg: 'yellow.50',
-              borderColor: 'yellow.200',
-              color: 'yellow.800',
-            },
-            error: {
-              bg: 'red.50',
-              borderColor: 'red.200',
-              color: 'red.800',
-            },
+            status: {
+              info: {
+                bg: 'blue.50',
+                borderColor: 'blue.200',
+                color: 'blue.800',
+              },
+              success: {
+                bg: 'green.50',
+                borderColor: 'green.200',
+                color: 'green.800',
+              },
+              warning: {
+                bg: 'yellow.50',
+                borderColor: 'yellow.200',
+                color: 'yellow.800',
+              },
+              error: {
+                bg: 'red.50',
+                borderColor: 'red.200',
+                color: 'red.800',
+              },
+            }
           },
         },
 
@@ -547,27 +551,29 @@ export const createThemeSystem = (themeId: string) => {
             borderRadius: 'md',
           },
           variants: {
-            outline: {
-              border: '1px solid',
-              borderColor: 'border.default',
-              bg: 'bg.panel',
-              color: 'text.primary',
-              _hover: {
-                borderColor: 'gray.400',
+            variant: {
+              outline: {
+                border: '1px solid',
+                borderColor: 'border.default',
+                bg: 'bg.panel',
+                color: 'text.primary',
+                _hover: {
+                  borderColor: 'gray.400',
+                },
+                _focus: {
+                  borderColor: 'gray.500',
+                  boxShadow: '0 0 0 1px {colors.gray.500}',
+                },
               },
-              _focus: {
-                borderColor: 'gray.500',
-                boxShadow: '0 0 0 1px {colors.gray.500}',
+              filled: {
+                bg: 'bg.subtle',
+                color: 'text.primary',
+                border: 'none',
+                _hover: {
+                  bg: 'bg.muted',
+                },
               },
-            },
-            filled: {
-              bg: 'bg.subtle',
-              color: 'text.primary',
-              border: 'none',
-              _hover: {
-                bg: 'bg.muted',
-              },
-            },
+            }
           },
         },
       },
@@ -583,10 +589,17 @@ export const createThemeSystem = (themeId: string) => {
 /**
  * Get the current theme system based on store state
  */
-export const getCurrentThemeSystem = (currentTheme: unknown) => {
-  if (!currentTheme) {
-    return createSystem(defaultConfig) // ✅ DefaultConfig para fallback
+export const getCurrentThemeSystem = (currentTheme: any) => {
+  // Always return a fallback if no theme or invalid theme
+  if (!currentTheme || typeof currentTheme !== 'object' || !currentTheme.id) {
+    console.warn('No valid theme provided, using default system')
+    return createSystem(defaultConfig)
   }
   
-  return createThemeSystem(currentTheme.id)
+  try {
+    return createThemeSystem(currentTheme.id)
+  } catch (error) {
+    console.error('Error in createThemeSystem, falling back to default:', error)
+    return createSystem(defaultConfig)
+  }
 }

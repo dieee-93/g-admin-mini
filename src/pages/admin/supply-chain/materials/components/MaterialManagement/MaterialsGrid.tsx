@@ -5,9 +5,9 @@ import {
 import { PencilIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { CubeIcon } from '@heroicons/react/24/outline';
 import { useMaterials } from '@/store/materialsStore';
-import { StockCalculation } from '@/pages/admin/supply-chain/inventory/stockCalculation';
-import type { MaterialItem } from '../types';
-import { isMeasurable } from '../types';
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
+import type { MaterialItem } from '../../types';
+import { isMeasurable } from '../../types'; 
 
 interface MaterialsGridProps {
   onEdit: (item: MaterialItem) => void;

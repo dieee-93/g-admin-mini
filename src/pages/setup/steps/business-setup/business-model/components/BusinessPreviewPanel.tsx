@@ -7,64 +7,74 @@ import {
   Circle,
   HStack,
   VStack,
+  Wrap,
+  WrapItem,
+  Badge,
 } from '@chakra-ui/react';
 import {
   InformationCircleIcon,
-  ComputerDesktopIcon,
+  StarIcon,
 } from '@heroicons/react/24/outline';
-import { BusinessConstellation } from './constellation/BusinessConstellation';
-import { operationalProfileMilestones } from '@/config/milestones';
+
+// Mapeo de capacidades a iconos y nombres amigables
+const capabilityDisplayMap: Record<string, { icon: string; displayName: string; color: string }> = {
+  sells_products: { icon: '📦', displayName: 'Vende Productos', color: 'blue' },
+  sells_services: { icon: '🛠️', displayName: 'Vende Servicios', color: 'green' },
+  manages_events: { icon: '🎉', displayName: 'Gestiona Eventos', color: 'purple' },
+  manages_recurrence: { icon: '🔄', displayName: 'Ingresos Recurrentes', color: 'orange' },
+  sells_products_for_onsite_consumption: { icon: '🍽️', displayName: 'Consumo Local', color: 'blue' },
+  sells_products_for_pickup: { icon: '📋', displayName: 'Para Llevar', color: 'blue' },
+  sells_products_with_delivery: { icon: '🚚', displayName: 'Delivery', color: 'blue' },
+  sells_digital_products: { icon: '💻', displayName: 'Productos Digitales', color: 'blue' },
+  sells_services_by_appointment: { icon: '📅', displayName: 'Por Cita', color: 'green' },
+  sells_services_by_class: { icon: '👥', displayName: 'Clases Grupales', color: 'green' },
+  sells_space_by_reservation: { icon: '🏢', displayName: 'Espacios', color: 'green' },
+  hosts_private_events: { icon: '🎊', displayName: 'Eventos Privados', color: 'purple' },
+  manages_offsite_catering: { icon: '🍾', displayName: 'Catering', color: 'purple' },
+  manages_rentals: { icon: '🏠', displayName: 'Alquileres', color: 'orange' },
+  manages_memberships: { icon: '🎫', displayName: 'Membresías', color: 'orange' },
+  manages_subscriptions: { icon: '📱', displayName: 'Suscripciones', color: 'orange' },
+  has_online_store: { icon: '🛒', displayName: 'Tienda Online', color: 'teal' },
+  is_b2b_focused: { icon: '🏢', displayName: 'Enfoque B2B', color: 'gray' },
+};
 
 interface BusinessPreviewPanelProps {
-  archetypes: string[];
-  operationalProfile: string[];
-  insightMessage: string | null;
+  selectedCapabilities: string[];
+  activeCapabilitiesCount: number;
   completedMilestones: string[];
 }
 
-const profileIcons = {
-  'E-commerce Asincrónico': '🛒',
-  'Canal Digital Sincrónico': '🌐',
-  'Enfoque B2B': '🤝',
-  'Multi-Sucursal': '🏬',
-  'Móvil / Nómada': '🚚',
-  'Escala Local': '🏠',
-};
-
-const formatArchetypesTitle = (archetypes: string[]): string => {
-  if (!archetypes || archetypes.length === 0 || archetypes[0] === 'Negocio') {
-    return 'Define tu Negocio';
-  }
-  if (archetypes.length === 1) {
-    return archetypes[0];
-  }
-  const last = archetypes[archetypes.length - 1];
-  const rest = archetypes.slice(0, -1);
-  return `${rest.join(', ')} y ${last}`;
-};
-
 export function BusinessPreviewPanel({
-  archetypes,
-  operationalProfile,
-  insightMessage,
+  selectedCapabilities,
+  activeCapabilitiesCount,
   completedMilestones,
 }: BusinessPreviewPanelProps) {
 
-  const profileWithStatus = operationalProfile.map(profileName => {
-    const milestoneId = operationalProfileMilestones[profileName];
-    return {
-      name: profileName,
-      isUnlocked: completedMilestones.includes(milestoneId) || !milestoneId,
-      icon: profileIcons[profileName] || '🪐',
-    };
-  });
+  const getConstellationTitle = (): string => {
+    if (activeCapabilitiesCount === 0) {
+      return 'Define tu ADN de Negocio';
+    }
+    if (activeCapabilitiesCount === 1) {
+      return 'Tu Modelo de Negocio';
+    }
+    return 'Tu Constelación de Negocio';
+  };
 
-  const title = formatArchetypesTitle(archetypes);
-  const showHelpBox = archetypes.length === 1 && archetypes[0] === 'Negocio';
+  const getConstellationSubtitle = (): string => {
+    if (activeCapabilitiesCount === 0) {
+      return 'Selecciona las capacidades que formarán el núcleo de tu negocio.';
+    }
+    if (activeCapabilitiesCount === 1) {
+      return 'Has iniciado la definición de tu modelo único.';
+    }
+    return `${activeCapabilitiesCount} capacidades componen tu modelo único.`;
+  };
+
+  const showHelpBox = activeCapabilitiesCount === 0;
 
   return (
     <Stack gap={5} position="sticky" top="24px">
-      {/* Main Identity CardWrapper  */}
+      {/* Main Business DNA Card */}
       <Box bg="gray.50" borderRadius="xl" overflow="hidden" boxShadow="md">
         <Box
           bg="gray.700"
@@ -78,37 +88,70 @@ export function BusinessPreviewPanel({
         </Box>
 
         <VStack p={{ base: 4, md: 6 }} gap={4}>
-          <BusinessConstellation
-            archetype={archetypes[0]} // Pass the primary archetype for visualization
-            operationalProfile={profileWithStatus}
-          />
+          {/* Constellation Icon/Visual */}
+          <Box position="relative">
+            <Circle size="80px" bg="gray.100" color="gray.500">
+              <StarIcon width={32} height={32} />
+            </Circle>
+            {activeCapabilitiesCount > 0 && (
+              <Circle 
+                size="24px" 
+                bg="blue.500" 
+                color="white" 
+                position="absolute" 
+                top="-2px" 
+                right="-2px"
+                fontSize="sm"
+                fontWeight="bold"
+              >
+                {activeCapabilitiesCount}
+              </Circle>
+            )}
+          </Box>
+
           <VStack textAlign="center" mt={2}>
-            <Heading size="md" color="gray.800">{title}</Heading>
+            <Heading size="md" color="gray.800">
+              {getConstellationTitle()}
+            </Heading>
             <Text fontSize="sm" color="gray.600" maxW="80%">
-              Esta es la constelación que representa tu negocio.
+              {getConstellationSubtitle()}
             </Text>
           </VStack>
+
+          {/* Capabilities Constellation Display */}
+          {selectedCapabilities.length > 0 && (
+            <Box w="full" mt={4}>
+              <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>
+                Capacidades Activas:
+              </Text>
+              <Wrap gap={2} justify="center">
+                {selectedCapabilities.map((capability) => {
+                  const display = capabilityDisplayMap[capability];
+                  if (!display) return null;
+                  
+                  return (
+                    <WrapItem key={capability}>
+                      <Badge
+                        colorScheme={display.color}
+                        variant="subtle"
+                        px={3}
+                        py={1}
+                        borderRadius="full"
+                        fontSize="xs"
+                      >
+                        <HStack gap={1}>
+                          <Text>{display.icon}</Text>
+                          <Text>{display.displayName}</Text>
+                        </HStack>
+                      </Badge>
+                    </WrapItem>
+                  );
+                })}
+              </Wrap>
+            </Box>
+          )}
         </VStack>
       </Box>
-
-      {/* Business Insight */}
-      {insightMessage && (
-        <Box bg="gray.50" borderRadius="xl" overflow="hidden" boxShadow="md" p={4}>
-          <HStack gap={3} align="flex-start">
-            <Circle size="36px" bg="gray.200" color="gray.600">
-              <ComputerDesktopIcon width={16} height={16} />
-            </Circle>
-            <Stack gap={1}>
-              <Text fontWeight="medium" fontSize="sm" color="gray.800">
-                Insight de Negocio
-              </Text>
-              <Text fontSize="sm" color="gray.600">
-                {insightMessage}
-              </Text>
-            </Stack>
-          </HStack>
-        </Box>
-      )}
 
       {/* Help Box - Only shown when needed */}
       {showHelpBox && (
@@ -125,10 +168,10 @@ export function BusinessPreviewPanel({
             </Circle>
             <Stack gap={1}>
               <Text fontWeight="medium" fontSize="sm" color="blue.800">
-                Define tu Arquetipo
+                Construye tu Modelo Único
               </Text>
               <Text fontSize="sm" color="blue.700">
-                Selecciona al menos una actividad principal para revelar el núcleo de tu negocio.
+                Cada capacidad que selecciones se convertirá en parte del ADN de tu negocio. Puedes elegir múltiples capacidades que coexistirán en tu modelo.
               </Text>
             </Stack>
           </HStack>

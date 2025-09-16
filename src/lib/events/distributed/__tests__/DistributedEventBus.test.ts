@@ -6,7 +6,7 @@ import type { NamespacedEvent } from '../../types';
 
 // Mock IndexedDB for testing - comprehensive mock
 const createMockIndexedDB = () => {
-  let databases = new Map();
+  const databases = new Map();
 
   const mockIndexedDB = {
     open: vi.fn((name: string, version?: number) => {

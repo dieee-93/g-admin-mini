@@ -5,9 +5,7 @@ import {
   type ReportAutomation,
   type ReportInsight,
 } from '../types';
-import {
-  generateMockReportingData
-} from '../../../data/mockData';
+import { generateMockReportingData } from '../../dashboard/data/mockData'; 
 
 export function useReportingData() {
   const [templates, setTemplates] = useState<ReportTemplate[]>([]);

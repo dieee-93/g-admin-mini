@@ -107,11 +107,11 @@ describe('RateLimiter', () => {
       }
       
       // IP1 should be blocked
-      let result1 = await rateLimiter.checkLimit('test.event', ip1);
+      const result1 = await rateLimiter.checkLimit('test.event', ip1);
       expect(result1.allowed).toBe(false);
       
       // IP2 should still be allowed
-      let result2 = await rateLimiter.checkLimit('test.event', ip2);
+      const result2 = await rateLimiter.checkLimit('test.event', ip2);
       expect(result2.allowed).toBe(true);
     });
   });

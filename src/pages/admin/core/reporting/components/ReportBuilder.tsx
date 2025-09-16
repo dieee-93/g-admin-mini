@@ -14,7 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { CardWrapper, Button } from '@/shared/ui';
 import { type ReportTemplate } from '../types';
-import { CATEGORY_COLLECTION } from '../constants/collections';
+import { CATEGORY_COLLECTION } from './constants/collections'; 
 
 interface ReportBuilderProps {
   // This will be expanded later when we add the hook

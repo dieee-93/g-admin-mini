@@ -192,7 +192,7 @@ export const SlotProvider: React.FC<SlotProviderProps> = ({
 
   // Debug information
   if (debug && process.env.NODE_ENV === 'development') {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     React.useEffect(() => {
       console.log('🎰 Slot Registry State:', {
         totalSlots: Object.keys(slotRegistry).length,

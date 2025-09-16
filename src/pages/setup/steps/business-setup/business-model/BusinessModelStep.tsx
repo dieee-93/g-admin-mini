@@ -12,12 +12,12 @@ import {
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { BusinessPreviewPanel } from './components/BusinessPreviewPanel';
 import { useBusinessCapabilities } from './hooks/useBusinessCapabilities';
-import { BusinessModelData } from './config/businessCapabilities';
+import type { BusinessModelData } from './config/businessCapabilities';
 import { CapabilitiesStep } from './components/CapabilitiesStep';
 import { StepProfile } from './components/StepProfile';
 
 interface BusinessModelStepProps {
-  onComplete: (data: BusinessModelData) => void;
+  onComplete: (data: BusinessModelData & { businessDNA: Record<string, { status: 'latent' }> }) => void;
   onBack: () => void;
 }
 
@@ -52,6 +52,7 @@ export function BusinessModelStep({
     }
   };
 
+  // Nuevo modelo compositivo: toggles independientes
   const handleCompetencyChange = (competency: keyof typeof selectedCompetencies) => {
     const isSelected = !selectedCompetencies[competency];
     setSelectedCompetencies(prev => ({ ...prev, [competency]: isSelected }));
@@ -145,8 +146,8 @@ export function BusinessModelStep({
               <Button
                 variant="outline"
                 onClick={handleBack}
-                leftIcon={<ChevronUpIcon width={16} height={16}/>}
               >
+                <ChevronUpIcon width={16} height={16}/>
                 {currentStep === 1 ? 'Volver al Wizard' : 'Volver'}
               </Button>
               <Button
@@ -158,9 +159,9 @@ export function BusinessModelStep({
                 onClick={handleNext}
                 disabled={!businessModel.canSubmit}
                 cursor={businessModel.canSubmit ? 'pointer' : 'not-allowed'}
-                rightIcon={<ChevronDownIcon width={16} height={16} />}
               >
                 {currentStep === totalSteps ? 'Finalizar y Guardar' : 'Continuar'}
+                <ChevronDownIcon width={16} height={16} />
               </Button>
             </Flex>
           </Box>
@@ -170,9 +171,8 @@ export function BusinessModelStep({
       {/* RIGHT COLUMN: PREVIEW & INSIGHTS */}
       <GridItem>
         <BusinessPreviewPanel
-          archetypes={businessModel.archetypes}
-          operationalProfile={businessModel.operationalProfile}
-          insightMessage={businessModel.insightMessage}
+          selectedCapabilities={businessModel.selectedCapabilities}
+          activeCapabilitiesCount={businessModel.activeCapabilitiesCount}
           completedMilestones={[]}
         />
       </GridItem>

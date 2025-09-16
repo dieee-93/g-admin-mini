@@ -405,7 +405,7 @@ export class ContentSecurityPolicy {
     sanitizedContent?: string;
   } {
     const violations: string[] = [];
-    let valid = true;
+    const valid = true;
 
     switch (contentType) {
       case 'script':

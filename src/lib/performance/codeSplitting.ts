@@ -1,5 +1,5 @@
 // codeSplitting.ts - Centralized code splitting configuration
-import { lazy } from 'react';
+import React, { lazy } from 'react';
 import { createLazyRoute, createLazyFeature } from './lazyLoading';
 
 // Configuration for large components that need splitting
@@ -28,34 +28,26 @@ export const CODE_SPLITTING_CONFIG = {
 export const lazyComponents = {
   // Materials module - Updated paths for route-based architecture v4.0
   OfflineMaterialsPage: createLazyRoute(
-    () => import('../../pages/admin/supply-chain/materials/components/LazyOfflineMaterialsPage'),
+    () => import('@/pages/admin/supply-chain/materials/components/LazyOfflineMaterialsPage'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.MATERIALS
   ),
   
   CrossModuleAnalytics: createLazyRoute(
-<<<<<<< HEAD
     () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
   ),
   ExecutiveDashboard: createLazyRoute(
-    () => import('@/pages/admin/core/dashboard/components/ExecutiveDashboard/LazyExecutiveDashboard'),
-=======
-    () => import('../../pages/admin/core/dashboard/components/business/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
-    CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
-  ),
-  ExecutiveDashboard: createLazyRoute(
-    () => import('../../pages/admin/core/dashboard/components/business/ExecutiveDashboard/LazyExecutiveDashboard'),
->>>>>>> refactor/module-reorganization
+    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.EXECUTIVE
   ),
+
   RecipeForm: createLazyRoute(
-    () => import('../../services/recipe/components/LazyRecipeForm'),
+    () => import('@/services/recipe/components/LazyRecipeForm'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.RECIPES
   ),
 
   // Sub-components
   MaterialsHeader: createLazyFeature(
-<<<<<<< HEAD
     () => import('@/pages/admin/supply-chain/materials/components/Overview/MaterialsHeader'),
     'MaterialsHeader'
   ),
@@ -72,34 +64,19 @@ export const lazyComponents = {
     'BottlenecksView'
   ),
   ExecutiveKPIGrid: createLazyFeature(
-    () => import('@/pages/admin/core/dashboard/components/ExecutiveDashboard/components/ExecutiveKPIGrid'),
-=======
-    () => import('../../pages/admin/supply-chain/materials/components/MaterialsHeader'),
-    'MaterialsHeader'
-  ),
-  MaterialsGrid: createLazyFeature(
-    () => import('../../pages/admin/supply-chain/materials/components/MaterialsGrid'),
-    'MaterialsGrid'
-  ),
-  CorrelationsView: createLazyFeature(
-    () => import('../../pages/admin/core/dashboard/components/business/CrossModuleAnalytics/components/CorrelationsView'),
-    'CorrelationsView'
-  ),
-  BottlenecksView: createLazyFeature(
-    () => import('../../pages/admin/core/dashboard/components/business/CrossModuleAnalytics/components/BottlenecksView'),
-    'BottlenecksView'
-  ),
-  ExecutiveKPIGrid: createLazyFeature(
-    () => import('../../pages/admin/core/dashboard/components/business/ExecutiveDashboard/components/ExecutiveKPIGrid'),
->>>>>>> refactor/module-reorganization
+    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/CrossModuleAnalytics'),
     'ExecutiveKPIGrid'
   ),
+  MaterialsGrid: createLazyFeature(
+    () => import('@/pages/admin/supply-chain/materials/components/MaterialManagement/MaterialsGrid'),
+    'MaterialsGrid'
+  ),
   RecipeBasicForm: createLazyFeature(
-    () => import('../../services/recipe/components/components/RecipeBasicForm'),
+    () => import('@/services/recipe/components/components/RecipeBasicForm'),
     'RecipeBasicForm'
   ),
   RecipeAISuggestions: createLazyFeature(
-    () => import('../../services/recipe/components/components/RecipeAISuggestions'),
+    () => import('@/services/recipe/components/components/RecipeAISuggestions'),
     'RecipeAISuggestions'
   ),
 };
@@ -134,7 +111,7 @@ export class CodeSplittingMonitor {
   static getPerformanceReport() {
     const report = {
       loadTimes: Object.fromEntries(this.loadTimes),
-      averageLoadTimes: {},
+      averageLoadTimes: {} as Record<string, number>,
       chunkSizes: Object.fromEntries(this.chunkSizes),
       recommendations: [] as string[]
     };
@@ -166,9 +143,8 @@ export class CodeSplittingMonitor {
 
 // Helper function to create lazy components with monitoring
 export function createMonitoredLazyComponent(
-  importFn: () => Promise<any>,
-  componentName: string,
-  chunkName?: string
+  importFn: () => Promise<{ default: React.ComponentType }>,
+  componentName: string
 ) {
   return lazy(async () => {
     const startTime = performance.now();

@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react';
 import {
+  FormSection,
+  Stack,
+  Typography,
+  Button,
+  Badge,
+  Alert,
+  Grid
+} from '@/shared/ui';
+import {
   VStack,
   HStack,
   Text,
@@ -7,10 +16,7 @@ import {
   Select,
   createListCollection,
   NumberInput,
-  Button,
   CardWrapper,
-  Badge,
-  Alert,
   Box,
   Textarea,
   Switch,

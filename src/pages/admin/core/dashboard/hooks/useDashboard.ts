@@ -7,8 +7,8 @@ import {
   ClockIcon,
   ChartBarIcon,
   CheckCircleIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   UserGroupIcon,
   ScaleIcon
 } from '@heroicons/react/24/outline';
@@ -103,7 +103,7 @@ export function useDashboard() {
 
     const kpiIconMapping = {
       financial: CurrencyDollarIcon,
-      operational: TrendingUpIcon,
+      operational: ArrowTrendingUpIcon,
       customer: UserGroupIcon,
       strategic: ScaleIcon,
     };
