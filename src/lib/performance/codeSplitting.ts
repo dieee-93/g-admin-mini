@@ -33,11 +33,11 @@ export const lazyComponents = {
   ),
   
   CrossModuleAnalytics: createLazyRoute(
-    () => import('@/pages/admin/core/dashboard/components/business/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
+    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
   ),
   ExecutiveDashboard: createLazyRoute(
-    () => import('@/pages/admin/core/dashboard/components/business/ExecutiveDashboard/LazyExecutiveDashboard'),
+    () => import('@/pages/admin/core/dashboard/components/ExecutiveDashboard/LazyExecutiveDashboard'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.EXECUTIVE
   ),
   RecipeForm: createLazyRoute(
@@ -47,23 +47,23 @@ export const lazyComponents = {
 
   // Sub-components
   MaterialsHeader: createLazyFeature(
-    () => import('@/pages/admin/supply-chain/materials/components/MaterialsHeader'),
+    () => import('@/pages/admin/supply-chain/materials/components/Overview/MaterialsHeader'),
     'MaterialsHeader'
   ),
-  MaterialsGrid: createLazyFeature(
-    () => import('@/pages/admin/supply-chain/materials/components/MaterialsGrid'),
-    'MaterialsGrid'
+  MaterialsInventoryGrid: createLazyFeature(
+    () => import('@/pages/admin/supply-chain/materials/components/MaterialsList/MaterialsInventoryGrid'),
+    'MaterialsInventoryGrid'
   ),
   CorrelationsView: createLazyFeature(
-    () => import('@/pages/admin/core/dashboard/components/business/CrossModuleAnalytics/components/CorrelationsView'),
+    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/components/CorrelationsView'),
     'CorrelationsView'
   ),
   BottlenecksView: createLazyFeature(
-    () => import('@/pages/admin/core/dashboard/components/business/CrossModuleAnalytics/components/BottlenecksView'),
+    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/components/BottlenecksView'),
     'BottlenecksView'
   ),
   ExecutiveKPIGrid: createLazyFeature(
-    () => import('@/pages/admin/core/dashboard/components/business/ExecutiveDashboard/components/ExecutiveKPIGrid'),
+    () => import('@/pages/admin/core/dashboard/components/ExecutiveDashboard/components/ExecutiveKPIGrid'),
     'ExecutiveKPIGrid'
   ),
   RecipeBasicForm: createLazyFeature(

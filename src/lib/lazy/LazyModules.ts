@@ -69,7 +69,7 @@ export const LazyStaffPage = createLazyComponent(
 
 // Lazy-loaded Customers Page (pages/admin/core/crm/page.tsx)
 export const LazyCustomersPage = createLazyComponent(
-  () => import('../../pages/admin/core/crm/page'),
+  () => import('../../pages/admin/core/crm/customers/page'),
   'customers',
   {
     chunkName: 'customers-module',
@@ -143,7 +143,9 @@ export const LazyThemeTestPage = createLazyComponent(
 
 // Materials Sub-Pages (pages/admin/supply-chain/materials/*)
 export const LazySupplyChainPage = createLazyComponent(
-  () => import('../../pages/admin/supply-chain/materials/supply-chain'),
+  () => import('../../pages/admin/supply-chain/materials/components/Procurement').then(module => ({
+    default: module.SupplyChainAnalysis
+  })),
   'supply-chain',
   {
     chunkName: 'supply-chain-module',
@@ -154,7 +156,7 @@ export const LazySupplyChainPage = createLazyComponent(
 );
 
 export const LazyProcurementPage = createLazyComponent(
-  () => import('../../pages/admin/supply-chain/materials/procurement'),
+  () => import('../../pages/admin/supply-chain/materials/components/Procurement/ProcurementRecommendationsTab'),
   'procurement',
   {
     chunkName: 'procurement-module',

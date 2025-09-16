@@ -10,7 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useMaterials } from '@/store/materialsStore';
 import { useSales } from '../../../operations/sales/hooks/useSales';
-import { useCustomers } from '@/pages/admin/core/crm/hooks/useCustomers';
+import { useCustomers } from '../../crm/customers/hooks/existing/useCustomers';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import type { DashboardStats, AlertItem, MetricCardProps } from '../types';

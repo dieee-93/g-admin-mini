@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { CompetitorData, MarketTrend, MarketInsight } from '../types';
-import { generateMockCompetitiveData } from '../../../../data/mockData';
+import type { CompetitorData, MarketTrend, MarketInsight } from '../types';
+import { generateMockCompetitiveData } from '../../../data/mockData';
 import { EventBus } from '@/lib/events';
 
 export const useCompetitiveIntelligence = () => {

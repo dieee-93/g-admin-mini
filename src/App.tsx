@@ -58,7 +58,7 @@ import {
 } from '@/lib/lazy';
 
 // Materials sub-modules
-import { default as ABCAnalysisView } from '@/pages/admin/supply-chain/materials/abc-analysis';
+import { ABCAnalysisSection as ABCAnalysisView } from '@/pages/admin/supply-chain/materials/components/Analytics';
 // LazySupplyChainPage and LazyProcurementPage now imported from central LazyModules
 
 // Settings sub-modules

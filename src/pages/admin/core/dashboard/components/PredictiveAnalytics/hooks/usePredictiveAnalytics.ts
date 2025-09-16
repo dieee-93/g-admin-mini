@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { MaterialDemand, PredictiveAnalyticsConfig } from '../types';
-import { generateMockPredictiveData } from '../../../../data/mockData';
+import type { MaterialDemand, PredictiveAnalyticsConfig } from '../types';
+import { generateMockPredictiveData } from '../../../data/mockData'; 
 import { EventBus } from '@/lib/events';
 
 export const usePredictiveAnalytics = () => {

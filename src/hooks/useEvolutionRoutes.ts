@@ -32,7 +32,9 @@ export function useEvolutionRoutes(): { suggestedRoutes: EvolutionRoute[], isLoa
     const completedMilestones = customizations?.milestonesCompleted || [];
 
     // Determine the full operational profile based on current capabilities
-    const fullOperationalProfile = getOperationalProfile(capabilities, businessStructure);
+    // Convert businessStructure to array format if it's a single value
+    const businessStructureArray = businessStructure ? [businessStructure] : [];
+    const fullOperationalProfile = getOperationalProfile(capabilities, businessStructureArray);
 
     // Find which planets are locked and have an associated milestone
     const lockedPlanets = fullOperationalProfile

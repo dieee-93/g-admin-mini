@@ -47,7 +47,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 // Fiscal imports
-import { fiscalApi } from '../../data/fiscalApi';
+import { fiscalApi } from '../../services';
 import { notify } from '@/lib/notifications';
 import { type Invoice, type InvoiceType, type CondicionIVA } from '../../types';
 
@@ -193,11 +193,11 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
 
   const getStatusBadge = (invoice: Invoice) => {
     if (invoice.cae) {
-      return <Badge colorPalette="success">Aprobada</Badge>;
+      return <Badge colorPalette="green">Aprobada</Badge>;
     } else if (invoice.resultado === 'R') {
-      return <Badge colorPalette="error">Rechazada</Badge>;
+      return <Badge colorPalette="red">Rechazada</Badge>;
     } else {
-      return <Badge colorPalette="warning">Pendiente</Badge>;
+      return <Badge colorPalette="orange">Pendiente</Badge>;
     }
   };
 
@@ -215,7 +215,7 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
         <Modal>
           <ModalTrigger asChild>
             <Button 
-              colorPalette="success"
+              colorPalette="green"
               size="lg"
               onClick={() => setShowCreateModal(true)}
             >
@@ -300,7 +300,7 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                colorPalette="error"
+                                colorPalette="red"
                                 onClick={() => removeItem(index)}
                               >
                                 <TrashIcon className="w-4 h-4" />
@@ -380,7 +380,7 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
                 <Button variant="outline">Cancelar</Button>
               </ModalClose>
               <Button
-                colorPalette="success"
+                colorPalette="green"
                 loading={isCreating}
                 onClick={handleCreateInvoice}
                 disabled={!formData.denominacion_cliente || formData.items.some(item => !item.descripcion)}

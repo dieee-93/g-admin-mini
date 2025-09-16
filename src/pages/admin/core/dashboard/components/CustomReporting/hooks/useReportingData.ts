@@ -7,7 +7,7 @@ import {
 } from '../types';
 import {
   generateMockReportingData
-} from '../../../../data/mockData';
+} from '../../../data/mockData';
 
 export function useReportingData() {
   const [templates, setTemplates] = useState<ReportTemplate[]>([]);
