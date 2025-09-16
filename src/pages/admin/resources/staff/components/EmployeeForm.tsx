@@ -10,10 +10,10 @@ import {
   Modal,
   Alert,
   Icon
-} from '@/shared/ui';
+} from '../../../../../shared/ui';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { useStaffWithLoader } from '@/hooks/useStaffData';
-import type { Employee } from '@/services/staff/staffApi';
+import { useStaffWithLoader } from '../../../../../hooks/useStaffData';
+import type { Employee } from '../../../../../services/staff/staffApi';
 
 interface EmployeeFormProps {
   employee?: Employee;

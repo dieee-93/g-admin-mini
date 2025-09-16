@@ -1,8 +1,8 @@
 
 import { ChakraProvider } from '@chakra-ui/react'
 import { type ReactNode } from 'react'
-import { useThemeStore } from '@/store/themeStore'
-import { getCurrentThemeSystem } from '@/lib/theming/dynamicTheming'
+import { useThemeStore } from '../../store/themeStore'
+import { getCurrentThemeSystem } from '../../lib/theming/dynamicTheming'
 
 interface ProviderProps {
   children: ReactNode
@@ -16,7 +16,7 @@ export function Provider({ children }: ProviderProps) {
   
 
   return (
-    <ChakraProvider value={dynamicSystem}>
+    <ChakraProvider theme={dynamicSystem}>
       {children}
     </ChakraProvider>
   )

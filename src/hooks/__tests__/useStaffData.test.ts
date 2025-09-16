@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useStaffData, useStaffDataRange, useStaffWithLoader, usePerformanceAnalytics } from '../useStaffData';
-import { useStaffStore } from '@/store/staffStore';
+import { useStaffStore } from '../../../store/staffStore';
 
 // Mock the staff store
 const mockStaffStore = {
@@ -29,7 +29,7 @@ const mockStaffStore = {
 vi.mocked(useStaffStore).mockReturnValue(mockStaffStore);
 
 // Mock the staff API
-vi.mock('@/services/staff/staffApi', () => ({
+vi.mock('../../../services/staff/staffApi', () => ({
   getEmployeePerformance: vi.fn().mockResolvedValue([]),
   getDepartmentPerformance: vi.fn().mockResolvedValue([]),
   getPerformanceTrends: vi.fn().mockResolvedValue([]),
@@ -261,7 +261,7 @@ describe('usePerformanceAnalytics', () => {
   });
 
   it('should handle errors correctly', async () => {
-    const { getEmployeePerformance } = await import('@/services/staff/staffApi');
+    const { getEmployeePerformance } = await import('../../../services/staff/staffApi');
     vi.mocked(getEmployeePerformance).mockRejectedValueOnce(new Error('API Error'));
 
     const { result } = renderHook(() => usePerformanceAnalytics());
@@ -277,7 +277,7 @@ describe('usePerformanceAnalytics', () => {
     const { result } = renderHook(() => usePerformanceAnalytics());
 
     // First cause an error
-    const { getEmployeePerformance } = await import('@/services/staff/staffApi');
+    const { getEmployeePerformance } = await import('../../../services/staff/staffApi');
     vi.mocked(getEmployeePerformance).mockRejectedValueOnce(new Error('API Error'));
     
     await act(async () => {
@@ -296,7 +296,7 @@ describe('usePerformanceAnalytics', () => {
 
   it('should return data from analytics functions', async () => {
     const mockData = [{ month: '2024-01', score: 85 }];
-    const { getEmployeePerformance } = await import('@/services/staff/staffApi');
+    const { getEmployeePerformance } = await import('../../../services/staff/staffApi');
     vi.mocked(getEmployeePerformance).mockResolvedValueOnce(mockData);
 
     const { result } = renderHook(() => usePerformanceAnalytics());

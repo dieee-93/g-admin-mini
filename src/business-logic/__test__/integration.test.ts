@@ -6,8 +6,8 @@ import { describe, it, expect } from 'vitest';
 import { DecimalUtils } from '../shared/decimalUtils';
 import { taxService } from '../fiscal/taxCalculationService';
 import { StockCalculation } from '../inventory/stockCalculation';
-import { recipeService } from '@/services/recipe/RecipeService';
-import { SmartCostCalculationEngine } from '@/business-logic/recipes/recipeCostCalculationEngine';
+import { recipeService } from '../../services/recipe/RecipeService';
+import { SmartCostCalculationEngine } from '../recipes/recipeCostCalculationEngine';
 
 describe('🎯 PRUEBA FINAL DE INTEGRACIÓN - Sistema Decimal.js Completo', () => {
 

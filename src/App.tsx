@@ -30,13 +30,10 @@ import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
 
 // Dashboard Module - Critical, not lazy loaded
 import { Dashboard } from '@/pages/admin/core/dashboard/page';
-import {
-  ExecutiveDashboard,
-  CrossModuleAnalytics,
-  CustomReporting,
-  CompetitiveIntelligence,
-  PredictiveAnalytics as PredictiveAnalyticsComponent
-} from '@/pages/admin/core/dashboard/components';
+import { CrossModuleAnalytics } from '@/pages/admin/core/dashboard/components/CrossModuleAnalytics';
+import { PredictiveAnalytics as PredictiveAnalyticsComponent } from '@/pages/admin/supply-chain/materials/components/PredictiveAnalytics';
+import CustomReporting from '@/pages/admin/core/reporting/page';
+import CompetitiveIntelligence from '@/pages/admin/core/intelligence/page';
 
 // Setup Wizard - Direct import to avoid lazy loading issues temporarily
 import { SetupWizard } from '@/pages/setup/SetupWizard';
@@ -191,13 +188,6 @@ function App() {
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
-                        <Route path="/admin/dashboard/executive" element={
-                          <ProtectedRouteNew>
-                            <ResponsiveLayout>
-                              <ExecutiveDashboard />
-                            </ResponsiveLayout>
-                          </ProtectedRouteNew>
-                        } />
                         <Route path="/admin/dashboard/cross-analytics" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
@@ -205,21 +195,21 @@ function App() {
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
-                        <Route path="/admin/dashboard/custom-reports" element={
+                        <Route path="/admin/reporting" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
                               <CustomReporting />
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
-                        <Route path="/admin/dashboard/competitive-intelligence" element={
+                        <Route path="/admin/intelligence" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
                               <CompetitiveIntelligence />
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
-                        <Route path="/admin/dashboard/predictive-analytics" element={
+                        <Route path="/admin/materials/predictive-analytics" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
                               <PredictiveAnalyticsComponent />

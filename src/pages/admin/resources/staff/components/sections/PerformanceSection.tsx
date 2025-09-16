@@ -9,7 +9,7 @@ import {
   CardWrapper,
   Alert,
   Tabs
-} from '@/shared/ui';
+} from '../../../../../../shared/ui';
 import { 
   Box, 
   Text,
@@ -30,9 +30,9 @@ import {
   CalendarIcon,
   EyeIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
-import { useStaffWithLoader } from '@/hooks/useStaffData';
-import staffApi from '@/services/staff/staffApi';
+import { Icon } from '../../../../../../shared/ui/Icon';
+import { useStaffWithLoader } from '../../../../../../hooks/useStaffData';
+import staffApi from '../../../../../../services/staff/staffApi';
 import type { StaffViewState } from '../../types';
 
 interface PerformanceSectionProps {

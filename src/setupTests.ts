@@ -24,7 +24,7 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 }))
 
 // Mock de supabase
-vi.mock('@/lib/supabase/client', () => {
+vi.mock('./lib/supabase/client', () => {
   const createQueryBuilder = (initialData = { data: [], error: null }) => {
     let query = Promise.resolve(initialData);
     const builder = {
@@ -82,8 +82,8 @@ vi.mock('@chakra-ui/react', async (importOriginal) => {
   
   return {
     ...actual,
-    ChakraProvider: ({ children }: { children: React.ReactNode }) => 
-      React.createElement('div', { 'data-testid': 'chakra-provider' }, children),
+    ChakraProvider: ({ children, theme }: { children: React.ReactNode, theme: any }) =>
+      React.createElement(actual.ChakraProvider, { theme }, children),
     useColorMode: vi.fn(() => ({
       colorMode: 'light',
       toggleColorMode: vi.fn(),
@@ -118,7 +118,7 @@ vi.mock('@heroicons/react/24/outline', async (importOriginal) => {
 });
 
 // Mock de Navigation Context
-vi.mock('@/contexts/NavigationContext', async (importOriginal) => {
+vi.mock('./contexts/NavigationContext', async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
@@ -135,13 +135,17 @@ vi.mock('@/contexts/NavigationContext', async (importOriginal) => {
 });
 
 // Mock de Zustand store
-vi.mock('@/store/materialsStore', () => ({
+vi.mock('./store/materialsStore', () => ({
   useMaterials: vi.fn()
 }));
 
-vi.mock('@/store/staffStore', () => ({
-  useStaffStore: vi.fn()
-}));
+vi.mock('./store/staffStore', () => {
+  const { create: actualCreate } = vi.importActual('zustand');
+  const store = actualCreate(vi.importActual('./store/staffStore').useStaffStore);
+  return {
+    useStaffStore: vi.fn((selector) => store(selector)),
+  };
+});
 
 // Mock de IndexedDB para tests offline
 const mockIDBDatabase = {

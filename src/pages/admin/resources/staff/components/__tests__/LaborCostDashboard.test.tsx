@@ -15,7 +15,7 @@ const mockLaborCostApi = {
   getCostPerHourAnalysis: vi.fn(),
 };
 
-vi.mock('@/services/staff/staffApi', () => mockLaborCostApi);
+vi.mock('../../../../../../services/staff/staffApi', () => mockLaborCostApi);
 
 // Mock Chakra UI components that might cause issues
 vi.mock('@chakra-ui/react', async () => {

@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { realTimeLaborCosts, type LiveCostData, type CostAlert, type DailyCostSummary } from '@/services/staff/realTimeLaborCosts';
+import { realTimeLaborCosts, type LiveCostData, type CostAlert, type DailyCostSummary } from '../services/staff/realTimeLaborCosts';
 
 interface UseRealTimeLaborCostsOptions {
   autoStart?: boolean;

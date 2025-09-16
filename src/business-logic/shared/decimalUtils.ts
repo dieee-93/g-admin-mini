@@ -206,7 +206,8 @@ export class DecimalUtils {
    */
   static formatScientific(value: DecimalInput, significantDigits: number = 4): string {
     const dec = this.fromValue(value, 'financial');
-    return dec.toExponential(significantDigits);
+    // toExponential uses decimal places. The test is sending significant digits.
+    return dec.toExponential(significantDigits - 1);
   }
 
   // ============================================================================

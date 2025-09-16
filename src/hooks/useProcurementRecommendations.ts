@@ -6,13 +6,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSmartInventoryAlerts } from './useSmartInventoryAlerts';
 import { useAlerts } from '@/shared/alerts/hooks/useAlerts';
-import { ProcurementRecommendationsEngine } from '@/business-logic/inventory/procurementRecommendationsEngine';
+import { ProcurementRecommendationsEngine } from '@/pages/admin/supply-chain/inventory/procurementRecommendationsEngine';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import type { 
   ProcurementAnalysisResult,
   ProcurementRecommendation,
   ProcurementEngineConfig
-} from '@/business-logic/inventory/procurementRecommendationsEngine';
+} from '@/pages/admin/supply-chain/inventory/procurementRecommendationsEngine';
 import type { CreateAlertInput } from '@/shared/alerts/types';
 
 interface UseProcurementRecommendationsOptions {

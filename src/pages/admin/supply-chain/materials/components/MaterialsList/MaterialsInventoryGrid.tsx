@@ -16,7 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { type InventoryItem } from '../types';
 import { VirtualizedList } from '@/lib/performance';
-import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
+import { StockCalculation } from '@/pages/admin/supply-chain/inventory/stockCalculation';
 
 interface MaterialsInventoryGridProps {
   items: InventoryItem[];

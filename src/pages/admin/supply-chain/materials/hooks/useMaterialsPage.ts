@@ -20,6 +20,7 @@ export interface MaterialsPageState {
   showABCAnalysis: boolean;
   showProcurement: boolean;
   showSupplyChain: boolean;
+  showPredictiveAnalytics: boolean;
   selectedCategory: string | null;
   viewMode: 'grid' | 'table' | 'cards';
 }
@@ -29,6 +30,7 @@ export interface MaterialsPageActions {
   handleABCAnalysis: () => void;
   handleProcurement: () => void;
   handleSupplyChain: () => void;
+  handlePredictiveAnalytics: () => void;
   handleStockAlert: () => void;
   handleBulkActions: () => void;
   toggleABCAnalysis: () => void;
@@ -91,6 +93,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     showABCAnalysis: false,
     showProcurement: false,
     showSupplyChain: false,
+    showPredictiveAnalytics: false,
     selectedCategory: null,
     viewMode: 'table'
   });
@@ -185,7 +188,8 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
       ...prev,
       showABCAnalysis: !prev.showABCAnalysis,
       showProcurement: false,
-      showSupplyChain: false
+      showSupplyChain: false,
+      showPredictiveAnalytics: false
     }));
   }, []);
 
@@ -194,7 +198,8 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
       ...prev,
       showProcurement: !prev.showProcurement,
       showABCAnalysis: false,
-      showSupplyChain: false
+      showSupplyChain: false,
+      showPredictiveAnalytics: false
     }));
   }, []);
 
@@ -203,7 +208,18 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
       ...prev,
       showSupplyChain: !prev.showSupplyChain,
       showABCAnalysis: false,
-      showProcurement: false
+      showProcurement: false,
+      showPredictiveAnalytics: false
+    }));
+  }, []);
+
+  const handlePredictiveAnalytics = useCallback(() => {
+    setPageState(prev => ({
+      ...prev,
+      showPredictiveAnalytics: !prev.showPredictiveAnalytics,
+      showABCAnalysis: false,
+      showProcurement: false,
+      showSupplyChain: false
     }));
   }, []);
 
@@ -278,6 +294,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     handleABCAnalysis,
     handleProcurement,
     handleSupplyChain,
+    handlePredictiveAnalytics,
     handleStockAlert,
     handleBulkActions,
     toggleABCAnalysis,

@@ -1,6 +1,6 @@
 // useRecipeBuilder - Shared logic for recipe building
 import { useState, useCallback } from 'react';
-import { recipeAPI, recipeService, type Recipe, type RecipeIngredient } from '@/services/recipe';
+import { recipeAPI, recipeService, type Recipe, type RecipeIngredient } from '../../../../services/recipe';
 
 interface UseRecipeBuilderOptions {
   mode: 'product' | 'material';

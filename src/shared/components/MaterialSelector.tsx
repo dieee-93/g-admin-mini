@@ -15,7 +15,7 @@ import {
 import { useMaterials } from '@/store/materialsStore';
 import { useDebounce } from '@/shared/hooks';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
-import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
+import { StockCalculation } from '@/pages/admin/supply-chain/inventory/stockCalculation';
 import { CardWrapper } from '../ui';
 export interface MaterialSelectorProps {
   onMaterialSelected: (material: MaterialItem) => void;

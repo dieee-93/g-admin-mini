@@ -12,17 +12,17 @@ import {
   Skeleton,
   SimpleGrid
 } from '@chakra-ui/react';
-import { CircularProgress, CircularProgressValueText } from '@/shared/ui/CircularProgress';
+import { CircularProgress, CircularProgressValueText } from '../../../../../../shared/ui/CircularProgress';
 import { 
   ChartBarIcon, 
   ExclamationTriangleIcon,
   ClockIcon,
   FireIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
-import type { Recipe, RecipeWithCost } from '@/services/recipe/types';
-import { fetchRecipesWithCosts } from '@/services/recipe/api/recipeApi';
-import { CardWrapper } from '@/shared/ui/CardWrapper';
+import { Icon } from '../../../../../../shared/ui/Icon';
+import type { Recipe, RecipeWithCost } from '../../../../../../services/recipe/types';
+import { fetchRecipesWithCosts } from '../../../../../../services/recipe/api/recipeApi';
+import { CardWrapper } from '../../../../../../shared/ui/CardWrapper';
 
 interface RecipeIntelligenceDashboardProps {
   recipes: Recipe[];

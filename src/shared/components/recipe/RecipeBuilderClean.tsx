@@ -14,9 +14,9 @@ import {
   ArrowTopRightOnSquareIcon,
   BeakerIcon
 } from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
-import { RecipeFormClean, RecipeListClean } from '@/services/recipe/components';
-import type { Recipe } from '@/services/recipe/types';
+import { useNavigation } from '../../../contexts/NavigationContext';
+import { RecipeFormClean, RecipeListClean } from '../../../services/recipe/components';
+import type { Recipe } from '../../../services/recipe/types';
 
 interface RecipeBuilderCleanProps {
   mode: 'product' | 'material';

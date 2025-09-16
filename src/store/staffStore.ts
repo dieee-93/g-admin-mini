@@ -8,8 +8,8 @@ import staffApi, {
   employeeToStaffMember, 
   scheduleToStoreFormat, 
   timeEntryToStoreFormat 
-} from '@/services/staff/staffApi';
-import { notify } from '@/lib/notifications';
+} from '../services/staff/staffApi';
+import { notify } from '../lib/notifications';
 
 export interface StaffMember {
   id: string;

@@ -13,7 +13,7 @@ import {
   Alert,
   Tabs,
   Icon
-} from '@/shared/ui';
+} from '../../../../../shared/ui';
 import {
   CurrencyDollarIcon,
   ClockIcon,
@@ -24,9 +24,9 @@ import {
   ChartBarIcon,
   CalculatorIcon
 } from '@heroicons/react/24/outline';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import staffApi, { type LaborCostData, type LaborCostSummary } from '@/services/staff/staffApi';
-import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
+import { DecimalUtils } from '../../../../../business-logic/shared/decimalUtils';
+import staffApi, { type LaborCostData, type LaborCostSummary } from '../../../../../services/staff/staffApi';
+import { QuickCalculations } from '../../../../../business-logic/shared/FinancialCalculations';
 
 interface LaborCostDashboardProps {
   compact?: boolean;

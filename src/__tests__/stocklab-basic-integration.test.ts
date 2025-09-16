@@ -4,13 +4,13 @@
 // Prueba básica para verificar que los engines pueden ser importados y ejecutados
 
 import { describe, test, expect } from 'vitest';
-import { ABCAnalysisEngine } from '@/business-logic/inventory/abcAnalysisEngine';
-import { SmartAlertsEngine } from '@/business-logic/inventory/smartAlertsEngine';
-import { ProcurementRecommendationsEngine } from '@/business-logic/inventory/procurementRecommendationsEngine';
-import { DemandForecastingEngine } from '@/business-logic/inventory/demandForecastingEngine';
-import { SupplierAnalysisEngine } from '@/business-logic/inventory/supplierAnalysisEngine';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+import { ABCAnalysisEngine } from '../pages/admin/supply-chain/materials/services/abcAnalysisEngine';
+import { SmartAlertsEngine } from '../pages/admin/supply-chain/materials/services/smartAlertsEngine';
+import { ProcurementRecommendationsEngine } from '../pages/admin/supply-chain/materials/services/procurementRecommendationsEngine';
+import { DemandForecastingEngine } from '../pages/admin/supply-chain/materials/services/demandForecastingEngine';
+import { SupplierAnalysisEngine } from '../pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import { DecimalUtils } from '../business-logic/shared/decimalUtils';
+import type { MaterialItem } from '../pages/admin/supply-chain/materials/types';
 
 describe('🔧 STOCKLAB BASIC INTEGRATION', () => {
   

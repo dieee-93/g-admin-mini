@@ -14,11 +14,10 @@ import { mockStaffData, mockScheduleData, mockTimeEntryData } from '../mocks/sta
 
 // Components to test
 import StaffPage from '@/pages/admin/resources/staff/page';
-import SchedulingPage from '@/pages/admin/resources/scheduling/page';
-
+import SchedulingPage from '@/pages/admin/resources/scheduling/page'; 
 // Services
-import { realTimeLaborCosts } from '@/services/staff/realTimeLaborCosts';
-import { laborCostNotifications } from '@/services/staff/laborCostNotifications';
+import { realTimeLaborCosts } from '../../../../services/staff/realTimeLaborCosts';
+import { laborCostNotifications } from '../../../../services/staff/laborCostNotifications';
 
 // Mock router
 const mockNavigate = vi.fn();
@@ -33,7 +32,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 // Mock navigation context
-vi.mock('@/contexts/NavigationContext', () => ({
+vi.mock('../../../contexts/NavigationContext', () => ({
   useNavigation: () => ({
     currentModule: 'staff',
     setQuickActions: vi.fn(),

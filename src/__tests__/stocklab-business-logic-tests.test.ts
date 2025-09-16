@@ -4,13 +4,13 @@
 // Tests de validación de lógica de negocio con escenarios del mundo real
 
 import { describe, test, expect, beforeEach } from 'vitest';
-import { ABCAnalysisEngine, type ABCAnalysisResult } from '@/business-logic/inventory/abcAnalysisEngine';
-import { ProcurementRecommendationsEngine } from '@/business-logic/inventory/procurementRecommendationsEngine';
-import { DemandForecastingEngine } from '@/business-logic/inventory/demandForecastingEngine';
-import { SmartAlertsEngine } from '@/business-logic/inventory/smartAlertsEngine';
-import { SupplierAnalysisEngine } from '@/business-logic/inventory/supplierAnalysisEngine';
-import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
-import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
+import { ABCAnalysisEngine, type ABCAnalysisResult } from '../pages/admin/supply-chain/materials/services/abcAnalysisEngine';
+import { ProcurementRecommendationsEngine } from '../pages/admin/supply-chain/materials/services/procurementRecommendationsEngine';
+import { DemandForecastingEngine } from '../pages/admin/supply-chain/materials/services/demandForecastingEngine';
+import { SmartAlertsEngine } from '../pages/admin/supply-chain/materials/services/smartAlertsEngine';
+import { SupplierAnalysisEngine } from '../pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import type { MaterialItem } from '../pages/admin/supply-chain/materials/types';
+import type { MaterialABC } from '../pages/admin/supply-chain/materials/types/abc-analysis';
 
 // ============================================================================
 // REAL-WORLD TEST DATA SETS

@@ -15,7 +15,7 @@ import {
   Spinner,
   Alert,
   Icon
-} from '@/shared/ui';
+} from '../../../../../../shared/ui';
 import { 
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -28,10 +28,10 @@ import {
   ClockIcon,
   PlusIcon
 } from '@heroicons/react/24/outline';
-import { useStaffWithLoader } from '@/hooks/useStaffData';
+import { useStaffWithLoader } from '../../../../../../hooks/useStaffData';
 import { EmployeeForm } from '../EmployeeForm';
 import type { StaffViewState } from '../../types';
-import type { Employee } from '@/services/staff/staffApi';
+import type { Employee } from '../../../../../../services/staff/staffApi';
 
 interface DirectorySectionProps {
   viewState: StaffViewState;

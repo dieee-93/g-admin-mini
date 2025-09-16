@@ -6,8 +6,13 @@ import {
   ShoppingCartIcon,
   ClockIcon,
   ChartBarIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  TrendingUpIcon,
+  TrendingDownIcon,
+  UserGroupIcon,
+  ScaleIcon
 } from '@heroicons/react/24/outline';
+import { generateMockExecutiveKPIs, ExecutiveKPI } from '../data/executive-kpis';
 import { useMaterials } from '@/store/materialsStore';
 import { useSales } from '../../../operations/sales/hooks/useSales';
 import { useCustomers } from '../../crm/customers/hooks/existing/useCustomers';
@@ -89,8 +94,33 @@ export function useDashboard() {
     isLoading
   }), [dashboardStats.sales.monthlyRevenue, dashboardStats.sales.monthlyTransactions, isLoading]);
 
+  // === EXECUTIVE KPIS ===
+  const executiveKPIs = useMemo(() => {
+    const kpis = generateMockExecutiveKPIs();
+    const highPriorityKPIs = kpis
+      .filter(kpi => kpi.priority === 'critical' || kpi.priority === 'high')
+      .slice(0, 4);
+
+    const kpiIconMapping = {
+      financial: CurrencyDollarIcon,
+      operational: TrendingUpIcon,
+      customer: UserGroupIcon,
+      strategic: ScaleIcon,
+    };
+
+    return highPriorityKPIs.map(kpi => ({
+      title: kpi.name,
+      value: `${kpi.unit === '$' ? '$' : ''}${kpi.value.toLocaleString()}${kpi.unit !== '$' ? kpi.unit : ''}`,
+      subtitle: `${kpi.change >= 0 ? '+' : ''}${kpi.change.toFixed(1)}%`,
+      icon: kpiIconMapping[kpi.category] || ChartBarIcon,
+      colorPalette: kpi.changeType === 'increase' ? 'green' : 'red',
+      isLoading
+    }));
+  }, [isLoading]);
+
   // === SECONDARY METRICS ===
   const secondaryMetrics = useMemo(() => [
+    ...executiveKPIs,
     {
       title: "Items en inventario",
       value: dashboardStats.inventory.totalItems,
@@ -111,7 +141,7 @@ export function useDashboard() {
       colorPalette: 'purple' as const,
       isLoading
     }
-  ], [dashboardStats, isLoading]);
+  ], [dashboardStats, isLoading, executiveKPIs]);
 
   // === METRIC CARDS (para compatibilidad con componentes existentes) ===
   const metricCards: MetricCardProps[] = useMemo(() => [

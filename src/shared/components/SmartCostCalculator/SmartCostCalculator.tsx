@@ -24,8 +24,8 @@ import {
   CheckCircleIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
-import { calculateRecipeCost } from '@/services/recipe/api/recipeApi';
-import type { Recipe } from '@/services/recipe/types';
+import { calculateRecipeCost } from '../../../../services/recipe/api/recipeApi';
+import type { Recipe } from '../../../../services/recipe/types';
 import { CardWrapper, Icon } from '@/shared/ui';
 
 interface SmartCostCalculatorProps {

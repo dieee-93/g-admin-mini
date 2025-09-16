@@ -40,7 +40,7 @@ const mockSupabase = {
   rpc: vi.fn().mockResolvedValue({ data: [], error: null })
 };
 
-vi.mock('@/lib/supabase/client', () => ({ supabase: mockSupabase }));
+vi.mock('../../../lib/supabase/client', () => ({ supabase: mockSupabase }));
 
 describe('Staff API - CRUD Operations', () => {
   beforeEach(() => {

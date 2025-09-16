@@ -9,7 +9,8 @@ import {
   BuildingStorefrontIcon,
   PlusIcon,
   ChartBarIcon,
-  ClipboardDocumentListIcon
+  ClipboardDocumentListIcon,
+  LightBulbIcon
 } from '@heroicons/react/24/outline';
 
 // Import components
@@ -18,7 +19,8 @@ import {
   Overview,
   AlertsTab,
   SmartAlertsTab,
-  MaterialsView
+  MaterialsView,
+  PredictiveAnalytics
 } from './components';
 
 // Page orchestration hook
@@ -72,6 +74,15 @@ function MaterialsPage() {
             >
               <ClipboardDocumentListIcon className="w-4 h-4" />
               Procurement
+            </Button>
+            <Button
+              variant="outline"
+              colorPalette="yellow"
+              onClick={actions.handlePredictiveAnalytics}
+              size="md"
+            >
+              <LightBulbIcon className="w-4 h-4" />
+              Predictive
             </Button>
             <Button
               colorPalette="purple"
@@ -152,6 +163,13 @@ function MaterialsPage() {
           <div>
             <p>Supply chain analysis and supplier performance metrics.</p>
           </div>
+        </Section>
+      )}
+
+      {/* Conditional Predictive Analytics Section */}
+      {pageState.showPredictiveAnalytics && (
+        <Section variant="elevated" title="Predictive Analytics">
+          <PredictiveAnalytics />
         </Section>
       )}
 

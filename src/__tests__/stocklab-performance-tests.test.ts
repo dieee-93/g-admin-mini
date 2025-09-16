@@ -5,13 +5,13 @@
 
 import { describe, test, expect, afterAll } from 'vitest';
 import { performance } from 'perf_hooks';
-import { ABCAnalysisEngine } from '@/business-logic/inventory/abcAnalysisEngine';
-import { ProcurementRecommendationsEngine } from '@/business-logic/inventory/procurementRecommendationsEngine';
-import { DemandForecastingEngine } from '@/business-logic/inventory/demandForecastingEngine';
-import { SmartAlertsEngine } from '@/business-logic/inventory/smartAlertsEngine';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
-import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
+import { ABCAnalysisEngine } from '../pages/admin/supply-chain/materials/services/abcAnalysisEngine';
+import { ProcurementRecommendationsEngine } from '../pages/admin/supply-chain/materials/services/procurementRecommendationsEngine';
+import { DemandForecastingEngine } from '../pages/admin/supply-chain/materials/services/demandForecastingEngine';
+import { SmartAlertsEngine } from '../pages/admin/supply-chain/materials/services/smartAlertsEngine';
+import { DecimalUtils } from '../business-logic/shared/decimalUtils';
+import type { MaterialItem } from '../pages/admin/supply-chain/materials/types';
+import type { MaterialABC } from '../pages/admin/supply-chain/materials/types/abc-analysis';
 
 // ============================================================================
 // PERFORMANCE MEASUREMENT UTILITIES
@@ -439,9 +439,9 @@ describe('📦 BUNDLE SIZE AND LOADING PERFORMANCE', () => {
     
     // In a real environment, these would be dynamic imports
     const modules = [
-      () => import('@/business-logic/inventory/abcAnalysisEngine'),
-      () => import('@/business-logic/inventory/smartAlertsEngine'),
-      () => import('@/business-logic/inventory/procurementRecommendationsEngine')
+      () => import('@/pages/admin/supply-chain/inventory/abcAnalysisEngine'),
+      () => import('@/pages/admin/supply-chain/inventory/smartAlertsEngine'),
+      () => import('@/pages/admin/supply-chain/inventory/procurementRecommendationsEngine')
     ];
     
     const loadedModules = await Promise.all(
@@ -461,8 +461,8 @@ describe('📦 BUNDLE SIZE AND LOADING PERFORMANCE', () => {
     // This would be tested with actual bundle analyzer in CI/CD
     // Here we simulate by checking that our engines don't import unnecessary dependencies
     
-    const ABCEngine = await import('@/business-logic/inventory/abcAnalysisEngine');
-    const AlertsEngine = await import('@/business-logic/inventory/smartAlertsEngine');
+    const ABCEngine = await import('@/pages/admin/supply-chain/inventory/abcAnalysisEngine');
+    const AlertsEngine = await import('@/pages/admin/supply-chain/inventory/smartAlertsEngine');
     
     // Engines should be lean and focused
     expect(ABCEngine.ABCAnalysisEngine).toBeDefined();

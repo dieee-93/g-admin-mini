@@ -23,7 +23,7 @@ Decimal.set({
  * Prioriza precisión máxima y banker's rounding para cumplir estándares
  */
 export const TaxDecimal = Decimal.clone({
-  precision: 20,
+  precision: 30,
   rounding: Decimal.ROUND_HALF_EVEN, // Crítico: evita sesgos estadísticos
   toExpNeg: -9,                      // Mayor precisión para decimales pequeños
   toExpPos: 21
@@ -34,7 +34,7 @@ export const TaxDecimal = Decimal.clone({
  * Balance entre precisión y performance para operaciones masivas
  */
 export const InventoryDecimal = Decimal.clone({
-  precision: 15,                     // Suficiente para inventarios
+  precision: 40,                     // Suficiente para inventarios
   rounding: Decimal.ROUND_HALF_UP,   // Tradicional para stock
   toExpNeg: -7,
   toExpPos: 21
@@ -45,7 +45,7 @@ export const InventoryDecimal = Decimal.clone({
  * Máxima precisión para cálculos complejos de rentabilidad
  */
 export const FinancialDecimal = Decimal.clone({
-  precision: 28,                     // Precisión máxima para análisis
+  precision: 30,                     // Precisión máxima para análisis
   rounding: Decimal.ROUND_HALF_EVEN, // Banker's rounding
   toExpNeg: -12,                     // Para porcentajes muy pequeños
   toExpPos: 21

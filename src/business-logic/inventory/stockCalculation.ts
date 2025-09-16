@@ -1,4 +1,4 @@
-import { type MaterialItem, isMeasurable, isCountable, isElaborated } from '@/pages/admin/supply-chain/materials/types';
+import { type MaterialItem } from '@/types';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
@@ -65,16 +65,16 @@ export class StockCalculation {
    * Gets appropriate unit for display based on item type
    */
   static getDisplayUnit(item: MaterialItem): string {
-    if (isMeasurable(item)) {
+    if (item.type === 'MEASURABLE') {
       return item.unit || 'kg';
     }
     
-    if (isCountable(item)) {
+    if (item.type === 'COUNTABLE') {
       // Prefer packaging unit if available
       return item.packaging?.package_unit || 'unidad';
     }
     
-    if (isElaborated(item)) {
+    if (item.type === 'ELABORATED') {
       return item.unit || 'porción';
     }
     
@@ -119,12 +119,12 @@ export class StockCalculation {
     if (needed.isZero()) return 0;
 
     // Round up to reasonable quantities based on type
-    if (isElaborated(item)) {
+    if (item.type === 'ELABORATED') {
       // Elaborated items: round to nearest 5
       return needed.dividedBy(5).ceil().times(5).toNumber();
     }
     
-    if (isCountable(item) && item.packaging?.package_size) {
+    if (item.type === 'COUNTABLE' && item.packaging?.package_size) {
       // Countable with packaging: round to full packages
       const packageSize = new InventoryDecimal(item.packaging.package_size);
       if (packageSize.isZero()) return needed.ceil().toNumber();

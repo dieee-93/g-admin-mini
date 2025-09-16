@@ -28,25 +28,34 @@ export const CODE_SPLITTING_CONFIG = {
 export const lazyComponents = {
   // Materials module - Updated paths for route-based architecture v4.0
   OfflineMaterialsPage: createLazyRoute(
-    () => import('@/pages/admin/supply-chain/materials/components/LazyOfflineMaterialsPage'),
+    () => import('../../pages/admin/supply-chain/materials/components/LazyOfflineMaterialsPage'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.MATERIALS
   ),
   
   CrossModuleAnalytics: createLazyRoute(
+<<<<<<< HEAD
     () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
   ),
   ExecutiveDashboard: createLazyRoute(
     () => import('@/pages/admin/core/dashboard/components/ExecutiveDashboard/LazyExecutiveDashboard'),
+=======
+    () => import('../../pages/admin/core/dashboard/components/business/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
+    CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
+  ),
+  ExecutiveDashboard: createLazyRoute(
+    () => import('../../pages/admin/core/dashboard/components/business/ExecutiveDashboard/LazyExecutiveDashboard'),
+>>>>>>> refactor/module-reorganization
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.EXECUTIVE
   ),
   RecipeForm: createLazyRoute(
-    () => import('@/services/recipe/components/LazyRecipeForm'),
+    () => import('../../services/recipe/components/LazyRecipeForm'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.RECIPES
   ),
 
   // Sub-components
   MaterialsHeader: createLazyFeature(
+<<<<<<< HEAD
     () => import('@/pages/admin/supply-chain/materials/components/Overview/MaterialsHeader'),
     'MaterialsHeader'
   ),
@@ -64,14 +73,33 @@ export const lazyComponents = {
   ),
   ExecutiveKPIGrid: createLazyFeature(
     () => import('@/pages/admin/core/dashboard/components/ExecutiveDashboard/components/ExecutiveKPIGrid'),
+=======
+    () => import('../../pages/admin/supply-chain/materials/components/MaterialsHeader'),
+    'MaterialsHeader'
+  ),
+  MaterialsGrid: createLazyFeature(
+    () => import('../../pages/admin/supply-chain/materials/components/MaterialsGrid'),
+    'MaterialsGrid'
+  ),
+  CorrelationsView: createLazyFeature(
+    () => import('../../pages/admin/core/dashboard/components/business/CrossModuleAnalytics/components/CorrelationsView'),
+    'CorrelationsView'
+  ),
+  BottlenecksView: createLazyFeature(
+    () => import('../../pages/admin/core/dashboard/components/business/CrossModuleAnalytics/components/BottlenecksView'),
+    'BottlenecksView'
+  ),
+  ExecutiveKPIGrid: createLazyFeature(
+    () => import('../../pages/admin/core/dashboard/components/business/ExecutiveDashboard/components/ExecutiveKPIGrid'),
+>>>>>>> refactor/module-reorganization
     'ExecutiveKPIGrid'
   ),
   RecipeBasicForm: createLazyFeature(
-    () => import('@/services/recipe/components/components/RecipeBasicForm'),
+    () => import('../../services/recipe/components/components/RecipeBasicForm'),
     'RecipeBasicForm'
   ),
   RecipeAISuggestions: createLazyFeature(
-    () => import('@/services/recipe/components/components/RecipeAISuggestions'),
+    () => import('../../services/recipe/components/components/RecipeAISuggestions'),
     'RecipeAISuggestions'
   ),
 };

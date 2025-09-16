@@ -2,14 +2,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen, waitFor, act } from "@testing-library/react"
 import { RecipeIntelligenceDashboard } from "./RecipeIntelligenceDashboard"
-import type { Recipe, RecipeWithCost } from "@/services/recipe/types"
-import { fetchRecipesWithCosts } from "@/services/recipe/api/recipeApi"
+import type { Recipe, RecipeWithCost } from "../../../../../../../services/recipe/types"
+import { fetchRecipesWithCosts } from "../../../../../../../services/recipe/api/recipeApi"
 
-import { Provider } from '@/shared/ui/provider'
-import { useThemeStore } from '@/store/themeStore'
+import { Provider } from '../../../../../../shared/ui/provider'
+import { useThemeStore } from '../../../../../../store/themeStore'
 
-vi.mock('@/store/themeStore')
-vi.mock('@/services/recipe/api/recipeApi')
+vi.mock('../../../../../../../store/themeStore')
+vi.mock('../../../../../../../services/recipe/api/recipeApi')
 
 const renderWithChakra = (component: React.ReactElement) => {
   (useThemeStore as vi.Mock).mockReturnValue({

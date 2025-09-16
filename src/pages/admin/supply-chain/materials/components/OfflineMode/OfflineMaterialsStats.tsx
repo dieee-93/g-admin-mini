@@ -1,6 +1,6 @@
 // OfflineMaterialsStats.tsx - Statistics grid component
 import { useMemo } from 'react';
-import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
+import { StockCalculation } from '@/pages/admin/supply-chain/inventory/stockCalculation';
 import {
   SimpleGrid,
   CardWrapper ,

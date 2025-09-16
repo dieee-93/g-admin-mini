@@ -17,7 +17,7 @@ import {
 } from '@/pages/admin/supply-chain/materials/types';
 
 // Import centralized utilities
-import { StockCalculation } from '@/business-logic/inventory/stockCalculation'; 
+import { StockCalculation } from '@/pages/admin/supply-chain/inventory/stockCalculation';
 
 export interface MaterialsFilters {
   type: 'all' | ItemType;

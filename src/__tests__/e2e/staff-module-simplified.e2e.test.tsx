@@ -9,11 +9,11 @@ import userEvent from '@testing-library/user-event';
 import { renderWithProviders, clearMockData, performanceTracker } from '../utils/testUtils';
 
 // Import components to test
-import StaffPage from '@/pages/admin/resources/staff/page';
-import { staffApi } from '@/services/staff/staffApi';
+import StaffPage from '../../../../pages/admin/resources/staff/page';
+import { staffApi } from '../../../../services/staff/staffApi';
 
 // Mock the staff API
-vi.mock('@/services/staff/staffApi', () => ({
+vi.mock('../../../../services/staff/staffApi', () => ({
   staffApi: {
     getEmployees: vi.fn(),
     createEmployee: vi.fn(),
@@ -26,7 +26,7 @@ vi.mock('@/services/staff/staffApi', () => ({
 }));
 
 // Mock the real-time service
-vi.mock('@/services/staff/realTimeLaborCosts', () => ({
+vi.mock('../../../../services/staff/realTimeLaborCosts', () => ({
   realTimeLaborCosts: {
     startMonitoring: vi.fn(),
     stopMonitoring: vi.fn(),

@@ -17,16 +17,16 @@ import {
 } from '@heroicons/react/24/outline';
 import { Button } from '@/shared/ui';
 
-import { useReportingData } from './hooks/useReportingData';
-import { useReportGeneration } from './hooks/useReportGeneration';
-import { useReportBuilder } from './hooks/useReportBuilder';
+import { useReportingData } from '../hooks/useReportingData';
+import { useReportGeneration } from '../hooks/useReportGeneration';
+import { useReportBuilder } from '../hooks/useReportBuilder';
 
-import { ReportingSummary } from './components/ReportingSummary';
-import { TemplatesTab } from './components/TemplatesTab';
-import { GeneratedReportsTab } from './components/GeneratedReportsTab';
-import { AutomationTab } from './components/AutomationTab';
-import { InsightsTab } from './components/InsightsTab';
-import { ReportBuilder } from './components/ReportBuilder';
+import { ReportingSummary } from './ReportingSummary';
+import { TemplatesTab } from './TemplatesTab';
+import { GeneratedReportsTab } from './GeneratedReportsTab';
+import { AutomationTab } from './AutomationTab';
+import { InsightsTab } from './InsightsTab';
+import { ReportBuilder } from './ReportBuilder';
 
 export function CustomReporting() {
   const {

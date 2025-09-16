@@ -1,6 +1,6 @@
 // useRecipeAPI - API operations hook
 import { useState, useCallback } from 'react';
-import { recipeAPI, type Recipe } from '@/services/recipe';
+import { recipeAPI, type Recipe } from '../../../../services/recipe';
 
 export const useRecipeAPI = () => {
   const [isLoading, setIsLoading] = useState(false);

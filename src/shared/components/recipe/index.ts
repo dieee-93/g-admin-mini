@@ -4,4 +4,4 @@ export { useRecipeBuilder } from './hooks/useRecipeBuilder';
 export { useRecipeAPI } from './hooks/useRecipeAPI';
 
 // Re-exports from service
-export * from '@/services/recipe';
+export * from '../../../services/recipe';

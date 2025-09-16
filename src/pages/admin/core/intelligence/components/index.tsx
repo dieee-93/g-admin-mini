@@ -21,13 +21,13 @@ import {
   BellIcon,
 } from '@heroicons/react/24/outline';
 import { CardWrapper, Icon } from '@/shared/ui';
-import { useCompetitiveIntelligence } from './hooks/useCompetitiveIntelligence';
-import { MarketOverviewDashboard } from './components/MarketOverviewDashboard';
-import { CompetitorsTable } from './components/CompetitorsTable';
-import { PricingAnalysisPanel } from './components/PricingAnalysisPanel';
-import { MarketTrendsPanel } from './components/MarketTrendsPanel';
-import { MarketInsightsPanel } from './components/MarketInsightsPanel';
-import { competitorTypeOptions, marketPositionOptions } from './constants';
+import { useCompetitiveIntelligence } from '../hooks/useCompetitiveIntelligence';
+import { MarketOverviewDashboard } from './MarketOverviewDashboard';
+import { CompetitorsTable } from './CompetitorsTable';
+import { PricingAnalysisPanel } from './PricingAnalysisPanel';
+import { MarketTrendsPanel } from './MarketTrendsPanel';
+import { MarketInsightsPanel } from './MarketInsightsPanel';
+import { competitorTypeOptions, marketPositionOptions } from '../constants';
 
 export function CompetitiveIntelligence() {
   const {

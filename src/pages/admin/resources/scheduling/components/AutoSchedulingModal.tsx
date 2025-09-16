@@ -34,10 +34,10 @@ import {
   LightBulbIcon,
   CalendarIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon } from '../../../../../shared/ui/Icon';
 
-import { autoSchedulingEngine, type SchedulingConstraints, type SchedulingSolution } from '@/services/scheduling/autoSchedulingEngine';
-import { notify } from '@/lib/notifications';
+import { autoSchedulingEngine, type SchedulingConstraints, type SchedulingSolution } from '../../../../../services/scheduling/autoSchedulingEngine';
+import { notify } from '../../../../../lib/notifications';
 
 interface AutoSchedulingModalProps {
   isOpen: boolean;

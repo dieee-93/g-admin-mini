@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { actHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useStaffStore } from '../staffStore';
 import type { Employee, Schedule, TimeEntry } from '../staffStore';
 
@@ -20,19 +20,18 @@ const mockStaffApi = {
   createTimeEntry: vi.fn(),
 };
 
-vi.mock('@/services/staff/staffApi', () => mockStaffApi);
+vi.mock('../../services/staff/staffApi', () => mockStaffApi);
 
 describe('Staff Store', () => {
   beforeEach(() => {
     // Reset store state before each test
-    const { result } = renderHook(() => useStaffStore());
     act(() => {
-      result.current.setState({
+      useStaffStore.setState({
         staff: [],
         schedules: [],
         timeEntries: [],
         loading: false,
-        error: null
+        error: null,
       });
     });
     

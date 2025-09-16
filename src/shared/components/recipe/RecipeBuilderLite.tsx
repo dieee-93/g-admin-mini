@@ -22,11 +22,11 @@ import {
   PlusIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
-import { recipeService, type Recipe, type RecipeIngredient } from '@/services/recipe';
+import { useNavigation } from '../../../contexts/NavigationContext';
+import { recipeService, type Recipe, type RecipeIngredient } from '../../../services/recipe';
 import { MaterialSelector } from '../MaterialSelector';
-import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
-import { CardWrapper, Icon } from '@/shared/ui';
+import type { MaterialItem, MeasurableItem, CountableItem } from '../../../modules/materials/types';
+import { CardWrapper, Icon } from '../../ui';
 interface RecipeBuilderLiteProps {
   mode: 'product' | 'material';
   onRecipeCreated?: (recipe: Recipe) => void;

@@ -4,14 +4,14 @@
 // Tests de auditoría pre-testing según FASE 0 del masterplan
 
 import { describe, test, expect } from 'vitest';
-import { AlertUtils } from '@/shared/alerts';
-import { SmartAlertsEngine, type SmartAlert } from '@/business-logic/inventory/smartAlertsEngine';
-import { SmartAlertsAdapter } from '@/business-logic/inventory/smartAlertsAdapter';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
-import { ABCAnalysisEngine } from '@/business-logic/inventory/abcAnalysisEngine';
-import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
-import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+import { AlertUtils } from '../shared/alerts';
+import { SmartAlertsEngine, type SmartAlert } from '../pages/admin/supply-chain/materials/services/smartAlertsEngine';
+import { SmartAlertsAdapter } from '../pages/admin/supply-chain/materials/services/smartAlertsAdapter';
+import { DecimalUtils } from '../business-logic/shared/decimalUtils';
+import { StockCalculation } from '../business-logic/inventory/stockCalculation';
+import { ABCAnalysisEngine } from '../pages/admin/supply-chain/materials/services/abcAnalysisEngine';
+import type { MaterialABC } from '../pages/admin/supply-chain/materials/types/abc-analysis';
+import type { MaterialItem } from '../pages/admin/supply-chain/materials/types';
 
 // ============================================================================
 // FASE 0.1: ALERTS SYSTEM INTEGRATION AUDIT TESTS

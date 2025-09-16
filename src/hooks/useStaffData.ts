@@ -2,7 +2,7 @@
 // Replaces mock data with real database integration
 
 import { useEffect, useState, useCallback } from 'react';
-import { useStaffStore } from '@/store/staffStore';
+import { useStaffStore } from '../store/staffStore';
 
 /**
  * Hook to automatically load staff data from Supabase when component mounts
@@ -111,7 +111,7 @@ export function usePerformanceAnalytics() {
     setLoading(true);
     setError(null);
     try {
-      const { getEmployeePerformance } = await import('@/services/staff/staffApi');
+      const { getEmployeePerformance } = await import('../services/staff/staffApi');
       return await getEmployeePerformance(employeeId, months);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading performance data');
@@ -125,7 +125,7 @@ export function usePerformanceAnalytics() {
     setLoading(true);
     setError(null);
     try {
-      const { getDepartmentPerformance } = await import('@/services/staff/staffApi');
+      const { getDepartmentPerformance } = await import('../services/staff/staffApi');
       return await getDepartmentPerformance();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading department performance');
@@ -139,7 +139,7 @@ export function usePerformanceAnalytics() {
     setLoading(true);
     setError(null);
     try {
-      const { getPerformanceTrends } = await import('@/services/staff/staffApi');
+      const { getPerformanceTrends } = await import('../services/staff/staffApi');
       return await getPerformanceTrends(months);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading trends');
@@ -153,7 +153,7 @@ export function usePerformanceAnalytics() {
     setLoading(true);
     setError(null);
     try {
-      const { getTopPerformers } = await import('@/services/staff/staffApi');
+      const { getTopPerformers } = await import('../services/staff/staffApi');
       return await getTopPerformers(limit);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading top performers');

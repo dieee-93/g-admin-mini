@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useStaffStore } from '@/store/staffStore';
+import { useStaffStore } from '../../../../../store/staffStore';
 import { DirectorySection } from '../components/sections/DirectorySection';
 import { PerformanceSection } from '../components/sections/PerformanceSection';
 import { ManagementSection } from '../components/sections/ManagementSection';
@@ -30,7 +30,7 @@ const mockStaffApi = {
   getCostPerHourAnalysis: vi.fn(),
 };
 
-vi.mock('@/services/staff/staffApi', () => mockStaffApi);
+vi.mock('../../../../../services/staff/staffApi', () => mockStaffApi);
 
 // Mock Chakra UI components that might have issues in tests
 vi.mock('@chakra-ui/react', async () => {

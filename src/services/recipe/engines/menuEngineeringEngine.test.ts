@@ -1,7 +1,7 @@
 // Menu Engineering Engine Tests - Comprehensive Test Suite
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MenuEngineeringEngine } from './menuEngineeringEngine'
-import { MenuCategory } from '../types'
+import { MenuCategory } from '../types/menu-engineering'
 
 describe('MenuEngineeringEngine', () => {
   beforeEach(() => {
