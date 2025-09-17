@@ -12,6 +12,11 @@ export { Section } from './Section';
 export { FormSection } from './FormSection';
 export { StatsSection } from './StatsSection';
 export { PageHeader } from './PageHeader';
+
+// Base Layout Primitives (Chakra wrappers)
+export { Box } from './Box';
+export { Container } from './Container';
+export { Card, CardHeader, CardBody, CardFooter } from './Card';
 export { 
   Stack, 
   VStack, 
@@ -47,7 +52,7 @@ export { TextareaField, Textarea } from './TextareaField';
 // Base Components
 export { Button } from './Button';
 export { ActionButton } from './ActionButton';
-export { CardWrapper, CardHeader, CardBody, CardFooter } from './CardWrapper';
+export { CardWrapper } from './CardWrapper';
 export { MetricCard } from './MetricCard';
 export { FeatureCard } from './FeatureCard';
 export { Table } from './Table';

@@ -1,3 +1,14 @@
+/**
+ * Section FIXED - Layout profesional con spacing mejorado
+ *
+ * Problemas identificados y solucionados:
+ * - Padding muy pequeño (6 -> 8)
+ * - Sin margin-bottom entre secciones
+ * - Header con spacing insuficiente
+ * - Contenido sin estructura Stack interna
+ * - Falta jerarquía visual clara
+ */
+
 import { Box, Stack, HStack } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
 import { Typography, Icon } from '.'
@@ -15,14 +26,13 @@ interface SectionProps {
 }
 
 /**
- * Section - Semantic wrapper for content sections
- * 
- * Provides consistent styling for content areas with recipes handling theming.
- * Uses gray.* tokens that adapt to current theme automatically.
- * 
- * Usage: 
- * <Section>Content here</Section>
- * <Section variant="elevated">Elevated content</Section>
+ * Section FIXED - Semantic wrapper con layout profesional
+ *
+ * MEJORAS:
+ * - Padding generoso para breathing room
+ * - Margin-bottom automático entre secciones
+ * - Estructura Stack interna para organizar contenido
+ * - Header con spacing mejorado
  */
 export function Section({
   children,
@@ -35,64 +45,69 @@ export function Section({
   className,
   ...chakraProps
 }: SectionProps) {
-  // Recipe-based styles - using semantic tokens for proper theming
+  // Recipe-based styles MEJORADOS con spacing profesional
   const variantStyles = {
     default: {
-      bg: 'gray.00',          // Semantic surface background
-      color: 'text.primary',     // ✅ Corrected semantic text color
-      border: '1px solid',   
-      borderColor: 'border.default', // ✅ Corrected semantic border
+      bg: 'gray.00',
+      color: 'text.primary',
+      border: '1px solid',
+      borderColor: 'border.default',
       borderRadius: 'lg',
-      p: '6',
+      p: '8',                    // ✅ FIXED: Más padding (32px en lugar de 24px)
+      mb: '8',                   // ✅ FIXED: Margin-bottom entre secciones
       shadow: 'sm'
     },
     elevated: {
-      bg: 'gray.50',          // Semantic surface background
-      color: 'text.primary',     // ✅ Corrected semantic text color
+      bg: 'gray.50',
+      color: 'text.primary',
       border: '1px solid',
-      borderColor: 'border.default', // ✅ Corrected semantic border
+      borderColor: 'border.default',
       borderRadius: 'lg',
-      p: '6',
-      shadow: 'lg',              // More elevation
+      p: '8',                    // ✅ FIXED: Más padding
+      mb: '8',                   // ✅ FIXED: Margin-bottom entre secciones
+      shadow: 'lg',
       position: 'relative'
     },
     flat: {
-      p: '6',
+      p: '8',                    // ✅ FIXED: Más padding incluso en flat
+      mb: '6',                   // ✅ FIXED: Menos margin para flat pero algo
       bg: 'transparent',
-      color: 'text.primary'      // ✅ Corrected semantic text color
+      color: 'text.primary'
     }
   }
 
-  // Render header if title, icon, or actions are provided
+  // Header MEJORADO con spacing profesional
   const renderHeader = () => {
     if (!title && !IconComponent && !actions) return null
 
     return (
-      <HStack justify="space-between" align="center" mb={4}>
-        <HStack align="center" gap={2}>
+      <HStack justify="space-between" align="center" mb={6}> {/* ✅ FIXED: mb=6 en lugar de 4 */}
+        <HStack align="center" gap={3}> {/* ✅ FIXED: gap=3 en lugar de 2 */}
           {IconComponent && (
-            <Icon 
-              icon={IconComponent} 
-              size="lg" 
+            <Icon
+              icon={IconComponent}
+              size="xl"                    // ✅ FIXED: Icono más grande
               color="text.muted"
             />
           )}
-          <Stack gap={0}>
+          <Stack gap={1}>              {/* ✅ FIXED: gap=1 para títulos */}
             {title && (
-              <Typography 
-                variant="heading" 
-                size="lg" 
-                weight="semibold"
+              <Typography
+                variant="heading"
+                size="xl"                  // ✅ FIXED: Títulos más grandes
+                weight="bold"              // ✅ FIXED: Más bold para jerarquía
                 color="text.primary"
+                lineHeight="1.2"          // ✅ FIXED: Line height mejorado
               >
                 {title}
               </Typography>
             )}
             {subtitle && (
-              <Typography 
-                variant="body" 
-                size="sm" 
+              <Typography
+                variant="body"
+                size="md"                  // ✅ FIXED: Subtítulo más grande
                 color="text.muted"
+                lineHeight="1.4"          // ✅ FIXED: Line height mejorado
               >
                 {subtitle}
               </Typography>
@@ -116,7 +131,10 @@ export function Section({
       {...chakraProps}
     >
       {renderHeader()}
-      {children}
+      {/* ✅ FIXED: Contenido envuelto en Stack para mejor organización */}
+      <Stack gap={4}>
+        {children}
+      </Stack>
     </Box>
   )
 }

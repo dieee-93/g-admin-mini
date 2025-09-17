@@ -6,7 +6,8 @@
 import { useMemo } from 'react';
 import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
 import type { BusinessCapabilities } from '@/pages/setup/steps/business-setup/business-model/config/businessCapabilities';
-import { MILESTONES, type Milestone } from '@/config/milestones';
+import { MILESTONE_DEFINITIONS, getMilestoneDefinition } from '@/config/milestones';
+import type { MilestoneDefinition } from '@/pages/admin/gamification/achievements/types';
 
 // Configuración de módulos por capacidad
 const MODULE_CONFIG = {
@@ -118,7 +119,7 @@ interface PersonalizedTutorial {
   isRelevant: boolean;
 }
 
-interface PersonalizedMilestone extends Milestone {
+interface PersonalizedMilestone extends MilestoneDefinition {
   isCompleted: boolean;
 }
 
@@ -128,9 +129,10 @@ export function usePersonalizedExperience() {
     hasCapability,
     shouldShowModule,
     shouldShowTutorial,
-    getOperationalTier,
     enabledFeatures,
-    dashboardModules
+    dashboardModules,
+    selectedCapabilities,
+    getActiveCapabilities
   } = useBusinessCapabilities();
 
   // Obtener módulos personalizados
@@ -242,24 +244,24 @@ export function usePersonalizedExperience() {
 
   // Obtener logros (milestones) personalizados
   const personalizedMilestones = useMemo((): PersonalizedMilestone[] => {
-    if (!profile?.capabilities) {
+    if (!selectedCapabilities || selectedCapabilities.length === 0) {
       return [];
     }
 
-    const activeCapabilities = (Object.keys(profile.capabilities) as (keyof BusinessCapabilities)[])
-      .filter(key => profile.capabilities[key]);
+    const activeCapabilities = selectedCapabilities;
 
-    if (activeCapabilities.length === 0) {
-      return [];
-    }
-
-    const relevantMilestones = MILESTONES.filter(m => activeCapabilities.includes(m.capability));
+    // Convertir MILESTONE_DEFINITIONS (Record) a array y filtrar por capabilities activas
+    const allMilestones = Object.values(MILESTONE_DEFINITIONS);
+    const relevantMilestones = allMilestones.filter(m => 
+      // Incluir milestones generales o aquellos relacionados con capacidades activas
+      m.category === 'business_setup' || activeCapabilities.some((cap: string) => m.id.includes(cap))
+    );
 
     return relevantMilestones.map(milestone => ({
       ...milestone,
-      isCompleted: profile?.customizations.milestonesCompleted?.includes(milestone.id) ?? false,
+      isCompleted: profile?.customizations?.milestonesCompleted?.includes(milestone.id) ?? false,
     }));
-  }, [profile]);
+  }, [selectedCapabilities, profile]);
 
 
   // Helper functions para componentes
@@ -268,20 +270,17 @@ export function usePersonalizedExperience() {
   };
 
   const getDashboardLayout = () => {
-    // Diferentes layouts basados en tier operativo
-    const tier = getOperationalTier();
+    // Layout basado en número de capacidades activas
+    const capabilityCount = selectedCapabilities?.length || 0;
 
-    switch (tier) {
-      case 'Base Operativa':
-        return 'single-column'; // Layout simple
-      case 'Estructura Funcional':
-        return 'two-columns'; // Layout balanceado
-      case 'Negocio Integrado':
-        return 'three-columns'; // Layout completo
-      case 'Sistema Consolidado':
-        return 'advanced'; // Layout con sidebar y widgets avanzados
-      default:
-        return 'simple';
+    if (capabilityCount <= 2) {
+      return 'single-column'; // Layout simple
+    } else if (capabilityCount <= 4) {
+      return 'two-columns'; // Layout balanceado
+    } else if (capabilityCount <= 6) {
+      return 'three-columns'; // Layout completo
+    } else {
+      return 'advanced'; // Layout con sidebar y widgets avanzados
     }
   };
 
@@ -289,7 +288,7 @@ export function usePersonalizedExperience() {
     // Prioritize incomplete milestones over tutorials
     const incompleteMilestones = personalizedMilestones.filter(m => !m.isCompleted);
     if (incompleteMilestones.length > 0) {
-      return incompleteMilestones.slice(0, 5).map(m => ({ id: m.id, title: m.title, isCompleted: false, type: 'milestone' }));
+      return incompleteMilestones.slice(0, 5).map(m => ({ id: m.id, title: m.name, isCompleted: false, type: 'milestone' }));
     }
 
     const incompleteTutorials = personalizedTutorials.filter(tutorial => !tutorial.isCompleted);
@@ -326,10 +325,17 @@ export function usePersonalizedExperience() {
   const completedMilestones = personalizedMilestones.filter(m => m.isCompleted).length;
   const totalMilestones = personalizedMilestones.length;
 
+  // Calcular tier basado en capacidades activas
+  const capabilityCount = selectedCapabilities?.length || 0;
+  let tier = 'Base Operativa';
+  if (capabilityCount > 6) tier = 'Sistema Consolidado';
+  else if (capabilityCount > 4) tier = 'Negocio Integrado';
+  else if (capabilityCount > 2) tier = 'Estructura Funcional';
+
   return {
     // Estado principal
     profile,
-    tier: getOperationalTier(),
+    tier,
 
     // Módulos y navegación
     modules: personalizedModules,

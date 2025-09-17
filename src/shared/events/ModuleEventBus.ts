@@ -2,7 +2,11 @@
  * Module EventBus Integration
  * Connects all modules using event-driven architecture
  */
-import { eventBus } from '@/lib/events';
+import EventBus from '@/lib/events/EventBus';
+import type { EventPattern } from '@/lib/events/types';
+
+// Create instance
+const eventBus = EventBus;
 
 // Event type definitions for type safety
 export interface ModuleEvents {
@@ -122,6 +126,16 @@ export interface ModuleEvents {
   'reporting.data_source_updated': { reportId: string; modulesChanged: string[]; dataPointsAdded: number };
   'reporting.insight_generated': { reportId: string; insightType: string; confidence: number; businessValue: number };
 
+  // Executive BI events
+  'executive.nlp_query_processed': { query: string; context: string; responseType: string; processingTime: number; confidence: number };
+  'executive.external_data_source_added': { sourceId: string; name: string; type: string; endpoint: string };
+  'executive.external_data_synced': { sourceId: string; status: 'success' | 'error'; recordsProcessed: number; timestamp: Date };
+  'executive.chart_exported': { chartId: string; format: string; timestamp: Date; fileSize: number };
+  'executive.dashboard_viewed': { dashboardType: string; userId?: string; timestamp: Date };
+  'executive.insight_generated': { category: string; insight: string; confidence: number; actionable: boolean };
+  'executive.kpi_threshold_breached': { kpi: string; value: number; threshold: number; severity: 'warning' | 'critical' };
+  'executive.forecast_updated': { metric: string; forecastPeriod: string; accuracy: number; lastUpdate: Date };
+
   // Analytics events
   'analytics.generated': { module: string; analyticsData: any; timestamp: string };
   'analytics.insight_created': { module: string; insight: string; priority: 'low' | 'medium' | 'high' };
@@ -138,29 +152,34 @@ export interface ModuleEvents {
  */
 class TypedEventBus {
   emit<K extends keyof ModuleEvents>(event: K, data: ModuleEvents[K]): void {
-    eventBus.emit(event, data);
+    eventBus.emit(event as EventPattern, data);
   }
 
   on<K extends keyof ModuleEvents>(
     event: K,
     handler: (data: ModuleEvents[K]) => void
   ): () => void {
-    eventBus.on(event, handler);
-    return () => eventBus.off(event, handler);
+    const unsubscribe = eventBus.on(event as EventPattern, (eventData) => {
+      handler(eventData.payload);
+    });
+    return unsubscribe;
   }
 
   off<K extends keyof ModuleEvents>(
     event: K,
     handler: (data: ModuleEvents[K]) => void
   ): void {
-    eventBus.off(event, handler);
+    // EventBus off method removes all handlers for pattern if no handler specified
+    eventBus.off(event as EventPattern);
   }
 
   once<K extends keyof ModuleEvents>(
     event: K,
     handler: (data: ModuleEvents[K]) => void
   ): void {
-    eventBus.once(event, handler);
+    eventBus.once(event as EventPattern, (eventData) => {
+      handler(eventData.payload);
+    });
   }
 }
 
@@ -179,6 +198,7 @@ export class ModuleIntegrations {
     this.setupRentalIntegrations();
     this.setupAssetIntegrations();
     this.setupReportingIntegrations();
+    this.setupExecutiveIntegrations();
     this.setupAnalyticsIntegrations();
     this.setupSystemIntegrations();
   }
@@ -1908,6 +1928,202 @@ export class ModuleIntegrations {
   }
 
   /**
+   * Executive BI module integrations
+   */
+  private static setupExecutiveIntegrations() {
+    // When NLP query is processed, generate insights
+    moduleEventBus.on('executive.nlp_query_processed', ({ query, context, responseType, processingTime, confidence }) => {
+      console.log(`[EventBus] NLP Query processed: ${query} in ${processingTime}ms`);
+
+      // Generate query analytics
+      moduleEventBus.emit('analytics.generated', {
+        module: 'executive-bi',
+        analyticsData: {
+          nlpQuery: {
+            query,
+            context,
+            responseType,
+            processingTime,
+            confidence,
+            timestamp: new Date().toISOString()
+          }
+        },
+        timestamp: new Date().toISOString()
+      });
+
+      // Create insight based on confidence level
+      if (confidence < 0.7) {
+        moduleEventBus.emit('analytics.insight_created', {
+          module: 'executive-bi',
+          insight: `Consulta NLP con baja confianza (${Math.round(confidence * 100)}%): "${query}" - Revisar contexto`,
+          priority: 'medium'
+        });
+      }
+    });
+
+    // When external data source is added, validate and track
+    moduleEventBus.on('executive.external_data_source_added', ({ sourceId, name, type, endpoint }) => {
+      console.log(`[EventBus] External data source added: ${name} (${type})`);
+
+      // Generate data source analytics
+      moduleEventBus.emit('analytics.generated', {
+        module: 'executive-bi',
+        analyticsData: {
+          dataSourceAdded: {
+            sourceId,
+            name,
+            type,
+            endpoint,
+            timestamp: new Date().toISOString()
+          }
+        },
+        timestamp: new Date().toISOString()
+      });
+
+      // Create integration insight
+      moduleEventBus.emit('analytics.insight_created', {
+        module: 'executive-bi',
+        insight: `Nueva fuente de datos integrada: ${name} (${type}) - Aumenta capacidades de BI`,
+        priority: 'medium'
+      });
+    });
+
+    // When external data is synced, track performance
+    moduleEventBus.on('executive.external_data_synced', ({ sourceId, status, recordsProcessed, timestamp }) => {
+      console.log(`[EventBus] External data synced: ${sourceId}, status: ${status}, records: ${recordsProcessed}`);
+
+      // Generate sync analytics
+      moduleEventBus.emit('analytics.generated', {
+        module: 'executive-bi',
+        analyticsData: {
+          dataSyncCompleted: {
+            sourceId,
+            status,
+            recordsProcessed,
+            timestamp: timestamp.toISOString()
+          }
+        },
+        timestamp: new Date().toISOString()
+      });
+
+      // Create alerts for sync failures
+      if (status === 'error') {
+        moduleEventBus.emit('analytics.insight_created', {
+          module: 'executive-bi',
+          insight: `Error en sincronización de fuente ${sourceId} - Verificar conectividad`,
+          priority: 'high'
+        });
+      }
+
+      // Create success insight for large syncs
+      if (status === 'success' && recordsProcessed > 1000) {
+        moduleEventBus.emit('analytics.insight_created', {
+          module: 'executive-bi',
+          insight: `Sincronización masiva exitosa: ${recordsProcessed.toLocaleString()} registros desde ${sourceId}`,
+          priority: 'low'
+        });
+      }
+    });
+
+    // When chart is exported, track usage patterns
+    moduleEventBus.on('executive.chart_exported', ({ chartId, format, timestamp, fileSize }) => {
+      console.log(`[EventBus] Chart exported: ${chartId} as ${format}, size: ${fileSize}KB`);
+
+      // Generate export analytics
+      moduleEventBus.emit('analytics.generated', {
+        module: 'executive-bi',
+        analyticsData: {
+          chartExported: {
+            chartId,
+            format,
+            fileSize,
+            timestamp: timestamp.toISOString()
+          }
+        },
+        timestamp: new Date().toISOString()
+      });
+
+      // Track popular charts
+      moduleEventBus.emit('analytics.insight_created', {
+        module: 'executive-bi',
+        insight: `Gráfico ${chartId} exportado como ${format.toUpperCase()} - Tracking popularidad`,
+        priority: 'low'
+      });
+    });
+
+    // When KPI threshold is breached, create alerts
+    moduleEventBus.on('executive.kpi_threshold_breached', ({ kpi, value, threshold, severity }) => {
+      console.log(`[EventBus] KPI threshold breached: ${kpi}, value: ${value}, threshold: ${threshold}`);
+
+      // Generate threshold breach analytics
+      moduleEventBus.emit('analytics.generated', {
+        module: 'executive-bi',
+        analyticsData: {
+          kpiThresholdBreach: {
+            kpi,
+            value,
+            threshold,
+            severity,
+            timestamp: new Date().toISOString()
+          }
+        },
+        timestamp: new Date().toISOString()
+      });
+
+      // Create priority alert based on severity
+      moduleEventBus.emit('analytics.insight_created', {
+        module: 'executive-bi',
+        insight: `ALERTA ${severity.toUpperCase()}: KPI ${kpi} = ${value} (umbral: ${threshold})`,
+        priority: severity === 'critical' ? 'high' : 'medium'
+      });
+
+      // Create actionable recommendation
+      moduleEventBus.emit('analytics.recommendation_created', {
+        module: 'executive-bi',
+        recommendation: `Analizar causas de desviación en ${kpi} y implementar acciones correctivas`,
+        actionable: true
+      });
+    });
+
+    // When forecast is updated, validate accuracy
+    moduleEventBus.on('executive.forecast_updated', ({ metric, forecastPeriod, accuracy, lastUpdate }) => {
+      console.log(`[EventBus] Forecast updated: ${metric}, accuracy: ${accuracy}%, period: ${forecastPeriod}`);
+
+      // Generate forecast analytics
+      moduleEventBus.emit('analytics.generated', {
+        module: 'executive-bi',
+        analyticsData: {
+          forecastUpdated: {
+            metric,
+            forecastPeriod,
+            accuracy,
+            lastUpdate: lastUpdate.toISOString()
+          }
+        },
+        timestamp: new Date().toISOString()
+      });
+
+      // Alert for low accuracy forecasts
+      if (accuracy < 80) {
+        moduleEventBus.emit('analytics.insight_created', {
+          module: 'executive-bi',
+          insight: `Pronóstico de ${metric} con baja precisión (${accuracy}%) - Revisar modelo`,
+          priority: 'medium'
+        });
+      }
+
+      // Celebrate high accuracy
+      if (accuracy > 95) {
+        moduleEventBus.emit('analytics.insight_created', {
+          module: 'executive-bi',
+          insight: `Excelente precisión en pronóstico de ${metric} (${accuracy}%) - Modelo optimizado`,
+          priority: 'low'
+        });
+      }
+    });
+  }
+
+  /**
    * Analytics module integrations
    */
   private static setupAnalyticsIntegrations() {
@@ -2304,6 +2520,55 @@ export const ModuleEventUtils = {
     },
     warrantyExpiring: (assetId: string, expirationDate: string, daysRemaining: number) => {
       moduleEventBus.emit('asset.warranty_expiring', { assetId, expirationDate, daysRemaining });
+    }
+  },
+
+  /**
+   * Emit executive BI events
+   */
+  executive: {
+    nlpQueryProcessed: (data: { query: string; context: string; responseType: string; processingTime: number; confidence: number }) => {
+      moduleEventBus.emit('executive.nlp_query_processed', data);
+    },
+    externalDataSourceAdded: (data: { sourceId: string; name: string; type: string; endpoint: string }) => {
+      moduleEventBus.emit('executive.external_data_source_added', data);
+    },
+    externalDataSynced: (data: { sourceId: string; status: 'success' | 'error'; recordsProcessed: number; timestamp: Date }) => {
+      moduleEventBus.emit('executive.external_data_synced', data);
+    },
+    chartExported: (data: { chartId: string; format: string; timestamp: Date; fileSize: number }) => {
+      moduleEventBus.emit('executive.chart_exported', data);
+    },
+    dashboardViewed: (dashboardType: string, userId?: string) => {
+      moduleEventBus.emit('executive.dashboard_viewed', {
+        dashboardType,
+        userId,
+        timestamp: new Date()
+      });
+    },
+    insightGenerated: (category: string, insight: string, confidence: number, actionable: boolean = true) => {
+      moduleEventBus.emit('executive.insight_generated', {
+        category,
+        insight,
+        confidence,
+        actionable
+      });
+    },
+    kpiThresholdBreached: (kpi: string, value: number, threshold: number, severity: 'warning' | 'critical') => {
+      moduleEventBus.emit('executive.kpi_threshold_breached', {
+        kpi,
+        value,
+        threshold,
+        severity
+      });
+    },
+    forecastUpdated: (metric: string, forecastPeriod: string, accuracy: number) => {
+      moduleEventBus.emit('executive.forecast_updated', {
+        metric,
+        forecastPeriod,
+        accuracy,
+        lastUpdate: new Date()
+      });
     }
   },
 

@@ -166,6 +166,104 @@ export const LazyProcurementPage = createLazyComponent(
   }
 );
 
+// ✅ NEW PHASE 4 & 5 MODULES - Missing lazy loaders added
+
+// Lazy-loaded Gamification Page (pages/admin/gamification/achievements/page.tsx)
+export const LazyGamificationPage = createLazyComponent(
+  () => import('../../pages/admin/gamification/achievements/page'),
+  'gamification',
+  {
+    chunkName: 'gamification-module',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+// Lazy-loaded Executive Dashboard Page (pages/admin/executive/dashboards/page.tsx)
+export const LazyExecutivePage = createLazyComponent(
+  () => import('../../pages/admin/executive/dashboards/page'),
+  'executive',
+  {
+    chunkName: 'executive-module',
+    preload: false,
+    priority: 'high', // Critical for C-Suite analytics
+    cacheStrategy: 'both'
+  }
+);
+
+// Lazy-loaded Finance Billing Page (pages/admin/finance/billing/page.tsx)
+export const LazyBillingPage = createLazyComponent(
+  () => import('../../pages/admin/finance/billing/page'),
+  'billing',
+  {
+    chunkName: 'billing-module',
+    preload: false,
+    priority: 'high', // Critical for recurring revenue
+    cacheStrategy: 'both'
+  }
+);
+
+// Lazy-loaded Finance Integrations Page (pages/admin/finance/integrations/page.tsx)
+export const LazyIntegrationsPage = createLazyComponent(
+  () => import('../../pages/admin/finance/integrations/page'),
+  'integrations',
+  {
+    chunkName: 'integrations-module',
+    preload: false,
+    priority: 'medium', // Important for Argentina payment ecosystem
+    cacheStrategy: 'memory'
+  }
+);
+
+// Lazy-loaded Memberships Page (pages/admin/operations/memberships/page.tsx)
+export const LazyMembershipsPage = createLazyComponent(
+  () => import('../../pages/admin/operations/memberships/page'),
+  'memberships',
+  {
+    chunkName: 'memberships-module',
+    preload: false,
+    priority: 'medium',
+    cacheStrategy: 'memory'
+  }
+);
+
+// Lazy-loaded Rentals Page (pages/admin/operations/rentals/page.tsx)
+export const LazyRentalsPage = createLazyComponent(
+  () => import('../../pages/admin/operations/rentals/page'),
+  'rentals',
+  {
+    chunkName: 'rentals-module',
+    preload: false,
+    priority: 'medium',
+    cacheStrategy: 'memory'
+  }
+);
+
+// Lazy-loaded Assets Page (pages/admin/operations/assets/page.tsx)
+export const LazyAssetsPage = createLazyComponent(
+  () => import('../../pages/admin/operations/assets/page'),
+  'assets',
+  {
+    chunkName: 'assets-module',
+    preload: false,
+    priority: 'medium',
+    cacheStrategy: 'memory'
+  }
+);
+
+// Lazy-loaded Advanced Reporting Page (pages/admin/tools/reporting/page.tsx)
+export const LazyReportingPage = createLazyComponent(
+  () => import('../../pages/admin/tools/reporting/page'),
+  'reporting',
+  {
+    chunkName: 'reporting-module',
+    preload: false,
+    priority: 'high', // Critical for business intelligence
+    cacheStrategy: 'both'
+  }
+);
+
 // Page preloading configuration based on usage patterns
 export const modulePreloadingConfig = {
   // When user is on dashboard, preload high-usage pages
@@ -291,7 +389,16 @@ export const lazyModules = {
   LazySettingsPage,
   LazyThemeTestPage,
   LazySupplyChainPage,
-  LazyProcurementPage
+  LazyProcurementPage,
+  // ✅ NEW PHASE 4 & 5 MODULES
+  LazyGamificationPage,
+  LazyExecutivePage,
+  LazyBillingPage,
+  LazyIntegrationsPage,
+  LazyMembershipsPage,
+  LazyRentalsPage,
+  LazyAssetsPage,
+  LazyReportingPage
 };
 
 export default lazyModules;

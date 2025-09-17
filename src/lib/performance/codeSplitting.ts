@@ -32,14 +32,7 @@ export const lazyComponents = {
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.MATERIALS
   ),
   
-  CrossModuleAnalytics: createLazyRoute(
-    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
-    CODE_SPLITTING_CONFIG.CHUNK_NAMES.ANALYTICS
-  ),
-  ExecutiveDashboard: createLazyRoute(
-    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/LazyCrossModuleAnalytics'),
-    CODE_SPLITTING_CONFIG.CHUNK_NAMES.EXECUTIVE
-  ),
+  // Removed CrossModuleAnalytics - consolidated into Dashboard components
 
   RecipeForm: createLazyRoute(
     () => import('@/services/recipe/components/LazyRecipeForm'),
@@ -55,18 +48,7 @@ export const lazyComponents = {
     () => import('@/pages/admin/supply-chain/materials/components/MaterialsList/MaterialsInventoryGrid'),
     'MaterialsInventoryGrid'
   ),
-  CorrelationsView: createLazyFeature(
-    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/components/CorrelationsView'),
-    'CorrelationsView'
-  ),
-  BottlenecksView: createLazyFeature(
-    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/components/BottlenecksView'),
-    'BottlenecksView'
-  ),
-  ExecutiveKPIGrid: createLazyFeature(
-    () => import('@/pages/admin/core/dashboard/components/CrossModuleAnalytics/CrossModuleAnalytics'),
-    'ExecutiveKPIGrid'
-  ),
+  // Removed CrossModuleAnalytics features - consolidated into modern dashboard
   MaterialsGrid: createLazyFeature(
     () => import('@/pages/admin/supply-chain/materials/components/MaterialManagement/MaterialsGrid'),
     'MaterialsGrid'

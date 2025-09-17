@@ -7,9 +7,9 @@
  * - EventBus para comunicación entre módulos
  */
 
-import { AchievementsEngine } from '../pages/admin/gamification/achievements/services/AchievementsEngine';
-import { initializeCapabilitiesIntegration } from '../store/businessCapabilitiesStore';
-import eventBus from '../lib/events/EventBus';
+import { AchievementsEngine } from '../../pages/admin/gamification/achievements/services/AchievementsEngine';
+import { initializeCapabilitiesIntegration } from '../../store/businessCapabilitiesStore';
+import eventBus from '../events/EventBus';
 
 export interface AchievementSystemConfig {
   userId?: string;

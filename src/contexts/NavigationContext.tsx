@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-  HomeIcon, 
-  CubeIcon, 
-  CogIcon, 
-  CurrencyDollarIcon, 
+import {
+  HomeIcon,
+  CubeIcon,
+  CogIcon,
+  CurrencyDollarIcon,
   UsersIcon,
   Cog6ToothIcon,
   ChartBarIcon,
@@ -15,7 +15,16 @@ import {
   ClockIcon,
   ShoppingBagIcon,
   UserIcon,
-  ListBulletIcon
+  ListBulletIcon,
+  // ✅ NEW ICONS FOR PHASE 4 & 5 MODULES
+  TrophyIcon,
+  PresentationChartLineIcon,
+  CreditCardIcon,
+  LinkIcon,
+  BuildingOfficeIcon,
+  TruckIcon,
+  ArchiveBoxIcon,
+  DocumentChartBarIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ModuleName } from '@/contexts/AuthContext';
@@ -291,7 +300,138 @@ const NAVIGATION_MODULES: NavigationModule[] = [
     path: '/admin/scheduling',
     description: 'Horarios + Coverage Planning'
   },
-  
+
+  // ✅ NEW PHASE 4 & 5 MODULES - Enterprise & Advanced Features
+
+  // 🎮 GAMIFICATION & ACHIEVEMENTS
+  {
+    id: 'gamification',
+    title: 'Gamificación',
+    icon: TrophyIcon,
+    color: 'yellow',
+    path: '/admin/gamification',
+    description: 'Sistema de logros y hitos del negocio'
+  },
+
+  // 📈 EXECUTIVE BUSINESS INTELLIGENCE
+  {
+    id: 'executive',
+    title: 'Executive BI',
+    icon: PresentationChartLineIcon,
+    color: 'purple',
+    path: '/admin/executive',
+    description: 'Business Intelligence ejecutivo con IA',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'executive-dashboard',
+        title: 'C-Suite Dashboard',
+        path: '/admin/executive/dashboards',
+        icon: PresentationChartLineIcon,
+        description: 'Dashboard ejecutivo con KPIs estratégicos'
+      },
+      {
+        id: 'natural-language-bi',
+        title: 'Natural Language BI',
+        path: '/admin/executive/dashboards',
+        icon: ChartBarIcon,
+        description: 'Consultas de negocio en lenguaje natural'
+      },
+      {
+        id: 'external-data',
+        title: 'External Data',
+        path: '/admin/executive/dashboards',
+        icon: LinkIcon,
+        description: 'Integración de fuentes de datos externas'
+      }
+    ]
+  },
+
+  // 💰 FINANCE ADVANCED MODULES
+  {
+    id: 'finance-advanced',
+    title: 'Finanzas Avanzadas',
+    icon: CreditCardIcon,
+    color: 'emerald',
+    path: '/admin/finance',
+    description: 'Facturación recurrente e integraciones de pago',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'billing',
+        title: 'Facturación Recurrente',
+        path: '/admin/finance/billing',
+        icon: DocumentTextIcon,
+        description: 'Gestión de suscripciones y facturación automática'
+      },
+      {
+        id: 'integrations',
+        title: 'Integraciones de Pago',
+        path: '/admin/finance/integrations',
+        icon: LinkIcon,
+        description: 'MercadoPago, MODO y ecosistema argentino'
+      }
+    ]
+  },
+
+  // 🏢 OPERATIONS ADVANCED MODULES
+  {
+    id: 'operations-advanced',
+    title: 'Operaciones Avanzadas',
+    icon: BuildingOfficeIcon,
+    color: 'sky',
+    path: '/admin/operations',
+    description: 'Módulos empresariales de operaciones',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'memberships',
+        title: 'Membresías',
+        path: '/admin/operations/memberships',
+        icon: UserGroupIcon,
+        description: 'Gestión de membresías y suscripciones'
+      },
+      {
+        id: 'rentals',
+        title: 'Alquileres',
+        path: '/admin/operations/rentals',
+        icon: TruckIcon,
+        description: 'Gestión de alquiler de equipos y espacios'
+      },
+      {
+        id: 'assets',
+        title: 'Gestión de Activos',
+        path: '/admin/operations/assets',
+        icon: ArchiveBoxIcon,
+        description: 'Gestión integral de activos empresariales'
+      }
+    ]
+  },
+
+  // 📊 ADVANCED TOOLS & REPORTING
+  {
+    id: 'advanced-tools',
+    title: 'Herramientas Avanzadas',
+    icon: DocumentChartBarIcon,
+    color: 'slate',
+    path: '/admin/tools',
+    description: 'Reportes avanzados y herramientas empresariales',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'advanced-reporting',
+        title: 'Reportes Avanzados',
+        path: '/admin/tools/reporting',
+        icon: DocumentChartBarIcon,
+        description: 'Sistema integral de reportes con IA'
+      }
+    ]
+  },
+
   // Tools module removed - functionality distributed to respective modules
   {
     id: 'settings',
@@ -661,7 +801,13 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
         'scheduling': 'scheduling',
         'fiscal': 'fiscal',
         'settings': 'settings',
-        'customers': 'sales' // Customers is part of sales workflow
+        'customers': 'sales', // Customers is part of sales workflow
+        // ✅ NEW PHASE 4 & 5 MODULES
+        'gamification': 'gamification',
+        'executive': 'executive',
+        'finance-advanced': 'billing', // Maps to billing permission
+        'operations-advanced': 'operations', // Maps to operations permission
+        'advanced-tools': 'reporting' // Maps to reporting permission
       };
       
       const moduleName = adminModuleNameMap[module.id];

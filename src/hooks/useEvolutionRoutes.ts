@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { MILESTONES, type Milestone, operationalProfileMilestones } from '../config/milestones';
+import { MILESTONE_DEFINITIONS, CAPABILITY_MILESTONE_CONFIG, getMilestoneDefinition } from '../config/milestones';
+import type { MilestoneDefinition } from '../pages/admin/gamification/achievements/types';
 import { useBusinessProfile } from '@/store/businessCapabilitiesStore'; 
 import { getOperationalProfile } from '../pages/setup/steps/business-setup/business-model/config/businessLogic';
 
@@ -10,7 +11,7 @@ import { getOperationalProfile } from '../pages/setup/steps/business-setup/busin
  */
 export interface EvolutionRoute {
   planetName: string;
-  milestone: Milestone;
+  milestone: MilestoneDefinition;
 }
 
 /**
@@ -39,7 +40,8 @@ export function useEvolutionRoutes(): { suggestedRoutes: EvolutionRoute[], isLoa
     // Find which planets are locked and have an associated milestone
     const lockedPlanets = fullOperationalProfile
       .map(planetName => {
-        const milestoneId = operationalProfileMilestones[planetName];
+        const capabilityConfig = CAPABILITY_MILESTONE_CONFIG[planetName];
+        const milestoneId = capabilityConfig?.milestones?.[0]; // Tomar el primer hito como ejemplo
         const isUnlocked = !milestoneId || completedMilestones.includes(milestoneId);
 
         return { planetName, isUnlocked, milestoneId };
@@ -49,7 +51,7 @@ export function useEvolutionRoutes(): { suggestedRoutes: EvolutionRoute[], isLoa
     // Map locked planets to their corresponding milestone data
     const routes: EvolutionRoute[] = lockedPlanets
       .map(planet => {
-        const milestone = MILESTONES.find(m => m.id === planet.milestoneId);
+        const milestone = getMilestoneDefinition(planet.milestoneId!);
         return milestone ? { planetName: planet.planetName, milestone } : null;
       })
       .filter((route): route is EvolutionRoute => route !== null);

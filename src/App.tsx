@@ -32,8 +32,8 @@ import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
 import { AchievementSystemProvider } from '@/lib/achievements/AchievementSystemIntegration';
 
 // Dashboard Module - Critical, not lazy loaded
-import { Dashboard } from '@/pages/admin/core/dashboard/page';
-import { CrossModuleAnalytics } from './pages/admin/core/dashboard/components/CrossModuleAnalytics/CrossModuleAnalytics';
+import DashboardPage from '@/pages/admin/core/dashboard/page';
+// Removed CrossModuleAnalytics - consolidated into Dashboard with CrossModuleInsights
 import { PredictiveAnalytics as PredictiveAnalyticsComponent } from '@/pages/admin/supply-chain/materials/components/PredictiveAnalytics';
 import CustomReporting from '@/pages/admin/core/reporting/page';
 import CompetitiveIntelligence from '@/pages/admin/core/intelligence/page';
@@ -54,7 +54,16 @@ import {
   LazySettingsPage,
   LazyThemeTestPage,
   LazySupplyChainPage,
-  LazyProcurementPage
+  LazyProcurementPage,
+  // ✅ NEW PHASE 4 & 5 MODULES
+  LazyGamificationPage,
+  LazyExecutivePage,
+  LazyBillingPage,
+  LazyIntegrationsPage,
+  LazyMembershipsPage,
+  LazyRentalsPage,
+  LazyAssetsPage,
+  LazyReportingPage
 } from '@/lib/lazy';
 
 // Materials sub-modules
@@ -187,7 +196,7 @@ function App() {
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
                               <DashboardRoleRouter>
-                                <Dashboard />
+                                <DashboardPage />
                               </DashboardRoleRouter>
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
@@ -195,7 +204,7 @@ function App() {
                         <Route path="/admin/dashboard/cross-analytics" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
-                              <CrossModuleAnalytics />
+                              <DashboardPage />
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
@@ -342,6 +351,104 @@ function App() {
                           </ProtectedRouteNew>
                         } />
                         
+                        {/* 🎮 ADMIN - GAMIFICATION */}
+                        <Route path="/admin/gamification/*" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="gamification">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Gamificación">
+                                  <LazyGamificationPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+
+                        {/* 📈 ADMIN - EXECUTIVE BI */}
+                        <Route path="/admin/executive/*" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Executive BI">
+                                  <LazyExecutivePage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+
+                        {/* 💰 ADMIN - FINANCE ADVANCED */}
+                        <Route path="/admin/finance/billing/*" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="fiscal">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Facturación Avanzada">
+                                  <LazyBillingPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/admin/finance/integrations/*" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="fiscal">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Integraciones de Pago">
+                                  <LazyIntegrationsPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+
+                        {/* 🏢 ADMIN - OPERATIONS ADVANCED */}
+                        <Route path="/admin/operations/memberships/*" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="operations">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Membresías">
+                                  <LazyMembershipsPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/admin/operations/rentals/*" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="operations">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Alquileres">
+                                  <LazyRentalsPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/admin/operations/assets/*" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="operations">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Gestión de Activos">
+                                  <LazyAssetsPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+
+                        {/* 📊 ADMIN - ADVANCED TOOLS */}
+                        <Route path="/admin/tools/reporting/*" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Reportes Avanzados">
+                                  <LazyReportingPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+
                         {/* 🔧 ADMIN - SETTINGS */}
                         <Route path="/admin/settings" element={
                           <ProtectedRouteNew>

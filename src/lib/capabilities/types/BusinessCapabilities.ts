@@ -64,7 +64,11 @@ export type BusinessCapability =
   | 'invoice_management'
   | 'payroll_basic'
   | 'payroll_advanced'
-  | 'financial_reporting';
+  | 'financial_reporting'
+  
+  // Gamification capabilities
+  | 'achievement_system'
+  | 'milestone_tracking';
 
 // Business model types from existing system
 export type BusinessModel =
@@ -358,6 +362,12 @@ export const moduleCapabilities: Record<string, {
     provides: ['recurring_billing'],
     requires: ['payment_gateway', 'customer_management', 'fiscal_compliance'],
     enhances: ['manages_subscriptions', 'manages_memberships']
+  },
+
+  // Gamification module
+  'gamification': {
+    provides: ['achievement_system', 'milestone_tracking'],
+    requires: []
   }
 };
 

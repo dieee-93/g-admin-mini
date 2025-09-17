@@ -11,7 +11,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { useMaterials } from '@/store/materialsStore';
 import { inventoryApi } from '../services/inventoryApi';
 import { MaterialsNormalizer } from '../services';
-import { StockCalculation } from '../services/stockCalculation';
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation'; 
 import { ABCAnalysisEngine } from '../services/abcAnalysisEngine';
 import { useApp } from '@/hooks/useZustandStores';
 import type { MaterialItem } from '../types';

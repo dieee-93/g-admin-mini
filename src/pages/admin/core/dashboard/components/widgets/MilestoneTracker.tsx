@@ -1,165 +1,139 @@
 import { useMemo } from 'react';
-import { usePersonalizedExperience } from '@/hooks/usePersonalizedExperience';
+import { useAchievements } from '@/pages/admin/gamification/achievements/hooks/useAchievements';
+import { useBusinessProfile } from '@/store/businessCapabilitiesStore';
 import { 
   Section, 
   Stack, 
   Typography, 
-  MetricCard,
   Badge,
-  Icon
+  Button
 } from '@/shared/ui';
-import { Box, Flex, Progress } from '@chakra-ui/react';
-import { CheckCircleIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
-import { Link } from '@/shared/navigation/Link';
+import { Box, Flex, Progress, Text } from '@chakra-ui/react';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 
 export function MilestoneTracker() {
-  const { milestones, stats } = usePersonalizedExperience();
+  const { profile } = useBusinessProfile();
+  const { 
+    progress, 
+    totalMilestones, 
+    completedMilestones, 
+    overallProgress,
+    isLoading 
+  } = useAchievements('demo-user'); // Usar ID fijo por ahora
 
-  // Asegurarse de que `milestones` y `stats` no son undefined
-  if (!milestones || milestones.length === 0 || !stats) {
-    return null; // No mostrar nada si no hay logros relevantes o stats
-  }
-
-  const { completedMilestones, totalMilestones } = stats;
-
-  // Manejar el caso donde totalMilestones podría ser 0 para evitar división por cero
-  const progressPercent = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
-
-  // Agrupar hitos por categoría
-  const groupedMilestones = useMemo(() => {
-    return milestones.reduce((acc, milestone) => {
-      const category = milestone.category || 'Otros';
+  // Filtrar solo hitos incompletos para mostrar
+  const incompleteCapabilities = useMemo(() => {
+    if (!progress || progress.length === 0) return [];
+    return progress.filter(p => !p.isActive);
+  }, [progress]);
+  
+  // Agrupar por categoría/dominio
+  const groupedProgress = useMemo(() => {
+    return incompleteCapabilities.reduce((acc, capabilityProgress) => {
+      // Determinar categoría basada en el ID de capacidad
+      let category = 'General';
+      if (capabilityProgress.capabilityId.includes('sells_')) category = 'Ventas';
+      else if (capabilityProgress.capabilityId.includes('manages_')) category = 'Operaciones';
+      else if (capabilityProgress.capabilityId.includes('staff')) category = 'Personal';
+      else if (capabilityProgress.capabilityId.includes('inventory')) category = 'Inventario';
+      
       if (!acc[category]) {
         acc[category] = [];
       }
-      acc[category].push(milestone);
+      acc[category].push(capabilityProgress);
       return acc;
-    }, {} as Record<string, typeof milestones>);
-  }, [milestones]);
+    }, {} as Record<string, typeof incompleteCapabilities>);
+  }, [incompleteCapabilities]);
 
-  const categoryOrder: (keyof typeof groupedMilestones)[] = ['Configuración Esencial', 'Primeros Pasos', 'Optimización'];
+  // Si está cargando o no hay datos
+  if (isLoading || !progress || progress.length === 0) {
+    return (
+      <Section title="Progreso de Hitos" size="md">
+        <Box p={4} textAlign="center" color="gray.500">
+          <Typography variant="body">Cargando progreso de hitos...</Typography>
+        </Box>
+      </Section>
+    );
+  }
 
   return (
-    <Section 
-      variant="elevated" 
-      title="Guía de Inicio Rápido"
-      subtitle="Completa estos pasos para configurar tu negocio y sacarle el máximo provecho a la aplicación"
-      icon={CheckCircleIcon}
-    >
-      <Stack gap="6">
-
-        <MetricCard
-          title="Progreso de Configuración"
-          value={`${completedMilestones} / ${totalMilestones}`}
-          subtitle="pasos completados"
-          icon={CheckCircleIcon}
-          colorPalette="blue"
-          badge={{
-            value: `${Math.round(progressPercent)}%`,
-            colorPalette: progressPercent >= 75 ? "green" : progressPercent >= 50 ? "orange" : "blue"
-          }}
-        />
-        
-        <Stack gap="2">
+    <Section title="Progreso de Hitos" size="md">
+      <Stack direction="column" gap="4">
+        {/* Progreso General */}
+        <Box>
+          <Flex justify="space-between" mb={2}>
+            <Text fontSize="sm" fontWeight="medium">
+              Progreso General
+            </Text>
+            <Text fontSize="sm" color="gray.500">
+              {completedMilestones}/{totalMilestones} completados
+            </Text>
+          </Flex>
           <Progress.Root 
-            value={progressPercent} 
-            size="md" 
-            colorPalette={progressPercent >= 75 ? "green" : "blue"}
+            value={overallProgress} 
+            colorPalette="blue" 
+            size="md"
           >
             <Progress.Track>
               <Progress.Range />
             </Progress.Track>
           </Progress.Root>
-          <Typography variant="body" size="sm" color="fg.muted" textAlign="center">
-            {progressPercent >= 100 
-              ? "¡Configuración completa! Tu negocio está listo para operar."
-              : `${Math.round(progressPercent)}% completado - ${totalMilestones - completedMilestones} pasos restantes`
-            }
-          </Typography>
-        </Stack>
+          <Text fontSize="xs" color="gray.500" mt={1}>
+            {Math.round(overallProgress)}% completado
+          </Text>
+        </Box>
 
-        <Stack gap="6">
-        {categoryOrder
-          .filter(category => groupedMilestones[category]) // Solo mostrar categorías que tienen hitos
-          .map((category) => (
+        {/* Categorías de Hitos */}
+        {Object.entries(groupedProgress).map(([category, capabilities]) => (
           <Box key={category}>
-            <Typography variant="heading" size="md" weight="semibold" color="fg.default" mb={3}>
+            <Text fontSize="sm" fontWeight="semibold" mb={2}>
               {category}
-            </Typography>
-            <Stack gap={3}>
-              {groupedMilestones[category].map((milestone) =>
-                milestone.isCompleted ? (
-                  <Box
-                    key={milestone.id}
-                    p={4}
-                    bg="green.50"
-                    borderLeft="4px solid"
-                    borderColor="green.400"
-                    borderRadius="md"
-                    opacity={0.8}
-                  >
-                    <Flex align="center" gap={3}>
-                      <Icon icon={CheckCircleIcon} color="green.500" size="md" />
-                      <Box flex="1">
-                        <Typography 
-                          variant="body" 
-                          size="md" 
-                          weight="medium" 
-                          color="green.700"
-                          textDecoration="line-through"
-                        >
-                          {milestone.title}
-                        </Typography>
-                      </Box>
-                      <Badge colorPalette="green" variant="subtle">
-                        Completado
-                      </Badge>
-                    </Flex>
-                  </Box>
-                ) : (
-                  <Link moduleId={milestone.moduleId} subPath={milestone.subPath} query={milestone.query} key={milestone.id} style={{ textDecoration: 'none' }}>
-                    <Box
-                      p={4}
-                      bg="blue.50"
-                      borderLeft="4px solid"
-                      borderColor="blue.400"
-                      borderRadius="md"
-                      _hover={{ 
-                        bg: 'blue.100', 
-                        transform: 'translateY(-2px)',
-                        shadow: 'md'
-                      }}
-                      transition="all 0.2s ease"
-                      cursor="pointer"
-                    >
-                      <Flex justify="space-between" align="center">
-                        <Flex align="center" gap={3}>
-                          <Icon icon={EllipsisHorizontalIcon} color="blue.500" size="md" />
-                          <Box>
-                            <Typography variant="body" size="md" weight="semibold" color="fg.default">
-                              {milestone.title}
-                            </Typography>
-                            <Typography variant="body" size="sm" color="fg.muted">
-                              {milestone.description}
-                            </Typography>
-                          </Box>
-                        </Flex>
-                        <Flex align="center" gap={2}>
-                          <Badge colorPalette="blue" variant="outline">
-                            Pendiente
-                          </Badge>
-                          <Icon icon={ArrowRightIcon} color="blue.500" size="sm" />
-                        </Flex>
-                      </Flex>
+            </Text>
+            <Stack direction="column" gap="2">
+              {capabilities.slice(0, 2).map((capabilityProgress) => (
+                <Box 
+                  key={capabilityProgress.capabilityId}
+                  p={3} 
+                  bg="gray.50" 
+                  borderRadius="md"
+                  borderLeft="3px solid"
+                  borderLeftColor="blue.200"
+                >
+                  <Flex justify="space-between" align="center">
+                    <Box flex={1}>
+                      <Text fontSize="sm" fontWeight="medium">
+                        {capabilityProgress.capabilityId.replace(/[_]/g, ' ')}
+                      </Text>
+                      <Text fontSize="xs" color="gray.600" mt={1}>
+                        Capacidad en desarrollo
+                      </Text>
                     </Box>
-                  </Link>
-                )
-              )}
+                    <Badge colorPalette="yellow" variant="subtle" size="sm">
+                      Pendiente
+                    </Badge>
+                  </Flex>
+                </Box>
+              ))}
             </Stack>
           </Box>
         ))}
-        </Stack>
+
+        {/* Botón para ver todos los logros */}
+        <Box>
+          <Link to="/admin/gamification/achievements" style={{ textDecoration: 'none' }}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              fullWidth
+            >
+              <Flex align="center" gap={2}>
+                <Text>Ver Galaxy de Logros</Text>
+                <ChevronRightIcon style={{ width: '16px', height: '16px' }} />
+              </Flex>
+            </Button>
+          </Link>
+        </Box>
       </Stack>
     </Section>
   );

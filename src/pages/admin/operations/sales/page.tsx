@@ -1,5 +1,5 @@
 import {
-  ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
+  ContentLayout, Section, StatsSection, CardGrid, MetricCard,
   Button, Alert, Badge, Icon, Stack, Typography
 } from '@/shared/ui';
 import {
@@ -15,6 +15,7 @@ import {
   ClockIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
+import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 import { useSalesPage } from './hooks';
 
 // Mock data
@@ -66,23 +67,15 @@ export default function SalesPage() {
   if (loading) {
     return (
       <ContentLayout spacing="normal">
-        <PageHeader
-          title="Sistema de Ventas"
-          subtitle="Cargando datos..."
-          icon={ComputerDesktopIcon}
-        />
+        <div>Cargando sistema de ventas...</div>
       </ContentLayout>
     );
   }
 
   if (error) {
+    ModuleEventUtils.business.error('sales-load-failed', error);
     return (
       <ContentLayout spacing="normal">
-        <PageHeader
-          title="Sistema de Ventas"
-          subtitle="Error al cargar datos"
-          icon={ComputerDesktopIcon}
-        />
         <Alert variant="subtle" title={error} />
       </ContentLayout>
     );
@@ -90,151 +83,137 @@ export default function SalesPage() {
 
   return (
     <ContentLayout spacing="normal">
-      <PageHeader
-        title="Sistema de Ventas"
-        subtitle={
-          <Stack direction="row" gap="sm" align="center">
-            <Badge variant="solid">Live</Badge>
-            <Typography variant="body" size="sm" color="text.muted">
-              POS inteligente con gestión completa
-            </Typography>
-          </Stack>
-        }
-        icon={ComputerDesktopIcon}
-        actions={
-          <Button variant="solid" onClick={actions.handleNewSale} size="lg">
-            <Icon icon={PlusIcon} size="sm" />
-            Nueva Venta
-          </Button>
-        }
-      />
-
-      {/* Sales Metrics */}
-      <StatsSection>
-        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
-          <MetricCard
-            title="Ventas Hoy"
-            value={`$${metrics.todayRevenue.toFixed(2)}`}
-            icon={CurrencyDollarIcon}
-            trend={{ value: metrics.salesGrowth, isPositive: metrics.salesGrowth > 0 }}
-            colorPalette="green"
-          />
-          <MetricCard
-            title="Transacciones"
-            value={metrics.todayTransactions}
-            icon={CreditCardIcon}
-            colorPalette="blue"
-          />
-          <MetricCard
-            title="Ticket Promedio"
-            value={`$${metrics.averageOrderValue.toFixed(2)}`}
-            icon={ArrowTrendingUpIcon}
-            colorPalette="purple"
-          />
-          <MetricCard
-            title="Mesas Activas"
-            value={metrics.activeTables}
-            icon={TableCellsIcon}
-            colorPalette="teal"
-          />
-        </CardGrid>
-      </StatsSection>
-
-      {/* POS System Section */}
-      <Section variant="elevated" title="Sistema POS">
-        <Stack direction="row" gap="sm" align="center" mb="md">
-          <Icon icon={CreditCardIcon} size="lg" color="teal.600" />
-          <Badge variant="subtle" colorPalette="teal">Principal</Badge>
-        </Stack>
-        <Typography variant="body" mb="md">
-          Sistema de punto de venta integrado con gestión de inventario en tiempo real.
-        </Typography>
-        <Stack direction="row" gap="md">
-          <Button variant="solid" onClick={actions.handleNewSale}>
-            Procesar Venta
-          </Button>
-          <Button variant="outline" onClick={actions.handleShowReports}>
-            Ver Historial
-          </Button>
-        </Stack>
-      </Section>
-
-      {/* Table Management Section */}
-      {pageState.activeSection === 'tables' && (
-        <Section variant="elevated" title="Gestión de Mesas">
-          <Stack direction="row" gap="sm" align="center" mb="md">
-            <Icon icon={TableCellsIcon} size="lg" color="blue.600" />
-            <Typography variant="body" color="text.muted">
-              Ocupación: {metrics.tableOccupancy.toFixed(1)}%
-            </Typography>
-          </Stack>
-          <Alert
-            variant="subtle"
-            icon={<Icon icon={InformationCircleIcon} size="sm" />}
-            title="Seleccione una mesa para iniciar una nueva venta."
-          />
-        </Section>
-      )}
-
-      {/* Analytics Section */}
-      {pageState.showAnalytics && (
-        <Section variant="elevated" title="Analytics de Ventas">
-          <CardGrid columns={{ base: 1, md: 2, lg: 3 }} gap="md">
+      <Stack gap={12}>
+        {/* 📊 MÉTRICAS DE NEGOCIO - SIEMPRE PRIMERO */}
+        <StatsSection>
+          <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
             <MetricCard
-              title="Órdenes Pendientes"
-              value={metrics.pendingOrders}
-              icon={ClockIcon}
-              colorPalette="orange"
-            />
-            <MetricCard
-              title="Tiempo Promedio Servicio"
-              value={`${metrics.averageServiceTime} min`}
-              icon={UsersIcon}
-              colorPalette="cyan"
-            />
-            <MetricCard
-              title="Margen de Ganancia"
-              value={`${metrics.profitMargin.toFixed(1)}%`}
-              icon={ArrowTrendingUpIcon}
+              title="Ventas Hoy"
+              value={`$${metrics.todayRevenue.toFixed(2)}`}
+              icon={CurrencyDollarIcon}
+              trend={{ value: metrics.salesGrowth, isPositive: metrics.salesGrowth > 0 }}
               colorPalette="green"
-              trend={{ value: metrics.profitMargin, isPositive: metrics.profitMargin > 0 }}
+              onClick={() => ModuleEventUtils.business.metricClicked('revenue')}
+            />
+            <MetricCard
+              title="Transacciones"
+              value={metrics.todayTransactions}
+              icon={CreditCardIcon}
+              colorPalette="blue"
+            />
+            <MetricCard
+              title="Ticket Promedio"
+              value={`$${metrics.averageOrderValue.toFixed(2)}`}
+              icon={ArrowTrendingUpIcon}
+              colorPalette="purple"
+            />
+            <MetricCard
+              title="Mesas Activas"
+              value={metrics.activeTables}
+              icon={TableCellsIcon}
+              colorPalette="teal"
             />
           </CardGrid>
-        </Section>
-      )}
+        </StatsSection>
 
-      {/* Quick Actions */}
-      <Section variant="flat" title="Acciones Rápidas">
-        <Stack direction="row" gap="md" flexWrap="wrap">
-          <Button
-            variant="outline"
-            onClick={actions.handleQRGeneration}
-            flex="1"
-            minW="200px"
-          >
-            <Icon icon={QrCodeIcon} size="sm" />
-            Códigos QR
-          </Button>
-          <Button
-            variant="outline"
-            onClick={actions.handleShowAnalytics}
-            flex="1"
-            minW="200px"
-          >
-            <Icon icon={ChartBarIcon} size="sm" />
-            Analytics
-          </Button>
-          <Button
-            variant="outline"
-            onClick={actions.handleKitchenDisplay}
-            flex="1"
-            minW="200px"
-          >
-            <Icon icon={ComputerDesktopIcon} size="sm" />
-            Pantalla Cocina
-          </Button>
-        </Stack>
-      </Section>
+        {/* 💼 SISTEMA POS PRINCIPAL */}
+        <Section variant="elevated" title="Sistema POS">
+          <Stack direction="row" gap="sm" align="center" mb="md">
+            <Icon icon={CreditCardIcon} size="lg" color="teal.600" />
+            <Badge variant="subtle" colorPalette="teal">Principal</Badge>
+            <Badge variant="solid">Live</Badge>
+          </Stack>
+          <Typography variant="body" mb="md">
+            Sistema de punto de venta integrado con gestión de inventario en tiempo real.
+          </Typography>
+          <Stack direction="row" gap="md">
+            <Button variant="solid" onClick={actions.handleNewSale} size="lg">
+              <Icon icon={PlusIcon} size="sm" />
+              Nueva Venta
+            </Button>
+            <Button variant="outline" onClick={actions.handleShowReports}>
+              Ver Historial
+            </Button>
+          </Stack>
+        </Section>
+
+        {/* 🏠 GESTIÓN DE MESAS - Condicional */}
+        {pageState.activeSection === 'tables' && (
+          <Section variant="elevated" title="Gestión de Mesas">
+            <Stack direction="row" gap="sm" align="center" mb="md">
+              <Icon icon={TableCellsIcon} size="lg" color="blue.600" />
+              <Typography variant="body" color="text.muted">
+                Ocupación: {metrics.tableOccupancy.toFixed(1)}%
+              </Typography>
+            </Stack>
+            <Alert
+              variant="subtle"
+              icon={<Icon icon={InformationCircleIcon} size="sm" />}
+              title="Seleccione una mesa para iniciar una nueva venta."
+            />
+          </Section>
+        )}
+
+        {/* 📈 ANALYTICS DE VENTAS - Condicional */}
+        {pageState.showAnalytics && (
+          <Section variant="elevated" title="Analytics de Ventas">
+            <CardGrid columns={{ base: 1, md: 2, lg: 3 }} gap="md">
+              <MetricCard
+                title="Órdenes Pendientes"
+                value={metrics.pendingOrders}
+                icon={ClockIcon}
+                colorPalette="orange"
+              />
+              <MetricCard
+                title="Tiempo Promedio Servicio"
+                value={`${metrics.averageServiceTime} min`}
+                icon={UsersIcon}
+                colorPalette="cyan"
+              />
+              <MetricCard
+                title="Margen de Ganancia"
+                value={`${metrics.profitMargin.toFixed(1)}%`}
+                icon={ArrowTrendingUpIcon}
+                colorPalette="green"
+                trend={{ value: metrics.profitMargin, isPositive: metrics.profitMargin > 0 }}
+              />
+            </CardGrid>
+          </Section>
+        )}
+
+        {/* ⚡ ACCIONES RÁPIDAS */}
+        <Section variant="default" title="Acciones Rápidas">
+          <Stack direction="row" gap="md" flexWrap="wrap">
+            <Button
+              variant="outline"
+              onClick={actions.handleQRGeneration}
+              flex="1"
+              minW="200px"
+            >
+              <Icon icon={QrCodeIcon} size="sm" />
+              Códigos QR
+            </Button>
+            <Button
+              variant="outline"
+              onClick={actions.handleShowAnalytics}
+              flex="1"
+              minW="200px"
+            >
+              <Icon icon={ChartBarIcon} size="sm" />
+              Analytics
+            </Button>
+            <Button
+              variant="outline"
+              onClick={actions.handleKitchenDisplay}
+              flex="1"
+              minW="200px"
+            >
+              <Icon icon={ComputerDesktopIcon} size="sm" />
+              Pantalla Cocina
+            </Button>
+          </Stack>
+        </Section>
+      </Stack>
     </ContentLayout>
   );
 }

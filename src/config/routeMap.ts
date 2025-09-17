@@ -22,6 +22,9 @@ export const domainRouteMap = {
   'scheduling': '/admin/scheduling',
   'settings': '/admin/settings',
   
+  // Gamification Domain
+  'gamification': '/admin/gamification',
+  
   // Dashboard Domain
   'dashboard': '/admin/dashboard'
 } as const;
@@ -38,6 +41,7 @@ export const routeToFileMap = {
   '/admin/staff': 'pages/admin/resources/staff/page',
   '/admin/scheduling': 'pages/admin/resources/scheduling/page',
   '/admin/settings': 'pages/admin/core/settings/page',
+  '/admin/gamification/achievements': 'pages/admin/gamification/achievements/page',
   '/admin/dashboard': 'pages/admin/core/dashboard/page',
 
   // Materials sub-views
@@ -82,6 +86,7 @@ export const routeToComponentMap = {
   '/admin/staff': 'LazyStaffPage',
   '/admin/scheduling': 'LazySchedulingPage',
   '/admin/settings': 'LazySettingsPage',
+  '/admin/gamification/achievements': 'LazyAchievementsGalaxy',
   '/admin/debug/theme-test': 'LazyThemeTestPage',
   '/admin/dashboard': 'Dashboard', // Dashboard not lazy loaded (critical)
 

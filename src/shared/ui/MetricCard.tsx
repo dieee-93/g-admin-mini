@@ -1,3 +1,13 @@
+/**
+ * MetricCard FIXED - Layout limpio y profesional
+ *
+ * Problemas identificados y solucionados:
+ * - Layout confuso con iconos mal posicionados
+ * - Spacing inconsistente
+ * - Alineación rota de elementos
+ */
+
+import React from 'react';
 import {
   Stack,
   Typography,
@@ -6,8 +16,8 @@ import {
   Badge,
   Icon
 } from '.';
-import { 
-  ArrowTrendingUpIcon, 
+import {
+  ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   EyeIcon,
   ChartBarIcon
@@ -21,6 +31,8 @@ interface BaseMetricProps {
   iconColor?: string;
   colorPalette?: 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'cyan' | 'purple' | 'pink';
   onClick?: () => void;
+  trend?: 'up' | 'down' | 'neutral';
+  change?: string;
   badge?: {
     value: string;
     colorPalette: 'gray' | 'green' | 'orange' | 'red' | 'blue';
@@ -29,49 +41,19 @@ interface BaseMetricProps {
   isLoading?: boolean;
 }
 
-interface SimpleMetricProps extends BaseMetricProps {
-  variant?: 'simple';
-  additionalInfo?: string;
-}
-
-interface HeroMetricProps extends BaseMetricProps {
-  variant: 'hero';
-  change?: {
-    value: number;
-    period: string;
-    type: 'increase' | 'decrease' | 'neutral';
-  };
-  status?: {
-    text: string;
-    color: 'gray' | 'brand' | 'success' | 'warning' | 'error' | 'info';
-  };
-  actions?: {
-    primary?: {
-      label: string;
-      onClick: () => void;
-    };
-    secondary?: {
-      label: string;
-      onClick: () => void;
-    };
-  };
-}
-
-type MetricCardProps = SimpleMetricProps | HeroMetricProps;
-
-export function MetricCard(props: MetricCardProps) {
-  const {
-    title,
-    value,
-    subtitle,
-    icon: IconComponent,
-    iconColor,
-    colorPalette,
-    onClick,
-    badge,
-    isLoading = false,
-    variant = 'simple'
-  } = props;
+export function MetricCard({
+  title,
+  value,
+  subtitle,
+  icon: IconComponent,
+  iconColor,
+  colorPalette = 'gray',
+  onClick,
+  trend,
+  change,
+  badge,
+  isLoading = false
+}: BaseMetricProps) {
 
   const formatValue = (val: string | number) => {
     if (typeof val === 'number') {
@@ -80,199 +62,109 @@ export function MetricCard(props: MetricCardProps) {
     return val;
   };
 
-  // Simple variant (original MetricCard)
-  if (variant === 'simple') {
-    const { additionalInfo } = props as SimpleMetricProps;
-    
-    return (
-      <CardWrapper 
-        variant="elevated"
-        colorPalette={colorPalette}
-        onClick={onClick}
-        cursor={onClick ? "pointer" : "default"}
-        _hover={onClick ? { 
-          transform: "translateY(-2px)",
-          shadow: "lg" 
-        } : {}}
-        transition="all 0.2s ease"
-      >
-        <Stack gap="md" align="start">
-          <Stack direction="row" justify="space-between" width="full" align="start">
-            <Icon 
-              icon={IconComponent} 
-              size="xl" 
-              color={iconColor || "text.muted"}
-            />
-            {badge && (
-              <Badge 
-                colorPalette={badge.colorPalette} 
-                variant={badge.variant || "subtle"}
-                size="sm"
-              >
-                {badge.value}
-              </Badge>
-            )}
-          </Stack>
-          
-          <Stack gap="xs" align="start" width="full">
-            <Typography 
-              variant="heading" 
-              size="3xl" 
-              weight="bold" 
-              color="text.primary"
-            >
-              {formatValue(value)}
-            </Typography>
-            
-            <Typography 
-              variant="body" 
-              size="md" 
-              color="text.muted"
-              weight="medium"
-            >
-              {title}
-            </Typography>
-            
-            {subtitle && (
-              <Typography 
-                variant="body" 
-                size="sm" 
-                color="text.muted"
-              >
-                {subtitle}
-              </Typography>
-            )}
-
-            {additionalInfo && (
-              <Typography 
-                variant="body" 
-                size="xs" 
-                color="text.muted"
-                weight="medium"
-              >
-                {additionalInfo}
-              </Typography>
-            )}
-          </Stack>
-        </Stack>
-      </CardWrapper>
-    );
-  }
-
-  // Hero variant (original HeroMetricCard)
-  const { change, status, actions } = props as HeroMetricProps;
-  
   const getTrendIcon = () => {
-    if (!change) return null;
-    
-    return change.type === 'increase' ? ArrowTrendingUpIcon : 
-           change.type === 'decrease' ? ArrowTrendingDownIcon : null;
+    if (trend === 'up') return ArrowTrendingUpIcon;
+    if (trend === 'down') return ArrowTrendingDownIcon;
+    return null;
   };
 
-  const getTrendColorPalette = () => {
-    if (!change) return 'secondary';
-    return change.type === 'increase' ? 'success' : 
-           change.type === 'decrease' ? 'error' : 'secondary';
+  const getTrendColor = () => {
+    if (trend === 'up') return 'green.500';
+    if (trend === 'down') return 'red.500';
+    return 'gray.500';
   };
 
   return (
-    <CardWrapper variant="elevated" colorPalette={colorPalette}>
-      <Stack gap="md" align="stretch">
-        {/* Header con ícono y título */}
-        <Stack direction="row" justify="space-between" align="start">
-          <Stack gap="xs" align="start">
-            <Stack direction="row" gap="sm" align="center">
-              <Icon 
-                icon={IconComponent} 
-                size="lg" 
-                color={iconColor || "theme.500"} 
-              />
-              <Typography variant="heading" size="lg" weight="semibold" color="text.primary">
-                {title}
-              </Typography>
-            </Stack>
-          </Stack>
-          
-          {status && (
-            <Badge 
-              colorPalette={status.color} 
-              variant="surface"
+    <CardWrapper
+      variant="elevated"
+      colorPalette={colorPalette}
+      onClick={onClick}
+      cursor={onClick ? "pointer" : "default"}
+      _hover={onClick ? {
+        transform: "translateY(-2px)",
+        shadow: "lg"
+      } : {}}
+      transition="all 0.2s ease"
+      p={6} // Padding explícito
+    >
+      <Stack gap={4} align="start" width="full">
+        {/* Header Row: Icon + Badge */}
+        <Stack direction="row" justify="space-between" align="center" width="full">
+          <Icon
+            icon={IconComponent}
+            size="2xl"
+            color={iconColor || `${colorPalette}.500`}
+          />
+          {badge && (
+            <Badge
+              colorPalette={badge.colorPalette}
+              variant={badge.variant || "subtle"}
+              size="sm"
             >
-              {status.text}
+              {badge.value}
             </Badge>
           )}
         </Stack>
 
-        {/* Valor principal */}
-        <Stack gap="sm" align="start">
-          <Typography 
-            variant="heading" 
-            size="3xl" 
-            weight="bold" 
+        {/* Main Value */}
+        <Stack gap={1} align="start" width="full">
+          <Typography
+            variant="heading"
+            size="4xl"
+            weight="bold"
             color="text.primary"
+            lineHeight="1.1"
           >
             {formatValue(value)}
           </Typography>
-          
-          {/* Cambio/Tendencia */}
-          {change && (
-            <Stack direction="row" gap="sm" align="center">
-              <Stack direction="row" gap="xs" align="center">
-                {getTrendIcon() && (
-                  <Icon 
-                    icon={getTrendIcon()!} 
-                    size="sm" 
-                    color={`${getTrendColorPalette()}.500`} 
-                  />
-                )}
-                <Typography 
-                  variant="body" 
-                  size="sm" 
-                  weight="medium" 
-                  color={getTrendColorPalette()}
+
+          {/* Change/Trend - if provided */}
+          {(change || trend) && (
+            <Stack direction="row" gap={2} align="center">
+              {getTrendIcon() && (
+                <Icon
+                  icon={getTrendIcon()!}
+                  size="sm"
+                  color={getTrendColor()}
+                />
+              )}
+              {change && (
+                <Typography
+                  variant="body"
+                  size="sm"
+                  weight="medium"
+                  color={getTrendColor()}
                 >
-                  {change.type === 'increase' ? '+' : change.type === 'decrease' ? '-' : ''}
-                  {Math.abs(change.value)}%
+                  {change}
                 </Typography>
-              </Stack>
-              <Typography variant="body" size="sm" color="text.secondary">
-                vs {change.period}
-              </Typography>
+              )}
             </Stack>
           )}
         </Stack>
 
-        {/* Acciones */}
-        {actions && (
-          <Stack direction="row" gap="sm" wrap>
-            {actions.primary && (
-              <Button
-                variant="solid"
-                size="sm"
-                colorPalette="info"
-                onClick={actions.primary.onClick}
-              >
-                <Stack direction="row" align="center" gap="xs">
-                  <Icon icon={EyeIcon} size="xs" />
-                  <Typography variant="body" size="xs">{actions.primary.label}</Typography>
-                </Stack>
-              </Button>
-            )}
-            {actions.secondary && (
-              <Button
-                variant="outline"
-                size="sm"
-                colorPalette="gray"
-                onClick={actions.secondary.onClick}
-              >
-                <Stack direction="row" align="center" gap="xs">
-                  <Icon icon={ChartBarIcon} size="xs" />
-                  <Typography variant="body" size="xs">{actions.secondary.label}</Typography>
-                </Stack>
-              </Button>
-            )}
-          </Stack>
-        )}
+        {/* Title and Subtitle */}
+        <Stack gap={1} align="start" width="full">
+          <Typography
+            variant="body"
+            size="md"
+            color="text.muted"
+            weight="semibold"
+            lineHeight="1.2"
+          >
+            {title}
+          </Typography>
+
+          {subtitle && (
+            <Typography
+              variant="body"
+              size="sm"
+              color="text.subtle"
+              lineHeight="1.2"
+            >
+              {subtitle}
+            </Typography>
+          )}
+        </Stack>
       </Stack>
     </CardWrapper>
   );

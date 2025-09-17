@@ -1,11 +1,13 @@
-// Settings Page - Semantic Layout with New Design System
-import React from 'react';
-import { 
-  ContentLayout, PageHeader, StatsSection, CardGrid, MetricCard, Button, Icon
+// ⚙️ PATRÓN DE CONFIGURACIÓN G-ADMIN - Migrado a v2.1
+// Siguiendo PLANTILLA: "Módulo de Configuración" desde G_ADMIN_PAGE_CONSTRUCTION_GUIDE.md
+import {
+  ContentLayout, Section, FormSection, Alert, Stack, Button
 } from '@/shared/ui';
+import { CogIcon } from '@heroicons/react/24/outline';
+import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 import { useSettingsPage } from './hooks';
 
-// Components  
+// Components de configuración
 import { 
   BusinessProfileSection,
   TaxConfigurationSection,
@@ -14,44 +16,57 @@ import {
 } from './components';
 
 export default function SettingsPage() {
-  const { metrics, handlers, icons } = useSettingsPage();
+  const { isLoading, error, isDirty, metrics, handlers, icons } = useSettingsPage();
+
+  if (isLoading) return <div>Cargando configuración...</div>;
+  if (error) {
+    ModuleEventUtils.system.moduleError("settings", error);
+    return <Alert variant="subtle" title={error} />;
+  }
 
   return (
-    <ContentLayout>
-      {/* 🎨 PAGE HEADER - Semantic, clean, with all functionality */}
-      <PageHeader 
-        title="Configuración"
-        subtitle="Centro de comando · G-Admin"
-        icon={icons.CogIcon}
-        actions={
-          <Button size="md" onClick={handlers.handleSaveSettings}>
-            <Icon icon={icons.CogIcon} size="sm" />
-            Guardar Cambios
-          </Button>
-        }
-      />
+    <ContentLayout spacing="normal">
+      <Stack gap={12}>
+        <Section variant="flat" title="Configuración del Sistema">
 
-      {/* 📊 METRICS SECTION - Semantic wrapper for dashboard stats */}
-      <StatsSection>
-        <CardGrid columns={{ base: 1, md: 4 }}>
-          {metrics.map((metric, index) => (
-            <MetricCard 
-              key={index}
-              title={metric.title}
-              value={metric.value}
-              subtitle={metric.subtitle}
-              icon={metric.icon}
-            />
-          ))}
-        </CardGrid>
-      </StatsSection>
+          <FormSection
+            title="Perfil Empresarial"
+            description="Información básica del negocio y configuración operacional"
+          >
+            <BusinessProfileSection />
+          </FormSection>
 
-      {/* 📋 SECCIONES PRINCIPALES - Some sections moved to independent pages */}
-      <BusinessProfileSection />
-      <TaxConfigurationSection />
-      <UserPermissionsSection />
-      {/* IntegrationsSection moved to /integrations page */}
-      <SystemSection />
+          <FormSection
+            title="Configuración Fiscal"
+            description="Impuestos, categorías y cumplimiento normativo"
+          >
+            <TaxConfigurationSection />
+          </FormSection>
+
+          <FormSection
+            title="Permisos y Usuarios"
+            description="Gestión de roles y accesos del sistema"
+          >
+            <UserPermissionsSection />
+          </FormSection>
+
+          <FormSection
+            title="Sistema y Seguridad"
+            description="Configuración técnica y políticas de seguridad"
+          >
+            <SystemSection />
+          </FormSection>
+
+          <Stack direction="row" gap="md" justify="end" mt="lg">
+            <Button variant="outline" onClick={handlers.handleReset} disabled={!isDirty}>
+              Restablecer
+            </Button>
+            <Button variant="solid" onClick={handlers.handleSave} disabled={!isDirty}>
+              Guardar Cambios
+            </Button>
+          </Stack>
+        </Section>
+      </Stack>
     </ContentLayout>
   );
 }

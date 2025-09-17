@@ -7,9 +7,9 @@ import type { User, Session } from '@supabase/supabase-js';
 export type UserRole = 'CLIENTE' | 'OPERADOR' | 'SUPERVISOR' | 'ADMINISTRADOR' | 'SUPER_ADMIN';
 
 // Module names for access control
-export type ModuleName = 
+export type ModuleName =
   | 'dashboard'
-  | 'operations' 
+  | 'operations'
   | 'sales'
   | 'materials'
   | 'products'
@@ -17,6 +17,14 @@ export type ModuleName =
   | 'scheduling'
   | 'fiscal'
   | 'settings'
+  | 'gamification'
+  | 'executive'
+  | 'billing'
+  | 'integrations'
+  | 'memberships'
+  | 'rentals'
+  | 'assets'
+  | 'reporting'
   | 'customer_portal'
   | 'customer_menu'
   | 'my_orders';
@@ -32,10 +40,10 @@ export type PermissionAction =
 // Role hierarchy and permissions (embedded directly for self-contained context)
 const MODULE_PERMISSIONS: Record<UserRole, ModuleName[]> = {
   'CLIENTE': ['customer_portal', 'customer_menu', 'my_orders', 'settings'],
-  'OPERADOR': ['dashboard', 'sales', 'operations', 'materials', 'products'],
-  'SUPERVISOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling'],
-  'ADMINISTRADOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings'],
-  'SUPER_ADMIN': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings']
+  'OPERADOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'gamification'],
+  'SUPERVISOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'gamification', 'memberships', 'rentals', 'assets'],
+  'ADMINISTRADOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings', 'gamification', 'executive', 'billing', 'integrations', 'memberships', 'rentals', 'assets', 'reporting'],
+  'SUPER_ADMIN': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings', 'gamification', 'executive', 'billing', 'integrations', 'memberships', 'rentals', 'assets', 'reporting']
 };
 
 // Permission utilities (embedded for self-contained context)
