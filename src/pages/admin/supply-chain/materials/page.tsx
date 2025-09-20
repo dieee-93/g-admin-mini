@@ -1,49 +1,86 @@
 import {
-  ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
-  Button, Alert
+  ContentLayout, Section, Button, Alert, Icon
 } from '@/shared/ui';
 import {
-  CubeIcon,
-  ExclamationTriangleIcon,
-  CurrencyDollarIcon,
-  BuildingStorefrontIcon,
-  PlusIcon,
-  ChartBarIcon,
-  ClipboardDocumentListIcon,
-  LightBulbIcon
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
-// Import components
+// ✅ 13 SISTEMAS INTEGRADOS
+import { useModuleIntegration } from '@/hooks/useModuleIntegration';
+import { CapabilityGate } from '@/lib/capabilities';
+import { useErrorHandler } from '@/lib/error-handling';
+import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
+import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
+import { useNavigation } from '@/contexts/NavigationContext';
+
+// ✅ COMPONENTES ESPECIALIZADOS
 import {
-  MaterialsList,
-  Overview,
-  AlertsTab,
-  SmartAlertsTab,
-  MaterialsView,
-  PredictiveAnalytics
+  MaterialsMetrics,
+  MaterialsManagement,
+  MaterialsActions,
+  MaterialsAlerts,
+  LazyMaterialFormModal
 } from './components';
 
-// Page orchestration hook
+// ✅ HOOKS ESPECIALIZADOS
 import { useMaterialsPage } from './hooks';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { useMaterials } from '@/store/materialsStore';
 
-function MaterialsPage() {
-  // Page orchestration logic
+// ✅ MODULE CONFIGURATION
+const MATERIALS_MODULE_CONFIG = {
+  capabilities: ['inventory_tracking', 'supplier_management', 'purchase_orders'],
+  events: {
+    emits: ['materials.stock_updated', 'materials.low_stock_alert', 'materials.purchase_order_created'],
+    listens: ['sales.completed', 'products.recipe_updated', 'kitchen.item_consumed']
+  },
+  eventHandlers: {
+    'sales.completed': (data: any) => {
+      // Auto-reduce stock based on sale
+      console.log('🛒 Materials: Sale completed, updating stock...', data);
+    },
+    'products.recipe_updated': (data: any) => {
+      // Recalculate material requirements
+      console.log('📝 Materials: Recipe updated, recalculating requirements...', data);
+    },
+    'kitchen.item_consumed': (data: any) => {
+      // Real-time stock depletion
+      console.log('🍳 Materials: Kitchen consumption recorded...', data);
+    }
+  }
+} as const;
+
+export default function MaterialsPage() {
+  // ✅ SISTEMAS INTEGRATION
+  const { emitEvent, hasCapability, status } = useModuleIntegration('materials', MATERIALS_MODULE_CONFIG);
+  const { handleError } = useErrorHandler();
+  const { isOnline } = useOfflineStatus();
+  const { shouldReduceAnimations } = usePerformanceMonitor();
+  const { isMobile } = useNavigation();
+
+  // ✅ PAGE ORCHESTRATION
   const {
-    pageState,
     metrics,
+    pageState,
     actions,
     loading,
-    error
+    error,
+    activeTab,
+    setActiveTab
   } = useMaterialsPage();
 
+  // ✅ MODAL STATE
+  const { isModalOpen, closeModal } = useMaterials();
+
+
+  // ✅ ERROR HANDLING
   if (error) {
     return (
       <ContentLayout spacing="normal">
-        <Alert status="error" title="Error de carga">
+        <Alert status="error" title="Error de carga del módulo">
           {error}
         </Alert>
         <Button onClick={() => window.location.reload()}>
+          <Icon icon={ArrowPathIcon} size="sm" />
           Recargar página
         </Button>
       </ContentLayout>
@@ -52,131 +89,65 @@ function MaterialsPage() {
 
   return (
     <ContentLayout spacing="normal">
-      <PageHeader
-        title="Materials"
-        subtitle="Inventory control & raw materials management"
-        actions={
-          <>
-            <Button
-              variant="outline"
-              colorPalette="blue"
-              onClick={actions.handleABCAnalysis}
-              size="md"
-            >
-              <ChartBarIcon className="w-4 h-4" />
-              ABC Analysis
-            </Button>
-            <Button
-              variant="outline"
-              colorPalette="green"
-              onClick={actions.handleProcurement}
-              size="md"
-            >
-              <ClipboardDocumentListIcon className="w-4 h-4" />
-              Procurement
-            </Button>
-            <Button
-              variant="outline"
-              colorPalette="yellow"
-              onClick={actions.handlePredictiveAnalytics}
-              size="md"
-            >
-              <LightBulbIcon className="w-4 h-4" />
-              Predictive
-            </Button>
-            <Button
-              colorPalette="purple"
-              onClick={actions.handleNewMaterial}
-              size="md"
-            >
-              <PlusIcon className="w-4 h-4" />
-              New Material
-            </Button>
-          </>
-        }
+      {/* 🔒 1. ESTADO DE CONEXIÓN - Solo si crítico */}
+      {!status.isActive && (
+        <Alert
+          variant="subtle"
+          title="Module Capabilities Required"
+          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
+        />
+      )}
+
+      {!isOnline && (
+        <Alert variant="warning" title="Modo Offline">
+          Los cambios se sincronizarán cuando recuperes la conexión
+        </Alert>
+      )}
+
+      {/* 📊 2. MÉTRICAS DE NEGOCIO - OBLIGATORIO PRIMERO */}
+      <MaterialsMetrics
+        metrics={metrics}
+        onMetricClick={actions.handleMetricClick}
+        loading={loading}
       />
 
-      {/* Metrics Overview Section */}
-      <StatsSection>
-        <CardGrid columns={{ base: 1, md: 4 }}>
-          <MetricCard
-            title="Total Items"
-            value={metrics.totalItems.toString()}
-            subtitle="in inventory"
-            icon={CubeIcon}
-          />
-          <MetricCard
-            title="Low Stock"
-            value={metrics.lowStockItems.toString()}
-            subtitle="need attention"
-            icon={ExclamationTriangleIcon}
-            colorPalette={metrics.criticalStockItems > 0 ? "red" : "yellow"}
-          />
-          <MetricCard
-            title="Total Value"
-            value={DecimalUtils.formatCurrency(metrics.totalValue)}
-            subtitle="inventory value"
-            icon={CurrencyDollarIcon}
-          />
-          <MetricCard
-            title="Suppliers"
-            value={metrics.supplierCount.toString()}
-            subtitle="active suppliers"
-            icon={BuildingStorefrontIcon}
-          />
-        </CardGrid>
-      </StatsSection>
+      {/* 🚨 3. ALERTAS CRÍTICAS - Solo si existen */}
+      <CapabilityGate capability="inventory_tracking">
+        <MaterialsAlerts
+          onAlertAction={actions.handleAlertAction}
+          context="materials"
+        />
+      </CapabilityGate>
 
-      {/* Overview Section */}
-      <Overview
-        onAddItem={actions.handleNewMaterial}
-        onShowAnalytics={actions.handleABCAnalysis}
+      {/* 🎯 4. GESTIÓN PRINCIPAL CON TABS - OBLIGATORIO */}
+      <Section variant="elevated" title="Gestión de Inventario">
+        <MaterialsManagement
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onStockUpdate={actions.handleStockUpdate}
+          onBulkAction={actions.handleBulkAction}
+          onAddMaterial={actions.handleOpenAddModal}
+          performanceMode={shouldReduceAnimations}
+        />
+      </Section>
+
+      {/* ⚡ 5. ACCIONES RÁPIDAS - OBLIGATORIO */}
+      <MaterialsActions
+        onAddMaterial={actions.handleOpenAddModal}
+        onBulkOperations={actions.handleBulkOperations}
+        onGenerateReport={actions.handleGenerateReport}
+        onSyncInventory={actions.handleSyncInventory}
+        isMobile={isMobile}
+        hasCapability={hasCapability}
       />
 
-      {/* Materials List Section */}
-      <MaterialsList />
-
-      {/* Conditional ABC Analysis Section */}
-      {pageState.showABCAnalysis && (
-        <Section variant="elevated" title="ABC Analysis">
-          {/* ABCAnalysisPanel component will go here */}
-          <div>
-            <p>ABC Analysis panel - showing classification of materials by value and usage.</p>
-          </div>
-        </Section>
+      {/* 🪟 MODAL - AGREGAR/EDITAR MATERIAL */}
+      {isModalOpen && (
+        <LazyMaterialFormModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+        />
       )}
-
-      {/* Conditional Procurement Section */}
-      {pageState.showProcurement && (
-        <Section variant="elevated" title="Procurement Recommendations">
-          {/* ProcurementPanel component will go here */}
-          <div>
-            <p>Procurement recommendations based on stock levels and demand forecasting.</p>
-          </div>
-        </Section>
-      )}
-
-      {/* Conditional Supply Chain Section */}
-      {pageState.showSupplyChain && (
-        <Section variant="elevated" title="Supply Chain Analysis">
-          {/* SupplyChainPanel component will go here */}
-          <div>
-            <p>Supply chain analysis and supplier performance metrics.</p>
-          </div>
-        </Section>
-      )}
-
-      {/* Conditional Predictive Analytics Section */}
-      {pageState.showPredictiveAnalytics && (
-        <Section variant="elevated" title="Predictive Analytics">
-          <PredictiveAnalytics />
-        </Section>
-      )}
-
-      {/* Material Form Modal */}
-      {/* <MaterialFormModal /> */}
     </ContentLayout>
   );
 }
-
-export default MaterialsPage;

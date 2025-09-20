@@ -5,9 +5,9 @@ import {
   HStack,
   Text,
   Badge,
-  Input,
   Select,
 } from '@chakra-ui/react';
+import { InputField } from '@/shared/ui';
 import type { InventoryItem } from '@/pages/admin/supply-chain/materials/types';
 
 interface RecipeIngredientForm {
@@ -93,7 +93,7 @@ export const RecipeFormIngredients: React.FC<RecipeFormIngredientsProps> = ({
                   </Select.Root>
                 </Box>
 
-                <Input
+                <InputField
                   placeholder={`Cantidad${selectedItem ? ` (${selectedItem.unit})` : ''}`}
                   type="number"
                   step="0.01"

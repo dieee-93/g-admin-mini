@@ -11,7 +11,7 @@ import {
   AlertTitle,
   AlertDescription
 } from '@/shared/ui';
-import { Schedule } from '@/types/schedule';
+import type { Schedule } from '@/types/schedule';
 import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
 
 const ScheduleDisplayCard = ({ schedule }: { schedule: Schedule }) => {

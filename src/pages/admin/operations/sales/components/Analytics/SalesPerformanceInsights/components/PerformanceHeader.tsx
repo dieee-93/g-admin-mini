@@ -4,9 +4,8 @@ import {
   HStack,
   Text,
   Button,
-  CardWrapper,
-  CircularProgress,
 } from '@chakra-ui/react';
+import { CardWrapper, CircularProgress } from '@/shared/ui';
 import {
   TrophyIcon,
   ShieldCheckIcon,
@@ -25,8 +24,8 @@ export const PerformanceHeader: React.FC<PerformanceHeaderProps> = ({
   onRefresh,
 }) => {
   return (
-    <CardWrapper .Root bg="gradient-to-r from-green-600 to-teal-700" color="white">
-      <CardWrapper .Body p={6}>
+    <CardWrapper bg="gradient-to-r from-green-600 to-teal-700" color="white">
+      <CardWrapper.Body p={6}>
         <VStack align="stretch" gap={4}>
           <HStack justify="space-between" align="center">
             <HStack gap={3}>
@@ -70,7 +69,7 @@ export const PerformanceHeader: React.FC<PerformanceHeaderProps> = ({
             </HStack>
           )}
         </VStack>
-      </CardWrapper .Body>
-    </CardWrapper .Root>
+      </CardWrapper.Body>
+    </CardWrapper>
   );
 };

@@ -22,7 +22,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useState, useEffect, useMemo } from 'react';
 import { CustomerSegment, ChurnRisk, LoyaltyTier, type CustomerProfile } from '../../types';
-import { useCustomers } from '../hooks/useCustomers'; 
+import { useCustomers } from '../../hooks/existing/useCustomers';  
 import { useCustomerRFM, useCustomerAnalytics, useCustomerSegmentation } from '../hooks/useCustomerRFM';
 
 export function CustomerAnalytics() {

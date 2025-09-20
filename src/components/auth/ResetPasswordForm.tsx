@@ -6,9 +6,8 @@ import {
   Link,
   Heading,
 } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui/CardWrapper';
-import { Button } from '@/shared/ui/Button';
-import { InputField } from '@/shared/ui/InputField';
+import { CardWrapper, Button, InputField } from '@/shared/ui';
+
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ResetPasswordFormProps {

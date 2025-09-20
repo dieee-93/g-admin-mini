@@ -20,10 +20,10 @@ import {
   DialogBody,
   DialogFooter,
   Flex,
-  CardWrapper ,
   Progress,
   createListCollection
 } from '@chakra-ui/react';
+import { Icon } from '@/shared/ui';
 import { 
   WifiIcon, 
   NoSymbolIcon, 
@@ -36,10 +36,10 @@ import {
   CircleStackIcon,
   BoltIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
+
 import offlineSync, { type SyncStatus } from './OfflineSync';
 import { EventBus } from '@/lib/events';
-import { EventBus } from '@/lib/events';
+
 
 // Connection status types
 interface ConnectionStatus {

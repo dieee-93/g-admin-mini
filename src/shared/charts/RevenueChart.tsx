@@ -1,9 +1,8 @@
 // src/components/charts/RevenueChart.tsx
 // Revenue analytics chart component
 
-import React from 'react';
-import { Box, CardWrapper , Text, VStack } from '@chakra-ui/react';
-
+import { Box, Text, VStack } from '@chakra-ui/react';
+import { CardWrapper } from '../ui';
 interface RevenueChartProps {
   data?: number[];
   labels?: string[];
@@ -18,13 +17,13 @@ export default function RevenueChart({
   height = 300 
 }: RevenueChartProps) {
   return (
-    <CardWrapper .Root>
-      <CardWrapper .Header>
+    <CardWrapper>
+      <CardWrapper.Header>
         <Text fontSize="lg" fontWeight="semibold">
           {title}
         </Text>
-      </CardWrapper .Header>
-      <CardWrapper .Body>
+      </CardWrapper.Header>
+      <CardWrapper.Body>
         <Box height={height} display="flex" alignItems="center" justifyContent="center">
           <VStack gap={2}>
             <Text color="gray.500">📊</Text>
@@ -36,8 +35,8 @@ export default function RevenueChart({
             </Text>
           </VStack>
         </Box>
-      </CardWrapper .Body>
-    </CardWrapper .Root>
+      </CardWrapper.Body>
+    </CardWrapper>
   );
 }
 

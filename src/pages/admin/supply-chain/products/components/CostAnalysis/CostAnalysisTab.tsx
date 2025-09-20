@@ -170,11 +170,11 @@ export function CostAnalysisTab() {
               <HStack gap="lg" align="start">
                 {/* Left Panel - Input Form */}
                 <CardWrapper variant="elevated" padding="lg" width="full">
-                  <CardWrapper .Header>
+                  <CardWrapper.Header>
                     <Typography variant="title">Cost Calculation Input</Typography>
-                  </CardWrapper .Header>
+                  </CardWrapper.Header>
 
-                  <CardWrapper .Body>
+                  <CardWrapper.Body>
                     <Stack gap="md" align="stretch">
                       {/* Product Selection */}
                       <Stack gap="xs">
@@ -297,16 +297,16 @@ export function CostAnalysisTab() {
                         {loading ? 'Calculating...' : 'Calculate Real Costs'}
                       </Button>
                     </Stack>
-                  </CardWrapper .Body>
+                  </CardWrapper.Body>
                 </CardWrapper>
 
                 {/* Right Panel - Latest Result */}
                 <CardWrapper variant="elevated" padding="lg" width="full">
-                  <CardWrapper .Header>
+                  <CardWrapper.Header>
                     <Typography variant="title">Latest Cost Analysis</Typography>
-                  </CardWrapper .Header>
+                  </CardWrapper.Header>
 
-                  <CardWrapper .Body>
+                  <CardWrapper.Body>
                     {calculations.length > 0 ? (
                       <Stack gap="md" align="stretch">
                         {(() => {
@@ -395,7 +395,7 @@ export function CostAnalysisTab() {
                         </Typography>
                       </Stack>
                     )}
-                  </CardWrapper .Body>
+                  </CardWrapper.Body>
                 </CardWrapper>
               </HStack>
             </TabPanel>
@@ -403,11 +403,11 @@ export function CostAnalysisTab() {
             {/* Analysis Results Tab */}
             <TabPanel value="analysis">
               <CardWrapper variant="elevated" padding="lg">
-                <CardWrapper .Header>
+                <CardWrapper.Header>
                   <Typography variant="title">Historical Cost Analysis</Typography>
-                </CardWrapper .Header>
+                </CardWrapper.Header>
 
-                <CardWrapper .Body>
+                <CardWrapper.Body>
                   {calculations.length > 0 ? (
                     <Stack gap="md">
                       {calculations.map((calc, index) => (
@@ -450,25 +450,25 @@ export function CostAnalysisTab() {
                       </Typography>
                     </Stack>
                   )}
-                </CardWrapper .Body>
+                </CardWrapper.Body>
               </CardWrapper>
             </TabPanel>
 
             {/* Pricing Scenarios Tab */}
             <TabPanel value="scenarios">
               <CardWrapper variant="elevated" padding="lg">
-                <CardWrapper .Header>
+                <CardWrapper.Header>
                   <Typography variant="title">Pricing Scenarios</Typography>
-                </CardWrapper .Header>
+                </CardWrapper.Header>
 
-                <CardWrapper .Body>
+                <CardWrapper.Body>
                   <Stack align="center" gap="md" padding="xl">
                     <DocumentTextIcon className="w-16 h-16 text-gray-400" />
                     <Typography variant="body" color="text.muted" align="center">
                       Pricing scenarios feature coming soon
                     </Typography>
                   </Stack>
-                </CardWrapper .Body>
+                </CardWrapper.Body>
               </CardWrapper>
             </TabPanel>
           </TabPanels>

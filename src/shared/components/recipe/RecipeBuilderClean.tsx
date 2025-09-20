@@ -6,10 +6,9 @@ import {
   Stack,
   Flex,
   Badge,
-  CardWrapper ,
   Button
 } from '@chakra-ui/react';
-import { Icon } from '@/shared/ui';
+import { Icon, CardWrapper } from '@/shared/ui';
 import { 
   ArrowTopRightOnSquareIcon,
   BeakerIcon
@@ -83,8 +82,8 @@ export const RecipeBuilderClean: React.FC<RecipeBuilderCleanProps> = ({
 
   return (
     <Box className={className}>
-      <CardWrapper .Root variant="outline">
-        <CardWrapper .Header p="4">
+      <CardWrapper variant="outline">
+        <CardWrapper.Header p="4">
           <Flex justify="space-between" align="center">
             <Flex gap="3" align="center">
               <Box fontSize="2xl">
@@ -127,17 +126,17 @@ export const RecipeBuilderClean: React.FC<RecipeBuilderCleanProps> = ({
               </Button>
             </Flex>
           </Flex>
-        </CardWrapper .Header>
+        </CardWrapper.Header>
 
-        <CardWrapper .Body p="4">
+        <CardWrapper.Body p="4">
           {showList && (
             <RecipeListClean
               onEdit={handleEditRecipe}
               onSelect={handleEditRecipe}
             />
           )}
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     </Box>
   );
 };

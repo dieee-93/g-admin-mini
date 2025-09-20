@@ -11,11 +11,9 @@ import {
   Text,
   Button,
   Select,
-  Input,
   Switch,
   Progress,
   Alert,
-  CardWrapper,
   Separator,
   Badge,
   SimpleGrid,
@@ -34,10 +32,10 @@ import {
   LightBulbIcon,
   CalendarIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '../../../../../shared/ui/Icon';
+import { Icon, InputField, CardWrapper } from '@/shared/ui';
 
 import { autoSchedulingEngine, type SchedulingConstraints, type SchedulingSolution } from '../../../../../services/scheduling/autoSchedulingEngine';
-import { notify } from '../../../../../lib/notifications';
+import { notify } from '@/lib/notifications';
 
 interface AutoSchedulingModalProps {
   isOpen: boolean;
@@ -163,7 +161,7 @@ export function AutoSchedulingModal({
   };
 
   const renderSettingsStep = () => (
-    <VStack align="stretch" spacing={6}>
+    <VStack align="stretch" gap={6}>
       <Text fontSize="lg" fontWeight="semibold">Configure Auto-Scheduling</Text>
       
       {/* Date Range */}
@@ -178,7 +176,7 @@ export function AutoSchedulingModal({
           <HStack spacing={4}>
             <Box flex={1}>
               <Text fontSize="sm" mb={1}>Start Date</Text>
-              <Input
+              <InputField
                 type="date"
                 value={settings.startDate}
                 onChange={(e) => setSettings(prev => ({
@@ -190,7 +188,7 @@ export function AutoSchedulingModal({
             </Box>
             <Box flex={1}>
               <Text fontSize="sm" mb={1}>End Date</Text>
-              <Input
+              <InputField
                 type="date"
                 value={settings.endDate}
                 onChange={(e) => setSettings(prev => ({ ...prev, endDate: e.target.value }))}
@@ -256,7 +254,7 @@ export function AutoSchedulingModal({
         <CardWrapper.Body>
           <Box>
             <Text fontSize="sm" mb={2}>Maximum Weekly Labor Budget</Text>
-            <Input
+            <InputField
               type="number"
               value={settings.maxWeeklyBudget}
               onChange={(e) => setSettings(prev => ({ ...prev, maxWeeklyBudget: Number(e.target.value) }))}

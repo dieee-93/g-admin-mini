@@ -7,7 +7,6 @@ import {
   Badge,
   SimpleGrid,
   Spinner,
-  Input,
   Select,
   Tabs,
 } from '@chakra-ui/react';
@@ -20,7 +19,7 @@ import {
   CurrencyDollarIcon,
   BellIcon,
 } from '@heroicons/react/24/outline';
-import { CardWrapper, Icon } from '@/shared/ui';
+import { CardWrapper, Icon, InputField } from '@/shared/ui';
 import { useCompetitiveIntelligence } from '../hooks/useCompetitiveIntelligence';
 import { MarketOverviewDashboard } from './MarketOverviewDashboard';
 import { CompetitorsTable } from './CompetitorsTable';
@@ -224,7 +223,7 @@ export function CompetitiveIntelligence() {
               {/* Filters */}
               <HStack gap="4" flexWrap="wrap">
                 <Box flex="1" minW="250px">
-                  <Input
+                  <InputField
                     placeholder="Buscar competidores..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}

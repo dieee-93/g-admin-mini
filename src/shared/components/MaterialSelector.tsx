@@ -2,7 +2,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import {
   Box,
-  Input,
   Stack,
   Flex,
   Text,
@@ -16,7 +15,7 @@ import { useMaterials } from '@/store/materialsStore';
 import { useDebounce } from '@/shared/hooks';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
-import { CardWrapper } from '../ui';
+import { CardWrapper, InputField } from '../ui';
 export interface MaterialSelectorProps {
   onMaterialSelected: (material: MaterialItem) => void;
   placeholder?: string;
@@ -94,7 +93,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
   return (
     <Box position="relative" w="full">
       <Box position="relative">
-        <Input
+        <InputField
           value={query}
           onChange={handleInputChange}
           placeholder={placeholder}

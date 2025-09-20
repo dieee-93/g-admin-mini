@@ -80,7 +80,7 @@ export interface MaterialsState {
 
 const initialFilters: MaterialsFilters = {
   type: 'all',
-  category: 'all',
+  category: 'all', // Changed from 'Sin categoría' to 'all'
   stockStatus: 'all',
   search: '',
   priceRange: [0, 1000000],
@@ -115,10 +115,20 @@ export const useMaterialsStore = create<MaterialsState>()(
         items: [],
         categories: ['Sin categoría', 'Lácteos', 'Carnes', 'Verduras', 'Frutas', 'Condimentos', 'Bebidas', 'Panadería'],
         itemTypes: ['MEASURABLE', 'COUNTABLE', 'ELABORATED'],
-        
+
         loading: false,
         error: null,
-        filters: initialFilters,
+        filters: {
+          type: 'all',
+          category: 'all', // Force 'all' instead of persisted value
+          stockStatus: 'all',
+          search: '',
+          priceRange: [0, 1000000],
+          location: 'all',
+          sortBy: 'name',
+          sortOrder: 'asc',
+          hasRecipe: undefined
+        },
         selectedItems: [],
         isModalOpen: false,
         modalMode: 'add',
@@ -135,7 +145,6 @@ export const useMaterialsStore = create<MaterialsState>()(
             }));
           }));
           get().refreshStats();
-          
         },
 
         addItem: async (itemData) => {
@@ -386,7 +395,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             if (filters.type !== 'all' && item.type !== filters.type) {
               return false;
             }
-            
+
             // Category filter - now business categories
             if (filters.category !== 'all') {
               if (item.category !== filters.category) {
@@ -463,9 +472,25 @@ export const useMaterialsStore = create<MaterialsState>()(
       {
         name: 'g-mini-materials-storage',
         partialize: (state) => ({
-          items: state.items,
-          filters: state.filters
-        })
+          items: state.items
+          // Temporarily exclude filters from persistence
+        }),
+        // Force clear on load to fix corrupted filters
+        onRehydrateStorage: () => (state) => {
+          if (state) {
+            state.filters = {
+              type: 'all',
+              category: 'all',
+              stockStatus: 'all',
+              search: '',
+              priceRange: [0, 1000000],
+              location: 'all',
+              sortBy: 'name',
+              sortOrder: 'asc',
+              hasRecipe: undefined
+            };
+          }
+        }
       }
     )
   )

@@ -7,7 +7,6 @@ import {
   Badge,
   Button,
   IconButton,
-  Input,
   SimpleGrid,
   Skeleton
 } from '@chakra-ui/react';
@@ -22,7 +21,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRecipes } from '../hooks/useRecipes';
 import type { Recipe } from '../types';
-import { CardWrapper, Icon } from '@/shared/ui';
+import { CardWrapper, Icon, InputField } from '@/shared/ui';
 
 interface RecipeListProps {
   onEdit?: (recipe: Recipe) => void;
@@ -111,7 +110,7 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
 
         {/* Search */}
         <Box position="relative">
-          <Input
+          <InputField
             placeholder="Buscar recetas..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

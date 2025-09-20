@@ -1,10 +1,9 @@
 // CodeSplittingReport.tsx - Performance monitoring for code splitting
 import React, { useState, useEffect } from 'react';
 import {
-  CardWrapper ,
   VStack,
   HStack,
-  Text,
+  Text, //TODO: REPLACE WITH TYPOGRAPHY
   Button,
   Badge,
   SimpleGrid,
@@ -15,7 +14,7 @@ import {
   Table,
   Skeleton
 } from '@chakra-ui/react';
-import { Icon } from '@/shared/ui';
+import { Icon, CardWrapper } from '@/shared/ui';
 import {
   ChartBarIcon,
   ClockIcon,
@@ -62,8 +61,8 @@ export function CodeSplittingReport({
 
   if (loading && !report) {
     return (
-      <CardWrapper .Root>
-        <CardWrapper .Body p={6}>
+      <CardWrapper>
+        <CardWrapper.Body p={6}>
           <VStack gap={4}>
             <Skeleton height="40px" width="300px" />
             <SimpleGrid columns={3} gap={4} w="full">
@@ -73,8 +72,8 @@ export function CodeSplittingReport({
             </SimpleGrid>
             <Skeleton height="200px" width="100%" />
           </VStack>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     );
   }
 
@@ -100,8 +99,8 @@ export function CodeSplittingReport({
   };
 
   return (
-    <CardWrapper .Root>
-      <CardWrapper .Header>
+    <CardWrapper>
+      <CardWrapper.Header>
         <HStack justify="space-between">
           <HStack gap={2}>
             <Icon icon={ChartBarIcon} size="lg" color="blue.500" />
@@ -124,9 +123,9 @@ export function CodeSplittingReport({
             </Button>
           </HStack>
         </HStack>
-      </CardWrapper .Header>
+      </CardWrapper.Header>
 
-      <CardWrapper .Body>
+      <CardWrapper.Body>
         <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value)}>
           <Tabs.List>
             <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
@@ -141,8 +140,8 @@ export function CodeSplittingReport({
               <VStack gap={6} align="stretch">
                 {/* Key Metrics */}
                 <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
-                  <CardWrapper .Root variant="subtle">
-                    <CardWrapper .Body p={4} textAlign="center">
+                  <CardWrapper variant="subtle">
+                    <CardWrapper.Body p={4} textAlign="center">
                       <Icon icon={ClockIcon} size="xl" color="blue.500" />
                       <Text fontSize="sm" color="gray.600" mt={2}>Avg Load Time</Text>
                       <Text fontSize="xl" fontWeight="bold">
@@ -155,31 +154,31 @@ export function CodeSplittingReport({
                           : 'N/A'
                         }
                       </Text>
-                    </CardWrapper .Body>
-                  </CardWrapper .Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
 
-                  <CardWrapper .Root variant="subtle">
-                    <CardWrapper .Body p={4} textAlign="center">
+                  <CardWrapper variant="subtle">
+                    <CardWrapper.Body p={4} textAlign="center">
                       <Icon icon={CubeIcon} size="xl" color="green.500" />
                       <Text fontSize="sm" color="gray.600" mt={2}>Total Chunks</Text>
                       <Text fontSize="xl" fontWeight="bold">
                         {Object.keys(report?.chunkSizes || {}).length}
                       </Text>
-                    </CardWrapper .Body>
-                  </CardWrapper .Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
 
-                  <CardWrapper .Root variant="subtle">
-                    <CardWrapper .Body p={4} textAlign="center">
+                  <CardWrapper variant="subtle">
+                    <CardWrapper.Body p={4} textAlign="center">
                       <Icon icon={ChartBarIcon} size="xl" color="purple.500" />
                       <Text fontSize="sm" color="gray.600" mt={2}>Components</Text>
                       <Text fontSize="xl" fontWeight="bold">
                         {Object.keys(report?.loadTimes || {}).length}
                       </Text>
-                    </CardWrapper .Body>
-                  </CardWrapper .Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
 
-                  <CardWrapper .Root variant="subtle">
-                    <CardWrapper .Body p={4} textAlign="center">
+                  <CardWrapper variant="subtle">
+                    <CardWrapper.Body p={4} textAlign="center">
                       {report?.recommendations?.length > 0 ? (
                         <Icon icon={ExclamationTriangleIcon} size="xl" color="orange.500" />
                       ) : (
@@ -191,8 +190,8 @@ export function CodeSplittingReport({
                       }>
                         {report?.recommendations?.length || 0}
                       </Text>
-                    </CardWrapper .Body>
-                  </CardWrapper .Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 </SimpleGrid>
 
                 {/* Performance Summary */}
@@ -219,8 +218,8 @@ export function CodeSplittingReport({
                   const times = report?.loadTimes?.[component] || [];
                   
                   return (
-                    <CardWrapper .Root key={component} variant="outline">
-                      <CardWrapper .Body p={4}>
+                    <CardWrapper key={component} variant="outline">
+                      <CardWrapper.Body p={4}>
                         <HStack justify="space-between" align="center">
                           <VStack align="start" gap={1}>
                             <Text fontWeight="medium">{component}</Text>
@@ -248,8 +247,8 @@ export function CodeSplittingReport({
                             />
                           </Box>
                         )}
-                      </CardWrapper .Body>
-                    </CardWrapper .Root>
+                      </CardWrapper.Body>
+                    </CardWrapper>
                   );
                 })}
               </VStack>
@@ -262,8 +261,8 @@ export function CodeSplittingReport({
                   const color = getChunkSizeColor(size);
                   
                   return (
-                    <CardWrapper .Root key={chunkName} variant="outline">
-                      <CardWrapper .Body p={4}>
+                    <CardWrapper key={chunkName} variant="outline">
+                      <CardWrapper.Body p={4}>
                         <HStack justify="space-between" align="center">
                           <Text fontWeight="medium">{chunkName}</Text>
                           
@@ -286,8 +285,8 @@ export function CodeSplittingReport({
                             size="sm"
                           />
                         </Box>
-                      </CardWrapper .Body>
-                    </CardWrapper .Root>
+                      </CardWrapper.Body>
+                    </CardWrapper>
                   );
                 })}
               </VStack>
@@ -320,8 +319,8 @@ export function CodeSplittingReport({
             </Tabs.Content>
           </Box>
         </Tabs.Root>
-      </CardWrapper .Body>
-    </CardWrapper .Root>
+      </CardWrapper.Body>
+    </CardWrapper>
   );
 }
 

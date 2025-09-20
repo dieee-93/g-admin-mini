@@ -1,28 +1,28 @@
-// OperationsPage.tsx - Pure Orchestrator Pattern
-// Following G-Admin Mini architecture standards
+// OperationsPage.tsx - Integrated with EventBus + CapabilityGate
+// Following G-Admin Mini v2.1 architecture standards
 
 import React from 'react';
 
-// Design System Components
+// Design System Components v2.1 (UPDATED)
 import {
-  // Layout & Structure
-  Stack,
-  VStack,
-  HStack,
+  // Semantic Layout Components (PRIORITY)
+  ContentLayout, Section, StatsSection, CardGrid, MetricCard,
 
-  // Typography
-  Typography,
+  // Base Components
+  Stack, VStack, HStack, Typography, Button, Alert,
 
-  // Components
-  CardWrapper,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel
+  // Legacy (for tabs only)
+  Tabs, TabList, Tab, TabPanels, TabPanel
 } from '@/shared/ui';
 
 import { Icon } from '@/shared/ui';
+
+// CapabilityGate and Slot integration
+import { CapabilityGate } from '@/lib/capabilities';
+import { Slot } from '@/lib/composition';
+
+// Module integration
+import { useModuleIntegration } from '@/hooks/useModuleIntegration';
 
 // Hooks
 import { useHubPage } from './hooks';
@@ -30,37 +30,107 @@ import { useHubPage } from './hooks';
 // Components
 import { OperationsHeader, Planning, Kitchen, Tables, Monitoring } from './components';
 
+// Module configuration for Operations
+const OPERATIONS_MODULE_CONFIG = {
+  capabilities: ['restaurant_operations', 'kitchen_management', 'table_service', 'pos_system'],
+  events: {
+    emits: ['order_created', 'order_ready', 'table_occupied', 'table_freed', 'kitchen_alert'],
+    listens: ['sales.order_placed', 'inventory.stock_low', 'staff.shift_changed']
+  },
+  eventHandlers: {
+    'sales.order_placed': (data: any) => {
+      console.log('🍽️ Operations: New order received', data);
+      // Handle new order from sales
+    },
+    'inventory.stock_low': (data: any) => {
+      console.log('📦 Operations: Stock alert received', data);
+      // Handle low stock alerts
+    },
+    'staff.shift_changed': (data: any) => {
+      console.log('👥 Operations: Staff shift update', data);
+      // Handle staff changes affecting operations
+    }
+  },
+  slots: ['operations-dashboard', 'kitchen-extensions', 'table-management']
+} as const;
+
 export default function OperationsPage() {
-  // All logic delegated to the orchestrator hook
+  // Module integration (EventBus + CapabilityGate + Slots)
+  const { emitEvent, hasCapability, status, registerSlotContent } = useModuleIntegration(
+    'operations',
+    OPERATIONS_MODULE_CONFIG
+  );
+
+  // Page orchestration logic
   const {
     overviewCards,
-    tabs
+    tabs,
+    metrics,
+    loading,
+    error
   } = useHubPage();
 
+  // Enhanced actions with EventBus integration
+  const handleOrderCreated = (orderData: any) => {
+    emitEvent('order_created', {
+      orderId: orderData.id,
+      tableId: orderData.tableId,
+      items: orderData.items,
+      totalAmount: orderData.total,
+      priority: orderData.priority || 'normal'
+    });
+  };
+
+  const handleTableStatusChange = (tableId: string, status: 'occupied' | 'free') => {
+    emitEvent(status === 'occupied' ? 'table_occupied' : 'table_freed', {
+      tableId,
+      timestamp: Date.now(),
+      capacity: 4 // TODO: get from table data
+    });
+  };
+
+  if (error) {
+    return (
+      <ContentLayout spacing="normal">
+        <Alert status="error" title="Error de carga">
+          {error}
+        </Alert>
+        <Button onClick={() => window.location.reload()}>
+          Recargar página
+        </Button>
+      </ContentLayout>
+    );
+  }
+
   return (
-      <Stack gap="lg" align="stretch">
-        <OperationsHeader />
+    <ContentLayout spacing="normal">
+      {/* 🔒 Module status indicator */}
+      {!status.isActive && (
+        <Alert
+          variant="subtle"
+          title="Module Capabilities Required"
+          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
+        />
+      )}
 
-        {/* Operations Overview CardWrappers - Using hook data */}
-        <Stack direction={{ base: 'column', lg: 'row' }} gap="md">
+      {/* Operations Metrics Section */}
+      <StatsSection>
+        <CardGrid columns={{ base: 1, md: 4 }}>
           {overviewCards.map((card) => (
-            <CardWrapper key={card.id} variant="elevated" padding="md" width="full">
-              <CardWrapper.Body>
-                <VStack align="start" gap="xs">
-                  <HStack gap="sm">
-                    <Icon icon={card.icon} size="lg" color={card.color} />
-                    <Typography variant="title">{card.title}</Typography>
-                  </HStack>
-                  <Typography variant="body" color="text.muted">
-                    {card.description}
-                  </Typography>
-                </VStack>
-              </CardWrapper.Body>
-            </CardWrapper>
+            <MetricCard
+              key={card.id}
+              title={card.title}
+              value={card.value}
+              subtitle={card.subtitle}
+              icon={card.icon}
+              colorPalette={card.status === 'critical' ? 'red' : card.status === 'warning' ? 'yellow' : 'blue'}
+            />
           ))}
-        </Stack>
+        </CardGrid>
+      </StatsSection>
 
-        {/* Tabbed Layout for Sections */}
+      {/* Operations Management Tabs */}
+      <Section variant="elevated" title="Operations Management">
         <Tabs>
           <TabList>
             {tabs.map((tab) => (
@@ -69,19 +139,31 @@ export default function OperationsPage() {
           </TabList>
           <TabPanels>
             <TabPanel>
-              <Planning />
+              <CapabilityGate capability="restaurant_operations">
+                <Planning onOrderCreated={handleOrderCreated} />
+              </CapabilityGate>
             </TabPanel>
             <TabPanel>
-              <Kitchen />
+              <CapabilityGate capability="kitchen_management">
+                <Kitchen />
+              </CapabilityGate>
             </TabPanel>
             <TabPanel>
-              <Tables />
+              <CapabilityGate capability="table_service">
+                <Tables onTableStatusChange={handleTableStatusChange} />
+              </CapabilityGate>
             </TabPanel>
             <TabPanel>
-              <Monitoring />
+              <CapabilityGate capability="restaurant_operations">
+                <Monitoring />
+              </CapabilityGate>
             </TabPanel>
           </TabPanels>
         </Tabs>
-    </Stack>
+      </Section>
+
+      {/* Extensions Slot */}
+      <Slot id="operations-dashboard" fallback={null} />
+    </ContentLayout>
   );
 }

@@ -17,7 +17,13 @@ import {
   ArrowTrendingUpIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
+// CapabilityGate and Slot integration
+import { CapabilityGate } from '@/lib/capabilities';
+import { Slot } from '@/lib/composition';
+
+// Module integration
+import { useModuleIntegration } from '@/hooks/useModuleIntegration';
+
 import { useStaffPage } from './hooks';
 
 // Import tab sections
@@ -27,7 +33,37 @@ import { TrainingSection } from './components/sections/TrainingSection';
 import { ManagementSection } from './components/sections/ManagementSection';
 import { TimeTrackingSection } from './components/sections/TimeTrackingSection';
 
+// Module configuration for Staff - HR & Scheduling integration
+const STAFF_MODULE_CONFIG = {
+  capabilities: ['staff_management', 'payroll_processing', 'schedule_management', 'time_tracking'],
+  events: {
+    emits: ['shift_changed', 'staff_clocked_in', 'staff_clocked_out', 'schedule_updated', 'performance_alert'],
+    listens: ['operations.kitchen_alert', 'sales.order_placed', 'scheduling.shift_reminder']
+  },
+  eventHandlers: {
+    'operations.kitchen_alert': (data: any) => {
+      console.log('👥 Staff: Kitchen alert received, checking staff availability', data);
+      // Check if more kitchen staff needed during rush
+    },
+    'sales.order_placed': (data: any) => {
+      console.log('👥 Staff: Order placed, monitoring service load', data);
+      // Monitor staff workload for service optimization
+    },
+    'scheduling.shift_reminder': (data: any) => {
+      console.log('👥 Staff: Shift reminder', data);
+      // Send notifications to staff about upcoming shifts
+    }
+  },
+  slots: ['staff-dashboard', 'hr-extensions', 'performance-widgets']
+} as const;
+
 export default function StaffPage() {
+  // Module integration (EventBus + CapabilityGate + Slots)
+  const { emitEvent, hasCapability, status, registerSlotContent } = useModuleIntegration(
+    'staff',
+    STAFF_MODULE_CONFIG
+  );
+
   const {
     pageState,
     metrics,
@@ -36,6 +72,42 @@ export default function StaffPage() {
     actions,
     alertsData
   } = useStaffPage();
+
+  // Enhanced actions with EventBus integration - Staff ↔ Operations coordination
+  const handleShiftChange = (staffId: string, shiftData: any) => {
+    // Emit shift change for kitchen and operations planning
+    emitEvent('shift_changed', {
+      staffId,
+      previousShift: shiftData.previous,
+      newShift: shiftData.new,
+      department: shiftData.department,
+      timestamp: Date.now()
+    });
+
+    // Process locally
+    actions.handleShiftChange?.(staffId, shiftData);
+  };
+
+  const handleClockIn = (staffId: string, location: string) => {
+    // Emit clock in event for attendance tracking
+    emitEvent('staff_clocked_in', {
+      staffId,
+      location, // kitchen, front_of_house, management
+      timestamp: Date.now(),
+      deviceInfo: navigator.userAgent
+    });
+  };
+
+  const handlePerformanceAlert = (staffId: string, alertType: string, severity: 'low' | 'medium' | 'high') => {
+    // Emit performance alerts for management
+    emitEvent('performance_alert', {
+      staffId,
+      alertType, // late_arrival, quality_issue, customer_complaint, etc.
+      severity,
+      timestamp: Date.now(),
+      requiresAction: severity === 'high'
+    });
+  };
 
   if (loading) {
     return (
@@ -46,7 +118,8 @@ export default function StaffPage() {
   }
 
   if (error) {
-    ModuleEventUtils.business.error('staff-load-failed', error);
+    // Emit error event for monitoring
+    emitEvent('staff_error', { type: 'load_failed', error, timestamp: Date.now() });
     return (
       <ContentLayout spacing="normal">
         <Stack gap={12}>
@@ -58,6 +131,15 @@ export default function StaffPage() {
 
   return (
     <ContentLayout spacing="normal">
+      {/* 🔒 Module status indicator */}
+      {!status.isActive && (
+        <Alert
+          variant="subtle"
+          title="Module Capabilities Required"
+          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
+        />
+      )}
+
       <Stack gap={12}>
         {/* 📊 MÉTRICAS DE STAFF - SIEMPRE PRIMERO */}
         <StatsSection>
@@ -80,14 +162,14 @@ export default function StaffPage() {
               value={metrics.totalStaff}
               icon={UsersIcon}
               colorPalette="blue"
-              onClick={() => ModuleEventUtils.business.metricClicked('total-staff')}
+              onClick={() => emitEvent('metric_clicked', { metric: 'total-staff', value: metrics.totalStaff })}
             />
             <MetricCard
               title="En Turno"
               value={metrics.onShiftCount}
               icon={ClockIcon}
               colorPalette="green"
-              onClick={() => ModuleEventUtils.business.metricClicked('on-shift')}
+              onClick={() => emitEvent('metric_clicked', { metric: 'on-shift' })}
             />
             <MetricCard
               title="Rendimiento Prom."
@@ -95,14 +177,14 @@ export default function StaffPage() {
               icon={TrophyIcon}
               colorPalette="purple"
               trend={{ value: metrics.avgPerformanceRating, isPositive: metrics.avgPerformanceRating > 3.5 }}
-              onClick={() => ModuleEventUtils.business.metricClicked('performance')}
+              onClick={() => emitEvent('metric_clicked', { metric: 'performance' })}
             />
             <MetricCard
               title="Evaluaciones Pendientes"
               value={metrics.upcomingReviews}
               icon={AcademicCapIcon}
               colorPalette="orange"
-              onClick={() => ModuleEventUtils.business.metricClicked('reviews')}
+              onClick={() => emitEvent('metric_clicked', { metric: 'reviews' })}
             />
           </CardGrid>
         </StatsSection>
@@ -115,7 +197,7 @@ export default function StaffPage() {
               value={`$${metrics.todayLaborCost.toFixed(2)}`}
               icon={CurrencyDollarIcon}
               colorPalette="teal"
-              onClick={() => ModuleEventUtils.business.metricClicked('labor-cost')}
+              onClick={() => emitEvent('metric_clicked', { metric: 'labor-cost' })}
             />
             <MetricCard
               title="Uso Presupuesto"
@@ -123,7 +205,7 @@ export default function StaffPage() {
               icon={ArrowTrendingUpIcon}
               colorPalette={metrics.budgetVariance > 10 ? "red" : "green"}
               trend={{ value: metrics.budgetVariance, isPositive: metrics.budgetVariance <= 0 }}
-              onClick={() => ModuleEventUtils.business.metricClicked('budget-usage')}
+              onClick={() => emitEvent('metric_clicked', { metric: 'budget-usage' })}
             />
             <MetricCard
               title="Eficiencia"
@@ -131,14 +213,14 @@ export default function StaffPage() {
               icon={CheckCircleIcon}
               colorPalette="cyan"
               trend={{ value: metrics.efficiencyScore, isPositive: metrics.efficiencyScore > 80 }}
-              onClick={() => ModuleEventUtils.business.metricClicked('efficiency')}
+              onClick={() => emitEvent('metric_clicked', { metric: 'efficiency' })}
             />
             <MetricCard
               title="Horas Extra"
               value={`${metrics.totalOvertimeHours.toFixed(1)}h`}
               icon={ExclamationTriangleIcon}
               colorPalette={metrics.overtimeConcerns > 0 ? "orange" : "green"}
-              onClick={() => ModuleEventUtils.business.metricClicked('overtime')}
+              onClick={() => emitEvent('metric_clicked', { metric: 'overtime' })}
             />
           </CardGrid>
         </StatsSection>
@@ -280,6 +362,9 @@ export default function StaffPage() {
             </Button>
           </Stack>
         </Section>
+
+        {/* Extensions Slot */}
+        <Slot id="staff-dashboard" fallback={null} />
       </Stack>
     </ContentLayout>
   );

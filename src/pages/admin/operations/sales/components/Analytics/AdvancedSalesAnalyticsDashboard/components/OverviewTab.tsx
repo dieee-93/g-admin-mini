@@ -8,13 +8,8 @@ import {
   Progress,
   SimpleGrid,
 } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
-import {
-  CircularProgress,
-  CircularProgressRoot,
-  CircularProgressValueText,
-  CircularProgressCircle
-} from '@/shared/ui';
+import { CardWrapper, CircularProgress } from '@/shared/ui';
+
 import {
   CurrencyDollarIcon,
   UsersIcon,

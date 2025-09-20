@@ -2,9 +2,9 @@ import { lazy, Suspense } from 'react';
 import { Box, Spinner, VStack } from '@chakra-ui/react';
 
 // Lazy load the heavy modal component
-const MaterialFormModalComplete = lazy(() => 
-  import('./MaterialFormModalComplete').then(module => ({
-    default: module.MaterialFormModalComplete
+const MaterialFormDialog = lazy(() =>
+  import('./MaterialsManagement/MaterialFormModalComplete').then(module => ({
+    default: module.MaterialFormDialog
   }))
 );
 
@@ -40,7 +40,7 @@ const ModalLoadingFallback = () => (
  */
 export const LazyMaterialFormModal = () => (
   <Suspense fallback={<ModalLoadingFallback />}>
-    <MaterialFormModalComplete />
+    <MaterialFormDialog />
   </Suspense>
 );
 

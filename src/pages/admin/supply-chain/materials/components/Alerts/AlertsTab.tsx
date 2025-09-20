@@ -7,13 +7,12 @@ import {
   HStack,
   Text,
   Button,
-  Input,
   Select,
-  CardWrapper ,
   createListCollection
 } from '@chakra-ui/react';
 
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { InputField, CardWrapper } from '@/shared/ui/';
 
 interface AlertsTabProps {
   alerts: any[];
@@ -48,8 +47,8 @@ export function AlertsTab({ alerts, alertSummary, onAddStock, loading }: AlertsT
       <VStack gap="4">
         <HStack gap="4" w="full">
           {['critical', 'warning', 'info'].map((type) => (
-            <CardWrapper .Root key={type} flex="1">
-              <CardWrapper .Body p="4">
+            <CardWrapper key={type} flex="1">
+              <CardWrapper.Body p="4">
                 <HStack gap="3">
                   <ExclamationTriangleIcon className="w-6 h-6" />
                   <VStack align="start" gap="0">
@@ -57,8 +56,8 @@ export function AlertsTab({ alerts, alertSummary, onAddStock, loading }: AlertsT
                     <Text fontSize="sm">Cargando...</Text>
                   </VStack>
                 </HStack>
-              </CardWrapper .Body>
-            </CardWrapper .Root>
+              </CardWrapper.Body>
+            </CardWrapper>
           ))}
         </HStack>
       </VStack>
@@ -69,8 +68,8 @@ export function AlertsTab({ alerts, alertSummary, onAddStock, loading }: AlertsT
     <VStack gap="6" align="stretch">
       {/* Resumen de alertas */}
       <HStack gap="4">
-        <CardWrapper .Root flex="1" bg="red.50" borderColor="red.200">
-          <CardWrapper .Body p="4">
+        <CardWrapper flex="1" bg="red.50" borderColor="red.200">
+          <CardWrapper.Body p="4">
             <HStack gap="3">
               <ExclamationTriangleIcon className="w-6 h-6 text-red-500" />
               <VStack align="start" gap="0">
@@ -80,11 +79,11 @@ export function AlertsTab({ alerts, alertSummary, onAddStock, loading }: AlertsT
                 <Text fontSize="sm" color="red.600">Críticas</Text>
               </VStack>
             </HStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
-        <CardWrapper .Root flex="1" bg="yellow.50" borderColor="yellow.200">
-          <CardWrapper .Body p="4">
+        <CardWrapper flex="1" bg="yellow.50" borderColor="yellow.200">
+          <CardWrapper.Body p="4">
             <HStack gap="3">
               <ExclamationTriangleIcon className="w-6 h-6 text-yellow-500" />
               <VStack align="start" gap="0">
@@ -94,11 +93,11 @@ export function AlertsTab({ alerts, alertSummary, onAddStock, loading }: AlertsT
                 <Text fontSize="sm" color="yellow.600">Advertencias</Text>
               </VStack>
             </HStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
-        <CardWrapper .Root flex="1" bg="blue.50" borderColor="blue.200">
-          <CardWrapper .Body p="4">
+        <CardWrapper flex="1" bg="blue.50" borderColor="blue.200">
+          <CardWrapper.Body p="4">
             <HStack gap="3">
               <ExclamationTriangleIcon className="w-6 h-6 text-blue-500" />
               <VStack align="start" gap="0">
@@ -108,13 +107,13 @@ export function AlertsTab({ alerts, alertSummary, onAddStock, loading }: AlertsT
                 <Text fontSize="sm" color="blue.600">Informativas</Text>
               </VStack>
             </HStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       </HStack>
 
       {/* Controles */}
       <HStack gap="4">
-        <Input
+        <InputField
           placeholder="Buscar alertas..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -141,8 +140,8 @@ export function AlertsTab({ alerts, alertSummary, onAddStock, loading }: AlertsT
 
       {/* Lista de alertas */}
       {filteredAlerts.length === 0 ? (
-        <CardWrapper .Root>
-          <CardWrapper .Body>
+        <CardWrapper>
+          <CardWrapper.Body>
             <VStack gap="4" p="6" textAlign="center">
               <ExclamationTriangleIcon className="w-12 h-12 text-green-500" />
               <VStack gap="2">
@@ -154,13 +153,13 @@ export function AlertsTab({ alerts, alertSummary, onAddStock, loading }: AlertsT
                 </Text>
               </VStack>
             </VStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       ) : (
         <VStack gap="3">
           {filteredAlerts.map((alert) => (
-            <CardWrapper .Root key={alert.id}>
-              <CardWrapper .Body>
+            <CardWrapper key={alert.id}>
+              <CardWrapper.Body>
                 <HStack justify="space-between" align="start">
                   <HStack gap="3">
                     <ExclamationTriangleIcon 
@@ -194,8 +193,8 @@ export function AlertsTab({ alerts, alertSummary, onAddStock, loading }: AlertsT
                     </Button>
                   </HStack>
                 </HStack>
-              </CardWrapper .Body>
-            </CardWrapper .Root>
+              </CardWrapper.Body>
+            </CardWrapper>
           ))}
         </VStack>
       )}

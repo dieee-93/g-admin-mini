@@ -70,10 +70,10 @@ export function CustomerOrdersHistory() {
     <Stack direction="column" gap="lg">
       {/* Filtros */}
       <CardWrapper>
-        <CardWrapper .Header>
+        <CardWrapper.Header>
           <Typography variant="heading">Filtros de Búsqueda</Typography>
-        </CardWrapper .Header>
-        <CardWrapper .Body>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
           <Stack direction="row" gap="md" className="flex-wrap">
             <div>
               <Typography size="sm" color="text.muted" className="mb-1">Cliente</Typography>
@@ -113,42 +113,42 @@ export function CustomerOrdersHistory() {
               </button>
             </div>
           </Stack>
-        </CardWrapper .Body>
+        </CardWrapper.Body>
       </CardWrapper>
 
       {/* Resumen */}
       <Grid className="grid-cols-3 gap-4">
         <CardWrapper>
-          <CardWrapper .Body className="text-center">
+          <CardWrapper.Body className="text-center">
             <Typography size="2xl" weight="bold" className="text-blue-600">
               {sales.length}
             </Typography>
             <Typography size="sm" color="text.muted">Total Pedidos</Typography>
-          </CardWrapper .Body>
+          </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper>
-          <CardWrapper .Body className="text-center">
+          <CardWrapper.Body className="text-center">
             <Typography size="2xl" weight="bold" className="text-green-600">
               {formatCurrency(sales.reduce((sum, sale) => sum + sale.total, 0))}
             </Typography>
             <Typography size="sm" color="text.muted">Revenue Total</Typography>
-          </CardWrapper .Body>
+          </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper>
-          <CardWrapper .Body className="text-center">
+          <CardWrapper.Body className="text-center">
             <Typography size="2xl" weight="bold" className="text-purple-600">
               {sales.length > 0 ? formatCurrency(sales.reduce((sum, sale) => sum + sale.total, 0) / sales.length) : '$0'}
             </Typography>
             <Typography size="sm" color="text.muted">Ticket Promedio</Typography>
-          </CardWrapper .Body>
+          </CardWrapper.Body>
         </CardWrapper>
       </Grid>
 
       {/* Lista de pedidos */}
       <CardWrapper>
-        <CardWrapper .Header>
+        <CardWrapper.Header>
           <Stack direction="row" justify="space-between">
             <Typography variant="heading">
               Historial de Pedidos
@@ -162,9 +162,9 @@ export function CustomerOrdersHistory() {
               {sales.length} pedidos
             </Badge>
           </Stack>
-        </CardWrapper .Header>
+        </CardWrapper.Header>
 
-        <CardWrapper .Body>
+        <CardWrapper.Body>
           {sales.length === 0 ? (
             <div className="p-8 text-center text-muted">
               <Typography>No se encontraron pedidos</Typography>
@@ -239,7 +239,7 @@ export function CustomerOrdersHistory() {
               </Table.Body>
             </Table.Root>
           )}
-        </CardWrapper .Body>
+        </CardWrapper.Body>
       </CardWrapper>
     </Stack>
   );

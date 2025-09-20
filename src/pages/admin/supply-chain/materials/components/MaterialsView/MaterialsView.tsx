@@ -13,8 +13,8 @@ import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { notify } from '@/lib/notifications';
 
 // Import both implementations
-import MaterialsPage from '../MaterialsPage';
-import OfflineMaterialsPage from './OfflineMaterialsPage';
+import MaterialsPage from '../../page';
+import OfflineMaterialsPage from '../OfflineMode/OfflineMaterialsPage';
 
 interface UnifiedMaterialsViewProps {
   // Optional props to customize behavior

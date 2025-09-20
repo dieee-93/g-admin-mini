@@ -53,6 +53,7 @@ interface BusinessCapabilitiesState {
   
   // Helpers para personalización de UI
   hasCapability: (capability: string) => boolean;
+  getOperationalTier: () => OperationalTier;
   getCapabilityStatus: (capability: string) => CapabilityStatus['status'];
   getActiveCapabilities: () => string[];
   shouldShowModule: (moduleId: string) => boolean;
@@ -250,6 +251,12 @@ export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
       hasCapability: (capability) => {
         const state = get();
         return state.selectedCapabilities.includes(capability);
+      },
+
+      getOperationalTier: () => {
+        const state = get();
+        if (!state.profile) return 'basic' as OperationalTier;
+        return calculateOperationalTier(state.profile.capabilities);
       },
 
       getCapabilityStatus: (capability) => {

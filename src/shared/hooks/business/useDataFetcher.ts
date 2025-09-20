@@ -2,7 +2,7 @@
  * Generic Data Fetcher Hook
  * Consolidates patterns from useCustomers, useMaterials, useProducts
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { notify } from '@/lib/notifications';
 
 interface DataFetcherConfig<T> {
@@ -27,28 +27,38 @@ export function useDataFetcher<T>({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Use refs to avoid dependencies changing on every render
+  const fetchFnRef = useRef(fetchFn);
+  const moduleRef = useRef(module);
+
+  // Update refs when props change
+  useEffect(() => {
+    fetchFnRef.current = fetchFn;
+    moduleRef.current = module;
+  });
+
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const result = await fetchFn();
+      const result = await fetchFnRef.current();
       setData(result);
     } catch (err) {
-      const errorMessage = `Error cargando ${module}`;
+      const errorMessage = `Error cargando ${moduleRef.current}`;
       setError(errorMessage);
       notify.error({ title: 'ERROR', description: errorMessage });
     } finally {
       setLoading(false);
     }
-  }, [fetchFn, module]);
+  }, []);
 
-  // Auto-load on mount and dependencies change
+  // Auto-load on mount only
   useEffect(() => {
     if (autoLoad) {
       loadData();
     }
-  }, [loadData, autoLoad, ...dependencies]);
+  }, [autoLoad, loadData]);
 
   const refresh = useCallback(() => {
     loadData();

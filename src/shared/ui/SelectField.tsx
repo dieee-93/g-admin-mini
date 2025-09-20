@@ -64,7 +64,8 @@ export function SelectField({
   variant = 'outline',
   height = 'auto',
   width = 'full',
-  childrenItem,
+  renderItem,
+  children,
   noPortal = false,
 }: SelectFieldProps) {
   // ✅ Recipes handle theming automatically

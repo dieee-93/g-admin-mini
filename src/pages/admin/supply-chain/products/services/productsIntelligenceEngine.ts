@@ -1,0 +1,1 @@
+// Motor para análisis inteligente de productos y alertas

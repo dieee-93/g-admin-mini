@@ -6,7 +6,7 @@ export * from './suppliersApi';
 export * from './supplyChainDataService';
 
 // Business Logic Services (moved from business-logic/inventory)
-export * from './stockCalculation';
+// Note: stockCalculation lives in @/business-logic/inventory/stockCalculation
 export * from './abcAnalysisEngine';
 export * from './demandForecastingEngine';
 export * from './formCalculation';

@@ -10,13 +10,7 @@ import {
   UserGroupIcon,
   CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from "@/shared/ui/Icon";
-import { Typography } from "@/shared/ui/Typography";
-import { CardWrapper } from "@/shared/ui/CardWrapper";
-import { Stack } from "@/shared/ui/Stack";
-import { SimpleGrid } from "@/shared/ui/Grid";
-import { Button } from "@/shared/ui/Button";
-import { Badge } from "@/shared/ui/Badge";
+import { Icon, Typography, CardWrapper, Stack, SimpleGrid, Button, Badge } from "@/shared/ui/";
 
 const EnterpriseSection: React.FC = () => {
   // Mock enterprise data
@@ -272,12 +266,12 @@ const EnterpriseSection: React.FC = () => {
             </Typography>
             
             <SimpleGrid columns={{ base: 1, md: 3 }} gap="md">
-              <Button variant="outline" colorPalette="info">Brand Standards</Button>
-              <Button variant="outline" colorPalette="success">Operational Policies</Button>
+              <Button variant="outline" colorPalette="blue">Brand Standards</Button>
+              <Button variant="outline" colorPalette="green">Operational Policies</Button>
               <Button variant="outline" colorPalette="brand">Financial Controls</Button>
-              <Button variant="outline" colorPalette="warning">Staff Policies</Button>
-              <Button variant="outline" colorPalette="info">Menu Standards</Button>
-              <Button variant="outline" colorPalette="error">Quality Controls</Button>
+              <Button variant="outline" colorPalette="orange">Staff Policies</Button>
+              <Button variant="outline" colorPalette="blue">Menu Standards</Button>
+              <Button variant="outline" colorPalette="red">Quality Controls</Button>
             </SimpleGrid>
           </Stack>
           </Stack>

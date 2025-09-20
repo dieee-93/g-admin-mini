@@ -15,8 +15,46 @@ import {
   ClockIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
-import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
+// CapabilityGate and Slot integration
+import { CapabilityGate } from '@/lib/capabilities';
+import { Slot } from '@/lib/composition';
+
+// Module integration
+import { useModuleIntegration } from '@/hooks/useModuleIntegration';
+
 import { useSalesPage } from './hooks';
+
+// Module configuration for Sales - CRITICAL: Inventory→Sales integration
+const SALES_MODULE_CONFIG = {
+  capabilities: ['sells_products', 'pos_system', 'payment_processing', 'customer_management'],
+  events: {
+    emits: ['order_placed', 'payment_completed', 'sale_completed', 'customer_registered'],
+    listens: ['materials.stock_updated', 'materials.low_stock_alert', 'operations.order_ready']
+  },
+  eventHandlers: {
+    'materials.stock_updated': (data: any) => {
+      console.log('🛒 Sales: Stock updated, checking product availability', data);
+      // Update product availability based on stock changes
+      if (data.critical) {
+        console.warn('⚠️ Sales: Critical stock detected for', data.materialName);
+        // Show low stock warning in POS
+      }
+    },
+    'materials.low_stock_alert': (data: any) => {
+      console.log('🚨 Sales: Low stock alert received', data);
+      // Handle low stock alerts in sales interface
+      if (data.severity === 'critical') {
+        // Disable product from POS
+        console.log('🚫 Sales: Disabling product due to stock critical level');
+      }
+    },
+    'operations.order_ready': (data: any) => {
+      console.log('✅ Sales: Order ready notification', data);
+      // Update order status for customer notification
+    }
+  },
+  slots: ['sales-dashboard', 'pos-extensions', 'payment-methods']
+} as const;
 
 // Mock data
 const mockTables = [{
@@ -56,6 +94,12 @@ const mockOrders = [{
 }];
 
 export default function SalesPage() {
+  // Module integration (EventBus + CapabilityGate + Slots)
+  const { emitEvent, hasCapability, status, registerSlotContent } = useModuleIntegration(
+    'sales',
+    SALES_MODULE_CONFIG
+  );
+
   const {
     pageState,
     metrics,
@@ -63,6 +107,42 @@ export default function SalesPage() {
     error,
     actions
   } = useSalesPage();
+
+  // Enhanced actions with EventBus integration - CRITICAL: Inventory→Sales flow
+  const handleOrderPlaced = (orderData: any) => {
+    // Emit order placed event for inventory deduction
+    emitEvent('order_placed', {
+      orderId: orderData.id,
+      items: orderData.items,
+      customerId: orderData.customerId,
+      totalAmount: orderData.total,
+      timestamp: Date.now()
+    });
+
+    // Process order locally
+    actions.handleOrderPlaced?.(orderData);
+  };
+
+  const handleSaleCompleted = (saleData: any) => {
+    // Emit sale completed for materials stock update
+    emitEvent('sale_completed', {
+      saleId: saleData.id,
+      items: saleData.items.map((item: any) => ({
+        materialId: item.product_id,
+        quantity: item.quantity,
+        productName: item.product_name
+      })),
+      totalRevenue: saleData.total,
+      timestamp: Date.now()
+    });
+
+    // Emit to operations for fulfillment tracking
+    emitEvent('payment_completed', {
+      orderId: saleData.id,
+      paymentMethod: saleData.payment_method,
+      amount: saleData.total
+    });
+  };
 
   if (loading) {
     return (
@@ -73,16 +153,31 @@ export default function SalesPage() {
   }
 
   if (error) {
-    ModuleEventUtils.business.error('sales-load-failed', error);
+    // Emit error event for monitoring
+    emitEvent('sales_error', { type: 'load_failed', error, timestamp: Date.now() });
     return (
       <ContentLayout spacing="normal">
-        <Alert variant="subtle" title={error} />
+        <Alert status="error" title="Error de carga">
+          {error}
+        </Alert>
+        <Button onClick={() => window.location.reload()}>
+          Recargar página
+        </Button>
       </ContentLayout>
     );
   }
 
   return (
     <ContentLayout spacing="normal">
+      {/* 🔒 Module status indicator */}
+      {!status.isActive && (
+        <Alert
+          variant="subtle"
+          title="Module Capabilities Required"
+          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
+        />
+      )}
+
       <Stack gap={12}>
         {/* 📊 MÉTRICAS DE NEGOCIO - SIEMPRE PRIMERO */}
         <StatsSection>
@@ -93,7 +188,7 @@ export default function SalesPage() {
               icon={CurrencyDollarIcon}
               trend={{ value: metrics.salesGrowth, isPositive: metrics.salesGrowth > 0 }}
               colorPalette="green"
-              onClick={() => ModuleEventUtils.business.metricClicked('revenue')}
+              onClick={() => emitEvent('metric_clicked', { metric: 'revenue', value: metrics.todayRevenue })}
             />
             <MetricCard
               title="Transacciones"
@@ -213,6 +308,9 @@ export default function SalesPage() {
             </Button>
           </Stack>
         </Section>
+
+        {/* Extensions Slot */}
+        <Slot id="sales-dashboard" fallback={null} />
       </Stack>
     </ContentLayout>
   );

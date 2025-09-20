@@ -7,9 +7,8 @@ import {
   Separator,
   Heading,
 } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui/CardWrapper';
-import { Button } from '@/shared/ui/Button';
-import { InputField } from '@/shared/ui/InputField';
+import { CardWrapper, InputField, Button } from '@/shared/ui';
+
 import { useAuth } from '@/contexts/AuthContext';
 
 interface RegisterFormProps {

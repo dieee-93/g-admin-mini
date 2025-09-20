@@ -13,8 +13,7 @@ import {
   DocumentCheckIcon,
   CogIcon
 } from "@heroicons/react/24/outline";
-import { Icon } from "@/shared/ui/Icon";
-import { Typography, CardWrapper, Section, Stack, SimpleGrid, Button, Badge, MetricCard, ActionButton, Alert } from "@/shared/ui";
+import { Icon, Typography, CardWrapper, Section, Stack, SimpleGrid, Button, Badge, MetricCard, ActionButton, Alert } from "@/shared/ui";
 
 export function TaxConfigurationSection() {
   const taxSettings = {
@@ -38,7 +37,7 @@ export function TaxConfigurationSection() {
     <Section variant="elevated" title="Configuración Fiscal">
       <Stack direction={{ base: "column", sm: "row" }} justify="space-between" align={{ base: "stretch", sm: "center" }} gap="md" mb="xl">
         <div />
-        <Button colorPalette="success" size="sm">
+          <Button colorPalette="green" size="sm">
           <Icon icon={DocumentTextIcon} size="sm" />
           Generar Reporte Fiscal
         </Button>

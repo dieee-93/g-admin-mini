@@ -20,15 +20,15 @@ import {
   ExclamationTriangleIcon,
   CurrencyDollarIcon,
   BuildingStorefrontIcon,
-  TrendingUpIcon,
-  TrendingDownIcon
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services/AnalyticsEngine';
-import { useMaterialsEnhanced } from '../../hooks/useMaterialsEnhanced';
+import { useMaterialsPage } from '../../hooks/useMaterialsPage';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 export function MaterialsAnalyticsPanel() {
-  const { materials, loading, metrics } = useMaterialsEnhanced();
+  const { materials, loading, metrics } = useMaterialsPage();
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
@@ -154,7 +154,7 @@ export function MaterialsAnalyticsPanel() {
             title="Tasa de Actividad"
             value={`${(analyticsData?.metrics?.activity_rate || 0).toFixed(1)}%`}
             subtitle="materiales activos"
-            icon={analyticsData?.metrics?.activity_rate > 70 ? TrendingUpIcon : TrendingDownIcon}
+            icon={analyticsData?.metrics?.activity_rate > 70 ? ArrowTrendingUpIcon : ArrowTrendingDownIcon}
             colorPalette={analyticsData?.metrics?.activity_rate > 70 ? "green" : "yellow"}
           />
           <MetricCard

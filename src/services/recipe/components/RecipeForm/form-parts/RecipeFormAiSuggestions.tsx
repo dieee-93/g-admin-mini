@@ -5,13 +5,12 @@ import {
   HStack,
   Text,
   Badge,
-  CardWrapper ,
   Tabs,
   Switch,
   Progress,
   SimpleGrid,
 } from '@chakra-ui/react';
-import { Icon } from '@/shared/ui';
+import { Icon, CardWrapper } from '@/shared/ui';
 import {
   LightBulbIcon,
   SparklesIcon,
@@ -60,8 +59,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
 }) => {
   return (
     <>
-      <CardWrapper .Root variant="outline" bg="gradient(to-r, purple.50, blue.50)">
-        <CardWrapper .Body p={4}>
+      <CardWrapper variant="outline" bg="gradient(to-r, purple.50, blue.50)">
+        <CardWrapper.Body p={4}>
           <HStack justify="space-between">
             <HStack gap={3}>
               <Icon icon={SparklesIcon} size="lg" color="purple.500" />
@@ -128,13 +127,13 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
               </Badge>
             </HStack>
           )}
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
 
       {estimatedCost > 0 && (
         <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-          <CardWrapper .Root variant="outline" bg="blue.50">
-            <CardWrapper .Body p={4}>
+          <CardWrapper variant="outline" bg="blue.50">
+            <CardWrapper.Body p={4}>
               <VStack gap={2} align="stretch">
                 <HStack justify="space-between">
                   <Text fontSize="sm" fontWeight="medium" color="blue.700">
@@ -159,12 +158,12 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                   </HStack>
                 )}
               </VStack>
-            </CardWrapper .Body>
-          </CardWrapper .Root>
+            </CardWrapper.Body>
+          </CardWrapper>
 
           {aiSuggestions && optimizedCost < estimatedCost && (
-            <CardWrapper .Root variant="outline" >
-              <CardWrapper .Body p={4}>
+            <CardWrapper variant="outline" >
+              <CardWrapper.Body p={4}>
                 <VStack gap={2} align="stretch">
                   <HStack justify="space-between">
                     <Text fontSize="sm" fontWeight="medium" color="green.700">
@@ -192,15 +191,15 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                     Ahorro: ${(estimatedCost - optimizedCost).toFixed(2)}
                   </Text>
                 </VStack>
-              </CardWrapper .Body>
-            </CardWrapper .Root>
+              </CardWrapper.Body>
+            </CardWrapper>
           )}
         </SimpleGrid>
       )}
 
       {aiSuggestions && showAISuggestions && (
-        <CardWrapper .Root variant="outline" bg="gradient(to-br, purple.25, blue.25)">
-          <CardWrapper .Header>
+        <CardWrapper variant="outline" bg="gradient(to-br, purple.25, blue.25)">
+          <CardWrapper.Header>
             <HStack justify="space-between">
               <HStack gap={2}>
                 <Icon icon={LightBulbIcon} size="lg" color="purple.500" />
@@ -216,8 +215,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 ✕
               </Button>
             </HStack>
-          </CardWrapper .Header>
-          <CardWrapper .Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <Tabs.Root value={activeAITab} onValueChange={(details) => setActiveAITab(details.value as any)}>
               <Tabs.List>
                 <Tabs.Trigger value="substitutions">
@@ -267,8 +266,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                         const isApplied = appliedSuggestions.has(suggestionId);
 
                         return (
-                          <CardWrapper .Root key={index} variant="subtle" size="sm">
-                            <CardWrapper .Body p={3}>
+                          <CardWrapper key={index} variant="subtle" size="sm">
+                            <CardWrapper.Body p={3}>
                               <VStack gap={2} align="stretch">
                                 <HStack justify="space-between">
                                   <VStack align="start" gap={0}>
@@ -316,8 +315,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                                   </VStack>
                                 </SimpleGrid>
                               </VStack>
-                            </CardWrapper .Body>
-                          </CardWrapper .Root>
+                            </CardWrapper.Body>
+                          </CardWrapper>
                         );
                       })
                     ) : (
@@ -331,8 +330,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 <Tabs.Content value="optimization">
                   <VStack gap={3} align="stretch">
                     {aiSuggestions.costOptimizations.map((opt, index) => (
-                      <CardWrapper .Root key={index} variant="subtle" size="sm">
-                        <CardWrapper .Body p={3}>
+                      <CardWrapper key={index} variant="subtle" size="sm">
+                        <CardWrapper.Body p={3}>
                           <VStack gap={2} align="stretch">
                             <HStack justify="space-between">
                               <VStack align="start" gap={0}>
@@ -366,16 +365,16 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                               </VStack>
                             </SimpleGrid>
                           </VStack>
-                        </CardWrapper .Body>
-                      </CardWrapper .Root>
+                        </CardWrapper.Body>
+                      </CardWrapper>
                     ))}
                   </VStack>
                 </Tabs.Content>
 
                 <Tabs.Content value="yield">
                   {aiSuggestions.yieldOptimization ? (
-                    <CardWrapper .Root variant="subtle" size="sm">
-                      <CardWrapper .Body p={4}>
+                    <CardWrapper variant="subtle" size="sm">
+                      <CardWrapper.Body p={4}>
                         <VStack gap={3} align="stretch">
                           <HStack justify="space-between">
                             <Text fontSize="sm" fontWeight="medium">
@@ -428,8 +427,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                             </VStack>
                           )}
                         </VStack>
-                      </CardWrapper .Body>
-                    </CardWrapper .Root>
+                      </CardWrapper.Body>
+                    </CardWrapper>
                   ) : (
                     <Text fontSize="sm" color="gray.600" textAlign="center" py={4}>
                       No se detectaron oportunidades de optimización de rendimiento.
@@ -440,8 +439,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 <Tabs.Content value="nutrition">
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap={3}>
                     {aiSuggestions.nutritionalInsights.map((insight, index) => (
-                      <CardWrapper .Root key={index} variant="subtle" size="sm">
-                        <CardWrapper .Body p={3}>
+                      <CardWrapper key={index} variant="subtle" size="sm">
+                        <CardWrapper.Body p={3}>
                           <VStack gap={2} align="stretch">
                             <HStack justify="space-between">
                               <Text fontSize="sm" fontWeight="medium" textTransform="capitalize">
@@ -479,15 +478,15 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                               </VStack>
                             )}
                           </VStack>
-                        </CardWrapper .Body>
-                      </CardWrapper .Root>
+                        </CardWrapper.Body>
+                      </CardWrapper>
                     ))}
                   </SimpleGrid>
                 </Tabs.Content>
               </Box>
             </Tabs.Root>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       )}
     </>
   );

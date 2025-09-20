@@ -1,0 +1,1 @@
+export { MaterialsAlerts } from './MaterialsAlerts';

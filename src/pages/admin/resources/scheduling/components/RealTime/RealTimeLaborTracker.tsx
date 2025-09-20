@@ -122,7 +122,7 @@ export function RealTimeLaborTracker({
   return (
     <VStack gap="6" align="stretch">
       {/* Header Controls */}
-      <CardWrapper.Root>
+      <CardWrapper>
         <CardWrapper.Body>
           <HStack justify="space-between">
             <VStack align="start" gap="1">
@@ -204,7 +204,7 @@ export function RealTimeLaborTracker({
 
       {/* Quick Stats */}
       <SimpleGrid columns={{ base: 2, md: 4, lg: 6 }} gap="4">
-        <CardWrapper.Root>
+        <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="blue.500">
@@ -219,7 +219,7 @@ export function RealTimeLaborTracker({
           </CardWrapper.Body>
         </CardWrapper.Root>
 
-        <CardWrapper.Root>
+        <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="green.500">
@@ -233,7 +233,7 @@ export function RealTimeLaborTracker({
           </CardWrapper.Body>
         </CardWrapper.Root>
 
-        <CardWrapper.Root>
+        <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="purple.500">
@@ -247,7 +247,7 @@ export function RealTimeLaborTracker({
           </CardWrapper.Body>
         </CardWrapper.Root>
 
-        <CardWrapper.Root>
+        <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
               <Text 
@@ -267,7 +267,7 @@ export function RealTimeLaborTracker({
           </CardWrapper.Body>
         </CardWrapper.Root>
 
-        <CardWrapper.Root>
+        <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
               <Text 
@@ -288,7 +288,7 @@ export function RealTimeLaborTracker({
           </CardWrapper.Body>
         </CardWrapper.Root>
 
-        <CardWrapper.Root>
+        <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
               <Text fontSize="xl" fontWeight="bold" color="teal.500">
@@ -304,7 +304,7 @@ export function RealTimeLaborTracker({
       </SimpleGrid>
 
       {/* Main Content Tabs */}
-      <CardWrapper.Root>
+      <CardWrapper>
         <CardWrapper.Body p="0">
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
@@ -344,7 +344,7 @@ export function RealTimeLaborTracker({
                   
                   {dailySummary && (
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-                      <CardWrapper.Root size="sm">
+                      <CardWrapper size="sm">
                         <CardWrapper.Body>
                           <VStack align="stretch" gap="3">
                             <Text fontSize="md" fontWeight="semibold">Costos</Text>
@@ -377,7 +377,7 @@ export function RealTimeLaborTracker({
                         </CardWrapper.Body>
                       </CardWrapper.Root>
 
-                      <CardWrapper.Root size="sm">
+                      <CardWrapper size="sm">
                         <CardWrapper.Body>
                           <VStack align="stretch" gap="3">
                             <Text fontSize="md" fontWeight="semibold">Horas</Text>
@@ -514,7 +514,7 @@ export function RealTimeLaborTracker({
                   
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                     {Object.entries(departmentBreakdown).map(([department, data]) => (
-                      <CardWrapper.Root key={department} size="sm">
+                      <CardWrapper key={department} size="sm">
                         <CardWrapper.Body>
                           <VStack align="stretch" gap="3">
                             <HStack justify="space-between">
@@ -560,7 +560,7 @@ export function RealTimeLaborTracker({
                   <Text fontSize="lg" fontWeight="semibold">Alertas Activas</Text>
                   
                   {criticalAlerts.length === 0 && overtimeAlerts.length === 0 && budgetAlerts.length === 0 ? (
-                    <CardWrapper.Root>
+                    <CardWrapper>
                       <CardWrapper.Body py="8" textAlign="center">
                         <VStack gap="3">
                           <EyeIcon className="w-8 h-8 text-green-500 mx-auto" />

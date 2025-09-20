@@ -1,21 +1,20 @@
 // Staff Directory Section - Employee list and profiles with REAL DATA
 import { useState, useEffect } from 'react';
+import { Spinner } from '@chakra-ui/react';
 import { 
   Box, 
   VStack, 
   HStack, 
-  Text, 
+  Typography as Text, //TODO: REPLACE ALL Text USAGES WITH Typography
   Badge, 
   SimpleGrid,
   Button,
   Avatar,
-  IconButton,
+  Icon,
   CardWrapper,
-  Input,
-  Spinner,
+  InputField,
   Alert,
-  Icon
-} from '../../../../../../shared/ui';
+} from '@/shared/ui';
 import { 
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -153,7 +152,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
       <VStack gap="4" align="stretch">
         <HStack gap="4" flexWrap="wrap">
           <Box flex="1" minW="300px">
-            <Input
+            <InputField
               placeholder="Buscar por nombre, email o posición..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -167,23 +166,23 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
             <Icon icon={FunnelIcon} size="sm" />
             Filtros
           </Button>
-          <IconButton
+          <Icon
             variant={viewState.viewMode === 'grid' ? 'solid' : 'outline'}
             onClick={() => onViewStateChange({ ...viewState, viewMode: 'grid' })}
           >
             <Icon icon={Squares2X2Icon} size="sm" />
-          </IconButton>
-          <IconButton
+          </Icon>
+          <Icon
             variant={viewState.viewMode === 'list' ? 'solid' : 'outline'}
             onClick={() => onViewStateChange({ ...viewState, viewMode: 'list' })}
           >
             <Icon icon={ListBulletIcon} size="sm" />
-          </IconButton>
+          </Icon>
         </HStack>
 
         {/* Advanced Filters */}
         {showFilters && (
-          <CardWrapper variant="flat" padding="md">
+          <CardWrapper variant="elevated" padding="md">
             <CardWrapper.Body>
               <SimpleGrid columns={{ base: 1, md: 3 }} gap="4">
                 <Box>
@@ -294,7 +293,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                       <Text fontSize="sm" fontWeight="medium">{employee.performance_score}%</Text>
                     </VStack>
                     <HStack gap="1">
-                      <IconButton 
+                      <Icon 
                         size="sm" 
                         variant="ghost"
                         onClick={() => {
@@ -302,8 +301,8 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                         }}
                       >
                         <Icon icon={EyeIcon} size="sm" />
-                      </IconButton>
-                      <IconButton 
+                      </Icon>
+                      <Icon 
                         size="sm" 
                         variant="ghost"
                         onClick={() => {
@@ -312,7 +311,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                         }}
                       >
                         <Icon icon={PencilIcon} size="sm" />
-                      </IconButton>
+                      </Icon>
                     </HStack>
                   </HStack>
                 </VStack>
@@ -346,7 +345,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                     {employee.performance_score}% rendimiento
                   </Text>
                   <HStack gap="1">
-                    <IconButton 
+                    <Icon 
                       size="sm" 
                       variant="ghost"
                       onClick={() => {
@@ -354,8 +353,8 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                       }}
                     >
                       <Icon icon={EyeIcon} size="sm" />
-                    </IconButton>
-                    <IconButton 
+                    </Icon>
+                    <Icon 
                       size="sm" 
                       variant="ghost"
                       onClick={() => {
@@ -364,7 +363,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                       }}
                     >
                       <Icon icon={PencilIcon} size="sm" />
-                    </IconButton>
+                    </Icon>
                   </HStack>
                 </HStack>
               </CardWrapper.Body>

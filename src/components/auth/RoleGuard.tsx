@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Stack } from '@chakra-ui/react';
-import { Typography } from '@/shared/ui';
-import { CardWrapper } from '@/shared/ui/CardWrapper';
+import { Typography, CardWrapper } from '@/shared/ui';;
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserRole, ModuleName, PermissionAction } from '@/contexts/AuthContext';
 

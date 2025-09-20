@@ -5,10 +5,9 @@ import {
   Text,
   Badge,
   SimpleGrid,
-  CardWrapper,
-  CircularProgress,
   Alert,
 } from '@chakra-ui/react';
+import { CardWrapper, CircularProgress } from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   ClockIcon,
@@ -27,12 +26,12 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ performance, getCatego
       {/* Category Scores */}
       <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
         {Object.entries(performance.category_scores).map(([category, score]) => (
-          <CardWrapper .Root
+          <CardWrapper
             key={category}
             borderTop="4px solid"
             borderTopColor={`${getCategoryColor(category)}.400`}
           >
-            <CardWrapper .Body p={4} textAlign="center">
+            <CardWrapper.Body p={4} textAlign="center">
               <VStack gap={3}>
                 <Text fontSize="sm" color="gray.600" textTransform="capitalize">
                   {category}
@@ -50,17 +49,17 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ performance, getCatego
                   {score >= 90 ? 'Excellent' : score >= 80 ? 'Good' : score >= 70 ? 'Average' : 'Needs Improvement'}
                 </Badge>
               </VStack>
-            </CardWrapper .Body>
-          </CardWrapper .Root>
+            </CardWrapper.Body>
+          </CardWrapper>
         ))}
       </SimpleGrid>
 
       {/* Critical Insights */}
-      <CardWrapper .Root>
-        <CardWrapper .Header>
+      <CardWrapper>
+        <CardWrapper.Header>
           <Text fontSize="lg" fontWeight="semibold">Critical Insights</Text>
-        </CardWrapper .Header>
-        <CardWrapper .Body>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
           <VStack align="stretch" gap={4}>
             {performance.insights
               .filter(insight => insight.type === 'critical' || insight.action_required)
@@ -89,8 +88,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ performance, getCatego
                 </Alert.Root>
               ))}
           </VStack>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     </VStack>
   );
 };

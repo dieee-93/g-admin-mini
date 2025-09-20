@@ -1,14 +1,13 @@
 import React from 'react';
 import {
   Box,
-  CardWrapper ,
   Flex,
   Grid,
   Heading,
   Text,
   Badge,
   Button,
-  Input,
+
   Textarea,
   VStack,
   HStack,
@@ -33,7 +32,7 @@ import {
   HeartIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, InputField, CardWrapper } from '@/shared/ui';
 import { supabase } from '@/lib/supabase/client';
 import { notify } from '@/lib/notifications';
 
@@ -133,7 +132,7 @@ export function QROrderPage() {
       });
     } catch (error) {
       console.error('Error loading QR data:', error);
-      notify.error('Failed to load table information');
+      notify.error({title:'Failed to load table information'});
     }
   };
 
@@ -161,7 +160,7 @@ export function QROrderPage() {
       setProducts(availableProducts);
     } catch (error) {
       console.error('Error loading menu:', error);
-      notify.error('Failed to load menu');
+      notify.error({title:'Failed to load menu'});
     } finally {
       setLoading(false);
     }
@@ -186,8 +185,8 @@ export function QROrderPage() {
         }];
       }
     });
-    
-    notify.success(`${product.name} added to cart`);
+
+    notify.success({title:`${product.name} added to cart`});
   };
 
   const updateCartQuantity = (productId: string, quantity: number) => {
@@ -242,12 +241,12 @@ export function QROrderPage() {
 
   const submitOrder = async () => {
     if (cart.length === 0) {
-      notify.error('Please add items to your order');
+      notify.error({title:'Please add items to your order'});
       return;
     }
 
     if (!customerName.trim()) {
-      notify.error('Please enter your name');
+      notify.error({title:'Please enter your name'});
       return;
     }
 
@@ -280,7 +279,7 @@ export function QROrderPage() {
       setOrderNumber(data.order_number);
       setOrderSubmitted(true);
       
-      notify.success('Order submitted successfully!');
+      notify.success({title:'Order submitted successfully!'});
 
       // Clear cart
       setCart([]);
@@ -290,7 +289,7 @@ export function QROrderPage() {
 
     } catch (error) {
       console.error('Error submitting order:', error);
-      notify.error('Failed to submit order. Please try again.');
+      notify.error({title:'Failed to submit order. Please try again.'});
     } finally {
       setSubmitting(false);
     }
@@ -327,7 +326,7 @@ export function QROrderPage() {
             </Text>
           </VStack>
 
-          <CardWrapper .Root w="full" p={4} >
+          <CardWrapper w="full" p={4} >
             <VStack gap={3}>
               <HStack justify="space-between" w="full">
                 <Text fontWeight="bold">Order Number:</Text>
@@ -346,7 +345,7 @@ export function QROrderPage() {
                 <Text>{Math.ceil(orderSummary.estimated_prep_time)} minutes</Text>
               </HStack>
             </VStack>
-          </CardWrapper .Root>
+          </CardWrapper>
 
           <VStack gap={2} textAlign="center">
             <Text fontSize="sm" color="gray.600">
@@ -418,12 +417,12 @@ export function QROrderPage() {
             const inCart = !!cartItem;
 
             return (
-              <CardWrapper .Root 
+              <CardWrapper 
                 key={product.id} 
                 _hover={{ transform: 'translateY(-2px)', shadow: 'md' }}
                 transition="all 0.2s"
               >
-                <CardWrapper .Body>
+                <CardWrapper.Body>
                   <VStack align="stretch" gap={3}>
                     {/* Product Image Placeholder */}
                     {product.image_url ? (
@@ -530,25 +529,25 @@ export function QROrderPage() {
                       </Button>
                     )}
                   </VStack>
-                </CardWrapper .Body>
-              </CardWrapper .Root>
+                </CardWrapper.Body>
+              </CardWrapper>
             );
           })}
         </Grid>
 
         {/* Customer Information Form */}
         {cart.length > 0 && (
-          <CardWrapper .Root mb={4}>
-            <CardWrapper .Header>
+          <CardWrapper mb={4}>
+            <CardWrapper.Header>
               <Text fontWeight="bold" fontSize="lg">Your Information</Text>
-            </CardWrapper .Header>
-            <CardWrapper .Body>
+            </CardWrapper.Header>
+            <CardWrapper.Body>
               <VStack gap={4} align="stretch">
                 <Box>
                   <Text mb={2} fontSize="sm" fontWeight="medium">
                     Name <Text as="span" color="red.500">*</Text>
                   </Text>
-                  <Input
+                  <InputField
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="Enter your name"
@@ -559,7 +558,7 @@ export function QROrderPage() {
                   <Text mb={2} fontSize="sm" fontWeight="medium">
                     Phone (Optional)
                   </Text>
-                  <Input
+                  <InputField
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     placeholder="Enter your phone number"
@@ -578,8 +577,8 @@ export function QROrderPage() {
                   />
                 </Box>
               </VStack>
-            </CardWrapper .Body>
-          </CardWrapper .Root>
+            </CardWrapper.Body>
+          </CardWrapper>
         )}
       </Box>
 

@@ -17,7 +17,6 @@ interface InputFieldProps extends Omit<ChakraInputProps, 'size' | 'variant'> {
   variant?: 'outline' | 'flushed' | 'subtle'
   startElement?: ReactNode
   endElement?: ReactNode
-  colorScheme?: 'theme' | 'default' // 🆕 Added theme support
 }
 
 export function InputField({

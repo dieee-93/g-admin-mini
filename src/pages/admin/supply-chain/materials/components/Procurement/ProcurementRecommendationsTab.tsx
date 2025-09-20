@@ -55,7 +55,7 @@ interface ProcurementRecommendationsTabProps {
   refreshInterval?: number;
 }
 
-const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsTabProps> = ({
+export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsTabProps> = ({
   autoRefresh = true,
   refreshInterval = 600000 // 10 minutos
 }) => {

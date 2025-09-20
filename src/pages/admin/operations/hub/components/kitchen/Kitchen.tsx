@@ -3,24 +3,20 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-// SOLO Design System Components - SIGUIENDO LAS REGLAS
+// Design System Components v2.1 (UPDATED)
 import {
+  // Semantic Layout Components (PRIORITY)
+  Section, CardGrid, MetricCard,
+
   // Layout & Structure
-  Stack,
-  VStack,
-  HStack,
-  
+  Stack, VStack, HStack,
+
   // Typography
   Typography,
-  
+
   // Components
-  CardWrapper,
-  Button,
-  Badge,
-  
-  // Advanced
-  Alert,
-  AlertDescription
+  Button, Badge, Alert, AlertDescription,
+  CardWrapper
 } from '@/shared/ui';
 
 import { Icon } from '@/shared/ui';
@@ -34,22 +30,30 @@ import {
   BoltIcon
 } from '@heroicons/react/24/outline';
 
+// EventBus integration for Kitchen module
+import { useEventBus } from '@/providers/EventBusProvider';
+
 import { useOfflineStatus } from '@/lib/offline';
 import { 
   useKitchenConfig,
   KITCHEN_MODE_DESCRIPTIONS,
   type EffectiveMode
 } from '../../hooks/useKitchenConfig';
+import { notify } from '@/lib/notifications';
 
-// Fixed Basic Kitchen Implementation - Design System Compliant
-const BasicKitchenDisplay = ({ mode }: { mode: EffectiveMode }) => {
+// Kitchen Display Component - Updated to v2.1 patterns
+const BasicKitchenDisplay = ({ mode, onOrderReady }: {
+  mode: EffectiveMode;
+  onOrderReady?: (orderId: string) => void;
+}) => {
   return (
-    <CardWrapper variant="elevated" padding="lg">
-      <CardWrapper.Body>
-        <VStack gap="md">
-          <Typography variant="title">Kitchen Display</Typography>
+    <Section variant="elevated" title="Kitchen Display">
+      <VStack gap="md">
+        <Typography variant="body" color="text.muted">
+          Active Mode: {mode}
+        </Typography>
           <Badge 
-            colorPalette={mode.includes('offline') ? 'accent' : 'success'}
+            colorPalette={mode.includes('offline') ? 'warning' : 'green'}
           >
             {mode.replace('-active', '').replace('-', ' ').toUpperCase()} MODE
           </Badge>
@@ -65,22 +69,70 @@ const BasicKitchenDisplay = ({ mode }: { mode: EffectiveMode }) => {
               </AlertDescription>
             </Alert>
           )}
+
+          {/* Order ready button for testing EventBus */}
+          <Button
+            onClick={() => onOrderReady?.('order-123')}
+            colorPalette="green"
+            size="sm"
+          >
+            Mark Order Ready (Test)
+          </Button>
         </VStack>
-      </CardWrapper.Body>
-    </CardWrapper>
+    </Section>
   );
 };
 
 export default function Kitchen() {
+  // EventBus integration for Kitchen operations
+  const { emit, on, off } = useEventBus();
+
   // Offline status monitoring
   const { isOnline, connectionQuality } = useOfflineStatus();
-  
+
   // Kitchen configuration state - now using Supabase instead of localStorage
   const { config, isLoading: configLoading } = useKitchenConfig();
 
   // Emergency override state
   const [emergencyMode, setEmergencyMode] = useState(false);
-  
+
+  // Kitchen EventBus integration
+  const handleOrderReady = useCallback((orderId: string) => {
+    console.log('🍳 Kitchen: Order ready', orderId);
+
+    // Emit order ready event to Operations and Sales
+    emit('operations.order_ready', {
+      orderId,
+      kitchenStation: 'main',
+      prepTime: 15, // minutes
+      timestamp: Date.now(),
+      status: 'ready_for_pickup'
+    });
+
+    // Also emit to sales for customer notification
+    emit('sales.order_ready_notification', {
+      orderId,
+      estimatedDelivery: Date.now() + (5 * 60 * 1000), // 5 minutes from now
+      notifyCustomer: true
+    });
+  }, [emit]);
+
+  // Listen for new orders from Sales
+  useEffect(() => {
+    const handleNewOrder = (orderData: any) => {
+      console.log('🍳 Kitchen: New order received', orderData);
+      // Update kitchen display with new order
+      // In a real app, this would update the kitchen queue
+    };
+
+    // Subscribe to new orders
+    const unsubscribe = on('sales.order_placed', handleNewOrder);
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [on]);
+
   // Mock states for demo
   const queueSize = 3;
 
@@ -151,7 +203,7 @@ export default function Kitchen() {
 
   // Render the kitchen component
   const renderKitchenComponent = () => {
-    return <BasicKitchenDisplay mode={effectiveMode} />;
+    return <BasicKitchenDisplay mode={effectiveMode} onOrderReady={handleOrderReady} />;
   };
 
   // Show loading state while config loads
@@ -177,8 +229,8 @@ export default function Kitchen() {
               <Typography variant="label">Current Mode:</Typography>
               <Badge 
                 colorPalette={
-                  effectiveMode.includes('emergency') ? 'error' :
-                  effectiveMode.includes('offline') ? 'accent' : 'success'
+                  effectiveMode.includes('emergency') ? 'red' :
+                  effectiveMode.includes('offline') ? 'orange' : 'green'
                 }
               >
                 {currentModeInfo.displayName}
@@ -189,7 +241,7 @@ export default function Kitchen() {
               {/* Connection Indicator */}
               {config.showConnectionIndicator && (
                 <Badge 
-                  colorPalette={isOnline ? 'success' : 'error'}
+                  colorPalette={isOnline ? 'green' : 'red'}
                   variant="subtle"
                 >
                   {isOnline ? <Icon icon={WifiIcon} size="sm" /> : <Icon icon={NoSymbolIcon} size="sm" />}
@@ -200,7 +252,7 @@ export default function Kitchen() {
               {/* Emergency Override Button */}
               <Button
                 variant={emergencyMode ? 'solid' : 'outline'}
-                colorPalette="error"
+                colorPalette="red"
                 size="sm"
                 onClick={() => setEmergencyMode(!emergencyMode)}
               >

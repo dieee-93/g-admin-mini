@@ -31,6 +31,11 @@ import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
 // 🎮 SISTEMA DE LOGROS Y GAMIFICACIÓN
 import { AchievementSystemProvider } from '@/lib/achievements/AchievementSystemIntegration';
 
+// 🔗 SISTEMA DE INTEGRACIÓN EVENTBUS + CAPABILITYGATE
+import { EventBusProvider } from '@/providers/EventBusProvider';
+import { CapabilityProvider } from '@/lib/capabilities';
+import { SlotProvider } from '@/lib/composition';
+
 // Dashboard Module - Critical, not lazy loaded
 import DashboardPage from '@/pages/admin/core/dashboard/page';
 // Removed CrossModuleAnalytics - consolidated into Dashboard with CrossModuleInsights
@@ -160,7 +165,12 @@ function App() {
               <AuthProvider>
                 <OfflineMonitorProvider>
                   <AchievementSystemProvider>
-                    <NavigationProvider>
+
+                    {/* 🔗 INTEGRATION LAYER: EventBus + CapabilityGate + Slots */}
+                    <CapabilityProvider>
+                      <EventBusProvider debug={process.env.NODE_ENV === 'development'}>
+                        <SlotProvider>
+                          <NavigationProvider>
      
                     
                     <PerformanceWrapper>
@@ -563,7 +573,11 @@ function App() {
                   }
                   
                   <Toaster />
-                  </NavigationProvider>
+                          </NavigationProvider>
+                        </SlotProvider>
+                      </EventBusProvider>
+                    </CapabilityProvider>
+
                 </AchievementSystemProvider>
               </OfflineMonitorProvider>
               </AuthProvider>

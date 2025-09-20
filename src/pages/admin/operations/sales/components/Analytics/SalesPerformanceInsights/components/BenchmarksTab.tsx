@@ -5,8 +5,8 @@ import {
   Text,
   Badge,
   Progress,
-  CardWrapper,
 } from '@chakra-ui/react';
+import { CardWrapper } from '@/shared/ui';
 import { ShieldCheckIcon } from '@heroicons/react/24/outline';
 import type { PerformanceMetrics } from '../types';
 
@@ -17,11 +17,11 @@ interface BenchmarksTabProps {
 export const BenchmarksTab: React.FC<BenchmarksTabProps> = ({ performance }) => {
   return (
     <VStack align="stretch" gap={6}>
-      <CardWrapper .Root>
-        <CardWrapper .Header>
+      <CardWrapper>
+        <CardWrapper.Header>
           <Text fontSize="lg" fontWeight="semibold">Industry Benchmarks</Text>
-        </CardWrapper .Header>
-        <CardWrapper .Body>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
           <VStack align="stretch" gap={4}>
             <HStack justify="space-between">
               <Text>Your Performance</Text>
@@ -53,14 +53,14 @@ export const BenchmarksTab: React.FC<BenchmarksTabProps> = ({ performance }) => 
               </Progress.Track>
             </Progress.Root>
           </VStack>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
 
-      <CardWrapper .Root>
-        <CardWrapper .Header>
+      <CardWrapper>
+        <CardWrapper.Header>
           <Text fontSize="lg" fontWeight="semibold">Competitive Position</Text>
-        </CardWrapper .Header>
-        <CardWrapper .Body>
+        </CardWrapper.Header>
+        <CardWrapper.Body>
           <VStack align="center" gap={4}>
             <ShieldCheckIcon className="w-16 h-16 text-green-500" />
             <Text fontSize="2xl" fontWeight="bold" color="green.600" textTransform="capitalize">
@@ -73,8 +73,8 @@ export const BenchmarksTab: React.FC<BenchmarksTabProps> = ({ performance }) => 
               +{performance.overall_score - performance.benchmarks.industry_average} points above average
             </Badge>
           </VStack>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     </VStack>
   );
 };

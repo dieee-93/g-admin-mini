@@ -7,14 +7,12 @@ import {
   Text, 
   Select, 
   Badge, 
-  CardWrapper , 
   SimpleGrid,
   Progress,
   Button,
   Avatar,
   IconButton,
   Tabs,
-  Input,
   Textarea,
   createListCollection
 } from '@chakra-ui/react';
@@ -33,7 +31,7 @@ import {
   PlayCircleIcon,
   PauseCircleIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, InputField, CardWrapper } from '@/shared/ui';
 import type { Employee, StaffViewState, TrainingRecord } from '../../types';
 
 interface TrainingSectionProps {
@@ -258,50 +256,50 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
     <VStack gap="6" align="stretch">
       {/* Training Overview Cards */}
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
-        <CardWrapper .Root>
-          <CardWrapper .Body textAlign="center">
+        <CardWrapper>
+          <CardWrapper.Body textAlign="center">
             <VStack gap="2">
               <Icon icon={BookOpenIcon} size="lg" color="var(--chakra-colors-blue-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.total}</Text>
               <Text fontSize="sm" color="gray.600">Total Entrenamientos</Text>
             </VStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
-        <CardWrapper .Root>
-          <CardWrapper .Body textAlign="center">
+        <CardWrapper>
+          <CardWrapper.Body textAlign="center">
             <VStack gap="2">
               <Icon icon={CheckCircleIcon} size="lg" color="var(--chakra-colors-green-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.completed}</Text>
               <Text fontSize="sm" color="gray.600">Completados</Text>
             </VStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
-        <CardWrapper .Root>
-          <CardWrapper .Body textAlign="center">
+        <CardWrapper>
+          <CardWrapper.Body textAlign="center">
             <VStack gap="2">
               <Icon icon={ClockIcon} size="lg" color="var(--chakra-colors-blue-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.inProgress}</Text>
               <Text fontSize="sm" color="gray.600">En Progreso</Text>
             </VStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
-        <CardWrapper .Root>
-          <CardWrapper .Body textAlign="center">
+        <CardWrapper>
+          <CardWrapper.Body textAlign="center">
             <VStack gap="2">
               <Icon icon={ExclamationTriangleIcon} size="lg" color="var(--chakra-colors-red-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.expired + trainingStats.expiringSoon}</Text>
               <Text fontSize="sm" color="gray.600">Requiere Atención</Text>
             </VStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       </SimpleGrid>
 
       {/* Training Management Tabs */}
-      <CardWrapper .Root>
-        <CardWrapper .Body p="0">
+      <CardWrapper>
+        <CardWrapper.Body p="0">
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="records" gap="2" flex="1" minH="44px">
@@ -375,8 +373,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                   {/* Training Records List */}
                   <VStack gap="3" align="stretch">
                     {filteredRecords.map((record) => (
-                      <CardWrapper .Root key={record.id} size="sm">
-                        <CardWrapper .Body>
+                      <CardWrapper key={record.id} size="sm">
+                        <CardWrapper.Body>
                           <VStack align="stretch" gap="3">
                             <HStack justify="space-between" align="start">
                               <VStack align="start" gap="1" flex="1">
@@ -472,8 +470,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                               )}
                             </HStack>
                           </VStack>
-                        </CardWrapper .Body>
-                      </CardWrapper .Root>
+                        </CardWrapper.Body>
+                      </CardWrapper>
                     ))}
                   </VStack>
                 </VStack>
@@ -492,8 +490,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                     {courseCatalog.map((course) => (
-                      <CardWrapper .Root key={course.id} size="sm">
-                        <CardWrapper .Body>
+                      <CardWrapper key={course.id} size="sm">
+                        <CardWrapper.Body>
                           <VStack align="stretch" gap="3">
                             <HStack justify="space-between" align="start">
                               <VStack align="start" gap="1" flex="1">
@@ -524,8 +522,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                               Asignar a Empleados
                             </Button>
                           </VStack>
-                        </CardWrapper .Body>
-                      </CardWrapper .Root>
+                        </CardWrapper.Body>
+                      </CardWrapper>
                     ))}
                   </SimpleGrid>
                 </VStack>
@@ -536,8 +534,8 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                 <VStack gap="4" align="stretch">
                   <Text fontSize="lg" fontWeight="semibold">Programar Nuevo Entrenamiento</Text>
                   
-                  <CardWrapper .Root>
-                    <CardWrapper .Body>
+                  <CardWrapper>
+                    <CardWrapper.Body>
                       <VStack gap="4" align="stretch">
                         <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                           <Box>
@@ -579,12 +577,12 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
 
                           <Box>
                             <Text fontSize="sm" fontWeight="medium" mb="2">Fecha de Inicio</Text>
-                            <Input type="date" />
+                            <InputField type="date" />
                           </Box>
 
                           <Box>
                             <Text fontSize="sm" fontWeight="medium" mb="2">Instructor</Text>
-                            <Input placeholder="Nombre del instructor" />
+                            <InputField placeholder="Nombre del instructor" />
                           </Box>
                         </SimpleGrid>
 
@@ -601,14 +599,14 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                           <Button colorPalette="blue">Programar Entrenamiento</Button>
                         </HStack>
                       </VStack>
-                    </CardWrapper .Body>
-                  </CardWrapper .Root>
+                    </CardWrapper.Body>
+                  </CardWrapper>
                 </VStack>
               </Tabs.Content>
             </Box>
           </Tabs.Root>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     </VStack>
   );
 }

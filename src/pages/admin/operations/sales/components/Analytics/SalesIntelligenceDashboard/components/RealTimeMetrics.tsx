@@ -7,7 +7,7 @@ import {
   Stat,
 } from '@chakra-ui/react';
 import { CardWrapper } from '@/shared/ui';
-import type { SalesAnalytics } from '../../../../../types';
+import type { SalesAnalytics } from '../../../../types';
 
 interface RealTimeMetricsProps {
   analytics: SalesAnalytics;

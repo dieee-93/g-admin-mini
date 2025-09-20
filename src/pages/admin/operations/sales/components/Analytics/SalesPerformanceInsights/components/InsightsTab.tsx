@@ -6,9 +6,9 @@ import {
   Badge,
   Button,
   Grid,
-  CardWrapper,
   Box
 } from '@chakra-ui/react';
+import { CardWrapper } from '@/shared/ui';
 import type { PerformanceInsight } from '../types';
 
 interface InsightsTabProps {
@@ -56,8 +56,8 @@ export const InsightsTab: React.FC<InsightsTabProps> = ({
           const TrendIcon = getTrendIcon(insight.trend);
 
           return (
-            <CardWrapper .Root key={index} variant="outline">
-              <CardWrapper .Body p={4}>
+            <CardWrapper key={index} variant="outline">
+              <CardWrapper.Body p={4}>
                 <VStack align="stretch" gap={3}>
                   <HStack justify="space-between">
                     <Badge colorPalette={getTypeColor(insight.type)} size="sm">
@@ -99,8 +99,8 @@ export const InsightsTab: React.FC<InsightsTabProps> = ({
                     </Badge>
                   )}
                 </VStack>
-              </CardWrapper .Body>
-            </CardWrapper .Root>
+              </CardWrapper.Body>
+            </CardWrapper>
           )
         })}
       </Grid>

@@ -427,39 +427,32 @@ import * as UI from '@/shared/ui'
 
 ---
 
-## 🎯 **Ejemplos Reales de Implementación**
+## 🎯 **Ejemplos de Implementación - REFERENCIA**
 
-### **Página Completa con Design System v2.0**
+⚠️ **IMPORTANTE**: Para **ejemplos completos de construcción de módulos** ver:
+`/docs/05-development/UI_MODULE_CONSTRUCTION_MASTER_GUIDE.md`
+
+### **Design System v2.0 - Componentes Base**
+
+Este documento se enfoca en **componentes individuales** del Design System.
+Para **plantillas completas de módulos**, usar el master guide que incluye:
+
+- ✅ **3 plantillas específicas** por tipo de módulo
+- ✅ **Código real verificado** del proyecto
+- ✅ **Patterns de consistencia** cross-módulo
+- ✅ **Hook patterns obligatorios**
+
+### **Ejemplo Base Simplificado**
 
 ```tsx
-// src/pages/admin/settings/page.tsx
-import React from 'react';
-import { 
-  ContentLayout, PageHeader, StatsSection, 
-  Section, Button, Icon 
-} from '@/shared/ui';
-import { CogIcon } from '@heroicons/react/24/outline';
+// Solo muestra uso de componentes base del Design System
+import { ContentLayout, Section, StatsSection } from '@/shared/ui';
 
-export default function SettingsPage() {
+export default function ExampleUsage() {
   return (
-    <ContentLayout>
-      <PageHeader 
-        title="Configuración"
-        subtitle="Centro de comando · G-Admin"
-        icon={CogIcon}
-        actions={<Button>Guardar Cambios</Button>}
-      />
-      
-      <StatsSection>
-        {/* Contenido de métricas */}
-      </StatsSection>
-
-      <Section variant="elevated" title="Business Profile">
-        <BusinessProfileForm />
-      </Section>
-      
-      <Section variant="default" title="Tax Configuration">
-        <TaxConfigForm />
+    <ContentLayout spacing="normal">
+      <Section variant="elevated" title="Component Example">
+        {/* Contenido usando componentes del Design System */}
       </Section>
     </ContentLayout>
   );

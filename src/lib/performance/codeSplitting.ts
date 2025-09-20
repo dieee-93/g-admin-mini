@@ -50,7 +50,7 @@ export const lazyComponents = {
   ),
   // Removed CrossModuleAnalytics features - consolidated into modern dashboard
   MaterialsGrid: createLazyFeature(
-    () => import('@/pages/admin/supply-chain/materials/components/MaterialManagement/MaterialsGrid'),
+    () => import('@/pages/admin/supply-chain/materials/components/MaterialsManagement/MaterialsGrid'),
     'MaterialsGrid'
   ),
   RecipeBasicForm: createLazyFeature(

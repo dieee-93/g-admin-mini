@@ -3,21 +3,21 @@ import { lazy, Suspense } from 'react';
 import { LazyWrapper, LazyFallback } from '@/lib/performance';
 
 // Lazy load the main component and sub-components
-const OfflineMaterialsPageHeader = lazy(() => 
-  import('./OfflineMaterialsPageHeader').then(module => ({ default: module.OfflineMaterialsPageHeader }))
+const OfflineMaterialsPageHeader = lazy(() =>
+  import('./OfflineMode/OfflineMaterialsPageHeader').then(module => ({ default: module.OfflineMaterialsPageHeader }))
 );
 
-const OfflineMaterialsStats = lazy(() => 
-  import('./OfflineMaterialsStats').then(module => ({ default: module.OfflineMaterialsStats }))
+const OfflineMaterialsStats = lazy(() =>
+  import('./OfflineMode/OfflineMaterialsStats').then(module => ({ default: module.OfflineMaterialsStats }))
 );
 
-const MaterialsInventoryGrid = lazy(() => 
-  import('./MaterialsInventoryGrid').then(module => ({ default: module.MaterialsInventoryGrid }))
+const MaterialsInventoryGrid = lazy(() =>
+  import('./MaterialsList').then(module => ({ default: module.MaterialsList }))
 );
 
 // Main page component - will be loaded synchronously as entry point
-export const LazyOfflineMaterialsPage = lazy(() => 
-  import('./OfflineMaterialsPage').then(module => ({ 
+export const LazyOfflineMaterialsPage = lazy(() =>
+  import('./OfflineMode/OfflineMaterialsPage').then(module => ({ 
     default: ({ ...props }) => {
       const OriginalComponent = module.OfflineMaterialsPage;
       return (

@@ -4,12 +4,12 @@ import {
   VStack,
   HStack,
   Text,
-  Input,
   Textarea,
   Select,
   createListCollection,
   Grid
 } from '@chakra-ui/react';
+import { InputField } from '@/shared/ui';
 import { type InventoryItem } from '@/modules/materials/types';
 
 interface RecipeBasicInfo {
@@ -60,7 +60,7 @@ export function RecipeBasicForm({
       <Grid templateColumns={{ base: "1fr", md: "2fr 1fr 1fr" }} gap={4}>
         <Box>
           <Text fontSize="sm" color="gray.600" mb={1}>Nombre de la receta</Text>
-          <Input
+          <InputField
             placeholder="Ej: Pan integral casero"
             name="name"
             value={form.name}
@@ -111,7 +111,7 @@ export function RecipeBasicForm({
           <Text fontSize="sm" color="gray.600" mb={1}>
             Cantidad{selectedOutputItem ? ` (${selectedOutputItem.unit})` : ''}
           </Text>
-          <Input
+          <InputField
             placeholder="Cantidad"
             name="output_quantity"
             type="number"
@@ -137,7 +137,7 @@ export function RecipeBasicForm({
         <Grid templateColumns={{ base: "1fr", md: "1fr 3fr" }} gap={4} w="full">
           <Box>
             <Text fontSize="sm" color="gray.600" mb={1}>Tiempo de preparación (min)</Text>
-            <Input
+            <InputField
               placeholder="Ej: 120"
               name="preparation_time"
               type="number"

@@ -30,7 +30,7 @@ export const MaterialsHeader = ({ onAddItem, onShowAnalytics }: MaterialsHeaderP
         <CardGrid columns={{ base: 1, md: 5 }}>
           <MetricCard 
             title="Total Items"
-            value={stats.totalItems.toString()}
+            value={stats.totalItems?.toString()}
             icon={CubeIcon}
           />
           <MetricCard 
@@ -40,7 +40,7 @@ export const MaterialsHeader = ({ onAddItem, onShowAnalytics }: MaterialsHeaderP
           />
           <MetricCard 
             title="Stock Bajo"
-            value={stats.lowStockCount.toString()}
+            value={stats.lowStockCount?.toString()}
             icon={ExclamationTriangleIcon}
             colorPalette={stats.lowStockCount > 0 ? "orange" : undefined}
             badge={stats.lowStockCount > 0 ? (
@@ -51,7 +51,7 @@ export const MaterialsHeader = ({ onAddItem, onShowAnalytics }: MaterialsHeaderP
           />
           <MetricCard 
             title="Stock Crítico"
-            value={stats.criticalStockCount.toString()}
+            value={stats.criticalStockCount?.toString()}
             icon={ExclamationTriangleIcon}
             colorPalette={stats.criticalStockCount > 0 ? "red" : undefined}
             badge={stats.criticalStockCount > 0 ? (
@@ -62,7 +62,7 @@ export const MaterialsHeader = ({ onAddItem, onShowAnalytics }: MaterialsHeaderP
           />
           <MetricCard 
             title="Sin Stock"
-            value={stats.outOfStockCount.toString()}
+            value={stats.outOfStockCount?.toString()}
             icon={ExclamationTriangleIcon}
             colorPalette={stats.outOfStockCount > 0 ? "red" : undefined}
             badge={stats.outOfStockCount > 0 ? (

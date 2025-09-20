@@ -1,10 +1,10 @@
 import {
   Box,
   Grid,
-  Input,
   Text,
   Select,
 } from '@chakra-ui/react';
+import { InputField } from '@/shared/ui';
 import type { ChangeEvent } from 'react';
 import type { InventoryItem } from '@/pages/admin/supply-chain/materials/types';
 
@@ -43,7 +43,7 @@ export const RecipeFormBasicInfo: React.FC<RecipeFormBasicInfoProps> = ({
           <Text fontSize="sm" color="gray.600" mb={1}>
             Nombre de la receta
           </Text>
-          <Input
+          <InputField
             placeholder="Ej: Pan integral casero"
             name="name"
             value={form.name}
@@ -98,7 +98,7 @@ export const RecipeFormBasicInfo: React.FC<RecipeFormBasicInfoProps> = ({
           <Text fontSize="sm" color="gray.600" mb={1}>
             Cantidad{selectedOutputItem ? ` (${selectedOutputItem.unit})` : ''}
           </Text>
-          <Input
+          <InputField
             placeholder="Cantidad"
             name="output_quantity"
             type="number"

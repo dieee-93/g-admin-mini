@@ -2,11 +2,20 @@
 // API functions para el módulo inventory
 
 import { supabase } from '@/lib/supabase/client';
+import { MaterialsMockService } from './materialsMockService';
 import type { InventoryItem, StockEntry } from '../types';
+import type { MaterialItem } from '../types/materialTypes';
+
+// ✅ DEVELOPMENT FLAG - Use mock data in development
+const USE_MOCK_DATA = process.env.NODE_ENV === 'development' || true; // Force mock for now
 
 export const inventoryApi = {
   // Items
-  async getItems(): Promise<InventoryItem[]> {
+  async getItems(): Promise<MaterialItem[]> {
+    if (USE_MOCK_DATA) {
+      return MaterialsMockService.getItems();
+    }
+
     const { data, error } = await supabase
       .from('items')
       .select('*')
@@ -14,6 +23,21 @@ export const inventoryApi = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  async createMaterial(item: Partial<MaterialItem>): Promise<MaterialItem> {
+    if (USE_MOCK_DATA) {
+      return MaterialsMockService.createMaterial(item);
+    }
+
+    const { data, error } = await supabase
+      .from('items')
+      .insert([item])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   async createItem(item: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>): Promise<InventoryItem> {
@@ -27,7 +51,11 @@ export const inventoryApi = {
     return data;
   },
 
-  async getItem(id: string): Promise<InventoryItem> {
+  async getItem(id: string): Promise<MaterialItem | null> {
+    if (USE_MOCK_DATA) {
+      return MaterialsMockService.getItem(id);
+    }
+
     const { data, error } = await supabase
       .from('items')
       .select('*')
@@ -36,6 +64,40 @@ export const inventoryApi = {
 
     if (error) throw error;
     return data;
+  },
+
+  async updateStock(id: string, newStock: number): Promise<MaterialItem> {
+    if (USE_MOCK_DATA) {
+      return MaterialsMockService.updateStock(id, newStock);
+    }
+
+    const { data, error } = await supabase
+      .from('items')
+      .update({ stock: newStock, lastUpdated: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async bulkAction(action: string, itemIds: string[]): Promise<void> {
+    if (USE_MOCK_DATA) {
+      return MaterialsMockService.bulkAction(action, itemIds);
+    }
+
+    // Implement real bulk actions here
+    console.log('Bulk action:', action, itemIds);
+  },
+
+  async generateReport(): Promise<void> {
+    if (USE_MOCK_DATA) {
+      return MaterialsMockService.generateReport();
+    }
+
+    // Implement real report generation here
+    console.log('Generating report...');
   },
 
   async updateItem(id: string, updates: Partial<InventoryItem>): Promise<InventoryItem> {

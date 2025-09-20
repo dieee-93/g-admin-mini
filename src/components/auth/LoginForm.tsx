@@ -7,9 +7,7 @@ import {
   Separator,
   Heading,
 } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui/CardWrapper';
-import { Button } from '@/shared/ui/Button';
-import { InputField } from '@/shared/ui/InputField';
+import { CardWrapper, Button, InputField } from '@/shared/ui';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginFormProps {
@@ -117,7 +115,7 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
 
               <Button
                 type="submit"
-                colorPalette="brand"
+                colorPalette="green"
                 fullWidth
                 loading={isLoading}
               >

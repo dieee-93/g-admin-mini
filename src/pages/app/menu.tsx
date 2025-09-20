@@ -10,9 +10,9 @@ import {
   Button,
   Grid,
   Badge,
-  Input,
   Tabs
 } from '@chakra-ui/react';
+import { CardWrapper, Icon, InputField } from '@/shared/ui';
 import {
   ShoppingBagIcon,
   MagnifyingGlassIcon,
@@ -20,8 +20,7 @@ import {
   PlusIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
-import { CardWrapper } from '@/shared/ui';
+
 // Tipos para productos
 interface Product {
   id: string;
@@ -93,7 +92,7 @@ function MenuFilters({ searchTerm, onSearchChange, selectedCategory, onCategoryC
     <VStack align="stretch" gap="4">
       {/* Búsqueda */}
       <Box position="relative">
-        <Input
+        <InputField
           placeholder="Buscar productos..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}

@@ -1,4 +1,4 @@
 export * from './conversions';
-export * from './stockCalculations';
+// Note: stockCalculations moved to @/business-logic/inventory/stockCalculation
 export * from './measurementTypes';
 export * from './formCalculations';

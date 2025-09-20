@@ -5,10 +5,10 @@
 
 import { useEffect, useCallback, useMemo } from 'react';
 import { useMaterials } from './useMaterials';
-import { useStockAlerts } from '@/shared/alerts/hooks/useAlerts';
+import { useAlerts } from '@/shared/alerts/hooks/useAlerts';
 import { useAlertsContext } from '@/shared/alerts/AlertsProvider';
-import { ABCAnalysisEngine } from '@/pages/admin/supply-chain/inventory/abcAnalysisEngine';
-import { SmartAlertsAdapter } from '@/pages/admin/supply-chain/inventory/smartAlertsAdapter';
+import { ABCAnalysisEngine } from '@/pages/admin/supply-chain/materials/services/abcAnalysisEngine';
+import { SmartAlertsAdapter } from '@/pages/admin/supply-chain/materials/services/smartAlertsAdapter';
 import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import type { Alert } from '@/shared/alerts/types';
 
@@ -85,14 +85,14 @@ export function useSmartInventoryAlerts(
 
   // Hooks dependencies
   const { items: materialItems, loading: materialsLoading } = useMaterials();
-  const { 
-    alerts: stockAlerts, 
+  const {
+    alerts: stockAlerts,
     loading: alertsLoading,
     actions: alertActions,
     activeCount,
     criticalCount,
     ui: alertsUI
-  } = useStockAlerts();
+  } = useAlerts({ context: 'materials' });
   const alertsContext = useAlertsContext();
 
   // State para controlar la generación de alertas

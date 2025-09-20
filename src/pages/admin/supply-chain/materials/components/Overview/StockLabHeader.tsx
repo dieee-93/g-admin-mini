@@ -1,16 +1,15 @@
-import React from 'react';
 import {
   Box,
   Flex,
   HStack,
   VStack,
   Text,
-  Input,
   IconButton,
   Button,
   Badge,
   useBreakpointValue
 } from '@chakra-ui/react';
+import { InputField } from '@/shared/ui';
 import { MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/solid';
 import { FunnelIcon } from '@heroicons/react/24/outline';
 import { useMaterials } from '@/store/materialsStore';
@@ -21,7 +20,7 @@ interface Props {
   onOpenFilters?: () => void;
 }
 
-export default function StockLabHeader({ onAddItem = () => {}, onShowAnalytics, onOpenFilters }: Props) {
+export function StockLabHeader({ onAddItem = () => {}, onShowAnalytics, onOpenFilters }: Props) {
   const { stats } = useMaterials();
   const showFullStats = useBreakpointValue({ base: false, md: true });
 
@@ -58,7 +57,7 @@ export default function StockLabHeader({ onAddItem = () => {}, onShowAnalytics, 
 
           <HStack w={{ base: '140px', md: '320px' }} display={{ base: 'none', md: 'flex' }} bg="surface.100" p={2} borderRadius="md" gap={2}>
             <MagnifyingGlassIcon className="w-4 h-4 text-gray-400" />
-            <Input
+            <InputField
               variant="subtle"
               placeholder="Buscar material, categoría..."
               size="md"
@@ -96,3 +95,5 @@ export default function StockLabHeader({ onAddItem = () => {}, onShowAnalytics, 
     </Box>
   );
 }
+
+export default StockLabHeader;

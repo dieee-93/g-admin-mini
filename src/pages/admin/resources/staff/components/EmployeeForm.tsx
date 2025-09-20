@@ -6,7 +6,7 @@ import {
   Text,
   Button,
   CardWrapper,
-  Input,
+  InputField,
   Modal,
   Alert,
   Icon
@@ -141,7 +141,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                     <HStack gap="4">
                       <VStack align="stretch" flex="1">
                         <Text fontSize="sm" fontWeight="medium">Nombre *</Text>
-                        <Input
+                        <InputField
                           required
                           value={formData.first_name}
                           onChange={(e) => handleInputChange('first_name', e.target.value)}
@@ -150,7 +150,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                       </VStack>
                       <VStack align="stretch" flex="1">
                         <Text fontSize="sm" fontWeight="medium">Apellido *</Text>
-                        <Input
+                        <InputField
                           required
                           value={formData.last_name}
                           onChange={(e) => handleInputChange('last_name', e.target.value)}
@@ -161,7 +161,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
 
                     <VStack align="stretch">
                       <Text fontSize="sm" fontWeight="medium">Email *</Text>
-                      <Input
+                      <InputField
                         type="email"
                         required
                         value={formData.email}
@@ -172,7 +172,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
 
                     <VStack align="stretch">
                       <Text fontSize="sm" fontWeight="medium">Teléfono</Text>
-                      <Input
+                      <InputField
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
@@ -192,7 +192,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                     <HStack gap="4">
                       <VStack align="stretch" flex="1">
                         <Text fontSize="sm" fontWeight="medium">Posición *</Text>
-                        <Input
+                        <InputField
                           required
                           value={formData.position}
                           onChange={(e) => handleInputChange('position', e.target.value)}
@@ -219,7 +219,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                     <HStack gap="4">
                       <VStack align="stretch" flex="1">
                         <Text fontSize="sm" fontWeight="medium">Fecha de Contratación *</Text>
-                        <Input
+                        <InputField
                           type="date"
                           required
                           value={formData.hire_date}
@@ -245,7 +245,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                     <HStack gap="4">
                       <VStack align="stretch" flex="1">
                         <Text fontSize="sm" fontWeight="medium">Salario Mensual</Text>
-                        <Input
+                        <InputField
                           type="number"
                           min="0"
                           step="0.01"
@@ -256,7 +256,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                       </VStack>
                       <VStack align="stretch" flex="1">
                         <Text fontSize="sm" fontWeight="medium">Horas Semanales</Text>
-                        <Input
+                        <InputField
                           type="number"
                           min="1"
                           max="60"

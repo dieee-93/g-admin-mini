@@ -4,7 +4,7 @@
 
 import React from 'react';
 import {
-  ContentLayout, CardGrid, Box, Card, CardBody, SimpleGrid, Stack, Typography, Icon, Badge, Button,
+  ContentLayout, CardGrid, Box, SimpleGrid, Stack, Typography, Icon, Badge, Button,
   CardWrapper, Section, MetricCard
 } from '@/shared/ui';
 import {

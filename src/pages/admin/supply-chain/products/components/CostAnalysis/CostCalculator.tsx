@@ -60,7 +60,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
     const calc = currentCalculation;
     
     if (!calc.materials_cost || !calc.labor_hours || !calc.batch_size) {
-      notify.error('Please fill in all required fields');
+      notify.error({ title:'Please fill in all required fields' });
       return;
     }
 
@@ -145,13 +145,13 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
     onCalculationComplete(newCalculation);
     setCurrentCalculation({ batch_size: 1, labor_rate_per_hour: 15.00 });
     setLoading(false);
-    notify.success('Cost calculation completed successfully');
+    notify.success({title:'Cost calculation completed successfully'});
   };
 
   const exportCalculation = (calc: CostCalculation) => {
     const data = JSON.stringify(calc, null, 2);
     console.log('Exporting calculation:', data);
-    notify.success('Calculation exported to console');
+    notify.success( { title:'Calculation exported to console' } );
   };
 
   return (
@@ -163,7 +163,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
             <CalculatorIcon className="w-5 h-5 text-blue-600" />
             <Text fontSize="lg" fontWeight="semibold">Cost Calculation Input</Text>
           </HStack>
-        </CardWrapperHeader>
+        </CardWrapper.Header>
         <CardWrapper.Body>
           <VStack gap={4} align="stretch">
             {/* Product Info */}

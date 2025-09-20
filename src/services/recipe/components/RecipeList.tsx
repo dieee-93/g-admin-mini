@@ -9,9 +9,9 @@ import {
   VStack,
   Text,
   Alert,
-  Input,
   Spinner
 } from '@chakra-ui/react';
+import { InputField } from '@/shared/ui';
 import { useState } from 'react';
 import { useRecipes, useRecipeOperations } from '../hooks/useRecipes';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
@@ -316,7 +316,7 @@ export function RecipeList() {
                 
                 <Box>
                   <Text mb={2}>Número de lotes a producir:</Text>
-                  <Input
+                  <InputField
                     type="number"
                     min="1"
                     value={batches}

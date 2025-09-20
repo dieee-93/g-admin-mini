@@ -7,7 +7,7 @@ import {
   VStack,
   HStack,
   Text,
-  Input,
+
   Switch,
   Tabs,
   Avatar,
@@ -24,7 +24,7 @@ import {
   StarIcon,
   GiftIcon
 } from '@heroicons/react/24/outline';
-import { CardWrapper, Button, Icon } from '@/shared/ui';
+import { CardWrapper, Button, Icon, InputField  } from '@/shared/ui';
 
 // Componente de sección del perfil
 function ProfileSection() {
@@ -78,7 +78,7 @@ function ProfileSection() {
               <Text fontSize="sm" fontWeight="medium">
                 Nombre Completo
               </Text>
-              <Input
+              <InputField
                 value={profileData.fullName}
                 isReadOnly={!isEditing}
                 onChange={(e) => setProfileData(prev => ({ ...prev, fullName: e.target.value }))}
@@ -89,10 +89,10 @@ function ProfileSection() {
               <Text fontSize="sm" fontWeight="medium">
                 Email
               </Text>
-              <Input
+              <InputField
                 type="email"
                 value={profileData.email}
-                isReadOnly={!isEditing}
+                disabled={!isEditing}
                 onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
               />
             </VStack>
@@ -101,10 +101,10 @@ function ProfileSection() {
               <Text fontSize="sm" fontWeight="medium">
                 Teléfono
               </Text>
-              <Input
+              <InputField
                 type="tel"
                 value={profileData.phone}
-                isReadOnly={!isEditing}
+                disabled={!isEditing}
                 onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
               />
             </VStack>
@@ -113,7 +113,7 @@ function ProfileSection() {
               <Text fontSize="sm" fontWeight="medium">
                 Fecha de Nacimiento
               </Text>
-              <Input
+              <InputField
                 type="date"
                 value={profileData.birthday}
                 isReadOnly={!isEditing}

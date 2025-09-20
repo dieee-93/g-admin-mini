@@ -288,7 +288,7 @@ const OfflineFiscalView: React.FC = () => {
     <VStack gap="lg">
       {/* Offline Status Header */}
       <CardWrapper variant="outline" padding="md">
-        <CardWrapper .Body>
+        <CardWrapper.Body>
           <HStack justify="space-between" align="center">
             <HStack gap="md">
               <Badge 
@@ -343,14 +343,14 @@ const OfflineFiscalView: React.FC = () => {
               </Button>
             </HStack>
           </HStack>
-        </CardWrapper .Body>
+        </CardWrapper.Body>
       </CardWrapper>
 
       {/* Quick Stats */}
       {fiscalStats && (
         <SimpleGrid columns={{ base: 2, md: 4 }} gap="md">
           <CardWrapper variant="outline" padding="md">
-            <CardWrapper .Body>
+            <CardWrapper.Body>
               <VStack gap="sm">
                 <DocumentTextIcon className="w-8 h-8 text-blue-500" />
                 <Typography variant="title">
@@ -360,11 +360,11 @@ const OfflineFiscalView: React.FC = () => {
                   Facturas Pendientes
                 </Typography>
               </VStack>
-            </CardWrapper .Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
           <CardWrapper variant="outline" padding="md">
-            <CardWrapper .Body>
+            <CardWrapper.Body>
               <VStack gap="sm">
                 <CloudArrowUpIcon className="w-8 h-8 text-yellow-500" />
                 <Typography variant="title">
@@ -374,11 +374,11 @@ const OfflineFiscalView: React.FC = () => {
                   Cola AFIP
                 </Typography>
               </VStack>
-            </CardWrapper .Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
           <CardWrapper variant="outline" padding="md">
-            <CardWrapper .Body>
+            <CardWrapper.Body>
               <VStack gap="sm">
                 <BanknotesIcon className="w-8 h-8 text-green-500" />
                 <Typography variant="title">
@@ -388,11 +388,11 @@ const OfflineFiscalView: React.FC = () => {
                   Total Pendiente
                 </Typography>
               </VStack>
-            </CardWrapper .Body>
+            </CardWrapper.Body>
           </CardWrapper>
 
           <CardWrapper variant="outline" padding="md">
-            <CardWrapper .Body>
+            <CardWrapper.Body>
               <VStack gap="sm">
                 <ExclamationTriangleIcon className="w-8 h-8 text-red-500" />
                 <Typography variant="title">
@@ -402,7 +402,7 @@ const OfflineFiscalView: React.FC = () => {
                   Errores de Sync
                 </Typography>
               </VStack>
-            </CardWrapper .Body>
+            </CardWrapper.Body>
           </CardWrapper>
         </SimpleGrid>
       )}
@@ -418,7 +418,7 @@ const OfflineFiscalView: React.FC = () => {
 
       {/* Invoice Management */}
       <CardWrapper variant="outline" padding="md">
-        <CardWrapper .Body>
+        <CardWrapper.Body>
           <VStack gap="md">
             <HStack justify="space-between" align="center">
               <HStack gap="md">
@@ -448,7 +448,7 @@ const OfflineFiscalView: React.FC = () => {
                 
                 return (
                   <CardWrapper key={invoice.id} variant="outline" padding="sm">
-                    <CardWrapper .Body>
+                    <CardWrapper.Body>
                       <HStack justify="space-between">
                         <VStack align="start" gap="xs">
                           <HStack gap="sm">
@@ -513,7 +513,7 @@ const OfflineFiscalView: React.FC = () => {
                           )}
                         </VStack>
                       </HStack>
-                    </CardWrapper .Body>
+                    </CardWrapper.Body>
                   </CardWrapper>
                 );
               })}
@@ -527,7 +527,7 @@ const OfflineFiscalView: React.FC = () => {
               </VStack>
             )}
           </VStack>
-        </CardWrapper .Body>
+        </CardWrapper.Body>
       </CardWrapper>
     </VStack>
   );

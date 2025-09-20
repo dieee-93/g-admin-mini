@@ -235,7 +235,7 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
                 <CardWrapper>
                   <CardWrapper.Header>
                     <Text fontSize="lg" fontWeight="semibold">Ingredient Cost Breakdown</Text>
-                  </CardWrapper .Header>
+                  </CardWrapper.Header>
                   <CardWrapper.Body>
                     <Table.Root size="sm">
                       <Table.Header>

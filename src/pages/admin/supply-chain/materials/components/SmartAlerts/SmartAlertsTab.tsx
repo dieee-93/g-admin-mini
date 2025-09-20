@@ -9,12 +9,12 @@ import {
   HStack,
   Text,
   Button,
-  Input,
   SimpleGrid,
   Badge,
   IconButton,
   Progress
 } from '@chakra-ui/react';
+import { InputField } from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   FireIcon,
@@ -41,7 +41,7 @@ interface SmartAlertsTabProps {
   refreshInterval?: number;
 }
 
-const SmartAlertsTab: React.FC<SmartAlertsTabProps> = ({ 
+export const SmartAlertsTab: React.FC<SmartAlertsTabProps> = ({
   autoRefresh = true,
   refreshInterval = 300000 // 5 minutos
 }) => {
@@ -165,7 +165,7 @@ const SmartAlertsTab: React.FC<SmartAlertsTabProps> = ({
             
             {/* Filtros */}
             <HStack gap="4" flex="1">
-              <Input
+              <InputField
                 placeholder="Buscar alertas o materiales..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

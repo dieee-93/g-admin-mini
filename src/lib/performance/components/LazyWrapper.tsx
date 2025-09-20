@@ -93,8 +93,8 @@ export function LazyFallback({
   // Error state
   if (error) {
     return (
-      <CardWrapper .Root maxW="500px" mx="auto" mt="8">
-        <CardWrapper .Body p="6" textAlign="center">
+      <CardWrapper maxW="500px" mx="auto" mt="8">
+        <CardWrapper.Body p="6" textAlign="center">
           <VStack gap="4">
             <Icon icon={ExclamationTriangleIcon} size="xl" color="red.500" />
             
@@ -133,15 +133,15 @@ export function LazyFallback({
               </Button>
             </HStack>
           </VStack>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
     );
   }
 
   // Detailed loading state
   return (
-    <CardWrapper .Root maxW="500px" mx="auto" mt="8">
-      <CardWrapper .Body p="6">
+    <CardWrapper maxW="500px" mx="auto" mt="8">
+      <CardWrapper.Body p="6">
         <VStack gap="4" align="stretch">
           {/* Loading header */}
           <HStack justify="center" gap="3">
@@ -193,8 +193,8 @@ export function LazyFallback({
             </Alert.Root>
           )}
         </VStack>
-      </CardWrapper .Body>
-    </CardWrapper .Root>
+      </CardWrapper.Body>
+    </CardWrapper>
   );
 }
 
@@ -454,8 +454,8 @@ export function LazyLoadingMonitor() {
       maxW="320px"
       shadow="lg"
     >
-      <CardWrapper .Root>
-        <CardWrapper .Body p="4">
+      <CardWrapper>
+        <CardWrapper.Body p="4">
         <VStack gap="4" align="stretch">
           <HStack justify="space-between" align="center">
             <Text fontWeight="semibold">Lazy Loading Performance</Text>
@@ -548,8 +548,8 @@ export function LazyLoadingMonitor() {
             </VStack>
           )}
         </VStack>
-      </CardWrapper .Body>
-    </CardWrapper .Root>
+      </CardWrapper.Body>
+    </CardWrapper>
     </Box>
   );
 }

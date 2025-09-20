@@ -5,7 +5,7 @@ import {
   Grid,
 } from '@chakra-ui/react';
 import { CardWrapper } from '@/shared/ui';
-import type { SalesAnalytics } from '../../../../../types';
+import type { SalesAnalytics } from '../../../../types';
 
 interface PeakHoursAnalysisProps {
   analytics: SalesAnalytics;

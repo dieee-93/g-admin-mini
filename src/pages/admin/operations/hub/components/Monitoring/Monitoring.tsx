@@ -1,8 +1,9 @@
 // Monitoring Section for real-time metrics and alerts
 import React from "react";
 import {
+  Icon,
   Stack,
-  CardWrapper ,
+  CardWrapper,
   Grid,
   Typography,
   Badge
@@ -13,7 +14,6 @@ import {
   CheckCircleIcon,
   ClockIcon
 } from "@heroicons/react/24/outline";
-import { Icon } from "@/shared/ui/Icon";
 
 export default function Monitoring() {
   const metrics = [

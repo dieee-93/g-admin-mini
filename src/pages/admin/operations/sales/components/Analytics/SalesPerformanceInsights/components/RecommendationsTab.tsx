@@ -6,8 +6,8 @@ import {
   Badge,
   Grid,
   Alert,
-  CardWrapper,
 } from '@chakra-ui/react';
+import { CardWrapper } from '@/shared/ui';
 import {
   BoltIcon,
   FireIcon,
@@ -24,8 +24,8 @@ interface RecommendationsTabProps {
 export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ performance }) => {
   return (
     <VStack align="stretch" gap={6}>
-      <CardWrapper .Root bg="gradient-to-r from-blue-500 to-purple-600" color="white">
-        <CardWrapper .Body p={6}>
+      <CardWrapper bg="gradient-to-r from-blue-500 to-purple-600" color="white">
+        <CardWrapper.Body p={6}>
           <VStack align="center" gap={4}>
             <BoltIcon className="w-12 h-12" />
             <Text fontSize="2xl" fontWeight="bold" textAlign="center">
@@ -35,18 +35,18 @@ export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ performa
               Prioritized recommendations to optimize your business performance
             </Text>
           </VStack>
-        </CardWrapper .Body>
-      </CardWrapper .Root>
+        </CardWrapper.Body>
+      </CardWrapper>
 
       <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={6}>
-        <CardWrapper .Root borderTop="4px solid" borderTopColor="red.400">
-          <CardWrapper .Header>
+        <CardWrapper borderTop="4px solid" borderTopColor="red.400">
+          <CardWrapper.Header>
             <HStack gap={2}>
               <FireIcon className="w-5 h-5 text-red-500" />
               <Text fontWeight="semibold" color="red.600">Immediate Actions</Text>
             </HStack>
-          </CardWrapper .Header>
-          <CardWrapper .Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <VStack align="stretch" gap={3}>
               {performance.recommendations.immediate_actions.map((action, index) => (
                 <HStack key={index} gap={3} align="start">
@@ -55,17 +55,17 @@ export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ performa
                 </HStack>
               ))}
             </VStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
-        <CardWrapper .Root borderTop="4px solid" borderTopColor="blue.400">
-          <CardWrapper .Header>
+        <CardWrapper borderTop="4px solid" borderTopColor="blue.400">
+          <CardWrapper.Header>
             <HStack gap={2}>
               <ChartBarIcon className="w-5 h-5 text-blue-500" />
               <Text fontWeight="semibold" color="blue.600">Strategic Initiatives</Text>
             </HStack>
-          </CardWrapper .Header>
-          <CardWrapper .Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <VStack align="stretch" gap={3}>
               {performance.recommendations.strategic_initiatives.map((initiative, index) => (
                 <HStack key={index} gap={3} align="start">
@@ -74,17 +74,17 @@ export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ performa
                 </HStack>
               ))}
             </VStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
 
-        <CardWrapper .Root borderTop="4px solid" borderTopColor="green.400">
-          <CardWrapper .Header>
+        <CardWrapper borderTop="4px solid" borderTopColor="green.400">
+          <CardWrapper.Header>
             <HStack gap={2}>
               <TrophyIcon className="w-5 h-5 text-green-500" />
               <Text fontWeight="semibold" color="green.600">Long-term Goals</Text>
             </HStack>
-          </CardWrapper .Header>
-          <CardWrapper .Body>
+          </CardWrapper.Header>
+          <CardWrapper.Body>
             <VStack align="stretch" gap={3}>
               {performance.recommendations.long_term_goals.map((goal, index) => (
                 <HStack key={index} gap={3} align="start">
@@ -93,8 +93,8 @@ export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ performa
                 </HStack>
               ))}
             </VStack>
-          </CardWrapper .Body>
-        </CardWrapper .Root>
+          </CardWrapper.Body>
+        </CardWrapper>
       </Grid>
 
       <Alert.Root status="info">

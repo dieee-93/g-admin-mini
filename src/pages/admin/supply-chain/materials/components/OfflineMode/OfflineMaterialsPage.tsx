@@ -15,3 +15,5 @@ export function OfflineMaterialsPage() {
     </Section>
   );
 }
+
+export default OfflineMaterialsPage;

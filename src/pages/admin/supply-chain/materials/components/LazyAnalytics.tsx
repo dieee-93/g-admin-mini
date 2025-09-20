@@ -2,8 +2,8 @@ import { lazy, Suspense } from 'react';
 import { Box, Spinner, VStack, Text } from '@chakra-ui/react';
 
 // Lazy load analytics components
-const ABCAnalysisPage = lazy(() => import('./ABCAnalysisPage'));
-const ABCAnalysisSection = lazy(() => import('./analytics/ABCAnalysisSection'));
+// ABCAnalysisPage component doesn't exist - removing broken import
+const ABCAnalysisSection = lazy(() => import('./Analytics/ABCAnalysisSection'));
 
 // Loading fallback for analytics
 const AnalyticsLoadingFallback = () => (
@@ -22,14 +22,7 @@ const AnalyticsLoadingFallback = () => (
   </Box>
 );
 
-/**
- * Lazy-loaded ABC Analysis Page
- */
-export const LazyABCAnalysisPage = () => (
-  <Suspense fallback={<AnalyticsLoadingFallback />}>
-    <ABCAnalysisPage />
-  </Suspense>
-);
+// LazyABCAnalysisPage removed - ABCAnalysisPage component doesn't exist
 
 /**
  * Lazy-loaded ABC Analysis Section
@@ -41,6 +34,5 @@ export const LazyABCAnalysisSection = () => (
 );
 
 export default {
-  LazyABCAnalysisPage,
   LazyABCAnalysisSection
 };

@@ -92,7 +92,7 @@ export function UserPermissionsSection() {
     <Section variant="elevated" title="Permisos de Usuario">
       <Stack direction={{ base: "column", sm: "row" }} justify="space-between" align={{ base: "stretch", sm: "center" }} gap="md" mb="xl">
         <div />
-        <Button colorPalette="success" size="sm">
+        <Button colorPalette="green" size="sm">
           <Icon icon={UserGroupIcon} size="sm" />
           Invitar Usuario
         </Button>

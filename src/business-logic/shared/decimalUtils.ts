@@ -591,3 +591,32 @@ export class DecimalUtils {
     return FinancialDecimal.max(MIN_SAFE, FinancialDecimal.min(MAX_SAFE, dec));
   }
 }
+
+// ============================================================================
+// HELPER FUNCTIONS FOR EASIER IMPORTS
+// ============================================================================
+
+/**
+ * Helper functions for direct import usage
+ * These wrap the DecimalUtils static methods for convenience
+ */
+export const formatCurrency = (value: DecimalInput, decimals: number = 2): string =>
+  DecimalUtils.formatCurrency(value, decimals);
+
+export const formatPercentage = (value: DecimalInput, decimals: number = 2): string =>
+  DecimalUtils.formatPercentage(value, decimals);
+
+export const formatQuantity = (value: DecimalInput, unit: string, decimals: number = 2): string =>
+  DecimalUtils.formatQuantity(value, unit, decimals);
+
+export const safeAdd = (values: DecimalInput[], domain?: 'tax' | 'inventory' | 'financial' | 'recipe') =>
+  values.reduce((sum, value) => DecimalUtils.add(sum, value, domain), DecimalUtils.fromValue(0, domain));
+
+export const safeSubtract = (a: DecimalInput, b: DecimalInput, domain?: 'tax' | 'inventory' | 'financial' | 'recipe') =>
+  DecimalUtils.subtract(a, b, domain);
+
+export const safeMultiply = (a: DecimalInput, b: DecimalInput, domain?: 'tax' | 'inventory' | 'financial' | 'recipe') =>
+  DecimalUtils.multiply(a, b, domain);
+
+export const safeDivide = (a: DecimalInput, b: DecimalInput, domain?: 'tax' | 'inventory' | 'financial' | 'recipe') =>
+  DecimalUtils.divide(a, b, domain);

@@ -10,7 +10,7 @@ import {
 } from '@/shared/ui';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { useState, useMemo } from 'react';
-import { useCustomers } from '../hooks/useCustomers';
+import { useCustomers } from '../../hooks/existing/useCustomers';
 import type { CustomerWithStats } from '../../types';
 
 interface CustomerSegment {

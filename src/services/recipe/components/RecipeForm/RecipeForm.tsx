@@ -12,7 +12,6 @@ import {
   Badge,
   Select,
   createListCollection,
-  CardWrapper ,
   Alert,
   IconButton,
   Tabs,
@@ -23,7 +22,7 @@ import {
   NumberInput
 } from '@chakra-ui/react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Icon } from '@/shared/ui';
+import { Icon, InputField, CardWrapper } from '@/shared/ui';
 import {
   LightBulbIcon,
   SparklesIcon,
@@ -38,15 +37,14 @@ import {
 import { useRecipes } from '@/shared/components'; 
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { inventoryApi } from '@/pages/admin/supply-chain/materials/services/inventoryApi';
-import { StockCalculation } from '@/pages/admin/supply-chain/inventory/stockCalculation';
-import { type InventoryItem } from '@/pages/admin/supply-chain/materials/types';
+import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
+import { type InventoryItem } from '@/lib/ml/inventory/PredictiveInventory'; 
 import { type CreateRecipeData } from '@/shared/components'; 
 import { RecipeFormBasicInfo } from './form-parts/RecipeFormBasicInfo';
-import { RecipeFormAISuggestions } from './form-parts/RecipeFormAISuggestions';
+import { RecipeFormAISuggestions } from './form-parts/RecipeFormAiSuggestions';
 import { RecipeFormIngredients } from './form-parts/RecipeFormIngredients';
 
 // Import event system
-import { EventBus } from '@/lib/events';
 import { EventBus } from '@/lib/events';
 
 interface FormErrors {
@@ -463,7 +461,7 @@ export function RecipeForm() {
           <Grid templateColumns={{ base: "1fr", md: "1fr 3fr" }} gap={4}>
             <Box>
               <Text fontSize="sm" color="gray.600" mb={1}>Tiempo de preparación (min)</Text>
-              <Input
+              <InputField
                 placeholder="Ej: 120"
                 name="preparation_time"
                 type="number"

@@ -2,7 +2,6 @@
 import {
   Box,
   Button,
-  Input,
   Textarea,
   Text,
   NumberInput,
@@ -24,7 +23,7 @@ import { useRecipes } from '../hooks/useRecipes';
 import { MaterialSelector } from '@/shared/components/MaterialSelector';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
 import type { Recipe } from '../types';
-import { CardWrapper, Stack, Icon } from '@/shared/ui';
+import { CardWrapper, Stack, Icon, InputField } from '@/shared/ui';
 interface RecipeFormProps {
   recipe?: Recipe;
   onSave?: (recipe: Recipe) => void;
@@ -362,7 +361,7 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
                 <Text fontSize="sm" fontWeight="medium" mb="2">
                   Nombre de la receta *
                 </Text>
-                <Input
+                <InputField
                   value={form.name}
                   onChange={(e) => handleFormChange('name', e.target.value)}
                   placeholder="ej. Hamburguesa Clásica"

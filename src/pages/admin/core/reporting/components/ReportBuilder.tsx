@@ -4,15 +4,15 @@ import {
   HStack,
   Text,
   Badge,
+  Box,
   SimpleGrid,
-  Input,
   Textarea,
   Select,
 } from '@chakra-ui/react';
 import {
   PlusIcon,
 } from '@heroicons/react/24/outline';
-import { CardWrapper, Button } from '@/shared/ui';
+import { CardWrapper, Button, InputField } from '@/shared/ui';
 import { type ReportTemplate } from '../types';
 import { CATEGORY_COLLECTION } from './constants/collections'; 
 
@@ -65,7 +65,7 @@ export function ReportBuilder({}: ReportBuilderProps) {
             <VStack gap={4} align="stretch">
               <Box>
                 <Text fontSize="sm" color="gray.700" mb={1}>Nombre del Reporte</Text>
-                <Input
+                <InputField
                   placeholder="Ej: Dashboard de Ventas Mensual"
                   value={newReport.name || ''}
                   onChange={(e) => setNewReport(prev => ({ ...prev, name: e.target.value }))}
