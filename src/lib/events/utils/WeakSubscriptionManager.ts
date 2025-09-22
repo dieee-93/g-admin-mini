@@ -84,7 +84,7 @@ export class WeakSubscriptionManager {
     this.stats.totalSubscriptions++;
     this.stats.activeSubscriptions++;
     
-    SecurityLogger.anomaly('Weak subscription added', {
+    SecurityLogger.info('Weak subscription added', {
       subscriptionId: subscription.id,
       pattern: subscription.pattern,
       moduleId: subscription.moduleId

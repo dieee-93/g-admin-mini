@@ -319,7 +319,7 @@ export class RealtimeIntegration {
       await localStorage.set('offline_orders', data.orderId, resolved);
     }
 
-    EventBus.emit('sales.order.updated'_REALTIME, data);
+    EventBus.emit('sales.order.updated_REALTIME', data);
   }
 
   private async handleOrderStatusChanged(data: OrderUpdate): Promise<void> {
@@ -333,7 +333,7 @@ export class RealtimeIntegration {
       await localStorage.set('offline_orders', data.orderId, localOrder);
     }
 
-    EventBus.emit('sales.order.status_changed'_REALTIME, data);
+    EventBus.emit('sales.order.status_changed_REALTIME', data);
     
     // Show status change notification
     const statusLabels = {
@@ -360,7 +360,7 @@ export class RealtimeIntegration {
       await localStorage.set('offline_inventory_items', data.itemId, resolved);
     }
 
-    EventBus.emit('inventory.updated'_REALTIME, data);
+    EventBus.emit('inventory.updated_REALTIME', data);
     
     // Show critical stock alerts
     if (data.field === 'stock' && data.newValue <= 5) {

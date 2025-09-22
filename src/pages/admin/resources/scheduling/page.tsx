@@ -1,53 +1,76 @@
-// SchedulingPage.tsx - Pure Orchestrator Pattern
-// Following G-Admin Mini architecture standards
+// SchedulingPage.tsx - Enterprise Module Following G-Admin Mini v2.1
+// Migrated to Design System v2.1 and Business Template
 
 import React from 'react';
 
-// Design System Components
+// ✅ DESIGN SYSTEM V2.1 - IMPORTS OBLIGATORIOS
 import {
-  // Layout & Structure
-  Stack,
-  VStack,
-  HStack,
-
-  // Typography
-  Typography,
-
-  // Components
-  CardWrapper,
-  Badge,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  SimpleGrid
+  ContentLayout, Section, Button, Alert, Icon
 } from '@/shared/ui';
 
-import { Icon } from '@/shared/ui';
+// ✅ ICONOS HEROICONS
 import {
-  CalendarIcon,
-  ClockIcon,
-  UsersIcon,
-  CurrencyDollarIcon,
-  UserMinusIcon
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
-// Hooks
+// ✅ 13 SISTEMAS INTEGRADOS
+import { useModuleIntegration } from '@/hooks/useModuleIntegration';
+import { CapabilityGate } from '@/lib/capabilities';
+import { useErrorHandler } from '@/lib/error-handling';
+import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
+import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
+import { useNavigation } from '@/contexts/NavigationContext';
+
+// ✅ HOOKS ESPECIALIZADOS
 import { useSchedulingPage } from './hooks';
 
-// Components
+// ✅ COMPONENTES ESPECIALIZADOS ENTERPRISE v2.1
 import {
-  WeeklyScheduleView,
-  TimeOffManager,
-  CoveragePlanner,
-  LaborCostTracker,
-  RealTimeLaborTracker,
+  SchedulingMetrics,
+  SchedulingManagement,
+  SchedulingActions,
+  SchedulingAlerts,
   AutoSchedulingModal
 } from './components';
 
+// ✅ MODULE CONFIGURATION
+const SCHEDULING_MODULE_CONFIG = {
+  capabilities: ['schedule_management', 'approve_timeoff', 'view_labor_costs'],
+  events: {
+    emits: [
+      'scheduling.schedule_updated',
+      'scheduling.overtime_alert',
+      'scheduling.coverage_gap',
+      'scheduling.shift_confirmed'
+    ],
+    listens: [
+      'staff.availability_updated',
+      'sales.volume_forecast',
+      'hr.rate_updated'
+    ]
+  },
+  eventHandlers: {
+    'staff.availability_updated': (data: any) => {
+      console.log('♻️ Scheduling: Staff availability changed, recalculating...', data);
+    },
+    'sales.volume_forecast': (data: any) => {
+      console.log('📊 Scheduling: Sales forecast updated, adjusting staffing...', data);
+    },
+    'hr.rate_updated': (data: any) => {
+      console.log('💰 Scheduling: Labor rates updated, recalculating costs...', data);
+    }
+  }
+} as const;
+
 export default function SchedulingPage() {
-  // All logic delegated to the orchestrator hook
+  // ✅ SISTEMAS INTEGRATION
+  const { emitEvent, hasCapability, status } = useModuleIntegration('scheduling', SCHEDULING_MODULE_CONFIG);
+  const { handleError } = useErrorHandler();
+  const { isOnline } = useOfflineStatus();
+  const { shouldReduceAnimations } = usePerformanceMonitor();
+  const { isMobile } = useNavigation();
+
+  // ✅ PAGE ORCHESTRATION
   const {
     viewState,
     schedulingStats,
@@ -55,181 +78,119 @@ export default function SchedulingPage() {
     handleTabChange,
     setViewState,
     setIsAutoSchedulingOpen,
-    handleScheduleGenerated
+    handleScheduleGenerated,
+    loading,
+    error
   } = useSchedulingPage();
 
+  // Debug logs removed to prevent console spam
+
+  // ✅ ERROR HANDLING
+  if (error) {
+    return (
+      <ContentLayout spacing="normal">
+        <Alert status="error" title="Error de carga del módulo">
+          {error}
+        </Alert>
+        <Button onClick={() => window.location.reload()}>
+          <Icon icon={ArrowPathIcon} size="sm" />
+          Recargar página
+        </Button>
+      </ContentLayout>
+    );
+  }
+
   return (
-    <Stack gap="lg" align="stretch">
-      {/* Header with KPIs - Using hook data */}
-      <CardWrapper variant="elevated" padding="md">
-        <CardWrapper.Body>
-          <VStack gap="md" align="start">
-            <HStack gap="sm">
-              <Icon icon={CalendarIcon} size="lg" color="blue.600" />
-              <VStack align="start" gap="xs">
-                <HStack gap="sm">
-                  <Typography variant="title">Staff Scheduling</Typography>
-                  <Badge colorPalette="blue">Week View</Badge>
-                  {schedulingStats.understaffed_shifts > 0 && (
-                    <Badge colorPalette="error">
-                      {schedulingStats.understaffed_shifts} Understaffed
-                    </Badge>
-                  )}
-                </HStack>
-                <Typography variant="body" color="text.muted">
-                  Manage employee schedules, time-off requests, and labor costs
-                </Typography>
-              </VStack>
-            </HStack>
+    <ContentLayout spacing="normal">
+      {/* 🔒 1. ESTADO DE CONEXIÓN - Solo si crítico */}
+      {!status.isActive && (
+        <Alert
+          variant="subtle"
+          title="Module Capabilities Required"
+          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
+        />
+      )}
 
-            {/* KPI Row */}
-            <SimpleGrid columns={{ base: 2, md: 4 }} gap="md" width="full">
-              <CardWrapper variant="outline" padding="sm">
-                <CardWrapper.Body textAlign="center">
-                  <Typography variant="display" color="blue.500">
-                    {schedulingStats.total_shifts_this_week}
-                  </Typography>
-                  <Typography variant="caption" color="text.muted">Shifts This Week</Typography>
-                </CardWrapper.Body>
-              </CardWrapper>
+      {!isOnline && (
+        <Alert variant="warning" title="Modo Offline">
+          Los cambios se sincronizarán cuando recuperes la conexión
+        </Alert>
+      )}
 
-              <CardWrapper variant="outline" padding="sm">
-                <CardWrapper.Body textAlign="center">
-                  <Typography variant="display" color="green.500">
-                    {schedulingStats.coverage_percentage}%
-                  </Typography>
-                  <Typography variant="caption" color="text.muted">Coverage Rate</Typography>
-                </CardWrapper.Body>
-              </CardWrapper>
-
-              <CardWrapper variant="outline" padding="sm">
-                <CardWrapper.Body textAlign="center">
-                  <Typography variant="display" color="orange.500">
-                    {schedulingStats.pending_time_off}
-                  </Typography>
-                  <Typography variant="caption" color="text.muted">Pending Requests</Typography>
-                </CardWrapper.Body>
-              </CardWrapper>
-
-              <CardWrapper variant="outline" padding="sm">
-                <CardWrapper.Body textAlign="center">
-                  <Typography variant="display" color="purple.500">
-                    ${schedulingStats.labor_cost_this_week.toLocaleString()}
-                  </Typography>
-                  <Typography variant="caption" color="text.muted">Labor Cost</Typography>
-                </CardWrapper.Body>
-              </CardWrapper>
-            </SimpleGrid>
-          </VStack>
-        </CardWrapper.Body>
-      </CardWrapper>
-
-      {/* Tabbed Layout for Sections */}
-      <Tabs>
-        <TabList>
-          <Tab onClick={() => handleTabChange('schedule')}>
-            <HStack gap="sm">
-              <Icon icon={CalendarIcon} size="sm" />
-              <Typography>Weekly Schedule</Typography>
-              <Badge size="sm" colorPalette="blue">
-                {schedulingStats.employees_scheduled}
-              </Badge>
-            </HStack>
-          </Tab>
-
-          <Tab onClick={() => handleTabChange('timeoff')}>
-            <HStack gap="sm">
-              <Icon icon={UserMinusIcon} size="sm" />
-              <Typography>Time Off</Typography>
-              {schedulingStats.pending_time_off > 0 && (
-                <Badge size="sm" colorPalette="orange">
-                  {schedulingStats.pending_time_off}
-                </Badge>
-              )}
-            </HStack>
-          </Tab>
-
-          <Tab onClick={() => handleTabChange('coverage')}>
-            <HStack gap="sm">
-              <Icon icon={UsersIcon} size="sm" />
-              <Typography>Coverage Planning</Typography>
-              {schedulingStats.understaffed_shifts > 0 && (
-                <Badge size="sm" colorPalette="error">
-                  {schedulingStats.understaffed_shifts}
-                </Badge>
-              )}
-            </HStack>
-          </Tab>
-
-          <Tab onClick={() => handleTabChange('costs')}>
-            <HStack gap="sm">
-              <Icon icon={CurrencyDollarIcon} size="sm" />
-              <Typography>Labor Costs</Typography>
-              {schedulingStats.overtime_hours > 0 && (
-                <Badge size="sm" colorPalette="warning">
-                  {schedulingStats.overtime_hours}h OT
-                </Badge>
-              )}
-            </HStack>
-          </Tab>
-
-          <Tab onClick={() => handleTabChange('realtime')}>
-            <HStack gap="sm">
-              <Icon icon={ClockIcon} size="sm" />
-              <Typography>Real-Time</Typography>
-              <Badge size="sm" colorPalette="success" variant="subtle">
-                LIVE
-              </Badge>
-            </HStack>
-          </Tab>
-        </TabList>
-
-        <TabPanels>
-          <TabPanel>
-            <WeeklyScheduleView
-              viewState={viewState}
-              onViewStateChange={setViewState}
-            />
-          </TabPanel>
-
-          <TabPanel>
-            <TimeOffManager
-              pendingCount={schedulingStats.pending_time_off}
-              approvedCount={schedulingStats.approved_requests}
-            />
-          </TabPanel>
-
-          <TabPanel>
-            <CoveragePlanner
-              understaffedShifts={schedulingStats.understaffed_shifts}
-              coveragePercentage={schedulingStats.coverage_percentage}
-            />
-          </TabPanel>
-
-          <TabPanel>
-            <LaborCostTracker
-              weeklyTotal={schedulingStats.labor_cost_this_week}
-              overtimeHours={schedulingStats.overtime_hours}
-            />
-          </TabPanel>
-
-          <TabPanel>
-            <RealTimeLaborTracker
-              selectedDate={new Date().toISOString().split('T')[0]}
-              showAlerts={true}
-              compactMode={false}
-            />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-
-      {/* Auto-Scheduling Modal */}
-      <AutoSchedulingModal
-        isOpen={isAutoSchedulingOpen}
-        onClose={() => setIsAutoSchedulingOpen(false)}
-        onScheduleGenerated={handleScheduleGenerated}
-        currentWeek={viewState.selectedWeek}
+      {/* 📊 2. MÉTRICAS DE NEGOCIO - OBLIGATORIO PRIMERO */}
+      <SchedulingMetrics
+        metrics={schedulingStats}
+        onMetricClick={(metric) => {
+          // Handle metric clicks to navigate to specific tabs
+          if (metric === 'coverage') handleTabChange('coverage');
+          if (metric === 'timeoff') handleTabChange('timeoff');
+          if (metric === 'costs') handleTabChange('costs');
+          if (metric === 'shifts') handleTabChange('schedule');
+        }}
+        loading={loading}
       />
-    </Stack>
+
+      {/* 🚨 3. ALERTAS CRÍTICAS - Solo si existen */}
+      <SchedulingAlerts
+        context="scheduling"
+        schedulingStats={schedulingStats}
+        onAlertAction={(action, data) => {
+          console.log('[SchedulingPage] 🚨 Alert action triggered:', { action, data });
+
+          // Handle alert actions
+          if (action === 'find_coverage') handleTabChange('coverage');
+          if (action === 'review_overtime') handleTabChange('costs');
+          if (action === 'review_requests') handleTabChange('timeoff');
+          if (action === 'improve_coverage') handleTabChange('coverage');
+          if (action === 'review_costs') handleTabChange('costs');
+
+          // Emit events for further processing
+          emitEvent(`scheduling.alert_action_${action}`, data);
+        }}
+      />
+
+      {/* 🎯 4. GESTIÓN PRINCIPAL CON TABS - OBLIGATORIO */}
+      <Section variant="elevated" title="Gestión de Horarios">
+        <SchedulingManagement
+          activeTab={viewState.activeTab}
+          onTabChange={handleTabChange}
+          schedulingStats={schedulingStats}
+          viewState={viewState}
+          onViewStateChange={setViewState}
+          performanceMode={shouldReduceAnimations}
+          isMobile={isMobile}
+        />
+      </Section>
+
+      {/* ⚡ 5. ACCIONES RÁPIDAS - OBLIGATORIO */}
+      <SchedulingActions
+        onAddShift={() => {
+          // TODO: Open shift creation modal
+          emitEvent('scheduling.new_shift_requested', {});
+        }}
+        onAutoSchedule={() => setIsAutoSchedulingOpen(true)}
+        onExportSchedule={() => emitEvent('scheduling.export_requested', {})}
+        onGenerateReport={() => emitEvent('scheduling.report_requested', {})}
+        onCopyWeek={() => emitEvent('scheduling.copy_week_requested', { week: viewState.selectedWeek })}
+        onFindCoverage={() => {
+          handleTabChange('coverage');
+          emitEvent('scheduling.find_coverage_requested', {});
+        }}
+        onBulkOperations={() => emitEvent('scheduling.bulk_operations_requested', {})}
+        hasCapability={hasCapability}
+        isMobile={isMobile}
+        loading={loading}
+      />
+
+      {/* 🪟 MODAL - AUTO SCHEDULING */}
+      {isAutoSchedulingOpen && (
+        <AutoSchedulingModal
+          isOpen={isAutoSchedulingOpen}
+          onClose={() => setIsAutoSchedulingOpen(false)}
+          onScheduleGenerated={handleScheduleGenerated}
+          currentWeek={viewState.selectedWeek}
+        />
+      )}
+    </ContentLayout>
   );
 }

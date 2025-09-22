@@ -375,7 +375,7 @@ export const DEFAULT_CONFIG: EventBusConfig = {
   
   testModeEnabled: false,
   
-  offlineSyncEnabled: true
+  offlineSyncEnabled: false
 };
 
 // =============================================================================

@@ -38,7 +38,7 @@ import type {
   MenuEngineeringData, 
   StrategyRecommendation,
   MenuCategory 
-} from '../../types';
+} from "../../types";
 
 export function MenuEngineeringMatrix() {
   // States
@@ -113,16 +113,16 @@ export function MenuEngineeringMatrix() {
             <Stack gap="md">
               <Typography variant="label">Menu Performance Overview</Typography>
               <HStack gap="md" wrap={true}>
-                <Badge variant="outline" colorPalette="success">
+                <Badge variant="outline" colorPalette="green">
                   ✓ {categoryMetrics.stars} Stars (High Profit + High Popularity)
                 </Badge>
-                <Badge variant="outline" colorPalette="info">
+                <Badge variant="outline" colorPalette="blue">
                   ⚡ {categoryMetrics.plowhorses} Plowhorses (Low Profit + High Popularity)
                 </Badge>
-                <Badge variant="outline" colorPalette="warning">
+                <Badge variant="outline" colorPalette="orange">
                   🧩 {categoryMetrics.puzzles} Puzzles (High Profit + Low Popularity)
                 </Badge>
-                <Badge variant="outline" colorPalette="error">
+                <Badge variant="outline" colorPalette="red">
                   🐕 {categoryMetrics.dogs} Dogs (Low Profit + Low Popularity)
                 </Badge>
               </HStack>
@@ -207,9 +207,9 @@ export function MenuEngineeringMatrix() {
                           size="sm"
                           onClick={() => handleCategoryFilter(category)}
                           colorPalette={
-                            category === 'stars' ? 'success' :
-                            category === 'plowhorses' ? 'info' :
-                            category === 'puzzles' ? 'warning' : 'error'
+                            category === 'stars' ? 'green' :
+                            category === 'plowhorses' ? 'blue' :
+                            category === 'puzzles' ? 'orange' : 'red'
                           }
                         >
                           {category.charAt(0).toUpperCase() + category.slice(1)} 
@@ -245,9 +245,9 @@ export function MenuEngineeringMatrix() {
                               </VStack>
                               <Badge 
                                 colorPalette={
-                                  product.menuCategory === 'stars' ? 'success' :
-                                  product.menuCategory === 'plowhorses' ? 'info' :
-                                  product.menuCategory === 'puzzles' ? 'warning' : 'error'
+                                  product.menuCategory === 'stars' ? 'green' :
+                                  product.menuCategory === 'plowhorses' ? 'blue' :
+                                  product.menuCategory === 'puzzles' ? 'orange' : 'red'
                                 }
                               >
                                 {product.menuCategory}
@@ -284,7 +284,7 @@ export function MenuEngineeringMatrix() {
                                 {recommendation.description}
                               </Typography>
                               <HStack gap="sm">
-                                <Badge colorPalette="info" size="sm">
+                                <Badge colorPalette="blue" size="sm">
                                   {recommendation.priority}
                                 </Badge>
                                 <Badge colorPalette="gray" size="sm">
@@ -367,9 +367,9 @@ export function MenuEngineeringMatrix() {
                             <Typography variant="body">{count} products</Typography>
                             <Badge 
                               colorPalette={
-                                category === 'stars' ? 'success' :
-                                category === 'plowhorses' ? 'info' :
-                                category === 'puzzles' ? 'warning' : 'error'
+                                category === 'stars' ? 'green' :
+                                category === 'plowhorses' ? 'blue' :
+                                category === 'puzzles' ? 'orange' : 'red'
                               }
                             >
                               {matrix ? 

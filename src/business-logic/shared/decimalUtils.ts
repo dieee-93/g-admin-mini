@@ -3,14 +3,23 @@
 // ============================================================================
 // Funciones helper centralizadas para operaciones matemáticas de precisión
 
-import { 
+import {
   type Decimal as DecimalType,
-  TaxDecimal, 
-  InventoryDecimal, 
-  FinancialDecimal, 
+  TaxDecimal,
+  InventoryDecimal,
+  FinancialDecimal,
   RecipeDecimal,
-  DECIMAL_CONSTANTS 
+  DECIMAL_CONSTANTS
 } from '@/config/decimal-config';
+
+// Re-export classes for external use
+export {
+  TaxDecimal,
+  InventoryDecimal,
+  FinancialDecimal,
+  RecipeDecimal,
+  DECIMAL_CONSTANTS
+};
 
 // Types
 export type DecimalInput = number | string | DecimalType;
@@ -616,6 +625,10 @@ export const safeSubtract = (a: DecimalInput, b: DecimalInput, domain?: 'tax' | 
   DecimalUtils.subtract(a, b, domain);
 
 export const safeMultiply = (a: DecimalInput, b: DecimalInput, domain?: 'tax' | 'inventory' | 'financial' | 'recipe') =>
+  DecimalUtils.multiply(a, b, domain);
+
+// Alias for safeMul (same as safeMultiply)
+export const safeMul = (a: DecimalInput, b: DecimalInput, domain?: 'tax' | 'inventory' | 'financial' | 'recipe') =>
   DecimalUtils.multiply(a, b, domain);
 
 export const safeDivide = (a: DecimalInput, b: DecimalInput, domain?: 'tax' | 'inventory' | 'financial' | 'recipe') =>

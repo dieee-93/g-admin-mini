@@ -88,6 +88,22 @@ export function Alert({
   const showIcon = icon !== false
   const customIcon = typeof icon === 'object' ? icon : null
 
+  // Debug: Check for invalid props
+  if ('action' in rest) {
+    console.warn('[Alert] ⚠️ Invalid prop "action" detected. React only allows "action" on <form> elements.', {
+      receivedProps: Object.keys(rest),
+      action: (rest as any).action,
+      title,
+      description,
+      status,
+      // Stack trace to identify source component
+      stackTrace: new Error().stack?.split('\n').slice(1, 4)
+    });
+    // Remove action prop to prevent React error
+    const { action, ...safeRest } = rest as any;
+    rest = safeRest;
+  }
+
   return (
     <ChakraAlert.Root
       status={status}

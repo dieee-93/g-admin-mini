@@ -518,7 +518,7 @@ export function ProductAnalyticsEnhanced() {
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'red' }}>
                 {analyticsData.profitabilityAnalysis.low}
               </div>
-              <Typography size="xs" color="text.muted">Baja (<30%)</Typography>
+              <Typography size="xs" color="text.muted">Baja (&lt;30%)</Typography>
             </div>
           </div>
         </Section>

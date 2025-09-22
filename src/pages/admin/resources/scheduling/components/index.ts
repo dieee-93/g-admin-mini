@@ -1,4 +1,10 @@
-// Scheduling Components - Feature-based exports
+// ✅ ENTERPRISE COMPONENTS v2.1 - PRIORITIZAR
+export { SchedulingMetrics } from './SchedulingMetrics';
+export { SchedulingManagement } from './SchedulingManagement';
+export { SchedulingActions } from './SchedulingActions';
+export { SchedulingAlerts } from './SchedulingAlerts';
+
+// ✅ EXISTING COMPONENTS (legacy - to be migrated)
 export * from './WeeklySchedule';
 export * from './TimeOff';
 export * from './Coverage';

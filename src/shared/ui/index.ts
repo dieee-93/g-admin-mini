@@ -54,6 +54,23 @@ export { Button } from './Button';
 export { ActionButton } from './ActionButton';
 export { CardWrapper } from './CardWrapper';
 export { MetricCard } from './MetricCard';
+
+// ✅ BUSINESS COMPONENTS - Scheduling & Staff Management
+export {
+  WeeklyCalendar,
+  TimeSlotPicker,
+  EmployeeAvailabilityCard
+} from './components/business';
+
+export type {
+  CalendarShift,
+  DayData,
+  WeeklyCalendarProps,
+  TimeSlot,
+  TimeSlotPickerProps,
+  EmployeeAvailability,
+  EmployeeAvailabilityCardProps
+} from './components/business';
 export { FeatureCard } from './FeatureCard';
 export { Table } from './Table';
 

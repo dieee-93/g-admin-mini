@@ -45,6 +45,10 @@ export interface UseSchedulingPageReturn {
   // Modal state
   isAutoSchedulingOpen: boolean;
 
+  // Loading and error states
+  loading: boolean;
+  error: string | null;
+
   // Actions
   handleTabChange: (tab: SchedulingTab) => void;
   setViewState: (state: SchedulingViewState | ((prev: SchedulingViewState) => SchedulingViewState)) => void;
@@ -54,6 +58,12 @@ export interface UseSchedulingPageReturn {
 
 export const useSchedulingPage = (): UseSchedulingPageReturn => {
   const { setQuickActions } = useNavigation();
+
+  // Debug logs removed to prevent console spam
+
+  // ✅ ESTADO EMPRESARIAL ESTÁNDAR
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [viewState, setViewState] = useState<SchedulingViewState>({
     activeTab: 'schedule',
@@ -65,7 +75,7 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
   const [isAutoSchedulingOpen, setIsAutoSchedulingOpen] = useState(false);
 
   // Mock scheduling stats - will be replaced with API call
-  const [schedulingStats] = useState<SchedulingStats>({
+  const [schedulingStats, setSchedulingStats] = useState<SchedulingStats>({
     total_shifts_this_week: 156,
     employees_scheduled: 24,
     coverage_percentage: 87.5,
@@ -75,6 +85,27 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
     understaffed_shifts: 3,
     approved_requests: 15
   });
+
+  // ✅ SIMULAR CARGA INICIAL
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Simular carga de datos
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Aquí iría la carga real de datos
+        setLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error loading scheduling data');
+        setLoading(false);
+      }
+    };
+
+    initializeData();
+  }, []);
 
   // Setup quick actions for the scheduling module
   useEffect(() => {
@@ -166,7 +197,7 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
 
     // Cleanup function
     return () => setQuickActions([]);
-  }, [viewState.activeTab, setQuickActions]);
+  }, [viewState.activeTab]); // ✅ REMOVED setQuickActions to prevent infinite loop
 
   const handleTabChange = useCallback((tab: SchedulingTab) => {
     setViewState(prev => ({ ...prev, activeTab: tab }));
@@ -183,6 +214,8 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
     viewState,
     schedulingStats,
     isAutoSchedulingOpen,
+    loading,
+    error,
     handleTabChange,
     setViewState,
     setIsAutoSchedulingOpen,

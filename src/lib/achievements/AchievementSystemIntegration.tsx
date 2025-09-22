@@ -5,7 +5,7 @@
  * para que esté disponible en toda la aplicación.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext'; // Ajustar según tu contexto de auth
 import { initializeAchievementSystem } from '@/lib/achievements/AchievementSystem';
 import useAchievementNotifications from '@/lib/achievements/useAchievementNotifications';
@@ -13,11 +13,12 @@ import useAchievementNotifications from '@/lib/achievements/useAchievementNotifi
 /**
  * Componente wrapper que inicializa el sistema de logros
  */
-export const AchievementSystemProvider: React.FC<{ children: React.ReactNode }> = ({ 
-  children 
+export const AchievementSystemProvider: React.FC<{ children: React.ReactNode }> = ({
+  children
 }) => {
   const { user } = useAuth(); // Obtener usuario autenticado
-  
+  const isInitialized = useRef(false);
+
   // Inicializar notificaciones de logros
   useAchievementNotifications();
 
@@ -25,14 +26,20 @@ export const AchievementSystemProvider: React.FC<{ children: React.ReactNode }> 
     let mounted = true;
 
     const initializeSystem = async () => {
+      // Prevenir múltiples inicializaciones
+      if (isInitialized.current) {
+        return;
+      }
+
       try {
         await initializeAchievementSystem({
           userId: (user as any)?.id || 'demo-user',
           autoStart: true,
           enableLogging: process.env.NODE_ENV === 'development'
         });
-        
+
         if (mounted) {
+          isInitialized.current = true;
           console.log('[App] Sistema de logros inicializado');
         }
       } catch (error) {
@@ -42,14 +49,14 @@ export const AchievementSystemProvider: React.FC<{ children: React.ReactNode }> 
       }
     };
 
-    if (user) {
+    if (user && !isInitialized.current) {
       initializeSystem();
     }
 
     return () => {
       mounted = false;
     };
-  }, [user]);
+  }, [user?.id]); // Solo observar user.id, no el objeto user completo
 
   return <>{children}</>;
 };

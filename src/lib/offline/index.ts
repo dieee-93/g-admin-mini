@@ -185,10 +185,10 @@ export const initializeOffline = async (config?: {
       syncInitialized = true;
     }
     
-    // Test storage
+    // Test storage using existing 'settings' store
     try {
-      await localStorage.set('test', 'init_test', { initialized: true });
-      await localStorage.delete('test', 'init_test');
+      await localStorage.set('settings', 'init_test', { initialized: true });
+      await localStorage.delete('settings', 'init_test');
       storageInitialized = true;
     } catch (error) {
       console.error('[Offline] Storage initialization failed:', error);

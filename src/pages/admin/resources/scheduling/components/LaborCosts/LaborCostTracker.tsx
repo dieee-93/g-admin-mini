@@ -69,6 +69,9 @@ type CostPeriod = 'week' | 'month' | 'quarter';
 type CostView = 'summary' | 'breakdown' | 'trends' | 'budget';
 
 export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTrackerProps) {
+  console.log('🔍 LaborCostTracker: RENDER START', { timestamp: Date.now() });
+  const renderStart = performance.now();
+  
   const [loading, setLoading] = useState(true);
   const [costBreakdown, setCostBreakdown] = useState<LaborCostBreakdown[]>([]);
   const [weeklySummary, setWeeklySummary] = useState<WeeklyCostSummary[]>([]);
@@ -214,6 +217,19 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
   
   return (
     <VStack gap="6" align="stretch">
+      {/* 🚨 CONTENIDO DE PRUEBA - PESTAÑA COSTOS */}
+      <div style={{ 
+        backgroundColor: '#339af0', 
+        color: 'white', 
+        padding: '20px', 
+        borderRadius: '8px',
+        fontSize: '18px',
+        fontWeight: 'bold',
+        textAlign: 'center'
+      }}>
+        ✅ COMPONENTE COSTOS FUNCIONANDO - LaborCostTracker renderizado correctamente
+      </div>
+
       {/* Key Metrics */}
       <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} gap="4">
         <CardWrapper>

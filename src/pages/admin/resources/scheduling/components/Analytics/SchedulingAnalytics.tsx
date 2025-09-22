@@ -5,29 +5,13 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  CardWrapper,
-  SimpleGrid,
-  Progress,
-  Badge,
-  Select,
-  Button,
-  Tabs,
-  Alert,
-  Separator,
-  Stack,
-  StatRoot,
-  StatLabel,
-  StatValueText,
-  StatHelpText
-} from '@chakra-ui/react';
+  Stack, Grid, Button, Badge, Alert, Typography,
+  MetricCard, CardGrid, Section, Icon
+} from '@/shared/ui';
 import {
   ChartBarIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   ClockIcon,
   CurrencyDollarIcon,
   UsersIcon,
@@ -411,8 +395,8 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
     const { trends } = analyticsData;
 
     const getTrendIcon = (direction: 'up' | 'down' | 'stable') => {
-      if (direction === 'up') return TrendingUpIcon;
-      if (direction === 'down') return TrendingDownIcon;
+      if (direction === 'up') return ArrowTrendingUpIcon;
+      if (direction === 'down') return ArrowTrendingDownIcon;
       return ArrowPathIcon;
     };
 
@@ -707,7 +691,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
 
       {/* Analytics Tabs */}
       <CardWrapper>
-        <Tabs.Root value={activeTab} onValueChange={({ value }) => setActiveTab(value as any)}>
+        <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
           <Tabs.List>
             <Tabs.Trigger value="efficiency">
               <HStack>
@@ -717,7 +701,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
             </Tabs.Trigger>
             <Tabs.Trigger value="trends">
               <HStack>
-                <TrendingUpIcon className="w-4 h-4" />
+                <ArrowTrendingUpIcon className="w-4 h-4" />
                 <Text>Trends</Text>
               </HStack>
             </Tabs.Trigger>

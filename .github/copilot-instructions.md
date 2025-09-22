@@ -4,39 +4,64 @@
 
 ### 🏗️ System Architecture
 
-**Frontend Stack**: React 19.1+ + TypeScript 5.0+ + Vite 6.0+ + Chakra UI v3.23.0 + Zustand v5.0.7  
-**Backend**: Supabase (auth, DB, realtime)  
-**Testing**: Vitest with comprehensive test suites (unit, integration, performance, stress)  
-**Key Systems**: EventBus v2 Enterprise, Module Federation, Offline-First Architecture
+**Frontend Stack**: React 19.1+ + TypeScript 5.8.3+ + Vite 7.0+ + Chakra UI v3.23.0 + Zustand v5.0.7  
+**Backend**: Supabase (PostgreSQL, auth, realtime) + Row Level Security (RLS)  
+**Testing**: Vitest v3.2.4 with JSdom environment and comprehensive test suites  
+**Key Systems**: EventBus v2 Enterprise, Offline-First, Capabilities System, Gamification
 
-### 📁 Project Structure (Domain-Driven)
+### 📁 Project Structure (Screaming Architecture)
 
-**Pages organized by business domain under `src/pages/admin/`**:
+**Business domains under `src/pages/admin/`**:
 - `core/` - Dashboard, CRM, Settings, Intelligence
 - `operations/` - Sales, Operations Hub
 - `supply-chain/` - Materials (StockLab), Products  
 - `finance/` - Fiscal management, AFIP integration
 - `resources/` - Staff, Scheduling
+- `gamification/` - Achievements, OnboardingGuide
 
-**Route mapping**: See `src/config/routeMap.ts` for automated domain ↔ route mapping
+**Route mapping**: `src/config/routeMap.ts` provides automated domain ↔ route mapping  
+**Shared systems**: `src/shared/` contains UI components, alerts, business logic  
+**Core libraries**: `src/lib/` contains events, capabilities, offline, error-handling, performance
 
-### 🏛️ Core Systems
+### 🏛️ Enterprise Core Systems
 
 **EventBus v2 Enterprise** (`src/lib/events/`):
-- Distributed event system with deduplication, offline-first support
-- Module registry with health monitoring
-- Security layer with encryption and rate limiting
-- Comprehensive test coverage (unit, integration, performance, stress)
+- Distributed event system with deduplication and offline-first support
+- Module lifecycle management with health monitoring  
+- Security hardening with encryption and rate limiting
+- Pattern: `domain.entity.action` (e.g., `sales.order.completed`)
+- Testing: 70.5% passing (93/132 tests) organized in unit/integration/performance/stress categories
 
-**Module System** (`src/lib/modules/`):
-- Module Federation with dependency injection
-- Dynamic loading with `ModuleRegistry` and `ModuleLoader`
-- React hooks: `useModule`, `useModulesByCapability`, `useModuleHealth`
+**Capabilities System** (`src/lib/capabilities/`):
+- Business capabilities for progressive disclosure vs role-based permissions
+- React patterns: `<CapabilityGate capability="advanced_analytics">` and `useCapabilities()` hook
+- BusinessDNA compositional model replacing archetypal approaches
+- 22 foundational milestones unlock capabilities through gamification
 
-**State Management** (`src/store/`):
-- Zustand stores per domain: `useAppStore`, `useMaterialsStore`, `useSalesStore`, etc.
-- Immer for immutable updates
-- Service hooks in `src/services/` for Supabase integration
+**Offline-First Architecture** (`src/lib/offline/`):
+- OfflineSync engine with IndexedDB queue and conflict resolution
+- Optimistic updates pattern: UI updates immediately, sync later if offline
+- Priority system: orders > payments > inventory for sync order
+- Anti-flapping protection for unstable connections
+
+**Error Handling System** (`src/lib/error-handling/`):
+- ErrorHandler singleton with batch processing and audit trail
+- `useErrorHandler()` hook with operation context
+- ErrorBoundary components with custom fallback UI
+- Integration with notifications: `notify.success()`, `handleApiError()`
+
+**Gamification System** (`src/pages/admin/gamification/achievements/`):
+- **Dual system**: 22 foundational milestones (activate capabilities) + mastery achievements (reward usage)
+- **AchievementsEngine**: Listens to 40+ EventBus patterns for automatic progress tracking
+- **BusinessDNA compositional model**: Replaces archetypal approaches with independent capabilities
+- **OnboardingGuide widget**: Interactive gamified activation system
+- **Achievement types**: Sales (First Seller → Sales Master), Materials (Organizer → Inventory Master), Staff (Emerging Leader → HR Master)
+
+**Performance Monitoring** (`src/lib/performance/`):
+- Real-time FPS monitoring with auto-optimization when FPS < 30
+- Bundle optimization: Framer Motion reduced from 34kb to 4.6kb (-86%)
+- `usePerformanceMonitor()` for adaptive animations
+- GPU acceleration with transform/opacity for hardware rendering
 
 ### 💻 Developer Workflows
 
@@ -45,27 +70,46 @@
 - `pnpm install` - Install dependencies
 - `pnpm dev` - Start Vite dev server
 - `pnpm build` - Production build with TypeScript check
-- `pnpm -s exec eslint .` - Lint with ESLint
+- `pnpm -s exec eslint .` - Lint with ESLint (CI uses explicit commands)
 - `pnpm -s exec tsc --noEmit` - Type check only
 - `pnpm test` - Run tests (excludes performance/stress)
-- `pnpm test:eventbus:full` - Full EventBus test suite
-
-**Linting**: ESLint config in `eslint.config.js`. CI uses explicit eslint commands.
+- `pnpm test:eventbus:full` - Full EventBus test suite including performance/stress
 
 **Testing Strategy**:
-- `pnpm test` - Excludes performance/stress tests
-- `pnpm test:eventbus:full` - Complete EventBus test suite
-- `pnpm test:coverage` - Coverage reports
+- Vitest v3.2.4 with JSdom environment (`vitest.config.ts`)
+- Coverage reporting: text, JSON, HTML outputs
 - EventBus tests organized: `unit/`, `integration/`, `performance/`, `stress/`, `business/`
-- Vitest config in `vitest.config.ts` with jsdom environment
+- Custom testing utilities: `EventBusTestingHarness`, `MockEventStore`
+- E2E workflows for Staff, Materials, Customer modules
+
+**Quality Gates**:
+1. `pnpm install` - Install dependencies
+2. `pnpm dev` - Test UI changes in development
+3. `pnpm -s exec eslint .` - ESLint validation
+4. `pnpm -s exec tsc --noEmit` - TypeScript strict checking
+5. `pnpm test` - Run core test suite
 
 ### 🎯 Project-Specific Patterns
 
 **UI Components**:
 - Custom wrapper system in `src/shared/ui/` - check imports before assuming Chakra props
-- Import pattern: `import { ContentLayout, PageHeader, Stack, Button } from '@/shared/ui'`
+- **Mixed component system**: Use `@/shared/ui` components when available, otherwise use `@chakra-ui/react` directly
+- Import pattern: `import { ContentLayout, PageHeader, Stack, Button } from '@/shared/ui'` for shared components
+- For missing components: `import { Skeleton, SimpleGrid } from '@chakra-ui/react'` is acceptable
 - Form patterns: See `MaterialFormModal.tsx`, `UniversalItemForm.tsx` for validation/state
 - Component organization follows domain structure under `src/pages/admin/[domain]/`
+
+**Module Construction Templates** (`docs/05-development/UI_MODULE_CONSTRUCTION_MASTER_GUIDE.md`):
+- **Enterprise modules**: ContentLayout + business metrics + offline-first patterns
+- **Settings modules**: Vertical tabs + form sections + validation
+- **Analytics modules**: StatsSection + performance monitoring integration
+- Architecture: App.tsx handles global wrappers, modules only use ContentLayout
+
+**Design System Conventions** (`docs/05-development/MODULE_DESIGN_CONVENTIONS.md`):
+- **"One Pattern per Purpose"** - Single official pattern for each UI need
+- **Mandatory templates**: Enterprise (Sales/Staff/Materials), Settings (Config/Admin), Analytics (Dashboard/Reports)
+- **Form patterns**: Standardized ModuleForm component structure with Modal + FormSection
+- **Import enforcement**: Only `@/shared/ui` imports allowed, never direct Chakra imports
 
 **Business Logic** (`src/business-logic/`):
 - Domain-specific logic separated from UI components
@@ -77,7 +121,7 @@
 - Domain-specific types in module-local `types.ts` files
 - Update types when changing data shapes in business logic
 - Strict TypeScript with comprehensive error checking
-- Zod v4.1.5 for validation with `@hookform/resolvers` integration
+- Zod v4.1.5 for validation with `@hookform/resolvers` integration (already configured)
 
 ### 🔌 Integration Points
 
@@ -109,6 +153,12 @@
 - Form patterns: `src/pages/admin/supply-chain/materials/components/MaterialFormModal.tsx`
 - Store usage: Check `src/store/` for existing domain stores before creating new state
 - SQL business logic: `database/functions/recipe_intelligence_functions.sql`
+
+**Critical Anti-Patterns to Avoid**:
+- ❌ Don't duplicate ErrorBoundary/ResponsiveLayout in individual pages
+- ❌ Avoid mixed state management (useState + Zustand for same data)
+- ❌ Don't bypass security patterns (always use `secureApiCall()` for critical operations)
+- ❌ Never hardcode theme colors (use dynamic theming system with 25+ themes)
 
 **Validation workflow**:
 - Install: `pnpm install`

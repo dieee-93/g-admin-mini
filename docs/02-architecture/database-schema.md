@@ -1,21 +1,228 @@
-# G-Admin Mini: Database Schema - Referencia Completa v3.0
+# G-Admin Mini: Database Schema - Referencia Completa v4.0
 
-**Fecha de actualización:** 20 de Agosto, 2025  
-**Versión:** 3.0
+**Fecha de actualización:** 21 de Septiembre, 2025
+**Versión:** 4.0
 
 ## Resumen del Schema
 
-Este documento describe la estructura completa de la base de datos PostgreSQL para la plataforma de gestión de negocio G-admin-mini, incluyendo todas las funcionalidades de restaurante, POS, analytics y gestión de clientes.
+Este documento describe la estructura completa de la base de datos PostgreSQL para la plataforma de gestión de negocio G-admin-mini, incluyendo todas las funcionalidades de restaurante, POS, analytics, gestión de clientes y el nuevo sistema de logros/gamificación.
 
 ### Entidades Principales
+- **Achievement System**: Sistema de logros y gamificación
+- **Staff Management**: Gestión de personal y horarios
 - **Inventory Management**: Items, Stock, Recipes, Products
-- **Restaurant Operations**: Tables, Parties, Orders, QR Ordering  
+- **Restaurant Operations**: Tables, Parties, Orders, QR Ordering
 - **Sales & Payments**: Sales, Payment Methods, Bill Splitting
 - **Customer Intelligence**: Customer Analytics, RFM Profiles
 - **Analytics & Performance**: Daily Analytics, Menu Performance
 - **Async Operations**: Background Processing, Dead Letter Queue
 - **POS System**: Advanced Order Processing, Table Management
 - **Financial**: AFIP Integration, Invoices, Tax Reports
+
+---
+
+## 🏆 Achievement System (Sistema de Logros)
+
+### Achievement Definitions (Definiciones de Logros)
+
+```sql
+CREATE TABLE public.achievement_definitions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name character varying NOT NULL,
+  description text,
+  category text NOT NULL CHECK (category = ANY (ARRAY['sales'::text, 'productivity'::text, 'engagement'::text, 'milestone'::text, 'training'::text, 'leadership'::text])),
+  type text NOT NULL CHECK (type = ANY (ARRAY['numeric'::text, 'boolean'::text, 'time_based'::text, 'streak'::text])),
+  target_value numeric,
+  metric_key character varying NOT NULL,
+  points integer NOT NULL DEFAULT 0,
+  badge_icon character varying,
+  badge_color character varying DEFAULT '#3182ce'::character varying,
+  requirements jsonb DEFAULT '{}'::jsonb,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT achievement_definitions_pkey PRIMARY KEY (id),
+  CONSTRAINT achievement_definitions_name_key UNIQUE (name)
+);
+```
+
+### User Achievements (Logros de Usuario)
+
+```sql
+CREATE TABLE public.user_achievements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  achievement_id uuid NOT NULL,
+  earned_at timestamp with time zone DEFAULT now(),
+  progress_value numeric DEFAULT 0,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  CONSTRAINT user_achievements_pkey PRIMARY KEY (id),
+  CONSTRAINT user_achievements_achievement_id_fkey FOREIGN KEY (achievement_id) REFERENCES public.achievement_definitions(id),
+  CONSTRAINT user_achievements_user_achievement_unique UNIQUE (user_id, achievement_id)
+);
+```
+
+### User Achievement Progress (Progreso de Logros de Usuario)
+
+```sql
+CREATE TABLE public.user_achievement_progress (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  achievement_id uuid NOT NULL,
+  current_value numeric NOT NULL DEFAULT 0,
+  target_value numeric NOT NULL,
+  percentage numeric GENERATED ALWAYS AS ((current_value / target_value) * 100::numeric) STORED,
+  last_updated timestamp with time zone DEFAULT now(),
+  metadata jsonb DEFAULT '{}'::jsonb,
+  CONSTRAINT user_achievement_progress_pkey PRIMARY KEY (id),
+  CONSTRAINT user_achievement_progress_achievement_id_fkey FOREIGN KEY (achievement_id) REFERENCES public.achievement_definitions(id),
+  CONSTRAINT user_achievement_progress_user_achievement_unique UNIQUE (user_id, achievement_id)
+);
+```
+
+### Achievement Categories (Categorías de Logros)
+
+```sql
+CREATE TABLE public.achievement_categories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name character varying NOT NULL UNIQUE,
+  description text,
+  icon character varying,
+  color character varying DEFAULT '#3182ce'::character varying,
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT achievement_categories_pkey PRIMARY KEY (id)
+);
+```
+
+---
+
+## 👥 Staff Management (Gestión de Personal)
+
+### Employees (Empleados)
+
+```sql
+CREATE TABLE public.employees (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  employee_number character varying UNIQUE,
+  first_name character varying NOT NULL,
+  last_name character varying NOT NULL,
+  email character varying UNIQUE,
+  phone character varying,
+  hire_date date NOT NULL DEFAULT CURRENT_DATE,
+  position character varying NOT NULL,
+  department character varying,
+  hourly_rate numeric DEFAULT 0.00,
+  salary numeric DEFAULT 0.00,
+  employment_type text DEFAULT 'full_time'::text CHECK (employment_type = ANY (ARRAY['full_time'::text, 'part_time'::text, 'contractor'::text, 'temporary'::text])),
+  status text DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'inactive'::text, 'terminated'::text, 'suspended'::text])),
+  emergency_contact_name character varying,
+  emergency_contact_phone character varying,
+  address text,
+  notes text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT employees_pkey PRIMARY KEY (id)
+);
+```
+
+### Shift Schedules (Horarios de Turnos)
+
+```sql
+CREATE TABLE public.shift_schedules (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  employee_id uuid NOT NULL,
+  date date NOT NULL,
+  start_time time without time zone NOT NULL,
+  end_time time without time zone NOT NULL,
+  position character varying,
+  location character varying,
+  status text DEFAULT 'scheduled'::text CHECK (status = ANY (ARRAY['scheduled'::text, 'confirmed'::text, 'in_progress'::text, 'completed'::text, 'cancelled'::text, 'no_show'::text])),
+  break_duration interval DEFAULT '00:30:00'::interval,
+  hourly_rate numeric,
+  total_hours numeric GENERATED ALWAYS AS (EXTRACT(epoch FROM (end_time - start_time)) / 3600::numeric) STORED,
+  notes text,
+  created_by uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT shift_schedules_pkey PRIMARY KEY (id),
+  CONSTRAINT shift_schedules_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES public.employees(id)
+);
+```
+
+### Time Entries (Entradas de Tiempo)
+
+```sql
+CREATE TABLE public.time_entries (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  employee_id uuid NOT NULL,
+  shift_schedule_id uuid,
+  entry_type text NOT NULL CHECK (entry_type = ANY (ARRAY['clock_in'::text, 'clock_out'::text, 'break_start'::text, 'break_end'::text])),
+  timestamp timestamp with time zone NOT NULL DEFAULT now(),
+  location character varying,
+  notes text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT time_entries_pkey PRIMARY KEY (id),
+  CONSTRAINT time_entries_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES public.employees(id),
+  CONSTRAINT time_entries_shift_schedule_id_fkey FOREIGN KEY (shift_schedule_id) REFERENCES public.shift_schedules(id)
+);
+```
+
+### Attendance Records (Registros de Asistencia)
+
+```sql
+CREATE TABLE public.attendance_records (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  employee_id uuid NOT NULL,
+  date date NOT NULL,
+  scheduled_start time without time zone,
+  scheduled_end time without time zone,
+  actual_start time without time zone,
+  actual_end time without time zone,
+  total_hours_worked numeric DEFAULT 0.00,
+  break_time_minutes integer DEFAULT 0,
+  overtime_hours numeric DEFAULT 0.00,
+  status text DEFAULT 'present'::text CHECK (status = ANY (ARRAY['present'::text, 'absent'::text, 'late'::text, 'early_leave'::text, 'holiday'::text, 'sick'::text, 'vacation'::text])),
+  notes text,
+  approved_by uuid,
+  approved_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT attendance_records_pkey PRIMARY KEY (id),
+  CONSTRAINT attendance_records_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES public.employees(id),
+  CONSTRAINT attendance_records_date_employee_unique UNIQUE (date, employee_id)
+);
+```
+
+### Employee Performance (Rendimiento de Empleados)
+
+```sql
+CREATE TABLE public.employee_performance (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  employee_id uuid NOT NULL,
+  period_start date NOT NULL,
+  period_end date NOT NULL,
+  total_sales numeric DEFAULT 0.00,
+  total_orders integer DEFAULT 0,
+  customer_rating_avg numeric DEFAULT 0.0,
+  punctuality_score numeric DEFAULT 100.0,
+  efficiency_score numeric DEFAULT 0.0,
+  teamwork_score numeric DEFAULT 0.0,
+  achievement_points integer DEFAULT 0,
+  goals_met integer DEFAULT 0,
+  goals_total integer DEFAULT 0,
+  notes text,
+  reviewed_by uuid,
+  reviewed_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT employee_performance_pkey PRIMARY KEY (id),
+  CONSTRAINT employee_performance_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES public.employees(id)
+);
+```
 
 ---
 
@@ -943,15 +1150,20 @@ CREATE TABLE public.item_modifications (
 
 ## 📝 Notas Importantes
 
-### Cambios Principales en v3.0
-1. **Expansión del sistema POS**: Nuevas tablas para gestión avanzada de órdenes y pagos
-2. **Sistema QR mejorado**: Funcionalidad completa de pedidos por QR
-3. **Analytics avanzados**: Métricas de rendimiento y análisis de menú
-4. **Integración AFIP**: Sistema completo de facturación electrónica
-5. **Gestión de personal**: Horarios, turnos y solicitudes de tiempo libre
-6. **Operaciones asíncronas**: Sistema robusto de procesamiento en background
-7. **Tipos de datos actualizados**: Cambio de integer a numeric para mayor precisión
-8. **Nuevos campos de audit**: Timestamps y tracking mejorado
+### Cambios Principales en v4.0
+1. **Sistema de logros y gamificación**: Nuevas tablas para achievement system
+   - `achievement_definitions`: Definiciones de logros configurables
+   - `user_achievements`: Logros obtenidos por usuarios
+   - `user_achievement_progress`: Progreso en tiempo real hacia logros
+   - `achievement_categories`: Categorización de logros
+2. **Gestión completa de personal**: Sistema robusto de recursos humanos
+   - `employees`: Información completa de empleados
+   - `shift_schedules`: Horarios programados con cálculo automático de horas
+   - `time_entries`: Registro de entradas/salidas con timestamps
+   - `attendance_records`: Registros de asistencia con validaciones
+   - `employee_performance`: Métricas de rendimiento y evaluaciones
+3. **Corrección de esquemas existentes**: Actualización de tablas para corregir errores en consultas
+4. **Mejoras en integridad referencial**: Foreign keys y constraints optimizados
 
 ### Tipos de Datos Personalizados (ENUMs)
 - `pos_entity_type`: Para operaciones asíncronas
@@ -964,4 +1176,4 @@ CREATE TABLE public.item_modifications (
 - Índices en foreign keys para mejor performance de JOINs
 
 ---
-**Documento generado automáticamente - G-Admin Mini v3.0**
+**Documento actualizado - G-Admin Mini v4.0 con Sistema de Logros y Staff Management**

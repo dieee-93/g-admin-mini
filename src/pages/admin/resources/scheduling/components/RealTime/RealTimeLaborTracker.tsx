@@ -4,23 +4,11 @@
  */
 
 import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  VStack, 
-  HStack, 
-  Text, 
-  CardWrapper,
-  Button,
-  Badge,
-  SimpleGrid,
-  Progress,
-  Table,
-  Alert,
-  Tabs,
-  Switch,
-  Flex,
-  Stack
-} from '@chakra-ui/react';
+import {
+  Stack, Button, Badge, Grid, Typography,
+  CardWrapper, MetricCard, CardGrid, Icon, SimpleGrid
+} from '@/shared/ui';
+import { Tabs, Progress, Table, Alert, Switch } from '@chakra-ui/react';
 import { 
   CurrencyDollarIcon,
   ClockIcon,
@@ -33,7 +21,6 @@ import {
   EyeIcon,
   BellIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
 import { useLiveCostDashboard, useOvertimeMonitoring, useBudgetMonitoring } from '@/hooks/useRealTimeLaborCosts';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 
@@ -112,7 +99,7 @@ export function RealTimeLaborTracker({
   if (error) {
     return (
       <Alert.Root status="error">
-        <Icon icon={ExclamationTriangleIcon} size="md" />
+        <Alert.Indicator />
         <Alert.Title>Error de Monitoreo</Alert.Title>
         <Alert.Description>{error}</Alert.Description>
       </Alert.Root>
@@ -120,43 +107,41 @@ export function RealTimeLaborTracker({
   }
 
   return (
-    <VStack gap="6" align="stretch">
+    <Stack direction="column" gap="lg">
       {/* Header Controls */}
-      <CardWrapper>
-        <CardWrapper.Body>
-          <HStack justify="space-between">
-            <VStack align="start" gap="1">
-              <Text fontSize="lg" fontWeight="bold">
-                Costos Laborales en Tiempo Real
-              </Text>
-              <HStack gap="2" align="center">
-                <Box 
-                  w="2" 
-                  h="2" 
-                  bg={isMonitoring ? 'green.500' : 'red.500'} 
-                  borderRadius="full"
-                />
-                <Text fontSize="sm" color="gray.600">
-                  {isMonitoring ? 'Monitoreando' : 'Pausado'}
-                </Text>
+      <CardWrapper variant="elevated" title="Costos Laborales en Tiempo Real">
+        <Stack direction="row" justify="space-between">
+          <Stack direction="column" gap="xs">
+            <Typography variant="heading">
+              Costos Laborales en Tiempo Real
+            </Typography>
+            <Stack direction="row" gap="sm" align="center">
+              <Badge
+                colorPalette={isMonitoring ? 'green' : 'red'}
+                variant="solid"
+                size="sm"
+              >
+                {isMonitoring ? 'Monitoreando' : 'Pausado'}
+              </Badge>
                 {loading && (
-                  <Text fontSize="sm" color="blue.600">Actualizando...</Text>
+                  <Typography fontSize="sm" color="blue.600">Actualizando...</Typography>
                 )}
-              </HStack>
-            </VStack>
+              </Stack>
+            </Stack>
 
-            <HStack gap="2">
-              <Box>
-                <Text fontSize="xs" mb="1">Auto-actualizar</Text>
+            <Stack gap="2">
+              <Stack>
+                <Typography fontSize="xs" mb="1">Auto-actualizar</Typography>
                 <Switch.Root
                   checked={autoRefresh}
                   onCheckedChange={(details) => setAutoRefresh(details.checked)}
                 >
+                  <Switch.HiddenInput />
                   <Switch.Control>
                     <Switch.Thumb />
                   </Switch.Control>
                 </Switch.Root>
-              </Box>
+              </Stack>
 
               <Button
                 size="sm"
@@ -176,17 +161,16 @@ export function RealTimeLaborTracker({
                 {isMonitoring ? <Icon icon={PauseIcon} size="sm" style={{marginRight: '8px'}} /> : <Icon icon={PlayIcon} size="sm" style={{marginRight: '8px'}} />}
                 {isMonitoring ? 'Pausar' : 'Iniciar'}
               </Button>
-            </HStack>
-          </HStack>
-        </CardWrapper.Body>
-      </CardWrapper.Root>
+            </Stack>
+          </Stack>
+      </CardWrapper>
 
       {/* Critical Alerts */}
       {showAlerts && (criticalAlerts.length > 0 || budgetAlerts.length > 0) && (
         <Stack gap="2">
           {criticalAlerts.map(alert => (
             <Alert.Root key={alert.id} status="error">
-              <Icon icon={ExclamationTriangleIcon} size="md" />
+              <Alert.Indicator />
               <Alert.Title>Alerta Crítica</Alert.Title>
               <Alert.Description>{alert.message}</Alert.Description>
             </Alert.Root>
@@ -194,7 +178,7 @@ export function RealTimeLaborTracker({
           
           {budgetAlerts.map(alert => (
             <Alert.Root key={alert.id} status="warning">
-              <Icon icon={BellIcon} size="md" />
+              <Alert.Indicator />
               <Alert.Title>Alerta de Presupuesto</Alert.Title>
               <Alert.Description>{alert.message}</Alert.Description>
             </Alert.Root>
@@ -206,222 +190,226 @@ export function RealTimeLaborTracker({
       <SimpleGrid columns={{ base: 2, md: 4, lg: 6 }} gap="4">
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
-            <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="blue.500">
+            <Stack gap="1">
+              <Typography fontSize="xl" fontWeight="bold" color="blue.500">
                 {QuickCalculations.formatCurrency(totalActiveCost)}
-              </Text>
-              <Text fontSize="xs" color="gray.600">Costo Actual</Text>
-              <HStack gap="1" justify="center">
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">Costo Actual</Typography>
+              <Stack gap="1" justify="center">
                 <Icon icon={BoltIcon} size="xs" color="var(--chakra-colors-blue-500)" />
-                <Text fontSize="xs" color="blue.500">En vivo</Text>
-              </HStack>
-            </VStack>
+                <Typography fontSize="xs" color="blue.500">En vivo</Typography>
+              </Stack>
+            </Stack>
           </CardWrapper.Body>
-        </CardWrapper.Root>
+        </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
-            <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="green.500">
+            <Stack gap="1">
+              <Typography fontSize="xl" fontWeight="bold" color="green.500">
                 {QuickCalculations.formatCurrency(totalProjectedCost)}
-              </Text>
-              <Text fontSize="xs" color="gray.600">Proyectado</Text>
-              <Text fontSize="xs" color="green.600">
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">Proyectado</Typography>
+              <Typography fontSize="xs" color="green.600">
                 +{QuickCalculations.formatCurrency(totalProjectedCost - totalActiveCost)}
-              </Text>
-            </VStack>
+              </Typography>
+            </Stack>
           </CardWrapper.Body>
-        </CardWrapper.Root>
+        </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
-            <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="purple.500">
+            <Stack gap="1">
+              <Typography fontSize="xl" fontWeight="bold" color="purple.500">
                 {activeEmployeeCount}
-              </Text>
-              <Text fontSize="xs" color="gray.600">Activos</Text>
-              <Text fontSize="xs" color="gray.500">
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">Activos</Typography>
+              <Typography fontSize="xs" color="gray.500">
                 {liveData.length} total
-              </Text>
-            </VStack>
+              </Typography>
+            </Stack>
           </CardWrapper.Body>
-        </CardWrapper.Root>
+        </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
-            <VStack gap="1">
-              <Text 
+            <Stack gap="1">
+              <Typography 
                 fontSize="xl" 
                 fontWeight="bold" 
                 color={overtimeEmployeeCount > 0 ? 'red.500' : 'green.500'}
               >
                 {overtimeEmployeeCount}
-              </Text>
-              <Text fontSize="xs" color="gray.600">En Overtime</Text>
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">En Overtime</Typography>
               {overtimeEmployeeCount > 0 && (
                 <Badge size="xs" colorPalette="red" variant="subtle">
                   Alerta
                 </Badge>
               )}
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
-        </CardWrapper.Root>
+        </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
-            <VStack gap="1">
-              <Text 
+            <Stack gap="1">
+              <Typography 
                 fontSize="xl" 
                 fontWeight="bold" 
                 color={isOverBudget ? 'red.500' : 'green.500'}
               >
                 {budgetUtilization.toFixed(1)}%
-              </Text>
-              <Text fontSize="xs" color="gray.600">Presupuesto</Text>
-              <Progress 
-                value={Math.min(budgetUtilization, 100)} 
-                colorPalette={isOverBudget ? 'red' : 'green'} 
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">Presupuesto</Typography>
+              <Progress.Root
+                value={Math.min(budgetUtilization, 100)}
+                colorPalette={isOverBudget ? 'red' : 'green'}
                 size="xs"
                 w="full"
-              />
-            </VStack>
+              >
+                <Progress.Track>
+                  <Progress.Range />
+                </Progress.Track>
+              </Progress.Root>
+            </Stack>
           </CardWrapper.Body>
-        </CardWrapper.Root>
+        </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
-            <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="teal.500">
+            <Stack gap="1">
+              <Typography fontSize="xl" fontWeight="bold" color="teal.500">
                 {dailySummary ? formatHours(dailySummary.total_hours_worked) : '0h'}
-              </Text>
-              <Text fontSize="xs" color="gray.600">Horas Trabajadas</Text>
-              <Text fontSize="xs" color="gray.500">
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">Horas Trabajadas</Typography>
+              <Typography fontSize="xs" color="gray.500">
                 {dailySummary ? formatHours(dailySummary.total_projected_hours) : '0h'} proyectadas
-              </Text>
-            </VStack>
+              </Typography>
+            </Stack>
           </CardWrapper.Body>
-        </CardWrapper.Root>
+        </CardWrapper>
       </SimpleGrid>
 
       {/* Main Content Tabs */}
       <CardWrapper>
-        <CardWrapper.Body p="0">
+        <CardWrapper p="0">
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="overview" gap="2" flex="1">
                 <Icon icon={ChartBarIcon} size="sm" />
-                <Text display={{ base: "none", sm: "block" }}>Resumen</Text>
+                <Typography display={{ base: "none", sm: "block" }}>Resumen</Typography>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="employees" gap="2" flex="1">
                 <Icon icon={ClockIcon} size="sm" />
-                <Text display={{ base: "none", sm: "block" }}>Empleados</Text>
+                <Typography display={{ base: "none", sm: "block" }}>Empleados</Typography>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="departments" gap="2" flex="1">
                 <Icon icon={CurrencyDollarIcon} size="sm" />
-                <Text display={{ base: "none", sm: "block" }}>Departamentos</Text>
+                <Typography display={{ base: "none", sm: "block" }}>Departamentos</Typography>
               </Tabs.Trigger>
               
               <Tabs.Trigger value="alerts" gap="2" flex="1">
                 <Icon icon={BellIcon} size="sm" />
-                <Text display={{ base: "none", sm: "block" }}>
+                <Typography display={{ base: "none", sm: "block" }}>
                   Alertas
                   {(criticalAlerts.length + overtimeAlerts.length) > 0 && (
                     <Badge ml="1" size="xs" colorPalette="red" variant="solid">
                       {criticalAlerts.length + overtimeAlerts.length}
                     </Badge>
                   )}
-                </Text>
+                </Typography>
               </Tabs.Trigger>
             </Tabs.List>
 
-            <Box p="6">
+            <Stack p="6">
               {/* Overview Tab */}
               <Tabs.Content value="overview">
-                <VStack gap="4" align="stretch">
-                  <Text fontSize="lg" fontWeight="semibold">Resumen del Día</Text>
+                <Stack gap="4" align="stretch">
+                  <Typography fontSize="lg" fontWeight="semibold">Resumen del Día</Typography>
                   
                   {dailySummary && (
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                       <CardWrapper size="sm">
-                        <CardWrapper.Body>
-                          <VStack align="stretch" gap="3">
-                            <Text fontSize="md" fontWeight="semibold">Costos</Text>
-                            <VStack align="stretch" gap="2">
-                              <HStack justify="space-between">
-                                <Text fontSize="sm">Actual</Text>
-                                <Text fontSize="sm" fontWeight="bold">
+                        <CardWrapper>
+                          <Stack align="stretch" gap="3">
+                            <Typography fontSize="md" fontWeight="semibold">Costos</Typography>
+                            <Stack align="stretch" gap="2">
+                              <Stack justify="space-between">
+                                <Typography fontSize="sm">Actual</Typography>
+                                <Typography fontSize="sm" fontWeight="bold">
                                   {QuickCalculations.formatCurrency(dailySummary.total_current_cost)}
-                                </Text>
-                              </HStack>
-                              <HStack justify="space-between">
-                                <Text fontSize="sm">Proyectado</Text>
-                                <Text fontSize="sm">
+                                </Typography>
+                              </Stack>
+                              <Stack justify="space-between">
+                                <Typography fontSize="sm">Proyectado</Typography>
+                                <Typography fontSize="sm">
                                   {QuickCalculations.formatCurrency(dailySummary.total_projected_cost)}
-                                </Text>
-                              </HStack>
-                              <HStack justify="space-between">
-                                <Text fontSize="sm">Variación</Text>
-                                <Text 
+                                </Typography>
+                              </Stack>
+                              <Stack justify="space-between">
+                                <Typography fontSize="sm">Variación</Typography>
+                                <Typography 
                                   fontSize="sm" 
                                   color={dailySummary.cost_variance > 0 ? 'red.500' : 'green.500'}
                                   fontWeight="semibold"
                                 >
                                   {dailySummary.cost_variance > 0 ? '+' : ''}
                                   {QuickCalculations.formatCurrency(dailySummary.cost_variance)}
-                                </Text>
-                              </HStack>
-                            </VStack>
-                          </VStack>
-                        </CardWrapper.Body>
-                      </CardWrapper.Root>
+                                </Typography>
+                              </Stack>
+                            </Stack>
+                          </Stack>
+                        </CardWrapper>
+                      </CardWrapper>
 
                       <CardWrapper size="sm">
-                        <CardWrapper.Body>
-                          <VStack align="stretch" gap="3">
-                            <Text fontSize="md" fontWeight="semibold">Horas</Text>
-                            <VStack align="stretch" gap="2">
-                              <HStack justify="space-between">
-                                <Text fontSize="sm">Trabajadas</Text>
-                                <Text fontSize="sm" fontWeight="bold">
+                        <CardWrapper>
+                          <Stack align="stretch" gap="3">
+                            <Typography fontSize="md" fontWeight="semibold">Horas</Typography>
+                            <Stack align="stretch" gap="2">
+                              <Stack justify="space-between">
+                                <Typography fontSize="sm">Trabajadas</Typography>
+                                <Typography fontSize="sm" fontWeight="bold">
                                   {formatHours(dailySummary.total_hours_worked)}
-                                </Text>
-                              </HStack>
-                              <HStack justify="space-between">
-                                <Text fontSize="sm">Proyectadas</Text>
-                                <Text fontSize="sm">
+                                </Typography>
+                              </Stack>
+                              <Stack justify="space-between">
+                                <Typography fontSize="sm">Proyectadas</Typography>
+                                <Typography fontSize="sm">
                                   {formatHours(dailySummary.total_projected_hours)}
-                                </Text>
-                              </HStack>
-                              <HStack justify="space-between">
-                                <Text fontSize="sm">Overtime</Text>
-                                <Text 
+                                </Typography>
+                              </Stack>
+                              <Stack justify="space-between">
+                                <Typography fontSize="sm">Overtime</Typography>
+                                <Typography 
                                   fontSize="sm" 
                                   color={dailySummary.overtime_hours > 0 ? 'red.500' : 'gray.500'}
                                   fontWeight="semibold"
                                 >
                                   {formatHours(dailySummary.overtime_hours)}
-                                </Text>
-                              </HStack>
-                            </VStack>
-                          </VStack>
-                        </CardWrapper.Body>
-                      </CardWrapper.Root>
+                                </Typography>
+                              </Stack>
+                            </Stack>
+                          </Stack>
+                        </CardWrapper>
+                      </CardWrapper>
                     </SimpleGrid>
                   )}
-                </VStack>
+                </Stack>
               </Tabs.Content>
 
               {/* Employees Tab */}
               <Tabs.Content value="employees">
-                <VStack gap="4" align="stretch">
-                  <HStack justify="space-between">
-                    <Text fontSize="lg" fontWeight="semibold">Estado de Empleados</Text>
+                <Stack gap="4" align="stretch">
+                  <Stack justify="space-between">
+                    <Typography fontSize="lg" fontWeight="semibold">Estado de Empleados</Typography>
                     <Badge colorPalette="green" variant="subtle">
                       {activeEmployeeCount} activos
                     </Badge>
-                  </HStack>
+                  </Stack>
                   
                   <Table.Root size="sm">
                     <Table.Header>
@@ -440,14 +428,14 @@ export function RealTimeLaborTracker({
                         .map(employee => (
                         <Table.Row key={employee.employee_id}>
                           <Table.Cell>
-                            <VStack align="start" gap="0">
-                              <Text fontSize="sm" fontWeight="medium">
+                            <Stack align="start" gap="0">
+                              <Typography fontSize="sm" fontWeight="medium">
                                 {employee.employee_name}
-                              </Text>
-                              <Text fontSize="xs" color="gray.500">
+                              </Typography>
+                              <Typography fontSize="xs" color="gray.500">
                                 {employee.department}
-                              </Text>
-                            </VStack>
+                              </Typography>
+                            </Stack>
                           </Table.Cell>
                           
                           <Table.Cell>
@@ -462,120 +450,120 @@ export function RealTimeLaborTracker({
                           </Table.Cell>
                           
                           <Table.Cell>
-                            <VStack align="start" gap="0">
-                              <Text fontSize="sm" fontWeight="medium">
+                            <Stack align="start" gap="0">
+                              <Typography fontSize="sm" fontWeight="medium">
                                 {formatHours(employee.current_hours)}
-                              </Text>
-                              <Text fontSize="xs" color="gray.500">
+                              </Typography>
+                              <Typography fontSize="xs" color="gray.500">
                                 {formatHours(employee.projected_hours)} proyectadas
-                              </Text>
-                            </VStack>
+                              </Typography>
+                            </Stack>
                           </Table.Cell>
                           
                           <Table.Cell>
-                            <Text fontSize="sm" fontWeight="bold">
+                            <Typography fontSize="sm" fontWeight="bold">
                               {QuickCalculations.formatCurrency(employee.current_cost)}
-                            </Text>
+                            </Typography>
                           </Table.Cell>
                           
                           <Table.Cell>
-                            <Text fontSize="sm">
+                            <Typography fontSize="sm">
                               {QuickCalculations.formatCurrency(employee.projected_cost)}
-                            </Text>
+                            </Typography>
                           </Table.Cell>
                           
                           <Table.Cell>
-                            <VStack align="start" gap="0">
+                            <Stack align="start" gap="0">
                               {employee.current_shift ? (
                                 <>
-                                  <Text fontSize="xs">
+                                  <Typography fontSize="xs">
                                     {employee.current_shift.start_time} - {employee.current_shift.end_time}
-                                  </Text>
-                                  <Text fontSize="xs" color="gray.500">
+                                  </Typography>
+                                  <Typography fontSize="xs" color="gray.500">
                                     {employee.current_shift.position}
-                                  </Text>
+                                  </Typography>
                                 </>
                               ) : (
-                                <Text fontSize="xs" color="gray.500">Sin turno</Text>
+                                <Typography fontSize="xs" color="gray.500">Sin turno</Typography>
                               )}
-                            </VStack>
+                            </Stack>
                           </Table.Cell>
                         </Table.Row>
                       ))}
                     </Table.Body>
                   </Table.Root>
-                </VStack>
+                </Stack>
               </Tabs.Content>
 
               {/* Departments Tab */}
               <Tabs.Content value="departments">
-                <VStack gap="4" align="stretch">
-                  <Text fontSize="lg" fontWeight="semibold">Costos por Departamento</Text>
+                <Stack gap="4" align="stretch">
+                  <Typography fontSize="lg" fontWeight="semibold">Costos por Departamento</Typography>
                   
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                     {Object.entries(departmentBreakdown).map(([department, data]) => (
                       <CardWrapper key={department} size="sm">
-                        <CardWrapper.Body>
-                          <VStack align="stretch" gap="3">
-                            <HStack justify="space-between">
-                              <Text fontSize="md" fontWeight="semibold">{department}</Text>
+                        <CardWrapper>
+                          <Stack align="stretch" gap="3">
+                            <Stack justify="space-between">
+                              <Typography fontSize="md" fontWeight="semibold">{department}</Typography>
                               <Badge colorPalette="blue" variant="subtle">
                                 {data.employee_count} empleados
                               </Badge>
-                            </HStack>
+                            </Stack>
                             
-                            <VStack align="stretch" gap="2">
-                              <HStack justify="space-between">
-                                <Text fontSize="sm">Costo Actual</Text>
-                                <Text fontSize="sm" fontWeight="bold">
+                            <Stack align="stretch" gap="2">
+                              <Stack justify="space-between">
+                                <Typography fontSize="sm">Costo Actual</Typography>
+                                <Typography fontSize="sm" fontWeight="bold">
                                   {QuickCalculations.formatCurrency(data.current_cost)}
-                                </Text>
-                              </HStack>
-                              <HStack justify="space-between">
-                                <Text fontSize="sm">Proyectado</Text>
-                                <Text fontSize="sm">
+                                </Typography>
+                              </Stack>
+                              <Stack justify="space-between">
+                                <Typography fontSize="sm">Proyectado</Typography>
+                                <Typography fontSize="sm">
                                   {QuickCalculations.formatCurrency(data.projected_cost)}
-                                </Text>
-                              </HStack>
+                                </Typography>
+                              </Stack>
                               {data.overtime_count > 0 && (
-                                <HStack justify="space-between">
-                                  <Text fontSize="sm">En Overtime</Text>
+                                <Stack justify="space-between">
+                                  <Typography fontSize="sm">En Overtime</Typography>
                                   <Badge size="xs" colorPalette="red" variant="subtle">
                                     {data.overtime_count}
                                   </Badge>
-                                </HStack>
+                                </Stack>
                               )}
-                            </VStack>
-                          </VStack>
-                        </CardWrapper.Body>
-                      </CardWrapper.Root>
+                            </Stack>
+                          </Stack>
+                        </CardWrapper>
+                      </CardWrapper>
                     ))}
                   </SimpleGrid>
-                </VStack>
+                </Stack>
               </Tabs.Content>
 
               {/* Alerts Tab */}
               <Tabs.Content value="alerts">
-                <VStack gap="4" align="stretch">
-                  <Text fontSize="lg" fontWeight="semibold">Alertas Activas</Text>
+                <Stack gap="4" align="stretch">
+                  <Typography fontSize="lg" fontWeight="semibold">Alertas Activas</Typography>
                   
                   {criticalAlerts.length === 0 && overtimeAlerts.length === 0 && budgetAlerts.length === 0 ? (
                     <CardWrapper>
-                      <CardWrapper.Body py="8" textAlign="center">
-                        <VStack gap="3">
-                          <EyeIcon className="w-8 h-8 text-green-500 mx-auto" />
-                          <Text color="gray.600">No hay alertas activas</Text>
-                          <Text fontSize="sm" color="gray.500">
+                      <CardWrapper py="8" textAlign="center">
+                        <Stack gap="3">
+                          <Icon icon={EyeIcon} size="lg" color="green.500" />
+                          <Typography color="gray.600">No hay alertas activas</Typography>
+                          <Typography fontSize="sm" color="gray.500">
                             Todos los sistemas funcionan normalmente
-                          </Text>
-                        </VStack>
-                      </CardWrapper.Body>
-                    </CardWrapper.Root>
+                          </Typography>
+                        </Stack>
+                      </CardWrapper>
+                    </CardWrapper>
                   ) : (
-                    <VStack gap="2" align="stretch">
+                    <Stack gap="2" align="stretch">
                       {[...criticalAlerts, ...overtimeAlerts, ...budgetAlerts].map(alert => (
                         <Alert.Root key={alert.id} status={alert.severity === 'critical' ? 'error' : 'warning'}>
-                          <Icon icon={ExclamationTriangleIcon} size="md" />
+                          <Alert.Indicator />
                           <Alert.Title>
                             {alert.employee_name || 'Sistema'}
                             {alert.department && ` - ${alert.department}`}
@@ -585,15 +573,15 @@ export function RealTimeLaborTracker({
                           </Alert.Description>
                         </Alert.Root>
                       ))}
-                    </VStack>
+                    </Stack>
                   )}
-                </VStack>
+                </Stack>
               </Tabs.Content>
-            </Box>
+            </Stack>
           </Tabs.Root>
-        </CardWrapper.Body>
-      </CardWrapper.Root>
-    </VStack>
+        </CardWrapper>
+      </CardWrapper>
+    </Stack>
   );
 }
 

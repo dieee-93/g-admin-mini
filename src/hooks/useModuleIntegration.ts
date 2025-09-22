@@ -3,7 +3,7 @@
  * Provides unified interface for module communication and capability checking
  */
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useEventBus } from '@/providers/EventBusProvider';
 import { useCapabilities } from '@/lib/capabilities';
 import { useSlotRegistry } from '@/lib/composition';
@@ -71,12 +71,44 @@ export function useModuleIntegration(
   const { hasCapability, hasAllCapabilities, activeCapabilities } = useCapabilities();
   const { bulkRegisterSlots, addSlotContent } = useSlotRegistry();
 
-  // Calculate module status
-  const missingCapabilities = config.capabilities.filter(cap => !hasCapability(cap));
-  const isActive = missingCapabilities.length === 0;
+  // ✅ MEMOIZE STATUS CALCULATION - Prevents infinite re-renders
+  const status = useMemo(() => {
+    const missingCapabilities = config.capabilities.filter(cap => !hasCapability(cap));
+    const isActive = missingCapabilities.length === 0;
+
+    // 🐛 DEBUG: Only log when status actually changes
+    console.log('[useModuleIntegration] ⚙️ Status calculated for', moduleId, {
+      isActive,
+      missingCapabilities,
+      activeCapabilities: activeCapabilities.length,
+      configCapabilities: config.capabilities,
+      configLength: config.capabilities.length,
+      missingCount: missingCapabilities.length,
+      timestamp: new Date().toISOString()
+    });
+
+    // Track connected modules (modules that emit events this module listens to)
+    const connectedModules = config.events?.listens?.map(event => {
+      const parts = event.split('.');
+      return parts[0] as ModuleId;
+    }).filter((module, index, self) => self.indexOf(module) === index) || [];
+
+    return {
+      isActive,
+      missingCapabilities,
+      connectedModules
+    };
+  }, [config.capabilities, config.events?.listens, hasCapability, activeCapabilities.length, moduleId]);
 
   // Register module on mount
   useEffect(() => {
+    console.log('[useModuleIntegration] 🔄 Module registration effect triggered', {
+      moduleId,
+      isActive: status.isActive,
+      missingCapabilities: status.missingCapabilities,
+      configCapabilities: config.capabilities
+    });
+
     // Emit module registration event
     emitModuleEvent('system', 'module_registered', {
       moduleId,
@@ -84,7 +116,7 @@ export function useModuleIntegration(
       events: config.events,
       slots: config.slots,
       metadata: config.metadata,
-      isActive
+      isActive: status.isActive
     });
 
     // Register slots if provided
@@ -110,13 +142,18 @@ export function useModuleIntegration(
 
     // Cleanup function
     return () => {
+      console.log('[useModuleIntegration] 🔄 Module unregistration cleanup triggered', {
+        moduleId,
+        reason: 'Effect cleanup'
+      });
+
       // Emit module unregistration
       emitModuleEvent('system', 'module_unregistered', { moduleId });
 
       // Cleanup event listeners
       unsubscribers.forEach(unsub => unsub());
     };
-  }, [moduleId, config, isActive]);
+  }, [moduleId, config, status.isActive]);
 
   // Event emission functions
   const emitEvent = useCallback((event: string, data?: any) => {
@@ -139,12 +176,6 @@ export function useModuleIntegration(
     });
   }, [moduleId, addSlotContent]);
 
-  // Track connected modules (modules that emit events this module listens to)
-  const connectedModules = config.events?.listens?.map(event => {
-    const parts = event.split('.');
-    return parts[0] as ModuleId;
-  }).filter((module, index, self) => self.indexOf(module) === index) || [];
-
   return {
     moduleId,
     emitEvent,
@@ -152,11 +183,7 @@ export function useModuleIntegration(
     hasCapability,
     hasAllCapabilities,
     registerSlotContent,
-    status: {
-      isActive,
-      missingCapabilities,
-      connectedModules
-    }
+    status
   };
 }
 

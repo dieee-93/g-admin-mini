@@ -17,7 +17,7 @@ import {
   Separator,
   Badge,
   SimpleGrid,
-  Modal,
+
   Fieldset,
   Slider
 } from '@chakra-ui/react';
@@ -32,7 +32,7 @@ import {
   LightBulbIcon,
   CalendarIcon
 } from '@heroicons/react/24/outline';
-import { Icon, InputField, CardWrapper } from '@/shared/ui';
+import { Icon, InputField, CardWrapper, Modal } from '@/shared/ui';
 
 import { autoSchedulingEngine, type SchedulingConstraints, type SchedulingSolution } from '../../../../../services/scheduling/autoSchedulingEngine';
 import { notify } from '@/lib/notifications';

@@ -22,7 +22,7 @@ export const shiftsApi = {
   }): Promise<Shift[]> {
     try {
       let query = supabase
-        .from('shifts')
+        .from('shift_schedules')
         .select(`
           *,
           employees:employee_id (
@@ -65,7 +65,7 @@ export const shiftsApi = {
   async createShift(shiftData: ShiftFormData): Promise<Shift> {
     try {
       const { data, error } = await supabase
-        .from('shifts')
+        .from('shift_schedules')
         .insert([{
           employee_id: shiftData.employee_id,
           date: shiftData.date,
@@ -100,7 +100,7 @@ export const shiftsApi = {
   async updateShift(shiftId: string, updates: Partial<Shift>): Promise<void> {
     try {
       const { error } = await supabase
-        .from('shifts')
+        .from('shift_schedules')
         .update({
           ...updates,
           updated_at: new Date().toISOString()
@@ -118,7 +118,7 @@ export const shiftsApi = {
   async deleteShift(shiftId: string): Promise<void> {
     try {
       const { error } = await supabase
-        .from('shifts')
+        .from('shift_schedules')
         .delete()
         .eq('id', shiftId);
 
@@ -133,7 +133,7 @@ export const shiftsApi = {
   async bulkCreateShifts(shiftsData: ShiftFormData[]): Promise<Shift[]> {
     try {
       const { data, error } = await supabase
-        .from('shifts')
+        .from('shift_schedules')
         .insert(
           shiftsData.map(shiftData => ({
             employee_id: shiftData.employee_id,
@@ -169,7 +169,7 @@ export const shiftsApi = {
   async getShiftConflicts(employeeId: string, date: string, startTime: string, endTime: string): Promise<Shift[]> {
     try {
       const { data, error } = await supabase
-        .from('shifts')
+        .from('shift_schedules')
         .select('*')
         .eq('employee_id', employeeId)
         .eq('date', date)
@@ -447,7 +447,7 @@ export const schedulesApi = {
 
       if (shiftsToCreate.length > 0) {
         const { error: shiftsError } = await supabase
-          .from('shifts')
+          .from('shift_schedules')
           .insert(shiftsToCreate);
 
         if (shiftsError) throw shiftsError;
@@ -553,7 +553,7 @@ export const schedulingAnalyticsApi = {
       // This would typically be a more complex query or stored procedure
       // For now, we'll do basic calculations
       const { data: shifts, error } = await supabase
-        .from('shifts')
+        .from('shift_schedules')
         .select(`
           *,
           employees:employee_id (
@@ -604,7 +604,7 @@ export const schedulingAnalyticsApi = {
       // Implementation would depend on business rules for minimum staffing
       
       const { data: shifts, error } = await supabase
-        .from('shifts')
+        .from('shift_schedules')
         .select(`
           date,
           start_time,

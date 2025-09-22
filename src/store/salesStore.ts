@@ -614,3 +614,14 @@ function calculateTopProducts(sales: Sale[]): SalesStats['topProducts'] {
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 10);
 }
+
+// Alias for easier imports
+export const useSales = useSalesStore;
+
+// Modal state helper
+export const useModalState = () => {
+  const isModalOpen = useSalesStore(state => state.isCheckoutModalOpen);
+  const closeModal = useSalesStore(state => state.closeCheckoutModal);
+
+  return { isModalOpen, closeModal };
+};

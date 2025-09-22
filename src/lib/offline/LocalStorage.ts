@@ -3,7 +3,7 @@
 
 // Database configuration
 const DB_NAME = 'G-Admin-Mini';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 const STORES_CONFIG = {
   orders: { keyPath: 'id', indexes: ['customerId', 'timestamp', 'status'] },
   inventory: { keyPath: 'id', indexes: ['type', 'category', 'lastUpdated'] },
@@ -14,16 +14,35 @@ const STORES_CONFIG = {
   conflicts: { keyPath: 'id', indexes: ['operationId', 'timestamp', 'resolved'] },
   settings: { keyPath: 'key', indexes: [] as string[] },
   cache: { keyPath: 'url', indexes: ['timestamp', 'expires'] },
-  analytics: { keyPath: 'id', indexes: ['type', 'timestamp', 'module'] }
+  analytics: { keyPath: 'id', indexes: ['type', 'timestamp', 'module'] },
+  // Stores adicionales para funcionalidades específicas
+  websocket_message_queue: { keyPath: 'key', indexes: ['timestamp'] },
+  offline_orders: { keyPath: 'id', indexes: ['timestamp', 'status'] },
+  offline_inventory_items: { keyPath: 'id', indexes: ['timestamp', 'itemId'] },
+  offline_time_entries: { keyPath: 'id', indexes: ['employeeId', 'timestamp'] },
+  offline_time_operations: { keyPath: 'id', indexes: ['timestamp', 'type'] },
+  offline_sales: { keyPath: 'id', indexes: ['timestamp', 'status'] },
+  audit_log: { keyPath: 'id', indexes: ['timestamp', 'action', 'entity'] }
 };
 
 // Data types for TypeScript
-interface StoredData {
-  id: string;
+interface BaseStoredData {
   data: any;
   timestamp: number;
   version: number;
   checksum?: string;
+}
+
+interface StoredData extends BaseStoredData {
+  id: string;
+}
+
+interface StoredDataWithKey extends BaseStoredData {
+  key: string;
+}
+
+interface StoredDataWithUrl extends BaseStoredData {
+  url: string;
 }
 
 interface CacheEntry {
@@ -50,9 +69,17 @@ class LocalStorageManager {
   private db: IDBDatabase | null = null;
   private dbPromise: Promise<IDBDatabase> | null = null;
   private isInitialized: boolean = false;
-  
+
   constructor() {
     this.initialize();
+  }
+
+  // Validar que el store existe en la configuración
+  private validateStoreName(storeName: string): void {
+    if (!STORES_CONFIG.hasOwnProperty(storeName)) {
+      const availableStores = Object.keys(STORES_CONFIG).join(', ');
+      throw new Error(`Invalid store name '${storeName}'. Available stores: ${availableStores}`);
+    }
   }
 
   // Initialize the database
@@ -191,32 +218,49 @@ class LocalStorageManager {
     mode: IDBTransactionMode,
     operation: (store: IDBObjectStore) => IDBRequest<T>
   ): Promise<T> {
+    // Validar store name antes de intentar usarlo
+    this.validateStoreName(storeName);
+
     const db = await this.ensureReady();
-    
+
+    // Verificar que el store existe en la base de datos
+    if (!db.objectStoreNames.contains(storeName)) {
+      throw new Error(`Object store '${storeName}' not found. Available stores: ${Array.from(db.objectStoreNames).join(', ')}`);
+    }
+
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([storeName], mode);
       const store = transaction.objectStore(storeName);
       const request = operation(store);
-      
+
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
-      
+
       transaction.onerror = () => reject(transaction.error);
     });
   }
 
   // Store data with metadata
   public async set(storeName: string, key: string, data: any): Promise<void> {
-    const storedData: StoredData = {
-      id: key,
+    // Obtener la configuración del store para usar el keyPath correcto
+    const storeConfig = STORES_CONFIG[storeName as keyof typeof STORES_CONFIG];
+    const keyPath = storeConfig.keyPath;
+
+    console.log(`[LocalStorage] 🔧 Using keyPath '${keyPath}' for store '${storeName}'`);
+
+    // Crear el objeto con la estructura correcta basada en el keyPath
+    const storedData: any = {
+      [keyPath]: key, // Usar el keyPath dinámicamente
       data,
       timestamp: Date.now(),
       version: 1,
       checksum: this.calculateChecksum(data)
     };
-    
+
+    console.log(`[LocalStorage] 🔧 Storing object:`, storedData);
+
     await this.performStoreOperation(storeName, 'readwrite', store => store.put(storedData));
-    console.log(`[LocalStorage] Stored data in ${storeName}: ${key}`);
+    console.log(`[LocalStorage] ✅ Stored data in ${storeName}: ${key}`);
   }
 
   // Retrieve data

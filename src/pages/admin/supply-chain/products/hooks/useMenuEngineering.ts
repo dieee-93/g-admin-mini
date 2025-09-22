@@ -5,7 +5,7 @@ import {
   type MenuEngineeringData,
   type StrategyRecommendation,
   type MatrixConfiguration
-} from '../types';
+} from '../components/MenuEngineeringMatrix';
 import {
   calculateMenuEngineeringMatrix,
   DEFAULT_MATRIX_CONFIG,

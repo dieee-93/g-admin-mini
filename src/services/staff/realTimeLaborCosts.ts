@@ -131,7 +131,7 @@ class RealTimeLaborCostService {
   private async updateLiveCosts(): Promise<void> {
     try {
       const today = new Date().toISOString().split('T')[0];
-      
+
       // Get all employees with their current shifts
       const { data: employees, error: employeesError } = await supabase
         .from('employees')
@@ -145,18 +145,18 @@ class RealTimeLaborCostService {
 
       if (employeesError) throw employeesError;
 
-      // Get active time entries (clock-ins without clock-outs)
-      const { data: timeEntries, error: timeEntriesError } = await supabase
+      // Get active employees (those who clocked in today but haven't clocked out)
+      const { data: clockInEntries, error: timeEntriesError } = await supabase
         .from('time_entries')
-        .select('*')
-        .eq('clock_out', null)
-        .gte('clock_in', `${today}T00:00:00Z`);
+        .select('employee_id, timestamp')
+        .eq('entry_type', 'clock_in')
+        .gte('timestamp', `${today}T00:00:00Z`);
 
       if (timeEntriesError) throw timeEntriesError;
 
-      // Get today's shifts
+      // Get today's shift schedules (use shift_schedules table which has date column)
       const { data: todayShifts, error: shiftsError } = await supabase
-        .from('shifts')
+        .from('shift_schedules')
         .select(`
           *,
           employees:employee_id (
@@ -168,13 +168,25 @@ class RealTimeLaborCostService {
 
       if (shiftsError) throw shiftsError;
 
+      // Get clock out entries to determine who is still active
+      const { data: clockOutEntries } = await supabase
+        .from('time_entries')
+        .select('employee_id, timestamp')
+        .eq('entry_type', 'clock_out')
+        .gte('timestamp', `${today}T00:00:00Z`);
+
       // Process live cost data
       const liveData: LiveCostData[] = (employees || []).map(employee => {
-        const currentTimeEntry = (timeEntries || []).find(te => te.employee_id === employee.id);
+        const clockInEntry = (clockInEntries || []).find(te => te.employee_id === employee.id);
+        const clockOutEntry = (clockOutEntries || []).find(te => te.employee_id === employee.id);
         const currentShift = (todayShifts || []).find(shift => shift.employee_id === employee.id);
-        
-        const clockInTime = currentTimeEntry?.clock_in;
-        const currentHours = clockInTime ? this.calculateCurrentHours(clockInTime) : 0;
+
+        // Only include if clocked in but not clocked out (or clocked in after last clock out)
+        const clockInTime = clockInEntry?.timestamp;
+        const clockOutTime = clockOutEntry?.timestamp;
+        const isCurrentlyActive = clockInTime && (!clockOutTime || new Date(clockInTime) > new Date(clockOutTime));
+
+        const currentHours = (isCurrentlyActive && clockInTime) ? this.calculateCurrentHours(clockInTime) : 0;
         
         // Calculate projected hours based on shift schedule
         let projectedHours = 0;

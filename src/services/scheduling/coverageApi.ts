@@ -1,7 +1,7 @@
 // coverageApi.ts - Coverage Planning API with Supabase Integration
 // Replaces mock data with real database operations for coverage planning
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase/client";
 
 // Database types for coverage planning
 export interface CoverageGap {
@@ -125,7 +125,7 @@ function calculateCoverageGaps(
       
       if (scheduledShifts.length < req.min_staff) {
         gaps.push({
-          id: `gap_${date}_${req.position}`,
+          id: `gap_${date}_${req.position}_${req.time_slot.replace(':', '')}`,
           date,
           shift_time: req.time_slot,
           position: req.position,

@@ -1,7 +1,7 @@
 // src/features/products/data/productApi.ts
 // G-Admin Products API - Leveraging Database Functions for Intelligence
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { 
   type Product, 
   type ProductWithIntelligence,

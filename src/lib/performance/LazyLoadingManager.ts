@@ -128,10 +128,14 @@ export class LazyLoadingManager {
         const loadTime = performance.now() - startTime;
         moduleState.retryCount++;
         
-        // Retry logic
+        // Retry logic with enhanced protection
         if (moduleState.retryCount < retryCount && this.shouldRetry(error as Error)) {
           console.warn(`Retrying ${moduleName} load (attempt ${moduleState.retryCount + 1}/${retryCount})`);
-          await this.delay(1000 * moduleState.retryCount); // Exponential backoff
+
+          // Enhanced backoff to prevent tight loops
+          const backoffDelay = Math.min(10000, 1000 * Math.pow(2, moduleState.retryCount)); // Max 10s
+          await this.delay(backoffDelay);
+
           return enhancedImport();
         }
         

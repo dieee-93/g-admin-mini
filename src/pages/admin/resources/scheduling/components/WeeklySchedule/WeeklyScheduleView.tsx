@@ -1,27 +1,27 @@
-// WeeklyScheduleView - Main calendar interface with drag & drop scheduling
+// WeeklyScheduleView - Enterprise Calendar with Shared Components
+// Migrated to G-Admin Mini v2.1 + Shared Business Components
+
 import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  VStack, 
-  HStack, 
-  Text, 
-  Button, 
-  Grid, 
-  Badge,
-  IconButton,
-  Skeleton,
-  Select,
-  Stack
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
-import { 
-  ChevronLeftIcon, 
-  ChevronRightIcon, 
+import {
+  Stack, Button, Icon, Badge, Grid,
+  WeeklyCalendar, EmployeeAvailabilityCard,
+  Section
+} from '@/shared/ui';
+
+import { Skeleton } from '@chakra-ui/react';
+
+// ✅ HEROICONS v2
+import {
   PlusIcon,
-  ClockIcon,
-  UserIcon,
-  ExclamationTriangleIcon
+  AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
+
+// ✅ SHARED TYPES
+import type {
+  CalendarShift,
+  EmployeeAvailability
+} from '@/shared/ui';
+
 import type { Shift, ShiftStatus } from '../../types';
 
 interface WeeklyScheduleViewProps {
@@ -38,335 +38,251 @@ interface WeeklyScheduleViewProps {
   onViewStateChange: (viewState: unknown) => void;
 }
 
-interface Employee {
-  id: string;
-  name: string;
-  position: string;
-  avatar?: string;
-  availability: string[];
-}
-
-interface DaySchedule {
-  date: string;
-  dayName: string;
-  shifts: Shift[];
-  totalHours: number;
-  coverage: number;
-}
-
 export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklyScheduleViewProps) {
+  console.log('🔍 WeeklyScheduleView: RENDER START', { timestamp: Date.now() });
+  const renderStart = performance.now();
+  
   const [loading, setLoading] = useState(true);
   const [selectedWeekStart, setSelectedWeekStart] = useState<Date>(new Date());
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [weekSchedule, setWeekSchedule] = useState<DaySchedule[]>([]);
+  const [employees, setEmployees] = useState<EmployeeAvailability[]>([]);
+  const [shifts, setShifts] = useState<CalendarShift[]>([]);
 
-  // Mock data - will be replaced with API calls
+  // ✅ MOCK DATA - será reemplazado por API calls
   useEffect(() => {
-    const mockEmployees: Employee[] = [
-      { id: '1', name: 'Ana García', position: 'Server', availability: ['mon', 'tue', 'wed', 'thu', 'fri'] },
-      { id: '2', name: 'Carlos López', position: 'Cook', availability: ['tue', 'wed', 'thu', 'fri', 'sat', 'sun'] },
-      { id: '3', name: 'María Rodríguez', position: 'Server', availability: ['wed', 'thu', 'fri', 'sat', 'sun'] },
-      { id: '4', name: 'José Martín', position: 'Manager', availability: ['mon', 'tue', 'wed', 'thu', 'fri'] },
-      { id: '5', name: 'Elena Fernández', position: 'Bartender', availability: ['thu', 'fri', 'sat', 'sun'] },
-      { id: '6', name: 'Pedro Sánchez', position: 'Cook', availability: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'] }
-    ];
-
-    const mockShifts: Shift[] = [
+    console.log('🔍 WeeklyScheduleView: useEffect START', { selectedWeekStart });
+    const effectStart = performance.now();
+    
+    const mockEmployees: EmployeeAvailability[] = [
       {
         id: '1',
-        employee_id: '1',
-        employee_name: 'Ana García',
-        date: '2024-01-15',
-        start_time: '09:00',
-        end_time: '17:00',
+        name: 'Ana García',
         position: 'Server',
-        status: 'confirmed',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        availableDays: ['mon', 'tue', 'wed', 'thu', 'fri'],
+        preferredShifts: ['morning', 'afternoon'],
+        maxWeeklyHours: 40,
+        currentWeeklyHours: 32,
+        status: 'available',
+        reliability: 95,
+        averageRating: 4.8,
+        totalShiftsThisMonth: 12
       },
       {
         id: '2',
-        employee_id: '2',
-        employee_name: 'Carlos López',
-        date: '2024-01-15',
-        start_time: '11:00',
-        end_time: '20:00',
+        name: 'Carlos López',
         position: 'Cook',
-        status: 'scheduled',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        availableDays: ['tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        preferredShifts: ['afternoon', 'evening'],
+        maxWeeklyHours: 40,
+        currentWeeklyHours: 36,
+        status: 'available',
+        reliability: 88,
+        averageRating: 4.5,
+        totalShiftsThisMonth: 15
+      },
+      {
+        id: '3',
+        name: 'María Rodríguez',
+        position: 'Server',
+        availableDays: ['wed', 'thu', 'fri', 'sat', 'sun'],
+        preferredShifts: ['evening'],
+        maxWeeklyHours: 32,
+        currentWeeklyHours: 28,
+        status: 'available',
+        reliability: 92,
+        averageRating: 4.7,
+        totalShiftsThisMonth: 10
       }
     ];
 
-    // Generate week schedule
-    const weekDays = generateWeekDays(selectedWeekStart);
-    const mockWeekSchedule = weekDays.map(day => ({
-      date: day.toISOString().split('T')[0],
-      dayName: day.toLocaleDateString('es-ES', { weekday: 'short' }),
-      shifts: mockShifts.filter(shift => shift.date === day.toISOString().split('T')[0]),
-      totalHours: 16, // Mock calculation
-      coverage: 85 // Mock coverage percentage
-    }));
+    const mockShifts: CalendarShift[] = [
+      {
+        id: '1',
+        employeeId: '1',
+        employeeName: 'Ana García',
+        date: '2024-01-15',
+        startTime: '09:00',
+        endTime: '17:00',
+        position: 'Server',
+        status: 'confirmed'
+      },
+      {
+        id: '2',
+        employeeId: '2',
+        employeeName: 'Carlos López',
+        date: '2024-01-15',
+        startTime: '11:00',
+        endTime: '20:00',
+        position: 'Cook',
+        status: 'scheduled'
+      }
+    ];
+
+    console.log('🔍 WeeklyScheduleView: Mock data created', { 
+      employeesCount: mockEmployees.length,
+      shiftsCount: mockShifts.length 
+    });
 
     setEmployees(mockEmployees);
-    setWeekSchedule(mockWeekSchedule);
+    setShifts(mockShifts);
     setLoading(false);
+    
+    const effectEnd = performance.now();
+    console.log('🔍 WeeklyScheduleView: useEffect END', { 
+      duration: `${effectEnd - effectStart}ms` 
+    });
   }, [selectedWeekStart]);
 
-  const generateWeekDays = (startDate: Date): Date[] => {
-    const days = [];
-    const start = new Date(startDate);
-    start.setDate(start.getDate() - start.getDay() + 1); // Start from Monday
-    
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(start);
-      day.setDate(start.getDate() + i);
-      days.push(day);
-    }
-    return days;
+  // ✅ HANDLERS
+  const handleWeekChange = (newWeek: Date) => {
+    setSelectedWeekStart(newWeek);
+    onViewStateChange({
+      ...viewState,
+      selectedWeek: newWeek.toISOString()
+    });
   };
 
-  const navigateWeek = (direction: 'prev' | 'next') => {
-    const newDate = new Date(selectedWeekStart);
-    newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
-    setSelectedWeekStart(newDate);
+  const handleShiftClick = (shift: CalendarShift) => {
+    console.log('Shift clicked:', shift);
+    // TODO: Open shift details modal
   };
 
-  const getShiftColor = (status: ShiftStatus) => {
-    const colors = {
-      scheduled: 'blue',
-      confirmed: 'green',
-      in_progress: 'orange',
-      completed: 'gray',
-      cancelled: 'red',
-      no_show: 'red'
-    };
-    return colors[status] || 'gray';
+  const handleNewShift = (date: string) => {
+    console.log('New shift for date:', date);
+    // TODO: Open new shift modal
   };
 
-  const ShiftCard = ({ shift }: { shift: Shift }) => (
-    <CardWrapper size="sm" mb="2" bg={`${getShiftColor(shift.status)}.50`}>
-      <CardWrapper.Body p="2">
-        <VStack gap="1" align="stretch">
-          <HStack justify="space-between">
-            <Text fontSize="xs" fontWeight="semibold">
-              {shift.employee_name}
-            </Text>
-            <Badge size="xs" colorPalette={getShiftColor(shift.status)}>
-              {shift.status}
-            </Badge>
-          </HStack>
-          <HStack gap="1">
-            <ClockIcon className="w-3 h-3 text-gray-500" />
-            <Text fontSize="xs" color="gray.600">
-              {shift.start_time} - {shift.end_time}
-            </Text>
-          </HStack>
-          <Text fontSize="xs" color="gray.500">
-            {shift.position}
-          </Text>
-        </VStack>
-      </CardWrapper.Body>
-    </CardWrapper>
-  );
+  const handleDayClick = (date: string) => {
+    console.log('Day clicked:', date);
+    // TODO: Focus on day view or show day details
+  };
+
+  const handleEmployeeAction = (employeeId: string, action: string) => {
+    console.log('Employee action:', employeeId, action);
+    // TODO: Handle employee actions (schedule, contact, etc.)
+  };
 
   if (loading) {
+    console.log('🔍 WeeklyScheduleView: RENDERING Loading state');
     return (
-      <VStack gap="4" align="stretch">
-        <Skeleton height="40px" />
-        <Grid templateColumns="repeat(7, 1fr)" gap="4">
-          {[...Array(7)].map((_, i) => (
-            <Skeleton key={i} height="200px" />
-          ))}
-        </Grid>
-      </VStack>
+      <Stack direction="column" gap="md">
+        <Skeleton h="60px" />
+        <Skeleton h="400px" />
+        <Skeleton h="200px" />
+      </Stack>
     );
   }
 
-  return (
-    <VStack gap="6" align="stretch">
-      {/* Week Navigation & Controls */}
-      <CardWrapper>
-        <CardWrapper.Body>
-          <HStack justify="space-between">
-            <HStack gap="4">
-              <HStack>
-                <IconButton variant="ghost" size="sm" onClick={() => navigateWeek('prev')}>
-                  <ChevronLeftIcon className="w-4 h-4" />
-                </IconButton>
-                <VStack gap="0">
-                  <Text fontWeight="semibold">
-                    {selectedWeekStart.toLocaleDateString('es-ES', { 
-                      month: 'long', 
-                      year: 'numeric' 
-                    })}
-                  </Text>
-                  <Text fontSize="sm" color="gray.600">
-                    Week of {selectedWeekStart.toLocaleDateString('es-ES', { 
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}
-                  </Text>
-                </VStack>
-                <IconButton variant="ghost" size="sm" onClick={() => navigateWeek('next')}>
-                  <ChevronRightIcon className="w-4 h-4" />
-                </IconButton>
-              </HStack>
+  console.log('🔍 WeeklyScheduleView: RENDERING Main content', {
+    renderDuration: `${performance.now() - renderStart}ms`,
+    employeesCount: employees.length,
+    shiftsCount: shifts.length
+  });
 
+  return (
+    <Stack direction="column" gap="md">
+      {/* � CONTENIDO DE PRUEBA - PESTAÑA HORARIOS */}
+      <div style={{ 
+        backgroundColor: '#ff6b6b', 
+        color: 'white', 
+        padding: '20px', 
+        borderRadius: '8px',
+        fontSize: '18px',
+        fontWeight: 'bold',
+        textAlign: 'center'
+      }}>
+        ✅ COMPONENTE HORARIOS FUNCIONANDO - WeeklyScheduleView renderizado correctamente
+      </div>
+
+      {/* �📅 MAIN WEEKLY CALENDAR */}
+      <Section variant="elevated" title="Calendario Semanal">
+        <Stack direction="column" gap="md">
+          {/* Controls Row */}
+          <Stack direction="row" justify="space-between" align="center">
+            <Stack direction="row" gap="sm" align="center">
               {/* View Mode Toggle */}
-              <HStack>
-                <Button 
-                  size="sm" 
+              <Stack direction="row" gap="xs">
+                <Button
+                  size="sm"
                   variant={viewState.viewMode === 'week' ? 'solid' : 'ghost'}
                   onClick={() => onViewStateChange({...viewState, viewMode: 'week'})}
                 >
-                  Week
+                  Semana
                 </Button>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant={viewState.viewMode === 'day' ? 'solid' : 'ghost'}
                   onClick={() => onViewStateChange({...viewState, viewMode: 'day'})}
                 >
-                  Day
+                  Día
                 </Button>
-              </HStack>
-            </HStack>
+              </Stack>
 
-            <HStack gap="2">
-              {/* Filters */}
-              <Select.Root size="sm" width="150px">
-                <Select.Trigger>
-                  <Select.ValueText placeholder="All Positions" />
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Item value="server">Server</Select.Item>
-                  <Select.Item value="cook">Cook</Select.Item>
-                  <Select.Item value="bartender">Bartender</Select.Item>
-                  <Select.Item value="manager">Manager</Select.Item>
-                </Select.Content>
-              </Select.Root>
+              {/* Quick Filters */}
+              <Badge size="sm" colorPalette="blue" variant="outline">
+                {shifts.length} turnos programados
+              </Badge>
+            </Stack>
 
-              <Button size="sm" leftIcon={<PlusIcon className="w-4 h-4" />}>
-                New Shift
+            <Stack direction="row" gap="sm">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => console.log('Filters')}
+              >
+                <Icon icon={AdjustmentsHorizontalIcon} size="sm" />
+                Filtros
               </Button>
-            </HStack>
-          </HStack>
-        </CardWrapper.Body>
-      </CardWrapper>
 
-      {/* Weekly Calendar Grid */}
-      <CardWrapper>
-        <CardWrapper.Body p="4">
-          <Grid templateColumns="repeat(7, 1fr)" gap="4">
-            {weekSchedule.map((day, index) => (
-              <VStack key={day.date} gap="2" align="stretch">
-                {/* Day Header */}
-                <VStack gap="1">
-                  <Text fontSize="sm" fontWeight="semibold" textTransform="capitalize">
-                    {day.dayName}
-                  </Text>
-                  <Text fontSize="lg" fontWeight="bold">
-                    {new Date(day.date).getDate()}
-                  </Text>
-                  <HStack gap="2">
-                    <Badge size="xs" colorPalette={day.coverage >= 80 ? 'green' : day.coverage >= 60 ? 'orange' : 'red'}>
-                      {day.coverage}%
-                    </Badge>
-                    <Text fontSize="xs" color="gray.600">
-                      {day.totalHours}h
-                    </Text>
-                  </HStack>
-                </VStack>
+              <Button
+                size="sm"
+                variant="solid"
+                onClick={() => handleNewShift(new Date().toISOString().split('T')[0])}
+              >
+                <Icon icon={PlusIcon} size="sm" />
+                Nuevo Turno
+              </Button>
+            </Stack>
+          </Stack>
 
-                {/* Shifts Column */}
-                <Box 
-                  minH="300px" 
-                  bg="bg.canvas" 
-                  borderRadius="md" 
-                  p="2"
-                  border="2px dashed"
-                  borderColor="border.default"
-                  _hover={{ borderColor: 'blue.300', bg: 'blue.50' }}
-                >
-                  {day.shifts.map(shift => (
-                    <ShiftCard key={shift.id} shift={shift} />
-                  ))}
-                  
-                  {day.shifts.length === 0 && (
-                    <VStack gap="2" justify="center" h="100px" color="gray.400">
-                      <PlusIcon className="w-6 h-6" />
-                      <Text fontSize="xs">Add shifts</Text>
-                    </VStack>
-                  )}
+          {/* Weekly Calendar Component */}
+          <WeeklyCalendar
+            shifts={shifts}
+            initialWeek={selectedWeekStart}
+            onWeekChange={handleWeekChange}
+            onDayClick={handleDayClick}
+            onShiftClick={handleShiftClick}
+            onNewShift={handleNewShift}
+            loading={false}
+            config={{
+              showCoverage: true,
+              showHours: true,
+              allowNewShifts: true,
+              compactMode: false
+            }}
+          />
+        </Stack>
+      </Section>
 
-                  {/* Coverage Warning */}
-                  {day.coverage < 60 && (
-                    <CardWrapper size="sm" bg="red.50" borderColor="red.200">
-                      <CardWrapper.Body p="2">
-                        <HStack gap="1">
-                          <ExclamationTriangleIcon className="w-3 h-3 text-red-500" />
-                          <Text fontSize="xs" color="red.600">
-                            Understaffed
-                          </Text>
-                        </HStack>
-                      </CardWrapper.Body>
-                    </CardWrapper>
-                  )}
-                </Box>
-              </VStack>
-            ))}
-          </Grid>
-        </CardWrapper.Body>
-      </CardWrapper>
-
-      {/* Employee Availability Panel */}
-      <CardWrapper>
-        <CardWrapper.Header>
-          <Text fontSize="md" fontWeight="semibold">Staff Availability</Text>
-        </CardWrapper.Header>
-        <CardWrapper.Body>
-          <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap="4">
-            {employees.map(employee => (
-              <CardWrapper key={employee.id} size="sm">
-                <CardWrapper.Body>
-                  <VStack gap="2" align="start">
-                    <HStack gap="2">
-                      <Box w="8" h="8" bg="blue.100" borderRadius="full" display="flex" alignItems="center" justifyContent="center">
-                        <UserIcon className="w-4 h-4 text-blue-600" />
-                      </Box>
-                      <VStack gap="0" align="start">
-                        <Text fontSize="sm" fontWeight="semibold">
-                          {employee.name}
-                        </Text>
-                        <Text fontSize="xs" color="gray.600">
-                          {employee.position}
-                        </Text>
-                      </VStack>
-                    </HStack>
-                    
-                    <Text fontSize="xs" color="gray.500">
-                      Available: {employee.availability.length} days/week
-                    </Text>
-                    
-                    <HStack gap="1" flexWrap="wrap">
-                      {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => (
-                        <Badge 
-                          key={day}
-                          size="xs" 
-                          colorPalette={employee.availability.includes(day) ? 'green' : 'gray'}
-                          variant={employee.availability.includes(day) ? 'subtle' : 'outline'}
-                        >
-                          {day}
-                        </Badge>
-                      ))}
-                    </HStack>
-                  </VStack>
-                </CardWrapper.Body>
-              </CardWrapper>
-            ))}
-          </Grid>
-        </CardWrapper.Body>
-      </CardWrapper>
-    </VStack>
+      {/* 👥 STAFF AVAILABILITY PANEL */}
+      <Section variant="elevated" title="Disponibilidad del Personal">
+        <Grid templateColumns="repeat(auto-fit, minmax(300px, 1fr))" gap="md">
+          {employees.map(employee => (
+            <EmployeeAvailabilityCard
+              key={employee.id}
+              employee={employee}
+              variant="default"
+              showActions={true}
+              onQuickAction={handleEmployeeAction}
+              config={{
+                showMetrics: true,
+                showContact: false,
+                showAvailabilityDetails: true,
+                allowScheduling: true
+              }}
+            />
+          ))}
+        </Grid>
+      </Section>
+    </Stack>
   );
 }
