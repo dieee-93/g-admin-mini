@@ -93,11 +93,10 @@
 
 **UI Components**:
 - Custom wrapper system in `src/shared/ui/` - check imports before assuming Chakra props
-- **Mixed component system**: Use `@/shared/ui` components when available, otherwise use `@chakra-ui/react` directly
-- Import pattern: `import { ContentLayout, PageHeader, Stack, Button } from '@/shared/ui'` for shared components
-- For missing components: `import { Skeleton, SimpleGrid } from '@chakra-ui/react'` is acceptable
+- Import pattern: `import { ContentLayout, PageHeader, Stack, Button } from '@/shared/ui'`
 - Form patterns: See `MaterialFormModal.tsx`, `UniversalItemForm.tsx` for validation/state
 - Component organization follows domain structure under `src/pages/admin/[domain]/`
+- **NEVER** import directly from `@chakra-ui/react` - always use semantic wrappers
 
 **Module Construction Templates** (`docs/05-development/UI_MODULE_CONSTRUCTION_MASTER_GUIDE.md`):
 - **Enterprise modules**: ContentLayout + business metrics + offline-first patterns
@@ -155,6 +154,7 @@
 - SQL business logic: `database/functions/recipe_intelligence_functions.sql`
 
 **Critical Anti-Patterns to Avoid**:
+- ❌ Never import directly from `@chakra-ui/react` (use `@/shared/ui` wrappers)
 - ❌ Don't duplicate ErrorBoundary/ResponsiveLayout in individual pages
 - ❌ Avoid mixed state management (useState + Zustand for same data)
 - ❌ Don't bypass security patterns (always use `secureApiCall()` for critical operations)

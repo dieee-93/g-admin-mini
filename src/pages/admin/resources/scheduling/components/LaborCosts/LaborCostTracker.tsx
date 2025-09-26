@@ -1,20 +1,11 @@
 // LaborCostTracker - Track and analyze labor costs, overtime, and budget performance
 // MIGRATED: Now uses centralized business logic for precise calculations
 import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  VStack, 
-  HStack, 
-  Text, 
-  Button, 
-  Badge,
-  SimpleGrid,
-  Progress,
-  Table,
-  Select,
-  Stack
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+import {
+  Stack, Button, Badge, SimpleGrid, Typography, Section,
+  Icon, MetricCard, CardGrid, CardWrapper,VStack, HStack
+} from '@/shared/ui';
+import { Progress, Table } from '@chakra-ui/react';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import * as TableOperations from '@/business-logic/operations/tableOperations';
@@ -69,9 +60,6 @@ type CostPeriod = 'week' | 'month' | 'quarter';
 type CostView = 'summary' | 'breakdown' | 'trends' | 'budget';
 
 export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTrackerProps) {
-  console.log('🔍 LaborCostTracker: RENDER START', { timestamp: Date.now() });
-  const renderStart = performance.now();
-  
   const [loading, setLoading] = useState(true);
   const [costBreakdown, setCostBreakdown] = useState<LaborCostBreakdown[]>([]);
   const [weeklySummary, setWeeklySummary] = useState<WeeklyCostSummary[]>([]);
@@ -217,28 +205,15 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
   
   return (
     <VStack gap="6" align="stretch">
-      {/* 🚨 CONTENIDO DE PRUEBA - PESTAÑA COSTOS */}
-      <div style={{ 
-        backgroundColor: '#339af0', 
-        color: 'white', 
-        padding: '20px', 
-        borderRadius: '8px',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        textAlign: 'center'
-      }}>
-        ✅ COMPONENTE COSTOS FUNCIONANDO - LaborCostTracker renderizado correctamente
-      </div>
-
       {/* Key Metrics */}
       <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} gap="4">
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="green.500">
+              <Typography fontSize="xl" fontWeight="bold" color="green.500">
                 ${weeklyTotal.toLocaleString()}
-              </Text>
-              <Text fontSize="xs" color="gray.600">Weekly Total</Text>
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">Weekly Total</Typography>
               {currentWeek && previousWeek && (
                 <HStack gap="1" justify="center">
                   {getTrendIcon(currentWeek.total_cost, previousWeek.total_cost) && (
@@ -246,9 +221,9 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                          className="w-3 h-3" 
                          color={getTrendColor(currentWeek.total_cost, previousWeek.total_cost, true)} />
                   )}
-                  <Text fontSize="xs" color={getTrendColor(currentWeek.total_cost, previousWeek.total_cost, true)}>
+                  <Typography fontSize="xs" color={getTrendColor(currentWeek.total_cost, previousWeek.total_cost, true)}>
                     {Math.abs(((currentWeek.total_cost - previousWeek.total_cost) / previousWeek.total_cost * 100)).toFixed(1)}%
-                  </Text>
+                  </Typography>
                 </HStack>
               )}
             </VStack>
@@ -258,10 +233,10 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="orange.500">
+              <Typography fontSize="xl" fontWeight="bold" color="orange.500">
                 {metrics.labor_cost_percentage}%
-              </Text>
-              <Text fontSize="xs" color="gray.600">of Revenue</Text>
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">of Revenue</Typography>
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -269,13 +244,13 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="red.500">
+              <Typography fontSize="xl" fontWeight="bold" color="red.500">
                 {overtimeHours}h
-              </Text>
-              <Text fontSize="xs" color="gray.600">Overtime</Text>
-              <Text fontSize="xs" color="gray.500">
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">Overtime</Typography>
+              <Typography fontSize="xs" color="gray.500">
                 {metrics.overtime_percentage}% of total
-              </Text>
+              </Typography>
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -283,10 +258,10 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="blue.500">
+              <Typography fontSize="xl" fontWeight="bold" color="blue.500">
                 {metrics.budget_utilization}%
-              </Text>
-              <Text fontSize="xs" color="gray.600">Budget Used</Text>
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">Budget Used</Typography>
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -294,10 +269,10 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="purple.500">
+              <Typography fontSize="xl" fontWeight="bold" color="purple.500">
                 ${metrics.avg_cost_per_shift}
-              </Text>
-              <Text fontSize="xs" color="gray.600">Avg per Shift</Text>
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">Avg per Shift</Typography>
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -305,10 +280,10 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="3">
             <VStack gap="1">
-              <Text fontSize="xl" fontWeight="bold" color="teal.500">
+              <Typography fontSize="xl" fontWeight="bold" color="teal.500">
                 ${metrics.cost_per_customer_served}
-              </Text>
-              <Text fontSize="xs" color="gray.600">per Customer</Text>
+              </Typography>
+              <Typography fontSize="xs" color="gray.600">per Customer</Typography>
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -321,12 +296,12 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
             <HStack gap="3">
               <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />
               <VStack align="start" gap="1">
-                <Text fontSize="sm" fontWeight="semibold" color="red.700">
+                <Typography fontSize="sm" fontWeight="semibold" color="red.700">
                   Budget Alert: {metrics.budget_utilization}% utilized
-                </Text>
-                <Text fontSize="xs" color="red.600">
+                </Typography>
+                <Typography fontSize="xs" color="red.600">
                   Weekly labor costs are approaching budget limits. Consider optimizing shift schedules.
-                </Text>
+                </Typography>
               </VStack>
             </HStack>
           </CardWrapper.Body>
@@ -339,7 +314,7 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
           <HStack justify="space-between">
             <HStack gap="4">
               <Box>
-                <Text fontSize="sm" mb="1" fontWeight="medium">Period</Text>
+                <Typography fontSize="sm" mb="1" fontWeight="medium">Period</Typography>
                 <Select.Root 
                   value={viewState.period}
                   onValueChange={(e) => setViewState(prev => ({...prev, period: e.value as CostPeriod}))}
@@ -356,7 +331,7 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
               </Box>
 
               <Box>
-                <Text fontSize="sm" mb="1" fontWeight="medium">View</Text>
+                <Typography fontSize="sm" mb="1" fontWeight="medium">View</Typography>
                 <Select.Root 
                   value={viewState.view}
                   onValueChange={(e) => setViewState(prev => ({...prev, view: e.value as CostView}))}
@@ -384,7 +359,7 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
       {/* Cost Breakdown by Position */}
       <CardWrapper>
         <CardWrapper.Header>
-          <Text fontSize="lg" fontWeight="semibold">Labor Cost Breakdown by Position</Text>
+          <Typography fontSize="lg" fontWeight="semibold">Labor Cost Breakdown by Position</Typography>
         </CardWrapper.Header>
         <CardWrapper.Body p="0">
           <Table.Root size="sm">
@@ -403,49 +378,49 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
               {costBreakdown.map(item => (
                 <Table.Row key={item.position}>
                   <Table.Cell>
-                    <Text fontWeight="semibold">{item.position}</Text>
+                    <Typography fontWeight="semibold">{item.position}</Typography>
                   </Table.Cell>
                   
                   <Table.Cell>
                     <VStack align="start" gap="0">
-                      <Text fontSize="sm">{item.regular_hours}h regular</Text>
+                      <Typography fontSize="sm">{item.regular_hours}h regular</Typography>
                       {item.overtime_hours > 0 && (
-                        <Text fontSize="xs" color="orange.600">
+                        <Typography fontSize="xs" color="orange.600">
                           +{item.overtime_hours}h OT
-                        </Text>
+                        </Typography>
                       )}
                     </VStack>
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <Text fontSize="sm">${item.regular_pay.toLocaleString()}</Text>
+                    <Typography fontSize="sm">${item.regular_pay.toLocaleString()}</Typography>
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <Text fontSize="sm" color={item.overtime_pay > 0 ? 'orange.600' : 'gray.500'}>
+                    <Typography fontSize="sm" color={item.overtime_pay > 0 ? 'orange.600' : 'gray.500'}>
                       ${item.overtime_pay.toLocaleString()}
-                    </Text>
+                    </Typography>
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <Text fontSize="sm" fontWeight="semibold">
+                    <Typography fontSize="sm" fontWeight="semibold">
                       ${item.total_cost.toLocaleString()}
-                    </Text>
+                    </Typography>
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <Text fontSize="sm">${item.budget_allocated.toLocaleString()}</Text>
+                    <Typography fontSize="sm">${item.budget_allocated.toLocaleString()}</Typography>
                   </Table.Cell>
                   
                   <Table.Cell>
                     <HStack gap="2">
-                      <Text 
+                      <Typography 
                         fontSize="sm" 
                         fontWeight="semibold"
                         color={getVarianceColor(item.variance)}
                       >
                         ${Math.abs(item.variance).toLocaleString()}
-                      </Text>
+                      </Typography>
                       <Badge 
                         size="sm" 
                         colorPalette={getVarianceColor(item.variance)}
@@ -461,44 +436,44 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
               {/* Totals Row */}
               <Table.Row bg="bg.canvas">
                 <Table.Cell>
-                  <Text fontWeight="bold">Total</Text>
+                  <Typography fontWeight="bold">Total</Typography>
                 </Table.Cell>
                 <Table.Cell>
-                  <Text fontWeight="semibold">
+                  <Typography fontWeight="semibold">
                     {QuickCalculations.formatNumber(
                       costBreakdown.reduce((sum, item) => 
                         DecimalUtils.financial.add(sum, DecimalUtils.financial.add(item.regular_hours, item.overtime_hours)), 0
                       )
                     )}h
-                  </Text>
+                  </Typography>
                 </Table.Cell>
                 <Table.Cell>
-                  <Text fontWeight="semibold">
+                  <Typography fontWeight="semibold">
                     ${costBreakdown.reduce((sum, item) => sum + item.regular_pay, 0).toLocaleString()}
-                  </Text>
+                  </Typography>
                 </Table.Cell>
                 <Table.Cell>
-                  <Text fontWeight="semibold">
+                  <Typography fontWeight="semibold">
                     ${costBreakdown.reduce((sum, item) => sum + item.overtime_pay, 0).toLocaleString()}
-                  </Text>
+                  </Typography>
                 </Table.Cell>
                 <Table.Cell>
-                  <Text fontWeight="bold" fontSize="md">
+                  <Typography fontWeight="bold" fontSize="md">
                     ${costBreakdown.reduce((sum, item) => sum + item.total_cost, 0).toLocaleString()}
-                  </Text>
+                  </Typography>
                 </Table.Cell>
                 <Table.Cell>
-                  <Text fontWeight="semibold">
+                  <Typography fontWeight="semibold">
                     ${costBreakdown.reduce((sum, item) => sum + item.budget_allocated, 0).toLocaleString()}
-                  </Text>
+                  </Typography>
                 </Table.Cell>
                 <Table.Cell>
-                  <Text 
+                  <Typography 
                     fontWeight="bold"
                     color={getVarianceColor(costBreakdown.reduce((sum, item) => sum + item.variance, 0))}
                   >
                     ${Math.abs(costBreakdown.reduce((sum, item) => sum + item.variance, 0)).toLocaleString()}
-                  </Text>
+                  </Typography>
                 </Table.Cell>
               </Table.Row>
             </Table.Body>
@@ -509,7 +484,7 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
       {/* Weekly Trends */}
       <CardWrapper>
         <CardWrapper.Header>
-          <Text fontSize="lg" fontWeight="semibold">Weekly Cost Trends</Text>
+          <Typography fontSize="lg" fontWeight="semibold">Weekly Cost Trends</Typography>
         </CardWrapper.Header>
         <CardWrapper.Body>
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
@@ -519,10 +494,10 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                   <VStack gap="3" align="stretch">
                     <HStack justify="space-between">
                       <VStack align="start" gap="0">
-                        <Text fontSize="sm" color="gray.600">Week ending</Text>
-                        <Text fontWeight="semibold">
+                        <Typography fontSize="sm" color="gray.600">Week ending</Typography>
+                        <Typography fontWeight="semibold">
                           {new Date(week.week_ending).toLocaleDateString('es-ES')}
-                        </Text>
+                        </Typography>
                       </VStack>
                       <Badge colorPalette={getVarianceColor(week.variance)} variant="subtle">
                         {week.variance > 0 ? '+' : ''}${Math.abs(week.variance)}
@@ -531,31 +506,31 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                     
                     <VStack gap="2" align="stretch">
                       <HStack justify="space-between">
-                        <Text fontSize="sm">Total Cost</Text>
-                        <Text fontSize="sm" fontWeight="bold">${week.total_cost.toLocaleString()}</Text>
+                        <Typography fontSize="sm">Total Cost</Typography>
+                        <Typography fontSize="sm" fontWeight="bold">${week.total_cost.toLocaleString()}</Typography>
                       </HStack>
                       <HStack justify="space-between">
-                        <Text fontSize="sm">Budget</Text>
-                        <Text fontSize="sm">${week.budget.toLocaleString()}</Text>
+                        <Typography fontSize="sm">Budget</Typography>
+                        <Typography fontSize="sm">${week.budget.toLocaleString()}</Typography>
                       </HStack>
                       <HStack justify="space-between">
-                        <Text fontSize="sm">Total Hours</Text>
-                        <Text fontSize="sm">
+                        <Typography fontSize="sm">Total Hours</Typography>
+                        <Typography fontSize="sm">
                           {QuickCalculations.formatNumber(
                             DecimalUtils.financial.add(week.regular_hours, week.overtime_hours)
                           )}h
-                        </Text>
+                        </Typography>
                       </HStack>
                       <HStack justify="space-between">
-                        <Text fontSize="sm">Avg Rate</Text>
-                        <Text fontSize="sm">${week.avg_hourly_rate.toFixed(2)}/h</Text>
+                        <Typography fontSize="sm">Avg Rate</Typography>
+                        <Typography fontSize="sm">${week.avg_hourly_rate.toFixed(2)}/h</Typography>
                       </HStack>
                     </VStack>
                     
                     <Box>
                       <HStack justify="space-between" mb="1">
-                        <Text fontSize="xs" color="gray.600">Budget Utilization</Text>
-                        <Text fontSize="xs">{((week.total_cost / week.budget) * 100).toFixed(1)}%</Text>
+                        <Typography fontSize="xs" color="gray.600">Budget Utilization</Typography>
+                        <Typography fontSize="xs">{((week.total_cost / week.budget) * 100).toFixed(1)}%</Typography>
                       </HStack>
                       <Progress 
                         value={(week.total_cost / week.budget) * 100} 

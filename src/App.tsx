@@ -28,6 +28,8 @@ import {
 // 📱 SISTEMA OFFLINE-FIRST
 import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
 
+// 🐛 DEBUG TOOLS (moved to /debug routes)
+
 // 🎮 SISTEMA DE LOGROS Y GAMIFICACIÓN
 import { AchievementSystemProvider } from '@/lib/achievements/AchievementSystemIntegration';
 
@@ -58,6 +60,16 @@ import {
   LazyFiscalPage,
   LazySettingsPage,
   LazyThemeTestPage,
+  LazyDebugDashboard,
+  LazyCapabilitiesDebug,
+  LazyThemeDebug,
+  LazyStoresDebug,
+  LazyApiDebug,
+  LazyPerformanceDebug,
+  LazyNavigationDebug,
+  LazyComponentsDebug,
+  LazySlotsDebug,
+  LazyBundleDebug,
   LazySupplyChainPage,
   LazyProcurementPage,
   // ✅ NEW PHASE 4 & 5 MODULES
@@ -506,7 +518,117 @@ function App() {
                           </ProtectedRouteNew>
                         } />
                         
-                        {/* � DEBUG ROUTES - Development only */}
+                        {/* 🛠️ DEBUG ROUTES - Development only */}
+                        <Route path="/debug" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Debug Dashboard">
+                                  <LazyDebugDashboard />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/capabilities" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Capabilities Debug">
+                                  <LazyCapabilitiesDebug />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/theme" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Theme Debug">
+                                  <LazyThemeDebug />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/stores" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Store Inspector">
+                                  <LazyStoresDebug />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/api" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="API Inspector">
+                                  <LazyApiDebug />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/performance" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Performance Monitor">
+                                  <LazyPerformanceDebug />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/navigation" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Navigation Debug">
+                                  <LazyNavigationDebug />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/components" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Component Library">
+                                  <LazyComponentsDebug />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/slots" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Slots System">
+                                  <LazySlotsDebug />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/bundle" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Bundle Analyzer">
+                                  <LazyBundleDebug />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
                         <Route path="/admin/debug/theme-test" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['SUPER_ADMIN']}>
@@ -573,6 +695,9 @@ function App() {
                   }
                   
                   <Toaster />
+
+                  {/* 🐛 DEBUG TOOLS moved to /debug routes */}
+
                           </NavigationProvider>
                         </SlotProvider>
                       </EventBusProvider>

@@ -33,21 +33,66 @@ export {
 // Grid Presets - REMOVED (use Chakra Grid directly)
 
 // Typography Components
-export { 
-  Typography, 
-  Heading, 
-  Title, 
-  Body, 
-  Caption, 
-  Label, 
-  Code 
+export {
+  Typography,
+  Title,
+  Body,
+  Caption,
+  Label,
+  Code
 } from './Typography';
+
+// Basic Components (Chakra Wrappers)
+export { Heading } from './Heading';
+export { Spinner } from './Spinner';
+export { Skeleton, SkeletonText } from './Skeleton';
+export { Separator } from './Separator';
 
 // Form Components
 export { InputField } from './InputField';
 export { NumberField } from './NumberField';
 export { SelectField, createListCollection } from './SelectField';
 export { TextareaField, Textarea } from './TextareaField';
+export {
+  Checkbox,
+  CheckboxRoot,
+  CheckboxControl,
+  CheckboxIndicator,
+  CheckboxLabel,
+  CheckboxGroup,
+  CheckboxHiddenInput,
+  PermissionCheckbox,
+  FeatureToggle
+} from './Checkbox';
+export {
+  RadioGroup,
+  RadioGroupRoot,
+  RadioItem,
+  RadioItemControl,
+  RadioItemText,
+  RadioLabel,
+  RadioItemHiddenInput,
+  Radio,
+  OptionsRadioGroup,
+  ThemeRadioGroup
+} from './RadioGroup';
+export {
+  Slider,
+  SliderRoot,
+  SliderControl,
+  SliderTrack,
+  SliderRange,
+  SliderThumb,
+  SliderLabel,
+  SliderValueText,
+  SliderMarker,
+  SliderMarkerGroup,
+  SliderMarkerIndicator,
+  SliderHiddenInput,
+  RangeSlider,
+  VolumeSlider,
+  PriceSlider
+} from './Slider';
 
 // Base Components
 export { Button } from './Button';
@@ -121,11 +166,22 @@ export {
 
 // Feedback Components
 export { CircularProgress } from './CircularProgress';
-export { 
-  ConnectionBadge, 
-  POSConnectionBadge, 
-  InventoryConnectionBadge, 
-  StaffConnectionBadge 
+export {
+  Progress,
+  ProgressRoot,
+  ProgressTrack,
+  ProgressRange,
+  ProgressLabel,
+  ProgressValueText,
+  LoadingProgress,
+  UploadProgress,
+  TaskProgress
+} from './Progress';
+export {
+  ConnectionBadge,
+  POSConnectionBadge,
+  InventoryConnectionBadge,
+  StaffConnectionBadge
 } from './ConnectionBadge';
 export { toaster, Toaster } from './toaster';
 

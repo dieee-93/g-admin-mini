@@ -1,160 +1,163 @@
-// useScheduling - Main hook for scheduling module business logic
-import { useState, useEffect, useCallback } from 'react';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import { calculateShiftHours } from '@/business-logic/scheduling/schedulingCalculations';
+/**
+ * UNIFIED SCHEDULING HOOK - G-ADMIN MINI v3.0
+ *
+ * BREAKING CHANGE: Complete rewrite using UnifiedCalendarEngine
+ * NO legacy support - uses new unified types and calendar system
+ *
+ * @version 3.0.0
+ * @breaking-change Replaces all legacy scheduling hooks
+ */
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  ISODateString,
+  ISOTimeString,
+  DurationMinutes,
+  TimezoneString,
+  TimeSlot,
+  DateRange,
+  createISODate,
+  createISOTime,
+  calculateDuration,
+  formatTimeSlotForUser,
+  getUserTimezone
+} from '@/shared/calendar/utils/dateTimeUtils';
+import { UnifiedCalendarEngine } from '@/shared/calendar/engine/UnifiedCalendarEngine';
 import type {
-  Shift,
-  Schedule,
+  StaffShift,
+  ShiftStatus,
+  WorkSchedule,
   TimeOffRequest,
   ShiftTemplate,
   ShiftFormData,
-  ShiftStatus
-} from '../types';
+  EmployeeResource,
+  LaborCost,
+  CoverageMetrics,
+  ScheduleDashboard
+} from '../types/schedulingTypes';
+import { shiftsApi, timeOffApi, schedulesApi } from '../services/schedulingApi';
 
-interface SchedulingState {
-  shifts: Shift[];
-  schedules: Schedule[];
+/**
+ * Unified scheduling state using new types
+ */
+interface UnifiedSchedulingState {
+  
+  shifts: StaffShift[];
+  schedules: WorkSchedule[];
   timeOffRequests: TimeOffRequest[];
   shiftTemplates: ShiftTemplate[];
+  employeeResources: EmployeeResource[];
+  dashboard: ScheduleDashboard | null;
+  laborCosts: LaborCost[];
+  coverageMetrics: CoverageMetrics[];
   loading: boolean;
   error: string | null;
-  selectedWeek: Date;
+  selectedDateRange: DateRange;
+  timezone: TimezoneString;
   filters: {
     position?: string;
-    employee?: string;
+    employeeId?: string;
     status?: ShiftStatus;
   };
 }
 
-interface SchedulingActions {
-  // Shift management
-  createShift: (shiftData: ShiftFormData) => Promise<Shift>;
-  updateShift: (shiftId: string, updates: Partial<Shift>) => Promise<void>;
+/**
+ * Unified scheduling actions using calendar engine
+ */
+interface UnifiedSchedulingActions {
+  // Shift management (unified)
+  createShift: (shiftData: ShiftFormData) => Promise<StaffShift>;
+  updateShift: (shiftId: string, updates: Partial<StaffShift>) => Promise<void>;
   deleteShift: (shiftId: string) => Promise<void>;
-  bulkCreateShifts: (shiftsData: ShiftFormData[]) => Promise<Shift[]>;
-  
-  // Schedule management
+  bulkCreateShifts: (shiftsData: ShiftFormData[]) => Promise<StaffShift[]>;
+  checkShiftConflicts: (employeeId: string, timeSlot: TimeSlot) => Promise<StaffShift[]>;
+
+  // Schedule management (unified)
+  createSchedule: (schedule: Omit<WorkSchedule, 'id' | 'createdAt' | 'updatedAt'>) => Promise<WorkSchedule>;
   publishSchedule: (scheduleId: string) => Promise<void>;
-  copySchedule: (sourceWeek: Date, targetWeek: Date) => Promise<void>;
-  autoSchedule: (weekDate: Date, constraints?: any) => Promise<void>;
-  
-  // Time-off management
-  createTimeOffRequest: (request: Omit<TimeOffRequest, 'id' | 'requested_at'>) => Promise<void>;
-  approveTimeOffRequest: (requestId: string) => Promise<void>;
-  denyTimeOffRequest: (requestId: string, reason?: string) => Promise<void>;
-  
-  // Filters and navigation
-  setFilters: (filters: Partial<SchedulingState['filters']>) => void;
+  copySchedule: (sourceRange: DateRange, targetRange: DateRange) => Promise<void>;
+  optimizeSchedule: (dateRange: DateRange, constraints?: any) => Promise<void>;
+
+  // Time-off management (unified)
+  createTimeOffRequest: (request: Omit<TimeOffRequest, 'id' | 'requestedAt'>) => Promise<void>;
+  approveTimeOffRequest: (requestId: string, reviewedBy: string) => Promise<void>;
+  denyTimeOffRequest: (requestId: string, reviewedBy: string, reason?: string) => Promise<void>;
+
+  // Real-time features
+  getAvailableSlots: (date: ISODateString, employeeIds: string[], duration: DurationMinutes) => Promise<TimeSlot[]>;
+  getDashboard: (date: ISODateString) => Promise<ScheduleDashboard>;
+  calculateLaborCosts: (dateRange: DateRange) => Promise<LaborCost[]>;
+  analyzeCoverage: (dateRange: DateRange) => Promise<CoverageMetrics[]>;
+
+  // Filters and navigation (unified)
+  setFilters: (filters: Partial<UnifiedSchedulingState['filters']>) => void;
+  setDateRange: (dateRange: DateRange) => void;
   navigateWeek: (direction: 'prev' | 'next') => void;
-  selectWeek: (date: Date) => void;
-  
+  navigateDay: (direction: 'prev' | 'next') => void;
+
   // Data refresh
   refreshData: () => Promise<void>;
+  refreshDashboard: () => Promise<void>;
 }
 
-export function useScheduling(): SchedulingState & SchedulingActions {
-  const [state, setState] = useState<SchedulingState>({
-    shifts: [],
-    schedules: [],
-    timeOffRequests: [],
-    shiftTemplates: [],
-    loading: true,
-    error: null,
-    selectedWeek: new Date(),
-    filters: {}
+/**
+ * Unified scheduling hook using calendar engine
+ */
+export function useScheduling(): UnifiedSchedulingState & UnifiedSchedulingActions {
+  const [state, setState] = useState<UnifiedSchedulingState>(() => {
+    const today = createISODate();
+    const endOfWeek = createISODate(new Date(Date.now() + 6 * 24 * 60 * 60 * 1000));
+
+    return {
+      shifts: [],
+      schedules: [],
+      timeOffRequests: [],
+      shiftTemplates: [],
+      employeeResources: [],
+      dashboard: null,
+      laborCosts: [],
+      coverageMetrics: [],
+      loading: true,
+      error: null,
+      selectedDateRange: {
+        startDate: today,
+        endDate: endOfWeek
+      },
+      timezone: getUserTimezone(),
+      filters: {}
+    };
   });
 
-  // Initialize data on mount
+  // Initialize data on mount and when date range changes
   useEffect(() => {
     loadSchedulingData();
-  }, [state.selectedWeek]);
+  }, [state.selectedDateRange]);
 
   const loadSchedulingData = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
-      
-      // TODO: Replace with actual API calls
-      const mockShifts: Shift[] = [
-        {
-          id: '1',
-          employee_id: 'emp1',
-          employee_name: 'Ana García',
-          date: '2024-01-15',
-          start_time: '09:00',
-          end_time: '17:00',
-          position: 'Server',
-          status: 'confirmed',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          employee_id: 'emp2',
-          employee_name: 'Carlos López',
-          date: '2024-01-15',
-          start_time: '11:00',
-          end_time: '20:00',
-          position: 'Cook',
-          status: 'scheduled',
-          break_time: 30,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ];
 
-      const mockTimeOffRequests: TimeOffRequest[] = [
-        {
-          id: '1',
-          employee_id: 'emp1',
-          start_date: '2024-02-15',
-          end_date: '2024-02-17',
-          type: 'vacation',
-          status: 'pending',
-          reason: 'Family vacation',
-          requested_at: '2024-01-10T10:00:00Z'
-        }
-      ];
-
-      const mockSchedules: Schedule[] = [
-        {
-          id: '1',
-          name: 'Week of January 15, 2024',
-          start_date: '2024-01-15',
-          end_date: '2024-01-21',
-          shifts: mockShifts,
-          status: 'published',
-          created_by: 'manager1',
-          created_at: new Date().toISOString()
-        }
-      ];
-
-      const mockShiftTemplates: ShiftTemplate[] = [
-        {
-          id: '1',
-          name: 'Morning Server',
-          start_time: '08:00',
-          end_time: '16:00',
-          days_of_week: [1, 2, 3, 4, 5], // Mon-Fri
-          position_id: 'server',
-          max_employees: 3
-        },
-        {
-          id: '2',
-          name: 'Evening Cook',
-          start_time: '16:00',
-          end_time: '23:00',
-          days_of_week: [0, 1, 2, 3, 4, 5, 6], // Every day
-          position_id: 'cook',
-          max_employees: 2
-        }
-      ];
+      // Load data using unified APIs
+      const [shifts, timeOffRequests, schedules, dashboard] = await Promise.all([
+        shiftsApi.getShifts(
+          state.selectedDateRange.startDate,
+          state.selectedDateRange.endDate,
+          state.filters
+        ),
+        timeOffApi.getTimeOffRequests(state.filters),
+        schedulesApi.getSchedules({
+          start_date: state.selectedDateRange.startDate,
+          end_date: state.selectedDateRange.endDate
+        }),
+        getDashboard(state.selectedDateRange.startDate)
+      ]);
 
       setState(prev => ({
         ...prev,
-        shifts: mockShifts,
-        timeOffRequests: mockTimeOffRequests,
-        schedules: mockSchedules,
-        shiftTemplates: mockShiftTemplates,
+        shifts,
+        timeOffRequests,
+        schedules,
+        dashboard,
         loading: false
       }));
     } catch (error) {
@@ -164,24 +167,11 @@ export function useScheduling(): SchedulingState & SchedulingActions {
         error: error instanceof Error ? error.message : 'Failed to load scheduling data'
       }));
     }
-  }, [state.selectedWeek]);
+  }, [state.selectedDateRange, state.filters]);
 
-  const createShift = useCallback(async (shiftData: ShiftFormData): Promise<Shift> => {
+  const createShift = useCallback(async (shiftData: ShiftFormData): Promise<StaffShift> => {
     try {
-      // TODO: Replace with actual API call
-      const newShift: Shift = {
-        id: `shift_${DecimalUtils.fromValue(Date.now(), 'financial').toFixed(0)}`,
-        employee_id: shiftData.employee_id,
-        employee_name: 'Employee Name', // Would be fetched from employee data
-        date: shiftData.date,
-        start_time: shiftData.start_time,
-        end_time: shiftData.end_time,
-        position: shiftData.position,
-        status: 'scheduled',
-        notes: shiftData.notes,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
+      const newShift = await shiftsApi.createShift(shiftData);
 
       setState(prev => ({
         ...prev,
@@ -194,14 +184,15 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     }
   }, []);
 
-  const updateShift = useCallback(async (shiftId: string, updates: Partial<Shift>): Promise<void> => {
+  const updateShift = useCallback(async (shiftId: string, updates: Partial<StaffShift>): Promise<void> => {
     try {
-      // TODO: Replace with actual API call
+      await shiftsApi.updateShift(shiftId, updates);
+
       setState(prev => ({
         ...prev,
         shifts: prev.shifts.map(shift =>
           shift.id === shiftId
-            ? { ...shift, ...updates, updated_at: new Date().toISOString() }
+            ? { ...shift, ...updates }
             : shift
         )
       }));
@@ -212,7 +203,8 @@ export function useScheduling(): SchedulingState & SchedulingActions {
 
   const deleteShift = useCallback(async (shiftId: string): Promise<void> => {
     try {
-      // TODO: Replace with actual API call
+      await shiftsApi.deleteShift(shiftId);
+
       setState(prev => ({
         ...prev,
         shifts: prev.shifts.filter(shift => shift.id !== shiftId)
@@ -222,22 +214,9 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     }
   }, []);
 
-  const bulkCreateShifts = useCallback(async (shiftsData: ShiftFormData[]): Promise<Shift[]> => {
+  const bulkCreateShifts = useCallback(async (shiftsData: ShiftFormData[]): Promise<StaffShift[]> => {
     try {
-      // TODO: Replace with actual API call
-      const newShifts = shiftsData.map((shiftData, index) => ({
-        id: `shift_${DecimalUtils.fromValue(Date.now(), 'financial').toFixed(0)}_${index}`,
-        employee_id: shiftData.employee_id,
-        employee_name: 'Employee Name',
-        date: shiftData.date,
-        start_time: shiftData.start_time,
-        end_time: shiftData.end_time,
-        position: shiftData.position,
-        status: 'scheduled' as const,
-        notes: shiftData.notes,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }));
+      const newShifts = await shiftsApi.bulkCreateShifts(shiftsData);
 
       setState(prev => ({
         ...prev,
@@ -252,12 +231,13 @@ export function useScheduling(): SchedulingState & SchedulingActions {
 
   const publishSchedule = useCallback(async (scheduleId: string): Promise<void> => {
     try {
-      // TODO: Replace with actual API call
+      await schedulesApi.updateScheduleStatus(scheduleId, 'published');
+
       setState(prev => ({
         ...prev,
         schedules: prev.schedules.map(schedule =>
           schedule.id === scheduleId
-            ? { ...schedule, status: 'published' as const }
+            ? { ...schedule, status: 'published' }
             : schedule
         )
       }));
@@ -266,31 +246,42 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     }
   }, []);
 
-  const copySchedule = useCallback(async (sourceWeek: Date, targetWeek: Date): Promise<void> => {
+  const copySchedule = useCallback(async (sourceRange: DateRange, targetRange: DateRange): Promise<void> => {
     try {
-      // TODO: Implement schedule copying logic
-      console.log('Copying schedule from', sourceWeek, 'to', targetWeek);
+      // Find source schedule
+      const sourceSchedules = await schedulesApi.getSchedules({
+        start_date: sourceRange.startDate,
+        end_date: sourceRange.endDate
+      });
+
+      if (sourceSchedules.length === 0) {
+        throw new Error('No schedule found for source date range');
+      }
+
+      // Copy the first schedule found
+      const sourceSchedule = sourceSchedules[0];
+      await schedulesApi.copySchedule(sourceSchedule.id, targetRange.startDate, targetRange.endDate);
+
+      // Refresh data to show the copied schedule
+      await refreshData();
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Failed to copy schedule');
     }
   }, []);
 
-  const autoSchedule = useCallback(async (weekDate: Date, constraints?: any): Promise<void> => {
+  const optimizeSchedule = useCallback(async (dateRange: DateRange, constraints?: any): Promise<void> => {
     try {
-      // TODO: Implement auto-scheduling algorithm
-      console.log('Auto-scheduling for week', weekDate, 'with constraints', constraints);
+      // TODO: Implement schedule optimization using calendar engine
+      console.log('Optimizing schedule for range', dateRange, 'with constraints', constraints);
+      // This would integrate with the UnifiedCalendarEngine's optimization features
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Failed to auto-schedule');
+      throw new Error(error instanceof Error ? error.message : 'Failed to optimize schedule');
     }
   }, []);
 
-  const createTimeOffRequest = useCallback(async (request: Omit<TimeOffRequest, 'id' | 'requested_at'>): Promise<void> => {
+  const createTimeOffRequest = useCallback(async (request: Omit<TimeOffRequest, 'id' | 'requestedAt'>): Promise<void> => {
     try {
-      const newRequest: TimeOffRequest = {
-        ...request,
-        id: `request_${DecimalUtils.fromValue(Date.now(), 'financial').toFixed(0)}`,
-        requested_at: new Date().toISOString()
-      };
+      const newRequest = await timeOffApi.createTimeOffRequest(request);
 
       setState(prev => ({
         ...prev,
@@ -301,17 +292,19 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     }
   }, []);
 
-  const approveTimeOffRequest = useCallback(async (requestId: string): Promise<void> => {
+  const approveTimeOffRequest = useCallback(async (requestId: string, reviewedBy: string): Promise<void> => {
     try {
+      await timeOffApi.updateTimeOffRequestStatus(requestId, 'approved', reviewedBy);
+
       setState(prev => ({
         ...prev,
         timeOffRequests: prev.timeOffRequests.map(request =>
           request.id === requestId
-            ? { 
-                ...request, 
-                status: 'approved' as const,
-                reviewed_at: new Date().toISOString(),
-                reviewed_by: 'current_user' // TODO: Get from auth context
+            ? {
+                ...request,
+                status: 'approved',
+                reviewedBy,
+                reviewedAt: { dateTime: new Date().toISOString(), timezone: state.timezone, utcOffset: 0 } as any
               }
             : request
         )
@@ -319,19 +312,22 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Failed to approve request');
     }
-  }, []);
+  }, [state.timezone]);
 
-  const denyTimeOffRequest = useCallback(async (requestId: string, reason?: string): Promise<void> => {
+  const denyTimeOffRequest = useCallback(async (requestId: string, reviewedBy: string, reason?: string): Promise<void> => {
     try {
+      await timeOffApi.updateTimeOffRequestStatus(requestId, 'denied', reviewedBy, reason);
+
       setState(prev => ({
         ...prev,
         timeOffRequests: prev.timeOffRequests.map(request =>
           request.id === requestId
-            ? { 
-                ...request, 
-                status: 'denied' as const,
-                reviewed_at: new Date().toISOString(),
-                reviewed_by: 'current_user'
+            ? {
+                ...request,
+                status: 'denied',
+                reviewedBy,
+                reviewedAt: { dateTime: new Date().toISOString(), timezone: state.timezone, utcOffset: 0 } as any,
+                notes: reason
               }
             : request
         )
@@ -339,9 +335,9 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Failed to deny request');
     }
-  }, []);
+  }, [state.timezone]);
 
-  const setFilters = useCallback((filters: Partial<SchedulingState['filters']>) => {
+  const setFilters = useCallback((filters: Partial<UnifiedSchedulingState['filters']>) => {
     setState(prev => ({
       ...prev,
       filters: { ...prev.filters, ...filters }
@@ -350,22 +346,129 @@ export function useScheduling(): SchedulingState & SchedulingActions {
 
   const navigateWeek = useCallback((direction: 'prev' | 'next') => {
     setState(prev => {
-      const newDate = new Date(prev.selectedWeek);
+      const currentStart = new Date(prev.selectedDateRange.startDate);
+      const currentEnd = new Date(prev.selectedDateRange.endDate);
       const daysToAdd = direction === 'next' ? 7 : -7;
-      const currentDay = newDate.getDate();
-      const newDay = DecimalUtils.add(currentDay.toString(), daysToAdd.toString(), 'financial').toNumber();
-      newDate.setDate(newDay);
-      return { ...prev, selectedWeek: newDate };
+
+      currentStart.setDate(currentStart.getDate() + daysToAdd);
+      currentEnd.setDate(currentEnd.getDate() + daysToAdd);
+
+      return {
+        ...prev,
+        selectedDateRange: {
+          startDate: createISODate(currentStart),
+          endDate: createISODate(currentEnd)
+        }
+      };
     });
   }, []);
 
-  const selectWeek = useCallback((date: Date) => {
-    setState(prev => ({ ...prev, selectedWeek: date }));
+  const setDateRange = useCallback((dateRange: DateRange) => {
+    setState(prev => ({ ...prev, selectedDateRange: dateRange }));
   }, []);
 
   const refreshData = useCallback(async () => {
     await loadSchedulingData();
   }, [loadSchedulingData]);
+
+  // New unified actions
+  const checkShiftConflicts = useCallback(async (employeeId: string, timeSlot: TimeSlot): Promise<StaffShift[]> => {
+    try {
+      return await shiftsApi.getShiftConflicts(employeeId, timeSlot);
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Failed to check shift conflicts');
+    }
+  }, []);
+
+  const createSchedule = useCallback(async (schedule: Omit<WorkSchedule, 'id' | 'createdAt' | 'updatedAt'>): Promise<WorkSchedule> => {
+    try {
+      const newSchedule = await schedulesApi.createSchedule(schedule);
+      setState(prev => ({
+        ...prev,
+        schedules: [...prev.schedules, newSchedule]
+      }));
+      return newSchedule;
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Failed to create schedule');
+    }
+  }, []);
+
+  const getAvailableSlots = useCallback(async (
+    date: ISODateString,
+    employeeIds: string[],
+    duration: DurationMinutes
+  ): Promise<TimeSlot[]> => {
+    try {
+      // TODO: Implement using UnifiedCalendarEngine
+      return [];
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Failed to get available slots');
+    }
+  }, []);
+
+  const getDashboard = useCallback(async (date: ISODateString): Promise<ScheduleDashboard> => {
+    try {
+      // TODO: Implement dashboard data aggregation
+      return {
+        date,
+        totalShifts: state.shifts.length,
+        activeShifts: state.shifts.filter(s => s.status === 'in_progress').length,
+        staffPresent: 0,
+        staffScheduled: state.shifts.filter(s => s.status === 'confirmed').length,
+        totalLaborCost: 0,
+        coverageStatus: [],
+        alerts: []
+      };
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Failed to get dashboard');
+    }
+  }, [state.shifts]);
+
+  const calculateLaborCosts = useCallback(async (dateRange: DateRange): Promise<LaborCost[]> => {
+    try {
+      // TODO: Implement labor cost calculation
+      return [];
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Failed to calculate labor costs');
+    }
+  }, []);
+
+  const analyzeCoverage = useCallback(async (dateRange: DateRange): Promise<CoverageMetrics[]> => {
+    try {
+      // TODO: Implement coverage analysis
+      return [];
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Failed to analyze coverage');
+    }
+  }, []);
+
+  const navigateDay = useCallback((direction: 'prev' | 'next') => {
+    setState(prev => {
+      const currentStart = new Date(prev.selectedDateRange.startDate);
+      const currentEnd = new Date(prev.selectedDateRange.endDate);
+      const daysToAdd = direction === 'next' ? 1 : -1;
+
+      currentStart.setDate(currentStart.getDate() + daysToAdd);
+      currentEnd.setDate(currentEnd.getDate() + daysToAdd);
+
+      return {
+        ...prev,
+        selectedDateRange: {
+          startDate: createISODate(currentStart),
+          endDate: createISODate(currentEnd)
+        }
+      };
+    });
+  }, []);
+
+  const refreshDashboard = useCallback(async () => {
+    try {
+      const dashboard = await getDashboard(state.selectedDateRange.startDate);
+      setState(prev => ({ ...prev, dashboard }));
+    } catch (error) {
+      console.error('Failed to refresh dashboard:', error);
+    }
+  }, [getDashboard, state.selectedDateRange.startDate]);
 
   return {
     ...state,
@@ -373,15 +476,23 @@ export function useScheduling(): SchedulingState & SchedulingActions {
     updateShift,
     deleteShift,
     bulkCreateShifts,
+    checkShiftConflicts,
+    createSchedule,
     publishSchedule,
     copySchedule,
-    autoSchedule,
+    optimizeSchedule,
     createTimeOffRequest,
     approveTimeOffRequest,
     denyTimeOffRequest,
+    getAvailableSlots,
+    getDashboard,
+    calculateLaborCosts,
+    analyzeCoverage,
     setFilters,
+    setDateRange,
     navigateWeek,
-    selectWeek,
-    refreshData
+    navigateDay,
+    refreshData,
+    refreshDashboard
   };
 }

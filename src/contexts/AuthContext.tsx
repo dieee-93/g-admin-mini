@@ -27,7 +27,8 @@ export type ModuleName =
   | 'reporting'
   | 'customer_portal'
   | 'customer_menu'
-  | 'my_orders';
+  | 'my_orders'
+  | 'debug'; // Debug tools for SUPER_ADMIN only
 
 // Permission actions
 export type PermissionAction = 
@@ -43,7 +44,7 @@ const MODULE_PERMISSIONS: Record<UserRole, ModuleName[]> = {
   'OPERADOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'gamification'],
   'SUPERVISOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'gamification', 'memberships', 'rentals', 'assets'],
   'ADMINISTRADOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings', 'gamification', 'executive', 'billing', 'integrations', 'memberships', 'rentals', 'assets', 'reporting'],
-  'SUPER_ADMIN': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings', 'gamification', 'executive', 'billing', 'integrations', 'memberships', 'rentals', 'assets', 'reporting']
+  'SUPER_ADMIN': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings', 'gamification', 'executive', 'billing', 'integrations', 'memberships', 'rentals', 'assets', 'reporting', 'debug']
 };
 
 // Permission utilities (embedded for self-contained context)

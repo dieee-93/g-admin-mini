@@ -24,10 +24,14 @@ import {
   BuildingOfficeIcon,
   TruckIcon,
   ArchiveBoxIcon,
-  DocumentChartBarIcon
+  DocumentChartBarIcon,
+  // ✅ DEBUG TOOLS ICON
+  BugAntIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ModuleName } from '@/contexts/AuthContext';
+import { useCapabilities } from '@/lib/capabilities/hooks/useCapabilities';
+import { shouldShowBusinessModule } from '@/lib/capabilities/businessCapabilitySystem';
 
 // ✅ Types definidos según arquitectura v2.0
 export interface NavigationSubModule {
@@ -472,6 +476,69 @@ const NAVIGATION_MODULES: NavigationModule[] = [
         description: 'Report configuration'
       }
     ]
+  },
+
+  // 🔧 DEBUG TOOLS (SUPER_ADMIN ONLY)
+  {
+    id: 'debug',
+    title: 'Debug Tools',
+    icon: BugAntIcon,
+    color: 'red',
+    path: '/debug',
+    description: 'Development debugging and diagnostics',
+    isExpandable: true,
+    isExpanded: false,
+    subModules: [
+      {
+        id: 'debug-dashboard',
+        title: 'Debug Dashboard',
+        path: '/debug',
+        icon: BugAntIcon,
+        description: 'Main debug overview and system status'
+      },
+      {
+        id: 'capabilities-debug',
+        title: 'Capabilities Debug',
+        path: '/debug/capabilities',
+        icon: BugAntIcon,
+        description: 'Business capabilities system debugging'
+      },
+      {
+        id: 'theme-debug',
+        title: 'Theme Debug',
+        path: '/debug/theme',
+        icon: BugAntIcon,
+        description: 'Theme and styling debugging'
+      },
+      {
+        id: 'stores-debug',
+        title: 'Store Inspector',
+        path: '/debug/stores',
+        icon: BugAntIcon,
+        description: 'Zustand stores and state debugging'
+      },
+      {
+        id: 'api-debug',
+        title: 'API Inspector',
+        path: '/debug/api',
+        icon: BugAntIcon,
+        description: 'HTTP requests and API monitoring'
+      },
+      {
+        id: 'performance-debug',
+        title: 'Performance Monitor',
+        path: '/debug/performance',
+        icon: BugAntIcon,
+        description: 'Performance metrics and optimization'
+      },
+      {
+        id: 'navigation-debug',
+        title: 'Navigation Debug',
+        path: '/debug/navigation',
+        icon: BugAntIcon,
+        description: 'Navigation and routing debugging'
+      }
+    ]
   }
 ];
 
@@ -760,35 +827,38 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { canAccessModule, isAuthenticated, isCliente } = useAuth();
+  const { activeCapabilities, resolvedCapabilities } = useCapabilities();
   
   // ✅ Responsive state - Mobile-first approach según arquitectura
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
-  // ✅ Filter modules based on user role - CLIENTE gets different experience
+  // ✅ HYBRID FILTERING: Roles (security) → Capabilities (business logic)
   const accessibleModules = useMemo(() => {
     if (!isAuthenticated) return [];
-    
+
     // ✅ CLIENTE gets customer-friendly navigation (web/app style)
     if (isCliente()) {
       return CLIENT_NAVIGATION_MODULES.filter(module => {
         // Map client module IDs to ModuleName enum
         const clientModuleNameMap: Record<string, ModuleName> = {
           'customer-portal': 'customer_portal',
-          'customer-menu': 'customer_menu', 
+          'customer-menu': 'customer_menu',
           'my-orders': 'my_orders',
           'customer-settings': 'settings'
         };
-        
+
         const moduleName = clientModuleNameMap[module.id];
         if (!moduleName) return false; // SECURITY: deny unmapped modules
-        
+
+        // LAYER 1: Role-based security filter
         return canAccessModule(moduleName);
+        // Note: Clientes don't need capability filtering for now - they get full customer experience
       });
     }
-    
-    // ✅ Staff/Admin users get admin navigation
+
+    // ✅ Staff/Admin users get HYBRID filtering: Roles → Capabilities
     return NAVIGATION_MODULES.filter(module => {
       // Map admin module IDs to ModuleName enum
       const adminModuleNameMap: Record<string, ModuleName> = {
@@ -807,15 +877,39 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
         'executive': 'executive',
         'finance-advanced': 'billing', // Maps to billing permission
         'operations-advanced': 'operations', // Maps to operations permission
-        'advanced-tools': 'reporting' // Maps to reporting permission
+        'advanced-tools': 'reporting', // Maps to reporting permission
+        // ✅ DEBUG TOOLS (SUPER_ADMIN ONLY)
+        'debug': 'debug' // Maps to debug permission for super_admin only
       };
-      
+
       const moduleName = adminModuleNameMap[module.id];
       if (!moduleName) return false; // SECURITY: deny unmapped modules
-      
-      return canAccessModule(moduleName);
+
+      // 🔒 LAYER 1: Role-based security filter (first gate)
+      const hasRoleAccess = canAccessModule(moduleName);
+      if (!hasRoleAccess) return false;
+
+      // 🛠️ SPECIAL CASE: Debug module bypasses capability filtering (SUPER_ADMIN only)
+      if (module.id === 'debug') {
+        return true; // Already passed role check above
+      }
+
+      // 🎯 LAYER 2: Capability-based business logic filter (second gate)
+      // ✅ Now using resolvedCapabilities (includes auto-resolved features)
+      const hasCapabilityAccess = shouldShowBusinessModule(module.id, activeCapabilities);
+
+      // Debug info for development
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔍 Module Filter Debug [${module.id}]:`, {
+          roleAccess: hasRoleAccess,
+          capabilityAccess: hasCapabilityAccess,
+          finalResult: hasRoleAccess && hasCapabilityAccess
+        });
+      }
+
+      return hasCapabilityAccess;
     });
-  }, [canAccessModule, isAuthenticated, isCliente]);
+  }, [canAccessModule, isAuthenticated, isCliente, resolvedCapabilities]);
 
   // ✅ Navigation state
   const [modules, setModules] = useState<NavigationModule[]>(accessibleModules);

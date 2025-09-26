@@ -1,25 +1,68 @@
 /**
- * CapabilityGate Component for G-Admin v3.0
- * Provides conditional rendering based on business capabilities
- * Integrates with existing businessCapabilitiesStore
- * Enhanced with telemetry, caching, and lazy loading (2024 optimizations)
+ * CapabilityGate Component - G-Admin Mini v2.1
+ * Sistema de control de acceso basado en Business Capabilities
+ * Integración completa con Business Capability System
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { useCapabilities } from './hooks/useCapabilities';
-import { getCapabilityTelemetry } from './telemetry/CapabilityTelemetry';
+import { getBusinessModuleFeatures, shouldShowBusinessModule } from './businessCapabilitySystem';
 import type { BusinessCapability } from './types/BusinessCapabilities';
+
+// Loading component
+const LoadingSpinner = ({ message = 'Loading...' }: { message?: string }) => (
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '20px',
+    color: '#666',
+    fontSize: '14px'
+  }}>
+    <div style={{
+      width: '16px',
+      height: '16px',
+      border: '2px solid #e5e7eb',
+      borderTop: '2px solid #3b82f6',
+      borderRadius: '50%',
+      animation: 'spin 1s linear infinite',
+      marginRight: '8px'
+    }} />
+    {message}
+    <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `}</style>
+  </div>
+);
 
 interface CapabilityGateProps {
   /**
    * Single capability or array of capabilities to check
    */
-  capabilities: BusinessCapability | BusinessCapability[];
+  capabilities?: BusinessCapability | BusinessCapability[];
+
+  /**
+   * Module ID to check (will verify module visibility + features)
+   */
+  moduleId?: string;
+
+  /**
+   * Specific module feature to check
+   */
+  moduleFeature?: string;
 
   /**
    * Component to render when capabilities are not met
    */
   fallback?: React.ReactNode;
+
+  /**
+   * Component to render while loading
+   */
+  loading?: React.ReactNode;
 
   /**
    * Children to render when capabilities are met
@@ -39,261 +82,254 @@ interface CapabilityGateProps {
   debug?: boolean;
 
   /**
-   * Enable telemetry tracking (default: true in production)
+   * Show loading state while checking capabilities
    */
-  telemetry?: boolean;
+  showLoading?: boolean;
 
   /**
-   * Enable lazy loading of capability modules (default: true)
-   */
-  lazyLoading?: boolean;
-
-  /**
-   * Track component performance metrics
-   */
-  trackPerformance?: boolean;
-
-  /**
-   * Unique identifier for telemetry tracking
+   * Unique identifier for debugging
    */
   gateName?: string;
 }
 
 /**
- * CapabilityGate - Conditional rendering based on business capabilities
+ * CapabilityGate - Control de acceso condicional
  *
  * @example
- * // Single capability
- * <CapabilityGate capabilities="manages_appointments">
- *   <AppointmentBookingModule />
+ * // Basic capability check
+ * <CapabilityGate capabilities="sells_products">
+ *   <ProductManagement />
  * </CapabilityGate>
  *
  * @example
- * // Multiple capabilities with OR logic (default)
- * <CapabilityGate capabilities={["sells_products", "table_management"]}>
- *   <RestaurantPOSModule />
+ * // Module-based check
+ * <CapabilityGate moduleId="scheduling">
+ *   <SchedulingModule />
  * </CapabilityGate>
  *
  * @example
- * // Multiple capabilities with AND logic
+ * // Feature-specific check
  * <CapabilityGate
- *   capabilities={["sells_products", "has_online_store"]}
- *   mode="all"
- *   fallback={<div>E-commerce not configured</div>}
+ *   moduleId="scheduling"
+ *   moduleFeature="approve_timeoff"
+ *   fallback={<div>Time-off approval not available</div>}
  * >
- *   <OnlineStoreModule />
+ *   <TimeOffApprovalComponent />
  * </CapabilityGate>
  */
-export const CapabilityGate: React.FC<CapabilityGateProps> = ({
+export const CapabilityGate: React.FC<CapabilityGateProps> = memo(({
   capabilities,
+  moduleId,
+  moduleFeature,
   fallback = null,
+  loading,
   children,
   mode = 'any',
   debug = false,
-  telemetry = process.env.NODE_ENV === 'production',
-  lazyLoading = true,
-  trackPerformance = false,
+  showLoading = false,
   gateName
 }) => {
+  const [isLoading, setIsLoading] = useState(showLoading);
+  const componentName = gateName || 'CapabilityGate';
+
   const {
     hasCapability,
     hasAllCapabilities,
     activeCapabilities,
-    preloadCapability,
-    isCapabilityLoaded,
-    cacheStats
+    resolvedCapabilities
   } = useCapabilities();
 
-  const telemetryInstance = getCapabilityTelemetry();
-  const renderStartTime = useRef<number>(Date.now());
-  const componentName = gateName || 'CapabilityGate';
-
-  // Normalize capabilities to array
-  const capabilityArray = Array.isArray(capabilities) ? capabilities : [capabilities];
-
-  // Track capability check performance
+  // Loading simulation
   useEffect(() => {
-    if (telemetry) {
-      const checkStartTime = Date.now();
+    if (showLoading) {
+      const timer = setTimeout(() => setIsLoading(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showLoading]);
 
-      // Check access based on mode
-      const hasAccess = mode === 'all'
+  try {
+    // Determine access based on different check types
+    let hasAccess = false;
+    let debugInfo: any = {};
+
+    if (moduleId) {
+      // Module-based check
+      hasAccess = shouldShowBusinessModule(moduleId, resolvedCapabilities);
+
+      if (moduleFeature) {
+        // Feature-specific check within module
+        const moduleFeatures = getBusinessModuleFeatures(moduleId, resolvedCapabilities);
+        const allFeatures = [...moduleFeatures.required, ...moduleFeatures.optional];
+        hasAccess = hasAccess && allFeatures.includes(moduleFeature);
+
+        debugInfo = {
+          checkType: 'moduleFeature',
+          moduleId,
+          moduleFeature,
+          moduleVisible: shouldShowBusinessModule(moduleId, resolvedCapabilities),
+          featureAvailable: allFeatures.includes(moduleFeature),
+          moduleFeatures
+        };
+      } else {
+        debugInfo = {
+          checkType: 'module',
+          moduleId,
+          moduleVisible: hasAccess
+        };
+      }
+    } else if (capabilities) {
+      // Capability-based check
+      const capabilityArray = Array.isArray(capabilities) ? capabilities : [capabilities];
+
+      hasAccess = mode === 'all'
         ? hasAllCapabilities(capabilityArray)
         : capabilityArray.some(cap => hasCapability(cap));
 
-      const checkDuration = Date.now() - checkStartTime;
-      const cacheHit = cacheStats?.hitRate > 0;
+      debugInfo = {
+        checkType: 'capabilities',
+        requiredCapabilities: capabilityArray,
+        mode,
+        activeCapabilities: activeCapabilities.filter(cap => capabilityArray.includes(cap))
+      };
+    } else {
+      // No criteria specified - allow access with warning
+      hasAccess = true;
+      if (debug) {
+        console.warn('⚠️ CapabilityGate: No capabilities or moduleId specified - allowing access');
+      }
+    }
 
-      // Track capability check
-      capabilityArray.forEach(cap => {
-        telemetryInstance.trackCapabilityCheck(cap, checkDuration, cacheHit);
-        telemetryInstance.trackCapabilityAccess(cap, hasAccess);
+    // Debug logging
+    if (debug && process.env.NODE_ENV === 'development') {
+      console.log(`🔒 ${componentName} Debug:`, {
+        ...debugInfo,
+        hasAccess,
+        totalActiveCapabilities: activeCapabilities.length,
+        totalResolvedCapabilities: resolvedCapabilities.length
       });
     }
-  }, [capabilities, mode, telemetry, hasCapability, hasAllCapabilities, capabilityArray, cacheStats, telemetryInstance]);
 
-  // Preload capabilities if lazy loading is enabled
-  useEffect(() => {
-    if (lazyLoading) {
-      capabilityArray.forEach(cap => {
-        if (!isCapabilityLoaded(cap)) {
-          preloadCapability(cap).catch(error => {
-            console.warn(`Failed to preload capability ${cap}:`, error);
-          });
-        }
-      });
+    // Loading state
+    if (isLoading) {
+      return <>{loading || <LoadingSpinner message="Checking access..." />}</>;
     }
-  }, [capabilityArray, lazyLoading, preloadCapability, isCapabilityLoaded]);
 
-  // Track component render performance
-  useEffect(() => {
-    if (trackPerformance && telemetry) {
-      const renderDuration = Date.now() - renderStartTime.current;
+    // Access decision
+    return hasAccess ? <>{children}</> : <>{fallback}</>;
 
-      telemetryInstance.trackPerformanceMetrics({
-        capabilityCheckDuration: renderDuration,
-        cacheHitRate: cacheStats?.hitRate || 0,
-        lazyLoadingTime: 0, // Would be measured from actual lazy loading
-        componentRenderTime: renderDuration
-      });
+  } catch (err) {
+    if (debug) {
+      console.error('❌ CapabilityGate Error:', err);
     }
-  });
-
-  // Check access based on mode (with caching from enhanced useCapabilities)
-  const hasAccess = mode === 'all'
-    ? hasAllCapabilities(capabilityArray)
-    : capabilityArray.some(cap => hasCapability(cap));
-
-  // Enhanced debug logging
-  if (debug && process.env.NODE_ENV === 'development') {
-    console.log('🔒 Enhanced CapabilityGate Debug:', {
-      componentName,
-      requiredCapabilities: capabilityArray,
-      mode,
-      activeCapabilities,
-      hasAccess,
-      performance: {
-        cacheHitRate: cacheStats?.hitRate,
-        lazyLoadingEnabled: lazyLoading,
-        telemetryEnabled: telemetry
-      },
-      loadedCapabilities: capabilityArray.map(cap => ({
-        capability: cap,
-        loaded: isCapabilityLoaded(cap)
-      }))
-    });
+    return <>{fallback}</>;
   }
+});
 
-  return hasAccess ? <>{children}</> : <>{fallback}</>;
-};
+CapabilityGate.displayName = 'CapabilityGate';
 
 /**
- * Higher-order component version of CapabilityGate
- * Useful for wrapping entire components or pages
+ * Higher-order component version
  */
 export const withCapabilityGate = <P extends object>(
   Component: React.ComponentType<P>,
-  requiredCapabilities: BusinessCapability | BusinessCapability[],
-  options?: {
+  options: {
+    capabilities?: BusinessCapability | BusinessCapability[];
+    moduleId?: string;
+    moduleFeature?: string;
     mode?: 'any' | 'all';
     fallback?: React.ReactNode;
+    loading?: React.ReactNode;
     debug?: boolean;
+    gateName?: string;
   }
 ) => {
   const WrappedComponent: React.FC<P> = (props) => (
     <CapabilityGate
-      capabilities={requiredCapabilities}
-      mode={options?.mode}
-      fallback={options?.fallback}
-      debug={options?.debug}
+      capabilities={options.capabilities}
+      moduleId={options.moduleId}
+      moduleFeature={options.moduleFeature}
+      mode={options.mode}
+      fallback={options.fallback}
+      loading={options.loading}
+      debug={options.debug}
+      gateName={options.gateName || Component.displayName || Component.name}
     >
       <Component {...props} />
     </CapabilityGate>
   );
 
   WrappedComponent.displayName = `withCapabilityGate(${Component.displayName || Component.name})`;
-
   return WrappedComponent;
 };
 
 /**
- * Hook-based capability checking for conditional logic within components
- *
- * @example
- * const MyComponent = () => {
- *   const canShowAdvanced = useCapabilityCheck(['is_b2b_focused', 'has_online_store'], 'all');
- *
- *   return (
- *     <div>
- *       <BasicFeatures />
- *       {canShowAdvanced && <AdvancedFeatures />}
- *     </div>
- *   );
- * };
+ * Hook for capability checking within components
  */
-export const useCapabilityCheck = (
-  capabilities: BusinessCapability | BusinessCapability[],
-  mode: 'any' | 'all' = 'any'
-): boolean => {
-  const { hasCapability, hasAllCapabilities } = useCapabilities();
-
-  const capabilityArray = Array.isArray(capabilities) ? capabilities : [capabilities];
-
-  return mode === 'all'
-    ? hasAllCapabilities(capabilityArray)
-    : capabilityArray.some(cap => hasCapability(cap));
-};
-
-/**
- * Component for debugging capabilities in development
- * Shows current active capabilities and their status
- */
-export const CapabilityDebugger: React.FC<{
-  capabilities?: BusinessCapability[];
-  show?: boolean;
-}> = ({
-  capabilities = [],
-  show = process.env.NODE_ENV === 'development'
+export const useCapabilityCheck = (options: {
+  capabilities?: BusinessCapability | BusinessCapability[];
+  moduleId?: string;
+  moduleFeature?: string;
+  mode?: 'any' | 'all';
 }) => {
-  const { activeCapabilities, businessModel } = useCapabilities();
+  const {
+    hasCapability,
+    hasAllCapabilities,
+    resolvedCapabilities,
+    activeCapabilities
+  } = useCapabilities();
 
-  if (!show) return null;
+  const { capabilities, moduleId, moduleFeature, mode = 'any' } = options;
 
-  const capabilitiesToCheck = capabilities.length > 0 ? capabilities : activeCapabilities;
+  // Module + Feature check
+  if (moduleId && moduleFeature) {
+    const moduleVisible = shouldShowBusinessModule(moduleId, resolvedCapabilities);
+    if (!moduleVisible) return { hasAccess: false, reason: 'Module not visible' };
 
-  return (
-    <div style={{
-      position: 'fixed',
-      bottom: '20px',
-      right: '20px',
-      background: '#1a1a1a',
-      color: '#fff',
-      padding: '12px',
-      borderRadius: '8px',
-      fontSize: '12px',
-      maxWidth: '300px',
-      zIndex: 9999,
-      fontFamily: 'monospace'
-    }}>
-      <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
-        🔍 Capability Debugger
-      </div>
-      <div style={{ marginBottom: '8px' }}>
-        <strong>Business Model:</strong> {businessModel || 'Not set'}
-      </div>
-      <div style={{ marginBottom: '8px' }}>
-        <strong>Active Capabilities ({activeCapabilities.length}):</strong>
-      </div>
-      <div style={{ maxHeight: '200px', overflow: 'auto' }}>
-        {capabilitiesToCheck.map(cap => (
-          <div key={cap} style={{
-            padding: '2px 0',
-            color: activeCapabilities.includes(cap) ? '#4ade80' : '#f87171'
-          }}>
-            {activeCapabilities.includes(cap) ? '✅' : '❌'} {cap}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+    const moduleFeatures = getBusinessModuleFeatures(moduleId, resolvedCapabilities);
+    const allFeatures = [...moduleFeatures.required, ...moduleFeatures.optional];
+    const featureAvailable = allFeatures.includes(moduleFeature);
+
+    return {
+      hasAccess: featureAvailable,
+      reason: featureAvailable ? 'Feature available' : 'Feature not available',
+      debug: { moduleFeatures, moduleVisible, featureAvailable }
+    };
+  }
+
+  // Module check
+  if (moduleId) {
+    const moduleVisible = shouldShowBusinessModule(moduleId, resolvedCapabilities);
+    return {
+      hasAccess: moduleVisible,
+      reason: moduleVisible ? 'Module visible' : 'Module not visible',
+      debug: { moduleVisible }
+    };
+  }
+
+  // Capability check
+  if (capabilities) {
+    const capabilityArray = Array.isArray(capabilities) ? capabilities : [capabilities];
+    const hasAccess = mode === 'all'
+      ? hasAllCapabilities(capabilityArray)
+      : capabilityArray.some(cap => hasCapability(cap));
+
+    return {
+      hasAccess,
+      reason: hasAccess ? 'Capabilities met' : `Missing capabilities (${mode} mode)`,
+      debug: {
+        required: capabilityArray,
+        active: activeCapabilities.filter(cap => capabilityArray.includes(cap)),
+        mode
+      }
+    };
+  }
+
+  // No criteria
+  return {
+    hasAccess: true,
+    reason: 'No criteria specified',
+    debug: {}
+  };
 };
+
+export default CapabilityGate;

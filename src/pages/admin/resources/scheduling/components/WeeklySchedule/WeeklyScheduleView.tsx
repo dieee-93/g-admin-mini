@@ -39,9 +39,6 @@ interface WeeklyScheduleViewProps {
 }
 
 export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklyScheduleViewProps) {
-  console.log('🔍 WeeklyScheduleView: RENDER START', { timestamp: Date.now() });
-  const renderStart = performance.now();
-  
   const [loading, setLoading] = useState(true);
   const [selectedWeekStart, setSelectedWeekStart] = useState<Date>(new Date());
   const [employees, setEmployees] = useState<EmployeeAvailability[]>([]);
@@ -49,9 +46,6 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
 
   // ✅ MOCK DATA - será reemplazado por API calls
   useEffect(() => {
-    console.log('🔍 WeeklyScheduleView: useEffect START', { selectedWeekStart });
-    const effectStart = performance.now();
-    
     const mockEmployees: EmployeeAvailability[] = [
       {
         id: '1',
@@ -117,19 +111,9 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
       }
     ];
 
-    console.log('🔍 WeeklyScheduleView: Mock data created', { 
-      employeesCount: mockEmployees.length,
-      shiftsCount: mockShifts.length 
-    });
-
     setEmployees(mockEmployees);
     setShifts(mockShifts);
     setLoading(false);
-    
-    const effectEnd = performance.now();
-    console.log('🔍 WeeklyScheduleView: useEffect END', { 
-      duration: `${effectEnd - effectStart}ms` 
-    });
   }, [selectedWeekStart]);
 
   // ✅ HANDLERS
@@ -162,7 +146,6 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
   };
 
   if (loading) {
-    console.log('🔍 WeeklyScheduleView: RENDERING Loading state');
     return (
       <Stack direction="column" gap="md">
         <Skeleton h="60px" />
@@ -172,28 +155,9 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
     );
   }
 
-  console.log('🔍 WeeklyScheduleView: RENDERING Main content', {
-    renderDuration: `${performance.now() - renderStart}ms`,
-    employeesCount: employees.length,
-    shiftsCount: shifts.length
-  });
-
   return (
     <Stack direction="column" gap="md">
-      {/* � CONTENIDO DE PRUEBA - PESTAÑA HORARIOS */}
-      <div style={{ 
-        backgroundColor: '#ff6b6b', 
-        color: 'white', 
-        padding: '20px', 
-        borderRadius: '8px',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        textAlign: 'center'
-      }}>
-        ✅ COMPONENTE HORARIOS FUNCIONANDO - WeeklyScheduleView renderizado correctamente
-      </div>
-
-      {/* �📅 MAIN WEEKLY CALENDAR */}
+      {/* 📅 MAIN WEEKLY CALENDAR */}
       <Section variant="elevated" title="Calendario Semanal">
         <Stack direction="column" gap="md">
           {/* Controls Row */}

@@ -31,48 +31,34 @@ export interface BusinessDNA {
 }
 
 interface BusinessCapabilitiesState {
-  // Estado principal - nuevo modelo de composición
+  // Estado principal - ÚNICA FUENTE DE VERDAD
   profile: BusinessProfile | null;
-  businessDNA: BusinessDNA;
-  selectedCapabilities: string[];
   isLoading: boolean;
   
-  // Computed values para personalización
-  enabledFeatures: string[];
-  dashboardModules: string[];
-  relevantTutorials: string[];
-  
-  // Actions - nuevo modelo compositivo
+  // Actions simplificados
   initializeProfile: (basicData: Partial<BusinessProfile>) => void;
-  addCapability: (capability: string) => void;
-  removeCapability: (capability: string) => void;
-  updateCapabilityStatus: (capability: string, status: CapabilityStatus['status']) => void;
+  setCapability: (capability: keyof BusinessCapabilities, value: boolean) => void;
   updateBasicInfo: (info: Partial<BusinessProfile>) => void;
   completeSetup: () => void;
   resetProfile: () => void;
-  
-  // Helpers para personalización de UI
-  hasCapability: (capability: string) => boolean;
-  getOperationalTier: () => OperationalTier;
-  getCapabilityStatus: (capability: string) => CapabilityStatus['status'];
-  getActiveCapabilities: () => string[];
-  shouldShowModule: (moduleId: string) => boolean;
-  shouldShowTutorial: (tutorialId: string) => boolean;
+
+  // ✅ Solo helpers básicos - NO business logic
+  hasCapability: (capability: keyof BusinessCapabilities) => boolean;
   
   // Sistema de logros
   handleCapabilityActivation: (capabilityId: string, timestamp: number, milestones: string[]) => void;
 }
 
 const defaultCapabilities: BusinessCapabilities = {
-  sells_products: false,
-  sells_services: false,
+  sells_products: true,
+  sells_services: true,
   manages_events: false,
   manages_recurrence: false,
-  sells_products_for_onsite_consumption: false,
+  sells_products_for_onsite_consumption: true,
   sells_products_for_pickup: false,
   sells_products_with_delivery: false,
   sells_digital_products: false,
-  sells_services_by_appointment: false,
+  sells_services_by_appointment: true,
   sells_services_by_class: false,
   sells_space_by_reservation: false,
   manages_offsite_catering: false,
@@ -88,12 +74,7 @@ export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
   persist(
     (set, get) => ({
       profile: null,
-      businessDNA: {},
-      selectedCapabilities: [],
       isLoading: false,
-      enabledFeatures: [],
-      dashboardModules: ['dashboard', 'materials', 'products'],
-      relevantTutorials: ['basics'],
 
       initializeProfile: (basicData) => {
         set((state) => {
@@ -109,7 +90,7 @@ export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
             setupCompleted: false,
             onboardingStep: 0,
             customizations: {
-              enabledModules: ['dashboard', 'materials', 'products'],
+              enabledModules: ['dashboard', 'materials', 'products', 'staff', 'scheduling'],
               tutorialsCompleted: [],
               milestonesCompleted: [],
             },
@@ -119,89 +100,23 @@ export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
           return {
             ...state,
             profile: newProfile,
-            enabledFeatures: getEnabledFeatures(newProfile.capabilities),
-            dashboardModules: getDashboardModules(newProfile.capabilities),
-            relevantTutorials: getRelevantTutorials(newProfile.capabilities),
           };
         });
       },
 
-      addCapability: (capability) => {
+      setCapability: (capability, value) => {
         set((state) => {
-          if (state.selectedCapabilities.includes(capability)) {
-            return state; // Ya está seleccionada
-          }
-
-          const newDNA = {
-            ...state.businessDNA,
-            [capability]: { status: 'latent' as const },
-          };
-
-          const newSelectedCapabilities = [...state.selectedCapabilities, capability];
-
-          // Crear un objeto de capacidades para compatibilidad con funciones existentes
-          const mockCapabilities = Object.keys(newDNA).reduce((acc, cap) => {
-            acc[cap as keyof BusinessCapabilities] = true;
-            return acc;
-          }, {} as Partial<BusinessCapabilities>);
-
-          const fullCapabilities = { ...defaultCapabilities, ...mockCapabilities };
+          if (!state.profile) return state;
 
           return {
             ...state,
-            businessDNA: newDNA,
-            selectedCapabilities: newSelectedCapabilities,
-            enabledFeatures: getEnabledFeatures(fullCapabilities),
-            dashboardModules: getDashboardModules(fullCapabilities),
-            relevantTutorials: getRelevantTutorials(fullCapabilities),
-          };
-        });
-      },
-
-      removeCapability: (capability) => {
-        set((state) => {
-          const newDNA = { ...state.businessDNA };
-          delete newDNA[capability];
-
-          const newSelectedCapabilities = state.selectedCapabilities.filter(cap => cap !== capability);
-
-          // Crear un objeto de capacidades para compatibilidad con funciones existentes
-          const mockCapabilities = Object.keys(newDNA).reduce((acc, cap) => {
-            acc[cap as keyof BusinessCapabilities] = true;
-            return acc;
-          }, {} as Partial<BusinessCapabilities>);
-
-          const fullCapabilities = { ...defaultCapabilities, ...mockCapabilities };
-
-          return {
-            ...state,
-            businessDNA: newDNA,
-            selectedCapabilities: newSelectedCapabilities,
-            enabledFeatures: getEnabledFeatures(fullCapabilities),
-            dashboardModules: getDashboardModules(fullCapabilities),
-            relevantTutorials: getRelevantTutorials(fullCapabilities),
-          };
-        });
-      },
-
-      updateCapabilityStatus: (capability, status) => {
-        set((state) => {
-          if (!state.businessDNA[capability]) {
-            return state; // Capacidad no existe
-          }
-
-          const newDNA = {
-            ...state.businessDNA,
-            [capability]: {
-              ...state.businessDNA[capability],
-              status,
-              ...(status === 'active' ? { activatedAt: new Date() } : {}),
+            profile: {
+              ...state.profile,
+              capabilities: {
+                ...state.profile.capabilities,
+                [capability]: value,
+              },
             },
-          };
-
-          return {
-            ...state,
-            businessDNA: newDNA,
           };
         });
       },
@@ -238,85 +153,45 @@ export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
       resetProfile: () => {
         set({
           profile: null,
-          businessDNA: {},
-          selectedCapabilities: [],
           isLoading: false,
-          enabledFeatures: [],
-          dashboardModules: ['dashboard', 'materials', 'products'],
-          relevantTutorials: ['basics'],
         });
       },
 
-      // Helper functions para uso en componentes
+      // ✅ Solo helper básico - NO business logic
       hasCapability: (capability) => {
         const state = get();
-        return state.selectedCapabilities.includes(capability);
+        return state.profile?.capabilities[capability] || false;
       },
 
-      getOperationalTier: () => {
-        const state = get();
-        if (!state.profile) return 'basic' as OperationalTier;
-        return calculateOperationalTier(state.profile.capabilities);
-      },
-
-      getCapabilityStatus: (capability) => {
-        const state = get();
-        return state.businessDNA[capability]?.status || 'latent';
-      },
-
-      getActiveCapabilities: () => {
-        const state = get();
-        return state.selectedCapabilities;
-      },
-
-      shouldShowModule: (moduleId) => {
-        const state = get();
-        return state.dashboardModules.includes(moduleId);
-      },
-
-      shouldShowTutorial: (tutorialId) => {
-        const state = get();
-        return state.relevantTutorials.includes(tutorialId);
-      },
-
-      // Método para manejar activación de capacidades desde el sistema de logros
+      // Sistema de logros - integración simplificada
       handleCapabilityActivation: (capabilityId: string, timestamp: number, milestones: string[]) => {
         set((state) => {
-          // Solo actualizar si la capacidad existe en el DNA
-          if (!state.businessDNA[capabilityId]) {
-            console.warn('[BusinessCapabilitiesStore] Capacidad no encontrada en DNA:', capabilityId);
-            return state;
+          if (!state.profile) return state;
+
+          // Activar la capacidad en el profile
+          const capability = capabilityId as keyof BusinessCapabilities;
+          if (state.profile.capabilities.hasOwnProperty(capability)) {
+            return {
+              ...state,
+              profile: {
+                ...state.profile,
+                capabilities: {
+                  ...state.profile.capabilities,
+                  [capability]: true,
+                },
+                customizations: {
+                  ...state.profile.customizations,
+                  milestonesCompleted: [
+                    ...state.profile.customizations.milestonesCompleted,
+                    ...milestones
+                  ],
+                },
+              },
+            };
           }
 
-          const newDNA = {
-            ...state.businessDNA,
-            [capabilityId]: {
-              ...state.businessDNA[capabilityId],
-              status: 'active' as const,
-              activatedAt: new Date(timestamp),
-              milestones,
-            },
-          };
-
-          // Recalcular características habilitadas
-          const mockCapabilities = Object.keys(newDNA)
-            .filter(cap => newDNA[cap].status === 'active')
-            .reduce((acc, cap) => {
-              acc[cap as keyof BusinessCapabilities] = true;
-              return acc;
-            }, {} as Partial<BusinessCapabilities>);
-
-          const fullCapabilities = { ...defaultCapabilities, ...mockCapabilities };
-
-          console.log('[BusinessCapabilitiesStore] DNA actualizado:', newDNA);
-
-          return {
-            ...state,
-            businessDNA: newDNA,
-            enabledFeatures: getEnabledFeatures(fullCapabilities),
-            dashboardModules: getDashboardModules(fullCapabilities),
-            relevantTutorials: getRelevantTutorials(fullCapabilities),
-          };
+          console.warn('[BusinessCapabilitiesStore] Capacidad no reconocida:', capabilityId);
+          return state;
         });
       },
     }),
@@ -324,8 +199,6 @@ export const useBusinessCapabilities = create<BusinessCapabilitiesState>()(
       name: 'business-capabilities-store',
       partialize: (state) => ({
         profile: state.profile,
-        businessDNA: state.businessDNA,
-        selectedCapabilities: state.selectedCapabilities,
       }),
     }
   )
@@ -336,19 +209,13 @@ export const useBusinessProfile = () => {
   const store = useBusinessCapabilities();
   return {
     profile: store.profile,
-    businessDNA: store.businessDNA,
-    selectedCapabilities: store.selectedCapabilities,
     isLoading: store.isLoading,
     hasCapability: store.hasCapability,
-    getCapabilityStatus: store.getCapabilityStatus,
-    getActiveCapabilities: store.getActiveCapabilities,
-    shouldShowModule: store.shouldShowModule,
-    shouldShowTutorial: store.shouldShowTutorial,
-    enabledFeatures: store.enabledFeatures,
-    dashboardModules: store.dashboardModules,
-    addCapability: store.addCapability,
-    removeCapability: store.removeCapability,
-    updateCapabilityStatus: store.updateCapabilityStatus,
+    setCapability: store.setCapability,
+    getOperationalTier: store.getOperationalTier,
+    getEnabledFeatures: store.getEnabledFeatures,
+    getDashboardModules: store.getDashboardModules,
+    getRelevantTutorials: store.getRelevantTutorials,
     handleCapabilityActivation: store.handleCapabilityActivation,
   };
 };

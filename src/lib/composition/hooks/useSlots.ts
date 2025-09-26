@@ -209,3 +209,19 @@ export const useSlotPerformance = (slotId: string, enabled: boolean = false) => 
     enabled
   };
 };
+
+/**
+ * Main useSlots hook - combines all slot functionality for debugging
+ * Used primarily by debug tools
+ */
+export const useSlots = () => {
+  const { getAllSlots, registerSlot, unregisterSlot } = useSlotContext();
+  const { getSlotComponents } = usePluggableComponents();
+
+  return {
+    getAllSlots,
+    registerSlot,
+    unregisterSlot,
+    getSlotComponents
+  };
+};

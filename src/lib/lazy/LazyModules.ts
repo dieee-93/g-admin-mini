@@ -141,6 +141,117 @@ export const LazyThemeTestPage = createLazyComponent(
   }
 );
 
+// 🛠️ DEBUG TOOLS - Development only
+export const LazyDebugDashboard = createLazyComponent(
+  () => import('../../pages/debug/index'),
+  'debug-dashboard',
+  {
+    chunkName: 'debug-dashboard',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyCapabilitiesDebug = createLazyComponent(
+  () => import('../../pages/debug/capabilities/index'),
+  'capabilities-debug',
+  {
+    chunkName: 'capabilities-debug',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyThemeDebug = createLazyComponent(
+  () => import('../../pages/debug/theme/index'),
+  'theme-debug',
+  {
+    chunkName: 'theme-debug',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyStoresDebug = createLazyComponent(
+  () => import('../../pages/debug/stores/index'),
+  'stores-debug',
+  {
+    chunkName: 'stores-debug',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyApiDebug = createLazyComponent(
+  () => import('../../pages/debug/api/index'),
+  'api-debug',
+  {
+    chunkName: 'api-debug',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyPerformanceDebug = createLazyComponent(
+  () => import('../../pages/debug/performance/index'),
+  'performance-debug',
+  {
+    chunkName: 'performance-debug',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyNavigationDebug = createLazyComponent(
+  () => import('../../pages/debug/navigation/index'),
+  'navigation-debug',
+  {
+    chunkName: 'navigation-debug',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyComponentsDebug = createLazyComponent(
+  () => import('../../pages/debug/components/index'),
+  'components-debug',
+  {
+    chunkName: 'components-debug',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazySlotsDebug = createLazyComponent(
+  () => import('../../pages/debug/slots/index'),
+  'slots-debug',
+  {
+    chunkName: 'slots-debug',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyBundleDebug = createLazyComponent(
+  () => import('../../pages/debug/bundle/index'),
+  'bundle-debug',
+  {
+    chunkName: 'bundle-debug',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
 // Materials Sub-Pages (pages/admin/supply-chain/materials/*)
 export const LazySupplyChainPage = createLazyComponent(
   () => import('../../pages/admin/supply-chain/materials/components/Procurement').then(module => ({

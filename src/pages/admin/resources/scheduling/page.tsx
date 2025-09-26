@@ -23,6 +23,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 
 // ✅ HOOKS ESPECIALIZADOS
 import { useSchedulingPage } from './hooks';
+import { useScheduling } from './hooks/useScheduling';
 
 // ✅ COMPONENTES ESPECIALIZADOS ENTERPRISE v2.1
 import {
@@ -32,6 +33,8 @@ import {
   SchedulingAlerts,
   AutoSchedulingModal
 } from './components';
+
+// ✅ UNIFIED CALENDAR SYSTEM
 
 // ✅ MODULE CONFIGURATION
 const SCHEDULING_MODULE_CONFIG = {
@@ -82,6 +85,9 @@ export default function SchedulingPage() {
     loading,
     error
   } = useSchedulingPage();
+
+  // ✅ UNIFIED SCHEDULING SYSTEM
+  const schedulingData = useScheduling();
 
   // Debug logs removed to prevent console spam
 

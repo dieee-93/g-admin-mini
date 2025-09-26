@@ -1,183 +1,301 @@
-// schedulingApi - Supabase API integration for scheduling module
-import { supabase } from '@/lib/supabase/client';
-import type { 
-  Shift, 
-  Schedule, 
-  TimeOffRequest, 
-  ShiftTemplate, 
-  ShiftFormData,
-  ShiftStatus 
-} from '../types';
+/**
+ * UNIFIED SCHEDULING API - G-ADMIN MINI v3.0
+ *
+ * BREAKING CHANGE: Complete rewrite using UnifiedCalendarEngine
+ * NO legacy support - uses new unified types and calendar system
+ *
+ * @version 3.0.0
+ * @breaking-change Replaces all legacy scheduling API patterns
+ */
 
-// =====================
-// SHIFTS API
-// =====================
+import { supabase } from '@/lib/supabase/client';
+import { UnifiedCalendarEngine } from '@/shared/calendar/engine/UnifiedCalendarEngine';
+import type { CalendarEngineConfig, QueryOptions } from '@/shared/calendar/engine/UnifiedCalendarEngine';
+import { BaseCalendarAdapter } from '@/shared/calendar/adapters/BaseCalendarAdapter';
+import type {
+  ISODateString,
+  ISOTimeString,
+  DurationMinutes,
+  TimezoneString,
+  TimeSlot,
+  Booking,
+  Resource,
+  DateRange,
+  CalendarConfig,
+} from '@/shared/calendar/types/DateTimeTypes';
+import { createISODate, createISODateTime, calculateDuration, nowTimestamp } from '@/shared/calendar';
+import type {
+  StaffShift,
+  ShiftStatus,
+  WorkSchedule,
+  TimeOffRequest,
+  ShiftTemplate,
+  ShiftFormData,
+  EmployeeResource,
+  LaborCost,
+  CoverageMetrics,
+  ScheduleDashboard,
+  ShiftTracking
+} from '../types/schedulingTypes';
+
+// ===============================
+// SCHEDULING CALENDAR ADAPTER
+// ===============================
+
+/**
+ * Scheduling-specific calendar adapter
+ * Implements business rules for staff scheduling
+ */
+class SchedulingCalendarAdapter extends BaseCalendarAdapter {
+  async validateBookingRules(bookingData: any) {
+    // Implement scheduling-specific validation
+    return { isValid: true, errors: [], warnings: [] };
+  }
+
+  async validateBookingUpdate(existingBooking: any, updates: any) {
+    return { isValid: true, errors: [], warnings: [] };
+  }
+
+  async validateCancellation(booking: any) {
+    return { isValid: true, errors: [], warnings: [] };
+  }
+
+  async processBookingCreation(booking: any) {
+    return { success: true, data: booking, errors: [], warnings: [] };
+  }
+
+  async processBookingUpdate(oldBooking: any, newBooking: any) {
+    return { success: true, data: newBooking, errors: [], warnings: [] };
+  }
+
+  async processCancellation(booking: any) {
+    return { success: true, data: booking, errors: [], warnings: [] };
+  }
+
+  async getBusinessHours(date: ISODateString) {
+    // Return default business hours for now
+    return null;
+  }
+
+  async checkResourceAvailability(resource: Resource, timeSlot: TimeSlot) {
+    return true;
+  }
+
+  async checkBusinessConflicts(timeSlot: TimeSlot, resourceIds: string[]) {
+    return { hasConflicts: false, conflicts: [] };
+  }
+}
+
+// ===============================
+// UNIFIED SCHEDULING ENGINE
+// ===============================
+
+/**
+ * Singleton instance of the scheduling calendar engine
+ */
+let schedulingEngine: UnifiedCalendarEngine | null = null;
+
+/**
+ * Gets or creates the scheduling calendar engine
+ */
+function getSchedulingEngine(): UnifiedCalendarEngine {
+  if (!schedulingEngine) {
+    const config: CalendarEngineConfig = {
+      businessModel: 'staff_scheduling',
+      timezone: 'UTC' as TimezoneString,
+      enabledFeatures: new Set(['shift_management', 'time_off', 'coverage_tracking']),
+      adapter: new SchedulingCalendarAdapter('staff_scheduling', {} as CalendarConfig),
+      eventBusEnabled: true
+    };
+    schedulingEngine = new UnifiedCalendarEngine(config);
+  }
+  return schedulingEngine;
+}
+
+// ===============================
+// UNIFIED SHIFTS API
+// ===============================
 
 export const shiftsApi = {
-  // Get shifts for a date range
-  async getShifts(startDate: string, endDate: string, filters?: {
-    position?: string;
-    employee_id?: string;
-    status?: ShiftStatus;
-  }): Promise<Shift[]> {
+  // Get shifts for a date range using unified engine
+  async getShifts(
+    startDate: ISODateString,
+    endDate: ISODateString,
+    filters?: {
+      position?: string;
+      employeeId?: string;
+      status?: ShiftStatus;
+    }
+  ): Promise<StaffShift[]> {
     try {
-      let query = supabase
-        .from('shift_schedules')
-        .select(`
-          *,
-          employees:employee_id (
-            name,
-            position
-          )
-        `)
-        .gte('date', startDate)
-        .lte('date', endDate)
-        .order('date', { ascending: true })
-        .order('start_time', { ascending: true });
+      const engine = getSchedulingEngine();
+
+      const queryOptions: QueryOptions = {
+        dateRange: { startDate, endDate },
+        bookingTypes: ['shift'],
+        statuses: filters?.status ? [filters.status] : undefined
+      };
+
+      const result = await engine.queryBookings(queryOptions);
+
+      if (!result.success) {
+        throw new Error(result.errors.join(', '));
+      }
+
+      // Convert unified bookings to staff shifts
+      const shifts = (result.data || []).map(booking => this.convertBookingToShift(booking));
+
+      // Apply additional filters
+      let filteredShifts = shifts;
 
       if (filters?.position) {
-        query = query.eq('position', filters.position);
-      }
-      
-      if (filters?.employee_id) {
-        query = query.eq('employee_id', filters.employee_id);
-      }
-      
-      if (filters?.status) {
-        query = query.eq('status', filters.status);
+        filteredShifts = shifts.filter(shift => shift.position === filters.position);
       }
 
-      const { data, error } = await query;
-      
-      if (error) throw error;
-      
-      return (data || []).map(shift => ({
-        ...shift,
-        employee_name: shift.employees?.name || 'Unknown'
-      }));
+      if (filters?.employeeId) {
+        filteredShifts = shifts.filter(shift => shift.employeeId === filters.employeeId);
+      }
+
+      return filteredShifts;
     } catch (error) {
       console.error('Error fetching shifts:', error);
       throw new Error('Failed to fetch shifts');
     }
   },
 
-  // Create a new shift
-  async createShift(shiftData: ShiftFormData): Promise<Shift> {
+  // Helper to convert unified booking to staff shift
+  convertBookingToShift(booking: Booking): StaffShift {
+    return {
+      ...booking,
+      type: 'shift',
+      employeeId: booking.resourceIds[0] || '',
+      employeeName: booking.customerName || 'Unknown',
+      position: booking.serviceType || 'General',
+      breakDuration: undefined // Would be in metadata
+    } as StaffShift;
+  },
+
+  // Create a new shift using unified engine
+  async createShift(shiftData: ShiftFormData): Promise<StaffShift> {
     try {
-      const { data, error } = await supabase
-        .from('shift_schedules')
-        .insert([{
-          employee_id: shiftData.employee_id,
-          date: shiftData.date,
-          start_time: shiftData.start_time,
-          end_time: shiftData.end_time,
-          position: shiftData.position,
-          notes: shiftData.notes,
-          status: 'scheduled'
-        }])
-        .select(`
-          *,
-          employees:employee_id (
-            name,
-            position
-          )
-        `)
-        .single();
+      const engine = getSchedulingEngine();
 
-      if (error) throw error;
+      const result = await engine.createBooking({
+        type: 'shift',
+        timeSlot: shiftData.timeSlot,
+        resourceIds: [shiftData.employeeId],
+        customerName: shiftData.employeeId, // Will be resolved to employee name
+        serviceType: shiftData.position,
+        notes: shiftData.notes,
+        createdBy: 'system' // Should come from auth context
+      });
 
-      return {
-        ...data,
-        employee_name: data.employees?.name || 'Unknown'
-      };
+      if (!result.success) {
+        throw new Error(result.errors.join(', '));
+      }
+
+      return this.convertBookingToShift(result.data!);
     } catch (error) {
       console.error('Error creating shift:', error);
       throw new Error('Failed to create shift');
     }
   },
 
-  // Update an existing shift
-  async updateShift(shiftId: string, updates: Partial<Shift>): Promise<void> {
+  // Update an existing shift using unified engine
+  async updateShift(shiftId: string, updates: Partial<StaffShift>): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('shift_schedules')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', shiftId);
+      const engine = getSchedulingEngine();
 
-      if (error) throw error;
+      const result = await engine.updateBooking(shiftId, {
+        timeSlot: updates.timeSlot,
+        status: updates.status,
+        notes: updates.notes,
+        cost: updates.cost
+      });
+
+      if (!result.success) {
+        throw new Error(result.errors.join(', '));
+      }
     } catch (error) {
       console.error('Error updating shift:', error);
       throw new Error('Failed to update shift');
     }
   },
 
-  // Delete a shift
+  // Cancel a shift (delete using unified engine)
   async deleteShift(shiftId: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('shift_schedules')
-        .delete()
-        .eq('id', shiftId);
+      const engine = getSchedulingEngine();
 
-      if (error) throw error;
+      const result = await engine.cancelBooking(shiftId, 'Shift deleted', 'system');
+
+      if (!result.success) {
+        throw new Error(result.errors.join(', '));
+      }
     } catch (error) {
       console.error('Error deleting shift:', error);
       throw new Error('Failed to delete shift');
     }
   },
 
-  // Bulk create shifts
-  async bulkCreateShifts(shiftsData: ShiftFormData[]): Promise<Shift[]> {
+  // Bulk create shifts using unified engine
+  async bulkCreateShifts(shiftsData: ShiftFormData[]): Promise<StaffShift[]> {
     try {
-      const { data, error } = await supabase
-        .from('shift_schedules')
-        .insert(
-          shiftsData.map(shiftData => ({
-            employee_id: shiftData.employee_id,
-            date: shiftData.date,
-            start_time: shiftData.start_time,
-            end_time: shiftData.end_time,
-            position: shiftData.position,
-            notes: shiftData.notes,
-            status: 'scheduled'
-          }))
-        )
-        .select(`
-          *,
-          employees:employee_id (
-            name,
-            position
-          )
-        `);
+      const createdShifts: StaffShift[] = [];
 
-      if (error) throw error;
+      // Create shifts one by one using the unified engine
+      for (const shiftData of shiftsData) {
+        try {
+          const shift = await this.createShift(shiftData);
+          createdShifts.push(shift);
+        } catch (error) {
+          console.warn(`Failed to create shift for employee ${shiftData.employeeId}:`, error);
+          // Continue with other shifts
+        }
+      }
 
-      return (data || []).map(shift => ({
-        ...shift,
-        employee_name: shift.employees?.name || 'Unknown'
-      }));
+      if (createdShifts.length === 0) {
+        throw new Error('Failed to create any shifts');
+      }
+
+      return createdShifts;
     } catch (error) {
       console.error('Error bulk creating shifts:', error);
       throw new Error('Failed to create shifts');
     }
   },
 
-  // Get shift conflicts for an employee
-  async getShiftConflicts(employeeId: string, date: string, startTime: string, endTime: string): Promise<Shift[]> {
+  // Get shift conflicts for an employee using unified engine
+  async getShiftConflicts(
+    employeeId: string,
+    timeSlot: TimeSlot
+  ): Promise<StaffShift[]> {
     try {
-      const { data, error } = await supabase
-        .from('shift_schedules')
-        .select('*')
-        .eq('employee_id', employeeId)
-        .eq('date', date)
-        .or(`and(start_time.lte.${endTime},end_time.gte.${startTime})`);
+      const engine = getSchedulingEngine();
 
-      if (error) throw error;
+      // Query existing bookings for the employee on the same date
+      const result = await engine.queryBookings({
+        dateRange: { startDate: timeSlot.date, endDate: timeSlot.date },
+        resourceIds: [employeeId],
+        bookingTypes: ['shift']
+      });
 
-      return data || [];
+      if (!result.success) {
+        throw new Error(result.errors.join(', '));
+      }
+
+      // Filter for actual time conflicts
+      const conflictingShifts = (result.data || [])
+        .map(booking => this.convertBookingToShift(booking))
+        .filter(shift => {
+          // Check if time slots overlap
+          return (
+            shift.timeSlot.startTime < timeSlot.endTime &&
+            shift.timeSlot.endTime > timeSlot.startTime
+          );
+        });
+
+      return conflictingShifts;
     } catch (error) {
       console.error('Error checking shift conflicts:', error);
       throw new Error('Failed to check shift conflicts');
@@ -185,9 +303,9 @@ export const shiftsApi = {
   }
 };
 
-// =====================
-// TIME-OFF REQUESTS API
-// =====================
+// ===============================
+// TIME-OFF REQUESTS API (UNIFIED)
+// ===============================
 
 export const timeOffApi = {
   // Get time-off requests

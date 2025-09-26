@@ -3,7 +3,7 @@
 
 import React from 'react';
 import {
-  Tabs, Stack, Typography, Badge, Icon
+  Tabs, Stack, Typography, Badge, Icon, Section, Alert, Spinner
 } from '@/shared/ui';
 import { CapabilityGate } from '@/lib/capabilities';
 import {
@@ -22,6 +22,37 @@ import {
   LaborCostTracker,
   RealTimeLaborTracker
 } from '../';
+
+// ✅ UNIFIED CALENDAR SYSTEM
+console.log('🔄 SchedulingManagement: Using React.lazy for UnifiedCalendar');
+
+// Create a fallback component first
+const CalendarFallback = () => (
+  <Section variant="elevated" title="Calendar" className="min-h-[400px]">
+    <Stack spacing="md">
+      <Alert status="warning">
+        <Typography variant="h5">Calendar Loading...</Typography>
+        <Typography variant="body">
+          UnifiedCalendar component is initializing. If this persists, please refresh the page.
+        </Typography>
+      </Alert>
+      <Spinner size="lg" />
+    </Stack>
+  </Section>
+);
+
+// Use React.lazy for proper dynamic import
+const UnifiedCalendar = React.lazy(() =>
+  import('@/shared/calendar/components/UnifiedCalendar')
+    .then(module => {
+      console.log('✅ SchedulingManagement: UnifiedCalendar loaded successfully', { module });
+      return { default: module.default || module.UnifiedCalendar };
+    })
+    .catch(error => {
+      console.error('❌ SchedulingManagement: Error loading UnifiedCalendar', error);
+      return { default: CalendarFallback };
+    })
+);
 
 interface SchedulingStats {
   total_shifts_this_week: number;
@@ -86,7 +117,7 @@ export function SchedulingManagement({
           value="coverage"
           icon={<Icon icon={UsersIcon} size="sm" />}
           badge={schedulingStats.understaffed_shifts > 0 ? (
-            <Badge size="sm" colorPalette="error">{schedulingStats.understaffed_shifts}</Badge>
+            <Badge size="sm" colorPalette="red">{schedulingStats.understaffed_shifts}</Badge>
           ) : undefined}
         >
           Cobertura
@@ -96,7 +127,7 @@ export function SchedulingManagement({
           value="costs"
           icon={<Icon icon={CurrencyDollarIcon} size="sm" />}
           badge={schedulingStats.overtime_hours > 0 ? (
-            <Badge size="sm" colorPalette="warning">{schedulingStats.overtime_hours}h OT</Badge>
+            <Badge size="sm" colorPalette="orange">{schedulingStats.overtime_hours}h OT</Badge>
           ) : undefined}
         >
           Costos
@@ -106,7 +137,7 @@ export function SchedulingManagement({
           <Tabs.Tab
             value="realtime"
             icon={<Icon icon={ClockIcon} size="sm" />}
-            badge={<Badge size="sm" colorPalette="success" variant="subtle">LIVE</Badge>}
+            badge={<Badge size="sm" colorPalette="green" variant="subtle">LIVE</Badge>}
           >
             Tiempo Real
           </Tabs.Tab>
@@ -114,51 +145,21 @@ export function SchedulingManagement({
       </Tabs.List>
 
       <Tabs.Panel value="schedule">
-        {/* 🚨 DEBUG - PRUEBA DIRECTA SIN CAPABILITY GATE */}
-        <div style={{ 
-          backgroundColor: '#ff6b6b', 
-          color: 'white', 
-          padding: '20px', 
-          margin: '10px',
-          borderRadius: '8px',
-          fontSize: '18px',
-          fontWeight: 'bold',
-          textAlign: 'center'
-        }}>
-          🔴 PANEL HORARIOS - RENDERIZADO DIRECTO (antes de CapabilityGate)
-        </div>
-
         <CapabilityGate capability="schedule_management">
-          {!performanceMode ? (
-            <WeeklyScheduleView
-              viewState={viewState}
-              onViewStateChange={onViewStateChange}
+          <React.Suspense fallback={<CalendarFallback />}>
+            <UnifiedCalendar
+              businessModel="staff_scheduling"
+              view={viewState.viewMode || 'week'}
+              onViewChange={(view) => onViewStateChange({ ...viewState, viewMode: view as any })}
+              features={['shift_management', 'time_off', 'coverage_tracking']}
+              performanceMode={performanceMode}
+              mobileOptimized={isMobile}
             />
-          ) : (
-            <WeeklyScheduleView
-              viewState={viewState}
-              onViewStateChange={onViewStateChange}
-              reducedMode={true}
-            />
-          )}
+          </React.Suspense>
         </CapabilityGate>
       </Tabs.Panel>
 
       <Tabs.Panel value="timeoff">
-        {/* 🚨 DEBUG - PRUEBA DIRECTA SIN CAPABILITY GATE */}
-        <div style={{ 
-          backgroundColor: '#51cf66', 
-          color: 'white', 
-          padding: '20px', 
-          margin: '10px',
-          borderRadius: '8px',
-          fontSize: '18px',
-          fontWeight: 'bold',
-          textAlign: 'center'
-        }}>
-          🟢 PANEL PERMISOS - RENDERIZADO DIRECTO (antes de CapabilityGate)
-        </div>
-
         <CapabilityGate capability="approve_timeoff">
           <TimeOffManager
             pendingCount={schedulingStats.pending_time_off}
@@ -168,20 +169,6 @@ export function SchedulingManagement({
       </Tabs.Panel>
 
       <Tabs.Panel value="coverage">
-        {/* 🚨 DEBUG - CONTROL - Este panel SÍ debe funcionar */}
-        <div style={{ 
-          backgroundColor: '#ffa500', 
-          color: 'white', 
-          padding: '20px', 
-          margin: '10px',
-          borderRadius: '8px',
-          fontSize: '18px',
-          fontWeight: 'bold',
-          textAlign: 'center'
-        }}>
-          🟠 PANEL COBERTURA - CONTROL - DEBE FUNCIONAR
-        </div>
-
         <CoveragePlanner
           understaffedShifts={schedulingStats.understaffed_shifts}
           coveragePercentage={schedulingStats.coverage_percentage}
@@ -189,20 +176,6 @@ export function SchedulingManagement({
       </Tabs.Panel>
 
       <Tabs.Panel value="costs">
-        {/* 🚨 DEBUG - PRUEBA DIRECTA SIN CAPABILITY GATE */}
-        <div style={{ 
-          backgroundColor: '#339af0', 
-          color: 'white', 
-          padding: '20px', 
-          margin: '10px',
-          borderRadius: '8px',
-          fontSize: '18px',
-          fontWeight: 'bold',
-          textAlign: 'center'
-        }}>
-          🔵 PANEL COSTOS - RENDERIZADO DIRECTO (antes de CapabilityGate)
-        </div>
-
         <CapabilityGate capability="view_labor_costs">
           <LaborCostTracker
             weeklyTotal={schedulingStats.labor_cost_this_week}

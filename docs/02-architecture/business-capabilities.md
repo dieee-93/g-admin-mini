@@ -467,10 +467,110 @@ El sistema de capacidades de negocio se integra con:
 - **Navegación**: Filtra módulos disponibles
 - **Análisis**: Adapta métricas y reportes al tipo de negocio
 - **Tutoriales**: Personaliza onboarding según capacidades
+- **🎯 Sistema de Slots**: Renderizado dinámico de componentes modulares
+
+## 🎯 Sistema de Slots (Nueva Implementación 2025)
+
+### Visión General
+
+El **Sistema de Slots** es la evolución del sistema de capacidades que elimina la necesidad de condicionales hardcodeados en toda la aplicación. Permite que los módulos se "enchufan" dinámicamente según las capacidades activas del negocio.
+
+### Arquitectura de Slots
+
+```
+src/lib/slots/
+├── SlotRegistry.ts        # Core del sistema de registro
+├── Slot.tsx              # Componente React principal
+├── utils.ts              # Utilidades y helpers
+└── examples/             # Ejemplos de implementación
+```
+
+### Uso Básico
+
+#### ANTES (con condicionales):
+```tsx
+function MaterialRow({ material }) {
+  const { hasCapability } = useCapabilities();
+
+  return (
+    <div>
+      <span>{material.name}</span>
+      {hasCapability('has_suppliers') && <SupplierInfo />}
+      {hasCapability('has_analytics') && <AnalyticsButton />}
+      {hasCapability('has_orders') && <QuickOrderButton />}
+    </div>
+  );
+}
+```
+
+#### DESPUÉS (con slots):
+```tsx
+import { Slot } from '@/lib/slots';
+
+function MaterialRow({ material }) {
+  return (
+    <div>
+      <span>{material.name}</span>
+      <Slot name="material-supplier" data={{ material }} single />
+      <Slot name="material-analytics" data={{ material }} single />
+      <Slot name="material-actions" data={{ material }} gap={2} />
+    </div>
+  );
+}
+```
+
+### Registro de Módulos
+
+```tsx
+import { registerModuleSlots } from '@/lib/slots';
+
+// Al inicializar cada módulo
+registerModuleSlots('suppliers', [
+  {
+    slotName: 'material-supplier',
+    component: SupplierInfoComponent,
+    requirements: ['has_suppliers']
+  }
+]);
+```
+
+### Beneficios del Sistema de Slots
+
+1. **🧹 Elimina Condicionales**: No más `if` statements esparcidos
+2. **📈 Escalabilidad**: Agregar módulos sin tocar código existente
+3. **🔌 Modularidad**: Módulos se "enchufan" automáticamente
+4. **⚡ Performance**: Solo renderiza componentes cuando debe
+5. **🛠️ Mantenibilidad**: Lógica centralizada en el registry
+
+### Slots Predefinidos
+
+| Slot Name | Uso | Datos |
+|-----------|-----|-------|
+| `material-supplier` | Info de proveedor en materiales | `{ material }` |
+| `material-actions` | Acciones rápidas en materiales | `{ material }` |
+| `product-analytics` | Analytics en productos | `{ product }` |
+| `customer-actions` | Acciones en clientes | `{ customer }` |
+| `dashboard-widget` | Widgets del dashboard | `{ widget }` |
+
+### Integración con Capacidades
+
+Los slots están completamente integrados con el sistema de capacidades:
+
+```tsx
+// El componente se registra con requisitos específicos
+slotRegistry.register(
+  'advanced-analytics',
+  AdvancedAnalyticsComponent,
+  ['has_analytics', 'premium_tier'], // Solo se muestra si tiene ambas
+  { moduleId: 'analytics', priority: 10 }
+);
+```
+
+Para más detalles sobre migración, ver: [📦 Guía de Migración de Slots](../03-setup-deployment/migration-guide-slots.md)
 
 ---
 
-✅ **Documentación actualizada** - Todas las rutas, componentes e interfaces ahora reflejan la implementación actual del código.
+✅ **Documentación actualizada** - Sistema de slots implementado completamente (2025-09-22)
 interface CapabilityCardProps {
   capability: OperationalCapability;
   onToggle: () => void;

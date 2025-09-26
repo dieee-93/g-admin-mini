@@ -1,31 +1,24 @@
 /**
- * G-Admin v3.0 Capability System
- * Main entry point for the capability-based rendering system
+ * G-Admin v2.1 Capability System - BUSINESS IMPLEMENTATION
+ * Main entry point for the business capability-based system
+ *
+ * CLEANED: All legacy code removed, only business capability system exports
  */
 
-import type React from 'react';
-
-// Core components
-export { CapabilityGate, withCapabilityGate, useCapabilityCheck, CapabilityDebugger } from './CapabilityGate';
-export {
-  CapabilityProvider,
-  useCapabilityContext,
-  useOptionalCapabilityContext,
-  withCapabilityProvider,
-  CapabilityDebugPanel,
-  CapabilityRequirements
-} from './CapabilityProvider';
-
-// Hooks
+// Core Hooks - BUSINESS CAPABILITY SYSTEM
 export {
   useCapabilities,
   useCapability,
   useCapabilityMap,
-  useBusinessModel as useBusinessModelFromCapabilities,
-  useModuleAccess as useModuleAccessFromCapabilities
+  useBusinessModel,
+  useModuleAccess
 } from './hooks/useCapabilities';
-export { useBusinessModel } from './hooks/useBusinessModel';
-export { useModuleAccess } from './hooks/useModuleAccess';
+
+// Context Provider
+export { CapabilityProvider, useCapabilityContext } from './CapabilityProvider';
+
+// Capability Gate Component
+export { CapabilityGate, withCapabilityGate } from './CapabilityGate';
 
 // Types
 export type {
@@ -38,35 +31,33 @@ export type {
 } from './types/BusinessCapabilities';
 export type { BusinessModelDefinition } from './types/BusinessModels';
 
-// Utilities
+// BUSINESS CAPABILITY SYSTEM - Core Functions
+export {
+  resolveBusinessCapabilities,
+  shouldShowBusinessModule,
+  getBusinessModuleFeatures,
+  BUSINESS_MODULE_CONFIGURATIONS,
+  BUSINESS_SHARED_DEPENDENCIES
+} from './businessCapabilitySystem';
+export type {
+  BusinessFeatureConfig,
+  BusinessModuleConfig
+} from './businessCapabilitySystem';
+
+// Utilities - ONLY non-deprecated functions
 export {
   meetsRequirements,
   getMissingCapabilities,
   getCapabilityCoverage,
   getBusinessModelRequirements,
   getBestBusinessModelMatch,
-  getCapabilityDependencies,
-  getEnabledModules,
-  getCapabilityImpact,
-  validateCapabilityConfiguration,
-  getCapabilityUpgradePath,
   formatCapabilityName,
   groupCapabilitiesByCategory
 } from './utils/capabilityUtils';
 
-export {
-  mapLegacyCapabilities,
-  detectBusinessModel,
-  getBusinessModelEvolution,
-  calculateBusinessModelReadiness,
-  getBusinessModelCompatibility,
-  suggestBusinessModelByIndustry
-} from './utils/businessModelMapping';
-
-// Constants and configurations
+// Business Model Constants - FROM ORIGINAL SYSTEM
 export {
   businessModelCapabilities,
-  moduleCapabilities,
   defaultCapabilities
 } from './types/BusinessCapabilities';
 export {
@@ -77,19 +68,17 @@ export {
 } from './types/BusinessModels';
 
 // Version info
-export const CAPABILITY_SYSTEM_VERSION = '1.0.0';
+export const CAPABILITY_SYSTEM_VERSION = '2.1.0-business';
 
 /**
- * Quick setup function for the capability system
- * Use this in your App.tsx or main entry point
+ * BUSINESS CAPABILITY SYSTEM: Quick setup function
  */
-export const setupCapabilitySystem = (options?: {
+export const setupBusinessCapabilitySystem = (options?: {
   debugMode?: boolean;
-  fallback?: React.ReactNode;
 }) => {
-  // Return configuration object instead of JSX to avoid TypeScript issues in .ts file
   return {
-    debugMode: options?.debugMode,
-    fallback: options?.fallback
+    version: CAPABILITY_SYSTEM_VERSION,
+    debugMode: options?.debugMode ?? false,
+    systemType: 'business'
   };
 };

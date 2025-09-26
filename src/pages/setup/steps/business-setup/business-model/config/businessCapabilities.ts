@@ -153,7 +153,7 @@ export const CAPABILITY_DEFINITIONS: CapabilityDefinition[] = [
     icon: '📅',
     description: 'Los servicios se prestan con cita previa.',
     keywords: ['cita', 'turno', 'reserva'],
-    enabledFeatures: ['appointment_booking', 'calendar_integration']
+    enabledFeatures: ['appointment_booking', 'calendar_integration', 'schedule_management', 'approve_timeoff', 'view_labor_costs', 'staff_scheduling']
   },
   {
     id: 'sells_services_by_class',

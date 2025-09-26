@@ -1,8 +1,8 @@
 # 📚 G-Admin Mini - Documentación Completa
 
-> **Sistema de gestión integral para restaurantes y negocios de alimentos**  
-> **Versión**: 3.1 - EventBus Enterprise Edition  
-> **Última actualización**: 2025-09-08
+> **Sistema de gestión integral para restaurantes y negocios de alimentos**
+> **Versión**: 3.2 - Slots System Implementation
+> **Última actualización**: 2025-09-22
 
 ## 🚀 Inicio Rápido
 
@@ -32,6 +32,7 @@
 - **[🗄️ Configuración de Base de Datos](03-setup-deployment/database-setup.md)** - Setup de Supabase
 - **[🧙‍♂️ Wizard de Setup](03-setup-deployment/setup-wizard.md)** - Configuración inicial
 - **[📦 Guía de Migración](03-setup-deployment/migration-guide.md)** - Migración de datos
+- **[🎯 Migración Sistema de Slots](03-setup-deployment/migration-guide-slots.md)** - ⭐ **NUEVO** - Implementación v3.2
 - **[🌍 Configuración de Entornos](03-setup-deployment/environment-config.md)** - Variables de entorno
 
 ### 👥 **04 - Guías de Usuario**
@@ -45,6 +46,7 @@
 - **[🧪 Guía de Testing](05-development/testing-guide.md)** - Pruebas y calidad
 - **[🎨 Librería de Componentes](05-development/component-library.md)** - Sistema de diseño
 - **[🎭 Guía de Theming](05-development/theming-guide.md)** - Temas y estilos
+- **[🧠 Module Planning Guide](05-development/MODULE_PLANNING_MASTER_GUIDE.md)** - Metodología modular
 - **[🧮 Precisión Decimal](05-development/decimal-precision.md)** - Sistema de cálculos exactos
 
 ### 🎯 **06 - Características y Módulos**

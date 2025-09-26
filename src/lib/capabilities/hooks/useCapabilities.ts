@@ -1,114 +1,126 @@
 /**
- * useCapabilities Hook for G-Admin v3.0
- * Provides access to business capabilities and capability checking
- * Integrates with existing businessCapabilitiesStore
- * Enhanced with caching and lazy loading (2024 performance optimizations)
+ * useBusinessCapabilities Hook - G-Admin v2.1
+ * BUSINESS CAPABILITY SYSTEM: Combines original dependency logic with flexible feature activation
+ *
+ * ENHANCED FEATURES:
+ * - Original business model accuracy with comprehensive definitions
+ * - Flexible feature activation with optional/required flags
+ * - Universal shared dependencies with smart resolution
+ * - Addresses optional features concern (restaurant without online menu)
  */
 
-import { useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
 import type { BusinessCapability } from '../types/BusinessCapabilities';
 import type { BusinessModel } from '../types/BusinessModels';
-import { businessModelCapabilities, moduleCapabilities } from '../types/BusinessCapabilities';
-import { getCapabilityCache } from '../cache/CapabilityCache';
-import { getLazyCapabilityLoader, registerCommonLazyCapabilities } from '../lazy/LazyCapabilityLoader';
+import { businessModelCapabilities } from '../types/BusinessCapabilities';
+import type { BusinessCapabilities } from '@/pages/setup/steps/business-setup/business-model/config/businessCapabilities';
+import {
+  calculateOperationalTier,
+  getEnabledFeatures,
+  getRelevantTutorials
+} from '@/pages/setup/steps/business-setup/business-model/config/businessCapabilities';
+import {
+  resolveBusinessCapabilities,
+  shouldShowBusinessModule,
+  getBusinessModuleFeatures,
+  BUSINESS_MODULE_CONFIGURATIONS
+} from '../businessCapabilitySystem';
 
 export interface UseCapabilitiesReturn {
   // Current state
   businessModel: BusinessModel | null;
   activeCapabilities: BusinessCapability[];
+  resolvedCapabilities: BusinessCapability[];
   enabledModules: string[];
 
-  // Capability checking functions (cached)
+  // Computed business logic
+  enabledFeatures: string[];
+  operationalTier: string;
+  relevantTutorials: string[];
+
+  // BUSINESS: Enhanced module features
+  getModuleFeatures: (moduleId: string) => {
+    required: string[];
+    optional: string[];
+    unavailable: string[];
+  };
+
+  // Capability checking functions
   hasCapability: (capability: BusinessCapability) => boolean;
   hasAllCapabilities: (capabilities: BusinessCapability[]) => boolean;
   hasAnyCapability: (capabilities: BusinessCapability[]) => boolean;
+  isCapabilityLoaded: (capability: BusinessCapability) => boolean;
+
+  // Lazy loading functions (for CapabilityGate compatibility)
+  preloadCapability: (capability: BusinessCapability) => Promise<void>;
+  cacheStats?: { hitRate: number };
 
   // Module checking functions
   hasModule: (moduleId: string) => boolean;
-  getRequiredModules: (capability: BusinessCapability) => string[];
 
   // Business model functions
   supportsBusinessModel: (model: BusinessModel) => boolean;
   getBusinessModelCapabilities: (model: BusinessModel) => BusinessCapability[];
 
-  // Store actions (for capability management)
-  setCapability: (capability: string, value: boolean) => void;
+  // Store actions
+  setCapability: (capability: keyof BusinessCapabilities, value: boolean) => void;
 
   // Computed properties
   isSetupComplete: boolean;
-  operationalTier: string;
 
-  // Performance & Lazy Loading (NEW)
-  cacheStats: any;
-  preloadCapability: (capability: BusinessCapability) => Promise<void>;
-  isCapabilityLoaded: (capability: BusinessCapability) => boolean;
-  isCapabilityLoading: (capability: BusinessCapability) => boolean;
+  // Auto-resolution debug info
+  autoResolvedFeatures: BusinessCapability[];
 }
 
 /**
- * Main capabilities hook
- * Provides comprehensive access to business capabilities system
- * Enhanced with caching and lazy loading
+ * BUSINESS CAPABILITY hook - combines best of both systems
  */
 export const useCapabilities = (): UseCapabilitiesReturn => {
   const store = useBusinessCapabilities();
-  const cache = getCapabilityCache();
-  const lazyLoader = getLazyCapabilityLoader();
 
-  // Initialize lazy loading on first render
-  useEffect(() => {
-    registerCommonLazyCapabilities();
-  }, []);
-
-  // Map store capabilities to new capability types
+  // ✅ Get base capabilities from store (same as before)
   const activeCapabilities: BusinessCapability[] = useMemo(() => {
-    if (!store.profile?.capabilities) return ['customer_management', 'system_settings'];
+    if (!store.profile?.capabilities) return ['system_settings'];
 
-    const capabilities: BusinessCapability[] = ['customer_management', 'dashboard_analytics', 'system_settings'];
-    const profile = store.profile.capabilities;
+    const capabilities: BusinessCapability[] = ['system_settings'];
 
-    // Map existing capabilities to new system
-    if (profile.sells_products) capabilities.push('sells_products', 'product_management', 'inventory_tracking');
-    if (profile.sells_products_for_onsite_consumption) capabilities.push('sells_products_for_onsite_consumption', 'pos_system', 'table_management');
-    if (profile.sells_products_for_pickup) capabilities.push('sells_products_for_pickup');
-    if (profile.sells_products_with_delivery) capabilities.push('sells_products_with_delivery', 'delivery_zones');
-    if (profile.sells_digital_products) capabilities.push('sells_digital_products');
+    Object.entries(store.profile.capabilities).forEach(([key, isEnabled]) => {
+      if (isEnabled) {
+        capabilities.push(key as BusinessCapability);
+      }
+    });
 
-    if (profile.sells_services) capabilities.push('sells_services', 'staff_management');
-    if (profile.sells_services_by_appointment) capabilities.push('sells_services_by_appointment', 'appointment_booking', 'calendar_integration');
-    if (profile.sells_services_by_class) capabilities.push('sells_services_by_class', 'class_scheduling');
-    if (profile.sells_space_by_reservation) capabilities.push('sells_space_by_reservation', 'space_booking');
-
-    if (profile.manages_events) capabilities.push('manages_events', 'event_management');
-    if (profile.hosts_private_events) capabilities.push('hosts_private_events');
-    if (profile.manages_offsite_catering) capabilities.push('manages_offsite_catering');
-
-    if (profile.manages_recurrence) capabilities.push('manages_recurrence', 'recurring_billing');
-    if (profile.manages_rentals) capabilities.push('manages_rentals', 'asset_management');
-    if (profile.manages_memberships) capabilities.push('manages_memberships');
-    if (profile.manages_subscriptions) capabilities.push('manages_subscriptions');
-
-    if (profile.has_online_store) capabilities.push('has_online_store');
-    if (profile.is_b2b_focused) capabilities.push('is_b2b_focused', 'supplier_management');
-
-    // Always include fiscal compliance
-    capabilities.push('fiscal_compliance');
-
-    // Add payment gateway if any selling capability
-    if (profile.sells_products || profile.sells_services) {
-      capabilities.push('payment_gateway');
-    }
-
-    // Add staff scheduling if needed
-    if (profile.sells_services_by_appointment || profile.sells_services_by_class) {
-      capabilities.push('staff_scheduling');
-    }
-
-    return [...new Set(capabilities)]; // Remove duplicates
+    return [...new Set(capabilities)];
   }, [store.profile?.capabilities]);
 
-  // Determine business model based on capabilities
+  // ✅ BUSINESS: Resolve capabilities using enhanced system
+  const resolvedCapabilities: BusinessCapability[] = useMemo(() => {
+    return resolveBusinessCapabilities(activeCapabilities);
+  }, [activeCapabilities]);
+
+  // ✅ Auto-resolved features for debugging
+  const autoResolvedFeatures: BusinessCapability[] = useMemo(() => {
+    return resolvedCapabilities.filter(cap => !activeCapabilities.includes(cap));
+  }, [resolvedCapabilities, activeCapabilities]);
+
+  // ✅ Business logic computed (maintained from original)
+  const enabledFeatures = useMemo(() => {
+    if (!store.profile?.capabilities) return [];
+    return getEnabledFeatures(store.profile.capabilities);
+  }, [store.profile?.capabilities]);
+
+  const operationalTier = useMemo(() => {
+    if (!store.profile?.capabilities) return 'Sin Configurar';
+    return calculateOperationalTier(store.profile.capabilities);
+  }, [store.profile?.capabilities]);
+
+  const relevantTutorials = useMemo(() => {
+    if (!store.profile?.capabilities) return ['basics'];
+    return getRelevantTutorials(store.profile.capabilities);
+  }, [store.profile?.capabilities]);
+
+  // Business model detection (maintained from original)
   const businessModel: BusinessModel | null = useMemo(() => {
     if (!store.profile?.capabilities) return null;
 
@@ -129,87 +141,41 @@ export const useCapabilities = (): UseCapabilitiesReturn => {
     return 'custom';
   }, [store.profile?.capabilities]);
 
-  // Get enabled modules from store
+  // ✅ BUSINESS: Get enabled modules using business capability logic
   const enabledModules = useMemo(() => {
-    return store.dashboardModules || [];
-  }, [store.dashboardModules]);
+    const allModules = Object.keys(BUSINESS_MODULE_CONFIGURATIONS);
 
-  // Enhanced capability checking functions with caching
+    return allModules.filter(moduleId => {
+      return shouldShowBusinessModule(moduleId, activeCapabilities);
+    });
+  }, [activeCapabilities]);
+
+  // ✅ BUSINESS: Enhanced module features function
+  const getModuleFeatures = useCallback((moduleId: string) => {
+    return getBusinessModuleFeatures(moduleId, activeCapabilities);
+  }, [activeCapabilities]);
+
+  // ✅ Capability checking functions (now use resolved capabilities)
   const hasCapability = useCallback((capability: BusinessCapability): boolean => {
-    const cacheKey = `single:${capability}`;
-
-    // Check cache first
-    const cachedResult = cache.get<boolean>(cacheKey);
-    if (cachedResult !== null) {
-      return cachedResult;
-    }
-
-    // Compute result
-    const result = activeCapabilities.includes(capability);
-
-    // Cache result with 5 minute TTL
-    cache.set(cacheKey, result, 5 * 60 * 1000);
-
-    // Trigger lazy loading if needed
-    if (result && !lazyLoader.isCapabilityLoaded(capability)) {
-      lazyLoader.preloadCapability(capability);
-    }
-
-    return result;
-  }, [activeCapabilities, cache, lazyLoader]);
+    return resolvedCapabilities.includes(capability);
+  }, [resolvedCapabilities]);
 
   const hasAllCapabilities = useCallback((capabilities: BusinessCapability[]): boolean => {
-    const cacheKey = `combo:${capabilities.sort().join(',')}:all`;
-
-    // Check cache first
-    const cachedResult = cache.get<boolean>(cacheKey);
-    if (cachedResult !== null) {
-      return cachedResult;
-    }
-
-    // Compute result
-    const result = capabilities.every(cap => hasCapability(cap));
-
-    // Cache result
-    cache.set(cacheKey, result, 5 * 60 * 1000);
-
-    return result;
-  }, [hasCapability, cache]);
+    return capabilities.every(cap => hasCapability(cap));
+  }, [hasCapability]);
 
   const hasAnyCapability = useCallback((capabilities: BusinessCapability[]): boolean => {
-    const cacheKey = `combo:${capabilities.sort().join(',')}:any`;
+    return capabilities.some(cap => hasCapability(cap));
+  }, [hasCapability]);
 
-    // Check cache first
-    const cachedResult = cache.get<boolean>(cacheKey);
-    if (cachedResult !== null) {
-      return cachedResult;
-    }
-
-    // Compute result
-    const result = capabilities.some(cap => hasCapability(cap));
-
-    // Cache result
-    cache.set(cacheKey, result, 5 * 60 * 1000);
-
-    return result;
-  }, [hasCapability, cache]);
+  // Check if capability is loaded/available
+  const isCapabilityLoaded = useCallback((capability: BusinessCapability): boolean => {
+    return hasCapability(capability);
+  }, [hasCapability]);
 
   // Module checking functions
   const hasModule = (moduleId: string): boolean => {
     return enabledModules.includes(moduleId);
-  };
-
-  const getRequiredModules = (capability: BusinessCapability): string[] => {
-    // Find modules that provide this capability
-    const providingModules: string[] = [];
-
-    Object.entries(moduleCapabilities).forEach(([moduleId, config]) => {
-      if (config.provides.includes(capability)) {
-        providingModules.push(moduleId);
-      }
-    });
-
-    return providingModules;
   };
 
   // Business model functions
@@ -222,46 +188,41 @@ export const useCapabilities = (): UseCapabilitiesReturn => {
     return businessModelCapabilities[model] || [];
   };
 
-  // Warm cache with current capabilities
-  useEffect(() => {
-    if (activeCapabilities.length > 0) {
-      // Create capability map for warming
-      const capabilityMap: Record<string, boolean> = {};
-      activeCapabilities.forEach(cap => {
-        capabilityMap[cap] = true;
-      });
-
-      cache.warm(activeCapabilities, capabilityMap);
-    }
-  }, [activeCapabilities, cache]);
-
-  // Lazy loading functions
+  // Lazy loading functions (simplified for compatibility)
   const preloadCapability = useCallback(async (capability: BusinessCapability): Promise<void> => {
-    return lazyLoader.preloadCapability(capability);
-  }, [lazyLoader]);
+    return Promise.resolve();
+  }, []);
 
-  const isCapabilityLoaded = useCallback((capability: BusinessCapability): boolean => {
-    return lazyLoader.isCapabilityLoaded(capability);
-  }, [lazyLoader]);
-
-  const isCapabilityLoading = useCallback((capability: BusinessCapability): boolean => {
-    return lazyLoader.isCapabilityLoading(capability);
-  }, [lazyLoader]);
+  // Simple cache stats (for compatibility)
+  const cacheStats = useMemo(() => ({ hitRate: 1.0 }), []);
 
   return {
     // Current state
     businessModel,
     activeCapabilities,
+    resolvedCapabilities,
     enabledModules,
 
-    // Capability checking (cached)
+    // Computed business logic
+    enabledFeatures,
+    operationalTier,
+    relevantTutorials,
+
+    // BUSINESS: Enhanced module features
+    getModuleFeatures,
+
+    // Capability checking
     hasCapability,
     hasAllCapabilities,
     hasAnyCapability,
+    isCapabilityLoaded,
+
+    // Lazy loading (for compatibility)
+    preloadCapability,
+    cacheStats,
 
     // Module checking
     hasModule,
-    getRequiredModules,
 
     // Business model functions
     supportsBusinessModel,
@@ -272,30 +233,24 @@ export const useCapabilities = (): UseCapabilitiesReturn => {
 
     // Computed properties
     isSetupComplete: store.profile?.setupCompleted ?? false,
-    operationalTier: store.getOperationalTier(),
 
-    // Performance & Lazy Loading (NEW)
-    cacheStats: cache.getStats(),
-    preloadCapability,
-    isCapabilityLoaded,
-    isCapabilityLoading
+    // Auto-resolution debug info
+    autoResolvedFeatures,
   };
 };
 
 /**
- * Hook for checking specific capabilities
- * Useful for simple conditional rendering
+ * Hook simplificado para verificar una sola capability
  */
-export const useCapability = (capability: BusinessCapability): boolean => {
+export function useCapability(capability: BusinessCapability): boolean {
   const { hasCapability } = useCapabilities();
   return hasCapability(capability);
-};
+}
 
 /**
- * Hook for checking multiple capabilities
- * Returns an object with the status of each capability
+ * Hook para obtener mapa de capabilities con sus estados
  */
-export const useCapabilityMap = (capabilities: BusinessCapability[]): Record<BusinessCapability, boolean> => {
+export function useCapabilityMap(capabilities: BusinessCapability[]): Record<BusinessCapability, boolean> {
   const { hasCapability } = useCapabilities();
 
   return useMemo(() => {
@@ -305,32 +260,27 @@ export const useCapabilityMap = (capabilities: BusinessCapability[]): Record<Bus
     });
     return map as Record<BusinessCapability, boolean>;
   }, [capabilities, hasCapability]);
-};
+}
 
 /**
- * Hook for business model checking
+ * Hook para obtener el modelo de negocio actual
  */
-export const useBusinessModel = () => {
+export function useBusinessModel() {
   const { businessModel, supportsBusinessModel, getBusinessModelCapabilities } = useCapabilities();
-
   return {
     currentModel: businessModel,
-    supports: supportsBusinessModel,
-    getCapabilities: getBusinessModelCapabilities,
-    is: (model: BusinessModel) => businessModel === model
+    supportsModel: supportsBusinessModel,
+    getModelCapabilities: getBusinessModelCapabilities
   };
-};
+}
 
 /**
- * Hook for module access checking
+ * Hook para verificar acceso a módulos
  */
-export const useModuleAccess = () => {
-  const { hasModule, enabledModules, getRequiredModules } = useCapabilities();
-
+export function useModuleAccess(moduleId: string) {
+  const { hasModule, getModuleFeatures } = useCapabilities();
   return {
-    hasModule,
-    enabledModules,
-    getRequiredModules,
-    isModuleEnabled: hasModule
+    hasAccess: hasModule(moduleId),
+    features: getModuleFeatures(moduleId)
   };
-};
+}

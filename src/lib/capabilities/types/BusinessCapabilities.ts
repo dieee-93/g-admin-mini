@@ -59,6 +59,9 @@ export type BusinessCapability =
   | 'purchase_orders'
   | 'staff_management'
   | 'staff_scheduling'
+  | 'schedule_management'
+  | 'approve_timeoff'
+  | 'view_labor_costs'
   | 'asset_management'
   | 'fiscal_compliance'
   | 'invoice_management'
@@ -69,6 +72,16 @@ export type BusinessCapability =
   // Gamification capabilities
   | 'achievement_system'
   | 'milestone_tracking';
+
+// Capability categorization
+export type CapabilityCategory =
+  | 'core'
+  | 'products'
+  | 'services'
+  | 'operations'
+  | 'finance'
+  | 'infrastructure'
+  | 'gamification';
 
 // Business model types from existing system
 export type BusinessModel =
@@ -149,6 +162,9 @@ export const businessModelCapabilities: Record<BusinessModel, BusinessCapability
     'inventory_tracking',
     'staff_management',
     'staff_scheduling',
+    'schedule_management',
+    'approve_timeoff',
+    'view_labor_costs',
     'fiscal_compliance'
   ],
   retail: [
@@ -170,6 +186,9 @@ export const businessModelCapabilities: Record<BusinessModel, BusinessCapability
     'calendar_integration',
     'staff_management',
     'staff_scheduling',
+    'schedule_management',
+    'approve_timeoff',
+    'view_labor_costs',
     'invoice_management',
     'fiscal_compliance'
   ],
@@ -229,6 +248,9 @@ export const businessModelCapabilities: Record<BusinessModel, BusinessCapability
     'hosts_private_events',
     'event_management',
     'staff_scheduling',
+    'schedule_management',
+    'approve_timeoff',
+    'view_labor_costs',
     'inventory_tracking',
     'fiscal_compliance'
   ],
@@ -239,6 +261,10 @@ export const businessModelCapabilities: Record<BusinessModel, BusinessCapability
     'manages_memberships',
     'class_scheduling',
     'staff_management',
+    'staff_scheduling',
+    'schedule_management',
+    'approve_timeoff',
+    'view_labor_costs',
     'recurring_billing',
     'fiscal_compliance'
   ],
@@ -248,6 +274,10 @@ export const businessModelCapabilities: Record<BusinessModel, BusinessCapability
     'sells_services_by_class',
     'class_scheduling',
     'staff_management',
+    'staff_scheduling',
+    'schedule_management',
+    'approve_timeoff',
+    'view_labor_costs',
     'invoice_management',
     'fiscal_compliance'
   ],
@@ -258,118 +288,18 @@ export const businessModelCapabilities: Record<BusinessModel, BusinessCapability
     'appointment_booking',
     'calendar_integration',
     'staff_management',
+    'staff_scheduling',
+    'schedule_management',
+    'approve_timeoff',
+    'view_labor_costs',
     'invoice_management',
     'fiscal_compliance'
   ],
   custom: [] // User-defined capabilities
 };
 
-// Module to capability mapping (what capabilities each module provides/requires)
-export const moduleCapabilities: Record<string, {
-  provides: BusinessCapability[];
-  requires: BusinessCapability[];
-  enhances?: BusinessCapability[];
-}> = {
-  // Core modules
-  'customers': {
-    provides: ['customer_management'],
-    requires: []
-  },
-  'dashboard': {
-    provides: ['dashboard_analytics'],
-    requires: []
-  },
-  'settings': {
-    provides: ['system_settings'],
-    requires: []
-  },
-
-  // Operations modules
-  'sales': {
-    provides: ['pos_system', 'payment_gateway', 'table_management', 'qr_ordering'],
-    requires: ['customer_management', 'inventory_tracking'],
-    enhances: ['sells_products_for_onsite_consumption']
-  },
-  'operations': {
-    provides: ['table_management'],
-    requires: ['pos_system'],
-    enhances: ['sells_products_for_onsite_consumption']
-  },
-  'appointments': {
-    provides: ['appointment_booking', 'calendar_integration'],
-    requires: ['customer_management', 'staff_scheduling'],
-    enhances: ['sells_services_by_appointment']
-  },
-  'classes': {
-    provides: ['class_scheduling'],
-    requires: ['staff_management', 'customer_management'],
-    enhances: ['sells_services_by_class']
-  },
-  'online-store': {
-    provides: ['has_online_store'],
-    requires: ['product_management', 'payment_gateway', 'inventory_tracking'],
-    enhances: ['sells_products']
-  },
-  'delivery': {
-    provides: ['delivery_zones', 'driver_management', 'route_optimization'],
-    requires: ['pos_system', 'customer_management'],
-    enhances: ['sells_products_with_delivery']
-  },
-
-  // Supply chain modules
-  'materials': {
-    provides: ['inventory_tracking'],
-    requires: []
-  },
-  'products': {
-    provides: ['product_management'],
-    requires: ['inventory_tracking']
-  },
-  'suppliers': {
-    provides: ['supplier_management', 'purchase_orders'],
-    requires: ['inventory_tracking'],
-    enhances: ['is_b2b_focused']
-  },
-
-  // Resources modules
-  'staff': {
-    provides: ['staff_management'],
-    requires: []
-  },
-  'scheduling': {
-    provides: ['staff_scheduling'],
-    requires: ['staff_management']
-  },
-  'assets': {
-    provides: ['asset_management'],
-    requires: []
-  },
-
-  // Finance modules
-  'fiscal': {
-    provides: ['fiscal_compliance'],
-    requires: []
-  },
-  'accounting': {
-    provides: ['invoice_management', 'financial_reporting'],
-    requires: ['fiscal_compliance']
-  },
-  'payroll': {
-    provides: ['payroll_basic', 'payroll_advanced'],
-    requires: ['staff_management', 'fiscal_compliance']
-  },
-  'recurring-billing': {
-    provides: ['recurring_billing'],
-    requires: ['payment_gateway', 'customer_management', 'fiscal_compliance'],
-    enhances: ['manages_subscriptions', 'manages_memberships']
-  },
-
-  // Gamification module
-  'gamification': {
-    provides: ['achievement_system', 'milestone_tracking'],
-    requires: []
-  }
-};
+// LEGACY CODE REMOVED - Now using BUSINESS_MODULE_CONFIGURATIONS in businessCapabilitySystem.ts
+// This old moduleCapabilities mapping has been superseded by the business capability system
 
 // Default capabilities (safe defaults)
 export const defaultCapabilities: BusinessCapabilities = {
@@ -402,3 +332,81 @@ export interface CapabilityContext {
   activeCapabilities: BusinessCapability[];
   enabledModules: string[];
 }
+
+/**
+ * Metadata for each business capability - defines category and properties
+ * This replaces hardcoded string matching in groupCapabilitiesByCategory
+ */
+export const capabilityMetadata: Record<BusinessCapability, {
+  category: CapabilityCategory;
+  description: string;
+  dependencies?: BusinessCapability[];
+  autoResolved?: boolean;
+}> = {
+  // ===== CORE =====
+  'customer_management': { category: 'core', description: 'Customer data and relationship management', autoResolved: true },
+  'dashboard_analytics': { category: 'core', description: 'Business dashboard and basic analytics', autoResolved: true },
+  'system_settings': { category: 'core', description: 'System configuration and settings', autoResolved: true },
+
+  // ===== PRODUCTS =====
+  'sells_products': { category: 'products', description: 'Can sell physical products' },
+  'sells_products_for_onsite_consumption': { category: 'products', description: 'Products consumed on-site (restaurant)' },
+  'sells_products_for_pickup': { category: 'products', description: 'Products for customer pickup' },
+  'sells_products_with_delivery': { category: 'products', description: 'Products with delivery service' },
+  'sells_digital_products': { category: 'products', description: 'Digital products and downloads' },
+  'inventory_tracking': { category: 'products', description: 'Track inventory levels', autoResolved: true },
+  'product_management': { category: 'products', description: 'Manage product catalog', autoResolved: true },
+
+  // ===== SERVICES =====
+  'sells_services': { category: 'services', description: 'Can sell services' },
+  'sells_services_by_appointment': { category: 'services', description: 'Appointment-based services' },
+  'sells_services_by_class': { category: 'services', description: 'Class-based services (fitness, education)' },
+  'sells_space_by_reservation': { category: 'services', description: 'Space rental and reservations' },
+  'appointment_booking': { category: 'services', description: 'Online appointment booking system', autoResolved: true },
+  'calendar_integration': { category: 'services', description: 'Calendar system integration', autoResolved: true },
+  'class_scheduling': { category: 'services', description: 'Class and group event scheduling', autoResolved: true },
+  'space_booking': { category: 'services', description: 'Space reservation management', autoResolved: true },
+
+  // ===== OPERATIONS =====
+  'manages_events': { category: 'operations', description: 'Event planning and management' },
+  'hosts_private_events': { category: 'operations', description: 'Private event hosting' },
+  'manages_offsite_catering': { category: 'operations', description: 'Off-site catering services' },
+  'manages_recurrence': { category: 'operations', description: 'Recurring appointments and subscriptions' },
+  'manages_rentals': { category: 'operations', description: 'Equipment or asset rentals' },
+  'manages_memberships': { category: 'operations', description: 'Membership programs' },
+  'manages_subscriptions': { category: 'operations', description: 'Subscription services' },
+  'table_management': { category: 'operations', description: 'Restaurant table management', autoResolved: true },
+  'pos_system': { category: 'operations', description: 'Point of sale system', autoResolved: true },
+  'qr_ordering': { category: 'operations', description: 'QR code ordering system', autoResolved: true },
+  'event_management': { category: 'operations', description: 'Event coordination and management', autoResolved: true },
+  'delivery_zones': { category: 'operations', description: 'Delivery area management', autoResolved: true },
+  'driver_management': { category: 'operations', description: 'Delivery driver coordination', autoResolved: true },
+  'route_optimization': { category: 'operations', description: 'Delivery route planning', autoResolved: true },
+  'supplier_management': { category: 'operations', description: 'Vendor and supplier relationships', autoResolved: true },
+  'purchase_orders': { category: 'operations', description: 'Purchase order management', autoResolved: true },
+  'staff_management': { category: 'operations', description: 'Employee management and profiles', autoResolved: true },
+  'staff_scheduling': { category: 'operations', description: 'Employee schedule management', autoResolved: true },
+  'schedule_management': { category: 'operations', description: 'General scheduling system', autoResolved: true },
+  'approve_timeoff': { category: 'operations', description: 'Time off approval workflow', autoResolved: true },
+  'view_labor_costs': { category: 'operations', description: 'Labor cost tracking and reporting', autoResolved: true },
+  'asset_management': { category: 'operations', description: 'Asset and equipment tracking', autoResolved: true },
+
+  // ===== FINANCE =====
+  'payment_gateway': { category: 'finance', description: 'Payment processing integration', autoResolved: true },
+  'recurring_billing': { category: 'finance', description: 'Automated recurring billing', autoResolved: true },
+  'fiscal_compliance': { category: 'finance', description: 'Tax and regulatory compliance', autoResolved: true },
+  'invoice_management': { category: 'finance', description: 'Invoice creation and management', autoResolved: true },
+  'payroll_basic': { category: 'finance', description: 'Basic payroll processing', autoResolved: true },
+  'payroll_advanced': { category: 'finance', description: 'Advanced payroll with benefits', autoResolved: true },
+  'financial_reporting': { category: 'finance', description: 'Financial reports and analytics', autoResolved: true },
+
+  // ===== INFRASTRUCTURE =====
+  'has_online_store': { category: 'infrastructure', description: 'E-commerce website capability' },
+  'is_b2b_focused': { category: 'infrastructure', description: 'Business-to-business operations' },
+  'notifications_system': { category: 'infrastructure', description: 'Push notifications and alerts', autoResolved: true },
+  'advanced_analytics': { category: 'infrastructure', description: 'Advanced business intelligence', autoResolved: true },
+
+  // ===== GAMIFICATION =====
+  'achievement_system': { category: 'gamification', description: 'Achievement and rewards system', autoResolved: true },
+  'milestone_tracking': { category: 'gamification', description: 'Progress milestone tracking', autoResolved: true }
+};

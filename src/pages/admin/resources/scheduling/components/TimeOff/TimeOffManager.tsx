@@ -1,20 +1,10 @@
 // TimeOffManager - Manage time-off requests, approvals, and PTO tracking
 import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  VStack, 
-  HStack, 
-  Text, 
-  Button, 
-  Badge,
-  Table,
-  SimpleGrid,
-  IconButton,
-  Select,
-  Stack,
-  createListCollection
-} from '@chakra-ui/react';
-import { CardWrapper, InputField } from '@/shared/ui';
+import {
+  Stack, Button, Badge, Grid, Typography, Section,
+  Icon, SelectField, InputField
+} from '@/shared/ui';
+import { Table } from '@chakra-ui/react';
 import { 
   CheckIcon, 
   XMarkIcon, 
@@ -53,9 +43,6 @@ type RequestFilter = 'all' | 'pending' | 'approved' | 'denied';
 type RequestType = 'vacation' | 'sick' | 'personal' | 'emergency' | 'all';
 
 export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerProps) {
-  console.log('🔍 TimeOffManager: RENDER START', { timestamp: Date.now() });
-  const renderStart = performance.now();
-  
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<TimeOffRequest[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -76,9 +63,6 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
 
   // Mock data - will be replaced with API calls
   useEffect(() => {
-    console.log('🔍 TimeOffManager: useEffect START');
-    const effectStart = performance.now();
-    
     const mockEmployees: Employee[] = [
       { id: '1', name: 'Ana García', position: 'Server', pto_balance: 15, sick_balance: 8 },
       { id: '2', name: 'Carlos López', position: 'Cook', pto_balance: 20, sick_balance: 5 },
@@ -142,20 +126,11 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
       avg_approval_time: 1.5,
       most_requested_type: 'vacation'
     };
-    console.log('🔍 TimeOffManager: Mock data created', { 
-      employeesCount: mockEmployees.length,
-      requestsCount: mockRequests.length 
-    });
 
     setEmployees(mockEmployees);
     setRequests(mockRequests);
     setStats(mockStats);
     setLoading(false);
-    
-    const effectEnd = performance.now();
-    console.log('🔍 TimeOffManager: useEffect END', { 
-      duration: `${effectEnd - effectStart}ms` 
-    });
   }, [pendingCount, approvedCount]);
 
   const getEmployeeName = (employeeId: string) => {
@@ -295,19 +270,6 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
 
   return (
     <VStack gap="6" align="stretch">
-      {/* 🚨 CONTENIDO DE PRUEBA - PESTAÑA PERMISOS */}
-      <div style={{ 
-        backgroundColor: '#51cf66', 
-        color: 'white', 
-        padding: '20px', 
-        borderRadius: '8px',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        textAlign: 'center'
-      }}>
-        ✅ COMPONENTE PERMISOS FUNCIONANDO - TimeOffManager renderizado correctamente
-      </div>
-
       {/* Stats Cards */}
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
         <CardWrapper>

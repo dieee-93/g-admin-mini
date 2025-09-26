@@ -5,7 +5,7 @@
 
 import type { BusinessCapability } from '../types/BusinessCapabilities';
 import type { BusinessModel } from '../types/BusinessModels';
-import { businessModelCapabilities, moduleCapabilities } from '../types/BusinessCapabilities';
+import { businessModelCapabilities, capabilityMetadata } from '../types/BusinessCapabilities';
 import { businessModelDefinitions } from '../types/BusinessModels';
 
 /**
@@ -73,34 +73,21 @@ export const getBestBusinessModelMatch = (
 };
 
 /**
- * Get capability dependencies (capabilities that enable other capabilities)
+ * DEPRECATED: This function used old moduleCapabilities system
+ * Use BUSINESS_MODULE_CONFIGURATIONS from businessCapabilitySystem.ts instead
  */
 export const getCapabilityDependencies = (capability: BusinessCapability): BusinessCapability[] => {
-  const dependencies: BusinessCapability[] = [];
-
-  // Check module dependencies
-  Object.values(moduleCapabilities).forEach(config => {
-    if (config.provides.includes(capability)) {
-      dependencies.push(...config.requires);
-    }
-  });
-
-  return [...new Set(dependencies)];
+  console.warn('getCapabilityDependencies is deprecated. Use business capability system instead.');
+  return [];
 };
 
 /**
- * Get all modules that would be enabled by a set of capabilities
+ * DEPRECATED: This function used old moduleCapabilities system
+ * Use shouldShowBusinessModule from businessCapabilitySystem.ts instead
  */
 export const getEnabledModules = (capabilities: BusinessCapability[]): string[] => {
-  const enabledModules: string[] = [];
-
-  Object.entries(moduleCapabilities).forEach(([moduleId, config]) => {
-    if (meetsRequirements(capabilities, config.requires)) {
-      enabledModules.push(moduleId);
-    }
-  });
-
-  return enabledModules;
+  console.warn('getEnabledModules is deprecated. Use shouldShowBusinessModule instead.');
+  return [];
 };
 
 /**
@@ -264,28 +251,35 @@ export const formatCapabilityName = (capability: BusinessCapability): string => 
 /**
  * Group capabilities by category
  */
+/**
+ * Group capabilities by category using metadata - Dynamic and scalable
+ * No more hardcoded string matching!
+ */
 export const groupCapabilitiesByCategory = (capabilities: BusinessCapability[]): Record<string, BusinessCapability[]> => {
+
   const groups: Record<string, BusinessCapability[]> = {
     core: [],
     products: [],
     services: [],
     operations: [],
     finance: [],
-    infrastructure: []
+    infrastructure: [],
+    gamification: []
   };
 
   capabilities.forEach(cap => {
-    if (['customer_management', 'dashboard_analytics', 'system_settings'].includes(cap)) {
-      groups.core.push(cap);
-    } else if (cap.includes('product') || cap.includes('inventory')) {
-      groups.products.push(cap);
-    } else if (cap.includes('service') || cap.includes('appointment') || cap.includes('class')) {
-      groups.services.push(cap);
-    } else if (cap.includes('delivery') || cap.includes('pos') || cap.includes('table')) {
-      groups.operations.push(cap);
-    } else if (cap.includes('fiscal') || cap.includes('payment') || cap.includes('invoice')) {
-      groups.finance.push(cap);
+    const metadata = capabilityMetadata[cap];
+    if (metadata) {
+      const category = metadata.category;
+      if (groups[category]) {
+        groups[category].push(cap);
+      } else {
+        // Fallback for unknown categories
+        groups.infrastructure.push(cap);
+      }
     } else {
+      // Fallback for capabilities without metadata
+      console.warn(`⚠️ Capability '${cap}' has no metadata - adding to infrastructure`);
       groups.infrastructure.push(cap);
     }
   });
