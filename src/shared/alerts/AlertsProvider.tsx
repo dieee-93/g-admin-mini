@@ -19,6 +19,7 @@ import { ALERT_EVENTS } from './types';
 import { EventBus } from '@/lib/events';
 import { useDebouncedCallback } from '../hooks';
 
+import { logger } from '@/lib/logging';
 // Default configuration
 const DEFAULT_CONFIG: AlertsConfiguration = {
   maxVisibleAlerts: 5,
@@ -113,7 +114,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
         setAlerts(activeAlerts);
       }
     } catch (error) {
-      console.error('Error loading persisted alerts:', error);
+      logger.error('App', 'Error loading persisted alerts:', error);
     }
   };
 
@@ -126,7 +127,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
         
       localStorage.setItem('g-mini-alerts', JSON.stringify(alertsToPersist));
     } catch (error) {
-      console.error('Error persisting alerts:', error);
+      logger.error('App', 'Error persisting alerts:', error);
     }
   };
 
@@ -423,7 +424,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     try {
       localStorage.setItem('g-mini-alerts-config', JSON.stringify({ ...config, ...newConfig }));
     } catch (error) {
-      console.error('Error persisting alerts config:', error);
+      logger.error('App', 'Error persisting alerts config:', error);
     }
   }, [config]);
 

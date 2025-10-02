@@ -3,6 +3,7 @@ import { Box, VStack, Text, Button, Alert } from '@chakra-ui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { CardWrapper, Icon } from '../ui';
 
+import { logger } from '@/lib/logging';
 interface Props {
   children: ReactNode;
   moduleName?: string;
@@ -24,7 +25,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(`Error caught by ErrorBoundary in ${this.props.moduleName || 'Unknown module'}:`, {
+    logger.error('App', `Error caught by ErrorBoundary in ${this.props.moduleName || 'Unknown module'}:`, {
       message: error.message,
       stack: error.stack,
       componentStack: errorInfo.componentStack

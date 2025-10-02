@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ZodSchema } from 'zod';
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 interface FormManagerConfig<T> {
   schema: ZodSchema<T>;
   onSubmit: (data: T) => Promise<void>;
@@ -40,7 +41,7 @@ export function useFormManager<T>({
         reset();
       }
     } catch (error) {
-      console.error('Form submission error:', error);
+      logger.error('App', 'Form submission error:', error);
       notify.error(errorMessage);
     }
   });

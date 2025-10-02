@@ -33,6 +33,7 @@ import { CalendarHeader } from './CalendarHeader';
 import { CalendarSidebar } from './CalendarSidebar';
 import { Slot } from '../slots/Slot';
 
+import { logger } from '@/lib/logging';
 // ===============================
 // COMPONENT INTERFACES
 // ===============================
@@ -176,10 +177,10 @@ export function UnifiedCalendar({
   useEffect(() => {
     if (providedAdapter) {
       // Use provided adapter
-      console.log('Using provided adapter for', businessModel);
+      logger.info('App', 'Using provided adapter for', businessModel);
     } else if (!adapterHook.hasAdapter(businessModel)) {
       // No adapter available - show warning
-      console.warn(`No adapter registered for business model: ${businessModel}`);
+      logger.warn('App', `No adapter registered for business model: ${businessModel}`);
     } else {
       // Auto-select adapter
       adapterHook.selectAdapter(businessModel, calendarConfig);

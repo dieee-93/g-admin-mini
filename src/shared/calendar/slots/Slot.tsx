@@ -10,6 +10,7 @@
 import React, { useMemo } from 'react';
 import { SlotRegistry, getSlotComponent } from './SlotRegistry';
 
+import { logger } from '@/lib/logging';
 // ===============================
 // SLOT INTERFACES
 // ===============================
@@ -105,7 +106,7 @@ class SlotErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error(`Error in slot "${this.props.slotName}":`, error);
+    logger.error('App', `Error in slot "${this.props.slotName}":`, error);
     this.props.onError?.(error, errorInfo);
   }
 

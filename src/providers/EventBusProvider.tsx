@@ -7,6 +7,7 @@ import React, { createContext, useContext, useEffect, useRef } from 'react';
 import EventBus from '@/lib/events/EventBus';
 import type { IEventBusV2, ModuleId } from '@/lib/events/types';
 
+import { logger } from '@/lib/logging';
 // Context for EventBus instance
 const EventBusContext = createContext<IEventBusV2 | null>(null);
 
@@ -23,7 +24,7 @@ export function EventBusProvider({ children, debug = false }: EventBusProviderPr
 
   useEffect(() => {
     if (debug) {
-      console.log('🚌 EventBusProvider initialized');
+      logger.info('App', '🚌 EventBusProvider initialized');
     }
 
     // Initialize EventBus for React context
@@ -31,7 +32,7 @@ export function EventBusProvider({ children, debug = false }: EventBusProviderPr
 
     // Global error handler for EventBus
     const handleEventBusError = (error: any) => {
-      console.error('🚨 EventBus Error:', error);
+      logger.error('App', '🚨 EventBus Error:', error);
     };
 
     // Setup global event listeners if needed
@@ -199,7 +200,7 @@ export function useEventBusDebugger(enabled: boolean = process.env.NODE_ENV === 
 
     // Log all events in development
     const debugHandler = (event: string, data: any) => {
-      console.log(`🚌 EventBus [${event}]:`, data);
+      logger.info('App', `🚌 EventBus [${event}]:`, data);
     };
 
     // Subscribe to all events for debugging

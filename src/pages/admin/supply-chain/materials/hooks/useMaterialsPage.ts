@@ -22,6 +22,7 @@ import { useDataFetcher, useDataSearch, useModuleAnalytics } from '@/shared/hook
 import { AnalyticsEngine } from '@/shared/services/AnalyticsEngine';
 import { handleAsyncOperation, CRUDHandlers } from '@/shared/utils/errorHandling';
 
+import { logger } from '@/lib/logging';
 export interface MaterialsPageState {
   activeTab: 'inventory' | 'analytics' | 'procurement';
   selectedFilters: FilterState;
@@ -273,7 +274,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
         refreshStats();
       }
     } catch (error) {
-      console.error('Error loading inventory data:', error);
+      logger.error('MaterialsStore', 'Error loading inventory data:', error);
       setLocalError('Error al cargar datos de inventario');
       handleError(error as Error, { operation: 'loadInventory' });
     }

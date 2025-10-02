@@ -4,6 +4,7 @@ import { fetchSales } from '../../../../data/salesApi';
 import { generateMockAnalytics } from '../data';
 import type { AdvancedSalesAnalytics, DateRange } from '../types';
 
+import { logger } from '@/lib/logging';
 const calculateAdvancedAnalytics = (salesData: Sale[]): AdvancedSalesAnalytics => {
   if (!salesData.length) return generateMockAnalytics();
 
@@ -117,7 +118,7 @@ export const useAdvancedSalesAnalytics = () => {
       const calculatedAnalytics = calculateAdvancedAnalytics(salesData);
       setAnalytics(calculatedAnalytics);
     } catch (err) {
-      console.error('Error loading sales analytics:', err);
+      logger.error('SalesStore', 'Error loading sales analytics:', err);
       setError('Failed to load analytics, using sample data');
       setAnalytics(generateMockAnalytics());
     } finally {

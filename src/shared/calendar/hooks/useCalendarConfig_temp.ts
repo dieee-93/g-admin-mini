@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { logger } from '@/lib/logging';
 import {
   CalendarConfig,
   BusinessHours,
@@ -262,7 +263,7 @@ export function useCalendarConfig(
       }
 
       // In a real implementation, this would save to API/storage
-      console.log('Saving configuration:', state.config);
+      logger.info('App', 'Saving configuration:', state.config);
 
       setState(prev => ({
         ...prev,

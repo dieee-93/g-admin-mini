@@ -2,6 +2,7 @@
 // Provides mocking, assertion helpers, and testing scenarios
 
 import { EventBus } from '../EventBus';
+import { logger } from '@/lib/logging';
 import type {
   NamespacedEvent,
   EventPattern,
@@ -134,13 +135,13 @@ export class EventBusTestingHarness {
     this.isRecording = true;
     this.capturedEvents = [];
     this.testStartTime = Date.now();
-    console.log('[TestHarness] Event recording started');
+    logger.info('EventBus', '[TestHarness] Event recording started');
   }
 
   // Stop event recording
   stopRecording(): CapturedEvent[] {
     this.isRecording = false;
-    console.log(`[TestHarness] Event recording stopped. Captured ${this.capturedEvents.length} events`);
+    logger.info('EventBus', `[TestHarness] Event recording stopped. Captured ${this.capturedEvents.length} events`);
     return [...this.capturedEvents];
   }
 
@@ -240,7 +241,7 @@ export class EventBusTestingHarness {
       });
     }
     
-    console.log(`[TestHarness] Mock module '${moduleId}' registered`);
+    logger.info('EventBus', `[TestHarness] Mock module '${moduleId}' registered`);
   }
 
   // Create assertion helpers
@@ -426,16 +427,16 @@ export class EventBusTestingHarness {
       throw new Error(`Test scenario '${name}' not found`);
     }
     
-    console.log(`[TestHarness] Running scenario: ${scenario.name}`);
+    logger.info('EventBus', `[TestHarness] Running scenario: ${scenario.name}`);
     
     try {
       this.startRecording();
       await scenario.setup();
       await scenario.execute();
       await scenario.verify();
-      console.log(`[TestHarness] Scenario '${name}' passed`);
+      logger.info('EventBus', `[TestHarness] Scenario '${name}' passed`);
     } catch (error) {
-      console.error(`[TestHarness] Scenario '${name}' failed:`, error);
+      logger.error('EventBus', `[TestHarness] Scenario '${name}' failed:`, error);
       throw error;
     } finally {
       this.stopRecording();
@@ -529,14 +530,14 @@ export class EventBusTestingHarness {
       try {
         await this.eventBus.deactivateModule(moduleId);
       } catch (error) {
-        console.warn(`[TestHarness] Error deactivating mock module '${moduleId}':`, error);
+        logger.error('EventBus', `[TestHarness] Error deactivating mock module '${moduleId}':`, error);
       }
     }
     
     this.mockModules.clear();
     this.eventBus.clearMockHistory();
     
-    console.log('[TestHarness] Cleanup completed');
+    logger.info('EventBus', '[TestHarness] Cleanup completed');
   }
 
   // Generate test event ID using secure random
@@ -548,7 +549,7 @@ export class EventBusTestingHarness {
       return secureRandom.generateTestId();
     } catch (error) {
       // Fallback for test environments where crypto might not be available
-      console.warn('SecureRandomGenerator not available in test environment, using timestamp-based ID');
+      logger.warn('EventBus', 'SecureRandomGenerator not available in test environment, using timestamp-based ID');
       return `test_${Date.now()}_fallback`;
     }
   }

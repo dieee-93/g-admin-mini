@@ -1,84 +1,140 @@
 /**
- * G-Admin v2.1 Capability System - BUSINESS IMPLEMENTATION
- * Main entry point for the business capability-based system
+ * UNIFIED CAPABILITY SYSTEM - Main Export
  *
- * CLEANED: All legacy code removed, only business capability system exports
+ * REEMPLAZA COMPLETAMENTE:
+ * - index.ts anterior (exports confusos)
+ * - Todos los exports scattered
+ * - Lógica duplicada
+ *
+ * UNIFIED: Un solo punto de entrada, exports claros
  */
 
-// Core Hooks - BUSINESS CAPABILITY SYSTEM
-export {
-  useCapabilities,
-  useCapability,
-  useCapabilityMap,
-  useBusinessModel,
-  useModuleAccess
-} from './hooks/useCapabilities';
-
-// Context Provider
-export { CapabilityProvider, useCapabilityContext } from './CapabilityProvider';
-
-// Capability Gate Component
-export { CapabilityGate, withCapabilityGate } from './CapabilityGate';
+// ============================================
+// CORE SYSTEM
+// ============================================
 
 // Types
+import { logger } from '@/lib/logging';
+
 export type {
+  CapabilityId,
+  CapabilityCategory,
   BusinessCapability,
-  BusinessCapabilities,
-  BusinessModel,
-  BusinessStructure,
-  CapabilityDefinition,
-  CapabilityContext
-} from './types/BusinessCapabilities';
-export type { BusinessModelDefinition } from './types/BusinessModels';
+  CapabilityEffects,
+  ModuleEffect,
+  ValidationRule,
+  UIEffect,
+  SystemConfiguration,
+  CapabilityProfile,
+  UnifiedCapabilityState
+} from './types/UnifiedCapabilities';
 
-// BUSINESS CAPABILITY SYSTEM - Core Functions
-export {
-  resolveBusinessCapabilities,
-  shouldShowBusinessModule,
-  getBusinessModuleFeatures,
-  BUSINESS_MODULE_CONFIGURATIONS,
-  BUSINESS_SHARED_DEPENDENCIES
-} from './businessCapabilitySystem';
-export type {
-  BusinessFeatureConfig,
-  BusinessModuleConfig
-} from './businessCapabilitySystem';
+// Core Engine
+export { CapabilityEngine } from './core/CapabilityEngine';
 
-// Utilities - ONLY non-deprecated functions
+// Capability Definitions
 export {
-  meetsRequirements,
-  getMissingCapabilities,
-  getCapabilityCoverage,
-  getBusinessModelRequirements,
-  getBestBusinessModelMatch,
-  formatCapabilityName,
-  groupCapabilitiesByCategory
-} from './utils/capabilityUtils';
+  CAPABILITY_DEFINITIONS,
+  getCapabilitiesByCategory,
+  getUniversalCapabilities,
+  getActivityCapabilities,
+  getInfrastructureCapabilities
+} from './config/CapabilityDefinitions';
 
-// Business Model Constants - FROM ORIGINAL SYSTEM
-export {
-  businessModelCapabilities,
-  defaultCapabilities
-} from './types/BusinessCapabilities';
-export {
-  businessModelDefinitions,
-  businessModelCategories,
-  complexityLevels,
-  migrationPaths
-} from './types/BusinessModels';
+// ============================================
+// STORE & HOOKS
+// ============================================
 
-// Version info
-export const CAPABILITY_SYSTEM_VERSION = '2.1.0-business';
+// Main Store
+export {
+  useCapabilityStore,
+  useCapabilities,
+  useCapability,
+  useModuleAccess
+} from '@/store/capabilityStore';
+
+// ============================================
+// COMPONENTS
+// ============================================
+
+// Gate System
+export {
+  CapabilityGate,
+  CapabilityCheck,
+  ModuleGate,
+  FeatureGate,
+  UIGate,
+  withCapabilityGate,
+  DebugCapabilityGate
+} from './components/CapabilityGate';
+
+// ============================================
+// UTILITIES
+// ============================================
 
 /**
- * BUSINESS CAPABILITY SYSTEM: Quick setup function
+ * Quick capability check utility
  */
-export const setupBusinessCapabilitySystem = (options?: {
-  debugMode?: boolean;
-}) => {
+export const hasCapability = (capabilities: CapabilityId[], target: CapabilityId): boolean => {
+  return capabilities.includes(target);
+};
+
+/**
+ * Quick module visibility check utility
+ */
+export const isModuleVisible = (visibleModules: string[], moduleId: string): boolean => {
+  return visibleModules.includes(moduleId);
+};
+
+/**
+ * Get capability definition utility
+ */
+export const getCapabilityDefinition = (capabilityId: CapabilityId) => {
+  return CAPABILITY_DEFINITIONS[capabilityId];
+};
+
+// ============================================
+// VERSION INFO
+// ============================================
+
+export const CAPABILITY_SYSTEM_VERSION = '3.0.0-unified';
+export const SYSTEM_TYPE = 'unified';
+
+/**
+ * System health check
+ */
+export const getSystemHealth = () => {
+  const totalCapabilities = Object.keys(CAPABILITY_DEFINITIONS).length;
+  const universalCount = getUniversalCapabilities().length;
+  const activityCount = getActivityCapabilities().length;
+  const infrastructureCount = getInfrastructureCapabilities().length;
+
   return {
     version: CAPABILITY_SYSTEM_VERSION,
-    debugMode: options?.debugMode ?? false,
-    systemType: 'business'
+    type: SYSTEM_TYPE,
+    capabilities: {
+      total: totalCapabilities,
+      universal: universalCount,
+      activity: activityCount,
+      infrastructure: infrastructureCount
+    },
+    healthy: totalCapabilities > 0 && universalCount > 0
   };
 };
+
+// ============================================
+// LEGACY CLEANUP WARNING
+// ============================================
+
+if (process.env.NODE_ENV === 'development') {
+  logger.info('App', `
+🚀 G-Admin Unified Capability System v${CAPABILITY_SYSTEM_VERSION} loaded
+
+✅ New unified system active
+❌ Legacy systems disabled
+📊 ${Object.keys(CAPABILITY_DEFINITIONS).length} capabilities defined
+🔧 Clean architecture - zero legacy code
+
+If you see any imports from old capability files, they need to be updated!
+  `);
+}

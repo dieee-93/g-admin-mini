@@ -47,6 +47,7 @@ import {
 
 import { BaseCalendarAdapter } from '../adapters/BaseCalendarAdapter';
 
+import { logger } from '@/lib/logging';
 // ===============================
 // ENGINE CONFIGURATION
 // ===============================
@@ -693,7 +694,7 @@ export class UnifiedCalendarEngine {
         try {
           listener(event);
         } catch (error) {
-          console.error(`Error in calendar event listener for ${type}:`, error);
+          logger.error('App', `Error in calendar event listener for ${type}:`, error);
         }
       }
     }

@@ -6,6 +6,7 @@
 import { realTimeLaborCosts, type CostAlert } from './realTimeLaborCosts';
 import { EventBus } from '@/lib/events';
 
+import { logger } from '@/lib/logging';
 interface NotificationConfig {
   overtimeWarningEnabled: boolean;
   budgetAlertEnabled: boolean;
@@ -61,7 +62,7 @@ class LaborCostNotificationService {
     }
 
     this.isInitialized = true;
-    console.log('🔔 Labor cost notifications initialized');
+    logger.info('StaffStore', '🔔 Labor cost notifications initialized');
   }
 
   /**
@@ -283,7 +284,7 @@ class LaborCostNotificationService {
         throw new Error('Failed to send email notification');
       }
     } catch (error) {
-      console.error('Error sending email notification:', error);
+      logger.error('StaffStore', 'Error sending email notification:', error);
     }
   }
 
@@ -328,7 +329,7 @@ class LaborCostNotificationService {
         body: JSON.stringify(payload)
       });
     } catch (error) {
-      console.error('Error sending Slack notification:', error);
+      logger.error('StaffStore', 'Error sending Slack notification:', error);
     }
   }
 
@@ -356,7 +357,7 @@ class LaborCostNotificationService {
       try {
         callback([...this.notifications]);
       } catch (error) {
-        console.error('Error notifying notification subscriber:', error);
+        logger.error('StaffStore', 'Error notifying notification subscriber:', error);
       }
     });
   }
@@ -417,7 +418,7 @@ class LaborCostNotificationService {
    */
   updateConfig(newConfig: Partial<NotificationConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log('🔧 Notification config updated:', this.config);
+    logger.info('StaffStore', '🔧 Notification config updated:', this.config);
   }
 
   /**

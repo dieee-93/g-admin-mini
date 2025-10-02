@@ -4,6 +4,8 @@
  */
 
 // Domain-to-Route mapping automático
+import { logger } from '@/lib/logging';
+
 export const domainRouteMap = {
   // Business Operations Domain
   'sales': '/admin/sales',
@@ -148,10 +150,10 @@ export function getRouteFromDomain(domain: DomainKey): string {
 // Developer Experience helpers
 export function findModuleByRoute(route: string): string {
   console.group(`🔍 Route Mapping Debug`);
-  console.log(`Route: ${route}`);
-  console.log(`File: ${getFilePathFromRoute(route as RoutePathAdmin)}`);
-  console.log(`Component: ${getComponentFromRoute(route as RoutePathAdmin)}`);
-  console.log(`Domain: ${getDomainFromRoute(route)}`);
+  logger.info('App', `Route: ${route}`);
+  logger.info('App', `File: ${getFilePathFromRoute(route as RoutePathAdmin)}`);
+  logger.info('App', `Component: ${getComponentFromRoute(route as RoutePathAdmin)}`);
+  logger.info('App', `Domain: ${getDomainFromRoute(route)}`);
   console.groupEnd();
   
   return getFilePathFromRoute(route as RoutePathAdmin);

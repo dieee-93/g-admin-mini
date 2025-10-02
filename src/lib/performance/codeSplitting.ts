@@ -2,6 +2,7 @@
 import React, { lazy } from 'react';
 import { createLazyRoute, createLazyFeature } from './lazyLoading';
 
+import { logger } from '@/lib/logging';
 // Configuration for large components that need splitting
 export const CODE_SPLITTING_CONFIG = {
   // Size thresholds in KB
@@ -76,7 +77,7 @@ export class CodeSplittingMonitor {
     
     // Log slow loads
     if (loadTime > 2000) {
-      console.warn(`Slow code split load: ${componentName} took ${loadTime}ms`);
+      logger.warn('Performance', `Slow code split load: ${componentName} took ${loadTime}ms`);
     }
   }
   

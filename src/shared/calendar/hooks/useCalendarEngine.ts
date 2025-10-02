@@ -20,6 +20,7 @@ import {
 } from '../types/DateTimeTypes';
 import { getUserTimezone } from '../utils/dateTimeUtils';
 
+import { logger } from '@/lib/logging';
 // ===============================
 // HOOK INTERFACES
 // ===============================
@@ -165,7 +166,7 @@ export function useCalendarEngine(): EngineState & EngineActions {
         }
       }));
     } catch (error) {
-      console.error('Error refreshing stats:', error);
+      logger.error('App', 'Error refreshing stats:', error);
     }
   }, [state.engine]);
 

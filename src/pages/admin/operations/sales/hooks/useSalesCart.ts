@@ -4,6 +4,7 @@ import { toaster } from '@/shared/ui/toaster';
 import { supabase } from '@/lib/supabase/client';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
+import { logger } from '@/lib/logging';
 export interface SaleItem {
   product_id: string;
   product_name: string;
@@ -77,7 +78,7 @@ export function useSalesCart(options: CartValidationOptions = {}) {
       });
 
       if (error) {
-        console.error('Error validating stock:', error);
+        logger.error('SalesStore', 'Error validating stock:', error);
         const errorMessage = error.message || 'Error al validar stock. Intenta nuevamente.';
         const result = {
           is_valid: false,
@@ -92,7 +93,7 @@ export function useSalesCart(options: CartValidationOptions = {}) {
       return result;
 
     } catch (error) {
-      console.error('Unexpected error:', error);
+      logger.error('SalesStore', 'Unexpected error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       const result = {
         is_valid: false,

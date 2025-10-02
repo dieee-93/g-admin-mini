@@ -9,6 +9,7 @@ import type {
 import SecureClientManager from './utils/SecureClientManager';
 import { SecurityLogger } from './utils/SecureLogger';
 
+import { logger } from '@/lib/logging';
 // Fast crypto-js alternative using Web Crypto API
 class CryptoUtils {
   static async sha256(data: string): Promise<string> {
@@ -284,7 +285,7 @@ export class DeduplicationManager {
       
       // Debug: Log deduplication check start
       if (this.config.testModeEnabled) {
-        console.log(`[DeduplicationManager] isDuplicate called for pattern: ${event.pattern}, windowMs: ${metadata.windowMs}`);
+        logger.info('EventBus', `[DeduplicationManager] isDuplicate called for pattern: ${event.pattern}, windowMs: ${metadata.windowMs}`);
       }
       
       // Strategy 1: Operation-based deduplication (highest priority - same operation ID)
@@ -295,12 +296,12 @@ export class DeduplicationManager {
         const windowMs = metadata.windowMs || this.config.defaultDeduplicationWindow;
         
         if (this.config.testModeEnabled) {
-          console.log(`[DeduplicationManager] Operation TTL Check: timeDiff=${timeDiff}ms, windowMs=${windowMs}ms, withinWindow=${timeDiff <= windowMs}`);
+          logger.info('EventBus', `[DeduplicationManager] Operation TTL Check: timeDiff=${timeDiff}ms, windowMs=${windowMs}ms, withinWindow=${timeDiff <= windowMs}`);
         }
         
         if (timeDiff <= windowMs) {
           if (this.config.testModeEnabled) {
-            console.log(`[DeduplicationManager] Duplicate found by operation_id: ${metadata.operationId}`);
+            logger.info('EventBus', `[DeduplicationManager] Duplicate found by operation_id: ${metadata.operationId}`);
           }
           return {
             isDupe: true,
@@ -310,7 +311,7 @@ export class DeduplicationManager {
         } else {
           // Operation exists but outside window - not a duplicate
           if (this.config.testModeEnabled) {
-            console.log(`[DeduplicationManager] Operation found but outside window: timeDiff=${timeDiff}ms > windowMs=${windowMs}ms`);
+            logger.info('EventBus', `[DeduplicationManager] Operation found but outside window: timeDiff=${timeDiff}ms > windowMs=${windowMs}ms`);
           }
         }
       }
@@ -324,7 +325,7 @@ export class DeduplicationManager {
         
         // Debug logging for tests
         if (this.config.testModeEnabled) {
-          console.log(`[DeduplicationManager] Content TTL Check: timeDiff=${timeDiff}ms, windowMs=${windowMs}ms, withinWindow=${timeDiff <= windowMs}`);
+          logger.info('EventBus', `[DeduplicationManager] Content TTL Check: timeDiff=${timeDiff}ms, windowMs=${windowMs}ms, withinWindow=${timeDiff <= windowMs}`);
         }
         
         if (timeDiff <= windowMs) {
@@ -336,7 +337,7 @@ export class DeduplicationManager {
         } else {
           // Content exists but outside window - not a duplicate
           if (this.config.testModeEnabled) {
-            console.log(`[DeduplicationManager] Content found but outside window: timeDiff=${timeDiff}ms > windowMs=${windowMs}ms`);
+            logger.info('EventBus', `[DeduplicationManager] Content found but outside window: timeDiff=${timeDiff}ms > windowMs=${windowMs}ms`);
           }
         }
       }
@@ -351,7 +352,7 @@ export class DeduplicationManager {
       if (semanticDuplicates.length > 0) {
         // Debug logging for tests
         if (this.config.testModeEnabled) {
-          console.log(`[DeduplicationManager] Semantic duplicates found: ${semanticDuplicates.length}, windowMs: ${windowMs}`);
+          logger.info('EventBus', `[DeduplicationManager] Semantic duplicates found: ${semanticDuplicates.length}, windowMs: ${windowMs}`);
         }
         
         // Check if any semantic duplicate is from same client
@@ -382,7 +383,7 @@ export class DeduplicationManager {
       return { isDupe: false };
       
     } catch (error) {
-      console.error('[DeduplicationManager] Error checking duplicates:', error);
+      logger.error('EventBus', '[DeduplicationManager] Error checking duplicates:', error);
       // On error, allow event to proceed (fail open)
       return { isDupe: false };
     }
@@ -396,7 +397,7 @@ export class DeduplicationManager {
       await this.ensureInitialized();
       await this.store.store(metadata);
     } catch (error) {
-      console.error('[DeduplicationManager] Error storing metadata:', error);
+      logger.error('EventBus', '[DeduplicationManager] Error storing metadata:', error);
     }
   }
 

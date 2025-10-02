@@ -5,6 +5,7 @@
 
 import { toaster } from '@/shared/ui/toaster';
 
+import { logger } from '@/lib/logging';
 /**
  * 🎯 NOTIFICATION SYSTEM v3.23.0
  * Sistema centralizado que reemplaza useErrorHandler y unifica todas las notificaciones
@@ -171,7 +172,7 @@ export const handleApiError = (
   });
 
   // Log del error para debugging
-  console.error('Error handled:', error);
+  logger.error('App', 'Error handled:', error);
 };
 
 /**

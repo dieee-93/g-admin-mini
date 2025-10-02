@@ -39,6 +39,7 @@ import type {
 } from '../../types/abc-analysis';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
+import { logger } from '@/lib/logging';
 const ABCAnalysisSection: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'A' | 'B' | 'C'>('all');
   const [analysisType, setAnalysisType] = useState<AnalysisType>('revenue');
@@ -66,7 +67,7 @@ const ABCAnalysisSection: React.FC = () => {
       setIsLoading(false);
       return result;
     } catch (error) {
-      console.error('Error en análisis ABC:', error);
+      logger.error('MaterialsStore', 'Error en análisis ABC:', error);
       setIsLoading(false);
       return null;
     }

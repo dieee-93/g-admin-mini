@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext'; // Ajustar según tu contexto 
 import { initializeAchievementSystem } from '@/lib/achievements/AchievementSystem';
 import useAchievementNotifications from '@/lib/achievements/useAchievementNotifications';
 
+import { logger } from '@/lib/logging';
 /**
  * Componente wrapper que inicializa el sistema de logros
  */
@@ -40,11 +41,11 @@ export const AchievementSystemProvider: React.FC<{ children: React.ReactNode }> 
 
         if (mounted) {
           isInitialized.current = true;
-          console.log('[App] Sistema de logros inicializado');
+          logger.info('CapabilitySystem', '[App] Sistema de logros inicializado');
         }
       } catch (error) {
         if (mounted) {
-          console.error('[App] Error inicializando sistema de logros:', error);
+          logger.error('CapabilitySystem', '[App] Error inicializando sistema de logros:', error);
         }
       }
     };

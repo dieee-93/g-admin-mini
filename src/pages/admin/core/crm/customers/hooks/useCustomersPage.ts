@@ -14,6 +14,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { CustomerAnalyticsEngine, CustomerRFMAnalytics } from '../services';
 import type { Customer, Sale, SaleItem, CustomerAnalyticsResult, CustomerRFMProfile } from '../types';
 
+import { logger } from '@/lib/logging';
 export type CustomerPageSection = 'management' | 'analytics' | 'orders' | 'loyalty';
 
 export interface CustomersPageState {
@@ -252,7 +253,7 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
         setRfmProfiles(mockRfmProfiles);
       }
     } catch (err) {
-      console.error('Error loading customer data:', err);
+      logger.error('App', 'Error loading customer data:', err);
       setError(err instanceof Error ? err.message : 'Error loading customer data');
     } finally {
       setLoading(false);
@@ -272,24 +273,24 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
   const handleNewCustomer = useCallback(() => {
     setActiveSection('management');
     // TODO: Open customer creation modal
-    console.log('Opening new customer modal');
+    logger.info('App', 'Opening new customer modal');
   }, [setActiveSection]);
 
   const handleEditCustomer = useCallback((customerId: string) => {
     setPageState(prev => ({ ...prev, selectedCustomerId: customerId }));
     // TODO: Open customer edit modal
-    console.log('Editing customer:', customerId);
+    logger.info('App', 'Editing customer:', customerId);
   }, []);
 
   const handleViewCustomer = useCallback((customerId: string) => {
     setPageState(prev => ({ ...prev, selectedCustomerId: customerId }));
     // TODO: Open customer details modal
-    console.log('Viewing customer:', customerId);
+    logger.info('App', 'Viewing customer:', customerId);
   }, []);
 
   const handleDeleteCustomer = useCallback((customerId: string) => {
     // TODO: Implement customer deletion with confirmation
-    console.log('Deleting customer:', customerId);
+    logger.info('App', 'Deleting customer:', customerId);
   }, []);
 
   const handleRFMAnalysis = useCallback(() => {
@@ -324,7 +325,7 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
 
   const handleGenerateReport = useCallback(() => {
     // TODO: Generate comprehensive customer report
-    console.log('Generating customer report...');
+    logger.info('App', 'Generating customer report...');
   }, []);
 
   const handleLoyaltyProgram = useCallback(() => {
@@ -333,7 +334,7 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
 
   const handlePointsManagement = useCallback(() => {
     // TODO: Open points management interface
-    console.log('Opening points management...');
+    logger.info('App', 'Opening points management...');
   }, []);
 
   const handleViewOrders = useCallback((customerId: string) => {

@@ -36,6 +36,7 @@ import { Icon, InputField, CardWrapper } from '@/shared/ui';
 import { supabase } from '@/lib/supabase/client';
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 interface Product {
   id: string;
   name: string;
@@ -131,7 +132,7 @@ export function QROrderPage() {
         }
       });
     } catch (error) {
-      console.error('Error loading QR data:', error);
+      logger.error('SalesStore', 'Error loading QR data:', error);
       notify.error({title:'Failed to load table information'});
     }
   };
@@ -159,7 +160,7 @@ export function QROrderPage() {
       setCategories(categoriesData || []);
       setProducts(availableProducts);
     } catch (error) {
-      console.error('Error loading menu:', error);
+      logger.error('SalesStore', 'Error loading menu:', error);
       notify.error({title:'Failed to load menu'});
     } finally {
       setLoading(false);
@@ -288,7 +289,7 @@ export function QROrderPage() {
       setSpecialRequests('');
 
     } catch (error) {
-      console.error('Error submitting order:', error);
+      logger.error('SalesStore', 'Error submitting order:', error);
       notify.error({title:'Failed to submit order. Please try again.'});
     } finally {
       setSubmitting(false);

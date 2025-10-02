@@ -2,6 +2,7 @@
 // G-Admin Products API - Leveraging Database Functions for Intelligence
 
 import { supabase } from "@/lib/supabase/client";
+import { logger } from '@/lib/logging';
 import { 
   type Product, 
   type ProductWithIntelligence,
@@ -45,7 +46,7 @@ export async function fetchProductsWithIntelligence(): Promise<ProductWithIntell
 
     return products;
   } catch (error) {
-    console.error("Error fetching products with intelligence:", error);
+    logger.error('App', "Error fetching products with intelligence:", error);
     throw error;
   }
 }
@@ -62,7 +63,7 @@ export async function fetchProducts(): Promise<Product[]> {
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error("Error fetching products:", error);
+    logger.error('App', "Error fetching products:", error);
     throw error;
   }
 }
@@ -78,7 +79,7 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error("Error creating product:", error);
+    logger.error('App', "Error creating product:", error);
     throw error;
   }
 }
@@ -97,7 +98,7 @@ export async function updateProduct(productData: UpdateProductData): Promise<Pro
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error("Error updating product:", error);
+    logger.error('App', "Error updating product:", error);
     throw error;
   }
 }
@@ -111,7 +112,7 @@ export async function deleteProduct(id: string): Promise<void> {
 
     if (error) throw error;
   } catch (error) {
-    console.error("Error deleting product:", error);
+    logger.error('App', "Error deleting product:", error);
     throw error;
   }
 }
@@ -126,7 +127,7 @@ export async function getProductCost(productId: string): Promise<number> {
     if (error) throw error;
     return data || 0;
   } catch (error) {
-    console.error("Error calculating product cost:", error);
+    logger.error('App', "Error calculating product cost:", error);
     return 0; // Fallback to 0
   }
 }
@@ -139,7 +140,7 @@ export async function getProductAvailability(productId: string): Promise<number>
     if (error) throw error;
     return data || 0;
   } catch (error) {
-    console.error("Error calculating product availability:", error);
+    logger.error('App', "Error calculating product availability:", error);
     return 0; // Fallback to 0
   }
 }
@@ -183,7 +184,7 @@ export async function fetchProductComponents(productId: string): Promise<Product
 
     return components;
   } catch (error) {
-    console.error("Error fetching product components:", error);
+    logger.error('App', "Error fetching product components:", error);
     return [];
   }
 }
@@ -222,7 +223,7 @@ export async function addProductComponent(componentData: AddComponentData): Prom
         : 0
     };
   } catch (error) {
-    console.error("Error adding product component:", error);
+    logger.error('App', "Error adding product component:", error);
     throw error;
   }
 }
@@ -236,7 +237,7 @@ export async function removeProductComponent(componentId: string): Promise<void>
 
     if (error) throw error;
   } catch (error) {
-    console.error("Error removing component:", error);
+    logger.error('App', "Error removing component:", error);
     throw error;
   }
 }

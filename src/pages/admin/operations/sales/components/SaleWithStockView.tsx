@@ -37,6 +37,7 @@ import { useSalesCart } from '../hooks/useSalesCart';
 import { useSalesStore } from '@/store/salesStore';
 import { supabase } from '@/lib/supabase/client';
 
+import { logger } from '@/lib/logging';
 interface Customer {
   id: string;
   name: string;
@@ -87,7 +88,7 @@ export function SalesWithStockView() {
       const data = await fetchCustomers();
       setCustomers(data);
     } catch (error) {
-      console.error('Error loading customers:', error);
+      logger.error('SalesStore', 'Error loading customers:', error);
       notify.error({
         title: "Error al cargar clientes",
         description: "No se pudieron cargar los clientes. Intenta recargar la página.",
@@ -197,7 +198,7 @@ export function SalesWithStockView() {
       setCheckoutStep('validation');
 
     } catch (error) {
-      console.error('Error processing sale:', error);
+      logger.error('SalesStore', 'Error processing sale:', error);
       notify.error({
         title: "Error al procesar venta",
         description: error instanceof Error ? error.message : "Error inesperado",

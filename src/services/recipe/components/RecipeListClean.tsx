@@ -23,6 +23,7 @@ import { useRecipes } from '../hooks/useRecipes';
 import type { Recipe } from '../types';
 import { CardWrapper, Icon, InputField } from '@/shared/ui';
 
+import { logger } from '@/lib/logging';
 interface RecipeListProps {
   onEdit?: (recipe: Recipe) => void;
   onDelete?: (recipeId: string) => void;
@@ -53,7 +54,7 @@ export const RecipeListClean: React.FC<RecipeListProps> = ({
         await deleteRecipe(recipeId);
         onDelete?.(recipeId);
       } catch (error) {
-        console.error('Error deleting recipe:', error);
+        logger.error('App', 'Error deleting recipe:', error);
       }
     }
   };

@@ -4,6 +4,7 @@
  */
 
 import { useCallback, useMemo, useState } from 'react';
+import { logger } from '@/lib/logging';
 import { 
   FieldValidator, 
   validateFields, 
@@ -256,7 +257,7 @@ export function useFormValidationWithServer<T extends Record<string, any>>(
       
       return true;
     } catch (error) {
-      console.error('Server validation error:', error);
+      logger.error('App', 'Server validation error:', error);
       return false;
     } finally {
       validation.setIsValidating?.(false);

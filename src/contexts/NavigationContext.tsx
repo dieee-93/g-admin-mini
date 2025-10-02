@@ -30,8 +30,9 @@ import {
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ModuleName } from '@/contexts/AuthContext';
-import { useCapabilities } from '@/lib/capabilities/hooks/useCapabilities';
-import { shouldShowBusinessModule } from '@/lib/capabilities/businessCapabilitySystem';
+import { useCapabilityStore } from '@/store/capabilityStore';
+import { useShallow } from 'zustand/react/shallow';
+import { logger } from '@/lib/logging';
 
 // ✅ Types definidos según arquitectura v2.0
 export interface NavigationSubModule {
@@ -827,7 +828,10 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { canAccessModule, isAuthenticated, isCliente } = useAuth();
-  const { activeCapabilities, resolvedCapabilities } = useCapabilities();
+
+  // ✅ PERFORMANCE: Get isModuleVisible directly from store
+  // isModuleVisible already accesses the latest store state, no need for resolvedCapabilities dependency
+  const isModuleVisible = useCapabilityStore(state => state.isModuleVisible);
   
   // ✅ Responsive state - Mobile-first approach según arquitectura
   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -836,6 +840,9 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
 
   // ✅ HYBRID FILTERING: Roles (security) → Capabilities (business logic)
   const accessibleModules = useMemo(() => {
+    const startTime = performance.now();
+    logger.debug('NavigationContext', 'Recalculating accessible modules');
+
     if (!isAuthenticated) return [];
 
     // ✅ CLIENTE gets customer-friendly navigation (web/app style)
@@ -895,29 +902,41 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
       }
 
       // 🎯 LAYER 2: Capability-based business logic filter (second gate)
-      // ✅ Now using resolvedCapabilities (includes auto-resolved features)
-      const hasCapabilityAccess = shouldShowBusinessModule(module.id, activeCapabilities);
+      // ✅ Now using unified capability system
+      const hasCapabilityAccess = isModuleVisible(module.id);
 
-      // Debug info for development
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🔍 Module Filter Debug [${module.id}]:`, {
-          roleAccess: hasRoleAccess,
-          capabilityAccess: hasCapabilityAccess,
-          finalResult: hasRoleAccess && hasCapabilityAccess
-        });
-      }
+      // ❌ REMOVED: This log was in hot path, causing performance issues
+      // Use React DevTools Profiler or performance.measure instead
 
       return hasCapabilityAccess;
     });
-  }, [canAccessModule, isAuthenticated, isCliente, resolvedCapabilities]);
+
+    // ✅ PERFORMANCE MONITORING
+    const endTime = performance.now();
+    const filterTime = endTime - startTime;
+    logger.performance('NavigationContext', 'Module filtering', filterTime, 5);
+
+    return modules;
+  }, [canAccessModule, isAuthenticated, isCliente, isModuleVisible]);
 
   // ✅ Navigation state
-  const [modules, setModules] = useState<NavigationModule[]>(accessibleModules);
+  // ✅ FIX: Separar estado mutable (expansión, badges) del estado filtrado (accessibleModules)
+  const [moduleState, setModuleState] = useState<Record<string, { isExpanded?: boolean; badge?: number }>>({});
   const [currentModule, setCurrentModule] = useState<NavigationModule | null>(null);
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // ✅ Empezar colapsado por defecto
+
+  // ✅ Merge accessibleModules con moduleState para obtener modules finales
+  const modules = useMemo(() =>
+    accessibleModules.map(module => ({
+      ...module,
+      isExpanded: moduleState[module.id]?.isExpanded ?? module.isExpanded,
+      badge: moduleState[module.id]?.badge ?? module.badge
+    })),
+    [accessibleModules, moduleState]
+  );
 
   // ✅ Derived state
   const showBottomNav = isMobile;
@@ -1044,7 +1063,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
 
     // Safety check: if still no module found, exit early
     if (!foundModule) {
-      console.warn('No navigation module found for path:', path);
+      logger.warn('NavigationContext', `No navigation module found for path: ${path}`);
       return;
     }
 
@@ -1136,10 +1155,11 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     });
   }, [location.pathname]); // Only depend on pathname to prevent infinite loops
 
-  // ✅ Update modules when accessible modules change
-  useEffect(() => {
-    setModules(accessibleModules);
-  }, [accessibleModules]);
+  // ❌ REMOVED: This useEffect was causing infinite loop
+  // accessibleModules is already memoized and used directly above
+  // useEffect(() => {
+  //   setModules(accessibleModules);
+  // }, [accessibleModules]);
 
   // ✅ Auto-collapse sidebar on tablet
   useEffect(() => {
@@ -1155,13 +1175,13 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   const handleNavigate = useCallback((moduleId: string, subPath?: string, query?: string) => {
     // Use current modules state to ensure updated paths
     const module = modules.find(m => m.id === moduleId);
-    console.log('🔍 Navigation Debug:', { moduleId, module: module?.path, subPath, query });
+    logger.debug('NavigationContext', 'handleNavigate', { moduleId, path: module?.path, subPath, query });
     if (module) {
       let targetPath = subPath ? `${module.path}${subPath}` : module.path;
       if (query) {
         targetPath += `?${query.replace(/^\?/, '')}`; // Ensure single '?'
       }
-      console.log('🔍 Navigating to:', targetPath);
+      logger.info('NavigationContext', `Navigating to: ${targetPath}`);
       navigate(targetPath);
     }
   }, [navigate, modules]);
@@ -1169,9 +1189,9 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   // ✅ Navigate directly to module main page (for dual-click pattern)
   const handleNavigateToModule = useCallback((moduleId: string) => {
     const module = modules.find(m => m.id === moduleId);
-    console.log('🔍 Direct Module Navigation:', { moduleId, module: module?.path });
+    logger.debug('NavigationContext', 'navigateToModule', { moduleId, path: module?.path });
     if (module) {
-      console.log('🔍 Navigating directly to:', module.path);
+      logger.info('NavigationContext', `Navigating to module: ${module.path}`);
       navigate(module.path);
     }
   }, [navigate, modules]);
@@ -1184,30 +1204,32 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
 
   // ✅ Toggle module expansion
   const toggleModuleExpansion = useCallback((moduleId: string) => {
-    setModules(prev => prev.map(module => 
-      module.id === moduleId 
-        ? { ...module, isExpanded: !module.isExpanded }
-        : module
-    ));
+    setModuleState(prev => ({
+      ...prev,
+      [moduleId]: {
+        ...prev[moduleId],
+        isExpanded: !(prev[moduleId]?.isExpanded ?? false)
+      }
+    }));
   }, []);
 
   // ✅ Update module badge - Optimized to prevent infinite loops
   const updateModuleBadge = useCallback((moduleId: string, count: number) => {
-    setModules(prev => {
-      const moduleIndex = prev.findIndex(module => module.id === moduleId);
-      if (moduleIndex === -1) return prev;
-      
-      const currentModule = prev[moduleIndex];
+    setModuleState(prev => {
       const newBadgeValue = count > 0 ? count : undefined;
-      
+
       // Only update if badge value actually changed
-      if (currentModule.badge === newBadgeValue) {
+      if (prev[moduleId]?.badge === newBadgeValue) {
         return prev;
       }
-      
-      const newModules = [...prev];
-      newModules[moduleIndex] = { ...currentModule, badge: newBadgeValue };
-      return newModules;
+
+      return {
+        ...prev,
+        [moduleId]: {
+          ...prev[moduleId],
+          badge: newBadgeValue
+        }
+      };
     });
   }, []);
 

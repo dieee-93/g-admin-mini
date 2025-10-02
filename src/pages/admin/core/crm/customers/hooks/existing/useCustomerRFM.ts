@@ -1,6 +1,7 @@
 // src/features/customers/logic/useCustomerRFM.ts
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { logger } from '@/lib/logging';
 import { 
   CustomerRFMProfile, 
   CustomerSegment, 
@@ -156,7 +157,7 @@ export function useCustomerRFM() {
       setRFMProfiles(profiles);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading RFM profiles');
-      console.error('Error loading RFM profiles:', err);
+      logger.error('App', 'Error loading RFM profiles:', err);
     } finally {
       setLoading(false);
     }
@@ -168,7 +169,7 @@ export function useCustomerRFM() {
       const profile = await getCustomerProfileWithRFM(customerId);
       return profile.rfm_profile || null;
     } catch (err) {
-      console.error('Error getting customer RFM:', err);
+      logger.error('App', 'Error getting customer RFM:', err);
       return null;
     }
   }, []);
@@ -181,7 +182,7 @@ export function useCustomerRFM() {
       // Reload all profiles to get updated data
       await loadRFMProfiles();
     } catch (err) {
-      console.error('Error recalculating RFM:', err);
+      logger.error('App', 'Error recalculating RFM:', err);
       throw err;
     }
   };
@@ -256,7 +257,7 @@ export function useCustomerAnalytics() {
       setAnalytics(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading analytics');
-      console.error('Error loading customer analytics:', err);
+      logger.error('App', 'Error loading customer analytics:', err);
     } finally {
       setLoading(false);
     }

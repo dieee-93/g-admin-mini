@@ -8,6 +8,7 @@ import type { BusinessModel } from '../types/BusinessModels';
 import { businessModelCapabilities, capabilityMetadata } from '../types/BusinessCapabilities';
 import { businessModelDefinitions } from '../types/BusinessModels';
 
+import { logger } from '@/lib/logging';
 /**
  * Check if a set of capabilities meets the requirements for another set
  */
@@ -77,7 +78,7 @@ export const getBestBusinessModelMatch = (
  * Use BUSINESS_MODULE_CONFIGURATIONS from businessCapabilitySystem.ts instead
  */
 export const getCapabilityDependencies = (capability: BusinessCapability): BusinessCapability[] => {
-  console.warn('getCapabilityDependencies is deprecated. Use business capability system instead.');
+  logger.warn('App', 'getCapabilityDependencies is deprecated. Use business capability system instead.');
   return [];
 };
 
@@ -86,7 +87,7 @@ export const getCapabilityDependencies = (capability: BusinessCapability): Busin
  * Use shouldShowBusinessModule from businessCapabilitySystem.ts instead
  */
 export const getEnabledModules = (capabilities: BusinessCapability[]): string[] => {
-  console.warn('getEnabledModules is deprecated. Use shouldShowBusinessModule instead.');
+  logger.warn('App', 'getEnabledModules is deprecated. Use shouldShowBusinessModule instead.');
   return [];
 };
 
@@ -279,7 +280,7 @@ export const groupCapabilitiesByCategory = (capabilities: BusinessCapability[]):
       }
     } else {
       // Fallback for capabilities without metadata
-      console.warn(`⚠️ Capability '${cap}' has no metadata - adding to infrastructure`);
+      logger.warn('App', `⚠️ Capability '${cap}' has no metadata - adding to infrastructure`);
       groups.infrastructure.push(cap);
     }
   });

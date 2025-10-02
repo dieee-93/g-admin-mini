@@ -5,6 +5,7 @@
 
 import { SmartAlertsEngine, type SmartAlert } from './smartAlertsEngine';
 import { type MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
+import { logger } from '@/lib/logging';
 import type { 
   CreateAlertInput, 
   Alert, 
@@ -61,7 +62,7 @@ export class SmartAlertsAdapter {
       
       return unifiedAlerts;
     } catch (error) {
-      console.error('Error generating smart alerts:', error);
+      logger.error('MaterialsStore', 'Error generating smart alerts:', error);
       return [];
     }
   }
@@ -149,7 +150,7 @@ export class SmartAlertsAdapter {
           variant: 'primary',
           action: async () => {
             // En producción, esto abriría el modal de compras o navegaría a la página de pedidos
-            console.log('Opening purchase order for item:', smartAlert.itemId);
+            logger.info('MaterialsStore', 'Opening purchase order for item:', smartAlert.itemId);
             // TODO: Implementar navegación a crear pedido de compra
           },
           autoResolve: true
@@ -161,7 +162,7 @@ export class SmartAlertsAdapter {
             variant: 'secondary', 
             action: async () => {
               // En producción, esto abriría el contacto del proveedor
-              console.log('Contacting supplier for item:', smartAlert.itemId);
+              logger.info('MaterialsStore', 'Contacting supplier for item:', smartAlert.itemId);
             }
           });
         }
@@ -172,7 +173,7 @@ export class SmartAlertsAdapter {
           label: 'Ver Promociones',
           variant: 'primary',
           action: async () => {
-            console.log('Opening promotions for item:', smartAlert.itemId);
+            logger.info('MaterialsStore', 'Opening promotions for item:', smartAlert.itemId);
             // TODO: Implementar navegación a crear promoción
           }
         });
@@ -183,7 +184,7 @@ export class SmartAlertsAdapter {
           label: 'Analizar Demanda',
           variant: 'primary',
           action: async () => {
-            console.log('Analyzing demand for item:', smartAlert.itemId);
+            logger.info('MaterialsStore', 'Analyzing demand for item:', smartAlert.itemId);
             // TODO: Implementar navegación a análisis de demanda
           }
         });
@@ -195,7 +196,7 @@ export class SmartAlertsAdapter {
       label: 'Ver Detalles',
       variant: 'secondary',
       action: async () => {
-        console.log('Viewing item details:', smartAlert.itemId);
+        logger.info('MaterialsStore', 'Viewing item details:', smartAlert.itemId);
         // TODO: Implementar navegación a detalles del material
       }
     });

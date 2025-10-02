@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import { MILESTONE_DEFINITIONS, CAPABILITY_MILESTONE_CONFIG, getMilestoneDefinition } from '../config/milestones';
 import type { MilestoneDefinition } from '../pages/admin/gamification/achievements/types';
-import { useBusinessProfile } from '@/store/businessCapabilitiesStore'; 
+// TODO: Refactorizar para usar el sistema de capabilities unificado
+// import { useBusinessProfile } from '@/store/businessCapabilitiesStore';
+import { useCapabilities } from '@/store/capabilityStore'; 
 import { getOperationalProfile } from '../pages/setup/steps/business-setup/business-model/config/businessLogic';
 
 /**

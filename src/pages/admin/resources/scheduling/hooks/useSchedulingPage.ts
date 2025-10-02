@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { logger } from '@/lib/logging';
 import {
   CalendarIcon,
   ClockIcon,
@@ -118,7 +119,7 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
           icon: PlusIcon,
           action: () => {
             // TODO: Open shift creation modal
-            console.log('Opening new shift form');
+            logger.info('API', 'Opening new shift form');
           }
         }
       ];
@@ -137,7 +138,7 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
               id: 'copy-week',
               label: 'Copy Week',
               icon: CalendarIcon,
-              action: () => console.log('Copying week schedule')
+              action: () => logger.info('API', 'Copying week schedule')
             }
           ];
         case 'timeoff':
@@ -204,7 +205,7 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
   }, []);
 
   const handleScheduleGenerated = useCallback((solution: any) => {
-    console.log('Schedule generated:', solution);
+    logger.info('API', 'Schedule generated:', solution);
     // TODO: Apply the generated schedule to the database
     // For now, just log the solution and refresh the view
     setIsAutoSchedulingOpen(false);

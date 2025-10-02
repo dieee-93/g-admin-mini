@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react'
 
+import { logger } from '@/lib/logging';
 /**
  * Utility para detectar si un componente contiene subcomponentes específicos
  * Usado para evitar double-padding y otros problemas en compound components

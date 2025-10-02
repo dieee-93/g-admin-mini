@@ -2,6 +2,7 @@
 import { toaster } from '@/shared/ui/toaster';
 import { type ApiError } from '@/types/app';
 
+import { logger } from '@/lib/logging';
 export function useErrorHandler() {
   const handleError = (
     error: unknown, 
@@ -31,7 +32,7 @@ export function useErrorHandler() {
       : typeof error === 'string' 
         ? error 
         : 'Unknown error';
-    console.error(`Error handled: ${errorMessage}`);
+    logger.error('App', `Error handled: ${errorMessage}`);
   };
 
   const handleSuccess = (message: string, title = 'Éxito') => {

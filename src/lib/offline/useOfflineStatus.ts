@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import offlineSync, { type SyncStatus } from './OfflineSync';
 import localStorage from './LocalStorage';
 
+import { logger } from '@/lib/logging';
 // Hook return types
 interface OfflineStatusHook {
   // Connection status
@@ -112,7 +113,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
         try {
           callback();
         } catch (error) {
-          console.error('[OfflineStatus] Error in online callback:', error);
+          logger.error('OfflineSync', '[OfflineStatus] Error in online callback:', error);
         }
       });
     } else {
@@ -124,7 +125,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
         try {
           callback();
         } catch (error) {
-          console.error('[OfflineStatus] Error in offline callback:', error);
+          logger.error('OfflineSync', '[OfflineStatus] Error in offline callback:', error);
         }
       });
     }
@@ -179,7 +180,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
         }));
       }
     } catch (error) {
-      console.error('[OfflineStatus] Error updating storage info:', error);
+      logger.error('OfflineSync', '[OfflineStatus] Error updating storage info:', error);
     }
   }, []);
 
@@ -263,7 +264,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
         try {
           callback(result);
         } catch (error) {
-          console.error('[OfflineStatus] Error in sync complete callback:', error);
+          logger.error('OfflineSync', '[OfflineStatus] Error in sync complete callback:', error);
         }
       });
     };
@@ -398,7 +399,7 @@ export const useOfflineStorage = () => {
       const stats = await localStorage.getStorageStats();
       setStorageStats(stats);
     } catch (error) {
-      console.error('[OfflineStorage] Error updating stats:', error);
+      logger.error('OfflineSync', '[OfflineStorage] Error updating stats:', error);
     }
   }, []);
 
@@ -414,7 +415,7 @@ export const useOfflineStorage = () => {
       }
       await updateStats();
     } catch (error) {
-      console.error('[OfflineStorage] Error clearing storage:', error);
+      logger.error('OfflineSync', '[OfflineStorage] Error clearing storage:', error);
     }
   }, [updateStats]);
 
@@ -422,7 +423,7 @@ export const useOfflineStorage = () => {
     try {
       return await localStorage.exportData();
     } catch (error) {
-      console.error('[OfflineStorage] Error exporting data:', error);
+      logger.error('OfflineSync', '[OfflineStorage] Error exporting data:', error);
       return {};
     }
   }, []);
@@ -432,7 +433,7 @@ export const useOfflineStorage = () => {
       await localStorage.importData(data);
       await updateStats();
     } catch (error) {
-      console.error('[OfflineStorage] Error importing data:', error);
+      logger.error('OfflineSync', '[OfflineStorage] Error importing data:', error);
     }
   }, [updateStats]);
 

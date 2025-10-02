@@ -3,6 +3,7 @@ import { Box, Skeleton, VStack } from '@chakra-ui/react';
 import { LazyComponentOptions } from './types';
 import { errorHandler } from '@/lib/error-handling';
 
+import { logger } from '@/lib/logging';
 /**
  * Enhanced lazy loading wrapper with error boundaries and retries
  */
@@ -99,7 +100,7 @@ export class LazyComponentWrapper {
         const loadTime = performance.now() - startTime;
 
         // Log performance metrics
-        console.log(`Lazy loaded ${chunkName} in ${loadTime.toFixed(2)}ms`);
+        logger.info('Performance', `Lazy loaded ${chunkName} in ${loadTime.toFixed(2)}ms`);
         
         return result;
       } catch (error) {
@@ -128,14 +129,14 @@ export class LazyComponentWrapper {
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => {
         importFn().catch(error => {
-          console.warn(`Preload failed for ${chunkName}:`, error);
+          logger.error('Performance', `Preload failed for ${chunkName}:`, error);
         });
       });
     } else {
       // Fallback for browsers without requestIdleCallback
       setTimeout(() => {
         importFn().catch(error => {
-          console.warn(`Preload failed for ${chunkName}:`, error);
+          logger.error('Performance', `Preload failed for ${chunkName}:`, error);
         });
       }, 0);
     }

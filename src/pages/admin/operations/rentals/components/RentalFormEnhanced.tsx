@@ -9,6 +9,7 @@ import {
 import { Icon } from '@/shared/ui';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 const rentalSchema = z.object({
   customerInfo: z.object({
     customerId: z.string().optional(),
@@ -155,7 +156,7 @@ export const RentalFormEnhanced: React.FC = () => {
 
   const handleFormSubmit = async (data: RentalFormData) => {
     try {
-      console.log('Creating rental:', data);
+      logger.info('App', 'Creating rental:', data);
 
       const rentalId = `rental_${Date.now()}`;
 
@@ -178,10 +179,10 @@ export const RentalFormEnhanced: React.FC = () => {
         });
       }
 
-      console.log(`[Rental] Rental created: ${rentalId}`);
+      logger.info('App', `[Rental] Rental created: ${rentalId}`);
 
     } catch (error) {
-      console.error('Error creating rental:', error);
+      logger.error('App', 'Error creating rental:', error);
     }
   };
 

@@ -24,6 +24,7 @@ import type {
 
 import type { Shift, ShiftStatus } from '../../types';
 
+import { logger } from '@/lib/logging';
 interface WeeklyScheduleViewProps {
   viewState: {
     activeTab: string;
@@ -126,22 +127,22 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
   };
 
   const handleShiftClick = (shift: CalendarShift) => {
-    console.log('Shift clicked:', shift);
+    logger.info('API', 'Shift clicked:', shift);
     // TODO: Open shift details modal
   };
 
   const handleNewShift = (date: string) => {
-    console.log('New shift for date:', date);
+    logger.info('API', 'New shift for date:', date);
     // TODO: Open new shift modal
   };
 
   const handleDayClick = (date: string) => {
-    console.log('Day clicked:', date);
+    logger.info('API', 'Day clicked:', date);
     // TODO: Focus on day view or show day details
   };
 
   const handleEmployeeAction = (employeeId: string, action: string) => {
-    console.log('Employee action:', employeeId, action);
+    logger.info('API', 'Employee action:', employeeId, action);
     // TODO: Handle employee actions (schedule, contact, etc.)
   };
 
@@ -191,7 +192,7 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => console.log('Filters')}
+                onClick={() => logger.info('API', 'Filters')}
               >
                 <Icon icon={AdjustmentsHorizontalIcon} size="sm" />
                 Filtros
@@ -218,10 +219,7 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
             onNewShift={handleNewShift}
             loading={false}
             config={{
-              showCoverage: true,
-              showHours: true,
-              allowNewShifts: true,
-              compactMode: false
+              showCoverage: true, showHours: true, allowNewShifts: true, compactMode: false
             }}
           />
         </Stack>
@@ -247,6 +245,5 @@ export function WeeklyScheduleView({ viewState, onViewStateChange }: WeeklySched
           ))}
         </Grid>
       </Section>
-    </Stack>
-  );
+    </Stack>);
 }

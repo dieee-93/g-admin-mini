@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
+import { logger } from '@/lib/logging';
 import { 
   calculateProductMaterialsCost,
   analyzeProductionViability,
@@ -139,7 +140,7 @@ export class ProductCostAnalysisService {
       };
 
     } catch (error) {
-      console.error('Error getting product materials cost:', error);
+      logger.error('App', 'Error getting product materials cost:', error);
       throw error;
     }
   }
@@ -171,7 +172,7 @@ export class ProductCostAnalysisService {
       }));
 
     } catch (error) {
-      console.error('Error getting products with recipes:', error);
+      logger.error('App', 'Error getting products with recipes:', error);
       throw error;
     }
   }
@@ -225,7 +226,7 @@ export class ProductCostAnalysisService {
       };
 
     } catch (error) {
-      console.error('Error validating production viability:', error);
+      logger.error('App', 'Error validating production viability:', error);
       throw error;
     }
   }
@@ -255,7 +256,7 @@ export class ProductCostAnalysisService {
       });
 
     } catch (error) {
-      console.error('Error getting detailed production analysis:', error);
+      logger.error('App', 'Error getting detailed production analysis:', error);
       throw error;
     }
   }

@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { recipeAPI, type Recipe } from '../../../../services/recipe';
 
+import { logger } from '@/lib/logging';
 export const useRecipeAPI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -12,7 +13,7 @@ export const useRecipeAPI = () => {
 
   const handleError = useCallback((err: Error) => {
     setError(err.message);
-    console.error('Recipe API Error:', err);
+    logger.error('App', 'Recipe API Error:', err);
   }, []);
 
   const getRecipes = useCallback(async (type?: 'product' | 'material') => {

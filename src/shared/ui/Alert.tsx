@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { Icon } from './Icon'
 
+import { logger } from '@/lib/logging';
 interface AlertProps {
   children: ReactNode
   status?: 'info' | 'warning' | 'success' | 'error' | 'neutral'
@@ -90,7 +91,7 @@ export function Alert({
 
   // Debug: Check for invalid props
   if ('action' in rest) {
-    console.warn('[Alert] ⚠️ Invalid prop "action" detected. React only allows "action" on <form> elements.', {
+    logger.error('App', '[Alert] ⚠️ Invalid prop "action" detected. React only allows "action" on <form> elements.', {
       receivedProps: Object.keys(rest),
       action: (rest as any).action,
       title,

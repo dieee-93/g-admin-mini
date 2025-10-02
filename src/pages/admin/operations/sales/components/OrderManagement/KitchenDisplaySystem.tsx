@@ -16,6 +16,7 @@ import {
   Separator
 } from '@chakra-ui/react';
 import { CardWrapper } from '@/shared/ui';
+import { logger } from '@/lib/logging';
 import {
   FireIcon,
   CheckCircleIcon,
@@ -57,7 +58,7 @@ export function KitchenDisplaySystem({
   const [selectedStation, setSelectedStation] = useState<string>(currentStation);
   const [sortBy, setSortBy] = useState<'priority' | 'time' | 'table'>('priority');
   const [showCompleted, setShowCompleted] = useState(false);
-  console.log(orders)
+  logger.info('SalesStore', orders)
   // Filter orders based on station
   const filteredOrders = useMemo(() => {
     let filtered = orders;
@@ -65,8 +66,7 @@ export function KitchenDisplaySystem({
     // Filter by station
     if (!showAllStations && selectedStation !== 'all') {
       filtered = filtered.filter(order => 
-        order.items.some(item => item.station === selectedStation)
-      );
+        order.items.some(item => item.station === selectedStation));
     }
   
     // Filter completed orders

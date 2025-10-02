@@ -8,6 +8,7 @@ import { Box } from '@/shared/ui';
 import { useSlotRegistry } from './SlotRegistry';
 import { useCapabilities } from '../capabilities/hooks/useCapabilities';
 
+import { logger } from '@/lib/logging';
 export interface SlotProps {
   /**
    * Nombre único del slot
@@ -98,7 +99,7 @@ export const Slot: React.FC<SlotProps> = ({
   // Debug info
   React.useEffect(() => {
     if (debug && process.env.NODE_ENV === 'development') {
-      console.log(`🎯 Slot [${name}]:`, {
+      logger.info('App', `🎯 Slot [${name}]:`, {
         availableComponents: validComponents.length,
         resolvedCapabilities: resolvedCapabilities.length,
         components: validComponents.map(comp => ({

@@ -6,9 +6,10 @@
 
 import React, { ReactNode } from 'react';
 import { useSlotContext, useSlotRegistration } from './SlotProvider';
-import { useCapabilities } from '../capabilities/hooks/useCapabilities';
+import { useCapabilities } from '@/store/capabilityStore';
 import { SlotConfig, CompoundSlotProps } from './types/SlotTypes';
 
+import { logger } from '@/lib/logging';
 /**
  * Base slot component props
  */
@@ -55,7 +56,7 @@ export const Slot: React.FC<SlotProps> = ({
 
   // Debug logging
   if (debug && process.env.NODE_ENV === 'development') {
-    console.log(`🎰 Slot ${id} render:`, {
+    logger.info('App', `🎰 Slot ${id} render:`, {
       hasContent: !!hasContent,
       activeContent: !!slot?.activeContent,
       childrenProvided: !!children,
@@ -65,7 +66,7 @@ export const Slot: React.FC<SlotProps> = ({
 
   // If no content and required, show warning in development
   if (!hasContent && required && process.env.NODE_ENV === 'development') {
-    console.warn(`🚨 Required slot "${id}" (${name}) has no content`);
+    logger.warn('App', `🚨 Required slot "${id}" (${name}) has no content`);
   }
 
   // Render priority: slot.activeContent > children > fallback

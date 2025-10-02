@@ -5,6 +5,7 @@ import { EventBus } from '@/lib/events';
 import { notify } from '@/lib/notifications';
 import { localStorage } from '@/lib/offline';
 
+import { logger } from '@/lib/logging';
 // WebSocket connection states
 type WSConnectionState = 'connecting' | 'connected' | 'disconnected' | 'reconnecting' | 'failed';
 
@@ -145,13 +146,13 @@ export class WebSocketManager {
     // Listen for offline status changes
     window.addEventListener('online', () => {
       if (this.state === 'disconnected' && this.config.enableAutoReconnect) {
-        console.log('Network restored, attempting WebSocket reconnection...');
+        logger.info('WebSocket', 'Network restored, attempting WebSocket reconnection...');
         this.connect();
       }
     });
 
     window.addEventListener('offline', () => {
-      console.log('Network lost, WebSocket will gracefully handle offline mode');
+      logger.info('WebSocket', 'Network lost, WebSocket will gracefully handle offline mode');
       this.handleNetworkLoss();
     });
 
@@ -172,10 +173,10 @@ export class WebSocketManager {
       const savedQueue = await localStorage.get('websocket_message_queue', 'queue');
       if (savedQueue && Array.isArray(savedQueue)) {
         this.messageQueue = savedQueue.slice(0, this.config.messageQueueSize);
-        console.log(`Loaded ${this.messageQueue.length} queued WebSocket messages`);
+        logger.info('WebSocket', `Loaded ${this.messageQueue.length} queued WebSocket messages`);
       }
     } catch (error) {
-      console.warn('Failed to load WebSocket message queue:', error);
+      logger.error('WebSocket', 'Failed to load WebSocket message queue:', error);
     }
   }
 
@@ -183,7 +184,7 @@ export class WebSocketManager {
     try {
       await localStorage.set('websocket_message_queue', 'queue', this.messageQueue);
     } catch (error) {
-      console.warn('Failed to save WebSocket message queue:', error);
+      logger.error('WebSocket', 'Failed to save WebSocket message queue:', error);
     }
   }
 
@@ -200,7 +201,7 @@ export class WebSocketManager {
     // Check if connection is paused due to repeated failures
     if (this.connectionPaused && Date.now() < this.pauseUntil) {
       const remainingPause = Math.round((this.pauseUntil - Date.now()) / 1000);
-      console.log(`[WebSocketManager] Connection paused for ${remainingPause}s due to repeated failures`);
+      logger.info('WebSocket', `[WebSocketManager] Connection paused for ${remainingPause}s due to repeated failures`);
       return;
     }
 
@@ -208,7 +209,7 @@ export class WebSocketManager {
     if (this.connectionPaused && Date.now() >= this.pauseUntil) {
       this.connectionPaused = false;
       this.reconnectAttempts = 0;
-      console.log('[WebSocketManager] Connection pause expired, resuming connection attempts');
+      logger.info('WebSocket', '[WebSocketManager] Connection pause expired, resuming connection attempts');
     }
 
     this.setState('connecting');
@@ -401,7 +402,7 @@ export class WebSocketManager {
   // Private methods
 
   private handleOpen(): void {
-    console.log('WebSocket connected successfully');
+    logger.info('WebSocket', 'WebSocket connected successfully');
     
     this.setState('connected');
     this.stats.successfulConnections++;
@@ -451,12 +452,12 @@ export class WebSocketManager {
       this.handleSystemMessage(message);
 
     } catch (error) {
-      console.error('Error processing WebSocket message:', error);
+      logger.error('WebSocket', 'Error processing WebSocket message:', error);
     }
   }
 
   private handleClose(event: CloseEvent): void {
-    console.log('WebSocket connection closed:', event.code, event.reason);
+    logger.info('WebSocket', 'WebSocket connection closed:', event.code, event.reason);
     
     this.setState('disconnected');
     this.stats.lastDisconnected = Date.now();
@@ -483,7 +484,7 @@ export class WebSocketManager {
   }
 
   private handleError(error: Event): void {
-    console.error('WebSocket error:', error);
+    logger.error('WebSocket', 'WebSocket error:', error);
     this.stats.failedConnections++;
     
     EventBus.emit('websocket.error', {
@@ -493,7 +494,7 @@ export class WebSocketManager {
   }
 
   private handleConnectionError(error: unknown): void {
-    console.error('WebSocket connection error:', error);
+    logger.error('WebSocket', 'WebSocket connection error:', error);
     this.setState('failed');
     this.stats.failedConnections++;
     
@@ -508,7 +509,7 @@ export class WebSocketManager {
     }
     
     // Don't show notification for network loss - handled by offline manager
-    console.log('WebSocket handling network loss gracefully');
+    logger.info('WebSocket', 'WebSocket handling network loss gracefully');
   }
 
   private scheduleReconnect(): void {
@@ -523,7 +524,7 @@ export class WebSocketManager {
       this.connectionPaused = true;
       // Pause for 5 minutes after max attempts
       this.pauseUntil = Date.now() + (5 * 60 * 1000);
-      console.log(`[WebSocketManager] Max reconnection attempts reached (${this.config.maxReconnectAttempts}). Pausing for 5 minutes.`);
+      logger.info('WebSocket', `[WebSocketManager] Max reconnection attempts reached (${this.config.maxReconnectAttempts}). Pausing for 5 minutes.`);
       this.setState('failed');
       return;
     }
@@ -536,7 +537,7 @@ export class WebSocketManager {
     const jitter = cappedDelay * this.config.jitterRange * (Math.random() * 2 - 1);
     const delay = Math.max(1000, cappedDelay + jitter); // Minimum 1 second
 
-    console.log(`[WebSocketManager] Scheduling reconnection in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts}/${this.config.maxReconnectAttempts})`);
+    logger.info('WebSocket', `[WebSocketManager] Scheduling reconnection in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts}/${this.config.maxReconnectAttempts})`);
 
     this.reconnectTimer = setTimeout(() => {
       this.connect();
@@ -548,7 +549,7 @@ export class WebSocketManager {
       const oldState = this.state;
       this.state = newState;
       
-      console.log(`WebSocket state changed: ${oldState} -> ${newState}`);
+      logger.info('WebSocket', `WebSocket state changed: ${oldState} -> ${newState}`);
       
       EventBus.emit('websocket.state_changed', {
         oldState,
@@ -584,10 +585,10 @@ export class WebSocketManager {
     if (this.lastHeartbeatResponse > 0 && 
         (heartbeatTimestamp - this.lastHeartbeatResponse) > (this.config.heartbeatTimeout + this.config.heartbeatInterval)) {
       this.consecutiveHeartbeatFailures++;
-      console.warn(`[WebSocketManager] Heartbeat timeout detected (${this.consecutiveHeartbeatFailures}/${this.maxConsecutiveHeartbeatFailures})`);
+      logger.warn('WebSocket', `[WebSocketManager] Heartbeat timeout detected (${this.consecutiveHeartbeatFailures}/${this.maxConsecutiveHeartbeatFailures})`);
       
       if (this.consecutiveHeartbeatFailures >= this.maxConsecutiveHeartbeatFailures) {
-        console.error('[WebSocketManager] Multiple heartbeat failures detected, assuming connection is dead');
+        logger.error('WebSocket', '[WebSocketManager] Multiple heartbeat failures detected, assuming connection is dead');
         this.handleHeartbeatFailure();
         return;
       }
@@ -602,7 +603,7 @@ export class WebSocketManager {
       },
       priority: 'low'
     }).catch(error => {
-      console.warn('[WebSocketManager] Heartbeat send failed:', error);
+      logger.error('WebSocket', '[WebSocketManager] Heartbeat send failed:', error);
       this.consecutiveHeartbeatFailures++;
       
       if (this.consecutiveHeartbeatFailures >= this.maxConsecutiveHeartbeatFailures) {
@@ -617,7 +618,7 @@ export class WebSocketManager {
     
     this.heartbeatTimeoutTimer = setTimeout(() => {
       this.consecutiveHeartbeatFailures++;
-      console.warn(`[WebSocketManager] Heartbeat response timeout (${this.consecutiveHeartbeatFailures}/${this.maxConsecutiveHeartbeatFailures})`);
+      logger.warn('WebSocket', `[WebSocketManager] Heartbeat response timeout (${this.consecutiveHeartbeatFailures}/${this.maxConsecutiveHeartbeatFailures})`);
       
       if (this.consecutiveHeartbeatFailures >= this.maxConsecutiveHeartbeatFailures) {
         this.handleHeartbeatFailure();
@@ -626,7 +627,7 @@ export class WebSocketManager {
   }
 
   private handleHeartbeatFailure(): void {
-    console.error('[WebSocketManager] Connection appears to be dead due to heartbeat failures');
+    logger.error('WebSocket', '[WebSocketManager] Connection appears to be dead due to heartbeat failures');
     
     // Reset heartbeat state
     this.consecutiveHeartbeatFailures = 0;
@@ -649,7 +650,7 @@ export class WebSocketManager {
       this.ws.send(JSON.stringify(message));
       this.stats.messagesSent++;
     } catch (error) {
-      console.error('Error sending WebSocket message:', error);
+      logger.error('WebSocket', 'Error sending WebSocket message:', error);
       throw error;
     }
   }
@@ -665,7 +666,7 @@ export class WebSocketManager {
     // Persist queue
     await this.saveMessageQueue();
     
-    console.log(`Message queued for later delivery: ${message.type}`);
+    logger.info('WebSocket', `Message queued for later delivery: ${message.type}`);
   }
 
   private async processMessageQueue(): Promise<void> {
@@ -673,7 +674,7 @@ export class WebSocketManager {
       return;
     }
 
-    console.log(`Processing ${this.messageQueue.length} queued messages`);
+    logger.debug('WebSocket', `Processing ${this.messageQueue.length} queued messages`);
 
     const messages = [...this.messageQueue];
     this.messageQueue = [];
@@ -683,7 +684,7 @@ export class WebSocketManager {
       try {
         await this.sendMessageImmediate(message);
       } catch (error) {
-        console.error('Error sending queued message:', error);
+        logger.error('WebSocket', 'Error sending queued message:', error);
         // Re-queue failed message
         this.messageQueue.unshift(message);
         break;
@@ -697,7 +698,7 @@ export class WebSocketManager {
       data: { messageId, originalData },
       priority: 'high'
     }).catch(error => {
-      console.error('Failed to send acknowledgment:', error);
+      logger.error('WebSocket', 'Failed to send acknowledgment:', error);
     });
   }
 
@@ -708,7 +709,7 @@ export class WebSocketManager {
         try {
           callback(message.data);
         } catch (error) {
-          console.error(`Error in WebSocket message handler for ${message.type}:`, error);
+          logger.error('WebSocket', `Error in WebSocket message handler for ${message.type}:`, error);
         }
       });
     }
@@ -784,6 +785,6 @@ export const wsManager = new WebSocketManager();
 // Auto-connect when online
 if (typeof window !== 'undefined' && navigator.onLine) {
   wsManager.connect().catch(error => {
-    console.warn('Initial WebSocket connection failed:', error);
+    logger.error('WebSocket', 'Initial WebSocket connection failed:', error);
   });
 }

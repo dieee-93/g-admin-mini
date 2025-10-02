@@ -5,6 +5,7 @@ import {
 import { Icon } from '@/shared/ui';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 interface WebhookEvent {
   id: string;
   provider: 'mercadopago' | 'modo' | 'transferencia3';
@@ -365,7 +366,7 @@ const WebhookEventsList: React.FC<{ events: WebhookEvent[], onRetry: (id: string
 
             <Stack direction="row" gap="sm">
               <Button
-                onClick={() => console.log('View payload:', event.payload)}
+                onClick={() => logger.error('App', 'View payload:', event.payload)}
                 variant="outline"
                 size="sm"
               >
@@ -394,8 +395,7 @@ const WebhookEventsList: React.FC<{ events: WebhookEvent[], onRetry: (id: string
           </Alert>
         )}
       </Stack>
-    </Section>
-  );
+    </Section>);
 };
 
 // Configuration component

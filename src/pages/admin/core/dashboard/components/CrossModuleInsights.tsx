@@ -23,6 +23,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { MetricCard } from '@/shared/ui';
 
+import { logger } from '@/lib/logging';
 // Import recuperated robust interfaces
 import type {
   CrossModuleInsight,
@@ -106,7 +107,7 @@ export const CrossModuleInsights: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 2500));
       setShowAdvanced(true);
     } catch (error) {
-      console.error('Error running deep analysis:', error);
+      logger.error('App', 'Error running deep analysis:', error);
     } finally {
       setIsAnalyzing(false);
     }

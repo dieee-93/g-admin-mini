@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Badge } from '@chakra-ui/react';
 import { useMaterials } from '@/store/materialsStore';
 import { useMaterialValidation } from '@/hooks';
+import { logger } from '@/lib/logging';
 import {
   type ItemFormData,
   type ItemType,
@@ -208,7 +209,7 @@ export const useMaterialForm = () => {
       await new Promise(resolve => setTimeout(resolve, 800));
       closeModal();
     } catch (error) {
-      console.error('Error al guardar:', error);
+      logger.error('MaterialsStore', 'Error al guardar:', error);
     } finally {
       setIsSubmitting(false);
       setLoadingStates({

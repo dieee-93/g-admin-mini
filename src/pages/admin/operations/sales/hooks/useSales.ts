@@ -7,6 +7,7 @@
 import { useMemo, useCallback } from 'react';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
+import { logger } from '@/lib/logging';
 import { 
   type Sale, 
   type Customer,
@@ -54,16 +55,16 @@ export function useSales(initialFilters?: SalesListFilters) {
     // Success/error callbacks to match original behavior
     onSuccess: (action, data) => {
       if (action === 'create') {
-        console.log('Sale created successfully');
+        logger.info('SalesStore', 'Sale created successfully');
       } else if (action === 'update') {
-        console.log('Sale updated successfully');
+        logger.info('SalesStore', 'Sale updated successfully');
       } else if (action === 'delete') {
-        console.log('Sale deleted successfully');
+        logger.info('SalesStore', 'Sale deleted successfully');
       }
     },
     
     onError: (action, error) => {
-      console.error(`Error ${action} sale:`, error);
+      logger.error('SalesStore', `Error ${action} sale:`, error);
     }
   });
 
@@ -139,7 +140,7 @@ export function useSalesData() {
     try {
       return await getSalesSummary();
     } catch (error) {
-      console.error('Error getting sales summary:', error);
+      logger.error('SalesStore', 'Error getting sales summary:', error);
       return {
         totalSales: 0,
         totalRevenue: 0,

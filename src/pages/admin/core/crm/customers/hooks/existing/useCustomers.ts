@@ -7,6 +7,7 @@
 import { useMemo } from 'react';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
+import { logger } from '@/lib/logging';
 import { 
   type Customer, 
   type CreateCustomerData,
@@ -34,16 +35,16 @@ export function useCustomers() {
     // Success/error callbacks to match original behavior
     onSuccess: (action, data) => {
       if (action === 'create') {
-        console.log('Customer created successfully');
+        logger.info('App', 'Customer created successfully');
       } else if (action === 'update') {
-        console.log('Customer updated successfully');  
+        logger.info('App', 'Customer updated successfully');  
       } else if (action === 'delete') {
-        console.log('Customer deleted successfully');
+        logger.info('App', 'Customer deleted successfully');
       }
     },
     
     onError: (action, error) => {
-      console.error(`Error ${action} customer:`, error);
+      logger.error('App', `Error ${action} customer:`, error);
     }
   });
 

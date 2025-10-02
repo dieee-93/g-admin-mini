@@ -1,4 +1,6 @@
 // Staff Management API - Database functions with security compliance
+import { logger } from '@/lib/logging';
+
 import type { 
   Employee, 
   MaskedEmployee, 
@@ -220,7 +222,7 @@ export async function createEmployee(
   mockEmployees.push(newEmployee);
   
   // In production, this would create an audit log entry
-  console.log(`Employee ${newEmployee.employee_id} created by ${createdBy}`);
+  logger.info('StaffStore', `Employee ${newEmployee.employee_id} created by ${createdBy}`);
   
   return newEmployee;
 }
@@ -254,7 +256,7 @@ export async function updateEmployee(
   mockEmployees[employeeIndex] = updatedEmployee;
   
   // In production, this would create an audit log entry
-  console.log(`Employee ${updatedEmployee.employee_id} updated by ${updatedBy}`);
+  logger.info('StaffStore', `Employee ${updatedEmployee.employee_id} updated by ${updatedBy}`);
   
   return updatedEmployee;
 }
@@ -473,7 +475,7 @@ export async function staff_update_performance_metrics(
     ...metrics
   };
   
-  console.log(`Performance metrics updated for ${employeeId} by ${updatedBy}`);
+  logger.info('StaffStore', `Performance metrics updated for ${employeeId} by ${updatedBy}`);
   return updatedMetrics;
 }
 

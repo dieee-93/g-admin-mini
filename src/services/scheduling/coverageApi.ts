@@ -3,6 +3,7 @@
 
 import { supabase } from "@/lib/supabase/client";
 
+import { logger } from '@/lib/logging';
 // Database types for coverage planning
 export interface CoverageGap {
   id: string;
@@ -77,7 +78,7 @@ export async function getCoverageGaps(
       .eq('status', 'scheduled');
 
     if (shiftsError) {
-      console.error('Error fetching shifts:', shiftsError);
+      logger.error('App', 'Error fetching shifts:', shiftsError);
       return [];
     }
 
@@ -91,7 +92,7 @@ export async function getCoverageGaps(
     return applyGapFilters(gaps, filters);
     
   } catch (error) {
-    console.error('Error getting coverage gaps:', error);
+    logger.error('App', 'Error getting coverage gaps:', error);
     return [];
   }
 }
@@ -158,13 +159,13 @@ export async function getStaffingRequirements(): Promise<StaffingRequirement[]> 
     }
 
     if (error) {
-      console.error('Error fetching staffing requirements:', error);
+      logger.error('App', 'Error fetching staffing requirements:', error);
       return getDefaultStaffingRequirements();
     }
 
     return data || getDefaultStaffingRequirements();
   } catch (error) {
-    console.error('Error getting staffing requirements:', error);
+    logger.error('App', 'Error getting staffing requirements:', error);
     return getDefaultStaffingRequirements();
   }
 }
@@ -264,7 +265,7 @@ export async function getCoverageAnalytics(
     };
     
   } catch (error) {
-    console.error('Error calculating coverage analytics:', error);
+    logger.error('App', 'Error calculating coverage analytics:', error);
     return {
       weekly_coverage_avg: 75,
       understaffed_shifts: 0,

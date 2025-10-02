@@ -21,6 +21,7 @@ import {
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 interface CostCalculation {
   id: string;
   product_name: string;
@@ -150,7 +151,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
 
   const exportCalculation = (calc: CostCalculation) => {
     const data = JSON.stringify(calc, null, 2);
-    console.log('Exporting calculation:', data);
+    logger.info('App', 'Exporting calculation:', data);
     notify.success( { title:'Calculation exported to console' } );
   };
 

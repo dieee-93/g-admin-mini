@@ -37,6 +37,7 @@ import {
 
 import type { StaffViewState } from '../types';
 
+import { logger } from '@/lib/logging';
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -390,7 +391,7 @@ export const useStaffPage = (): UseStaffPageReturn => {
               id: 'bulk-actions',
               label: 'Acciones Masivas',
               icon: UsersIcon,
-              action: () => console.log('Bulk actions'),
+              action: () => logger.info('StaffStore', 'Bulk actions'),
               color: 'purple'
             }
           ];
@@ -536,28 +537,28 @@ export const useStaffPage = (): UseStaffPageReturn => {
   const actions: StaffPageActions = useMemo(() => ({
     // Employee Management
     handleNewEmployee: () => {
-      console.log('Opening new employee modal');
+      logger.info('StaffStore', 'Opening new employee modal');
       // Would open employee creation modal
     },
 
     handleEditEmployee: (employeeId: string) => {
-      console.log('Editing employee:', employeeId);
+      logger.info('StaffStore', 'Editing employee:', employeeId);
       // Would open employee edit modal
     },
 
     handleEmployeeBulkAction: (action: string, employeeIds: string[]) => {
-      console.log('Bulk action:', action, 'for employees:', employeeIds);
+      logger.info('StaffStore', 'Bulk action:', action, 'for employees:', employeeIds);
       // Would handle bulk operations
     },
 
     // Performance Management
     handlePerformanceReview: (employeeId: string) => {
-      console.log('Starting performance review for:', employeeId);
+      logger.info('StaffStore', 'Starting performance review for:', employeeId);
       // Would open performance review interface
     },
 
     handleBulkPerformanceUpdate: () => {
-      console.log('Bulk performance update');
+      logger.info('StaffStore', 'Bulk performance update');
       // Would open bulk performance update modal
     },
 
@@ -567,49 +568,49 @@ export const useStaffPage = (): UseStaffPageReturn => {
 
     // Training & Development
     handleScheduleTraining: (employeeId?: string) => {
-      console.log('Scheduling training for:', employeeId || 'all employees');
+      logger.info('StaffStore', 'Scheduling training for:', employeeId || 'all employees');
       // Would open training scheduler
     },
 
     handleTrainingProgram: () => {
-      console.log('Managing training programs');
+      logger.info('StaffStore', 'Managing training programs');
       // Would open training program management
     },
 
     handleSkillAssessment: () => {
-      console.log('Starting skill assessment');
+      logger.info('StaffStore', 'Starting skill assessment');
       // Would open skill assessment interface
     },
 
     // Time & Labor Management
     handleClockInOut: (employeeId: string) => {
-      console.log('Clock in/out for employee:', employeeId);
+      logger.info('StaffStore', 'Clock in/out for employee:', employeeId);
       // Would handle time tracking
     },
 
     handleTimeReports: () => {
-      console.log('Generating time reports');
+      logger.info('StaffStore', 'Generating time reports');
       // Would open time reporting interface
     },
 
     handleScheduleManagement: () => {
-      console.log('Opening schedule management');
+      logger.info('StaffStore', 'Opening schedule management');
       // Would open schedule management interface
     },
 
     // Administrative Actions
     handlePayrollGeneration: () => {
-      console.log('Generating payroll');
+      logger.info('StaffStore', 'Generating payroll');
       // Would start payroll generation process
     },
 
     handleBudgetAnalysis: () => {
-      console.log('Opening budget analysis');
+      logger.info('StaffStore', 'Opening budget analysis');
       // Would open budget analysis dashboard
     },
 
     handleComplianceReport: () => {
-      console.log('Generating compliance report');
+      logger.info('StaffStore', 'Generating compliance report');
       // Would generate compliance reports
     },
 

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, DependencyList } from 'react';
 
+import { logger } from '@/lib/logging';
 /**
  * Enhanced useCallback with dependency comparison and performance monitoring
  */
@@ -21,7 +22,7 @@ export function useMemoizedCallback<T extends (...args: any[]) => any>(
     deps.some((dep, index) => !Object.is(dep, lastDepsRef.current![index]));
 
   if (depsChanged && debugName && process.env.NODE_ENV === 'development') {
-    console.log(`useMemoizedCallback(${debugName}): Dependencies changed`, {
+    logger.debug('Performance', `useMemoizedCallback(${debugName}): Dependencies changed`, {
       renderCount: renderCountRef.current,
       oldDeps: lastDepsRef.current,
       newDeps: deps
@@ -36,7 +37,7 @@ export function useMemoizedCallback<T extends (...args: any[]) => any>(
 
       // Log slow callbacks in development
       if (process.env.NODE_ENV === 'development' && endTime - startTime > 10) {
-        console.warn(`Slow callback ${debugName || 'unknown'}: ${(endTime - startTime).toFixed(2)}ms`);
+        logger.warn('Performance', `Slow callback ${debugName || 'unknown'}: ${(endTime - startTime).toFixed(2)}ms`);
       }
 
       return result;
@@ -78,7 +79,7 @@ export function useMemoizedValue<T>(
     const computationTime = endTime - startTime;
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`useMemoizedValue(${debugName || 'unknown'}):`, {
+      logger.debug('Performance', `useMemoizedValue(${debugName || 'unknown'}):`, {
         renderCount: renderCountRef.current,
         computationCount: computationCountRef.current,
         computationTime: computationTime.toFixed(2) + 'ms',
@@ -87,7 +88,7 @@ export function useMemoizedValue<T>(
 
       // Warn about expensive computations
       if (computationTime > 50) {
-        console.warn(`Expensive computation in ${debugName || 'unknown'}: ${computationTime.toFixed(2)}ms`);
+        logger.warn('Performance', `Expensive computation in ${debugName || 'unknown'}: ${computationTime.toFixed(2)}ms`);
       }
     }
 
@@ -327,7 +328,7 @@ export function usePersistentMemo<T>(
       
       localStorage.setItem(`memo_${cacheKey}`, JSON.stringify(Array.from(cache.entries())));
     } catch (error) {
-      console.warn('Failed to persist memo cache:', error);
+      logger.error('Performance', 'Failed to persist memo cache:', error);
     }
 
     return result;

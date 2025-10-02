@@ -22,7 +22,9 @@ import {
   CardWrapper,
   Box
 } from '@/shared/ui';
-import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
+// TODO: Refactorizar para usar el sistema de capabilities unificado
+// import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
+import { useCapabilities } from '@/store/capabilityStore';
 
 type StoreTab = 'business-capabilities' | 'localStorage' | 'sessionStorage' | 'live-state';
 

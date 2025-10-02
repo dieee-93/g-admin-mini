@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { useAchievements } from '@/pages/admin/gamification/achievements/hooks/useAchievements';
-import { useBusinessProfile } from '@/store/businessCapabilitiesStore';
+// TODO: Refactorizar para usar el sistema de capabilities unificado
+// import { useBusinessProfile } from '@/store/businessCapabilitiesStore';
+import { useCapabilities } from '@/store/capabilityStore';
 import { 
   Section, 
   Stack, 

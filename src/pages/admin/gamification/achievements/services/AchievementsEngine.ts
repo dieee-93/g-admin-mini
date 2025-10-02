@@ -12,6 +12,7 @@ import eventBus from '../../../../../lib/events';
 import type { EventPattern } from '../../../../../lib/events';
 import { supabase } from '../../../../../lib/supabase/client';
 import { MILESTONE_DEFINITIONS, CAPABILITY_MILESTONE_CONFIG, getMilestonesForCapability } from '../../../../../config/milestones';
+import { logger } from '@/lib/logging';
 import type { 
   MilestoneDefinition, 
   AchievementProgress, 
@@ -61,8 +62,8 @@ export class AchievementsEngine {
     
     this.isInitialized = true;
 
-    console.info('[AchievementsEngine] Inicializado para usuario:', userId);
-    console.info('[AchievementsEngine] Logros de maestría cargados:', this.masteryAchievements.length);
+    logger.info('CapabilitySystem', '[AchievementsEngine] Inicializado para usuario:', userId);
+    logger.info('CapabilitySystem', '[AchievementsEngine] Logros de maestría cargados:', this.masteryAchievements.length);
   }
 
   /**
@@ -77,14 +78,14 @@ export class AchievementsEngine {
         .eq('type', 'mastery');
 
       if (error) {
-        console.error('[AchievementsEngine] Error cargando logros de maestría:', error);
+        logger.error('CapabilitySystem', '[AchievementsEngine] Error cargando logros de maestría:', error);
         return;
       }
 
       this.masteryAchievements = data || [];
       
     } catch (error) {
-      console.error('[AchievementsEngine] Error cargando logros de maestría:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error cargando logros de maestría:', error);
       this.masteryAchievements = [];
     }
   }
@@ -113,8 +114,8 @@ export class AchievementsEngine {
       });
     }
 
-    console.info('[AchievementsEngine] Configurados listeners para', allPatterns.size, 'tipos de eventos');
-    console.info('[AchievementsEngine] Hitos fundacionales:', milestonePatterns.size, 'Logros maestría:', masteryPatterns.size);
+    logger.info('CapabilitySystem', '[AchievementsEngine] Configurados listeners para', allPatterns.size, 'tipos de eventos');
+    logger.info('CapabilitySystem', '[AchievementsEngine] Hitos fundacionales:', milestonePatterns.size, 'Logros maestría:', masteryPatterns.size);
   }
 
   /**
@@ -122,7 +123,7 @@ export class AchievementsEngine {
    */
   private async handleBusinessEvent(event: any): Promise<void> {
     if (!this.userId) {
-      console.warn('[AchievementsEngine] No hay usuario configurado');
+      logger.warn('CapabilitySystem', '[AchievementsEngine] No hay usuario configurado');
       return;
     }
 
@@ -134,7 +135,7 @@ export class AchievementsEngine {
       await this.processMasteryAchievements(event);
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error procesando evento:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error procesando evento:', error);
     }
   }
 
@@ -151,7 +152,7 @@ export class AchievementsEngine {
       return;
     }
 
-    console.info('[AchievementsEngine] Procesando', matchingMilestones.length, 'hitos fundacionales para evento:', event.type);
+    logger.info('CapabilitySystem', '[AchievementsEngine] Procesando', matchingMilestones.length, 'hitos fundacionales para evento:', event.type);
 
     // Actualizar progreso de cada hito
     for (const milestone of matchingMilestones) {
@@ -172,7 +173,7 @@ export class AchievementsEngine {
       return;
     }
 
-    console.info('[AchievementsEngine] Procesando', matchingAchievements.length, 'logros de maestría para evento:', event.type);
+    logger.info('CapabilitySystem', '[AchievementsEngine] Procesando', matchingAchievements.length, 'logros de maestría para evento:', event.type);
 
     // Evaluar cada logro de maestría
     for (const achievement of matchingAchievements) {
@@ -236,13 +237,13 @@ export class AchievementsEngine {
         throw updateError;
       }
 
-      console.info('[AchievementsEngine] Hito completado:', milestoneId);
+      logger.info('CapabilitySystem', '[AchievementsEngine] Hito completado:', milestoneId);
 
       // Verificar si alguna capacidad debe activarse
       await this.checkCapabilityActivations(milestoneId);
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error completando hito:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error completando hito:', error);
     }
   }
 
@@ -267,7 +268,7 @@ export class AchievementsEngine {
       }
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error verificando activaciones:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error verificando activaciones:', error);
     }
   }
 
@@ -305,7 +306,7 @@ export class AchievementsEngine {
       return allCompleted;
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error verificando capacidad:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error verificando capacidad:', error);
       return false;
     }
   }
@@ -359,10 +360,10 @@ export class AchievementsEngine {
 
       await eventBus.emit(activationEvent.type as EventPattern, activationEvent);
 
-      console.info('[AchievementsEngine] 🎉 Capacidad activada:', capabilityId);
+      logger.info('CapabilitySystem', '[AchievementsEngine] 🎉 Capacidad activada:', capabilityId);
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error activando capacidad:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error activando capacidad:', error);
     }
   }
 
@@ -407,7 +408,7 @@ export class AchievementsEngine {
       return progress;
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error obteniendo progreso:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error obteniendo progreso:', error);
       return [];
     }
   }
@@ -439,7 +440,7 @@ export class AchievementsEngine {
         .filter(Boolean);
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error obteniendo hitos pendientes:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error obteniendo hitos pendientes:', error);
       return [];
     }
   }
@@ -475,7 +476,7 @@ export class AchievementsEngine {
       }
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error evaluando logro de maestría:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error evaluando logro de maestría:', error);
     }
   }
 
@@ -499,7 +500,7 @@ export class AchievementsEngine {
         return await this.evaluateTimeBasedCondition(achievement, event);
       
       default:
-        console.warn('[AchievementsEngine] Tipo de condición no soportado:', conditions.type);
+        logger.warn('CapabilitySystem', '[AchievementsEngine] Tipo de condición no soportado:', conditions.type);
         return false;
     }
   }
@@ -556,7 +557,7 @@ export class AchievementsEngine {
       }
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error evaluando condición acumulativa:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error evaluando condición acumulativa:', error);
       return false;
     }
   }
@@ -574,7 +575,7 @@ export class AchievementsEngine {
    */
   private async evaluateStreakCondition(achievement: MasteryAchievementDefinition, event: any): Promise<boolean> {
     // TODO: Implementar lógica de rachas
-    console.warn('[AchievementsEngine] Condiciones de racha aún no implementadas');
+    logger.warn('CapabilitySystem', '[AchievementsEngine] Condiciones de racha aún no implementadas');
     return false;
   }
 
@@ -583,7 +584,7 @@ export class AchievementsEngine {
    */
   private async evaluateTimeBasedCondition(achievement: MasteryAchievementDefinition, event: any): Promise<boolean> {
     // TODO: Implementar lógica basada en tiempo
-    console.warn('[AchievementsEngine] Condiciones basadas en tiempo aún no implementadas');
+    logger.warn('CapabilitySystem', '[AchievementsEngine] Condiciones basadas en tiempo aún no implementadas');
     return false;
   }
 
@@ -632,10 +633,10 @@ export class AchievementsEngine {
 
       await eventBus.emit('achievement:unlocked' as EventPattern, unlockEvent);
 
-      console.info('[AchievementsEngine] 🏆 Logro de maestría desbloqueado:', achievement.name);
+      logger.info('CapabilitySystem', '[AchievementsEngine] 🏆 Logro de maestría desbloqueado:', achievement.name);
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error desbloqueando logro de maestría:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error desbloqueando logro de maestría:', error);
     }
   }
 
@@ -659,7 +660,7 @@ export class AchievementsEngine {
       return data || [];
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error obteniendo logros del usuario:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error obteniendo logros del usuario:', error);
       return [];
     }
   }
@@ -682,7 +683,7 @@ export class AchievementsEngine {
       return data || [];
 
     } catch (error) {
-      console.error('[AchievementsEngine] Error obteniendo resumen de progreso:', error);
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error obteniendo resumen de progreso:', error);
       return [];
     }
   }

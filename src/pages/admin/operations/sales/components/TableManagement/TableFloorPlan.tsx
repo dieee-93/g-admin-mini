@@ -3,6 +3,7 @@ import { Box, Button, Grid, Text } from '@chakra-ui/react';
 import { supabase } from '@/lib/supabase/client';
 import { useSalesStore } from '@/store/salesStore';
 
+import { logger } from '@/lib/logging';
 // Define the table type based on your database schema
 interface Table {
   id: string;
@@ -20,7 +21,7 @@ export function TableFloorPlan() {
     const fetchTables = async () => {
       const { data, error } = await supabase.from('tables').select('*');
       if (error) {
-        console.error('Error fetching tables:', error);
+        logger.error('SalesStore', 'Error fetching tables:', error);
         setError('Could not fetch tables.');
       } else {
         setTables(data as Table[]);

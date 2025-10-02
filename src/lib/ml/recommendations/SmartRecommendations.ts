@@ -6,6 +6,7 @@ import type { ForecastResult } from '../core/MLEngine';
 import { EventBus } from '@/lib/events';
 import { EventBus } from '@/lib/events';
 
+import { logger } from '@/lib/logging';
 // ===== INTERFACES =====
 
 export interface MenuItem {
@@ -454,7 +455,7 @@ export class SmartRecommendationEngine {
       return recommendations;
 
     } catch (error) {
-      console.error('Failed to generate menu recommendations:', error);
+      logger.error('Performance', 'Failed to generate menu recommendations:', error);
       return [];
     }
   }
@@ -543,7 +544,7 @@ export class SmartRecommendationEngine {
       }
 
     } catch (error) {
-      console.warn(`Failed to get forecast for ${itemId}:`, error);
+      logger.error('Performance', `Failed to get forecast for ${itemId}:`, error);
     }
 
     // Low performance items
@@ -972,7 +973,7 @@ export class SmartRecommendationEngine {
       return insights.slice(0, 10); // Top 10 insights
 
     } catch (error) {
-      console.error('Failed to generate sales insights:', error);
+      logger.error('Performance', 'Failed to generate sales insights:', error);
       return [];
     }
   }
@@ -1006,7 +1007,7 @@ export class SmartRecommendationEngine {
         recommendations: this.getRevenueRecommendations(forecast.metadata.trend, trendChange)
       };
     } catch (error) {
-      console.warn('Failed to analyze revenue trend:', error);
+      logger.error('Performance', 'Failed to analyze revenue trend:', error);
       return null;
     }
   }
@@ -1108,7 +1109,7 @@ export class SmartRecommendationEngine {
    * Run comprehensive analysis
    */
   private async runComprehensiveAnalysis(): Promise<void> {
-    console.log('🔄 Running comprehensive recommendation analysis...');
+    logger.info('Performance', '🔄 Running comprehensive recommendation analysis...');
     
     try {
       // Clear old cache
@@ -1119,10 +1120,10 @@ export class SmartRecommendationEngine {
       await this.generateSalesInsights();
       
       this.lastAnalysis = Date.now();
-      console.log('✅ Recommendation analysis completed');
+      logger.info('Performance', '✅ Recommendation analysis completed');
       
     } catch (error) {
-      console.error('❌ Recommendation analysis failed:', error);
+      logger.error('Performance', '❌ Recommendation analysis failed:', error);
     }
   }
 

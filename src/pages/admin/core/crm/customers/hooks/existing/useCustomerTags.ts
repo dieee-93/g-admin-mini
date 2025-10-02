@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { CustomerTag, CustomerProfile } from '../types';
+import { logger } from '@/lib/logging';
 import {
   assignTagToCustomer,
   removeTagFromCustomer,
@@ -61,7 +62,7 @@ export function useCustomerTags() {
     try {
       await assignTagToCustomer(customerId, tagId);
     } catch (err) {
-      console.error('Error assigning tag to customer:', err);
+      logger.error('App', 'Error assigning tag to customer:', err);
       throw err;
     }
   }, []);
@@ -71,7 +72,7 @@ export function useCustomerTags() {
     try {
       await removeTagFromCustomer(customerId, tagId);
     } catch (err) {
-      console.error('Error removing tag from customer:', err);
+      logger.error('App', 'Error removing tag from customer:', err);
       throw err;
     }
   }, []);
@@ -81,7 +82,7 @@ export function useCustomerTags() {
     try {
       return await getCustomersWithTag(tagId);
     } catch (err) {
-      console.error('Error getting customers with tag:', err);
+      logger.error('App', 'Error getting customers with tag:', err);
       throw err;
     }
   }, []);
@@ -177,7 +178,7 @@ export function useCustomerTagsForCustomer(customerId: string) {
       // For now, we'll simulate it
       setCustomerTags([]);
     } catch (err) {
-      console.error('Error loading customer tags:', err);
+      logger.error('App', 'Error loading customer tags:', err);
     } finally {
       setLoading(false);
     }
@@ -189,7 +190,7 @@ export function useCustomerTagsForCustomer(customerId: string) {
       await assignTag(customerId, tagId);
       await loadCustomerTags(); // Reload customer's tags
     } catch (err) {
-      console.error('Error adding tag to customer:', err);
+      logger.error('App', 'Error adding tag to customer:', err);
       throw err;
     }
   };
@@ -200,7 +201,7 @@ export function useCustomerTagsForCustomer(customerId: string) {
       await removeTag(customerId, tagId);
       await loadCustomerTags(); // Reload customer's tags
     } catch (err) {
-      console.error('Error removing tag from customer:', err);
+      logger.error('App', 'Error removing tag from customer:', err);
       throw err;
     }
   };

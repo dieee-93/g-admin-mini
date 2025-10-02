@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AchievementsEngine } from '../services/AchievementsEngine';
+import { logger } from '@/lib/logging';
 import type { 
   MasteryAchievementDefinition, 
   UserAchievement, 
@@ -90,7 +91,7 @@ export function useAchievementsPage() {
         engine.getCapabilityProgress()
       ]);
 
-      console.log('📊 Datos cargados:', {
+      logger.info('CapabilitySystem', '📊 Datos cargados:', {
         userAchievements: userAchievements.length,
         domains: domainProgress.length,
         foundational: foundationalProgress.length
@@ -153,7 +154,7 @@ export function useAchievementsPage() {
       }));
 
     } catch (error) {
-      console.error('Error cargando datos de logros:', error);
+      logger.error('CapabilitySystem', 'Error cargando datos de logros:', error);
       setState(prev => ({
         ...prev,
         error: 'Error al cargar los logros. Por favor intenta de nuevo.',

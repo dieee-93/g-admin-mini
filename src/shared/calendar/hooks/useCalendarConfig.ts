@@ -20,6 +20,7 @@ import {
 } from '../types/DateTimeTypes';
 import { getUserTimezone } from '../utils/dateTimeUtils';
 
+import { logger } from '@/lib/logging';
 // ===============================
 // CONFIGURATION INTERFACES
 // ===============================
@@ -262,7 +263,7 @@ export function useCalendarConfig(
       }
 
       // In a real implementation, this would save to API/storage
-      console.log('Saving configuration:', state.config);
+      logger.info('App', 'Saving configuration:', state.config);
 
       setState(prev => ({
         ...prev,

@@ -21,6 +21,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useStaffWithLoader, usePerformanceAnalytics } from '@/hooks/useStaffData';
 
+import { logger } from '@/lib/logging';
 interface PerformanceDashboardProps {
   compact?: boolean;
   showDetails?: boolean;
@@ -85,7 +86,7 @@ export function PerformanceDashboard({ compact = false, showDetails = true }: Pe
       setAlerts(performanceAlerts);
 
     } catch (error) {
-      console.error('Error loading performance dashboard:', error);
+      logger.error('StaffStore', 'Error loading performance dashboard:', error);
     }
   };
 

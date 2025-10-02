@@ -1,6 +1,7 @@
 import { Select, createListCollection, Portal } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
 
+import { logger } from '@/lib/logging';
 // Tipo para opciones simples
 interface SimpleOption {
   value: string | number

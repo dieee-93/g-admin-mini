@@ -59,6 +59,7 @@ import { notify } from '@/lib/notifications';
 // Staff imports
 import type { Employee, StaffViewState, TimeEntry, TimeSheet, TimeTrackingStats } from '../../types';
 
+import { logger } from '@/lib/logging';
 // Time tracking specific offline types
 
 interface OfflineTimeOperation {
@@ -234,7 +235,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
       updateCurrentShifts([...timeEntries, ...offlineEntries]);
 
     } catch (error) {
-      console.error('Error loading time tracking data:', error);
+      logger.error('StaffStore', 'Error loading time tracking data:', error);
       
       // Fallback to cached/offline data
       const cachedEntries = await getCachedData('time_entries') || [];
@@ -257,7 +258,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
       const operations = await localStorage.getAll('offline_time_operations') || [];
       setOfflineOperations(operations);
     } catch (error) {
-      console.error('Error loading offline time operations:', error);
+      logger.error('StaffStore', 'Error loading offline time operations:', error);
     }
   };
 
@@ -436,7 +437,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
           handleClockDialogClose();
           return;
         } catch (error) {
-          console.warn('Online clock action failed, switching to offline mode:', error);
+          logger.error('StaffStore', 'Online clock action failed, switching to offline mode:', error);
         }
       }
 
@@ -446,7 +447,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
       handleClockDialogClose();
 
     } catch (error) {
-      console.error('Error processing clock action:', error);
+      logger.error('StaffStore', 'Error processing clock action:', error);
       notify.error(`Failed to register ${getActionLabel(clockAction).toLowerCase()}`);
     }
   };
@@ -533,7 +534,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
       await loadOfflineOperations();
       notify.success('Time tracking sync completed');
     } catch (error) {
-      console.error('Error forcing time tracking sync:', error);
+      logger.error('StaffStore', 'Error forcing time tracking sync:', error);
       notify.error('Failed to sync time tracking operations');
     }
   };

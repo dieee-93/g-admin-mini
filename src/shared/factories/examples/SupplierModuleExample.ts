@@ -281,6 +281,7 @@ export const {
 // In a React component:
 import { SupplierPage, useSuppliers } from './SupplierModuleExample';
 
+import { logger } from '@/lib/logging';
 function App() {
   return <SupplierPage />;
 }
@@ -293,12 +294,11 @@ function CustomSupplierManagement() {
   return (
     <div>
       <SupplierForm
-        onSuccess={() => console.log('Supplier created!')}
+        onSuccess={() => logger.info('App', 'Supplier created!')}
         onCancel={() => console.log('Cancelled')}
       />
       <SupplierList />
       <SupplierAnalytics />
-    </div>
-  );
+    </div>);
 }
 */

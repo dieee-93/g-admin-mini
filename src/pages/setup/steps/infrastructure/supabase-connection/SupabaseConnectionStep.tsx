@@ -9,6 +9,7 @@ import { ActionButtons } from './components/ActionButtons';
 import { WhatHappensNext } from './components/WhatHappensNext';
 import { SUPABASE_CONNECTION_CONFIG } from './config/constants';
 
+import { logger } from '@/lib/logging';
 interface SupabaseConnectionStepProps {
   onConnectionSuccess: (url: string, anonKey: string) => void;
   isConnecting: boolean;
@@ -24,7 +25,7 @@ export function SupabaseConnectionStep({
   });
 
   const handleDebugSkip = () => {
-    console.log('🚀 Debug: Skipping Supabase setup');
+    logger.debug('App', '🚀 Debug: Skipping Supabase setup');
     onConnectionSuccess('https://debug.supabase.co', 'debug-key-' + Date.now());
   };
 

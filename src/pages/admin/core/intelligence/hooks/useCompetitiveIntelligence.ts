@@ -3,6 +3,7 @@ import type { CompetitorData, MarketTrend, MarketInsight } from '../types';
 import { generateMockCompetitiveData } from '../../dashboard/data/mockData';
 import { EventBus } from '@/lib/events';
 
+import { logger } from '@/lib/logging';
 export const useCompetitiveIntelligence = () => {
   // State management
   const [competitors, setCompetitors] = useState<CompetitorData[]>([]);
@@ -37,7 +38,7 @@ export const useCompetitiveIntelligence = () => {
       setMarketInsights(mockInsights);
 
     } catch (error) {
-      console.error('Error loading competitive intelligence:', error);
+      logger.error('App', 'Error loading competitive intelligence:', error);
     } finally {
       setIsLoading(false);
     }

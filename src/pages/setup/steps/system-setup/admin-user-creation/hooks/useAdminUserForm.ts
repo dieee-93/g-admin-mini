@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { ADMIN_USER_CONFIG, AdminUserData, FormErrors } from '../config/constants';
 
+import { logger } from '@/lib/logging';
 export interface UseAdminUserFormReturn {
   // Form state
   email: string;
@@ -173,7 +174,7 @@ export function useAdminUserForm({ onComplete }: UseAdminUserFormProps): UseAdmi
         fullName: fullName.trim()
       });
     } catch (error) {
-      console.error('Error creating admin user:', error);
+      logger.error('App', 'Error creating admin user:', error);
     } finally {
       setIsCreating(false);
     }

@@ -8,6 +8,7 @@ import { useCapabilities } from './useCapabilities';
 import { getBusinessModuleFeatures, BUSINESS_MODULE_CONFIGURATIONS } from '../businessCapabilitySystem';
 import type { BusinessCapability } from '../types/BusinessCapabilities';
 
+import { logger } from '@/lib/logging';
 export interface ModuleFeatureConfig {
   // Features disponibles para este módulo
   availableFeatures: string[];
@@ -88,7 +89,7 @@ export function useModuleFeaturesDebug(moduleId: string) {
   const moduleFeatures = useModuleFeatures(moduleId);
 
   if (process.env.NODE_ENV === 'development') {
-    console.log(`🔍 Module Features Debug [${moduleId}]:`, moduleFeatures.debugInfo);
+    logger.debug('App', `🔍 Module Features Debug [${moduleId}]:`, moduleFeatures.debugInfo);
   }
 
   return moduleFeatures;

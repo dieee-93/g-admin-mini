@@ -33,9 +33,9 @@ import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
 // 🎮 SISTEMA DE LOGROS Y GAMIFICACIÓN
 import { AchievementSystemProvider } from '@/lib/achievements/AchievementSystemIntegration';
 
-// 🔗 SISTEMA DE INTEGRACIÓN EVENTBUS + CAPABILITYGATE
+// 🔗 SISTEMA DE INTEGRACIÓN EVENTBUS + SLOTS
+// NOTA: CapabilityProvider removido - el nuevo sistema unificado usa Zustand sin Provider
 import { EventBusProvider } from '@/providers/EventBusProvider';
-import { CapabilityProvider } from '@/lib/capabilities';
 import { SlotProvider } from '@/lib/composition';
 
 // Dashboard Module - Critical, not lazy loaded
@@ -85,6 +85,7 @@ import {
 
 // Materials sub-modules
 import { ABCAnalysisSection as ABCAnalysisView } from '@/pages/admin/supply-chain/materials/components/Analytics';
+import { logger } from '@/lib/logging';
 // LazySupplyChainPage and LazyProcurementPage now imported from central LazyModules
 
 // Settings sub-modules
@@ -138,13 +139,13 @@ function PerformanceWrapper({ children }: { children: React.ReactNode }) {
       syncInterval: 30000,
       maxRetries: 3
     }).then(({ serviceWorker, syncInitialized, storageInitialized }) => {
-      console.log('[App] Offline system initialized:', {
+      logger.info('App', '[App] Offline system initialized:', {
         serviceWorker: !!serviceWorker,
         syncInitialized,
         storageInitialized
       });
     }).catch(error => {
-      console.error('[App] Failed to initialize offline system:', error);
+      logger.error('App', '[App] Failed to initialize offline system:', error);
     });
   }, []);
 
@@ -178,8 +179,8 @@ function App() {
                 <OfflineMonitorProvider>
                   <AchievementSystemProvider>
 
-                    {/* 🔗 INTEGRATION LAYER: EventBus + CapabilityGate + Slots */}
-                    <CapabilityProvider>
+                    {/* 🔗 INTEGRATION LAYER: EventBus + Slots + Navigation */}
+                    {/* NOTA: CapabilityProvider removido - nuevo sistema unificado usa Zustand */}
                       <EventBusProvider debug={process.env.NODE_ENV === 'development'}>
                         <SlotProvider>
                           <NavigationProvider>
@@ -701,7 +702,6 @@ function App() {
                           </NavigationProvider>
                         </SlotProvider>
                       </EventBusProvider>
-                    </CapabilityProvider>
 
                 </AchievementSystemProvider>
               </OfflineMonitorProvider>

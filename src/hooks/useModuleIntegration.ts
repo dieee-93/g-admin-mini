@@ -10,6 +10,7 @@ import { useSlotRegistry } from '@/lib/composition';
 import type { ModuleId } from '@/lib/events/types';
 import type { BusinessCapability } from '@/lib/capabilities/types/BusinessCapabilities';
 
+import { logger } from '@/lib/logging';
 export interface ModuleConfig {
   /** Required capabilities for this module */
   capabilities: BusinessCapability[];
@@ -77,7 +78,7 @@ export function useModuleIntegration(
     const isActive = missingCapabilities.length === 0;
 
     // 🐛 DEBUG: Only log when status actually changes
-    console.log('[useModuleIntegration] ⚙️ Status calculated for', moduleId, {
+    logger.info('App', '[useModuleIntegration] ⚙️ Status calculated for', moduleId, {
       isActive,
       missingCapabilities,
       activeCapabilities: activeCapabilities.length,
@@ -102,7 +103,7 @@ export function useModuleIntegration(
 
   // Register module on mount
   useEffect(() => {
-    console.log('[useModuleIntegration] 🔄 Module registration effect triggered', {
+    logger.info('App', '[useModuleIntegration] 🔄 Module registration effect triggered', {
       moduleId,
       isActive: status.isActive,
       missingCapabilities: status.missingCapabilities,
@@ -142,7 +143,7 @@ export function useModuleIntegration(
 
     // Cleanup function
     return () => {
-      console.log('[useModuleIntegration] 🔄 Module unregistration cleanup triggered', {
+      logger.info('App', '[useModuleIntegration] 🔄 Module unregistration cleanup triggered', {
         moduleId,
         reason: 'Effect cleanup'
       });

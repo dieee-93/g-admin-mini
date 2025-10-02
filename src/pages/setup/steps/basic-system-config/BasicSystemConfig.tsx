@@ -5,6 +5,7 @@ import { Button } from '@/shared/ui/Button';
 import { InputField } from '@/shared/ui/InputField';
 import { CogIcon } from '@heroicons/react/24/outline';
 
+import { logger } from '@/lib/logging';
 interface BasicSystemConfigProps {
   onComplete: () => void;
   onBack: () => void;
@@ -22,10 +23,10 @@ export function BasicSystemConfig({ onComplete, onBack, onSkip }: BasicSystemCon
     
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('System config saved:', { businessName, currency });
+      logger.info('App', 'System config saved:', { businessName, currency });
       onComplete();
     } catch (error) {
-      console.error('Error:', error);
+      logger.error('App', 'Error:', error);
     } finally {
       setIsSaving(false);
     }

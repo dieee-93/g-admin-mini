@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 // MODO Configuration Schema
 const MODOConfigSchema = z.object({
   // API Credentials
@@ -119,7 +120,7 @@ const MODOIntegration: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('MODO connection error:', error);
+      logger.error('App', 'MODO connection error:', error);
       setConnectionStatus('error');
       setBankingInfo({ error: 'Error de conexión con MODO Banking API' });
     } finally {
@@ -130,7 +131,7 @@ const MODOIntegration: React.FC = () => {
   const onSubmit = async (data: MODOConfig) => {
     try {
       // Simulate saving configuration
-      console.log('Saving MODO config:', data);
+      logger.info('App', 'Saving MODO config:', data);
 
       // Emit configuration event
       ModuleEventUtils.analytics.generated('payment-integrations', {
@@ -146,7 +147,7 @@ const MODOIntegration: React.FC = () => {
 
       alert('Configuración de MODO guardada exitosamente');
     } catch (error) {
-      console.error('Error saving MODO config:', error);
+      logger.error('App', 'Error saving MODO config:', error);
     }
   };
 

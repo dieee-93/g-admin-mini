@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 // QR Configuration Schema
 const QRConfigSchema = z.object({
   // Business Information
@@ -176,7 +177,7 @@ const QRInteroperableManager: React.FC = () => {
   const onSubmit = async (data: QRConfig) => {
     try {
       // Simulate saving configuration
-      console.log('Saving QR config:', data);
+      logger.info('App', 'Saving QR config:', data);
 
       // Emit configuration event
       ModuleEventUtils.analytics.generated('payment-integrations', {
@@ -191,7 +192,7 @@ const QRInteroperableManager: React.FC = () => {
 
       alert('Configuración de QR Interoperable guardada exitosamente');
     } catch (error) {
-      console.error('Error saving QR config:', error);
+      logger.error('App', 'Error saving QR config:', error);
     }
   };
 

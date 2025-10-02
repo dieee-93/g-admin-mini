@@ -15,6 +15,7 @@ import {
 } from '@/business-logic/shared/HRCalculations';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 // Enhanced Staff schema with performance calculations
 const StaffSchema = z.object({
   id: z.string().optional(),
@@ -382,12 +383,12 @@ export function StaffFormEnhanced({ employee, onSuccess, onCancel }: StaffFormEn
 
   // Mock CRUD operations (would be replaced with real API calls)
   const createEmployee = async (data: any) => {
-    console.log('Creating employee:', data);
+    logger.info('StaffStore', 'Creating employee:', data);
     return { id: Date.now().toString(), ...data };
   };
 
   const updateEmployee = async (id: string, data: any) => {
-    console.log('Updating employee:', id, data);
+    logger.info('StaffStore', 'Updating employee:', id, data);
     return { id, ...data };
   };
 

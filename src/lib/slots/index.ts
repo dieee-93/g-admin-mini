@@ -4,6 +4,8 @@
  */
 
 // Core del sistema
+import { logger } from '@/lib/logging';
+
 export { slotRegistry, useSlotRegistry, registerModuleSlots } from './SlotRegistry';
 export type { SlotComponent, SlotRegistration, SlotData } from './SlotRegistry';
 
@@ -20,7 +22,7 @@ export * from './utils';
  */
 export function initializeSlotSystem() {
   // Registrar slots básicos del sistema
-  console.log('🎯 Sistema de Slots inicializado');
+  logger.info('App', '🎯 Sistema de Slots inicializado');
 
   // TODO: Registrar slots básicos aquí cuando sea necesario
   // slotRegistry.register('app-header-actions', HeaderActionsComponent, []);

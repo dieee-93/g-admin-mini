@@ -3,6 +3,8 @@
  * Conecta el nuevo sistema de route mapping con el LazyLoadingManager existente
  */
 
+import { logger } from '@/lib/logging';
+
 import { 
   routeToComponentMap, 
   getComponentFromRoute,
@@ -23,7 +25,7 @@ export function getLazyComponentByRoute(route: string): any {
   const componentName = getComponentFromRoute(route as RoutePathAdmin);
   
   if (!componentName) {
-    console.warn(`⚠️ No component mapping found for route: ${route}`);
+    logger.warn('NavigationContext', `⚠️ No component mapping found for route: ${route}`);
     return null;
   }
 
@@ -68,10 +70,10 @@ export function debugRoute(route: string) {
   const metadata = getModuleMetadata(route);
   
   console.group(`🔍 Route Debug: ${route}`);
-  console.log(`Component: ${componentName}`);
-  console.log(`Domain: ${domain}`);
-  console.log(`Preload Config:`, preloadConfig);
-  console.log(`Metadata:`, metadata);
+  logger.info('NavigationContext', `Component: ${componentName}`);
+  logger.info('NavigationContext', `Domain: ${domain}`);
+  logger.info('NavigationContext', `Preload Config:`, preloadConfig);
+  logger.info('NavigationContext', `Metadata:`, metadata);
   console.groupEnd();
   
   return {

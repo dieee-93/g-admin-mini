@@ -4,6 +4,7 @@
 import { lazy } from 'react';
 import type { ComponentType, LazyExoticComponent } from 'react';
 
+import { logger } from '@/lib/logging';
 // Performance monitoring interfaces
 interface LoadingStats {
   module: string;
@@ -130,7 +131,7 @@ export class LazyLoadingManager {
         
         // Retry logic with enhanced protection
         if (moduleState.retryCount < retryCount && this.shouldRetry(error as Error)) {
-          console.warn(`Retrying ${moduleName} load (attempt ${moduleState.retryCount + 1}/${retryCount})`);
+          logger.warn('Performance', `Retrying ${moduleName} load (attempt ${moduleState.retryCount + 1}/${retryCount})`);
 
           // Enhanced backoff to prevent tight loops
           const backoffDelay = Math.min(10000, 1000 * Math.pow(2, moduleState.retryCount)); // Max 10s
@@ -167,14 +168,14 @@ export class LazyLoadingManager {
   public async preloadModule(moduleName: string, priority: 'high' | 'medium' | 'low' = 'medium'): Promise<void> {
     const preloadFunction = this.preloadCache.get(moduleName);
     if (!preloadFunction) {
-      console.warn(`Module ${moduleName} not found in preload cache`);
+      logger.warn('Performance', `Module ${moduleName} not found in preload cache`);
       return;
     }
 
     // Check if module is already loaded
     const moduleState = this.moduleStates.get(moduleName);
     if (moduleState && moduleState.state === 'loaded') {
-      console.log(`Module ${moduleName} already loaded`);
+      logger.info('Performance', `Module ${moduleName} already loaded`);
       return;
     }
 
@@ -191,11 +192,11 @@ export class LazyLoadingManager {
       
       // For high/medium priority, load immediately
       await (preloadFunction as () => Promise<any>)();
-      console.log(`Module ${moduleName} preloaded successfully`);
+      logger.info('Performance', `Module ${moduleName} preloaded successfully`);
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`Failed to preload module ${moduleName}: ${errorMessage}`);
+      logger.error('Performance', `Failed to preload module ${moduleName}: ${errorMessage}`);
     }
   }
 
@@ -365,7 +366,7 @@ export class LazyLoadingManager {
         this.performanceObserver.observe({ entryTypes: ['navigation', 'resource'] });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        console.warn(`Performance observer initialization failed: ${errorMessage}`);
+        logger.error('Performance', `Performance observer initialization failed: ${errorMessage}`);
       }
     }
   }

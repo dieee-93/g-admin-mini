@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { updateSystemSettings, getSystemSettings } from '@/pages/admin/core/settings/services/settingsApi';
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 // Kitchen mode configuration types
 export type KitchenMode = 'auto' | 'online-first' | 'offline-first' | 'offline-only';
 export type EffectiveMode = 'online-active' | 'offline-active' | 'hybrid-active' | 'emergency-offline';
@@ -65,7 +66,7 @@ export function useKitchenConfig(): UseKitchenConfigReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load kitchen configuration';
       setError(errorMessage);
-      console.error('Error loading kitchen config:', err);
+      logger.error('App', 'Error loading kitchen config:', err);
       
       // Fallback to default config
       setConfig(DEFAULT_CONFIG);
@@ -100,7 +101,7 @@ export function useKitchenConfig(): UseKitchenConfigReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update kitchen configuration';
       setError(errorMessage);
-      console.error('Error updating kitchen config:', err);
+      logger.error('App', 'Error updating kitchen config:', err);
       
       notify.error({
         title: 'Configuration Update Failed',
@@ -119,7 +120,7 @@ export function useKitchenConfig(): UseKitchenConfigReturn {
         description: 'Kitchen settings have been reset to defaults'
       });
     } catch (err) {
-      console.error('Error resetting kitchen config:', err);
+      logger.error('App', 'Error resetting kitchen config:', err);
     }
   }, [updateConfig]);
 
@@ -143,10 +144,10 @@ export function useKitchenConfig(): UseKitchenConfigReturn {
           description: 'Kitchen settings have been moved to your user preferences'
         });
         
-        console.log('Kitchen configuration migrated from localStorage to Supabase');
+        logger.info('App', 'Kitchen configuration migrated from localStorage to Supabase');
       }
     } catch (err) {
-      console.error('Error migrating kitchen config from localStorage:', err);
+      logger.error('App', 'Error migrating kitchen config from localStorage:', err);
     }
   }, [updateConfig]);
 

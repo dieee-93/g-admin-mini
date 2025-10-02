@@ -6,6 +6,7 @@
 import { lazy, ComponentType } from 'react';
 import { routeToFileMap, routeToComponentMap } from '@/config/routeMap';
 
+import { logger } from '@/lib/logging';
 // Type for lazy component creation
 type LazyComponentCreator = () => Promise<{ default: ComponentType<any> }>;
 
@@ -25,9 +26,9 @@ export function createLazyComponent(filePath: string): ComponentType<any> {
   const importPath = `@/${filePath}`;
   
   const LazyComponent = lazy(() => {
-    console.log(`🔄 Lazy loading: ${filePath}`);
+    logger.info('NavigationContext', `🔄 Lazy loading: ${filePath}`);
     return import(importPath).catch((error) => {
-      console.error(`❌ Failed to load module: ${filePath}`, error);
+      logger.error('NavigationContext', `❌ Failed to load module: ${filePath}`, error);
       // Fallback to a basic error component
       return import('@/shared/components/ErrorFallback');
     });
@@ -57,7 +58,7 @@ export function createAutoLazyComponents(): Record<string, ComponentType<any>> {
     }
   });
 
-  console.log(`✅ Created ${Object.keys(lazyComponents).length} lazy components`);
+  logger.info('NavigationContext', `✅ Created ${Object.keys(lazyComponents).length} lazy components`);
   
   return lazyComponents;
 }
@@ -76,7 +77,7 @@ export function getLazyComponentByRoute(route: string): ComponentType<any> | nul
   const filePath = routeToFileMap[route as keyof typeof routeToFileMap];
   
   if (!filePath) {
-    console.warn(`⚠️ No file mapping found for route: ${route}`);
+    logger.warn('NavigationContext', `⚠️ No file mapping found for route: ${route}`);
     return null;
   }
 
@@ -90,7 +91,7 @@ export function preloadComponent(route: string): Promise<void> {
   const filePath = routeToFileMap[route as keyof typeof routeToFileMap];
   
   if (!filePath) {
-    console.warn(`⚠️ Cannot preload - no file mapping for route: ${route}`);
+    logger.warn('NavigationContext', `⚠️ Cannot preload - no file mapping for route: ${route}`);
     return Promise.resolve();
   }
 
@@ -98,10 +99,10 @@ export function preloadComponent(route: string): Promise<void> {
   
   return import(importPath)
     .then(() => {
-      console.log(`✅ Preloaded: ${filePath}`);
+      logger.info('NavigationContext', `✅ Preloaded: ${filePath}`);
     })
     .catch((error) => {
-      console.error(`❌ Failed to preload: ${filePath}`, error);
+      logger.error('NavigationContext', `❌ Failed to preload: ${filePath}`, error);
     });
 }
 
@@ -115,7 +116,7 @@ export function preloadCriticalRoutes(): Promise<void[]> {
     '/admin/operations'
   ];
 
-  console.log('🚀 Preloading critical routes...');
+  logger.info('NavigationContext', '🚀 Preloading critical routes...');
   
   return Promise.all(
     criticalRoutes.map(route => preloadComponent(route))

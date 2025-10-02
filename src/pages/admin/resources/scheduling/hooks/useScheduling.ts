@@ -37,6 +37,7 @@ import type {
 } from '../types/schedulingTypes';
 import { shiftsApi, timeOffApi, schedulesApi } from '../services/schedulingApi';
 
+import { logger } from '@/lib/logging';
 /**
  * Unified scheduling state using new types
  */
@@ -272,7 +273,7 @@ export function useScheduling(): UnifiedSchedulingState & UnifiedSchedulingActio
   const optimizeSchedule = useCallback(async (dateRange: DateRange, constraints?: any): Promise<void> => {
     try {
       // TODO: Implement schedule optimization using calendar engine
-      console.log('Optimizing schedule for range', dateRange, 'with constraints', constraints);
+      logger.info('API', 'Optimizing schedule for range', dateRange, 'with constraints', constraints);
       // This would integrate with the UnifiedCalendarEngine's optimization features
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Failed to optimize schedule');
@@ -466,7 +467,7 @@ export function useScheduling(): UnifiedSchedulingState & UnifiedSchedulingActio
       const dashboard = await getDashboard(state.selectedDateRange.startDate);
       setState(prev => ({ ...prev, dashboard }));
     } catch (error) {
-      console.error('Failed to refresh dashboard:', error);
+      logger.error('API', 'Failed to refresh dashboard:', error);
     }
   }, [getDashboard, state.selectedDateRange.startDate]);
 

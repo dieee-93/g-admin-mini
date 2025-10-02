@@ -3,6 +3,7 @@ import type { MaterialDemand, PredictiveAnalyticsConfig } from '../types';
 import { generateMockPredictiveData } from '@/pages/admin/core/dashboard/data/mockData';
 import { EventBus } from '@/lib/events';
 
+import { logger } from '@/lib/logging';
 export const usePredictiveAnalytics = () => {
   // State
   const [materials, setMaterials] = useState<MaterialDemand[]>([]);
@@ -49,7 +50,7 @@ export const usePredictiveAnalytics = () => {
         setSelectedMaterial(mockMaterials[0]);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`Error loading predictive analytics data: ${errorMessage}`);
+        logger.error('MaterialsStore', `Error loading predictive analytics data: ${errorMessage}`);
       } finally {
         setLoading(false);
       }
@@ -133,7 +134,7 @@ export const usePredictiveAnalytics = () => {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`Error running predictive analysis: ${errorMessage}`);
+      logger.error('MaterialsStore', `Error running predictive analysis: ${errorMessage}`);
     } finally {
       setIsRunningAnalysis(false);
     }

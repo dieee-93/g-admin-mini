@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 
+import { logger } from '@/lib/logging';
 export interface SupabaseCredentials {
   url: string;
   anonKey: string;
@@ -58,7 +59,7 @@ export function useSupabaseConnection({
   }, []);
 
   const handleConnect = useCallback(() => {
-    console.log('🔌 Iniciando conexión a Supabase...', { 
+    logger.info('App', '🔌 Iniciando conexión a Supabase...', { 
       supabaseUrl, 
       supabaseAnonKeyLength: supabaseAnonKey.length 
     });
@@ -68,17 +69,17 @@ export function useSupabaseConnection({
     // Validaciones
     const validationError = validateCredentials(supabaseUrl, supabaseAnonKey);
     if (validationError) {
-      console.warn('❌ Validación fallida:', validationError);
+      logger.error('App', '❌ Validación fallida:', validationError);
       setError(validationError);
       return;
     }
 
-    console.log('✅ Validaciones pasadas, llamando onConnectionSuccess...');
+    logger.info('App', '✅ Validaciones pasadas, llamando onConnectionSuccess...');
     onConnectionSuccess(supabaseUrl, supabaseAnonKey);
   }, [supabaseUrl, supabaseAnonKey, onConnectionSuccess, validateCredentials]);
 
   const handleUseDemo = useCallback(() => {
-    console.log('🎮 Usando configuración de demo...');
+    logger.info('App', '🎮 Usando configuración de demo...');
     setError(null);
     
     // Usar las variables de entorno o datos de demo
@@ -86,14 +87,14 @@ export function useSupabaseConnection({
     const demoKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlbW8tcHJvamVjdCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQ1MDA0ODAwLCJleHAiOjE5NjAzODA4MDB9.demo-key-for-testing-purposes-only';
     
-    console.log('🔧 Configuración de demo:', { demoUrl, demoKeyLength: demoKey.length });
+    logger.info('App', '🔧 Configuración de demo:', { demoUrl, demoKeyLength: demoKey.length });
     
     setSupabaseUrl(demoUrl);
     setSupabaseAnonKey(demoKey);
     
     // Auto-conectar después de un momento
     setTimeout(() => {
-      console.log('⏰ Auto-conectando con demo data...');
+      logger.info('App', '⏰ Auto-conectando con demo data...');
       onConnectionSuccess(demoUrl, demoKey);
     }, 500);
   }, [onConnectionSuccess]);

@@ -9,6 +9,7 @@ import eventBus from '@/lib/events/EventBus';
 import type { CapabilityActivationEvent, MasteryAchievementUnlockedEvent } from '@/pages/admin/gamification/achievements/types';
 import type { CreateAlertInput } from '@/shared/alerts/types';
 
+import { logger } from '@/lib/logging';
 // Función para crear alerta desde fuera del contexto de React
 declare global {
   interface Window {
@@ -37,7 +38,7 @@ export class AchievementNotificationService {
    */
   public initialize(): void {
     if (this.isInitialized) {
-      console.warn('[AchievementNotifications] Servicio ya inicializado');
+      logger.warn('CapabilitySystem', '[AchievementNotifications] Servicio ya inicializado');
       return;
     }
 
@@ -49,10 +50,10 @@ export class AchievementNotificationService {
       eventBus.on('achievement:unlocked' as any, this.handleMasteryAchievementUnlocked.bind(this));
 
       this.isInitialized = true;
-      console.log('[AchievementNotifications] ✅ Servicio de notificaciones de logros inicializado');
+      logger.info('CapabilitySystem', '[AchievementNotifications] ✅ Servicio de notificaciones de logros inicializado');
 
     } catch (error) {
-      console.error('[AchievementNotifications] ❌ Error inicializando servicio:', error);
+      logger.error('CapabilitySystem', '[AchievementNotifications] ❌ Error inicializando servicio:', error);
     }
   }
 
@@ -63,7 +64,7 @@ export class AchievementNotificationService {
     try {
       const capabilityEvent = event as CapabilityActivationEvent;
       
-      console.log('[AchievementNotifications] 🎯 Capacidad activada:', capabilityEvent.capabilityId);
+      logger.info('CapabilitySystem', '[AchievementNotifications] 🎯 Capacidad activada:', capabilityEvent.capabilityId);
 
       const alertInput: CreateAlertInput = {
         type: 'achievement',
@@ -101,7 +102,7 @@ export class AchievementNotificationService {
       await this.createAlert(alertInput);
 
     } catch (error) {
-      console.error('[AchievementNotifications] Error procesando activación de capacidad:', error);
+      logger.error('CapabilitySystem', '[AchievementNotifications] Error procesando activación de capacidad:', error);
     }
   }
 
@@ -112,7 +113,7 @@ export class AchievementNotificationService {
     try {
       const masteryEvent = event as MasteryAchievementUnlockedEvent;
       
-      console.log('[AchievementNotifications] 🏆 Logro de maestría desbloqueado:', masteryEvent.achievementId);
+      logger.info('CapabilitySystem', '[AchievementNotifications] 🏆 Logro de maestría desbloqueado:', masteryEvent.achievementId);
 
       const alertInput: CreateAlertInput = {
         type: 'achievement',
@@ -151,7 +152,7 @@ export class AchievementNotificationService {
       await this.createAlert(alertInput);
 
     } catch (error) {
-      console.error('[AchievementNotifications] Error procesando logro de maestría:', error);
+      logger.error('CapabilitySystem', '[AchievementNotifications] Error procesando logro de maestría:', error);
     }
   }
 
@@ -193,10 +194,10 @@ export class AchievementNotificationService {
       });
       localStorage.setItem('pendingAchievementAlerts', JSON.stringify(pendingAlerts));
       
-      console.log('[AchievementNotifications] 📌 Alerta guardada para procesamiento posterior');
+      logger.info('CapabilitySystem', '[AchievementNotifications] 📌 Alerta guardada para procesamiento posterior');
 
     } catch (error) {
-      console.error('[AchievementNotifications] Error creando alerta:', error);
+      logger.error('CapabilitySystem', '[AchievementNotifications] Error creando alerta:', error);
     }
   }
 
@@ -211,13 +212,13 @@ export class AchievementNotificationService {
         return;
       }
 
-      console.log(`[AchievementNotifications] 📋 Procesando ${pendingAlerts.length} alertas pendientes`);
+      logger.info('CapabilitySystem', `[AchievementNotifications] 📋 Procesando ${pendingAlerts.length} alertas pendientes`);
 
       for (const alertData of pendingAlerts) {
         try {
           await createAlertFn(alertData);
         } catch (error) {
-          console.error('[AchievementNotifications] Error procesando alerta pendiente:', error);
+          logger.error('CapabilitySystem', '[AchievementNotifications] Error procesando alerta pendiente:', error);
         }
       }
 
@@ -225,7 +226,7 @@ export class AchievementNotificationService {
       localStorage.removeItem('pendingAchievementAlerts');
 
     } catch (error) {
-      console.error('[AchievementNotifications] Error procesando alertas pendientes:', error);
+      logger.error('CapabilitySystem', '[AchievementNotifications] Error procesando alertas pendientes:', error);
     }
   }
 
@@ -234,7 +235,7 @@ export class AchievementNotificationService {
    */
   public destroy(): void {
     this.isInitialized = false;
-    console.log('[AchievementNotifications] 🗑️ Servicio destruido');
+    logger.info('CapabilitySystem', '[AchievementNotifications] 🗑️ Servicio destruido');
   }
 }
 

@@ -9,6 +9,7 @@ import {
 import { Icon } from '@/shared/ui';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 const membershipSchema = z.object({
   memberName: z.string().min(1, 'Nombre del miembro requerido'),
   memberEmail: z.string().email('Email válido requerido'),
@@ -183,7 +184,7 @@ export const MembershipFormEnhanced: React.FC = () => {
 
   const handleFormSubmit = async (data: MembershipFormData) => {
     try {
-      console.log('Creating membership:', data);
+      logger.info('App', 'Creating membership:', data);
 
       const membershipId = `mem_${Date.now()}`;
       const customerId = `cust_${Date.now()}`;
@@ -203,7 +204,7 @@ export const MembershipFormEnhanced: React.FC = () => {
         retentionProbability: membershipMetrics.retentionProbability
       });
 
-      console.log(`[Membership] Member created: ${membershipId}`);
+      logger.info('App', `[Membership] Member created: ${membershipId}`);
 
       // If auto-renewal, create billing subscription
       if (data.autoRenewal && data.fees.monthlyFee > 0) {
@@ -220,7 +221,7 @@ export const MembershipFormEnhanced: React.FC = () => {
       }
 
     } catch (error) {
-      console.error('Error creating membership:', error);
+      logger.error('App', 'Error creating membership:', error);
     }
   };
 

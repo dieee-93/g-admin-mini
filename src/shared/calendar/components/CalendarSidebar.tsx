@@ -20,6 +20,7 @@ import {
 import { Checkbox } from '@chakra-ui/react';
 import { UnifiedCalendarEngine } from '../engine/UnifiedCalendarEngine';
 import { BaseCalendarAdapter } from '../adapters/BaseCalendarAdapter';
+import { logger } from '@/lib/logging';
 import {
   CalendarConfig,
   DateRange,
@@ -187,7 +188,7 @@ export function CalendarSidebar({
     actions.push({
       label: 'New Booking',
       icon: 'Plus',
-      action: () => console.log('New booking'),
+      action: () => logger.info('App', 'New booking'),
       variant: 'solid',
       colorPalette: 'blue'
     });
@@ -196,7 +197,7 @@ export function CalendarSidebar({
       actions.push({
         label: 'Generate Report',
         icon: 'FileText',
-        action: () => console.log('Generate report'),
+        action: () => logger.info('App', 'Generate report'),
         variant: 'outline'
       });
     }
@@ -205,7 +206,7 @@ export function CalendarSidebar({
       actions.push({
         label: 'Export Data',
         icon: 'Download',
-        action: () => console.log('Export data'),
+        action: () => logger.info('App', 'Export data'),
         variant: 'outline'
       });
     }
@@ -215,7 +216,7 @@ export function CalendarSidebar({
         {
           label: 'Auto Schedule',
           icon: 'Zap',
-          action: () => console.log('Auto schedule'),
+          action: () => logger.info('App', 'Auto schedule'),
           variant: 'outline',
           colorPalette: 'purple'
         },
@@ -224,14 +225,13 @@ export function CalendarSidebar({
           icon: 'Users',
           action: () => console.log('Coverage report'),
           variant: 'ghost'
-        }
-      );
+        });
     } else if (businessModel === 'medical_appointments') {
       actions.push(
         {
           label: 'Patient List',
           icon: 'Users',
-          action: () => console.log('Patient list'),
+          action: () => logger.info('App', 'Patient list'),
           variant: 'outline',
           colorPalette: 'green'
         },
@@ -240,8 +240,7 @@ export function CalendarSidebar({
           icon: 'Bell',
           action: () => console.log('Send reminders'),
           variant: 'ghost'
-        }
-      );
+        });
     }
 
     return actions;

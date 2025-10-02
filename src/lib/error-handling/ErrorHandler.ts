@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logging';
+
 export enum ErrorType {
   VALIDATION = 'validation',
   NETWORK = 'network',
@@ -116,16 +118,16 @@ export class ErrorHandler {
 
     switch (error.severity) {
       case ErrorSeverity.CRITICAL:
-        console.error('🚨 CRITICAL ERROR:', logData, error.stack);
+        logger.error('App', '🚨 CRITICAL ERROR:', logData, error.stack);
         break;
       case ErrorSeverity.HIGH:
-        console.error('❌ HIGH ERROR:', logData);
+        logger.error('App', '❌ HIGH ERROR:', logData);
         break;
       case ErrorSeverity.MEDIUM:
-        console.warn('⚠️ MEDIUM ERROR:', logData);
+        logger.error('App', '⚠️ MEDIUM ERROR:', logData);
         break;
       case ErrorSeverity.LOW:
-        console.info('ℹ️ LOW ERROR:', logData);
+        logger.error('App', 'ℹ️ LOW ERROR:', logData);
         break;
     }
   }
@@ -151,7 +153,7 @@ export class ErrorHandler {
       
       localStorage.setItem('error-logs', JSON.stringify(logs));
     } catch (e) {
-      console.error('Failed to send error to monitoring:', e);
+      logger.error('App', 'Failed to send error to monitoring:', e);
     }
   }
 

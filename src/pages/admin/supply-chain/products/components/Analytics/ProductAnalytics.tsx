@@ -28,6 +28,7 @@ import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services
 import { FinancialCalculations, QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
+import { logger } from '@/lib/logging';
 interface ProductData {
   id: string;
   name: string;
@@ -147,7 +148,7 @@ export function ProductAnalyticsEnhanced() {
       });
 
     } catch (error) {
-      console.error('Error generating product analytics:', error);
+      logger.error('App', 'Error generating product analytics:', error);
     } finally {
       setLoading(false);
     }

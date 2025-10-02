@@ -1,6 +1,7 @@
 import { createSystem, defaultConfig, defineConfig, mergeConfigs } from '@chakra-ui/react'
 import { availableThemes } from '@/store/themeStore'
 
+import { logger } from '@/lib/logging';
 /**
  * Get the actual color values from our theme definitions
  * Maps theme IDs to their actual hex values

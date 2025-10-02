@@ -28,6 +28,7 @@ import { calculateRecipeCost } from '@/services/recipe/api/recipeApi';
 import type { Recipe } from '@/services/recipe/types';
 import { CardWrapper, Icon } from '@/shared/ui';
 
+import { logger } from '@/lib/logging';
 interface SmartCostCalculatorProps {
   recipe?: Recipe;
   onCostCalculated?: (cost: number) => void;
@@ -101,7 +102,7 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
         onCostCalculated?.(mockBreakdown.totalCost);
       }
     } catch (err) {
-      console.error('Error calculating cost:', err);
+      logger.error('App', 'Error calculating cost:', err);
       setError('Failed to calculate recipe cost');
     } finally {
       setLoading(false);

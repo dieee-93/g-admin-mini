@@ -3,6 +3,7 @@
 
 import { SecureLogger } from '../utils/SecureLogger';
 
+import { logger } from '@/lib/logging';
 export interface LeaderElectionConfig {
   channelName: string;
   instanceId: string;
@@ -64,7 +65,7 @@ export class BrowserLeaderElection {
       ...config
     };
 
-    console.log(`[DEBUG] ${this.config.instanceId}: Initializing with priority ${this.config.priority || 'auto'}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Initializing with priority ${this.config.priority || 'auto'}`);
 
     this.broadcastChannel = new BroadcastChannel(this.config.channelName);
     this.setupMessageHandling();
@@ -201,7 +202,7 @@ export class BrowserLeaderElection {
     this.connectedInstances.add(message.senderId);
     this.instanceLastSeen.set(message.senderId, Date.now());
     
-    console.log(`[DEBUG] ${this.config.instanceId}: Received ${message.type} from ${message.senderId}, connected instances: [${Array.from(this.connectedInstances).join(', ')}], wasNew: ${wasNewInstance}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Received ${message.type} from ${message.senderId}, connected instances: [${Array.from(this.connectedInstances).join(', ')}], wasNew: ${wasNewInstance}`);
     
     SecureLogger.debug('EventBus', 'Received leader election message', {
       type: message.type,
@@ -219,7 +220,7 @@ export class BrowserLeaderElection {
         break;
       
       case 'COORDINATOR':
-        console.log(`[DEBUG] ${this.config.instanceId}: Processing COORDINATOR message from ${message.senderId} with priority ${message.priority}`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Processing COORDINATOR message from ${message.senderId} with priority ${message.priority}`);
         this.handleCoordinatorMessage(message);
         break;
       
@@ -245,10 +246,10 @@ export class BrowserLeaderElection {
     const myPriority = this.config.priority || this.getInstancePriority(this.config.instanceId);
     const senderPriority = message.priority || this.getSenderPriority(message.senderId);
 
-    console.log(`[DEBUG] ${this.config.instanceId}: Election comparison - my priority: ${myPriority}, sender priority: ${senderPriority}, current leader: ${this.currentLeader}, am I leader: ${this.isCurrentlyLeader}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Election comparison - my priority: ${myPriority}, sender priority: ${senderPriority}, current leader: ${this.currentLeader}, am I leader: ${this.isCurrentlyLeader}`);
 
     if (myPriority > senderPriority) {
-      console.log(`[DEBUG] ${this.config.instanceId}: I have higher priority, responding with OK and preparing to take leadership`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: I have higher priority, responding with OK and preparing to take leadership`);
       
       // We have higher priority, respond with OK
       this.sendMessage({
@@ -260,9 +261,9 @@ export class BrowserLeaderElection {
 
       // Standard Bully Algorithm: Just respond OK, don't become leader yet
       // Leaders are only elected through their own election process
-      console.log(`[DEBUG] ${this.config.instanceId}: Responded OK, may start own election later if needed`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Responded OK, may start own election later if needed`);
     } else {
-      console.log(`[DEBUG] ${this.config.instanceId}: Sender has higher priority (${senderPriority} > ${myPriority}), not responding`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Sender has higher priority (${senderPriority} > ${myPriority}), not responding`);
     }
     // If sender has higher priority, we don't respond (they should become leader)
   }
@@ -292,24 +293,24 @@ export class BrowserLeaderElection {
   private handleCoordinatorMessage(message: LeaderElectionMessage): void {
     const previousLeader = this.currentLeader;
     
-    console.log(`[DEBUG] ${this.config.instanceId}: Received coordinator message from ${message.senderId}, previousLeader: ${previousLeader}, wasLeader: ${this.isCurrentlyLeader}, electionInProgress: ${this.electionInProgress}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Received coordinator message from ${message.senderId}, previousLeader: ${previousLeader}, wasLeader: ${this.isCurrentlyLeader}, electionInProgress: ${this.electionInProgress}`);
     
     // Check if we have higher priority than the announcing leader
     const myPriority = this.config.priority || this.getInstancePriority(this.config.instanceId);
     const announcingLeaderPriority = message.priority || this.getSenderPriority(message.senderId);
     
     if (myPriority > announcingLeaderPriority) {
-      console.log(`[DEBUG] ${this.config.instanceId}: I have higher priority (${myPriority}) than announcing leader (${announcingLeaderPriority}), challenging`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: I have higher priority (${myPriority}) than announcing leader (${announcingLeaderPriority}), challenging`);
       
       // Cancel current election if in progress to start challenge
       if (this.electionInProgress) {
-        console.log(`[DEBUG] ${this.config.instanceId}: Canceling current election to challenge lower priority leader`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Canceling current election to challenge lower priority leader`);
         this.cancelElection();
       }
       
       // Challenge the leadership immediately - no delays
       if (!this.isDestroyed) {
-        console.log(`[DEBUG] ${this.config.instanceId}: Starting immediate challenge election against lower priority leader ${message.senderId}`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Starting immediate challenge election against lower priority leader ${message.senderId}`);
         this.startElection();
       }
       return;
@@ -319,7 +320,7 @@ export class BrowserLeaderElection {
     
     // If we were the leader, stop being leader
     if (this.isCurrentlyLeader) {
-      console.log(`[DEBUG] ${this.config.instanceId}: Stepping down from leadership`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Stepping down from leadership`);
       this.stopBeingLeader();
     }
 
@@ -338,7 +339,7 @@ export class BrowserLeaderElection {
 
     // Notify callbacks - only if we're not the new leader
     if (message.senderId !== this.config.instanceId) {
-      console.log(`[DEBUG] ${this.config.instanceId}: Notifying ${this.leadershipCallbacks.length} callbacks about leadership change (new leader: ${message.senderId})`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Notifying ${this.leadershipCallbacks.length} callbacks about leadership change (new leader: ${message.senderId})`);
       this.notifyLeadershipChange(false, previousLeader);
     }
   }
@@ -350,7 +351,7 @@ export class BrowserLeaderElection {
     const myPriority = this.config.priority || this.getInstancePriority(this.config.instanceId);
     const senderPriority = message.priority || this.getSenderPriority(message.senderId);
     
-    console.log(`[DEBUG] ${this.config.instanceId}: Received HEARTBEAT from ${message.senderId}, currentLeader is ${this.currentLeader}, senderPriority: ${senderPriority}, myPriority: ${myPriority}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Received HEARTBEAT from ${message.senderId}, currentLeader is ${this.currentLeader}, senderPriority: ${senderPriority}, myPriority: ${myPriority}`);
     
     // Handle heartbeat from known current leader
     if (message.senderId === this.currentLeader) {
@@ -359,28 +360,28 @@ export class BrowserLeaderElection {
       
       // Check if we have higher priority than the current leader
       if (myPriority > senderPriority && !this.isCurrentlyLeader) {
-        console.log(`[DEBUG] ${this.config.instanceId}: Detected leader ${message.senderId} with lower priority (${senderPriority} < ${myPriority}), checking if challenge needed`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Detected leader ${message.senderId} with lower priority (${senderPriority} < ${myPriority}), checking if challenge needed`);
         
         // Only start challenge if we're not already in an election
         // This prevents the infinite loop of cancelling and restarting elections
         if (!this.electionInProgress) {
-          console.log(`[DEBUG] ${this.config.instanceId}: Starting challenge election against lower priority leader`);
+          logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Starting challenge election against lower priority leader`);
           if (!this.isDestroyed) {
             this.startElection();
           }
         } else {
-          console.log(`[DEBUG] ${this.config.instanceId}: Already in election process, not restarting challenge (this prevents infinite loops)`);
+          logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Already in election process, not restarting challenge (this prevents infinite loops)`);
         }
       } else {
-        console.log(`[DEBUG] ${this.config.instanceId}: Not challenging leader - myPriority: ${myPriority}, senderPriority: ${senderPriority}, isCurrentlyLeader: ${this.isCurrentlyLeader}`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Not challenging leader - myPriority: ${myPriority}, senderPriority: ${senderPriority}, isCurrentlyLeader: ${this.isCurrentlyLeader}`);
       }
     }
     // Handle heartbeat from potential competing leader (split-brain resolution)
     else if (this.isCurrentlyLeader && message.senderId !== this.config.instanceId) {
-      console.log(`[DEBUG] ${this.config.instanceId}: Received heartbeat from competing leader ${message.senderId} (priority ${senderPriority}) while I am leader (priority ${myPriority})`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Received heartbeat from competing leader ${message.senderId} (priority ${senderPriority}) while I am leader (priority ${myPriority})`);
       
       if (senderPriority > myPriority) {
-        console.log(`[DEBUG] ${this.config.instanceId}: Competing leader has higher priority, stepping down`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Competing leader has higher priority, stepping down`);
         
         // Step down immediately - the other leader has higher priority
         this.stopBeingLeader();
@@ -391,7 +392,7 @@ export class BrowserLeaderElection {
         // Notify about leadership change
         this.notifyLeadershipChange(false, this.config.instanceId);
       } else {
-        console.log(`[DEBUG] ${this.config.instanceId}: I have higher priority than competing leader, continuing as leader`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: I have higher priority than competing leader, continuing as leader`);
         // Send COORDINATOR message to assert dominance
         this.sendMessage({
           type: 'COORDINATOR',
@@ -403,7 +404,7 @@ export class BrowserLeaderElection {
     }
     // Handle heartbeat from unknown leader when we're not leader  
     else if (!this.isCurrentlyLeader && message.senderId !== this.currentLeader) {
-      console.log(`[DEBUG] ${this.config.instanceId}: Received heartbeat from unknown leader ${message.senderId} (priority ${senderPriority}), considering as current leader`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Received heartbeat from unknown leader ${message.senderId} (priority ${senderPriority}), considering as current leader`);
       
       // Accept this as the new leader if we don't have one, or if this one has higher priority
       if (!this.currentLeader || senderPriority > (this.getSenderPriority(this.currentLeader) || 0)) {
@@ -418,7 +419,7 @@ export class BrowserLeaderElection {
         try {
           callback(message.senderId);
         } catch (error) {
-          console.error(`[DEBUG] ${this.config.instanceId}: Error in heartbeat callback:`, error);
+          logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Error in heartbeat callback:`, error);
         }
       });
   }
@@ -448,7 +449,7 @@ export class BrowserLeaderElection {
    * Handle SHUTDOWN message - clean up instance immediately
    */
   private handleShutdownMessage(message: LeaderElectionMessage): void {
-    console.log(`[DEBUG] ${this.config.instanceId}: Received shutdown notification from ${message.senderId}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Received shutdown notification from ${message.senderId}`);
     
     // Remove the instance from tracking
     this.connectedInstances.delete(message.senderId);
@@ -473,7 +474,7 @@ export class BrowserLeaderElection {
       try {
         callback(message.senderId);
       } catch (error) {
-        console.error(`[DEBUG] ${this.config.instanceId}: Error in shutdown callback for ${message.senderId}:`, error);
+        logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Error in shutdown callback for ${message.senderId}:`, error);
       }
     });
     
@@ -498,15 +499,15 @@ export class BrowserLeaderElection {
     // Uniform delay for all instances - no priority-based timing complications
     const delay = isTest ? 200 : 1000;
     
-    console.log(`[DEBUG] ${this.config.instanceId}: Scheduling initial election in ${delay}ms`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Scheduling initial election in ${delay}ms`);
     
     this.initialElectionTimeout = window.setTimeout(() => {
-      console.log(`[DEBUG] ${this.config.instanceId}: Initial election timeout fired`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Initial election timeout fired`);
       if (!this.isDestroyed && !this.currentLeader && !this.electionInProgress) {
-        console.log(`[DEBUG] ${this.config.instanceId}: Starting initial election`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Starting initial election`);
         this.startElection();
       } else {
-        console.log(`[DEBUG] ${this.config.instanceId}: Skipping initial election - leader: ${this.currentLeader}, election in progress: ${this.electionInProgress}, destroyed: ${this.isDestroyed}`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Skipping initial election - leader: ${this.currentLeader}, election in progress: ${this.electionInProgress}, destroyed: ${this.isDestroyed}`);
       }
     }, delay);
   }
@@ -516,7 +517,7 @@ export class BrowserLeaderElection {
    */
   private startElection(): void {
     if (this.electionInProgress || this.isDestroyed) {
-      console.log(`[DEBUG] ${this.config.instanceId}: Cannot start election - already in progress: ${this.electionInProgress}, destroyed: ${this.isDestroyed}`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Cannot start election - already in progress: ${this.electionInProgress}, destroyed: ${this.isDestroyed}`);
       return;
     }
 
@@ -528,7 +529,7 @@ export class BrowserLeaderElection {
     this.electionCount++;
 
     const myPriority = this.config.priority || this.getInstancePriority(this.config.instanceId);
-    console.log(`[DEBUG] ${this.config.instanceId}: Starting election with priority ${myPriority}, participationCount: ${this.electionCount}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Starting election with priority ${myPriority}, participationCount: ${this.electionCount}`);
 
     SecureLogger.info('EventBus', 'Starting leader election', {
       instanceId: this.config.instanceId,
@@ -548,9 +549,9 @@ export class BrowserLeaderElection {
                    typeof window !== 'undefined' && window.location?.hostname === 'localhost';
     const electionTimeout = isTest ? Math.min(this.config.electionTimeout, 2000) : this.config.electionTimeout;
     
-    console.log(`[DEBUG] ${this.config.instanceId}: Setting election timeout for ${electionTimeout}ms`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Setting election timeout for ${electionTimeout}ms`);
     this.pendingElectionTimeout = window.setTimeout(() => {
-      console.log(`[DEBUG] ${this.config.instanceId}: Election timeout fired, calling completeElection()`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Election timeout fired, calling completeElection()`);
       this.completeElection();
     }, electionTimeout);
   }
@@ -559,13 +560,13 @@ export class BrowserLeaderElection {
    * Complete election process
    */
   private completeElection(): void {
-    console.log(`[DEBUG] ${this.config.instanceId}: completeElection() called, electionInProgress: ${this.electionInProgress}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: completeElection() called, electionInProgress: ${this.electionInProgress}`);
     if (!this.electionInProgress) {
-      console.log(`[DEBUG] ${this.config.instanceId}: Election not in progress, skipping completion`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Election not in progress, skipping completion`);
       return;
     }
 
-    console.log(`[DEBUG] ${this.config.instanceId}: Completing election - received ${this.receivedElectionResponses.size} responses from: [${Array.from(this.receivedElectionResponses).join(', ')}]`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Completing election - received ${this.receivedElectionResponses.size} responses from: [${Array.from(this.receivedElectionResponses).join(', ')}]`);
 
     this.electionInProgress = false;
     
@@ -576,7 +577,7 @@ export class BrowserLeaderElection {
 
     // Standard Bully Algorithm: If no responses received, become leader immediately
     if (this.receivedElectionResponses.size === 0) {
-      console.log(`[DEBUG] ${this.config.instanceId}: No responses received, becoming leader`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: No responses received, becoming leader`);
       this.becomeLeader();
     } else {
       // Check if any responder has higher priority than us
@@ -585,17 +586,17 @@ export class BrowserLeaderElection {
       
       for (const responderId of this.receivedElectionResponses) {
         const responderPriority = this.instancePriorities.get(responderId) || this.getSenderPriority(responderId);
-        console.log(`[DEBUG] ${this.config.instanceId}: Checking responder ${responderId} with priority ${responderPriority} vs my priority ${myPriority}`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Checking responder ${responderId} with priority ${responderPriority} vs my priority ${myPriority}`);
         
         if (responderPriority > myPriority) {
           hasHigherPriorityResponder = true;
-          console.log(`[DEBUG] ${this.config.instanceId}: Found higher priority responder: ${responderId} (${responderPriority})`);
+          logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Found higher priority responder: ${responderId} (${responderPriority})`);
           break;
         }
       }
       
       if (hasHigherPriorityResponder) {
-        console.log(`[DEBUG] ${this.config.instanceId}: Responses from higher priority instances, waiting for coordinator`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Responses from higher priority instances, waiting for coordinator`);
         
         SecureLogger.debug('EventBus', 'Election completed - waiting for higher priority instance', {
           responses: this.receivedElectionResponses.size,
@@ -605,13 +606,13 @@ export class BrowserLeaderElection {
         // Wait for COORDINATOR message, or restart election if it doesn't come
         setTimeout(() => {
           if (!this.currentLeader && !this.isDestroyed) {
-            console.log(`[DEBUG] ${this.config.instanceId}: No coordinator message received, restarting election`);
+            logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: No coordinator message received, restarting election`);
             SecureLogger.warn('EventBus', 'No coordinator message received, restarting election');
             this.startElection();
           }
         }, this.config.electionTimeout);
       } else {
-        console.log(`[DEBUG] ${this.config.instanceId}: All responders have lower priority, becoming leader`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: All responders have lower priority, becoming leader`);
         this.becomeLeader();
       }
     }
@@ -622,17 +623,17 @@ export class BrowserLeaderElection {
    */
   private cancelElection(): void {
     if (this.electionInProgress) {
-      console.log(`[DEBUG] ${this.config.instanceId}: Canceling election, was in progress: ${this.electionInProgress}, had timeout: ${!!this.pendingElectionTimeout}`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Canceling election, was in progress: ${this.electionInProgress}, had timeout: ${!!this.pendingElectionTimeout}`);
       this.electionInProgress = false;
       this.receivedElectionResponses.clear();
       
       if (this.pendingElectionTimeout) {
-        console.log(`[DEBUG] ${this.config.instanceId}: Clearing pending election timeout`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Clearing pending election timeout`);
         clearTimeout(this.pendingElectionTimeout);
         this.pendingElectionTimeout = undefined;
       }
     } else {
-      console.log(`[DEBUG] ${this.config.instanceId}: cancelElection() called but no election was in progress`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: cancelElection() called but no election was in progress`);
     }
   }
 
@@ -640,15 +641,15 @@ export class BrowserLeaderElection {
    * Become the leader
    */
   private becomeLeader(): void {
-    console.log(`[DEBUG] ${this.config.instanceId}: becomeLeader() called - current state: isCurrentlyLeader=${this.isCurrentlyLeader}, isDestroyed=${this.isDestroyed}, currentLeader=${this.currentLeader}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: becomeLeader() called - current state: isCurrentlyLeader=${this.isCurrentlyLeader}, isDestroyed=${this.isDestroyed}, currentLeader=${this.currentLeader}`);
     
     if (this.isCurrentlyLeader || this.isDestroyed) {
-      console.log(`[DEBUG] ${this.config.instanceId}: Cannot become leader - already leader: ${this.isCurrentlyLeader}, destroyed: ${this.isDestroyed}`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Cannot become leader - already leader: ${this.isCurrentlyLeader}, destroyed: ${this.isDestroyed}`);
       return;
     }
 
     const previousLeader = this.currentLeader || this.lastKnownLeader;
-    console.log(`[DEBUG] ${this.config.instanceId}: BECOMING LEADER - setting isCurrentlyLeader=true, previousLeader=${previousLeader}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: BECOMING LEADER - setting isCurrentlyLeader=true, previousLeader=${previousLeader}`);
     
     this.isCurrentlyLeader = true;
     this.currentLeader = this.config.instanceId;
@@ -658,7 +659,7 @@ export class BrowserLeaderElection {
     this.lastKnownLeader = undefined;
 
     const myPriority = this.config.priority || this.getInstancePriority(this.config.instanceId);
-    console.log(`[DEBUG] ${this.config.instanceId}: NOW LEADER with priority ${myPriority}, totalElections: ${this.electionCount}, isCurrentlyLeader=${this.isCurrentlyLeader}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: NOW LEADER with priority ${myPriority}, totalElections: ${this.electionCount}, isCurrentlyLeader=${this.isCurrentlyLeader}`);
 
     // Announce leadership
     this.sendMessage({
@@ -681,7 +682,7 @@ export class BrowserLeaderElection {
     // No immediate or split-brain detection heartbeats needed
 
     // Notify callbacks
-    console.log(`[DEBUG] ${this.config.instanceId}: Notifying ${this.leadershipCallbacks.length} callbacks about leadership change (became leader)`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Notifying ${this.leadershipCallbacks.length} callbacks about leadership change (became leader)`);
     this.notifyLeadershipChange(true, previousLeader);
   }
 
@@ -726,12 +727,12 @@ export class BrowserLeaderElection {
       clearInterval(this.heartbeatInterval);
     }
 
-    console.log(`[DEBUG] ${this.config.instanceId}: Starting heartbeat with interval ${this.config.heartbeatInterval}ms`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Starting heartbeat with interval ${this.config.heartbeatInterval}ms`);
 
     this.heartbeatInterval = window.setInterval(() => {
       if (this.isCurrentlyLeader && !this.isDestroyed) {
         const myPriority = this.config.priority || this.getInstancePriority(this.config.instanceId);
-        console.log(`[DEBUG] ${this.config.instanceId}: Sending heartbeat as leader`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Sending heartbeat as leader`);
         
         this.sendMessage({
           type: 'HEARTBEAT',
@@ -782,7 +783,7 @@ export class BrowserLeaderElection {
       
       // Remove inactive instances and notify callbacks
       inactiveInstances.forEach(instanceId => {
-        console.log(`[DEBUG] ${this.config.instanceId}: Detected inactive instance: ${instanceId}`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Detected inactive instance: ${instanceId}`);
         this.connectedInstances.delete(instanceId);
         this.instanceLastSeen.delete(instanceId);
         
@@ -791,7 +792,7 @@ export class BrowserLeaderElection {
           try {
             callback(instanceId);
           } catch (error) {
-            console.error(`[DEBUG] ${this.config.instanceId}: Error in shutdown callback for ${instanceId}:`, error);
+            logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Error in shutdown callback for ${instanceId}:`, error);
           }
         });
       });
@@ -853,13 +854,13 @@ export class BrowserLeaderElection {
     try {
       // Check if channel is still open before sending
       if (this.isDestroyed) {
-        console.log(`[DEBUG] ${this.config.instanceId}: Cannot send message - instance destroyed`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Cannot send message - instance destroyed`);
         return;
       }
       
       this.broadcastChannel.postMessage(message);
     } catch (error) {
-      console.error(`[DEBUG] ${this.config.instanceId}: Failed to send message:`, error);
+      logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Failed to send message:`, error);
       SecureLogger.error('EventBus', 'Failed to send leader election message', {
         messageType: message.type,
         error: error.message,
@@ -869,7 +870,7 @@ export class BrowserLeaderElection {
       // If BroadcastChannel fails, consider this instance as potentially isolated
       // Don't become leader if we can't communicate
       if (this.isCurrentlyLeader) {
-        console.log(`[DEBUG] ${this.config.instanceId}: Communication failure as leader, stepping down`);
+        logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Communication failure as leader, stepping down`);
         this.stopBeingLeader();
       }
     }
@@ -879,21 +880,21 @@ export class BrowserLeaderElection {
    * Notify all registered callbacks about leadership change
    */
   private notifyLeadershipChange(isLeader: boolean, previousLeader?: string): void {
-    console.log(`[DEBUG] ${this.config.instanceId}: notifyLeadershipChange called with isLeader=${isLeader}, previousLeader=${previousLeader}, callbacks=${this.leadershipCallbacks.length}`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: notifyLeadershipChange called with isLeader=${isLeader}, previousLeader=${previousLeader}, callbacks=${this.leadershipCallbacks.length}`);
     
     if (this.leadershipCallbacks.length === 0) {
-      console.log(`[DEBUG] ${this.config.instanceId}: No callbacks registered`);
+      logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: No callbacks registered`);
       return;
     }
     
     this.leadershipCallbacks.forEach((callback, index) => {
       const retryCallback = (attempt: number = 1) => {
         try {
-          console.log(`[DEBUG] ${this.config.instanceId}: Calling callback ${index} (attempt ${attempt}) with (${isLeader}, ${previousLeader})`);
+          logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Calling callback ${index} (attempt ${attempt}) with (${isLeader}, ${previousLeader})`);
           callback(isLeader, previousLeader);
-          console.log(`[DEBUG] ${this.config.instanceId}: Callback ${index} completed successfully`);
+          logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Callback ${index} completed successfully`);
         } catch (error) {
-          console.log(`[DEBUG] ${this.config.instanceId}: Callback ${index} failed on attempt ${attempt}:`, error);
+          logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Callback ${index} failed on attempt ${attempt}:`, error);
           
           // Retry once after a short delay
           if (attempt === 1) {
@@ -910,7 +911,7 @@ export class BrowserLeaderElection {
       
       retryCallback();
     });
-    console.log(`[DEBUG] ${this.config.instanceId}: All callbacks processed`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: All callbacks processed`);
   }
 
   /**
@@ -978,7 +979,7 @@ export class BrowserLeaderElection {
       return;
     }
 
-    console.log(`[DEBUG] ${this.config.instanceId}: Destroying leader election instance`);
+    logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Destroying leader election instance`);
 
     // Send shutdown notification to other instances BEFORE marking as destroyed
     const myPriority = this.config.priority || this.getInstancePriority(this.config.instanceId);

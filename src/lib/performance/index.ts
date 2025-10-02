@@ -26,6 +26,7 @@ import { PerformanceDashboard } from './components/PerformanceDashboard';
 import { VirtualizedList } from './virtualization/VirtualizedList';
 import { useRouteBasedPreloading } from '../../hooks/useRouteBasedPreloading';
 import { usePerformance } from './RuntimeOptimizations'; 
+import { logger } from '@/lib/logging';
 // ===== PERFORMANCE COMPONENTS =====
 export {
   LazyWrapper,
@@ -192,7 +193,7 @@ export function initializePerformanceSystem(config: Partial<PerformanceConfig> =
 
   const finalConfig = { ...defaultConfig, ...config };
   
-  console.log('🚀 Performance system initialized with config:', finalConfig);
+  logger.info('Performance', '🚀 Performance system initialized with config:', finalConfig);
   
   return finalConfig;
 }
@@ -322,7 +323,7 @@ export function createPerformanceMonitor() {
       const start = measurements.get(label);
       if (start) {
         const duration = performance.now() - start;
-        console.log(`⏱️ ${label}: ${duration.toFixed(2)}ms`);
+        logger.info('Performance', `⏱️ ${label}: ${duration.toFixed(2)}ms`);
         measurements.delete(label);
         return duration;
       }
@@ -331,7 +332,7 @@ export function createPerformanceMonitor() {
     
     mark: (label: string) => {
       const now = performance.now();
-      console.log(`📍 ${label}: ${(now - startTime).toFixed(2)}ms`);
+      logger.info('Performance', `📍 ${label}: ${(now - startTime).toFixed(2)}ms`);
       return now - startTime;
     },
     

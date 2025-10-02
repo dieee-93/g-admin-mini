@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { EventBus } from '@/lib/events';
 import { type ReportTemplate, type GeneratedReport } from '../types';
 
+import { logger } from '@/lib/logging';
 interface UseReportGenerationParams {
   templates: ReportTemplate[];
   setTemplates: React.Dispatch<React.SetStateAction<ReportTemplate[]>>;
@@ -59,7 +60,7 @@ export function useReportGeneration({
       }, 'CustomReporting');
 
     } catch (error) {
-      console.error('Error generating report:', error);
+      logger.error('App', 'Error generating report:', error);
     } finally {
       setIsGenerating(null);
     }

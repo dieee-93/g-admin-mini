@@ -4,6 +4,7 @@ import { type ReactNode, useMemo } from 'react'
 import { useThemeStore } from '../../store/themeStore'
 import { getCurrentThemeSystem } from '../../lib/theming/dynamicTheming'
 
+import { logger } from '@/lib/logging';
 interface ProviderProps {
   children: ReactNode
 }

@@ -24,6 +24,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
 import { CardWrapper } from '@/shared/ui';
+import { logger } from '@/lib/logging';
 // Tipos para pedidos
 interface OrderItem {
   id: string;
@@ -292,12 +293,12 @@ export function MyOrders() {
   const [selectedTab, setSelectedTab] = useState('all');
 
   const handleViewDetails = (orderId: string) => {
-    console.log('Ver detalles del pedido:', orderId);
+    logger.info('App', 'Ver detalles del pedido:', orderId);
     // TODO: Implementar modal o navegación a detalles
   };
 
   const handleReorder = (orderId: string) => {
-    console.log('Reordenar pedido:', orderId);
+    logger.info('App', 'Reordenar pedido:', orderId);
     // TODO: Implementar lógica de reorden
   };
 

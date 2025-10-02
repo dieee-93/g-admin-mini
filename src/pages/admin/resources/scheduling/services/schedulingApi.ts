@@ -24,6 +24,7 @@ import type {
   CalendarConfig,
 } from '@/shared/calendar/types/DateTimeTypes';
 import { createISODate, createISODateTime, calculateDuration, nowTimestamp } from '@/shared/calendar';
+import { logger } from '@/lib/logging';
 import type {
   StaffShift,
   ShiftStatus,
@@ -158,7 +159,7 @@ export const shiftsApi = {
 
       return filteredShifts;
     } catch (error) {
-      console.error('Error fetching shifts:', error);
+      logger.error('API', 'Error fetching shifts:', error);
       throw new Error('Failed to fetch shifts');
     }
   },
@@ -196,7 +197,7 @@ export const shiftsApi = {
 
       return this.convertBookingToShift(result.data!);
     } catch (error) {
-      console.error('Error creating shift:', error);
+      logger.error('API', 'Error creating shift:', error);
       throw new Error('Failed to create shift');
     }
   },
@@ -217,7 +218,7 @@ export const shiftsApi = {
         throw new Error(result.errors.join(', '));
       }
     } catch (error) {
-      console.error('Error updating shift:', error);
+      logger.error('API', 'Error updating shift:', error);
       throw new Error('Failed to update shift');
     }
   },
@@ -233,7 +234,7 @@ export const shiftsApi = {
         throw new Error(result.errors.join(', '));
       }
     } catch (error) {
-      console.error('Error deleting shift:', error);
+      logger.error('API', 'Error deleting shift:', error);
       throw new Error('Failed to delete shift');
     }
   },
@@ -249,7 +250,7 @@ export const shiftsApi = {
           const shift = await this.createShift(shiftData);
           createdShifts.push(shift);
         } catch (error) {
-          console.warn(`Failed to create shift for employee ${shiftData.employeeId}:`, error);
+          logger.error('API', `Failed to create shift for employee ${shiftData.employeeId}:`, error);
           // Continue with other shifts
         }
       }
@@ -260,7 +261,7 @@ export const shiftsApi = {
 
       return createdShifts;
     } catch (error) {
-      console.error('Error bulk creating shifts:', error);
+      logger.error('API', 'Error bulk creating shifts:', error);
       throw new Error('Failed to create shifts');
     }
   },
@@ -297,7 +298,7 @@ export const shiftsApi = {
 
       return conflictingShifts;
     } catch (error) {
-      console.error('Error checking shift conflicts:', error);
+      logger.error('API', 'Error checking shift conflicts:', error);
       throw new Error('Failed to check shift conflicts');
     }
   }
@@ -344,7 +345,7 @@ export const timeOffApi = {
       
       return data || [];
     } catch (error) {
-      console.error('Error fetching time-off requests:', error);
+      logger.error('API', 'Error fetching time-off requests:', error);
       throw new Error('Failed to fetch time-off requests');
     }
   },
@@ -365,7 +366,7 @@ export const timeOffApi = {
 
       return data;
     } catch (error) {
-      console.error('Error creating time-off request:', error);
+      logger.error('API', 'Error creating time-off request:', error);
       throw new Error('Failed to create time-off request');
     }
   },
@@ -390,7 +391,7 @@ export const timeOffApi = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error updating time-off request:', error);
+      logger.error('API', 'Error updating time-off request:', error);
       throw new Error('Failed to update time-off request');
     }
   },
@@ -414,7 +415,7 @@ export const timeOffApi = {
 
       return data || [];
     } catch (error) {
-      console.error('Error fetching time-off conflicts:', error);
+      logger.error('API', 'Error fetching time-off conflicts:', error);
       throw new Error('Failed to fetch time-off conflicts');
     }
   }
@@ -470,7 +471,7 @@ export const schedulesApi = {
         }))
       }));
     } catch (error) {
-      console.error('Error fetching schedules:', error);
+      logger.error('API', 'Error fetching schedules:', error);
       throw new Error('Failed to fetch schedules');
     }
   },
@@ -491,7 +492,7 @@ export const schedulesApi = {
 
       return data;
     } catch (error) {
-      console.error('Error creating schedule:', error);
+      logger.error('API', 'Error creating schedule:', error);
       throw new Error('Failed to create schedule');
     }
   },
@@ -506,7 +507,7 @@ export const schedulesApi = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error updating schedule status:', error);
+      logger.error('API', 'Error updating schedule status:', error);
       throw new Error('Failed to update schedule status');
     }
   },
@@ -573,7 +574,7 @@ export const schedulesApi = {
 
       return newSchedule;
     } catch (error) {
-      console.error('Error copying schedule:', error);
+      logger.error('API', 'Error copying schedule:', error);
       throw new Error('Failed to copy schedule');
     }
   }
@@ -596,7 +597,7 @@ export const shiftTemplatesApi = {
 
       return data || [];
     } catch (error) {
-      console.error('Error fetching shift templates:', error);
+      logger.error('API', 'Error fetching shift templates:', error);
       throw new Error('Failed to fetch shift templates');
     }
   },
@@ -614,7 +615,7 @@ export const shiftTemplatesApi = {
 
       return data;
     } catch (error) {
-      console.error('Error creating shift template:', error);
+      logger.error('API', 'Error creating shift template:', error);
       throw new Error('Failed to create shift template');
     }
   },
@@ -654,7 +655,7 @@ export const shiftTemplatesApi = {
       // Create the shifts
       return await shiftsApi.bulkCreateShifts(shiftsToCreate);
     } catch (error) {
-      console.error('Error applying shift template:', error);
+      logger.error('API', 'Error applying shift template:', error);
       throw new Error('Failed to apply shift template');
     }
   }
@@ -703,7 +704,7 @@ export const schedulingAnalyticsApi = {
         shift_count: shifts?.length || 0
       };
     } catch (error) {
-      console.error('Error fetching labor cost analytics:', error);
+      logger.error('API', 'Error fetching labor cost analytics:', error);
       throw new Error('Failed to fetch labor cost analytics');
     }
   },
@@ -752,7 +753,7 @@ export const schedulingAnalyticsApi = {
           : 0
       };
     } catch (error) {
-      console.error('Error fetching coverage analytics:', error);
+      logger.error('API', 'Error fetching coverage analytics:', error);
       throw new Error('Failed to fetch coverage analytics');
     }
   }

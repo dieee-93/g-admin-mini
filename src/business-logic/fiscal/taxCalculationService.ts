@@ -4,6 +4,7 @@
 import { EventBus } from '@/lib/events';
 import { TaxDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { logger } from '@/lib/logging';
 
 // ============================================================================
 // TAX RATES AND CONSTANTS
@@ -110,7 +111,7 @@ class TaxCalculationService {
     
     // ENHANCED: Validate inputs for production safety
     if (!DecimalUtils.isFinanciallyValid(amount)) {
-      console.warn('TaxCalculationService: Invalid amount provided:', amount);
+      logger.warn('API', 'TaxCalculationService: Invalid amount provided:', amount);
       return this.getZeroTaxResult();
     }
     
@@ -169,7 +170,7 @@ class TaxCalculationService {
       }
     };
     } catch (error: unknown) {
-      console.error('TaxCalculationService.calculateTaxesForAmount:', error instanceof Error ? error.message : error);
+      logger.error('API', 'TaxCalculationService.calculateTaxesForAmount:', error instanceof Error ? error.message : error);
       return this.getZeroTaxResult();
     }
   }
@@ -210,7 +211,7 @@ class TaxCalculationService {
       try {
         // ENHANCED: Validate each item's inputs
         if (!DecimalUtils.isFinanciallyValid(item.quantity) || !DecimalUtils.isFinanciallyValid(item.unitPrice)) {
-          console.warn(`TaxCalculationService: Invalid item data:`, item);
+          logger.warn('API', `TaxCalculationService: Invalid item data:`, item);
           continue; // Skip invalid items
         }
         
@@ -250,7 +251,7 @@ class TaxCalculationService {
         totalIvaAmountDec = totalIvaAmountDec.plus(itemIvaAmountDec);
         totalIngresosBrutosAmountDec = totalIngresosBrutosAmountDec.plus(itemIngresosBrutosAmountDec);
       } catch (error: unknown) {
-        console.error(`TaxCalculationService: Error processing item ${item.productId}:`, error.message);
+        logger.error('API', `TaxCalculationService: Error processing item ${item.productId}:`, error.message);
         // Continue processing other items
       }
     }

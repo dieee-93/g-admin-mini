@@ -27,6 +27,7 @@ import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services
 import { useMaterialsPage } from '../../hooks/useMaterialsPage';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
+import { logger } from '@/lib/logging';
 export function MaterialsAnalyticsPanel() {
   const { materials, loading, metrics } = useMaterialsPage();
   const [analyticsData, setAnalyticsData] = useState<any>(null);
@@ -90,7 +91,7 @@ export function MaterialsAnalyticsPanel() {
       });
 
     } catch (error) {
-      console.error('Error generating materials analytics:', error);
+      logger.error('MaterialsStore', 'Error generating materials analytics:', error);
     } finally {
       setAnalyticsLoading(false);
     }

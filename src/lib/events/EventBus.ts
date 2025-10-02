@@ -1,6 +1,7 @@
 // EventBus.ts - Enterprise Event Bus Implementation
 // Complete event bus with module management, deduplication, offline-first support, and comprehensive monitoring
 
+import { logger } from '@/lib/logging';
 import { EventStoreIndexedDB } from './EventStore';
 import { DeduplicationManager } from './DeduplicationManager';
 import { ModuleRegistry } from './ModuleRegistry';
@@ -527,18 +528,21 @@ class EventBus implements IEventBus {
     };
     
     // Add to weak subscription manager for memory safety
-    console.log(`[EventBus] Adding subscription to weak subscription manager for pattern: ${pattern}`);
+    logger.debug('EventBus', `Adding subscription for pattern: ${pattern}`);
     this.weakSubscriptionManager.addSubscription(subscription);
-    
+
     // Add to module registry if moduleId provided
     if (options.moduleId) {
       const unsubscribeFn = () => this.removeSubscription(subscription);
       this.moduleRegistry.addModuleSubscription(options.moduleId, subscription, unsubscribeFn);
-      
+
       return unsubscribeFn;
     }
-    
-    console.log(`[EventBus] Subscription added: ${pattern} (${subscription.id}) [moduleId: ${subscription.moduleId}]`);
+
+    logger.debug('EventBus', `Subscription added: ${pattern}`, {
+      id: subscription.id,
+      moduleId: subscription.moduleId
+    });
     
     // Return unsubscribe function
     return () => this.removeSubscription(subscription);
@@ -681,7 +685,7 @@ class EventBus implements IEventBus {
   // === SYSTEM OPERATIONS ===
 
   async gracefulShutdown(timeoutMs: number = 30000): Promise<void> {
-    console.log('[EventBus] Starting graceful shutdown...');
+    logger.info('EventBus', 'Starting graceful shutdown');
     this.isShuttingDown = true;
     
     try {
@@ -715,10 +719,10 @@ class EventBus implements IEventBus {
       // Cleanup pattern cache
       this.patternCache.destroy();
       
-      console.log('[EventBus] Graceful shutdown completed');
+      logger.info('EventBus', 'Graceful shutdown completed');
       
     } catch (error) {
-      console.error('[EventBus] Error during graceful shutdown:', error);
+      logger.error('EventBus', 'Error during graceful shutdown', error);
       throw new EventBusError(
         `Graceful shutdown failed: ${error.message}`,
         EventBusErrorCode.GRACEFUL_SHUTDOWN_TIMEOUT,
@@ -824,12 +828,12 @@ class EventBus implements IEventBus {
     this.testMode = true;
     this.mockHistory = [];
     this.loadTestHandlers();
-    console.log('[EventBus] Test mode enabled');
+    logger.debug('EventBus', 'Test mode enabled');
   }
 
   disableTestMode(): void {
     this.testMode = false;
-    console.log('[EventBus] Test mode disabled');
+    logger.debug('EventBus', 'Test mode disabled');
   }
 
   mockEvent<TPayload = any>(pattern: EventPattern, payload: TPayload): void {
@@ -852,50 +856,54 @@ class EventBus implements IEventBus {
     try {
       const testHandlers = createTestEventHandlers();
       this.availableHandlers.clear();
-      
+
       for (const [handlerName, handler] of testHandlers.entries()) {
         this.availableHandlers.set(handlerName, handler);
-        console.log(`[EventBus] Test handler '${handlerName}' loaded for auto-registration`);
+        logger.debug('EventBus', `Test handler loaded: ${handlerName}`);
       }
-      
-      console.log(`[EventBus] Loaded ${testHandlers.size} test handlers for auto-registration`);
+
+      logger.debug('EventBus', `Loaded ${testHandlers.size} test handlers`);
     } catch (error) {
-      console.warn('[EventBus] Failed to load test handlers:', error);
+      logger.warn('EventBus', 'Failed to load test handlers', error);
     }
   }
 
   private autoRegisterModuleHandlers(moduleId: ModuleId): void {
     try {
-      console.log(`[EventBus] Auto-registering handlers for module: ${moduleId}`);
-      
+      logger.debug('EventBus', `Auto-registering handlers for module: ${moduleId}`);
+
       // Get module descriptor
       const registeredModules = this.moduleRegistry.getRegisteredModules();
       const moduleDescriptor = registeredModules[moduleId];
-      
+
       if (!moduleDescriptor) {
-        console.warn(`[EventBus] Module descriptor not found for: ${moduleId}`);
+        logger.warn('EventBus', `Module descriptor not found: ${moduleId}`);
         return;
       }
 
       let registeredCount = 0;
-      
+
       // Register each handler from the module's eventSubscriptions
       for (const subscription of moduleDescriptor.eventSubscriptions) {
         const fullHandlerName = `${moduleId}.${subscription.handler}`;
         const availableHandler = this.availableHandlers.get(fullHandlerName);
-        
+
         if (availableHandler) {
           this.moduleHandlers.set(fullHandlerName, availableHandler);
-          console.log(`[EventBus] Auto-registered handler: ${fullHandlerName} for pattern: ${subscription.pattern}`);
+          logger.debug('EventBus', `Handler registered: ${fullHandlerName}`, {
+            pattern: subscription.pattern
+          });
           registeredCount++;
         } else {
-          console.warn(`[EventBus] Available handler not found: ${fullHandlerName}`);
+          logger.warn('EventBus', `Handler not found: ${fullHandlerName}`);
         }
       }
 
-      console.log(`[EventBus] Auto-registered ${registeredCount}/${moduleDescriptor.eventSubscriptions.length} handlers for module: ${moduleId}`);
+      logger.info('EventBus', `Auto-registered ${registeredCount}/${moduleDescriptor.eventSubscriptions.length} handlers`, {
+        moduleId
+      });
     } catch (error) {
-      console.error(`[EventBus] Error auto-registering handlers for module ${moduleId}:`, error);
+      logger.error('EventBus', `Error auto-registering handlers for ${moduleId}`, error);
     }
   }
 
@@ -987,7 +995,9 @@ class EventBus implements IEventBus {
 
   private async processEvent(event: NamespacedEvent): Promise<void> {
     const matchingSubscriptions = this.getMatchingSubscriptions(event.pattern);
-    console.log(`[EventBus] Processing event ${event.pattern}: Found ${matchingSubscriptions.length} matching subscriptions`);
+    logger.debug('EventBus', `Processing event: ${event.pattern}`, {
+      subscriptions: matchingSubscriptions.length
+    });
     
     // Security Layer 3: Decrypt payload before processing if needed
     let processableEvent = event;
@@ -1167,7 +1177,7 @@ class EventBus implements IEventBus {
       await offlineSync.queueOperation(syncOperation);
       
     } catch (error) {
-      console.error('[EventBus] Failed to queue event for offline sync:', error);
+      logger.error('EventBus', 'Failed to queue event for offline sync', error);
     }
   }
 
@@ -1192,7 +1202,9 @@ class EventBus implements IEventBus {
       this.moduleRegistry.removeModuleSubscription(subscription.moduleId, subscription.id);
     }
     
-    console.log(`[EventBus] Subscription removed: ${subscription.pattern} (${subscription.id})`);
+    logger.debug('EventBus', `Subscription removed: ${subscription.pattern}`, {
+      id: subscription.id
+    });
   }
 
   private async registerModuleEventSubscriptions(descriptor: ModuleDescriptor): Promise<void> {
@@ -1220,30 +1232,34 @@ class EventBus implements IEventBus {
     }
     
     // Fallback: return a placeholder if handler not found
-    console.warn(`[EventBus] Handler '${handlerName}' not found in registry for module ${moduleId}`);
+    logger.warn('EventBus', `Handler not found: ${handlerName}`, { moduleId });
     return async (event) => {
-      console.log(`[EventBus] Placeholder: Module ${moduleId} handler ${handlerName} called for ${event.pattern}`);
+      logger.debug('EventBus', `Placeholder handler called: ${moduleId}.${handlerName}`, {
+        pattern: event.pattern
+      });
     };
   }
 
   // Method to register handlers (for testing)
   registerHandler(handlerName: string, handler: EventHandler): void {
     this.moduleHandlers.set(handlerName, handler);
-    console.log(`[EventBus] Handler '${handlerName}' registered in global registry`);
+    logger.debug('EventBus', `Handler registered: ${handlerName}`);
   }
 
   private setupModuleRegistryListeners(): void {
     this.moduleRegistry.on('moduleActivated', (data) => {
-      console.log(`[EventBus] Module activated: ${data.moduleId}`);
+      logger.info('EventBus', `Module activated: ${data.moduleId}`);
       this.autoRegisterModuleHandlers(data.moduleId);
     });
-    
+
     this.moduleRegistry.on('moduleDeactivated', (data) => {
-      console.log(`[EventBus] Module deactivated: ${data.moduleId}`);
+      logger.info('EventBus', `Module deactivated: ${data.moduleId}`);
     });
-    
+
     this.moduleRegistry.on('moduleHealthChanged', (data) => {
-      console.log(`[EventBus] Module health changed: ${data.moduleId} -> ${data.currentStatus}`);
+      logger.debug('EventBus', `Module health changed: ${data.moduleId}`, {
+        status: data.currentStatus
+      });
     });
   }
 

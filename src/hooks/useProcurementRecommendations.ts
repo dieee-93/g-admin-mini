@@ -15,6 +15,7 @@ import type {
 } from '@/pages/admin/supply-chain/inventory/procurementRecommendationsEngine';
 import type { CreateAlertInput } from '@/shared/alerts/types';
 
+import { logger } from '@/lib/logging';
 interface UseProcurementRecommendationsOptions {
   // Configuración del engine
   config?: Partial<ProcurementEngineConfig>;
@@ -168,7 +169,7 @@ export function useProcurementRecommendations(
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error generando recomendaciones';
       setError(errorMessage);
-      console.error('Error generating procurement recommendations:', err);
+      logger.error('App', 'Error generating procurement recommendations:', err);
     } finally {
       setGenerating(false);
     }
@@ -200,7 +201,7 @@ export function useProcurementRecommendations(
               label: 'Ver Presupuesto',
               variant: 'primary',
               action: async () => {
-                console.log('Navigate to budget approval');
+                logger.info('App', 'Navigate to budget approval');
                 // TODO: Implementar navegación
               }
             }
@@ -213,14 +214,14 @@ export function useProcurementRecommendations(
       // Crear alertas en el sistema
       const createPromises = newAlerts.map(alert => 
         alertActions.create(alert).catch(error => {
-          console.error('Error creating procurement alert:', error);
+          logger.error('App', 'Error creating procurement alert:', error);
         })
       );
       
       await Promise.all(createPromises);
       
     } catch (error) {
-      console.error('Error generating additional alerts:', error);
+      logger.error('App', 'Error generating additional alerts:', error);
     }
   }, [alertActions]);
 
@@ -326,7 +327,7 @@ export function useProcurementRecommendations(
     
     try {
       // Ejecutar la acción (por ahora solo log, TODO: implementar acciones reales)
-      console.log('Executing procurement action:', {
+      logger.info('App', 'Executing procurement action:', {
         recommendationId,
         actionType,
         parameters: action.parameters
@@ -338,7 +339,7 @@ export function useProcurementRecommendations(
       }
       
     } catch (error) {
-      console.error('Error executing recommendation action:', error);
+      logger.error('App', 'Error executing recommendation action:', error);
       setError(`Error ejecutando acción: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }, [recommendations]);

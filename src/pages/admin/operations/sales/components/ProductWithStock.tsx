@@ -29,6 +29,7 @@ import {
 import { fetchProductsWithAvailability } from '../services/saleApi';
 import { useSaleStockValidation } from '@/hooks/useSaleStockValidation';
 
+import { logger } from '@/lib/logging';
 interface ProductWithAvailability {
   id: string;
   name: string;
@@ -89,7 +90,7 @@ export function ProductWithStock({
       setPrices(initialPrices);
       
     } catch (error) {
-      console.error('Error loading products:', error);
+      logger.error('SalesStore', 'Error loading products:', error);
       notify.error({
         title: "Error al cargar productos",
         description: "No se pudieron cargar los productos con stock disponible"

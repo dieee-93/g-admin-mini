@@ -15,6 +15,7 @@ import {
 } from '@/business-logic/shared/FiscalCalculations';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 // Enhanced Invoice schema with tax calculations
 const InvoiceSchema = z.object({
   id: z.string().optional(),
@@ -441,12 +442,12 @@ export function FiscalFormEnhanced({
 
   // Mock CRUD operations
   const createInvoice = async (data: any) => {
-    console.log('Creating invoice:', data);
+    logger.info('API', 'Creating invoice:', data);
     return { id: Date.now().toString(), ...data };
   };
 
   const updateInvoice = async (id: string, data: any) => {
-    console.log('Updating invoice:', id, data);
+    logger.info('API', 'Updating invoice:', id, data);
     return { id, ...data };
   };
 

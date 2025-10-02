@@ -2,6 +2,8 @@
  * Standard accessibility props for all components
  * Based on WAI-ARIA guidelines and React best practices
  */
+import { logger } from '@/lib/logging';
+
 export interface AccessibilityProps {
   // ARIA attributes
   'aria-label'?: string

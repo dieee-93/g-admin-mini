@@ -15,6 +15,7 @@ import type {
 } from './types/ModuleTypes';
 import type { BusinessCapability } from '../capabilities/types/BusinessCapabilities';
 
+import { logger } from '@/lib/logging';
 /**
  * Module registry events
  */
@@ -70,7 +71,7 @@ export class ModuleRegistry extends EventEmitter {
     this.emit('module:registered', id, module);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`📦 Module registered: ${id} (${module.metadata.name})`);
+      logger.info('App', `📦 Module registered: ${id} (${module.metadata.name})`);
     }
   }
 
@@ -97,7 +98,7 @@ export class ModuleRegistry extends EventEmitter {
     this.emit('module:unregistered', moduleId);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`📦 Module unregistered: ${moduleId}`);
+      logger.info('App', `📦 Module unregistered: ${moduleId}`);
     }
 
     return true;
@@ -252,7 +253,7 @@ export class ModuleRegistry extends EventEmitter {
     this.emit('module:activated', moduleId);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🚀 Module activated: ${moduleId}`);
+      logger.info('App', `🚀 Module activated: ${moduleId}`);
     }
   }
 
@@ -278,7 +279,7 @@ export class ModuleRegistry extends EventEmitter {
     this.emit('module:deactivated', moduleId);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`⏸️ Module deactivated: ${moduleId}`);
+      logger.info('App', `⏸️ Module deactivated: ${moduleId}`);
     }
   }
 
@@ -464,7 +465,7 @@ export class ModuleRegistry extends EventEmitter {
 
     // Validate components
     if (!components.MainComponent && !components.pages && !components.components) {
-      console.warn(`Module ${metadata.id} has no exported components`);
+      logger.warn('App', `Module ${metadata.id} has no exported components`);
     }
   }
 

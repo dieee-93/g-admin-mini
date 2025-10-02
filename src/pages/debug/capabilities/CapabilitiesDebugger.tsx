@@ -20,13 +20,13 @@ import {
   TabPanel,
   InputField
 } from '@/shared/ui';
-import { useCapabilities } from '@/lib/capabilities/hooks/useCapabilities';
-import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
-import type { BusinessCapability } from '@/lib/capabilities/types/BusinessCapabilities';
-import { shouldShowBusinessModule, getBusinessModuleFeatures, BUSINESS_MODULE_CONFIGURATIONS } from '@/lib/capabilities/businessCapabilitySystem';
+// TODO: Este archivo necesita refactorización completa para usar el sistema unificado
+// Por ahora, usamos imports compatibles con ambos sistemas
+import { useCapabilities } from '@/store/capabilityStore';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { groupCapabilitiesByCategory } from '@/lib/capabilities/utils/capabilityUtils';
 
+import { logger } from '@/lib/logging';
 type DebugTab = 'overview' | 'capabilities' | 'modules' | 'actions';
 
 export function CapabilitiesDebugger() {
@@ -48,14 +48,14 @@ export function CapabilitiesDebugger() {
     // Create a set to avoid duplicates
     const allCapabilities = [...new Set([...storeCapabilities, ...resolvedCapabilities])] as BusinessCapability[];
 
-    console.log('🔍 Store capabilities:', storeCapabilities);
-    console.log('🔍 Resolved capabilities:', resolvedCapabilities);
-    console.log('🔍 Combined capabilities:', allCapabilities);
+    logger.info('App', '🔍 Store capabilities:', storeCapabilities);
+    logger.info('App', '🔍 Resolved capabilities:', resolvedCapabilities);
+    logger.info('App', '🔍 Combined capabilities:', allCapabilities);
 
     // Use existing function from utils
     const groups = groupCapabilitiesByCategory(allCapabilities);
 
-    console.log('📊 Grouped capabilities:', groups);
+    logger.info('App', '📊 Grouped capabilities:', groups);
     return groups;
   }, [store.profile?.capabilities]);
 
@@ -400,7 +400,7 @@ function ActionsTab({ capabilities, store, capabilitiesByCategory }: {
           <Button
             size="sm"
             onClick={() => {
-              console.log('🐛 DEBUG INFO:', {
+              logger.debug('App', '🐛 DEBUG INFO:', {
                 storeCapabilities: store.profile?.capabilities,
                 allCapabilityKeys: Object.keys(store.profile?.capabilities || {}),
                 capabilitiesByCategory: capabilitiesByCategory,
@@ -426,7 +426,7 @@ function ActionsTab({ capabilities, store, capabilitiesByCategory }: {
             colorPalette="blue"
             onClick={() => {
               const stored = localStorage.getItem('business-capabilities-store');
-              console.log('📦 LocalStorage:', stored ? JSON.parse(stored) : 'No data');
+              logger.info('App', '📦 LocalStorage:', stored ? JSON.parse(stored) : 'No data');
             }}
           >
             📦 Check Storage
@@ -448,9 +448,9 @@ function ActionsTab({ capabilities, store, capabilitiesByCategory }: {
             onClick={() => {
               if (!store.profile) {
                 store.initializeProfile({ businessName: 'Debug Business' });
-                console.log('✅ Profile initialized with default capabilities');
+                logger.info('App', '✅ Profile initialized with default capabilities');
               } else {
-                console.log('ℹ️ Profile already exists');
+                logger.info('App', 'ℹ️ Profile already exists');
               }
             }}
           >

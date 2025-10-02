@@ -9,6 +9,7 @@ import {
 import { Icon } from '@/shared/ui';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 const recurringBillingSchema = z.object({
   subscriptionName: z.string().min(1, 'Nombre de suscripción requerido'),
   customerId: z.string().min(1, 'Cliente requerido'),
@@ -141,7 +142,7 @@ export const RecurringBillingFormEnhanced: React.FC = () => {
 
   const handleFormSubmit = async (data: RecurringBillingFormData) => {
     try {
-      console.log('Creating recurring billing:', data);
+      logger.info('App', 'Creating recurring billing:', data);
 
       const subscriptionId = `sub_${Date.now()}`;
 
@@ -153,10 +154,10 @@ export const RecurringBillingFormEnhanced: React.FC = () => {
       });
 
       // Emit custom billing events (will be added to EventBus)
-      console.log(`[RecurringBilling] Subscription created: ${subscriptionId}`);
+      logger.info('App', `[RecurringBilling] Subscription created: ${subscriptionId}`);
 
     } catch (error) {
-      console.error('Error creating subscription:', error);
+      logger.error('App', 'Error creating subscription:', error);
     }
   };
 

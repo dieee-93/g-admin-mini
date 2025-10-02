@@ -6,6 +6,7 @@ import { MaterialsMockService } from './materialsMockService';
 import type { InventoryItem, StockEntry } from '../types';
 import type { MaterialItem } from '../types/materialTypes';
 
+import { logger } from '@/lib/logging';
 // ✅ DEVELOPMENT FLAG - Use mock data in development
 const USE_MOCK_DATA = process.env.NODE_ENV === 'development' || true; // Force mock for now
 
@@ -88,7 +89,7 @@ export const inventoryApi = {
     }
 
     // Implement real bulk actions here
-    console.log('Bulk action:', action, itemIds);
+    logger.info('MaterialsStore', 'Bulk action:', action, itemIds);
   },
 
   async generateReport(): Promise<void> {
@@ -97,7 +98,7 @@ export const inventoryApi = {
     }
 
     // Implement real report generation here
-    console.log('Generating report...');
+    logger.info('MaterialsStore', 'Generating report...');
   },
 
   async updateItem(id: string, updates: Partial<InventoryItem>): Promise<InventoryItem> {
@@ -170,7 +171,7 @@ export const inventoryApi = {
         .eq('item_id', id);
 
       if (stockError) {
-        console.warn('Warning cleaning stock entries:', stockError);
+        logger.error('MaterialsStore', 'Warning cleaning stock entries:', stockError);
         // Continue anyway, the item deletion might still work
       }
 
@@ -183,7 +184,7 @@ export const inventoryApi = {
       if (deleteError) throw deleteError;
 
     } catch (error) {
-      console.error('Error in deleteItem:', error);
+      logger.error('MaterialsStore', 'Error in deleteItem:', error);
       throw error;
     }
   }

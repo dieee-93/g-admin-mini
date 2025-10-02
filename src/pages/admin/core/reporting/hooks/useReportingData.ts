@@ -7,6 +7,7 @@ import {
 } from '../types';
 import { generateMockReportingData } from '../../dashboard/data/mockData'; 
 
+import { logger } from '@/lib/logging';
 export function useReportingData() {
   const [templates, setTemplates] = useState<ReportTemplate[]>([]);
   const [generatedReports, setGeneratedReports] = useState<GeneratedReport[]>([]);
@@ -33,7 +34,7 @@ export function useReportingData() {
         setInsights(mockInsights);
 
       } catch (error) {
-        console.error('Error loading custom reporting data:', error);
+        logger.error('App', 'Error loading custom reporting data:', error);
       } finally {
         setLoading(false);
       }

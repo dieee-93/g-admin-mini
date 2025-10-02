@@ -7,6 +7,7 @@ import { EventBus } from '@/lib/events';
 import { EventBus } from '@/lib/events';
 import { offlineSync } from '@/lib/offline';
 
+import { logger } from '@/lib/logging';
 // ===== INTERFACES =====
 
 export interface InventoryItem {
@@ -234,7 +235,7 @@ export class PredictiveInventoryManager {
       }
 
     } catch (error) {
-      console.warn(`Failed to update predictive metrics for ${itemId}:`, error);
+      logger.error('Performance', `Failed to update predictive metrics for ${itemId}:`, error);
       
       // Fallback to basic metrics
       const basicMetrics = this.calculateBasicMetrics(item);
@@ -457,7 +458,7 @@ export class PredictiveInventoryManager {
     this.isProcessing = true;
     
     try {
-      console.log('🔄 Running inventory optimization...');
+      logger.info('Performance', '🔄 Running inventory optimization...');
       
       // Update metrics for all items
       const updatePromises = Array.from(this.items.keys()).map(itemId => 
@@ -483,11 +484,11 @@ export class PredictiveInventoryManager {
       const optimization = this.calculateOptimizationMetrics();
       this.lastOptimization = Date.now();
       
-      console.log('✅ Inventory optimization completed');
+      logger.info('Performance', '✅ Inventory optimization completed');
       return optimization;
       
     } catch (error) {
-      console.error('❌ Inventory optimization failed:', error);
+      logger.error('Performance', '❌ Inventory optimization failed:', error);
       throw error;
     } finally {
       this.isProcessing = false;
@@ -642,7 +643,7 @@ export class PredictiveInventoryManager {
       return true;
       
     } catch (error) {
-      console.error('Failed to process automatic reorder:', error);
+      logger.error('Performance', 'Failed to process automatic reorder:', error);
       return false;
     }
   }

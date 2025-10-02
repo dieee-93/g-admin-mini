@@ -12,7 +12,9 @@ import {
   AlertDescription
 } from '@/shared/ui';
 import type { Schedule } from '@/types/schedule';
-import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
+// TODO: Refactorizar para usar el sistema de capabilities unificado
+// import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
+import { useCapabilities } from '@/store/capabilityStore';
 
 const ScheduleDisplayCard = ({ schedule }: { schedule: Schedule }) => {
     const typeColors = {

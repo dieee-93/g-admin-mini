@@ -47,6 +47,7 @@ import { RecipeFormIngredients } from './form-parts/RecipeFormIngredients';
 // Import event system
 import { EventBus } from '@/lib/events';
 
+import { logger } from '@/lib/logging';
 interface FormErrors {
   name?: string;
   output_item_id?: string;
@@ -301,7 +302,7 @@ export function RecipeForm() {
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`Error generating AI suggestions: ${errorMessage}`);
+      logger.error('App', `Error generating AI suggestions: ${errorMessage}`);
     } finally {
       setIsGeneratingAI(false);
     }

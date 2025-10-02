@@ -13,6 +13,7 @@ import {
 
 import { routeLazyBridge } from './routeLazyBridge';
 
+import { logger } from '@/lib/logging';
 /**
  * Valida que todos los mappings estén correctamente configurados
  */
@@ -24,7 +25,7 @@ export function validateRouteMappings(): {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  console.log('🔍 Validating Route Mappings...\n');
+  logger.debug('NavigationContext', '🔍 Validating Route Mappings...\n');
 
   // Check 1: All routes have corresponding components
   Object.entries(routeToFileMap).forEach(([route, filePath]) => {
@@ -38,11 +39,11 @@ export function validateRouteMappings(): {
       errors.push(`Route "${route}" missing file path mapping`);
     }
     
-    console.log(`✓ ${route} → ${componentName} (${filePath})`);
+    logger.info('NavigationContext', `✓ ${route} → ${componentName} (${filePath})`);
   });
 
   // Check 2: Domain extraction works correctly
-  console.log('\n🏗️ Testing Domain Extraction...\n');
+  logger.info('NavigationContext', '\n🏗️ Testing Domain Extraction...\n');
   
   const testRoutes = [
     '/admin/sales',
@@ -53,11 +54,11 @@ export function validateRouteMappings(): {
 
   testRoutes.forEach(route => {
     const domain = getDomainFromRoute(route);
-    console.log(`✓ ${route} → domain: ${domain || 'null'}`);
+    logger.info('NavigationContext', `✓ ${route} → domain: ${domain || 'null'}`);
   });
 
   // Check 3: Lazy loading integration
-  console.log('\n🚀 Testing Lazy Loading Integration...\n');
+  logger.info('NavigationContext', '\n🚀 Testing Lazy Loading Integration...\n');
   
   const lazyRoutes = [
     '/admin/sales',
@@ -68,23 +69,23 @@ export function validateRouteMappings(): {
   lazyRoutes.forEach(route => {
     const requiresLazy = routeLazyBridge.requiresLazyLoading(route);
     const metadata = routeLazyBridge.getModuleMetadata(route);
-    console.log(`✓ ${route} → lazy: ${requiresLazy}, size: ${metadata?.estimatedSize || 'unknown'}`);
+    logger.info('NavigationContext', `✓ ${route} → lazy: ${requiresLazy}, size: ${metadata?.estimatedSize || 'unknown'}`);
   });
 
   // Summary
-  console.log('\n📊 Validation Summary:');
-  console.log(`✅ Routes mapped: ${Object.keys(routeToFileMap).length}`);
-  console.log(`❌ Errors: ${errors.length}`);
-  console.log(`⚠️ Warnings: ${warnings.length}`);
+  logger.info('NavigationContext', '\n📊 Validation Summary:');
+  logger.info('NavigationContext', `✅ Routes mapped: ${Object.keys(routeToFileMap).length}`);
+  logger.error('NavigationContext', `❌ Errors: ${errors.length}`);
+  logger.warn('NavigationContext', `⚠️ Warnings: ${warnings.length}`);
 
   if (errors.length > 0) {
-    console.log('\n❌ Errors found:');
-    errors.forEach(error => console.log(`  - ${error}`));
+    logger.error('NavigationContext', '\n❌ Errors found:');
+    errors.forEach(error => logger.error('NavigationContext', `  - ${error}`));
   }
 
   if (warnings.length > 0) {
-    console.log('\n⚠️ Warnings:');
-    warnings.forEach(warning => console.log(`  - ${warning}`));
+    logger.warn('NavigationContext', '\n⚠️ Warnings:');
+    warnings.forEach(warning => logger.warn('NavigationContext', `  - ${warning}`));
   }
 
   return {
@@ -98,20 +99,20 @@ export function validateRouteMappings(): {
  * Debug helper - show complete route information
  */
 export function debugRouteSystem() {
-  console.log('🔍 G-Admin Mini Route System Debug\n');
+  logger.debug('NavigationContext', '🔍 G-Admin Mini Route System Debug\n');
   
-  console.log('📋 All Routes:');
+  logger.info('NavigationContext', '📋 All Routes:');
   Object.entries(routeToFileMap).forEach(([route, filePath]) => {
     const componentName = getComponentFromRoute(route as any);
     const domain = getDomainFromRoute(route);
     const requiresLazy = routeLazyBridge.requiresLazyLoading(route);
     
-    console.log(`  ${route}`);
-    console.log(`    → Component: ${componentName}`);
-    console.log(`    → File: ${filePath}`);
-    console.log(`    → Domain: ${domain}`);
-    console.log(`    → Lazy: ${requiresLazy}`);
-    console.log('');
+    logger.info('NavigationContext', `  ${route}`);
+    logger.info('NavigationContext', `    → Component: ${componentName}`);
+    logger.info('NavigationContext', `    → File: ${filePath}`);
+    logger.info('NavigationContext', `    → Domain: ${domain}`);
+    logger.info('NavigationContext', `    → Lazy: ${requiresLazy}`);
+    logger.info('NavigationContext', '');
   });
 }
 

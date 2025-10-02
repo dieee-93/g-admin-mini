@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { generatePerformanceInsights } from '../data';
 import type { PerformanceMetrics, PerformanceInsight } from '../types';
+import { logger } from '@/lib/logging';
 import {
     CheckCircleIcon,
     ClockIcon,
@@ -27,7 +28,7 @@ export const usePerformanceInsights = () => {
       const performanceData = generatePerformanceInsights();
       setPerformance(performanceData);
     } catch (err) {
-      console.error('Error loading performance insights:', err);
+      logger.error('SalesStore', 'Error loading performance insights:', err);
       setError('Failed to load performance insights');
     } finally {
       setLoading(false);

@@ -2,6 +2,7 @@
 // Handles conflict resolution, data merging, and optimistic updates
 
 import { EventBus } from '@/lib/events';
+import { logger } from '@/lib/logging';
 
 // IndexedDB utilities for persistent queue storage
 class OfflineSyncDB {
@@ -263,19 +264,19 @@ class OfflineSync {
       if (savedQueue.length > 0) {
         // Sort by priority
         this.syncQueue = savedQueue.sort((a, b) => a.priority - b.priority);
-        console.log(`[OfflineSync] Restored ${this.syncQueue.length} operations from persistent storage`);
+        logger.info('OfflineSync', `Restored ${this.syncQueue.length} operations from persistent storage`);
       }
       
       // Restore conflicts
       this.persistedConflicts = await this.db.loadConflicts();
       if (this.persistedConflicts.length > 0) {
-        console.log(`[OfflineSync] Restored ${this.persistedConflicts.length} conflicts from storage`);
+        logger.info('OfflineSync', `Restored ${this.persistedConflicts.length} conflicts from storage`);
       }
       
       // Cleanup old operations (>7 days)
       const cleanedCount = await this.db.cleanupOldOperations(7);
       if (cleanedCount > 0) {
-        console.log(`[OfflineSync] Cleaned up ${cleanedCount} old operations`);
+        logger.info('OfflineSync', `Cleaned up ${cleanedCount} old operations`);
       }
       
       this.isInitialized = true;
@@ -291,7 +292,7 @@ class OfflineSync {
       });
       
     } catch (error) {
-      console.error('[OfflineSync] Failed to initialize persistent storage:', error);
+      logger.error('OfflineSync', 'Failed to initialize persistent storage', error);
       // Fall back to memory-only mode
       this.isInitialized = true;
       this.initializeEventListeners();
@@ -354,10 +355,10 @@ class OfflineSync {
     try {
       await this.persistQueue();
     } catch (error) {
-      console.warn('[OfflineSync] Failed to persist queue to IndexedDB:', error);
+      logger.warn('OfflineSync', 'Failed to persist queue to IndexedDB', error);
     }
     
-    console.log(`[OfflineSync] Queued operation: ${syncOperation.type} ${syncOperation.entity}`);
+    logger.info('OfflineSync', `Queued operation: ${syncOperation.type} ${syncOperation.entity}`);
     
     // Emit event
     this.emitEvent('operationQueued', { operation: syncOperation });
@@ -377,7 +378,7 @@ class OfflineSync {
     try {
       await this.db.saveQueue(this.syncQueue);
     } catch (error) {
-      console.error('[OfflineSync] Failed to persist queue:', error);
+      logger.error('OfflineSync', 'Failed to persist queue', error);
     }
   }
 
@@ -409,7 +410,7 @@ class OfflineSync {
       return;
     }
     
-    console.log(`[OfflineSync] Starting sync of ${this.syncQueue.length} operations`);
+    logger.info('OfflineSync', `Starting sync of ${this.syncQueue.length} operations`);
     this.isSyncing = true;
     
     this.emitEvent('syncStarted', { queueSize: this.syncQueue.length });
@@ -421,11 +422,11 @@ class OfflineSync {
         await this.processBatch(batch);
       }
       
-      console.log('[OfflineSync] Sync completed successfully');
+      logger.info('OfflineSync', 'Sync completed successfully');
       this.emitEvent('syncCompleted', { success: true });
       
     } catch (error) {
-      console.error('[OfflineSync] Sync failed:', error);
+      logger.error('OfflineSync', 'Sync failed', error);
       this.emitEvent('syncFailed', { error: error.message });
     } finally {
       this.isSyncing = false;
@@ -452,11 +453,11 @@ class OfflineSync {
         } else {
           // Max retries reached, remove from queue
           completedOperations.push(operation.id);
-          console.error(`[OfflineSync] Operation ${operation.id} failed after ${this.config.maxRetries} retries`);
+          logger.error('OfflineSync', `Operation ${operation.id} failed after ${this.config.maxRetries} retries`);
         }
         
       } catch (error) {
-        console.error(`[OfflineSync] Error processing operation ${operation.id}:`, error);
+        logger.error('OfflineSync', `Error processing operation ${operation.id}`, error);
         results.push({
           success: false,
           operation,
@@ -479,7 +480,7 @@ class OfflineSync {
       try {
         await this.db.removeOperation(operationId);
       } catch (error) {
-        console.warn(`[OfflineSync] Failed to remove completed operation ${operationId} from IndexedDB:`, error);
+        logger.warn('OfflineSync', `Failed to remove completed operation ${operationId} from IndexedDB`, error);
       }
     }
     
@@ -501,7 +502,7 @@ class OfflineSync {
 
   // Sync individual operation
   private async syncOperation(operation: SyncOperation): Promise<SyncResult> {
-    console.log(`[OfflineSync] Syncing operation: ${operation.type} ${operation.entity} (${operation.id})`);
+    logger.debug('OfflineSync', `Syncing operation: ${operation.type} ${operation.entity}`, { operationId: operation.id });
     
     try {
       const endpoint = this.getEndpointForEntity(operation.entity);
@@ -627,7 +628,7 @@ class OfflineSync {
 
   // Handle sync conflicts
   private async handleConflicts(conflicts: SyncConflict[]): Promise<void> {
-    console.log(`[OfflineSync] Handling ${conflicts.length} conflicts`);
+    logger.info('OfflineSync', `Handling ${conflicts.length} conflicts`);
     
     const unresolvedConflicts: SyncConflict[] = [];
     
@@ -635,7 +636,7 @@ class OfflineSync {
       try {
         const resolved = await this.resolveConflict(conflict);
         if (resolved) {
-          console.log(`[OfflineSync] Conflict resolved: ${conflict.id}`);
+          logger.info('OfflineSync', `Conflict resolved: ${conflict.id}`);
         } else {
           // Add timestamp for persistence
           if (!conflict.timestamp) {
@@ -644,7 +645,7 @@ class OfflineSync {
           unresolvedConflicts.push(conflict);
         }
       } catch (error) {
-        console.error(`[OfflineSync] Failed to resolve conflict ${conflict.id}:`, error);
+        logger.error('OfflineSync', `Failed to resolve conflict ${conflict.id}`, error);
         if (!conflict.timestamp) {
           conflict.timestamp = Date.now();
         }
@@ -660,7 +661,7 @@ class OfflineSync {
       try {
         await this.db.saveConflicts(this.persistedConflicts);
       } catch (error) {
-        console.error('[OfflineSync] Failed to persist conflicts:', error);
+        logger.error('OfflineSync', 'Failed to persist conflicts', error);
       }
     }
     
@@ -763,7 +764,7 @@ class OfflineSync {
       clearTimeout(this.reconnectStableTimer);
     }
     
-    console.log(`[OfflineSync] Network online detected (flaps: ${this.connectionFlaps})`);
+    logger.info('OfflineSync', `Network online detected (flaps: ${this.connectionFlaps})`);
     this.emitEvent('networkOnline', { flaps: this.connectionFlaps });
     
     // If too many flaps, wait longer for stability
@@ -774,7 +775,7 @@ class OfflineSync {
     // Schedule sync only after connection is stable
     this.reconnectStableTimer = window.setTimeout(() => {
       if (this.isOnline && navigator.onLine) {
-        console.log('[OfflineSync] Connection stable, starting sync');
+        logger.info('OfflineSync', 'Connection stable, starting sync');
         this.syncPendingOperations();
       }
     }, waitTime);
@@ -782,7 +783,7 @@ class OfflineSync {
 
   // Handle network offline event
   private handleOffline(): void {
-    console.log('[OfflineSync] Network went offline');
+    logger.info('OfflineSync', 'Network went offline');
     this.isOnline = false;
     this.isSyncing = false;
     
@@ -809,7 +810,7 @@ class OfflineSync {
         }
         break;
       case 'SYNC_COMPLETE':
-        console.log(`[OfflineSync] Service Worker synced ${data.payload.syncedCount} items`);
+        logger.info('OfflineSync', `Service Worker synced ${data.payload.syncedCount} items`);
         break;
     }
   }
@@ -897,7 +898,7 @@ class OfflineSync {
         try {
           callback(data);
         } catch (error) {
-          console.error(`[OfflineSync] Error in event listener for ${event}:`, error);
+          logger.error('OfflineSync', `Error in event listener for ${event}`, error);
         }
       });
     }
@@ -906,7 +907,7 @@ class OfflineSync {
   // Force sync now
   public async forceSync(): Promise<void> {
     if (this.isSyncing) {
-      console.log('[OfflineSync] Sync already in progress');
+      logger.debug('OfflineSync', 'Sync already in progress');
       return;
     }
     
@@ -921,13 +922,13 @@ class OfflineSync {
     if (this.isInitialized) {
       try {
         await this.db.saveQueue([]);
-        console.log('[OfflineSync] Sync queue cleared from memory and IndexedDB');
+        logger.info('OfflineSync', 'Sync queue cleared from memory and IndexedDB');
       } catch (error) {
-        console.error('[OfflineSync] Failed to clear IndexedDB queue:', error);
-        console.log('[OfflineSync] Sync queue cleared from memory only');
+        logger.error('OfflineSync', 'Failed to clear IndexedDB queue', error);
+        logger.info('OfflineSync', 'Sync queue cleared from memory only');
       }
     } else {
-      console.log('[OfflineSync] Sync queue cleared from memory');
+      logger.info('OfflineSync', 'Sync queue cleared from memory');
     }
   }
 

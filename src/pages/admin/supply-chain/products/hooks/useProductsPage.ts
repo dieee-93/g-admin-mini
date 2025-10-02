@@ -4,6 +4,7 @@ import { PlusIcon, CogIcon } from '@heroicons/react/24/outline';
 import { useProductsStore } from '@/store/productsStore';
 import { productsService } from '../services/productsService';
 
+import { logger } from '@/lib/logging';
 export function useProductsPage() {
   const { setQuickActions } = useNavigation();
 
@@ -42,17 +43,17 @@ export function useProductsPage() {
   // Action handlers
   // These will eventually call methods on the productsService
   const handleNewProduct = () => {
-    console.log('New product action triggered');
+    logger.info('App', 'New product action triggered');
     // Example: productsService.openNewProductModal();
   };
 
   const handleMenuAnalysis = () => {
-    console.log('Menu analysis action triggered');
+    logger.info('App', 'Menu analysis action triggered');
     // This could toggle a state in the store, managed by the service
   };
 
   const handleMenuEngineering = () => {
-    console.log('Navigate to menu engineering internally');
+    logger.info('App', 'Navigate to menu engineering internally');
   };
 
   return {

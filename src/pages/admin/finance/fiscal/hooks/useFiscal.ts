@@ -3,6 +3,7 @@ import { fiscalApi } from '../services/fiscalApi';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { type FiscalStats } from '../types';
 
+import { logger } from '@/lib/logging';
 interface UseFiscalReturn {
   fiscalStats: FiscalStats | null;
   isLoading: boolean;
@@ -23,7 +24,7 @@ export function useFiscal(): UseFiscalReturn {
       setFiscalStats(stats);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar estadísticas fiscales');
-      console.error('Error fetching fiscal stats:', err instanceof Error ? err.message : String(err));
+      logger.error('API', 'Error fetching fiscal stats:', err instanceof Error ? err.message : String(err));
     } finally {
       setIsLoading(false);
     }

@@ -15,6 +15,7 @@ import { Icon, HeaderIcon } from '@/shared/ui/Icon';
 import { QuickThemeToggle } from '@/shared/components/ThemeToggle';
 import { SidebarContainer, NavItemContainer } from './SidebarContainer';
 
+import { logger } from '@/lib/logging';
 export function Sidebar() {
   const location = useLocation();
   const [isHovering, setIsHovering] = React.useState(false);
@@ -45,12 +46,12 @@ export function Sidebar() {
         height="100vh"
         width={actualShowExpanded ? "15rem" : "3rem"}
         onMouseEnter={() => {
-          console.log('🎯 Sidebar hover ENTER'); // Debug
+          logger.info('App', '🎯 Sidebar hover ENTER'); // Debug
           setIsHovering(true);
           window.dispatchEvent(new CustomEvent('sidebarHover', { detail: { isHovering: true } }));
         }}
         onMouseLeave={() => {
-          console.log('🎯 Sidebar hover LEAVE'); // Debug
+          logger.info('App', '🎯 Sidebar hover LEAVE'); // Debug
           setIsHovering(false);
           window.dispatchEvent(new CustomEvent('sidebarHover', { detail: { isHovering: false } }));
         }}

@@ -6,6 +6,7 @@
 import { inventoryApi } from './inventoryApi';
 import { supabase } from '@/lib/supabase/client';
 
+import { logger } from '@/lib/logging';
 export interface SupplyChainMetrics {
   totalItems: number;
   totalStockValue: number;
@@ -96,7 +97,7 @@ export class SupplyChainDataService {
       };
 
     } catch (error) {
-      console.error('Error fetching supply chain metrics:', error);
+      logger.error('MaterialsStore', 'Error fetching supply chain metrics:', error);
       throw error;
     }
   }
@@ -125,7 +126,7 @@ export class SupplyChainDataService {
       })) || [];
 
     } catch (error) {
-      console.error('Error fetching item performance:', error);
+      logger.error('MaterialsStore', 'Error fetching item performance:', error);
       throw error;
     }
   }
@@ -143,7 +144,7 @@ export class SupplyChainDataService {
       return data || [];
 
     } catch (error) {
-      console.error('Error fetching stock alerts:', error);
+      logger.error('MaterialsStore', 'Error fetching stock alerts:', error);
       throw error;
     }
   }
@@ -161,7 +162,7 @@ export class SupplyChainDataService {
       return data?.[0] || null;
 
     } catch (error) {
-      console.error('Error fetching monthly stats:', error);
+      logger.error('MaterialsStore', 'Error fetching monthly stats:', error);
       throw error;
     }
   }
@@ -187,7 +188,7 @@ export class SupplyChainDataService {
       return trends.reverse(); // Chronological order
 
     } catch (error) {
-      console.error('Error fetching historical trends:', error);
+      logger.error('MaterialsStore', 'Error fetching historical trends:', error);
       throw error;
     }
   }
@@ -205,7 +206,7 @@ export class SupplyChainDataService {
       return data || [];
 
     } catch (error) {
-      console.error('Error fetching item history:', error);
+      logger.error('MaterialsStore', 'Error fetching item history:', error);
       throw error;
     }
   }
@@ -289,7 +290,7 @@ export class SupplyChainDataService {
       }
 
     } catch (error) {
-      console.error(`Error generating ${reportType} report:`, error);
+      logger.error('MaterialsStore', `Error generating ${reportType} report:`, error);
       throw error;
     }
   }

@@ -41,6 +41,7 @@ import offlineSync, { type SyncStatus } from './OfflineSync';
 import { EventBus } from '@/lib/events';
 
 
+import { logger } from '@/lib/logging';
 // Connection status types
 interface ConnectionStatus {
   isOnline: boolean;
@@ -98,12 +99,12 @@ export const ConnectionStatus = () => {
         
         // Trigger automatic sync when coming back online
         if (wasOffline && isNowOnline) {
-          console.log('[OfflineMonitor] Network restored, triggering automatic sync');
+          logger.info('OfflineSync', '[OfflineMonitor] Network restored, triggering automatic sync');
           // Wait 2 seconds for connection to stabilize before syncing
           setTimeout(() => {
             const currentSyncStatus = offlineSync.getSyncStatus();
             if (currentSyncStatus.queueSize > 0 && !currentSyncStatus.isSyncing) {
-              console.log(`[OfflineMonitor] Auto-syncing ${currentSyncStatus.queueSize} pending operations`);
+              logger.info('OfflineSync', `[OfflineMonitor] Auto-syncing ${currentSyncStatus.queueSize} pending operations`);
               offlineSync.forceSync();
             }
           }, 2000);
@@ -127,12 +128,12 @@ export const ConnectionStatus = () => {
 
     // Enhanced network event handlers
     const handleOnline = () => {
-      console.log('[OfflineMonitor] Network online event detected');
+      logger.info('OfflineSync', '[OfflineMonitor] Network online event detected');
       updateConnectionStatus();
     };
 
     const handleOffline = () => {
-      console.log('[OfflineMonitor] Network offline event detected');
+      logger.info('OfflineSync', '[OfflineMonitor] Network offline event detected');
       updateConnectionStatus();
     };
 
@@ -152,7 +153,7 @@ export const ConnectionStatus = () => {
     offlineSync.on('syncStarted', updateSyncStatus);
     offlineSync.on('syncCompleted', updateSyncStatus);
     offlineSync.on('initialized', (data: { queueSize: number }) => {
-      console.log(`[OfflineMonitor] OfflineSync initialized with ${data.queueSize} operations`);
+      logger.info('OfflineSync', `[OfflineMonitor] OfflineSync initialized with ${data.queueSize} operations`);
       updateSyncStatus();
     });
 

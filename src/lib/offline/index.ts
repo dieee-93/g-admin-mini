@@ -46,9 +46,9 @@ export {
 export const forceSync = async (): Promise<void> => {
   try {
     await offlineSync.syncPendingOperations();
-    console.log('[Offline] Force sync completed');
+    logger.info('OfflineSync', '[Offline] Force sync completed');
   } catch (error) {
-    console.error('[Offline] Force sync failed:', error);
+    logger.error('OfflineSync', '[Offline] Force sync failed:', error);
     throw error;
   }
 };
@@ -57,24 +57,24 @@ export const forceSync = async (): Promise<void> => {
 export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
   if ('serviceWorker' in navigator) {
     try {
-      console.log('[Offline] Registering Service Worker...');
+      logger.info('OfflineSync', '[Offline] Registering Service Worker...');
       
       const registration = await navigator.serviceWorker.register('/sw.js', {
         scope: '/',
         updateViaCache: 'none'
       });
       
-      console.log('[Offline] Service Worker registered successfully:', registration);
+      logger.info('OfflineSync', '[Offline] Service Worker registered successfully:', registration);
       
       // Handle updates
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
         if (newWorker) {
-          console.log('[Offline] New Service Worker installing...');
+          logger.info('OfflineSync', '[Offline] New Service Worker installing...');
           
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('[Offline] New Service Worker installed, ready to update');
+              logger.info('OfflineSync', '[Offline] New Service Worker installed, ready to update');
               // Notify user about update availability
               window.dispatchEvent(new CustomEvent('sw-update-available', {
                 detail: { registration }
@@ -86,12 +86,12 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
       
       return registration;
     } catch (error) {
-      console.error('[Offline] Service Worker registration failed:', error);
+      logger.error('OfflineSync', '[Offline] Service Worker registration failed:', error);
       return null;
     }
   }
   
-  console.warn('[Offline] Service Workers not supported in this browser');
+  logger.warn('OfflineSync', '[Offline] Service Workers not supported in this browser');
   return null;
 };
 
@@ -130,12 +130,12 @@ export const installPWA = (): Promise<boolean> => {
       deferredPrompt.prompt();
       
       deferredPrompt.userChoice.then((choiceResult: unknown) => {
-        console.log('[PWA] User choice:', choiceResult.outcome);
+        logger.info('OfflineSync', '[PWA] User choice:', choiceResult.outcome);
         (window as any).deferredPrompt = null;
         resolve(choiceResult.outcome === 'accepted');
       });
     } else {
-      console.log('[PWA] Install prompt not available');
+      logger.info('OfflineSync', '[PWA] Install prompt not available');
       resolve(false);
     }
   });
@@ -160,7 +160,7 @@ export const initializeOffline = async (config?: {
   syncInitialized: boolean;
   storageInitialized: boolean;
 }> => {
-  console.log('[Offline] Initializing offline capabilities...');
+  logger.info('OfflineSync', '[Offline] Initializing offline capabilities...');
   
   const {
     enableServiceWorker = true,
@@ -191,10 +191,10 @@ export const initializeOffline = async (config?: {
       await localStorage.delete('settings', 'init_test');
       storageInitialized = true;
     } catch (error) {
-      console.error('[Offline] Storage initialization failed:', error);
+      logger.error('OfflineSync', '[Offline] Storage initialization failed:', error);
     }
     
-    console.log('[Offline] Initialization complete:', {
+    logger.info('OfflineSync', '[Offline] Initialization complete:', {
       serviceWorker: !!serviceWorker,
       syncInitialized,
       storageInitialized
@@ -207,7 +207,7 @@ export const initializeOffline = async (config?: {
     };
     
   } catch (error) {
-    console.error('[Offline] Initialization failed:', error);
+    logger.error('OfflineSync', '[Offline] Initialization failed:', error);
     
     return {
       serviceWorker: null,
@@ -248,7 +248,7 @@ export const getStorageSummary = async () => {
       isOnline: navigator.onLine
     };
   } catch (error) {
-    console.error('[Offline] Error getting storage summary:', error);
+    logger.error('OfflineSync', '[Offline] Error getting storage summary:', error);
     return null;
   }
 };
@@ -279,6 +279,7 @@ import offlineSync from './OfflineSync';
 import localStorage from './LocalStorage';
 import conflictResolution from './ConflictResolution';
 import OfflineMonitor from './OfflineMonitor';
+import { logger } from '@/lib/logging';
 import {
   useOfflineStatus,
   useOnlineStatus,

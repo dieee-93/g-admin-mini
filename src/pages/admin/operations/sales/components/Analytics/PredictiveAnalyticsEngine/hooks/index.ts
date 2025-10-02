@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { generatePredictiveAnalytics } from '../data';
 import type { PredictiveMetrics, Timeframe } from '../types';
 
+import { logger } from '@/lib/logging';
 export const usePredictiveAnalytics = () => {
   const [analytics, setAnalytics] = useState<PredictiveMetrics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -19,7 +20,7 @@ export const usePredictiveAnalytics = () => {
       const predictiveData = generatePredictiveAnalytics();
       setAnalytics(predictiveData);
     } catch (err) {
-      console.error('Error loading predictive analytics:', err);
+      logger.error('SalesStore', 'Error loading predictive analytics:', err);
       setError('Failed to load predictive analytics');
     } finally {
       setLoading(false);

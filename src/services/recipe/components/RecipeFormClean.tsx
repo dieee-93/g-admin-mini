@@ -24,6 +24,7 @@ import { MaterialSelector } from '@/shared/components/MaterialSelector';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
 import type { Recipe } from '../types';
 import { CardWrapper, Stack, Icon, InputField } from '@/shared/ui';
+import { logger } from '@/lib/logging';
 interface RecipeFormProps {
   recipe?: Recipe;
   onSave?: (recipe: Recipe) => void;
@@ -199,7 +200,7 @@ export const RecipeFormClean: React.FC<RecipeFormProps> = ({
         onSave?.(created);
       }
     } catch (error) {
-      console.error('Error saving recipe:', error);
+      logger.error('App', 'Error saving recipe:', error);
     }
   }, [form, ingredients, totalCost, recipe, createRecipe, updateRecipe, onSave]);
 

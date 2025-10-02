@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 
+import { logger } from '@/lib/logging';
 // User role type
 export type UserRole = 'CLIENTE' | 'OPERADOR' | 'SUPERVISOR' | 'ADMINISTRADOR' | 'SUPER_ADMIN';
 
@@ -114,7 +115,7 @@ function decodeJWTClaims(token: string): CustomClaims | null {
       error: decoded.error
     };
   } catch (error) {
-    console.error('Error decoding JWT claims:', error);
+    logger.error('AuthContext', 'Error decoding JWT claims:', error);
     return null;
   }
 }
@@ -136,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const claims = decodeJWTClaims(currentSession.access_token);
       
       if (claims && claims.user_role && !claims.error) {
-        console.log('Role from JWT:', claims.user_role);
+        logger.info('AuthContext', 'Role from JWT:', claims.user_role);
         return {
           role: claims.user_role,
           isActive: claims.is_active ?? true,
@@ -145,7 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       if (claims?.error) {
-        console.warn('JWT claims error:', claims.error);
+        logger.error('AuthContext', 'JWT claims error:', claims.error);
       }
     }
 
@@ -159,7 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (!roleError && roleData) {
-        console.log('Role from database:', roleData.role);
+        logger.info('AuthContext', 'Role from database:', roleData.role);
         return {
           role: roleData.role as UserRole,
           isActive: roleData.is_active,
@@ -167,7 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
     } catch (dbError) {
-      console.error('Database role fetch error:', dbError);
+      logger.error('AuthContext', 'Database role fetch error:', dbError);
     }
 
     // 3. Final fallback
@@ -193,11 +194,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
 
       setUser(enhancedUser);
-      console.log(`🔐 AuthContext - User authenticated - Role: ${role} (${source})`);
-      console.log('🔐 AuthContext - Enhanced user object:', enhancedUser);
+      logger.info('AuthContext', `🔐 AuthContext - User authenticated - Role: ${role} (${source})`);
+      logger.info('AuthContext', '🔐 AuthContext - Enhanced user object:', enhancedUser);
       
     } catch (error) {
-      console.error('Error in handleAuthState:', error);
+      logger.error('AuthContext', 'Error in handleAuthState:', error);
       setUser({
         ...currentSession.user,
         role: 'CLIENTE',
@@ -225,7 +226,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        logger.error('AuthContext', 'Error initializing auth:', error);
         if (mounted) {
           setUser(null);
           setSession(null);
@@ -241,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       if (!mounted) return;
 
-      console.log('Auth state change:', event, !!currentSession);
+      logger.info('AuthContext', 'Auth state change:', event, !!currentSession);
 
       if (event === 'SIGNED_OUT' || !currentSession) {
         // Explicit cleanup on sign out
@@ -267,7 +268,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data, error } = await supabase.auth.refreshSession();
     
     if (error) {
-      console.error('Error refreshing session:', error);
+      logger.error('AuthContext', 'Error refreshing session:', error);
       await handleAuthState(session);
     } else if (data.session) {
       await handleAuthState(data.session);
@@ -288,7 +289,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       return {};
     } catch (error) {
-      console.error('Sign in error:', error);
+      logger.error('AuthContext', 'Sign in error:', error);
       return { error: 'An unexpected error occurred' };
     } finally {
       setLoading(false);
@@ -314,7 +315,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       return {};
     } catch (error) {
-      console.error('Sign up error:', error);
+      logger.error('AuthContext', 'Sign up error:', error);
       return { error: 'An unexpected error occurred' };
     } finally {
       setLoading(false);
@@ -333,7 +334,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        console.error('Sign out error:', error);
+        logger.error('AuthContext', 'Sign out error:', error);
       }
       
       // Force clear any persisted session data
@@ -342,7 +343,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Navigate after cleanup
       navigate('/login');
     } catch (error) {
-      console.error('Sign out error:', error);
+      logger.error('AuthContext', 'Sign out error:', error);
       // Even if error, clear local state
       setUser(null);
       setSession(null);

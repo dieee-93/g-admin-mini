@@ -24,6 +24,7 @@ import type { Recipe, RecipeWithCost } from '@/services/recipe/types';
 import { fetchRecipesWithCosts } from '@/services/recipe/api/recipeApi';
 import { CardWrapper } from '@/shared/ui';
 
+import { logger } from '@/lib/logging';
 interface RecipeIntelligenceDashboardProps {
   recipes: Recipe[];
   loading?: boolean;
@@ -79,7 +80,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
         });
       }
     } catch (err) {
-      console.error('Error loading recipe analytics:', err);
+      logger.error('App', 'Error loading recipe analytics:', err);
       setError('Error loading recipe analytics');
     } finally {
       setLoading(false);

@@ -1,6 +1,7 @@
 // Fiscal API - AFIP Integration and Tax Management
 import { supabase } from '@/lib/supabase/client';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { logger } from '@/lib/logging';
 import { 
   type Invoice, 
   type AFIPConfiguration, 
@@ -27,7 +28,7 @@ class FiscalAPI {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching invoices:', error);
+      logger.error('API', 'Error fetching invoices:', error);
       // Return mock data for development
       return this.getMockInvoices();
     }
@@ -57,7 +58,7 @@ class FiscalAPI {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error creating invoice:', error);
+      logger.error('API', 'Error creating invoice:', error);
       // Return mock invoice for development
       return this.createMockInvoice(invoiceData);
     }
@@ -81,7 +82,7 @@ class FiscalAPI {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error requesting CAE:', error);
+      logger.error('API', 'Error requesting CAE:', error);
       throw error;
     }
   }
@@ -100,11 +101,11 @@ class FiscalAPI {
           // Add delay between requests
           await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
-          console.error(`Error retrying CAE for invoice ${invoice.id}:`, error);
+          logger.error('API', `Error retrying CAE for invoice ${invoice.id}:`, error);
         }
       }
     } catch (error) {
-      console.error('Error retrying all pending CAE:', error);
+      logger.error('API', 'Error retrying all pending CAE:', error);
       throw error;
     }
   }
@@ -127,7 +128,7 @@ class FiscalAPI {
         failed_requests: 0
       };
     } catch (error) {
-      console.error('Error getting AFIP status:', error);
+      logger.error('API', 'Error getting AFIP status:', error);
       throw error;
     }
   }
@@ -153,7 +154,7 @@ class FiscalAPI {
 
       return data;
     } catch (error) {
-      console.error('Error getting AFIP configuration:', error);
+      logger.error('API', 'Error getting AFIP configuration:', error);
       throw error;
     }
   }
@@ -165,7 +166,7 @@ class FiscalAPI {
       await new Promise(resolve => setTimeout(resolve, 2000));
       return;
     } catch (error) {
-      console.error('Error testing AFIP connection:', error);
+      logger.error('API', 'Error testing AFIP connection:', error);
       throw error;
     }
   }
@@ -177,7 +178,7 @@ class FiscalAPI {
       await new Promise(resolve => setTimeout(resolve, 3000));
       return;
     } catch (error) {
-      console.error('Error renewing AFIP token:', error);
+      logger.error('API', 'Error renewing AFIP token:', error);
       throw error;
     }
   }
@@ -203,7 +204,7 @@ class FiscalAPI {
         ultimo_error: null
       }));
     } catch (error) {
-      console.error('Error getting pending invoices:', error);
+      logger.error('API', 'Error getting pending invoices:', error);
       return [];
     }
   }
@@ -223,7 +224,7 @@ class FiscalAPI {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching tax reports:', error);
+      logger.error('API', 'Error fetching tax reports:', error);
       return this.getMockTaxReports();
     }
   }
@@ -234,7 +235,7 @@ class FiscalAPI {
       // For now, return mock periods
       return this.getMockTaxPeriods();
     } catch (error) {
-      console.error('Error getting tax periods:', error);
+      logger.error('API', 'Error getting tax periods:', error);
       return [];
     }
   }
@@ -252,7 +253,7 @@ class FiscalAPI {
         vencimiento: '2024-08-15'
       };
     } catch (error) {
-      console.error('Error getting tax period detail:', error);
+      logger.error('API', 'Error getting tax period detail:', error);
       throw error;
     }
   }
@@ -263,7 +264,7 @@ class FiscalAPI {
       await new Promise(resolve => setTimeout(resolve, 3000));
       return;
     } catch (error) {
-      console.error('Error generating IVA report:', error);
+      logger.error('API', 'Error generating IVA report:', error);
       throw error;
     }
   }
@@ -274,7 +275,7 @@ class FiscalAPI {
       await new Promise(resolve => setTimeout(resolve, 5000));
       return;
     } catch (error) {
-      console.error('Error submitting tax return:', error);
+      logger.error('API', 'Error submitting tax return:', error);
       throw error;
     }
   }
@@ -290,7 +291,7 @@ class FiscalAPI {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error getting percepciones/retenciones:', error);
+      logger.error('API', 'Error getting percepciones/retenciones:', error);
       return [];
     }
   }
@@ -310,7 +311,7 @@ class FiscalAPI {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching financial reports:', error);
+      logger.error('API', 'Error fetching financial reports:', error);
       return this.getMockFinancialReports();
     }
   }
@@ -339,7 +340,7 @@ class FiscalAPI {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error generating financial report:', error);
+      logger.error('API', 'Error generating financial report:', error);
       return this.createMockFinancialReport(tipo);
     }
   }
@@ -350,7 +351,7 @@ class FiscalAPI {
       await new Promise(resolve => setTimeout(resolve, 2000));
       return;
     } catch (error) {
-      console.error('Error exporting financial report:', error);
+      logger.error('API', 'Error exporting financial report:', error);
       throw error;
     }
   }
@@ -365,7 +366,7 @@ class FiscalAPI {
         { label: 'Margen Bruto', value: 42.1, change: 2.3, trend: 'up', format: 'percentage' }
       ];
     } catch (error) {
-      console.error('Error getting financial KPIs:', error);
+      logger.error('API', 'Error getting financial KPIs:', error);
       return [];
     }
   }
@@ -388,7 +389,7 @@ class FiscalAPI {
         proxima_presentacion: '15/08/2024'
       };
     } catch (error) {
-      console.error('Error getting fiscal stats:', error instanceof Error ? error.message : String(error));
+      logger.error('API', 'Error getting fiscal stats:', error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -580,7 +581,7 @@ class FiscalAPI {
         ? DecimalUtils.add(data[0].numero.toString(), '1', 'financial').toNumber() 
         : 1;
     } catch (error) {
-      console.error('Error getting next invoice number:', error);
+      logger.error('API', 'Error getting next invoice number:', error);
       return Math.floor(DecimalUtils.add(DecimalUtils.multiply(Math.random().toString(), '100000', 'financial').toString(), '1', 'financial').toNumber());
     }
   }

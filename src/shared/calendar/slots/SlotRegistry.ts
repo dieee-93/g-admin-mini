@@ -9,6 +9,7 @@
 
 import React from 'react';
 
+import { logger } from '@/lib/logging';
 // ===============================
 // REGISTRY INTERFACES
 // ===============================
@@ -325,7 +326,7 @@ export class SlotRegistry {
       try {
         listener(event);
       } catch (error) {
-        console.error('Error in slot registry listener:', error);
+        logger.error('App', 'Error in slot registry listener:', error);
       }
     }
   }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '@/lib/logging';
 import { 
   CardWrapper, 
   CardHeader, 
@@ -57,7 +58,7 @@ export function DatabaseSetupStep({ onNext }: DatabaseSetupStepProps) {
       // Reset después de 3 segundos
       setTimeout(() => setHasCopied(false), 3000);
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      logger.error('App', 'Failed to copy: ', err);
     }
   };
 

@@ -26,6 +26,7 @@ import {
 import { useSalesPage } from './hooks';
 import { useModalState } from '@/store/salesStore';
 
+import { logger } from '@/lib/logging';
 // ✅ MODULE CONFIGURATION
 const SALES_MODULE_CONFIG = {
   capabilities: ['sells_products', 'pos_system', 'payment_processing', 'customer_management'],
@@ -36,15 +37,15 @@ const SALES_MODULE_CONFIG = {
   eventHandlers: {
     'materials.stock_updated': (data: any) => {
       // Auto-update product availability based on stock changes
-      console.log('🛒 Sales: Stock updated, updating product availability...', data);
+      logger.info('SalesStore', '🛒 Sales: Stock updated, updating product availability...', data);
     },
     'materials.low_stock_alert': (data: any) => {
       // Auto-disable products with critical stock levels
-      console.log('🚨 Sales: Low stock alert received, adjusting POS...', data);
+      logger.info('SalesStore', '🚨 Sales: Low stock alert received, adjusting POS...', data);
     },
     'kitchen.order_ready': (data: any) => {
       // Real-time order status updates
-      console.log('✅ Sales: Order ready notification...', data);
+      logger.info('SalesStore', '✅ Sales: Order ready notification...', data);
     }
   }
 } as const;

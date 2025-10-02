@@ -25,6 +25,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { useSchedulingPage } from './hooks';
 import { useScheduling } from './hooks/useScheduling';
 
+import { logger } from '@/lib/logging';
 // ✅ COMPONENTES ESPECIALIZADOS ENTERPRISE v2.1
 import {
   SchedulingMetrics,
@@ -54,13 +55,13 @@ const SCHEDULING_MODULE_CONFIG = {
   },
   eventHandlers: {
     'staff.availability_updated': (data: any) => {
-      console.log('♻️ Scheduling: Staff availability changed, recalculating...', data);
+      logger.debug('API', '♻️ Scheduling: Staff availability changed, recalculating...', data);
     },
     'sales.volume_forecast': (data: any) => {
-      console.log('📊 Scheduling: Sales forecast updated, adjusting staffing...', data);
+      logger.info('API', '📊 Scheduling: Sales forecast updated, adjusting staffing...', data);
     },
     'hr.rate_updated': (data: any) => {
-      console.log('💰 Scheduling: Labor rates updated, recalculating costs...', data);
+      logger.debug('API', '💰 Scheduling: Labor rates updated, recalculating costs...', data);
     }
   }
 } as const;
@@ -141,7 +142,7 @@ export default function SchedulingPage() {
         context="scheduling"
         schedulingStats={schedulingStats}
         onAlertAction={(action, data) => {
-          console.log('[SchedulingPage] 🚨 Alert action triggered:', { action, data });
+          logger.info('API', '[SchedulingPage] 🚨 Alert action triggered:', { action, data });
 
           // Handle alert actions
           if (action === 'find_coverage') handleTabChange('coverage');

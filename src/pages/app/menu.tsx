@@ -13,6 +13,7 @@ import {
   Tabs
 } from '@chakra-ui/react';
 import { CardWrapper, Icon, InputField } from '@/shared/ui';
+import { logger } from '@/lib/logging';
 import {
   ShoppingBagIcon,
   MagnifyingGlassIcon,
@@ -255,7 +256,7 @@ export function CustomerMenu() {
   const handleAddToCart = (productId: string) => {
     setCartItems(prev => [...prev, productId]);
     // TODO: Implementar lógica real del carrito
-    console.log('Producto agregado al carrito:', productId);
+    logger.info('App', 'Producto agregado al carrito:', productId);
   };
 
   return (

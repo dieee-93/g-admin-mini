@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { CustomerNote } from '../types';
+import { logger } from '@/lib/logging';
 import {
   getCustomerNotes,
   createCustomerNote,
@@ -26,7 +27,7 @@ export function useCustomerNotes(customerId?: string) {
       setNotes(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading notes');
-      console.error('Error loading customer notes:', err);
+      logger.error('App', 'Error loading customer notes:', err);
     } finally {
       setLoading(false);
     }
@@ -39,7 +40,7 @@ export function useCustomerNotes(customerId?: string) {
       await loadNotes(); // Reload to get updated list
       return newNote;
     } catch (err) {
-      console.error('Error creating note:', err);
+      logger.error('App', 'Error creating note:', err);
       throw err;
     }
   };
@@ -51,7 +52,7 @@ export function useCustomerNotes(customerId?: string) {
       await loadNotes(); // Reload to get updated list
       return updatedNote;
     } catch (err) {
-      console.error('Error updating note:', err);
+      logger.error('App', 'Error updating note:', err);
       throw err;
     }
   };
@@ -62,7 +63,7 @@ export function useCustomerNotes(customerId?: string) {
       await deleteCustomerNote(id);
       await loadNotes(); // Reload to get updated list
     } catch (err) {
-      console.error('Error deleting note:', err);
+      logger.error('App', 'Error deleting note:', err);
       throw err;
     }
   };
@@ -195,7 +196,7 @@ export function useAllCustomerNotes() {
       setAllNotes([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading all notes');
-      console.error('Error loading all customer notes:', err);
+      logger.error('App', 'Error loading all customer notes:', err);
     } finally {
       setLoading(false);
     }

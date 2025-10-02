@@ -18,6 +18,7 @@ import {
 
 // Import centralized utilities
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation'; 
+import { logger } from '@/lib/logging';
 export interface MaterialsFilters {
   type: 'all' | ItemType;
   category: 'all' | string; // Business category filter (e.g., "Lácteos", "Carnes")
@@ -238,7 +239,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             
 
           } catch (error) {
-            console.error('Error adding item:', error);
+            logger.error('App', 'Error adding item:', error);
             set({ 
               loading: false, 
               error: error instanceof Error ? error.message : 'Error al crear material'
@@ -253,7 +254,7 @@ export const useMaterialsStore = create<MaterialsState>()(
 
           if (!originalItem) {
             const error = new Error('Item no encontrado para actualizar.');
-            console.error(error);
+            logger.error('App', error);
             set({ error: error.message });
             throw error;
           }
@@ -300,7 +301,7 @@ export const useMaterialsStore = create<MaterialsState>()(
              // This will now fetch alerts from the backend
 
           } catch (error) {
-            console.error('Error updating item:', error);
+            logger.error('App', 'Error updating item:', error);
             const errorMessage = error instanceof Error ? error.message : 'Error al actualizar el material.';
             set({ loading: false, error: errorMessage });
             throw error;

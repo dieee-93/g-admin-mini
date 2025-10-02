@@ -8,9 +8,9 @@
  */
 
 import { AchievementsEngine } from '../../pages/admin/gamification/achievements/services/AchievementsEngine';
-import { initializeCapabilitiesIntegration } from '../../store/businessCapabilitiesStore';
 import eventBus from '../events/EventBus';
 
+import { logger } from '@/lib/logging';
 export interface AchievementSystemConfig {
   userId?: string;
   autoStart?: boolean;
@@ -43,19 +43,19 @@ export class AchievementSystemManager {
    */
   public async initialize(config: AchievementSystemConfig = {}): Promise<void> {
     if (this.isInitialized) {
-      console.warn('[AchievementSystem] Sistema ya inicializado');
+      logger.warn('CapabilitySystem', '[AchievementSystem] Sistema ya inicializado');
       return;
     }
 
     this.config = { autoStart: true, enableLogging: true, ...config };
 
     try {
-      console.log('[AchievementSystem] 🚀 Inicializando sistema de logros...');
+      logger.info('CapabilitySystem', '[AchievementSystem] 🚀 Inicializando sistema de logros...');
 
-      // 1. Inicializar integración del store de capacidades
-      initializeCapabilitiesIntegration();
-      
-      // 2. Inicializar el motor de logros si tenemos userId
+      // TODO: Integración con nuevo sistema de capabilities unificado
+      // La integración legacy de businessCapabilitiesStore ha sido removida
+
+      // 1. Inicializar el motor de logros si tenemos userId
       if (this.config.userId) {
         await this.startAchievementsEngine(this.config.userId);
       }
@@ -66,10 +66,10 @@ export class AchievementSystemManager {
       }
 
       this.isInitialized = true;
-      console.log('[AchievementSystem] ✅ Sistema de logros inicializado correctamente');
+      logger.info('CapabilitySystem', '[AchievementSystem] ✅ Sistema de logros inicializado correctamente');
 
     } catch (error) {
-      console.error('[AchievementSystem] ❌ Error inicializando sistema:', error);
+      logger.error('CapabilitySystem', '[AchievementSystem] ❌ Error inicializando sistema:', error);
       throw error;
     }
   }
@@ -86,10 +86,10 @@ export class AchievementSystemManager {
       this.achievementsEngine = AchievementsEngine.getInstance();
       await this.achievementsEngine.initialize(userId);
       
-      console.log('[AchievementSystem] ⚡ Motor de logros iniciado para usuario:', userId);
+      logger.info('CapabilitySystem', '[AchievementSystem] ⚡ Motor de logros iniciado para usuario:', userId);
       
     } catch (error) {
-      console.error('[AchievementSystem] Error iniciando motor de logros:', error);
+      logger.error('CapabilitySystem', '[AchievementSystem] Error iniciando motor de logros:', error);
       throw error;
     }
   }
@@ -101,7 +101,7 @@ export class AchievementSystemManager {
     if (this.achievementsEngine) {
       await this.achievementsEngine.destroy();
       this.achievementsEngine = null;
-      console.log('[AchievementSystem] 🛑 Motor de logros detenido');
+      logger.info('CapabilitySystem', '[AchievementSystem] 🛑 Motor de logros detenido');
     }
   }
 
@@ -111,7 +111,7 @@ export class AchievementSystemManager {
   private setupEventLogging(): void {
     // Eventos de hitos completados
     eventBus.on('milestone:completed' as any, (event: any) => {
-      console.log('[AchievementSystem] 🎯 Hito completado:', {
+      logger.info('CapabilitySystem', '[AchievementSystem] 🎯 Hito completado:', {
         milestone: event.milestoneId || event.milestone_id,
         user: event.userId || event.user_id,
         capability: event.capabilityId || event.capability_id
@@ -120,7 +120,7 @@ export class AchievementSystemManager {
 
     // Eventos de capacidades activadas
     eventBus.on('capability:activated' as any, (event: any) => {
-      console.log('[AchievementSystem] 🎉 Capacidad activada:', {
+      logger.info('CapabilitySystem', '[AchievementSystem] 🎉 Capacidad activada:', {
         capability: event.capabilityId,
         user: event.userId,
         milestones: event.data?.completedMilestones?.length || 0
@@ -129,14 +129,14 @@ export class AchievementSystemManager {
 
     // Eventos de progreso actualizado
     eventBus.on('progress:updated' as any, (event: any) => {
-      console.log('[AchievementSystem] 📈 Progreso actualizado:', {
+      logger.info('CapabilitySystem', '[AchievementSystem] 📈 Progreso actualizado:', {
         capability: event.capabilityId || event.capability_id,
         user: event.userId || event.user_id,
         progress: event.progress?.progressPercentage || 'N/A'
       });
     });
 
-    console.log('[AchievementSystem] 📝 Logging de eventos habilitado');
+    logger.info('CapabilitySystem', '[AchievementSystem] 📝 Logging de eventos habilitado');
   }
 
   /**
@@ -165,13 +165,13 @@ export class AchievementSystemManager {
         }
       };
 
-      console.log('[AchievementSystem] 🧪 Simulando completación de hito:', milestoneId);
+      logger.info('CapabilitySystem', '[AchievementSystem] 🧪 Simulando completación de hito:', milestoneId);
       
       // Emitir evento
       await eventBus.emit('business.milestone.completed' as any, mockEvent);
       
     } catch (error) {
-      console.error('[AchievementSystem] Error simulando hito:', error);
+      logger.error('CapabilitySystem', '[AchievementSystem] Error simulando hito:', error);
       throw error;
     }
   }
@@ -197,10 +197,10 @@ export class AchievementSystemManager {
       this.isInitialized = false;
       this.config = {};
       
-      console.log('[AchievementSystem] 🗑️ Sistema de logros destruido');
+      logger.info('CapabilitySystem', '[AchievementSystem] 🗑️ Sistema de logros destruido');
       
     } catch (error) {
-      console.error('[AchievementSystem] Error destruyendo sistema:', error);
+      logger.error('CapabilitySystem', '[AchievementSystem] Error destruyendo sistema:', error);
     }
   }
 }

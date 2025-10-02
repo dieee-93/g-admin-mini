@@ -1,6 +1,8 @@
 // BundleOptimizer.ts - Advanced bundle optimization and analysis
 // Provides build-time and runtime optimization recommendations
 
+import { logger } from '@/lib/logging';
+
 interface BundleAnalysis {
   totalSize: number;
   gzippedSize: number;
@@ -70,7 +72,7 @@ export class BundleOptimizer {
         
         observer.observe({ entryTypes: ['resource'] });
       } catch (error) {
-        console.warn('Performance observer initialization failed:', error);
+        logger.error('Performance', 'Performance observer initialization failed:', error);
       }
     }
   }

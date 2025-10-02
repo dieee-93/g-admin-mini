@@ -44,6 +44,7 @@ import { ProcurementRecommendationsEngine } from '../../services/procurementReco
 import { useSmartInventoryAlerts } from '@/hooks/useSmartInventoryAlerts';
 import { useMaterials } from '@/hooks/useMaterials';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { logger } from '@/lib/logging';
 import type { 
   ProcurementAnalysisResult, 
   ProcurementRecommendation,
@@ -97,7 +98,7 @@ export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsT
       // TODO: Integrar con sistema de alertas para nuevas alertas
       
     } catch (error) {
-      console.error('Error generating procurement recommendations:', error);
+      logger.error('MaterialsStore', 'Error generating procurement recommendations:', error);
     } finally {
       setIsGenerating(false);
     }
@@ -511,7 +512,7 @@ const ProcurementRecommendationCard: React.FC<ProcurementRecommendationCardProps
               leftIcon={getActionIcon(action.type)}
               onClick={() => {
                 // TODO: Implementar acciones reales
-                console.log('Executing action:', action);
+                logger.info('MaterialsStore', 'Executing action:', action);
               }}
             >
               {action.label}

@@ -37,6 +37,7 @@ import { notify } from '@/lib/notifications';
 
 // Import REAL data connections - NO MORE MOCK DATA
 import { useCostAnalysis, type RealCostAnalysisResult, type RealCostCalculationInput } from '../../hooks/useCostAnalysis';
+import { logger } from '@/lib/logging';
 // import { useCostCalculations } from '../hooks/useCostCalculations'; // Commented out - hook not found
 
 export function CostAnalysisTab() {
@@ -116,7 +117,7 @@ export function CostAnalysisTab() {
         });
       }
     } catch (err) {
-      console.error('Error calculating real costs:', err);
+      logger.error('App', 'Error calculating real costs:', err);
       notify.error({
         title: 'Error',
         description: 'Error performing cost analysis'

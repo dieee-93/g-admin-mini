@@ -2,6 +2,8 @@
 // Provides robust local storage with schema versioning and data migrations
 
 // Database configuration
+import { logger } from '@/lib/logging';
+
 const DB_NAME = 'G-Admin-Mini';
 const DB_VERSION = 4;
 const STORES_CONFIG = {
@@ -89,9 +91,9 @@ class LocalStorageManager {
     try {
       this.db = await this.openDatabase();
       this.isInitialized = true;
-      console.log('[LocalStorage] Database initialized successfully');
+      logger.info('OfflineSync', '[LocalStorage] Database initialized successfully');
     } catch (error) {
-      console.error('[LocalStorage] Failed to initialize database:', error);
+      logger.error('OfflineSync', '[LocalStorage] Failed to initialize database:', error);
       throw error;
     }
   }
@@ -104,17 +106,17 @@ class LocalStorageManager {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
       
       request.onerror = () => {
-        console.error('[LocalStorage] Database opening failed:', request.error);
+        logger.error('OfflineSync', '[LocalStorage] Database opening failed:', request.error);
         reject(request.error);
       };
       
       request.onsuccess = () => {
-        console.log('[LocalStorage] Database opened successfully');
+        logger.info('OfflineSync', '[LocalStorage] Database opened successfully');
         resolve(request.result);
       };
       
       request.onupgradeneeded = (event) => {
-        console.log(`[LocalStorage] Database upgrade needed: ${event.oldVersion} -> ${event.newVersion}`);
+        logger.info('OfflineSync', `[LocalStorage] Database upgrade needed: ${event.oldVersion} -> ${event.newVersion}`);
         this.handleDatabaseUpgrade(event);
       };
     });
@@ -127,7 +129,7 @@ class LocalStorageManager {
     const db = (event.target as IDBOpenDBRequest).result;
     const transaction = (event.target as IDBOpenDBRequest).transaction!;
     
-    console.log(`[LocalStorage] Upgrading database from version ${event.oldVersion} to ${event.newVersion}`);
+    logger.info('OfflineSync', `[LocalStorage] Upgrading database from version ${event.oldVersion} to ${event.newVersion}`);
     
     // Create or update object stores
     Object.entries(STORES_CONFIG).forEach(([storeName, config]) => {
@@ -144,12 +146,12 @@ class LocalStorageManager {
     
     if (db.objectStoreNames.contains(storeName)) {
       // Store exists, might need to update indexes
-      console.log(`[LocalStorage] Updating store: ${storeName}`);
+      logger.info('OfflineSync', `[LocalStorage] Updating store: ${storeName}`);
       // Note: In real implementation, you'd need to handle index updates during upgrade
       return;
     } else {
       // Create new store
-      console.log(`[LocalStorage] Creating store: ${storeName}`);
+      logger.info('OfflineSync', `[LocalStorage] Creating store: ${storeName}`);
       store = db.createObjectStore(storeName, {
         keyPath: config.keyPath,
         autoIncrement: config.autoIncrement || false
@@ -159,7 +161,7 @@ class LocalStorageManager {
     // Create indexes
     config.indexes.forEach(indexName => {
       if (!store.indexNames.contains(indexName)) {
-        console.log(`[LocalStorage] Creating index: ${indexName} on ${storeName}`);
+        logger.info('OfflineSync', `[LocalStorage] Creating index: ${indexName} on ${storeName}`);
         store.createIndex(indexName, indexName, { unique: false });
       }
     });
@@ -167,7 +169,7 @@ class LocalStorageManager {
 
   // Run database migrations
   private runMigrations(db: IDBDatabase, transaction: IDBTransaction, oldVersion: number, newVersion: number): void {
-    console.log(`[LocalStorage] Running migrations: ${oldVersion} -> ${newVersion}`);
+    logger.info('OfflineSync', `[LocalStorage] Running migrations: ${oldVersion} -> ${newVersion}`);
     
     // Version-specific migrations
     if (oldVersion < 2) {
@@ -181,7 +183,7 @@ class LocalStorageManager {
 
   // Migration to version 2
   private migrateToVersion2(db: IDBDatabase, transaction: IDBTransaction): void {
-    console.log('[LocalStorage] Migrating to version 2: Adding analytics store');
+    logger.info('OfflineSync', '[LocalStorage] Migrating to version 2: Adding analytics store');
     
     if (!db.objectStoreNames.contains('analytics')) {
       const store = db.createObjectStore('analytics', { keyPath: 'id' });
@@ -193,7 +195,7 @@ class LocalStorageManager {
 
   // Migration to version 3
   private migrateToVersion3(db: IDBDatabase, transaction: IDBTransaction): void {
-    console.log('[LocalStorage] Migrating to version 3: Adding cache optimization');
+    logger.info('OfflineSync', '[LocalStorage] Migrating to version 3: Adding cache optimization');
     
     // Add new indexes to existing stores
     if (db.objectStoreNames.contains('cache')) {
@@ -246,7 +248,7 @@ class LocalStorageManager {
     const storeConfig = STORES_CONFIG[storeName as keyof typeof STORES_CONFIG];
     const keyPath = storeConfig.keyPath;
 
-    console.log(`[LocalStorage] 🔧 Using keyPath '${keyPath}' for store '${storeName}'`);
+    logger.info('OfflineSync', `[LocalStorage] 🔧 Using keyPath '${keyPath}' for store '${storeName}'`);
 
     // Crear el objeto con la estructura correcta basada en el keyPath
     const storedData: any = {
@@ -257,10 +259,10 @@ class LocalStorageManager {
       checksum: this.calculateChecksum(data)
     };
 
-    console.log(`[LocalStorage] 🔧 Storing object:`, storedData);
+    logger.info('OfflineSync', `[LocalStorage] 🔧 Storing object:`, storedData);
 
     await this.performStoreOperation(storeName, 'readwrite', store => store.put(storedData));
-    console.log(`[LocalStorage] ✅ Stored data in ${storeName}: ${key}`);
+    logger.info('OfflineSync', `[LocalStorage] ✅ Stored data in ${storeName}: ${key}`);
   }
 
   // Retrieve data
@@ -271,7 +273,7 @@ class LocalStorageManager {
       if (result) {
         // Verify checksum if available
         if (result.checksum && result.checksum !== this.calculateChecksum(result.data)) {
-          console.warn(`[LocalStorage] Checksum mismatch for ${storeName}:${key}`);
+          logger.warn('OfflineSync', `[LocalStorage] Checksum mismatch for ${storeName}:${key}`);
         }
         
         return result.data;
@@ -279,7 +281,7 @@ class LocalStorageManager {
       
       return null;
     } catch (error) {
-      console.error(`[LocalStorage] Error getting ${storeName}:${key}:`, error);
+      logger.error('OfflineSync', `[LocalStorage] Error getting ${storeName}:${key}:`, error);
       return null;
     }
   }
@@ -290,7 +292,7 @@ class LocalStorageManager {
       const results = await this.performStoreOperation(storeName, 'readonly', store => store.getAll());
       return results.map(result => result.data || result);
     } catch (error) {
-      console.error(`[LocalStorage] Error getting all from ${storeName}:`, error);
+      logger.error('OfflineSync', `[LocalStorage] Error getting all from ${storeName}:`, error);
       return [];
     }
   }
@@ -298,13 +300,13 @@ class LocalStorageManager {
   // Delete data
   public async delete(storeName: string, key: string): Promise<void> {
     await this.performStoreOperation(storeName, 'readwrite', store => store.delete(key));
-    console.log(`[LocalStorage] Deleted from ${storeName}: ${key}`);
+    logger.info('OfflineSync', `[LocalStorage] Deleted from ${storeName}: ${key}`);
   }
 
   // Clear entire store
   public async clear(storeName: string): Promise<void> {
     await this.performStoreOperation(storeName, 'readwrite', store => store.clear());
-    console.log(`[LocalStorage] Cleared store: ${storeName}`);
+    logger.info('OfflineSync', `[LocalStorage] Cleared store: ${storeName}`);
   }
 
   // Count items in store
@@ -446,7 +448,7 @@ class LocalStorageManager {
       };
       
       transaction.oncomplete = () => {
-        console.log('[LocalStorage] Expired cache entries cleaned');
+        logger.info('OfflineSync', '[LocalStorage] Expired cache entries cleaned');
         resolve();
       };
       
@@ -485,7 +487,7 @@ class LocalStorageManager {
       try {
         exportData[storeName] = await this.getAll(storeName);
       } catch (error) {
-        console.error(`[LocalStorage] Error exporting ${storeName}:`, error);
+        logger.error('OfflineSync', `[LocalStorage] Error exporting ${storeName}:`, error);
         exportData[storeName] = [];
       }
     }
@@ -507,9 +509,9 @@ class LocalStorageManager {
           }));
           
           await this.bulkSet(storeName, itemsToImport);
-          console.log(`[LocalStorage] Imported ${items.length} items to ${storeName}`);
+          logger.info('OfflineSync', `[LocalStorage] Imported ${items.length} items to ${storeName}`);
         } catch (error) {
-          console.error(`[LocalStorage] Error importing ${storeName}:`, error);
+          logger.error('OfflineSync', `[LocalStorage] Error importing ${storeName}:`, error);
         }
       }
     }
@@ -536,7 +538,7 @@ class LocalStorageManager {
 
   // Database maintenance
   public async maintenance(): Promise<void> {
-    console.log('[LocalStorage] Starting database maintenance');
+    logger.info('OfflineSync', '[LocalStorage] Starting database maintenance');
     
     try {
       // Clean expired cache
@@ -550,9 +552,9 @@ class LocalStorageManager {
       const monthAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
       await this.cleanOldAnalytics(monthAgo);
       
-      console.log('[LocalStorage] Database maintenance completed');
+      logger.info('OfflineSync', '[LocalStorage] Database maintenance completed');
     } catch (error) {
-      console.error('[LocalStorage] Maintenance failed:', error);
+      logger.error('OfflineSync', '[LocalStorage] Maintenance failed:', error);
     }
   }
 
@@ -579,7 +581,7 @@ class LocalStorageManager {
       };
       
       transaction.oncomplete = () => {
-        console.log(`[LocalStorage] Cleaned ${deleted} old sync queue items`);
+        logger.info('OfflineSync', `[LocalStorage] Cleaned ${deleted} old sync queue items`);
         resolve();
       };
       
@@ -610,7 +612,7 @@ class LocalStorageManager {
       };
       
       transaction.oncomplete = () => {
-        console.log(`[LocalStorage] Cleaned ${deleted} old analytics entries`);
+        logger.info('OfflineSync', `[LocalStorage] Cleaned ${deleted} old analytics entries`);
         resolve();
       };
       
@@ -624,7 +626,7 @@ class LocalStorageManager {
       this.db.close();
       this.db = null;
       this.isInitialized = false;
-      console.log('[LocalStorage] Database connection closed');
+      logger.info('OfflineSync', '[LocalStorage] Database connection closed');
     }
   }
 
@@ -650,7 +652,7 @@ const localStorage = new LocalStorageManager();
 if (typeof window !== 'undefined') {
   setInterval(() => {
     localStorage.maintenance().catch(error => {
-      console.error('[LocalStorage] Periodic maintenance failed:', error);
+      logger.error('OfflineSync', '[LocalStorage] Periodic maintenance failed:', error);
     });
   }, 24 * 60 * 60 * 1000); // Daily maintenance
 }

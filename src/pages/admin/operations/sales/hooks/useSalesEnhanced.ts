@@ -9,6 +9,7 @@ import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { useSales as useSalesOriginal } from './useSales';
 import { useMemo } from 'react';
 
+import { logger } from '@/lib/logging';
 interface SaleTransaction {
   id: string;
   order_number: string;
@@ -276,7 +277,7 @@ export function useSalesEnhanced() {
         }
       };
     } catch (error) {
-      console.error('Error generating sales analytics:', error);
+      logger.error('SalesStore', 'Error generating sales analytics:', error);
       return null;
     }
   };

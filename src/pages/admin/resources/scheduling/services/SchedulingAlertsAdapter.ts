@@ -14,6 +14,7 @@ import { EmitEventFn } from '@/hooks/useModuleIntegration';
 // ✅ BUSINESS LOGIC UTILITIES
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
+import { logger } from '@/lib/logging';
 // ✅ ALERT MAPPING CONFIGURATION
 const ALERT_PRIORITY_MAP = {
   'critical': 1,
@@ -90,7 +91,7 @@ export class SchedulingAlertsAdapter {
       return sortedAlerts;
 
     } catch (error) {
-      console.error('❌ SchedulingAlertsAdapter: Error generating alerts:', error);
+      logger.error('API', '❌ SchedulingAlertsAdapter: Error generating alerts:', error);
       this.emitEvent('scheduling.alert_generation_error', { error: String(error) });
       return [];
     }
@@ -312,7 +313,7 @@ export class SchedulingAlertsAdapter {
       return result;
 
     } catch (error) {
-      console.error('❌ Error handling alert action:', error);
+      logger.error('API', '❌ Error handling alert action:', error);
       return {
         success: false,
         message: `Error ejecutando acción: ${String(error)}`

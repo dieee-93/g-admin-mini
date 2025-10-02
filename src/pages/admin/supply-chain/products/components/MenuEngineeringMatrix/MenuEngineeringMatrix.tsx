@@ -34,6 +34,7 @@ import { Icon } from '@/shared/ui/Icon';
 // Business Logic
 // import { MenuEngineeringMatrix } from '../analytics/MenuEngineeringMatrix'; // File not found after refactor
 import { useMenuEngineering } from '../../hooks/useMenuEngineering';
+import { logger } from '@/lib/logging';
 import type { 
   MenuEngineeringData, 
   StrategyRecommendation,
@@ -62,12 +63,12 @@ export function MenuEngineeringMatrix() {
 
   // Real event handlers
   const handleProductSelect = (product: MenuEngineeringData) => {
-    console.log("Product selected for analysis:", product);
+    logger.info('App', "Product selected for analysis:", product);
     // TODO: Integrate with ProductsStore for editing
   };
 
   const handleStrategySelect = (recommendation: StrategyRecommendation) => {
-    console.log("Strategy selected:", recommendation);
+    logger.info('App', "Strategy selected:", recommendation);
     // TODO: Implement strategy execution logic
   };
 

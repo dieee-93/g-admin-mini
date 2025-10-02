@@ -4,6 +4,7 @@ import { CubeIcon, PlusIcon, ExclamationTriangleIcon } from '@heroicons/react/24
 import { useMaterials } from '@/store/materialsStore';
 import { formatCurrency } from '@/business-logic/shared/decimalUtils';
 
+import { logger } from '@/lib/logging';
 interface InventoryTabProps {
   onStockUpdate: (itemId: string, newStock: number) => Promise<void>;
   onBulkAction: (action: string, itemIds: string[]) => Promise<void>;
@@ -26,7 +27,7 @@ export function InventoryTab({
     try {
       await onStockUpdate(itemId, newStock);
     } catch (error) {
-      console.error('Error updating stock:', error);
+      logger.error('MaterialsStore', 'Error updating stock:', error);
     } finally {
       setIsLoading(false);
     }

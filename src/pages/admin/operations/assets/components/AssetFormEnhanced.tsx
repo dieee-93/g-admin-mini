@@ -9,6 +9,7 @@ import {
 import { Icon } from '@/shared/ui';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 const assetSchema = z.object({
   basicInfo: z.object({
     assetName: z.string().min(1, 'Nombre del asset requerido'),
@@ -190,7 +191,7 @@ export const AssetFormEnhanced: React.FC = () => {
 
   const handleFormSubmit = async (data: AssetFormData) => {
     try {
-      console.log('Creating asset:', data);
+      logger.info('App', 'Creating asset:', data);
 
       const assetId = `asset_${Date.now()}`;
 
@@ -202,10 +203,10 @@ export const AssetFormEnhanced: React.FC = () => {
         annualRevenue: assetMetrics.annualRentalRevenue
       });
 
-      console.log(`[Asset] Asset created: ${assetId}`);
+      logger.info('App', `[Asset] Asset created: ${assetId}`);
 
     } catch (error) {
-      console.error('Error creating asset:', error);
+      logger.error('App', 'Error creating asset:', error);
     }
   };
 

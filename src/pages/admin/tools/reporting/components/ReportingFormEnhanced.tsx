@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 // Report Configuration Schema
 const ReportConfigSchema = z.object({
   // Basic Configuration
@@ -209,7 +210,7 @@ const ReportingFormEnhanced: React.FC = () => {
       );
 
     } catch (error) {
-      console.error('Error generating report:', error);
+      logger.error('App', 'Error generating report:', error);
       ModuleEventUtils.reporting.error(
         `report-${Date.now()}`,
         error instanceof Error ? error.message : 'Unknown error',

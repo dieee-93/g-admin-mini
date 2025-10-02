@@ -30,6 +30,7 @@ import { lazyLoadingManager, getPerformanceMetrics } from '../LazyLoadingManager
 import { bundleOptimizer, analyzeBundleSize, getChunkLoadStats } from '../BundleOptimizer';
 import { usePerformance } from '../RuntimeOptimizations';
 
+import { logger } from '@/lib/logging';
 interface PerformanceTab {
   id: string;
   label: string;
@@ -82,7 +83,7 @@ export function PerformanceDashboard() {
       const bundleData = await analyzeBundleSize();
       setBundleAnalysis(bundleData);
     } catch (error) {
-      console.warn('Bundle analysis failed:', error);
+      logger.error('Performance', 'Bundle analysis failed:', error);
     }
   };
 

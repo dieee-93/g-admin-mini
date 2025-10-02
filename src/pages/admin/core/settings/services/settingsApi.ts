@@ -1,4 +1,6 @@
 // Settings API - Business configuration database functions
+import { logger } from '@/lib/logging';
+
 import type { 
   BusinessSettings, 
   TaxSettings,
@@ -179,7 +181,7 @@ export async function updateBusinessSettings(
   };
   
   // In production, this would create an audit log entry
-  console.log(`Business settings updated by ${updatedBy}`);
+  logger.info('App', `Business settings updated by ${updatedBy}`);
   
   return mockBusinessSettings;
 }
@@ -202,7 +204,7 @@ export async function updateTaxConfiguration(
   };
   mockBusinessSettings.updated_at = new Date().toISOString();
   
-  console.log(`Tax configuration updated by ${updatedBy}`);
+  logger.info('App', `Tax configuration updated by ${updatedBy}`);
   
   return mockBusinessSettings.tax_settings;
 }
@@ -222,7 +224,7 @@ export async function updateOperatingHours(
   mockBusinessSettings.operating_hours = operatingHours;
   mockBusinessSettings.updated_at = new Date().toISOString();
   
-  console.log(`Operating hours updated by ${updatedBy}`);
+  logger.info('App', `Operating hours updated by ${updatedBy}`);
   
   return mockBusinessSettings.operating_hours;
 }
@@ -253,7 +255,7 @@ export async function updateSystemSettings(
     ...settings
   };
   
-  console.log(`System settings updated by ${updatedBy}`);
+  logger.info('App', `System settings updated by ${updatedBy}`);
   
   return mockSystemSettings;
 }
@@ -287,7 +289,7 @@ export async function createUserRole(
   
   mockUserRoles.push(newRole);
   
-  console.log(`User role ${newRole.name} created by ${createdBy}`);
+  logger.info('App', `User role ${newRole.name} created by ${createdBy}`);
   
   return newRole;
 }
@@ -316,7 +318,7 @@ export async function updateUserRole(
     ...roleData
   };
   
-  console.log(`User role updated by ${updatedBy}`);
+  logger.info('App', `User role updated by ${updatedBy}`);
   
   return mockUserRoles[roleIndex];
 }
@@ -342,7 +344,7 @@ export async function deleteUserRole(roleId: string, deletedBy: string): Promise
   
   mockUserRoles.splice(roleIndex, 1);
   
-  console.log(`User role ${role.name} deleted by ${deletedBy}`);
+  logger.info('App', `User role ${role.name} deleted by ${deletedBy}`);
 }
 
 /**
@@ -380,7 +382,7 @@ export async function updateIntegrationConfig(
     last_sync: new Date().toISOString()
   };
   
-  console.log(`Integration ${mockIntegrations[integrationIndex].name} updated by ${updatedBy}`);
+  logger.info('App', `Integration ${mockIntegrations[integrationIndex].name} updated by ${updatedBy}`);
   
   return mockIntegrations[integrationIndex];
 }
@@ -409,7 +411,7 @@ export async function toggleIntegrationStatus(
     mockIntegrations[integrationIndex].last_sync = new Date().toISOString();
   }
   
-  console.log(`Integration ${mockIntegrations[integrationIndex].name} ${status} by ${updatedBy}`);
+  logger.info('App', `Integration ${mockIntegrations[integrationIndex].name} ${status} by ${updatedBy}`);
   
   return mockIntegrations[integrationIndex];
 }
@@ -466,7 +468,7 @@ export async function updateNotificationSettings(
   };
   mockBusinessSettings.updated_at = new Date().toISOString();
   
-  console.log(`Notification settings updated by ${updatedBy}`);
+  logger.info('App', `Notification settings updated by ${updatedBy}`);
   
   return mockBusinessSettings.notification_settings;
 }

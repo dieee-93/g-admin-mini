@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase/client';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { RecipeDecimal } from '@/config/decimal-config';
 
+import { logger } from '@/lib/logging';
 export interface RecipeIngredientData {
   id: string;
   name: string;
@@ -92,7 +93,7 @@ export class SmartCostCalculationEngine {
       });
 
     } catch (error) {
-      console.error('Error calculating recipe cost:', error);
+      logger.error('App', 'Error calculating recipe cost:', error);
       // Retornar estructura vacía en caso de error
       return SmartCostCalculationEngine.getEmptyResult();
     }

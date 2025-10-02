@@ -6,6 +6,7 @@
 import { slotRegistry } from './SlotRegistry';
 import type { BusinessCapability } from '../capabilities/types/BusinessCapabilities';
 
+import { logger } from '@/lib/logging';
 /**
  * Registra múltiples slots para un módulo específico
  * Simplifica el registro masivo de componentes
@@ -106,8 +107,8 @@ export function createTypedSlot<T extends SlotName>(
 export function debugSlots(): void {
   if (process.env.NODE_ENV === 'development') {
     console.group('🎯 Debug Slots System');
-    console.log('Registry Info:', slotRegistry.getDebugInfo());
-    console.log('All Slots:', slotRegistry.getAllSlots());
+    logger.debug('App', 'Registry Info:', slotRegistry.getDebugInfo());
+    logger.info('App', 'All Slots:', slotRegistry.getAllSlots());
     console.groupEnd();
   }
 }

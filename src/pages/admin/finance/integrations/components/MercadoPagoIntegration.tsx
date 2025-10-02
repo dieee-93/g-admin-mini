@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 // MercadoPago Configuration Schema
 const MercadoPagoConfigSchema = z.object({
   // API Credentials
@@ -112,7 +113,7 @@ const MercadoPagoIntegration: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('MercadoPago connection error:', error);
+      logger.error('App', 'MercadoPago connection error:', error);
       setConnectionStatus('error');
       setTestResults({ error: 'Error de conexión con MercadoPago API' });
     } finally {
@@ -123,7 +124,7 @@ const MercadoPagoIntegration: React.FC = () => {
   const onSubmit = async (data: MercadoPagoConfig) => {
     try {
       // Simulate saving configuration
-      console.log('Saving MercadoPago config:', data);
+      logger.info('App', 'Saving MercadoPago config:', data);
 
       // Emit configuration event
       ModuleEventUtils.analytics.generated('payment-integrations', {
@@ -135,7 +136,7 @@ const MercadoPagoIntegration: React.FC = () => {
 
       alert('Configuración de MercadoPago guardada exitosamente');
     } catch (error) {
-      console.error('Error saving MercadoPago config:', error);
+      logger.error('App', 'Error saving MercadoPago config:', error);
     }
   };
 

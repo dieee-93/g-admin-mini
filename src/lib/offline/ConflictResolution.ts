@@ -4,6 +4,7 @@
 import { EventBus } from '@/lib/events';
 import localStorage from './LocalStorage';
 
+import { logger } from '@/lib/logging';
 // Conflict types and resolution strategies
 interface DataConflict {
   id: string;
@@ -204,7 +205,7 @@ class ConflictResolutionEngine {
 
   // Main conflict resolution method
   public async resolveConflict(conflict: DataConflict): Promise<ResolutionResult> {
-    console.log(`[ConflictResolution] Resolving conflict: ${conflict.id} (${conflict.type})`);
+    logger.info('OfflineSync', `[ConflictResolution] Resolving conflict: ${conflict.id} (${conflict.type})`);
     
     // Store conflict for tracking
     this.activeConflicts.set(conflict.id, conflict);
@@ -213,7 +214,7 @@ class ConflictResolutionEngine {
       // Find and apply the best strategy
       for (const strategy of this.strategies) {
         if (strategy.condition(conflict)) {
-          console.log(`[ConflictResolution] Applying strategy: ${strategy.name}`);
+          logger.info('OfflineSync', `[ConflictResolution] Applying strategy: ${strategy.name}`);
           
           const result = strategy.resolve(conflict);
           
@@ -249,7 +250,7 @@ class ConflictResolutionEngine {
       return this.requireManualResolution(conflict);
       
     } catch (error) {
-      console.error(`[ConflictResolution] Error resolving conflict ${conflict.id}:`, error);
+      logger.error('OfflineSync', `[ConflictResolution] Error resolving conflict ${conflict.id}:`, error);
       return {
         success: false,
         resolvedValue: conflict.localValue,
@@ -679,7 +680,7 @@ class ConflictResolutionEngine {
       try {
         await this.applySideEffect(effect);
       } catch (error) {
-        console.error('[ConflictResolution] Failed to apply side effect:', error);
+        logger.error('OfflineSync', '[ConflictResolution] Failed to apply side effect:', error);
       }
     }
   }
@@ -707,12 +708,12 @@ class ConflictResolutionEngine {
 
   private async updateRelatedData(target: string, data: any): Promise<void> {
     // Implementation would update related database records
-    console.log(`[ConflictResolution] Side effect: Update ${target}`, data);
+    logger.info('OfflineSync', `[ConflictResolution] Side effect: Update ${target}`, data);
   }
 
   private async sendNotification(target: string, action: string, data: any): Promise<void> {
     // Implementation would send notifications to users/systems
-    console.log(`[ConflictResolution] Side effect: Notify ${target} about ${action}`, data);
+    logger.info('OfflineSync', `[ConflictResolution] Side effect: Notify ${target} about ${action}`, data);
   }
 
   private async logAuditTrail(target: string, action: string, data: any): Promise<void> {
@@ -723,12 +724,12 @@ class ConflictResolutionEngine {
       data,
       timestamp: new Date().toISOString()
     });
-    console.log(`[ConflictResolution] Side effect: Logged ${action} to ${target}`, data);
+    logger.info('OfflineSync', `[ConflictResolution] Side effect: Logged ${action} to ${target}`, data);
   }
 
   private async cascadeChanges(target: string, data: any): Promise<void> {
     // Implementation would propagate changes to dependent entities
-    console.log(`[ConflictResolution] Side effect: Cascade changes to ${target}`, data);
+    logger.info('OfflineSync', `[ConflictResolution] Side effect: Cascade changes to ${target}`, data);
   }
 
   // User preference management

@@ -1,4 +1,5 @@
 import { Tabs, Stack, Button, Alert, Icon, Typography, Badge } from '@/shared/ui';
+import { logger } from '@/lib/logging';
 import {
   CreditCardIcon,
   ChartBarIcon,
@@ -69,7 +70,7 @@ export function SalesManagement({
             </Button>
             <Button
               variant="outline"
-              onClick={() => console.log('Ver Historial')}
+              onClick={() => logger.info('SalesStore', 'Ver Historial')}
             >
               Ver Historial
             </Button>
@@ -186,6 +187,5 @@ export function SalesManagement({
           />
         </Stack>
       </Tabs.Content>
-    </Tabs>
-  );
+    </Tabs>);
 }

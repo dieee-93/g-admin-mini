@@ -6,6 +6,7 @@
 import { createBrowserClient } from '@supabase/ssr';
 import { supabase } from '@/lib/supabase/client';
 
+import { logger } from '@/lib/logging';
 export interface SetupProgress {
   step: string;
   description: string;
@@ -89,7 +90,7 @@ export class DatabaseSetupService {
 
       return true;
     } catch (error) {
-      console.error('Error en configuración automática:', error);
+      logger.error('App', 'Error en configuración automática:', error);
       return false;
     }
   }

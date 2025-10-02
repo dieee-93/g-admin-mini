@@ -5,6 +5,7 @@
 
 import { SlotConfig, ModuleSlotDefinition, PluggableComponentConfig } from '../types/SlotTypes';
 
+import { logger } from '@/lib/logging';
 /**
  * Creates standardized slot configurations for a module
  */
@@ -30,14 +31,14 @@ export const createModuleSlots = (
 export const validateSlotConfiguration = (config: SlotConfig): boolean => {
   // Check required fields
   if (!config.id || !config.name) {
-    console.error('Slot configuration missing required fields:', config);
+    logger.error('App', 'Slot configuration missing required fields:', config);
     return false;
   }
 
   // Check ID format (should be kebab-case)
   const idPattern = /^[a-z][a-z0-9-]*[a-z0-9]$/;
   if (!idPattern.test(config.id)) {
-    console.error('Slot ID should be in kebab-case format:', config.id);
+    logger.error('App', 'Slot ID should be in kebab-case format:', config.id);
     return false;
   }
 

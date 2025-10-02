@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logging';
+
 import {
   type MaterialItem,
   type MeasurableItem,
@@ -28,7 +30,7 @@ export class MaterialsNormalizer {
 
     const mappedType = typeMapping[apiType?.toUpperCase()];
     if (!mappedType) {
-      console.warn(`Unknown API type "${apiType}", defaulting to COUNTABLE`);
+      logger.warn('MaterialsStore', `Unknown API type "${apiType}", defaulting to COUNTABLE`);
       return 'COUNTABLE';
     }
     
@@ -66,7 +68,7 @@ export class MaterialsNormalizer {
       case 'ELABORATED':
         return 'ELABORATED';
       default:
-        console.warn(`Unknown item type "${itemType}", defaulting to COUNTABLE`);
+        logger.warn('MaterialsStore', `Unknown item type "${itemType}", defaulting to COUNTABLE`);
         return 'COUNTABLE';
     }
   }
@@ -181,7 +183,7 @@ export class MaterialsNormalizer {
    */
   static normalizeApiItems(apiItems: any[]): MaterialItem[] {
     if (!Array.isArray(apiItems)) {
-      console.warn('MaterialsNormalizer: Expected array, got:', typeof apiItems);
+      logger.warn('MaterialsStore', 'MaterialsNormalizer: Expected array, got:', typeof apiItems);
       return [];
     }
 
@@ -195,13 +197,13 @@ export class MaterialsNormalizer {
       } catch (error) {
         const errorMsg = `Item at index ${i}: ${error instanceof Error ? error.message : String(error)}`;
         errors.push(errorMsg);
-        console.error('MaterialsNormalizer error:', errorMsg, apiItems[i]);
+        logger.error('MaterialsStore', 'MaterialsNormalizer error:', errorMsg, apiItems[i]);
       }
     }
 
     // Report errors but don't fail completely
     if (errors.length > 0) {
-      console.warn(`MaterialsNormalizer: ${errors.length} items failed to normalize:`, errors);
+      logger.error('MaterialsStore', `MaterialsNormalizer: ${errors.length} items failed to normalize:`, errors);
     }
 
     return normalized;

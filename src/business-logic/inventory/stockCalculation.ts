@@ -2,6 +2,7 @@ import { type MaterialItem } from '@/types';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
+import { logger } from '@/lib/logging';
 /**
  * Stock status levels
  */
@@ -94,13 +95,13 @@ export class StockCalculation {
       
       // Additional safety check on result
       if (!DecimalUtils.isFiniteDecimal(result)) {
-        console.warn(`StockCalculation.getTotalValue: Invalid result for item ${item.id}:`, { stock: item.stock, cost: item.unit_cost });
+        logger.warn('MaterialsStore', `StockCalculation.getTotalValue: Invalid result for item ${item.id}:`, { stock: item.stock, cost: item.unit_cost });
         return 0;
       }
       
       return result.toNumber();
     } catch (error: unknown) {
-      console.error(`StockCalculation.getTotalValue: Error calculating value for item ${item.id}:`, error.message);
+      logger.error('MaterialsStore', `StockCalculation.getTotalValue: Error calculating value for item ${item.id}:`, error.message);
       return 0; // Safe fallback
     }
   }

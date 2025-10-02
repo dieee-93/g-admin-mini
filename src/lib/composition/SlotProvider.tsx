@@ -5,6 +5,7 @@
  */
 
 import React, { createContext, useContext, useCallback, useState, useMemo, ReactNode } from 'react';
+import { logger } from '@/lib/logging';
 import {
   SlotConfig,
   SlotContent,
@@ -54,7 +55,7 @@ export const SlotProvider: React.FC<SlotProviderProps> = ({
     setSlotRegistry(prev => {
       if (prev[config.id]) {
         if (debug) {
-          console.warn(`🎰 Slot ${config.id} already registered, updating configuration`);
+          logger.warn('App', `🎰 Slot ${config.id} already registered, updating configuration`);
         }
         return {
           ...prev,
@@ -66,7 +67,7 @@ export const SlotProvider: React.FC<SlotProviderProps> = ({
       }
 
       if (debug) {
-        console.log(`🎰 Registering slot: ${config.id} (${config.name})`);
+        logger.info('App', `🎰 Registering slot: ${config.id} (${config.name})`);
       }
 
       return {
@@ -84,13 +85,13 @@ export const SlotProvider: React.FC<SlotProviderProps> = ({
     setSlotRegistry(prev => {
       if (!prev[id]) {
         if (debug) {
-          console.warn(`🎰 Attempted to unregister non-existent slot: ${id}`);
+          logger.warn('App', `🎰 Attempted to unregister non-existent slot: ${id}`);
         }
         return prev;
       }
 
       if (debug) {
-        console.log(`🎰 Unregistering slot: ${id}`);
+        logger.info('App', `🎰 Unregistering slot: ${id}`);
       }
 
       const { [id]: removed, ...rest } = prev;
@@ -103,7 +104,7 @@ export const SlotProvider: React.FC<SlotProviderProps> = ({
     setSlotRegistry(prev => {
       if (!prev[slotId]) {
         if (debug) {
-          console.warn(`🎰 Attempted to add content to non-existent slot: ${slotId}`);
+          logger.warn('App', `🎰 Attempted to add content to non-existent slot: ${slotId}`);
         }
         return prev;
       }
@@ -115,7 +116,7 @@ export const SlotProvider: React.FC<SlotProviderProps> = ({
       updatedContents.sort((a, b) => (b.priority || 0) - (a.priority || 0));
 
       if (debug) {
-        console.log(`🎰 Adding content to slot: ${slotId}, total contents: ${updatedContents.length}`);
+        logger.info('App', `🎰 Adding content to slot: ${slotId}, total contents: ${updatedContents.length}`);
       }
 
       return {
@@ -142,7 +143,7 @@ export const SlotProvider: React.FC<SlotProviderProps> = ({
       );
 
       if (debug) {
-        console.log(`🎰 Removing content from slot: ${slotId}, remaining: ${updatedContents.length}`);
+        logger.info('App', `🎰 Removing content from slot: ${slotId}, remaining: ${updatedContents.length}`);
       }
 
       return {
@@ -194,7 +195,7 @@ export const SlotProvider: React.FC<SlotProviderProps> = ({
   if (debug && process.env.NODE_ENV === 'development') {
      
     React.useEffect(() => {
-      console.log('🎰 Slot Registry State:', {
+      logger.info('App', '🎰 Slot Registry State:', {
         totalSlots: Object.keys(slotRegistry).length,
         slots: Object.keys(slotRegistry),
         strategy: options.strategy

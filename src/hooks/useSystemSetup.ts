@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 
+import { logger } from '@/lib/logging';
 // Tipos para el estado del sistema
 export interface SystemRequirement {
   id: string;
@@ -410,7 +411,7 @@ export function useSystemSetup() {
 
         step.isCompleted = isCompleted;
       } catch (error) {
-        console.error(`Error checking step ${step.id}:`, error);
+        logger.error('App', `Error checking step ${step.id}:`, error);
         step.isCompleted = false;
       }
     }
@@ -453,7 +454,7 @@ export function useSystemSetup() {
     try {
       // Aquí se podría ejecutar el script SQL automáticamente
       // Por ahora, mostraremos instrucciones al usuario
-      console.log('Iniciando configuración automática de base de datos...');
+      logger.info('App', 'Iniciando configuración automática de base de datos...');
       
       // Simular tiempo de configuración
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -463,7 +464,7 @@ export function useSystemSetup() {
       
       return true;
     } catch (error) {
-      console.error('Error en configuración automática:', error);
+      logger.error('App', 'Error en configuración automática:', error);
       return false;
     }
   };

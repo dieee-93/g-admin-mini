@@ -3,6 +3,7 @@ import { errorHandler } from '@/lib/error-handling';
 import { hasAllPermissions } from './permissions';
 import { sanitizeObject } from './sanitization';
 
+import { logger } from '@/lib/logging';
 // Rate limiting store (in production, use Redis or similar)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
@@ -313,7 +314,7 @@ function logSecurityEvent(event: string, details: Record<string, any>): void {
   };
   
   // In production, send to your logging service
-  console.log('Security Event:', logEntry);
+  logger.info('App', 'Security Event:', logEntry);
   
   // Store locally for audit (in production, send to secure logging service)
   const existingLogs = localStorage.getItem('security-logs');

@@ -12,6 +12,7 @@ import {
 import { CardWrapper, InputField  } from '@/shared/ui';
 import { PlusIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
+import { logger } from '@/lib/logging';
 interface Supplier {
   id: string;
   name: string;
@@ -70,12 +71,12 @@ export const SupplierFields = ({
       // Usar la API real de suppliers
       const { suppliersApi } = await import('@/pages/admin/supply-chain/materials/services');
       const suppliersData = await suppliersApi.getActiveSuppliers();
-      console.log('Suppliers loaded from API:', suppliersData); // Debug
+      logger.info('MaterialsStore', 'Suppliers loaded from API:', suppliersData); // Debug
       
       if (suppliersData && suppliersData.length > 0) {
         setSuppliers(suppliersData);
       } else {
-        console.log('No suppliers found in DB, using fallback data'); // Debug
+        logger.info('MaterialsStore', 'No suppliers found in DB, using fallback data'); // Debug
         // Fallback a mock data si no hay suppliers en DB
         setSuppliers([
           { id: 'mock-1', name: 'Distribuidora Central (Mock)', contact_person: 'Juan Pérez', email: 'juan@distcentral.com', rating: 4.5, is_active: true, created_at: '', updated_at: '' },
@@ -84,7 +85,7 @@ export const SupplierFields = ({
         ] as Supplier[]);
       }
     } catch (error) {
-      console.error('Error loading suppliers:', error);
+      logger.error('MaterialsStore', 'Error loading suppliers:', error);
       // Fallback a mock data si la API falla
       setSuppliers([
         { id: 'mock-1', name: 'Distribuidora Central (Error Fallback)', contact_person: 'Juan Pérez', email: 'juan@distcentral.com', rating: 4.5, is_active: true, created_at: '', updated_at: '' },
@@ -97,7 +98,7 @@ export const SupplierFields = ({
   };
 
   const handleSupplierChange = (supplierId: string) => {
-    console.log('handleSupplierChange called with:', supplierId); // Debug
+    logger.info('MaterialsStore', 'handleSupplierChange called with:', supplierId); // Debug
     if (supplierId === 'new') {
       setShowNewSupplierForm(true);
       updateSupplierData({ supplier_id: undefined });
@@ -105,7 +106,7 @@ export const SupplierFields = ({
       setShowNewSupplierForm(false);
       updateSupplierData({ supplier_id: supplierId, new_supplier: undefined });
     }
-    console.log('State updated, supplier_id should be:', supplierId); // Debug
+    logger.info('MaterialsStore', 'State updated, supplier_id should be:', supplierId); // Debug
   };
 
   if (!isVisible) return null;
@@ -154,7 +155,7 @@ export const SupplierFields = ({
                     <Select.Root
                       value={supplierData.supplier_id || ''}
                       onValueChange={(details) => {
-                        console.log('Select change:', details); // Debug
+                        logger.info('MaterialsStore', 'Select change:', details); // Debug
                         const selectedValue = details.value?.[0] || details.value;
                         handleSupplierChange(selectedValue as string);
                       }}

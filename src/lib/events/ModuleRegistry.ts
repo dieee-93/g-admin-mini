@@ -13,6 +13,7 @@ import type {
 
 import { ModuleStatus, EventBusError, EventBusErrorCode } from './types';
 
+import { logger } from '@/lib/logging';
 // Registered module with runtime state
 interface RegisteredModule {
   descriptor: ModuleDescriptor;
@@ -115,7 +116,7 @@ export class ModuleRegistry {
     // Calculate activation order
     this.calculateActivationOrder();
     
-    console.log(`[ModuleRegistry] Module '${id}' registered successfully`);
+    logger.info('EventBus', `[ModuleRegistry] Module '${id}' registered successfully`);
     
     // Emit registration event
     this.emitEvent('moduleRegistered', { moduleId: id, descriptor });
@@ -138,12 +139,12 @@ export class ModuleRegistry {
     }
     
     if (module.status === ModuleStatus.ACTIVE) {
-      console.log(`[ModuleRegistry] Module '${moduleId}' is already active`);
+      logger.info('EventBus', `[ModuleRegistry] Module '${moduleId}' is already active`);
       return;
     }
     
     try {
-      console.log(`[ModuleRegistry] Activating module '${moduleId}'...`);
+      logger.info('EventBus', `[ModuleRegistry] Activating module '${moduleId}'...`);
       module.status = ModuleStatus.ACTIVATING;
       
       // Activate dependencies first (recursive activation)
@@ -166,7 +167,7 @@ export class ModuleRegistry {
       module.health.status = ModuleStatus.ERROR;
       module.health.message = error.message;
       
-      console.error(`[ModuleRegistry] Failed to activate module '${moduleId}':`, error);
+      logger.error('EventBus', `[ModuleRegistry] Failed to activate module '${moduleId}':`, error);
       
       this.emitEvent('moduleActivationFailed', {
         moduleId,
@@ -193,7 +194,7 @@ export class ModuleRegistry {
     }
     
     if (module.status === ModuleStatus.INACTIVE) {
-      console.log(`[ModuleRegistry] Module '${moduleId}' is already inactive`);
+      logger.info('EventBus', `[ModuleRegistry] Module '${moduleId}' is already inactive`);
       return;
     }
     
@@ -201,7 +202,7 @@ export class ModuleRegistry {
     await this.deactivateDependentModules(moduleId);
     
     try {
-      console.log(`[ModuleRegistry] Deactivating module '${moduleId}'...`);
+      logger.info('EventBus', `[ModuleRegistry] Deactivating module '${moduleId}'...`);
       module.status = ModuleStatus.DEACTIVATING;
       
       // Stop health monitoring
@@ -227,7 +228,7 @@ export class ModuleRegistry {
       module.health.status = ModuleStatus.INACTIVE;
       module.activatedAt = undefined;
       
-      console.log(`[ModuleRegistry] Module '${moduleId}' deactivated successfully`);
+      logger.info('EventBus', `[ModuleRegistry] Module '${moduleId}' deactivated successfully`);
       
       // Emit deactivation event
       this.emitEvent('moduleDeactivated', { moduleId });
@@ -240,7 +241,7 @@ export class ModuleRegistry {
       module.health.status = ModuleStatus.ERROR;
       module.health.message = `Deactivation failed: ${error.message}`;
       
-      console.error(`[ModuleRegistry] Failed to deactivate module '${moduleId}':`, error);
+      logger.error('EventBus', `[ModuleRegistry] Failed to deactivate module '${moduleId}':`, error);
       
       this.emitEvent('moduleDeactivationFailed', {
         moduleId,
@@ -377,7 +378,7 @@ export class ModuleRegistry {
 
   // Graceful shutdown of all modules
   async gracefulShutdown(timeoutMs: number = 30000): Promise<void> {
-    console.log('[ModuleRegistry] Starting graceful shutdown...');
+    logger.info('EventBus', '[ModuleRegistry] Starting graceful shutdown...');
     this.isShuttingDown = true;
     
     // Stop global health monitoring
@@ -394,12 +395,12 @@ export class ModuleRegistry {
         try {
           await this.deactivateModule(moduleId);
         } catch (error) {
-          console.error(`[ModuleRegistry] Error deactivating module '${moduleId}' during shutdown:`, error);
+          logger.error('EventBus', `[ModuleRegistry] Error deactivating module '${moduleId}' during shutdown:`, error);
         }
       }
     }
     
-    console.log('[ModuleRegistry] Graceful shutdown completed');
+    logger.info('EventBus', '[ModuleRegistry] Graceful shutdown completed');
     this.emitEvent('registryShutdown', { modulesCount: this.modules.size });
   }
 
@@ -489,7 +490,7 @@ export class ModuleRegistry {
         
         // If dependency is not active, activate it recursively
         if (depModule.status !== ModuleStatus.ACTIVE) {
-          console.log(`[ModuleRegistry] Activating dependency '${depId}' for module '${moduleId}'`);
+          logger.info('EventBus', `[ModuleRegistry] Activating dependency '${depId}' for module '${moduleId}'`);
           
           // First activate dependencies of this dependency (recursive)
           await this.activateModuleDependencies(depId, activatingStack);
@@ -515,7 +516,7 @@ export class ModuleRegistry {
       return;
     }
 
-    console.log(`[ModuleRegistry] Directly activating module '${moduleId}'...`);
+    logger.info('EventBus', `[ModuleRegistry] Directly activating module '${moduleId}'...`);
     module.status = ModuleStatus.ACTIVATING;
     
     try {
@@ -544,7 +545,7 @@ export class ModuleRegistry {
       // Perform initial health check
       await this.performHealthCheck(moduleId);
       
-      console.log(`[ModuleRegistry] Module '${moduleId}' activated directly`);
+      logger.info('EventBus', `[ModuleRegistry] Module '${moduleId}' activated directly`);
       
       // Emit activation event
       this.emitEvent('moduleActivated', { moduleId, module: module.descriptor });
@@ -554,7 +555,7 @@ export class ModuleRegistry {
       module.health.status = ModuleStatus.ERROR;
       module.health.message = error.message;
       
-      console.error(`[ModuleRegistry] Failed to activate module '${moduleId}' directly:`, error);
+      logger.error('EventBus', `[ModuleRegistry] Failed to activate module '${moduleId}' directly:`, error);
       throw error;
     }
   }
@@ -624,7 +625,7 @@ export class ModuleRegistry {
     }
     
     this.activationOrder = order;
-    console.log('[ModuleRegistry] Activation order calculated:', order);
+    logger.info('EventBus', '[ModuleRegistry] Activation order calculated:', order);
   }
 
   // Register module event subscriptions
@@ -634,7 +635,7 @@ export class ModuleRegistry {
     
     // This would be implemented by the EventBus itself
     // For now, just log
-    console.log(`[ModuleRegistry] Registering ${module.descriptor.eventSubscriptions.length} subscriptions for module '${moduleId}'`);
+    logger.info('EventBus', `[ModuleRegistry] Registering ${module.descriptor.eventSubscriptions.length} subscriptions for module '${moduleId}'`);
   }
 
   // Unregister module event subscriptions
@@ -647,7 +648,7 @@ export class ModuleRegistry {
       try {
         unsubscribeFn();
       } catch (error) {
-        console.error(`[ModuleRegistry] Error unsubscribing ${subscriptionId}:`, error);
+        logger.error('EventBus', `[ModuleRegistry] Error unsubscribing ${subscriptionId}:`, error);
       }
     }
     
@@ -655,7 +656,7 @@ export class ModuleRegistry {
     module.subscriptions.clear();
     module.unsubscribeFunctions.clear();
     
-    console.log(`[ModuleRegistry] Unregistered all subscriptions for module '${moduleId}'`);
+    logger.info('EventBus', `[ModuleRegistry] Unregistered all subscriptions for module '${moduleId}'`);
   }
 
   // Activate dependent modules
@@ -670,7 +671,7 @@ export class ModuleRegistry {
           try {
             await this.activateModule(dependentId);
           } catch (error) {
-            console.error(`[ModuleRegistry] Failed to activate dependent module '${dependentId}':`, error);
+            logger.error('EventBus', `[ModuleRegistry] Failed to activate dependent module '${dependentId}':`, error);
           }
         }
       }
@@ -701,11 +702,11 @@ export class ModuleRegistry {
     
     // Deactivate each dependent (this will recursively call deactivateModule)
     for (const dependentId of orderedDependents) {
-      console.log(`[ModuleRegistry] Deactivating dependent module '${dependentId}' before deactivating '${moduleId}'`);
+      logger.info('EventBus', `[ModuleRegistry] Deactivating dependent module '${dependentId}' before deactivating '${moduleId}'`);
       try {
         await this.deactivateModule(dependentId);
       } catch (error) {
-        console.error(`[ModuleRegistry] Failed to deactivate dependent module '${dependentId}':`, error);
+        logger.error('EventBus', `[ModuleRegistry] Failed to deactivate dependent module '${dependentId}':`, error);
       }
     }
   }
@@ -734,11 +735,11 @@ export class ModuleRegistry {
         // Check if this was a required dependency
         const dependentDescriptor = dependentModule.descriptor;
         if (dependentDescriptor.dependencies.includes(moduleId)) {
-          console.log(`[ModuleRegistry] Deactivating dependent module '${dependentId}' due to dependency '${moduleId}'`);
+          logger.info('EventBus', `[ModuleRegistry] Deactivating dependent module '${dependentId}' due to dependency '${moduleId}'`);
           try {
             await this.deactivateModule(dependentId);
           } catch (error) {
-            console.error(`[ModuleRegistry] Failed to deactivate dependent module '${dependentId}':`, error);
+            logger.error('EventBus', `[ModuleRegistry] Failed to deactivate dependent module '${dependentId}':`, error);
           }
         }
       }
@@ -784,7 +785,7 @@ export class ModuleRegistry {
         
         this.emitEvent('moduleHealthChanged', healthEvent);
         
-        console.log(`[ModuleRegistry] Module '${moduleId}' health changed: ${previousStatus} -> ${health.status}`);
+        logger.info('EventBus', `[ModuleRegistry] Module '${moduleId}' health changed: ${previousStatus} -> ${health.status}`);
       }
       
     } catch (error) {
@@ -796,7 +797,7 @@ export class ModuleRegistry {
         lastCheck: new Date()
       };
       
-      console.error(`[ModuleRegistry] Health check failed for module '${moduleId}':`, error);
+      logger.error('EventBus', `[ModuleRegistry] Health check failed for module '${moduleId}':`, error);
     }
   }
 
@@ -841,7 +842,7 @@ export class ModuleRegistry {
         
         // If health check is overdue, perform it
         if (timeSinceCheck > maxInterval) {
-          console.log(`[ModuleRegistry] Health check overdue for module '${moduleId}', performing now`);
+          logger.info('EventBus', `[ModuleRegistry] Health check overdue for module '${moduleId}', performing now`);
           await this.performHealthCheck(moduleId);
         }
       }
@@ -867,7 +868,7 @@ export class ModuleRegistry {
         try {
           callback(data);
         } catch (error) {
-          console.error(`[ModuleRegistry] Error in event listener for ${event}:`, error);
+          logger.error('EventBus', `[ModuleRegistry] Error in event listener for ${event}:`, error);
         }
       });
     }

@@ -10,6 +10,7 @@ import { AchievementsEngine } from '../services/AchievementsEngine';
 import { getMilestoneDefinition } from '../../../../../config/milestones';
 import type { AchievementProgress, MilestoneDefinition } from '../types';
 
+import { logger } from '@/lib/logging';
 // Estado del hook
 interface UseAchievementsState {
   progress: AchievementProgress[];
@@ -71,7 +72,7 @@ export function useAchievements(userId?: string): UseAchievementsResult {
       await refreshProgress();
       
     } catch (error) {
-      console.error('[useAchievements] Error inicializando:', error);
+      logger.error('CapabilitySystem', '[useAchievements] Error inicializando:', error);
       setState(prev => ({
         ...prev,
         isLoading: false,
@@ -85,7 +86,7 @@ export function useAchievements(userId?: string): UseAchievementsResult {
    */
   const refreshProgress = useCallback(async (): Promise<void> => {
     if (!achievementsEngine.current) {
-      console.warn('[useAchievements] Motor no inicializado');
+      logger.warn('CapabilitySystem', '[useAchievements] Motor no inicializado');
       return;
     }
 
@@ -102,7 +103,7 @@ export function useAchievements(userId?: string): UseAchievementsResult {
       }));
       
     } catch (error) {
-      console.error('[useAchievements] Error refrescando progreso:', error);
+      logger.error('CapabilitySystem', '[useAchievements] Error refrescando progreso:', error);
       setState(prev => ({
         ...prev,
         isLoading: false,
@@ -116,14 +117,14 @@ export function useAchievements(userId?: string): UseAchievementsResult {
    */
   const getPendingMilestones = useCallback(async (capabilityId: string): Promise<MilestoneDefinition[]> => {
     if (!achievementsEngine.current) {
-      console.warn('[useAchievements] Motor no inicializado');
+      logger.warn('CapabilitySystem', '[useAchievements] Motor no inicializado');
       return [];
     }
 
     try {
       return await achievementsEngine.current.getPendingMilestones(capabilityId);
     } catch (error) {
-      console.error('[useAchievements] Error obteniendo hitos pendientes:', error);
+      logger.error('CapabilitySystem', '[useAchievements] Error obteniendo hitos pendientes:', error);
       return [];
     }
   }, []);
@@ -133,7 +134,7 @@ export function useAchievements(userId?: string): UseAchievementsResult {
    */
   const completeManualMilestone = useCallback(async (milestoneId: string, data?: any): Promise<void> => {
     if (!achievementsEngine.current || !currentUserId.current) {
-      console.warn('[useAchievements] Motor no inicializado o usuario no disponible');
+      logger.warn('CapabilitySystem', '[useAchievements] Motor no inicializado o usuario no disponible');
       return;
     }
 
@@ -154,13 +155,13 @@ export function useAchievements(userId?: string): UseAchievementsResult {
 
       // Llamar directamente al método privado a través de reflexión o
       // crear un método público para casos de testing
-      console.info('[useAchievements] Completando hito manualmente:', milestoneId);
+      logger.info('CapabilitySystem', '[useAchievements] Completando hito manualmente:', milestoneId);
       
       // Recargar progreso para reflejar cambios
       await refreshProgress();
       
     } catch (error) {
-      console.error('[useAchievements] Error completando hito manual:', error);
+      logger.error('CapabilitySystem', '[useAchievements] Error completando hito manual:', error);
       setState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Error completando hito'

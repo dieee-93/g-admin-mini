@@ -25,6 +25,7 @@ import {
 import { schedulingApi } from '@/pages/admin/resources/scheduling/services/schedulingApi';
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 interface SchedulingAnalyticsProps {
   dateRange: {
     startDate: string;
@@ -276,7 +277,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
       setAnalyticsData(mockData);
       
     } catch (error) {
-      console.error('Error loading analytics data:', error);
+      logger.error('API', 'Error loading analytics data:', error);
       notify.error({
         title: 'Analytics Error',
         description: 'Failed to load scheduling analytics'

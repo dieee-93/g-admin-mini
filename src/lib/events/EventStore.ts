@@ -1,6 +1,8 @@
 // EventStore.ts - Enterprise Event Persistence with Event Sourcing
 // IndexedDB-based event store with efficient querying and replay capabilities
 
+import { logger } from '@/lib/logging';
+
 import type {
   NamespacedEvent,
   EventPattern,
@@ -62,45 +64,45 @@ export class EventStoreIndexedDB implements IEventStore {
   }
 
   async init(): Promise<void> {
-    console.log(`[EventStore] Starting init... (dbName: ${this.dbName})`);
+    logger.info('EventBus', `[EventStore] Starting init... (dbName: ${this.dbName})`);
     // If already initialized, return immediately
     if (this.isInitialized && this.db) {
-      console.log('[EventStore] Already initialized, returning');
+      logger.info('EventBus', '[EventStore] Already initialized, returning');
       return;
     }
     
     // If initialization is in progress, return the existing promise
     if (this.initPromise) {
-      console.log('[EventStore] Init already in progress, awaiting...');
+      logger.info('EventBus', '[EventStore] Init already in progress, awaiting...');
       return this.initPromise;
     }
     
     // Start initialization
-    console.log('[EventStore] Starting new initialization...');
+    logger.info('EventBus', '[EventStore] Starting new initialization...');
     this.initPromise = new Promise((resolve, reject) => {
-      console.log(`[EventStore] Opening IndexedDB: ${this.dbName} v${this.DB_VERSION}`);
+      logger.info('EventBus', `[EventStore] Opening IndexedDB: ${this.dbName} v${this.DB_VERSION}`);
       const request = indexedDB.open(this.dbName, this.DB_VERSION);
       
       request.onerror = () => {
-        console.error('[EventStore] Failed to open database:', request.error);
+        logger.error('EventBus', '[EventStore] Failed to open database:', request.error);
         this.initPromise = null; // Reset promise on error
         reject(request.error);
       };
       
       request.onsuccess = () => {
-        console.log('[EventStore] IndexedDB open success event');
+        logger.info('EventBus', '[EventStore] IndexedDB open success event');
         this.db = request.result;
         this.isInitialized = true;
         this.initPromise = null; // Clear promise on success
-        console.log('[EventStore] Database opened successfully');
+        logger.info('EventBus', '[EventStore] Database opened successfully');
         resolve();
       };
       
       request.onupgradeneeded = (event) => {
-        console.log('[EventStore] Database upgrade needed');
+        logger.info('EventBus', '[EventStore] Database upgrade needed');
         const db = (event.target as IDBOpenDBRequest).result;
         this.createStores(db);
-        console.log('[EventStore] Stores created during upgrade');
+        logger.info('EventBus', '[EventStore] Stores created during upgrade');
       };
     });
     
@@ -143,7 +145,7 @@ export class EventStoreIndexedDB implements IEventStore {
 
   // Append event to store (Event Sourcing pattern)
   async append(event: NamespacedEvent): Promise<void> {
-    console.log(`[EventStore] Starting append for event ${event.id}...`);
+    logger.info('EventBus', `[EventStore] Starting append for event ${event.id}...`);
     if (!this.isInitialized) await this.init();
     if (!this.db) throw new Error('EventStore not initialized');
     
@@ -155,7 +157,7 @@ export class EventStoreIndexedDB implements IEventStore {
       retryCount: 0
     };
     
-    console.log(`[EventStore] Creating transaction for event ${event.id}...`);
+    logger.info('EventBus', `[EventStore] Creating transaction for event ${event.id}...`);
     const tx = this.db.transaction(this.EVENTS_STORE, 'readwrite');
     const store = tx.objectStore(this.EVENTS_STORE);
     
@@ -163,20 +165,20 @@ export class EventStoreIndexedDB implements IEventStore {
       const request = store.add(storedEvent);
       
       request.onsuccess = () => {
-        console.log(`[EventStore] Event appended: ${event.pattern} (${event.id})`);
+        logger.info('EventBus', `[EventStore] Event appended: ${event.pattern} (${event.id})`);
         resolve();
       };
       
       request.onerror = () => {
-        console.error(`[EventStore] Failed to append event ${event.id}:`, request.error);
+        logger.error('EventBus', `[EventStore] Failed to append event ${event.id}:`, request.error);
         reject(request.error);
       };
     });
 
-    console.log(`[EventStore] Starting size limit enforcement for event ${event.id}...`);
+    logger.info('EventBus', `[EventStore] Starting size limit enforcement for event ${event.id}...`);
     // Enforce maxEventHistorySize limit after successful append
     await this.enforceSizeLimit();
-    console.log(`[EventStore] Completed append and cleanup for event ${event.id}`);
+    logger.info('EventBus', `[EventStore] Completed append and cleanup for event ${event.id}`);
   }
 
   private async enforceSizeLimit(): Promise<void> {
@@ -198,7 +200,7 @@ export class EventStoreIndexedDB implements IEventStore {
           return;
         }
 
-        console.log(`[EventStore] Enforcing size limit: deleting ${eventsToDelete} oldest events`);
+        logger.info('EventBus', `[EventStore] Enforcing size limit: deleting ${eventsToDelete} oldest events`);
         
         // Use cursor to efficiently delete oldest events by timestamp
         const index = store.index('timestamp');
@@ -219,13 +221,13 @@ export class EventStoreIndexedDB implements IEventStore {
               if (deletedCount < eventsToDelete) {
                 cursor.continue();
               } else {
-                console.log(`[EventStore] Successfully deleted ${deletedCount} oldest events`);
+                logger.info('EventBus', `[EventStore] Successfully deleted ${deletedCount} oldest events`);
                 resolve();
               }
             };
             
             deleteRequest.onerror = () => {
-              console.error('[EventStore] Failed to delete event:', deleteRequest.error);
+              logger.error('EventBus', '[EventStore] Failed to delete event:', deleteRequest.error);
               reject(deleteRequest.error);
             };
           } else {
@@ -235,24 +237,24 @@ export class EventStoreIndexedDB implements IEventStore {
         };
         
         cursorRequest.onerror = () => {
-          console.error('[EventStore] Failed to open cursor for cleanup:', cursorRequest.error);
+          logger.error('EventBus', '[EventStore] Failed to open cursor for cleanup:', cursorRequest.error);
           reject(cursorRequest.error);
         };
       };
       
       countRequest.onerror = () => {
-        console.error('[EventStore] Failed to count events:', countRequest.error);
+        logger.error('EventBus', '[EventStore] Failed to count events:', countRequest.error);
         reject(countRequest.error);
       };
       
       // Handle transaction errors
       tx.onerror = () => {
-        console.error('[EventStore] Transaction failed during size enforcement:', tx.error);
+        logger.error('EventBus', '[EventStore] Transaction failed during size enforcement:', tx.error);
         reject(tx.error);
       };
       
       tx.onabort = () => {
-        console.error('[EventStore] Transaction aborted during size enforcement');
+        logger.error('EventBus', '[EventStore] Transaction aborted during size enforcement');
         reject(new Error('Transaction aborted'));
       };
     });
@@ -454,7 +456,7 @@ export class EventStoreIndexedDB implements IEventStore {
         const cursor = (event.target as IDBRequest).result as IDBCursorWithValue;
         
         if (!cursor) {
-          console.log(`[EventStore] Cleaned up ${deletedCount} events`);
+          logger.info('EventBus', `[EventStore] Cleaned up ${deletedCount} events`);
           resolve(deletedCount);
           return;
         }

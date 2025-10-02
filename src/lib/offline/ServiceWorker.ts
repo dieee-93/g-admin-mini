@@ -3,6 +3,8 @@
 
 /// <reference lib="webworker" />
 
+import { logger } from '@/lib/logging';
+
 declare const self: ServiceWorkerGlobalScope;
 
 const CACHE_NAME = 'g-admin-mini-v3.0';
@@ -42,24 +44,24 @@ const SYNC_OPERATIONS = [
 
 // Install Event - Cache static assets
 self.addEventListener('install', (event: ExtendableEvent) => {
-  console.log('[ServiceWorker] Installing G-Admin Mini SW v3.0');
+  logger.info('OfflineSync', '[ServiceWorker] Installing G-Admin Mini SW v3.0');
   
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-      console.log('[ServiceWorker] Caching static assets');
+      logger.info('OfflineSync', '[ServiceWorker] Caching static assets');
       
       try {
         await cache.addAll(STATIC_ASSETS);
-        console.log('[ServiceWorker] Static assets cached successfully');
+        logger.info('OfflineSync', '[ServiceWorker] Static assets cached successfully');
       } catch (error) {
-        console.error('[ServiceWorker] Failed to cache static assets:', error);
+        logger.error('OfflineSync', '[ServiceWorker] Failed to cache static assets:', error);
         // Cache assets individually to avoid failing due to one bad asset
         for (const asset of STATIC_ASSETS) {
           try {
             await cache.add(asset);
           } catch (assetError) {
-            console.warn(`[ServiceWorker] Failed to cache asset: ${asset}`, assetError);
+            logger.error('OfflineSync', `[ServiceWorker] Failed to cache asset: ${asset}`, assetError);
           }
         }
       }
@@ -72,7 +74,7 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 
 // Activate Event - Clean up old caches
 self.addEventListener('activate', (event: ExtendableEvent) => {
-  console.log('[ServiceWorker] Activating G-Admin Mini SW v3.0');
+  logger.info('OfflineSync', '[ServiceWorker] Activating G-Admin Mini SW v3.0');
   
   event.waitUntil(
     (async () => {
@@ -81,7 +83,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
       const deletePromises = cacheNames
         .filter(name => name !== CACHE_NAME && name.startsWith('g-admin-mini'))
         .map(name => {
-          console.log(`[ServiceWorker] Deleting old cache: ${name}`);
+          logger.info('OfflineSync', `[ServiceWorker] Deleting old cache: ${name}`);
           return caches.delete(name);
         });
       
@@ -90,7 +92,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
       // Claim all clients immediately
       await self.clients.claim();
       
-      console.log('[ServiceWorker] G-Admin Mini SW v3.0 activated');
+      logger.info('OfflineSync', '[ServiceWorker] G-Admin Mini SW v3.0 activated');
     })()
   );
 });
@@ -134,7 +136,7 @@ function handleApiRequest(event: FetchEvent): void {
         
         return networkResponse;
       } catch (error) {
-        console.log(`[ServiceWorker] Network failed for ${url.pathname}, trying cache`);
+        logger.error('OfflineSync', `[ServiceWorker] Network failed for ${url.pathname}, trying cache`);
         
         // Network failed, try cache
         const cachedResponse = await caches.match(request);
@@ -177,7 +179,7 @@ function handleStaticAssets(event: FetchEvent): void {
         }
         return networkResponse;
       } catch (error) {
-        console.error('[ServiceWorker] Failed to load static asset:', event.request.url);
+        logger.error('OfflineSync', '[ServiceWorker] Failed to load static asset:', event.request.url);
         throw error;
       }
     })()
@@ -193,7 +195,7 @@ function handlePageRequest(event: FetchEvent): void {
         const networkResponse = await fetch(event.request);
         return networkResponse;
       } catch (error) {
-        console.log('[ServiceWorker] Network failed for page, serving from cache');
+        logger.error('OfflineSync', '[ServiceWorker] Network failed for page, serving from cache');
         
         // Network failed, try cache
         const cachedResponse = await caches.match(event.request);
@@ -230,7 +232,7 @@ function handleNonGetRequest(event: FetchEvent): void {
         const networkResponse = await fetch(request);
         return networkResponse;
       } catch (error) {
-        console.log(`[ServiceWorker] Network failed for ${request.method} ${url.pathname}`);
+        logger.error('OfflineSync', `[ServiceWorker] Network failed for ${request.method} ${url.pathname}`);
         
         // Store request for background sync
         await storeRequestForSync(request);
@@ -256,7 +258,7 @@ function handleNonGetRequest(event: FetchEvent): void {
 
 // Background Sync Event
 self.addEventListener('sync', (event: unknown) => {
-  console.log('[ServiceWorker] Background sync triggered:', event.tag);
+  logger.info('OfflineSync', '[ServiceWorker] Background sync triggered:', event.tag);
   
   if (event.tag === SYNC_TAG) {
     event.waitUntil(syncQueuedRequests());
@@ -265,7 +267,7 @@ self.addEventListener('sync', (event: unknown) => {
 
 // Message Event - Communication with main thread
 self.addEventListener('message', (event: ExtendableMessageEvent) => {
-  console.log('[ServiceWorker] Message received:', event.data);
+  logger.info('OfflineSync', '[ServiceWorker] Message received:', event.data);
   
   const { type, payload } = event.data;
   
@@ -296,7 +298,7 @@ self.addEventListener('message', (event: ExtendableMessageEvent) => {
 
 // Push Event - Handle push notifications
 self.addEventListener('push', (event: PushEvent) => {
-  console.log('[ServiceWorker] Push received');
+  logger.info('OfflineSync', '[ServiceWorker] Push received');
   
   let notificationData = {
     title: 'G-Admin Mini',
@@ -310,7 +312,7 @@ self.addEventListener('push', (event: PushEvent) => {
     try {
       notificationData = { ...notificationData, ...event.data.json() };
     } catch (error) {
-      console.error('[ServiceWorker] Error parsing push data:', error);
+      logger.error('OfflineSync', '[ServiceWorker] Error parsing push data:', error);
     }
   }
   
@@ -328,7 +330,7 @@ self.addEventListener('push', (event: PushEvent) => {
 
 // Notification Click Event
 self.addEventListener('notificationclick', (event: NotificationEvent) => {
-  console.log('[ServiceWorker] Notification clicked');
+  logger.info('OfflineSync', '[ServiceWorker] Notification clicked');
   
   event.notification.close();
   
@@ -427,19 +429,19 @@ async function storeRequestForSync(request: Request): Promise<void> {
     };
     
     // Store in IndexedDB (implementation would use a proper IndexedDB wrapper)
-    console.log('[ServiceWorker] Storing request for sync:', requestData);
+    logger.info('OfflineSync', '[ServiceWorker] Storing request for sync:', requestData);
     
     // Register for background sync
     if ('sync' in self.registration) {
       await (self.registration as any).sync.register(SYNC_TAG);
     }
   } catch (error) {
-    console.error('[ServiceWorker] Error storing request for sync:', error);
+    logger.error('OfflineSync', '[ServiceWorker] Error storing request for sync:', error);
   }
 }
 
 async function syncQueuedRequests(): Promise<void> {
-  console.log('[ServiceWorker] Syncing queued requests...');
+  logger.info('OfflineSync', '[ServiceWorker] Syncing queued requests...');
   
   try {
     // Get queued requests from IndexedDB
@@ -454,13 +456,13 @@ async function syncQueuedRequests(): Promise<void> {
         });
         
         if (response.ok) {
-          console.log(`[ServiceWorker] Successfully synced: ${requestData.method} ${requestData.url}`);
+          logger.info('OfflineSync', `[ServiceWorker] Successfully synced: ${requestData.method} ${requestData.url}`);
           await removeQueuedRequest(requestData);
         } else {
-          console.warn(`[ServiceWorker] Sync failed for: ${requestData.method} ${requestData.url}`, response.status);
+          logger.error('OfflineSync', `[ServiceWorker] Sync failed for: ${requestData.method} ${requestData.url}`, response.status);
         }
       } catch (error) {
-        console.error(`[ServiceWorker] Sync error for: ${requestData.method} ${requestData.url}`, error);
+        logger.error('OfflineSync', `[ServiceWorker] Sync error for: ${requestData.method} ${requestData.url}`, error);
       }
     }
     
@@ -474,19 +476,19 @@ async function syncQueuedRequests(): Promise<void> {
     });
     
   } catch (error) {
-    console.error('[ServiceWorker] Error during sync:', error);
+    logger.error('OfflineSync', '[ServiceWorker] Error during sync:', error);
   }
 }
 
 async function getQueuedRequests(): Promise<any[]> {
   // This would be implemented with proper IndexedDB operations
-  console.log('[ServiceWorker] Getting queued requests from IndexedDB');
+  logger.info('OfflineSync', '[ServiceWorker] Getting queued requests from IndexedDB');
   return [];
 }
 
 async function removeQueuedRequest(requestData: unknown): Promise<void> {
   // This would be implemented with proper IndexedDB operations
-  console.log('[ServiceWorker] Removing synced request from queue');
+  logger.info('OfflineSync', '[ServiceWorker] Removing synced request from queue');
 }
 
 async function clearCache(): Promise<void> {
@@ -496,7 +498,7 @@ async function clearCache(): Promise<void> {
     .map(name => caches.delete(name));
   
   await Promise.all(deletePromises);
-  console.log('[ServiceWorker] All caches cleared');
+  logger.info('OfflineSync', '[ServiceWorker] All caches cleared');
 }
 
 async function getCacheStats(): Promise<any> {
@@ -524,7 +526,7 @@ async function getCacheStats(): Promise<any> {
 let isOnline = true;
 
 self.addEventListener('online', () => {
-  console.log('[ServiceWorker] Device is now online');
+  logger.info('OfflineSync', '[ServiceWorker] Device is now online');
   isOnline = true;
   
   // Notify clients
@@ -544,7 +546,7 @@ self.addEventListener('online', () => {
 });
 
 self.addEventListener('offline', () => {
-  console.log('[ServiceWorker] Device is now offline');
+  logger.info('OfflineSync', '[ServiceWorker] Device is now offline');
   isOnline = false;
   
   // Notify clients

@@ -15,8 +15,11 @@ import {
 import { Icon } from "@/shared/ui/Icon";
 import { WeeklyScheduleEditor } from '@/shared/components/WeeklyScheduleEditor';
 import type { Schedule, DailyRule } from '@/types/schedule';
-import { useBusinessCapabilities } from "@/store/businessCapabilitiesStore";
+// TODO: Refactorizar para usar el sistema de capabilities unificado
+// import { useBusinessCapabilities } from "@/store/businessCapabilitiesStore";
+import { useCapabilities } from "@/store/capabilityStore";
 
+import { logger } from '@/lib/logging';
 const initialBusinessHours: Partial<Schedule> = {
   name: "Horario de Atención Principal",
   type: "BUSINESS_HOURS",
@@ -36,12 +39,14 @@ const dayOrder: DailyRule['dayOfWeek'][] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'T
 export function BusinessProfileSection() {
   const [isEditingHours, setIsEditingHours] = useState(false);
   const [businessHours, setBusinessHours] = useState(initialBusinessHours);
-  const { completeMilestone } = useBusinessCapabilities();
+  // TODO: Refactorizar para integrar con achievements system
+  // const { completeMilestone } = useCapabilities();
 
   const handleSaveHours = () => {
-    console.log("Saving new business hours:", businessHours);
+    logger.info('App', "Saving new business hours:", businessHours);
     setIsEditingHours(false);
-    completeMilestone('define-business-hours');
+    // TODO: Emit event para achievements system
+    // completeMilestone('define-business-hours');
   };
 
   const businessData = {

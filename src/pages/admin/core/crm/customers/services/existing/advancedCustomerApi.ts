@@ -1,5 +1,6 @@
 // src/features/customers/data/advancedCustomerApi.ts - WITH DECIMAL PRECISION
 import { supabase } from '@/lib/supabase/client';
+import { logger } from '@/lib/logging';
 import { 
   calculateCustomerCLV,
   calculateAverageOrderValue,
@@ -25,7 +26,7 @@ export async function calculateCustomerRFM(): Promise<CustomerRFMProfile[]> {
     const { error: calcError } = await supabase.rpc('calculate_customer_rfm_profiles', { analysis_period_days: 365 });
     
     if (calcError) {
-      console.warn('Database RFM calculation failed, using fallback:', calcError);
+      logger.error('App', 'Database RFM calculation failed, using fallback:', calcError);
       return generateFallbackRFMDataWithPrecision();
     }
 
@@ -33,7 +34,7 @@ export async function calculateCustomerRFM(): Promise<CustomerRFMProfile[]> {
     const { data, error } = await supabase.rpc('get_customer_rfm_data');
     
     if (error) {
-      console.warn('Database RFM fetch failed, using fallback:', error);
+      logger.error('App', 'Database RFM fetch failed, using fallback:', error);
       return generateFallbackRFMDataWithPrecision();
     }
     
@@ -41,7 +42,7 @@ export async function calculateCustomerRFM(): Promise<CustomerRFMProfile[]> {
     const validData = data && data.length > 0 ? validateRFMData(data) : null;
     return validData || generateFallbackRFMDataWithPrecision();
   } catch (error) {
-    console.warn('RFM calculation completely failed, using fallback:', error);
+    logger.error('App', 'RFM calculation completely failed, using fallback:', error);
     return generateFallbackRFMDataWithPrecision();
   }
 }
@@ -51,13 +52,13 @@ export async function getCustomerAnalyticsDashboard(): Promise<CustomerAnalytics
     const { data, error } = await supabase.rpc('get_customer_analytics_dashboard');
     
     if (error) {
-      console.warn('Database analytics dashboard failed, using fallback:', error);
+      logger.error('App', 'Database analytics dashboard failed, using fallback:', error);
       return generateFallbackAnalyticsWithPrecision();
     }
     
     return data || generateFallbackAnalyticsWithPrecision();
   } catch (error) {
-    console.warn('Analytics dashboard completely failed, using fallback:', error);
+    logger.error('App', 'Analytics dashboard completely failed, using fallback:', error);
     return generateFallbackAnalyticsWithPrecision();
   }
 }
@@ -79,13 +80,13 @@ function validateRFMData(data: any[]): CustomerRFMProfile[] | null {
     // If more than 50% of data is corrupted, use fallback
     const corruptionRatio = (data.length - validatedData.length) / data.length;
     if (corruptionRatio > 0.5) {
-      console.warn('High data corruption detected, using fallback data');
+      logger.warn('App', 'High data corruption detected, using fallback data');
       return null;
     }
 
     return validatedData.length > 0 ? validatedData as CustomerRFMProfile[] : null;
   } catch (error) {
-    console.warn('Data validation failed:', error);
+    logger.error('App', 'Data validation failed:', error);
     return null;
   }
 }
@@ -214,7 +215,7 @@ export async function getCustomerProfileWithRFM(customerId: string): Promise<Cus
   });
   
   if (error) {
-    console.error('Error getting customer profile with RFM:', error);
+    logger.error('App', 'Error getting customer profile with RFM:', error);
     throw new Error('Failed to get customer profile with RFM data');
   }
   
@@ -229,7 +230,7 @@ export async function getCustomerTags(): Promise<CustomerTag[]> {
     .order('name');
   
   if (error) {
-    console.error('Error fetching customer tags:', error);
+    logger.error('App', 'Error fetching customer tags:', error);
     throw new Error('Failed to fetch customer tags');
   }
   
@@ -245,7 +246,7 @@ export async function getCustomerNotes(customerId: string): Promise<CustomerNote
     .order('created_at', { ascending: false });
   
   if (error) {
-    console.error('Error fetching customer notes:', error);
+    logger.error('App', 'Error fetching customer notes:', error);
     throw new Error('Failed to fetch customer notes');
   }
   
@@ -260,7 +261,7 @@ export async function createCustomerNote(noteData: Omit<CustomerNote, 'id' | 'cr
     .single();
   
   if (error) {
-    console.error('Error creating customer note:', error);
+    logger.error('App', 'Error creating customer note:', error);
     throw new Error('Failed to create customer note');
   }
   
@@ -278,7 +279,7 @@ export async function getCustomerPreferences(customerId: string): Promise<Custom
     if (error.code === 'PGRST116') {
       return null;
     }
-    console.error('Error fetching customer preferences:', error);
+    logger.error('App', 'Error fetching customer preferences:', error);
     throw new Error('Failed to fetch customer preferences');
   }
   

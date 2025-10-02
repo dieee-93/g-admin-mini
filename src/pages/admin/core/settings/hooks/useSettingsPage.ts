@@ -11,6 +11,7 @@ import {
 import { useNavigation } from '@/contexts/NavigationContext';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 export function useSettingsPage() {
   // 📊 Estado principal del módulo de configuración
   const [isLoading, setIsLoading] = useState(false);
@@ -89,7 +90,7 @@ export function useSettingsPage() {
 
   // 🎯 Handlers de acciones de configuración
   const handleSave = useCallback(() => {
-    console.log('Guardando configuración...');
+    logger.info('App', 'Guardando configuración...');
     // Emitir evento de configuración guardada
     ModuleEventUtils.analytics.generated('settings', { action: 'config_saved' }, new Date().toISOString());
     setIsDirty(false);
@@ -97,7 +98,7 @@ export function useSettingsPage() {
   }, []);
 
   const handleReset = useCallback(() => {
-    console.log('Restableciendo configuración...');
+    logger.info('App', 'Restableciendo configuración...');
     // Emitir evento de configuración restablecida
     ModuleEventUtils.analytics.generated('settings', { action: 'config_reset' }, new Date().toISOString());
     setIsDirty(false);

@@ -20,7 +20,7 @@ import {
   CardWrapper
 } from '@/shared/ui';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { useCapabilities } from '@/lib/capabilities/hooks/useCapabilities';
+import { useCapabilities } from '@/store/capabilityStore';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 type NavTab = 'current-route' | 'modules' | 'capabilities' | 'routing-tree';

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
+import { logger } from '@/lib/logging';
 import { 
   Button, 
   Heading, 
@@ -16,11 +17,11 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
 
   const handleStart = () => {
     if (userName.trim()) {
-      console.log('👋 WelcomeScreen: calling onComplete with:', userName.trim());
+      logger.info('App', '👋 WelcomeScreen: calling onComplete with:', userName.trim());
       onComplete(userName.trim());
-      console.log('👋 WelcomeScreen: onComplete called');
+      logger.info('App', '👋 WelcomeScreen: onComplete called');
     } else {
-      console.warn('👋 WelcomeScreen: userName is empty, cannot proceed');
+      logger.warn('App', '👋 WelcomeScreen: userName is empty, cannot proceed');
     }
   };
 

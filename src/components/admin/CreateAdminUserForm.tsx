@@ -17,6 +17,7 @@ import {
 import { CardWrapper, Button, InputField, Typography, SelectField } from '@/shared/ui';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 
+import { logger } from '@/lib/logging';
 interface CreateAdminUserFormProps {
   onCancel?: () => void;
   onSuccess?: (user: unknown) => void;
@@ -87,7 +88,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
     
     try {
       // TODO: Implementar creación real de usuario
-      console.log('Creating admin user:', {
+      logger.info('App', 'Creating admin user:', {
         email: formData.email,
         fullName: formData.fullName,
         role: formData.role

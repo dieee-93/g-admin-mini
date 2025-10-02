@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { supabase } from '@/lib/supabase/client';
 
+import { logger } from '@/lib/logging';
 /**
  * Configuration for CRUD operations
  */
@@ -205,7 +206,7 @@ export function useCrudOperations<T extends FieldValues>(
     const errorMessage = error.message || 'Ha ocurrido un error inesperado';
     setError(errorMessage);
     onErrorRef.current?.(action, error);
-    console.error(`CRUD ${action} error:`, error);
+    logger.error('App', `CRUD ${action} error:`, error);
   }, [setError]);
 
   // Success handler - ✅ OPTIMIZED: Stable dependencies using useRef for callbacks  

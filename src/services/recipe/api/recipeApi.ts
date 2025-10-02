@@ -1,5 +1,6 @@
 // src/features/recipes/data/recipeApi.ts
 import { supabase } from '@/lib/supabase/client';
+import { logger } from '@/lib/logging';
 import { 
   type Recipe, 
   type RecipeWithCost, 
@@ -154,7 +155,7 @@ export async function calculateRecipeCost(recipeId: string): Promise<number> {
     .rpc('calculate_recipe_cost', { recipe_id: recipeId });
   
   if (error) {
-    console.error('Cost calculation error:', error);
+    logger.error('App', 'Cost calculation error:', error);
     throw new Error(`Error calculating recipe cost: ${error.message}`);
   }
   

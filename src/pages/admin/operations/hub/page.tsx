@@ -30,6 +30,7 @@ import { useHubPage } from './hooks';
 // Components
 import { OperationsHeader, Planning, Kitchen, Tables, Monitoring } from './components';
 
+import { logger } from '@/lib/logging';
 // Module configuration for Operations
 const OPERATIONS_MODULE_CONFIG = {
   capabilities: ['restaurant_operations', 'kitchen_management', 'table_service', 'pos_system'],
@@ -39,15 +40,15 @@ const OPERATIONS_MODULE_CONFIG = {
   },
   eventHandlers: {
     'sales.order_placed': (data: any) => {
-      console.log('🍽️ Operations: New order received', data);
+      logger.info('App', '🍽️ Operations: New order received', data);
       // Handle new order from sales
     },
     'inventory.stock_low': (data: any) => {
-      console.log('📦 Operations: Stock alert received', data);
+      logger.info('App', '📦 Operations: Stock alert received', data);
       // Handle low stock alerts
     },
     'staff.shift_changed': (data: any) => {
-      console.log('👥 Operations: Staff shift update', data);
+      logger.info('App', '👥 Operations: Staff shift update', data);
       // Handle staff changes affecting operations
     }
   },

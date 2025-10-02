@@ -23,6 +23,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Table } from '../../types';
 
+import { logger } from '@/lib/logging';
 interface QRCodeGeneratorProps {
   tables: Table[];
   onQRGenerated: (tableId: string, qrCode: string) => void;
@@ -126,7 +127,7 @@ export function QRCodeGenerator({
       setShowQRModal(true);
       
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      logger.error('SalesStore', 'Error generating QR code:', error);
     } finally {
       setIsGenerating(false);
     }
@@ -150,7 +151,7 @@ export function QRCodeGenerator({
       await navigator.clipboard.writeText(url);
       // You might want to show a toast notification here
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      logger.error('SalesStore', 'Failed to copy to clipboard:', error);
     }
   };
 
@@ -204,7 +205,7 @@ export function QRCodeGenerator({
                 width: 200,
                 margin: 2
               }, function (error, canvas) {
-                if (error) console.error(error);
+                if (error) logger.error('SalesStore', error);
                 document.getElementById('qrcode').appendChild(canvas);
                 window.print();
               });

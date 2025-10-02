@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
+import { logger } from '@/lib/logging';
 export interface RecipeStockValidationResult {
   is_valid: boolean;
   error_message?: string;
@@ -39,7 +40,7 @@ export function useRecipeStockValidation() {
       });
 
       if (error) {
-        console.error('Error validating recipe stock:', error);
+        logger.error('App', 'Error validating recipe stock:', error);
         const result = { 
           is_valid: false, 
           error_message: `Error de validación: ${error.message}` 
@@ -68,7 +69,7 @@ export function useRecipeStockValidation() {
       return result;
       
     } catch (error) {
-      console.error('Unexpected error:', error);
+      logger.error('App', 'Unexpected error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       const result = { 
         is_valid: false, 

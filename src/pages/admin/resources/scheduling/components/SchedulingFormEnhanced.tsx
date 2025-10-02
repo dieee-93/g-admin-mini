@@ -15,6 +15,7 @@ import {
 } from '@/business-logic/shared/SchedulingCalculations';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
+import { logger } from '@/lib/logging';
 // Enhanced Schedule schema with optimization calculations
 const ScheduleSchema = z.object({
   id: z.string().optional(),
@@ -398,12 +399,12 @@ export function SchedulingFormEnhanced({
 
   // Mock CRUD operations (would be replaced with real API calls)
   const createSchedule = async (data: any) => {
-    console.log('Creating schedule:', data);
+    logger.info('API', 'Creating schedule:', data);
     return { id: Date.now().toString(), ...data };
   };
 
   const updateSchedule = async (id: string, data: any) => {
-    console.log('Updating schedule:', id, data);
+    logger.info('API', 'Updating schedule:', id, data);
     return { id, ...data };
   };
 

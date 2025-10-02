@@ -4,6 +4,7 @@
  */
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 export interface ErrorConfig {
   module: string;
   operation: string;
@@ -34,7 +35,7 @@ export async function handleAsyncOperation<T>(
     const errorMessage = fallbackMessage || `Error en ${op} de ${module}`;
 
     if (logToConsole) {
-      console.error(`[${module}] ${op} failed:`, error);
+      logger.error('App', `[${module}] ${op} failed:`, error);
     }
 
     if (showToast) {

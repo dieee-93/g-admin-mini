@@ -1,5 +1,6 @@
 // src/features/recipes/logic/useRecipes.ts
 import { useEffect, useState } from 'react';
+import { logger } from '@/lib/logging';
 import { 
   type Recipe, 
   type RecipeWithCost, 
@@ -30,7 +31,7 @@ export function useRecipes() {
       const data = await fetchRecipes();
       setRecipes(data);
     } catch (e) {
-      console.error('Error loading recipes:', e);
+      logger.error('App', 'Error loading recipes:', e);
       // Don't re-throw error in useEffect context - handle gracefully
       setRecipes([]);
     } finally {
@@ -44,7 +45,7 @@ export function useRecipes() {
       const data = await fetchRecipesWithCosts();
       setRecipesWithCosts(data);
     } catch (e) {
-      console.error('Error loading recipes with costs:', e);
+      logger.error('App', 'Error loading recipes with costs:', e);
       // Don't re-throw error in useEffect context - handle gracefully
       setRecipesWithCosts([]);
     } finally {
@@ -101,7 +102,7 @@ export function useRecipeOperations() {
     try {
       return await calculateRecipeCost(recipeId);
     } catch (e) {
-      console.error('Error calculating recipe cost:', e);
+      logger.error('App', 'Error calculating recipe cost:', e);
       throw e;
     } finally {
       setLoading(false);
@@ -113,7 +114,7 @@ export function useRecipeOperations() {
     try {
       return await checkRecipeViability(recipeId);
     } catch (e) {
-      console.error('Error checking recipe viability:', e);
+      logger.error('App', 'Error checking recipe viability:', e);
       throw e;
     } finally {
       setLoading(false);
@@ -128,7 +129,7 @@ export function useRecipeOperations() {
     try {
       return await executeRecipe(recipeId, batches);
     } catch (e) {
-      console.error('Error executing recipe:', e);
+      logger.error('App', 'Error executing recipe:', e);
       throw e;
     } finally {
       setLoading(false);

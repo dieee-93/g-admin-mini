@@ -8,6 +8,7 @@ import { useFormManager, useDataFetcher, useDataSearch, useModuleAnalytics } fro
 import { CRUDHandlers, handleAsyncOperation } from '@/shared/utils/errorHandling';
 import { AnalyticsEngine } from '@/shared/services/AnalyticsEngine';
 
+import { logger } from '@/lib/logging';
 export interface ModuleConfig<TEntity, TMetrics = Record<string, any>> {
   // Module metadata
   name: string;
@@ -173,7 +174,7 @@ export function createModule<TEntity extends { id: string }, TMetrics = Record<s
           ...customAnalytics
         };
       } catch (error) {
-        console.error(`Error generating analytics for ${config.name}:`, error);
+        logger.error('App', `Error generating analytics for ${config.name}:`, error);
         return null;
       }
     };

@@ -25,6 +25,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { CodeSplittingMonitor } from '../codeSplitting';
 
+import { logger } from '@/lib/logging';
 interface CodeSplittingReportProps {
   autoRefresh?: boolean;
   refreshInterval?: number;
@@ -44,7 +45,7 @@ export function CodeSplittingReport({
       const newReport = CodeSplittingMonitor.getPerformanceReport();
       setReport(newReport);
     } catch (error) {
-      console.error('Failed to generate code splitting report:', error);
+      logger.error('Performance', 'Failed to generate code splitting report:', error);
     } finally {
       setLoading(false);
     }

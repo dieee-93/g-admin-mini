@@ -27,6 +27,7 @@ import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { useSales } from '../hooks/useSales';
 
+import { logger } from '@/lib/logging';
 interface SaleData {
   id: string;
   amount: number;
@@ -154,7 +155,7 @@ export function SalesAnalyticsEnhanced() {
       });
 
     } catch (error) {
-      console.error('Error generating sales analytics:', error);
+      logger.error('SalesStore', 'Error generating sales analytics:', error);
     } finally {
       setAnalyticsLoading(false);
     }

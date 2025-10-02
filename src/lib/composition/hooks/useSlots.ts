@@ -7,7 +7,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useSlotContext } from '../SlotProvider';
 import { SlotContent, PluggableComponentConfig } from '../types/SlotTypes';
-import { useCapabilities } from '../../capabilities/hooks/useCapabilities';
+import { useCapabilities } from '@/store/capabilityStore';
 
 /**
  * Hook for managing slot content with capabilities integration

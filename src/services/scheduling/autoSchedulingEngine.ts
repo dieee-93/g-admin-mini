@@ -6,6 +6,7 @@
 import { supabase } from '@/lib/supabase/client';
 import { EventBus } from '@/lib/events';
 import { errorHandler, createBusinessError } from '@/lib/error-handling';
+import { logger } from '@/lib/logging';
 import { 
   calculateShiftHours, 
   calculateShiftCost, 
@@ -136,7 +137,7 @@ class AutoSchedulingEngine {
     constraints: SchedulingConstraints
   ): Promise<SchedulingSolution> {
     try {
-      console.log('🤖 Starting auto-scheduling algorithm...');
+      logger.info('App', '🤖 Starting auto-scheduling algorithm...');
       
       // Step 1: Get requirements and availability
       const [requirements, availability] = await Promise.all([
@@ -160,7 +161,7 @@ class AutoSchedulingEngine {
         timestamp: new Date().toISOString()
       });
 
-      console.log(`✅ Auto-scheduling completed: ${validatedSolution.metrics.total_shifts} shifts generated`);
+      logger.info('App', `✅ Auto-scheduling completed: ${validatedSolution.metrics.total_shifts} shifts generated`);
       return validatedSolution;
 
     } catch (error) {
@@ -502,7 +503,7 @@ class AutoSchedulingEngine {
       });
 
     if (error) {
-      console.warn('Using fallback shift requirements due to API error:', error);
+      logger.error('App', 'Using fallback shift requirements due to API error:', error);
       return this.getFallbackRequirements(startDate, endDate);
     }
 
@@ -528,7 +529,7 @@ class AutoSchedulingEngine {
       .eq('status', 'active');
 
     if (error) {
-      console.warn('Using fallback availability due to API error:', error);
+      logger.error('App', 'Using fallback availability due to API error:', error);
       return [];
     }
 

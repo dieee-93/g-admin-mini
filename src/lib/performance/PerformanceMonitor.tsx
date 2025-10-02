@@ -7,6 +7,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { logger } from '@/lib/logging';
 interface PerformanceMetrics {
   fps: number;
   memoryUsage: number;
@@ -72,7 +73,7 @@ export const usePerformanceMonitor = () => {
         
         // Auto-optimización basada en rendimiento
         if (isLagging && !config.reducedEffects) {
-          console.warn('Performance issue detected, reducing effects...');
+          logger.warn('Performance', 'Performance issue detected, reducing effects...');
           setConfig(prev => ({
             ...prev,
             reducedEffects: true,

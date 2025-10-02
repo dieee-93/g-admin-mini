@@ -19,6 +19,7 @@ import {
 import { DOMAIN_METADATA } from '@/config/masteryAchievements';
 import type { DomainProgressSummary } from '../../types';
 
+import { logger } from '@/lib/logging';
 interface GridViewProps {
   domainProgress: DomainProgressSummary[];
   onDomainSelect: (domain: string) => void;
@@ -87,7 +88,7 @@ export const GridView: React.FC<GridViewProps> = ({
         const metadata = DOMAIN_METADATA[domain.domain as keyof typeof DOMAIN_METADATA];
         
         // Debug individual domain
-        console.log(`🔍 Domain: ${domain.domain}`, { domain, metadata });
+        logger.info('CapabilitySystem', `🔍 Domain: ${domain.domain}`, { domain, metadata });
         
         // Si no hay metadata, usar valores por defecto
         const domainInfo = metadata || {

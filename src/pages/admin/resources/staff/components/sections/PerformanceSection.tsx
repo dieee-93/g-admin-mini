@@ -35,6 +35,7 @@ import { useStaffWithLoader } from '../../../../../../hooks/useStaffData';
 import staffApi from '../../../../../../services/staff/staffApi';
 import type { StaffViewState } from '../../types';
 
+import { logger } from '@/lib/logging';
 interface PerformanceSectionProps {
   viewState: StaffViewState;
   onViewStateChange: (state: StaffViewState) => void;
@@ -111,7 +112,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
       setPerformanceTrends(trendData);
       setTopPerformers(topData);
     } catch (error) {
-      console.error('Error loading analytics:', error);
+      logger.error('StaffStore', 'Error loading analytics:', error);
     } finally {
       setLoading(false);
     }

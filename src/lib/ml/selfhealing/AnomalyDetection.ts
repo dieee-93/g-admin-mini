@@ -6,6 +6,7 @@ import { EventBus } from '@/lib/events';
 import { mlEngine } from '../core/MLEngine';
 import { bundleOptimizer } from '@/lib/performance/BundleOptimizer';
 
+import { logger } from '@/lib/logging';
 // ===== INTERFACES =====
 
 export interface Anomaly {
@@ -197,10 +198,10 @@ export class AnomalyDetectionEngine {
               );
             }
             
-            console.log('🔧 Performance cache cleared successfully');
+            logger.info('Performance', '🔧 Performance cache cleared successfully');
             return true;
           } catch (error) {
-            console.error('Failed to clear performance cache:', error);
+            logger.error('Performance', 'Failed to clear performance cache:', error);
             return false;
           }
         }
@@ -220,12 +221,12 @@ export class AnomalyDetectionEngine {
             const wsManager = (window as any).wsManager;
             if (wsManager && typeof wsManager.reconnect === 'function') {
               await wsManager.reconnect();
-              console.log('🔧 WebSocket connection restarted successfully');
+              logger.info('Performance', '🔧 WebSocket connection restarted successfully');
               return true;
             }
             return false;
           } catch (error) {
-            console.error('Failed to restart WebSocket connection:', error);
+            logger.error('Performance', 'Failed to restart WebSocket connection:', error);
             return false;
           }
         },
@@ -265,10 +266,10 @@ export class AnomalyDetectionEngine {
               optimizer.optimizeChunkLoadingOrder(currentChunks);
             }
 
-            console.log('🔧 Memory usage optimized successfully');
+            logger.info('Performance', '🔧 Memory usage optimized successfully');
             return true;
           } catch (error) {
-            console.error('Failed to optimize memory usage:', error);
+            logger.error('Performance', 'Failed to optimize memory usage:', error);
             return false;
           }
         }
@@ -287,10 +288,10 @@ export class AnomalyDetectionEngine {
             // Access offline sync through module or global reference
             const { forceSync } = await import('@/lib/offline');
             await forceSync();
-            console.log('🔧 Offline sync forced successfully');
+            logger.info('Performance', '🔧 Offline sync forced successfully');
             return true;
           } catch (error) {
-            console.error('Failed to force offline sync:', error);
+            logger.error('Performance', 'Failed to force offline sync:', error);
             return false;
           }
         }
@@ -308,10 +309,10 @@ export class AnomalyDetectionEngine {
           try {
             // Reinitialize ML engine
             await mlEngine.initialize();
-            console.log('🔧 ML models reloaded successfully');
+            logger.info('Performance', '🔧 ML models reloaded successfully');
             return true;
           } catch (error) {
-            console.error('Failed to reload ML models:', error);
+            logger.error('Performance', 'Failed to reload ML models:', error);
             return false;
           }
         }
@@ -326,7 +327,7 @@ export class AnomalyDetectionEngine {
         prerequisites: [],
         rollbackable: false,
         execute: async () => {
-          console.warn('🚨 Emergency page reload initiated');
+          logger.warn('Performance', '🚨 Emergency page reload initiated');
           // Delay to allow logging and cleanup
           setTimeout(() => {
             window.location.reload();
@@ -441,7 +442,7 @@ export class AnomalyDetectionEngine {
   public startMonitoring(): void {
     if (this.isMonitoring) return;
 
-    console.log('🔍 Starting anomaly detection monitoring...');
+    logger.info('Performance', '🔍 Starting anomaly detection monitoring...');
     this.isMonitoring = true;
 
     // Monitor system health every 30 seconds
@@ -464,7 +465,7 @@ export class AnomalyDetectionEngine {
       this.monitoringInterval = null;
     }
     this.isMonitoring = false;
-    console.log('⏹️ Anomaly detection monitoring stopped');
+    logger.info('Performance', '⏹️ Anomaly detection monitoring stopped');
   }
 
   /**
@@ -500,7 +501,7 @@ export class AnomalyDetectionEngine {
       await this.checkOfflineSyncQueue();
 
     } catch (error) {
-      console.error('Error collecting metrics:', error);
+      logger.error('Performance', 'Error collecting metrics:', error);
     }
   }
 
@@ -762,7 +763,7 @@ export class AnomalyDetectionEngine {
 
         // Check prerequisites
         if (!this.checkPrerequisites(action.prerequisites)) {
-          console.warn(`Prerequisites not met for healing action: ${actionId}`);
+          logger.warn('Performance', `Prerequisites not met for healing action: ${actionId}`);
           continue;
         }
 
@@ -773,12 +774,12 @@ export class AnomalyDetectionEngine {
         );
 
         if (recentExecutions.length > 0) {
-          console.log(`Healing action ${actionId} was recently executed, skipping`);
+          logger.info('Performance', `Healing action ${actionId} was recently executed, skipping`);
           continue;
         }
 
         try {
-          console.log(`🔧 Executing healing action: ${action.description}`);
+          logger.info('Performance', `🔧 Executing healing action: ${action.description}`);
           
           const success = await action.execute();
           
@@ -789,7 +790,7 @@ export class AnomalyDetectionEngine {
           });
 
           if (success) {
-            console.log(`✅ Healing action ${actionId} completed successfully`);
+            logger.info('Performance', `✅ Healing action ${actionId} completed successfully`);
             
             // Emit healing event
             await EventBus.emit('alerts.automated_action_executed', {
@@ -806,10 +807,10 @@ export class AnomalyDetectionEngine {
             this.anomalies.delete(anomaly.id);
             break; // Stop trying other actions for this anomaly
           } else {
-            console.error(`❌ Healing action ${actionId} failed`);
+            logger.error('Performance', `❌ Healing action ${actionId} failed`);
           }
         } catch (error) {
-          console.error(`Error executing healing action ${actionId}:`, error);
+          logger.error('Performance', `Error executing healing action ${actionId}:`, error);
           
           this.executedActions.push({
             actionId,
@@ -836,7 +837,7 @@ export class AnomalyDetectionEngine {
           if (responseMetric && responseMetric.value > 2000) return false;
           break;
         default:
-          console.warn(`Unknown prerequisite: ${prerequisite}`);
+          logger.warn('Performance', `Unknown prerequisite: ${prerequisite}`);
           break;
       }
     }
@@ -971,7 +972,7 @@ export class AnomalyDetectionEngine {
   public async executeHealingAction(actionId: string): Promise<boolean> {
     const action = this.healingActions.get(actionId);
     if (!action) {
-      console.error(`Healing action not found: ${actionId}`);
+      logger.error('Performance', `Healing action not found: ${actionId}`);
       return false;
     }
 
@@ -986,7 +987,7 @@ export class AnomalyDetectionEngine {
 
       return success;
     } catch (error) {
-      console.error(`Failed to execute healing action ${actionId}:`, error);
+      logger.error('Performance', `Failed to execute healing action ${actionId}:`, error);
       return false;
     }
   }

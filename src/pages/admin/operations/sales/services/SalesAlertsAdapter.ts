@@ -4,6 +4,8 @@
 // Adaptador que conecta SalesIntelligenceEngine con el sistema unificado de alertas
 // Convierte alertas inteligentes específicas de sales al formato estándar
 
+import { logger } from '@/lib/logging';
+
 import {
   SalesIntelligenceEngine,
   type SalesAlert,
@@ -116,7 +118,7 @@ export class SalesAlertsAdapter {
       };
 
     } catch (error) {
-      console.error('Error generating sales alerts:', error);
+      logger.error('SalesStore', 'Error generating sales alerts:', error);
       throw new Error(`Sales alerts generation failed: ${error}`);
     }
   }
@@ -202,16 +204,16 @@ export class SalesAlertsAdapter {
    */
   private async pushToUnifiedSystem(unifiedAlerts: UnifiedAlert[]): Promise<void> {
     // TODO: Implementar integración real con AlertUtils cuando esté disponible
-    console.log('📊 Sales Alerts Generated:', unifiedAlerts.length);
+    logger.info('SalesStore', '📊 Sales Alerts Generated:', unifiedAlerts.length);
 
     for (const alert of unifiedAlerts) {
       // Placeholder para integración con sistema unificado
       // AlertUtils.createRevenueAlert(alert.title, alert.message, alert.type, alert.metadata);
-      console.log(`🚨 ${alert.type.toUpperCase()}: ${alert.title}`);
-      console.log(`   ${alert.message}`);
+      logger.info('SalesStore', `🚨 ${alert.type.toUpperCase()}: ${alert.title}`);
+      logger.info('SalesStore', `   ${alert.message}`);
 
       if (alert.metadata?.affectedModules?.length > 0) {
-        console.log(`   Módulos afectados: ${alert.metadata.affectedModules.join(', ')}`);
+        logger.info('SalesStore', `   Módulos afectados: ${alert.metadata.affectedModules.join(', ')}`);
       }
     }
   }
@@ -347,7 +349,7 @@ export class SalesAlertsAdapter {
    * Método de testing para validar el flujo completo
    */
   static async testFullFlow(): Promise<void> {
-    console.log('🧪 Testing Sales Alerts Flow...');
+    logger.info('SalesStore', '🧪 Testing Sales Alerts Flow...');
 
     const adapter = SalesAlertsAdapter.getInstance();
     const mockData = SalesAlertsAdapter.generateMockSalesData();
@@ -355,17 +357,17 @@ export class SalesAlertsAdapter {
     try {
       const result = await adapter.generateAndUpdateAlerts(mockData);
 
-      console.log('✅ Test completed successfully');
-      console.log(`📊 Generated ${result.summary.total} alerts`);
-      console.log(`🔴 Critical: ${result.summary.critical}`);
-      console.log(`🟡 Warning: ${result.summary.warning}`);
-      console.log(`🔵 Info: ${result.summary.info}`);
-      console.log(`💡 Recommendations: ${result.recommendations.length}`);
+      logger.info('SalesStore', '✅ Test completed successfully');
+      logger.info('SalesStore', `📊 Generated ${result.summary.total} alerts`);
+      logger.info('SalesStore', `🔴 Critical: ${result.summary.critical}`);
+      logger.warn('SalesStore', `🟡 Warning: ${result.summary.warning}`);
+      logger.info('SalesStore', `🔵 Info: ${result.summary.info}`);
+      logger.info('SalesStore', `💡 Recommendations: ${result.recommendations.length}`);
 
-      result.recommendations.forEach(rec => console.log(`   ${rec}`));
+      result.recommendations.forEach(rec => logger.info('SalesStore', `   ${rec}`));
 
     } catch (error) {
-      console.error('❌ Test failed:', error);
+      logger.error('SalesStore', '❌ Test failed:', error);
     }
   }
 }

@@ -17,6 +17,7 @@ import {
 } from '@/shared/ui';
 import { UnifiedCalendarEngine } from '../engine/UnifiedCalendarEngine';
 import { BaseCalendarAdapter } from '../adapters/BaseCalendarAdapter';
+import { logger } from '@/lib/logging';
 import {
   CalendarConfig,
   DateRange,
@@ -102,7 +103,7 @@ export function CalendarGrid({
 
         setCalendarData({ timeSlots, bookings, resources });
       } catch (error) {
-        console.error('Error loading calendar data:', error);
+        logger.error('App', 'Error loading calendar data:', error);
       }
     };
 

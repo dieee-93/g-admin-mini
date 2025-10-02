@@ -37,6 +37,7 @@ import { Icon, InputField, CardWrapper, Modal } from '@/shared/ui';
 import { autoSchedulingEngine, type SchedulingConstraints, type SchedulingSolution } from '../../../../../services/scheduling/autoSchedulingEngine';
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 interface AutoSchedulingModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -110,7 +111,7 @@ export function AutoSchedulingModal({
       };
 
       setProgress(30);
-      console.log('🤖 Starting auto-scheduling with constraints:', constraints);
+      logger.info('API', '🤖 Starting auto-scheduling with constraints:', constraints);
 
       // Generate schedule
       const generatedSolution = await autoSchedulingEngine.generateOptimalSchedule(
@@ -138,7 +139,7 @@ export function AutoSchedulingModal({
       }
 
     } catch (error) {
-      console.error('Auto-scheduling error:', error);
+      logger.error('API', 'Auto-scheduling error:', error);
       notify.error({
         title: 'Scheduling Failed',
         description: 'Unable to generate schedule. Please try again or adjust constraints.'

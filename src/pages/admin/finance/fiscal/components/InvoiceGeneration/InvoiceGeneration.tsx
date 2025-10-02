@@ -51,6 +51,7 @@ import { fiscalApi } from '../../services';
 import { notify } from '@/lib/notifications';
 import { type Invoice, type InvoiceType, type CondicionIVA } from '../../types';
 
+import { logger } from '@/lib/logging';
 interface InvoiceGenerationProps {
   // Optional mode prop for future use
   mode?: 'online' | 'offline' | 'hybrid';
@@ -89,7 +90,7 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
       const data = await fiscalApi.getInvoices();
       setInvoices(data);
     } catch (error) {
-      console.error('Error loading invoices:', error);
+      logger.error('API', 'Error loading invoices:', error);
       notify.error({
         title: 'Error',
         description: 'No se pudieron cargar las facturas'
@@ -138,7 +139,7 @@ export function InvoiceGeneration({ mode = 'hybrid' }: InvoiceGenerationProps) {
       loadInvoices();
       
     } catch (error) {
-      console.error('Error creating invoice:', error);
+      logger.error('API', 'Error creating invoice:', error);
       notify.error({
         title: 'Error',
         description: 'No se pudo crear la factura'

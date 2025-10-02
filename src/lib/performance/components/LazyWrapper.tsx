@@ -25,6 +25,7 @@ import {
 import { CardWrapper, Icon } from '@/shared/ui';
 import { lazyLoadingManager } from '../LazyLoadingManager';
 
+import { logger } from '@/lib/logging';
 // Loading state types
 interface LoadingState {
   isLoading: boolean;
@@ -227,7 +228,7 @@ export class LazyErrorBoundary extends React.Component<
     });
 
     // Log error to monitoring service
-    console.error(`Lazy loading error in ${this.props.moduleName}:`, {
+    logger.error('Performance', `Lazy loading error in ${this.props.moduleName}:`, {
       message: error.message,
       stack: error.stack,
       componentStack: errorInfo.componentStack

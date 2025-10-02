@@ -8,6 +8,7 @@ import type { Shift } from '@/pages/admin/resources/scheduling/types';
 import type { Employee, TimeEntry } from '@/store/staffStore';
 import { calculateLaborCosts, getLaborCostSummary } from './staffApi';
 
+import { logger } from '@/lib/logging';
 // Real-time cost tracking interfaces
 export interface LiveCostData {
   employee_id: string;
@@ -77,7 +78,7 @@ class RealTimeLaborCostService {
       this.updateLiveCosts();
     }, this.UPDATE_INTERVAL);
 
-    console.log('🔄 Real-time labor cost monitoring started');
+    logger.info('StaffStore', '🔄 Real-time labor cost monitoring started');
   }
 
   /**
@@ -89,7 +90,7 @@ class RealTimeLaborCostService {
       this.updateInterval = null;
     }
 
-    console.log('⏹️ Real-time labor cost monitoring stopped');
+    logger.info('StaffStore', '⏹️ Real-time labor cost monitoring stopped');
   }
 
   /**
@@ -224,7 +225,7 @@ class RealTimeLaborCostService {
       this.notifySubscribers();
 
     } catch (error) {
-      console.error('Error updating live costs:', error);
+      logger.error('StaffStore', 'Error updating live costs:', error);
     }
   }
 
@@ -331,7 +332,7 @@ class RealTimeLaborCostService {
         });
       }
     } catch (error) {
-      console.error('Error checking budget alerts:', error);
+      logger.error('StaffStore', 'Error checking budget alerts:', error);
     }
 
     // Update active alerts (remove old ones, add new ones)
@@ -371,7 +372,7 @@ class RealTimeLaborCostService {
       try {
         callback([...this.currentData]);
       } catch (error) {
-        console.error('Error notifying subscriber:', error);
+        logger.error('StaffStore', 'Error notifying subscriber:', error);
       }
     });
   }
@@ -384,7 +385,7 @@ class RealTimeLaborCostService {
       try {
         callback([...this.activeAlerts]);
       } catch (error) {
-        console.error('Error notifying alert subscriber:', error);
+        logger.error('StaffStore', 'Error notifying alert subscriber:', error);
       }
     });
   }
@@ -423,7 +424,7 @@ class RealTimeLaborCostService {
       };
 
     } catch (error) {
-      console.error('Error calculating daily cost summary:', error);
+      logger.error('StaffStore', 'Error calculating daily cost summary:', error);
       throw new Error('Failed to calculate daily cost summary');
     }
   }

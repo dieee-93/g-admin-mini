@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Link as RouterLink, type LinkProps as RouterLinkProps } from 'react-router-dom';
 import { useNavigation } from '@/contexts/NavigationContext';
 
+import { logger } from '@/lib/logging';
 interface CustomLinkProps extends Omit<RouterLinkProps, 'to'> {
   moduleId: string;
   subPath?: string;
@@ -19,7 +20,7 @@ export function Link({ moduleId, subPath, query, ...props }: CustomLinkProps) {
   const to = useMemo(() => {
     const module = modules.find(m => m.id === moduleId);
     if (!module) {
-      console.warn(`[CustomLink] Module with id "${moduleId}" not found.`);
+      logger.warn('App', `[CustomLink] Module with id "${moduleId}" not found.`);
       return '#'; // Fallback for invalid module
     }
     let path = subPath ? `${module.path}${subPath}` : module.path;

@@ -2,6 +2,8 @@
 // Centralized exports for WebSocket functionality
 
 // Core WebSocket functionality
+import { logger } from '@/lib/logging';
+
 export { WebSocketManager, wsManager, type WSMessage, type WSMessageType } from './WebSocketManager';
 export { RealtimeIntegration, realtimeIntegration } from './RealtimeIntegration';
 
@@ -38,9 +40,9 @@ export const initializeWebSocket = async () => {
       await wsManager.connect();
     }
     
-    console.log('WebSocket system initialized successfully');
+    logger.info('WebSocket', 'WebSocket system initialized successfully');
   } catch (error) {
-    console.warn('WebSocket system initialization failed:', error);
+    logger.error('WebSocket', 'WebSocket system initialization failed:', error);
     // System will work in offline mode
   }
 };
@@ -53,5 +55,5 @@ export const cleanupWebSocket = () => {
   import('./WebSocketManager').then(({ wsManager }) => {
     wsManager.disconnect();
   });
-  console.log('WebSocket system cleaned up');
+  logger.info('WebSocket', 'WebSocket system cleaned up');
 };

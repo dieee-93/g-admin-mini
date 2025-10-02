@@ -9,6 +9,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { useFiscal } from './useFiscal';
 import { useOfflineStatus } from '@/lib/offline';
 import { notify } from '@/lib/notifications';
+import { logger } from '@/lib/logging';
 import {
   DocumentTextIcon,
   CogIcon,
@@ -459,21 +460,21 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
   const actions: FiscalPageActions = useMemo(() => ({
     // Invoice Management
     handleNewInvoice: () => {
-      console.log('Opening new invoice modal');
+      logger.info('API', 'Opening new invoice modal');
       setPageState(prev => ({ ...prev, activeTab: 'invoicing' }));
       // Would open invoice creation interface
     },
 
     handleInvoiceGeneration: (data: any) => {
-      console.log('Generating invoice:', data);
+      logger.info('API', 'Generating invoice:', data);
       // Use tax calculation service for accurate tax computation
       const taxResult = calculateTotalTax(data.amount, taxConfiguration);
-      console.log('Tax calculation result:', taxResult);
+      logger.info('API', 'Tax calculation result:', taxResult);
       // Would process invoice generation with AFIP
     },
 
     handleBulkInvoicing: () => {
-      console.log('Opening bulk invoicing interface');
+      logger.info('API', 'Opening bulk invoicing interface');
       // Would open bulk invoice processing
     },
 
@@ -487,7 +488,7 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
         return;
       }
 
-      console.log('Synchronizing with AFIP');
+      logger.info('API', 'Synchronizing with AFIP');
       notify.info({
         title: 'Sincronización iniciada',
         description: 'Enviando datos pendientes a AFIP'
@@ -496,12 +497,12 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
     },
 
     handleCAERequest: (invoiceData: any) => {
-      console.log('Requesting CAE for invoice:', invoiceData);
+      logger.info('API', 'Requesting CAE for invoice:', invoiceData);
       // Would request CAE from AFIP
     },
 
     handleAFIPStatusCheck: () => {
-      console.log('Checking AFIP status');
+      logger.debug('API', 'Checking AFIP status');
       setPageState(prev => ({ ...prev, activeTab: 'afip' }));
       // Would check AFIP service status
     },
@@ -510,17 +511,17 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
     handleTaxCalculation: (amount: number, config?: TaxConfiguration) => {
       const finalConfig = config || taxConfiguration;
       const result = calculateTotalTax(amount, finalConfig);
-      console.log('Tax calculation:', { amount, config: finalConfig, result });
+      logger.info('API', 'Tax calculation:', { amount, config: finalConfig, result });
       return result;
     },
 
     handleBulkTaxUpdate: () => {
-      console.log('Updating taxes for all pending transactions');
+      logger.info('API', 'Updating taxes for all pending transactions');
       // Would recalculate taxes for pending transactions
     },
 
     handleTaxConfigUpdate: (config: TaxConfiguration) => {
-      console.log('Updating tax configuration:', config);
+      logger.info('API', 'Updating tax configuration:', config);
       setPageState(prev => ({
         ...prev,
         filters: { ...prev.filters, jurisdiction: config.jurisdiction }
@@ -530,37 +531,37 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
 
     // Compliance & Reporting
     handleComplianceCheck: () => {
-      console.log('Running compliance check');
+      logger.info('API', 'Running compliance check');
       setPageState(prev => ({ ...prev, activeTab: 'compliance' }));
       // Would run compliance verification
     },
 
     handleGenerateReport: (type: string, period: string) => {
-      console.log(`Generating ${type} report for ${period}`);
+      logger.info('API', `Generating ${type} report for ${period}`);
       setPageState(prev => ({ ...prev, activeTab: 'reporting' }));
       // Would generate fiscal reports
     },
 
     handleExportData: (format: 'pdf' | 'excel' | 'csv') => {
-      console.log(`Exporting fiscal data in ${format} format`);
+      logger.info('API', `Exporting fiscal data in ${format} format`);
       // Would export fiscal data
     },
 
     // Financial Analysis
     handleCashFlowAnalysis: () => {
-      console.log('Generating cash flow analysis');
+      logger.info('API', 'Generating cash flow analysis');
       // Would use financialPlanningEngine for cash flow projections
       // const projections = generateCashFlowProjections(data);
       // setCashFlowData(projections);
     },
 
     handleProfitabilityAnalysis: () => {
-      console.log('Generating profitability analysis');
+      logger.info('API', 'Generating profitability analysis');
       // Would use financialPlanningEngine for profitability analysis
     },
 
     handleBudgetVarianceAnalysis: () => {
-      console.log('Generating budget variance analysis');
+      logger.info('API', 'Generating budget variance analysis');
       // Would analyze budget variances
     },
 

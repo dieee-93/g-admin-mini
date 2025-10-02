@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { STEP_GROUPS } from '@/pages/setup/config/setupSteps';
 
+import { logger } from '@/lib/logging';
 export interface SupabaseCredentials {
   url: string;
   anonKey: string;
@@ -87,7 +88,7 @@ export const useSetupStore = create<SetupStore>()(
             if (canProceedToStep(get(), currentGroup + 1)) {
               set({ currentGroup: currentGroup + 1, currentSubStep: 0, timestamp: Date.now() }, false, 'nextGroup');
             } else {
-              console.warn('Cannot proceed to next group, prerequisites not met.');
+              logger.warn('App', 'Cannot proceed to next group, prerequisites not met.');
             }
           }
         },
@@ -111,7 +112,7 @@ export const useSetupStore = create<SetupStore>()(
             if (canProceedToStep(get(), groupIndex)) {
                 set({ currentGroup: groupIndex, currentSubStep: subStepIndex, timestamp: Date.now() }, false, 'jumpToStep');
             } else {
-                console.warn(`Cannot jump to group ${groupIndex}, prerequisites not met.`);
+                logger.warn('App', `Cannot jump to group ${groupIndex}, prerequisites not met.`);
             }
         },
 

@@ -23,6 +23,7 @@ import { AlertDisplay } from './AlertDisplay';
 import { useAlerts } from '../hooks/useAlerts';
 import { useAlertsContext } from '../AlertsProvider';
 import { CardWrapper, Icon } from '@/shared/ui';
+import { logger } from '@/lib/logging';
 export interface GlobalAlertsDisplayProps {
   maxVisible?: number;
   position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
@@ -148,7 +149,7 @@ export function GlobalAlertsDisplay({
                       color="white"
                       onClick={() => {
                         // TODO: Open alerts configuration
-                        console.log('Open alerts configuration');
+                        logger.info('App', 'Open alerts configuration');
                       }}
                       aria-label="Configurar alertas"
                     >
@@ -212,7 +213,7 @@ export function GlobalAlertsDisplay({
                             await actions.resolve(alertId, `Resuelto por acción: ${action.label}`);
                           }
                         } catch (error) {
-                          console.error('Error executing alert action:', error);
+                          logger.error('App', 'Error executing alert action:', error);
                         }
                       }
                     }}

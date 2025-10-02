@@ -2,6 +2,8 @@
 // Centralized exports for all ML/AI functionality including predictions, recommendations, and self-healing
 
 // ===== CORE ML ENGINE =====
+import { logger } from '@/lib/logging';
+
 export {
   MLEngine,
   mlEngine,
@@ -221,7 +223,7 @@ class MLSystemManager {
   public async initializeSystem(config: Partial<MLSystemConfig> = {}): Promise<void> {
     if (this.isInitialized) return;
 
-    console.log('🤖 Initializing complete ML system...');
+    logger.info('Performance', '🤖 Initializing complete ML system...');
     
     this.config = { ...this.config, ...config };
     const startTime = Date.now();
@@ -255,7 +257,7 @@ class MLSystemManager {
       this.status.lastUpdate = Date.now();
 
       const initTime = Date.now() - startTime;
-      console.log(`✅ ML system initialized successfully in ${initTime}ms`);
+      logger.info('Performance', `✅ ML system initialized successfully in ${initTime}ms`);
 
       // Emit initialization event
       const { EventBus } = await import('@/lib/events/EventBus');
@@ -273,7 +275,7 @@ class MLSystemManager {
       }, 'MLSystem');
 
     } catch (error) {
-      console.error('❌ ML system initialization failed:', error);
+      logger.error('Performance', '❌ ML system initialization failed:', error);
       this.status.initialized = false;
       throw error;
     }
@@ -287,7 +289,7 @@ class MLSystemManager {
       await mlEngine.initialize();
       this.status.components.mlEngine = 'active';
     } catch (error) {
-      console.error('ML Engine initialization failed:', error);
+      logger.error('Performance', 'ML Engine initialization failed:', error);
       this.status.components.mlEngine = 'error';
     }
   }
@@ -300,7 +302,7 @@ class MLSystemManager {
       await predictiveInventory.runOptimization();
       this.status.components.predictiveInventory = 'active';
     } catch (error) {
-      console.error('Predictive Inventory initialization failed:', error);
+      logger.error('Performance', 'Predictive Inventory initialization failed:', error);
       this.status.components.predictiveInventory = 'error';
     }
   }
@@ -313,7 +315,7 @@ class MLSystemManager {
       await smartRecommendations.generateMenuRecommendations();
       this.status.components.recommendations = 'active';
     } catch (error) {
-      console.error('Smart Recommendations initialization failed:', error);
+      logger.error('Performance', 'Smart Recommendations initialization failed:', error);
       this.status.components.recommendations = 'error';
     }
   }
@@ -326,7 +328,7 @@ class MLSystemManager {
       anomalyDetection.startMonitoring();
       this.status.components.anomalyDetection = 'active';
     } catch (error) {
-      console.error('Anomaly Detection initialization failed:', error);
+      logger.error('Performance', 'Anomaly Detection initialization failed:', error);
       this.status.components.anomalyDetection = 'error';
     }
   }
@@ -369,7 +371,7 @@ class MLSystemManager {
       this.status.lastUpdate = Date.now();
 
     } catch (error) {
-      console.error('Failed to update system status:', error);
+      logger.error('Performance', 'Failed to update system status:', error);
     }
   }
 
@@ -511,7 +513,7 @@ class MLSystemManager {
       return newInsights;
 
     } catch (error) {
-      console.error('Failed to generate ML insights:', error);
+      logger.error('Performance', 'Failed to generate ML insights:', error);
       return [];
     }
   }
@@ -649,7 +651,7 @@ class MLSystemManager {
     this.isInitialized = false;
     this.status.initialized = false;
     
-    console.log('🔌 ML system shutdown completed');
+    logger.info('Performance', '🔌 ML system shutdown completed');
   }
 }
 

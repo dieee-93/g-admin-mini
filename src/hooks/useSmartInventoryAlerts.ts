@@ -115,7 +115,7 @@ export function useSmartInventoryAlerts(
         ...analysisResult.classC
       ];
     } catch (error) {
-      console.error('Error analyzing materials for alerts:', error);
+      logger.error('App', 'Error analyzing materials for alerts:', error);
       return [];
     }
   }, [materialItems, minValue, includeInactive, enablePredictive]);
@@ -147,7 +147,7 @@ export function useSmartInventoryAlerts(
       // 3. Crear nuevas alertas
       const createPromises = filteredAlerts.map(alert => 
         alertActions.create(alert).catch(error => {
-          console.error('Error creating alert:', error);
+          logger.error('App', 'Error creating alert:', error);
           return null;
         })
       );
@@ -158,7 +158,7 @@ export function useSmartInventoryAlerts(
       const alertsToUpdate = SmartAlertsAdapter.getAlertsToUpdate(materials, stockAlerts);
       const updatePromises = alertsToUpdate.map(({ id, updates }) => 
         alertActions.update(id, updates).catch(error => {
-          console.error('Error updating alert:', error);
+          logger.error('App', 'Error updating alert:', error);
         })
       );
       
@@ -170,7 +170,7 @@ export function useSmartInventoryAlerts(
       }
       
     } catch (error) {
-      console.error('Error generating smart alerts:', error);
+      logger.error('App', 'Error generating smart alerts:', error);
     } finally {
       setIsGeneratingAlerts(false);
     }
@@ -185,14 +185,14 @@ export function useSmartInventoryAlerts(
       
       const resolvePromises = alertsToResolve.map(alertId => 
         alertActions.resolve(alertId, 'Auto-resuelto: condición ya no se cumple').catch(error => {
-          console.error('Error auto-resolving alert:', error);
+          logger.error('App', 'Error auto-resolving alert:', error);
         })
       );
       
       await Promise.all(resolvePromises);
       
     } catch (error) {
-      console.error('Error resolving outdated alerts:', error);
+      logger.error('App', 'Error resolving outdated alerts:', error);
     }
   }, [materials, stockAlerts, alertActions]);
 
@@ -327,3 +327,4 @@ export function useSmartInventoryAlerts(
 
 // Fix para useState import
 import React from 'react';
+import { logger } from '@/lib/logging';

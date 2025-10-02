@@ -6,6 +6,7 @@ import {
   Tabs, Stack, Typography, Badge, Icon, Section, Alert, Spinner
 } from '@/shared/ui';
 import { CapabilityGate } from '@/lib/capabilities';
+import { logger } from '@/lib/logging';
 import {
   CalendarIcon,
   ClockIcon,
@@ -24,7 +25,7 @@ import {
 } from '../';
 
 // ✅ UNIFIED CALENDAR SYSTEM
-console.log('🔄 SchedulingManagement: Using React.lazy for UnifiedCalendar');
+logger.info('API', '🔄 SchedulingManagement: Using React.lazy for UnifiedCalendar');
 
 // Create a fallback component first
 const CalendarFallback = () => (
@@ -45,11 +46,11 @@ const CalendarFallback = () => (
 const UnifiedCalendar = React.lazy(() =>
   import('@/shared/calendar/components/UnifiedCalendar')
     .then(module => {
-      console.log('✅ SchedulingManagement: UnifiedCalendar loaded successfully', { module });
+      logger.info('API', '✅ SchedulingManagement: UnifiedCalendar loaded successfully', { module });
       return { default: module.default || module.UnifiedCalendar };
     })
     .catch(error => {
-      console.error('❌ SchedulingManagement: Error loading UnifiedCalendar', error);
+      logger.error('API', '❌ SchedulingManagement: Error loading UnifiedCalendar', error);
       return { default: CalendarFallback };
     })
 );

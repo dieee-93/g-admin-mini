@@ -1,4 +1,5 @@
 import { Section, Stack, Button, Icon } from '@/shared/ui';
+import { logger } from '@/lib/logging';
 import {
   PlusIcon,
   QrCodeIcon,
@@ -85,7 +86,7 @@ export function SalesActions({
           <>
             <Button
               variant="outline"
-              onClick={() => console.log('Gestión Mesas')}
+              onClick={() => logger.debug('SalesStore', 'Gestión Mesas')}
               flex="1"
               minW="200px"
             >
@@ -127,6 +128,5 @@ export function SalesActions({
           </>
         )}
       </Stack>
-    </Section>
-  );
+    </Section>);
 }

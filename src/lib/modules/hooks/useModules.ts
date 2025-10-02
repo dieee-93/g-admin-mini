@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getModuleRegistry } from '../ModuleRegistry';
 import { getModuleLoader } from '../ModuleLoader';
 import { useCapabilities } from '../../capabilities/hooks/useCapabilities';
+import { logger } from '@/lib/logging';
 import type {
   ModuleInterface,
   ModuleRegistryEntry,
@@ -259,7 +260,7 @@ export const useModuleHealth = (moduleId: string, interval: number = 60000) => {
           setHealth(healthCheck);
         }
       } catch (error) {
-        console.error(`Health check failed for module ${moduleId}:`, error);
+        logger.error('App', `Health check failed for module ${moduleId}:`, error);
       }
 
       // Schedule next check

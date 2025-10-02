@@ -41,6 +41,7 @@ import {
 } from '../../hooks/useKitchenConfig';
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 // Kitchen Display Component - Updated to v2.1 patterns
 const BasicKitchenDisplay = ({ mode, onOrderReady }: {
   mode: EffectiveMode;
@@ -98,7 +99,7 @@ export default function Kitchen() {
 
   // Kitchen EventBus integration
   const handleOrderReady = useCallback((orderId: string) => {
-    console.log('🍳 Kitchen: Order ready', orderId);
+    logger.info('App', '🍳 Kitchen: Order ready', orderId);
 
     // Emit order ready event to Operations and Sales
     emit('operations.order_ready', {
@@ -120,7 +121,7 @@ export default function Kitchen() {
   // Listen for new orders from Sales
   useEffect(() => {
     const handleNewOrder = (orderData: any) => {
-      console.log('🍳 Kitchen: New order received', orderData);
+      logger.info('App', '🍳 Kitchen: New order received', orderData);
       // Update kitchen display with new order
       // In a real app, this would update the kitchen queue
     };

@@ -13,6 +13,7 @@ import type {
 import { getModuleRegistry } from './ModuleRegistry';
 import { getCapabilityTelemetry } from '../capabilities/telemetry/CapabilityTelemetry';
 
+import { logger } from '@/lib/logging';
 /**
  * Module loader class for dynamic loading and federation
  */
@@ -130,7 +131,7 @@ export class ModuleLoader {
       if (result.status === 'fulfilled') {
         instances[result.value.id] = result.value.instance;
       } else {
-        console.error(`Failed to load module ${moduleId}:`, result.reason);
+        logger.error('App', `Failed to load module ${moduleId}:`, result.reason);
       }
     });
 
@@ -154,13 +155,13 @@ export class ModuleLoader {
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('🚀 Preloading modules:', toPreload);
+      logger.info('App', '🚀 Preloading modules:', toPreload);
     }
 
     // Load in background without waiting
     toPreload.forEach(id => {
       this.loadModule(id).catch(error => {
-        console.warn(`Preload failed for module ${id}:`, error);
+        logger.error('App', `Preload failed for module ${id}:`, error);
       });
     });
   }
@@ -266,7 +267,7 @@ export class ModuleLoader {
       try {
         return await this.loadModuleFederation(federation, './Module');
       } catch (error) {
-        console.warn(`Module Federation failed for ${metadata.id}, falling back to dynamic import:`, error);
+        logger.error('App', `Module Federation failed for ${metadata.id}, falling back to dynamic import:`, error);
       }
     }
 
@@ -305,7 +306,7 @@ export class ModuleLoader {
     entry.error = undefined;
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🗑️ Module unloaded: ${moduleId}`);
+      logger.info('App', `🗑️ Module unloaded: ${moduleId}`);
     }
   }
 

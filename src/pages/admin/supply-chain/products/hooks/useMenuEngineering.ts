@@ -15,6 +15,7 @@ import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';
 
+import { logger } from '@/lib/logging';
 interface UseMenuEngineeringOptions {
   configuration?: MatrixConfiguration;
   autoRefresh?: boolean;
@@ -152,7 +153,7 @@ export const useMenuEngineering = (
             .rpc('get_product_cost', { p_product_id: product.id });
 
           if (costError) {
-            console.warn(`Error getting cost for product ${product.name}:`, costError);
+            logger.error('App', `Error getting cost for product ${product.name}:`, costError);
           }
 
           const productCost = costData || 0;
@@ -177,7 +178,7 @@ export const useMenuEngineering = (
             salesDates: salesInfo.salesDates
           });
         } catch (err) {
-          console.warn(`Error processing product ${product.name}:`, err);
+          logger.error('App', `Error processing product ${product.name}:`, err);
           // Continue with estimated cost if database function fails
           const estimatedCost = DecimalUtils.multiply(
             salesInfo.totalRevenue.toString(), 
@@ -204,7 +205,7 @@ export const useMenuEngineering = (
 
       return salesData;
     } catch (err) {
-      console.error('Error fetching sales data:', err);
+      logger.error('App', 'Error fetching sales data:', err);
       throw err;
     }
   }, [config.analysisPeriodDays, config.minimumSalesForAnalysis]);

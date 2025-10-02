@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
+import { logger } from '@/lib/logging';
 interface DashboardStats {
   totalItems: number;
   totalStockValue: number;
@@ -37,7 +38,7 @@ export function useDashboardStats() {
           return;
         }
       } catch (dashboardErr) {
-        console.warn('get_dashboard_stats failed, using individual queries');
+        logger.error('App', 'get_dashboard_stats failed, using individual queries');
       }
 
       // ✅ FALLBACK: Consultas individuales
@@ -77,7 +78,7 @@ export function useDashboardStats() {
       });
 
     } catch (error) {
-      console.error('Error loading dashboard stats:', error);
+      logger.error('App', 'Error loading dashboard stats:', error);
       setStats(prev => ({ ...prev, loading: false }));
     }
   };

@@ -4,6 +4,7 @@
 import { EventBus } from '@/lib/events';
 import { EventBus } from '@/lib/events';
 
+import { logger } from '@/lib/logging';
 // ===== CORE ML INTERFACES =====
 
 export interface DataPoint {
@@ -403,7 +404,7 @@ export class MLEngine {
   public async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    console.log('🤖 Initializing ML Engine...');
+    logger.info('Performance', '🤖 Initializing ML Engine...');
     
     try {
       // Initialize training data collection
@@ -413,10 +414,10 @@ export class MLEngine {
       this.startBackgroundProcessing();
       
       this.isInitialized = true;
-      console.log('✅ ML Engine initialized successfully');
+      logger.info('Performance', '✅ ML Engine initialized successfully');
       
     } catch (error) {
-      console.error('❌ ML Engine initialization failed:', error);
+      logger.error('Performance', '❌ ML Engine initialization failed:', error);
       throw error;
     }
   }
@@ -466,7 +467,7 @@ export class MLEngine {
 
       this.forecastEngine.addTrainingData(timeSeries);
     } catch (error) {
-      console.error('Error processing sale data for ML:', error);
+      logger.error('Performance', 'Error processing sale data for ML:', error);
     }
   }
 
@@ -493,7 +494,7 @@ export class MLEngine {
 
       this.forecastEngine.addTrainingData(timeSeries);
     } catch (error) {
-      console.error('Error processing inventory data for ML:', error);
+      logger.error('Performance', 'Error processing inventory data for ML:', error);
     }
   }
 
@@ -523,7 +524,7 @@ export class MLEngine {
         this.forecastEngine.addTrainingData(timeSeries);
       });
     } catch (error) {
-      console.error('Error processing order data for ML:', error);
+      logger.error('Performance', 'Error processing order data for ML:', error);
     }
   }
 
@@ -532,7 +533,7 @@ export class MLEngine {
    */
   private async initializeTrainingData(): Promise<void> {
     // This would typically load historical data from the database
-    console.log('📚 Loading historical data for ML training...');
+    logger.info('Performance', '📚 Loading historical data for ML training...');
     
     // For now, we'll generate some sample data to bootstrap the system
     const sampleSalesData = this.generateSampleData('sales', 30);
@@ -582,7 +583,7 @@ export class MLEngine {
       try {
         await this.processBackgroundTasks();
       } catch (error) {
-        console.error('Background ML processing error:', error);
+        logger.error('Performance', 'Background ML processing error:', error);
       }
     }, 60 * 60 * 1000); // 1 hour
   }
@@ -591,7 +592,7 @@ export class MLEngine {
    * Background processing tasks
    */
   private async processBackgroundTasks(): Promise<void> {
-    console.log('🔄 Running background ML processing...');
+    logger.debug('Performance', '🔄 Running background ML processing...');
     
     // Clear old cache entries
     this.forecastEngine.invalidateCache();
@@ -603,11 +604,11 @@ export class MLEngine {
       try {
         await this.forecastEngine.forecast(seriesInfo.id, 7);
       } catch (error) {
-        console.warn(`Failed to generate forecast for ${seriesInfo.id}:`, error);
+        logger.error('Performance', `Failed to generate forecast for ${seriesInfo.id}:`, error);
       }
     }
     
-    console.log('✅ Background ML processing completed');
+    logger.debug('Performance', '✅ Background ML processing completed');
   }
 
   /**

@@ -12,6 +12,7 @@ import { fetchSales } from '@/pages/admin/sales/services/saleApi';
 import { useCustomers } from '../hooks/useCustomers';
 import type { Sale } from '@/pages/admin/sales/types';
 
+import { logger } from '@/lib/logging';
 export function CustomerOrdersHistory() {
   const { customers } = useCustomers();
   const [sales, setSales] = useState<Sale[]>([]);
@@ -34,7 +35,7 @@ export function CustomerOrdersHistory() {
         const data = await fetchSales(filters);
         setSales(data);
       } catch (error) {
-        console.error('Error loading sales:', error);
+        logger.error('App', 'Error loading sales:', error);
       } finally {
         setLoading(false);
       }

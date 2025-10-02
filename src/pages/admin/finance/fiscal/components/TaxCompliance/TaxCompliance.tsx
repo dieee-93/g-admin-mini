@@ -36,6 +36,7 @@ import { type TaxReport } from '../../types';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';
 
+import { logger } from '@/lib/logging';
 interface TaxPeriod {
   id: string;
   period: string;
@@ -155,7 +156,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       // Update period-specific data
     } catch (error) {
-      console.error('Error loading period detail:', error);
+      logger.error('API', 'Error loading period detail:', error);
     } finally {
       setLoading(false);
     }

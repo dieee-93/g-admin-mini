@@ -500,6 +500,7 @@ export const {
 // In a React component:
 import { SchedulingPage, useScheduling } from './SchedulingModuleExample';
 
+import { logger } from '@/lib/logging';
 function App() {
   return <SchedulingPage />;
 }
@@ -512,12 +513,11 @@ function CustomSchedulingManagement() {
   return (
     <div>
       <SchedulingForm
-        onSuccess={() => console.log('Schedule created!')}
+        onSuccess={() => logger.info('App', 'Schedule created!')}
         onCancel={() => console.log('Cancelled')}
       />
       <SchedulingList />
       <SchedulingAnalytics />
-    </div>
-  );
+    </div>);
 }
 */

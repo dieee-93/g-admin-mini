@@ -8,6 +8,7 @@ import { type MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 
+import { logger } from '@/lib/logging';
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -443,7 +444,7 @@ export class DemandForecastingEngine {
       return forecast;
       
     } catch (error) {
-      console.error(`Error generating forecast for ${material.name}:`, error);
+      logger.error('MaterialsStore', `Error generating forecast for ${material.name}:`, error);
       return null;
     }
   }

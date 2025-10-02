@@ -22,6 +22,7 @@ import { Icon } from '@/shared/ui/Icon';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 interface Table {
   id: string;
   number: number;
@@ -102,7 +103,7 @@ export default function TableManagement() {
 
       setTables(formattedTables);
     } catch (error) {
-      console.error('Error loading tables:', error);
+      logger.error('App', 'Error loading tables:', error);
       notify.error({ title: 'Error loading table data' });
     }
   };
@@ -140,7 +141,7 @@ export default function TableManagement() {
       
       setStats(stats);
     } catch (error) {
-      console.error('Error loading table stats:', error);
+      logger.error('App', 'Error loading table stats:', error);
     }
   };
 
@@ -151,7 +152,7 @@ export default function TableManagement() {
       if (error) throw error;
       setWaitTimeData(data);
     } catch (error) {
-      console.error('Error loading wait time:', error);
+      logger.error('App', 'Error loading wait time:', error);
     }
   };
 

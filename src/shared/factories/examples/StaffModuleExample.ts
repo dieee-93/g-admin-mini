@@ -466,6 +466,7 @@ export const {
 // In a React component:
 import { StaffPage, useStaff } from './StaffModuleExample';
 
+import { logger } from '@/lib/logging';
 function App() {
   return <StaffPage />;
 }
@@ -478,12 +479,11 @@ function CustomStaffManagement() {
   return (
     <div>
       <StaffForm
-        onSuccess={() => console.log('Employee created!')}
+        onSuccess={() => logger.info('App', 'Employee created!')}
         onCancel={() => console.log('Cancelled')}
       />
       <StaffList />
       <StaffAnalytics />
-    </div>
-  );
+    </div>);
 }
 */

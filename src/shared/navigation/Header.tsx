@@ -25,6 +25,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { ConnectionStatus } from '@/lib/offline/OfflineMonitor';
 
+import { logger } from '@/lib/logging';
 export function Header() {
   const { currentModule, modules, navigate } = useNavigation();
   const { user, signOut } = useAuth();
@@ -48,7 +49,7 @@ export function Header() {
       await signOut();
       // Navigation is handled by the signOut function
     } catch (error) {
-      console.error('Error during sign out:', error);
+      logger.error('App', 'Error during sign out:', error);
     }
   };
   

@@ -11,6 +11,7 @@ import { CardWrapper, InputField, Button } from '@/shared/ui';
 
 import { useAuth } from '@/contexts/AuthContext';
 
+import { logger } from '@/lib/logging';
 interface RegisterFormProps {
   onSwitchToLogin?: () => void;
 }
@@ -74,7 +75,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     });
     
     if (success) {
-      console.log('Registration successful');
+      logger.info('App', 'Registration successful');
     }
   };
 

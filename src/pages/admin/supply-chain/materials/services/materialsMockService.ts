@@ -1,5 +1,6 @@
 import type { MaterialItem } from '../types/materialTypes';
 
+import { logger } from '@/lib/logging';
 /**
  * Mock data service for Materials module
  * Provides realistic test data for development and testing
@@ -330,7 +331,7 @@ export class MaterialsMockService {
         );
         break;
       default:
-        console.log(`Bulk action ${action} applied to items:`, itemIds);
+        logger.info('MaterialsStore', `Bulk action ${action} applied to items:`, itemIds);
     }
   }
 
@@ -339,7 +340,7 @@ export class MaterialsMockService {
    */
   static async generateReport(): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log('Reporte de inventario generado exitosamente');
+    logger.info('MaterialsStore', 'Reporte de inventario generado exitosamente');
   }
 
   /**

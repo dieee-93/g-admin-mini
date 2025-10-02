@@ -7,6 +7,7 @@ import { EventBus } from '@/lib/events';
 import { notify } from '@/lib/notifications';
 import { offlineSync, localStorage } from '@/lib/offline';
 
+import { logger } from '@/lib/logging';
 // Real-time update types for different modules
 interface OrderUpdate {
   orderId: string;
@@ -72,7 +73,7 @@ export class RealtimeIntegration {
    */
   public initialize(): void {
     if (this.isInitialized) {
-      console.warn('RealtimeIntegration already initialized');
+      logger.warn('WebSocket', 'RealtimeIntegration already initialized');
       return;
     }
 
@@ -81,7 +82,7 @@ export class RealtimeIntegration {
     this.setupModuleIntegrations();
     
     this.isInitialized = true;
-    console.log('RealtimeIntegration initialized successfully');
+    logger.info('WebSocket', 'RealtimeIntegration initialized successfully');
   }
 
   /**
@@ -91,7 +92,7 @@ export class RealtimeIntegration {
     this.subscriptions.forEach(unsubscribe => unsubscribe());
     this.subscriptions = [];
     this.isInitialized = false;
-    console.log('RealtimeIntegration cleaned up');
+    logger.info('WebSocket', 'RealtimeIntegration cleaned up');
   }
 
   /**
@@ -109,7 +110,7 @@ export class RealtimeIntegration {
         priority
       });
     } catch (error) {
-      console.warn('Failed to broadcast real-time update:', error);
+      logger.error('WebSocket', 'Failed to broadcast real-time update:', error);
       // Gracefully handle WebSocket failure - offline sync will handle it
     }
   }
@@ -289,7 +290,7 @@ export class RealtimeIntegration {
   // WebSocket message handlers
 
   private async handleOrderCreated(data: OrderUpdate): Promise<void> {
-    console.log('Real-time order created:', data.orderId);
+    logger.info('WebSocket', 'Real-time order created:', data.orderId);
     
     // Check for conflicts with local data
     const localOrder = await localStorage.get('offline_orders', data.orderId);
@@ -310,7 +311,7 @@ export class RealtimeIntegration {
   }
 
   private async handleOrderUpdated(data: OrderUpdate): Promise<void> {
-    console.log('Real-time order updated:', data.orderId);
+    logger.info('WebSocket', 'Real-time order updated:', data.orderId);
     
     // Update local cache if exists
     const localOrder = await localStorage.get('offline_orders', data.orderId);
@@ -323,7 +324,7 @@ export class RealtimeIntegration {
   }
 
   private async handleOrderStatusChanged(data: OrderUpdate): Promise<void> {
-    console.log('Real-time order status changed:', data.orderId, data.status);
+    logger.info('WebSocket', 'Real-time order status changed:', data.orderId, data.status);
     
     // Update local cache
     const localOrder = await localStorage.get('offline_orders', data.orderId);
@@ -351,7 +352,7 @@ export class RealtimeIntegration {
   }
 
   private async handleInventoryUpdated(data: InventoryUpdate): Promise<void> {
-    console.log('Real-time inventory updated:', data.itemId, data.field);
+    logger.info('WebSocket', 'Real-time inventory updated:', data.itemId, data.field);
     
     // Check for conflicts with local data
     const localItem = await localStorage.get('offline_inventory_items', data.itemId);
@@ -371,7 +372,7 @@ export class RealtimeIntegration {
   }
 
   private async handleStaffUpdate(data: StaffUpdate): Promise<void> {
-    console.log('Real-time staff update:', data.employeeId, data.action);
+    logger.info('WebSocket', 'Real-time staff update:', data.employeeId, data.action);
     
     // Update local time tracking data
     const timeEntry = {
@@ -393,7 +394,7 @@ export class RealtimeIntegration {
   }
 
   private async handleKitchenUpdate(data: KitchenUpdate): Promise<void> {
-    console.log('Real-time kitchen update:', data.type);
+    logger.info('WebSocket', 'Real-time kitchen update:', data.type);
     
     EventBus.emit('realtime.kitchen.updated', data);
     
@@ -406,7 +407,7 @@ export class RealtimeIntegration {
   }
 
   private async handleNotification(data: NotificationUpdate): Promise<void> {
-    console.log('Real-time notification:', data.type, data.title);
+    logger.info('WebSocket', 'Real-time notification:', data.type, data.title);
     
     // Show notification based on type
     switch (data.type) {
@@ -428,7 +429,7 @@ export class RealtimeIntegration {
   }
 
   private async handleSyncRequest(data: unknown): Promise<void> {
-    console.log('Real-time sync request received:', data);
+    logger.info('WebSocket', 'Real-time sync request received:', data);
     
     // Trigger offline sync if we have pending operations
     const pendingOperations = await offlineSync.getPendingOperations();

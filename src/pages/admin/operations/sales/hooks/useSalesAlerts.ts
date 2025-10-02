@@ -6,6 +6,7 @@ import {
 import type { SalesAlert } from '../services/SalesIntelligenceEngine';
 import type { SalesPageMetrics } from './useSalesPage';
 
+import { logger } from '@/lib/logging';
 // ============================================================================
 // HOOK: USE SALES ALERTS
 // ============================================================================
@@ -62,7 +63,7 @@ export function useSalesAlerts(): UseSalesAlertsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error generating alerts';
       setError(errorMessage);
-      console.error('Sales alerts generation failed:', err);
+      logger.error('SalesStore', 'Sales alerts generation failed:', err);
     } finally {
       setIsGenerating(false);
     }

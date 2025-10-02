@@ -33,6 +33,7 @@ import { TrainingSection } from './components/sections/TrainingSection';
 import { ManagementSection } from './components/sections/ManagementSection';
 import { TimeTrackingSection } from './components/sections/TimeTrackingSection';
 
+import { logger } from '@/lib/logging';
 // Module configuration for Staff - HR & Scheduling integration
 const STAFF_MODULE_CONFIG = {
   capabilities: ['staff_management', 'payroll_processing', 'schedule_management', 'time_tracking'],
@@ -42,15 +43,15 @@ const STAFF_MODULE_CONFIG = {
   },
   eventHandlers: {
     'operations.kitchen_alert': (data: any) => {
-      console.log('👥 Staff: Kitchen alert received, checking staff availability', data);
+      logger.debug('StaffStore', '👥 Staff: Kitchen alert received, checking staff availability', data);
       // Check if more kitchen staff needed during rush
     },
     'sales.order_placed': (data: any) => {
-      console.log('👥 Staff: Order placed, monitoring service load', data);
+      logger.info('StaffStore', '👥 Staff: Order placed, monitoring service load', data);
       // Monitor staff workload for service optimization
     },
     'scheduling.shift_reminder': (data: any) => {
-      console.log('👥 Staff: Shift reminder', data);
+      logger.info('StaffStore', '👥 Staff: Shift reminder', data);
       // Send notifications to staff about upcoming shifts
     }
   },

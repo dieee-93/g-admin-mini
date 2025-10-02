@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { logger } from '@/lib/logging';
 import {
   ClockIcon,
   ChartBarIcon,
@@ -35,7 +36,7 @@ export const useHubPage = (): UseHubPageReturn => {
         id: 'new-recipe',
         label: 'Nueva Receta',
         icon: CogIcon,
-        action: () => console.log('New recipe'),
+        action: () => logger.info('App', 'New recipe'),
         color: 'orange'
       }
     ]);

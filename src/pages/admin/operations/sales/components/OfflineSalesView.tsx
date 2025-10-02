@@ -67,6 +67,7 @@ import {
 // Real-time functionality
 import { useRealtimeOrders, RealtimeStatusIndicator } from '@/lib/websocket';
 
+import { logger } from '@/lib/logging';
 interface Customer {
   id: string;
   name: string;
@@ -227,7 +228,7 @@ export function OfflineSalesView() {
         }
       }
     } catch (error) {
-      console.error('Error loading customers:', error);
+      logger.error('SalesStore', 'Error loading customers:', error);
       
       // Try cache as fallback
       const cachedData = await getCachedData('customers');
@@ -251,7 +252,7 @@ export function OfflineSalesView() {
       const sales = await localStorage.getAll('offline_sales');
       setOfflineSales(sales || []);
     } catch (error) {
-      console.error('Error loading offline sales:', error);
+      logger.error('SalesStore', 'Error loading offline sales:', error);
     }
   };
 
@@ -365,7 +366,7 @@ export function OfflineSalesView() {
           const saleResult = await processSale(saleData);
           await handleSuccessfulSale(saleResult, saleData);
         } catch (error) {
-          console.warn('Online sale failed, switching to offline mode:', error);
+          logger.error('SalesStore', 'Online sale failed, switching to offline mode:', error);
           await processOfflineSale(saleData);
         }
       } else {
@@ -374,7 +375,7 @@ export function OfflineSalesView() {
       }
 
     } catch (error) {
-      console.error('Error processing sale:', error);
+      logger.error('SalesStore', 'Error processing sale:', error);
       notify.error({
         title: "Error al procesar venta",
         description: error instanceof Error ? error.message : "Error inesperado",
@@ -436,7 +437,7 @@ export function OfflineSalesView() {
             source: 'pos'
           });
         } catch (error) {
-          console.warn('Failed to broadcast real-time order:', error);
+          logger.error('SalesStore', 'Failed to broadcast real-time order:', error);
         }
       }
 
@@ -466,7 +467,7 @@ export function OfflineSalesView() {
       loadOfflineSales(); // Refresh offline sales list
 
     } catch (error) {
-      console.error('Error processing offline sale:', error);
+      logger.error('SalesStore', 'Error processing offline sale:', error);
       throw error;
     }
   };
@@ -518,7 +519,7 @@ export function OfflineSalesView() {
     try {
       await forceSync();
     } catch (error) {
-      console.error('Error forcing sync:', error);
+      logger.error('SalesStore', 'Error forcing sync:', error);
       notify.error({
         title: "Error de sincronización",
         description: "No se pudo forzar la sincronización. Verifica tu conexión.",

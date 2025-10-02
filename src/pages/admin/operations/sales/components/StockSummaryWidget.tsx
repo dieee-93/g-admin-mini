@@ -20,6 +20,7 @@ import {
 import { fetchProductsWithAvailability } from '../services/saleApi';
 import { toaster } from '@/shared/ui/toaster';
 
+import { logger } from '@/lib/logging';
 interface ProductSummary {
   id: string;
   name: string;
@@ -104,7 +105,7 @@ export function StockSummaryWidget({
       setStats(stats);
       
     } catch (error) {
-      console.error('Error loading stock summary:', error);
+      logger.error('SalesStore', 'Error loading stock summary:', error);
       toaster.create({
         title: "Error al cargar resumen",
         description: "No se pudo cargar el resumen de stock",

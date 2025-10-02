@@ -26,6 +26,7 @@ import {
 import { useMaterialsPage } from './hooks';
 import { useMaterials } from '@/store/materialsStore';
 
+import { logger } from '@/lib/logging';
 // ✅ MODULE CONFIGURATION
 const MATERIALS_MODULE_CONFIG = {
   capabilities: ['inventory_tracking', 'supplier_management', 'purchase_orders'],
@@ -36,15 +37,15 @@ const MATERIALS_MODULE_CONFIG = {
   eventHandlers: {
     'sales.completed': (data: any) => {
       // Auto-reduce stock based on sale
-      console.log('🛒 Materials: Sale completed, updating stock...', data);
+      logger.info('MaterialsStore', '🛒 Materials: Sale completed, updating stock...', data);
     },
     'products.recipe_updated': (data: any) => {
       // Recalculate material requirements
-      console.log('📝 Materials: Recipe updated, recalculating requirements...', data);
+      logger.debug('MaterialsStore', '📝 Materials: Recipe updated, recalculating requirements...', data);
     },
     'kitchen.item_consumed': (data: any) => {
       // Real-time stock depletion
-      console.log('🍳 Materials: Kitchen consumption recorded...', data);
+      logger.info('MaterialsStore', '🍳 Materials: Kitchen consumption recorded...', data);
     }
   }
 } as const;

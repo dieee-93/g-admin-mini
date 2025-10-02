@@ -23,6 +23,7 @@ import { secureApiCall } from '@/lib/validation/security';
 import { FinancialDecimal, formatCurrency, safeAdd, safeMul, safeDiv } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 
+import { logger } from '@/lib/logging';
 import {
   calculateSalesMetrics,
   comparePeriods,
@@ -641,7 +642,7 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
   const handleGenerateReport = useCallback((type: 'daily' | 'weekly' | 'monthly') => {
     // TODO: Generate sales reports
-    console.log('Generating report:', type);
+    logger.info('SalesStore', 'Generating report:', type);
   }, []);
 
   const handleKitchenDisplay = useCallback(() => {
@@ -650,17 +651,17 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
   const handleOrderUpdate = useCallback((orderId: string, status: string) => {
     // TODO: Update order status
-    console.log('Updating order:', orderId, 'to status:', status);
+    logger.info('SalesStore', 'Updating order:', orderId, 'to status:', status);
   }, []);
 
   const handleQRGeneration = useCallback(() => {
     // TODO: Generate QR codes for tables
-    console.log('Generating QR codes...');
+    logger.info('SalesStore', 'Generating QR codes...');
   }, []);
 
   const handleQRCodeManagement = useCallback(() => {
     // TODO: Manage existing QR codes
-    console.log('Managing QR codes...');
+    logger.info('SalesStore', 'Managing QR codes...');
   }, []);
 
   // Toggle handlers
@@ -691,22 +692,22 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
   // NEW: Component-specific handlers
   const handleMetricClick = useCallback((metric: string, value: any) => {
-    console.log('Metric clicked:', metric, value);
+    logger.info('SalesStore', 'Metric clicked:', metric, value);
     // TODO: Implement metric drill-down navigation
   }, []);
 
   const handleAlertAction = useCallback((action: string, alertId: string) => {
-    console.log('Alert action:', action, alertId);
+    logger.info('SalesStore', 'Alert action:', action, alertId);
     // TODO: Implement alert action logic
   }, []);
 
   const handleOrderPlace = useCallback((orderData: any) => {
-    console.log('Order placed:', orderData);
+    logger.info('SalesStore', 'Order placed:', orderData);
     // TODO: Implement order placement logic
   }, []);
 
   const handlePaymentProcess = useCallback((paymentData: any) => {
-    console.log('Payment processed:', paymentData);
+    logger.info('SalesStore', 'Payment processed:', paymentData);
     // TODO: Implement payment processing logic
   }, []);
 

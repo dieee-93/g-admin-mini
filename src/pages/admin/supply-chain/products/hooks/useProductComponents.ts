@@ -9,6 +9,7 @@ import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
 import { type ProductComponent, type AddComponentData } from '../types';
 
+import { logger } from '@/lib/logging';
 export function useProductComponents(productId: string) {
   // Use our unified CRUD system - eliminates 50+ lines of boilerplate!
   const crud = useCrudOperations<ProductComponent>({
@@ -31,14 +32,14 @@ export function useProductComponents(productId: string) {
     // Success/error callbacks to match original behavior
     onSuccess: (action, data) => {
       if (action === 'create') {
-        console.log('Component added successfully');
+        logger.info('App', 'Component added successfully');
       } else if (action === 'delete') {
-        console.log('Component removed successfully');
+        logger.info('App', 'Component removed successfully');
       }
     },
     
     onError: (action, error) => {
-      console.error(`Error ${action} component:`, error);
+      logger.error('App', `Error ${action} component:`, error);
     }
   });
 
