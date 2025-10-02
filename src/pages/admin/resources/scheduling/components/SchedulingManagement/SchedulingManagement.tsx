@@ -81,6 +81,7 @@ interface SchedulingManagementProps {
   onViewStateChange: (state: ViewState) => void;
   performanceMode?: boolean;
   isMobile?: boolean;
+  onShiftClick?: (shiftId: string) => void;
 }
 
 export function SchedulingManagement({
@@ -90,7 +91,8 @@ export function SchedulingManagement({
   viewState,
   onViewStateChange,
   performanceMode = false,
-  isMobile = false
+  isMobile = false,
+  onShiftClick,
 }: SchedulingManagementProps) {
 
   return (
@@ -155,6 +157,7 @@ export function SchedulingManagement({
               features={['shift_management', 'time_off', 'coverage_tracking']}
               performanceMode={performanceMode}
               mobileOptimized={isMobile}
+              onBookingClick={onShiftClick}
             />
           </React.Suspense>
         </CapabilityGate>

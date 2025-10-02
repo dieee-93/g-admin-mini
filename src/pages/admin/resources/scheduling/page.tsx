@@ -32,7 +32,8 @@ import {
   SchedulingManagement,
   SchedulingActions,
   SchedulingAlerts,
-  AutoSchedulingModal
+  AutoSchedulingModal,
+  ShiftEditorModal
 } from './components';
 
 // ✅ UNIFIED CALENDAR SYSTEM
@@ -79,18 +80,32 @@ export default function SchedulingPage() {
     viewState,
     schedulingStats,
     isAutoSchedulingOpen,
+    isShiftEditorOpen,
+    editingShift,
     handleTabChange,
     setViewState,
     setIsAutoSchedulingOpen,
     handleScheduleGenerated,
+    handleOpenCreateShift,
+    handleCloseShiftEditor,
     loading,
     error
   } = useSchedulingPage();
 
   // ✅ UNIFIED SCHEDULING SYSTEM
-  const schedulingData = useScheduling();
+  const { shifts: allShifts, refreshData } = useScheduling();
 
   // Debug logs removed to prevent console spam
+
+  const handleCalendarShiftClick = (shiftId: string) => {
+    const clickedShift = allShifts.find(s => s.id === shiftId);
+    if (clickedShift) {
+      handleOpenEditShift(clickedShift);
+    } else {
+      console.error(`Shift with ID ${shiftId} not found.`);
+      // Optionally, show a notification to the user
+    }
+  };
 
   // ✅ ERROR HANDLING
   if (error) {
@@ -166,15 +181,13 @@ export default function SchedulingPage() {
           onViewStateChange={setViewState}
           performanceMode={shouldReduceAnimations}
           isMobile={isMobile}
+          onShiftClick={handleCalendarShiftClick}
         />
       </Section>
 
       {/* ⚡ 5. ACCIONES RÁPIDAS - OBLIGATORIO */}
       <SchedulingActions
-        onAddShift={() => {
-          // TODO: Open shift creation modal
-          emitEvent('scheduling.new_shift_requested', {});
-        }}
+        onAddShift={handleOpenCreateShift}
         onAutoSchedule={() => setIsAutoSchedulingOpen(true)}
         onExportSchedule={() => emitEvent('scheduling.export_requested', {})}
         onGenerateReport={() => emitEvent('scheduling.report_requested', {})}
@@ -196,6 +209,20 @@ export default function SchedulingPage() {
           onClose={() => setIsAutoSchedulingOpen(false)}
           onScheduleGenerated={handleScheduleGenerated}
           currentWeek={viewState.selectedWeek}
+        />
+      )}
+
+      {/* 🪟 MODAL - SHIFT EDITOR */}
+      {isShiftEditorOpen && (
+        <ShiftEditorModal
+          isOpen={isShiftEditorOpen}
+          onClose={handleCloseShiftEditor}
+          onSuccess={() => {
+            handleCloseShiftEditor();
+            refreshData();
+          }}
+          shift={editingShift}
+          prefilledDate={viewState.selectedWeek}
         />
       )}
     </ContentLayout>

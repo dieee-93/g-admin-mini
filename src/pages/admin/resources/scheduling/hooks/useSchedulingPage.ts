@@ -13,6 +13,8 @@ import {
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 
+import type { Shift } from '../../types/schedulingTypes';
+
 // Types
 interface SchedulingStats {
   total_shifts_this_week: number;
@@ -45,6 +47,8 @@ export interface UseSchedulingPageReturn {
 
   // Modal state
   isAutoSchedulingOpen: boolean;
+  isShiftEditorOpen: boolean;
+  editingShift: Shift | null;
 
   // Loading and error states
   loading: boolean;
@@ -55,6 +59,9 @@ export interface UseSchedulingPageReturn {
   setViewState: (state: SchedulingViewState | ((prev: SchedulingViewState) => SchedulingViewState)) => void;
   setIsAutoSchedulingOpen: (isOpen: boolean) => void;
   handleScheduleGenerated: (solution: any) => void;
+  handleOpenCreateShift: () => void;
+  handleOpenEditShift: (shift: Shift) => void;
+  handleCloseShiftEditor: () => void;
 }
 
 export const useSchedulingPage = (): UseSchedulingPageReturn => {
@@ -74,6 +81,8 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
   });
 
   const [isAutoSchedulingOpen, setIsAutoSchedulingOpen] = useState(false);
+  const [isShiftEditorOpen, setIsShiftEditorOpen] = useState(false);
+  const [editingShift, setEditingShift] = useState<Shift | null>(null);
 
   // Mock scheduling stats - will be replaced with API call
   const [schedulingStats, setSchedulingStats] = useState<SchedulingStats>({
@@ -108,6 +117,23 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
     initializeData();
   }, []);
 
+  // ✅ MODAL HANDLERS
+  const handleOpenCreateShift = useCallback(() => {
+    setEditingShift(null);
+    setIsShiftEditorOpen(true);
+  }, []);
+
+  const handleOpenEditShift = useCallback((shift: Shift) => {
+    setEditingShift(shift);
+    setIsShiftEditorOpen(true);
+  }, []);
+
+  const handleCloseShiftEditor = useCallback(() => {
+    setIsShiftEditorOpen(false);
+    setEditingShift(null);
+  }, []);
+
+
   // Setup quick actions for the scheduling module
   useEffect(() => {
     // Set context-aware quick actions based on active tab
@@ -117,10 +143,14 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
           id: 'new-shift',
           label: 'New Shift',
           icon: PlusIcon,
+<<<<<<< HEAD
           action: () => {
             // TODO: Open shift creation modal
             logger.info('API', 'Opening new shift form');
           }
+=======
+          action: handleOpenCreateShift,
+>>>>>>> 9afb991f93084fb5ddcc752c5e73e58eeb7f9720
         }
       ];
 
@@ -198,7 +228,7 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
 
     // Cleanup function
     return () => setQuickActions([]);
-  }, [viewState.activeTab]); // ✅ REMOVED setQuickActions to prevent infinite loop
+  }, [viewState.activeTab, handleOpenCreateShift]); // ✅ REMOVED setQuickActions to prevent infinite loop
 
   const handleTabChange = useCallback((tab: SchedulingTab) => {
     setViewState(prev => ({ ...prev, activeTab: tab }));
@@ -215,11 +245,16 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
     viewState,
     schedulingStats,
     isAutoSchedulingOpen,
+    isShiftEditorOpen,
+    editingShift,
     loading,
     error,
     handleTabChange,
     setViewState,
     setIsAutoSchedulingOpen,
-    handleScheduleGenerated
+    handleScheduleGenerated,
+    handleOpenCreateShift,
+    handleOpenEditShift,
+    handleCloseShiftEditor,
   };
 };

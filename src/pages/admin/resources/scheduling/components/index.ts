@@ -14,3 +14,4 @@ export * from './Analytics';
 
 // Standalone components
 export { AutoSchedulingModal } from './AutoSchedulingModal';
+export { ShiftEditorModal } from './ShiftEditorModal';
