@@ -84,27 +84,42 @@ export const Slot: React.FC<SlotProps> = ({
 };
 
 /**
- * Capability-aware slot that only renders if user has required capabilities
+ * Feature-aware slot that only renders if user has required features
+ *
+ * NEW v4.0: Uses Feature System instead of old Capabilities
+ * Backward compatible with old API through aliases
  */
-interface CapabilitySlotProps extends SlotProps {
-  /** Required capabilities to render this slot */
+interface FeatureSlotProps extends SlotProps {
+  /** Required features to render this slot (NEW v4.0) */
+  requiredFeatures?: string[];
+  /** Feature check mode */
+  featureMode?: 'any' | 'all';
+
+  // BACKWARD COMPATIBILITY - Old API (deprecated but still works)
+  /** @deprecated Use requiredFeatures instead */
   requiredCapabilities?: string[];
-  /** Capability check mode */
+  /** @deprecated Use featureMode instead */
   capabilityMode?: 'any' | 'all';
 }
 
-export const CapabilitySlot: React.FC<CapabilitySlotProps> = ({
-  requiredCapabilities = [],
-  capabilityMode = 'any',
+export const FeatureSlot: React.FC<FeatureSlotProps> = ({
+  requiredFeatures,
+  featureMode = 'any',
+  requiredCapabilities, // backward compat
+  capabilityMode, // backward compat
   ...slotProps
 }) => {
-  const { hasCapability, hasAllCapabilities } = useCapabilities();
+  const { hasFeature, hasAllFeatures } = useCapabilities();
 
-  // Check capabilities if specified
-  if (requiredCapabilities.length > 0) {
-    const hasAccess = capabilityMode === 'all'
-      ? hasAllCapabilities(requiredCapabilities as any[])
-      : requiredCapabilities.some(cap => hasCapability(cap as any));
+  // Backward compatibility: use old props if new ones not provided
+  const features = requiredFeatures || requiredCapabilities || [];
+  const mode = featureMode || capabilityMode || 'any';
+
+  // Check features if specified
+  if (features.length > 0) {
+    const hasAccess = mode === 'all'
+      ? hasAllFeatures(features as any[])
+      : features.some(feat => hasFeature(feat as any));
 
     if (!hasAccess) {
       return null;
@@ -113,6 +128,12 @@ export const CapabilitySlot: React.FC<CapabilitySlotProps> = ({
 
   return <Slot {...slotProps} />;
 };
+
+/**
+ * @deprecated Use FeatureSlot instead
+ * Backward compatibility alias
+ */
+export const CapabilitySlot = FeatureSlot;
 
 /**
  * Compound component base for creating slotted components

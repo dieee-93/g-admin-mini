@@ -8,8 +8,7 @@ import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { ABCAnalysisEngine } from '@/pages/admin/supply-chain/inventory/abcAnalysisEngine';
 import { ProcurementRecommendationsEngine } from '@/pages/admin/supply-chain/inventory/procurementRecommendationsEngine';
 import { DemandForecastingEngine } from '@/pages/admin/supply-chain/inventory/demandForecastingEngine';
-import { SupplierAnalysisEngine } from '@/pages/admin/supply-chain/inventory/supplierAnalysisEngine';
-import { InventoryDecimal, FinancialDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
+import { FinancialDecimal } from '@/config/decimal-config';
 import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 
@@ -198,9 +197,9 @@ describe('📊 ABC ANALYSIS ENGINE - MATHEMATICAL ACCURACY', () => {
       
       // Verify cumulative percentages are precise
       let runningCumulative = new FinancialDecimal('0');
-      allItems.forEach((item, index) => {
+      allItems.forEach((item) => {
         runningCumulative = runningCumulative.plus(item.valuePercentage);
-        
+
         // Each cumulative should be precise
         expect(Math.abs(item.cumulativePercentage - runningCumulative.toNumber())).toBeLessThan(0.000001);
       });

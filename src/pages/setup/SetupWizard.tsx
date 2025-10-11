@@ -83,8 +83,8 @@ export function SetupWizard() {
             onStepClick={(group, subStep) => jumpToStep(group, subStep)}
             onFillTestData={fillWithTestData}
             onResetAll={reset}
-            onJumpToGroup={(group) => jumpToStep(group)}
-            onJumpToSubStep={(subStep) => jumpToStep(currentGroup, subStep)}
+            onJumpToGroup={(group) => jumpToStep(group, 0, true)}
+            onJumpToSubStep={(subStep) => jumpToStep(currentGroup, subStep, true)}
           />
 
           {/* Main Content Area */}

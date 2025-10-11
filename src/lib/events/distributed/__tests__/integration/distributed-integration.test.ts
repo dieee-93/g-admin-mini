@@ -186,7 +186,7 @@ describe('Distributed EventBus Integration Tests', () => {
       const instance2 = createInstance('instance-2');
 
       const receivedEvents: any[] = [];
-      instance2.on('ordered.test', (event) => {
+      instance2.on('ordered.test', (_event) => {
         receivedEvents.push(event.data);
       });
 
@@ -445,7 +445,7 @@ describe('Distributed EventBus Integration Tests', () => {
       const instance2 = createInstance('latency-2');
 
       const latencyEvents: number[] = [];
-      instance2.on('latency.test', (event) => {
+      instance2.on('latency.test', (_event) => {
         const latency = Date.now() - event.data.timestamp;
         latencyEvents.push(latency);
       });
@@ -482,7 +482,7 @@ describe('Distributed EventBus Integration Tests', () => {
       const instance2 = createInstance('partition-2', 'consistency-bus');
 
       const orderedEvents: any[] = [];
-      instance2.on('consistency.test', (event) => {
+      instance2.on('consistency.test', (_event) => {
         orderedEvents.push({
           sequence: event.data.sequence,
           partitionKey: event.data.partitionKey

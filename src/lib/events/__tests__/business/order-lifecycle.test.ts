@@ -86,7 +86,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       // Setup business logic handlers
       
       // 1. Order Created → Stock Check
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         workflowEvents.push('order-created');
         const order = event.payload;
         
@@ -110,7 +110,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // 2. Stock Check → Stock Reserved
-      eventBus.on('inventory.stock.check', async (event) => {
+      eventBus.on('inventory.stock.check', async (_event) => {
         workflowEvents.push('stock-check');
         const { orderId, itemId, requiredQuantity } = event.payload;
         const currentStock = inventoryState.get(itemId) || 0;
@@ -136,7 +136,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // 3. Stock Reserved → Payment Request
-      eventBus.on('inventory.stock.reserved', async (event) => {
+      eventBus.on('inventory.stock.reserved', async (_event) => {
         workflowEvents.push('stock-reserved');
         const order = orderStates.get(event.payload.orderId);
         
@@ -161,7 +161,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // 4. Payment Request → Payment Processing
-      eventBus.on('payments.payment.requested', async (event) => {
+      eventBus.on('payments.payment.requested', async (_event) => {
         workflowEvents.push('payment-requested');
         
         // Simulate payment processing
@@ -177,7 +177,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // 5. Payment Processed → Kitchen Order
-      eventBus.on('payments.payment.processed', async (event) => {
+      eventBus.on('payments.payment.processed', async (_event) => {
         workflowEvents.push('payment-processed');
         
         await eventBus.emit('kitchen.order.received', {
@@ -189,7 +189,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // 6. Kitchen Order → Order Completion
-      eventBus.on('kitchen.order.received', async (event) => {
+      eventBus.on('kitchen.order.received', async (_event) => {
         workflowEvents.push('kitchen-received');
         
         // Simulate kitchen preparation
@@ -203,7 +203,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // 7. Kitchen Completed → Order Fulfilled
-      eventBus.on('kitchen.order.completed', async (event) => {
+      eventBus.on('kitchen.order.completed', async (_event) => {
         workflowEvents.push('kitchen-completed');
         
         const order = orderStates.get(event.payload.orderId);
@@ -220,7 +220,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // 8. Order Fulfilled → Customer Notification
-      eventBus.on('sales.order.fulfilled', async (event) => {
+      eventBus.on('sales.order.fulfilled', async (_event) => {
         workflowEvents.push('order-fulfilled');
         
         const order = orderStates.get(event.payload.orderId);
@@ -244,7 +244,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // Final step - Customer Notification
-      eventBus.on('customers.notification.sent', async (event) => {
+      eventBus.on('customers.notification.sent', async (_event) => {
         workflowEvents.push('customer-notified');
       });
 
@@ -300,14 +300,14 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       const cancellationEvents: string[] = [];
 
       // Setup cancellation handlers
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         orderStates.set(event.payload.orderId, {
           ...event.payload,
           status: 'created'
         });
       });
 
-      eventBus.on('sales.order.cancellation.requested', async (event) => {
+      eventBus.on('sales.order.cancellation.requested', async (_event) => {
         cancellationEvents.push('cancellation-requested');
         const order = orderStates.get(event.payload.orderId);
         
@@ -319,7 +319,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('inventory.stock.released', async (event) => {
+      eventBus.on('inventory.stock.released', async (_event) => {
         cancellationEvents.push('stock-released');
         
         // Restore stock
@@ -334,7 +334,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         });
       });
 
-      eventBus.on('payments.refund.requested', async (event) => {
+      eventBus.on('payments.refund.requested', async (_event) => {
         cancellationEvents.push('refund-requested');
         
         await eventBus.emit('sales.order.cancelled', {
@@ -344,7 +344,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         });
       });
 
-      eventBus.on('sales.order.cancelled', async (event) => {
+      eventBus.on('sales.order.cancelled', async (_event) => {
         cancellationEvents.push('order-cancelled');
         const order = orderStates.get(event.payload.orderId);
         if (order) {
@@ -396,7 +396,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
 
       const insufficientStockEvents: string[] = [];
 
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         for (const item of event.payload.items) {
           await eventBus.emit('inventory.stock.check', {
             orderId: event.payload.orderId,
@@ -406,7 +406,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('inventory.stock.check', async (event) => {
+      eventBus.on('inventory.stock.check', async (_event) => {
         const { orderId, itemId, requiredQuantity } = event.payload;
         const currentStock = inventoryState.get(itemId) || 0;
 
@@ -422,7 +422,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('inventory.stock.insufficient', async (event) => {
+      eventBus.on('inventory.stock.insufficient', async (_event) => {
         insufficientStockEvents.push('stock-insufficient');
         
         await eventBus.emit('sales.order.stock.problem', {
@@ -435,7 +435,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         });
       });
 
-      eventBus.on('sales.order.stock.problem', async (event) => {
+      eventBus.on('sales.order.stock.problem', async (_event) => {
         insufficientStockEvents.push('order-stock-problem');
         
         await eventBus.emit('customers.notification.sent', {
@@ -462,7 +462,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       
       const processingOrder: string[] = [];
 
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         const order = event.payload;
         const customer = mockBusinessData.customers.find(c => c.id === order.customerId);
         
@@ -487,7 +487,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('kitchen.order.received', async (event) => {
+      eventBus.on('kitchen.order.received', async (_event) => {
         processingOrder.push(`kitchen-${event.payload.priority}-${event.payload.orderId}`);
       });
 
@@ -520,7 +520,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       let discountApplied = false;
       let loyaltyPointsAwarded = 0;
 
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         const customer = mockBusinessData.customers.find(c => c.id === event.payload.customerId);
         
         if (customer?.tier === 'VIP') {
@@ -538,7 +538,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('sales.discount.applied', async (event) => {
+      eventBus.on('sales.discount.applied', async (_event) => {
         // Award loyalty points
         loyaltyPointsAwarded = Math.floor(event.payload.finalTotal * 2); // 2x points for VIP
         
@@ -585,7 +585,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       const complexityHandlers: string[] = [];
       const itemPreparationTasks: any[] = [];
 
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         complexityHandlers.push('order-received');
         
         // Process each item individually
@@ -600,7 +600,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('kitchen.item.preparation.scheduled', async (event) => {
+      eventBus.on('kitchen.item.preparation.scheduled', async (_event) => {
         complexityHandlers.push(`item-scheduled-${event.payload.itemId}`);
         
         itemPreparationTasks.push({
@@ -620,7 +620,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }, 50);
       });
 
-      eventBus.on('kitchen.item.preparation.completed', async (event) => {
+      eventBus.on('kitchen.item.preparation.completed', async (_event) => {
         complexityHandlers.push(`item-completed-${event.payload.itemId}`);
         
         // Update task status
@@ -642,7 +642,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('kitchen.order.assembly.ready', async (event) => {
+      eventBus.on('kitchen.order.assembly.ready', async (_event) => {
         complexityHandlers.push('assembly-ready');
         
         await eventBus.emit('kitchen.order.completed', {
@@ -685,14 +685,14 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
 
       const errorRecoveryEvents: string[] = [];
 
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         await eventBus.emit('kitchen.order.received', {
           orderId: event.payload.orderId,
           items: event.payload.items
         });
       });
 
-      eventBus.on('kitchen.order.received', async (event) => {
+      eventBus.on('kitchen.order.received', async (_event) => {
         // Simulate kitchen error
         await new Promise(resolve => setTimeout(resolve, 100));
         
@@ -704,7 +704,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         });
       });
 
-      eventBus.on('kitchen.order.error', async (event) => {
+      eventBus.on('kitchen.order.error', async (_event) => {
         errorRecoveryEvents.push('kitchen-error');
         
         // Initiate error recovery
@@ -715,7 +715,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         });
       });
 
-      eventBus.on('operations.error.recovery.initiated', async (event) => {
+      eventBus.on('operations.error.recovery.initiated', async (_event) => {
         errorRecoveryEvents.push('recovery-initiated');
         
         // Provide compensation
@@ -728,7 +728,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         });
       });
 
-      eventBus.on('customers.compensation.offered', async (event) => {
+      eventBus.on('customers.compensation.offered', async (_event) => {
         errorRecoveryEvents.push('compensation-offered');
         
         await eventBus.emit('sales.order.compensated', {

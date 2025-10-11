@@ -30,7 +30,7 @@ interface SetupActions {
 
   nextStep: () => void;
   prevStep: () => void;
-  jumpToStep: (groupIndex: number, subStepIndex?: number) => void;
+  jumpToStep: (groupIndex: number, subStepIndex?: number, force?: boolean) => void;
 
   reset: () => void;
   fillWithTestData: () => void;
@@ -76,7 +76,7 @@ export const useSetupStore = create<SetupStore>()(
 
         setUserName: (name) => set({ userName: name, timestamp: Date.now() }, false, 'setUserName'),
         setSupabaseCredentials: (credentials) => set({ supabaseCredentials: credentials, timestamp: Date.now() }, false, 'setSupabaseCredentials'),
-        setAdminUserData: (data) => set({ adminUserData: data, timestamp: Date.now() }, false, 'setAdminUserData'),
+        setAdminUserData: (_data) => set({ adminUserData: data, timestamp: Date.now() }, false, 'setAdminUserData'),
 
         nextStep: () => {
           const { currentGroup, currentSubStep } = get();
@@ -108,9 +108,12 @@ export const useSetupStore = create<SetupStore>()(
           }
         },
 
-        jumpToStep: (groupIndex, subStepIndex = 0) => {
-            if (canProceedToStep(get(), groupIndex)) {
+        jumpToStep: (groupIndex, subStepIndex = 0, force = false) => {
+            if (force || canProceedToStep(get(), groupIndex)) {
                 set({ currentGroup: groupIndex, currentSubStep: subStepIndex, timestamp: Date.now() }, false, 'jumpToStep');
+                if (force) {
+                    logger.info('App', `🚀 Force jumping to group ${groupIndex} (dev mode)`);
+                }
             } else {
                 logger.warn('App', `Cannot jump to group ${groupIndex}, prerequisites not met.`);
             }
@@ -133,6 +136,15 @@ export const useSetupStore = create<SetupStore>()(
       }),
       {
         name: 'g-admin-setup-progress',
+        // Security: Do NOT persist sensitive setup data
+        partialize: (state) => ({
+          currentGroup: state.currentGroup, // ✅ Safe - wizard progress
+          currentSubStep: state.currentSubStep, // ✅ Safe - wizard progress
+          userName: state.userName, // ✅ Safe - non-sensitive
+          // ❌ supabaseCredentials: Contains API keys - do not persist
+          // ❌ adminUserData: Contains PASSWORD IN PLAIN TEXT - NEVER persist
+          timestamp: state.timestamp, // ✅ Safe
+        })
       }
     ),
     {

@@ -196,7 +196,7 @@ export class CrossInstanceCoordinator {
    * Setup message handling
    */
   private setupMessageHandling(): void {
-    this.broadcastChannel.addEventListener('message', (event) => {
+    this.broadcastChannel.addEventListener('message', (_event) => {
       if (this.isDestroyed) return;
 
       const message = event.data as CrossInstanceMessage;

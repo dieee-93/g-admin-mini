@@ -1,13 +1,13 @@
 import {
-  ContentLayout, Section, Button, Alert, Icon
+  ContentLayout, Section, Button, Alert, Icon, CollapsibleAlertStack, type AlertItem
 } from '@/shared/ui';
 import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 // ✅ 13 SISTEMAS INTEGRADOS
-import { useModuleIntegration } from '@/hooks/useModuleIntegration';
-import { CapabilityGate } from '@/lib/capabilities';
+import EventBus from '@/lib/events';
+import { CapabilityGate, useCapabilities } from '@/lib/capabilities';
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
@@ -31,7 +31,7 @@ import { logger } from '@/lib/logging';
 const MATERIALS_MODULE_CONFIG = {
   capabilities: ['inventory_tracking', 'supplier_management', 'purchase_orders'],
   events: {
-    emits: ['materials.stock_updated', 'materials.low_stock_alert', 'materials.purchase_order_created'],
+    emits: ['materials.stock_updated', 'materials.low_stock_alert', 'materials.material_created', 'materials.purchase_order_created'],
     listens: ['sales.completed', 'products.recipe_updated', 'kitchen.item_consumed']
   },
   eventHandlers: {
@@ -52,7 +52,7 @@ const MATERIALS_MODULE_CONFIG = {
 
 export default function MaterialsPage() {
   // ✅ SISTEMAS INTEGRATION
-  const { emitEvent, hasCapability, status } = useModuleIntegration('materials', MATERIALS_MODULE_CONFIG);
+  const { hasFeature } = useCapabilities();
   const { handleError } = useErrorHandler();
   const { isOnline } = useOfflineStatus();
   const { shouldReduceAnimations } = usePerformanceMonitor();
@@ -88,21 +88,29 @@ export default function MaterialsPage() {
     );
   }
 
+  // Prepare system alerts
+  const systemAlerts: AlertItem[] = [];
+
+  if (!isOnline) {
+    systemAlerts.push({
+      status: 'warning',
+      title: 'Modo Offline',
+      description: 'Los cambios se sincronizarán cuando recuperes la conexión'
+    });
+  }
+
   return (
     <ContentLayout spacing="normal">
-      {/* 🔒 1. ESTADO DE CONEXIÓN - Solo si crítico */}
-      {!status.isActive && (
-        <Alert
+      {/* 🔒 1. ALERTAS DEL SISTEMA - Solo si existen */}
+      {systemAlerts.length > 0 && (
+        <CollapsibleAlertStack
+          alerts={systemAlerts}
+          defaultOpen={false}
+          title="Alertas del Sistema"
           variant="subtle"
-          title="Module Capabilities Required"
-          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
+          size="md"
+          showCount
         />
-      )}
-
-      {!isOnline && (
-        <Alert variant="warning" title="Modo Offline">
-          Los cambios se sincronizarán cuando recuperes la conexión
-        </Alert>
       )}
 
       {/* 📊 2. MÉTRICAS DE NEGOCIO - OBLIGATORIO PRIMERO */}
@@ -139,7 +147,7 @@ export default function MaterialsPage() {
         onGenerateReport={actions.handleGenerateReport}
         onSyncInventory={actions.handleSyncInventory}
         isMobile={isMobile}
-        hasCapability={hasCapability}
+        hasCapability={hasFeature}
       />
 
       {/* 🪟 MODAL - AGREGAR/EDITAR MATERIAL */}

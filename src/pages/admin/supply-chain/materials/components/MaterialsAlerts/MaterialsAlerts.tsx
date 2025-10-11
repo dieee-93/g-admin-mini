@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Section, Alert, Stack, Button, Badge } from '@/shared/ui';
+import { CollapsibleAlertStack, Stack, Button, type AlertItem } from '@/shared/ui';
 import { useAlerts } from '@/shared/alerts';
 import { useSmartInventoryAlerts } from '@/hooks/useSmartInventoryAlerts';
 
@@ -26,40 +26,42 @@ export function MaterialsAlerts({ onAlertAction, context }: MaterialsAlertsProps
     return null;
   }
 
-  return (
-    <Section variant="elevated" title="Alertas y Notificaciones">
-      <Stack direction="column" gap="sm">
-        {materialsAlerts.map((alert) => (
-          <Alert
-            key={alert.id}
-            variant="subtle"
-            status={alert.severity}
-            title={alert.title}
-            description={alert.message}
-            actions={
-              <Stack direction="row" gap="xs">
-                {alert.actions?.map((action) => (
-                  <Button
-                    key={action.id}
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onAlertAction(alert.id, action.id)}
-                  >
-                    {action.label}
-                  </Button>
-                ))}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => dismissAlert(alert.id)}
-                >
-                  Descartar
-                </Button>
-              </Stack>
-            }
-          />
+  // Transform alerts to CollapsibleAlertStack format
+  const alertItems: AlertItem[] = materialsAlerts.map((alert) => ({
+    status: alert.severity,
+    title: alert.title,
+    description: alert.message,
+    children: (
+      <Stack direction="row" gap="xs" mt="sm">
+        {alert.actions?.map((action) => (
+          <Button
+            key={action.id}
+            size="sm"
+            variant="outline"
+            onClick={() => onAlertAction(alert.id, action.id)}
+          >
+            {action.label}
+          </Button>
         ))}
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => dismissAlert(alert.id)}
+        >
+          Descartar
+        </Button>
       </Stack>
-    </Section>
+    )
+  }));
+
+  return (
+    <CollapsibleAlertStack
+      alerts={alertItems}
+      defaultOpen={materialsAlerts.some(a => a.severity === 'error')}
+      title="Alertas de Inventario"
+      variant="subtle"
+      size="md"
+      showCount
+    />
   );
 }

@@ -113,7 +113,7 @@ export default function PerformanceDebugPage() {
   const getBundleInfo = () => {
     // Approximate bundle size calculation
     const scripts = document.querySelectorAll('script[src]');
-    let totalSize = 0;
+    const totalSize = 0;
 
     return {
       chunks: scripts.length,

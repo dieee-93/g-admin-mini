@@ -407,12 +407,12 @@ export class AnomalyDetectionEngine {
    */
   private initializeEventListeners(): void {
     // Listen for system errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', (_event) => {
       this.updateMetric('error_rate', this.calculateErrorRate());
     });
 
     // Listen for unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', (_event) => {
       this.updateMetric('error_rate', this.calculateErrorRate());
     });
 
@@ -422,7 +422,7 @@ export class AnomalyDetectionEngine {
     });
 
     // Listen for ML prediction failures
-    EventBus.on('alerts.generated', (event) => {
+    EventBus.on('alerts.generated', (_event) => {
       if (event.payload.alertType === 'system' && 
           event.payload.description.includes('prediction')) {
         this.incrementMetric('failed_predictions');

@@ -39,7 +39,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const order = mockBusinessData.orders[0];
       const paymentAmount = order.total;
@@ -124,7 +124,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const order = mockBusinessData.orders[1];
       const paymentAmount = order.total;
@@ -206,7 +206,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const order = mockBusinessData.orders[1]; // Use second order instead of non-existent third
       const paymentAmount = order.total;
@@ -271,7 +271,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const order = mockBusinessData.orders[0];
       const totalAmount = order.total; // $67.50
@@ -367,7 +367,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const order = { ...mockBusinessData.orders[0], total: 120.00 };
       const splitAmount = 40.00; // 3-way split
@@ -432,7 +432,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const order = mockBusinessData.orders[0];
       const paymentAmount = order.total;
@@ -498,7 +498,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const order = mockBusinessData.orders[0];
       const paymentAmount = order.total;
@@ -560,7 +560,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await eventBus.registerModule(inventoryModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const originalOrder = mockBusinessData.orders[0];
       const originalPayment = 'pay_original_001';
@@ -654,7 +654,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await eventBus.registerModule(inventoryModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const originalOrder = mockBusinessData.orders[0];
       const refundItem = originalOrder.items[0]; // Refund first item only
@@ -712,7 +712,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const order = mockBusinessData.orders[0];
       const tipAmount = 15.00;
@@ -785,7 +785,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const largeGroupOrder = { ...mockBusinessData.orders[0], partySize: 8 };
       const autoGratuityRate = 0.18; // 18%
@@ -833,7 +833,7 @@ describe('EventBus - Payment Processing Business Logic', () => {
       await setupPaymentModules();
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const reportDate = new Date().toISOString().split('T')[0];
 

@@ -31,6 +31,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import type { ModuleName } from '@/contexts/AuthContext';
 import { useCapabilityStore } from '@/store/capabilityStore';
+import { MODULE_FEATURE_MAP } from '@/config/FeatureRegistry';
 import { useShallow } from 'zustand/react/shallow';
 import { logger } from '@/lib/logging';
 
@@ -829,10 +830,9 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   const location = useLocation();
   const { canAccessModule, isAuthenticated, isCliente } = useAuth();
 
-  // ✅ PERFORMANCE: Get isModuleVisible directly from store
-  // isModuleVisible already accesses the latest store state, no need for resolvedCapabilities dependency
-  const isModuleVisible = useCapabilityStore(state => state.isModuleVisible);
-  
+  // ✅ PERFORMANCE: Get active modules from memoized state (v4.0 API - no loop!)
+  const activeModules = useCapabilityStore(state => state.features.activeModules);
+
   // ✅ Responsive state - Mobile-first approach según arquitectura
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
@@ -896,17 +896,17 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
       const hasRoleAccess = canAccessModule(moduleName);
       if (!hasRoleAccess) return false;
 
-      // 🛠️ SPECIAL CASE: Debug module bypasses capability filtering (SUPER_ADMIN only)
-      if (module.id === 'debug') {
-        return true; // Already passed role check above
+      // 🎯 LAYER 2: Capability-based business logic filter (second gate)
+      // ✅ Now using unified capability system v4.0 + MODULE_FEATURE_MAP
+
+      // Check if module is always-active (dashboard, settings, gamification, debug)
+      const moduleConfig = MODULE_FEATURE_MAP[module.id];
+      if (moduleConfig?.alwaysActive) {
+        return true; // Always-active modules bypass feature check
       }
 
-      // 🎯 LAYER 2: Capability-based business logic filter (second gate)
-      // ✅ Now using unified capability system
-      const hasCapabilityAccess = isModuleVisible(module.id);
-
-      // ❌ REMOVED: This log was in hot path, causing performance issues
-      // Use React DevTools Profiler or performance.measure instead
+      // For other modules, check if they're in activeModules list
+      const hasCapabilityAccess = activeModules.includes(module.id);
 
       return hasCapabilityAccess;
     });
@@ -917,7 +917,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     logger.performance('NavigationContext', 'Module filtering', filterTime, 5);
 
     return modules;
-  }, [canAccessModule, isAuthenticated, isCliente, isModuleVisible]);
+  }, [canAccessModule, isAuthenticated, isCliente, activeModules]);
 
   // ✅ Navigation state
   // ✅ FIX: Separar estado mutable (expansión, badges) del estado filtrado (accessibleModules)
@@ -1050,15 +1050,35 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   // ✅ Find current module based on location
   useEffect(() => {
     const path = location.pathname;
-    let foundModule = modules.find(module => {
-      if (module.path === '/' && path === '/') return true;
-      if (module.path !== '/' && path.startsWith(module.path)) return true;
+    logger.debug('NavigationContext', `🔍 Finding module for path: ${path}`);
+    
+    // Log all available modules for debugging
+    logger.debug('NavigationContext', `Available modules:`, modules.map(m => ({ id: m.id, title: m.title, path: m.path })));
+    
+    // 🔧 FIX: Sort modules by path length (longer paths first) for more specific matching
+    const sortedModules = [...modules].sort((a, b) => b.path.length - a.path.length);
+    
+    let foundModule = sortedModules.find(module => {
+      // Exact match for root path
+      if (module.path === '/' && path === '/') {
+        logger.info('NavigationContext', `✅ Exact match: ${module.id} (${module.title}) for path: ${path}`);
+        return true;
+      }
+      
+      // For non-root paths, check if current path starts with module path
+      if (module.path !== '/' && path.startsWith(module.path)) {
+        logger.info('NavigationContext', `✅ Path match: ${module.id} (${module.title}) for path: ${path} (module path: ${module.path})`);
+        return true;
+      }
+      
       return false;
     });
 
     // Default to dashboard if no match
     if (!foundModule) {
+      logger.warn('NavigationContext', `⚠️ No module found for path: ${path}, defaulting to dashboard`);
       foundModule = modules.find(module => module.id === 'dashboard') || modules[0];
+      logger.info('NavigationContext', `🔄 Using fallback module: ${foundModule?.id} (${foundModule?.title})`);
     }
 
     // Safety check: if still no module found, exit early
@@ -1076,6 +1096,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
         
         // Update breadcrumbs when module changes
         const crumbs: BreadcrumbItem[] = [];
+        logger.debug('NavigationContext', `🍞 Building breadcrumbs for module: ${foundModule.id} (${foundModule.title})`);
 
         // Always add dashboard as root (unless we're on dashboard)
         if (foundModule.id !== 'dashboard') {
@@ -1084,6 +1105,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             path: '/',
             isActive: false
           });
+          logger.debug('NavigationContext', `🍞 Added Dashboard to breadcrumbs`);
         }
 
         // Add current module
@@ -1092,6 +1114,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
           path: foundModule.path,
           isActive: true
         });
+        logger.debug('NavigationContext', `🍞 Added current module: ${foundModule.title} to breadcrumbs`);
 
         // Add sub-path if exists
         if (path !== foundModule.path && path.startsWith(foundModule.path)) {
@@ -1104,6 +1127,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
           }
         }
 
+        logger.debug('NavigationContext', `🍞 Final breadcrumbs:`, crumbs);
         setBreadcrumbs(crumbs);
         
         return foundModule;

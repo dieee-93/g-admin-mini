@@ -51,7 +51,7 @@ export const useProductsStore = create<ProductsState>()(
         })),
         
         setLoading: (isLoading) => set({ isLoading }),
-        setError: (error) => set({ error }),
+        setError: (_error) => set({ error }),
         
         // Computed getters
         getProductById: (id) => {

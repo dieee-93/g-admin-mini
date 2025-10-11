@@ -155,7 +155,7 @@ export class EventBusTestingHarness {
     
     // Convert event handlers to tracked handlers
     for (const [pattern, handler] of Object.entries(eventHandlers)) {
-      const trackedHandler: EventHandler = async (event) => {
+      const trackedHandler: EventHandler = async (_event) => {
         const handlerName = `handle_${pattern.replace('.', '_')}`;
         
         // Record call
@@ -310,7 +310,7 @@ export class EventBusTestingHarness {
         reject(new Error(`Timeout waiting for event: ${pattern}`));
       }, timeout);
       
-      const unsubscribe = this.eventBus.on(pattern, (event) => {
+      const unsubscribe = this.eventBus.on(pattern, (_event) => {
         if (!filter || filter(event)) {
           clearTimeout(timeoutId);
           unsubscribe();

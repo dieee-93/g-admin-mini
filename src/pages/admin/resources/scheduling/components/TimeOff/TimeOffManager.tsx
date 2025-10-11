@@ -1,10 +1,10 @@
 // TimeOffManager - Manage time-off requests, approvals, and PTO tracking
 import { useState, useEffect } from 'react';
 import {
-  Stack, Button, Badge, Grid, Typography, Section,
-  Icon, SelectField, InputField
+  Stack, VStack, HStack, Button, Badge, Grid, SimpleGrid, Typography, Section,
+  Icon, SelectField, InputField, CardWrapper, MetricCard, CardGrid, Box, createListCollection
 } from '@/shared/ui';
-import { Table } from '@chakra-ui/react';
+import { Table, IconButton, Select } from '@chakra-ui/react';
 import { 
   CheckIcon, 
   XMarkIcon, 
@@ -195,10 +195,10 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
               <IconComponent className="w-4 h-4" />
             </Box>
             <VStack align="start" gap="0">
-              <Text fontWeight="semibold">{getEmployeeName(request.employee_id)}</Text>
-              <Text fontSize="sm" color="gray.600">
+              <Typography variant="body" weight="semibold">{getEmployeeName(request.employee_id)}</Typography>
+              <Typography variant="caption" color="gray.600">
                 {employees.find(emp => emp.id === request.employee_id)?.position}
-              </Text>
+              </Typography>
             </VStack>
           </HStack>
         </Table.Cell>
@@ -208,20 +208,20 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
             <Badge colorPalette={getStatusColor(request.status)} variant="subtle" textTransform="capitalize">
               {request.type}
             </Badge>
-            <Text fontSize="sm">
+            <Typography variant="body" size="sm">
               {daysDuration} day{daysDuration > 1 ? 's' : ''}
-            </Text>
+            </Typography>
           </VStack>
         </Table.Cell>
         
         <Table.Cell>
           <VStack align="start" gap="0">
-            <Text fontSize="sm">
+            <Typography variant="body" size="sm">
               {new Date(request.start_date).toLocaleDateString('es-ES')}
-            </Text>
-            <Text fontSize="xs" color="gray.600">
+            </Typography>
+            <Typography variant="caption" color="gray.600">
               to {new Date(request.end_date).toLocaleDateString('es-ES')}
-            </Text>
+            </Typography>
           </VStack>
         </Table.Cell>
         
@@ -232,9 +232,9 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
         </Table.Cell>
         
         <Table.Cell>
-          <Text fontSize="sm" maxW="200px">
+          <Typography variant="body" size="sm" style={{ maxWidth: '200px' }}>
             {request.reason}
-          </Text>
+          </Typography>
         </Table.Cell>
         
         <Table.Cell>
@@ -259,9 +259,9 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
             </HStack>
           )}
           {request.status !== 'pending' && (
-            <Text fontSize="xs" color="gray.500">
+            <Typography variant="caption" color="gray.500">
               {request.reviewed_at && new Date(request.reviewed_at).toLocaleDateString('es-ES')}
-            </Text>
+            </Typography>
           )}
         </Table.Cell>
       </Table.Row>
@@ -275,10 +275,10 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="4">
             <VStack gap="1">
-              <Text fontSize="2xl" fontWeight="bold" color="orange.500">
+              <Typography variant="heading" size="2xl" weight="bold" color="orange.500">
                 {stats.pending_requests}
-              </Text>
-              <Text fontSize="sm" color="gray.600">Pending Requests</Text>
+              </Typography>
+              <Typography variant="label" size="sm" color="gray.600">Pending Requests</Typography>
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -286,10 +286,10 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="4">
             <VStack gap="1">
-              <Text fontSize="2xl" fontWeight="bold" color="green.500">
+              <Typography variant="heading" size="2xl" weight="bold" color="green.500">
                 {stats.approved_requests}
-              </Text>
-              <Text fontSize="sm" color="gray.600">Approved This Month</Text>
+              </Typography>
+              <Typography variant="label" size="sm" color="gray.600">Approved This Month</Typography>
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -297,10 +297,10 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="4">
             <VStack gap="1">
-              <Text fontSize="2xl" fontWeight="bold" color="blue.500">
+              <Typography variant="heading" size="2xl" weight="bold" color="blue.500">
                 {stats.avg_approval_time}d
-              </Text>
-              <Text fontSize="sm" color="gray.600">Avg Approval Time</Text>
+              </Typography>
+              <Typography variant="label" size="sm" color="gray.600">Avg Approval Time</Typography>
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -308,10 +308,10 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
         <CardWrapper>
           <CardWrapper.Body textAlign="center" py="4">
             <VStack gap="1">
-              <Text fontSize="2xl" fontWeight="bold" color="purple.500">
+              <Typography variant="heading" size="2xl" weight="bold" color="purple.500">
                 {stats.total_requests_this_month}
-              </Text>
-              <Text fontSize="sm" color="gray.600">Total This Month</Text>
+              </Typography>
+              <Typography variant="label" size="sm" color="gray.600">Total This Month</Typography>
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -323,7 +323,7 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
           <Stack direction={{ base: 'column', md: 'row' }} gap="4" align="end">
             <HStack gap="4" flex="1">
               <Box>
-                <Text fontSize="sm" mb="1" fontWeight="medium">Status</Text>
+                <Typography variant="label" size="sm" style={{ marginBottom: '0.25rem' }}>Status</Typography>
                 <Select.Root 
                   collection={createListCollection({
                     items: [
@@ -344,7 +344,7 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
               </Box>
 
               <Box>
-                <Text fontSize="sm" mb="1" fontWeight="medium">Type</Text>
+                <Typography variant="label" size="sm" style={{ marginBottom: '0.25rem' }}>Type</Typography>
                 <Select.Root 
                   collection={createListCollection({
                     items: [
@@ -366,7 +366,7 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
               </Box>
 
               <Box flex="1">
-                <Text fontSize="sm" mb="1" fontWeight="medium">Search</Text>
+                <Typography variant="label" size="sm" style={{ marginBottom: '0.25rem' }}>Search</Typography>
                 <InputField
                   placeholder="Search by employee or reason..."
                   value={filters.search}
@@ -387,9 +387,9 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
       <CardWrapper>
         <CardWrapper.Header>
           <HStack justify="space-between">
-            <Text fontSize="lg" fontWeight="semibold">
+            <Typography variant="title" size="lg" weight="semibold">
               Time Off Requests ({filteredRequests.length})
-            </Text>
+            </Typography>
             {stats.pending_requests > 0 && (
               <Badge colorPalette="orange">
                 {stats.pending_requests} pending review
@@ -418,8 +418,8 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
                   <Table.Cell colSpan={6} textAlign="center" py="8">
                     <VStack gap="2" color="gray.500">
                       <InformationCircleIcon className="w-8 h-8" />
-                      <Text>No time-off requests found</Text>
-                      <Text fontSize="sm">Try adjusting your filters</Text>
+                      <Typography variant="body">No time-off requests found</Typography>
+                      <Typography variant="caption">Try adjusting your filters</Typography>
                     </VStack>
                   </Table.Cell>
                 </Table.Row>
@@ -432,7 +432,7 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
       {/* Employee PTO Balances */}
       <CardWrapper>
         <CardWrapper.Header>
-          <Text fontSize="lg" fontWeight="semibold">Employee PTO Balances</Text>
+          <Typography variant="title" size="lg" weight="semibold">Employee PTO Balances</Typography>
         </CardWrapper.Header>
         <CardWrapper.Body>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
@@ -442,23 +442,23 @@ export function TimeOffManager({ pendingCount, approvedCount }: TimeOffManagerPr
                   <VStack gap="3" align="stretch">
                     <HStack justify="space-between">
                       <VStack align="start" gap="0">
-                        <Text fontWeight="semibold">{employee.name}</Text>
-                        <Text fontSize="sm" color="gray.600">{employee.position}</Text>
+                        <Typography variant="body" weight="semibold">{employee.name}</Typography>
+                        <Typography variant="caption" color="gray.600">{employee.position}</Typography>
                       </VStack>
                     </HStack>
                     
                     <SimpleGrid columns={2} gap="3">
                       <VStack gap="1">
-                        <Text fontSize="lg" fontWeight="bold" color="blue.500">
+                        <Typography variant="title" size="lg" weight="bold" color="blue.500">
                           {employee.pto_balance}
-                        </Text>
-                        <Text fontSize="xs" color="gray.600">PTO Days</Text>
+                        </Typography>
+                        <Typography variant="caption" color="gray.600">PTO Days</Typography>
                       </VStack>
                       <VStack gap="1">
-                        <Text fontSize="lg" fontWeight="bold" color="green.500">
+                        <Typography variant="title" size="lg" weight="bold" color="green.500">
                           {employee.sick_balance}
-                        </Text>
-                        <Text fontSize="xs" color="gray.600">Sick Days</Text>
+                        </Typography>
+                        <Typography variant="caption" color="gray.600">Sick Days</Typography>
                       </VStack>
                     </SimpleGrid>
                   </VStack>

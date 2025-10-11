@@ -486,7 +486,7 @@ export class EventPartitioner {
     // Process all events regardless of order
     const handler = this.partitionHandlers.get(partition);
     if (handler) {
-      queue.forEach(async (event) => {
+      queue.forEach(async (_event) => {
         try {
           const startTime = Date.now();
           await handler(event);

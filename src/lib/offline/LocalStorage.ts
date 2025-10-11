@@ -115,7 +115,7 @@ class LocalStorageManager {
         resolve(request.result);
       };
       
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = (_event) => {
         logger.info('OfflineSync', `[LocalStorage] Database upgrade needed: ${event.oldVersion} -> ${event.newVersion}`);
         this.handleDatabaseUpgrade(event);
       };
@@ -439,7 +439,7 @@ class LocalStorageManager {
       const range = IDBKeyRange.upperBound(now);
       const request = index.openCursor(range);
       
-      request.onsuccess = (event) => {
+      request.onsuccess = (_event) => {
         const cursor = (event.target as IDBRequest).result;
         if (cursor) {
           cursor.delete();
@@ -571,7 +571,7 @@ class LocalStorageManager {
       
       let deleted = 0;
       
-      request.onsuccess = (event) => {
+      request.onsuccess = (_event) => {
         const cursor = (event.target as IDBRequest).result;
         if (cursor) {
           cursor.delete();
@@ -602,7 +602,7 @@ class LocalStorageManager {
       
       let deleted = 0;
       
-      request.onsuccess = (event) => {
+      request.onsuccess = (_event) => {
         const cursor = (event.target as IDBRequest).result;
         if (cursor) {
           cursor.delete();

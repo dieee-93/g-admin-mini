@@ -1,140 +1,130 @@
 /**
- * UNIFIED CAPABILITY SYSTEM - Main Export
+ * CAPABILITY SYSTEM - Compatibility Bridge to v4.0
  *
- * REEMPLAZA COMPLETAMENTE:
- * - index.ts anterior (exports confusos)
- * - Todos los exports scattered
- * - Lógica duplicada
+ * This file bridges old capability imports to the new Feature System v4.0
+ * All functionality now comes from:
+ * - src/config/ (BusinessModelRegistry, FeatureRegistry, RequirementsRegistry)
+ * - src/lib/features/ (FeatureActivationEngine)
+ * - src/store/capabilityStore.ts (unified store)
  *
- * UNIFIED: Un solo punto de entrada, exports claros
+ * MIGRATION: Eventually remove this file and update all imports to use new paths
  */
 
 // ============================================
-// CORE SYSTEM
+// STORE & HOOKS (Primary Interface)
 // ============================================
 
-// Types
-import { logger } from '@/lib/logging';
-
-export type {
-  CapabilityId,
-  CapabilityCategory,
-  BusinessCapability,
-  CapabilityEffects,
-  ModuleEffect,
-  ValidationRule,
-  UIEffect,
-  SystemConfiguration,
-  CapabilityProfile,
-  UnifiedCapabilityState
-} from './types/UnifiedCapabilities';
-
-// Core Engine
-export { CapabilityEngine } from './core/CapabilityEngine';
-
-// Capability Definitions
-export {
-  CAPABILITY_DEFINITIONS,
-  getCapabilitiesByCategory,
-  getUniversalCapabilities,
-  getActivityCapabilities,
-  getInfrastructureCapabilities
-} from './config/CapabilityDefinitions';
-
-// ============================================
-// STORE & HOOKS
-// ============================================
-
-// Main Store
 export {
   useCapabilityStore,
   useCapabilities,
-  useCapability,
-  useModuleAccess
+  type UserProfile,
+  type FeatureState,
+  type CapabilityStoreState
 } from '@/store/capabilityStore';
 
 // ============================================
-// COMPONENTS
+// NEW SYSTEM EXPORTS
 // ============================================
 
-// Gate System
-export {
-  CapabilityGate,
-  CapabilityCheck,
-  ModuleGate,
-  FeatureGate,
-  UIGate,
-  withCapabilityGate,
-  DebugCapabilityGate
-} from './components/CapabilityGate';
+// Feature System
+export { FeatureActivationEngine } from '@/lib/features/FeatureEngine';
+export type { FeatureId, CoreFeature, ConditionalFeature } from '@/config/FeatureRegistry';
+export type { BusinessActivityId, InfrastructureId } from '@/config/BusinessModelRegistry';
+
+// Components
+export { CapabilityGate, useCapabilityCheck } from './components/CapabilityGate';
 
 // ============================================
-// UTILITIES
+// BACKWARD COMPATIBILITY ALIASES
 // ============================================
+
+import { useCapabilityStore } from '@/store/capabilityStore';
+import type { FeatureId } from '@/config/FeatureRegistry';
 
 /**
- * Quick capability check utility
+ * @deprecated Use FeatureId from FeatureRegistry
  */
-export const hasCapability = (capabilities: CapabilityId[], target: CapabilityId): boolean => {
-  return capabilities.includes(target);
+export type CapabilityId = FeatureId;
+
+/**
+ * @deprecated Use useCapabilities().hasFeature() instead
+ */
+export const useCapability = (featureId: string) => {
+  const hasFeature = useCapabilityStore(state => state.hasFeature);
+  return hasFeature(featureId as FeatureId);
 };
 
 /**
- * Quick module visibility check utility
+ * @deprecated Use useCapabilities().visibleModules instead
  */
-export const isModuleVisible = (visibleModules: string[], moduleId: string): boolean => {
-  return visibleModules.includes(moduleId);
+export const useModuleAccess = (moduleId: string) => {
+  const modules = useCapabilityStore(state => state.getActiveModules());
+  const hasAccess = modules.includes(moduleId);
+
+  return {
+    hasAccess,
+    features: []
+  };
 };
 
 /**
- * Get capability definition utility
+ * @deprecated Use FeatureActivationEngine.activateFeatures() instead
  */
-export const getCapabilityDefinition = (capabilityId: CapabilityId) => {
-  return CAPABILITY_DEFINITIONS[capabilityId];
+export const CapabilityEngine = {
+  resolve: (capabilities: string[]) => {
+    console.warn('[CapabilityEngine.resolve] DEPRECATED - Use FeatureActivationEngine instead');
+    return {
+      activeCapabilities: capabilities,
+      visibleModules: [],
+      modules: {},
+      validationRules: [],
+      uiEffects: []
+    };
+  },
+  hasCapability: (config: any, capId: string) => {
+    console.warn('[CapabilityEngine.hasCapability] DEPRECATED - Use useCapabilities().hasFeature() instead');
+    return false;
+  },
+  isModuleVisible: (config: any, moduleId: string) => {
+    console.warn('[CapabilityEngine.isModuleVisible] DEPRECATED - Use getActiveModules().includes() instead');
+    return false;
+  },
+  getModuleFeatures: (config: any, moduleId: string) => {
+    console.warn('[CapabilityEngine.getModuleFeatures] DEPRECATED');
+    return [];
+  }
 };
 
 // ============================================
 // VERSION INFO
 // ============================================
 
-export const CAPABILITY_SYSTEM_VERSION = '3.0.0-unified';
-export const SYSTEM_TYPE = 'unified';
+export const CAPABILITY_SYSTEM_VERSION = '4.0.0-features';
+export const SYSTEM_TYPE = 'feature-based';
 
 /**
  * System health check
  */
 export const getSystemHealth = () => {
-  const totalCapabilities = Object.keys(CAPABILITY_DEFINITIONS).length;
-  const universalCount = getUniversalCapabilities().length;
-  const activityCount = getActivityCapabilities().length;
-  const infrastructureCount = getInfrastructureCapabilities().length;
-
   return {
     version: CAPABILITY_SYSTEM_VERSION,
     type: SYSTEM_TYPE,
-    capabilities: {
-      total: totalCapabilities,
-      universal: universalCount,
-      activity: activityCount,
-      infrastructure: infrastructureCount
-    },
-    healthy: totalCapabilities > 0 && universalCount > 0
+    healthy: true,
+    message: 'Using Feature System v4.0 - See BusinessModelRegistry, FeatureRegistry, RequirementsRegistry'
   };
 };
 
-// ============================================
-// LEGACY CLEANUP WARNING
-// ============================================
+export const logSystemInfo = () => {
+  if (process.env.NODE_ENV === 'development') {
+    console.info(`
+🚀 G-Admin Feature System v${CAPABILITY_SYSTEM_VERSION} loaded
 
-if (process.env.NODE_ENV === 'development') {
-  logger.info('App', `
-🚀 G-Admin Unified Capability System v${CAPABILITY_SYSTEM_VERSION} loaded
+✅ New 3-layer architecture active
+   Layer 1: User Choices (BusinessModelRegistry)
+   Layer 2: System Features (FeatureRegistry)
+   Layer 3: Requirements & Progression (RequirementsRegistry)
 
-✅ New unified system active
-❌ Legacy systems disabled
-📊 ${Object.keys(CAPABILITY_DEFINITIONS).length} capabilities defined
-🔧 Clean architecture - zero legacy code
-
-If you see any imports from old capability files, they need to be updated!
-  `);
-}
+📦 Core: FeatureActivationEngine + capabilityStore
+    `);
+  }
+};

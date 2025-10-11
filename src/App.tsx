@@ -38,6 +38,9 @@ import { AchievementSystemProvider } from '@/lib/achievements/AchievementSystemI
 import { EventBusProvider } from '@/providers/EventBusProvider';
 import { SlotProvider } from '@/lib/composition';
 
+// 🔄 CAPABILITY SYNC - Database persistence
+import { CapabilitySync } from '@/components/capabilities/CapabilitySync';
+
 // Dashboard Module - Critical, not lazy loaded
 import DashboardPage from '@/pages/admin/core/dashboard/page';
 // Removed CrossModuleAnalytics - consolidated into Dashboard with CrossModuleInsights
@@ -176,6 +179,9 @@ function App() {
           <AlertsProvider>
             <Router>
               <AuthProvider>
+                {/* 🔄 Sync capabilities from Supabase on app init */}
+                <CapabilitySync />
+
                 <OfflineMonitorProvider>
                   <AchievementSystemProvider>
 

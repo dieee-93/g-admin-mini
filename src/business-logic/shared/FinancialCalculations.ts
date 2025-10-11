@@ -356,9 +356,9 @@ export class FinancialCalculations {
     
     const initialDec = DecimalUtils.fromValue(initialValue, 'financial');
     const finalDec = DecimalUtils.fromValue(finalValue, 'financial');
-    const periodsDec = DecimalUtils.fromValue(periods, 'financial');
-    
+
     // CAGR = (Final Value / Initial Value)^(1/periods) - 1
+    // Note: periods used directly in Math.pow() as it requires native numbers
     const ratioDec = DecimalUtils.divide(finalDec, initialDec, 'financial');
     const ratio = DecimalUtils.toNumber(ratioDec);
     
@@ -376,9 +376,9 @@ export class FinancialCalculations {
   ): number {
     const futureValueDec = DecimalUtils.fromValue(futureValue, 'financial');
     const discountRateDec = DecimalUtils.fromValue(discountRate, 'financial');
-    const periodsDec = DecimalUtils.fromValue(periods, 'financial');
-    
+
     // PV = FV / (1 + r)^n
+    // Note: periods used directly in Math.pow() as it requires native numbers
     const onePlusRateDec = DecimalUtils.add(DecimalUtils.fromValue(1, 'financial'), discountRateDec, 'financial');
     const discountFactor = Math.pow(DecimalUtils.toNumber(onePlusRateDec), periods);
     

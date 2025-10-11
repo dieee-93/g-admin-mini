@@ -155,7 +155,7 @@ export function UnifiedCalendar({
   // ===============================
 
   // Load or create calendar configuration
-  const configHook = useCalendarConfig(businessModel, false);
+  const configHook = useCalendarConfig(businessModel, true);
 
   const calendarConfig = useMemo((): CalendarConfig => {
     if (providedConfig && configHook.config) {
@@ -173,19 +173,45 @@ export function UnifiedCalendar({
 
   const adapterHook = useCalendarAdapter();
 
-  // Initialize adapter
+  // Initialize adapter when config is ready
   useEffect(() => {
+    // Skip if provided adapter is used
     if (providedAdapter) {
-      // Use provided adapter
       logger.info('App', 'Using provided adapter for', businessModel);
-    } else if (!adapterHook.hasAdapter(businessModel)) {
-      // No adapter available - show warning
-      logger.warn('App', `No adapter registered for business model: ${businessModel}`);
-    } else {
-      // Auto-select adapter
-      adapterHook.selectAdapter(businessModel, calendarConfig);
+      return;
     }
-  }, [businessModel, providedAdapter, calendarConfig, adapterHook]);
+
+    // Check if adapter is registered
+    if (!adapterHook.hasAdapter(businessModel)) {
+      logger.warn('App', `No adapter registered for business model: ${businessModel}`);
+      logger.info('App', `Available adapters: ${adapterHook.availableAdapters.join(', ')}`);
+      return;
+    }
+
+    // Wait for config to be fully loaded
+    if (!configHook.config || !configHook.isLoaded || configHook.loading) {
+      logger.info('App', 'Waiting for config to load before selecting adapter...');
+      return;
+    }
+
+    // Wait for calendarConfig to be ready
+    if (!calendarConfig || !calendarConfig.businessModel) {
+      logger.warn('App', 'Calendar config not ready yet, waiting...');
+      return;
+    }
+
+    // Skip if adapter is already selected for this business model
+    if (adapterHook.currentAdapter && adapterHook.currentBusinessModel === businessModel) {
+      logger.info('App', 'Adapter already selected for', businessModel);
+      return;
+    }
+
+    // Auto-select adapter
+    logger.info('App', `Selecting adapter for "${businessModel}" with config:`, calendarConfig);
+    adapterHook.selectAdapter(businessModel, calendarConfig).catch((_error) => {
+      logger.error('App', 'Failed to select adapter:', error);
+    });
+  }, [businessModel, providedAdapter, configHook.config, configHook.isLoaded, configHook.loading, calendarConfig.businessModel]);
 
   // ===============================
   // ENGINE MANAGEMENT

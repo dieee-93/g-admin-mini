@@ -2,7 +2,7 @@
 // TESTS AVANZADOS DECIMALUTILS - CASOS EXTREMOS Y PRECISIÓN
 // ============================================================================
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { DecimalUtils } from '../decimalUtils';
 import { TaxDecimal, InventoryDecimal, FinancialDecimal, RecipeDecimal } from '@/config/decimal-config';
 

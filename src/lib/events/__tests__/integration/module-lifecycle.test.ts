@@ -112,11 +112,11 @@ describe('EventBus - Module Lifecycle Integration', () => {
       // Listen for lifecycle events
       const lifecycleEvents: string[] = [];
       
-      eventBus.on('global.eventbus.module-registered', async (event) => {
+      eventBus.on('global.eventbus.module-registered', async (_event) => {
         lifecycleEvents.push(`registered:${event.payload.moduleId}`);
       });
 
-      eventBus.on('global.eventbus.module-activated', async (event) => {
+      eventBus.on('global.eventbus.module-activated', async (_event) => {
         lifecycleEvents.push(`activated:${event.payload.moduleId}`);
       });
 
@@ -209,7 +209,7 @@ describe('EventBus - Module Lifecycle Integration', () => {
       const handlerCalls: string[] = [];
       
       console.log('[TEST] Setting up simple handler...');
-      eventBus.on('test.simple', async (event) => {
+      eventBus.on('test.simple', async (_event) => {
         console.log('[TEST] Simple handler called!');
         handlerCalls.push('simple-called');
       });
@@ -228,7 +228,7 @@ describe('EventBus - Module Lifecycle Integration', () => {
       const eventFlow: string[] = [];
 
       // Setup handlers that simulate cross-module communication
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         eventFlow.push('1.order-created-received');
         
         // Sales module emits inventory check event
@@ -238,7 +238,7 @@ describe('EventBus - Module Lifecycle Integration', () => {
         });
       });
 
-      eventBus.on('inventory.stock.check', async (event) => {
+      eventBus.on('inventory.stock.check', async (_event) => {
         eventFlow.push('2.stock-check-received');
         
         // Inventory module responds with stock status
@@ -248,7 +248,7 @@ describe('EventBus - Module Lifecycle Integration', () => {
         });
       });
 
-      eventBus.on('inventory.stock.checked', async (event) => {
+      eventBus.on('inventory.stock.checked', async (_event) => {
         eventFlow.push('3.stock-checked-received');
         
         if (event.payload.stockAvailable) {
@@ -259,7 +259,7 @@ describe('EventBus - Module Lifecycle Integration', () => {
         }
       });
 
-      eventBus.on('sales.order.confirmed', async (event) => {
+      eventBus.on('sales.order.confirmed', async (_event) => {
         eventFlow.push('4.order-confirmed-received');
       });
 
@@ -285,17 +285,17 @@ describe('EventBus - Module Lifecycle Integration', () => {
       const regularOrdersReceived: any[] = [];
 
       // Handler for VIP customers only
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         vipOrdersReceived.push(event.payload);
       }, {
-        filter: (event) => event.payload.customerTier === 'VIP'
+        filter: (_event) => event.payload.customerTier === 'VIP'
       });
 
       // Handler for regular customers
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         regularOrdersReceived.push(event.payload);
       }, {
-        filter: (event) => event.payload.customerTier === 'REGULAR'
+        filter: (_event) => event.payload.customerTier === 'REGULAR'
       });
 
       // Emit orders with different tiers
@@ -329,19 +329,19 @@ describe('EventBus - Module Lifecycle Integration', () => {
       const processingOrder: string[] = [];
 
       // High priority handler
-      eventBus.on('test.priority.event', async (event) => {
+      eventBus.on('test.priority.event', async (_event) => {
         processingOrder.push('high-priority');
         await new Promise(resolve => setTimeout(resolve, 10));
       }, { priority: 'high' });
 
       // Medium priority handler  
-      eventBus.on('test.priority.event', async (event) => {
+      eventBus.on('test.priority.event', async (_event) => {
         processingOrder.push('medium-priority');
         await new Promise(resolve => setTimeout(resolve, 10));
       }, { priority: 'medium' });
 
       // Low priority handler
-      eventBus.on('test.priority.event', async (event) => {
+      eventBus.on('test.priority.event', async (_event) => {
         processingOrder.push('low-priority');
         await new Promise(resolve => setTimeout(resolve, 10));
       }, { priority: 'low' });
@@ -413,7 +413,7 @@ describe('EventBus - Module Lifecycle Integration', () => {
     it('should emit deactivation events', async () => {
       const deactivationEvents: string[] = [];
 
-      eventBus.on('global.eventbus.module-deactivated', async (event) => {
+      eventBus.on('global.eventbus.module-deactivated', async (_event) => {
         deactivationEvents.push(event.payload.moduleId);
       });
 
@@ -503,7 +503,7 @@ describe('EventBus - Module Lifecycle Integration', () => {
       ];
 
       workflowPatterns.forEach(pattern => {
-        eventBus.on(pattern, async (event) => {
+        eventBus.on(pattern, async (_event) => {
           workflowEvents.push(pattern);
         });
       });
@@ -603,12 +603,12 @@ describe('EventBus - Module Lifecycle Integration', () => {
       await eventBus.registerModule(createSalesTestModule());
 
       // Setup data consistency tracking
-      eventBus.on('inventory.stock.updated', async (event) => {
+      eventBus.on('inventory.stock.updated', async (_event) => {
         const key = `inventory.${event.payload.itemId}`;
         dataStore.set(key, event.payload.newStock);
       });
 
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         // Simulate stock reduction
         for (const item of event.payload.items || []) {
           const currentStock = dataStore.get(`inventory.${item.id}`) || 100;

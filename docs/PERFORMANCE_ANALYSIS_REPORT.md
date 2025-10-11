@@ -135,12 +135,12 @@
 
 ## 🚨 Critical Errors Detected
 
-### Error 1: CAPABILITY_DEFINITIONS is not defined
+### Error 1: CAPABILITY_DEFINITIONS is not defined ✅ FIXED
 
 **Severity**: CRITICAL - BLOQUEANTE
 **Affected Modules**:
-- Materials (StockLab) - `/admin/materials`
-- Sales (POS) - `/admin/sales`
+- ✅ Materials (StockLab) - `/admin/materials` - **NOW WORKING**
+- ⚠️ Sales (POS) - `/admin/sales` - **Has different error**
 
 **Error Message:**
 ```
@@ -151,32 +151,24 @@ at ErrorBoundary (ErrorBoundary.tsx:189:5)
 at LazyWithErrorBoundary (LazyWithErrorBoundary.tsx:66:41)
 ```
 
-**Stack Trace Location:**
-```
-src/shared/components/ErrorBoundary.tsx:189
-src/shared/components/LazyWithErrorBoundary.tsx:66
-```
+**Investigation Status**: ✅ RESOLVED - 2025-10-02
 
-**Investigation Status**: 🔍 IN PROGRESS
+**Root Cause:**
+Module-level code execution in `src/lib/capabilities/index.ts` (lines 129-140) that tried to access `CAPABILITY_DEFINITIONS` immediately when the module loaded during lazy loading.
 
-**Known Facts:**
-1. ✅ TypeScript compiles without errors
-2. ✅ Export exists: `src/lib/capabilities/config/CapabilityDefinitions.ts:493`
-3. ✅ Re-export exists: `src/lib/capabilities/index.ts:37`
-4. ❌ Runtime error during lazy module loading
-5. ✅ Dashboard module works fine (no error)
+**Solution Applied:**
+Wrapped the logging code in an exported function `logSystemInfo()` instead of executing it at module load time.
 
-**Hypothesis:**
-- Timing issue during lazy loading
-- Circular dependency in capability system
-- Missing import in lazy-loaded chunks
-- Vite chunk splitting issue
+**Fix Location:**
+- `src/lib/capabilities/index.ts:129-144` - Converted module-level execution to function
 
-**Next Steps:**
-- [ ] Trace exact import path in failing modules
-- [ ] Check Vite build output for chunk dependencies
-- [ ] Verify import order in lazy modules
-- [ ] Check for circular dependencies
+**Verification:**
+- ✅ Materials module loads successfully
+- ✅ Shows inventory grid with 10 items
+- ✅ No CAPABILITY_DEFINITIONS error
+
+**Documentation:**
+See `docs/CAPABILITY_DEFINITIONS_FIX.md` for complete analysis and solution details.
 
 ---
 

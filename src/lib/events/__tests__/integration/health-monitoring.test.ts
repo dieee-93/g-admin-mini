@@ -30,7 +30,7 @@ describe('EventBus - Health Monitoring Integration', () => {
     assertions = new EventBusAssertions();
     
     // Listen to all events for testing
-    eventBus.on('**', async (event) => {
+    eventBus.on('**', async (_event) => {
       capturedEvents.push(event);
     });
     
@@ -73,7 +73,7 @@ describe('EventBus - Health Monitoring Integration', () => {
       const healthEvents: any[] = [];
 
       // Listen for metrics events (which contain health monitoring data)
-      eventBus.on('global.eventbus.metrics', async (event) => {
+      eventBus.on('global.eventbus.metrics', async (_event) => {
         console.log('[HEALTH-TEST] Metrics event received:', event.payload);
         healthEvents.push(event.payload);
       });
@@ -105,7 +105,7 @@ describe('EventBus - Health Monitoring Integration', () => {
       let moduleRecovered = false;
 
       // Listen for recovery events
-      eventBus.on('global.eventbus.module-recovered', async (event) => {
+      eventBus.on('global.eventbus.module-recovered', async (_event) => {
         console.log('[HEALTH-TEST] Module recovered:', event.payload);
         moduleRecovered = true;
       });

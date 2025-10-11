@@ -123,7 +123,10 @@ export function calculateLaborCosts(
   let overtimeHoursDec: any;
 
   // Calculate regular and overtime hours
-  if (DecimalUtils.lessThanOrEqual(hoursDec, thresholdDec)) {
+  const hoursNum = DecimalUtils.toNumber(hoursDec);
+  const thresholdNum = DecimalUtils.toNumber(thresholdDec);
+
+  if (hoursNum <= thresholdNum) {
     // No overtime
     regularHoursDec = hoursDec;
     overtimeHoursDec = DecimalUtils.fromValue(0, 'inventory');
@@ -160,9 +163,13 @@ export function determineOvertimeStatus(
   const thresholdDec = DecimalUtils.fromValue(overtimeThreshold, 'inventory');
   const warningDec = DecimalUtils.fromValue(warningThreshold, 'inventory');
 
-  if (DecimalUtils.greaterThanOrEqual(hoursDec, thresholdDec)) {
+  const hoursNum = DecimalUtils.toNumber(hoursDec);
+  const thresholdNum = DecimalUtils.toNumber(thresholdDec);
+  const warningNum = DecimalUtils.toNumber(warningDec);
+
+  if (hoursNum >= thresholdNum) {
     return 'in_overtime';
-  } else if (DecimalUtils.greaterThanOrEqual(hoursDec, warningDec)) {
+  } else if (hoursNum >= warningNum) {
     return 'approaching';
   } else {
     return 'none';

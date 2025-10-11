@@ -100,17 +100,17 @@ export class PredictiveInventoryManager {
    */
   private initializeEventListeners(): void {
     // Listen for inventory changes
-    EventBus.on('inventory.stock_adjusted', async (event) => {
+    EventBus.on('inventory.stock_adjusted', async (_event) => {
       await this.updateItemStock(event.payload);
     });
 
     // Listen for stock low events
-    EventBus.on('inventory.stock_low', async (event) => {
+    EventBus.on('inventory.stock_low', async (_event) => {
       await this.handleStockLowEvent(event.payload);
     });
 
     // Listen for new orders to update demand patterns
-    EventBus.on('sales.order.placed', async (event) => {
+    EventBus.on('sales.order.placed', async (_event) => {
       await this.updateDemandFromOrder(event.payload);
     });
   }

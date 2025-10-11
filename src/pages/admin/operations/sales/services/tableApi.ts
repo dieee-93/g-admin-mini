@@ -35,9 +35,8 @@ export async function fetchTables(): Promise<Table[]> {
         service_timeline:service_events(*)
       )
     `)
-    .eq('is_active', true)
     .order('number', { ascending: true });
-  
+
   if (error) throw error;
   return data || [];
 }
@@ -257,8 +256,7 @@ export async function getServiceTimeline(partyId: string): Promise<ServiceEvent[
 export async function getCapacityManager(): Promise<CapacityManager> {
   const { data: tables, error } = await supabase
     .from('tables')
-    .select('id, status')
-    .eq('is_active', true);
+    .select('id, status');
 
   if (error) throw error;
 

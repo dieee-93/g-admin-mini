@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { StockCalculation } from '../stockCalculation';
+import { describe, it, expect, beforeEach, afterEach, vi, type SpyInstance } from 'vitest';
+import { StockCalculation, type StockStatus } from '../stockCalculation';
 import { type MaterialItem, type CountableItem } from '@/pages/admin/supply-chain/materials/types';
 
 /**
@@ -20,7 +20,7 @@ import { type MaterialItem, type CountableItem } from '@/pages/admin/supply-chai
  */
 
 describe('StockCalculation - Complete Test Suite', () => {
-  let consoleErrorSpy: any;
+  let consoleErrorSpy: SpyInstance;
   let performanceStart: number;
 
   // Base mock items for different types
@@ -252,8 +252,8 @@ describe('StockCalculation - Complete Test Suite', () => {
     });
 
     it('should handle unknown status with defaults', () => {
-      expect(StockCalculation.getStatusColor('unknown' as any)).toBe('gray.300');
-      expect(StockCalculation.getStatusLabel('unknown' as any)).toBe('Desconocido');
+      expect(StockCalculation.getStatusColor('unknown' as unknown as StockStatus)).toBe('gray.300');
+      expect(StockCalculation.getStatusLabel('unknown' as unknown as StockStatus)).toBe('Desconocido');
     });
   });
 

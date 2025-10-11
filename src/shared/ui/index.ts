@@ -41,6 +41,7 @@ export {
   Label,
   Code
 } from './Typography';
+export { Text } from './Text';
 
 // Basic Components (Chakra Wrappers)
 export { Heading } from './Heading';
@@ -77,6 +78,17 @@ export {
   ThemeRadioGroup
 } from './RadioGroup';
 export {
+  SegmentGroup,
+  SegmentItem,
+  SegmentGroupRoot,
+  SegmentGroupItem,
+  SegmentGroupItemText,
+  SegmentGroupIndicator,
+  SegmentGroupItemControl,
+  SegmentGroupItemHiddenInput,
+  SegmentGroupLabel
+} from './SegmentGroup';
+export {
   Slider,
   SliderRoot,
   SliderControl,
@@ -96,6 +108,7 @@ export {
 
 // Base Components
 export { Button } from './Button';
+export { IconButton } from './IconButton';
 export { ActionButton } from './ActionButton';
 export { CardWrapper } from './CardWrapper';
 export { MetricCard } from './MetricCard';
@@ -141,6 +154,17 @@ export {
 } from './Alert';
 
 export {
+  CollapsibleAlertStack,
+  InventoryAlertStack,
+  SystemAlertStack
+} from './CollapsibleAlertStack';
+
+export type {
+  AlertItem,
+  CollapsibleAlertStackProps
+} from './CollapsibleAlertStack';
+
+export {
   Badge,
   StatusBadge,
   StockBadge,
@@ -160,11 +184,16 @@ export {
   DataTabs
 } from './Tabs';
 
+// HeaderSwitch - Dashboard Evolutivo
+export { HeaderSwitch, DashboardSwitch } from './HeaderSwitch';
+export type { SwitchPosition, HeaderSwitchProps } from './HeaderSwitch';
+
 // Collapsible components are imported directly from @chakra-ui/react when needed
 
 // Business Components - REMOVED (move to specific modules if needed)
 
 // Feedback Components
+export { Presence } from './Presence';
 export { CircularProgress } from './CircularProgress';
 export {
   Progress,

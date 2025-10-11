@@ -3,7 +3,6 @@ import type { Recipe, RecipeIngredient, RecipeValidationResult, RecipeCalculatio
 import { recipeAPI } from './RecipeAPI';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { RecipeDecimal } from '@/config/decimal-config';
-import { SmartCostCalculationEngine, calculateRecipeCost } from '@/business-logic/recipes/recipeCostCalculationEngine';
 
 class RecipeService {
   // Recipe validation

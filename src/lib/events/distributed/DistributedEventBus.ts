@@ -117,7 +117,7 @@ export class DistributedEventBus extends EventBus implements IEventBus {
         });
 
         this.crossInstanceCoordinator.onRemoteEvent(
-          (event) => this.handleRemoteEvent(event)
+          (_event) => this.handleRemoteEvent(event)
         );
       }
 

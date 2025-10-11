@@ -333,7 +333,7 @@ export const useMaterialsStore = create<MaterialsState>()(
 
         // UI Actions
         setLoading: (loading) => set({ loading }),
-        setError: (error) => set({ error }),
+        setError: (_error) => set({ error }),
         setFilters: (newFilters) => set(produce((state: MaterialsState) => {
           state.filters = { ...state.filters, ...newFilters };
         })),

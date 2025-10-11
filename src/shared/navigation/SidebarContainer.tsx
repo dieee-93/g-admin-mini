@@ -55,9 +55,9 @@ export function NavItemContainer({
     <button
       style={{
         width: "100%",
-        padding: "4px 8px", // xs padding
-        minHeight: "28px",
-        borderRadius: "4px", // sm
+        padding: "8px 8px", // ✅ WCAG: Padding aumentado para mejor touch target
+        minHeight: "44px",    // ✅ WCAG: Altura mínima 44px para accesibilidad
+        borderRadius: "8px",  // ✅ Design consistency: 8px como en las cards
         backgroundColor: isActive ? "var(--chakra-colors-gray-600)" : "transparent", // 🎨 Estado activo
         color: isActive ? "var(--chakra-colors-gray-50)" : "var(--chakra-colors-gray-600)", // 🎨 Colores consistentes
         textAlign: "left",
@@ -106,7 +106,7 @@ export function NavItemContainer({
         direction="row" 
         align="center" 
         gap={isExpanded ? "4" : "0"}
-        justify={isExpanded ? "flex-start" : "center"}
+        justify={isExpanded ? "start" : "center"}
         style={{ width: "100%" }}
       >
         {children}

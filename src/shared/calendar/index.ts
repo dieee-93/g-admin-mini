@@ -8,6 +8,20 @@
  */
 
 // ===============================
+// IMPORTS FOR DEFAULT EXPORT
+// ===============================
+
+import { UnifiedCalendarEngine } from './engine/UnifiedCalendarEngine';
+import { BaseCalendarAdapter } from './adapters/BaseCalendarAdapter';
+import { useCalendarEngine, useCalendarAdapter, useBookingManagement, useCalendarConfig } from './hooks';
+import Slot from './slots/Slot';
+import { SlotRegistry } from './slots/SlotRegistry';
+import { CALENDAR_SLOTS, BUSINESS_MODEL_SLOTS } from './slots/CalendarSlotDefinitions';
+import { createUnifiedCalendarSystem } from './factory/CalendarFactory';
+import { CalendarPresets } from './presets/CalendarPresets';
+import { CALENDAR_SYSTEM_VERSION, CALENDAR_SYSTEM_BUILD } from './config/CalendarConfig';
+
+// ===============================
 // CORE SYSTEM EXPORTS
 // ===============================
 

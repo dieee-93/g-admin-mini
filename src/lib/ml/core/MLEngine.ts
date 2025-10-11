@@ -427,17 +427,17 @@ export class MLEngine {
    */
   private initializeEventListeners(): void {
     // Listen for sales data
-    const salesListener = EventBus.on('sales.completed', async (event) => {
+    const salesListener = EventBus.on('sales.completed', async (_event) => {
       await this.processSaleData(event.payload);
     });
 
     // Listen for inventory updates
-    const inventoryListener = EventBus.on('inventory.stock_adjusted', async (event) => {
+    const inventoryListener = EventBus.on('inventory.stock_adjusted', async (_event) => {
       await this.processInventoryData(event.payload);
     });
 
     // Listen for order events
-    const orderListener = EventBus.on('sales.order.placed', async (event) => {
+    const orderListener = EventBus.on('sales.order.placed', async (_event) => {
       await this.processOrderData(event.payload);
     });
 

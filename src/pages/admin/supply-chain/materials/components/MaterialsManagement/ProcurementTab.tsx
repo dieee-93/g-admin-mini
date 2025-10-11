@@ -45,8 +45,8 @@ export function ProcurementTab() {
   );
 
   return (
-    <Stack direction="column" gap="lg">
-      <Stack direction="row" justify="space-between" align="center">
+    <Stack direction="column" gap="xl">
+      <Stack direction="row" justify="space-between" align="center" mb="md">
         <Typography variant="heading" size="lg">
           Recomendaciones de Compras
         </Typography>
@@ -67,29 +67,29 @@ export function ProcurementTab() {
 
       {/* Quick Actions */}
       <Stack direction="row" gap="sm">
-        <Button variant="solid" size="sm" disabled={lowStockItems.length === 0}>
-          <Icon icon={ClipboardDocumentListIcon} size="sm" />
+        <Button variant="solid" colorPalette="blue" size="lg" disabled={lowStockItems.length === 0}>
+          <Icon icon={ClipboardDocumentListIcon} size="md" />
           Generar Orden de Compra
         </Button>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="md">
           <Icon icon={TruckIcon} size="sm" />
           Contactar Proveedores
         </Button>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="md">
           <Icon icon={CalendarIcon} size="sm" />
           Programar Entrega
         </Button>
       </Stack>
 
       {/* Procurement Recommendations */}
-      <Stack direction="column" gap="sm">
+      <Stack direction="column" gap="md">
         {lowStockItems.length === 0 ? (
           <Stack
             direction="column"
-            gap="md"
+            gap="lg"
             align="center"
             justify="center"
-            minH="200px"
+            minH="240px"
             bg="green.50"
             borderRadius="md"
             p="xl"

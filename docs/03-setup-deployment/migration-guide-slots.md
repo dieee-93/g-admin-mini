@@ -1,15 +1,108 @@
-# 🚀 Guía de Migración: Sistema de Slots G-Admin v3.2
+# 🚀 Guía de Migración: Sistema de Slots G-Admin v3.2+
 
-> **Versión**: 3.2 - Slots System Implementation
-> **Fecha**: 2025-09-22
+> **Versión**: 3.2+ - Slots System Implementation + Dynamic Loading
+> **Última Actualización**: 2025-01-09
 > **Tipo**: Major Update - Refactoring Arquitectónico
 
 **📋 Índice de Migración:**
+- [🎯 Dos Sistemas de Slots](#-dos-sistemas-de-slots)
 - [✅ Cambios Implementados](#-cambios-implementados)
 - [🔄 Migración de Componentes](#-migración-de-componentes)
 - [🚨 Breaking Changes](#-breaking-changes)
 - [🛠️ APIs Principales](#-apis-principales)
 - [📚 Referencias](#-referencias)
+
+---
+
+## 🎯 **Dos Sistemas de Slots**
+
+G-Admin Mini usa **DOS sistemas de slots complementarios**, cada uno con un propósito específico:
+
+### **1. Runtime Slots (`src/lib/slots/`)** - Sistema Legacy
+
+**Cuándo usarlo**: Slots que se registran dinámicamente en runtime
+
+- ✅ Componentes pequeños insertados dentro de otros componentes
+- ✅ Plugins que se registran al cargar módulos
+- ✅ Contenido que cambia frecuentemente en runtime
+
+**Características**:
+- Context API + React hooks
+- Registro en runtime con `slotRegistry.register()`
+- Componentes pasan directamente como `ComponentType`
+
+**Ejemplo**:
+```tsx
+// MaterialRow.tsx - Host component con slots
+<Slot name="material-actions" data={{ material }} />
+
+// SupplierModule.tsx - Plugin registra contenido
+slotRegistry.register('material-actions', SupplierActionButton, ['has_suppliers']);
+```
+
+---
+
+### **2. Static Slots (`ComponentLoader + SlotRegistry`)** - Sistema Nuevo (v3.2+)
+
+**Cuándo usarlo**: Widgets/secciones grandes lazy-loaded según features activas
+
+- ✅ Dashboard widgets
+- ✅ Secciones completas de páginas
+- ✅ Componentes que se cargan según Atomic Capabilities
+- ✅ Code splitting y lazy loading automático
+
+**Características**:
+- Vite `import.meta.glob` + React.lazy pre-loading
+- **Factory Pattern v3.0** → Elimina 90% de duplicación de código
+- Metadata en `SlotRegistry.ts` (strings, no ComponentType)
+- Lazy loading automático con code splitting
+- Compatible con Vite build-time analysis
+
+**Ejemplo**:
+```tsx
+// SlotRegistry.ts - Metadata (qué widgets existen)
+'dashboard-sales-widget': {
+  component: 'SalesWidget', // Solo el nombre
+  requiredFeatures: ['sales_order_management'],
+  targetSlots: ['dashboard-widgets']
+}
+
+// DashboardPage.tsx - Renderiza widgets según features activas
+const widgets = getSlotsForTarget(activeFeatures, 'dashboard-widgets');
+widgets.map(slot => {
+  const Component = getDashboardWidget(slot.component);
+  return <Suspense><Component /></Suspense>
+})
+```
+
+**📖 Documentación Completa**: [Dynamic Component Loading Pattern](../05-development/DYNAMIC_COMPONENT_LOADING_PATTERN.md) ⭐ **Actualizado v3.0 con Factory Pattern**
+
+**🏭 Factory Pattern (v3.0)**:
+Ahora agregar un nuevo tipo de módulo requiere solo **2 líneas de código** en vez de ~20 líneas:
+```typescript
+// ComponentLoader.ts - Agregar nuevo módulo
+const operationsModules = import.meta.glob('/src/.../widgets/*.tsx');
+export const operationsWidgets = createComponentLoader(operationsModules, 'Operations Widget');
+```
+
+---
+
+### **Comparación Rápida**
+
+| Característica | Runtime Slots | Static Slots |
+|----------------|--------------|--------------|
+| **Lazy Loading** | ❌ No | ✅ Sí (React.lazy) |
+| **Code Splitting** | ❌ No | ✅ Sí (Vite chunks) |
+| **Registro** | Runtime (Context API) | Build-time (import.meta.glob) |
+| **Componentes** | Pequeños (buttons, badges) | Grandes (widgets, sections) |
+| **Performance** | ⚡ Inmediato | 🚀 Optimizado (lazy) |
+| **Vite Compatibility** | N/A | ✅ Totalmente compatible |
+
+**Regla de oro**:
+- Si es **pequeño y dinámico** → Runtime Slots
+- Si es **grande y basado en features** → Static Slots (ComponentLoader)
+
+---
 
 ## ✅ **¿Qué se implementó?**
 
@@ -226,16 +319,27 @@ debugSlots(); // Solo en development
 ## 📚 **Referencias**
 
 ### Documentación Relacionada
+
+**Sistemas de Slots**:
+- **[🔌 Dynamic Component Loading Pattern](../05-development/DYNAMIC_COMPONENT_LOADING_PATTERN.md)** - ⭐ **NUEVO** - Static Slots con Vite + React.lazy
 - **[🏢 Capacidades de Negocio](../02-architecture/business-capabilities.md)** - Arquitectura completa del sistema
 - **[🧠 Module Planning Guide](../05-development/MODULE_PLANNING_MASTER_GUIDE.md)** - Metodología para nuevos módulos
 - **[🎨 Component Library](../05-development/component-library.md)** - Sistema de diseño
 - **[🧪 Testing Guide](../05-development/testing-guide.md)** - Testing del sistema de slots
 
 ### Código de Referencia
-- **`src/lib/slots/`** - Implementación completa del sistema
+
+**Runtime Slots (Legacy)**:
+- **`src/lib/slots/`** - Implementación completa del sistema runtime
 - **`src/lib/capabilities/`** - Sistema de capacidades integrado
 - **`src/store/businessCapabilitiesStore.ts`** - Store simplificado
 - **`src/lib/slots/examples/`** - Ejemplos de implementación
+
+**Static Slots (Nuevo v3.2+)**:
+- **`src/lib/composition/ComponentLoader.ts`** - Sistema de carga dinámica con Vite
+- **`src/config/SlotRegistry.ts`** - Metadata de slots estáticos
+- **`src/config/FeatureRegistry.ts`** - Mapeo Features → Slots
+- **`src/pages/admin/core/dashboard/page.tsx`** - Ejemplo de uso (Dashboard widgets)
 
 ### Próximos Pasos
 1. **Implementar slots** en módulos existentes uno por uno

@@ -2,6 +2,13 @@
 export * from './saleApi';
 export * from './tableApi';
 
+// Re-export commonly used functions explicitly for better IDE support
+export {
+  fetchTables,
+  seatParty,
+  clearTable
+} from './tableApi';
+
 // Business Logic Services (moved from business-logic/)
 export * from './salesAnalytics';
 export * from './taxCalculationService';

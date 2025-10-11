@@ -15,7 +15,23 @@ function getSupabaseClient() {
   if (!supabaseInstance) {
     supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
       auth: {
+        // Security: Use PKCE flow for better security (vs implicit flow)
+        // PKCE (Proof Key for Code Exchange) protects against authorization code interception
+        flowType: 'pkce',
+
+        // Auto-detect session from URL after OAuth/magic link redirects
+        detectSessionInUrl: true,
+
+        // Persist session across page refreshes
         persistSession: true,
+
+        // Auto-refresh tokens before they expire
+        autoRefreshToken: true,
+
+        // Storage configuration
+        // Note: Using localStorage for development. In production with SSR,
+        // this should be replaced with cookie-based storage via custom adapter.
+        // See: docs/SECURITY_ARCHITECTURE.md for production configuration
         storageKey: 'g-admin-auth-token'
       }
     });

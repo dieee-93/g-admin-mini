@@ -1,11 +1,10 @@
 import React from 'react'
 import { useThemeStore, availableThemes } from '@/store/themeStore'
-import { SelectField } from '@/shared/ui/SelectField'
-import { 
-  Layout, Stack, Typography, CardWrapper, Button, Badge, Alert
+import {
+  Stack, Typography, CardWrapper, Button, Badge, Alert
 } from '@/shared/ui'
-import { 
-  PaintBrushIcon, 
+import {
+  PaintBrushIcon,
   SparklesIcon,
   EyeIcon,
   CheckCircleIcon
@@ -20,17 +19,6 @@ export const DynamicThemeTest = () => {
     'Professional': ['corporate', 'nature', 'sunset', 'ocean', 'corporate-dark', 'nature-dark', 'sunset-dark', 'ocean-dark'],
     'Base': ['light', 'dark', 'system'],
     'Accessibility': ['high-contrast']
-  }
-
-  // Create options for SelectField
-  const themeOptions = availableThemes.map(theme => ({
-    value: theme.id,
-    label: theme.name
-  }))
-
-  const handleThemeChange = (value: string | string[]) => {
-    const selectedTheme = Array.isArray(value) ? value[0] : value
-    applyTheme(selectedTheme)
   }
 
   const getCategoryForTheme = (themeId: string) => {

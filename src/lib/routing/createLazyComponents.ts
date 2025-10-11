@@ -27,7 +27,7 @@ export function createLazyComponent(filePath: string): ComponentType<any> {
   
   const LazyComponent = lazy(() => {
     logger.info('NavigationContext', `🔄 Lazy loading: ${filePath}`);
-    return import(importPath).catch((error) => {
+    return import(importPath).catch((_error) => {
       logger.error('NavigationContext', `❌ Failed to load module: ${filePath}`, error);
       // Fallback to a basic error component
       return import('@/shared/components/ErrorFallback');
@@ -101,7 +101,7 @@ export function preloadComponent(route: string): Promise<void> {
     .then(() => {
       logger.info('NavigationContext', `✅ Preloaded: ${filePath}`);
     })
-    .catch((error) => {
+    .catch((_error) => {
       logger.error('NavigationContext', `❌ Failed to preload: ${filePath}`, error);
     });
 }

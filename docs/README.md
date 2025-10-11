@@ -48,6 +48,7 @@
 - **[🎭 Guía de Theming](05-development/theming-guide.md)** - Temas y estilos
 - **[🧠 Module Planning Guide](05-development/MODULE_PLANNING_MASTER_GUIDE.md)** - Metodología modular
 - **[🧮 Precisión Decimal](05-development/decimal-precision.md)** - Sistema de cálculos exactos
+- **[🔌 Dynamic Component Loading Pattern](05-development/DYNAMIC_COMPONENT_LOADING_PATTERN.md)** - ⭐ **NUEVO** - Patrón de carga dinámica con Vite + React
 
 ### 🎯 **06 - Características y Módulos**
 - **[💰 Módulo de Ventas](06-features/sales-module.md)** - Sistema POS y ventas

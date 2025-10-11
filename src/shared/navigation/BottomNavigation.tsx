@@ -28,9 +28,8 @@ export function BottomNavigation() {
           const isActive = currentModule?.id === module.id;
           
           return (
-            <div style={{ position: 'relative', minWidth: '60px', height: '54px' }}>
+            <div key={module.id} style={{ position: 'relative', minWidth: '60px', height: '54px' }}>
               <Button
-                key={module.id}
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(module.id)}

@@ -146,7 +146,7 @@ describe('EventBus - Latency Performance', () => {
       let handlerCallCount = 0;
 
       // Setup handler with latency measurement
-      const unsubscribe = eventBus.on('test.handler.latency', async (event) => {
+      const unsubscribe = eventBus.on('test.handler.latency', async (_event) => {
         const handlerStart = performance.now();
         
         // Simulate minimal processing
@@ -199,7 +199,7 @@ describe('EventBus - Latency Performance', () => {
       const unsubscribers: (() => void)[] = [];
       
       for (let i = 0; i < subscriberCount; i++) {
-        const unsubscribe = eventBus.on('test.multiple.handler.latency', async (event) => {
+        const unsubscribe = eventBus.on('test.multiple.handler.latency', async (_event) => {
           const handlerStart = performance.now();
           
           totalHandlerCalls++;
@@ -259,7 +259,7 @@ describe('EventBus - Latency Performance', () => {
 
       // Setup handlers with different priorities
       priorities.forEach(priority => {
-        const unsubscribe = eventBus.on('test.priority.latency', async (event) => {
+        const unsubscribe = eventBus.on('test.priority.latency', async (_event) => {
           const handlerStart = performance.now();
           
           // Simulate processing based on priority
@@ -338,7 +338,7 @@ describe('EventBus - Latency Performance', () => {
       const workflowStartTimes = new Map<string, number>();
 
       // Step 1: Order created
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         await eventBus.emit('inventory.stock.check', {
           orderId: event.payload.orderId,
           items: event.payload.items || []
@@ -346,7 +346,7 @@ describe('EventBus - Latency Performance', () => {
       });
 
       // Step 2: Stock checked
-      eventBus.on('inventory.stock.check', async (event) => {
+      eventBus.on('inventory.stock.check', async (_event) => {
         await eventBus.emit('payments.payment.requested', {
           orderId: event.payload.orderId,
           amount: Math.random() * 100 + 20
@@ -354,7 +354,7 @@ describe('EventBus - Latency Performance', () => {
       });
 
       // Step 3: Payment requested
-      eventBus.on('payments.payment.requested', async (event) => {
+      eventBus.on('payments.payment.requested', async (_event) => {
         await eventBus.emit('payments.payment.completed', {
           orderId: event.payload.orderId,
           amount: event.payload.amount
@@ -362,7 +362,7 @@ describe('EventBus - Latency Performance', () => {
       });
 
       // Step 4: Payment completed (end of workflow)
-      eventBus.on('payments.payment.completed', async (event) => {
+      eventBus.on('payments.payment.completed', async (_event) => {
         const orderId = event.payload.orderId;
         const startTime = workflowStartTimes.get(orderId);
         
@@ -418,7 +418,7 @@ describe('EventBus - Latency Performance', () => {
 
           // Start waiting for event
           const waitPromise = eventBus.waitFor('test.wait.response', 1000, 
-            (event) => event.payload.requestId === eventId
+            (_event) => event.payload.requestId === eventId
           );
 
           // Emit the waited-for event after a short delay
@@ -517,7 +517,7 @@ describe('EventBus - Latency Performance', () => {
       const orderStartTimes = new Map<string, number>();
 
       // Order processing chain
-      eventBus.on('sales.order.created', async (event) => {
+      eventBus.on('sales.order.created', async (_event) => {
         // Simulate order validation
         await new Promise(resolve => setTimeout(resolve, 1));
         
@@ -527,7 +527,7 @@ describe('EventBus - Latency Performance', () => {
         });
       });
 
-      eventBus.on('inventory.stock.reserved', async (event) => {
+      eventBus.on('inventory.stock.reserved', async (_event) => {
         // Simulate inventory update
         await new Promise(resolve => setTimeout(resolve, 2));
         
@@ -537,7 +537,7 @@ describe('EventBus - Latency Performance', () => {
         });
       });
 
-      eventBus.on('kitchen.order.queued', async (event) => {
+      eventBus.on('kitchen.order.queued', async (_event) => {
         // Simulate kitchen processing
         await new Promise(resolve => setTimeout(resolve, 5));
         
@@ -593,7 +593,7 @@ describe('EventBus - Latency Performance', () => {
       let processedUpdates = 0;
 
       // Handler that processes inventory updates
-      eventBus.on('inventory.stock.updated', async (event) => {
+      eventBus.on('inventory.stock.updated', async (_event) => {
         processedUpdates++;
         
         // Simulate low stock check

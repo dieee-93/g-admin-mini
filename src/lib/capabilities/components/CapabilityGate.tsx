@@ -1,241 +1,154 @@
 /**
- * UNIFIED CAPABILITY GATE - Sistema simplificado y efectivo
- *
- * REEMPLAZA COMPLETAMENTE:
- * - CapabilityGate.tsx complejo (200+ líneas)
- * - Lógica confusa de moduleId + moduleFeature
- * - Sistema de lazy loading innecesario
- *
- * SIMPLIFICA: Una lógica, casos claros, fácil de entender
+ * CapabilityGate - Feature-based conditional rendering
+ * Compatible with Feature System v4.0
  */
 
 import React from 'react';
-import { useCapabilityStore } from '@/store/capabilityStore';
-import { CapabilityEngine } from '../core/CapabilityEngine';
-import type { CapabilityId } from '../types/UnifiedCapabilities';
-
-import { logger } from '@/lib/logging';
-// ============================================
-// CAPABILITY GATE PROPS
-// ============================================
+import { useCapabilities } from '@/store/capabilityStore';
 
 interface CapabilityGateProps {
   children: React.ReactNode;
+
+  // Single capability/feature requirement
+  capability?: string;
+
+  // Multiple capabilities (OR logic - any one matches)
+  requires?: string[];
+
+  // Multiple capabilities (AND logic - all must match)
+  requiresAll?: string[];
+
+  // Fallback content when requirements not met
   fallback?: React.ReactNode;
 
-  // OPTION 1: Check capability directly
-  capability?: CapabilityId;
-
-  // OPTION 2: Check module visibility
-  moduleId?: string;
-
-  // OPTION 3: Check module feature
-  moduleFeature?: {
-    moduleId: string;
-    feature: string;
-    requiredState?: 'enabled' | 'required';
-  };
-
-  // OPTION 4: Check UI effect
-  uiTarget?: string;
-
-  // Logic mode
-  mode?: 'any' | 'all';
+  // Show reason for hiding (development only)
+  showReason?: boolean;
 }
 
-// ============================================
-// CAPABILITY GATE COMPONENT
-// ============================================
-
+/**
+ * Conditionally render children based on feature availability
+ *
+ * @example
+ * // Single feature check
+ * <CapabilityGate capability="advanced_analytics">
+ *   <AdvancedChart />
+ * </CapabilityGate>
+ *
+ * @example
+ * // Multiple features (OR logic)
+ * <CapabilityGate requires={['inventory_management', 'production_tracking']}>
+ *   <MaterialsModule />
+ * </CapabilityGate>
+ *
+ * @example
+ * // Multiple features (AND logic)
+ * <CapabilityGate requiresAll={['scheduling', 'staff_management']}>
+ *   <SchedulingModule />
+ * </CapabilityGate>
+ */
 export function CapabilityGate({
   children,
-  fallback = null,
   capability,
-  moduleId,
-  moduleFeature,
-  uiTarget,
-  mode = 'any'
+  requires,
+  requiresAll,
+  fallback,
+  showReason = false
 }: CapabilityGateProps) {
-  const configuration = useCapabilityStore(state => state.configuration);
+  const { hasFeature } = useCapabilities();
 
-  // No configuration = no access (setup not completed)
-  if (!configuration) {
-    return <>{fallback}</>;
-  }
-
-  let hasAccess = false;
-
-  // OPTION 1: Capability check
+  // Single capability check
   if (capability) {
-    hasAccess = CapabilityEngine.hasCapability(configuration, capability);
-  }
+    const hasCapability = hasFeature(capability);
 
-  // OPTION 2: Module visibility check
-  else if (moduleId && !moduleFeature) {
-    hasAccess = CapabilityEngine.isModuleVisible(configuration, moduleId);
-  }
-
-  // OPTION 3: Module feature check
-  else if (moduleFeature) {
-    const moduleVisible = CapabilityEngine.isModuleVisible(configuration, moduleFeature.moduleId);
-    if (!moduleVisible) {
-      hasAccess = false;
-    } else {
-      const features = CapabilityEngine.getModuleFeatures(configuration, moduleFeature.moduleId);
-      const featureState = features[moduleFeature.feature];
-
-      if (moduleFeature.requiredState) {
-        hasAccess = featureState === moduleFeature.requiredState;
-      } else {
-        hasAccess = featureState === 'enabled' || featureState === 'required';
+    if (!hasCapability) {
+      if (showReason && process.env.NODE_ENV === 'development') {
+        return (
+          <div style={{
+            padding: '1rem',
+            background: '#fef3cd',
+            border: '1px solid #ffc107',
+            borderRadius: '4px',
+            fontSize: '0.875rem'
+          }}>
+            ⚠️ Missing capability: <code>{capability}</code>
+          </div>
+        );
       }
+      return <>{fallback}</> || null;
     }
+
+    return <>{children}</>;
   }
 
-  // OPTION 4: UI target check
-  else if (uiTarget) {
-    hasAccess = CapabilityEngine.isUIFeatureActive(configuration, uiTarget);
+  // OR logic - any one feature matches
+  if (requires && requires.length > 0) {
+    const hasAnyFeature = requires.some(feat => hasFeature(feat));
+
+    if (!hasAnyFeature) {
+      if (showReason && process.env.NODE_ENV === 'development') {
+        return (
+          <div style={{
+            padding: '1rem',
+            background: '#fef3cd',
+            border: '1px solid #ffc107',
+            borderRadius: '4px',
+            fontSize: '0.875rem'
+          }}>
+            ⚠️ Requires one of: <code>{requires.join(', ')}</code>
+          </div>
+        );
+      }
+      return <>{fallback}</> || null;
+    }
+
+    return <>{children}</>;
   }
 
-  // Default: deny access if no valid option provided
-  else {
-    logger.warn('App', 'CapabilityGate: No valid check option provided');
-    hasAccess = false;
+  // AND logic - all features must be present
+  if (requiresAll && requiresAll.length > 0) {
+    const hasAllFeatures = requiresAll.every(feat => hasFeature(feat));
+
+    if (!hasAllFeatures) {
+      const missingFeatures = requiresAll.filter(feat => !hasFeature(feat));
+
+      if (showReason && process.env.NODE_ENV === 'development') {
+        return (
+          <div style={{
+            padding: '1rem',
+            background: '#fef3cd',
+            border: '1px solid #ffc107',
+            borderRadius: '4px',
+            fontSize: '0.875rem'
+          }}>
+            ⚠️ Missing features: <code>{missingFeatures.join(', ')}</code>
+          </div>
+        );
+      }
+      return <>{fallback}</> || null;
+    }
+
+    return <>{children}</>;
   }
 
-  return hasAccess ? <>{children}</> : <>{fallback}</>;
-}
-
-// ============================================
-// CONVENIENCE COMPONENTS
-// ============================================
-
-/**
- * Gate específico para capabilities
- */
-export function CapabilityCheck({
-  capability,
-  children,
-  fallback
-}: {
-  capability: CapabilityId;
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}) {
-  return (
-    <CapabilityGate capability={capability} fallback={fallback}>
-      {children}
-    </CapabilityGate>
-  );
+  // No requirements specified - render children
+  return <>{children}</>;
 }
 
 /**
- * Gate específico para módulos
+ * Hook for imperative capability checks in logic
+ *
+ * @example
+ * const { can } = useCapabilityCheck();
+ *
+ * if (can('advanced_analytics')) {
+ *   // Show advanced features
+ * }
  */
-export function ModuleGate({
-  moduleId,
-  children,
-  fallback
-}: {
-  moduleId: string;
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}) {
-  return (
-    <CapabilityGate moduleId={moduleId} fallback={fallback}>
-      {children}
-    </CapabilityGate>
-  );
-}
+export function useCapabilityCheck() {
+  const { hasFeature } = useCapabilities();
 
-/**
- * Gate específico para features de módulo
- */
-export function FeatureGate({
-  moduleId,
-  feature,
-  requiredState,
-  children,
-  fallback
-}: {
-  moduleId: string;
-  feature: string;
-  requiredState?: 'enabled' | 'required';
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}) {
-  return (
-    <CapabilityGate
-      moduleFeature={{ moduleId, feature, requiredState }}
-      fallback={fallback}
-    >
-      {children}
-    </CapabilityGate>
-  );
-}
-
-/**
- * Gate específico para UI targets
- */
-export function UIGate({
-  target,
-  children,
-  fallback
-}: {
-  target: string;
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}) {
-  return (
-    <CapabilityGate uiTarget={target} fallback={fallback}>
-      {children}
-    </CapabilityGate>
-  );
-}
-
-// ============================================
-// HOC PATTERN (Advanced)
-// ============================================
-
-/**
- * HOC para proteger componentes completos
- */
-export function withCapabilityGate<P extends object>(
-  Component: React.ComponentType<P>,
-  gateProps: Omit<CapabilityGateProps, 'children' | 'fallback'>,
-  fallback?: React.ReactNode
-) {
-  return function CapabilityProtectedComponent(props: P) {
-    return (
-      <CapabilityGate {...gateProps} fallback={fallback}>
-        <Component {...props} />
-      </CapabilityGate>
-    );
+  return {
+    can: (capability: string) => hasFeature(capability),
+    hasFeature
   };
-}
-
-// ============================================
-// DEBUGGING HELPERS
-// ============================================
-
-/**
- * Component para debugging - shows gate status
- */
-export function DebugCapabilityGate(props: CapabilityGateProps & { label?: string }) {
-  const configuration = useCapabilityStore(state => state.configuration);
-
-  if (process.env.NODE_ENV !== 'development') {
-    return <CapabilityGate {...props} />;
-  }
-
-  const { label = 'Debug Gate', ...gateProps } = props;
-
-  return (
-    <div style={{ border: '1px dashed #ccc', padding: '8px', margin: '4px' }}>
-      <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>
-        🔍 {label} - Config: {configuration ? '✅' : '❌'}
-      </div>
-      <CapabilityGate {...gateProps} />
-    </div>
-  );
 }

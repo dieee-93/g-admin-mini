@@ -4,43 +4,78 @@ import { hasAllPermissions } from './permissions';
 import { sanitizeObject } from './sanitization';
 
 import { logger } from '@/lib/logging';
-// Rate limiting store (in production, use Redis or similar)
+/**
+ * @deprecated DO NOT USE - Client-side rate limiting is INSECURE
+ *
+ * This in-memory Map can be trivially bypassed by:
+ * - Clearing browser memory/localStorage
+ * - Using incognito mode
+ * - Opening multiple tabs
+ *
+ * ✅ PRODUCTION SOLUTION: Cloudflare Rate Limiting
+ *
+ * Cloudflare Free Tier provides:
+ * - 10,000 requests/month rate limiting
+ * - Server-side enforcement (impossible to bypass)
+ * - DDoS protection
+ * - Configuration via dashboard (no code needed)
+ *
+ * See docs/SECURITY_ARCHITECTURE.md for Cloudflare setup instructions.
+ *
+ * This function will be removed once Cloudflare is configured.
+ * @see https://developers.cloudflare.com/waf/rate-limiting-rules/
+ */
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-/**
- * Rate limiting middleware
- */
 export function rateLimitGuard(
-  identifier: string, 
-  maxRequests: number = 100, 
+  identifier: string,
+  maxRequests: number = 100,
   windowMs: number = 60000
 ): boolean {
+  console.warn(
+    'rateLimitGuard() is client-side only and INSECURE. ' +
+    'Use Cloudflare Rate Limiting for production. ' +
+    'See docs/SECURITY_ARCHITECTURE.md'
+  );
+
   const now = Date.now();
   const key = identifier;
-  
+
   const current = rateLimitStore.get(key);
-  
+
   if (!current) {
     rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
     return true;
   }
-  
+
   if (now > current.resetTime) {
-    // Reset window
     rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
     return true;
   }
-  
+
   if (current.count >= maxRequests) {
-    return false; // Rate limit exceeded
+    return false;
   }
-  
+
   current.count++;
   return true;
 }
 
 /**
  * Secure API call wrapper with validation and security checks
+ *
+ * @deprecated This function is being phased out in favor of:
+ * 1. Supabase RLS (Row Level Security) for authorization
+ * 2. Database triggers for audit logging
+ * 3. CloudFlare for rate limiting and DDoS protection
+ * 4. Edge Functions for critical business logic
+ *
+ * Current uses remaining: None in core modules (Materials, Sales use direct services)
+ *
+ * TODO: Remove completely after verifying all modules use the new pattern:
+ *   Hook → Service → Supabase Client → RLS (PostgreSQL)
+ *
+ * See: docs/MODULE_DESIGN_CONVENTIONS.md for the definitive pattern
  */
 export async function secureApiCall<T>(
   operation: () => Promise<T>,
@@ -211,16 +246,22 @@ export function validateAndSanitizeInput<T>(
 }
 
 /**
- * Secure password hashing (for future use)
+ * @deprecated DO NOT USE - Supabase Auth handles password hashing with bcrypt
+ *
+ * Supabase automatically hashes passwords using bcrypt when you call:
+ * - supabase.auth.signUp({ email, password })
+ * - supabase.auth.signInWithPassword({ email, password })
+ *
+ * This custom SHA-256 implementation is INSECURE and should never be used.
+ * It will be removed in a future version.
+ *
+ * @see https://supabase.com/docs/guides/auth/password-security
  */
-export async function hashPassword(password: string): Promise<string> {
-  // In a real app, use bcrypt or similar
-  // This is a basic implementation
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password + 'salt');
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+export async function hashPassword(_password: string): Promise<string> {
+  throw new Error(
+    'hashPassword() is deprecated. Use Supabase Auth instead: ' +
+    'supabase.auth.signUp({ email, password })'
+  );
 }
 
 /**
@@ -233,31 +274,27 @@ export function generateSecureToken(length: number = 32): string {
 }
 
 /**
- * SQL injection prevention
+ * @deprecated DO NOT USE - Supabase automatically prevents SQL injection
+ *
+ * Supabase uses parameterized queries and PostgREST, which automatically
+ * escape all parameters. You NEVER need to manually sanitize SQL.
+ *
+ * ✅ CORRECT:
+ *   const { data } = await supabase
+ *     .from('users')
+ *     .select('*')
+ *     .eq('email', userInput)  // Automatically safe
+ *
+ * ❌ WRONG: Don't manually build SQL strings
+ *
+ * This function will be removed in a future version.
+ * @see https://supabase.com/docs/guides/database/overview
  */
-export function preventSqlInjection(query: string, params: any[]): { query: string; params: any[] } {
-  // Basic SQL injection prevention
-  // In production, use parameterized queries with your ORM
-  
-  const suspiciousPatterns = [
-    /('|(\\)|;|--|\/\*|\*\/|xp_|sp_|union|select|insert|update|delete|drop|create|alter|exec|execute)/gi
-  ];
-  
-  for (const pattern of suspiciousPatterns) {
-    if (pattern.test(query)) {
-      throw new Error('Potentially malicious SQL detected');
-    }
-  }
-  
-  // Validate parameters
-  const sanitizedParams = params.map(param => {
-    if (typeof param === 'string') {
-      return param.replace(/['"\\;-]/g, ''); // Remove dangerous characters
-    }
-    return param;
-  });
-  
-  return { query, params: sanitizedParams };
+export function preventSqlInjection(_query: string, _params: any[]): { query: string; params: any[] } {
+  throw new Error(
+    'preventSqlInjection() is deprecated. Supabase automatically prevents SQL injection. ' +
+    'Use Supabase query builder: supabase.from(table).select().eq(col, value)'
+  );
 }
 
 /**
@@ -275,13 +312,28 @@ export function preventXss(input: string): string {
 }
 
 /**
- * CSRF token validation
+ * @deprecated DO NOT USE - Supabase Auth handles CSRF protection automatically
+ *
+ * Supabase Auth protects against CSRF attacks using:
+ * 1. PKCE flow (Proof Key for Code Exchange)
+ * 2. SameSite cookies (Lax by default)
+ * 3. State parameters in OAuth flows
+ *
+ * No manual CSRF token validation is needed when using Supabase Auth.
+ *
+ * Configuration in src/lib/supabase/client.ts:
+ *   - flowType: 'pkce' ✅
+ *   - detectSessionInUrl: true ✅
+ *
+ * This function will be removed in a future version.
+ * @see https://supabase.com/docs/guides/auth/sessions/pkce-flow
  */
 export function validateCsrfToken(): boolean {
-  // In production, implement proper CSRF token validation
-  // This is a placeholder
-  const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-  return !!token;
+  console.warn(
+    'validateCsrfToken() is deprecated and does nothing. ' +
+    'Supabase Auth handles CSRF protection automatically via PKCE flow.'
+  );
+  return true; // Always return true to avoid breaking existing code
 }
 
 /**

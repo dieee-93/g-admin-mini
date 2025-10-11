@@ -13,7 +13,7 @@ import {
   DocumentCheckIcon,
   CogIcon
 } from "@heroicons/react/24/outline";
-import { Icon, Typography, CardWrapper, Section, Stack, SimpleGrid, Button, Badge, MetricCard, ActionButton, Alert } from "@/shared/ui";
+import { Icon, Typography, CardWrapper, Section, Stack, SimpleGrid, Button, Badge, MetricCard, Alert } from "@/shared/ui";
 
 export function TaxConfigurationSection() {
   const taxSettings = {
@@ -199,14 +199,14 @@ export function TaxConfigurationSection() {
               
               {/* Quick Actions */}
               <Stack direction="row" gap="sm" mt="sm">
-                <ActionButton size="sm" colorPalette="blue" variant="outline">
+                <Button size="sm" colorPalette="blue" variant="outline">
                   <Icon icon={CalculatorIcon} size="xs" />
                   Agregar Categoría
-                </ActionButton>
-                <ActionButton size="sm" colorPalette="gray" variant="ghost">
+                </Button>
+                <Button size="sm" colorPalette="gray" variant="ghost">
                   <Icon icon={DocumentTextIcon} size="xs" />
                   Ver Productos
-                </ActionButton>
+                </Button>
               </Stack>
             </Stack>
           </CardWrapper.Body>
@@ -290,18 +290,18 @@ export function TaxConfigurationSection() {
             
             {/* Quick Actions for Compliance */}
             <Stack direction="row" gap="sm">
-              <ActionButton size="sm" colorPalette="orange">
+              <Button size="sm" colorPalette="orange">
                 <Icon icon={DocumentTextIcon} size="xs" />
                 Enviar Reportes Pendientes
-              </ActionButton>
-              <ActionButton size="sm" colorPalette="green" variant="outline">
+              </Button>
+              <Button size="sm" colorPalette="green" variant="outline">
                 <Icon icon={CheckCircleIcon} size="xs" />
                 Verificar Configuración
-              </ActionButton>
-              <ActionButton size="sm" colorPalette="gray" variant="ghost">
+              </Button>
+              <Button size="sm" colorPalette="gray" variant="ghost">
                 <Icon icon={ShieldCheckIcon} size="xs" />
                 Historial de Cumplimiento
-              </ActionButton>
+              </Button>
             </Stack>
           </Stack>
         </CardWrapper.Body>

@@ -434,6 +434,29 @@ export const useStaffStore = create<StaffState>()(
           });
         },
 
+        loadSchedules: async (startDate, endDate) => {
+          try {
+            set((state) => {
+              state.loading = true;
+              state.error = null;
+            });
+
+            const schedules = await staffApi.getShiftSchedules(startDate, endDate);
+            const formattedSchedules = schedules.map(scheduleToStoreFormat);
+
+            set((state) => {
+              state.schedules = formattedSchedules;
+              state.loading = false;
+            });
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to load schedules';
+            set((state) => {
+              state.loading = false;
+              state.error = errorMessage;
+            });
+          }
+        },
+
         addSchedule: (scheduleData) => {
           set((state) => {
             const newSchedule: ShiftSchedule = {
@@ -467,6 +490,29 @@ export const useStaffStore = create<StaffState>()(
           set((state) => {
             state.timeEntries = entries;
           });
+        },
+
+        loadTimeEntries: async (startDate, endDate) => {
+          try {
+            set((state) => {
+              state.loading = true;
+              state.error = null;
+            });
+
+            const timeEntries = await staffApi.getTimeEntries(startDate, endDate);
+            const formattedEntries = timeEntries.map(timeEntryToStoreFormat);
+
+            set((state) => {
+              state.timeEntries = formattedEntries;
+              state.loading = false;
+            });
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to load time entries';
+            set((state) => {
+              state.loading = false;
+              state.error = errorMessage;
+            });
+          }
         },
 
         clockIn: (staffId) => {
@@ -545,7 +591,7 @@ export const useStaffStore = create<StaffState>()(
           });
         },
 
-        setError: (error) => {
+        setError: (_error) => {
           set((state) => {
             state.error = error;
           });
@@ -820,13 +866,15 @@ export const useStaffStore = create<StaffState>()(
       })),
       {
         name: 'g-mini-staff-storage',
+        // Security: Only persist UI state, NOT staff PII (emails, phones, salaries)
+        // Staff data is loaded from Supabase on each session
         partialize: (state) => ({
-          staff: state.staff,
-          schedules: state.schedules,
-          timeEntries: state.timeEntries,
-          filters: state.filters,
-          calendarDate: state.calendarDate.toISOString(),
-          calendarView: state.calendarView
+          // ❌ staff: state.staff, // Contains PII (emails, phones, SALARIES) - do not persist
+          // ❌ schedules: state.schedules, // May contain sensitive scheduling info
+          // ❌ timeEntries: state.timeEntries, // Contains work hours and attendance
+          filters: state.filters, // ✅ Safe - only UI preferences
+          calendarDate: state.calendarDate.toISOString(), // ✅ Safe - only UI state
+          calendarView: state.calendarView // ✅ Safe - only UI state
         })
       }
     ),

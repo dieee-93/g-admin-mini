@@ -73,7 +73,7 @@ const DEFAULT_CONFIG: LogConfig = {
   includeStackTrace: false,
 };
 
-let config: LogConfig = { ...DEFAULT_CONFIG };
+const config: LogConfig = { ...DEFAULT_CONFIG };
 
 // ============================================
 // EMOJI MAPPING

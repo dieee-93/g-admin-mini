@@ -45,7 +45,224 @@ import { HomeIcon, UserIcon } from '@heroicons/react/24/outline';
 // NUNCA USAR - Genera inconsistencias
 import { Box, VStack, HStack, Text, SimpleGrid } from '@chakra-ui/react';
 import { Icon as ChakraIcon } from '@chakra-ui/react';
+import { secureApiCall } from '@/lib/validation/security'; // DEPRECATED - usar servicios directos
 ```
+
+---
+
+## 🔒 **SEGURIDAD Y SERVICIOS API**
+
+### **PATRÓN DEFINITIVO DE ARQUITECTURA**
+
+```
+┌─────────────────────────────────────────────────┐
+│ Frontend (React Hook)                           │
+│  - UI/UX logic                                   │
+│  - Optimistic updates                           │
+│  - Client-side validation (UX only, not security)│
+└──────────────┬──────────────────────────────────┘
+               │
+┌──────────────▼──────────────────────────────────┐
+│ Service Layer (API Services)                    │
+│  - Business logic                               │
+│  - Data transformation                          │
+│  - Error handling                               │
+└──────────────┬──────────────────────────────────┘
+               │
+┌──────────────▼──────────────────────────────────┐
+│ Supabase Client (@supabase/ssr)                 │
+│  - Auth (JWT)                                    │
+│  - Realtime subscriptions                       │
+└──────────────┬──────────────────────────────────┘
+               │
+┌──────────────▼──────────────────────────────────┐
+│ PostgreSQL + RLS (Row Level Security)           │
+│  ✅ Authorization (roles: CLIENTE → SUPER_ADMIN) │
+│  ✅ Data access control                          │
+│  ✅ Audit via triggers                           │
+│  ✅ Cannot be bypassed from frontend             │
+└─────────────────────────────────────────────────┘
+```
+
+### **✅ CORRECTO - Servicios Directos + RLS**
+
+```typescript
+// 📁 src/pages/admin/[domain]/[module]/hooks/useModulePage.ts
+import {
+  fetchItems,
+  fetchItemById,
+  createItem,
+  updateItem,
+  deleteItem
+} from '../services';
+
+const loadData = useCallback(async () => {
+  try {
+    setLoading(true);
+
+    // ✅ CORRECTO: Servicio directo → Supabase → RLS valida permisos
+    const [items, customers] = await Promise.all([
+      fetchItems({ status: 'active' }),
+      fetchCustomers()
+    ]);
+
+    setItems(items);
+    setCustomers(customers);
+  } catch (err) {
+    handleError(err, 'Data Loading');
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
+// ✅ CORRECTO: Para operaciones críticas
+const processPayment = useCallback(async (paymentData) => {
+  try {
+    // Servicio encapsula lógica de negocio
+    const result = await processSale(paymentData);
+
+    if (result.success) {
+      notify.success('Pago procesado correctamente');
+      await refreshData();
+    }
+  } catch (err) {
+    handleError(err, 'Payment Processing');
+  }
+}, [refreshData]);
+```
+
+### **❌ INCORRECTO - secureApiCall (Deprecated)**
+
+```typescript
+// ❌ NO USAR - secureApiCall está deprecated
+const loadData = useCallback(async () => {
+  try {
+    // ❌ PROBLEMA: secureApiCall NO protege contra ataques reales
+    //    - Rate limiting en frontend (bypasseable)
+    //    - Audit log en localStorage (inseguro)
+    //    - Duplica lógica que RLS ya maneja
+    const items = await secureApiCall('/api/items', {
+      method: 'GET'
+    });
+  } catch (err) {
+    handleError(err);
+  }
+}, []);
+```
+
+### **🛡️ CAPAS DE SEGURIDAD REALES**
+
+**1. CloudFlare (Edge/DNS Level)**
+- ✅ Rate limiting global
+- ✅ DDoS protection
+- ✅ WAF (Web Application Firewall)
+- ✅ **No puede ser bypasseado**
+
+**2. Supabase RLS (Database Level)**
+- ✅ Authorization con roles jerárquicos
+- ✅ Políticas granulares por tabla
+- ✅ Validación en cada query
+- ✅ **No puede ser bypasseado desde frontend**
+
+**3. Database Triggers (Audit Trail)**
+- ✅ Logging automático e inmutable
+- ✅ Centralizado y seguro
+- ✅ Escalable
+- ✅ **No depende del frontend**
+
+**4. Edge Functions (Business Logic Crítica - Futuro)**
+- ✅ Cálculos autoritativos en backend
+- ✅ Procesamiento de pagos seguro
+- ✅ Integraciones con APIs externas
+- ⏳ **Implementar según docs/EDGE_FUNCTIONS_TODO.md**
+
+### **📝 ESTRUCTURA DE SERVICIOS**
+
+```typescript
+// 📁 src/pages/admin/[domain]/[module]/services/moduleApi.ts
+import { supabase } from '@/lib/supabase/client';
+import { errorHandler } from '@/lib/error-handling';
+import { logger } from '@/lib/logging';
+
+/**
+ * Fetch module items with filters
+ * Security: RLS validates user permissions automatically
+ */
+export async function fetchItems(filters?: ItemFilters): Promise<Item[]> {
+  try {
+    let query = supabase
+      .from('items')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (filters?.status) {
+      query = query.eq('status', filters.status);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      errorHandler.handle(error, { operation: 'fetchItems', filters });
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
+    logger.error('ModuleApi', 'fetchItems failed', error);
+    throw error;
+  }
+}
+
+/**
+ * Create new item
+ * Security: RLS checks INSERT permissions based on user role
+ */
+export async function createItem(itemData: CreateItemData): Promise<Item> {
+  try {
+    const { data, error } = await supabase
+      .from('items')
+      .insert(itemData)
+      .select()
+      .single();
+
+    if (error) {
+      errorHandler.handle(error, { operation: 'createItem', itemData });
+      throw error;
+    }
+
+    // Database trigger handles audit logging automatically
+    logger.info('ModuleApi', 'Item created successfully', { id: data.id });
+
+    return data;
+  } catch (error) {
+    logger.error('ModuleApi', 'createItem failed', error);
+    throw error;
+  }
+}
+```
+
+### **🔍 DEBUGGING Y LOGGING**
+
+```typescript
+// ✅ CORRECTO: Usar logger para operaciones importantes
+import { logger } from '@/lib/logging';
+
+logger.info('SalesStore', 'Payment processed', { amount, orderId });
+logger.warn('SalesStore', 'Low stock detected', { productId, stock });
+logger.error('SalesStore', 'Payment failed', error);
+
+// ❌ INCORRECTO: console.log en producción
+console.log('Payment processed'); // Se pierde, no se centraliza
+```
+
+### **📚 REFERENCIAS**
+
+- **RLS Policies**: `rls_policies_complete.sql`
+- **Edge Functions Plan**: `docs/EDGE_FUNCTIONS_TODO.md`
+- **Service Examples**:
+  - `src/pages/admin/supply-chain/materials/services/inventoryApi.ts`
+  - `src/pages/admin/operations/sales/services/saleApi.ts`
+- **Deprecated Security**: `src/lib/validation/security.ts` (marked @deprecated)
 
 ### **🏗️ ESTRUCTURA DE PÁGINA - PLANTILLAS ESPECÍFICAS**
 

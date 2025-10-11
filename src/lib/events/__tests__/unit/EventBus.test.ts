@@ -130,7 +130,7 @@ describe('EventBus Core Functionality', () => {
       const pattern: EventPattern = 'test.subscription.basic';
       let receivedEvent: NamespacedEvent | null = null;
 
-      const unsubscribe = eventBus.on(pattern, async (event) => {
+      const unsubscribe = eventBus.on(pattern, async (_event) => {
         receivedEvent = event;
       });
 
@@ -152,15 +152,15 @@ describe('EventBus Core Functionality', () => {
       const receivedEvents: NamespacedEvent[] = [];
 
       // Subscribe 3 handlers
-      const unsubscribe1 = eventBus.on(pattern, async (event) => {
+      const unsubscribe1 = eventBus.on(pattern, async (_event) => {
         receivedEvents.push({ ...event, source: 'handler1' });
       });
 
-      const unsubscribe2 = eventBus.on(pattern, async (event) => {
+      const unsubscribe2 = eventBus.on(pattern, async (_event) => {
         receivedEvents.push({ ...event, source: 'handler2' });
       });
 
-      const unsubscribe3 = eventBus.on(pattern, async (event) => {
+      const unsubscribe3 = eventBus.on(pattern, async (_event) => {
         receivedEvents.push({ ...event, source: 'handler3' });
       });
 
@@ -225,7 +225,7 @@ describe('EventBus Core Functionality', () => {
 
       const unsubscribe = eventBus.on(
         pattern,
-        async (event) => {
+        async (_event) => {
           receivedEvent = event;
         },
         {
@@ -247,7 +247,7 @@ describe('EventBus Core Functionality', () => {
     it('should support wildcard patterns', async () => {
       const receivedEvents: NamespacedEvent[] = [];
 
-      const unsubscribe = eventBus.on('test.wildcard.*', async (event) => {
+      const unsubscribe = eventBus.on('test.wildcard.*', async (_event) => {
         receivedEvents.push(event);
       });
 
@@ -270,11 +270,11 @@ describe('EventBus Core Functionality', () => {
 
       const unsubscribe = eventBus.on(
         pattern,
-        async (event) => {
+        async (_event) => {
           filteredEvents.push(event);
         },
         {
-          filter: (event) => event.payload.priority === 'high'
+          filter: (_event) => event.payload.priority === 'high'
         }
       );
 
@@ -327,7 +327,7 @@ describe('EventBus Core Functionality', () => {
       const waitPromise = eventBus.waitFor(
         pattern,
         1000,
-        (event) => event.payload.status === 'completed'
+        (_event) => event.payload.status === 'completed'
       );
 
       // Emit events - first should be filtered out
@@ -360,7 +360,7 @@ describe('EventBus Core Functionality', () => {
       });
 
       // Listen for error events
-      const unsubscribeError = eventBus.on('global.eventbus.handler-error', async (event) => {
+      const unsubscribeError = eventBus.on('global.eventbus.handler-error', async (_event) => {
         errorCaught = true;
         expect(event.payload.pattern).toBe(pattern);
       });

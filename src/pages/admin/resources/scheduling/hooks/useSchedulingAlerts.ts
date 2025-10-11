@@ -14,7 +14,7 @@ import type { SchedulingData } from '../services/SchedulingIntelligenceEngine';
 import type { Alert } from '@/shared/types/alerts';
 
 // ✅ ARCHITECTURAL SYSTEMS
-import { useModuleIntegration } from '@/hooks/useModuleIntegration';
+import EventBus from '@/lib/events';
 import { useErrorHandler } from '@/lib/error-handling';
 
 // ✅ SCHEDULING CONTEXT
@@ -89,7 +89,6 @@ export function useSchedulingAlerts(
   // Debug logs removed to prevent console spam
 
   // ✅ ARCHITECTURAL INTEGRATION
-  const { emitEvent } = useModuleIntegration('scheduling', SCHEDULING_ALERTS_CONFIG);
   const { handleError } = useErrorHandler();
   const schedulingStore = useSchedulingStore();
 
@@ -102,8 +101,8 @@ export function useSchedulingAlerts(
 
   // 🧠 ADAPTER INTELIGENTE
   const alertsAdapter = useMemo(
-    () => createSchedulingAlertsAdapter(emitEvent),
-    [emitEvent]
+    () => createSchedulingAlertsAdapter(),
+    []
   );
 
   /**
@@ -198,7 +197,7 @@ export function useSchedulingAlerts(
         }
 
         // 📡 EMIT SUCCESS EVENT
-        emitEvent('scheduling.alert_action_success', {
+        EventBus.emit('scheduling.alert_action_success', {
           alertId,
           actionId,
           message: result.message
@@ -218,7 +217,7 @@ export function useSchedulingAlerts(
   const dismissAlert = useCallback((alertId: string) => {
     setAlerts(prev => prev.filter(alert => alert.id !== alertId));
 
-    emitEvent('scheduling.alert_dismissed', {
+    EventBus.emit('scheduling.alert_dismissed', {
       alertId,
       context: options.context,
       timestamp: new Date()
@@ -238,7 +237,7 @@ export function useSchedulingAlerts(
   const togglePredictive = useCallback(() => {
     setEnablePredictive(prev => {
       const newValue = !prev;
-      emitEvent('scheduling.predictive_analysis_toggled', {
+      EventBus.emit('scheduling.predictive_analysis_toggled', {
         enabled: newValue,
         context: options.context
       });
@@ -274,7 +273,7 @@ export function useSchedulingAlerts(
     if (alerts.length > 0) {
       const timeoutId = setTimeout(() => {
         // Debounced emission to prevent rapid consecutive events
-        emitEvent('scheduling.alerts_generated', {
+        EventBus.emit('scheduling.alerts_generated', {
           context: options.context,
           alertsCount: alerts.length,
           criticalCount: alerts.filter(a => a.type === 'critical').length,
@@ -286,7 +285,7 @@ export function useSchedulingAlerts(
         // 🚨 CRITICAL ALERTS - Separate emission for urgent cases
         const criticalAlerts = alerts.filter(a => a.type === 'critical');
         if (criticalAlerts.length > 0) {
-          emitEvent('scheduling.critical_alerts_detected', {
+          EventBus.emit('scheduling.critical_alerts_detected', {
             count: criticalAlerts.length,
             alerts: criticalAlerts.map(a => ({
               id: a.id,

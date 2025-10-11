@@ -1,4 +1,4 @@
-# Módulo de Dashboard - G-Admin Mini
+te# Módulo de Dashboard - G-Admin Mini
 
 ## 📋 Descripción del Módulo
 

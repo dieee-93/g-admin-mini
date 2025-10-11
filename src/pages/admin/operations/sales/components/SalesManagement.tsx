@@ -11,6 +11,17 @@ import {
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
 
+// 🔍 DEBUG: Check imports
+logger.debug('SalesStore', '🔍 SalesManagement Imports:', {
+  Tabs: typeof Tabs,
+  Stack: typeof Stack,
+  Button: typeof Button,
+  Alert: typeof Alert,
+  Icon: typeof Icon,
+  Typography: typeof Typography,
+  Badge: typeof Badge
+});
+
 interface SalesManagementProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -28,24 +39,26 @@ export function SalesManagement({
   onNewSale,
   performanceMode = false
 }: SalesManagementProps) {
+  logger.debug('SalesStore', '🔍 SalesManagement Rendering - Tabs API fixed to use .Tab and .Panel');
+
   return (
     <Tabs value={activeTab} onValueChange={onTabChange}>
       <Tabs.List>
-        <Tabs.Trigger value="pos">
+        <Tabs.Tab value="pos">
           <Icon icon={CreditCardIcon} size="sm" />
           POS
-        </Tabs.Trigger>
-        <Tabs.Trigger value="analytics">
+        </Tabs.Tab>
+        <Tabs.Tab value="analytics">
           <Icon icon={ChartBarIcon} size="sm" />
           Analytics
-        </Tabs.Trigger>
-        <Tabs.Trigger value="reports">
+        </Tabs.Tab>
+        <Tabs.Tab value="reports">
           <Icon icon={DocumentTextIcon} size="sm" />
           Reportes
-        </Tabs.Trigger>
+        </Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Content value="pos">
+      <Tabs.Panel value="pos">
         <Stack gap="lg">
           {/* Sistema POS Principal */}
           <Stack direction="row" gap="sm" align="center" mb="md">
@@ -98,9 +111,9 @@ export function SalesManagement({
             description="El sistema POS está funcionando correctamente. Todas las integraciones activas."
           />
         </Stack>
-      </Tabs.Content>
+      </Tabs.Panel>
 
-      <Tabs.Content value="analytics">
+      <Tabs.Panel value="analytics">
         <Stack gap="lg">
           <Typography variant="heading" size="lg" mb="md">
             Analytics de Ventas
@@ -139,9 +152,9 @@ export function SalesManagement({
             description="Revenue patterns, conversion rates, customer behavior y correlaciones cross-módulo."
           />
         </Stack>
-      </Tabs.Content>
+      </Tabs.Panel>
 
-      <Tabs.Content value="reports">
+      <Tabs.Panel value="reports">
         <Stack gap="lg">
           <Typography variant="heading" size="lg" mb="md">
             Reportes y Documentación
@@ -186,6 +199,7 @@ export function SalesManagement({
             description="Los reportes se generan automáticamente y están disponibles para descarga."
           />
         </Stack>
-      </Tabs.Content>
-    </Tabs>);
+      </Tabs.Panel>
+    </Tabs>
+  );
 }

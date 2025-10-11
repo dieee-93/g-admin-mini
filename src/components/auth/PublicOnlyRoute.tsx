@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSmartRedirect } from '@/hooks/useSmartRedirect';
 
@@ -14,7 +14,6 @@ interface PublicOnlyRouteProps {
 export function PublicOnlyRoute({ children }: PublicOnlyRouteProps) {
   const { isAuthenticated, user, loading } = useAuth();
   const { getDefaultRouteForRole } = useSmartRedirect();
-  const location = useLocation();
 
   // Show loading while checking auth state
   if (loading) {

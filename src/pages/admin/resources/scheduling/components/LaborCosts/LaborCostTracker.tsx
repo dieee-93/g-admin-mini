@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import {
   Stack, Button, Badge, SimpleGrid, Typography, Section,
-  Icon, MetricCard, CardGrid, CardWrapper,VStack, HStack
+  Icon, MetricCard, CardGrid, CardWrapper, VStack, HStack, Box,
 } from '@/shared/ui';
-import { Progress, Table } from '@chakra-ui/react';
+import { Progress, Table, Select, createListCollection } from '@chakra-ui/react';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import * as TableOperations from '@/business-logic/operations/tableOperations';
@@ -58,6 +58,24 @@ interface LaborMetrics {
 
 type CostPeriod = 'week' | 'month' | 'quarter';
 type CostView = 'summary' | 'breakdown' | 'trends' | 'budget';
+
+// Collections for Select components (Chakra UI v3 pattern)
+const periodCollection = createListCollection({
+  items: [
+    { label: 'Week', value: 'week' },
+    { label: 'Month', value: 'month' },
+    { label: 'Quarter', value: 'quarter' },
+  ],
+});
+
+const viewCollection = createListCollection({
+  items: [
+    { label: 'Summary', value: 'summary' },
+    { label: 'Breakdown', value: 'breakdown' },
+    { label: 'Trends', value: 'trends' },
+    { label: 'Budget', value: 'budget' },
+  ],
+});
 
 export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTrackerProps) {
   const [loading, setLoading] = useState(true);
@@ -315,42 +333,52 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
             <HStack gap="4">
               <Box>
                 <Typography fontSize="sm" mb="1" fontWeight="medium">Period</Typography>
-                <Select.Root 
-                  value={viewState.period}
-                  onValueChange={(e) => setViewState(prev => ({...prev, period: e.value as CostPeriod}))}
+                <Select.Root
+                  collection={periodCollection}
+                  value={[viewState.period]}
+                  onValueChange={(details) => setViewState(prev => ({...prev, period: details.value[0] as CostPeriod}))}
+                  width="120px"
                 >
-                  <Select.Trigger width="120px">
+                  <Select.Trigger>
                     <Select.ValueText />
                   </Select.Trigger>
                   <Select.Content>
-                    <Select.Item value="week">Week</Select.Item>
-                    <Select.Item value="month">Month</Select.Item>
-                    <Select.Item value="quarter">Quarter</Select.Item>
+                    {periodCollection.items.map((item) => (
+                      <Select.Item key={item.value} item={item}>
+                        {item.label}
+                      </Select.Item>
+                    ))}
                   </Select.Content>
                 </Select.Root>
               </Box>
 
               <Box>
                 <Typography fontSize="sm" mb="1" fontWeight="medium">View</Typography>
-                <Select.Root 
-                  value={viewState.view}
-                  onValueChange={(e) => setViewState(prev => ({...prev, view: e.value as CostView}))}
+                <Select.Root
+                  collection={viewCollection}
+                  value={[viewState.view]}
+                  onValueChange={(details) => setViewState(prev => ({...prev, view: details.value[0] as CostView}))}
+                  width="120px"
                 >
-                  <Select.Trigger width="120px">
+                  <Select.Trigger>
                     <Select.ValueText />
                   </Select.Trigger>
                   <Select.Content>
-                    <Select.Item value="summary">Summary</Select.Item>
-                    <Select.Item value="breakdown">Breakdown</Select.Item>
-                    <Select.Item value="trends">Trends</Select.Item>
-                    <Select.Item value="budget">Budget</Select.Item>
+                    {viewCollection.items.map((item) => (
+                      <Select.Item key={item.value} item={item}>
+                        {item.label}
+                      </Select.Item>
+                    ))}
                   </Select.Content>
                 </Select.Root>
               </Box>
             </HStack>
 
-            <Button leftIcon={<DocumentArrowDownIcon className="w-4 h-4" />}>
-              Export Report
+            <Button>
+              <HStack gap="2">
+                <DocumentArrowDownIcon className="w-4 h-4" />
+                <Typography>Export Report</Typography>
+              </HStack>
             </Button>
           </HStack>
         </CardWrapper.Body>
@@ -440,11 +468,10 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                 </Table.Cell>
                 <Table.Cell>
                   <Typography fontWeight="semibold">
-                    {QuickCalculations.formatNumber(
-                      costBreakdown.reduce((sum, item) => 
-                        DecimalUtils.financial.add(sum, DecimalUtils.financial.add(item.regular_hours, item.overtime_hours)), 0
-                      )
-                    )}h
+                    {costBreakdown.reduce((sum, item) => {
+                      const itemTotal = DecimalUtils.add(item.regular_hours, item.overtime_hours, 'financial');
+                      return DecimalUtils.toNumber(DecimalUtils.add(sum, itemTotal, 'financial'));
+                    }, 0).toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}h
                   </Typography>
                 </Table.Cell>
                 <Table.Cell>
@@ -516,9 +543,9 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                       <HStack justify="space-between">
                         <Typography fontSize="sm">Total Hours</Typography>
                         <Typography fontSize="sm">
-                          {QuickCalculations.formatNumber(
-                            DecimalUtils.financial.add(week.regular_hours, week.overtime_hours)
-                          )}h
+                          {DecimalUtils.toNumber(
+                            DecimalUtils.add(week.regular_hours, week.overtime_hours, 'financial')
+                          ).toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}h
                         </Typography>
                       </HStack>
                       <HStack justify="space-between">
@@ -532,11 +559,15 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
                         <Typography fontSize="xs" color="gray.600">Budget Utilization</Typography>
                         <Typography fontSize="xs">{((week.total_cost / week.budget) * 100).toFixed(1)}%</Typography>
                       </HStack>
-                      <Progress 
-                        value={(week.total_cost / week.budget) * 100} 
+                      <Progress.Root
+                        value={(week.total_cost / week.budget) * 100}
                         colorPalette={week.total_cost > week.budget ? 'red' : 'green'}
                         size="sm"
-                      />
+                      >
+                        <Progress.Track>
+                          <Progress.Range />
+                        </Progress.Track>
+                      </Progress.Root>
                     </Box>
                   </VStack>
                 </CardWrapper.Body>

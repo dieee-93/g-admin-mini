@@ -155,7 +155,7 @@ export class RealtimeIntegration {
 
   private setupOfflineIntegration(): void {
     // When offline operations are synced, broadcast updates
-    EventBus.on('system.sync_completed', async (event) => {
+    EventBus.on('system.sync_completed', async (_event) => {
       if (wsManager.isConnected()) {
         // Inform other clients about synchronized operations
         for (const operation of event.payload.operations) {
@@ -179,7 +179,7 @@ export class RealtimeIntegration {
 
   private setupModuleIntegrations(): void {
     // Sales module integration
-    EventBus.on('sales.order.placed', async (data) => {
+    EventBus.on('sales.order.placed', async (_data) => {
       if (!data.isOffline) {
         await this.broadcastUpdate('ORDER_CREATED', {
           orderId: data.orderId,
@@ -190,7 +190,7 @@ export class RealtimeIntegration {
       }
     });
 
-    EventBus.on('sales.order.updated', async (data) => {
+    EventBus.on('sales.order.updated', async (_data) => {
       if (!data.isOffline) {
         await this.broadcastUpdate('ORDER_UPDATED', {
           orderId: data.orderId,
@@ -201,7 +201,7 @@ export class RealtimeIntegration {
     });
 
     // Kitchen module integration
-    EventBus.on('sales.order.status_changed', async (data) => {
+    EventBus.on('sales.order.status_changed', async (_data) => {
       await this.broadcastUpdate('ORDER_STATUS_CHANGED', {
         orderId: data.orderId,
         oldStatus: data.oldStatus,
@@ -212,7 +212,7 @@ export class RealtimeIntegration {
     });
 
     // Inventory module integration
-    EventBus.on('inventory.updated', async (event) => {
+    EventBus.on('inventory.updated', async (_event) => {
       if (!event.payload?.isOffline) {
         await this.broadcastUpdate('INVENTORY_UPDATED', {
           itemId: event.payload.itemId,
@@ -226,7 +226,7 @@ export class RealtimeIntegration {
     });
 
     // Staff module integration
-    EventBus.on('staff.clock_in', async (event) => {
+    EventBus.on('staff.clock_in', async (_event) => {
       if (!event.payload?.isOffline) {
         await this.broadcastUpdate('STAFF_CLOCK_ACTION', {
           employeeId: event.payload.employeeId,
@@ -238,7 +238,7 @@ export class RealtimeIntegration {
       }
     });
 
-    EventBus.on('staff.clock_out', async (event) => {
+    EventBus.on('staff.clock_out', async (_event) => {
       if (!event.payload?.isOffline) {
         await this.broadcastUpdate('STAFF_CLOCK_ACTION', {
           employeeId: event.payload.employeeId,
