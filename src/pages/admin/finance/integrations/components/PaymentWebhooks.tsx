@@ -319,7 +319,7 @@ const WebhookEventsList: React.FC<{ events: WebhookEvent[], onRetry: (id: string
   return (
     <Section title="Lista de Eventos de Webhook" variant="elevated">
       <Stack gap="md">
-        {events.map((event) => (
+        {events.map((_event) => (
           <Stack
             key={event.id}
             direction="row"

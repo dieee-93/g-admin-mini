@@ -79,7 +79,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
     });
 
     // Setup global inventory update handler
-    eventBus.on('inventory.stock.updated', async (event) => {
+    eventBus.on('inventory.stock.updated', async (_event) => {
       const item = inventoryState.get(event.payload.itemId);
       if (item) {
         item.currentStock = event.payload.newStock;
@@ -99,7 +99,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
       let reorderTriggered = false;
 
       // Setup stock monitoring
-      eventBus.on('inventory.stock.updated', async (event) => {
+      eventBus.on('inventory.stock.updated', async (_event) => {
         const item = inventoryState.get(event.payload.itemId);
         if (item) {
           item.currentStock = event.payload.newStock;
@@ -119,7 +119,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         }
       });
 
-      eventBus.on('inventory.stock.low', async (event) => {
+      eventBus.on('inventory.stock.low', async (_event) => {
         lowStockEvents.push(`low-stock-${event.payload.itemId}`);
         
         // Trigger automatic reorder if critically low
@@ -137,7 +137,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         }
       });
 
-      eventBus.on('inventory.reorder.automatic', async (event) => {
+      eventBus.on('inventory.reorder.automatic', async (_event) => {
         lowStockEvents.push('reorder-triggered');
         reorderTriggered = true;
         
@@ -186,7 +186,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
     it('should handle stock reservations for pending orders', async () => {
       const reservationEvents: string[] = [];
       
-      eventBus.on('inventory.stock.reservation.requested', async (event) => {
+      eventBus.on('inventory.stock.reservation.requested', async (_event) => {
         reservationEvents.push('reservation-requested');
         const { itemId, quantity, orderId } = event.payload;
         const item = inventoryState.get(itemId);
@@ -214,11 +214,11 @@ describe('EventBus - Inventory Management Business Logic', () => {
         }
       });
 
-      eventBus.on('inventory.stock.reserved', async (event) => {
+      eventBus.on('inventory.stock.reserved', async (_event) => {
         reservationEvents.push('stock-reserved');
       });
 
-      eventBus.on('inventory.stock.reservation.failed', async (event) => {
+      eventBus.on('inventory.stock.reservation.failed', async (_event) => {
         reservationEvents.push('reservation-failed');
       });
 
@@ -252,7 +252,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
       const expirationEvents: string[] = [];
       
       // Add handler for reservation requests
-      eventBus.on('inventory.stock.reservation.requested', async (event) => {
+      eventBus.on('inventory.stock.reservation.requested', async (_event) => {
         const item = inventoryState.get(event.payload.itemId);
         if (item && item.available >= event.payload.quantity) {
           item.reserved += event.payload.quantity;
@@ -268,7 +268,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         }
       });
       
-      eventBus.on('inventory.stock.reserved', async (event) => {
+      eventBus.on('inventory.stock.reserved', async (_event) => {
         // Simulate reservation expiration check
         setTimeout(async () => {
           await eventBus.emit('inventory.stock.reservation.expired', {
@@ -280,7 +280,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         }, 100); // Quick expiration for testing
       });
 
-      eventBus.on('inventory.stock.reservation.expired', async (event) => {
+      eventBus.on('inventory.stock.reservation.expired', async (_event) => {
         expirationEvents.push('reservation-expired');
         
         // Release reserved stock
@@ -298,7 +298,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         });
       });
 
-      eventBus.on('inventory.stock.released', async (event) => {
+      eventBus.on('inventory.stock.released', async (_event) => {
         expirationEvents.push('stock-released');
       });
 
@@ -325,7 +325,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
       const supplierOrderEvents: string[] = [];
       const supplierOrders = new Map<string, any>();
 
-      eventBus.on('suppliers.order.placed', async (event) => {
+      eventBus.on('suppliers.order.placed', async (_event) => {
         supplierOrderEvents.push('order-placed');
         const order = {
           ...event.payload,
@@ -347,7 +347,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         }, 50);
       });
 
-      eventBus.on('suppliers.order.confirmed', async (event) => {
+      eventBus.on('suppliers.order.confirmed', async (_event) => {
         supplierOrderEvents.push('order-confirmed');
         const order = supplierOrders.get(event.payload.orderId);
         if (order) {
@@ -365,7 +365,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         }, 100);
       });
 
-      eventBus.on('suppliers.delivery.arrived', async (event) => {
+      eventBus.on('suppliers.delivery.arrived', async (_event) => {
         supplierOrderEvents.push('delivery-arrived');
         
         // Process incoming inventory
@@ -392,7 +392,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         });
       });
 
-      eventBus.on('suppliers.delivery.processed', async (event) => {
+      eventBus.on('suppliers.delivery.processed', async (_event) => {
         supplierOrderEvents.push('delivery-processed');
       });
 
@@ -426,7 +426,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
       const discrepancyEvents: string[] = [];
       const discrepancies: any[] = [];
 
-      eventBus.on('suppliers.delivery.arrived', async (event) => {
+      eventBus.on('suppliers.delivery.arrived', async (_event) => {
         const expectedItems = [
           { itemId: 'ITEM-001', quantity: 50 },
           { itemId: 'ITEM-002', quantity: 100 }
@@ -465,7 +465,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         }
       });
 
-      eventBus.on('suppliers.delivery.discrepancy', async (event) => {
+      eventBus.on('suppliers.delivery.discrepancy', async (_event) => {
         discrepancyEvents.push('discrepancy-detected');
         
         await eventBus.emit('suppliers.discrepancy.reported', {
@@ -476,7 +476,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         });
       });
 
-      eventBus.on('suppliers.discrepancy.reported', async (event) => {
+      eventBus.on('suppliers.discrepancy.reported', async (_event) => {
         discrepancyEvents.push('discrepancy-reported');
       });
 
@@ -504,7 +504,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
     it('should track and report inventory waste', async () => {
       const wasteEvents: string[] = [];
 
-      eventBus.on('inventory.item.expired', async (event) => {
+      eventBus.on('inventory.item.expired', async (_event) => {
         wasteEvents.push('item-expired');
         
         const wasteEntry = {
@@ -520,7 +520,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         await eventBus.emit('inventory.waste.recorded', wasteEntry);
       });
 
-      eventBus.on('inventory.item.damaged', async (event) => {
+      eventBus.on('inventory.item.damaged', async (_event) => {
         wasteEvents.push('item-damaged');
         
         const wasteEntry = {
@@ -536,7 +536,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         await eventBus.emit('inventory.waste.recorded', wasteEntry);
       });
 
-      eventBus.on('inventory.waste.recorded', async (event) => {
+      eventBus.on('inventory.waste.recorded', async (_event) => {
         wasteEvents.push('waste-recorded');
         
         // Update inventory
@@ -573,7 +573,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         }
       });
 
-      eventBus.on('inventory.waste.threshold.exceeded', async (event) => {
+      eventBus.on('inventory.waste.threshold.exceeded', async (_event) => {
         wasteEvents.push('waste-threshold-exceeded');
       });
 
@@ -626,7 +626,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         wasteDate: new Date().toISOString()
       }));
 
-      eventBus.on('inventory.waste.analysis.requested', async (event) => {
+      eventBus.on('inventory.waste.analysis.requested', async (_event) => {
         analyticsEvents.push('analysis-requested');
         
         // Calculate waste analytics
@@ -682,7 +682,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         });
       });
 
-      eventBus.on('inventory.waste.analysis.completed', async (event) => {
+      eventBus.on('inventory.waste.analysis.completed', async (_event) => {
         analyticsEvents.push('analysis-completed');
       });
 
@@ -711,7 +711,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
       const salesPatterns = new Map<string, any>();
 
       // Track sales patterns
-      eventBus.on('sales.item.sold', async (event) => {
+      eventBus.on('sales.item.sold', async (_event) => {
         const pattern = salesPatterns.get(event.payload.itemId) || {
           itemId: event.payload.itemId,
           totalSold: 0,
@@ -726,7 +726,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         salesPatterns.set(event.payload.itemId, pattern);
       });
 
-      eventBus.on('inventory.optimization.analysis.requested', async (event) => {
+      eventBus.on('inventory.optimization.analysis.requested', async (_event) => {
         optimizationEvents.push('optimization-requested');
         
         const optimizationRecommendations: any[] = [];
@@ -761,7 +761,7 @@ describe('EventBus - Inventory Management Business Logic', () => {
         });
       });
 
-      eventBus.on('inventory.optimization.recommendations.generated', async (event) => {
+      eventBus.on('inventory.optimization.recommendations.generated', async (_event) => {
         optimizationEvents.push('recommendations-generated');
       });
 

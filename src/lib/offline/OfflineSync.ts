@@ -22,7 +22,7 @@ class OfflineSyncDB {
         resolve();
       };
       
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = (_event) => {
         const db = (event.target as IDBOpenDBRequest).result;
         
         // Create queue store
@@ -130,7 +130,7 @@ class OfflineSyncDB {
     const queueIndex = queueStore.index('timestamp');
     const queueRequest = queueIndex.openCursor(IDBKeyRange.upperBound(cutoffTime));
     
-    queueRequest.onsuccess = (event) => {
+    queueRequest.onsuccess = (_event) => {
       const cursor = (event.target as IDBRequest).result;
       if (cursor) {
         cursor.delete();
@@ -144,7 +144,7 @@ class OfflineSyncDB {
     const conflictsIndex = conflictsStore.index('timestamp');
     const conflictsRequest = conflictsIndex.openCursor(IDBKeyRange.upperBound(cutoffTime));
     
-    conflictsRequest.onsuccess = (event) => {
+    conflictsRequest.onsuccess = (_event) => {
       const cursor = (event.target as IDBRequest).result;
       if (cursor) {
         cursor.delete();

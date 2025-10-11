@@ -228,16 +228,16 @@ export function calculateOptimalCapacity(
   currentCapacity: number,
   averageOrderValue: number,
   averageTurnTime: number,
-  operatingHours: number,
-  fixedCosts: number = 0
+  operatingHours: number
+  // fixedCosts parameter removed - not currently used in calculations
+  // Can be re-added when break-even analysis is implemented
 ): CapacityOptimization {
   const currentRevenueDec = DecimalUtils.fromValue(currentRevenue, 'financial');
   const currentCapacityDec = DecimalUtils.fromValue(currentCapacity, 'financial');
   const aovDec = DecimalUtils.fromValue(averageOrderValue, 'financial');
   const turnTimeDec = DecimalUtils.fromValue(averageTurnTime, 'financial');
   const operatingHoursDec = DecimalUtils.fromValue(operatingHours, 'financial');
-  const fixedCostsDec = DecimalUtils.fromValue(fixedCosts, 'financial');
-  
+
   // Calculate turns per day
   const operatingMinutesDec = DecimalUtils.multiply(operatingHoursDec, DecimalUtils.fromValue(60, 'financial'), 'financial');
   const turnsPerTableDec = DecimalUtils.divide(operatingMinutesDec, turnTimeDec, 'financial');

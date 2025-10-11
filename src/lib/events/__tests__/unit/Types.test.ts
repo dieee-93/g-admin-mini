@@ -376,7 +376,7 @@ describe('Modern TypeScript Types V3', () => {
 
     it('should provide type-safe event handlers', () => {
       // Type-safe event handler for specific pattern
-      const salesOrderHandler: TypedEventHandler<'sales.order.created'> = (event) => {
+      const salesOrderHandler: TypedEventHandler<'sales.order.created'> = (_event) => {
         // TypeScript knows the exact payload structure
         expect(event.payload.orderId).toBeDefined();
         expect(event.payload.customerId).toBeDefined();

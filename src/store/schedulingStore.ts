@@ -163,7 +163,7 @@ export const useSchedulingStore = create<SchedulingState>()(
 
       // UI Actions
       setLoading: (loading) => set({ loading }),
-      setError: (error) => set({ error }),
+      setError: (_error) => set({ error }),
       setSelectedWeek: (selectedWeek) => set({ selectedWeek }),
       setActiveTab: (activeTab) => set({ activeTab }),
       setFilters: (filters) => set((state) => ({

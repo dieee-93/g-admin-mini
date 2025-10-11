@@ -97,7 +97,7 @@ export class DistributedEventStore {
         resolve(request.result);
       };
 
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = (_event) => {
         const db = (event.target as IDBOpenDBRequest).result;
 
         // Events store
@@ -232,7 +232,7 @@ export class DistributedEventStore {
     return new Promise((resolve, reject) => {
       const request = store.openCursor();
 
-      request.onsuccess = (event) => {
+      request.onsuccess = (_event) => {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
         
         if (cursor) {
@@ -601,7 +601,7 @@ export class DistributedEventStore {
     return new Promise((resolve, reject) => {
       const request = index.openCursor();
 
-      request.onsuccess = (event) => {
+      request.onsuccess = (_event) => {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
         
         if (cursor && removed < count) {

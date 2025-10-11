@@ -14,8 +14,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 // ✅ 13 SISTEMAS INTEGRADOS
-import { useModuleIntegration } from '@/hooks/useModuleIntegration';
-import { CapabilityGate } from '@/lib/capabilities';
+import EventBus from '@/lib/events';
+import { CapabilityGate, useCapabilities } from '@/lib/capabilities';
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
@@ -24,6 +24,9 @@ import { useNavigation } from '@/contexts/NavigationContext';
 // ✅ HOOKS ESPECIALIZADOS
 import { useSchedulingPage } from './hooks';
 import { useScheduling } from './hooks/useScheduling';
+
+// ✅ REGISTER CALENDAR ADAPTER (import triggers registration)
+import './services/schedulingApi';
 
 import { logger } from '@/lib/logging';
 // ✅ COMPONENTES ESPECIALIZADOS ENTERPRISE v2.1
@@ -69,7 +72,7 @@ const SCHEDULING_MODULE_CONFIG = {
 
 export default function SchedulingPage() {
   // ✅ SISTEMAS INTEGRATION
-  const { emitEvent, hasCapability, status } = useModuleIntegration('scheduling', SCHEDULING_MODULE_CONFIG);
+  const { hasFeature } = useCapabilities();
   const { handleError } = useErrorHandler();
   const { isOnline } = useOfflineStatus();
   const { shouldReduceAnimations } = usePerformanceMonitor();
@@ -87,6 +90,7 @@ export default function SchedulingPage() {
     setIsAutoSchedulingOpen,
     handleScheduleGenerated,
     handleOpenCreateShift,
+    handleOpenEditShift,
     handleCloseShiftEditor,
     loading,
     error
@@ -125,14 +129,6 @@ export default function SchedulingPage() {
   return (
     <ContentLayout spacing="normal">
       {/* 🔒 1. ESTADO DE CONEXIÓN - Solo si crítico */}
-      {!status.isActive && (
-        <Alert
-          variant="subtle"
-          title="Module Capabilities Required"
-          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
-        />
-      )}
-
       {!isOnline && (
         <Alert variant="warning" title="Modo Offline">
           Los cambios se sincronizarán cuando recuperes la conexión
@@ -167,7 +163,7 @@ export default function SchedulingPage() {
           if (action === 'review_costs') handleTabChange('costs');
 
           // Emit events for further processing
-          emitEvent(`scheduling.alert_action_${action}`, data);
+          EventBus.emit(`scheduling.alert_action_${action}`, data);
         }}
       />
 
@@ -189,15 +185,15 @@ export default function SchedulingPage() {
       <SchedulingActions
         onAddShift={handleOpenCreateShift}
         onAutoSchedule={() => setIsAutoSchedulingOpen(true)}
-        onExportSchedule={() => emitEvent('scheduling.export_requested', {})}
-        onGenerateReport={() => emitEvent('scheduling.report_requested', {})}
-        onCopyWeek={() => emitEvent('scheduling.copy_week_requested', { week: viewState.selectedWeek })}
+        onExportSchedule={() => EventBus.emit('scheduling.export_requested', {})}
+        onGenerateReport={() => EventBus.emit('scheduling.report_requested', {})}
+        onCopyWeek={() => EventBus.emit('scheduling.copy_week_requested', { week: viewState.selectedWeek })}
         onFindCoverage={() => {
           handleTabChange('coverage');
-          emitEvent('scheduling.find_coverage_requested', {});
+          EventBus.emit('scheduling.find_coverage_requested', {});
         }}
-        onBulkOperations={() => emitEvent('scheduling.bulk_operations_requested', {})}
-        hasCapability={hasCapability}
+        onBulkOperations={() => EventBus.emit('scheduling.bulk_operations_requested', {})}
+        hasCapability={hasFeature}
         isMobile={isMobile}
         loading={loading}
       />

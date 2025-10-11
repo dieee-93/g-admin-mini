@@ -162,13 +162,14 @@ export function useSalesAlerts(): UseSalesAlertsReturn {
 }
 
 // ============================================================================
-// HELPER HOOK: CONVERT METRICS TO ANALYSIS DATA
+// HELPER FUNCTION: CONVERT METRICS TO ANALYSIS DATA
 // ============================================================================
 
 /**
- * Hook que convierte métricas de Sales a formato requerido por el Intelligence Engine
+ * ✅ NOT A HOOK - Pure transformation function
+ * Convierte métricas de Sales a formato requerido por el Intelligence Engine
  */
-export function useMetricsToAnalysisData(metrics: SalesPageMetrics): SalesAnalysisData {
+export function metricsToAnalysisData(metrics: SalesPageMetrics): SalesAnalysisData {
   return {
     todayRevenue: metrics.todayRevenue,
     targetRevenue: 5000, // TODO: Obtener de configuración

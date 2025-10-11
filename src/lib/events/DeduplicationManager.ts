@@ -50,7 +50,7 @@ class DeduplicationStore {
         resolve();
       };
       
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = (_event) => {
         const db = (event.target as IDBOpenDBRequest).result;
         
         if (!db.objectStoreNames || !db.objectStoreNames.contains(this.STORE_NAME)) {
@@ -146,7 +146,7 @@ class DeduplicationStore {
     return new Promise((resolve, reject) => {
       const request = index.openCursor(IDBKeyRange.upperBound(cutoffTime));
       
-      request.onsuccess = (event) => {
+      request.onsuccess = (_event) => {
         const cursor = (event.target as IDBRequest).result;
         if (cursor) {
           cursor.delete();

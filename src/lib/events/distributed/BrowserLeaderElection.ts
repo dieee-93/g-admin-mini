@@ -174,7 +174,7 @@ export class BrowserLeaderElection {
    * Setup message handling for leader election
    */
   private setupMessageHandling(): void {
-    this.broadcastChannel.addEventListener('message', (event) => {
+    this.broadcastChannel.addEventListener('message', (_event) => {
       if (this.isDestroyed) return;
 
       const message = event.data as LeaderElectionMessage;

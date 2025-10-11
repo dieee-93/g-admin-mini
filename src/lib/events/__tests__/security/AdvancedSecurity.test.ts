@@ -109,7 +109,7 @@ describe('Advanced EventBus Security Tests', () => {
       };
 
       let capturedEvent: any = null;
-      eventBus.on('test.security.spoofing', (event) => {
+      eventBus.on('test.security.spoofing', (_event) => {
         capturedEvent = event;
       });
 
@@ -130,13 +130,13 @@ describe('Advanced EventBus Security Tests', () => {
       };
 
       // This handler will throw an error
-      await eventBus.on('test.security.data_leak', (event) => {
+      await eventBus.on('test.security.data_leak', (_event) => {
         throw new Error(`Processing failed for user ${event.payload.userName}`);
       });
 
       let errorLog: any = null;
       // Listen for the global error event
-      await eventBus.on('global.eventbus.handler-error', (event) => {
+      await eventBus.on('global.eventbus.handler-error', (_event) => {
         errorLog = event.payload;
       });
 

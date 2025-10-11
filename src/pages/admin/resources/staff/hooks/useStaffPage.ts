@@ -26,6 +26,7 @@ import {
   calculateDailyCostSummary,
   analyzeBudgetVariance,
   calculateLaborEfficiency,
+  getStaffStats,
   type PerformanceMetrics,
   type DailyCostSummary,
   type LiveCostCalculation,
@@ -155,7 +156,7 @@ export interface UseStaffPageReturn {
 
 export const useStaffPage = (): UseStaffPageReturn => {
   const { setQuickActions, updateModuleBadge } = useNavigation();
-  const { staff, loading: staffLoading, error: staffError, getStaffStats } = useStaffWithLoader();
+  const { staff, loading: staffLoading, error: staffError } = useStaffWithLoader();
 
   // ============================================================================
   // STATE MANAGEMENT
@@ -174,6 +175,14 @@ export const useStaffPage = (): UseStaffPageReturn => {
   const [performanceAnalytics, setPerformanceAnalytics] = useState<StaffAnalyticsResult | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [staffStatsData, setStaffStatsData] = useState<any>(null);
+
+  // Load staff stats async
+  useEffect(() => {
+    getStaffStats().then(stats => setStaffStatsData(stats)).catch(err => {
+      logger.error('App', 'Failed to load staff stats:', err);
+    });
+  }, [staff.length]);
 
   // ============================================================================
   // COMPUTED DATA & METRICS
@@ -181,7 +190,32 @@ export const useStaffPage = (): UseStaffPageReturn => {
 
   // Real-time staff metrics calculation
   const metrics: StaffPageMetrics = useMemo(() => {
-    const staffStats = getStaffStats();
+    if (!staffStatsData) {
+      return {
+        totalStaff: staff.length,
+        activeStaff: staff.filter(s => s.status === 'active').length,
+        onShiftCount: 0,
+        avgPerformanceRating: 0,
+        todayLaborCost: 0,
+        projectedLaborCost: 0,
+        laborCostPerHour: 0,
+        budgetUtilization: 0,
+        budgetVariance: 0,
+        avgAttendanceRate: 0,
+        avgPunctualityScore: 0,
+        totalOvertimeHours: 0,
+        efficiencyScore: 0,
+        departmentBreakdown: {},
+        upcomingReviews: 0,
+        trainingHoursThisMonth: 0,
+        skillGaps: [],
+        criticalAlerts: 0,
+        retentionRisks: 0,
+        overtimeConcerns: 0
+      };
+    }
+
+    const staffStats = staffStatsData;
 
     // Mock time entries and schedules (in real app, these would come from API)
     const mockTimeEntries: TimeEntry[] = staff.map((employee, index) => ({
@@ -252,7 +286,7 @@ export const useStaffPage = (): UseStaffPageReturn => {
       retentionRisks: Math.floor(staff.length * 0.15), // 15% estimated retention risk
       overtimeConcerns: liveCosts.filter(lc => lc.overtime_hours > 10).length
     };
-  }, [staff, getStaffStats]);
+  }, [staff, staffStatsData]);
 
   // Labor cost summary for detailed analysis
   const laborCostSummary: DailyCostSummary = useMemo(() => {

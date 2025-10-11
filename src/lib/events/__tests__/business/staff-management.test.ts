@@ -30,7 +30,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(schedulingModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('**', (event) => workflowEvents.push(event));
+      eventBus.on('**', (_event) => workflowEvents.push(event));
 
       const newStaff = mockBusinessData.staff[0];
 
@@ -153,7 +153,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(staffModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const staffId = 'staff_001';
 
@@ -197,7 +197,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(staffModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const staffId = 'staff_001';
       const reviewPeriod = '2024-Q1';
@@ -274,7 +274,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(staffModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const staffId = 'staff_002';
 
@@ -354,7 +354,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(schedulingModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const requestingStaffId = 'staff_001';
       const targetStaffId = 'staff_002';
@@ -431,7 +431,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(schedulingModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const staffId = 'staff_001';
 
@@ -494,7 +494,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(staffModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const staffId = 'staff_001';
 
@@ -572,7 +572,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(schedulingModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const staffId = 'staff_002';
 
@@ -639,7 +639,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(staffModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const staffId = 'staff_001';
 
@@ -705,7 +705,7 @@ describe('EventBus - Staff Management Business Logic', () => {
       await eventBus.registerModule(staffModule);
 
       const workflowEvents: any[] = [];
-      eventBus.on('*', (event) => workflowEvents.push(event));
+      eventBus.on('*', (_event) => workflowEvents.push(event));
 
       const staffId = 'staff_001';
       const payPeriod = '2024-03-01_to_2024-03-15';

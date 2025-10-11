@@ -9,8 +9,21 @@
 
 import React from 'react';
 import type { SlotComponent, SlotRegistrationOptions, SlotRegistrationResult } from './SlotRegistry';
-import { SlotRegistry } from './SlotRegistry';
-import { registerBusinessSlot, getBusinessSlotComponent } from './SlotRegistry';
+import {
+  SlotRegistry,
+  registerSlot,
+  registerBusinessSlot,
+  getSlotComponent,
+  getBusinessSlotComponent,
+  hasSlot,
+  unregisterSlot,
+  clearAllSlots,
+  getRegistryStats,
+  registerSlotsFromModule,
+  autoRegisterSlots
+} from './SlotRegistry';
+import Slot from './Slot';
+import { CALENDAR_SLOTS, BUSINESS_MODEL_SLOTS } from './CalendarSlotDefinitions';
 
 // ===============================
 // CORE SLOT EXPORTS

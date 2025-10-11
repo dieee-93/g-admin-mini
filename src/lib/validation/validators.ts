@@ -94,7 +94,7 @@ export function createValidationSchema(type: 'inventory' | 'customer' | 'sale' |
           {
             name: 'stock_consistency',
             description: 'El stock actual debe estar dentro de los límites establecidos',
-            validate: (data) => {
+            validate: (_data) => {
               if (data.max_stock && data.current_stock > data.max_stock) {
                 return 'El stock actual excede el máximo permitido';
               }

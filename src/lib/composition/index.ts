@@ -6,7 +6,15 @@
 
 // Core slot components
 export { SlotProvider, useSlotContext, useSlotRegistration } from './SlotProvider';
-export { Slot, CapabilitySlot, Card, Dashboard, Module, createCompoundComponent } from './Slot';
+export {
+  Slot,
+  FeatureSlot,      // NEW v4.0: Use this for new code
+  CapabilitySlot,   // Backward compatibility alias
+  Card,
+  Dashboard,
+  Module,
+  createCompoundComponent
+} from './Slot';
 
 // Slot management hooks
 export {

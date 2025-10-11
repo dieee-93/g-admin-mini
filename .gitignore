@@ -25,6 +25,7 @@ out/
 .env.production.local
 .env.development
 .env.production
+.env.mcp
 *.local
 
 # TypeScript

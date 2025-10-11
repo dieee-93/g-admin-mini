@@ -149,7 +149,7 @@ class EventDelegationManager {
     const eventTypes = ['click', 'change', 'input', 'keydown', 'mouseover', 'mouseout'];
     
     eventTypes.forEach(eventType => {
-      this.rootElement!.addEventListener(eventType, (event) => {
+      this.rootElement!.addEventListener(eventType, (_event) => {
         this.handleDelegatedEvent(eventType, event);
       }, true);
     });

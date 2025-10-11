@@ -52,7 +52,7 @@ describe('SecureEventProcessor Timeout Protection', () => {
 
   describe('Basic Timeout Protection', () => {
     it('should execute fast handler successfully', async () => {
-      const fastHandler: EventHandler = async (event) => {
+      const fastHandler: EventHandler = async (_event) => {
         await new Promise(resolve => setTimeout(resolve, 100)); // 100ms
         return Promise.resolve();
       };

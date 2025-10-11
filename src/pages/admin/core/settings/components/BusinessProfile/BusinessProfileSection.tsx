@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  Stack, Typography, CardWrapper, Section, Button, Badge, SimpleGrid, MetricCard, ActionButton
+  Stack, Typography, CardWrapper, Section, Button, Badge, SimpleGrid, MetricCard
 } from "@/shared/ui";
 import { 
   BuildingOfficeIcon, 
@@ -138,10 +138,10 @@ export function BusinessProfileSection() {
                         </Stack>
                     )
                   })}
-                  <ActionButton mt={2} size="sm" colorPalette="blue" variant="outline" onClick={() => setIsEditingHours(true)}>
+                  <Button mt={2} size="sm" colorPalette="blue" variant="outline" onClick={() => setIsEditingHours(true)}>
                     <Icon icon={PencilIcon} size="xs" />
                     Editar Horarios
-                  </ActionButton>
+                  </Button>
                 </Stack>
               )}
             </CardWrapper.Body>

@@ -29,11 +29,11 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
       {/* ✅ Sidebar fixed - no necesita estar en el HStack */}
       <Sidebar />
 
-      {/* 🔧 OVERLAY SIDEBAR: Main area with left margin to avoid sidebar overlap */}
+      {/* 🔧 OVERLAY SIDEBAR: Main area with responsive left margin to avoid sidebar overlap */}
       <Box
         position="absolute"
         top="60px"
-        left="3rem"
+        left={{ base: "0", md: "3rem" }}
         right="0"
         bottom="0"
         overflow="auto"

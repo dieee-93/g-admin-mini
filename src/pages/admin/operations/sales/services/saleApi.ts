@@ -34,7 +34,7 @@ interface SaleCompletedEvent {
   }>;
   timestamp: string;
 }
-import { taxService } from '@/business-logic/fiscal/taxCalculationService';
+import { taxService } from './taxCalculationService';
 import { errorHandler, createNetworkError, createBusinessError } from '@/lib/error-handling';
 
 // ===== CRUD BÁSICO DE VENTAS =====
@@ -52,7 +52,7 @@ export async function fetchSales(filters?: SalesListFilters): Promise<Sale[]> {
           quantity,
           unit_price,
           created_at,
-          product:products(id, name, unit, type, description)
+          product:products(id, name, description, price, category)
         )
       `)
       .order('created_at', { ascending: false });
@@ -104,7 +104,7 @@ export async function fetchSaleById(id: string): Promise<Sale> {
           quantity,
           unit_price,
           created_at,
-          product:products(id, name, unit, type, description)
+          product:products(id, name, description, price, category)
         )
       `)
       .eq('id', id)
@@ -171,9 +171,84 @@ export async function fetchProductsWithAvailability(): Promise<Product[]> {
   // ✅ Usar la función normalizada de Supabase
   const { data, error } = await supabase
     .rpc('get_products_with_availability');
-  
+
   if (error) throw error;
   return data || [];
+}
+
+// ===== TRANSACCIONES Y ÓRDENES =====
+
+/**
+ * Fetch sales transactions with period filter
+ * @param period - Time period ('today', 'week', 'month', 'year', or custom date range)
+ */
+export async function fetchTransactions(period: string = 'today'): Promise<Sale[]> {
+  try {
+    let dateFrom: string;
+    const now = new Date();
+
+    // Calculate date range based on period
+    switch (period) {
+      case 'today':
+        dateFrom = new Date(now.setHours(0, 0, 0, 0)).toISOString();
+        break;
+      case 'week':
+        dateFrom = new Date(now.setDate(now.getDate() - 7)).toISOString();
+        break;
+      case 'month':
+        dateFrom = new Date(now.setMonth(now.getMonth() - 1)).toISOString();
+        break;
+      case 'year':
+        dateFrom = new Date(now.setFullYear(now.getFullYear() - 1)).toISOString();
+        break;
+      default:
+        dateFrom = period; // Assume custom ISO date
+    }
+
+    return await fetchSales({ dateFrom });
+  } catch (error) {
+    errorHandler.handle(error as Error, { operation: 'fetchTransactions', period });
+    throw error;
+  }
+}
+
+/**
+ * Fetch orders/sales by status
+ * @param status - Order status filter ('active', 'pending', 'completed', etc.)
+ */
+export async function fetchOrders(status?: string): Promise<Sale[]> {
+  try {
+    let query = supabase
+      .from('sales')
+      .select(`
+        *,
+        customer:customers(id, name, phone, email),
+        sale_items(
+          id,
+          product_id,
+          quantity,
+          unit_price,
+          product:products(id, name, price, category)
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      errorHandler.handle(createNetworkError(`Error fetching orders: ${error.message}`, { error, status }));
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
+    errorHandler.handle(error as Error, { operation: 'fetchOrders', status });
+    throw error;
+  }
 }
 
 // ===== ESTADÍSTICAS Y REPORTES =====
@@ -186,7 +261,7 @@ export async function getTopSellingProducts(dateFrom: string, dateTo: string, li
       quantity,
       unit_price,
       created_at,
-      product:products(name, unit, type),
+      product:products(name, price, category),
       sale:sales(created_at)
     `)
     .gte('sale.created_at', dateFrom) // ✅ Ahora funciona

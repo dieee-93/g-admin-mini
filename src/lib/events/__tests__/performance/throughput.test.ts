@@ -255,13 +255,13 @@ describe('EventBus - Throughput Performance', () => {
       let handledCount = 0;
 
       // Add test handlers
-      const unsubscribe1 = eventBus.on('test.handler.performance', async (event) => {
+      const unsubscribe1 = eventBus.on('test.handler.performance', async (_event) => {
         handledCount++;
         // Simulate minimal processing
         await new Promise(resolve => setImmediate(resolve));
       });
 
-      const unsubscribe2 = eventBus.on('test.handler.performance', async (event) => {
+      const unsubscribe2 = eventBus.on('test.handler.performance', async (_event) => {
         handledCount++;
         // Simulate minimal processing
         await new Promise(resolve => setImmediate(resolve));
@@ -299,7 +299,7 @@ describe('EventBus - Throughput Performance', () => {
 
       // Add multiple subscribers
       for (let i = 0; i < subscriberCount; i++) {
-        const unsubscribe = eventBus.on('test.multiple.subscribers', async (event) => {
+        const unsubscribe = eventBus.on('test.multiple.subscribers', async (_event) => {
           totalHandlerCalls++;
           // Simulate very light processing
           event.payload.processed = true;
@@ -342,12 +342,12 @@ describe('EventBus - Throughput Performance', () => {
       let slowEventsProcessed = 0;
 
       // Fast handler
-      const unsubscribeFast = eventBus.on('test.fast.handler', async (event) => {
+      const unsubscribeFast = eventBus.on('test.fast.handler', async (_event) => {
         fastEventsProcessed++;
       });
 
       // Slow handler  
-      const unsubscribeSlow = eventBus.on('test.slow.handler', async (event) => {
+      const unsubscribeSlow = eventBus.on('test.slow.handler', async (_event) => {
         await new Promise(resolve => setTimeout(resolve, 50)); // 50ms delay
         slowEventsProcessed++;
       });
@@ -463,7 +463,7 @@ describe('EventBus - Throughput Performance', () => {
       let processedCount = 0;
 
       // Add handler to ensure events are processed
-      const unsubscribe = eventBus.on('test.cleanup.gc', async (event) => {
+      const unsubscribe = eventBus.on('test.cleanup.gc', async (_event) => {
         processedCount++;
       });
 
@@ -533,7 +533,7 @@ describe('EventBus - Throughput Performance', () => {
       let totalInventoryUpdates = 0;
 
       // Setup order processing
-      const unsubscribeOrders = eventBus.on('sales.order.created', async (event) => {
+      const unsubscribeOrders = eventBus.on('sales.order.created', async (_event) => {
         totalOrders++;
         
         // Each order triggers inventory updates for each item
@@ -546,7 +546,7 @@ describe('EventBus - Throughput Performance', () => {
         }
       });
 
-      const unsubscribeInventory = eventBus.on('inventory.stock.updated', async (event) => {
+      const unsubscribeInventory = eventBus.on('inventory.stock.updated', async (_event) => {
         totalInventoryUpdates++;
       });
 
@@ -614,42 +614,42 @@ describe('EventBus - Throughput Performance', () => {
 
       // Setup complex business flow handlers
       const handlers = [
-        eventBus.on('sales.order.created', async (event) => {
+        eventBus.on('sales.order.created', async (_event) => {
           totalEvents++;
           await eventBus.emit('inventory.stock.check', { orderId: event.payload.orderId });
         }),
         
-        eventBus.on('inventory.stock.check', async (event) => {
+        eventBus.on('inventory.stock.check', async (_event) => {
           totalEvents++;
           await eventBus.emit('inventory.stock.reserved', { orderId: event.payload.orderId });
         }),
         
-        eventBus.on('inventory.stock.reserved', async (event) => {
+        eventBus.on('inventory.stock.reserved', async (_event) => {
           totalEvents++;
           await eventBus.emit('payments.payment.requested', { orderId: event.payload.orderId });
         }),
         
-        eventBus.on('payments.payment.requested', async (event) => {
+        eventBus.on('payments.payment.requested', async (_event) => {
           totalEvents++;
           await eventBus.emit('payments.payment.processed', { orderId: event.payload.orderId });
         }),
         
-        eventBus.on('payments.payment.processed', async (event) => {
+        eventBus.on('payments.payment.processed', async (_event) => {
           totalEvents++;
           await eventBus.emit('kitchen.order.queued', { orderId: event.payload.orderId });
         }),
         
-        eventBus.on('kitchen.order.queued', async (event) => {
+        eventBus.on('kitchen.order.queued', async (_event) => {
           totalEvents++;
           await eventBus.emit('kitchen.order.completed', { orderId: event.payload.orderId });
         }),
         
-        eventBus.on('kitchen.order.completed', async (event) => {
+        eventBus.on('kitchen.order.completed', async (_event) => {
           totalEvents++;
           await eventBus.emit('sales.order.fulfilled', { orderId: event.payload.orderId });
         }),
         
-        eventBus.on('sales.order.fulfilled', async (event) => {
+        eventBus.on('sales.order.fulfilled', async (_event) => {
           totalEvents++;
         })
       ];

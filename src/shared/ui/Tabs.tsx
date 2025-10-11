@@ -176,11 +176,8 @@ export function TabPanels({
   className,
   ...rest
 }: TabPanelsProps) {
-  return (
-    <ChakraTabs.Content className={className} {...rest}>
-      {children}
-    </ChakraTabs.Content>
-  )
+  // TabPanels is just a semantic wrapper - render children directly
+  return <>{children}</>;
 }
 
 export function TabPanel({

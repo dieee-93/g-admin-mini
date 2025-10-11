@@ -157,7 +157,7 @@ export class WebSocketManager {
     });
 
     // Listen for offline sync completion to trigger real-time sync
-    EventBus.on('system.sync_completed', (data) => {
+    EventBus.on('system.sync_completed', (_data) => {
       if (this.isConnected()) {
         this.sendMessage({
           type: 'SYNC_REQUEST',

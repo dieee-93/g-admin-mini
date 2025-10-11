@@ -1,0 +1,57 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema.json",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "I:/Programacion/Proyectos/g-mini",
+        "I:/Programacion/Proyectos/g-mini/src",
+        "I:/Programacion/Proyectos/g-mini/docs",
+        "I:/Programacion/Proyectos/g-mini/database"
+      ]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-supabase"],
+      "env": {
+        "SUPABASE_URL": "https://ocwjrkxjwqmxvhckgtud.supabase.co",
+        "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jd2pya3hqd3FteHZoY2tndHVkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MzgxNDY0NCwiZXhwIjoyMDY5MzkwNjQ0fQ.SyrjskUJndbM_VDAqT4N6CaTxEUE2HZn02e4wu6pnNc"
+      }
+    },
+    "postgres-pro": {
+      "command": "npx",
+      "args": ["-y", "mcp-postgres-server"],
+      "env": {
+        "DATABASE_URL": "${SUPABASE_DATABASE_URL}"
+      }
+    },
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "mcp-figma"],
+      "env": {
+        "FIGMA_API_KEY": "${FIGMA_API_KEY}"
+      }
+    },
+    "claude-context": {
+      "command": "npx",
+      "args": ["-y", "@zilliz/claude-context-mcp"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "MILVUS_TOKEN": "${MILVUS_TOKEN}"
+      }
+    }
+  }
+}

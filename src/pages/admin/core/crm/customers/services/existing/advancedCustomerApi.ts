@@ -1,13 +1,13 @@
 // src/features/customers/data/advancedCustomerApi.ts - WITH DECIMAL PRECISION
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
-import { 
+import {
   calculateCustomerCLV,
   calculateAverageOrderValue,
   calculateRetentionRate,
   determineCustomerSegment,
   generateCustomerRecommendations
-} from '@/business-logic/sales/customerRFMAnalytics';
+} from '../customerRFMAnalytics';
 import type { 
   CustomerRFMProfile, 
   CustomerAnalytics, 

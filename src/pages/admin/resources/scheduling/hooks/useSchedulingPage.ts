@@ -143,14 +143,7 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
           id: 'new-shift',
           label: 'New Shift',
           icon: PlusIcon,
-<<<<<<< HEAD
-          action: () => {
-            // TODO: Open shift creation modal
-            logger.info('API', 'Opening new shift form');
-          }
-=======
           action: handleOpenCreateShift,
->>>>>>> 9afb991f93084fb5ddcc752c5e73e58eeb7f9720
         }
       ];
 

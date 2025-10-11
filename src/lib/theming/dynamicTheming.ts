@@ -61,7 +61,7 @@ const getThemeColors = (themeId: string) => {
     'dracula': {
       50: { value: "#282a36" },   // Fondo principal - el característico fondo oscuro de Dracula
       100: { value: "#44475a" },  // Superficie - color de comentarios/UI elements
-      200: { value: "#6272a4" },  // Bordes - un azul más claro
+      200: { value: "#3d4a77" },  // Bordes - AJUSTADO para contraste WCAG AA 4.5:1 (era #6272a4)
       300: { value: "#7d8cc4" },  // Elementos - progresión hacia texto
       400: { value: "#9fb1d4" },  // Elementos activos
       500: { value: "#bd93f9" },  // Primary - el púrpura característico de Dracula

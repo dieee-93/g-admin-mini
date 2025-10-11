@@ -324,7 +324,7 @@ export function QRCodeGenerator({
             </Text>
           ) : (
             <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="4">
-              {qrConfigs.map((config) => {
+              {qrConfigs.map((_config) => {
                 const table = tables.find(t => t.id === config.tableId);
                 const status = getQRStatus(config);
                 const qrUrl = `${baseUrl}/order/${config.qrCode}`;

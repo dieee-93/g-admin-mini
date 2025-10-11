@@ -40,7 +40,7 @@ describe('EventBus - High Load Stress Tests', () => {
       let processedEvents = 0;
 
       // Simple handler to count processed events
-      const unsubscribe = eventBus.on('stress.high.volume', async (event) => {
+      const unsubscribe = eventBus.on('stress.high.volume', async (_event) => {
         processedEvents++;
       });
 
@@ -102,7 +102,7 @@ describe('EventBus - High Load Stress Tests', () => {
       let processedEvents = 0;
       const processingTimes: number[] = [];
 
-      const unsubscribe = eventBus.on('stress.concurrent.burst', async (event) => {
+      const unsubscribe = eventBus.on('stress.concurrent.burst', async (_event) => {
         const processStart = performance.now();
         processedEvents++;
         processingTimes.push(performance.now() - processStart);
@@ -163,7 +163,7 @@ describe('EventBus - High Load Stress Tests', () => {
       let processedEvents = 0;
       const latencies: number[] = [];
 
-      const unsubscribe = eventBus.on('stress.sustained.frequency', async (event) => {
+      const unsubscribe = eventBus.on('stress.sustained.frequency', async (_event) => {
         processedEvents++;
         const latency = Date.now() - event.payload.emitTime;
         latencies.push(latency);
@@ -225,7 +225,7 @@ describe('EventBus - High Load Stress Tests', () => {
       let processedEvents = 0;
       const memorySnapshots: number[] = [];
 
-      const unsubscribe = eventBus.on('stress.memory.pressure', async (event) => {
+      const unsubscribe = eventBus.on('stress.memory.pressure', async (_event) => {
         processedEvents++;
         
         // Take memory snapshot every 50 events
@@ -295,14 +295,14 @@ describe('EventBus - High Load Stress Tests', () => {
       const processingOrder: string[] = [];
 
       // Slow handler (blocks for 100ms each)
-      const unsubscribeSlow = eventBus.on('stress.queue.slow', async (event) => {
+      const unsubscribeSlow = eventBus.on('stress.queue.slow', async (_event) => {
         processingOrder.push(`slow-${event.payload.sequence}`);
         await new Promise(resolve => setTimeout(resolve, 100));
         slowEventsProcessed++;
       });
 
       // Fast handler
-      const unsubscribeFast = eventBus.on('stress.queue.fast', async (event) => {
+      const unsubscribeFast = eventBus.on('stress.queue.fast', async (_event) => {
         processingOrder.push(`fast-${event.payload.sequence}`);
         fastEventsProcessed++;
       });
@@ -362,7 +362,7 @@ describe('EventBus - High Load Stress Tests', () => {
 
       // Create many subscribers
       for (let i = 0; i < subscriberCount; i++) {
-        const unsubscribe = eventBus.on('stress.subscription.overflow', async (event) => {
+        const unsubscribe = eventBus.on('stress.subscription.overflow', async (_event) => {
           totalHandlerCalls++;
           // Minimal processing to avoid timeout
         });
@@ -502,12 +502,12 @@ describe('EventBus - High Load Stress Tests', () => {
       const errorEvents: any[] = [];
 
       // Handler that tracks errors
-      const unsubscribeError = eventBus.on('global.eventbus.error', async (event) => {
+      const unsubscribeError = eventBus.on('global.eventbus.error', async (_event) => {
         errorEvents.push(event.payload);
       });
 
       // Handler for successful events
-      const unsubscribeSuccess = eventBus.on('stress.cascade.recovery', async (event) => {
+      const unsubscribeSuccess = eventBus.on('stress.cascade.recovery', async (_event) => {
         if (event.payload.shouldFail && Math.random() > 0.7) {
           throw new Error(`Simulated failure for event ${event.payload.sequence}`);
         }
@@ -571,7 +571,7 @@ describe('EventBus - High Load Stress Tests', () => {
       const processingPromises: Promise<void>[] = [];
 
       // Handler with processing delay
-      const unsubscribe = eventBus.on('stress.graceful.shutdown', async (event) => {
+      const unsubscribe = eventBus.on('stress.graceful.shutdown', async (_event) => {
         const promise = new Promise<void>(resolve => {
           setTimeout(() => {
             processedEvents++;

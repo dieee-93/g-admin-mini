@@ -30,13 +30,14 @@ import {
 } from '@heroicons/react/24/outline';
 
 // Design System v2.0
-import { 
-  ContentLayout, 
-  Section, 
-  CardWrapper, 
-  MetricCard, 
-  CardGrid, 
-  PageHeader 
+import {
+  ContentLayout,
+  Section,
+  CardWrapper,
+  MetricCard,
+  CardGrid,
+  PageHeader,
+  Icon
 } from '@/shared/ui';
 
 // Business Logic
@@ -141,7 +142,7 @@ export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsT
     return (
       <ContentLayout spacing="normal">
         <VStack align="center" gap="4">
-          <ShoppingCartIcon className="w-12 h-12" />
+          <Icon icon={ShoppingCartIcon} size="2xl" />
           <Text>Generando recomendaciones de compra inteligentes...</Text>
           <Progress size="sm" colorPalette="blue" />
         </VStack>
@@ -154,19 +155,19 @@ export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsT
     return (
       <ContentLayout spacing="normal">
         <VStack align="center" gap="4">
-          <ShoppingCartIcon className="w-16 h-16 text-gray-400" />
+          <Icon icon={ShoppingCartIcon} size="2xl" color="gray.400" />
           <Text fontSize="lg" fontWeight="semibold">
             Recomendaciones de Compra no disponibles
           </Text>
           <Text color="gray.600" textAlign="center">
             No se pudieron generar recomendaciones. Verifique que existan materiales con datos válidos.
           </Text>
-          <Button 
+          <Button
             onClick={generateRecommendations}
             colorPalette="blue"
             loading={isGenerating}
-            leftIcon={<ArrowPathIcon className="w-4 h-4" />}
           >
+            <Icon icon={ArrowPathIcon} />
             Generar Recomendaciones
           </Button>
         </VStack>
@@ -182,14 +183,14 @@ export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsT
         <PageHeader
           title="Recomendaciones de Compra Inteligentes"
           subtitle={`${analysisResult?.totalItemsAnalyzed || 0} items analizados • Confianza promedio: ${Math.round(analysisResult?.averageConfidence || 0)}%`}
-          icon={<ShoppingCartIcon className="w-6 h-6" />}
+          icon={<Icon icon={ShoppingCartIcon} size="md" />}
           actions={
             <Button
               onClick={generateRecommendations}
               loading={isGenerating}
               size="sm"
-              leftIcon={<ArrowPathIcon className="w-4 h-4" />}
             >
+              <Icon icon={ArrowPathIcon} />
               Actualizar
             </Button>
           }
@@ -203,32 +204,32 @@ export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsT
               <MetricCard
                 title="Inversión Recomendada"
                 value={DecimalUtils.formatCurrency(analysisResult.totalRecommendedInvestment)}
-                icon={<CurrencyDollarIcon className="w-5 h-5" />}
+                icon={<Icon icon={CurrencyDollarIcon} size="sm" />}
                 trend={analysisResult.totalRecommendedInvestment > 0 ? 'neutral' : 'positive'}
                 colorScheme="blue"
               />
-              
+
               <MetricCard
                 title="Ahorro Estimado"
                 value={DecimalUtils.formatCurrency(analysisResult.estimatedTotalSavings)}
-                icon={<CheckCircleIcon className="w-5 h-5" />}
+                icon={<Icon icon={CheckCircleIcon} size="sm" />}
                 trend={analysisResult.estimatedTotalSavings > 0 ? 'positive' : 'neutral'}
                 colorScheme="green"
                 subtitle="Por optimización de inventario"
               />
-              
+
               <MetricCard
                 title="Items Urgentes"
                 value={analysisResult.urgentRecommendations.length}
-                icon={<ExclamationTriangleIcon className="w-5 h-5" />}
+                icon={<Icon icon={ExclamationTriangleIcon} size="sm" />}
                 trend={analysisResult.urgentRecommendations.length > 0 ? 'negative' : 'positive'}
                 colorScheme={analysisResult.urgentRecommendations.length > 0 ? 'red' : 'green'}
               />
-              
+
               <MetricCard
                 title="Oportunidades"
                 value={analysisResult.opportunityRecommendations.length}
-                icon={<ChartBarIcon className="w-5 h-5" />}
+                icon={<Icon icon={ChartBarIcon} size="sm" />}
                 colorScheme="purple"
                 subtitle="Optimizaciones adicionales"
               />
@@ -309,8 +310,8 @@ export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsT
               colorPalette="red"
               size="sm"
               onClick={() => setSelectedTab('urgent')}
-              leftIcon={<ExclamationTriangleIcon className="w-4 h-4" />}
             >
+              <Icon icon={ExclamationTriangleIcon} />
               Urgentes ({analysisResult?.urgentRecommendations.length || 0})
             </Button>
             <Button
@@ -318,8 +319,8 @@ export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsT
               colorPalette="blue"
               size="sm"
               onClick={() => setSelectedTab('planned')}
-              leftIcon={<ClockIcon className="w-4 h-4" />}
             >
+              <Icon icon={ClockIcon} />
               Planificadas ({analysisResult?.plannedRecommendations.length || 0})
             </Button>
             <Button
@@ -327,8 +328,8 @@ export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsT
               colorPalette="purple"
               size="sm"
               onClick={() => setSelectedTab('opportunity')}
-              leftIcon={<ChartBarIcon className="w-4 h-4" />}
             >
+              <Icon icon={ChartBarIcon} />
               Oportunidades ({analysisResult?.opportunityRecommendations.length || 0})
             </Button>
           </HStack>
@@ -337,7 +338,7 @@ export const ProcurementRecommendationsTab: React.FC<ProcurementRecommendationsT
           {filteredRecommendations.length === 0 ? (
             <CardWrapper variant="elevated" p="8">
               <VStack align="center" gap="4">
-                <CheckCircleIcon className="w-16 h-16 text-green-500" />
+                <Icon icon={CheckCircleIcon} size="2xl" color="green.500" />
                 <Text fontSize="lg" fontWeight="semibold">
                   No hay recomendaciones en esta categoría
                 </Text>
@@ -488,7 +489,7 @@ const ProcurementRecommendationCard: React.FC<ProcurementRecommendationCardProps
           {/* Riesgo de stock-out */}
           {recommendation.stockoutRisk > 20 && (
             <HStack gap="2">
-              <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" />
+              <Icon icon={ExclamationTriangleIcon} color="orange.500" />
               <Text fontSize="sm" color="orange.600">
                 Riesgo de stock-out: {recommendation.stockoutRisk}%
               </Text>
@@ -509,12 +510,12 @@ const ProcurementRecommendationCard: React.FC<ProcurementRecommendationCardProps
               size="sm"
               variant={action.type === 'create_order' ? 'solid' : 'outline'}
               colorPalette={action.type === 'create_order' ? 'blue' : 'gray'}
-              leftIcon={getActionIcon(action.type)}
               onClick={() => {
                 // TODO: Implementar acciones reales
                 logger.info('MaterialsStore', 'Executing action:', action);
               }}
             >
+              {getActionIcon(action.type)}
               {action.label}
             </Button>
           ))}
@@ -528,11 +529,11 @@ const ProcurementRecommendationCard: React.FC<ProcurementRecommendationCardProps
 // Helper para iconos de acciones
 function getActionIcon(actionType: string) {
   switch (actionType) {
-    case 'create_order': return <ShoppingCartIcon className="w-4 h-4" />;
-    case 'contact_supplier': return <PhoneIcon className="w-4 h-4" />;
-    case 'request_quote': return <DocumentTextIcon className="w-4 h-4" />;
-    case 'schedule_delivery': return <TruckIcon className="w-4 h-4" />;
-    case 'view_details': return <EyeIcon className="w-4 h-4" />;
+    case 'create_order': return <Icon icon={ShoppingCartIcon} />;
+    case 'contact_supplier': return <Icon icon={PhoneIcon} />;
+    case 'request_quote': return <Icon icon={DocumentTextIcon} />;
+    case 'schedule_delivery': return <Icon icon={TruckIcon} />;
+    case 'view_details': return <Icon icon={EyeIcon} />;
     default: return null;
   }
 }

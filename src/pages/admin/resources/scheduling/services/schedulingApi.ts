@@ -23,7 +23,7 @@ import type {
   DateRange,
   CalendarConfig,
 } from '@/shared/calendar/types/DateTimeTypes';
-import { createISODate, createISODateTime, calculateDuration, nowTimestamp } from '@/shared/calendar';
+import { createISODate, createISODateTime, calculateDuration, nowTimestamp, registerGlobalAdapter } from '@/shared/calendar';
 import { logger } from '@/lib/logging';
 import type {
   StaffShift,
@@ -47,7 +47,7 @@ import type {
  * Scheduling-specific calendar adapter
  * Implements business rules for staff scheduling
  */
-class SchedulingCalendarAdapter extends BaseCalendarAdapter {
+export class SchedulingCalendarAdapter extends BaseCalendarAdapter {
   async validateBookingRules(bookingData: any) {
     // Implement scheduling-specific validation
     return { isValid: true, errors: [], warnings: [] };
@@ -758,6 +758,16 @@ export const schedulingAnalyticsApi = {
     }
   }
 };
+
+// ===============================
+// ADAPTER REGISTRATION
+// ===============================
+
+/**
+ * Register the scheduling adapter globally
+ * This makes it available to UnifiedCalendar when using businessModel="staff_scheduling"
+ */
+registerGlobalAdapter('staff_scheduling', SchedulingCalendarAdapter);
 
 // Export all APIs
 export const schedulingApi = {

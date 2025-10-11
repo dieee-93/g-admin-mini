@@ -1,4 +1,4 @@
-import { Stack, Button } from '@/shared/ui';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@/shared/ui';
 import { InventoryTab } from './InventoryTab';
 import { ABCAnalysisTab } from './ABCAnalysisTab';
 import { ProcurementTab } from './ProcurementTab';
@@ -21,44 +21,45 @@ export function MaterialsManagement({
   performanceMode = false
 }: MaterialsManagementProps) {
   return (
-    <Stack direction="column" gap="md">
-      {/* Simple Tab Navigation */}
-      <Stack direction="row" gap="sm">
-        <Button
-          variant={activeTab === 'inventory' ? 'solid' : 'outline'}
-          onClick={() => onTabChange('inventory')}
-        >
+    <Tabs
+      value={activeTab}
+      onValueChange={onTabChange}
+      variant="line"
+      colorPalette="blue"
+      size="md"
+      isLazy
+      lazyBehavior="keepMounted"
+    >
+      <TabList gap="sm">
+        <Tab value="inventory">
           Inventario
-        </Button>
-        <Button
-          variant={activeTab === 'analytics' ? 'solid' : 'outline'}
-          onClick={() => onTabChange('analytics')}
-        >
+        </Tab>
+        <Tab value="analytics">
           Análisis ABC
-        </Button>
-        <Button
-          variant={activeTab === 'procurement' ? 'solid' : 'outline'}
-          onClick={() => onTabChange('procurement')}
-        >
+        </Tab>
+        <Tab value="procurement">
           Compras
-        </Button>
-      </Stack>
+        </Tab>
+      </TabList>
 
-      {/* Tab Content */}
-      <Stack>
-        {activeTab === 'inventory' && (
+      <TabPanels>
+        <TabPanel value="inventory" padding="md">
           <InventoryTab
             onStockUpdate={onStockUpdate}
             onBulkAction={onBulkAction}
             onAddMaterial={onAddMaterial}
             performanceMode={performanceMode}
           />
-        )}
+        </TabPanel>
 
-        {activeTab === 'analytics' && <ABCAnalysisTab />}
+        <TabPanel value="analytics" padding="md">
+          <ABCAnalysisTab />
+        </TabPanel>
 
-        {activeTab === 'procurement' && <ProcurementTab />}
-      </Stack>
-    </Stack>
+        <TabPanel value="procurement" padding="md">
+          <ProcurementTab />
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
   );
 }

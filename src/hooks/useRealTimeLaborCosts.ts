@@ -61,7 +61,7 @@ export function useRealTimeLaborCosts(options: UseRealTimeLaborCostsOptions = {}
       setError(null);
 
       // Subscribe to live data updates
-      unsubscribeDataRef.current = realTimeLaborCosts.subscribe((data) => {
+      unsubscribeDataRef.current = realTimeLaborCosts.subscribe((_data) => {
         setLiveData(data);
         setLoading(false);
       });

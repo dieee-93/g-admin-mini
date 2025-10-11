@@ -19,7 +19,6 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
-import { secureApiCall } from '@/lib/validation/security';
 import { FinancialDecimal, formatCurrency, safeAdd, safeMul, safeDiv } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 
@@ -30,7 +29,14 @@ import {
   analyzeProductPerformance,
   calculateRevenueBreakdown,
   calculateSalesVelocity,
-  taxService
+  taxService,
+  fetchTransactions,
+  fetchOrders,
+  fetchProductsWithAvailability,
+  fetchTables,
+  processSale,
+  seatParty,
+  clearTable
 } from '../services';
 import type {
   SalesMetrics,
@@ -175,6 +181,9 @@ export const useSalesPage = (): UseSalesPageReturn => {
   const { isOnline } = useOfflineStatus();
   const { shouldReduceAnimations } = usePerformanceMonitor();
 
+  // 🔧 DEBUG: Force Vite HMR to reload this file
+  console.log('🔍 [DEBUG] useSalesPage hook initializing - v3 FIXED');
+
   // State
   const [pageState, setPageState] = useState<SalesPageState>({
     activeSection: 'pos',
@@ -217,56 +226,7 @@ export const useSalesPage = (): UseSalesPageReturn => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Setup quick actions with sales-specific actions
-  useEffect(() => {
-    const quickActions = [
-      {
-        id: 'new-sale',
-        label: 'Nueva Venta',
-        icon: CreditCardIcon,
-        action: () => handleNewSale(),
-        color: 'teal'
-      },
-      {
-        id: 'view-analytics',
-        label: 'Analytics',
-        icon: ChartBarIcon,
-        action: () => handleShowAnalytics(),
-        color: 'blue'
-      },
-      {
-        id: 'table-management',
-        label: 'Gestión Mesas',
-        icon: TableCellsIcon,
-        action: () => setActiveSection('tables'),
-        color: 'green'
-      },
-      {
-        id: 'qr-codes',
-        label: 'Códigos QR',
-        icon: QrCodeIcon,
-        action: () => handleQRGeneration(),
-        color: 'purple'
-      },
-      {
-        id: 'kitchen-display',
-        label: 'Cocina',
-        icon: ComputerDesktopIcon,
-        action: () => handleKitchenDisplay(),
-        color: 'orange'
-      },
-      {
-        id: 'refresh-data',
-        label: 'Actualizar',
-        icon: ArrowPathIcon,
-        action: () => refreshSalesData(),
-        color: 'gray'
-      }
-    ];
-
-    setQuickActions(quickActions);
-    return () => setQuickActions([]);
-  }, [setQuickActions]);
+  // 🔧 FIX: Quick actions setup moved to after all functions are declared (see line ~760)
 
   // Calculate metrics using business logic services
   const metrics: SalesPageMetrics = useMemo(() => {
@@ -350,18 +310,13 @@ export const useSalesPage = (): UseSalesPageReturn => {
         }
       }
 
-      // Secure API calls with decimal precision
+      // ✅ DIRECT API CALLS - RLS provides security
+      // Pattern: Hook → Service → Supabase Client → RLS (PostgreSQL)
       const [transactionsRes, productsRes, tablesRes, salesRes] = await Promise.all([
-        secureApiCall('/api/sales/transactions', {
-          method: 'GET',
-          params: { period: pageState.analyticsTimeRange }
-        }),
-        secureApiCall('/api/sales/products', { method: 'GET' }),
-        secureApiCall('/api/sales/tables', { method: 'GET' }),
-        secureApiCall('/api/sales/orders', {
-          method: 'GET',
-          params: { status: 'active' }
-        })
+        fetchTransactions(pageState.analyticsTimeRange),
+        fetchProductsWithAvailability(),
+        fetchTables(),
+        fetchOrders('active')
       ]);
 
       // Process with decimal precision for financial calculations
@@ -427,6 +382,14 @@ export const useSalesPage = (): UseSalesPageReturn => {
     loadSalesData();
   }, [loadSalesData]);
 
+  // 🔧 FIX: refreshSalesData declared EARLY, before any useCallback that uses it
+  const refreshSalesData = useCallback(async () => {
+    console.log('🔍 [DEBUG] refreshSalesData called');
+    await loadSalesData();
+  }, [loadSalesData]);
+
+  console.log('🔍 [DEBUG] refreshSalesData declared successfully at line 387');
+
   // ✅ ENTERPRISE ACTION HANDLERS WITH SECURITY & DECIMAL PRECISION
   const setActiveSection = useCallback((section: SalesPageSection) => {
     setPageState(prev => ({ ...prev, activeSection: section }));
@@ -446,15 +409,10 @@ export const useSalesPage = (): UseSalesPageReturn => {
         }
       }));
 
-      // Security audit log for financial operations
-      await secureApiCall('/api/audit/log', {
-        method: 'POST',
-        body: {
-          action: 'new_sale_initiated',
-          module: 'sales',
-          timestamp: new Date().toISOString(),
-          user_id: 'current_user' // would come from auth context
-        }
+      // TODO: Implement audit logging via database triggers or Edge Function
+      // For now, rely on RLS and database audit tables
+      logger.info('SalesStore', 'New sale initiated', {
+        timestamp: new Date().toISOString()
       });
 
       notify.success('Nueva venta iniciada');
@@ -478,18 +436,20 @@ export const useSalesPage = (): UseSalesPageReturn => {
       const taxResult = taxService.calculateTaxesForItems(pageState.currentSale.items);
       const total = safeAdd(subtotal, taxResult.total_taxes);
 
-      // Secure payment processing
-      const paymentResult = await secureApiCall('/api/sales/process-payment', {
-        method: 'POST',
-        body: {
-          items: pageState.currentSale.items,
-          subtotal: subtotal.toString(),
-          taxes: taxResult,
-          total: total.toString(),
-          payment_method: paymentData?.method || 'cash',
-          table_number: pageState.currentSale.tableNumber
-        }
-      });
+      // TODO: Implement via Edge Function (see docs/EDGE_FUNCTIONS_TODO.md)
+      // For now, use processSale service directly
+      const saleData = {
+        items: pageState.currentSale.items.map(item => ({
+          product_id: item.productId,
+          quantity: item.quantity,
+          unit_price: item.unitPrice
+        })),
+        payment_method: paymentData?.method || 'cash',
+        table_number: pageState.currentSale.tableNumber,
+        notes: null
+      };
+
+      const paymentResult = await processSale(saleData);
 
       if (paymentResult.success) {
         // Reset sale state
@@ -520,16 +480,13 @@ export const useSalesPage = (): UseSalesPageReturn => {
   const handleVoidSale = useCallback(async () => {
     try {
       if (pageState.currentSale.isActive && pageState.currentSale.items.length > 0) {
-        // Security audit for voided sales
-        await secureApiCall('/api/audit/log', {
-          method: 'POST',
-          body: {
-            action: 'sale_voided',
-            module: 'sales',
-            sale_value: pageState.currentSale.total,
-            items_count: pageState.currentSale.items.length,
-            timestamp: new Date().toISOString()
-          }
+        // TODO: Implement audit logging via database triggers
+        logger.warn('SalesStore', 'Sale voided', {
+          action: 'sale_voided',
+          module: 'sales',
+          sale_value: pageState.currentSale.total,
+          items_count: pageState.currentSale.items.length,
+          timestamp: new Date().toISOString()
         });
       }
 
@@ -552,38 +509,22 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
   const handleRefund = useCallback(async (saleId: string, refundAmount?: number) => {
     try {
-      // Security validation for refund operations
-      const refundResult = await secureApiCall('/api/sales/process-refund', {
-        method: 'POST',
-        body: {
-          sale_id: saleId,
-          refund_amount: refundAmount ? new FinancialDecimal(refundAmount).toString() : null,
-          partial: !!refundAmount,
-          timestamp: new Date().toISOString(),
-          reason: 'user_requested' // would come from form input
-        }
+      // TODO: Implement refund via Edge Function (see docs/EDGE_FUNCTIONS_TODO.md)
+      // For now, log the refund request
+      logger.warn('SalesStore', 'Refund requested - not yet implemented', {
+        sale_id: saleId,
+        refund_amount: refundAmount,
+        timestamp: new Date().toISOString()
       });
 
-      if (refundResult.success) {
-        // Audit log for financial security
-        await secureApiCall('/api/audit/log', {
-          method: 'POST',
-          body: {
-            action: 'refund_processed',
-            module: 'sales',
-            sale_id: saleId,
-            refund_amount: refundAmount || refundResult.amount,
-            timestamp: new Date().toISOString()
-          }
-        });
+      notify.warning('Función de reembolso en desarrollo. Contacta soporte.');
 
-        await refreshSalesData();
-        notify.success(`Reembolso procesado: ${formatCurrency(refundResult.amount)}`);
-      }
+      // When implemented, will use:
+      // const refundResult = await processSaleRefund(saleId, refundAmount);
     } catch (err) {
       handleError(err, 'Refund Processing', { sale_id: saleId, refund_amount: refundAmount });
     }
-  }, [handleError, refreshSalesData]);
+  }, [handleError]);
 
   const handleTableSelect = useCallback((tableId: string) => {
     setPageState(prev => ({ ...prev, selectedTableId: tableId }));
@@ -592,20 +533,11 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
   const handleTableAssign = useCallback(async (tableId: string, orderData: any) => {
     try {
-      // Assign order to table with audit trail
-      const assignResult = await secureApiCall('/api/sales/assign-table', {
-        method: 'POST',
-        body: {
-          table_id: tableId,
-          order_data: orderData,
-          timestamp: new Date().toISOString()
-        }
-      });
+      // Use tableApi service - already implemented with RLS
+      const party = await seatParty(tableId, orderData.partySize, orderData);
 
-      if (assignResult.success) {
-        await refreshSalesData();
-        notify.success(`Mesa ${tableId} asignada correctamente`);
-      }
+      await refreshSalesData();
+      notify.success(`Mesa ${tableId} asignada correctamente`);
     } catch (err) {
       handleError(err, 'Table Assignment', { table_id: tableId });
     }
@@ -613,19 +545,11 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
   const handleTableClear = useCallback(async (tableId: string) => {
     try {
-      // Clear table with proper cleanup
-      const clearResult = await secureApiCall('/api/sales/clear-table', {
-        method: 'POST',
-        body: {
-          table_id: tableId,
-          timestamp: new Date().toISOString()
-        }
-      });
+      // Use tableApi service - already implemented with RLS
+      await clearTable(tableId);
 
-      if (clearResult.success) {
-        await refreshSalesData();
-        notify.success(`Mesa ${tableId} liberada`);
-      }
+      await refreshSalesData();
+      notify.success(`Mesa ${tableId} liberada`);
     } catch (err) {
       handleError(err, 'Table Clear', { table_id: tableId });
     }
@@ -686,9 +610,7 @@ export const useSalesPage = (): UseSalesPageReturn => {
     setPageState(prev => ({ ...prev, analyticsTimeRange: range }));
   }, []);
 
-  const refreshSalesData = useCallback(async () => {
-    await loadSalesData();
-  }, [loadSalesData]);
+  // 🔧 MOVED: refreshSalesData declaration moved earlier - removed from here
 
   // NEW: Component-specific handlers
   const handleMetricClick = useCallback((metric: string, value: any) => {
@@ -758,6 +680,67 @@ export const useSalesPage = (): UseSalesPageReturn => {
     refreshSalesData,
     setActiveSection
   };
+
+  // 🔧 FIX: Setup quick actions AFTER all functions are declared
+  // This prevents "Cannot access 'refreshSalesData' before initialization" error
+  useEffect(() => {
+    console.log('🔍 [DEBUG] Setting up quick actions - refreshSalesData exists:', typeof refreshSalesData);
+    const quickActions = [
+      {
+        id: 'new-sale',
+        label: 'Nueva Venta',
+        icon: CreditCardIcon,
+        action: () => handleNewSale(),
+        color: 'teal'
+      },
+      {
+        id: 'view-analytics',
+        label: 'Analytics',
+        icon: ChartBarIcon,
+        action: () => handleShowAnalytics(),
+        color: 'blue'
+      },
+      {
+        id: 'table-management',
+        label: 'Gestión Mesas',
+        icon: TableCellsIcon,
+        action: () => setActiveSection('tables'),
+        color: 'green'
+      },
+      {
+        id: 'qr-codes',
+        label: 'Códigos QR',
+        icon: QrCodeIcon,
+        action: () => handleQRGeneration(),
+        color: 'purple'
+      },
+      {
+        id: 'kitchen-display',
+        label: 'Cocina',
+        icon: ComputerDesktopIcon,
+        action: () => handleKitchenDisplay(),
+        color: 'orange'
+      },
+      {
+        id: 'refresh-data',
+        label: 'Actualizar',
+        icon: ArrowPathIcon,
+        action: () => refreshSalesData(),
+        color: 'gray'
+      }
+    ];
+
+    setQuickActions(quickActions);
+    return () => setQuickActions([]);
+  }, [
+    setQuickActions,
+    handleNewSale,
+    handleShowAnalytics,
+    setActiveSection,
+    handleQRGeneration,
+    handleKitchenDisplay,
+    refreshSalesData
+  ]);
 
   return {
     pageState,

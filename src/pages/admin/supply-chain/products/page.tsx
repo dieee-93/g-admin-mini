@@ -5,7 +5,7 @@ import {
   Button
 } from '@/shared/ui';
 import { CogIcon, PlusIcon } from '@heroicons/react/24/outline';
-import { CapabilityGate } from '@/components/personalization/CapabilityGate';
+import { CapabilityGate } from '@/lib/capabilities/components/CapabilityGate';
 
 // Import components and hooks using barrel exports
 import {

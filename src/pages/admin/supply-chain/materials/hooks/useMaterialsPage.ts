@@ -21,6 +21,7 @@ import type { MaterialItem } from '../types';
 import { useDataFetcher, useDataSearch, useModuleAnalytics } from '@/shared/hooks/business';
 import { AnalyticsEngine } from '@/shared/services/AnalyticsEngine';
 import { handleAsyncOperation, CRUDHandlers } from '@/shared/utils/errorHandling';
+import eventBus from '@/lib/events';
 
 import { logger } from '@/lib/logging';
 export interface MaterialsPageState {
@@ -308,13 +309,58 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     // Stock operations
     handleStockUpdate: useCallback(async (itemId: string, newStock: number) => {
       try {
-        await inventoryApi.updateStock(itemId, newStock);
-        // Refresh data after successful update
-        await loadInventoryData();
+        const updatedItem = await inventoryApi.updateStock(itemId, newStock);
+
+        // Find the item to get details
+        const currentItems = getFilteredItems();
+        const item = currentItems.find(i => i.id === itemId);
+
+        // Update item directly in store (optimistic update)
+        const updatedItems = currentItems.map(item =>
+          item.id === itemId ? { ...item, stock: newStock, lastUpdated: new Date() } : item
+        );
+        setItems(updatedItems);
+
+        // Refresh stats
+        if (refreshStats) {
+          refreshStats();
+        }
+
+        // ✅ EMIT EVENTBUS: Stock updated
+        if (item) {
+          eventBus.emit('materials.stock_updated', {
+            itemId,
+            itemName: item.name,
+            previousStock: item.stock,
+            newStock,
+            timestamp: new Date().toISOString()
+          });
+
+          // Check if stock is now low or critical
+          const stockStatus = StockCalculation.getStockStatus(
+            newStock,
+            item.minStock || 0,
+            item.maxStock
+          );
+
+          if (stockStatus === 'critical' || stockStatus === 'low') {
+            eventBus.emit('materials.low_stock_alert', {
+              itemId,
+              itemName: item.name,
+              currentStock: newStock,
+              minStock: item.minStock || 0,
+              status: stockStatus,
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
       } catch (error) {
+        // On error, reload data to ensure consistency
+        await loadInventoryData();
         handleError(error as Error, { operation: 'updateStock', itemId });
+        throw error;
       }
-    }, [loadInventoryData, handleError]),
+    }, [getFilteredItems, setItems, refreshStats, loadInventoryData, handleError]),
 
     // Material management
     handleOpenAddModal: useCallback(() => {
@@ -323,8 +369,17 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
 
     handleAddMaterial: useCallback(async (materialData: any) => {
       try {
-        await inventoryApi.createMaterial(materialData);
+        const newMaterial = await inventoryApi.createMaterial(materialData);
         await loadInventoryData();
+
+        // ✅ EMIT EVENTBUS: Material created
+        eventBus.emit('materials.material_created', {
+          materialId: newMaterial?.id || 'new',
+          materialName: materialData.name,
+          category: materialData.category,
+          initialStock: materialData.stock || 0,
+          timestamp: new Date().toISOString()
+        });
       } catch (error) {
         handleError(error as Error, { operation: 'addMaterial' });
       }

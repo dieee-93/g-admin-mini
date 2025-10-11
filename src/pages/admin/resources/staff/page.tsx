@@ -18,11 +18,9 @@ import {
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
 // CapabilityGate and Slot integration
-import { CapabilityGate } from '@/lib/capabilities';
+import EventBus from '@/lib/events';
+import { CapabilityGate, useCapabilities } from '@/lib/capabilities';
 import { Slot } from '@/lib/composition';
-
-// Module integration
-import { useModuleIntegration } from '@/hooks/useModuleIntegration';
 
 import { useStaffPage } from './hooks';
 
@@ -60,10 +58,7 @@ const STAFF_MODULE_CONFIG = {
 
 export default function StaffPage() {
   // Module integration (EventBus + CapabilityGate + Slots)
-  const { emitEvent, hasCapability, status, registerSlotContent } = useModuleIntegration(
-    'staff',
-    STAFF_MODULE_CONFIG
-  );
+  const { hasFeature } = useCapabilities();
 
   const {
     pageState,
@@ -77,7 +72,7 @@ export default function StaffPage() {
   // Enhanced actions with EventBus integration - Staff ↔ Operations coordination
   const handleShiftChange = (staffId: string, shiftData: any) => {
     // Emit shift change for kitchen and operations planning
-    emitEvent('shift_changed', {
+    EventBus.emit('shift_changed', {
       staffId,
       previousShift: shiftData.previous,
       newShift: shiftData.new,
@@ -91,7 +86,7 @@ export default function StaffPage() {
 
   const handleClockIn = (staffId: string, location: string) => {
     // Emit clock in event for attendance tracking
-    emitEvent('staff_clocked_in', {
+    EventBus.emit('staff_clocked_in', {
       staffId,
       location, // kitchen, front_of_house, management
       timestamp: Date.now(),
@@ -101,7 +96,7 @@ export default function StaffPage() {
 
   const handlePerformanceAlert = (staffId: string, alertType: string, severity: 'low' | 'medium' | 'high') => {
     // Emit performance alerts for management
-    emitEvent('performance_alert', {
+    EventBus.emit('performance_alert', {
       staffId,
       alertType, // late_arrival, quality_issue, customer_complaint, etc.
       severity,
@@ -120,7 +115,7 @@ export default function StaffPage() {
 
   if (error) {
     // Emit error event for monitoring
-    emitEvent('staff_error', { type: 'load_failed', error, timestamp: Date.now() });
+    EventBus.emit('staff_error', { type: 'load_failed', error, timestamp: Date.now() });
     return (
       <ContentLayout spacing="normal">
         <Stack gap={12}>
@@ -132,14 +127,6 @@ export default function StaffPage() {
 
   return (
     <ContentLayout spacing="normal">
-      {/* 🔒 Module status indicator */}
-      {!status.isActive && (
-        <Alert
-          variant="subtle"
-          title="Module Capabilities Required"
-          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
-        />
-      )}
 
       <Stack gap={12}>
         {/* 📊 MÉTRICAS DE STAFF - SIEMPRE PRIMERO */}
@@ -163,14 +150,14 @@ export default function StaffPage() {
               value={metrics.totalStaff}
               icon={UsersIcon}
               colorPalette="blue"
-              onClick={() => emitEvent('metric_clicked', { metric: 'total-staff', value: metrics.totalStaff })}
+              onClick={() => EventBus.emit('metric_clicked', { metric: 'total-staff', value: metrics.totalStaff })}
             />
             <MetricCard
               title="En Turno"
               value={metrics.onShiftCount}
               icon={ClockIcon}
               colorPalette="green"
-              onClick={() => emitEvent('metric_clicked', { metric: 'on-shift' })}
+              onClick={() => EventBus.emit('metric_clicked', { metric: 'on-shift' })}
             />
             <MetricCard
               title="Rendimiento Prom."
@@ -178,14 +165,14 @@ export default function StaffPage() {
               icon={TrophyIcon}
               colorPalette="purple"
               trend={{ value: metrics.avgPerformanceRating, isPositive: metrics.avgPerformanceRating > 3.5 }}
-              onClick={() => emitEvent('metric_clicked', { metric: 'performance' })}
+              onClick={() => EventBus.emit('metric_clicked', { metric: 'performance' })}
             />
             <MetricCard
               title="Evaluaciones Pendientes"
               value={metrics.upcomingReviews}
               icon={AcademicCapIcon}
               colorPalette="orange"
-              onClick={() => emitEvent('metric_clicked', { metric: 'reviews' })}
+              onClick={() => EventBus.emit('metric_clicked', { metric: 'reviews' })}
             />
           </CardGrid>
         </StatsSection>
@@ -198,7 +185,7 @@ export default function StaffPage() {
               value={`$${metrics.todayLaborCost.toFixed(2)}`}
               icon={CurrencyDollarIcon}
               colorPalette="teal"
-              onClick={() => emitEvent('metric_clicked', { metric: 'labor-cost' })}
+              onClick={() => EventBus.emit('metric_clicked', { metric: 'labor-cost' })}
             />
             <MetricCard
               title="Uso Presupuesto"
@@ -206,7 +193,7 @@ export default function StaffPage() {
               icon={ArrowTrendingUpIcon}
               colorPalette={metrics.budgetVariance > 10 ? "red" : "green"}
               trend={{ value: metrics.budgetVariance, isPositive: metrics.budgetVariance <= 0 }}
-              onClick={() => emitEvent('metric_clicked', { metric: 'budget-usage' })}
+              onClick={() => EventBus.emit('metric_clicked', { metric: 'budget-usage' })}
             />
             <MetricCard
               title="Eficiencia"
@@ -214,14 +201,14 @@ export default function StaffPage() {
               icon={CheckCircleIcon}
               colorPalette="cyan"
               trend={{ value: metrics.efficiencyScore, isPositive: metrics.efficiencyScore > 80 }}
-              onClick={() => emitEvent('metric_clicked', { metric: 'efficiency' })}
+              onClick={() => EventBus.emit('metric_clicked', { metric: 'efficiency' })}
             />
             <MetricCard
               title="Horas Extra"
               value={`${metrics.totalOvertimeHours.toFixed(1)}h`}
               icon={ExclamationTriangleIcon}
               colorPalette={metrics.overtimeConcerns > 0 ? "orange" : "green"}
-              onClick={() => emitEvent('metric_clicked', { metric: 'overtime' })}
+              onClick={() => EventBus.emit('metric_clicked', { metric: 'overtime' })}
             />
           </CardGrid>
         </StatsSection>

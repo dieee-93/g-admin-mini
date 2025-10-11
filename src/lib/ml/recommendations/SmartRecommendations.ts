@@ -160,17 +160,17 @@ export class SmartRecommendationEngine {
    */
   private initializeEventListeners(): void {
     // Listen for completed orders
-    EventBus.on('sales.order.placed', (event) => {
+    EventBus.on('sales.order.placed', (_event) => {
       this.processOrderForAnalysis(event.payload);
     });
 
     // Listen for menu changes
-    EventBus.on('recipes.used', (event) => {
+    EventBus.on('recipes.used', (_event) => {
       this.updateMenuItemUsage(event.payload);
     });
 
     // Listen for sales completions
-    EventBus.on('sales.completed', (event) => {
+    EventBus.on('sales.completed', (_event) => {
       this.processSaleForAnalysis(event.payload);
     });
   }

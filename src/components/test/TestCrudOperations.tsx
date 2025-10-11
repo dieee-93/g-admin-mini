@@ -5,7 +5,7 @@
  * y que useCrudOperations se comporta correctamente sin ciclos infinitos.
  */
 
-import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { z } from 'zod';
 
@@ -15,6 +15,15 @@ interface TestItem {
   name: string;
   description?: string;
   created_at?: string;
+}
+
+// Tipo para tracking de valores entre renders
+interface RenderValues {
+  items: number;
+  loading: boolean;
+  error: string | null;
+  isSubscribed: boolean;
+  status: string;
 }
 
 // Schema simple para testing - ✅ MOVIDO FUERA para evitar recreación
@@ -33,22 +42,27 @@ const defaultValues = {
 
 export function TestCrudOperations() {
   const renderCountRef = useRef(0);
-  const renderReasonsRef = useRef<string[]>([]);
-  const previousValuesRef = useRef<any>({});
+  const previousValuesRef = useRef<RenderValues>({
+    items: 0,
+    loading: false,
+    error: null,
+    isSubscribed: false,
+    status: 'idle'
+  });
   const [status, setStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
 
   // ✅ Incrementar contador de renders sin causar re-renders
   renderCountRef.current += 1;
-  
+
   // 🔍 Log cada render para debugging
   console.log(`🔄 TestCrudOperations render #${renderCountRef.current}`);
 
   // ✅ Stable callbacks to prevent hook from recreating functions
-  const onSuccess = useCallback((action: string, data: any) => {
+  const onSuccess = useCallback((action: string, data: unknown) => {
     console.log('✅ CRUD Success:', action, data);
   }, []);
 
-  const onError = useCallback((action: string, error: any) => {
+  const onError = useCallback((action: string, error: unknown) => {
     console.log('❌ CRUD Error:', action, error);
   }, []);
 
@@ -59,13 +73,8 @@ export function TestCrudOperations() {
     error,
     form,
     fetchAll,
-    create,
-    update,
-    remove,
     refresh,
     startCreate,
-    startEdit,
-    saveForm,
     cancelForm,
     resetForm,
     searchItems,
@@ -84,7 +93,7 @@ export function TestCrudOperations() {
   });
 
   // 🔍 Track what changed between renders
-  const currentValues = {
+  const currentValues: RenderValues = {
     items: items.length,
     loading,
     error,
@@ -96,17 +105,17 @@ export function TestCrudOperations() {
   useEffect(() => {
     const previous = previousValuesRef.current;
     const changes: string[] = [];
-    
-    Object.keys(currentValues).forEach(key => {
-      if (previous[key] !== (currentValues as any)[key]) {
-        changes.push(`${key}: ${previous[key]} → ${(currentValues as any)[key]}`);
+
+    (Object.keys(currentValues) as Array<keyof RenderValues>).forEach(key => {
+      if (previous[key] !== currentValues[key]) {
+        changes.push(`${key}: ${previous[key]} → ${currentValues[key]}`);
       }
     });
-    
+
     if (changes.length > 0) {
       console.log(`🔍 Render #${renderCountRef.current} caused by:`, changes);
     }
-    
+
     previousValuesRef.current = { ...currentValues };
   });
 

@@ -7,7 +7,7 @@ import {
   ArrowPathIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
-import { useSalesAlerts, useMetricsToAnalysisData } from '../hooks/useSalesAlerts';
+import { useSalesAlerts, metricsToAnalysisData } from '../hooks/useSalesAlerts';
 import type { SalesPageMetrics } from '../hooks/useSalesPage';
 
 interface SalesAlertsProps {
@@ -30,8 +30,9 @@ export function SalesAlerts({ onAlertAction, context, metrics }: SalesAlertsProp
     acknowledgeAlert
   } = useSalesAlerts();
 
-  // Convertir métricas a formato de análisis si están disponibles
-  const analysisData = metrics ? useMetricsToAnalysisData(metrics) : null;
+  // ✅ FIX: Not a hook, just a data transformation function
+  // Safe to call conditionally since it doesn't use any React hooks
+  const analysisData = metrics ? metricsToAnalysisData(metrics) : null;
 
   const handleAlertAction = (action: string, alertId: string) => {
     onAlertAction?.(action, alertId);

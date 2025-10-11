@@ -18,11 +18,9 @@ import {
 import { Icon } from '@/shared/ui';
 
 // CapabilityGate and Slot integration
-import { CapabilityGate } from '@/lib/capabilities';
+import EventBus from '@/lib/events';
+import { CapabilityGate, useCapabilities } from '@/lib/capabilities';
 import { Slot } from '@/lib/composition';
-
-// Module integration
-import { useModuleIntegration } from '@/hooks/useModuleIntegration';
 
 // Hooks
 import { useHubPage } from './hooks';
@@ -57,10 +55,7 @@ const OPERATIONS_MODULE_CONFIG = {
 
 export default function OperationsPage() {
   // Module integration (EventBus + CapabilityGate + Slots)
-  const { emitEvent, hasCapability, status, registerSlotContent } = useModuleIntegration(
-    'operations',
-    OPERATIONS_MODULE_CONFIG
-  );
+  const { hasFeature } = useCapabilities();
 
   // Page orchestration logic
   const {
@@ -73,7 +68,7 @@ export default function OperationsPage() {
 
   // Enhanced actions with EventBus integration
   const handleOrderCreated = (orderData: any) => {
-    emitEvent('order_created', {
+    EventBus.emit('order_created', {
       orderId: orderData.id,
       tableId: orderData.tableId,
       items: orderData.items,
@@ -83,7 +78,7 @@ export default function OperationsPage() {
   };
 
   const handleTableStatusChange = (tableId: string, status: 'occupied' | 'free') => {
-    emitEvent(status === 'occupied' ? 'table_occupied' : 'table_freed', {
+    EventBus.emit(status === 'occupied' ? 'table_occupied' : 'table_freed', {
       tableId,
       timestamp: Date.now(),
       capacity: 4 // TODO: get from table data
@@ -105,15 +100,6 @@ export default function OperationsPage() {
 
   return (
     <ContentLayout spacing="normal">
-      {/* 🔒 Module status indicator */}
-      {!status.isActive && (
-        <Alert
-          variant="subtle"
-          title="Module Capabilities Required"
-          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
-        />
-      )}
-
       {/* Operations Metrics Section */}
       <StatsSection>
         <CardGrid columns={{ base: 1, md: 4 }}>

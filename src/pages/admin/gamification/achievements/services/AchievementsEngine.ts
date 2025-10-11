@@ -11,7 +11,19 @@
 import eventBus from '../../../../../lib/events';
 import type { EventPattern } from '../../../../../lib/events';
 import { supabase } from '../../../../../lib/supabase/client';
-import { MILESTONE_DEFINITIONS, CAPABILITY_MILESTONE_CONFIG, getMilestonesForCapability } from '../../../../../config/milestones';
+
+// NEW v4.0: Use RequirementsRegistry instead of old milestones.ts
+import {
+  REQUIREMENTS_REGISTRY,
+  getAllFoundationalMilestones,
+  getAllMasteryAchievements,
+  getFoundationalMilestone,
+  getMasteryAchievement
+} from '../../../../../config/RequirementsRegistry';
+
+// Import capability store to update milestone completion
+import { useCapabilityStore } from '../../../../../store/capabilityStore';
+
 import { logger } from '@/lib/logging';
 import type { 
   MilestoneDefinition, 
@@ -68,6 +80,7 @@ export class AchievementsEngine {
 
   /**
    * Carga las definiciones de logros de maestría desde la base de datos
+   * FASE 2: Filtra logros según business model (condicionales)
    */
   private async loadMasteryAchievements(): Promise<void> {
     try {
@@ -82,8 +95,46 @@ export class AchievementsEngine {
         return;
       }
 
-      this.masteryAchievements = data || [];
-      
+      let achievements = data || [];
+
+      // FASE 2: Filtrar por business model del usuario (Logros Condicionales)
+      const store = useCapabilityStore.getState();
+      const userActivities = store.profile?.selectedActivities || [];
+      const userInfrastructure = store.profile?.selectedInfrastructure || [];
+
+      if (userActivities.length > 0 || userInfrastructure.length > 0) {
+        achievements = achievements.filter(achievement => {
+          // Si tiene requiredActivities, verificar que el usuario las tenga
+          if (achievement.required_activities && achievement.required_activities.length > 0) {
+            const hasRequired = achievement.required_activities.some((activity: string) =>
+              userActivities.includes(activity as any)
+            );
+            if (!hasRequired) return false;
+          }
+
+          // Si tiene requiredInfrastructure, verificar
+          if (achievement.required_infrastructure && achievement.required_infrastructure.length > 0) {
+            const hasRequired = achievement.required_infrastructure.some((infra: string) =>
+              userInfrastructure.includes(infra as any)
+            );
+            if (!hasRequired) return false;
+          }
+
+          // Sin requisitos = visible para todos
+          return true;
+        });
+
+        logger.info(
+          'CapabilitySystem',
+          '[AchievementsEngine] Logros filtrados por business model:',
+          achievements.length,
+          'de',
+          data?.length || 0
+        );
+      }
+
+      this.masteryAchievements = achievements;
+
     } catch (error) {
       logger.error('CapabilitySystem', '[AchievementsEngine] Error cargando logros de maestría:', error);
       this.masteryAchievements = [];
@@ -92,11 +143,14 @@ export class AchievementsEngine {
 
   /**
    * Configura listeners para todos los eventos de hitos y logros de maestría
+   * NEW v4.0: Uses RequirementsRegistry
+   * FASE 2: Workflows Automatizados
    */
   private async setupEventListeners(): Promise<void> {
     // Obtener todos los patterns de eventos únicos de hitos fundacionales
+    const foundationalMilestones = getAllFoundationalMilestones();
     const milestonePatterns = new Set(
-      Object.values(MILESTONE_DEFINITIONS).map(milestone => milestone.event_pattern)
+      foundationalMilestones.map(milestone => milestone.eventPattern)
     );
 
     // Obtener todos los patterns de eventos únicos de logros de maestría
@@ -114,8 +168,14 @@ export class AchievementsEngine {
       });
     }
 
+    // FASE 2: Listener para workflows automatizados
+    eventBus.on('milestone:completed', async (event: any) => {
+      await this.handleMilestoneCompletedWorkflows(event);
+    });
+
     logger.info('CapabilitySystem', '[AchievementsEngine] Configurados listeners para', allPatterns.size, 'tipos de eventos');
     logger.info('CapabilitySystem', '[AchievementsEngine] Hitos fundacionales:', milestonePatterns.size, 'Logros maestría:', masteryPatterns.size);
+    logger.info('CapabilitySystem', '[AchievementsEngine] Workflows automatizados activados');
   }
 
   /**
@@ -141,11 +201,13 @@ export class AchievementsEngine {
 
   /**
    * Procesa hitos fundacionales para el evento recibido
+   * NEW v4.0: Uses RequirementsRegistry
    */
   private async processFoundationalMilestones(event: any): Promise<void> {
     // Encontrar hitos que coincidan con este evento
-    const matchingMilestones = Object.values(MILESTONE_DEFINITIONS).filter(
-      milestone => this.eventMatches(milestone, event)
+    const allMilestones = getAllFoundationalMilestones();
+    const matchingMilestones = allMilestones.filter(
+      milestone => this.eventMatchesMilestone(milestone.eventPattern, event)
     );
 
     if (matchingMilestones.length === 0) {
@@ -182,27 +244,31 @@ export class AchievementsEngine {
   }
 
   /**
-   * Verifica si un evento coincide con un hito
+   * Verifica si un evento coincide con un patron de evento
+   * NEW v4.0: Simplified - only checks event pattern
    */
-  private eventMatches(milestone: MilestoneDefinition, event: any): boolean {
-    // Verificar patrón básico
-    if (event.type === milestone.event_pattern) {
-      return true;
-    }
-
-    // Verificar acción específica si está definida
-    if (milestone.action_type && event.action === milestone.action_type) {
-      return true;
-    }
-
-    return false;
+  private eventMatchesMilestone(eventPattern: string, event: any): boolean {
+    return event.type === eventPattern || event.eventPattern === eventPattern;
   }
 
   /**
-   * Marca un hito como completado y verifica activaciones de capacidades
+   * Marca un hito como completado y actualiza el capabilityStore
+   * NEW v4.0: Updates capabilityStore to trigger feature unlocking
    */
   private async completeMilestone(milestoneId: string, triggerEvent: any): Promise<void> {
     if (!this.userId) return;
+
+    logger.info('CapabilitySystem', '[AchievementsEngine] Completando hito:', milestoneId);
+
+    // NEW v4.0: Update capabilityStore immediately
+    try {
+      const store = useCapabilityStore.getState();
+      store.completeMilestone(milestoneId);
+
+      logger.info('CapabilitySystem', '[AchievementsEngine] ✅ Hito completado y store actualizado:', milestoneId);
+    } catch (error) {
+      logger.error('CapabilitySystem', '[AchievementsEngine] Error actualizando store:', error);
+    }
 
     try {
       // Verificar si ya está completado
@@ -695,5 +761,159 @@ export class AchievementsEngine {
     this.isInitialized = false;
     this.userId = null;
     // Note: EventBus subscriptions se limpian automáticamente
+  }
+
+  /**
+   * FASE 2: Workflows Automatizados por Milestone
+   *
+   * Ejecuta acciones automáticas al completar ciertos milestones.
+   * Ejemplos:
+   * - create_first_product → auto-crear categoría "General"
+   * - configure_tables → sugerir crear menú digital
+   */
+  private async handleMilestoneCompletedWorkflows(event: any): Promise<void> {
+    if (!this.userId || !event.milestoneId) return;
+
+    const milestoneId = event.milestoneId;
+
+    logger.info(
+      'CapabilitySystem',
+      '[AchievementsEngine] 🔄 Evaluando workflows para milestone:',
+      milestoneId
+    );
+
+    try {
+      // Workflow 1: Al crear primer producto → auto-crear categoría
+      if (milestoneId === 'create_first_product') {
+        await this.workflowAutoCreateCategory();
+      }
+
+      // Workflow 2: Al configurar mesas → sugerir crear menú
+      if (milestoneId === 'configure_tables') {
+        await this.workflowSuggestCreateMenu();
+      }
+
+      // Workflow 3: Al configurar staff → sugerir horarios
+      if (milestoneId === 'configure_staff') {
+        await this.workflowSuggestScheduling();
+      }
+
+      // Workflow 4: Al completar setup de delivery → sugerir zonas
+      if (milestoneId === 'configure_delivery') {
+        await this.workflowSuggestDeliveryZones();
+      }
+
+    } catch (error) {
+      logger.error(
+        'CapabilitySystem',
+        '[AchievementsEngine] Error ejecutando workflow:',
+        error
+      );
+    }
+  }
+
+  /**
+   * Workflow: Auto-crear categoría "General" si no existe
+   */
+  private async workflowAutoCreateCategory(): Promise<void> {
+    // Verificar si ya tiene categorías
+    const { data: categories, error } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('user_id', this.userId)
+      .limit(1);
+
+    if (error) {
+      logger.error('CapabilitySystem', '[Workflow] Error verificando categorías:', error);
+      return;
+    }
+
+    // Si ya tiene categorías, no hacer nada
+    if (categories && categories.length > 0) {
+      return;
+    }
+
+    // Auto-crear categoría "General"
+    const { error: insertError } = await supabase
+      .from('categories')
+      .insert({
+        user_id: this.userId,
+        name: 'General',
+        description: 'Categoría predeterminada',
+        created_by_system: true
+      });
+
+    if (insertError) {
+      logger.error('CapabilitySystem', '[Workflow] Error creando categoría:', insertError);
+      return;
+    }
+
+    logger.info('CapabilitySystem', '[Workflow] ✅ Categoría "General" creada automáticamente');
+
+    // Notificar al usuario
+    eventBus.emit('system:notification', {
+      type: 'info',
+      message: '💡 Creamos una categoría "General" para organizar tus productos'
+    });
+  }
+
+  /**
+   * Workflow: Sugerir crear menú digital
+   */
+  private async workflowSuggestCreateMenu(): Promise<void> {
+    // Verificar si ya tiene productos
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('id')
+      .eq('user_id', this.userId)
+      .limit(1);
+
+    if (error || !products || products.length === 0) {
+      return; // No hay productos, no tiene sentido sugerir menú
+    }
+
+    logger.info('CapabilitySystem', '[Workflow] 💡 Sugiriendo crear menú digital');
+
+    // Disparar notificación
+    eventBus.emit('system:notification', {
+      type: 'success',
+      message: '🎉 ¡Mesas configuradas! ¿Querés crear tu primer menú digital?',
+      action: {
+        label: 'Crear menú',
+        url: '/admin/products/menu'
+      }
+    });
+  }
+
+  /**
+   * Workflow: Sugerir configurar horarios de staff
+   */
+  private async workflowSuggestScheduling(): Promise<void> {
+    logger.info('CapabilitySystem', '[Workflow] 💡 Sugiriendo configurar horarios');
+
+    eventBus.emit('system:notification', {
+      type: 'info',
+      message: '👥 Staff configurado. Recordá asignar horarios de trabajo',
+      action: {
+        label: 'Configurar horarios',
+        url: '/admin/scheduling'
+      }
+    });
+  }
+
+  /**
+   * Workflow: Sugerir configurar zonas de delivery
+   */
+  private async workflowSuggestDeliveryZones(): Promise<void> {
+    logger.info('CapabilitySystem', '[Workflow] 💡 Sugiriendo configurar zonas de delivery');
+
+    eventBus.emit('system:notification', {
+      type: 'info',
+      message: '🚚 Delivery configurado. Definí las zonas de entrega y costos',
+      action: {
+        label: 'Configurar zonas',
+        url: '/admin/settings/delivery'
+      }
+    });
   }
 }

@@ -5,7 +5,6 @@ import React from 'react';
 import {
   Tabs, Stack, Typography, Badge, Icon, Section, Alert, Spinner
 } from '@/shared/ui';
-import { CapabilityGate } from '@/lib/capabilities';
 import { logger } from '@/lib/logging';
 import {
   CalendarIcon,
@@ -148,28 +147,24 @@ export function SchedulingManagement({
       </Tabs.List>
 
       <Tabs.Panel value="schedule">
-        <CapabilityGate capability="schedule_management">
-          <React.Suspense fallback={<CalendarFallback />}>
-            <UnifiedCalendar
-              businessModel="staff_scheduling"
-              view={viewState.viewMode || 'week'}
-              onViewChange={(view) => onViewStateChange({ ...viewState, viewMode: view as any })}
-              features={['shift_management', 'time_off', 'coverage_tracking']}
-              performanceMode={performanceMode}
-              mobileOptimized={isMobile}
-              onBookingClick={onShiftClick}
-            />
-          </React.Suspense>
-        </CapabilityGate>
+        <React.Suspense fallback={<CalendarFallback />}>
+          <UnifiedCalendar
+            businessModel="staff_scheduling"
+            view={viewState.viewMode || 'week'}
+            onViewChange={(view) => onViewStateChange({ ...viewState, viewMode: view as any })}
+            features={['shift_management', 'time_off', 'coverage_tracking']}
+            performanceMode={performanceMode}
+            mobileOptimized={isMobile}
+            onBookingClick={onShiftClick}
+          />
+        </React.Suspense>
       </Tabs.Panel>
 
       <Tabs.Panel value="timeoff">
-        <CapabilityGate capability="approve_timeoff">
-          <TimeOffManager
-            pendingCount={schedulingStats.pending_time_off}
-            approvedCount={schedulingStats.approved_requests}
-          />
-        </CapabilityGate>
+        <TimeOffManager
+          pendingCount={schedulingStats.pending_time_off}
+          approvedCount={schedulingStats.approved_requests}
+        />
       </Tabs.Panel>
 
       <Tabs.Panel value="coverage">
@@ -180,12 +175,10 @@ export function SchedulingManagement({
       </Tabs.Panel>
 
       <Tabs.Panel value="costs">
-        <CapabilityGate capability="view_labor_costs">
-          <LaborCostTracker
-            weeklyTotal={schedulingStats.labor_cost_this_week}
-            overtimeHours={schedulingStats.overtime_hours}
-          />
-        </CapabilityGate>
+        <LaborCostTracker
+          weeklyTotal={schedulingStats.labor_cost_this_week}
+          overtimeHours={schedulingStats.overtime_hours}
+        />
       </Tabs.Panel>
 
       {!isMobile && (

@@ -70,7 +70,7 @@ export function useRealtimeUpdates(): UseRealtimeUpdatesReturn {
 
   useEffect(() => {
     // Update state when connection changes
-    const unsubscribeState = EventBus.on('websocket.state_changed', (data) => {
+    const unsubscribeState = EventBus.on('websocket.state_changed', (_data) => {
       setConnectionState(data.payload.newState);
       setStats(wsManager.getStats());
     });
@@ -233,7 +233,7 @@ export function useRealtimeInventory(): UseRealtimeInventoryReturn {
 
   const onStockLevelChanged = useCallback((callback: (item: unknown) => void) => {
     // Filter for stock-specific updates
-    return base.subscribe('INVENTORY_UPDATED', (data) => {
+    return base.subscribe('INVENTORY_UPDATED', (_data) => {
       if (data.field === 'stock') {
         callback(data);
       }
@@ -322,7 +322,7 @@ export function useRealtimeKitchen(): UseRealtimeKitchenReturn {
 
   const onOrderReceived = useCallback((callback: (order: unknown) => void) => {
     // Filter for order_received updates
-    return base.subscribe('KITCHEN_UPDATE', (data) => {
+    return base.subscribe('KITCHEN_UPDATE', (_data) => {
       if (data.type === 'order_received') {
         callback(data);
       }
@@ -379,7 +379,7 @@ export function useRealtimeConnectionStatus() {
   const [isConnected, setIsConnected] = useState(wsManager.isConnected());
 
   useEffect(() => {
-    const unsubscribeState = EventBus.on('websocket.state_changed', (data) => {
+    const unsubscribeState = EventBus.on('websocket.state_changed', (_data) => {
       setConnectionState(data.payload.newState);
       setIsConnected(data.payload.newState === 'connected');
     });

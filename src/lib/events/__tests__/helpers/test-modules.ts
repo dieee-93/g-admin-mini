@@ -367,19 +367,19 @@ export const createTestEventHandlers = () => {
   const handlers = new Map<string, EventHandler>();
 
   // Sales handlers
-  handlers.set('test-sales.handleLowStock', async (event) => {
+  handlers.set('test-sales.handleLowStock', async (_event) => {
     console.log(`[TestSales] Handling low stock for ${event.payload.itemName}`);
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 10));
   });
 
-  handlers.set('test-sales.handleCustomerUpdate', async (event) => {
+  handlers.set('test-sales.handleCustomerUpdate', async (_event) => {
     console.log(`[TestSales] Customer ${event.payload.customerId} updated`);
     await new Promise(resolve => setTimeout(resolve, 5));
   });
 
   // Inventory handlers
-  handlers.set('test-inventory.updateStock', async (event) => {
+  handlers.set('test-inventory.updateStock', async (_event) => {
     console.log(`[TestInventory] Updating stock for order ${event.payload.orderId}`);
     await new Promise(resolve => setTimeout(resolve, 15));
     
@@ -390,30 +390,30 @@ export const createTestEventHandlers = () => {
     }
   });
 
-  handlers.set('test-inventory.processRestock', async (event) => {
+  handlers.set('test-inventory.processRestock', async (_event) => {
     console.log(`[TestInventory] Processing restock for ${event.payload.itemId}`);
     await new Promise(resolve => setTimeout(resolve, 20));
   });
 
   // Customer handlers
-  handlers.set('test-customers.updateCustomerActivity', async (event) => {
+  handlers.set('test-customers.updateCustomerActivity', async (_event) => {
     console.log(`[TestCustomers] Updated activity for customer ${event.payload.customerId}`);
     await new Promise(resolve => setTimeout(resolve, 8));
   });
 
   // Staff handlers
-  handlers.set('test-staff.recordClockIn', async (event) => {
+  handlers.set('test-staff.recordClockIn', async (_event) => {
     console.log(`[TestStaff] ${event.payload.staffId} clocked in at ${event.payload.timestamp}`);
     await new Promise(resolve => setTimeout(resolve, 12));
   });
 
-  handlers.set('test-staff.recordClockOut', async (event) => {
+  handlers.set('test-staff.recordClockOut', async (_event) => {
     console.log(`[TestStaff] ${event.payload.staffId} clocked out at ${event.payload.timestamp}`);
     await new Promise(resolve => setTimeout(resolve, 12));
   });
 
   // Payment handlers
-  handlers.set('test-payment.processCashPayment', async (event) => {
+  handlers.set('test-payment.processCashPayment', async (_event) => {
     console.log(`[TestPayment] Processing cash payment of ${event.payload.amount}`);
     await new Promise(resolve => setTimeout(resolve, 25));
     
@@ -421,7 +421,7 @@ export const createTestEventHandlers = () => {
     console.log(`[TestPayment] Cash payment processed successfully`);
   });
 
-  handlers.set('test-payment.processCardPayment', async (event) => {
+  handlers.set('test-payment.processCardPayment', async (_event) => {
     console.log(`[TestPayment] Processing card payment of ${event.payload.amount}`);
     await new Promise(resolve => setTimeout(resolve, 35));
     
@@ -433,14 +433,14 @@ export const createTestEventHandlers = () => {
     }
   });
 
-  handlers.set('test-payment.processMobilePayment', async (event) => {
+  handlers.set('test-payment.processMobilePayment', async (_event) => {
     console.log(`[TestPayment] Processing mobile payment of ${event.payload.amount}`);
     await new Promise(resolve => setTimeout(resolve, 20));
     console.log(`[TestPayment] Mobile payment processed successfully`);
   });
 
   // Fiscal handlers
-  handlers.set('test-fiscal.generateReceipt', async (event) => {
+  handlers.set('test-fiscal.generateReceipt', async (_event) => {
     console.log(`[TestFiscal] Generating receipt for payment ${event.payload.paymentId}`);
     await new Promise(resolve => setTimeout(resolve, 30));
     
@@ -448,13 +448,13 @@ export const createTestEventHandlers = () => {
     console.log(`[TestFiscal] Receipt ${receiptId} generated successfully`);
   });
 
-  handlers.set('test-fiscal.processReceiptRequest', async (event) => {
+  handlers.set('test-fiscal.processReceiptRequest', async (_event) => {
     console.log(`[TestFiscal] Processing receipt request for ${event.payload.transactionId}`);
     await new Promise(resolve => setTimeout(resolve, 15));
   });
 
   // Kitchen handlers (that may fail)
-  handlers.set('test-kitchen-failing.processOrder', async (event) => {
+  handlers.set('test-kitchen-failing.processOrder', async (_event) => {
     console.log(`[TestKitchen] Processing order ${event.payload.orderId}`);
     
     // Simulate random failures
@@ -466,12 +466,12 @@ export const createTestEventHandlers = () => {
   });
 
   // Scheduling handlers
-  handlers.set('test-scheduling.recordShiftAssignment', async (event) => {
+  handlers.set('test-scheduling.recordShiftAssignment', async (_event) => {
     console.log(`[TestScheduling] Recording shift assignment for ${event.payload.staffId}`);
     await new Promise(resolve => setTimeout(resolve, 10));
   });
 
-  handlers.set('test-scheduling.processShiftSwap', async (event) => {
+  handlers.set('test-scheduling.processShiftSwap', async (_event) => {
     console.log(`[TestScheduling] Processing shift swap between ${event.payload.fromStaffId} and ${event.payload.toStaffId}`);
     await new Promise(resolve => setTimeout(resolve, 15));
   });

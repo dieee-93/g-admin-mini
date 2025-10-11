@@ -556,7 +556,7 @@ class EventBus implements IEventBus {
     let hasBeenCalled = false;
     let unsubscribeFn: UnsubscribeFn;
     
-    const wrappedHandler: EventHandler<TPayload> = async (event) => {
+    const wrappedHandler: EventHandler<TPayload> = async (_event) => {
       if (hasBeenCalled) return;
       hasBeenCalled = true;
       
@@ -648,7 +648,7 @@ class EventBus implements IEventBus {
     return new Promise((resolve, reject) => {
       let timeoutId: NodeJS.Timeout;
       
-      const unsubscribe = this.on(pattern, (event) => {
+      const unsubscribe = this.on(pattern, (_event) => {
         if (!filter || filter(event)) {
           clearTimeout(timeoutId);
           unsubscribe();
@@ -1233,7 +1233,7 @@ class EventBus implements IEventBus {
     
     // Fallback: return a placeholder if handler not found
     logger.warn('EventBus', `Handler not found: ${handlerName}`, { moduleId });
-    return async (event) => {
+    return async (_event) => {
       logger.debug('EventBus', `Placeholder handler called: ${moduleId}.${handlerName}`, {
         pattern: event.pattern
       });
@@ -1247,16 +1247,16 @@ class EventBus implements IEventBus {
   }
 
   private setupModuleRegistryListeners(): void {
-    this.moduleRegistry.on('moduleActivated', (data) => {
+    this.moduleRegistry.on('moduleActivated', (_data) => {
       logger.info('EventBus', `Module activated: ${data.moduleId}`);
       this.autoRegisterModuleHandlers(data.moduleId);
     });
 
-    this.moduleRegistry.on('moduleDeactivated', (data) => {
+    this.moduleRegistry.on('moduleDeactivated', (_data) => {
       logger.info('EventBus', `Module deactivated: ${data.moduleId}`);
     });
 
-    this.moduleRegistry.on('moduleHealthChanged', (data) => {
+    this.moduleRegistry.on('moduleHealthChanged', (_data) => {
       logger.debug('EventBus', `Module health changed: ${data.moduleId}`, {
         status: data.currentStatus
       });

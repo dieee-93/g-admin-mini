@@ -6,8 +6,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 // ✅ 13 SISTEMAS INTEGRADOS
-import { useModuleIntegration } from '@/hooks/useModuleIntegration';
-import { CapabilityGate } from '@/lib/capabilities';
+import EventBus from '@/lib/events';
+import { CapabilityGate, useCapabilities } from '@/lib/capabilities';
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
@@ -51,14 +51,19 @@ const SALES_MODULE_CONFIG = {
 } as const;
 
 export default function SalesPage() {
+  logger.debug('SalesStore', '🔍 SalesPage Component rendering');
+
   // ✅ SISTEMAS INTEGRATION
-  const { emitEvent, hasCapability, status } = useModuleIntegration('sales', SALES_MODULE_CONFIG);
+  const { hasFeature } = useCapabilities();
   const { handleError } = useErrorHandler();
   const { isOnline } = useOfflineStatus();
   const { shouldReduceAnimations } = usePerformanceMonitor();
   const { isMobile } = useNavigation();
 
+  logger.debug('SalesStore', '🔍 SalesPage Hooks initialized successfully');
+
   // ✅ PAGE ORCHESTRATION
+  logger.debug('SalesStore', '🔍 SalesPage Calling useSalesPage...');
   const {
     metrics,
     pageState,
@@ -69,12 +74,23 @@ export default function SalesPage() {
     setActiveTab
   } = useSalesPage();
 
+  logger.debug('SalesStore', '🔍 SalesPage useSalesPage completed:', {
+    hasMetrics: !!metrics,
+    hasActions: !!actions,
+    loading,
+    error
+  });
+
   // ✅ MODAL STATE
+  logger.debug('SalesStore', '🔍 SalesPage Getting modal state...');
   const { isModalOpen, closeModal } = useModalState();
+
+  logger.debug('SalesStore', '🔍 SalesPage All hooks completed successfully!');
 
 
   // ✅ ERROR HANDLING
   if (error) {
+    logger.error('SalesStore', '🔍 SalesPage Error detected:', error);
     return (
       <ContentLayout spacing="normal">
         <Alert status="error" title="Error de carga del módulo">
@@ -88,17 +104,11 @@ export default function SalesPage() {
     );
   }
 
+  logger.debug('SalesStore', '🔍 SalesPage Starting render...');
+
   return (
     <ContentLayout spacing="normal">
       {/* 🔒 1. ESTADO DE CONEXIÓN - Solo si crítico */}
-      {!status.isActive && (
-        <Alert
-          variant="subtle"
-          title="Module Capabilities Required"
-          description={`Missing capabilities: ${status.missingCapabilities.join(', ')}`}
-        />
-      )}
-
       {!isOnline && (
         <Alert variant="warning" title="Modo Offline">
           Los cambios se sincronizarán cuando recuperes la conexión
@@ -140,7 +150,7 @@ export default function SalesPage() {
         onShowAnalytics={actions.handleShowAnalytics}
         onKitchenDisplay={actions.handleKitchenDisplay}
         isMobile={isMobile}
-        hasCapability={hasCapability}
+        hasCapability={hasFeature}
       />
 
       {/* 🪟 MODAL - AGREGAR/PROCESAR VENTA */}

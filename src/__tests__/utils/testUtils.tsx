@@ -36,20 +36,20 @@ export function renderWithProviders(
 /**
  * Mock data storage
  */
-const mockDataStore = new Map<string, any[]>();
+const mockDataStore = new Map<string, unknown[]>();
 
 /**
  * Mock Supabase data for testing
  */
-export function mockSupabaseData(table: string, data: any[]): void {
-  mockDataStore.set(table, data);
+export function mockSupabaseData<T = unknown>(table: string, data: T[]): void {
+  mockDataStore.set(table, data as unknown[]);
 }
 
 /**
  * Get mock data for table
  */
-export function getMockData(table: string): any[] {
-  return mockDataStore.get(table) || [];
+export function getMockData<T = unknown>(table: string): T[] {
+  return (mockDataStore.get(table) || []) as T[];
 }
 
 /**

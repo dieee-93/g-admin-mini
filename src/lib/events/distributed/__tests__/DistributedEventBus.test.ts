@@ -318,7 +318,7 @@ describe('DistributedEventBus', () => {
     it('should maintain ordering within partitions', async () => {
       const orderedEvents: NamespacedEvent[] = [];
       
-      eventBus.on('ordered.test', (event) => {
+      eventBus.on('ordered.test', (_event) => {
         orderedEvents.push(event);
       });
 

@@ -14,7 +14,7 @@ import {
   ChartBarIcon
 } from "@heroicons/react/24/outline";
 import { 
-  Stack, Typography, CardWrapper, Section, Button, Badge, Avatar, Switch, SimpleGrid, MetricCard, ActionButton, Alert
+  Stack, Typography, CardWrapper, Section, Button, Badge, Avatar, Switch, SimpleGrid, MetricCard, Alert
 } from "@/shared/ui";
 import { Icon, HeaderIcon } from "@/shared/ui/Icon";
 
@@ -189,14 +189,14 @@ export function UserPermissionsSection() {
               
               {/* Quick Actions */}
               <Stack direction="row" gap="sm" mt="sm">
-                <ActionButton size="sm" colorPalette="blue" variant="outline">
+                <Button size="sm" colorPalette="blue" variant="outline">
                   <Icon icon={PlusIcon} size="xs" />
                   Nuevo Rol
-                </ActionButton>
-                <ActionButton size="sm" colorPalette="gray" variant="ghost">
+                </Button>
+                <Button size="sm" colorPalette="gray" variant="ghost">
                   <Icon icon={KeyIcon} size="xs" />
                   Configurar Permisos
-                </ActionButton>
+                </Button>
               </Stack>
             </Stack>
           </CardWrapper.Body>
@@ -304,14 +304,14 @@ export function UserPermissionsSection() {
               
               {/* Quick Actions */}
               <Stack direction="row" gap="sm" mt="sm">
-                <ActionButton size="sm" colorPalette="green" variant="outline">
+                <Button size="sm" colorPalette="green" variant="outline">
                   <Icon icon={PlusIcon} size="xs" />
                   Nuevo Usuario
-                </ActionButton>
-                <ActionButton size="sm" colorPalette="gray" variant="ghost">
+                </Button>
+                <Button size="sm" colorPalette="gray" variant="ghost">
                   <Icon icon={ClockIcon} size="xs" />
                   Ver Actividad
-                </ActionButton>
+                </Button>
               </Stack>
             </Stack>
           </CardWrapper.Body>
@@ -395,18 +395,18 @@ export function UserPermissionsSection() {
             
             {/* Security Actions */}
             <Stack direction="row" gap="sm">
-              <ActionButton size="sm" colorPalette="orange">
+              <Button size="sm" colorPalette="orange">
                 <Icon icon={ClockIcon} size="xs" />
                 Revisar Usuarios Inactivos
-              </ActionButton>
-              <ActionButton size="sm" colorPalette="blue" variant="outline">
+              </Button>
+              <Button size="sm" colorPalette="blue" variant="outline">
                 <Icon icon={ShieldCheckIcon} size="xs" />
                 Auditar Permisos
-              </ActionButton>
-              <ActionButton size="sm" colorPalette="gray" variant="ghost">
+              </Button>
+              <Button size="sm" colorPalette="gray" variant="ghost">
                 <Icon icon={ChartBarIcon} size="xs" />
                 Reporte de Seguridad
-              </ActionButton>
+              </Button>
             </Stack>
           </Stack>
         </CardWrapper.Body>

@@ -34,50 +34,56 @@ export const useSlotContent = (slotId: string) => {
 };
 
 /**
- * Hook for capability-aware content injection
+ * Hook for feature-aware content injection (NEW v4.0)
  */
-export const useCapabilitySlotContent = (
+export const useFeatureSlotContent = (
   slotId: string,
-  requiredCapabilities: string[] = [],
+  requiredFeatures: string[] = [],
   mode: 'any' | 'all' = 'any'
 ) => {
-  const { hasCapability, hasAllCapabilities } = useCapabilities();
+  const { hasFeature, hasAllFeatures } = useCapabilities();
   const { addContent, removeContent, ...slotInfo } = useSlotContent(slotId);
 
   const hasAccess = useMemo(() => {
-    if (requiredCapabilities.length === 0) return true;
+    if (requiredFeatures.length === 0) return true;
 
     return mode === 'all'
-      ? hasAllCapabilities(requiredCapabilities as any[])
-      : requiredCapabilities.some(cap => hasCapability(cap as any));
-  }, [requiredCapabilities, mode, hasCapability, hasAllCapabilities]);
+      ? hasAllFeatures(requiredFeatures as any[])
+      : requiredFeatures.some(feat => hasFeature(feat as any));
+  }, [requiredFeatures, mode, hasFeature, hasAllFeatures]);
 
-  const addCapabilityContent = useCallback((content: Omit<SlotContent, 'conditions'>) => {
+  const addFeatureContent = useCallback((content: Omit<SlotContent, 'conditions'>) => {
     if (hasAccess) {
       addContent({
         ...content,
         conditions: {
-          capabilities: requiredCapabilities,
+          capabilities: requiredFeatures, // Keep key name for backward compat with SlotContent type
           mode
         }
       });
     }
-  }, [hasAccess, addContent, requiredCapabilities, mode]);
+  }, [hasAccess, addContent, requiredFeatures, mode]);
 
   return {
     ...slotInfo,
     hasAccess,
-    addContent: addCapabilityContent,
+    addContent: addFeatureContent,
     removeContent
   };
 };
+
+/**
+ * @deprecated Use useFeatureSlotContent instead
+ * Backward compatibility alias
+ */
+export const useCapabilitySlotContent = useFeatureSlotContent;
 
 /**
  * Hook for managing pluggable components
  */
 export const usePluggableComponents = (targetSlotIds: string[] = []) => {
   const { getAllSlots, addSlotContent } = useSlotContext();
-  const { hasCapability, hasAllCapabilities } = useCapabilities();
+  const { hasFeature, hasAllFeatures } = useCapabilities();
 
   // Register a pluggable component
   const registerComponent = useCallback((config: PluggableComponentConfig) => {
@@ -89,9 +95,9 @@ export const usePluggableComponents = (targetSlotIds: string[] = []) => {
       priority = 0
     } = config;
 
-    // Check capabilities
+    // Check capabilities (now using features)
     const hasAccess = requiredCapabilities.length === 0 ||
-      requiredCapabilities.some(cap => hasCapability(cap as any));
+      requiredCapabilities.some(cap => hasFeature(cap as any));
 
     if (!hasAccess) {
       return;
@@ -117,7 +123,7 @@ export const usePluggableComponents = (targetSlotIds: string[] = []) => {
         }
       });
     });
-  }, [targetSlotIds, hasCapability, addSlotContent]);
+  }, [targetSlotIds, hasFeature, addSlotContent]);
 
   // Get components for specific slots
   const getSlotComponents = useCallback((slotId: string) => {

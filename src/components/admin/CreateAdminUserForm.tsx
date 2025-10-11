@@ -1,23 +1,29 @@
 import React, { useState } from 'react';
 import {
-  Box,
-  Stack,
-  Progress,
-  IconButton,
-  Alert
-} from '@chakra-ui/react';
-import { 
-  EyeIcon, 
-  EyeSlashIcon, 
+  EyeIcon,
+  EyeSlashIcon,
   ShieldCheckIcon,
   UserPlusIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { CardWrapper, Button, InputField, Typography, SelectField } from '@/shared/ui';
+import {
+  Box,
+  Stack,
+  Progress,
+  IconButton,
+  Alert,
+  CardWrapper,
+  Button,
+  InputField,
+  Typography,
+  SelectField
+} from '@/shared/ui';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
-
 import { logger } from '@/lib/logging';
+
+type AdminRole = 'OPERADOR' | 'SUPERVISOR' | 'ADMINISTRADOR';
+
 interface CreateAdminUserFormProps {
   onCancel?: () => void;
   onSuccess?: (user: unknown) => void;
@@ -29,7 +35,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
     password: '',
     confirmPassword: '',
     fullName: '',
-    role: 'OPERADOR' as 'OPERADOR' | 'SUPERVISOR' | 'ADMINISTRADOR'
+    role: 'OPERADOR' as AdminRole
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -110,6 +116,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
       }
       
     } catch (error) {
+      logger.error('App', 'Failed to create admin user', { error });
       setError('Error al crear usuario administrativo');
     } finally {
       setIsLoading(false);
@@ -183,7 +190,7 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
             <SelectField
               label="Rol Administrativo"
               value={formData.role}
-              onChange={(value) => setFormData(prev => ({ ...prev, role: value as any }))}
+              onChange={(value) => setFormData(prev => ({ ...prev, role: value as AdminRole }))}
               placeholder="Seleccionar rol"
               required
               disabled={isLoading}

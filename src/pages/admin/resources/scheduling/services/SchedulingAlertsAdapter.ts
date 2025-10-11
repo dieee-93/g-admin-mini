@@ -9,7 +9,7 @@ import {
 
 // ✅ SHARED ALERTS SYSTEM INTEGRATION
 import { Alert, AlertAction } from '@/shared/types/alerts';
-import { EmitEventFn } from '@/hooks/useModuleIntegration';
+import EventBus from '@/lib/events';
 
 // ✅ BUSINESS LOGIC UTILITIES
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
@@ -61,11 +61,9 @@ const SCHEDULING_ALERT_ACTIONS: Record<string, AlertAction[]> = {
 // ✅ SCHEDULING ALERTS ADAPTER CLASS
 export class SchedulingAlertsAdapter {
   private engine: SchedulingIntelligenceEngine;
-  private emitEvent: EmitEventFn;
 
-  constructor(emitEvent: EmitEventFn) {
+  constructor() {
     this.engine = new SchedulingIntelligenceEngine();
-    this.emitEvent = emitEvent;
   }
 
   /**
@@ -92,7 +90,7 @@ export class SchedulingAlertsAdapter {
 
     } catch (error) {
       logger.error('API', '❌ SchedulingAlertsAdapter: Error generating alerts:', error);
-      this.emitEvent('scheduling.alert_generation_error', { error: String(error) });
+      EventBus.emit('scheduling.alert_generation_error', { error: String(error) });
       return [];
     }
   }
@@ -236,7 +234,7 @@ export class SchedulingAlertsAdapter {
     // ⚡ USAR setTimeout PARA EVITAR RENDER CYCLE EMISSION
     setTimeout(() => {
       // 📊 EVENTO GENERAL DE ANÁLISIS
-      this.emitEvent('scheduling.intelligent_analysis_completed', {
+      EventBus.emit('scheduling.intelligent_analysis_completed', {
         alertsGenerated: alerts.length,
         criticalAlerts: alerts.filter(a => a.severity === 'critical').length,
         analysisTimestamp: new Date(),
@@ -251,7 +249,7 @@ export class SchedulingAlertsAdapter {
       alerts
         .filter(alert => alert.severity === 'critical')
         .forEach(alert => {
-          this.emitEvent(`scheduling.critical_alert_${alert.type}`, {
+          EventBus.emit(`scheduling.critical_alert_${alert.type}`, {
             alertId: alert.title,
             confidence: alert.confidence,
             affectedAreas: alert.affectedAreas,
@@ -266,7 +264,7 @@ export class SchedulingAlertsAdapter {
       );
 
       if (crossModuleAlerts.length > 0) {
-        this.emitEvent('scheduling.cross_module_impact_detected', {
+        EventBus.emit('scheduling.cross_module_impact_detected', {
           affectedModules: [...new Set(
             crossModuleAlerts.flatMap(alert => alert.affectedAreas)
           )],
@@ -286,7 +284,7 @@ export class SchedulingAlertsAdapter {
   ): Promise<{ success: boolean; message: string }> {
     try {
       // 📡 EMIT EVENT PARA TRACKING
-      this.emitEvent('scheduling.alert_action_triggered', {
+      EventBus.emit('scheduling.alert_action_triggered', {
         alertId,
         actionId,
         timestamp: new Date(),
@@ -297,13 +295,13 @@ export class SchedulingAlertsAdapter {
       const result = await this.executeAlertAction(actionId, context);
 
       if (result.success) {
-        this.emitEvent('scheduling.alert_action_completed', {
+        EventBus.emit('scheduling.alert_action_completed', {
           alertId,
           actionId,
           result: result.message
         });
       } else {
-        this.emitEvent('scheduling.alert_action_failed', {
+        EventBus.emit('scheduling.alert_action_failed', {
           alertId,
           actionId,
           error: result.message
@@ -332,7 +330,7 @@ export class SchedulingAlertsAdapter {
     switch (actionId) {
       case 'find_coverage':
         // TODO: Integrar con módulo de Staff para buscar personal disponible
-        this.emitEvent('staff.coverage_search_requested', context);
+        EventBus.emit('staff.coverage_search_requested', context);
         return { success: true, message: 'Búsqueda de cobertura iniciada' };
 
       case 'review_overtime':
@@ -341,12 +339,12 @@ export class SchedulingAlertsAdapter {
 
       case 'optimize_schedule':
         // TODO: Ejecutar algoritmo de optimización automática
-        this.emitEvent('scheduling.auto_optimization_requested', context);
+        EventBus.emit('scheduling.auto_optimization_requested', context);
         return { success: true, message: 'Optimización automática iniciada' };
 
       case 'emergency_staffing':
         // TODO: Activar protocolo de personal de emergencia
-        this.emitEvent('scheduling.emergency_protocol_activated', context);
+        EventBus.emit('scheduling.emergency_protocol_activated', context);
         return { success: true, message: 'Protocolo de emergencia activado' };
 
       default:
@@ -359,8 +357,8 @@ export class SchedulingAlertsAdapter {
 }
 
 // ✅ FACTORY FUNCTION PARA EASY INTEGRATION
-export function createSchedulingAlertsAdapter(emitEvent: EmitEventFn): SchedulingAlertsAdapter {
-  return new SchedulingAlertsAdapter(emitEvent);
+export function createSchedulingAlertsAdapter(): SchedulingAlertsAdapter {
+  return new SchedulingAlertsAdapter();
 }
 
 // ✅ TIPOS PARA EXPORT

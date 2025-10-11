@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { EyeIcon, EyeSlashIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import {
   Box,
-  VStack,
-  HStack,
+  Stack as VStack,
+  Stack as HStack,
   Text,
   Presence,
   IconButton,
   Progress,
   Heading,
-  Alert
-} from '@chakra-ui/react';
-import { EyeIcon, EyeSlashIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+  Alert,
+  CardWrapper,
+  Button,
+  InputField
+} from '@/shared/ui';
 import { useAuth } from '@/contexts/AuthContext';
-import { CardWrapper, Button, InputField } from '@/shared/ui';
+import { logger } from '@/lib/logging';
 
 export function LoginPageNew() {
   const [email, setEmail] = useState('');
@@ -87,6 +90,7 @@ export function LoginPageNew() {
         navigate(from, { replace: true });
       }
     } catch (error) {
+      logger.error('Auth', 'Login failed with unexpected error', { error, email });
       setError('Error inesperado al iniciar sesión');
     } finally {
       setIsLoading(false);

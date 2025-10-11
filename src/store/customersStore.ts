@@ -219,7 +219,7 @@ export const useCustomersStore = create<CustomersState>()(
           });
         },
 
-        setError: (error) => {
+        setError: (_error) => {
           set((state) => {
             state.error = error;
           });
@@ -408,9 +408,11 @@ export const useCustomersStore = create<CustomersState>()(
       })),
       {
         name: 'g-mini-customers-storage',
+        // Security: Only persist UI state, NOT customer PII (emails, phones)
+        // Customer data is loaded from Supabase on each session
         partialize: (state) => ({
-          customers: state.customers,
-          filters: state.filters
+          // ❌ customers: state.customers, // Contains PII - do not persist
+          filters: state.filters, // ✅ Safe - only UI preferences
         })
       }
     ),

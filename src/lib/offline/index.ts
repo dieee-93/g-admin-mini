@@ -101,7 +101,7 @@ export const sendMessageToSW = async (message: unknown): Promise<any> => {
     return new Promise((resolve, reject) => {
       const messageChannel = new MessageChannel();
       
-      messageChannel.port1.onmessage = (event) => {
+      messageChannel.port1.onmessage = (_event) => {
         if (event.data.error) {
           reject(new Error(event.data.error));
         } else {
