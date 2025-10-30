@@ -15,17 +15,18 @@ export { PageHeader } from './PageHeader';
 
 // Base Layout Primitives (Chakra wrappers)
 export { Box } from './Box';
+export { Circle } from './Circle';
 export { Container } from './Container';
 export { Card, CardHeader, CardBody, CardFooter } from './Card';
-export { 
-  Stack, 
-  VStack, 
-  HStack, 
-  Cluster, 
-  Center 
+export {
+  Stack,
+  VStack,
+  HStack,
+  Cluster,
+  Center
 } from './Stack';
-export { 
-  Grid, 
+export {
+  Grid,
   SimpleGrid,
   SimpleGrid as CardGrid  // Semantic alias for common dashboard layouts
 } from './Grid';
@@ -146,12 +147,89 @@ export {
 } from './Modal';
 
 export {
+  DialogRoot,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogCloseTrigger,
+  DialogBackdrop,
+  DialogPositioner,
+  DialogActionTrigger,
+  Dialog
+} from './Dialog';
+
+export {
+  FieldsetRoot,
+  FieldsetContent,
+  FieldsetLegend,
+  FieldsetHelperText,
+  FieldsetErrorText,
+  Fieldset
+} from './Fieldset';
+
+export {
+  Menu,
+  MenuRoot,
+  MenuTrigger,
+  MenuContextTrigger,
+  MenuContent,
+  MenuPositioner,
+  MenuItem,
+  MenuItemText,
+  MenuItemCommand,
+  MenuTriggerItem,
+  MenuCheckboxItem,
+  MenuRadioItem,
+  MenuRadioItemGroup,
+  MenuItemGroup,
+  MenuItemGroupLabel,
+  MenuIndicator,
+  MenuItemIndicator,
+  MenuSeparator,
+  MenuArrow,
+  MenuArrowTip
+} from './Menu';
+
+export {
+  Drawer,
+  DrawerRoot,
+  DrawerTrigger,
+  DrawerActionTrigger,
+  DrawerCloseTrigger,
+  DrawerBackdrop,
+  DrawerPositioner,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription
+} from './Drawer';
+
+export {
+  Collapsible,
+  CollapsibleRoot,
+  CollapsibleTrigger,
+  CollapsibleContent,
+  CollapsibleIndicator
+} from './Collapsible';
+
+export type { CollapsibleRootProps } from './Collapsible';
+
+export {
   Alert,
-  AlertIcon,
+  AlertRoot,
+  AlertIndicator,
+  AlertContent,
   AlertTitle,
-  AlertDescription,
-  AlertAction
+  AlertDescription
 } from './Alert';
+
+export type { AlertRootProps } from './Alert';
 
 export {
   CollapsibleAlertStack,
@@ -175,14 +253,15 @@ export {
 
 export {
   Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  ModuleTabs,
-  SettingsTabs,
-  DataTabs
+  TabsRoot,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  TabsIndicator,
+  TabsContentGroup
 } from './Tabs';
+
+export type { TabsRootProps } from './Tabs';
 
 // HeaderSwitch - Dashboard Evolutivo
 export { HeaderSwitch, DashboardSwitch } from './HeaderSwitch';
@@ -219,6 +298,7 @@ export { Icon } from './Icon';
 export { Avatar, AvatarGroup, UserAvatar } from './Avatar';
 export { Switch, SwitchGroup, StatusSwitch, PermissionSwitch } from './Switch';
 export { ProductionCalendar } from './ProductionCalendar';
+export { Portal } from './Portal';
 
 // 🎯 SIMPLE WRAPPERS - REMOVED (duplicated Layout functionality)
 

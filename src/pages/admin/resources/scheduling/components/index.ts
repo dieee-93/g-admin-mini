@@ -3,6 +3,7 @@ export { SchedulingMetrics } from './SchedulingMetrics';
 export { SchedulingManagement } from './SchedulingManagement';
 export { SchedulingActions } from './SchedulingActions';
 export { SchedulingAlerts } from './SchedulingAlerts';
+export { SchedulingTopBar } from './SchedulingTopBar';
 
 // ✅ EXISTING COMPONENTS (legacy - to be migrated)
 export * from './WeeklySchedule';

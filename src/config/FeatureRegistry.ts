@@ -15,12 +15,12 @@
 import type { FeatureId, Feature } from './types';
 
 // ============================================
-// FEATURE DEFINITIONS (86 features)
+// FEATURE DEFINITIONS (88 features)
 // ============================================
 
 const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
   // ============================================
-  // SALES DOMAIN (24 features)
+  // SALES DOMAIN (26 features)
   // ============================================
 
   'sales_order_management': {
@@ -79,8 +79,8 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
     category: 'conditional'
   },
 
-  'sales_async_order_processing': {
-    id: 'sales_async_order_processing',
+  'sales_online_order_processing': {
+    id: 'sales_online_order_processing',
     name: 'Procesamiento Asincrónico',
     description: 'Procesar pedidos fuera de horario comercial',
     domain: 'SALES',
@@ -207,6 +207,22 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
     category: 'conditional'
   },
 
+  'sales_pickup_orders': {
+    id: 'sales_pickup_orders',
+    name: 'Pedidos para Retirar',
+    description: 'Sistema de pedidos TakeAway/Pick-up para retirar en local',
+    domain: 'SALES',
+    category: 'conditional'
+  },
+
+  'sales_delivery_orders': {
+    id: 'sales_delivery_orders',
+    name: 'Pedidos a Domicilio',
+    description: 'Sistema de pedidos con entrega a domicilio',
+    domain: 'SALES',
+    category: 'conditional'
+  },
+
   // ============================================
   // INVENTORY DOMAIN (13 features)
   // ============================================
@@ -311,18 +327,18 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
   // PRODUCTION DOMAIN (4 features)
   // ============================================
 
-  'production_recipe_management': {
-    id: 'production_recipe_management',
-    name: 'Gestión de Recetas',
-    description: 'BOM (Bill of Materials) y recetas',
+  'production_bom_management': {
+    id: 'production_bom_management',
+    name: 'BOM Management',
+    description: 'Manage production workflows (recipes, assemblies, service protocols)',
     domain: 'PRODUCTION',
     category: 'conditional'
   },
 
-  'production_kitchen_display': {
-    id: 'production_kitchen_display',
-    name: 'Pantalla de Cocina',
-    description: 'KDS (Kitchen Display System)',
+  'production_display_system': {
+    id: 'production_display_system',
+    name: 'Production Display System',
+    description: 'Display system for production queue (KDS, job board, etc.)',
     domain: 'PRODUCTION',
     category: 'conditional'
   },
@@ -507,21 +523,14 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
     category: 'conditional'
   },
 
-  'customer_online_reservation': {
-    id: 'customer_online_reservation',
+  'customer_online_accounts': {
+    id: 'customer_online_accounts',
     name: 'Reservas Online',
     description: 'Portal web para reservas de clientes',
     domain: 'CUSTOMER',
     category: 'conditional'
   },
 
-  'customer_reservation_reminders': {
-    id: 'customer_reservation_reminders',
-    name: 'Recordatorios de Reserva',
-    description: 'Recordatorios automáticos de reservas',
-    domain: 'CUSTOMER',
-    category: 'conditional'
-  },
 
   // ============================================
   // FINANCE DOMAIN (4 features)
@@ -563,13 +572,6 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
   // MOBILE DOMAIN (5 features)
   // ============================================
 
-  'mobile_pos_offline': {
-    id: 'mobile_pos_offline',
-    name: 'POS Móvil Offline',
-    description: 'POS que funciona sin conexión',
-    domain: 'MOBILE',
-    category: 'conditional'
-  },
 
   'mobile_location_tracking': {
     id: 'mobile_location_tracking',
@@ -595,13 +597,6 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
     category: 'conditional'
   },
 
-  'mobile_sync_management': {
-    id: 'mobile_sync_management',
-    name: 'Gestión de Sincronización',
-    description: 'Sincronización offline-online para móvil',
-    domain: 'MOBILE',
-    category: 'conditional'
-  },
 
   // ============================================
   // MULTISITE DOMAIN (5 features)
@@ -871,8 +866,8 @@ export const MODULE_FEATURE_MAP: Record<string, {
 
   'products': {
     optionalFeatures: [
-      'production_recipe_management',
-      'production_kitchen_display',
+      'production_bom_management',
+      'production_display_system',
       'production_order_queue'
     ],
     description: 'Módulo de productos - activo con cualquier feature de PRODUCTION'
@@ -926,6 +921,30 @@ export const MODULE_FEATURE_MAP: Record<string, {
     description: 'Módulo fiscal/finanzas - activo con cualquier feature de FINANCE'
   },
 
+  'delivery': {
+    requiredFeatures: [
+      'operations_delivery_zones',
+      'operations_delivery_tracking'
+    ],
+    description: 'Módulo de delivery - requiere TODAS las features de delivery (delivery_shipping capability)'
+  },
+
+  'kitchen': {
+    requiredFeatures: [
+      'production_display_system',
+      'production_order_queue'
+    ],
+    description: 'Módulo de cocina - requiere TODAS las features de kitchen (production_workflow capability)'
+  },
+
+  'floor': {
+    requiredFeatures: [
+      'operations_table_management',
+      'operations_floor_plan_config'
+    ],
+    description: 'Módulo de piso/mesas - requiere TODAS las features de floor (onsite_service capability)'
+  },
+
   // ============================================
   // ADVANCED MODULES (Feature-dependent)
   // ============================================
@@ -969,9 +988,9 @@ export const MODULE_FEATURE_MAP: Record<string, {
 
   'mobile': {
     optionalFeatures: [
-      'mobile_pos_offline',
-      'mobile_location_tracking',
-      'mobile_route_planning'
+      'mobile_location_tracking',       // GPS tracking
+      'mobile_route_planning',          // Route planning
+      'mobile_inventory_constraints'    // Capacity limits
     ],
     description: 'Módulo móvil - activo con features de MOBILE'
   },
@@ -983,69 +1002,34 @@ export const MODULE_FEATURE_MAP: Record<string, {
       'multisite_transfer_orders'
     ],
     description: 'Multi-ubicación - activo con features de MULTISITE'
+  },
+
+  // ============================================
+  // SUPPLY CHAIN MODULES (Added - Navigation Fix)
+  // ============================================
+
+  'suppliers': {
+    optionalFeatures: [
+      'inventory_supplier_management',
+      'inventory_purchase_orders',
+      'operations_vendor_performance'
+    ],
+    description: 'Módulo de gestión de proveedores'
+  },
+
+  'supplier-orders': {
+    requiredFeatures: ['inventory_supplier_management'],
+    optionalFeatures: [
+      'inventory_purchase_orders',
+      'inventory_demand_forecasting'
+    ],
+    description: 'Órdenes de compra a proveedores'
   }
 };
 
 // ============================================
 // FEATURE → UI MAPPING FUNCTIONS
 // ============================================
-
-import { getSlotDefinitionsForFeatures } from './SlotRegistry';
-
-/**
- * Obtiene slots activos para un conjunto de features (v2.0)
- *
- * Slots son componentes que se pueden insertar en diferentes partes de la UI
- * según las features activas del usuario.
- *
- * @param features - Array de FeatureIds activas
- * @returns Array de slots con id, component y priority
- *
- * @example
- * const slots = getSlotsForActiveFeatures(['sales_order_management', 'inventory_stock_tracking']);
- * // Returns: [{ id: 'sales_widget', component: 'SalesWidget', priority: 10 }, ...]
- */
-export function getSlotsForActiveFeatures(
-  features: FeatureId[]
-): Array<{ id: string; component: string; priority: number }> {
-  const slotDefinitions = getSlotDefinitionsForFeatures(features);
-
-  // Map to simplified format
-  return slotDefinitions.map(slot => ({
-    id: slot.id,
-    component: slot.component,
-    priority: slot.priority
-  }));
-}
-
-/**
- * Obtiene slots para un target slot ID específico (v2.0)
- *
- * Útil para renderizar slots en ubicaciones específicas de la UI.
- * Los slots se ordenan por prioridad descendente (mayor prioridad primero).
- *
- * @param features - Array de FeatureIds activas
- * @param targetSlotId - ID del slot objetivo (ej: 'dashboard-widgets', 'sales-toolbar')
- * @returns Array de slots filtrados y ordenados por prioridad
- *
- * @example
- * const dashboardSlots = getSlotsForTarget(activeFeatures, 'dashboard-widgets');
- * // Returns widgets ordenados por prioridad
- */
-export function getSlotsForTarget(
-  features: FeatureId[],
-  targetSlotId: string
-): Array<{ id: string; component: string; priority: number }> {
-  const allSlots = getSlotsForActiveFeatures(features);
-  const definitions = getSlotDefinitionsForFeatures(features);
-
-  return allSlots
-    .filter((slot, index) => {
-      const definition = definitions[index];
-      return definition.targetSlots.includes(targetSlotId);
-    })
-    .sort((a, b) => b.priority - a.priority); // Sort by priority descending
-}
 
 /**
  * Obtiene módulos activos para un conjunto de features (v2.0 - Navigation Integration Fix)
@@ -1099,5 +1083,6 @@ export function getModulesForActiveFeatures(features: FeatureId[]): string[] {
 // EXPORTS
 // ============================================
 
+export type { FeatureId } from './types';
 export { FEATURE_REGISTRY };
 export default FEATURE_REGISTRY;

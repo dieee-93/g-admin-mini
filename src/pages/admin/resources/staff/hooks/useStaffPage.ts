@@ -277,7 +277,7 @@ export const useStaffPage = (): UseStaffPageReturn => {
       departmentBreakdown,
 
       // Training & Development
-      upcomingReviews: staffStats.upcomingReviews.length,
+      upcomingReviews: staffStats.upcomingReviews?.length || 0,
       trainingHoursThisMonth: Math.floor(Math.random() * 50) + 20,
       skillGaps: ['Customer Service', 'Food Safety', 'POS Systems'],
 

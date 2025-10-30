@@ -48,8 +48,15 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
 
       // INVENTORY
       'inventory_stock_tracking',
+      'inventory_supplier_management',
       'inventory_alert_system',
-      'inventory_low_stock_auto_reorder'
+      'inventory_low_stock_auto_reorder',
+
+      // STAFF - Meseros, cajeros, personal de atención
+      'staff_employee_management',
+      'staff_shift_management',
+      'staff_time_tracking',
+      'staff_performance_tracking'
     ],
 
     blockingRequirements: [
@@ -69,13 +76,20 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'sales_order_management',
       'sales_payment_processing',
       'sales_catalog_menu',
+      'sales_pickup_orders',
       'sales_split_payment',
       'sales_coupon_management',
       'operations_pickup_scheduling',
       'operations_notification_system',
       'inventory_stock_tracking',
+      'inventory_supplier_management',
       'inventory_alert_system',
-      'inventory_low_stock_auto_reorder'
+      'inventory_low_stock_auto_reorder',
+
+      // STAFF - Personal que prepara y entrega pedidos
+      'staff_employee_management',
+      'staff_shift_management',
+      'staff_time_tracking'
     ],
 
     blockingRequirements: [
@@ -95,14 +109,22 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'sales_order_management',
       'sales_payment_processing',
       'sales_catalog_menu',
+      'sales_delivery_orders',
       'sales_split_payment',
       'sales_coupon_management',
       'operations_delivery_zones',
       'operations_delivery_tracking',
       'operations_notification_system',
       'inventory_stock_tracking',
+      'inventory_supplier_management',
       'inventory_alert_system',
-      'inventory_low_stock_auto_reorder'
+      'inventory_low_stock_auto_reorder',
+
+      // STAFF - Repartidores, preparadores, despachadores
+      'staff_employee_management',
+      'staff_shift_management',
+      'staff_time_tracking',
+      'staff_performance_tracking'
     ],
 
     blockingRequirements: [
@@ -111,16 +133,16 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
     ]
   },
 
-  'requires_preparation': {
-    id: 'requires_preparation',
-    name: 'Requiere Producción',
-    description: 'Cocina/producción/manufactura',
+  'production_workflow': {
+    id: 'production_workflow',
+    name: 'Production Workflow',
+    description: 'Businesses that require production/assembly/preparation workflows',
     icon: '👨‍🍳',
     type: 'production',
 
     activatesFeatures: [
-      'production_recipe_management',
-      'production_kitchen_display',
+      'production_bom_management',      // RENAMED from production_recipe_management
+      'production_display_system',      // RENAMED from production_kitchen_display
       'production_order_queue',
       'production_capacity_planning',
       'inventory_purchase_orders',
@@ -128,7 +150,14 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'inventory_demand_forecasting',
       'inventory_batch_lot_tracking',
       'inventory_expiration_tracking',
-      'operations_vendor_performance'
+      'operations_vendor_performance',
+
+      // STAFF - Production staff, supervisors, operators
+      'staff_employee_management',
+      'staff_shift_management',
+      'staff_time_tracking',
+      'staff_performance_tracking',
+      'staff_training_management'
     ],
 
     blockingRequirements: []
@@ -149,8 +178,13 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'customer_service_history',
       'customer_preference_tracking',
       'customer_online_reservation',
-      'customer_reservation_reminders',
-      'sales_package_management'
+      'sales_package_management',
+
+      // STAFF - Profesionales, técnicos, prestadores de servicio
+      'staff_employee_management',
+      'staff_shift_management',
+      'staff_time_tracking',
+      'staff_performance_tracking'
     ],
 
     blockingRequirements: [
@@ -159,31 +193,16 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
     ]
   },
 
-  'walkin_service': {
-    id: 'walkin_service',
-    name: 'Servicios Walk-in',
-    description: 'Servicios sin cita previa',
-    icon: '🚶',
-    type: 'service_mode',
-
-    activatesFeatures: [
-      // Sin features adicionales específicas
-      // Usa las de onsite_service
-    ],
-
-    blockingRequirements: []
-  },
-
-  'async_operations': {
-    id: 'async_operations',
-    name: 'Operaciones 24/7',
-    description: 'Venta asincrónica (e-commerce)',
+  'online_store': { // ✅ RENAMED: async_operations → online_store
+    id: 'online_store',
+    name: 'Tienda Online',
+    description: 'E-commerce 24/7 con fulfillment diferido',
     icon: '🌐',
     type: 'special_operation',
 
     activatesFeatures: [
       'sales_catalog_ecommerce',
-      'sales_async_order_processing',
+      'sales_online_order_processing', // ✅ RENAMED: async → online
       'sales_online_payment_gateway',
       'sales_cart_management',
       'sales_checkout_process',
@@ -192,7 +211,7 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'analytics_conversion_tracking',
       'operations_deferred_fulfillment',
       'inventory_available_to_promise',
-      'customer_online_reservation'
+      'customer_online_accounts' // ✅ RENAMED: online_reservation → online_accounts
     ],
 
     blockingRequirements: [
@@ -221,7 +240,11 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'sales_quote_generation',
       'inventory_available_to_promise',
       'inventory_demand_forecasting',
-      'operations_vendor_performance'
+      'operations_vendor_performance',
+
+      // STAFF - Ejecutivos de cuenta, vendedores B2B
+      'staff_employee_management',
+      'staff_performance_tracking'
     ],
 
     blockingRequirements: [
@@ -237,11 +260,15 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
     type: 'special_operation',
 
     activatesFeatures: [
-      'mobile_pos_offline',
       'mobile_location_tracking',
       'mobile_route_planning',
       'mobile_inventory_constraints',
-      'mobile_sync_management'
+
+      // STAFF - Conductor, asistente, personal móvil
+      'staff_employee_management',
+      'staff_shift_management',
+      'staff_time_tracking',
+      'staff_performance_tracking'
     ],
 
     blockingRequirements: [
@@ -262,7 +289,7 @@ const INFRASTRUCTURE: Record<InfrastructureId, Infrastructure> = {
     icon: '🏪',
     type: 'infrastructure',
 
-    conflicts: ['multi_location', 'mobile_business'],
+    conflicts: ['multi_location'], // ✅ FIXED: Solo conflicto con multi_location
 
     activatesFeatures: [],
 
@@ -278,7 +305,7 @@ const INFRASTRUCTURE: Record<InfrastructureId, Infrastructure> = {
     icon: '🏢',
     type: 'infrastructure',
 
-    conflicts: ['single_location', 'mobile_business'],
+    conflicts: ['single_location'], // ✅ FIXED: Solo conflicto con single_location
 
     activatesFeatures: [
       'multisite_location_management',
@@ -301,7 +328,7 @@ const INFRASTRUCTURE: Record<InfrastructureId, Infrastructure> = {
     icon: '🚐',
     type: 'infrastructure',
 
-    conflicts: ['single_location', 'multi_location'],
+    conflicts: [], // ✅ FIXED: Sin conflictos - puede combinarse con todo
 
     activatesFeatures: [
       // Ya cubierto por 'mobile_operations' capability
@@ -448,6 +475,9 @@ export function getBlockingRequirements(
 // ============================================
 // COMPATIBILITY EXPORTS (para migración gradual)
 // ============================================
+
+// Re-export types from ./types for convenience
+export type { InfrastructureId, FeatureId, BusinessCapabilityId } from './types';
 
 /**
  * @deprecated Usar BusinessCapabilityId en su lugar

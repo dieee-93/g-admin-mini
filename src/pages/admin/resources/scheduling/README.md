@@ -1,418 +1,361 @@
-# Módulo de Scheduling - G-Admin Mini
+# Scheduling Module - Documentation Index
 
-## 📋 Descripción del Módulo
-
-El módulo de **Scheduling** es el sistema integral de gestión de horarios y planificación laboral de G-Admin Mini, proporcionando herramientas completas para la programación de turnos, gestión de tiempo libre, planificación de cobertura y seguimiento de costos laborales en tiempo real.
-
-### Características principales:
-- ✅ Sistema de programación de turnos avanzado
-- ✅ Gestión integral de solicitudes de tiempo libre
-- ✅ Planificador inteligente de cobertura de personal
-- ✅ Seguimiento en tiempo real de costos laborales
-- ✅ Motor de programación automática
-- ✅ Interface tabbed para navegación eficiente
-- ✅ Dashboard de métricas laborales
-- ✅ Sistema de alertas y notificaciones
+**Version:** 2.3.0 - Phase 3 Complete + All Features Integrated
+**Last Updated:** 2025-01-12
 
 ---
 
-## 🏗️ Estructura Estándar de Módulo
+## 📚 Documentation
 
-Esta estructura representa nuestro **patrón oficial** para todos los módulos de G-Admin Mini:
+### Core Documentation
+
+1. **[Scheduling Calendar Design](./docs/SCHEDULING_CALENDAR_DESIGN.md)** 🏗️
+   - Architecture overview
+   - Component hierarchy
+   - Month/Week/Day views specification
+   - Color system
+   - Interactions & UX patterns
+
+2. **[Event Types Specification](./docs/SCHEDULING_EVENT_TYPES.md)** 📊
+   - Complete event type catalog
+   - UnifiedScheduleEvent structure
+   - Metadata specifications
+   - Capability mapping
+   - Examples for each event type
+
+3. **[Integration Guide](./docs/SCHEDULING_INTEGRATION_GUIDE.md)** 🔗
+   - Quick start examples
+   - Creating new adapters
+   - Cross-module integration
+   - EventBus patterns
+   - Testing strategies
+   - Troubleshooting
+
+4. **[Module Registry Integration](./docs/MODULE_REGISTRY_INTEGRATION.md)** 🔌 **NEW**
+   - HookPoints implementation (calendar.events, toolbar.actions, top_metrics)
+   - Cross-module actions reference (Sales, Materials, Kitchen)
+   - Extension pattern for new modules
+   - Debugging & troubleshooting
+   - Styling guidelines & priorities
+
+---
+
+## 🚀 Quick Links
+
+### For Users
+- **Main Page:** `page.tsx`
+- **Calendar Views:** `components/calendar/`
+- **Filters:** `components/calendar/CalendarFiltersPanel.tsx`
+
+### For Developers
+- **Types:** `types/calendar.ts`
+- **Adapters:** `adapters/` (StaffShift, Delivery, TimeOff, Maintenance)
+- **Hooks:** `hooks/`
+- **Services:** `services/schedulingApi.ts`
+- **Implementation Guide:** `PHASE_3_PROMPT.md`
+
+### For Designers
+- **Color System:** See `types/calendar.ts` → `EVENT_COLORS`
+- **UI Components:** `components/calendar/`
+- **Design Spec:** `docs/SCHEDULING_CALENDAR_DESIGN.md`
+
+---
+
+## ✅ What's Implemented
+
+### Phase 1: Core Calendar (✅ COMPLETED)
+
+- ✅ **UnifiedScheduleEvent** type system
+- ✅ **Adapter pattern** for data normalization
+- ✅ **StaffShiftAdapter** (fully functional)
+- ✅ **Month view** with event dots & tooltips
+- ✅ **Calendar view selector** (Month/Week/Day tabs)
+- ✅ **Date navigation** (◀ Today ▶)
+- ✅ **Filters panel** (event types, departments, statuses)
+- ✅ **Compact top bar** (metrics + alerts)
+- ✅ **Modal integration** (ShiftEditor, AutoScheduling)
+- ✅ **Complete documentation** (3 comprehensive guides)
+
+### Phase 2: Week & Day Views (✅ COMPLETED)
+
+- ✅ **WeekCalendarGrid** - Timeline with drag & drop
+- ✅ **DayCalendarTimeline** - Detailed hour-by-hour view
+- ✅ **EventBlock component** - Medium variant for week view
+- ✅ **EventCard component** - Expanded variant for day view
+- ✅ **Drag & drop** - Reschedule events by dragging (Week view)
+- ✅ **Current time indicator** - Red line in Day view
+- ✅ **Overlap handling** - Multi-column layout for simultaneous events
+- ✅ **Inline actions** - Edit/Delete/Complete buttons in Day view
+- ✅ **Auto-scroll** - Day view scrolls to current time
+- ✅ **Empty states** - User-friendly messages when no events
+
+### Phase 3: Additional Event Types & Features (✅ COMPLETED)
+
+#### Event Type Adapters
+- ✅ **DeliveryAdapter** - Delivery schedules with zones & drivers
+- ✅ **TimeOffAdapter** - Employee time-off requests (vacation, sick, personal, emergency)
+- ✅ **MaintenanceAdapter** - Equipment maintenance (preventive, corrective, inspection)
+- ✅ **ProductionAdapter** - Production blocks (placeholder - requires production module data)
+- ✅ **AppointmentAdapter** - Customer appointments (placeholder - requires appointments table)
+
+#### Secondary Features
+- ✅ **Drag & drop backend integration** - Events persist to database via `shiftsApi.updateEventTime()`
+- ✅ **Employee filter dropdown** - Multi-select filter by employee with event counts
+- ✅ **Search functionality** - Real-time search in title, description, employee, department
+- ✅ **Department filters** - Exact match filtering by department name
+- ✅ **Status filters** - Filter events by status (scheduled, confirmed, in_progress, etc.)
+- ✅ **Event click handlers** - Switch-case routing for all 6 event types
+- ✅ **Metric click actions** - Interactive metrics that open filters or navigate to views
+
+---
+
+## 📋 What's Pending
+
+### Phase 4: Advanced Features
+
+- 📋 **Bulk operations** - Copy week, delete multiple
+- 📋 **Export** - PDF/Excel export
+- 📋 **Keyboard shortcuts** - Cmd+N, arrows, etc.
+- 📋 **Mobile responsive** - Touch optimizations
+- 📋 **Detail modals** - Delivery, TimeOff, Maintenance detail views (handlers exist, modals pending)
+
+### Phase 5: AI & Automation
+
+- 📋 **Smart suggestions** - AI-powered scheduling
+- 📋 **Conflict detection** - Auto-detect overlaps
+- 📋 **Auto-fill gaps** - Based on availability
+- 📋 **Forecasting** - Predict staffing needs
+
+---
+
+## 🏗️ Architecture
 
 ```
-src/pages/admin/resources/scheduling/
-├── README.md                          # 📖 Este archivo (documentación completa)
-├── page.tsx                           # 🎯 Página orquestadora (componente principal)
+scheduling/
+├── docs/                               # 📚 Documentation
+│   ├── SCHEDULING_CALENDAR_DESIGN.md
+│   ├── SCHEDULING_EVENT_TYPES.md
+│   └── SCHEDULING_INTEGRATION_GUIDE.md
 │
-├── components/                        # 🧩 Componentes UI específicos del módulo
-│   ├── index.ts                       # 📦 Barrel exports
-│   ├── WeeklySchedule/               # 📅 Programación semanal
-│   │   ├── WeeklyScheduleView.tsx
-│   │   └── index.ts
-│   ├── TimeOff/                      # 🏖️ Gestión de tiempo libre
-│   │   ├── TimeOffManager.tsx
-│   │   └── index.ts
-│   ├── Coverage/                     # 👥 Planificación de cobertura
-│   │   ├── CoveragePlanner.tsx
-│   │   └── index.ts
-│   ├── LaborCosts/                   # 💰 Seguimiento de costos
-│   │   ├── LaborCostTracker.tsx
-│   │   └── index.ts
-│   ├── RealTime/                     # ⏱️ Monitoreo en tiempo real
-│   │   ├── RealTimeLaborTracker.tsx
-│   │   └── index.ts
-│   ├── Analytics/                    # 📊 Análisis y reportes
-│   │   ├── SchedulingAnalytics.tsx
-│   │   └── index.ts
-│   └── AutoSchedulingModal.tsx       # 🤖 Modal de programación automática
+├── types/                              # 📐 TypeScript Types
+│   └── calendar.ts                     # UnifiedScheduleEvent, EventType, etc.
 │
-├── hooks/                             # 🪝 Hooks de negocio y página
-│   ├── index.ts                       # 📦 Barrel exports
-│   ├── useSchedulingPage.ts          # 🎭 Hook orquestador de la página
-│   └── useScheduling.ts              # 📊 Hook de lógica de negocio
+├── adapters/                           # 🔄 Data Adapters
+│   ├── SchedulingAdapter.ts            # Base class
+│   ├── staffShiftAdapter.ts            # ✅ Staff shifts (implemented)
+│   ├── deliveryAdapter.ts              # ✅ Deliveries (implemented)
+│   ├── timeOffAdapter.ts               # ✅ Time-off (implemented)
+│   ├── maintenanceAdapter.ts           # ✅ Maintenance (implemented)
+│   ├── productionAdapter.ts            # 📋 Production (placeholder)
+│   ├── appointmentAdapter.ts           # 📋 Appointments (placeholder)
+│   └── index.ts
 │
-├── services/                          # ⚙️ Lógica de negocio y servicios
-│   └── schedulingApi.ts              # 🔌 API de scheduling
+├── components/
+│   ├── calendar/                       # 📅 Calendar Components
+│   │   ├── CalendarViewSelector.tsx   # ✅ Month/Week/Day tabs
+│   │   ├── MonthCalendarGrid.tsx      # ✅ Month view (completed)
+│   │   ├── WeekCalendarGrid.tsx       # ✅ Week view (completed)
+│   │   ├── DayCalendarTimeline.tsx    # ✅ Day view (completed)
+│   │   ├── EventDot.tsx                # ✅ Color dots for month view
+│   │   ├── EventTooltip.tsx            # ✅ Hover tooltips
+│   │   ├── CalendarFiltersPanel.tsx   # ✅ Filters sidebar
+│   │   └── index.ts
+│   │
+│   ├── SchedulingTopBar.tsx            # ✅ Metrics + Alerts compact
+│   ├── SchedulingMetrics.tsx           # ⚠️ Legacy (usar TopBar)
+│   ├── SchedulingAlerts.tsx            # ⚠️ Legacy (usar TopBar)
+│   ├── ShiftEditorModal.tsx            # ✅ Create/edit shifts
+│   └── AutoSchedulingModal.tsx         # ✅ Auto-schedule wizard
 │
-└── types/                             # 🏷️ Definiciones TypeScript
-    ├── index.ts                       # 📦 Barrel exports
-    └── schedulingTypes.ts             # 🏗️ Tipos de scheduling
+├── hooks/
+│   ├── useSchedulingPage.ts            # Page orchestration
+│   └── useScheduling.ts                # Supabase data fetching
+│
+├── services/
+│   └── schedulingApi.ts                # Supabase queries
+│
+├── page.tsx                            # ✅ Main scheduling page (v2.0)
+├── page.tsx.backup                     # Old version (backup)
+└── README.md                           # 👈 You are here
 ```
 
 ---
 
-## 🎯 Patrón "Página Orquestadora"
+## 🎨 Design System
 
-### Concepto
-El archivo `page.tsx` actúa como un **orquestador limpio** que:
-- ✅ No contiene lógica de negocio
-- ✅ Usa componentes semánticos del sistema de diseño
-- ✅ Delega la lógica a hooks especializados
-- ✅ Mantiene una estructura clara y consistente
+### Event Colors
 
-### Implementación Actual
+| Type        | Bg        | Border     | Text       | Dot       | Use Case            |
+|-------------|-----------|------------|------------|-----------|---------------------|
+| staff_shift | blue.50   | blue.500   | blue.900   | #3182CE   | Employee shifts     |
+| production  | purple.50 | purple.500 | purple.900 | #805AD5   | Kitchen production  |
+| appointment | green.50  | green.500  | green.900  | #38A169   | Customer bookings   |
+| time_off    | orange.50 | orange.500 | orange.900 | #DD6B20   | Employee absences   |
+| delivery    | cyan.50   | cyan.500   | cyan.900   | #0BC5EA   | Delivery schedules  |
+| maintenance | gray.50   | gray.500   | gray.900   | #718096   | Equipment service   |
 
-```tsx
-// src/pages/admin/resources/scheduling/page.tsx
-export default function SchedulingPage() {
-  // 🎭 Toda la lógica delegada al hook orquestador
-  const {
-    viewState,
-    schedulingStats,
-    isAutoSchedulingOpen,
-    handleTabChange,
-    setViewState,
-    setIsAutoSchedulingOpen,
-    handleScheduleGenerated
-  } = useSchedulingPage();
+### Icons (Heroicons v2)
 
-  return (
-    <Stack gap="lg" align="stretch">
-      {/* Header with KPIs - Using hook data */}
-      <CardWrapper variant="elevated" padding="md">
-        <CardWrapper.Body>
-          <VStack gap="md" align="start">
-            <HStack gap="sm">
-              <Icon icon={CalendarIcon} size="lg" color="blue.600" />
-              <VStack align="start" gap="xs">
-                <HStack gap="sm">
-                  <Typography variant="title">Staff Scheduling</Typography>
-                  <Badge colorPalette="blue">Week View</Badge>
-                </HStack>
-                <Typography variant="body" color="text.muted">
-                  Manage employee schedules, time-off requests, and labor costs
-                </Typography>
-              </VStack>
-            </HStack>
-
-            {/* KPI Row */}
-            <SimpleGrid columns={{ base: 2, md: 4 }} gap="md" width="full">
-              {/* KPI Cards */}
-            </SimpleGrid>
-          </VStack>
-        </CardWrapper.Body>
-      </CardWrapper>
-
-      {/* Tabbed Layout for Sections */}
-      <Tabs>
-        <TabList>
-          <Tab onClick={() => handleTabChange('schedule')}>
-            <HStack gap="sm">
-              <Icon icon={CalendarIcon} size="sm" />
-              <Typography>Weekly Schedule</Typography>
-            </HStack>
-          </Tab>
-          {/* More tabs... */}
-        </TabList>
-
-        <TabPanels>
-          <TabPanel><WeeklyScheduleView /></TabPanel>
-          <TabPanel><TimeOffManager /></TabPanel>
-          <TabPanel><CoveragePlanner /></TabPanel>
-          <TabPanel><LaborCostTracker /></TabPanel>
-          <TabPanel><RealTimeLaborTracker /></TabPanel>
-        </TabPanels>
-      </Tabs>
-    </Stack>
-  );
-}
-```
-
-### Hook Orquestador Scheduling
-
-```tsx
-// src/pages/admin/resources/scheduling/hooks/useSchedulingPage.ts
-export const useSchedulingPage = (): UseSchedulingPageReturn => {
-  const { setQuickActions } = useNavigation();
-
-  // 🚀 Configurar acciones rápidas del scheduling
-  useEffect(() => {
-    setQuickActions([
-      {
-        id: 'new-shift',
-        label: 'New Shift',
-        icon: PlusIcon,
-        action: () => console.log('Opening new shift form')
-      },
-      {
-        id: 'auto-schedule',
-        label: 'Auto Schedule',
-        icon: Cog6ToothIcon,
-        action: () => setIsAutoSchedulingOpen(true)
-      }
-    ]);
-
-    return () => setQuickActions([]);
-  }, [setQuickActions]);
-
-  return {
-    viewState,
-    schedulingStats,
-    isAutoSchedulingOpen,
-    handleTabChange,
-    setViewState,
-    setIsAutoSchedulingOpen,
-    handleScheduleGenerated
-  };
-};
-```
+- `UserIcon` - Staff shifts
+- `BeakerIcon` - Production
+- `CalendarIcon` - Appointments
+- `TruckIcon` - Deliveries
+- `CalendarDaysIcon` - Time-off
+- `WrenchScrewdriverIcon` - Maintenance
 
 ---
 
-## 🎨 Sistema de Diseño Integrado
+## 🔧 Development
 
-### Componentes Semánticos Obligatorios
+### Running Locally
 
-```tsx
-import {
-  // 🏗️ Componentes de Layout Semánticos (PRIORIDAD)
-  Stack, VStack, HStack,        // Estructuras de layout
-  CardWrapper,                  // Contenedores de contenido
-  Tabs, TabList, Tab, TabPanels, TabPanel, // Navegación tabbed
-  SimpleGrid,                   // Grillas responsivas
-
-  // 🧩 Componentes Base
-  Typography, Icon, Badge,      // Elementos básicos
-
-  // 📊 Componentes de Negocio
-  [componentes específicos según necesidad]
-} from '@/shared/ui'
-```
-
-### Reglas de Diseño
-1. **❌ NUNCA** importar de `@chakra-ui/react` directamente
-2. **✅ SIEMPRE** usar componentes del sistema de diseño
-3. **✅ USAR** `CardWrapper` para contenido estructurado
-4. **✅ APLICAR** `Tabs` para navegación entre secciones
-5. **✅ DELEGAR** theming automático (tokens `gray.*`)
-
----
-
-## 🧠 Arquitectura de Scheduling
-
-### Secciones del Scheduling
-
-```typescript
-// Tipos de secciones disponibles
-export type SchedulingTab =
-  | 'schedule'        // Programación semanal
-  | 'timeoff'         // Gestión de tiempo libre
-  | 'coverage'        // Planificación de cobertura
-  | 'costs'           // Seguimiento de costos laborales
-  | 'realtime';       // Monitoreo en tiempo real
-
-// Configuración de cada sección
-export interface SchedulingStats {
-  total_shifts_this_week: number;
-  employees_scheduled: number;
-  coverage_percentage: number;
-  pending_time_off: number;
-  labor_cost_this_week: number;
-  overtime_hours: number;
-  understaffed_shifts: number;
-  approved_requests: number;
-}
-```
-
-### Integración de Scheduling
-
-```typescript
-// types/schedulingTypes.ts
-export interface Shift {
-  id: string;
-  employee_id: string;
-  employee_name: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  position: string;
-  status: ShiftStatus;
-  break_time?: number;
-  notes?: string;
-}
-
-export interface TimeOffRequest {
-  id: string;
-  employee_id: string;
-  start_date: string;
-  end_date: string;
-  type: 'vacation' | 'sick' | 'personal' | 'emergency';
-  status: 'pending' | 'approved' | 'denied';
-  reason?: string;
-}
-```
-
----
-
-## 🔄 Integración con EventBus
-
-### Eventos del Módulo Scheduling
-
-```typescript
-// Eventos que emite el módulo
-const SCHEDULING_EVENTS = {
-  SHIFT_CREATED: 'scheduling:shift_created',
-  SHIFT_UPDATED: 'scheduling:shift_updated',
-  SHIFT_DELETED: 'scheduling:shift_deleted',
-  TIMEOFF_REQUESTED: 'scheduling:timeoff_requested',
-  TIMEOFF_APPROVED: 'scheduling:timeoff_approved',
-  SCHEDULE_PUBLISHED: 'scheduling:schedule_published',
-  AUTO_SCHEDULE_GENERATED: 'scheduling:auto_schedule_generated',
-  COVERAGE_ALERT: 'scheduling:coverage_alert'
-} as const;
-
-// Eventos que escucha el módulo
-const SUBSCRIBED_EVENTS = [
-  'staff:employee_added',           // Nuevo empleado disponible para scheduling
-  'staff:employee_updated',         // Cambios en disponibilidad de empleado
-  'staff:position_changed',         // Cambios de posición que afectan horarios
-  'operations:demand_forecast',     // Pronóstico de demanda para ajustar cobertura
-  'fiscal:labor_budget_updated',    // Actualizaciones de presupuesto laboral
-  'system:notification_sent'        // Notificaciones enviadas a empleados
-] as const;
-```
-
----
-
-## 📊 Testing Strategy
-
-### Estructura de Tests
-
-```
-src/pages/admin/resources/scheduling/
-├── __tests__/
-│   ├── page.test.tsx                     # Tests del componente principal
-│   ├── components/
-│   │   ├── WeeklySchedule/
-│   │   │   └── WeeklyScheduleView.test.tsx
-│   │   ├── TimeOff/
-│   │   │   └── TimeOffManager.test.tsx
-│   │   ├── Coverage/
-│   │   │   └── CoveragePlanner.test.tsx
-│   │   ├── LaborCosts/
-│   │   │   └── LaborCostTracker.test.tsx
-│   │   └── RealTime/
-│   │       └── RealTimeLaborTracker.test.tsx
-│   ├── hooks/
-│   │   ├── useSchedulingPage.test.ts     # Tests del hook orquestador
-│   │   └── useScheduling.test.ts         # Tests del hook de negocio
-│   └── services/
-│       └── schedulingApi.test.ts         # Tests de servicios
-```
-
----
-
-## 🚀 Secciones del Scheduling
-
-### ✅ Secciones Implementadas
-
-1. **📅 Weekly Schedule (Programación Semanal)**
-   - Vista de calendario semanal interactiva
-   - Creación y edición de turnos
-   - Gestión de plantillas de turnos
-   - Copia de horarios entre semanas
-
-2. **🏖️ Time Off (Gestión de Tiempo Libre)**
-   - Solicitudes de tiempo libre
-   - Proceso de aprobación/denegación
-   - Calendario de ausencias
-   - Gestión de diferentes tipos de licencias
-
-3. **👥 Coverage Planning (Planificación de Cobertura)**
-   - Análisis de cobertura por turno
-   - Identificación de turnos con personal insuficiente
-   - Sugerencias de cobertura automática
-   - Gestión de empleados de reemplazo
-
-4. **💰 Labor Costs (Seguimiento de Costos)**
-   - Cálculo automático de costos laborales
-   - Seguimiento de horas extra
-   - Análisis de presupuesto vs real
-   - Proyecciones de costos semanales/mensuales
-
-5. **⏱️ Real-Time (Monitoreo en Tiempo Real)**
-   - Estado actual de empleados
-   - Alertas de asistencia
-   - Seguimiento en vivo de horas trabajadas
-   - Dashboard de métricas instantáneas
-
-### 🔄 Flujo de Scheduling
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  Weekly Schedule │───▶│   Time Off      │───▶│   Coverage      │
-│                 │    │   Management    │    │   Planning      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                        │                        │
-         ▼                        ▼                        ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  Labor Costs    │    │   Real-Time     │    │   Auto Schedule │
-│   Tracking      │    │   Monitoring    │    │    Engine       │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
----
-
-## 🔗 Referencias Técnicas
-
-### Dependencias Clave Scheduling
-- **CardWrapper**: Contenedores de sección estructurados
-- **Tabs System**: Navegación entre secciones de scheduling
-- **SimpleGrid**: Layout responsivo para KPIs y métricas
-- **Real-time Updates**: Actualizaciones en tiempo real vía EventBus
-- **Navigation Context**: Integración con navegación global
-- **Auto-Scheduling Engine**: Motor de programación inteligente
-
-### Patrones Scheduling Aplicados
-- ✅ **Tabbed Interface**: Navegación eficiente entre funciones
-- ✅ **Real-time Monitoring**: Métricas y estado actualizados
-- ✅ **Smart Scheduling**: Programación automática inteligente
-- ✅ **Cross-Module Integration**: Integración con Staff, Operations y Fiscal
-- ✅ **Labor Cost Management**: Control integral de costos laborales
-
----
-
-## 📈 Métricas de Calidad Scheduling
-
-### Indicadores de Éxito Específicos
-- ⚡ **Performance**: Carga de secciones < 200ms
-- 🧪 **Testing Coverage**: > 85% en componentes críticos
-- 📦 **Bundle Size**: Carga lazy de secciones no activas
-- 🔧 **Scheduling Accuracy**: Programación automática > 95% precisión
-- 🎯 **User Experience**: Navegación entre secciones < 1 segundo
-
-### Validación Técnica Scheduling
 ```bash
-# Comandos de verificación específicos
-npm run test:scheduling       # Tests del módulo scheduling
-npm run analyze:scheduling    # Análisis del sistema de scheduling
-npm run validate:shifts       # Validación de turnos y horarios
-npm run benchmark:auto        # Performance del motor automático
+# Install dependencies
+pnpm install
+
+# Start dev server (usually running on :5173)
+pnpm dev
+
+# Type check
+pnpm -s exec tsc --noEmit
+
+# Lint
+pnpm lint
 ```
+
+### Testing
+
+```bash
+# Run tests
+pnpm test
+
+# Run with coverage
+pnpm test:coverage
+
+# Run specific test
+pnpm test scheduling
+```
+
+### Adding a New Event Type
+
+1. Read [Integration Guide](./docs/SCHEDULING_INTEGRATION_GUIDE.md)
+2. Define metadata interface in `types/calendar.ts`
+3. Create adapter in `adapters/`
+4. Wire to page in `page.tsx`
+5. Update documentation
 
 ---
 
-**🎯 Este README.md documenta el sistema integral de gestión de horarios de G-Admin Mini.**
+## 🐛 Known Issues
 
-**📋 El módulo Scheduling implementa el patrón oficial mientras proporciona gestión completa del capital humano y planificación laboral.**
+### High Priority
+- ❗ Production/Appointment adapters need real data sources (placeholders throw errors)
+- ❗ Delivery/TimeOff/Maintenance tables don't exist in Supabase yet (adapters ready)
+
+### Medium Priority
+- ⚠️ Detail modals for Delivery/TimeOff/Maintenance not implemented (click handlers log to console)
+- ⚠️ Mobile responsive needs optimization
+- ⚠️ Coverage/cost analysis views referenced by metrics don't exist yet
+
+### Low Priority
+- 💡 Keyboard shortcuts not implemented
+- 💡 Bulk operations not implemented
+- 💡 Export not implemented
+
+---
+
+## 📦 Dependencies
+
+### Core
+- React 19.1+
+- TypeScript 5.8.3+
+- Chakra UI v3.23.0 (via `@/shared/ui`)
+- Heroicons v2.2.0
+
+### State Management
+- Zustand v5.0.7 (`schedulingStore.ts`)
+- Supabase client (`shift_schedules` table)
+
+### Utilities
+- date-fns (via `combineDateTime` helper)
+- Logger (`@/lib/logging`)
+- EventBus (`@/lib/events`)
+
+---
+
+## 🆘 Support
+
+### Internal Resources
+1. **Documentation:** `./docs/`
+2. **Code Examples:** `adapters/staffShiftAdapter.ts`
+3. **Type Definitions:** `types/calendar.ts`
+
+### Common Questions
+
+**Q: Are Week/Day views functional?**
+A: Yes! Both are fully implemented with drag & drop, time indicators, and overlap handling.
+
+**Q: How do I add Production events?**
+A: See [Integration Guide](./docs/SCHEDULING_INTEGRATION_GUIDE.md) → Scenario 2. Adapter exists but needs real data source.
+
+**Q: Can I customize event colors?**
+A: Yes, edit `EVENT_COLORS` in `types/calendar.ts`.
+
+**Q: How do I filter by employee?**
+A: Use the filters panel (funnel icon). Employee filter is fully functional via `SchedulingUtils.filterByEmployee()`.
+
+**Q: Why aren't Delivery/TimeOff/Maintenance events showing?**
+A: The adapters exist and are integrated, but the Supabase tables haven't been created yet. Add placeholder data to test.
+
+---
+
+## 📈 Version History
+
+### v2.3.0 (2025-01-12) - Current
+- ✅ All 3 new adapters integrated (Delivery, TimeOff, Maintenance)
+- ✅ Department & status filters implemented
+- ✅ Event click handlers for all 6 types
+- ✅ Interactive metric clicks with filter actions
+- ✅ Complete documentation update
+
+### v2.2.0 (2025-01-11)
+- ✅ DeliveryAdapter, TimeOffAdapter, MaintenanceAdapter created
+- ✅ Phase 3 adapter development complete
+
+### v2.1.0 (2025-01-11)
+- ✅ Week view fully functional with drag & drop
+- ✅ Day view with timeline and current time indicator
+- ✅ EventBlock & EventCard components
+- ✅ Overlap handling (multi-column layout)
+- ✅ Inline actions in Day view
+- ✅ Auto-scroll to current time
+
+### v2.0.0 (2025-01-10)
+- ✅ Complete rewrite with calendar-first design
+- ✅ UnifiedScheduleEvent type system
+- ✅ Adapter pattern implementation
+- ✅ Month view with filters
+- ✅ Comprehensive documentation
+
+### v1.0.0 (Previous)
+- ⚠️ Legacy tab-based design
+- ⚠️ Separated views (Horarios, Permisos, Cobertura, etc.)
+- ⚠️ No unified event system
+- ⚠️ Backup available in `page.tsx.backup`
+
+---
+
+## 🎯 Next Steps
+
+1. **Immediate** - Create Supabase tables for Delivery/TimeOff/Maintenance
+2. **This Week** - Implement detail modals for new event types
+3. **This Week** - Create production_schedules table and wire ProductionAdapter
+4. **This Month** - Create appointments table and wire AppointmentAdapter
+5. **Q1 2025** - Coverage/cost analysis views for metric clicks
+6. **Q2 2025** - AI-powered scheduling suggestions
+
+---
+
+**Maintainer:** G-Admin Team
+**Last Updated:** 2025-01-12
+**Status:** ✅ Phase 1, 2 & 3 Complete

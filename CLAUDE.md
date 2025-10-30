@@ -2,241 +2,403 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Development Commands
+## Project Overview
 
-**Package manager**: pnpm (recommended)
+**G-Mini v3.1** is an enterprise-grade restaurant management system built with React 19.1, TypeScript 5.8.3, Vite 7.0, Chakra UI v3.23.0, and Supabase. It features a modular architecture with EventBus v2 Enterprise, offline-first capabilities, and a sophisticated atomic capabilities system for progressive feature disclosure.
 
-### Essential Commands
-- `pnpm install` - Install dependencies
-- `pnpm dev` - Start Vite dev server (usually running on :5173)
-- `pnpm build` - Production build with TypeScript check (`tsc -b && vite build`)
-- `pnpm preview` - Preview production build
+## Essential Commands
 
-### Quality & Linting
-- `pnpm lint` - Run ESLint with max 0 warnings
-- `pnpm lint:fix` - Auto-fix ESLint issues
-- `pnpm -s exec tsc --noEmit` - TypeScript type checking only
+### Development
+```bash
+pnpm install           # Install dependencies (required first)
+pnpm dev              # Start dev server (runs on :5173 by default)
+pnpm build            # Production build with TypeScript check
+pnpm build:skip-ts    # Production build without type checking
+```
+
+### Code Quality
+```bash
+pnpm -s exec eslint .              # Run ESLint (CI-compatible)
+pnpm -s exec tsc --noEmit          # Type check only (no build)
+pnpm lint                          # Run ESLint with default config
+pnpm lint:fix                      # Auto-fix ESLint issues
+```
 
 ### Testing
-- `pnpm test` - Run tests (excludes performance/stress)
-- `pnpm test:run` - Single test run without watch
-- `pnpm test:coverage` - Test coverage report
-- `pnpm test:eventbus` - EventBus v2 full test suite
-- `pnpm test:eventbus:unit` - EventBus unit tests only
-- `pnpm test:eventbus:integration` - EventBus integration tests
-- `pnpm test:eventbus:performance` - EventBus performance benchmarks
-- `pnpm test:eventbus:business` - EventBus business logic tests
+```bash
+pnpm test                          # Run tests (excludes performance/stress)
+pnpm test:run                      # Run tests once (CI mode)
+pnpm test:with-logs                # Run with verbose logging
+pnpm test:coverage                 # Generate coverage report
+pnpm test:eventbus:full            # Full EventBus suite (includes perf/stress)
+pnpm test:eventbus:unit            # Unit tests only
+pnpm test:eventbus:integration     # Integration tests only
+```
 
 ## Architecture Overview
 
-### Stack
-- **Frontend**: React 19.1+, TypeScript 5.8.3+, Vite 7.0+
-- **UI Framework**: Chakra UI v3.23.0 (strict v3 only - v2 props don't work)
-- **State**: Zustand v5.0.7 with Immer middleware
-- **Backend**: Supabase (PostgreSQL + real-time)
-- **Testing**: Vitest v3.2.4 with JSdom
+### Module Registry System (WordPress-inspired)
 
-### Project Structure - "Screaming Architecture"
+The project uses a **Module Registry** pattern inspired by WordPress hooks and VS Code extensions. This enables:
 
-Business domains organized under `src/pages/admin/`:
-- `core/` - Dashboard, Settings, Intelligence, CRM
-- `operations/` - Sales POS, Operations Hub
-- `supply-chain/` - Materials (StockLab), Products
-- `finance/` - Fiscal management, AFIP integration
-- `resources/` - Staff, Scheduling
-- `gamification/` - Achievements, OnboardingGuide
+- **Decoupled Modules**: Modules communicate via hooks, not direct imports
+- **Feature-Based Loading**: Modules only load when user has required features
+- **Progressive Enhancement**: Modules can extend other modules' UI dynamically
+- **Hook Points**: UI extension points like `calendar.events`, `dashboard.widgets`
 
-Key directories:
-- `src/shared/ui/` - Design system components (ONLY import from here, never `@chakra-ui/react`)
-- `src/store/` - Zustand stores by domain (materialsStore, salesStore, staffStore, etc.)
-- `src/lib/` - Core systems (events, offline, error-handling, performance)
-- `src/business-logic/` - Domain logic separated from UI
-
-### Critical Design System Rules
-
-**NEVER import directly from `@chakra-ui/react`** - Always use `@/shared/ui` wrappers:
-```tsx
-// ✅ CORRECT
-import { ContentLayout, Section, Button, Stack } from '@/shared/ui'
-
-// ❌ WRONG - will cause compile errors
-import { Box, Button } from '@chakra-ui/react'
+**Module Structure**:
+```
+src/modules/
+├── [module-name]/
+│   └── manifest.tsx       # Module definition with hooks, deps, exports
+└── index.ts              # Central registry of all modules
 ```
 
-**Semantic layout components** (v2.1 patterns):
-- `ContentLayout` - Page wrapper with proper spacing
-- `Section` - Content sections with variants (flat/elevated/default)
-- `FormSection` - Specialized for forms with title/description
-- `StatsSection` - For metrics/KPIs layouts
-- `CardGrid` - Semantic alias for dashboard grids
-
-**Import pattern**:
-```tsx
-import {
-  ContentLayout, Section, FormSection, StatsSection,
-  Stack, Button, Modal, Alert, Badge,
-  MetricCard, CardGrid, Icon
-} from '@/shared/ui'
-```
-
-## Core Systems
+**Key Integration Points**:
+- `src/lib/modules/ModuleRegistry.ts` - Core registry implementation
+- `src/lib/modules/HookPoint.tsx` - React component for hook execution
+- `src/modules/` - Module manifests directory
+- Module manifests declare: `id`, `version`, `depends`, `requiredFeatures`, `hooks`, `setup`, `exports`
 
 ### EventBus v2 Enterprise
-- **Location**: `src/lib/events/`
-- **Pattern**: `domain.entity.action` (e.g., `sales.order.completed`)
-- **Features**: Module registry, deduplication, offline-first, encryption, rate limiting
-- **Testing**: 70%+ coverage with unit/integration/performance/stress suites
-- **Module communication**: Use EventBus for cross-module events, NOT direct imports
 
-### Offline-First Architecture
-- **Location**: `src/lib/offline/`
-- **Components**: OfflineSync, OfflineMonitor, ConflictResolution
-- **Pattern**: Optimistic updates (UI updates immediately, sync when online)
-- **Priority**: orders > payments > inventory
-- **Storage**: IndexedDB with automatic sync queue
+Distributed event system with:
+- Pattern-based subscriptions: `domain.entity.action` (e.g., `sales.order.completed`)
+- Module lifecycle management with health monitoring
+- Deduplication and offline-first support
+- Security hardening (encryption, rate limiting)
+- 70.5% test coverage (93/132 tests passing)
 
-### State Management - Zustand Stores
-Domain-specific stores with Immer + persist middleware:
-- `appStore.ts` - Global UI state, auth, notifications
-- `materialsStore.ts` - Inventory/materials management
-- `salesStore.ts` - POS, cart, orders
-- `customersStore.ts` - CRM, RFM analysis
-- `staffStore.ts` - HR, performance, training
-- `schedulingStore.ts` - Shifts, time-off
-- `operationsStore.ts` - Kitchen, tables, operations
-- `productsStore.ts` - Menu, recipes, costs
-- `fiscalStore.ts` - Invoicing, AFIP, taxes
+**Usage**:
+```typescript
+// In module setup
+registry.addAction('calendar.events', (data) => <Component />, 'moduleId', priority);
 
-### Error Handling
-- **Location**: `src/lib/error-handling/`
-- **Components**: ErrorHandler singleton, ErrorBoundary, useErrorHandler hook
-- **Integration**: Works with `notify.success()`, `notify.error()` from notifications system
-- **Pattern**: Wrap critical operations with ErrorBoundary, use `handleApiError()` for API calls
-
-### Performance System
-- **Location**: `src/lib/performance/`
-- **Features**: FPS monitoring, bundle optimization, lazy loading with retry
-- **Virtualization**: Lists >50 items use virtual scrolling (MaterialsGrid, ProductList)
-- **Lazy Loading**: All major routes lazy-loaded via `src/lib/lazy/`
-- **Bundle**: Optimized from 34kb to 4.6kb (-86%) for Framer Motion
-
-## Development Patterns
-
-### Form Validation
-- **Zod v4.1.5**: Schema validation with `@hookform/resolvers`
-- **React Hook Form v7.62.0**: Form state management
-- **Example**: `src/pages/admin/supply-chain/materials/components/MaterialFormModal.tsx`
-
-### Business Logic
-- **Decimal.js**: ALL financial calculations (0% float errors, 20-digit precision)
-- **Separation**: Domain logic in `src/business-logic/`, NOT in components
-- **SQL Functions**: Complex calculations in `database/functions/`
-
-### Type System
-- **Strict TypeScript**: All code must pass `tsc --noEmit`
-- **Domain types**: Module-local `types.ts` files
-- **Update types**: When changing data shapes in business logic
-
-### Database Operations
-- **Client**: `src/lib/supabase/client.ts` - Singleton pattern
-- **Services**: `src/services/` - Database operation wrappers
-- **Real-time**: Supabase subscriptions for live updates
-- **Migrations**: SQL files in `database/` or `database-updates/`
-
-## Module Construction Templates
-
-**Reference documentation**:
-- `docs/05-development/UI_MODULE_CONSTRUCTION_MASTER_GUIDE.md` - Page construction patterns
-- `docs/05-development/MODULE_DESIGN_CONVENTIONS.md` - Design conventions
-
-**Page structure**:
-```tsx
-// ✅ Standard module page structure
-import { ContentLayout, Section } from '@/shared/ui'
-
-export default function ModulePage() {
-  return (
-    <ContentLayout spacing="normal">
-      <Section variant="flat" title="Module Title">
-        {/* Header content */}
-      </Section>
-
-      <Section variant="elevated" title="Main Content">
-        {/* Module body */}
-      </Section>
-    </ContentLayout>
-  )
-}
+// In pages
+<HookPoint name="calendar.events" data={{...}} fallback={<NoData />} />
 ```
 
-**AVOID**:
-- ❌ Don't duplicate ErrorBoundary/ResponsiveLayout in pages (App.tsx handles this)
-- ❌ Don't mix useState + Zustand for same data
-- ❌ Don't use PageHeader (excessive vertical space)
-- ❌ Don't bypass security patterns (use `secureApiCall()` for critical ops)
+**Event Patterns (Updated Jan 2025)**:
+- `sales.order.*` - Sales module events
+- `production.order.*` - Production module events (was `kitchen.*`)
+- `fulfillment.onsite.*` - Onsite fulfillment events (was `floor.*`)
+- `fulfillment.pickup.*` - Pickup fulfillment events (Phase 1)
+- `fulfillment.delivery.*` - Delivery fulfillment events (Phase 1)
+- `materials.stock.*` - Materials/inventory events
+- `staff.driver.*` - Driver location and assignment events (Phase 1)
+- `finance.credit_check.*` - Credit validation events (Phase 3)
+- `finance.invoice_created` - Invoice creation events (Phase 3)
+- `finance.payment_received` - Payment tracking events (Phase 3)
 
-## Gamification & Capabilities
+### Capabilities & Features System
 
-### Achievement System
-- **Location**: `src/pages/admin/gamification/achievements/`
-- **Engine**: AchievementsEngine listens to 40+ EventBus patterns
-- **Types**: Foundational milestones (unlock capabilities) + mastery achievements (reward usage)
-- **Integration**: EventBus-driven automatic progress tracking
+**Three-Layer Architecture**:
+1. **Capabilities** (User-facing): What the business can do (e.g., "onsite_service", "delivery_shipping", "production_workflow", "b2b_sales")
+2. **Features** (System-level): 81 granular features auto-activated by capabilities (was 84, reduced in Phase 0.5)
+3. **Modules** (UI-level): 31 modules (26 main + 5 sub-modules) shown based on active features
 
-### Capabilities System
-- **Location**: `src/lib/capabilities/`
-- **Pattern**: Progressive disclosure vs role-based permissions
-- **Usage**: `<CapabilityGate capability="advanced_analytics">` and `useCapabilities()` hook
-- **Model**: BusinessDNA compositional model (22 foundational milestones)
+**Files**:
+- `src/config/BusinessModelRegistry.ts` - 8 capability definitions
+- `src/config/FeatureRegistry.ts` - 81 feature definitions + MODULE_FEATURE_MAP
+- `src/lib/capabilities/` - Capability engine and components
+- `src/lib/features/FeatureEngine.ts` - Feature activation logic
+
+**Key Changes (Phase 0.5)**:
+- Capability renamed: `requires_preparation` → `production_workflow`
+- Features renamed: `production_recipe_management` → `production_bom_management`, `production_kitchen_display` → `production_display_system`
+- Features deleted: `mobile_pos_offline`, `mobile_sync_management`, `customer_reservation_reminders` (now base architecture)
+
+**Navigation Integration**: `getModulesForActiveFeatures()` in FeatureRegistry determines which modules appear in navigation based on active features.
+
+### Screaming Architecture (Domain-Driven)
+
+Project structure follows business domains:
+
+```
+src/pages/admin/
+├── core/           # Dashboard, CRM (Customers), Settings, Intelligence
+├── operations/     # Sales (includes B2B), Fulfillment (onsite/pickup/delivery), Production
+├── supply-chain/   # Materials (StockLab), Products, Suppliers
+├── finance/        # Finance (B2B accounts, credit), Fiscal, Billing, Integrations
+├── resources/      # Staff, Scheduling
+├── gamification/   # Achievements, Onboarding
+└── executive/      # BI dashboards
+```
+
+**Recent Changes (Phases 0.5-3 - Jan 2025)**:
+- ❌ `Floor` module → Merged into `Fulfillment/onsite`
+- ❌ `Kitchen` module → Renamed to `Production`
+- ❌ `Ecommerce` module → Merged into `Sales/ecommerce`
+- ✅ `Finance` module → NEW in Phase 3 (B2B corporate accounts, credit management)
+- ✅ `Sales/b2b` subfolder → NEW in Phase 3 (quotes, contracts, tiered pricing)
+- Routes auto-redirect: `/operations/floor` → `/operations/fulfillment/onsite`, `/operations/kitchen` → `/operations/production`
+
+**Route Mapping**: `src/config/routeMap.ts` provides automated domain ↔ route ↔ component mapping.
+
+### State Management
+
+- **Zustand v5.0.7**: Primary state management with Immer for immutability
+- **Domain Stores**: `useAppStore`, `useMaterialsStore`, `useSalesStore`, etc.
+- **EventBus**: For cross-module communication
+- **Offline-First**: IndexedDB queue with optimistic updates
+
+### UI Component System
+
+**Critical Pattern**: NEVER import directly from `@chakra-ui/react`. Always use semantic wrappers:
+
+```typescript
+// ✅ CORRECT
+import { Stack, Button, Text } from '@/shared/ui';
+
+// ❌ WRONG - Will cause prop mismatches
+import { Stack, Button } from '@chakra-ui/react';
+```
+
+**Design Patterns** (see `docs/05-development/MODULE_DESIGN_CONVENTIONS.md`):
+- **Enterprise modules**: ContentLayout + business metrics + offline-first
+- **Settings modules**: Vertical tabs + form sections + validation
+- **Analytics modules**: StatsSection + performance monitoring
+
+**No Duplicate Wrappers**: App.tsx handles global wrappers (ErrorBoundary, ResponsiveLayout). Individual pages only use ContentLayout.
+
+### Business Logic Separation
+
+- **Location**: `src/business-logic/[domain]/`
+- **Decimal.js**: Banking-level precision (20 digits, 0% float errors)
+- **SQL Functions**: Complex calculations in `database/functions/`
+- **Service Layer**: `src/services/` for Supabase operations
+
+### Real-time Updates
+
+**IMPORTANT**: The project uses **Supabase Realtime** (PostgreSQL Change Data Capture) for real-time synchronization, NOT custom WebSocket.
+
+- **WebSocket system removed** (2025-01-30): Custom WebSocket implementation eliminated to reduce complexity
+- **Use Supabase Realtime**: For database change subscriptions (see `useRealtimeMaterials.ts` example)
+- **Use EventBus**: For cross-module real-time communication within the app
+- **Offline-first**: OfflineSync handles synchronization when network is restored
+
+**Example Supabase Realtime:**
+```typescript
+const channel = supabase
+  .channel('materials-all')
+  .on('postgres_changes', {
+    event: '*',
+    schema: 'public',
+    table: 'items',
+  }, (payload) => {
+    // Handle real-time change
+  })
+  .subscribe();
+```
+
+## Critical Development Patterns
+
+### Before Making Changes
+
+1. **Read Architecture Docs**: Check `src/modules/ARCHITECTURE.md` and `docs/05-development/`
+2. **Check Feature Dependencies**: Use FeatureRegistry to understand feature relationships
+3. **Verify Module Hooks**: If adding UI extension points, check existing HookPoints
+4. **TypeScript First**: Run `pnpm -s exec tsc --noEmit` after changes
+
+### Adding New Modules
+
+1. Create module manifest in `src/modules/[module]/manifest.tsx`
+2. Define dependencies, required features, and hooks
+3. Register in `src/modules/index.ts`
+4. Add feature mapping in `FeatureRegistry.ts` → `MODULE_FEATURE_MAP`
+5. Module auto-loads when user activates required features
+
+### Working with EventBus
+
+```typescript
+// Module emits event
+emit('sales.order.completed', { orderId: 123 }, { priority: EventPriority.HIGH });
+
+// Module subscribes to event
+eventBus.subscribe('sales.order.*', (event) => {
+  // Handle event
+}, { moduleId: 'inventory', priority: 100 });
+```
+
+**Pattern**: `domain.entity.action` (wildcards supported: `sales.order.*`, `*.*.completed`)
+
+**Fulfillment Event Patterns (Phase 1)**:
+```typescript
+// Pickup Events
+'fulfillment.pickup.queued'              // Order queued for pickup
+'fulfillment.pickup.ready'               // Order ready for customer pickup
+'fulfillment.pickup.picked_up'           // Customer picked up order
+'fulfillment.pickup.time_slot_reserved'  // Time slot booked
+
+// Delivery Events
+'fulfillment.delivery.queued'            // Order queued for delivery
+'fulfillment.delivery.validation_failed' // Zone/address validation failed
+'fulfillment.delivery.driver_assigned'   // Driver assigned to order
+'fulfillment.delivery.needs_manual_assignment' // Auto-assign failed
+'fulfillment.delivery.picked_up'         // Driver picked up order
+'fulfillment.delivery.in_transit'        // Driver en route
+'fulfillment.delivery.delivered'         // Order delivered successfully
+
+// Driver Events
+'staff.driver_location_update'           // GPS location updated
+'staff.driver_location_error'            // GPS tracking error
+'staff.driver_available'                 // Driver became available
+'staff.driver_busy'                      // Driver started delivery
+```
+
+### Form Patterns
+
+Reference implementations:
+- `src/pages/admin/supply-chain/materials/components/MaterialFormModal.tsx`
+- Uses `react-hook-form` + Zod v4.1.5 + `@hookform/resolvers`
+- Validation schemas in module-local `types.ts` files
+
+### Database Changes
+
+- **Migrations**: `database/migrations/` or `database-updates/`
+- **RLS Policies**: Always required for new tables
+- **Functions**: SQL functions for complex business logic
+
+**Phase 0.5 Database Updates (Jan 2025)**:
+- ✅ New tables: `fulfillment_queue`, `mobile_routes`, `corporate_accounts`
+- ✅ 9 indexes added for performance
+- ✅ 9 RLS policies configured for security
+- Use Supabase MCP for migrations: `mcp__supabase__apply_migration`
+
+**Phase 1 Database Updates (Jan 2025)**:
+- ✅ `pickup_time_slots` - Time slot management for pickup orders (11 columns, 4 indexes, 2 RLS policies)
+- ✅ `delivery_assignments` - Driver assignment tracking (26 columns, 6 indexes, 2 RLS policies)
+- ✅ `delivery_zones` - Delivery zone definitions with polygons (15 columns - existing)
+- ✅ `driver_locations` - Real-time GPS tracking (11 columns - existing)
+- All tables have Row Level Security (RLS) enabled
 
 ## Testing Strategy
 
-### Framework: Vitest v3.2.4
-- **Environment**: JSdom for DOM testing
-- **Coverage**: Text, JSON, HTML outputs
-- **Utilities**: EventBusTestingHarness, MockEventStore in `src/lib/events/testing/`
+### Test Organization
+- **Unit tests**: `src/lib/events/__tests__/unit/`
+- **Integration tests**: `src/lib/events/__tests__/integration/`
+- **Performance tests**: Excluded by default (use `pnpm test:all`)
+- **E2E workflows**: `src/__tests__/e2e/`
 
-### Test Categories
-- `unit/` - Component/function isolation
-- `integration/` - Module-to-module workflows
-- `performance/` - Throughput/latency benchmarks
-- `stress/` - High-load edge cases
-- `business/` - Domain logic validation
+### Custom Test Utilities
+- `EventBusTestingHarness` - EventBus test utilities
+- `src/__tests__/utils/testUtils.tsx` - React testing utilities
+- Mock implementations in `src/__tests__/mocks/`
 
-## Quality Workflow
+### Running Specific Tests
+```bash
+vitest run path/to/test.test.ts              # Single file
+vitest run src/lib/events/__tests__/unit     # Directory
+```
 
-**Before committing**:
-1. `pnpm install` - Ensure dependencies synced
-2. `pnpm dev` - Test UI changes locally
-3. `pnpm lint` - ESLint validation (0 warnings required)
-4. `pnpm -s exec tsc --noEmit` - Type checking
-5. `pnpm test` - Run core test suite
+## Common Anti-Patterns to Avoid
 
-## Routing System
+1. ❌ **Direct Chakra imports** - Use `@/shared/ui` wrappers
+2. ❌ **Duplicate ErrorBoundary/ResponsiveLayout** - Already in App.tsx
+3. ❌ **Mixed state management** - Don't use useState + Zustand for same data
+4. ❌ **Bypassing CapabilityGate** - Always check capabilities for protected features
+5. ❌ **Hardcoded theme colors** - Use dynamic theming system (25+ themes)
+6. ❌ **Float arithmetic for money** - Use Decimal.js
+7. ❌ **Direct module imports** - Use Module Registry and exports API
+8. ❌ **Skipping TypeScript checks** - Always run `pnpm -s exec tsc --noEmit`
 
-All routes defined in `src/App.tsx`:
-- Public: `/`, `/admin`, `/login`, `/admin/login`
-- Setup: `/setup` (wizard)
-- Admin: `/admin/dashboard`, `/admin/sales`, `/admin/materials`, etc.
-- Customer App: `/app/portal`, `/app/menu`, `/app/orders`
-- Debug: `/debug/*` (SUPER_ADMIN only, dev environment)
+## Performance Optimization
 
-**Lazy loading**: Most routes lazy-loaded via `src/lib/lazy/` for performance
+### Bundle Splitting
+Vite config includes manual chunks for:
+- Capabilities system (`capabilities` chunk)
+- UI libraries (`vendor-ui` chunk)
+- Forms (`vendor-forms` chunk)
+- Supabase (`vendor-supabase` chunk)
+- Per-module chunks (`module-materials`, `module-sales`, etc.)
 
-## Critical Anti-Patterns
+### Lazy Loading
+- Module code loaded on-demand via Module Registry
+- Routes use React.lazy() via `src/lib/routing/createLazyComponents.ts`
+- Adaptive animations via `usePerformanceMonitor()` when FPS < 30
 
-1. **Never import from `@chakra-ui/react`** - Use `@/shared/ui` wrappers
-2. **Don't create test components** unless explicitly authorized
-3. **Avoid running dev servers** - One already running on :5173
-4. **Don't hardcode colors** - Use dynamic theming (25+ themes with `gray.*` tokens)
-5. **Never bypass security** - Use `secureApiCall()`, ErrorBoundary patterns
-6. **Don't skip type checking** - All code must pass strict TypeScript
+### Monitoring
+- Real-time FPS monitoring in `src/lib/performance/PerformanceMonitor.tsx`
+- Bundle analysis: `pnpm build` generates visualizer output
 
-## Additional Context
+## Security Patterns
 
-- **Supabase**: PostgreSQL backend with Row Level Security (RLS) policies
-- **Real-time**: WebSocket subscriptions via `src/lib/websocket/`
-- **Offline storage**: IndexedDB for offline-first operations
-- **Icons**: Heroicons v2.2.0 (SVG)
-- **Responsive**: Mobile-first design with breakpoint tokens
-- **Theming**: 25+ themes (dracula, synthwave, corporate, etc.) with dynamic switching
+### Content Security Policy
+- HTTP headers in `vite.config.ts` (dev) + production server config
+- No inline scripts (except theme script in index.html)
+- Supabase domains whitelisted for connect-src
+
+### Authentication
+- Supabase Auth with RLS (Row Level Security)
+- JWT tokens with custom claims in `access_token_hook`
+- Role-based access via `RoleGuard` component
+- Protected routes via `ProtectedRoute` component
+
+### Data Security
+- Event payload encryption in EventBus
+- Rate limiting per module/pattern
+- SQL injection prevention via Supabase client parameterized queries
+
+## Offline-First System
+
+### Architecture
+- **OfflineSync** engine with IndexedDB queue
+- **Optimistic updates**: UI updates immediately, sync later
+- **Priority system**: orders > payments > inventory
+- **Conflict resolution**: Last-write-wins with merge strategies
+- **Anti-flapping**: Debounced network state changes
+
+### Integration Points
+- `src/lib/offline/OfflineSync.ts` - Core sync engine
+- `src/lib/offline/OfflineMonitor.tsx` - Network status component
+- EventBus integration for offline event queueing
+
+## Development Workflow
+
+### Standard Workflow
+1. `pnpm install` - Install dependencies
+2. `pnpm dev` - Start dev server (DO NOT run if already running on :5173)
+3. Make changes
+4. `pnpm -s exec eslint .` - Lint check
+5. `pnpm -s exec tsc --noEmit` - Type check
+6. `pnpm test:run` - Run tests
+7. `pnpm build` - Production build test
+
+### Git Workflow
+- Development on feature branches
+- Current branch: `refactor/eliminate-hub`
+- Conventional commits encouraged
+- Pre-commit hooks with husky + lint-staged
+
+## Key Files Reference
+
+### Configuration
+- `package.json` - Scripts and dependencies
+- `vite.config.ts` - Build config + CSP headers + manual chunks
+- `vitest.config.ts` - Test configuration
+- `tsconfig.json` - TypeScript configuration (composite project)
+
+### Core Systems
+- `src/App.tsx` - Root component with global wrappers
+- `src/lib/events/EventBus.ts` - EventBus v2 implementation
+- `src/lib/events/ModuleRegistry.ts` - Module lifecycle management (EventBus-specific)
+- `src/lib/modules/ModuleRegistry.ts` - Module registry for UI hooks
+- `src/lib/capabilities/index.ts` - Capability system
+- `src/config/BusinessModelRegistry.ts` - Capability definitions
+- `src/config/FeatureRegistry.ts` - Feature definitions + MODULE_FEATURE_MAP
+
+### Documentation
+- `docs/05-development/` - Development guides
+- `src/modules/README.md` - Module Registry guide
+- `src/modules/ARCHITECTURE.md` - Module system architecture
+- `.github/copilot-instructions.md` - Additional context for AI assistants
+
+## Notes
+
+- **Package Manager**: pnpm only (see pnpm-lock.yaml)
+- **Node Version**: Ensure compatible Node.js version for React 19.1
+- **Dev Server**: Always runs on port 5173 by default
+- **Two Module Registries**: One for EventBus module lifecycle (`src/lib/events/ModuleRegistry.ts`), one for UI hooks (`src/lib/modules/ModuleRegistry.ts`)
+- **ChakraUI v3**: Major version with breaking changes from v2 - always check Chakra v3 docs
+- **Test Coverage**: EventBus at 70.5%, other modules vary
+- **Database**: Supabase PostgreSQL with RLS policies required for all tables

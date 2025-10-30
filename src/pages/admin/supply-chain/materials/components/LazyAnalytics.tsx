@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Box, Spinner, VStack, Text } from '@chakra-ui/react';
+import { Box, Spinner, VStack, Text } from '@/shared/ui';
 
 // Lazy load analytics components
 // ABCAnalysisPage component doesn't exist - removing broken import

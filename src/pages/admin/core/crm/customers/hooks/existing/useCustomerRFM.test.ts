@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useCustomerRFM, useCustomerSegmentation } from './useCustomerRFM'
-import { CustomerSegment, ChurnRisk } from '../types'
+import { CustomerSegment, ChurnRisk } from '../../types'
 
 // Mock the API
 vi.mock('../data/advancedCustomerApi', () => ({

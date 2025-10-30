@@ -1,0 +1,254 @@
+/**
+ * USE MODULE NAVIGATION HOOK
+ *
+ * Generates navigation structure from ModuleRegistry manifests
+ * Replaces hardcoded NAVIGATION_MODULES array with dynamic generation
+ *
+ * FEATURES:
+ * - Generates navigation from manifest metadata
+ * - Applies capability filtering
+ * - Applies role-based security
+ * - Groups by business domains
+ * - Single source of truth
+ *
+ * @version 2.0.0 - Navigation System Refactor
+ */
+
+import { useMemo } from 'react';
+import { ModuleRegistry } from './ModuleRegistry';
+import { useCapabilityStore } from '@/store/capabilityStore';
+import { useAuth } from '@/contexts/AuthContext';
+import { MODULE_FEATURE_MAP } from '@/config/FeatureRegistry';
+import { logger } from '@/lib/logging';
+import type { ModuleName } from '@/contexts/AuthContext';
+
+// ============================================
+// TYPE DEFINITIONS
+// ============================================
+
+export interface NavigationSubModule {
+  id: string;
+  title: string;
+  path: string;
+  icon: any;
+  description?: string;
+}
+
+export interface NavigationModule {
+  id: string;
+  title: string;
+  icon: any;
+  color: string;
+  path: string;
+  description?: string;
+  badge?: number;
+  isActive?: boolean;
+  isExpandable?: boolean;
+  isExpanded?: boolean;
+  subModules?: NavigationSubModule[];
+  domain?: 'core' | 'supply-chain' | 'operations' | 'finance' | 'resources' | 'advanced' | 'debug';
+}
+
+export interface NavigationByDomain {
+  core: NavigationModule[];
+  'supply-chain': NavigationModule[];
+  operations: NavigationModule[];
+  finance: NavigationModule[];
+  resources: NavigationModule[];
+  advanced: NavigationModule[];
+  debug: NavigationModule[];
+}
+
+// ============================================
+// HOOK
+// ============================================
+
+/**
+ * Hook to generate navigation from ModuleRegistry
+ *
+ * Returns accessible modules filtered by:
+ * 1. Role-based security (AuthContext)
+ * 2. Capability-based features (CapabilityStore)
+ * 3. Module registration status (ModuleRegistry)
+ *
+ * @returns Accessible navigation modules
+ */
+export function useModuleNavigation() {
+  const { canAccessModule, isAuthenticated } = useAuth();
+  const activeModules = useCapabilityStore(state => state.features.activeModules);
+
+  const modules = useMemo(() => {
+    const startTime = performance.now();
+
+    if (!isAuthenticated) {
+      logger.debug('NavigationGeneration', 'User not authenticated, returning empty modules');
+      return [];
+    }
+
+    // Get ModuleRegistry instance
+    const registry = ModuleRegistry.getInstance();
+    const registeredModules = registry.getAll();
+
+    logger.debug('NavigationGeneration', `Found ${registeredModules.length} registered modules`);
+
+    // Filter and transform modules
+    const accessibleModules = registeredModules
+      .filter(moduleInstance => {
+        const manifest = moduleInstance.manifest;
+
+        // Only include modules with navigation metadata
+        if (!manifest.metadata?.navigation) {
+          logger.debug('NavigationGeneration', `Skipping ${manifest.id} - no navigation metadata`);
+          return false;
+        }
+
+        // Map module ID to ModuleName for role checking
+        const adminModuleNameMap: Record<string, ModuleName> = {
+          'dashboard': 'dashboard',
+          'sales': 'sales',
+          'operations': 'operations',
+          'operations-hub': 'operations',
+          'materials': 'materials',
+          'products': 'products',
+          'staff': 'staff',
+          'scheduling': 'scheduling',
+          'fiscal': 'fiscal',
+          'billing': 'billing',
+          'finance-integrations': 'billing',
+          'settings': 'settings',
+          'customers': 'sales',
+          'suppliers': 'materials', // Suppliers part of materials permissions
+          'supplier-orders': 'materials', // Supplier orders part of materials permissions
+          'memberships': 'operations',
+          'rentals': 'operations',
+          'assets': 'operations',
+          'reporting': 'reporting',
+          'intelligence': 'reporting',
+          'gamification': 'gamification',
+          'executive': 'executive',
+          'finance-advanced': 'billing',
+          'operations-advanced': 'operations',
+          'advanced-tools': 'reporting',
+          'debug': 'debug'
+        };
+
+        const moduleName = adminModuleNameMap[manifest.id];
+        if (!moduleName) {
+          logger.warn('NavigationGeneration', `Module ${manifest.id} not mapped to ModuleName, denying access`);
+          return false;
+        }
+
+        // 🔒 LAYER 1: Role-based security filter
+        const hasRoleAccess = canAccessModule(moduleName);
+        if (!hasRoleAccess) {
+          logger.debug('NavigationGeneration', `User lacks role access to ${manifest.id}`);
+          return false;
+        }
+
+        // 🎯 LAYER 2: Capability-based filter
+        const moduleConfig = MODULE_FEATURE_MAP[manifest.id];
+
+        // Always-active modules (dashboard, settings, gamification, debug)
+        if (moduleConfig?.alwaysActive) {
+          logger.debug('NavigationGeneration', `${manifest.id} is always-active`);
+          return true;
+        }
+
+        // ✨ NEW: Auto-install modules (always visible when role permits)
+        if (manifest.autoInstall === true) {
+          logger.debug('NavigationGeneration', `${manifest.id} has autoInstall=true`);
+          return true;
+        }
+
+        // Check if module's required features are active
+        if (moduleConfig?.requiredFeatures && moduleConfig.requiredFeatures.length > 0) {
+          const hasAllRequired = moduleConfig.requiredFeatures.every(f =>
+            manifest.requiredFeatures.includes(f)
+          );
+          if (!hasAllRequired) {
+            logger.debug('NavigationGeneration', `${manifest.id} missing required features`);
+            return false;
+          }
+        }
+
+        // Check if module is in activeModules list
+        const hasCapabilityAccess = activeModules.includes(manifest.id);
+        if (!hasCapabilityAccess) {
+          logger.debug('NavigationGeneration', `${manifest.id} not in activeModules`);
+          return false;
+        }
+
+        return true;
+      })
+      .map(moduleInstance => {
+        const manifest = moduleInstance.manifest;
+        const nav = manifest.metadata!.navigation!;
+
+        // Transform to NavigationModule format
+        const navModule: NavigationModule = {
+          id: manifest.id,
+          title: manifest.name,
+          icon: nav.icon,
+          color: nav.color || 'gray',
+          path: nav.route,
+          description: manifest.metadata?.description,
+          isExpandable: nav.isExpandable || false,
+          isExpanded: false,
+          subModules: nav.submodules || [],
+          domain: nav.domain || 'core'
+        };
+
+        return navModule;
+      })
+      .sort((a, b) => {
+        // Sort by domain first, then by title
+        const domainOrder = ['core', 'supply-chain', 'operations', 'finance', 'resources', 'advanced', 'debug'];
+        const aDomainIndex = domainOrder.indexOf(a.domain || 'core');
+        const bDomainIndex = domainOrder.indexOf(b.domain || 'core');
+
+        if (aDomainIndex !== bDomainIndex) {
+          return aDomainIndex - bDomainIndex;
+        }
+
+        return a.title.localeCompare(b.title);
+      });
+
+    const endTime = performance.now();
+    logger.performance('NavigationGeneration', 'Module navigation generation', endTime - startTime, 10);
+    logger.info('NavigationGeneration', `Generated ${accessibleModules.length} accessible modules`);
+
+    return accessibleModules;
+  }, [canAccessModule, isAuthenticated, activeModules]);
+
+  return modules;
+}
+
+/**
+ * Hook to generate navigation grouped by business domain
+ *
+ * @returns Navigation modules grouped by domain
+ */
+export function useModuleNavigationByDomain(): NavigationByDomain {
+  const modules = useModuleNavigation();
+
+  return useMemo(() => {
+    const grouped: NavigationByDomain = {
+      core: [],
+      'supply-chain': [],
+      operations: [],
+      finance: [],
+      resources: [],
+      advanced: [],
+      debug: []
+    };
+
+    modules.forEach(module => {
+      const domain = module.domain || 'core';
+      if (grouped[domain]) {
+        grouped[domain].push(module);
+      }
+    });
+
+    return grouped;
+  }, [modules]);
+}

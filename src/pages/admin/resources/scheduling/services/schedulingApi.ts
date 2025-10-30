@@ -223,6 +223,35 @@ export const shiftsApi = {
     }
   },
 
+  // Update event time (for drag & drop)
+  async updateEventTime(eventId: string, newStart: Date, newEnd: Date): Promise<void> {
+    try {
+      const engine = getSchedulingEngine();
+
+      // Extract date and time components
+      const date = newStart.toISOString().split('T')[0] as ISODateString;
+      const startTime = `${String(newStart.getHours()).padStart(2, '0')}:${String(newStart.getMinutes()).padStart(2, '0')}` as ISOTimeString;
+      const endTime = `${String(newEnd.getHours()).padStart(2, '0')}:${String(newEnd.getMinutes()).padStart(2, '0')}` as ISOTimeString;
+
+      const result = await engine.updateBooking(eventId, {
+        timeSlot: {
+          date,
+          startTime,
+          endTime
+        }
+      });
+
+      if (!result.success) {
+        throw new Error(result.errors.join(', '));
+      }
+
+      logger.info('API', `Event ${eventId} time updated to ${startTime}-${endTime} on ${date}`);
+    } catch (error) {
+      logger.error('API', 'Error updating event time:', error);
+      throw new Error('Failed to update event time');
+    }
+  },
+
   // Cancel a shift (delete using unified engine)
   async deleteShift(shiftId: string): Promise<void> {
     try {
@@ -325,7 +354,7 @@ export const timeOffApi = {
             position
           )
         `)
-        .order('requested_at', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (filters?.status) {
         query = query.eq('status', filters.status);
@@ -351,7 +380,7 @@ export const timeOffApi = {
   },
 
   // Create a time-off request
-  async createTimeOffRequest(request: Omit<TimeOffRequest, 'id' | 'requested_at'>): Promise<TimeOffRequest> {
+  async createTimeOffRequest(request: Omit<TimeOffRequest, 'id' | 'created_at'>): Promise<TimeOffRequest> {
     try {
       const { data, error } = await supabase
         .from('time_off_requests')
@@ -437,7 +466,7 @@ export const schedulesApi = {
         .from('schedules')
         .select(`
           *,
-          shifts (
+          shift_schedules (
             *,
             employees:employee_id (
               name,
@@ -465,7 +494,7 @@ export const schedulesApi = {
       
       return (data || []).map(schedule => ({
         ...schedule,
-        shifts: (schedule.shifts || []).map(shift => ({
+        shifts: (schedule.shift_schedules || []).map(shift => ({
           ...shift,
           employee_name: shift.employees?.name || 'Unknown'
         }))

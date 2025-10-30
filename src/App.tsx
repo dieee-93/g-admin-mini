@@ -41,6 +41,10 @@ import { SlotProvider } from '@/lib/composition';
 // 🔄 CAPABILITY SYNC - Database persistence
 import { CapabilitySync } from '@/components/capabilities/CapabilitySync';
 
+// 🔧 MODULE REGISTRY - Cross-module composition system
+import { initializeModulesForCapabilities } from '@/lib/modules/integration';
+import { ALL_MODULE_MANIFESTS } from '@/modules';
+
 // Dashboard Module - Critical, not lazy loaded
 import DashboardPage from '@/pages/admin/core/dashboard/page';
 // Removed CrossModuleAnalytics - consolidated into Dashboard with CrossModuleInsights
@@ -54,8 +58,11 @@ import { SetupWizard } from '@/pages/setup/SetupWizard';
 // Lazy-loaded modules for performance
 import {
   LazySalesPage,
-  LazyOperationsPage,
+  LazyFloorPage,
+  LazyKitchenPage,
   LazyStockLab,
+  LazySuppliersPage,
+  LazySupplierOrdersPage,
   LazyProductsPage,
   LazyStaffPage,
   LazyCustomersPage,
@@ -150,6 +157,24 @@ function PerformanceWrapper({ children }: { children: React.ReactNode }) {
     }).catch(error => {
       logger.error('App', '[App] Failed to initialize offline system:', error);
     });
+
+    // Initialize Module Registry
+    initializeModulesForCapabilities(ALL_MODULE_MANIFESTS)
+      .then((result) => {
+        logger.info('App', '🔧 Module Registry initialized:', {
+          initialized: result.initialized.length,
+          failed: result.failed.length,
+          skipped: result.skipped.length,
+          duration: `${result.duration}ms`
+        });
+
+        if (result.failed.length > 0) {
+          logger.warn('App', '⚠️ Some modules failed to initialize:', result.failed);
+        }
+      })
+      .catch(error => {
+        logger.error('App', '❌ Failed to initialize Module Registry:', error);
+      });
   }, []);
 
   return <>{children}</>;
@@ -271,12 +296,26 @@ function App() {
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
-                        <Route path="/admin/operations" element={
+                        {/* 🏢 ADMIN - OPERATIONS - Floor Management */}
+                        <Route path="/admin/operations/floor" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="operations">
                               <ResponsiveLayout>
-                                <LazyWithErrorBoundary moduleName="Operaciones">
-                                  <LazyOperationsPage />
+                                <LazyWithErrorBoundary moduleName="Floor Management">
+                                  <LazyFloorPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+
+                        {/* 🔥 ADMIN - OPERATIONS - Kitchen Display */}
+                        <Route path="/admin/operations/kitchen" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="operations">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Kitchen Display">
+                                  <LazyKitchenPage />
                                 </LazyWithErrorBoundary>
                               </ResponsiveLayout>
                             </RoleGuard>
@@ -337,7 +376,33 @@ function App() {
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
-                        
+
+                        {/* 🏢 ADMIN - SUPPLIERS */}
+                        <Route path="/admin/suppliers" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="materials">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Proveedores">
+                                  <LazySuppliersPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+
+                        {/* 📦 ADMIN - SUPPLIER ORDERS */}
+                        <Route path="/admin/supplier-orders" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="materials">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Órdenes de Compra">
+                                  <LazySupplierOrdersPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+
                         {/* 🍕 ADMIN - PRODUCTS */}
                         <Route path="/admin/products" element={
                           <ProtectedRouteNew>

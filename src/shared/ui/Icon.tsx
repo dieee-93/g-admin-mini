@@ -54,13 +54,39 @@ export const Icon = ({
     );
   }
 
-  // Si tenemos un componente de ícono, lo renderizamos
-    if (IconComponent) {
+  // Si tenemos un componente de ícono, lo renderizamos directamente sin ChakraIcon
+  // Heroicons v2 son componentes SVG que funcionan mejor sin wrapper
+  if (IconComponent) {
+    // Map Chakra sizes to pixel values for Heroicons
+    const sizeMap = {
+      'xs': '16px',
+      'sm': '20px',
+      'md': '24px',
+      'lg': '32px',
+      'xl': '40px',
+      '2xl': '48px',
+      'inherit': 'inherit'
+    };
+
+    const pixelSize = sizeMap[size as keyof typeof sizeMap] || size;
+
+    // Extract only valid SVG props (filter out Chakra-specific props)
+    const { color, colorPalette, ...svgProps } = props as any;
+
+    // Convert Chakra color to CSS color for SVG
+    const svgColor = color && typeof color === 'string' && color.includes('.')
+      ? `var(--chakra-colors-${color.replace('.', '-')})`
+      : color;
+
     return (
-      <ChakraIcon 
-        as={IconComponent} 
-        size={size}
-        {...props}
+      <IconComponent
+        style={{
+          width: pixelSize,
+          height: pixelSize,
+          color: svgColor,
+          ...props.style
+        }}
+        {...svgProps}
       />
     );
   }

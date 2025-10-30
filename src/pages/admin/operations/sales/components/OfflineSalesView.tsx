@@ -2,10 +2,10 @@
 // Provides seamless offline sales processing with intelligent sync
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  Stack, 
-  Button, 
-  Typography, 
+import {
+  Stack,
+  Button,
+  Typography,
   CardWrapper ,
   Modal,
   ModalContent,
@@ -14,21 +14,18 @@ import {
   ModalFooter,
   ModalTitle,
   ModalClose,
-  createListCollection,
   Grid,
   Alert,
   Badge
 } from '@/shared/ui';
 import { notify } from '@/lib/notifications';
-import { 
-  UserIcon,
+import {
   CreditCardIcon,
   ArrowPathIcon,
   WifiIcon,
   CloudIcon,
   ExclamationTriangleIcon,
-  ClockIcon,
-  CheckCircleIcon
+  ClockIcon
 } from '@heroicons/react/24/outline';
 import {
   CheckCircleIcon as CheckSolid,
@@ -41,6 +38,8 @@ import { CartValidationSummary, CartQuickAlert } from './CartValidationSummary';
 import { fetchCustomers, processSale } from '../services/saleApi';
 import { useSalesCart } from '../hooks/useSalesCart';
 import { EventBus } from '@/lib/events';
+import type { CreateSaleData } from '../types';
+
 // Event payload type for order placement
 interface OrderPlacedEvent {
   orderId: string;
@@ -56,16 +55,21 @@ interface OrderPlacedEvent {
   timestamp: string;
 }
 
+// Offline sale item type (extends cart item with additional offline metadata)
+interface OfflineSaleItem {
+  productId: string;
+  quantity: number;
+  price: number;
+  name: string;
+}
+
 // Offline functionality
-import { 
+import {
   useOfflineStatus,
   offlineSync,
   localStorage,
-  type SyncOperation 
+  type SyncOperation
 } from '@/lib/offline';
-
-// Real-time functionality
-import { useRealtimeOrders, RealtimeStatusIndicator } from '@/lib/websocket';
 
 import { logger } from '@/lib/logging';
 interface Customer {
@@ -78,12 +82,13 @@ interface Customer {
 interface OfflineSale {
   id: string;
   timestamp: number;
-  items: any[];
+  items: OfflineSaleItem[];
   customer?: Customer;
   note?: string;
   totalAmount: number;
   status: 'pending' | 'syncing' | 'synced' | 'failed';
   retryCount: number;
+  syncOperationId?: string;
 }
 
 export function OfflineSalesView() {
@@ -100,14 +105,6 @@ export function OfflineSalesView() {
     getCachedData
   } = useOfflineStatus();
 
-  // Real-time functionality
-  const {
-    isConnected: isRealtimeConnected,
-    createOrder,
-    onOrderStatusChanged,
-    onOrderUpdated
-  } = useRealtimeOrders();
-
   // Component state
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
@@ -120,7 +117,6 @@ export function OfflineSalesView() {
   const [offlineSales, setOfflineSales] = useState<OfflineSale[]>([]);
   const [syncProgress, setSyncProgress] = useState(0);
   const [showOfflineStatus, setShowOfflineStatus] = useState(false);
-  const [realtimeOrders, setRealtimeOrders] = useState<any[]>([]);
   const syncRetryRef = useRef<NodeJS.Timeout | null>(null);
 
   // Enhanced cart with offline support
@@ -144,69 +140,8 @@ export function OfflineSalesView() {
     // Note: Offline-specific options removed as they don't exist in current interface
   });
 
-  // Initialize offline functionality and real-time subscriptions
-  useEffect(() => {
-    loadCustomersWithOfflineSupport();
-    loadOfflineSales();
-    setupSyncEventListeners();
-    
-    const unsubscribeRealtime = setupRealtimeSubscriptions();
-
-    return () => {
-      if (syncRetryRef.current) {
-        clearTimeout(syncRetryRef.current);
-      }
-      unsubscribeRealtime?.();
-    };
-  }, []);
-
-  const setupRealtimeSubscriptions = () => {
-    if (!isRealtimeConnected) return;
-
-    // Listen for order status changes
-    const unsubscribeStatus = onOrderStatusChanged((order) => {
-      setRealtimeOrders(prev => {
-        const existing = prev.find(o => o.id === order.orderId);
-        if (existing) {
-          return prev.map(o => o.id === order.orderId ? { ...o, status: order.status } : o);
-        }
-        return prev;
-      });
-      
-      // Show notification for status changes
-      notify.info({
-        title: 'Order Status Update',
-        description: `Order ${order.orderId} is now ${order.status}`,
-      });
-    });
-
-    // Listen for order updates
-    const unsubscribeUpdates = onOrderUpdated((order) => {
-      setRealtimeOrders(prev => {
-        const existing = prev.find(o => o.id === order.orderId);
-        if (existing) {
-          return prev.map(o => o.id === order.orderId ? { ...o, ...order.updatedFields } : o);
-        }
-        return prev;
-      });
-    });
-
-    return () => {
-      unsubscribeStatus();
-      unsubscribeUpdates();
-    };
-  };
-
-  // Sync status monitoring
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updateSyncProgress();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isSyncing]);
-
-  const loadCustomersWithOfflineSupport = async () => {
+  // Separate setup functions to avoid dependency issues
+  const loadCustomersWithOfflineSupport = useCallback(async () => {
     try {
       if (isOnline) {
         // Try to fetch from server
@@ -229,7 +164,7 @@ export function OfflineSalesView() {
       }
     } catch (error) {
       logger.error('SalesStore', 'Error loading customers:', error);
-      
+
       // Try cache as fallback
       const cachedData = await getCachedData('customers');
       if (cachedData && Array.isArray(cachedData)) {
@@ -245,7 +180,68 @@ export function OfflineSalesView() {
         });
       }
     }
-  };
+  }, [isOnline, cacheData, getCachedData]);
+
+  const setupSyncEventListeners = useCallback(() => {
+    // Listen for sync events
+    offlineSync.on('syncStarted', () => {
+      setSyncProgress(0);
+    });
+
+    offlineSync.on('syncCompleted', () => {
+      setSyncProgress(100);
+      loadOfflineSales(); // Refresh offline sales after sync
+      notify.success({
+        title: "Sincronización completa",
+        description: "Todas las ventas offline han sido sincronizadas",
+      });
+    });
+
+    offlineSync.on('syncFailed', () => {
+      notify.error({
+        title: "Error de sincronización",
+        description: "Algunas ventas no se pudieron sincronizar. Se reintentará automáticamente.",
+      });
+    });
+  }, []);
+
+  // Initialize offline functionality and real-time subscriptions
+  useEffect(() => {
+    loadCustomersWithOfflineSupport();
+    loadOfflineSales();
+    setupSyncEventListeners();
+
+    const unsubscribeRealtime = setupRealtimeSubscriptions();
+    const retryRef = syncRetryRef;
+
+    return () => {
+      if (retryRef.current) {
+        clearTimeout(retryRef.current);
+      }
+      unsubscribeRealtime?.();
+    };
+  }, [loadCustomersWithOfflineSupport, setupSyncEventListeners]);
+
+  // Realtime subscriptions removed - using Supabase Realtime or EventBus instead
+
+  const updateSyncProgress = useCallback(() => {
+    if (isSyncing && queueSize > 0) {
+      // Simulate progress based on queue reduction
+      const progress = Math.max(0, Math.min(100, (1 - queueSize / 10) * 100));
+      setSyncProgress(progress);
+    } else if (!isSyncing) {
+      setSyncProgress(100);
+    }
+  }, [isSyncing, queueSize]);
+
+  // Sync status monitoring
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateSyncProgress();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [updateSyncProgress]);
 
   const loadOfflineSales = async () => {
     try {
@@ -256,49 +252,11 @@ export function OfflineSalesView() {
     }
   };
 
-  const setupSyncEventListeners = () => {
-    // Listen for sync events
-    offlineSync.on('syncStarted', (data: unknown) => {
-      setSyncProgress(0);
-    });
-
-    offlineSync.on('syncCompleted', (data: unknown) => {
-      setSyncProgress(100);
-      loadOfflineSales(); // Refresh offline sales after sync
-      notify.success({
-        title: "Sincronización completa",
-        description: "Todas las ventas offline han sido sincronizadas",
-      });
-    });
-
-    offlineSync.on('syncFailed', (data: unknown) => {
-      notify.error({
-        title: "Error de sincronización",
-        description: "Algunas ventas no se pudieron sincronizar. Se reintentará automáticamente.",
-      });
-    });
-  };
-
-  const updateSyncProgress = () => {
-    if (isSyncing && queueSize > 0) {
-      // Simulate progress based on queue reduction
-      const progress = Math.max(0, Math.min(100, (1 - queueSize / 10) * 100));
-      setSyncProgress(progress);
-    } else if (!isSyncing) {
-      setSyncProgress(100);
-    }
-  };
-
-  // Collection for customer select
-  const customersCollection = createListCollection({
-    items: [
-      { value: '', label: 'Sin cliente específico' },
-      ...customers.map(customer => ({
-        value: customer.id,
-        label: `${customer.name}${customer.phone ? ` (${customer.phone})` : ''}`
-      }))
-    ]
-  });
+  // TODO: Replace native HTML inputs with ChakraUI components
+  // - Use SelectField for customer selection (with customers collection)
+  // - Use TextareaField for notes
+  // - Maintains design system consistency and accessibility
+  // - See src/shared/ui/SelectField.tsx and TextareaField.tsx
 
   // Enhanced checkout with offline support
   const handleOpenCheckout = useCallback(async () => {
@@ -331,6 +289,128 @@ export function OfflineSalesView() {
       setCheckoutStep('confirmation');
     }
   }, [checkoutStep, validationResult, isOnline]);
+
+  const handleSaleCompletion = useCallback(async () => {
+    // Reset form
+    clearCart();
+    setSelectedCustomerId('');
+    setNote('');
+    setShowCheckout(false);
+    setCheckoutStep('validation');
+  }, [clearCart]);
+
+  const handleSuccessfulSale = useCallback(async (saleResult: { sale_id?: string }) => {
+    // Emit online order event
+    const orderPlacedEvent: OrderPlacedEvent = {
+      orderId: saleResult.sale_id || `sale_${Date.now()}`,
+      customerId: selectedCustomerId || undefined,
+      tableId: undefined,
+      items: cart.map(item => ({
+        productId: item.product_id,
+        quantity: item.quantity,
+        specialInstructions: note || undefined
+      })),
+      totalAmount: summary.totalAmount,
+      orderType: 'dine_in' as const,
+      timestamp: new Date().toISOString()
+    };
+
+    await EventBus.emit('sales.order.placed', orderPlacedEvent, 'SalesModule');
+
+    notify.success({
+      title: "¡Venta procesada!",
+      description: `Venta por $${summary.totalAmount.toFixed(2)} completada exitosamente`,
+    });
+
+    await handleSaleCompletion();
+  }, [cart, selectedCustomerId, note, summary.totalAmount, handleSaleCompletion]);
+
+  const processOfflineSale = useCallback(async (saleData: CreateSaleData) => {
+    try {
+      const offlineSale: OfflineSale = {
+        id: `offline_sale_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: Date.now(),
+        items: cart.map(item => ({
+          productId: item.product_id,
+          quantity: item.quantity,
+          price: item.unit_price,
+          name: item.product_name
+        })),
+        customer: selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : undefined,
+        note: note || undefined,
+        totalAmount: summary.totalAmount,
+        status: 'pending',
+        retryCount: 0
+      };
+
+      // Store offline sale
+      await localStorage.set('offline_sales', offlineSale.id, offlineSale);
+
+      // Queue for sync
+            const syncOperation: Omit<SyncOperation, 'id' | 'timestamp' | 'clientId' | 'retry'> = {
+        clientOperationId: `sale_${Date.now()}`,
+        type: 'CREATE' as const,
+        entity: 'sales',
+        data: saleData,
+        priority: 1
+      };
+
+      const operationId = queueOperation(syncOperation);
+
+      // Update offline sale with operation ID
+      await localStorage.set('offline_sales', offlineSale.id, {
+        ...offlineSale,
+        syncOperationId: operationId
+      });
+
+      // Broadcast real-time order if connected
+      if (isRealtimeConnected) {
+        try {
+          await createOrder({
+            id: offlineSale.id,
+            timestamp: offlineSale.timestamp,
+            items: offlineSale.items,
+            customer: offlineSale.customer,
+            note: offlineSale.note,
+            totalAmount: offlineSale.totalAmount,
+            isOffline: true,
+            source: 'pos'
+          });
+        } catch (error) {
+          logger.error('SalesStore', 'Failed to broadcast real-time order:', error);
+        }
+      }
+
+      // Emit offline order event
+      const orderPlacedEvent: OrderPlacedEvent = {
+        orderId: offlineSale.id,
+        customerId: selectedCustomerId || undefined,
+        tableId: undefined,
+        items: offlineSale.items.map(item => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          specialInstructions: note || undefined
+        })),
+        totalAmount: summary.totalAmount,
+        orderType: 'dine_in' as const,
+        timestamp: new Date().toISOString()
+      };
+
+      await EventBus.emit('sales.order.placed', orderPlacedEvent, 'OfflineSales');
+
+      notify.success({
+        title: "¡Venta guardada offline!",
+        description: `Venta por $${summary.totalAmount.toFixed(2)} guardada localmente. Se sincronizará automáticamente.`,
+      });
+
+      await handleSaleCompletion();
+      loadOfflineSales(); // Refresh offline sales list
+
+    } catch (error) {
+      logger.error('SalesStore', 'Error processing offline sale:', error);
+      throw error;
+    }
+  }, [cart, selectedCustomerId, customers, note, summary.totalAmount, queueOperation, handleSaleCompletion]);
 
   // Enhanced sale processing with offline support
   const handleProcessSale = useCallback(async () => {
@@ -383,137 +463,17 @@ export function OfflineSalesView() {
     } finally {
       setIsProcessing(false);
     }
-  }, [canProcessSale, isOnline, validateCartStock, getSaleData, selectedCustomerId, note]);
+  }, [canProcessSale, isOnline, validateCartStock, getSaleData, selectedCustomerId, note, handleSuccessfulSale, processOfflineSale]);
 
-  const processOfflineSale = async (saleData: unknown) => {
-    try {
-      const offlineSale: OfflineSale = {
-        id: `offline_sale_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        timestamp: Date.now(),
-        items: cart.map(item => ({
-          productId: item.product_id,
-          quantity: item.quantity,
-          price: (item as any).price || 0,
-          name: (item as any).name || `Item ${(item as any).productId || 'unknown'}`
-        })),
-        customer: selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : undefined,
-        note: note || undefined,
-        totalAmount: summary.totalAmount,
-        status: 'pending',
-        retryCount: 0
-      };
-
-      // Store offline sale
-      await localStorage.set('offline_sales', offlineSale.id, offlineSale);
-
-      // Queue for sync
-            const syncOperation: Omit<SyncOperation, 'id' | 'timestamp' | 'clientId' | 'retry'> = {
-        clientOperationId: `sale_${Date.now()}`,
-        type: 'CREATE' as const,
-        entity: 'sales',
-        data: saleData,
-        priority: 1
-      };
-
-      const operationId = queueOperation(syncOperation);
-      
-      // Update offline sale with operation ID
-      await localStorage.set('offline_sales', offlineSale.id, {
-        ...offlineSale,
-        syncOperationId: operationId
-      });
-
-      // Broadcast real-time order if connected
-      if (isRealtimeConnected) {
-        try {
-          await createOrder({
-            id: offlineSale.id,
-            timestamp: offlineSale.timestamp,
-            items: offlineSale.items,
-            customer: offlineSale.customer,
-            note: offlineSale.note,
-            totalAmount: offlineSale.totalAmount,
-            isOffline: true,
-            source: 'pos'
-          });
-        } catch (error) {
-          logger.error('SalesStore', 'Failed to broadcast real-time order:', error);
-        }
-      }
-
-      // Emit offline order event
-      const orderPlacedEvent: OrderPlacedEvent = {
-        orderId: offlineSale.id,
-        customerId: selectedCustomerId || undefined,
-        tableId: undefined,
-        items: offlineSale.items.map(item => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          specialInstructions: note || undefined
-        })),
-        totalAmount: summary.totalAmount,
-        orderType: 'dine_in',
-        timestamp: new Date().toISOString()
-      } as any;
-
-      await EventBus.emit('sales.order.placed', orderPlacedEvent, 'OfflineSales');
-
-      notify.success({
-        title: "¡Venta guardada offline!",
-        description: `Venta por $${summary.totalAmount.toFixed(2)} guardada localmente. Se sincronizará automáticamente.`,
-      });
-
-      await handleSaleCompletion();
-      loadOfflineSales(); // Refresh offline sales list
-
-    } catch (error) {
-      logger.error('SalesStore', 'Error processing offline sale:', error);
-      throw error;
-    }
-  };
-
-  const handleSuccessfulSale = async (saleResult: any, saleData: any) => {
-    // Emit online order event
-    const orderPlacedEvent: OrderPlacedEvent = {
-      orderId: saleResult.sale_id || `sale_${Date.now()}`,
-      customerId: selectedCustomerId || undefined,
-      tableId: undefined,
-      items: cart.map(item => ({
-        productId: item.product_id,
-        quantity: item.quantity,
-        specialInstructions: note || undefined
-      })),
-      totalAmount: summary.totalAmount,
-      orderType: 'dine_in',
-      timestamp: new Date().toISOString()
-    };
-
-    await EventBus.emit('sales.order.placed', orderPlacedEvent, 'SalesModule');
-
-    notify.success({
-      title: "¡Venta procesada!",
-      description: `Venta por $${summary.totalAmount.toFixed(2)} completada exitosamente`,
-    });
-
-    await handleSaleCompletion();
-  };
-
-  const handleSaleCompletion = async () => {
-    // Reset form
-    clearCart();
-    setSelectedCustomerId('');
-    setNote('');
-    setShowCheckout(false);
-    setCheckoutStep('validation');
-  };
-
-  const handleSuggestMaxQuantity = useCallback((productId: string, maxQuantity: number) => {
-    updateQuantity(productId, maxQuantity);
-    notify.info({
-      title: "Cantidad ajustada",
-      description: `Cantidad ajustada al máximo disponible: ${maxQuantity}`,
-    });
-  }, [updateQuantity]);
+  // TODO: Implement max quantity suggestion UI
+  // This function is ready but needs UI integration in ProductWithStock component
+  // const handleSuggestMaxQuantity = useCallback((productId: string, maxQuantity: number) => {
+  //   updateQuantity(productId, maxQuantity);
+  //   notify.info({
+  //     title: "Cantidad ajustada",
+  //     description: `Cantidad ajustada al máximo disponible: ${maxQuantity}`,
+  //   });
+  // }, [updateQuantity]);
 
   const handleForceSyncOfflineSales = async () => {
     try {
@@ -566,13 +526,11 @@ export function OfflineSalesView() {
           </Stack>
           
           <Stack direction="row" gap="md">
-            {/* Real-time Status Indicator */}
-            <RealtimeStatusIndicator showDetails={true} />
             {/* Offline Sales Indicator */}
             {offlineSales.length > 0 && (
               <Button
                 variant="outline"
-                colorPalette="warning"
+                colorPalette="orange"
                 onClick={() => setShowOfflineStatus(true)}
                 title={`${offlineSales.length} ventas pendientes de sincronización`}
               >
@@ -593,7 +551,7 @@ export function OfflineSalesView() {
             {queueSize > 0 && (
               <Button
                 variant="outline"
-                colorPalette="info"
+                colorPalette="blue"
                 onClick={handleForceSyncOfflineSales}
                 loading={isSyncing}
               >
@@ -605,7 +563,7 @@ export function OfflineSalesView() {
             {/* Stock Validation */}
             <Button
               variant="outline"
-              colorPalette="info"
+              colorPalette="blue"
               onClick={() => validateCartStock()}
               loading={isValidating}
               disabled={!summary.hasItems}
@@ -616,7 +574,7 @@ export function OfflineSalesView() {
             
             {/* Checkout Button */}
             <Button
-              colorPalette="success"
+              colorPalette="green"
               onClick={handleOpenCheckout}
               disabled={!summary.hasItems || isValidating}
               loading={isProcessing}
@@ -689,7 +647,7 @@ export function OfflineSalesView() {
               {checkoutStep === 'details' && 'Detalles de Venta'}
               {checkoutStep === 'confirmation' && 'Confirmar Venta'}
               {!isOnline && (
-                <Badge colorPalette="warning" variant="subtle">
+                <Badge colorPalette="orange" variant="subtle">
                   Modo Offline
                 </Badge>
               )}
@@ -750,10 +708,10 @@ export function OfflineSalesView() {
                     <Stack>
                       <Typography variant="body" mb="2" fontWeight="medium">Nota (Opcional)</Typography>
                         {/* Simple input placeholder for now */}
-                        <input 
+                        <input
                           placeholder="Nota adicional para la venta..."
                           value={note}
-                          onChange={(e: unknown) => setNote(e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNote(e.target.value)}
                           style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
                         />
                     </Stack>
@@ -834,7 +792,7 @@ export function OfflineSalesView() {
 
                   {checkoutStep !== 'confirmation' ? (
                     <Button
-                      colorPalette="info"
+                      colorPalette="blue"
                       onClick={handleProceedToNextStep}
                       disabled={
                         (checkoutStep === 'validation' && isOnline && (!validationResult?.is_valid || isValidating)) ||
@@ -846,7 +804,7 @@ export function OfflineSalesView() {
                     </Button>
                   ) : (
                     <Button
-                      colorPalette="success"
+                      colorPalette="green"
                       onClick={handleProcessSale}
                       loading={isProcessing}
                       disabled={false} // Allow offline processing
@@ -952,7 +910,7 @@ const OfflineSalesStatusModal = ({
                 Cerrar
               </Button>
               <Button
-                colorPalette="info"
+                colorPalette="blue"
                 onClick={onForceSync}
                 loading={isSyncing}
                 disabled={offlineSales.length === 0}

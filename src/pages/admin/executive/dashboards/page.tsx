@@ -1,8 +1,14 @@
 import React from 'react';
 import {
-  ContentLayout, PageHeader, Section, Stack, Button, Badge, Tabs
+  ContentLayout, PageHeader, Section, Stack, Button, Badge, Tabs, Icon
 } from '@/shared/ui';
-import { Icon } from '@/shared/ui';
+import {
+  ChartBarIcon,
+  ChatBubbleLeftRightIcon,
+  GlobeAltIcon,
+  PresentationChartLineIcon,
+  UserGroupIcon
+} from '@heroicons/react/24/outline';
 import ExecutiveDashboard from './components/ExecutiveDashboard';
 import NaturalLanguageBI from './components/NaturalLanguageBI';
 import ExternalDataIntegration from './components/ExternalDataIntegration';
@@ -24,7 +30,7 @@ const ExecutiveDashboardsPage: React.FC = () => {
         colorPalette="purple"
         size="sm"
       >
-        <Icon name="ChartBarIcon" />
+        <Icon icon={ChartBarIcon} size="sm" />
         Executive View
       </Button>
       <Button
@@ -32,7 +38,7 @@ const ExecutiveDashboardsPage: React.FC = () => {
         variant="outline"
         size="sm"
       >
-        <Icon name="ChatBubbleLeftRightIcon" />
+        <Icon icon={ChatBubbleLeftRightIcon} size="sm" />
         Natural Language
       </Button>
       <Button
@@ -40,7 +46,7 @@ const ExecutiveDashboardsPage: React.FC = () => {
         variant="outline"
         size="sm"
       >
-        <Icon name="GlobeAltIcon" />
+        <Icon icon={GlobeAltIcon} size="sm" />
         External Data
       </Button>
       <Button
@@ -48,7 +54,7 @@ const ExecutiveDashboardsPage: React.FC = () => {
         variant="outline"
         size="sm"
       >
-        <Icon name="PresentationChartLineIcon" />
+        <Icon icon={PresentationChartLineIcon} size="sm" />
         Advanced Charts
       </Button>
     </Stack>
@@ -74,26 +80,25 @@ const ExecutiveDashboardsPage: React.FC = () => {
       <PageHeader
         title="Executive Business Intelligence"
         subtitle="Dashboards ejecutivos, Natural Language BI y integración de datos externos para decisiones estratégicas"
-        icon="PresentationChartLineIcon"
         actions={quickActions}
       />
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+      <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
         <Tabs.List>
           <Tabs.Trigger value="executive">
-            <Icon name="UserGroupIcon" />
+            <Icon icon={UserGroupIcon} size="sm" />
             C-Suite Dashboard
           </Tabs.Trigger>
           <Tabs.Trigger value="nlp">
-            <Icon name="ChatBubbleLeftRightIcon" />
+            <Icon icon={ChatBubbleLeftRightIcon} size="sm" />
             Natural Language BI
           </Tabs.Trigger>
           <Tabs.Trigger value="external">
-            <Icon name="GlobeAltIcon" />
+            <Icon icon={GlobeAltIcon} size="sm" />
             External Data
           </Tabs.Trigger>
           <Tabs.Trigger value="visualizations">
-            <Icon name="PresentationChartLineIcon" />
+            <Icon icon={PresentationChartLineIcon} size="sm" />
             Advanced Charts
           </Tabs.Trigger>
         </Tabs.List>
@@ -101,7 +106,7 @@ const ExecutiveDashboardsPage: React.FC = () => {
         <Tabs.Content value={activeTab}>
           {renderTabContent()}
         </Tabs.Content>
-      </Tabs>
+      </Tabs.Root>
     </ContentLayout>
   );
 };

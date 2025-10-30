@@ -13,7 +13,7 @@ import {
   type CreateCustomerData,
   type UpdateCustomerData,
   type CustomerWithStats
-} from '../types';
+} from '../../types';
 
 export function useCustomers() {
   // Use our unified CRUD system - eliminates 80+ lines of boilerplate!

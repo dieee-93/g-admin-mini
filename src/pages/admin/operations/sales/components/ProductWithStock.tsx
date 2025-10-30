@@ -1,17 +1,17 @@
 // src/features/sales/components/ProductWithStock.tsx
 import { useState, useEffect } from 'react';
-import { 
+import {
   Stack,
-  Typography, 
-  Button, 
+  Typography,
+  Button,
   Badge,
   InputField,
   NumberField,
-  CardWrapper ,
+  CardWrapper,
   Alert,
-  Icon
+  Icon,
+  Skeleton
 } from '@/shared/ui';
-import { Skeleton } from '@chakra-ui/react';
 import { notify } from '@/lib/notifications';
 import { 
   ShoppingCartIcon,

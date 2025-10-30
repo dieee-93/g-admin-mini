@@ -1,302 +1,217 @@
-import { Alert as ChakraAlert, Box, HStack } from '@chakra-ui/react'
-import type { ReactNode } from 'react'
-import { 
-  CheckCircleIcon, 
-  ExclamationTriangleIcon, 
-  XCircleIcon, 
-  InformationCircleIcon,
-  XMarkIcon 
-} from '@heroicons/react/24/outline'
-import { Icon } from './Icon'
+// ============================================
+// ALERT - Chakra UI v3 Wrapper
+// ============================================
+// Wrapper for Chakra UI v3 Alert component
+// Provides feedback messages to users
 
-import { logger } from '@/lib/logging';
-interface AlertProps {
-  children: ReactNode
-  status?: 'info' | 'warning' | 'success' | 'error' | 'neutral'
-  variant?: 'subtle' | 'solid' | 'outline' | 'top-accent' | 'left-accent'
-  size?: 'sm' | 'md' | 'lg'
-  title?: string
-  description?: ReactNode
-  icon?: ReactNode | boolean
-  closable?: boolean
-  onClose?: () => void
-  className?: string
-  width?: 'auto' | 'full'
+import { Alert as ChakraAlert } from '@chakra-ui/react';
+import type { AlertRootProps } from '@chakra-ui/react';
+import * as React from 'react';
+
+// ============================================
+// ROOT
+// ============================================
+
+/**
+ * Alert Root Component
+ * Main container for alert messages
+ */
+export const AlertRoot = ChakraAlert.Root;
+
+// ============================================
+// INDICATOR
+// ============================================
+
+/**
+ * Alert Indicator Component
+ * Shows status icon
+ */
+export const AlertIndicator = ChakraAlert.Indicator;
+
+// ============================================
+// CONTENT
+// ============================================
+
+/**
+ * Alert Content Component
+ * Wrapper for title and description
+ */
+export const AlertContent = ChakraAlert.Content;
+
+// ============================================
+// TITLE
+// ============================================
+
+/**
+ * Alert Title Component
+ * Main alert message
+ */
+export const AlertTitle = ChakraAlert.Title;
+
+// ============================================
+// DESCRIPTION
+// ============================================
+
+/**
+ * Alert Description Component
+ * Additional alert details
+ */
+export const AlertDescription = ChakraAlert.Description;
+
+// ============================================
+// CONVENIENT WRAPPER
+// ============================================
+
+export interface AlertProps extends Omit<AlertRootProps, 'title'> {
+  /** Icon element or custom start element */
+  startElement?: React.ReactNode;
+  /** Custom end element (e.g., close button) */
+  endElement?: React.ReactNode;
+  /** Alert title */
+  title?: React.ReactNode;
+  /** Alert description (children) */
+  children?: React.ReactNode;
+  /** Custom icon to override default status icon */
+  icon?: React.ReactElement;
 }
 
-interface AlertIconProps {
-  children: ReactNode
-  className?: string
-}
+/**
+ * Alert Convenient Component
+ * Simplified Alert with automatic structure
+ */
+export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  function Alert(props, ref) {
+    const { title, children, icon, startElement, endElement, ...rest } = props;
 
-interface AlertTitleProps {
-  children: ReactNode
-  className?: string
-}
-
-interface AlertDescriptionProps {
-  children: ReactNode
-  className?: string
-}
-
-interface AlertActionProps {
-  children: ReactNode
-  className?: string
-}
-
-const statusIcons = {
-  success: CheckCircleIcon,
-  warning: ExclamationTriangleIcon,
-  error: XCircleIcon,
-  info: InformationCircleIcon,
-  neutral: InformationCircleIcon,
-}
-
-const statusColorMap = {
-  success: 'success',
-  warning: 'warning',
-  error: 'error',
-  info: 'info',
-  neutral: 'gray',
-}
-
-const sizeMap = {
-  sm: 'sm',
-  md: 'md',
-  lg: 'lg',
-}
-
-const widthMap = {
-  auto: 'auto',
-  full: 'full',
-}
-
-export function Alert({
-  children,
-  status = 'info',
-  variant = 'subtle',
-  size = 'md',
-  title,
-  description,
-  icon = true,
-  closable = false,
-  onClose,
-  className,
-  width = 'full',
-  ...rest
-}: AlertProps) {
-  const StatusIcon = statusIcons[status]
-  const showIcon = icon !== false
-  const customIcon = typeof icon === 'object' ? icon : null
-
-  // Debug: Check for invalid props
-  if ('action' in rest) {
-    logger.error('App', '[Alert] ⚠️ Invalid prop "action" detected. React only allows "action" on <form> elements.', {
-      receivedProps: Object.keys(rest),
-      action: (rest as any).action,
-      title,
-      description,
-      status,
-      // Stack trace to identify source component
-      stackTrace: new Error().stack?.split('\n').slice(1, 4)
-    });
-    // Remove action prop to prevent React error
-    const { action, ...safeRest } = rest as any;
-    rest = safeRest;
-  }
-
-  return (
-    <ChakraAlert.Root
-      status={status}
-      variant={variant === 'top-accent' || variant === 'left-accent' ? 'subtle' : variant}
-      size={sizeMap[size] as any}
-      colorPalette={statusColorMap[status as keyof typeof statusColorMap]}
-      width={widthMap[width]}
-      className={className}
-      {...rest}
-    >
-      <HStack gap="md" width="full" align="start">
-        {showIcon && (
-          <AlertIcon>
-            {customIcon || <Icon icon={StatusIcon} size="md" />}
-          </AlertIcon>
+    return (
+      <ChakraAlert.Root ref={ref} {...rest}>
+        {startElement || <ChakraAlert.Indicator>{icon}</ChakraAlert.Indicator>}
+        {children ? (
+          <ChakraAlert.Content>
+            <ChakraAlert.Title>{title}</ChakraAlert.Title>
+            <ChakraAlert.Description>{children}</ChakraAlert.Description>
+          </ChakraAlert.Content>
+        ) : (
+          <ChakraAlert.Title flex="1">{title}</ChakraAlert.Title>
         )}
-        
-        <Box flex="1" minWidth={0}>
-          {title && (
-            <AlertTitle>{title}</AlertTitle>
-          )}
-          
-          {description && (
-            <AlertDescription>{description}</AlertDescription>
-          )}
-          
-          {children && !title && !description && (
-            <Box>{children}</Box>
-          )}
-          
-          {children && (title || description) && (
-            <Box mt="sm">{children}</Box>
-          )}
-        </Box>
-        
-        {closable && onClose && (
-          <AlertAction>
-            <Box
-              as="button"
-              onClick={onClose}
-              p={1}
-              borderRadius="sm"
-              _hover={{ bg: 'blackAlpha.100' }}
-              cursor="pointer"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Icon icon={XMarkIcon} size="sm" />
-            </Box>
-          </AlertAction>
-        )}
-      </HStack>
-    </ChakraAlert.Root>
-  )
-}
-
-export function AlertIcon({ children, className, ...rest }: AlertIconProps) {
-  return (
-    <ChakraAlert.Indicator className={className} {...rest}>
-      {children}
-    </ChakraAlert.Indicator>
-  )
-}
-
-export function AlertTitle({ children, className, ...rest }: AlertTitleProps) {
-  return (
-    <ChakraAlert.Title 
-      fontWeight="semibold"
-      fontSize="sm"
-      className={className}
-      {...rest}
-    >
-      {children}
-    </ChakraAlert.Title>
-  )
-}
-
-export function AlertDescription({ children, className, ...rest }: AlertDescriptionProps) {
-  return (
-    <ChakraAlert.Description 
-      fontSize="sm"
-      className={className}
-      {...rest}
-    >
-      {children}
-    </ChakraAlert.Description>
-  )
-}
-
-export function AlertAction({ children, className, ...rest }: AlertActionProps) {
-  return (
-    <Box className={className} {...rest}>
-      {children}
-    </Box>
-  )
-}
-
-// Componentes de conveniencia para casos específicos del negocio
-export function InventoryAlert({ 
-  level, 
-  item, 
-  current, 
-  minimum,
-  onRestock,
-  ...props 
-}: {
-  level: 'low' | 'critical' | 'out'
-  item: string
-  current: number
-  minimum: number
-  onRestock?: () => void
-} & Omit<AlertProps, 'status' | 'title' | 'description'>) {
-  const statusMap = {
-    low: 'warning' as const,
-    critical: 'error' as const,
-    out: 'error' as const,
+        {endElement}
+      </ChakraAlert.Root>
+    );
   }
-  
-  const messageMap = {
-    low: `Stock bajo para ${item}`,
-    critical: `Stock crítico para ${item}`,
-    out: `Sin stock de ${item}`,
-  }
+);
 
-  return (
-    <Alert
-      status={statusMap[level]}
-      title={messageMap[level]}
-      description={`Actual: ${current} | Mínimo: ${minimum}`}
-      closable={false}
-      {...props}
-    >
-      {onRestock && (
-        <AlertAction>
-          <button 
-            onClick={onRestock}
-            style={{
-              padding: '4px 8px',
-              fontSize: '12px',
-              backgroundColor: 'var(--chakra-colors-brand-500)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Reabastecer
-          </button>
-        </AlertAction>
-      )}
-    </Alert>
-  )
-}
+// ============================================
+// COMPOUND COMPONENT EXPORT
+// ============================================
 
-export function SystemAlert({
-  type,
-  message,
-  details,
-  action,
-  ...props
-}: {
-  type: 'maintenance' | 'update' | 'error' | 'notice'
-  message: string
-  details?: string
-  action?: ReactNode
-} & Omit<AlertProps, 'status' | 'title' | 'description'>) {
-  const statusMap = {
-    maintenance: 'warning' as const,
-    update: 'info' as const,
-    error: 'error' as const,
-    notice: 'neutral' as const,
-  }
+/**
+ * Alert Compound Component
+ *
+ * @example
+ * ```tsx
+ * import { Alert } from '@/shared/ui';
+ *
+ * // Simple usage with convenience component
+ * <Alert status="info" title="Information">
+ *   This is an informational alert
+ * </Alert>
+ *
+ * // Compound component usage (more control)
+ * <Alert.Root status="success">
+ *   <Alert.Indicator />
+ *   <Alert.Content>
+ *     <Alert.Title>Success!</Alert.Title>
+ *     <Alert.Description>
+ *       Your changes were saved successfully
+ *     </Alert.Description>
+ *   </Alert.Content>
+ * </Alert.Root>
+ *
+ * // With all status types
+ * <Alert status="error" title="Error">
+ *   Something went wrong
+ * </Alert>
+ *
+ * <Alert status="warning" title="Warning">
+ *   Please review your input
+ * </Alert>
+ *
+ * <Alert status="success" title="Success">
+ *   Operation completed
+ * </Alert>
+ *
+ * <Alert status="info" title="Info">
+ *   Additional information
+ * </Alert>
+ *
+ * // With variants
+ * <Alert status="success" variant="subtle" title="Subtle">
+ *   Default subtle variant
+ * </Alert>
+ *
+ * <Alert status="success" variant="solid" title="Solid">
+ *   Solid background variant
+ * </Alert>
+ *
+ * <Alert status="success" variant="surface" title="Surface">
+ *   Surface variant
+ * </Alert>
+ *
+ * <Alert status="success" variant="outline" title="Outline">
+ *   Outlined variant
+ * </Alert>
+ *
+ * // With custom icon
+ * <Alert.Root status="warning">
+ *   <Alert.Indicator>
+ *     <CustomIcon />
+ *   </Alert.Indicator>
+ *   <Alert.Title>Custom icon alert</Alert.Title>
+ * </Alert.Root>
+ *
+ * // With action button
+ * <Alert.Root status="info">
+ *   <Alert.Indicator />
+ *   <Alert.Content>
+ *     <Alert.Title>Update Available</Alert.Title>
+ *     <Alert.Description>
+ *       A new version is ready to install
+ *     </Alert.Description>
+ *   </Alert.Content>
+ *   <Button size="sm" alignSelf="center">Update</Button>
+ * </Alert.Root>
+ *
+ * // With close button
+ * import { CloseButton } from '@chakra-ui/react';
+ *
+ * <Alert.Root>
+ *   <Alert.Indicator />
+ *   <Alert.Content>
+ *     <Alert.Title>Notification</Alert.Title>
+ *     <Alert.Description>You have new messages</Alert.Description>
+ *   </Alert.Content>
+ *   <CloseButton />
+ * </Alert.Root>
+ *
+ * // Sizes
+ * <Alert status="info" title="Small" size="sm" />
+ * <Alert status="info" title="Medium" size="md" />
+ * <Alert status="info" title="Large" size="lg" />
+ *
+ * // Color palette override
+ * <Alert status="info" colorPalette="teal" title="Custom Color">
+ *   Info alert with teal color
+ * </Alert>
+ * ```
+ */
+Alert.Root = AlertRoot;
+Alert.Indicator = AlertIndicator;
+Alert.Content = AlertContent;
+Alert.Title = AlertTitle;
+Alert.Description = AlertDescription;
 
-  return (
-    <Alert
-      status={statusMap[type]}
-      title={message}
-      description={details}
-      {...props}
-    >
-      {action && <AlertAction>{action}</AlertAction>}
-    </Alert>
-  )
-}
+// ============================================
+// TYPE EXPORTS
+// ============================================
 
-// Compound component pattern
-Alert.Icon = AlertIcon
-Alert.Title = AlertTitle
-Alert.Description = AlertDescription
-Alert.Action = AlertAction
-
-// Business-specific components
-Alert.Inventory = InventoryAlert
-Alert.System = SystemAlert
+export type { AlertRootProps };

@@ -304,6 +304,22 @@ export function SchedulingFormEnhanced({
   const hourlyRate = watchedValues.hourly_rate || 15;
   const breakMinutes = watchedValues.break_minutes || 30;
 
+  // Helper function to calculate minutes between times
+  const calculateMinutesBetween = React.useCallback((start: string, end: string): number => {
+    const [startHour, startMin] = start.split(':').map(Number);
+    const [endHour, endMin] = end.split(':').map(Number);
+
+    const startMinutes = startHour * 60 + startMin;
+    let endMinutes = endHour * 60 + endMin;
+
+    // Handle next day scenarios
+    if (endMinutes < startMinutes) {
+      endMinutes += 24 * 60;
+    }
+
+    return endMinutes - startMinutes;
+  }, []);
+
   // Real-time scheduling metrics
   const schedulingMetrics = React.useMemo(() => {
     const totalMinutes = calculateMinutesBetween(startTime, endTime);
@@ -351,23 +367,7 @@ export function SchedulingFormEnhanced({
       efficiencyScore: Number(efficiencyScore.toFixed(1)),
       volumeImpact: ((volumeMultipliers[expectedVolume as keyof typeof volumeMultipliers] - 1) * 100).toFixed(0)
     };
-  }, [startTime, endTime, hourlyRate, breakMinutes, watchedValues]);
-
-  // Helper function to calculate minutes between times
-  const calculateMinutesBetween = (start: string, end: string): number => {
-    const [startHour, startMin] = start.split(':').map(Number);
-    const [endHour, endMin] = end.split(':').map(Number);
-
-    const startMinutes = startHour * 60 + startMin;
-    let endMinutes = endHour * 60 + endMin;
-
-    // Handle next day scenarios
-    if (endMinutes < startMinutes) {
-      endMinutes += 24 * 60;
-    }
-
-    return endMinutes - startMinutes;
-  };
+  }, [startTime, endTime, hourlyRate, breakMinutes, watchedValues, calculateMinutesBetween]);
 
   // Enhance schedule data with calculations
   const enhanceScheduleData = async (data: ScheduleFormData) => {

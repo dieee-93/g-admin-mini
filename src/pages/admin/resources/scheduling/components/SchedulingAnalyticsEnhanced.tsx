@@ -388,10 +388,8 @@ export function SchedulingAnalyticsEnhanced({
             value={`${analytics.metrics.coverageRate.toFixed(1)}%`}
             icon={CheckCircleIcon}
             colorPalette={analytics.metrics.coverageRate >= 90 ? "green" : analytics.metrics.coverageRate >= 80 ? "orange" : "red"}
-            trend={{
-              value: analytics.shiftTrend.growthRate || 0,
-              isPositive: (analytics.shiftTrend.growthRate || 0) > 0
-            }}
+            trend={(analytics.shiftTrend.growthRate || 0) > 0 ? 'up' : (analytics.shiftTrend.growthRate || 0) < 0 ? 'down' : 'neutral'}
+            change={`${Math.abs(analytics.shiftTrend.growthRate || 0).toFixed(1)}%`}
           />
           <MetricCard
             title="Eficiencia General"
@@ -414,7 +412,8 @@ export function SchedulingAnalyticsEnhanced({
         </CardGrid>
       </StatsSection>
 
-      {/* Shift Efficiency Quadrants (BCG Matrix for Scheduling) */}
+      {/* Shift Efficiency Quadrants (BCG Matrix for Scheduling) - TEMPORARILY COMMENTED */}
+      {/*
       <Section variant="elevated" title="🎯 Matriz de Eficiencia de Turnos">
         <Typography variant="body" size="sm" color="text.muted" mb="lg">
           Análisis de turnos basado en cobertura vs costo - Metodología BCG Matrix adaptada
@@ -468,6 +467,7 @@ export function SchedulingAnalyticsEnhanced({
           ))}
         </CardGrid>
       </Section>
+      */}
 
       {/* Coverage Analysis by Time Slots */}
       <Section variant="elevated" title="⏰ Análisis de Cobertura por Franjas Horarias">

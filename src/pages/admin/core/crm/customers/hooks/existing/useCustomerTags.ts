@@ -3,13 +3,13 @@ import { useCallback, useState } from 'react';
 import { z } from 'zod';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import { CustomerTag, CustomerProfile } from '../types';
+import { CustomerTag, CustomerProfile } from '../../types';
 import { logger } from '@/lib/logging';
 import {
   assignTagToCustomer,
   removeTagFromCustomer,
   getCustomersWithTag
-} from '../services/advancedCustomerApi';
+} from '../../services/advancedCustomerApi';
 
 // Schema for CustomerTag validation
 const CustomerTagSchema = z.object({

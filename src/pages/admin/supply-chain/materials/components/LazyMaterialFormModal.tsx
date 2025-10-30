@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Box, Spinner, VStack } from '@chakra-ui/react';
+import { Box, Spinner, VStack } from '@/shared/ui';
 
 // Lazy load the heavy modal component
 const MaterialFormDialog = lazy(() =>

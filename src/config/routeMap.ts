@@ -8,8 +8,8 @@ import { logger } from '@/lib/logging';
 
 export const domainRouteMap = {
   // Business Operations Domain
-  'sales': '/admin/sales',
-  'operations': '/admin/operations', 
+  'sales': '/admin/operations/sales',
+  'operations': '/admin/operations',
   'customers': '/admin/customers',
   
   // Supply Chain Domain
@@ -34,8 +34,9 @@ export const domainRouteMap = {
 // Route-to-File mapping automático con types
 export const routeToFileMap = {
   // Admin main pages
-  '/admin/sales': 'pages/admin/operations/sales/page',
-  '/admin/operations': 'pages/admin/operations/hub/page',
+  '/admin/operations/sales': 'pages/admin/operations/sales/page',
+  '/admin/operations/fulfillment/onsite': 'pages/admin/operations/fulfillment/onsite/page',
+  '/admin/operations/kitchen': 'pages/admin/operations/kitchen/page',
   '/admin/customers': 'pages/admin/core/crm/page',
   '/admin/materials': 'pages/admin/supply-chain/materials/page',
   '/admin/products': 'pages/admin/supply-chain/products/page',
@@ -56,9 +57,6 @@ export const routeToFileMap = {
   '/admin/settings/diagnostics': 'pages/admin/core/settings/diagnostics',
   '/admin/settings/reporting': 'pages/admin/core/settings/reporting',
   '/admin/settings/enterprise': 'pages/admin/core/settings/enterprise',
-  
-  // Operations sub-views
-  '/admin/operations/tables': 'pages/admin/operations/hub/tables',
 
   // Dashboard sub-views
   '/admin/dashboard/predictive': 'pages/admin/core/dashboard/predictive',
@@ -79,8 +77,9 @@ export const routeToFileMap = {
 // Component name mapping
 export const routeToComponentMap = {
   // Admin main pages (lazy loaded)
-  '/admin/sales': 'LazySalesPage',
-  '/admin/operations': 'LazyOperationsPage',
+  '/admin/operations/sales': 'LazySalesPage',
+  '/admin/operations/fulfillment/onsite': 'LazyFulfillmentOnsitePage',
+  '/admin/operations/kitchen': 'LazyKitchenPage',
   '/admin/customers': 'LazyCustomersPage',
   '/admin/materials': 'LazyStockLab', // StockLab is the branded name
   '/admin/products': 'LazyProductsPage',
@@ -89,7 +88,7 @@ export const routeToComponentMap = {
   '/admin/scheduling': 'LazySchedulingPage',
   '/admin/settings': 'LazySettingsPage',
   '/admin/gamification/achievements': 'LazyAchievementsGalaxy',
-  '/admin/debug/theme-test': 'LazyThemeTestPage',
+  // '/admin/debug/theme-test': 'LazyThemeTestPage', // DISABLED: Component does not exist
   '/admin/dashboard': 'Dashboard', // Dashboard not lazy loaded (critical)
 
   // Sub-views (direct imports)
@@ -102,7 +101,6 @@ export const routeToComponentMap = {
   '/admin/settings/reporting': 'ReportingView',
   '/admin/settings/enterprise': 'EnterpriseView',
 
-  '/admin/operations/tables': 'TableManagementView',
   '/admin/dashboard/predictive': 'PredictiveAnalyticsView',
 
   // Customer App (direct imports)

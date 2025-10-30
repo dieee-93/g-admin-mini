@@ -2,7 +2,6 @@
 // Calculadora de costos como componente independiente
 
 import React, { useState } from 'react';
-import { Box, Separator, Text } from '@chakra-ui/react'; // Import Box directly from Chakra
 import {
   CardWrapper,
   VStack,
@@ -12,6 +11,9 @@ import {
   Grid,
   InputField,
   NumberField,
+  Box,
+  Separator,
+  Text
 } from '@/shared/ui';
 import {
   CurrencyDollarIcon,

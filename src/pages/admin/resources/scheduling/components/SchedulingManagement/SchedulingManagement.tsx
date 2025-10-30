@@ -23,36 +23,8 @@ import {
   RealTimeLaborTracker
 } from '../';
 
-// ✅ UNIFIED CALENDAR SYSTEM
-logger.info('API', '🔄 SchedulingManagement: Using React.lazy for UnifiedCalendar');
-
-// Create a fallback component first
-const CalendarFallback = () => (
-  <Section variant="elevated" title="Calendar" className="min-h-[400px]">
-    <Stack spacing="md">
-      <Alert status="warning">
-        <Typography variant="h5">Calendar Loading...</Typography>
-        <Typography variant="body">
-          UnifiedCalendar component is initializing. If this persists, please refresh the page.
-        </Typography>
-      </Alert>
-      <Spinner size="lg" />
-    </Stack>
-  </Section>
-);
-
-// Use React.lazy for proper dynamic import
-const UnifiedCalendar = React.lazy(() =>
-  import('@/shared/calendar/components/UnifiedCalendar')
-    .then(module => {
-      logger.info('API', '✅ SchedulingManagement: UnifiedCalendar loaded successfully', { module });
-      return { default: module.default || module.UnifiedCalendar };
-    })
-    .catch(error => {
-      logger.error('API', '❌ SchedulingManagement: Error loading UnifiedCalendar', error);
-      return { default: CalendarFallback };
-    })
-);
+// ✅ REMOVED OLD UNIFIED CALENDAR SYSTEM
+// Now using WeeklyScheduleView component + Module Registry pattern
 
 interface SchedulingStats {
   total_shifts_this_week: number;
@@ -147,17 +119,10 @@ export function SchedulingManagement({
       </Tabs.List>
 
       <Tabs.Panel value="schedule">
-        <React.Suspense fallback={<CalendarFallback />}>
-          <UnifiedCalendar
-            businessModel="staff_scheduling"
-            view={viewState.viewMode || 'week'}
-            onViewChange={(view) => onViewStateChange({ ...viewState, viewMode: view as any })}
-            features={['shift_management', 'time_off', 'coverage_tracking']}
-            performanceMode={performanceMode}
-            mobileOptimized={isMobile}
-            onBookingClick={onShiftClick}
-          />
-        </React.Suspense>
+        <WeeklyScheduleView
+          viewState={viewState}
+          onViewStateChange={onViewStateChange}
+        />
       </Tabs.Panel>
 
       <Tabs.Panel value="timeoff">

@@ -1,6 +1,6 @@
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@/shared/ui';
-import { InventoryTab } from './InventoryTab';
-import { ABCAnalysisTab } from './ABCAnalysisTab';
+import { Tabs } from '@/shared/ui';
+import { InventoryTabEnhanced } from './InventoryTabEnhanced';
+import { AnalyticsTabEnhanced } from './AnalyticsTabEnhanced';
 import { ProcurementTab } from './ProcurementTab';
 
 interface MaterialsManagementProps {
@@ -21,45 +21,43 @@ export function MaterialsManagement({
   performanceMode = false
 }: MaterialsManagementProps) {
   return (
-    <Tabs
+    <Tabs.Root
       value={activeTab}
-      onValueChange={onTabChange}
+      onValueChange={(details) => onTabChange(details.value)}
       variant="line"
       colorPalette="blue"
       size="md"
-      isLazy
-      lazyBehavior="keepMounted"
+      lazyMount
+      unmountOnExit={false}
     >
-      <TabList gap="sm">
-        <Tab value="inventory">
+      <Tabs.List gap="sm">
+        <Tabs.Trigger value="inventory">
           Inventario
-        </Tab>
-        <Tab value="analytics">
+        </Tabs.Trigger>
+        <Tabs.Trigger value="analytics">
           Análisis ABC
-        </Tab>
-        <Tab value="procurement">
+        </Tabs.Trigger>
+        <Tabs.Trigger value="procurement">
           Compras
-        </Tab>
-      </TabList>
+        </Tabs.Trigger>
+      </Tabs.List>
 
-      <TabPanels>
-        <TabPanel value="inventory" padding="md">
-          <InventoryTab
-            onStockUpdate={onStockUpdate}
-            onBulkAction={onBulkAction}
-            onAddMaterial={onAddMaterial}
-            performanceMode={performanceMode}
-          />
-        </TabPanel>
+      <Tabs.Content value="inventory" padding="md">
+        <InventoryTabEnhanced
+          onStockUpdate={onStockUpdate}
+          onBulkAction={onBulkAction}
+          onAddMaterial={onAddMaterial}
+          performanceMode={performanceMode}
+        />
+      </Tabs.Content>
 
-        <TabPanel value="analytics" padding="md">
-          <ABCAnalysisTab />
-        </TabPanel>
+      <Tabs.Content value="analytics" padding="md">
+        <AnalyticsTabEnhanced />
+      </Tabs.Content>
 
-        <TabPanel value="procurement" padding="md">
-          <ProcurementTab />
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+      <Tabs.Content value="procurement" padding="md">
+        <ProcurementTab />
+      </Tabs.Content>
+    </Tabs.Root>
   );
 }

@@ -1,9 +1,8 @@
 import React from 'react';
-import { Box, Stack, Heading, Text, SimpleGrid, HStack, Circle, Button, Spinner, Center } from '@chakra-ui/react';
+import { Box, Stack, Heading, Text, SimpleGrid, HStack, Circle, Button, Spinner, Center, CardWrapper, Icon } from '@/shared/ui';
 import { useEvolutionRoutes } from '@/hooks/useEvolutionRoutes';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
-import { CardWrapper, Icon } from '@/shared/ui';
 
 const planetIcons: { [key: string]: string } = {
   'E-commerce Asincrónico': '🛒',

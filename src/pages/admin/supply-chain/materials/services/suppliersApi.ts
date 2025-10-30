@@ -84,12 +84,33 @@ export const suppliersApi = {
     return await this.createSupplier(supplier);
   },
 
+  // Delete supplier
+  async deleteSupplier(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('suppliers')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  // Check if supplier has associated materials
+  async hasAssociatedMaterials(supplierId: string): Promise<boolean> {
+    const { count, error } = await supabase
+      .from('items')
+      .select('id', { count: 'exact', head: true })
+      .eq('supplier_id', supplierId);
+
+    if (error) throw error;
+    return (count ?? 0) > 0;
+  },
+
   // Get supplier performance metrics
   async getSupplierPerformance(supplierId: string, days: number = 90) {
     const { data, error } = await supabase
-      .rpc('get_supplier_performance', { 
+      .rpc('get_supplier_performance', {
         p_supplier_id: supplierId,
-        p_days: days 
+        p_days: days
       });
 
     if (error) throw error;

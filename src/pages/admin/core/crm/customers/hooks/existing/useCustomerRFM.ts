@@ -2,17 +2,17 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { logger } from '@/lib/logging';
-import { 
-  CustomerRFMProfile, 
-  CustomerSegment, 
+import {
+  CustomerRFMProfile,
+  CustomerSegment,
   ChurnRisk,
-  CustomerAnalytics 
-} from '../types';
+  CustomerAnalytics
+} from '../../types';
 import {
   calculateCustomerRFM,
   getCustomerAnalyticsDashboard,
   getCustomerProfileWithRFM
-} from '../services/advancedCustomerApi';
+} from '../../services/advancedCustomerApi';
 
 export function useCustomerRFM() {
   const [rfmProfiles, setRFMProfiles] = useState<CustomerRFMProfile[]>([]);

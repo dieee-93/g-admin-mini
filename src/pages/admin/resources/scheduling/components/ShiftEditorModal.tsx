@@ -1,10 +1,10 @@
 import {
-  Modal,
+  Dialog,
   Button,
   Icon,
   HStack,
   Text,
-  VStack,
+  VStack
 } from '@/shared/ui';
 import { PencilSquareIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 import { SchedulingFormEnhanced } from './SchedulingFormEnhanced';
@@ -30,46 +30,62 @@ export function ShiftEditorModal({
   const isEditMode = !!shift;
 
   return (
-    <Modal.Root isOpen={isOpen} onOpenChange={() => onClose()} size="2xl">
-      <Modal.Backdrop />
-      <Modal.Content>
-        <Modal.Header>
-          <HStack>
-            <Icon
-              icon={isEditMode ? PencilSquareIcon : PlusCircleIcon}
-              size="lg"
-              className="text-gray-500"
-            />
-            <VStack align="start" gap="0">
-              <Modal.Title>{isEditMode ? 'Edit Shift' : 'Create New Shift'}</Modal.Title>
-              <Text fontSize="sm" color="gray.500">
-                {isEditMode
-                  ? 'Update the details for this shift.'
-                  : 'Fill out the form to add a new shift to the schedule.'}
-              </Text>
-            </VStack>
-          </HStack>
-        </Modal.Header>
-        <Modal.Body>
-          <SchedulingFormEnhanced
-            schedule={shift}
-            onSuccess={() => {
-              onSuccess();
-              onClose();
-            }}
-            onCancel={onClose}
-            prefilledDate={prefilledDate}
-            prefilledEmployee={prefilledEmployee}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-            <HStack justify="end" w="full">
-                <Button variant="outline" onClick={onClose}>
-                    Cancel
-                </Button>
+    <Dialog.Root
+      open={isOpen}
+      onOpenChange={(details) => {
+        if (!details.open) {
+          onClose();
+        }
+      }}
+      size={{ base: "full", md: "xl" }}
+    >
+      <Dialog.Backdrop />
+      <Dialog.Positioner>
+        <Dialog.Content
+          maxW={{ base: "100%", md: "900px" }}
+          maxH={{ base: "100vh", md: "90vh" }}
+          w="full"
+          overflowY="auto"
+        >
+          <Dialog.CloseTrigger />
+          <Dialog.Header>
+            <HStack>
+              <Icon
+                icon={isEditMode ? PencilSquareIcon : PlusCircleIcon}
+                size="lg"
+                className="text-gray-500"
+              />
+              <VStack align="start" gap="0">
+                <Dialog.Title>{isEditMode ? 'Edit Shift' : 'Create New Shift'}</Dialog.Title>
+                <Text fontSize="sm" color="gray.500">
+                  {isEditMode
+                    ? 'Update the details for this shift.'
+                    : 'Fill out the form to add a new shift to the schedule.'}
+                </Text>
+              </VStack>
             </HStack>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Root>
+          </Dialog.Header>
+          <Dialog.Body>
+            <SchedulingFormEnhanced
+              schedule={shift}
+              onSuccess={() => {
+                onSuccess();
+                onClose();
+              }}
+              onCancel={onClose}
+              prefilledDate={prefilledDate}
+              prefilledEmployee={prefilledEmployee}
+            />
+          </Dialog.Body>
+          <Dialog.Footer>
+            <HStack justify="end" w="full">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+            </HStack>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog.Positioner>
+    </Dialog.Root>
   );
 }

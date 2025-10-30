@@ -217,21 +217,17 @@ export class AnomalyDetectionEngine {
         rollbackable: true,
         execute: async () => {
           try {
-            // Access WebSocket manager through global reference or module
-            const wsManager = (window as any).wsManager;
-            if (wsManager && typeof wsManager.reconnect === 'function') {
-              await wsManager.reconnect();
-              logger.info('Performance', '🔧 WebSocket connection restarted successfully');
-              return true;
-            }
-            return false;
+            // WebSocket system removed - using Supabase Realtime instead
+            // Supabase handles reconnection automatically
+            logger.info('Performance', '🔧 Realtime connections managed by Supabase');
+            return true;
           } catch (error) {
-            logger.error('Performance', 'Failed to restart WebSocket connection:', error);
+            logger.error('Performance', 'Failed to check realtime connection:', error);
             return false;
           }
         },
         rollback: async () => {
-          // WebSocket connections self-manage, no explicit rollback needed
+          // Supabase Realtime connections self-manage, no explicit rollback needed
           return true;
         }
       },
@@ -416,10 +412,7 @@ export class AnomalyDetectionEngine {
       this.updateMetric('error_rate', this.calculateErrorRate());
     });
 
-    // Listen for WebSocket events
-    EventBus.on('websocket.disconnected', () => {
-      this.incrementMetric('websocket_disconnections');
-    });
+    // WebSocket events removed - using Supabase Realtime instead
 
     // Listen for ML prediction failures
     EventBus.on('alerts.generated', (_event) => {

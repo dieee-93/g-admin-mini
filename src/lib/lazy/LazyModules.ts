@@ -28,14 +28,26 @@ export const LazySalesPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Operations Page (pages/admin/operations/hub/page.tsx)
-export const LazyOperationsPage = createLazyComponent(
-  () => import('../../pages/admin/operations/hub/page'),
-  'operations',
+// Lazy-loaded Floor Management Page (pages/admin/operations/floor/page.tsx)
+export const LazyFloorPage = createLazyComponent(
+  () => import('../../pages/admin/operations/floor/page'),
+  'floor',
   {
-    chunkName: 'operations-module',
-    preload: false, // Load on demand
+    chunkName: 'floor-module',
+    preload: false,
     priority: 'high', // Critical for restaurant operations
+    cacheStrategy: 'both'
+  }
+);
+
+// Lazy-loaded Kitchen Display Page (pages/admin/operations/kitchen/page.tsx)
+export const LazyKitchenPage = createLazyComponent(
+  () => import('../../pages/admin/operations/kitchen/page'),
+  'kitchen',
+  {
+    chunkName: 'kitchen-module',
+    preload: false,
+    priority: 'high', // Critical for kitchen operations
     cacheStrategy: 'both'
   }
 );
@@ -54,6 +66,30 @@ export const LazyMaterialsPage = createLazyComponent(
 
 // Legacy alias - use LazyMaterialsPage instead
 export const LazyStockLab = LazyMaterialsPage;
+
+// Lazy-loaded Suppliers Page (pages/admin/supply-chain/suppliers/page.tsx)
+export const LazySuppliersPage = createLazyComponent(
+  () => import('../../pages/admin/supply-chain/suppliers/page'),
+  'suppliers',
+  {
+    chunkName: 'suppliers-module',
+    preload: false,
+    priority: 'medium',
+    cacheStrategy: 'both'
+  }
+);
+
+// Lazy-loaded Supplier Orders Page (pages/admin/supply-chain/supplier-orders/page.tsx)
+export const LazySupplierOrdersPage = createLazyComponent(
+  () => import('../../pages/admin/supply-chain/supplier-orders/page'),
+  'supplier-orders',
+  {
+    chunkName: 'supplier-orders-module',
+    preload: false,
+    priority: 'medium',
+    cacheStrategy: 'both'
+  }
+);
 
 // Lazy-loaded Staff Page (pages/admin/resources/staff/page.tsx)
 export const LazyStaffPage = createLazyComponent(
@@ -489,7 +525,8 @@ export const moduleMetadata = {
 // Export all lazy pages
 export const lazyModules = {
   LazySalesPage,
-  LazyOperationsPage,
+  LazyFloorPage,
+  LazyKitchenPage,
   LazyMaterialsPage,
   LazyStockLab,
   LazyProductsPage,

@@ -71,10 +71,17 @@ export const adminRoutes: RouteConfig[] = [
     showInNav: true
   },
   {
-    path: '/admin/operations',
-    component: 'LazyOperationsPage', 
-    title: 'Operaciones',
-    icon: 'CogIcon',
+    path: '/admin/operations/floor',
+    component: 'LazyFloorPage',
+    title: 'Floor Management',
+    icon: 'BuildingStorefrontIcon',
+    requiredModule: 'operations',
+  },
+  {
+    path: '/admin/operations/kitchen',
+    component: 'LazyKitchenPage',
+    title: 'Kitchen Display',
+    icon: 'FireIcon',
     requiredModule: 'operations',
     showInNav: true
   },

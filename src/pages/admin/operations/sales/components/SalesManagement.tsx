@@ -42,23 +42,23 @@ export function SalesManagement({
   logger.debug('SalesStore', '🔍 SalesManagement Rendering - Tabs API fixed to use .Tab and .Panel');
 
   return (
-    <Tabs value={activeTab} onValueChange={onTabChange}>
+    <Tabs.Root value={activeTab} onValueChange={(details) => onTabChange(details.value)}>
       <Tabs.List>
-        <Tabs.Tab value="pos">
+        <Tabs.Trigger value="pos">
           <Icon icon={CreditCardIcon} size="sm" />
           POS
-        </Tabs.Tab>
-        <Tabs.Tab value="analytics">
+        </Tabs.Trigger>
+        <Tabs.Trigger value="analytics">
           <Icon icon={ChartBarIcon} size="sm" />
           Analytics
-        </Tabs.Tab>
-        <Tabs.Tab value="reports">
+        </Tabs.Trigger>
+        <Tabs.Trigger value="reports">
           <Icon icon={DocumentTextIcon} size="sm" />
           Reportes
-        </Tabs.Tab>
+        </Tabs.Trigger>
       </Tabs.List>
 
-      <Tabs.Panel value="pos">
+      <Tabs.Content value="pos">
         <Stack gap="lg">
           {/* Sistema POS Principal */}
           <Stack direction="row" gap="sm" align="center" mb="md">
@@ -111,9 +111,9 @@ export function SalesManagement({
             description="El sistema POS está funcionando correctamente. Todas las integraciones activas."
           />
         </Stack>
-      </Tabs.Panel>
+      </Tabs.Content>
 
-      <Tabs.Panel value="analytics">
+      <Tabs.Content value="analytics">
         <Stack gap="lg">
           <Typography variant="heading" size="lg" mb="md">
             Analytics de Ventas
@@ -152,9 +152,9 @@ export function SalesManagement({
             description="Revenue patterns, conversion rates, customer behavior y correlaciones cross-módulo."
           />
         </Stack>
-      </Tabs.Panel>
+      </Tabs.Content>
 
-      <Tabs.Panel value="reports">
+      <Tabs.Content value="reports">
         <Stack gap="lg">
           <Typography variant="heading" size="lg" mb="md">
             Reportes y Documentación
@@ -199,7 +199,7 @@ export function SalesManagement({
             description="Los reportes se generan automáticamente y están disponibles para descarga."
           />
         </Stack>
-      </Tabs.Panel>
-    </Tabs>
+      </Tabs.Content>
+    </Tabs.Root>
   );
 }

@@ -3,12 +3,13 @@
 
 import { supabase } from '@/lib/supabase/client';
 import { MaterialsMockService } from './materialsMockService';
+import { MaterialsDataNormalizer } from './materialsDataNormalizer';
 import type { InventoryItem, StockEntry } from '../types';
 import type { MaterialItem } from '../types/materialTypes';
 
 import { logger } from '@/lib/logging';
 // ✅ DEVELOPMENT FLAG - Use mock data in development
-const USE_MOCK_DATA = process.env.NODE_ENV === 'development' || true; // Force mock for now
+const USE_MOCK_DATA = false; // Changed to false to use real Supabase data
 
 export const inventoryApi = {
   // Items
@@ -22,8 +23,13 @@ export const inventoryApi = {
       .select('*')
       .order('name');
 
-    if (error) throw error;
-    return data || [];
+    if (error) {
+      logger.error('MaterialsStore', 'Error loading materials from Supabase:', error);
+      throw error;
+    }
+
+    // Normalize data from Supabase format to MaterialItem format
+    return data ? MaterialsDataNormalizer.normalizeArray(data) : [];
   },
 
   async createMaterial(item: Partial<MaterialItem>): Promise<MaterialItem> {
@@ -74,7 +80,7 @@ export const inventoryApi = {
 
     const { data, error } = await supabase
       .from('items')
-      .update({ stock: newStock, lastUpdated: new Date().toISOString() })
+      .update({ stock: newStock, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .single();
