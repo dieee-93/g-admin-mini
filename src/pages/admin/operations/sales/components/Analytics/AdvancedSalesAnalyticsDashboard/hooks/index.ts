@@ -31,8 +31,8 @@ const calculateAdvancedAnalytics = (salesData: Sale[]): AdvancedSalesAnalytics =
 
   // Performance calculations
   const topItems = salesData
-    .reduce((acc: any[], sale) => {
-      sale.items?.forEach((item: any) => {
+    .reduce((acc: Array<{ name: string; quantity: number; revenue: number }>, sale) => {
+      sale.items?.forEach((item: { name: string; quantity: number; price: number }) => {
         const existing = acc.find(i => i.name === item.name);
         if (existing) {
           existing.quantity += item.quantity;
@@ -101,7 +101,6 @@ const calculateAdvancedAnalytics = (salesData: Sale[]): AdvancedSalesAnalytics =
 
 export const useAdvancedSalesAnalytics = () => {
   const [analytics, setAnalytics] = useState<AdvancedSalesAnalytics | null>(null);
-  const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange>('today');
@@ -113,7 +112,6 @@ export const useAdvancedSalesAnalytics = () => {
       setError(null);
 
       const salesData = await fetchSales();
-      setSales(salesData);
 
       const calculatedAnalytics = calculateAdvancedAnalytics(salesData);
       setAnalytics(calculatedAnalytics);

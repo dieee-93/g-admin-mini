@@ -1,10 +1,14 @@
 // ============================================
 // SUPPLIER FORM MODAL - Create/Edit supplier
 // ============================================
+// ARCHITECTURE: Follows Material Form pattern
+// - Business logic in useSupplierForm hook
+// - UI component is presentational only
+// - Integrates useSupplierValidation for validation
+// - Shows validation summary, field errors/warnings
+// - Progress indicator during submission
 
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React from 'react';
 import {
   Button,
   Stack,
@@ -12,217 +16,339 @@ import {
   Text,
   InputField,
   TextareaField,
-  Dialog
+  Dialog,
+  Alert,
+  Box,
+  Flex,
+  Progress
 } from '@/shared/ui';
-import { SupplierSchema, type SupplierFormData, type Supplier } from '../types/supplierTypes';
-import { logger } from '@/lib/logging';
-import { toaster } from '@/shared/ui/toaster';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { useSupplierForm } from '../hooks/useSupplierForm';
+import type { Supplier } from '../types/supplierTypes';
 
 interface SupplierFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: SupplierFormData) => Promise<void>;
   supplier?: Supplier | null;
 }
 
-export function SupplierFormModal({ isOpen, onClose, onSubmit, supplier }: SupplierFormModalProps) {
-  const isEditing = !!supplier;
-
+export function SupplierFormModal({ isOpen, onClose, supplier }: SupplierFormModalProps) {
   const {
-    register,
+    formData,
+    handleFieldChange,
+    fieldErrors,
+    fieldWarnings,
+    validationState,
+    isSubmitting,
+    modalTitle,
+    submitButtonContent,
+    operationProgress,
+    formStatusBadge,
     handleSubmit,
-    reset,
-    formState: { errors, isSubmitting }
-  } = useForm<SupplierFormData>({
-    resolver: zodResolver(SupplierSchema),
-    defaultValues: supplier || {
-      name: '',
-      contact_person: '',
-      email: '',
-      phone: '',
-      address: '',
-      tax_id: '',
-      payment_terms: '30 días',
-      rating: undefined,
-      notes: '',
-      is_active: true
-    }
-  });
-
-  // Reset form when supplier changes
-  useEffect(() => {
-    if (supplier) {
-      reset({
-        name: supplier.name,
-        contact_person: supplier.contact_person || '',
-        email: supplier.email || '',
-        phone: supplier.phone || '',
-        address: supplier.address || '',
-        tax_id: supplier.tax_id || '',
-        payment_terms: supplier.payment_terms || '30 días',
-        rating: supplier.rating || undefined,
-        notes: supplier.notes || '',
-        is_active: supplier.is_active
-      });
-    } else {
-      reset({
-        name: '',
-        contact_person: '',
-        email: '',
-        phone: '',
-        address: '',
-        tax_id: '',
-        payment_terms: '30 días',
-        rating: undefined,
-        notes: '',
-        is_active: true
-      });
-    }
-  }, [supplier, reset]);
-
-  const handleFormSubmit = async (data: SupplierFormData) => {
-    try {
-      await onSubmit(data);
-
-      toaster.create({
-        title: isEditing ? 'Proveedor actualizado' : 'Proveedor creado',
-        description: `${data.name} ${isEditing ? 'actualizado' : 'creado'} exitosamente`,
-        type: 'success',
-        duration: 3000
-      });
-
-      onClose();
-    } catch (error) {
-      logger.error('SupplierFormModal', 'Error submitting form', error);
-
-      toaster.create({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Error al guardar proveedor',
-        type: 'error',
-        duration: 5000
-      });
-    }
-  };
+    onClose: closeModal
+  } = useSupplierForm({ isOpen, onClose, supplier });
 
   return (
     <Dialog.Root
       open={isOpen}
-      onOpenChange={(details) => !details.open && onClose()}
-      size="lg"
+      onOpenChange={(details) => !details.open && !isSubmitting && closeModal()}
+      size={{ base: 'full', md: 'xl' }}
+      closeOnEscape={!isSubmitting}
     >
       <Dialog.Backdrop />
       <Dialog.Positioner>
-        <Dialog.Content>
+        <Dialog.Content
+          maxW={{ base: '100%', md: '800px' }}
+          maxH={{ base: '100vh', md: '90vh' }}
+          w="full"
+          overflowY="auto"
+          borderRadius={{ base: '0', md: 'lg' }}
+          m={{ base: '0', md: '4' }}
+        >
           <Dialog.CloseTrigger />
           <Dialog.Header>
-            <Dialog.Title>
-              {isEditing ? 'Editar Proveedor' : 'Nuevo Proveedor'}
-            </Dialog.Title>
+            <Dialog.Title>{modalTitle}</Dialog.Title>
           </Dialog.Header>
 
-          <Dialog.Body>
-          <form id="supplier-form" onSubmit={handleSubmit(handleFormSubmit)}>
-            <Stack direction="column" gap={4}>
+          <Dialog.Body p={{ base: '4', md: '6' }}>
+            <Stack gap={{ base: '4', md: '6' }} w="full">
+              {/* Validation Summary */}
+              {validationState.hasErrors && (
+                <Alert.Root status="error" variant="subtle">
+                  <Alert.Indicator>
+                    <ExclamationTriangleIcon style={{ width: '20px', height: '20px' }} />
+                  </Alert.Indicator>
+                  <Alert.Title>Errores de validación</Alert.Title>
+                  <Alert.Description>
+                    Por favor corrige {validationState.errorCount} error(es) antes de continuar
+                  </Alert.Description>
+                </Alert.Root>
+              )}
+
+              {validationState.hasWarnings && !validationState.hasErrors && (
+                <Alert.Root status="warning" variant="subtle">
+                  <Alert.Indicator>
+                    <ExclamationTriangleIcon style={{ width: '20px', height: '20px' }} />
+                  </Alert.Indicator>
+                  <Alert.Title>Advertencias</Alert.Title>
+                  <Alert.Description>
+                    Hay {validationState.warningCount} advertencia(s). Puedes continuar pero revisa los campos marcados.
+                  </Alert.Description>
+                </Alert.Root>
+              )}
+
+              {/* Form Status Badge */}
+              <Flex justify="space-between" align="center">
+                <Text fontSize="lg" fontWeight="bold">
+                  Información del Proveedor
+                </Text>
+                {formStatusBadge}
+              </Flex>
+
               {/* Basic Info */}
               <FormSection title="Información Básica">
-                <InputField
-                  label="Nombre *"
-                  error={errors.name?.message}
-                  {...register('name')}
-                  placeholder="Ej: Distribuidora Central"
-                />
+                <Box>
+                  <InputField
+                    label="Nombre *"
+                    value={formData.name}
+                    onChange={(e) => handleFieldChange('name')(e.target.value)}
+                    placeholder="Ej: Distribuidora Central"
+                    style={{
+                      borderColor: fieldErrors.name ? 'var(--colors-error)' :
+                                   fieldWarnings.name ? 'var(--colors-warning)' :
+                                   undefined
+                    }}
+                  />
+                  {fieldErrors.name && (
+                    <Text color="error" fontSize="sm" mt="1">
+                      ❌ {fieldErrors.name}
+                    </Text>
+                  )}
+                  {!fieldErrors.name && fieldWarnings.name && (
+                    <Text color="warning" fontSize="sm" mt="1">
+                      ⚠️ {fieldWarnings.name}
+                    </Text>
+                  )}
+                </Box>
 
-                <InputField
-                  label="Persona de Contacto"
-                  error={errors.contact_person?.message}
-                  {...register('contact_person')}
-                  placeholder="Ej: Juan Pérez"
-                />
+                <Box>
+                  <InputField
+                    label="Persona de Contacto"
+                    value={formData.contact_person}
+                    onChange={(e) => handleFieldChange('contact_person')(e.target.value)}
+                    placeholder="Ej: Juan Pérez"
+                    style={{
+                      borderColor: fieldWarnings.contact_person ? 'var(--colors-warning)' : undefined
+                    }}
+                  />
+                  {fieldWarnings.contact_person && (
+                    <Text color="warning" fontSize="sm" mt="1">
+                      ⚠️ {fieldWarnings.contact_person}
+                    </Text>
+                  )}
+                </Box>
               </FormSection>
 
               {/* Contact Info */}
               <FormSection title="Información de Contacto">
-                <InputField
-                  label="Email"
-                  type="email"
-                  error={errors.email?.message}
-                  {...register('email')}
-                  placeholder="proveedor@empresa.com"
-                />
+                <Box>
+                  <InputField
+                    label="Email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleFieldChange('email')(e.target.value)}
+                    placeholder="proveedor@empresa.com"
+                    style={{
+                      borderColor: fieldErrors.email ? 'var(--colors-error)' :
+                                   fieldWarnings.email ? 'var(--colors-warning)' :
+                                   undefined
+                    }}
+                  />
+                  {fieldErrors.email && (
+                    <Text color="error" fontSize="sm" mt="1">
+                      ❌ {fieldErrors.email}
+                    </Text>
+                  )}
+                  {!fieldErrors.email && fieldWarnings.email && (
+                    <Text color="warning" fontSize="sm" mt="1">
+                      ⚠️ {fieldWarnings.email}
+                    </Text>
+                  )}
+                </Box>
 
-                <InputField
-                  label="Teléfono"
-                  type="tel"
-                  error={errors.phone?.message}
-                  {...register('phone')}
-                  placeholder="+54 11 1234-5678"
-                />
+                <Box>
+                  <InputField
+                    label="Teléfono"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => handleFieldChange('phone')(e.target.value)}
+                    placeholder="+54 11 1234-5678"
+                    style={{
+                      borderColor: fieldWarnings.phone ? 'var(--colors-warning)' : undefined
+                    }}
+                  />
+                  {fieldWarnings.phone && (
+                    <Text color="warning" fontSize="sm" mt="1">
+                      ⚠️ {fieldWarnings.phone}
+                    </Text>
+                  )}
+                </Box>
 
-                <TextareaField
-                  label="Dirección"
-                  error={errors.address?.message}
-                  {...register('address')}
-                  placeholder="Dirección completa"
-                  rows={2}
-                />
+                <Box>
+                  <TextareaField
+                    label="Dirección"
+                    value={formData.address}
+                    onChange={(e) => handleFieldChange('address')(e.target.value)}
+                    placeholder="Dirección completa"
+                    rows={2}
+                  />
+                </Box>
               </FormSection>
 
               {/* Business Info */}
               <FormSection title="Información Comercial">
-                <InputField
-                  label="CUIT/CUIL"
-                  error={errors.tax_id?.message}
-                  {...register('tax_id')}
-                  placeholder="20-12345678-9"
-                />
+                <Box>
+                  <InputField
+                    label="CUIT/CUIL"
+                    value={formData.tax_id}
+                    onChange={(e) => handleFieldChange('tax_id')(e.target.value)}
+                    placeholder="20-12345678-9"
+                    style={{
+                      borderColor: fieldErrors.tax_id ? 'var(--colors-error)' :
+                                   fieldWarnings.tax_id ? 'var(--colors-warning)' :
+                                   undefined
+                    }}
+                  />
+                  {fieldErrors.tax_id && (
+                    <Text color="error" fontSize="sm" mt="1">
+                      ❌ {fieldErrors.tax_id}
+                    </Text>
+                  )}
+                  {!fieldErrors.tax_id && fieldWarnings.tax_id && (
+                    <Text color="warning" fontSize="sm" mt="1">
+                      ⚠️ {fieldWarnings.tax_id}
+                    </Text>
+                  )}
+                </Box>
 
-                <InputField
-                  label="Términos de Pago"
-                  error={errors.payment_terms?.message}
-                  {...register('payment_terms')}
-                  placeholder="30 días"
-                />
+                <Box>
+                  <InputField
+                    label="Términos de Pago"
+                    value={formData.payment_terms}
+                    onChange={(e) => handleFieldChange('payment_terms')(e.target.value)}
+                    placeholder="30 días"
+                    style={{
+                      borderColor: fieldWarnings.payment_terms ? 'var(--colors-warning)' : undefined
+                    }}
+                  />
+                  {fieldWarnings.payment_terms && (
+                    <Text color="warning" fontSize="sm" mt="1">
+                      ⚠️ {fieldWarnings.payment_terms}
+                    </Text>
+                  )}
+                </Box>
 
-                <InputField
-                  label="Rating (1-5)"
-                  type="number"
-                  error={errors.rating?.message}
-                  {...register('rating', { valueAsNumber: true })}
-                  min={1}
-                  max={5}
-                  step={0.1}
-                  placeholder="4.5"
-                />
+                <Box>
+                  <InputField
+                    label="Rating (1-5)"
+                    type="number"
+                    value={formData.rating ?? ''}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? null : parseFloat(e.target.value);
+                      handleFieldChange('rating')(value);
+                    }}
+                    min={1}
+                    max={5}
+                    step={0.1}
+                    placeholder="4.5"
+                    style={{
+                      borderColor: fieldErrors.rating ? 'var(--colors-error)' :
+                                   fieldWarnings.rating ? 'var(--colors-warning)' :
+                                   undefined
+                    }}
+                  />
+                  {fieldErrors.rating && (
+                    <Text color="error" fontSize="sm" mt="1">
+                      ❌ {fieldErrors.rating}
+                    </Text>
+                  )}
+                  {!fieldErrors.rating && fieldWarnings.rating && (
+                    <Text color="warning" fontSize="sm" mt="1">
+                      ⚠️ {fieldWarnings.rating}
+                    </Text>
+                  )}
+                </Box>
               </FormSection>
 
               {/* Notes */}
               <FormSection title="Notas">
                 <TextareaField
                   label="Observaciones"
-                  error={errors.notes?.message}
-                  {...register('notes')}
+                  value={formData.notes}
+                  onChange={(e) => handleFieldChange('notes')(e.target.value)}
                   placeholder="Notas adicionales..."
                   rows={3}
                 />
               </FormSection>
-            </Stack>
-          </form>
-        </Dialog.Body>
 
-        <Dialog.Footer>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Cancelar
-          </Button>
-          <Button
-            type="submit"
-            form="supplier-form"
-            colorPalette="blue"
-            loading={isSubmitting}
-          >
-            {isEditing ? 'Actualizar' : 'Crear'} Proveedor
-          </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
+              {/* Operation Progress */}
+              {operationProgress && (
+                <Box w="full" mt="4">
+                  <Stack gap="2">
+                    <Flex justify="space-between" align="center">
+                      <Text fontSize="sm" color="text.muted">
+                        {operationProgress.currentStep}
+                      </Text>
+                      <Text fontSize="sm" color="text.muted">
+                        {operationProgress.progress}%
+                      </Text>
+                    </Flex>
+                    <Progress.Root value={operationProgress.progress} size="sm" colorPalette="blue">
+                      <Progress.Track>
+                        <Progress.Range />
+                      </Progress.Track>
+                    </Progress.Root>
+                  </Stack>
+                </Box>
+              )}
+            </Stack>
+          </Dialog.Body>
+
+          <Dialog.Footer>
+            <Flex
+              gap="3"
+              pt="4"
+              justify={{ base: 'stretch', md: 'flex-end' }}
+              direction={{ base: 'column-reverse', md: 'row' }}
+              borderTop="1px solid"
+              borderColor="border"
+            >
+              <Button
+                variant="outline"
+                onClick={closeModal}
+                disabled={isSubmitting}
+                height="44px"
+                fontSize="md"
+                px="6"
+                w={{ base: 'full', md: 'auto' }}
+              >
+                Cancelar
+              </Button>
+
+              <Button
+                colorPalette={isSubmitting ? 'gray' : 'blue'}
+                onClick={handleSubmit}
+                disabled={validationState.hasErrors || isSubmitting}
+                height="44px"
+                fontSize="md"
+                px="6"
+                w={{ base: 'full', md: 'auto' }}
+              >
+                {submitButtonContent}
+              </Button>
+            </Flex>
+          </Dialog.Footer>
+        </Dialog.Content>
       </Dialog.Positioner>
     </Dialog.Root>
   );

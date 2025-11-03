@@ -151,7 +151,7 @@ export default function GalaxiaHabilidadesPage() {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <VStack gap={8} py={20}>
+        <VStack gap="8" py="20">
           <Spinner size="xl" colorPalette="blue" />
           <Text color="gray.400" fontSize="lg">
             Cargando tu galaxia de habilidades...
@@ -162,7 +162,7 @@ export default function GalaxiaHabilidadesPage() {
 
     if (error) {
       return (
-        <VStack gap={6} py={20}>
+        <VStack gap="6" py="20">
           <Alert status="error">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -182,7 +182,7 @@ export default function GalaxiaHabilidadesPage() {
         >
         {/* Header de la Galaxia */}
         <m.div variants={itemVariants}>
-          <VStack gap={6} textAlign="center" mb={12}>
+          <VStack gap="6" textAlign="center" mb="12">
             
             <m.div
               animate={{
@@ -203,7 +203,7 @@ export default function GalaxiaHabilidadesPage() {
                 fontWeight="bold" 
                 color="white"
                 textAlign="center"
-                mb={4}
+                mb="4"
                 bgGradient="linear(to-r, white, cyan.200, white)"
                 bgClip="text"
               >
@@ -226,11 +226,11 @@ export default function GalaxiaHabilidadesPage() {
 
         {/* Estadísticas dinámicas */}
         <m.div variants={itemVariants}>
-          <Grid templateColumns={{ base: "1fr", md: "repeat(4, 1fr)" }} gap={6} mb={12}>
+          <Grid templateColumns={{ base: "1fr", md: "repeat(4, 1fr)" }} gap="6" mb="12">
             {/* Total Achievements */}
             <m.div variants={statsCardVariants} whileHover="hover">
               <Box
-                p={6}
+                p="6"
                 bg={cardBg} 
                 borderRadius="xl"
                 border="2px solid"
@@ -254,7 +254,7 @@ export default function GalaxiaHabilidadesPage() {
                 }}
               >
                 <Stat.Root>
-                  <VStack gap={2}>
+                  <VStack gap="2">
                     <Icon as={StarIcon} boxSize={8} color="blue.400" />
                     <Stat.ValueText color="white" fontSize="2xl" fontWeight="bold">
                       {stats.total.allAchievements}
@@ -270,7 +270,7 @@ export default function GalaxiaHabilidadesPage() {
             {/* Unlocked Achievements */}
             <m.div variants={statsCardVariants} whileHover="hover">
               <Box
-                p={6}
+                p="6"
                 bg={cardBg} 
                 borderRadius="xl"
                 border="2px solid"
@@ -280,7 +280,7 @@ export default function GalaxiaHabilidadesPage() {
                 bgGradient="linear(135deg, rgba(255, 193, 7, 0.1), transparent, rgba(255, 152, 0, 0.1))"
               >
                 <Stat.Root>
-                  <VStack gap={2}>
+                  <VStack gap="2">
                     <Icon as={TrophyIcon} boxSize={8} color="yellow.400" />
                     <Stat.ValueText color="white" fontSize="2xl" fontWeight="bold">
                       {stats.total.unlockedAchievements}
@@ -296,7 +296,7 @@ export default function GalaxiaHabilidadesPage() {
             {/* Completion Percentage */}
             <m.div variants={statsCardVariants} whileHover="hover">
               <Box
-                p={6}
+                p="6"
                 bg={cardBg} 
                 borderRadius="xl"
                 border="2px solid"
@@ -306,7 +306,7 @@ export default function GalaxiaHabilidadesPage() {
                 bgGradient="linear(135deg, rgba(34, 197, 94, 0.1), transparent, rgba(21, 128, 61, 0.1))"
               >
                 <Stat.Root>
-                  <VStack gap={2}>
+                  <VStack gap="2">
                     <Icon as={TargetIcon} boxSize={8} color="green.400" />
                     <Stat.ValueText color="white" fontSize="2xl" fontWeight="bold">
                       {stats.total.completionPercentage}%
@@ -322,7 +322,7 @@ export default function GalaxiaHabilidadesPage() {
             {/* Active Domains/Capabilities */}
             <m.div variants={statsCardVariants} whileHover="hover">
               <Box
-                p={6}
+                p="6"
                 bg={cardBg} 
                 borderRadius="xl"
                 border="2px solid"
@@ -332,7 +332,7 @@ export default function GalaxiaHabilidadesPage() {
                 bgGradient="linear(135deg, rgba(168, 85, 247, 0.1), transparent, rgba(147, 51, 234, 0.1))"
               >
                 <Stat.Root>
-                  <VStack gap={2}>
+                  <VStack gap="2">
                     <Badge size="lg" colorPalette="purple" variant="solid">
                       {state.achievementMode === 'foundational' 
                         ? (stats.modeSpecific?.completedMilestones || 0)
@@ -359,8 +359,8 @@ export default function GalaxiaHabilidadesPage() {
         </m.div>
 
         {/* Navegación entre tipos de logros */}
-        <HStack justify="space-between" wrap="wrap" gap={6} mb={8}>
-          <HStack gap={3}>
+        <HStack justify="space-between" wrap="wrap" gap="6" mb="8">
+          <HStack gap="3">
             <Text fontSize="lg" color="gray.300" fontWeight="medium">
               🌌 Explora tu Galaxia de Habilidades:
             </Text>
@@ -384,7 +384,7 @@ export default function GalaxiaHabilidadesPage() {
             </Button>
           </HStack>
           
-          <HStack gap={3}>
+          <HStack gap="3">
             <Button
               variant="ghost"
               size="lg"
@@ -396,7 +396,7 @@ export default function GalaxiaHabilidadesPage() {
             
             {/* Selector de vista solo para mastery */}
             {state.achievementMode === 'mastery' && (
-              <HStack gap={2}>
+              <HStack gap="2">
                 <Text fontSize="sm" color="gray.400">Vista:</Text>
                 <Button
                   variant={state.viewMode === 'galaxy' ? 'solid' : 'outline'}
@@ -420,7 +420,7 @@ export default function GalaxiaHabilidadesPage() {
         </HStack>
 
         {/* Contenido principal - Visualización que cambia según el modo */}
-        <VStack gap={8} align="stretch">
+        <VStack gap="8" align="stretch">
           <Box textAlign="center" position="relative">
             {/* Efecto de nebulosa de fondo */}
             <Box
@@ -439,7 +439,7 @@ export default function GalaxiaHabilidadesPage() {
               zIndex={0}
             />
             
-            <VStack gap={3} position="relative" zIndex={1}>
+            <VStack gap="3" position="relative" zIndex={1}>
               <Text 
                 fontSize="3xl" 
                 fontWeight="bold" 
@@ -462,7 +462,7 @@ export default function GalaxiaHabilidadesPage() {
           
           {/* Botones de toggle de vista - Solo en modo mastery */}
           {state.achievementMode === 'mastery' && (
-            <HStack justify="center" gap={4}>
+            <HStack justify="center" gap="4">
               <Button
                 onClick={() => setViewMode('galaxy')}
                 variant={state.viewMode === 'galaxy' ? 'solid' : 'outline'}
@@ -570,8 +570,8 @@ export default function GalaxiaHabilidadesPage() {
         />
       )}
       
-      <Container maxW="8xl" position="relative" zIndex={2} py={8}>
-        <VStack gap={8} align="stretch">
+      <Container maxW="8xl" position="relative" zIndex={2} py="8">
+        <VStack gap="8" align="stretch">
           {renderContent()}
         </VStack>
       </Container>

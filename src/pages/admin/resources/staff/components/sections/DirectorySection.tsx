@@ -106,10 +106,10 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
   // Loading state
   if (loading) {
     return (
-      <VStack gap="4" py="8">
+      <Stack direction="column" gap="4" py="8">
         <Spinner size="lg" />
         <Text>Cargando empleados...</Text>
-      </VStack>
+      </Stack>
     );
   }
 
@@ -127,14 +127,14 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
   // Empty state
   if (staff.length === 0) {
     return (
-      <VStack gap="6" py="12" textAlign="center">
+      <Stack direction="column" gap="6" py="12" textAlign="center">
         <Box p="4" bg="gray.100" borderRadius="full">
           <Icon icon={PlusIcon} size="xl" color="gray.400" />
         </Box>
-        <VStack gap="2">
+        <Stack direction="column" gap="2">
           <Text fontSize="lg" fontWeight="semibold">No hay empleados registrados</Text>
           <Text color="gray.600">Comienza agregando tu primer empleado</Text>
-        </VStack>
+        </Stack>
         <Button 
           colorPalette="blue"
           onClick={() => setShowEmployeeForm(true)}
@@ -142,15 +142,15 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
           <Icon icon={PlusIcon} size="sm" />
           Agregar Empleado
         </Button>
-      </VStack>
+      </Stack>
     );
   }
 
   return (
-    <VStack gap="6" align="stretch">
+    <Stack direction="column" gap="6" align="stretch">
       {/* Search and Filters Bar */}
-      <VStack gap="4" align="stretch">
-        <HStack gap="4" flexWrap="wrap">
+      <Stack direction="column" gap="4" align="stretch">
+        <Stack direction="row" gap="4" flexWrap="wrap">
           <Box flex="1" minW="300px">
             <InputField
               placeholder="Buscar por nombre, email o posición..."
@@ -178,7 +178,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
           >
             <Icon icon={ListBulletIcon} size="sm" />
           </Icon>
-        </HStack>
+        </Stack>
 
         {/* Advanced Filters */}
         {showFilters && (
@@ -216,7 +216,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                 </Box>
                 <Box>
                   <Text fontSize="sm" fontWeight="medium" mb="2">Acciones</Text>
-                  <HStack gap="2">
+                  <Stack direction="row" gap="2">
                     <Button size="sm" variant="outline" onClick={() => {
                       setSearchTerm('');
                       setSelectedDepartment('all');
@@ -224,13 +224,13 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                     }}>
                       Limpiar
                     </Button>
-                  </HStack>
+                  </Stack>
                 </Box>
               </SimpleGrid>
             </CardWrapper.Body>
           </CardWrapper>
         )}
-      </VStack>
+      </Stack>
 
       {/* Results Summary */}
       <Text fontSize="sm" color="gray.600">
@@ -243,56 +243,56 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
           {staff.map((employee) => (
             <CardWrapper key={employee.id} variant="elevated" padding="md">
               <CardWrapper.Body>
-                <VStack gap="4" align="stretch">
+                <Stack direction="column" gap="4" align="stretch">
                   {/* Employee Header */}
-                  <HStack gap="3">
+                  <Stack direction="row" gap="3">
                     <Avatar
                       name={employee.name}
                       src={employee.avatar}
                       size="md"
                     />
-                    <VStack align="start" gap="1" flex="1">
+                    <Stack direction="column" align="start" gap="1" flex="1">
                       <Text fontWeight="semibold" fontSize="md">{employee.name}</Text>
                       <Text fontSize="sm" color="gray.600">{employee.position}</Text>
-                    </VStack>
-                  </HStack>
+                    </Stack>
+                  </Stack>
 
                   {/* Employee Info */}
-                  <VStack gap="2" align="stretch">
-                    <HStack gap="2">
+                  <Stack direction="column" gap="2" align="stretch">
+                    <Stack direction="row" gap="2">
                       <Badge colorPalette={getDepartmentColor(employee.department)} size="sm">
                         {formatDepartment(employee.department)}
                       </Badge>
                       <Badge colorPalette={getStatusColor(employee.status)} size="sm">
                         {formatStatus(employee.status)}
                       </Badge>
-                    </HStack>
+                    </Stack>
 
-                    <HStack gap="2" fontSize="sm" color="gray.600">
+                    <Stack direction="row" gap="2" fontSize="sm" color="gray.600">
                       <Icon icon={EnvelopeIcon} size="sm" />
                       <Text>{employee.email}</Text>
-                    </HStack>
+                    </Stack>
 
                     {employee.phone && (
-                      <HStack gap="2" fontSize="sm" color="gray.600">
+                      <Stack direction="row" gap="2" fontSize="sm" color="gray.600">
                         <Icon icon={PhoneIcon} size="sm" />
                         <Text>{employee.phone}</Text>
-                      </HStack>
+                      </Stack>
                     )}
 
-                    <HStack gap="2" fontSize="sm" color="gray.600">
+                    <Stack direction="row" gap="2" fontSize="sm" color="gray.600">
                       <Icon icon={ClockIcon} size="sm" />
                       <Text>Desde {new Date(employee.hire_date).toLocaleDateString()}</Text>
-                    </HStack>
-                  </VStack>
+                    </Stack>
+                  </Stack>
 
                   {/* Performance Indicator */}
-                  <HStack gap="2" justify="space-between" align="center">
-                    <VStack align="start" gap="0">
+                  <Stack direction="row" gap="2" justify="space-between" align="center">
+                    <Stack direction="column" align="start" gap="0">
                       <Text fontSize="xs" color="gray.500">Rendimiento</Text>
                       <Text fontSize="sm" fontWeight="medium">{employee.performance_score}%</Text>
-                    </VStack>
-                    <HStack gap="1">
+                    </Stack>
+                    <Stack direction="row" gap="1">
                       <Icon 
                         size="sm" 
                         variant="ghost"
@@ -312,29 +312,29 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                       >
                         <Icon icon={PencilIcon} size="sm" />
                       </Icon>
-                    </HStack>
-                  </HStack>
-                </VStack>
+                    </Stack>
+                  </Stack>
+                </Stack>
               </CardWrapper.Body>
             </CardWrapper>
           ))}
         </SimpleGrid>
       ) : (
         /* List View */
-        <VStack gap="2" align="stretch">
+        <Stack direction="column" gap="2" align="stretch">
           {staff.map((employee) => (
             <CardWrapper key={employee.id} variant="flat" padding="md">
               <CardWrapper.Body>
-                <HStack gap="4" align="center">
+                <Stack direction="row" gap="4" align="center">
                   <Avatar
                     name={employee.name}
                     src={employee.avatar}
                     size="sm"
                   />
-                  <VStack align="start" gap="0" flex="1">
+                  <Stack direction="column" align="start" gap="0" flex="1">
                     <Text fontWeight="medium">{employee.name}</Text>
                     <Text fontSize="sm" color="gray.600">{employee.position}</Text>
-                  </VStack>
+                  </Stack>
                   <Badge colorPalette={getDepartmentColor(employee.department)} size="sm">
                     {formatDepartment(employee.department)}
                   </Badge>
@@ -344,7 +344,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                   <Text fontSize="sm" color="gray.600" minW="100px">
                     {employee.performance_score}% rendimiento
                   </Text>
-                  <HStack gap="1">
+                  <Stack direction="row" gap="1">
                     <Icon 
                       size="sm" 
                       variant="ghost"
@@ -364,12 +364,12 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
                     >
                       <Icon icon={PencilIcon} size="sm" />
                     </Icon>
-                  </HStack>
-                </HStack>
+                  </Stack>
+                </Stack>
               </CardWrapper.Body>
             </CardWrapper>
           ))}
-        </VStack>
+        </Stack>
       )}
 
       {/* Employee Form Modal */}
@@ -385,6 +385,6 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
           setEditingEmployee(undefined);
         }}
       />
-    </VStack>
+    </Stack>
   );
 }

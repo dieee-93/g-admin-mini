@@ -1,4 +1,4 @@
-import { Box, Stack, Text } from '@chakra-ui/react';
+import { Box, Stack, Text } from '@/shared/ui';
 import { SelectField } from '@/shared/ui';
 import { type ItemType } from '../../../types';
 import { ITEM_TYPE_COLLECTION } from '../constants';

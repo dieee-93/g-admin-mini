@@ -36,7 +36,11 @@ export interface Employee {
   
   // Scheduling Data
   availability?: EmployeeAvailability;
-  
+
+  // Location Data (Multi-Location Support)
+  home_location_id?: string; // Primary location where employee works
+  can_work_multiple_locations: boolean; // Can be scheduled at any location
+
   // Sensitive Data (masked in UI)
   salary?: number; // Only visible to HR/Admin
   hourly_rate?: number; // Only visible to HR/Admin
@@ -137,6 +141,7 @@ export interface StaffFilters {
   employment_status?: Employee['employment_status'];
   employment_type?: Employee['employment_type'];
   role?: Employee['role'];
+  location_id?: string; // Filter by home location
   search?: string;
 }
 
@@ -240,4 +245,39 @@ export interface EmployeeFormData {
   role: Employee['role'];
   hourly_rate?: number;
   permissions: string[];
+  salary?: number;
+  notes?: string;
+  skills?: string[];
+  home_location_id?: string; // Primary work location
+  can_work_multiple_locations?: boolean; // Multi-location capability
+}
+
+// Labor Cost Analysis Types
+export interface DepartmentCostAnalysis {
+  department: string;
+  avg_hourly_cost: number;
+  total_hours: number;
+  total_cost: number;
+  efficiency_score: number;
+  employee_count: number;
+}
+
+// Performance Dashboard Types
+export interface TopPerformer {
+  id: string;
+  name: string;
+  avatar_url?: string;
+  position: string;
+  department: string;
+  performance_score: number;
+  trend: 'up' | 'down' | 'stable';
+}
+
+export interface PerformanceAlert {
+  id: string;
+  type: 'low_performance' | 'absence' | 'training_due' | 'review_due';
+  severity: 'low' | 'medium' | 'high';
+  message: string;
+  employee_id?: string;
+  employee_name?: string;
 }

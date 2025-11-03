@@ -1,386 +1,364 @@
 /**
- * Galaxia de Habilidades - Versión Simplificada
- * 
- * Componente básico que funciona sin dependencias complejas
- * para recuperar la funcionalidad previa a la migración
+ * REQUIREMENTS & ACHIEVEMENTS PAGE
+ *
+ * Página dedicada para visualizar y completar requirements del sistema.
+ * Integrada con Module Registry y Achievements System.
+ *
+ * CARACTERÍSTICAS:
+ * - Vista de progreso por capability
+ * - Checklist de requirements MANDATORY
+ * - Enlaces directos a configuración
+ * - Filtros por capability
+ *
+ * @version 1.0.0 - Integration with Achievements System
  */
 
-import React, { useState } from 'react';
-import { LazyMotion, domAnimation, m } from 'framer-motion';
-import { 
-  Progress, ButtonGroup, IconButton, Badge, Box, Container, VStack, HStack, Grid, Heading,
-  Text
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  StarIcon,
-  TrophyIcon,
-  CheckCircleIcon as TargetIcon,
-  BoltIcon,
-  ArrowPathIcon
-} from '@heroicons/react/24/outline';
+  ContentLayout,
+  Section,
+  Box,
+  VStack,
+  HStack,
+  Heading,
+  Text,
+  Button,
+  Badge,
+  Stack,
+  SkipLink
+} from '@/shared/ui';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { Icon } from '@/shared/ui/Icon';
+import { useCapabilities } from '@/lib/capabilities';
+import { useValidationContext } from '@/hooks/useValidationContext';
+import { ModuleRegistry } from '@/lib/modules';
+import type { CapabilityProgress, Requirement } from '@/modules/achievements/types';
+import type { BusinessCapabilityId } from '@/config/types';
 
-// Mock data simple para testing
-const mockAchievements = [
-  {
-    id: '1',
-    title: 'Primer Login',
-    description: 'Realiza tu primer acceso al sistema',
-    category: 'onboarding',
-    points: 100,
-    unlocked: true,
-    progress: 100
-  },
-  {
-    id: '2',
-    title: 'Explorador de Módulos',
-    description: 'Visita 3 módulos diferentes',
-    category: 'exploration',
-    points: 200,
-    unlocked: false,
-    progress: 66
-  },
-  {
-    id: '3',
-    title: 'Maestro de Datos',
-    description: 'Completa 10 registros',
-    category: 'data',
-    points: 300,
-    unlocked: false,
-    progress: 30
-  },
-  {
-    id: '4',
-    title: 'Analista Avanzado',
-    description: 'Genera tu primer reporte',
-    category: 'analytics',
-    points: 250,
-    unlocked: false,
-    progress: 0
-  },
-  {
-    id: '5',
-    title: 'Colaborador Estrella',
-    description: 'Invita a 5 usuarios al equipo',
-    category: 'collaboration',
-    points: 500,
-    unlocked: false,
-    progress: 20
-  },
-  {
-    id: '6',
-    title: 'Configurador Pro',
-    description: 'Personaliza 5 configuraciones',
-    category: 'customization',
-    points: 350,
-    unlocked: false,
-    progress: 80
-  }
-];
+/**
+ * Capability Names Mapping
+ */
+const CAPABILITY_NAMES: Record<BusinessCapabilityId, string> = {
+  onsite_service: 'Dine-In (Servicio en Mesas)',
+  pickup_counter: 'TakeAway (Para Llevar)',
+  online_store: 'E-commerce (Tienda Online)',
+  delivery_shipping: 'Delivery (Envíos a Domicilio)',
+  corporate_sales: 'B2B (Ventas Corporativas)',
+  manufacturing: 'Producción Industrial',
+  rental_service: 'Alquiler de Equipos',
+  membership_service: 'Membresías y Suscripciones',
+  event_hosting: 'Organización de Eventos',
+  consultation_service: 'Servicios de Consultoría'
+};
 
-const SimpleCosmicBackground: React.FC = () => {
-  const stars = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    left: Math.random() * 100,
-    top: Math.random() * 100,
-    size: Math.random() * 2 + 1,
-    color: i % 3 === 0 ? '#60A5FA' : i % 3 === 1 ? '#A78BFA' : '#F472B6'
-  }));
+/**
+ * Main Page Component
+ */
+export default function RequirementsAchievementsPage() {
+  const { activeCapabilities } = useCapabilities();
+  const context = useValidationContext();
+  const registry = useMemo(() => ModuleRegistry.getInstance(), []);
+  const navigate = useNavigate();
+
+  // Filter state
+  const [selectedCapability, setSelectedCapability] = useState<BusinessCapabilityId | 'all'>('all');
+
+  // Get progress for all active capabilities
+  const capabilitiesProgress: CapabilityProgress[] = useMemo(() => {
+    if (activeCapabilities.length === 0) {
+      return [];
+    }
+
+    return activeCapabilities
+      .map((capability) => {
+        const results = registry.doAction('achievements.get_progress', {
+          capability,
+          context,
+        });
+        return results[0] as CapabilityProgress;
+      })
+      .filter(Boolean);
+  }, [activeCapabilities.length, registry]);
+
+  // Calculate global progress
+  const globalProgress = useMemo(() => {
+    const total = capabilitiesProgress.reduce((sum, cp) => sum + cp.total, 0);
+    const completed = capabilitiesProgress.reduce((sum, cp) => sum + cp.completed, 0);
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    return { total, completed, percentage };
+  }, [capabilitiesProgress]);
+
+  // Filter progress by selected capability
+  const filteredProgress = useMemo(() => {
+    if (selectedCapability === 'all') {
+      return capabilitiesProgress;
+    }
+    return capabilitiesProgress.filter(cp => cp.capability === selectedCapability);
+  }, [capabilitiesProgress, selectedCapability]);
 
   return (
     <>
-      {/* Gradiente base del espacio */}
-      <Box
-        position="fixed"
-        top={0}
-        left={0}
-        width="100vw"
-        height="100vh"
-        bgGradient="radial(circle at 30% 80%, purple.800, transparent 60%), radial(circle at 70% 20%, blue.800, transparent 60%), linear(to-br, gray.900, purple.900, blue.900)"
-        zIndex={-3}
-      />
+      <SkipLink />
 
-      {/* Estrellas simples */}
-      <Box
-        position="fixed"
-        top={0}
-        left={0}
-        width="100vw"
-        height="100vh"
-        zIndex={-2}
-      >
-        {stars.map((star) => (
-          <Box
-            key={star.id}
-            position="absolute"
-            left={`${star.left}%`}
-            top={`${star.top}%`}
-            width={`${star.size}px`}
-            height={`${star.size}px`}
-            backgroundColor={star.color}
-            borderRadius="50%"
-            boxShadow={`0 0 ${star.size * 4}px ${star.color}`}
-            opacity={0.8}
-            css={{
-              animation: `twinkle ${2 + Math.random() * 3}s ease-in-out infinite alternate`,
-              '@keyframes twinkle': {
-                '0%': { opacity: 0.3 },
-                '100%': { opacity: 1 }
-              }
-            }}
-          />
-        ))}
-      </Box>
-    </>
-  );
-};
+      <ContentLayout spacing="normal" mainLabel="Requirements & Achievements">
+        {/* HEADER */}
+        <Section
+          variant="flat"
+          title="Configuración del Sistema"
+          subtitle="Completa estos pasos para comenzar a operar comercialmente"
+          semanticHeading="Requirements and Business Setup Progress"
+        />
 
-export default function GalaxiaHabilidadesPageSimple() {
-  const [viewMode, setViewMode] = useState<'grid' | 'galaxy'>('grid');
-  
-  const achievements = mockAchievements;
-  const totalAchievements = achievements.length;
-  const completedAchievements = achievements.filter(a => a.unlocked).length;
-  const totalPoints = achievements.filter(a => a.unlocked).reduce((sum, a) => sum + a.points, 0);
-  const inProgressCount = achievements.filter(a => !a.unlocked && a.progress > 0).length;
+        {/* GLOBAL PROGRESS */}
+        <Section variant="elevated">
+          <VStack align="start" gap="4" w="full">
+            <HStack justify="space-between" w="full">
+              <Heading size="md">Progreso Global</Heading>
+              <Badge
+                colorPalette={globalProgress.percentage === 100 ? 'green' : 'orange'}
+                size="lg"
+              >
+                {globalProgress.completed} / {globalProgress.total} completados
+              </Badge>
+            </HStack>
 
-  const handleViewModeSwitch = (mode: 'grid' | 'galaxy') => {
-    setViewMode(mode);
-  };
-
-  return (
-    <LazyMotion features={domAnimation}>
-      <Box 
-        position="relative" 
-        minHeight="100vh" 
-        bg="rgba(15, 23, 42, 0.9)"
-        overflow="hidden"
-      >
-        <SimpleCosmicBackground />
-        
-        <Container maxW="7xl" py={8} position="relative" zIndex={3}>
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            {/* Header */}
-            <Box
-              bg="linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)"
-              backdropFilter="blur(12px)"
-              border="1px solid rgba(255, 255, 255, 0.1)"
-              borderRadius="20px"
-              p={6}
-              mb={8}
-              boxShadow="0 8px 32px rgba(0, 0, 0, 0.3)"
-            >
-              <VStack gap={4}>
-                <HStack gap={3}>
-                  <StarIcon width={32} height={32} color="rgb(196 181 253)" />
-                  <Heading 
-                    size="xl" 
-                    bgGradient="linear(to-r, purple.400, pink.400)"
-                    bgClip="text"
-                    fontWeight="bold"
-                  >
-                    🌌 Galaxia de Habilidades
-                  </Heading>
-                </HStack>
-                <Typography variant="body" size="lg" color="gray.300" textAlign="center">
-                  Explora tu universo de logros empresariales. Cada habilidad desbloqueada es una estrella en tu constelación del éxito.
-                </Typography>
-                
-                <ButtonGroup size="md" colorScheme="purple" variant="outline">
-                  <IconButton
-                    aria-label="Vista Galaxia"
-                    onClick={() => handleViewModeSwitch('galaxy')}
-                    colorPalette={viewMode === 'galaxy' ? 'purple' : 'gray'}
-                    bg={viewMode === 'galaxy' ? 'purple.600' : 'transparent'}
-                    _hover={{ bg: 'purple.500', transform: 'scale(1.05)' }}
-                    transition="all 0.2s"
-                  >
-                    <BoltIcon width={20} height={20} />
-                  </IconButton>
-                  <IconButton
-                    aria-label="Vista Cuadrícula"
-                    onClick={() => handleViewModeSwitch('grid')}
-                    colorPalette={viewMode === 'grid' ? 'purple' : 'gray'}
-                    bg={viewMode === 'grid' ? 'purple.600' : 'transparent'}
-                    _hover={{ bg: 'purple.500', transform: 'scale(1.05)' }}
-                    transition="all 0.2s"
-                  >
-                    <ArrowPathIcon width={20} height={20} />
-                  </IconButton>
-                </ButtonGroup>
-              </VStack>
+            {/* Progress Bar */}
+            <Box w="full">
+              <Box
+                h="12px"
+                w="full"
+                bg="gray.200"
+                borderRadius="full"
+                overflow="hidden"
+                _dark={{ bg: 'gray.700' }}
+              >
+                <Box
+                  h="full"
+                  w={`${globalProgress.percentage}%`}
+                  bg={globalProgress.percentage === 100 ? 'green.500' : 'orange.500'}
+                  transition="width 0.5s"
+                />
+              </Box>
+              <Text fontSize="sm" color="gray.600" _dark={{ color: 'gray.400' }} mt={2}>
+                {globalProgress.percentage}% completado
+              </Text>
             </Box>
 
-            {/* Estadísticas */}
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(4, 1fr)' }} gap={6} mb={8}>
-              <CardWrapper
-                bg="linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%)"
-                backdropFilter="blur(12px)"
-                border="1px solid rgba(255, 255, 255, 0.1)"
+            {globalProgress.percentage === 100 && (
+              <Box
+                w="full"
+                p="4"
+                bg="green.50"
+                borderRadius="md"
+                border="2px solid"
+                borderColor="green.200"
+                _dark={{ bg: 'green.900/20', borderColor: 'green.700' }}
               >
-                <CardWrapper.Body p={6}>
-                  <VStack gap={2}>
-                    <HStack gap={3}>
-                      <TrophyIcon width={24} height={24} color="rgb(96 165 250)" />
-                      <Typography variant="body" fontSize="sm" color="gray.300" fontWeight="medium">
-                        Total Logros
-                      </Typography>
-                    </HStack>
-                    <Typography variant="body" fontSize="3xl" fontWeight="bold" color="white">
-                      {totalAchievements}
-                    </Typography>
-                    <Typography variant="body" fontSize="sm" color="blue.300">
-                      En toda la galaxia
-                    </Typography>
+                <HStack gap="2">
+                  <Text fontSize="2xl">✅</Text>
+                  <VStack align="start" gap="1">
+                    <Text fontSize="sm" fontWeight="bold" color="green.700" _dark={{ color: 'green.300' }}>
+                      ¡Configuración Completa!
+                    </Text>
+                    <Text fontSize="xs" color="green.600" _dark={{ color: 'green.400' }}>
+                      Tu negocio está listo para operar comercialmente
+                    </Text>
                   </VStack>
-                </CardWrapper.Body>
-              </CardWrapper>
-
-              <CardWrapper
-                bg="linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)"
-                backdropFilter="blur(12px)"
-                border="1px solid rgba(255, 255, 255, 0.1)"
+                </HStack>
+              </Box>
+            )}
+          </VStack>
+        </Section>
+mb="8"
+        {/* FILTERS */}
+        <Section variant="flat">
+          <VStack align="start" gap="3" w="full">
+            <Text fontSize="sm" fontWeight="medium" color="gray.700" _dark={{ color: 'gray.300' }}>
+              Filtrar por Capability:
+            </Text>
+            <HStack wrap="wrap" gap="2">
+              <Button
+                size="sm"
+                variant={selectedCapability === 'all' ? 'solid' : 'outline'}
+                colorPalette={selectedCapability === 'all' ? 'blue' : 'gray'}
+                onClick={() => setSelectedCapability('all')}
               >
-                <CardWrapper.Body p={6}>
-                  <VStack gap={2}>
-                    <HStack gap={3}>
-                      <TargetIcon width={24} height={24} color="rgb(74 222 128)" />
-                      <Typography variant="body" fontSize="sm" color="gray.300" fontWeight="medium">
-                        Completados
-                      </Typography>
-                    </HStack>
-                    <Typography variant="body" fontSize="3xl" fontWeight="bold" color="white">
-                      {completedAchievements}
-                    </Typography>
-                    <Typography variant="body" fontSize="sm" color="green.300">
-                      {Math.round((completedAchievements / totalAchievements) * 100)}% completo
-                    </Typography>
-                  </VStack>
-                </CardWrapper.Body>
-              </CardWrapper>
-
-              <CardWrapper
-                bg="linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%)"
-                backdropFilter="blur(12px)"
-                border="1px solid rgba(255, 255, 255, 0.1)"
-              >
-                <CardWrapper.Body p={6}>
-                  <VStack gap={2}>
-                    <HStack gap={3}>
-                      <BoltIcon width={24} height={24} color="rgb(250 204 21)" />
-                      <Typography variant="body" fontSize="sm" color="gray.300" fontWeight="medium">
-                        En Progreso
-                      </Typography>
-                    </HStack>
-                    <Typography variant="body" fontSize="3xl" fontWeight="bold" color="white">
-                      {inProgressCount}
-                    </Typography>
-                    <Typography variant="body" fontSize="sm" color="yellow.300">
-                      Activos ahora
-                    </Typography>
-                  </VStack>
-                </CardWrapper.Body>
-              </CardWrapper>
-
-              <CardWrapper
-                bg="linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%)"
-                backdropFilter="blur(12px)"
-                border="1px solid rgba(255, 255, 255, 0.1)"
-              >
-                <CardWrapper.Body p={6}>
-                  <VStack gap={2}>
-                    <HStack gap={3}>
-                      <StarIcon width={24} height={24} color="rgb(196 181 253)" />
-                      <Typography variant="body" fontSize="sm" color="gray.300" fontWeight="medium">
-                        Puntos XP
-                      </Typography>
-                    </HStack>
-                    <Typography variant="body" fontSize="3xl" fontWeight="bold" color="white">
-                      {totalPoints.toLocaleString()}
-                    </Typography>
-                    <Typography variant="body" fontSize="sm" color="purple.300">
-                      Experiencia total
-                    </Typography>
-                  </VStack>
-                </CardWrapper.Body>
-              </CardWrapper>
-            </Grid>
-
-            {/* Lista de Logros */}
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={6}>
-              {achievements.map((achievement) => (
-                <m.div
-                  key={achievement.id}
-                  whileHover={{ scale: 1.02, y: -4 }}
-                  transition={{ duration: 0.2 }}
+                Todas ({capabilitiesProgress.length})
+              </Button>
+              {activeCapabilities.map(capability => (
+                <Button
+                  key={capability}
+                  size="sm"
+                  variant={selectedCapability === capability ? 'solid' : 'outline'}
+                  colorPalette={selectedCapability === capability ? 'blue' : 'gray'}
+                  onClick={() => setSelectedCapability(capability)}
                 >
-                  <CardWrapper
-                    bg={achievement.unlocked 
-                      ? "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)"
-                      : "linear-gradient(135deg, rgba(71, 85, 105, 0.1) 0%, rgba(100, 116, 139, 0.1) 100%)"
-                    }
-                    backdropFilter="blur(12px)"
-                    border="1px solid rgba(255, 255, 255, 0.1)"
-                    h="full"
-                  >
-                    <CardWrapper.Body p={6}>
-                      <VStack gap={4} align="start">
-                        <HStack justify="space-between" w="full">
-                          <Icon 
-                            as={achievement.unlocked ? TrophyIcon : StarIcon} 
-                            size="xl" 
-                            color={achievement.unlocked ? "green.400" : "gray.400"} 
-                          />
-                          <Badge
-                            colorScheme={achievement.unlocked ? "green" : "gray"}
-                            variant="subtle"
-                          >
-                            {achievement.points} XP
-                          </Badge>
-                        </HStack>
-                        
-                        <VStack gap={2} align="start" w="full">
-                          <Typography variant="body" 
-                            fontSize="lg" 
-                            fontWeight="bold" 
-                            color={achievement.unlocked ? "white" : "gray.300"}
-                          >
-                            {achievement.title}
-                          </Typography>
-                          <Typography variant="body" fontSize="sm" color="gray.400">
-                            {achievement.description}
-                          </Typography>
-                        </VStack>
-
-                        <Box w="full">
-                          <HStack justify="space-between" mb={2}>
-                            <Typography variant="body" fontSize="xs" color="gray.400">
-                              Progreso
-                            </Typography>
-                            <Typography variant="body" fontSize="xs" color="gray.400">
-                              {achievement.progress}%
-                            </Typography>
-                          </HStack>
-                          <Progress 
-                            value={achievement.progress} 
-                            colorScheme={achievement.unlocked ? "green" : "purple"}
-                            size="sm"
-                            borderRadius="full"
-                          />
-                        </Box>
-                      </VStack>
-                    </CardWrapper.Body>
-                  </CardWrapper>
-                </m.div>
+                  {CAPABILITY_NAMES[capability] || capability}
+                </Button>
               ))}
-            </Grid>
-          </m.div>
-        </Container>
-      </Box>
-    </LazyMotion>
+            </HStack>
+          </VStack>
+        </Section>
+
+        {/* CAPABILITIES LIST */}
+        <Section variant="flat">
+          <VStack gap="4" w="full">
+            {filteredProgress.length === 0 ? (
+              <Box p="8" textAlign="center">
+                <Text color="gray.600" _dark={{ color: 'gray.400' }}>
+                  No hay capabilities activas. Activa capabilities desde la configuración del negocio.
+                </Text>
+              </Box>
+            ) : (
+              filteredProgress.map(progress => (
+                <CapabilityCard
+                  key={progress.capability}
+                  progress={progress}
+                  onNavigate={navigate}mb="8"
+                />
+              ))
+            )}
+          </VStack>
+        </Section>
+      </ContentLayout>
+    </>
+  );
+}
+
+/**
+ * Capability Card Component
+ */
+interface CapabilityCardProps {
+  progress: CapabilityProgress;
+  onNavigate: (url: string) => void;
+}
+
+function CapabilityCard({ progress, onNavigate }: CapabilityCardProps) {
+  const { capability, total, completed, percentage, missing } = progress;
+  const isComplete = percentage === 100;
+
+  return (
+    <Box
+      w="full"
+      p="5"
+      bg={isComplete ? 'green.50' : 'white'}
+      borderRadius="lg"
+      border="2px solid"
+      borderColor={isComplete ? 'green.200' : 'gray.200'}
+      _dark={{
+        bg: isComplete ? 'green.900/20' : 'gray.800',
+        borderColor: isComplete ? 'green.700' : 'gray.700'
+      }}
+    >
+      <VStack align="start" gap="4" w="full">
+        {/* Header */}
+        <HStack justify="space-between" w="full">
+          <VStack align="start" gap="1">
+            <Text fontSize="lg" fontWeight="bold" color="gray.800" _dark={{ color: 'gray.200' }}>
+              {CAPABILITY_NAMES[capability] || capability}
+            </Text>
+            <Text fontSize="sm" color="gray.600" _dark={{ color: 'gray.400' }}>
+              {completed} de {total} configuraciones completadas
+            </Text>
+          </VStack>
+
+          <Badge
+            colorPalette={isComplete ? 'green' : 'orange'}
+            size="lg"
+          >
+            {isComplete ? '✓ Listo' : `${percentage}%`}
+          </Badge>
+        </HStack>
+
+        {/* Progress Bar */}
+        <Box w="full">
+          <Box
+            h="8px"
+            w="full"
+            bg="gray.200"
+            borderRadius="full"
+            overflow="hidden"
+            _dark={{ bg: 'gray.700' }}
+          >
+            <Box
+              h="full"
+              w={`${percentage}%`}
+              bg={isComplete ? 'green.500' : 'orange.500'}
+              transition="width 0.3s"
+            />
+          </Box>
+        </Box>
+
+        {/* Missing Requirements List */}
+        {!isComplete && missing && missing.length > 0 && (
+          <VStack align="start" gap="2" w="full">
+            <Text fontSize="sm" fontWeight="medium" color="gray.700" _dark={{ color: 'gray.300' }}>
+              Pasos Pendientes:
+            </Text>
+            {missing.map(req => (
+              <RequirementItem
+                key={req.id}
+                requirement={req}
+                onNavigate={onNavigate}
+              />
+            ))}
+          </VStack>
+        )}
+      </VStack>
+    </Box>
+  );
+}
+
+/**
+ * Requirement Item Component
+ */
+interface RequirementItemProps {
+  requirement: Requirement;
+  onNavigate: (url: string) => void;
+}
+
+function RequirementItem({ requirement, onNavigate }: RequirementItemProps) {
+  return (
+    <HStack
+      w="full"
+      p="3"
+      bg="white"
+      borderRadius="md"
+      border="1px solid"
+      borderColor="gray.200"
+      _dark={{ bg: 'gray.900', borderColor: 'gray.700' }}
+      justify="space-between"
+      _hover={{
+        borderColor: 'blue.300',
+        _dark: { borderColor: 'blue.600' }
+      }}
+      cursor="pointer"
+      onClick={() => requirement.redirectUrl && onNavigate(requirement.redirectUrl)}
+    >
+      <HStack gap="3">
+        <Text fontSize="xl">{requirement.icon}</Text>
+        <VStack align="start" gap="1">
+          <Text fontSize="sm" fontWeight="medium" color="gray.800" _dark={{ color: 'gray.200' }}>
+            {requirement.name}
+          </Text>
+          {requirement.description && (
+            <Text fontSize="xs" color="gray.600" _dark={{ color: 'gray.400' }}>
+              {requirement.description}
+            </Text>
+          )}
+          {requirement.estimatedMinutes && (
+            <Text fontSize="xs" color="gray.500" _dark={{ color: 'gray.500' }}>
+              ~{requirement.estimatedMinutes} minutos
+            </Text>
+          )}
+        </VStack>
+      </HStack>
+
+      {requirement.redirectUrl && (
+        <Icon icon={ChevronRightIcon} size="sm" color="gray.500" />
+      )}
+    </HStack>
   );
 }

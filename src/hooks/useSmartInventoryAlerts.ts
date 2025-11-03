@@ -1,330 +1,125 @@
-// ============================================================================
-// SMART INVENTORY ALERTS HOOK
-// ============================================================================
-// Hook para integrar alertas inteligentes de inventario con el sistema unificado
+/**
+ * USE SMART INVENTORY ALERTS HOOK
+ * ============================================================================
+ * Intelligent alert generation for inventory/materials management
+ * Analyzes stock levels, demand patterns, and generates actionable alerts
+ *
+ * Integration:
+ * - Uses unified alert system (@/shared/alerts)
+ * - Integrates with Materials store via SmartAlertsAdapter
+ * - EventBus integration for cross-module alerts
+ *
+ * @module hooks/useSmartInventoryAlerts
+ */
 
-import { useEffect, useCallback, useMemo } from 'react';
-import { useMaterials } from './useMaterials';
-import { useAlerts } from '@/shared/alerts/hooks/useAlerts';
-import { useAlertsContext } from '@/shared/alerts/AlertsProvider';
-import { ABCAnalysisEngine } from '@/pages/admin/supply-chain/materials/services/abcAnalysisEngine';
+import { useCallback, useEffect, useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { useAlerts } from '@/shared/alerts';
+import { useMaterialsStore } from '@/store/materialsStore';
 import { SmartAlertsAdapter } from '@/pages/admin/supply-chain/materials/services/smartAlertsAdapter';
-import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
-import type { Alert } from '@/shared/alerts/types';
+import { logger } from '@/lib/logging';
 
-interface UseSmartInventoryAlertsOptions {
-  // Configuración del análisis ABC
-  autoRefresh?: boolean;
-  refreshIntervalMs?: number;
-  
-  // Filtros de alertas
-  minValue?: number;
-  includeInactive?: boolean;
-  
-  // Configuración de alertas
-  enablePredictive?: boolean;
-  autoResolveOutdated?: boolean;
-}
+/**
+ * Hook for generating and managing smart inventory alerts
+ *
+ * @returns Object with alert generation methods and state
+ *
+ * @example
+ * ```typescript
+ * const { generateAndUpdateAlerts, isGenerating } = useSmartInventoryAlerts();
+ *
+ * useEffect(() => {
+ *   generateAndUpdateAlerts();
+ * }, [generateAndUpdateAlerts]);
+ * ```
+ */
+export function useSmartInventoryAlerts() {
+  const { actions } = useAlerts();
+  // 🔧 FIX: Usar useShallow para prevenir re-renders por cambio de referencia del array
+  const materials = useMaterialsStore(
+    useShallow(state => state.items)
+  );
 
-interface SmartInventoryAlertsReturn {
-  // Estados
-  materialsLoading: boolean;
-  alertsLoading: boolean;
-  isGeneratingAlerts: boolean;
-  
-  // Datos
-  materials: MaterialABC[];
-  activeAlerts: Alert[];
-  criticalAlerts: Alert[];
-  alertsCount: number;
-  
-  // Acciones
-  refreshAlerts: () => Promise<void>;
-  resolveOutdatedAlerts: () => Promise<void>;
-  generateAndUpdateAlerts: () => Promise<void>;
-  
-  // Analytics
-  analytics: {
-    totalItemsMonitored: number;
-    itemsWithAlerts: number;
-    alertsByClass: Record<'A' | 'B' | 'C', number>;
-    mostCriticalItems: Array<{
-      id: string;
-      name: string;
-      abcClass: 'A' | 'B' | 'C';
-      alertCount: number;
-      maxSeverity: string;
-    }>;
-  };
-  
-  // UI helpers
-  ui: {
-    badgeCount: number;
-    badgeColor: 'red' | 'orange' | 'yellow' | 'blue' | 'gray';
-    statusText: string;
-    shouldShowBadge: boolean;
+  // ✅ Circuit breaker: Prevent excessive alert generation
+  const lastGenerationRef = useRef<number>(0);
+  const MIN_GENERATION_INTERVAL = 3000; // 3 seconds minimum between generations
+
+  /**
+   * Generate and update inventory alerts based on current stock levels
+   *
+   * Features:
+   * - Low stock detection (below min_stock threshold)
+   * - Out of stock alerts (critical)
+   * - Overstock warnings
+   * - Slow-moving inventory detection
+   * - ABC analysis-based prioritization
+   */
+  const generateAndUpdateAlerts = useCallback(async () => {
+    try {
+      logger.debug('Materials', '[useSmartInventoryAlerts] Generating smart alerts...', {
+        timestamp: new Date().toISOString(),
+        materialCount: materials.length
+      });
+
+      // 1. Clear previous materials alerts to avoid duplicates
+      // ✅ FIX: Usar clearAll con filtro de context (API correcta)
+      await actions.clearAll({ context: 'materials' });
+
+      // 2. Generate alerts via SmartAlertsAdapter
+      // The adapter converts SmartAlert[] → CreateAlertInput[] (unified format)
+      const alerts = await SmartAlertsAdapter.generateMaterialsAlerts(materials);
+
+      // 3. Add alerts to unified system
+      // ✅ FIX: Usar actions.create en lugar de addAlert
+      for (const alert of alerts) {
+        await actions.create(alert);
+      }
+
+      logger.info('Materials', `Generated ${alerts.length} smart inventory alerts`, {
+        alertCount: alerts.length,
+        severities: alerts.reduce((acc, alert) => {
+          acc[alert.severity] = (acc[alert.severity] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      });
+
+    } catch (error) {
+      logger.error('Materials', 'Error generating smart inventory alerts:', error);
+    }
+  }, [materials, actions]);
+
+  // Auto-generate alerts when materials change
+  // ✅ FIX: Remove generateAndUpdateAlerts from deps to prevent circular dependency
+  // The function is stable because it's wrapped in useCallback with [materials, actions]
+  // ✅ Circuit Breaker: Rate limit to prevent infinite loops
+  useEffect(() => {
+    const now = Date.now();
+    const timeSinceLastGeneration = now - lastGenerationRef.current;
+
+    if (materials.length > 0 && timeSinceLastGeneration >= MIN_GENERATION_INTERVAL) {
+      lastGenerationRef.current = now;
+      generateAndUpdateAlerts();
+
+      logger.debug('Materials', '[useSmartInventoryAlerts] Alert generation allowed', {
+        timeSinceLastGeneration: `${timeSinceLastGeneration}ms`,
+        materialsCount: materials.length
+      });
+    } else if (materials.length > 0) {
+      logger.warn('Materials', '[useSmartInventoryAlerts] Alert generation throttled', {
+        timeSinceLastGeneration: `${timeSinceLastGeneration}ms`,
+        minInterval: `${MIN_GENERATION_INTERVAL}ms`,
+        message: 'Preventing excessive re-renders'
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [materials]);
+
+  return {
+    generateAndUpdateAlerts
   };
 }
 
 /**
- * Hook para manejo inteligente de alertas de inventario
- * Integra ABC Analysis con el sistema de alertas unificado
+ * Export default for backward compatibility
  */
-export function useSmartInventoryAlerts(
-  options: UseSmartInventoryAlertsOptions = {}
-): SmartInventoryAlertsReturn {
-  
-  const {
-    autoRefresh = true,
-    refreshIntervalMs = 300000, // 5 minutos
-    minValue = 100,
-    includeInactive = false,
-    enablePredictive = true,
-    autoResolveOutdated = true
-  } = options;
-
-  // Hooks dependencies
-  const { items: materialItems, loading: materialsLoading } = useMaterials();
-  const {
-    alerts: stockAlerts,
-    loading: alertsLoading,
-    actions: alertActions,
-    activeCount,
-    criticalCount,
-    ui: alertsUI
-  } = useAlerts({ context: 'materials' });
-  const alertsContext = useAlertsContext();
-
-  // State para controlar la generación de alertas
-  const [isGeneratingAlerts, setIsGeneratingAlerts] = React.useState(false);
-
-  // Generar materiales con clasificación ABC
-  const materials = useMemo<MaterialABC[]>(() => {
-    if (!materialItems || materialItems.length === 0) return [];
-    
-    try {
-      const analysisResult = ABCAnalysisEngine.analyzeInventory(materialItems, {
-        minValue,
-        includeInactive,
-        enablePredictiveAlerts: enablePredictive
-      });
-      
-      return [
-        ...analysisResult.classA,
-        ...analysisResult.classB, 
-        ...analysisResult.classC
-      ];
-    } catch (error) {
-      logger.error('App', 'Error analyzing materials for alerts:', error);
-      return [];
-    }
-  }, [materialItems, minValue, includeInactive, enablePredictive]);
-
-  // Filtrar alertas activas y críticas
-  const activeAlerts = useMemo(() => 
-    stockAlerts.filter(alert => alert.status === 'active'),
-    [stockAlerts]
-  );
-
-  const criticalAlerts = useMemo(() => 
-    stockAlerts.filter(alert => alert.severity === 'critical' && alert.status === 'active'),
-    [stockAlerts]
-  );
-
-  // Función para generar y actualizar alertas
-  const generateAndUpdateAlerts = useCallback(async () => {
-    if (!materials.length || isGeneratingAlerts) return;
-    
-    try {
-      setIsGeneratingAlerts(true);
-      
-      // 1. Generar nuevas alertas inteligentes
-      const newAlerts = await SmartAlertsAdapter.generateMaterialsAlerts(materials);
-      
-      // 2. Filtrar duplicados
-      const filteredAlerts = SmartAlertsAdapter.filterDuplicateAlerts(newAlerts, stockAlerts);
-      
-      // 3. Crear nuevas alertas
-      const createPromises = filteredAlerts.map(alert => 
-        alertActions.create(alert).catch(error => {
-          logger.error('App', 'Error creating alert:', error);
-          return null;
-        })
-      );
-      
-      await Promise.all(createPromises);
-      
-      // 4. Actualizar alertas existentes que han cambiado
-      const alertsToUpdate = SmartAlertsAdapter.getAlertsToUpdate(materials, stockAlerts);
-      const updatePromises = alertsToUpdate.map(({ id, updates }) => 
-        alertActions.update(id, updates).catch(error => {
-          logger.error('App', 'Error updating alert:', error);
-        })
-      );
-      
-      await Promise.all(updatePromises);
-      
-      // 5. Resolver alertas outdated si está habilitado
-      if (autoResolveOutdated) {
-        await resolveOutdatedAlerts();
-      }
-      
-    } catch (error) {
-      logger.error('App', 'Error generating smart alerts:', error);
-    } finally {
-      setIsGeneratingAlerts(false);
-    }
-  }, [materials, stockAlerts, alertActions, isGeneratingAlerts, autoResolveOutdated]);
-
-  // Función para resolver alertas outdated
-  const resolveOutdatedAlerts = useCallback(async () => {
-    if (!materials.length) return;
-    
-    try {
-      const alertsToResolve = SmartAlertsAdapter.getAlertsToResolve(materials, stockAlerts);
-      
-      const resolvePromises = alertsToResolve.map(alertId => 
-        alertActions.resolve(alertId, 'Auto-resuelto: condición ya no se cumple').catch(error => {
-          logger.error('App', 'Error auto-resolving alert:', error);
-        })
-      );
-      
-      await Promise.all(resolvePromises);
-      
-    } catch (error) {
-      logger.error('App', 'Error resolving outdated alerts:', error);
-    }
-  }, [materials, stockAlerts, alertActions]);
-
-  // Función para refresh manual
-  const refreshAlerts = useCallback(async () => {
-    await generateAndUpdateAlerts();
-  }, [generateAndUpdateAlerts]);
-
-  // Auto-refresh con intervalo
-  useEffect(() => {
-    if (!autoRefresh || !materials.length) return;
-    
-    const interval = setInterval(() => {
-      generateAndUpdateAlerts();
-    }, refreshIntervalMs);
-    
-    return () => clearInterval(interval);
-  }, [autoRefresh, materials.length, refreshIntervalMs, generateAndUpdateAlerts]);
-
-  // Generar alertas inicialmente cuando hay materiales
-  useEffect(() => {
-    if (materials.length > 0 && !isGeneratingAlerts) {
-      // Delay para evitar múltiples ejecuciones
-      const timeout = setTimeout(generateAndUpdateAlerts, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [materials.length, isGeneratingAlerts, generateAndUpdateAlerts]);
-
-  // Analytics calculados
-  const analytics = useMemo(() => {
-    const itemsWithAlerts = new Set(
-      activeAlerts
-        .filter(alert => alert.metadata?.itemId)
-        .map(alert => alert.metadata!.itemId!)
-    ).size;
-
-    // Alertas por clase ABC
-    const alertsByClass = activeAlerts.reduce(
-      (acc, alert) => {
-        const itemId = alert.metadata?.itemId;
-        const material = materials.find(m => m.id === itemId);
-        if (material) {
-          acc[material.abcClass] = (acc[material.abcClass] || 0) + 1;
-        }
-        return acc;
-      },
-      { A: 0, B: 0, C: 0 } as Record<'A' | 'B' | 'C', number>
-    );
-
-    // Items más críticos
-    const itemAlertCounts = new Map<string, {
-      material: MaterialABC;
-      alertCount: number;
-      maxSeverity: string;
-    }>();
-
-    activeAlerts.forEach(alert => {
-      const itemId = alert.metadata?.itemId;
-      const material = materials.find(m => m.id === itemId);
-      if (material) {
-        const existing = itemAlertCounts.get(itemId!) || {
-          material,
-          alertCount: 0,
-          maxSeverity: 'low'
-        };
-        
-        existing.alertCount += 1;
-        
-        // Actualizar severidad máxima
-        const severityOrder = { critical: 4, high: 3, medium: 2, low: 1, info: 0 };
-        if (severityOrder[alert.severity] > severityOrder[existing.maxSeverity]) {
-          existing.maxSeverity = alert.severity;
-        }
-        
-        itemAlertCounts.set(itemId!, existing);
-      }
-    });
-
-    const mostCriticalItems = Array.from(itemAlertCounts.values())
-      .sort((a, b) => {
-        // Primero por severidad máxima, luego por cantidad de alertas
-        const severityOrder = { critical: 4, high: 3, medium: 2, low: 1, info: 0 };
-        const severityDiff = severityOrder[b.maxSeverity] - severityOrder[a.maxSeverity];
-        return severityDiff !== 0 ? severityDiff : b.alertCount - a.alertCount;
-      })
-      .slice(0, 5)
-      .map(({ material, alertCount, maxSeverity }) => ({
-        id: material.id,
-        name: material.name,
-        abcClass: material.abcClass,
-        alertCount,
-        maxSeverity
-      }));
-
-    return {
-      totalItemsMonitored: materials.length,
-      itemsWithAlerts,
-      alertsByClass,
-      mostCriticalItems
-    };
-  }, [materials, activeAlerts]);
-
-  return {
-    // Estados
-    materialsLoading,
-    alertsLoading,
-    isGeneratingAlerts,
-    
-    // Datos
-    materials,
-    activeAlerts,
-    criticalAlerts,
-    alertsCount: activeAlerts.length,
-    
-    // Acciones
-    refreshAlerts,
-    resolveOutdatedAlerts,
-    generateAndUpdateAlerts,
-    
-    // Analytics
-    analytics,
-    
-    // UI helpers (delegando al sistema de alertas existente)
-    ui: {
-      badgeCount: alertsUI.badgeCount,
-      badgeColor: alertsUI.badgeColor,
-      statusText: alertsUI.statusText,
-      shouldShowBadge: alertsUI.shouldShowBadge
-    }
-  };
-}
-
-// Fix para useState import
-import React from 'react';
-import { logger } from '@/lib/logging';
+export default useSmartInventoryAlerts;

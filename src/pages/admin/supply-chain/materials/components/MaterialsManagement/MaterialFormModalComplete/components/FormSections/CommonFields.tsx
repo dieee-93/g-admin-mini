@@ -1,4 +1,4 @@
-import { Box, Stack, Text } from '@chakra-ui/react';
+import { Box, Stack, Text } from '@/shared/ui';
 import type { ItemType, ItemFormData } from '@/pages/admin/supply-chain/materials/types'; 
 import { TypeSelector } from '../TypeSelector';
 import { InputField } from '@/shared/ui';
@@ -22,7 +22,7 @@ export const CommonFields = ({
     <Stack gap="6">
       <Box>
         <Box role="group">
-          <Text as="label" fontWeight="medium" mb={2} display="block">
+          <Text as="label" fontWeight="medium" mb="2" display="block">
             Nombre del Material
           </Text>
           <InputField
@@ -35,7 +35,7 @@ export const CommonFields = ({
             aria-invalid={!!fieldErrors.name}
           />
           {fieldErrors.name && (
-            <Text color="red.500" fontSize="sm" mt={2}>
+            <Text color="red.500" fontSize="sm" mt="2">
               {fieldErrors.name}
             </Text>
           )}

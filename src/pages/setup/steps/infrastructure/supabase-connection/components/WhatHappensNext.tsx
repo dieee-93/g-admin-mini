@@ -16,9 +16,9 @@ export function WhatHappensNext() {
     >
       <VStack gap="md" align="stretch">
         <HStack>
-          <Badge variant="outline" colorScheme="green">{whatHappensNext.title}</Badge>
+          <Badge variant="outline" colorPalette="green">{whatHappensNext.title}</Badge>
         </HStack>
-        <VStack gap="xs" align="start" pl={4}>
+        <VStack gap="xs" align="start" pl="4">
           {whatHappensNext.steps.map((step, index) => (
             <Stack 
               key={index}

@@ -9,7 +9,7 @@ import type {
   SupplierAnalysis
 } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
 import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
-import type { Supplier } from '../types/supplierTypes';
+import type { Supplier, ProcurementRecommendation } from '../types/supplierTypes';
 import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 import type { SupplierOrderWithDetails } from '@/pages/admin/supply-chain/supplier-orders/types';
 import { logger } from '@/lib/logging';
@@ -39,7 +39,7 @@ export const supplierAnalyticsService = {
       const materialsABC = this.transformToMaterialABC(materials, orders);
 
       // 2. Generate procurement recommendations (empty for now, could integrate procurementRecommendationsEngine)
-      const procurementRecs: any[] = [];
+      const procurementRecs: ProcurementRecommendation[] = [];
 
       // 3. Run engine analysis
       const result = await SupplierAnalysisEngine.analyzeSuppliers(

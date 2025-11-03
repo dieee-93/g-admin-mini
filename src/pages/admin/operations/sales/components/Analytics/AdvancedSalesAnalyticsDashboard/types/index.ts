@@ -1,4 +1,5 @@
-import type { Sale } from '../../../../types';
+// TODO: Use Sale type for data transformation utilities
+// import type { Sale } from '../../../../types';
 
 export interface AdvancedSalesAnalytics {
   revenue: {

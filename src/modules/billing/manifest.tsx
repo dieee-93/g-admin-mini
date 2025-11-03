@@ -7,7 +7,7 @@
  * @version 1.0.0
  */
 
-import React from 'react';
+import React, { lazy } from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
@@ -29,6 +29,9 @@ export const billingManifest: ModuleManifest = {
     'finance_payment_terms',
   ] as FeatureId[],
 
+  // 🔒 PERMISSIONS: Supervisors can manage billing
+  minimumRole: 'SUPERVISOR' as const,
+
   hooks: {
     provide: [
       'billing.invoice_generated',  // Invoice events
@@ -45,21 +48,18 @@ export const billingManifest: ModuleManifest = {
     logger.info('App', '💳 Setting up Billing module');
 
     try {
+      // ✅ Dashboard Widget - Billing status
+      const BillingWidget = lazy(() => import('./components/BillingWidget'));
+
       registry.addAction(
         'dashboard.widgets',
-        () => ({
-          id: 'billing-summary',
-          title: 'Billing Status',
-          type: 'billing',
-          priority: 4,
-          data: {
-            pendingInvoices: 0,
-            overdueAmount: 0,
-            monthlyRecurring: 0,
-          },
-        }),
+        () => (
+          <React.Suspense fallback={<div>Cargando billing...</div>}>
+            <BillingWidget />
+          </React.Suspense>
+        ),
         'billing',
-        4
+        35 // Medium priority widget
       );
 
       logger.info('App', '✅ Billing module setup complete');
@@ -74,13 +74,37 @@ export const billingManifest: ModuleManifest = {
   },
 
   exports: {
-    generateInvoice: async (customerId: string, items: any[]) => {
+    generateInvoice: async (customerId: string, items: Array<{ productId: string; quantity: number; price: number }>) => {
       logger.debug('App', 'Generating invoice', { customerId, items });
-      return { invoice: null };
+
+      // Calculate total from items using Decimal.js for precision
+      const { calculateInvoiceTotal } = await import('@/pages/admin/finance/billing/services');
+      const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+      const { amount, taxAmount, totalAmount } = calculateInvoiceTotal(subtotal, 0.21); // 21% IVA
+
+      // Generate invoice using billingApi
+      const { generateInvoice: createInvoice } = await import('@/pages/admin/finance/billing/services');
+      const { data: invoice, error } = await createInvoice(customerId, {
+        amount,
+        taxAmount,
+        totalAmount,
+        currency: 'ARS',
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days
+      });
+
+      return { invoice, error };
     },
-    processPayment: async (invoiceId: string, paymentData: any) => {
-      logger.debug('App', 'Processing payment', { invoiceId });
-      return { success: true };
+    processPayment: async (invoiceId: string, paymentData: { paymentMethodId: string; amount: number }) => {
+      logger.debug('App', 'Processing payment', { invoiceId, paymentData });
+
+      // Process payment using billingApi
+      const { processPayment: makePayment } = await import('@/pages/admin/finance/billing/services');
+      const { data: payment, error } = await makePayment(invoiceId, {
+        ...paymentData,
+        currency: 'ARS'
+      });
+
+      return { success: !error, payment, error };
     },
   },
 

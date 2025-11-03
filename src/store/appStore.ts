@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { StateCreator } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { errorHandler } from '@/lib/error-handling';
 
@@ -28,10 +29,17 @@ export interface AppState {
 
   // App settings
   settings: {
+    // Basic config (always required)
     businessName: string;
     currency: string;
     timezone: string;
     language: 'es' | 'en';
+
+    // Shared business config (used by multiple modules)
+    address?: string;        // Used by: Takeaway, Ecommerce, Delivery
+    logoUrl?: string;        // Used by: Branding, Ecommerce
+    contactEmail?: string;   // Used by: Ecommerce, Support
+    contactPhone?: string;   // Used by: Ecommerce, Takeaway
   };
 
   // Actions
@@ -63,7 +71,7 @@ interface Notification {
   autoClose?: boolean;
 }
 
-export const appStoreInitializer = (set, get) => ({
+export const appStoreInitializer: StateCreator<AppState, [["zustand/devtools", never], ["zustand/persist", unknown]]> = (set, get) => ({
         // Initial state
         user: {
           id: null,
@@ -74,7 +82,7 @@ export const appStoreInitializer = (set, get) => ({
 
         ui: {
           sidebarCollapsed: false,
-          theme: 'system',
+          theme: 'system' as const,
           loading: false,
           notifications: []
         },
@@ -89,7 +97,12 @@ export const appStoreInitializer = (set, get) => ({
           businessName: 'Mi Negocio',
           currency: 'ARS',
           timezone: 'America/Argentina/Buenos_Aires',
-          language: 'es'
+          language: 'es',
+          // Optional shared config (undefined until configured)
+          address: undefined,
+          logoUrl: undefined,
+          contactEmail: undefined,
+          contactPhone: undefined
         },
 
         // User actions
@@ -189,11 +202,12 @@ export const appStoreInitializer = (set, get) => ({
         // Error handling
         handleError: (error, context) => {
           const appError = errorHandler.handle(error, context);
-          
+
           get().addNotification({
             type: 'error',
             title: 'Error',
             message: appError.message,
+            timestamp: new Date(),
             autoClose: appError.severity === 'low'
           });
         }

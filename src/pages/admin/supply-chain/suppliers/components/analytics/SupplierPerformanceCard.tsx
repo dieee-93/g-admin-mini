@@ -32,7 +32,7 @@ export function SupplierPerformanceCard({
     <Card.Root>
       <Card.Header>
         <HStack justify="space-between">
-          <VStack align="start" gap={1}>
+          <VStack align="start" gap="1">
             <Text fontWeight="bold" fontSize="lg">
               {supplier.name}
             </Text>
@@ -50,9 +50,9 @@ export function SupplierPerformanceCard({
       </Card.Header>
 
       <Card.Body>
-        <VStack align="stretch" gap={4}>
+        <VStack align="stretch" gap="4">
           {/* Metrics Grid */}
-          <SimpleGrid columns={2} gap={3}>
+          <SimpleGrid columns={2} gap="3">
             {/* Quality Score */}
             <MetricDisplay
               label="Calidad"
@@ -93,7 +93,7 @@ export function SupplierPerformanceCard({
           </SimpleGrid>
 
           {/* Business Metrics */}
-          <VStack align="stretch" gap={2}>
+          <VStack align="stretch" gap="2">
             <HStack justify="space-between">
               <Text fontSize="sm" color="fg.muted">
                 Valor Anual:
@@ -138,7 +138,7 @@ export function SupplierPerformanceCard({
           )}
 
           {/* Actions */}
-          <HStack gap={2} mt={2}>
+          <HStack gap="2" mt="2">
             <Button size="sm" variant="solid" flex={1} onClick={() => onViewDetails?.(supplier)}>
               Ver Detalles
             </Button>
@@ -169,9 +169,9 @@ interface MetricDisplayProps {
 
 function MetricDisplay({ label, value, icon: Icon, color }: MetricDisplayProps) {
   return (
-    <HStack gap={2}>
+    <HStack gap="2">
       <Icon width={20} height={20} style={{ color: `var(--chakra-colors-${color}-500)` }} />
-      <VStack align="start" gap={0}>
+      <VStack align="start" gap="0">
         <Text fontSize="xs" color="fg.muted">
           {label}
         </Text>

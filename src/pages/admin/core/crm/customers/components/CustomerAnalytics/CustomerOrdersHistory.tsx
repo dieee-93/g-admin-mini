@@ -8,9 +8,9 @@ import {
   Table,
   Grid
 } from '@/shared/ui';
-import { fetchSales } from '@/pages/admin/sales/services/saleApi';
-import { useCustomers } from '../hooks/useCustomers';
-import type { Sale } from '@/pages/admin/sales/types';
+import { fetchSales } from '@/pages/admin/operations/sales/services/saleApi';
+import { useCustomers } from '../../hooks/existing/useCustomers';
+import type { Sale } from '@/pages/admin/operations/sales/types';
 
 import { logger } from '@/lib/logging';
 export function CustomerOrdersHistory() {
@@ -154,7 +154,7 @@ export function CustomerOrdersHistory() {
             <Typography variant="heading">
               Historial de Pedidos
               {selectedCustomer && (
-                <Badge colorPalette="info" className="ml-2">
+                <Badge colorPalette="blue" className="ml-2">
                   {customers?.find(c => c.id === selectedCustomer)?.name}
                 </Badge>
               )}

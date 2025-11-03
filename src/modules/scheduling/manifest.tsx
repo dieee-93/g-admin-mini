@@ -15,10 +15,11 @@
  * @see src/pages/admin/resources/scheduling/page.tsx
  */
 
-import React from 'react';
+import React, { lazy } from 'react';
 import type { ModuleManifest, ModuleRegistry } from '@/lib/modules/types';
 import { Badge, Stack, Typography } from '@/shared/ui';
-import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon } from '@heroicons/react/24/outline';
+import { logger } from '@/lib/logging';
 
 // ============================================
 // MODULE MANIFEST
@@ -42,6 +43,9 @@ export const schedulingManifest: ModuleManifest = {
     'scheduling_appointment_booking',
     'scheduling_calendar_management'
   ],
+
+  // 🔒 PERMISSIONS: Supervisors can manage schedules
+  minimumRole: 'SUPERVISOR' as const,
 
   // Hook points this module provides and consumes
   hooks: {
@@ -71,7 +75,7 @@ export const schedulingManifest: ModuleManifest = {
     // Hook 1: Calendar Events - Time-off requests overlay
     registry.addAction(
       'calendar.events',
-      (data?: { selectedWeek?: string; shifts?: any[] }) => {
+      () => {
         // Mock time-off data - real version would query database
         const timeOffRequests = [
           { id: '1', employee: 'John Doe', date: '2025-10-15', status: 'pending' },
@@ -79,16 +83,16 @@ export const schedulingManifest: ModuleManifest = {
         ];
 
         return (
-          <Stack direction="column" gap={2} key="scheduling-calendar-events">
-            <Stack direction="row" align="center" gap={2}>
+          <Stack direction="column" gap="2" key="scheduling-calendar-events">
+            <Stack direction="row" align="center" gap="2">
               <CalendarIcon className="w-5 h-5 text-orange-500" />
               <Typography variant="heading" size="sm" fontWeight="semibold">
                 Time-Off Requests ({timeOffRequests.length})
               </Typography>
             </Stack>
-            <Stack direction="column" gap={1}>
+            <Stack direction="column" gap="1">
               {timeOffRequests.map((request, idx) => (
-                <Stack key={idx} direction="row" align="center" gap={2}>
+                <Stack key={idx} direction="row" align="center" gap="2">
                   <Badge
                     variant="solid"
                     colorPalette={request.status === 'approved' ? 'green' : 'orange'}
@@ -111,49 +115,26 @@ export const schedulingManifest: ModuleManifest = {
       80 // Medium-high priority - renders after staff shifts
     );
 
-    // Hook 2: Dashboard Widget - Scheduling stats
+    // ✅ Hook 2: Dashboard Widget - Scheduling stats
+    const SchedulingWidget = lazy(() => import('@/pages/admin/core/dashboard/components/widgets/SchedulingWidget'));
+
     registry.addAction(
       'dashboard.widgets',
-      () => {
-        return (
-          <Stack
-            direction="column"
-            gap={3}
-            p={4}
-            bg="orange.50"
-            borderRadius="md"
-            key="scheduling-dashboard-widget"
-          >
-            <Stack direction="row" align="center" gap={2}>
-              <ClockIcon className="w-6 h-6 text-orange-600" />
-              <Typography variant="heading" size="md" fontWeight="bold" color="orange.900">
-                Scheduling Stats
-              </Typography>
-            </Stack>
-            <Stack direction="column" gap={1}>
-              <Typography variant="body" size="sm" color="orange.800">
-                Total Shifts: 45
-              </Typography>
-              <Typography variant="body" size="sm" color="orange.800">
-                Coverage: 92%
-              </Typography>
-              <Typography variant="body" size="sm" color="orange.800">
-                Labor Cost: $3,240
-              </Typography>
-            </Stack>
-          </Stack>
-        );
-      },
+      () => (
+        <React.Suspense fallback={<div>Cargando scheduling...</div>}>
+          <SchedulingWidget />
+        </React.Suspense>
+      ),
       'scheduling',
       70 // Medium priority widget
     );
 
-    console.log('[Scheduling Module] Hooks registered successfully');
+    logger.info('Scheduling', '✅ Scheduling module setup complete - hooks registered');
   },
 
   // Teardown function - cleanup
   teardown: () => {
-    console.log('[Scheduling Module] Cleanup complete');
+    logger.info('Scheduling', 'Module teardown complete');
   },
 
   // Public API exports
@@ -165,7 +146,7 @@ export const schedulingManifest: ModuleManifest = {
      */
     getWeeklySchedule: async (week: string) => {
       // Mock implementation - real version would query database
-      console.log(`[Scheduling Module] Fetching schedule for week: ${week}`);
+      logger.debug('Scheduling', `Fetching weekly schedule for: ${week}`);
       return [
         { id: '1', employee_id: '1', date: '2025-10-13', start: '09:00', end: '17:00' },
         { id: '2', employee_id: '2', date: '2025-10-14', start: '10:00', end: '18:00' }
@@ -174,10 +155,10 @@ export const schedulingManifest: ModuleManifest = {
 
     /**
      * Calculate total labor costs for shifts
-     * @param shifts - Array of shift objects
+     * @param shifts - Array of shift objects with start_time and end_time
      * @returns Total cost in dollars
      */
-    calculateLaborCosts: (shifts: any[]) => {
+    calculateLaborCosts: (shifts: Array<{ start_time: string; end_time: string }>) => {
       const totalHours = shifts.reduce((sum, shift) => {
         const start = new Date(`2000-01-01T${shift.start_time}`);
         const end = new Date(`2000-01-01T${shift.end_time}`);
@@ -197,7 +178,7 @@ export const schedulingManifest: ModuleManifest = {
     author: 'G-Admin Team',
     tags: ['scheduling', 'shifts', 'time-off', 'labor-costs'],
     navigation: {
-      route: '/admin/scheduling',
+      route: '/admin/resources/scheduling',
       icon: CalendarIcon,
       color: 'violet',
       domain: 'resources',

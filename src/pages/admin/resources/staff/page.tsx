@@ -1,13 +1,10 @@
 import {
   ContentLayout, Section, StatsSection, CardGrid, MetricCard,
-  Button, Alert, Badge, Icon, Stack, Typography
+  Button, Alert, Badge, Icon, Stack, Typography, Tabs
 } from '@/shared/ui';
 import {
-  UserGroupIcon,
   UsersIcon,
-  ChartBarIcon,
   AcademicCapIcon,
-  CogIcon,
   PlusIcon,
   ClockIcon,
   TrophyIcon,
@@ -17,48 +14,52 @@ import {
   ArrowTrendingUpIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-// CapabilityGate and Slot integration
+// Module Registry integration
 import EventBus from '@/lib/events';
-import { CapabilityGate, useCapabilities } from '@/lib/capabilities';
-import { Slot } from '@/lib/composition';
+import { HookPoint } from '@/lib/modules/HookPoint';
+import { useLocation } from '@/contexts/LocationContext';
+import { useEffect, useState } from 'react';
+import { logger } from '@/lib/logging';
 
 import { useStaffPage } from './hooks';
+import { useStaffStore } from '@/store/staffStore';
 
-// Import tab sections
+// Tab sections
 import { DirectorySection } from './components/sections/DirectorySection';
 import { PerformanceSection } from './components/sections/PerformanceSection';
 import { TrainingSection } from './components/sections/TrainingSection';
 import { ManagementSection } from './components/sections/ManagementSection';
 import { TimeTrackingSection } from './components/sections/TimeTrackingSection';
 
-import { logger } from '@/lib/logging';
-// Module configuration for Staff - HR & Scheduling integration
-const STAFF_MODULE_CONFIG = {
-  capabilities: ['staff_management', 'payroll_processing', 'schedule_management', 'time_tracking'],
-  events: {
-    emits: ['shift_changed', 'staff_clocked_in', 'staff_clocked_out', 'schedule_updated', 'performance_alert'],
-    listens: ['operations.kitchen_alert', 'sales.order_placed', 'scheduling.shift_reminder']
-  },
-  eventHandlers: {
-    'operations.kitchen_alert': (data: any) => {
-      logger.debug('StaffStore', '👥 Staff: Kitchen alert received, checking staff availability', data);
-      // Check if more kitchen staff needed during rush
-    },
-    'sales.order_placed': (data: any) => {
-      logger.info('StaffStore', '👥 Staff: Order placed, monitoring service load', data);
-      // Monitor staff workload for service optimization
-    },
-    'scheduling.shift_reminder': (data: any) => {
-      logger.info('StaffStore', '👥 Staff: Shift reminder', data);
-      // Send notifications to staff about upcoming shifts
-    }
-  },
-  slots: ['staff-dashboard', 'hr-extensions', 'performance-widgets']
-} as const;
+// Forms and Modals
+import { EmployeeForm } from './components/EmployeeForm';
+import { Dialog } from '@/shared/ui';
+import type { Employee } from '@/services/staff/staffApi';
+
+// EventBus payload types for cross-module communication
+interface KitchenAlertEventData {
+  type: 'rush_hour' | 'understaffed' | 'quality_issue';
+  severity: 'low' | 'medium' | 'high';
+  message: string;
+}
+
+interface OrderPlacedEventData {
+  orderId: string;
+  tableNumber?: number;
+  itemCount: number;
+}
+
+interface ShiftReminderEventData {
+  employeeId: string;
+  employeeName: string;
+  shiftStart: string;
+  minutesUntilShift: number;
+}
 
 export default function StaffPage() {
-  // Module integration (EventBus + CapabilityGate + Slots)
-  const { hasFeature } = useCapabilities();
+  // Module integration (EventBus + Module Registry Hooks)
+  const { selectedLocation, isMultiLocationMode } = useLocation();
+  const { loadStaff } = useStaffStore();
 
   const {
     pageState,
@@ -69,41 +70,87 @@ export default function StaffPage() {
     alertsData
   } = useStaffPage();
 
-  // Enhanced actions with EventBus integration - Staff ↔ Operations coordination
-  const handleShiftChange = (staffId: string, shiftData: any) => {
-    // Emit shift change for kitchen and operations planning
-    EventBus.emit('shift_changed', {
-      staffId,
-      previousShift: shiftData.previous,
-      newShift: shiftData.new,
-      department: shiftData.department,
-      timestamp: Date.now()
-    });
+  // Local state for view configuration
+  const [viewState, setViewState] = useState({
+    viewMode: 'grid' as 'grid' | 'list',
+    sortBy: 'name',
+    sortDirection: 'asc' as 'asc' | 'desc'
+  });
 
-    // Process locally
-    actions.handleShiftChange?.(staffId, shiftData);
+  // Modal state for employee forms
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | undefined>(undefined);
+
+  // Delete confirmation state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingEmployee, setDeletingEmployee] = useState<Employee | undefined>(undefined);
+  const { deleteStaffMember } = useStaffStore();
+
+  // Handle delete employee
+  const handleDeleteEmployee = async () => {
+    if (!deletingEmployee) return;
+
+    try {
+      await deleteStaffMember(deletingEmployee.id);
+      setIsDeleteDialogOpen(false);
+      setDeletingEmployee(undefined);
+      loadStaff(); // Refresh data
+    } catch (error) {
+      logger.error('StaffPage', 'Error deleting employee', error);
+    }
   };
 
-  const handleClockIn = (staffId: string, location: string) => {
-    // Emit clock in event for attendance tracking
-    EventBus.emit('staff_clocked_in', {
-      staffId,
-      location, // kitchen, front_of_house, management
-      timestamp: Date.now(),
-      deviceInfo: navigator.userAgent
-    });
-  };
+  // EventBus subscriptions - Listen to events from other modules
+  useEffect(() => {
+    // Listen to kitchen alerts to check staff availability during rush
+    const unsubKitchen = EventBus.subscribe(
+      'production.alert.*',
+      (event) => {
+        const data = event.payload as KitchenAlertEventData;
+        logger.debug('StaffStore', '👥 Kitchen alert received, checking staff availability', data);
+        // TODO: Check if more kitchen staff needed during rush
+        // TODO: Trigger alert if understaffed
+      },
+      { moduleId: 'staff', priority: 75 }
+    );
 
-  const handlePerformanceAlert = (staffId: string, alertType: string, severity: 'low' | 'medium' | 'high') => {
-    // Emit performance alerts for management
-    EventBus.emit('performance_alert', {
-      staffId,
-      alertType, // late_arrival, quality_issue, customer_complaint, etc.
-      severity,
-      timestamp: Date.now(),
-      requiresAction: severity === 'high'
-    });
-  };
+    // Monitor sales orders to track staff workload
+    const unsubSales = EventBus.subscribe(
+      'sales.order.placed',
+      (event) => {
+        const data = event.payload as OrderPlacedEventData;
+        logger.info('StaffStore', '👥 Order placed, monitoring service load', data);
+        // TODO: Monitor staff workload for service optimization
+        // TODO: Alert if service staff overloaded
+      },
+      { moduleId: 'staff', priority: 50 }
+    );
+
+    // Handle shift reminders
+    const unsubScheduling = EventBus.subscribe(
+      'scheduling.shift.reminder',
+      (event) => {
+        const data = event.payload as ShiftReminderEventData;
+        logger.info('StaffStore', '👥 Shift reminder for employee', data);
+        // TODO: Send notifications to staff about upcoming shifts
+        // TODO: Update UI to show pending shift starts
+      },
+      { moduleId: 'staff', priority: 100 }
+    );
+
+    return () => {
+      unsubKitchen();
+      unsubSales();
+      unsubScheduling();
+    };
+  }, []);
+
+  // Staff event emitters - Available for future use when implementing tab sections
+  // These will be used when DirectorySection, TimeTrackingSection, etc. are implemented
+  // const handleShiftChange = (staffId: string, shiftData: ShiftChangeData) => { ... };
+  // const handleClockIn = (staffId: string, location: string) => { ... };
+  // const handleClockOut = (staffId: string) => { ... };
+  // const handlePerformanceAlert = (staffId: string, alertType: string, severity: 'low' | 'medium' | 'high') => { ... };
 
   if (loading) {
     return (
@@ -114,11 +161,9 @@ export default function StaffPage() {
   }
 
   if (error) {
-    // Emit error event for monitoring
-    EventBus.emit('staff_error', { type: 'load_failed', error, timestamp: Date.now() });
     return (
       <ContentLayout spacing="normal">
-        <Stack gap={12}>
+        <Stack gap="12">
           <Alert variant="subtle" title={error} />
         </Stack>
       </ContentLayout>
@@ -128,18 +173,31 @@ export default function StaffPage() {
   return (
     <ContentLayout spacing="normal">
 
-      <Stack gap={12}>
+      <Stack gap="12">
         {/* 📊 MÉTRICAS DE STAFF - SIEMPRE PRIMERO */}
         <StatsSection>
           <Stack direction="row" justify="space-between" align="center" mb="lg">
-            <Stack direction="row" gap="sm" align="center">
+            <Stack direction="row" gap="sm" align="center" flexWrap="wrap">
               <Badge variant="solid" colorPalette="blue">Security Compliant</Badge>
               <Badge variant="solid" colorPalette="green">{metrics.activeStaff} Activos</Badge>
+              {/* 🌎 Multi-Location Badge */}
+              {isMultiLocationMode && selectedLocation && (
+                <Badge variant="solid" colorPalette="purple">
+                  📍 {selectedLocation.name}
+                </Badge>
+              )}
               <Typography variant="body" size="sm" color="text.muted">
                 Directorio, rendimiento, entrenamiento y administración HR
               </Typography>
             </Stack>
-            <Button variant="solid" onClick={actions.handleNewEmployee} size="lg">
+            <Button
+              variant="solid"
+              onClick={() => {
+                setEditingEmployee(undefined);
+                setIsEmployeeModalOpen(true);
+              }}
+              size="lg"
+            >
               <Icon icon={PlusIcon} size="sm" />
               Nuevo Empleado
             </Button>
@@ -150,14 +208,12 @@ export default function StaffPage() {
               value={metrics.totalStaff}
               icon={UsersIcon}
               colorPalette="blue"
-              onClick={() => EventBus.emit('metric_clicked', { metric: 'total-staff', value: metrics.totalStaff })}
             />
             <MetricCard
               title="En Turno"
               value={metrics.onShiftCount}
               icon={ClockIcon}
               colorPalette="green"
-              onClick={() => EventBus.emit('metric_clicked', { metric: 'on-shift' })}
             />
             <MetricCard
               title="Rendimiento Prom."
@@ -165,14 +221,12 @@ export default function StaffPage() {
               icon={TrophyIcon}
               colorPalette="purple"
               trend={{ value: metrics.avgPerformanceRating, isPositive: metrics.avgPerformanceRating > 3.5 }}
-              onClick={() => EventBus.emit('metric_clicked', { metric: 'performance' })}
             />
             <MetricCard
               title="Evaluaciones Pendientes"
               value={metrics.upcomingReviews}
               icon={AcademicCapIcon}
               colorPalette="orange"
-              onClick={() => EventBus.emit('metric_clicked', { metric: 'reviews' })}
             />
           </CardGrid>
         </StatsSection>
@@ -185,7 +239,6 @@ export default function StaffPage() {
               value={`$${metrics.todayLaborCost.toFixed(2)}`}
               icon={CurrencyDollarIcon}
               colorPalette="teal"
-              onClick={() => EventBus.emit('metric_clicked', { metric: 'labor-cost' })}
             />
             <MetricCard
               title="Uso Presupuesto"
@@ -193,7 +246,6 @@ export default function StaffPage() {
               icon={ArrowTrendingUpIcon}
               colorPalette={metrics.budgetVariance > 10 ? "red" : "green"}
               trend={{ value: metrics.budgetVariance, isPositive: metrics.budgetVariance <= 0 }}
-              onClick={() => EventBus.emit('metric_clicked', { metric: 'budget-usage' })}
             />
             <MetricCard
               title="Eficiencia"
@@ -201,14 +253,12 @@ export default function StaffPage() {
               icon={CheckCircleIcon}
               colorPalette="cyan"
               trend={{ value: metrics.efficiencyScore, isPositive: metrics.efficiencyScore > 80 }}
-              onClick={() => EventBus.emit('metric_clicked', { metric: 'efficiency' })}
             />
             <MetricCard
               title="Horas Extra"
               value={`${metrics.totalOvertimeHours.toFixed(1)}h`}
               icon={ExclamationTriangleIcon}
               colorPalette={metrics.overtimeConcerns > 0 ? "orange" : "green"}
-              onClick={() => EventBus.emit('metric_clicked', { metric: 'overtime' })}
             />
           </CardGrid>
         </StatsSection>
@@ -229,131 +279,144 @@ export default function StaffPage() {
           </Section>
         )}
 
-        {/* ⏰ CONTROL DE TIEMPO */}
-        <Section variant="elevated" title="Control de Tiempo">
-          <Stack direction="row" gap="sm" align="center" mb="md">
-            <Icon icon={ClockIcon} size="lg" color="blue.600" />
-            <Typography variant="body" color="text.muted">
-              Personal activo en turno: {metrics.onShiftCount}
-            </Typography>
-          </Stack>
-          <Stack direction="row" gap="md" flexWrap="wrap">
-            <Button
-              variant="outline"
-              onClick={actions.handleTimeReports}
-              flex="1"
-              minW="200px"
-            >
-              <Icon icon={ChartBarIcon} size="sm" />
-              Ver Reportes
-            </Button>
-            <Button
-              variant="outline"
-              onClick={actions.handleScheduleManagement}
-              flex="1"
-              minW="200px"
-            >
-              <Icon icon={ClockIcon} size="sm" />
-              Gestionar Horarios
-            </Button>
-          </Stack>
-        </Section>
-
-        {/* 📈 ANALYTICS DE RENDIMIENTO - Condicional */}
-        {pageState.showAnalytics && (
-          <Section variant="elevated" title="Analytics de Rendimiento">
-            <CardGrid columns={{ base: 1, md: 2, lg: 3 }} gap="md">
-              <MetricCard
-                title="Asistencia Promedio"
-                value={`${metrics.avgAttendanceRate.toFixed(1)}%`}
-                icon={CheckCircleIcon}
-                colorPalette="green"
-              />
-              <MetricCard
-                title="Puntualidad"
-                value={`${metrics.avgPunctualityScore.toFixed(1)}%`}
-                icon={ClockIcon}
-                colorPalette="blue"
-              />
-              <MetricCard
-                title="Riesgos de Retención"
-                value={metrics.retentionRisks}
-                icon={ExclamationTriangleIcon}
-                colorPalette="red"
-              />
-            </CardGrid>
-          </Section>
-        )}
-
-        {/* 🏢 ACCIONES ADMINISTRATIVAS */}
-        <Section variant="flat" title="Acciones Administrativas">
-          <Stack direction="row" gap="md" flexWrap="wrap">
-            <Button
-              variant="outline"
-              onClick={actions.handlePayrollGeneration}
-              flex="1"
-              minW="200px"
-            >
-              <Icon icon={CurrencyDollarIcon} size="sm" />
-              Generar Nómina
-            </Button>
-            <Button
-              variant="outline"
-              onClick={actions.handleBudgetAnalysis}
-              flex="1"
-              minW="200px"
-            >
-              <Icon icon={ChartBarIcon} size="sm" />
-              Análisis Presupuesto
-            </Button>
-            <Button
-              variant="outline"
-              onClick={actions.handleScheduleTraining}
-              flex="1"
-              minW="200px"
-            >
-              <Icon icon={AcademicCapIcon} size="sm" />
-              Programar Entrenamiento
-            </Button>
-          </Stack>
-        </Section>
-
-        {/* ⚡ ACCIONES RÁPIDAS */}
-        <Section variant="default" title="Acciones Rápidas">
-          <Stack direction="row" gap="md" flexWrap="wrap">
-            <Button
-              variant="outline"
-              onClick={actions.handleShowAnalytics}
-              flex="1"
-              minW="200px"
-            >
-              <Icon icon={ChartBarIcon} size="sm" />
-              {pageState.showAnalytics ? 'Ocultar' : 'Ver'} Analytics
-            </Button>
-            <Button
-              variant="outline"
-              onClick={actions.handleBulkPerformanceUpdate}
-              flex="1"
-              minW="200px"
-            >
+        {/* 📑 TAB NAVIGATION */}
+        <Tabs.Root
+          defaultValue="directory"
+          value={pageState.activeTab}
+          onValueChange={(details) => actions.setActiveTab(details.value as typeof pageState.activeTab)}
+          variant="enclosed"
+          size="lg"
+        >
+          <Tabs.List>
+            <Tabs.Trigger value="directory">
+              <Icon icon={UsersIcon} size="sm" />
+              <Typography variant="body" size="sm">Directorio</Typography>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="performance">
               <Icon icon={TrophyIcon} size="sm" />
-              Evaluación Masiva
-            </Button>
-            <Button
-              variant="outline"
-              onClick={actions.handleComplianceReport}
-              flex="1"
-              minW="200px"
-            >
+              <Typography variant="body" size="sm">Rendimiento</Typography>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="timetracking">
+              <Icon icon={ClockIcon} size="sm" />
+              <Typography variant="body" size="sm">Control Tiempo</Typography>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="training">
+              <Icon icon={AcademicCapIcon} size="sm" />
+              <Typography variant="body" size="sm">Entrenamiento</Typography>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="management">
               <Icon icon={ShieldCheckIcon} size="sm" />
-              Reporte Cumplimiento
-            </Button>
-          </Stack>
-        </Section>
+              <Typography variant="body" size="sm">Administración</Typography>
+            </Tabs.Trigger>
+            <Tabs.Indicator />
+          </Tabs.List>
 
-        {/* Extensions Slot */}
-        <Slot id="staff-dashboard" fallback={null} />
+          {/* Directory Tab */}
+          <Tabs.Content value="directory">
+            <DirectorySection
+              viewState={viewState}
+              onViewStateChange={setViewState}
+              onEditEmployee={(employee: Employee) => {
+                setEditingEmployee(employee);
+                setIsEmployeeModalOpen(true);
+              }}
+              onDeleteEmployee={(employee: Employee) => {
+                setDeletingEmployee(employee);
+                setIsDeleteDialogOpen(true);
+              }}
+            />
+          </Tabs.Content>
+
+          {/* Performance Tab */}
+          <Tabs.Content value="performance">
+            <PerformanceSection
+              viewState={viewState}
+              onViewStateChange={setViewState}
+            />
+          </Tabs.Content>
+
+          {/* Time Tracking Tab */}
+          <Tabs.Content value="timetracking">
+            <TimeTrackingSection
+              viewState={viewState}
+              onViewStateChange={setViewState}
+            />
+          </Tabs.Content>
+
+          {/* Training Tab */}
+          <Tabs.Content value="training">
+            <TrainingSection
+              viewState={viewState}
+              onViewStateChange={setViewState}
+            />
+          </Tabs.Content>
+
+          {/* Management Tab */}
+          <Tabs.Content value="management">
+            <ManagementSection
+              viewState={viewState}
+              onViewStateChange={setViewState}
+            />
+          </Tabs.Content>
+        </Tabs.Root>
+
+        {/* Extensions Hook Point */}
+        <HookPoint name="staff.dashboard" />
       </Stack>
+
+      {/* Employee Form Modal */}
+      <EmployeeForm
+        employee={editingEmployee}
+        isOpen={isEmployeeModalOpen}
+        onClose={() => {
+          setIsEmployeeModalOpen(false);
+          setEditingEmployee(undefined);
+        }}
+        onSuccess={() => {
+          setIsEmployeeModalOpen(false);
+          setEditingEmployee(undefined);
+          // Refresh staff data from database
+          loadStaff();
+        }}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog.Root
+        open={isDeleteDialogOpen}
+        onOpenChange={(e) => {
+          setIsDeleteDialogOpen(e.open);
+          if (!e.open) setDeletingEmployee(undefined);
+        }}
+      >
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header>
+              <Dialog.Title>Confirmar Eliminación</Dialog.Title>
+            </Dialog.Header>
+            <Dialog.Body>
+              <Typography variant="body">
+                ¿Estás seguro de que deseas eliminar a{' '}
+                <strong>{deletingEmployee?.first_name} {deletingEmployee?.last_name}</strong>?
+              </Typography>
+              <Typography variant="body" size="sm" color="text.muted" mt="2">
+                Esta acción marcará al empleado como inactivo. No se eliminarán datos de forma permanente.
+              </Typography>
+            </Dialog.Body>
+            <Dialog.Footer>
+              <Stack direction="row" gap="3" justify="end">
+                <Dialog.CloseTrigger asChild>
+                  <Button variant="outline">Cancelar</Button>
+                </Dialog.CloseTrigger>
+                <Button colorPalette="red" onClick={handleDeleteEmployee}>
+                  Eliminar
+                </Button>
+              </Stack>
+            </Dialog.Footer>
+            <Dialog.CloseTrigger />
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
     </ContentLayout>
   );
 }

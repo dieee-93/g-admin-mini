@@ -1,8 +1,18 @@
 /**
- * SUPPLIERS PAGE - Main entry point
+ * Suppliers Page - Supplier Relationship Management
  *
- * Standalone module for supplier management.
- * Handles CRUD operations, analytics, and performance tracking.
+ * SEMANTIC v3.0 - WCAG AA Compliant:
+ * ✅ Skip link for keyboard navigation (WCAG 2.4.1 Level A)
+ * ✅ Semantic main content wrapper with ARIA label
+ * ✅ Proper section headings for screen readers
+ * ✅ ARIA live region for offline status
+ * ✅ Aside pattern for metrics
+ * ✅ 3-Layer Architecture (Semantic → Layout → Primitives)
+ *
+ * FEATURES:
+ * - Supplier CRUD operations
+ * - Performance analytics
+ * - Offline-first support
  *
  * @version 1.0.0
  * @see ./README.md
@@ -11,9 +21,11 @@
 import React from 'react';
 import {
   ContentLayout,
+  Section,
   Alert,
   Button,
-  Icon
+  Icon,
+  SkipLink
 } from '@/shared/ui';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
@@ -23,21 +35,14 @@ import { SuppliersMetrics, SuppliersManagement, SupplierFormModal } from './comp
 // Hooks & Services
 import { useSuppliersPage } from './hooks/useSuppliersPage';
 
-// Types
-import type { SupplierFormData } from './types/supplierTypes';
-
 // Systems Integration
-import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
-import { CapabilityGate } from '@/lib/capabilities';
-import { logger } from '@/lib/logging';
 
 export default function SuppliersPage() {
   // ============================================
   // SYSTEMS INTEGRATION
   // ============================================
 
-  const { handleError } = useErrorHandler();
   const { isOnline } = useOfflineStatus();
 
   // ============================================
@@ -53,35 +58,14 @@ export default function SuppliersPage() {
     isModalOpen,
     editingSupplier,
     allSuppliers,
-    closeModal,
-    createSupplier,
-    updateSupplier,
-    refreshData
+    closeModal
   } = pageState;
 
   // ============================================
   // MODAL HANDLERS
   // ============================================
-
-  const handleModalSubmit = async (data: SupplierFormData) => {
-    try {
-      if (editingSupplier) {
-        // Update existing
-        await updateSupplier(editingSupplier, data);
-        logger.info('Suppliers', 'Supplier updated successfully');
-      } else {
-        // Create new
-        await createSupplier(data);
-        logger.info('Suppliers', 'Supplier created successfully');
-      }
-
-      // Refresh data
-      await refreshData();
-    } catch (err) {
-      handleError(err as Error);
-      throw err; // Re-throw to let form handle it
-    }
-  };
+  // NOTE: Modal now handles submission internally via useSupplierForm hook
+  // No need for external handleModalSubmit - removed in migration to new pattern
 
   // ============================================
   // ERROR HANDLING
@@ -89,15 +73,18 @@ export default function SuppliersPage() {
 
   if (error) {
     return (
-      <ContentLayout spacing="normal">
-        <Alert status="error" title="Error de carga del módulo">
-          {error}
-        </Alert>
-        <Button onClick={() => window.location.reload()}>
-          <Icon icon={ArrowPathIcon} size="sm" />
-          Recargar página
-        </Button>
-      </ContentLayout>
+      <>
+        <SkipLink />
+        <ContentLayout spacing="normal" mainLabel="Supplier Management Error">
+          <Alert status="error" title="Error de carga del módulo">
+            {error}
+          </Alert>
+          <Button onClick={() => window.location.reload()}>
+            <Icon icon={ArrowPathIcon} size="sm" />
+            Recargar página
+          </Button>
+        </ContentLayout>
+      </>
     );
   }
 
@@ -106,29 +93,52 @@ export default function SuppliersPage() {
   // ============================================
 
   return (
-    <CapabilityGate capability="inventory_supplier_management">
-      <ContentLayout spacing="normal">
-        {/* OFFLINE WARNING */}
-        {!isOnline && (
-          <Alert status="warning" title="Modo Offline">
-            Los cambios se sincronizarán cuando recuperes la conexión
-          </Alert>
-        )}
+      <>
+        {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
+        <SkipLink />
 
-        {/* METRICS */}
-        <SuppliersMetrics metrics={metrics} loading={loading} />
+        {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
+        <ContentLayout spacing="normal" mainLabel="Supplier Relationship Management">
 
-        {/* MAIN MANAGEMENT COMPONENT */}
-        <SuppliersManagement pageState={pageState} />
+          {/* ✅ OFFLINE WARNING SECTION - ARIA live region */}
+          {!isOnline && (
+            <Section
+              variant="flat"
+              semanticHeading="System Status Alert"
+              live="polite"
+              atomic
+            >
+              <Alert status="warning" title="Modo Offline">
+                Los cambios se sincronizarán cuando recuperes la conexión
+              </Alert>
+            </Section>
+          )}
 
-        {/* FORM MODAL */}
-        <SupplierFormModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onSubmit={handleModalSubmit}
-          supplier={editingSupplier ? allSuppliers.find(s => s.id === editingSupplier) : null}
-        />
-      </ContentLayout>
-    </CapabilityGate>
+          {/* ✅ METRICS SECTION - Complementary aside pattern */}
+          <Section
+            as="aside"
+            variant="flat"
+            semanticHeading="Supplier Metrics Overview"
+          >
+            <SuppliersMetrics metrics={metrics} loading={loading} />
+          </Section>
+
+          {/* ✅ MAIN MANAGEMENT SECTION - Primary content area */}
+          <Section
+            variant="elevated"
+            semanticHeading="Supplier Management Tools"
+          >
+            <SuppliersManagement pageState={pageState} />
+          </Section>
+
+          {/* FORM MODAL - Now handles submission internally */}
+          <SupplierFormModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            supplier={editingSupplier ? allSuppliers.find(s => s.id === editingSupplier) : null}
+          />
+
+        </ContentLayout>
+      </>
   );
 }

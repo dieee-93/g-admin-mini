@@ -37,7 +37,7 @@ export const DemandForecasting: React.FC<DemandForecastingProps> = ({ analytics 
   return (
     <CardWrapper>
       <CardWrapper.Header>
-        <HStack gap={2}>
+        <HStack gap="2">
           <ChartBarIcon className="w-6 h-6 text-blue-500" />
           <Text fontSize="lg" fontWeight="semibold">Demand Forecasting</Text>
         </HStack>

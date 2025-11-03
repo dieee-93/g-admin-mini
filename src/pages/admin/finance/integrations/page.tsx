@@ -3,6 +3,10 @@ import {
   ContentLayout, PageHeader, Section, Stack, Button, Badge, Tabs
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import {
+  BanknotesIcon, BoltIcon, ChartBarIcon, CreditCardIcon, HomeIcon
+} from '@heroicons/react/24/outline';
+
 import MercadoPagoIntegration from './components/MercadoPagoIntegration';
 import MODOIntegration from './components/MODOIntegration';
 import PaymentWebhooks from './components/PaymentWebhooks';
@@ -24,7 +28,7 @@ const IntegrationsPage: React.FC = () => {
         colorPalette="blue"
         size="sm"
       >
-        <Icon name="CreditCardIcon" />
+        <Icon as={CreditCardIcon} />
         MercadoPago
       </Button>
       <Button
@@ -32,7 +36,7 @@ const IntegrationsPage: React.FC = () => {
         variant="outline"
         size="sm"
       >
-        <Icon name="BanknotesIcon" />
+        <Icon as={BanknotesIcon} />
         MODO
       </Button>
       <Button
@@ -40,7 +44,7 @@ const IntegrationsPage: React.FC = () => {
         variant="outline"
         size="sm"
       >
-        <Icon name="BoltIcon" />
+        <Icon as={BoltIcon} />
         Webhooks
       </Button>
       <Button
@@ -48,7 +52,7 @@ const IntegrationsPage: React.FC = () => {
         variant="outline"
         size="sm"
       >
-        <Icon name="ChartBarIcon" />
+        <Icon as={ChartBarIcon} />
         Analytics
       </Button>
     </Stack>
@@ -76,30 +80,30 @@ const IntegrationsPage: React.FC = () => {
       <PageHeader
         title="Integraciones de Pago"
         subtitle="Payment processors argentinos, billeteras virtuales y webhooks para ecosystem local"
-        icon="CreditCardIcon"
+        icon={CreditCardIcon}
         actions={quickActions}
       />
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'dashboard' | 'mercadopago' | 'modo' | 'webhooks' | 'analytics')}>
         <Tabs.List>
           <Tabs.Trigger value="dashboard">
-            <Icon name="HomeIcon" />
+            <Icon as={HomeIcon} />
             Dashboard
           </Tabs.Trigger>
           <Tabs.Trigger value="mercadopago">
-            <Icon name="CreditCardIcon" />
+            <Icon as={CreditCardIcon} />
             MercadoPago
           </Tabs.Trigger>
           <Tabs.Trigger value="modo">
-            <Icon name="BanknotesIcon" />
+            <Icon as={BanknotesIcon} />
             MODO
           </Tabs.Trigger>
           <Tabs.Trigger value="webhooks">
-            <Icon name="BoltIcon" />
+            <Icon as={BoltIcon} />
             Webhooks
           </Tabs.Trigger>
           <Tabs.Trigger value="analytics">
-            <Icon name="ChartBarIcon" />
+            <Icon as={ChartBarIcon} />
             Analytics
           </Tabs.Trigger>
         </Tabs.List>

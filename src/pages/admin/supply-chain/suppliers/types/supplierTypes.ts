@@ -156,6 +156,39 @@ export interface SupplierSort {
 }
 
 // ============================================
+// SERVICE TYPES
+// ============================================
+
+/**
+ * Supplier analysis result (from SupplierAnalysisEngine)
+ */
+export interface SupplierAnalysisResultForService {
+  supplierAnalyses: Array<{
+    id: string;
+    name: string;
+    overallRating: number;
+    ratingCategory: 'excellent' | 'good' | 'fair' | 'poor' | 'critical';
+    riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  }>;
+  portfolioMetrics?: {
+    averageRating: number;
+    totalAnnualSpend: number;
+  };
+}
+
+/**
+ * Procurement recommendation type
+ */
+export interface ProcurementRecommendation {
+  id: string;
+  materialId: string;
+  supplierId: string;
+  recommendationType: string;
+  priority: number;
+  estimatedSavings?: number;
+}
+
+// ============================================
 // EXPORT VALIDATIONS
 // ============================================
 

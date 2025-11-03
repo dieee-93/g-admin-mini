@@ -25,7 +25,7 @@ export function ConsolidationOpportunities({
 }: ConsolidationOpportunitiesProps) {
   if (opportunities.length === 0) {
     return (
-      <VStack align="stretch" gap={4}>
+      <VStack align="stretch" gap="4">
         <Text fontSize="xl" fontWeight="bold">
           Oportunidades de Consolidación
         </Text>
@@ -40,7 +40,7 @@ export function ConsolidationOpportunities({
   const totalSavings = opportunities.reduce((sum, opp) => sum + opp.potentialSavings, 0);
 
   return (
-    <VStack align="stretch" gap={4}>
+    <VStack align="stretch" gap="4">
       <HStack justify="space-between">
         <Text fontSize="xl" fontWeight="bold">
           Oportunidades de Consolidación
@@ -50,7 +50,7 @@ export function ConsolidationOpportunities({
         </Badge>
       </HStack>
 
-      <CardGrid columns={{ base: 1, md: 2 }} gap={4}>
+      <CardGrid columns={{ base: 1, md: 2 }} gap="4">
         {opportunities.map((opp, index) => (
           <Card.Root key={`${opp.category}-${index}`}>
             <Card.Header>
@@ -69,13 +69,13 @@ export function ConsolidationOpportunities({
             </Card.Header>
 
             <Card.Body>
-              <VStack align="stretch" gap={3}>
+              <VStack align="stretch" gap="3">
                 {/* Current Suppliers */}
-                <VStack align="start" gap={1}>
+                <VStack align="start" gap="1">
                   <Text fontSize="sm" fontWeight="semibold" color="fg.muted">
                     Proveedores Actuales ({opp.currentSuppliers.length}):
                   </Text>
-                  <VStack align="start" gap={0} pl={2}>
+                  <VStack align="start" gap="0" pl="2">
                     {opp.currentSuppliers.map(supplier => (
                       <Text key={supplier} fontSize="sm">
                         • {supplier}
@@ -85,7 +85,7 @@ export function ConsolidationOpportunities({
                 </VStack>
 
                 {/* Recommended Supplier */}
-                <VStack align="start" gap={1}>
+                <VStack align="start" gap="1">
                   <Text fontSize="sm" fontWeight="semibold" color="fg.muted">
                     Proveedor Recomendado:
                   </Text>
@@ -99,7 +99,7 @@ export function ConsolidationOpportunities({
 
                 {/* Metrics */}
                 <HStack justify="space-between">
-                  <VStack align="start" gap={0}>
+                  <VStack align="start" gap="0">
                     <Text fontSize="xs" color="fg.muted">
                       Ahorro Estimado
                     </Text>
@@ -111,7 +111,7 @@ export function ConsolidationOpportunities({
                     </HStack>
                   </VStack>
 
-                  <VStack align="end" gap={0}>
+                  <VStack align="end" gap="0">
                     <Text fontSize="xs" color="fg.muted">
                       Reducción de Riesgo
                     </Text>

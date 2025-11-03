@@ -1,3 +1,4 @@
+import { useCallback, memo } from 'react';
 import { Stack, Typography } from '@/shared/ui';
 import { useMaterials } from '@/store/materialsStore';
 import { notify } from '@/lib/notifications';
@@ -24,13 +25,14 @@ interface InventoryTabEnhancedProps {
   performanceMode?: boolean;
 }
 
-export function InventoryTabEnhanced({
+// ✅ PERFORMANCE: Memoize entire component to isolate from TabsContext thrashing
+const InventoryTabEnhancedContent = memo(function InventoryTabEnhancedContent({
   onStockUpdate,
   onBulkAction,
   onAddMaterial,
   performanceMode = false
 }: InventoryTabEnhancedProps) {
-  const { openModal, updateItem, deleteItem } = useMaterials();
+  const { openModal, deleteItem } = useMaterials();
 
   // Use inventory state hook
   const {
@@ -57,13 +59,12 @@ export function InventoryTabEnhanced({
     handleApplyAdvancedFilters,
     handleClearAdvancedFilters,
     selectItem,
-    deselectItem,
     selectAll,
     deselectAll
   } = useInventoryState();
 
-  // Bulk actions handlers
-  const handleBulkExport = async () => {
+  // Bulk actions handlers - Wrapped in useCallback to prevent recreating on every render
+  const handleBulkExport = useCallback(async () => {
     try {
       const selectedMaterials = materials.filter(m => selectedItems.includes(m.id));
 
@@ -102,41 +103,41 @@ export function InventoryTabEnhanced({
         description: 'No se pudieron exportar los materiales'
       });
     }
-  };
+  }, [materials, selectedItems]);
 
-  const handleBulkAddStock = async () => {
+  const handleBulkAddStock = useCallback(async () => {
     notify.info({
       title: 'Funcionalidad en desarrollo',
       description: 'Agregar stock masivo próximamente'
     });
     // TODO: Implement bulk add stock modal
-  };
+  }, []);
 
-  const handleBulkRemoveStock = async () => {
+  const handleBulkRemoveStock = useCallback(async () => {
     notify.info({
       title: 'Funcionalidad en desarrollo',
       description: 'Reducir stock masivo próximamente'
     });
     // TODO: Implement bulk remove stock modal
-  };
+  }, []);
 
-  const handleBulkChangeCategory = async () => {
+  const handleBulkChangeCategory = useCallback(async () => {
     notify.info({
       title: 'Funcionalidad en desarrollo',
       description: 'Cambiar categoría masivo próximamente'
     });
     // TODO: Implement bulk change category modal
-  };
+  }, []);
 
-  const handleBulkEdit = async () => {
+  const handleBulkEdit = useCallback(async () => {
     notify.info({
       title: 'Funcionalidad en desarrollo',
       description: 'Edición masiva próximamente'
     });
     // TODO: Implement bulk edit modal
-  };
+  }, []);
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = useCallback(async () => {
     if (!window.confirm(`¿Estás seguro de eliminar ${selectedItems.length} materiales?`)) {
       return;
     }
@@ -155,18 +156,20 @@ export function InventoryTabEnhanced({
         description: 'No se pudieron eliminar los materiales'
       });
     }
-  };
+  }, [selectedItems, deleteItem, deselectAll]);
 
-  // Single material actions
-  const handleEdit = (material: any) => {
+  // Single material actions - Wrapped in useCallback to prevent recreating on every render
+  type MaterialType = typeof materials[0];
+
+  const handleEdit = useCallback((material: MaterialType) => {
     openModal('edit', material);
-  };
+  }, [openModal]);
 
-  const handleView = (material: any) => {
+  const handleView = useCallback((material: MaterialType) => {
     openModal('view', material);
-  };
+  }, [openModal]);
 
-  const handleDelete = async (material: any) => {
+  const handleDelete = useCallback(async (material: MaterialType) => {
     if (!window.confirm(`¿Eliminar ${material.name}?`)) {
       return;
     }
@@ -184,7 +187,57 @@ export function InventoryTabEnhanced({
         description: 'No se pudo eliminar el material'
       });
     }
-  };
+  }, [deleteItem]);
+
+  // ✅ CRITICAL FIX: FilterDrawer callbacks - Extract inline functions to useCallback
+  // setState functions are stable and don't need to be in dependencies
+  const handleCloseFilters = useCallback(() => {
+    setIsFiltersDrawerOpen(false);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ✅ PERFORMANCE: Use functional setState to avoid advancedFilters dependency
+  const handleTypeToggle = useCallback((type) => {
+    setAdvancedFilters((prev) => {
+      const newTypes = prev.selectedTypes.includes(type)
+        ? prev.selectedTypes.filter(t => t !== type)
+        : [...prev.selectedTypes, type];
+      return { ...prev, selectedTypes: newTypes };
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handlePriceRangeChange = useCallback((range) => {
+    setAdvancedFilters((prev) => ({ ...prev, priceRange: range }));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSupplierToggle = useCallback((id) => {
+    setAdvancedFilters((prev) => {
+      const newSuppliers = prev.selectedSuppliers.includes(id)
+        ? prev.selectedSuppliers.filter(s => s !== id)
+        : [...prev.selectedSuppliers, id];
+      return { ...prev, selectedSuppliers: newSuppliers };
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleToggleOutOfStock = useCallback((value) => {
+    setAdvancedFilters((prev) => ({ ...prev, showOutOfStock: value }));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleToggleLowStock = useCallback((value) => {
+    setAdvancedFilters((prev) => ({ ...prev, showLowStock: value }));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleToggleCritical = useCallback((value) => {
+    setAdvancedFilters((prev) => ({ ...prev, showCritical: value }));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleABCToggle = useCallback((abcClass) => {
+    setAdvancedFilters((prev) => {
+      const newClasses = prev.selectedABCClasses.includes(abcClass)
+        ? prev.selectedABCClasses.filter(c => c !== abcClass)
+        : [...prev.selectedABCClasses, abcClass];
+      return { ...prev, selectedABCClasses: newClasses };
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Stack direction="column" gap="xl">
@@ -257,44 +310,21 @@ export function InventoryTabEnhanced({
       {/* Advanced Filters Drawer */}
       <FilterDrawer
         isOpen={isFiltersDrawerOpen}
-        onClose={() => setIsFiltersDrawerOpen(false)}
+        onClose={handleCloseFilters}
         selectedTypes={advancedFilters.selectedTypes}
-        onTypeToggle={(type) => {
-          const newTypes = advancedFilters.selectedTypes.includes(type)
-            ? advancedFilters.selectedTypes.filter(t => t !== type)
-            : [...advancedFilters.selectedTypes, type];
-          setAdvancedFilters({ ...advancedFilters, selectedTypes: newTypes });
-        }}
+        onTypeToggle={handleTypeToggle}
         priceRange={advancedFilters.priceRange}
-        onPriceRangeChange={(range) =>
-          setAdvancedFilters({ ...advancedFilters, priceRange: range })
-        }
+        onPriceRangeChange={handlePriceRangeChange}
         selectedSuppliers={advancedFilters.selectedSuppliers}
-        onSupplierToggle={(id) => {
-          const newSuppliers = advancedFilters.selectedSuppliers.includes(id)
-            ? advancedFilters.selectedSuppliers.filter(s => s !== id)
-            : [...advancedFilters.selectedSuppliers, id];
-          setAdvancedFilters({ ...advancedFilters, selectedSuppliers: newSuppliers });
-        }}
+        onSupplierToggle={handleSupplierToggle}
         showOutOfStock={advancedFilters.showOutOfStock}
         showLowStock={advancedFilters.showLowStock}
         showCritical={advancedFilters.showCritical}
-        onToggleOutOfStock={(value) =>
-          setAdvancedFilters({ ...advancedFilters, showOutOfStock: value })
-        }
-        onToggleLowStock={(value) =>
-          setAdvancedFilters({ ...advancedFilters, showLowStock: value })
-        }
-        onToggleCritical={(value) =>
-          setAdvancedFilters({ ...advancedFilters, showCritical: value })
-        }
+        onToggleOutOfStock={handleToggleOutOfStock}
+        onToggleLowStock={handleToggleLowStock}
+        onToggleCritical={handleToggleCritical}
         selectedABCClasses={advancedFilters.selectedABCClasses}
-        onABCToggle={(abcClass) => {
-          const newClasses = advancedFilters.selectedABCClasses.includes(abcClass)
-            ? advancedFilters.selectedABCClasses.filter(c => c !== abcClass)
-            : [...advancedFilters.selectedABCClasses, abcClass];
-          setAdvancedFilters({ ...advancedFilters, selectedABCClasses: newClasses });
-        }}
+        onABCToggle={handleABCToggle}
         onApply={handleApplyAdvancedFilters}
         onClear={handleClearAdvancedFilters}
         activeFiltersCount={activeFiltersCount}
@@ -308,4 +338,17 @@ export function InventoryTabEnhanced({
       )}
     </Stack>
   );
+}, (prevProps, nextProps) => {
+  // Custom comparison - only re-render if callbacks or performanceMode change
+  return (
+    prevProps.onStockUpdate === nextProps.onStockUpdate &&
+    prevProps.onBulkAction === nextProps.onBulkAction &&
+    prevProps.onAddMaterial === nextProps.onAddMaterial &&
+    prevProps.performanceMode === nextProps.performanceMode
+  );
+});
+
+// Export wrapper component
+export function InventoryTabEnhanced(props: InventoryTabEnhancedProps) {
+  return <InventoryTabEnhancedContent {...props} />;
 }

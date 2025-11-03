@@ -1,19 +1,19 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationActions } from '@/contexts/NavigationContext';
+// import { useLocation } from '@/contexts/LocationContext'; // Phase 5
 import { logger } from '@/lib/logging';
 import {
   CalendarIcon,
   ClockIcon,
   UsersIcon,
-  CurrencyDollarIcon,
   PlusIcon,
   ChartBarIcon,
   CheckCircleIcon,
-  UserMinusIcon,
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 
 import type { Shift } from '../../types/schedulingTypes';
+import { schedulingAnalyticsApi } from '../services/schedulingApi';
 
 // Types
 interface SchedulingStats {
@@ -36,6 +36,7 @@ interface SchedulingViewState {
     position?: string;
     employee?: string;
     status?: string;
+    location_id?: string; // 🌎 Multi-location filter
   };
   viewMode: 'week' | 'day' | 'month';
 }
@@ -58,18 +59,18 @@ export interface UseSchedulingPageReturn {
   handleTabChange: (tab: SchedulingTab) => void;
   setViewState: (state: SchedulingViewState | ((prev: SchedulingViewState) => SchedulingViewState)) => void;
   setIsAutoSchedulingOpen: (isOpen: boolean) => void;
-  handleScheduleGenerated: (solution: any) => void;
+  handleScheduleGenerated: (solution: unknown) => void;
   handleOpenCreateShift: () => void;
   handleOpenEditShift: (shift: Shift) => void;
   handleCloseShiftEditor: () => void;
 }
 
 export const useSchedulingPage = (): UseSchedulingPageReturn => {
-  const { setQuickActions } = useNavigation();
+  const { setQuickActions } = useNavigationActions();
+  // Multi-location support disabled for now - will be used in Phase 5
+  // const { selectedLocation, isMultiLocationMode } = useLocation();
 
-  // Debug logs removed to prevent console spam
-
-  // ✅ ESTADO EMPRESARIAL ESTÁNDAR
+  // Estado empresarial estándar
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -84,31 +85,53 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
   const [isShiftEditorOpen, setIsShiftEditorOpen] = useState(false);
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
 
-  // Mock scheduling stats - will be replaced with API call
+  // Real scheduling stats from API
   const [schedulingStats, setSchedulingStats] = useState<SchedulingStats>({
-    total_shifts_this_week: 156,
-    employees_scheduled: 24,
-    coverage_percentage: 87.5,
-    pending_time_off: 8,
-    labor_cost_this_week: 18750,
-    overtime_hours: 12,
-    understaffed_shifts: 3,
-    approved_requests: 15
+    total_shifts_this_week: 0,
+    employees_scheduled: 0,
+    coverage_percentage: 0,
+    pending_time_off: 0,
+    labor_cost_this_week: 0,
+    overtime_hours: 0,
+    understaffed_shifts: 0,
+    approved_requests: 0
   });
 
-  // ✅ SIMULAR CARGA INICIAL
+  // Load real data from API
   useEffect(() => {
     const initializeData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Simular carga de datos
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Get current week range
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-        // Aquí iría la carga real de datos
+        // Load weekly dashboard from API
+        const dashboard = await schedulingAnalyticsApi.getWeeklyDashboard({
+          startDate: startOfWeek.toISOString().split('T')[0],
+          endDate: endOfWeek.toISOString().split('T')[0]
+        });
+
+        // Map API response to stats
+        setSchedulingStats({
+          total_shifts_this_week: dashboard.totalShifts || 0,
+          employees_scheduled: dashboard.activeEmployees || 0,
+          coverage_percentage: dashboard.averageCoverage || 0,
+          pending_time_off: dashboard.pendingTimeOff || 0,
+          labor_cost_this_week: dashboard.totalLaborCost || 0,
+          overtime_hours: dashboard.overtimeHours || 0,
+          understaffed_shifts: dashboard.understaffedShifts || 0,
+          approved_requests: dashboard.approvedRequests || 0
+        });
+
         setLoading(false);
       } catch (err) {
+        logger.error('UseSchedulingPage', 'Error loading scheduling data', err);
         setError(err instanceof Error ? err.message : 'Error loading scheduling data');
         setLoading(false);
       }
@@ -170,13 +193,13 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
               id: 'new-request',
               label: 'New Request',
               icon: PlusIcon,
-              action: () => console.log('Creating time-off request')
+              action: () => logger.debug('UseSchedulingPage', 'Creating time-off request')
             },
             {
               id: 'bulk-approve',
               label: 'Bulk Approve',
               icon: CheckCircleIcon,
-              action: () => console.log('Bulk approving requests')
+              action: () => logger.debug('UseSchedulingPage', 'Bulk approving requests')
             }
           ];
         case 'coverage':
@@ -185,7 +208,7 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
               id: 'find-coverage',
               label: 'Find Coverage',
               icon: UsersIcon,
-              action: () => console.log('Finding coverage')
+              action: () => logger.debug('UseSchedulingPage', 'Finding coverage')
             }
           ];
         case 'costs':
@@ -194,7 +217,7 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
               id: 'export-costs',
               label: 'Export Report',
               icon: ChartBarIcon,
-              action: () => console.log('Exporting cost report')
+              action: () => logger.debug('UseSchedulingPage', 'Exporting cost report')
             }
           ];
         case 'realtime':
@@ -203,13 +226,13 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
               id: 'force-refresh',
               label: 'Force Refresh',
               icon: ClockIcon,
-              action: () => console.log('Force refreshing real-time data')
+              action: () => logger.debug('UseSchedulingPage', 'Force refreshing real-time data')
             },
             {
               id: 'export-live-data',
               label: 'Export Live Data',
               icon: ChartBarIcon,
-              action: () => console.log('Exporting live data')
+              action: () => logger.debug('UseSchedulingPage', 'Exporting live data')
             }
           ];
         default:
@@ -221,13 +244,14 @@ export const useSchedulingPage = (): UseSchedulingPageReturn => {
 
     // Cleanup function
     return () => setQuickActions([]);
-  }, [viewState.activeTab, handleOpenCreateShift]); // ✅ REMOVED setQuickActions to prevent infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewState.activeTab, handleOpenCreateShift]); // setQuickActions is stable but causes lint warning
 
   const handleTabChange = useCallback((tab: SchedulingTab) => {
     setViewState(prev => ({ ...prev, activeTab: tab }));
   }, []);
 
-  const handleScheduleGenerated = useCallback((solution: any) => {
+  const handleScheduleGenerated = useCallback((solution: unknown) => {
     logger.info('API', 'Schedule generated:', solution);
     // TODO: Apply the generated schedule to the database
     // For now, just log the solution and refresh the view

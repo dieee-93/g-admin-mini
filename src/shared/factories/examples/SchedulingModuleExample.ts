@@ -514,7 +514,7 @@ function CustomSchedulingManagement() {
     <div>
       <SchedulingForm
         onSuccess={() => logger.info('App', 'Schedule created!')}
-        onCancel={() => console.log('Cancelled')}
+        onCancel={() => logger.debug('SchedulingModuleExample', 'Cancelled')}
       />
       <SchedulingList />
       <SchedulingAnalytics />

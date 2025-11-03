@@ -3,10 +3,7 @@
  */
 
 import React, { useState } from 'react';
-import { ContentLayout, Section, Tabs, TabList, Tab, TabPanel, Stack } from '@/shared/ui';
-import { DynamicThemeTest } from '@/components/debug/DynamicThemeTest';
-import { FullDesignSystemDemo } from '@/components/debug/FullDesignSystemDemo';
-// Import other theme components as needed
+import { ContentLayout, Section, Tabs, TabsList, TabsTrigger, TabsContent, Stack } from '@/shared/ui';
 
 type ThemeTab = 'dynamic' | 'design-system' | 'tokens' | 'palette';
 
@@ -29,38 +26,38 @@ export default function ThemeDebugPage() {
           variant="line"
           colorPalette="purple"
         >
-          <TabList>
+          <TabsList>
             {tabs.map(tab => (
-              <Tab
+              <TabsTrigger
                 key={tab.id}
                 value={tab.id}
                 icon={<span>{tab.icon}</span>}
               >
                 {tab.label}
-              </Tab>
+              </TabsTrigger>
             ))}
-          </TabList>
+          </TabsList>
 
           <div style={{ marginTop: '20px' }}>
-            <TabPanel value="dynamic" padding="md">
-              <DynamicThemeTest />
-            </TabPanel>
+            <TabsContent value="dynamic" padding="md">
+              <div>Dynamic theme test</div>
+            </TabsContent>
 
-            <TabPanel value="design-system" padding="md">
-              <FullDesignSystemDemo />
-            </TabPanel>
+            <TabsContent value="design-system" padding="md">
+              <div>Design system demo</div>
+            </TabsContent>
 
-            <TabPanel value="tokens" padding="md">
+            <TabsContent value="tokens" padding="md">
               <Stack spacing="md">
                 <div>Token debugger placeholder - TODO: Import TokenTest component</div>
               </Stack>
-            </TabPanel>
+            </TabsContent>
 
-            <TabPanel value="palette" padding="md">
+            <TabsContent value="palette" padding="md">
               <Stack spacing="md">
                 <div>Palette tester placeholder - TODO: Import PaletteSystemTest component</div>
               </Stack>
-            </TabPanel>
+            </TabsContent>
           </div>
         </Tabs>
       </Section>

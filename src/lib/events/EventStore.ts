@@ -98,7 +98,7 @@ export class EventStoreIndexedDB implements IEventStore {
         resolve();
       };
       
-      request.onupgradeneeded = (_event) => {
+      request.onupgradeneeded = (event) => {
         logger.info('EventBus', '[EventStore] Database upgrade needed');
         const db = (event.target as IDBOpenDBRequest).result;
         this.createStores(db);
@@ -206,8 +206,8 @@ export class EventStoreIndexedDB implements IEventStore {
         const index = store.index('timestamp');
         const cursorRequest = index.openCursor();
         let deletedCount = 0;
-        
-        cursorRequest.onsuccess = (_event) => {
+
+        cursorRequest.onsuccess = (event) => {
           const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
           
           if (cursor && deletedCount < eventsToDelete) {
@@ -346,8 +346,8 @@ export class EventStoreIndexedDB implements IEventStore {
       let count = 0;
       const offset = options.offset || 0;
       const limit = options.limit || 1000;
-      
-      request.onsuccess = (_event) => {
+
+      request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result as IDBCursorWithValue;
         
         if (!cursor) {
@@ -451,8 +451,8 @@ export class EventStoreIndexedDB implements IEventStore {
     return new Promise((resolve, reject) => {
       const range = IDBKeyRange.upperBound(beforeTimestamp);
       const request = index.openCursor(range);
-      
-      request.onsuccess = (_event) => {
+
+      request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result as IDBCursorWithValue;
         
         if (!cursor) {
@@ -517,8 +517,8 @@ export class EventStoreIndexedDB implements IEventStore {
       };
       
       const request = store.openCursor();
-      
-      request.onsuccess = (_event) => {
+
+      request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result as IDBCursorWithValue;
         
         if (!cursor) {

@@ -24,7 +24,7 @@ import type {
  * Cada tipo de evento (staff, production, etc.) debe extender esta clase
  * e implementar el método adapt().
  */
-export abstract class SchedulingAdapter<TSource = any> {
+export abstract class SchedulingAdapter<TSource = unknown> {
   /**
    * Convierte datos de origen al formato UnifiedScheduleEvent
    *

@@ -65,9 +65,9 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
 
   return (
     <CardWrapper>
-      <Box maxW="md" mx="auto" mt={8}>
-        <VStack gap={6}>
-          <VStack gap={2}>
+      <Box maxW="md" mx="auto" mt="8">
+        <VStack gap="6">
+          <VStack gap="2">
             <Heading size="lg" color="blue.500">
               G-Mini
             </Heading>
@@ -77,11 +77,11 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
           </VStack>
           
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-            <VStack gap={4}>
+            <VStack gap="4">
               {error && (
                 <Box 
                   w="full" 
-                  p={3} 
+                  p="3" 
                   bg="red.50" 
                   border="1px solid" 
                   borderColor="red.200" 
@@ -153,7 +153,7 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
                 </>
               )}
 
-              <Box mt={4}>
+              <Box mt="4">
                 <Text fontSize="xs" color="gray.500" textAlign="center">
                   Demo: Usa cualquier email válido para crear una cuenta de prueba
                 </Text>

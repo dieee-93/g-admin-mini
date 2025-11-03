@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Stack, Typography, Button, Icon, Checkbox, Badge } from '@/shared/ui';
 import { Drawer } from '@/shared/ui';
 import { XMarkIcon, FunnelIcon } from '@heroicons/react/24/outline';
@@ -43,7 +44,7 @@ interface FilterDrawerProps {
   activeFiltersCount?: number;
 }
 
-export function FilterDrawer({
+export const FilterDrawer = memo(function FilterDrawer({
   isOpen,
   onClose,
   selectedTypes,
@@ -104,19 +105,19 @@ export function FilterDrawer({
                 <Stack direction="column" gap="sm">
                   <Checkbox
                     checked={selectedTypes.includes('MEASURABLE')}
-                    onChange={(e) => onTypeToggle('MEASURABLE')}
+                    onChange={() => onTypeToggle('MEASURABLE')}
                   >
                     Medibles (kg, L, m)
                   </Checkbox>
                   <Checkbox
                     checked={selectedTypes.includes('COUNTABLE')}
-                    onChange={(e) => onTypeToggle('COUNTABLE')}
+                    onChange={() => onTypeToggle('COUNTABLE')}
                   >
                     Contables (unidades, paquetes)
                   </Checkbox>
                   <Checkbox
                     checked={selectedTypes.includes('ELABORATED')}
-                    onChange={(e) => onTypeToggle('ELABORATED')}
+                    onChange={() => onTypeToggle('ELABORATED')}
                   >
                     Elaborados (recetas)
                   </Checkbox>
@@ -265,4 +266,4 @@ export function FilterDrawer({
       </Drawer.Positioner>
     </Drawer.Root>
   );
-}
+});

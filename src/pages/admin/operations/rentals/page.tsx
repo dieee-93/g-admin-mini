@@ -1,8 +1,27 @@
+/**
+ * Rentals Management Page - Equipment & Space Rental Management
+ *
+ * SEMANTIC v3.0 - WCAG AA Compliant:
+ * ✅ Skip link for keyboard navigation (WCAG 2.4.1 Level A)
+ * ✅ Semantic main content wrapper with ARIA label
+ * ✅ Proper section headings for screen readers
+ * ✅ Nav pattern for tab navigation
+ * ✅ 3-Layer Architecture (Semantic → Layout → Primitives)
+ *
+ * FEATURES:
+ * - Rental lifecycle management
+ * - Asset utilization tracking
+ * - Payment processing
+ * - Cross-module integration (Customers, Analytics, Billing)
+ * - EventBus integration
+ */
+
 import React from 'react';
 import {
-  ContentLayout, PageHeader, Section, Stack, Button, Badge, Tabs
+  ContentLayout, Section, Stack, Button, Badge, Tabs, SkipLink, HStack
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import { PlusIcon, ChartBarIcon, CubeIcon, CogIcon, HomeIcon, ListBulletIcon } from '@heroicons/react/24/outline';
 import RentalFormEnhanced from './components/RentalFormEnhanced';
 import RentalAnalyticsEnhanced from './components/RentalAnalyticsEnhanced';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
@@ -14,42 +33,6 @@ const RentalPage: React.FC = () => {
     // Emit module loaded event
     ModuleEventUtils.system.moduleLoaded('rental');
   }, []);
-
-  const quickActions = (
-    <Stack direction="row" gap="sm">
-      <Button
-        onClick={() => setActiveTab('create')}
-        colorPalette="blue"
-        size="sm"
-      >
-        <Icon name="PlusIcon" />
-        Nuevo Rental
-      </Button>
-      <Button
-        onClick={() => setActiveTab('analytics')}
-        variant="outline"
-        size="sm"
-      >
-        <Icon name="ChartBarIcon" />
-        Analytics
-      </Button>
-      <Button
-        onClick={() => setActiveTab('assets')}
-        variant="outline"
-        size="sm"
-      >
-        <Icon name="CubeIcon" />
-        Assets
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-      >
-        <Icon name="CogIcon" />
-        Configuración
-      </Button>
-    </Stack>
-  );
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -69,43 +52,94 @@ const RentalPage: React.FC = () => {
   };
 
   return (
-    <ContentLayout spacing="normal">
-      <PageHeader
-        title="Gestión de Rentals"
-        subtitle="Sistema integral de alquiler de equipos, espacios y vehículos con analytics de utilización"
-        icon="CubeIcon"
-        actions={quickActions}
-      />
+    <>
+      {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
+      <SkipLink />
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-        <Tabs.List>
-          <Tabs.Trigger value="dashboard">
-            <Icon name="HomeIcon" />
-            Dashboard
-          </Tabs.Trigger>
-          <Tabs.Trigger value="create">
-            <Icon name="PlusIcon" />
-            Nuevo Rental
-          </Tabs.Trigger>
-          <Tabs.Trigger value="manage">
-            <Icon name="ListBulletIcon" />
-            Gestionar Rentals
-          </Tabs.Trigger>
-          <Tabs.Trigger value="assets">
-            <Icon name="CubeIcon" />
-            Assets
-          </Tabs.Trigger>
-          <Tabs.Trigger value="analytics">
-            <Icon name="ChartBarIcon" />
-            Analytics
-          </Tabs.Trigger>
-        </Tabs.List>
+      {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
+      <ContentLayout spacing="normal" mainLabel="Rental Management">
 
-        <Tabs.Content value={activeTab}>
-          {renderTabContent()}
-        </Tabs.Content>
-      </Tabs>
-    </ContentLayout>
+        {/* ✅ HEADER SECTION - Title and actions */}
+        <Section
+          variant="flat"
+          title="Gestión de Rentals"
+          subtitle="Sistema integral de alquiler de equipos, espacios y vehículos con analytics de utilización"
+          semanticHeading="Rental Management Dashboard"
+          actions={
+            <HStack gap="2">
+              <Button
+                onClick={() => setActiveTab('create')}
+                colorPalette="blue"
+                size="sm"
+              >
+                <Icon as={PlusIcon} />
+                Nuevo Rental
+              </Button>
+              <Button
+                onClick={() => setActiveTab('analytics')}
+                variant="outline"
+                size="sm"
+              >
+                <Icon as={ChartBarIcon} />
+                Analytics
+              </Button>
+              <Button
+                onClick={() => setActiveTab('assets')}
+                variant="outline"
+                size="sm"
+              >
+                <Icon as={CubeIcon} />
+                Assets
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+              >
+                <Icon as={CogIcon} />
+                Configuración
+              </Button>
+            </HStack>
+          }
+        />
+
+        {/* ✅ TAB NAVIGATION SECTION - Semantic nav pattern */}
+        <Section
+          as="nav"
+          variant="elevated"
+          semanticHeading="Rental Management Sections"
+        >
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+            <Tabs.List>
+              <Tabs.Trigger value="dashboard">
+                <Icon as={HomeIcon} />
+                Dashboard
+              </Tabs.Trigger>
+              <Tabs.Trigger value="create">
+                <Icon as={PlusIcon} />
+                Nuevo Rental
+              </Tabs.Trigger>
+              <Tabs.Trigger value="manage">
+                <Icon as={ListBulletIcon} />
+                Gestionar Rentals
+              </Tabs.Trigger>
+              <Tabs.Trigger value="assets">
+                <Icon as={CubeIcon} />
+                Assets
+              </Tabs.Trigger>
+              <Tabs.Trigger value="analytics">
+                <Icon as={ChartBarIcon} />
+                Analytics
+              </Tabs.Trigger>
+            </Tabs.List>
+
+            <Tabs.Content value={activeTab}>
+              {renderTabContent()}
+            </Tabs.Content>
+          </Tabs>
+        </Section>
+
+      </ContentLayout>
+    </>
   );
 };
 
@@ -113,7 +147,7 @@ const RentalPage: React.FC = () => {
 const RentalDashboard: React.FC = () => {
   return (
     <Stack gap="lg">
-      <Section title="Estado del Sistema" variant="elevated">
+      <Section title="Estado del Sistema" variant="elevated" semanticHeading="Rental System Status Overview">
         <Stack gap="md">
           <Stack direction="row" gap="md" wrap="wrap">
             <Badge colorPalette="green" variant="subtle" size="lg">
@@ -170,7 +204,7 @@ const RentalDashboard: React.FC = () => {
 // Rental Manager component
 const RentalManager: React.FC = () => {
   return (
-    <Section title="Gestión de Rentals Activos" variant="elevated">
+    <Section title="Gestión de Rentals Activos" variant="elevated" semanticHeading="Active Rentals Management Panel">
       <Stack gap="md">
         <p><strong>Panel de gestión de rentals en curso y historial</strong></p>
 
@@ -212,7 +246,7 @@ const RentalManager: React.FC = () => {
 // Asset Manager component
 const AssetManager: React.FC = () => {
   return (
-    <Section title="Gestión de Assets" variant="elevated">
+    <Section title="Gestión de Assets" variant="elevated" semanticHeading="Rental Assets Management Panel">
       <Stack gap="md">
         <p><strong>Control integral de inventario de assets rentables</strong></p>
 

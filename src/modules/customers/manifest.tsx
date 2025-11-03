@@ -7,11 +7,18 @@
  * @version 1.0.0
  */
 
-import React from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
 import { UsersIcon } from '@heroicons/react/24/outline';
+
+interface CustomerData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  note?: string;
+}
 
 export const customersManifest: ModuleManifest = {
   id: 'customers',
@@ -27,8 +34,11 @@ export const customersManifest: ModuleManifest = {
     'customer_service_history',
     'customer_preference_tracking',
     'customer_loyalty_program',
-    'customer_online_reservation',
+    'customer_online_accounts',
   ] as FeatureId[],
+
+  // 🔒 PERMISSIONS: Employees can create/view customers
+  minimumRole: 'OPERADOR' as const,
 
   hooks: {
     provide: [
@@ -45,26 +55,17 @@ export const customersManifest: ModuleManifest = {
     logger.info('App', '👥 Setting up Customers module');
 
     try {
-      // Register CRM dashboard widget
+      // Register dashboard widget
+      const { CustomersWidget } = await import('@/pages/admin/core/crm/customers/components');
+
       registry.addAction(
         'dashboard.widgets',
-        () => ({
-          id: 'crm-summary',
-          title: 'Customer Analytics',
-          type: 'crm',
-          priority: 7,
-          data: {
-            totalCustomers: 0,
-            newThisMonth: 0,
-            activeCustomers: 0,
-            averageLifetimeValue: 0,
-          },
-        }),
+        () => <CustomersWidget />,
         'customers',
-        7
+        40 // Priority - adjust as needed
       );
 
-      logger.info('App', '✅ Customers module setup complete');
+      logger.info('App', '✅ Customers module setup complete - Dashboard widget registered');
     } catch (error) {
       logger.error('App', '❌ Customers module setup failed', error);
       throw error;
@@ -80,7 +81,7 @@ export const customersManifest: ModuleManifest = {
       logger.debug('App', 'Getting customer', { customerId });
       return { customer: null };
     },
-    updateCustomer: async (customerId: string, data: any) => {
+    updateCustomer: async (customerId: string, data: CustomerData) => {
       logger.debug('App', 'Updating customer', { customerId, data });
       return { success: true };
     },

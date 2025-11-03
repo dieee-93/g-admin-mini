@@ -13,10 +13,10 @@ import {
   UserIcon,
   ChartBarIcon
 } from "@heroicons/react/24/outline";
-import { 
+import {
   Stack, Typography, CardWrapper, Section, Button, Badge, Avatar, Switch, SimpleGrid, MetricCard, Alert
 } from "@/shared/ui";
-import { Icon, HeaderIcon } from "@/shared/ui/Icon";
+import { Icon } from "@/shared/ui/Icon";
 
 export function UserPermissionsSection() {
   const roles = [

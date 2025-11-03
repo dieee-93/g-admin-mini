@@ -6,21 +6,21 @@ import {
   ClipboardDocumentListIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationActions } from '@/contexts/NavigationContext';
+import { useLocation } from '@/contexts/LocationContext'; // 🆕 MULTI-LOCATION
 import { useMaterials } from '@/store/materialsStore';
 import { inventoryApi } from '../services/inventoryApi';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
 import { ABCAnalysisEngine } from '../services/abcAnalysisEngine';
+import { TrendsService } from '../services/trendsService'; // ✅ Phase 3: Historical trends
 // ✅ SISTEMAS INTEGRATION
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import type { MaterialItem } from '../types';
+import type { MaterialItem, ItemFormData } from '../types';
 // Enhanced functionality imports
-import { useDataFetcher, useDataSearch, useModuleAnalytics } from '@/shared/hooks/business';
-import { AnalyticsEngine } from '@/shared/services/AnalyticsEngine';
-import { handleAsyncOperation, CRUDHandlers } from '@/shared/utils/errorHandling';
+// NOTE: Removed unused imports (useDataFetcher, useDataSearch, useModuleAnalytics, AnalyticsEngine, handleAsyncOperation, CRUDHandlers)
 import eventBus from '@/lib/events';
 
 import { logger } from '@/lib/logging';
@@ -53,7 +53,7 @@ export interface MaterialsPageActions {
 
   // Material management
   handleOpenAddModal: () => void;
-  handleAddMaterial: (materialData: any) => Promise<void>;
+  handleAddMaterial: (materialData: ItemFormData) => Promise<void>;
 
   // Bulk operations
   handleBulkOperations: () => void;
@@ -93,9 +93,12 @@ export interface MaterialsPageMetrics {
   classAValue: number;
   classBValue: number;
   classCValue: number;
-  // Trends
+  // Trends (✅ Phase 3: Calculated from TrendsService)
   valueGrowth: number;
   stockTurnover: number;
+  avgTurnoverRate: number;
+  fastMovingItems: string[];
+  slowMovingItems: string[];
 }
 
 export interface UseMaterialsPageReturn {
@@ -131,25 +134,31 @@ export interface UseMaterialsPageReturn {
   searchLoading: boolean;
   searchQuery: string;
   clearSearch: () => void;
-  analytics: any;
+  analytics: Record<string, unknown>;
   analyticsLoading: boolean;
-  formatMetric: (value: any, format: string) => string;
-  createMaterial: (data: any) => Promise<any>;
-  updateMaterial: (id: string, data: any) => Promise<any>;
-  deleteMaterial: (id: string, name: string) => Promise<any>;
-  adjustStock: (id: string, adjustment: number, reason?: string) => Promise<any>;
-  alerts: any[];
+  formatMetric: (value: string | number, format: string) => string;
+  createMaterial: (data: ItemFormData) => Promise<MaterialItem>;
+  updateMaterial: (id: string, data: Partial<ItemFormData>) => Promise<MaterialItem>;
+  deleteMaterial: (id: string, name: string) => Promise<void>;
+  adjustStock: (id: string, adjustment: number, reason?: string) => Promise<MaterialItem>;
+  alerts: Array<{ id: string; type: string; message: string }>;
   refresh: () => Promise<void>;
-  inventory: any;
+  inventory: Record<string, unknown>;
+
+  // ✅ Phase 3: Historical trends
+  systemTrends: Record<string, unknown>;
+  trendsLoading: boolean;
+  loadSystemTrends: () => Promise<void>;
 }
 
 export const useMaterialsPage = (): UseMaterialsPageReturn => {
-  const { setQuickActions, updateModuleBadge } = useNavigation();
+  const { setQuickActions, updateModuleBadge } = useNavigationActions();
 
   // ✅ SISTEMAS INTEGRATION
   const { handleError } = useErrorHandler();
   const { isOnline } = useOfflineStatus();
   const { shouldReduceAnimations } = usePerformanceMonitor();
+  const { selectedLocation, isMultiLocationMode } = useLocation(); // 🆕 MULTI-LOCATION
 
   // Materials store state
   const {
@@ -180,26 +189,54 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
 
   const [localError, setLocalError] = useState<string | null>(null);
 
+  // ✅ Phase 3: Historical trends state
+  const [systemTrends, setSystemTrends] = useState<Record<string, unknown> | null>(null);
+  const [trendsLoading, setTrendsLoading] = useState(false);
+
   // ✅ CALCULATE METRICS USING BUSINESS LOGIC SERVICES
-  const metrics: MaterialsPageMetrics = {
-    totalItems: items.length,
-    totalValue: DecimalUtils.toNumber(items.reduce((sum, item) =>
-      DecimalUtils.add(sum, StockCalculation.getTotalValue(item), 'financial'),
-      DecimalUtils.fromValue(0, 'financial')
-    )),
-    lowStockItems: StockCalculation.getLowStockItems(items).length,
-    criticalStockItems: StockCalculation.getCriticalStockItems(items).length,
-    outOfStockItems: StockCalculation.getOutOfStockItems(items).length,
-    supplierCount: new Set(items.map(item => item.supplier_id).filter(Boolean)).size,
-    lastUpdate: new Date(),
-    // ABC Analysis
-    classAValue: 0, // TODO: Calculate from ABCAnalysisEngine
-    classBValue: 0,
-    classCValue: 0,
-    // Trends
-    valueGrowth: 5.2, // TODO: Calculate from historical data
-    stockTurnover: 12.5
-  };
+  const metrics: MaterialsPageMetrics = useMemo(() => {
+    // Run ABC Analysis
+    const abcAnalysis = ABCAnalysisEngine.analyzeInventory(items);
+
+    // Calculate class values using correct structure (classA, classB, classC)
+    const classAValue = abcAnalysis.classA?.reduce(
+      (sum, material) => sum + (material.totalValue || 0),
+      0
+    ) || 0;
+
+    const classBValue = abcAnalysis.classB?.reduce(
+      (sum, material) => sum + (material.totalValue || 0),
+      0
+    ) || 0;
+
+    const classCValue = abcAnalysis.classC?.reduce(
+      (sum, material) => sum + (material.totalValue || 0),
+      0
+    ) || 0;
+
+    return {
+      totalItems: items.length,
+      totalValue: DecimalUtils.toNumber(items.reduce((sum, item) =>
+        DecimalUtils.add(sum, StockCalculation.getTotalValue(item), 'financial'),
+        DecimalUtils.fromValue(0, 'financial')
+      )),
+      lowStockItems: StockCalculation.getLowStockItems(items).length,
+      criticalStockItems: StockCalculation.getCriticalStockItems(items).length,
+      outOfStockItems: StockCalculation.getOutOfStockItems(items).length,
+      supplierCount: new Set(items.map(item => item.supplier_id).filter(Boolean)).size,
+      lastUpdate: new Date(),
+      // ✅ ABC Analysis (calculated from ABCAnalysisEngine)
+      classAValue,
+      classBValue,
+      classCValue,
+      // ✅ Phase 3: Trends (calculated from TrendsService)
+      valueGrowth: systemTrends?.valueGrowth || 0,
+      stockTurnover: systemTrends?.avgTurnoverRate || 0,
+      avgTurnoverRate: systemTrends?.avgTurnoverRate || 0,
+      fastMovingItems: systemTrends?.fastMovingItems || [],
+      slowMovingItems: systemTrends?.slowMovingItems || []
+    };
+  }, [items, systemTrends]);
 
   // Setup quick actions in navigation
   useEffect(() => {
@@ -259,27 +296,48 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     setPageState(prev => ({ ...prev, activeTab: tab }));
   }, []);
 
-  // ✅ LOAD INVENTORY DATA (Simplified for mock data)
+  // ✅ Phase 3: Load system trends
+  const loadSystemTrends = useCallback(async () => {
+    try {
+      setTrendsLoading(true);
+      const trends = await TrendsService.calculateSystemTrends();
+      setSystemTrends(trends);
+    } catch (error) {
+      logger.error('MaterialsStore', 'Error loading system trends:', error);
+      // Don't show error to user - trends are non-critical
+    } finally {
+      setTrendsLoading(false);
+    }
+  }, []);
+
+  // ✅ LOAD INVENTORY DATA (with multi-location support)
   const loadInventoryData = useCallback(async () => {
     try {
       setLocalError(null); // Clear any previous errors
       setItems([]);
 
-      // Direct call to API (will use mock data)
-      const apiItems = await inventoryApi.getItems();
+      // 🆕 MULTI-LOCATION: Pass location_id to API if in multi-location mode
+      const locationId = isMultiLocationMode && selectedLocation?.id
+        ? selectedLocation.id
+        : undefined;
 
-      // For now, use items directly from mock service (they're already in the correct format)
+      const apiItems = await inventoryApi.getItems(locationId);
+
+      // For now, use items directly from API (they're already in the correct format)
       setItems(apiItems);
 
       if (refreshStats) {
         refreshStats();
       }
+
+      // ✅ Phase 3: Load trends after materials are loaded
+      loadSystemTrends();
     } catch (error) {
       logger.error('MaterialsStore', 'Error loading inventory data:', error);
       setLocalError('Error al cargar datos de inventario');
       handleError(error as Error, { operation: 'loadInventory' });
     }
-  }, [setItems, refreshStats, handleError]);
+  }, [setItems, refreshStats, handleError, isMultiLocationMode, selectedLocation?.id, loadSystemTrends]);
 
   // ✅ BUSINESS ACTIONS
   const actions = {
@@ -309,7 +367,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     // Stock operations
     handleStockUpdate: useCallback(async (itemId: string, newStock: number) => {
       try {
-        const updatedItem = await inventoryApi.updateStock(itemId, newStock);
+        await inventoryApi.updateStock(itemId, newStock);
 
         // Find the item to get details
         const currentItems = getFilteredItems();
@@ -367,7 +425,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
       openModal('add');
     }, [openModal]),
 
-    handleAddMaterial: useCallback(async (materialData: any) => {
+    handleAddMaterial: useCallback(async (materialData: ItemFormData) => {
       try {
         const newMaterial = await inventoryApi.createMaterial(materialData);
         await loadInventoryData();
@@ -422,7 +480,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     }, [loadInventoryData, handleError]),
 
     // Alert handling
-    handleAlertAction: useCallback(async (alertId: string, action: string) => {
+    handleAlertAction: useCallback(async (alertId: string) => {
       try {
         // Handle smart alert actions
         // TODO: Implement smart alert actions
@@ -478,9 +536,9 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
 
     handleStockAlert: useCallback(() => {
       // Filter to show only items with stock alerts
-      const alertItems = StockCalculation.getCriticalStockItems(items);
+      // const alertItems = StockCalculation.getCriticalStockItems(items);
       // TODO: Open modal or filter view for critical items
-    }, [items]),
+    }, []),
 
     handleBulkActions: useCallback(() => {
       setPageState(prev => ({ ...prev, bulkMode: !prev.bulkMode }));
@@ -510,24 +568,10 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     return StockCalculation.getOutOfStockItems(items);
   }, [items]);
 
-  const getLocalFilteredItems = useCallback(() => {
-    let filteredItems = items;
-
-    // Filter by selected category
-    if (pageState.selectedCategory) {
-      filteredItems = filteredItems.filter(item =>
-        item.category === pageState.selectedCategory
-      );
-    }
-
-    return filteredItems;
-  }, [items, pageState.selectedCategory]);
-
   // ✅ ENHANCED FUNCTIONALITY (from useMaterialsEnhanced)
 
   // Search functionality
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchLoading, setSearchLoading] = useState(false);
 
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return items;
@@ -547,27 +591,30 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
   const clearSearch = useCallback(() => {
     setSearchQuery('');
   }, []);
+  // Search loading state (always false for sync filtering)
+  const searchLoading = false;
+
 
   // Analytics functionality
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
-  const [analyticsData, setAnalyticsData] = useState<any>({});
+  const analyticsLoading = false;
+  const analyticsData: Record<string, unknown> = {};
 
-  const formatMetric = useCallback((value: any, format: string) => {
+  const formatMetric = useCallback((value: string | number, format: string) => {
     switch (format) {
       case 'currency':
         return new Intl.NumberFormat('es-ES', {
           style: 'currency',
           currency: 'EUR'
-        }).format(value);
+        }).format(Number(value));
       case 'number':
-        return new Intl.NumberFormat('es-ES').format(value);
+        return new Intl.NumberFormat('es-ES').format(Number(value));
       default:
         return String(value);
     }
   }, []);
 
   // Enhanced CRUD operations
-  const createMaterial = useCallback(async (materialData: any) => {
+  const createMaterial = useCallback(async (materialData: ItemFormData) => {
     try {
       const result = await inventoryApi.createMaterial(materialData);
       await loadInventoryData();
@@ -578,7 +625,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     }
   }, [loadInventoryData, handleError]);
 
-  const updateMaterial = useCallback(async (id: string, materialData: any) => {
+  const updateMaterial = useCallback(async (id: string, materialData: Partial<ItemFormData>) => {
     try {
       const result = await inventoryApi.updateMaterial(id, materialData);
       await loadInventoryData();
@@ -711,6 +758,11 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
       getFilteredItems,
       loading,
       error
-    }
+    },
+
+    // ✅ Phase 3: Historical trends
+    systemTrends,
+    trendsLoading,
+    loadSystemTrends
   };
 };

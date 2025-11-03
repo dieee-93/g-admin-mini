@@ -28,7 +28,7 @@ const DiagnosticsPage: React.FC = () => {
                 <Icon icon={CheckCircleIcon} size="lg" />
                 <Stack gap="xs">
                   <Typography variant="body" size="sm" fontWeight="semibold">System Status</Typography>
-                  <Badge colorPalette="success" size="sm">Healthy</Badge>
+                  <Badge colorPalette="green" size="sm">Healthy</Badge>
                 </Stack>
               </Stack>
             </CardWrapper.Body>
@@ -40,7 +40,7 @@ const DiagnosticsPage: React.FC = () => {
                 <Icon icon={CpuChipIcon} size="lg" />
                 <Stack gap="xs">
                   <Typography variant="body" size="sm" fontWeight="semibold">Performance</Typography>
-                  <Badge colorPalette="info" size="sm">Optimal</Badge>
+                  <Badge colorPalette="blue" size="sm">Optimal</Badge>
                 </Stack>
               </Stack>
             </CardWrapper.Body>
@@ -64,7 +64,7 @@ const DiagnosticsPage: React.FC = () => {
                 <Icon icon={ExclamationTriangleIcon} size="lg" color="warning.500" />
                 <Stack gap="xs">
                   <Typography variant="body" size="sm" fontWeight="semibold">Alerts</Typography>
-                  <Badge colorPalette="warning" size="sm">2 Minor</Badge>
+                  <Badge colorPalette="orange" size="sm">2 Minor</Badge>
                 </Stack>
               </Stack>
             </CardWrapper.Body>

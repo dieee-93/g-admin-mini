@@ -18,7 +18,7 @@ import {
 import { UnifiedCalendarEngine } from '../engine/UnifiedCalendarEngine';
 import { BaseCalendarAdapter } from '../adapters/BaseCalendarAdapter';
 import { logger } from '@/lib/logging';
-import {
+import type {
   CalendarConfig,
   DateRange,
   TimeSlot,

@@ -1,6 +1,7 @@
 // Custom hooks for accessing Zustand stores with better TypeScript support
 
 import { useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/store/appStore';
 import { useMaterialsStore } from '@/store/materialsStore';
 import { useSalesStore } from '@/store/salesStore';
@@ -51,13 +52,14 @@ export const useApp = () => {
 
 // Materials Store Hook (new preferred name)
 export const useMaterials = () => {
-  const items = useMaterialsStore(state => state.items);
-  const categories = useMaterialsStore(state => state.categories);
+  // 🔧 FIX: Usar useShallow para arrays que pueden cambiar de referencia
+  const items = useMaterialsStore(useShallow(state => state.items));
+  const categories = useMaterialsStore(useShallow(state => state.categories));
   const loading = useMaterialsStore(state => state.loading);
   const error = useMaterialsStore(state => state.error);
   const filters = useMaterialsStore(state => state.filters);
   const stats = useMaterialsStore(state => state.stats);
-  const selectedItems = useMaterialsStore(state => state.selectedItems);
+  const selectedItems = useMaterialsStore(useShallow(state => state.selectedItems));
   const isModalOpen = useMaterialsStore(state => state.isModalOpen);
   const modalMode = useMaterialsStore(state => state.modalMode);
   const currentItem = useMaterialsStore(state => state.currentItem);
@@ -419,10 +421,10 @@ export const useStaff = () => {
 // Theme Store Hook
 export const useTheme = () => {
   const theme = useThemeStore(state => state.theme);
-  const resolvedTheme = useThemeStore(state => state.resolvedTheme);
+  const resolvedTheme = useThemeStore(state => (state as any).resolvedTheme);
   const setTheme = useThemeStore(state => state.setTheme);
   const toggleTheme = useThemeStore(state => state.toggleTheme);
-  const getThemeColors = useThemeStore(state => state.getThemeColors);
+  const getThemeColors = useThemeStore(state => (state as any).getThemeColors);
 
   return {
     theme,

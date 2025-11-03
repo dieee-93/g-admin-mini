@@ -10,7 +10,7 @@ import {
   Grid
 } from '@chakra-ui/react';
 import { InputField } from '@/shared/ui';
-import { type InventoryItem } from '@/modules/materials/types';
+import { type InventoryItem } from '@/pages/admin/supply-chain/materials/types';
 
 interface RecipeBasicInfo {
   name: string;
@@ -54,12 +54,12 @@ export function RecipeBasicForm({
 
   return (
     <Box>
-      <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>
+      <Text fontSize="sm" fontWeight="medium" color="gray.700" mb="3">
         Información Básica
       </Text>
-      <Grid templateColumns={{ base: "1fr", md: "2fr 1fr 1fr" }} gap={4}>
+      <Grid templateColumns={{ base: "1fr", md: "2fr 1fr 1fr" }} gap="4">
         <Box>
-          <Text fontSize="sm" color="gray.600" mb={1}>Nombre de la receta</Text>
+          <Text fontSize="sm" color="gray.600" mb="1">Nombre de la receta</Text>
           <InputField
             placeholder="Ej: Pan integral casero"
             name="name"
@@ -68,14 +68,14 @@ export function RecipeBasicForm({
             borderColor={errors.name ? 'red.300' : undefined}
           />
           {errors.name && (
-            <Text color="red.500" fontSize="sm" mt={1}>
+            <Text color="red.500" fontSize="sm" mt="1">
               {errors.name}
             </Text>
           )}
         </Box>
 
         <Box>
-          <Text fontSize="sm" color="gray.600" mb={1}>Producto que genera</Text>
+          <Text fontSize="sm" color="gray.600" mb="1">Producto que genera</Text>
           <Select.Root 
             collection={elaboratedItemsCollection}
             value={form.output_item_id ? [form.output_item_id] : []}
@@ -101,14 +101,14 @@ export function RecipeBasicForm({
             </Select.Positioner>
           </Select.Root>
           {errors.output_item_id && (
-            <Text color="red.500" fontSize="sm" mt={1}>
+            <Text color="red.500" fontSize="sm" mt="1">
               {errors.output_item_id}
             </Text>
           )}
         </Box>
 
         <Box>
-          <Text fontSize="sm" color="gray.600" mb={1}>
+          <Text fontSize="sm" color="gray.600" mb="1">
             Cantidad{selectedOutputItem ? ` (${selectedOutputItem.unit})` : ''}
           </Text>
           <InputField
@@ -122,7 +122,7 @@ export function RecipeBasicForm({
             borderColor={errors.output_quantity ? 'red.300' : undefined}
           />
           {errors.output_quantity && (
-            <Text color="red.500" fontSize="sm" mt={1}>
+            <Text color="red.500" fontSize="sm" mt="1">
               {errors.output_quantity}
             </Text>
           )}
@@ -130,13 +130,13 @@ export function RecipeBasicForm({
       </Grid>
 
       {/* Additional Information */}
-      <VStack gap={4} mt={6}>
+      <VStack gap="4" mt="6">
         <Text fontSize="sm" fontWeight="medium" color="gray.700" alignSelf="start">
           Información Adicional
         </Text>
-        <Grid templateColumns={{ base: "1fr", md: "1fr 3fr" }} gap={4} w="full">
+        <Grid templateColumns={{ base: "1fr", md: "1fr 3fr" }} gap="4" w="full">
           <Box>
-            <Text fontSize="sm" color="gray.600" mb={1}>Tiempo de preparación (min)</Text>
+            <Text fontSize="sm" color="gray.600" mb="1">Tiempo de preparación (min)</Text>
             <InputField
               placeholder="Ej: 120"
               name="preparation_time"
@@ -148,7 +148,7 @@ export function RecipeBasicForm({
           </Box>
           
           <Box>
-            <Text fontSize="sm" color="gray.600" mb={1}>Instrucciones</Text>
+            <Text fontSize="sm" color="gray.600" mb="1">Instrucciones</Text>
             <Textarea
               placeholder="Describe los pasos para preparar esta receta..."
               name="instructions"

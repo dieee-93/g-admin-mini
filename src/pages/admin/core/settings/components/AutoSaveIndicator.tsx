@@ -103,7 +103,7 @@ export const AutoSaveIndicator = ({
               fontSize="sm"
               textDecoration="underline"
               _hover={{ color: 'red.600' }}
-              ml={2}
+              ml="2"
             >
               Reintentar
             </Box>
@@ -129,8 +129,8 @@ export const AutoSaveStatusBadge = ({
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
       <Box
-        px={2}
-        py={1}
+        px="2"
+        py="1"
         borderRadius="full"
         fontSize="xs"
         fontWeight="medium"

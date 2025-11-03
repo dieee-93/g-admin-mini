@@ -16,3 +16,8 @@ export * from './Analytics';
 // Standalone components
 export { AutoSchedulingModal } from './AutoSchedulingModal';
 export { ShiftEditorModal } from './ShiftEditorModal';
+export { AvailabilityTab } from './AvailabilityTab';
+
+// 📅 PHASE 4: APPOINTMENTS COMPONENTS
+export * from './Appointments';
+export { AppointmentBookingModal } from './Appointments/AppointmentBookingModal';

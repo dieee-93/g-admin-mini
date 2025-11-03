@@ -28,11 +28,17 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'performance';
 export type LogModule =
   // Core Systems
   | 'NavigationContext'
+  | 'NavigationGeneration'
   | 'AuthContext'
+  | 'Auth'
+  | 'LocationContext'
   | 'EventBus'
+  | 'ModuleEventBus'
   | 'OfflineSync'
   | 'WebSocket'
   | 'CapabilitySystem'
+  | 'CapabilitySync'
+  | 'FeatureEngine'
   // Stores
   | 'MaterialsStore'
   | 'SalesStore'
@@ -42,6 +48,7 @@ export type LogModule =
   | 'Layout'
   | 'Modal'
   | 'Form'
+  | 'Provider'
   // Performance
   | 'Performance'
   | 'LazyLoading'
@@ -68,7 +75,7 @@ const DEFAULT_CONFIG: LogConfig = {
   enabled: process.env.NODE_ENV === 'development',
   level: 'debug',
   modules: 'all', // Log all modules, or use Set(['NavigationContext', 'EventBus'])
-  performanceThreshold: 10, // Only log if operation takes > 10ms
+  performanceThreshold: 500, // Only log if operation takes > 500ms (modules need time to setup hooks)
   includeTimestamp: true,
   includeStackTrace: false,
 };

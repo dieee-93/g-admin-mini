@@ -82,7 +82,9 @@ export function ProductionWidget() {
       <CardWrapper.Body p="4">
         <Stack gap="4">
           <Stack direction="row" align="center" gap="2">
-            <Icon icon={CubeIcon} size="md" color="purple.500" />
+            <Icon size="md" color="purple.500" >
+                <CubeIcon />
+              </Icon>
             <Typography variant="body" size="md" weight="medium">
               Estado de Producción
             </Typography>

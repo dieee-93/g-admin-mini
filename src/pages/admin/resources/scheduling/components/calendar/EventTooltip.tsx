@@ -48,8 +48,8 @@ export function EventTooltip({ events, date }: EventTooltipProps) {
   return (
     <Stack
       direction="column"
-      gap={2}
-      p={3}
+      gap="2"
+      p="3"
       bg="white"
       borderRadius="md"
       boxShadow="lg"
@@ -67,7 +67,7 @@ export function EventTooltip({ events, date }: EventTooltipProps) {
       </Stack>
 
       {/* Conteo por tipo */}
-      <Stack direction="row" gap={2} flexWrap="wrap">
+      <Stack direction="row" gap="2" flexWrap="wrap">
         {Object.entries(countByType).map(([type, count]) => (
           <Typography key={type} variant="body" size="xs" color="gray.600">
             {getTypeLabel(type as EventType)}: {count}
@@ -81,9 +81,9 @@ export function EventTooltip({ events, date }: EventTooltipProps) {
       )}
 
       {/* Preview de eventos */}
-      <Stack direction="column" gap={1}>
+      <Stack direction="column" gap="1">
         {previewEvents.map((event) => (
-          <Stack key={event.id} direction="row" align="center" gap={2}>
+          <Stack key={event.id} direction="row" align="center" gap="2">
             <div
               style={{
                 width: '3px',

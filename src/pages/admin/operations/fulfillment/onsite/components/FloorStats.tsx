@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, Grid, CardWrapper, Typography, Badge, Alert, AlertTitle, AlertDescription } from '@/shared/ui';
+import { Stack, Grid, CardWrapper, Typography, Badge, Alert } from '@/shared/ui';
 import { supabase } from '@/lib/supabase/client';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { logger } from '@/lib/logging';
@@ -50,26 +50,32 @@ export function FloorStats({ refreshTrigger }: FloorStatsProps) {
 
       if (error) throw error;
 
+      interface TableData {
+        status: string;
+        daily_revenue?: number;
+        turn_count?: number;
+      }
+
       const statsData = {
         total_tables: data.length,
-        available_tables: data.filter((t: any) => t.status === 'available').length,
-        occupied_tables: data.filter((t: any) => t.status === 'occupied').length,
-        reserved_tables: data.filter((t: any) => t.status === 'reserved').length,
+        available_tables: data.filter((t: TableData) => t.status === 'available').length,
+        occupied_tables: data.filter((t: TableData) => t.status === 'occupied').length,
+        reserved_tables: data.filter((t: TableData) => t.status === 'reserved').length,
         average_occupancy: DecimalUtils.multiply(
           DecimalUtils.divide(
-            data.filter((t: any) => t.status === 'occupied').length.toString(),
+            data.filter((t: TableData) => t.status === 'occupied').length.toString(),
             data.length.toString(),
             'financial'
           ).toString(),
           '100',
           'financial'
         ).toNumber(),
-        total_revenue: data.reduce((sum: number, t: any) =>
+        total_revenue: data.reduce((sum: number, t: TableData) =>
           DecimalUtils.add(sum.toString(), (t.daily_revenue || 0).toString(), 'financial').toNumber(),
           0
         ),
         average_turn_time: DecimalUtils.divide(
-          data.reduce((sum: number, t: any) =>
+          data.reduce((sum: number, t: TableData) =>
             DecimalUtils.add(sum.toString(), (t.turn_count || 0).toString(), 'financial').toNumber(),
             0
           ).toString(),

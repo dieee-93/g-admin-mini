@@ -28,7 +28,7 @@ interface BaseSegmentGroupProps {
   size?: 'xs' | 'sm' | 'md' | 'lg';
 
   // Event Handlers
-  onValueChange?: (details: { value: string }) => void;
+  onValueChange?: (details: { value: string | null }) => void;
 
   // Content Props
   children: ReactNode;
@@ -135,3 +135,43 @@ export const SegmentGroupIndicator = ChakraSegmentGroup.Indicator;
 export const SegmentGroupItemControl = ChakraSegmentGroup.ItemControl;
 export const SegmentGroupItemHiddenInput = ChakraSegmentGroup.ItemHiddenInput;
 export const SegmentGroupLabel = ChakraSegmentGroup.Label;
+
+// =============================================================================
+// USAGE EXAMPLE
+// =============================================================================
+/**
+ * @example Basic SegmentGroup (Tab-like selector)
+ * ```tsx
+ * import { SegmentGroup, SegmentItem } from '@/shared/ui'
+ *
+ * function ViewSelector() {
+ *   const [view, setView] = useState('list')
+ *
+ *   return (
+ *     <SegmentGroup
+ *       value={view}
+ *       onValueChange={(details) => setView(details.value || 'list')}
+ *       colorPalette="blue"
+ *     >
+ *       <SegmentItem value="list">Lista</SegmentItem>
+ *       <SegmentItem value="grid">Cuadrícula</SegmentItem>
+ *       <SegmentItem value="timeline">Línea de tiempo</SegmentItem>
+ *     </SegmentGroup>
+ *   )
+ * }
+ * ```
+ *
+ * @example Vertical SegmentGroup
+ * ```tsx
+ * <SegmentGroup
+ *   value={activeTab}
+ *   onValueChange={(details) => setActiveTab(details.value || 'alerts')}
+ *   orientation="vertical"
+ *   size="sm"
+ * >
+ *   <SegmentItem value="alerts">Alertas</SegmentItem>
+ *   <SegmentItem value="setup">Configuración</SegmentItem>
+ *   <SegmentItem value="analytics">Analíticas</SegmentItem>
+ * </SegmentGroup>
+ * ```
+ */

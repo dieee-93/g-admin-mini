@@ -12,6 +12,7 @@ import type {
 } from '../types';
 import { logger } from '@/lib/logging';
 import { useErrorHandler } from '@/lib/error-handling';
+import eventBus from '@/lib/events'; // ✅ EventBus integration
 
 /**
  * Hook for supplier orders data management
@@ -48,6 +49,20 @@ export function useSupplierOrders() {
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  // ✅ FIX: Listen to materials.low_stock_alert event
+  useEffect(() => {
+    const unsubscribe = eventBus.on('materials.low_stock_alert', async (data) => {
+      logger.warn('SupplierOrdersStore', 'Low stock alert received', data);
+
+      // Log the alert for awareness
+      // Future enhancement: Auto-create draft supplier order
+      // based on material's supplier_id and suggested reorder quantity
+      logger.info('SupplierOrdersStore', `Material ${data.itemName} is low: ${data.currentStock}/${data.minStock}`);
+    });
+
+    return unsubscribe;
+  }, []);
 
   // ============================================
   // MUTATIONS

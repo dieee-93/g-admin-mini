@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { logger } from '@/lib/logging';
-import {
+import type {
   CustomerRFMProfile,
   CustomerSegment,
   ChurnRisk,
@@ -12,7 +12,7 @@ import {
   calculateCustomerRFM,
   getCustomerAnalyticsDashboard,
   getCustomerProfileWithRFM
-} from '../../services/advancedCustomerApi';
+} from '../../services/existing/advancedCustomerApi';
 
 export function useCustomerRFM() {
   const [rfmProfiles, setRFMProfiles] = useState<CustomerRFMProfile[]>([]);
@@ -113,17 +113,26 @@ export function useCustomerRFM() {
   // Churn Risk Assessment
   const assessChurnRisk = useCallback((rfmProfile: CustomerRFMProfile): ChurnRisk => {
     const { recency_score, frequency_score, monetary_score } = rfmProfile;
-    
-    // High risk: Low recency and frequency
+
+    // Critical risk: Low recency, frequency, AND low monetary value
+    if (recency_score <= 2 && frequency_score <= 2 && monetary_score <= 2) {
+      return ChurnRisk.HIGH;
+    }
+
+    // High risk: Low recency and frequency (but good monetary - worth saving)
     if (recency_score <= 2 && frequency_score <= 2) {
       return ChurnRisk.HIGH;
     }
-    
-    // Medium risk: Either low recency or frequency, but not both
+
+    // Medium risk: Either low recency or frequency (monetary score considered)
+    if ((recency_score <= 2 || frequency_score <= 2) && monetary_score >= 3) {
+      return ChurnRisk.MEDIUM; // Higher value customer, medium risk
+    }
+
     if (recency_score <= 2 || frequency_score <= 2) {
       return ChurnRisk.MEDIUM;
     }
-    
+
     // Low risk: Good scores across the board
     return ChurnRisk.LOW;
   }, []);
@@ -175,7 +184,7 @@ export function useCustomerRFM() {
   }, []);
 
   // Force recalculation of RFM for specific customer
-  const recalculateCustomerRFM = async (customerId: string) => {
+  const recalculateCustomerRFM = async () => {
     try {
       // This would trigger the database function
       await calculateCustomerRFM();

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Link as RouterLink, type LinkProps as RouterLinkProps } from 'react-router-dom';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationState } from '@/contexts/NavigationContext';
 
 import { logger } from '@/lib/logging';
 interface CustomLinkProps extends Omit<RouterLinkProps, 'to'> {
@@ -11,11 +11,11 @@ interface CustomLinkProps extends Omit<RouterLinkProps, 'to'> {
 
 /**
  * A custom Link component that integrates with the NavigationContext.
- * It uses a `moduleId` to construct the path, ensuring that navigation
+ * It uses a `moduleId` to construct the path, ensuring that navState
  * is consistent with the centralized route configuration.
  */
 export function Link({ moduleId, subPath, query, ...props }: CustomLinkProps) {
-  const { modules } = useNavigation();
+  const navState = useNavigationState(); const { modules } = navState;
 
   const to = useMemo(() => {
     const module = modules.find(m => m.id === moduleId);

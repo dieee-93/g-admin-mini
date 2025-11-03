@@ -4,15 +4,7 @@
 import React from 'react';
 import { CostAnalysisTab } from './CostAnalysisTab';
 
-interface CostAnalysisModuleProps {
-  activeSubSection?: string;
-  onSubSectionChange?: (subSection: string) => void;
-}
-
-export function CostAnalysisModule({ 
-  activeSubSection = 'calculator',
-  onSubSectionChange 
-}: CostAnalysisModuleProps) {
-  
+// Cost Analysis Module - Wrapper component for future extensibility
+export function CostAnalysisModule() {
   return <CostAnalysisTab />;
 }

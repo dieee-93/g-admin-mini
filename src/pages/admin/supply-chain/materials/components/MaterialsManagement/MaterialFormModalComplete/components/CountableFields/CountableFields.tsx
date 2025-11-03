@@ -6,11 +6,11 @@ import {
   Switch,
   Alert,
   Flex
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { SelectField, InputField, CardWrapper } from '@/shared/ui';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { type ItemFormData } from '../../types';
-import { CATEGORY_COLLECTION, type LabeledOption } from '../../constants';
+import { CATEGORY_COLLECTION } from '../../constants';
 import { CountableStockFields } from './CountableStockFields';
 
 interface CountableFieldsProps {
@@ -38,14 +38,14 @@ export const CountableFields = ({
     if (formData.type === 'COUNTABLE' && !formData.unit) {
       setFormData({ ...formData, unit: 'unidad' });
     }
-  }, [formData.type]);
+  }, [formData.type, formData.unit, formData, setFormData]);
 
   useEffect(() => {
     if (!usePackaging) {
       setFormData({ ...formData, packaging: undefined });
       setPackageQuantity(1);
     }
-  }, [usePackaging]);
+  }, [usePackaging, formData, setFormData]);
 
   useEffect(() => {
     if (formData.packaging?.package_size && formData.initial_stock) {
@@ -69,7 +69,7 @@ export const CountableFields = ({
         <SelectField
           label="Categoría del Producto"
           placeholder="¿A qué categoría pertenece?"
-          collection={CATEGORY_COLLECTION as any} // TODO: Fix typing issue with SelectField
+          collection={CATEGORY_COLLECTION}
           value={formData.category ? [formData.category] : []}
           onValueChange={(details) => 
             setFormData({ 

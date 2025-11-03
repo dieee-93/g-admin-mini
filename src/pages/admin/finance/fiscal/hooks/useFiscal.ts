@@ -1,8 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { fiscalApi } from '../services/fiscalApi';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { type FiscalStats } from '../types';
-
 import { logger } from '@/lib/logging';
 interface UseFiscalReturn {
   fiscalStats: FiscalStats | null;

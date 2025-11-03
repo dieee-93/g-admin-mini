@@ -1,17 +1,15 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  UsersIcon,
   PlusIcon,
   ChartBarIcon,
-  DocumentTextIcon,
   CreditCardIcon,
   UserGroupIcon,
-  CurrencyDollarIcon,
-  ArrowTrendingUpIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
-import { CustomerAnalyticsEngine, CustomerRFMAnalytics } from '../services';
+import { useNavigationActions } from '@/contexts/NavigationContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { CustomerAnalyticsEngine } from '../services';
+import { CustomerAPI } from '../services/customerApi';
 import type { Customer, Sale, SaleItem, CustomerAnalyticsResult, CustomerRFMProfile } from '../types';
 
 import { logger } from '@/lib/logging';
@@ -95,7 +93,7 @@ export interface UseCustomersPageReturn {
   getNewCustomers: () => Customer[];
 
   // Analytics helpers
-  calculateSegmentMetrics: () => Record<string, any>;
+  calculateSegmentMetrics: () => Record<string, { customers: number; revenue: number; averageSpend: number; retentionRate: number }>;
   getChurnPredictions: () => Array<{
     customerId: string;
     churnProbability: number;
@@ -105,7 +103,8 @@ export interface UseCustomersPageReturn {
 }
 
 export const useCustomersPage = (): UseCustomersPageReturn => {
-  const { setQuickActions, updateModuleBadge } = useNavigation();
+  const { setQuickActions, updateModuleBadge } = useNavigationActions();
+  const { user } = useAuth();
 
   // State
   const [pageState, setPageState] = useState<CustomersPageState>({
@@ -119,12 +118,56 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
 
   // Data state
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [sales, setSales] = useState<Sale[]>([]);
-  const [saleItems, setSaleItems] = useState<SaleItem[]>([]);
   const [analyticsResult, setAnalyticsResult] = useState<CustomerAnalyticsResult | null>(null);
   const [rfmProfiles, setRfmProfiles] = useState<CustomerRFMProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Helper to set active section
+  const setActiveSection = useCallback((section: CustomerPageSection) => {
+    setPageState(prev => ({ ...prev, activeSection: section }));
+  }, []);
+
+  // Action handlers - defined before useEffect
+  const handleNewCustomer = useCallback(() => {
+    setActiveSection('management');
+    // TODO: Open customer creation modal
+    logger.info('App', 'Opening new customer modal');
+  }, [setActiveSection]);
+
+  const handleRFMAnalysis = useCallback(() => {
+    setActiveSection('analytics');
+    setPageState(prev => ({
+      ...prev,
+      showRFMAnalysis: true,
+      showCustomerSegments: false,
+      showChurnPrediction: false
+    }));
+  }, [setActiveSection]);
+
+  const handleCustomerSegments = useCallback(() => {
+    setActiveSection('analytics');
+    setPageState(prev => ({
+      ...prev,
+      showCustomerSegments: true,
+      showRFMAnalysis: false,
+      showChurnPrediction: false
+    }));
+  }, [setActiveSection]);
+
+  const handleChurnPrediction = useCallback(() => {
+    setActiveSection('analytics');
+    setPageState(prev => ({
+      ...prev,
+      showChurnPrediction: true,
+      showRFMAnalysis: false,
+      showCustomerSegments: false
+    }));
+  }, [setActiveSection]);
+
+  const handleLoyaltyProgram = useCallback(() => {
+    setActiveSection('loyalty');
+  }, [setActiveSection]);
 
   // Setup quick actions
   useEffect(() => {
@@ -133,42 +176,42 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
         id: 'new-customer',
         label: 'Nuevo Cliente',
         icon: PlusIcon,
-        action: () => handleNewCustomer(),
+        action: handleNewCustomer,
         color: 'pink'
       },
       {
         id: 'rfm-analysis',
         label: 'Análisis RFM',
         icon: ChartBarIcon,
-        action: () => handleRFMAnalysis(),
+        action: handleRFMAnalysis,
         color: 'blue'
       },
       {
         id: 'customer-segments',
         label: 'Segmentación',
         icon: UserGroupIcon,
-        action: () => handleCustomerSegments(),
+        action: handleCustomerSegments,
         color: 'green'
       },
       {
         id: 'churn-prediction',
         label: 'Riesgo de Churn',
         icon: ExclamationTriangleIcon,
-        action: () => handleChurnPrediction(),
+        action: handleChurnPrediction,
         color: 'red'
       },
       {
         id: 'loyalty-program',
         label: 'Programa Lealtad',
         icon: CreditCardIcon,
-        action: () => handleLoyaltyProgram(),
+        action: handleLoyaltyProgram,
         color: 'purple'
       }
     ];
 
     setQuickActions(quickActions);
     return () => setQuickActions([]);
-  }, [setQuickActions]);
+  }, [setQuickActions, handleNewCustomer, handleRFMAnalysis, handleCustomerSegments, handleChurnPrediction, handleLoyaltyProgram]);
 
   // Calculate metrics using business logic services
   const metrics: CustomersPageMetrics = useMemo(() => {
@@ -220,20 +263,22 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
       setLoading(true);
       setError(null);
 
-      // TODO: Replace with actual API calls
-      // In a real implementation, these would come from your API
-      const mockCustomers: Customer[] = [];
-      const mockSales: Sale[] = [];
-      const mockSaleItems: SaleItem[] = [];
+      // ✅ REAL API CALL - Fetch customers from database
+      const fetchedCustomers = await CustomerAPI.getCustomers(user, {
+        status: 'active',
+        limit: 1000 // Adjust as needed
+      });
 
-      setCustomers(mockCustomers);
-      setSales(mockSales);
-      setSaleItems(mockSaleItems);
+      setCustomers(fetchedCustomers);
 
       // Generate analytics using business logic
-      if (mockCustomers.length > 0) {
+      if (fetchedCustomers.length > 0) {
+        // TODO: Fetch real sales data from Sales module
+        const mockSales: Sale[] = [];
+        const mockSaleItems: SaleItem[] = [];
+
         const analytics = await CustomerAnalyticsEngine.generateCustomerAnalytics(
-          mockCustomers,
+          fetchedCustomers,
           mockSales,
           mockSaleItems,
           {
@@ -258,24 +303,14 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
     } finally {
       setLoading(false);
     }
-  }, [pageState.analyticsTimeRange]);
+  }, [pageState.analyticsTimeRange, user]);
 
   // Initialize data loading
   useEffect(() => {
     loadCustomerData();
   }, [loadCustomerData]);
 
-  // Action handlers
-  const setActiveSection = useCallback((section: CustomerPageSection) => {
-    setPageState(prev => ({ ...prev, activeSection: section }));
-  }, []);
-
-  const handleNewCustomer = useCallback(() => {
-    setActiveSection('management');
-    // TODO: Open customer creation modal
-    logger.info('App', 'Opening new customer modal');
-  }, [setActiveSection]);
-
+  // Additional action handlers
   const handleEditCustomer = useCallback((customerId: string) => {
     setPageState(prev => ({ ...prev, selectedCustomerId: customerId }));
     // TODO: Open customer edit modal
@@ -293,44 +328,10 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
     logger.info('App', 'Deleting customer:', customerId);
   }, []);
 
-  const handleRFMAnalysis = useCallback(() => {
-    setActiveSection('analytics');
-    setPageState(prev => ({
-      ...prev,
-      showRFMAnalysis: true,
-      showCustomerSegments: false,
-      showChurnPrediction: false
-    }));
-  }, [setActiveSection]);
-
-  const handleCustomerSegments = useCallback(() => {
-    setActiveSection('analytics');
-    setPageState(prev => ({
-      ...prev,
-      showCustomerSegments: true,
-      showRFMAnalysis: false,
-      showChurnPrediction: false
-    }));
-  }, [setActiveSection]);
-
-  const handleChurnPrediction = useCallback(() => {
-    setActiveSection('analytics');
-    setPageState(prev => ({
-      ...prev,
-      showChurnPrediction: true,
-      showRFMAnalysis: false,
-      showCustomerSegments: false
-    }));
-  }, [setActiveSection]);
-
   const handleGenerateReport = useCallback(() => {
     // TODO: Generate comprehensive customer report
     logger.info('App', 'Generating customer report...');
   }, []);
-
-  const handleLoyaltyProgram = useCallback(() => {
-    setActiveSection('loyalty');
-  }, [setActiveSection]);
 
   const handlePointsManagement = useCallback(() => {
     // TODO: Open points management interface
@@ -413,7 +414,12 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
         retentionRate: segment.retentionRate
       };
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, {
+      customers: number;
+      revenue: number;
+      averageSpend: number;
+      retentionRate: number;
+    }>);
   }, [analyticsResult]);
 
   const getChurnPredictions = useCallback(() => {

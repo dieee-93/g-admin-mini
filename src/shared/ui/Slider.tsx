@@ -273,7 +273,7 @@ export const SliderValueText = React.forwardRef<HTMLDivElement, { children?: Rea
   }
 )
 
-export const SliderMarker = React.forwardRef<HTMLSpanElement, SliderMarkerProps>(
+export const SliderMarker = React.forwardRef<HTMLDivElement, SliderMarkerProps>(
   function SliderMarker({ value, children, ...props }, ref) {
     return (
       <ChakraSlider.Marker ref={ref} value={value} {...props}>

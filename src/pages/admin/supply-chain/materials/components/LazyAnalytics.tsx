@@ -7,10 +7,10 @@ const ABCAnalysisSection = lazy(() => import('./Analytics/ABCAnalysisSection'));
 
 // Loading fallback for analytics
 const AnalyticsLoadingFallback = () => (
-  <Box p={6}>
-    <VStack gap={4} align="center">
+  <Box p="6">
+    <VStack gap="4" align="center">
       <Spinner size="lg" color="blue.500" />
-      <VStack gap={1}>
+      <VStack gap="1">
         <Text fontSize="lg" fontWeight="semibold" color="gray.700">
           Cargando Analytics
         </Text>

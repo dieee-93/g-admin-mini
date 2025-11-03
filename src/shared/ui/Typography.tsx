@@ -99,12 +99,12 @@ const weightMap = {
 // ✅ MAPPING DE NIVELES DE HEADING SEGÚN MEJORES PRÁCTICAS
 // Asegura jerarquía semántica correcta
 const headingLevelMap = {
-  1: { as: 'h1', variant: 'display' },
-  2: { as: 'h2', variant: 'heading' },
-  3: { as: 'h3', variant: 'title' },
-  4: { as: 'h4', variant: 'subtitle' },
-  5: { as: 'h5', variant: 'body', weight: 'semibold' },
-  6: { as: 'h6', variant: 'caption', weight: 'semibold' },
+  1: { as: 'h1' as const, variant: 'display' as const, weight: undefined as 'semibold' | undefined },
+  2: { as: 'h2' as const, variant: 'heading' as const, weight: undefined as 'semibold' | undefined },
+  3: { as: 'h3' as const, variant: 'title' as const, weight: undefined as 'semibold' | undefined },
+  4: { as: 'h4' as const, variant: 'subtitle' as const, weight: undefined as 'semibold' | undefined },
+  5: { as: 'h5' as const, variant: 'body' as const, weight: 'semibold' as const },
+  6: { as: 'h6' as const, variant: 'caption' as const, weight: 'semibold' as const },
 } as const
 
 export function Typography({

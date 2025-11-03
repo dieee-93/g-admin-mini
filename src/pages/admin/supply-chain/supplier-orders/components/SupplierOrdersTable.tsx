@@ -3,7 +3,7 @@
 // ============================================
 
 import React from 'react';
-import { Stack, HStack, Text, Badge, Table, Button, IconButton, Menu } from '@/shared/ui';
+import { Stack, HStack, Text, Badge, Table, IconButton, Menu } from '@/shared/ui';
 import type { SupplierOrderWithDetails } from '../types';
 import {
   STATUS_CONFIG,
@@ -50,7 +50,7 @@ export function SupplierOrdersTable({
 
   if (loading) {
     return (
-      <Stack direction="column" align="center" py={12}>
+      <Stack direction="column" align="center" py="12">
         <Text color="fg.muted">Cargando órdenes...</Text>
       </Stack>
     );
@@ -62,7 +62,7 @@ export function SupplierOrdersTable({
 
   if (orders.length === 0) {
     return (
-      <Stack direction="column" align="center" py={16} gap={2}>
+      <Stack direction="column" align="center" py="16" gap="2">
         <Text fontSize="xl" fontWeight="semibold">
           No hay órdenes
         </Text>
@@ -129,7 +129,7 @@ export function SupplierOrdersTable({
 
               {/* Actions */}
               <Table.Cell>
-                <HStack justify="center" gap={1}>
+                <HStack justify="center" gap="1">
                   {/* Quick Actions - Primary buttons */}
                   {canApp && onApprove && (
                     <IconButton

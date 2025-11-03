@@ -3,14 +3,17 @@
 
 import { supabase } from "@/lib/supabase/client";
 import { logger } from '@/lib/logging';
-import { 
-  type Product, 
+import { requirePermission, type AuthUser } from '@/lib/permissions';
+import { eventBus, EventPriority } from '@/lib/events';
+import {
+  type Product,
   type ProductWithIntelligence,
   type ProductComponent,
   type CreateProductData,
   type UpdateProductData,
   type AddComponentData,
-  type ProductsWithAvailabilityResponse 
+  type ProductsWithAvailabilityResponse,
+  type ProductType
 } from "../types";
 
 // ===== PRODUCTS WITH INTELLIGENCE =====
@@ -28,7 +31,7 @@ export async function fetchProductsWithIntelligence(): Promise<ProductWithIntell
       id: item.id,
       name: item.name,
       unit: item.unit,
-      type: item.type as any,
+      type: item.type as ProductType,
       description: item.description,
       created_at: item.created_at,
       updated_at: item.updated_at,
@@ -68,15 +71,33 @@ export async function fetchProducts(): Promise<Product[]> {
   }
 }
 
-export async function createProduct(productData: CreateProductData): Promise<Product> {
+export async function createProduct(productData: CreateProductData, user: AuthUser): Promise<Product> {
   try {
-    const { data, error } = await supabase
+    // 🔒 PERMISSION CHECK: Require 'create' permission on 'products' module
+    requirePermission(user, 'products', 'create');
+
+    const { data, error} = await supabase
       .from("products")
       .insert([productData])
       .select()
       .single();
 
     if (error) throw error;
+
+    logger.info('App', 'Product created', { productId: data.id, userId: user.id });
+
+    // 📡 EVENTBUS: Emit product_created event
+    eventBus.emit('products.product_created', {
+      productId: data.id,
+      productName: data.name,
+      productType: data.type,
+      timestamp: new Date().toISOString(),
+      userId: user.id
+    }, {
+      priority: EventPriority.HIGH,
+      moduleId: 'products'
+    });
+
     return data;
   } catch (error) {
     logger.error('App', "Error creating product:", error);
@@ -84,10 +105,20 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
   }
 }
 
-export async function updateProduct(productData: UpdateProductData): Promise<Product> {
+export async function updateProduct(productData: UpdateProductData, user: AuthUser): Promise<Product> {
   try {
+    // 🔒 PERMISSION CHECK: Require 'update' permission on 'products' module
+    requirePermission(user, 'products', 'update');
+
     const { id, ...updates } = productData;
-    
+
+    // Get old product data for price change detection
+    const { data: oldProduct } = await supabase
+      .from("products")
+      .select('*')
+      .eq("id", id)
+      .single();
+
     const { data, error } = await supabase
       .from("products")
       .update(updates)
@@ -96,6 +127,36 @@ export async function updateProduct(productData: UpdateProductData): Promise<Pro
       .single();
 
     if (error) throw error;
+
+    logger.info('App', 'Product updated', { productId: id, userId: user.id });
+
+    // 📡 EVENTBUS: Emit product_updated event
+    eventBus.emit('products.product_updated', {
+      productId: id,
+      productName: data.name,
+      changes: Object.keys(updates),
+      timestamp: new Date().toISOString(),
+      userId: user.id
+    }, {
+      priority: EventPriority.MEDIUM,
+      moduleId: 'products'
+    });
+
+    // 📡 EVENTBUS: Emit price_changed event if price was updated
+    if (updates.price && oldProduct && oldProduct.price !== updates.price) {
+      eventBus.emit('products.price_changed', {
+        productId: id,
+        productName: data.name,
+        oldPrice: oldProduct.price,
+        newPrice: updates.price,
+        timestamp: new Date().toISOString(),
+        userId: user.id
+      }, {
+        priority: EventPriority.HIGH,
+        moduleId: 'products'
+      });
+    }
+
     return data;
   } catch (error) {
     logger.error('App', "Error updating product:", error);
@@ -103,14 +164,37 @@ export async function updateProduct(productData: UpdateProductData): Promise<Pro
   }
 }
 
-export async function deleteProduct(id: string): Promise<void> {
+export async function deleteProduct(id: string, user: AuthUser): Promise<void> {
   try {
+    // 🔒 PERMISSION CHECK: Require 'delete' permission on 'products' module
+    requirePermission(user, 'products', 'delete');
+
+    // Get product data before deletion
+    const { data: product } = await supabase
+      .from("products")
+      .select('name')
+      .eq("id", id)
+      .single();
+
     const { error } = await supabase
       .from("products")
       .delete()
       .eq("id", id);
 
     if (error) throw error;
+
+    logger.info('App', 'Product deleted', { productId: id, userId: user.id });
+
+    // 📡 EVENTBUS: Emit product_deleted event
+    eventBus.emit('products.product_deleted', {
+      productId: id,
+      productName: product?.name || 'Unknown',
+      timestamp: new Date().toISOString(),
+      userId: user.id
+    }, {
+      priority: EventPriority.MEDIUM,
+      moduleId: 'products'
+    });
   } catch (error) {
     logger.error('App', "Error deleting product:", error);
     throw error;
@@ -242,3 +326,31 @@ export async function removeProductComponent(componentId: string): Promise<void>
   }
 }
 
+// ===== PRODUCTS SERVICE =====
+// Service layer that coordinates API calls with store updates
+
+export const productsService = {
+  async loadProducts() {
+    try {
+      const { useProductsStore } = await import('@/store/productsStore');
+      const { setProducts, setLoading, setError } = useProductsStore.getState();
+
+      setLoading(true);
+      setError(null);
+
+      const products = await fetchProductsWithIntelligence();
+      setProducts(products);
+
+      setLoading(false);
+      return products;
+    } catch (error) {
+      const { useProductsStore } = await import('@/store/productsStore');
+      const { setLoading, setError } = useProductsStore.getState();
+
+      setLoading(false);
+      setError(error instanceof Error ? error.message : 'Error loading products');
+      logger.error('App', "Error in loadProducts:", error);
+      throw error;
+    }
+  }
+};

@@ -171,14 +171,14 @@ export function SupplierOrdersManagement({ pageState }: SupplierOrdersManagement
     <>
       <Section variant="elevated">
         {/* Header with tabs and actions */}
-        <Stack direction="row" justify="space-between" mb={4}>
+        <Stack direction="row" justify="space-between" mb="4">
           <Tabs.Root value="list">
             <Tabs.List>
               <Tabs.Trigger value="list">Órdenes</Tabs.Trigger>
             </Tabs.List>
           </Tabs.Root>
 
-          <HStack gap={2}>
+          <HStack gap="2">
             <Button
               size="sm"
               variant="outline"
@@ -187,7 +187,7 @@ export function SupplierOrdersManagement({ pageState }: SupplierOrdersManagement
               <Icon icon={AdjustmentsHorizontalIcon} size="xs" />
               Filtros
               {activeFiltersCount > 0 && (
-                <Badge ml={2} colorPalette="blue" size="sm">
+                <Badge ml="2" colorPalette="blue" size="sm">
                   {activeFiltersCount}
                 </Badge>
               )}
@@ -201,7 +201,7 @@ export function SupplierOrdersManagement({ pageState }: SupplierOrdersManagement
         </Stack>
 
         {/* Collapsible filters panel */}
-        <Collapsible.Root open={showFilters} mb={4}>
+        <Collapsible.Root open={showFilters} mb="4">
           <Collapsible.Content>
             <SupplierOrdersFilters
               filters={filters}
@@ -262,7 +262,7 @@ export function SupplierOrdersManagement({ pageState }: SupplierOrdersManagement
                 ¿Estás seguro que deseas eliminar la orden{' '}
                 <strong>{targetOrder?.po_number}</strong>?
               </Text>
-              <Text color="fg.muted" fontSize="sm" mt={2}>
+              <Text color="fg.muted" fontSize="sm" mt="2">
                 Esta acción no se puede deshacer. Solo se pueden eliminar órdenes en estado
                 borrador.
               </Text>
@@ -295,7 +295,7 @@ export function SupplierOrdersManagement({ pageState }: SupplierOrdersManagement
               <Text>
                 ¿Deseas aprobar la orden <strong>{targetOrder?.po_number}</strong>?
               </Text>
-              <Text color="fg.muted" fontSize="sm" mt={2}>
+              <Text color="fg.muted" fontSize="sm" mt="2">
                 Al aprobar, la orden será enviada al proveedor y no podrá ser editada.
               </Text>
             </Dialog.Body>
@@ -328,7 +328,7 @@ export function SupplierOrdersManagement({ pageState }: SupplierOrdersManagement
                 ¿Estás seguro que deseas cancelar la orden{' '}
                 <strong>{targetOrder?.po_number}</strong>?
               </Text>
-              <Text color="fg.muted" fontSize="sm" mt={2}>
+              <Text color="fg.muted" fontSize="sm" mt="2">
                 La orden será marcada como cancelada. Esta acción no se puede deshacer.
               </Text>
             </Dialog.Body>

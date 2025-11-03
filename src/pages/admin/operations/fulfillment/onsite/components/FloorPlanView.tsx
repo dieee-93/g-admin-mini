@@ -72,10 +72,24 @@ export function FloorPlanView({ refreshTrigger }: FloorPlanViewProps) {
 
       if (error) throw error;
 
-      const formattedTables = data.map((table: any) => ({
+      interface PartyData {
+        status: string;
+        size: number;
+        customer_name: string;
+        seated_at: string;
+        estimated_duration?: number;
+      }
+
+      interface TableData {
+        section?: string;
+        parties?: PartyData[];
+        [key: string]: unknown;
+      }
+
+      const formattedTables = data.map((table: TableData) => ({
         ...table,
         location: table.section || 'main', // Map section → location for code compatibility
-        current_party: table.parties?.find((p: any) =>
+        current_party: table.parties?.find((p: PartyData) =>
           p.status === 'seated' || p.status === 'active'
         ) ? {
           size: table.parties[0].size,

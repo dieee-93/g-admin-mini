@@ -4,25 +4,20 @@
  * Following the established products pattern
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigationActions } from '@/contexts/NavigationContext';
+import { useLocation } from '@/contexts/LocationContext';
 import { useFiscal } from './useFiscal';
 import { useOfflineStatus } from '@/lib/offline';
 import { notify } from '@/lib/notifications';
 import { logger } from '@/lib/logging';
+import { fiscalApiMultiLocation } from '../services/fiscalApi.multi-location';
 import {
   DocumentTextIcon,
   CogIcon,
   ChartBarIcon,
   ExclamationTriangleIcon,
-  BanknotesIcon,
-  CalendarDaysIcon,
-  WifiIcon,
-  NoSymbolIcon,
-  CloudIcon,
-  CurrencyDollarIcon,
-  ReceiptTaxIcon,
-  BuildingLibraryIcon
+  CloudIcon
 } from '@heroicons/react/24/outline';
 
 // Import migrated services
@@ -35,10 +30,9 @@ import {
   TAX_RATES,
   DEFAULT_TAX_CONFIG,
   type CashFlowProjection,
-  type ROIAnalysis,
-  type ProfitabilityAnalysis,
-  type BudgetVarianceAnalysis
+  type ProfitabilityAnalysis
 } from '../services';
+import type { AFIPConfiguration, Location, FiscalAlert, FiscalStats } from '../types/fiscalTypes';
 
 // ============================================================================
 // TYPES
@@ -79,6 +73,11 @@ export interface FiscalPageState {
   activeTab: 'invoicing' | 'afip' | 'compliance' | 'reporting';
   fiscalMode: 'auto' | 'online-first' | 'offline-first';
   effectiveFiscalMode: 'online' | 'offline' | 'hybrid';
+  // Multi-location support
+  fiscalViewMode: 'per-location' | 'consolidated';
+  selectedLocation?: Location | null;
+  isMultiLocationMode: boolean;
+  afipConfig?: AFIPConfiguration;
   filters: {
     dateRange?: [Date, Date];
     taxType?: 'all' | 'iva' | 'ingresos_brutos' | 'ganancias';
@@ -92,12 +91,12 @@ export interface FiscalPageState {
 export interface FiscalPageActions {
   // Invoice Management
   handleNewInvoice: () => void;
-  handleInvoiceGeneration: (data: any) => void;
+  handleInvoiceGeneration: (data: InvoiceGenerationData) => void;
   handleBulkInvoicing: () => void;
 
   // AFIP Integration
   handleAFIPSync: () => void;
-  handleCAERequest: (invoiceData: any) => void;
+  handleCAERequest: (invoiceData: CAERequestData) => void;
   handleAFIPStatusCheck: () => void;
 
   // Tax Calculations
@@ -118,6 +117,7 @@ export interface FiscalPageActions {
   // State Management
   setActiveTab: (tab: FiscalPageState['activeTab']) => void;
   setFiscalMode: (mode: FiscalPageState['fiscalMode']) => void;
+  setFiscalViewMode: (mode: FiscalPageState['fiscalViewMode']) => void;
   setFilters: (filters: Partial<FiscalPageState['filters']>) => void;
   toggleAnalytics: () => void;
   setAnalyticsTimeframe: (timeframe: FiscalPageState['analyticsTimeframe']) => void;
@@ -127,7 +127,7 @@ export interface UseFiscalPageReturn {
   // Data
   pageState: FiscalPageState;
   metrics: FiscalPageMetrics;
-  fiscalStats: any;
+  fiscalStats: FiscalStats | null;
   cashFlowData: CashFlowProjection[];
   profitabilityAnalysis: ProfitabilityAnalysis | null;
 
@@ -147,7 +147,7 @@ export interface UseFiscalPageReturn {
   // Computed Data
   shouldShowOfflineView: boolean;
   taxConfiguration: TaxConfiguration;
-  alertsData: any[];
+  alertsData: FiscalAlert[];
 }
 
 // ============================================================================
@@ -155,8 +155,11 @@ export interface UseFiscalPageReturn {
 // ============================================================================
 
 export const useFiscalPage = (): UseFiscalPageReturn => {
-  const { setQuickActions, updateModuleBadge } = useNavigation();
+  const { setQuickActions, updateModuleBadge } = useNavigationActions();
   const { fiscalStats, isLoading: fiscalLoading, error: fiscalError } = useFiscal();
+
+  // 🆕 Location Context
+  const { selectedLocation, isMultiLocationMode } = useLocation();
 
   // Offline status monitoring
   const { isOnline, connectionQuality, isSyncing, queueSize } = useOfflineStatus();
@@ -167,10 +170,15 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
 
   const [pageState, setPageState] = useState<FiscalPageState>(() => {
     const storedMode = localStorage.getItem('fiscal_mode') as FiscalPageState['fiscalMode'];
+    const storedViewMode = localStorage.getItem('fiscal_view_mode') as FiscalPageState['fiscalViewMode'];
     return {
       activeTab: 'invoicing',
       fiscalMode: storedMode || 'offline-first',
       effectiveFiscalMode: 'offline',
+      fiscalViewMode: storedViewMode || 'per-location',
+      selectedLocation: null,
+      isMultiLocationMode: false,
+      afipConfig: undefined,
       filters: {},
       selectedPeriod: 'month',
       showAnalytics: false,
@@ -181,6 +189,22 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
   const [error, setError] = useState<string | null>(null);
   const [cashFlowData, setCashFlowData] = useState<CashFlowProjection[]>([]);
   const [profitabilityAnalysis, setProfitabilityAnalysis] = useState<ProfitabilityAnalysis | null>(null);
+
+  // ============================================================================
+  // 🆕 MULTI-LOCATION STATE
+  // ============================================================================
+
+  // AFIP config for selected location
+  const [afipConfig, setAfipConfig] = useState<AFIPConfiguration | null>(null);
+  const [afipConfigLoading, setAfipConfigLoading] = useState(false);
+
+  // Location-aware fiscal stats
+  const [locationFiscalStats, setLocationFiscalStats] = useState<FiscalStats | null>(null);
+  const [locationStatsLoading, setLocationStatsLoading] = useState(false);
+
+  // Use location-aware stats if available, fallback to useFiscal hook
+  const effectiveFiscalStats = isMultiLocationMode ? locationFiscalStats : fiscalStats;
+  const effectiveLoading = isMultiLocationMode ? locationStatsLoading : fiscalLoading;
 
   // ============================================================================
   // COMPUTED DATA & METRICS
@@ -209,7 +233,7 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
 
   // Calculate fiscal metrics using migrated business logic
   const metrics: FiscalPageMetrics = useMemo(() => {
-    if (!fiscalStats) {
+    if (!effectiveFiscalStats) {
       return {
         facturacionMesActual: 0,
         facturasEmitidasMes: 0,
@@ -240,7 +264,7 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
     };
 
     // Mock calculations for demo - in real app would use actual data
-    const mockBaseAmount = fiscalStats.facturacion_mes_actual || 100000;
+    const mockBaseAmount = effectiveFiscalStats.facturacion_mes_actual || 100000;
     const taxResult = calculateTotalTax(mockBaseAmount, taxConfig);
 
     const ivaAmount = calculateIVA(mockBaseAmount, taxConfig.ivaRate);
@@ -250,26 +274,26 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
 
     return {
       // Facturación y Ventas
-      facturacionMesActual: fiscalStats.facturacion_mes_actual || 0,
-      facturasEmitidasMes: fiscalStats.facturas_emitidas_mes || 0,
-      promedioFacturacion: (fiscalStats.facturacion_mes_actual || 0) / Math.max(1, fiscalStats.facturas_emitidas_mes || 1),
+      facturacionMesActual: effectiveFiscalStats.facturacion_mes_actual || 0,
+      facturasEmitidasMes: effectiveFiscalStats.facturas_emitidas_mes || 0,
+      promedioFacturacion: (effectiveFiscalStats.facturacion_mes_actual || 0) / Math.max(1, effectiveFiscalStats.facturas_emitidas_mes || 1),
       crecimientoFacturacion: 12.5, // Mock growth percentage
 
       // Impuestos y Obligaciones
       totalIVARecaudado: ivaAmount.tax_amount,
       totalIngresosBrutos: ingresosBrutosAmount.tax_amount || 0,
-      obligacionesPendientes: fiscalStats.cae_pendientes || 0,
-      proximoVencimiento: fiscalStats.proxima_presentacion || 'N/A',
+      obligacionesPendientes: effectiveFiscalStats.cae_pendientes || 0,
+      proximoVencimiento: effectiveFiscalStats.proxima_presentacion || 'N/A',
 
       // AFIP Integration
       afipConnectionStatus: isOnline ? 'connected' : 'disconnected',
-      caeGenerados: Math.floor((fiscalStats.facturas_emitidas_mes || 0) * 0.8), // 80% success rate
-      caePendientes: fiscalStats.cae_pendientes || 0,
+      caeGenerados: Math.floor((effectiveFiscalStats.facturas_emitidas_mes || 0) * 0.8), // 80% success rate
+      caePendientes: effectiveFiscalStats.cae_pendientes || 0,
       ultimaSincronizacion: new Date().toLocaleTimeString('es-AR'),
 
       // Cash Flow & Financial
-      flujoEfectivoMensual: (fiscalStats.facturacion_mes_actual || 0) - (taxResult.total_tax_amount || 0),
-      posicionEfectivo: (fiscalStats.facturacion_mes_actual || 0) * 0.15, // 15% cash position
+      flujoEfectivoMensual: (effectiveFiscalStats.facturacion_mes_actual || 0) - (taxResult.total_tax_amount || 0),
+      posicionEfectivo: (effectiveFiscalStats.facturacion_mes_actual || 0) * 0.15, // 15% cash position
       ratioLiquidez: 1.8, // Mock liquidity ratio
       margenOperativo: 0.18, // Mock operating margin
 
@@ -278,7 +302,7 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
       riesgosFiscales: queueSize > 5 ? 3 : queueSize > 2 ? 1 : 0,
       alertasVencimiento: Math.floor(Math.random() * 3) // Mock alerts
     };
-  }, [fiscalStats, isOnline, queueSize]);
+  }, [effectiveFiscalStats, isOnline, queueSize]);
 
   // Tax configuration for calculations
   const taxConfiguration: TaxConfiguration = useMemo(() => ({
@@ -346,10 +370,86 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
   // EFFECTS
   // ============================================================================
 
+  // 🆕 Fetch AFIP config for selected location
+  useEffect(() => {
+    if (!selectedLocation?.id || !isMultiLocationMode || pageState.fiscalViewMode !== 'per-location') {
+      setAfipConfig(null);
+      return;
+    }
+
+    const loadAFIPConfig = async () => {
+      setAfipConfigLoading(true);
+      try {
+        const config = await fiscalApiMultiLocation.getAFIPConfiguration(selectedLocation.id);
+        setAfipConfig(config);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        logger.error('FiscalPage', 'Error loading AFIP config:', errorMessage);
+        setAfipConfig(null);
+      } finally {
+        setAfipConfigLoading(false);
+      }
+    };
+
+    loadAFIPConfig();
+  }, [selectedLocation?.id, isMultiLocationMode, pageState.fiscalViewMode]);
+
+  // 🆕 Fetch location-aware fiscal stats
+  useEffect(() => {
+    if (!isMultiLocationMode) {
+      setLocationFiscalStats(null);
+      return;
+    }
+
+    const loadFiscalStats = async () => {
+      setLocationStatsLoading(true);
+      try {
+        const now = new Date();
+        const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
+
+        if (pageState.fiscalViewMode === 'consolidated') {
+          const stats = await fiscalApiMultiLocation.getFiscalStats(null, startDate, endDate);
+          setLocationFiscalStats(stats);
+        } else if (selectedLocation) {
+          const stats = await fiscalApiMultiLocation.getFiscalStats(
+            selectedLocation.id,
+            startDate,
+            endDate
+          );
+          setLocationFiscalStats(stats);
+        }
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        logger.error('FiscalPage', 'Error loading fiscal stats:', errorMessage);
+        setLocationFiscalStats(null);
+      } finally {
+        setLocationStatsLoading(false);
+      }
+    };
+
+    loadFiscalStats();
+  }, [selectedLocation?.id, isMultiLocationMode, pageState.fiscalViewMode]);
+
+  // 🆕 Update pageState with location context
+  useEffect(() => {
+    setPageState(prev => ({
+      ...prev,
+      selectedLocation,
+      isMultiLocationMode,
+      afipConfig
+    }));
+  }, [selectedLocation, isMultiLocationMode, afipConfig]);
+
   // Save fiscal mode preference
   useEffect(() => {
     localStorage.setItem('fiscal_mode', pageState.fiscalMode);
   }, [pageState.fiscalMode]);
+
+  // Save fiscal view mode preference
+  useEffect(() => {
+    localStorage.setItem('fiscal_view_mode', pageState.fiscalViewMode);
+  }, [pageState.fiscalViewMode]);
 
   // Configure quick actions based on active tab
   useEffect(() => {
@@ -460,17 +560,34 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
   const actions: FiscalPageActions = useMemo(() => ({
     // Invoice Management
     handleNewInvoice: () => {
-      logger.info('API', 'Opening new invoice modal');
+      // 🆕 Validate location selection in multi-location mode
+      if (isMultiLocationMode && !selectedLocation) {
+        notify.warning({
+          title: 'Seleccione un local',
+          description: 'Debe seleccionar un local específico para emitir facturas'
+        });
+        return;
+      }
+
+      logger.info('API', 'Opening new invoice modal', {
+        locationId: selectedLocation?.id,
+        locationName: selectedLocation?.name,
+        puntoVenta: afipConfig?.punto_venta
+      });
       setPageState(prev => ({ ...prev, activeTab: 'invoicing' }));
-      // Would open invoice creation interface
+      // Would open invoice creation interface with location context
     },
 
-    handleInvoiceGeneration: (data: any) => {
+    handleInvoiceGeneration: (data: InvoiceGenerationData) => {
       logger.info('API', 'Generating invoice:', data);
+      // Calculate total from items
+      const totalAmount = data.items.reduce((sum, item) => {
+        return sum + (item.precio_unitario * item.cantidad);
+      }, 0);
       // Use tax calculation service for accurate tax computation
-      const taxResult = calculateTotalTax(data.amount, taxConfiguration);
+      const taxResult = calculateTotalTax(totalAmount, taxConfiguration);
       logger.info('API', 'Tax calculation result:', taxResult);
-      // Would process invoice generation with AFIP
+      // TODO: Implement AFIP invoice generation with CAE request
     },
 
     handleBulkInvoicing: () => {
@@ -479,7 +596,7 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
     },
 
     // AFIP Integration
-    handleAFIPSync: () => {
+    handleAFIPSync: async () => {
       if (!isOnline) {
         notify.warning({
           title: 'Sin conexión',
@@ -488,15 +605,47 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
         return;
       }
 
-      logger.info('API', 'Synchronizing with AFIP');
-      notify.info({
-        title: 'Sincronización iniciada',
-        description: 'Enviando datos pendientes a AFIP'
-      });
-      // Would handle AFIP synchronization
+      try {
+        notify.info({
+          title: 'Sincronización iniciada',
+          description: 'Enviando CAEs pendientes a AFIP...'
+        });
+
+        // 🆕 Multi-location sync support
+        if (pageState.fiscalViewMode === 'consolidated') {
+          logger.info('API', 'Synchronizing all locations with AFIP');
+          const results = await fiscalApiMultiLocation.syncAllLocationsPendingCAE();
+          const total = Object.values(results).reduce((sum, count) => sum + count, 0);
+
+          notify.success({
+            title: 'Sincronización exitosa',
+            description: `${total} CAEs actualizados en todas las ubicaciones`
+          });
+        } else if (selectedLocation) {
+          logger.info('API', 'Synchronizing location with AFIP', { locationId: selectedLocation.id });
+          const count = await fiscalApiMultiLocation.syncLocationPendingCAE(selectedLocation.id);
+
+          notify.success({
+            title: 'Sincronización exitosa',
+            description: `${count} CAEs actualizados para ${selectedLocation.name}`
+          });
+        } else {
+          notify.warning({
+            title: 'Seleccione un local',
+            description: 'Debe seleccionar un local para sincronizar'
+          });
+        }
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'No se pudo sincronizar con AFIP';
+        logger.error('API', 'AFIP sync error:', errorMessage);
+        notify.error({
+          title: 'Error en sincronización',
+          description: errorMessage
+        });
+      }
     },
 
-    handleCAERequest: (invoiceData: any) => {
+    handleCAERequest: (invoiceData: CAERequestData) => {
       logger.info('API', 'Requesting CAE for invoice:', invoiceData);
       // Would request CAE from AFIP
     },
@@ -536,10 +685,55 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
       // Would run compliance verification
     },
 
-    handleGenerateReport: (type: string, period: string) => {
-      logger.info('API', `Generating ${type} report for ${period}`);
-      setPageState(prev => ({ ...prev, activeTab: 'reporting' }));
-      // Would generate fiscal reports
+    handleGenerateReport: async (type: string, period: string) => {
+      try {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1;
+
+        // 🆕 Multi-location report generation
+        if (pageState.fiscalViewMode === 'consolidated') {
+          logger.info('API', `Generating consolidated ${type} report for ${period}`);
+          await fiscalApiMultiLocation.generateConsolidatedTaxReport(
+            type as 'iva_ventas' | 'iva_compras' | 'ingresos_brutos' | 'ganancias',
+            year,
+            month
+          );
+
+          notify.success({
+            title: 'Reporte consolidado generado',
+            description: 'El reporte fiscal consolidado está listo'
+          });
+        } else if (selectedLocation) {
+          logger.info('API', `Generating ${type} report for location ${selectedLocation.name}`);
+          await fiscalApiMultiLocation.generateLocationTaxReport(
+            selectedLocation.id,
+            type as 'iva_ventas' | 'iva_compras' | 'ingresos_brutos' | 'ganancias',
+            year,
+            month
+          );
+
+          notify.success({
+            title: 'Reporte generado',
+            description: `Reporte fiscal para ${selectedLocation.name} está listo`
+          });
+        } else {
+          notify.warning({
+            title: 'Seleccione un local',
+            description: 'Debe seleccionar un local para generar reportes'
+          });
+          return;
+        }
+
+        setPageState(prev => ({ ...prev, activeTab: 'reporting' }));
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'No se pudo generar el reporte';
+        logger.error('API', 'Report generation error:', errorMessage);
+        notify.error({
+          title: 'Error al generar reporte',
+          description: errorMessage
+        });
+      }
     },
 
     handleExportData: (format: 'pdf' | 'excel' | 'csv') => {
@@ -548,21 +742,76 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
     },
 
     // Financial Analysis
-    handleCashFlowAnalysis: () => {
-      logger.info('API', 'Generating cash flow analysis');
-      // Would use financialPlanningEngine for cash flow projections
-      // const projections = generateCashFlowProjections(data);
-      // setCashFlowData(projections);
+    handleCashFlowAnalysis: async () => {
+      try {
+        logger.info('API', 'Generating cash flow analysis');
+        const { generateCashFlowProjections } = await import('../services/financialPlanningEngine');
+
+        // Generate 6-month cash flow projections
+        const projections = generateCashFlowProjections({
+          currentRevenue: metrics.facturacionMesActual,
+          growthRate: metrics.crecimientoFacturacion / 100,
+          monthsAhead: 6
+        });
+
+        setCashFlowData(projections);
+        setPageState(prev => ({ ...prev, showAnalytics: true }));
+
+        notify.success({
+          title: 'Análisis completado',
+          description: 'Proyección de flujo de efectivo generada'
+        });
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        logger.error('API', 'Cash flow analysis error:', errorMessage);
+        setError(errorMessage);
+      }
     },
 
-    handleProfitabilityAnalysis: () => {
-      logger.info('API', 'Generating profitability analysis');
-      // Would use financialPlanningEngine for profitability analysis
+    handleProfitabilityAnalysis: async () => {
+      try {
+        logger.info('API', 'Generating profitability analysis');
+        const { analyzeProfitability } = await import('../services/financialPlanningEngine');
+
+        const analysis = analyzeProfitability({
+          revenue: metrics.facturacionMesActual,
+          costs: metrics.totalIVARecaudado + metrics.totalIngresosBrutos,
+          period: pageState.analyticsTimeframe
+        });
+
+        setProfitabilityAnalysis(analysis);
+
+        notify.success({
+          title: 'Análisis completado',
+          description: `Margen operativo: ${(analysis.operatingMargin * 100).toFixed(1)}%`
+        });
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        logger.error('API', 'Profitability analysis error:', errorMessage);
+        setError(errorMessage);
+      }
     },
 
-    handleBudgetVarianceAnalysis: () => {
-      logger.info('API', 'Generating budget variance analysis');
-      // Would analyze budget variances
+    handleBudgetVarianceAnalysis: async () => {
+      try {
+        logger.info('API', 'Generating budget variance analysis');
+        const { analyzeBudgetVariance } = await import('../services/financialPlanningEngine');
+
+        const variance = analyzeBudgetVariance({
+          actual: metrics.facturacionMesActual,
+          budgeted: metrics.facturacionMesActual * 1.1, // Mock: 10% growth expected
+          period: pageState.selectedPeriod
+        });
+
+        notify.info({
+          title: 'Variación presupuestaria',
+          description: `Variación: ${variance.variancePercentage > 0 ? '+' : ''}${variance.variancePercentage.toFixed(1)}%`
+        });
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        logger.error('API', 'Budget variance error:', errorMessage);
+        setError(errorMessage);
+      }
     },
 
     // State Management
@@ -579,6 +828,16 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
       });
     },
 
+    // 🆕 Set fiscal view mode (per-location vs consolidated)
+    setFiscalViewMode: (mode: FiscalPageState['fiscalViewMode']) => {
+      setPageState(prev => ({ ...prev, fiscalViewMode: mode }));
+
+      notify.info({
+        title: 'Vista actualizada',
+        description: mode === 'consolidated' ? 'Vista consolidada activada' : 'Vista por local activada'
+      });
+    },
+
     setFilters: (filters: Partial<FiscalPageState['filters']>) => {
       setPageState(prev => ({ ...prev, filters: { ...prev.filters, ...filters } }));
     },
@@ -590,7 +849,7 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
     setAnalyticsTimeframe: (timeframe: FiscalPageState['analyticsTimeframe']) => {
       setPageState(prev => ({ ...prev, analyticsTimeframe: timeframe }));
     }
-  }), [taxConfiguration, isOnline]);
+  }), [taxConfiguration, isOnline, isMultiLocationMode, selectedLocation, afipConfig, pageState.fiscalViewMode]);
 
   // ============================================================================
   // RETURN
@@ -600,7 +859,7 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
     // Data
     pageState,
     metrics,
-    fiscalStats,
+    fiscalStats: effectiveFiscalStats, // 🆕 Use location-aware stats
     cashFlowData,
     profitabilityAnalysis,
 
@@ -611,7 +870,7 @@ export const useFiscalPage = (): UseFiscalPageReturn => {
     queueSize,
 
     // State
-    loading: fiscalLoading,
+    loading: effectiveLoading || afipConfigLoading, // 🆕 Include AFIP config loading
     error: error || fiscalError,
 
     // Actions

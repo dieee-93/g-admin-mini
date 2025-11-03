@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useMaterials } from '@/store/materialsStore';
 import type { ItemType } from '../../../types';
 
@@ -21,8 +21,48 @@ export function useInventoryState() {
   const [sortBy, setSortBy] = useState<string>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // Get filtered materials
-  const materials = getFilteredItems();
+  // ✅ PERFORMANCE FIX: Memoize filtered materials to prevent creating new array reference on every render
+  // Only recompute when filters actually change, not on every render
+  const filteredMaterials = useMemo(() => {
+    return getFilteredItems();
+  }, [getFilteredItems]); // getFilteredItems already depends on filters internally
+
+  // ✅ OPTIMIZATION: Memoize sorted materials to avoid re-sorting on every render
+  const materials = useMemo(() => {
+    if (!filteredMaterials || filteredMaterials.length === 0) return [];
+
+    // Clone array to avoid mutating original
+    const sorted = [...filteredMaterials];
+
+    // Sort based on current criteria
+    sorted.sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'type':
+          comparison = (a.type || '').localeCompare(b.type || '');
+          break;
+        case 'category':
+          comparison = (a.category || '').localeCompare(b.category || '');
+          break;
+        case 'stock':
+          comparison = (a.stock || 0) - (b.stock || 0);
+          break;
+        case 'unit_cost':
+          comparison = (a.unit_cost || 0) - (b.unit_cost || 0);
+          break;
+        default:
+          comparison = 0;
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return sorted;
+  }, [filteredMaterials, sortBy, sortOrder]);
 
   // Advanced filters state (for drawer)
   const [advancedFilters, setAdvancedFilters] = useState({
@@ -49,43 +89,45 @@ export function useInventoryState() {
     return count;
   }, [filters, advancedFilters]);
 
-  // Handlers
-  const handleSearch = (value: string) => {
+  // Handlers - Wrapped in useCallback to prevent recreating on every render
+  const handleSearch = useCallback((value: string) => {
     setFilters({ search: value });
-  };
+  }, [setFilters]);
 
-  const handleTypeChange = (type: 'all' | ItemType) => {
+  const handleTypeChange = useCallback((type: 'all' | ItemType) => {
     setFilters({ type });
-  };
+  }, [setFilters]);
 
-  const handleCategoryChange = (category: string) => {
+  const handleCategoryChange = useCallback((category: string) => {
     setFilters({ category });
-  };
+  }, [setFilters]);
 
-  const handleStockStatusChange = (stockStatus: 'all' | 'ok' | 'low' | 'critical' | 'out') => {
+  const handleStockStatusChange = useCallback((stockStatus: 'all' | 'ok' | 'low' | 'critical' | 'out') => {
     setFilters({ stockStatus });
-  };
+  }, [setFilters]);
 
-  const handleSort = (field: string) => {
+  const handleSort = useCallback((field: string) => {
     if (sortBy === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+      setSortOrder(newSortOrder);
+      setFilters({ sortBy: field as string, sortOrder: newSortOrder });
     } else {
       setSortBy(field);
       setSortOrder('asc');
+      setFilters({ sortBy: field as string, sortOrder: 'asc' });
     }
-    setFilters({ sortBy: field as any, sortOrder });
-  };
+  }, [sortBy, sortOrder, setFilters]);
 
-  const handleApplyAdvancedFilters = () => {
+  const handleApplyAdvancedFilters = useCallback(() => {
     // Apply advanced filters to store
     if (advancedFilters.selectedTypes.length > 0) {
       setFilters({ type: advancedFilters.selectedTypes[0] }); // TODO: Support multiple types
     }
     // TODO: Apply other advanced filters
     setIsFiltersDrawerOpen(false);
-  };
+  }, [advancedFilters.selectedTypes, setFilters]);
 
-  const handleClearAdvancedFilters = () => {
+  const handleClearAdvancedFilters = useCallback(() => {
     setAdvancedFilters({
       selectedTypes: [],
       priceRange: [0, 10000],
@@ -95,7 +137,7 @@ export function useInventoryState() {
       showCritical: false,
       selectedABCClasses: []
     });
-  };
+  }, []);
 
   return {
     // Data

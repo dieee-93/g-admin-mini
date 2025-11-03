@@ -7,7 +7,6 @@ import { VStack, Text, Alert, HStack, Badge, Collapsible, Stack } from '@/shared
 import type { SupplierAnalysis, SupplierRiskFactor } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
 import { useMemo } from 'react';
 import {
-  ExclamationTriangleIcon,
   ShieldExclamationIcon
 } from '@heroicons/react/24/outline';
 
@@ -64,7 +63,7 @@ export function RiskFactorsPanel({ suppliers }: RiskFactorsPanelProps) {
   }
 
   return (
-    <VStack align="stretch" gap={4}>
+    <VStack align="stretch" gap="4">
       {/* High Risk Suppliers Summary */}
       {highRiskSuppliers.length > 0 && (
         <Alert.Root status="warning">
@@ -87,15 +86,15 @@ export function RiskFactorsPanel({ suppliers }: RiskFactorsPanelProps) {
       </Text>
 
       {/* Risk Factors List */}
-      <Stack direction="column" gap={3}>
+      <Stack direction="column" gap="3">
         {allRiskFactors.map((risk, index) => (
           <Alert.Root
             key={`${risk.supplierId}-${risk.id}-${index}`}
             status={getRiskSeverityStatus(risk.severity)}
           >
-            <VStack align="stretch" width="full" gap={2}>
+            <VStack align="stretch" width="full" gap="2">
               <HStack justify="space-between" width="full">
-                <VStack align="start" gap={1}>
+                <VStack align="start" gap="1">
                   <HStack>
                     <Text fontWeight="bold">{risk.title}</Text>
                     <Badge size="sm" colorPalette={getRiskCategoryColor(risk.category)}>
@@ -108,7 +107,7 @@ export function RiskFactorsPanel({ suppliers }: RiskFactorsPanelProps) {
                   <Text fontSize="sm">{risk.description}</Text>
                 </VStack>
 
-                <VStack align="end" gap={1}>
+                <VStack align="end" gap="1">
                   <Badge colorPalette={getRiskSeverityColor(risk.severity)}>
                     {getRiskSeverityLabel(risk.severity)}
                   </Badge>
@@ -130,9 +129,9 @@ export function RiskFactorsPanel({ suppliers }: RiskFactorsPanelProps) {
                     </Text>
                   </Collapsible.Trigger>
                   <Collapsible.Content>
-                    <VStack align="start" gap={1} mt={2} pl={4}>
+                    <VStack align="start" gap="1" mt="2" pl="4">
                       {risk.mitigationActions.map((action, idx) => (
-                        <HStack key={idx} gap={2}>
+                        <HStack key={idx} gap="2">
                           <Text fontSize="xs">•</Text>
                           <Text fontSize="sm">{action}</Text>
                         </HStack>

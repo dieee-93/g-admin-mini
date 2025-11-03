@@ -71,9 +71,9 @@ export function SuppliersManagement({ pageState }: SuppliersManagementProps) {
 
         {/* Tab: List */}
         <Tabs.Content value="list">
-          <Stack direction="column" gap={4}>
+          <Stack direction="column" gap="4">
             {/* Filters */}
-            <Stack direction="row" gap={3} align="center">
+            <Stack direction="row" gap="3" align="center">
               <InputField
                 placeholder="Buscar proveedores..."
                 value={filters.searchText}
@@ -111,7 +111,7 @@ export function SuppliersManagement({ pageState }: SuppliersManagementProps) {
 
         {/* Tab: Performance */}
         <Tabs.Content value="performance">
-          <Stack direction="column" align="center" justify="center" py={16} gap={3}>
+          <Stack direction="column" align="center" justify="center" py="16" gap="3">
             <Text fontSize="xl" fontWeight="semibold">
               Performance de Proveedores
             </Text>

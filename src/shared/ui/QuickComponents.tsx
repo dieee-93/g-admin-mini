@@ -3,7 +3,7 @@
 // ====================================
 // Componentes pre-configurados para casos comunes
 
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { HStack, VStack } from '@chakra-ui/react'
 import { Typography, Button, Badge, Icon, Layout } from './index'
 
@@ -41,8 +41,8 @@ export function PageTitle({
   badge?: ReactNode
 }) {
   return (
-    <HStack gap={3} align="center">
-      <VStack gap={1} align="start" flex={1}>
+    <HStack gap="3" align="center">
+      <VStack gap="1" align="start" flex={1}>
         <Typography variant="heading" level={1}>
           {title}
         </Typography>
@@ -67,10 +67,10 @@ export function ActionBar({
 }) {
   return (
     <HStack justify="space-between" align="center" w="full">
-      <HStack gap={2}>
+      <HStack gap="2">
         {secondary}
       </HStack>
-      <HStack gap={2}>
+      <HStack gap="2">
         {primary}
       </HStack>
     </HStack>
@@ -93,11 +93,11 @@ export function ListItem({
     <HStack 
       justify="space-between" 
       align="center" 
-      p={3}
+      p="3"
       borderRadius="md"
       _hover={{ bg: "bg.subtle" }}
     >
-      <VStack gap={1} align="start" flex={1}>
+      <VStack gap="1" align="start" flex={1}>
         <Typography variant="body" weight="medium">
           {title}
         </Typography>
@@ -108,7 +108,7 @@ export function ListItem({
         )}
       </VStack>
       
-      <HStack gap={2}>
+      <HStack gap="2">
         {status}
         {actions}
       </HStack>
@@ -127,8 +127,8 @@ export function EmptyState({
   action?: ReactNode
 }) {
   return (
-    <VStack gap={4} align="center" py={12}>
-      <VStack gap={2} align="center">
+    <VStack gap="4" align="center" py="12">
+      <VStack gap="2" align="center">
         <Typography variant="heading" level={3} color="text.muted">
           {title}
         </Typography>

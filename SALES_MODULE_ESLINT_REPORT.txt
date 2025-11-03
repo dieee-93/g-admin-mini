@@ -1,0 +1,250 @@
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\b2b\components\QuoteBuilder.tsx
+  11:15  error  'QuoteFormData' is defined but never used   @typescript-eslint/no-unused-vars
+  30:3   error  'customerId' is defined but never used      @typescript-eslint/no-unused-vars
+  31:3   error  'onQuoteCreated' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\b2b\services\approvalWorkflowService.ts
+   15:3   error  'ApprovalRule' is defined but never used   @typescript-eslint/no-unused-vars
+  107:3   error  'comments' is defined but never used       @typescript-eslint/no-unused-vars
+  155:32  error  'userId' is defined but never used         @typescript-eslint/no-unused-vars
+  155:48  error  'requiredLevel' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\b2b\services\financeIntegration.ts
+  12:15  error  'B2BQuote' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\b2b\services\quotesService.ts
+  10:10  error  'supabase' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\b2b\services\tieredPricingService.ts
+  15:3  error  'PricingTierType' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\ecommerce\components\CatalogManagement.tsx
+   56:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  122:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\ecommerce\components\OnlineCatalogTab.tsx
+   30:3   error  'MagnifyingGlassIcon' is defined but never used  @typescript-eslint/no-unused-vars
+   76:40  error  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  117:93  error  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\ecommerce\components\OnlineOrdersTab.tsx
+   15:3   error  'Button' is defined but never used        @typescript-eslint/no-unused-vars
+   65:75  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:89  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  140:97  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\ecommerce\hooks\useCart.ts
+  215:6  warning  React Hook useEffect has missing dependencies: 'params.customerId' and 'params.sessionId'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\ecommerce\hooks\useOnlineOrders.ts
+  138:6  warning  React Hook useEffect has a missing dependency: 'fetchOrders'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\ecommerce\hooks\useProductCatalog.ts
+  163:6  warning  React Hook useEffect has a missing dependency: 'fetchProducts'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\ecommerce\services\checkoutService.ts
+  1:29  error  'CreateOrderParams' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\ecommerce\types\index.ts
+  43:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\modules\sales\manifest.tsx
+  29:1  warning  This rule can't verify that `export *` only exports components  react-refresh/only-export-components
+  30:1  warning  This rule can't verify that `export *` only exports components  react-refresh/only-export-components
+  31:1  warning  This rule can't verify that `export *` only exports components  react-refresh/only-export-components
+  32:1  warning  This rule can't verify that `export *` only exports components  react-refresh/only-export-components
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\AdvancedSalesAnalyticsDashboard.tsx
+  1:1  warning  This rule can't verify that `export *` only exports components  react-refresh/only-export-components
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\AdvancedSalesAnalyticsDashboard\hooks\index.ts
+   34:19  error  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+   35:34  error  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  104:10  error  'sales' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\AdvancedSalesAnalyticsDashboard\types\index.ts
+  1:15  error  'Sale' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\PredictiveAnalyticsEngine.tsx
+  1:1  warning  This rule can't verify that `export *` only exports components  react-refresh/only-export-components
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\SalesAnalyticsEnhanced.tsx
+   23:3   error    'ClockIcon' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+   26:41  error    'TrendAnalytics' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+   56:54  error    Unexpected any. Specify a different type                                                                                   @typescript-eslint/no-explicit-any
+   63:6   warning  React Hook useEffect has a missing dependency: 'generateSalesAnalytics'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   93:13  error    'customerSalesData' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+  279:54  error    Unexpected any. Specify a different type                                                                                   @typescript-eslint/no-explicit-any
+  308:94  error    Unexpected any. Specify a different type                                                                                   @typescript-eslint/no-explicit-any
+  392:62  error    Unexpected any. Specify a different type                                                                                   @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\SalesIntelligenceDashboard.tsx
+  1:1  warning  This rule can't verify that `export *` only exports components  react-refresh/only-export-components
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\SalesIntelligenceDashboard\components\MetricCardsGrid.tsx
+  15:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\SalesIntelligenceDashboard\hooks\index.ts
+   29:9  error    Unexpected lexical declaration in case block                                                                     no-case-declarations
+   30:9  error    Unexpected lexical declaration in case block                                                                     no-case-declarations
+  150:5  warning  React Hook useMemo has a missing dependency: 'getMetricCards'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  173:9  error    Unexpected lexical declaration in case block                                                                     no-case-declarations
+  178:9  error    Unexpected lexical declaration in case block                                                                     no-case-declarations
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\SalesIntelligenceDashboard\types\index.ts
+  8:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\SalesPerformanceInsights.tsx
+  1:1  warning  This rule can't verify that `export *` only exports components  react-refresh/only-export-components
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Analytics\SalesPerformanceInsights\hooks\index.ts
+  3:35  error  'PerformanceInsight' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\AppointmentsCalendarView.tsx
+  15:3  error  'selectedDate' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\AppointmentsTab.tsx
+   3:31  error    'Badge' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+   3:38  error    'Alert' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+  29:17  error    'setStats' is assigned a value but never used                                                                        @typescript-eslint/no-unused-vars
+  29:38  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  34:6   warning  React Hook useEffect has a missing dependency: 'loadAppointments'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\CartValidationSummary.tsx
+   8:3  error  'Alert' is defined but never used               @typescript-eslint/no-unused-vars
+  69:3  error  'isOffline' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\DeliveryOrders\DeliveryOrderCard.tsx
+  4:30  error  'DriverPerformance' is defined but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\OfflineSalesView.tsx
+   24:3   error    'UserIcon' is defined but never used                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   31:3   error    'CheckCircleIcon' is defined but never used                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   81:10  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  123:10  error    'realtimeOrders' is assigned a value but never used                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  123:56  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  157:35  warning  The ref value 'syncRetryRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'syncRetryRef.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+  161:6   warning  React Hook useEffect has missing dependencies: 'loadCustomersWithOfflineSupport', 'setupRealtimeSubscriptions', and 'setupSyncEventListeners'. Either include them or remove the dependency array                                                                        react-hooks/exhaustive-deps
+  207:6   warning  React Hook useEffect has a missing dependency: 'updateSyncProgress'. Either include it or remove the dependency array                                                                                                                                                    react-hooks/exhaustive-deps
+  261:36  error    'data' is defined but never used                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  265:38  error    'data' is defined but never used                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  274:35  error    'data' is defined but never used                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  293:9   error    'customersCollection' is assigned a value but never used                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+  386:6   warning  React Hook useCallback has missing dependencies: 'handleSuccessfulSale' and 'processOfflineSale'. Either include them or remove the dependency array                                                                                                                     react-hooks/exhaustive-deps
+  396:27  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  397:26  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  397:56  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  457:12  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  475:51  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  475:56  error    'saleData' is defined but never used                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  475:66  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  510:9   error    'handleSuggestMaxQuantity' is assigned a value but never used                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\PaymentConfirmationModal.tsx
+   20:3   error  'Badge' is defined but never used                 @typescript-eslint/no-unused-vars
+   37:10  error  'DecimalUtils' is defined but never used          @typescript-eslint/no-unused-vars
+  127:83  error  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  237:75  error  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  291:27  error  'PaymentIcon' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\Payment\ModernPaymentProcessor.tsx
+    3:20  error    'useEffect' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+   32:3   error    'SplitBill' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+  179:6   warning  React Hook useMemo has a missing dependency: 'calculatedSubtotal'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  206:9   error    'updatePaymentAmount' is assigned a value but never used                                                             @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\ProductWithStock.tsx
+    8:3   error    'InputField' is defined but never used                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+   12:3   error    'Icon' is defined but never used                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   18:3   error    'ExclamationTriangleIcon' is defined but never used                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   19:3   error    'CheckCircleIcon' is defined but never used                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+   20:3   error    'XCircleIcon' is defined but never used                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   21:3   error    'InformationCircleIcon' is defined but never used                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   32:10  error    'StockCalculation' is defined but never used                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   66:3   error    'currentCart' is assigned a value but never used                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   68:3   error    'offlineMode' is assigned a value but never used                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   77:9   warning  The 'validateStock' function makes the dependencies of useEffect Hook (at line 128) change on every render. Move it inside the useEffect callback. Alternatively, wrap the definition of 'validateStock' in its own useCallback() Hook  react-hooks/exhaustive-deps
+  119:17  error    '_' is defined but never used                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\QROrdering\QRCodeGenerator.tsx
+   22:3   error  'ExclamationTriangleIcon' is defined but never used  @typescript-eslint/no-unused-vars
+  327:31  error  '_config' is defined but never used                  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\QROrdering\QROrderPage.tsx
+   14:3  error  'Separator' is defined but never used                        @typescript-eslint/no-unused-vars
+   16:3  error  'Alert' is defined but never used                            @typescript-eslint/no-unused-vars
+   17:3  error  'NumberInput' is defined but never used                      @typescript-eslint/no-unused-vars
+   29:3  error  'UserIcon' is defined but never used                         @typescript-eslint/no-unused-vars
+   30:3  error  'PhoneIcon' is defined but never used                        @typescript-eslint/no-unused-vars
+   32:3  error  'HeartIcon' is defined but never used                        @typescript-eslint/no-unused-vars
+  214:9  error  'updateItemInstructions' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\SaleFormModal.tsx
+   18:3   error  'Alert' is defined but never used                      @typescript-eslint/no-unused-vars
+   48:5   error  'getCartTotal' is assigned a value but never used      @typescript-eslint/no-unused-vars
+   49:5   error  'getCartItemCount' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   62:34  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  110:52  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\SaleWithStockView.tsx
+   19:3   error  'Badge' is defined but never used         @typescript-eslint/no-unused-vars
+   24:3   error  'UserIcon' is defined but never used      @typescript-eslint/no-unused-vars
+  355:60  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\SalesAlerts.tsx
+   5:3   error  'CheckCircleIcon' is defined but never used        @typescript-eslint/no-unused-vars
+  20:46  error  'context' is defined but never used                @typescript-eslint/no-unused-vars
+  35:9   error  'analysisData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\SalesManagement.tsx
+  10:3   error  'ComputerDesktopIcon' is defined but never used       @typescript-eslint/no-unused-vars
+  33:30  error  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  34:36  error  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  42:3   error  'onOrderPlace' is defined but never used              @typescript-eslint/no-unused-vars
+  43:3   error  'onPaymentProcess' is defined but never used          @typescript-eslint/no-unused-vars
+  45:3   error  'performanceMode' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\components\SalesMetrics.tsx
+  16:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\hooks\useAdminAppointments.ts
+  153:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  205:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  247:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\hooks\useSales.ts
+  32:3   error  'fetchCustomers' is defined but never used        @typescript-eslint/no-unused-vars
+  79:25  error  'data' is defined but never used                  @typescript-eslint/no-unused-vars
+  97:11  error  'crudFilters' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\hooks\useSalesEnhanced.ts
+   76:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   77:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  209:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  217:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+I:\Programacion\Proyectos\g-mini\src\pages\admin\operations\sales\hooks\useSalesPage.ts
+    7:3   error  'ClipboardDocumentListIcon' is defined but never used        @typescript-eslint/no-unused-vars
+    9:3   error  'PlusIcon' is defined but never used                         @typescript-eslint/no-unused-vars
+   11:3   error  'CurrencyDollarIcon' is defined but never used               @typescript-eslint/no-unused-vars
+   12:3   error  'ArrowTrendingUpIcon' is defined but never used              @typescript-eslint/no-unused-vars
+   13:3   error  'UsersIcon' is defined but never used                        @typescript-eslint/no-unused-vars
+   14:3   error  'DocumentTextIcon' is defined but never used                 @typescript-eslint/no-unused-vars
+   23:10  error  'FinancialDecimal' is defined but never used                 @typescript-eslint/no-unused-vars
+   23:62  error  'safeDiv' is defined but never used                          @typescript-eslint/no-unused-vars
+   29:3   error  'comparePeriods' is defined but never used                   @typescript-eslint/no-unused-vars
+  115:51  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  132:46  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  134:33  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  135:39  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  166:16  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  167:23  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  171:32  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  183:11  error  'shouldReduceAnimations' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  211:46  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  212:58  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  213:50  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  214:46  error  Unexpected any. Specify a different type                     @typescript-eslint/no-explicit-any
+  226:28  error  'setPeriodComparison' is assigned a value but never used     @typescript-eslint/no-unused-vars

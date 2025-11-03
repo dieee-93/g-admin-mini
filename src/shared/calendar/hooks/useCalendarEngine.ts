@@ -9,7 +9,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { UnifiedCalendarEngine } from '../engine/UnifiedCalendarEngine';
-import {
+import type {
   CalendarConfig,
   DateRange,
   TimeSlot,

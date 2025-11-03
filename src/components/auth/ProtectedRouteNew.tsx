@@ -34,7 +34,7 @@ export function ProtectedRouteNew({
         bg="bg.canvas"
       >
         <Stack direction="column" gap="4">
-          <Spinner size="xl" color="blue.500" thickness="3px" />
+          <Spinner size="xl" color="blue.500" />
           <Typography variant="body" color="text.secondary">
             Verificando autenticación...
           </Typography>

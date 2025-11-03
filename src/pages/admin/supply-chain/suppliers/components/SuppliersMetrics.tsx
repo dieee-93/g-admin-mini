@@ -21,7 +21,7 @@ interface SuppliersMetricsProps {
 
 export function SuppliersMetrics({ metrics, loading, onMetricClick }: SuppliersMetricsProps) {
   return (
-    <Stack direction="row" gap={3} wrap="wrap">
+    <Stack direction="row" gap="3" wrap="wrap">
       {/* Total Suppliers */}
       <MetricCard
         label="Total Proveedores"

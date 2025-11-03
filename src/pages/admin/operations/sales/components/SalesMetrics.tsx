@@ -13,12 +13,12 @@ import type { SalesPageMetrics } from '../hooks/useSalesPage';
 
 interface SalesMetricsProps {
   metrics: SalesPageMetrics;
-  onMetricClick?: (metric: string, value: any) => void;
+  onMetricClick?: (metric: string, value: string | number) => void;
   loading?: boolean;
 }
 
 export function SalesMetrics({ metrics, onMetricClick, loading }: SalesMetricsProps) {
-  const handleMetricClick = (metric: string, value: any) => {
+  const handleMetricClick = (metric: string, value: string | number) => {
     onMetricClick?.(metric, value);
   };
 

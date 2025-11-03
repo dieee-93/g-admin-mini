@@ -17,7 +17,7 @@ import {
 import type { SupplierOrderFilters, SupplierOrderStatus } from '../types';
 import { STATUS_CONFIG } from '../types';
 import type { Supplier } from '../../suppliers/types/supplierTypes';
-import { suppliersApi } from '../../materials/services/suppliersApi';
+import { suppliersApi } from '../../suppliers/services/suppliersApi';
 import { FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
 
@@ -146,8 +146,8 @@ export function SupplierOrdersFilters({
   return (
     <Stack
       direction="column"
-      gap={4}
-      p={4}
+      gap="4"
+      p="4"
       borderWidth="1px"
       borderRadius="md"
       borderColor="border.default"
@@ -155,7 +155,7 @@ export function SupplierOrdersFilters({
     >
       {/* Header */}
       <HStack justify="space-between">
-        <HStack gap={2}>
+        <HStack gap="2">
           <FunnelIcon style={{ width: 20, height: 20 }} />
           <Text fontWeight="semibold">Filtros</Text>
           {activeFiltersCount > 0 && (
@@ -182,7 +182,7 @@ export function SupplierOrdersFilters({
       />
 
       {/* Status and Supplier */}
-      <HStack gap={3}>
+      <HStack gap="3">
         <SelectField
           label="Estado"
           placeholder="Seleccionar estado"
@@ -202,11 +202,11 @@ export function SupplierOrdersFilters({
       </HStack>
 
       {/* Date Range */}
-      <Stack direction="column" gap={2}>
+      <Stack direction="column" gap="2">
         <Text fontSize="sm" fontWeight="medium">
           Rango de Fechas (Entrega Esperada)
         </Text>
-        <HStack gap={3}>
+        <HStack gap="3">
           <InputField
             label="Desde"
             type="date"

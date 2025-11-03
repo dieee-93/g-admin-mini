@@ -2,7 +2,26 @@ import React from 'react';
 import {
   ContentLayout, Section, Stack, Badge, Button, CardGrid, MetricCard
 } from '@/shared/ui';
-import { Icon } from '@/shared/ui';
+import {
+  CurrencyDollarIcon,
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  PresentationChartLineIcon,
+  UserGroupIcon,
+  ArrowTrendingDownIcon,
+  StarIcon,
+  CalculatorIcon,
+  CheckCircleIcon,
+  CubeIcon,
+  UserIcon,
+  ArchiveBoxIcon,
+  ClockIcon,
+  GlobeAltIcon,
+  HeartIcon,
+  LightBulbIcon,
+  SparklesIcon,
+  ShieldExclamationIcon
+} from '@heroicons/react/24/outline';
 
 interface ExecutiveMetrics {
   revenue: {
@@ -154,29 +173,29 @@ const ExecutiveDashboard: React.FC = () => {
           <MetricCard
             title="Revenue Actual"
             value={`$${(executiveData.revenue.current / 1000000).toFixed(1)}M`}
-            icon="CurrencyDollarIcon"
+            icon={CurrencyDollarIcon}
             trend={{ value: revenueGrowth, isPositive: true }}
             subtitle={`vs período anterior`}
           />
           <MetricCard
             title="Target Achievement"
             value={`${revenueProgress.toFixed(1)}%`}
-            icon="ChartBarIcon"
-            colorScheme={revenueProgress >= 100 ? 'green' : revenueProgress >= 90 ? 'orange' : 'red'}
+            icon={ChartBarIcon}
+            colorPalette={revenueProgress >= 100 ? 'green' : revenueProgress >= 90 ? 'orange' : 'red'}
             subtitle={`Target: $${(executiveData.revenue.target / 1000000).toFixed(1)}M`}
           />
           <MetricCard
             title="Gross Margin"
             value={`${executiveData.profitability.grossMargin}%`}
-            icon="TrendingUpIcon"
-            colorScheme="green"
+            icon={ArrowTrendingUpIcon}
+            colorPalette="green"
             subtitle="vs industry avg 28%"
           />
           <MetricCard
             title="EBITDA"
             value={`${executiveData.profitability.ebitda}%`}
-            icon="PresentationChartLineIcon"
-            colorScheme="purple"
+            icon={PresentationChartLineIcon}
+            colorPalette="purple"
             subtitle="earnings performance"
           />
         </CardGrid>
@@ -210,43 +229,43 @@ const ExecutiveDashboard: React.FC = () => {
           <MetricCard
             title="Total Customers"
             value={executiveData.customerMetrics.totalCustomers.toLocaleString()}
-            icon="UserGroupIcon"
-            colorScheme="blue"
+            icon={UserGroupIcon}
+            colorPalette="blue"
             subtitle="customer base"
           />
           <MetricCard
             title="Customer LTV"
             value={`$${(executiveData.customerMetrics.ltv / 1000).toFixed(0)}K`}
-            icon="CurrencyDollarIcon"
-            colorScheme="green"
+            icon={CurrencyDollarIcon}
+            colorPalette="green"
             subtitle="lifetime value"
           />
           <MetricCard
             title="Churn Rate"
             value={`${executiveData.customerMetrics.churnRate}%`}
-            icon="ArrowTrendingDownIcon"
-            colorScheme={executiveData.customerMetrics.churnRate < 5 ? 'green' : 'red'}
+            icon={ArrowTrendingDownIcon}
+            colorPalette={executiveData.customerMetrics.churnRate < 5 ? 'green' : 'red'}
             subtitle="monthly churn"
           />
           <MetricCard
             title="NPS Score"
             value={executiveData.customerMetrics.nps.toString()}
-            icon="StarIcon"
-            colorScheme={executiveData.customerMetrics.nps > 60 ? 'green' : executiveData.customerMetrics.nps > 40 ? 'orange' : 'red'}
+            icon={StarIcon}
+            colorPalette={executiveData.customerMetrics.nps > 60 ? 'green' : executiveData.customerMetrics.nps > 40 ? 'orange' : 'red'}
             subtitle="net promoter score"
           />
           <MetricCard
             title="CAC Ratio"
             value={`1:${(executiveData.customerMetrics.ltv / executiveData.customerMetrics.acquisitionCost).toFixed(1)}`}
-            icon="CalculatorIcon"
-            colorScheme="purple"
+            icon={CalculatorIcon}
+            colorPalette="purple"
             subtitle="LTV:CAC ratio"
           />
           <MetricCard
             title="Active Rate"
             value={`${((executiveData.customerMetrics.activeCustomers / executiveData.customerMetrics.totalCustomers) * 100).toFixed(1)}%`}
-            icon="CheckCircleIcon"
-            colorScheme="blue"
+            icon={CheckCircleIcon}
+            colorPalette="blue"
             subtitle="customer engagement"
           />
         </CardGrid>
@@ -261,29 +280,29 @@ const ExecutiveDashboard: React.FC = () => {
           <MetricCard
             title="Asset Utilization"
             value={`${executiveData.operationalEfficiency.assetUtilization}%`}
-            icon="CubeIcon"
-            colorScheme="green"
+            icon={CubeIcon}
+            colorPalette="green"
             subtitle="asset efficiency"
           />
           <MetricCard
             title="Staff Productivity"
             value={`${executiveData.operationalEfficiency.staffProductivity}`}
-            icon="UserIcon"
-            colorScheme="blue"
+            icon={UserIcon}
+            colorPalette="blue"
             subtitle="productivity index"
           />
           <MetricCard
             title="Inventory Turnover"
             value={`${executiveData.operationalEfficiency.inventoryTurnover}x`}
-            icon="ArchiveBoxIcon"
-            colorScheme="purple"
+            icon={ArchiveBoxIcon}
+            colorPalette="purple"
             subtitle="annual turnover"
           />
           <MetricCard
             title="Cash Cycle"
             value={`${executiveData.operationalEfficiency.cashCycle} days`}
-            icon="ClockIcon"
-            colorScheme={executiveData.operationalEfficiency.cashCycle < 30 ? 'green' : 'orange'}
+            icon={ClockIcon}
+            colorPalette={executiveData.operationalEfficiency.cashCycle < 30 ? 'green' : 'orange'}
             subtitle="cash conversion"
           />
         </CardGrid>
@@ -307,36 +326,36 @@ const ExecutiveDashboard: React.FC = () => {
           <MetricCard
             title="Market Share"
             value={`${executiveData.strategicKPIs.marketShare}%`}
-            icon="GlobeAltIcon"
-            colorScheme="blue"
+            icon={GlobeAltIcon}
+            colorPalette="blue"
             subtitle="market position"
           />
           <MetricCard
             title="Brand Health"
             value={`${executiveData.strategicKPIs.brandHealth}/100`}
-            icon="HeartIcon"
-            colorScheme="red"
+            icon={HeartIcon}
+            colorPalette="red"
             subtitle="brand strength"
           />
           <MetricCard
             title="Innovation Index"
             value={`${executiveData.strategicKPIs.innovationIndex}/100`}
-            icon="LightBulbIcon"
-            colorScheme="yellow"
+            icon={LightBulbIcon}
+            colorPalette="yellow"
             subtitle="innovation capability"
           />
           <MetricCard
             title="Sustainability"
             value={`${executiveData.strategicKPIs.sustainabilityScore}/100`}
-            icon="LeafIcon"
-            colorScheme="green"
+            icon={SparklesIcon}
+            colorPalette="green"
             subtitle="ESG score"
           />
           <MetricCard
             title="Risk Score"
             value={`${executiveData.strategicKPIs.riskScore}/100`}
-            icon="ShieldExclamationIcon"
-            colorScheme={executiveData.strategicKPIs.riskScore < 30 ? 'green' : executiveData.strategicKPIs.riskScore < 60 ? 'orange' : 'red'}
+            icon={ShieldExclamationIcon}
+            colorPalette={executiveData.strategicKPIs.riskScore < 30 ? 'green' : executiveData.strategicKPIs.riskScore < 60 ? 'orange' : 'red'}
             subtitle="enterprise risk"
           />
         </CardGrid>
@@ -452,7 +471,6 @@ const ExecutiveDashboard: React.FC = () => {
               >
                 <Stack direction="row" align="center" justify="between">
                   <Stack direction="row" align="center" gap="md">
-                    <Icon name={getAlertIcon(alert.type) as any} color={`${getAlertColor(alert.type)}.500`} />
                     <Stack>
                       <Badge
                         colorPalette={getAlertColor(alert.type)}
@@ -487,7 +505,6 @@ const ExecutiveDashboard: React.FC = () => {
 
                 <Stack direction="row" align="center" justify="between" marginTop="md">
                   <Stack direction="row" align="center" gap="sm">
-                    <Icon name="ArrowRightIcon" size="sm" />
                     <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
                       Action: {alert.action}
                     </span>
@@ -508,19 +525,15 @@ const ExecutiveDashboard: React.FC = () => {
         <Section title="Quick Executive Actions" variant="flat">
           <Stack direction="row" gap="md" wrap="wrap">
             <Button colorPalette="purple" size="sm">
-              <Icon name="DocumentTextIcon" />
               Generate Board Report
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="PresentationChartLineIcon" />
               Schedule Strategy Review
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="CalendarIcon" />
               Plan Quarterly OKRs
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="ChatBubbleLeftRightIcon" />
               Ask Natural Language Question
             </Button>
           </Stack>

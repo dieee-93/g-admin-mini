@@ -14,34 +14,53 @@ export function useReportingData() {
   const [automations, setAutomations] = useState<ReportAutomation[]>([]);
   const [insights, setInsights] = useState<ReportInsight[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadReportingData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      const mockData = generateMockReportingData();
+      const mockTemplates = mockData.templates;
+      const mockGenerated = mockData.generatedReports;
+      const mockAutomations = [];
+      const mockInsights = [];
+
+      setTemplates(mockTemplates);
+      setGeneratedReports(mockGenerated);
+      setAutomations(mockAutomations);
+      setInsights(mockInsights);
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar reportes';
+      setError(errorMessage);
+      logger.error('App', 'Error loading custom reporting data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const loadReportingData = async () => {
-      setLoading(true);
-      try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        const mockData = generateMockReportingData();
-        const mockTemplates = mockData.templates;
-        const mockGenerated = mockData.generatedReports;
-        const mockAutomations = [];
-        const mockInsights = [];
-
-        setTemplates(mockTemplates);
-        setGeneratedReports(mockGenerated);
-        setAutomations(mockAutomations);
-        setInsights(mockInsights);
-
-      } catch (error) {
-        logger.error('App', 'Error loading custom reporting data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadReportingData();
-  }, []);
+  }, [loadReportingData]);
+
+  // ⏱️ Timeout de 10 segundos
+  useEffect(() => {
+    if (!loading) return;
+
+    const timeout = setTimeout(() => {
+      if (loading) {
+        setError('Timeout al cargar reportes. Por favor, intenta de nuevo.');
+        setLoading(false);
+        logger.error('App', 'Reporting page loading timeout after 10 seconds');
+      }
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, [loading]);
 
   const reportingSummary = useMemo(() => {
     const totalTemplates = templates.length;
@@ -77,7 +96,9 @@ export function useReportingData() {
     automations,
     insights,
     loading,
+    error,
     reportingSummary,
     toggleAutomation,
+    retry: loadReportingData,
   };
 }

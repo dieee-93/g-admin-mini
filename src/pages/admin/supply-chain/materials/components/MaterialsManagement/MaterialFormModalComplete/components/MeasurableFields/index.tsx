@@ -1,1 +1,1 @@
-export * from './MeasurableStockFields';
+export { MeasurableStockFields } from './MeasurableStockFields';

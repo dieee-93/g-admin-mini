@@ -45,16 +45,16 @@ export default function KPIChart({
         </Text>
       </CardWrapper.Header>
       <CardWrapper.Body>
-        <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap={4}>
+        <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap="4">
           {metrics.map((metric, index) => (
             <Box
               key={index}
-              p={4}
+              p="4"
               bg="bg.canvas"
               borderRadius="md"
               textAlign="center"
             >
-              <VStack gap={1}>
+              <VStack gap="1">
                 <Text fontSize="sm" color="gray.600">
                   {metric.label}
                 </Text>

@@ -1,46 +1,46 @@
-import { Button as ChakraButton, ButtonProps } from '@chakra-ui/react'
+import { Button as ChakraButton, type ButtonProps } from '@chakra-ui/react'
 
 interface ThemedButtonProps extends Omit<ButtonProps, 'colorPalette'> {
   variant?: 'solid' | 'outline' | 'ghost' | 'subtle'
   useCurrentTheme?: boolean
 }
 
-export function ThemedButton({ 
-  variant = 'solid', 
-  useCurrentTheme = true, 
-  children, 
-  ...props 
+export function ThemedButton({
+  variant = 'solid',
+  useCurrentTheme = true,
+  children,
+  ...props
 }: ThemedButtonProps) {
-  
+
   if (!useCurrentTheme) {
     return <ChakraButton variant={variant} {...props}>{children}</ChakraButton>
   }
-  
-  // Apply theme colors based on variant
+
+  // Apply theme colors based on variant using Chakra UI v3 tokens
   const variantStyles = {
     solid: {
-      bg: primary,
+      bg: 'purple.500',
       color: 'white',
-      _hover: { bg: primaryHover },
+      _hover: { bg: 'purple.600' },
     },
     outline: {
-      borderColor: primary,
-      color: primary,
-      _hover: { bg: primaryLight },
+      borderColor: 'purple.500',
+      color: 'purple.500',
+      _hover: { bg: 'purple.50' },
     },
     ghost: {
-      color: primary,
-      _hover: { bg: primaryLight },
+      color: 'purple.500',
+      _hover: { bg: 'purple.50' },
     },
     subtle: {
-      bg: primaryLight,
-      color: primary,
-      _hover: { bg: primaryHover, color: 'white' },
+      bg: 'purple.50',
+      color: 'purple.500',
+      _hover: { bg: 'purple.600', color: 'white' },
     }
   }
-  
+
   return (
-    <ChakraButton 
+    <ChakraButton
       {...variantStyles[variant]}
       {...props}
     >

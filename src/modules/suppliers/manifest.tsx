@@ -19,6 +19,7 @@ import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
 import { Button, Icon, Stack, Badge } from '@/shared/ui';
 import { BuildingStorefrontIcon, StarIcon, TruckIcon } from '@heroicons/react/24/outline';
+import { SuppliersWidget } from './components';
 
 /**
  * Suppliers Module Manifest
@@ -69,6 +70,15 @@ export const suppliersManifest: ModuleManifest = {
   ] as FeatureId[],
 
   // ============================================
+  // PERMISSIONS & ROLES
+  // ============================================
+
+  /**
+   * 🔒 PERMISSIONS: Supervisors can manage suppliers
+   */
+  minimumRole: 'SUPERVISOR' as const,
+
+  // ============================================
   // HOOK POINTS
   // ============================================
 
@@ -110,23 +120,28 @@ export const suppliersManifest: ModuleManifest = {
       // HOOK 1: Dashboard Widget
       // ============================================
 
+      /**
+       * Provides Suppliers summary widget for dashboard
+       * Shows total suppliers, active count, and average rating
+       *
+       * 🔒 PERMISSIONS: Requires 'read' permission on 'suppliers' module
+       */
       registry.addAction(
         'dashboard.widgets',
         () => {
-          return {
-            id: 'suppliers-summary',
-            title: 'Proveedores',
-            type: 'suppliers',
-            priority: 7,
-            data: {
-              totalSuppliers: 0,
-              activeSuppliers: 0,
-              averageRating: 0
-            }
-          };
+          return (
+            <SuppliersWidget
+              key="suppliers-widget"
+              onClick={() => {
+                logger.info('App', 'Navigating to suppliers from dashboard widget');
+                window.location.href = '/admin/supply-chain/suppliers';
+              }}
+            />
+          );
         },
         'suppliers',
-        7
+        7,
+        { requiredPermission: { module: 'suppliers', action: 'read' } }
       );
 
       logger.debug('App', 'Registered dashboard.widgets hook for suppliers');
@@ -138,6 +153,8 @@ export const suppliersManifest: ModuleManifest = {
       /**
        * Provides actions when viewing materials that have suppliers
        * Allows quick navigation to supplier details
+       *
+       * 🔒 PERMISSIONS: Requires 'read' permission on 'suppliers' module
        */
       registry.addAction(
         'materials.supplier.actions',
@@ -177,7 +194,8 @@ export const suppliersManifest: ModuleManifest = {
           );
         },
         'suppliers',
-        85
+        85,
+        { requiredPermission: { module: 'suppliers', action: 'read' } }
       );
 
       logger.debug('App', 'Registered materials.supplier.actions for suppliers');
@@ -188,6 +206,8 @@ export const suppliersManifest: ModuleManifest = {
 
       /**
        * Shows supplier rating badge in materials views
+       *
+       * 🔒 PERMISSIONS: Requires 'read' permission on 'suppliers' module
        */
       registry.addAction(
         'materials.supplier.badge',
@@ -203,7 +223,7 @@ export const suppliersManifest: ModuleManifest = {
               key="supplier-rating-badge"
               direction="row"
               align="center"
-              gap={1}
+              gap="1"
             >
               <Icon icon={StarIcon} size="xs" color="yellow.500" />
               <Badge size="xs" colorPalette="yellow">
@@ -213,10 +233,63 @@ export const suppliersManifest: ModuleManifest = {
           );
         },
         'suppliers',
-        90
+        90,
+        { requiredPermission: { module: 'suppliers', action: 'read' } }
       );
 
       logger.debug('App', 'Registered materials.supplier.badge for suppliers');
+
+      // ============================================
+      // HOOK 4: Materials Row Actions - Create PO Button
+      // ============================================
+
+      /**
+       * Adds "Create PO" button in materials grid row actions
+       *
+       * 🔒 PERMISSIONS: Requires 'create' permission on 'suppliers' module
+       * Note: Creating a PO is a supplier-level action, requires higher privilege
+       */
+      registry.addAction(
+        'materials.row.actions',
+        (data) => {
+          const { material } = data || {};
+
+          if (!material) {
+            return null;
+          }
+
+          return (
+            <Button
+              key="create-po-from-material"
+              size="xs"
+              variant="outline"
+              colorPalette="blue"
+              onClick={() => {
+                logger.info('App', 'Creating PO from material', {
+                  materialId: material.id,
+                  materialName: material.name
+                });
+
+                // TODO: Open PO creation modal with material pre-filled
+                toaster.create({
+                  title: '📦 Crear Orden de Compra',
+                  description: `Preparando PO para ${material.name}`,
+                  type: 'info',
+                  duration: 2000
+                });
+              }}
+            >
+              <Icon icon={TruckIcon} size="xs" />
+              PO
+            </Button>
+          );
+        },
+        'suppliers',
+        10,
+        { requiredPermission: { module: 'suppliers', action: 'create' } }
+      );
+
+      logger.debug('App', 'Registered materials.row.actions for Create PO button');
 
       // ============================================
       // CONSUME: Listen to materials events
@@ -230,7 +303,7 @@ export const suppliersManifest: ModuleManifest = {
        */
 
       logger.info('App', '✅ Suppliers module setup complete', {
-        hooksProvided: 3,
+        hooksProvided: 5,  // dashboard.widgets + 4 materials hooks
         hooksConsumed: 3
       });
     } catch (error) {
@@ -294,7 +367,7 @@ export const suppliersManifest: ModuleManifest = {
     author: 'G-Admin Team',
     tags: ['suppliers', 'vendors', 'procurement', 'purchasing'],
     navigation: {
-      route: '/admin/suppliers',
+      route: '/admin/supply-chain/suppliers',
       icon: TruckIcon,
       color: 'blue',
       domain: 'supply-chain',

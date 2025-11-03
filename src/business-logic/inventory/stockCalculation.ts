@@ -1,4 +1,4 @@
-import { type MaterialItem } from '@/types';
+import { type MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
@@ -101,7 +101,8 @@ export class StockCalculation {
       
       return result.toNumber();
     } catch (error: unknown) {
-      logger.error('MaterialsStore', `StockCalculation.getTotalValue: Error calculating value for item ${item.id}:`, error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('MaterialsStore', `StockCalculation.getTotalValue: Error calculating value for item ${item.id}:`, errorMessage);
       return 0; // Safe fallback
     }
   }

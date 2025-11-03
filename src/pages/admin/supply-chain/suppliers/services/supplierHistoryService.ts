@@ -5,7 +5,6 @@
 
 import type { SupplierOrderWithDetails } from '@/pages/admin/supply-chain/supplier-orders/types';
 import { logger } from '@/lib/logging';
-import Decimal from 'decimal.js';
 
 export interface SupplierHistoryMetrics {
   totalOrders: number;
@@ -223,10 +222,14 @@ export const supplierHistoryService = {
   /**
    * Calculate defect rate from orders
    * (This would require additional fields in the database to track defects)
+   * TODO: Implement defect tracking in supplier_orders table (add defect_count, quality_score columns)
+   * TODO: Create defect_reports table to track quality issues
    */
   calculateDefectRate(orders: SupplierOrderWithDetails[]): number {
     // Placeholder: In real implementation, would check for defect records
-    // For now, return 0
+    // Would query defect_reports table and calculate percentage
+    // For now, return 0 until defect tracking is implemented
+    logger.debug('SupplierHistoryService', `Defect calculation not implemented - processed ${orders.length} orders`);
     return 0;
   },
 

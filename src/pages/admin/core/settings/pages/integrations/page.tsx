@@ -100,7 +100,7 @@ export default function IntegrationsPage() {
                   <Stack direction="column" gap="sm">
                         <Stack direction="row" justify="space-between" align="center">
                           <Stack direction="row" align="center" gap="sm">
-                            <Badge colorPalette="info" variant="subtle">{integration.icon}</Badge>
+                            <Badge colorPalette="blue" variant="subtle">{integration.icon}</Badge>
                             <Stack direction="column" gap="xs">
                               <Typography variant="body" weight="medium">{integration.name}</Typography>
                               <Typography variant="caption" color="text.secondary">
@@ -110,14 +110,14 @@ export default function IntegrationsPage() {
                           </Stack>
                           <Stack direction="row" align="center" gap="sm">
                             <Badge 
-                              colorPalette={integration.status === "connected" ? "success" : "error"}
+                              colorPalette={integration.status === "connected" ? "green" : "red"}
                               variant="subtle"
                             >
                               {integration.status === "connected" ? "Conectado" : "Error"}
                             </Badge>
                             <Switch 
                               defaultChecked={integration.status === "connected"}
-                              colorPalette={integration.status === "connected" ? "success" : "error"}
+                              colorPalette={integration.status === "connected" ? "green" : "red"}
                               size="sm"
                             />
                           </Stack>
@@ -155,7 +155,7 @@ export default function IntegrationsPage() {
                         <Typography variant="caption" color="text.secondary" textAlign="center">
                           {integration.description}
                         </Typography>
-                        <Button size="sm" colorPalette="info" variant="outline">
+                        <Button size="sm" colorPalette="blue" variant="outline">
                           Conectar
                         </Button>
                       </Stack>

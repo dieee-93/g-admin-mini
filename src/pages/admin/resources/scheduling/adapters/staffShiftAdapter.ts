@@ -1,32 +1,34 @@
 /**
- * STAFF SHIFT ADAPTER
+ * STAFF SHIFT ADAPTER (v3.0)
  *
- * Convierte datos de shift_schedules (Supabase) al formato UnifiedScheduleEvent.
+ * Convierte datos de StaffShift (v3.0 types) al formato UnifiedScheduleEvent.
  *
- * @version 1.0.0
+ * MIGRATED: Now uses v3.0 StaffShift type from schedulingTypes.ts
+ *
+ * @version 2.0.0 (v3.0 architecture)
  * @see ../docs/SCHEDULING_INTEGRATION_GUIDE.md#staff-shifts
  */
 
 import { SchedulingAdapter } from './SchedulingAdapter';
 import type { UnifiedScheduleEvent, StaffShiftMetadata } from '../types/calendar';
-import type { Shift } from '@/store/schedulingStore';
+import type { StaffShift } from '../types/schedulingTypes';
 
 /**
- * Adapter para Staff Shifts
+ * Adapter para Staff Shifts (v3.0)
  *
- * Convierte datos de la tabla shift_schedules a UnifiedScheduleEvent
+ * Convierte datos de StaffShift (v3.0) a UnifiedScheduleEvent
  */
-export class StaffShiftAdapter extends SchedulingAdapter<Shift> {
+export class StaffShiftAdapter extends SchedulingAdapter<StaffShift> {
   /**
-   * Convierte un Shift a UnifiedScheduleEvent
+   * Convierte un StaffShift v3.0 a UnifiedScheduleEvent
    *
-   * @param shift - Datos del shift desde schedulingStore
+   * @param shift - Datos del shift desde useScheduling v3.0 hook
    * @returns Evento unificado
    */
-  adapt(shift: Shift): UnifiedScheduleEvent {
-    // Combinar fecha + hora de inicio/fin
-    const start = this.combineDateTime(shift.date, shift.start_time);
-    const end = this.combineDateTime(shift.date, shift.end_time);
+  adapt(shift: StaffShift): UnifiedScheduleEvent {
+    // v3.0: Use dateRange and timeSlot from unified types
+    const start = new Date(shift.dateRange.start);
+    const end = new Date(shift.dateRange.end);
 
     // Validar fechas
     this.validateDates(start, end);
@@ -38,8 +40,8 @@ export class StaffShiftAdapter extends SchedulingAdapter<Shift> {
     const metadata: StaffShiftMetadata = {
       type: 'staff_shift',
       position: shift.position,
-      hourlyRate: shift.hourly_rate,
-      breakDuration: 30, // Default 30 min break
+      hourlyRate: undefined, // v3.0 doesn't have hourlyRate in StaffShift
+      breakDuration: shift.breakDuration || 30, // Use v3.0 breakDuration or default
       notes: shift.notes,
       isMandatory: false,
       canBeCovered: true
@@ -51,7 +53,7 @@ export class StaffShiftAdapter extends SchedulingAdapter<Shift> {
       type: 'staff_shift',
 
       // Información básica
-      title: this.generateTitle(shift.employee_name, 'Shift', shift.position),
+      title: this.generateTitle(shift.employeeName, 'Shift', shift.position),
       description: shift.notes,
 
       // Temporal
@@ -59,10 +61,10 @@ export class StaffShiftAdapter extends SchedulingAdapter<Shift> {
       end,
       allDay: false,
 
-      // Relaciones
-      employeeId: shift.employee_id,
-      employeeName: shift.employee_name,
-      departmentId: undefined, // TODO: Agregar departamento a Shift type
+      // Relaciones (v3.0 uses employeeId instead of employee_id)
+      employeeId: shift.employeeId,
+      employeeName: shift.employeeName,
+      departmentId: undefined, // TODO: Add department to StaffShift type
       departmentName: undefined,
       locationId: undefined,
 
@@ -80,27 +82,27 @@ export class StaffShiftAdapter extends SchedulingAdapter<Shift> {
       colorDot: colors.dot,
       icon: 'UserIcon', // Heroicons
 
-      // Audit
-      createdAt: new Date(shift.created_at),
-      updatedAt: new Date(shift.updated_at),
-      createdBy: undefined
+      // Audit (v3.0 uses timestamps)
+      createdAt: new Date(shift.createdAt),
+      updatedAt: new Date(shift.updatedAt),
+      createdBy: shift.createdBy
     };
 
     return event;
   }
 
   /**
-   * Convierte múltiples shifts filtrados por semana
+   * Convierte múltiples shifts filtrados por semana (v3.0)
    *
-   * @param shifts - Array de shifts
+   * @param shifts - Array de StaffShift v3.0
    * @param weekStart - Inicio de semana (lunes)
    * @param weekEnd - Fin de semana (domingo)
    * @returns Array de eventos unificados
    */
-  adaptWeekShifts(shifts: Shift[], weekStart: Date, weekEnd: Date): UnifiedScheduleEvent[] {
-    // Filtrar shifts de la semana
+  adaptWeekShifts(shifts: StaffShift[], weekStart: Date, weekEnd: Date): UnifiedScheduleEvent[] {
+    // Filtrar shifts de la semana usando v3.0 dateRange
     const weekShifts = shifts.filter(shift => {
-      const shiftDate = new Date(shift.date);
+      const shiftDate = new Date(shift.dateRange.start);
       return shiftDate >= weekStart && shiftDate <= weekEnd;
     });
 
@@ -108,14 +110,17 @@ export class StaffShiftAdapter extends SchedulingAdapter<Shift> {
   }
 
   /**
-   * Convierte shifts de un día específico
+   * Convierte shifts de un día específico (v3.0)
    *
-   * @param shifts - Array de shifts
+   * @param shifts - Array de StaffShift v3.0
    * @param date - Fecha (YYYY-MM-DD)
    * @returns Array de eventos unificados
    */
-  adaptDayShifts(shifts: Shift[], date: string): UnifiedScheduleEvent[] {
-    const dayShifts = shifts.filter(shift => shift.date === date);
+  adaptDayShifts(shifts: StaffShift[], date: string): UnifiedScheduleEvent[] {
+    const dayShifts = shifts.filter(shift => {
+      const shiftDate = shift.dateRange.start.split('T')[0]; // Extract YYYY-MM-DD from ISO string
+      return shiftDate === date;
+    });
     return this.adaptMany(dayShifts);
   }
 }

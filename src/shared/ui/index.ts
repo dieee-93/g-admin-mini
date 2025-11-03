@@ -1,23 +1,44 @@
-// Shared UI Components Index - Sistema de Diseño G-Admin Mini v2.0
+// Shared UI Components Index - Sistema de Diseño G-Admin Mini v3.0
+// SEMANTIC ARCHITECTURE (3 Layers)
+//
+// Layer 3: Semantic Components - Pure semantic HTML + ARIA (NEW!)
+// Layer 2: Layout Components - Styling + composition
+// Layer 1: Primitives - Low-level Chakra wrappers
 
 // Providers & Context
 export { Provider } from './provider';
 
 // 🎨 Theme Hooks (REMOVED - dynamic system with recipes handles everything automatically)
 
-// Layout Components
+// ===== LAYER 3: SEMANTIC COMPONENTS (NEW!) =====
+// Pure semantics, zero styling, WCAG AAA compliant
+export { Main, SemanticSection, SkipLink } from './semantic';
+export type { MainProps, SemanticSectionProps, SkipLinkProps } from './semantic';
+
+// ===== LAYER 2.5: HELPERS (NEW!) =====
+// Composition helpers for common patterns (Dialog, Form)
+// Simplifies ChakraUI v3 while maintaining accessibility
+export { Form } from './helpers';
+// Dialog helpers renamed to avoid conflict with Dialog namespace
+export { Dialog as DialogHelpers } from './helpers';
+
+// ===== LAYER 2: LAYOUT COMPONENTS =====
+// Combines Layer 3 semantics with visual styling
 export { Layout } from './Layout';
 export { ContentLayout } from './ContentLayout';
 export { Section } from './Section';
 export { FormSection } from './FormSection';
 export { StatsSection } from './StatsSection';
+export { StatRoot, StatLabel, StatValueText, StatHelpText, StatUpIndicator, StatDownIndicator, StatValueUnit } from './Stat';
 export { PageHeader } from './PageHeader';
 
 // Base Layout Primitives (Chakra wrappers)
 export { Box } from './Box';
+export { Flex } from './Flex';
 export { Circle } from './Circle';
 export { Container } from './Container';
 export { Card, CardHeader, CardBody, CardFooter } from './Card';
+export { CardWrapper } from './CardWrapper';
 export {
   Stack,
   VStack,
@@ -43,17 +64,50 @@ export {
   Code
 } from './Typography';
 export { Text } from './Text';
+export { Kbd } from './Kbd';
 
 // Basic Components (Chakra Wrappers)
 export { Heading } from './Heading';
 export { Spinner } from './Spinner';
 export { Skeleton, SkeletonText } from './Skeleton';
+export { Image } from './Image';
+export type { ImageProps } from './Image';
+
+// Multi-Location Components
+export { LocationSelector, LocationSelectorCompact, LocationBadge } from './LocationSelector';
 export { Separator } from './Separator';
 
 // Form Components
-export { InputField } from './InputField';
+export { Field } from './Field';
+export { Input, InputField } from './Input';
 export { NumberField } from './NumberField';
+// Re-export NumberInput parts from Chakra for direct usage
+export { NumberInput } from '@chakra-ui/react';
 export { SelectField, createListCollection } from './SelectField';
+export {
+  Select,
+  SelectRoot,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValueText,
+  SelectLabel,
+  SelectControl,
+  SelectIndicator,
+  SelectIndicatorGroup,
+  SelectPositioner,
+  SelectItemIndicator,
+  SelectHiddenSelect,
+  SelectItemText,
+  SelectClearTrigger
+} from './Select';
+export type { SelectRootProps } from './Select';
+export {
+  NativeSelect,
+  NativeSelectRoot,
+  NativeSelectField,
+  NativeSelectIndicator
+} from './NativeSelect';
 export { TextareaField, Textarea } from './TextareaField';
 export {
   Checkbox,
@@ -111,7 +165,6 @@ export {
 export { Button } from './Button';
 export { IconButton } from './IconButton';
 export { ActionButton } from './ActionButton';
-export { CardWrapper } from './CardWrapper';
 export { MetricCard } from './MetricCard';
 
 // ✅ BUSINESS COMPONENTS - Scheduling & Staff Management
@@ -146,6 +199,8 @@ export {
   ModalClose
 } from './Modal';
 
+// Dialog namespace (preferred) + individual components
+export { Dialog } from './Dialog';
 export {
   DialogRoot,
   DialogTrigger,
@@ -158,8 +213,7 @@ export {
   DialogCloseTrigger,
   DialogBackdrop,
   DialogPositioner,
-  DialogActionTrigger,
-  Dialog
+  DialogActionTrigger
 } from './Dialog';
 
 export {

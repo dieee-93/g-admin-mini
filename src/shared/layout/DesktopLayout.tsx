@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Box, HStack, VStack } from '@chakra-ui/react';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationLayout } from '@/contexts/NavigationContext';
 import { Sidebar } from '../navigation/Sidebar';
 import { Breadcrumb } from '../navigation/Breadcrumb';
 import { ActionToolbar } from '../navigation/ActionToolbar';
@@ -14,29 +14,19 @@ interface DesktopLayoutProps {
 }
 
 export function DesktopLayout({ children }: DesktopLayoutProps) {
-  const { sidebarCollapsed } = useNavigation();
+  const { sidebarCollapsed } = useNavigationLayout();
   const [sidebarHovered, setSidebarHovered] = React.useState(false);
 
   return (
-    <Box 
-      minH="100vh" 
-      bg="bg.canvas"
-      color="text.primary"
-      position="relative"
-      w="100%"
-      overflow="hidden"
-    >
-      {/* ✅ Sidebar fixed - no necesita estar en el HStack */}
+    <>
+      {/* ✅ Sidebar FUERA del flujo del documento */}
       <Sidebar />
 
-      {/* 🔧 OVERLAY SIDEBAR: Main area with responsive left margin to avoid sidebar overlap */}
+      {/* Main content area */}
       <Box
-        position="absolute"
-        top="60px"
-        left={{ base: "0", md: "3rem" }}
-        right="0"
-        bottom="0"
-        overflow="auto"
+        minH="100vh"
+        mt="60px"
+        ml={{ base: "0", md: "3rem" }}
         bg="bg.canvas"
         color="text.primary"
       >
@@ -57,6 +47,6 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
         {/* ✅ Action toolbar fijo en bottom */}
         <ActionToolbar />
       </Box>
-    </Box>
+    </>
   );
 }

@@ -2,6 +2,13 @@ import type { ModuleManifest } from '@/lib/modules/types';
 import { TruckIcon } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
 
+// Extend globalThis for module cleanup
+declare global {
+  interface GlobalThis {
+    __fulfillmentCleanup?: Array<() => void>;
+  }
+}
+
 export const fulfillmentManifest: ModuleManifest = {
   id: 'fulfillment',
   name: 'Fulfillment',
@@ -28,6 +35,9 @@ export const fulfillmentManifest: ModuleManifest = {
 
   depends: ['sales', 'staff', 'materials'],
   autoInstall: false,
+
+  // 🔒 PERMISSIONS: Operadores can manage fulfillment
+  minimumRole: 'OPERADOR' as const,
 
   hooks: {
     provide: [
@@ -73,17 +83,25 @@ export const fulfillmentManifest: ModuleManifest = {
 
       const { eventBus } = await import('@/lib/events');
 
+      // Store unsubscribe functions for cleanup
+      const unsubscribers: Array<() => void> = [];
+
       // Handle new orders
-      eventBus.subscribe('sales.order_placed', (event) => {
+      const unsub1 = eventBus.subscribe('sales.order_placed', (event) => {
         logger.debug('App', '🔔 New order placed', event.payload);
         // Queue logic handled by FulfillmentService
       }, { moduleId: 'fulfillment' });
+      unsubscribers.push(unsub1);
 
       // Handle production completed
-      eventBus.subscribe('production.order_ready', (event) => {
+      const unsub2 = eventBus.subscribe('production.order_ready', (event) => {
         logger.debug('App', '✅ Production order ready', event.payload);
         // Notify fulfillment team
       }, { moduleId: 'fulfillment' });
+      unsubscribers.push(unsub2);
+
+      // Store cleanup functions globally for teardown
+      globalThis.__fulfillmentCleanup = unsubscribers;
 
       logger.info('App', '✅ Fulfillment module setup complete', {
         widgetRegistered: hasFeature('sales_order_management'),
@@ -97,10 +115,9 @@ export const fulfillmentManifest: ModuleManifest = {
 
   teardown: () => {
     // Cleanup event subscriptions
-    import('@/lib/events').then(({ eventBus }) => {
-      eventBus.unsubscribe('sales.order_placed', { moduleId: 'fulfillment' });
-      eventBus.unsubscribe('production.order_ready', { moduleId: 'fulfillment' });
-    });
+    const cleanupFns = globalThis.__fulfillmentCleanup || [];
+    cleanupFns.forEach((fn) => fn());
+    delete globalThis.__fulfillmentCleanup;
   },
 
   exports: {

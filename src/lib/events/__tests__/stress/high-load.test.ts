@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { EventBus } from '../EventBus';
 import { TestSetup, testConfigs, MemoryMonitor, PerformanceMeasurement } from '../helpers/test-utilities';
 import { dataGenerators } from '../helpers/mock-data';
-import { createSalesTestModule, createInventoryTestModule, createFailingKitchenTestModule, createCustomersTestModule } from '../helpers/test-modules';
+import { createSalesTestModule, createInventoryTestModule, createFailingProductionTestModule, createCustomersTestModule } from '../helpers/test-modules';
 import type { EventPattern } from '../types';
 
 describe('EventBus - High Load Stress Tests', () => {
@@ -409,7 +409,7 @@ describe('EventBus - High Load Stress Tests', () => {
         createInventoryTestModule(),
         createCustomersTestModule(),
         createSalesTestModule(),
-        createFailingKitchenTestModule()
+        createFailingProductionTestModule()
       ];
 
       for (const module of modules) {

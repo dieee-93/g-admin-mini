@@ -404,8 +404,8 @@ export function RecipeForm() {
 
 
   return (
-    <Box borderWidth="1px" rounded="md" p={6} mb={6} bg="white">
-      <Heading size="md" mb={6} color="purple.600">
+    <Box borderWidth="1px" rounded="md" p="6" mb="6" bg="white">
+      <Heading size="md" mb="6" color="purple.600">
         📝 Nueva Receta
       </Heading>
       
@@ -456,12 +456,12 @@ export function RecipeForm() {
 
         {/* Información adicional */}
         <Box>
-          <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>
+          <Text fontSize="sm" fontWeight="medium" color="gray.700" mb="3">
             Información Adicional
           </Text>
-          <Grid templateColumns={{ base: "1fr", md: "1fr 3fr" }} gap={4}>
+          <Grid templateColumns={{ base: "1fr", md: "1fr 3fr" }} gap="4">
             <Box>
-              <Text fontSize="sm" color="gray.600" mb={1}>Tiempo de preparación (min)</Text>
+              <Text fontSize="sm" color="gray.600" mb="1">Tiempo de preparación (min)</Text>
               <InputField
                 placeholder="Ej: 120"
                 name="preparation_time"
@@ -473,7 +473,7 @@ export function RecipeForm() {
             </Box>
             
             <Box>
-              <Text fontSize="sm" color="gray.600" mb={1}>Instrucciones</Text>
+              <Text fontSize="sm" color="gray.600" mb="1">Instrucciones</Text>
               <Textarea
                 placeholder="Describe los pasos para preparar esta receta..."
                 name="instructions"
@@ -487,7 +487,7 @@ export function RecipeForm() {
         </Box>
 
         {/* Botón de envío mejorado */}
-        <HStack gap={4} justify="flex-end">
+        <HStack gap="4" justify="flex-end">
           {aiSuggestions && showAISuggestions && (
             <Button 
               variant="outline"

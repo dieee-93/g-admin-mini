@@ -7,7 +7,7 @@
  * @version 1.0.0
  */
 
-import React from 'react';
+import React, { lazy } from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
@@ -24,6 +24,9 @@ export const fiscalManifest: ModuleManifest = {
   requiredFeatures: [] as FeatureId[],
   optionalFeatures: [] as FeatureId[],
 
+  // 🔒 PERMISSIONS: Supervisors and above can manage fiscal documents
+  minimumRole: 'SUPERVISOR' as const,
+
   hooks: {
     provide: [
       'fiscal.invoice_generated',   // Emitted when invoice is created
@@ -39,22 +42,18 @@ export const fiscalManifest: ModuleManifest = {
     logger.info('App', '🧾 Setting up Fiscal module');
 
     try {
-      // Register fiscal dashboard widget
+      // ✅ Dashboard Widget - Fiscal status
+      const FiscalWidget = lazy(() => import('./components/FiscalWidget'));
+
       registry.addAction(
         'dashboard.widgets',
-        () => ({
-          id: 'fiscal-summary',
-          title: 'Fiscal Status',
-          type: 'fiscal',
-          priority: 5,
-          data: {
-            pendingInvoices: 0,
-            todayRevenue: 0,
-            taxLiability: 0,
-          },
-        }),
+        () => (
+          <React.Suspense fallback={<div>Cargando fiscal...</div>}>
+            <FiscalWidget />
+          </React.Suspense>
+        ),
         'fiscal',
-        5
+        50 // Medium-high priority widget
       );
 
       logger.info('App', '✅ Fiscal module setup complete');
@@ -85,7 +84,7 @@ export const fiscalManifest: ModuleManifest = {
     author: 'G-Admin Team',
     tags: ['fiscal', 'tax', 'afip', 'invoicing'],
     navigation: {
-      route: '/admin/fiscal',
+      route: '/admin/finance/fiscal',
       icon: ReceiptPercentIcon,
       color: 'teal',
       domain: 'finance',

@@ -5,11 +5,10 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { logger } from '@/lib/logging';
-import { 
-  FieldValidator, 
-  validateFields, 
-  getFieldError, 
-  ValidationResult 
+import { validateFields, getFieldError } from '../core/FieldValidators';
+import type {
+  FieldValidator,
+  ValidationResult
 } from '../core/FieldValidators';
 
 export type FormValidationConfig<T extends Record<string, any>> = {

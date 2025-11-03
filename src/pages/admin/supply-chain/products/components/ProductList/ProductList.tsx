@@ -90,7 +90,7 @@ export function ProductList({
             items={products}
             itemHeight={320}
             containerHeight={window.innerHeight - 200}
-            renderItem={(product, index, style) => (
+            renderItem={(product) => (
               <div className="px-2 pb-4">
                 <CardWrapper className="p-4 shadow-sm">
                   <Stack direction="column" gap="sm">
@@ -106,7 +106,7 @@ export function ProductList({
                           </Typography>
                         )}
                       </Stack>
-                      <Badge colorPalette="info" size="sm">
+                      <Badge colorPalette="blue" size="sm">
                         {product.type}
                       </Badge>
                     </Stack>
@@ -156,7 +156,7 @@ export function ProductList({
                       <Stack direction="row" justify="space-between">
                         <Typography size="sm" color="text.muted">Estado:</Typography>
                         <Badge 
-                          colorPalette={product.production_ready ? "success" : "gray"}
+                          colorPalette={product.production_ready ? "green" : "gray"}
                           size="sm"
                         >
                           {product.production_ready ? "Listo para producir" : "Requiere configuración"}
@@ -234,7 +234,7 @@ export function ProductList({
                     </Typography>
                   )}
                 </Stack>
-                <Badge colorPalette="info" size="sm">
+                <Badge colorPalette="blue" size="sm">
                   {product.type}
                 </Badge>
               </Stack>
@@ -284,7 +284,7 @@ export function ProductList({
                 <Stack direction="row" justify="space-between">
                   <Typography size="sm" color="text.muted">Estado:</Typography>
                   <Badge 
-                    colorPalette={product.production_ready ? "success" : "gray"}
+                    colorPalette={product.production_ready ? "green" : "gray"}
                     size="sm"
                   >
                     {product.production_ready ? "Listo para producir" : "Requiere configuración"}

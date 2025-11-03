@@ -6,3 +6,6 @@ export * from './SchedulingIntelligenceEngine';
 
 // 🔄 UNIFIED ALERTS ADAPTER
 export * from './SchedulingAlertsAdapter';
+
+// 📅 PHASE 4: APPOINTMENTS API
+export * from './appointmentApi';

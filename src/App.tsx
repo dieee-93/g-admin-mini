@@ -17,6 +17,9 @@ import { RoleGuard, DashboardRoleRouter, PublicOnlyRoute } from '@/components/au
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ProtectedRouteNew } from '@/components/auth/ProtectedRouteNew';
 
+// 🏢 MULTI-LOCATION SYSTEM
+import { LocationProvider } from '@/contexts/LocationContext';
+
 // 🆕 PÁGINAS - LOGIN DUAL SYSTEM
 import { 
   LandingPage, 
@@ -30,36 +33,37 @@ import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
 
 // 🐛 DEBUG TOOLS (moved to /debug routes)
 
-// 🎮 SISTEMA DE LOGROS Y GAMIFICACIÓN
-import { AchievementSystemProvider } from '@/lib/achievements/AchievementSystemIntegration';
-
-// 🔗 SISTEMA DE INTEGRACIÓN EVENTBUS + SLOTS
+// 🔗 SISTEMA DE INTEGRACIÓN EVENTBUS
 // NOTA: CapabilityProvider removido - el nuevo sistema unificado usa Zustand sin Provider
 import { EventBusProvider } from '@/providers/EventBusProvider';
-import { SlotProvider } from '@/lib/composition';
 
 // 🔄 CAPABILITY SYNC - Database persistence
 import { CapabilitySync } from '@/components/capabilities/CapabilitySync';
 
 // 🔧 MODULE REGISTRY - Cross-module composition system
-import { initializeModulesForCapabilities } from '@/lib/modules/integration';
+import { initializeModulesForCapabilities, subscribeToCapabilityChanges } from '@/lib/modules/integration';
+import { ModuleRegistry, HookPoint } from '@/lib/modules';
 import { ALL_MODULE_MANIFESTS } from '@/modules';
 
-// Dashboard Module - Critical, not lazy loaded
-import DashboardPage from '@/pages/admin/core/dashboard/page';
-// Removed CrossModuleAnalytics - consolidated into Dashboard with CrossModuleInsights
-import { PredictiveAnalytics as PredictiveAnalyticsComponent } from '@/pages/admin/supply-chain/materials/components/PredictiveAnalytics';
-import CustomReporting from '@/pages/admin/core/reporting/page';
-import CompetitiveIntelligence from '@/pages/admin/core/intelligence/page';
+// 📅 BACKGROUND SERVICES - Appointment reminders (React hooks)
+// import { useAppointmentReminders } from '@/hooks/useAppointmentReminders';
 
-// Setup Wizard - Direct import to avoid lazy loading issues temporarily
-import { SetupWizard } from '@/pages/setup/SetupWizard';
+// 🎧 CONSOLE HELPER - For Chrome DevTools debugging
+import { ConsoleHelper } from '@/lib/logging';
+
+// ⚡ PHASE 1 OPTIMIZATION: Lazy load critical pages
+const { lazy } = React;
+const LazyDashboardPage = lazy(() => import('@/pages/admin/core/dashboard/page'));
+const LazyCustomReporting = lazy(() => import('@/pages/admin/core/reporting/page'));
+const LazyCompetitiveIntelligence = lazy(() => import('@/pages/admin/core/intelligence/page'));
+const LazySetupWizard = lazy(() => import('@/pages/setup/SetupWizard').then(m => ({ default: m.SetupWizard })));
 
 // Lazy-loaded modules for performance
 import {
   LazySalesPage,
-  LazyFloorPage,
-  LazyKitchenPage,
+  LazyFulfillmentOnsitePage,
+  LazyProductionPage,
+  LazyDeliveryPage,
   LazyStockLab,
   LazySuppliersPage,
   LazySupplierOrdersPage,
@@ -69,7 +73,7 @@ import {
   LazySchedulingPage,
   LazyFiscalPage,
   LazySettingsPage,
-  LazyThemeTestPage,
+  // LazyThemeTestPage, // REMOVED: Component does not exist
   LazyDebugDashboard,
   LazyCapabilitiesDebug,
   LazyThemeDebug,
@@ -78,10 +82,10 @@ import {
   LazyPerformanceDebug,
   LazyNavigationDebug,
   LazyComponentsDebug,
-  LazySlotsDebug,
+  // LazySlotsDebug, // REMOVED: Legacy system
   LazyBundleDebug,
-  LazySupplyChainPage,
-  LazyProcurementPage,
+  // LazySupplyChainPage, // DISABLED: Component does not exist
+  // LazyProcurementPage, // DISABLED: Component does not exist
   // ✅ NEW PHASE 4 & 5 MODULES
   LazyGamificationPage,
   LazyExecutivePage,
@@ -93,32 +97,59 @@ import {
   LazyReportingPage
 } from '@/lib/lazy';
 
-// Materials sub-modules
-import { ABCAnalysisSection as ABCAnalysisView } from '@/pages/admin/supply-chain/materials/components/Analytics';
+// ⚡ PHASE 1 OPTIMIZATION: Lazy load Materials sub-modules
+const LazyABCAnalysisView = lazy(() =>
+  import('@/pages/admin/supply-chain/materials/components/Analytics').then(m => ({ default: m.ABCAnalysisSection }))
+);
+
+// ⚡ PHASE 1 OPTIMIZATION: Lazy load Settings sub-modules
+const LazyDiagnosticsView = lazy(() =>
+  import('@/pages/admin/core/settings').then(m => ({ default: m.DiagnosticsView }))
+);
+const LazyReportingView = lazy(() =>
+  import('@/pages/admin/core/settings').then(m => ({ default: m.ReportingView }))
+);
+const LazyEnterpriseView = lazy(() =>
+  import('@/pages/admin/core/settings').then(m => ({ default: m.EnterpriseView }))
+);
+const LazyIntegrationsView = lazy(() =>
+  import('@/pages/admin/core/settings').then(m => ({ default: m.IntegrationsView }))
+);
+
+// ⚡ PHASE 1 OPTIMIZATION: Lazy load Customer App modules
+const LazyCustomerPortal = lazy(() =>
+  import('@/pages/app').then(m => ({ default: m.CustomerPortal }))
+);
+const LazyCustomerMenu = lazy(() =>
+  import('@/pages/app').then(m => ({ default: m.CustomerMenu }))
+);
+const LazyMyOrders = lazy(() =>
+  import('@/pages/app').then(m => ({ default: m.MyOrders }))
+);
+const LazyCustomerSettings = lazy(() =>
+  import('@/pages/app').then(m => ({ default: m.CustomerSettings }))
+);
+const LazyBookingPage = lazy(() => import('@/pages/app/booking/page'));
+const LazyAppointmentsPage = lazy(() => import('@/pages/app/appointments/page'));
+
+// E-commerce customer pages
+const LazyCatalogPage = lazy(() => import('@/pages/app/catalog/page'));
+const LazyCartPage = lazy(() => import('@/pages/app/cart/page'));
+const LazyCheckoutPage = lazy(() => import('@/pages/app/checkout/page'));
+
 import { logger } from '@/lib/logging';
-// LazySupplyChainPage and LazyProcurementPage now imported from central LazyModules
-
-// Settings sub-modules
-import {
-  DiagnosticsView,
-  ReportingView,
-  EnterpriseView,
-  IntegrationsView
-} from '@/pages/admin/core/settings';
-
-// Customer modules - Experiencia específica para usuarios CLIENTE
-import { 
-  CustomerPortal, 
-  CustomerMenu, 
-  MyOrders, 
-  CustomerSettings 
-} from '@/pages/app';
 
 // Performance monitoring component
 function PerformanceWrapper({ children }: { children: React.ReactNode }) {
+  logger.info('App', '🎬 PerformanceWrapper RENDERED');
+
   useRouteBasedPreloading();
-  
+
+  // Initialize appointment reminders (auto-cleanup on unmount)
+  // useAppointmentReminders();
+
   React.useEffect(() => {
+    logger.info('App', '🔥 PerformanceWrapper useEffect STARTED');
     // Initialize performance system
     initializePerformanceSystem({
       lazyLoading: {
@@ -142,9 +173,15 @@ function PerformanceWrapper({ children }: { children: React.ReactNode }) {
       }
     });
 
+    // Initialize Console Helper for debugging (dev only)
+    if (process.env.NODE_ENV === 'development') {
+      ConsoleHelper.init();
+    }
+
     // Initialize offline system
+    // 🚨 CRITICAL: Service Worker ONLY in production to avoid conflicts with Vite HMR
     initializeOffline({
-      enableServiceWorker: true,
+      enableServiceWorker: import.meta.env.PROD, // ✅ Only in production, NOT development
       enableSync: true,
       syncInterval: 30000,
       maxRetries: 3
@@ -152,21 +189,45 @@ function PerformanceWrapper({ children }: { children: React.ReactNode }) {
       logger.info('App', '[App] Offline system initialized:', {
         serviceWorker: !!serviceWorker,
         syncInitialized,
-        storageInitialized
+        storageInitialized,
+        environment: import.meta.env.MODE
       });
     }).catch(error => {
       logger.error('App', '[App] Failed to initialize offline system:', error);
     });
 
     // Initialize Module Registry
+    logger.info('App', '⏰ Starting Module Registry initialization...', { manifestCount: ALL_MODULE_MANIFESTS.length });
+
     initializeModulesForCapabilities(ALL_MODULE_MANIFESTS)
       .then((result) => {
-        logger.info('App', '🔧 Module Registry initialized:', {
+        logger.info('App', '✅ Module Registry INITIALIZED!', {
           initialized: result.initialized.length,
           failed: result.failed.length,
           skipped: result.skipped.length,
-          duration: `${result.duration}ms`
+          duration: `${result.duration}ms`,
+          modules: result.initialized
         });
+
+        // DEBUG: Log detailed module registration
+        logger.debug('App', '📋 Registered modules:', result.initialized);
+        logger.debug('App', '⏭️ Skipped modules:', result.skipped);
+
+        // DEBUG: Check if achievements module registered
+        const registry = ModuleRegistry.getInstance();
+        const hasAchievements = registry.has('achievements');
+        logger.info('App', `🏆 Achievements module registered: ${hasAchievements}`);
+
+        // DEBUG: Check hook registration
+        const stats = registry.getStats();
+        logger.info('App', '🔌 Hook registry stats:', stats);
+
+        // DEBUG: Expose registry in window for Chrome DevTools debugging
+        interface WindowWithRegistry extends Window {
+          __MODULE_REGISTRY__?: typeof registry;
+        }
+        (window as WindowWithRegistry).__MODULE_REGISTRY__ = registry;
+        logger.info('App', '🪟 ModuleRegistry exposed in window.__MODULE_REGISTRY__');
 
         if (result.failed.length > 0) {
           logger.warn('App', '⚠️ Some modules failed to initialize:', result.failed);
@@ -175,6 +236,14 @@ function PerformanceWrapper({ children }: { children: React.ReactNode }) {
       .catch(error => {
         logger.error('App', '❌ Failed to initialize Module Registry:', error);
       });
+
+    // Subscribe to capability changes and auto-reinitialize modules
+    const unsubscribe = subscribeToCapabilityChanges(ALL_MODULE_MANIFESTS);
+
+    // Cleanup on unmount
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return <>{children}</>;
@@ -207,13 +276,16 @@ function App() {
                 {/* 🔄 Sync capabilities from Supabase on app init */}
                 <CapabilitySync />
 
-                <OfflineMonitorProvider>
-                  <AchievementSystemProvider>
+                {/* 🎮 Initialize gamification notifications via Module Registry */}
+                <HookPoint name="app.init" />
 
-                    {/* 🔗 INTEGRATION LAYER: EventBus + Slots + Navigation */}
+                {/* 🏢 Multi-Location Context - Available after auth */}
+                <LocationProvider>
+                <OfflineMonitorProvider>
+
+                    {/* 🔗 INTEGRATION LAYER: EventBus + Navigation */}
                     {/* NOTA: CapabilityProvider removido - nuevo sistema unificado usa Zustand */}
                       <EventBusProvider debug={process.env.NODE_ENV === 'development'}>
-                        <SlotProvider>
                           <NavigationProvider>
      
                     
@@ -243,14 +315,20 @@ function App() {
                         } />
                         
                         {/* 🔧 SETUP WIZARD - Configuration inicial del sistema */}
-                        <Route path="/setup" element={<SetupWizard />} />
+                        <Route path="/setup" element={
+                          <Suspense fallback={<LoadingFallback />}>
+                            <LazySetupWizard />
+                          </Suspense>
+                        } />
                         
                         {/* 🏠 ADMIN - DASHBOARD */}
                         <Route path="/admin/dashboard" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
                               <DashboardRoleRouter>
-                                <DashboardPage />
+                                <Suspense fallback={<LoadingFallback />}>
+                                  <LazyDashboardPage />
+                                </Suspense>
                               </DashboardRoleRouter>
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
@@ -258,40 +336,46 @@ function App() {
                         <Route path="/admin/dashboard/cross-analytics" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
-                              <DashboardPage />
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyDashboardPage />
+                              </Suspense>
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
                         <Route path="/admin/reporting" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
-                              <CustomReporting />
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyCustomReporting />
+                              </Suspense>
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
                         <Route path="/admin/intelligence" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
-                              <CompetitiveIntelligence />
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyCompetitiveIntelligence />
+                              </Suspense>
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
-                        <Route path="/admin/materials/predictive-analytics" element={
+                        {/* <Route path="/admin/materials/predictive-analytics" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
                               <PredictiveAnalyticsComponent />
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
-                        } />
-                        
+                        } /> */}
+
                         {/* 🏢 ADMIN - BUSINESS OPERATIONS */}
-                        <Route path="/admin/sales" element={
+                        <Route path="/admin/operations/sales" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="sales">
                               <ResponsiveLayout>
-                                <LazyWithErrorBoundary moduleName="Ventas">
+                                <Suspense fallback={<div>Cargando Ventas...</div>}>
                                   <LazySalesPage />
-                                </LazyWithErrorBoundary>
+                                </Suspense>
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -302,7 +386,7 @@ function App() {
                             <RoleGuard requiredModule="operations">
                               <ResponsiveLayout>
                                 <LazyWithErrorBoundary moduleName="Floor Management">
-                                  <LazyFloorPage />
+                                  <LazyFulfillmentOnsitePage />
                                 </LazyWithErrorBoundary>
                               </ResponsiveLayout>
                             </RoleGuard>
@@ -315,12 +399,32 @@ function App() {
                             <RoleGuard requiredModule="operations">
                               <ResponsiveLayout>
                                 <LazyWithErrorBoundary moduleName="Kitchen Display">
-                                  <LazyKitchenPage />
+                                  <LazyProductionPage />
                                 </LazyWithErrorBoundary>
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
+
+                        {/* 🚚 ADMIN - OPERATIONS - Delivery Management */}
+                        {/* Delivery - Consolidated into Fulfillment */}
+                        <Route path="/admin/operations/fulfillment/delivery" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredModule="operations">
+                              <ResponsiveLayout>
+                                <LazyWithErrorBoundary moduleName="Delivery Management">
+                                  <LazyDeliveryPage />
+                                </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+
+                        {/* Redirect old delivery route to new location */}
+                        <Route path="/admin/operations/delivery" element={
+                          <Navigate to="/admin/operations/fulfillment/delivery" replace />
+                        } />
+
                         <Route path="/admin/customers" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="sales">
@@ -334,7 +438,7 @@ function App() {
                         } />
                         
                         {/* 🏭 ADMIN - SUPPLY CHAIN & Materials */}
-                        <Route path="/admin/materials" element={
+                        <Route path="/admin/supply-chain/materials" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="materials">
                               <ResponsiveLayout>
@@ -349,11 +453,14 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="materials">
                               <ResponsiveLayout>
-                                <ABCAnalysisView />
+                                <Suspense fallback={<LoadingFallback />}>
+                                  <LazyABCAnalysisView />
+                                </Suspense>
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
+                        {/* DISABLED: LazySupplyChainPage component does not exist
                         <Route path="/admin/materials/supply-chain" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="materials">
@@ -365,7 +472,8 @@ function App() {
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
-                        <Route path="/admin/materials/procurement" element={
+                        */}
+                        {/* <Route path="/admin/materials/procurement" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="materials">
                               <ResponsiveLayout>
@@ -375,10 +483,10 @@ function App() {
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
-                        } />
+                        } /> */}
 
                         {/* 🏢 ADMIN - SUPPLIERS */}
-                        <Route path="/admin/suppliers" element={
+                        <Route path="/admin/supply-chain/suppliers" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="materials">
                               <ResponsiveLayout>
@@ -391,7 +499,7 @@ function App() {
                         } />
 
                         {/* 📦 ADMIN - SUPPLIER ORDERS */}
-                        <Route path="/admin/supplier-orders" element={
+                        <Route path="/admin/supply-chain/supplier-orders" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="materials">
                               <ResponsiveLayout>
@@ -404,7 +512,7 @@ function App() {
                         } />
 
                         {/* 🍕 ADMIN - PRODUCTS */}
-                        <Route path="/admin/products" element={
+                        <Route path="/admin/supply-chain/products" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="products">
                               <ResponsiveLayout>
@@ -415,7 +523,7 @@ function App() {
                         } />
                         
                         {/* 💰 ADMIN - FISCAL */}
-                        <Route path="/admin/fiscal" element={
+                        <Route path="/admin/finance/fiscal" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="fiscal">
                               <ResponsiveLayout>
@@ -426,7 +534,7 @@ function App() {
                         } />
                         
                         {/* 👨‍💼 ADMIN - STAFF & HR */}
-                        <Route path="/admin/staff" element={
+                        <Route path="/admin/resources/staff" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="staff">
                               <ResponsiveLayout>
@@ -435,7 +543,7 @@ function App() {
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
-                        <Route path="/admin/scheduling" element={
+                        <Route path="/admin/resources/scheduling" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredModule="scheduling">
                               <ResponsiveLayout>
@@ -557,7 +665,9 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
                               <ResponsiveLayout>
-                                <IntegrationsView />
+                                <Suspense fallback={<LoadingFallback />}>
+                                  <LazyIntegrationsView />
+                                </Suspense>
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -566,7 +676,9 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
                               <ResponsiveLayout>
-                                <DiagnosticsView />
+                                <Suspense fallback={<LoadingFallback />}>
+                                  <LazyDiagnosticsView />
+                                </Suspense>
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -575,7 +687,9 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
                               <ResponsiveLayout>
-                                <ReportingView />
+                                <Suspense fallback={<LoadingFallback />}>
+                                  <LazyReportingView />
+                                </Suspense>
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -584,7 +698,9 @@ function App() {
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['SUPER_ADMIN']}>
                               <ResponsiveLayout>
-                                <EnterpriseView />
+                                <Suspense fallback={<LoadingFallback />}>
+                                  <LazyEnterpriseView />
+                                </Suspense>
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -609,6 +725,17 @@ function App() {
                                 <LazyWithErrorBoundary moduleName="Capabilities Debug">
                                   <LazyCapabilitiesDebug />
                                 </LazyWithErrorBoundary>
+                              </ResponsiveLayout>
+                            </RoleGuard>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/debug/feature-ui-mapping" element={
+                          <ProtectedRouteNew>
+                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                              <ResponsiveLayout>
+                                <Suspense fallback={<LoadingFallback />}>
+                                  {React.createElement(React.lazy(() => import('@/pages/debug/feature-ui-mapping/FeatureUIMappingDebugger')))}
+                                </Suspense>
                               </ResponsiveLayout>
                             </RoleGuard>
                           </ProtectedRouteNew>
@@ -679,17 +806,8 @@ function App() {
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
-                        <Route path="/debug/slots" element={
-                          <ProtectedRouteNew>
-                            <RoleGuard requiredRoles={['SUPER_ADMIN']}>
-                              <ResponsiveLayout>
-                                <LazyWithErrorBoundary moduleName="Slots System">
-                                  <LazySlotsDebug />
-                                </LazyWithErrorBoundary>
-                              </ResponsiveLayout>
-                            </RoleGuard>
-                          </ProtectedRouteNew>
-                        } />
+                        {/* REMOVED: Slots debug - Legacy system eliminated */}
+                        {/* <Route path="/debug/slots" element={...} /> */}
                         <Route path="/debug/bundle" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['SUPER_ADMIN']}>
@@ -701,6 +819,7 @@ function App() {
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
+                        {/* REMOVED: LazyThemeTestPage component does not exist
                         <Route path="/admin/debug/theme-test" element={
                           <ProtectedRouteNew>
                             <RoleGuard requiredRoles={['SUPER_ADMIN']}>
@@ -710,37 +829,89 @@ function App() {
                             </RoleGuard>
                           </ProtectedRouteNew>
                         } />
+                        */}
                         
                         {/* �📱 CUSTOMER APP - Para usuarios CLIENTE */}
                         <Route path="/app/portal" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
-                              <CustomerPortal />
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyCustomerPortal />
+                              </Suspense>
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
                         <Route path="/app/menu" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
-                              <CustomerMenu />
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyCustomerMenu />
+                              </Suspense>
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
                         <Route path="/app/orders" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
-                              <MyOrders />
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyMyOrders />
+                              </Suspense>
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
                         <Route path="/app/settings" element={
                           <ProtectedRouteNew>
                             <ResponsiveLayout>
-                              <CustomerSettings />
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyCustomerSettings />
+                              </Suspense>
                             </ResponsiveLayout>
                           </ProtectedRouteNew>
                         } />
-                        
+                        <Route path="/app/booking" element={
+                          <ProtectedRouteNew>
+                            <ResponsiveLayout>
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyBookingPage />
+                              </Suspense>
+                            </ResponsiveLayout>
+                          </ProtectedRouteNew>
+                        } />
+                        <Route path="/app/appointments" element={
+                          <ProtectedRouteNew>
+                            <ResponsiveLayout>
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyAppointmentsPage />
+                              </Suspense>
+                            </ResponsiveLayout>
+                          </ProtectedRouteNew>
+                        } />
+
+                        {/* 🛒 E-COMMERCE - Customer shopping */}
+                        <Route path="/app/catalog" element={
+                          <ResponsiveLayout>
+                            <Suspense fallback={<LoadingFallback />}>
+                              <LazyCatalogPage />
+                            </Suspense>
+                          </ResponsiveLayout>
+                        } />
+                        <Route path="/app/cart" element={
+                          <ResponsiveLayout>
+                            <Suspense fallback={<LoadingFallback />}>
+                              <LazyCartPage />
+                            </Suspense>
+                          </ResponsiveLayout>
+                        } />
+                        <Route path="/app/checkout" element={
+                          <ProtectedRouteNew>
+                            <ResponsiveLayout>
+                              <Suspense fallback={<LoadingFallback />}>
+                                <LazyCheckoutPage />
+                              </Suspense>
+                            </ResponsiveLayout>
+                          </ProtectedRouteNew>
+                        } />
+
                         {/* 🚫 404 fallback */}
                         <Route path="*" element={
                           <div style={{
@@ -771,11 +942,10 @@ function App() {
                   {/* 🐛 DEBUG TOOLS moved to /debug routes */}
 
                           </NavigationProvider>
-                        </SlotProvider>
                       </EventBusProvider>
 
-                </AchievementSystemProvider>
               </OfflineMonitorProvider>
+              </LocationProvider>
               </AuthProvider>
             </Router>
           </AlertsProvider>

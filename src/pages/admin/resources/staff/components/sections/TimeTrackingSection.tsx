@@ -1,7 +1,7 @@
 // OfflineTimeTrackingSection.tsx - Offline-First Time Tracking for G-Admin Mini
 // Provides seamless offline time tracking with intelligent sync
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   VStack,
@@ -16,12 +16,7 @@ import {
   Progress,
   Tooltip,
   Tabs,
-  Table,
-  NumberInput,
-  Textarea,
-  Select,
-  createListCollection,
-  IconButton
+  Textarea
 } from '@chakra-ui/react';
 import { CardWrapper } from '@/shared/ui';
 import {
@@ -30,43 +25,42 @@ import {
   StopIcon,
   PauseIcon,
   CalendarIcon,
-  UserIcon,
   ExclamationTriangleIcon,
   WifiIcon,
   NoSymbolIcon,
   CloudIcon,
   CircleStackIcon,
   ArrowPathIcon,
-  CheckCircleIcon,
   ClockIcon as TimeIcon,
   ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
   ChartBarIcon,
   DocumentTextIcon,
   AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
 
 // Offline functionality
-import { 
+import {
   useOfflineStatus,
-  offlineSync,
   localStorage,
-  type SyncOperation 
+  type SyncOperation
 } from '@/lib/offline';
 import { EventBus } from '@/lib/events';
 import { notify } from '@/lib/notifications';
 
 // Staff imports
-import type { Employee, StaffViewState, TimeEntry, TimeSheet, TimeTrackingStats } from '../../types';
-
+import type { StaffViewState, TimeEntry, TimeSheet, TimeTrackingStats } from '../../types';
 import { logger } from '@/lib/logging';
-// Time tracking specific offline types
 
+// TODO: Implement useMemo and useCallback when performance optimization is needed
+// TODO: Implement Table, NumberInput, Select, IconButton when time entry editing UI is added
+// TODO: Implement offlineSync integration for automatic synchronization
+
+// Time tracking specific offline types
 interface OfflineTimeOperation {
   id: string;
   type: 'time_entry_create' | 'time_entry_update' | 'timesheet_submit' | 'timesheet_approve';
   entityId: string;
-  data: any;
+  data: TimeEntry | TimeSheet;
   timestamp: number;
   retryCount: number;
   status: 'pending' | 'syncing' | 'synced' | 'failed';
@@ -131,7 +125,7 @@ const mockEmployees: Employee[] = [
   }
 ];
 
-export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTimeTrackingSectionProps) {
+export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: _onViewStateChange }: OfflineTimeTrackingSectionProps) {
   // Offline status management
   const {
     isOnline,
@@ -456,7 +450,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
     try {
       if (!navigator.geolocation) return undefined;
       
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         navigator.geolocation.getCurrentPosition(
           (position) => resolve({
             latitude: position.coords.latitude,
@@ -561,17 +555,17 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
   };
 
   return (
-    <VStack gap="6" align="stretch">
+    <Stack direction="column" gap="6" align="stretch">
       {/* Enhanced Header with Connection Status */}
-      <HStack justify="space-between" align="center">
-        <HStack>
+      <Stack direction="row" justify="space-between" align="center">
+        <Stack direction="row">
           <Text fontSize="lg" fontWeight="semibold">Time Tracking</Text>
           <Badge 
             colorPalette={getConnectionStatusColor()} 
             variant="subtle"
             p={2}
           >
-            <HStack gap={1}>
+            <Stack direction="row" gap={1}>
               {isOnline ? 
                 <WifiIcon className="w-3 h-3" /> : 
                 <NoSymbolIcon className="w-3 h-3" />
@@ -581,11 +575,11 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                  isConnecting ? 'Connecting...' : 
                  `Online (${connectionQuality})`}
               </Text>
-            </HStack>
+            </Stack>
           </Badge>
-        </HStack>
+        </Stack>
 
-        <HStack gap="2">
+        <Stack direction="row" gap="2">
           {/* Offline Operations Indicator */}
           {offlineOperations.length > 0 && (
             <Tooltip.Root aria-label={`${offlineOperations.length} operations pending sync` }>
@@ -626,8 +620,8 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
               Sync ({queueSize})
             </Button>
           )}
-        </HStack>
-      </HStack>
+        </Stack>
+      </Stack>
 
       {/* Offline Mode Alert */}
       {!isOnline && (
@@ -646,61 +640,61 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
       <SimpleGrid columns={{ base: 2, md: 4, lg: 6 }} gap="4">
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
-            <VStack gap="1">
+            <Stack direction="column" gap="1">
               <TimeIcon className="w-5 h-5 text-blue-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.today_total_hours.toFixed(1)}</Text>
               <Text fontSize="xs" color="gray.600">Hours Today</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
-            <VStack gap="1">
+            <Stack direction="column" gap="1">
               <CalendarIcon className="w-5 h-5 text-green-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.week_total_hours.toFixed(1)}</Text>
               <Text fontSize="xs" color="gray.600">Hours This Week</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
-            <VStack gap="1">
+            <Stack direction="column" gap="1">
               <PlayIcon className="w-5 h-5 text-purple-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.active_employees}</Text>
               <Text fontSize="xs" color="gray.600">Active Now</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
-            <VStack gap="1">
+            <Stack direction="column" gap="1">
               <PauseIcon className="w-5 h-5 text-orange-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.on_break}</Text>
               <Text fontSize="xs" color="gray.600">On Break</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
-            <VStack gap="1">
+            <Stack direction="column" gap="1">
               <ArrowTrendingUpIcon className="w-5 h-5 text-red-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.overtime_this_week.toFixed(1)}</Text>
               <Text fontSize="xs" color="gray.600">Overtime Week</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
-            <VStack gap="1">
+            <Stack direction="column" gap="1">
               <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500 mx-auto" />
               <Text fontSize="lg" fontWeight="bold">{timeStats.pending_approvals}</Text>
               <Text fontSize="xs" color="gray.600">Pending Approval</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
       </SimpleGrid>
@@ -738,7 +732,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
             <Box p="6">
               {/* Clock Tab */}
               <Tabs.Content value="clock">
-                <VStack gap="6" align="stretch">
+                <Stack direction="column" gap="6" align="stretch">
                   <Text fontSize="lg" fontWeight="semibold">Employee Clock</Text>
 
                   {/* Current Shifts */}
@@ -750,20 +744,20 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                       return (
                         <CardWrapper key={employee.id}>
                           <CardWrapper.Body>
-                            <VStack align="stretch" gap="3">
-                              <HStack gap="3">
+                            <Stack direction="column" align="stretch" gap="3">
+                              <Stack direction="row" gap="3">
                                 <Avatar.Root size='sm'>
                                   <Avatar.Fallback name={`${employee.first_name} ${employee.last_name}`}/>
                                 </Avatar.Root>
                         
-                                <VStack align="start" gap="0" flex="1">
+                                <Stack direction="column" align="start" gap="0" flex="1">
                                   <Text fontWeight="medium" fontSize="sm">
                                     {employee.first_name} {employee.last_name}
                                   </Text>
                                   <Text fontSize="xs" color="gray.600">
                                     {employee.position}
                                   </Text>
-                                </VStack>
+                                </Stack>
                                 <Badge 
                                   colorPalette={status.color} 
                                   variant="subtle" 
@@ -771,17 +765,17 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                                 >
                                   {status.label}
                                 </Badge>
-                              </HStack>
+                              </Stack>
 
                               {status.status !== 'off_duty' && (
-                                <VStack align="stretch" gap="1">
-                                  <HStack justify="space-between">
+                                <Stack direction="column" align="stretch" gap="1">
+                                  <Stack direction="row" justify="space-between">
                                     <Text fontSize="xs" color="gray.600">Shift Time:</Text>
                                     <Text fontSize="xs" fontWeight="medium">
                                       {shiftHours.toFixed(1)} hrs
                                     </Text>
-                                  </HStack>
-                                </VStack>
+                                  </Stack>
+                                </Stack>
                               )}
 
                               <Button
@@ -808,7 +802,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                               </Button>
 
                               {status.status === 'working' && (
-                                <HStack gap="1">
+                                <Stack direction="row" gap="1">
                                   <Button
                                     size="xs"
                                     variant="outline"
@@ -823,7 +817,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                                     <PauseIcon className="w-3 h-3" />
                                     Break
                                   </Button>
-                                </HStack>
+                                </Stack>
                               )}
 
                               {status.status === 'on_break' && (
@@ -842,24 +836,24 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                                   End Break
                                 </Button>
                               )}
-                            </VStack>
+                            </Stack>
                           </CardWrapper.Body>
                         </CardWrapper>
                       );
                     })}
                   </SimpleGrid>
-                </VStack>
+                </Stack>
               </Tabs.Content>
 
               {/* Timesheets Tab */}
               <Tabs.Content value="timesheets">
-                <VStack gap="4" align="stretch">
-                  <HStack justify="space-between">
+                <Stack direction="column" gap="4" align="stretch">
+                  <Stack direction="row" justify="space-between">
                     <Text fontSize="lg" fontWeight="semibold">Timesheets</Text>
                     <Button size="sm" colorPalette="blue">
                       Generate Report
                     </Button>
-                  </HStack>
+                  </Stack>
 
                   <CardWrapper>
                     <CardWrapper.Body>
@@ -868,12 +862,12 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                       </Text>
                     </CardWrapper.Body>
                   </CardWrapper>
-                </VStack>
+                </Stack>
               </Tabs.Content>
 
               {/* Reports Tab */}
               <Tabs.Content value="reports">
-                <VStack gap="4" align="stretch">
+                <Stack direction="column" gap="4" align="stretch">
                   <Text fontSize="lg" fontWeight="semibold">Time Tracking Reports</Text>
 
                   <CardWrapper>
@@ -883,12 +877,12 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                       </Text>
                     </CardWrapper.Body>
                   </CardWrapper>
-                </VStack>
+                </Stack>
               </Tabs.Content>
 
               {/* Settings Tab */}
               <Tabs.Content value="settings">
-                <VStack gap="4" align="stretch">
+                <Stack direction="column" gap="4" align="stretch">
                   <Text fontSize="lg" fontWeight="semibold">Time Tracking Settings</Text>
 
                   <CardWrapper>
@@ -898,7 +892,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                       </Text>
                     </CardWrapper.Body>
                   </CardWrapper>
-                </VStack>
+                </Stack>
               </Tabs.Content>
             </Box>
           </Tabs.Root>
@@ -919,7 +913,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
             </Dialog.Header>
 
             <Dialog.Body>
-              <VStack gap="4" align="stretch">
+              <Stack direction="column" gap="4" align="stretch">
                 {!isOnline && (
                   <Alert.Root status="info" size="sm">
                     <Alert.Indicator />
@@ -930,7 +924,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                   </Alert.Root>
                 )}
 
-                <VStack align="stretch" gap="3">
+                <Stack direction="column" align="stretch" gap="3">
                   <Box>
                     <Text fontSize="sm" fontWeight="medium" mb={2}>Action Type</Text>
                     <Text fontSize="lg" fontWeight="bold" color="blue.600">
@@ -954,12 +948,12 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                       rows={3}
                     />
                   </Box>
-                </VStack>
-              </VStack>
+                </Stack>
+              </Stack>
             </Dialog.Body>
 
             <Dialog.Footer>
-              <HStack gap="3">
+              <Stack direction="row" gap="3">
                 <Button variant="outline" onClick={handleClockDialogClose}>
                   Cancel
                 </Button>
@@ -969,7 +963,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
                 >
                   {isOnline ? 'Confirm' : 'Save Offline'}
                 </Button>
-              </HStack>
+              </Stack>
             </Dialog.Footer>
           </Dialog.Content>
         </Dialog.Positioner>
@@ -983,7 +977,7 @@ export function TimeTrackingSection({ viewState, onViewStateChange }: OfflineTim
         onForceSync={handleForceSyncTimeTracking}
         isSyncing={isSyncing}
       />
-    </VStack>
+    </Stack>
   );
 }
 
@@ -1012,17 +1006,17 @@ const OfflineTimeOperationsModal = ({
           </Dialog.Header>
 
           <Dialog.Body>
-            <VStack gap="4" align="stretch">
+            <Stack direction="column" gap="4" align="stretch">
               <Text color="gray.600">
                 {operations.length} time tracking operation(s) pending synchronization
               </Text>
 
               <Box maxH="400px" overflowY="auto">
-                <VStack gap="3" align="stretch">
+                <Stack direction="column" gap="3" align="stretch">
                   {operations.map((operation) => (
                     <CardWrapper key={operation.id} p="4">
-                      <HStack justify="space-between" mb="2">
-                        <VStack align="start" spacing="1">
+                      <Stack direction="row" justify="space-between" mb="2">
+                        <Stack direction="column" align="start" spacing="1">
                           <Text fontWeight="medium" textTransform="capitalize">
                             {operation.type.replace('_', ' ')}
                           </Text>
@@ -1032,7 +1026,7 @@ const OfflineTimeOperationsModal = ({
                           <Text fontSize="sm" color="gray.600">
                             {new Date(operation.timestamp).toLocaleString()}
                           </Text>
-                        </VStack>
+                        </Stack>
                         <Badge
                           colorScheme={
                             operation.status === 'synced' ? 'green' :
@@ -1042,7 +1036,7 @@ const OfflineTimeOperationsModal = ({
                         >
                           {operation.status}
                         </Badge>
-                      </HStack>
+                      </Stack>
                       
                       {operation.retryCount > 0 && (
                         <Text fontSize="sm" color="orange.600">
@@ -1051,13 +1045,13 @@ const OfflineTimeOperationsModal = ({
                       )}
                     </CardWrapper>
                   ))}
-                </VStack>
+                </Stack>
               </Box>
-            </VStack>
+            </Stack>
           </Dialog.Body>
 
           <Dialog.Footer>
-            <HStack gap="3">
+            <Stack direction="row" gap="3">
               <Button variant="outline" onClick={onClose}>
                 Close
               </Button>
@@ -1071,7 +1065,7 @@ const OfflineTimeOperationsModal = ({
               >
                 Force Sync All
               </Button>
-            </HStack>
+            </Stack>
           </Dialog.Footer>
         </Dialog.Content>
       </Dialog.Positioner>

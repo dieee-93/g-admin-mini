@@ -27,28 +27,22 @@ export const CODE_SPLITTING_CONFIG = {
 
 // Lazy-loaded large components with proper chunking
 export const lazyComponents = {
-  // Materials module - Updated paths for route-based architecture v4.0
-  OfflineMaterialsPage: createLazyRoute(
-    () => import('@/pages/admin/supply-chain/materials/components/LazyOfflineMaterialsPage'),
-    CODE_SPLITTING_CONFIG.CHUNK_NAMES.MATERIALS
-  ),
-  
-  // Removed CrossModuleAnalytics - consolidated into Dashboard components
-
   RecipeForm: createLazyRoute(
     () => import('@/services/recipe/components/LazyRecipeForm'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.RECIPES
   ),
 
   // Sub-components
-  MaterialsHeader: createLazyFeature(
-    () => import('@/pages/admin/supply-chain/materials/components/Overview/MaterialsHeader'),
-    'MaterialsHeader'
-  ),
-  MaterialsInventoryGrid: createLazyFeature(
-    () => import('@/pages/admin/supply-chain/materials/components/MaterialsList/MaterialsInventoryGrid'),
-    'MaterialsInventoryGrid'
-  ),
+  // DISABLED: MaterialsHeader component does not exist
+  // MaterialsHeader: createLazyFeature(
+  //   () => import('@/pages/admin/supply-chain/materials/components/Overview/MaterialsHeader'),
+  //   'MaterialsHeader'
+  // ),
+  // DISABLED: MaterialsInventoryGrid component does not exist
+  // MaterialsInventoryGrid: createLazyFeature(
+  //   () => import('@/pages/admin/supply-chain/materials/components/MaterialsList/MaterialsInventoryGrid'),
+  //   'MaterialsInventoryGrid'
+  // ),
   // Removed CrossModuleAnalytics features - consolidated into modern dashboard
   MaterialsGrid: createLazyFeature(
     () => import('@/pages/admin/supply-chain/materials/components/MaterialsManagement/MaterialsGrid'),

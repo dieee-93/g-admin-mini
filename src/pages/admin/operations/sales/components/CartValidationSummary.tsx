@@ -1,11 +1,12 @@
 // src/features/sales/components/CartValidationSummary.tsx
-import { 
+import {
   Stack,
-  Typography, 
+  Typography,
   Button,
   CardWrapper ,
   Badge,
-  Alert,
+  // TODO: Add error alerts for validation failures
+  // Alert,
   Icon
 } from '@/shared/ui';
 import { 
@@ -65,9 +66,9 @@ export function CartValidationSummary({
   isValidating,
   onProceedToCheckout,
   onValidateCart,
-  disabled = false,
-  isOffline = false
+  disabled = false
 }: CartValidationSummaryProps) {
+  // TODO: Display offline indicator when isOffline is true
 
   // Determinar el estado general del carrito
   const getCartStatus = () => {
@@ -156,7 +157,7 @@ export function CartValidationSummary({
                   <Icon icon={ShoppingCartIcon} size="xs" />
                   <Typography variant="body" size="sm">Productos en carrito</Typography>
                 </Stack>
-                <Badge colorPalette="info" variant="outline">
+                <Badge colorPalette="blue" variant="outline">
                   {summary.itemCount}
                 </Badge>
               </Stack>
@@ -231,7 +232,7 @@ export function CartValidationSummary({
               {onValidateCart && (
                 <Button
                   variant="outline"
-                  colorPalette="info"
+                  colorPalette="blue"
                   onClick={onValidateCart}
                   disabled={disabled || !summary.hasItems || isValidating}
                 >
@@ -247,7 +248,7 @@ export function CartValidationSummary({
               {/* Botón principal de checkout */}
               {onProceedToCheckout && (
                 <Button
-                  colorPalette="success"
+                  colorPalette="green"
                   size="lg"
                   onClick={onProceedToCheckout}
                   disabled={

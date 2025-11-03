@@ -18,8 +18,7 @@ import { InputField, CardWrapper} from '@/shared/ui';
 import {
   QrCodeIcon,
   PrinterIcon,
-  ClipboardDocumentIcon,
-  ExclamationTriangleIcon
+  ClipboardDocumentIcon
 } from '@heroicons/react/24/outline';
 import { Table } from '../../types';
 
@@ -324,11 +323,11 @@ export function QRCodeGenerator({
             </Text>
           ) : (
             <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="4">
-              {qrConfigs.map((_config) => {
+              {qrConfigs.map((config) => {
                 const table = tables.find(t => t.id === config.tableId);
                 const status = getQRStatus(config);
                 const qrUrl = `${baseUrl}/order/${config.qrCode}`;
-                
+
                 return (
                   <CardWrapper key={config.tableId} p="4" variant="outline">
                     <VStack gap="3" align="stretch">

@@ -7,11 +7,12 @@
  * @version 1.0.0
  */
 
-import React from 'react';
+import React, { lazy } from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
 import { TrophyIcon } from '@heroicons/react/24/outline';
+import { AchievementNotificationsInit } from './components/AchievementNotificationsInit';
 
 export const gamificationManifest: ModuleManifest = {
   id: 'gamification',
@@ -24,11 +25,15 @@ export const gamificationManifest: ModuleManifest = {
   requiredFeatures: [] as FeatureId[],
   optionalFeatures: ['gamification'] as FeatureId[],
 
+  // 🔒 PERMISSIONS: Operadores can view gamification
+  minimumRole: 'OPERADOR' as const,
+
   hooks: {
     provide: [
       'gamification.achievement_unlocked', // Achievement notifications
       'dashboard.widgets',                 // Progress widgets
       'navigation.badges',                 // Achievement badges in nav
+      'app.init',                          // Achievement notifications init
     ],
     consume: [
       // Gamification listens to 40+ EventBus patterns
@@ -42,23 +47,26 @@ export const gamificationManifest: ModuleManifest = {
     logger.info('App', '🏆 Setting up Gamification module');
 
     try {
-      // Register gamification dashboard widget
+      // ✅ Achievement Notifications - Initialize globally
+      registry.addAction(
+        'app.init',
+        () => <AchievementNotificationsInit />,
+        'gamification',
+        100 // Highest priority - initialize first
+      );
+
+      // ✅ Dashboard Widget - Gamification progress
+      const GamificationWidget = lazy(() => import('./components/GamificationWidget'));
+
       registry.addAction(
         'dashboard.widgets',
-        () => ({
-          id: 'achievements-progress',
-          title: 'Your Progress',
-          type: 'gamification',
-          priority: 3,
-          data: {
-            level: 1,
-            totalAchievements: 0,
-            unlockedAchievements: 0,
-            nextMilestone: null,
-          },
-        }),
+        () => (
+          <React.Suspense fallback={<div>Cargando gamification...</div>}>
+            <GamificationWidget />
+          </React.Suspense>
+        ),
         'gamification',
-        3
+        60 // High priority widget
       );
 
       logger.info('App', '✅ Gamification module setup complete');

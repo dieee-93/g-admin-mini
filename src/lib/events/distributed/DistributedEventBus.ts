@@ -2,10 +2,10 @@
 // Extends EventBus with distributed capabilities for microfrontends
 
 import { EventBus } from '../EventBus';
-import { 
-  EventBusConfig, 
-  NamespacedEvent, 
-  EventPattern, 
+import type {
+  EventBusConfig,
+  NamespacedEvent,
+  EventPattern,
   ModuleId,
   IEventBus
 } from '../types';
@@ -151,6 +151,7 @@ export class DistributedEventBus extends EventBus implements IEventBus {
 
       SecureLogger.info('EventBus', 'Distributed layer initialized successfully');
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Failed to initialize distributed layer', { error });
       // Gracefully degrade to local-only mode
       this.isDistributedEnabled = false;
@@ -221,9 +222,10 @@ export class DistributedEventBus extends EventBus implements IEventBus {
         instanceId: this.distributedConfig.instanceId
       });
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Failed to propagate event to other instances', {
         pattern,
-        error: error.message
+        error: err.message
       });
 
       // Circuit breaker pattern - fail gracefully
@@ -272,10 +274,11 @@ export class DistributedEventBus extends EventBus implements IEventBus {
         fromInstance: event.instanceId
       });
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Failed to handle remote event', {
         eventId: event.id,
         pattern: event.pattern,
-        error: error.message
+        error: err.message
       });
     }
   }
@@ -350,6 +353,7 @@ export class DistributedEventBus extends EventBus implements IEventBus {
         });
       }
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Failed to sync after partition heal', { error });
     }
   }
@@ -360,7 +364,7 @@ export class DistributedEventBus extends EventBus implements IEventBus {
   private async handlePropagationFailure(pattern: EventPattern, error: Error): Promise<void> {
     SecureLogger.security('Event propagation failure detected', {
       pattern,
-      error: error.message,
+      error: err.message,
       instanceId: this.distributedConfig.instanceId
     });
 
@@ -524,6 +528,7 @@ export class DistributedEventBus extends EventBus implements IEventBus {
 
       SecureLogger.info('EventBus', 'Distributed graceful shutdown completed');
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Error during distributed graceful shutdown', { error });
       throw error;
     }

@@ -1,6 +1,6 @@
 import { Table, VStack, Text, HStack, Badge, IconButton } from '@chakra-ui/react';
 import { CardWrapper, Icon } from '@/shared/ui';
-import { CompetitorData } from '../types';
+import type { CompetitorData } from '../types';
 import { EyeIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
 interface CompetitorsTableProps {

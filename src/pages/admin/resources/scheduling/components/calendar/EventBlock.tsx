@@ -12,6 +12,7 @@ import React from 'react';
 import { Stack } from '@/shared/ui';
 import type { UnifiedScheduleEvent } from '../../types/calendar';
 import { format } from 'date-fns';
+import { logger } from '@/lib/logging';
 
 export interface EventBlockProps {
   event: UnifiedScheduleEvent;
@@ -95,7 +96,7 @@ export function EventBlock({
         e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
-      <Stack direction="column" gap={1}>
+      <Stack direction="column" gap="1">
         {/* Event Title */}
         <div
           style={{
@@ -170,7 +171,7 @@ export function EventBlockStacked({
   const remainingCount = events.length - maxVisible;
 
   return (
-    <Stack direction="column" gap={1}>
+    <Stack direction="column" gap="1">
       {visibleEvents.map((event) => (
         <EventBlock key={event.id} event={event} onClick={onClick} />
       ))}
@@ -188,7 +189,7 @@ export function EventBlockStacked({
           }}
           onClick={() => {
             // TODO: Show all events in modal or expanded view
-            console.log(`Show ${remainingCount} more events`);
+            logger.debug('EventBlock', `Show ${remainingCount} more events`);
           }}
         >
           +{remainingCount} más

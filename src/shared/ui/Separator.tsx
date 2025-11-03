@@ -25,8 +25,8 @@ export function Separator({
       size={size}
       colorPalette={colorPalette}
       variant={variant}
-      thickness={thickness}
       className={className}
+      {...(thickness ? { borderWidth: thickness } : {})}
       {...rest}
     />
   )

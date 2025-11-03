@@ -1,5 +1,6 @@
-import { type ItemFormData, type MeasurableUnit, type PackagingInfo } from '@/pages/admin/supply-chain/materials/types';
-import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
+import { type ItemFormData, type MeasurableUnit } from '@/pages/admin/supply-chain/materials/types';
+import { InventoryDecimal } from '@/config/decimal-config';
+import { safeDecimal } from '@/business-logic/shared/decimalUtils';
 
 /**
  * Utility functions for material form calculations
@@ -16,8 +17,8 @@ export class FormCalculations {
    * IMPORTANT: Determines if unit_cost represents total cost or unit cost based on context
    */
   static calculateUnitCost(totalCost: number, quantity: number): number {
-    const totalCostDec = new InventoryDecimal(totalCost);
-    const quantityDec = new InventoryDecimal(quantity);
+    const totalCostDec = safeDecimal(totalCost, 'inventory', 0);
+    const quantityDec = safeDecimal(quantity, 'inventory', 0);
     if (quantityDec.isZero() || quantityDec.isNegative()) return 0;
     return totalCostDec.dividedBy(quantityDec).toNumber();
   }
@@ -27,7 +28,7 @@ export class FormCalculations {
    * unit_cost should represent cost per unit, quantity is the amount purchased
    */
   static calculateTotalCost(unitCost: number, quantity: number): number {
-    return new InventoryDecimal(unitCost).times(quantity).toNumber();
+    return safeDecimal(unitCost, 'inventory', 0).times(safeDecimal(quantity, 'inventory', 0)).toNumber();
   }
   
   /**
@@ -60,25 +61,25 @@ export class FormCalculations {
    * Calculates cost per package
    */
   static calculateCostPerPackage(unitCost: number, packageSize: number): number {
-    return new InventoryDecimal(unitCost).times(packageSize).toNumber();
+    return safeDecimal(unitCost, 'inventory', 0).times(safeDecimal(packageSize, 'inventory', 0)).toNumber();
   }
   
   /**
    * Calculates how many complete packages from total units
    */
   static calculateCompletePackages(totalUnits: number, packageSize: number): number {
-    const packageSizeDec = new InventoryDecimal(packageSize);
+    const packageSizeDec = safeDecimal(packageSize, 'inventory', 0);
     if (packageSizeDec.isZero() || packageSizeDec.isNegative()) return 0;
-    return new InventoryDecimal(totalUnits).dividedBy(packageSizeDec).floor().toNumber();
+    return safeDecimal(totalUnits, 'inventory', 0).dividedBy(packageSizeDec).floor().toNumber();
   }
   
   /**
    * Calculates remaining loose units after complete packages
    */
   static calculateLooseUnits(totalUnits: number, packageSize: number): number {
-    const packageSizeDec = new InventoryDecimal(packageSize);
+    const packageSizeDec = safeDecimal(packageSize, 'inventory', 0);
     if (packageSizeDec.isZero() || packageSizeDec.isNegative()) return totalUnits;
-    return new InventoryDecimal(totalUnits).modulo(packageSizeDec).toNumber();
+    return safeDecimal(totalUnits, 'inventory', 0).modulo(packageSizeDec).toNumber();
   }
   
   /**
@@ -113,7 +114,7 @@ export class FormCalculations {
    */
   static convertWeight(amount: number, fromUnit: 'kg' | 'g', toUnit: 'kg' | 'g'): number {
     if (fromUnit === toUnit) return amount;
-    const amountDec = new InventoryDecimal(amount);
+    const amountDec = safeDecimal(amount, 'inventory', 0);
     
     if (fromUnit === 'kg' && toUnit === 'g') {
       return amountDec.times(1000).toNumber();
@@ -131,7 +132,7 @@ export class FormCalculations {
    */
   static convertVolume(amount: number, fromUnit: 'l' | 'ml', toUnit: 'l' | 'ml'): number {
     if (fromUnit === toUnit) return amount;
-    const amountDec = new InventoryDecimal(amount);
+    const amountDec = safeDecimal(amount, 'inventory', 0);
     
     if (fromUnit === 'l' && toUnit === 'ml') {
       return amountDec.times(1000).toNumber();
@@ -198,7 +199,7 @@ export class FormCalculations {
    * Formats currency with appropriate decimal places
    */
   static formatCurrency(amount: number, decimals: number = 2): string {
-    return new InventoryDecimal(amount).toFixed(decimals);
+    return safeDecimal(amount, 'inventory', 0).toFixed(decimals);
   }
   
   /**
@@ -212,9 +213,9 @@ export class FormCalculations {
    * Formats quantity with appropriate decimal places
    */
   static formatQuantity(amount: number, decimals: number = 0): string {
-    return new InventoryDecimal(amount).toLocaleString(undefined, { 
+    return safeDecimal(amount, 'inventory', 0).toLocaleString(undefined, {
       minimumFractionDigits: 0,
-      maximumFractionDigits: decimals 
+      maximumFractionDigits: decimals
     });
   }
   

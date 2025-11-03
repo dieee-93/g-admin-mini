@@ -1,12 +1,15 @@
-import { Decimal } from 'decimal.js';
+import Decimal from 'decimal.js';
 
 // ============================================================================
 // CONFIGURACIÓN OPTIMIZADA DECIMAL.JS v2.0
 // ============================================================================
 // Basada en mejores prácticas 2025 y documentación oficial
 
+// Type assertion para métodos que existen pero no están en los tipos
+const DecimalConstructor = Decimal as any;
+
 // Configuración principal optimizada para aplicaciones financieras
-Decimal.set({ 
+DecimalConstructor.set({
   precision: 20,                    // Estándar recomendado (era 10)
   rounding: Decimal.ROUND_HALF_EVEN, // Banker's rounding (mode 6) - mejor para finanzas
   toExpNeg: -7,                     // Control notación exponencial negativa
@@ -22,7 +25,7 @@ Decimal.set({
  * Configuración específica para cálculos fiscales (IVA, Ingresos Brutos)
  * Prioriza precisión máxima y banker's rounding para cumplir estándares
  */
-export const TaxDecimal = Decimal.clone({
+export const TaxDecimal = DecimalConstructor.clone({
   precision: 30,
   rounding: Decimal.ROUND_HALF_EVEN, // Crítico: evita sesgos estadísticos
   toExpNeg: -9,                      // Mayor precisión para decimales pequeños
@@ -33,7 +36,7 @@ export const TaxDecimal = Decimal.clone({
  * Configuración para inventario y stock
  * Balance entre precisión y performance para operaciones masivas
  */
-export const InventoryDecimal = Decimal.clone({
+export const InventoryDecimal = DecimalConstructor.clone({
   precision: 40,                     // Suficiente para inventarios
   rounding: Decimal.ROUND_HALF_UP,   // Tradicional para stock
   toExpNeg: -7,
@@ -44,7 +47,7 @@ export const InventoryDecimal = Decimal.clone({
  * Configuración para análisis financiero y pricing
  * Máxima precisión para cálculos complejos de rentabilidad
  */
-export const FinancialDecimal = Decimal.clone({
+export const FinancialDecimal = DecimalConstructor.clone({
   precision: 30,                     // Precisión máxima para análisis
   rounding: Decimal.ROUND_HALF_EVEN, // Banker's rounding
   toExpNeg: -12,                     // Para porcentajes muy pequeños
@@ -55,7 +58,7 @@ export const FinancialDecimal = Decimal.clone({
  * Configuración para recetas y costos de producción
  * Optimizada para cálculos de ingredientes y yields
  */
-export const RecipeDecimal = Decimal.clone({
+export const RecipeDecimal = DecimalConstructor.clone({
   precision: 18,                     // Balanceada para recetas
   rounding: Decimal.ROUND_HALF_EVEN, // Consistencia en escalado
   toExpNeg: -8,
@@ -88,3 +91,6 @@ export const DECIMAL_CONSTANTS = {
 
 // Export default para retrocompatibilidad
 export default Decimal;
+
+// Re-export Decimal como named export
+export { Decimal };

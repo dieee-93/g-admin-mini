@@ -17,13 +17,13 @@ interface CustomerIntelligenceProps {
 
 export const CustomerIntelligence: React.FC<CustomerIntelligenceProps> = ({ analytics }) => {
   return (
-    <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>
+    <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap="6">
       <CardWrapper>
         <CardWrapper.Header>
           <Text fontSize="lg" fontWeight="semibold">Churn Prediction</Text>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <VStack align="stretch" gap={4}>
+          <VStack align="stretch" gap="4">
             <HStack justify="space-between">
               <Text>At-Risk Customers</Text>
               <Badge colorPalette="red" size="lg">
@@ -55,7 +55,7 @@ export const CustomerIntelligence: React.FC<CustomerIntelligenceProps> = ({ anal
           <Text fontSize="lg" fontWeight="semibold">Customer Lifetime Value</Text>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <VStack align="stretch" gap={4}>
+          <VStack align="stretch" gap="4">
             <HStack justify="space-between">
               <Text>Average CLV</Text>
               <Text fontSize="xl" fontWeight="bold" color="green.600">

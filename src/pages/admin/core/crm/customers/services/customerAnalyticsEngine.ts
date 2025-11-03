@@ -2,7 +2,12 @@
 // CUSTOMER ANALYTICS ENGINE - Business Logic
 // ============================================================================
 // Sistema inteligente de análisis de comportamiento y segmentación de clientes
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 
+// TODO: These imports are for future precise financial calculations
+// DecimalUtils: For CLV, AOV, and revenue calculations with banking precision
+// InventoryDecimal: For inventory-related customer analytics
+// DECIMAL_CONSTANTS: For rounding and precision configuration
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 

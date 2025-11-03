@@ -242,12 +242,20 @@ export class ModuleRegistry implements IModuleRegistry {
    * @param handler - Handler function
    * @param moduleId - Module registering the hook (optional, for tracking)
    * @param priority - Execution priority (higher = earlier, default: 10)
+   * @param options - Optional hook configuration (NEW: includes requiredPermission)
    */
   public addAction<T = any, R = any>(
     hookName: string,
     handler: HookHandler<T, R>,
     moduleId?: string,
-    priority: number = 10
+    priority: number = 10,
+    options?: {
+      requiredPermission?: {
+        module: string;
+        action: string;
+      };
+      metadata?: Record<string, any>;
+    }
   ): void {
     if (!this.hooks.has(hookName)) {
       this.hooks.set(hookName, []);
@@ -259,6 +267,8 @@ export class ModuleRegistry implements IModuleRegistry {
         moduleId: moduleId || 'unknown',
         hookName,
         timestamp: Date.now(),
+        requiredPermission: options?.requiredPermission,
+        metadata: options?.metadata,
       },
       priority,
     };
@@ -272,12 +282,17 @@ export class ModuleRegistry implements IModuleRegistry {
     logger.debug('App', `Hook registered: ${hookName}`, {
       moduleId: registeredHook.context.moduleId,
       priority,
+      requiredPermission: options?.requiredPermission,
       totalHandlers: hooks.length,
     });
   }
 
   /**
    * Execute all handlers for a hook
+   *
+   * 🔒 PERMISSIONS: Hooks with requiredPermission are NOT filtered here.
+   * Permission filtering happens at HookPoint component level.
+   * If calling doAction programmatically, ensure proper permission checks.
    *
    * @param hookName - Hook identifier
    * @param data - Data to pass to handlers

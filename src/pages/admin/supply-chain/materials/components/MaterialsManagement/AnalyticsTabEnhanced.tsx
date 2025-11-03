@@ -14,9 +14,11 @@ export function AnalyticsTabEnhanced() {
   // Calculate ABC analysis
   const totalValue = materials.reduce((sum, item) => sum + (item.stock * (item.unit_cost || 0)), 0);
 
-  const classA = materials.filter(item => (item as any).abcClass === 'A');
-  const classB = materials.filter(item => (item as any).abcClass === 'B');
-  const classC = materials.filter(item => (item as any).abcClass === 'C');
+  type MaterialWithABC = typeof materials[0] & { abcClass?: 'A' | 'B' | 'C' };
+
+  const classA = materials.filter(item => (item as MaterialWithABC).abcClass === 'A');
+  const classB = materials.filter(item => (item as MaterialWithABC).abcClass === 'B');
+  const classC = materials.filter(item => (item as MaterialWithABC).abcClass === 'C');
 
   const valueA = classA.reduce((sum, item) => sum + (item.stock * (item.unit_cost || 0)), 0);
   const valueB = classB.reduce((sum, item) => sum + (item.stock * (item.unit_cost || 0)), 0);
@@ -31,12 +33,16 @@ export function AnalyticsTabEnhanced() {
 
   // Prepare data for Bar Chart (Top 10 by value)
   const top10ByValue: BarChartDataPoint[] = materials
-    .map(item => ({
-      name: item.name.length > 20 ? item.name.substring(0, 20) + '...' : item.name,
-      value: item.stock * (item.unit_cost || 0),
-      color: (item as any).abcClass === 'A' ? '#e53e3e' :
-             (item as any).abcClass === 'B' ? '#dd6b20' : '#38a169'
-    }))
+    .map(item => {
+      const materialABC = item as MaterialWithABC;
+      const abcColor = materialABC.abcClass === 'A' ? '#e53e3e' :
+                       materialABC.abcClass === 'B' ? '#dd6b20' : '#38a169';
+      return {
+        name: item.name.length > 20 ? item.name.substring(0, 20) + '...' : item.name,
+        value: item.stock * (item.unit_cost || 0),
+        color: abcColor
+      };
+    })
     .sort((a, b) => b.value - a.value)
     .slice(0, 10);
 
@@ -143,8 +149,8 @@ export function AnalyticsTabEnhanced() {
           Análisis Detallado por Clase
         </Typography>
 
-        {['A', 'B', 'C'].map((abcClass) => {
-          const classItems = materials.filter(item => (item as any).abcClass === abcClass);
+        {(['A', 'B', 'C'] as const).map((abcClass) => {
+          const classItems = materials.filter(item => (item as MaterialWithABC).abcClass === abcClass);
           const classValue = classItems.reduce((sum, item) => sum + (item.stock * (item.unit_cost || 0)), 0);
           const classColor = abcClass === 'A' ? 'red' : abcClass === 'B' ? 'orange' : 'green';
 

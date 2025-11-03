@@ -16,6 +16,7 @@ import { Box, Stack, Typography, Icon, Badge } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { TableCellsIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/lib/supabase/client';
+import { logger } from '@/lib/logging';
 
 interface TableStats {
   totalTables: number;
@@ -69,7 +70,7 @@ export function TablesWidget() {
           averageOccupancy
         });
       } catch (err) {
-        console.error('Error loading table stats:', err);
+        logger.error('TablesWidget', 'Error loading table stats:', err);
         setStats({
           totalTables: 0,
           occupiedTables: 0,
@@ -149,7 +150,9 @@ export function TablesWidget() {
               borderRadius="full"
               color="cyan.600"
             >
-              <Icon icon={TableCellsIcon} size="lg" />
+              <Icon size="lg">
+                <TableCellsIcon />
+              </Icon>
             </Stack>
           </Stack>
 

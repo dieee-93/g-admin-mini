@@ -1,8 +1,9 @@
 // DistributedEventBusFactory.ts - Factory pattern for managing multiple distributed EventBus instances
 // Supports microfrontend architecture with isolated instances and cross-instance communication
 
-import { DistributedEventBus, DistributedConfig } from './DistributedEventBus';
-import { EventBusConfig, ModuleId } from '../types';
+import { DistributedEventBus } from './DistributedEventBus';
+import type { DistributedConfig } from './DistributedEventBus';
+import type { EventBusConfig, ModuleId } from '../types';
 import { SecureLogger } from '../utils/SecureLogger';
 
 export interface FactoryConfig {
@@ -147,6 +148,7 @@ export class DistributedEventBusFactory {
 
       return eventBus;
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       // Update status on error
       const info = this.instanceInfo.get(instanceId);
       if (info) {
@@ -156,7 +158,7 @@ export class DistributedEventBusFactory {
       SecureLogger.error('EventBus', 'Failed to create EventBus instance', {
         factoryId: this.config.factoryId,
         instanceId,
-        error: error.message
+        error: err.message
       });
 
       throw error;
@@ -192,6 +194,7 @@ export class DistributedEventBusFactory {
         instanceId
       });
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       info.status = 'error';
       throw error;
     }
@@ -217,6 +220,7 @@ export class DistributedEventBusFactory {
         instanceId
       });
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       info.status = 'error';
       throw error;
     }
@@ -248,10 +252,11 @@ export class DistributedEventBusFactory {
         instanceId
       });
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Error destroying EventBus instance', {
         factoryId: this.config.factoryId,
         instanceId,
-        error: error.message
+        error: err.message
       });
       throw error;
     }
@@ -307,11 +312,12 @@ export class DistributedEventBusFactory {
       try {
         await eventBus.emit(pattern, payload, options);
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         SecureLogger.error('EventBus', 'Error broadcasting event to instance', {
           factoryId: this.config.factoryId,
           instanceId,
           pattern,
-          error: error.message
+          error: err.message
         });
       }
     });
@@ -464,7 +470,7 @@ export class DistributedEventBusFactory {
         this.destroyInstance(instanceId).catch(error => {
           SecureLogger.error('EventBus', 'Error during cleanup', {
             instanceId,
-            error: error.message
+            error: err.message
           });
         });
       }

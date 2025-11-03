@@ -17,16 +17,13 @@ import {
   Badge,
   SimpleGrid,
   Dialog,
-  Fieldset,
   Slider,
   Icon,
   InputField,
   CardWrapper
 } from '@/shared/ui';
-import { SelectField } from '@/shared/ui';
 import {
   Cog6ToothIcon,
-  ClockIcon,
   CurrencyDollarIcon,
   UsersIcon,
   CheckCircleIcon,
@@ -164,7 +161,7 @@ export function AutoSchedulingModal({
   };
 
   const renderSettingsStep = () => (
-    <VStack align="stretch" gap={6}>
+    <VStack align="stretch" gap="6">
       <Text fontSize="lg" fontWeight="semibold">Configure Auto-Scheduling</Text>
       
       {/* Date Range */}
@@ -176,9 +173,9 @@ export function AutoSchedulingModal({
           </HStack>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <HStack gap={4}>
+          <HStack gap="4">
             <Box flex={1}>
-              <Text fontSize="sm" mb={1}>Start Date</Text>
+              <Text fontSize="sm" mb="1">Start Date</Text>
               <InputField
                 type="date"
                 value={settings.startDate}
@@ -190,7 +187,7 @@ export function AutoSchedulingModal({
               />
             </Box>
             <Box flex={1}>
-              <Text fontSize="sm" mb={1}>End Date</Text>
+              <Text fontSize="sm" mb="1">End Date</Text>
               <InputField
                 type="date"
                 value={settings.endDate}
@@ -210,9 +207,9 @@ export function AutoSchedulingModal({
           </HStack>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <VStack align="stretch" spacing={4}>
+          <VStack align="stretch" gap="4">
             <Box>
-              <HStack justify="space-between" mb={2}>
+              <HStack justify="space-between" mb="2">
                 <Text fontSize="sm">Max Hours per Employee</Text>
                 <Text fontSize="sm" color="blue.500" fontWeight="medium">
                   {settings.maxHoursPerEmployee}h
@@ -237,7 +234,7 @@ export function AutoSchedulingModal({
             </Box>
             
             <Box>
-              <HStack justify="space-between" mb={2}>
+              <HStack justify="space-between" mb="2">
                 <Text fontSize="sm">Overtime Threshold</Text>
                 <Text fontSize="sm" color="orange.500" fontWeight="medium">
                   {settings.overtimeThreshold}h
@@ -274,7 +271,7 @@ export function AutoSchedulingModal({
         </CardWrapper.Header>
         <CardWrapper.Body>
           <Box>
-            <Text fontSize="sm" mb={2}>Maximum Weekly Labor Budget</Text>
+            <Text fontSize="sm" mb="2">Maximum Weekly Labor Budget</Text>
             <InputField
               type="number"
               value={settings.maxWeeklyBudget}
@@ -294,9 +291,9 @@ export function AutoSchedulingModal({
           </HStack>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <VStack align="stretch" spacing={3}>
+          <VStack align="stretch" gap="3">
             <HStack justify="space-between">
-              <VStack align="start" gap={0}>
+              <VStack align="start" gap="0">
                 <Text fontSize="sm">Balance Workload</Text>
                 <Text fontSize="xs" color="gray.600">Distribute hours evenly among employees</Text>
               </VStack>
@@ -312,7 +309,7 @@ export function AutoSchedulingModal({
             </HStack>
 
             <HStack justify="space-between">
-              <VStack align="start" gap={0}>
+              <VStack align="start" gap="0">
                 <Text fontSize="sm">Minimize Cost</Text>
                 <Text fontSize="xs" color="gray.600">Prioritize lower-cost employees</Text>
               </VStack>
@@ -328,7 +325,7 @@ export function AutoSchedulingModal({
             </HStack>
 
             <HStack justify="space-between">
-              <VStack align="start" gap={0}>
+              <VStack align="start" gap="0">
                 <Text fontSize="sm">Prefer Experienced Staff</Text>
                 <Text fontSize="xs" color="gray.600">Prioritize senior employees for busy shifts</Text>
               </VStack>
@@ -346,7 +343,7 @@ export function AutoSchedulingModal({
             <Separator />
             
             <HStack justify="space-between">
-              <VStack align="start" gap={0}>
+              <VStack align="start" gap="0">
                 <Text fontSize="sm">Auto-Apply Schedule</Text>
                 <Text fontSize="xs" color="gray.600">Apply schedule without preview</Text>
               </VStack>
@@ -370,11 +367,11 @@ export function AutoSchedulingModal({
     if (!solution) return null;
 
     return (
-      <VStack align="stretch" spacing={6}>
+      <VStack align="stretch" gap="6">
         <HStack justify="space-between">
           <Text fontSize="lg" fontWeight="semibold">Generated Schedule Preview</Text>
           <Badge 
-            colorScheme={solution.success ? 'green' : 'orange'}
+            colorPalette={solution.success ? 'green' : 'orange'}
             fontSize="sm"
           >
             {solution.success ? 'Optimized' : 'Needs Review'}
@@ -382,9 +379,9 @@ export function AutoSchedulingModal({
         </HStack>
 
         {/* Metrics Overview */}
-        <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4}>
+        <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
           <CardWrapper size="sm">
-            <CardWrapper.Body textAlign="center" py={3}>
+            <CardWrapper.Body textAlign="center" py="3">
               <Text fontSize="2xl" fontWeight="bold" color="blue.500">
                 {solution.metrics.total_shifts}
               </Text>
@@ -393,7 +390,7 @@ export function AutoSchedulingModal({
           </CardWrapper>
           
           <CardWrapper size="sm">
-            <CardWrapper.Body textAlign="center" py={3}>
+            <CardWrapper.Body textAlign="center" py="3">
               <Text fontSize="2xl" fontWeight="bold" color="green.500">
                 {solution.metrics.coverage_rate.toFixed(1)}%
               </Text>
@@ -402,7 +399,7 @@ export function AutoSchedulingModal({
           </CardWrapper>
           
           <CardWrapper size="sm">
-            <CardWrapper.Body textAlign="center" py={3}>
+            <CardWrapper.Body textAlign="center" py="3">
               <Text fontSize="2xl" fontWeight="bold" color="purple.500">
                 ${solution.metrics.total_cost.toLocaleString()}
               </Text>
@@ -411,7 +408,7 @@ export function AutoSchedulingModal({
           </CardWrapper>
           
           <CardWrapper size="sm">
-            <CardWrapper.Body textAlign="center" py={3}>
+            <CardWrapper.Body textAlign="center" py="3">
               <Text fontSize="2xl" fontWeight="bold" color={solution.metrics.overtime_hours > 0 ? 'orange.500' : 'green.500'}>
                 {solution.metrics.overtime_hours}h
               </Text>
@@ -427,11 +424,11 @@ export function AutoSchedulingModal({
               <HStack>
                 <Icon icon={ExclamationTriangleIcon} size="md" />
                 <Text fontWeight="medium">Conflicts & Issues</Text>
-                <Badge colorScheme="orange">{solution.conflicts.length}</Badge>
+                <Badge colorPalette="orange">{solution.conflicts.length}</Badge>
               </HStack>
             </CardWrapper.Header>
             <CardWrapper.Body>
-              <VStack align="stretch" gap={2}>
+              <VStack align="stretch" gap="2">
                 {solution.conflicts.slice(0, 5).map((conflict, index) => (
                   <Alert.Root key={index} status={conflict.severity === 'critical' ? 'error' : 'warning'}>
                     <Alert.Indicator />
@@ -461,10 +458,10 @@ export function AutoSchedulingModal({
               </HStack>
             </CardWrapper.Header>
             <CardWrapper.Body>
-              <VStack align="stretch" gap={2}>
+              <VStack align="stretch" gap="2">
                 {solution.recommendations.map((rec, index) => (
                   <HStack key={index}>
-                    <Box w={2} h={2} bg="blue.400" borderRadius="full" mt={2} />
+                    <Box w="2" h="2" bg="blue.400" borderRadius="full" mt="2" />
                     <Text fontSize="sm">{rec}</Text>
                   </HStack>
                 ))}
@@ -477,7 +474,7 @@ export function AutoSchedulingModal({
   };
 
   const renderCompleteStep = () => (
-    <VStack align="stretch" gap={6} textAlign="center">
+    <VStack align="stretch" gap="6" textAlign="center">
       <Icon icon={CheckCircleIcon} size="3xl" color="var(--chakra-colors-green-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
       <Text fontSize="xl" fontWeight="semibold">Schedule Applied Successfully!</Text>
       <Text color="gray.600">
@@ -486,7 +483,7 @@ export function AutoSchedulingModal({
       </Text>
       
       {solution && (
-        <SimpleGrid columns={2} spacing={4} mt={4}>
+        <SimpleGrid columns={2} gap="4" mt="4">
           <Box textAlign="center">
             <Text fontSize="2xl" fontWeight="bold" color="green.500">
               {solution.metrics.total_shifts}
@@ -529,13 +526,13 @@ export function AutoSchedulingModal({
           <Dialog.Body>
             {/* Progress Bar */}
             {isGenerating && (
-              <Box mb={6}>
+              <Box mb="6">
                 <Progress.Root value={progress} colorPalette="blue">
                   <Progress.Track>
                     <Progress.Range />
                   </Progress.Track>
                 </Progress.Root>
-                <Text fontSize="sm" color="gray.600" mt={1}>
+                <Text fontSize="sm" color="gray.600" mt="1">
                   {progress < 30 ? 'Analyzing constraints...' :
                    progress < 80 ? 'Generating optimal schedule...' :
                    'Finalizing schedule...'}
@@ -567,7 +564,7 @@ export function AutoSchedulingModal({
 
                 {currentStep === 'settings' && (
                   <Button
-                    colorScheme="blue"
+                    colorPalette="blue"
                     onClick={handleGenerateSchedule}
                     loading={isGenerating}
                   >
@@ -577,7 +574,7 @@ export function AutoSchedulingModal({
 
                 {currentStep === 'preview' && solution && (
                   <Button
-                    colorScheme="green"
+                    colorPalette="green"
                     onClick={handleApplySchedule}
                     disabled={!solution.success && solution.conflicts.filter(c => c.severity === 'critical').length > 0}
                   >

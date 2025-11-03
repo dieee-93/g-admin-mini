@@ -90,7 +90,7 @@ export function SuppliersTable({
 
   if (loading) {
     return (
-      <Stack direction="column" align="center" justify="center" py={12}>
+      <Stack direction="column" align="center" justify="center" py="12">
         <Text color="fg.muted" fontSize="lg">
           Cargando proveedores...
         </Text>
@@ -100,7 +100,7 @@ export function SuppliersTable({
 
   if (suppliers.length === 0) {
     return (
-      <Stack direction="column" align="center" justify="center" py={16} gap={2}>
+      <Stack direction="column" align="center" justify="center" py="16" gap="2">
         <Text fontSize="xl" fontWeight="semibold">
           No hay proveedores
         </Text>
@@ -155,7 +155,7 @@ export function SuppliersTable({
 
             {/* Email/Phone */}
             <Table.Cell>
-              <Stack direction="column" gap={0.5}>
+              <Stack direction="column" gap="0.5">
                 {supplier.email && (
                   <span style={{ fontSize: '0.875rem' }}>{supplier.email}</span>
                 )}
@@ -171,7 +171,7 @@ export function SuppliersTable({
             {/* Rating */}
             <Table.Cell>
               {supplier.rating ? (
-                <Stack direction="row" align="center" gap={1}>
+                <Stack direction="row" align="center" gap="1">
                   <Icon icon={StarIcon} size="xs" color="yellow.500" />
                   <span>{supplier.rating.toFixed(1)}</span>
                 </Stack>
@@ -199,7 +199,7 @@ export function SuppliersTable({
 
             {/* Actions */}
             <Table.Cell textAlign="right">
-              <Stack direction="row" gap={1} justify="flex-end">
+              <Stack direction="row" gap="1" justify="flex-end">
                 <Button
                   size="sm"
                   variant="ghost"
@@ -252,7 +252,7 @@ export function SuppliersTable({
         <Dialog.Content>
           <Dialog.Header>
             <Dialog.Title>
-              <Stack direction="row" align="center" gap={2}>
+              <Stack direction="row" align="center" gap="2">
                 <Icon icon={ExclamationTriangleIcon} size="md" color="red.500" />
                 Eliminar Proveedor
               </Stack>
@@ -260,7 +260,7 @@ export function SuppliersTable({
           </Dialog.Header>
 
           <Dialog.Body>
-            <Stack direction="column" gap={3}>
+            <Stack direction="column" gap="3">
               <Text>
                 ¿Estás seguro que deseas eliminar el proveedor{' '}
                 <strong>{deleteDialog.supplier?.name}</strong>?

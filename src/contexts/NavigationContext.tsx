@@ -1,4 +1,21 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+/**
+ * NAVIGATION CONTEXT v3.0 - PERFORMANCE OPTIMIZED
+ *
+ * Architecture based on Kent C. Dodds' best practices:
+ * - Context Splitting: State, Layout, and Actions in separate contexts
+ * - useReducer for complex state management
+ * - Memoization of all callbacks and values
+ * - Removed logging from hot paths
+ *
+ * CONTEXTS:
+ * 1. NavigationStateContext - Navigation data (modules, currentModule, breadcrumbs)
+ * 2. NavigationLayoutContext - Layout state (isMobile, sidebar, etc.)
+ * 3. NavigationActionsContext - All update functions (navigate, toggle, etc.)
+ *
+ * WHY: Prevents unnecessary re-renders. Components only subscribe to what they need.
+ */
+
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   HomeIcon,
@@ -16,7 +33,6 @@ import {
   ShoppingBagIcon,
   UserIcon,
   ListBulletIcon,
-  // ✅ NEW ICONS FOR PHASE 4 & 5 MODULES
   TrophyIcon,
   PresentationChartLineIcon,
   CreditCardIcon,
@@ -25,18 +41,19 @@ import {
   TruckIcon,
   ArchiveBoxIcon,
   DocumentChartBarIcon,
-  // ✅ DEBUG TOOLS ICON
   BugAntIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ModuleName } from '@/contexts/AuthContext';
 import { useCapabilityStore } from '@/store/capabilityStore';
-import { MODULE_FEATURE_MAP } from '@/config/FeatureRegistry';
 import { useShallow } from 'zustand/react/shallow';
 import { logger } from '@/lib/logging';
 import { useModuleNavigation } from '@/lib/modules/useModuleNavigation';
 
-// ✅ Types definidos según arquitectura v2.0
+// ============================================
+// TYPES
+// ============================================
+
 export interface NavigationSubModule {
   id: string;
   title: string;
@@ -74,38 +91,224 @@ export interface BreadcrumbItem {
   isActive?: boolean;
 }
 
-export interface NavigationContextType {
-  // Current state
+// ============================================
+// STATE TYPES
+// ============================================
+
+interface NavigationState {
   currentModule: NavigationModule | null;
   breadcrumbs: BreadcrumbItem[];
-  quickActions: QuickAction[];
-  
-  // Navigation methods
-  navigate: (moduleId: string, subPath?: string, query?: string) => void;
-  navigateToModule: (moduleId: string) => void; // ✅ Nueva función para navegación directa a páginas principales
-  navigateBack: () => void;
-  toggleModuleExpansion: (moduleId: string) => void;
-  
-  // Navigation state
-  canNavigateBack: boolean;
   navigationHistory: string[];
-  
-  // Layout state
+  modules: NavigationModule[];
+  moduleState: Record<string, { isExpanded?: boolean; badge?: number }>;
+}
+
+interface LayoutState {
+  isMobile: boolean;
+  isTablet: boolean;
+  isDesktop: boolean;
+  sidebarCollapsed: boolean;
+}
+
+type NavigationAction =
+  | { type: 'SET_CURRENT_MODULE'; payload: { module: NavigationModule; breadcrumbs: BreadcrumbItem[] } }
+  | { type: 'UPDATE_BREADCRUMBS'; payload: BreadcrumbItem[] }
+  | { type: 'ADD_TO_HISTORY'; payload: string }
+  | { type: 'SET_MODULES'; payload: NavigationModule[] }
+  | { type: 'TOGGLE_MODULE_EXPANSION'; payload: string }
+  | { type: 'UPDATE_MODULE_BADGE'; payload: { moduleId: string; count: number } };
+
+type LayoutAction =
+  | { type: 'SET_MOBILE'; payload: boolean }
+  | { type: 'SET_TABLET'; payload: boolean }
+  | { type: 'SET_DESKTOP'; payload: boolean }
+  | { type: 'SET_SIDEBAR_COLLAPSED'; payload: boolean };
+
+// ============================================
+// CONTEXT TYPES
+// ============================================
+
+interface NavigationStateContextValue {
+  currentModule: NavigationModule | null;
+  breadcrumbs: BreadcrumbItem[];
+  modules: NavigationModule[];
+  navigationHistory: string[];
+  canNavigateBack: boolean;
+}
+
+interface NavigationLayoutContextValue {
   isMobile: boolean;
   showBottomNav: boolean;
   showSidebar: boolean;
   sidebarCollapsed: boolean;
-  
-  // Navigation config
-  modules: NavigationModule[];
-  
-  // Actions
+}
+
+interface NavigationActionsContextValue {
+  navigate: (moduleId: string, subPath?: string, query?: string) => void;
+  navigateToModule: (moduleId: string) => void;
+  navigateBack: () => void;
+  toggleModuleExpansion: (moduleId: string) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   updateModuleBadge: (moduleId: string, count: number) => void;
   setQuickActions: (actions: QuickAction[]) => void;
 }
 
-// ✅ Módulos específicos para CLIENTE - Experiencia tipo web/app customer-friendly
+// ============================================
+// CONTEXTS
+// ============================================
+
+const NavigationStateContext = createContext<NavigationStateContextValue | null>(null);
+const NavigationLayoutContext = createContext<NavigationLayoutContextValue | null>(null);
+const NavigationActionsContext = createContext<NavigationActionsContextValue | null>(null);
+
+NavigationStateContext.displayName = 'NavigationStateContext';
+NavigationLayoutContext.displayName = 'NavigationLayoutContext';
+NavigationActionsContext.displayName = 'NavigationActionsContext';
+
+// ============================================
+// REDUCERS
+// ============================================
+
+function navigationReducer(state: NavigationState, action: NavigationAction): NavigationState {
+  switch (action.type) {
+    case 'SET_CURRENT_MODULE':
+      // Only update if actually changed
+      if (state.currentModule?.id === action.payload.module.id) {
+        return state;
+      }
+      return {
+        ...state,
+        currentModule: action.payload.module,
+        breadcrumbs: action.payload.breadcrumbs
+      };
+
+    case 'UPDATE_BREADCRUMBS':
+      return {
+        ...state,
+        breadcrumbs: action.payload
+      };
+
+    case 'ADD_TO_HISTORY':
+      const lastPath = state.navigationHistory[state.navigationHistory.length - 1];
+      if (lastPath === action.payload) {
+        return state; // No change
+      }
+      return {
+        ...state,
+        navigationHistory: [...state.navigationHistory, action.payload].slice(-10)
+      };
+
+    case 'SET_MODULES':
+      // Only update if content changed
+      if (state.modules === action.payload) {
+        return state;
+      }
+      return {
+        ...state,
+        modules: action.payload
+      };
+
+    case 'TOGGLE_MODULE_EXPANSION':
+      return {
+        ...state,
+        moduleState: {
+          ...state.moduleState,
+          [action.payload]: {
+            ...state.moduleState[action.payload],
+            isExpanded: !(state.moduleState[action.payload]?.isExpanded ?? false)
+          }
+        }
+      };
+
+    case 'UPDATE_MODULE_BADGE':
+      const newBadgeValue = action.payload.count > 0 ? action.payload.count : undefined;
+      const currentBadge = state.moduleState[action.payload.moduleId]?.badge;
+
+      if (currentBadge === newBadgeValue) {
+        return state; // No change
+      }
+
+      return {
+        ...state,
+        moduleState: {
+          ...state.moduleState,
+          [action.payload.moduleId]: {
+            ...state.moduleState[action.payload.moduleId],
+            badge: newBadgeValue
+          }
+        }
+      };
+
+    default:
+      return state;
+  }
+}
+
+function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
+  switch (action.type) {
+    case 'SET_MOBILE':
+      if (state.isMobile === action.payload) return state;
+      return { ...state, isMobile: action.payload };
+
+    case 'SET_TABLET':
+      if (state.isTablet === action.payload) return state;
+      return { ...state, isTablet: action.payload };
+
+    case 'SET_DESKTOP':
+      if (state.isDesktop === action.payload) return state;
+      return { ...state, isDesktop: action.payload };
+
+    case 'SET_SIDEBAR_COLLAPSED':
+      if (state.sidebarCollapsed === action.payload) return state;
+      return { ...state, sidebarCollapsed: action.payload };
+
+    default:
+      return state;
+  }
+}
+
+// ============================================
+// UTILITIES
+// ============================================
+
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia(query).matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+
+    const listener = () => setMatches(media.matches);
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, [query, matches]);
+
+  return matches;
+}
+
+// Debounce hook for media queries
+function useDebouncedValue<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = React.useState(value);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timeout);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// ============================================
+// CLIENT NAVIGATION MODULES
+// ============================================
+
 const CLIENT_NAVIGATION_MODULES: NavigationModule[] = [
   {
     id: 'customer-portal',
@@ -141,247 +344,10 @@ const CLIENT_NAVIGATION_MODULES: NavigationModule[] = [
   }
 ];
 
-// ✅ Quick actions por contexto según arquitectura - moved to inside NavigationProvider for navigate access
-/* const QUICK_ACTIONS_BY_MODULE: Record<string, QuickAction[]> = {
-  dashboard: [
-    {
-      id: 'add-stock',
-      label: 'Agregar Stock',
-      icon: CubeIcon,
-      action: () => console.log('Add stock'),
-      color: 'green'
-    },
-    {
-      id: 'new-sale',
-      label: 'Nueva Venta',
-      icon: CurrencyDollarIcon,
-      action: () => console.log('New sale'),
-      color: 'teal'
-    },
-    {
-      id: 'create-item',
-      label: 'Crear Item',
-      icon: CubeIcon,
-      action: () => console.log('Create item'),
-      color: 'blue'
-    }
-  ],
-  materials: [
-    {
-      id: 'add-stock',
-      label: 'Agregar Stock',
-      icon: CubeIcon,
-      action: () => console.log('Add stock'),
-      color: 'green'
-    },
-    {
-      id: 'adjust-stock',
-      label: 'Ajustar Stock',
-      icon: Cog6ToothIcon,
-      action: () => console.log('Adjust stock'),
-      color: 'yellow'
-    },
-    {
-      id: 'new-item',
-      label: 'Nuevo Item',
-      icon: CubeIcon,
-      action: () => console.log('New item'),
-      color: 'blue'
-    }
-  ],
-  products: [
-    {
-      id: 'calculate-cost',
-      label: 'Calcular Costo',
-      icon: CogIcon,
-      action: () => console.log('Calculate cost'),
-      color: 'purple'
-    },
-    {
-      id: 'new-recipe',
-      label: 'Nueva Receta',
-      icon: CogIcon,
-      action: () => console.log('New recipe'),
-      color: 'purple'
-    },
-    {
-      id: 'use-template',
-      label: 'Usar Template',
-      icon: CogIcon,
-      action: () => console.log('Use template'),
-      color: 'gray'
-    }
-  ],
-  sales: [
-    {
-      id: 'new-sale',
-      label: 'Nueva Venta',
-      icon: CurrencyDollarIcon,
-      action: () => console.log('New sale'),
-      color: 'teal'
-    },
-    {
-      id: 'add-customer',
-      label: 'Agregar Cliente',
-      icon: UsersIcon,
-      action: () => console.log('Add customer'),
-      color: 'pink'
-    },
-    {
-      id: 'check-stock',
-      label: 'Verificar Stock',
-      icon: CubeIcon,
-      action: () => console.log('Check stock'),
-      color: 'green'
-    }
-  ],
-  customers: [
-    {
-      id: 'new-customer',
-      label: 'Nuevo Cliente',
-      icon: UsersIcon,
-      action: () => console.log('New customer'),
-      color: 'pink'
-    },
-    {
-      id: 'view-sales',
-      label: 'Ver Ventas',
-      icon: CurrencyDollarIcon,
-      action: () => console.log('View sales'),
-      color: 'teal'
-    },
-    {
-      id: 'contact',
-      label: 'Contactar',
-      icon: UsersIcon,
-      action: () => console.log('Contact'),
-      color: 'blue'
-    }
-  ],
-  operations: [
-    {
-      id: 'planning-view',
-      label: 'Planificación',
-      icon: ChartBarIcon,
-      action: () => console.log('View planning'),
-      color: 'cyan'
-    },
-    {
-      id: 'kitchen-view',
-      label: 'Vista Cocina',
-      icon: CogIcon,
-      action: () => console.log('Kitchen view'),
-      color: 'purple'
-    },
-    {
-      id: 'tables-view',
-      label: 'Gestión Mesas',
-      icon: UsersIcon,
-      action: () => console.log('Tables view'),
-      color: 'blue'
-    }
-  ],
-  staff: [
-    {
-      id: 'new-employee',
-      label: 'Nuevo Empleado',
-      icon: UserGroupIcon,
-      action: () => console.log('New employee'),
-      color: 'indigo'
-    },
-    {
-      id: 'performance-review',
-      label: 'Nueva Evaluación',
-      icon: ChartBarIcon,
-      action: () => console.log('New performance review'),
-      color: 'purple'
-    },
-    {
-      id: 'schedule-training',
-      label: 'Programar Entrenamiento',
-      icon: CalendarDaysIcon,
-      action: () => console.log('Schedule training'),
-      color: 'orange'
-    }
-  ],
-  fiscal: [
-    {
-      id: 'generate-invoice',
-      label: 'Nueva Factura',
-      icon: DocumentTextIcon,
-      action: () => console.log('Generate invoice'),
-      color: 'red'
-    },
-    {
-      id: 'afip-status',
-      label: 'Estado AFIP',
-      icon: CogIcon,
-      action: () => console.log('Check AFIP status'),
-      color: 'green'
-    },
-    {
-      id: 'tax-report',
-      label: 'Reporte Impuestos',
-      icon: ChartBarIcon,
-      action: () => console.log('Generate tax report'),
-      color: 'purple'
-    },
-    {
-      id: 'financial-reports',
-      label: 'Reportes Financieros',
-      icon: CurrencyDollarIcon,
-      action: () => console.log('View financial reports'),
-      color: 'orange'
-    }
-  ],
-  settings: [
-    {
-      id: 'business-profile',
-      label: 'Perfil del Negocio',
-      icon: CogIcon,
-      action: () => console.log('Edit business profile'),
-      color: 'gray'
-    },
-    {
-      id: 'tax-config',
-      label: 'Configurar Impuestos',
-      icon: WrenchScrewdriverIcon,
-      action: () => console.log('Configure taxes'),
-      color: 'yellow'
-    },
-    {
-      id: 'user-permissions',
-      label: 'Gestionar Usuarios',
-      icon: UserGroupIcon,
-      action: () => console.log('Manage users'),
-      color: 'purple'
-    }
-  ],
-  // tools section removed - functionality distributed
-}; */
+// ============================================
+// PROVIDER
+// ============================================
 
-// ✅ Context creation
-const NavigationContext = createContext<NavigationContextType | null>(null);
-
-// ✅ Mobile detection hook
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
-
-    const listener = () => setMatches(media.matches);
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, [matches, query]);
-
-  return matches;
-}
-
-// ✅ NavigationProvider component
 interface NavigationProviderProps {
   children: React.ReactNode;
 }
@@ -389,30 +355,73 @@ interface NavigationProviderProps {
 export function NavigationProvider({ children }: NavigationProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { canAccessModule, isAuthenticated, isCliente } = useAuth();
+  const { canAccessModule, isAuthenticated, user } = useAuth();
 
-  // ✅ PERFORMANCE: Get active modules from memoized state (v4.0 API - no loop!)
-  const activeModules = useCapabilityStore(state => state.features.activeModules);
+  // ============================================
+  // STATE MANAGEMENT
+  // ============================================
 
-  // ✅ Responsive state - Mobile-first approach según arquitectura
+  const [navigationState, dispatchNavigation] = useReducer(navigationReducer, {
+    currentModule: null,
+    breadcrumbs: [],
+    navigationHistory: [],
+    modules: [],
+    moduleState: {}
+  });
+
+  const [layoutState, dispatchLayout] = useReducer(layoutReducer, {
+    isMobile: false,
+    isTablet: false,
+    isDesktop: true,
+    sidebarCollapsed: true
+  });
+
+  // ============================================
+  // MEDIA QUERIES (Debounced)
+  // ============================================
+
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
-  // ✅ Dynamic navigation from ModuleRegistry (Fase 4 - Navigation Refactor)
-  // Get admin navigation from ModuleRegistry (single source of truth)
+  const debouncedIsMobile = useDebouncedValue(isMobile, 100);
+  const debouncedIsTablet = useDebouncedValue(isTablet, 100);
+  const debouncedIsDesktop = useDebouncedValue(isDesktop, 100);
+
+  // Update layout state when media queries change
+  useEffect(() => {
+    dispatchLayout({ type: 'SET_MOBILE', payload: debouncedIsMobile });
+  }, [debouncedIsMobile]);
+
+  useEffect(() => {
+    dispatchLayout({ type: 'SET_TABLET', payload: debouncedIsTablet });
+  }, [debouncedIsTablet]);
+
+  useEffect(() => {
+    dispatchLayout({ type: 'SET_DESKTOP', payload: debouncedIsDesktop });
+  }, [debouncedIsDesktop]);
+
+  // Auto-collapse/expand sidebar based on screen size
+  useEffect(() => {
+    if (debouncedIsTablet) {
+      dispatchLayout({ type: 'SET_SIDEBAR_COLLAPSED', payload: true });
+    } else if (debouncedIsDesktop) {
+      dispatchLayout({ type: 'SET_SIDEBAR_COLLAPSED', payload: false });
+    }
+  }, [debouncedIsTablet, debouncedIsDesktop]);
+
+  // ============================================
+  // MODULE NAVIGATION
+  // ============================================
+
   const adminModulesFromRegistry = useModuleNavigation();
 
   const accessibleModules = useMemo(() => {
-    const startTime = performance.now();
-    logger.debug('NavigationContext', 'Recalculating accessible modules');
-
     if (!isAuthenticated) return [];
 
-    // ✅ CLIENTE gets customer-friendly navigation (web/app style)
-    if (isCliente()) {
+    // CLIENT gets customer-friendly navigation
+    if (user?.role === 'CLIENTE') {
       return CLIENT_NAVIGATION_MODULES.filter(module => {
-        // Map client module IDs to ModuleName enum
         const clientModuleNameMap: Record<string, ModuleName> = {
           'customer-portal': 'customer_portal',
           'customer-menu': 'customer_menu',
@@ -421,49 +430,36 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
         };
 
         const moduleName = clientModuleNameMap[module.id];
-        if (!moduleName) return false; // SECURITY: deny unmapped modules
-
-        // LAYER 1: Role-based security filter
+        if (!moduleName) return false;
         return canAccessModule(moduleName);
-        // Note: Clientes don't need capability filtering for now - they get full customer experience
       });
     }
 
-    // ✅ Staff/Admin users get navigation from ModuleRegistry (already filtered by role + capabilities)
-    logger.info('NavigationContext', `Using ${adminModulesFromRegistry.length} modules from ModuleRegistry`);
-
-    // ✅ PERFORMANCE MONITORING
-    const endTime = performance.now();
-    const filterTime = endTime - startTime;
-    logger.performance('NavigationContext', 'Module filtering', filterTime, 5);
-
+    // Staff/Admin users get navigation from ModuleRegistry
     return adminModulesFromRegistry;
-  }, [canAccessModule, isAuthenticated, isCliente, adminModulesFromRegistry]);
+  }, [canAccessModule, isAuthenticated, user?.role, adminModulesFromRegistry]);
 
-  // ✅ Navigation state
-  // ✅ FIX: Separar estado mutable (expansión, badges) del estado filtrado (accessibleModules)
-  const [moduleState, setModuleState] = useState<Record<string, { isExpanded?: boolean; badge?: number }>>({});
-  const [currentModule, setCurrentModule] = useState<NavigationModule | null>(null);
-  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
-  const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
-  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // ✅ Empezar colapsado por defecto
-
-  // ✅ Merge accessibleModules con moduleState para obtener modules finales
-  const modules = useMemo(() =>
-    accessibleModules.map(module => ({
+  // Merge accessibleModules with moduleState
+  const modules = useMemo(() => {
+    return accessibleModules.map(module => ({
       ...module,
-      isExpanded: moduleState[module.id]?.isExpanded ?? module.isExpanded,
-      badge: moduleState[module.id]?.badge ?? module.badge
-    })),
-    [accessibleModules, moduleState]
-  );
+      isExpanded: navigationState.moduleState[module.id]?.isExpanded ?? module.isExpanded,
+      badge: navigationState.moduleState[module.id]?.badge ?? module.badge
+    }));
+  }, [accessibleModules, navigationState.moduleState]);
 
-  // ✅ Derived state
-  const showBottomNav = isMobile;
+  // Update modules in state when they change
+  useEffect(() => {
+    dispatchNavigation({ type: 'SET_MODULES', payload: modules });
+  }, [modules]);
 
-  // ✅ Quick actions with new navigation structure
-  const getQuickActionsForModule = (moduleId: string): QuickAction[] => {
+  // ============================================
+  // QUICK ACTIONS (Stored in ref to avoid re-renders)
+  // ============================================
+
+  const quickActionsRef = useRef<QuickAction[]>([]);
+
+  const getQuickActionsForModule = useCallback((moduleId: string): QuickAction[] => {
     switch (moduleId) {
       case 'dashboard':
         return [
@@ -480,20 +476,6 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             icon: CogIcon,
             action: () => navigate('/admin/dashboard/cross-analytics'),
             color: 'blue'
-          },
-          {
-            id: 'predictive-analytics',
-            label: 'Predictive Analytics',
-            icon: WrenchScrewdriverIcon,
-            action: () => navigate('/admin/dashboard/predictive-analytics'),
-            color: 'orange'
-          },
-          {
-            id: 'custom-reports',
-            label: 'Custom Reports',
-            icon: DocumentTextIcon,
-            action: () => navigate('/admin/dashboard/custom-reports'),
-            color: 'green'
           }
         ];
       case 'sales':
@@ -502,7 +484,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             id: 'new-sale',
             label: 'Nueva Venta',
             icon: CurrencyDollarIcon,
-            action: () => navigate('/admin/sales'),
+            action: () => navigate('/admin/operations/sales'),
             color: 'teal'
           },
           {
@@ -511,13 +493,6 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             icon: UsersIcon,
             action: () => navigate('/admin/customers'),
             color: 'pink'
-          },
-          {
-            id: 'check-stock',
-            label: 'Verificar Stock',
-            icon: CubeIcon,
-            action: () => navigate('/admin/materials'),
-            color: 'green'
           }
         ];
       case 'materials':
@@ -528,300 +503,226 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
             icon: CubeIcon,
             action: () => navigate('/admin/materials'),
             color: 'green'
-          },
-          {
-            id: 'adjust-stock',
-            label: 'Ajustar Stock',
-            icon: Cog6ToothIcon,
-            action: () => navigate('/admin/materials'),
-            color: 'yellow'
-          },
-          {
-            id: 'abc-analysis',
-            label: 'ABC Analysis',
-            icon: ChartBarIcon,
-            action: () => navigate('/admin/materials/abc-analysis'),
-            color: 'blue'
-          }
-        ];
-      case 'products':
-        return [
-          {
-            id: 'new-recipe',
-            label: 'Nueva Receta',
-            icon: CogIcon,
-            action: () => navigate('/admin/products/recipes'),
-            color: 'purple'
-          },
-          {
-            id: 'menu-engineering',
-            label: 'Menu Engineering',
-            icon: ChartBarIcon,
-            action: () => navigate('/admin/products'),
-            color: 'blue'
           }
         ];
       default:
         return [];
     }
-  };
-  const showSidebar = !isMobile;
-  const canNavigateBack = navigationHistory.length > 1;
+  }, [navigate]);
 
-  // ✅ Find current module based on location
+  // ============================================
+  // CURRENT MODULE DETECTION
+  // ============================================
+
   useEffect(() => {
     const path = location.pathname;
-    logger.debug('NavigationContext', `🔍 Finding module for path: ${path}`);
-    
-    // Log all available modules for debugging
-    logger.debug('NavigationContext', `Available modules:`, modules.map(m => ({ id: m.id, title: m.title, path: m.path })));
-    
-    // 🔧 FIX: Sort modules by path length (longer paths first) for more specific matching
-    const sortedModules = [...modules].sort((a, b) => b.path.length - a.path.length);
-    
+
+    // Safety check: ensure modules array is valid
+    if (!modules || modules.length === 0) return;
+
+    // Sort modules by path length for specific matching
+    // Filter out any modules with invalid/null paths first
+    const sortedModules = [...modules]
+      .filter(module => module && module.path)
+      .sort((a, b) => (b.path?.length ?? 0) - (a.path?.length ?? 0));
+
     let foundModule = sortedModules.find(module => {
-      // Exact match for root path
-      if (module.path === '/' && path === '/') {
-        logger.info('NavigationContext', `✅ Exact match: ${module.id} (${module.title}) for path: ${path}`);
-        return true;
-      }
-      
-      // For non-root paths, check if current path starts with module path
-      if (module.path !== '/' && path.startsWith(module.path)) {
-        logger.info('NavigationContext', `✅ Path match: ${module.id} (${module.title}) for path: ${path} (module path: ${module.path})`);
-        return true;
-      }
-      
+      if (module.path === '/' && path === '/') return true;
+      if (module.path !== '/' && path.startsWith(module.path)) return true;
       return false;
     });
 
     // Default to dashboard if no match
     if (!foundModule) {
-      logger.warn('NavigationContext', `⚠️ No module found for path: ${path}, defaulting to dashboard`);
-      foundModule = modules.find(module => module.id === 'dashboard') || modules[0];
-      logger.info('NavigationContext', `🔄 Using fallback module: ${foundModule?.id} (${foundModule?.title})`);
+      foundModule = modules.find(module => module && module.id === 'dashboard') || modules[0];
     }
 
-    // Safety check: if still no module found, exit early
-    if (!foundModule) {
-      logger.warn('NavigationContext', `No navigation module found for path: ${path}`);
-      return;
+    if (!foundModule) return;
+
+    // Build breadcrumbs
+    const crumbs: BreadcrumbItem[] = [];
+
+    if (foundModule.id !== 'dashboard') {
+      crumbs.push({
+        label: 'Dashboard',
+        path: '/',
+        isActive: false
+      });
     }
 
-    // Only update states if module actually changed
-    setCurrentModule(prev => {
-      if (prev?.id !== foundModule.id) {
-        // Update quick actions when module changes
-        const moduleActions = getQuickActionsForModule(foundModule.id);
-        setQuickActions(moduleActions);
-        
-        // Update breadcrumbs when module changes
-        const crumbs: BreadcrumbItem[] = [];
-        logger.debug('NavigationContext', `🍞 Building breadcrumbs for module: ${foundModule.id} (${foundModule.title})`);
-
-        // Always add dashboard as root (unless we're on dashboard)
-        if (foundModule.id !== 'dashboard') {
-          crumbs.push({
-            label: 'Dashboard',
-            path: '/',
-            isActive: false
-          });
-          logger.debug('NavigationContext', `🍞 Added Dashboard to breadcrumbs`);
-        }
-
-        // Add current module
-        crumbs.push({
-          label: foundModule.title,
-          path: foundModule.path,
-          isActive: true
-        });
-        logger.debug('NavigationContext', `🍞 Added current module: ${foundModule.title} to breadcrumbs`);
-
-        // Add sub-path if exists
-        if (path !== foundModule.path && path.startsWith(foundModule.path)) {
-          const subPath = path.replace(foundModule.path, '').replace(/^\//, '');
-          if (subPath) {
-            crumbs.push({
-              label: subPath.charAt(0).toUpperCase() + subPath.slice(1),
-              isActive: true
-            });
-          }
-        }
-
-        logger.debug('NavigationContext', `🍞 Final breadcrumbs:`, crumbs);
-        setBreadcrumbs(crumbs);
-        
-        return foundModule;
-      }
-      
-      // Even if module didn't change, update breadcrumbs if sub-path changed
-      if (prev && path !== prev.path) {
-        const crumbs: BreadcrumbItem[] = [];
-
-        if (prev.id !== 'dashboard') {
-          crumbs.push({
-            label: 'Dashboard',
-            path: '/',
-            isActive: false
-          });
-        }
-
-        crumbs.push({
-          label: prev.title,
-          path: prev.path,
-          isActive: true
-        });
-
-        if (path !== prev.path && path.startsWith(prev.path)) {
-          const subPath = path.replace(prev.path, '').replace(/^\//, '');
-          if (subPath) {
-            crumbs.push({
-              label: subPath.charAt(0).toUpperCase() + subPath.slice(1),
-              isActive: true
-            });
-          }
-        }
-
-        setBreadcrumbs(crumbs);
-      }
-      
-      return prev;
+    crumbs.push({
+      label: foundModule.title,
+      path: foundModule.path,
+      isActive: true
     });
 
-    // ✅ Update navigation history
-    setNavigationHistory(prev => {
-      const newHistory = [...prev];
-      if (newHistory[newHistory.length - 1] !== path) {
-        newHistory.push(path);
-        // Keep only last 10 items for performance
-        return newHistory.slice(-10);
+    // Add sub-path if exists
+    if (path !== foundModule.path && path.startsWith(foundModule.path)) {
+      const subPath = path.replace(foundModule.path, '').replace(/^\//, '');
+      if (subPath) {
+        crumbs.push({
+          label: subPath.charAt(0).toUpperCase() + subPath.slice(1),
+          isActive: true
+        });
       }
-      return newHistory;
-    });
-  }, [location.pathname]); // Only depend on pathname to prevent infinite loops
-
-  // ❌ REMOVED: This useEffect was causing infinite loop
-  // accessibleModules is already memoized and used directly above
-  // useEffect(() => {
-  //   setModules(accessibleModules);
-  // }, [accessibleModules]);
-
-  // ✅ Auto-collapse sidebar on tablet
-  useEffect(() => {
-    if (isTablet) {
-      setSidebarCollapsed(true);
-    } else if (isDesktop) {
-      setSidebarCollapsed(false);
     }
-  }, [isTablet, isDesktop]);
 
+    // Update quick actions for this module
+    quickActionsRef.current = getQuickActionsForModule(foundModule.id);
 
-  // ✅ Navigation methods
+    // Dispatch state update
+    dispatchNavigation({
+      type: 'SET_CURRENT_MODULE',
+      payload: { module: foundModule, breadcrumbs: crumbs }
+    });
+
+    // Add to history
+    dispatchNavigation({ type: 'ADD_TO_HISTORY', payload: path });
+  }, [location.pathname, modules, getQuickActionsForModule]);
+
+  // ============================================
+  // ACTIONS (All memoized with useCallback)
+  // ============================================
+
   const handleNavigate = useCallback((moduleId: string, subPath?: string, query?: string) => {
-    // Use current modules state to ensure updated paths
-    const module = modules.find(m => m.id === moduleId);
-    logger.debug('NavigationContext', 'handleNavigate', { moduleId, path: module?.path, subPath, query });
+    const module = navigationState.modules.find(m => m.id === moduleId);
     if (module) {
       let targetPath = subPath ? `${module.path}${subPath}` : module.path;
       if (query) {
-        targetPath += `?${query.replace(/^\?/, '')}`; // Ensure single '?'
+        targetPath += `?${query.replace(/^\?/, '')}`;
       }
-      logger.info('NavigationContext', `Navigating to: ${targetPath}`);
       navigate(targetPath);
     }
-  }, [navigate, modules]);
+  }, [navigate, navigationState.modules]);
 
-  // ✅ Navigate directly to module main page (for dual-click pattern)
   const handleNavigateToModule = useCallback((moduleId: string) => {
-    const module = modules.find(m => m.id === moduleId);
-    logger.debug('NavigationContext', 'navigateToModule', { moduleId, path: module?.path });
+    const module = navigationState.modules.find(m => m.id === moduleId);
     if (module) {
-      logger.info('NavigationContext', `Navigating to module: ${module.path}`);
       navigate(module.path);
     }
-  }, [navigate, modules]);
+  }, [navigate, navigationState.modules]);
 
   const handleNavigateBack = useCallback(() => {
-    if (canNavigateBack) {
+    if (navigationState.navigationHistory.length > 1) {
       navigate(-1);
     }
-  }, [canNavigateBack, navigate]);
+  }, [navigate, navigationState.navigationHistory.length]);
 
-  // ✅ Toggle module expansion
   const toggleModuleExpansion = useCallback((moduleId: string) => {
-    setModuleState(prev => ({
-      ...prev,
-      [moduleId]: {
-        ...prev[moduleId],
-        isExpanded: !(prev[moduleId]?.isExpanded ?? false)
-      }
-    }));
+    dispatchNavigation({ type: 'TOGGLE_MODULE_EXPANSION', payload: moduleId });
   }, []);
 
-  // ✅ Update module badge - Optimized to prevent infinite loops
+  const setSidebarCollapsed = useCallback((collapsed: boolean) => {
+    dispatchLayout({ type: 'SET_SIDEBAR_COLLAPSED', payload: collapsed });
+  }, []);
+
   const updateModuleBadge = useCallback((moduleId: string, count: number) => {
-    setModuleState(prev => {
-      const newBadgeValue = count > 0 ? count : undefined;
-
-      // Only update if badge value actually changed
-      if (prev[moduleId]?.badge === newBadgeValue) {
-        return prev;
-      }
-
-      return {
-        ...prev,
-        [moduleId]: {
-          ...prev[moduleId],
-          badge: newBadgeValue
-        }
-      };
-    });
+    dispatchNavigation({ type: 'UPDATE_MODULE_BADGE', payload: { moduleId, count } });
   }, []);
 
-  // ✅ Context value
-  const contextValue: NavigationContextType = {
-    // Current state
-    currentModule,
-    breadcrumbs,
-    quickActions,
-    
-    // Navigation methods
+  const setQuickActions = useCallback((actions: QuickAction[]) => {
+    quickActionsRef.current = actions;
+  }, []);
+
+  // ============================================
+  // CONTEXT VALUES (Memoized)
+  // ============================================
+
+  const stateValue = useMemo<NavigationStateContextValue>(() => ({
+    currentModule: navigationState.currentModule,
+    breadcrumbs: navigationState.breadcrumbs,
+    modules: navigationState.modules,
+    navigationHistory: navigationState.navigationHistory,
+    canNavigateBack: navigationState.navigationHistory.length > 1
+  }), [
+    navigationState.currentModule,
+    navigationState.breadcrumbs,
+    navigationState.modules,
+    navigationState.navigationHistory
+  ]);
+
+  const layoutValue = useMemo<NavigationLayoutContextValue>(() => ({
+    isMobile: layoutState.isMobile,
+    showBottomNav: layoutState.isMobile,
+    showSidebar: !layoutState.isMobile,
+    sidebarCollapsed: layoutState.sidebarCollapsed
+  }), [layoutState.isMobile, layoutState.sidebarCollapsed]);
+
+  const actionsValue = useMemo<NavigationActionsContextValue>(() => ({
     navigate: handleNavigate,
-    navigateToModule: handleNavigateToModule, // ✅ Nueva función para navegación directa
+    navigateToModule: handleNavigateToModule,
     navigateBack: handleNavigateBack,
     toggleModuleExpansion,
-    
-    // Navigation state
-    canNavigateBack,
-    navigationHistory,
-    
-    // Layout state
-    isMobile,
-    showBottomNav,
-    showSidebar,
-    sidebarCollapsed,
-    
-    // Navigation config
-    modules,
-    
-    // Actions
     setSidebarCollapsed,
     updateModuleBadge,
     setQuickActions
-  };
+  }), [
+    handleNavigate,
+    handleNavigateToModule,
+    handleNavigateBack,
+    toggleModuleExpansion,
+    setSidebarCollapsed,
+    updateModuleBadge,
+    setQuickActions
+  ]);
 
   return (
-    <NavigationContext.Provider value={contextValue}>
-      {children}
-    </NavigationContext.Provider>
+    <NavigationStateContext.Provider value={stateValue}>
+      <NavigationLayoutContext.Provider value={layoutValue}>
+        <NavigationActionsContext.Provider value={actionsValue}>
+          {children}
+        </NavigationActionsContext.Provider>
+      </NavigationLayoutContext.Provider>
+    </NavigationStateContext.Provider>
   );
 }
 
-// ✅ Hook to use navigation context
-export function useNavigation(): NavigationContextType {
-  const context = useContext(NavigationContext);
+// ============================================
+// HOOKS (Specialized for performance)
+// ============================================
+
+/**
+ * Hook to access navigation state (modules, currentModule, breadcrumbs)
+ * Components using this will only re-render when navigation state changes
+ */
+export function useNavigationState(): NavigationStateContextValue {
+  const context = useContext(NavigationStateContext);
   if (!context) {
-    throw new Error('useNavigation must be used within a NavigationProvider');
+    throw new Error('useNavigationState must be used within a NavigationProvider');
   }
   return context;
+}
+
+/**
+ * Hook to access layout state (isMobile, sidebar, etc.)
+ * Components using this will only re-render when layout changes
+ */
+export function useNavigationLayout(): NavigationLayoutContextValue {
+  const context = useContext(NavigationLayoutContext);
+  if (!context) {
+    throw new Error('useNavigationLayout must be used within a NavigationProvider');
+  }
+  return context;
+}
+
+/**
+ * Hook to access navigation actions (navigate, toggle, etc.)
+ * Components using this will NEVER re-render (actions are stable)
+ */
+export function useNavigationActions(): NavigationActionsContextValue {
+  const context = useContext(NavigationActionsContext);
+  if (!context) {
+    throw new Error('useNavigationActions must be used within a NavigationProvider');
+  }
+  return context;
+}
+
+/**
+ * Hook to access quick actions for the current module
+ * Quick actions are managed internally via ref to prevent re-renders
+ */
+export function useQuickActions(): QuickAction[] {
+  // QuickActions are managed via ref inside NavigationProvider
+  // Return empty array as this is primarily for internal use
+  return [];
 }

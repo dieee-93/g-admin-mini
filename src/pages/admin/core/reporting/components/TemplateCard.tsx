@@ -26,15 +26,15 @@ interface TemplateCardProps {
 export function TemplateCard({ template, getCategoryColor, generateReport, isGenerating }: TemplateCardProps) {
   return (
     <CardWrapper key={template.id} variant="outline">
-      <CardWrapper.Body p={4}>
-        <VStack align="stretch" gap={3}>
+      <CardWrapper.Body p="4">
+        <VStack align="stretch" gap="3">
           {/* Header */}
           <HStack justify="space-between">
-            <VStack align="start" gap={0}>
+            <VStack align="start" gap="0">
               <Text fontSize="md" fontWeight="bold">
                 {template.name}
               </Text>
-              <HStack gap={1}>
+              <HStack gap="1">
                 <Badge colorPalette={getCategoryColor(template.category)} size="xs">
                   {template.category}
                 </Badge>
@@ -56,12 +56,12 @@ export function TemplateCard({ template, getCategoryColor, generateReport, isGen
           </Text>
 
           {/* Stats */}
-          <SimpleGrid columns={2} gap={2} fontSize="xs">
-            <VStack align="start" gap={0}>
+          <SimpleGrid columns={2} gap="2" fontSize="xs">
+            <VStack align="start" gap="0">
               <Text color="gray.500">Generaciones:</Text>
               <Text fontWeight="medium">{template.generationCount}</Text>
             </VStack>
-            <VStack align="end" gap={0}>
+            <VStack align="end" gap="0">
               <Text color="gray.500">Última generación:</Text>
               <Text fontWeight="medium">
                 {template.lastGenerated
@@ -74,7 +74,7 @@ export function TemplateCard({ template, getCategoryColor, generateReport, isGen
 
           {/* Schedule Info */}
           {template.schedule?.isEnabled && (
-            <HStack gap={2} fontSize="xs" color="blue.600" bg="blue.50" p={2} borderRadius="sm">
+            <HStack gap="2" fontSize="xs" color="blue.600" bg="blue.50" p="2" borderRadius="sm">
               <CalendarIcon className="w-3 h-3" />
               <Text>
                 Programado: {template.schedule.frequency} a las {template.schedule.time}
@@ -83,7 +83,7 @@ export function TemplateCard({ template, getCategoryColor, generateReport, isGen
           )}
 
           {/* Actions */}
-          <HStack gap={2}>
+          <HStack gap="2">
             <Button
               size="sm"
               flex="1"

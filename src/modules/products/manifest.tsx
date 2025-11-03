@@ -7,11 +7,13 @@
  * @version 1.0.0
  */
 
-import React from 'react';
+import React, { lazy } from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
-import { RectangleStackIcon } from '@heroicons/react/24/outline';
+import { RectangleStackIcon, BeakerIcon } from '@heroicons/react/24/outline';
+import { Button, Icon } from '@/shared/ui';
+import { toaster } from '@/shared/ui/toaster';
 
 export const productsManifest: ModuleManifest = {
   id: 'products',
@@ -22,11 +24,14 @@ export const productsManifest: ModuleManifest = {
   autoInstall: false,
 
   requiredFeatures: [] as FeatureId[], // Optional - user activates
-  optionalFeatures: ['production_recipe_management',
+  optionalFeatures: ['production_bom_management',
     'sales_catalog_menu',
     'sales_catalog_ecommerce',
     'sales_package_management',
   ] as FeatureId[],
+
+  // 🔒 PERMISSIONS: Employees can view products
+  minimumRole: 'OPERADOR' as const,
 
   hooks: {
     provide: [
@@ -44,23 +49,75 @@ export const productsManifest: ModuleManifest = {
     logger.info('App', '🍽️ Setting up Products module');
 
     try {
-      // Register products dashboard widget
+      // ============================================
+      // HOOK 1: Dashboard Widget
+      // ============================================
+
+      /**
+       * ✅ CORRECT: Hook returns React component (not metadata)
+       * Lazy-loaded for performance
+       */
+      const ProductsWidget = lazy(() => import('./components/ProductsWidget'));
+
       registry.addAction(
         'dashboard.widgets',
-        () => ({
-          id: 'products-summary',
-          title: 'Product Performance',
-          type: 'products',
-          priority: 6,
-          data: {
-            totalProducts: 0,
-            bestSeller: null,
-            averageMargin: 0,
-          },
-        }),
+        () => (
+          <React.Suspense fallback={<div>Cargando productos...</div>}>
+            <ProductsWidget />
+          </React.Suspense>
+        ),
         'products',
         6
       );
+
+      // ============================================
+      // HOOK 2: Materials Row Actions - Recipe Usage Button
+      // ============================================
+
+      /**
+       * Adds "Recipe Usage" button in materials grid row actions
+       * Shows which recipes use this material
+       */
+      registry.addAction(
+        'materials.row.actions',
+        (data) => {
+          const { material } = data || {};
+
+          if (!material) {
+            return null;
+          }
+
+          return (
+            <Button
+              key="check-recipe-usage"
+              size="xs"
+              variant="ghost"
+              colorPalette="orange"
+              onClick={() => {
+                logger.info('App', 'Checking recipe usage for material', {
+                  materialId: material.id,
+                  materialName: material.name
+                });
+
+                // TODO: Show modal with recipes that use this material
+                toaster.create({
+                  title: '🍽️ Uso en Recetas',
+                  description: `Verificando recetas con ${material.name}`,
+                  type: 'info',
+                  duration: 2000
+                });
+              }}
+            >
+              <Icon icon={BeakerIcon} size="xs" />
+              Recetas
+            </Button>
+          );
+        },
+        'products',
+        8
+      );
+
+      logger.debug('App', 'Registered materials.row.actions for Recipe Usage button');
 
       logger.info('App', '✅ Products module setup complete');
     } catch (error) {
@@ -90,7 +147,7 @@ export const productsManifest: ModuleManifest = {
     author: 'G-Admin Team',
     tags: ['products', 'menu', 'recipes', 'catalog'],
     navigation: {
-      route: '/admin/products',
+      route: '/admin/supply-chain/products',
       icon: RectangleStackIcon,
       color: 'orange',
       domain: 'supply-chain',

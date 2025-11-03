@@ -24,4 +24,5 @@ export { EventBusTestingHarness } from './testing/EventBusTestingHarness';
 
 // Default instance for immediate use
 import eventBus from './EventBus';
+export { eventBus }; // Named export for compatibility
 export default eventBus;

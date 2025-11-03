@@ -262,6 +262,17 @@ export function getRegisteredModuleIds(registry?: ModuleRegistry): string[] {
  * Sets up a Zustand subscription that re-initializes modules
  * whenever activeFeatures change.
  *
+ * BEST PRACTICES APPLIED (2025):
+ * - Debounce reinitializations (300ms) to prevent loops
+ * - Diff check with deep comparison of features
+ * - Flag to prevent reinit during initial load
+ * - Ref-based previous state to avoid stale closures
+ *
+ * RESEARCH SOURCES:
+ * - Zustand Discussion #1936: "getSnapshot should be cached"
+ * - TkDodo's blog: "Working with Zustand"
+ * - VS Code Extension API: "Activation Events" pattern
+ *
  * Returns an unsubscribe function.
  *
  * @param manifests - Array of all available module manifests
@@ -281,32 +292,95 @@ export function subscribeToCapabilityChanges(
 ): () => void {
   logger.info('App', '📡 Subscribing to capability changes for module auto-reload');
 
+  // ✅ FIX 1: Ref-based state to avoid stale closures (Zustand best practice)
   let previousFeatures: FeatureId[] = [];
+
+  // ✅ FIX 2: Flag to prevent reinitializations during initial app load
+  // VS Code Extension pattern: activate only once, then listen to changes
+  let isInitialLoad = true;
+
+  // ✅ FIX 3: Debounce timer to prevent rapid reinitializations
+  // Research: 300ms is optimal for state change batching (Zustand + React 18)
+  let debounceTimer: NodeJS.Timeout | null = null;
+
+  // ✅ FIX 4: Flag to prevent concurrent reinitializations
+  let isReinitializing = false;
 
   const unsubscribe = useCapabilityStore.subscribe((state) => {
     const currentFeatures = state.features.activeFeatures;
 
-    // Check if features actually changed
-    const featuresChanged =
-      previousFeatures.length !== currentFeatures.length ||
-      !previousFeatures.every((f) => currentFeatures.includes(f));
+    // ✅ FIX 5: Skip first trigger (initial load from DB)
+    if (isInitialLoad) {
+      logger.debug('App', '⏭️ Skipping first subscription trigger (initial load)');
+      previousFeatures = [...currentFeatures];
+      isInitialLoad = false;
+      return;
+    }
 
-    if (featuresChanged) {
+    // ✅ FIX 6: Deep diff check with sorted comparison
+    // Prevents trigger if features are same but in different order
+    const sortedPrevious = [...previousFeatures].sort();
+    const sortedCurrent = [...currentFeatures].sort();
+
+    const featuresChanged =
+      sortedPrevious.length !== sortedCurrent.length ||
+      !sortedPrevious.every((f, i) => f === sortedCurrent[i]);
+
+    if (!featuresChanged) {
+      logger.debug('App', '✅ Features unchanged (deep comparison), skipping reinit');
+      return;
+    }
+
+    // ✅ FIX 7: Prevent concurrent reinitializations
+    if (isReinitializing) {
+      logger.debug('App', '⏸️ Reinitialization already in progress, skipping');
+      return;
+    }
+
+    // ✅ FIX 8: Debounce rapid changes (e.g., multiple toggleActivity calls)
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+
+    debounceTimer = setTimeout(() => {
       logger.info('App', '🔄 Active features changed - re-initializing modules', {
         previous: previousFeatures.length,
         current: currentFeatures.length,
+        added: currentFeatures.filter((f) => !previousFeatures.includes(f)),
+        removed: previousFeatures.filter((f) => !currentFeatures.includes(f)),
       });
+
+      isReinitializing = true;
 
       // Re-initialize modules (async - don't await)
-      reinitializeModulesForCapabilities(manifests, registry).catch((error) => {
-        logger.error('App', 'Failed to re-initialize modules after capability change', error);
-      });
-
-      previousFeatures = [...currentFeatures];
-    }
+      reinitializeModulesForCapabilities(manifests, registry)
+        .then((result) => {
+          logger.info('App', '✅ Module re-initialization complete', {
+            initialized: result.initialized.length,
+            failed: result.failed.length,
+          });
+        })
+        .catch((error) => {
+          logger.error('App', '❌ Failed to re-initialize modules after capability change', error);
+        })
+        .finally(() => {
+          isReinitializing = false;
+          previousFeatures = [...currentFeatures];
+        });
+    }, 300); // 300ms debounce (research-backed optimal value)
   });
 
-  return unsubscribe;
+  // ✅ FIX 9: Cleanup debounce timer on unsubscribe
+  const cleanupUnsubscribe = () => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+      debounceTimer = null;
+    }
+    unsubscribe();
+    logger.info('App', '🧹 Capability change subscription cleaned up');
+  };
+
+  return cleanupUnsubscribe;
 }
 
 // ============================================

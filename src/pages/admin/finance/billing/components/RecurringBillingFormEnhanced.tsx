@@ -8,6 +8,7 @@ import {
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
+import { PlusIcon, EyeIcon } from '@heroicons/react/24/outline';
 
 import { logger } from '@/lib/logging';
 const recurringBillingSchema = z.object({
@@ -49,7 +50,6 @@ export const RecurringBillingFormEnhanced: React.FC = () => {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors, isSubmitting }
   } = useForm<RecurringBillingFormData>({
     resolver: zodResolver(recurringBillingSchema),
@@ -100,9 +100,7 @@ export const RecurringBillingFormEnhanced: React.FC = () => {
         return monthlyAmount * months;
       }
       if (billingCycles) {
-        const cycleMonths = billingType === 'monthly' ? 1 :
-                          billingType === 'quarterly' ? 3 :
-                          billingType === 'annual' ? 12 : 1;
+        // Calculate total value based on billing type and cycles
         return (amount || 0) * billingCycles;
       }
       return annualRevenue * 2; // Estimate 2 years if indefinite
@@ -175,26 +173,26 @@ export const RecurringBillingFormEnhanced: React.FC = () => {
               <MetricCard
                 title="Ingresos Mensuales"
                 value={`$${billingMetrics.monthlyAmount.toLocaleString()}`}
-                change={billingMetrics.revenueHealth === 'high' ? 15 : billingMetrics.revenueHealth === 'medium' ? 5 : -2}
+                change={(billingMetrics.revenueHealth === 'high' ? 15 : billingMetrics.revenueHealth === 'medium' ? 5 : -2).toString()}
                 icon="TrendingUpIcon"
               />
               <MetricCard
                 title="Ingresos Anuales"
                 value={`$${billingMetrics.annualRevenue.toLocaleString()}`}
-                change={12}
+                change="12"
                 icon="CurrencyDollarIcon"
               />
               <MetricCard
                 title="Valor de Vida (LTV)"
                 value={`$${billingMetrics.lifetimeValue.toLocaleString()}`}
-                change={25}
+                change="25"
                 icon="ChartBarIcon"
               />
               <MetricCard
                 title="Próxima Facturación"
                 value={billingMetrics.nextBillingDate ?
                   billingMetrics.nextBillingDate.toLocaleDateString() : 'N/A'}
-                change={0}
+                change="0"
                 icon="CalendarIcon"
               />
             </CardGrid>
@@ -477,11 +475,11 @@ export const RecurringBillingFormEnhanced: React.FC = () => {
               loading={isSubmitting}
               size="lg"
             >
-              <Icon name="PlusIcon" />
+              <Icon as={PlusIcon} />
               Crear Suscripción Recurrente
             </Button>
             <Button variant="outline" size="lg">
-              <Icon name="EyeIcon" />
+              <Icon as={EyeIcon} />
               Vista Previa
             </Button>
           </Stack>

@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 import { PlusIcon, CogIcon } from '@heroicons/react/24/outline';
 import { useProductsStore } from '@/store/productsStore';
-import { productsService } from '../services/productsService';
+import { productsService } from '../services/productApi';
 
 import { logger } from '@/lib/logging';
 export function useProductsPage() {
-  const { setQuickActions } = useNavigation();
+  const { setQuickActions } = useNavigationActions();
 
   // Get state directly from the Zustand store
   const { products, isLoading, error } = useProductsStore();

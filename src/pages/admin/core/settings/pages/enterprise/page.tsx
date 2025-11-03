@@ -1,17 +1,16 @@
 // Enterprise Page - Enterprise Management Tools
 import React from 'react';
-import { 
+import {
   BuildingOfficeIcon,
   GlobeAltIcon,
-  UsersIcon,
   ChartBarIcon,
   MapPinIcon,
   CogIcon,
   UserGroupIcon,
   CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
-import { 
-  ContentLayout, PageHeader, Section, StatsSection, CardGrid, Stack, Typography, Button, Badge
+import {
+  ContentLayout, PageHeader, Section, StatsSection, CardGrid, Stack, Typography, Button, Badge, CardWrapper, SimpleGrid
 } from "@/shared/ui";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -158,7 +157,7 @@ export default function EnterprisePage() {
         <Stack gap="md">
           <Stack direction="row" justify="space-between" align="center">
             <Typography variant="heading" size="md">Locations</Typography>
-            <Button size="sm" colorPalette="brand">
+            <Button size="sm" colorPalette="purple">
               <Icon icon={BuildingOfficeIcon} size="sm" />
               Add Location
             </Button>
@@ -231,7 +230,7 @@ export default function EnterprisePage() {
                   
                   <Button 
                     size="sm" 
-                    colorPalette="brand" 
+                    colorPalette="purple" 
                     variant="outline"
                   >
                     {tool.status === 'active' ? 'Configure' : 
@@ -255,12 +254,12 @@ export default function EnterprisePage() {
             </Typography>
             
             <SimpleGrid columns={{ base: 1, md: 3 }} gap="md">
-              <Button variant="outline" colorPalette="info">Brand Standards</Button>
-              <Button variant="outline" colorPalette="success">Operational Policies</Button>
-              <Button variant="outline" colorPalette="brand">Financial Controls</Button>
-              <Button variant="outline" colorPalette="warning">Staff Policies</Button>
-              <Button variant="outline" colorPalette="info">Menu Standards</Button>
-              <Button variant="outline" colorPalette="error">Quality Controls</Button>
+              <Button variant="outline" colorPalette="blue">Brand Standards</Button>
+              <Button variant="outline" colorPalette="green">Operational Policies</Button>
+              <Button variant="outline" colorPalette="purple">Financial Controls</Button>
+              <Button variant="outline" colorPalette="orange">Staff Policies</Button>
+              <Button variant="outline" colorPalette="blue">Menu Standards</Button>
+              <Button variant="outline" colorPalette="red">Quality Controls</Button>
             </SimpleGrid>
           </Stack>
         </Stack>

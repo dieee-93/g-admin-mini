@@ -59,7 +59,7 @@ export function SetupSidebar({
         bg="gray.50"
         borderRightWidth="1px"
         borderColor="gray.200"
-        py={6}
+        py="6"
         px={{
           base: 2,
           md: 4,
@@ -72,13 +72,13 @@ export function SetupSidebar({
         height="calc(100vh - 64px)"
         overflowY="auto"
       >
-        <Stack gap={2}>
+        <Stack gap="2">
           <Text
             fontSize="xs"
             fontWeight="medium"
             color="gray.500"
-            px={2}
-            mb={1}
+            px="2"
+            mb="1"
             display={{
               base: 'none',
               md: 'block',
@@ -90,8 +90,8 @@ export function SetupSidebar({
           {setupSteps.map((step, idx) => (
             <Flex
               key={step.id}
-              py={2}
-              px={3}
+              py="2"
+              px="3"
               borderRadius="md"
               alignItems="center"
               bg={step.current ? 'gray.100' : 'transparent'}
@@ -130,7 +130,7 @@ export function SetupSidebar({
                 alignItems="center"
                 justifyContent="center"
                 fontSize="xs"
-                mr={3}
+                mr="3"
               >
                 {step.completed ? <Icon icon={CheckIcon} size="xs" /> : idx + 1}
               </Box>
@@ -147,7 +147,7 @@ export function SetupSidebar({
           ))}
           
           <Separator
-            my={4}
+            my="4"
             display={{
               base: 'none',
               md: 'block',
@@ -158,8 +158,8 @@ export function SetupSidebar({
             fontSize="xs"
             fontWeight="medium"
             color="gray.500"
-            px={2}
-            mb={1}
+            px="2"
+            mb="1"
             display={{
               base: 'none',
               md: 'block',
@@ -169,8 +169,8 @@ export function SetupSidebar({
           </Text>
           
           <Flex
-            py={2}
-            px={3}
+            py="2"
+            px="3"
             borderRadius="md"
             alignItems="center"
             _hover={{
@@ -191,8 +191,8 @@ export function SetupSidebar({
           </Flex>
           
           <Flex
-            py={2}
-            px={3}
+            py="2"
+            px="3"
             borderRadius="md"
             alignItems="center"
             _hover={{

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, VStack, Stack, Text, Heading } from '@chakra-ui/react';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { Button } from '@/shared/ui/Button';
-import { InputField } from '@/shared/ui/InputField';
+import { InputField } from '@/shared/ui';
 import { CogIcon } from '@heroicons/react/24/outline';
 
 import { logger } from '@/lib/logging';
@@ -33,10 +33,10 @@ export function BasicSystemConfig({ onComplete, onBack, onSkip }: BasicSystemCon
   };
 
   return (
-    <Box maxW="500px" mx="auto" p={6}>
-      <VStack gap={6} align="stretch">
-        <VStack gap={3} textAlign="center">
-          <Box bg="green.500" color="white" borderRadius="full" p={3} display="inline-flex">
+    <Box maxW="500px" mx="auto" p="6">
+      <VStack gap="6" align="stretch">
+        <VStack gap="3" textAlign="center">
+          <Box bg="green.500" color="white" borderRadius="full" p="3" display="inline-flex">
             <CogIcon width={24} height={24} />
           </Box>
           <Heading size="lg" color="gray.700">Configuración Básica</Heading>
@@ -49,8 +49,8 @@ export function BasicSystemConfig({ onComplete, onBack, onSkip }: BasicSystemCon
         </VStack>
 
         <CardWrapper>
-          <Box p={6}>
-            <VStack gap={4} align="stretch">
+          <Box p="6">
+            <VStack gap="4" align="stretch">
               <InputField
                 label="Nombre del negocio"
                 placeholder="Ej: Mi Restaurante"
@@ -59,7 +59,7 @@ export function BasicSystemConfig({ onComplete, onBack, onSkip }: BasicSystemCon
                 required
               />
               <Box>
-                <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
+                <Text fontSize="sm" fontWeight="medium" color="gray.700" mb="2">
                   Moneda
                 </Text>
                 <select 
@@ -84,7 +84,7 @@ export function BasicSystemConfig({ onComplete, onBack, onSkip }: BasicSystemCon
 
         <Stack direction="row" justify="space-between">
           <Button variant="ghost" onClick={onBack}>← Atrás</Button>
-          <Stack direction="row" gap={3}>
+          <Stack direction="row" gap="3">
             {onSkip && (
               <Button variant="outline" onClick={onSkip}>
                 Saltar por ahora

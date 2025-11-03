@@ -1,4 +1,3 @@
-
 import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react'
 import { type ReactNode, useMemo } from 'react'
 import { useThemeStore } from '../../store/themeStore'
@@ -23,11 +22,11 @@ export function Provider({ children }: ProviderProps) {
         console.log(`✅ Theme system loaded: ${currentTheme?.id || 'default'}`)
         return dynamicSystem
       } else {
-        console.warn('Dynamic system invalid, falling back to default config')
+        logger.warn('Provider', 'Dynamic system invalid, falling back to default config')
         return createSystem(defaultConfig)
       }
     } catch (error) {
-      console.error('Error creating theme system, falling back to default:', error)
+      logger.error('Provider', 'Error creating theme system, falling back to default:', error)
       return createSystem(defaultConfig)
     }
   }, [currentTheme])

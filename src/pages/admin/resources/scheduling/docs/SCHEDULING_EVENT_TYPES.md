@@ -67,7 +67,7 @@ Este documento especifica todos los tipos de eventos soportados por el calendari
 **Descripción:** Bloque de producción/cocina
 
 **Activado por capabilities:**
-- `requires_preparation` - Cocina/producción/manufactura
+- `production_workflow` - Cocina/producción/manufactura
 
 **Color:** 🟣 Púrpura (`purple.50`, `#805AD5`)
 
@@ -548,7 +548,7 @@ interface MaintenanceMetadata {
 | Event Type     | Required Capability                | Status        |
 |----------------|------------------------------------|---------------|
 | staff_shift    | onsite_service, pickup_orders, etc | ✅ Active      |
-| production     | requires_preparation               | 📋 Placeholder |
+| production     | production_workflow               | 📋 Placeholder |
 | appointment    | appointment_based                  | 📋 Placeholder |
 | delivery       | delivery_shipping                  | 📋 Placeholder |
 | delivery       | delivery_scheduling                | ✅ Implemented |
@@ -563,14 +563,14 @@ Los event types se activan automáticamente según las features del `FeatureRegi
 // Ejemplo: Si el usuario tiene estas features activas:
 const activeFeatures = [
   'staff_shift_management',
-  'production_kitchen_display',
+  'production_display_system',
   'scheduling_appointment_booking'
 ];
 
 // El calendario mostrará estos tipos:
 const availableEventTypes = [
   'staff_shift',    // ← from staff_shift_management
-  'production',     // ← from production_kitchen_display
+  'production',     // ← from production_display_system
   'appointment',    // ← from scheduling_appointment_booking
   'time_off',       // ← always available
   'maintenance'     // ← always available

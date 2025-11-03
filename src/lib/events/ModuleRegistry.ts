@@ -163,21 +163,22 @@ export class ModuleRegistry {
       await this.activateDependentModules(moduleId);
       
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       module.status = ModuleStatus.ERROR;
       module.health.status = ModuleStatus.ERROR;
-      module.health.message = error.message;
-      
-      logger.error('EventBus', `[ModuleRegistry] Failed to activate module '${moduleId}':`, error);
-      
+      module.health.message = err.message;
+
+      logger.error('EventBus', `[ModuleRegistry] Failed to activate module '${moduleId}':`, err);
+
       this.emitEvent('moduleActivationFailed', {
         moduleId,
-        error: error.message
+        error: err.message
       });
-      
+
       throw new EventBusError(
-        `Failed to activate module '${moduleId}': ${error.message}`,
+        `Failed to activate module '${moduleId}': ${err.message}`,
         EventBusErrorCode.MODULE_ACTIVATION_FAILED,
-        { moduleId, originalError: error }
+        { moduleId, originalError: err }
       );
     }
   }
@@ -237,21 +238,22 @@ export class ModuleRegistry {
       await this.checkDependentModules(moduleId);
       
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       module.status = ModuleStatus.ERROR;
       module.health.status = ModuleStatus.ERROR;
-      module.health.message = `Deactivation failed: ${error.message}`;
-      
-      logger.error('EventBus', `[ModuleRegistry] Failed to deactivate module '${moduleId}':`, error);
-      
+      module.health.message = `Deactivation failed: ${err.message}`;
+
+      logger.error('EventBus', `[ModuleRegistry] Failed to deactivate module '${moduleId}':`, err);
+
       this.emitEvent('moduleDeactivationFailed', {
         moduleId,
-        error: error.message
+        error: err.message
       });
-      
+
       throw new EventBusError(
-        `Failed to deactivate module '${moduleId}': ${error.message}`,
+        `Failed to deactivate module '${moduleId}': ${err.message}`,
         EventBusErrorCode.MODULE_NOT_FOUND,
-        { moduleId, originalError: error }
+        { moduleId, originalError: err }
       );
     }
   }
@@ -551,12 +553,13 @@ export class ModuleRegistry {
       this.emitEvent('moduleActivated', { moduleId, module: module.descriptor });
       
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       module.status = ModuleStatus.ERROR;
       module.health.status = ModuleStatus.ERROR;
-      module.health.message = error.message;
-      
-      logger.error('EventBus', `[ModuleRegistry] Failed to activate module '${moduleId}' directly:`, error);
-      throw error;
+      module.health.message = err.message;
+
+      logger.error('EventBus', `[ModuleRegistry] Failed to activate module '${moduleId}' directly:`, err);
+      throw err;
     }
   }
 
@@ -789,15 +792,16 @@ export class ModuleRegistry {
       }
       
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       module.health = {
         status: ModuleStatus.ERROR,
-        message: `Health check failed: ${error.message}`,
+        message: `Health check failed: ${err.message}`,
         metrics: module.metrics,
         dependencies: {},
         lastCheck: new Date()
       };
-      
-      logger.error('EventBus', `[ModuleRegistry] Health check failed for module '${moduleId}':`, error);
+
+      logger.error('EventBus', `[ModuleRegistry] Health check failed for module '${moduleId}':`, err);
     }
   }
 

@@ -3,6 +3,10 @@ import {
   ContentLayout, PageHeader, Section, Stack, Button, Badge, Tabs
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import {
+  PlusIcon, ChartBarIcon, DocumentDuplicateIcon, CogIcon,
+  HomeIcon, FolderIcon, DocumentChartBarIcon
+} from '@heroicons/react/24/outline';
 import ReportingFormEnhanced from './components/ReportingFormEnhanced';
 import ReportingAnalyticsEnhanced from './components/ReportingAnalyticsEnhanced';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
@@ -22,7 +26,7 @@ const ReportingPage: React.FC = () => {
         colorPalette="blue"
         size="sm"
       >
-        <Icon name="PlusIcon" />
+        <Icon as={PlusIcon} />
         Nuevo Reporte
       </Button>
       <Button
@@ -30,7 +34,7 @@ const ReportingPage: React.FC = () => {
         variant="outline"
         size="sm"
       >
-        <Icon name="ChartBarIcon" />
+        <Icon as={ChartBarIcon} />
         Analytics
       </Button>
       <Button
@@ -38,14 +42,14 @@ const ReportingPage: React.FC = () => {
         variant="outline"
         size="sm"
       >
-        <Icon name="DocumentDuplicateIcon" />
+        <Icon as={DocumentDuplicateIcon} />
         Templates
       </Button>
       <Button
         variant="outline"
         size="sm"
       >
-        <Icon name="CogIcon" />
+        <Icon as={CogIcon} />
         Configuración
       </Button>
     </Stack>
@@ -73,30 +77,30 @@ const ReportingPage: React.FC = () => {
       <PageHeader
         title="Advanced Reporting"
         subtitle="Sistema integral de reportes ejecutivos con analytics cross-module y automatización inteligente"
-        icon="DocumentChartBarIcon"
+        icon={DocumentChartBarIcon}
         actions={quickActions}
       />
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
         <Tabs.List>
           <Tabs.Trigger value="dashboard">
-            <Icon name="HomeIcon" />
+            <Icon as={HomeIcon} />
             Dashboard
           </Tabs.Trigger>
           <Tabs.Trigger value="create">
-            <Icon name="PlusIcon" />
+            <Icon as={PlusIcon} />
             Crear Reporte
           </Tabs.Trigger>
           <Tabs.Trigger value="manage">
-            <Icon name="FolderIcon" />
+            <Icon as={FolderIcon} />
             Gestionar Reportes
           </Tabs.Trigger>
           <Tabs.Trigger value="templates">
-            <Icon name="DocumentDuplicateIcon" />
+            <Icon as={DocumentDuplicateIcon} />
             Templates
           </Tabs.Trigger>
           <Tabs.Trigger value="analytics">
-            <Icon name="ChartBarIcon" />
+            <Icon as={ChartBarIcon} />
             System Analytics
           </Tabs.Trigger>
         </Tabs.List>

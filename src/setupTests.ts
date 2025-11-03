@@ -75,15 +75,16 @@ vi.mock('./lib/supabase/client', () => {
   return { supabase };
 });
 
-// Mock de ChakraProvider con configuración básica
+// Mock de ChakraProvider con configuración básica para Chakra UI v3
+// Note: ChakraProvider v3 usa "value" prop en lugar de "theme"
 vi.mock('@chakra-ui/react', async (importOriginal) => {
   const actual = await importOriginal();
   const React = await import('react');
-  
+
   return {
     ...actual,
-    ChakraProvider: ({ children, theme }: { children: React.ReactNode, theme: any }) =>
-      React.createElement(actual.ChakraProvider, { theme }, children),
+    // Keep the actual ChakraProvider from v3 - don't mock it
+    // This allows tests to use defaultSystem properly
     useColorMode: vi.fn(() => ({
       colorMode: 'light',
       toggleColorMode: vi.fn(),

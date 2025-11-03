@@ -255,7 +255,7 @@ setup: (registry: ModuleRegistry) => {
 ```
 User Profile:
 ├── Active Features: ['staff_employee_management', 'staff_shift_management']
-└── Inactive Features: ['production_kitchen_display']
+└── Inactive Features: ['production_display_system']
 
 Module Loading Decision:
 ┌──────────────────────────────────────────────────┐
@@ -276,7 +276,7 @@ Module Loading Decision:
 
 ┌──────────────────────────────────────────────────┐
 │ Production Module                                 │
-│ Required: ['production_kitchen_display']         │
+│ Required: ['production_display_system']         │
 │ User Has: ❌ NO                                  │
 │ Result: ❌ SKIP MODULE                           │
 └──────────────────────────────────────────────────┘

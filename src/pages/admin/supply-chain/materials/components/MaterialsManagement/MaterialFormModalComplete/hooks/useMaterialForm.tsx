@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Badge } from '@chakra-ui/react';
+import { Badge } from '@/shared/ui';
 import { useMaterials } from '@/store/materialsStore';
 import { useMaterialValidation } from '@/hooks';
 import { logger } from '@/lib/logging';
@@ -20,7 +20,7 @@ import {
     HStack,
     Spinner,
     Text,
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 
 export const useMaterialForm = () => {
   const { 
@@ -62,10 +62,10 @@ export const useMaterialForm = () => {
     setFormData(prev => ({ ...prev, ...updates }));
   }, [setFormData]);
 
-  const handleFieldChange = useCallback((field: keyof ItemFormData) => 
+  const handleFieldChange = useCallback((field: keyof ItemFormData) =>
     (value: unknown) => {
-      setFormData(prev => ({ ...prev, [field]: value as any }));
-      validateField(field as string, value as any);
+      setFormData(prev => ({ ...prev, [field]: value as ItemFormData[typeof field] }));
+      validateField(field as string, value);
     }, [validateField, setFormData]
   );
 
@@ -112,6 +112,13 @@ export const useMaterialForm = () => {
 
   const isEditMode = modalMode === 'edit';
   const isViewMode = modalMode === 'view';
+  // Helper function to get unit from MaterialItem
+  const getItemUnit = useCallback((item: MaterialItem): AllUnit => {
+    if (isMeasurable(item)) return item.unit;
+    if (isCountable(item)) return 'unidad';
+    if (isElaborated(item)) return item.unit;
+    return 'unidad' as AllUnit;
+  }, []);
 
   useEffect(() => {
     if (formData.type === 'ELABORATED') {
@@ -152,20 +159,13 @@ export const useMaterialForm = () => {
         }
       });
     }
-  }, [isModalOpen, currentItem]);
+  }, [isModalOpen, currentItem, getItemUnit]);
 
   useEffect(() => {
     if (!isModalOpen) {
       clearValidation();
     }
   }, [isModalOpen, clearValidation]);
-
-  const getItemUnit = useCallback((item: MaterialItem): AllUnit => {
-    if (isMeasurable(item)) return item.unit;
-    if (isCountable(item)) return 'unidad';
-    if (isElaborated(item)) return item.unit;
-    return 'unidad' as AllUnit;
-  }, []);
 
   const validateForm = useCallback(async () => {
     return await optimizedValidateForm();

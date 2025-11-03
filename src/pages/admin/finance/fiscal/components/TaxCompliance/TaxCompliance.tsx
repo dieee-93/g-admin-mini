@@ -137,7 +137,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       setTaxReports(mockTaxReports);
       setTaxPeriods(mockTaxPeriods);
-    } catch (error) {
+    } catch (error: unknown) {
       notify.error({ 
         title: 'Error al cargar datos fiscales',
         description: 'No se pudieron cargar los datos de impuestos'
@@ -155,7 +155,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
       // Mock API call
       await new Promise(resolve => setTimeout(resolve, 500));
       // Update period-specific data
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('API', 'Error loading period detail:', error);
     } finally {
       setLoading(false);
@@ -315,7 +315,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
 
   if (variant === 'compact') {
     return (
-      <CardWrapper colorPalette="brand">
+      <CardWrapper colorPalette="purple">
         <VStack gap="md" align="stretch">
           <HStack justify="space-between">
             <Typography variant="heading" size="sm">
@@ -351,7 +351,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
   return (
     <VStack gap="lg" align="stretch">
       {/* Header */}
-      <CardWrapper colorPalette="brand">
+      <CardWrapper colorPalette="purple">
         <VStack align="stretch" gap="md">
           <HStack justify="space-between">
             <Typography variant="heading" size="lg">Gestión de Impuestos</Typography>
@@ -382,7 +382,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
 
       {/* Compliance Overview */}
       <Grid templateColumns="repeat(auto-fit, minmax(280px, 1fr))" gap="md">
-        <CardWrapper colorPalette="brand">
+        <CardWrapper colorPalette="purple">
           <VStack align="stretch" gap="md">
             <HStack>
               <CheckCircleIcon className="w-5 h-5 text-green-600" />
@@ -399,7 +399,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
           </VStack>
         </CardWrapper>
 
-        <CardWrapper colorPalette="brand">
+        <CardWrapper colorPalette="purple">
           <VStack align="stretch" gap="md">
             <HStack>
               <ExclamationTriangleIcon className="w-5 h-5 text-orange-600" />
@@ -416,7 +416,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
           </VStack>
         </CardWrapper>
 
-        <CardWrapper colorPalette="brand">
+        <CardWrapper colorPalette="purple">
           <VStack align="stretch" gap="md">
             <HStack>
               <ClockIcon className="w-5 h-5 text-red-600" />
@@ -433,7 +433,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
           </VStack>
         </CardWrapper>
 
-        <CardWrapper colorPalette="brand">
+        <CardWrapper colorPalette="purple">
           <VStack align="stretch" gap="md">
             <HStack>
               <BanknotesIcon className="w-5 h-5 text-blue-600" />
@@ -475,7 +475,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
         <TabPanels>
           {/* Periods Tab */}
           <TabPanel value="periods">
-            <CardWrapper colorPalette="brand">
+            <CardWrapper colorPalette="purple">
               <VStack align="stretch" gap="md">
                 <Typography variant="heading" size="sm">
                   Períodos Fiscales 2024
@@ -500,7 +500,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
                           </Typography>
                         </Table.Cell>
                         <Table.Cell>
-                          <Badge variant="outline" colorPalette="info">
+                          <Badge variant="outline" colorPalette="blue">
                             {period.type}
                           </Badge>
                         </Table.Cell>
@@ -543,7 +543,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
 
           {/* Reports Tab */}
           <TabPanel value="reports">
-            <CardWrapper colorPalette="brand">
+            <CardWrapper colorPalette="purple">
               <VStack align="stretch" gap="md">
                 <Typography variant="heading" size="sm">
                   Reportes de Impuestos
@@ -597,7 +597,7 @@ export const TaxCompliance = ({ variant = 'default' }: TaxComplianceProps) => {
           <TabPanel value="actions">
             <VStack gap="md" align="stretch">
               {/* Generate Reports Section */}
-              <CardWrapper colorPalette="brand">
+              <CardWrapper colorPalette="purple">
                 <VStack align="stretch" gap="md">
                   <Typography variant="heading" size="sm">
                     Generar Reportes

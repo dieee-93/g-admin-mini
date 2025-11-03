@@ -1,37 +1,43 @@
 /**
- * Staff Schedule Widget - Dynamic Dashboard Component
+ * Staff Schedule Widget - Dynamic Dashboard Component (v3.0)
  *
- * REFACTORED v2.0:
- * - Usa datos reales de useSchedulingStore.shifts (no mock)
+ * REFACTORED v3.0:
+ * - Usa datos reales de useScheduling v3.0 hook (no legacy store)
  * - Muestra turnos de HOY con status en tiempo real
  * - Visible solo si scheduling features están activas (gestionado por SlotRegistry)
  * - Elimina verificación hasFeature (ya lo hace SlotRegistry)
  *
- * @version 2.0.0 - Real Data Integration
+ * MIGRATED: Now uses v3.0 useScheduling hook instead of legacy store
+ *
+ * @version 3.0.0 - v3.0 Architecture
  */
 
-import React, { useMemo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
+import { useMemo, useEffect } from 'react';
 import { Box, Stack, Typography, Icon, Badge } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { CalendarIcon } from '@heroicons/react/24/outline';
-import { useSchedulingStore } from '@/store/schedulingStore';
+import { useScheduling } from '@/pages/admin/resources/scheduling/hooks/useScheduling';
 import { COMPONENT_TOKENS } from '@/theme/tokens';
 
 export function SchedulingWidget() {
-  // ✅ CRITICAL FIX: Usar useShallow de Zustand v5 para evitar loop infinito
-  const { shifts, stats, loading } = useSchedulingStore(useShallow(state => ({
-    shifts: state.shifts,
-    stats: state.stats,
-    loading: state.loading
-  })));
+  // ✅ v3.0: Use unified scheduling hook
+  const { shifts, loading, refreshData } = useScheduling();
+
+  // Load data on mount
+  useEffect(() => {
+    refreshData();
+  }, [refreshData]);
 
   // Calcular shifts de HOY
   const todayShifts = useMemo(() => {
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
-    const todayShiftsList = shifts.filter(shift => shift.date === todayStr);
+    const todayShiftsList = shifts.filter(shift => {
+      // v3.0 shifts use dateRange
+      const shiftDate = shift.dateRange.start.split('T')[0];
+      return shiftDate === todayStr;
+    });
 
     const scheduled = todayShiftsList.length;
     const active = todayShiftsList.filter(s =>
@@ -44,8 +50,10 @@ export function SchedulingWidget() {
     return { scheduled, active, pending };
   }, [shifts]);
 
-  // Coverage desde stats (si está disponible) o calcular básico
-  const coverage = stats?.coverage_percentage || 0;
+  // Calculate coverage: active/scheduled ratio
+  const coverage = todayShifts.scheduled > 0
+    ? (todayShifts.active / todayShifts.scheduled) * 100
+    : 0;
 
   return (
     <CardWrapper
@@ -83,7 +91,9 @@ export function SchedulingWidget() {
               borderRadius="full"
               color="teal.600"
             >
-              <Icon icon={CalendarIcon} size="lg" />
+              <Icon size="lg">
+                <CalendarIcon />
+              </Icon>
             </Box>
           </Stack>
 

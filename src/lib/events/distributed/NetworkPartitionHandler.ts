@@ -127,12 +127,13 @@ export class NetworkPartitionHandler {
         
         return result;
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         lastError = error as Error;
         
         SecureLogger.warn('EventBus', 'Operation failed - will retry', {
           attempt,
           maxRetries: this.config.maxRetries,
-          error: error.message
+          error: err.message
         });
 
         // Check if this looks like a network partition
@@ -331,7 +332,7 @@ export class NetworkPartitionHandler {
    * Handle potential partition based on operation error
    */
   private handlePotentialPartition(error: Error): void {
-    const errorMessage = error.message.toLowerCase();
+    const errorMessage = err.message.toLowerCase();
     
     // Common network partition indicators
     const partitionIndicators = [
@@ -348,7 +349,7 @@ export class NetworkPartitionHandler {
     );
 
     if (isNetworkIssue && !this.partitionState.isPartitioned) {
-      this.declarePartition(error.message);
+      this.declarePartition(err.message);
     }
   }
 
@@ -356,7 +357,7 @@ export class NetworkPartitionHandler {
    * Check if error indicates network partition
    */
   private isNetworkPartitionError(error: Error): boolean {
-    const errorMessage = error.message.toLowerCase();
+    const errorMessage = err.message.toLowerCase();
     
     return [
       'network',
@@ -395,6 +396,7 @@ export class NetworkPartitionHandler {
       try {
         callback();
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         SecureLogger.error('EventBus', 'Error in partition callback', { error });
       }
     });
@@ -435,6 +437,7 @@ export class NetworkPartitionHandler {
       try {
         callback();
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         SecureLogger.error('EventBus', 'Error in healing callback', { error });
       }
     });
@@ -477,7 +480,7 @@ export class NetworkPartitionHandler {
       SecureLogger.warn('EventBus', 'Circuit breaker opened due to repeated failures', {
         failureCount: this.circuitBreaker.failureCount,
         nextRetryTime: new Date(this.circuitBreaker.nextRetryTime).toISOString(),
-        error: error.message
+        error: err.message
       });
     }
   }

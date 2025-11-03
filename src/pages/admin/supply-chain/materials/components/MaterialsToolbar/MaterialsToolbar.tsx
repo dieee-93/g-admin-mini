@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Stack, Button, Icon, InputField, Badge } from '@/shared/ui';
 import {
   MagnifyingGlassIcon,
@@ -40,7 +41,7 @@ interface MaterialsToolbarProps {
   disabled?: boolean;
 }
 
-export function MaterialsToolbar({
+export const MaterialsToolbar = memo(function MaterialsToolbar({
   searchValue,
   onSearchChange,
   selectedType,
@@ -239,4 +240,26 @@ export function MaterialsToolbar({
       </Stack>
     </Stack>
   );
-}
+}, (prevProps, nextProps) => {
+  // ✅ PERFORMANCE: Custom comparison to prevent MenuRoot re-renders from TabsContext changes
+  return (
+    prevProps.searchValue === nextProps.searchValue &&
+    prevProps.selectedType === nextProps.selectedType &&
+    prevProps.selectedCategory === nextProps.selectedCategory &&
+    prevProps.selectedStockStatus === nextProps.selectedStockStatus &&
+    prevProps.viewMode === nextProps.viewMode &&
+    prevProps.activeFiltersCount === nextProps.activeFiltersCount &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.onSearchChange === nextProps.onSearchChange &&
+    prevProps.onTypeChange === nextProps.onTypeChange &&
+    prevProps.onCategoryChange === nextProps.onCategoryChange &&
+    prevProps.onStockStatusChange === nextProps.onStockStatusChange &&
+    prevProps.onViewModeChange === nextProps.onViewModeChange &&
+    prevProps.onAddMaterial === nextProps.onAddMaterial &&
+    prevProps.onImport === nextProps.onImport &&
+    prevProps.onExport === nextProps.onExport &&
+    prevProps.onOpenFilters === nextProps.onOpenFilters &&
+    // Compare categories array by length (usually stable)
+    prevProps.categories?.length === nextProps.categories?.length
+  );
+});

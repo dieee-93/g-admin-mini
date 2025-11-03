@@ -8,7 +8,7 @@ import {
   createSalesTestModule, 
   createInventoryTestModule, 
   createCustomersTestModule,
-  createFailingKitchenTestModule 
+  createFailingProductionTestModule 
 } from '../helpers/test-modules';
 import type { ModuleDescriptor, ModuleHealth, ModuleId } from '../../types';
 describe('ModuleRegistry', () => {
@@ -164,7 +164,7 @@ describe('ModuleRegistry', () => {
 
     it('should handle activation failures', async () => {
       const inventoryModule = createInventoryTestModule();
-      const failingModule = createFailingKitchenTestModule();
+      const failingModule = createFailingProductionTestModule();
       
       // Register dependencies first
       await moduleRegistry.registerModule(inventoryModule);
@@ -301,7 +301,7 @@ describe('ModuleRegistry', () => {
 
     it('should handle failing health checks', async () => {
       const inventoryModule = createInventoryTestModule();
-      const failingModule = createFailingKitchenTestModule();
+      const failingModule = createFailingProductionTestModule();
       
       // Register dependencies first
       await moduleRegistry.registerModule(inventoryModule);

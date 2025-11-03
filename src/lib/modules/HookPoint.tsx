@@ -22,7 +22,7 @@
  *   data={{ userId: user.id }}
  *   fallback={<Text>No widgets available</Text>}
  *   direction="column"
- *   gap={4}
+ *   gap="4"
  *   debug={false}
  * />
  * ```
@@ -34,7 +34,10 @@
 import React from 'react';
 import { ModuleRegistry } from './ModuleRegistry';
 import { Stack } from '@/shared/ui';
+import { useAuth } from '@/contexts/AuthContext';
+import { hasPermission } from '@/config/PermissionsRegistry';
 import type { HookPointProps } from './types';
+import type { UserRole, ModuleName, PermissionAction } from '@/contexts/AuthContext';
 
 // ============================================
 // HOOKPOINT COMPONENT
@@ -57,25 +60,64 @@ export const HookPoint = <T = any,>(props: HookPointProps<T>): React.ReactElemen
     debug = false,
   } = props;
 
+  // Get current user for permission checking
+  const { user } = useAuth();
+
   // Get registry instance
   const registry = React.useMemo(() => ModuleRegistry.getInstance(), []);
 
-  // Execute hooks
+  // Execute hooks with permission filtering
   const results = React.useMemo(() => {
     const startTime = performance.now();
-    const hookResults = registry.doAction(name, data);
+
+    // Get all hooks for this point
+    const allHooks = registry['hooks'].get(name) || [];
+
+    // Filter by permissions
+    const permittedHooks = allHooks.filter(hook => {
+      const permission = hook.context.requiredPermission;
+
+      // No permission required → allow
+      if (!permission) return true;
+
+      // No user → deny
+      if (!user || !user.role) return false;
+
+      // Check permission
+      const allowed = hasPermission(
+        user.role as UserRole,
+        permission.module as ModuleName,
+        permission.action as PermissionAction
+      );
+
+      if (!allowed && debug) {
+        console.log(`[HookPoint] Hook filtered (no permission): ${name}`, {
+          moduleId: hook.context.moduleId,
+          requiredPermission: permission,
+          userRole: user.role
+        });
+      }
+
+      return allowed;
+    });
+
+    // Execute permitted hooks
+    const hookResults = permittedHooks.map(hook => hook.handler(data));
+
     const duration = performance.now() - startTime;
 
     if (debug) {
       console.log(`[HookPoint] Executed hook: ${name}`, {
-        resultsCount: hookResults.length,
+        totalHooks: allHooks.length,
+        permittedHooks: permittedHooks.length,
+        filteredOut: allHooks.length - permittedHooks.length,
         duration: `${duration.toFixed(2)}ms`,
         data,
       });
     }
 
     return hookResults;
-  }, [registry, name, data, debug]);
+  }, [registry, name, data, user, debug]);
 
   // Handle empty results
   if (results.length === 0) {

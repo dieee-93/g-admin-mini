@@ -44,7 +44,7 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
           <ExclamationTriangleIcon className="w-5 h-5" />
         </Alert.Indicator>
         <Alert.Description>{error}</Alert.Description>
-        <Button onClick={loadAnalytics} variant="outline" size="sm" ml={4}>
+        <Button onClick={loadAnalytics} variant="outline" size="sm" ml="4">
           Retry
         </Button>
       </Alert>
@@ -53,7 +53,7 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
 
   return (
     <Box>
-      <VStack align="stretch" gap={6}>
+      <VStack align="stretch" gap="6">
         <DashboardHeader
           analytics={analytics}
           dateRange={dateRange}
@@ -63,9 +63,9 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
         />
 
         {loading && !analytics ? (
-          <VStack gap={4}>
+          <VStack gap="4">
             <Skeleton height="200px" />
-            <Grid templateColumns="repeat(4, 1fr)" gap={4}>
+            <Grid templateColumns="repeat(4, 1fr)" gap="4">
               <Skeleton height="150px" />
               <Skeleton height="150px" />
               <Skeleton height="150px" />
@@ -113,9 +113,9 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
 
         {/* Real-time Status */}
         <CardWrapper bg="bg.canvas">
-          <CardWrapper.Body p={3}>
-            <HStack justify="center" gap={4}>
-              <HStack gap={2}>
+          <CardWrapper.Body p="3">
+            <HStack justify="center" gap="4">
+              <HStack gap="2">
                 <Box width="8px" height="8px"  borderRadius="50%" />
                 <Text fontSize="sm" color="gray.600">
                   Last updated: {new Date().toLocaleTimeString()}

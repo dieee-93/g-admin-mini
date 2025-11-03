@@ -1,9 +1,15 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 
 import { logger } from '@/lib/logging';
+import {
+  type PermissionAction as RegistryPermissionAction,
+  hasPermission as checkPermission,
+  canAccessModule as checkCanAccessModule,
+} from '@/config/PermissionsRegistry';
+
 // User role type
 export type UserRole = 'CLIENTE' | 'OPERADOR' | 'SUPERVISOR' | 'ADMINISTRADOR' | 'SUPER_ADMIN';
 
@@ -12,6 +18,7 @@ export type ModuleName =
   | 'dashboard'
   | 'operations'
   | 'sales'
+  | 'customers'
   | 'materials'
   | 'products'
   | 'staff'
@@ -26,33 +33,14 @@ export type ModuleName =
   | 'rentals'
   | 'assets'
   | 'reporting'
+  | 'intelligence'
   | 'customer_portal'
   | 'customer_menu'
   | 'my_orders'
   | 'debug'; // Debug tools for SUPER_ADMIN only
 
-// Permission actions
-export type PermissionAction = 
-  | 'read'
-  | 'create' 
-  | 'update'
-  | 'delete'
-  | 'manage';
-
-// Role hierarchy and permissions (embedded directly for self-contained context)
-const MODULE_PERMISSIONS: Record<UserRole, ModuleName[]> = {
-  'CLIENTE': ['customer_portal', 'customer_menu', 'my_orders', 'settings'],
-  'OPERADOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'gamification'],
-  'SUPERVISOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'gamification', 'memberships', 'rentals', 'assets'],
-  'ADMINISTRADOR': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings', 'gamification', 'executive', 'billing', 'integrations', 'memberships', 'rentals', 'assets', 'reporting'],
-  'SUPER_ADMIN': ['dashboard', 'sales', 'operations', 'materials', 'products', 'staff', 'scheduling', 'fiscal', 'settings', 'gamification', 'executive', 'billing', 'integrations', 'memberships', 'rentals', 'assets', 'reporting', 'debug']
-};
-
-// Permission utilities (embedded for self-contained context)
-const canAccessModule = (userRole: UserRole | undefined, module: ModuleName): boolean => {
-  if (!userRole) return false;
-  return MODULE_PERMISSIONS[userRole]?.includes(module) ?? false;
-};
+// Permission actions (re-export from PermissionsRegistry)
+export type PermissionAction = RegistryPermissionAction;
 
 // JWT Custom Claims interface
 interface CustomClaims {
@@ -85,22 +73,32 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isRole: (role: UserRole | UserRole[]) => boolean;
   hasRole: (roles: UserRole[]) => boolean;
-  // Role access methods (migrated from useRoleAccess)
+
+  // ========================================================================
+  // PERMISSIONS SYSTEM (PermissionsRegistry Integration)
+  // ========================================================================
+
+  /** Check if user can access a module (has any permission) */
   canAccessModule: (module: ModuleName) => boolean;
+
+  /** Check if user can perform a specific action on a module */
   canPerformAction: (module: ModuleName, action: PermissionAction) => boolean;
-  isCliente: () => boolean;
-  isOperador: () => boolean;
-  isSupervisor: () => boolean;
-  isAdministrador: () => boolean;
-  isSuperAdmin: () => boolean;
-  canManageUsers: () => boolean;
-  canManageSettings: () => boolean;
-  canViewReports: () => boolean;
-  canManageInventory: () => boolean;
-  canManageStaff: () => boolean;
+
+  /** CRUD Permission Checks */
+  canCreate: (module: ModuleName) => boolean;
+  canRead: (module: ModuleName) => boolean;
+  canUpdate: (module: ModuleName) => boolean;
+  canDelete: (module: ModuleName) => boolean;
+
+  /** Special Action Permission Checks */
+  canVoid: (module: ModuleName) => boolean;
+  canApprove: (module: ModuleName) => boolean;
+  canConfigure: (module: ModuleName) => boolean;
+  canExport: (module: ModuleName) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+AuthContext.displayName = 'AuthContext';
 
 // Helper function to decode JWT and extract custom claims
 function decodeJWTClaims(token: string): CustomClaims | null {
@@ -125,6 +123,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // 🐛 PERFORMANCE DEBUG: Track renders to detect re-render issues
+  const renderCountRef = useRef(0);
+  renderCountRef.current++;
+  logger.debug('AuthContext', `🔵 RENDER #${renderCountRef.current}`);
+
+  // Track critical state changes
+  const prevUserRef = useRef(user);
+  const prevSessionRef = useRef(session);
+  const prevLoadingRef = useRef(loading);
+
+  if (prevUserRef.current !== user) {
+    logger.warn('AuthContext', '⚠️ user CHANGED!', {
+      prevUserId: prevUserRef.current?.id,
+      newUserId: user?.id,
+      prevRole: prevUserRef.current?.role,
+      newRole: user?.role,
+      renderCount: renderCountRef.current,
+      areSameReference: prevUserRef.current === user
+    });
+    prevUserRef.current = user;
+  }
+
+  if (prevSessionRef.current !== session) {
+    logger.info('AuthContext', '📝 session CHANGED', {
+      hadSession: !!prevSessionRef.current,
+      hasSession: !!session,
+      renderCount: renderCountRef.current,
+      areSameReference: prevSessionRef.current === session
+    });
+    prevSessionRef.current = session;
+  }
+
+  if (prevLoadingRef.current !== loading) {
+    logger.info('AuthContext', `🔄 loading: ${prevLoadingRef.current} → ${loading}`, {
+      renderCount: renderCountRef.current
+    });
+    prevLoadingRef.current = loading;
+  }
+
+  // Alert on excessive renders
+  if (renderCountRef.current > 20) {
+    logger.error('AuthContext', '🔴 EXCESSIVE RENDERS DETECTED!', {
+      count: renderCountRef.current,
+      userId: user?.id,
+      isLoading: loading
+    });
+  }
 
   // Enhanced function to get user role with JWT claims priority
   const getUserRoleFromMultipleSources = async (currentSession: Session): Promise<{
@@ -157,10 +203,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .select('role, is_active')
         .eq('user_id', currentSession.user.id)
         .eq('is_active', true)
-        .single();
+        .single<{ role: string; is_active: boolean }>();
 
       if (!roleError && roleData) {
-        logger.info('AuthContext', 'Role from database:', roleData.role);
+        logger.info('AuthContext', 'Role from database:', { role: roleData.role });
         return {
           role: roleData.role as UserRole,
           isActive: roleData.is_active,
@@ -179,11 +225,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   };
 
+  // ✅ FIX: Memoize handleAuthState to prevent re-creation
   // Handle authentication state and fetch user role
-  const handleAuthState = async (currentSession: Session) => {
+  const handleAuthState = useCallback(async (currentSession: Session) => {
     try {
-      setSession(currentSession);
-      
+      // 🔥 PERFORMANCE FIX: Only update session if it's actually different
+      setSession(prevSession => {
+        // Compare by reference first (fast path)
+        if (prevSession === currentSession) return prevSession;
+
+        // Compare by access token (definitive check)
+        if (prevSession?.access_token === currentSession.access_token) {
+          return prevSession; // PRESERVE OLD REFERENCE
+        }
+
+        return currentSession; // New session
+      });
+
       const { role, isActive, source } = await getUserRoleFromMultipleSources(currentSession);
 
       const enhancedUser: AuthUser = {
@@ -193,10 +251,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         roleSource: source
       };
 
-      setUser(enhancedUser);
-      logger.info('AuthContext', `🔐 AuthContext - User authenticated - Role: ${role} (${source})`);
-      logger.info('AuthContext', '🔐 AuthContext - Enhanced user object:', enhancedUser);
-      
+      // 🔥 PERFORMANCE FIX: Only update user if values actually changed
+      setUser(prevUser => {
+        // If no previous user, return new one
+        if (!prevUser) return enhancedUser;
+
+        // Compare relevant properties to detect actual changes
+        const hasChanges =
+          prevUser.id !== enhancedUser.id ||
+          prevUser.role !== enhancedUser.role ||
+          prevUser.isActive !== enhancedUser.isActive ||
+          prevUser.roleSource !== enhancedUser.roleSource ||
+          prevUser.email !== enhancedUser.email;
+
+        if (!hasChanges) {
+          logger.debug('AuthContext', '🔄 User unchanged, preserving reference');
+          return prevUser; // PRESERVE OLD REFERENCE - prevents re-renders!
+        }
+
+        logger.info('AuthContext', `🔐 AuthContext - User authenticated - Role: ${role} (${source})`);
+        logger.info('AuthContext', '🔐 AuthContext - Enhanced user object:', enhancedUser);
+        return enhancedUser; // New user object
+      });
+
     } catch (error) {
       logger.error('AuthContext', 'Error in handleAuthState:', error);
       setUser({
@@ -206,7 +283,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         roleSource: 'fallback'
       });
     }
-  };
+  }, []); // Empty deps: uses setters which are stable
 
   useEffect(() => {
     let mounted = true;
@@ -242,7 +319,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       if (!mounted) return;
 
-      logger.info('AuthContext', 'Auth state change:', event, !!currentSession);
+      logger.info('AuthContext', 'Auth state change:', { event, hasSession: !!currentSession });
 
       if (event === 'SIGNED_OUT' || !currentSession) {
         // Explicit cleanup on sign out
@@ -259,23 +336,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [handleAuthState]);
 
+  // ✅ FIX: Memoize auth functions to prevent re-creation
   // Force refresh user role
-  const refreshRole = async () => {
+  const refreshRole = useCallback(async () => {
     if (!session) return;
-    
+
     const { data, error } = await supabase.auth.refreshSession();
-    
+
     if (error) {
       logger.error('AuthContext', 'Error refreshing session:', error);
       await handleAuthState(session);
     } else if (data.session) {
       await handleAuthState(data.session);
     }
-  };
+  }, [session, handleAuthState]);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithPassword({
@@ -294,9 +372,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
+  const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signUp({
@@ -320,26 +398,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       // Clear local state immediately
       setUser(null);
       setSession(null);
-      
+
       // Clear Supabase session
       const { error } = await supabase.auth.signOut();
-      
+
       if (error) {
         logger.error('AuthContext', 'Sign out error:', error);
       }
-      
+
       // Force clear any persisted session data
       localStorage.removeItem('g-admin-auth-token');
-      
+
       // Navigate after cleanup
       navigate('/login');
     } catch (error) {
@@ -351,43 +429,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   const isAuthenticated = !!user && !!session;
-  
-  const isRole = (role: UserRole | UserRole[]): boolean => {
+
+  // ✅ FIX: Memoize helper functions to prevent re-creation
+  const isRole = useCallback((role: UserRole | UserRole[]): boolean => {
     if (!user?.role) return false;
     return Array.isArray(role) ? role.includes(user.role) : user.role === role;
-  };
+  }, [user?.role]);
 
-  const hasRole = (roles: UserRole[]): boolean => {
+  const hasRole = useCallback((roles: UserRole[]): boolean => {
     return isRole(roles);
-  };
+  }, [isRole]);
 
-  // Role access methods implementation
-  const canAccessModuleImpl = (module: ModuleName): boolean => {
-    return canAccessModule(user?.role, module);
-  };
+  // ========================================================================
+  // MODULE ACCESS & PERMISSIONS (New Granular System)
+  // ========================================================================
+  // ✅ FIX: Memoized with useCallback to prevent infinite loops in NavigationProvider
 
-  const canPerformActionImpl = (module: ModuleName): boolean => {
-    // For now, if user can access module, they can perform basic actions
-    // This can be expanded later for granular permissions
-    return canAccessModule(user?.role, module);
-  };
+  const canAccessModuleImpl = useCallback((module: ModuleName): boolean => {
+    if (!user?.role) return false;
+    return checkCanAccessModule(user.role, module);
+  }, [user?.role]);
 
-  const isClienteImpl = (): boolean => user?.role === 'CLIENTE';
-  const isOperadorImpl = (): boolean => user?.role === 'OPERADOR';
-  const isSupervisorImpl = (): boolean => user?.role === 'SUPERVISOR';
-  const isAdministradorImpl = (): boolean => user?.role === 'ADMINISTRADOR';
-  const isSuperAdminImpl = (): boolean => user?.role === 'SUPER_ADMIN';
+  const canPerformActionImpl = useCallback((module: ModuleName, action: PermissionAction): boolean => {
+    if (!user?.role) return false;
+    return checkPermission(user.role, module, action);
+  }, [user?.role]);
 
-  const canManageUsersImpl = (): boolean => hasRole(['SUPER_ADMIN']);
-  const canManageSettingsImpl = (): boolean => hasRole(['ADMINISTRADOR', 'SUPER_ADMIN']);
-  const canViewReportsImpl = (): boolean => hasRole(['SUPERVISOR', 'ADMINISTRADOR', 'SUPER_ADMIN']);
-  const canManageInventoryImpl = (): boolean => hasRole(['SUPERVISOR', 'ADMINISTRADOR', 'SUPER_ADMIN']);
-  const canManageStaffImpl = (): boolean => hasRole(['SUPERVISOR', 'ADMINISTRADOR', 'SUPER_ADMIN']);
+  // CRUD Permission Checks
+  const canCreateImpl = useCallback((module: ModuleName): boolean =>
+    canPerformActionImpl(module, 'create')
+  , [canPerformActionImpl]);
 
-  const contextValue: AuthContextType = {
+  const canReadImpl = useCallback((module: ModuleName): boolean =>
+    canPerformActionImpl(module, 'read')
+  , [canPerformActionImpl]);
+
+  const canUpdateImpl = useCallback((module: ModuleName): boolean =>
+    canPerformActionImpl(module, 'update')
+  , [canPerformActionImpl]);
+
+  const canDeleteImpl = useCallback((module: ModuleName): boolean =>
+    canPerformActionImpl(module, 'delete')
+  , [canPerformActionImpl]);
+
+  // Special Action Permission Checks
+  const canVoidImpl = useCallback((module: ModuleName): boolean =>
+    canPerformActionImpl(module, 'void')
+  , [canPerformActionImpl]);
+
+  const canApproveImpl = useCallback((module: ModuleName): boolean =>
+    canPerformActionImpl(module, 'approve')
+  , [canPerformActionImpl]);
+
+  const canConfigureImpl = useCallback((module: ModuleName): boolean =>
+    canPerformActionImpl(module, 'configure')
+  , [canPerformActionImpl]);
+
+  const canExportImpl = useCallback((module: ModuleName): boolean =>
+    canPerformActionImpl(module, 'export')
+  , [canPerformActionImpl]);
+
+
+  // ✅ FIX: Memoize contextValue to prevent re-creating object on every render
+  const contextValue = useMemo<AuthContextType>(() => ({
     user,
     session,
     loading,
@@ -398,20 +505,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated,
     isRole,
     hasRole,
-    // Role access methods
+
+    // Permissions System (PermissionsRegistry Integration)
     canAccessModule: canAccessModuleImpl,
     canPerformAction: canPerformActionImpl,
-    isCliente: isClienteImpl,
-    isOperador: isOperadorImpl,
-    isSupervisor: isSupervisorImpl,
-    isAdministrador: isAdministradorImpl,
-    isSuperAdmin: isSuperAdminImpl,
-    canManageUsers: canManageUsersImpl,
-    canManageSettings: canManageSettingsImpl,
-    canViewReports: canViewReportsImpl,
-    canManageInventory: canManageInventoryImpl,
-    canManageStaff: canManageStaffImpl,
-  };
+    canCreate: canCreateImpl,
+    canRead: canReadImpl,
+    canUpdate: canUpdateImpl,
+    canDelete: canDeleteImpl,
+    canVoid: canVoidImpl,
+    canApprove: canApproveImpl,
+    canConfigure: canConfigureImpl,
+    canExport: canExportImpl,
+  }), [
+    user,
+    session,
+    loading,
+    signIn,
+    signUp,
+    signOut,
+    refreshRole,
+    isAuthenticated,
+    isRole,
+    hasRole,
+    canAccessModuleImpl,
+    canPerformActionImpl,
+    canCreateImpl,
+    canReadImpl,
+    canUpdateImpl,
+    canDeleteImpl,
+    canVoidImpl,
+    canApproveImpl,
+    canConfigureImpl,
+    canExportImpl,
+  ]);
 
   return (
     <AuthContext.Provider value={contextValue}>

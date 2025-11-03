@@ -1,596 +1,399 @@
-# Módulo de Staff - G-Admin Mini
+# 👥 Staff Module - Employee Management System
 
-## 📋 Descripción del Módulo
-
-El módulo de **Staff** gestiona la administración completa de personal, incluyendo análisis de rendimiento en tiempo real, gestión de costos laborales, control de asistencia, y desarrollo profesional. Incluye funcionalidades avanzadas de analytics de productividad, cálculos de costos laborales con precisión decimal, y sistemas de alertas para optimización de recursos humanos.
-
-### Características principales:
-- ✅ Gestión completa de directorio de empleados y roles
-- ✅ Analytics de rendimiento con métricas de productividad en tiempo real
-- ✅ Motor de costos laborales con cálculo de horas extra y presupuesto
-- ✅ Sistema de alertas de retención y riesgos operacionales
-- ✅ Gestión de entrenamiento y desarrollo profesional
-- ✅ Control de tiempo y asistencia con reportes automatizados
-- ✅ Análisis de eficiencia departamental y organizacional
-- ✅ Cálculos de nómina y presupuesto con precisión decimal (Decimal.js)
+**Version**: 1.0.0
+**Status**: Production Ready
+**Module ID**: `staff`
+**Domain**: Resources
 
 ---
 
-## 🏗️ Estructura Estándar de Módulo
+## 📋 Overview
 
-Esta estructura sigue nuestro **patrón oficial** establecido en el módulo Products:
+The **Staff Module** provides comprehensive employee management capabilities including personnel directory, performance tracking, time tracking, training management, and labor cost analytics.
+
+### Key Features
+
+- ✅ **Employee Directory** - Complete CRUD operations for staff management
+- ✅ **Performance Tracking** - Real-time performance metrics and analytics
+- ✅ **Time Tracking** - Clock in/out with offline support
+- ✅ **Training Management** - Course catalog and certification tracking
+- ✅ **Labor Cost Analytics** - Real-time cost calculations with Decimal.js precision
+- ✅ **Multi-Location Support** - Filter employees by location
+- ✅ **Offline-First** - Continues working without internet connection
+
+---
+
+## 🗄️ Database Schema
+
+### Tables
+
+#### `employees` (38 columns)
+Primary table for employee data with comprehensive fields:
+
+**Basic Info**:
+- `id` (uuid) - Primary key
+- `first_name`, `last_name`, `name` - Personnel identification
+- `email`, `phone` - Contact information
+- `avatar_url` - Profile picture
+
+**Employment**:
+- `position`, `department` - Role and department
+- `employment_status` - `active` | `inactive` | `terminated` | `on_leave`
+- `hire_date` - Date of hire
+- `salary`, `hourly_rate` - Compensation (RLS protected)
+- `weekly_hours` - Standard hours (default: 40)
+
+**Performance**:
+- `performance_score` - 0-100 rating
+- `attendance_rate` - Attendance percentage
+
+**Multi-Location**:
+- `home_location_id` - Primary work location
+- `can_work_multiple_locations` - Boolean flag
+
+**Delivery/Driver**:
+- `vehicle_type`, `license_number` - For delivery staff
+- `driver_rating`, `total_deliveries` - Driver metrics
+
+**Appointments** (for service businesses):
+- `accepts_appointments` - Boolean flag
+- `services_provided` - Array of service UUIDs
+- `max_appointments_per_day` - Capacity limit
+- `booking_buffer_minutes` - Time between appointments
+
+#### `employee_availability`
+Tracks when employees are available for scheduling.
+
+#### `employee_skills`
+Maps skills and certifications to employees.
+
+#### `employee_training`
+Stores training records and course completions.
+
+#### `staffing_requirements`
+Defines minimum staffing needs by department/time.
+
+### Row Level Security (RLS)
+
+✅ **6 RLS Policies Configured**:
+1. `Enable all access for service role` - Service role bypass
+2. `Enable read access for all users` - Public read
+3. `employees_select_policy` - Read permissions
+4. `employees_insert_policy` - Create permissions
+5. `employees_update_policy` - Update permissions
+6. `employees_delete_policy` - Delete permissions
+
+**Sensitive Data Protection**:
+- `salary` and `hourly_rate` fields are masked for non-HR roles
+- Only users with `SUPERVISOR` or higher can access sensitive fields
+
+---
+
+## 🏗️ Architecture
+
+### File Structure
 
 ```
 src/pages/admin/resources/staff/
-├── README.md                   # 📖 Este archivo (documentación completa)
-├── page.tsx                    # 🎯 Página orquestadora (componente principal)
-│
-├── components/                 # 🧩 Componentes UI específicos del módulo
-│   ├── index.ts               # 📦 Barrel exports
-│   ├── sections/              # 📋 Secciones especializadas
-│   │   ├── DirectorySection/  # 👥 Directorio de empleados
-│   │   ├── PerformanceSection/ # 📊 Análisis de rendimiento
-│   │   ├── TrainingSection/   # 🎓 Gestión de entrenamiento
-│   │   ├── ManagementSection/ # 🏢 Administración HR
-│   │   └── TimeTrackingSection/ # ⏰ Control de tiempo
-│   └── [otros componentes]/   # 🔧 Componentes adicionales
-│
-├── hooks/                     # 🪝 Hooks de negocio y página
-│   ├── index.ts              # 📦 Barrel exports
-│   ├── useStaffPage.ts       # 🎭 Hook orquestador de la página
-│   └── [otros hooks]/        # 🔧 Hooks específicos
-│
-├── services/                  # ⚙️ Lógica de negocio y servicios
-│   ├── index.ts              # 📦 Barrel exports
-│   ├── staffApi.ts           # 🌐 API calls de empleados
-│   ├── realTimeLaborCostEngine.ts # 💰 Motor de costos laborales (migrado de business-logic)
-│   └── staffPerformanceAnalyticsEngine.ts # 📊 Motor de analytics de rendimiento (migrado de business-logic)
-│
-├── types.ts                  # 🏷️ Definiciones TypeScript
-└── __tests__/               # 🧪 Tests del módulo
-    ├── page.test.tsx        # Tests del componente principal
-    ├── hooks/              # Tests de hooks
-    └── services/           # Tests de lógica de negocio
+├── page.tsx                    # Main page component
+├── README.md                   # This file
+├── types.ts                    # TypeScript definitions
+├── components/
+│   ├── EmployeeForm.tsx        # CRUD form for employees
+│   ├── LaborCostDashboard.tsx  # Real-time cost tracking
+│   ├── PerformanceDashboard.tsx
+│   ├── StaffAnalyticsEnhanced.tsx
+│   ├── StaffFormEnhanced.tsx
+│   └── sections/
+│       ├── DirectorySection.tsx      # Employee list/grid
+│       ├── PerformanceSection.tsx    # Performance metrics
+│       ├── TimeTrackingSection.tsx   # Clock in/out
+│       ├── TrainingSection.tsx       # Courses & certs
+│       └── ManagementSection.tsx     # HR admin functions
+├── hooks/
+│   ├── useStaffPage.ts         # Page orchestrator hook
+│   └── index.ts
+└── services/
+    ├── staffApi.ts              # Supabase CRUD operations
+    ├── realTimeLaborCostEngine.ts       # Decimal.js cost calc
+    ├── staffPerformanceAnalyticsEngine.ts
+    └── index.ts
 ```
+
+### Module Manifest
+
+**Location**: `src/modules/staff/manifest.tsx`
+
+**Dependencies**: None (foundation module)
+
+**Required Features**:
+- `staff_employee_management` (required)
+
+**Optional Features**:
+- `staff_shift_management`
+- `staff_time_tracking`
+- `staff_performance_tracking`
+- `staff_training_management`
+- `staff_labor_cost_tracking`
+
+**Permissions**: Minimum role `SUPERVISOR`
+
+**Hooks Provided**:
+1. `calendar.events` - Renders staff shifts on scheduling calendar
+2. `dashboard.widgets` - Staff performance widget
+3. `scheduling.toolbar.actions` - "View Staff Availability" button
+
+**Event Subscriptions** (EventBus):
+- `production.alert.*` - Monitor kitchen alerts for staffing needs
+- `sales.order.placed` - Track service load
+- `scheduling.shift.reminder` - Send shift notifications
 
 ---
 
-## 🎯 Patrón "Página Orquestadora"
+## 🔌 Integration with Other Modules
 
-### Concepto
-El archivo `page.tsx` actúa como un **orquestador limpio** que:
-- ✅ No contiene lógica de negocio
-- ✅ Usa componentes semánticos del sistema de diseño
-- ✅ Delega la lógica a hooks especializados
-- ✅ Mantiene una estructura clara y consistente
+### Scheduling Module
+- **Provides**: Staff availability data via `exports.getStaffAvailability()`
+- **Consumes**: Shift data for calendar events
+- **EventBus**: `scheduling.shift.completed` event
 
-### Implementación Actual
+### Production Module
+- **Listens**: `production.alert.*` to adjust kitchen staffing
+- **Use Case**: Auto-alert when understaffed during rush hour
 
-```tsx
-// src/pages/admin/resources/staff/page.tsx
-export default function StaffPage() {
-  // 🎭 Toda la lógica delegada al hook orquestador
+### Sales Module
+- **Listens**: `sales.order.placed` to monitor service workload
+- **Use Case**: Recommend additional service staff during high volume
+
+### Materials Module
+- Uses labor cost data for full cost accounting
+
+---
+
+## 🚀 Usage
+
+### Basic Operations
+
+#### Creating an Employee
+
+```typescript
+import { createEmployee } from '@/services/staff/staffApi';
+
+const newEmployee = await createEmployee({
+  first_name: 'John',
+  last_name: 'Doe',
+  email: 'john@example.com',
+  position: 'Server',
+  department: 'Servicio',
+  hire_date: '2024-01-01',
+  hourly_rate: 15.00,
+  employment_status: 'active',
+  can_work_multiple_locations: false
+});
+```
+
+#### Fetching Staff
+
+```typescript
+import { getStaff } from '@/services/staff/staffApi';
+
+// Get all active employees
+const staff = await getStaff({ status: 'active' });
+
+// Get by department
+const kitchen = await getStaff({ department: 'Cocina' });
+
+// Get by location (multi-location mode)
+const locationStaff = await getStaff({ location_id: 'loc-123' });
+```
+
+#### Labor Cost Calculation
+
+```typescript
+import { calculateEmployeeLiveCost } from '@/services/staff/realTimeLaborCostEngine';
+
+const cost = calculateEmployeeLiveCost({
+  employee_id: 'emp-123',
+  employee_name: 'John Doe',
+  hourly_rate: 15.50,
+  clock_in_time: new Date('2024-01-15T09:00:00'),
+  shift_start_time: '09:00',
+  shift_end_time: '17:00'
+});
+
+console.log(cost.current_cost); // Real-time cost (Decimal.js precision)
+console.log(cost.overtime_hours); // Overtime calculation
+console.log(cost.overtime_status); // 'normal' | 'approaching' | 'in_overtime'
+```
+
+### Using the Page Hook
+
+```typescript
+import { useStaffPage } from './hooks';
+
+function MyStaffPage() {
   const {
-    pageState,
-    metrics,
-    loading,
-    error,
-    actions,
-    alertsData
+    pageState,      // UI state (activeTab, filters, etc.)
+    metrics,        // Real-time metrics (totalStaff, laborCost, etc.)
+    employees,      // Staff list
+    loading,        // Loading state
+    actions         // Action handlers
   } = useStaffPage();
 
   return (
-    <ContentLayout spacing="normal">
-      {/* 📋 Header semántico with real-time metrics */}
-      <PageHeader
-        title="Gestión de Personal"
-        subtitle={
-          <Stack direction="row" gap="sm" align="center">
-            <Badge variant="solid" colorPalette="blue">Security Compliant</Badge>
-            <Badge variant="solid" colorPalette="green">{metrics.activeStaff} Activos</Badge>
-            <Typography variant="body" size="sm" color="text.muted">
-              Directorio, rendimiento, entrenamiento y administración HR
-            </Typography>
-          </Stack>
-        }
-        icon={UserGroupIcon}
-        actions={
-          <Button variant="solid" onClick={actions.handleNewEmployee} size="lg">
-            <Icon icon={PlusIcon} size="sm" />
-            Nuevo Empleado
-          </Button>
-        }
-      />
-
-      {/* 📊 Métricas de personal en tiempo real */}
-      <StatsSection>
-        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
-          <MetricCard
-            title="Total Personal"
-            value={metrics.totalStaff}
-            icon={UsersIcon}
-            colorPalette="blue"
-          />
-          <MetricCard
-            title="En Turno"
-            value={metrics.onShiftCount}
-            icon={ClockIcon}
-            colorPalette="green"
-          />
-          <MetricCard
-            title="Rendimiento Prom."
-            value={`${(metrics.avgPerformanceRating * 20).toFixed(1)}%`}
-            icon={TrophyIcon}
-            colorPalette="purple"
-            trend={{ value: metrics.avgPerformanceRating, isPositive: metrics.avgPerformanceRating > 3.5 }}
-          />
-          {/* Más métricas... */}
-        </CardGrid>
-      </StatsSection>
-
-      {/* 💰 Labor Cost & Budget Analytics */}
-      <StatsSection>
-        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
-          <MetricCard
-            title="Costo Laboral Hoy"
-            value={`$${metrics.todayLaborCost.toFixed(2)}`}
-            icon={CurrencyDollarIcon}
-            colorPalette="teal"
-          />
-          {/* Métricas financieras... */}
-        </CardGrid>
-      </StatsSection>
-
-      {/* 🚨 Alertas dinámicas */}
-      {alertsData.length > 0 && (
-        <Section variant="elevated" title="Alertas y Notificaciones">
-          {/* Alert components */}
-        </Section>
-      )}
-
-      {/* 🧩 Secciones especializadas */}
-      <Section variant="elevated" title="Control de Tiempo">
-        {/* Time tracking functionality */}
-      </Section>
-
-      {/* 📊 Analytics condicionales */}
-      {pageState.showAnalytics && (
-        <Section variant="elevated" title="Analytics de Rendimiento">
-          {/* Performance analytics */}
-        </Section>
-      )}
-    </ContentLayout>
+    <div>
+      <h1>Total Staff: {metrics.totalStaff}</h1>
+      <p>Today's Labor Cost: ${metrics.todayLaborCost.toFixed(2)}</p>
+    </div>
   );
 }
 ```
 
-### Hook Orquestador
+---
 
-```tsx
-// src/pages/admin/resources/staff/hooks/useStaffPage.ts
-export const useStaffPage = (): UseStaffPageReturn => {
-  const { setQuickActions, updateModuleBadge } = useNavigation();
-  const { staff, loading: staffLoading, error: staffError, getStaffStats } = useStaffWithLoader();
+## 📊 Real-Time Metrics
 
-  // 🚀 Configurar acciones rápidas del header global basadas en tab activo
-  useEffect(() => {
-    const quickActions = [
-      {
-        id: 'new-employee',
-        label: 'Nuevo Empleado',
-        icon: PlusIcon,
-        action: () => handleNewEmployee(),
-        color: 'blue'
-      },
-      {
-        id: 'analytics',
-        label: 'Ver Analytics',
-        icon: ChartBarIcon,
-        action: () => handleShowAnalytics(),
-        color: 'green'
-      },
-      {
-        id: 'payroll',
-        label: 'Generar Nómina',
-        icon: CreditCardIcon,
-        action: () => handlePayrollGeneration(),
-        color: 'teal'
-      }
-    ];
+The Staff module provides real-time metrics calculated with Decimal.js precision:
 
-    setQuickActions(quickActions);
-    return () => setQuickActions([]);
-  }, [pageState.activeTab]);
+### Core Metrics
+- **Total Staff**: Count of all employees
+- **Active Staff**: Currently employed
+- **On Shift**: Currently clocked in
+- **Average Performance**: Mean performance rating (0-5 scale)
 
-  // 📊 Cálculo de métricas usando servicios migrados
-  const metrics: StaffPageMetrics = useMemo(() => {
-    // Usar servicios de business logic migrados
-    const liveCosts: LiveCostCalculation[] = staff
-      .filter(emp => emp.status === 'active')
-      .map(employee => {
-        return calculateEmployeeLiveCost({
-          employee_id: employee.id,
-          employee_name: employee.name,
-          hourly_rate: employee.hourly_rate || 15,
-          clock_in_time: new Date(Date.now() - Math.random() * 8 * 60 * 60 * 1000),
-          shift_start_time: '09:00',
-          shift_end_time: '17:00'
-        });
-      });
+### Labor Cost Metrics
+- **Today's Labor Cost**: Real-time daily cost
+- **Projected Cost**: Estimated end-of-day cost
+- **Budget Utilization**: % of budget used
+- **Budget Variance**: Over/under budget %
 
-    const laborSummary = calculateDailyCostSummary(liveCosts, 2000); // $2000 daily budget
-    const budgetAnalysis = analyzeBudgetVariance(laborSummary.total_current_cost, 2000);
-    const efficiencyData = calculateLaborEfficiency(liveCosts);
+### Performance Metrics
+- **Attendance Rate**: Average attendance %
+- **Punctuality Score**: On-time arrival %
+- **Overtime Hours**: Total OT this period
+- **Efficiency Score**: Productivity rating
 
-    return {
-      // Real-time labor cost metrics
-      todayLaborCost: laborSummary.total_current_cost,
-      projectedLaborCost: laborSummary.total_projected_cost,
-      budgetUtilization: laborSummary.budget_utilization_percent,
-      budgetVariance: budgetAnalysis.variance_percentage,
-      efficiencyScore: efficiencyData.overall_efficiency,
-      // ... más métricas
-    };
-  }, [staff, getStaffStats]);
-
-  // 🎯 Handlers de acciones específicas
-  const actions: StaffPageActions = useMemo(() => ({
-    handleNewEmployee: () => {
-      console.log('Opening new employee modal');
-    },
-
-    handleShowAnalytics: () => {
-      // Generar analytics usando StaffPerformanceAnalyticsEngine
-      generatePerformanceAnalytics();
-    },
-
-    handlePayrollGeneration: () => {
-      console.log('Generating payroll using labor cost data');
-    },
-
-    // ... más acciones
-  }), []);
-
-  return {
-    pageState,
-    metrics,
-    loading: staffLoading || analyticsLoading,
-    error: error || staffError,
-    actions,
-    alertsData,
-    // ... más datos
-  };
-};
-```
+### Alerts
+- **Critical Alerts**: Issues requiring immediate attention
+- **Retention Risks**: Employees at risk of leaving
+- **Overtime Concerns**: Employees with excessive OT
 
 ---
 
-## 🎨 Sistema de Diseño Integrado
+## 🧪 Testing
 
-### Componentes Semánticos Obligatorios
+### E2E Tests
 
-```tsx
-import {
-  // 🏗️ Componentes de Layout Semánticos (PRIORIDAD)
-  ContentLayout,    // Estructura principal de página
-  PageHeader,       // Header con título, subtítulo y acciones
-  Section,          // Secciones con variants (elevated/flat/default)
-  StatsSection,     // Sección especializada para métricas
+Located in: `src/__tests__/e2e/`
 
-  // 🧩 Componentes Base
-  Button, Alert, Badge, Icon, Stack, Typography,
+**Test Files**:
+- `staff-module-basic.e2e.test.tsx` - Basic CRUD operations
+- `staff-business-flows.e2e.test.tsx` - Business workflows
+- `staff-production-performance.e2e.test.tsx` - Performance tests
 
-  // 📊 Componentes de Negocio
-  MetricCard, CardGrid
-} from '@/shared/ui'
-```
-
-### Reglas de Diseño
-1. **❌ NUNCA** importar de `@chakra-ui/react` directamente
-2. **✅ SIEMPRE** usar `ContentLayout` como contenedor principal
-3. **✅ USAR** `PageHeader` para títulos complejos con acciones
-4. **✅ APLICAR** `Section` con variants apropiados
-5. **✅ USAR** `StatsSection + CardGrid + MetricCard` para métricas
-6. **✅ DELEGAR** theming automático (tokens `gray.*`)
-
----
-
-## 🧠 Arquitectura de Lógica de Negocio
-
-### Separación de Responsabilidades
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   page.tsx      │───▶│     hooks/      │───▶│   services/     │
-│  (Orquestador)  │    │ (Estado/Efectos)│    │ (Lógica Pura)  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-        │                       │                       │
-        ▼                       ▼                       ▼
-   🎭 UI Structure        🪝 State Management     ⚙️ Business Logic
-```
-
-### Migración de Business Logic
-
-**Servicios migrados desde `business-logic/staff/`:**
-
-1. **realTimeLaborCostEngine.ts** (529 líneas)
-   - ✅ `calculateEmployeeLiveCost()` - Costos laborales en tiempo real con Decimal.js
-   - ✅ `calculateDailyCostSummary()` - Resúmenes diarios de costos
-   - ✅ `analyzeBudgetVariance()` - Análisis de variación presupuestaria
-   - ✅ `calculateLaborEfficiency()` - Métricas de eficiencia laboral
-   - ✅ `analyzeOvertimePattern()` - Patrones de horas extra
-
-2. **staffPerformanceAnalyticsEngine.ts** (1058 líneas)
-   - ✅ `StaffPerformanceAnalyticsEngine.generateStaffAnalytics()` - Analytics completos
-   - ✅ Análisis de asistencia y puntualidad
-   - ✅ Métricas de productividad y calidad
-   - ✅ Análisis departamental y organizacional
-   - ✅ Sistema de recomendaciones y alertas
-   - ✅ Evaluación de riesgo de retención
-
-### Tipos de Hooks
-
-1. **Hook Orquestador** (`useStaffPage.ts`)
-   - 🎯 Maneja el estado completo de la página de staff
-   - 🚀 Configura acciones rápidas globales dinámicamente
-   - 📊 Calcula métricas usando servicios de negocio migrados
-   - ⚠️ Gestiona alertas y notificaciones en tiempo real
-   - 🎭 Coordina entre directorio, rendimiento, entrenamiento y administración
-
-2. **Hooks de Negocio** (futuros)
-   - 👥 `useEmployeeManagement` - Gestión de empleados CRUD
-   - 📊 `usePerformanceAnalytics` - Analytics detallados de rendimiento
-   - ⏰ `useTimeTracking` - Control de tiempo y asistencia
-   - 💰 `useLaborCostMonitoring` - Monitoreo de costos laborales
-
----
-
-## 🔄 Integración con EventBus
-
-### Eventos del Módulo
-
-```typescript
-// Eventos que emite el módulo
-const STAFF_EVENTS = {
-  EMPLOYEE_CREATED: 'staff:employee_created',
-  EMPLOYEE_UPDATED: 'staff:employee_updated',
-  CLOCK_IN: 'staff:clock_in',
-  CLOCK_OUT: 'staff:clock_out',
-  PERFORMANCE_REVIEW_COMPLETED: 'staff:performance_review_completed',
-  OVERTIME_ALERT: 'staff:overtime_alert',
-  RETENTION_RISK_DETECTED: 'staff:retention_risk_detected',
-  LABOR_COST_THRESHOLD_EXCEEDED: 'staff:labor_cost_exceeded'
-} as const;
-
-// Eventos que escucha el módulo
-const SUBSCRIBED_EVENTS = [
-  'sales:sale_completed',        // Calcular productividad por empleado
-  'scheduling:shift_assigned',   // Actualizar horarios y costos
-  'training:course_completed',   // Actualizar skills y desarrollo
-  'payroll:payment_processed'    // Actualizar costos y presupuesto
-] as const;
-```
-
-### Integración Tiempo Real
-
-```typescript
-// Actualización de métricas de costos laborales en tiempo real
-useEffect(() => {
-  const unsubscribe = eventBus.subscribe('staff:clock_in', (employee) => {
-    // Recalcular costos laborales inmediatamente
-    const newLiveCost = calculateEmployeeLiveCost({
-      employee_id: employee.id,
-      employee_name: employee.name,
-      hourly_rate: employee.hourly_rate,
-      clock_in_time: new Date(employee.clock_in_time)
-    });
-
-    // Actualizar métricas en tiempo real
-    updateLaborCostMetrics(newLiveCost);
-  });
-
-  return unsubscribe;
-}, []);
-
-// Sistema de alertas automáticas
-useEffect(() => {
-  const unsubscribe = eventBus.subscribe('staff:overtime_alert', (data) => {
-    updateModuleBadge('staff', {
-      count: data.overtimeEmployeesCount,
-      color: 'orange',
-      pulse: true
-    });
-  });
-
-  return unsubscribe;
-}, []);
-```
-
----
-
-## 📊 Testing Strategy
-
-### Estructura de Tests
-
-```
-src/pages/admin/resources/staff/
-├── __tests__/
-│   ├── page.test.tsx                    # Tests del componente principal
-│   ├── hooks/
-│   │   └── useStaffPage.test.ts         # Tests de hook orquestador
-│   └── services/
-│       ├── realTimeLaborCostEngine.test.ts      # Tests de motor de costos
-│       └── staffPerformanceAnalyticsEngine.test.ts # Tests de analytics engine
-```
-
-### Tests Críticos de Precisión
-
-```typescript
-// Ejemplo: Tests de cálculos de costos laborales
-describe('realTimeLaborCostEngine', () => {
-  it('should calculate labor costs with decimal precision', () => {
-    const result = calculateEmployeeLiveCost({
-      employee_id: 'test-1',
-      employee_name: 'Test Employee',
-      hourly_rate: 15.75,
-      clock_in_time: new Date('2024-01-01T09:00:00'),
-      current_time: new Date('2024-01-01T17:30:00')
-    });
-
-    expect(result.current_cost).toBeCloseTo(133.875, 3); // 8.5 hours * 15.75
-    expect(result.overtime_hours).toBeCloseTo(0.5, 1);
-    expect(result.overtime_status).toBe('in_overtime');
-  });
-
-  it('should calculate daily cost summary accurately', () => {
-    const liveCosts = [/* mock data */];
-    const summary = calculateDailyCostSummary(liveCosts, 2000);
-
-    expect(summary.budget_utilization_percent).toBeLessThanOrEqual(100);
-    expect(summary.efficiency_score).toBeGreaterThan(0);
-    expect(summary.cost_variance).toBeInstanceOf(Number);
-  });
-});
-
-// Tests de analytics de rendimiento
-describe('staffPerformanceAnalyticsEngine', () => {
-  it('should generate comprehensive performance analytics', async () => {
-    const analytics = await StaffPerformanceAnalyticsEngine.generateStaffAnalytics(
-      mockEmployees,
-      mockTimeEntries,
-      mockSchedules
-    );
-
-    expect(analytics.employeeMetrics).toBeDefined();
-    expect(analytics.departmentAnalytics).toBeDefined();
-    expect(analytics.organizationMetrics).toBeDefined();
-    expect(analytics.recommendationsCount).toBeGreaterThan(0);
-  });
-});
-```
-
----
-
-## 🚀 Funcionalidades Clave
-
-### 1. Gestión de Personal Integral
-- ✅ Directorio completo de empleados con roles y permisos
-- ✅ Gestión de departamentos y posiciones
-- ✅ Estados de empleados (activo, vacaciones, licencia, terminado)
-- ✅ Historial completo de cambios y actualizaciones
-- ✅ Integración con sistemas de autenticación
-
-### 2. Analytics de Rendimiento Avanzado
-- ✅ Métricas de productividad individuales y departamentales
-- ✅ Análisis de asistencia y puntualidad con precisión
-- ✅ Evaluaciones de desempeño automatizadas
-- ✅ Identificación de fortalezas y áreas de mejora
-- ✅ Análisis de tendencias de rendimiento temporal
-
-### 3. Motor de Costos Laborales en Tiempo Real
-- ✅ Cálculo de costos por empleado con Decimal.js
-- ✅ Monitoreo de horas extra y alertas automáticas
-- ✅ Análisis de variación presupuestaria
-- ✅ Proyecciones de costos diarios y mensuales
-- ✅ Eficiencia laboral y ratios de productividad
-
-### 4. Sistema de Alertas Inteligentes
-- ✅ Riesgos de retención de empleados
-- ✅ Alertas de costos laborales excesivos
-- ✅ Notificaciones de rendimiento bajo
-- ✅ Alertas de asistencia y puntualidad
-- ✅ Recordatorios de evaluaciones pendientes
-
-### 5. Gestión de Desarrollo y Entrenamiento
-- ✅ Programas de entrenamiento personalizados
-- ✅ Seguimiento de habilidades y certificaciones
-- ✅ Planes de desarrollo profesional
-- ✅ Métricas de progreso de entrenamiento
-- ✅ Identificación de gaps de habilidades
-
-### 6. Control de Tiempo y Asistencia
-- ✅ Sistema de clock in/out con timestamp preciso
-- ✅ Gestión de horarios y turnos
-- ✅ Reportes de tiempo trabajado
-- ✅ Análisis de patrones de asistencia
-- ✅ Cálculo automático de horas extra
-
-### 7. Administración de Nómina y Presupuesto
-- ✅ Generación automatizada de nómina
-- ✅ Análisis de costos por departamento
-- ✅ Control presupuestario en tiempo real
-- ✅ Reportes financieros de recursos humanos
-- ✅ Proyecciones de costos futuros
-
----
-
-## 🔗 Referencias Técnicas
-
-### Dependencias Clave
-- **Decimal.js**: Precisión en cálculos de costos laborales y nómina
-- **Zustand**: State management global para datos de empleados
-- **ChakraUI v3**: Sistema de componentes base
-- **React Query**: Data fetching para APIs de staff y analytics
-- **Heroicons**: Iconografía consistente
-- **EventBus**: Comunicación en tiempo real entre módulos
-- **Date-fns**: Manipulación de fechas para control de tiempo
-
-### Patrones Aplicados
-- ✅ **Separation of Concerns**: UI, Estado, Lógica de Negocio
-- ✅ **Real-time Analytics**: Métricas calculadas en tiempo real
-- ✅ **Domain-Driven Design**: Estructura por dominios de HR
-- ✅ **Decimal Precision**: Cálculos financieros exactos
-- ✅ **Modular Services**: Migración desde business-logic centralizada
-- ✅ **Event-Driven Updates**: Actualizaciones automáticas vía EventBus
-
-### Integración con Otros Módulos
-- 📊 **Sales**: Productividad por empleado basada en ventas
-- 📅 **Scheduling**: Integración de horarios y turnos
-- 💰 **Finance**: Costos laborales en reportes financieros
-- 🍽️ **Kitchen**: Rendimiento de personal de cocina
-- 🎯 **Training**: Programas de desarrollo y certificaciones
-
----
-
-## 📈 Métricas de Calidad
-
-### Indicadores de Éxito
-- ⚡ **Performance**: Cálculos de costos < 50ms
-- 🧪 **Testing**: Cobertura > 90% (crítico en cálculos de nómina)
-- 📦 **Bundle Size**: Incremento < 100KB (engines complejos)
-- 🔧 **Mantenibilidad**: Complejidad ciclomática < 15
-- 🎨 **UX Consistency**: 100% componentes del design system
-- 💰 **Precision**: 0 errores en cálculos decimales
-- 📊 **Analytics Accuracy**: Métricas verificables vs datos reales
-
-### Validación Técnica
+**Running Tests**:
 ```bash
-# Comandos de verificación específicos para Staff
-npm run typecheck           # Sin errores TypeScript
-npm run lint               # Sin warnings ESLint
-npm run test:unit          # Tests unitarios (servicios)
-npm run test:integration   # Tests de integración (analytics)
-npm run test:performance   # Tests de rendimiento de cálculos
-npm run test:decimal       # Tests específicos de precisión decimal
-npm run build              # Build exitoso
+# Run all staff E2E tests
+pnpm test staff-module
+
+# Run specific test file
+pnpm test staff-module-basic
 ```
 
-### KPIs Operacionales
-- 📊 **Analytics Generation**: < 2 segundos para 100 empleados
-- ⚡ **Real-time Updates**: < 100ms para métricas en vivo
-- 🎯 **Calculation Accuracy**: 100% precisión en cálculos laborales
-- 📱 **Mobile Performance**: Funcional en dispositivos móviles
-- 🔄 **Data Synchronization**: < 500ms para actualizaciones en tiempo real
+### Manual Testing Checklist
 
-### Benchmarks de Rendimiento
-- 👥 **Employee Analytics**: Hasta 500 empleados simultáneos
-- 📈 **Performance Metrics**: 6 meses de datos históricos
-- 💰 **Cost Calculations**: Precisión hasta 6 decimales
-- ⏰ **Real-time Updates**: 10+ métricas actualizadas por segundo
-- 🚨 **Alert Processing**: < 50ms para detección de alertas
+- [ ] Create new employee
+- [ ] Update employee information
+- [ ] Deactivate/reactivate employee
+- [ ] Clock in/out functionality
+- [ ] View performance metrics
+- [ ] Filter by department
+- [ ] Filter by location (multi-location)
+- [ ] Export staff report
+- [ ] Labor cost calculations
+- [ ] Offline mode (disconnect internet, create employee)
 
 ---
 
-**🎯 Este README.md representa nuestro estándar oficial para el módulo de Staff en G-Admin Mini.**
+## 🔒 Security
 
-**📋 El módulo Staff sirve como referencia para otros módulos que requieren analytics avanzados, cálculos de precisión decimal, y sistemas de alertas en tiempo real para optimización de recursos.**
+### Data Masking
+
+Sensitive fields (`salary`, `hourly_rate`, `social_security`) are automatically masked for users without proper permissions:
+
+```typescript
+import { getEmployeeWithMasking } from '@/services/staff/staffApi';
+
+const employee = await getEmployeeWithMasking('emp-123', currentUserRole);
+
+if (currentUserRole === 'EMPLOYEE') {
+  console.log(employee.salary_masked); // true
+  console.log(employee.salary); // undefined (hidden)
+}
+```
+
+### Role-Based Access
+
+- **ADMIN/HR**: Full access including sensitive data
+- **SUPERVISOR**: Read access to all employees, edit their own team
+- **EMPLOYEE**: Read-only access to public employee directory
+
+---
+
+## 📈 Performance Optimizations
+
+1. **Lazy Loading**: All tab sections load on-demand
+2. **Decimal.js**: Banking-grade precision for financial calculations
+3. **Offline-First**: IndexedDB queue for offline operations
+4. **Real-time Updates**: Supabase Realtime for live synchronization
+5. **Zustand Performance**: Uses `useShallow` for array/object selectors
+
+---
+
+## 🐛 Known Issues
+
+1. React Hook warning in `TimeTrackingSection.tsx` line 178
+   - **Status**: Acceptable (false positive)
+   - **Reason**: Functions intentionally not in deps to avoid re-runs
+
+2. ESLint errors for `_param` unused variables
+   - **Status**: Acceptable (intentional design)
+   - **Reason**: Parameters prefixed with `_` are reserved for future use
+
+---
+
+## 🛠️ Troubleshooting
+
+### Issue: "Cannot read employees"
+**Solution**: Check RLS policies are enabled for your user role
+
+### Issue: "Sensitive data visible"
+**Solution**: Verify user role is correctly set in JWT token
+
+### Issue: "Offline sync not working"
+**Solution**: Check IndexedDB permissions and service worker registration
+
+---
+
+## 📝 TODO
+
+- [ ] Implement DecimalUtils in `staffPerformanceAnalyticsEngine.ts`
+- [ ] Add salary history tracking
+- [ ] Implement skill-based scheduling recommendations
+- [ ] Add performance review workflow
+- [ ] Integrate with payroll systems
+- [ ] Add automated shift scheduling based on demand
+
+---
+
+## 📚 References
+
+- [Module Registry Documentation](../../../modules/README.md)
+- [EventBus v2 Guide](../../../lib/events/README.md)
+- [Decimal.js Configuration](../../../config/decimal-config.ts)
+- [Multi-Location Guide](../../../contexts/LocationContext.tsx)
+
+---
+
+**Last Updated**: 2025-01-30
+**Maintained By**: G-Admin Development Team

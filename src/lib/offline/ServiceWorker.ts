@@ -385,7 +385,7 @@ async function getOfflineData(pathname: string): Promise<any> {
   };
   
   switch (true) {
-    case pathname.includes('/admin/sales'):
+    case pathname.includes('/admin/operations/sales'):
       return {
         ...baseResponse,
         data: {

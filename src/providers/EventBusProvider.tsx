@@ -10,6 +10,7 @@ import type { IEventBusV2, ModuleId } from '@/lib/events/types';
 import { logger } from '@/lib/logging';
 // Context for EventBus instance
 const EventBusContext = createContext<IEventBusV2 | null>(null);
+EventBusContext.displayName = 'EventBusContext';
 
 interface EventBusProviderProps {
   children: React.ReactNode;

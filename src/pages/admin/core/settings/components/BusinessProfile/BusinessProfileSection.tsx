@@ -2,24 +2,29 @@ import React, { useState } from "react";
 import {
   Stack, Typography, CardWrapper, Section, Button, Badge, SimpleGrid, MetricCard
 } from "@/shared/ui";
-import { 
-  BuildingOfficeIcon, 
+import {
+  BuildingOfficeIcon,
   PencilIcon,
   ClockIcon,
   MapPinIcon,
   PhoneIcon,
   EnvelopeIcon,
-  GlobeAltIcon,
   CheckCircleIcon
 } from "@heroicons/react/24/outline";
 import { Icon } from "@/shared/ui/Icon";
 import { WeeklyScheduleEditor } from '@/shared/components/WeeklyScheduleEditor';
 import type { Schedule, DailyRule } from '@/types/schedule';
-// TODO: Refactorizar para usar el sistema de capabilities unificado
-// import { useBusinessCapabilities } from "@/store/businessCapabilitiesStore";
-import { useCapabilities } from "@/store/capabilityStore";
-
 import { logger } from '@/lib/logging';
+
+// TODO: Implementar formulario editable con validación Zod
+// import { useForm } from 'react-hook-form';
+// import { zodResolver } from '@hookform/resolvers/zod';
+// import { BusinessProfileSchema, validateBusinessEmail, type BusinessProfileFormData } from '../../types/validation';
+
+// TODO: Refactorizar para usar el sistema de capabilities unificado
+// TODO: Integrar con achievements system cuando se guarden los horarios
+// import { useBusinessCapabilities } from "@/store/businessCapabilitiesStore";
+// import { useCapabilities } from "@/store/capabilityStore";
 const initialBusinessHours: Partial<Schedule> = {
   name: "Horario de Atención Principal",
   type: "BUSINESS_HOURS",
@@ -118,19 +123,19 @@ export function BusinessProfileSection() {
             </CardWrapper.Header>
             <CardWrapper.Body>
               {isEditingHours ? (
-                <Stack gap={4}>
+                <Stack gap="4">
                   <WeeklyScheduleEditor schedule={businessHours} onChange={setBusinessHours} />
                   <Stack direction="row" justify="flex-end">
                     <Button variant="ghost" onClick={() => setIsEditingHours(false)}>Cancelar</Button>
-                    <Button colorScheme="blue" onClick={handleSaveHours}>Guardar Horarios</Button>
+                    <Button colorPalette="blue" onClick={handleSaveHours}>Guardar Horarios</Button>
                   </Stack>
                 </Stack>
               ) : (
-                <Stack direction="column" gap={2}>
+                <Stack direction="column" gap="2">
                   {sortedRules?.map((rule) => {
                     const isOpen = rule.timeBlocks.length > 0;
                     return (
-                        <Stack key={rule.dayOfWeek} direction="row" justify="space-between" p={2} bg={isOpen ? "green.50" : "gray.100"} borderRadius="md">
+                        <Stack key={rule.dayOfWeek} direction="row" justify="space-between" p="2" bg={isOpen ? "green.50" : "gray.100"} borderRadius="md">
                             <Typography variant="body" weight="medium" width="100px">{rule.dayOfWeek}</Typography>
                             <Typography variant="body" size="sm" color={isOpen ? "green.700" : "gray.500"}>
                                 {isOpen ? rule.timeBlocks.map(b => `${b.startTime} - ${b.endTime}`).join(', ') : 'Cerrado'}
@@ -138,7 +143,7 @@ export function BusinessProfileSection() {
                         </Stack>
                     )
                   })}
-                  <Button mt={2} size="sm" colorPalette="blue" variant="outline" onClick={() => setIsEditingHours(true)}>
+                  <Button mt="2" size="sm" colorPalette="blue" variant="outline" onClick={() => setIsEditingHours(true)}>
                     <Icon icon={PencilIcon} size="xs" />
                     Editar Horarios
                   </Button>

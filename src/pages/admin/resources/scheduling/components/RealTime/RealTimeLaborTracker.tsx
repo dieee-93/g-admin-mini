@@ -5,14 +5,13 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Stack, Button, Badge, Grid, Typography,
-  CardWrapper, MetricCard, CardGrid, Icon, SimpleGrid
+  Stack, Button, Badge, Typography,
+  CardWrapper, SimpleGrid
 } from '@/shared/ui';
 import { Tabs, Progress, Table, Alert, Switch } from '@chakra-ui/react';
 import { 
   CurrencyDollarIcon,
   ClockIcon,
-  ExclamationTriangleIcon,
   BoltIcon,
   ChartBarIcon,
   ArrowPathIcon,
@@ -27,13 +26,12 @@ import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations
 interface RealTimeLaborTrackerProps {
   selectedDate?: string;
   showAlerts?: boolean;
-  compactMode?: boolean;
+  // TODO: compactMode will be used when implementing responsive mobile view
 }
 
-export function RealTimeLaborTracker({ 
-  selectedDate, 
-  showAlerts = true, 
-  compactMode = false 
+export function RealTimeLaborTracker({
+  selectedDate,
+  showAlerts = true
 }: RealTimeLaborTrackerProps) {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'employees' | 'departments' | 'alerts'>('overview');
@@ -55,10 +53,10 @@ export function RealTimeLaborTracker({
     criticalAlerts
   } = useLiveCostDashboard(selectedDate);
 
-  const { 
-    overtimeEmployees, 
+  const {
+    // TODO: overtimeEmployees will be displayed in employees tab when implemented
     overtimeAlerts,
-    overtimeEmployeeCount 
+    overtimeEmployeeCount
   } = useOvertimeMonitoring();
 
   const {
@@ -294,7 +292,7 @@ export function RealTimeLaborTracker({
       {/* Main Content Tabs */}
       <CardWrapper>
         <CardWrapper p="0">
-          <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
+          <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as unknown)}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="overview" gap="2" flex="1">
                 <Icon icon={ChartBarIcon} size="sm" />

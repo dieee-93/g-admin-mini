@@ -19,7 +19,7 @@ import type { BusinessCapabilityId } from '@/config/types';
  *
  * Cada tipo se activa según la capability del negocio:
  * - staff_shift: onsite_service, pickup_orders, delivery_shipping
- * - production: requires_preparation
+ * - production: production_workflow
  * - appointment: appointment_based
  * - delivery: delivery_shipping
  * - time_off: Todas (gestión de personal)
@@ -398,6 +398,9 @@ export interface CalendarFilters {
 
   /** Capabilities activas (filtro dinámico) */
   capabilities: BusinessCapabilityId[];
+
+  /** 🌎 Multi-Location: Filter by location ID */
+  locationId?: string;
 
   /** Texto de búsqueda */
   searchText?: string;

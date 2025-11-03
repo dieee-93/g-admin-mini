@@ -1,4 +1,4 @@
-import { Box, Stack, Text } from '@chakra-ui/react';
+import { Box, Stack, Text } from '@/shared/ui';
 import { SelectField } from '@/shared/ui';
 import { type ItemFormData, type MeasurableUnit } from '../../../types';
 import { CATEGORY_COLLECTION, MEASURABLE_UNITS_COLLECTION } from '../constants';

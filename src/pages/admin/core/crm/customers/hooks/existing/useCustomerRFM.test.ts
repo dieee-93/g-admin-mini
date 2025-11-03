@@ -1,8 +1,9 @@
 // src/features/customers/logic/useCustomerRFM.test.ts
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { renderHook } from '@testing-library/react'
 import { useCustomerRFM, useCustomerSegmentation } from './useCustomerRFM'
-import { CustomerSegment, ChurnRisk } from '../../types'
+import type { CustomerSegment, ChurnRisk } from '../../types'
 
 // Mock the API
 vi.mock('../data/advancedCustomerApi', () => ({
@@ -175,36 +176,37 @@ describe('useCustomerRFM', () => {
 })
 
 describe('useCustomerSegmentation', () => {
-  const mockRFMProfiles = [
-    {
-      customer_id: '1',
-      recency_score: 5,
-      frequency_score: 5,
-      monetary_score: 5,
-      rfm_segment: CustomerSegment.CHAMPIONS,
-      lifetime_value: 1000,
-      avg_order_value: 200,
-      visit_frequency: 2,
-      churn_risk: ChurnRisk.LOW,
-      last_calculated_at: '2024-01-01',
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01'
-    },
-    {
-      customer_id: '2',
-      recency_score: 1,
-      frequency_score: 1,
-      monetary_score: 1,
-      rfm_segment: CustomerSegment.LOST,
-      lifetime_value: 50,
-      avg_order_value: 25,
-      visit_frequency: 0.1,
-      churn_risk: ChurnRisk.HIGH,
-      last_calculated_at: '2024-01-01',
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01'
-    }
-  ]
+  // NOTE: Keeping this for future test expansion
+  // const mockRFMProfiles = [
+  //   {
+  //     customer_id: '1',
+  //     recency_score: 5,
+  //     frequency_score: 5,
+  //     monetary_score: 5,
+  //     rfm_segment: CustomerSegment.CHAMPIONS,
+  //     lifetime_value: 1000,
+  //     avg_order_value: 200,
+  //     visit_frequency: 2,
+  //     churn_risk: ChurnRisk.LOW,
+  //     last_calculated_at: '2024-01-01',
+  //     created_at: '2024-01-01',
+  //     updated_at: '2024-01-01'
+  //   },
+  //   {
+  //     customer_id: '2',
+  //     recency_score: 1,
+  //     frequency_score: 1,
+  //     monetary_score: 1,
+  //     rfm_segment: CustomerSegment.LOST,
+  //     lifetime_value: 50,
+  //     avg_order_value: 25,
+  //     visit_frequency: 0.1,
+  //     churn_risk: ChurnRisk.HIGH,
+  //     last_calculated_at: '2024-01-01',
+  //     created_at: '2024-01-01',
+  //     updated_at: '2024-01-01'
+  //   }
+  // ]
 
   it('should provide correct segment recommendations', () => {
     const { result } = renderHook(() => useCustomerSegmentation())

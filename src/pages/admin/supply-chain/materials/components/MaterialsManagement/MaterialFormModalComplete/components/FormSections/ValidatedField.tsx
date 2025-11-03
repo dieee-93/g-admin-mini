@@ -5,7 +5,7 @@ import {
   Text,
   Spinner,
   Flex
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { InputField } from '@/shared/ui';
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 

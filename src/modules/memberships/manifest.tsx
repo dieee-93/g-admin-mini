@@ -7,7 +7,7 @@
  * @version 1.0.0
  */
 
-import React from 'react';
+import React, { lazy } from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
@@ -27,6 +27,9 @@ export const membershipsManifest: ModuleManifest = {
     'finance_payment_terms',
   ] as FeatureId[],
 
+  // 🔒 PERMISSIONS: Supervisors can manage memberships
+  minimumRole: 'SUPERVISOR' as const,
+
   hooks: {
     provide: [
       'memberships.tier_benefits',   // Member benefits
@@ -43,22 +46,78 @@ export const membershipsManifest: ModuleManifest = {
     logger.info('App', '👥 Setting up Memberships module');
 
     try {
+      // Import EventBus for subscriptions
+      const { eventBus } = await import('@/lib/events');
+
+      // ✅ Dashboard Widget - Memberships status
+      const MembershipsWidget = lazy(() => import('./components/MembershipsWidget'));
+
       registry.addAction(
         'dashboard.widgets',
-        () => ({
-          id: 'memberships-summary',
-          title: 'Memberships',
-          type: 'memberships',
-          priority: 6,
-          data: {
-            activeMembers: 0,
-            newThisMonth: 0,
-            renewalsDue: 0,
-          },
-        }),
+        () => (
+          <React.Suspense fallback={<div>Cargando memberships...</div>}>
+            <MembershipsWidget />
+          </React.Suspense>
+        ),
         'memberships',
-        6
+        30 // Medium priority widget
       );
+
+      // ✅ EventBus Integration - Billing payments
+      eventBus.subscribe('billing.payment_received', async (event) => {
+        logger.info('Memberships', 'Payment received for membership', event.payload);
+
+        try {
+          const { customerId } = event.payload;
+
+          if (!customerId) {
+            logger.warn('Memberships', 'Payment received without customerId', event.payload);
+            return;
+          }
+
+          const { activateMembershipOnPayment } = await import('@/pages/admin/operations/memberships/services');
+          const result = await activateMembershipOnPayment(customerId);
+
+          if (result) {
+            logger.info('Memberships', 'Membership activated/renewed successfully', {
+              membershipId: result.id,
+              status: result.status
+            });
+          } else {
+            logger.info('Memberships', 'No membership to activate (customer may need to enroll first)', { customerId });
+          }
+        } catch (error) {
+          logger.error('Memberships', 'Error handling payment_received event', error);
+        }
+      }, { moduleId: 'memberships', priority: 100 });
+
+      // ✅ EventBus Integration - Subscription ended
+      eventBus.subscribe('billing.subscription_ended', async (event) => {
+        logger.info('Memberships', 'Subscription ended', event.payload);
+
+        try {
+          const { customerId } = event.payload;
+
+          if (!customerId) {
+            logger.warn('Memberships', 'Subscription ended without customerId', event.payload);
+            return;
+          }
+
+          const { expireMembershipOnSubscriptionEnd } = await import('@/pages/admin/operations/memberships/services');
+          const result = await expireMembershipOnSubscriptionEnd(customerId);
+
+          if (result) {
+            logger.info('Memberships', 'Membership expired successfully', {
+              membershipId: result.id,
+              status: result.status
+            });
+          } else {
+            logger.info('Memberships', 'No active membership found to expire', { customerId });
+          }
+        } catch (error) {
+          logger.error('Memberships', 'Error handling subscription_ended event', error);
+        }
+      }, { moduleId: 'memberships', priority: 100 });
 
       logger.info('App', '✅ Memberships module setup complete');
     } catch (error) {
@@ -73,11 +132,13 @@ export const membershipsManifest: ModuleManifest = {
 
   exports: {
     checkAccess: async (memberId: string, benefitId: string) => {
-      logger.debug('App', 'Checking membership access', { memberId, benefitId });
-      return { hasAccess: false };
+      const { checkBenefitAccess } = await import('@/pages/admin/operations/memberships/services');
+      return await checkBenefitAccess(memberId, benefitId);
     },
     renewMembership: async (memberId: string) => {
-      logger.debug('App', 'Renewing membership', { memberId });
+      const { renewMembership } = await import('@/pages/admin/operations/memberships/services');
+      const { user } = await import('@/contexts/AuthContext').then(m => m.useAuth());
+      await renewMembership(memberId, user!);
       return { success: true };
     },
   },

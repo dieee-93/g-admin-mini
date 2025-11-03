@@ -96,7 +96,7 @@ export function SchedulingMetrics({
                 title="Horas Extra"
                 value={`${metrics.overtime_hours}h`}
                 icon={ClockIcon}
-                colorPalette="warning"
+                colorPalette="orange"
                 size="sm"
                 loading={loading}
               />

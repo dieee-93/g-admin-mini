@@ -44,7 +44,9 @@ export function InventoryWidget() {
       <CardWrapper.Body p="4">
         <Stack gap="4">
           <Stack direction="row" align="center" gap="2">
-            <Icon icon={ExclamationTriangleIcon} size="md" color="orange.500" />
+            <Icon size="md" color="orange.500" >
+                <ExclamationTriangleIcon />
+              </Icon>
             <Typography variant="body" size="md" weight="medium">
               Alertas de Inventario
             </Typography>

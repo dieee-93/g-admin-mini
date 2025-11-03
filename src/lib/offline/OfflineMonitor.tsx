@@ -1,7 +1,7 @@
 // OfflineMonitor.tsx - Connection and Sync Status Monitoring for G-Admin Mini
 // Provides real-time offline status, sync progress, and queue monitoring
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   HStack, 
@@ -71,7 +71,8 @@ interface SyncProgress {
 }
 
 // Connection Status Component
-export const ConnectionStatus = () => {
+// ✅ Memoized to prevent unnecessary re-renders
+export const ConnectionStatus = React.memo(() => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({
     isOnline: navigator.onLine,
     lastOnline: Date.now(),
@@ -144,14 +145,13 @@ export const ConnectionStatus = () => {
       (navigator as any).connection.addEventListener('change', updateConnectionStatus);
     }
 
-    // Sync status updates
-    const syncStatusInterval = setInterval(updateSyncStatus, 1000);
-
-    // Event listeners for sync events
+    // ✅ FIX: Event listeners for sync events - NO polling needed!
+    // OfflineSync already emits events when status changes
     offlineSync.on('networkOnline', updateConnectionStatus);
     offlineSync.on('networkOffline', updateConnectionStatus);
     offlineSync.on('syncStarted', updateSyncStatus);
     offlineSync.on('syncCompleted', updateSyncStatus);
+    offlineSync.on('batchProcessed', updateSyncStatus); // ✅ Added to track progress during sync
     offlineSync.on('initialized', (data: { queueSize: number }) => {
       logger.info('OfflineSync', `[OfflineMonitor] OfflineSync initialized with ${data.queueSize} operations`);
       updateSyncStatus();
@@ -167,12 +167,13 @@ export const ConnectionStatus = () => {
       if ((navigator as any).connection) {
         (navigator as any).connection.removeEventListener('change', updateConnectionStatus);
       }
-      clearInterval(syncStatusInterval);
-      
+      // ✅ No interval to clear - using pure event-driven architecture
+
       offlineSync.off('networkOnline', updateConnectionStatus);
       offlineSync.off('networkOffline', updateConnectionStatus);
       offlineSync.off('syncStarted', updateSyncStatus);
       offlineSync.off('syncCompleted', updateSyncStatus);
+      offlineSync.off('batchProcessed', updateSyncStatus);
       offlineSync.off('initialized', updateSyncStatus);
     };
   }, []);
@@ -180,13 +181,13 @@ export const ConnectionStatus = () => {
   const getConnectionBadgeProps = () => {
     if (connectionStatus.isOnline) {
       return {
-        colorScheme: 'green',
+        colorPalette: 'green',
         icon: WifiIcon,
         text: 'Online'
       };
     } else {
       return {
-        colorScheme: 'red',
+        colorPalette: 'red',
         icon: NoSymbolIcon,
         text: 'Offline'
       };
@@ -196,7 +197,7 @@ export const ConnectionStatus = () => {
   const badgeProps = getConnectionBadgeProps();
 
   return (
-    <HStack gap={1} align="center">
+    <HStack gap="1" align="center">
       {/* Icono principal de conexión - más discreto */}
       <Box 
         w="6" 
@@ -246,10 +247,11 @@ export const ConnectionStatus = () => {
       )}
     </HStack>
   );
-};
+});
 
 // Sync Progress Component
-export const SyncProgress = () => {
+// ✅ Memoized to prevent unnecessary re-renders
+export const SyncProgress = React.memo(() => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
   const [syncProgress, setSyncProgress] = useState<SyncProgress>({
     current: 0,
@@ -291,16 +293,16 @@ export const SyncProgress = () => {
       }));
     };
 
-    // Set up listeners
-    const interval = setInterval(updateSyncStatus, 1000);
+    // ✅ FIX: Event-driven - no polling needed
     offlineSync.on('syncStarted', handleSyncStarted);
+    offlineSync.on('syncCompleted', updateSyncStatus); // ✅ Added to update when sync finishes
     offlineSync.on('batchProcessed', handleBatchProcessed);
 
     updateSyncStatus();
 
     return () => {
-      clearInterval(interval);
       offlineSync.off('syncStarted', handleSyncStarted);
+      offlineSync.off('syncCompleted', updateSyncStatus);
       offlineSync.off('batchProcessed', handleBatchProcessed);
     };
   }, []);
@@ -311,8 +313,8 @@ export const SyncProgress = () => {
 
   return (
     <>
-      <Box p={3} bg="blue.50" borderRadius="md" border="1px" borderColor="blue.200">
-        <HStack justify="space-between" mb={2}>
+      <Box p="3" bg="blue.50" borderRadius="md" border="1px" borderColor="blue.200">
+        <HStack justify="space-between" mb="2">
           <HStack>
             <Icon icon={BoltIcon} size="sm" color="var(--chakra-colors-blue-500)" />
             <Text fontSize="sm" fontWeight="medium" color="blue.700">
@@ -325,11 +327,11 @@ export const SyncProgress = () => {
         </HStack>
         
         {syncStatus?.isSyncing && (
-          <VStack gap={1} align="stretch">
+          <VStack gap="1" align="stretch">
             <Progress.Root 
               value={syncProgress.percentage} 
               size="sm" 
-              colorScheme="blue"
+              colorPalette="blue"
               borderRadius="full"
             >
               <Progress.Track>
@@ -355,7 +357,7 @@ export const SyncProgress = () => {
             </Text>
             <Button 
               size="xs" 
-              colorScheme="blue" 
+              colorPalette="blue" 
               onClick={() => offlineSync.forceSync()}
               
             >
@@ -374,17 +376,18 @@ export const SyncProgress = () => {
       />
     </>
   );
-};
+});
 
 // Offline Status Alert Component
-export const OfflineAlert = () => {
+// ✅ Memoized to prevent unnecessary re-renders
+export const OfflineAlert = React.memo(() => {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [queueSize, setQueueSize] = useState(0);
 
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
-    
+
     const updateQueueSize = () => {
       const status = offlineSync.getSyncStatus();
       setQueueSize(status.queueSize);
@@ -392,14 +395,20 @@ export const OfflineAlert = () => {
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
-    const interval = setInterval(updateQueueSize, 2000);
-    updateQueueSize();
+
+    // ✅ FIX: Event-driven - update only when queue actually changes
+    offlineSync.on('operationQueued', updateQueueSize);
+    offlineSync.on('batchProcessed', updateQueueSize);
+    offlineSync.on('syncCompleted', updateQueueSize);
+
+    updateQueueSize(); // Initial load
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      clearInterval(interval);
+      offlineSync.off('operationQueued', updateQueueSize);
+      offlineSync.off('batchProcessed', updateQueueSize);
+      offlineSync.off('syncCompleted', updateQueueSize);
     };
   }, []);
 
@@ -425,10 +434,11 @@ export const OfflineAlert = () => {
       </Box>
     </Alert.Root>
   );
-};
+});
 
 // Queue Monitor Component
-export const QueueMonitor = () => {
+// ✅ Memoized to prevent unnecessary re-renders
+export const QueueMonitor = React.memo(() => {
   const [queueOperations, setQueueOperations] = useState<QueuedOperation[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -441,10 +451,18 @@ export const QueueMonitor = () => {
       setQueueOperations([]); // Would be populated from actual queue
     };
 
-    const interval = setInterval(updateQueue, 2000);
-    updateQueue();
+    // ✅ FIX: Event-driven - update only when queue actually changes
+    offlineSync.on('operationQueued', updateQueue);
+    offlineSync.on('batchProcessed', updateQueue);
+    offlineSync.on('syncCompleted', updateQueue);
 
-    return () => clearInterval(interval);
+    updateQueue(); // Initial load
+
+    return () => {
+      offlineSync.off('operationQueued', updateQueue);
+      offlineSync.off('batchProcessed', updateQueue);
+      offlineSync.off('syncCompleted', updateQueue);
+    };
   }, []);
 
   if (queueOperations.length === 0) {
@@ -452,8 +470,8 @@ export const QueueMonitor = () => {
   }
 
   return (
-    <Box bg="bg.canvas" borderRadius="md" p={3} border="1px" borderColor="border.default">
-      <HStack justify="space-between" mb={2} cursor="pointer" onClick={() => setIsExpanded(!isExpanded)}>
+    <Box bg="bg.canvas" borderRadius="md" p="3" border="1px" borderColor="border.default">
+      <HStack justify="space-between" mb="2" cursor="pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <HStack>
           <Icon icon={CircleStackIcon} size="sm" />
           <Text fontSize="sm" fontWeight="medium">
@@ -464,7 +482,7 @@ export const QueueMonitor = () => {
       </HStack>
 
       {isExpanded && (
-        <VStack gap={2} align="stretch">
+        <VStack gap="2" align="stretch">
           {queueOperations.slice(0, 5).map(operation => (
             <OperationItem key={operation.id} operation={operation} />
           ))}
@@ -477,31 +495,31 @@ export const QueueMonitor = () => {
       )}
     </Box>
   );
-};
+});
 
 // Individual Operation Item
 const OperationItem = ({ operation }: { operation: QueuedOperation }) => {
   const getStatusProps = () => {
     switch (operation.status) {
       case 'pending':
-        return { colorScheme: 'yellow', icon: ClockIcon };
+        return { colorPalette: 'yellow', icon: ClockIcon };
       case 'syncing':
-        return { colorScheme: 'blue', icon: ArrowPathIcon };
+        return { colorPalette: 'blue', icon: ArrowPathIcon };
       case 'failed':
-        return { colorScheme: 'red', icon: XCircleIcon };
+        return { colorPalette: 'red', icon: XCircleIcon };
       case 'completed':
-        return { colorScheme: 'green', icon: CheckCircleIcon };
+        return { colorPalette: 'green', icon: CheckCircleIcon };
       default:
-        return { colorScheme: 'gray', icon: ClockIcon };
+        return { colorPalette: 'gray', icon: ClockIcon };
     }
   };
 
   const statusProps = getStatusProps();
 
   return (
-    <HStack gap={3} p={2} bg="white" borderRadius="sm" fontSize="sm">
+    <HStack gap="3" p="2" bg="white" borderRadius="sm" fontSize="sm">
       <Icon icon={statusProps.icon} size="sm" color="var(--chakra-colors-gray-500)" />
-      <VStack gap={0} align="start" flex="1">
+      <VStack gap="0" align="start" flex="1">
         <Text fontWeight="medium">
           {operation.type} {operation.entity}
         </Text>
@@ -509,7 +527,7 @@ const OperationItem = ({ operation }: { operation: QueuedOperation }) => {
           {new Date(operation.timestamp).toLocaleTimeString()}
         </Text>
       </VStack>
-      <Badge colorScheme={statusProps.colorScheme} size="sm">
+      <Badge colorPalette={statusProps.colorPalette} size="sm">
         {operation.status}
       </Badge>
     </HStack>
@@ -530,11 +548,11 @@ export const OfflineStatusBar = () => {
       
       borderBottom="1px"
       borderColor="border.default"
-      p={2}
+      p="2"
     >
       <Flex justify="space-between" align="center" maxW="container.xl" mx="auto">
         <ConnectionStatus />
-        <HStack gap={3}>
+        <HStack gap="3">
           <Text fontSize="sm" color="gray.600">G-Admin Mini</Text>
         </HStack>
       </Flex>
@@ -572,10 +590,10 @@ const SyncDetailsModal = ({
           <DialogCloseTrigger />
         </DialogHeader>
         <DialogBody>
-          <VStack gap={4} align="stretch">
+          <VStack gap="4" align="stretch">
             {/* Connection Info */}
             <Box>
-              <Text fontWeight="semibold" mb={2}>Connection Status</Text>
+              <Text fontWeight="semibold" mb="2">Connection Status</Text>
               <HStack>
                 <ConnectionStatus />
               </HStack>
@@ -584,14 +602,14 @@ const SyncDetailsModal = ({
             {/* Sync Progress */}
             {syncStatus?.isSyncing && (
               <Box>
-                <Text fontWeight="semibold" mb={2}>Sync Progress</Text>
-                <HStack gap={4}>
+                <Text fontWeight="semibold" mb="2">Sync Progress</Text>
+                <HStack gap="4">
                   <Box>
                     <Text fontSize="2xl" fontWeight="bold" color="blue.400">
                       {syncProgress.percentage}%
                     </Text>
                   </Box>
-                  <VStack align="start" gap={1}>
+                  <VStack align="start" gap="1">
                     <Text fontSize="sm">
                       {syncProgress.current} of {syncProgress.total} operations
                     </Text>
@@ -608,15 +626,15 @@ const SyncDetailsModal = ({
 
             {/* Queue Status */}
             <Box>
-              <Text fontWeight="semibold" mb={2}>Queue Status</Text>
-              <VStack gap={2} align="stretch">
+              <Text fontWeight="semibold" mb="2">Queue Status</Text>
+              <VStack gap="2" align="stretch">
                 <HStack justify="space-between">
                   <Text fontSize="sm">Pending Operations:</Text>
-                  <Badge colorScheme="yellow">{syncStatus?.queueSize || 0}</Badge>
+                  <Badge colorPalette="yellow">{syncStatus?.queueSize || 0}</Badge>
                 </HStack>
                 <HStack justify="space-between">
                   <Text fontSize="sm">Conflicts:</Text>
-                  <Badge colorScheme="red">{syncStatus?.conflicts.length || 0}</Badge>
+                  <Badge colorPalette="red">{syncStatus?.conflicts.length || 0}</Badge>
                 </HStack>
                 <HStack justify="space-between">
                   <Text fontSize="sm">Last Sync:</Text>
@@ -633,10 +651,10 @@ const SyncDetailsModal = ({
             {/* Errors */}
             {syncStatus?.errors && syncStatus.errors.length > 0 && (
               <Box>
-                <Text fontWeight="semibold" mb={2} color="red.500">Recent Errors</Text>
-                <VStack gap={1} align="stretch">
+                <Text fontWeight="semibold" mb="2" color="red.500">Recent Errors</Text>
+                <VStack gap="1" align="stretch">
                   {syncStatus.errors.slice(0, 3).map((error, index) => (
-                    <Text key={index} fontSize="xs" color="red.500" bg="red.50" p={2} borderRadius="sm">
+                    <Text key={index} fontSize="xs" color="red.500" bg="red.50" p="2" borderRadius="sm">
                       {error}
                     </Text>
                   ))}
@@ -646,15 +664,15 @@ const SyncDetailsModal = ({
           </VStack>
         </DialogBody>
         <DialogFooter>
-          <HStack gap={2}>
+          <HStack gap="2">
             <Button variant="ghost" onClick={onClose}>
               Close
             </Button>
-            <Button colorScheme="red" size="sm" onClick={handleClearQueue}>
+            <Button colorPalette="red" size="sm" onClick={handleClearQueue}>
               Clear Queue
             </Button>
             <Button 
-              colorScheme="blue" 
+              colorPalette="blue" 
               onClick={handleForcSync}
               loading={syncStatus?.isSyncing}
             >
@@ -677,7 +695,7 @@ export const OfflineMonitorProvider = ({ children }: { children: React.ReactNode
         {children}
       </Box>
       <Box position="fixed" bottom={4} right={4} zIndex="tooltip">
-        <VStack gap={2} align="end">
+        <VStack gap="2" align="end">
           <OfflineAlert />
           <SyncProgress />
           <QueueMonitor />

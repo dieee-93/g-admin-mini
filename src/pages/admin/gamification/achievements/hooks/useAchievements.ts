@@ -6,7 +6,8 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { AchievementsEngine } from '../services/AchievementsEngine';
+// DEPRECATED: AchievementsEngine removed - use Module Registry system
+// import { AchievementsEngine } from '../services/AchievementsEngine';
 import { getMilestoneDefinition } from '../../../../../config/milestones';
 import type { AchievementProgress, MilestoneDefinition } from '../types';
 

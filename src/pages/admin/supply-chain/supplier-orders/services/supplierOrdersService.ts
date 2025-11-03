@@ -270,8 +270,8 @@ export const supplierOrdersService = {
     const sorted = [...orders];
 
     sorted.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
+      let aValue: string | number | Date | null;
+      let bValue: string | number | Date | null;
 
       switch (sort.field) {
         case 'po_number':

@@ -22,6 +22,14 @@ import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
 import { Button, Icon, Stack, Badge } from '@/shared/ui';
 import { ChartBarIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { TAKEAWAY_MANDATORY } from '@/modules/achievements/constants';
+import { TakeAwayToggle } from './components';
+
+// Ecommerce sub-module exports
+export * from './ecommerce/components';
+export * from './ecommerce/hooks';
+export * from './ecommerce/services';
+export * from './ecommerce/types';
 
 /**
  * Sales Module Manifest
@@ -77,6 +85,20 @@ export const salesManifest: ModuleManifest = {
   ] as FeatureId[],
 
   // ============================================
+  // PERMISSIONS & ROLES
+  // ============================================
+
+  /**
+   * 🔒 PERMISSIONS: Minimum role required to access this module
+   * - employee: Can create and process sales (read, create, update)
+   * - supervisor: + Can void orders (read, create, update, void)
+   * - manager/admin: Full access (read, create, update, void, delete, export, configure)
+   *
+   * Granular permissions checked at component level via usePermissions()
+   */
+  minimumRole: 'OPERADOR' as const, // Employee level and above
+
+  // ============================================
   // HOOK POINTS
   // ============================================
 
@@ -91,6 +113,9 @@ export const salesManifest: ModuleManifest = {
       'sales.payment_received', // Emitted when payment is processed
       'materials.row.actions', // Provides actions for materials grid
       'dashboard.widgets', // Provides dashboard widgets
+      'sales.toolbar.actions', // Provides toolbar actions (TakeAway toggle, etc.)
+      'sales.tabs', // NEW - ecommerce will inject here
+      'sales.tab_content', // NEW - ecommerce tab content
     ],
 
     /**
@@ -99,7 +124,7 @@ export const salesManifest: ModuleManifest = {
      */
     consume: [
       'materials.stock_updated',        // Listen to inventory changes
-      'kitchen.order_ready',            // Listen to kitchen status
+      'production.order_ready',         // Listen to production status (RENAMED: kitchen → production)
       'scheduling.toolbar.actions',     // Add sales forecast button to scheduling
       'scheduling.top_metrics',         // Add sales forecast widget
     ],
@@ -122,38 +147,51 @@ export const salesManifest: ModuleManifest = {
 
     try {
       // ============================================
-      // EXAMPLE 1: Register dashboard widget
+      // ACHIEVEMENTS: Registrar Requirements TakeAway
       // ============================================
 
       /**
-       * Hook: dashboard.widgets
-       * Provides a sales summary widget for the dashboard
+       * Registrar requirements obligatorios para TakeAway
+       * Solo si la feature está activa
        */
-      registry.addAction(
-        'dashboard.widgets',
-        () => {
-          // Return React component or data
-          return {
-            id: 'sales-summary',
-            title: 'Sales Summary',
-            type: 'sales',
-            priority: 10,
-            // Component would be lazy-loaded in production
-            data: {
-              todaySales: 0,
-              pendingOrders: 0,
-              completedOrders: 0,
-            },
-          };
-        },
-        'sales', // moduleId
-        10 // priority (higher = executed first)
-      );
+      const { useCapabilityStore } = await import('@/store/capabilityStore');
+      const hasFeature = useCapabilityStore.getState().hasFeature;
 
-      logger.debug('App', 'Registered dashboard.widgets hook');
+      if (hasFeature('sales_pickup_orders')) {
+        logger.debug('App', 'Registrando TakeAway requirements...');
+
+        registry.doAction('achievements.register_requirement', {
+          capability: 'pickup_counter',
+          requirements: TAKEAWAY_MANDATORY
+        });
+
+        logger.debug('App', `✅ Registrados ${TAKEAWAY_MANDATORY.length} requirements TakeAway`);
+      }
 
       // ============================================
-      // EXAMPLE 2: Register material row actions
+      // HOOK: TakeAway Toggle (Toolbar Action)
+      // ============================================
+
+      /**
+       * Hook: sales.toolbar.actions
+       * Inyecta el toggle de TakeAway en la toolbar de Sales
+       *
+       * 🔒 PERMISSIONS: Requires 'create' permission on 'sales' module
+       */
+      registry.addAction(
+        'sales.toolbar.actions',
+        () => {
+          return <TakeAwayToggle key="takeaway-toggle" />;
+        },
+        'sales',
+        90, // Alta prioridad - mostrar prominente
+        { requiredPermission: { module: 'sales', action: 'create' } }
+      );
+
+      logger.debug('App', 'Registered sales.toolbar.actions hook (TakeAway toggle)');
+
+      // ============================================
+      // MATERIAL ROW ACTIONS HOOK
       // ============================================
 
       /**
@@ -162,8 +200,8 @@ export const salesManifest: ModuleManifest = {
        */
       registry.addAction(
         'materials.row.actions',
-        (data) => {
-          // data contains material info from materials module
+        () => {
+          // Material info passed via onClick parameter
           return {
             id: 'create-sale-from-material',
             label: 'Create Sale',
@@ -187,6 +225,8 @@ export const salesManifest: ModuleManifest = {
       /**
        * Hook: scheduling.toolbar.actions
        * Adds "View Sales Forecast" button to scheduling toolbar
+       *
+       * 🔒 PERMISSIONS: Requires 'read' permission on 'sales' module
        */
       registry.addAction(
         'scheduling.toolbar.actions',
@@ -221,7 +261,8 @@ export const salesManifest: ModuleManifest = {
           );
         },
         'sales',
-        85 // High priority - show near other actions
+        85, // High priority - show near other actions
+        { requiredPermission: { module: 'sales', action: 'read' } }
       );
 
       logger.debug('App', 'Registered scheduling.toolbar.actions hook');
@@ -233,10 +274,12 @@ export const salesManifest: ModuleManifest = {
       /**
        * Hook: scheduling.top_metrics
        * Adds sales forecast metric to scheduling top bar
+       *
+       * 🔒 PERMISSIONS: Requires 'read' permission on 'sales' module
        */
       registry.addAction(
         'scheduling.top_metrics',
-        (data) => {
+        () => {
           // Mock forecast data - would come from sales forecast API
           const forecastRevenue = '$12,450';
           const forecastOrders = 145;
@@ -245,8 +288,8 @@ export const salesManifest: ModuleManifest = {
             <Stack
               key="sales-forecast-metric"
               direction="column"
-              gap={1}
-              p={3}
+              gap="1"
+              p="3"
               bg="green.50"
               borderRadius="md"
               borderWidth="1px"
@@ -270,10 +313,53 @@ export const salesManifest: ModuleManifest = {
           );
         },
         'sales',
-        90 // High priority metric
+        90, // High priority metric
+        { requiredPermission: { module: 'sales', action: 'read' } }
       );
 
       logger.debug('App', 'Registered scheduling.top_metrics hook');
+
+      // ============================================
+      // ECOMMERCE SUB-MODULE INTEGRATION
+      // ============================================
+
+      /**
+       * Register ecommerce sub-module hooks if online_store capability active
+       */
+      if (hasFeature('sales_catalog_ecommerce')) {
+        logger.debug('App', 'Registering ecommerce hooks...');
+
+        const { OnlineOrdersTab } = await import('./ecommerce/components');
+        const { ShoppingCartIcon } = await import('@heroicons/react/24/outline');
+
+        // Inject Online Orders tab in Sales
+        registry.addAction(
+          'sales.tabs',
+          () => (
+            <button key="online-orders-tab" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <ShoppingCartIcon style={{ width: '1rem', height: '1rem' }} />
+              Online Orders
+              <Badge colorPalette="green" size="sm">NEW</Badge>
+            </button>
+          ),
+          'sales',
+          15
+        );
+
+        registry.addAction(
+          'sales.tab_content',
+          ({ activeTab }: { activeTab: string }) => {
+            if (activeTab === 'online-orders') {
+              return <OnlineOrdersTab />;
+            }
+            return null;
+          },
+          'sales',
+          15
+        );
+
+        logger.debug('App', '✅ Ecommerce hooks registered in Sales module');
+      }
 
       // ============================================
       // EXAMPLE 5: Listen to inventory changes
@@ -287,8 +373,9 @@ export const salesManifest: ModuleManifest = {
       // This is just for documentation - actual consumption happens via EventBus
 
       logger.info('App', '✅ Sales module setup complete', {
-        hooksProvided: 5,
+        hooksProvided: 7, // sales.toolbar.actions + materials.row.actions + scheduling hooks + sales.tabs + sales.tab_content
         hooksConsumed: 2,
+        requirementsRegistered: TAKEAWAY_MANDATORY.length,
       });
     } catch (error) {
       logger.error('App', '❌ Sales module setup failed', error);
@@ -322,7 +409,7 @@ export const salesManifest: ModuleManifest = {
    */
   exports: {
     // Example API methods
-    createOrder: async (orderData: any) => {
+    createOrder: async (orderData: OrderData) => {
       logger.debug('App', 'Creating order via public API', orderData);
       // Implementation would be here
       return { id: 'order-123', status: 'created' };
@@ -344,7 +431,7 @@ export const salesManifest: ModuleManifest = {
     author: 'G-Admin Team',
     tags: ['sales', 'orders', 'pos', 'payments'],
     navigation: {
-      route: '/admin/sales',
+      route: '/admin/operations/sales',
       icon: CurrencyDollarIcon,
       color: 'teal',
       domain: 'operations',
@@ -366,8 +453,14 @@ export default salesManifest;
  * Type definition for Sales module public API
  * Other modules can use this for type-safe access
  */
+interface OrderData {
+  items: unknown[];
+  customerId?: string;
+  total?: number;
+}
+
 export interface SalesAPI {
-  createOrder: (orderData: any) => Promise<{ id: string; status: string }>;
+  createOrder: (orderData: OrderData) => Promise<{ id: string; status: string }>;
   getOrderStatus: (orderId: string) => Promise<{ status: string }>;
 }
 

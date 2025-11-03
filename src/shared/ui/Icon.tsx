@@ -1,103 +1,76 @@
 import { Icon as ChakraIcon } from '@chakra-ui/react';
 import type { IconProps as ChakraIconProps, ConditionalValue } from '@chakra-ui/react';
-import type { ElementType, ReactElement } from 'react';
+import type { ElementType } from 'react';
 
-
-interface IconProps extends Omit<ChakraIconProps, 'children' | 'as' | 'size'> {
-  /** El componente de ícono a renderizar (ej: de heroicons, react-icons, etc.) */
+interface IconProps extends Omit<ChakraIconProps, 'size'> {
+  /** El componente de ícono a renderizar - alternativa a `as` prop (ej: de heroicons, react-icons, etc.) */
   icon?: ElementType;
   /** Tamaño predefinido del ícono */
   size?: ConditionalValue<"sm" | "md" | "lg" | "xl" | "2xl" | "xs" | "inherit" | undefined>;
-  /** Para compatibilidad con asChild pattern */
-  asChild?: boolean;
-  /** Children para el patrón asChild */
-  children?: ReactElement;
 }
 
 /**
- * Componente Icon universal - Wrapper simple para Chakra UI Icon
+ * Componente Icon universal - Wrapper para Chakra UI Icon v3
  * Compatible con Heroicons, React Icons y cualquier SVG component
- * 
+ *
  * @example
- * // Con heroicons
+ * // Patrón 1: Con children (estándar Chakra v3)
  * import { HomeIcon } from '@heroicons/react/24/outline'
+ * <Icon size="md"><HomeIcon /></Icon>
+ *
+ * // Patrón 2: Con `as` prop (estándar Chakra v3)
+ * <Icon as={HomeIcon} size="md" />
+ *
+ * // Patrón 3: Con `icon` prop (compatibilidad legacy)
  * <Icon icon={HomeIcon} size="md" />
- * 
- * // Con react-icons
- * import { FiHome } from 'react-icons/fi'
- * <Icon icon={FiHome} size="lg" />
- *  
- * // Con tamaño custom
- * <Icon icon={UserIcon} size="8" />
- * 
- * // Patrón asChild (compatible con Chakra UI v3)
- * <Icon asChild>
+ *
+ * // Con asChild pattern
+ * <Icon asChild size="lg">
  *   <CustomSvgIcon />
  * </Icon>
  */
-export const Icon = ({ 
-  icon: IconComponent, 
-  size = 'md', 
-  asChild, 
+export const Icon = ({
+  icon: IconComponent,
+  as: AsComponent,
+  size = 'md',
   children,
-  ...props 
+  ...props
 }: IconProps) => {
-  // Determinar el tamaño final - asegurar compatibilidad con Chakra UI
+  // Prioridad: as > icon > children
+  // Si tenemos `as` o `icon` prop, usamos ese componente
+  const IconToRender = AsComponent || IconComponent;
 
-
-  // Si usamos el patrón asChild, renderizamos el children directamente
-  if (asChild && children) {
+  // FIX: Validar que sea un componente React válido
+  // Si es string, undefined, null, o cualquier cosa que no sea función, no usar ChakraIcon
+  if (typeof IconToRender !== 'function') {
+    // Renderizar como texto simple (emojis, strings, etc)
+    const sizeMap = { 'xs': '12px', 'sm': '14px', 'md': '16px', 'lg': '20px', 'xl': '24px', '2xl': '28px' };
+    const fontSize = sizeMap[size as keyof typeof sizeMap] || '16px';
     return (
-      <ChakraIcon size={size} {...props} asChild>
+      <span style={{ fontSize, display: 'inline-block', lineHeight: 1 }}>
+        {typeof IconToRender === 'string' ? IconToRender : '?'}
+      </span>
+    );
+  }
+
+  // Si llegamos aquí, IconToRender ES una función (componente React válido)
+  if (IconToRender) {
+    return (
+      <ChakraIcon as={IconToRender} size={size} {...props} />
+    );
+  }
+
+  // Si tenemos children, usamos el patrón children
+  if (children) {
+    return (
+      <ChakraIcon size={size} {...props}>
         {children}
       </ChakraIcon>
     );
   }
 
-  // Si tenemos un componente de ícono, lo renderizamos directamente sin ChakraIcon
-  // Heroicons v2 son componentes SVG que funcionan mejor sin wrapper
-  if (IconComponent) {
-    // Map Chakra sizes to pixel values for Heroicons
-    const sizeMap = {
-      'xs': '16px',
-      'sm': '20px',
-      'md': '24px',
-      'lg': '32px',
-      'xl': '40px',
-      '2xl': '48px',
-      'inherit': 'inherit'
-    };
-
-    const pixelSize = sizeMap[size as keyof typeof sizeMap] || size;
-
-    // Extract only valid SVG props (filter out Chakra-specific props)
-    const { color, colorPalette, ...svgProps } = props as any;
-
-    // Convert Chakra color to CSS color for SVG
-    const svgColor = color && typeof color === 'string' && color.includes('.')
-      ? `var(--chakra-colors-${color.replace('.', '-')})`
-      : color;
-
-    return (
-      <IconComponent
-        style={{
-          width: pixelSize,
-          height: pixelSize,
-          color: svgColor,
-          ...props.style
-        }}
-        {...svgProps}
-      />
-    );
-  }
-
-  // Fallback - renderizar ChakraIcon sin contenido
-  return (
-    <ChakraIcon 
-      size={size}
-      {...props}
-    />
-  );
+  // Fallback - Icon vacío
+  return <ChakraIcon size={size} {...props} />;
 };
 
 // Variantes especializadas para diferentes contextos

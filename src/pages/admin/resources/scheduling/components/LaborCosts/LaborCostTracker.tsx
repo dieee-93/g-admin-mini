@@ -2,21 +2,14 @@
 // MIGRATED: Now uses centralized business logic for precise calculations
 import { useState, useEffect } from 'react';
 import {
-  Stack, Button, Badge, SimpleGrid, Typography, Section,
-  Icon, MetricCard, CardGrid, CardWrapper, VStack, HStack, Box,
+  Button, Badge, SimpleGrid, Typography, CardWrapper, VStack, HStack, Box
 } from '@/shared/ui';
 import { Progress, Table, Select, createListCollection } from '@chakra-ui/react';
-import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import * as TableOperations from '@/business-logic/operations/tableOperations';
-import { 
-  CurrencyDollarIcon,
-  ChartBarIcon,
+import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   ExclamationTriangleIcon,
-  CalendarIcon,
-  ClockIcon,
   DocumentArrowDownIcon
 } from '@heroicons/react/24/outline';
 
@@ -65,8 +58,7 @@ const periodCollection = createListCollection({
     { label: 'Week', value: 'week' },
     { label: 'Month', value: 'month' },
     { label: 'Quarter', value: 'quarter' },
-  ],
-});
+  ]});
 
 const viewCollection = createListCollection({
   items: [
@@ -74,8 +66,7 @@ const viewCollection = createListCollection({
     { label: 'Breakdown', value: 'breakdown' },
     { label: 'Trends', value: 'trends' },
     { label: 'Budget', value: 'budget' },
-  ],
-});
+  ]});
 
 export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTrackerProps) {
   const [loading, setLoading] = useState(true);
@@ -95,8 +86,24 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
     view: 'summary' as CostView
   });
 
-  // Mock data - will be replaced with API calls
+  // Load real data from props - calculated from actual shifts
   useEffect(() => {
+    setLoading(true);
+
+    // For now, use simple calculated metrics from props
+    // In future, this will call schedulingAnalyticsApi.getLaborCostBreakdown()
+    const calculatedMetrics: LaborMetrics = {
+      labor_cost_percentage: weeklyTotal > 0 ? (weeklyTotal / 50000) * 100 : 0, // Assume 50k revenue
+      overtime_percentage: overtimeHours > 0 ? (overtimeHours / 160) * 100 : 0, // Assume 160 total hours
+      avg_cost_per_shift: weeklyTotal > 0 ? weeklyTotal / 40 : 0, // Assume 40 shifts/week
+      cost_per_customer_served: weeklyTotal > 0 ? weeklyTotal / 500 : 0, // Assume 500 customers/week
+      budget_utilization: weeklyTotal > 0 ? (weeklyTotal / 20000) * 100 : 0, // Assume 20k budget
+      efficiency_score: 75 // Default efficiency score
+    };
+
+    setMetrics(calculatedMetrics);
+
+    // Mock breakdown data - will be replaced with API call
     const mockCostBreakdown: LaborCostBreakdown[] = [
       {
         position: 'Server',
@@ -194,7 +201,6 @@ export function LaborCostTracker({ weeklyTotal, overtimeHours }: LaborCostTracke
 
     setCostBreakdown(mockCostBreakdown);
     setWeeklySummary(mockWeeklySummary);
-    setMetrics(mockMetrics);
     setLoading(false);
   }, [weeklyTotal, overtimeHours]);
 

@@ -13,12 +13,9 @@ export function MaterialsAlerts({ onAlertAction, context }: MaterialsAlertsProps
   const { alerts, dismissAlert } = useAlerts();
 
   // ✅ ENGINE INTELIGENTE (específico)
-  const { generateAndUpdateAlerts, intelligentAlerts } = useSmartInventoryAlerts();
-
-  // ✅ SYNC INTELLIGENT ALERTS WITH UNIFIED SYSTEM
-  useEffect(() => {
-    generateAndUpdateAlerts();
-  }, [generateAndUpdateAlerts]);
+  // ❌ FIX: Removed duplicate useEffect - alert generation is already handled
+  // by useSmartInventoryAlerts internally via its own useEffect
+  const { generateAndUpdateAlerts } = useSmartInventoryAlerts();
 
   const materialsAlerts = alerts.filter(alert => alert.context === context);
 

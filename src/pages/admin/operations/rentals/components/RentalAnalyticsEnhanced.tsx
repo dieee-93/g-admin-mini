@@ -306,7 +306,7 @@ const RentalAnalyticsEnhanced: React.FC = () => {
               <Section key={category.category} variant="flat">
                 <Stack direction={{ base: 'column', md: 'row' }} justify="between" align="start" gap="md">
                   <Stack gap="sm">
-                    <Typography variant="h6">{category.category}</Typography>
+                    <Typography variant="subtitle">{category.category}</Typography>
                     <Stack direction="row" gap="sm">
                       <Badge
                         colorPalette={category.utilization > 80 ? 'green' : category.utilization > 60 ? 'yellow' : 'red'}
@@ -391,7 +391,7 @@ const RentalAnalyticsEnhanced: React.FC = () => {
                 <Stack direction={{ base: 'column', md: 'row' }} justify="between" align="start" gap="md">
                   <Stack gap="sm">
                     <Stack direction="row" align="center" gap="sm">
-                      <Typography variant="h6">{trend.period}</Typography>
+                      <Typography variant="subtitle">{trend.period}</Typography>
                       <Badge
                         colorPalette={
                           trend.status === 'excellent' ? 'green' :
@@ -470,7 +470,7 @@ const RentalAnalyticsEnhanced: React.FC = () => {
             {rentalInsights.map((insight, index) => (
               <Alert key={index} status={insight.type} size="md">
                 <Stack gap="sm">
-                  <Typography variant="h6">{insight.title}</Typography>
+                  <Typography variant="subtitle">{insight.title}</Typography>
                   <Typography variant="body">{insight.description}</Typography>
                   {insight.actionable && (
                     <Badge colorPalette="blue" variant="subtle" size="sm">

@@ -28,7 +28,7 @@ import {
 } from '../types';
 import type { Supplier } from '../../suppliers/types/supplierTypes';
 import type { MaterialItem } from '../../materials/types';
-import { suppliersApi } from '../../materials/services/suppliersApi';
+import { suppliersApi } from '../../suppliers/services/suppliersApi';
 import { inventoryApi } from '../../materials/services/inventoryApi';
 import { toaster } from '@/shared/ui/toaster';
 import { logger } from '@/lib/logging';
@@ -250,7 +250,7 @@ export function SupplierOrderFormModal({
 
           <Dialog.Body>
             <form id="supplier-order-form" onSubmit={handleSubmit(handleFormSubmit)}>
-              <Stack direction="column" gap={4}>
+              <Stack direction="column" gap="4">
                 {/* Loading State */}
                 {loadingSources && (
                   <Alert status="info">
@@ -298,7 +298,7 @@ export function SupplierOrderFormModal({
                   title="Materiales"
                   description="Agrega los materiales que deseas ordenar"
                 >
-                  <Stack direction="column" gap={3}>
+                  <Stack direction="column" gap="3">
                     {fields.map((field, index) => {
                       const materialId = watchItems[index]?.material_id;
                       const material = materialId ? getMaterialInfo(materialId) : null;
@@ -310,8 +310,8 @@ export function SupplierOrderFormModal({
                         <Stack
                           key={field.id}
                           direction="column"
-                          gap={2}
-                          p={3}
+                          gap="2"
+                          p="3"
                           borderWidth="1px"
                           borderRadius="md"
                           borderColor="border.default"
@@ -345,7 +345,7 @@ export function SupplierOrderFormModal({
 
                           {/* Show material stock info */}
                           {material && (
-                            <HStack gap={2} fontSize="xs" color="fg.muted">
+                            <HStack gap="2" fontSize="xs" color="fg.muted">
                               <Text>Stock actual: {material.stock || 0}</Text>
                               {material.minimum_stock && (
                                 <Text>| Mínimo: {material.minimum_stock}</Text>
@@ -357,7 +357,7 @@ export function SupplierOrderFormModal({
                           )}
 
                           {/* Quantity and cost */}
-                          <HStack gap={2}>
+                          <HStack gap="2">
                             <NumberField
                               label="Cantidad *"
                               error={errors.items?.[index]?.quantity?.message}
@@ -380,11 +380,11 @@ export function SupplierOrderFormModal({
                               placeholder="0.00"
                             />
 
-                            <Stack direction="column" gap={1} flex={1}>
+                            <Stack direction="column" gap="1" flex={1}>
                               <Text fontSize="xs" fontWeight="medium" color="fg.muted">
                                 Subtotal
                               </Text>
-                              <Badge colorPalette="blue" size="lg" py={2}>
+                              <Badge colorPalette="blue" size="lg" py="2">
                                 ${itemTotal.toFixed(2)}
                               </Badge>
                             </Stack>
@@ -425,7 +425,7 @@ export function SupplierOrderFormModal({
                 {/* Total Section */}
                 <HStack
                   justify="space-between"
-                  p={4}
+                  p="4"
                   bg="bg.subtle"
                   borderRadius="md"
                   borderWidth="1px"

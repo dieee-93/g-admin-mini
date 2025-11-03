@@ -44,7 +44,7 @@ export default function SalesAnalyticsChart({
     <CardWrapper>
       <CardWrapper.Header>
         <HStack justify="space-between">
-          <HStack gap={2}>
+          <HStack gap="2">
             <Icon icon={ChartBarIcon} size="lg" color="blue.600" />
             <Text fontSize="lg" fontWeight="semibold">
               {title}
@@ -56,22 +56,22 @@ export default function SalesAnalyticsChart({
         </HStack>
       </CardWrapper.Header>
       <CardWrapper.Body>
-        <VStack gap={4} align="stretch">
+        <VStack gap="4" align="stretch">
           {/* Summary Stats */}
-          <HStack justify="space-around" p={4} bg="blue.50" borderRadius="md">
-            <VStack gap={1}>
+          <HStack justify="space-around" p="4" bg="blue.50" borderRadius="md">
+            <VStack gap="1">
               <Text fontSize="sm" color="gray.600">Total Sales</Text>
               <Text fontSize="xl" fontWeight="bold" color="blue.600">
                 ${totalSales.toLocaleString()}
               </Text>
             </VStack>
-            <VStack gap={1}>
+            <VStack gap="1">
               <Text fontSize="sm" color="gray.600">Total Orders</Text>
               <Text fontSize="xl" fontWeight="bold" color="green.600">
                 {totalOrders}
               </Text>
             </VStack>
-            <VStack gap={1}>
+            <VStack gap="1">
               <Text fontSize="sm" color="gray.600">Avg Order</Text>
               <Text fontSize="xl" fontWeight="bold" color="purple.600">
                 ${avgOrderValue.toFixed(2)}
@@ -89,7 +89,7 @@ export default function SalesAnalyticsChart({
             borderColor="border.default"
             borderRadius="md"
           >
-            <VStack gap={2}>
+            <VStack gap="2">
               <Icon icon={ChartBarIcon} size="3xl" color="gray.400" />
               <Text fontSize="sm" color="gray.600" textAlign="center">
                 Sales trend chart placeholder
@@ -102,11 +102,11 @@ export default function SalesAnalyticsChart({
 
           {/* Data Table */}
           <Box fontSize="sm">
-            <Text fontSize="sm" fontWeight="semibold" mb={2}>Data Preview</Text>
+            <Text fontSize="sm" fontWeight="semibold" mb="2">Data Preview</Text>
             {data.slice(0, 3).map((item, index) => (
-              <HStack key={index} justify="space-between" py={1}>
+              <HStack key={index} justify="space-between" py="1">
                 <Text>{item.period}</Text>
-                <HStack gap={4}>
+                <HStack gap="4">
                   <Text>${item.sales}</Text>
                   <Text color="green.600">{item.orders} orders</Text>
                   <Text color="purple.600">${item.avgOrder.toFixed(2)} avg</Text>

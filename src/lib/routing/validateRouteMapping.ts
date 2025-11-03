@@ -44,9 +44,9 @@ export function validateRouteMappings(): {
 
   // Check 2: Domain extraction works correctly
   logger.info('NavigationContext', '\n🏗️ Testing Domain Extraction...\n');
-  
+
   const testRoutes = [
-    '/admin/sales',
+    '/admin/operations/sales',
     '/admin/materials',
     '/admin/settings/integrations',
     '/app/portal'
@@ -59,9 +59,9 @@ export function validateRouteMappings(): {
 
   // Check 3: Lazy loading integration
   logger.info('NavigationContext', '\n🚀 Testing Lazy Loading Integration...\n');
-  
+
   const lazyRoutes = [
-    '/admin/sales',
+    '/admin/operations/sales',
     '/admin/materials',
     '/admin/settings'
   ];

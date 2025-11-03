@@ -24,6 +24,9 @@ export const intelligenceManifest: ModuleManifest = {
   requiredFeatures: [] as FeatureId[],
   optionalFeatures: [] as FeatureId[],
 
+  // 🔒 PERMISSIONS: Only ADMINISTRADOR for competitive intelligence
+  minimumRole: 'ADMINISTRADOR' as const,
+
   hooks: {
     provide: [
       'dashboard.widgets',        // Intelligence insights widget

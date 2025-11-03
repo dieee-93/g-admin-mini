@@ -1,4 +1,4 @@
-import { Stack, Typography, Icon, Badge, CardGrid, MetricCard, CardWrapper } from '@/shared/ui';
+import { Stack, Typography, Badge, CardGrid, MetricCard, CardWrapper } from '@/shared/ui';
 import { ChartBarIcon, CurrencyDollarIcon, CubeIcon } from '@heroicons/react/24/outline';
 import { useMaterials } from '@/store/materialsStore';
 import { formatCurrency, formatPercentage } from '@/business-logic/shared/decimalUtils';

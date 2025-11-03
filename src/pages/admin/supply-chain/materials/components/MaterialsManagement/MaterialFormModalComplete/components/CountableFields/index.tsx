@@ -1,1 +1,1 @@
-export * from './CountableStockFields';
+export { CountableStockFields } from './CountableStockFields';

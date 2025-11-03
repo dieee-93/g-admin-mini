@@ -68,7 +68,7 @@ export const GalaxyView: React.FC<GalaxyViewProps> = ({
   if (selectedDomain) {
     // Vista de constelación específica
     return (
-      <VStack gap={8} align="stretch">
+      <VStack gap="8" align="stretch">
         {/* Botón para volver a la galaxia */}
         <HStack>
           <Button
@@ -99,14 +99,14 @@ export const GalaxyView: React.FC<GalaxyViewProps> = ({
 
   // Vista de galaxia principal
   return (
-    <VStack gap={8} align="stretch">
-      <Box textAlign="center" mb={6}>
+    <VStack gap="8" align="stretch">
+      <Box textAlign="center" mb="6">
         <Text 
           fontSize="4xl" 
           fontWeight="bold" 
           bgGradient="linear(to-r, purple.400, blue.400, cyan.400)"
           bgClip="text"
-          mb={4}
+          mb="4"
         >
           🌌 Tu Galaxia Personal
         </Text>
@@ -229,8 +229,8 @@ export const GalaxyView: React.FC<GalaxyViewProps> = ({
                   transform="translateX(-50%)"
                   bg="rgba(0, 0, 0, 0.8)"
                   color="white"
-                  px={3}
-                  py={1}
+                  px="3"
+                  py="1"
                   borderRadius="md"
                   fontSize="xs"
                   whiteSpace="nowrap"
@@ -249,7 +249,7 @@ export const GalaxyView: React.FC<GalaxyViewProps> = ({
       </Box>
       
       {/* Leyenda de la galaxia */}
-      <Box textAlign="center" mt={8}>
+      <Box textAlign="center" mt="8">
         <Text color="gray.400" fontSize="sm">
           💡 <strong>Galaxia de Maestría:</strong> Cada planeta representa un dominio. 
           El brillo indica tu progreso. Haz clic para explorar las constelaciones de logros.

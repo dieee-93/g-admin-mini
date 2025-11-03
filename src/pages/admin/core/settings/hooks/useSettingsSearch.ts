@@ -19,7 +19,7 @@ interface SearchableItem {
   section: 'perfil' | 'fiscal' | 'usuarios' | 'sistema';
   category: string;
   keywords: string[];
-  icon: any;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   path?: string;
   priority: 'high' | 'medium' | 'low';
 }

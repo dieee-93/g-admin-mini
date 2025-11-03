@@ -131,9 +131,9 @@ export function CalendarViewSelector({
   // ============================================
 
   return (
-    <Stack direction="row" justify="space-between" align="center" gap={4} py={3}>
+    <Stack direction="row" justify="space-between" align="center" gap="4" py="3">
       {/* LEFT: View Tabs */}
-      <Stack direction="row" gap={2}>
+      <Stack direction="row" gap="2">
         <Button
           size="sm"
           variant={view === 'month' ? 'solid' : 'outline'}
@@ -166,7 +166,7 @@ export function CalendarViewSelector({
       </Stack>
 
       {/* CENTER: Date Navigation */}
-      <Stack direction="row" align="center" gap={3}>
+      <Stack direction="row" align="center" gap="3">
         <Button
           size="sm"
           variant="ghost"
@@ -196,13 +196,13 @@ export function CalendarViewSelector({
       </Stack>
 
       {/* RIGHT: Current Date Display */}
-      <Stack direction="row" align="center" gap={2}>
+      <Stack direction="row" align="center" gap="2">
         <Badge
           size="lg"
           variant="subtle"
           colorPalette="blue"
-          px={4}
-          py={2}
+          px="4"
+          py="2"
           fontWeight="semibold"
         >
           {formatDate()}

@@ -81,7 +81,7 @@ export class SecureLogger {
    * Security-specific logging for threats and anomalies
    */
   static security(message: string, data?: any): void {
-    this.log('error', 'Security', `[SECURITY] ${message}`, data);
+    this.log('info', 'Security', `[SECURITY] ${message}`, data);
   }
 
   /**

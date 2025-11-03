@@ -1,5 +1,5 @@
 import { Card, Stack, Typography, Box } from '@/shared/ui';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface ChartCardProps {
   title: string;

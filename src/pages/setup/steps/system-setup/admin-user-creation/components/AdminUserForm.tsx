@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, VStack } from '@chakra-ui/react';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
-import { InputField } from '@/shared/ui/InputField';
+import { InputField } from '@/shared/ui';
 import { ADMIN_USER_CONFIG } from '../config/constants';
 import { PasswordRequirements } from './PasswordRequirements';
 import type { FormErrors } from '../config/constants';
@@ -38,8 +38,8 @@ export function AdminUserForm({
 
   return (
     <CardWrapper>
-      <Box p={6}>
-        <VStack gap={4} align="stretch">
+      <Box p="6">
+        <VStack gap="4" align="stretch">
           <InputField
             label={form.fullNameLabel}
             placeholder={form.fullNamePlaceholder}

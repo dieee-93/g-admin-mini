@@ -19,6 +19,9 @@ export const supplierOrdersManifest: ModuleManifest = {
   requiredFeatures: ['inventory_supplier_management'] as FeatureId[],
   optionalFeatures: ['inventory_purchase_orders'] as FeatureId[],
 
+  // 🔒 PERMISSIONS: Supervisors can manage purchase orders
+  minimumRole: 'SUPERVISOR' as const,
+
   hooks: {
     provide: [
       'supplier_orders.order_created',
@@ -33,7 +36,7 @@ export const supplierOrdersManifest: ModuleManifest = {
     ]
   },
 
-  setup: async (registry) => {
+  setup: async () => {
     logger.info('App', '📦 Setting up Supplier Orders module');
 
     // Future: Add hook points for integration
@@ -53,7 +56,7 @@ export const supplierOrdersManifest: ModuleManifest = {
     author: 'G-Admin Team',
     tags: ['purchase-orders', 'suppliers', 'procurement', 'inventory'],
     navigation: {
-      route: '/admin/supplier-orders',
+      route: '/admin/supply-chain/supplier-orders',
       icon: DocumentTextIcon,
       color: 'purple',
       domain: 'supply-chain',

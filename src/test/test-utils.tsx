@@ -3,6 +3,7 @@ import { render, type RenderOptions } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { useThemeStore } from '@/store/themeStore';
 import { getCurrentThemeSystem } from '@/lib/theming/dynamicTheming';
+import { vi } from 'vitest';
 
 vi.mock('@/lib/supabase/client', () => ({
   supabase: {

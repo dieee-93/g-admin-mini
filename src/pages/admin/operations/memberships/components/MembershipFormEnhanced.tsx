@@ -7,6 +7,10 @@ import {
   Alert, Badge
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import {
+  CalendarIcon, CurrencyDollarIcon, EyeIcon, TrendingUpIcon, UserIcon, UserPlusIcon
+} from '@heroicons/react/24/outline';
+
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
 import { logger } from '@/lib/logging';
@@ -72,7 +76,6 @@ export const MembershipFormEnhanced: React.FC = () => {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors, isSubmitting }
   } = useForm<MembershipFormData>({
     resolver: zodResolver(membershipSchema),
@@ -241,27 +244,27 @@ export const MembershipFormEnhanced: React.FC = () => {
                 value={`$${membershipMetrics.monthlyRevenue.toLocaleString()}`}
                 change={membershipMetrics.membershipValue === 'premium' ? 25 :
                        membershipMetrics.membershipValue === 'high' ? 15 : 5}
-                icon="CurrencyDollarIcon"
+                icon={CurrencyDollarIcon}
               />
               <MetricCard
                 title="Valor de Vida (LTV)"
                 value={`$${membershipMetrics.lifetimeValue.toLocaleString()}`}
                 change={membershipMetrics.membershipValue === 'enterprise' ? 35 : 20}
-                icon="TrendingUpIcon"
+                icon={TrendingUpIcon}
               />
               <MetricCard
                 title="Retención Estimada"
                 value={`${membershipMetrics.retentionProbability}%`}
                 change={membershipMetrics.retentionProbability > 80 ? 10 :
                        membershipMetrics.retentionProbability > 70 ? 5 : -5}
-                icon="UserIcon"
+                icon={UserIcon}
               />
               <MetricCard
                 title="Próxima Renovación"
                 value={membershipMetrics.renewalDate ?
                   membershipMetrics.renewalDate.toLocaleDateString() : 'Vitalicia'}
                 change={0}
-                icon="CalendarIcon"
+                icon={CalendarIcon}
               />
             </CardGrid>
 
@@ -587,11 +590,11 @@ export const MembershipFormEnhanced: React.FC = () => {
               loading={isSubmitting}
               size="lg"
             >
-              <Icon name="UserPlusIcon" />
+              <Icon as={UserPlusIcon} />
               Crear Membresía
             </Button>
             <Button variant="outline" size="lg">
-              <Icon name="EyeIcon" />
+              <Icon as={EyeIcon} />
               Vista Previa
             </Button>
           </Stack>

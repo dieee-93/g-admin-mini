@@ -13,7 +13,7 @@ import {
   ArrowTopRightOnSquareIcon,
   BeakerIcon
 } from '@heroicons/react/24/outline';
-import { useNavigation } from '../../../contexts/NavigationContext';
+import { useNavigationActions } from '../../../contexts/NavigationContext';
 import { RecipeFormClean, RecipeListClean } from '../../../services/recipe/components';
 import type { Recipe } from '../../../services/recipe/types';
 
@@ -32,7 +32,7 @@ export const RecipeBuilderClean: React.FC<RecipeBuilderCleanProps> = ({
   context,
   className
 }) => {
-  const { navigate } = useNavigation();
+  const { navigate } = useNavigationActions();
   const [view, setView] = useState<'form' | 'list'>('form');
   const [editingRecipe, setEditingRecipe] = useState<Recipe | undefined>();
 

@@ -158,7 +158,7 @@ export const CapabilityAccordionItem: React.FC<CapabilityAccordionItemProps> = (
     >
       {/* HEADER - Siempre visible */}
       <Box
-        p={4}
+        p="4"
         cursor="pointer"
         onClick={onToggle}
         bg={isExpanded ? 'gray.50' : 'white'}
@@ -167,9 +167,9 @@ export const CapabilityAccordionItem: React.FC<CapabilityAccordionItemProps> = (
           bg: 'gray.50'
         }}
       >
-        <Stack direction="row" justify="space-between" align="center" gap={3}>
+        <Stack direction="row" justify="space-between" align="center" gap="3">
           {/* Left: Icon + Name + Progress */}
-          <Stack direction="row" align="center" gap={3} flex="1">
+          <Stack direction="row" align="center" gap="3" flex="1">
             {/* Expand/Collapse Icon */}
             <Icon
               icon={isExpanded ? ChevronDownIcon : ChevronRightIcon}
@@ -181,8 +181,8 @@ export const CapabilityAccordionItem: React.FC<CapabilityAccordionItemProps> = (
             <Box fontSize="xl">{capability.icon}</Box>
 
             {/* Name + Progress Bar */}
-            <Stack gap={1} flex="1">
-              <Stack direction="row" align="center" gap={2}>
+            <Stack gap="1" flex="1">
+              <Stack direction="row" align="center" gap="2">
                 <Typography variant="body" fontWeight="semibold" fontSize="md">
                   {capability.name}
                 </Typography>
@@ -217,11 +217,11 @@ export const CapabilityAccordionItem: React.FC<CapabilityAccordionItemProps> = (
       {/* CONTENT - Colapsable */}
       <Collapsible.Root open={isExpanded}>
         <Collapsible.Content>
-          <Box p={4} pt={0} bg="gray.50">
-            <Stack gap={3}>
+          <Box p="4" pt="0" bg="gray.50">
+            <Stack gap="3">
               {/* Milestones Críticos */}
               {milestonesByPriority.critical.length > 0 && (
-                <Stack gap={2}>
+                <Stack gap="2">
                   <Typography variant="body" fontSize="xs" fontWeight="medium" color="red.700">
                     {PRIORITY_CONFIG.critical.icon} CRÍTICOS
                   </Typography>
@@ -237,7 +237,7 @@ export const CapabilityAccordionItem: React.FC<CapabilityAccordionItemProps> = (
 
               {/* Milestones Importantes */}
               {milestonesByPriority.important.length > 0 && (
-                <Stack gap={2}>
+                <Stack gap="2">
                   <Typography variant="body" fontSize="xs" fontWeight="medium" color="yellow.700">
                     {PRIORITY_CONFIG.important.icon} IMPORTANTES
                   </Typography>
@@ -262,7 +262,7 @@ export const CapabilityAccordionItem: React.FC<CapabilityAccordionItemProps> = (
                       justifyContent="flex-start"
                       width="full"
                     >
-                      <Stack direction="row" align="center" gap={2}>
+                      <Stack direction="row" align="center" gap="2">
                         <Icon icon={ChevronRightIcon} size="xs" />
                         <Typography variant="body" fontSize="xs" fontWeight="medium" color="green.700">
                           ✅ COMPLETADOS ({milestonesByPriority.completed.length})
@@ -271,7 +271,7 @@ export const CapabilityAccordionItem: React.FC<CapabilityAccordionItemProps> = (
                     </Button>
                   </Collapsible.Trigger>
                   <Collapsible.Content>
-                    <Stack gap={2} mt={2}>
+                    <Stack gap="2" mt="2">
                       {milestonesByPriority.completed.map((milestone) => (
                         <MilestoneCard
                           key={milestone.id}
@@ -301,11 +301,10 @@ interface MilestoneCardProps {
 }
 
 const MilestoneCard: React.FC<MilestoneCardProps> = ({ milestone, onClick }) => {
-  const priorityConfig = PRIORITY_CONFIG[milestone.priority];
-
+  // Priority badge based on milestone priority
   return (
     <Box
-      p={3}
+      p="3"
       bg="white"
       borderWidth="1px"
       borderColor={milestone.completed ? 'green.200' : 'gray.200'}
@@ -320,10 +319,10 @@ const MilestoneCard: React.FC<MilestoneCardProps> = ({ milestone, onClick }) => 
       }}
       onClick={onClick}
     >
-      <Stack gap={2}>
+      <Stack gap="2">
         {/* Header */}
         <Stack direction="row" justify="space-between" align="flex-start">
-          <Stack direction="row" align="center" gap={2} flex="1">
+          <Stack direction="row" align="center" gap="2" flex="1">
             {milestone.icon && <Box fontSize="md">{milestone.icon}</Box>}
             <Typography variant="body" fontWeight="medium" fontSize="sm">
               {milestone.name}
@@ -331,7 +330,7 @@ const MilestoneCard: React.FC<MilestoneCardProps> = ({ milestone, onClick }) => 
           </Stack>
 
           {/* Badges */}
-          <Stack direction="row" gap={1}>
+          <Stack direction="row" gap="1">
             {milestone.estimatedMinutes && !milestone.completed && (
               <Badge colorPalette="gray" variant="outline" size="xs">
                 ~{milestone.estimatedMinutes}min

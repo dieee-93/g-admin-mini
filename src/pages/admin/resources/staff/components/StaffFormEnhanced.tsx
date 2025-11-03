@@ -7,15 +7,17 @@ import { z } from 'zod';
 import { DynamicForm, type FormSectionConfig } from '@/shared/components/forms';
 import { useFormManager } from '@/shared/hooks/business';
 import { CRUDHandlers } from '@/shared/utils/errorHandling';
-import {
-  PerformanceCalculations,
-  HRAnalytics,
-  type PerformanceMetrics,
-  type EmployeeAnalysis
-} from '@/business-logic/shared/HRCalculations';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
-
 import { logger } from '@/lib/logging';
+
+// TODO: Import and use PerformanceCalculations and HRAnalytics when implementing performance tracking
+// import {
+//   PerformanceCalculations,
+//   HRAnalytics,
+//   type PerformanceMetrics,
+//   type EmployeeAnalysis
+// } from '@/business-logic/shared/HRCalculations';
+
 // Enhanced Staff schema with performance calculations
 const StaffSchema = z.object({
   id: z.string().optional(),
@@ -46,7 +48,7 @@ const StaffSchema = z.object({
 type StaffFormData = z.infer<typeof StaffSchema>;
 
 interface StaffFormEnhancedProps {
-  employee?: any;
+  employee?: Partial<StaffFormData>;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -232,8 +234,9 @@ export function StaffFormEnhanced({ employee, onSuccess, onCancel }: StaffFormEn
     }
   ];
 
+  // TODO: Use register, errors, and isSubmitting for form validation
   // Enhanced form manager with performance calculations
-  const { register, errors, watch, submit, isSubmitting } = useFormManager({
+  const { watch, submit } = useFormManager({
     schema: StaffSchema,
     defaultValues: {
       employee_id: employee?.employee_id || '',
@@ -382,12 +385,12 @@ export function StaffFormEnhanced({ employee, onSuccess, onCancel }: StaffFormEn
   };
 
   // Mock CRUD operations (would be replaced with real API calls)
-  const createEmployee = async (data: any) => {
+  const createEmployee = async (data: StaffFormData) => {
     logger.info('StaffStore', 'Creating employee:', data);
     return { id: Date.now().toString(), ...data };
   };
 
-  const updateEmployee = async (id: string, data: any) => {
+  const updateEmployee = async (id: string, data: Partial<StaffFormData>) => {
     logger.info('StaffStore', 'Updating employee:', id, data);
     return { id, ...data };
   };
@@ -400,7 +403,7 @@ export function StaffFormEnhanced({ employee, onSuccess, onCancel }: StaffFormEn
         schema={StaffSchema}
         sections={formSections}
         defaultValues={watchedValues}
-        onSubmit={submit as any}
+        onSubmit={submit as (data: StaffFormData) => Promise<void>}
         onCancel={onCancel}
         submitText={isEditMode ? '✅ Actualizar Empleado' : '✅ Crear Empleado'}
         successMessage={{

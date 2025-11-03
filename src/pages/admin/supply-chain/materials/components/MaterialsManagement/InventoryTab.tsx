@@ -8,6 +8,44 @@ import { formatCurrency, formatQuantity } from '@/business-logic/shared/decimalU
 import { notify } from '@/lib/notifications';
 
 import { logger } from '@/lib/logging';
+
+// ============================================================================
+// PURE UTILITY FUNCTIONS (Outside component for performance)
+// ============================================================================
+
+type MaterialWithStock = {
+  id: string;
+  stock: number;
+  minStock?: number;
+  [key: string]: unknown;
+};
+
+/**
+ * Determines stock status based on current stock vs minimum threshold
+ * Pure function - no dependencies on component state
+ */
+const getStockStatus = (item: MaterialWithStock): 'critical' | 'low' | 'healthy' => {
+  if (!item.minStock) return 'healthy';
+  if (item.stock < item.minStock * 0.5) return 'critical';
+  if (item.stock <= item.minStock) return 'low';
+  return 'healthy';
+};
+
+/**
+ * Maps stock status to color palette
+ */
+const getStatusColor = (status: string): string => {
+  switch (status) {
+    case 'critical': return 'red';
+    case 'low': return 'yellow';
+    default: return 'green';
+  }
+};
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 interface InventoryTabProps {
   onStockUpdate: (itemId: string, newStock: number) => Promise<void>;
   onBulkAction: (action: string, itemIds: string[]) => Promise<void>;
@@ -17,7 +55,6 @@ interface InventoryTabProps {
 
 export function InventoryTab({
   onStockUpdate,
-  onBulkAction,
   onAddMaterial,
   performanceMode = false
 }: InventoryTabProps) {
@@ -54,25 +91,11 @@ export function InventoryTab({
     }
   };
 
-  const getStockStatus = (item: any) => {
-    if (item.stock < item.minStock * 0.5) return 'critical';
-    if (item.stock <= item.minStock) return 'low';
-    return 'healthy';
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'critical': return 'red';
-      case 'low': return 'yellow';
-      default: return 'green';
-    }
-  };
-
   // Group materials by criticality with pagination support
   const groupedMaterials = useMemo(() => {
-    const critical: any[] = [];
-    const low: any[] = [];
-    const healthy: any[] = [];
+    const critical: MaterialWithStock[] = [];
+    const low: MaterialWithStock[] = [];
+    const healthy: MaterialWithStock[] = [];
 
     materials.forEach((item) => {
       const status = getStockStatus(item);
@@ -104,7 +127,7 @@ export function InventoryTab({
   }, [materials, criticalPage, lowPage, healthyPage, ITEMS_PER_PAGE]);
 
   // Render material card (reusable component)
-  const renderMaterialCard = (item: any) => {
+  const renderMaterialCard = (item: MaterialWithStock) => {
     const status = getStockStatus(item);
     const statusColor = getStatusColor(status);
 

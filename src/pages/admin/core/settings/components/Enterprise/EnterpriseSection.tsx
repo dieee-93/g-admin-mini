@@ -1,9 +1,8 @@
 // EnterpriseSection.tsx - Enterprise Management Tools (migrated from tools)
 import React from 'react';
-import { 
+import {
   BuildingOfficeIcon,
   GlobeAltIcon,
-  UsersIcon,
   ChartBarIcon,
   MapPinIcon,
   CogIcon,
@@ -158,7 +157,7 @@ const EnterpriseSection: React.FC = () => {
         <CardWrapper.Header>
           <Stack direction="row" justify="space-between" align="center">
             <Typography variant="heading" size="md">Locations</Typography>
-            <Button size="sm" colorPalette="brand">
+            <Button size="sm" colorPalette="purple">
               <Icon icon={BuildingOfficeIcon} size="sm" />
               Add Location
             </Button>
@@ -238,7 +237,7 @@ const EnterpriseSection: React.FC = () => {
                   
                   <Button 
                     size="sm" 
-                    colorPalette="brand" 
+                    colorPalette="purple" 
                     variant="outline"
                   >
                     {tool.status === 'active' ? 'Configure' : 
@@ -268,7 +267,7 @@ const EnterpriseSection: React.FC = () => {
             <SimpleGrid columns={{ base: 1, md: 3 }} gap="md">
               <Button variant="outline" colorPalette="blue">Brand Standards</Button>
               <Button variant="outline" colorPalette="green">Operational Policies</Button>
-              <Button variant="outline" colorPalette="brand">Financial Controls</Button>
+              <Button variant="outline" colorPalette="purple">Financial Controls</Button>
               <Button variant="outline" colorPalette="orange">Staff Policies</Button>
               <Button variant="outline" colorPalette="blue">Menu Standards</Button>
               <Button variant="outline" colorPalette="red">Quality Controls</Button>

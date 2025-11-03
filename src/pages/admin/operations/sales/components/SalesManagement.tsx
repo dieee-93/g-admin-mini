@@ -1,15 +1,19 @@
 import { Tabs, Stack, Button, Alert, Icon, Typography, Badge } from '@/shared/ui';
 import { logger } from '@/lib/logging';
+import { HookPoint } from '@/lib/modules';
 import {
   CreditCardIcon,
   ChartBarIcon,
   DocumentTextIcon,
   TableCellsIcon,
   QrCodeIcon,
-  ComputerDesktopIcon,
   PlusIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  TruckIcon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
+import { DeliveryOrdersTab } from './DeliveryOrders/DeliveryOrdersTab';
+import { AppointmentsTab } from './AppointmentsTab';
 
 // 🔍 DEBUG: Check imports
 logger.debug('SalesStore', '🔍 SalesManagement Imports:', {
@@ -22,11 +26,23 @@ logger.debug('SalesStore', '🔍 SalesManagement Imports:', {
   Badge: typeof Badge
 });
 
+interface OrderData {
+  items: Array<{ productId: string; quantity: number }>;
+  customerId?: string;
+  tableId?: string;
+}
+
+interface PaymentData {
+  amount: number;
+  method: string;
+  tip?: number;
+}
+
 interface SalesManagementProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  onOrderPlace?: (orderData: any) => void;
-  onPaymentProcess?: (paymentData: any) => void;
+  onOrderPlace?: (orderData: OrderData) => void;
+  onPaymentProcess?: (paymentData: PaymentData) => void;
   onNewSale?: () => void;
   performanceMode?: boolean;
 }
@@ -34,11 +50,10 @@ interface SalesManagementProps {
 export function SalesManagement({
   activeTab,
   onTabChange,
-  onOrderPlace,
-  onPaymentProcess,
-  onNewSale,
-  performanceMode = false
+  onNewSale
 }: SalesManagementProps) {
+  // onOrderPlace, onPaymentProcess, performanceMode are available but not yet implemented
+  // TODO: Implement order placement and payment processing handlers
   logger.debug('SalesStore', '🔍 SalesManagement Rendering - Tabs API fixed to use .Tab and .Panel');
 
   return (
@@ -56,6 +71,22 @@ export function SalesManagement({
           <Icon icon={DocumentTextIcon} size="sm" />
           Reportes
         </Tabs.Trigger>
+        <Tabs.Trigger value="delivery">
+          <Icon icon={TruckIcon} size="sm" />
+          Delivery Orders
+        </Tabs.Trigger>
+        <Tabs.Trigger value="appointments">
+          <Icon icon={CalendarIcon} size="sm" />
+          Appointments
+        </Tabs.Trigger>
+
+        {/* 🎯 HOOK POINT: External modules can inject tabs here */}
+        <HookPoint
+          name="sales.tabs"
+          data={{ activeTab, onTabChange }}
+          direction="row"
+          gap="0"
+        />
       </Tabs.List>
 
       <Tabs.Content value="pos">
@@ -89,14 +120,14 @@ export function SalesManagement({
             </Button>
             <Button
               variant="outline"
-              onClick={() => console.log('Gestión Mesas')}
+              onClick={() => logger.debug('SalesManagement', 'Gestión Mesas')}
             >
               <Icon icon={TableCellsIcon} size="sm" />
               Gestión Mesas
             </Button>
             <Button
               variant="outline"
-              onClick={() => console.log('Códigos QR')}
+              onClick={() => logger.debug('SalesManagement', 'Códigos QR')}
             >
               <Icon icon={QrCodeIcon} size="sm" />
               Códigos QR
@@ -127,20 +158,20 @@ export function SalesManagement({
             <Button
               variant="solid"
               colorPalette="blue"
-              onClick={() => console.log('Análisis Profundo')}
+              onClick={() => logger.debug('SalesManagement', 'Análisis Profundo')}
             >
               <Icon icon={ChartBarIcon} size="sm" />
               Análisis Profundo
             </Button>
             <Button
               variant="outline"
-              onClick={() => console.log('Revenue Trends')}
+              onClick={() => logger.debug('SalesManagement', 'Revenue Trends')}
             >
               Revenue Trends
             </Button>
             <Button
               variant="outline"
-              onClick={() => console.log('Customer Insights')}
+              onClick={() => logger.debug('SalesManagement', 'Customer Insights')}
             >
               Customer Insights
             </Button>
@@ -168,26 +199,26 @@ export function SalesManagement({
             <Button
               variant="solid"
               colorPalette="purple"
-              onClick={() => console.log('Reporte Diario')}
+              onClick={() => logger.debug('SalesManagement', 'Reporte Diario')}
             >
               <Icon icon={DocumentTextIcon} size="sm" />
               Reporte Diario
             </Button>
             <Button
               variant="outline"
-              onClick={() => console.log('Reporte Semanal')}
+              onClick={() => logger.debug('SalesManagement', 'Reporte Semanal')}
             >
               Reporte Semanal
             </Button>
             <Button
               variant="outline"
-              onClick={() => console.log('Reporte Mensual')}
+              onClick={() => logger.debug('SalesManagement', 'Reporte Mensual')}
             >
               Reporte Mensual
             </Button>
             <Button
               variant="outline"
-              onClick={() => console.log('Export Data')}
+              onClick={() => logger.debug('SalesManagement', 'Export Data')}
             >
               Export Data
             </Button>
@@ -200,6 +231,22 @@ export function SalesManagement({
           />
         </Stack>
       </Tabs.Content>
+
+      <Tabs.Content value="delivery">
+        <DeliveryOrdersTab />
+      </Tabs.Content>
+
+      <Tabs.Content value="appointments">
+        <AppointmentsTab />
+      </Tabs.Content>
+
+      {/* 🎯 HOOK POINT: External modules can inject tab content here */}
+      <HookPoint
+        name="sales.tab_content"
+        data={{ activeTab, onTabChange }}
+        direction="column"
+        gap="4"
+      />
     </Tabs.Root>
   );
 }

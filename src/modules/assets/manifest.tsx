@@ -7,7 +7,7 @@
  * @version 1.0.0
  */
 
-import React from 'react';
+import React, { lazy } from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
@@ -23,6 +23,9 @@ export const assetsManifest: ModuleManifest = {
 
   requiredFeatures: [] as FeatureId[],
   optionalFeatures: [] as FeatureId[],
+
+  // 🔒 PERMISSIONS: Supervisors can manage assets
+  minimumRole: 'SUPERVISOR' as const,
 
   hooks: {
     provide: [
@@ -40,21 +43,18 @@ export const assetsManifest: ModuleManifest = {
     logger.info('App', '🏗️ Setting up Assets module');
 
     try {
+      // ✅ Dashboard Widget - Assets status
+      const AssetsWidget = lazy(() => import('./components/AssetsWidget'));
+
       registry.addAction(
         'dashboard.widgets',
-        () => ({
-          id: 'assets-summary',
-          title: 'Asset Status',
-          type: 'assets',
-          priority: 4,
-          data: {
-            totalAssets: 0,
-            inUse: 0,
-            maintenanceDue: 0,
-          },
-        }),
+        () => (
+          <React.Suspense fallback={<div>Cargando assets...</div>}>
+            <AssetsWidget />
+          </React.Suspense>
+        ),
         'assets',
-        4
+        40 // Medium priority widget
       );
 
       logger.info('App', '✅ Assets module setup complete');

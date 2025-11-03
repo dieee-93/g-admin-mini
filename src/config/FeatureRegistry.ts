@@ -840,6 +840,10 @@ export const MODULE_FEATURE_MAP: Record<string, {
     alwaysActive: true,
     description: 'Herramientas de debug - visible solo para SUPER_ADMIN (filtrado por role)'
   },
+  'achievements': {
+    alwaysActive: true,
+    description: 'Sistema de logros y requisitos - siempre visible para mostrar progreso'
+  },
 
   // ============================================
   // BUSINESS MODULES (Feature-dependent)
@@ -921,6 +925,16 @@ export const MODULE_FEATURE_MAP: Record<string, {
     description: 'Módulo fiscal/finanzas - activo con cualquier feature de FINANCE'
   },
 
+  'finance': {
+    requiredFeatures: ['finance_corporate_accounts'],
+    optionalFeatures: [
+      'finance_credit_management',
+      'finance_invoice_scheduling',
+      'finance_payment_terms'
+    ],
+    description: 'Módulo Finance B2B - gestión de cuentas corporativas y crédito'
+  },
+
   'delivery': {
     requiredFeatures: [
       'operations_delivery_zones',
@@ -929,7 +943,7 @@ export const MODULE_FEATURE_MAP: Record<string, {
     description: 'Módulo de delivery - requiere TODAS las features de delivery (delivery_shipping capability)'
   },
 
-  'kitchen': {
+  'production': { // RENAMED: kitchen → production
     requiredFeatures: [
       'production_display_system',
       'production_order_queue'
@@ -956,6 +970,85 @@ export const MODULE_FEATURE_MAP: Record<string, {
       'multisite_comparative_analytics'
     ],
     description: 'Business Intelligence ejecutivo - requiere analytics avanzados'
+  },
+
+  'reporting': {
+    optionalFeatures: [
+      'analytics_ecommerce_metrics',
+      'analytics_conversion_tracking',
+      'multisite_comparative_analytics',
+      'sales_order_management' // Reportes de ventas
+    ],
+    description: 'Sistema de reportes y analytics - activo con cualquier feature de analytics'
+  },
+
+  'intelligence': {
+    optionalFeatures: [
+      'analytics_ecommerce_metrics',
+      'analytics_conversion_tracking',
+      'sales_catalog_ecommerce',
+      'sales_product_retail'
+    ],
+    description: 'Inteligencia de mercado y competencia - análisis de tendencias y competidores'
+  },
+
+  'products-analytics': {
+    optionalFeatures: [
+      'production_bom_management',
+      'production_order_queue',
+      'sales_product_retail',
+      'inventory_demand_forecasting',
+      'analytics_ecommerce_metrics'
+    ],
+    description: 'Analytics de productos - análisis de producción y rentabilidad'
+  },
+
+  'billing': {
+    optionalFeatures: [
+      'finance_invoice_scheduling',
+      'finance_payment_terms',
+      'customer_loyalty_program',
+      'finance_credit_management'
+    ],
+    description: 'Billing recurrente y suscripciones - facturas programadas'
+  },
+
+  'finance-integrations': {
+    optionalFeatures: [
+      'sales_online_payment_gateway',
+      'sales_payment_processing',
+      'finance_payment_terms'
+    ],
+    description: 'Integraciones de pago - MercadoPago, MODO, pasarelas'
+  },
+
+  'memberships': {
+    optionalFeatures: [
+      'customer_loyalty_program',
+      'scheduling_appointment_booking',
+      'finance_invoice_scheduling'
+    ],
+    description: 'Gestión de membresías y suscripciones - planes y cobros recurrentes'
+  },
+
+  'rentals': {
+    optionalFeatures: [
+      'inventory_stock_tracking',
+      'scheduling_appointment_booking',
+      'operations_vendor_performance',
+      'inventory_available_to_promise'
+    ],
+    description: 'Gestión de alquileres - equipos, espacios, recursos'
+  },
+
+  'assets': {
+    optionalFeatures: [
+      'inventory_stock_tracking',
+      'operations_vendor_performance',
+      'staff_employee_management',
+      'scheduling_calendar_management'
+    ],
+    description: 'Gestión de activos - equipos, vehículos, mantenimiento'
   },
 
   'finance-advanced': {

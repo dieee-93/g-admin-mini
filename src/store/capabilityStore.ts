@@ -12,6 +12,7 @@
  * - Gamification patterns (Yu-kai Chou)
  */
 
+import React from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import eventBus from '@/lib/events/EventBus';
@@ -24,7 +25,7 @@ import type {
 
 // NEW SYSTEM - Layer 2: Features
 import type { FeatureId } from '@/config/FeatureRegistry';
-import { getSlotsForActiveFeatures, getModulesForActiveFeatures } from '@/config/FeatureRegistry';
+import { getModulesForActiveFeatures } from '@/config/FeatureRegistry';
 
 // NEW SYSTEM - Feature Engine
 import { FeatureActivationEngine } from '@/lib/features/FeatureEngine';
@@ -38,6 +39,32 @@ import {
 } from '@/services/businessProfileService';
 
 import { logger } from '@/lib/logging';
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Compares two arrays by content (not reference)
+ * Returns the old array if content is equal to prevent unnecessary re-renders
+ */
+function getUpdatedArrayIfChanged<T>(oldArray: T[], newArray: T[]): T[] {
+  // Quick length check
+  if (oldArray.length !== newArray.length) {
+    return newArray;
+  }
+
+  // Deep equality check (works for primitive arrays)
+  const isEqual = oldArray.every((val, idx) => val === newArray[idx]);
+
+  if (isEqual) {
+    logger.debug('CapabilityStore', '⚡ Array unchanged, preserving reference to prevent re-renders');
+    return oldArray; // PRESERVE OLD REFERENCE
+  }
+
+  logger.debug('CapabilityStore', '🔄 Array content changed, returning new reference');
+  return newArray;
+}
 
 // ============================================
 // STATE TYPES
@@ -181,6 +208,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
               blockedFeatures: activationResult.blockedFeatures.length
             });
 
+            const newActiveModules = getModulesForActiveFeatures(activationResult.activeFeatures);
+
             return {
               ...state,
               profile: newProfile,
@@ -190,8 +219,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
                 pendingMilestones: activationResult.pendingMilestones,
                 completedMilestones: [],
                 validationErrors: activationResult.validationErrors,
-                activeModules: getModulesForActiveFeatures(activationResult.activeFeatures),
-                activeSlots: getSlotsForActiveFeatures(activationResult.activeFeatures)
+                activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules),
+                activeSlots: [] // Legacy system removed - use Hook System instead
               }
             };
           } catch (error) {
@@ -202,13 +231,32 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
       },
 
       toggleActivity: (activityId) => {
+        logger.info('CapabilityStore', '🔄 toggleActivity START', {
+          activityId,
+          currentActivities: get().profile?.selectedActivities || []
+        });
+
         set((state) => {
-          if (!state.profile) return state;
+          if (!state.profile) {
+            logger.warn('CapabilityStore', '⚠️ No profile found, cannot toggle activity');
+            return state;
+          }
 
           const currentActivities = state.profile.selectedActivities;
-          const newActivities = currentActivities.includes(activityId)
+          const isAdding = !currentActivities.includes(activityId);
+          const rawNewActivities = currentActivities.includes(activityId)
             ? currentActivities.filter(id => id !== activityId)
             : [...currentActivities, activityId];
+
+          // 🔧 FIX: Preserve array reference if content unchanged
+          const newActivities = getUpdatedArrayIfChanged(currentActivities, rawNewActivities);
+
+          logger.info('CapabilityStore', `${isAdding ? '➕' : '➖'} ${isAdding ? 'Adding' : 'Removing'} activity`, {
+            activityId,
+            oldCount: currentActivities.length,
+            newCount: newActivities.length,
+            newActivities
+          });
 
           const updatedProfile = {
             ...state.profile,
@@ -216,9 +264,13 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
           };
 
           // Persist to database (async, don't wait)
-          saveProfileToDB(updatedProfile).catch(err => {
-            logger.error('CapabilityStore', '❌ Error persisting activity toggle to DB:', err);
-          });
+          saveProfileToDB(updatedProfile)
+            .then(() => {
+              logger.info('CapabilityStore', '✅ Profile persisted to DB successfully');
+            })
+            .catch(err => {
+              logger.error('CapabilityStore', '❌ Error persisting activity toggle to DB:', err);
+            });
 
           // Re-activar features
           try {
@@ -229,6 +281,12 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
               {}
             );
 
+            logger.info('CapabilityStore', '⚙️ Features reactivated', {
+              activeFeatures: activationResult.activeFeatures.length,
+              blockedFeatures: activationResult.blockedFeatures.length,
+              pendingMilestones: activationResult.pendingMilestones.length
+            });
+
             // Emit event si se agregó una nueva activity
             if (!currentActivities.includes(activityId)) {
               eventBus.emit('user_choice.activity_selected', {
@@ -236,6 +294,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
                 timestamp: Date.now()
               });
             }
+
+            const newActiveModules = getModulesForActiveFeatures(activationResult.activeFeatures);
 
             return {
               ...state,
@@ -246,8 +306,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
                 pendingMilestones: activationResult.pendingMilestones,
                 completedMilestones: state.features.completedMilestones,
                 validationErrors: activationResult.validationErrors,
-                activeModules: getModulesForActiveFeatures(activationResult.activeFeatures),
-                activeSlots: getSlotsForActiveFeatures(activationResult.activeFeatures)
+                activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules),
+                activeSlots: [] // Legacy system removed - use Hook System instead
               }
             };
           } catch (error) {
@@ -261,9 +321,15 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
         set((state) => {
           if (!state.profile) return state;
 
+          // 🔧 FIX: Preserve array reference if content unchanged
+          const selectedActivities = getUpdatedArrayIfChanged(
+            state.profile.selectedActivities,
+            capabilities
+          );
+
           const updatedProfile = {
             ...state.profile,
-            selectedActivities: capabilities
+            selectedActivities
           };
 
           // Persist to database (async, don't wait)
@@ -285,6 +351,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
               activeFeatures: activationResult.activeFeatures.length
             });
 
+            const newActiveModules = getModulesForActiveFeatures(activationResult.activeFeatures);
+
             return {
               ...state,
               profile: updatedProfile,
@@ -294,8 +362,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
                 pendingMilestones: activationResult.pendingMilestones,
                 completedMilestones: state.features.completedMilestones,
                 validationErrors: activationResult.validationErrors,
-                activeModules: getModulesForActiveFeatures(activationResult.activeFeatures),
-                activeSlots: getSlotsForActiveFeatures(activationResult.activeFeatures)
+                activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules),
+                activeSlots: [] // Legacy system removed - use Hook System instead
               }
             };
           } catch (error) {
@@ -309,9 +377,16 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
         set((state) => {
           if (!state.profile) return state;
 
+          // 🔧 FIX: Preserve array reference if content unchanged (prevent re-renders)
+          const newInfrastructure = [infraId];
+          const selectedInfrastructure = getUpdatedArrayIfChanged(
+            state.profile.selectedInfrastructure,
+            newInfrastructure
+          );
+
           const updatedProfile = {
             ...state.profile,
-            selectedInfrastructure: [infraId] // Solo una infrastructure a la vez
+            selectedInfrastructure
           };
 
           // Persist to database (async, don't wait)
@@ -332,6 +407,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
               timestamp: Date.now()
             });
 
+            const newActiveModules = getModulesForActiveFeatures(activationResult.activeFeatures);
+
             return {
               ...state,
               profile: updatedProfile,
@@ -341,8 +418,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
                 pendingMilestones: activationResult.pendingMilestones,
                 completedMilestones: state.features.completedMilestones,
                 validationErrors: activationResult.validationErrors,
-                activeModules: getModulesForActiveFeatures(activationResult.activeFeatures),
-                activeSlots: getSlotsForActiveFeatures(activationResult.activeFeatures)
+                activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules),
+                activeSlots: [] // Legacy system removed - use Hook System instead
               }
             };
           } catch (error) {
@@ -439,6 +516,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
             logger.error('CapabilityStore', '❌ Error persisting milestone to DB:', err);
           });
 
+          const newActiveModules = getModulesForActiveFeatures(newActiveFeatures);
+
           return {
             ...state,
             features: {
@@ -449,8 +528,8 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
               pendingMilestones: state.features.pendingMilestones.filter(
                 m => m !== milestoneId
               ),
-              activeModules: getModulesForActiveFeatures(newActiveFeatures),
-              activeSlots: getSlotsForActiveFeatures(newActiveFeatures)
+              activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules)
+              // Note: activeSlots removed - Slot system deprecated in favor of Module Registry
             }
           };
         });
@@ -608,7 +687,7 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
 
       getActiveSlots: () => {
         const { features } = get();
-        return getSlotsForActiveFeatures(features.activeFeatures);
+        return []; // Legacy system removed - use Hook System instead
       },
 
       getActiveModules: () => {
@@ -640,11 +719,13 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
 
 /**
  * Hook principal para usar capabilities
+ * ✅ FIX: Wrapped with useMemo to prevent infinite re-renders in consuming components
  */
 export const useCapabilities = () => {
   const store = useCapabilityStore();
 
-  return {
+  // ✅ FIX: Use React.useMemo to prevent creating new object on every render
+  return React.useMemo(() => ({
     // State
     profile: store.profile,
     activeFeatures: store.features.activeFeatures,
@@ -684,7 +765,19 @@ export const useCapabilities = () => {
     hasCapability: store.hasFeature,
     hasAllCapabilities: store.hasAllFeatures,
     activeCapabilities: store.features.activeFeatures // v4.0 migration alias
-  };
+  }), [
+    // Dependencies: only recreate when these actually change
+    store.profile,
+    store.features.activeFeatures,
+    store.features.blockedFeatures,
+    store.features.pendingMilestones,
+    store.features.completedMilestones,
+    store.features.validationErrors,
+    store.isLoading,
+    store.features.activeModules,
+    store.features.activeSlots,
+    // Functions are stable from Zustand, no need to include them
+  ]);
 };
 
 // Performance-optimized selectors

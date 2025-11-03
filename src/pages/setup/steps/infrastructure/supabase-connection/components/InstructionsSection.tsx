@@ -17,14 +17,14 @@ export function InstructionsSection() {
     >
       <VStack gap="sm" align="start">
         <HStack>
-          <Badge variant="outline" colorScheme="blue">{instructions.title}</Badge>
+          <Badge variant="outline" colorPalette="blue">{instructions.title}</Badge>
           <Typography variant="medium" fontSize="sm">{instructions.subtitle}</Typography>
         </HStack>
         <VStack 
           gap="xs" 
           align="start" 
           fontSize="sm" 
-          pl={4}
+          pl="4"
           opacity={0.9}
         >
           {instructions.steps.map((step, index) => (

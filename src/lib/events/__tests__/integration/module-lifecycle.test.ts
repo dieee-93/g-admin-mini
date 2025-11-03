@@ -9,7 +9,7 @@ import {
   createInventoryTestModule, 
   createCustomersTestModule, 
   createStaffTestModule,
-  createFailingKitchenTestModule 
+  createFailingProductionTestModule 
 } from '../helpers/test-modules';
 import { mockEventTemplates, businessScenarios } from '../helpers/mock-data';
 import type { NamespacedEvent, ModuleDescriptor, ModuleId } from '../../types';
@@ -82,7 +82,7 @@ describe('EventBus - Module Lifecycle Integration', () => {
 
     it('should handle module activation failures gracefully', async () => {
       const stableModule = createInventoryTestModule();
-      const failingModule = createFailingKitchenTestModule();
+      const failingModule = createFailingProductionTestModule();
 
       await eventBus.registerModule(stableModule);
       await eventBus.registerModule(failingModule);

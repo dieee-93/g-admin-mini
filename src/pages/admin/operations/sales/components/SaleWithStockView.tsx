@@ -16,12 +16,10 @@ import {
   InputField,
   Grid,
   Alert,
-  Badge,
   createListCollection
 } from '@/shared/ui';
 import { notify } from '@/lib/notifications';
-import { 
-  UserIcon,
+import {
   CreditCardIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
@@ -234,7 +232,7 @@ export function SalesWithStockView() {
           <Stack direction="row" gap="md">
             <Button
               variant="outline"
-              colorPalette="info"
+              colorPalette="blue"
               onClick={() => validateCartStock()}
               loading={isValidating}
               disabled={!summary.hasItems}
@@ -244,7 +242,7 @@ export function SalesWithStockView() {
             </Button>
             
             <Button
-              colorPalette="success"
+              colorPalette="green"
               onClick={handleOpenCheckout}
               disabled={!summary.hasItems || isValidating || !selectedTableId}
               loading={isProcessing}
@@ -352,7 +350,7 @@ export function SalesWithStockView() {
                     <Stack direction="column" gap="xs">
                       <Typography variant="body" size="md" weight="medium">Cliente</Typography>
                       <SelectField
-                        collection={customersCollection as any}
+                        collection={customersCollection}
                         value={selectedCustomerId ? [selectedCustomerId] : []}
                         onValueChange={(details) => setSelectedCustomerId(details.value[0] || '')}
                         placeholder="Seleccionar cliente (opcional)"
@@ -443,7 +441,7 @@ export function SalesWithStockView() {
 
                   {checkoutStep !== 'confirmation' ? (
                     <Button
-                      colorPalette="info"
+                      colorPalette="blue"
                       onClick={handleProceedToNextStep}
                       disabled={
                         (checkoutStep === 'validation' && (!validationResult?.is_valid || isValidating)) ||
@@ -455,7 +453,7 @@ export function SalesWithStockView() {
                     </Button>
                   ) : (
                     <Button
-                      colorPalette="success"
+                      colorPalette="green"
                       onClick={handleProcessSale}
                       loading={isProcessing}
                       disabled={!canProcessSale}

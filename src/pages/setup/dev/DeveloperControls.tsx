@@ -34,13 +34,13 @@ export function DeveloperControls({
 
   return (
     <>
-      <Separator my={4} />
+      <Separator my="4" />
       <Text
         fontSize="xs"
         fontWeight="medium"
         color="gray.500"
-        px={2}
-        mb={1}
+        px="2"
+        mb="1"
         display={{
           base: 'none',
           md: 'block',
@@ -70,15 +70,15 @@ export function DeveloperControls({
         fontSize="xs"
         fontWeight="medium"
         color="purple.500"
-        px={2}
-        mt={2}
-        mb={1}
+        px="2"
+        mt="2"
+        mb="1"
       >
         🔍 System Health
       </Text>
       
     { /* <Box
-        p={2}
+        p="2"
         bg="gray.100"
         borderRadius="md"
         fontSize="xs"
@@ -90,7 +90,7 @@ export function DeveloperControls({
           {systemHealth.percentage}% Complete
         </Text>
         {Object.entries(systemHealth.checks).map(([key, check]) => (
-          <Text key={key} color="gray.600" mt={1}>
+          <Text key={key} color="gray.600" mt="1">
             {check.status ? '✅' : '❌'} {check.label}
           </Text>
         ))}
@@ -101,21 +101,21 @@ export function DeveloperControls({
         fontSize="xs"
         fontWeight="medium"
         color="blue.500"
-        px={2}
-        mt={2}
-        mb={1}
+        px="2"
+        mt="2"
+        mb="1"
       >
         📍 Navigation
       </Text>
       
       {/* Group Navigation */}
-      <Flex gap={1} flexWrap="wrap">
+      <Flex gap="1" flexWrap="wrap">
         {STEP_GROUPS.map((group, groupIndex) => (
           <Button
             key={group.id}
             size="xs"
             variant={currentGroup === groupIndex ? "solid" : "outline"}
-            colorScheme={currentGroup === groupIndex ? "blue" : "gray"}
+            colorPalette={currentGroup === groupIndex ? "blue" : "gray"}
             onClick={() => onJumpToGroup(groupIndex)}
           >
             {groupIndex + 1}
@@ -128,20 +128,20 @@ export function DeveloperControls({
         fontSize="xs"
         fontWeight="medium"
         color="green.500"
-        px={2}
-        mt={2}
-        mb={1}
+        px="2"
+        mt="2"
+        mb="1"
       >
         🔸 Sub-steps
       </Text>
       
-      <Flex gap={1} flexWrap="wrap">
+      <Flex gap="1" flexWrap="wrap">
         {STEP_GROUPS[currentGroup]?.subSteps.map((subStep, subIndex) => (
           <Button
             key={subStep.id}
             size="xs"
             variant={currentSubStep === subIndex ? "solid" : "outline"}
-            colorScheme={currentSubStep === subIndex ? "green" : "gray"}
+            colorPalette={currentSubStep === subIndex ? "green" : "gray"}
             onClick={() => onJumpToSubStep(subIndex)}
             title={subStep.title}
           >
@@ -155,18 +155,18 @@ export function DeveloperControls({
         fontSize="xs"
         fontWeight="medium"
         color="purple.500"
-        px={2}
-        mt={2}
-        mb={1}
+        px="2"
+        mt="2"
+        mb="1"
       >
         ⚡ Quick Jump
       </Text>
       
-      <Flex gap={1} flexWrap="wrap">
+      <Flex gap="1" flexWrap="wrap">
         <Button
           size="xs"
           variant="outline"
-          colorScheme="purple"
+          colorPalette="purple"
           onClick={() => onJumpToGroup(0)}
         >
           ⏮️ Start
@@ -174,7 +174,7 @@ export function DeveloperControls({
         <Button
           size="xs"
           variant="outline"
-          colorScheme="purple"
+          colorPalette="purple"
           onClick={() => onJumpToGroup(STEP_GROUPS.length - 1)}
         >
           ⏭️ End

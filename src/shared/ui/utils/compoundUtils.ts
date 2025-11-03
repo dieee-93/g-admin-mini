@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import React, { type ReactNode } from 'react'
 
 import { logger } from '@/lib/logging';
 /**
@@ -6,13 +6,20 @@ import { logger } from '@/lib/logging';
  * Usado para evitar double-padding y otros problemas en compound components
  */
 export function hasSubcomponents(
-  children: ReactNode, 
+  children: ReactNode,
   componentNames: string[]
 ): boolean {
-  return React.Children.toArray(children).some(child =>
-    React.isValidElement(child) && 
-    componentNames.includes(child.type?.displayName || '')
-  )
+  return React.Children.toArray(children).some(child => {
+    if (!React.isValidElement(child)) return false;
+
+    const type = child.type;
+    // Skip if type is a string (intrinsic element like 'div', 'span', etc.)
+    if (typeof type === 'string') return false;
+
+    // Check displayName for component types
+    const displayName = (type as any).displayName || '';
+    return componentNames.includes(displayName);
+  })
 }
 
 /**

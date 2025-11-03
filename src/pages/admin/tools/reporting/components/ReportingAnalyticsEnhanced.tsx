@@ -3,6 +3,12 @@ import {
   ContentLayout, Section, Stack, Badge, Button, CardGrid, MetricCard
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import {
+  DocumentTextIcon, CheckCircleIcon, ClockIcon, ShieldCheckIcon,
+  StarIcon, CogIcon, LightBulbIcon, UserGroupIcon, EyeIcon,
+  ArrowRightIcon, PlusIcon, DocumentArrowDownIcon, CalendarIcon,
+  ChartBarIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, MinusIcon
+} from '@heroicons/react/24/outline';
 
 interface ReportingSystemData {
   reportCatalog: {
@@ -292,10 +298,10 @@ const ReportingAnalyticsEnhanced: React.FC = () => {
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'up': return 'ArrowTrendingUpIcon';
-      case 'down': return 'ArrowTrendingDownIcon';
-      case 'stable': return 'MinusIcon';
-      default: return 'MinusIcon';
+      case 'up': return ArrowTrendingUpIcon;
+      case 'down': return ArrowTrendingDownIcon;
+      case 'stable': return MinusIcon;
+      default: return MinusIcon;
     }
   };
 
@@ -369,44 +375,44 @@ const ReportingAnalyticsEnhanced: React.FC = () => {
             <MetricCard
               title="Total Reportes"
               value={dashboardData.performanceMetrics.totalReports.toString()}
-              icon="DocumentTextIcon"
+              icon={DocumentTextIcon}
               trend={{ value: 12, isPositive: true }}
               subtitle="vs período anterior"
             />
             <MetricCard
               title="Reportes Activos"
               value={dashboardData.performanceMetrics.activeReports.toString()}
-              icon="CheckCircleIcon"
-              colorScheme="green"
+              icon={CheckCircleIcon}
+              colorPalette="green"
               subtitle={`${Math.round((dashboardData.performanceMetrics.activeReports / dashboardData.performanceMetrics.totalReports) * 100)}% del total`}
             />
             <MetricCard
               title="Tiempo Promedio"
               value={dashboardData.performanceMetrics.avgGenerationTime}
-              icon="ClockIcon"
-              colorScheme="blue"
+              icon={ClockIcon}
+              colorPalette="blue"
               trend={{ value: -15, isPositive: true }}
               subtitle="mejora vs anterior"
             />
             <MetricCard
               title="Precisión de Datos"
               value={`${dashboardData.performanceMetrics.dataAccuracy}%`}
-              icon="ShieldCheckIcon"
-              colorScheme="purple"
+              icon={ShieldCheckIcon}
+              colorPalette="purple"
               subtitle="calidad de datos"
             />
             <MetricCard
               title="Satisfacción"
               value={`${dashboardData.performanceMetrics.userSatisfaction}/5`}
-              icon="StarIcon"
-              colorScheme="yellow"
+              icon={StarIcon}
+              colorPalette="yellow"
               subtitle="rating promedio"
             />
             <MetricCard
               title="Automatización"
               value={`${dashboardData.performanceMetrics.automationRate}%`}
-              icon="CogIcon"
-              colorScheme="green"
+              icon={CogIcon}
+              colorPalette="green"
               trend={{ value: 8, isPositive: true }}
               subtitle="vs manual"
             />
@@ -455,7 +461,7 @@ const ReportingAnalyticsEnhanced: React.FC = () => {
 
                 <Stack direction="row" align="center" gap="sm">
                   <Icon
-                    name={getTrendIcon(type.trend)}
+                    as={getTrendIcon(type.trend)}
                     color={getTrendColor(type.trend)}
                   />
                   <Badge
@@ -527,15 +533,15 @@ const ReportingAnalyticsEnhanced: React.FC = () => {
 
                       <Stack direction="row" gap="md" align="center">
                         <Stack align="center">
-                          <Icon name="LightBulbIcon" size="sm" />
+                          <Icon as={LightBulbIcon} size="sm" />
                           <span style={{ fontSize: '12px' }}>{report.insights}</span>
                         </Stack>
                         <Stack align="center">
-                          <Icon name="UserGroupIcon" size="sm" />
+                          <Icon as={UserGroupIcon} size="sm" />
                           <span style={{ fontSize: '12px' }}>{report.recipients}</span>
                         </Stack>
                         <Button size="sm" variant="outline">
-                          <Icon name="EyeIcon" />
+                          <Icon as={EyeIcon} />
                           Ver
                         </Button>
                       </Stack>
@@ -584,7 +590,7 @@ const ReportingAnalyticsEnhanced: React.FC = () => {
                 </p>
 
                 <Stack direction="row" align="center" gap="sm">
-                  <Icon name="ArrowRightIcon" size="sm" />
+                  <Icon as={ArrowRightIcon} size="sm" />
                   <span style={{ fontSize: '14px', fontStyle: 'italic' }}>
                     Acción recomendada: {insight.action}
                   </span>
@@ -598,23 +604,23 @@ const ReportingAnalyticsEnhanced: React.FC = () => {
         <Section title="Acciones Rápidas" variant="flat">
           <Stack direction="row" gap="md" wrap="wrap">
             <Button colorPalette="blue" size="sm">
-              <Icon name="PlusIcon" />
+              <Icon as={PlusIcon} />
               Nuevo Reporte Ejecutivo
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="DocumentArrowDownIcon" />
+              <Icon as={DocumentArrowDownIcon} />
               Exportar Analytics
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="CogIcon" />
+              <Icon as={CogIcon} />
               Configurar Alertas
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="ChartBarIcon" />
+              <Icon as={ChartBarIcon} />
               Dashboard Personalizado
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="CalendarIcon" />
+              <Icon as={CalendarIcon} />
               Programar Reportes
             </Button>
           </Stack>

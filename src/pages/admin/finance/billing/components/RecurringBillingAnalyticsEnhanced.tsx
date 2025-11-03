@@ -3,10 +3,24 @@ import {
   ContentLayout, Section, CardGrid, MetricCard, Stack, Badge,
   Typography, Alert
 } from '@/shared/ui';
+import {
+  CurrencyDollarIcon,
+  ArrowTrendingUpIcon,
+  UserGroupIcon,
+  ArrowPathIcon,
+  ChartBarIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  ClockIcon,
+  DocumentTextIcon,
+  PauseIcon,
+  XCircleIcon,
+  BeakerIcon
+} from '@heroicons/react/24/outline';
 
 const RecurringBillingAnalyticsEnhanced: React.FC = () => {
   // Mock data - en implementación real vendría del AnalyticsEngine
-  const mockData = {
+  const mockData = React.useMemo(() => ({
     subscriptions: {
       total: 247,
       active: 198,
@@ -38,11 +52,9 @@ const RecurringBillingAnalyticsEnhanced: React.FC = () => {
       retrySuccessRate: 67.3,
       averageCollectionTime: 2.1
     }
-  };
+  }), []);
 
   const subscriptionMatrix = React.useMemo(() => {
-    const { revenue, churn } = mockData;
-
     return [
       {
         title: "Champions 🏆",
@@ -85,7 +97,7 @@ const RecurringBillingAnalyticsEnhanced: React.FC = () => {
         strategies: ["Educación producto", "Migración a planes superiores", "Automatización"]
       }
     ];
-  }, [mockData]);
+  }, []); // mockData is stable (memoized), so we don't need it in dependencies
 
   const revenueInsights = React.useMemo(() => {
     const { revenue, subscriptions, churn, ltv } = mockData;
@@ -120,7 +132,7 @@ const RecurringBillingAnalyticsEnhanced: React.FC = () => {
         actionable: false
       }
     ];
-  }, [mockData]);
+  }, []); // mockData is stable (memoized), so we don't need it in dependencies
 
   const cohortAnalysis = React.useMemo(() => {
     return [
@@ -173,32 +185,32 @@ const RecurringBillingAnalyticsEnhanced: React.FC = () => {
             <MetricCard
               title="Ingresos Mensuales"
               value={`$${mockData.revenue.monthly.toLocaleString()}`}
-              change={mockData.revenue.growth}
-              icon="CurrencyDollarIcon"
+              change={mockData.revenue.growth.toString()}
+              icon={CurrencyDollarIcon}
             />
             <MetricCard
               title="MRR Anualizado"
               value={`$${mockData.revenue.annual.toLocaleString()}`}
-              change={mockData.revenue.growth}
-              icon="TrendingUpIcon"
+              change={mockData.revenue.growth.toString()}
+              icon={ArrowTrendingUpIcon}
             />
             <MetricCard
               title="Suscripciones Activas"
               value={mockData.subscriptions.active.toString()}
-              change={8.3}
-              icon="UserGroupIcon"
+              change="8.3"
+              icon={UserGroupIcon}
             />
             <MetricCard
               title="Tasa de Churn"
               value={`${mockData.churn.rate}%`}
-              change={mockData.churn.trend}
-              icon="ArrowPathIcon"
+              change={mockData.churn.trend.toString()}
+              icon={ArrowPathIcon}
             />
             <MetricCard
               title="LTV Promedio"
               value={`$${mockData.ltv.average.toLocaleString()}`}
-              change={mockData.ltv.cohortImprovement}
-              icon="ChartBarIcon"
+              change={mockData.ltv.cohortImprovement.toString()}
+              icon={ChartBarIcon}
             />
           </CardGrid>
         </Section>
@@ -248,26 +260,26 @@ const RecurringBillingAnalyticsEnhanced: React.FC = () => {
             <MetricCard
               title="Cargos Exitosos"
               value={`${mockData.billingHealth.successfulCharges}%`}
-              change={2.1}
-              icon="CheckCircleIcon"
+              change="2.1"
+              icon={CheckCircleIcon}
             />
             <MetricCard
               title="Cargos Fallidos"
               value={`${mockData.billingHealth.failedCharges}%`}
-              change={-0.8}
-              icon="ExclamationCircleIcon"
+              change="-0.8"
+              icon={ExclamationCircleIcon}
             />
             <MetricCard
               title="Éxito en Reintentos"
               value={`${mockData.billingHealth.retrySuccessRate}%`}
-              change={5.2}
-              icon="ArrowPathIcon"
+              change="5.2"
+              icon={ArrowPathIcon}
             />
             <MetricCard
               title="Tiempo de Cobro"
               value={`${mockData.billingHealth.averageCollectionTime} días`}
-              change={-0.3}
-              icon="ClockIcon"
+              change="-0.3"
+              icon={ClockIcon}
             />
           </CardGrid>
 
@@ -289,7 +301,7 @@ const RecurringBillingAnalyticsEnhanced: React.FC = () => {
                 <Stack direction={{ base: 'column', md: 'row' }} justify="between" align="start" gap="md">
                   <Stack gap="sm">
                     <Stack direction="row" align="center" gap="sm">
-                      <Typography variant="h6">{cohort.cohort}</Typography>
+                      <Typography variant="subtitle">{cohort.cohort}</Typography>
                       <Badge
                         colorPalette={
                           cohort.status === 'growing' ? 'green' :
@@ -338,7 +350,7 @@ const RecurringBillingAnalyticsEnhanced: React.FC = () => {
             {revenueInsights.map((insight, index) => (
               <Alert key={index} status={insight.type} size="md">
                 <Stack gap="sm">
-                  <Typography variant="h6">{insight.title}</Typography>
+                  <Typography variant="subtitle">{insight.title}</Typography>
                   <Typography variant="body">{insight.description}</Typography>
                   {insight.actionable && (
                     <Badge colorPalette="blue" variant="subtle" size="sm">
@@ -357,32 +369,32 @@ const RecurringBillingAnalyticsEnhanced: React.FC = () => {
             <MetricCard
               title="Total Suscripciones"
               value={mockData.subscriptions.total.toString()}
-              change={6.2}
-              icon="DocumentTextIcon"
+              change="6.2"
+              icon={DocumentTextIcon}
             />
             <MetricCard
               title="Activas"
               value={mockData.subscriptions.active.toString()}
-              change={8.3}
-              icon="CheckCircleIcon"
+              change="8.3"
+              icon={CheckCircleIcon}
             />
             <MetricCard
               title="Suspendidas"
               value={mockData.subscriptions.suspended.toString()}
-              change={-2.1}
-              icon="PauseIcon"
+              change="-2.1"
+              icon={PauseIcon}
             />
             <MetricCard
               title="Canceladas"
               value={mockData.subscriptions.cancelled.toString()}
-              change={-4.5}
-              icon="XCircleIcon"
+              change="-4.5"
+              icon={XCircleIcon}
             />
             <MetricCard
               title="En Prueba"
               value={mockData.subscriptions.trial.toString()}
-              change={15.7}
-              icon="BeakerIcon"
+              change="15.7"
+              icon={BeakerIcon}
             />
           </CardGrid>
         </Section>

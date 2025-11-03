@@ -73,11 +73,11 @@ export const GridView: React.FC<GridViewProps> = ({
   glowColor
 }) => {
   return (
-    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={8}>
+    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="8">
       {/* Debug: Mostrar información del estado */}
       {domainProgress.length === 0 && (
-        <Box p={8} bg="red.900" color="white" borderRadius="xl" gridColumn="1 / -1">
-          <VStack gap={2}>
+        <Box p="8" bg="red.900" color="white" borderRadius="xl" gridColumn="1 / -1">
+          <VStack gap="2">
             <Text fontSize="xl" fontWeight="bold">🔍 DEBUG: Sin datos de dominios</Text>
             <Text fontSize="sm">domainProgress.length: {domainProgress.length}</Text>
           </VStack>
@@ -101,7 +101,7 @@ export const GridView: React.FC<GridViewProps> = ({
         return (
           <Box
             key={domain.domain}
-            p={8}
+            p="8"
             bg={cardBg}
             border="1px solid"
             borderColor={cardBorder}
@@ -131,11 +131,11 @@ export const GridView: React.FC<GridViewProps> = ({
               animation="pulse 3s ease-in-out infinite"
             />
             
-            <VStack gap={6} align="center">
+            <VStack gap="6" align="center">
               {/* Ícono de constelación */}
               <Box position="relative">
                 <Box
-                  p={4}
+                  p="4"
                   bg="rgba(139, 92, 246, 0.2)"
                   borderRadius="2xl"
                   border="1px solid"
@@ -149,7 +149,7 @@ export const GridView: React.FC<GridViewProps> = ({
               </Box>
               
               {/* Información del dominio */}
-              <VStack gap={3} textAlign="center">
+              <VStack gap="3" textAlign="center">
                 <Text 
                   fontSize="xl" 
                   fontWeight="bold" 
@@ -159,8 +159,8 @@ export const GridView: React.FC<GridViewProps> = ({
                   {metadata.name}
                 </Text>
                 
-                <HStack justify="center" gap={4}>
-                  <VStack gap={1}>
+                <HStack justify="center" gap="4">
+                  <VStack gap="1">
                     <Text fontSize="2xl" fontWeight="bold" color="purple.300">
                       {domain.total_achievements}
                     </Text>
@@ -171,7 +171,7 @@ export const GridView: React.FC<GridViewProps> = ({
                   
                   <Box width="1px" height="40px" bg="gray.600" />
                   
-                  <VStack gap={1}>
+                  <VStack gap="1">
                     <Text fontSize="2xl" fontWeight="bold" color="cyan.300">
                       {domain.unlocked_achievements}
                     </Text>
@@ -198,7 +198,7 @@ export const GridView: React.FC<GridViewProps> = ({
                     />
                   </Box>
                   
-                  <Text fontSize="xs" color="gray.400" mt={2} textAlign="center">
+                  <Text fontSize="xs" color="gray.400" mt="2" textAlign="center">
                     {domain.total_achievements > 0 ? Math.round((domain.unlocked_achievements / domain.total_achievements) * 100) : 0}% completado
                   </Text>
                 </Box>

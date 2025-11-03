@@ -123,17 +123,17 @@ export interface StaffState {
   // Schedule management - Enhanced with Supabase
   setSchedules: (schedules: ShiftSchedule[]) => void;
   loadSchedules: (startDate?: string, endDate?: string) => Promise<void>;
-  addSchedule: (schedule: Omit<ShiftSchedule, 'id'>) => Promise<void>;
-  updateSchedule: (id: string, updates: Partial<ShiftSchedule>) => Promise<void>;
-  deleteSchedule: (id: string) => Promise<void>;
+  addSchedule: (schedule: Omit<ShiftSchedule, 'id'>) => void;
+  updateSchedule: (id: string, updates: Partial<ShiftSchedule>) => void;
+  deleteSchedule: (id: string) => void;
   
   // Time tracking - Enhanced with Supabase
   setTimeEntries: (entries: TimeEntry[]) => void;
   loadTimeEntries: (startDate?: string, endDate?: string) => Promise<void>;
-  clockIn: (staffId: string, location?: { latitude: number; longitude: number }, notes?: string) => Promise<void>;
-  clockOut: (staffId: string, location?: { latitude: number; longitude: number }, notes?: string) => Promise<void>;
-  startBreak: (staffId: string, notes?: string) => Promise<void>;
-  endBreak: (staffId: string, notes?: string) => Promise<void>;
+  clockIn: (staffId: string, location?: { latitude: number; longitude: number }, notes?: string) => void;
+  clockOut: (staffId: string, location?: { latitude: number; longitude: number }, notes?: string) => void;
+  startBreak: (staffId: string, notes?: string) => void;
+  endBreak: (staffId: string, notes?: string) => void;
   
   // UI actions
   setLoading: (loading: boolean) => void;
@@ -333,7 +333,7 @@ export const useStaffStore = create<StaffState>()(
             });
 
             // Convert updates to Employee format
-            const employeeUpdates: unknown = {};
+            const employeeUpdates: Partial<Employee> = {};
             if (updates.name) {
               const nameParts = updates.name.split(' ');
               employeeUpdates.first_name = nameParts[0];
@@ -442,7 +442,7 @@ export const useStaffStore = create<StaffState>()(
             });
 
             const schedules = await staffApi.getShiftSchedules(startDate, endDate);
-            const formattedSchedules = schedules.map(scheduleToStoreFormat);
+            const formattedSchedules = schedules.map(schedule => scheduleToStoreFormat(schedule));
 
             set((state) => {
               state.schedules = formattedSchedules;
@@ -500,7 +500,7 @@ export const useStaffStore = create<StaffState>()(
             });
 
             const timeEntries = await staffApi.getTimeEntries(startDate, endDate);
-            const formattedEntries = timeEntries.map(timeEntryToStoreFormat);
+            const formattedEntries = timeEntries.map(entry => timeEntryToStoreFormat(entry));
 
             set((state) => {
               state.timeEntries = formattedEntries;
@@ -593,7 +593,7 @@ export const useStaffStore = create<StaffState>()(
 
         setError: (_error) => {
           set((state) => {
-            state.error = error;
+            state.error = _error;
           });
         },
 
@@ -637,11 +637,11 @@ export const useStaffStore = create<StaffState>()(
         },
 
         // Modal actions
-        openStaffModal: (mode, staff = null) => {
+        openStaffModal: (mode, staff) => {
           set((state) => {
             state.isStaffModalOpen = true;
             state.modalMode = mode;
-            state.currentStaff = staff;
+            state.currentStaff = staff ?? null;
           });
         },
 
@@ -652,11 +652,11 @@ export const useStaffStore = create<StaffState>()(
           });
         },
 
-        openScheduleModal: (mode, schedule = null) => {
+        openScheduleModal: (mode, schedule) => {
           set((state) => {
             state.isScheduleModalOpen = true;
             state.modalMode = mode;
-            state.currentSchedule = schedule;
+            state.currentSchedule = schedule ?? null;
           });
         },
 
@@ -875,7 +875,13 @@ export const useStaffStore = create<StaffState>()(
           filters: state.filters, // ✅ Safe - only UI preferences
           calendarDate: state.calendarDate.toISOString(), // ✅ Safe - only UI state
           calendarView: state.calendarView // ✅ Safe - only UI state
-        })
+        }),
+        // Convert calendarDate string back to Date object on rehydration
+        onRehydrateStorage: () => (state) => {
+          if (state && typeof state.calendarDate === 'string') {
+            state.calendarDate = new Date(state.calendarDate);
+          }
+        }
       }
     ),
     {

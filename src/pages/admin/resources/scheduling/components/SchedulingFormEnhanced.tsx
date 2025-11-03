@@ -7,12 +7,8 @@ import { z } from 'zod';
 import { DynamicForm, type FormSectionConfig } from '@/shared/components/forms';
 import { useFormManager } from '@/shared/hooks/business';
 import { CRUDHandlers } from '@/shared/utils/errorHandling';
-import {
-  SchedulingCalculations,
-  LaborOptimization,
-  type CoverageAnalysis,
-  type ShiftOptimization
-} from '@/business-logic/shared/SchedulingCalculations';
+// TODO: Implement ShiftOptimization type when business logic is complete
+// import type { ShiftOptimization } from '@/business-logic/shared/SchedulingCalculations';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
 import { logger } from '@/lib/logging';
@@ -46,7 +42,7 @@ const ScheduleSchema = z.object({
 type ScheduleFormData = z.infer<typeof ScheduleSchema>;
 
 interface SchedulingFormEnhancedProps {
-  schedule?: any;
+  schedule?: unknown;
   onSuccess?: () => void;
   onCancel?: () => void;
   prefilledDate?: string;
@@ -230,7 +226,7 @@ export function SchedulingFormEnhanced({
   ];
 
   // Enhanced form manager with scheduling calculations
-  const { register, errors, watch, submit, isSubmitting } = useFormManager({
+  const { watch, submit } = useFormManager({
     schema: ScheduleSchema,
     defaultValues: {
       schedule_id: schedule?.schedule_id || `SCH${Date.now()}`,
@@ -398,12 +394,12 @@ export function SchedulingFormEnhanced({
   };
 
   // Mock CRUD operations (would be replaced with real API calls)
-  const createSchedule = async (data: any) => {
+  const createSchedule = async (data: unknown) => {
     logger.info('API', 'Creating schedule:', data);
     return { id: Date.now().toString(), ...data };
   };
 
-  const updateSchedule = async (id: string, data: any) => {
+  const updateSchedule = async (id: string, data: unknown) => {
     logger.info('API', 'Updating schedule:', id, data);
     return { id, ...data };
   };
@@ -416,7 +412,7 @@ export function SchedulingFormEnhanced({
         schema={ScheduleSchema}
         sections={formSections}
         defaultValues={watchedValues}
-        onSubmit={submit as any}
+        onSubmit={submit as (data: unknown) => Promise<void>}
         onCancel={onCancel}
         submitText={isEditMode ? '✅ Actualizar Turno' : '✅ Crear Turno'}
         successMessage={{

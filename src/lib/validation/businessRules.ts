@@ -1,4 +1,4 @@
-import { BusinessRule } from './types';
+import type { BusinessRule } from './types';
 import { useMaterialsStore } from '@/store/materialsStore';
 import { useSalesStore } from '@/store/salesStore';
 import { useCustomersStore } from '@/store/customersStore';

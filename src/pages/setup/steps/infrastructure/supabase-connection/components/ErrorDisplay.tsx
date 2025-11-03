@@ -21,7 +21,7 @@ export function ErrorDisplay({ error }: ErrorDisplayProps) {
       }}
     >
       <HStack gap="sm">
-        <Badge variant="solid" colorScheme="red">❌ ERROR</Badge>
+        <Badge variant="solid" colorPalette="red">❌ ERROR</Badge>
         <Typography variant="default" color="red.700" fontSize="sm">{error}</Typography>
       </HStack>
     </Section>

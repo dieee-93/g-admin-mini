@@ -7,7 +7,6 @@
  * @version 1.0.0
  */
 
-import React from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
@@ -26,6 +25,9 @@ export const financeIntegrationsManifest: ModuleManifest = {
     'sales_online_payment_gateway',
     'operations_shipping_integration',
   ] as FeatureId[],
+
+  // 🔒 PERMISSIONS: Only administrators can manage integrations
+  minimumRole: 'ADMINISTRADOR' as const,
 
   hooks: {
     provide: [

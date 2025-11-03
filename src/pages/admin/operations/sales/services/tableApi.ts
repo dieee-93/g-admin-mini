@@ -1,12 +1,12 @@
 // src/features/sales/data/tableApi.ts
 // 🚀 TABLE MANAGEMENT API - Modern Restaurant Operations
 import { supabase } from '@/lib/supabase/client';
-import { 
+import {
   calculateEstimatedDuration,
-  calculateActualDuration,
-  calculateTableUtilization,
-  calculateServiceEfficiency,
-  calculateWaitTime
+  calculateActualDuration
+  // calculateTableUtilization, // TODO: Use in analytics
+  // calculateServiceEfficiency, // TODO: Use in performance metrics
+  // calculateWaitTime // TODO: Use in wait time calculator
 } from '@/business-logic/operations/tableOperations';
 import { 
   Table, 

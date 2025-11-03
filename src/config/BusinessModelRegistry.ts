@@ -177,7 +177,7 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'scheduling_availability_rules',
       'customer_service_history',
       'customer_preference_tracking',
-      'customer_online_reservation',
+      'customer_online_accounts',
       'sales_package_management',
 
       // STAFF - Profesionales, técnicos, prestadores de servicio
@@ -434,12 +434,20 @@ export function getActivatedFeatures(
   // Features de capabilities
   capabilities.forEach(capId => {
     const capability = CAPABILITIES[capId];
+    if (!capability) {
+      console.warn(`[BusinessModelRegistry] Unknown capability ID: ${capId}`);
+      return; // Skip invalid capability
+    }
     capability.activatesFeatures.forEach(f => features.add(f));
   });
 
   // Features de infrastructure
   infrastructure.forEach(infraId => {
     const infra = INFRASTRUCTURE[infraId];
+    if (!infra) {
+      console.warn(`[BusinessModelRegistry] Unknown infrastructure ID: ${infraId}`);
+      return; // Skip invalid infrastructure
+    }
     infra.activatesFeatures.forEach(f => features.add(f));
   });
 
@@ -457,6 +465,10 @@ export function getBlockingRequirements(
 
   capabilities.forEach(capId => {
     const capability = CAPABILITIES[capId];
+    if (!capability) {
+      console.warn(`[BusinessModelRegistry] Unknown capability ID in getBlockingRequirements: ${capId}`);
+      return;
+    }
     if (capability.blockingRequirements) {
       capability.blockingRequirements.forEach(r => requirements.add(r));
     }
@@ -464,6 +476,10 @@ export function getBlockingRequirements(
 
   infrastructure.forEach(infraId => {
     const infra = INFRASTRUCTURE[infraId];
+    if (!infra) {
+      console.warn(`[BusinessModelRegistry] Unknown infrastructure ID in getBlockingRequirements: ${infraId}`);
+      return;
+    }
     if (infra.blockingRequirements) {
       infra.blockingRequirements.forEach(r => requirements.add(r));
     }

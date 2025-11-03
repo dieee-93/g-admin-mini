@@ -24,6 +24,9 @@ export const executiveManifest: ModuleManifest = {
   requiredFeatures: [] as FeatureId[],
   optionalFeatures: ['executive'] as FeatureId[],
 
+  // 🔒 PERMISSIONS: Only ADMINISTRADOR for executive dashboard
+  minimumRole: 'ADMINISTRADOR' as const,
+
   hooks: {
     provide: [
       'executive.kpi_panels',     // Executive KPI panels

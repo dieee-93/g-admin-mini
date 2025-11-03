@@ -1,8 +1,34 @@
+/**
+ * Assets Management Page - Enterprise Asset Management
+ *
+ * SEMANTIC v3.0 - WCAG AA Compliant:
+ * ✅ Skip link for keyboard navigation (WCAG 2.4.1 Level A)
+ * ✅ Semantic main content wrapper with ARIA label
+ * ✅ Proper section headings for screen readers
+ * ✅ Nav pattern for tab navigation
+ * ✅ Article pattern for tab content
+ * ✅ 3-Layer Architecture (Semantic → Layout → Primitives)
+ *
+ * FEATURES:
+ * - Asset lifecycle management
+ * - ROI tracking and depreciation
+ * - Maintenance scheduling
+ * - Cross-module integration (Rentals, Finance, Operations)
+ * - EventBus integration
+ */
+
 import React from 'react';
 import {
-  ContentLayout, PageHeader, Section, Stack, Button, Badge, Tabs
+  ContentLayout, Section, Stack, Button, Badge, Tabs, SkipLink, HStack, Icon
 } from '@/shared/ui';
-import { Icon } from '@/shared/ui';
+import {
+  PlusIcon,
+  ChartBarIcon,
+  WrenchScrewdriverIcon,
+  CogIcon,
+  HomeIcon,
+  ListBulletIcon
+} from '@heroicons/react/24/outline';
 import AssetFormEnhanced from './components/AssetFormEnhanced';
 import AssetAnalyticsEnhanced from './components/AssetAnalyticsEnhanced';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
@@ -14,42 +40,6 @@ const AssetPage: React.FC = () => {
     // Emit module loaded event
     ModuleEventUtils.system.moduleLoaded('asset');
   }, []);
-
-  const quickActions = (
-    <Stack direction="row" gap="sm">
-      <Button
-        onClick={() => setActiveTab('create')}
-        colorPalette="blue"
-        size="sm"
-      >
-        <Icon name="PlusIcon" />
-        Nuevo Asset
-      </Button>
-      <Button
-        onClick={() => setActiveTab('analytics')}
-        variant="outline"
-        size="sm"
-      >
-        <Icon name="ChartBarIcon" />
-        Analytics
-      </Button>
-      <Button
-        onClick={() => setActiveTab('maintenance')}
-        variant="outline"
-        size="sm"
-      >
-        <Icon name="WrenchScrewdriverIcon" />
-        Mantenimiento
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-      >
-        <Icon name="CogIcon" />
-        Configuración
-      </Button>
-    </Stack>
-  );
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -69,43 +59,94 @@ const AssetPage: React.FC = () => {
   };
 
   return (
-    <ContentLayout spacing="normal">
-      <PageHeader
-        title="Gestión de Assets"
-        subtitle="Control integral de assets empresariales con ROI tracking, depreciación y analytics de lifecycle"
-        icon="CubeIcon"
-        actions={quickActions}
-      />
+    <>
+      {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
+      <SkipLink />
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-        <Tabs.List>
-          <Tabs.Trigger value="dashboard">
-            <Icon name="HomeIcon" />
-            Dashboard
-          </Tabs.Trigger>
-          <Tabs.Trigger value="create">
-            <Icon name="PlusIcon" />
-            Nuevo Asset
-          </Tabs.Trigger>
-          <Tabs.Trigger value="manage">
-            <Icon name="ListBulletIcon" />
-            Gestionar Assets
-          </Tabs.Trigger>
-          <Tabs.Trigger value="maintenance">
-            <Icon name="WrenchScrewdriverIcon" />
-            Mantenimiento
-          </Tabs.Trigger>
-          <Tabs.Trigger value="analytics">
-            <Icon name="ChartBarIcon" />
-            Analytics
-          </Tabs.Trigger>
-        </Tabs.List>
+      {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
+      <ContentLayout spacing="normal" mainLabel="Enterprise Asset Management">
 
-        <Tabs.Content value={activeTab}>
-          {renderTabContent()}
-        </Tabs.Content>
-      </Tabs>
-    </ContentLayout>
+        {/* ✅ HEADER SECTION - Title and actions */}
+        <Section
+          variant="flat"
+          title="Gestión de Assets"
+          subtitle="Control integral de assets empresariales con ROI tracking, depreciación y analytics de lifecycle"
+          semanticHeading="Asset Management Dashboard"
+          actions={
+            <HStack gap="2">
+              <Button
+                onClick={() => setActiveTab('create')}
+                colorPalette="blue"
+                size="sm"
+              >
+                <Icon as={PlusIcon} />
+                Nuevo Asset
+              </Button>
+              <Button
+                onClick={() => setActiveTab('analytics')}
+                variant="outline"
+                size="sm"
+              >
+                <Icon as={ChartBarIcon} />
+                Analytics
+              </Button>
+              <Button
+                onClick={() => setActiveTab('maintenance')}
+                variant="outline"
+                size="sm"
+              >
+                <Icon as={WrenchScrewdriverIcon} />
+                Mantenimiento
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+              >
+                <Icon as={CogIcon} />
+                Configuración
+              </Button>
+            </HStack>
+          }
+        />
+
+        {/* ✅ TAB NAVIGATION SECTION - Semantic nav pattern */}
+        <Section
+          as="nav"
+          variant="elevated"
+          semanticHeading="Asset Management Sections"
+        >
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+            <Tabs.List>
+              <Tabs.Trigger value="dashboard">
+                <Icon as={HomeIcon} />
+                Dashboard
+              </Tabs.Trigger>
+              <Tabs.Trigger value="create">
+                <Icon as={PlusIcon} />
+                Nuevo Asset
+              </Tabs.Trigger>
+              <Tabs.Trigger value="manage">
+                <Icon as={ListBulletIcon} />
+                Gestionar Assets
+              </Tabs.Trigger>
+              <Tabs.Trigger value="maintenance">
+                <Icon as={WrenchScrewdriverIcon} />
+                Mantenimiento
+              </Tabs.Trigger>
+              <Tabs.Trigger value="analytics">
+                <Icon as={ChartBarIcon} />
+                Analytics
+              </Tabs.Trigger>
+            </Tabs.List>
+
+            <Tabs.Content value={activeTab}>
+              {renderTabContent()}
+            </Tabs.Content>
+          </Tabs>
+        </Section>
+
+      </ContentLayout>
+    </>
   );
 };
 
@@ -113,7 +154,11 @@ const AssetPage: React.FC = () => {
 const AssetDashboard: React.FC = () => {
   return (
     <Stack gap="lg">
-      <Section title="Estado del Sistema" variant="elevated">
+      <Section
+        title="Estado del Sistema"
+        variant="elevated"
+        semanticHeading="Asset System Status Overview"
+      >
         <Stack gap="md">
           <Stack direction="row" gap="md" wrap="wrap">
             <Badge colorPalette="green" variant="subtle" size="lg">
@@ -136,7 +181,11 @@ const AssetDashboard: React.FC = () => {
             </Badge>
           </Stack>
 
-          <Section variant="flat" title="Integración EventBus">
+          <Section
+            variant="flat"
+            title="Integración EventBus"
+            semanticHeading="EventBus Integration Status"
+          >
             <Stack gap="sm">
               <p>✅ 12 eventos de asset configurados</p>
               <p>✅ Integración con módulos: Rentals, Finance, Operations, Maintenance</p>
@@ -148,7 +197,11 @@ const AssetDashboard: React.FC = () => {
             </Stack>
           </Section>
 
-          <Section variant="flat" title="Funcionalidades Implementadas">
+          <Section
+            variant="flat"
+            title="Funcionalidades Implementadas"
+            semanticHeading="Implemented Features List"
+          >
             <Stack gap="sm">
               <p><strong>✅ AssetFormEnhanced</strong>: DynamicForm completo con 8 secciones, cálculos de ROI en tiempo real, asset health scoring</p>
               <p><strong>✅ AssetAnalyticsEnhanced</strong>: Matrix de lifecycle, análisis de categorías, maintenance analytics avanzado</p>
@@ -170,11 +223,19 @@ const AssetDashboard: React.FC = () => {
 // Asset Manager component
 const AssetManager: React.FC = () => {
   return (
-    <Section title="Gestión de Assets Empresariales" variant="elevated">
+    <Section
+      title="Gestión de Assets Empresariales"
+      variant="elevated"
+      semanticHeading="Enterprise Asset Management Panel"
+    >
       <Stack gap="md">
         <p><strong>Panel de control integral para assets corporativos</strong></p>
 
-        <Section variant="flat" title="Funcionalidades de Gestión">
+        <Section
+          variant="flat"
+          title="Funcionalidades de Gestión"
+          semanticHeading="Asset Management Features"
+        >
           <Stack gap="sm">
             <p>• <strong>Inventario maestro</strong> con categorías (IT, Oficina, Producción, Vehículos, Inmuebles)</p>
             <p>• <strong>Status tracking</strong> en tiempo real (Activo, En Uso, Mantenimiento, Almacenado, Dado de Baja)</p>
@@ -187,7 +248,11 @@ const AssetManager: React.FC = () => {
           </Stack>
         </Section>
 
-        <Section variant="flat" title="Integración Cross-Module">
+        <Section
+          variant="flat"
+          title="Integración Cross-Module"
+          semanticHeading="Cross-Module Integration Status"
+        >
           <Stack gap="sm">
             <p>✅ <strong>Rental Integration</strong>: Assets disponibles para alquiler con pricing dinámico</p>
             <p>✅ <strong>Finance Integration</strong>: Depreciación automática, cost centers, budget tracking</p>
@@ -196,7 +261,11 @@ const AssetManager: React.FC = () => {
           </Stack>
         </Section>
 
-        <Section variant="flat" title="Asset Categories & Performance">
+        <Section
+          variant="flat"
+          title="Asset Categories & Performance"
+          semanticHeading="Asset Categories Performance Metrics"
+        >
           <Stack gap="sm">
             <p>💻 <strong>IT Assets</strong>: 89 items, 94.2% uptime, $780K valor, ciclo 3-4 años</p>
             <p>🏢 <strong>Office Assets</strong>: 134 items, 87.6% utilización, $420K valor, ciclo 5-7 años</p>
@@ -213,11 +282,19 @@ const AssetManager: React.FC = () => {
 // Maintenance Manager component
 const MaintenanceManager: React.FC = () => {
   return (
-    <Section title="Gestión de Mantenimiento" variant="elevated">
+    <Section
+      title="Gestión de Mantenimiento"
+      variant="elevated"
+      semanticHeading="Asset Maintenance Management Panel"
+    >
       <Stack gap="md">
         <p><strong>Sistema integral de mantenimiento preventivo y correctivo</strong></p>
 
-        <Section variant="flat" title="Programación de Mantenimiento">
+        <Section
+          variant="flat"
+          title="Programación de Mantenimiento"
+          semanticHeading="Maintenance Scheduling"
+        >
           <Stack gap="sm">
             <p>• <strong>Mantenimiento preventivo</strong> con cronogramas automáticos por tipo de asset</p>
             <p>• <strong>Mantenimiento correctivo</strong> con priorización y tracking de urgencia</p>
@@ -230,7 +307,11 @@ const MaintenanceManager: React.FC = () => {
           </Stack>
         </Section>
 
-        <Section variant="flat" title="Analytics de Mantenimiento">
+        <Section
+          variant="flat"
+          title="Analytics de Mantenimiento"
+          semanticHeading="Maintenance Analytics Dashboard"
+        >
           <Stack gap="sm">
             <p>📊 <strong>MTBF Analytics</strong>: Mean Time Between Failures por categoría</p>
             <p>📊 <strong>Cost Analytics</strong>: Trending de costos y ROI de mantenimiento preventivo</p>
@@ -239,7 +320,11 @@ const MaintenanceManager: React.FC = () => {
           </Stack>
         </Section>
 
-        <Section variant="flat" title="Maintenance Categories">
+        <Section
+          variant="flat"
+          title="Maintenance Categories"
+          semanticHeading="Maintenance Categories Overview"
+        >
           <Stack gap="sm">
             <p>🔧 <strong>Preventivo Programado</strong>: 89 tasks pendientes, 94.2% completion rate</p>
             <p>⚡ <strong>Correctivo Urgente</strong>: 12 issues activos, 2.1h avg resolution</p>

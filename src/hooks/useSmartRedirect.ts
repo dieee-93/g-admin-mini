@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserRole } from '@/contexts/AuthContext';
-import { getDefaultRoute } from '@/config/routes';
+import { getDefaultRoute } from '@/lib/routing/roleRedirects';
 
 /**
  * Hook inteligente para redirección post-login basada en rol

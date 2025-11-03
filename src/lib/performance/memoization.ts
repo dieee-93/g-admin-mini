@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useRef, DependencyList } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
+import type { DependencyList } from 'react';
 
 import { logger } from '@/lib/logging';
 /**

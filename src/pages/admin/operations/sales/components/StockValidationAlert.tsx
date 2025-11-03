@@ -91,7 +91,7 @@ export function StockValidationAlert({ validationResult, isLoading }: StockValid
                       Necesitas {item.required}, disponible: {item.available}
                     </Typography>
                   </Stack>
-                  <Badge colorPalette="error" size="sm">
+                  <Badge colorPalette="red" size="sm">
                     Faltan {item.missing}
                   </Badge>
                 </div>

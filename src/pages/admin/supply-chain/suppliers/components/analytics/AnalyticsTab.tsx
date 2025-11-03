@@ -35,7 +35,7 @@ export function AnalyticsTab() {
         <Alert status="error" title="Error al cargar analytics">
           {error}
         </Alert>
-        <Button mt={4} onClick={refreshAnalytics}>
+        <Button mt="4" onClick={refreshAnalytics}>
           Reintentar
         </Button>
       </Section>
@@ -55,7 +55,7 @@ export function AnalyticsTab() {
   return (
     <Section variant="elevated">
       <Tabs.Root defaultValue="overview">
-        <Stack direction="row" justify="space-between" mb={4}>
+        <Stack direction="row" justify="space-between" mb="4">
           <Tabs.List>
             <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
             <Tabs.Trigger value="performance">Performance</Tabs.Trigger>
@@ -77,7 +77,7 @@ export function AnalyticsTab() {
 
         {/* Overview Tab */}
         <Tabs.Content value="overview">
-          <Stack direction="column" gap={6}>
+          <Stack direction="column" gap="6">
             {/* Portfolio Metrics Summary */}
             <PortfolioMetricsCards metrics={analytics.portfolioMetrics} />
 
@@ -106,7 +106,7 @@ export function AnalyticsTab() {
 
         {/* Opportunities Tab */}
         <Tabs.Content value="opportunities">
-          <Stack direction="column" gap={6}>
+          <Stack direction="column" gap="6">
             <ConsolidationOpportunities
               opportunities={analytics.consolidationOpportunities}
             />

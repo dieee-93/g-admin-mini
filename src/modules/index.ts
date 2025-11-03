@@ -48,7 +48,7 @@ import { materialsManifest } from './materials/manifest';
 import { suppliersManifest } from './suppliers/manifest';
 import { supplierOrdersManifest } from './supplier-orders/manifest';
 import { productsManifest } from './products/manifest';
-import { productionManifest } from './production/manifest';
+import { productsAnalyticsManifest } from './products/analytics/manifest';
 
 // ============================================
 // OPERATIONS DOMAIN - Daily operations
@@ -56,12 +56,18 @@ import { productionManifest } from './production/manifest';
 import { salesManifest } from './sales/manifest';
 import { fulfillmentManifest } from './fulfillment/manifest';
 import { fulfillmentOnsiteManifest } from './fulfillment/onsite/manifest';
-import { kitchenManifest } from './kitchen/manifest';
-import { deliveryManifest } from './delivery/manifest';
+import { fulfillmentPickupManifest } from './fulfillment/pickup/manifest';
+import { fulfillmentDeliveryManifest } from './fulfillment/delivery/manifest';
+import { productionManifest } from './production/manifest';
+// DISABLED: kitchen module is obsolete, functionality merged into production
+// import { kitchenManifest } from './production/kitchen/manifest';
+// DISABLED: delivery standalone module is obsolete, consolidated into fulfillment-delivery submódulo
+// import { deliveryManifest } from './delivery/manifest';
+import { mobileManifest } from './mobile/manifest';
 import { membershipsManifest } from './memberships/manifest';
 import { rentalsManifest } from './rentals/manifest';
 import { assetsManifest } from './assets/manifest';
-import { ecommerceManifest } from './ecommerce/manifest';
+
 
 // ============================================
 // RESOURCES DOMAIN - Staff & scheduling
@@ -75,6 +81,7 @@ import { schedulingManifest } from './scheduling/manifest';
 import { fiscalManifest } from './fiscal/manifest';
 import { billingManifest } from './billing/manifest';
 import { financeIntegrationsManifest } from './finance-integrations/manifest';
+import { financeManifest } from './finance/manifest';
 
 // ============================================
 // GAMIFICATION DOMAIN - Achievements & progress
@@ -94,7 +101,9 @@ import { executiveManifest } from './executive/manifest';
  * Array of all module manifests in the system.
  * Modules will be registered in dependency order by bootstrap process.
  *
- * ✅ UPDATED: 25 modules total (8 original + 17 new)
+ * ✅ UPDATED: 31 modules total (Phase 3)
+ * - 26 main modules (25 + finance module)
+ * - 5 sub-modules (fulfillment-onsite, fulfillment-pickup, fulfillment-delivery, fulfillment-pickup, production-kitchen)
  *
  * DEPENDENCY ORDER:
  * 1. Foundation modules (no dependencies): dashboard, settings, debug, staff, materials, suppliers, sales, customers
@@ -136,7 +145,8 @@ export const ALL_MODULE_MANIFESTS = [
 
   schedulingManifest,    // ✅ Depends on: staff
   productsManifest,      // ✅ Depends on: materials
-  productionManifest,    // ✅ Depends on: materials
+  productsAnalyticsManifest, // ✅ NEW: Products analytics sub-module (Menu Engineering, Cost Analysis)
+  productionManifest,    // ✅ RENAMED from kitchen - Depends on: materials
   billingManifest,       // ✅ Depends on: customers
   fiscalManifest,        // ✅ Depends on: sales
 
@@ -144,11 +154,15 @@ export const ALL_MODULE_MANIFESTS = [
   // TIER 3: Second-level dependencies
   // ============================================
 
-  supplierOrdersManifest,    // ✅ Depends on: suppliers + materials
-  fulfillmentManifest,      // ✅ NEW: Unified fulfillment system
-  fulfillmentOnsiteManifest, // ✅ NEW: Onsite service (from floor)
+  supplierOrdersManifest,      // ✅ Depends on: suppliers + materials
+  fulfillmentManifest,        // ✅ NEW: Unified fulfillment system
+  fulfillmentOnsiteManifest,  // ✅ NEW: Onsite service (from floor)
+  fulfillmentPickupManifest,  // ✅ NEW: Pickup orders sub-module
+  fulfillmentDeliveryManifest, // ✅ NEW: Delivery orders sub-module
+  mobileManifest,             // ✅ NEW Phase 2: Mobile operations (GPS, routes, inventory)
+  financeManifest,            // ✅ NEW Phase 3: B2B Finance (corporate accounts, credit)
   financeIntegrationsManifest, // ✅ Depends on: fiscal + billing
-  ecommerceManifest,         // ✅ Depends on: sales + products (hook injection)
+  
 
   // ============================================
   // TIER 4: Third-level dependencies
@@ -162,8 +176,10 @@ export const ALL_MODULE_MANIFESTS = [
   // TIER 5: Cross-cutting modules (aggregate data)
   // ============================================
 
-  kitchenManifest,       // ✅ Links: sales + materials (auto-install)
-  deliveryManifest,      // ✅ Depends on: sales + staff
+  // DISABLED: kitchen module is obsolete
+  // kitchenManifest,       // ✅ Links: sales + materials (auto-install)
+  // DISABLED: delivery standalone module is obsolete, use fulfillmentDeliveryManifest instead
+  // deliveryManifest,      // ❌ REMOVED - Consolidated into fulfillment-delivery submódulo
   gamificationManifest,  // ✅ Listens to: all modules (auto-install)
   executiveManifest,     // ✅ Aggregates: all modules
 ];
@@ -187,6 +203,7 @@ export {
   // Supply-chain domain
   materialsManifest,
   suppliersManifest,
+  productsAnalyticsManifest,
   supplierOrdersManifest,
   productsManifest,
   productionManifest,
@@ -195,12 +212,17 @@ export {
   salesManifest,
   fulfillmentManifest,
   fulfillmentOnsiteManifest,
-  kitchenManifest,
-  deliveryManifest,
+  fulfillmentPickupManifest,
+  fulfillmentDeliveryManifest,
+  mobileManifest,
+  // DISABLED: kitchen module is obsolete
+  // kitchenManifest,
+  // DISABLED: delivery standalone module is obsolete
+  // deliveryManifest,
   membershipsManifest,
   rentalsManifest,
   assetsManifest,
-  ecommerceManifest,
+  
 
   // Resources domain
   staffManifest,
@@ -209,6 +231,7 @@ export {
   // Finance domain
   fiscalManifest,
   billingManifest,
+  financeManifest,
   financeIntegrationsManifest,
 
   // Cross-cutting domains
@@ -230,14 +253,14 @@ export type { ModuleManifest } from '@/lib/modules/types';
  * Module count by domain (for debugging/monitoring)
  */
 export const MODULE_STATS = {
-  total: ALL_MODULE_MANIFESTS.length, // 26 modules (was 25)
+  total: ALL_MODULE_MANIFESTS.length, // 31 modules (was 30, +1 finance added in Phase 3)
   byDomain: {
     system: 1,        // achievements (TIER 0)
     core: 6,          // dashboard, settings, debug, customers, reporting, intelligence
     supplyChain: 5,   // materials, suppliers, supplier-orders, products, production
-    operations: 8,    // sales, fulfillment (onsite/pickup/delivery), kitchen, memberships, rentals, assets, ecommerce
+    operations: 8,    // sales (includes ecommerce), fulfillment (onsite/pickup/delivery), mobile, kitchen, memberships, rentals, assets
     resources: 2,     // staff, scheduling
-    finance: 3,       // fiscal, billing, finance-integrations
+    finance: 4,       // fiscal, billing, finance (NEW), finance-integrations
     gamification: 1,  // gamification
     executive: 1,     // executive
   },

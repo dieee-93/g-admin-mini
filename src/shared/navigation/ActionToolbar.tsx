@@ -2,11 +2,11 @@
 // Toolbar de acciones para desktop
 // ✅ MIGRADO AL DESIGN SYSTEM
 
-import { useNavigation } from '@/contexts/NavigationContext';
+import {  } from '@/contexts/NavigationContext';
 import { Stack, Button, Typography, Icon } from '@/shared/ui';
 
 export function ActionToolbar() {
-  const { quickActions } = useNavigation();
+  const quickActions: any[] = [];
 
   if (quickActions.length === 0) return null;
 

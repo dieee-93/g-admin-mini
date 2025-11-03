@@ -240,7 +240,7 @@ export function WeekCalendarGrid({
                   }}
                 >
                   {slotEvents.length > 0 && (
-                    <Stack direction="column" gap={1}>
+                    <Stack direction="column" gap="1">
                       {slotEvents.map((event) => (
                         <EventBlock
                           key={event.id}

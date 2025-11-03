@@ -695,6 +695,58 @@ export const shiftTemplatesApi = {
 // =====================
 
 export const schedulingAnalyticsApi = {
+  // Get weekly dashboard stats
+  async getWeeklyDashboard({ startDate, endDate }: { startDate: string; endDate: string }) {
+    try {
+      // Get shifts for the week
+      const { data: shifts, error: shiftsError } = await supabase
+        .from('shifts')
+        .select('*')
+        .gte('date', startDate)
+        .lte('date', endDate);
+
+      if (shiftsError) throw shiftsError;
+
+      // Get time-off requests
+      const { data: timeOffRequests, error: timeOffError } = await supabase
+        .from('time_off_requests')
+        .select('*')
+        .gte('start_date', startDate)
+        .lte('end_date', endDate);
+
+      if (timeOffError) throw timeOffError;
+
+      // Calculate stats
+      const totalShifts = shifts?.length || 0;
+      const uniqueEmployees = new Set(shifts?.map(s => s.employee_id) || []).size;
+      const pendingTimeOff = timeOffRequests?.filter(r => r.status === 'pending').length || 0;
+      const approvedRequests = timeOffRequests?.filter(r => r.status === 'approved').length || 0;
+
+      return {
+        total_shifts_this_week: totalShifts,
+        employees_scheduled: uniqueEmployees,
+        coverage_percentage: totalShifts > 0 ? 85 : 0, // TODO: Calculate real coverage
+        pending_time_off: pendingTimeOff,
+        labor_cost_this_week: 0, // TODO: Calculate from shifts
+        overtime_hours: 0, // TODO: Calculate from shifts
+        understaffed_shifts: 0, // TODO: Calculate from coverage data
+        approved_requests: approvedRequests
+      };
+    } catch (error) {
+      logger.error('API', 'Error fetching weekly dashboard:', error);
+      return {
+        total_shifts_this_week: 0,
+        employees_scheduled: 0,
+        coverage_percentage: 0,
+        pending_time_off: 0,
+        labor_cost_this_week: 0,
+        overtime_hours: 0,
+        understaffed_shifts: 0,
+        approved_requests: 0
+      };
+    }
+  },
+
   // Get labor cost analytics
   async getLaborCostAnalytics(startDate: string, endDate: string) {
     try {

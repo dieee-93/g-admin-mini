@@ -13,7 +13,6 @@
  * @version 1.0.0
  */
 
-import React from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
@@ -51,7 +50,7 @@ export const debugManifest: ModuleManifest = {
    */
   depends: [],
 
-  autoInstall: false, // Only available in dev mode or SUPER_ADMIN
+  autoInstall: true, // Always available (visibility filtered by role in navigation)
 
   // ============================================
   // FEATURE REQUIREMENTS
@@ -66,6 +65,15 @@ export const debugManifest: ModuleManifest = {
    * Optional features that enhance functionality
    */
   optionalFeatures: ['debug'] as FeatureId[],
+
+  // ============================================
+  // PERMISSIONS & ROLES
+  // ============================================
+
+  /**
+   * 🔒 PERMISSIONS: Only SUPER_ADMIN can access debug tools
+   */
+  minimumRole: 'SUPER_ADMIN' as const,
 
   // ============================================
   // HOOK POINTS
@@ -96,7 +104,7 @@ export const debugManifest: ModuleManifest = {
   /**
    * Setup function - register hook handlers
    */
-  setup: async (registry) => {
+  setup: async () => {
     // Only setup in development mode
     if (process.env.NODE_ENV !== 'development') {
       logger.info('App', '⚠️ Debug module skipped (production mode)');
@@ -138,7 +146,7 @@ export const debugManifest: ModuleManifest = {
     /**
      * Log debug information
      */
-    log: (category: string, message: string, data?: any) => {
+    log: (category: string, message: string, data?: unknown) => {
       logger.debug(category, message, data);
       return { logged: true };
     },
@@ -193,12 +201,12 @@ export default debugManifest;
  * Debug module public API types
  */
 export interface DebugAPI {
-  log: (category: string, message: string, data?: any) => { logged: boolean };
+  log: (category: string, message: string, data?: unknown) => { logged: boolean };
   getDiagnostics: () => Promise<{
     environment: string;
     modules: number;
     features: number;
-    performance: any;
+    performance: Record<string, unknown>;
   }>;
-  takeSnapshot: () => Promise<{ snapshot: any }>;
+  takeSnapshot: () => Promise<{ snapshot: Record<string, unknown> }>;
 }

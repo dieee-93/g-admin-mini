@@ -1,3 +1,4 @@
+// Components only - Fast Refresh compatible
 export * from './components/TypeSelector';
 export * from './components/MeasurableFields';
 export * from './components/CountableFields';

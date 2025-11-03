@@ -22,17 +22,17 @@ interface OverviewTabProps {
 
 export const OverviewTab: React.FC<OverviewTabProps> = ({ performance, getCategoryColor, getTypeColor }) => {
   return (
-    <VStack align="stretch" gap={6}>
+    <VStack align="stretch" gap="6">
       {/* Category Scores */}
-      <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
+      <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
         {Object.entries(performance.category_scores).map(([category, score]) => (
           <CardWrapper
             key={category}
             borderTop="4px solid"
             borderTopColor={`${getCategoryColor(category)}.400`}
           >
-            <CardWrapper.Body p={4} textAlign="center">
-              <VStack gap={3}>
+            <CardWrapper.Body p="4" textAlign="center">
+              <VStack gap="3">
                 <Text fontSize="sm" color="gray.600" textTransform="capitalize">
                   {category}
                 </Text>
@@ -60,7 +60,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ performance, getCatego
           <Text fontSize="lg" fontWeight="semibold">Critical Insights</Text>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <VStack align="stretch" gap={4}>
+          <VStack align="stretch" gap="4">
             {performance.insights
               .filter(insight => insight.type === 'critical' || insight.action_required)
               .map((insight, index) => (
@@ -72,7 +72,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ performance, getCatego
                     }
                   </Alert.Indicator>
                   <Alert.Description>
-                    <VStack align="stretch" gap={2}>
+                    <VStack align="stretch" gap="2">
                       <HStack justify="space-between">
                         <Text fontWeight="bold">{insight.title}</Text>
                         <Badge colorPalette={getTypeColor(insight.type)} size="sm">

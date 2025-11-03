@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 /**
  * Customer RFM Analytics with Decimal.js Precision
  * Advanced customer analytics with mathematical precision for CLV, RFM scores, and segmentation

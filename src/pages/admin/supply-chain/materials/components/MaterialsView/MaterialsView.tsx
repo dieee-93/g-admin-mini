@@ -2,7 +2,7 @@
 // Intelligently switches between MaterialsPage and OfflineMaterialsPage based on connection
 
 import React, { useEffect, useMemo } from 'react';
-import { ContentLayout, Section, Badge, Alert, Icon } from '@/shared/ui';
+import { Section, Badge, Alert, Icon } from '@/shared/ui';
 import { 
   WifiIcon, 
   CloudIcon, 

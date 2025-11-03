@@ -13,10 +13,10 @@ interface SetupSummaryProps {
 
 export function SetupSummary({ userName, adminUser, onComplete, onBack }: SetupSummaryProps) {
   return (
-    <Box maxW="500px" mx="auto" p={6}>
-      <VStack gap={6} align="stretch">
-        <VStack gap={3} textAlign="center">
-          <Box bg="purple.500" color="white" borderRadius="full" p={3} display="inline-flex">
+    <Box maxW="500px" mx="auto" p="6">
+      <VStack gap="6" align="stretch">
+        <VStack gap="3" textAlign="center">
+          <Box bg="purple.500" color="white" borderRadius="full" p="3" display="inline-flex">
             <DocumentCheckIcon width={24} height={24} />
           </Box>
           <Heading size="lg" color="gray.700">Resumen de Configuración</Heading>
@@ -26,8 +26,8 @@ export function SetupSummary({ userName, adminUser, onComplete, onBack }: SetupS
         </VStack>
 
         <CardWrapper>
-          <Box p={6}>
-            <VStack gap={4} align="start">
+          <Box p="6">
+            <VStack gap="4" align="start">
               <Box>
                 <Text fontSize="sm" fontWeight="medium" color="gray.700">Usuario de bienvenida:</Text>
                 <Text fontSize="sm" color="gray.600">{userName || 'No especificado'}</Text>

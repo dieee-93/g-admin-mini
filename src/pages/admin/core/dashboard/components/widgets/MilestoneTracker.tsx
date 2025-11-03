@@ -1,12 +1,9 @@
 import { useMemo } from 'react';
 import { useAchievements } from '@/pages/admin/gamification/achievements/hooks/useAchievements';
-// TODO: Refactorizar para usar el sistema de capabilities unificado
-// import { useBusinessProfile } from '@/store/businessCapabilitiesStore';
-import { useCapabilities } from '@/store/capabilityStore';
-import { 
-  Section, 
-  Stack, 
-  Typography, 
+import {
+  Section,
+  Stack,
+  Typography,
   Badge,
   Button
 } from '@/shared/ui';
@@ -15,7 +12,8 @@ import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
 export function MilestoneTracker() {
-  const { profile } = useBusinessProfile();
+  // Business profile can be used for personalization in future
+  // const businessProfile = useBusinessProfile();
   const { 
     progress, 
     totalMilestones, 
@@ -52,7 +50,7 @@ export function MilestoneTracker() {
   if (isLoading || !progress || progress.length === 0) {
     return (
       <Section title="Progreso de Hitos" size="md">
-        <Box p={4} textAlign="center" color="gray.500">
+        <Box p="4" textAlign="center" color="gray.500">
           <Typography variant="body">Cargando progreso de hitos...</Typography>
         </Box>
       </Section>
@@ -64,7 +62,7 @@ export function MilestoneTracker() {
       <Stack direction="column" gap="4">
         {/* Progreso General */}
         <Box>
-          <Flex justify="space-between" mb={2}>
+          <Flex justify="space-between" mb="2">
             <Text fontSize="sm" fontWeight="medium">
               Progreso General
             </Text>
@@ -81,7 +79,7 @@ export function MilestoneTracker() {
               <Progress.Range />
             </Progress.Track>
           </Progress.Root>
-          <Text fontSize="xs" color="gray.500" mt={1}>
+          <Text fontSize="xs" color="gray.500" mt="1">
             {Math.round(overallProgress)}% completado
           </Text>
         </Box>
@@ -89,14 +87,14 @@ export function MilestoneTracker() {
         {/* Categorías de Hitos */}
         {Object.entries(groupedProgress).map(([category, capabilities]) => (
           <Box key={category}>
-            <Text fontSize="sm" fontWeight="semibold" mb={2}>
+            <Text fontSize="sm" fontWeight="semibold" mb="2">
               {category}
             </Text>
             <Stack direction="column" gap="2">
               {capabilities.slice(0, 2).map((capabilityProgress) => (
                 <Box 
                   key={capabilityProgress.capabilityId}
-                  p={3} 
+                  p="3" 
                   bg="gray.50" 
                   borderRadius="md"
                   borderLeft="3px solid"
@@ -107,7 +105,7 @@ export function MilestoneTracker() {
                       <Text fontSize="sm" fontWeight="medium">
                         {capabilityProgress.capabilityId.replace(/[_]/g, ' ')}
                       </Text>
-                      <Text fontSize="xs" color="gray.600" mt={1}>
+                      <Text fontSize="xs" color="gray.600" mt="1">
                         Capacidad en desarrollo
                       </Text>
                     </Box>
@@ -129,7 +127,7 @@ export function MilestoneTracker() {
               size="sm" 
               fullWidth
             >
-              <Flex align="center" gap={2}>
+              <Flex align="center" gap="2">
                 <Text>Ver Galaxy de Logros</Text>
                 <ChevronRightIcon style={{ width: '16px', height: '16px' }} />
               </Flex>

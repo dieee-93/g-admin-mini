@@ -1,23 +1,22 @@
 // Staff Training Section - Records and certifications management
 import { useState } from 'react';
-import { 
-  Box, 
-  VStack, 
-  HStack, 
-  Text, 
-  Select, 
-  Badge, 
+import {
+  Box,
+  Stack,
+  Text,
+  Select,
+  Badge,
   SimpleGrid,
   Progress,
   Button,
-  Avatar,
-  IconButton,
   Tabs,
   Textarea,
-  createListCollection
-} from '@chakra-ui/react';
-import { 
-  AcademicCapIcon,
+  createListCollection,
+  Icon,
+  CardWrapper,
+  InputField
+} from '@/shared/ui';
+import {
   BookOpenIcon,
   ClockIcon,
   CheckCircleIcon,
@@ -25,19 +24,20 @@ import {
   CalendarDaysIcon,
   DocumentTextIcon,
   PlusIcon,
-  MagnifyingGlassIcon,
   UserGroupIcon,
   TrophyIcon,
-  PlayCircleIcon,
-  PauseCircleIcon
+  PlayCircleIcon
 } from '@heroicons/react/24/outline';
-import { Icon, InputField, CardWrapper } from '@/shared/ui';
-import type { Employee, StaffViewState, TrainingRecord } from '../../types';
+import type { StaffViewState, TrainingRecord } from '../../types';
 
 interface TrainingSectionProps {
   viewState: StaffViewState;
   onViewStateChange: (state: StaffViewState) => void;
 }
+
+// TODO: Replace mock data with real data from useStaffWithLoader hook
+// TODO: Implement training record CRUD operations
+// TODO: Implement course enrollment functionality
 
 // Mock training records
 const mockTrainingRecords: TrainingRecord[] = [
@@ -184,7 +184,8 @@ const courseCatalog = [
   }
 ];
 
-export function TrainingSection({ viewState, onViewStateChange }: TrainingSectionProps) {
+export function TrainingSection(_props: TrainingSectionProps) {
+  // TODO: Implement viewState and onViewStateChange when view configuration is needed
   const [activeTab, setActiveTab] = useState<'records' | 'catalog' | 'schedule'>('records');
   const [selectedEmployee, setSelectedEmployee] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -253,46 +254,46 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
   const trainingStats = getTrainingStats();
 
   return (
-    <VStack gap="6" align="stretch">
+    <Stack direction="column" gap="6" align="stretch">
       {/* Training Overview Cards */}
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
         <CardWrapper>
           <CardWrapper.Body textAlign="center">
-            <VStack gap="2">
+            <Stack direction="column" gap="2">
               <Icon icon={BookOpenIcon} size="lg" color="var(--chakra-colors-blue-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.total}</Text>
               <Text fontSize="sm" color="gray.600">Total Entrenamientos</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center">
-            <VStack gap="2">
+            <Stack direction="column" gap="2">
               <Icon icon={CheckCircleIcon} size="lg" color="var(--chakra-colors-green-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.completed}</Text>
               <Text fontSize="sm" color="gray.600">Completados</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center">
-            <VStack gap="2">
+            <Stack direction="column" gap="2">
               <Icon icon={ClockIcon} size="lg" color="var(--chakra-colors-blue-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.inProgress}</Text>
               <Text fontSize="sm" color="gray.600">En Progreso</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center">
-            <VStack gap="2">
+            <Stack direction="column" gap="2">
               <Icon icon={ExclamationTriangleIcon} size="lg" color="var(--chakra-colors-red-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="2xl" fontWeight="bold">{trainingStats.expired + trainingStats.expiringSoon}</Text>
               <Text fontSize="sm" color="gray.600">Requiere Atención</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
       </SimpleGrid>
@@ -300,7 +301,7 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
       {/* Training Management Tabs */}
       <CardWrapper>
         <CardWrapper.Body p="0">
-          <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
+          <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as 'records' | 'catalog' | 'schedule')}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="records" gap="2" flex="1" minH="44px">
                 <Icon icon={DocumentTextIcon} size="md" />
@@ -321,9 +322,9 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
             <Box p="6">
               {/* Training Records Tab */}
               <Tabs.Content value="records">
-                <VStack gap="4" align="stretch">
+                <Stack direction="column" gap="4" align="stretch">
                   {/* Filters */}
-                  <HStack gap="4" wrap="wrap">
+                  <Stack direction="row" gap="4" wrap="wrap">
                     <Box>
                       <Text fontSize="sm" fontWeight="medium" mb="1">Empleado</Text>
                       <Select.Root
@@ -368,32 +369,32 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                         <Select.Content />
                       </Select.Root>
                     </Box>
-                  </HStack>
+                  </Stack>
 
                   {/* Training Records List */}
-                  <VStack gap="3" align="stretch">
+                  <Stack direction="column" gap="3" align="stretch">
                     {filteredRecords.map((record) => (
                       <CardWrapper key={record.id} size="sm">
                         <CardWrapper.Body>
-                          <VStack align="stretch" gap="3">
-                            <HStack justify="space-between" align="start">
-                              <VStack align="start" gap="1" flex="1">
-                                <HStack gap="2">
+                          <Stack direction="column" align="stretch" gap="3">
+                            <Stack direction="row" justify="space-between" align="start">
+                              <Stack direction="column" align="start" gap="1" flex="1">
+                                <Stack direction="row" gap="2">
                                   <Text fontWeight="semibold">{record.course_name}</Text>
                                   <Badge colorPalette={getTypeColor(record.course_type)} size="xs">
                                     {record.course_type}
                                   </Badge>
-                                </HStack>
-                                <HStack gap="4" fontSize="sm" color="gray.600">
+                                </Stack>
+                                <Stack direction="row" gap="4" fontSize="sm" color="gray.600">
                                   <Text>Empleado: {record.employee_id}</Text>
                                   <Text>Duración: {record.hours}h</Text>
                                   {record.instructor && (
                                     <Text>Instructor: {record.instructor}</Text>
                                   )}
-                                </HStack>
-                              </VStack>
+                                </Stack>
+                              </Stack>
 
-                              <VStack align="end" gap="1">
+                              <Stack direction="column" align="end" gap="1">
                                 <Badge colorPalette={getStatusColor(record.status)} size="sm">
                                   {record.status === 'completed' ? 'Completado' :
                                    record.status === 'in_progress' ? 'En Progreso' :
@@ -404,16 +405,16 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                                     {record.score}%
                                   </Badge>
                                 )}
-                              </VStack>
-                            </HStack>
+                              </Stack>
+                            </Stack>
 
                             {/* Progress for in-progress courses */}
                             {record.status === 'in_progress' && (
                               <Box>
-                                <HStack justify="space-between" mb="1">
+                                <Stack direction="row" justify="space-between" mb="1">
                                   <Text fontSize="sm">Progreso</Text>
                                   <Text fontSize="sm">65%</Text>
-                                </HStack>
+                                </Stack>
                                 <Progress.Root value={65} colorPalette="blue" size="sm">
                                   <Progress.Track>
                                     <Progress.Range />
@@ -423,16 +424,16 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                             )}
 
                             {/* Dates and expiry warnings */}
-                            <HStack justify="space-between" fontSize="sm" color="gray.500">
-                              <HStack gap="4">
+                            <Stack direction="row" justify="space-between" fontSize="sm" color="gray.500">
+                              <Stack direction="row" gap="4">
                                 <Text>Inicio: {new Date(record.start_date).toLocaleDateString()}</Text>
                                 {record.completion_date && (
                                   <Text>Completado: {new Date(record.completion_date).toLocaleDateString()}</Text>
                                 )}
-                              </HStack>
+                              </Stack>
                               
                               {record.expiry_date && (
-                                <HStack gap="1">
+                                <Stack direction="row" gap="1">
                                   {isExpiringSoon(record.expiry_date) && (
                                     <Icon icon={ExclamationTriangleIcon} size="sm" color="var(--chakra-colors-orange-500)" />
                                   )}
@@ -445,12 +446,12 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                                   }>
                                     Vence: {new Date(record.expiry_date).toLocaleDateString()}
                                   </Text>
-                                </HStack>
+                                </Stack>
                               )}
-                            </HStack>
+                            </Stack>
 
                             {/* Actions */}
-                            <HStack gap="2">
+                            <Stack direction="row" gap="2">
                               {record.certificate_url && (
                                 <Button size="sm" variant="outline" colorPalette="green">
                                   <Icon icon={TrophyIcon} size="sm" style={{marginRight: '8px'}} />
@@ -468,75 +469,75 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                                   Renovar
                                 </Button>
                               )}
-                            </HStack>
-                          </VStack>
+                            </Stack>
+                          </Stack>
                         </CardWrapper.Body>
                       </CardWrapper>
                     ))}
-                  </VStack>
-                </VStack>
+                  </Stack>
+                </Stack>
               </Tabs.Content>
 
               {/* Course Catalog Tab */}
               <Tabs.Content value="catalog">
-                <VStack gap="4" align="stretch">
-                  <HStack justify="space-between">
+                <Stack direction="column" gap="4" align="stretch">
+                  <Stack direction="row" justify="space-between">
                     <Text fontSize="lg" fontWeight="semibold">Catálogo de Cursos</Text>
                     <Button colorPalette="blue">
                       <Icon icon={PlusIcon} size="sm" style={{marginRight: '8px'}} />
                       Nuevo Curso
                     </Button>
-                  </HStack>
+                  </Stack>
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                     {courseCatalog.map((course) => (
                       <CardWrapper key={course.id} size="sm">
                         <CardWrapper.Body>
-                          <VStack align="stretch" gap="3">
-                            <HStack justify="space-between" align="start">
-                              <VStack align="start" gap="1" flex="1">
-                                <HStack gap="2">
+                          <Stack direction="column" align="stretch" gap="3">
+                            <Stack direction="row" justify="space-between" align="start">
+                              <Stack direction="column" align="start" gap="1" flex="1">
+                                <Stack direction="row" gap="2">
                                   <Text fontWeight="semibold">{course.name}</Text>
                                   {course.required && (
                                     <Badge colorPalette="red" size="xs">Requerido</Badge>
                                   )}
-                                </HStack>
+                                </Stack>
                                 <Text fontSize="sm" color="gray.600">
                                   {course.description}
                                 </Text>
-                              </VStack>
-                              <Badge colorPalette={getTypeColor(course.type as any)} size="sm">
+                              </Stack>
+                              <Badge colorPalette={getTypeColor(course.type as TrainingRecord['course_type'])} size="sm">
                                 {course.type}
                               </Badge>
-                            </HStack>
+                            </Stack>
 
-                            <HStack justify="space-between" fontSize="sm" color="gray.500">
+                            <Stack direction="row" justify="space-between" fontSize="sm" color="gray.500">
                               <Text>Duración: {course.hours}h</Text>
                               {course.validity_months && (
                                 <Text>Válido: {course.validity_months} meses</Text>
                               )}
-                            </HStack>
+                            </Stack>
 
                             <Button size="sm" colorPalette="blue" w="full">
                               <Icon icon={UserGroupIcon} size="sm" style={{marginRight: '8px'}} />
                               Asignar a Empleados
                             </Button>
-                          </VStack>
+                          </Stack>
                         </CardWrapper.Body>
                       </CardWrapper>
                     ))}
                   </SimpleGrid>
-                </VStack>
+                </Stack>
               </Tabs.Content>
 
               {/* Schedule Training Tab */}
               <Tabs.Content value="schedule">
-                <VStack gap="4" align="stretch">
+                <Stack direction="column" gap="4" align="stretch">
                   <Text fontSize="lg" fontWeight="semibold">Programar Nuevo Entrenamiento</Text>
                   
                   <CardWrapper>
                     <CardWrapper.Body>
-                      <VStack gap="4" align="stretch">
+                      <Stack direction="column" gap="4" align="stretch">
                         <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                           <Box>
                             <Text fontSize="sm" fontWeight="medium" mb="2">Curso</Text>
@@ -594,19 +595,19 @@ export function TrainingSection({ viewState, onViewStateChange }: TrainingSectio
                           />
                         </Box>
 
-                        <HStack gap="2" justify="end">
+                        <Stack direction="row" gap="2" justify="end">
                           <Button variant="outline">Cancelar</Button>
                           <Button colorPalette="blue">Programar Entrenamiento</Button>
-                        </HStack>
-                      </VStack>
+                        </Stack>
+                      </Stack>
                     </CardWrapper.Body>
                   </CardWrapper>
-                </VStack>
+                </Stack>
               </Tabs.Content>
             </Box>
           </Tabs.Root>
         </CardWrapper.Body>
       </CardWrapper>
-    </VStack>
+    </Stack>
   );
 }

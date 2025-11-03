@@ -129,7 +129,7 @@ export const TabsContentGroup = ChakraTabs.ContentGroup;
  *
  * // With indicator (for plain variant)
  * <Tabs.Root defaultValue="members" variant="plain">
- *   <Tabs.List bg="bg.muted" rounded="l3" p={1}>
+ *   <Tabs.List bg="bg.muted" rounded="l3" p="1">
  *     <Tabs.Trigger value="members">Members</Tabs.Trigger>
  *     <Tabs.Trigger value="projects">Projects</Tabs.Trigger>
  *     <Tabs.Indicator rounded="l2" />

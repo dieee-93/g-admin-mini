@@ -56,21 +56,21 @@ export function RevenueWidget() {
         <Stack gap="3">
           <Stack direction="row" justify="space-between" align="center">
             <Stack gap="2" flex={1}>
-              <Typography variant="body" size="sm" color="text.secondary">
+              <Typography variant="body" size="sm" color="fg.muted" fontWeight="medium">
                 Ingresos Semanales
               </Typography>
 
               {loading ? (
-                <Typography variant="body" size="sm" color="text.secondary">
+                <Typography variant="body" size="sm" color="fg.muted">
                   Cargando...
                 </Typography>
               ) : (
                 <>
-                  <Typography variant="heading" level={3} weight="bold">
+                  <Typography variant="heading" level={3} weight="bold" color="fg.default">
                     {DecimalUtils.formatCurrency(weekTotal)}
                   </Typography>
 
-                  <Typography variant="body" size="xs" color="text.secondary">
+                  <Typography variant="body" size="sm" color="fg.default">
                     {weekPercentageOfMonth}% del mes
                   </Typography>
                 </>
@@ -79,11 +79,13 @@ export function RevenueWidget() {
 
             <Stack
               p="3"
-              bg="teal.100"
+              bg="colorPalette.subtle"
               borderRadius="full"
-              color="teal.600"
+              color="colorPalette.fg"
             >
-              <Icon icon={ChartBarIcon} size="lg" />
+              <Icon size="lg">
+                <ChartBarIcon />
+              </Icon>
             </Stack>
           </Stack>
 
@@ -106,14 +108,14 @@ export function RevenueWidget() {
                 </Stack>
               </Badge>
 
-              <Typography variant="body" size="xs" color="text.secondary">
+              <Typography variant="body" size="xs" color="fg.muted">
                 proyección mensual
               </Typography>
             </Stack>
           )}
 
           {!loading && todayTotal > 0 && (
-            <Typography variant="body" size="xs" color="text.secondary">
+            <Typography variant="body" size="sm" color="fg.default">
               Hoy: {DecimalUtils.formatCurrency(todayTotal)}
             </Typography>
           )}

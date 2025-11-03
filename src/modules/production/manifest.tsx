@@ -17,8 +17,10 @@
 
 import React from 'react';
 import type { ModuleManifest, ModuleRegistry } from '@/lib/modules/types';
-import { Badge, Stack, Typography } from '@/shared/ui';
-import { CubeIcon, BeakerIcon } from '@heroicons/react/24/outline';
+import { Badge, Stack, Typography, Button, Icon } from '@/shared/ui';
+import { BeakerIcon, FireIcon } from '@heroicons/react/24/outline';
+import { toaster } from '@/shared/ui/toaster';
+import { logger } from '@/lib/logging';
 
 // ============================================
 // MODULE MANIFEST
@@ -33,14 +35,28 @@ export const productionManifest: ModuleManifest = {
   depends: ['materials'],
 
   // Requires kitchen display feature
-  requiredFeatures: ['production_kitchen_display'],
+  requiredFeatures: ['production_display_system'],
 
   // Optional features enhance functionality
   optionalFeatures: [
-    'production_recipe_management',
+    'production_bom_management',
     'production_order_queue',
     'production_capacity_planning'
   ],
+
+  // ============================================
+  // PERMISSIONS & ROLES
+  // ============================================
+
+  /**
+   * 🔒 PERMISSIONS: Minimum role required to access this module
+   * - employee: Can view kitchen display (read)
+   * - supervisor: + Can update order status (read, update)
+   * - manager/admin: Full access (read, update, configure)
+   *
+   * Granular permissions checked at component level via usePermissions()
+   */
+  minimumRole: 'OPERADOR' as const, // Employee level and above
 
   // Hook points this module provides and consumes
   hooks: {
@@ -59,7 +75,7 @@ export const productionManifest: ModuleManifest = {
     // Hook 1: Calendar Events - Production schedule overlay
     registry.addAction(
       'calendar.events',
-      (data?: { selectedWeek?: string; shifts?: any[] }) => {
+      () => {
         // Mock production schedule - real version would query database
         const productionOrders = [
           { id: '1', recipe: 'Classic Burger', quantity: 50, scheduled: '09:00' },
@@ -67,16 +83,16 @@ export const productionManifest: ModuleManifest = {
         ];
 
         return (
-          <Stack direction="column" gap={2} key="production-calendar-events">
-            <Stack direction="row" align="center" gap={2}>
+          <Stack direction="column" gap="2" key="production-calendar-events">
+            <Stack direction="row" align="center" gap="2">
               <BeakerIcon className="w-5 h-5 text-purple-500" />
               <Typography variant="heading" size="sm" fontWeight="semibold">
                 Production Schedule ({productionOrders.length})
               </Typography>
             </Stack>
-            <Stack direction="column" gap={1}>
+            <Stack direction="column" gap="1">
               {productionOrders.map((order, idx) => (
-                <Stack key={idx} direction="row" align="center" gap={2}>
+                <Stack key={idx} direction="row" align="center" gap="2">
                   <Badge variant="solid" colorPalette="purple">
                     {order.scheduled}
                   </Badge>
@@ -96,28 +112,71 @@ export const productionManifest: ModuleManifest = {
     // Hook 2: Materials Row Actions - "Use in Kitchen" button
     registry.addAction(
       'materials.row.actions',
-      (data?: { material?: any }) => {
-        if (!data?.material) return null;
-
-        return (
-          <button
-            key={`production-use-${data.material.id}`}
-            onClick={() => {
-              console.log(`[Production] Using material in kitchen: ${data.material.name}`);
-              // Trigger production modal or action
-            }}
-            className="px-2 py-1 text-xs font-medium text-purple-700 bg-purple-50 rounded hover:bg-purple-100 transition-colors"
-            title="Use this material in kitchen"
-          >
-            Use in Kitchen
-          </button>
-        );
+      () => {
+        return {
+          id: 'use-in-production',
+          label: 'Use in Production',
+          icon: 'BeakerIcon',
+          onClick: (materialId: string) => {
+            console.log(`[Production] Using material in production: ${materialId}`);
+            // Trigger production modal or action
+          }
+        };
       },
       'production',
       80 // High priority action
     );
 
-    console.log('[Production Module] Hooks registered successfully');
+    // Hook 3: Sales Order Actions - "Send to Kitchen" button
+    registry.addAction(
+      'sales.order.actions',
+      (data) => {
+        const { order, onStatusChange } = data || {};
+
+        // Only show for confirmed orders (not yet in production)
+        if (!order || order.status !== 'confirmed') {
+          return null;
+        }
+
+        return (
+          <Button
+            key="send-to-kitchen"
+            size="sm"
+            variant="solid"
+            colorPalette="orange"
+            onClick={() => {
+              logger.info('Production', 'Sending order to kitchen', {
+                orderId: order.order_id || order.id,
+                items: order.items?.length || 0
+              });
+
+              // TODO: Create production order
+              // TODO: Update order status
+              if (onStatusChange) {
+                onStatusChange(order.order_id || order.id, 'in_production');
+              }
+
+              toaster.create({
+                title: '🔥 Orden Enviada a Cocina',
+                description: `Orden #${(order.order_id || order.id).substring(0, 8)} en producción`,
+                type: 'success',
+                duration: 3000
+              });
+            }}
+          >
+            <Icon icon={FireIcon} size="xs" />
+            Enviar a Cocina
+          </Button>
+        );
+      },
+      'production',
+      15 // High priority - shows before other actions
+    );
+
+    logger.info('Production', '✅ Production module hooks registered', {
+      hooksProvided: 3,
+      hooksConsumed: 2
+    });
   },
 
   // Teardown function - cleanup

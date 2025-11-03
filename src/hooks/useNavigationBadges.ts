@@ -39,10 +39,7 @@ export function useNavigationBadges(): NavigationBadges {
       customers: 0,
       dashboard: 0,
       global: 0,
-      security: 0,
-      system: 0,
-      validation: 0,
-      business: 0,
+      gamification: 0,
     };
 
     // 3. Iterar una sola vez sobre las alertas para poblar los contadores.

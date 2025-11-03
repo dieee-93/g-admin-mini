@@ -19,7 +19,7 @@ import {
   Cog6ToothIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { SetupStep } from '../../config/setupSteps';
+import { SetupStep } from '../config/setupSteps';
 
 interface SetupHeaderProps {
   setupSteps: SetupStep[];
@@ -39,20 +39,20 @@ export function SetupHeader({ setupSteps }: SetupHeaderProps) {
         bg="gray.50"
         borderBottomWidth="1px"
         borderColor="gray.200"
-        py={2}
-        px={4}
+        py="2"
+        px="4"
         alignItems="center"
         justifyContent="space-between"
         zIndex={10}
       >
         {/* Logo and App Name */}
-        <HStack gap={3}>
+        <HStack gap="3">
           <Box
             bg="gray.800"
             color="gray.50"
             fontSize="xl"
             fontWeight="bold"
-            p={2}
+            p="2"
             borderRadius="md"
             width="40px"
             height="40px"
@@ -69,7 +69,7 @@ export function SetupHeader({ setupSteps }: SetupHeaderProps) {
 
         {/* Center - Progress */}
         <HStack
-          gap={4}
+          gap="4"
           display={{
             base: 'none',
             md: 'flex',
@@ -77,7 +77,7 @@ export function SetupHeader({ setupSteps }: SetupHeaderProps) {
         >
           {setupSteps.map((step, idx) => {
             return (
-              <HStack key={step.id} gap={1}>
+              <HStack key={step.id} gap="1">
                 <Box
                   w="24px"
                   h="24px"
@@ -98,7 +98,7 @@ export function SetupHeader({ setupSteps }: SetupHeaderProps) {
                 >
                   {step.completed ? <CheckIcon width={14} height={14} /> : idx + 1}
                 </Box>
-                <VStack gap={0} align="start">
+                <VStack gap="0" align="start">
                   <Text
                     fontSize="sm"
                     fontWeight={step.current ? 'medium' : 'normal'}

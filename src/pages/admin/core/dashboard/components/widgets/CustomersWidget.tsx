@@ -73,7 +73,9 @@ export function CustomersWidget() {
                     {vipCustomers > 0 && (
                       <Badge variant="subtle" colorPalette="purple" size="xs">
                         <Stack direction="row" align="center" gap="1">
-                          <Icon icon={StarIcon} size="xs" />
+                          <Icon size="xs">
+                <StarIcon />
+              </Icon>
                           {vipCustomers} VIP
                         </Stack>
                       </Badge>
@@ -89,7 +91,9 @@ export function CustomersWidget() {
               borderRadius="full"
               color="blue.600"
             >
-              <Icon icon={UserGroupIcon} size="lg" />
+              <Icon size="lg">
+                <UserGroupIcon />
+              </Icon>
             </Stack>
           </Stack>
 

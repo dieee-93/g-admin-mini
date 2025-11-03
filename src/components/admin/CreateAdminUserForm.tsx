@@ -337,7 +337,6 @@ export function CreateAdminUserForm({ onCancel, onSuccess }: CreateAdminUserForm
               colorPalette="blue"
               disabled={isLoading || !passwordValidation.isValid || !formData.email || !formData.fullName}
               loading={isLoading}
-              loadingText="Creando usuario..."
             >
               <Stack direction="row" gap="sm">
                 <ShieldCheckIcon style={{ width: '16px', height: '16px' }} />

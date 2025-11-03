@@ -2,7 +2,6 @@ import { Stack, Alert, Button, Icon, Typography, Badge } from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   InformationCircleIcon,
-  CheckCircleIcon,
   XMarkIcon,
   ArrowPathIcon,
   ClockIcon
@@ -12,12 +11,11 @@ import type { SalesPageMetrics } from '../hooks/useSalesPage';
 
 interface SalesAlertsProps {
   onAlertAction?: (action: string, alertId: string) => void;
-  context: string;
   metrics?: SalesPageMetrics;
 }
 
 // ✅ SISTEMA INTELIGENTE DE ALERTAS INTEGRADO
-export function SalesAlerts({ onAlertAction, context, metrics }: SalesAlertsProps) {
+export function SalesAlerts({ onAlertAction, metrics }: SalesAlertsProps) {
   const {
     alerts,
     alertsSummary,
@@ -30,9 +28,11 @@ export function SalesAlerts({ onAlertAction, context, metrics }: SalesAlertsProp
     acknowledgeAlert
   } = useSalesAlerts();
 
-  // ✅ FIX: Not a hook, just a data transformation function
-  // Safe to call conditionally since it doesn't use any React hooks
-  const analysisData = metrics ? metricsToAnalysisData(metrics) : null;
+  // Transform metrics to analysis data when available
+  // TODO: Use this data to enhance alert context when metrics are provided
+  if (metrics) {
+    metricsToAnalysisData(metrics);
+  }
 
   const handleAlertAction = (action: string, alertId: string) => {
     onAlertAction?.(action, alertId);

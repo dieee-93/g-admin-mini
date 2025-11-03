@@ -13,10 +13,11 @@
  * @see src/pages/admin/resources/staff/page.tsx
  */
 
-import React from 'react';
+import React, { lazy } from 'react';
 import type { ModuleManifest, ModuleRegistry } from '@/lib/modules/types';
 import { Badge, Stack, Typography } from '@/shared/ui';
 import { UsersIcon } from '@heroicons/react/24/outline';
+import { logger } from '@/lib/logging';
 
 // ============================================
 // MODULE MANIFEST
@@ -42,6 +43,9 @@ export const staffManifest: ModuleManifest = {
     'staff_labor_cost_tracking'
   ],
 
+  // 🔒 PERMISSIONS: Supervisors and above can manage staff
+  minimumRole: 'SUPERVISOR' as const,
+
   // Hook points this module provides
   hooks: {
     provide: [
@@ -57,22 +61,22 @@ export const staffManifest: ModuleManifest = {
     // Hook 1: Calendar Events - Render staff shifts
     registry.addAction(
       'calendar.events',
-      (data?: { selectedWeek?: string; shifts?: any[] }) => {
+      (data?: { selectedWeek?: string; shifts?: Array<{ type: string; employee_name: string; start_time: string; end_time: string }> }) => {
         const staffShifts = data?.shifts?.filter(s => s.type === 'staff') || [];
 
         if (staffShifts.length === 0) return null;
 
         return (
-          <Stack direction="column" gap={2} key="staff-calendar-events">
-            <Stack direction="row" align="center" gap={2}>
+          <Stack direction="column" gap="2" key="staff-calendar-events">
+            <Stack direction="row" align="center" gap="2">
               <UsersIcon className="w-5 h-5 text-blue-500" />
               <Typography variant="heading" size="sm" fontWeight="semibold">
                 Staff Shifts ({staffShifts.length})
               </Typography>
             </Stack>
-            <Stack direction="column" gap={1}>
+            <Stack direction="column" gap="1">
               {staffShifts.slice(0, 5).map((shift, idx) => (
-                <Stack key={idx} direction="row" align="center" gap={2}>
+                <Stack key={idx} direction="row" align="center" gap="2">
                   <Badge variant="solid" colorPalette="blue">
                     {shift.employee_name}
                   </Badge>
@@ -94,42 +98,21 @@ export const staffManifest: ModuleManifest = {
       100 // Highest priority - staff shifts render first
     );
 
-    // Hook 2: Dashboard Widget - Staff performance
+    // ✅ Hook 2: Dashboard Widget - Staff performance
+    const StaffWidget = lazy(() => import('./components/StaffWidget'));
+
     registry.addAction(
       'dashboard.widgets',
-      () => {
-        return (
-          <Stack
-            direction="column"
-            gap={3}
-            p={4}
-            bg="blue.50"
-            borderRadius="md"
-            key="staff-dashboard-widget"
-          >
-            <Stack direction="row" align="center" gap={2}>
-              <UsersIcon className="w-6 h-6 text-blue-600" />
-              <Typography variant="heading" size="md" fontWeight="bold" color="blue.900">
-                Staff Performance
-              </Typography>
-            </Stack>
-            <Stack direction="column" gap={1}>
-              <Typography variant="body" size="sm" color="blue.800">
-                Active Staff: 12
-              </Typography>
-              <Typography variant="body" size="sm" color="blue.800">
-                Avg. Performance: 87%
-              </Typography>
-              <Typography variant="body" size="sm" color="blue.800">
-                On Shift: 5
-              </Typography>
-            </Stack>
-          </Stack>
-        );
-      },
+      () => (
+        <React.Suspense fallback={<div>Cargando staff...</div>}>
+          <StaffWidget />
+        </React.Suspense>
+      ),
       'staff',
       75 // High priority widget
     );
+
+    logger.info('App', '✅ Staff module setup complete');
 
     // Hook 3: Scheduling Toolbar Action - Availability button
     registry.addAction(
@@ -160,8 +143,9 @@ export const staffManifest: ModuleManifest = {
   // Public API exports
   exports: {
     // Functions that other modules can call
-    getStaffAvailability: async (date: string) => {
+    getStaffAvailability: async () => {
       // Mock implementation - real version would query database
+      // TODO: Implement real database query with date parameter
       return [
         { id: '1', name: 'John Doe', available: true, skills: ['kitchen'] },
         { id: '2', name: 'Jane Smith', available: false, skills: ['service'] }
@@ -180,7 +164,7 @@ export const staffManifest: ModuleManifest = {
     author: 'G-Admin Team',
     tags: ['hr', 'staff', 'scheduling', 'performance'],
     navigation: {
-      route: '/admin/staff',
+      route: '/admin/resources/staff',
       icon: UsersIcon,
       color: 'indigo',
       domain: 'resources',

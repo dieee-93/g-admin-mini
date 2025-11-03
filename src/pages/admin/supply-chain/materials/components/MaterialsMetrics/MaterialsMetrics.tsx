@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   StatsSection, CardGrid, MetricCard
 } from '@/shared/ui';
@@ -14,7 +15,7 @@ interface MaterialsMetricsProps {
   loading?: boolean;
 }
 
-export function MaterialsMetrics({ metrics, onMetricClick, loading }: MaterialsMetricsProps) {
+export const MaterialsMetrics = memo(function MaterialsMetrics({ metrics, onMetricClick, loading }: MaterialsMetricsProps) {
   if (loading) {
     return (
       <StatsSection>
@@ -76,4 +77,16 @@ export function MaterialsMetrics({ metrics, onMetricClick, loading }: MaterialsM
       </CardGrid>
     </StatsSection>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison - only re-render if metrics actually changed
+  // Compare each metric field individually for precise control
+  return (
+    prevProps.loading === nextProps.loading &&
+    prevProps.onMetricClick === nextProps.onMetricClick &&
+    prevProps.metrics.totalValue === nextProps.metrics.totalValue &&
+    prevProps.metrics.totalItems === nextProps.metrics.totalItems &&
+    prevProps.metrics.criticalStockItems === nextProps.metrics.criticalStockItems &&
+    prevProps.metrics.supplierCount === nextProps.metrics.supplierCount &&
+    prevProps.metrics.valueGrowth === nextProps.metrics.valueGrowth
+  );
+});

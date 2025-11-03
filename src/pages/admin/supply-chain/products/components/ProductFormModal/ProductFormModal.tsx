@@ -8,20 +8,21 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EntitySchemas, type SchemaType } from '@/lib/validation/zod/CommonSchemas';
-import { 
-  FinancialCalculations, 
-  QuickCalculations, 
-  type PricingScenario 
+import {
+  FinancialCalculations,
+  QuickCalculations,
+  type PricingScenario
 } from '@/business-logic/shared/FinancialCalculations';
+import type { ProductComponent } from '../../types';
 
 // Type safety with Zod schema
 type ProductFormData = SchemaType<typeof EntitySchemas.product> & {
   estimated_cost?: number;
-  recipe?: any;
+  recipe?: ProductComponent[];
 };
 
 interface ProductFormModalMigratedProps {
-  product?: any;
+  product?: Partial<ProductFormData>;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: ProductFormData) => void;

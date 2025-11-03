@@ -7,14 +7,14 @@ interface DashboardRoleRouterProps {
 }
 
 /**
- * Router que redirige usuarios CLIENTE del dashboard administrativo 
+ * Router que redirige usuarios CLIENTE del dashboard administrativo
  * a su portal personalizado
  */
 export function DashboardRoleRouter({ children }: DashboardRoleRouterProps) {
-  const { isCliente } = useAuth();
+  const { user } = useAuth();
 
   // Si es usuario CLIENTE, redirigir a customer-portal
-  if (isCliente()) {
+  if (user?.role === 'CLIENTE') {
     return <Navigate to="/customer-portal" replace />;
   }
 

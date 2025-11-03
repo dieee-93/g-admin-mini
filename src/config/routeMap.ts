@@ -36,7 +36,8 @@ export const routeToFileMap = {
   // Admin main pages
   '/admin/operations/sales': 'pages/admin/operations/sales/page',
   '/admin/operations/fulfillment/onsite': 'pages/admin/operations/fulfillment/onsite/page',
-  '/admin/operations/kitchen': 'pages/admin/operations/kitchen/page',
+  '/admin/operations/fulfillment/delivery': 'pages/admin/operations/fulfillment/delivery/page',
+  '/admin/operations/production': 'pages/admin/operations/production/page',
   '/admin/customers': 'pages/admin/core/crm/page',
   '/admin/materials': 'pages/admin/supply-chain/materials/page',
   '/admin/products': 'pages/admin/supply-chain/products/page',
@@ -45,6 +46,7 @@ export const routeToFileMap = {
   '/admin/scheduling': 'pages/admin/resources/scheduling/page',
   '/admin/settings': 'pages/admin/core/settings/page',
   '/admin/gamification/achievements': 'pages/admin/gamification/achievements/page',
+  '/admin/debug': 'pages/admin/debug/page',
   '/admin/dashboard': 'pages/admin/core/dashboard/page',
 
   // Materials sub-views
@@ -79,7 +81,8 @@ export const routeToComponentMap = {
   // Admin main pages (lazy loaded)
   '/admin/operations/sales': 'LazySalesPage',
   '/admin/operations/fulfillment/onsite': 'LazyFulfillmentOnsitePage',
-  '/admin/operations/kitchen': 'LazyKitchenPage',
+  '/admin/operations/fulfillment/delivery': 'LazyDeliveryPage',
+  '/admin/operations/production': 'LazyProductionPage',
   '/admin/customers': 'LazyCustomersPage',
   '/admin/materials': 'LazyStockLab', // StockLab is the branded name
   '/admin/products': 'LazyProductsPage',
@@ -88,7 +91,7 @@ export const routeToComponentMap = {
   '/admin/scheduling': 'LazySchedulingPage',
   '/admin/settings': 'LazySettingsPage',
   '/admin/gamification/achievements': 'LazyAchievementsGalaxy',
-  // '/admin/debug/theme-test': 'LazyThemeTestPage', // DISABLED: Component does not exist
+  '/admin/debug': 'LazyDebugPage', // Debug tools (SUPER_ADMIN only, dev mode only)
   '/admin/dashboard': 'Dashboard', // Dashboard not lazy loaded (critical)
 
   // Sub-views (direct imports)

@@ -14,7 +14,6 @@ import {
   UsersIcon,
   CheckCircleIcon,
   CurrencyDollarIcon,
-  ExclamationTriangleIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
 
@@ -65,7 +64,7 @@ export function SchedulingTopBar({
 
   if (loading) {
     return (
-      <Stack direction="column" gap={3}>
+      <Stack direction="column" gap="3">
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           {[1, 2, 3, 4].map(i => (
             <div
@@ -85,7 +84,7 @@ export function SchedulingTopBar({
   }
 
   return (
-    <Stack direction="column" gap={3}>
+    <Stack direction="column" gap="3">
       {/* METRICS ROW */}
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
         {/* Metric 1: Total Shifts */}
@@ -93,7 +92,7 @@ export function SchedulingTopBar({
           label="Turnos"
           value={stats.total_shifts_this_week.toString()}
           icon={UsersIcon}
-          colorScheme="blue"
+          colorPalette="blue"
           onClick={() => onMetricClick?.('shifts')}
         />
 
@@ -102,7 +101,7 @@ export function SchedulingTopBar({
           label="Cobertura"
           value={`${stats.coverage_percentage.toFixed(1)}%`}
           icon={CheckCircleIcon}
-          colorScheme={stats.coverage_percentage >= 90 ? 'green' : stats.coverage_percentage >= 70 ? 'orange' : 'red'}
+          colorPalette={stats.coverage_percentage >= 90 ? 'green' : stats.coverage_percentage >= 70 ? 'orange' : 'red'}
           onClick={() => onMetricClick?.('coverage')}
         />
 
@@ -111,7 +110,7 @@ export function SchedulingTopBar({
           label="Permisos"
           value={stats.pending_time_off.toString()}
           icon={ClockIcon}
-          colorScheme={stats.pending_time_off > 0 ? 'orange' : 'gray'}
+          colorPalette={stats.pending_time_off > 0 ? 'orange' : 'gray'}
           badge={stats.pending_time_off > 0 ? 'Pendientes' : undefined}
           onClick={() => onMetricClick?.('timeoff')}
         />
@@ -121,7 +120,7 @@ export function SchedulingTopBar({
           label="Costo Laboral"
           value={formatCurrency(stats.labor_cost_this_week)}
           icon={CurrencyDollarIcon}
-          colorScheme="purple"
+          colorPalette="purple"
           subtitle={stats.overtime_hours > 0 ? `${stats.overtime_hours}h extras` : undefined}
           onClick={() => onMetricClick?.('costs')}
         />
@@ -129,7 +128,7 @@ export function SchedulingTopBar({
 
       {/* CRITICAL ALERTS (only if problems exist) */}
       {alerts.length > 0 && (
-        <Stack direction="column" gap={2}>
+        <Stack direction="column" gap="2">
           {alerts.map((alert, index) => (
             <Alert
               key={index}
@@ -154,8 +153,8 @@ export function SchedulingTopBar({
 interface MetricCardProps {
   label: string;
   value: string;
-  icon: React.ComponentType<any>;
-  colorScheme: 'blue' | 'green' | 'orange' | 'red' | 'purple' | 'gray';
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  colorPalette: 'blue' | 'green' | 'orange' | 'red' | 'purple' | 'gray';
   badge?: string;
   subtitle?: string;
   onClick?: () => void;
@@ -165,7 +164,7 @@ function MetricCard({
   label,
   value,
   icon: IconComponent,
-  colorScheme,
+  colorPalette,
   badge,
   subtitle,
   onClick
@@ -197,21 +196,21 @@ function MetricCard({
         }
       }}
     >
-      <Stack direction="row" justify="space-between" align="start" gap={2}>
+      <Stack direction="row" justify="space-between" align="start" gap="2">
         {/* Left: Icon + Label */}
-        <Stack direction="column" gap={1} flex="1">
-          <Stack direction="row" align="center" gap={2}>
+        <Stack direction="column" gap="1" flex="1">
+          <Stack direction="row" align="center" gap="2">
             <div
               style={{
                 padding: '6px',
                 borderRadius: '6px',
-                backgroundColor: `var(--chakra-colors-${colorScheme}-50)`,
+                backgroundColor: `var(--chakra-colors-${colorPalette}-50)`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
             >
-              <Icon icon={IconComponent} size="sm" color={`${colorScheme}.600`} />
+              <Icon icon={IconComponent} size="sm" color={`${colorPalette}.600`} />
             </div>
 
             <Typography variant="body" size="xs" color="gray.600" fontWeight="medium">
@@ -234,7 +233,7 @@ function MetricCard({
 
         {/* Right: Badge (if exists) */}
         {badge && (
-          <Badge size="sm" colorPalette={colorScheme}>
+          <Badge size="sm" colorPalette={colorPalette}>
             {badge}
           </Badge>
         )}

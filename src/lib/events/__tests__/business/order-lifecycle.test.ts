@@ -180,7 +180,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       eventBus.on('payments.payment.processed', async (_event) => {
         workflowEvents.push('payment-processed');
         
-        await eventBus.emit('kitchen.order.received', {
+        await eventBus.emit('production.order.received', {
           orderId: event.payload.orderId,
           priority: 'normal',
           estimatedTime: 20,
@@ -189,13 +189,13 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // 6. Kitchen Order → Order Completion
-      eventBus.on('kitchen.order.received', async (_event) => {
+      eventBus.on('production.order.received', async (_event) => {
         workflowEvents.push('kitchen-received');
         
         // Simulate kitchen preparation
         await new Promise(resolve => setTimeout(resolve, 30));
         
-        await eventBus.emit('kitchen.order.completed', {
+        await eventBus.emit('production.order.completed', {
           orderId: event.payload.orderId,
           actualTime: 18,
           quality: 'good'
@@ -203,7 +203,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       });
 
       // 7. Kitchen Completed → Order Fulfilled
-      eventBus.on('kitchen.order.completed', async (_event) => {
+      eventBus.on('production.order.completed', async (_event) => {
         workflowEvents.push('kitchen-completed');
         
         const order = orderStates.get(event.payload.orderId);
@@ -469,7 +469,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         if (customer?.tier === 'VIP') {
           processingOrder.push(`vip-${order.orderId}`);
           
-          await eventBus.emit('kitchen.order.received', {
+          await eventBus.emit('production.order.received', {
             orderId: order.orderId,
             priority: 'high',
             customerTier: 'VIP',
@@ -478,7 +478,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         } else {
           processingOrder.push(`regular-${order.orderId}`);
           
-          await eventBus.emit('kitchen.order.received', {
+          await eventBus.emit('production.order.received', {
             orderId: order.orderId,
             priority: 'normal',
             customerTier: 'REGULAR',
@@ -487,7 +487,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('kitchen.order.received', async (_event) => {
+      eventBus.on('production.order.received', async (_event) => {
         processingOrder.push(`kitchen-${event.payload.priority}-${event.payload.orderId}`);
       });
 
@@ -590,7 +590,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         
         // Process each item individually
         for (const item of event.payload.items) {
-          await eventBus.emit('kitchen.item.preparation.scheduled', {
+          await eventBus.emit('production.item.preparation.scheduled', {
             orderId: event.payload.orderId,
             itemId: item.id,
             quantity: item.quantity,
@@ -600,7 +600,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('kitchen.item.preparation.scheduled', async (_event) => {
+      eventBus.on('production.item.preparation.scheduled', async (_event) => {
         complexityHandlers.push(`item-scheduled-${event.payload.itemId}`);
         
         itemPreparationTasks.push({
@@ -612,7 +612,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
 
         // Simulate preparation
         setTimeout(async () => {
-          await eventBus.emit('kitchen.item.preparation.completed', {
+          await eventBus.emit('production.item.preparation.completed', {
             orderId: event.payload.orderId,
             itemId: event.payload.itemId,
             actualTime: event.payload.estimatedTime
@@ -620,7 +620,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }, 50);
       });
 
-      eventBus.on('kitchen.item.preparation.completed', async (_event) => {
+      eventBus.on('production.item.preparation.completed', async (_event) => {
         complexityHandlers.push(`item-completed-${event.payload.itemId}`);
         
         // Update task status
@@ -634,7 +634,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         const completedTasks = orderTasks.filter(t => t.status === 'completed');
 
         if (completedTasks.length === orderTasks.length) {
-          await eventBus.emit('kitchen.order.assembly.ready', {
+          await eventBus.emit('production.order.assembly.ready', {
             orderId: event.payload.orderId,
             totalItems: orderTasks.length,
             specialRequests: complexOrder.specialRequests
@@ -642,10 +642,10 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         }
       });
 
-      eventBus.on('kitchen.order.assembly.ready', async (_event) => {
+      eventBus.on('production.order.assembly.ready', async (_event) => {
         complexityHandlers.push('assembly-ready');
         
-        await eventBus.emit('kitchen.order.completed', {
+        await eventBus.emit('production.order.completed', {
           orderId: event.payload.orderId,
           totalTime: 22,
           quality: 'excellent',
@@ -686,17 +686,17 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
       const errorRecoveryEvents: string[] = [];
 
       eventBus.on('sales.order.created', async (_event) => {
-        await eventBus.emit('kitchen.order.received', {
+        await eventBus.emit('production.order.received', {
           orderId: event.payload.orderId,
           items: event.payload.items
         });
       });
 
-      eventBus.on('kitchen.order.received', async (_event) => {
+      eventBus.on('production.order.received', async (_event) => {
         // Simulate kitchen error
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        await eventBus.emit('kitchen.order.error', {
+        await eventBus.emit('production.order.error', {
           orderId: event.payload.orderId,
           errorType: 'equipment_failure',
           message: 'Grill malfunction - cannot complete order',
@@ -704,7 +704,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         });
       });
 
-      eventBus.on('kitchen.order.error', async (_event) => {
+      eventBus.on('production.order.error', async (_event) => {
         errorRecoveryEvents.push('kitchen-error');
         
         // Initiate error recovery
@@ -751,7 +751,7 @@ describe('EventBus - Order Lifecycle Business Logic', () => {
         'compensation-offered'
       ]);
 
-      assertions.assertEventEmitted('kitchen.order.error');
+      assertions.assertEventEmitted('production.order.error');
       assertions.assertEventEmitted('customers.compensation.offered');
       assertions.assertEventEmitted('sales.order.compensated');
     });

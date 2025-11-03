@@ -10,7 +10,7 @@
  */
 
 import React from 'react';
-import { ContentLayout, Section, Stack, Button, SkipLink, HStack, VStack } from '@/shared/ui';
+import { ContentLayout, Section, Button, SkipLink, HStack, Alert } from '@/shared/ui';
 import { PlusIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
 import { HookPoint } from '@/lib/modules';
@@ -18,9 +18,24 @@ import { FloorStats } from './components/FloorStats';
 import { FloorPlanView } from './components/FloorPlanView';
 import { ReservationsList } from './components/ReservationsList';
 import { notify } from '@/lib/notifications';
+import { usePermissions } from '@/hooks/usePermissions';
 
 export default function FloorManagementPage() {
   const [refreshTrigger, setRefreshTrigger] = React.useState(0);
+  const { canRead, canCreate, canUpdate } = usePermissions('fulfillment');
+
+  // Check read permission
+  if (!canRead) {
+    return (
+      <ContentLayout spacing="normal" mainLabel="Access Denied">
+        <Section variant="elevated">
+          <Alert status="warning" title="Access Denied">
+            You don't have permission to view fulfillment operations.
+          </Alert>
+        </Section>
+      </ContentLayout>
+    );
+  }
 
   const handleRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
@@ -52,14 +67,18 @@ export default function FloorManagementPage() {
         {/* ✅ ACTIONS SECTION - Standard actions */}
         <Section variant="flat">
           <HStack gap="2">
-            <Button onClick={handleRefresh} variant="outline" size="sm">
-              <Icon icon={ArrowPathIcon} size="sm" />
-              Refresh
-            </Button>
-            <Button colorPalette="blue" size="sm">
-              <Icon icon={PlusIcon} size="sm" />
-              New Reservation
-            </Button>
+            {canUpdate && (
+              <Button onClick={handleRefresh} variant="outline" size="sm">
+                <Icon icon={ArrowPathIcon} size="sm" />
+                Refresh
+              </Button>
+            )}
+            {canCreate && (
+              <Button colorPalette="blue" size="sm">
+                <Icon icon={PlusIcon} size="sm" />
+                New Reservation
+              </Button>
+            )}
           </HStack>
         </Section>
 

@@ -224,12 +224,12 @@ export const createStaffTestModule = (): ModuleDescriptor => ({
   }
 });
 
-// Kitchen module mock (failing module for error testing)
-export const createFailingKitchenTestModule = (): ModuleDescriptor => ({
-  id: 'test-kitchen-failing',
-  name: 'Test Kitchen Module (Failing)',
+// Production module mock (failing module for error testing) - RENAMED: kitchen → production
+export const createFailingProductionTestModule = (): ModuleDescriptor => ({
+  id: 'test-production-failing',
+  name: 'Test Production Module (Failing)',
   version: '2.0.0-test',
-  description: 'Mock kitchen module that simulates failures',
+  description: 'Mock production module that simulates failures',
   dependencies: ['test-inventory'],
   eventSubscriptions: [
     {
@@ -243,7 +243,7 @@ export const createFailingKitchenTestModule = (): ModuleDescriptor => ({
     const isHealthy = Math.random() > 0.3; // 70% chance of failure
     return {
       status: isHealthy ? 'active' : 'error',
-      message: isHealthy ? 'Kitchen operational' : 'Kitchen equipment malfunction',
+      message: isHealthy ? 'Production operational' : 'Production equipment malfunction',
       metrics: {
         eventsProcessed: Math.floor(Math.random() * 100),
         eventsEmitted: Math.floor(Math.random() * 50),
@@ -258,17 +258,17 @@ export const createFailingKitchenTestModule = (): ModuleDescriptor => ({
     };
   },
   onActivate: async () => {
-    console.log('[TestKitchenModule] Attempting activation...');
+    console.log('[TestProductionModule] Attempting activation...');
     // Simulate activation failure sometimes
     if (Math.random() > 0.7) {
       throw new Error('Kitchen equipment not responding');
     }
   },
   onDeactivate: async () => {
-    console.log('[TestKitchenModule] Deactivating...');
+    console.log('[TestProductionModule] Deactivating...');
   },
   config: {
-    eventNamespace: 'kitchen',
+    eventNamespace: 'production', // RENAMED: kitchen → production
     maxConcurrentEvents: 25,
     healthCheckIntervalMs: 3000,
     gracefulShutdownTimeoutMs: 5000
@@ -359,7 +359,7 @@ export const createTestModules = () => ({
   staff: createStaffTestModule(),
   payment: createPaymentTestModule(),
   fiscal: createFiscalTestModule(),
-  kitchenFailing: createFailingKitchenTestModule()
+  productionFailing: createFailingProductionTestModule() // RENAMED: kitchenFailing → productionFailing
 });
 
 // Event handlers for test modules
@@ -367,22 +367,22 @@ export const createTestEventHandlers = () => {
   const handlers = new Map<string, EventHandler>();
 
   // Sales handlers
-  handlers.set('test-sales.handleLowStock', async (_event) => {
+  handlers.set('test-sales.handleLowStock', async (event) => {
     console.log(`[TestSales] Handling low stock for ${event.payload.itemName}`);
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 10));
   });
 
-  handlers.set('test-sales.handleCustomerUpdate', async (_event) => {
+  handlers.set('test-sales.handleCustomerUpdate', async (event) => {
     console.log(`[TestSales] Customer ${event.payload.customerId} updated`);
     await new Promise(resolve => setTimeout(resolve, 5));
   });
 
   // Inventory handlers
-  handlers.set('test-inventory.updateStock', async (_event) => {
+  handlers.set('test-inventory.updateStock', async (event) => {
     console.log(`[TestInventory] Updating stock for order ${event.payload.orderId}`);
     await new Promise(resolve => setTimeout(resolve, 15));
-    
+
     // Emit low stock event if needed
     if (Math.random() > 0.8) {
       // This would emit via the actual EventBus instance
@@ -390,41 +390,41 @@ export const createTestEventHandlers = () => {
     }
   });
 
-  handlers.set('test-inventory.processRestock', async (_event) => {
+  handlers.set('test-inventory.processRestock', async (event) => {
     console.log(`[TestInventory] Processing restock for ${event.payload.itemId}`);
     await new Promise(resolve => setTimeout(resolve, 20));
   });
 
   // Customer handlers
-  handlers.set('test-customers.updateCustomerActivity', async (_event) => {
+  handlers.set('test-customers.updateCustomerActivity', async (event) => {
     console.log(`[TestCustomers] Updated activity for customer ${event.payload.customerId}`);
     await new Promise(resolve => setTimeout(resolve, 8));
   });
 
   // Staff handlers
-  handlers.set('test-staff.recordClockIn', async (_event) => {
+  handlers.set('test-staff.recordClockIn', async (event) => {
     console.log(`[TestStaff] ${event.payload.staffId} clocked in at ${event.payload.timestamp}`);
     await new Promise(resolve => setTimeout(resolve, 12));
   });
 
-  handlers.set('test-staff.recordClockOut', async (_event) => {
+  handlers.set('test-staff.recordClockOut', async (event) => {
     console.log(`[TestStaff] ${event.payload.staffId} clocked out at ${event.payload.timestamp}`);
     await new Promise(resolve => setTimeout(resolve, 12));
   });
 
   // Payment handlers
-  handlers.set('test-payment.processCashPayment', async (_event) => {
+  handlers.set('test-payment.processCashPayment', async (event) => {
     console.log(`[TestPayment] Processing cash payment of ${event.payload.amount}`);
     await new Promise(resolve => setTimeout(resolve, 25));
-    
+
     // Simulate successful cash processing
     console.log(`[TestPayment] Cash payment processed successfully`);
   });
 
-  handlers.set('test-payment.processCardPayment', async (_event) => {
+  handlers.set('test-payment.processCardPayment', async (event) => {
     console.log(`[TestPayment] Processing card payment of ${event.payload.amount}`);
     await new Promise(resolve => setTimeout(resolve, 35));
-    
+
     // Simulate card processing
     if (Math.random() > 0.1) { // 90% success rate
       console.log(`[TestPayment] Card payment authorized`);
@@ -433,45 +433,45 @@ export const createTestEventHandlers = () => {
     }
   });
 
-  handlers.set('test-payment.processMobilePayment', async (_event) => {
+  handlers.set('test-payment.processMobilePayment', async (event) => {
     console.log(`[TestPayment] Processing mobile payment of ${event.payload.amount}`);
     await new Promise(resolve => setTimeout(resolve, 20));
     console.log(`[TestPayment] Mobile payment processed successfully`);
   });
 
   // Fiscal handlers
-  handlers.set('test-fiscal.generateReceipt', async (_event) => {
+  handlers.set('test-fiscal.generateReceipt', async (event) => {
     console.log(`[TestFiscal] Generating receipt for payment ${event.payload.paymentId}`);
     await new Promise(resolve => setTimeout(resolve, 30));
-    
+
     const receiptId = `REC-${Date.now()}`;
     console.log(`[TestFiscal] Receipt ${receiptId} generated successfully`);
   });
 
-  handlers.set('test-fiscal.processReceiptRequest', async (_event) => {
+  handlers.set('test-fiscal.processReceiptRequest', async (event) => {
     console.log(`[TestFiscal] Processing receipt request for ${event.payload.transactionId}`);
     await new Promise(resolve => setTimeout(resolve, 15));
   });
 
   // Kitchen handlers (that may fail)
-  handlers.set('test-kitchen-failing.processOrder', async (_event) => {
+  handlers.set('test-kitchen-failing.processOrder', async (event) => {
     console.log(`[TestKitchen] Processing order ${event.payload.orderId}`);
-    
+
     // Simulate random failures
     if (Math.random() > 0.7) {
       throw new Error('Kitchen equipment malfunction');
     }
-    
+
     await new Promise(resolve => setTimeout(resolve, 50));
   });
 
   // Scheduling handlers
-  handlers.set('test-scheduling.recordShiftAssignment', async (_event) => {
+  handlers.set('test-scheduling.recordShiftAssignment', async (event) => {
     console.log(`[TestScheduling] Recording shift assignment for ${event.payload.staffId}`);
     await new Promise(resolve => setTimeout(resolve, 10));
   });
 
-  handlers.set('test-scheduling.processShiftSwap', async (_event) => {
+  handlers.set('test-scheduling.processShiftSwap', async (event) => {
     console.log(`[TestScheduling] Processing shift swap between ${event.payload.fromStaffId} and ${event.payload.toStaffId}`);
     await new Promise(resolve => setTimeout(resolve, 15));
   });

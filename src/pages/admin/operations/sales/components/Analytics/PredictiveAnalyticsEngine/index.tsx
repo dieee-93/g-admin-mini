@@ -40,7 +40,7 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
           <ExclamationTriangleIcon className="w-5 h-5" />
         </Alert.Indicator>
         <Alert.Description>{error}</Alert.Description>
-        <Button onClick={loadPredictiveAnalytics} variant="outline" size="sm" ml={4}>
+        <Button onClick={loadPredictiveAnalytics} variant="outline" size="sm" ml="4">
           Retry
         </Button>
       </Alert>
@@ -49,7 +49,7 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
 
   return (
     <Box>
-      <VStack align="stretch" gap={6}>
+      <VStack align="stretch" gap="6">
         <EngineHeader
           analytics={analytics}
           selectedTimeframe={selectedTimeframe}
@@ -59,16 +59,16 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
         />
 
         {loading && !analytics ? (
-          <VStack gap={4}>
+          <VStack gap="4">
             <Skeleton height="200px" />
-            <Grid templateColumns="repeat(3, 1fr)" gap={4}>
+            <Grid templateColumns="repeat(3, 1fr)" gap="4">
               <Skeleton height="150px" />
               <Skeleton height="150px" />
               <Skeleton height="150px" />
             </Grid>
           </VStack>
         ) : analytics ? (
-          <VStack align="stretch" gap={6}>
+          <VStack align="stretch" gap="6">
             <RevenueForecast analytics={analytics} />
             <DemandForecasting analytics={analytics} />
             <CustomerIntelligence analytics={analytics} />
@@ -80,9 +80,9 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
 
         {/* Status */}
         <CardWrapper bg="bg.canvas">
-          <CardWrapper.Body p={3}>
-            <HStack justify="center" gap={4}>
-              <HStack gap={2}>
+          <CardWrapper.Body p="3">
+            <HStack justify="center" gap="4">
+              <HStack gap="2">
                 <Box width="8px" height="8px" bg="indigo.500" borderRadius="50%" />
                 <Text fontSize="sm" color="gray.600">
                   Predictive models last updated: {new Date().toLocaleString()}

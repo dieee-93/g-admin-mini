@@ -2,3 +2,4 @@
 // Provides clean imports for all product management types
 
 export * from './product';
+export * from './menu-engineering';

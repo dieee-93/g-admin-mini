@@ -8,6 +8,7 @@ import { SupplierPerformanceCard } from './SupplierPerformanceCard';
 import type { SupplierAnalysis } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
 import { supplierAnalyticsService } from '../../services/supplierAnalyticsService';
 import { useMemo } from 'react';
+import type { SupplierAnalysisResultForService } from '../../types/supplierTypes';
 
 interface SupplierPerformanceGridProps {
   suppliers: SupplierAnalysis[];
@@ -33,14 +34,14 @@ export function SupplierPerformanceGrid({
       return { topPerformers: [], bottomPerformers: [] };
     }
 
-    // Create a fake analysis result to use the service helper
-    const fakeResult = {
+    // Create analysis result to use the service helper
+    const analysisResult: SupplierAnalysisResultForService = {
       supplierAnalyses: suppliers
-    } as any;
+    };
 
     return {
-      topPerformers: supplierAnalyticsService.getTopPerformers(fakeResult, 5),
-      bottomPerformers: supplierAnalyticsService.getBottomPerformers(fakeResult, 5)
+      topPerformers: supplierAnalyticsService.getTopPerformers(analysisResult, 5),
+      bottomPerformers: supplierAnalyticsService.getBottomPerformers(analysisResult, 5)
     };
   }, [suppliers, showTopPerformers]);
 
@@ -49,21 +50,21 @@ export function SupplierPerformanceGrid({
 
   if (!showTopPerformers && suppliers.length === 0) {
     return (
-      <Text color="fg.muted" textAlign="center" py={8}>
+      <Text color="fg.muted" textAlign="center" py="8">
         No hay proveedores para mostrar
       </Text>
     );
   }
 
   return (
-    <VStack align="stretch" gap={6}>
+    <VStack align="stretch" gap="6">
       {/* Top Performers Section */}
       {showTopPerformers && topPerformers.length > 0 && (
-        <VStack align="stretch" gap={4}>
+        <VStack align="stretch" gap="4">
           <Text fontSize="xl" fontWeight="bold">
             🏆 Top Performers
           </Text>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
             {topPerformers.map(supplier => (
               <SupplierPerformanceCard
                 key={supplier.id}
@@ -83,11 +84,11 @@ export function SupplierPerformanceGrid({
 
       {/* Bottom Performers Section */}
       {showTopPerformers && bottomPerformers.length > 0 && (
-        <VStack align="stretch" gap={4}>
+        <VStack align="stretch" gap="4">
           <Text fontSize="xl" fontWeight="bold">
             ⚠️ Necesitan Atención
           </Text>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
             {bottomPerformers.map(supplier => (
               <SupplierPerformanceCard
                 key={supplier.id}
@@ -102,7 +103,7 @@ export function SupplierPerformanceGrid({
 
       {/* All Suppliers Grid */}
       {!showTopPerformers && (
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
           {displaySuppliers.map(supplier => (
             <SupplierPerformanceCard
               key={supplier.id}

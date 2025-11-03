@@ -58,7 +58,7 @@ src/modules/
 - **ID**: `production`
 - **Version**: `1.0.0`
 - **Dependencies**: `materials` (requires materials module)
-- **Required Features**: `production_kitchen_display`
+- **Required Features**: `production_display_system`
 - **Provides Hooks**:
   - `calendar.events` (priority 70) - Production schedule overlay
   - `materials.row.actions` (priority 80) - "Use in Kitchen" button
@@ -201,7 +201,7 @@ Modules only load when user has features:
 ```tsx
 // Staff module loads ONLY if user has 'staff_employee_management'
 // Scheduling module loads ONLY if user has 'staff_shift_management'
-// Production module loads ONLY if user has 'production_kitchen_display'
+// Production module loads ONLY if user has 'production_display_system'
 ```
 
 ### 4. Dependency Resolution

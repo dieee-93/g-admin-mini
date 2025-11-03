@@ -76,7 +76,7 @@ export const useSetupStore = create<SetupStore>()(
 
         setUserName: (name) => set({ userName: name, timestamp: Date.now() }, false, 'setUserName'),
         setSupabaseCredentials: (credentials) => set({ supabaseCredentials: credentials, timestamp: Date.now() }, false, 'setSupabaseCredentials'),
-        setAdminUserData: (_data) => set({ adminUserData: data, timestamp: Date.now() }, false, 'setAdminUserData'),
+        setAdminUserData: (_data) => set({ adminUserData: _data, timestamp: Date.now() }, false, 'setAdminUserData'),
 
         nextStep: () => {
           const { currentGroup, currentSubStep } = get();

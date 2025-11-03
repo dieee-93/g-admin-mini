@@ -301,6 +301,9 @@ vitest run src/lib/events/__tests__/unit     # Directory
 6. ❌ **Float arithmetic for money** - Use Decimal.js
 7. ❌ **Direct module imports** - Use Module Registry and exports API
 8. ❌ **Skipping TypeScript checks** - Always run `pnpm -s exec tsc --noEmit`
+9. ❌ **Zustand selectors without useShallow** - Causes re-renders when returning arrays/objects (see Performance section)
+10. ❌ **DecimalUtils without fallbacks** - Always use `value ?? 0` to prevent DecimalError on undefined
+11. ❌ **Creating new arrays in Zustand actions** - Use `getUpdatedArrayIfChanged()` to preserve references
 
 ## Performance Optimization
 
@@ -320,6 +323,88 @@ Vite config includes manual chunks for:
 ### Monitoring
 - Real-time FPS monitoring in `src/lib/performance/PerformanceMonitor.tsx`
 - Bundle analysis: `pnpm build` generates visualizer output
+- ConsoleHelper: `window.__CONSOLE_HELPER__` for debugging re-renders (dev only)
+
+### Zustand Performance Best Practices (v5)
+
+**CRITICAL**: Prevent unnecessary re-renders with proper selector patterns:
+
+```typescript
+// ❌ WRONG - Creates new array reference every render
+const items = useStore(state => state.items || []);
+
+// ✅ CORRECT - Use useShallow for arrays/objects
+import { useShallow } from 'zustand/react/shallow';
+const items = useStore(useShallow(state => state.items || EMPTY_ARRAY));
+
+// ✅ CORRECT - Preserve array references in actions
+const EMPTY_ARRAY: string[] = []; // Stable reference
+
+set((state) => {
+  const newArray = [...state.items, newItem];
+  return {
+    items: getUpdatedArrayIfChanged(state.items, newArray) // Preserves reference if equal
+  };
+});
+```
+
+**Array Reference Stability Helper**:
+```typescript
+// Use this helper in Zustand actions to prevent re-renders
+function getUpdatedArrayIfChanged<T>(oldArray: T[], newArray: T[]): T[] {
+  if (oldArray.length !== newArray.length) return newArray;
+  const isEqual = oldArray.every((val, idx) => val === newArray[idx]);
+  return isEqual ? oldArray : newArray; // PRESERVE OLD REFERENCE if equal
+}
+```
+
+**When to use `useShallow`**:
+- ✅ Selectors returning arrays: `state => state.someArray`
+- ✅ Selectors returning objects: `state => ({ a: state.a, b: state.b })`
+- ✅ Selectors with `|| []` or `|| {}` fallbacks
+- ✅ Arrays from persist middleware (rehidration creates new references)
+
+**React Strict Mode Note**: In development, React 19 Strict Mode runs effects twice:
+- Mount → Unmount (cleanup test) → Mount again
+- EventBus subscriptions will show: subscribe → unsubscribe → subscribe
+- This is **expected behavior** and disappears in production
+
+### DecimalUtils Safe Usage
+
+```typescript
+// ❌ WRONG - Throws DecimalError if value is undefined
+DecimalUtils.fromValue(material.stock, 'inventory');
+
+// ✅ CORRECT - Always provide fallback with nullish coalescing
+DecimalUtils.fromValue(material.stock ?? 0, 'inventory');
+
+// ✅ CORRECT - Use safeFromValue for validation
+DecimalUtils.safeFromValue(material.stock, 'inventory', 'material stock');
+
+// ✅ CORRECT - Use assertFinite for critical operations
+DecimalUtils.assertFinite(total, 'total calculation');
+```
+
+### Debugging Re-renders with ConsoleHelper
+
+Available in development at `window.__CONSOLE_HELPER__`:
+
+```javascript
+// Get errors only
+__CONSOLE_HELPER__.getErrors(10)
+
+// Find module with most activity
+__CONSOLE_HELPER__.getTopModules(5)
+
+// Search specific module logs
+__CONSOLE_HELPER__.getByModule("Materials", 20)
+
+// Get AI-optimized export (reduces 123K → <1K tokens)
+__CONSOLE_HELPER__.exportForAI({ level: "error" })
+
+// Statistics
+__CONSOLE_HELPER__.getSummary()
+```
 
 ## Security Patterns
 

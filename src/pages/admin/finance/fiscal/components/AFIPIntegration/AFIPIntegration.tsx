@@ -28,14 +28,10 @@ import {
   ShieldCheckIcon,
   DocumentTextIcon,
   CloudIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
-  XCircleIcon,
   ArrowPathIcon,
   CogIcon,
   KeyIcon,
   ServerIcon,
-  ClockIcon
 } from '@heroicons/react/24/outline';
 
 import { fiscalApi } from '../../services/fiscalApi'; 

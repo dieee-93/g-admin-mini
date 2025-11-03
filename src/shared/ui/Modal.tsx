@@ -1,5 +1,5 @@
-import { DialogRoot, DialogTrigger, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle, DialogDescription, DialogCloseTrigger, Portal } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import { DialogRoot, DialogTrigger, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle, DialogDescription, DialogCloseTrigger, DialogBackdrop, DialogPositioner, Portal } from '@chakra-ui/react'
+import type { ReactNode } from 'react'
 import { withDisplayName } from './utils/compoundUtils'
 
 interface ModalProps {
@@ -122,19 +122,22 @@ export function ModalTrigger({ children, asChild = false }: ModalTriggerProps) {
   )
 }
 
-export function ModalContent({ 
-  children, 
+export function ModalContent({
+  children,
   className,
-  ...rest 
+  ...rest
 }: ModalContentProps) {
   return (
     <Portal>
-      <DialogContent 
-        className={className}
-        {...rest}
-      >
-        {children}
-      </DialogContent>
+      <DialogBackdrop />
+      <DialogPositioner>
+        <DialogContent
+          className={className}
+          {...rest}
+        >
+          {children}
+        </DialogContent>
+      </DialogPositioner>
     </Portal>
   )
 }
@@ -289,3 +292,4 @@ Modal.Footer = ModalFooter
 Modal.Title = ModalTitle
 Modal.Description = ModalDescription
 Modal.Close = ModalClose
+Modal.CloseTrigger = ModalClose // Alias for Chakra v3 compatibility

@@ -4,7 +4,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog } from '@chakra-ui/react';
 import {
   Button,
@@ -183,9 +182,9 @@ export function ReceiveOrderModal({
 
           <Dialog.Body>
             <form id="receive-order-form" onSubmit={handleSubmit(handleFormSubmit)}>
-              <Stack direction="column" gap={4}>
+              <Stack direction="column" gap="4">
                 {/* Order Info Summary */}
-                <VStack align="stretch" gap={2} p={3} bg="bg.subtle" borderRadius="md">
+                <VStack align="stretch" gap="2" p="3" bg="bg.subtle" borderRadius="md">
                   <HStack justify="space-between">
                     <Text fontSize="sm" fontWeight="semibold" color="fg.muted">
                       N° Orden
@@ -236,19 +235,18 @@ export function ReceiveOrderModal({
                   title="Materiales Recibidos"
                   description="Verifica las cantidades recibidas de cada material"
                 >
-                  <Stack direction="column" gap={3}>
+                  <Stack direction="column" gap="3">
                     {fields.map((field, index) => {
                       const item = watchItems[index];
                       const hasDiscrepancy = item && item.received_quantity !== item.ordered_quantity;
-                      const isPartial = item && item.received_quantity < item.ordered_quantity;
                       const isOver = item && item.received_quantity > item.ordered_quantity;
 
                       return (
                         <Stack
                           key={field.id}
                           direction="column"
-                          gap={2}
-                          p={3}
+                          gap="2"
+                          p="3"
                           borderWidth="1px"
                           borderRadius="md"
                           borderColor={
@@ -262,7 +260,7 @@ export function ReceiveOrderModal({
                         >
                           {/* Material name */}
                           <HStack justify="space-between">
-                            <VStack align="start" gap={0}>
+                            <VStack align="start" gap="0">
                               <Text fontWeight="semibold">{item.material_name}</Text>
                               <Text fontSize="xs" color="fg.muted">
                                 Unidad: {item.unit}
@@ -296,19 +294,19 @@ export function ReceiveOrderModal({
                           </HStack>
 
                           {/* Quantities */}
-                          <HStack gap={3}>
+                          <HStack gap="3">
                             {/* Ordered quantity (read-only) */}
-                            <VStack align="start" gap={1} flex={1}>
+                            <VStack align="start" gap="1" flex={1}>
                               <Text fontSize="xs" fontWeight="medium" color="fg.muted">
                                 Cantidad Ordenada
                               </Text>
-                              <Badge colorPalette="gray" size="lg" py={2} width="full">
+                              <Badge colorPalette="gray" size="lg" py="2" width="full">
                                 {item.ordered_quantity} {item.unit}
                               </Badge>
                             </VStack>
 
                             {/* Received quantity (editable) */}
-                            <VStack align="start" gap={1} flex={1}>
+                            <VStack align="start" gap="1" flex={1}>
                               <NumberField
                                 label="Cantidad Recibida *"
                                 error={errors.items?.[index]?.received_quantity?.message}
@@ -343,8 +341,8 @@ export function ReceiveOrderModal({
                 {/* Summary Section */}
                 <VStack
                   align="stretch"
-                  gap={2}
-                  p={4}
+                  gap="2"
+                  p="4"
                   bg="bg.subtle"
                   borderRadius="md"
                   borderWidth="1px"

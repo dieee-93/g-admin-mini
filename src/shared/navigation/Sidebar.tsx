@@ -1,14 +1,15 @@
 // ====================================
-// src/shared/navigation/Sidebar.tsx - SISTEMA DE DISEÑO G-ADMIN MINI v2.0
+// src/shared/navState/Sidebar.tsx - SISTEMA DE DISEÑO G-ADMIN MINI v2.0
 // ====================================
 
 import React, { Fragment, useMemo } from 'react';
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useLocation } from 'react-router-dom';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationState, useNavigationLayout, useNavigationActions } from '@/contexts/NavigationContext';
 import { useModuleNavigationByDomain } from '@/lib/modules/useModuleNavigation';
+import { useLocation as useLocationContext } from '@/contexts/LocationContext';
 import {
-  Layout, Stack, Typography, CardWrapper, Button, Badge, Box, Collapsible
+  Layout, Stack, Typography, CardWrapper, Button, Badge, Box, Collapsible, LocationSelector
 } from '@/shared/ui';
 import { Icon, HeaderIcon } from '@/shared/ui/Icon';
 import { QuickThemeToggle } from '@/shared/components/ThemeToggle';
@@ -30,16 +31,16 @@ const DOMAIN_LABELS: Record<string, string> = {
 export function Sidebar() {
   const location = useLocation();
   const [isHovering, setIsHovering] = React.useState(false);
-  const {
-    modules,
-    currentModule,
-    navigate,
-    navigateToModule,
-    sidebarCollapsed,
-    setSidebarCollapsed,
-    toggleModuleExpansion,
-    isMobile
-  } = useNavigation();
+  const { isMultiLocationMode } = useLocationContext();
+
+  // ✅ Use specialized navigation hooks
+  const navState = useNavigationState();
+  const navLayout = useNavigationLayout();
+  const navActions = useNavigationActions();
+
+  const { modules, currentModule } = navState;
+  const { isMobile, sidebarCollapsed } = navLayout;
+  const { navigate, navigateToModule, setSidebarCollapsed, toggleModuleExpansion } = navActions;
 
   // Get modules grouped by domain
   const modulesByDomain = useModuleNavigationByDomain();
@@ -266,9 +267,12 @@ export function Sidebar() {
 
   return (
     <Box
-        position="relative"
+        position="fixed"
         height="100vh"
         width={actualShowExpanded ? "15rem" : "3rem"}
+        left="0"
+        top="0"
+        zIndex="9999"
         onMouseEnter={() => {
           logger.info('App', '🎯 Sidebar hover ENTER'); // Debug
           setIsHovering(true);
@@ -325,6 +329,20 @@ export function Sidebar() {
 {/* Toggle button removed - hover-only sidebar */}
             </Stack>
           </div>
+
+          {/* 🏢 Location Selector - Only in multi-location mode */}
+          {isMultiLocationMode && (
+            <div
+              style={{
+                padding: actualShowExpanded ? "8px 12px" : "8px 8px",
+                borderBottom: "1px solid",
+                borderColor: "var(--chakra-colors-border-default)",
+                opacity: 0.3
+              }}
+            >
+              <LocationSelector />
+            </div>
+          )}
 
           {/* Navigation Section - Grouped by Domain */}
           <div style={{ flex: 1, padding: "8px", paddingTop: "4px", overflow: "auto" }}>

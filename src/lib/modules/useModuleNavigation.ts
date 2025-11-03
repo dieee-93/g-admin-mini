@@ -14,9 +14,10 @@
  * @version 2.0.0 - Navigation System Refactor
  */
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { ModuleRegistry } from './ModuleRegistry';
 import { useCapabilityStore } from '@/store/capabilityStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/contexts/AuthContext';
 import { MODULE_FEATURE_MAP } from '@/config/FeatureRegistry';
 import { logger } from '@/lib/logging';
@@ -73,9 +74,43 @@ export interface NavigationByDomain {
  *
  * @returns Accessible navigation modules
  */
+// Helper to compare arrays by content and preserve reference
+function getUpdatedArrayIfChanged<T>(oldArray: T[], newArray: T[], compareFn?: (a: T, b: T) => boolean): T[] {
+  if (oldArray.length !== newArray.length) {
+    return newArray;
+  }
+
+  const isEqual = compareFn
+    ? oldArray.every((val, idx) => compareFn(val, newArray[idx]))
+    : oldArray.every((val, idx) => val === newArray[idx]);
+
+  if (isEqual) {
+    logger.debug('NavigationGeneration', '⚡ Array unchanged, preserving reference to prevent re-renders');
+    return oldArray;
+  }
+
+  logger.debug('NavigationGeneration', '🔄 Array content changed, returning new reference');
+  return newArray;
+}
+
+// Helper to deep compare NavigationModule objects
+function compareNavigationModules(a: NavigationModule, b: NavigationModule): boolean {
+  return a.id === b.id &&
+    a.title === b.title &&
+    a.path === b.path &&
+    a.color === b.color &&
+    a.domain === b.domain;
+}
+
 export function useModuleNavigation() {
   const { canAccessModule, isAuthenticated } = useAuth();
-  const activeModules = useCapabilityStore(state => state.features.activeModules);
+  // 🔧 FIX: Usar useShallow para prevenir re-renders por cambio de referencia del array
+  const activeModules = useCapabilityStore(
+    useShallow(state => state.features.activeModules)
+  );
+
+  // Store previous result to compare
+  const prevModulesRef = React.useRef<NavigationModule[]>([]);
 
   const modules = useMemo(() => {
     const startTime = performance.now();
@@ -103,32 +138,51 @@ export function useModuleNavigation() {
         }
 
         // Map module ID to ModuleName for role checking
+        // ============================================
+        // CORE MODULES
+        // ============================================
         const adminModuleNameMap: Record<string, ModuleName> = {
+          // Core
           'dashboard': 'dashboard',
-          'sales': 'sales',
-          'operations': 'operations',
-          'operations-hub': 'operations',
-          'materials': 'materials',
-          'products': 'products',
-          'staff': 'staff',
-          'scheduling': 'scheduling',
-          'fiscal': 'fiscal',
-          'billing': 'billing',
-          'finance-integrations': 'billing',
           'settings': 'settings',
           'customers': 'sales',
-          'suppliers': 'materials', // Suppliers part of materials permissions
-          'supplier-orders': 'materials', // Supplier orders part of materials permissions
+          'intelligence': 'reporting',
+
+          // Operations
+          'sales': 'sales',
+          'production': 'operations',
+          'production-kitchen': 'operations', // Legacy: renamed to production
+          'fulfillment': 'operations',
+          'fulfillment-onsite': 'operations',
+          'fulfillment-pickup': 'operations',
+          'fulfillment-delivery': 'operations',
+          'delivery': 'operations',
           'memberships': 'operations',
           'rentals': 'operations',
           'assets': 'operations',
+
+          // Supply Chain
+          'materials': 'materials',
+          'products': 'products',
+          'products-analytics': 'products', // Submodule
+          'suppliers': 'materials',
+          'supplier-orders': 'materials',
+
+          // Finance
+          'fiscal': 'fiscal',
+          'billing': 'billing',
+          'finance': 'billing',
+          'finance-integrations': 'billing',
+
+          // Resources
+          'staff': 'staff',
+          'scheduling': 'scheduling',
+
+          // Advanced
           'reporting': 'reporting',
-          'intelligence': 'reporting',
           'gamification': 'gamification',
           'executive': 'executive',
-          'finance-advanced': 'billing',
-          'operations-advanced': 'operations',
-          'advanced-tools': 'reporting',
+          'mobile': 'operations',
           'debug': 'debug'
         };
 
@@ -217,7 +271,17 @@ export function useModuleNavigation() {
     logger.performance('NavigationGeneration', 'Module navigation generation', endTime - startTime, 10);
     logger.info('NavigationGeneration', `Generated ${accessibleModules.length} accessible modules`);
 
-    return accessibleModules;
+    // ✅ FIX: Preserve array reference if content hasn't changed
+    const finalModules = getUpdatedArrayIfChanged(
+      prevModulesRef.current,
+      accessibleModules,
+      compareNavigationModules
+    );
+
+    // Update ref for next comparison
+    prevModulesRef.current = finalModules;
+
+    return finalModules;
   }, [canAccessModule, isAuthenticated, activeModules]);
 
   return modules;

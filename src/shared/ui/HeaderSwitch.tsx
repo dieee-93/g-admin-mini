@@ -92,19 +92,19 @@ export interface HeaderSwitchProps {
 
 const SIZE_CONFIG = {
   sm: {
-    padding: '6px 12px',
+    padding: '4px 12px',
     fontSize: '0.875rem',
     gap: '6px',
     iconSize: '14px'
   },
   md: {
-    padding: '8px 16px',
+    padding: '6px 16px', // Reducido de 8px a 6px (ahorro de 4px arriba + 4px abajo = 8px total por item)
     fontSize: '1rem',
     gap: '8px',
     iconSize: '16px'
   },
   lg: {
-    padding: '10px 20px',
+    padding: '8px 20px', // Reducido de 10px a 8px
     fontSize: '1.125rem',
     gap: '10px',
     iconSize: '18px'

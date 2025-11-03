@@ -10,6 +10,7 @@ export const useCompetitiveIntelligence = () => {
   const [marketTrends, setMarketTrends] = useState<MarketTrend[]>([]);
   const [marketInsights, setMarketInsights] = useState<MarketInsight[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'competitors' | 'pricing' | 'trends' | 'insights'>('overview');
 
   // Filters
@@ -17,14 +18,10 @@ export const useCompetitiveIntelligence = () => {
   const [marketPositionFilter, setMarketPositionFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Load competitive intelligence data
-  useEffect(() => {
-    loadCompetitiveData();
-  }, []);
-
-  const loadCompetitiveData = async () => {
+  const loadCompetitiveData = useCallback(async () => {
     try {
       setIsLoading(true);
+      setError(null);
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -38,11 +35,33 @@ export const useCompetitiveIntelligence = () => {
       setMarketInsights(mockInsights);
 
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar inteligencia competitiva';
+      setError(errorMessage);
       logger.error('App', 'Error loading competitive intelligence:', error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // Load competitive intelligence data
+  useEffect(() => {
+    loadCompetitiveData();
+  }, [loadCompetitiveData]);
+
+  // ⏱️ Timeout de 10 segundos
+  useEffect(() => {
+    if (!isLoading) return;
+
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        setError('Servicio no disponible. Por favor, intenta de nuevo más tarde.');
+        setIsLoading(false);
+        logger.error('App', 'Intelligence page loading timeout after 10 seconds');
+      }
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
 
   // Refresh competitive intelligence
   const refreshIntelligence = useCallback(async () => {
@@ -99,6 +118,7 @@ export const useCompetitiveIntelligence = () => {
     marketTrends,
     marketInsights,
     isLoading,
+    error,
     activeTab,
     setActiveTab,
     competitorTypeFilter,
@@ -109,6 +129,7 @@ export const useCompetitiveIntelligence = () => {
     setSearchTerm,
     refreshIntelligence,
     filteredCompetitors,
-    marketOverview
+    marketOverview,
+    retry: loadCompetitiveData,
   };
 };

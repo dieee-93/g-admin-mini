@@ -29,7 +29,7 @@ interface UnifiedAlert {
   context: string;
   priority: number;
   timestamp: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface AlertGenerationResult {

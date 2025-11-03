@@ -3,11 +3,11 @@
 // ============================================================================
 // Sistema inteligente de análisis y rating de proveedores integrado con procurement
 
-import { type Supplier, type MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+import { type Supplier } from '@/pages/admin/supply-chain/materials/types';
 import { type MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
-import { type ProcurementRecommendation } from './procurementRecommendationsEngine';
+// NOTE: ProcurementRecommendation import removed - not used after parameter cleanup
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
+// NOTE: MaterialItem, InventoryDecimal, DECIMAL_CONSTANTS imports removed - not used
 
 // ============================================================================
 // TYPES
@@ -256,10 +256,10 @@ export class SupplierAnalysisEngine {
   static async analyzeSuppliers(
     suppliers: Supplier[],
     materials: MaterialABC[],
-    procurementRecommendations: ProcurementRecommendation[] = [],
+    // NOTE: procurementRecommendations parameter removed - not used in current implementation
     config: Partial<SupplierAnalysisConfig> = {}
   ): Promise<SupplierAnalysisResult> {
-    
+
     const fullConfig = { ...this.DEFAULT_CONFIG, ...config };
     const timestamp = new Date().toISOString();
     
@@ -373,7 +373,7 @@ export class SupplierAnalysisEngine {
   // METRICS CALCULATION
   // ============================================================================
 
-  private static calculateSupplierMetrics(supplier: Supplier, materials: MaterialABC[]): SupplierMetrics {
+  private static calculateSupplierMetrics(supplier: Supplier): SupplierMetrics {
     // En producción, estas métricas vendrían de datos históricos reales
     // Por ahora generamos valores simulados pero realistas
     
@@ -578,9 +578,9 @@ export class SupplierAnalysisEngine {
   }
 
   private static identifyOpportunities(
-    supplier: Supplier, 
-    metrics: SupplierMetrics, 
-    businessAnalysis: any
+    supplier: Supplier,
+    metrics: SupplierMetrics,
+    businessAnalysis: { totalValue: number; itemCount: number }
   ): SupplierOpportunity[] {
     const opportunities: SupplierOpportunity[] = [];
     
@@ -628,8 +628,8 @@ export class SupplierAnalysisEngine {
   // ============================================================================
 
   private static evaluateConsolidationPotential(
-    supplier: Supplier, 
-    businessAnalysis: any, 
+    _supplier: Supplier,
+    businessAnalysis: { totalValue: number; itemCount: number },
     config: SupplierAnalysisConfig
   ): ConsolidationOpportunity {
     if (businessAnalysis.totalValue < config.consolidation.minValueForConsolidation) {
@@ -645,8 +645,8 @@ export class SupplierAnalysisEngine {
   }
 
   private static calculateConsolidationValue(
-    supplier: Supplier, 
-    businessAnalysis: any, 
+    _supplier: Supplier,
+    businessAnalysis: { totalValue: number },
     config: SupplierAnalysisConfig
   ): number {
     return DecimalUtils.multiply(
@@ -684,7 +684,7 @@ export class SupplierAnalysisEngine {
     return Math.round(completeness);
   }
 
-  private static calculateAnalysisConfidence(supplier: Supplier, metrics: SupplierMetrics): number {
+  private static calculateAnalysisConfidence(supplier: Supplier): number {
     let confidence = 70; // Base
     
     // Mayor confianza con más datos
@@ -744,19 +744,15 @@ export class SupplierAnalysisEngine {
     };
   }
 
-  private static identifyConsolidationOpportunities(
-    analyses: (SupplierAnalysis | null)[],
-    materials: MaterialABC[],
-    config: SupplierAnalysisConfig
-  ) {
+  private static identifyConsolidationOpportunities() {
+    // NOTE: Parameters removed - not used in current stub implementation
+    // TODO: Add analyses, materials, config when implementing full logic
     // Por ahora retorna array vacío - en producción implementaríamos lógica compleja
     return [];
   }
 
   private static generateStrategicRecommendations(
-    analyses: (SupplierAnalysis | null)[],
-    portfolioMetrics: any,
-    config: SupplierAnalysisConfig
+    portfolioMetrics: { supplierConcentration: number }
   ) {
     const recommendations = [];
     
@@ -777,8 +773,7 @@ export class SupplierAnalysisEngine {
   }
 
   private static generateSupplierAlerts(
-    analyses: (SupplierAnalysis | null)[],
-    config: SupplierAnalysisConfig
+    analyses: (SupplierAnalysis | null)[]
   ) {
     const alerts = [];
     

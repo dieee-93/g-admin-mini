@@ -34,6 +34,11 @@ export interface HookContext {
   timestamp: number;
   /** Optional metadata */
   metadata?: Record<string, any>;
+  /** Required permission to execute this hook (NEW) */
+  requiredPermission?: {
+    module: string;  // ModuleName from AuthContext
+    action: string;  // PermissionAction ('create', 'read', etc.)
+  };
 }
 
 /**
@@ -82,8 +87,14 @@ export interface ModuleManifest {
   hooks?: {
     /** Hooks this module offers to others */
     provide: string[];
-    /** Hooks this module consumes from others */
-    consume: string[];
+    /** Hooks this module consumes from others (NEW: can be string or object with permission) */
+    consume: Array<string | {
+      name: string;
+      requiredPermission?: {
+        module: string;
+        action: string;
+      };
+    }>;
   };
 
   /** Setup function (called on module registration) */

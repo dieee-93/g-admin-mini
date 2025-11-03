@@ -1,7 +1,10 @@
 /**
- * Unified CRUD Operations Hook
+ * Unified CRUD Operations Hook - v1.1
  * Eliminates ~2000 lines of duplicated CRUD logic across the application
  * Integrates perfectly with Zustand stores and React Hook Form
+ *
+ * v1.1 CHANGES:
+ * - ✅ Added request deduplication for fetchAll operations
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -11,6 +14,7 @@ import { z } from 'zod';
 import { supabase } from '@/lib/supabase/client';
 
 import { logger } from '@/lib/logging';
+import { deduplicator, generateRequestKey } from '@/lib/query/requestDeduplication'; // ✅ Deduplication
 /**
  * Configuration for CRUD operations
  */
@@ -162,7 +166,7 @@ export function useCrudOperations<T extends FieldValues>(
 
   // React Hook Form integration
   const form = useForm<T>({
-    resolver: schema ? zodResolver(schema) as any : undefined,
+    resolver: schema ? (zodResolver(schema as z.ZodType<T, any, any>) as any) : undefined,
     defaultValues,
     mode: 'onChange'
   });
@@ -235,43 +239,51 @@ export function useCrudOperations<T extends FieldValues>(
   }, []); // ✅ No dependencies
 
   // Fetch all items
+  // ✅ OPTIMIZED: Deduplicated to prevent multiple simultaneous queries
   const fetchAll = useCallback(async (): Promise<T[]> => {
-    try {
-      setLoading(true);
-      
-      // Check cache first
-      if (cache) {
-        const cached = cache.get();
-        if (cached && cache.isValid(cached.timestamp)) {
-          const transformedData = applyTransformAfterLoad(cached.data) as T[];
-          setItems(transformedData);
-          handleSuccess('read', transformedData);
-          return transformedData;
+    // Generate unique key for this specific table/query combination
+    const dedupeKey = generateRequestKey(tableName, 'fetchAll', {
+      query: selectQuery
+    });
+
+    return deduplicator.dedupe(dedupeKey, async () => {
+      try {
+        setLoading(true);
+
+        // Check cache first
+        if (cache) {
+          const cached = cache.get();
+          if (cached && cache.isValid(cached.timestamp)) {
+            const transformedData = applyTransformAfterLoad(cached.data) as T[];
+            setItems(transformedData);
+            handleSuccess('read', transformedData);
+            return transformedData;
+          }
         }
+
+        const { data, error } = await supabase
+          .from(tableName)
+          .select(selectQuery);
+
+        if (error) throw error;
+
+        const transformedData = applyTransformAfterLoad(data || []) as T[];
+        setItems(transformedData);
+
+        // Cache the results
+        if (cache) {
+          cache.set(transformedData);
+        }
+
+        handleSuccess('read', transformedData);
+        return transformedData;
+      } catch (error) {
+        handleError('read', error as Error);
+        return [];
+      } finally {
+        setLoading(false);
       }
-
-      const { data, error } = await supabase
-        .from(tableName)
-        .select(selectQuery);
-
-      if (error) throw error;
-
-      const transformedData = applyTransformAfterLoad(data || []) as T[];
-      setItems(transformedData);
-      
-      // Cache the results
-      if (cache) {
-        cache.set(transformedData);
-      }
-
-      handleSuccess('read', transformedData);
-      return transformedData;
-    } catch (error) {
-      handleError('read', error as Error);
-      return [];
-    } finally {
-      setLoading(false);
-    }
+    });
   }, [tableName, selectQuery, cache, applyTransformAfterLoad, setItems, setLoading, handleSuccess, handleError]);
 
   // Fetch single item
@@ -308,9 +320,9 @@ export function useCrudOperations<T extends FieldValues>(
       
       const { data: result, error } = await supabase
         .from(tableName)
-        .insert([transformedData])
+        .insert([transformedData] as any)
         .select()
-        .single();
+        .single() as { data: any; error: any };
 
       if (error) throw error;
 
@@ -342,9 +354,12 @@ export function useCrudOperations<T extends FieldValues>(
   const update = useCallback(async (id: string, data: Partial<T>): Promise<T> => {
     try {
       setLoading(true);
-      
-      const transformedData = transformBeforeSave ? transformBeforeSave(data as T) : data;
-      
+
+      // Transform only if we have full data, otherwise pass partial directly
+      const transformedData = transformBeforeSave && data
+        ? transformBeforeSave(data as T)
+        : data;
+
       const { data: result, error } = await supabase
         .from(tableName)
         .update(transformedData)
@@ -429,10 +444,10 @@ export function useCrudOperations<T extends FieldValues>(
       setLoading(true);
       
       const transformedItems = newItems.map(applyTransformBeforeSave);
-      
+
       const { data, error } = await supabase
         .from(tableName)
-        .insert(transformedItems)
+        .insert(transformedItems as any)
         .select();
 
       if (error) throw error;

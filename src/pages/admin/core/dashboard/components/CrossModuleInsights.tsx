@@ -202,10 +202,10 @@ export const CrossModuleInsights: React.FC = () => {
 
   return (
     <Section variant="elevated" title="Insights Cross-Module">
-      <Stack gap={8}> {/* Más espacio entre secciones */}
+      <Stack gap="8"> {/* Más espacio entre secciones */}
 
         {/* Stats de Integración - Con MetricCard arreglado */}
-        <CardGrid columns={{ base: 2, md: 4 }} gap={6}>
+        <CardGrid columns={{ base: 2, md: 4 }} gap="6">
           <MetricCard
             title="Módulos Integrados"
             value={moduleStats.totalIntegrations.toString()}
@@ -239,9 +239,9 @@ export const CrossModuleInsights: React.FC = () => {
         </CardGrid>
 
         {/* Insights Detallados - Con mejor spacing */}
-        <Stack gap={6}>
+        <Stack gap="6">
           <Stack direction="row" justify="space-between" align="center">
-            <Stack direction="row" align="center" gap={3}>
+            <Stack direction="row" align="center" gap="3">
               <Icon icon={ChartBarIcon} size="lg" />
               <Typography variant="heading" size="xl" weight="semibold">
                 Insights Inteligentes del Sistema
@@ -254,15 +254,14 @@ export const CrossModuleInsights: React.FC = () => {
               colorPalette="purple"
               onClick={runDeepAnalysis}
               loading={isAnalyzing}
-              loadingText="Analizando..."
             >
               <MagnifyingGlassIcon style={{ width: '16px', height: '16px', marginRight: '8px' }} />
-              Análisis Profundo
+              {isAnalyzing ? 'Analizando...' : 'Análisis Profundo'}
             </Button>
           </Stack>
 
           {/* Insights Grid - Usando componentes semánticos */}
-          <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
+          <SimpleGrid columns={{ base: 1, lg: 2 }} gap="6">
             {insights.map((insight) => (
               <CardWrapper
                 key={insight.id}
@@ -283,8 +282,8 @@ export const CrossModuleInsights: React.FC = () => {
                 )}
 
                 <CardWrapper.Body>
-                  <Stack gap={4}>
-                    <Stack direction="row" align="start" gap={4}>
+                  <Stack gap="4">
+                    <Stack direction="row" align="start" gap="4">
                       <Icon
                         icon={getInsightIcon(insight.type)}
                         size="lg"
@@ -295,7 +294,7 @@ export const CrossModuleInsights: React.FC = () => {
                         }
                       />
 
-                      <Stack gap={3} flex={1}>
+                      <Stack gap="3" flex={1}>
                         <Typography variant="heading" size="lg" weight="semibold" lineHeight="1.3">
                           {insight.title}
                         </Typography>
@@ -305,7 +304,7 @@ export const CrossModuleInsights: React.FC = () => {
                         </Typography>
 
                         {insight.value && (
-                          <Stack direction="row" gap={3} align="center">
+                          <Stack direction="row" gap="3" align="center">
                             <Typography variant="heading" size="xl" weight="bold" color="gray.800">
                               {insight.value}
                             </Typography>
@@ -316,7 +315,7 @@ export const CrossModuleInsights: React.FC = () => {
                         )}
 
                         {/* Módulos Tags - Usando Stack en lugar de div */}
-                        <Stack direction="row" wrap="wrap" gap={2}>
+                        <Stack direction="row" wrap="wrap" gap="2">
                           {insight.modules.map((module) => (
                             <Badge key={module} size="sm" colorPalette="gray" variant="subtle">
                               {module}
@@ -334,17 +333,17 @@ export const CrossModuleInsights: React.FC = () => {
 
         {/* Advanced Analysis Results */}
         {showAdvanced && (
-          <Stack gap={8}>
+          <Stack gap="8">
             {/* System Health Section */}
-            <Stack gap={4}>
+            <Stack gap="4">
               <Typography variant="heading" size="lg" weight="semibold">
                 🔧 Salud del Sistema (Análisis Avanzado)
               </Typography>
-              <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+              <SimpleGrid columns={{ base: 1, md: 3 }} gap="4">
                 {systemHealth.map((health, index) => (
                   <CardWrapper key={index} variant="elevated" colorPalette="gray">
                     <CardWrapper.Body>
-                      <Stack gap={3}>
+                      <Stack gap="3">
                         <Stack direction="row" justify="space-between" align="center">
                           <Typography variant="body" size="sm" weight="medium">{health.name}</Typography>
                           <Badge
@@ -368,18 +367,18 @@ export const CrossModuleInsights: React.FC = () => {
             </Stack>
 
             {/* Business Bottlenecks Section - Mejorado */}
-            <Stack gap={6}>
+            <Stack gap="6">
               <Typography variant="heading" size="lg" weight="semibold">
                 ⚠️ Business Bottlenecks Detectados
               </Typography>
               {businessBottlenecks.map((bottleneck) => (
                 <CardWrapper key={bottleneck.id} variant="elevated" colorPalette="orange">
                   <CardWrapper.Body>
-                    <Stack gap={4}>
+                    <Stack gap="4">
                       <Stack direction="row" justify="space-between" align="start">
-                        <Stack gap={2}>
+                        <Stack gap="2">
                           <Typography variant="heading" size="lg" weight="bold">{bottleneck.name}</Typography>
-                          <Stack direction="row" gap={2}>
+                          <Stack direction="row" gap="2">
                             <Badge size="sm" colorPalette="orange">{bottleneck.severity}</Badge>
                             <Badge size="sm" colorPalette="gray">{bottleneck.type}</Badge>
                             <Badge size="sm" colorPalette="blue">Priority {bottleneck.priority}/10</Badge>
@@ -394,20 +393,20 @@ export const CrossModuleInsights: React.FC = () => {
                       {/* Impact Grid - Usando SimpleGrid */}
                       <CardWrapper variant="subtle" colorPalette="gray">
                         <CardWrapper.Body>
-                          <SimpleGrid columns={3} gap={4} textAlign="center">
-                            <Box>
+                          <SimpleGrid columns={3} gap="4">
+                            <Box textAlign="center">
                               <Typography variant="heading" size="lg" weight="bold" color="red.600">
                                 ${Math.abs(bottleneck.estimatedImpact.financial)}
                               </Typography>
                               <Typography variant="body" size="xs" color="gray.600">Pérdida Financiera</Typography>
                             </Box>
-                            <Box>
+                            <Box textAlign="center">
                               <Typography variant="heading" size="lg" weight="bold" color="orange.600">
                                 -{bottleneck.estimatedImpact.operational}%
                               </Typography>
                               <Typography variant="body" size="xs" color="gray.600">Eficiencia</Typography>
                             </Box>
-                            <Box>
+                            <Box textAlign="center">
                               <Typography variant="heading" size="lg" weight="bold" color="yellow.600">
                                 -{bottleneck.estimatedImpact.customer}%
                               </Typography>
@@ -418,13 +417,13 @@ export const CrossModuleInsights: React.FC = () => {
                       </CardWrapper>
 
                       {/* Recommendations - Usando Card */}
-                      <Stack gap={2}>
+                      <Stack gap="2">
                         <Typography variant="body" size="sm" weight="semibold">Recomendación:</Typography>
                         {bottleneck.recommendations.map((rec, idx) => (
                           <CardWrapper key={idx} variant="subtle" colorPalette="blue">
                             <CardWrapper.Body>
                               <Typography variant="body" size="md" lineHeight="1.4">{rec.action}</Typography>
-                              <Stack direction="row" gap={4} mt={2}>
+                              <Stack direction="row" gap="4" mt="2">
                                 <Typography variant="body" size="sm" color="gray.600">
                                   Esfuerzo: <strong>{rec.effort}</strong>
                                 </Typography>
@@ -444,7 +443,7 @@ export const CrossModuleInsights: React.FC = () => {
                       </Stack>
 
                       {/* Affected Modules - Usando Stack */}
-                      <Stack direction="row" wrap="wrap" gap={2}>
+                      <Stack direction="row" wrap="wrap" gap="2">
                         {bottleneck.affectedModules.map((module) => (
                           <Badge key={module} size="sm" colorPalette="blue" variant="subtle">{module}</Badge>
                         ))}
@@ -460,8 +459,8 @@ export const CrossModuleInsights: React.FC = () => {
         {/* Resumen de Impacto - Usando Card + SimpleGrid */}
         <CardWrapper variant="elevated" colorPalette="blue">
           <CardWrapper.Body>
-            <SimpleGrid columns={{ base: 1, md: 3 }} gap={6} textAlign="center">
-              <Box>
+            <SimpleGrid columns={{ base: 1, md: 3 }} gap="6">
+              <Box textAlign="center">
                 <Typography variant="heading" size="3xl" weight="bold" color="blue.600">
                   $195K+
                 </Typography>
@@ -469,7 +468,7 @@ export const CrossModuleInsights: React.FC = () => {
                   Impacto financiero anual
                 </Typography>
               </Box>
-              <Box>
+              <Box textAlign="center">
                 <Typography variant="heading" size="3xl" weight="bold" color="green.600">
                   23%
                 </Typography>
@@ -477,7 +476,7 @@ export const CrossModuleInsights: React.FC = () => {
                   Mejora promedio eficiencia
                 </Typography>
               </Box>
-              <Box>
+              <Box textAlign="center">
                 <Typography variant="heading" size="3xl" weight="bold" color="purple.600">
                   6
                 </Typography>

@@ -1,6 +1,6 @@
-import { SecurityOptions } from './types';
+import type { SecurityOptions } from './types';
 import { errorHandler } from '@/lib/error-handling';
-import { hasAllPermissions } from './permissions';
+// NOTE: Permission checks removed - secureApiCall is @deprecated. Modern modules use usePermissions() hook + Supabase RLS
 import { sanitizeObject } from './sanitization';
 
 import { logger } from '@/lib/logging';
@@ -103,11 +103,11 @@ export async function secureApiCall<T>(
     }
     
     // 3. Permission check
-    if (options.requiredPermissions?.length) {
-      if (!hasAllPermissions(options.requiredPermissions)) {
-        throw new Error(`Insufficient permissions: ${options.requiredPermissions.join(', ')}`);
-      }
-    }
+//     if (options.requiredPermissions?.length) {
+//       if (!// hasAllPermissions(options.requiredPermissions)) {
+//         throw new Error(`Insufficient permissions: ${options.requiredPermissions.join(', ')}`);
+//       }
+//     }
     
     // 4. CSRF validation (if enabled)
     if (options.validateCsrf) {

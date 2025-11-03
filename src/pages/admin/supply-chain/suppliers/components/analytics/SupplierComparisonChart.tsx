@@ -1,11 +1,27 @@
 // ============================================
 // SUPPLIER COMPARISON CHART
 // ============================================
-// Visual comparison of multiple suppliers
+// Visual comparison of multiple suppliers using Recharts
 
-import { VStack, Text, Card, HStack, Badge, SimpleGrid } from '@/shared/ui';
+import { VStack, Text, Card, HStack, Badge, Box, Tabs } from '@/shared/ui';
 import type { SupplierAnalysis } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
 import { useMemo } from 'react';
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Cell
+} from 'recharts';
 
 interface SupplierComparisonChartProps {
   data: SupplierAnalysis[];
@@ -13,8 +29,8 @@ interface SupplierComparisonChartProps {
 
 /**
  * Supplier Comparison Chart Component
- * Shows visual comparison between suppliers
- * TODO: Integrate with actual chart library (Recharts) for production
+ * Shows visual comparison between suppliers using Recharts
+ * Provides both Radar Chart and Bar Chart visualizations
  */
 export function SupplierComparisonChart({ data }: SupplierComparisonChartProps) {
   // Sort suppliers by overall rating
@@ -22,184 +38,216 @@ export function SupplierComparisonChart({ data }: SupplierComparisonChartProps) 
     return [...data].sort((a, b) => b.overallRating - a.overallRating);
   }, [data]);
 
+  // Prepare data for Radar Chart (compare top 3 suppliers)
+  const radarData = useMemo(() => {
+    const top3 = sortedSuppliers.slice(0, 3);
+
+    return [
+      {
+        metric: 'Calidad',
+        ...Object.fromEntries(top3.map((s, idx) => [`supplier${idx}`, s.metrics.qualityScore]))
+      },
+      {
+        metric: 'Entregas',
+        ...Object.fromEntries(top3.map((s, idx) => [`supplier${idx}`, s.metrics.onTimeDeliveryRate]))
+      },
+      {
+        metric: 'Estabilidad',
+        ...Object.fromEntries(top3.map((s, idx) => [`supplier${idx}`, s.metrics.costStability]))
+      },
+      {
+        metric: 'Servicio',
+        ...Object.fromEntries(top3.map((s, idx) => [`supplier${idx}`, s.metrics.responsiveness]))
+      }
+    ];
+  }, [sortedSuppliers]);
+
+  // Prepare data for Bar Chart (all suppliers by rating)
+  const barData = useMemo(() => {
+    return sortedSuppliers.map(supplier => ({
+      name: supplier.name.length > 20 ? supplier.name.substring(0, 20) + '...' : supplier.name,
+      fullName: supplier.name,
+      rating: supplier.overallRating,
+      itemCount: supplier.itemCount,
+      totalValue: supplier.totalAnnualValue
+    }));
+  }, [sortedSuppliers]);
+
+  const top3Suppliers = sortedSuppliers.slice(0, 3);
+  const supplierColors = ['#3b82f6', '#10b981', '#f59e0b']; // blue, green, orange
+
   return (
-    <VStack align="stretch" gap={4}>
+    <VStack align="stretch" gap="6">
       <Text fontSize="xl" fontWeight="bold">
-        Comparación de Proveedores (por Rating)
+        Comparación Visual de Proveedores
       </Text>
 
-      {/* Bar Chart Representation */}
-      <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4}>
-        {sortedSuppliers.map(supplier => (
-          <Card.Root key={supplier.id}>
+      <Tabs.Root defaultValue="radar" variant="enclosed">
+        <Tabs.List>
+          <Tabs.Trigger value="radar">Vista Radar (Top 3)</Tabs.Trigger>
+          <Tabs.Trigger value="bar">Vista Barras (Todos)</Tabs.Trigger>
+        </Tabs.List>
+
+        {/* Radar Chart - Top 3 Suppliers */}
+        <Tabs.Content value="radar">
+          <Card.Root>
             <Card.Body>
-              <VStack align="stretch" gap={3}>
-                {/* Supplier Header */}
-                <HStack justify="space-between">
-                  <Text fontWeight="bold">{supplier.name}</Text>
-                  <Badge colorPalette={getRatingColor(supplier.overallRating)}>
-                    {supplier.overallRating.toFixed(0)}
-                  </Badge>
-                </HStack>
+              <VStack align="stretch" gap="4">
+                <Text fontSize="md" fontWeight="semibold">
+                  Comparación de Métricas - Top 3 Proveedores
+                </Text>
 
-                {/* Metrics Bars */}
-                <VStack align="stretch" gap={2}>
-                  <MetricBar
-                    label="Calidad"
-                    value={supplier.metrics.qualityScore}
-                    color={getMetricColor(supplier.metrics.qualityScore)}
-                  />
-                  <MetricBar
-                    label="Entregas"
-                    value={supplier.metrics.onTimeDeliveryRate}
-                    color={getMetricColor(supplier.metrics.onTimeDeliveryRate)}
-                  />
-                  <MetricBar
-                    label="Estabilidad"
-                    value={supplier.metrics.costStability}
-                    color={getMetricColor(supplier.metrics.costStability)}
-                  />
-                  <MetricBar
-                    label="Servicio"
-                    value={supplier.metrics.responsiveness}
-                    color={getMetricColor(supplier.metrics.responsiveness)}
-                  />
-                </VStack>
+                <Box height="400px" width="full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart data={radarData}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="metric" />
+                      <PolarRadiusAxis angle={90} domain={[0, 100]} />
+                      {top3Suppliers.map((supplier, idx) => (
+                        <Radar
+                          key={supplier.id}
+                          name={supplier.name}
+                          dataKey={`supplier${idx}`}
+                          stroke={supplierColors[idx]}
+                          fill={supplierColors[idx]}
+                          fillOpacity={0.3}
+                        />
+                      ))}
+                      <Legend />
+                      <Tooltip />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </Box>
 
-                {/* Summary */}
-                <HStack justify="space-between" fontSize="sm" color="fg.muted">
-                  <Text>{supplier.itemCount} items</Text>
-                  <Text>
-                    {new Intl.NumberFormat('es-AR', {
-                      style: 'currency',
-                      currency: 'ARS',
-                      minimumFractionDigits: 0
-                    }).format(supplier.totalAnnualValue)}
-                  </Text>
+                {/* Top 3 Summary */}
+                <HStack justify="space-around" flexWrap="wrap" gap="4">
+                  {top3Suppliers.map((supplier, idx) => (
+                    <VStack key={supplier.id} gap="1">
+                      <HStack gap="2">
+                        <div
+                          style={{
+                            width: 16,
+                            height: 16,
+                            backgroundColor: supplierColors[idx],
+                            borderRadius: 4
+                          }}
+                        />
+                        <Text fontSize="sm" fontWeight="semibold">
+                          {supplier.name}
+                        </Text>
+                      </HStack>
+                      <HStack gap="1">
+                        <Badge colorPalette={getRatingColor(supplier.overallRating)} size="sm">
+                          {supplier.overallRating.toFixed(0)}
+                        </Badge>
+                        <Text fontSize="xs" color="fg.muted">
+                          {supplier.itemCount} items
+                        </Text>
+                      </HStack>
+                    </VStack>
+                  ))}
                 </HStack>
               </VStack>
             </Card.Body>
           </Card.Root>
-        ))}
-      </SimpleGrid>
+        </Tabs.Content>
 
-      {/* Legend */}
-      <Card.Root>
-        <Card.Body>
-          <HStack justify="center" gap={4} flexWrap="wrap">
-            <HStack>
-              <div
-                style={{
-                  width: 16,
-                  height: 16,
-                  backgroundColor: 'var(--chakra-colors-green-500)',
-                  borderRadius: 4
-                }}
-              />
-              <Text fontSize="sm">Excelente (85+)</Text>
-            </HStack>
-            <HStack>
-              <div
-                style={{
-                  width: 16,
-                  height: 16,
-                  backgroundColor: 'var(--chakra-colors-blue-500)',
-                  borderRadius: 4
-                }}
-              />
-              <Text fontSize="sm">Bueno (70-84)</Text>
-            </HStack>
-            <HStack>
-              <div
-                style={{
-                  width: 16,
-                  height: 16,
-                  backgroundColor: 'var(--chakra-colors-yellow-500)',
-                  borderRadius: 4
-                }}
-              />
-              <Text fontSize="sm">Regular (55-69)</Text>
-            </HStack>
-            <HStack>
-              <div
-                style={{
-                  width: 16,
-                  height: 16,
-                  backgroundColor: 'var(--chakra-colors-orange-500)',
-                  borderRadius: 4
-                }}
-              />
-              <Text fontSize="sm">Malo (40-54)</Text>
-            </HStack>
-            <HStack>
-              <div
-                style={{
-                  width: 16,
-                  height: 16,
-                  backgroundColor: 'var(--chakra-colors-red-500)',
-                  borderRadius: 4
-                }}
-              />
-              <Text fontSize="sm">Crítico (&lt;40)</Text>
-            </HStack>
-          </HStack>
-        </Card.Body>
-      </Card.Root>
+        {/* Bar Chart - All Suppliers */}
+        <Tabs.Content value="bar">
+          <Card.Root>
+            <Card.Body>
+              <VStack align="stretch" gap="4">
+                <Text fontSize="md" fontWeight="semibold">
+                  Rating General por Proveedor
+                </Text>
+
+                <Box height="400px" width="full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={barData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="name"
+                        angle={-45}
+                        textAnchor="end"
+                        height={100}
+                        fontSize={12}
+                      />
+                      <YAxis domain={[0, 100]} label={{ value: 'Rating', angle: -90, position: 'insideLeft' }} />
+                      <Tooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <Card.Root size="sm">
+                                <Card.Body p="3">
+                                  <VStack align="start" gap="1">
+                                    <Text fontSize="sm" fontWeight="bold">
+                                      {data.fullName}
+                                    </Text>
+                                    <Text fontSize="sm">
+                                      Rating: {data.rating.toFixed(0)}
+                                    </Text>
+                                    <Text fontSize="xs" color="fg.muted">
+                                      {data.itemCount} items
+                                    </Text>
+                                    <Text fontSize="xs" color="fg.muted">
+                                      {new Intl.NumberFormat('es-AR', {
+                                        style: 'currency',
+                                        currency: 'ARS',
+                                        minimumFractionDigits: 0
+                                      }).format(data.totalValue)}
+                                    </Text>
+                                  </VStack>
+                                </Card.Body>
+                              </Card.Root>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Bar dataKey="rating">
+                        {barData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={getBarColor(entry.rating)} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Box>
+
+                {/* Legend */}
+                <HStack justify="center" gap="4" flexWrap="wrap">
+                  <HStack>
+                    <div style={{ width: 16, height: 16, backgroundColor: '#10b981', borderRadius: 4 }} />
+                    <Text fontSize="sm">Excelente (85+)</Text>
+                  </HStack>
+                  <HStack>
+                    <div style={{ width: 16, height: 16, backgroundColor: '#3b82f6', borderRadius: 4 }} />
+                    <Text fontSize="sm">Bueno (70-84)</Text>
+                  </HStack>
+                  <HStack>
+                    <div style={{ width: 16, height: 16, backgroundColor: '#eab308', borderRadius: 4 }} />
+                    <Text fontSize="sm">Regular (55-69)</Text>
+                  </HStack>
+                  <HStack>
+                    <div style={{ width: 16, height: 16, backgroundColor: '#f97316', borderRadius: 4 }} />
+                    <Text fontSize="sm">Malo (40-54)</Text>
+                  </HStack>
+                  <HStack>
+                    <div style={{ width: 16, height: 16, backgroundColor: '#ef4444', borderRadius: 4 }} />
+                    <Text fontSize="sm">Crítico (&lt;40)</Text>
+                  </HStack>
+                </HStack>
+              </VStack>
+            </Card.Body>
+          </Card.Root>
+        </Tabs.Content>
+      </Tabs.Root>
     </VStack>
   );
 }
 
 /**
- * Metric Bar Component
- */
-interface MetricBarProps {
-  label: string;
-  value: number;
-  color: string;
-}
-
-function MetricBar({ label, value, color }: MetricBarProps) {
-  return (
-    <VStack align="stretch" gap={1}>
-      <HStack justify="space-between" fontSize="sm">
-        <Text color="fg.muted">{label}</Text>
-        <Text fontWeight="semibold">{value.toFixed(0)}</Text>
-      </HStack>
-      <div
-        style={{
-          width: '100%',
-          height: 8,
-          backgroundColor: 'var(--chakra-colors-gray-200)',
-          borderRadius: 4,
-          overflow: 'hidden'
-        }}
-      >
-        <div
-          style={{
-            width: `${value}%`,
-            height: '100%',
-            backgroundColor: `var(--chakra-colors-${color}-500)`,
-            transition: 'width 0.3s ease'
-          }}
-        />
-      </div>
-    </VStack>
-  );
-}
-
-/**
- * Get color based on metric value
- */
-function getMetricColor(value: number): string {
-  if (value >= 85) return 'green';
-  if (value >= 70) return 'blue';
-  if (value >= 55) return 'yellow';
-  if (value >= 40) return 'orange';
-  return 'red';
-}
-
-/**
- * Get color based on rating
+ * Get color palette based on rating (for Chakra Badge)
  */
 function getRatingColor(rating: number): string {
   if (rating >= 85) return 'green';
@@ -207,4 +255,15 @@ function getRatingColor(rating: number): string {
   if (rating >= 55) return 'yellow';
   if (rating >= 40) return 'orange';
   return 'red';
+}
+
+/**
+ * Get hex color for bar chart based on rating
+ */
+function getBarColor(rating: number): string {
+  if (rating >= 85) return '#10b981'; // green
+  if (rating >= 70) return '#3b82f6'; // blue
+  if (rating >= 55) return '#eab308'; // yellow
+  if (rating >= 40) return '#f97316'; // orange
+  return '#ef4444'; // red
 }

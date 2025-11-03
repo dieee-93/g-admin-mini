@@ -4,8 +4,10 @@
 // Sistema inteligente de alertas para análisis de revenue patterns,
 // conversion optimization y customer behavior analytics
 
-import { FinancialDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
-import { formatCurrency, safeAdd, safeMul, safeDiv } from '@/business-logic/shared/decimalUtils';
+// import { FinancialDecimal } from '@/config/decimal-config'; // TODO: Use for decimal operations
+// import { DECIMAL_CONSTANTS } from '@/config/decimal-config'; // TODO: Use for constants
+import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+// import { safeAdd, safeMul, safeDiv } from '@/business-logic/shared/decimalUtils'; // TODO: Use for calculations
 
 // ============================================================================
 // TYPES
@@ -22,6 +24,39 @@ export type SalesAlertType =
   | 'customer_churn_risk'
   | 'cross_module_impact'
   | 'predictive_opportunity';
+
+// Specific types for alert data
+export interface SalesAlertCorrelationData {
+  weeklyTrend?: number;
+  seasonalFactor?: number;
+  crossModuleImpact?: {
+    materials?: number;
+    staff?: number;
+    kitchen?: number;
+  };
+  performanceComparison?: {
+    vsYesterday?: number;
+    vsLastWeek?: number;
+    vsAverage?: number;
+  };
+  // Allow additional dynamic fields
+  [key: string]: string | number | Record<string, number> | undefined;
+}
+
+export interface SalesAlertContextData {
+  hourlyBreakdown?: number[];
+  expectedEndOfDayRevenue?: number;
+  actionsSuggested?: string[];
+  peakHourOpportunities?: number[];
+  staffingRecommendations?: string[];
+  customerSegments?: {
+    new?: number;
+    returning?: number;
+    vip?: number;
+  };
+  // Allow additional dynamic fields
+  [key: string]: string | number | string[] | number[] | Record<string, number> | undefined;
+}
 
 export interface SalesAlert {
   id: string;
@@ -43,7 +78,7 @@ export interface SalesAlert {
 
   // Cross-module correlations
   affectedModules: string[];
-  correlationData: Record<string, any>;
+  correlationData: SalesAlertCorrelationData;
 
   // Metadata
   generatedAt: string;
@@ -53,7 +88,7 @@ export interface SalesAlert {
   acknowledgedBy?: string;
 
   // Context data para análisis
-  contextData: Record<string, any>;
+  contextData: SalesAlertContextData;
 }
 
 export interface SalesAnalysisData {
@@ -420,7 +455,8 @@ export class SalesIntelligenceEngine {
     timestamp: string
   ): SalesAlert[] {
     const alerts: SalesAlert[] = [];
-    const { materialsStockCritical, staffCapacity, kitchenEfficiency } = data;
+    const { materialsStockCritical, staffCapacity } = data;
+    // const kitchenEfficiency = data.kitchenEfficiency; // TODO: Use for kitchen performance alerts
 
     // Stock impact on sales
     if (materialsStockCritical > 0) {
@@ -608,7 +644,8 @@ export class SalesIntelligenceEngine {
     return 'neutral';
   }
 
-  private static identifyRecoveryOpportunities(data: SalesAnalysisData): string[] {
+  private static identifyRecoveryOpportunities(/* data: SalesAnalysisData */): string[] {
+    // TODO: Use data parameter to generate data-driven recommendations
     return [
       'Activar promociones de última hora',
       'Optimizar delivery/takeout',

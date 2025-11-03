@@ -1,27 +1,23 @@
 // Staff Management Section - HR functions and permissions with security compliance
 import { useState } from 'react';
-import { 
-  Box, 
-  VStack, 
-  HStack, 
-  Text, 
-  Select, 
-  Badge, 
+import {
+  Box,
+  VStack,
+  HStack,
+  Text,
+  Select,
+  Badge,
   SimpleGrid,
   Button,
   Avatar,
-  IconButton,
   Tabs,
   Switch,
   Table,
   Alert,
-  Separator,
-  CheckboxGroup,
-  Flex,
   createListCollection
 } from '@chakra-ui/react';
-import { Icon, InputField, CardWrapper } from '@/shared/ui/';
-import { 
+import { Icon, CardWrapper } from '@/shared/ui/';
+import {
   ShieldCheckIcon,
   CogIcon,
   BanknotesIcon,
@@ -35,12 +31,15 @@ import {
   LockClosedIcon,
   PlusIcon,
   PencilIcon,
-  TrashIcon,
   CheckCircleIcon,
   ChartBarIcon
 } from '@heroicons/react/24/outline';
 
-import type { Employee, StaffViewState, UserRole, Permission } from '../../types';
+import type { StaffViewState, Permission } from '../../types';
+
+// TODO: Implement permission management CRUD operations
+// TODO: Implement payroll generation functionality
+// TODO: Implement compliance reporting
 import { LaborCostDashboard } from '../LaborCostDashboard';
 
 interface ManagementSectionProps {
@@ -84,13 +83,14 @@ const mockPayrollData = [
   }
 ];
 
-const mockPermissions: Permission[] = [
-  { resource: 'staff', actions: ['read', 'write', 'manage'] },
-  { resource: 'performance', actions: ['read', 'write'] },
-  { resource: 'training', actions: ['read', 'write'] },
-  { resource: 'payroll', actions: ['read'] },
-  { resource: 'scheduling', actions: ['read', 'write', 'manage'] }
-];
+// TODO: Use mockPermissions for permission management UI
+// const mockPermissions: Permission[] = [
+//   { resource: 'staff', actions: ['read', 'write', 'manage'] },
+//   { resource: 'performance', actions: ['read', 'write'] },
+//   { resource: 'training', actions: ['read', 'write'] },
+//   { resource: 'payroll', actions: ['read'] },
+//   { resource: 'scheduling', actions: ['read', 'write', 'manage'] }
+// ];
 
 const mockAuditLog = [
   {
@@ -122,15 +122,14 @@ const mockAuditLog = [
   }
 ];
 
-export function ManagementSection({ viewState, onViewStateChange }: ManagementSectionProps) {
+export function ManagementSection({ viewState: _viewState, onViewStateChange: _onViewStateChange }: ManagementSectionProps) {
   const [activeTab, setActiveTab] = useState<'payroll' | 'labor-costs' | 'permissions' | 'audit' | 'settings'>('payroll');
   const [showSensitiveData, setShowSensitiveData] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
 
   // Mock current user permissions (in real app, this would come from auth context)
   const currentUserRole = 'admin'; // admin, hr, manager, supervisor, employee
-  
-  const hasPermission = (resource: string, action: string) => {
+
+  const hasPermission = (resource: string, _action: string) => {
     // Security check - only admin and HR can see payroll
     if (resource === 'payroll' && !['admin', 'hr'].includes(currentUserRole)) {
       return false;
@@ -151,18 +150,19 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
     return showSensitiveData ? `$${value.toLocaleString()}` : '$***';
   };
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'admin': return 'purple';
-      case 'manager': return 'blue';
-      case 'supervisor': return 'teal';
-      case 'employee': return 'gray';
-      default: return 'gray';
-    }
-  };
+  // TODO: Use getRoleBadgeColor when implementing role management UI
+  // const getRoleBadgeColor = (role: string) => {
+  //   switch (role) {
+  //     case 'admin': return 'purple';
+  //     case 'manager': return 'blue';
+  //     case 'supervisor': return 'teal';
+  //     case 'employee': return 'gray';
+  //     default: return 'gray';
+  //   }
+  // };
 
   return (
-    <VStack gap="6" align="stretch">
+    <Stack direction="column" gap="6" align="stretch">
       {/* Security Alert */}
       <Alert.Root status="warning" variant="subtle">
         <Icon icon={ExclamationTriangleIcon} size="md" />
@@ -176,43 +176,43 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
         <CardWrapper>
           <CardWrapper.Body textAlign="center">
-            <VStack gap="2">
+            <Stack direction="column" gap="2">
               <Icon icon={BanknotesIcon} size="lg" color="var(--chakra-colors-green-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="lg" fontWeight="bold">
                 {showSensitiveData ? '$127,350' : '$***,***'}
               </Text>
               <Text fontSize="sm" color="gray.600">Nómina Total/Mes</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center">
-            <VStack gap="2">
+            <Stack direction="column" gap="2">
               <Icon icon={ShieldCheckIcon} size="lg" color="var(--chakra-colors-blue-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="lg" fontWeight="bold">24</Text>
               <Text fontSize="sm" color="gray.600">Usuarios Activos</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center">
-            <VStack gap="2">
+            <Stack direction="column" gap="2">
               <Icon icon={ClockIcon} size="lg" color="var(--chakra-colors-orange-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="lg" fontWeight="bold">3</Text>
               <Text fontSize="sm" color="gray.600">Revisiones Pendientes</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
 
         <CardWrapper>
           <CardWrapper.Body textAlign="center">
-            <VStack gap="2">
+            <Stack direction="column" gap="2">
               <Icon icon={DocumentTextIcon} size="lg" color="var(--chakra-colors-purple-500)" style={{marginLeft: 'auto', marginRight: 'auto'}} />
               <Text fontSize="lg" fontWeight="bold">156</Text>
               <Text fontSize="sm" color="gray.600">Acciones Auditadas</Text>
-            </VStack>
+            </Stack>
           </CardWrapper.Body>
         </CardWrapper>
       </SimpleGrid>
@@ -220,14 +220,14 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
       {/* Data Visibility Control */}
       <CardWrapper>
         <CardWrapper.Body>
-          <HStack justify="space-between" align="center">
-            <VStack align="start" gap="1">
+          <Stack direction="row" justify="space-between" align="center">
+            <Stack direction="column" align="start" gap="1">
               <Text fontWeight="semibold">Mostrar Datos Sensibles</Text>
               <Text fontSize="sm" color="gray.600">
                 Habilita la visualización de salarios y datos personales
               </Text>
-            </VStack>
-            <HStack gap="2">
+            </Stack>
+            <Stack direction="row" gap="2">
               {showSensitiveData ? (
                 <Icon icon={EyeSlashIcon} size="md" color="var(--chakra-colors-gray-500)" />
               ) : (
@@ -238,15 +238,15 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                 onCheckedChange={(details) => setShowSensitiveData(details.checked)}
                 size="lg"
               />
-            </HStack>
-          </HStack>
+            </Stack>
+          </Stack>
         </CardWrapper.Body>
       </CardWrapper>
 
       {/* Management Tabs */}
       <CardWrapper>
         <CardWrapper.Body p="0">
-          <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
+          <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as 'payroll' | 'labor-costs' | 'permissions' | 'audit' | 'settings')}>
             <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
               <Tabs.Trigger value="payroll" gap="2" flex="1" minH="44px">
                 <Icon icon={BanknotesIcon} size="md" />
@@ -278,8 +278,8 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
               {/* Payroll Tab */}
               <Tabs.Content value="payroll">
                 {hasPermission('payroll', 'read') ? (
-                  <VStack gap="4" align="stretch">
-                    <HStack justify="space-between">
+                  <Stack direction="column" gap="4" align="stretch">
+                    <Stack direction="row" justify="space-between">
                       <Text fontSize="lg" fontWeight="semibold">Gestión de Nómina</Text>
                       <Button 
                         colorPalette="green"
@@ -288,7 +288,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                         <Icon icon={PlusIcon} size="sm" style={{marginRight: '8px'}} />
                         Procesar Nómina
                       </Button>
-                    </HStack>
+                    </Stack>
 
                     <Table.Root size="sm" variant="outline">
                       <Table.Header>
@@ -306,12 +306,12 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                         {mockPayrollData.map((payroll) => (
                           <Table.Row key={payroll.employee_id}>
                             <Table.Cell>
-                              <HStack gap="2">
+                              <Stack direction="row" gap="2">
                                 <Avatar.Root size="xs"  >
                                   <Avatar.Fallback name={payroll.employee_id}/>
                                 </Avatar.Root>
                                 <Text fontSize="sm">{payroll.employee_id}</Text>
-                              </HStack>
+                              </Stack>
                             </Table.Cell>
                             <Table.Cell>
                               <Badge size="xs" colorPalette={payroll.salary ? 'blue' : 'green'}>
@@ -343,7 +343,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                               </Text>
                             </Table.Cell>
                             <Table.Cell>
-                              <HStack gap="1">
+                              <Stack direction="row" gap="1">
                                 <IconButton
                                   size="xs"
                                   variant="ghost"
@@ -352,25 +352,25 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 >
                                   <Icon icon={PencilIcon} size="xs" />
                                 </IconButton>
-                              </HStack>
+                              </Stack>
                             </Table.Cell>
                           </Table.Row>
                         ))}
                       </Table.Body>
                     </Table.Root>
-                  </VStack>
+                  </Stack>
                 ) : (
                   <CardWrapper>
                     <CardWrapper.Body py="12" textAlign="center">
-                      <VStack gap="4">
+                      <Stack direction="column" gap="4">
                         <LockClosedIcon className="w-12 h-12 text-gray-400 mx-auto" />
-                        <VStack gap="2">
+                        <Stack direction="column" gap="2">
                           <Text fontSize="lg" fontWeight="semibold">Acceso Restringido</Text>
                           <Text color="gray.600">
                             No tienes permisos para ver información de nómina
                           </Text>
-                        </VStack>
-                      </VStack>
+                        </Stack>
+                      </Stack>
                     </CardWrapper.Body>
                   </CardWrapper>
                 )}
@@ -383,15 +383,15 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                 ) : (
                   <CardWrapper>
                     <CardWrapper.Body py="12" textAlign="center">
-                      <VStack gap="4">
+                      <Stack direction="column" gap="4">
                         <LockClosedIcon className="w-12 h-12 text-gray-400 mx-auto" />
-                        <VStack gap="2">
+                        <Stack direction="column" gap="2">
                           <Text fontSize="lg" fontWeight="semibold">Acceso Restringido</Text>
                           <Text color="gray.600">
                             No tienes permisos para ver información de costos laborales
                           </Text>
-                        </VStack>
-                      </VStack>
+                        </Stack>
+                      </Stack>
                     </CardWrapper.Body>
                   </CardWrapper>
                 )}
@@ -399,8 +399,8 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
 
               {/* Permissions Tab */}
               <Tabs.Content value="permissions">
-                <VStack gap="4" align="stretch">
-                  <HStack justify="space-between">
+                <Stack direction="column" gap="4" align="stretch">
+                  <Stack direction="row" justify="space-between">
                     <Text fontSize="lg" fontWeight="semibold">Gestión de Permisos</Text>
                     <Button 
                       colorPalette="blue"
@@ -409,198 +409,198 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                       <UserPlusIcon className="w-4 h-4 mr-2" />
                       Nuevo Rol
                     </Button>
-                  </HStack>
+                  </Stack>
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                     {/* Admin Role */}
                     <CardWrapper>
                       <CardWrapper.Body>
-                        <VStack align="stretch" gap="4">
-                          <HStack justify="space-between">
-                            <VStack align="start" gap="1">
-                              <HStack gap="2">
+                        <Stack direction="column" align="stretch" gap="4">
+                          <Stack direction="row" justify="space-between">
+                            <Stack direction="column" align="start" gap="1">
+                              <Stack direction="row" gap="2">
                                 <Text fontWeight="semibold">Administrador</Text>
                                 <Badge colorPalette="purple" size="sm">ADMIN</Badge>
-                              </HStack>
+                              </Stack>
                               <Text fontSize="sm" color="gray.600">Acceso completo al sistema</Text>
-                            </VStack>
+                            </Stack>
                             <Text fontSize="sm" color="gray.500">1 usuario</Text>
-                          </HStack>
+                          </Stack>
 
                           <Box>
                             <Text fontSize="sm" fontWeight="medium" mb="2">Permisos</Text>
-                            <VStack align="start" gap="1">
-                              <HStack gap="2">
+                            <Stack direction="column" align="start" gap="1">
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Personal: Gestión completa</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Nómina: Lectura/Escritura</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Horarios: Gestión completa</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Entrenamientos: Gestión completa</Text>
-                              </HStack>
-                            </VStack>
+                              </Stack>
+                            </Stack>
                           </Box>
 
                           <Button size="sm" variant="outline" w="full">
                             <PencilIcon className="w-4 h-4 mr-2" />
                             Editar Permisos
                           </Button>
-                        </VStack>
+                        </Stack>
                       </CardWrapper.Body>
                     </CardWrapper>
 
                     {/* Manager Role */}
                     <CardWrapper>
                       <CardWrapper.Body>
-                        <VStack align="stretch" gap="4">
-                          <HStack justify="space-between">
-                            <VStack align="start" gap="1">
-                              <HStack gap="2">
+                        <Stack direction="column" align="stretch" gap="4">
+                          <Stack direction="row" justify="space-between">
+                            <Stack direction="column" align="start" gap="1">
+                              <Stack direction="row" gap="2">
                                 <Text fontWeight="semibold">Gerente</Text>
                                 <Badge colorPalette="blue" size="sm">MANAGER</Badge>
-                              </HStack>
+                              </Stack>
                               <Text fontSize="sm" color="gray.600">Gestión de equipo y operaciones</Text>
-                            </VStack>
+                            </Stack>
                             <Text fontSize="sm" color="gray.500">3 usuarios</Text>
-                          </HStack>
+                          </Stack>
 
                           <Box>
                             <Text fontSize="sm" fontWeight="medium" mb="2">Permisos</Text>
-                            <VStack align="start" gap="1">
-                              <HStack gap="2">
+                            <Stack direction="column" align="start" gap="1">
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Personal: Lectura/Escritura</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Rendimiento: Lectura/Escritura</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Horarios: Gestión completa</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Entrenamientos: Lectura/Escritura</Text>
-                              </HStack>
-                            </VStack>
+                              </Stack>
+                            </Stack>
                           </Box>
 
                           <Button size="sm" variant="outline" w="full">
                             <PencilIcon className="w-4 h-4 mr-2" />
                             Editar Permisos
                           </Button>
-                        </VStack>
+                        </Stack>
                       </CardWrapper.Body>
                     </CardWrapper>
 
                     {/* Supervisor Role */}
                     <CardWrapper>
                       <CardWrapper.Body>
-                        <VStack align="stretch" gap="4">
-                          <HStack justify="space-between">
-                            <VStack align="start" gap="1">
-                              <HStack gap="2">
+                        <Stack direction="column" align="stretch" gap="4">
+                          <Stack direction="row" justify="space-between">
+                            <Stack direction="column" align="start" gap="1">
+                              <Stack direction="row" gap="2">
                                 <Text fontWeight="semibold">Supervisor</Text>
                                 <Badge colorPalette="teal" size="sm">SUPERVISOR</Badge>
-                              </HStack>
+                              </Stack>
                               <Text fontSize="sm" color="gray.600">Supervisión de área específica</Text>
-                            </VStack>
+                            </Stack>
                             <Text fontSize="sm" color="gray.500">5 usuarios</Text>
-                          </HStack>
+                          </Stack>
 
                           <Box>
                             <Text fontSize="sm" fontWeight="medium" mb="2">Permisos</Text>
-                            <VStack align="start" gap="1">
-                              <HStack gap="2">
+                            <Stack direction="column" align="start" gap="1">
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Personal: Solo lectura</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Rendimiento: Lectura/Escritura</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Horarios: Solo lectura</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Entrenamientos: Solo lectura</Text>
-                              </HStack>
-                            </VStack>
+                              </Stack>
+                            </Stack>
                           </Box>
 
                           <Button size="sm" variant="outline" w="full">
                             <PencilIcon className="w-4 h-4 mr-2" />
                             Editar Permisos
                           </Button>
-                        </VStack>
+                        </Stack>
                       </CardWrapper.Body>
                     </CardWrapper>
 
                     {/* Employee Role */}
                     <CardWrapper>
                       <CardWrapper.Body>
-                        <VStack align="stretch" gap="4">
-                          <HStack justify="space-between">
-                            <VStack align="start" gap="1">
-                              <HStack gap="2">
+                        <Stack direction="column" align="stretch" gap="4">
+                          <Stack direction="row" justify="space-between">
+                            <Stack direction="column" align="start" gap="1">
+                              <Stack direction="row" gap="2">
                                 <Text fontWeight="semibold">Empleado</Text>
                                 <Badge colorPalette="gray" size="sm">EMPLOYEE</Badge>
-                              </HStack>
+                              </Stack>
                               <Text fontSize="sm" color="gray.600">Acceso básico del sistema</Text>
-                            </VStack>
+                            </Stack>
                             <Text fontSize="sm" color="gray.500">15 usuarios</Text>
-                          </HStack>
+                          </Stack>
 
                           <Box>
                             <Text fontSize="sm" fontWeight="medium" mb="2">Permisos</Text>
-                            <VStack align="start" gap="1">
-                              <HStack gap="2">
+                            <Stack direction="column" align="start" gap="1">
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Personal: Solo su perfil</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Rendimiento: Solo lectura (propio)</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Horarios: Solo lectura (propio)</Text>
-                              </HStack>
-                              <HStack gap="2">
+                              </Stack>
+                              <Stack direction="row" gap="2">
                                 <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                 <Text fontSize="sm">Entrenamientos: Solo lectura (propio)</Text>
-                              </HStack>
-                            </VStack>
+                              </Stack>
+                            </Stack>
                           </Box>
 
                           <Button size="sm" variant="outline" w="full">
                             <PencilIcon className="w-4 h-4 mr-2" />
                             Editar Permisos
                           </Button>
-                        </VStack>
+                        </Stack>
                       </CardWrapper.Body>
                     </CardWrapper>
                   </SimpleGrid>
-                </VStack>
+                </Stack>
               </Tabs.Content>
 
               {/* Audit Tab */}
               <Tabs.Content value="audit">
-                <VStack gap="4" align="stretch">
-                  <HStack justify="space-between">
+                <Stack direction="column" gap="4" align="stretch">
+                  <Stack direction="row" justify="space-between">
                     <Text fontSize="lg" fontWeight="semibold">Registro de Auditoría</Text>
-                    <HStack gap="2">
+                    <Stack direction="row" gap="2">
                       <Select.Root 
                         collection={createListCollection({
                           items: [
@@ -622,15 +622,15 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                       <Button size="sm" variant="outline">
                         Exportar
                       </Button>
-                    </HStack>
-                  </HStack>
+                    </Stack>
+                  </Stack>
 
-                  <VStack gap="2" align="stretch">
+                  <Stack direction="column" gap="2" align="stretch">
                     {mockAuditLog.map((log) => (
                       <CardWrapper key={log.id} size="sm">
                         <CardWrapper.Body>
-                          <HStack justify="space-between" gap="4">
-                            <HStack gap="4" flex="1">
+                          <Stack direction="row" justify="space-between" gap="4">
+                            <Stack direction="row" gap="4" flex="1">
                               <Box>
                                 <Badge 
                                   colorPalette={
@@ -644,76 +644,76 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 </Badge>
                               </Box>
                               
-                              <VStack align="start" gap="1" flex="1">
+                              <Stack direction="column" align="start" gap="1" flex="1">
                                 <Text fontSize="sm" fontWeight="medium">
                                   {log.details}
                                 </Text>
-                                <HStack gap="4" fontSize="xs" color="gray.500">
+                                <Stack direction="row" gap="4" fontSize="xs" color="gray.500">
                                   <Text>Empleado: {log.employee_id}</Text>
                                   <Text>Por: {log.performed_by}</Text>
                                   <Text>IP: {log.ip_address}</Text>
-                                </HStack>
-                              </VStack>
-                            </HStack>
+                                </Stack>
+                              </Stack>
+                            </Stack>
 
-                            <VStack align="end" gap="1">
+                            <Stack direction="column" align="end" gap="1">
                               <Text fontSize="xs" color="gray.500">
                                 {new Date(log.timestamp).toLocaleDateString()}
                               </Text>
                               <Text fontSize="xs" color="gray.500">
                                 {new Date(log.timestamp).toLocaleTimeString()}
                               </Text>
-                            </VStack>
-                          </HStack>
+                            </Stack>
+                          </Stack>
                         </CardWrapper.Body>
                       </CardWrapper>
                     ))}
-                  </VStack>
-                </VStack>
+                  </Stack>
+                </Stack>
               </Tabs.Content>
 
               {/* Settings Tab */}
               <Tabs.Content value="settings">
-                <VStack gap="6" align="stretch">
+                <Stack direction="column" gap="6" align="stretch">
                   <Text fontSize="lg" fontWeight="semibold">Configuración de Seguridad</Text>
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
                     {/* Security Settings */}
                     <CardWrapper>
                       <CardWrapper.Body>
-                        <VStack align="stretch" gap="4">
+                        <Stack direction="column" align="stretch" gap="4">
                           <Text fontWeight="semibold">Configuración de Seguridad</Text>
                           
-                          <VStack align="stretch" gap="3">
-                            <HStack justify="space-between">
-                              <VStack align="start" gap="0">
+                          <Stack direction="column" align="stretch" gap="3">
+                            <Stack direction="row" justify="space-between">
+                              <Stack direction="column" align="start" gap="0">
                                 <Text fontSize="sm" fontWeight="medium">Autenticación de 2 Factores</Text>
                                 <Text fontSize="xs" color="gray.600">Requerida para acceso HR</Text>
-                              </VStack>
+                              </Stack>
                               <Switch.Root defaultChecked size="sm" />
-                            </HStack>
+                            </Stack>
 
-                            <HStack justify="space-between">
-                              <VStack align="start" gap="0">
+                            <Stack direction="row" justify="space-between">
+                              <Stack direction="column" align="start" gap="0">
                                 <Text fontSize="sm" fontWeight="medium">Enmascarar Datos Sensibles</Text>
                                 <Text fontSize="xs" color="gray.600">Por defecto ocultar salarios</Text>
-                              </VStack>
+                              </Stack>
                               <Switch.Root defaultChecked size="sm" />
-                            </HStack>
+                            </Stack>
 
-                            <HStack justify="space-between">
-                              <VStack align="start" gap="0">
+                            <Stack direction="row" justify="space-between">
+                              <Stack direction="column" align="start" gap="0">
                                 <Text fontSize="sm" fontWeight="medium">Registro de Auditoría</Text>
                                 <Text fontSize="xs" color="gray.600">Auditar todas las acciones</Text>
-                              </VStack>
+                              </Stack>
                               <Switch.Root defaultChecked size="sm" />
-                            </HStack>
+                            </Stack>
 
-                            <HStack justify="space-between">
-                              <VStack align="start" gap="0">
+                            <Stack direction="row" justify="space-between">
+                              <Stack direction="column" align="start" gap="0">
                                 <Text fontSize="sm" fontWeight="medium">Timeout de Sesión</Text>
                                 <Text fontSize="xs" color="gray.600">Auto-logout por inactividad</Text>
-                              </VStack>
+                              </Stack>
                               <Select.Root 
                                 collection={createListCollection({
                                   items: [
@@ -731,24 +731,24 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 </Select.Trigger>
                                 <Select.Content />
                               </Select.Root>
-                            </HStack>
-                          </VStack>
-                        </VStack>
+                            </Stack>
+                          </Stack>
+                        </Stack>
                       </CardWrapper.Body>
                     </CardWrapper>
 
                     {/* Data Retention */}
                     <CardWrapper>
                       <CardWrapper.Body>
-                        <VStack align="stretch" gap="4">
+                        <Stack direction="column" align="stretch" gap="4">
                           <Text fontWeight="semibold">Retención de Datos</Text>
                           
-                          <VStack align="stretch" gap="3">
-                            <HStack justify="space-between">
-                              <VStack align="start" gap="0">
+                          <Stack direction="column" align="stretch" gap="3">
+                            <Stack direction="row" justify="space-between">
+                              <Stack direction="column" align="start" gap="0">
                                 <Text fontSize="sm" fontWeight="medium">Logs de Auditoría</Text>
                                 <Text fontSize="xs" color="gray.600">Tiempo de retención</Text>
-                              </VStack>
+                              </Stack>
                               <Select.Root 
                                 collection={createListCollection({
                                   items: [
@@ -767,13 +767,13 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 </Select.Trigger>
                                 <Select.Content />
                               </Select.Root>
-                            </HStack>
+                            </Stack>
 
-                            <HStack justify="space-between">
-                              <VStack align="start" gap="0">
+                            <Stack direction="row" justify="space-between">
+                              <Stack direction="column" align="start" gap="0">
                                 <Text fontSize="sm" fontWeight="medium">Datos de Performance</Text>
                                 <Text fontSize="xs" color="gray.600">Historial de evaluaciones</Text>
-                              </VStack>
+                              </Stack>
                               <Select.Root 
                                 collection={createListCollection({
                                   items: [
@@ -792,13 +792,13 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 </Select.Trigger>
                                 <Select.Content />
                               </Select.Root>
-                            </HStack>
+                            </Stack>
 
-                            <HStack justify="space-between">
-                              <VStack align="start" gap="0">
+                            <Stack direction="row" justify="space-between">
+                              <Stack direction="column" align="start" gap="0">
                                 <Text fontSize="sm" fontWeight="medium">Registros de Nómina</Text>
                                 <Text fontSize="xs" color="gray.600">Historial de pagos</Text>
-                              </VStack>
+                              </Stack>
                               <Select.Root 
                                 collection={createListCollection({
                                   items: [
@@ -816,13 +816,13 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                                 </Select.Trigger>
                                 <Select.Content />
                               </Select.Root>
-                            </HStack>
+                            </Stack>
 
                             <Button size="sm" colorPalette="blue" w="full">
                               Aplicar Configuración
                             </Button>
-                          </VStack>
-                        </VStack>
+                          </Stack>
+                        </Stack>
                       </CardWrapper.Body>
                     </CardWrapper>
                   </SimpleGrid>
@@ -830,7 +830,7 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                   {/* GDPR Compliance */}
                   <CardWrapper>
                     <CardWrapper.Body>
-                      <VStack align="stretch" gap="4">
+                      <Stack direction="column" align="stretch" gap="4">
                         <Text fontWeight="semibold">Cumplimiento GDPR/Privacidad</Text>
                         
                         <SimpleGrid columns={{ base: 1, md: 3 }} gap="4">
@@ -844,15 +844,15 @@ export function ManagementSection({ viewState, onViewStateChange }: ManagementSe
                             Generar Reporte de Privacidad
                           </Button>
                         </SimpleGrid>
-                      </VStack>
+                      </Stack>
                     </CardWrapper.Body>
                   </CardWrapper>
-                </VStack>
+                </Stack>
               </Tabs.Content>
             </Box>
           </Tabs.Root>
         </CardWrapper.Body>
       </CardWrapper>
-    </VStack>
+    </Stack>
   );
 }

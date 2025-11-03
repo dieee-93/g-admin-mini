@@ -24,6 +24,9 @@ export const reportingManifest: ModuleManifest = {
   requiredFeatures: [] as FeatureId[],
   optionalFeatures: [] as FeatureId[],
 
+  // 🔒 PERMISSIONS: Supervisors can generate reports
+  minimumRole: 'SUPERVISOR' as const,
+
   hooks: {
     provide: [
       'reporting.data_sources',   // Register data sources for reports

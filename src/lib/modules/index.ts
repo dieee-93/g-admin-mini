@@ -64,7 +64,7 @@ export type {
  *   data={{ userId: 123 }}
  *   fallback={<EmptyState />}
  *   direction="column"
- *   gap={4}
+ *   gap="4"
  * />
  * ```
  */

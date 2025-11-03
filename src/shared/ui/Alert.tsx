@@ -67,10 +67,14 @@ export interface AlertProps extends Omit<AlertRootProps, 'title'> {
   startElement?: React.ReactNode;
   /** Custom end element (e.g., close button) */
   endElement?: React.ReactNode;
+  /** Action element (alias for endElement - more semantic for buttons) */
+  action?: React.ReactNode;
   /** Alert title */
   title?: React.ReactNode;
   /** Alert description (children) */
   children?: React.ReactNode;
+  /** Alert description (alias for children) */
+  description?: React.ReactNode;
   /** Custom icon to override default status icon */
   icon?: React.ReactElement;
 }
@@ -79,26 +83,40 @@ export interface AlertProps extends Omit<AlertRootProps, 'title'> {
  * Alert Convenient Component
  * Simplified Alert with automatic structure
  */
-export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+const AlertComponent = React.forwardRef<HTMLDivElement, AlertProps>(
   function Alert(props, ref) {
-    const { title, children, icon, startElement, endElement, ...rest } = props;
+    const { title, children, description, icon, startElement, endElement, action, ...rest } = props;
+
+    // Support both 'action' (semantic) and 'endElement' (explicit)
+    // Support both 'description' and 'children' for alert content
+    const finalEndElement = action || endElement;
+    const finalDescription = description || children;
 
     return (
       <ChakraAlert.Root ref={ref} {...rest}>
         {startElement || <ChakraAlert.Indicator>{icon}</ChakraAlert.Indicator>}
-        {children ? (
+        {finalDescription ? (
           <ChakraAlert.Content>
             <ChakraAlert.Title>{title}</ChakraAlert.Title>
-            <ChakraAlert.Description>{children}</ChakraAlert.Description>
+            <ChakraAlert.Description>{finalDescription}</ChakraAlert.Description>
           </ChakraAlert.Content>
         ) : (
           <ChakraAlert.Title flex="1">{title}</ChakraAlert.Title>
         )}
-        {endElement}
+        {finalEndElement}
       </ChakraAlert.Root>
     );
   }
 );
+
+// Add compound component properties with proper typing
+export const Alert = Object.assign(AlertComponent, {
+  Root: AlertRoot,
+  Indicator: AlertIndicator,
+  Content: AlertContent,
+  Title: AlertTitle,
+  Description: AlertDescription,
+});
 
 // ============================================
 // COMPOUND COMPONENT EXPORT
@@ -204,11 +222,6 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
  * </Alert>
  * ```
  */
-Alert.Root = AlertRoot;
-Alert.Indicator = AlertIndicator;
-Alert.Content = AlertContent;
-Alert.Title = AlertTitle;
-Alert.Description = AlertDescription;
 
 // ============================================
 // TYPE EXPORTS

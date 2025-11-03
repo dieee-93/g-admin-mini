@@ -25,8 +25,7 @@ import {
   Badge,
   Button,
   Box,
-  Progress,
-  CardGrid
+  Progress
 } from '@/shared/ui';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
@@ -135,14 +134,14 @@ export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }
           logger.error('Dashboard', 'Error loading achievements', achievementsError);
         } else if (achievements) {
           setRecentAchievements(
-            achievements.map((a: any) => ({
-              id: a.id,
-              name: a.achievement_definitions.name,
-              description: a.achievement_definitions.description,
-              icon: a.achievement_definitions.icon,
-              xp: a.achievement_definitions.points,
-              unlockedAt: new Date(a.unlocked_at),
-              tier: a.achievement_definitions.tier
+            achievements.map((a: Record<string, unknown>) => ({
+              id: a.id as string,
+              name: (a.achievement_definitions as Record<string, unknown>)?.name as string,
+              description: (a.achievement_definitions as Record<string, unknown>)?.description as string,
+              icon: (a.achievement_definitions as Record<string, unknown>)?.icon as string,
+              xp: (a.achievement_definitions as Record<string, unknown>)?.points as number,
+              unlockedAt: new Date(a.unlocked_at as string),
+              tier: (a.achievement_definitions as Record<string, unknown>)?.tier as 'common' | 'rare' | 'epic' | 'legendary'
             }))
           );
         }
@@ -202,13 +201,13 @@ export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }
 
   // Listener para nuevos logros
   useEffect(() => {
-    const unsubscribe = eventBus.on('achievement:unlocked', (event: any) => {
+    const unsubscribe = eventBus.on('achievement:unlocked', (event: Record<string, unknown>) => {
       logger.info('Dashboard', 'New achievement unlocked', event);
 
       notify.success(
-        `🎉 ¡Logro desbloqueado! ${event.achievementName}`,
+        `🎉 ¡Logro desbloqueado! ${event.achievementName as string}`,
         {
-          description: `+${event.xp || 0} XP`,
+          description: `+${(event.xp as number) || 0} XP`,
           duration: 5000
         }
       );
@@ -252,10 +251,10 @@ export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }
 
   return (
     <Section variant="elevated" title="🏆 Sistema de Logros">
-      <Stack gap={6}>
+      <Stack gap="6">
         {/* Celebration Header */}
-        <Box textAlign="center" py={4}>
-          <Typography variant="heading" fontSize="2xl" mb={2}>
+        <Box textAlign="center" py="4">
+          <Typography variant="heading" fontSize="2xl" mb="2">
             🎉 ¡Configuración completa!
           </Typography>
           <Typography variant="body" color="gray.600">
@@ -266,16 +265,16 @@ export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }
         {/* Recent Achievements */}
         {recentAchievements.length > 0 && (
           <Box>
-            <Typography variant="heading" fontSize="md" mb={3}>
+            <Typography variant="heading" fontSize="md" mb="3">
               🏆 Logros Recientes
             </Typography>
-            <Stack gap={3}>
+            <Stack gap="3">
               {recentAchievements.slice(0, 3).map((achievement) => {
                 const tierConfig = TIER_CONFIG[achievement.tier];
                 return (
                   <Box
                     key={achievement.id}
-                    p={4}
+                    p="4"
                     bg="white"
                     borderWidth="1px"
                     borderColor="gray.200"
@@ -287,10 +286,10 @@ export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }
                     }}
                   >
                     <Stack direction="row" justify="space-between" align="flex-start">
-                      <Stack direction="row" gap={3} flex="1">
+                      <Stack direction="row" gap="3" flex="1">
                         <Box fontSize="2xl">{achievement.icon}</Box>
-                        <Stack gap={1}>
-                          <Stack direction="row" align="center" gap={2}>
+                        <Stack gap="1">
+                          <Stack direction="row" align="center" gap="2">
                             <Typography variant="body" fontWeight="semibold">
                               {achievement.name}
                             </Typography>
@@ -320,13 +319,13 @@ export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }
         {/* Next Achievement */}
         {nextAchievement && (
           <Box
-            p={4}
+            p="4"
             bg="blue.50"
             borderWidth="1px"
             borderColor="blue.200"
             borderRadius="md"
           >
-            <Stack gap={2}>
+            <Stack gap="2">
               <Stack direction="row" justify="space-between" align="center">
                 <Typography variant="body" fontWeight="semibold" fontSize="sm">
                   🔒 Próximo Logro
@@ -339,7 +338,7 @@ export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }
                 {nextAchievement.name}
               </Typography>
               <Box>
-                <Stack direction="row" justify="space-between" mb={1}>
+                <Stack direction="row" justify="space-between" mb="1">
                   <Typography variant="body" fontSize="xs" color="gray.600">
                     Progreso: {nextAchievement.progress}/{nextAchievement.total}
                   </Typography>
@@ -362,14 +361,14 @@ export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }
         {/* Domain Progress */}
         {domainProgress.length > 0 && (
           <Box>
-            <Typography variant="heading" fontSize="md" mb={3}>
+            <Typography variant="heading" fontSize="md" mb="3">
               📊 Progreso por Dominio
             </Typography>
-            <Stack gap={3}>
+            <Stack gap="3">
               {domainProgress.map((domain) => (
                 <Box key={domain.domain}>
-                  <Stack direction="row" justify="space-between" align="center" mb={2}>
-                    <Stack direction="row" align="center" gap={2}>
+                  <Stack direction="row" justify="space-between" align="center" mb="2">
+                    <Stack direction="row" align="center" gap="2">
                       <Box fontSize="lg">{domain.icon}</Box>
                       <Typography variant="body" fontWeight="medium" fontSize="sm">
                         {domain.domain}

@@ -2,6 +2,9 @@ import { Tabs } from '@/shared/ui';
 import { InventoryTabEnhanced } from './InventoryTabEnhanced';
 import { AnalyticsTabEnhanced } from './AnalyticsTabEnhanced';
 import { ProcurementTab } from './ProcurementTab';
+import { TransfersTab } from './TransfersTab';
+import { HookPoint } from '@/lib/modules';
+import { useCallback, memo } from 'react';
 
 interface MaterialsManagementProps {
   activeTab: string;
@@ -12,7 +15,8 @@ interface MaterialsManagementProps {
   performanceMode?: boolean;
 }
 
-export function MaterialsManagement({
+// ✅ PERFORMANCE: Memoize to prevent unnecessary re-renders
+export const MaterialsManagement = memo(function MaterialsManagement({
   activeTab,
   onTabChange,
   onStockUpdate,
@@ -20,10 +24,15 @@ export function MaterialsManagement({
   onAddMaterial,
   performanceMode = false
 }: MaterialsManagementProps) {
+  // ✅ PERFORMANCE: Stabilize onValueChange callback to prevent TabsContext thrashing
+  const handleTabChange = useCallback((details: { value: string }) => {
+    onTabChange(details.value);
+  }, [onTabChange]);
+
   return (
     <Tabs.Root
       value={activeTab}
-      onValueChange={(details) => onTabChange(details.value)}
+      onValueChange={handleTabChange}
       variant="line"
       colorPalette="blue"
       size="md"
@@ -40,6 +49,18 @@ export function MaterialsManagement({
         <Tabs.Trigger value="procurement">
           Compras
         </Tabs.Trigger>
+        <Tabs.Trigger value="transfers">
+          Transferencias 🏢
+        </Tabs.Trigger>
+
+        {/* Hook point for cross-module tabs (e.g., Suppliers tab, Products tab) */}
+        <HookPoint
+          name="materials.tabs"
+          data={{ activeTab, onTabChange }}
+          direction="row"
+          gap="0"
+          fallback={null}
+        />
       </Tabs.List>
 
       <Tabs.Content value="inventory" padding="md">
@@ -58,6 +79,27 @@ export function MaterialsManagement({
       <Tabs.Content value="procurement" padding="md">
         <ProcurementTab />
       </Tabs.Content>
+
+      <Tabs.Content value="transfers" padding="md">
+        <TransfersTab />
+      </Tabs.Content>
+
+      {/* Hook point for cross-module tab content (e.g., Suppliers content, Products content) */}
+      <HookPoint
+        name="materials.tab_content"
+        data={{ activeTab }}
+        fallback={null}
+      />
     </Tabs.Root>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent re-renders when props haven't meaningfully changed
+  return (
+    prevProps.activeTab === nextProps.activeTab &&
+    prevProps.onTabChange === nextProps.onTabChange &&
+    prevProps.onStockUpdate === nextProps.onStockUpdate &&
+    prevProps.onBulkAction === nextProps.onBulkAction &&
+    prevProps.onAddMaterial === nextProps.onAddMaterial &&
+    prevProps.performanceMode === nextProps.performanceMode
+  );
+});

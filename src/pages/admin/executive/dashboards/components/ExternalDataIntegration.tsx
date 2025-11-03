@@ -3,6 +3,18 @@ import {
   ContentLayout, Section, Stack, Button, Badge, Typography,
   CardGrid, MetricCard, Icon, Modal
 } from '@/shared/ui';
+import {
+  PlusIcon,
+  CloudIcon,
+  CircleStackIcon,
+  DocumentIcon,
+  BoltIcon,
+  CheckCircleIcon,
+  ArrowPathIcon,
+  XCircleIcon,
+  QuestionMarkCircleIcon,
+  Cog6ToothIcon
+} from '@heroicons/react/24/outline';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -196,19 +208,19 @@ const ExternalDataIntegration: React.FC = () => {
 
   const getStatusIcon = (status: DataSource['status']) => {
     switch (status) {
-      case 'connected': return 'CheckCircleIcon';
-      case 'syncing': return 'ArrowPathIcon';
-      case 'error': return 'XCircleIcon';
-      default: return 'QuestionMarkCircleIcon';
+      case 'connected': return CheckCircleIcon;
+      case 'syncing': return ArrowPathIcon;
+      case 'error': return XCircleIcon;
+      default: return QuestionMarkCircleIcon;
     }
   };
 
   const getTypeIcon = (type: DataSource['type']) => {
     switch (type) {
-      case 'api': return 'CloudIcon';
-      case 'database': return 'CircleStackIcon';
-      case 'file': return 'DocumentIcon';
-      case 'webhook': return 'BoltIcon';
+      case 'api': return CloudIcon;
+      case 'database': return CircleStackIcon;
+      case 'file': return DocumentIcon;
+      case 'webhook': return BoltIcon;
     }
   };
 
@@ -225,7 +237,7 @@ const ExternalDataIntegration: React.FC = () => {
               title="Fuentes Conectadas"
               value={connectedSources.toString()}
               subtitle={`de ${dataSources.length} total`}
-              icon="CloudIcon"
+              icon={CloudIcon}
               trend="up"
               change="+1"
             />
@@ -233,7 +245,7 @@ const ExternalDataIntegration: React.FC = () => {
               title="Registros Sincronizados"
               value={totalRecords.toLocaleString()}
               subtitle="último período"
-              icon="CircleStackIcon"
+              icon={CircleStackIcon}
               trend="up"
               change="+12%"
             />
@@ -241,7 +253,7 @@ const ExternalDataIntegration: React.FC = () => {
               title="Fuentes con Error"
               value={errorSources.toString()}
               subtitle="requieren atención"
-              icon="ExclamationTriangleIcon"
+              icon={ExclamationTriangleIcon}
               trend={errorSources > 0 ? "down" : "neutral"}
               change={errorSources > 0 ? "Error" : "OK"}
             />
@@ -249,7 +261,7 @@ const ExternalDataIntegration: React.FC = () => {
               title="Última Sincronización"
               value="hace 1h"
               subtitle="Google Analytics"
-              icon="ClockIcon"
+              icon={ClockIcon}
               trend="neutral"
             />
           </CardGrid>
@@ -262,7 +274,7 @@ const ExternalDataIntegration: React.FC = () => {
                   colorPalette="blue"
                   size="sm"
                 >
-                  <Icon name="PlusIcon" />
+                  <Icon as={PlusIcon} />
                   Nueva Integración
                 </Button>
 
@@ -274,7 +286,7 @@ const ExternalDataIntegration: React.FC = () => {
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-3">
-                          <Icon name={getTypeIcon(source.type)} />
+                          <Icon as={getTypeIcon(source.type)} />
                           <div>
                             <Typography fontWeight="medium">{source.name}</Typography>
                             <Typography fontSize="sm" color="gray.600">
@@ -284,7 +296,7 @@ const ExternalDataIntegration: React.FC = () => {
                         </div>
                         <Badge colorPalette={getStatusColor(source.status)} size="sm">
                           <Icon
-                            name={getStatusIcon(source.status)}
+                            as={getStatusIcon(source.status)}
                             className={source.status === 'syncing' ? 'animate-spin' : ''}
                           />
                           {source.status}
@@ -317,7 +329,7 @@ const ExternalDataIntegration: React.FC = () => {
                           onClick={() => syncSource(source.id)}
                           disabled={source.status === 'syncing'}
                         >
-                          <Icon name="ArrowPathIcon" />
+                          <Icon as={ArrowPathIcon} />
                           Sincronizar
                         </Button>
                         <Button
@@ -325,7 +337,7 @@ const ExternalDataIntegration: React.FC = () => {
                           variant="outline"
                           onClick={() => setSelectedSource(source)}
                         >
-                          <Icon name="Cog6ToothIcon" />
+                          <Icon as={Cog6ToothIcon} />
                           Configurar
                         </Button>
                       </div>

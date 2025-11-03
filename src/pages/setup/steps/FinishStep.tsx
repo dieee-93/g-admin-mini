@@ -47,8 +47,8 @@ export function FinishStep() {
   };
 
   return (
-    <Box textAlign="center" p={8}>
-      <Stack gap={6} align="center">
+    <Box textAlign="center" p="8">
+      <Stack gap="6" align="center">
         <Text fontSize="3xl" color="gray.700">
           ¡Todo listo! 🎉
         </Text>

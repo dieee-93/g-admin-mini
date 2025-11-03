@@ -63,10 +63,10 @@ export function CodeSplittingReport({
   if (loading && !report) {
     return (
       <CardWrapper>
-        <CardWrapper.Body p={6}>
-          <VStack gap={4}>
+        <CardWrapper.Body p="6">
+          <VStack gap="4">
             <Skeleton height="40px" width="300px" />
-            <SimpleGrid columns={3} gap={4} w="full">
+            <SimpleGrid columns={3} gap="4" w="full">
               <Skeleton height="80px" />
               <Skeleton height="80px" />
               <Skeleton height="80px" />
@@ -103,11 +103,11 @@ export function CodeSplittingReport({
     <CardWrapper>
       <CardWrapper.Header>
         <HStack justify="space-between">
-          <HStack gap={2}>
+          <HStack gap="2">
             <Icon icon={ChartBarIcon} size="lg" color="blue.500" />
             <Text fontSize="lg" fontWeight="bold">Code Splitting Performance</Text>
           </HStack>
-          <HStack gap={2}>
+          <HStack gap="2">
             {autoRefresh && (
               <Badge colorPalette="green" variant="subtle">
                 Auto-refresh
@@ -135,16 +135,16 @@ export function CodeSplittingReport({
             <Tabs.Trigger value="recommendations">Recommendations</Tabs.Trigger>
           </Tabs.List>
 
-          <Box mt={6}>
+          <Box mt="6">
             {/* Overview Tab */}
             <Tabs.Content value="overview">
-              <VStack gap={6} align="stretch">
+              <VStack gap="6" align="stretch">
                 {/* Key Metrics */}
-                <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
+                <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
                   <CardWrapper variant="subtle">
-                    <CardWrapper.Body p={4} textAlign="center">
+                    <CardWrapper.Body p="4" textAlign="center">
                       <Icon icon={ClockIcon} size="xl" color="blue.500" />
-                      <Text fontSize="sm" color="gray.600" mt={2}>Avg Load Time</Text>
+                      <Text fontSize="sm" color="gray.600" mt="2">Avg Load Time</Text>
                       <Text fontSize="xl" fontWeight="bold">
                         {report?.averageLoadTimes && Object.keys(report.averageLoadTimes).length > 0
                           ? `${Math.round(
@@ -159,9 +159,9 @@ export function CodeSplittingReport({
                   </CardWrapper>
 
                   <CardWrapper variant="subtle">
-                    <CardWrapper.Body p={4} textAlign="center">
+                    <CardWrapper.Body p="4" textAlign="center">
                       <Icon icon={CubeIcon} size="xl" color="green.500" />
-                      <Text fontSize="sm" color="gray.600" mt={2}>Total Chunks</Text>
+                      <Text fontSize="sm" color="gray.600" mt="2">Total Chunks</Text>
                       <Text fontSize="xl" fontWeight="bold">
                         {Object.keys(report?.chunkSizes || {}).length}
                       </Text>
@@ -169,9 +169,9 @@ export function CodeSplittingReport({
                   </CardWrapper>
 
                   <CardWrapper variant="subtle">
-                    <CardWrapper.Body p={4} textAlign="center">
+                    <CardWrapper.Body p="4" textAlign="center">
                       <Icon icon={ChartBarIcon} size="xl" color="purple.500" />
-                      <Text fontSize="sm" color="gray.600" mt={2}>Components</Text>
+                      <Text fontSize="sm" color="gray.600" mt="2">Components</Text>
                       <Text fontSize="xl" fontWeight="bold">
                         {Object.keys(report?.loadTimes || {}).length}
                       </Text>
@@ -179,13 +179,13 @@ export function CodeSplittingReport({
                   </CardWrapper>
 
                   <CardWrapper variant="subtle">
-                    <CardWrapper.Body p={4} textAlign="center">
+                    <CardWrapper.Body p="4" textAlign="center">
                       {report?.recommendations?.length > 0 ? (
                         <Icon icon={ExclamationTriangleIcon} size="xl" color="orange.500" />
                       ) : (
                         <Icon icon={CheckCircleIcon} size="xl" color="green.500" />
                       )}
-                      <Text fontSize="sm" color="gray.600" mt={2}>Issues</Text>
+                      <Text fontSize="sm" color="gray.600" mt="2">Issues</Text>
                       <Text fontSize="xl" fontWeight="bold" color={
                         report?.recommendations?.length > 0 ? 'orange.600' : 'green.600'
                       }>
@@ -213,23 +213,23 @@ export function CodeSplittingReport({
 
             {/* Load Times Tab */}
             <Tabs.Content value="loadtimes">
-              <VStack gap={4} align="stretch">
+              <VStack gap="4" align="stretch">
                 {Object.entries(report?.averageLoadTimes || {}).map(([component, avgTime]: [string, any]) => {
                   const color = getLoadTimeColor(avgTime);
                   const times = report?.loadTimes?.[component] || [];
                   
                   return (
                     <CardWrapper key={component} variant="outline">
-                      <CardWrapper.Body p={4}>
+                      <CardWrapper.Body p="4">
                         <HStack justify="space-between" align="center">
-                          <VStack align="start" gap={1}>
+                          <VStack align="start" gap="1">
                             <Text fontWeight="medium">{component}</Text>
                             <Text fontSize="sm" color="gray.600">
                               {times.length} load{times.length !== 1 ? 's' : ''} recorded
                             </Text>
                           </VStack>
                           
-                          <VStack align="end" gap={1}>
+                          <VStack align="end" gap="1">
                             <Text fontSize="lg" fontWeight="bold" color={`${color}.600`}>
                               {Math.round(avgTime)}ms
                             </Text>
@@ -240,7 +240,7 @@ export function CodeSplittingReport({
                         </HStack>
                         
                         {avgTime > 0 && (
-                          <Box mt={3}>
+                          <Box mt="3">
                             <Progress 
                               value={Math.min((avgTime / 5000) * 100, 100)} 
                               colorPalette={color}
@@ -257,17 +257,17 @@ export function CodeSplittingReport({
 
             {/* Chunk Sizes Tab */}
             <Tabs.Content value="chunks">
-              <VStack gap={4} align="stretch">
+              <VStack gap="4" align="stretch">
                 {Object.entries(report?.chunkSizes || {}).map(([chunkName, size]: [string, any]) => {
                   const color = getChunkSizeColor(size);
                   
                   return (
                     <CardWrapper key={chunkName} variant="outline">
-                      <CardWrapper.Body p={4}>
+                      <CardWrapper.Body p="4">
                         <HStack justify="space-between" align="center">
                           <Text fontWeight="medium">{chunkName}</Text>
                           
-                          <VStack align="end" gap={1}>
+                          <VStack align="end" gap="1">
                             <Text fontSize="lg" fontWeight="bold" color={`${color}.600`}>
                               {formatSize(size)}
                             </Text>
@@ -279,7 +279,7 @@ export function CodeSplittingReport({
                           </VStack>
                         </HStack>
                         
-                        <Box mt={3}>
+                        <Box mt="3">
                           <Progress 
                             value={Math.min((size / (200 * 1024)) * 100, 100)} 
                             colorPalette={color}
@@ -295,7 +295,7 @@ export function CodeSplittingReport({
 
             {/* Recommendations Tab */}
             <Tabs.Content value="recommendations">
-              <VStack gap={4} align="stretch">
+              <VStack gap="4" align="stretch">
                 {report?.recommendations?.length > 0 ? (
                   report.recommendations.map((recommendation: string, index: number) => (
                     <Alert.Root key={index} status="warning">

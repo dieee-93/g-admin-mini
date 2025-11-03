@@ -17,9 +17,6 @@ import { useCalendarEngine, useCalendarAdapter, useBookingManagement, useCalenda
 import Slot from './slots/Slot';
 import { SlotRegistry } from './slots/SlotRegistry';
 import { CALENDAR_SLOTS, BUSINESS_MODEL_SLOTS } from './slots/CalendarSlotDefinitions';
-import { createUnifiedCalendarSystem } from './factory/CalendarFactory';
-import { CalendarPresets } from './presets/CalendarPresets';
-import { CALENDAR_SYSTEM_VERSION, CALENDAR_SYSTEM_BUILD } from './config/CalendarConfig';
 
 // ===============================
 // CORE SYSTEM EXPORTS
@@ -252,124 +249,6 @@ export type {
 // UNIFIED CALENDAR FACTORY
 // ===============================
 
-/**
- * Complete calendar system factory
- * Creates a fully configured calendar system for a business model
- */
-export function createUnifiedCalendarSystem({
-  businessModel,
-  adapter,
-  config,
-  slots = {},
-  autoRegisterSlots = true
-}: {
-  businessModel: string;
-  adapter?: BaseCalendarAdapter;
-  config?: Partial<CalendarConfig>;
-  slots?: Record<string, any>;
-  autoRegisterSlots?: boolean;
-}) {
-  // Register adapter if provided
-  if (adapter) {
-    registerGlobalAdapter(businessModel, adapter.constructor as any);
-  }
-
-  // Register slots if provided
-  if (autoRegisterSlots && Object.keys(slots).length > 0) {
-    registerBusinessModelSlots(businessModel, slots);
-  }
-
-  // Initialize slot system
-  const slotSystem = initializeSlotSystem(businessModel);
-
-  // Create hook system
-  const hookSystem = createCalendarSystem(businessModel);
-
-  return {
-    businessModel,
-
-    // Hook system
-    hooks: hookSystem,
-
-    // Slot system
-    slots: slotSystem,
-
-    // Configuration
-    config: config || {},
-
-    // Utilities
-    registerSlot: slotSystem.register,
-    hasSlot: slotSystem.hasSlot,
-    getStats: () => ({
-      slots: slotSystem.getStats(),
-      registry: getRegistryStats()
-    })
-  };
-}
-
-// ===============================
-// BUSINESS MODEL PRESETS
-// ===============================
-
-/**
- * Pre-configured calendar systems for common business models
- */
-export const CalendarPresets = {
-  /**
-   * Staff scheduling calendar
-   */
-  StaffScheduling: (config?: Partial<CalendarConfig>) =>
-    createUnifiedCalendarSystem({
-      businessModel: 'staff_scheduling',
-      config: {
-        enabledFeatures: ['shift_management', 'time_off', 'coverage_tracking', 'labor_cost_tracking'],
-        ...config
-      }
-    }),
-
-  /**
-   * Medical appointments calendar
-   */
-  MedicalAppointments: (config?: Partial<CalendarConfig>) =>
-    createUnifiedCalendarSystem({
-      businessModel: 'medical_appointments',
-      config: {
-        enabledFeatures: ['appointment_booking', 'patient_management', 'reminder_system'],
-        ...config
-      }
-    }),
-
-  /**
-   * Fitness classes calendar
-   */
-  FitnessClasses: (config?: Partial<CalendarConfig>) =>
-    createUnifiedCalendarSystem({
-      businessModel: 'fitness_classes',
-      config: {
-        enabledFeatures: ['class_booking', 'capacity_management', 'waitlist'],
-        ...config
-      }
-    }),
-
-  /**
-   * Equipment rental calendar
-   */
-  EquipmentRental: (config?: Partial<CalendarConfig>) =>
-    createUnifiedCalendarSystem({
-      businessModel: 'equipment_rental',
-      config: {
-        enabledFeatures: ['rental_booking', 'inventory_tracking', 'damage_reports'],
-        ...config
-      }
-    })
-};
-
-// ===============================
-// VERSION INFO
-// ===============================
-
-export const CALENDAR_SYSTEM_VERSION = '3.0.0';
-export const CALENDAR_SYSTEM_BUILD = 'unified-architecture';
 
 // ===============================
 // DEFAULT EXPORT
@@ -390,13 +269,5 @@ export default {
   Slot,
   SlotRegistry,
   CALENDAR_SLOTS,
-  BUSINESS_MODEL_SLOTS,
-
-  // Factory
-  createUnifiedCalendarSystem,
-  CalendarPresets,
-
-  // Version
-  version: CALENDAR_SYSTEM_VERSION,
-  build: CALENDAR_SYSTEM_BUILD
+  BUSINESS_MODEL_SLOTS
 };

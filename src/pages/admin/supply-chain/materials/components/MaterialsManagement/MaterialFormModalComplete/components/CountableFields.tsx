@@ -5,12 +5,10 @@ import {
   Text,
   Alert,
   Field,
-  Switch,
   Flex,
   NumberInput,
-  RadioGroup,
-  HStack
-} from '@chakra-ui/react';
+  RadioGroup
+} from '@/shared/ui';
 import { SelectField, CardWrapper, InputField } from '@/shared/ui';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { type ItemFormData } from '../types';
@@ -44,43 +42,43 @@ export const CountableFields = ({
   // Auto-set unit for countable items
   useEffect(() => {
     if (formData.type === 'COUNTABLE' && !formData.unit) {
-      setFormData({ ...formData, unit: 'unidad' });
+      setFormData(prev => ({ ...prev, unit: 'unidad' }));
     }
-  }, [formData.type]);
+  }, [formData.type, formData.unit, setFormData]);
 
   // Handle stock config type changes
   useEffect(() => {
     switch (stockConfigType) {
       case 'none':
         setAddToStockNow(false);
-        setFormData({ 
-          ...formData, 
+        setFormData(prev => ({
+          ...prev,
           packaging: undefined,
           initial_stock: 0,
           unit_cost: 0
-        });
+        }));
         break;
       case 'individual':
         setAddToStockNow(true);
-        setFormData({ ...formData, packaging: undefined });
+        setFormData(prev => ({ ...prev, packaging: undefined }));
         break;
       case 'packages':
         setAddToStockNow(true);
         // Keep existing packaging if any
         break;
     }
-  }, [stockConfigType]);
+  }, [stockConfigType, setFormData, setAddToStockNow]);
 
   // Auto-calculate from packaging
   useEffect(() => {
     if (stockConfigType === 'packages' && formData.packaging?.package_size && packageQuantity > 0) {
       const totalUnits = packageQuantity * formData.packaging.package_size;
-      setFormData({ 
-        ...formData, 
-        initial_stock: totalUnits 
-      });
+      setFormData(prev => ({
+        ...prev,
+        initial_stock: totalUnits
+      }));
     }
-  }, [stockConfigType, packageQuantity, formData.packaging]);
+  }, [stockConfigType, packageQuantity, formData.packaging?.package_size, setFormData]);
 
   // Initialize stock config type based on current state
   useEffect(() => {
@@ -91,7 +89,7 @@ export const CountableFields = ({
     } else {
       setStockConfigType('individual');
     }
-  }, []);
+  }, [addToStockNow, formData.packaging?.package_size]);
 
   return (
     <Stack gap="6" w="full">

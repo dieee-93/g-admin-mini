@@ -3,9 +3,8 @@
 
 import React from 'react';
 import {
-  Tabs, Stack, Typography, Badge, Icon, Section, Alert, Spinner
+  Tabs
 } from '@/shared/ui';
-import { logger } from '@/lib/logging';
 import {
   CalendarIcon,
   ClockIcon,
@@ -37,10 +36,17 @@ interface SchedulingStats {
   approved_requests: number;
 }
 
+interface SchedulingFilters {
+  position?: string;
+  employee?: string;
+  status?: string;
+  location_id?: string;
+}
+
 interface ViewState {
   activeTab: string;
   selectedWeek: string;
-  filters: any;
+  filters: SchedulingFilters;
   viewMode: 'week' | 'day' | 'month';
 }
 
@@ -50,9 +56,8 @@ interface SchedulingManagementProps {
   schedulingStats: SchedulingStats;
   viewState: ViewState;
   onViewStateChange: (state: ViewState) => void;
-  performanceMode?: boolean;
-  isMobile?: boolean;
-  onShiftClick?: (shiftId: string) => void;
+  // performanceMode and isMobile props reserved for future optimization features
+  // onShiftClick callback will be implemented when shift detail modal is added
 }
 
 export function SchedulingManagement({
@@ -60,10 +65,7 @@ export function SchedulingManagement({
   onTabChange,
   schedulingStats,
   viewState,
-  onViewStateChange,
-  performanceMode = false,
-  isMobile = false,
-  onShiftClick,
+  onViewStateChange
 }: SchedulingManagementProps) {
 
   return (

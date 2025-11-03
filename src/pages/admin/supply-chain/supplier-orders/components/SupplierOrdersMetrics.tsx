@@ -10,7 +10,6 @@ import {
   ClockIcon,
   CheckCircleIcon,
   CheckBadgeIcon,
-  XCircleIcon,
   CurrencyDollarIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
@@ -23,7 +22,7 @@ interface SupplierOrdersMetricsProps {
 
 export function SupplierOrdersMetrics({ metrics, loading, onMetricClick }: SupplierOrdersMetricsProps) {
   return (
-    <Stack direction="row" gap={3} wrap="wrap">
+    <Stack direction="row" gap="3" wrap="wrap">
       {/* Total Orders */}
       <MetricCard
         label="Total Órdenes"

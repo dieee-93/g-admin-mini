@@ -12,7 +12,6 @@
  * @version 1.0.0
  */
 
-import React from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
@@ -63,6 +62,15 @@ export const dashboardManifest: ModuleManifest = {
   optionalFeatures: ['dashboard'] as FeatureId[],
 
   // ============================================
+  // PERMISSIONS & ROLES
+  // ============================================
+
+  /**
+   * 🔒 PERMISSIONS: All employees can view dashboard
+   */
+  minimumRole: 'OPERADOR' as const,
+
+  // ============================================
   // HOOK POINTS
   // ============================================
 
@@ -96,7 +104,7 @@ export const dashboardManifest: ModuleManifest = {
   /**
    * Setup function - register hook handlers
    */
-  setup: async (registry) => {
+  setup: async () => {
     logger.info('App', '🏠 Setting up Dashboard module');
 
     try {
@@ -134,7 +142,7 @@ export const dashboardManifest: ModuleManifest = {
     /**
      * Register a custom widget
      */
-    registerWidget: async (widgetConfig: any) => {
+    registerWidget: async (widgetConfig: Record<string, unknown>) => {
       logger.debug('App', 'Registering custom widget', { widgetConfig });
       return { success: true };
     },
@@ -144,7 +152,7 @@ export const dashboardManifest: ModuleManifest = {
      */
     getLayout: async () => {
       logger.debug('App', 'Getting dashboard layout');
-      return { layout: [] };
+      return { layout: [] as Array<Record<string, unknown>> };
     },
   },
 
@@ -176,6 +184,6 @@ export default dashboardManifest;
  * Dashboard module public API types
  */
 export interface DashboardAPI {
-  registerWidget: (widgetConfig: any) => Promise<{ success: boolean }>;
-  getLayout: () => Promise<{ layout: any[] }>;
+  registerWidget: (widgetConfig: Record<string, unknown>) => Promise<{ success: boolean }>;
+  getLayout: () => Promise<{ layout: Array<Record<string, unknown>> }>;
 }

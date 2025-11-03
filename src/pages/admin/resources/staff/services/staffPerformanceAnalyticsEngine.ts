@@ -3,8 +3,9 @@
 // ============================================================================
 // Sistema inteligente de análisis de rendimiento de personal y productividad
 
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
+// TODO: Integrate DecimalUtils for precise financial calculations
+// import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+// import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 
 // ============================================================================
 // TYPES
@@ -56,6 +57,16 @@ export interface Schedule {
 }
 
 export type ScheduleStatus = 'scheduled' | 'confirmed' | 'completed' | 'missed' | 'cancelled';
+
+interface AttendanceMetrics {
+  attendanceRate: number;
+  punctualityScore: number;
+}
+
+interface ProductivityMetrics {
+  productivityScore: number;
+  qualityScore: number;
+}
 
 // Performance Analysis Types
 export interface PerformanceMetrics {
@@ -145,6 +156,38 @@ export interface DepartmentAnalytics {
     recommendation: string;
     affectedEmployees: number;
   }>;
+}
+
+// Organization-wide Metrics
+export interface OrganizationMetrics {
+  totalActiveEmployees: number;
+  averagePerformanceRating: number;
+  overallAttendanceRate: number;
+  overallPunctualityScore: number;
+  totalLaborCost: number;
+  averageTenure: number;           // Average employee tenure in months
+  turnoverRate: number;            // % turnover in period
+
+  // Efficiency Metrics
+  revenuePerEmployee?: number;
+  profitPerEmployee?: number;
+  costPerServiceHour: number;
+
+  // Trends
+  performanceTrend: 'improving' | 'stable' | 'declining';
+  costTrend: 'increasing' | 'stable' | 'decreasing';
+  productivityTrend: 'improving' | 'stable' | 'declining';
+}
+
+// Strategic Insight
+export interface StrategicInsight {
+  type: 'strength' | 'weakness' | 'opportunity' | 'threat';
+  category: 'performance' | 'cost' | 'staffing' | 'training' | 'retention';
+  title: string;
+  description: string;
+  impact: 'high' | 'medium' | 'low';
+  recommendation: string;
+  priority: number; // 1-5
 }
 
 // Comprehensive Analytics Result
@@ -347,9 +390,8 @@ export class StaffPerformanceAnalyticsEngine {
     
     // 2. Calculate department analytics
     const departmentAnalytics = this.calculateDepartmentAnalytics(
-      validEmployeeMetrics, 
-      employees, 
-      fullConfig
+      validEmployeeMetrics,
+      employees
     );
     
     // 3. Calculate organization-wide metrics
@@ -369,9 +411,7 @@ export class StaffPerformanceAnalyticsEngine {
     
     // 5. Generate actionable recommendations
     const recommendations = this.generateRecommendations(
-      validEmployeeMetrics, 
-      departmentAnalytics, 
-      strategicInsights
+      validEmployeeMetrics
     );
     
     // 6. Generate performance alerts
@@ -425,10 +465,10 @@ export class StaffPerformanceAnalyticsEngine {
     const performanceIndicators = this.calculatePerformanceIndicators(employee, attendanceMetrics, productivityMetrics);
     
     // Calculate financial impact
-    const financialMetrics = this.calculateFinancialMetrics(employee, employeeTimeEntries);
-    
+    const financialMetrics = this.calculateFinancialMetrics(employee);
+
     // Determine performance trend
-    const performanceTrend = this.determinePerformanceTrend(employee, employeeTimeEntries);
+    const performanceTrend = this.determinePerformanceTrend(employee);
     
     return {
       employeeId: employee.id,
@@ -514,7 +554,7 @@ export class StaffPerformanceAnalyticsEngine {
     };
   }
 
-  private static calculatePerformanceIndicators(employee: Employee, attendanceMetrics: any, productivityMetrics: any) {
+  private static calculatePerformanceIndicators(employee: Employee, attendanceMetrics: AttendanceMetrics, productivityMetrics: ProductivityMetrics) {
     const performanceRating = employee.performance_rating;
     
     // Determine strengths and improvement areas based on metrics
@@ -538,10 +578,10 @@ export class StaffPerformanceAnalyticsEngine {
     };
   }
 
-  private static calculateFinancialMetrics(employee: Employee, timeEntries: TimeEntry[]) {
+  private static calculateFinancialMetrics(employee: Employee) {
     const laborCostPerHour = employee.hourly_rate * 1.3; // Include benefits/overhead
-    const totalHours = timeEntries.reduce((sum, entry) => sum + entry.total_hours, 0);
-    
+    // TODO: Use timeEntries parameter for more accurate cost calculations based on actual hours
+
     // Mock revenue calculation (would require sales integration)
     const revenuePerHour = employee.department === 'Servicio' ? employee.hourly_rate * 4 : undefined;
     const costEfficiencyRatio = revenuePerHour ? revenuePerHour / laborCostPerHour : 1.0;
@@ -553,7 +593,8 @@ export class StaffPerformanceAnalyticsEngine {
     };
   }
 
-  private static determinePerformanceTrend(employee: Employee, timeEntries: TimeEntry[]): 'improving' | 'stable' | 'declining' {
+  private static determinePerformanceTrend(employee: Employee): 'improving' | 'stable' | 'declining' {
+    // TODO: Use timeEntries parameter to analyze historical performance trends
     // Simplified trend analysis - in real system would analyze historical performance data
     const recentPerformance = employee.performance_rating;
     
@@ -562,7 +603,7 @@ export class StaffPerformanceAnalyticsEngine {
     return 'declining';
   }
 
-  private static assessRetentionRisk(employee: Employee, attendanceMetrics: any, performanceIndicators: any): 'low' | 'medium' | 'high' {
+  private static assessRetentionRisk(employee: Employee, attendanceMetrics: AttendanceMetrics, performanceIndicators: Pick<PerformanceMetrics, 'performanceRating'>): 'low' | 'medium' | 'high' {
     let riskScore = 0;
     
     if (performanceIndicators.performanceRating < 3.0) riskScore += 2;
@@ -595,9 +636,9 @@ export class StaffPerformanceAnalyticsEngine {
 
   private static calculateDepartmentAnalytics(
     employeeMetrics: PerformanceMetrics[],
-    allEmployees: Employee[],
-    config: StaffAnalyticsConfig
+    allEmployees: Employee[]
   ): DepartmentAnalytics[] {
+    // TODO: Add config parameter for department-specific thresholds and settings
     
     const departments = Array.from(new Set(allEmployees.map(emp => emp.department)));
     
@@ -779,9 +820,9 @@ export class StaffPerformanceAnalyticsEngine {
       
       costPerServiceHour: totalLaborCost / Math.max(1, employeeMetrics.reduce((sum, m) => sum + m.totalHoursWorked, 0)),
       
-      performanceTrend: this.determineOrganizationTrend(employeeMetrics, 'performance') as any,
+      performanceTrend: this.determineOrganizationTrend(employeeMetrics, 'performance') as 'improving' | 'stable' | 'declining',
       costTrend: 'stable' as const, // Would require historical cost data
-      productivityTrend: this.determineOrganizationTrend(employeeMetrics, 'productivity') as any
+      productivityTrend: this.determineOrganizationTrend(employeeMetrics, 'productivity') as 'improving' | 'stable' | 'declining'
     };
   }
 
@@ -820,7 +861,7 @@ export class StaffPerformanceAnalyticsEngine {
   private static generateStrategicInsights(
     employeeMetrics: PerformanceMetrics[],
     departmentAnalytics: DepartmentAnalytics[],
-    organizationMetrics: any,
+    organizationMetrics: OrganizationMetrics,
     config: StaffAnalyticsConfig
   ) {
     const insights = [];
@@ -873,10 +914,10 @@ export class StaffPerformanceAnalyticsEngine {
   // ============================================================================
 
   private static generateRecommendations(
-    employeeMetrics: PerformanceMetrics[],
-    departmentAnalytics: DepartmentAnalytics[],
-    strategicInsights: any[]
+    employeeMetrics: PerformanceMetrics[]
   ) {
+    // TODO: Use departmentAnalytics to generate department-specific recommendations
+    // TODO: Use strategicInsights to align recommendations with strategic insights
     const recommendations = [];
     
     // Performance improvement recommendations
@@ -1024,10 +1065,10 @@ export class StaffPerformanceAnalyticsEngine {
     return values.reduce((sum, val) => sum + val, 0) / values.length;
   }
 
-  private static calculateWeightedAverage(
-    items: any[], 
-    valueSelector: (item: unknown) => number, 
-    weightSelector: (item: unknown) => number
+  private static calculateWeightedAverage<T>(
+    items: T[],
+    valueSelector: (item: T) => number,
+    weightSelector: (item: T) => number
   ): number {
     if (items.length === 0) return 0;
     

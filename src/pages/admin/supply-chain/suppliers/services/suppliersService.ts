@@ -2,7 +2,7 @@
 // SUPPLIERS SERVICE - Business logic layer
 // ============================================
 
-import { suppliersApi } from '@/pages/admin/supply-chain/materials/services/suppliersApi';
+import { suppliersApi } from './suppliersApi';
 import type {
   Supplier,
   SupplierFormData,
@@ -301,8 +301,8 @@ export const suppliersService = {
     const sorted = [...suppliers];
 
     sorted.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
+      let aValue: string | number;
+      let bValue: string | number;
 
       switch (sort.field) {
         case 'name':

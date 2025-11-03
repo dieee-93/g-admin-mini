@@ -295,7 +295,7 @@ function CustomSupplierManagement() {
     <div>
       <SupplierForm
         onSuccess={() => logger.info('App', 'Supplier created!')}
-        onCancel={() => console.log('Cancelled')}
+        onCancel={() => logger.debug('SupplierModuleExample', 'Cancelled')}
       />
       <SupplierList />
       <SupplierAnalytics />

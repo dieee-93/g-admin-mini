@@ -78,6 +78,15 @@ const debugTools: DebugTool[] = [
     category: 'ui',
     status: 'stable'
   },
+  {
+    id: 'feature-ui-mapping',
+    title: 'Feature-UI Mapping',
+    description: 'Validate UI components sync with capabilities',
+    icon: '🔍',
+    path: '/debug/feature-ui-mapping',
+    category: 'ui',
+    status: 'stable'
+  },
 
   // Data Tools
   {
@@ -177,7 +186,7 @@ export default function DebugDashboard() {
                     <Stack direction="row" justify="space-between" align="center">
                       <Stack direction="row" align="center" spacing="sm">
                         <span style={{ fontSize: '24px' }}>{tool.icon}</span>
-                        <Typography variant="h6">{tool.title}</Typography>
+                        <Typography variant="subtitle">{tool.title}</Typography>
                       </Stack>
                       <Stack direction="row" spacing="xs">
                         <Badge

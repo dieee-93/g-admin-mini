@@ -60,11 +60,11 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
   return (
     <>
       <CardWrapper variant="outline" bg="gradient(to-r, purple.50, blue.50)">
-        <CardWrapper.Body p={4}>
+        <CardWrapper.Body p="4">
           <HStack justify="space-between">
-            <HStack gap={3}>
+            <HStack gap="3">
               <Icon icon={SparklesIcon} size="lg" color="purple.500" />
-              <VStack align="start" gap={0}>
+              <VStack align="start" gap="0">
                 <Text fontSize="sm" fontWeight="medium" color="purple.700">
                   🤖 AI Recipe Assistant
                 </Text>
@@ -74,9 +74,9 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
               </VStack>
             </HStack>
 
-            <HStack gap={2}>
+            <HStack gap="2">
               {isGeneratingAI && (
-                <HStack gap={2}>
+                <HStack gap="2">
                   <Text fontSize="xs" color="purple.600">Analizando...</Text>
                   <Progress.Root size="sm" width="60px" colorPalette="purple">
                     <Progress.Track>
@@ -112,7 +112,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
           </HStack>
 
           {aiSuggestions && (
-            <HStack gap={4} mt={3} fontSize="xs">
+            <HStack gap="4" mt="3" fontSize="xs">
               <Badge colorPalette="green" variant="subtle">
                 Score: {aiSuggestions.overallScore}/100
               </Badge>
@@ -131,10 +131,10 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
       </CardWrapper>
 
       {estimatedCost > 0 && (
-        <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+        <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
           <CardWrapper variant="outline" bg="blue.50">
-            <CardWrapper.Body p={4}>
-              <VStack gap={2} align="stretch">
+            <CardWrapper.Body p="4">
+              <VStack gap="2" align="stretch">
                 <HStack justify="space-between">
                   <Text fontSize="sm" fontWeight="medium" color="blue.700">
                     💰 Costo Actual
@@ -163,8 +163,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
 
           {aiSuggestions && optimizedCost < estimatedCost && (
             <CardWrapper variant="outline" >
-              <CardWrapper.Body p={4}>
-                <VStack gap={2} align="stretch">
+              <CardWrapper.Body p="4">
+                <VStack gap="2" align="stretch">
                   <HStack justify="space-between">
                     <Text fontSize="sm" fontWeight="medium" color="green.700">
                       🎯 Costo Optimizado (IA)
@@ -201,7 +201,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
         <CardWrapper variant="outline" bg="gradient(to-br, purple.25, blue.25)">
           <CardWrapper.Header>
             <HStack justify="space-between">
-              <HStack gap={2}>
+              <HStack gap="2">
                 <Icon icon={LightBulbIcon} size="lg" color="purple.500" />
                 <Text fontSize="md" fontWeight="bold" color="purple.700">
                   🧠 Sugerencias de IA
@@ -220,7 +220,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
             <Tabs.Root value={activeAITab} onValueChange={(details) => setActiveAITab(details.value as any)}>
               <Tabs.List>
                 <Tabs.Trigger value="substitutions">
-                  <HStack gap={1}>
+                  <HStack gap="1">
                     <Icon icon={ArrowPathIcon} size="xs" />
                     <Text fontSize="sm">Sustituciones</Text>
                     {aiSuggestions.substitutions.length > 0 && (
@@ -230,7 +230,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 </Tabs.Trigger>
 
                 <Tabs.Trigger value="optimization">
-                  <HStack gap={1}>
+                  <HStack gap="1">
                     <Icon icon={CurrencyDollarIcon} size="xs" />
                     <Text fontSize="sm">Optimización</Text>
                     {aiSuggestions.costOptimizations.length > 0 && (
@@ -240,14 +240,14 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 </Tabs.Trigger>
 
                 <Tabs.Trigger value="yield">
-                  <HStack gap={1}>
+                  <HStack gap="1">
                     <Icon icon={ScaleIcon} size="xs" />
                     <Text fontSize="sm">Rendimiento</Text>
                   </HStack>
                 </Tabs.Trigger>
 
                 <Tabs.Trigger value="nutrition">
-                  <HStack gap={1}>
+                  <HStack gap="1">
                     <Icon icon={BeakerIcon} size="xs" />
                     <Text fontSize="sm">Nutrición</Text>
                     {aiSuggestions.nutritionalInsights.length > 0 && (
@@ -257,9 +257,9 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 </Tabs.Trigger>
               </Tabs.List>
 
-              <Box mt={4}>
+              <Box mt="4">
                 <Tabs.Content value="substitutions">
-                  <VStack gap={3} align="stretch">
+                  <VStack gap="3" align="stretch">
                     {aiSuggestions.substitutions.length > 0 ? (
                       aiSuggestions.substitutions.map((sub, index) => {
                         const suggestionId = `sub_${index}`;
@@ -267,10 +267,10 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
 
                         return (
                           <CardWrapper key={index} variant="subtle" size="sm">
-                            <CardWrapper.Body p={3}>
-                              <VStack gap={2} align="stretch">
+                            <CardWrapper.Body p="3">
+                              <VStack gap="2" align="stretch">
                                 <HStack justify="space-between">
-                                  <VStack align="start" gap={0}>
+                                  <VStack align="start" gap="0">
                                     <Text fontSize="sm" fontWeight="medium">
                                       {sub.originalIngredient} → {sub.suggestedSubstitute}
                                     </Text>
@@ -294,7 +294,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                                   )}
                                 </HStack>
 
-                                <SimpleGrid columns={3} gap={2} fontSize="xs">
+                                <SimpleGrid columns={3} gap="2" fontSize="xs">
                                   <VStack>
                                     <Text color="gray.500">Ahorro</Text>
                                     <Text fontWeight="medium" color={sub.costImpact > 0 ? 'green.600' : 'red.600'}>
@@ -320,7 +320,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                         );
                       })
                     ) : (
-                      <Text fontSize="sm" color="gray.600" textAlign="center" py={4}>
+                      <Text fontSize="sm" color="gray.600" textAlign="center" py="4">
                         No se encontraron sustituciones recomendadas para esta receta.
                       </Text>
                     )}
@@ -328,13 +328,13 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 </Tabs.Content>
 
                 <Tabs.Content value="optimization">
-                  <VStack gap={3} align="stretch">
+                  <VStack gap="3" align="stretch">
                     {aiSuggestions.costOptimizations.map((opt, index) => (
                       <CardWrapper key={index} variant="subtle" size="sm">
-                        <CardWrapper.Body p={3}>
-                          <VStack gap={2} align="stretch">
+                        <CardWrapper.Body p="3">
+                          <VStack gap="2" align="stretch">
                             <HStack justify="space-between">
-                              <VStack align="start" gap={0}>
+                              <VStack align="start" gap="0">
                                 <Text fontSize="sm" fontWeight="medium">
                                   {opt.description}
                                 </Text>
@@ -350,7 +350,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                               </Badge>
                             </HStack>
 
-                            <SimpleGrid columns={3} gap={2} fontSize="xs">
+                            <SimpleGrid columns={3} gap="2" fontSize="xs">
                               <VStack>
                                 <Text color="gray.500">Costo Actual</Text>
                                 <Text fontWeight="medium">${opt.currentCost.toFixed(2)}</Text>
@@ -374,8 +374,8 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                 <Tabs.Content value="yield">
                   {aiSuggestions.yieldOptimization ? (
                     <CardWrapper variant="subtle" size="sm">
-                      <CardWrapper.Body p={4}>
-                        <VStack gap={3} align="stretch">
+                      <CardWrapper.Body p="4">
+                        <VStack gap="3" align="stretch">
                           <HStack justify="space-between">
                             <Text fontSize="sm" fontWeight="medium">
                               Optimización de Rendimiento
@@ -394,7 +394,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                             {aiSuggestions.yieldOptimization.reasoning}
                           </Text>
 
-                          <SimpleGrid columns={3} gap={3} fontSize="xs">
+                          <SimpleGrid columns={3} gap="3" fontSize="xs">
                             <VStack>
                               <Text color="gray.500">Rendimiento Actual</Text>
                               <Text fontSize="sm" fontWeight="medium">{aiSuggestions.yieldOptimization.currentYield}</Text>
@@ -414,10 +414,10 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                           </SimpleGrid>
 
                           {aiSuggestions.yieldOptimization.adjustments.length > 0 && (
-                            <VStack gap={2} align="stretch">
+                            <VStack gap="2" align="stretch">
                               <Text fontSize="xs" fontWeight="medium" color="gray.700">Ajustes recomendados:</Text>
                               {aiSuggestions.yieldOptimization.adjustments.map((adj, index) => (
-                                <HStack key={index} justify="space-between" fontSize="xs" bg="white" p={2} borderRadius="sm">
+                                <HStack key={index} justify="space-between" fontSize="xs" bg="white" p="2" borderRadius="sm">
                                   <Text>{adj.ingredient}</Text>
                                   <Text color="blue.600">
                                     {adj.currentQuantity} → {adj.suggestedQuantity}
@@ -430,18 +430,18 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                       </CardWrapper.Body>
                     </CardWrapper>
                   ) : (
-                    <Text fontSize="sm" color="gray.600" textAlign="center" py={4}>
+                    <Text fontSize="sm" color="gray.600" textAlign="center" py="4">
                       No se detectaron oportunidades de optimización de rendimiento.
                     </Text>
                   )}
                 </Tabs.Content>
 
                 <Tabs.Content value="nutrition">
-                  <SimpleGrid columns={{ base: 1, md: 2 }} gap={3}>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} gap="3">
                     {aiSuggestions.nutritionalInsights.map((insight, index) => (
                       <CardWrapper key={index} variant="subtle" size="sm">
-                        <CardWrapper.Body p={3}>
-                          <VStack gap={2} align="stretch">
+                        <CardWrapper.Body p="3">
+                          <VStack gap="2" align="stretch">
                             <HStack justify="space-between">
                               <Text fontSize="sm" fontWeight="medium" textTransform="capitalize">
                                 {insight.category === 'calories' ? 'Calorías' :
@@ -469,7 +469,7 @@ export const RecipeFormAISuggestions: React.FC<RecipeFormAISuggestionsProps> = (
                             </HStack>
 
                             {insight.recommendations.length > 0 && (
-                              <VStack gap={1} align="start">
+                              <VStack gap="1" align="start">
                                 {insight.recommendations.map((rec, recIndex) => (
                                   <Text key={recIndex} fontSize="xs" color="gray.600">
                                     • {rec}

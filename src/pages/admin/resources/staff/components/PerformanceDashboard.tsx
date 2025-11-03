@@ -16,10 +16,11 @@ import {
   TrophyIcon,
   ClockIcon,
   ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+// TODO: Use ArrowTrendingDownIcon for performance trend indicators
 import { useStaffWithLoader, usePerformanceAnalytics } from '@/hooks/useStaffData';
+import type { TopPerformer, PerformanceAlert } from '../types';
 
 import { logger } from '@/lib/logging';
 interface PerformanceDashboardProps {
@@ -30,17 +31,18 @@ interface PerformanceDashboardProps {
 export function PerformanceDashboard({ compact = false, showDetails = true }: PerformanceDashboardProps) {
   const { staff, loading: staffLoading } = useStaffWithLoader();
   const { loading: analyticsLoading, loadTopPerformers, loadDepartmentPerformance } = usePerformanceAnalytics();
-  const [topPerformers, setTopPerformers] = useState<any[]>([]);
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [topPerformers, setTopPerformers] = useState<TopPerformer[]>([]);
+  const [alerts, setAlerts] = useState<PerformanceAlert[]>([]);
 
   // Load performance data
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadData = async () => {
     try {
-      const [performers, deptData] = await Promise.all([
+      const [performers] = await Promise.all([
         loadTopPerformers(3),
         loadDepartmentPerformance()
       ]);

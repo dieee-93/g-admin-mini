@@ -173,10 +173,10 @@ export function CalendarFiltersPanel({
         overflowY: 'auto'
       }}
     >
-      <Stack direction="column" gap={4}>
+      <Stack direction="column" gap="4">
         {/* Header */}
         <Stack direction="row" justify="space-between" align="center">
-          <Stack direction="row" align="center" gap={2}>
+          <Stack direction="row" align="center" gap="2">
             <Icon icon={FunnelIcon} size="sm" />
             <Typography variant="heading" size="md" fontWeight="bold">
               Filtros
@@ -207,7 +207,7 @@ export function CalendarFiltersPanel({
         )}
 
         {/* SEARCH */}
-        <Stack direction="column" gap={2}>
+        <Stack direction="column" gap="2">
           <Typography variant="body" size="sm" fontWeight="semibold" color="gray.700">
             Buscar
           </Typography>
@@ -255,7 +255,7 @@ export function CalendarFiltersPanel({
         </Stack>
 
         {/* EVENT TYPES */}
-        <Stack direction="column" gap={2}>
+        <Stack direction="column" gap="2">
           <Typography variant="body" size="sm" fontWeight="semibold" color="gray.700">
             Tipo de Evento
           </Typography>
@@ -272,7 +272,7 @@ export function CalendarFiltersPanel({
         </Stack>
 
         {/* DEPARTMENTS */}
-        <Stack direction="column" gap={2}>
+        <Stack direction="column" gap="2">
           <Typography variant="body" size="sm" fontWeight="semibold" color="gray.700">
             Departamento
           </Typography>
@@ -289,7 +289,7 @@ export function CalendarFiltersPanel({
         </Stack>
 
         {/* STATUSES */}
-        <Stack direction="column" gap={2}>
+        <Stack direction="column" gap="2">
           <Typography variant="body" size="sm" fontWeight="semibold" color="gray.700">
             Estado
           </Typography>
@@ -307,7 +307,7 @@ export function CalendarFiltersPanel({
 
         {/* EMPLOYEES */}
         {uniqueEmployees.length > 0 && (
-          <Stack direction="column" gap={2}>
+          <Stack direction="column" gap="2">
             <Typography variant="body" size="sm" fontWeight="semibold" color="gray.700">
               Empleado
             </Typography>

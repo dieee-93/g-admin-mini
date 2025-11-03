@@ -14,9 +14,9 @@ interface ReportingSummaryProps {
 
 export function ReportingSummary({ summary }: ReportingSummaryProps) {
   return (
-    <SimpleGrid columns={{ base: 2, md: 6 }} gap={4} w="full">
+    <SimpleGrid columns={{ base: 2, md: 6 }} gap="4" w="full">
       <CardWrapper variant="subtle" bg="blue.50">
-        <CardWrapper.Body p={4} textAlign="center">
+        <CardWrapper.Body p="4" textAlign="center">
           <Text fontSize="2xl" fontWeight="bold" color="blue.600">
             {summary.totalTemplates}
           </Text>
@@ -25,7 +25,7 @@ export function ReportingSummary({ summary }: ReportingSummaryProps) {
       </CardWrapper>
 
       <CardWrapper variant="subtle" >
-        <CardWrapper.Body p={4} textAlign="center">
+        <CardWrapper.Body p="4" textAlign="center">
           <Text fontSize="2xl" fontWeight="bold" color="green.600">
             {summary.activeTemplates}
           </Text>
@@ -34,7 +34,7 @@ export function ReportingSummary({ summary }: ReportingSummaryProps) {
       </CardWrapper>
 
       <CardWrapper variant="subtle" bg="purple.50">
-        <CardWrapper.Body p={4} textAlign="center">
+        <CardWrapper.Body p="4" textAlign="center">
           <Text fontSize="2xl" fontWeight="bold" color="purple.600">
             {summary.scheduledReports}
           </Text>
@@ -43,7 +43,7 @@ export function ReportingSummary({ summary }: ReportingSummaryProps) {
       </CardWrapper>
 
       <CardWrapper variant="subtle" bg="orange.50">
-        <CardWrapper.Body p={4} textAlign="center">
+        <CardWrapper.Body p="4" textAlign="center">
           <Text fontSize="2xl" fontWeight="bold" color="orange.600">
             {summary.totalGenerated}
           </Text>
@@ -52,7 +52,7 @@ export function ReportingSummary({ summary }: ReportingSummaryProps) {
       </CardWrapper>
 
       <CardWrapper variant="subtle" bg="pink.50">
-        <CardWrapper.Body p={4} textAlign="center">
+        <CardWrapper.Body p="4" textAlign="center">
           <Text fontSize="2xl" fontWeight="bold" color="pink.600">
             {summary.activeAutomations}
           </Text>
@@ -61,7 +61,7 @@ export function ReportingSummary({ summary }: ReportingSummaryProps) {
       </CardWrapper>
 
       <CardWrapper variant="subtle" bg="yellow.50">
-        <CardWrapper.Body p={4} textAlign="center">
+        <CardWrapper.Body p="4" textAlign="center">
           <Text fontSize="2xl" fontWeight="bold" color="yellow.600">
             {summary.totalInsights}
           </Text>

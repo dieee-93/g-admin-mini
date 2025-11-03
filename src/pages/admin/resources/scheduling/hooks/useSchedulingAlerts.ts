@@ -17,8 +17,7 @@ import type { Alert } from '@/shared/types/alerts';
 import EventBus from '@/lib/events';
 import { useErrorHandler } from '@/lib/error-handling';
 
-// ✅ SCHEDULING CONTEXT
-import { useSchedulingStore } from '@/store/schedulingStore';
+// ✅ v3.0: No longer using legacy store - alerts are self-contained
 
 // ✅ HOOK CONFIGURATION
 interface UseSchedulingAlertsOptions {
@@ -90,7 +89,6 @@ export function useSchedulingAlerts(
 
   // ✅ ARCHITECTURAL INTEGRATION
   const { handleError } = useErrorHandler();
-  const schedulingStore = useSchedulingStore();
 
   // 📊 ESTADO LOCAL
   const [alerts, setAlerts] = useState<Alert[]>([]);

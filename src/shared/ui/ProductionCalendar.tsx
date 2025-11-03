@@ -64,9 +64,9 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
   };
   
   return (
-    <Stack direction="column" gap={4} align="stretch">
+    <Stack direction="column" gap="4" align="stretch">
       {/* Calendar Header */}
-      <Stack direction="row" justify="space-between" p={3} bg="bg.subtle" borderRadius="md">
+      <Stack direction="row" justify="space-between" p="3" bg="bg.subtle" borderRadius="md">
         <Button size="sm" variant="ghost" onClick={handlePrevMonth}>
           ←
         </Button>
@@ -84,10 +84,10 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
       </Stack>
       
       {/* Calendar Grid */}
-      <Grid templateColumns="repeat(7, 1fr)" gap={2}>
+      <Grid templateColumns="repeat(7, 1fr)" gap="2">
         {/* Day Headers */}
         {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
-          <Box key={day} p={2} textAlign="center" fontWeight="semibold" fontSize="sm" color="text.secondary">
+          <Box key={day} p="2" textAlign="center" fontWeight="semibold" fontSize="sm" color="text.secondary">
             {day}
           </Box>
         ))}
@@ -119,7 +119,7 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
               h="16"
               position="relative"
               flexDirection="column"
-              gap={1}
+              gap="1"
               onClick={() => onDateChange(date)}
               bg={isSelected ? "brand.500" : undefined}
               color={isSelected ? "white" : "text.primary"}
@@ -133,7 +133,7 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
               
               {/* Production indicators */}
               {dayPlans.length > 0 && (
-                <Stack direction="row" gap={1} wrap="wrap" justify="center">
+                <Stack direction="row" gap="1" wrap="wrap" justify="center">
                   {statusCounts.completed && (
                     <Badge size="xs" colorPalette="green" borderRadius="full">
                       {statusCounts.completed}
@@ -162,23 +162,23 @@ export function ProductionCalendar({ selectedDate, onDateChange, plans }: Produc
       </Grid>
       
       {/* Calendar Legend */}
-      <Box p={3} borderRadius="md">
-        <Stack direction="column" gap={2} align="start">
+      <Box p="3" borderRadius="md">
+        <Stack direction="column" gap="2" align="start">
           <Typography variant="body" fontSize="sm" fontWeight="semibold">Leyenda</Typography>
-          <Stack direction="row" gap={4} flexWrap="wrap">
-            <Stack direction="row" gap={1}>
+          <Stack direction="row" gap="4" flexWrap="wrap">
+            <Stack direction="row" gap="1">
               <Badge size="xs" colorPalette="gray" borderRadius="full">1</Badge>
               <Typography variant="body" fontSize="xs">Programado</Typography>
             </Stack>
-            <Stack direction="row" gap={1}>
+            <Stack direction="row" gap="1">
               <Badge size="xs" colorPalette="blue" borderRadius="full">1</Badge>
               <Typography variant="body" fontSize="xs">En Progreso</Typography>
             </Stack>
-            <Stack direction="row" gap={1}>
+            <Stack direction="row" gap="1">
               <Badge size="xs" colorPalette="green" borderRadius="full">1</Badge>
               <Typography variant="body" fontSize="xs">Completado</Typography>
             </Stack>
-            <Stack direction="row" gap={1}>
+            <Stack direction="row" gap="1">
               <Badge size="xs" colorPalette="red" borderRadius="full">1</Badge>
               <Typography variant="body" fontSize="xs">Retrasado</Typography>
             </Stack>

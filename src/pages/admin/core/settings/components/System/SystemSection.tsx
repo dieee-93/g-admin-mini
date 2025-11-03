@@ -1,17 +1,15 @@
 // SystemSection.tsx - System Settings with Theme Configuration
 import React from 'react';
-import { 
-  Layout, Stack, Typography, CardWrapper, Section, Badge, SimpleGrid, Icon,
-  Button
+import {
+  Stack, Typography, CardWrapper, Section, Badge, SimpleGrid, Icon
 } from '@/shared/ui';
 import { Button as ChakraButton } from '@chakra-ui/react';
-import { 
+import {
   PaintBrushIcon,
   ComputerDesktopIcon,
   CogIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
-import { HeaderIcon } from '@/shared/ui/Icon';
 import { ThemeToggle } from '@/shared/components/ThemeToggle';
 import { availableThemes } from '@/store/themeStore';
 
@@ -30,7 +28,7 @@ export const SystemSection: React.FC = () => {
           <CardWrapper variant="outline" >
             <CardWrapper.Header>
               <Stack direction="row" gap="sm" align="center">
-                <HeaderIcon icon={PaintBrushIcon}  />
+                <Icon icon={PaintBrushIcon} size="md" />
                 <Typography variant="heading" level={4}>Themes & Appearance</Typography>
               </Stack>
             </CardWrapper.Header>
@@ -55,7 +53,7 @@ export const SystemSection: React.FC = () => {
           <CardWrapper variant="outline" >
             <CardWrapper.Header>
               <Stack direction="row" gap="sm" align="center">
-                <HeaderIcon icon={ComputerDesktopIcon}  />
+                <Icon icon={ComputerDesktopIcon} size="md" />
                 <Typography variant="heading" level={4}>System Status</Typography>
                 <Badge variant="solid" colorPalette="green" size="sm">Operativo</Badge>
               </Stack>
@@ -86,7 +84,7 @@ export const SystemSection: React.FC = () => {
           <CardWrapper variant="outline" >
             <CardWrapper.Header>
               <Stack direction="row" gap="sm" align="center">
-                <HeaderIcon icon={InformationCircleIcon} />
+                <Icon icon={InformationCircleIcon} size="md" />
                 <Typography variant="heading" level={4}>System Information</Typography>
               </Stack>
             </CardWrapper.Header>

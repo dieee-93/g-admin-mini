@@ -6,9 +6,18 @@ import { Icon } from '@/shared/ui';
 import RecurringBillingFormEnhanced from './components/RecurringBillingFormEnhanced';
 import RecurringBillingAnalyticsEnhanced from './components/RecurringBillingAnalyticsEnhanced';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
+import {
+  PlusIcon,
+  ChartBarIcon,
+  CogIcon,
+  HomeIcon,
+  ListBulletIcon
+} from '@heroicons/react/24/outline';
+
+type BillingTab = 'dashboard' | 'create' | 'manage' | 'analytics';
 
 const BillingPage: React.FC = () => {
-  const [activeTab, setActiveTab] = React.useState<'dashboard' | 'create' | 'manage' | 'analytics'>('dashboard');
+  const [activeTab, setActiveTab] = React.useState<BillingTab>('dashboard');
 
   React.useEffect(() => {
     // Emit module loaded event
@@ -22,7 +31,7 @@ const BillingPage: React.FC = () => {
         colorPalette="blue"
         size="sm"
       >
-        <Icon name="PlusIcon" />
+        <Icon as={PlusIcon} />
         Nueva Suscripción
       </Button>
       <Button
@@ -30,14 +39,14 @@ const BillingPage: React.FC = () => {
         variant="outline"
         size="sm"
       >
-        <Icon name="ChartBarIcon" />
+        <Icon as={ChartBarIcon} />
         Analytics
       </Button>
       <Button
         variant="outline"
         size="sm"
       >
-        <Icon name="CogIcon" />
+        <Icon as={CogIcon} />
         Configuración
       </Button>
     </Stack>
@@ -58,6 +67,12 @@ const BillingPage: React.FC = () => {
     }
   };
 
+  const handleTabChange = (details: { value: string | null }) => {
+    if (details.value && ['dashboard', 'create', 'manage', 'analytics'].includes(details.value)) {
+      setActiveTab(details.value as BillingTab);
+    }
+  };
+
   return (
     <ContentLayout spacing="normal">
       <PageHeader
@@ -67,22 +82,22 @@ const BillingPage: React.FC = () => {
         actions={quickActions}
       />
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <Tabs.List>
           <Tabs.Trigger value="dashboard">
-            <Icon name="HomeIcon" />
+            <Icon as={HomeIcon} />
             Dashboard
           </Tabs.Trigger>
           <Tabs.Trigger value="create">
-            <Icon name="PlusIcon" />
+            <Icon as={PlusIcon} />
             Crear Suscripción
           </Tabs.Trigger>
           <Tabs.Trigger value="manage">
-            <Icon name="ListBulletIcon" />
+            <Icon as={ListBulletIcon} />
             Gestionar
           </Tabs.Trigger>
           <Tabs.Trigger value="analytics">
-            <Icon name="ChartBarIcon" />
+            <Icon as={ChartBarIcon} />
             Analytics
           </Tabs.Trigger>
         </Tabs.List>

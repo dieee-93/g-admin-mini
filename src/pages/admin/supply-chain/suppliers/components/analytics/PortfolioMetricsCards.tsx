@@ -3,7 +3,7 @@
 // ============================================
 // Summary metrics for the entire supplier portfolio
 
-import { SimpleGrid, Text, HStack, VStack } from '@/shared/ui';
+import { SimpleGrid } from '@/shared/ui';
 import { MetricCard } from '@/shared/ui';
 import type { SupplierAnalysisResult } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
 import {
@@ -50,7 +50,7 @@ export function PortfolioMetricsCards({ metrics }: PortfolioMetricsCardsProps) {
   };
 
   return (
-    <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={4}>
+    <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="4">
       {/* Average Rating */}
       <MetricCard
         title="Rating Promedio"

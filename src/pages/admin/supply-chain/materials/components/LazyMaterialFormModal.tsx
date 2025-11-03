@@ -21,10 +21,10 @@ const ModalLoadingFallback = () => (
   >
     <VStack 
       bg="white" 
-      p={8} 
+      p="8" 
       borderRadius="lg" 
       boxShadow="xl"
-      gap={4}
+      gap="4"
     >
       <Spinner size="lg" color="blue.500" />
       <Box textAlign="center" color="gray.600">

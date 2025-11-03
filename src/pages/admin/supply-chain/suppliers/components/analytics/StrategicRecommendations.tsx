@@ -26,7 +26,7 @@ export function StrategicRecommendations({
 }: StrategicRecommendationsProps) {
   if (recommendations.length === 0) {
     return (
-      <VStack align="stretch" gap={4}>
+      <VStack align="stretch" gap="4">
         <Text fontSize="xl" fontWeight="bold">
           Recomendaciones Estratégicas
         </Text>
@@ -38,12 +38,12 @@ export function StrategicRecommendations({
   }
 
   return (
-    <VStack align="stretch" gap={4}>
+    <VStack align="stretch" gap="4">
       <Text fontSize="xl" fontWeight="bold">
         Recomendaciones Estratégicas
       </Text>
 
-      <Stack direction="column" gap={3}>
+      <Stack direction="column" gap="3">
         {recommendations.map(rec => (
           <Card.Root key={rec.id}>
             <Card.Header>
@@ -60,7 +60,7 @@ export function StrategicRecommendations({
             </Card.Header>
 
             <Card.Body>
-              <VStack align="stretch" gap={3}>
+              <VStack align="stretch" gap="3">
                 {/* Description */}
                 <Text>{rec.description}</Text>
 

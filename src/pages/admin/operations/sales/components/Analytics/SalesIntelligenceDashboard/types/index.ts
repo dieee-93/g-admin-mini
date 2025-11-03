@@ -5,6 +5,6 @@ export interface MetricCard {
   trend?: 'up' | 'down' | 'stable';
   target?: number;
   format?: 'currency' | 'percentage' | 'number' | 'time';
-  icon?: any;
+  icon?: React.ElementType;
   color?: string;
 }

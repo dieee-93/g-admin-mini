@@ -1,5 +1,4 @@
-import { Box, Stack, Alert, Text } from '@chakra-ui/react';
-import { SelectField } from '@/shared/ui';
+import { Box, Stack, Alert, SelectField } from '@/shared/ui';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { type ItemFormData } from '../../../types';
 import { CATEGORY_COLLECTION } from '../constants';

@@ -178,20 +178,20 @@ export function StockSummaryWidget({
             
             <Stack direction="row" justify="space-between" align="center">
               <Typography variant="body" size="sm" color="text.secondary">Disponibles:</Typography>
-              <Badge colorPalette="success" size="sm">{stats.availableProducts}</Badge>
+              <Badge colorPalette="green" size="sm">{stats.availableProducts}</Badge>
             </Stack>
             
             {stats.lowStockProducts > 0 && (
               <Stack direction="row" justify="space-between" align="center">
                 <Typography variant="body" size="sm" color="text.secondary">Stock Bajo:</Typography>
-                <Badge colorPalette="warning" size="sm">{stats.lowStockProducts}</Badge>
+                <Badge colorPalette="orange" size="sm">{stats.lowStockProducts}</Badge>
               </Stack>
             )}
             
             {stats.outOfStockProducts > 0 && (
               <Stack direction="row" justify="space-between" align="center">
                 <Typography variant="body" size="sm" color="text.secondary">Sin Stock:</Typography>
-                <Badge colorPalette="error" size="sm">{stats.outOfStockProducts}</Badge>
+                <Badge colorPalette="red" size="sm">{stats.outOfStockProducts}</Badge>
               </Stack>
             )}
             

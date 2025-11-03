@@ -62,7 +62,9 @@ export function TrendsWidget() {
       <CardWrapper.Body p="4">
         <Stack gap="4">
           <Stack direction="row" align="center" gap="2">
-            <Icon icon={SparklesIcon} size="md" color="indigo.500" />
+            <Icon size="md" color="indigo.500" >
+                <SparklesIcon />
+              </Icon>
             <Typography variant="body" size="md" weight="medium">
               Tendencias
             </Typography>

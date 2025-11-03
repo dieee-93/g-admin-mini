@@ -5,21 +5,22 @@
 import React, { useMemo } from 'react';
 import {
   ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
-  Button, Badge, Icon, Stack, Typography
+  Badge, Icon, Typography
 } from '@/shared/ui';
 import {
   ChartBarIcon,
-  UsersIcon,
   TrophyIcon,
   ExclamationTriangleIcon,
   CurrencyDollarIcon,
   ClockIcon,
   AcademicCapIcon,
-  ArrowTrendingUpIcon,
-  CheckCircleIcon,
-  XCircleIcon
+  CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services/AnalyticsEngine';
+import { AnalyticsEngine, TrendAnalytics } from '@/shared/services/AnalyticsEngine';
+import type { FC, SVGProps } from 'react';
+
+// Hero icon type
+type HeroIcon = FC<SVGProps<SVGSVGElement>>;
 
 // HR-specific analytics types
 interface StaffMember {
@@ -71,7 +72,7 @@ interface PerformanceQuadrant {
   avgSalary: number;
   retention: number;
   color: string;
-  icon: any;
+  icon: HeroIcon;
   priority: 'low' | 'medium' | 'high' | 'critical';
   actionRecommendations: string[];
 }
@@ -117,16 +118,16 @@ const generateMockStaffData = (): StaffMember[] => {
       last_review_date: new Date(2024, Math.floor(Math.random() * 6), 1).toISOString(),
       certifications: Math.random() > 0.7 ? ['Food Safety', 'First Aid'] : [],
       skills: ['Communication', 'Teamwork', 'Customer Service'].slice(0, Math.floor(Math.random() * 3) + 1),
-      employment_type: Math.random() > 0.2 ? 'full_time' : 'part_time' as any,
-      status: Math.random() > 0.1 ? 'active' : 'inactive' as any
+      employment_type: (Math.random() > 0.2 ? 'full_time' : 'part_time') as StaffMember['employment_type'],
+      status: (Math.random() > 0.1 ? 'active' : 'inactive') as StaffMember['status']
     };
   });
 };
 
 export function StaffAnalyticsEnhanced({
-  staff = generateMockStaffData(),
-  timeframe = '3M'
-}: StaffAnalyticsEnhancedProps) {
+  staff = generateMockStaffData()
+}: Omit<StaffAnalyticsEnhancedProps, 'timeframe'>) {
+  // TODO: Implement timeframe filtering when historical data is available
 
   // Core analytics calculations
   const analytics = useMemo(() => {
@@ -269,7 +270,7 @@ export function StaffAnalyticsEnhanced({
 
   // Generate insights and recommendations
   const insights = useMemo(() => {
-    const { metrics, performanceQuadrants, departmentAnalysis } = analytics;
+    const { metrics, departmentAnalysis } = analytics;
     const insights = [];
 
     // Performance insights

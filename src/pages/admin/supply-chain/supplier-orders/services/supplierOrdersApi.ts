@@ -5,7 +5,6 @@
 import { supabase } from '@/lib/supabase/client';
 import type {
   SupplierOrder,
-  SupplierOrderItem,
   SupplierOrderWithDetails,
   SupplierOrderFormData,
   SupplierOrderStatus,
@@ -198,7 +197,7 @@ export const supplierOrdersApi = {
     updates: Partial<SupplierOrderFormData>
   ): Promise<SupplierOrderWithDetails> {
     // Update order
-    const orderUpdates: any = {};
+    const orderUpdates: Partial<SupplierOrder> = {};
     if (updates.supplier_id) orderUpdates.supplier_id = updates.supplier_id;
     if (updates.expected_delivery_date !== undefined) {
       orderUpdates.expected_delivery_date = updates.expected_delivery_date || null;
@@ -251,7 +250,7 @@ export const supplierOrdersApi = {
     id: string,
     status: SupplierOrderStatus
   ): Promise<SupplierOrder> {
-    const updates: any = { status };
+    const updates: Partial<SupplierOrder> = { status };
 
     // Set timestamps based on status
     if (status === 'approved') {
@@ -276,8 +275,8 @@ export const supplierOrdersApi = {
    */
   async receiveOrder(id: string, receiveData: ReceiveOrderData): Promise<SupplierOrderWithDetails> {
     // Update order status
-    const updates: any = {
-      status: 'received',
+    const updates: Partial<SupplierOrder> = {
+      status: 'received' as SupplierOrderStatus,
       received_at: new Date().toISOString(),
       actual_delivery_date: receiveData.actual_delivery_date || null
     };

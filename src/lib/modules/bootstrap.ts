@@ -311,8 +311,16 @@ export function validateModuleManifests(manifests: ModuleManifest[]): ModuleVali
       warnings.push(`Module "${manifest.id}" has no dependencies and is not auto-install`);
     }
 
-    if (manifest.requiredFeatures.length === 0) {
-      warnings.push(`Module "${manifest.id}" has no required features`);
+    // ⚠️ Only warn if module has NO feature configuration at all
+    // (not alwaysActive, not requiredFeatures, not optionalFeatures)
+    if (
+      manifest.requiredFeatures.length === 0 &&
+      (!manifest.optionalFeatures || manifest.optionalFeatures.length === 0) &&
+      !manifest.autoInstall
+    ) {
+      warnings.push(
+        `Module "${manifest.id}" has no feature requirements (not alwaysActive, no requiredFeatures, no optionalFeatures)`
+      );
     }
   }
 

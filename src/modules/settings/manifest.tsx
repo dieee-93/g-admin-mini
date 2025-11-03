@@ -12,7 +12,7 @@
  * @version 1.0.0
  */
 
-import React from 'react';
+import type React from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
@@ -63,6 +63,15 @@ export const settingsManifest: ModuleManifest = {
   optionalFeatures: ['settings'] as FeatureId[],
 
   // ============================================
+  // PERMISSIONS & ROLES
+  // ============================================
+
+  /**
+   * 🔒 PERMISSIONS: Only ADMINISTRADOR can modify system settings
+   */
+  minimumRole: 'ADMINISTRADOR' as const,
+
+  // ============================================
   // HOOK POINTS
   // ============================================
 
@@ -92,7 +101,7 @@ export const settingsManifest: ModuleManifest = {
   /**
    * Setup function - register hook handlers
    */
-  setup: async (registry) => {
+  setup: async () => {
     logger.info('App', '⚙️ Setting up Settings module');
 
     try {
@@ -130,13 +139,13 @@ export const settingsManifest: ModuleManifest = {
      */
     getSetting: async (key: string) => {
       logger.debug('App', 'Getting setting', { key });
-      return { value: null };
+      return { value: null as unknown };
     },
 
     /**
      * Set a setting value
      */
-    setSetting: async (key: string, value: any) => {
+    setSetting: async (key: string, value: unknown) => {
       logger.debug('App', 'Setting value', { key, value });
       return { success: true };
     },
@@ -144,7 +153,7 @@ export const settingsManifest: ModuleManifest = {
     /**
      * Register a settings section
      */
-    registerSection: async (sectionConfig: any) => {
+    registerSection: async (sectionConfig: SettingsSectionConfig) => {
       logger.debug('App', 'Registering settings section', { sectionConfig });
       return { success: true };
     },
@@ -175,10 +184,21 @@ export const settingsManifest: ModuleManifest = {
 export default settingsManifest;
 
 /**
+ * Settings section configuration
+ */
+export interface SettingsSectionConfig {
+  id: string;
+  title: string;
+  description?: string;
+  icon?: React.ComponentType;
+  component: React.ComponentType;
+}
+
+/**
  * Settings module public API types
  */
 export interface SettingsAPI {
-  getSetting: (key: string) => Promise<{ value: any }>;
-  setSetting: (key: string, value: any) => Promise<{ success: boolean }>;
-  registerSection: (sectionConfig: any) => Promise<{ success: boolean }>;
+  getSetting: (key: string) => Promise<{ value: unknown }>;
+  setSetting: (key: string, value: unknown) => Promise<{ success: boolean }>;
+  registerSection: (sectionConfig: SettingsSectionConfig) => Promise<{ success: boolean }>;
 }

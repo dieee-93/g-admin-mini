@@ -170,10 +170,10 @@ export function EventCard({
         transform: isHovered ? 'translateY(-2px)' : 'translateY(0)'
       }}
     >
-      <Stack direction="column" gap={3}>
+      <Stack direction="column" gap="3">
         {/* HEADER */}
         <Stack direction="row" justify="space-between" align="start">
-          <Stack direction="row" gap={2} align="center">
+          <Stack direction="row" gap="2" align="center">
             <Icon as={EventIcon} size="lg" color={event.colorBorder} />
             <div>
               <div style={{ fontSize: '15px', fontWeight: 600, color: event.colorText }}>
@@ -212,7 +212,7 @@ export function EventCard({
               fontSize: '12px'
             }}
           >
-            <Stack direction="column" gap={2}>
+            <Stack direction="column" gap="2">
               {renderMetadata()}
               {event.location && <MetadataRow label="Ubicación" value={event.location} />}
               {event.description && <MetadataRow label="Descripción" value={event.description} />}
@@ -222,7 +222,7 @@ export function EventCard({
 
         {/* ACTIONS */}
         {showActions && (isHovered || expanded) && (
-          <Stack direction="row" gap={2} justify="end">
+          <Stack direction="row" gap="2" justify="end">
             {event.status !== 'completed' && onComplete && (
               <Button
                 size="xs"

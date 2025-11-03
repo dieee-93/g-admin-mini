@@ -9,6 +9,50 @@ import {
 } from '../types';
 
 /**
+ * Raw API response type - mirrors database schema
+ * This represents what we receive from Supabase
+ */
+interface ApiMaterialItem {
+  id: string | number;
+  name: string;
+  type: string;
+  unit?: string;
+  stock?: number | string;
+  unit_cost?: number | string;
+  min_stock?: number | string;
+  target_stock?: number | string;
+  supplier_id?: string;
+  category?: string;
+  package_size?: number | string;
+  package_unit?: string;
+  package_cost?: number | string;
+  display_mode?: string;
+  precision_digits?: number | string;
+  requires_production?: boolean;
+  auto_calculate_cost?: boolean;
+  ingredients_available?: boolean;
+  recipe_id?: string;
+  production_time?: number | string;
+  batch_size?: number | string;
+  created_at?: string;
+  updated_at?: string;
+  location_id?: string;
+}
+
+/**
+ * Base item structure after initial validation
+ */
+interface NormalizedBaseItem {
+  id: string;
+  name: string;
+  type: ItemType;
+  stock: number;
+  unit_cost: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
  * Service responsible for normalizing API data into consistent MaterialItem objects.
  * Handles type-specific transformations and provides default values for missing properties.
  */
@@ -58,8 +102,9 @@ export class MaterialsNormalizer {
 
   /**
    * Maps internal TypeScript types to database types for API calls
+   * Note: Removed unused 'category' parameter - not needed for simple type mapping
    */
-  static mapItemTypeToApiType(itemType: ItemType, category?: string): string {
+  static mapItemTypeToApiType(itemType: ItemType): string {
     switch (itemType) {
       case 'COUNTABLE':
         return 'COUNTABLE';
@@ -77,32 +122,39 @@ export class MaterialsNormalizer {
    * Normalizes a single item from API format to MaterialItem format
    */
   static normalizeApiItem(apiItem: unknown): MaterialItem {
+    // Type guard: Ensure apiItem is an object
+    if (!apiItem || typeof apiItem !== 'object') {
+      throw new Error('Invalid API item: expected object, got ' + typeof apiItem);
+    }
+
+    const item = apiItem as ApiMaterialItem;
+
     // Validate required fields
-    if (!apiItem.id || !apiItem.name || !apiItem.type) {
+    if (!item.id || !item.name || !item.type) {
       throw new Error('Invalid API item: missing required fields (id, name, type)');
     }
 
     // Map API type to internal type
-    const internalType = this.mapApiTypeToItemType(apiItem.type);
+    const internalType = this.mapApiTypeToItemType(item.type);
 
-    const baseItem = {
-      id: String(apiItem.id),
-      name: String(apiItem.name).trim(),
+    const baseItem: NormalizedBaseItem = {
+      id: String(item.id),
+      name: String(item.name).trim(),
       type: internalType,
-      stock: Math.max(0, Number(apiItem.stock) || 0),
-      unit_cost: Math.max(0, Number(apiItem.unit_cost) || 0),
-      created_at: apiItem.created_at || new Date().toISOString(),
-      updated_at: apiItem.updated_at || new Date().toISOString()
+      stock: Math.max(0, Number(item.stock) || 0),
+      unit_cost: Math.max(0, Number(item.unit_cost) || 0),
+      created_at: item.created_at || new Date().toISOString(),
+      updated_at: item.updated_at || new Date().toISOString()
     };
 
     // Type-specific normalization based on internal type
     switch (internalType) {
       case 'COUNTABLE':
-        return this.normalizeCountableItem(baseItem, apiItem);
+        return this.normalizeCountableItem(baseItem, item);
       case 'MEASURABLE':
-        return this.normalizeMeasurableItem(baseItem, apiItem);
+        return this.normalizeMeasurableItem(baseItem, item);
       case 'ELABORATED':
-        return this.normalizeElaboratedItem(baseItem, apiItem);
+        return this.normalizeElaboratedItem(baseItem, item);
       default:
         throw new Error(`Unknown internal type: ${internalType}`);
     }
@@ -111,7 +163,7 @@ export class MaterialsNormalizer {
   /**
    * Normalizes COUNTABLE item with packaging information
    */
-  private static normalizeCountableItem(base: any, api: any): CountableItem {
+  private static normalizeCountableItem(base: NormalizedBaseItem, api: ApiMaterialItem): CountableItem {
     const item: CountableItem = {
       ...base,
       type: 'COUNTABLE',
@@ -135,7 +187,7 @@ export class MaterialsNormalizer {
   /**
    * Normalizes MEASURABLE item with business category and precision
    */
-  private static normalizeMeasurableItem(base: any, api: any): MeasurableItem {
+  private static normalizeMeasurableItem(base: NormalizedBaseItem, api: ApiMaterialItem): MeasurableItem {
     const unit = api.unit || 'kg';
     const item: MeasurableItem = {
       ...base,
@@ -151,7 +203,7 @@ export class MaterialsNormalizer {
   /**
    * Normalizes ELABORATED item with production settings
    */
-  private static normalizeElaboratedItem(base: any, api: any): ElaboratedItem {
+  private static normalizeElaboratedItem(base: NormalizedBaseItem, api: ApiMaterialItem): ElaboratedItem {
     const item: ElaboratedItem = {
       ...base,
       type: 'ELABORATED',
@@ -181,7 +233,7 @@ export class MaterialsNormalizer {
   /**
    * Normalizes an array of API items
    */
-  static normalizeApiItems(apiItems: any[]): MaterialItem[] {
+  static normalizeApiItems(apiItems: unknown[]): MaterialItem[] {
     if (!Array.isArray(apiItems)) {
       logger.warn('MaterialsStore', 'MaterialsNormalizer: Expected array, got:', typeof apiItems);
       return [];

@@ -4,8 +4,18 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+// Test types for mocks
+interface MockComponentProps {
+  children?: React.ReactNode;
+  open?: boolean;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  onClick?: (value: string) => void;
+  [key: string]: unknown;
+}
 import { useStaffStore } from '../../../../../store/staffStore';
 import { DirectorySection } from '../components/sections/DirectorySection';
 import { PerformanceSection } from '../components/sections/PerformanceSection';
@@ -38,31 +48,31 @@ vi.mock('@chakra-ui/react', async () => {
   return {
     ...actual,
     Modal: {
-      Root: ({ children, open }: any) => open ? <div data-testid="modal">{children}</div> : null,
-      Backdrop: ({ children }: any) => <div data-testid="modal-backdrop">{children}</div>,
-      Content: ({ children }: any) => <div data-testid="modal-content">{children}</div>,
-      Header: ({ children }: any) => <div data-testid="modal-header">{children}</div>,
-      Body: ({ children }: any) => <div data-testid="modal-body">{children}</div>,
-      Footer: ({ children }: any) => <div data-testid="modal-footer">{children}</div>,
-      CloseTrigger: ({ children, ...props }: any) => <button data-testid="modal-close" {...props}>{children}</button>,
+      Root: ({ children, open }: MockComponentProps) => open ? <div data-testid="modal">{children}</div> : null,
+      Backdrop: ({ children }: MockComponentProps) => <div data-testid="modal-backdrop">{children}</div>,
+      Content: ({ children }: MockComponentProps) => <div data-testid="modal-content">{children}</div>,
+      Header: ({ children }: MockComponentProps) => <div data-testid="modal-header">{children}</div>,
+      Body: ({ children }: MockComponentProps) => <div data-testid="modal-body">{children}</div>,
+      Footer: ({ children }: MockComponentProps) => <div data-testid="modal-footer">{children}</div>,
+      CloseTrigger: ({ children, ...props }: MockComponentProps) => <button data-testid="modal-close" {...props}>{children}</button>,
     },
     Tabs: {
-      Root: ({ children, value, onValueChange }: any) => (
-        <div data-testid="tabs-root" data-value={value} onChange={onValueChange}>
+      Root: ({ children, value, onValueChange }: MockComponentProps) => (
+        <div data-testid="tabs-root" data-value={value} onChange={() => onValueChange?.(value || '')}>
           {children}
         </div>
       ),
-      List: ({ children }: any) => <div data-testid="tabs-list">{children}</div>,
-      Trigger: ({ children, value, onClick }: any) => (
-        <button 
-          data-testid={`tab-${value}`} 
+      List: ({ children }: MockComponentProps) => <div data-testid="tabs-list">{children}</div>,
+      Trigger: ({ children, value, onClick }: MockComponentProps) => (
+        <button
+          data-testid={`tab-${value}`}
           data-value={value}
-          onClick={() => onClick && onClick(value)}
+          onClick={() => onClick?.(value || '')}
         >
           {children}
         </button>
       ),
-      Content: ({ children, value }: any) => <div data-testid={`tab-content-${value}`}>{children}</div>,
+      Content: ({ children, value }: MockComponentProps) => <div data-testid={`tab-content-${value}`}>{children}</div>,
     }
   };
 });

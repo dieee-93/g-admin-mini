@@ -11,9 +11,10 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { ContentLayout, Section, Button, Alert, Icon, Stack } from '@/shared/ui';
-import { PlusIcon, FunnelIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { ContentLayout, Section, Button, Alert, Icon, Stack, Badge, Tabs } from '@/shared/ui';
+import { PlusIcon, FunnelIcon, Cog6ToothIcon, CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { HookPoint } from '@/lib/modules';
+import { useLocation } from '@/contexts/LocationContext';
 
 // Calendar components
 import {
@@ -27,22 +28,28 @@ import {
 // Top bar
 import { SchedulingTopBar } from './components/SchedulingTopBar';
 
+// Availability configuration
+import { AvailabilityTab } from './components/AvailabilityTab';
+
 // Modals
-import { ShiftEditorModal, AutoSchedulingModal } from './components';
+import { ShiftEditorModal, AutoSchedulingModal, AppointmentBookingModal } from './components';
 
 // Types & Adapters
 import type { CalendarView, CalendarFilters, UnifiedScheduleEvent } from './types/calendar';
+import type { Appointment } from './types/appointments';
 import {
   staffShiftAdapter,
   deliveryAdapter,
   timeOffAdapter,
-  maintenanceAdapter
+  maintenanceAdapter,
+  appointmentAdapter
 } from './adapters';
 import { SchedulingUtils } from './adapters/SchedulingAdapter';
 
 // Hooks
 import { useSchedulingPage } from './hooks';
 import { useScheduling } from './hooks/useScheduling';
+import { useAppointments } from './hooks/useAppointments';
 
 // Systems integration
 import { useErrorHandler } from '@/lib/error-handling';
@@ -66,6 +73,16 @@ export default function SchedulingPage() {
 
   const { handleError } = useErrorHandler();
   const { isOnline } = useOfflineStatus();
+  const { selectedLocation, isMultiLocationMode } = useLocation();
+
+  // ============================================
+  // CALENDAR VIEW STATE (Must be declared first)
+  // ============================================
+
+  const [activeTab, setActiveTab] = useState('calendar');
+  const [calendarView, setCalendarView] = useState<CalendarView>('month');
+  const [referenceDate, setReferenceDate] = useState<Date>(new Date());
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // ============================================
   // PAGE STATE
@@ -88,18 +105,28 @@ export default function SchedulingPage() {
   // Get shifts data
   const { shifts: allShifts, refreshData } = useScheduling();
 
+  // Phase 4: Get appointments data (depends on referenceDate)
+  const {
+    appointments,
+    refreshAppointments
+  } = useAppointments({
+    dateFrom: new Date(referenceDate.getFullYear(), referenceDate.getMonth(), 1)
+      .toISOString()
+      .split('T')[0],
+    dateTo: new Date(referenceDate.getFullYear(), referenceDate.getMonth() + 1, 0)
+      .toISOString()
+      .split('T')[0],
+    autoLoad: true
+  });
+
   // TODO: Get data from other sources when tables are ready
   // const { deliveries } = useDeliveries();
   // const { timeOffRequests } = useTimeOff();
   // const { maintenanceSchedules } = useMaintenance();
 
-  // ============================================
-  // CALENDAR VIEW STATE
-  // ============================================
-
-  const [calendarView, setCalendarView] = useState<CalendarView>('month');
-  const [referenceDate, setReferenceDate] = useState<Date>(new Date());
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  // Phase 4: Appointment modal state
+  const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
 
   // ============================================
   // FILTERS STATE
@@ -133,19 +160,24 @@ export default function SchedulingPage() {
         events.push(...staffShiftAdapter.adaptMany(allShifts));
       }
 
+      // Phase 4: Appointments
+      if (appointments && appointments.length > 0) {
+        events.push(...appointmentAdapter.adaptMany(appointments));
+      }
+
       // Deliveries (when data available)
       if (deliveries.length > 0) {
-        events.push(...deliveryAdapter.adaptMany(deliveries as any[]));
+        events.push(...deliveryAdapter.adaptMany(deliveries as never[]));
       }
 
       // Time-off requests (when data available)
       if (timeOffRequests.length > 0) {
-        events.push(...timeOffAdapter.adaptMany(timeOffRequests as any[]));
+        events.push(...timeOffAdapter.adaptMany(timeOffRequests as never[]));
       }
 
       // Maintenance schedules (when data available)
       if (maintenanceSchedules.length > 0) {
-        events.push(...maintenanceAdapter.adaptMany(maintenanceSchedules as any[]));
+        events.push(...maintenanceAdapter.adaptMany(maintenanceSchedules as never[]));
       }
 
       return events;
@@ -154,11 +186,24 @@ export default function SchedulingPage() {
       handleError(err as Error);
       return [];
     }
-  }, [allShifts, handleError]);
+  }, [allShifts, appointments, handleError]);
 
   // Apply filters
   const filteredEvents = useMemo(() => {
     let filtered = unifiedEvents;
+
+    // Multi-Location Filter: Auto-filter by selected location if in multi-location mode
+    if (isMultiLocationMode && selectedLocation) {
+      filtered = filtered.filter(event => {
+        // Only show events for the selected location
+        return event.locationId === selectedLocation.id || !event.locationId; // Include events without location (backwards compatibility)
+      });
+    }
+
+    // Filter by location_id (manual filter)
+    if (filters.locationId) {
+      filtered = filtered.filter(event => event.locationId === filters.locationId);
+    }
 
     // Filter by event types
     if (filters.eventTypes.length > 0) {
@@ -206,7 +251,7 @@ export default function SchedulingPage() {
     }
 
     return filtered;
-  }, [unifiedEvents, filters]);
+  }, [unifiedEvents, filters, isMultiLocationMode, selectedLocation]);
 
   // ============================================
   // HANDLERS
@@ -333,9 +378,15 @@ export default function SchedulingPage() {
       }
 
       case 'appointment': {
-        // TODO: Open appointment details when appointments feature is active
-        logger.info('Scheduling', 'Appointment event clicked', event.metadata);
-        // Future: Navigate to customer appointments view
+        // Phase 4: Open appointment editor modal
+        const appointment = appointments?.find(a => a.id === event.id);
+        if (appointment) {
+          setEditingAppointment(appointment);
+          setIsAppointmentModalOpen(true);
+          logger.info('Scheduling', 'Opening appointment editor', { appointmentId: appointment.id });
+        } else {
+          logger.warn('Scheduling', 'Appointment not found in local data', { eventId: event.id });
+        }
         break;
       }
 
@@ -421,6 +472,36 @@ export default function SchedulingPage() {
     // setIsStockReceptionModalOpen(true);
   };
 
+  // ============================================
+  // PHASE 4: APPOINTMENT HANDLERS
+  // ============================================
+
+  /**
+   * Handler: Open create appointment modal
+   */
+  const handleOpenCreateAppointment = () => {
+    setEditingAppointment(null);
+    setIsAppointmentModalOpen(true);
+    logger.info('Scheduling', 'Opening create appointment modal');
+  };
+
+  /**
+   * Handler: Close appointment modal
+   */
+  const handleCloseAppointmentModal = () => {
+    setIsAppointmentModalOpen(false);
+    setEditingAppointment(null);
+  };
+
+  /**
+   * Handler: Appointment created/updated successfully
+   */
+  const handleAppointmentSuccess = async () => {
+    await refreshAppointments();
+    await refreshData(); // Refresh all scheduling data
+    logger.info('Scheduling', 'Appointment saved successfully, data refreshed');
+  };
+
   /**
    * Handler: Create Production Block
    * Opens modal/form to schedule production batch
@@ -474,9 +555,23 @@ export default function SchedulingPage() {
         onMetricClick={handleMetricClick}
       />
 
-      {/* 2. CALENDAR SECTION */}
-      <Section variant="elevated">
-        <Stack direction="column" gap={4}>
+      {/* 2. MAIN TABS: Calendar vs Availability Config */}
+      <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value)}>
+        <Tabs.List>
+          <Tabs.Trigger value="calendar">
+            <Icon icon={CalendarIcon} size="sm" />
+            Calendar & Shifts
+          </Tabs.Trigger>
+          <Tabs.Trigger value="availability">
+            <Icon icon={ClockIcon} size="sm" />
+            Availability Configuration
+          </Tabs.Trigger>
+        </Tabs.List>
+
+        {/* CALENDAR TAB */}
+        <Tabs.Content value="calendar">
+          <Section variant="elevated">
+        <Stack direction="column" gap="4">
           {/* Calendar Controls */}
           <Stack direction="row" justify="space-between" align="center">
             {/* Left: View Selector */}
@@ -488,7 +583,14 @@ export default function SchedulingPage() {
             />
 
             {/* Right: Actions */}
-            <Stack direction="row" gap={2}>
+            <Stack direction="row" gap="2" align="center">
+              {/* Multi-Location Badge */}
+              {isMultiLocationMode && selectedLocation && (
+                <Badge variant="solid" colorPalette="purple">
+                  Location: {selectedLocation.name}
+                </Badge>
+              )}
+
               <Button
                 size="sm"
                 variant="outline"
@@ -505,6 +607,15 @@ export default function SchedulingPage() {
               >
                 <Icon icon={PlusIcon} size="xs" />
                 Nuevo Turno
+              </Button>
+
+              <Button
+                size="sm"
+                colorPalette="green"
+                onClick={handleOpenCreateAppointment}
+              >
+                <Icon icon={CalendarIcon} size="xs" />
+                Nueva Cita
               </Button>
 
               <Button
@@ -532,7 +643,7 @@ export default function SchedulingPage() {
                 }}
                 fallback={null}
                 direction="row"
-                gap={2}
+                gap="2"
               />
             </Stack>
           </Stack>
@@ -578,10 +689,17 @@ export default function SchedulingPage() {
             }}
             fallback={null}
             direction="column"
-            gap={3}
+            gap="3"
           />
         </Stack>
       </Section>
+        </Tabs.Content>
+
+        {/* AVAILABILITY TAB */}
+        <Tabs.Content value="availability">
+          <AvailabilityTab location_id={selectedLocation?.id} />
+        </Tabs.Content>
+      </Tabs.Root>
 
       {/* 3. FILTERS PANEL (Slide-in from right) */}
       <CalendarFiltersPanel
@@ -617,6 +735,17 @@ export default function SchedulingPage() {
           currentWeek={referenceDate.toISOString().split('T')[0]}
         />
       )}
+
+      {/* Phase 4: Appointment Booking Modal */}
+      {isAppointmentModalOpen && (
+        <AppointmentBookingModal
+          isOpen={isAppointmentModalOpen}
+          onClose={handleCloseAppointmentModal}
+          onSuccess={handleAppointmentSuccess}
+          appointment={editingAppointment}
+          prefilledDate={referenceDate.toISOString().split('T')[0]}
+        />
+      )}
     </ContentLayout>
   );
 }
@@ -624,7 +753,7 @@ export default function SchedulingPage() {
 /**
  * NOTES & TODOs:
  *
- * ✅ COMPLETED IN THIS SESSION:
+ * COMPLETED IN THIS SESSION:
  * - Calendar-first design with Month view functional
  * - Unified event system with adapters
  * - Filters panel with event type/department/status filters
@@ -645,7 +774,7 @@ export default function SchedulingPage() {
  *
  * 🔗 CROSS-MODULE INTEGRATION:
  * - Production module: production blocks in calendar
- * - Sales module: volume forecasts → staffing suggestions
+ * - Sales module: volume forecasts -> staffing suggestions
  * - Customer module: appointments in calendar
  * - Finance module: budget alerts when costs exceed threshold
  *
@@ -654,3 +783,4 @@ export default function SchedulingPage() {
  * - See ./docs/SCHEDULING_EVENT_TYPES.md for event type specs
  * - See ./docs/SCHEDULING_INTEGRATION_GUIDE.md for adding new event types
  */
+

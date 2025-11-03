@@ -1,31 +1,25 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   CreditCardIcon,
   TableCellsIcon,
   ChartBarIcon,
   QrCodeIcon,
-  ClipboardDocumentListIcon,
   ComputerDesktopIcon,
-  PlusIcon,
-  ArrowPathIcon,
-  CurrencyDollarIcon,
-  ArrowTrendingUpIcon,
-  UsersIcon,
-  DocumentTextIcon
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationActions } from '@/contexts/NavigationContext';
+import { useSalesStore } from '@/store/salesStore';
 
 // ✅ ENTERPRISE SYSTEMS INTEGRATION
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
-import { FinancialDecimal, formatCurrency, safeAdd, safeMul, safeDiv } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency, safeAdd, safeMul, safeDecimal } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 
 import { logger } from '@/lib/logging';
 import {
   calculateSalesMetrics,
-  comparePeriods,
   analyzeProductPerformance,
   calculateRevenueBreakdown,
   calculateSalesVelocity,
@@ -45,6 +39,7 @@ import type {
   RevenueBreakdown,
   TaxCalculationResult
 } from '../services';
+import type { Sale, Order, Table, SaleItem } from '../types';
 
 export type SalesPageSection = 'pos' | 'tables' | 'analytics' | 'kitchen' | 'reports';
 
@@ -111,7 +106,7 @@ export interface SalesPageActions {
 
   // Table management
   handleTableSelect: (tableId: string) => void;
-  handleTableAssign: (tableId: string, orderData: any) => void;
+  handleTableAssign: (tableId: string, orderData: Partial<Order>) => void;
   handleTableClear: (tableId: string) => void;
 
   // Analytics actions
@@ -128,10 +123,10 @@ export interface SalesPageActions {
   handleQRCodeManagement: () => void;
 
   // NEW: Component-specific actions
-  handleMetricClick: (metric: string, value: any) => void;
+  handleMetricClick: (metric: string, value: string | number) => void;
   handleAlertAction: (action: string, alertId: string) => void;
-  handleOrderPlace: (orderData: any) => void;
-  handlePaymentProcess: (paymentData: any) => void;
+  handleOrderPlace: (orderData: Partial<Order>) => void;
+  handlePaymentProcess: (paymentData: { amount: number; method: string; tip?: number }) => void;
 
   // Toggle handlers
   toggleAnalytics: () => void;
@@ -162,27 +157,80 @@ export interface UseSalesPageReturn {
   actions: SalesPageActions;
 
   // Real-time data
-  activeSales: any[];
-  recentTransactions: any[];
+  activeSales: Sale[];
+  recentTransactions: Sale[];
   tableStatuses: Record<string, 'available' | 'occupied' | 'reserved' | 'cleaning'>;
 
   // Analytics helpers
-  calculateTotalTaxes: (items: any[]) => TaxCalculationResult;
+  calculateTotalTaxes: (items: SaleItem[]) => TaxCalculationResult;
   getTopPerformingProducts: (limit?: number) => ProductPerformance[];
   getSalesComparison: () => PeriodComparison | null;
   getRevenueBreakdown: () => RevenueBreakdown;
 }
 
 export const useSalesPage = (): UseSalesPageReturn => {
-  const { setQuickActions, updateModuleBadge } = useNavigation();
+  // 🔬 SCIENTIFIC DEBUG: Track renders with timestamp
+  if (!window.__salesPageHookRenders) {
+    window.__salesPageHookRenders = [];
+    window.__renderSnapshots = [];
+  }
+  window.__salesPageHookRenders.push(Date.now());
+  const renderNum = window.__salesPageHookRenders.length;
+
+  console.log(`\n${'='.repeat(80)}`);
+  console.log(`🔵 [useSalesPage HOOK] RENDER #${renderNum} at ${new Date().toLocaleTimeString()}`);
+  console.log(`🔵 [useSalesPage HOOK] WHY? Component re-rendered, so hook re-executes`);
+  console.log(`${'='.repeat(80)}`);
+
+  const navigationContext = useNavigation();
+  const { setQuickActions, updateModuleBadge } = navigationContext;
+
+  // 📸 Snapshot de funciones de navegación para comparar
+  const navSnapshot = {
+    render: renderNum,
+    setQuickActionsId: setQuickActions.toString().substring(0, 100),
+    updateModuleBadgeId: updateModuleBadge.toString().substring(0, 100)
+  };
+  window.__renderSnapshots.push(navSnapshot);
+
+  // 🐛 DEBUG: Log when NavigationContext functions change
+  const prevSetQuickActionsRef = useRef(setQuickActions);
+  const prevUpdateBadgeRef = useRef(updateModuleBadge);
+
+  if (prevSetQuickActionsRef.current !== setQuickActions) {
+    console.log('⚠️ [DEPS CHANGE] setQuickActions CHANGED!');
+    prevSetQuickActionsRef.current = setQuickActions;
+  }
+
+  if (prevUpdateBadgeRef.current !== updateModuleBadge) {
+    console.log('⚠️ [DEPS CHANGE] updateModuleBadge CHANGED!');
+    prevUpdateBadgeRef.current = updateModuleBadge;
+  }
 
   // ✅ ENTERPRISE SYSTEMS HOOKS
+  // 🔧 FIX: Consume hooks HERE like Materials does
   const { handleError } = useErrorHandler();
   const { isOnline } = useOfflineStatus();
-  const { shouldReduceAnimations } = usePerformanceMonitor();
+  // Note: usePerformanceMonitor NOT consumed here - too frequent updates
 
-  // 🔧 DEBUG: Force Vite HMR to reload this file
-  console.log('🔍 [DEBUG] useSalesPage hook initializing - v3 FIXED');
+  // 🔧 FIX LOOP INFINITO: Use ref for handleError to break dependency cycle
+  // handleError se recrea en cada render, causando que todos los useCallbacks
+  // que dependen de él también se recreen, causando un loop infinito
+  const handleErrorRef = useRef(handleError);
+  useEffect(() => {
+    handleErrorRef.current = handleError;
+  }, [handleError]);
+
+  // 🔧 DEBUG: Force Vite HMR to reload this file - v4 WITH SAFE DECIMAL
+  logger.debug('UseSalesPage', '🔍 [DEBUG] useSalesPage hook initializing - v4 SAFE DECIMAL FIX');
+
+  // 🐛 DEBUG: Count hook executions
+  useEffect(() => {
+    logger.info('UseSalesPage', '✅ useSalesPage MOUNTED');
+    return () => {
+      logger.warn('UseSalesPage', '❌ useSalesPage UNMOUNTING!');
+    };
+  }, []);
 
   // State
   const [pageState, setPageState] = useState<SalesPageState>({
@@ -207,10 +255,10 @@ export const useSalesPage = (): UseSalesPageReturn => {
   const [activeTab, setActiveTab] = useState('pos');
 
   // Data state
-  const [salesData, setSalesData] = useState<any[]>([]);
-  const [transactionData, setTransactionData] = useState<any[]>([]);
-  const [productData, setProductData] = useState<any[]>([]);
-  const [tableData, setTableData] = useState<any[]>([]);
+  const [salesData, setSalesData] = useState<Sale[]>([]);
+  const [transactionData, setTransactionData] = useState<Sale[]>([]);
+  const [productData, setProductData] = useState<ProductPerformance[]>([]);
+  const [tableData, setTableData] = useState<Table[]>([]);
   const [currentSalesMetrics, setCurrentSalesMetrics] = useState<SalesMetrics>({
     total_revenue: 0,
     average_order_value: 0,
@@ -222,7 +270,7 @@ export const useSalesPage = (): UseSalesPageReturn => {
     refunds_amount: 0,
     net_revenue: 0
   });
-  const [periodComparison, setPeriodComparison] = useState<PeriodComparison | null>(null);
+  const [periodComparison] = useState<PeriodComparison | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -230,13 +278,15 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
   // Calculate metrics using business logic services
   const metrics: SalesPageMetrics = useMemo(() => {
+    // ✅ FIX LOOP: Create Date once outside filter to prevent infinite re-calculations
+    const today = new Date();
     const todayTransactions = transactionData.filter(t => {
       const transactionDate = new Date(t.created_at);
-      const today = new Date();
       return transactionDate.toDateString() === today.toDateString();
     });
 
-    const todayRevenue = todayTransactions.reduce((sum, t) => sum + t.total, 0);
+    // ✅ Sum amounts (already numbers after processing)
+    const todayRevenue = todayTransactions.reduce((sum, t) => sum + (t.amount || t.total || 0), 0);
     const averageOrderValue = todayTransactions.length > 0
       ? todayRevenue / todayTransactions.length
       : 0;
@@ -261,11 +311,15 @@ export const useSalesPage = (): UseSalesPageReturn => {
       ? calculateSalesVelocity(dailySalesData)
       : { current_velocity: 0, velocity_trend: 'stable' as const, momentum_score: 0 };
 
+    // Calculate conversion rate (sales / visitors)
+    // TODO: Get actual visitor count from analytics
+    const conversionRate = 0; // Placeholder until we have visitor tracking
+
     return {
       todayRevenue,
       todayTransactions: todayTransactions.length,
       averageOrderValue,
-      conversionRate: currentSalesMetrics.conversion_rate,
+      conversionRate, // ✅ FIX: Calculated internally instead of reading from currentSalesMetrics
       salesGrowth: periodComparison?.growth_metrics.revenue_growth || 0,
       profitMargin: revenueBreakdown.gross_margin_percentage,
       topProducts,
@@ -280,19 +334,25 @@ export const useSalesPage = (): UseSalesPageReturn => {
       netRevenue: revenueBreakdown.net_revenue,
       salesVelocity
     };
-  }, [transactionData, productData, salesData, tableData, currentSalesMetrics, periodComparison]);
+  }, [transactionData, productData, salesData, tableData, periodComparison]); // ✅ FIX: currentSalesMetrics removed - all values calculated internally
 
+  // 🐛 SUSPECTED CAUSE OF INFINITE LOOP - Temporarily disabled
   // Update navigation badge with pending orders
-  useEffect(() => {
-    if (updateModuleBadge && metrics.pendingOrders > 0) {
-      updateModuleBadge('sales', metrics.pendingOrders);
-    }
-  }, [metrics.pendingOrders, updateModuleBadge]);
+  // useEffect(() => {
+  //   if (updateModuleBadge && metrics.pendingOrders > 0) {
+  //     updateModuleBadge('sales', metrics.pendingOrders);
+  //   }
+  // }, [metrics.pendingOrders, updateModuleBadge]);
+
+  console.log('🧪 [DEBUG] updateModuleBadge useEffect DISABLED to test loop');
 
   // ✅ OFFLINE-FIRST DATA LOADING WITH SECURITY HARDENING
   const loadSalesData = useCallback(async () => {
+    console.log('🔴 [loadSalesData] CALLED - This triggers multiple setStates');
     try {
+      console.log('🔴 [loadSalesData] Setting loading=true');
       setLoading(true);
+      console.log('🔴 [loadSalesData] Setting error=null');
       setError(null);
 
       // Offline-first pattern: Use cached data if offline
@@ -319,14 +379,25 @@ export const useSalesPage = (): UseSalesPageReturn => {
         fetchOrders('active')
       ]);
 
-      // Process with decimal precision for financial calculations
-      const processedTransactions = transactionsRes.map((t: any) => ({
-        ...t,
-        amount: new FinancialDecimal(t.amount),
-        discount: new FinancialDecimal(t.discount || 0),
-        refund_amount: new FinancialDecimal(t.refund_amount || 0),
-        cost_of_goods: new FinancialDecimal(t.cost_of_goods || 0)
-      }));
+      // ✅ Process transactions - validate with safeDecimal then convert to numbers
+      // Analytics functions expect numbers, so we validate then extract numeric values
+      // 🐛 FIX: Defensive validation to prevent DecimalError with undefined/null values
+      const processedTransactions = transactionsRes.map((t: Sale) => {
+        // Explicit null/undefined coalescing BEFORE passing to Decimal
+        const safeAmount = t?.amount ?? 0;
+        const safeDiscount = t?.discount ?? 0;
+        const safeRefund = t?.refund_amount ?? 0;
+        const safeCost = t?.cost_of_goods ?? 0;
+
+        return {
+          ...t,
+          amount: safeDecimal(safeAmount, 'financial', 0).toNumber(),
+          discount: safeDecimal(safeDiscount, 'financial', 0).toNumber(),
+          refund_amount: safeDecimal(safeRefund, 'financial', 0).toNumber(),
+          cost_of_goods: safeDecimal(safeCost, 'financial', 0).toNumber(),
+          items_count: t?.items_count || 0
+        };
+      });
 
       setTransactionData(processedTransactions);
       setProductData(productsRes);
@@ -353,7 +424,7 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error loading sales data';
-      handleError(err, 'Sales Data Loading', {
+      handleErrorRef.current(err, 'Sales Data Loading', {
         operation: 'loadSalesData',
         period: pageState.analyticsTimeRange,
         isOnline
@@ -373,22 +444,38 @@ export const useSalesPage = (): UseSalesPageReturn => {
         }
       }
     } finally {
+      console.log('🔴 [loadSalesData] Setting loading=false - FINAL setState');
       setLoading(false);
     }
-  }, [pageState.analyticsTimeRange, isOnline, handleError]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageState.analyticsTimeRange]); // ✅ FIX: Removed isOnline - causes loop because useOfflineStatus updates every 2s
 
-  // Initialize data loading
+  // Initialize data loading - ONLY ON MOUNT
+  // 🔧 FIX: Don't depend on loadSalesData to avoid infinite loop
+  // loadSalesData will be called when its dependencies (analyticsTimeRange) actually change
   useEffect(() => {
+    console.log('🔥🔥🔥 [CRITICAL useEffect] This should ONLY run on MOUNT - If you see this multiple times, THIS IS THE PROBLEM');
+    logger.debug('UseSalesPage', '🔄 useEffect[MOUNT] TRIGGERED - calling loadSalesData()');
     loadSalesData();
+    return () => {
+      console.log('🔥🔥🔥 [CRITICAL useEffect] CLEANUP - Component is UNMOUNTING');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // ✅ FIX: Empty deps = only run on mount
+
+  // 🔧 FIX: refreshSalesData using ref to avoid dependency on loadSalesData
+  const loadSalesDataRef = useRef(loadSalesData);
+  useEffect(() => {
+    loadSalesDataRef.current = loadSalesData;
   }, [loadSalesData]);
 
-  // 🔧 FIX: refreshSalesData declared EARLY, before any useCallback that uses it
   const refreshSalesData = useCallback(async () => {
-    console.log('🔍 [DEBUG] refreshSalesData called');
-    await loadSalesData();
-  }, [loadSalesData]);
+    logger.debug('UseSalesPage', '🔍 [DEBUG] refreshSalesData called');
+    await loadSalesDataRef.current();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // ✅ FIX: No dependencies, use ref instead
 
-  console.log('🔍 [DEBUG] refreshSalesData declared successfully at line 387');
+  logger.debug('UseSalesPage', '🔍 [DEBUG] refreshSalesData declared successfully at line 387');
 
   // ✅ ENTERPRISE ACTION HANDLERS WITH SECURITY & DECIMAL PRECISION
   const setActiveSection = useCallback((section: SalesPageSection) => {
@@ -409,6 +496,9 @@ export const useSalesPage = (): UseSalesPageReturn => {
         }
       }));
 
+      // ✅ FIX: Open the checkout modal to actually start a new sale
+      useSalesStore.getState().openCheckoutModal();
+
       // TODO: Implement audit logging via database triggers or Edge Function
       // For now, rely on RLS and database audit tables
       logger.info('SalesStore', 'New sale initiated', {
@@ -417,11 +507,12 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
       notify.success('Nueva venta iniciada');
     } catch (err) {
-      handleError(err, 'New Sale Initiation');
+      handleErrorRef.current(err, 'New Sale Initiation');
     }
-  }, [setActiveSection, handleError]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // ✅ FIX LOOP: setActiveSection is stable (useCallback with [])
 
-  const handleProcessPayment = useCallback(async (paymentData?: any) => {
+  const handleProcessPayment = useCallback(async (paymentData?: { amount: number; method: string; tip?: number }) => {
     try {
       if (!pageState.currentSale.isActive || pageState.currentSale.items.length === 0) {
         notify.warning('No hay venta activa para procesar');
@@ -470,12 +561,13 @@ export const useSalesPage = (): UseSalesPageReturn => {
         notify.success(`Pago procesado: ${formatCurrency(total)}`);
       }
     } catch (err) {
-      handleError(err, 'Payment Processing', {
+      handleErrorRef.current(err, 'Payment Processing', {
         sale_amount: pageState.currentSale.total,
         payment_method: paymentData?.method
       });
     }
-  }, [pageState.currentSale, handleError, refreshSalesData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageState.currentSale, refreshSalesData]); // ✅ FIX: Using handleErrorRef
 
   const handleVoidSale = useCallback(async () => {
     try {
@@ -503,9 +595,10 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
       notify.warning('Venta cancelada');
     } catch (err) {
-      handleError(err, 'Sale Void');
+      handleErrorRef.current(err, 'Sale Void');
     }
-  }, [pageState.currentSale, handleError]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageState.currentSale]); // ✅ FIX: Using handleErrorRef
 
   const handleRefund = useCallback(async (saleId: string, refundAmount?: number) => {
     try {
@@ -522,26 +615,28 @@ export const useSalesPage = (): UseSalesPageReturn => {
       // When implemented, will use:
       // const refundResult = await processSaleRefund(saleId, refundAmount);
     } catch (err) {
-      handleError(err, 'Refund Processing', { sale_id: saleId, refund_amount: refundAmount });
+      handleErrorRef.current(err, 'Refund Processing', { sale_id: saleId, refund_amount: refundAmount });
     }
-  }, [handleError]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // ✅ FIX: Using handleErrorRef, no dependencies needed
 
   const handleTableSelect = useCallback((tableId: string) => {
     setPageState(prev => ({ ...prev, selectedTableId: tableId }));
     setActiveSection('tables');
-  }, [setActiveSection]);
+  }, []); // ✅ FIX LOOP: setActiveSection is stable
 
-  const handleTableAssign = useCallback(async (tableId: string, orderData: any) => {
+  const handleTableAssign = useCallback(async (tableId: string, orderData: Partial<Order>) => {
     try {
       // Use tableApi service - already implemented with RLS
-      const party = await seatParty(tableId, orderData.partySize, orderData);
+      await seatParty(tableId, 1, orderData); // Default party size to 1 if not provided
 
       await refreshSalesData();
       notify.success(`Mesa ${tableId} asignada correctamente`);
     } catch (err) {
-      handleError(err, 'Table Assignment', { table_id: tableId });
+      handleErrorRef.current(err, 'Table Assignment', { table_id: tableId });
     }
-  }, [handleError, refreshSalesData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshSalesData]); // ✅ FIX: Using handleErrorRef
 
   const handleTableClear = useCallback(async (tableId: string) => {
     try {
@@ -551,18 +646,20 @@ export const useSalesPage = (): UseSalesPageReturn => {
       await refreshSalesData();
       notify.success(`Mesa ${tableId} liberada`);
     } catch (err) {
-      handleError(err, 'Table Clear', { table_id: tableId });
+      handleErrorRef.current(err, 'Table Clear', { table_id: tableId });
     }
-  }, [handleError, refreshSalesData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshSalesData]); // ✅ FIX: Using handleErrorRef
 
   const handleShowAnalytics = useCallback(() => {
+    // ✅ FIX LOOP: setActiveSection is already a useCallback with [], so safe to call directly
     setActiveSection('analytics');
     setPageState(prev => ({ ...prev, showAnalytics: true }));
-  }, [setActiveSection]);
+  }, []); // ✅ No dependencies - setActiveSection is stable
 
   const handleShowReports = useCallback(() => {
     setActiveSection('reports');
-  }, [setActiveSection]);
+  }, []); // ✅ FIX LOOP: setActiveSection is stable
 
   const handleGenerateReport = useCallback((type: 'daily' | 'weekly' | 'monthly') => {
     // TODO: Generate sales reports
@@ -571,7 +668,7 @@ export const useSalesPage = (): UseSalesPageReturn => {
 
   const handleKitchenDisplay = useCallback(() => {
     setActiveSection('kitchen');
-  }, [setActiveSection]);
+  }, []); // ✅ FIX LOOP: setActiveSection is stable
 
   const handleOrderUpdate = useCallback((orderId: string, status: string) => {
     // TODO: Update order status
@@ -613,7 +710,7 @@ export const useSalesPage = (): UseSalesPageReturn => {
   // 🔧 MOVED: refreshSalesData declaration moved earlier - removed from here
 
   // NEW: Component-specific handlers
-  const handleMetricClick = useCallback((metric: string, value: any) => {
+  const handleMetricClick = useCallback((metric: string, value: string | number) => {
     logger.info('SalesStore', 'Metric clicked:', metric, value);
     // TODO: Implement metric drill-down navigation
   }, []);
@@ -623,18 +720,18 @@ export const useSalesPage = (): UseSalesPageReturn => {
     // TODO: Implement alert action logic
   }, []);
 
-  const handleOrderPlace = useCallback((orderData: any) => {
+  const handleOrderPlace = useCallback((orderData: Partial<Order>) => {
     logger.info('SalesStore', 'Order placed:', orderData);
     // TODO: Implement order placement logic
   }, []);
 
-  const handlePaymentProcess = useCallback((paymentData: any) => {
+  const handlePaymentProcess = useCallback((paymentData: { amount: number; method: string; tip?: number }) => {
     logger.info('SalesStore', 'Payment processed:', paymentData);
     // TODO: Implement payment processing logic
   }, []);
 
   // Analytics helpers
-  const calculateTotalTaxes = useCallback((items: any[]) => {
+  const calculateTotalTaxes = useCallback((items: SaleItem[]) => {
     // Calculate taxes using the business logic service
     return taxService.calculateTaxesForItems(items);
   }, []);
@@ -651,8 +748,8 @@ export const useSalesPage = (): UseSalesPageReturn => {
     return metrics.revenueBreakdown;
   }, [metrics.revenueBreakdown]);
 
-  // Actions object
-  const actions: SalesPageActions = {
+  // Actions object - ✅ MEMOIZED to prevent creating new object reference on every render
+  const actions: SalesPageActions = useMemo(() => ({
     handleNewSale,
     handleProcessPayment,
     handleVoidSale,
@@ -679,12 +776,83 @@ export const useSalesPage = (): UseSalesPageReturn => {
     setAnalyticsTimeRange,
     refreshSalesData,
     setActiveSection
-  };
+  }), [
+    handleNewSale,
+    handleProcessPayment,
+    handleVoidSale,
+    handleRefund,
+    handleTableSelect,
+    handleTableAssign,
+    handleTableClear,
+    handleShowAnalytics,
+    handleShowReports,
+    handleGenerateReport,
+    handleKitchenDisplay,
+    handleOrderUpdate,
+    handleQRGeneration,
+    handleQRCodeManagement,
+    handleMetricClick,
+    handleAlertAction,
+    handleOrderPlace,
+    handlePaymentProcess,
+    toggleAnalytics,
+    toggleRevenueBreakdown,
+    toggleProductPerformance,
+    toggleTaxDetails,
+    setAnalyticsTimeRange,
+    refreshSalesData,
+    setActiveSection
+  ]);
+
+  // ✅ FIX: Removed debug useEffect that was causing infinite re-renders
+  // The useEffect without dependency array was executing on EVERY render
 
   // 🔧 FIX: Setup quick actions AFTER all functions are declared
   // This prevents "Cannot access 'refreshSalesData' before initialization" error
+  // 🧪 TEMPORARILY DISABLED TO TEST IF THIS CAUSES THE LOOP
+  /*
   useEffect(() => {
-    console.log('🔍 [DEBUG] Setting up quick actions - refreshSalesData exists:', typeof refreshSalesData);
+    // ⚠️ DEBUG COUNTER: Track loop iterations
+    if (!window.__qaDepsLog) window.__qaDepsLog = [];
+    window.__qaDepsLog.push(Date.now());
+
+    console.log(`🔥 [QUICK ACTIONS] useEffect #${window.__qaDepsLog.length} TRIGGERED`);
+    console.log(`🔍 [FUNCTION IDENTITIES] Checking if functions changed:`);
+
+    // 🔬 SCIENTIFIC LOGGING: Track function identities
+    if (!window.__funcIdentities) {
+      window.__funcIdentities = {};
+    }
+
+    const currentIdentities = {
+      handleNewSale: handleNewSale.toString().substring(0, 50),
+      handleShowAnalytics: handleShowAnalytics.toString().substring(0, 50),
+      setActiveSection: setActiveSection.toString().substring(0, 50),
+      handleQRGeneration: handleQRGeneration.toString().substring(0, 50),
+      handleKitchenDisplay: handleKitchenDisplay.toString().substring(0, 50),
+      refreshSalesData: refreshSalesData.toString().substring(0, 50)
+    };
+
+    if (window.__qaDepsLog.length > 1) {
+      Object.keys(currentIdentities).forEach(key => {
+        if (window.__funcIdentities[key] !== currentIdentities[key]) {
+          console.warn(`⚠️ FUNCTION CHANGED: ${key}`);
+          console.log(`   OLD: ${window.__funcIdentities[key]}`);
+          console.log(`   NEW: ${currentIdentities[key]}`);
+        }
+      });
+    }
+
+    window.__funcIdentities = currentIdentities;
+
+    if (window.__qaDepsLog.length > 5) {
+      console.error(`⛔ LOOP DETECTED! QuickActions ran ${window.__qaDepsLog.length} times`);
+      console.error('Last 5 executions:', window.__qaDepsLog.slice(-5).map((t, i) =>
+        i > 0 ? `${t - window.__qaDepsLog[window.__qaDepsLog.length - 5 + i - 1]}ms` : 'start'
+      ));
+    }
+
+    logger.debug('UseSalesPage', '🔍 [DEBUG] Setting up quick actions - refreshSalesData exists:', typeof refreshSalesData);
     const quickActions = [
       {
         id: 'new-sale',
@@ -730,17 +898,67 @@ export const useSalesPage = (): UseSalesPageReturn => {
       }
     ];
 
+    console.log('🟡 [QuickActions useEffect] Calling setQuickActions - Check if this runs multiple times');
     setQuickActions(quickActions);
-    return () => setQuickActions([]);
-  }, [
-    setQuickActions,
-    handleNewSale,
-    handleShowAnalytics,
-    setActiveSection,
-    handleQRGeneration,
-    handleKitchenDisplay,
-    refreshSalesData
-  ]);
+    // 🔧 FIX: No cleanup needed - let the next page handle its own quickActions
+    // Removing cleanup prevents flickering and unnecessary updates
+    // return () => setQuickActions([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // ✅ FIX LOOP: Empty deps - only run on mount, functions are captured in closure
+  */
+  console.log('🧪 [DEBUG] QuickActions useEffect DISABLED to test loop');
+
+  // ✅ FIX LOOP INFINITO: Memoize derived data to prevent creating new objects on every render
+  // Without memoization, these create new array/object references every time, causing
+  // infinite loops in components that use them in useEffect dependencies
+  const activeSales = useMemo(() =>
+    salesData.filter(s => s.status !== 'completed'),
+    [salesData]
+  );
+
+  const recentTransactions = useMemo(() =>
+    transactionData.slice(-10),
+    [transactionData]
+  );
+
+  const tableStatuses = useMemo(() =>
+    tableData.reduce((acc, table) => {
+      acc[table.id] = table.status;
+      return acc;
+    }, {} as Record<string, 'available' | 'occupied' | 'reserved' | 'cleaning'>),
+    [tableData]
+  );
+
+  // 🛑 CIRCUIT BREAKER: Analizar renders sin detener ejecución
+  if (renderNum === 5) {
+    console.warn('\n⚠️ ADVERTENCIA - 5 renders detectados:');
+    console.warn('='.repeat(80));
+
+    // Comparar snapshots
+    const snapshots = window.__renderSnapshots || [];
+    if (snapshots.length >= 2) {
+      const first = snapshots[0];
+      const latest = snapshots[snapshots.length - 1];
+
+      console.warn('📊 Comparación Render #1 vs Render #' + renderNum + ':');
+      console.warn('setQuickActions cambió:', first.setQuickActionsId !== latest.setQuickActionsId);
+      console.warn('updateModuleBadge cambió:', first.updateModuleBadgeId !== latest.updateModuleBadgeId);
+
+      console.table(snapshots);
+    }
+    console.warn('='.repeat(80));
+  }
+
+  // 📊 REPORTE FINAL cuando se estabilice
+  if (renderNum === 20) {
+    console.log('\n✅ ESTABILIZACIÓN DETECTADA - 20 renders alcanzados:');
+    console.log('La página parece haberse estabilizado.');
+    console.log('Total de renders:', renderNum);
+    console.log('='.repeat(80));
+  }
+
+  console.log(`🟢 [useSalesPage HOOK] RETURN - Hook execution complete, returning values to component`);
+  console.log(`🟢 [useSalesPage HOOK] loading=${loading}, error=${error ? 'HAS_ERROR' : 'null'}`);
 
   return {
     pageState,
@@ -752,12 +970,9 @@ export const useSalesPage = (): UseSalesPageReturn => {
     loading,
     error,
     actions,
-    activeSales: salesData.filter(s => s.status !== 'completed'),
-    recentTransactions: transactionData.slice(-10),
-    tableStatuses: tableData.reduce((acc, table) => {
-      acc[table.id] = table.status;
-      return acc;
-    }, {} as Record<string, any>),
+    activeSales,
+    recentTransactions,
+    tableStatuses,
     calculateTotalTaxes,
     getTopPerformingProducts,
     getSalesComparison,

@@ -26,11 +26,11 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
   };
 
   return (
-    <Box w="full" p={4}>
+    <Box w="full" p="4">
       <Box
         bgGradient="linear(135deg, gray.100 0%, gray.200 50%, gray.300 100%)"
         borderRadius="xl"
-        p={8}
+        p="8"
         w="full"
       >
           <VStack gap="xl" align="center" textAlign="center">
@@ -59,7 +59,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             </VStack>
 
             {/* Sección de personalización */}
-            <VStack gap="lg" mt={8}>
+            <VStack gap="lg" mt="8">
               <VStack gap="sm">
                 <Text fontSize="lg" fontWeight="medium">
                   Para empezar, ¿cómo te gustaría que te llamemos?
@@ -77,7 +77,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
                   size="lg"
                 />
                 {userName.trim() && (
-                  <Text fontSize="sm" mt={2}>
+                  <Text fontSize="sm" mt="2">
                     ¡Perfecto! Te llamaremos {userName.trim()} 👍
                   </Text>
                 )}
@@ -85,7 +85,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             </VStack>
 
             {/* Botón de continuar */}
-            <Box w="full" maxW="md" mt={6}>
+            <Box w="full" maxW="md" mt="6">
               <Button
                 variant="solid"
                 onClick={handleStart}
@@ -97,7 +97,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             </Box>
 
             {/* Footer informativo */}
-            <VStack gap="sm" pt="md" borderTop="1px solid" borderColor="gray.200" mt={8}>
+            <VStack gap="sm" pt="md" borderTop="1px solid" borderColor="gray.200" mt="8">
               <Text fontSize="sm" fontWeight="medium">
                 📋 Configuración estimada: 5-10 minutos
               </Text>

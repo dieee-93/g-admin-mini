@@ -20,7 +20,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Section,
   Stack,
   Typography,
   Box,
@@ -70,7 +69,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
             title: 'Stock Bajo',
             description: 'Harina (2kg restantes)',
             children: (
-              <Stack direction="row" gap={2} mt={2}>
+              <Stack direction="row" gap="2" mt="2">
                 <button
                   onClick={() => navigate('/admin/materials')}
                   style={{
@@ -127,7 +126,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
 
   return (
     <Card.Root variant="elevated" size="sm">
-      <Card.Header pb={2}>
+      <Card.Header pb="2">
         <Stack direction="row" justify="space-between" align="center">
           <Box>
             <Heading size="md" fontWeight="semibold" mb={0.5}>
@@ -140,8 +139,8 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
         </Stack>
       </Card.Header>
 
-      <Card.Body pt={2}>
-        <Stack gap={3}>
+      <Card.Body pt="2">
+        <Stack gap="3">
           {/* Alerts - Más compactas */}
           {alerts.length > 0 ? (
             <Box maxW="full">
@@ -156,14 +155,14 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
             </Box>
           ) : (
             <Box
-              p={3}
+              p="3"
               textAlign="center"
               bg="green.50"
               borderRadius="md"
               borderWidth="1px"
               borderColor="green.200"
             >
-              <Typography variant="heading" fontSize="sm" color="green.700" mb={1}>
+              <Typography variant="heading" fontSize="sm" color="green.700" mb="1">
                 ✅ Todo en orden
               </Typography>
               <Typography variant="body" fontSize="xs" color="gray.600">
@@ -173,11 +172,11 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
           )}
 
           {/* Quick Actions - Dentro del mismo card */}
-          <Box pt={2} borderTop="1px solid" borderColor="gray.100">
-            <Typography variant="body" fontSize="xs" fontWeight="semibold" mb={2} color="gray.600" textTransform="uppercase">
+          <Box pt="1" borderTop="1px solid" borderColor="gray.100"> {/* Reducido pt de 2 a 1 */}
+            <Typography variant="body" fontSize="xs" fontWeight="semibold" mb="1" color="gray.600" textTransform="uppercase"> {/* Reducido mb de 2 a 1 */}
               Acciones Rápidas
             </Typography>
-            <Stack direction="row" gap={2} flexWrap="wrap">
+            <Stack direction="row" gap="2" flexWrap="wrap">
               <Button
                 size="sm"
                 variant="outline"
@@ -189,7 +188,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => navigate('/admin/sales')}
+                onClick={() => navigate('/admin/operations/sales')}
                 colorPalette="green"
               >
                 💰 Ventas
