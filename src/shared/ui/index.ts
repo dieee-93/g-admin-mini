@@ -29,7 +29,7 @@ export { ContentLayout } from './ContentLayout';
 export { Section } from './Section';
 export { FormSection } from './FormSection';
 export { StatsSection } from './StatsSection';
-export { StatRoot, StatLabel, StatValueText, StatHelpText, StatUpIndicator, StatDownIndicator, StatValueUnit } from './Stat';
+export { StatRoot, StatLabel, StatValueText, StatHelpText, StatUpIndicator, StatDownIndicator, StatValueUnit, Stat } from './Stat';
 export { PageHeader } from './PageHeader';
 
 // Base Layout Primitives (Chakra wrappers)
@@ -81,8 +81,8 @@ export { Separator } from './Separator';
 export { Field } from './Field';
 export { Input, InputField } from './Input';
 export { NumberField } from './NumberField';
-// Re-export NumberInput parts from Chakra for direct usage
-export { NumberInput } from '@chakra-ui/react';
+// Re-export NumberInput from wrapper (prevents TDZ errors in vendor-ui bundle)
+export { NumberInput, NumberInputRoot, NumberInputControl, NumberInputIncrementTrigger, NumberInputDecrementTrigger } from './NumberInput';
 export { SelectField, createListCollection } from './SelectField';
 export {
   Select,

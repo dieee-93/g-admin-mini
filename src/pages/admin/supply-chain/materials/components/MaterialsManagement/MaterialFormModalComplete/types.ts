@@ -1,4 +1,4 @@
-import { type ItemType, type AllUnit, type PackagingInfo } from '../../types';
+import { type ItemType, type AllUnit, type PackagingInfo } from '../../../types';
 
 export interface ItemFormData {
   name: string;

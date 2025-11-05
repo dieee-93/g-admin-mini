@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { deliveryApi } from '../services/deliveryApi';
-import type { DeliveryOrder } from '../types/deliveryTypes';
+import type { DeliveryOrder } from '../types';
 import { logger } from '@/lib/logging';
 
 /**

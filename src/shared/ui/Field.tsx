@@ -19,6 +19,7 @@ export const Field = {
   Input: ChakraField.Input,
   Select: ChakraField.Select,
   Textarea: ChakraField.Textarea,
+  RootProvider: ChakraField.RootProvider,
 };
 
 // Type exports

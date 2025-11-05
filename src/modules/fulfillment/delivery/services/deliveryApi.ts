@@ -1,6 +1,6 @@
 // delivery/services/deliveryApi.ts
 import { supabase } from '@/lib/supabase/client';
-import type { DeliveryOrder, DeliveryZone, DriverPerformance, DeliveryMetrics } from '../types/deliveryTypes';
+import type { DeliveryOrder, DeliveryZone, DriverPerformance, DeliveryMetrics } from '../types';
 import { logger } from '@/lib/logging';
 
 /**
@@ -75,34 +75,82 @@ export const deliveryApi = {
       logger.info('DeliveryAPI', 'Fetching drivers...');
 
       // Query employees table for delivery drivers
+      // Look for position containing 'Repartidor' or 'Repartidora'
       const { data, error } = await supabase
         .from('employees')
         .select('*')
-        .eq('department', 'Delivery')
-        .eq('employment_status', 'active')
-        .order('first_name');
+        .or('position.ilike.%repartidor%,position.ilike.%driver%,department.eq.Delivery')
+        .eq('status', 'active')
+        .order('name');
 
       if (error) {
         logger.error('DeliveryAPI', 'Supabase error:', error);
         throw error;
       }
 
-      // Transform to DriverPerformance
-      return (data || []).map(employee => ({
-        driver_id: employee.id,
-        driver_name: employee.name || `${employee.first_name || ''} ${employee.last_name || ''}`.trim(),
-        avatar_url: undefined, // employees table doesn't have avatar_url currently
-        total_deliveries: employee.total_deliveries || 0,
-        completed_today: 0, // TODO: Calculate from today's deliveries
-        avg_delivery_time_minutes: 0, // TODO: Calculate from delivery_orders
-        on_time_rate: 0, // TODO: Calculate from delivery_orders
-        customer_rating: employee.driver_rating || 0,
-        is_active: employee.employment_status === 'active',
-        is_available: employee.is_available || false,
-        current_delivery_id: undefined, // TODO: Get from active delivery
-        last_location: undefined, // TODO: Get from driver_locations
-        last_updated: employee.updated_at || employee.created_at
+      // For each driver, calculate performance metrics from delivery_assignments
+      const driversWithMetrics = await Promise.all((data || []).map(async (employee) => {
+        // Get delivery assignments for this driver
+        const { data: assignments } = await supabase
+          .from('delivery_assignments')
+          .select('*')
+          .eq('driver_id', employee.id)
+          .not('deleted_at', 'is', null);
+
+        const totalDeliveries = assignments?.length || 0;
+        const completedDeliveries = assignments?.filter(a => a.delivered_at !== null) || [];
+        const onTimeDeliveries = completedDeliveries.filter(a => a.on_time === true);
+
+        // Calculate average delivery time
+        const deliveryTimes = completedDeliveries
+          .filter(a => a.actual_duration_minutes !== null)
+          .map(a => a.actual_duration_minutes);
+        const avgDeliveryTime = deliveryTimes.length > 0
+          ? deliveryTimes.reduce((sum, time) => sum + time, 0) / deliveryTimes.length
+          : 0;
+
+        // Calculate on-time rate
+        const onTimeRate = completedDeliveries.length > 0
+          ? onTimeDeliveries.length / completedDeliveries.length
+          : 0;
+
+        // Get today's completions
+        const today = new Date().toISOString().split('T')[0];
+        const completedToday = completedDeliveries.filter(a =>
+          a.delivered_at && a.delivered_at.startsWith(today)
+        ).length;
+
+        // Get average customer rating
+        const ratings = completedDeliveries
+          .filter(a => a.customer_rating !== null)
+          .map(a => a.customer_rating);
+        const avgRating = ratings.length > 0
+          ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
+          : 0;
+
+        // Get current active delivery
+        const activeAssignment = assignments?.find(a =>
+          a.status === 'assigned' || a.status === 'picked_up' || a.status === 'in_transit'
+        );
+
+        return {
+          driver_id: employee.id,
+          driver_name: employee.name || `${employee.first_name || ''} ${employee.last_name || ''}`.trim(),
+          avatar_url: undefined,
+          total_deliveries: totalDeliveries,
+          completed_today: completedToday,
+          avg_delivery_time_minutes: Math.round(avgDeliveryTime),
+          on_time_rate: onTimeRate,
+          customer_rating: avgRating,
+          is_active: employee.status === 'active',
+          is_available: !activeAssignment, // Available if no active delivery
+          current_delivery_id: activeAssignment?.queue_id,
+          last_location: undefined, // TODO: Get from driver_locations table
+          last_updated: employee.updated_at || employee.created_at
+        };
       }));
+
+      return driversWithMetrics;
     } catch (error) {
       logger.error('DeliveryAPI', 'Failed to fetch drivers:', error);
       throw error;

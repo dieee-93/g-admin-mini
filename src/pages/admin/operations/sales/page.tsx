@@ -108,6 +108,10 @@ function SalesPage() {
     canExport,
     canConfigure
   } = usePermissions('sales');
+  
+  // ✅ ERROR HANDLING SYSTEM
+  const { handleError } = useErrorHandler();
+  const { isOnline } = useOfflineStatus();
 
   const {
     metrics,

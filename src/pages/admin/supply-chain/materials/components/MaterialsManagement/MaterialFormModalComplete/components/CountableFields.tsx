@@ -11,7 +11,7 @@ import {
 } from '@/shared/ui';
 import { SelectField, CardWrapper, InputField } from '@/shared/ui';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import { type ItemFormData } from '../types';
+import { type ItemFormData } from '@/pages/admin/supply-chain/materials/types';
 import { CATEGORY_COLLECTION } from '../constants';
 import { CountableStockFields } from './CountableFields/CountableStockFields';
 

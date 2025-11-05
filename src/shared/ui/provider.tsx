@@ -9,14 +9,25 @@ interface ProviderProps {
 }
 
 export function Provider({ children }: ProviderProps) {
+  // ⚠️ PRODUCTION FIX: Avoid dynamic theme initialization on first render
+  // The useMemo + useThemeStore combo causes circular dependency issues in production builds
+  // This happens because Emotion initialization happens before Zustand store is ready
+
   const { currentTheme } = useThemeStore()
-  
+
   // Create a stable system using memoization
   const system = useMemo(() => {
+    // ✅ In production, always start with default config to avoid initialization errors
+    // Theme switching will work after initial mount
+    if (import.meta.env.PROD && !currentTheme) {
+      logger.info('Provider', 'Production mode: Using default config for initial render')
+      return createSystem(defaultConfig)
+    }
+
     try {
       // Use the full theme system now that it's working
       const dynamicSystem = getCurrentThemeSystem(currentTheme)
-      
+
       // Verify the system has the required structure
       if (dynamicSystem && dynamicSystem._config) {
         console.log(`✅ Theme system loaded: ${currentTheme?.id || 'default'}`)

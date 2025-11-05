@@ -23,7 +23,7 @@ import {
   ArrowRightIcon
 } from '@heroicons/react/24/outline';
 import { TransferStatusBadge } from './TransferStatusBadge';
-import { inventoryTransfersApi } from '../services/inventoryTransfersApi';
+import { inventoryTransfersApi } from '@/pages/admin/supply-chain/materials/services/inventoryTransfersApi';
 import { notify } from '@/lib/notifications';
 import type { InventoryTransfer } from '../types/inventoryTransferTypes';
 import { format } from 'date-fns';

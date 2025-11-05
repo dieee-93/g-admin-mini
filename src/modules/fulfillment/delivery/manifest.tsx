@@ -113,6 +113,7 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
       const { eventBus } = await import('@/lib/events');
       const { deliveryService } = await import('./services/deliveryService');
       const { routeOptimizationService } = await import('./services/routeOptimizationService');
+      const { setupDeliveryEventListeners } = await import('./services/deliveryEvents');
 
       // Note: gpsTrackingService is available at '@/lib/tracking' for mobile app integration
       // It's exported in this module's exports for other modules to use
@@ -465,6 +466,16 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
         'fulfillment-delivery',
         12 // Medium-high priority
       );
+
+      // ============================================
+      // SETUP ADDITIONAL EVENT LISTENERS
+      // ============================================
+
+      /**
+       * Setup legacy EventBus v1 listeners for backward compatibility
+       * These listen to sales.order.created and sales.order.updated
+       */
+      setupDeliveryEventListeners();
 
       logger.info('App', '✅ Delivery module setup complete', {
         hooksProvided: 2,

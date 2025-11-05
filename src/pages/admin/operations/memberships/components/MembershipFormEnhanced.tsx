@@ -8,7 +8,7 @@ import {
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
 import {
-  CalendarIcon, CurrencyDollarIcon, EyeIcon, TrendingUpIcon, UserIcon, UserPlusIcon
+  CalendarIcon, CurrencyDollarIcon, EyeIcon, ArrowTrendingUpIcon, UserIcon, UserPlusIcon
 } from '@heroicons/react/24/outline';
 
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
@@ -250,7 +250,7 @@ export const MembershipFormEnhanced: React.FC = () => {
                 title="Valor de Vida (LTV)"
                 value={`$${membershipMetrics.lifetimeValue.toLocaleString()}`}
                 change={membershipMetrics.membershipValue === 'enterprise' ? 35 : 20}
-                icon={TrendingUpIcon}
+                icon={ArrowTrendingUpIcon}
               />
               <MetricCard
                 title="Retención Estimada"

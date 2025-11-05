@@ -303,7 +303,7 @@ const AssetAnalyticsEnhanced: React.FC = () => {
               title="ROI Promedio"
               value={`${mockData.performance.averageROI}%`}
               change={1.5}
-              icon="TrendingUpIcon"
+              icon="ArrowTrendingUpIcon"
             />
             <MetricCard
               title="Utilización"

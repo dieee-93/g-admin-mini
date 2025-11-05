@@ -1,7 +1,7 @@
 // OfflineMonitor.tsx - Connection and Sync Status Monitoring for G-Admin Mini
 // Provides real-time offline status, sync progress, and queue monitoring
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { type ReactNode, memo, useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   HStack, 
@@ -72,7 +72,7 @@ interface SyncProgress {
 
 // Connection Status Component
 // ✅ Memoized to prevent unnecessary re-renders
-export const ConnectionStatus = React.memo(() => {
+export const ConnectionStatus = memo(() => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({
     isOnline: navigator.onLine,
     lastOnline: Date.now(),
@@ -251,7 +251,7 @@ export const ConnectionStatus = React.memo(() => {
 
 // Sync Progress Component
 // ✅ Memoized to prevent unnecessary re-renders
-export const SyncProgress = React.memo(() => {
+export const SyncProgress = memo(() => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
   const [syncProgress, setSyncProgress] = useState<SyncProgress>({
     current: 0,
@@ -380,7 +380,7 @@ export const SyncProgress = React.memo(() => {
 
 // Offline Status Alert Component
 // ✅ Memoized to prevent unnecessary re-renders
-export const OfflineAlert = React.memo(() => {
+export const OfflineAlert = memo(() => {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [queueSize, setQueueSize] = useState(0);
 
@@ -438,7 +438,7 @@ export const OfflineAlert = React.memo(() => {
 
 // Queue Monitor Component
 // ✅ Memoized to prevent unnecessary re-renders
-export const QueueMonitor = React.memo(() => {
+export const QueueMonitor = memo(() => {
   const [queueOperations, setQueueOperations] = useState<QueuedOperation[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -687,7 +687,7 @@ const SyncDetailsModal = ({
 };
 
 // Main Offline Monitor Provider
-export const OfflineMonitorProvider = ({ children }: { children: React.ReactNode }) => {
+export const OfflineMonitorProvider = ({ children }: { children: ReactNode }) => {
   return (
     <Box position="relative">
       <OfflineStatusBar />

@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import type { DeliveryOrder } from '../../types/deliveryTypes';
+import type { DeliveryOrder } from '../../types';
 
 interface MapMarkerProps {
   delivery: DeliveryOrder;

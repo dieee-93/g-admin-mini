@@ -9,7 +9,7 @@ import {
 } from '@/shared/ui';
 import { SelectField, InputField, CardWrapper } from '@/shared/ui';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import { type ItemFormData } from '../../types';
+import { type ItemFormData } from '../../../../types';
 import { CATEGORY_COLLECTION } from '../../constants';
 import { CountableStockFields } from './CountableStockFields';
 

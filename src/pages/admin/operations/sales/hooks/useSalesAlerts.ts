@@ -1,18 +1,27 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
+import { useAlerts } from '@/shared/alerts';
 import {
   salesAlertsAdapter,
   type SalesAnalysisData
 } from '../services/SalesAlertsAdapter';
-import type { SalesAlert } from '../services/SalesIntelligenceEngine';
-import type { SalesPageMetrics } from './useSalesPage';
-
 import { logger } from '@/lib/logging';
+
 // ============================================================================
-// HOOK: USE SALES ALERTS
+// HOOK: USE SALES ALERTS (REFACTORED - Unified Alerts System)
+// ============================================================================
+// PATTERN: Follows Materials SmartAlertsAdapter pattern
+// Uses unified alerts system via shared/alerts/hooks/useAlerts
+// Adapter generates CreateAlertInput[], not maintains state
 // ============================================================================
 
 interface UseSalesAlertsReturn {
-  alerts: SalesAlert[];
+  // From unified system
+  alerts: ReturnType<typeof useAlerts>['alerts'];
+  activeAlerts: ReturnType<typeof useAlerts>['activeAlerts'];
+  dismissAlert: ReturnType<typeof useAlerts>['dismissAlert'];
+  acknowledgeAlert: ReturnType<typeof useAlerts>['acknowledgeAlert'];
+
+  // Sales-specific
   alertsSummary: {
     total: number;
     critical: number;
@@ -27,22 +36,41 @@ interface UseSalesAlertsReturn {
   // Actions
   generateAlerts: (salesData: SalesAnalysisData) => Promise<void>;
   refreshAlerts: () => Promise<void>;
-  dismissAlert: (alertId: string) => void;
-  acknowledgeAlert: (alertId: string) => void;
 }
 
 export function useSalesAlerts(): UseSalesAlertsReturn {
-  const [alerts, setAlerts] = useState<SalesAlert[]>([]);
-  const [alertsSummary, setAlertsSummary] = useState({
-    total: 0,
-    critical: 0,
-    warning: 0,
-    info: 0
-  });
+  // ✅ Use unified alerts system (NOT useState)
+  const {
+    alerts,
+    activeAlerts,
+    dismissAlert,
+    acknowledgeAlert,
+    addAlert,
+  } = useAlerts({ context: 'sales' });
+
+  // Local state only for meta-information (not the alerts themselves)
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Compute summary from unified alerts
+  const alertsSummary = useMemo(() => {
+    const summary = {
+      total: activeAlerts?.length || 0,
+      critical: 0,
+      warning: 0,
+      info: 0
+    };
+
+    activeAlerts?.forEach(alert => {
+      if (alert.severity === 'critical') summary.critical++;
+      else if (alert.severity === 'warning') summary.warning++;
+      else if (alert.severity === 'info') summary.info++;
+    });
+
+    return summary;
+  }, [activeAlerts]);
 
   // ============================================================================
   // MAIN GENERATION METHOD
@@ -53,144 +81,102 @@ export function useSalesAlerts(): UseSalesAlertsReturn {
       setIsGenerating(true);
       setError(null);
 
-      const result = await salesAlertsAdapter.generateAndUpdateAlerts(salesData);
+      // ✅ Adapter generates CreateAlertInput[], not maintains state
+      const result = await salesAlertsAdapter.generateAlerts(salesData);
 
-      setAlerts(result.alerts);
-      setAlertsSummary(result.summary);
+      // ✅ Add to unified system instead of setAlerts()
+      result.alerts.forEach(alertInput => {
+        addAlert(alertInput);
+      });
+
       setRecommendations(result.recommendations);
       setLastUpdate(new Date());
+
+      logger.info('SalesAlerts', `Generated ${result.alerts.length} alerts`, {
+        summary: {
+          total: result.alerts.length,
+          recommendations: result.recommendations.length
+        }
+      });
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error generating alerts';
       setError(errorMessage);
-      logger.error('SalesStore', 'Sales alerts generation failed:', err);
+      logger.error('SalesAlerts', 'Alert generation failed', err);
     } finally {
       setIsGenerating(false);
     }
-  }, []);
+  }, [addAlert]);
 
   // ============================================================================
   // REFRESH METHOD
   // ============================================================================
 
   const refreshAlerts = useCallback(async () => {
-    // Para refresh, usamos datos mock por ahora
-    // En producción esto vendría de un store o API
-    const mockData = {
+    // For refresh, fetch current sales data and regenerate
+    // In production this would come from a store or API
+    const mockData: SalesAnalysisData = {
       todayRevenue: 3500,
-      targetRevenue: 5000,
       yesterdayRevenue: 4200,
-      lastWeekRevenue: 4800,
-      todayTransactions: 45,
-      averageOrderValue: 77.78,
-      tableOccupancy: 75,
-      averageServiceTime: 32,
-      tablesTurnover: 2.5,
-      paymentSuccessRate: 98,
-      conversionRate: 82,
-      newCustomers: 15,
-      returningCustomers: 30,
-      customerSatisfaction: 8.5,
-      materialsStockCritical: 2,
-      staffCapacity: 85,
-      kitchenEfficiency: 88
+      weekRevenue: 24500,
+      lastWeekRevenue: 26300,
+      monthRevenue: 105000,
+      lastMonthRevenue: 98000,
+      averageOrderValue: 85,
+      orderCount: 45,
+      revenueTarget: 5000,
+      topProducts: [],
+      lowStockItems: [],
+      peakHours: [],
     };
 
     await generateAlerts(mockData);
   }, [generateAlerts]);
 
-  // ============================================================================
-  // ALERT MANAGEMENT ACTIONS
-  // ============================================================================
-
-  const dismissAlert = useCallback((alertId: string) => {
-    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
-
-    // Update summary
-    setAlertsSummary(prev => ({
-      ...prev,
-      total: prev.total - 1
-    }));
-  }, []);
-
-  const acknowledgeAlert = useCallback((alertId: string) => {
-    setAlerts(prev => prev.map(alert =>
-      alert.id === alertId
-        ? {
-            ...alert,
-            isAcknowledged: true,
-            acknowledgedAt: new Date().toISOString()
-          }
-        : alert
-    ));
-  }, []);
-
-  // ============================================================================
-  // AUTO-REFRESH EFFECT
-  // ============================================================================
-
-  useEffect(() => {
-    // Auto-refresh alerts every 5 minutes during business hours
-    const interval = setInterval(() => {
-      const now = new Date();
-      const hour = now.getHours();
-
-      // Only auto-refresh during business hours (8 AM - 11 PM)
-      if (hour >= 8 && hour <= 23) {
-        refreshAlerts();
-      }
-    }, 5 * 60 * 1000); // 5 minutes
-
-    // Initial load
-    refreshAlerts();
-
-    return () => clearInterval(interval);
-  }, [refreshAlerts]);
-
   return {
+    // From unified system
     alerts,
+    activeAlerts,
+    dismissAlert,
+    acknowledgeAlert,
+
+    // Computed
     alertsSummary,
+
+    // Sales-specific state
     recommendations,
     isGenerating,
     lastUpdate,
     error,
+
+    // Actions
     generateAlerts,
     refreshAlerts,
-    dismissAlert,
-    acknowledgeAlert
   };
 }
 
+export default useSalesAlerts;
+
 // ============================================================================
-// HELPER FUNCTION: CONVERT METRICS TO ANALYSIS DATA
+// HELPER: METRICS TO ANALYSIS DATA CONVERTER
 // ============================================================================
 
 /**
- * ✅ NOT A HOOK - Pure transformation function
- * Convierte métricas de Sales a formato requerido por el Intelligence Engine
+ * Converts SalesPageMetrics to SalesAnalysisData format for alert generation
  */
-export function metricsToAnalysisData(metrics: SalesPageMetrics): SalesAnalysisData {
+export function metricsToAnalysisData(metrics: any): SalesAnalysisData {
   return {
-    todayRevenue: metrics.todayRevenue,
-    targetRevenue: 5000, // TODO: Obtener de configuración
-    yesterdayRevenue: metrics.todayRevenue * 0.95, // Estimación
-    lastWeekRevenue: metrics.todayRevenue * 7 * 1.1, // Estimación
-
-    todayTransactions: metrics.todayTransactions,
-    averageOrderValue: metrics.averageOrderValue,
-    tableOccupancy: metrics.tableOccupancy,
-    averageServiceTime: metrics.averageServiceTime,
-
-    tablesTurnover: metrics.todayTransactions / 10, // Estimación basada en # mesas
-    paymentSuccessRate: 98, // TODO: Obtener de datos reales
-    conversionRate: metrics.conversionRate,
-
-    newCustomers: Math.round(metrics.todayTransactions * 0.3), // Estimación
-    returningCustomers: Math.round(metrics.todayTransactions * 0.7), // Estimación
-    customerSatisfaction: 8.5, // TODO: Obtener de surveys
-
-    materialsStockCritical: 0, // TODO: Obtener del EventBus
-    staffCapacity: 90, // TODO: Obtener del módulo Staff
-    kitchenEfficiency: 88 // TODO: Obtener del módulo Kitchen
+    todayRevenue: metrics.todayRevenue || 0,
+    yesterdayRevenue: 0, // Not available in metrics
+    weekRevenue: 0, // Not available in metrics
+    lastWeekRevenue: 0, // Not available in metrics
+    monthRevenue: 0, // Not available in metrics
+    lastMonthRevenue: 0, // Not available in metrics
+    averageOrderValue: metrics.averageOrderValue || 0,
+    orderCount: metrics.todayTransactions || 0,
+    revenueTarget: 5000, // Default target
+    topProducts: metrics.topProducts || [],
+    lowStockItems: [], // Not available in metrics
+    peakHours: [], // Not available in metrics
   };
 }

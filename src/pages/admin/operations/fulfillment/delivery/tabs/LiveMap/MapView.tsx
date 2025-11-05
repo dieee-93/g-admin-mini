@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Box } from '@/shared/ui';
-import type { DeliveryOrder, DeliveryZone } from '../../types/deliveryTypes';
+import type { DeliveryOrder, DeliveryZone } from '@/modules/fulfillment/delivery/types';
 import { MapMarker } from './MapMarker';
 import { DriverMarker } from './DriverMarker';
 

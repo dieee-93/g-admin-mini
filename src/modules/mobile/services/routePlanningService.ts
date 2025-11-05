@@ -10,7 +10,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
-import { eventBus } from '@/lib/events/EventBus';
+import eventBus from '@/lib/events/EventBus';
 import { logger } from '@/lib/logging';
 import type {
   MobileRoute,

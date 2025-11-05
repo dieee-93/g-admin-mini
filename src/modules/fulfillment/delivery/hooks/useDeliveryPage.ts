@@ -1,6 +1,6 @@
 // delivery/hooks/useDeliveryPage.ts
 import { useState, useEffect } from 'react';
-import type { DeliveryMetrics } from '../types/deliveryTypes';
+import type { DeliveryMetrics } from '../types';
 import { deliveryApi } from '../services/deliveryApi';
 import { useActiveDeliveries } from './useActiveDeliveries';
 import { useDrivers } from './useDrivers';

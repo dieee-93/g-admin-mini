@@ -182,7 +182,7 @@ export const useSalesPage = (): UseSalesPageReturn => {
   console.log(`🔵 [useSalesPage HOOK] WHY? Component re-rendered, so hook re-executes`);
   console.log(`${'='.repeat(80)}`);
 
-  const navigationContext = useNavigation();
+  const navigationContext = useNavigationActions();
   const { setQuickActions, updateModuleBadge } = navigationContext;
 
   // 📸 Snapshot de funciones de navegación para comparar

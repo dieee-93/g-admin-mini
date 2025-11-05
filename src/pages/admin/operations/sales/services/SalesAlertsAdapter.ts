@@ -13,9 +13,7 @@ import {
   type SalesIntelligenceConfig
 } from './SalesIntelligenceEngine';
 
-// Import del sistema unificado de alertas (placeholder por ahora)
-// TODO: Cuando AlertUtils esté disponible, importar desde @/shared/alerts
-// import { AlertUtils } from '@/shared/alerts';
+import type { CreateAlertInput } from '@/shared/alerts';
 
 // ============================================================================
 // TYPES FOR UNIFIED SYSTEM INTEGRATION
@@ -33,7 +31,7 @@ interface UnifiedAlert {
 }
 
 interface AlertGenerationResult {
-  alerts: SalesAlert[];
+  alerts: CreateAlertInput[];
   summary: {
     total: number;
     critical: number;
@@ -42,6 +40,8 @@ interface AlertGenerationResult {
   };
   recommendations: string[];
 }
+
+export type { SalesAnalysisData };
 
 // ============================================================================
 // SALES ALERTS ADAPTER
@@ -89,7 +89,16 @@ export class SalesAlertsAdapter {
   // ============================================================================
 
   /**
+   * Genera alertas inteligentes basadas en datos de ventas actuales
+   * Retorna CreateAlertInput[] para usar con unified alerts system
+   */
+  async generateAlerts(salesData: SalesAnalysisData): Promise<AlertGenerationResult> {
+    return this.generateAndUpdateAlerts(salesData);
+  }
+
+  /**
    * Genera y actualiza alertas inteligentes basadas en datos de ventas actuales
+   * @deprecated Use generateAlerts() for unified system integration
    */
   async generateAndUpdateAlerts(salesData: SalesAnalysisData): Promise<AlertGenerationResult> {
     try {

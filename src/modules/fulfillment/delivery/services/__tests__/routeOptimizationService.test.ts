@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { routeOptimizationService } from '../routeOptimizationService';
-import type { DeliveryOrder, DriverPerformance } from '../../types/deliveryTypes';
+import type { DeliveryOrder, DriverPerformance } from '../../types';
 
 describe('RouteOptimizationService', () => {
   const mockDelivery: DeliveryOrder = {

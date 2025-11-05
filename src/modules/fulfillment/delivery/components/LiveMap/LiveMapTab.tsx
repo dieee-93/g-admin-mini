@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Stack, Button } from '@/shared/ui';
-import type { DeliveryOrder, DeliveryZone } from '../../types/deliveryTypes';
+import type { DeliveryOrder, DeliveryZone } from '../../types';
 import { DeliverySidebar } from './DeliverySidebar';
 import { MapView } from './MapView';
 

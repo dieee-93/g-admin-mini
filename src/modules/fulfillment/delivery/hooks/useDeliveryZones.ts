@@ -1,7 +1,7 @@
 // delivery/hooks/useDeliveryZones.ts
 import { useState, useEffect } from 'react';
 import { deliveryApi } from '../services/deliveryApi';
-import type { DeliveryZone } from '../types/deliveryTypes';
+import type { DeliveryZone } from '../types';
 import { logger } from '@/lib/logging';
 
 /**

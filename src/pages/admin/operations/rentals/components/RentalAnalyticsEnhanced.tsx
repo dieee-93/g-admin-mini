@@ -230,7 +230,7 @@ const RentalAnalyticsEnhanced: React.FC = () => {
               title="ARR Proyectado"
               value={`$${mockData.revenue.annual.toLocaleString()}`}
               change={mockData.revenue.growth}
-              icon="TrendingUpIcon"
+              icon="ArrowTrendingUpIcon"
             />
             <MetricCard
               title="Rentals Activos"

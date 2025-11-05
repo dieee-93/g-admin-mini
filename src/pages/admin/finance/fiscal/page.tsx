@@ -12,7 +12,6 @@ import {
   CloudIcon,
   CurrencyDollarIcon,
   BuildingLibraryIcon,
-  ReceiptTaxIcon,
   ArrowTrendingUpIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
@@ -175,7 +174,7 @@ export function FiscalPage() {
           <MetricCard
             title="IVA Recaudado"
             value={`$${metrics.totalIVARecaudado.toFixed(2)}`}
-            icon={ReceiptTaxIcon}
+            icon={DocumentTextIcon}
             colorPalette="purple"
           />
           <MetricCard
@@ -409,7 +408,7 @@ export function FiscalPage() {
             variant="outline"
             onClick={actions.handleBulkTaxUpdate}
           >
-            <Icon icon={ReceiptTaxIcon} size="sm" />
+            <Icon icon={DocumentTextIcon} size="sm" />
             Actualizar Impuestos
           </Button>
         </Stack>

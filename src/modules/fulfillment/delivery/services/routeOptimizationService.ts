@@ -1,5 +1,5 @@
 // Route optimization service for suggesting best drivers
-import type { DriverPerformance, DeliveryOrder } from '../types/deliveryTypes';
+import type { DriverPerformance, DeliveryOrder } from '../types';
 import { logger } from '@/lib/logging';
 
 export interface DriverSuggestion {

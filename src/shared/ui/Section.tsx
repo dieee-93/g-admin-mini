@@ -58,7 +58,8 @@
 
 import { Stack, HStack, Box } from '@chakra-ui/react';
 import { SemanticSection } from './semantic/Section';
-import { Typography, Icon } from '.';
+import { Typography } from './Typography';
+import { Icon } from './Icon';
 import type { ReactNode } from 'react';
 
 interface SectionProps {

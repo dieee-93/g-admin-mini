@@ -1,6 +1,7 @@
 // App.tsx - NUEVA ARQUITECTURA DE RUTAS - Clean and organized routing
-import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import * as React from 'react';
+import { Suspense, useEffect, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider, Toaster } from '@/shared/ui';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { ResponsiveLayout } from '@/shared/layout/ResponsiveLayout';
@@ -52,11 +53,10 @@ import { ALL_MODULE_MANIFESTS } from '@/modules';
 import { ConsoleHelper } from '@/lib/logging';
 
 // ⚡ PHASE 1 OPTIMIZATION: Lazy load critical pages
-const { lazy } = React;
-const LazyDashboardPage = lazy(() => import('@/pages/admin/core/dashboard/page'));
-const LazyCustomReporting = lazy(() => import('@/pages/admin/core/reporting/page'));
-const LazyCompetitiveIntelligence = lazy(() => import('@/pages/admin/core/intelligence/page'));
-const LazySetupWizard = lazy(() => import('@/pages/setup/SetupWizard').then(m => ({ default: m.SetupWizard })));
+const LazyDashboardPage = React.lazy(() => import('@/pages/admin/core/dashboard/page'));
+const LazyCustomReporting = React.lazy(() => import('@/pages/admin/core/reporting/page'));
+const LazyCompetitiveIntelligence = React.lazy(() => import('@/pages/admin/core/intelligence/page'));
+const LazySetupWizard = React.lazy(() => import('@/pages/setup/SetupWizard').then(m => ({ default: m.SetupWizard })));
 
 // Lazy-loaded modules for performance
 import {
@@ -148,7 +148,7 @@ function PerformanceWrapper({ children }: { children: React.ReactNode }) {
   // Initialize appointment reminders (auto-cleanup on unmount)
   // useAppointmentReminders();
 
-  React.useEffect(() => {
+  useEffect(() => {
     logger.info('App', '🔥 PerformanceWrapper useEffect STARTED');
     // Initialize performance system
     initializePerformanceSystem({

@@ -174,7 +174,7 @@ export const RecurringBillingFormEnhanced: React.FC = () => {
                 title="Ingresos Mensuales"
                 value={`$${billingMetrics.monthlyAmount.toLocaleString()}`}
                 change={(billingMetrics.revenueHealth === 'high' ? 15 : billingMetrics.revenueHealth === 'medium' ? 5 : -2).toString()}
-                icon="TrendingUpIcon"
+                icon="ArrowTrendingUpIcon"
               />
               <MetricCard
                 title="Ingresos Anuales"

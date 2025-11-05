@@ -62,11 +62,10 @@ export default function ProductsWidget() {
     <Box
       p="5"
       bg="gray.50"
-      _dark={{ bg: 'gray.800' }}
       borderRadius="lg"
       borderWidth="1px"
       borderColor="gray.200"
-      _dark={{ borderColor: 'gray.700' }}
+      _dark={{ bg: 'gray.800', borderColor: 'gray.700' }}
     >
       <VStack align="stretch" gap="4">
         {/* Header */}

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Stack, Button, SimpleGrid, Text, Box } from '@/shared/ui';
 import { Input } from '@chakra-ui/react';
 import { UserIcon } from '@heroicons/react/24/outline';
-import type { DriverPerformance } from '../../types/deliveryTypes';
+import type { DriverPerformance } from '@/modules/fulfillment/delivery/types';
 import { DriverCard } from './DriverCard';
 import { LoadingSkeleton } from './LoadingSkeleton';
 

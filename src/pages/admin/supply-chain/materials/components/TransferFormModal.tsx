@@ -20,7 +20,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useLocation } from '@/contexts/LocationContext';
 import { inventoryTransfersApi } from '../services/inventoryTransfersApi';
 import { notify } from '@/lib/notifications';
-import type { CreateTransferData, MaterialItem } from '../types';
+import type { CreateTransferData, MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 
 interface TransferFormModalProps {
   isOpen: boolean;

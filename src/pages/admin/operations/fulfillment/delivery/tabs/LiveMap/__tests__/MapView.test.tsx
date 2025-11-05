@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test-utils';
 import { MapView } from '../MapView';
-import type { DeliveryOrder, DeliveryZone } from '../../../types/deliveryTypes';
+import type { DeliveryOrder, DeliveryZone } from '@/modules/fulfillment/delivery/types';
 
 // Mock react-leaflet components
 vi.mock('react-leaflet', () => ({

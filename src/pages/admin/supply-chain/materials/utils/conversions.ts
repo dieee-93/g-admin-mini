@@ -10,7 +10,7 @@ import {
   type LengthUnit,
   type ConversionResult,
   type UnitHelper
-} from '../types';
+} from '@/pages/admin/supply-chain/materials/types';
 
 // ============================================================================
 // 🔍 DETECCIÓN DE CATEGORÍA DE UNIDAD

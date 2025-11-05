@@ -33,7 +33,7 @@ import { notify } from '@/lib/notifications';
 // Import REAL data connections - NO MORE MOCK DATA
 import { useCostAnalysis, type RealCostAnalysisResult, type RealCostCalculationInput } from '../../hooks/useCostAnalysis';
 import { logger } from '@/lib/logging';
-// import { useCostCalculations } from '../hooks/useCostCalculations'; // Commented out - hook not found
+// import { useCostCalculations } from '@/pages/admin/supply-chain/products/hooks/useCostCalculations'; // Commented out - hook not found
 
 export function CostAnalysisTab() {
   // REAL data hooks - connected to MaterialsStore and ProductsStore

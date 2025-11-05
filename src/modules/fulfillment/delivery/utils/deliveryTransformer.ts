@@ -1,7 +1,7 @@
 // delivery/utils/deliveryTransformer.ts
 import type { Sale } from '@/pages/admin/operations/sales/types';
-import type { DeliveryOrder, DeliveryItem } from '../types/deliveryTypes';
-import { DeliveryStatus, DeliveryType } from '../types/deliveryTypes';
+import type { DeliveryOrder, DeliveryItem } from '../types';
+import { DeliveryType } from '../types';
 import { getCustomerDefaultAddress } from '@/pages/admin/core/crm/customers/services/customerAddressesApi';
 import { logger } from '@/lib/logging';
 
@@ -50,7 +50,7 @@ export async function transformSaleToDeliveryOrder(sale: Sale): Promise<Delivery
     // Driver & Status
     driver_id: undefined,
     driver_name: undefined,
-    status: DeliveryStatus.PENDING,
+    status: 'pending',
 
     // Timing
     created_at: sale.created_at,

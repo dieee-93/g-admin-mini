@@ -8,7 +8,7 @@ import {
 } from './SchedulingIntelligenceEngine';
 
 // ✅ SHARED ALERTS SYSTEM INTEGRATION
-import { Alert, AlertAction } from '@/shared/types/alerts';
+import { Alert, AlertAction } from '@/shared/alerts/types';
 import EventBus from '@/lib/events';
 
 // ✅ BUSINESS LOGIC UTILITIES

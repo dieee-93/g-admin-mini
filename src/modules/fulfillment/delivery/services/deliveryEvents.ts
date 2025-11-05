@@ -1,6 +1,7 @@
 // delivery/services/deliveryEvents.ts
 import EventBus from '@/lib/events';
 import { logger } from '@/lib/logging';
+import { deliveryApi } from './deliveryApi';
 
 /**
  * EventBus Integration for Delivery Module
@@ -11,22 +12,26 @@ import { logger } from '@/lib/logging';
 // ============================================
 
 /**
- * Listen to sales.order.created to detect new delivery orders
+ * Listen to sales.completed to detect new delivery orders
+ * Note: Sales module emits 'sales.completed' for all completed sales
  */
 export function setupDeliveryEventListeners() {
-  // Listen for new orders with delivery fulfillment
-  EventBus.on('sales.order.created', (data: any) => {
-    if (data.fulfillment_type === 'delivery' || data.fulfillment_type === 'DELIVERY') {
-      logger.info('Delivery', '📦 New delivery order created:', data);
-      handleNewDeliveryOrder(data);
-    }
+  // Listen for completed sales with delivery fulfillment
+  EventBus.on('sales.completed', (data: any) => {
+    // Check if this is a delivery order
+    // Note: fulfillment_type might be in saleData or metadata
+    logger.debug('Delivery', '📦 Sale completed event received:', data);
+
+    // For now, we'll handle all sales and check delivery type in handler
+    // TODO: Add fulfillment_type check once Sales includes it in event payload
+    handleNewDeliveryOrder(data);
   });
 
-  // Listen for order updates
-  EventBus.on('sales.order.updated', (data: any) => {
-    if (data.fulfillment_type === 'delivery') {
-      logger.info('Delivery', '🔄 Delivery order updated:', data);
-      // Update delivery data if needed
+  // Listen for order placement (alternative event)
+  EventBus.on('sales.order.placed', (data: any) => {
+    if (data.orderType === 'delivery' || data.fulfillmentType === 'delivery') {
+      logger.info('Delivery', '📦 New delivery order placed:', data);
+      handleNewDeliveryOrder(data);
     }
   });
 
@@ -37,8 +42,8 @@ export function setupDeliveryEventListeners() {
  * Cleanup listeners on unmount
  */
 export function cleanupDeliveryEventListeners() {
-  EventBus.off('sales.order.created');
-  EventBus.off('sales.order.updated');
+  EventBus.off('sales.completed');
+  EventBus.off('sales.order.placed');
   logger.info('Delivery', '🧹 Delivery EventBus listeners cleaned up');
 }
 
@@ -92,10 +97,37 @@ export function emitDeliveryCompleted(deliveryId: string, orderId: string) {
 // ============================================
 
 async function handleNewDeliveryOrder(orderData: any) {
-  // Transform and store delivery order
-  // This would trigger UI updates in the Delivery module
-  logger.info('Delivery', '🆕 Processing new delivery order...');
+  try {
+    // Extract sale ID from event payload (different events have different structures)
+    const saleId = orderData.saleId || orderData.id || orderData.orderId;
 
-  // TODO: Call deliveryApi.createDeliveryFromOrder(orderData)
-  // TODO: Update Zustand store or trigger re-fetch
+    if (!saleId) {
+      logger.warn('Delivery', '⚠️ No sale ID found in order data:', orderData);
+      return;
+    }
+
+    // Transform and store delivery order
+    logger.info('Delivery', '🆕 Processing new delivery order...', { saleId });
+
+    // Create delivery order from sale
+    const delivery = await deliveryApi.createDeliveryFromSale(saleId);
+
+    logger.info('Delivery', '✅ Delivery order created successfully:', {
+      deliveryId: delivery.id,
+      saleId
+    });
+
+    // Emit event for other modules to react
+    EventBus.emit('delivery.order.created', {
+      delivery_id: delivery.id,
+      sale_id: saleId,
+      customer_id: delivery.customer_id,
+      status: delivery.status,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    logger.error('Delivery', '❌ Failed to create delivery order:', error);
+    // Non-critical error - log and continue
+  }
 }

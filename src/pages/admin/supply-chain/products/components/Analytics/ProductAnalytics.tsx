@@ -16,7 +16,7 @@ import {
   CubeIcon,
   ChartBarIcon,
   CurrencyDollarIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { AnalyticsEngine } from '@/shared/services/AnalyticsEngine';
@@ -336,7 +336,7 @@ export function ProductAnalyticsEnhanced() {
             title="Precio Promedio"
             value={customMetrics ? DecimalUtils.formatCurrency(customMetrics.avgPrice) : '$0'}
             subtitle="ticket promedio"
-            icon={TrendingUpIcon}
+            icon={ArrowTrendingUpIcon}
           />
           <MetricCard
             title="Productos Activos"

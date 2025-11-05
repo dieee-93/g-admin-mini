@@ -6,7 +6,7 @@ import {
   type CountableItem,
   type ElaboratedItem,
   type ItemType
-} from '../types';
+} from '@/pages/admin/supply-chain/materials/types';
 
 /**
  * Raw API response type - mirrors database schema

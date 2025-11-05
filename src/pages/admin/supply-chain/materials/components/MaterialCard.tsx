@@ -16,8 +16,8 @@ import {
 import { PencilIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { CubeIcon } from '@heroicons/react/24/outline';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
-import type { MaterialItem } from '../types';
-import { isMeasurable } from '../types';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+import { isMeasurable } from '@/pages/admin/supply-chain/materials/types';
 import { HookPoint } from '@/lib/modules';
 
 export interface MaterialCardProps {

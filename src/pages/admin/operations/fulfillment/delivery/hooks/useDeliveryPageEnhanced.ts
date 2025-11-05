@@ -1,10 +1,10 @@
 // delivery/hooks/useDeliveryPage.ts
 import { useState, useEffect } from 'react';
-import type { DeliveryMetrics } from '../types/deliveryTypes';
-import { deliveryApi } from '../services/deliveryApi';
-import { useActiveDeliveries } from './useActiveDeliveries';
-import { useDrivers } from './useDrivers';
-import { useDeliveryZones } from './useDeliveryZones';
+import type { DeliveryMetrics } from '@/modules/fulfillment/delivery/types';
+import { deliveryApi } from '@/modules/fulfillment/delivery/services/deliveryApi';
+import { useActiveDeliveries } from '@/modules/fulfillment/delivery/hooks/useActiveDeliveries';
+import { useDrivers } from '@/modules/fulfillment/delivery/hooks/useDrivers';
+import { useDeliveryZones } from '@/modules/fulfillment/delivery/hooks/useDeliveryZones';
 import { logger } from '@/lib/logging';
 
 /**

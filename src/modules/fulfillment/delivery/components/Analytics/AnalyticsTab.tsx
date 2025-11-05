@@ -1,6 +1,6 @@
 import { Stack, SimpleGrid, MetricCard, Button, Spinner } from '@/shared/ui';
 import { TruckIcon, ClockIcon, ChartBarIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
-import type { DeliveryMetrics } from '../../types/deliveryTypes';
+import type { DeliveryMetrics } from '../../types';
 import { DeliveriesChart } from './DeliveriesChart';
 import { TopDriversTable } from './TopDriversTable';
 

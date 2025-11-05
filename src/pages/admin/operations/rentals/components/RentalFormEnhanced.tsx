@@ -215,7 +215,7 @@ export const RentalFormEnhanced: React.FC = () => {
                 title="Margen Estimado"
                 value={`${rentalMetrics.profitMargin.toFixed(1)}%`}
                 change={rentalMetrics.profitMargin > 60 ? 10 : rentalMetrics.profitMargin > 40 ? 5 : -5}
-                icon="TrendingUpIcon"
+                icon="ArrowTrendingUpIcon"
               />
               <MetricCard
                 title="Duración"

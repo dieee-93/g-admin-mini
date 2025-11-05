@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Stack, Button } from '@/shared/ui';
-import type { DeliveryZone } from '../../types/deliveryTypes';
+import type { DeliveryZone } from '@/modules/fulfillment/delivery/types';
 import { ZonesList } from './ZonesList';
 import { ZoneEditor } from './ZoneEditor';
 import { logger } from '@/lib/logging';

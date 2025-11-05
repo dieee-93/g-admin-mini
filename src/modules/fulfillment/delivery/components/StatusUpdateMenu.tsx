@@ -7,7 +7,7 @@ import {
   XCircleIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
-import type { DeliveryOrder } from '../types/deliveryTypes';
+import type { DeliveryOrder } from '../types';
 import { logger } from '@/lib/logging';
 
 interface StatusUpdateMenuProps {

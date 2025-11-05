@@ -1,6 +1,6 @@
 import { Stack, Badge, CardWrapper, Text } from '@/shared/ui';
 import { TruckIcon, UserIcon, ClockIcon, MapPinIcon } from '@heroicons/react/24/outline';
-import type { DeliveryOrder } from '../../types/deliveryTypes';
+import type { DeliveryOrder } from '@/modules/fulfillment/delivery/types';
 
 interface DeliveryMiniCardProps {
   delivery: DeliveryOrder;

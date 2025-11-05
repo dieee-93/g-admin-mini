@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 import { PlusIcon, CogIcon } from '@heroicons/react/24/outline';
 import { useProductsStore } from '@/store/productsStore';
-import { productsService } from '../services/productApi';
+import { productsService } from '@/pages/admin/supply-chain/products/services/productApi';
 
 import { logger } from '@/lib/logging';
 export function useProductsPage() {

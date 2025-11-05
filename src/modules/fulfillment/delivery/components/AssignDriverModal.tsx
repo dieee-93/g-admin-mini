@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Stack, Text, Button, Badge, CardWrapper, Box, Modal, RadioGroup, Radio } from '@/shared/ui';
 import { UserIcon, TruckIcon, StarIcon } from '@heroicons/react/24/solid';
-import type { DeliveryOrder, DriverPerformance } from '../types/deliveryTypes';
+import type { DeliveryOrder, DriverPerformance } from '../types';
 import { logger } from '@/lib/logging';
 
 interface AssignDriverModalProps {

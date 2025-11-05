@@ -38,7 +38,7 @@ import { useRecipes } from '@/shared/components';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { inventoryApi } from '@/pages/admin/supply-chain/materials/services/inventoryApi';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
-import { type InventoryItem } from '@/lib/ml/inventory/PredictiveInventory'; 
+// TODO: Implementar PredictiveInventory - import { type InventoryItem } from '@/lib/ml/inventory/PredictiveInventory'; 
 import { type CreateRecipeData } from '@/shared/components'; 
 import { RecipeFormBasicInfo } from './form-parts/RecipeFormBasicInfo';
 import { RecipeFormAISuggestions } from './form-parts/RecipeFormAiSuggestions';

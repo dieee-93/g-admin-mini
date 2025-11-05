@@ -8,7 +8,7 @@ import {
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
 import {
-  ChartBarIcon, CurrencyDollarIcon, EyeIcon, HeartIcon, PlusIcon, QrCodeIcon, TrendingUpIcon
+  ChartBarIcon, CurrencyDollarIcon, EyeIcon, HeartIcon, PlusIcon, QrCodeIcon, ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
@@ -229,7 +229,7 @@ export const AssetFormEnhanced: React.FC = () => {
                 title="ROI Anual"
                 value={`${assetMetrics.roi.toFixed(1)}%`}
                 change={assetMetrics.roi > 15 ? 15 : assetMetrics.roi > 8 ? 5 : -5}
-                icon={TrendingUpIcon}
+                icon={ArrowTrendingUpIcon}
               />
               <MetricCard
                 title="Valor Depreciado"

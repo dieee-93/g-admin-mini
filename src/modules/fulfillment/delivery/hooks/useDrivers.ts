@@ -1,7 +1,7 @@
 // delivery/hooks/useDrivers.ts
 import { useState, useEffect } from 'react';
 import { deliveryApi } from '../services/deliveryApi';
-import type { DriverPerformance } from '../types/deliveryTypes';
+import type { DriverPerformance } from '../types';
 import { logger } from '@/lib/logging';
 
 /**

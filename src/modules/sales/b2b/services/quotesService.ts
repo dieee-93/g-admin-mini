@@ -7,8 +7,7 @@
  * @module sales/b2b/services/quotesService
  */
 
-// TODO Phase 3: Uncomment when b2b_quotes table is created in database
-// import { supabase } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import Decimal from 'decimal.js';
 import { logger } from '@/lib/logging';
 import type {
@@ -70,16 +69,14 @@ export const getQuotes = async (): Promise<B2BQuote[]> => {
   try {
     logger.debug('B2B', 'Fetching all quotes');
 
-    // TODO: Replace with actual Supabase query when table exists
-    // const { data, error } = await supabase
-    //   .from('b2b_quotes')
-    //   .select('*')
-    //   .order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('b2b_quotes')
+      .select('*, customer:customers(id, name), b2b_quote_items(*)')
+      .order('created_at', { ascending: false });
 
-    // if (error) throw error;
+    if (error) throw error;
 
-    // Placeholder: return empty array
-    return [];
+    return data as B2BQuote[];
   } catch (error) {
     logger.error('B2B', 'Error fetching quotes', error);
     throw error;
@@ -93,14 +90,13 @@ export const getQuoteById = async (id: string): Promise<B2BQuote | null> => {
   try {
     logger.debug('B2B', 'Fetching quote', { id });
 
-    // TODO: Replace with actual Supabase query when table exists
-    // const { data, error } = await supabase
-    //   .from('b2b_quotes')
-    //   .select('*')
-    //   .eq('id', id)
-    //   .single();
+    const { data, error } = await supabase
+      .from('b2b_quotes')
+      .select('*, customer:customers(id, name), b2b_quote_items(*)')
+      .eq('id', id)
+      .single();
 
-    // if (error) throw error;
+    if (error) throw error;
 
     // Placeholder: return null
     return null;
@@ -114,8 +110,7 @@ export const getQuoteById = async (id: string): Promise<B2BQuote | null> => {
  * Create a new quote
  */
 export const createQuote = async (
-  formData: QuoteFormData,
-  createdBy: string
+  formData: QuoteFormData
 ): Promise<B2BQuote> => {
   try {
     logger.info('B2B', 'Creating quote', { customer_id: formData.customer_id });
@@ -123,34 +118,52 @@ export const createQuote = async (
     const quoteNumber = generateQuoteNumber();
     const totals = calculateQuoteTotals(formData.items);
 
-    const quoteData = {
-      quote_number: quoteNumber,
-      customer_id: formData.customer_id,
-      status: 'draft' as QuoteStatus,
-      valid_until: formData.valid_until,
-      items: formData.items,
-      ...totals,
-      notes: formData.notes,
-      terms_and_conditions: formData.terms_and_conditions,
-      created_by: createdBy,
-    };
+    // Insert quote
+    const { data: quoteData, error: quoteError } = await supabase
+      .from('b2b_quotes')
+      .insert({
+        quote_number: quoteNumber,
+        customer_id: formData.customer_id,
+        status: 'draft',
+        valid_until: formData.valid_until,
+        subtotal: totals.subtotal,
+        discount_amount: totals.discount_amount,
+        tax_amount: totals.tax_amount,
+        total_amount: totals.total_amount,
+        notes: formData.notes,
+        terms_and_conditions: formData.terms_and_conditions,
+      })
+      .select()
+      .single();
 
-    // TODO: Replace with actual Supabase insert when table exists
-    // const { data, error } = await supabase
-    //   .from('b2b_quotes')
-    //   .insert(quoteData)
-    //   .select()
-    //   .single();
+    if (quoteError) throw quoteError;
 
-    // if (error) throw error;
+    // Insert quote items
+    if (formData.items.length > 0) {
+      const { error: itemsError } = await supabase
+        .from('b2b_quote_items')
+        .insert(
+          formData.items.map(item => ({
+            quote_id: quoteData.id,
+            product_id: item.product_id,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            tiered_price: item.tiered_price,
+            subtotal: new Decimal(item.tiered_price || item.unit_price)
+              .times(item.quantity)
+              .toFixed(2),
+          }))
+        );
+
+      if (itemsError) throw itemsError;
+    }
 
     logger.info('B2B', 'Quote created successfully', { quote_number: quoteNumber });
 
-    // Placeholder: return mock data
     return {
-      id: 'mock-id',
+      id: quoteData.id,
       ...quoteData,
-      created_at: new Date().toISOString(),
+      created_at: quoteData.created_at,
       updated_at: new Date().toISOString(),
     } as B2BQuote;
   } catch (error) {

@@ -10,7 +10,7 @@ import {
   Grid
 } from "@/shared/ui";
 import { VirtualizedList } from "@/lib/performance/virtualization/VirtualizedList";
-import { type ProductWithIntelligence } from "../types";
+import { type ProductWithIntelligence } from "../../types";
 
 interface ProductListProps {
   products: ProductWithIntelligence[];

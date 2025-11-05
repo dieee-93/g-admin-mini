@@ -8,14 +8,12 @@
  */
 
 import React from 'react';
-import {
-  Stack,
-  Typography,
-  CardWrapper,
-  Button,
-  Badge,
-  Icon
-} from '.';
+import { Stack } from './Stack';
+import { Typography } from './Typography';
+import { CardWrapper } from './CardWrapper';
+import { Button } from './Button';
+import { Badge } from './Badge';
+import { Icon } from './Icon';
 import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,

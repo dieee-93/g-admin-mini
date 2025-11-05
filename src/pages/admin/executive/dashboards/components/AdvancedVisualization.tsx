@@ -8,7 +8,7 @@ import {
   UserGroupIcon,
   CogIcon,
   GlobeAltIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   ArrowPathIcon,
   PhotoIcon,
   DocumentIcon,
@@ -64,7 +64,7 @@ const AdvancedVisualization: React.FC = () => {
       id: 'predictive-trends',
       title: 'Tendencias Predictivas',
       type: 'forecast',
-      icon: TrendingUpIcon,
+      icon: ArrowTrendingUpIcon,
       description: 'Proyecciones basadas en IA y machine learning'
     },
     {
@@ -405,7 +405,7 @@ const AdvancedVisualization: React.FC = () => {
                   { name: 'Market Comparison', type: 'Bubble Chart', icon: GlobeAltIcon },
                   { name: 'Performance Matrix', type: 'Scatter Plot', icon: ChartBarIcon },
                   { name: 'Risk Assessment', type: 'Heat Map', icon: ExclamationTriangleIcon },
-                  { name: 'Trend Forecast', type: 'Predictive', icon: TrendingUpIcon },
+                  { name: 'Trend Forecast', type: 'Predictive', icon: ArrowTrendingUpIcon },
                   { name: 'Portfolio View', type: 'Tree Map', icon: Squares2X2Icon }
                 ].map((template, index) => (
                   <Button

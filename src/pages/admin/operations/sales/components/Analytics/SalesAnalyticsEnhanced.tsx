@@ -18,7 +18,7 @@ import {
   CurrencyDollarIcon,
   ChartBarIcon,
   UsersIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   TrendingDownIcon,
   // TODO: Add time-based filtering using ClockIcon
   // ClockIcon,
@@ -236,7 +236,7 @@ export function SalesAnalyticsEnhanced() {
             title="Tasa de Actividad"
             value={`${(analyticsData?.metrics?.activity_rate || 0).toFixed(1)}%`}
             subtitle="ventas recientes"
-            icon={analyticsData?.metrics?.activity_rate > 70 ? TrendingUpIcon : TrendingDownIcon}
+            icon={analyticsData?.metrics?.activity_rate > 70 ? ArrowTrendingUpIcon : TrendingDownIcon}
             colorPalette={analyticsData?.metrics?.activity_rate > 70 ? "green" : "yellow"}
           />
         </CardGrid>

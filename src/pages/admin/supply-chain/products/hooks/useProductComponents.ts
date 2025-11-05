@@ -7,7 +7,7 @@
 import { useMemo } from 'react';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
-import { type ProductComponent, type AddComponentData } from '../types';
+import { type ProductComponent, type AddComponentData } from '@/pages/admin/supply-chain/products/types';
 
 import { logger } from '@/lib/logging';
 export function useProductComponents(productId: string) {

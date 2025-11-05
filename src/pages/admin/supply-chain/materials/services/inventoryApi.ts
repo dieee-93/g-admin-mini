@@ -6,7 +6,7 @@ import { MaterialsMockService } from './materialsMockService';
 import { MaterialsDataNormalizer } from './materialsDataNormalizer';
 import { BulkOperationsService } from './bulkOperationsService'; // ✅ Bulk operations
 import { CacheService, invalidateMaterialsListCache, invalidateMaterialCache } from './cacheService'; // ✅ Caching
-import type { InventoryItem, StockEntry } from '../types';
+import type { InventoryItem, StockEntry } from '@/pages/admin/supply-chain/materials/types';
 import type { MaterialItem } from '../types/materialTypes';
 import { secureApiCall } from '@/lib/validation'; // ✅ Secure API wrapper
 

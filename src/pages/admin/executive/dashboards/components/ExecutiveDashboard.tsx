@@ -385,7 +385,7 @@ const ExecutiveDashboard: React.FC = () => {
 
   const getAlertIcon = (type: string) => {
     switch (type) {
-      case 'opportunity': return 'TrendingUpIcon';
+      case 'opportunity': return 'ArrowTrendingUpIcon';
       case 'risk': return 'ExclamationTriangleIcon';
       case 'milestone': return 'TrophyIcon';
       case 'anomaly': return 'QuestionMarkCircleIcon';

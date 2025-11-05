@@ -24,11 +24,11 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { useMaterials } from '@/store/materialsStore';
-import { MaterialsDataNormalizer } from '../services/materialsDataNormalizer';
+import { MaterialsDataNormalizer } from '@/pages/admin/supply-chain/materials/services/materialsDataNormalizer';
 import { logger } from '@/lib/logging';
 import eventBus from '@/lib/events';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import type { MaterialItem } from '../types';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 
 interface UseRealtimeMaterialsOptions {
   /**

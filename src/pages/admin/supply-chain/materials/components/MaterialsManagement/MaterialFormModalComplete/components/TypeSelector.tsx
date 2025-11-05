@@ -1,6 +1,6 @@
 import { Box, Stack, Text } from '@/shared/ui';
 import { SelectField } from '@/shared/ui';
-import { type ItemType } from '../../../types';
+import { type ItemType } from '../../../../types';
 import { ITEM_TYPE_COLLECTION } from '../constants';
 
 interface TypeSelectorProps {

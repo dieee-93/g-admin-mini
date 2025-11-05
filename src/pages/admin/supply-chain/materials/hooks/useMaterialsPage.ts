@@ -9,16 +9,16 @@ import {
 import { useNavigationActions } from '@/contexts/NavigationContext';
 import { useLocation } from '@/contexts/LocationContext'; // 🆕 MULTI-LOCATION
 import { useMaterials } from '@/store/materialsStore';
-import { inventoryApi } from '../services/inventoryApi';
+// TODO: Mover a módulo - import { inventoryApi } from '@/pages/admin/supply-chain/materials/services/inventoryApi';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
-import { ABCAnalysisEngine } from '../services/abcAnalysisEngine';
-import { TrendsService } from '../services/trendsService'; // ✅ Phase 3: Historical trends
+// TODO: Mover a módulo - import { ABCAnalysisEngine } from '@/pages/admin/supply-chain/materials/services/abcAnalysisEngine';
+// TODO: Implementar TrendsService (Phase 3) - import { TrendsService } from '@/pages/admin/supply-chain/materials/services/trendsService'; // ✅ Phase 3: Historical trends
 // ✅ SISTEMAS INTEGRATION
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import type { MaterialItem, ItemFormData } from '../types';
+import type { MaterialItem, ItemFormData } from '@/pages/admin/supply-chain/materials/types';
 // Enhanced functionality imports
 // NOTE: Removed unused imports (useDataFetcher, useDataSearch, useModuleAnalytics, AnalyticsEngine, handleAsyncOperation, CRUDHandlers)
 import eventBus from '@/lib/events';

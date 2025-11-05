@@ -11,8 +11,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BulkOperationsService } from '../services/bulkOperationsService';
-import type { MaterialItem } from '../types';
+import { BulkOperationsService } from '@/pages/admin/supply-chain/materials/services/bulkOperationsService';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
 
