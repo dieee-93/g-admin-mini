@@ -5,18 +5,17 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationActions } from '@/contexts/NavigationContext';
+import { useLocation } from '@/contexts/LocationContext';
 import { useStaffWithLoader } from '@/hooks/useStaffData';
 import {
   UsersIcon,
   ChartBarIcon,
   AcademicCapIcon,
-  CogIcon,
   PlusIcon,
   ClockIcon,
   CreditCardIcon,
-  TrophyIcon,
-  ExclamationTriangleIcon
+  TrophyIcon
 } from '@heroicons/react/24/outline';
 
 // Import migrated services
@@ -26,7 +25,9 @@ import {
   calculateDailyCostSummary,
   analyzeBudgetVariance,
   calculateLaborEfficiency,
-  getStaffStats,
+  getRealStaffStats,
+  getTimeEntries,
+  getSchedules,
   type PerformanceMetrics,
   type DailyCostSummary,
   type LiveCostCalculation,
@@ -35,8 +36,6 @@ import {
   type TimeEntry,
   type Schedule
 } from '../services';
-
-import type { StaffViewState } from '../types';
 
 import { logger } from '@/lib/logging';
 // ============================================================================
@@ -84,6 +83,7 @@ export interface StaffPageState {
     position?: string;
     status?: string;
     performanceRange?: [number, number];
+    location_id?: string; // Multi-location filter
   };
   sortBy: {
     field: string;
@@ -155,7 +155,8 @@ export interface UseStaffPageReturn {
 // ============================================================================
 
 export const useStaffPage = (): UseStaffPageReturn => {
-  const { setQuickActions, updateModuleBadge } = useNavigation();
+  const { setQuickActions, updateModuleBadge } = useNavigationActions();
+  const { selectedLocation, isMultiLocationMode } = useLocation();
   const { staff, loading: staffLoading, error: staffError } = useStaffWithLoader();
 
   // ============================================================================
@@ -175,11 +176,23 @@ export const useStaffPage = (): UseStaffPageReturn => {
   const [performanceAnalytics, setPerformanceAnalytics] = useState<StaffAnalyticsResult | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [staffStatsData, setStaffStatsData] = useState<any>(null);
+  const [staffStatsData, setStaffStatsData] = useState<{
+    totalStaff: number;
+    activeStaff: number;
+    avgPerformance: number;
+    upcomingReviews?: Array<{ id: string; employee_id: string; due_date: string }>;
+  } | null>(null);
 
-  // Load staff stats async
+  // Load staff stats async - REAL DATA
   useEffect(() => {
-    getStaffStats().then(stats => setStaffStatsData(stats)).catch(err => {
+    getRealStaffStats().then(stats => {
+      setStaffStatsData({
+        totalStaff: stats.total_employees,
+        activeStaff: stats.active_employees,
+        avgPerformance: stats.avg_performance,
+        upcomingReviews: [] // Would come from reviews table
+      });
+    }).catch(err => {
       logger.error('App', 'Failed to load staff stats:', err);
     });
   }, [staff.length]);
@@ -217,19 +230,8 @@ export const useStaffPage = (): UseStaffPageReturn => {
 
     const staffStats = staffStatsData;
 
-    // Mock time entries and schedules (in real app, these would come from API)
-    const mockTimeEntries: TimeEntry[] = staff.map((employee, index) => ({
-      id: `time_${index}`,
-      employee_id: employee.id,
-      clock_in: new Date(Date.now() - Math.random() * 8 * 60 * 60 * 1000).toISOString(),
-      clock_out: Math.random() > 0.3 ? new Date().toISOString() : null,
-      break_minutes: 30,
-      total_hours: 6 + Math.random() * 4,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }));
-
-    // Calculate live labor costs
+    // Calculate live labor costs based on REAL active employees
+    // Note: In production, this would use actual clock-in times from time_entries table
     const liveCosts: LiveCostCalculation[] = staff
       .filter(emp => emp.status === 'active')
       .map(employee => {
@@ -237,7 +239,7 @@ export const useStaffPage = (): UseStaffPageReturn => {
           employee_id: employee.id,
           employee_name: employee.name,
           hourly_rate: employee.hourly_rate || 15,
-          clock_in_time: new Date(Date.now() - Math.random() * 8 * 60 * 60 * 1000),
+          clock_in_time: new Date(), // In production: get from time_entries
           shift_start_time: '09:00',
           shift_end_time: '17:00'
         });
@@ -277,7 +279,7 @@ export const useStaffPage = (): UseStaffPageReturn => {
       departmentBreakdown,
 
       // Training & Development
-      upcomingReviews: staffStats.upcomingReviews.length,
+      upcomingReviews: staffStats.upcomingReviews?.length || 0,
       trainingHoursThisMonth: Math.floor(Math.random() * 50) + 20,
       skillGaps: ['Customer Service', 'Food Safety', 'POS Systems'],
 
@@ -310,7 +312,16 @@ export const useStaffPage = (): UseStaffPageReturn => {
   const filteredEmployees = useMemo(() => {
     let filtered = [...staff];
 
-    // Apply filters
+    // 🌎 Multi-Location Filter: Filter by selected location if in multi-location mode
+    if (isMultiLocationMode && selectedLocation) {
+      filtered = filtered.filter(emp => {
+        // Show employees who work at the selected location (home_location_id matches)
+        // OR employees who can work at multiple locations
+        return emp.home_location_id === selectedLocation.id || emp.can_work_multiple_locations;
+      });
+    }
+
+    // Apply other filters
     if (pageState.filters.department) {
       filtered = filtered.filter(emp => emp.department === pageState.filters.department);
     }
@@ -320,12 +331,18 @@ export const useStaffPage = (): UseStaffPageReturn => {
     if (pageState.filters.position) {
       filtered = filtered.filter(emp => emp.position?.toLowerCase().includes(pageState.filters.position!.toLowerCase()));
     }
+    if (pageState.filters.location_id) {
+      filtered = filtered.filter(emp =>
+        emp.home_location_id === pageState.filters.location_id ||
+        emp.can_work_multiple_locations
+      );
+    }
 
     // Apply sorting
     filtered.sort((a, b) => {
       const { field, direction } = pageState.sortBy;
-      let aValue = (a as any)[field];
-      let bValue = (b as any)[field];
+      let aValue = a[field as keyof Employee];
+      let bValue = b[field as keyof Employee];
 
       if (typeof aValue === 'string') aValue = aValue.toLowerCase();
       if (typeof bValue === 'string') bValue = bValue.toLowerCase();
@@ -338,11 +355,16 @@ export const useStaffPage = (): UseStaffPageReturn => {
     });
 
     return filtered;
-  }, [staff, pageState.filters, pageState.sortBy]);
+  }, [staff, pageState.filters, pageState.sortBy, isMultiLocationMode, selectedLocation]);
 
   // Department statistics
   const departmentStats = useMemo(() => {
-    const stats: Record<string, any> = {};
+    const stats: Record<string, {
+      total: number;
+      active: number;
+      avgPerformance: number;
+      avgHourlyRate: number;
+    }> = {};
 
     Object.keys(metrics.departmentBreakdown).forEach(dept => {
       const deptEmployees = staff.filter(emp => emp.department === dept);
@@ -494,6 +516,7 @@ export const useStaffPage = (): UseStaffPageReturn => {
 
     setQuickActions(getQuickActionsForTab(pageState.activeTab));
     return () => setQuickActions([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageState.activeTab]);
 
   // Update module badge with critical alerts count
@@ -514,6 +537,7 @@ export const useStaffPage = (): UseStaffPageReturn => {
     if (pageState.showAnalytics && !performanceAnalytics && !analyticsLoading) {
       generatePerformanceAnalytics();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageState.showAnalytics, performanceAnalytics, analyticsLoading]);
 
   // ============================================================================
@@ -525,43 +549,33 @@ export const useStaffPage = (): UseStaffPageReturn => {
     setError(null);
 
     try {
-      // Mock data - in real app would come from APIs
-      const mockTimeEntries: TimeEntry[] = staff.map((employee, index) => ({
-        id: `time_${index}`,
-        employee_id: employee.id,
-        clock_in: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-        clock_out: new Date(Date.now() - Math.random() * 8 * 60 * 60 * 1000).toISOString(),
-        break_minutes: 30 + Math.random() * 30,
-        total_hours: 6 + Math.random() * 4,
-        created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date().toISOString()
-      }));
+      // REAL DATA - Fetch from database
+      const months = pageState.analyticsTimeframe === '1M' ? 1 :
+                     pageState.analyticsTimeframe === '3M' ? 3 :
+                     pageState.analyticsTimeframe === '6M' ? 6 : 12;
 
-      const mockSchedules: Schedule[] = staff.map((employee, index) => ({
-        id: `schedule_${index}`,
-        employee_id: employee.id,
-        start_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-        end_time: new Date(Date.now() - Math.random() * 8 * 60 * 60 * 1000).toISOString(),
-        break_minutes: 30,
-        status: Math.random() > 0.1 ? 'completed' : 'missed' as any,
-        created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date().toISOString()
-      }));
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - months);
+      const endDate = new Date();
+
+      const [timeEntriesData, schedulesData] = await Promise.all([
+        getTimeEntries(startDate.toISOString(), endDate.toISOString()),
+        getSchedules(startDate.toISOString(), endDate.toISOString())
+      ]);
+
+      logger.info('StaffPage', `📊 Loaded ${timeEntriesData.length} time entries and ${schedulesData.length} schedules`);
 
       const analytics = await StaffPerformanceAnalyticsEngine.generateStaffAnalytics(
         staff as Employee[],
-        mockTimeEntries,
-        mockSchedules,
-        {
-          analysisMonths: pageState.analyticsTimeframe === '1M' ? 1 :
-                          pageState.analyticsTimeframe === '3M' ? 3 :
-                          pageState.analyticsTimeframe === '6M' ? 6 : 12
-        }
+        timeEntriesData as TimeEntry[],
+        schedulesData as Schedule[],
+        { analysisMonths: months }
       );
 
       setPerformanceAnalytics(analytics);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error generating analytics');
+      logger.error('StaffPage', 'Failed to generate analytics', err);
     } finally {
       setAnalyticsLoading(false);
     }

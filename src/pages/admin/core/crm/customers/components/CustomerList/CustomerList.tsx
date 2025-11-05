@@ -1,6 +1,6 @@
 // src/features/customers/ui/CustomerList.tsx - Design System v2.0
 // MIGRATED: Now uses centralized financial calculations
-import { 
+import {
   Stack,
   CardWrapper ,
   Typography,
@@ -10,7 +10,8 @@ import {
   Table
 } from '@/shared/ui';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
-import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
+// TODO: Implement virtualization for large customer lists (1000+ records)
+// import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
 import { useState } from 'react';
 import { useCustomers, useCustomerSearch } from '../../hooks/existing/useCustomers';
 import { type Customer } from '../../types';
@@ -100,7 +101,7 @@ export function CustomerList() {
           direction="row"
           align="center"
           justify="center"
-          p={4}
+          p="4"
         >
           <CardWrapper padding="md" width="full">
             <div style={{ maxWidth: '600px', maxHeight: '90vh', overflow: 'auto' }}>
@@ -125,7 +126,7 @@ export function CustomerList() {
               {customers.length} clientes
             </Badge>
             {showStats && !loadingStats && (
-              <Badge colorPalette="info" variant="subtle">
+              <Badge colorPalette="blue" variant="subtle">
                 Con estadísticas
               </Badge>
             )}
@@ -136,7 +137,7 @@ export function CustomerList() {
           <Button
             size="sm"
             variant={showStats ? "solid" : "outline"}
-            colorPalette="info"
+            colorPalette="blue"
             onClick={() => setShowStats(!showStats)}
             disabled={loadingStats}
           >
@@ -289,7 +290,7 @@ export function CustomerList() {
                     <Stack direction="row" gap="xs">
                       <Button
                         size="xs"
-                        colorPalette="info"
+                        colorPalette="blue"
                         variant="ghost"
                         onClick={() => handleEdit(customer)}
                       >
@@ -298,7 +299,7 @@ export function CustomerList() {
                       
                       <Button
                         size="xs"
-                        colorPalette="error"
+                        colorPalette="red"
                         variant="ghost"
                         onClick={() => handleDelete(customer)}
                       >

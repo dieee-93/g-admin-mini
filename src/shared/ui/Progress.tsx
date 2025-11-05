@@ -66,69 +66,7 @@ interface ProgressValueTextProps {
 }
 
 // =============================================================================
-// MAIN PROGRESS COMPONENT (Simplified Interface)
-// =============================================================================
-
-export function Progress({
-  value,
-  defaultValue = 50,
-  min = 0,
-  max = 100,
-  colorPalette = 'blue',
-  variant = 'outline',
-  size = 'md',
-  shape = 'rounded',
-  striped = false,
-  animated = false,
-  orientation = 'horizontal',
-  label,
-  showValueText = false,
-  valueText,
-  info,
-  children,
-  className,
-  ...props
-}: BaseProgressProps) {
-  return (
-    <ChakraProgress.Root
-      value={value}
-      defaultValue={defaultValue}
-      min={min}
-      max={max}
-      colorPalette={colorPalette}
-      variant={variant}
-      size={size}
-      shape={shape}
-      striped={striped}
-      animated={animated}
-      orientation={orientation}
-      className={className}
-      {...props}
-    >
-      {label && (
-        <ChakraProgress.Label>
-          {label}
-          {info && <span style={{ marginLeft: '4px' }}>{info}</span>}
-        </ChakraProgress.Label>
-      )}
-
-      <ChakraProgress.Track>
-        <ChakraProgress.Range />
-      </ChakraProgress.Track>
-
-      {showValueText && (
-        <ChakraProgress.ValueText>
-          {valueText}
-        </ChakraProgress.ValueText>
-      )}
-
-      {children}
-    </ChakraProgress.Root>
-  )
-}
-
-// =============================================================================
-// COMPOSITIONAL COMPONENTS (Direct Chakra Wrappers)
+// COMPOSITIONAL COMPONENTS (Direct Chakra Wrappers) - Define first for use in main component
 // =============================================================================
 
 export const ProgressRoot = React.forwardRef<HTMLDivElement, ProgressRootProps>(
@@ -205,6 +143,77 @@ export const ProgressValueText = React.forwardRef<HTMLSpanElement, ProgressValue
     )
   }
 )
+
+// =============================================================================
+// MAIN PROGRESS COMPONENT (Simplified Interface with Compositional API)
+// =============================================================================
+
+const ProgressComponent = function Progress({
+  value,
+  defaultValue = 50,
+  min = 0,
+  max = 100,
+  colorPalette = 'blue',
+  variant = 'outline',
+  size = 'md',
+  shape = 'rounded',
+  striped = false,
+  animated = false,
+  orientation = 'horizontal',
+  label,
+  showValueText = false,
+  valueText,
+  info,
+  children,
+  className,
+  ...props
+}: BaseProgressProps) {
+  return (
+    <ProgressRoot
+      value={value}
+      defaultValue={defaultValue}
+      min={min}
+      max={max}
+      colorPalette={colorPalette}
+      variant={variant}
+      size={size}
+      shape={shape}
+      striped={striped}
+      animated={animated}
+      orientation={orientation}
+      className={className}
+      {...props}
+    >
+      {label && (
+        <ProgressLabel>
+          {label}
+          {info && <span style={{ marginLeft: '4px' }}>{info}</span>}
+        </ProgressLabel>
+      )}
+
+      <ProgressTrack>
+        <ProgressRange />
+      </ProgressTrack>
+
+      {showValueText && (
+        <ProgressValueText>
+          {valueText}
+        </ProgressValueText>
+      )}
+
+      {children}
+    </ProgressRoot>
+  )
+}
+
+// Attach compositional API to main component
+export const Progress = Object.assign(ProgressComponent, {
+  Root: ProgressRoot,
+  Track: ProgressTrack,
+  Range: ProgressRange,
+  Label: ProgressLabel,
+  ValueText: ProgressValueText
+})
 
 // =============================================================================
 // BUSINESS PROGRESS COMPONENTS

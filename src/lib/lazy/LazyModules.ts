@@ -28,14 +28,39 @@ export const LazySalesPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Operations Page (pages/admin/operations/hub/page.tsx)
-export const LazyOperationsPage = createLazyComponent(
-  () => import('../../pages/admin/operations/hub/page'),
-  'operations',
+// Lazy-loaded Fulfillment Onsite Page
+export const LazyFulfillmentOnsitePage = createLazyComponent(
+  () => import('../../pages/admin/operations/fulfillment/onsite/page'),
+  'fulfillment-onsite',
   {
-    chunkName: 'operations-module',
-    preload: false, // Load on demand
-    priority: 'high', // Critical for restaurant operations
+    chunkName: 'fulfillment-onsite-module',
+    preload: false,
+    priority: 'high',
+    cacheStrategy: 'both'
+  }
+);
+
+// Lazy-loaded Production Page
+export const LazyProductionPage = createLazyComponent(
+  () => import('../../pages/admin/operations/production/page'),
+  'production',
+  {
+    chunkName: 'production-module',
+    preload: false,
+    priority: 'high',
+    cacheStrategy: 'both'
+  }
+);
+
+// Lazy-loaded Delivery Management Page (pages/admin/operations/fulfillment/delivery/page.tsx)
+// UPDATED: Consolidated into fulfillment-delivery module
+export const LazyDeliveryPage = createLazyComponent(
+  () => import('../../pages/admin/operations/fulfillment/delivery/page'),
+  'fulfillment-delivery',
+  {
+    chunkName: 'fulfillment-delivery-module',
+    preload: false,
+    priority: 'medium', // Important for delivery operations
     cacheStrategy: 'both'
   }
 );
@@ -54,6 +79,30 @@ export const LazyMaterialsPage = createLazyComponent(
 
 // Legacy alias - use LazyMaterialsPage instead
 export const LazyStockLab = LazyMaterialsPage;
+
+// Lazy-loaded Suppliers Page (pages/admin/supply-chain/suppliers/page.tsx)
+export const LazySuppliersPage = createLazyComponent(
+  () => import('../../pages/admin/supply-chain/suppliers/page'),
+  'suppliers',
+  {
+    chunkName: 'suppliers-module',
+    preload: false,
+    priority: 'medium',
+    cacheStrategy: 'both'
+  }
+);
+
+// Lazy-loaded Supplier Orders Page (pages/admin/supply-chain/supplier-orders/page.tsx)
+export const LazySupplierOrdersPage = createLazyComponent(
+  () => import('../../pages/admin/supply-chain/supplier-orders/page'),
+  'supplier-orders',
+  {
+    chunkName: 'supplier-orders-module',
+    preload: false,
+    priority: 'medium',
+    cacheStrategy: 'both'
+  }
+);
 
 // Lazy-loaded Staff Page (pages/admin/resources/staff/page.tsx)
 export const LazyStaffPage = createLazyComponent(
@@ -124,17 +173,6 @@ export const LazySettingsPage = createLazyComponent(
   'settings',
   {
     chunkName: 'settings-module',
-    preload: false,
-    priority: 'low',
-    cacheStrategy: 'memory'
-  }
-);
-
-export const LazyThemeTestPage = createLazyComponent(
-  () => import('../../pages/ThemeTestPage'),
-  'debug',
-  {
-    chunkName: 'debug-module',
     preload: false,
     priority: 'low',
     cacheStrategy: 'memory'
@@ -230,16 +268,17 @@ export const LazyComponentsDebug = createLazyComponent(
   }
 );
 
-export const LazySlotsDebug = createLazyComponent(
-  () => import('../../pages/debug/slots/index'),
-  'slots-debug',
-  {
-    chunkName: 'slots-debug',
-    preload: false,
-    priority: 'low',
-    cacheStrategy: 'memory'
-  }
-);
+// REMOVED: Slots debug page - Legacy system eliminated
+// export const LazySlotsDebug = createLazyComponent(
+//   () => import('../../pages/debug/slots/index'),
+//   'slots-debug',
+//   {
+//     chunkName: 'slots-debug',
+//     preload: false,
+//     priority: 'low',
+//     cacheStrategy: 'memory'
+//   }
+// );
 
 export const LazyBundleDebug = createLazyComponent(
   () => import('../../pages/debug/bundle/index'),
@@ -253,7 +292,8 @@ export const LazyBundleDebug = createLazyComponent(
 );
 
 // Materials Sub-Pages (pages/admin/supply-chain/materials/*)
-export const LazySupplyChainPage = createLazyComponent(
+// DISABLED: Procurement component does not exist
+/* export const LazySupplyChainPage = createLazyComponent(
   () => import('../../pages/admin/supply-chain/materials/components/Procurement').then(module => ({
     default: module.SupplyChainAnalysis
   })),
@@ -264,9 +304,10 @@ export const LazySupplyChainPage = createLazyComponent(
     priority: 'medium',
     cacheStrategy: 'memory'
   }
-);
+); */
 
-export const LazyProcurementPage = createLazyComponent(
+// DISABLED: ProcurementRecommendationsTab component does not exist
+/* export const LazyProcurementPage = createLazyComponent(
   () => import('../../pages/admin/supply-chain/materials/components/Procurement/ProcurementRecommendationsTab'),
   'procurement',
   {
@@ -275,7 +316,7 @@ export const LazyProcurementPage = createLazyComponent(
     priority: 'medium',
     cacheStrategy: 'memory'
   }
-);
+); */
 
 // ✅ NEW PHASE 4 & 5 MODULES - Missing lazy loaders added
 
@@ -489,19 +530,19 @@ export const moduleMetadata = {
 // Export all lazy pages
 export const lazyModules = {
   LazySalesPage,
-  LazyOperationsPage,
+  LazyFulfillmentOnsitePage,
+  LazyProductionPage,
+  LazyDeliveryPage,
   LazyMaterialsPage,
   LazyStockLab,
+  LazySuppliersPage,
+  LazySupplierOrdersPage,
   LazyProductsPage,
   LazyStaffPage,
   LazyCustomersPage,
   LazySchedulingPage,
   LazyFiscalPage,
   LazySettingsPage,
-  LazyThemeTestPage,
-  LazySupplyChainPage,
-  LazyProcurementPage,
-  // ✅ NEW PHASE 4 & 5 MODULES
   LazyGamificationPage,
   LazyExecutivePage,
   LazyBillingPage,

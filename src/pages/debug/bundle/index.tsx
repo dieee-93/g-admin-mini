@@ -259,7 +259,7 @@ export default function BundleAnalyzer() {
                         <Badge colorPalette="red" size="sm">
                           #{index + 1}
                         </Badge>
-                        <Typography variant="h6" style={{ fontSize: '14px' }}>
+                        <Typography variant="subtitle" style={{ fontSize: '14px' }}>
                           {module.name}
                         </Typography>
                       </Stack>
@@ -410,7 +410,7 @@ export default function BundleAnalyzer() {
               <Card variant="elevated">
                 <CardHeader>
                   <Stack direction="row" justify="space-between" align="center">
-                    <Typography variant="h6">{selectedModule.name}</Typography>
+                    <Typography variant="subtitle">{selectedModule.name}</Typography>
                     <Button
                       variant="ghost"
                       size="sm"

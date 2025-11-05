@@ -16,7 +16,7 @@ interface TextareaFieldProps extends Omit<ChakraTextareaProps, 'size' | 'variant
   variant?: 'outline' | 'flushed' | 'subtle'
   rows?: number
   resize?: 'none' | 'both' | 'horizontal' | 'vertical'
-  colorScheme?: 'theme' | 'default' // Added theme support
+  colorPalette?: 'theme' | 'default' // Added theme support
 }
 
 export function TextareaField({
@@ -32,7 +32,7 @@ export function TextareaField({
   variant = 'outline',
   rows = 4,
   resize = 'vertical',
-  colorScheme = 'default',
+  colorPalette = 'default',
   ...textareaProps // Spread todas las demás props de Chakra Textarea
 }: TextareaFieldProps) {
   // Recipes handle all theming automatically - no manual props needed

@@ -3,6 +3,13 @@ import {
   ContentLayout, Section, Stack, Badge, Button, CardGrid, MetricCard
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import {
+  ArrowRightIcon,
+  ChartBarIcon,
+  CogIcon,
+  DocumentArrowDownIcon,
+  ArrowPathIcon
+} from '@heroicons/react/24/outline';
 
 interface IntegrationAnalyticsData {
   paymentProviders: {
@@ -256,14 +263,14 @@ const IntegrationsAnalytics: React.FC = () => {
               title="Volumen Procesado"
               value={`$${(analyticsData.performanceMetrics.totalVolume / 1000000).toFixed(1)}M`}
               icon="BanknotesIcon"
-              colorScheme="green"
+              colorPalette="green"
               subtitle="ARS en el período"
             />
             <MetricCard
               title="Tasa de Éxito"
               value={`${analyticsData.performanceMetrics.avgSuccessRate}%`}
               icon="CheckCircleIcon"
-              colorScheme="blue"
+              colorPalette="blue"
               trend={{ value: 2.1, isPositive: true }}
               subtitle="promedio ponderado"
             />
@@ -271,21 +278,21 @@ const IntegrationsAnalytics: React.FC = () => {
               title="Tiempo Procesamiento"
               value={analyticsData.performanceMetrics.avgProcessingTime}
               icon="ClockIcon"
-              colorScheme="purple"
+              colorPalette="purple"
               subtitle="tiempo promedio"
             />
             <MetricCard
               title="Confiabilidad Webhooks"
               value={`${analyticsData.performanceMetrics.webhookReliability}%`}
               icon="BoltIcon"
-              colorScheme="orange"
+              colorPalette="orange"
               subtitle="delivery rate"
             />
             <MetricCard
               title="System Uptime"
               value={`${analyticsData.performanceMetrics.systemUptime}%`}
               icon="ServerIcon"
-              colorScheme="green"
+              colorPalette="green"
               subtitle="disponibilidad"
             />
           </CardGrid>
@@ -308,7 +315,7 @@ const IntegrationsAnalytics: React.FC = () => {
               >
                 <Stack direction="row" align="center" gap="md" flex="1">
                   <Stack>
-                    <Icon name={provider.icon as any} size="lg" />
+                    <Icon as={provider.icon} size="lg" />
                     <Badge
                       colorPalette={getStatusColor(provider.status)}
                       variant="subtle"
@@ -331,7 +338,7 @@ const IntegrationsAnalytics: React.FC = () => {
                         variant="subtle"
                         size="sm"
                       >
-                        <Icon name={getTrendIcon(provider.trend) as any} size="xs" />
+                        <Icon as={getTrendIcon(provider.trend)} size="xs" />
                         {provider.trend === 'up' ? 'Creciendo' : provider.trend === 'down' ? 'Declinando' : 'Estable'}
                       </Badge>
                     </Stack>
@@ -468,7 +475,7 @@ const IntegrationsAnalytics: React.FC = () => {
                 </p>
 
                 <Stack direction="row" align="center" gap="sm">
-                  <Icon name="ArrowRightIcon" size="sm" />
+                  <Icon as={ArrowRightIcon} size="sm" />
                   <span style={{ fontSize: '14px', fontStyle: 'italic' }}>
                     Acción recomendada: {insight.action}
                   </span>
@@ -482,19 +489,19 @@ const IntegrationsAnalytics: React.FC = () => {
         <Section title="Acciones Rápidas" variant="flat">
           <Stack direction="row" gap="md" wrap="wrap">
             <Button colorPalette="blue" size="sm">
-              <Icon name="ChartBarIcon" />
+              <Icon as={ChartBarIcon} />
               Generar Reporte Detallado
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="CogIcon" />
+              <Icon as={CogIcon} />
               Configurar Alertas
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="DocumentArrowDownIcon" />
+              <Icon as={DocumentArrowDownIcon} />
               Exportar Datos
             </Button>
             <Button variant="outline" size="sm">
-              <Icon name="ArrowPathIcon" />
+              <Icon as={ArrowPathIcon} />
               Refrescar Métricas
             </Button>
           </Stack>

@@ -3,14 +3,18 @@
 // ============================================================================
 // Funciones helper centralizadas para operaciones matemáticas de precisión
 
+import DecimalJS from 'decimal.js';
 import {
-  type Decimal as DecimalType,
+  Decimal,
   TaxDecimal,
   InventoryDecimal,
   FinancialDecimal,
   RecipeDecimal,
   DECIMAL_CONSTANTS
 } from '@/config/decimal-config';
+
+// Type alias for convenience (extract instance type from Decimal constructor)
+type DecimalType = InstanceType<typeof DecimalJS>;
 
 // Re-export classes for external use
 export {
@@ -37,16 +41,17 @@ export class DecimalUtils {
   /**
    * Convierte cualquier input a Decimal de forma segura
    * Usa strings para evitar pérdida de precisión en números grandes
+   * ⚠️ IMPORTANTE: NO valida undefined/null - usa safeFromValue() para eso
    */
   static fromValue(value: DecimalInput, domain: 'tax' | 'inventory' | 'financial' | 'recipe' = 'financial'): DecimalType {
-    if (value instanceof TaxDecimal || value instanceof InventoryDecimal || 
+    if (value instanceof TaxDecimal || value instanceof InventoryDecimal ||
         value instanceof FinancialDecimal || value instanceof RecipeDecimal) {
-      return value;
+      return value as DecimalType;
     }
-    
+
     // Convertir number a string para mantener precisión
     const stringValue = typeof value === 'number' ? value.toString() : value;
-    
+
     switch (domain) {
       case 'tax':
         return new TaxDecimal(stringValue);
@@ -56,6 +61,43 @@ export class DecimalUtils {
         return new RecipeDecimal(stringValue);
       default:
         return new FinancialDecimal(stringValue);
+    }
+  }
+
+  /**
+   * ✅ VERSIÓN SEGURA - Protege contra undefined/null/NaN
+   * Usa este método en lugar de fromValue() cuando los datos vienen de APIs o inputs de usuario
+   */
+  static fromValueSafe(
+    value: DecimalInput | undefined | null,
+    domain: 'tax' | 'inventory' | 'financial' | 'recipe' = 'financial',
+    defaultValue: DecimalInput = 0
+  ): DecimalType {
+    // Protección contra valores nulos/undefined
+    if (value === undefined || value === null) {
+      return this.fromValue(defaultValue, domain);
+    }
+
+    // Protección contra NaN
+    if (typeof value === 'number' && isNaN(value)) {
+      return this.fromValue(defaultValue, domain);
+    }
+
+    // Protección contra strings vacíos
+    if (typeof value === 'string' && value.trim() === '') {
+      return this.fromValue(defaultValue, domain);
+    }
+
+    // Validar que el valor sea finito
+    try {
+      const result = this.fromValue(value, domain);
+      if (!result.isFinite()) {
+        return this.fromValue(defaultValue, domain);
+      }
+      return result;
+    } catch (error) {
+      // Si hay error en la conversión, usar valor por defecto
+      return this.fromValue(defaultValue, domain);
     }
   }
 
@@ -72,7 +114,7 @@ export class DecimalUtils {
   }
 
   static isPositive(value: DecimalInput): boolean {
-    return this.fromValue(value).isPositive();
+    return this.fromValue(value).gt(0);
   }
 
   static isZero(value: DecimalInput): boolean {
@@ -340,11 +382,11 @@ export class DecimalUtils {
     if (values.length === 0) {
       throw new Error('Se requiere al menos un valor');
     }
-    
+
     return values.reduce((max, current) => {
       const currentDec = this.fromValue(current);
-      return FinancialDecimal.max(max, currentDec);
-    }, this.fromValue(values[0]));
+      return FinancialDecimal.max(max, currentDec) as DecimalType;
+    }, this.fromValue(values[0])) as DecimalType;
   }
 
   /**
@@ -354,11 +396,11 @@ export class DecimalUtils {
     if (values.length === 0) {
       throw new Error('Se requiere al menos un valor');
     }
-    
+
     return values.reduce((min, current) => {
       const currentDec = this.fromValue(current);
-      return FinancialDecimal.min(min, currentDec);
-    }, this.fromValue(values[0]));
+      return FinancialDecimal.min(min, currentDec) as DecimalType;
+    }, this.fromValue(values[0])) as DecimalType;
   }
 
   // ============================================================================
@@ -484,7 +526,7 @@ export class DecimalUtils {
   static isPositiveFinite(value: DecimalInput): boolean {
     try {
       const dec = this.fromValue(value);
-      return dec.isFinite() && !dec.isNaN() && dec.isPositive();
+      return dec.isFinite() && !dec.isNaN() && dec.gt(0);
     } catch {
       return false;
     }
@@ -633,3 +675,13 @@ export const safeMul = (a: DecimalInput, b: DecimalInput, domain?: 'tax' | 'inve
 
 export const safeDivide = (a: DecimalInput, b: DecimalInput, domain?: 'tax' | 'inventory' | 'financial' | 'recipe') =>
   DecimalUtils.divide(a, b, domain);
+
+/**
+ * ✅ FUNCIÓN HELPER SEGURA - Usar para convertir valores de APIs/inputs
+ * Protege contra undefined, null, NaN, strings vacíos
+ */
+export const safeDecimal = (
+  value: DecimalInput | undefined | null,
+  domain?: 'tax' | 'inventory' | 'financial' | 'recipe',
+  defaultValue: DecimalInput = 0
+) => DecimalUtils.fromValueSafe(value, domain, defaultValue);

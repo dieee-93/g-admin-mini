@@ -6,7 +6,7 @@ interface OnboardingGuideProps {
 
 export const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ userId }) => {
   return (
-    <VStack align="stretch" spacing={4}>
+    <VStack align="stretch" gap="4">
       <div className="bg-white border rounded-lg p-4">
         <h3 className="text-lg font-bold mb-2">Guía de Inicio</h3>
         <p className="text-sm text-gray-600">

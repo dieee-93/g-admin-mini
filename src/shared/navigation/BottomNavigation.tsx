@@ -2,11 +2,14 @@
 // src/components/navigation/BottomNavigation.tsx - ICONOS CORREGIDOS
 // ====================================
 
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationState, useNavigationActions } from '@/contexts/NavigationContext';
 import { Icon, Button, Stack, Typography, Badge } from '@/shared/ui';
 
 export function BottomNavigation() {
-  const { modules, currentModule, navigate } = useNavigation();
+  const navState = useNavigationState(); const navActions = useNavigationActions(); const { modules, currentModule } = navState; const { navigate } = navActions;
+
+  // Limitar a primeros 5 módulos principales en mobile
+  const visibleModules = modules.filter(m => !m.isHidden).slice(0, 5);
 
   return (
     <nav
@@ -15,16 +18,16 @@ export function BottomNavigation() {
         bottom: 0,
         left: 0,
         right: 0,
-        background: 'var(--colors-bg-canvas)',
-        borderTop: '1px solid var(--colors-border-subtle)',
-        padding: '0.5rem',
+        backgroundColor: 'var(--chakra-colors-bg-surface)',
+        borderTop: '1px solid var(--chakra-colors-border-default)',
+        padding: '0.5rem 0',
         height: '70px',
         zIndex: 1002,
-        boxShadow: 'var(--shadows-lg)'
+        boxShadow: '0 -2px 10px rgba(0,0,0,0.1)'
       }}
     >
-      <Stack direction="row" justify="space-around" align="center" height="100%">
-        {modules.map((module) => {
+      <Stack direction="row" justify="space-around" align="center" height="100%" px="2">
+        {visibleModules.map((module) => {
           const isActive = currentModule?.id === module.id;
           
           return (

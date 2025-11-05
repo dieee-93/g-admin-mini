@@ -25,7 +25,7 @@ export default function RevenueChart({
       </CardWrapper.Header>
       <CardWrapper.Body>
         <Box height={height} display="flex" alignItems="center" justifyContent="center">
-          <VStack gap={2}>
+          <VStack gap="2">
             <Text color="gray.500">📊</Text>
             <Text fontSize="sm" color="gray.600" textAlign="center">
               Revenue chart placeholder

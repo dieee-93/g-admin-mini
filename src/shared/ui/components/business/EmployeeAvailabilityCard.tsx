@@ -278,11 +278,6 @@ export function EmployeeAvailabilityCard({
             name={employee.name}
             src={employee.avatar}
             size={isCompact ? "sm" : "md"}
-            fallback={{
-              icon: UserIcon,
-              bg: `${getStatusColor(employee.status)}.subtle`,
-              color: `${getStatusColor(employee.status)}.solid`
-            }}
           />
 
           <Stack direction="column" gap="0">

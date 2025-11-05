@@ -28,10 +28,10 @@ import {
   RadioGroup,
   Slider,
   Tabs,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
+  TabsTrigger,
+  TabsList,
+  TabsContent,
+  TabsContentGroup,
   Progress,
   Spinner,
   Skeleton,
@@ -179,7 +179,7 @@ const componentExamples: ComponentExample[] = [
     component: (
       <CardWrapper variant="elevated" maxW="300px">
         <CardWrapper.Header>
-          <Typography variant="h6">Card Title</Typography>
+          <Typography variant="subtitle">Card Title</Typography>
         </CardWrapper.Header>
         <CardWrapper.Body>
           <Typography>This is the card content area where you can put any information.</Typography>
@@ -188,7 +188,7 @@ const componentExamples: ComponentExample[] = [
     ),
     code: `<CardWrapper variant="elevated">
   <CardWrapper.Header>
-    <Typography variant="h6">Card Title</Typography>
+    <Typography variant="subtitle">Card Title</Typography>
   </CardWrapper.Header>
   <CardWrapper.Body>
     <Typography>Card content</Typography>
@@ -400,35 +400,35 @@ const componentExamples: ComponentExample[] = [
     category: 'navigation',
     component: (
       <Tabs defaultValue="tab1" variant="line">
-        <TabList>
-          <Tab value="tab1">First Tab</Tab>
-          <Tab value="tab2">Second Tab</Tab>
-          <Tab value="tab3">Third Tab</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel value="tab1">
+        <TabsList>
+          <TabsTrigger value="tab1">First Tab</TabsTrigger>
+          <TabsTrigger value="tab2">Second Tab</TabsTrigger>
+          <TabsTrigger value="tab3">Third Tab</TabsTrigger>
+        </TabsList>
+        <TabsContentGroup>
+          <TabsContent value="tab1">
             <Typography>Content of the first tab</Typography>
-          </TabPanel>
-          <TabPanel value="tab2">
+          </TabsContent>
+          <TabsContent value="tab2">
             <Typography>Content of the second tab</Typography>
-          </TabPanel>
-          <TabPanel value="tab3">
+          </TabsContent>
+          <TabsContent value="tab3">
             <Typography>Content of the third tab</Typography>
-          </TabPanel>
-        </TabPanels>
+          </TabsContent>
+        </TabsContentGroup>
       </Tabs>
     ),
     code: `<Tabs defaultValue="tab1" variant="line">
-  <TabList>
-    <Tab value="tab1">First Tab</Tab>
-    <Tab value="tab2">Second Tab</Tab>
-    <Tab value="tab3">Third Tab</Tab>
-  </TabList>
-  <TabPanels>
-    <TabPanel value="tab1">Content 1</TabPanel>
-    <TabPanel value="tab2">Content 2</TabPanel>
-    <TabPanel value="tab3">Content 3</TabPanel>
-  </TabPanels>
+  <TabsList>
+    <TabsTrigger value="tab1">First Tab</TabsTrigger>
+    <TabsTrigger value="tab2">Second Tab</TabsTrigger>
+    <TabsTrigger value="tab3">Third Tab</TabsTrigger>
+  </TabsList>
+  <TabsContentGroup>
+    <TabsContent value="tab1">Content 1</TabsContent>
+    <TabsContent value="tab2">Content 2</TabsContent>
+    <TabsContent value="tab3">Content 3</TabsContent>
+  </TabsContentGroup>
 </Tabs>`,
     description: 'Tabbed navigation with multiple panels'
   },
@@ -608,7 +608,7 @@ export default function ComponentsDebugger() {
                 <CardWrapper.Header>
                   <Stack direction="row" justify="space-between" align="center">
                     <Stack direction="row" align="center" spacing="sm">
-                      <Typography variant="h6">{component.name}</Typography>
+                      <Typography variant="subtitle">{component.name}</Typography>
                       <Badge
                         colorPalette={categoryColors[component.category]}
                         size="sm"

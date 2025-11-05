@@ -253,7 +253,7 @@ export function CalendarHeader({
               onClick={handlePreviousPeriod}
               aria-label={`Previous ${navigationStep.label}`}
             >
-              <Icon name="ChevronLeft" />
+              <Icon as={ChevronLeftIcon} />
             </Button>
 
             <Button
@@ -270,7 +270,7 @@ export function CalendarHeader({
               onClick={handleNextPeriod}
               aria-label={`Next ${navigationStep.label}`}
             >
-              <Icon name="ChevronRight" />
+              <Icon as={ChevronRightIcon} />
             </Button>
           </>
         )}

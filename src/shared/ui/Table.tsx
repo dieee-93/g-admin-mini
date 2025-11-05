@@ -1,6 +1,5 @@
 // src/shared/ui/Table.tsx - Design System v2.0
 import React from 'react';
-import { type ResponsiveValue } from './types/tokens';
 
 // =============================================================================
 // TYPES
@@ -62,7 +61,7 @@ export interface TableCaptionProps extends React.HTMLAttributes<HTMLTableCaption
 // STYLES
 // =============================================================================
 
-const getTableStyles = (props: TableRootProps): React.CSSProperties => {
+const getTableStyles = (props: TableRootProps): React.CSSProperties & Record<string, string> => {
   const {
     size = 'md',
     variant = 'line',
@@ -122,7 +121,7 @@ const getTableStyles = (props: TableRootProps): React.CSSProperties => {
     '--table-stripe-bg': 'var(--bg-subtle)',
     '--table-hover-bg': 'var(--bg-subtle)',
     '--table-column-border': showColumnBorder ? '1px solid var(--border-subtle)' : 'none'
-  } as React.CSSProperties;
+  } as React.CSSProperties & Record<string, string>;
 };
 
 const getHeaderStyles = (stickyHeader?: boolean): React.CSSProperties => ({
@@ -136,10 +135,8 @@ const getHeaderStyles = (stickyHeader?: boolean): React.CSSProperties => ({
 const getRowStyles = (isStriped?: boolean, isInteractive?: boolean): React.CSSProperties => ({
   borderBottom: 'var(--table-border-bottom)',
   backgroundColor: isStriped ? 'var(--table-stripe-bg)' : 'transparent',
-  transition: isInteractive ? 'background-color 0.2s' : 'none',
-  ':hover': isInteractive ? {
-    backgroundColor: 'var(--table-hover-bg)'
-  } : {}
+  transition: isInteractive ? 'background-color 0.2s' : 'none'
+  // Note: hover effects should be handled via CSS classes, not inline styles
 });
 
 const getCellStyles = (numeric?: boolean): React.CSSProperties => ({
@@ -162,20 +159,27 @@ const getHeaderCellStyles = (numeric?: boolean): React.CSSProperties => ({
 // COMPONENTS
 // =============================================================================
 
-const TableRoot: React.FC<TableRootProps> = ({ 
-  children, 
-  className = '', 
+const TableRoot: React.FC<TableRootProps> = ({
+  children,
+  className = '',
   style,
-  ...props 
+  size,
+  variant,
+  showColumnBorder,
+  striped,
+  interactive,
+  stickyHeader,
+  colorPalette,
+  ...htmlProps
 }) => {
-  const tableStyles = getTableStyles(props);
-  
+  const tableStyles = getTableStyles({ size, variant, showColumnBorder, striped, interactive, stickyHeader, colorPalette, children });
+
   return (
     <div style={{ overflowX: 'auto', borderRadius: '0.375rem' }}>
       <table
         className={`table ${className}`}
         style={{ ...tableStyles, ...style }}
-        {...props}
+        {...htmlProps}
       >
         {children}
       </table>

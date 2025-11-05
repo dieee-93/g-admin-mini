@@ -7,11 +7,10 @@ import {
   Field,
   NumberInput,
   Flex
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { CardWrapper  } from '@/shared/ui';
 import { FormCalculations } from '@/pages/admin/supply-chain/materials/services';
-import { type ItemFormData } from '@/pages/admin/supply-chain/materials/types'; 
-import { suppliersApi } from '';
+import { type ItemFormData } from '@/pages/admin/supply-chain/materials/types';
 interface MeasurableStockFieldsProps {
   formData: ItemFormData;
   updateFormData: (updates: Partial<ItemFormData>) => void;
@@ -32,12 +31,12 @@ export const MeasurableStockFields = ({
   // Estado local para el precio total (independiente de unit_cost)
   const [totalPurchasePrice, setTotalPurchasePrice] = useState(0);
 
-  // Sincronizar precio total inicial solo una vez
+  // Sincronizar precio total inicial
   useEffect(() => {
     if (formData.unit_cost && formData.initial_stock) {
       setTotalPurchasePrice(formData.unit_cost * formData.initial_stock);
     }
-  }, []);
+  }, [formData.unit_cost, formData.initial_stock]);
 
   // Función para actualizar unit_cost basado en el precio total
   const updateUnitCostFromTotal = (newTotalPrice: number) => {

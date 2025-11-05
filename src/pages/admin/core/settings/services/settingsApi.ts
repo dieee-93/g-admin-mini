@@ -1,246 +1,175 @@
 // Settings API - Business configuration database functions
+// Connected to Supabase (2025-11-01)
+import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
 
-import type { 
-  BusinessSettings, 
-  TaxSettings,
-  SystemSettings,
-  NotificationSettings,
-  OperatingHours,
-  BusinessType
+import type {
+  BusinessSettings,
+  SystemSettings
 } from '../types';
 
-// Mock data store - in production this would connect to Supabase/database
-let mockBusinessSettings: BusinessSettings = {
-  id: '1',
-  business_name: 'Restaurante El Sabor',
-  business_type: 'restaurant',
-  address: {
-    street: 'Av. Principal 123',
-    city: 'Ciudad de México',
-    state: 'CDMX',
-    postal_code: '01000',
-    country: 'México'
-  },
-  contact: {
-    phone: '+52 55 1234-5678',
-    email: 'contacto@elsabor.com',
-    website: 'https://elsabor.com',
-    social_media: {
-      facebook: 'https://facebook.com/elsabor',
-      instagram: 'https://instagram.com/elsabor',
-      twitter: 'https://twitter.com/elsabor'
-    }
-  },
-  operating_hours: [
-    { day_of_week: 0, is_open: false }, // Sunday
-    { day_of_week: 1, is_open: true, open_time: '09:00', close_time: '22:00' }, // Monday
-    { day_of_week: 2, is_open: true, open_time: '09:00', close_time: '22:00' }, // Tuesday
-    { day_of_week: 3, is_open: true, open_time: '09:00', close_time: '22:00' }, // Wednesday
-    { day_of_week: 4, is_open: true, open_time: '09:00', close_time: '22:00' }, // Thursday
-    { day_of_week: 5, is_open: true, open_time: '09:00', close_time: '23:00' }, // Friday
-    { day_of_week: 6, is_open: true, open_time: '10:00', close_time: '23:00' }  // Saturday
-  ],
-  tax_settings: {
-    tax_rate: 16,
-    tax_name: 'IVA',
-    include_tax_in_prices: true,
-    tax_number: 'RFC123456789'
-  },
-  currency: {
-    code: 'MXN',
-    symbol: '$',
-    decimal_places: 2,
-    position: 'before'
-  },
-  notification_settings: {
-    email_notifications: true,
-    sms_notifications: true,
-    low_stock_alerts: true,
-    order_notifications: true,
-    employee_notifications: true
-  },
-  updated_at: new Date().toISOString()
-};
+// ============================================
+// TYPES
+// ============================================
 
-// Mock system settings
-let mockSystemSettings: SystemSettings = {
-  theme: 'auto',
-  language: 'es',
-  timezone: 'America/Mexico_City',
-  date_format: 'DD/MM/YYYY',
-  time_format: '24h'
-};
+// Integration config type
+type IntegrationConfig = Record<string, string | number | boolean | null>;
 
-// Mock user roles and permissions
-interface UserRole {
+// User Role interface
+export interface UserRole {
   id: string;
   name: string;
   description: string;
   permissions: string[];
-  users_count: number;
+  priority: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
-const mockUserRoles: UserRole[] = [
-  {
-    id: '1',
-    name: 'Administrador',
-    description: 'Acceso completo al sistema',
-    permissions: ['all'],
-    users_count: 1
-  },
-  {
-    id: '2',
-    name: 'Gerente',
-    description: 'Gestión operacional completa',
-    permissions: ['operations:manage', 'sales:read', 'staff:manage', 'reports:read'],
-    users_count: 2
-  },
-  {
-    id: '3',
-    name: 'Empleado',
-    description: 'Acceso básico a operaciones',
-    permissions: ['operations:read', 'sales:write'],
-    users_count: 8
-  },
-  {
-    id: '4',
-    name: 'Cajero',
-    description: 'Acceso solo a ventas',
-    permissions: ['sales:write', 'sales:read'],
-    users_count: 3
-  }
-];
-
-// Mock integrations data
-interface Integration {
+// Integration interface
+export interface Integration {
   id: string;
   name: string;
   description: string;
   status: 'active' | 'inactive' | 'error';
-  type: 'payment' | 'messaging' | 'analytics' | 'delivery' | 'pos';
-  config?: Record<string, any>;
+  type: 'payment' | 'messaging' | 'analytics' | 'delivery' | 'pos' | 'fiscal';
+  config?: IntegrationConfig;
   last_sync?: string;
+  last_error?: string;
+  error_count?: number;
 }
 
-const mockIntegrations: Integration[] = [
-  {
-    id: '1',
-    name: 'Stripe',
-    description: 'Procesamiento de pagos online',
-    status: 'active',
-    type: 'payment',
-    config: { publishable_key: 'pk_test_***', webhook_url: '/api/webhooks/stripe' },
-    last_sync: new Date().toISOString()
-  },
-  {
-    id: '2',
-    name: 'WhatsApp Business',
-    description: 'Notificaciones y atención al cliente',
-    status: 'active',
-    type: 'messaging',
-    config: { phone_number: '+52551234567', business_account_id: 'wa_***' },
-    last_sync: new Date(Date.now() - 300000).toISOString() // 5 minutes ago
-  },
-  {
-    id: '3',
-    name: 'Google Analytics',
-    description: 'Análisis web y comportamiento de usuarios',
-    status: 'inactive',
-    type: 'analytics',
-    config: { tracking_id: 'GA-***' }
-  }
-];
+// User Preferences interface
+export interface UserPreferences {
+  id: string;
+  user_id: string;
+  preferences: Record<string, unknown>;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// ============================================
+// BUSINESS PROFILE FUNCTIONS
+// ============================================
 
 /**
- * Get business settings
- * @returns Promise<BusinessSettings>
+ * Get business profile
+ * @returns Promise<BusinessSettings | null>
  */
-export async function getBusinessSettings(): Promise<BusinessSettings> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 100));
-  return mockBusinessSettings;
+export async function getBusinessProfile(): Promise<BusinessSettings | null> {
+  try {
+    const { data, error } = await supabase
+      .from('business_profiles')
+      .select('*')
+      .limit(1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned - return null
+        logger.warn('App', 'No business profile found');
+        return null;
+      }
+      throw error;
+    }
+
+    logger.info('App', 'Business profile retrieved successfully');
+    return data as BusinessSettings;
+  } catch (error) {
+    logger.error('App', 'Failed to get business profile', error);
+    throw error;
+  }
 }
 
 /**
- * Update business settings with audit trail
- * @param settings - Updated business settings
+ * Update business profile
+ * @param profile - Business settings to update
  * @param updatedBy - User ID performing the update
  * @returns Promise<BusinessSettings>
  */
-export async function updateBusinessSettings(
-  settings: Partial<BusinessSettings>,
+export async function updateBusinessProfile(
+  profile: Partial<BusinessSettings>,
   updatedBy: string
 ): Promise<BusinessSettings> {
-  await new Promise(resolve => setTimeout(resolve, 200));
-  
-  mockBusinessSettings = {
-    ...mockBusinessSettings,
-    ...settings,
-    updated_at: new Date().toISOString()
-  };
-  
-  // In production, this would create an audit log entry
-  logger.info('App', `Business settings updated by ${updatedBy}`);
-  
-  return mockBusinessSettings;
+  try {
+    // Check if profile exists
+    const existing = await getBusinessProfile();
+
+    if (existing) {
+      // Update existing profile
+      const { data, error } = await supabase
+        .from('business_profiles')
+        .update({
+          ...profile,
+          updated_by: updatedBy,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      logger.info('App', 'Business profile updated successfully', { profileId: data.id });
+      return data as BusinessSettings;
+    } else {
+      // Create new profile
+      const { data, error } = await supabase
+        .from('business_profiles')
+        .insert({
+          ...profile,
+          created_by: updatedBy,
+          updated_by: updatedBy
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      logger.info('App', 'Business profile created successfully', { profileId: data.id });
+      return data as BusinessSettings;
+    }
+  } catch (error) {
+    logger.error('App', 'Failed to update business profile', error);
+    throw error;
+  }
 }
 
-/**
- * Update tax configuration
- * @param taxSettings - Updated tax settings
- * @param updatedBy - User ID performing the update
- * @returns Promise<TaxSettings>
- */
-export async function updateTaxConfiguration(
-  taxSettings: Partial<TaxSettings>,
-  updatedBy: string
-): Promise<TaxSettings> {
-  await new Promise(resolve => setTimeout(resolve, 150));
-  
-  mockBusinessSettings.tax_settings = {
-    ...mockBusinessSettings.tax_settings,
-    ...taxSettings
-  };
-  mockBusinessSettings.updated_at = new Date().toISOString();
-  
-  logger.info('App', `Tax configuration updated by ${updatedBy}`);
-  
-  return mockBusinessSettings.tax_settings;
-}
-
-/**
- * Update operating hours
- * @param operatingHours - Updated operating hours
- * @param updatedBy - User ID performing the update
- * @returns Promise<OperatingHours[]>
- */
-export async function updateOperatingHours(
-  operatingHours: OperatingHours[],
-  updatedBy: string
-): Promise<OperatingHours[]> {
-  await new Promise(resolve => setTimeout(resolve, 150));
-  
-  mockBusinessSettings.operating_hours = operatingHours;
-  mockBusinessSettings.updated_at = new Date().toISOString();
-  
-  logger.info('App', `Operating hours updated by ${updatedBy}`);
-  
-  return mockBusinessSettings.operating_hours;
-}
+// ============================================
+// SYSTEM SETTINGS FUNCTIONS
+// ============================================
 
 /**
  * Get system settings
- * @returns Promise<SystemSettings>
+ * @returns Promise<SystemSettings | null>
  */
-export async function getSystemSettings(): Promise<SystemSettings> {
-  await new Promise(resolve => setTimeout(resolve, 100));
-  return mockSystemSettings;
+export async function getSystemSettings(): Promise<SystemSettings | null> {
+  try {
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('*')
+      .limit(1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        logger.warn('App', 'No system settings found');
+        return null;
+      }
+      throw error;
+    }
+
+    logger.info('App', 'System settings retrieved successfully');
+    return data as SystemSettings;
+  } catch (error) {
+    logger.error('App', 'Failed to get system settings', error);
+    throw error;
+  }
 }
 
 /**
  * Update system settings
- * @param settings - Updated system settings
+ * @param settings - System settings to update
  * @param updatedBy - User ID performing the update
  * @returns Promise<SystemSettings>
  */
@@ -248,112 +177,377 @@ export async function updateSystemSettings(
   settings: Partial<SystemSettings>,
   updatedBy: string
 ): Promise<SystemSettings> {
-  await new Promise(resolve => setTimeout(resolve, 150));
-  
-  mockSystemSettings = {
-    ...mockSystemSettings,
-    ...settings
-  };
-  
-  logger.info('App', `System settings updated by ${updatedBy}`);
-  
-  return mockSystemSettings;
+  try {
+    const existing = await getSystemSettings();
+
+    if (existing) {
+      // Update existing settings
+      const { data, error } = await supabase
+        .from('system_settings')
+        .update({
+          ...settings,
+          updated_by: updatedBy,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      logger.info('App', 'System settings updated successfully');
+      return data as SystemSettings;
+    } else {
+      // Create new settings
+      const { data, error } = await supabase
+        .from('system_settings')
+        .insert({
+          ...settings,
+          updated_by: updatedBy
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      logger.info('App', 'System settings created successfully');
+      return data as SystemSettings;
+    }
+  } catch (error) {
+    logger.error('App', 'Failed to update system settings', error);
+    throw error;
+  }
 }
 
+// ============================================
+// USER ROLES FUNCTIONS
+// ============================================
+
 /**
- * Get all user roles with permissions
+ * Get all user roles
  * @returns Promise<UserRole[]>
  */
 export async function getUserRoles(): Promise<UserRole[]> {
-  await new Promise(resolve => setTimeout(resolve, 100));
-  return mockUserRoles;
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('*')
+      .order('priority', { ascending: false });
+
+    if (error) throw error;
+
+    logger.info('App', 'User roles retrieved successfully', { count: data.length });
+    return data.map(role => ({
+      ...role,
+      permissions: role.permissions as string[]
+    })) as UserRole[];
+  } catch (error) {
+    logger.error('App', 'Failed to get user roles', error);
+    throw error;
+  }
 }
 
 /**
- * Create new user role
- * @param roleData - New role data
+ * Get a specific role by ID
+ * @param roleId - Role ID
+ * @returns Promise<UserRole | null>
+ */
+export async function getUserRole(roleId: string): Promise<UserRole | null> {
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('*')
+      .eq('id', roleId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+
+    return {
+      ...data,
+      permissions: data.permissions as string[]
+    } as UserRole;
+  } catch (error) {
+    logger.error('App', 'Failed to get user role', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new user role
+ * @param role - Role data
  * @param createdBy - User ID creating the role
  * @returns Promise<UserRole>
  */
 export async function createUserRole(
-  roleData: Omit<UserRole, 'id' | 'users_count'>,
+  role: Omit<UserRole, 'id' | 'created_at' | 'updated_at'>,
   createdBy: string
 ): Promise<UserRole> {
-  await new Promise(resolve => setTimeout(resolve, 200));
-  
-  const newRole: UserRole = {
-    id: Date.now().toString(),
-    ...roleData,
-    users_count: 0
-  };
-  
-  mockUserRoles.push(newRole);
-  
-  logger.info('App', `User role ${newRole.name} created by ${createdBy}`);
-  
-  return newRole;
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .insert({
+        ...role,
+        created_by: createdBy
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    logger.info('App', 'User role created successfully', { roleName: data.name });
+    return {
+      ...data,
+      permissions: data.permissions as string[]
+    } as UserRole;
+  } catch (error) {
+    logger.error('App', 'Failed to create user role', error);
+    throw error;
+  }
 }
 
 /**
- * Update user role
- * @param roleId - Role ID to update
- * @param roleData - Updated role data
- * @param updatedBy - User ID performing the update
+ * Update a user role
+ * @param roleId - Role ID
+ * @param updates - Role updates
  * @returns Promise<UserRole>
  */
 export async function updateUserRole(
   roleId: string,
-  roleData: Partial<Omit<UserRole, 'id' | 'users_count'>>,
-  updatedBy: string
+  updates: Partial<Omit<UserRole, 'id' | 'created_at' | 'updated_at'>>
 ): Promise<UserRole> {
-  await new Promise(resolve => setTimeout(resolve, 150));
-  
-  const roleIndex = mockUserRoles.findIndex(role => role.id === roleId);
-  if (roleIndex === -1) {
-    throw new Error('Role not found');
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', roleId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    logger.info('App', 'User role updated successfully', { roleId });
+    return {
+      ...data,
+      permissions: data.permissions as string[]
+    } as UserRole;
+  } catch (error) {
+    logger.error('App', 'Failed to update user role', error);
+    throw error;
   }
-  
-  mockUserRoles[roleIndex] = {
-    ...mockUserRoles[roleIndex],
-    ...roleData
-  };
-  
-  logger.info('App', `User role updated by ${updatedBy}`);
-  
-  return mockUserRoles[roleIndex];
 }
 
 /**
- * Delete user role
- * @param roleId - Role ID to delete
- * @param deletedBy - User ID performing the deletion
+ * Delete a user role
+ * @param roleId - Role ID
  * @returns Promise<void>
  */
-export async function deleteUserRole(roleId: string, deletedBy: string): Promise<void> {
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
-  const roleIndex = mockUserRoles.findIndex(role => role.id === roleId);
-  if (roleIndex === -1) {
-    throw new Error('Role not found');
+export async function deleteUserRole(roleId: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('user_roles')
+      .delete()
+      .eq('id', roleId);
+
+    if (error) throw error;
+
+    logger.info('App', 'User role deleted successfully', { roleId });
+  } catch (error) {
+    logger.error('App', 'Failed to delete user role', error);
+    throw error;
   }
-  
-  const role = mockUserRoles[roleIndex];
-  if (role.users_count > 0) {
-    throw new Error('Cannot delete role with assigned users');
-  }
-  
-  mockUserRoles.splice(roleIndex, 1);
-  
-  logger.info('App', `User role ${role.name} deleted by ${deletedBy}`);
 }
+
+// ============================================
+// USER PREFERENCES FUNCTIONS
+// ============================================
+
+/**
+ * Get user preferences
+ * @param userId - User ID
+ * @returns Promise<UserPreferences | null>
+ */
+export async function getUserPreferences(userId: string): Promise<UserPreferences | null> {
+  try {
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+
+    return data as UserPreferences;
+  } catch (error) {
+    logger.error('App', 'Failed to get user preferences', error);
+    throw error;
+  }
+}
+
+/**
+ * Update user preferences
+ * @param userId - User ID
+ * @param preferences - Preferences to update
+ * @returns Promise<UserPreferences>
+ */
+export async function updateUserPreferences(
+  userId: string,
+  preferences: Record<string, unknown>
+): Promise<UserPreferences> {
+  try {
+    const existing = await getUserPreferences(userId);
+
+    if (existing) {
+      // Update existing preferences
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .update({
+          preferences: {
+            ...existing.preferences,
+            ...preferences
+          },
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      logger.info('App', 'User preferences updated successfully', { userId });
+      return data as UserPreferences;
+    } else {
+      // Create new preferences
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .insert({
+          user_id: userId,
+          preferences
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      logger.info('App', 'User preferences created successfully', { userId });
+      return data as UserPreferences;
+    }
+  } catch (error) {
+    logger.error('App', 'Failed to update user preferences', error);
+    throw error;
+  }
+}
+
+// ============================================
+// INTEGRATIONS FUNCTIONS
+// ============================================
 
 /**
  * Get all integrations
  * @returns Promise<Integration[]>
  */
 export async function getIntegrations(): Promise<Integration[]> {
-  await new Promise(resolve => setTimeout(resolve, 100));
-  return mockIntegrations;
+  try {
+    const { data, error } = await supabase
+      .from('integrations')
+      .select('*')
+      .order('name');
+
+    if (error) throw error;
+
+    logger.info('App', 'Integrations retrieved successfully', { count: data.length });
+    return data as Integration[];
+  } catch (error) {
+    logger.error('App', 'Failed to get integrations', error);
+    throw error;
+  }
+}
+
+/**
+ * Get integrations by type
+ * @param type - Integration type
+ * @returns Promise<Integration[]>
+ */
+export async function getIntegrationsByType(
+  type: Integration['type']
+): Promise<Integration[]> {
+  try {
+    const { data, error } = await supabase
+      .from('integrations')
+      .select('*')
+      .eq('type', type)
+      .order('name');
+
+    if (error) throw error;
+
+    return data as Integration[];
+  } catch (error) {
+    logger.error('App', 'Failed to get integrations by type', error);
+    throw error;
+  }
+}
+
+/**
+ * Get a specific integration by ID
+ * @param integrationId - Integration ID
+ * @returns Promise<Integration | null>
+ */
+export async function getIntegration(integrationId: string): Promise<Integration | null> {
+  try {
+    const { data, error } = await supabase
+      .from('integrations')
+      .select('*')
+      .eq('id', integrationId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+
+    return data as Integration;
+  } catch (error) {
+    logger.error('App', 'Failed to get integration', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new integration
+ * @param integration - Integration data
+ * @param createdBy - User ID creating the integration
+ * @returns Promise<Integration>
+ */
+export async function createIntegration(
+  integration: Omit<Integration, 'id' | 'created_at' | 'updated_at'>,
+  createdBy: string
+): Promise<Integration> {
+  try {
+    const { data, error } = await supabase
+      .from('integrations')
+      .insert({
+        ...integration,
+        created_by: createdBy
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    logger.info('App', 'Integration created successfully', { name: data.name });
+    return data as Integration;
+  } catch (error) {
+    logger.error('App', 'Failed to create integration', error);
+    throw error;
+  }
 }
 
 /**
@@ -365,191 +559,116 @@ export async function getIntegrations(): Promise<Integration[]> {
  */
 export async function updateIntegrationConfig(
   integrationId: string,
-  config: Record<string, any>,
-  updatedBy: string
+  config: IntegrationConfig
 ): Promise<Integration> {
-  await new Promise(resolve => setTimeout(resolve, 200));
-  
-  const integrationIndex = mockIntegrations.findIndex(int => int.id === integrationId);
-  if (integrationIndex === -1) {
-    throw new Error('Integration not found');
+  try {
+    const { data, error } = await supabase
+      .from('integrations')
+      .update({
+        config,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', integrationId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    logger.info('App', 'Integration config updated successfully', { integrationId });
+    return data as Integration;
+  } catch (error) {
+    logger.error('App', 'Failed to update integration config', error);
+    throw error;
   }
-  
-  mockIntegrations[integrationIndex] = {
-    ...mockIntegrations[integrationIndex],
-    config: { ...mockIntegrations[integrationIndex].config, ...config },
-    status: 'active',
-    last_sync: new Date().toISOString()
-  };
-  
-  logger.info('App', `Integration ${mockIntegrations[integrationIndex].name} updated by ${updatedBy}`);
-  
-  return mockIntegrations[integrationIndex];
 }
 
 /**
- * Toggle integration status
+ * Update integration status
  * @param integrationId - Integration ID
  * @param status - New status
- * @param updatedBy - User ID performing the update
  * @returns Promise<Integration>
  */
-export async function toggleIntegrationStatus(
+export async function updateIntegrationStatus(
   integrationId: string,
-  status: 'active' | 'inactive',
-  updatedBy: string
+  status: Integration['status']
 ): Promise<Integration> {
-  await new Promise(resolve => setTimeout(resolve, 150));
-  
-  const integrationIndex = mockIntegrations.findIndex(int => int.id === integrationId);
-  if (integrationIndex === -1) {
-    throw new Error('Integration not found');
+  try {
+    const { data, error } = await supabase
+      .from('integrations')
+      .update({
+        status,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', integrationId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    logger.info('App', 'Integration status updated successfully', { integrationId, status });
+    return data as Integration;
+  } catch (error) {
+    logger.error('App', 'Failed to update integration status', error);
+    throw error;
   }
-  
-  mockIntegrations[integrationIndex].status = status;
-  if (status === 'active') {
-    mockIntegrations[integrationIndex].last_sync = new Date().toISOString();
-  }
-  
-  logger.info('App', `Integration ${mockIntegrations[integrationIndex].name} ${status} by ${updatedBy}`);
-  
-  return mockIntegrations[integrationIndex];
 }
 
 /**
- * Test integration connection
+ * Record integration sync
  * @param integrationId - Integration ID
- * @returns Promise<boolean>
+ * @param success - Whether sync was successful
+ * @param errorMessage - Error message if sync failed
+ * @returns Promise<Integration>
  */
-export async function testIntegrationConnection(integrationId: string): Promise<boolean> {
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate connection test
-  
-  const integration = mockIntegrations.find(int => int.id === integrationId);
-  if (!integration) {
-    throw new Error('Integration not found');
+export async function recordIntegrationSync(
+  integrationId: string,
+  success: boolean,
+  errorMessage?: string
+): Promise<Integration> {
+  try {
+    const integration = await getIntegration(integrationId);
+    if (!integration) throw new Error('Integration not found');
+
+    const { data, error } = await supabase
+      .from('integrations')
+      .update({
+        last_sync: new Date().toISOString(),
+        status: success ? 'active' : 'error',
+        last_error: success ? null : errorMessage,
+        error_count: success ? 0 : (integration.error_count || 0) + 1,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', integrationId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    logger.info('App', 'Integration sync recorded', { integrationId, success });
+    return data as Integration;
+  } catch (error) {
+    logger.error('App', 'Failed to record integration sync', error);
+    throw error;
   }
-  
-  // Simulate connection test (mock success/failure)
-  const success = Math.random() > 0.1; // 90% success rate
-  
-  if (success && integration.status !== 'error') {
-    const integrationIndex = mockIntegrations.findIndex(int => int.id === integrationId);
-    mockIntegrations[integrationIndex].last_sync = new Date().toISOString();
-    mockIntegrations[integrationIndex].status = 'active';
+}
+
+/**
+ * Delete an integration
+ * @param integrationId - Integration ID
+ * @returns Promise<void>
+ */
+export async function deleteIntegration(integrationId: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('integrations')
+      .delete()
+      .eq('id', integrationId);
+
+    if (error) throw error;
+
+    logger.info('App', 'Integration deleted successfully', { integrationId });
+  } catch (error) {
+    logger.error('App', 'Failed to delete integration', error);
+    throw error;
   }
-  
-  return success;
 }
-
-/**
- * Get notification preferences
- * @returns Promise<NotificationSettings>
- */
-export async function getNotificationSettings(): Promise<NotificationSettings> {
-  await new Promise(resolve => setTimeout(resolve, 100));
-  return mockBusinessSettings.notification_settings;
-}
-
-/**
- * Update notification preferences
- * @param settings - Updated notification settings
- * @param updatedBy - User ID performing the update
- * @returns Promise<NotificationSettings>
- */
-export async function updateNotificationSettings(
-  settings: Partial<NotificationSettings>,
-  updatedBy: string
-): Promise<NotificationSettings> {
-  await new Promise(resolve => setTimeout(resolve, 150));
-  
-  mockBusinessSettings.notification_settings = {
-    ...mockBusinessSettings.notification_settings,
-    ...settings
-  };
-  mockBusinessSettings.updated_at = new Date().toISOString();
-  
-  logger.info('App', `Notification settings updated by ${updatedBy}`);
-  
-  return mockBusinessSettings.notification_settings;
-}
-
-/**
- * Get available business types
- * @returns Promise<BusinessType[]>
- */
-export async function getBusinessTypes(): Promise<BusinessType[]> {
-  await new Promise(resolve => setTimeout(resolve, 50));
-  return ['restaurant', 'cafe', 'bakery', 'food_truck', 'catering', 'other'];
-}
-
-/**
- * Get available currencies
- * @returns Promise<Array<{code: string, name: string, symbol: string}>>
- */
-export async function getAvailableCurrencies(): Promise<Array<{code: string, name: string, symbol: string}>> {
-  await new Promise(resolve => setTimeout(resolve, 50));
-  return [
-    { code: 'MXN', name: 'Peso Mexicano', symbol: '$' },
-    { code: 'USD', name: 'Dólar Estadounidense', symbol: '$' },
-    { code: 'EUR', name: 'Euro', symbol: '€' },
-    { code: 'CAD', name: 'Dólar Canadiense', symbol: '$' },
-    { code: 'GBP', name: 'Libra Esterlina', symbol: '£' }
-  ];
-}
-
-/**
- * Get available timezones
- * @returns Promise<Array<{value: string, label: string}>>
- */
-export async function getAvailableTimezones(): Promise<Array<{value: string, label: string}>> {
-  await new Promise(resolve => setTimeout(resolve, 50));
-  return [
-    { value: 'America/Mexico_City', label: 'Ciudad de México (GMT-6)' },
-    { value: 'America/New_York', label: 'Nueva York (GMT-5)' },
-    { value: 'America/Los_Angeles', label: 'Los Ángeles (GMT-8)' },
-    { value: 'Europe/Madrid', label: 'Madrid (GMT+1)' },
-    { value: 'Europe/London', label: 'Londres (GMT+0)' }
-  ];
-}
-
-/**
- * Export interface for external integrations
- */
-export interface SettingsApiInterface {
-  // Business settings
-  getBusinessSettings: typeof getBusinessSettings;
-  updateBusinessSettings: typeof updateBusinessSettings;
-  updateTaxConfiguration: typeof updateTaxConfiguration;
-  updateOperatingHours: typeof updateOperatingHours;
-  
-  // System settings
-  getSystemSettings: typeof getSystemSettings;
-  updateSystemSettings: typeof updateSystemSettings;
-  
-  // User management
-  getUserRoles: typeof getUserRoles;
-  createUserRole: typeof createUserRole;
-  updateUserRole: typeof updateUserRole;
-  deleteUserRole: typeof deleteUserRole;
-  
-  // Integrations
-  getIntegrations: typeof getIntegrations;
-  updateIntegrationConfig: typeof updateIntegrationConfig;
-  toggleIntegrationStatus: typeof toggleIntegrationStatus;
-  testIntegrationConnection: typeof testIntegrationConnection;
-  
-  // Notifications
-  getNotificationSettings: typeof getNotificationSettings;
-  updateNotificationSettings: typeof updateNotificationSettings;
-  
-  // Metadata
-  getBusinessTypes: typeof getBusinessTypes;
-  getAvailableCurrencies: typeof getAvailableCurrencies;
-  getAvailableTimezones: typeof getAvailableTimezones;
-}
-
-// Export all functions for easy importing
-export {
-  type UserRole,
-  type Integration
-};

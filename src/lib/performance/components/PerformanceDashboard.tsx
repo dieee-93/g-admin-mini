@@ -181,7 +181,7 @@ export function PerformanceDashboard() {
             </Button>
 
             <Button
-              colorScheme="blue"
+              colorPalette="blue"
               size="sm" 
               onClick={exportReport}
             >

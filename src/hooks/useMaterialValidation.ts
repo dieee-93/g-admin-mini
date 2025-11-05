@@ -5,10 +5,11 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import { useForm, UseFormReturn } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import type { UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EntitySchemas, type SchemaType } from '@/lib/validation/zod/CommonSchemas';
-import type { MaterialItem } from '@/modules/materials/types';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types/materialTypes';
 
 // Infer the type from our Zod schema
 export type MaterialFormData = SchemaType<typeof EntitySchemas.material>;

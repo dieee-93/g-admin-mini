@@ -5,6 +5,7 @@
 
 export interface Sale {
   id: string;
+  location_id?: string; // 🆕 MULTI-LOCATION: Location where sale was made
   customer_id?: string;
   table_id?: string; // 🚀 NEW: Table management integration
   order_id?: string; // 🚀 NEW: Order lifecycle tracking
@@ -403,7 +404,8 @@ export enum OrderType {
   TAKEOUT = 'takeout',
   DELIVERY = 'delivery',
   PICKUP = 'pickup',
-  CATERING = 'catering'
+  CATERING = 'catering',
+  APPOINTMENT = 'APPOINTMENT'
 }
 
 export enum OrderStatus {
@@ -555,6 +557,7 @@ export enum SplitBillStatus {
 // ========================================================
 
 export interface CreateSaleData {
+  location_id?: string; // 🆕 MULTI-LOCATION: Location where sale is being created
   customer_id?: string;
   table_id?: string;
   order_type?: OrderType;
@@ -568,7 +571,7 @@ export interface CreateSaleData {
     modifications?: ItemModification[];
     special_instructions?: string;
   }[];
-  
+
   // 🚀 NEW: Modern POS features
   payment_methods?: {
     type: PaymentType;
@@ -577,6 +580,8 @@ export interface CreateSaleData {
   }[];
   split_bill?: boolean;
   tip_percentage?: number;
+  tax_rate?: number; // Tax rate for calculations
+  payment_method?: string; // Legacy payment method
 }
 
 export interface SaleValidation {
@@ -609,6 +614,7 @@ export interface SaleProcessResult {
 }
 
 export interface SalesListFilters {
+  location_id?: string; // 🆕 MULTI-LOCATION: Filter by location
   dateFrom?: string;
   dateTo?: string;
   customerId?: string;
@@ -619,6 +625,7 @@ export interface SalesListFilters {
   minTotal?: number;
   maxTotal?: number;
   fulfillmentType?: FulfillmentType;
+  status?: string; // General status filter
 }
 
 export interface SalesSummary {

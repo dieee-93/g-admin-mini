@@ -7,7 +7,7 @@
 import { useMemo } from 'react';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
-import { type ProductComponent, type AddComponentData } from '../types';
+import { type ProductComponent, type AddComponentData } from '@/pages/admin/supply-chain/products/types';
 
 import { logger } from '@/lib/logging';
 export function useProductComponents(productId: string) {
@@ -30,14 +30,14 @@ export function useProductComponents(productId: string) {
     ] : [],
     
     // Success/error callbacks to match original behavior
-    onSuccess: (action, data) => {
+    onSuccess: (action) => {
       if (action === 'create') {
         logger.info('App', 'Component added successfully');
       } else if (action === 'delete') {
         logger.info('App', 'Component removed successfully');
       }
     },
-    
+
     onError: (action, error) => {
       logger.error('App', `Error ${action} component:`, error);
     }
@@ -46,8 +46,8 @@ export function useProductComponents(productId: string) {
   // Filter components by productId (extra safety)
   const components = useMemo(() => {
     if (!productId) return [];
-    return crud.items.filter(component => 
-      (component as any).product_id === productId
+    return crud.items.filter(component =>
+      (component as ProductComponent).product_id === productId
     );
   }, [crud.items, productId]);
 

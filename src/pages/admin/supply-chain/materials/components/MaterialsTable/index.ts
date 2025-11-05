@@ -1,0 +1,1 @@
+export { MaterialsTable } from './MaterialsTable';

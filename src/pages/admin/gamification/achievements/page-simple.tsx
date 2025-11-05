@@ -169,7 +169,7 @@ export default function GalaxiaHabilidadesPageSimple() {
       >
         <SimpleCosmicBackground />
         
-        <Container maxW="7xl" py={8} position="relative" zIndex={3}>
+        <Container maxW="7xl" py="8" position="relative" zIndex={3}>
           <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -181,12 +181,12 @@ export default function GalaxiaHabilidadesPageSimple() {
               backdropFilter="blur(12px)"
               border="1px solid rgba(255, 255, 255, 0.1)"
               borderRadius="20px"
-              p={6}
-              mb={8}
+              p="6"
+              mb="8"
               boxShadow="0 8px 32px rgba(0, 0, 0, 0.3)"
             >
-              <VStack spacing={4}>
-                <HStack spacing={3}>
+              <VStack gap="4">
+                <HStack gap="3">
                   <Icon as={StarIcon} boxSize={8} color="purple.400" />
                   <Heading 
                     size="xl" 
@@ -201,7 +201,7 @@ export default function GalaxiaHabilidadesPageSimple() {
                   Explora tu universo de logros empresariales. Cada habilidad desbloqueada es una estrella en tu constelación del éxito.
                 </Text>
                 
-                <ButtonGroup size="md" colorScheme="purple" variant="outline">
+                <ButtonGroup size="md" colorPalette="purple" variant="outline">
                   <IconButton
                     aria-label="Vista Galaxia"
                     icon={<Icon as={BoltIcon} />}
@@ -225,15 +225,15 @@ export default function GalaxiaHabilidadesPageSimple() {
             </Box>
 
             {/* Estadísticas */}
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(4, 1fr)' }} gap={6} mb={8}>
+            <Grid templateColumns={{ base: '1fr', md: 'repeat(4, 1fr)' }} gap="6" mb="8">
               <Card
                 bg="linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%)"
                 backdropFilter="blur(12px)"
                 border="1px solid rgba(255, 255, 255, 0.1)"
               >
-                <CardBody p={6}>
-                  <VStack spacing={2}>
-                    <HStack spacing={3}>
+                <CardBody p="6">
+                  <VStack gap="2">
+                    <HStack gap="3">
                       <Icon as={TrophyIcon} boxSize={6} color="blue.400" />
                       <Text fontSize="sm" color="gray.300" fontWeight="medium">
                         Total Logros
@@ -254,9 +254,9 @@ export default function GalaxiaHabilidadesPageSimple() {
                 backdropFilter="blur(12px)"
                 border="1px solid rgba(255, 255, 255, 0.1)"
               >
-                <CardBody p={6}>
-                  <VStack spacing={2}>
-                    <HStack spacing={3}>
+                <CardBody p="6">
+                  <VStack gap="2">
+                    <HStack gap="3">
                       <Icon as={TargetIcon} boxSize={6} color="green.400" />
                       <Text fontSize="sm" color="gray.300" fontWeight="medium">
                         Completados
@@ -277,9 +277,9 @@ export default function GalaxiaHabilidadesPageSimple() {
                 backdropFilter="blur(12px)"
                 border="1px solid rgba(255, 255, 255, 0.1)"
               >
-                <CardBody p={6}>
-                  <VStack spacing={2}>
-                    <HStack spacing={3}>
+                <CardBody p="6">
+                  <VStack gap="2">
+                    <HStack gap="3">
                       <Icon as={BoltIcon} boxSize={6} color="yellow.400" />
                       <Text fontSize="sm" color="gray.300" fontWeight="medium">
                         En Progreso
@@ -300,9 +300,9 @@ export default function GalaxiaHabilidadesPageSimple() {
                 backdropFilter="blur(12px)"
                 border="1px solid rgba(255, 255, 255, 0.1)"
               >
-                <CardBody p={6}>
-                  <VStack spacing={2}>
-                    <HStack spacing={3}>
+                <CardBody p="6">
+                  <VStack gap="2">
+                    <HStack gap="3">
                       <Icon as={StarIcon} boxSize={6} color="purple.400" />
                       <Text fontSize="sm" color="gray.300" fontWeight="medium">
                         Puntos XP
@@ -320,7 +320,7 @@ export default function GalaxiaHabilidadesPageSimple() {
             </Grid>
 
             {/* Lista de Logros */}
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={6}>
+            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap="6">
               {achievements.map((achievement) => (
                 <m.div
                   key={achievement.id}
@@ -336,8 +336,8 @@ export default function GalaxiaHabilidadesPageSimple() {
                     border="1px solid rgba(255, 255, 255, 0.1)"
                     h="full"
                   >
-                    <CardBody p={6}>
-                      <VStack spacing={4} align="start">
+                    <CardBody p="6">
+                      <VStack gap="4" align="start">
                         <HStack justify="space-between" w="full">
                           <Icon 
                             as={achievement.unlocked ? TrophyIcon : StarIcon} 
@@ -345,14 +345,14 @@ export default function GalaxiaHabilidadesPageSimple() {
                             color={achievement.unlocked ? "green.400" : "gray.400"} 
                           />
                           <Badge
-                            colorScheme={achievement.unlocked ? "green" : "gray"}
+                            colorPalette={achievement.unlocked ? "green" : "gray"}
                             variant="subtle"
                           >
                             {achievement.points} XP
                           </Badge>
                         </HStack>
                         
-                        <VStack spacing={2} align="start" w="full">
+                        <VStack gap="2" align="start" w="full">
                           <Text 
                             fontSize="lg" 
                             fontWeight="bold" 
@@ -366,7 +366,7 @@ export default function GalaxiaHabilidadesPageSimple() {
                         </VStack>
 
                         <Box w="full">
-                          <HStack justify="space-between" mb={2}>
+                          <HStack justify="space-between" mb="2">
                             <Text fontSize="xs" color="gray.400">
                               Progreso
                             </Text>
@@ -376,7 +376,7 @@ export default function GalaxiaHabilidadesPageSimple() {
                           </HStack>
                           <Progress 
                             value={achievement.progress} 
-                            colorScheme={achievement.unlocked ? "green" : "purple"}
+                            colorPalette={achievement.unlocked ? "green" : "purple"}
                             size="sm"
                             borderRadius="full"
                           />

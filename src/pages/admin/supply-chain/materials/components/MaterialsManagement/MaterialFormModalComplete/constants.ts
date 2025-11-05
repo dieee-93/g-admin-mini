@@ -3,7 +3,7 @@ import {
   type ItemType, 
   type MeasurableUnit, 
   type CountUnit 
-} from '../../types';
+} from '../../../types';
 
 // Common type for all select options with labels
 export type LabeledOption<T> = {

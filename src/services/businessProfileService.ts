@@ -1,5 +1,5 @@
 /**
- * BUSINESS PROFILE SERVICE - V4.0
+ * BUSINESS PROFILE SERVICE - V4.1
  *
  * Sincronización bidireccional entre:
  * - capabilityStore (Zustand + localStorage)
@@ -10,6 +10,9 @@
  * 2. User changes → saveProfileToDB()
  * 3. Real-time subscriptions → syncProfileFromDB()
  *
+ * V4.1 CHANGES:
+ * - ✅ Added request deduplication for loadProfileFromDB()
+ *
  * V4.0 CHANGES:
  * - Migrated from activeCapabilities → selectedActivities/selectedInfrastructure
  * - Added completedMilestones tracking
@@ -19,6 +22,7 @@
 import { supabase } from '@/lib/supabase/client';
 import type { UserProfile } from '@/store/capabilityStore';
 import { logger } from '@/lib/logging';
+import { deduplicator } from '@/lib/query/requestDeduplication'; // ✅ Deduplication
 
 type CapabilityProfile = UserProfile;
 
@@ -64,62 +68,67 @@ export interface BusinessProfileRow {
 /**
  * Cargar profile desde Supabase (al iniciar la app)
  * Returns null si no existe profile en la DB
+ *
+ * ✅ OPTIMIZED: Deduplicated to prevent multiple simultaneous loads
+ * Multiple components may try to load this on app init - only 1 DB query is made.
  */
 export async function loadProfileFromDB(): Promise<CapabilityProfile | null> {
-  try {
-    logger.info('BusinessProfileService', '📥 Loading profile from database...');
+  return deduplicator.dedupe('business_profile:load', async () => {
+    try {
+      logger.info('BusinessProfileService', '📥 Loading profile from database...');
 
-    const { data, error } = await supabase
-      .from('business_profiles')
-      .select('*')
-      .is('organization_id', null) // Single tenant
-      .limit(1)
-      .single();
+      const { data, error } = await supabase
+        .from('business_profiles')
+        .select('*')
+        .is('organization_id', null) // Single tenant
+        .limit(1)
+        .single();
 
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // No rows found - esto es OK para primera vez
-        logger.info('BusinessProfileService', '📭 No profile found in database (first time setup)');
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No rows found - esto es OK para primera vez
+          logger.info('BusinessProfileService', '📭 No profile found in database (first time setup)');
+          return null;
+        }
+        throw error;
+      }
+
+      if (!data) {
+        logger.info('BusinessProfileService', '📭 No profile data returned');
         return null;
       }
+
+      // Map DB row to CapabilityProfile (v4.0)
+      const profile: CapabilityProfile = {
+        businessName: data.business_name,
+        businessType: data.business_type || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        country: data.country,
+        currency: data.currency,
+
+        // V4.0 fields
+        selectedActivities: data.selected_activities || [],
+        selectedInfrastructure: data.selected_infrastructure || ['single_location'],
+
+        setupCompleted: data.setup_completed,
+        isFirstTimeInDashboard: data.is_first_time_dashboard ?? true,
+        onboardingStep: data.onboarding_step
+      };
+
+      logger.info('BusinessProfileService', '✅ Profile loaded from database', {
+        businessName: profile.businessName,
+        activities: profile.selectedActivities.length,
+        infrastructure: profile.selectedInfrastructure.length,
+        setupCompleted: profile.setupCompleted
+      });
+
+      return profile;
+    } catch (error) {
+      logger.error('BusinessProfileService', '❌ Error loading profile from database', { error });
       throw error;
     }
-
-    if (!data) {
-      logger.info('BusinessProfileService', '📭 No profile data returned');
-      return null;
-    }
-
-    // Map DB row to CapabilityProfile (v4.0)
-    const profile: CapabilityProfile = {
-      businessName: data.business_name,
-      businessType: data.business_type || '',
-      email: data.email || '',
-      phone: data.phone || '',
-      country: data.country,
-      currency: data.currency,
-
-      // V4.0 fields
-      selectedActivities: data.selected_activities || [],
-      selectedInfrastructure: data.selected_infrastructure || ['single_location'],
-
-      setupCompleted: data.setup_completed,
-      isFirstTimeInDashboard: data.is_first_time_dashboard ?? true,
-      onboardingStep: data.onboarding_step
-    };
-
-    logger.info('BusinessProfileService', '✅ Profile loaded from database', {
-      businessName: profile.businessName,
-      activities: profile.selectedActivities.length,
-      infrastructure: profile.selectedInfrastructure.length,
-      setupCompleted: profile.setupCompleted
-    });
-
-    return profile;
-  } catch (error) {
-    logger.error('BusinessProfileService', '❌ Error loading profile from database', { error });
-    throw error;
-  }
+  });
 }
 
 // ============================================
@@ -379,23 +388,27 @@ export async function hasProfileInDB(): Promise<boolean> {
 
 /**
  * Obtener solo las activities seleccionadas (v4.0)
+ *
+ * ✅ OPTIMIZED: Deduplicated
  */
 export async function getSelectedActivitiesFromDB(): Promise<string[]> {
-  try {
-    const { data, error } = await supabase
-      .from('business_profiles')
-      .select('selected_activities')
-      .is('organization_id', null)
-      .single();
+  return deduplicator.dedupe('business_profile:activities', async () => {
+    try {
+      const { data, error } = await supabase
+        .from('business_profiles')
+        .select('selected_activities')
+        .is('organization_id', null)
+        .single();
 
-    if (error) {
-      if (error.code === 'PGRST116') return [];
-      throw error;
+      if (error) {
+        if (error.code === 'PGRST116') return [];
+        throw error;
+      }
+
+      return data?.selected_activities || [];
+    } catch (error) {
+      logger.error('BusinessProfileService', '❌ Error getting activities from DB', { error });
+      return [];
     }
-
-    return data?.selected_activities || [];
-  } catch (error) {
-    logger.error('BusinessProfileService', '❌ Error getting activities from DB', { error });
-    return [];
-  }
+  });
 }

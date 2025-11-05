@@ -7,9 +7,11 @@ import {
   Badge,
   SimpleGrid,
   Spinner,
-  Select,
   Tabs,
-} from '@chakra-ui/react';
+  CardWrapper,
+  Icon,
+  InputField
+} from '@/shared/ui';
 import {
   PresentationChartLineIcon,
   ArrowTrendingUpIcon,
@@ -19,7 +21,6 @@ import {
   CurrencyDollarIcon,
   BellIcon,
 } from '@heroicons/react/24/outline';
-import { CardWrapper, Icon, InputField } from '@/shared/ui';
 import { useCompetitiveIntelligence } from '../hooks/useCompetitiveIntelligence';
 import { MarketOverviewDashboard } from './MarketOverviewDashboard';
 import { CompetitorsTable } from './CompetitorsTable';
@@ -34,6 +35,7 @@ export function CompetitiveIntelligence() {
     marketTrends,
     marketInsights,
     isLoading,
+    error,
     activeTab,
     setActiveTab,
     competitorTypeFilter,
@@ -45,7 +47,28 @@ export function CompetitiveIntelligence() {
     refreshIntelligence,
     filteredCompetitors,
     marketOverview,
+    retry,
   } = useCompetitiveIntelligence();
+
+  if (error) {
+    return (
+      <VStack gap="6" py="16" align="center">
+        <Icon icon={PresentationChartLineIcon} size="3xl" color="red.400" />
+        <VStack gap="2" align="center">
+          <Text fontSize="xl" fontWeight="semibold">Error al Cargar Datos de Inteligencia</Text>
+          <Text color="gray.400">{error}</Text>
+        </VStack>
+        <HStack gap="4">
+          <Button variant="outline" onClick={() => window.location.href = '/admin/dashboard'}>
+            Ir al Dashboard
+          </Button>
+          <Button colorPalette="blue" onClick={retry}>
+            Reintentar
+          </Button>
+        </HStack>
+      </VStack>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -81,9 +104,9 @@ export function CompetitiveIntelligence() {
                 <Button
                   colorPalette="green"
                   onClick={refreshIntelligence}
-                  leftIcon={<Icon icon={ArrowPathIcon} size="sm" />}
                   size="sm"
                 >
+                  <Icon icon={ArrowPathIcon} size="sm" />
                   Actualizar Inteligencia
                 </Button>
               </HStack>
@@ -167,14 +190,14 @@ export function CompetitiveIntelligence() {
       <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
         <Tabs.List>
           <Tabs.Trigger value="overview">
-            <HStack gap={2}>
+            <HStack gap="2">
               <Icon icon={GlobeAltIcon} size="sm" />
               <Text>Overview</Text>
             </HStack>
           </Tabs.Trigger>
 
           <Tabs.Trigger value="competitors">
-            <HStack gap={2}>
+            <HStack gap="2">
               <Icon icon={UserGroupIcon} size="sm" />
               <Text>Competidores</Text>
               <Badge colorPalette="blue" size="sm">{competitors.length}</Badge>
@@ -182,14 +205,14 @@ export function CompetitiveIntelligence() {
           </Tabs.Trigger>
 
           <Tabs.Trigger value="pricing">
-            <HStack gap={2}>
+            <HStack gap="2">
               <Icon icon={CurrencyDollarIcon} size="sm" />
               <Text>Análisis Precios</Text>
             </HStack>
           </Tabs.Trigger>
 
           <Tabs.Trigger value="trends">
-            <HStack gap={2}>
+            <HStack gap="2">
               <Icon icon={ArrowTrendingUpIcon} size="sm" />
               <Text>Tendencias</Text>
               <Badge colorPalette="green" size="sm">{marketTrends.length}</Badge>
@@ -197,7 +220,7 @@ export function CompetitiveIntelligence() {
           </Tabs.Trigger>
 
           <Tabs.Trigger value="insights">
-            <HStack gap={2}>
+            <HStack gap="2">
               <Icon icon={BellIcon} size="sm" />
               <Text>Insights</Text>
               {marketInsights.filter(i => i.urgency === 'immediate').length > 0 && (

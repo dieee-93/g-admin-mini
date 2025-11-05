@@ -15,7 +15,7 @@ interface NumberFieldProps {
   disabled?: boolean
   size?: 'xs' | 'sm' | 'md' | 'lg'
   variant?: 'outline' | 'flushed' | 'subtle'
-  colorScheme?: 'theme' | 'default' // 🆕 Added theme support
+  colorPalette?: 'theme' | 'default' // 🆕 Added theme support
 }
 
 export function NumberField({
@@ -33,7 +33,7 @@ export function NumberField({
   disabled = false,
   size = 'md',
   variant = 'outline',
-  colorScheme = 'default',
+  colorPalette = 'default',
 }: NumberFieldProps) {
   // ✅ Recipes handle all theming automatically - no manual logic needed
 

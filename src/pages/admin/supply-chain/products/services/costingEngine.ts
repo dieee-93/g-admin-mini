@@ -1,10 +1,8 @@
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
-import { 
+import {
   calculateProductMaterialsCost,
   analyzeProductionViability,
-  type MaterialCost as MaterialCostEngine,
-  type ProductCostBreakdown as ProductCostBreakdownEngine,
   type ProductionViability
 } from '@/business-logic/products/productMaterialsCostEngine';
 
@@ -28,6 +26,42 @@ export interface ProductCostBreakdown {
   materials_breakdown: MaterialCost[];
   recipe_yield: number;
   cost_per_unit: number;
+}
+
+// Database types for Supabase responses
+interface RecipeIngredientItem {
+  id: string;
+  name: string;
+  unit: string;
+  cost: number | null;
+  stock_quantity: number | null;
+}
+
+interface RecipeIngredient {
+  id: string;
+  item_id: string;
+  quantity: number;
+  items: RecipeIngredientItem;
+}
+
+interface Recipe {
+  id: string;
+  name: string;
+  output_quantity: number | null;
+  recipe_ingredients: RecipeIngredient[] | null;
+}
+
+interface ProductComponent {
+  id: string;
+  component_type: string;
+  recipe_id: string | null;
+  recipes: Recipe | null;
+}
+
+interface ProductWithComponents {
+  id: string;
+  name: string;
+  product_components: ProductComponent[] | null;
 }
 
 export class ProductCostAnalysisService {
@@ -74,15 +108,16 @@ export class ProductCostAnalysisService {
       if (!productData) return null;
 
       // Find recipe component
-      const recipeComponent = productData.product_components?.find(
-        (comp: any) => comp.component_type === 'recipe'
+      const typedProductData = productData as unknown as ProductWithComponents;
+      const recipeComponent = typedProductData.product_components?.find(
+        (comp) => comp.component_type === 'recipe'
       );
 
       if (!recipeComponent?.recipes) {
         // No recipe found - return empty cost structure
         const emptyResult = calculateProductMaterialsCost({
           product_id: productId,
-          product_name: productData.name,
+          product_name: typedProductData.name,
           recipe_yield: 1,
           ingredients: []
         });
@@ -106,7 +141,7 @@ export class ProductCostAnalysisService {
       const recipe = recipeComponent.recipes;
 
       // Prepare ingredients data for centralized calculation
-      const ingredients = recipe.recipe_ingredients ? recipe.recipe_ingredients.map((ingredient: any) => ({
+      const ingredients = recipe.recipe_ingredients ? recipe.recipe_ingredients.map((ingredient) => ({
         item_id: ingredient.items.id,
         item_name: ingredient.items.name,
         quantity: ingredient.quantity,
@@ -118,7 +153,7 @@ export class ProductCostAnalysisService {
       // Use centralized calculation engine with decimal precision
       const costResult = calculateProductMaterialsCost({
         product_id: productId,
-        product_name: productData.name,
+        product_name: typedProductData.name,
         recipe_yield: recipe.output_quantity || 1,
         ingredients
       });

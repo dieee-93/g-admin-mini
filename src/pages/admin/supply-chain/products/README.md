@@ -235,23 +235,200 @@ export const calculateMenuEngineeringMatrix = (
 
 ## 🔄 Integración con EventBus
 
-### Eventos del Módulo
+### Eventos Emitidos (PROVIDES)
 
 ```typescript
-// Eventos que emite el módulo
-const PRODUCT_EVENTS = {
-  PRODUCT_CREATED: 'product:created',
-  PRODUCT_UPDATED: 'product:updated',
-  COST_RECALCULATED: 'product:cost_recalculated',
-  MENU_ANALYSIS_COMPLETED: 'product:menu_analysis_completed'
-} as const;
+// products.product_created - Cuando se crea un nuevo producto
+eventBus.emit('products.product_created', {
+  productId: string,
+  productName: string,
+  productType: ProductType,
+  timestamp: string,
+  userId: string
+}, {
+  priority: EventPriority.HIGH,
+  moduleId: 'products'
+});
 
-// Eventos que escucha el módulo
-const SUBSCRIBED_EVENTS = [
-  'material:cost_updated',  // Recalcular costos cuando cambian materiales
-  'sales:new_sale',         // Actualizar métricas de Menu Engineering
-  'kitchen:recipe_modified' // Recalcular costos de productos con recetas
-] as const;
+// products.product_updated - Cuando se actualiza un producto
+eventBus.emit('products.product_updated', {
+  productId: string,
+  productName: string,
+  changes: string[],  // Array of changed fields
+  timestamp: string,
+  userId: string
+}, {
+  priority: EventPriority.MEDIUM,
+  moduleId: 'products'
+});
+
+// products.price_changed - Cuando cambia el precio de un producto
+eventBus.emit('products.price_changed', {
+  productId: string,
+  productName: string,
+  oldPrice: number,
+  newPrice: number,
+  timestamp: string,
+  userId: string
+}, {
+  priority: EventPriority.HIGH,  // HIGH porque afecta ventas activas
+  moduleId: 'products'
+});
+
+// products.product_deleted - Cuando se elimina un producto
+eventBus.emit('products.product_deleted', {
+  productId: string,
+  productName: string,
+  timestamp: string,
+  userId: string
+}, {
+  priority: EventPriority.MEDIUM,
+  moduleId: 'products'
+});
+```
+
+### Eventos Suscritos (CONSUMES)
+
+```typescript
+// materials.stock_updated - Recalcular disponibilidad de productos con recetas
+eventBus.subscribe('materials.stock_updated', (event) => {
+  // Recalcular availability para productos que usan este material
+  const affectedProducts = getProductsUsingMaterial(event.data.materialId);
+  affectedProducts.forEach(product => {
+    recalculateProductAvailability(product.id);
+  });
+}, {
+  moduleId: 'products',
+  priority: 100
+});
+
+// materials.low_stock_alert - Alertar sobre productos afectados
+eventBus.subscribe('materials.low_stock_alert', (event) => {
+  // Mostrar alerta si productos populares se verán afectados
+  const criticalProducts = getPopularProductsUsingMaterial(event.data.materialId);
+  if (criticalProducts.length > 0) {
+    showLowStockWarning(criticalProducts);
+  }
+}, {
+  moduleId: 'products',
+  priority: 80
+});
+
+// sales.order_completed - Actualizar métricas de Menu Engineering
+eventBus.subscribe('sales.order.*', (event) => {
+  // Actualizar estadísticas de ventas para análisis de menú
+  updateProductSalesMetrics(event.data.items);
+}, {
+  moduleId: 'products',
+  priority: 50  // LOW priority, no urgente
+});
+```
+
+### Integración Cross-Module
+
+| Módulo | Relación | Eventos Clave |
+|--------|----------|---------------|
+| **Materials** | 🔗 Dependencies | `materials.stock_updated`, `materials.low_stock_alert` |
+| **Sales** | 📊 Analytics | `sales.order_completed`, `sales.item_sold` |
+| **Dashboard** | 📈 Widgets | `dashboard.widgets` (hook point) |
+
+---
+
+## 🔒 Sistema de Permisos
+
+### Configuración del Módulo
+
+```typescript
+// src/modules/products/manifest.tsx
+export const productsManifest = {
+  id: 'products',
+  minimumRole: 'OPERADOR',  // 🔒 Employees can VIEW products
+  // ...
+};
+```
+
+### Permisos en Service Layer
+
+```typescript
+// src/pages/admin/supply-chain/products/services/productApi.ts
+import { requirePermission, type AuthUser } from '@/lib/permissions';
+
+export async function createProduct(
+  productData: CreateProductData,
+  user: AuthUser  // 🔑 User context required
+): Promise<Product> {
+  // 🔒 PERMISSION CHECK: Require 'create' permission
+  requirePermission(user, 'products', 'create');
+
+  // Proceed with operation...
+  const { data, error } = await supabase
+    .from("products")
+    .insert([productData])
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  // 📡 EVENTBUS: Emit event after successful creation
+  eventBus.emit('products.product_created', {
+    productId: data.id,
+    productName: data.name,
+    userId: user.id  // 🔑 Track who performed the action
+  });
+
+  return data;
+}
+
+export async function updateProduct(
+  productData: UpdateProductData,
+  user: AuthUser
+): Promise<Product> {
+  // 🔒 PERMISSION CHECK
+  requirePermission(user, 'products', 'update');
+  // ...
+}
+
+export async function deleteProduct(
+  id: string,
+  user: AuthUser
+): Promise<void> {
+  // 🔒 PERMISSION CHECK
+  requirePermission(user, 'products', 'delete');
+  // ...
+}
+```
+
+### Matriz de Permisos
+
+| Rol | read | create | update | delete | analytics |
+|-----|------|--------|--------|--------|-----------|
+| **OPERADOR** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **ENCARGADO** | ✅ | ✅ | ✅ | ❌ | ✅ |
+| **ADMINISTRADOR** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **SUPER_ADMIN** | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+### Error Handling
+
+```typescript
+import {
+  PermissionDeniedError,
+  isPermissionDeniedError
+} from '@/lib/permissions';
+
+try {
+  await createProduct(data, user);
+} catch (error) {
+  if (isPermissionDeniedError(error)) {
+    // Show user-friendly permission error
+    notify.error({
+      title: 'Permission Denied',
+      description: `You don't have permission to create products. Contact your administrator.`
+    });
+  } else {
+    // Handle other errors
+    throw error;
+  }
+}
 ```
 
 ---

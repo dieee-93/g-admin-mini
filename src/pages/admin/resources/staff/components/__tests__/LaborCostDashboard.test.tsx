@@ -4,9 +4,16 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LaborCostDashboard } from '../LaborCostDashboard';
+
+// Test types for mocks
+interface MockTabProps {
+  children?: React.ReactNode;
+  value?: string;
+  [key: string]: unknown;
+}
 
 // Mock the labor cost API functions
 const mockLaborCostApi = {
@@ -23,12 +30,12 @@ vi.mock('@chakra-ui/react', async () => {
   return {
     ...actual,
     Tabs: {
-      Root: ({ children, ...props }: any) => <div data-testid="tabs-root" {...props}>{children}</div>,
-      List: ({ children }: any) => <div data-testid="tabs-list">{children}</div>,
-      Trigger: ({ children, value, ...props }: any) => (
+      Root: ({ children, ...props }: MockTabProps) => <div data-testid="tabs-root" {...props}>{children}</div>,
+      List: ({ children }: MockTabProps) => <div data-testid="tabs-list">{children}</div>,
+      Trigger: ({ children, value, ...props }: MockTabProps) => (
         <button data-testid={`tab-${value}`} data-value={value} {...props}>{children}</button>
       ),
-      Content: ({ children, value }: any) => <div data-testid={`tab-content-${value}`}>{children}</div>,
+      Content: ({ children, value }: MockTabProps) => <div data-testid={`tab-content-${value}`}>{children}</div>,
     }
   };
 });
@@ -235,10 +242,7 @@ describe('LaborCostDashboard', () => {
     render(<LaborCostDashboard />);
 
     await waitFor(() => {
-      // Regular cost: $4,200, Overtime cost: $800
-      const regularPercentage = (4200 / 5000) * 100; // 84%
-      const overtimePercentage = (800 / 5000) * 100; // 16%
-      
+      // Regular cost: $4,200 (84%), Overtime cost: $800 (16%)
       expect(screen.getByText('84%')).toBeInTheDocument();
       expect(screen.getByText('16%')).toBeInTheDocument();
     });

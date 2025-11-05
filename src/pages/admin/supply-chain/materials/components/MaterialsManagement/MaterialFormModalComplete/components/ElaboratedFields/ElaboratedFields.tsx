@@ -1,8 +1,8 @@
-import { Box, Stack, Alert, Text } from '@chakra-ui/react';
+import { Box, Stack, Alert } from '@/shared/ui';
 import { SelectField } from '@/shared/ui';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { type ItemFormData } from '../../types';
-import { CATEGORY_COLLECTION, type LabeledOption } from '../../constants';
+import { type ItemFormData } from '../../../../types';
+import { CATEGORY_COLLECTION } from '../../constants';
 import { RecipeBuilderClean } from '@/shared/components/recipe/RecipeBuilderClean';
 
 interface ElaboratedFieldsProps {
@@ -21,7 +21,7 @@ export const ElaboratedFields = ({
         <SelectField
           label="Categoría del Producto"
           placeholder="¿A qué categoría pertenece?"
-          collection={CATEGORY_COLLECTION as any} // TODO: Fix typing issue with SelectField
+          collection={CATEGORY_COLLECTION}
           value={formData.category ? [formData.category] : []}
           onValueChange={(details) => 
             setFormData({ 

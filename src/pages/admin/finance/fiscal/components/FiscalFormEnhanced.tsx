@@ -3,13 +3,12 @@
  * Migrates from custom form to DynamicForm with real-time tax calculations
  */
 import React from 'react';
+import type { InvoiceGenerationData } from '../types/fiscalTypes';
 import { z } from 'zod';
 import { DynamicForm, type FormSectionConfig } from '@/shared/components/forms';
 import { useFormManager } from '@/shared/hooks/business';
 import { CRUDHandlers } from '@/shared/utils/errorHandling';
 import {
-  FiscalCalculations,
-  TaxCalculations,
   type InvoiceAnalysis,
   type TaxBreakdown
 } from '@/business-logic/shared/FiscalCalculations';
@@ -441,12 +440,12 @@ export function FiscalFormEnhanced({
   };
 
   // Mock CRUD operations
-  const createInvoice = async (data: any) => {
+  const createInvoice = async (data: InvoiceGenerationData) => {
     logger.info('API', 'Creating invoice:', data);
     return { id: Date.now().toString(), ...data };
   };
 
-  const updateInvoice = async (id: string, data: any) => {
+  const updateInvoice = async (id: string, data: InvoiceGenerationData) => {
     logger.info('API', 'Updating invoice:', id, data);
     return { id, ...data };
   };

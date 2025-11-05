@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Stack, Skeleton, SkeletonText, SkeletonCircle } from '@chakra-ui/react';
+import { Box, Stack, Skeleton, SkeletonCircle } from '@chakra-ui/react';
 import { CardWrapper } from '@/shared/ui';
 import { COMPONENT_TOKENS, DASHBOARD_TOKENS } from '@/theme/tokens';
 

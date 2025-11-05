@@ -16,6 +16,9 @@ import {
   isElaborated
 } from '@/pages/admin/supply-chain/materials/types';
 
+// Re-export MaterialItem for store/index.ts
+export type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+
 // Import centralized utilities
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation'; 
 import { logger } from '@/lib/logging';
@@ -26,7 +29,7 @@ export interface MaterialsFilters {
   search: string;
   priceRange: [number, number];
   location: string;
-  sortBy: 'name' | 'stock' | 'type' | 'unit_cost' | 'updated_at';
+  sortBy: 'name' | 'stock' | 'type' | 'unit_cost' | 'updated_at' | 'created_at';
   sortOrder: 'asc' | 'desc';
   hasRecipe?: boolean; // Para items elaborados
 }
@@ -156,7 +159,7 @@ export const useMaterialsStore = create<MaterialsState>()(
             const { MaterialsNormalizer } = await import('@/pages/admin/supply-chain/materials/services/materialsNormalizer');
 
             // Map TypeScript type to API type
-            const apiType = MaterialsNormalizer.mapItemTypeToApiType(itemData.type, itemData.category);
+            const apiType = MaterialsNormalizer.mapItemTypeToApiType(itemData.type);
 
             // Map business category to technical category for DB constraint
             const technicalCategory = MaterialsNormalizer.mapBusinessCategoryToTechnicalCategory(
@@ -196,7 +199,7 @@ export const useMaterialsStore = create<MaterialsState>()(
 
             // Handle supplier and stock entry creation if supplier data provided
             if (itemData.supplier && (itemData.initial_stock || 0) > 0) {
-              const { suppliersApi } = await import('@/pages/admin/supply-chain/materials/services/suppliersApi');
+              const { suppliersApi } = await import('@/pages/admin/supply-chain/suppliers/services/suppliersApi');
               
               let supplierId: string | undefined = itemData.supplier.supplier_id;
               
@@ -254,7 +257,7 @@ export const useMaterialsStore = create<MaterialsState>()(
 
           if (!originalItem) {
             const error = new Error('Item no encontrado para actualizar.');
-            logger.error('App', error);
+            logger.error('App', error.message);
             set({ error: error.message });
             throw error;
           }
@@ -270,15 +273,21 @@ export const useMaterialsStore = create<MaterialsState>()(
             const { supabase } = await import('@/lib/supabase/client');
             const { inventoryApi } = await import('@/pages/admin/supply-chain/materials/services/inventoryApi');
 
+            // Get authenticated user for update operation
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+              throw new Error('Authentication required to update material');
+            }
+
             if (Object.keys(otherUpdates).length > 0) {
-              await inventoryApi.updateItem(id, otherUpdates);
+              await inventoryApi.updateItem(id, otherUpdates, user);
             }
 
             if (stockDifference !== 0) {
               const { error: rpcError } = await supabase.rpc('update_item_stock', {
                 p_item_id: id,
                 p_quantity_to_add: stockDifference,
-              });
+              } as any);
 
               if (rpcError) {
                 throw new Error(`Error en RPC al actualizar stock: ${rpcError.message}`);
@@ -287,6 +296,9 @@ export const useMaterialsStore = create<MaterialsState>()(
 
             // Re-fetch the item to ensure state consistency
             const updatedItem = await inventoryApi.getItem(id);
+
+            // Import normalizer for type mapping
+            const { MaterialsNormalizer } = await import('@/pages/admin/supply-chain/materials/services/materialsNormalizer');
             const normalizedItem = MaterialsNormalizer.normalizeApiItem(updatedItem);
 
             set(produce((state: MaterialsState) => {
@@ -333,7 +345,7 @@ export const useMaterialsStore = create<MaterialsState>()(
 
         // UI Actions
         setLoading: (loading) => set({ loading }),
-        setError: (_error) => set({ error }),
+        setError: (_error) => set({ error: _error }),
         setFilters: (newFilters) => set(produce((state: MaterialsState) => {
           state.filters = { ...state.filters, ...newFilters };
         })),
@@ -352,11 +364,11 @@ export const useMaterialsStore = create<MaterialsState>()(
         })),
         deselectAll: () => set({ selectedItems: [] }),
 
-        openModal: (mode, item = null) => {
+        openModal: (mode, item) => {
           set({
             isModalOpen: true,
             modalMode: mode,
-            currentItem: item
+            currentItem: item ?? undefined
           });
         },
         closeModal: () => set({
@@ -431,9 +443,9 @@ export const useMaterialsStore = create<MaterialsState>()(
             return true;
           }).sort((a, b) => {
             const { sortBy, sortOrder } = filters;
-            let aValue: unknown = a[sortBy as keyof MaterialItem];
-            let bValue: unknown = b[sortBy as keyof MaterialItem];
-            
+            let aValue: string | number = a[sortBy as keyof MaterialItem] as string | number;
+            let bValue: string | number = b[sortBy as keyof MaterialItem] as string | number;
+
             // Handle different data types
             if (sortBy === 'updated_at' || sortBy === 'created_at') {
               aValue = new Date(aValue as string).getTime();
@@ -442,7 +454,7 @@ export const useMaterialsStore = create<MaterialsState>()(
               aValue = aValue.toLowerCase();
               bValue = bValue.toLowerCase();
             }
-            
+
             if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
             if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
             return 0;

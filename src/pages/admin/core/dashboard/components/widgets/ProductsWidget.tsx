@@ -6,7 +6,7 @@
  * - Cantidad vendida
  * - Ingresos generados
  *
- * Visible solo si sales_catalog_menu o production_recipe_management están activas.
+ * Visible solo si sales_catalog_menu o production_bom_management están activas.
  *
  * @version 1.0.0 - Initial Implementation
  */
@@ -44,7 +44,9 @@ export function ProductsWidget() {
       <CardWrapper.Body p="4">
         <Stack gap="4">
           <Stack direction="row" align="center" gap="2">
-            <Icon icon={FireIcon} size="md" color="amber.500" />
+            <Icon size="md" color="amber.500" >
+                <FireIcon />
+              </Icon>
             <Typography variant="body" size="md" weight="medium">
               Top Productos
             </Typography>

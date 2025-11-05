@@ -5,24 +5,20 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Stack, Grid, Button, Badge, Alert, Typography,
-  MetricCard, CardGrid, Section, Icon
+  Button, Badge, Alert, CardWrapper, Tabs, VStack, HStack, Box, SimpleGrid, Progress, Select,
+  StatRoot, StatLabel, StatValueText, StatHelpText
 } from '@/shared/ui';
 import {
-  ChartBarIcon,
-  ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   ClockIcon,
   CurrencyDollarIcon,
   UsersIcon,
-  CalendarIcon,
   LightBulbIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
-import { schedulingApi } from '@/pages/admin/resources/scheduling/services/schedulingApi';
 import { notify } from '@/lib/notifications';
 
 import { logger } from '@/lib/logging';
@@ -292,9 +288,9 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
     const { efficiency } = analyticsData;
 
     return (
-      <VStack align="stretch" spacing={6}>
+      <VStack align="stretch" gap="6">
         {/* Overall Efficiency Metrics */}
-        <SimpleGrid columns={{ base: 2, md: 5 }} spacing={4}>
+        <SimpleGrid columns={{ base: 2, md: 5 }} gap="4">
           <StatRoot>
             <StatLabel>Overall Efficiency</StatLabel>
             <StatValueText fontSize="2xl" color="blue.500">
@@ -336,7 +332,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
           </StatRoot>
         </SimpleGrid>
 
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+        <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
           {/* Position Efficiency */}
           <CardWrapper>
             <CardWrapper.Header>
@@ -346,16 +342,16 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
               </HStack>
             </CardWrapper.Header>
             <CardWrapper.Body>
-              <VStack align="stretch" spacing={4}>
+              <VStack align="stretch" gap="4">
                 {Object.entries(efficiency.position_efficiency).map(([position, score]) => (
                   <Box key={position}>
-                    <HStack justify="space-between" mb={2}>
+                    <HStack justify="space-between" mb="2">
                       <Text fontSize="sm">{position}</Text>
                       <Text fontSize="sm" fontWeight="medium" color={score >= 85 ? 'green.500' : score >= 75 ? 'yellow.500' : 'red.500'}>
                         {score}%
                       </Text>
                     </HStack>
-                    <Progress value={score} colorScheme={score >= 85 ? 'green' : score >= 75 ? 'yellow' : 'red'} size="sm" />
+                    <Progress value={score} colorPalette={score >= 85 ? 'green' : score >= 75 ? 'yellow' : 'red'} size="sm" />
                   </Box>
                 ))}
               </VStack>
@@ -371,16 +367,16 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
               </HStack>
             </CardWrapper.Header>
             <CardWrapper.Body>
-              <VStack align="stretch" spacing={4}>
+              <VStack align="stretch" gap="4">
                 {Object.entries(efficiency.time_slot_efficiency).map(([slot, score]) => (
                   <Box key={slot}>
-                    <HStack justify="space-between" mb={2}>
+                    <HStack justify="space-between" mb="2">
                       <Text fontSize="sm" textTransform="capitalize">{slot}</Text>
                       <Text fontSize="sm" fontWeight="medium" color={score >= 85 ? 'green.500' : score >= 75 ? 'yellow.500' : 'red.500'}>
                         {score}%
                       </Text>
                     </HStack>
-                    <Progress value={score} colorScheme={score >= 85 ? 'green' : score >= 75 ? 'yellow' : 'red'} size="sm" />
+                    <Progress value={score} colorPalette={score >= 85 ? 'green' : score >= 75 ? 'yellow' : 'red'} size="sm" />
                   </Box>
                 ))}
               </VStack>
@@ -407,7 +403,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
     };
 
     return (
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+      <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
         {/* Labor Cost Trend */}
         <CardWrapper>
           <CardWrapper.Header>
@@ -417,7 +413,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
             </HStack>
           </CardWrapper.Header>
           <CardWrapper.Body>
-            <VStack align="stretch" spacing={4}>
+            <VStack align="stretch" gap="4">
               <HStack justify="space-between">
                 <HStack>
                   {(() => {
@@ -428,13 +424,13 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
                     {trends.labor_cost_trend.percentage > 0 ? '+' : ''}{trends.labor_cost_trend.percentage}%
                   </Text>
                 </HStack>
-                <Badge colorScheme={getTrendColor(trends.labor_cost_trend.direction, false)}>
+                <Badge colorPalette={getTrendColor(trends.labor_cost_trend.direction, false)}>
                   {trends.labor_cost_trend.direction}
                 </Badge>
               </HStack>
               <Text fontSize="sm" color="gray.600">vs last period</Text>
               {/* Mini chart would go here in a real implementation */}
-              <Box h={20} bg="gray.50" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
+              <Box h="20" bg="gray.50" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
                 <Text fontSize="xs" color="gray.500">Cost trend visualization</Text>
               </Box>
             </VStack>
@@ -450,7 +446,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
             </HStack>
           </CardWrapper.Header>
           <CardWrapper.Body>
-            <VStack align="stretch" spacing={4}>
+            <VStack align="stretch" gap="4">
               <HStack justify="space-between">
                 <HStack>
                   {(() => {
@@ -461,12 +457,12 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
                     {trends.coverage_trend.percentage > 0 ? '+' : ''}{trends.coverage_trend.percentage}%
                   </Text>
                 </HStack>
-                <Badge colorScheme={getTrendColor(trends.coverage_trend.direction, true)}>
+                <Badge colorPalette={getTrendColor(trends.coverage_trend.direction, true)}>
                   {trends.coverage_trend.direction}
                 </Badge>
               </HStack>
               <Text fontSize="sm" color="gray.600">vs last period</Text>
-              <Box h={20} bg="gray.50" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
+              <Box h="20" bg="gray.50" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
                 <Text fontSize="xs" color="gray.500">Coverage trend visualization</Text>
               </Box>
             </VStack>
@@ -482,7 +478,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
             </HStack>
           </CardWrapper.Header>
           <CardWrapper.Body>
-            <VStack align="stretch" spacing={4}>
+            <VStack align="stretch" gap="4">
               <HStack justify="space-between">
                 <HStack>
                   {(() => {
@@ -493,12 +489,12 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
                     {trends.overtime_trend.percentage > 0 ? '+' : ''}{trends.overtime_trend.percentage}%
                   </Text>
                 </HStack>
-                <Badge colorScheme={getTrendColor(trends.overtime_trend.direction, false)}>
+                <Badge colorPalette={getTrendColor(trends.overtime_trend.direction, false)}>
                   {trends.overtime_trend.direction}
                 </Badge>
               </HStack>
               <Text fontSize="sm" color="gray.600">vs last period</Text>
-              <Box h={20} bg="gray.50" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
+              <Box h="20" bg="gray.50" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
                 <Text fontSize="xs" color="gray.500">Overtime trend visualization</Text>
               </Box>
             </VStack>
@@ -514,7 +510,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
             </HStack>
           </CardWrapper.Header>
           <CardWrapper.Body>
-            <VStack align="stretch" spacing={4}>
+            <VStack align="stretch" gap="4">
               <HStack justify="space-between">
                 <HStack>
                   {(() => {
@@ -525,12 +521,12 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
                     {trends.staff_satisfaction_trend.score}/10
                   </Text>
                 </HStack>
-                <Badge colorScheme={getTrendColor(trends.staff_satisfaction_trend.direction, true)}>
+                <Badge colorPalette={getTrendColor(trends.staff_satisfaction_trend.direction, true)}>
                   +{trends.staff_satisfaction_trend.percentage}%
                 </Badge>
               </HStack>
               <Text fontSize="sm" color="gray.600">Current satisfaction score</Text>
-              <Progress value={trends.staff_satisfaction_trend.score * 10} colorScheme="green" size="lg" />
+              <Progress value={trends.staff_satisfaction_trend.score * 10} colorPalette="green" size="lg" />
             </VStack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -543,7 +539,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
     const { optimization } = analyticsData;
 
     return (
-      <VStack align="stretch" spacing={6}>
+      <VStack align="stretch" gap="6">
         {/* Potential Savings */}
         <CardWrapper>
           <CardWrapper.Header>
@@ -552,7 +548,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
                 <CurrencyDollarIcon className="w-5 h-5" />
                 <Text fontWeight="semibold">Optimization Potential</Text>
               </HStack>
-              <Badge colorScheme="green" fontSize="md">
+              <Badge colorPalette="green" fontSize="md">
                 ${optimization.potential_savings}/week
               </Badge>
             </HStack>
@@ -574,21 +570,21 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
             </HStack>
           </CardWrapper.Header>
           <CardWrapper.Body>
-            <VStack align="stretch" spacing={4}>
+            <VStack align="stretch" gap="4">
               {optimization.optimization_opportunities.map(opportunity => (
-                <Box key={opportunity.id} p={4} border="1px" borderColor="gray.200" borderRadius="md">
-                  <HStack justify="space-between" mb={2}>
+                <Box key={opportunity.id} p="4" border="1px" borderColor="gray.200" borderRadius="md">
+                  <HStack justify="space-between" mb="2">
                     <Text fontWeight="medium">{opportunity.title}</Text>
                     <HStack>
-                      <Badge colorScheme={opportunity.difficulty === 'easy' ? 'green' : opportunity.difficulty === 'medium' ? 'yellow' : 'red'}>
+                      <Badge colorPalette={opportunity.difficulty === 'easy' ? 'green' : opportunity.difficulty === 'medium' ? 'yellow' : 'red'}>
                         {opportunity.difficulty}
                       </Badge>
-                      <Badge colorScheme="blue">
+                      <Badge colorPalette="blue">
                         ${opportunity.estimated_savings}/week
                       </Badge>
                     </HStack>
                   </HStack>
-                  <Text fontSize="sm" color="gray.600" mb={2}>
+                  <Text fontSize="sm" color="gray.600" mb="2">
                     {opportunity.description}
                   </Text>
                   <Text fontSize="sm" fontWeight="medium" color="green.600">
@@ -600,7 +596,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
           </CardWrapper.Body>
         </CardWrapper>
 
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+        <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
           {/* Best Practices */}
           <CardWrapper>
             <CardWrapper.Header>
@@ -610,16 +606,16 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
               </HStack>
             </CardWrapper.Header>
             <CardWrapper.Body>
-              <VStack align="stretch" spacing={3}>
+              <VStack align="stretch" gap="3">
                 {optimization.best_practices.map(practice => (
                   <Box key={practice.id}>
-                    <HStack justify="space-between" mb={1}>
+                    <HStack justify="space-between" mb="1">
                       <Text fontSize="sm" fontWeight="medium">{practice.title}</Text>
-                      <Badge size="xs" colorScheme={practice.priority === 'high' ? 'red' : practice.priority === 'medium' ? 'yellow' : 'green'}>
+                      <Badge size="xs" colorPalette={practice.priority === 'high' ? 'red' : practice.priority === 'medium' ? 'yellow' : 'green'}>
                         {practice.priority}
                       </Badge>
                     </HStack>
-                    <Text fontSize="xs" color="gray.600" mb={1}>
+                    <Text fontSize="xs" color="gray.600" mb="1">
                       {practice.description}
                     </Text>
                     <Text fontSize="xs" color="blue.600">
@@ -640,7 +636,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
               </HStack>
             </CardWrapper.Header>
             <CardWrapper.Body>
-              <VStack align="stretch" spacing={3}>
+              <VStack align="stretch" gap="3">
                 {optimization.red_flags.map(flag => (
                   <Alert key={flag.id} status={flag.severity === 'critical' ? 'error' : 'warning'}>
                     <Alert.Indicator />
@@ -649,7 +645,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
                       <Alert.Description fontSize="xs">
                         {flag.description}
                         <br />
-                        <Text fontWeight="medium" mt={1}>
+                        <Text fontWeight="medium" mt="1">
                           Recommendation: {flag.recommendation}
                         </Text>
                       </Alert.Description>
@@ -666,20 +662,20 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
 
   if (loading) {
     return (
-      <Box textAlign="center" py={8}>
-        <Progress size="xs" isIndeterminate colorScheme="blue" />
-        <Text mt={2} color="gray.600">Loading scheduling analytics...</Text>
+      <Box textAlign="center" py="8">
+        <Progress size="xs" isIndeterminate colorPalette="blue" />
+        <Text mt="2" color="gray.600">Loading scheduling analytics...</Text>
       </Box>
     );
   }
 
   return (
-    <VStack align="stretch" spacing={6}>
+    <VStack align="stretch" gap="6">
       {/* Header with Controls */}
       <HStack justify="space-between">
         <Text fontSize="xl" fontWeight="semibold">Scheduling Analytics</Text>
         <HStack>
-          <Select value={timeFrame} onChange={(e) => setTimeFrame(e.target.value as any)} size="sm">
+          <Select value={timeFrame} onChange={(e) => setTimeFrame(e.target.value as unknown)} size="sm">
             <option value="week">This Week</option>
             <option value="month">This Month</option>
             <option value="quarter">This Quarter</option>
@@ -692,7 +688,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
 
       {/* Analytics Tabs */}
       <CardWrapper>
-        <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
+        <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as unknown)}>
           <Tabs.List>
             <Tabs.Trigger value="efficiency">
               <HStack>
@@ -714,7 +710,7 @@ export function SchedulingAnalytics({ dateRange }: SchedulingAnalyticsProps) {
             </Tabs.Trigger>
           </Tabs.List>
 
-          <Box p={6}>
+          <Box p="6">
             <Tabs.Content value="efficiency">
               {renderEfficiencyTab()}
             </Tabs.Content>

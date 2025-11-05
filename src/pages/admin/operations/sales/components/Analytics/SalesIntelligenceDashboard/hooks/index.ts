@@ -24,11 +24,12 @@ export const useSalesIntelligence = (
         return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       case 'percentage':
         return `${value.toFixed(1)}%`;
-      case 'time':
+      case 'time': {
         if (value < 60) return `${Math.round(value)}m`;
         const hours = Math.floor(value / 60);
         const minutes = Math.round(value % 60);
         return `${hours}h ${minutes}m`;
+      }
       default:
         return value.toLocaleString();
     }
@@ -147,7 +148,7 @@ export const useSalesIntelligence = (
   // Current metric cards
   const currentMetrics = useMemo(() =>
     getMetricCards(selectedMetricCategory),
-    [selectedMetricCategory, analytics]
+    [selectedMetricCategory, analytics, getMetricCards]
   );
 
   // Get trend icon and color
@@ -169,17 +170,19 @@ export const useSalesIntelligence = (
       case 'today':
         dateFrom = dateTo = now.toISOString().split('T')[0];
         break;
-      case 'yesterday':
+      case 'yesterday': {
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
         dateFrom = dateTo = yesterday.toISOString().split('T')[0];
         break;
-      case 'week':
+      }
+      case 'week': {
         const weekStart = new Date(now);
         weekStart.setDate(weekStart.getDate() - weekStart.getDay());
         dateFrom = weekStart.toISOString().split('T')[0];
         dateTo = now.toISOString().split('T')[0];
         break;
+      }
       case 'month':
         dateFrom = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
         dateTo = now.toISOString().split('T')[0];

@@ -11,8 +11,8 @@ export { default as OnboardingGuide } from './components/OnboardingGuide';
 // Hooks
 export { default as useAchievements } from './hooks/useAchievements';
 
-// Servicios
-export { AchievementsEngine } from './services/AchievementsEngine';
+// NOTE: AchievementsEngine removed - functionality moved to Module Registry
+// Use the new requirements system in src/modules/achievements instead
 
 // Tipos
 export type {

@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Fiscal Analytics Enhanced - Using AnalyticsEngine patterns
  * Specialized fiscal analytics with P&L statements, tax analysis, and compliance metrics
@@ -5,23 +6,19 @@
 import React, { useMemo } from 'react';
 import {
   ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
-  Button, Badge, Icon, Stack, Typography
+  Badge, Icon, Typography
 } from '@/shared/ui';
 import {
   BuildingLibraryIcon,
   CurrencyDollarIcon,
   DocumentTextIcon,
-  ReceiptTaxIcon,
   ExclamationTriangleIcon,
   TrophyIcon,
   ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  ChartBarIcon,
   CheckCircleIcon,
   XCircleIcon,
-  CalendarDaysIcon
 } from '@heroicons/react/24/outline';
-import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services/AnalyticsEngine';
+import { TrendAnalytics } from '@/shared/services/AnalyticsEngine';
 
 // Fiscal-specific analytics types
 interface FiscalTransaction {
@@ -111,7 +108,7 @@ const generateMockFiscalData = (): FiscalTransaction[] => {
     return {
       id: `fiscal_${i + 1}`,
       invoice_number: `0001-${(i + 1).toString().padStart(8, '0')}`,
-      invoice_type: invoiceTypes[Math.floor(Math.random() * invoiceTypes.length)] as any,
+      invoice_type: invoiceTypes[Math.floor(Math.random() * invoiceTypes.length)] as FiscalTransaction['invoice_type'],
       customer_id: `cust_${Math.floor(i / 10) + 1}`,
       customer_name: `Cliente ${Math.floor(i / 10) + 1}`,
       issue_date: new Date(2024, 0, 1 + Math.floor(i / 3)).toISOString().split('T')[0],
@@ -119,10 +116,10 @@ const generateMockFiscalData = (): FiscalTransaction[] => {
       subtotal: Math.round(subtotal * 100) / 100,
       tax_amount: Math.round(taxAmount * 100) / 100,
       total_amount: Math.round(totalAmount * 100) / 100,
-      currency: currencies[Math.floor(Math.random() * currencies.length)] as any,
+      currency: currencies[Math.floor(Math.random() * currencies.length)] as FiscalTransaction['currency'],
       payment_method: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
       payment_status: paymentStatuses[Math.floor(Math.random() * paymentStatuses.length)] as any,
-      afip_status: afipStatuses[Math.floor(Math.random() * afipStatuses.length)] as any,
+      afip_status: afipStatuses[Math.floor(Math.random() * afipStatuses.length)] as string,
       compliance_score: 60 + Math.random() * 40, // 60-100 range
       tax_breakdown: {
         iva_21: taxRate === 21 ? taxAmount : 0,
@@ -299,7 +296,7 @@ export function FiscalAnalyticsEnhanced({
 
     // Revenue trend analysis
     const revenueTrend = TrendAnalytics.calculateTrend(
-      activeTransactions.map((transaction, index) => ({
+      activeTransactions.map((transaction, _) => ({
         date: transaction.issue_date,
         value: transaction.total_amount
       })).slice(0, 50) // Last 50 transactions for trend
@@ -490,7 +487,7 @@ export function FiscalAnalyticsEnhanced({
         </Typography>
 
         <CardGrid columns={{ base: 1, md: 2, lg: 4 }} gap="md">
-          {analytics.taxQuadrants.map((quadrant, index) => (
+          {analytics.taxQuadrants.map((quadrant, _) => (
             <div
               key={index}
               style={{
@@ -541,7 +538,7 @@ export function FiscalAnalyticsEnhanced({
       {/* Invoice Type Analysis */}
       <Section variant="elevated" title="📄 Análisis por Tipo de Comprobante">
         <CardGrid columns={{ base: 1, md: 2, lg: 4 }} gap="md">
-          {analytics.invoiceTypeAnalysis.map((type, index) => (
+          {analytics.invoiceTypeAnalysis.map((type, _) => (
             <div
               key={index}
               style={{
@@ -616,7 +613,7 @@ export function FiscalAnalyticsEnhanced({
         </Typography>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '16px' }}>
-          {insights.map((insight, index) => (
+          {insights.map((insight, _) => (
             <div
               key={index}
               style={{

@@ -8,7 +8,7 @@
  * @breaking-change Replaces all legacy adapter patterns
  */
 
-import {
+import type {
   ISODateString,
   ISOTimeString,
   TimeSlot,
@@ -23,7 +23,7 @@ import {
   CalendarConfig
 } from '../types/DateTimeTypes';
 
-import { QueryOptions, EngineResult } from '../engine/UnifiedCalendarEngine';
+import type { QueryOptions, EngineResult } from '../engine/UnifiedCalendarEngine';
 
 // ===============================
 // ADAPTER INTERFACES

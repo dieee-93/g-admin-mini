@@ -3,7 +3,8 @@
  * Crea lazy components automáticamente basado en route mapping
  */
 
-import { lazy, ComponentType } from 'react';
+import { lazy } from 'react';
+import type { ComponentType } from 'react';
 import { routeToFileMap, routeToComponentMap } from '@/config/routeMap';
 
 import { logger } from '@/lib/logging';
@@ -112,7 +113,7 @@ export function preloadComponent(route: string): Promise<void> {
 export function preloadCriticalRoutes(): Promise<void[]> {
   const criticalRoutes = [
     '/admin/dashboard',
-    '/admin/sales', 
+    '/admin/operations/sales',
     '/admin/operations'
   ];
 

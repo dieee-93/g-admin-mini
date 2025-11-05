@@ -10,24 +10,23 @@ import {
   Alert
 } from '@/shared/ui';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
-import { 
-  ChartBarIcon, 
-  UsersIcon, 
+import {
+  ChartBarIcon,
+  UsersIcon,
   ExclamationTriangleIcon,
   TrophyIcon,
   ArrowTrendingUpIcon,
-  ArrowPathIcon,
   FireIcon,
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
-import { useState, useEffect, useMemo } from 'react';
-import { CustomerSegment, ChurnRisk, LoyaltyTier, type CustomerProfile } from '../../types';
-import { useCustomers } from '../../hooks/existing/useCustomers';  
-import { useCustomerRFM, useCustomerAnalytics, useCustomerSegmentation } from '../hooks/useCustomerRFM';
+import { useState } from 'react';
+import { CustomerSegment, ChurnRisk, LoyaltyTier } from '../../types';
+import { useCustomers } from '../../hooks/existing/useCustomers';
+import { useCustomerRFM, useCustomerAnalytics, useCustomerSegmentation } from '../../hooks/existing/useCustomerRFM';
 
 export function CustomerAnalytics() {
   const { customers, loading } = useCustomers();
-  const { rfmProfiles, loading: rfmLoading, segmentStats } = useCustomerRFM();
+  const { loading: rfmLoading, segmentStats } = useCustomerRFM();
   const { analytics, loading: analyticsLoading, getChurnRiskCustomers, getHighValueCustomers } = useCustomerAnalytics();
   const { getSegmentPerformance, getSegmentRecommendations } = useCustomerSegmentation();
   const [selectedSegment, setSelectedSegment] = useState<CustomerSegment | null>(null);
@@ -35,6 +34,9 @@ export function CustomerAnalytics() {
   // Computed analytics
   const churnRiskCustomers = getChurnRiskCustomers;
   const highValueCustomers = getHighValueCustomers;
+
+  // TODO: Implement RFM profiles visualization
+  // const rfmProfiles = useCustomerRFM().rfmProfiles;
   
   // Overall loading state
   const isLoading = loading || rfmLoading || analyticsLoading;

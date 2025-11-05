@@ -58,4 +58,4 @@ Object.defineProperty(window, 'alert', {
 })
 
 // Global test utilities
-global.mockSupabase = mockSupabase
+(global as any).mockSupabase = mockSupabase

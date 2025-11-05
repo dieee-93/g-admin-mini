@@ -7,8 +7,33 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
+import {
+  BanknotesIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  XMarkIcon,
+  CheckIcon
+} from '@heroicons/react/24/outline';
 
 import { logger } from '@/lib/logging';
+
+// Types
+interface BankingInfo {
+  consortiumStatus: string;
+  participatingBanks: string[];
+  supportedServices: string[];
+  transactionLimits: {
+    dailyLimit: number;
+    monthlyLimit: number;
+    perTransactionLimit: number;
+  };
+  fees: Record<string, string>;
+}
+
+interface ErrorResult {
+  error: string;
+}
+
 // MODO Configuration Schema
 const MODOConfigSchema = z.object({
   // API Credentials
@@ -46,14 +71,13 @@ type MODOConfig = z.infer<typeof MODOConfigSchema>;
 
 const MODOIntegration: React.FC = () => {
   const [connectionStatus, setConnectionStatus] = React.useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
-  const [bankingInfo, setBankingInfo] = React.useState<any>(null);
+  const [bankingInfo, setBankingInfo] = React.useState<BankingInfo | ErrorResult | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors, isSubmitting }
   } = useForm<MODOConfig>({
     resolver: zodResolver(MODOConfigSchema),
@@ -179,21 +203,21 @@ const MODOIntegration: React.FC = () => {
                 colorPalette="green"
                 size="sm"
               >
-                <Icon name="BanknotesIcon" />
+                <Icon as={BanknotesIcon} />
                 Probar Conexión Bancaria
               </Button>
             </Stack>
 
             {connectionStatus === 'connected' && (
               <Alert status="success">
-                <Icon name="CheckCircleIcon" />
+                <Icon as={CheckCircleIcon} />
                 Conexión exitosa con MODO Banking Consortium
               </Alert>
             )}
 
             {connectionStatus === 'error' && (
               <Alert status="error">
-                <Icon name="ExclamationTriangleIcon" />
+                <Icon as={ExclamationTriangleIcon} />
                 Error de conexión. Verifica tus credenciales MODO.
               </Alert>
             )}
@@ -427,7 +451,7 @@ const MODOIntegration: React.FC = () => {
                 <Stack gap="md">
                   {bankingInfo.error ? (
                     <Alert status="error">
-                      <Icon name="ExclamationTriangleIcon" />
+                      <Icon as={ExclamationTriangleIcon} />
                       {bankingInfo.error}
                     </Alert>
                   ) : (
@@ -460,7 +484,7 @@ const MODOIntegration: React.FC = () => {
                         <Stack gap="sm">
                           {bankingInfo.supportedServices.map((service: string, index: number) => (
                             <Stack key={index} direction="row" align="center" gap="sm">
-                              <Icon name="CheckCircleIcon" color="green.500" size="sm" />
+                              <Icon as={CheckCircleIcon} color="green.500" size="sm" />
                               <span>{service}</span>
                             </Stack>
                           ))}
@@ -511,7 +535,7 @@ const MODOIntegration: React.FC = () => {
             {/* Submit Button */}
             <Stack direction="row" gap="md" justify="end">
               <Button variant="outline" type="button">
-                <Icon name="XMarkIcon" />
+                <Icon as={XMarkIcon} />
                 Cancelar
               </Button>
               <Button
@@ -519,7 +543,7 @@ const MODOIntegration: React.FC = () => {
                 colorPalette="green"
                 loading={isSubmitting}
               >
-                <Icon name="CheckIcon" />
+                <Icon as={CheckIcon} />
                 Guardar Configuración MODO
               </Button>
             </Stack>

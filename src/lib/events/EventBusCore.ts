@@ -266,18 +266,19 @@ export class EventBus implements IEventBusV2 {
       }, { persistent: false });
       
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.initPromise = null; // Clear promise on error
-      
+
       SecurityLogger.threat('EventBus initialization failed', {
         instanceId: this.instanceId,
-        error: error.message,
-        stack: error.stack
+        error: err.message,
+        stack: err.stack
       });
-      
+
       throw new EventBusError(
-        `Failed to initialize EventBus instance ${this.instanceId}: ${error.message}`,
+        `Failed to initialize EventBus instance ${this.instanceId}: ${err.message}`,
         EventBusErrorCode.INITIALIZATION_FAILED,
-        { originalError: error, instanceId: this.instanceId }
+        { originalError: err, instanceId: this.instanceId }
       );
     }
   }
@@ -471,11 +472,12 @@ export class EventBus implements IEventBusV2 {
       });
       
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecurityLogger.threat('Error during graceful shutdown', {
         instanceId: this.instanceId,
-        error: error.message
+        error: err.message
       });
-      throw error;
+      throw err;
     }
   }
 

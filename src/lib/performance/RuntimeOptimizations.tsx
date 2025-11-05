@@ -212,6 +212,7 @@ interface PerformanceContextType {
 }
 
 const PerformanceContext = createContext<PerformanceContextType | null>(null);
+PerformanceContext.displayName = 'PerformanceContext';
 
 export function PerformanceProvider({ children }: { children: React.ReactNode }) {
   const [metrics, setMetrics] = useState<PerformanceMetrics>({

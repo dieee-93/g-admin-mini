@@ -21,13 +21,13 @@ interface GeneratedReportsTabProps {
 
 export function GeneratedReportsTab({ reports, getStatusColor }: GeneratedReportsTabProps) {
   return (
-    <VStack gap={4} align="stretch">
+    <VStack gap="4" align="stretch">
       {reports.map((report) => (
         <CardWrapper key={report.id} variant="outline">
-          <CardWrapper.Body p={4}>
+          <CardWrapper.Body p="4">
             <HStack justify="space-between" align="start">
-              <VStack align="start" gap={2} flex="1">
-                <HStack gap={2}>
+              <VStack align="start" gap="2" flex="1">
+                <HStack gap="2">
                   <Text fontSize="md" fontWeight="bold">
                     {report.templateName}
                   </Text>
@@ -40,12 +40,12 @@ export function GeneratedReportsTab({ reports, getStatusColor }: GeneratedReport
                   </Badge>
                 </HStack>
 
-                <HStack gap={4} fontSize="sm" color="gray.600">
-                  <HStack gap={1}>
+                <HStack gap="4" fontSize="sm" color="gray.600">
+                  <HStack gap="1">
                     <CalendarIcon className="w-4 h-4" />
                     <Text>{new Date(report.generatedAt).toLocaleString()}</Text>
                   </HStack>
-                  <HStack gap={1}>
+                  <HStack gap="1">
                     <ClockIcon className="w-4 h-4" />
                     <Text>{(report.executionTime / 1000).toFixed(1)}s</Text>
                   </HStack>
@@ -61,7 +61,7 @@ export function GeneratedReportsTab({ reports, getStatusColor }: GeneratedReport
                 </Text>
               </VStack>
 
-              <VStack gap={2}>
+              <VStack gap="2">
                 {report.status === 'generating' && (
                   <Progress.Root colorPalette="blue" size="sm" width="100px" indeterminate />
                 )}

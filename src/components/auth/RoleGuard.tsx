@@ -53,10 +53,10 @@ export function RoleGuard({
  */
 function AccessDenied({ reason }: { reason: string }) {
   return (
-    <Box p={8}>
+    <Box p="8">
       <CardWrapper>
-        <Stack direction="column" gap={4} p={8}>
-          <Typography variant="heading" size="6xl">🔒</Typography>
+        <Stack direction="column" gap="4" p="8">
+          <Typography variant="heading" size="4xl">🔒</Typography>
           <Typography variant="heading" size="xl" weight="bold" color="red.500">
             Acceso Denegado
           </Typography>

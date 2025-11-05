@@ -44,7 +44,7 @@ export function AuthLoadingScreen() {
   return (
     <Center minH="100vh">
       <Box textAlign="center">
-        <Spinner size="xl" color="blue.500" mb={4} />
+        <Spinner size="xl" color="blue.500" mb="4" />
         <Typography variant="body" color="gray.600">
           Cargando...
         </Typography>

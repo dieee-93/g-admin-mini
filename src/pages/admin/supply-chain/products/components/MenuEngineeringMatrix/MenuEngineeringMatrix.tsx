@@ -4,17 +4,13 @@
 import React, { useState } from 'react';
 import {
   // Design System Components
-  
+
   Stack,
   VStack,
   HStack,
   Typography,
   CardWrapper ,
   Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
   Badge,
   Button,
   Alert,
@@ -27,7 +23,6 @@ import {
   StarIcon,
   CogIcon,
   PuzzlePieceIcon,
-  TrashIcon
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
 
@@ -43,7 +38,8 @@ import type {
 
 export function MenuEngineeringMatrix() {
   // States
-  const [activeTab, setActiveTab] = useState('matrix');
+  // Tab navigation for future expansion (currently showing matrix only)
+  // const [activeTab, setActiveTab] = useState('matrix');
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory | null>(null);
 
   // Real data hooks (similar to CostAnalysisTab pattern)
@@ -141,29 +137,29 @@ export function MenuEngineeringMatrix() {
         )}
 
         {/* Main Content Tabs - Design System Pattern */}
-        <Tabs defaultValue="matrix" variant="line">
-          <TabList>
-            <Tab value="matrix">
+        <Tabs.Root defaultValue="matrix" variant="line">
+          <Tabs.List>
+            <Tabs.Trigger value="matrix">
               <Icon icon={ChartBarIcon} size="sm" />
               Matrix Analysis
-            </Tab>
-            <Tab value="categories">
+            </Tabs.Trigger>
+            <Tabs.Trigger value="categories">
               <Icon icon={StarIcon} size="sm" />
               Category Details
-            </Tab>
-            <Tab value="recommendations">
+            </Tabs.Trigger>
+            <Tabs.Trigger value="recommendations">
               <Icon icon={CogIcon} size="sm" />
               Strategic Actions
-            </Tab>
-            <Tab value="performance">
+            </Tabs.Trigger>
+            <Tabs.Trigger value="performance">
               <Icon icon={PuzzlePieceIcon} size="sm" />
               Performance Metrics
-            </Tab>
-          </TabList>
+            </Tabs.Trigger>
+          </Tabs.List>
 
-          <TabPanels>
+          
             {/* Matrix Analysis Tab */}
-            <TabPanel value="matrix">
+            <Tabs.Content value="matrix">
               <CardWrapper variant="elevated" padding="lg">
                 <CardWrapper.Header>
                   <Typography variant="title">Four-Quadrant Matrix</Typography>
@@ -191,10 +187,10 @@ export function MenuEngineeringMatrix() {
                   )}
                 </CardWrapper.Body>
               </CardWrapper>
-            </TabPanel>
+            </Tabs.Content>
 
             {/* Category Details Tab */}
-            <TabPanel value="categories">
+            <Tabs.Content value="categories">
               <VStack gap="md" align="stretch">
                 {/* Category Filters */}
                 <CardWrapper variant="outline" padding="md">
@@ -265,10 +261,10 @@ export function MenuEngineeringMatrix() {
                   </CardWrapper.Body>
                 </CardWrapper>
               </VStack>
-            </TabPanel>
+            </Tabs.Content>
 
             {/* Strategic Recommendations Tab */}
-            <TabPanel value="recommendations">
+            <Tabs.Content value="recommendations">
               <CardWrapper variant="elevated" padding="lg">
                 <CardWrapper.Header>
                   <Typography variant="title">Top Strategic Recommendations</Typography>
@@ -313,10 +309,10 @@ export function MenuEngineeringMatrix() {
                   </Stack>
                 </CardWrapper.Body>
               </CardWrapper>
-            </TabPanel>
+            </Tabs.Content>
 
             {/* Performance Metrics Tab */}
-            <TabPanel value="performance">
+            <Tabs.Content value="performance">
               <VStack gap="md" align="stretch">
                 <CardWrapper variant="elevated" padding="lg">
                   <CardWrapper.Header>
@@ -384,9 +380,9 @@ export function MenuEngineeringMatrix() {
                   </CardWrapper.Body>
                 </CardWrapper>
               </VStack>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+            </Tabs.Content>
+          
+        </Tabs.Root>
       </Stack>
     
   );

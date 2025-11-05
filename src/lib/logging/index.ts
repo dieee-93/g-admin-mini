@@ -6,3 +6,6 @@
 
 export { logger, Logger } from './Logger';
 export type { LogLevel, LogModule } from './Logger';
+
+export { ConsoleHelper } from './ConsoleHelper';
+export type { ConsoleFilterOptions } from './ConsoleHelper';

@@ -80,10 +80,11 @@ export class SecureClientManager {
       
       return newClientId;
     } catch (error) {
-      SecurityLogger.threat('Failed to get secure client ID', { 
-        error: error.message 
+      const err = error instanceof Error ? error : new Error(String(error));
+      SecurityLogger.threat('Failed to get secure client ID', {
+        error: err.message
       });
-      throw error;
+      throw err;
     }
   }
 
@@ -111,10 +112,11 @@ export class SecureClientManager {
         clientIdPrefix: clientId.substring(0, 8) + '...'
       });
     } catch (error) {
-      SecurityLogger.threat('Failed to store client ID securely', { 
-        error: error.message 
+      const err = error instanceof Error ? error : new Error(String(error));
+      SecurityLogger.threat('Failed to store client ID securely', {
+        error: err.message
       });
-      throw error;
+      throw err;
     }
   }
 
@@ -161,8 +163,9 @@ export class SecureClientManager {
 
       return secureData.id;
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecurityLogger.threat('Error retrieving client ID', { 
-        error: error.message 
+        error: err.message 
       });
       await this.clearStoredData();
       return null;
@@ -182,8 +185,9 @@ export class SecureClientManager {
 
       SecurityLogger.anomaly('Client data cleared');
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecurityLogger.threat('Failed to clear client data', { 
-        error: error.message 
+        error: err.message 
       });
     }
   }
@@ -227,10 +231,11 @@ export class SecureClientManager {
       }
       return Math.abs(hash).toString(16).padStart(8, '0');
     } catch (error) {
-      SecurityLogger.threat('Failed to generate signature', { 
-        error: error.message 
+      const err = error instanceof Error ? error : new Error(String(error));
+      SecurityLogger.threat('Failed to generate signature', {
+        error: err.message
       });
-      throw error;
+      throw err;
     }
   }
 
@@ -242,8 +247,9 @@ export class SecureClientManager {
       const expectedSignature = await this.generateSignature(data.id);
       return expectedSignature === data.signature;
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecurityLogger.threat('Signature validation failed', { 
-        error: error.message 
+        error: err.message 
       });
       return false;
     }
@@ -261,11 +267,12 @@ export class SecureClientManager {
       const serialized = JSON.stringify(data);
       sessionStorage.setItem(this.STORAGE_KEY, serialized);
     } catch (error) {
-      if (error.name === 'QuotaExceededError') {
+      const err = error instanceof Error ? error : new Error(String(error));
+      if (err.name === 'QuotaExceededError') {
         SecurityLogger.violation('SessionStorage quota exceeded');
         throw new Error('Storage quota exceeded');
       }
-      throw error;
+      throw err;
     }
   }
 
@@ -286,8 +293,9 @@ export class SecureClientManager {
       const parsed = JSON.parse(stored);
       return parsed;
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecurityLogger.violation('Failed to parse stored client data', { 
-        error: error.message 
+        error: err.message 
       });
       return null;
     }
@@ -381,8 +389,9 @@ export class SecureClientManager {
 
       return { migrated: false, legacy: null };
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecurityLogger.threat('Error during legacy storage migration', { 
-        error: error.message 
+        error: err.message 
       });
       return { migrated: false, legacy: null };
     }

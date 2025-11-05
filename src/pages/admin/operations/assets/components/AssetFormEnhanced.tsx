@@ -7,6 +7,10 @@ import {
   Alert, Badge
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import {
+  ChartBarIcon, CurrencyDollarIcon, EyeIcon, HeartIcon, PlusIcon, QrCodeIcon, ArrowTrendingUpIcon
+} from '@heroicons/react/24/outline';
+
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
 import { logger } from '@/lib/logging';
@@ -225,25 +229,25 @@ export const AssetFormEnhanced: React.FC = () => {
                 title="ROI Anual"
                 value={`${assetMetrics.roi.toFixed(1)}%`}
                 change={assetMetrics.roi > 15 ? 15 : assetMetrics.roi > 8 ? 5 : -5}
-                icon="TrendingUpIcon"
+                icon={ArrowTrendingUpIcon}
               />
               <MetricCard
                 title="Valor Depreciado"
                 value={`$${assetMetrics.depreciatedValue.toLocaleString()}`}
                 change={-financial.depreciationRate}
-                icon="CurrencyDollarIcon"
+                icon={CurrencyDollarIcon}
               />
               <MetricCard
                 title="Ingresos Anuales"
                 value={`$${assetMetrics.annualRentalRevenue.toLocaleString()}`}
                 change={condition.utilizationScore > 80 ? 20 : condition.utilizationScore > 60 ? 10 : 0}
-                icon="ChartBarIcon"
+                icon={ChartBarIcon}
               />
               <MetricCard
                 title="Salud del Asset"
                 value={`${assetMetrics.assetHealth}/100`}
                 change={assetMetrics.assetHealth > 80 ? 5 : assetMetrics.assetHealth > 60 ? 0 : -10}
-                icon="HeartIcon"
+                icon={HeartIcon}
               />
             </CardGrid>
 
@@ -736,15 +740,15 @@ export const AssetFormEnhanced: React.FC = () => {
               loading={isSubmitting}
               size="lg"
             >
-              <Icon name="PlusIcon" />
+              <Icon as={PlusIcon} />
               Crear Asset
             </Button>
             <Button variant="outline" size="lg">
-              <Icon name="EyeIcon" />
+              <Icon as={EyeIcon} />
               Vista Previa
             </Button>
             <Button variant="outline" size="lg">
-              <Icon name="QrCodeIcon" />
+              <Icon as={QrCodeIcon} />
               Generar QR
             </Button>
           </Stack>

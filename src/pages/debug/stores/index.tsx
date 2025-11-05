@@ -8,9 +8,9 @@ import {
   ContentLayout,
   Section,
   Tabs,
-  TabList,
-  Tab,
-  TabPanel,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
   Stack,
   Typography,
   Button,
@@ -190,26 +190,26 @@ export default function StoreInspectorPage() {
             variant="line"
             colorPalette="green"
           >
-            <TabList>
+            <TabsList>
               {tabs.map(tab => (
-                <Tab
+                <TabsTrigger
                   key={tab.id}
                   value={tab.id}
                   icon={<span>{tab.icon}</span>}
                 >
                   {tab.label}
-                </Tab>
+                </TabsTrigger>
               ))}
-            </TabList>
+            </TabsList>
 
             <div style={{ marginTop: '20px' }}>
-              <TabPanel value="business-capabilities" padding="md">
+              <TabsContent value="business-capabilities" padding="md">
                 <Stack spacing="md">
-                  <Typography variant="h6">Business Capabilities Store</Typography>
+                  <Typography variant="subtitle">Business Capabilities Store</Typography>
 
                   <CardWrapper variant="elevated">
                     <CardWrapper.Header>
-                      <Typography variant="h6">Store State</Typography>
+                      <Typography variant="subtitle">Store State</Typography>
                     </CardWrapper.Header>
                     <CardWrapper.Body>
                       <Stack spacing="sm">
@@ -238,7 +238,7 @@ export default function StoreInspectorPage() {
 
                   <CardWrapper variant="elevated">
                     <CardWrapper.Header>
-                      <Typography variant="h6">Raw Store Data</Typography>
+                      <Typography variant="subtitle">Raw Store Data</Typography>
                     </CardWrapper.Header>
                     <CardWrapper.Body>
                       <Box
@@ -258,12 +258,12 @@ export default function StoreInspectorPage() {
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="localStorage" padding="md">
+              <TabsContent value="localStorage" padding="md">
                 <Stack spacing="md">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="h6">LocalStorage ({filteredLocalStorage.length} entries)</Typography>
+                    <Typography variant="subtitle">LocalStorage ({filteredLocalStorage.length} entries)</Typography>
                     <Badge colorPalette="blue">
                       {Math.round(JSON.stringify(localStorage).length / 1024)} KB total
                     </Badge>
@@ -311,12 +311,12 @@ export default function StoreInspectorPage() {
                     </CardWrapper>
                   ))}
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="sessionStorage" padding="md">
+              <TabsContent value="sessionStorage" padding="md">
                 <Stack spacing="md">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="h6">SessionStorage ({filteredSessionStorage.length} entries)</Typography>
+                    <Typography variant="subtitle">SessionStorage ({filteredSessionStorage.length} entries)</Typography>
                     <Badge colorPalette="purple">
                       {Math.round(JSON.stringify(sessionStorage).length / 1024)} KB total
                     </Badge>
@@ -364,11 +364,11 @@ export default function StoreInspectorPage() {
                     </CardWrapper>
                   ))}
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="live-state" padding="md">
+              <TabsContent value="live-state" padding="md">
                 <Stack spacing="md">
-                  <Typography variant="h6">Live State Monitor</Typography>
+                  <Typography variant="subtitle">Live State Monitor</Typography>
                   <Typography variant="body" style={{ color: '#666' }}>
                     Real-time state updates will be displayed here.
                     This will show all Zustand store changes as they happen.
@@ -382,7 +382,7 @@ export default function StoreInspectorPage() {
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
-              </TabPanel>
+              </TabsContent>
             </div>
           </Tabs>
         </Stack>

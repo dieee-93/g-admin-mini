@@ -44,7 +44,7 @@ export const SalesPerformanceInsights: React.FC = () => {
           <ExclamationTriangleIcon className="w-5 h-5" />
         </Alert.Indicator>
         <Alert.Description>{error}</Alert.Description>
-        <Button onClick={loadPerformanceInsights} variant="outline" size="sm" ml={4}>
+        <Button onClick={loadPerformanceInsights} variant="outline" size="sm" ml="4">
           Retry
         </Button>
       </Alert.Root>
@@ -53,7 +53,7 @@ export const SalesPerformanceInsights: React.FC = () => {
 
   return (
     <Box>
-      <VStack align="stretch" gap={6}>
+      <VStack align="stretch" gap="6">
         <PerformanceHeader
           performance={performance}
           loading={loading}
@@ -61,9 +61,9 @@ export const SalesPerformanceInsights: React.FC = () => {
         />
 
         {loading && !performance ? (
-          <VStack gap={4}>
+          <VStack gap="4">
             <Skeleton height="200px" />
-            <Grid templateColumns="repeat(4, 1fr)" gap={4}>
+            <Grid templateColumns="repeat(4, 1fr)" gap="4">
               <Skeleton height="120px" />
               <Skeleton height="120px" />
               <Skeleton height="120px" />

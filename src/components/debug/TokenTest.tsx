@@ -67,13 +67,13 @@ export const TokenTest: React.FC = () => {
 
           {/* Test brand colors */}
           <Stack direction="row" gap="sm">
-            <Button colorPalette="brand" variant="solid">
+            <Button colorPalette="purple" variant="solid">
               Brand Solid
             </Button>
-            <Button colorPalette="brand" variant="outline">
+            <Button colorPalette="purple" variant="outline">
               Brand Outline
             </Button>
-            <Button colorPalette="brand" variant="ghost">
+            <Button colorPalette="purple" variant="ghost">
               Brand Ghost
             </Button>
           </Stack>

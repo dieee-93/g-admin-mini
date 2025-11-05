@@ -4,6 +4,7 @@
 import { EventBus } from '@/lib/events';
 import { TaxDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { logger } from '@/lib/logging';
 
 // ============================================================================
 // TAX RATES AND CONSTANTS
@@ -110,7 +111,7 @@ class TaxCalculationService {
     
     // ENHANCED: Validate inputs for production safety
     if (!DecimalUtils.isFinanciallyValid(amount)) {
-      console.warn('TaxCalculationService: Invalid amount provided:', amount);
+      logger.warn('TaxCalculationService', 'TaxCalculationService: Invalid amount provided:', amount);
       return this.getZeroTaxResult();
     }
     
@@ -169,7 +170,7 @@ class TaxCalculationService {
       }
     };
     } catch (error: unknown) {
-      console.error('TaxCalculationService.calculateTaxesForAmount:', error instanceof Error ? error.message : error);
+      logger.error('TaxCalculationService', 'TaxCalculationService.calculateTaxesForAmount:', error instanceof Error ? error.message : error);
       return this.getZeroTaxResult();
     }
   }
@@ -210,7 +211,7 @@ class TaxCalculationService {
       try {
         // ENHANCED: Validate each item's inputs
         if (!DecimalUtils.isFinanciallyValid(item.quantity) || !DecimalUtils.isFinanciallyValid(item.unitPrice)) {
-          console.warn(`TaxCalculationService: Invalid item data:`, item);
+          logger.warn('TaxCalculationService', `TaxCalculationService: Invalid item data:`, item);
           continue; // Skip invalid items
         }
         
@@ -250,7 +251,7 @@ class TaxCalculationService {
         totalIvaAmountDec = totalIvaAmountDec.plus(itemIvaAmountDec);
         totalIngresosBrutosAmountDec = totalIngresosBrutosAmountDec.plus(itemIngresosBrutosAmountDec);
       } catch (error: unknown) {
-        console.error(`TaxCalculationService: Error processing item ${item.productId}:`, error.message);
+        logger.error('TaxCalculationService', `TaxCalculationService: Error processing item ${item.productId}:`, error.message);
         // Continue processing other items
       }
     }
@@ -421,6 +422,46 @@ export function getTaxAmount(totalAmount: number): number {
 export function getSubtotal(totalAmount: number): number {
   const result = taxService.reverseTaxCalculation(totalAmount);
   return result.subtotal;
+}
+
+/**
+ * Calculate total taxes (alias for calculateTaxes)
+ * @param amount - Base amount
+ * @param config - Tax configuration
+ * @returns Full tax calculation result
+ */
+export function calculateTotalTax(amount: number, config?: Partial<TaxConfiguration>): TaxCalculationResult {
+  return calculateTaxes(amount, config);
+}
+
+/**
+ * Calculate only IVA (Value Added Tax)
+ * @param amount - Base amount
+ * @param ivaRate - IVA rate (default: 21%)
+ * @returns Object with tax_amount property
+ */
+export function calculateIVA(amount: number, ivaRate: number = TAX_RATES.IVA.GENERAL): { tax_amount: number } {
+  const taxAmount = new TaxDecimal(amount)
+    .times(ivaRate)
+    .toDecimalPlaces(2, TaxDecimal.ROUND_HALF_UP)
+    .toNumber();
+
+  return { tax_amount: taxAmount };
+}
+
+/**
+ * Calculate only Ingresos Brutos (Gross Income Tax)
+ * @param amount - Base amount
+ * @param rate - Ingresos Brutos rate
+ * @returns Object with tax_amount property
+ */
+export function calculateIngresosBrutos(amount: number, rate: number): { tax_amount: number } {
+  const taxAmount = new TaxDecimal(amount)
+    .times(rate)
+    .toDecimalPlaces(2, TaxDecimal.ROUND_HALF_UP)
+    .toNumber();
+
+  return { tax_amount: taxAmount };
 }
 
 export { TaxCalculationService };

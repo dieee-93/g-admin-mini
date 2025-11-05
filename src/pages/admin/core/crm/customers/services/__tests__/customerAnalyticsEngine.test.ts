@@ -1,6 +1,7 @@
 // ============================================================================
 // CUSTOMER ANALYTICS ENGINE - Comprehensive Test Suite
 // ============================================================================
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CustomerAnalyticsEngine } from '../customerAnalyticsEngine';

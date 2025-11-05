@@ -13,9 +13,9 @@ import {
   Badge,
   Button,
   Tabs,
-  TabList,
-  Tab,
-  TabPanel,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
   Alert,
   Box
 } from '@/shared/ui';
@@ -147,28 +147,28 @@ export default function PerformanceDebugPage() {
             variant="line"
             colorPalette="orange"
           >
-            <TabList>
+            <TabsList>
               {tabs.map(tab => (
-                <Tab
+                <TabsTrigger
                   key={tab.id}
                   value={tab.id}
                   icon={<span>{tab.icon}</span>}
                 >
                   {tab.label}
-                </Tab>
+                </TabsTrigger>
               ))}
-            </TabList>
+            </TabsList>
 
             <div style={{ marginTop: '20px' }}>
-              <TabPanel value="real-time" padding="md">
+              <TabsContent value="real-time" padding="md">
                 <Stack spacing="md">
-                  <Typography variant="h6">Real-time Performance Metrics</Typography>
+                  <Typography variant="subtitle">Real-time Performance Metrics</Typography>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                     <CardWrapper variant="elevated">
                       <CardWrapper.Header>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Typography variant="h6">FPS</Typography>
+                          <Typography variant="subtitle">FPS</Typography>
                           <Badge colorPalette={getPerformanceColor(60 - metrics.fps, { good: 10, warning: 20 })}>
                             {metrics.fps > 0 ? 'LIVE' : 'STOPPED'}
                           </Badge>
@@ -189,7 +189,7 @@ export default function PerformanceDebugPage() {
 
                     <CardWrapper variant="elevated">
                       <CardWrapper.Header>
-                        <Typography variant="h6">Memory Usage</Typography>
+                        <Typography variant="subtitle">Memory Usage</Typography>
                       </CardWrapper.Header>
                       <CardWrapper.Body style={{ textAlign: 'center' }}>
                         <Typography variant="h2" style={{
@@ -207,7 +207,7 @@ export default function PerformanceDebugPage() {
 
                     <CardWrapper variant="elevated">
                       <CardWrapper.Header>
-                        <Typography variant="h6">Load Time</Typography>
+                        <Typography variant="subtitle">Load Time</Typography>
                       </CardWrapper.Header>
                       <CardWrapper.Body style={{ textAlign: 'center' }}>
                         <Typography variant="h2" style={{
@@ -224,7 +224,7 @@ export default function PerformanceDebugPage() {
 
                     <CardWrapper variant="elevated">
                       <CardWrapper.Header>
-                        <Typography variant="h6">Re-renders</Typography>
+                        <Typography variant="subtitle">Re-renders</Typography>
                       </CardWrapper.Header>
                       <CardWrapper.Body style={{ textAlign: 'center' }}>
                         <Typography variant="h2" style={{ color: '#3b82f6', margin: '0 0 4px 0' }}>
@@ -240,7 +240,7 @@ export default function PerformanceDebugPage() {
                   {/* Performance Tips */}
                   <CardWrapper variant="elevated">
                     <CardWrapper.Header>
-                      <Typography variant="h6">Performance Tips</Typography>
+                      <Typography variant="subtitle">Performance Tips</Typography>
                     </CardWrapper.Header>
                     <CardWrapper.Body>
                       <Stack spacing="sm">
@@ -263,15 +263,15 @@ export default function PerformanceDebugPage() {
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="bundle" padding="md">
+              <TabsContent value="bundle" padding="md">
                 <Stack spacing="md">
-                  <Typography variant="h6">Bundle Analysis</Typography>
+                  <Typography variant="subtitle">Bundle Analysis</Typography>
 
                   <CardWrapper variant="elevated">
                     <CardWrapper.Header>
-                      <Typography variant="h6">Bundle Information</Typography>
+                      <Typography variant="subtitle">Bundle Information</Typography>
                     </CardWrapper.Header>
                     <CardWrapper.Body>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
@@ -307,11 +307,11 @@ export default function PerformanceDebugPage() {
                     For detailed bundle analysis, run `npm run analyze` to generate a webpack bundle report.
                   </Alert>
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="memory" padding="md">
+              <TabsContent value="memory" padding="md">
                 <Stack spacing="md">
-                  <Typography variant="h6">Memory Usage Analysis</Typography>
+                  <Typography variant="subtitle">Memory Usage Analysis</Typography>
 
                   <CardWrapper variant="elevated">
                     <CardWrapper.Body>
@@ -322,11 +322,11 @@ export default function PerformanceDebugPage() {
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="network" padding="md">
+              <TabsContent value="network" padding="md">
                 <Stack spacing="md">
-                  <Typography variant="h6">Network Performance</Typography>
+                  <Typography variant="subtitle">Network Performance</Typography>
 
                   <CardWrapper variant="elevated">
                     <CardWrapper.Body>
@@ -337,7 +337,7 @@ export default function PerformanceDebugPage() {
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
-              </TabPanel>
+              </TabsContent>
             </div>
           </Tabs>
 

@@ -126,10 +126,10 @@ export function LoginPageNew() {
         animationName={{ _open: "scale-fade-in", _closed: "scale-fade-out" }}
         animationDuration="moderate"
       >
-        <CardWrapper variant="elevated" 
+        <CardWrapper variant="elevated"
           padding="lg"
-          maxW="md" 
-          w="full"
+          maxW="md"
+          width="full"
         >
             <CardWrapper.Header>
               <VStack gap="lg" textAlign="center">
@@ -234,13 +234,11 @@ export function LoginPageNew() {
               
                   <Button
                     type="submit"
-                    w="full"
                     size="lg"
                     variant="solid"
-                    colorPalette="brand"
+                    colorPalette="purple"
                     disabled={isLoading || !email || !password}
                     loading={isLoading}
-                    loadingText="Iniciando sesión..."
                   >
                     <HStack gap="sm">
                       <ShieldCheckIcon style={{ width: '16px', height: '16px' }} />

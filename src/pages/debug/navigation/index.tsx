@@ -12,14 +12,14 @@ import {
   Badge,
   Button,
   Tabs,
-  TabList,
-  Tab,
-  TabPanel,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
   InputField,
   Box,
   CardWrapper
 } from '@/shared/ui';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationState, useNavigationLayout, useNavigationActions } from '@/contexts/NavigationContext';
 import { useCapabilities } from '@/store/capabilityStore';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -29,10 +29,16 @@ export default function NavigationDebugPage() {
   const [activeTab, setActiveTab] = useState<NavTab>('current-route');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const navigation = useNavigation();
+  // ✅ Use specialized hooks for debugging
+  const navState = useNavigationState();
+  const navLayout = useNavigationLayout();
+  const navActions = useNavigationActions();
   const capabilities = useCapabilities();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Combine for easier access in debug view
+  const navigation = { ...navState, ...navLayout, ...navActions };
 
   const tabs = [
     { id: 'current-route' as NavTab, label: 'Current Route', icon: '📍' },
@@ -143,25 +149,25 @@ export default function NavigationDebugPage() {
             variant="line"
             colorPalette="blue"
           >
-            <TabList>
+            <TabsList>
               {tabs.map(tab => (
-                <Tab
+                <TabsTrigger
                   key={tab.id}
                   value={tab.id}
                 >
                   <span style={{ marginRight: '8px' }}>{tab.icon}</span>
                   {tab.label}
-                </Tab>
+                </TabsTrigger>
               ))}
-            </TabList>
+            </TabsList>
 
-              <TabPanel value="current-route" padding="md" style={{ marginTop: '20px' }}>
+              <TabsContent value="current-route" padding="md" style={{ marginTop: '20px' }}>
                 <Stack spacing="md">
-                  <Typography variant="h6">Current Route Information</Typography>
+                  <Typography variant="subtitle">Current Route Information</Typography>
 
                   <CardWrapper variant="elevated">
                     <CardWrapper.Header>
-                      <Typography variant="h6">Route Details</Typography>
+                      <Typography variant="subtitle">Route Details</Typography>
                     </CardWrapper.Header>
                     <CardWrapper.Body>
                       <Stack spacing="sm">
@@ -199,7 +205,7 @@ export default function NavigationDebugPage() {
 
                   <CardWrapper variant="elevated">
                     <CardWrapper.Header>
-                      <Typography variant="h6">Navigation State</Typography>
+                      <Typography variant="subtitle">Navigation State</Typography>
                     </CardWrapper.Header>
                     <CardWrapper.Body>
                       <Stack spacing="sm">
@@ -226,11 +232,11 @@ export default function NavigationDebugPage() {
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="modules" padding="md" style={{ marginTop: '20px' }}>
+              <TabsContent value="modules" padding="md" style={{ marginTop: '20px' }}>
                 <Stack spacing="md">
-                  <Typography variant="h6">Available Modules ({filteredModules.length})</Typography>
+                  <Typography variant="subtitle">Available Modules ({filteredModules.length})</Typography>
 
                   {filteredModules.map(module => (
                     <CardWrapper key={module.id} variant="elevated">
@@ -278,15 +284,15 @@ export default function NavigationDebugPage() {
                     </CardWrapper>
                   ))}
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="capabilities" padding="md" style={{ marginTop: '20px' }}>
+              <TabsContent value="capabilities" padding="md" style={{ marginTop: '20px' }}>
                 <Stack spacing="md">
-                  <Typography variant="h6">Navigation Capabilities</Typography>
+                  <Typography variant="subtitle">Navigation Capabilities</Typography>
 
                   <CardWrapper variant="elevated">
                     <CardWrapper.Header>
-                      <Typography variant="h6">Capability System Status</Typography>
+                      <Typography variant="subtitle">Capability System Status</Typography>
                     </CardWrapper.Header>
                     <CardWrapper.Body>
                       <Stack spacing="sm">
@@ -316,7 +322,7 @@ export default function NavigationDebugPage() {
 
                   <CardWrapper variant="elevated">
                     <CardWrapper.Header>
-                      <Typography variant="h6">Module Capability Check</Typography>
+                      <Typography variant="subtitle">Module Capability Check</Typography>
                     </CardWrapper.Header>
                     <CardWrapper.Body>
                       <Typography variant="body" style={{ fontSize: '12px', marginBottom: '8px' }}>
@@ -347,12 +353,12 @@ export default function NavigationDebugPage() {
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="routing-tree" padding="md" style={{ marginTop: '20px' }}>
+              <TabsContent value="routing-tree" padding="md" style={{ marginTop: '20px' }}>
                 <Stack spacing="md">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-                    <Typography variant="h6">Application Route Tree</Typography>
+                    <Typography variant="subtitle">Application Route Tree</Typography>
                     <Badge colorPalette="blue" size="lg">
                       Total: {filteredRoutes.length}
                     </Badge>
@@ -417,7 +423,7 @@ export default function NavigationDebugPage() {
                     </CardWrapper>
                   ))}
                 </Stack>
-              </TabPanel>
+              </TabsContent>
           </Tabs>
         </Stack>
       </Section>

@@ -8,7 +8,7 @@
  * @breaking-change Replaces all legacy date utility functions
  */
 
-import {
+import type {
   ISODateString,
   ISOTimeString,
   ISODateTimeString,
@@ -18,7 +18,9 @@ import {
   Timestamp,
   ValidationResult,
   ConflictResult,
-  AvailabilityResult,
+  AvailabilityResult
+} from '../types/DateTimeTypes';
+import {
   isISODateString,
   isISOTimeString,
   isISODateTimeString,

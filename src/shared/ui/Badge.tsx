@@ -81,7 +81,7 @@ export function Badge({
 }: BadgeProps) {
 
   const badgeContent = (
-    <HStack gap={1} align="center">
+    <HStack gap="1" align="center">
       {dot && (
         <Box
           width="6px"

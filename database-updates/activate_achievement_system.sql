@@ -1,1 +1,0 @@
--- Ejecuta este SQL en tu consola de Supabase para activar el sistema de logros

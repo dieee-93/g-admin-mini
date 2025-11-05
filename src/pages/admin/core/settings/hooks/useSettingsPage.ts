@@ -8,7 +8,7 @@ import {
   UserGroupIcon,
   LinkIcon
 } from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 import { useSettingsAutoSave } from './useAutoSave';
 import { logger } from '@/lib/logging';
@@ -48,32 +48,49 @@ export function useSettingsPage() {
   const autoSave = useSettingsAutoSave(settingsData);
   
   // �🚀 Configuración de navegación global
-  const { setQuickActions } = useNavigation();
+  const { setQuickActions } = useNavigationActions();
 
   // 🎯 Inicialización del módulo
   useEffect(() => {
     initializeConfiguration();
     setupQuickActions();
     return () => cleanup();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const initializeConfiguration = async () => {
+  // ⏱️ Timeout de 10 segundos para loading
+  useEffect(() => {
+    if (!isLoading) return;
+
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        setError('Timeout al cargar configuración. Por favor, recarga la página.');
+        setIsLoading(false);
+        logger.error('App', 'Settings page loading timeout after 10 seconds');
+      }
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
+
+  const initializeConfiguration = useCallback(async () => {
     try {
       setIsLoading(true);
-      
+
       // Simulación de carga de configuración
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // Reportar carga exitosa
       ModuleEventUtils.system.moduleLoaded('settings');
-      
-    } catch (error: any) {
-      setError(error.message);
-      ModuleEventUtils.system.moduleError('settings', error.message);
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      setError(errorMessage);
+      ModuleEventUtils.system.moduleError('settings', errorMessage);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const setupQuickActions = useCallback(() => {
     const quickActions = [
@@ -87,6 +104,7 @@ export function useSettingsPage() {
     ];
 
     setQuickActions(quickActions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Métricas del dashboard de configuración
@@ -134,6 +152,11 @@ export function useSettingsPage() {
     // TODO: Implementar lógica de reset
   }, []);
 
+  const handleRetry = useCallback(() => {
+    setError(null);
+    initializeConfiguration();
+  }, [initializeConfiguration]);
+
   const cleanup = useCallback(() => {
     setQuickActions([]);
   }, [setQuickActions]);
@@ -168,6 +191,8 @@ export function useSettingsPage() {
       businessProfile: { ...prev.businessProfile, ...updates }
     }));
     setIsDirty(true);
+    // We don't include settingsData in deps because we use prev => pattern
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateFiscalConfig = useCallback((updates: Partial<typeof settingsData.fiscalConfig>) => {
@@ -176,6 +201,8 @@ export function useSettingsPage() {
       fiscalConfig: { ...prev.fiscalConfig, ...updates }
     }));
     setIsDirty(true);
+    // We don't include settingsData in deps because we use prev => pattern
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateSystemConfig = useCallback((updates: Partial<typeof settingsData.systemConfig>) => {
@@ -184,6 +211,8 @@ export function useSettingsPage() {
       systemConfig: { ...prev.systemConfig, ...updates }
     }));
     setIsDirty(true);
+    // We don't include settingsData in deps because we use prev => pattern
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -206,6 +235,7 @@ export function useSettingsPage() {
     handlers: {
       handleSave,
       handleReset,
+      handleRetry,
       handleSaveSettings: handleSave, // Alias para compatibilidad
       openSearch,
       closeSearch,

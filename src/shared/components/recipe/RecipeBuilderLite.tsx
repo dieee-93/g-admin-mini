@@ -22,7 +22,7 @@ import {
   PlusIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
-import { useNavigation } from '../../../contexts/NavigationContext';
+import { useNavigationActions } from '../../../contexts/NavigationContext';
 import { recipeService, type Recipe, type RecipeIngredient } from '../../../services/recipe';
 import { MaterialSelector } from '../MaterialSelector';
 import type { MaterialItem, MeasurableItem, CountableItem } from '../../../modules/materials/types';
@@ -44,7 +44,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
   context,
   className
 }) => {
-  const { navigate } = useNavigation();
+  const { navigate } = useNavigationActions();
   const [recipe, setRecipe] = useState<Partial<Recipe>>(() => 
     recipeService.getRecipeTemplate(mode)
   );
@@ -327,7 +327,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
             <Stack gap="4">
               <Flex gap="4">
                 <Box flex="2">
-                  <Text fontSize="sm" fontWeight="medium" mb={1}>
+                  <Text fontSize="sm" fontWeight="medium" mb="1">
                     Nombre de la receta
                   </Text>
                   <Input
@@ -342,7 +342,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
                 </Box>
                 
                 <Box flex="1">
-                  <Text fontSize="sm" fontWeight="medium" mb={1}>
+                  <Text fontSize="sm" fontWeight="medium" mb="1">
                     Porciones (calculado automáticamente)
                   </Text>
                   <Box
@@ -364,7 +364,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
             
             {/* Instructions Field */}
             <Box>
-              <Text fontSize="sm" fontWeight="medium" mb={1}>
+              <Text fontSize="sm" fontWeight="medium" mb="1">
                 Instrucciones de preparación
               </Text>
               <Textarea
@@ -454,7 +454,7 @@ export const RecipeBuilderLite: React.FC<RecipeBuilderLiteProps> = ({
             {/* Cost Summary */}
             {calculations && (
               <CardWrapper variant="subtle" bg={mode === 'product' ? 'blue.50' : 'green.50'}>
-                <CardWrapper.Body p={3}>
+                <CardWrapper.Body p="3">
                   <Flex justify="space-between">
                     <Stack gap="0">
                       <Text fontSize="sm" color="gray.600">

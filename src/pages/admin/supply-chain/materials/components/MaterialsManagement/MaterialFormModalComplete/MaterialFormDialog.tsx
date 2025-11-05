@@ -3,11 +3,12 @@ import {
   Button,
   Container,
   Alert,
-  Modal,
   Stack,
-  Typography
+  Dialog,
+  Flex,
+  Text,
+  Progress
 } from '@/shared/ui';
-import { Badge, Dialog, Flex, Text, Progress } from '@chakra-ui/react';
 import {
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';

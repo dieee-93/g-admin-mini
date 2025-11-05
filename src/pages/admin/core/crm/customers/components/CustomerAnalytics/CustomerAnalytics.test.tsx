@@ -8,11 +8,7 @@ import { CustomerSegment, ChurnRisk, LoyaltyTier } from '../../types'
 import { Provider } from '@/shared/ui/provider'
 import { useThemeStore } from '@/store/themeStore'
 
-// Define mock functions globally to be used in tests
-const mockUseCustomers = vi.fn();
-const mockUseCustomerRFM = vi.fn();
-const mockUseCustomerAnalytics = vi.fn();
-const mockUseCustomerSegmentation = vi.fn();
+// Mock functions will be configured in individual tests as needed
 
 vi.mock('../hooks/useCustomers', () => ({
   useCustomers: vi.fn(),

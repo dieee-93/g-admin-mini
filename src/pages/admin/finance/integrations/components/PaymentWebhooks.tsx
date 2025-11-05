@@ -3,6 +3,10 @@ import {
   ContentLayout, Section, Stack, Button, Badge, Alert, Tabs
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import {
+  ArrowPathIcon, BanknotesIcon, BoltIcon, ChartBarIcon, CogIcon, CreditCardIcon, DocumentTextIcon, EyeIcon, InformationCircleIcon, PlayIcon, QrCodeIcon, StopIcon
+} from '@heroicons/react/24/outline';
+
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
 import { logger } from '@/lib/logging';
@@ -12,15 +16,23 @@ interface WebhookEvent {
   event: string;
   timestamp: string;
   status: 'pending' | 'processed' | 'failed' | 'retrying';
-  payload: any;
+  payload: Record<string, unknown>;
   attempts: number;
   lastError?: string;
+}
+
+interface SystemStatus {
+  isActive: boolean;
+  processingQueue: number;
+  totalProcessed: number;
+  failureRate: number;
+  avgProcessingTime: string;
 }
 
 const PaymentWebhooks: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState<'dashboard' | 'events' | 'config' | 'logs'>('dashboard');
   const [webhookEvents, setWebhookEvents] = React.useState<WebhookEvent[]>([]);
-  const [systemStatus, setSystemStatus] = React.useState({
+  const [systemStatus, setSystemStatus] = React.useState<SystemStatus>({
     isActive: true,
     processingQueue: 0,
     totalProcessed: 1247,
@@ -119,25 +131,6 @@ const PaymentWebhooks: React.FC = () => {
     }, 2000);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'processed': return 'green';
-      case 'pending': return 'blue';
-      case 'retrying': return 'orange';
-      case 'failed': return 'red';
-      default: return 'gray';
-    }
-  };
-
-  const getProviderIcon = (provider: string) => {
-    switch (provider) {
-      case 'mercadopago': return 'CreditCardIcon';
-      case 'modo': return 'BanknotesIcon';
-      case 'transferencia3': return 'QrCodeIcon';
-      default: return 'BoltIcon';
-    }
-  };
-
   const renderTabContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -173,7 +166,7 @@ const PaymentWebhooks: React.FC = () => {
                 variant="outline"
                 size="sm"
               >
-                <Icon name={systemStatus.isActive ? 'StopIcon' : 'PlayIcon'} />
+                <Icon as={systemStatus.isActive ? StopIcon : PlayIcon} />
                 {systemStatus.isActive ? 'Detener' : 'Activar'}
               </Button>
 
@@ -182,7 +175,7 @@ const PaymentWebhooks: React.FC = () => {
                 variant="outline"
                 size="sm"
               >
-                <Icon name="ArrowPathIcon" />
+                <Icon as={ArrowPathIcon} />
                 Refrescar
               </Button>
             </Stack>
@@ -204,22 +197,22 @@ const PaymentWebhooks: React.FC = () => {
           </Stack>
         </Section>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'dashboard' | 'events' | 'config' | 'logs')}>
           <Tabs.List>
             <Tabs.Trigger value="dashboard">
-              <Icon name="ChartBarIcon" />
+              <Icon as={ChartBarIcon} />
               Dashboard
             </Tabs.Trigger>
             <Tabs.Trigger value="events">
-              <Icon name="BoltIcon" />
+              <Icon as={BoltIcon} />
               Eventos
             </Tabs.Trigger>
             <Tabs.Trigger value="config">
-              <Icon name="CogIcon" />
+              <Icon as={CogIcon} />
               Configuración
             </Tabs.Trigger>
             <Tabs.Trigger value="logs">
-              <Icon name="DocumentTextIcon" />
+              <Icon as={DocumentTextIcon} />
               Logs
             </Tabs.Trigger>
           </Tabs.List>
@@ -234,7 +227,7 @@ const PaymentWebhooks: React.FC = () => {
 };
 
 // Dashboard component
-const WebhookDashboard: React.FC<{ systemStatus: any }> = ({ systemStatus }) => {
+const WebhookDashboard: React.FC<{ systemStatus: SystemStatus }> = ({ systemStatus }) => {
   return (
     <Stack gap="lg">
       <Section title="Métricas del Sistema" variant="elevated">
@@ -273,7 +266,7 @@ const WebhookDashboard: React.FC<{ systemStatus: any }> = ({ systemStatus }) => 
           <Stack direction="row" gap="md">
             <Stack flex="1" padding="md" border="1px solid" borderColor="blue.200" borderRadius="md" bg="blue.50">
               <Stack direction="row" align="center" gap="sm">
-                <Icon name="CreditCardIcon" color="blue.500" />
+                <Icon as={CreditCardIcon} color="blue.500" />
                 <h4>MercadoPago</h4>
               </Stack>
               <p>✅ Conectado y activo</p>
@@ -282,7 +275,7 @@ const WebhookDashboard: React.FC<{ systemStatus: any }> = ({ systemStatus }) => 
             </Stack>
             <Stack flex="1" padding="md" border="1px solid" borderColor="green.200" borderRadius="md" bg="green.50">
               <Stack direction="row" align="center" gap="sm">
-                <Icon name="BanknotesIcon" color="green.500" />
+                <Icon as={BanknotesIcon} color="green.500" />
                 <h4>MODO</h4>
               </Stack>
               <p>✅ Conectado y activo</p>
@@ -291,7 +284,7 @@ const WebhookDashboard: React.FC<{ systemStatus: any }> = ({ systemStatus }) => 
             </Stack>
             <Stack flex="1" padding="md" border="1px solid" borderColor="purple.200" borderRadius="md" bg="purple.50">
               <Stack direction="row" align="center" gap="sm">
-                <Icon name="QrCodeIcon" color="purple.500" />
+                <Icon as={QrCodeIcon} color="purple.500" />
                 <h4>Transferencia 3.0</h4>
               </Stack>
               <p>✅ Conectado y activo</p>
@@ -316,10 +309,29 @@ const WebhookDashboard: React.FC<{ systemStatus: any }> = ({ systemStatus }) => 
 
 // Events List component
 const WebhookEventsList: React.FC<{ events: WebhookEvent[], onRetry: (id: string) => void }> = ({ events, onRetry }) => {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'processed': return 'green';
+      case 'pending': return 'blue';
+      case 'retrying': return 'orange';
+      case 'failed': return 'red';
+      default: return 'gray';
+    }
+  };
+
+  const getProviderIcon = (provider: string) => {
+    switch (provider) {
+      case 'mercadopago': return CreditCardIcon;
+      case 'modo': return BanknotesIcon;
+      case 'transferencia3': return QrCodeIcon;
+      default: return BoltIcon;
+    }
+  };
+
   return (
     <Section title="Lista de Eventos de Webhook" variant="elevated">
       <Stack gap="md">
-        {events.map((_event) => (
+        {events.map((event) => (
           <Stack
             key={event.id}
             direction="row"
@@ -332,7 +344,7 @@ const WebhookEventsList: React.FC<{ events: WebhookEvent[], onRetry: (id: string
             bg={event.status === 'failed' ? 'red.50' : 'white'}
           >
             <Stack direction="row" align="center" gap="md" flex="1">
-              <Icon name={getProviderIcon(event.provider)} size="lg" />
+              <Icon as={getProviderIcon(event.provider)} size="lg" />
 
               <Stack gap="xs">
                 <Stack direction="row" align="center" gap="sm">
@@ -370,7 +382,7 @@ const WebhookEventsList: React.FC<{ events: WebhookEvent[], onRetry: (id: string
                 variant="outline"
                 size="sm"
               >
-                <Icon name="EyeIcon" />
+                <Icon as={EyeIcon} />
                 Ver Payload
               </Button>
 
@@ -380,7 +392,7 @@ const WebhookEventsList: React.FC<{ events: WebhookEvent[], onRetry: (id: string
                   colorPalette="orange"
                   size="sm"
                 >
-                  <Icon name="ArrowPathIcon" />
+                  <Icon as={ArrowPathIcon} />
                   Reintentar
                 </Button>
               )}
@@ -390,7 +402,7 @@ const WebhookEventsList: React.FC<{ events: WebhookEvent[], onRetry: (id: string
 
         {events.length === 0 && (
           <Alert status="info">
-            <Icon name="InformationCircleIcon" />
+            <Icon as={InformationCircleIcon} />
             No hay eventos de webhook para mostrar
           </Alert>
         )}
@@ -439,21 +451,21 @@ const WebhookConfiguration: React.FC = () => {
       <Section title="Configuración por Provider" variant="elevated">
         <Stack gap="md">
           <Alert status="info">
-            <Icon name="InformationCircleIcon" />
+            <Icon as={InformationCircleIcon} />
             Las configuraciones específicas de cada provider se manejan en sus respectivas secciones.
           </Alert>
 
           <Stack direction="row" gap="md">
             <Button colorPalette="blue" variant="outline">
-              <Icon name="CreditCardIcon" />
+              <Icon as={CreditCardIcon} />
               Configurar MercadoPago
             </Button>
             <Button colorPalette="green" variant="outline">
-              <Icon name="BanknotesIcon" />
+              <Icon as={BanknotesIcon} />
               Configurar MODO
             </Button>
             <Button colorPalette="purple" variant="outline">
-              <Icon name="QrCodeIcon" />
+              <Icon as={QrCodeIcon} />
               Configurar Transferencia 3.0
             </Button>
           </Stack>
@@ -505,25 +517,5 @@ const WebhookLogs: React.FC = () => {
     </Section>
   );
 };
-
-// Helper functions
-function getProviderIcon(provider: string): any {
-  switch (provider) {
-    case 'mercadopago': return 'CreditCardIcon';
-    case 'modo': return 'BanknotesIcon';
-    case 'transferencia3': return 'QrCodeIcon';
-    default: return 'BoltIcon';
-  }
-}
-
-function getStatusColor(status: string): any {
-  switch (status) {
-    case 'processed': return 'green';
-    case 'pending': return 'blue';
-    case 'retrying': return 'orange';
-    case 'failed': return 'red';
-    default: return 'gray';
-  }
-}
 
 export default PaymentWebhooks;

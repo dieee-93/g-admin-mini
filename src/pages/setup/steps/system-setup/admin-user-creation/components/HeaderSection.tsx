@@ -7,12 +7,12 @@ export function HeaderSection() {
   const { header } = ADMIN_USER_CONFIG.TEXTS;
 
   return (
-    <VStack gap={3} textAlign="center">
+    <VStack gap="3" textAlign="center">
       <Box
         bg="blue.500"
         color="white"
         borderRadius="full"
-        p={3}
+        p="3"
         display="inline-flex"
       >
         <UserPlusIcon width={24} height={24} />

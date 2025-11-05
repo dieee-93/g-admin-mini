@@ -1,7 +1,7 @@
 // DistributedEventStore.ts - Distributed event persistence with conflict resolution
 // Implements partition-tolerant event storage using IndexedDB
 
-import { NamespacedEvent } from '../types';
+import type { NamespacedEvent } from '../types';
 import { SecureLogger } from '../utils/SecureLogger';
 
 export interface DistributedStoreConfig {
@@ -75,8 +75,9 @@ export class DistributedEventStore {
         dbName: this.config.dbName
       });
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Failed to initialize distributed event store', {
-        error: error.message
+        error: err.message
       });
       throw error;
     }
@@ -97,7 +98,7 @@ export class DistributedEventStore {
         resolve(request.result);
       };
 
-      request.onupgradeneeded = (_event) => {
+      request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
 
         // Events store
@@ -232,7 +233,7 @@ export class DistributedEventStore {
     return new Promise((resolve, reject) => {
       const request = store.openCursor();
 
-      request.onsuccess = (_event) => {
+      request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
         
         if (cursor) {
@@ -561,6 +562,7 @@ export class DistributedEventStore {
         });
       }
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Error during event compaction', { error });
     }
   }
@@ -601,7 +603,7 @@ export class DistributedEventStore {
     return new Promise((resolve, reject) => {
       const request = index.openCursor();
 
-      request.onsuccess = (_event) => {
+      request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
         
         if (cursor && removed < count) {

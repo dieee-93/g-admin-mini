@@ -3,7 +3,6 @@
  * Replaces mock data with real Supabase functions for Supply Chain Intelligence
  */
 
-import { inventoryApi } from './inventoryApi';
 import { supabase } from '@/lib/supabase/client';
 
 import { logger } from '@/lib/logging';
@@ -75,8 +74,8 @@ export class SupplyChainDataService {
       if (valuationError) throw valuationError;
 
       // Calculate additional metrics
-      const totalValue = valuationData?.reduce((sum: number, item: any) => 
-        sum + parseFloat(item.total_value || 0), 0) || 0;
+      const totalValue = valuationData?.reduce((sum: number, item: { total_value?: string | number }) =>
+        sum + parseFloat(String(item.total_value || 0)), 0) || 0;
 
       const averageValue = valuationData?.length > 0 ? 
         totalValue / valuationData.length : 0;
@@ -113,14 +112,22 @@ export class SupplyChainDataService {
       if (error) throw error;
 
       // Transform to ItemPerformance format and add calculated fields
-      return data?.map((item: unknown) => ({
+      return data?.map((item: {
+        item_id: string;
+        item_name: string;
+        item_type: string;
+        current_stock: number;
+        unit_cost?: string | number;
+        total_value?: string | number;
+        percentage_of_total?: string | number;
+      }) => ({
         item_id: item.item_id,
         item_name: item.item_name,
         item_type: item.item_type,
         current_stock: item.current_stock,
-        unit_cost: parseFloat(item.unit_cost || 0),
-        total_value: parseFloat(item.total_value || 0),
-        percentage_of_total: parseFloat(item.percentage_of_total || 0),
+        unit_cost: parseFloat(String(item.unit_cost || 0)),
+        total_value: parseFloat(String(item.total_value || 0)),
+        percentage_of_total: parseFloat(String(item.percentage_of_total || 0)),
         stock_velocity: Math.random() * 5, // TODO: Calculate from historical data
         last_movement: new Date().toISOString() // TODO: Get from stock_entries
       })) || [];
@@ -196,7 +203,7 @@ export class SupplyChainDataService {
   /**
    * Get item history for detailed analysis
    */
-  static async getItemHistory(itemId: string): Promise<any[]> {
+  static async getItemHistory(itemId: string): Promise<Array<Record<string, unknown>>> {
     try {
       const { data, error } = await supabase
         .rpc('get_item_history', { p_item_id: itemId });
@@ -216,10 +223,10 @@ export class SupplyChainDataService {
    */
   static async generateSupplyChainReport(
     reportType: 'inventory' | 'alerts' | 'performance' | 'trends'
-  ): Promise<any> {
+  ): Promise<Record<string, unknown>> {
     try {
       switch (reportType) {
-        case 'inventory':
+        case 'inventory': {
           const [metrics, itemPerformance] = await Promise.all([
             this.getMetrics(),
             this.getItemPerformance()
@@ -238,8 +245,9 @@ export class SupplyChainDataService {
               efficiency: `${(metrics.inventoryEfficiency * 100).toFixed(1)}%`
             }
           };
+        }
 
-        case 'alerts':
+        case 'alerts': {
           const alerts = await this.getStockAlerts();
           
           return {
@@ -253,8 +261,9 @@ export class SupplyChainDataService {
               estimatedCost: alerts.reduce((sum, a) => sum + a.estimated_cost, 0)
             }
           };
+        }
 
-        case 'performance':
+        case 'performance': {
           const performance = await this.getItemPerformance();
           
           return {
@@ -269,8 +278,9 @@ export class SupplyChainDataService {
               averageVelocity: performance.reduce((sum, item) => sum + item.stock_velocity, 0) / performance.length
             }
           };
+        }
 
-        case 'trends':
+        case 'trends': {
           const trends = await this.getHistoricalTrends();
           
           return {
@@ -284,6 +294,7 @@ export class SupplyChainDataService {
               averageMonthlyGrowth: this.calculateGrowthRate(trends)
             }
           };
+        }
 
         default:
           throw new Error(`Unknown report type: ${reportType}`);

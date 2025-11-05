@@ -2,13 +2,13 @@
 import React from 'react';
 import { Section } from '@/shared/ui';
 import { useMaterialsPage } from '../../hooks/useMaterialsPage';
+import type { MaterialItem } from '../../types';
 
 // Sub-componentes internos
-import { MaterialsFilters } from './MaterialsFilters';
 import { MaterialsInventoryGrid } from './MaterialsInventoryGrid';
 
 interface MaterialsListProps {
-  onStockChange?: (material: any) => void;
+  onStockChange?: (material: MaterialItem) => void;
 }
 
 export function MaterialsList({ onStockChange }: MaterialsListProps) {
@@ -17,13 +17,11 @@ export function MaterialsList({ onStockChange }: MaterialsListProps) {
     search,
     searchQuery,
     searchResults,
-    loading,
-    error,
     actions
   } = useMaterialsPage();
 
   // Enhanced stock change handler with EventBus integration
-  const handleStockChangeWithEvents = (item: any) => {
+  const handleStockChangeWithEvents = (item: MaterialItem) => {
     // Call parent handler for EventBus integration
     onStockChange?.(item);
   };

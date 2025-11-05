@@ -1,9 +1,8 @@
-import { 
-  Section, Stack, InputField, Button, SelectField 
+import {
+  Section, Stack, InputField, Button, SelectField
 } from '@/shared/ui';
-import { 
+import {
   MagnifyingGlassIcon,
-  AdjustmentsHorizontalIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import { useMaterials } from '@/hooks/useZustandStores';
@@ -101,7 +100,7 @@ export const MaterialsFilters = () => {
               label="Estado de Stock"
               options={statusOptions}
               value={filters.status}
-              onChange={(value) => setFilters({ status: value as any })}
+              onChange={(value) => setFilters({ status: value as 'all' | 'ok' | 'low' | 'critical' | 'out' })}
               size="sm"
             />
           </div>
@@ -111,7 +110,7 @@ export const MaterialsFilters = () => {
               label="Ordenar por"
               options={sortOptions}
               value={filters.sortBy}
-              onChange={(value) => setFilters({ sortBy: value as any })}
+              onChange={(value) => setFilters({ sortBy: value as 'name' | 'stock' | 'value' | 'updated' })}
               size="sm"
             />
           </div>
@@ -121,7 +120,7 @@ export const MaterialsFilters = () => {
               label="Orden"
               options={orderOptions}
               value={filters.sortOrder}
-              onChange={(value) => setFilters({ sortOrder: value as any })}
+              onChange={(value) => setFilters({ sortOrder: value as 'asc' | 'desc' })}
               size="sm"
             />
           </div>

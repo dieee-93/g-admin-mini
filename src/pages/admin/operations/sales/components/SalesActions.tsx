@@ -17,7 +17,6 @@ interface SalesActionsProps {
   onShowAnalytics?: () => void;
   onKitchenDisplay?: () => void;
   isMobile?: boolean;
-  hasCapability?: (capability: string) => boolean;
 }
 
 export function SalesActions({
@@ -25,8 +24,7 @@ export function SalesActions({
   onQRGeneration,
   onShowAnalytics,
   onKitchenDisplay,
-  isMobile = false,
-  hasCapability = () => true
+  isMobile = false
 }: SalesActionsProps) {
   return (
     <Section variant="default" title="Acciones Rápidas">
@@ -41,8 +39,6 @@ export function SalesActions({
           size="lg"
           onClick={onNewSale}
           colorPalette="teal"
-          flex={isMobile ? "1" : "none"}
-          minW="200px"
         >
           <Icon icon={PlusIcon} size="sm" />
           Nueva Venta
@@ -52,9 +48,6 @@ export function SalesActions({
         <Button
           variant="outline"
           onClick={onQRGeneration}
-          flex="1"
-          minW="200px"
-          disabled={!hasCapability('pos_system')}
         >
           <Icon icon={QrCodeIcon} size="sm" />
           Códigos QR
@@ -63,8 +56,6 @@ export function SalesActions({
         <Button
           variant="outline"
           onClick={onShowAnalytics}
-          flex="1"
-          minW="200px"
         >
           <Icon icon={ChartBarIcon} size="sm" />
           Ver Analytics
@@ -73,9 +64,6 @@ export function SalesActions({
         <Button
           variant="outline"
           onClick={onKitchenDisplay}
-          flex="1"
-          minW="200px"
-          disabled={!hasCapability('pos_system')}
         >
           <Icon icon={ComputerDesktopIcon} size="sm" />
           Pantalla Cocina
@@ -87,8 +75,6 @@ export function SalesActions({
             <Button
               variant="outline"
               onClick={() => logger.debug('SalesStore', 'Gestión Mesas')}
-              flex="1"
-              minW="200px"
             >
               <Icon icon={TableCellsIcon} size="sm" />
               Gestión Mesas
@@ -96,10 +82,7 @@ export function SalesActions({
 
             <Button
               variant="outline"
-              onClick={() => console.log('Procesar Pagos')}
-              flex="1"
-              minW="200px"
-              disabled={!hasCapability('payment_processing')}
+              onClick={() => logger.debug('SalesActions', 'Procesar Pagos')}
             >
               <Icon icon={CreditCardIcon} size="sm" />
               Procesar Pagos
@@ -107,9 +90,7 @@ export function SalesActions({
 
             <Button
               variant="outline"
-              onClick={() => console.log('Generar Reportes')}
-              flex="1"
-              minW="200px"
+              onClick={() => logger.debug('SalesActions', 'Generar Reportes')}
             >
               <Icon icon={DocumentTextIcon} size="sm" />
               Reportes
@@ -118,8 +99,6 @@ export function SalesActions({
             <Button
               variant="outline"
               onClick={() => window.location.reload()}
-              flex="1"
-              minW="200px"
               colorPalette="gray"
             >
               <Icon icon={ArrowPathIcon} size="sm" />

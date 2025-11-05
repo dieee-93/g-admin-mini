@@ -12,7 +12,7 @@ import type { MetricCard } from '../types';
 interface MetricCardsGridProps {
   metrics: MetricCard[];
   formatValue: (value: number, format?: string) => string;
-  getTrendInfo: (change?: number) => { icon: any; color: string };
+  getTrendInfo: (change?: number) => { icon: React.ElementType; color: string };
 }
 
 export const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({

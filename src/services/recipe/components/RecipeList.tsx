@@ -117,19 +117,19 @@ export function RecipeList() {
 
   return (
     <Box>
-      <HStack justify="space-between" align="center" mb={4}>
+      <HStack justify="space-between" align="center" mb="4">
         <Heading size="md" color="purple.600">
           📝 Recetas con Costeo
         </Heading>
-        <Badge colorScheme="purple" variant="subtle">
+        <Badge colorPalette="purple" variant="subtle">
           {recipesWithCosts.length} recetas
         </Badge>
       </HStack>
 
       {recipesWithCosts.length === 0 ? (
-        <Box p={8} textAlign="center" color="gray.500">
+        <Box p="8" textAlign="center" color="gray.500">
           <Text>No hay recetas registradas</Text>
-          <Text fontSize="sm" mt={2}>
+          <Text fontSize="sm" mt="2">
             Crea tu primera receta usando el formulario de arriba
           </Text>
         </Box>
@@ -179,7 +179,7 @@ export function RecipeList() {
                         {formatCurrency(recipe.total_cost)}
                       </Text>
                       {(!recipe.total_cost || recipe.total_cost === 0) && (
-                        <Badge size="xs" colorScheme="orange" variant="subtle">
+                        <Badge size="xs" colorPalette="orange" variant="subtle">
                           Sin costos
                         </Badge>
                       )}
@@ -192,7 +192,7 @@ export function RecipeList() {
                         {formatCurrency(recipe.cost_per_unit)}
                       </Text>
                       {(!recipe.cost_per_unit || recipe.cost_per_unit === 0) && (
-                        <Badge size="xs" colorScheme="orange" variant="subtle">
+                        <Badge size="xs" colorPalette="orange" variant="subtle">
                           Sin costo
                         </Badge>
                       )}
@@ -206,15 +206,15 @@ export function RecipeList() {
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <Badge size="sm" colorScheme="gray">
+                    <Badge size="sm" colorPalette="gray">
                       {recipe.ingredient_count} items
                     </Badge>
                   </Table.Cell>
                   
                   <Table.Cell>
-                    <Badge 
-                      size="sm" 
-                      colorScheme={getViabilityColor(recipe.is_viable)}
+                    <Badge
+                      size="sm"
+                      colorPalette={getViabilityColor(recipe.is_viable)}
                     >
                       {recipe.is_viable ? 'Viable' : 'Sin stock'}
                     </Badge>
@@ -224,7 +224,7 @@ export function RecipeList() {
                     <HStack gap="1">
                       <Button
                         size="xs"
-                        colorScheme="blue"
+                        colorPalette="blue"
                         variant="ghost"
                         onClick={() => handleCheckViability(recipe.id)}
                         disabled={operationLoading}
@@ -235,10 +235,10 @@ export function RecipeList() {
                           '🔍'
                         )}
                       </Button>
-                      
+
                       <Button
                         size="xs"
-                        colorScheme="green"
+                        colorPalette="green"
                         variant="ghost"
                         onClick={() => handleExecuteRecipe(recipe.id)}
                         disabled={!recipe.is_viable || operationLoading}
@@ -254,7 +254,7 @@ export function RecipeList() {
 
           {/* Panel de Viabilidad */}
           {showViability && viabilityData && selectedRecipeData && (
-            <Box borderWidth="1px" borderRadius="md" p={4} bg="blue.50">
+            <Box borderWidth="1px" borderRadius="md" p="4" bg="blue.50">
               <VStack gap="4" align="stretch">
                 <HStack justify="space-between">
                   <Text fontWeight="bold" color="blue.700">
@@ -279,12 +279,12 @@ export function RecipeList() {
 
                 {!viabilityData.is_viable && viabilityData.missing_ingredients.length > 0 && (
                   <Box>
-                    <Text fontWeight="medium" mb={2}>
+                    <Text fontWeight="medium" mb="2">
                       Ingredientes faltantes:
                     </Text>
                     <VStack gap="2" align="stretch">
                       {viabilityData.missing_ingredients.map((item, index) => (
-                        <Box key={index} p={3} bg="red.50" borderRadius="md">
+                        <Box key={index} p="3" bg="red.50" borderRadius="md">
                           <Text fontWeight="medium" color="red.700">
                             {item.item_name}
                           </Text>
@@ -303,7 +303,7 @@ export function RecipeList() {
 
           {/* Panel de Ejecución */}
           {showExecuteForm && selectedRecipeData && (
-            <Box borderWidth="1px" borderRadius="md" p={4} >
+            <Box borderWidth="1px" borderRadius="md" p="4" >
               <VStack gap="4" align="stretch">
                 <HStack justify="space-between">
                   <Text fontWeight="bold" color="green.700">
@@ -315,7 +315,7 @@ export function RecipeList() {
                 </HStack>
                 
                 <Box>
-                  <Text mb={2}>Número de lotes a producir:</Text>
+                  <Text mb="2">Número de lotes a producir:</Text>
                   <InputField
                     type="number"
                     min="1"
@@ -326,15 +326,15 @@ export function RecipeList() {
                   />
                 </Box>
 
-                <Box p={3} bg="blue.50" borderRadius="md">
+                <Box p="3" bg="blue.50" borderRadius="md">
                   <Text fontSize="sm" color="blue.700">
                     Esto producirá: {selectedRecipeData.output_quantity * parseInt(batches || '1')} {selectedRecipeData.output_item?.unit} de {selectedRecipeData.output_item?.name}
                   </Text>
                 </Box>
 
                 <HStack gap="3">
-                  <Button 
-                    colorScheme="green"
+                  <Button
+                    colorPalette="green"
                     onClick={confirmExecution}
                     loading={operationLoading}
                     loadingText="Ejecutando..."
@@ -351,7 +351,7 @@ export function RecipeList() {
 
           {/* Panel de Resultado */}
           {showExecutionResult && executionData && (
-            <Box borderWidth="1px" borderRadius="md" p={4} >
+            <Box borderWidth="1px" borderRadius="md" p="4" >
               <VStack gap="4" align="stretch">
                 <HStack justify="space-between">
                   <Text fontWeight="bold" color="green.700">
@@ -371,7 +371,7 @@ export function RecipeList() {
 
                 {executionData.items_consumed.length > 0 && (
                   <Box>
-                    <Text fontWeight="medium" mb={2}>Ingredientes consumidos:</Text>
+                    <Text fontWeight="medium" mb="2">Ingredientes consumidos:</Text>
                     <VStack gap="1" align="stretch">
                       {executionData.items_consumed.map((item, index) => (
                         <Text key={index} fontSize="sm" color="red.600">
@@ -384,7 +384,7 @@ export function RecipeList() {
 
                 {executionData.items_produced.length > 0 && (
                   <Box>
-                    <Text fontWeight="medium" mb={2}>Productos generados:</Text>
+                    <Text fontWeight="medium" mb="2">Productos generados:</Text>
                     <VStack gap="1" align="stretch">
                       {executionData.items_produced.map((item, index) => (
                         <Text key={index} fontSize="sm" color="green.600">

@@ -73,8 +73,8 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
   const getBlocksForDay = (day: DailyRule['dayOfWeek']) => weeklyRules.find(r => r.dayOfWeek === day)?.timeBlocks || [];
 
   return (
-    <Box borderWidth="1px" borderRadius="lg" p={4} bg="gray.50">
-      <Stack direction="column" gap={4} align="stretch">
+    <Box borderWidth="1px" borderRadius="lg" p="4" bg="gray.50">
+      <Stack direction="column" gap="4" align="stretch">
         <Stack direction="column" align="stretch">
             <Typography variant="body" fontWeight="medium">Nombre del Horario:</Typography>
             <Input
@@ -88,7 +88,7 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
         <Separator />
 
         <Typography variant="body" fontWeight="medium">Selecciona los días para editar el horario:</Typography>
-        <Stack direction="row" gap={2}>
+        <Stack direction="row" gap="2">
           {dayMap.map((day, index) => (
             <Button
               key={day}
@@ -96,7 +96,7 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
               isActive={selectedDays.has(day)}
               size="sm"
               variant="outline"
-              colorScheme={selectedDays.has(day) ? 'blue' : 'gray'}
+              colorPalette={selectedDays.has(day) ? 'blue' : 'gray'}
               bg={selectedDays.has(day) ? 'blue.50' : 'white'}
             >
               {dayNames[index]}
@@ -107,27 +107,27 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
         <Separator />
 
         <Box>
-          <Stack direction="row" mb={2} justify="space-between">
+          <Stack direction="row" mb="2" justify="space-between">
             <Typography variant="body" fontWeight="medium">Bloques de Horario:</Typography>
-            <Button leftIcon={<Icon icon={PlusIcon} size="sm" />} size="xs" variant="solid" colorScheme="blue" onClick={handleAddTimeBlock} isDisabled={selectedDays.size === 0}>
+            <Button leftIcon={<Icon icon={PlusIcon} size="sm" />} size="xs" variant="solid" colorPalette="blue" onClick={handleAddTimeBlock} isDisabled={selectedDays.size === 0}>
               Añadir Bloque
             </Button>
           </Stack>
-          <Typography variant="body" fontSize="xs" color="gray.500" mb={3}>
+          <Typography variant="body" fontSize="xs" color="gray.500" mb="3">
             {selectedDays.size > 0
                 ? `Editando para: ${Array.from(selectedDays).join(', ')}`
                 : "Selecciona uno o más días para añadir bloques de horario."}
           </Typography>
 
-          <Stack direction="column" gap={4} align="stretch">
+          <Stack direction="column" gap="4" align="stretch">
             {dayMap.map(day => {
               const blocks = getBlocksForDay(day);
               return (
-                <Stack direction="row" key={day} gap={3} align="center">
-                  <Tag colorScheme={blocks.length > 0 ? 'green' : 'gray'} width="90px" justify="center">{day.substring(0, 3)}</Tag>
+                <Stack direction="row" key={day} gap="3" align="center">
+                  <Tag colorPalette={blocks.length > 0 ? 'green' : 'gray'} width="90px" justify="center">{day.substring(0, 3)}</Tag>
                   <Stack direction="column" align="stretch" width="100%">
                     {blocks.length > 0 ? blocks.map((block, index) => (
-                       <Stack direction="row" key={index} gap={2}>
+                       <Stack direction="row" key={index} gap="2">
                          <Input type="time" value={block.startTime} onChange={(e) => handleTimeChange(day, index, 'startTime', e.target.value)} bg="white"/>
                          <Typography variant="body">-</Typography>
                          <Input type="time" value={block.endTime} onChange={(e) => handleTimeChange(day, index, 'endTime', e.target.value)} bg="white"/>

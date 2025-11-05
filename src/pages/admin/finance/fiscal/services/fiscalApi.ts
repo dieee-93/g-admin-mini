@@ -2,12 +2,17 @@
 import { supabase } from '@/lib/supabase/client';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { logger } from '@/lib/logging';
-import { 
-  type Invoice, 
-  type AFIPConfiguration, 
-  type TaxReport, 
+import {
+  type Invoice,
+  type AFIPConfiguration,
+  type TaxReport,
   type FinancialReport,
   type FiscalStats,
+  type AFIPStatusResponse,
+  type CAEResponse,
+  type InvoiceListItem,
+  type ComplianceReportData,
+  type AFIPInvoiceRequest,
   InvoiceType,
   CondicionIVA
 } from '../types';
@@ -114,7 +119,7 @@ class FiscalAPI {
   // AFIP INTEGRATION
   // ============================================================================
 
-  async getAFIPStatus(): Promise<any> {
+  async getAFIPStatus(): Promise<AFIPStatusResponse> {
     try {
       // This would check actual AFIP service status
       // For now, return mock status
@@ -127,8 +132,9 @@ class FiscalAPI {
         pending_requests: 0,
         failed_requests: 0
       };
-    } catch (error) {
-      logger.error('API', 'Error getting AFIP status:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      logger.error('API', 'Error getting AFIP status:', errorMessage);
       throw error;
     }
   }

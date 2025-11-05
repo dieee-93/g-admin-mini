@@ -21,10 +21,10 @@ interface PredictionsTabProps {
 
 export const PredictionsTab: React.FC<PredictionsTabProps> = ({ analytics }) => {
   return (
-    <VStack align="stretch" gap={6}>
+    <VStack align="stretch" gap="6">
       <CardWrapper bg="gradient-to-r from-purple-500 to-pink-500" color="white">
-        <CardWrapper.Body p={6}>
-          <VStack align="center" gap={4}>
+        <CardWrapper.Body p="6">
+          <VStack align="center" gap="4">
             <BoltIcon className="w-12 h-12" />
             <Text fontSize="2xl" fontWeight="bold" textAlign="center">
               Predictive Analytics & Forecasting
@@ -36,16 +36,16 @@ export const PredictionsTab: React.FC<PredictionsTabProps> = ({ analytics }) => 
         </CardWrapper.Body>
       </CardWrapper>
 
-      <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+      <SimpleGrid columns={{ base: 1, md: 2 }} gap="6">
         <CardWrapper>
           <CardWrapper.Header>
-            <HStack gap={2}>
+            <HStack gap="2">
               <ArrowTrendingUpIcon className="w-5 h-5 text-green-500" />
               <Text fontSize="lg" fontWeight="semibold" color="green.600">Revenue Forecast</Text>
             </HStack>
           </CardWrapper.Header>
           <CardWrapper.Body>
-            <VStack align="stretch" gap={4}>
+            <VStack align="stretch" gap="4">
               <HStack justify="space-between">
                 <Text>Next Week Projected</Text>
                 <Text fontSize="xl" fontWeight="bold" color="green.600">
@@ -71,13 +71,13 @@ export const PredictionsTab: React.FC<PredictionsTabProps> = ({ analytics }) => 
 
         <CardWrapper>
           <CardWrapper.Header>
-            <HStack gap={2}>
+            <HStack gap="2">
               <LightBulbIcon className="w-5 h-5 text-yellow-500" />
               <Text fontSize="lg" fontWeight="semibold" color="yellow.600">Smart Insights</Text>
             </HStack>
           </CardWrapper.Header>
           <CardWrapper.Body>
-            <VStack align="stretch" gap={4}>
+            <VStack align="stretch" gap="4">
               <Alert status="warning" size="sm">
                 <Alert.Description>
                   <strong>{analytics.predictions.inventory_alerts}</strong> items need restocking soon
@@ -105,15 +105,15 @@ export const PredictionsTab: React.FC<PredictionsTabProps> = ({ analytics }) => 
           <Text fontSize="lg" fontWeight="semibold">Strategic Recommendations</Text>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6}>
-            <VStack align="stretch" gap={3}>
+          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="6">
+            <VStack align="stretch" gap="3">
               <Text fontWeight="medium" color="green.600">🚀 Revenue Optimization</Text>
               <Text fontSize="sm">• Focus on peak hours (7-9 PM) for premium pricing</Text>
               <Text fontSize="sm">• Bundle top-performing items for higher AOV</Text>
               <Text fontSize="sm">• Implement dynamic pricing during high demand</Text>
             </VStack>
 
-            <VStack align="stretch" gap={3}>
+            <VStack align="stretch" gap="3">
               <Text fontWeight="medium" color="blue.600">👥 Customer Experience</Text>
               <Text fontSize="sm">• Reduce fulfillment time to under 15 minutes</Text>
               <Text fontSize="sm">• Create loyalty program for returning customers</Text>

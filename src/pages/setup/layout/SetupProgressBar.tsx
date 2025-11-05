@@ -14,7 +14,7 @@ export function SetupProgressBar({
 }: SetupProgressBarProps) {
   return (
     <Box
-      mb={6}
+      mb="6"
       display={{
         base: 'block',
         md: 'none',
@@ -29,7 +29,7 @@ export function SetupProgressBar({
           <Progress.Range />
         </Progress.Track>
       </Progress.Root>
-      <Flex justify="space-between" mt={2}>
+      <Flex justify="space-between" mt="2">
         <Text fontSize="xs" color="gray.500">
           Paso {currentStep} de {totalSteps}
         </Text>

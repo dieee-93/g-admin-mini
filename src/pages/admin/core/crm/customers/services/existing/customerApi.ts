@@ -12,7 +12,7 @@ import {
   
   type UpdateCustomerData,
   type CustomerWithStats
-} from '../types';
+} from '../../types';
 
 // ===== CRUD BÁSICO =====
 

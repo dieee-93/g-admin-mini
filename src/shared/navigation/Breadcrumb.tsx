@@ -5,10 +5,10 @@
 import { Stack, Button } from '@chakra-ui/react';
 import { Typography, Icon } from '@/shared/ui';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationState, useNavigationActions } from '@/contexts/NavigationContext';
 
 export function Breadcrumb() {
-  const { breadcrumbs, navigate } = useNavigation();
+  const navState = useNavigationState(); const navActions = useNavigationActions(); const { breadcrumbs } = navState; const { navigate } = navActions;
 
   if (breadcrumbs.length === 0) return null;
 

@@ -30,9 +30,9 @@ export function TemplatesTab({
   );
 
   return (
-    <VStack gap={4} align="stretch">
+    <VStack gap="4" align="stretch">
       {/* Filters */}
-      <HStack gap={4} flexWrap="wrap">
+      <HStack gap="4" flexWrap="wrap">
         <Select.Root
           collection={CATEGORY_COLLECTION}
           value={[selectedCategory]}
@@ -53,7 +53,7 @@ export function TemplatesTab({
       </HStack>
 
       {/* Templates Grid */}
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
         {filteredTemplates.map((template) => (
           <TemplateCard
             key={template.id}

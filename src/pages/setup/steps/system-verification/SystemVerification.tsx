@@ -12,10 +12,10 @@ interface SystemVerificationProps {
 
 export function SystemVerification({ onNext, onBack, onSkip }: SystemVerificationProps) {
   return (
-    <Box maxW="500px" mx="auto" p={6}>
-      <VStack gap={6} align="stretch">
-        <VStack gap={3} textAlign="center">
-          <Box bg="orange.500" color="white" borderRadius="full" p={3} display="inline-flex">
+    <Box maxW="500px" mx="auto" p="6">
+      <VStack gap="6" align="stretch">
+        <VStack gap="3" textAlign="center">
+          <Box bg="orange.500" color="white" borderRadius="full" p="3" display="inline-flex">
             <CheckCircleIcon width={24} height={24} />
           </Box>
           <Heading size="lg" color="gray.700">Verificación del Sistema</Heading>
@@ -28,8 +28,8 @@ export function SystemVerification({ onNext, onBack, onSkip }: SystemVerificatio
         </VStack>
 
         <CardWrapper>
-          <Box p={6}>
-            <VStack gap={3} align="start">
+          <Box p="6">
+            <VStack gap="3" align="start">
               <Text fontSize="sm" color="green.600">✓ Conexión a base de datos establecida</Text>
               <Text fontSize="sm" color="green.600">✓ Tablas creadas correctamente</Text>
               <Text fontSize="sm" color="green.600">✓ Usuario administrador configurado</Text>
@@ -40,7 +40,7 @@ export function SystemVerification({ onNext, onBack, onSkip }: SystemVerificatio
 
         <Stack direction="row" justify="space-between">
           <Button variant="ghost" onClick={onBack}>← Atrás</Button>
-          <Stack direction="row" gap={3}>
+          <Stack direction="row" gap="3">
             {onSkip && (
               <Button variant="outline" onClick={onSkip}>
                 Saltar verificación

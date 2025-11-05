@@ -13,7 +13,7 @@ import {
   type CreateCustomerData,
   type UpdateCustomerData,
   type CustomerWithStats
-} from '../types';
+} from '../../types';
 
 export function useCustomers() {
   // Use our unified CRUD system - eliminates 80+ lines of boilerplate!
@@ -33,11 +33,11 @@ export function useCustomers() {
     cacheTime: 5 * 60 * 1000, // 5 minutes
     
     // Success/error callbacks to match original behavior
-    onSuccess: (action, data) => {
+    onSuccess: (action) => {
       if (action === 'create') {
         logger.info('App', 'Customer created successfully');
       } else if (action === 'update') {
-        logger.info('App', 'Customer updated successfully');  
+        logger.info('App', 'Customer updated successfully');
       } else if (action === 'delete') {
         logger.info('App', 'Customer deleted successfully');
       }

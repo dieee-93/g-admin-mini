@@ -35,7 +35,7 @@ export function CredentialsForm({
             onChange={(e) => onUrlChange(e.target.value)}
             disabled={isConnecting}
             helperText={<>
-              Ejemplo: <Code fontSize="xs" bg="gray.100" px={1} py={0.5} borderRadius="sm">{form.urlExample}</Code>
+              Ejemplo: <Code fontSize="xs" bg="gray.100" px="1" py={0.5} borderRadius="sm">{form.urlExample}</Code>
             </>}
           />
         </Box>

@@ -18,12 +18,13 @@ import {
   CurrencyDollarIcon,
   ChartBarIcon,
   UsersIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   TrendingDownIcon,
-  ClockIcon,
+  // TODO: Add time-based filtering using ClockIcon
+  // ClockIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
-import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services/AnalyticsEngine';
+import { AnalyticsEngine, RFMAnalytics, /* TrendAnalytics */ } from '@/shared/services/AnalyticsEngine';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { useSales } from '../hooks/useSales';
 
@@ -51,18 +52,22 @@ interface CustomerSalesData {
   last_activity: string;
 }
 
+interface AnalyticsData {
+  totals: { totalRevenue: number; totalTransactions: number; averageTicket: number };
+  customerRFM: Record<string, { r: number; f: number; m: number; segment: string }>;
+  paymentMethodStats: Record<string, { value: number; count: number }>;
+  timeSeries: Array<{ label: string; value: number }>;
+  trends?: { revenueGrowth: number; transactionGrowth: number };
+  forecast?: { revenue: number; transactions: number };
+  segments?: Record<string, number>;
+}
+
 export function SalesAnalyticsEnhanced() {
   const { sales, loading, customers } = useSales();
-  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
-  useEffect(() => {
-    if (sales && sales.length > 0) {
-      generateSalesAnalytics();
-    }
-  }, [sales]);
-
-  const generateSalesAnalytics = async () => {
+  const generateSalesAnalytics = React.useCallback(async () => {
     setAnalyticsLoading(true);
 
     try {
@@ -90,7 +95,6 @@ export function SalesAnalyticsEnhanced() {
       });
 
       // Customer RFM Analysis for sales
-      const customerSalesData: CustomerSalesData[] = [];
       const customerMap = new Map<string, CustomerSalesData>();
 
       salesForAnalysis.forEach(sale => {
@@ -159,7 +163,13 @@ export function SalesAnalyticsEnhanced() {
     } finally {
       setAnalyticsLoading(false);
     }
-  };
+  }, [sales, customers]);
+
+  useEffect(() => {
+    if (sales && sales.length > 0) {
+      generateSalesAnalytics();
+    }
+  }, [sales, generateSalesAnalytics]);
 
   if (loading || analyticsLoading) {
     return (
@@ -226,7 +236,7 @@ export function SalesAnalyticsEnhanced() {
             title="Tasa de Actividad"
             value={`${(analyticsData?.metrics?.activity_rate || 0).toFixed(1)}%`}
             subtitle="ventas recientes"
-            icon={analyticsData?.metrics?.activity_rate > 70 ? TrendingUpIcon : TrendingDownIcon}
+            icon={analyticsData?.metrics?.activity_rate > 70 ? ArrowTrendingUpIcon : TrendingDownIcon}
             colorPalette={analyticsData?.metrics?.activity_rate > 70 ? "green" : "yellow"}
           />
         </CardGrid>
@@ -276,7 +286,7 @@ export function SalesAnalyticsEnhanced() {
                 {Object.entries(analyticsData.customerRFM)
                   .sort(([,a], [,b]) => (b.f + b.m) - (a.f + a.m))
                   .slice(0, 5)
-                  .map(([customerId, data]: [string, any]) => (
+                  .map(([customerId, data]: [string, { r: number; f: number; m: number; segment: string }]) => (
                   <div key={customerId} style={{
                     padding: '8px',
                     border: '1px solid var(--border-subtle)',
@@ -305,7 +315,7 @@ export function SalesAnalyticsEnhanced() {
       {analyticsData?.paymentMethodStats && (
         <Section variant="elevated" title="💳 Métodos de Pago">
           <CardGrid columns={{ base: 1, md: 3 }}>
-            {Object.entries(analyticsData.paymentMethodStats).map(([method, stats]: [string, any]) => (
+            {Object.entries(analyticsData.paymentMethodStats).map(([method, stats]: [string, { value: number; count: number }]) => (
               <div key={method} style={{
                 padding: '16px',
                 border: '1px solid var(--border-subtle)',
@@ -389,7 +399,7 @@ export function SalesAnalyticsEnhanced() {
             gap: '2px',
             fontSize: '8px'
           }}>
-            {analyticsData.timeSeries.slice(-14).map((point: any, index: number) => (
+            {analyticsData.timeSeries.slice(-14).map((point: { label: string; value: number }, index: number) => (
               <div key={index} style={{ textAlign: 'center' }}>
                 <div style={{
                   height: `${Math.max(10, (point.value / 5) * 30)}px`,

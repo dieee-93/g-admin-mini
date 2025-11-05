@@ -16,8 +16,8 @@ export function AdminUserCreationStep({ onComplete, onBack }: AdminUserCreationS
   const form = useAdminUserForm({ onComplete });
 
   return (
-    <Box maxW="500px" mx="auto" p={6}>
-      <VStack gap={6} align="stretch">
+    <Box maxW="500px" mx="auto" p="6">
+      <VStack gap="6" align="stretch">
         {/* Header */}
         <HeaderSection />
 

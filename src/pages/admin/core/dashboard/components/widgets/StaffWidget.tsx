@@ -77,7 +77,9 @@ export function StaffWidget() {
               borderRadius="full"
               color="purple.600"
             >
-              <Icon icon={UserIcon} size="lg" />
+              <Icon size="lg">
+                <UserIcon />
+              </Icon>
             </Stack>
           </Stack>
 
@@ -92,7 +94,9 @@ export function StaffWidget() {
               {avgPerformance > 0 && (
                 <Badge variant="subtle" colorPalette={performanceColor} size="sm">
                   <Stack direction="row" align="center" gap="1">
-                    <Icon icon={ChartBarIcon} size="xs" />
+                    <Icon size="xs">
+                <ChartBarIcon />
+              </Icon>
                     {avgPerformance.toFixed(0)}% performance
                   </Stack>
                 </Badge>

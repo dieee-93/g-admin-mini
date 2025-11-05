@@ -7,8 +7,8 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import { CardWrapper, Button, InputField } from '@/shared/ui';
-
-import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase/client';
+import { logger } from '@/lib/logging/Logger';
 
 interface ResetPasswordFormProps {
   onSwitchToLogin?: () => void;
@@ -18,44 +18,57 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  
-  const { resetPassword, isLoading, error, clearError } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
+    setError('');
     setEmailError('');
-    
+
     if (!email?.trim()) {
       setEmailError('El email es requerido');
       return;
     }
-    
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError('Formato de email inválido');
       return;
     }
 
-    const success = await resetPassword(email);
-    
-    if (success) {
-      setSubmitted(true);
+    setIsLoading(true);
+
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (resetError) {
+        setError(resetError.message);
+      } else {
+        setSubmitted(true);
+      }
+    } catch (err) {
+      logger.error('Auth', 'Error sending reset email:', err);
+      setError('Ocurrió un error inesperado');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   if (submitted) {
     return (
       <CardWrapper>
-        <Box maxW="md" mx="auto" mt={8}>
-          <VStack gap={6}>
+        <Box maxW="md" mx="auto" mt="8">
+          <VStack gap="6">
             <Heading size="lg" color="green.500">
               Email Enviado
             </Heading>
             
-            <VStack gap={4}>
+            <VStack gap="4">
               <Box 
                 w="full" 
-                p={4} 
+                p="4" 
                  
                 border="1px solid" 
                 borderColor="green.200" 
@@ -73,7 +86,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
 
               <Button
                 variant="outline"
-                colorPalette="brand"
+                colorPalette="purple"
                 onClick={() => setSubmitted(false)}
               >
                 Enviar nuevamente
@@ -100,9 +113,9 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
 
   return (
     <CardWrapper>
-      <Box maxW="md" mx="auto" mt={8}>
-        <VStack gap={6}>
-          <VStack gap={2}>
+      <Box maxW="md" mx="auto" mt="8">
+        <VStack gap="6">
+          <VStack gap="2">
             <Heading size="lg" color="blue.500">
               Recuperar Contraseña
             </Heading>
@@ -112,11 +125,11 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
           </VStack>
           
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-            <VStack gap={4}>
+            <VStack gap="4">
               {error && (
                 <Box 
                   w="full" 
-                  p={3} 
+                  p="3" 
                   bg="red.50" 
                   border="1px solid" 
                   borderColor="red.200" 
@@ -140,7 +153,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
 
               <Button
                 type="submit"
-                colorPalette="brand"
+                colorPalette="purple"
                 fullWidth
                 loading={isLoading}
               >

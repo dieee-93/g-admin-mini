@@ -87,10 +87,10 @@ export default function BusinessModelStep() {
 
   return (
     <ContentLayout spacing="normal">
-      <Stack gap={8}>
+      <Stack gap="8">
         {/* Header */}
         <Section variant="flat">
-          <Stack gap={3}>
+          <Stack gap="3">
             <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1a202c' }}>
               🎯 ¿Cómo opera tu negocio?
             </h2>
@@ -102,7 +102,7 @@ export default function BusinessModelStep() {
 
         {/* Capabilities Selection */}
         <Section variant="elevated" title="Capacidades de Negocio">
-          <Stack gap={4}>
+          <Stack gap="4">
             <p style={{ fontSize: '14px', color: '#718096', marginBottom: '12px' }}>
               Podés combinar libremente las capacidades que necesites
             </p>
@@ -123,7 +123,7 @@ export default function BusinessModelStep() {
                     transition: 'all 0.2s'
                   }}
                 >
-                  <Stack gap={2}>
+                  <Stack gap="2">
                     <div style={{ fontSize: '32px' }}>{capability.icon}</div>
                     <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#2d3748' }}>
                       {capability.name}
@@ -132,7 +132,7 @@ export default function BusinessModelStep() {
                       {capability.description}
                     </div>
                     {isCapabilitySelected(capability.id) && (
-                      <Badge colorScheme="blue" style={{ width: 'fit-content' }}>
+                      <Badge colorPalette="blue" style={{ width: 'fit-content' }}>
                         ✓ Seleccionado
                       </Badge>
                     )}
@@ -145,7 +145,7 @@ export default function BusinessModelStep() {
 
         {/* Infrastructure Selection */}
         <Section variant="elevated" title="Infraestructura">
-          <Stack gap={4}>
+          <Stack gap="4">
             <p style={{ fontSize: '14px', color: '#718096', marginBottom: '12px' }}>
               Seleccioná cómo opera físicamente tu negocio
             </p>
@@ -167,7 +167,7 @@ export default function BusinessModelStep() {
                     opacity: infra.conflicts && infra.conflicts.length > 0 ? 1 : 1 // Preparado para mostrar conflicts
                   }}
                 >
-                  <Stack gap={2}>
+                  <Stack gap="2">
                     <div style={{ fontSize: '32px' }}>{infra.icon}</div>
                     <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#2d3748' }}>
                       {infra.name}
@@ -176,7 +176,7 @@ export default function BusinessModelStep() {
                       {infra.description}
                     </div>
                     {selectedInfra === infra.id && (
-                      <Badge colorScheme="green" style={{ width: 'fit-content' }}>
+                      <Badge colorPalette="green" style={{ width: 'fit-content' }}>
                         ✓ Seleccionado
                       </Badge>
                     )}
@@ -189,14 +189,14 @@ export default function BusinessModelStep() {
 
         {/* Summary & Continue */}
         <Section variant="flat">
-          <Stack gap={4}>
+          <Stack gap="4">
             <div style={{
               padding: '16px',
               backgroundColor: '#edf2f7',
               borderRadius: '8px',
               borderLeft: '4px solid #3182ce'
             }}>
-              <Stack gap={2}>
+              <Stack gap="2">
                 <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#2d3748' }}>
                   Resumen de tu selección:
                 </div>
@@ -216,7 +216,7 @@ export default function BusinessModelStep() {
 
             <Button
               size="lg"
-              colorScheme="blue"
+              colorPalette="blue"
               onClick={handleContinue}
               isDisabled={selectedCapabilities.length === 0}
               style={{ marginTop: '16px' }}

@@ -18,10 +18,26 @@ import {
   Icon
 } from '@/shared/ui';
 import { Checkbox } from '@chakra-ui/react';
+import {
+  ClockIcon,
+  CpuChipIcon as CoffeeIcon,
+  ExclamationCircleIcon as AlertCircleIcon,
+  HeartIcon as StethoscopeIcon,
+  BoltIcon as ZapIcon,
+  ArrowPathIcon as RefreshCwIcon,
+  ChartBarIcon as ActivityIcon,
+  UserIcon,
+  Cog6ToothIcon as SettingsIcon,
+  PlusIcon,
+  DocumentTextIcon as FileTextIcon,
+  ArrowDownTrayIcon as DownloadIcon,
+  UsersIcon,
+  BellIcon
+} from '@heroicons/react/24/outline';
 import { UnifiedCalendarEngine } from '../engine/UnifiedCalendarEngine';
 import { BaseCalendarAdapter } from '../adapters/BaseCalendarAdapter';
 import { logger } from '@/lib/logging';
-import {
+import type {
   CalendarConfig,
   DateRange,
   BookingStatus,
@@ -63,7 +79,7 @@ export interface CalendarFilters {
 interface LegendItem {
   readonly label: string;
   readonly color: string;
-  readonly icon?: string;
+  readonly icon?: React.ComponentType<{ className?: string }>;
   readonly count?: number;
 }
 
@@ -72,7 +88,7 @@ interface LegendItem {
  */
 interface QuickAction {
   readonly label: string;
-  readonly icon: string;
+  readonly icon: React.ComponentType<{ className?: string }>;
   readonly action: () => void;
   readonly variant?: 'solid' | 'outline' | 'ghost';
   readonly colorPalette?: string;
@@ -157,21 +173,21 @@ export function CalendarSidebar({
     // Business model specific legend items
     if (businessModel === 'staff_scheduling') {
       items.push(
-        { label: 'Shift', color: '#3B82F6', icon: 'Clock' },
-        { label: 'Break', color: '#8B5CF6', icon: 'Coffee' },
-        { label: 'Overtime', color: '#EF4444', icon: 'AlertCircle' }
+        { label: 'Shift', color: '#3B82F6', icon: ClockIcon },
+        { label: 'Break', color: '#8B5CF6', icon: CoffeeIcon },
+        { label: 'Overtime', color: '#EF4444', icon: AlertCircleIcon }
       );
     } else if (businessModel === 'medical_appointments') {
       items.push(
-        { label: 'Consultation', color: '#10B981', icon: 'Stethoscope' },
-        { label: 'Emergency', color: '#EF4444', icon: 'Zap' },
-        { label: 'Follow-up', color: '#F59E0B', icon: 'RefreshCw' }
+        { label: 'Consultation', color: '#10B981', icon: StethoscopeIcon },
+        { label: 'Emergency', color: '#EF4444', icon: ZapIcon },
+        { label: 'Follow-up', color: '#F59E0B', icon: RefreshCwIcon }
       );
     } else if (businessModel === 'fitness_classes') {
       items.push(
-        { label: 'Class', color: '#8B5CF6', icon: 'Activity' },
-        { label: 'Personal Training', color: '#06B6D4', icon: 'User' },
-        { label: 'Equipment Maintenance', color: '#6B7280', icon: 'Settings' }
+        { label: 'Class', color: '#8B5CF6', icon: ActivityIcon },
+        { label: 'Personal Training', color: '#06B6D4', icon: UserIcon },
+        { label: 'Equipment Maintenance', color: '#6B7280', icon: SettingsIcon }
       );
     }
 
@@ -187,7 +203,7 @@ export function CalendarSidebar({
 
     actions.push({
       label: 'New Booking',
-      icon: 'Plus',
+      icon: PlusIcon,
       action: () => logger.info('App', 'New booking'),
       variant: 'solid',
       colorPalette: 'blue'
@@ -196,7 +212,7 @@ export function CalendarSidebar({
     if (businessModelConfig.hasReports) {
       actions.push({
         label: 'Generate Report',
-        icon: 'FileText',
+        icon: FileTextIcon,
         action: () => logger.info('App', 'Generate report'),
         variant: 'outline'
       });
@@ -205,7 +221,7 @@ export function CalendarSidebar({
     if (businessModelConfig.hasExport) {
       actions.push({
         label: 'Export Data',
-        icon: 'Download',
+        icon: DownloadIcon,
         action: () => logger.info('App', 'Export data'),
         variant: 'outline'
       });
@@ -215,30 +231,30 @@ export function CalendarSidebar({
       actions.push(
         {
           label: 'Auto Schedule',
-          icon: 'Zap',
+          icon: ZapIcon,
           action: () => logger.info('App', 'Auto schedule'),
           variant: 'outline',
           colorPalette: 'purple'
         },
         {
           label: 'Coverage Report',
-          icon: 'Users',
-          action: () => console.log('Coverage report'),
+          icon: UsersIcon,
+          action: () => logger.debug('CalendarSidebar', 'Coverage report'),
           variant: 'ghost'
         });
     } else if (businessModel === 'medical_appointments') {
       actions.push(
         {
           label: 'Patient List',
-          icon: 'Users',
+          icon: UsersIcon,
           action: () => logger.info('App', 'Patient list'),
           variant: 'outline',
           colorPalette: 'green'
         },
         {
           label: 'Send Reminders',
-          icon: 'Bell',
-          action: () => console.log('Send reminders'),
+          icon: BellIcon,
+          action: () => logger.debug('CalendarSidebar', 'Send reminders'),
           variant: 'ghost'
         });
     }
@@ -364,7 +380,7 @@ export function CalendarSidebar({
                   border: '1px solid var(--colors-gray-300)'
                 }}
               />
-              {item.icon && <Icon name={item.icon} size="sm" />}
+              {item.icon && <Icon as={item.icon} size="sm" />}
               <Typography variant="caption" flex="1">
                 {item.label}
               </Typography>
@@ -389,7 +405,7 @@ export function CalendarSidebar({
             variant={action.variant || 'outline'}
             colorPalette={action.colorPalette}
             size="sm"
-            leftIcon={<Icon name={action.icon} />}
+            leftIcon={<Icon as={action.icon} />}
             onClick={action.action}
             width="full"
           >

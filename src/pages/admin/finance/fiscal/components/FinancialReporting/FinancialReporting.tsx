@@ -34,6 +34,7 @@ import { type FinancialReport } from '../../types';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 interface FinancialKPI {
   label: string;
@@ -130,7 +131,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
         const latestReport = mockFinancialReports.find(r => r.tipo === selectedReportType) || mockFinancialReports[0];
         setCurrentReport(latestReport);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       notify.error({
         title: 'Error al cargar reportes financieros',
         description: 'No se pudieron cargar los datos financieros'
@@ -210,7 +211,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
         title: `Reporte exportado en formato ${format.toUpperCase()}`,
         description: 'El archivo ha sido descargado correctamente'
       });
-    } catch (error) {
+    } catch (error: unknown) {
       notify.error({
         title: 'Error al exportar reporte',
         description: 'No se pudo exportar el reporte en el formato solicitado'
@@ -264,13 +265,14 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
     }
   };
 
+  // TODO: Implement status badge rendering
   const getStatusBadge = (estado: string) => {
     const statusConfig = {
       finalizado: { colorPalette: 'success' as const, children: 'Finalizado' },
       borrador: { colorPalette: 'warning' as const, children: 'Borrador' },
       procesando: { colorPalette: 'info' as const, children: 'Procesando' }
     };
-    
+
     return <Badge {...statusConfig[estado as keyof typeof statusConfig]} />;
   };
 
@@ -278,6 +280,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
     return new Date(dateString).toLocaleDateString('es-AR');
   };
 
+  // Period formatting helper
   const formatPeriod = (periodo: string) => {
     const [year, month] = periodo.split('-');
     const months = [
@@ -306,7 +309,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
 
   if (variant === 'compact') {
     return (
-      <CardWrapper colorPalette="brand">
+      <CardWrapper colorPalette="purple">
         <VStack gap="md" align="stretch">
           <HStack justify="space-between">
             <Typography variant="heading" size="sm">
@@ -349,7 +352,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
   return (
     <VStack gap="lg" align="stretch">
       {/* Header */}
-      <CardWrapper colorPalette="brand">
+      <CardWrapper colorPalette="purple">
         <VStack align="stretch" gap="md">
           <HStack justify="space-between">
             <Typography variant="heading" size="lg">Reportes Financieros</Typography>
@@ -389,7 +392,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
       {/* Financial KPIs */}
       <Grid templateColumns="repeat(auto-fit, minmax(280px, 1fr))" gap="md">
         {financialKPIs.map((kpi, index) => (
-          <CardWrapper key={index} colorPalette="brand">
+          <CardWrapper key={index} colorPalette="purple">
             <VStack align="stretch" gap="md">
               <HStack justify="space-between">
                 <Typography variant="heading" size="sm">
@@ -433,7 +436,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
         <TabPanels>
           {/* Reports Tab */}
           <TabPanel value="reports">
-            <CardWrapper colorPalette="brand">
+            <CardWrapper colorPalette="purple">
               <VStack align="stretch" gap="md">
                 <HStack justify="space-between">
                   <Typography variant="heading" size="sm">
@@ -490,7 +493,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
                           </Typography>
                         </Table.Cell>
                         <Table.Cell>
-                          <Badge colorPalette="success">Finalizado</Badge>
+                          <Badge colorPalette="green">Finalizado</Badge>
                         </Table.Cell>
                         <Table.Cell>
                           <HStack gap="xs">
@@ -521,7 +524,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
 
           {/* Generator Tab */}
           <TabPanel value="generator">
-            <CardWrapper colorPalette="brand">
+            <CardWrapper colorPalette="purple">
               <VStack align="stretch" gap="md">
                 <Typography variant="heading" size="sm">
                   Generar Nuevo Reporte
@@ -583,7 +586,7 @@ export const FinancialReporting = ({ variant = 'default' }: FinancialReportingPr
           {/* Analytics Tab */}
           <TabPanel value="analytics">
             <VStack gap="md" align="stretch">
-              <CardWrapper colorPalette="brand">
+              <CardWrapper colorPalette="purple">
                 <VStack align="stretch" gap="md">
                   <Typography variant="heading" size="sm">
                     Análisis Financiero

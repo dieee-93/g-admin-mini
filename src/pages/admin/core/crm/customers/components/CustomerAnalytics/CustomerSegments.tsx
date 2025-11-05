@@ -5,8 +5,7 @@ import {
   Typography,
   CardWrapper ,
   Badge,
-  Table,
-  Grid
+  Table
 } from '@/shared/ui';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { useState, useMemo } from 'react';
@@ -139,8 +138,8 @@ export function CustomerSegments() {
               <Stack key={segment.id} direction="column" gap="xs">
                 <Stack direction="row" justify="space-between" align="center">
                   <Stack direction="row" gap="sm" align="center">
-                    <Badge 
-                      colorPalette={segment.color as any} 
+                    <Badge
+                      colorPalette={segment.color as 'blue' | 'green' | 'red' | 'purple' | 'orange'}
                       clickable
                       onClick={() => setSelectedSegment(segment.id)}
                     >
@@ -184,7 +183,7 @@ export function CustomerSegments() {
               <Typography variant="heading" size="lg">
                 {selectedSegmentData?.name}
               </Typography>
-              <Badge colorPalette={selectedSegmentData?.color as any}>
+              <Badge colorPalette={selectedSegmentData?.color as 'blue' | 'green' | 'red' | 'purple' | 'orange'}>
                 {filteredCustomers.length}
               </Badge>
             </Stack>

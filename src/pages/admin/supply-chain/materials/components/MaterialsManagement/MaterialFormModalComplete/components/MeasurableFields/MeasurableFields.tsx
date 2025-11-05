@@ -1,7 +1,7 @@
-import { Box, Stack } from '@chakra-ui/react';
+import { Box, Stack } from '@/shared/ui';
 import { SelectField } from '@/shared/ui';
 import { type ItemFormData, type MeasurableUnit } from '../../../../types';
-import { CATEGORY_COLLECTION, MEASURABLE_UNITS_COLLECTION, type LabeledOption } from '../../constants';
+import { CATEGORY_COLLECTION, MEASURABLE_UNITS_COLLECTION } from '../../constants';
 import { MeasurableStockFields } from './MeasurableStockFields';
 
 interface MeasurableFieldsProps {
@@ -28,7 +28,7 @@ export const MeasurableFields = ({
         <SelectField
           label="Categoría del Producto"
           placeholder="¿A qué categoría pertenece?"
-          collection={CATEGORY_COLLECTION as any} // TODO: Fix typing issue with SelectField
+          collection={CATEGORY_COLLECTION}
           value={formData.category ? [formData.category] : []}
           onValueChange={(details) => 
             updateFormData({ 

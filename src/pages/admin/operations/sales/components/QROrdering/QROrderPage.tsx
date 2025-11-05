@@ -7,30 +7,20 @@ import {
   Text,
   Badge,
   Button,
-
   Textarea,
   VStack,
   HStack,
-  Separator,
   Spinner,
-  Alert,
-  NumberInput,
   Image,
   Tabs,
   IconButton,
 } from '@chakra-ui/react';
-import { 
-  PlusIcon, 
-  MinusIcon, 
+import {
+  PlusIcon,
+  MinusIcon,
   ShoppingCartIcon,
   ClockIcon,
-  CheckCircleIcon,
-  QrCodeIcon,
-  UserIcon,
-  PhoneIcon,
-  ExclamationTriangleIcon,
-  HeartIcon,
-  StarIcon
+  CheckCircleIcon
 } from '@heroicons/react/24/outline';
 import { Icon, InputField, CardWrapper } from '@/shared/ui';
 import { supabase } from '@/lib/supabase/client';
@@ -211,15 +201,16 @@ export function QROrderPage() {
     );
   };
 
-  const updateItemInstructions = (productId: string, instructions: string) => {
-    setCart(currentCart =>
-      currentCart.map(item =>
-        item.product_id === productId
-          ? { ...item, special_instructions: instructions }
-          : item
-      )
-    );
-  };
+  // TODO: Add UI for item-level special instructions
+  // const updateItemInstructions = (productId: string, instructions: string) => {
+  //   setCart(currentCart =>
+  //     currentCart.map(item =>
+  //       item.product_id === productId
+  //         ? { ...item, special_instructions: instructions }
+  //         : item
+  //     )
+  //   );
+  // };
 
   const calculateOrderSummary = (): OrderSummary => {
     const subtotal = cart.reduce((sum, item) => 
@@ -316,22 +307,22 @@ export function QROrderPage() {
 
   if (orderSubmitted) {
     return (
-      <Box p={6} textAlign="center" maxW="md" mx="auto">
-        <VStack gap={6}>
+      <Box p="6" textAlign="center" maxW="md" mx="auto">
+        <VStack gap="6">
           <Icon icon={CheckCircleIcon} size="2xl" className="text-green-500" />
           
-          <VStack gap={2}>
+          <VStack gap="2">
             <Heading size="lg" color="green.600">Order Confirmed!</Heading>
             <Text color="gray.600">
               Your order has been sent to the kitchen
             </Text>
           </VStack>
 
-          <CardWrapper w="full" p={4} >
-            <VStack gap={3}>
+          <CardWrapper w="full" p="4" >
+            <VStack gap="3">
               <HStack justify="space-between" w="full">
                 <Text fontWeight="bold">Order Number:</Text>
-                <Badge colorScheme="green" fontSize="md" p={2}>
+                <Badge colorPalette="green" fontSize="md" p="2">
                   {orderNumber}
                 </Badge>
               </HStack>
@@ -348,7 +339,7 @@ export function QROrderPage() {
             </VStack>
           </CardWrapper>
 
-          <VStack gap={2} textAlign="center">
+          <VStack gap="2" textAlign="center">
             <Text fontSize="sm" color="gray.600">
               Your order is being prepared. You'll be notified when it's ready.
             </Text>
@@ -374,15 +365,15 @@ export function QROrderPage() {
   return (
     <Box minH="100vh" bg="bg.canvas">
       {/* Header */}
-      <Box bg="white" shadow="sm" p={4} position="sticky" top={0} zIndex={10}>
-        <VStack gap={2}>
-          <HStack justify="center" gap={2}>
+      <Box bg="white" shadow="sm" p="4" position="sticky" top={0} zIndex={10}>
+        <VStack gap="2">
+          <HStack justify="center" gap="2">
             <Icon icon={QrCodeIcon} size="lg" className="text-blue-500" />
             <Heading size="md">{qrData?.restaurant_info?.name}</Heading>
           </HStack>
           
           {qrData && (
-            <HStack gap={4} fontSize="sm" color="gray.600">
+            <HStack gap="4" fontSize="sm" color="gray.600">
               <Text>Table {qrData.table_number}</Text>
               {qrData.restaurant_info?.wifi_password && (
                 <Text>WiFi: {qrData.restaurant_info.wifi_password}</Text>
@@ -392,9 +383,9 @@ export function QROrderPage() {
         </VStack>
       </Box>
 
-      <Box p={4} pb={cart.length > 0 ? '120px' : '4'}>
+      <Box p="4" pb={cart.length > 0 ? '120px' : '4'}>
         {/* Category Tabs */}
-        <Box mb={4}>
+        <Box mb="4">
           <Tabs.Root 
             value={activeCategory}
             onValueChange={(details) => setActiveCategory(details.value)}
@@ -412,7 +403,7 @@ export function QROrderPage() {
         </Box>
 
         {/* Products Grid */}
-        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4} mb={6}>
+        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="4" mb="6">
           {filteredProducts.map(product => {
             const cartItem = cart.find(item => item.product_id === product.id);
             const inCart = !!cartItem;
@@ -424,7 +415,7 @@ export function QROrderPage() {
                 transition="all 0.2s"
               >
                 <CardWrapper.Body>
-                  <VStack align="stretch" gap={3}>
+                  <VStack align="stretch" gap="3">
                     {/* Product Image Placeholder */}
                     {product.image_url ? (
                       <Image 
@@ -448,13 +439,13 @@ export function QROrderPage() {
                     )}
 
                     {/* Product Info */}
-                    <VStack align="start" gap={1}>
+                    <VStack align="start" gap="1">
                       <HStack justify="space-between" w="full">
                         <Text fontWeight="bold" fontSize="lg">
                           {product.name}
                         </Text>
                         {product.popularity_score && product.popularity_score > 80 && (
-                          <Badge colorScheme="yellow" leftIcon={<Icon icon={StarIcon} size="xs" />}>
+                          <Badge colorPalette="yellow" leftIcon={<Icon icon={StarIcon} size="xs" />}>
                             Popular
                           </Badge>
                         )}
@@ -514,7 +505,7 @@ export function QROrderPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          colorScheme="red"
+                          colorPalette="red"
                           onClick={() => removeFromCart(product.id)}
                         >
                           Remove
@@ -522,7 +513,7 @@ export function QROrderPage() {
                       </HStack>
                     ) : (
                       <Button
-                        colorScheme="blue"
+                        colorPalette="blue"
                         onClick={() => addToCart(product)}
                         leftIcon={<Icon icon={PlusIcon} size="sm" />}
                       >
@@ -538,14 +529,14 @@ export function QROrderPage() {
 
         {/* Customer Information Form */}
         {cart.length > 0 && (
-          <CardWrapper mb={4}>
+          <CardWrapper mb="4">
             <CardWrapper.Header>
               <Text fontWeight="bold" fontSize="lg">Your Information</Text>
             </CardWrapper.Header>
             <CardWrapper.Body>
-              <VStack gap={4} align="stretch">
+              <VStack gap="4" align="stretch">
                 <Box>
-                  <Text mb={2} fontSize="sm" fontWeight="medium">
+                  <Text mb="2" fontSize="sm" fontWeight="medium">
                     Name <Text as="span" color="red.500">*</Text>
                   </Text>
                   <InputField
@@ -556,7 +547,7 @@ export function QROrderPage() {
                 </Box>
 
                 <Box>
-                  <Text mb={2} fontSize="sm" fontWeight="medium">
+                  <Text mb="2" fontSize="sm" fontWeight="medium">
                     Phone (Optional)
                   </Text>
                   <InputField
@@ -567,7 +558,7 @@ export function QROrderPage() {
                 </Box>
 
                 <Box>
-                  <Text mb={2} fontSize="sm" fontWeight="medium">
+                  <Text mb="2" fontSize="sm" fontWeight="medium">
                     Special Requests (Optional)
                   </Text>
                   <Textarea
@@ -592,14 +583,14 @@ export function QROrderPage() {
           right={0}
           bg="white"
           shadow="lg"
-          p={4}
+          p="4"
           borderTop="1px solid"
           borderColor="border.default"
         >
-          <VStack gap={3}>
+          <VStack gap="3">
             {/* Order Summary */}
             <HStack justify="space-between" w="full">
-              <VStack align="start" gap={0}>
+              <VStack align="start" gap="0">
                 <Text fontSize="sm" color="gray.600">
                   {orderSummary.total_items} items
                 </Text>
@@ -608,7 +599,7 @@ export function QROrderPage() {
                 </Text>
               </VStack>
               
-              <VStack align="end" gap={0}>
+              <VStack align="end" gap="0">
                 <Text fontSize="sm" color="gray.600">
                   Est. {Math.ceil(orderSummary.estimated_prep_time)} min
                 </Text>
@@ -623,7 +614,7 @@ export function QROrderPage() {
 
             {/* Submit Order Button */}
             <Button
-              colorScheme="green"
+              colorPalette="green"
               size="lg"
               w="full"
               onClick={submitOrder}
@@ -640,10 +631,10 @@ export function QROrderPage() {
 
       {/* Empty Cart Message */}
       {cart.length === 0 && !loading && (
-        <Box textAlign="center" py={8}>
-          <VStack gap={4}>
+        <Box textAlign="center" py="8">
+          <VStack gap="4">
             <Icon icon={ShoppingCartIcon} size="2xl" className="text-gray-400" />
-            <VStack gap={2}>
+            <VStack gap="2">
               <Text fontSize="lg" fontWeight="medium">
                 Your cart is empty
               </Text>

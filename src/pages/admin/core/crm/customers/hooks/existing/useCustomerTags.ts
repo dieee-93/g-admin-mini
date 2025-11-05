@@ -3,13 +3,13 @@ import { useCallback, useState } from 'react';
 import { z } from 'zod';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import { CustomerTag, CustomerProfile } from '../types';
+import type { CustomerTag, CustomerProfile } from '../../types';
 import { logger } from '@/lib/logging';
 import {
   assignTagToCustomer,
   removeTagFromCustomer,
   getCustomersWithTag
-} from '../services/advancedCustomerApi';
+} from '../../services/existing/advancedCustomerApi';
 
 // Schema for CustomerTag validation
 const CustomerTagSchema = z.object({
@@ -164,7 +164,7 @@ export function useCustomerTags() {
 
 // Hook for managing tags of a specific customer
 export function useCustomerTagsForCustomer(customerId: string) {
-  const { tags, assignTag, removeTag } = useCustomerTags();
+  const { assignTag, removeTag } = useCustomerTags();
   const [customerTags, setCustomerTags] = useState<CustomerTag[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -222,6 +222,7 @@ export function useCustomerTagsForCustomer(customerId: string) {
 
   useEffect(() => {
     loadCustomerTags();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId]);
 
   return {

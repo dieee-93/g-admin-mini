@@ -221,7 +221,7 @@ export const useCustomersStore = create<CustomersState>()(
 
         setError: (_error) => {
           set((state) => {
-            state.error = error;
+            state.error = _error;
           });
         },
 
@@ -265,11 +265,11 @@ export const useCustomersStore = create<CustomersState>()(
         },
 
         // Modal actions
-        openModal: (mode, customer = null) => {
+        openModal: (mode, customer) => {
           set((state) => {
             state.isModalOpen = true;
             state.modalMode = mode;
-            state.currentCustomer = customer;
+            state.currentCustomer = customer ?? null;
           });
         },
 

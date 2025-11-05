@@ -1,5 +1,5 @@
 import React from 'react';
-import { VStack } from '@chakra-ui/react';
+import { VStack } from '@/shared/ui';
 import { useSalesIntelligence } from './hooks';
 import { DashboardHeader } from './components/DashboardHeader';
 import { MetricCardsGrid } from './components/MetricCardsGrid';

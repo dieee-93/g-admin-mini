@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { generatePerformanceInsights } from '../data';
-import type { PerformanceMetrics, PerformanceInsight } from '../types';
+import type { PerformanceMetrics, /* PerformanceInsight */ } from '../types';
 import { logger } from '@/lib/logging';
 import {
     CheckCircleIcon,

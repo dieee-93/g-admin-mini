@@ -12,9 +12,9 @@ export function InfoAlert() {
       border="1px solid"
       borderColor="blue.200"
       borderRadius="md"
-      p={4}
+      p="4"
     >
-      <Stack direction="row" gap={3} align="start">
+      <Stack direction="row" gap="3" align="start">
         <InformationCircleIcon width={20} height={20} color="#3182ce" />
         <Box>
           <Text fontSize="sm" fontWeight="medium" color="blue.800">

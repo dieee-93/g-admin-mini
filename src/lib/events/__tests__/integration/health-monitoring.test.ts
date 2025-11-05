@@ -9,7 +9,7 @@ import {
   createInventoryTestModule, 
   createCustomersTestModule, 
   createStaffTestModule,
-  createFailingKitchenTestModule 
+  createFailingProductionTestModule 
 } from '../helpers/test-modules';
 import type { NamespacedEvent, ModuleDescriptor, ModuleId } from '../../types';
 
@@ -51,7 +51,7 @@ describe('EventBus - Health Monitoring Integration', () => {
         createInventoryTestModule(),
         createCustomersTestModule(),
         createSalesTestModule(),
-        createFailingKitchenTestModule()
+        createFailingProductionTestModule()
       ];
 
       for (const module of modules) {

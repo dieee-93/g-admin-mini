@@ -31,10 +31,10 @@ export const InsightsTab: React.FC<InsightsTabProps> = ({
   getTrendIcon,
 }) => {
   return (
-    <VStack align="stretch" gap={4}>
+    <VStack align="stretch" gap="4">
       <HStack justify="space-between">
         <Text fontSize="lg" fontWeight="semibold">Performance Insights</Text>
-        <HStack gap={2}>
+        <HStack gap="2">
           {['all', 'revenue', 'efficiency', 'customer', 'operational'].map(category => (
             <Button
               key={category}
@@ -50,26 +50,26 @@ export const InsightsTab: React.FC<InsightsTabProps> = ({
         </HStack>
       </HStack>
 
-      <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
+      <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="4">
         {insights.map((insight, index) => {
           const ImpactIcon = getImpactIcon(insight.impact);
           const TrendIcon = getTrendIcon(insight.trend);
 
           return (
             <CardWrapper key={index} variant="outline">
-              <CardWrapper.Body p={4}>
-                <VStack align="stretch" gap={3}>
+              <CardWrapper.Body p="4">
+                <VStack align="stretch" gap="3">
                   <HStack justify="space-between">
                     <Badge colorPalette={getTypeColor(insight.type)} size="sm">
                       {insight.type}
                     </Badge>
-                    <HStack gap={1}>
+                    <HStack gap="1">
                       <ImpactIcon className={`w-4 h-4 text-${getTypeColor(insight.type)}-500`} />
                       <TrendIcon className={`w-4 h-4`} />
                     </HStack>
                   </HStack>
 
-                  <VStack align="stretch" gap={2}>
+                  <VStack align="stretch" gap="2">
                     <Text fontWeight="bold" fontSize="md">{insight.title}</Text>
                     <Text fontSize="sm" color="gray.600">{insight.description}</Text>
                   </VStack>
@@ -87,7 +87,7 @@ export const InsightsTab: React.FC<InsightsTabProps> = ({
                     </Badge>
                   </HStack>
 
-                  <Box p={3} bg="bg.canvas" borderRadius="md">
+                  <Box p="3" bg="bg.canvas" borderRadius="md">
                     <Text fontSize="sm" fontWeight="medium" color="blue.600">
                       💡 {insight.recommendation}
                     </Text>

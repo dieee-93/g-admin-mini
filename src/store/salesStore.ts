@@ -361,7 +361,7 @@ export const useSalesStore = create<SalesState>()(
 
         setError: (_error) => {
           set((state) => {
-            state.error = error;
+            state.error = _error;
           });
         },
 

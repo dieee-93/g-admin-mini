@@ -30,7 +30,7 @@ export function SupabaseConnectionStep({
   };
 
   return (
-    <Box w="full" p={4}>
+    <Box w="full" p="4">
       <VStack 
         gap="lg" 
         align="stretch"

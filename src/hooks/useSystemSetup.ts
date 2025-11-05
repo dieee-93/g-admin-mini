@@ -404,7 +404,7 @@ export function useSystemSetup() {
               .from('system_config')
               .select('value')
               .eq('key', 'onboarding_completed')
-              .single();
+              .single<{ value: string }>();
             isCompleted = onboardingData?.value === 'true';
             break;
         }
@@ -484,7 +484,7 @@ export function useSystemSetup() {
           key: 'onboarding_completed',
           value: 'true',
           updated_at: new Date().toISOString()
-        });
+        } as any);
     }
 
     // Re-verificar el estado

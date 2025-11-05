@@ -18,15 +18,15 @@ import {
   CurrencyDollarIcon,
   ClockIcon,
   ExclamationTriangleIcon,
-  CheckCircleIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
-  ChartBarIcon,
   CalculatorIcon
 } from '@heroicons/react/24/outline';
+// TODO: Implement chart visualization using ChartBarIcon and CheckCircleIcon
 import { DecimalUtils } from '../../../../../business-logic/shared/decimalUtils';
 import staffApi, { type LaborCostData, type LaborCostSummary } from '../../../../../services/staff/staffApi';
 import { QuickCalculations } from '../../../../../business-logic/shared/FinancialCalculations';
+import type { DepartmentCostAnalysis } from '../types';
 
 interface LaborCostDashboardProps {
   compact?: boolean;
@@ -37,19 +37,19 @@ interface LaborCostDashboardProps {
   };
 }
 
-export function LaborCostDashboard({ 
-  compact = false, 
-  showDetails = true, 
-  dateRange 
+export function LaborCostDashboard({
+  compact = false,
+  showDetails = true,
+  dateRange
 }: LaborCostDashboardProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
-  
+
   // Data states
   const [laborCosts, setLaborCosts] = useState<LaborCostData[]>([]);
   const [costSummary, setCostSummary] = useState<LaborCostSummary | null>(null);
-  const [costAnalysis, setCostAnalysis] = useState<any[]>([]);
+  const [costAnalysis, setCostAnalysis] = useState<DepartmentCostAnalysis[]>([]);
 
   // Default date range (current week) - MIGRATED TO DECIMAL PRECISION  
   const defaultDateRange = {

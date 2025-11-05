@@ -63,13 +63,13 @@ export const FoundationalProgress: React.FC<FoundationalProgressProps> = ({
   cardBorder
 }) => {
   return (
-    <VStack gap={8} align="stretch">
+    <VStack gap="8" align="stretch">
       <Text fontSize="2xl" fontWeight="semibold" textAlign="center" color="white">
         🧬 ADN de tu Negocio - Activación por Hitos
       </Text>
       
       {/* Galaxia de Capacidades - Grid cósmico */}
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={8}>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="8">
         {foundationalProgress.map((capability) => {
           // Validación y valores por defecto
           const safeCapability = {
@@ -87,7 +87,7 @@ export const FoundationalProgress: React.FC<FoundationalProgressProps> = ({
           return (
             <Box
               key={safeCapability.capabilityId}
-              p={6}
+              p="6"
               bg={cardBg}
               border="2px solid"
               borderColor={statusInfo.bg}
@@ -115,7 +115,7 @@ export const FoundationalProgress: React.FC<FoundationalProgressProps> = ({
                 zIndex={0}
               />
               
-              <VStack gap={4} position="relative" zIndex={1}>
+              <VStack gap="4" position="relative" zIndex={1}>
                 {/* Header con estado */}
                 <HStack justify="space-between" width="100%">
                   <Text fontSize="2xl">
@@ -143,7 +143,7 @@ export const FoundationalProgress: React.FC<FoundationalProgressProps> = ({
                 
                 {/* Progreso de hitos */}
                 <Box width="100%">
-                  <HStack justify="space-between" mb={2}>
+                  <HStack justify="space-between" mb="2">
                     <Text fontSize="sm" color="gray.400">
                       Progreso de Hitos
                     </Text>
@@ -163,18 +163,18 @@ export const FoundationalProgress: React.FC<FoundationalProgressProps> = ({
                     </Progress.Track>
                   </Progress.Root>
                   
-                  <Text fontSize="xs" color="gray.500" textAlign="center" mt={1}>
+                  <Text fontSize="xs" color="gray.500" textAlign="center" mt="1">
                     {safeCapability.progress}% completado
                   </Text>
                 </Box>
                 
                 {/* Lista de hitos (máximo 3 visibles) */}
-                <VStack gap={2} width="100%" align="stretch">
+                <VStack gap="2" width="100%" align="stretch">
                   <Text fontSize="xs" color="gray.400" textAlign="center">
                     Próximos Hitos
                   </Text>
                   {safeCapability.milestones?.slice(0, 3).map((milestone: Milestone) => (
-                    <HStack key={milestone?.id || Math.random()} gap={2}>
+                    <HStack key={milestone?.id || Math.random()} gap="2">
                       <Text fontSize="xs" color={milestone?.completed ? 'green.400' : 'gray.500'}>
                         {milestone?.completed ? '✓' : '○'}
                       </Text>

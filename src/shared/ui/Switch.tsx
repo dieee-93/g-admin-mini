@@ -1,5 +1,7 @@
 import { Switch as ChakraSwitch } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
+import { Stack } from './Stack'
+import { Text } from './Text'
 
 interface SwitchProps {
   // Core functionality
@@ -8,20 +10,19 @@ interface SwitchProps {
   onChange?: (checked: boolean) => void
   disabled?: boolean
   invalid?: boolean
-  
+
   // Content
   children?: ReactNode
   label?: string
-  description?: string
-  
+
   // Styling
   size?: 'sm' | 'md' | 'lg'
   colorPalette?: 'gray' | 'blue' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
-  variant?: 'raised' | 'outline'
-  
+  variant?: 'solid' | 'raised'
+
   // Layout
   labelPlacement?: 'start' | 'end'
-  
+
   // Props
   name?: string
   value?: string
@@ -39,9 +40,9 @@ interface SwitchGroupProps {
 }
 
 const sizeMap = {
-  sm: 'sm',
-  md: 'md', 
-  lg: 'lg'
+  sm: 'sm' as const,
+  md: 'md' as const,
+  lg: 'lg' as const
 }
 
 
@@ -53,10 +54,9 @@ export function Switch({
   invalid = false,
   children,
   label,
-  description,
   size = 'md',
-  colorPalette = 'brand',
-  variant = 'raised',
+  colorPalette = 'gray',
+  variant = 'solid',
   labelPlacement = 'end',
   name,
   value,
@@ -73,7 +73,7 @@ export function Switch({
       onCheckedChange={(details) => onChange?.(details.checked)}
       disabled={disabled}
       invalid={invalid}
-      size={sizeMap[size]}
+      size={size}
       colorPalette={colorPalette}
       variant={variant}
       name={name}
@@ -94,10 +94,6 @@ export function Switch({
       {labelPlacement === 'end' && displayLabel && (
         <ChakraSwitch.Label>{displayLabel}</ChakraSwitch.Label>
       )}
-      
-      {description && (
-        <ChakraSwitch.Description>{description}</ChakraSwitch.Description>
-      )}
     </ChakraSwitch.Root>
   )
 }
@@ -110,37 +106,28 @@ export function SwitchGroup({
   gap = 'md',
   className,
 }: SwitchGroupProps) {
-  const gapMap = {
-    sm: '2',
-    md: '4',
-    lg: '6'
-  }
-
   return (
-    <ChakraSwitch.Root className={className}>
+    <Stack gap={gap} className={className}>
       {label && (
-        <ChakraSwitch.Label fontWeight="semibold" mb="2">
+        <Text fontWeight="semibold" mb="2">
           {label}
-        </ChakraSwitch.Label>
+        </Text>
       )}
-      
+
       {description && (
-        <ChakraSwitch.Description mb="4">
+        <Text fontSize="sm" color="gray.600" mb="4">
           {description}
-        </ChakraSwitch.Description>
+        </Text>
       )}
-      
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: orientation === 'vertical' ? 'column' : 'row',
-          gap: `${gapMap[gap]}`,
-          alignItems: orientation === 'horizontal' ? 'center' : 'stretch'
-        }}
+
+      <Stack
+        direction={orientation === 'horizontal' ? 'row' : 'column'}
+        gap={gap}
+        align={orientation === 'horizontal' ? 'center' : 'stretch'}
       >
         {children}
-      </div>
-    </ChakraSwitch.Root>
+      </Stack>
+    </Stack>
   )
 }
 
@@ -185,7 +172,7 @@ export function PermissionSwitch({
     <Switch
       checked={hasPermission}
       onChange={onToggle}
-      colorPalette={hasPermission ? 'success' : 'error'}
+      colorPalette={hasPermission ? 'green' : 'red'}
       {...props}
     >
       {hasPermission ? allowLabel : denyLabel}

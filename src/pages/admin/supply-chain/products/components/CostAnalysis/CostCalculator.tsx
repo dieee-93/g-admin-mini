@@ -2,7 +2,6 @@
 // Calculadora de costos como componente independiente
 
 import React, { useState } from 'react';
-import { Box, Separator, Text } from '@chakra-ui/react'; // Import Box directly from Chakra
 import {
   CardWrapper,
   VStack,
@@ -12,6 +11,9 @@ import {
   Grid,
   InputField,
   NumberField,
+  Box,
+  Separator,
+  Text
 } from '@/shared/ui';
 import {
   CurrencyDollarIcon,
@@ -156,7 +158,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
   };
 
   return (
-    <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap={6}>
+    <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap="6">
       {/* Input Form */}
       <CardWrapper>
         <CardWrapper.Header>
@@ -166,10 +168,10 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
           </HStack>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <VStack gap={4} align="stretch">
+          <VStack gap="4" align="stretch">
             {/* Product Info */}
             <Box>
-              <Text fontSize="sm" fontWeight="medium" mb={2}>Product Name</Text>
+              <Text fontSize="sm" fontWeight="medium" mb="2">Product Name</Text>
               <InputField
                 value={currentCalculation.product_name || ''}
                 onChange={(e) => setCurrentCalculation(prev => ({ ...prev, product_name: e.target.value }))}
@@ -178,7 +180,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
             </Box>
 
             <Box>
-              <Text fontSize="sm" fontWeight="medium" mb={2}>Batch Size (units)</Text>
+              <Text fontSize="sm" fontWeight="medium" mb="2">Batch Size (units)</Text>
               <NumberField
                 value={currentCalculation.batch_size}
                 onChange={(value) => setCurrentCalculation(prev => ({ ...prev, batch_size: value }))}
@@ -193,7 +195,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
             <Text fontSize="md" fontWeight="semibold" color="blue.600">Material Costs</Text>
             
             <Box>
-              <Text fontSize="sm" fontWeight="medium" mb={2}>Total Materials Cost ($)</Text>
+              <Text fontSize="sm" fontWeight="medium" mb="2">Total Materials Cost ($)</Text>
               <NumberField
                 value={currentCalculation.materials_cost}
                 onChange={(value) => setCurrentCalculation(prev => ({ ...prev, materials_cost: value }))}
@@ -208,9 +210,9 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
             {/* Labor Costs */}
             <Text fontSize="md" fontWeight="semibold" color="green.600">Labor Costs</Text>
             
-            <Grid templateColumns="1fr 1fr" gap={3}>
+            <Grid templateColumns="1fr 1fr" gap="3">
               <Box>
-                <Text fontSize="sm" fontWeight="medium" mb={2}>Labor Hours</Text>
+                <Text fontSize="sm" fontWeight="medium" mb="2">Labor Hours</Text>
                 <NumberInput.Root
                   value={currentCalculation.labor_hours?.toString()}
                   onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, labor_hours: parseFloat(details.value) }))}
@@ -222,7 +224,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
               </Box>
               
               <Box>
-                <Text fontSize="sm" fontWeight="medium" mb={2}>Rate/Hour ($)</Text>
+                <Text fontSize="sm" fontWeight="medium" mb="2">Rate/Hour ($)</Text>
                 <NumberInput.Root
                   value={currentCalculation.labor_rate_per_hour?.toString()}
                   onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, labor_rate_per_hour: parseFloat(details.value) }))}
@@ -239,9 +241,9 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
             {/* Overhead Costs */}
             <Text fontSize="md" fontWeight="semibold" color="orange.600">Overhead Costs</Text>
             
-            <Grid templateColumns="1fr 1fr" gap={3}>
+            <Grid templateColumns="1fr 1fr" gap="3">
               <Box>
-                <Text fontSize="sm" fontWeight="medium" mb={2}>Equipment ($)</Text>
+                <Text fontSize="sm" fontWeight="medium" mb="2">Equipment ($)</Text>
                 <NumberInput.Root
                   value={currentCalculation.equipment_cost?.toString()}
                   onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, equipment_cost: parseFloat(details.value) }))}
@@ -253,7 +255,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
               </Box>
               
               <Box>
-                <Text fontSize="sm" fontWeight="medium" mb={2}>Utilities ($)</Text>
+                <Text fontSize="sm" fontWeight="medium" mb="2">Utilities ($)</Text>
                 <NumberInput.Root
                   value={currentCalculation.utility_cost?.toString()}
                   onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, utility_cost: parseFloat(details.value) }))}
@@ -266,7 +268,7 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
             </Grid>
 
             <Box>
-              <Text fontSize="sm" fontWeight="medium" mb={2}>Facility Cost ($)</Text>
+              <Text fontSize="sm" fontWeight="medium" mb="2">Facility Cost ($)</Text>
               <NumberInput.Root
                 value={currentCalculation.facility_cost?.toString()}
                 onValueChange={(details) => setCurrentCalculation(prev => ({ ...prev, facility_cost: parseFloat(details.value) }))}
@@ -305,17 +307,17 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
             </HStack>
           </CardWrapper.Header>
           <CardWrapper.Body>
-            <VStack gap={4} align="stretch">
+            <VStack gap="4" align="stretch">
               {/* Cost Summary */}
-              <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                <Box textAlign="center" p={3} bg="blue.50" borderRadius="md">
+              <Grid templateColumns="repeat(2, 1fr)" gap="4">
+                <Box textAlign="center" p="3" bg="blue.50" borderRadius="md">
                   <Text fontSize="xs" color="gray.600">Total Cost</Text>
                   <Text fontSize="xl" fontWeight="bold" color="blue.600">
                     ${calculations[0].total_cost.toFixed(2)}
                   </Text>
                 </Box>
                 
-                <Box textAlign="center" p={3}  borderRadius="md">
+                <Box textAlign="center" p="3"  borderRadius="md">
                   <Text fontSize="xs" color="gray.600">Cost per Unit</Text>
                   <Text fontSize="xl" fontWeight="bold" color="green.600">
                     ${calculations[0].cost_per_unit.toFixed(2)}
@@ -325,8 +327,8 @@ export function CostCalculator({ calculations, onCalculationComplete }: CostCalc
 
               {/* Pricing Analysis */}
               <Box>
-                <Text fontSize="sm" fontWeight="semibold" mb={2}>Pricing Analysis</Text>
-                <Grid templateColumns="repeat(2, 1fr)" gap={3} fontSize="sm">
+                <Text fontSize="sm" fontWeight="semibold" mb="2">Pricing Analysis</Text>
+                <Grid templateColumns="repeat(2, 1fr)" gap="3" fontSize="sm">
                   <HStack justify="space-between">
                     <Text>Suggested Price:</Text>
                     <Text fontWeight="bold">${calculations[0].suggested_price.toFixed(2)}</Text>

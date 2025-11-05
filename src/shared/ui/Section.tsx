@@ -1,51 +1,155 @@
 /**
- * Section FIXED - Layout profesional con spacing mejorado
+ * Section - Semantic content section with styling
  *
- * Problemas identificados y solucionados:
- * - Padding muy pequeño (6 -> 8)
- * - Sin margin-bottom entre secciones
- * - Header con spacing insuficiente
- * - Contenido sin estructura Stack interna
- * - Falta jerarquía visual clara
+ * LAYER 2: LAYOUT COMPONENTS
+ * Purpose: Combines semantic sectioning with visual design variants
+ *
+ * REFACTORED v3.0 (Semantic Architecture):
+ * - ✅ Uses semantic <SemanticSection> component (Layer 3)
+ * - ✅ Auto-generates hidden headings for screen readers
+ * - ✅ ARIA live region support for dynamic content
+ * - ✅ Visual variants (default/elevated/flat)
+ * - ✅ Separation of semantics (Layer 3) from styling (Layer 2)
+ *
+ * Architecture:
+ * - Layer 3: <SemanticSection> (semantic HTML + ARIA)
+ * - Layer 2: Section (styling + variants) ← You are here
+ * - Layer 1: Box, Stack, Typography (primitives)
+ *
+ * @example
+ * // Basic section with visual styling
+ * <Section variant="elevated" title="Sales Metrics">
+ *   <YourContent />
+ * </Section>
+ *
+ * @example
+ * // Section with semantic heading for screen readers
+ * <Section
+ *   variant="flat"
+ *   title="Metrics"
+ *   semanticHeading="Sales Performance Metrics"
+ * >
+ *   <MetricsGrid />
+ * </Section>
+ *
+ * @example
+ * // Article with live region for dynamic content
+ * <Section
+ *   as="article"
+ *   variant="elevated"
+ *   title="Latest Updates"
+ *   semanticHeading="System Alerts and Notifications"
+ *   live="polite"
+ * >
+ *   <AlertsView />
+ * </Section>
+ *
+ * @example
+ * // Aside for complementary content
+ * <Section
+ *   as="aside"
+ *   variant="default"
+ *   title="Quick Stats"
+ *   semanticHeading="Performance Statistics"
+ * >
+ *   <StatsGrid />
+ * </Section>
  */
 
-import { Box, Stack, HStack } from '@chakra-ui/react'
-import type { ReactNode } from 'react'
-import { Typography, Icon } from '.'
+import { Stack, HStack, Box } from '@chakra-ui/react';
+import { SemanticSection } from './semantic/Section';
+import { Typography } from './Typography';
+import { Icon } from './Icon';
+import type { ReactNode } from 'react';
 
 interface SectionProps {
-  children: ReactNode
-  variant?: 'default' | 'elevated' | 'flat'
-  title?: string
-  subtitle?: string
-  icon?: React.ComponentType<any>
-  actions?: ReactNode
-  colorPalette?: string
-  className?: string
-  [key: string]: any  // Allow any Chakra props for flexibility
+  // ===== PRESENTATIONAL PROPS (Layer 2) =====
+
+  /** Visual variant for styling */
+  variant?: 'default' | 'elevated' | 'flat';
+
+  /** Visual title (displayed) */
+  title?: string;
+
+  /** Visual subtitle (displayed) */
+  subtitle?: string;
+
+  /** Icon component to display next to title */
+  icon?: React.ComponentType<any>;
+
+  /** Action buttons/controls in header */
+  actions?: ReactNode;
+
+  /** Color palette for theming */
+  colorPalette?: string;
+
+  // ===== SEMANTIC PROPS (delegated to Layer 3) =====
+
+  /** HTML element to render (default: section) */
+  as?: 'section' | 'article' | 'aside' | 'nav';
+
+  /** Hidden heading for screen readers (auto-generates <h2>) */
+  semanticHeading?: string;
+
+  /** ARIA label (only if no semanticHeading) */
+  ariaLabel?: string;
+
+  /** ID of element that labels this section */
+  ariaLabelledBy?: string;
+
+  /** ARIA live region for dynamic content */
+  live?: 'off' | 'polite' | 'assertive';
+
+  /** Whether to announce all content changes */
+  atomic?: boolean;
+
+  /** What types of changes to announce */
+  relevant?: 'additions' | 'removals' | 'text' | 'all' | 'additions removals';
+
+  // ===== COMMON PROPS =====
+
+  /** Content to render */
+  children: ReactNode;
+
+  /** Additional className */
+  className?: string;
+
+  /** Any other props passed to SemanticSection */
+  [key: string]: any;
 }
 
 /**
- * Section FIXED - Semantic wrapper con layout profesional
+ * Section - Styled semantic section component
  *
- * MEJORAS:
- * - Padding generoso para breathing room
- * - Margin-bottom automático entre secciones
- * - Estructura Stack interna para organizar contenido
- * - Header con spacing mejorado
+ * ✅ Uses Layer 3 semantic <SemanticSection>
+ * ✅ Visual variants for different contexts
+ * ✅ Auto-generates screen reader headings
+ * ✅ ARIA live region support
  */
 export function Section({
-  children,
+  // Presentational
   variant = 'default',
   title,
   subtitle,
   icon: IconComponent,
   actions,
   colorPalette,
+
+  // Semantic
+  as = 'section',
+  semanticHeading,
+  ariaLabel,
+  ariaLabelledBy,
+  live,
+  atomic,
+  relevant,
+
+  // Common
+  children,
   className,
-  ...chakraProps
+  ...rest
 }: SectionProps) {
-  // Recipe-based styles MEJORADOS con spacing profesional
+  // ===== VISUAL STYLING (Layer 2 responsibility) =====
   const variantStyles = {
     default: {
       bg: 'gray.00',
@@ -53,8 +157,8 @@ export function Section({
       border: '1px solid',
       borderColor: 'border.default',
       borderRadius: 'lg',
-      p: '8',                    // ✅ FIXED: Más padding (32px en lugar de 24px)
-      mb: '8',                   // ✅ FIXED: Margin-bottom entre secciones
+      p: '8',
+      mb: '8',
       shadow: 'sm'
     },
     elevated: {
@@ -63,41 +167,41 @@ export function Section({
       border: '1px solid',
       borderColor: 'border.default',
       borderRadius: 'lg',
-      p: '8',                    // ✅ FIXED: Más padding
-      mb: '8',                   // ✅ FIXED: Margin-bottom entre secciones
+      p: '8',
+      mb: '8',
       shadow: 'lg',
-      position: 'relative'
+      position: 'relative' as const
     },
     flat: {
-      p: '8',                    // ✅ FIXED: Más padding incluso en flat
-      mb: '6',                   // ✅ FIXED: Menos margin para flat pero algo
+      p: '8',
+      mb: '6',
       bg: 'transparent',
       color: 'text.primary'
     }
-  }
+  };
 
-  // Header MEJORADO con spacing profesional
+  // ===== VISUAL HEADER (optional) =====
   const renderHeader = () => {
-    if (!title && !IconComponent && !actions) return null
+    if (!title && !IconComponent && !actions) return null;
 
     return (
-      <HStack justify="space-between" align="center" mb={6}> {/* ✅ FIXED: mb=6 en lugar de 4 */}
-        <HStack align="center" gap={3}> {/* ✅ FIXED: gap=3 en lugar de 2 */}
+      <HStack justify="space-between" align="center" mb="6">
+        <HStack align="center" gap="3">
           {IconComponent && (
             <Icon
               icon={IconComponent}
-              size="xl"                    // ✅ FIXED: Icono más grande
+              size="xl"
               color="text.muted"
             />
           )}
-          <Stack gap={1}>              {/* ✅ FIXED: gap=1 para títulos */}
+          <Stack gap="1">
             {title && (
               <Typography
                 variant="heading"
-                size="xl"                  // ✅ FIXED: Títulos más grandes
-                weight="bold"              // ✅ FIXED: Más bold para jerarquía
+                size="xl"
+                weight="bold"
                 color="text.primary"
-                lineHeight="1.2"          // ✅ FIXED: Line height mejorado
+                lineHeight="1.2"
               >
                 {title}
               </Typography>
@@ -105,9 +209,9 @@ export function Section({
             {subtitle && (
               <Typography
                 variant="body"
-                size="md"                  // ✅ FIXED: Subtítulo más grande
+                size="md"
                 color="text.muted"
-                lineHeight="1.4"          // ✅ FIXED: Line height mejorado
+                lineHeight="1.4"
               >
                 {subtitle}
               </Typography>
@@ -120,21 +224,30 @@ export function Section({
           </Box>
         )}
       </HStack>
-    )
-  }
+    );
+  };
 
+  // ===== RENDER =====
+  // Layer 3 (SemanticSection) handles semantics + ARIA
+  // Layer 2 (this component) handles styling + visual layout
   return (
-    <Box
-      {...variantStyles[variant]}
-      colorPalette={colorPalette}
+    <SemanticSection
+      as={as}
+      heading={semanticHeading}
+      label={ariaLabel}
+      labelledBy={ariaLabelledBy}
+      live={live}
+      atomic={atomic}
+      relevant={relevant}
       className={className}
-      {...chakraProps}
+      colorPalette={colorPalette}
+      {...variantStyles[variant]}
+      {...rest}
     >
       {renderHeader()}
-      {/* ✅ FIXED: Contenido envuelto en Stack para mejor organización */}
-      <Stack gap={4}>
+      <Stack gap="4">
         {children}
       </Stack>
-    </Box>
-  )
+    </SemanticSection>
+  );
 }

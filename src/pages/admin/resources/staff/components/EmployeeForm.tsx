@@ -1,19 +1,23 @@
-// Employee Form - Create/Edit employee form with real API integration
-import { useState } from 'react';
+// Employee Form - MIGRATED to Zod + React Hook Form validation
+import { useEffect } from 'react';
 import {
   VStack,
   HStack,
   Text,
   Button,
   CardWrapper,
-  InputField,
+  Input,
   Modal,
   Alert,
-  Icon
+  Icon,
+  Field,
+  NativeSelect
 } from '../../../../../shared/ui';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { useStaffWithLoader } from '../../../../../hooks/useStaffData';
+import { useEmployeeValidation } from '../../../../../hooks/useEmployeeValidation';
 import type { Employee } from '../../../../../services/staff/staffApi';
+import type { EmployeeCompleteFormData } from '@/lib/validation/zod/CommonSchemas';
 
 interface EmployeeFormProps {
   employee?: Employee;
@@ -22,55 +26,78 @@ interface EmployeeFormProps {
   onSuccess?: (employee: Employee) => void;
 }
 
-interface EmployeeFormData {
-  employee_id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  position: string;
-  department: 'kitchen' | 'service' | 'admin' | 'cleaning' | 'management';
-  hire_date: string;
-  employment_type: 'full_time' | 'part_time' | 'contractor' | 'temp';
-  salary: number;
-  weekly_hours: number;
-  shift_preference: 'morning' | 'afternoon' | 'night' | 'flexible';
-}
-
 export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeFormProps) {
-  const { createEmployee, updateEmployee, loading } = useStaffWithLoader();
-  const [formData, setFormData] = useState<EmployeeFormData>({
-    employee_id: employee?.employee_id || '',
-    first_name: employee?.first_name || '',
-    last_name: employee?.last_name || '',
-    email: employee?.email || '',
-    phone: employee?.phone || '',
-    position: employee?.position || '',
-    department: employee?.department || 'service',
-    hire_date: employee?.hire_date || new Date().toISOString().split('T')[0],
-    employment_type: employee?.employment_type || 'full_time',
-    salary: employee?.salary || 0,
-    weekly_hours: employee?.weekly_hours || 40,
-    shift_preference: employee?.shift_preference || 'flexible'
-  });
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { createEmployee, updateEmployee, loading, employees } = useStaffWithLoader();
 
   const isEditing = !!employee;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitError(null);
+  // 🔥 NEW: Use validation hook with Zod + React Hook Form
+  const {
+    form,
+    fieldErrors,
+    fieldWarnings,
+    validationState,
+    validateForm
+  } = useEmployeeValidation(
+    {
+      employee_id: employee?.employee_id || '',
+      first_name: employee?.first_name || '',
+      last_name: employee?.last_name || '',
+      email: employee?.email || '',
+      phone: employee?.phone || '',
+      position: employee?.position || '',
+      department: (employee?.department || 'service') as 'kitchen' | 'service' | 'admin' | 'cleaning' | 'management',
+      hire_date: employee?.hire_date || new Date().toISOString().split('T')[0],
+      employment_type: (employee?.employment_type || 'full_time') as 'full_time' | 'part_time' | 'contract' | 'intern',
+      employment_status: 'active',
+      salary: employee?.salary,
+      hourly_rate: employee?.hourly_rate,
+      weekly_hours: 40,
+      role: 'employee',
+      can_work_multiple_locations: false
+    },
+    employees || [],
+    employee?.id
+  );
+
+  const { register, handleSubmit: createSubmitHandler, reset, formState: { errors } } = form;
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      reset();
+    }
+  }, [isOpen, reset]);
+
+  const handleSubmit = createSubmitHandler(async (data: EmployeeCompleteFormData) => {
+    // Additional validation
+    const isValid = await validateForm();
+    if (!isValid) return;
 
     try {
+      // Map form data to API format
       const employeeData = {
-        ...formData,
-        employment_status: 'active' as const,
-        role: 'employee' as const,
+        employee_id: data.employee_id,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone || '',
+        position: data.position,
+        department: data.department,
+        hire_date: data.hire_date,
+        employment_type: data.employment_type,
+        employment_status: data.employment_status,
+        salary: data.salary || 0,
+        hourly_rate: data.hourly_rate || 0,
+        weekly_hours: data.weekly_hours || 40,
+        role: data.role,
         performance_score: 85,
         attendance_rate: 95,
         completed_tasks: 0,
         available_days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        permissions: [] as string[]
+        permissions: [] as string[],
+        home_location_id: data.home_location_id,
+        can_work_multiple_locations: data.can_work_multiple_locations
       };
 
       let result: Employee | null = null;
@@ -84,30 +111,15 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
       if (result) {
         onSuccess?.(result);
         onClose();
-        // Reset form
-        setFormData({
-          employee_id: '',
-          first_name: '',
-          last_name: '',
-          email: '',
-          phone: '',
-          position: '',
-          department: 'service',
-          hire_date: new Date().toISOString().split('T')[0],
-          employment_type: 'full_time',
-          salary: 0,
-          weekly_hours: 40,
-          shift_preference: 'flexible'
-        });
+        reset();
       }
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Error al guardar empleado');
+      form.setError('root', {
+        type: 'manual',
+        message: error instanceof Error ? error.message : 'Error al guardar empleado'
+      });
     }
-  };
-
-  const handleInputChange = (field: keyof EmployeeFormData, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  });
 
   return (
     <Modal open={isOpen} onClose={onClose} size="lg">
@@ -122,13 +134,25 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
         </Modal.Header>
 
         <Modal.Body>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} id="employee-form">
             <VStack gap="4" align="stretch">
-              {submitError && (
+              {/* Root Error */}
+              {errors.root && (
                 <Alert status="error">
                   <Alert.Indicator />
                   <Alert.Title>Error</Alert.Title>
-                  <Alert.Description>{submitError}</Alert.Description>
+                  <Alert.Description>{errors.root.message}</Alert.Description>
+                </Alert>
+              )}
+
+              {/* Validation Summary */}
+              {validationState.hasErrors && (
+                <Alert status="error">
+                  <Alert.Indicator />
+                  <Alert.Title>Errores de Validación</Alert.Title>
+                  <Alert.Description>
+                    Hay {validationState.errorCount} error(es) en el formulario. Corrige los campos marcados.
+                  </Alert.Description>
                 </Alert>
               )}
 
@@ -137,48 +161,71 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                 <CardWrapper.Body>
                   <VStack gap="4" align="stretch">
                     <Text fontWeight="semibold">Información Personal</Text>
-                    
+
+                    {/* Employee ID */}
+                    <Field.Root invalid={!!fieldErrors.employee_id}>
+                      <Field.Label>ID Empleado *</Field.Label>
+                      <Input
+                        {...register('employee_id')}
+                        placeholder="EMP001"
+                      />
+                      {fieldErrors.employee_id && (
+                        <Field.ErrorText>{fieldErrors.employee_id}</Field.ErrorText>
+                      )}
+                      <Field.HelperText>Identificador único del empleado</Field.HelperText>
+                    </Field.Root>
+
                     <HStack gap="4">
-                      <VStack align="stretch" flex="1">
-                        <Text fontSize="sm" fontWeight="medium">Nombre *</Text>
-                        <InputField
-                          required
-                          value={formData.first_name}
-                          onChange={(e) => handleInputChange('first_name', e.target.value)}
-                          placeholder="Nombre"
+                      {/* First Name */}
+                      <Field.Root invalid={!!fieldErrors.first_name} flex="1">
+                        <Field.Label>Nombre *</Field.Label>
+                        <Input
+                          {...register('first_name')}
+                          placeholder="Juan"
                         />
-                      </VStack>
-                      <VStack align="stretch" flex="1">
-                        <Text fontSize="sm" fontWeight="medium">Apellido *</Text>
-                        <InputField
-                          required
-                          value={formData.last_name}
-                          onChange={(e) => handleInputChange('last_name', e.target.value)}
-                          placeholder="Apellido"
+                        {fieldErrors.first_name && (
+                          <Field.ErrorText>{fieldErrors.first_name}</Field.ErrorText>
+                        )}
+                      </Field.Root>
+
+                      {/* Last Name */}
+                      <Field.Root invalid={!!fieldErrors.last_name} flex="1">
+                        <Field.Label>Apellido *</Field.Label>
+                        <Input
+                          {...register('last_name')}
+                          placeholder="Pérez"
                         />
-                      </VStack>
+                        {fieldErrors.last_name && (
+                          <Field.ErrorText>{fieldErrors.last_name}</Field.ErrorText>
+                        )}
+                      </Field.Root>
                     </HStack>
 
-                    <VStack align="stretch">
-                      <Text fontSize="sm" fontWeight="medium">Email *</Text>
-                      <InputField
+                    {/* Email */}
+                    <Field.Root invalid={!!fieldErrors.email}>
+                      <Field.Label>Email *</Field.Label>
+                      <Input
                         type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        {...register('email')}
                         placeholder="email@ejemplo.com"
                       />
-                    </VStack>
+                      {fieldErrors.email && (
+                        <Field.ErrorText>{fieldErrors.email}</Field.ErrorText>
+                      )}
+                    </Field.Root>
 
-                    <VStack align="stretch">
-                      <Text fontSize="sm" fontWeight="medium">Teléfono</Text>
-                      <InputField
+                    {/* Phone */}
+                    <Field.Root invalid={!!fieldErrors.phone}>
+                      <Field.Label>Teléfono</Field.Label>
+                      <Input
                         type="tel"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
-                        placeholder="+1234567890"
+                        {...register('phone')}
+                        placeholder="+54 11 1234-5678"
                       />
-                    </VStack>
+                      {fieldErrors.phone && (
+                        <Field.ErrorText>{fieldErrors.phone}</Field.ErrorText>
+                      )}
+                    </Field.Root>
                   </VStack>
                 </CardWrapper.Body>
               </CardWrapper>
@@ -188,97 +235,128 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                 <CardWrapper.Body>
                   <VStack gap="4" align="stretch">
                     <Text fontWeight="semibold">Información Laboral</Text>
-                    
+
                     <HStack gap="4">
-                      <VStack align="stretch" flex="1">
-                        <Text fontSize="sm" fontWeight="medium">Posición *</Text>
-                        <InputField
-                          required
-                          value={formData.position}
-                          onChange={(e) => handleInputChange('position', e.target.value)}
+                      {/* Position */}
+                      <Field.Root invalid={!!fieldErrors.position} flex="1">
+                        <Field.Label>Posición *</Field.Label>
+                        <Input
+                          {...register('position')}
                           placeholder="Ej: Mesero, Cocinero, Gerente"
                         />
-                      </VStack>
-                      <VStack align="stretch" flex="1">
-                        <Text fontSize="sm" fontWeight="medium">Departamento *</Text>
-                        <select
-                          required
-                          value={formData.department}
-                          onChange={(e) => handleInputChange('department', e.target.value)}
-                          className="w-full p-2 border rounded-md"
-                        >
-                          <option value="kitchen">Cocina</option>
-                          <option value="service">Servicio</option>
-                          <option value="admin">Administración</option>
-                          <option value="cleaning">Limpieza</option>
-                          <option value="management">Gerencia</option>
-                        </select>
-                      </VStack>
+                        {fieldErrors.position && (
+                          <Field.ErrorText>{fieldErrors.position}</Field.ErrorText>
+                        )}
+                      </Field.Root>
+
+                      {/* Department */}
+                      <Field.Root invalid={!!fieldErrors.department} flex="1">
+                        <Field.Label>Departamento *</Field.Label>
+                        <NativeSelect.Root {...register('department')}>
+                          <NativeSelect.Field placeholder="Seleccionar...">
+                            <option value="kitchen">Cocina</option>
+                            <option value="service">Servicio</option>
+                            <option value="admin">Administración</option>
+                            <option value="cleaning">Limpieza</option>
+                            <option value="management">Gerencia</option>
+                          </NativeSelect.Field>
+                        </NativeSelect.Root>
+                        {fieldErrors.department && (
+                          <Field.ErrorText>{fieldErrors.department}</Field.ErrorText>
+                        )}
+                      </Field.Root>
                     </HStack>
 
                     <HStack gap="4">
-                      <VStack align="stretch" flex="1">
-                        <Text fontSize="sm" fontWeight="medium">Fecha de Contratación *</Text>
-                        <InputField
+                      {/* Hire Date */}
+                      <Field.Root invalid={!!fieldErrors.hire_date} flex="1">
+                        <Field.Label>Fecha de Contratación *</Field.Label>
+                        <Input
                           type="date"
-                          required
-                          value={formData.hire_date}
-                          onChange={(e) => handleInputChange('hire_date', e.target.value)}
+                          {...register('hire_date')}
                         />
-                      </VStack>
-                      <VStack align="stretch" flex="1">
-                        <Text fontSize="sm" fontWeight="medium">Tipo de Empleo *</Text>
-                        <select
-                          required
-                          value={formData.employment_type}
-                          onChange={(e) => handleInputChange('employment_type', e.target.value)}
-                          className="w-full p-2 border rounded-md"
-                        >
-                          <option value="full_time">Tiempo Completo</option>
-                          <option value="part_time">Tiempo Parcial</option>
-                          <option value="contractor">Contratista</option>
-                          <option value="temp">Temporal</option>
-                        </select>
-                      </VStack>
+                        {fieldErrors.hire_date && (
+                          <Field.ErrorText>{fieldErrors.hire_date}</Field.ErrorText>
+                        )}
+                      </Field.Root>
+
+                      {/* Employment Type */}
+                      <Field.Root invalid={!!fieldErrors.employment_type} flex="1">
+                        <Field.Label>Tipo de Empleo *</Field.Label>
+                        <NativeSelect.Root {...register('employment_type')}>
+                          <NativeSelect.Field placeholder="Seleccionar...">
+                            <option value="full_time">Tiempo Completo</option>
+                            <option value="part_time">Tiempo Parcial</option>
+                            <option value="contractor">Contratista</option>
+                            <option value="temp">Temporal</option>
+                          </NativeSelect.Field>
+                        </NativeSelect.Root>
+                        {fieldErrors.employment_type && (
+                          <Field.ErrorText>{fieldErrors.employment_type}</Field.ErrorText>
+                        )}
+                      </Field.Root>
                     </HStack>
 
                     <HStack gap="4">
-                      <VStack align="stretch" flex="1">
-                        <Text fontSize="sm" fontWeight="medium">Salario Mensual</Text>
-                        <InputField
+                      {/* Salary */}
+                      <Field.Root invalid={!!fieldErrors.salary} flex="1">
+                        <Field.Label>Salario Mensual</Field.Label>
+                        <Input
                           type="number"
-                          min="0"
                           step="0.01"
-                          value={formData.salary}
-                          onChange={(e) => handleInputChange('salary', parseFloat(e.target.value) || 0)}
+                          {...register('salary', { valueAsNumber: true })}
                           placeholder="0.00"
                         />
-                      </VStack>
-                      <VStack align="stretch" flex="1">
-                        <Text fontSize="sm" fontWeight="medium">Horas Semanales</Text>
-                        <InputField
+                        {fieldErrors.salary && (
+                          <Field.ErrorText>{fieldErrors.salary}</Field.ErrorText>
+                        )}
+                        {fieldWarnings.salary && (
+                          <HStack gap="1" color="orange.500" fontSize="sm">
+                            <Icon icon={ExclamationTriangleIcon} size="xs" />
+                            <Text>{fieldWarnings.salary}</Text>
+                          </HStack>
+                        )}
+                      </Field.Root>
+
+                      {/* Weekly Hours */}
+                      <Field.Root invalid={!!fieldErrors.weekly_hours} flex="1">
+                        <Field.Label>Horas Semanales</Field.Label>
+                        <Input
                           type="number"
-                          min="1"
-                          max="60"
-                          value={formData.weekly_hours}
-                          onChange={(e) => handleInputChange('weekly_hours', parseInt(e.target.value) || 40)}
+                          {...register('weekly_hours', { valueAsNumber: true })}
+                          placeholder="40"
                         />
-                      </VStack>
+                        {fieldErrors.weekly_hours && (
+                          <Field.ErrorText>{fieldErrors.weekly_hours}</Field.ErrorText>
+                        )}
+                        {fieldWarnings.weekly_hours && (
+                          <HStack gap="1" color="orange.500" fontSize="sm">
+                            <Icon icon={ExclamationTriangleIcon} size="xs" />
+                            <Text>{fieldWarnings.weekly_hours}</Text>
+                          </HStack>
+                        )}
+                      </Field.Root>
                     </HStack>
 
-                    <VStack align="stretch">
-                      <Text fontSize="sm" fontWeight="medium">Preferencia de Turno</Text>
-                      <select
-                        value={formData.shift_preference}
-                        onChange={(e) => handleInputChange('shift_preference', e.target.value)}
-                        className="w-full p-2 border rounded-md"
-                      >
-                        <option value="morning">Mañana</option>
-                        <option value="afternoon">Tarde</option>
-                        <option value="night">Noche</option>
-                        <option value="flexible">Flexible</option>
-                      </select>
-                    </VStack>
+                    {/* Hourly Rate */}
+                    <Field.Root invalid={!!fieldErrors.hourly_rate}>
+                      <Field.Label>Tarifa Horaria</Field.Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...register('hourly_rate', { valueAsNumber: true })}
+                        placeholder="0.00"
+                      />
+                      {fieldErrors.hourly_rate && (
+                        <Field.ErrorText>{fieldErrors.hourly_rate}</Field.ErrorText>
+                      )}
+                      {fieldWarnings.hourly_rate && (
+                        <HStack gap="1" color="orange.500" fontSize="sm">
+                          <Icon icon={ExclamationTriangleIcon} size="xs" />
+                          <Text>{fieldWarnings.hourly_rate}</Text>
+                        </HStack>
+                      )}
+                    </Field.Root>
                   </VStack>
                 </CardWrapper.Body>
               </CardWrapper>
@@ -293,9 +371,9 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
             </Button>
             <Button
               type="submit"
+              form="employee-form"
               colorPalette="blue"
               loading={loading}
-              onClick={handleSubmit}
             >
               {isEditing ? 'Actualizar' : 'Crear'} Empleado
             </Button>

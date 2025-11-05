@@ -158,8 +158,17 @@ export class LazyLoadingManager {
       this.preloadModule(moduleName, priority);
     }
 
+    // 🔧 FIX: Cache the promise to prevent React.lazy() from creating new promises on every render
+    // React.lazy() requires the SAME promise instance for the same module to avoid remounting
+    let cachedModulePromise: Promise<{ default: T }> | null = null;
+
     // Create lazy component with enhanced import
-    return lazy(() => enhancedImport());
+    return lazy(() => {
+      if (!cachedModulePromise) {
+        cachedModulePromise = enhancedImport();
+      }
+      return cachedModulePromise;
+    });
   }
 
   /**

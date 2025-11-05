@@ -3,8 +3,7 @@
 // ====================================
 
 import React from 'react';
-import { Stack } from '@/shared/ui';
-import { Box } from '@chakra-ui/react';
+import { Stack, Box } from '@/shared/ui';
 
 interface SidebarContainerProps {
   children: React.ReactNode;
@@ -40,11 +39,11 @@ export function SidebarContainer({
 }
 
 // Navigation Item Container
-export function NavItemContainer({ 
-  children, 
-  isActive, 
+export function NavItemContainer({
+  children,
+  isActive,
   isExpanded,
-  onClick 
+  onClick
 }: {
   children: React.ReactNode;
   isActive: boolean;
@@ -52,65 +51,53 @@ export function NavItemContainer({
   onClick?: () => void;
 }) {
   return (
-    <button
-      style={{
-        width: "100%",
-        padding: "8px 8px", // ✅ WCAG: Padding aumentado para mejor touch target
-        minHeight: "44px",    // ✅ WCAG: Altura mínima 44px para accesibilidad
-        borderRadius: "8px",  // ✅ Design consistency: 8px como en las cards
-        backgroundColor: isActive ? "var(--chakra-colors-gray-600)" : "transparent", // 🎨 Estado activo
-        color: isActive ? "var(--chakra-colors-gray-50)" : "var(--chakra-colors-gray-600)", // 🎨 Colores consistentes
-        textAlign: "left",
-        cursor: "pointer",
-        position: "relative",
-        transition: "all 0.12s ease",
-        border: "none",
-        outline: "none"
+    <Box
+      as="button"
+      width="100%"
+      padding="8px 8px"
+      minHeight="44px"
+      borderRadius="8px"
+      bg={isActive ? "bg.emphasized" : "transparent"}
+      color={isActive ? "fg.inverted" : "fg.muted"}
+      textAlign="left"
+      cursor="pointer"
+      position="relative"
+      transition="all 0.12s ease"
+      border="none"
+      outline="none"
+      _hover={{
+        bg: isActive ? "bg.emphasized" : "bg.subtle"
       }}
-      onMouseEnter={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.backgroundColor = "var(--chakra-colors-gray-200)"; // 🎨 Hover consistente
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.backgroundColor = "transparent";
-        }
-      }}
-      onFocus={(e) => {
-        e.currentTarget.style.outline = "1px solid var(--chakra-colors-gray-500)";
-        e.currentTarget.style.outlineOffset = "1px";
-      }}
-      onBlur={(e) => {
-        e.currentTarget.style.outline = "none";
+      _focus={{
+        outline: "1px solid",
+        outlineColor: "border.emphasized",
+        outlineOffset: "1px"
       }}
       onClick={onClick}
     >
       {/* Indicador de estado activo */}
       {isActive && (
-        <div 
-          style={{
-            position: "absolute",
-            left: "-4px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: "3px",
-            height: "16px",
-            backgroundColor: "var(--chakra-colors-gray-600)", // 🎨 Indicador activo
-            borderRadius: "0 2px 2px 0"
-          }}
+        <Box
+          position="absolute"
+          left="-4px"
+          top="50%"
+          transform="translateY(-50%)"
+          width="3px"
+          height="16px"
+          bg="bg.emphasized"
+          borderRadius="0 2px 2px 0"
         />
       )}
-      
-      <Stack 
-        direction="row" 
-        align="center" 
+
+      <Stack
+        direction="row"
+        align="center"
         gap={isExpanded ? "4" : "0"}
         justify={isExpanded ? "start" : "center"}
-        style={{ width: "100%" }}
+        width="100%"
       >
         {children}
       </Stack>
-    </button>
+    </Box>
   );
 }

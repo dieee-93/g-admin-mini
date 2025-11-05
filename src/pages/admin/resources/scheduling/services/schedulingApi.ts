@@ -223,6 +223,35 @@ export const shiftsApi = {
     }
   },
 
+  // Update event time (for drag & drop)
+  async updateEventTime(eventId: string, newStart: Date, newEnd: Date): Promise<void> {
+    try {
+      const engine = getSchedulingEngine();
+
+      // Extract date and time components
+      const date = newStart.toISOString().split('T')[0] as ISODateString;
+      const startTime = `${String(newStart.getHours()).padStart(2, '0')}:${String(newStart.getMinutes()).padStart(2, '0')}` as ISOTimeString;
+      const endTime = `${String(newEnd.getHours()).padStart(2, '0')}:${String(newEnd.getMinutes()).padStart(2, '0')}` as ISOTimeString;
+
+      const result = await engine.updateBooking(eventId, {
+        timeSlot: {
+          date,
+          startTime,
+          endTime
+        }
+      });
+
+      if (!result.success) {
+        throw new Error(result.errors.join(', '));
+      }
+
+      logger.info('API', `Event ${eventId} time updated to ${startTime}-${endTime} on ${date}`);
+    } catch (error) {
+      logger.error('API', 'Error updating event time:', error);
+      throw new Error('Failed to update event time');
+    }
+  },
+
   // Cancel a shift (delete using unified engine)
   async deleteShift(shiftId: string): Promise<void> {
     try {
@@ -325,7 +354,7 @@ export const timeOffApi = {
             position
           )
         `)
-        .order('requested_at', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (filters?.status) {
         query = query.eq('status', filters.status);
@@ -351,7 +380,7 @@ export const timeOffApi = {
   },
 
   // Create a time-off request
-  async createTimeOffRequest(request: Omit<TimeOffRequest, 'id' | 'requested_at'>): Promise<TimeOffRequest> {
+  async createTimeOffRequest(request: Omit<TimeOffRequest, 'id' | 'created_at'>): Promise<TimeOffRequest> {
     try {
       const { data, error } = await supabase
         .from('time_off_requests')
@@ -437,7 +466,7 @@ export const schedulesApi = {
         .from('schedules')
         .select(`
           *,
-          shifts (
+          shift_schedules (
             *,
             employees:employee_id (
               name,
@@ -465,7 +494,7 @@ export const schedulesApi = {
       
       return (data || []).map(schedule => ({
         ...schedule,
-        shifts: (schedule.shifts || []).map(shift => ({
+        shifts: (schedule.shift_schedules || []).map(shift => ({
           ...shift,
           employee_name: shift.employees?.name || 'Unknown'
         }))
@@ -666,6 +695,58 @@ export const shiftTemplatesApi = {
 // =====================
 
 export const schedulingAnalyticsApi = {
+  // Get weekly dashboard stats
+  async getWeeklyDashboard({ startDate, endDate }: { startDate: string; endDate: string }) {
+    try {
+      // Get shifts for the week
+      const { data: shifts, error: shiftsError } = await supabase
+        .from('shifts')
+        .select('*')
+        .gte('date', startDate)
+        .lte('date', endDate);
+
+      if (shiftsError) throw shiftsError;
+
+      // Get time-off requests
+      const { data: timeOffRequests, error: timeOffError } = await supabase
+        .from('time_off_requests')
+        .select('*')
+        .gte('start_date', startDate)
+        .lte('end_date', endDate);
+
+      if (timeOffError) throw timeOffError;
+
+      // Calculate stats
+      const totalShifts = shifts?.length || 0;
+      const uniqueEmployees = new Set(shifts?.map(s => s.employee_id) || []).size;
+      const pendingTimeOff = timeOffRequests?.filter(r => r.status === 'pending').length || 0;
+      const approvedRequests = timeOffRequests?.filter(r => r.status === 'approved').length || 0;
+
+      return {
+        total_shifts_this_week: totalShifts,
+        employees_scheduled: uniqueEmployees,
+        coverage_percentage: totalShifts > 0 ? 85 : 0, // TODO: Calculate real coverage
+        pending_time_off: pendingTimeOff,
+        labor_cost_this_week: 0, // TODO: Calculate from shifts
+        overtime_hours: 0, // TODO: Calculate from shifts
+        understaffed_shifts: 0, // TODO: Calculate from coverage data
+        approved_requests: approvedRequests
+      };
+    } catch (error) {
+      logger.error('API', 'Error fetching weekly dashboard:', error);
+      return {
+        total_shifts_this_week: 0,
+        employees_scheduled: 0,
+        coverage_percentage: 0,
+        pending_time_off: 0,
+        labor_cost_this_week: 0,
+        overtime_hours: 0,
+        understaffed_shifts: 0,
+        approved_requests: 0
+      };
+    }
+  },
+
   // Get labor cost analytics
   async getLaborCostAnalytics(startDate: string, endDate: string) {
     try {

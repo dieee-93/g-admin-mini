@@ -90,15 +90,15 @@ export function calculateMenuEngineeringMatrix(
   const matrix = classifyProducts(menuData);
 
   // Add performance metrics
-  const performanceMetrics = calculatePerformanceMetrics(menuData, totalRevenue);
-  
+  const performanceMetrics = calculatePerformanceMetrics(menuData);
+
   // Generate strategic recommendations
   const strategicActions = generateStrategicRecommendations(menuData);
 
   return {
     ...matrix,
     performanceMetrics,
-    benchmarkAnalysis: calculateBenchmarkAnalysis(menuData),
+    benchmarkAnalysis: calculateBenchmarkAnalysis(),
     trendAnalysis: calculateTrendAnalysis(menuData),
     strategicActions,
     lastUpdated: new Date(),
@@ -237,8 +237,7 @@ function classifyProducts(menuData: MenuEngineeringData[]): Omit<MenuEngineering
  * Calculate performance metrics
  */
 function calculatePerformanceMetrics(
-  menuData: MenuEngineeringData[],
-  totalRevenue: number
+  menuData: MenuEngineeringData[]
 ): PerformanceMetrics {
   const revenueByCategory = {
     stars: menuData.filter(p => p.menuCategory === MenuCategory.STARS).reduce((sum, p) => sum + p.totalRevenue, 0),
@@ -282,9 +281,8 @@ function calculatePerformanceMetrics(
 /**
  * Calculate benchmark analysis
  */
-function calculateBenchmarkAnalysis(menuData: MenuEngineeringData[]): BenchmarkAnalysis {
-  const totalProducts = menuData.length;
-  
+function calculateBenchmarkAnalysis(): BenchmarkAnalysis {
+  // Industry benchmarks (not dependent on current data)
   return {
     industryAverages: {
       starsPercentage: 20,        // Industry benchmark: 20% stars

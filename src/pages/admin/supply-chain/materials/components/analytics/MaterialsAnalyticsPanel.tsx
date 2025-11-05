@@ -16,30 +16,57 @@ import {
 } from '@/shared/ui';
 import {
   ChartBarIcon,
-  CubeIcon,
-  ExclamationTriangleIcon,
   CurrencyDollarIcon,
   BuildingStorefrontIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
-import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services/AnalyticsEngine';
+import { AnalyticsEngine, RFMAnalytics } from '@/shared/services/AnalyticsEngine';
 import { useMaterialsPage } from '../../hooks/useMaterialsPage';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 import { logger } from '@/lib/logging';
+interface CategoryStat {
+  category: string;
+  count: number;
+  value: number;
+}
+
+interface RFMData {
+  r: number;
+  f: number;
+  m: number;
+  segment: string;
+}
+
+interface TimeSeriesPoint {
+  label: string;
+  value: number;
+}
+
+interface AnalyticsData {
+  metrics: Record<string, unknown>;
+  rfmAnalysis: Record<string, RFMData>;
+  categoryStats: CategoryStat[];
+  supplierAnalysis: SupplierData[];
+  insights?: string[];
+  recommendations?: Array<{ title: string; description: string; priority: string }>;
+  timeSeries?: TimeSeriesPoint[];
+}
+
+interface SupplierData {
+  id: string;
+  total_value: number;
+  frequency: number;
+  last_activity?: string;
+}
+
 export function MaterialsAnalyticsPanel() {
-  const { materials, loading, metrics } = useMaterialsPage();
-  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const { materials, loading } = useMaterialsPage();
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
-  useEffect(() => {
-    if (materials && materials.length > 0) {
-      generateAnalytics();
-    }
-  }, [materials]);
-
-  const generateAnalytics = async () => {
+  const generateAnalytics = React.useCallback(async () => {
     setAnalyticsLoading(true);
 
     try {
@@ -53,24 +80,26 @@ export function MaterialsAnalyticsPanel() {
 
       // Materials-specific RFM analysis (for suppliers or categories)
       const supplierData = materials.reduce((acc, material) => {
-        if (!material.supplier) return acc;
+        if (!material.supplier_id) return acc;
 
-        const existing = acc.find(s => s.id === material.supplier);
+        const existing = acc.find(s => s.id === material.supplier_id);
+        const materialValue = (material.stock || 0) * (material.unit_cost || 0);
+
         if (existing) {
-          existing.total_value = (existing.total_value || 0) + (material.total_value || 0);
+          existing.total_value = (existing.total_value || 0) + materialValue;
           existing.frequency = (existing.frequency || 0) + 1;
-          existing.last_activity = material.last_activity || existing.last_activity;
+          existing.last_activity = material.updated_at || existing.last_activity;
         } else {
           acc.push({
-            id: material.supplier,
-            total_value: material.total_value || 0,
+            id: material.supplier_id,
+            total_value: materialValue,
             frequency: 1,
-            last_activity: material.last_activity
+            last_activity: material.updated_at
           });
         }
 
         return acc;
-      }, [] as any[]);
+      }, [] as SupplierData[]);
 
       const rfmAnalysis = RFMAnalytics.calculateRFM(supplierData);
 
@@ -95,7 +124,13 @@ export function MaterialsAnalyticsPanel() {
     } finally {
       setAnalyticsLoading(false);
     }
-  };
+  }, [materials]);
+
+  useEffect(() => {
+    if (materials && materials.length > 0) {
+      generateAnalytics();
+    }
+  }, [materials, generateAnalytics]);
 
   if (loading || analyticsLoading) {
     return (
@@ -193,7 +228,7 @@ export function MaterialsAnalyticsPanel() {
       {analyticsData?.categoryStats && (
         <Section variant="elevated" title="📈 Análisis por Categoría">
           <CardGrid columns={{ base: 1, md: 3 }} gap="md">
-            {analyticsData.categoryStats.map((cat: any) => (
+            {analyticsData.categoryStats.map((cat) => (
               <div key={cat.category} style={{
                 padding: '12px',
                 border: '1px solid var(--border-subtle)',
@@ -216,7 +251,7 @@ export function MaterialsAnalyticsPanel() {
       {analyticsData?.rfmAnalysis && Object.keys(analyticsData.rfmAnalysis).length > 0 && (
         <Section variant="elevated" title="🏢 Análisis de Proveedores (RFM)">
           <CardGrid columns={{ base: 1, md: 2 }} gap="md">
-            {Object.entries(analyticsData.rfmAnalysis).map(([supplier, data]: [string, any]) => (
+            {Object.entries(analyticsData.rfmAnalysis).map(([supplier, data]) => (
               <div key={supplier} style={{
                 padding: '16px',
                 border: '1px solid var(--border-subtle)',
@@ -257,7 +292,7 @@ export function MaterialsAnalyticsPanel() {
             gap: '4px',
             fontSize: '10px'
           }}>
-            {analyticsData.timeSeries.slice(-14).map((point: any, index: number) => (
+            {analyticsData.timeSeries.slice(-14).map((point, index) => (
               <div key={index} style={{ textAlign: 'center' }}>
                 <div style={{
                   height: `${Math.max(20, (point.value / 10) * 40)}px`,

@@ -20,13 +20,13 @@ interface AutomationTabProps {
 
 export function AutomationTab({ automations, toggleAutomation }: AutomationTabProps) {
   return (
-    <VStack gap={4} align="stretch">
+    <VStack gap="4" align="stretch">
       {automations.map((automation) => (
         <CardWrapper key={automation.id} variant="outline">
-          <CardWrapper.Body p={4}>
+          <CardWrapper.Body p="4">
             <HStack justify="space-between" align="start">
-              <VStack align="start" gap={2} flex="1">
-                <HStack gap={2}>
+              <VStack align="start" gap="2" flex="1">
+                <HStack gap="2">
                   <Text fontSize="md" fontWeight="bold">
                     {automation.name}
                   </Text>
@@ -42,7 +42,7 @@ export function AutomationTab({ automations, toggleAutomation }: AutomationTabPr
                   {automation.description}
                 </Text>
 
-                <HStack gap={4} fontSize="sm" color="gray.600">
+                <HStack gap="4" fontSize="sm" color="gray.600">
                   <Text>Ejecutado: {automation.executionCount} veces</Text>
                   <Text>Éxito: {automation.successRate.toFixed(1)}%</Text>
                   {automation.lastExecuted && (
@@ -53,11 +53,11 @@ export function AutomationTab({ automations, toggleAutomation }: AutomationTabPr
                 </HStack>
 
                 {/* Triggers */}
-                <VStack align="start" gap={1}>
+                <VStack align="start" gap="1">
                   <Text fontSize="xs" fontWeight="medium" color="gray.700">
                     Disparadores:
                   </Text>
-                  <HStack gap={1} flexWrap="wrap">
+                  <HStack gap="1" flexWrap="wrap">
                     {automation.triggers.map((trigger, index) => (
                       <Badge key={index} colorPalette="blue" size="xs">
                         {trigger.type === 'schedule' ? 'Programado' :
@@ -69,11 +69,11 @@ export function AutomationTab({ automations, toggleAutomation }: AutomationTabPr
                 </VStack>
 
                 {/* Actions */}
-                <VStack align="start" gap={1}>
+                <VStack align="start" gap="1">
                   <Text fontSize="xs" fontWeight="medium" color="gray.700">
                     Acciones:
                   </Text>
-                  <HStack gap={1} flexWrap="wrap">
+                  <HStack gap="1" flexWrap="wrap">
                     {automation.actions.map((action, index) => (
                       <Badge key={index} colorPalette="green" size="xs">
                         {action.type === 'generate_report' ? 'Generar Reporte' :
@@ -85,7 +85,7 @@ export function AutomationTab({ automations, toggleAutomation }: AutomationTabPr
                 </VStack>
               </VStack>
 
-              <VStack gap={2}>
+              <VStack gap="2">
                 <IconButton size="sm" variant="outline">
                   <PencilIcon className="w-3 h-3" />
                 </IconButton>

@@ -1,376 +1,234 @@
-import { Tabs as ChakraTabs, Box, HStack } from '@chakra-ui/react'
-import type { ReactNode } from 'react'
+// ============================================
+// TABS - Chakra UI v3 Wrapper
+// ============================================
+// Wrapper for Chakra UI v3 Tabs component
+// Provides tabbed interfaces
 
-interface TabsProps {
-  children: ReactNode
-  value?: string
-  defaultValue?: string
-  onValueChange?: (value: string) => void
-  orientation?: 'horizontal' | 'vertical'
-  variant?: 'line' | 'enclosed' | 'soft-rounded' | 'solid-rounded' | 'plain'
-  size?: 'sm' | 'md' | 'lg'
-  colorPalette?: 'gray' | 'blue' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
-  fitted?: boolean
-  isLazy?: boolean
-  lazyBehavior?: 'keepMounted' | 'unmountOnExit'
-  className?: string
-}
+import { Tabs as ChakraTabs } from '@chakra-ui/react';
+import type { TabsRootProps } from '@chakra-ui/react';
 
-interface TabListProps {
-  children: ReactNode
-  justify?: 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly'
-  gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg'
-  className?: string
-}
+// ============================================
+// ROOT
+// ============================================
 
-interface TabProps {
-  children: ReactNode
-  value: string
-  disabled?: boolean
-  icon?: ReactNode
-  badge?: ReactNode
-  className?: string
-}
+/**
+ * Tabs Root Component
+ * Main container for tabs interface
+ */
+export const TabsRoot = ChakraTabs.Root;
 
-interface TabPanelsProps {
-  children: ReactNode
-  className?: string
-}
+// ============================================
+// LIST
+// ============================================
 
-interface TabPanelProps {
-  children: ReactNode
-  value: string
-  padding?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  className?: string
-}
+/**
+ * Tabs List Component
+ * Container for tab triggers
+ */
+export const TabsList = ChakraTabs.List;
 
-const sizeMap = {
-  sm: 'sm',
-  md: 'md',
-  lg: 'lg',
-}
+// ============================================
+// TRIGGER
+// ============================================
 
-const gapMap = {
-  none: 0,
-  xs: 1,
-  sm: 2,
-  md: 3,
-  lg: 4,
-}
+/**
+ * Tabs Trigger Component
+ * Individual tab button
+ */
+export const TabsTrigger = ChakraTabs.Trigger;
 
-const paddingMap = {
-  none: 0,
-  xs: 2,
-  sm: 3,
-  md: 4,
-  lg: 6,
-  xl: 8,
-}
+// ============================================
+// CONTENT
+// ============================================
 
-const justifyMap = {
-  start: 'flex-start',
-  center: 'center',
-  end: 'flex-end',
-  'space-between': 'space-between',
-  'space-around': 'space-around',
-  'space-evenly': 'space-evenly',
-}
+/**
+ * Tabs Content Component
+ * Tab panel content
+ */
+export const TabsContent = ChakraTabs.Content;
 
-export function Tabs({
-  children,
-  value,
-  defaultValue,
-  onValueChange,
-  orientation = 'horizontal',
-  variant = 'line',
-  size = 'md',
-  colorPalette = 'brand',
-  fitted = false,
-  isLazy = false,
-  lazyBehavior = 'keepMounted',
-  className,
-  ...rest
-}: TabsProps) {
-  
-  return (
-    <ChakraTabs.Root
-      value={value}
-      defaultValue={defaultValue}
-      onValueChange={(details) => onValueChange?.(details.value)}
-      orientation={orientation}
-      variant={variant}
-      size={sizeMap[size]}
-      colorPalette={colorPalette}
-      fitted={fitted}
-      lazyMount={isLazy}
-      unmountOnExit={lazyBehavior === 'unmountOnExit'}
-      className={className}
-      {...rest}
-    >
-      {children}
-    </ChakraTabs.Root>
-  )
-}
+// ============================================
+// INDICATOR
+// ============================================
 
-export function TabList({
-  children,
-  justify = 'start',
-  gap = 'none',
-  className,
-  ...rest
-}: TabListProps) {
-  return (
-    <ChakraTabs.List
-      display="flex"
-      justifyContent={justifyMap[justify]}
-      gap={gapMap[gap]}
-      className={className}
-      {...rest}
-    >
-      {children}
-    </ChakraTabs.List>
-  )
-}
+/**
+ * Tabs Indicator Component
+ * Visual indicator for active tab
+ */
+export const TabsIndicator = ChakraTabs.Indicator;
 
-export function Tab({
-  children,
-  value,
-  disabled = false,
-  icon,
-  badge,
-  className,
-  ...rest
-}: TabProps) {
-  
-  
-  // 🎨 Get theme-aware text color from parent Tabs context
-  // We need to check if the parent is using theme colors
+// ============================================
+// CONTENT GROUP
+// ============================================
 
-  return (
-    <ChakraTabs.Trigger
-      value={value}
-      disabled={disabled}
-      className={className}
+/**
+ * Tabs Content Group Component
+ * Container for multiple tab contents
+ */
+export const TabsContentGroup = ChakraTabs.ContentGroup;
 
-      {...rest}
-    >
-      <HStack gap={2} align="center">
-        {icon && (
-          <Box display="flex" alignItems="center">
-            {icon}
-          </Box>
-        )}
-        <Box>{children}</Box>
-        {badge && (
-          <Box display="flex" alignItems="center">
-            {badge}
-          </Box>
-        )}
-      </HStack>
-    </ChakraTabs.Trigger>
-  )
-}
+// ============================================
+// COMPOUND COMPONENT EXPORT
+// ============================================
 
-export function TabPanels({
-  children,
-  className,
-  ...rest
-}: TabPanelsProps) {
-  // TabPanels is just a semantic wrapper - render children directly
-  return <>{children}</>;
-}
+/**
+ * Tabs Compound Component
+ *
+ * @example
+ * ```tsx
+ * import { Tabs } from '@/shared/ui';
+ *
+ * // Basic usage
+ * <Tabs.Root defaultValue="members">
+ *   <Tabs.List>
+ *     <Tabs.Trigger value="members">Members</Tabs.Trigger>
+ *     <Tabs.Trigger value="projects">Projects</Tabs.Trigger>
+ *     <Tabs.Trigger value="tasks">Tasks</Tabs.Trigger>
+ *   </Tabs.List>
+ *   <Tabs.Content value="members">Manage your team members</Tabs.Content>
+ *   <Tabs.Content value="projects">Manage your projects</Tabs.Content>
+ *   <Tabs.Content value="tasks">Manage your tasks</Tabs.Content>
+ * </Tabs.Root>
+ *
+ * // Controlled state
+ * const [value, setValue] = useState('first');
+ * <Tabs.Root value={value} onValueChange={(e) => setValue(e.value)}>
+ *   <Tabs.List>
+ *     <Tabs.Trigger value="first">First</Tabs.Trigger>
+ *     <Tabs.Trigger value="second">Second</Tabs.Trigger>
+ *   </Tabs.List>
+ *   <Tabs.Content value="first">First panel</Tabs.Content>
+ *   <Tabs.Content value="second">Second panel</Tabs.Content>
+ * </Tabs.Root>
+ *
+ * // With variants
+ * <Tabs.Root defaultValue="tab-1" variant="line">
+ *   <Tabs.List>
+ *     <Tabs.Trigger value="tab-1">Tab 1</Tabs.Trigger>
+ *     <Tabs.Trigger value="tab-2">Tab 2</Tabs.Trigger>
+ *   </Tabs.List>
+ *   <Tabs.Content value="tab-1">Line variant (default)</Tabs.Content>
+ *   <Tabs.Content value="tab-2">Content 2</Tabs.Content>
+ * </Tabs.Root>
+ *
+ * <Tabs.Root defaultValue="tab-1" variant="subtle">
+ *   // Subtle variant
+ * </Tabs.Root>
+ *
+ * <Tabs.Root defaultValue="tab-1" variant="enclosed">
+ *   // Enclosed variant
+ * </Tabs.Root>
+ *
+ * <Tabs.Root defaultValue="tab-1" variant="outline">
+ *   // Outline variant
+ * </Tabs.Root>
+ *
+ * <Tabs.Root defaultValue="tab-1" variant="plain">
+ *   // Plain variant (use with Indicator)
+ * </Tabs.Root>
+ *
+ * // With indicator (for plain variant)
+ * <Tabs.Root defaultValue="members" variant="plain">
+ *   <Tabs.List bg="bg.muted" rounded="l3" p="1">
+ *     <Tabs.Trigger value="members">Members</Tabs.Trigger>
+ *     <Tabs.Trigger value="projects">Projects</Tabs.Trigger>
+ *     <Tabs.Indicator rounded="l2" />
+ *   </Tabs.List>
+ *   <Tabs.Content value="members">Members content</Tabs.Content>
+ *   <Tabs.Content value="projects">Projects content</Tabs.Content>
+ * </Tabs.Root>
+ *
+ * // With icons
+ * import { UserIcon, FolderIcon } from '@heroicons/react/24/outline';
+ *
+ * <Tabs.Root defaultValue="members">
+ *   <Tabs.List>
+ *     <Tabs.Trigger value="members">
+ *       <UserIcon width={16} height={16} />
+ *       Members
+ *     </Tabs.Trigger>
+ *     <Tabs.Trigger value="projects">
+ *       <FolderIcon width={16} height={16} />
+ *       Projects
+ *     </Tabs.Trigger>
+ *   </Tabs.List>
+ *   <Tabs.Content value="members">Content</Tabs.Content>
+ *   <Tabs.Content value="projects">Content</Tabs.Content>
+ * </Tabs.Root>
+ *
+ * // Disabled tab
+ * <Tabs.Root defaultValue="members">
+ *   <Tabs.List>
+ *     <Tabs.Trigger value="members">Members</Tabs.Trigger>
+ *     <Tabs.Trigger value="projects" disabled>
+ *       Projects (Disabled)
+ *     </Tabs.Trigger>
+ *   </Tabs.List>
+ *   <Tabs.Content value="members">Content</Tabs.Content>
+ * </Tabs.Root>
+ *
+ * // Lazy mounted (unmounts on exit)
+ * <Tabs.Root lazyMount unmountOnExit defaultValue="tab-1">
+ *   <Tabs.List>
+ *     <Tabs.Trigger value="tab-1">Tab 1</Tabs.Trigger>
+ *     <Tabs.Trigger value="tab-2">Tab 2</Tabs.Trigger>
+ *   </Tabs.List>
+ *   <Tabs.Content value="tab-1">Lazy content 1</Tabs.Content>
+ *   <Tabs.Content value="tab-2">Lazy content 2</Tabs.Content>
+ * </Tabs.Root>
+ *
+ * // Vertical orientation
+ * <Tabs.Root defaultValue="members" orientation="vertical">
+ *   <Tabs.List>
+ *     <Tabs.Trigger value="members">Members</Tabs.Trigger>
+ *     <Tabs.Trigger value="projects">Projects</Tabs.Trigger>
+ *   </Tabs.List>
+ *   <Tabs.Content value="members">Content</Tabs.Content>
+ *   <Tabs.Content value="projects">Content</Tabs.Content>
+ * </Tabs.Root>
+ *
+ * // Sizes
+ * <Tabs.Root defaultValue="tab-1" size="sm">
+ *   // Small
+ * </Tabs.Root>
+ *
+ * <Tabs.Root defaultValue="tab-1" size="md">
+ *   // Medium (default)
+ * </Tabs.Root>
+ *
+ * <Tabs.Root defaultValue="tab-1" size="lg">
+ *   // Large
+ * </Tabs.Root>
+ *
+ * // Color palette
+ * <Tabs.Root defaultValue="tab-1" colorPalette="blue">
+ *   <Tabs.List>
+ *     <Tabs.Trigger value="tab-1">Blue palette</Tabs.Trigger>
+ *   </Tabs.List>
+ *   <Tabs.Content value="tab-1">Content</Tabs.Content>
+ * </Tabs.Root>
+ *
+ * // Fitted tabs
+ * <Tabs.Root defaultValue="tab-1" variant="enclosed" fitted maxW="md">
+ *   <Tabs.List>
+ *     <Tabs.Trigger value="tab-1">Tab 1</Tabs.Trigger>
+ *     <Tabs.Trigger value="tab-2">Tab 2</Tabs.Trigger>
+ *     <Tabs.Trigger value="tab-3">Tab 3</Tabs.Trigger>
+ *   </Tabs.List>
+ * </Tabs.Root>
+ * ```
+ */
+export const Tabs = {
+  Root: TabsRoot,
+  List: TabsList,
+  Trigger: TabsTrigger,
+  Content: TabsContent,
+  Indicator: TabsIndicator,
+  ContentGroup: TabsContentGroup
+};
 
-export function TabPanel({
-  children,
-  value,
-  padding = 'md',
-  className,
-  ...rest
-}: TabPanelProps) {
-  
-  
-  // 🎨 Apply theme text color to panel content
+// ============================================
+// TYPE EXPORTS
+// ============================================
 
-  return (
-    <ChakraTabs.Content
-      value={value}
-      p={paddingMap[padding]}
-      className={className}
-
-      {...rest}
-    >
-      {children}
-    </ChakraTabs.Content>
-  )
-}
-
-// Componentes especializados para casos de uso del negocio
-export function ModuleTabs({
-  activeModule,
-  onModuleChange,
-  modules,
-  showBadges = false,
-  ...props
-}: {
-  activeModule: string
-  onModuleChange: (module: string) => void
-  modules: Array<{
-    id: string
-    label: string
-    icon?: ReactNode
-    badge?: number | string
-    disabled?: boolean
-  }>
-  showBadges?: boolean
-} & Omit<TabsProps, 'value' | 'onValueChange' | 'children'>) {
-  return (
-    <Tabs
-      value={activeModule}
-      onValueChange={onModuleChange}
-      variant="line"
-      colorPalette="brand"
-      {...props}
-    >
-      <TabList>
-        {modules.map((module) => (
-          <Tab
-            key={module.id}
-            value={module.id}
-            disabled={module.disabled}
-            icon={module.icon}
-            badge={showBadges && module.badge ? (
-              <Box
-                borderRadius="full"
-                px={2}
-                py={1}
-                fontSize="xs"
-                minWidth="20px"
-                textAlign="center"
-                style={{ backgroundColor: 'var(--chakra-colors-error-500)', color: 'white' }}
-              >
-                {module.badge}
-              </Box>
-            ) : undefined}
-          >
-            {module.label}
-          </Tab>
-        ))}
-      </TabList>
-    </Tabs>
-  )
-}
-
-export function SettingsTabs({
-  activeSection,
-  onSectionChange,
-  sections,
-  ...props
-}: {
-  activeSection: string
-  onSectionChange: (section: string) => void
-  sections: Array<{
-    id: string
-    label: string
-    icon?: ReactNode
-    description?: string
-  }>
-} & Omit<TabsProps, 'value' | 'onValueChange' | 'children' | 'orientation'>) {
-  return (
-    <Tabs
-      value={activeSection}
-      onValueChange={onSectionChange}
-      orientation="vertical"
-      variant="soft-rounded"
-      colorPalette="gray"
-      {...props}
-    >
-      <TabList gap="xs">
-        {sections.map((section) => (
-          <Tab
-            key={section.id}
-            value={section.id}
-            icon={section.icon}
-            style={{ 
-              justifyContent: 'flex-start',
-              textAlign: 'left',
-              width: '100%'
-            }}
-          >
-            <Box>
-              <Box fontWeight="medium">{section.label}</Box>
-              {section.description && (
-                <Box fontSize="xs" mt={1}>
-                  {section.description}
-                </Box>
-              )}
-            </Box>
-          </Tab>
-        ))}
-      </TabList>
-    </Tabs>
-  )
-}
-
-export function DataTabs({
-  activeView,
-  onViewChange,
-  views,
-  count,
-  ...props
-}: {
-  activeView: string
-  onViewChange: (view: string) => void
-  views: Array<{
-    id: string
-    label: string
-    count?: number
-    icon?: ReactNode
-  }>
-  count?: Record<string, number>
-} & Omit<TabsProps, 'value' | 'onValueChange' | 'children'>) {
-  return (
-    <Tabs
-      value={activeView}
-      onValueChange={onViewChange}
-      variant="enclosed"
-      colorPalette="gray"
-      {...props}
-    >
-      <TabList>
-        {views.map((view) => {
-          const itemCount = count?.[view.id] ?? view.count
-          return (
-            <Tab
-              key={view.id}
-              value={view.id}
-              icon={view.icon}
-              badge={itemCount ? (
-                <Box
-                  borderRadius="full"
-                  px={2}
-                  fontSize="xs"
-                  fontWeight="medium"
-                >
-                  {itemCount}
-                </Box>
-              ) : undefined}
-            >
-              {view.label}
-            </Tab>
-          )
-        })}
-      </TabList>
-    </Tabs>
-  )
-}
-
-// Compound component pattern
-Tabs.List = TabList
-Tabs.Tab = Tab
-Tabs.Panels = TabPanels
-Tabs.Panel = TabPanel
-
-// Specialized components
-Tabs.Module = ModuleTabs
-Tabs.Settings = SettingsTabs
-Tabs.Data = DataTabs
+export type { TabsRootProps };

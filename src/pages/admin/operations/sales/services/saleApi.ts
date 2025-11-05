@@ -1,7 +1,7 @@
 // src/features/sales/data/saleApi.ts - ESQUEMA NORMALIZADO
 import { supabase } from '@/lib/supabase/client';
-import { 
-  type Sale, 
+import {
+  type Sale,
   type Customer,
   type Product,
   type CreateSaleData,
@@ -11,6 +11,10 @@ import {
   type SalesSummary
 } from '../types';
 import { EventBus } from '@/lib/events';
+
+// 🔒 PERMISSIONS: Service layer validation
+import { requirePermission, requireModuleAccess } from '@/lib/permissions';
+import type { AuthUser } from '@/contexts/AuthContext';
 
 // Event payload type for sale completion
 interface SaleCompletedEvent {
@@ -39,7 +43,12 @@ import { errorHandler, createNetworkError, createBusinessError } from '@/lib/err
 
 // ===== CRUD BÁSICO DE VENTAS =====
 
-export async function fetchSales(filters?: SalesListFilters): Promise<Sale[]> {
+export async function fetchSales(filters?: SalesListFilters, user?: AuthUser | null): Promise<Sale[]> {
+  // 🔒 PERMISSIONS: Validate user can read sales
+  if (user) {
+    requireModuleAccess(user, 'sales');
+  }
+
   try {
     let query = supabase
       .from('sales')
@@ -57,22 +66,31 @@ export async function fetchSales(filters?: SalesListFilters): Promise<Sale[]> {
       `)
       .order('created_at', { ascending: false });
 
+    // 🆕 MULTI-LOCATION: Filter by location
+    if (filters?.location_id) {
+      query = query.eq('location_id', filters.location_id);
+    }
+
     if (filters?.dateFrom) {
       query = query.gte('created_at', filters.dateFrom);
     }
-    
+
     if (filters?.dateTo) {
       query = query.lte('created_at', filters.dateTo);
     }
-    
+
     if (filters?.customerId) {
       query = query.eq('customer_id', filters.customerId);
     }
-    
+
+    if (filters?.status) {
+      query = query.eq('status', filters.status);
+    }
+
     if (filters?.minTotal) {
       query = query.gte('total', filters.minTotal);
     }
-    
+
     if (filters?.maxTotal) {
       query = query.lte('total', filters.maxTotal);
     }
@@ -300,7 +318,7 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
   try {
     // Validar stock antes del procesamiento
     const stockValidation = await validateSaleStock(saleData.items);
-    
+
     if (!stockValidation.is_valid) {
       return {
         success: false,
@@ -314,15 +332,16 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
     const subtotal = saleData.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
     const taxResult = taxService.calculateTaxes(subtotal, saleData.tax_rate || 0.21);
 
-    // Preparar datos de venta
+    // Preparar datos de venta con location_id
     const saleToCreate = {
+      location_id: saleData.location_id, // 🆕 MULTI-LOCATION: Include location
       customer_id: saleData.customer_id,
       total: taxResult.total,
       subtotal: taxResult.subtotal,
       tax_amount: taxResult.taxAmount,
       tax_rate: taxResult.taxRate,
       payment_method: saleData.payment_method || 'cash',
-      notes: saleData.notes || '',
+      notes: saleData.notes || saleData.note || '',
       created_at: new Date().toISOString()
     };
 

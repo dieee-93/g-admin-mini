@@ -19,7 +19,7 @@ import {
   getClassImportance
 } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
+import { InventoryDecimal } from '@/config/decimal-config';
 
 /**
  * ABC Analysis Engine - Clasificación inteligente de inventario
@@ -119,14 +119,19 @@ export class ABCAnalysisEngine {
   // CÁLCULO DE MÉTRICAS
   // ============================================================================
 
+  /**
+   * Calculate analysis metrics for inventory items
+   * @param items - Materials to analyze
+   * @param config - Analysis configuration (time period, criteria, etc.)
+   */
   private static calculateAnalysisMetrics(
     items: MaterialItem[],
     config: ABCAnalysisConfig
   ): MaterialABC[] {
     return items.map(item => {
-      // Calcular consumo anual simulado basado en stock actual
+      // Calcular consumo anual usando el período configurado
       // En producción, esto vendría de datos históricos reales
-      const annualConsumption = this.estimateAnnualConsumption(item);
+      const annualConsumption = this.estimateAnnualConsumption(item, config.analysisPeridMonths);
       const annualValue = DecimalUtils.multiply(
         annualConsumption, 
         item.unit_cost || 0, 
@@ -156,25 +161,29 @@ export class ABCAnalysisEngine {
 
   /**
    * Estima consumo anual basado en tipo de material y stock actual
+   * @param item - Material item
+   * @param months - Analysis period in months (from config)
    * En producción real, esto se calcularía con datos históricos de movimientos
    */
-  private static estimateAnnualConsumption(item: MaterialItem): number {
-    const baseConsumption = item.stock * 12; // Estimación simple
-    
+  private static estimateAnnualConsumption(item: MaterialItem, months: number = 12): number {
+    // Proyectar al año completo basado en el período configurado
+    const monthlyConsumption = item.stock * (12 / months);
+    const baseConsumption = monthlyConsumption * 12;
+
     // Factores por tipo de item
     switch (item.type) {
       case 'MEASURABLE':
         // Items conmensurables tienden a tener rotación alta (carnes, lácteos)
         return Math.round(baseConsumption * 1.5);
-        
+
       case 'COUNTABLE':
         // Items contables varían según packaging
         return Math.round(baseConsumption * 1.2);
-        
+
       case 'ELABORATED':
         // Items elaborados dependen de demanda de productos finales
         return Math.round(baseConsumption * 0.8);
-        
+
       default:
         return Math.round(baseConsumption);
     }
@@ -190,9 +199,29 @@ export class ABCAnalysisEngine {
     }
   }
 
+  /**
+   * Estimate last used date for material
+   * Uses item type to estimate usage frequency realistically
+   * NOTE: In production, query actual usage from stock_movements table
+   */
   private static estimateLastUsedDate(item: MaterialItem): string {
-    // Simula última fecha de uso (en producción vendría de movimientos)
-    const daysAgo = Math.floor(Math.random() * 30);
+    // Estimación más realista basada en tipo de item
+    let maxDaysAgo: number;
+    switch (item.type) {
+      case 'MEASURABLE':
+        maxDaysAgo = 7; // Ingredientes básicos se usan semanalmente
+        break;
+      case 'COUNTABLE':
+        maxDaysAgo = 15; // Items empaquetados menos frecuente
+        break;
+      case 'ELABORATED':
+        maxDaysAgo = 30; // Semi-elaborados varían
+        break;
+      default:
+        maxDaysAgo = 30;
+    }
+
+    const daysAgo = Math.floor(Math.random() * maxDaysAgo);
     const lastUsed = new Date();
     lastUsed.setDate(lastUsed.getDate() - daysAgo);
     return lastUsed.toISOString();
@@ -227,7 +256,7 @@ export class ABCAnalysisEngine {
     // 3. Calcular porcentajes y clasificar
     let cumulativeValue = DecimalUtils.fromValue(0, 'inventory');
     
-    return sorted.map((item, index) => {
+    return sorted.map((item) => {
       // Calcular porcentaje individual
       const itemValue = DecimalUtils.fromValue(item.annualValue, 'inventory');
       const revenuePercentage = DecimalUtils.calculatePercentage(
@@ -325,12 +354,17 @@ export class ABCAnalysisEngine {
   // GENERACIÓN DE RECOMENDACIONES
   // ============================================================================
 
+  /**
+   * Generate actionable recommendations based on ABC analysis
+   * @param materials - Classified materials
+   * @param summary - Class summary stats for cross-class insights
+   */
   private static generateRecommendations(
     materials: MaterialABC[],
     summary: Record<ABCClass, ABCClassSummary>
   ): ABCRecommendation[] {
     const recommendations: ABCRecommendation[] = [];
-    
+
     // Recomendación 1: Optimización de stock clase A
     const classAItems = materials.filter(m => m.abcClass === 'A');
     if (classAItems.length > 0) {
@@ -378,10 +412,10 @@ export class ABCAnalysisEngine {
     }
     
     // Recomendación 3: Revisión de items con baja rotación
-    const lowRotationItems = materials.filter(m => 
+    const lowRotationItems = materials.filter(m =>
       (m.consumptionFrequency || 0) < 5 && m.totalStockValue && m.totalStockValue > 1000
     );
-    
+
     if (lowRotationItems.length > 0) {
       recommendations.push({
         id: 'review-low-rotation-items',
@@ -399,7 +433,28 @@ export class ABCAnalysisEngine {
         ]
       });
     }
-    
+
+    // Recomendación 4: Balance de portafolio (usando summary stats)
+    // Si Class C tiene muchos items pero poco valor, simplificar catálogo
+    if (summary.C.itemCount > summary.A.itemCount * 2 && summary.C.percentageOfValue < 10) {
+      recommendations.push({
+        id: 'simplify-portfolio',
+        type: 'process_improvement',
+        priority: 'low',
+        title: 'Simplificar portafolio de productos',
+        description: `Clase C tiene ${summary.C.itemCount} items (${summary.C.percentageOfItems.toFixed(1)}%) pero solo ${summary.C.percentageOfValue.toFixed(1)}% del valor. Reducir complejidad puede ahorrar costos administrativos.`,
+        potentialSavings: summary.C.totalValue * 0.05, // 5% savings on admin costs
+        implementationEffort: 'medium',
+        affectedItems: materials.filter(m => m.abcClass === 'C').map(m => m.id),
+        actionItems: [
+          'Identificar items Clase C redundantes',
+          'Consolidar proveedores de items similares',
+          'Eliminar items con muy baja rotación',
+          'Estandarizar especificaciones'
+        ]
+      });
+    }
+
     return recommendations;
   }
 

@@ -3,6 +3,7 @@
  * Advanced sales performance analytics with mathematical precision for revenue analysis
  */
 
+import Decimal from 'decimal.js';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 export interface SalesMetrics {
@@ -100,10 +101,10 @@ export function calculateSalesMetrics(
 
   // Process each transaction with decimal precision
   transactions.forEach(transaction => {
-    const amountDec = DecimalUtils.fromValue(transaction.amount, 'financial');
-    const itemsDec = DecimalUtils.fromValue(transaction.items_count, 'financial');
-    const refundDec = DecimalUtils.fromValue(transaction.refund_amount || 0, 'financial');
-    const costDec = DecimalUtils.fromValue(transaction.cost_of_goods || 0, 'financial');
+    const amountDec = DecimalUtils.fromValueSafe(transaction.amount, 'financial', 0);
+    const itemsDec = DecimalUtils.fromValueSafe(transaction.items_count, 'financial', 0);
+    const refundDec = DecimalUtils.fromValueSafe(transaction.refund_amount, 'financial', 0);
+    const costDec = DecimalUtils.fromValueSafe(transaction.cost_of_goods, 'financial', 0);
 
     totalRevenueDec = DecimalUtils.add(totalRevenueDec, amountDec, 'financial');
     totalItemsDec = DecimalUtils.add(totalItemsDec, itemsDec, 'financial');
@@ -116,7 +117,9 @@ export function calculateSalesMetrics(
 
   // Calculate AOV
   const transactionCountDec = DecimalUtils.fromValue(transactions.length, 'financial');
-  const aovDec = DecimalUtils.divide(totalRevenueDec, transactionCountDec, 'financial');
+  const aovDec = DecimalUtils.isZero(transactionCountDec)
+    ? DecimalUtils.fromValue(0, 'financial')
+    : DecimalUtils.divide(totalRevenueDec, transactionCountDec, 'financial');
 
   // Calculate profit margin
   const grossProfitDec = DecimalUtils.subtract(netRevenueDec, totalCostDec, 'financial');
@@ -148,14 +151,14 @@ export function comparePeriods(
   currentMetrics: SalesMetrics,
   previousMetrics: SalesMetrics
 ): PeriodComparison {
-  const currentRevDec = DecimalUtils.fromValue(currentMetrics.total_revenue, 'financial');
-  const previousRevDec = DecimalUtils.fromValue(previousMetrics.total_revenue, 'financial');
-  const currentAovDec = DecimalUtils.fromValue(currentMetrics.average_order_value, 'financial');
-  const previousAovDec = DecimalUtils.fromValue(previousMetrics.average_order_value, 'financial');
-  const currentVolumeDec = DecimalUtils.fromValue(currentMetrics.units_sold, 'financial');
-  const previousVolumeDec = DecimalUtils.fromValue(previousMetrics.units_sold, 'financial');
-  const currentMarginDec = DecimalUtils.fromValue(currentMetrics.profit_margin, 'financial');
-  const previousMarginDec = DecimalUtils.fromValue(previousMetrics.profit_margin, 'financial');
+  const currentRevDec = DecimalUtils.fromValueSafe(currentMetrics.total_revenue, 'financial', 0);
+  const previousRevDec = DecimalUtils.fromValueSafe(previousMetrics.total_revenue, 'financial', 0);
+  const currentAovDec = DecimalUtils.fromValueSafe(currentMetrics.average_order_value, 'financial', 0);
+  const previousAovDec = DecimalUtils.fromValueSafe(previousMetrics.average_order_value, 'financial', 0);
+  const currentVolumeDec = DecimalUtils.fromValueSafe(currentMetrics.units_sold, 'financial', 0);
+  const previousVolumeDec = DecimalUtils.fromValueSafe(previousMetrics.units_sold, 'financial', 0);
+  const currentMarginDec = DecimalUtils.fromValueSafe(currentMetrics.profit_margin, 'financial', 0);
+  const previousMarginDec = DecimalUtils.fromValueSafe(previousMetrics.profit_margin, 'financial', 0);
 
   // Calculate growth rates
   const revenueGrowthDec = calculateGrowthRate(currentRevDec, previousRevDec);
@@ -186,7 +189,7 @@ export function comparePeriods(
 /**
  * Calculate growth rate between two values
  */
-function calculateGrowthRate(current: any, previous: any): any {
+function calculateGrowthRate(current: Decimal, previous: Decimal): Decimal {
   if (DecimalUtils.isZero(previous)) {
     return DecimalUtils.fromValue(0, 'financial');
   }
@@ -257,9 +260,9 @@ export function analyzeProductPerformance(
   const totalRevenueDec = DecimalUtils.fromValue(totalRevenue, 'financial');
 
   return products.map(product => {
-    const revenueDec = DecimalUtils.fromValue(product.revenue, 'financial');
-    const costDec = DecimalUtils.fromValue(product.cost_of_goods, 'financial');
-    const unitsDec = DecimalUtils.fromValue(product.units_sold, 'financial');
+    const revenueDec = DecimalUtils.fromValueSafe(product.revenue, 'financial', 0);
+    const costDec = DecimalUtils.fromValueSafe(product.cost_of_goods, 'financial', 0);
+    // const unitsDec = DecimalUtils.fromValue(product.units_sold, 'financial'); // TODO: Use for per-unit calculations
 
     // Calculate profit margin
     const profitDec = DecimalUtils.subtract(revenueDec, costDec, 'financial');
@@ -272,16 +275,18 @@ export function analyzeProductPerformance(
         );
 
     // Calculate contribution percentage
-    const contributionDec = DecimalUtils.multiply(
-      DecimalUtils.divide(revenueDec, totalRevenueDec, 'financial'),
-      DecimalUtils.fromValue(100, 'financial'),
-      'financial'
-    );
+    const contributionDec = DecimalUtils.isZero(totalRevenueDec)
+      ? DecimalUtils.fromValue(0, 'financial')
+      : DecimalUtils.multiply(
+          DecimalUtils.divide(revenueDec, totalRevenueDec, 'financial'),
+          DecimalUtils.fromValue(100, 'financial'),
+          'financial'
+        );
 
     // Calculate growth rate if previous period data available
     let growthRate = 0;
     if (product.previous_period_revenue) {
-      const previousDec = DecimalUtils.fromValue(product.previous_period_revenue, 'financial');
+      const previousDec = DecimalUtils.fromValueSafe(product.previous_period_revenue, 'financial', 0);
       const growthDec = calculateGrowthRate(revenueDec, previousDec);
       growthRate = DecimalUtils.toNumber(growthDec);
     }
@@ -310,11 +315,12 @@ export function calculateRevenueBreakdown(
   taxes: number,
   costOfGoodsSold: number
 ): RevenueBreakdown {
-  const grossDec = DecimalUtils.fromValue(grossRevenue, 'financial');
-  const discountsDec = DecimalUtils.fromValue(discounts, 'financial');
-  const refundsDec = DecimalUtils.fromValue(refunds, 'financial');
-  const taxesDec = DecimalUtils.fromValue(taxes, 'financial');
-  const cogsDec = DecimalUtils.fromValue(costOfGoodsSold, 'financial');
+  // 🐛 FIX: Use fromValueSafe to handle undefined/null/NaN values
+  const grossDec = DecimalUtils.fromValueSafe(grossRevenue, 'financial', 0);
+  const discountsDec = DecimalUtils.fromValueSafe(discounts, 'financial', 0);
+  const refundsDec = DecimalUtils.fromValueSafe(refunds, 'financial', 0);
+  const taxesDec = DecimalUtils.fromValueSafe(taxes, 'financial', 0);
+  const cogsDec = DecimalUtils.fromValueSafe(costOfGoodsSold, 'financial', 0);
 
   // Calculate net revenue
   const netRevenueDec = DecimalUtils.subtract(
@@ -417,12 +423,12 @@ export function calculateSalesVelocity(
 /**
  * Helper to calculate average revenue from daily sales
  */
-function calculateAverageRevenue(salesData: Array<{ revenue: number }>): any {
+function calculateAverageRevenue(salesData: Array<{ revenue: number }>): Decimal {
   if (salesData.length === 0) return DecimalUtils.fromValue(0, 'financial');
 
   let totalDec = DecimalUtils.fromValue(0, 'financial');
   salesData.forEach(day => {
-    totalDec = DecimalUtils.add(totalDec, DecimalUtils.fromValue(day.revenue, 'financial'), 'financial');
+    totalDec = DecimalUtils.add(totalDec, DecimalUtils.fromValueSafe(day.revenue, 'financial', 0), 'financial');
   });
 
   return DecimalUtils.divide(totalDec, DecimalUtils.fromValue(salesData.length, 'financial'), 'financial');

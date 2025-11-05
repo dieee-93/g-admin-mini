@@ -155,16 +155,16 @@ export class EventBusTestingHarness {
     
     // Convert event handlers to tracked handlers
     for (const [pattern, handler] of Object.entries(eventHandlers)) {
-      const trackedHandler: EventHandler = async (_event) => {
+      const trackedHandler: EventHandler = async (event) => {
         const handlerName = `handle_${pattern.replace('.', '_')}`;
-        
+
         // Record call
         callHistory.push({
           handlerName,
           event,
           timestamp: new Date()
         });
-        
+
         // Track in captured events if recording
         if (this.isRecording) {
           const lastCaptured = this.capturedEvents[this.capturedEvents.length - 1];
@@ -172,7 +172,7 @@ export class EventBusTestingHarness {
             lastCaptured.handlersCalled.push(`${moduleId}.${handlerName}`);
           }
         }
-        
+
         try {
           await handler(event);
         } catch (error) {
@@ -347,8 +347,8 @@ export class EventBusTestingHarness {
         });
         
         this.createMockModule('kitchen', {
-          'kitchen.preparation.started': async () => { /* start cooking */ },
-          'kitchen.item.ready': async () => { /* item ready */ }
+          'production.preparation.started': async () => { /* start cooking */ },
+          'production.item.ready': async () => { /* item ready */ }
         });
         
         await this.registerMockModule('sales');
@@ -358,8 +358,8 @@ export class EventBusTestingHarness {
       execute: async () => {
         await this.simulateEventSequence([
           { pattern: 'sales.order.placed', payload: { orderId: 'test-123' } },
-          { pattern: 'kitchen.preparation.started', payload: { orderId: 'test-123' }, delayMs: 100 },
-          { pattern: 'kitchen.item.ready', payload: { orderId: 'test-123' }, delayMs: 200 },
+          { pattern: 'production.preparation.started', payload: { orderId: 'test-123' }, delayMs: 100 },
+          { pattern: 'production.item.ready', payload: { orderId: 'test-123' }, delayMs: 200 },
           { pattern: 'sales.payment.completed', payload: { orderId: 'test-123' }, delayMs: 300 }
         ]);
       },
@@ -367,7 +367,7 @@ export class EventBusTestingHarness {
       verify: async () => {
         const assert = this.createAssertions();
         
-        if (!assert.eventsInOrder(['sales.order.placed', 'kitchen.preparation.started', 'kitchen.item.ready', 'sales.payment.completed'])) {
+        if (!assert.eventsInOrder(['sales.order.placed', 'production.preparation.started', 'production.item.ready', 'sales.payment.completed'])) {
           throw new Error('Events not emitted in correct order');
         }
         

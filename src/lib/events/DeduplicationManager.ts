@@ -49,8 +49,8 @@ class DeduplicationStore {
         this.db = request.result;
         resolve();
       };
-      
-      request.onupgradeneeded = (_event) => {
+
+      request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
         
         if (!db.objectStoreNames || !db.objectStoreNames.contains(this.STORE_NAME)) {
@@ -145,8 +145,8 @@ class DeduplicationStore {
     
     return new Promise((resolve, reject) => {
       const request = index.openCursor(IDBKeyRange.upperBound(cutoffTime));
-      
-      request.onsuccess = (_event) => {
+
+      request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result;
         if (cursor) {
           cursor.delete();
@@ -208,13 +208,14 @@ export class DeduplicationManager {
       // Get secure client ID
       return await SecureClientManager.getClientId();
     } catch (error) {
-      SecurityLogger.threat('Failed to get secure client ID', { error: error.message });
-      
+      const err = error instanceof Error ? error : new Error(String(error));
+      SecurityLogger.threat('Failed to get secure client ID', { error: err.message });
+
       // Fallback to basic secure generation (no storage)
       if (crypto.randomUUID) {
         return `client_${Date.now()}_${crypto.randomUUID()}`;
       }
-      
+
       throw new Error('Unable to generate secure client ID');
     }
   }
@@ -231,7 +232,8 @@ export class DeduplicationManager {
           SecurityLogger.anomaly('Deduplication cleanup completed', { cleanedEntries: cleaned });
         }
       } catch (error) {
-        SecurityLogger.threat('Deduplication cleanup failed', { error: error.message });
+        const err = error instanceof Error ? error : new Error(String(error));
+        SecurityLogger.threat('Deduplication cleanup failed', { error: err.message });
       }
     }, this.config.cleanupIntervalMs);
   }

@@ -1,7 +1,7 @@
 // ABC Analysis types for Materials Inventory Management
 // Advanced inventory categorization and analytics
 
-import type { MaterialItem } from '../types';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 
 // ============================================================================
 // 🎯 ABC CLASSIFICATION TYPES

@@ -116,7 +116,7 @@ export function LazyFallback({
             <HStack gap="3">
               {onRetry && (
                 <Button
-                  colorScheme="blue"
+                  colorPalette="blue"
                   onClick={onRetry}
                   size="sm"
                 >
@@ -533,7 +533,7 @@ export function LazyLoadingMonitor() {
                       <HStack key={`${stat.module}-${stat.timestamp}`} justify="space-between" fontSize="xs" py="1">
                         <Text>{stat.module}</Text>
                         <HStack gap="2">
-                          <Badge colorScheme={stat.success ? 'green' : 'red'} size="xs">
+                          <Badge colorPalette={stat.success ? 'green' : 'red'} size="xs">
                             {stat.loadTime}ms
                           </Badge>
                           {stat.success ? (

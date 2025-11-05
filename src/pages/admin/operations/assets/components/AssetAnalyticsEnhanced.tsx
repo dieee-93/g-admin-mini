@@ -303,7 +303,7 @@ const AssetAnalyticsEnhanced: React.FC = () => {
               title="ROI Promedio"
               value={`${mockData.performance.averageROI}%`}
               change={1.5}
-              icon="TrendingUpIcon"
+              icon="ArrowTrendingUpIcon"
             />
             <MetricCard
               title="Utilización"
@@ -379,7 +379,7 @@ const AssetAnalyticsEnhanced: React.FC = () => {
               <Section key={category.category} variant="flat">
                 <Stack direction={{ base: 'column', md: 'row' }} justify="between" align="start" gap="md">
                   <Stack gap="sm">
-                    <Typography variant="h6">{category.category}</Typography>
+                    <Typography variant="subtitle">{category.category}</Typography>
                     <Stack direction="row" gap="sm">
                       <Badge
                         colorPalette={category.utilization > 80 ? 'green' : category.utilization > 60 ? 'yellow' : 'red'}
@@ -465,7 +465,7 @@ const AssetAnalyticsEnhanced: React.FC = () => {
                 <Stack direction={{ base: 'column', md: 'row' }} justify="between" align="start" gap="md">
                   <Stack gap="sm">
                     <Stack direction="row" align="center" gap="sm">
-                      <Typography variant="h6">{period.period}</Typography>
+                      <Typography variant="subtitle">{period.period}</Typography>
                       <Badge
                         colorPalette={
                           period.status === 'excellent' ? 'green' :
@@ -549,7 +549,7 @@ const AssetAnalyticsEnhanced: React.FC = () => {
               <Section key={index} variant="flat">
                 <Stack direction={{ base: 'column', md: 'row' }} justify="between" align="start" gap="md">
                   <Stack gap="sm">
-                    <Typography variant="h6">{risk.risk}</Typography>
+                    <Typography variant="subtitle">{risk.risk}</Typography>
                     <Stack direction="row" gap="sm">
                       <Badge
                         colorPalette={risk.impact === 'high' ? 'red' : risk.impact === 'medium' ? 'yellow' : 'green'}
@@ -589,7 +589,7 @@ const AssetAnalyticsEnhanced: React.FC = () => {
             {assetInsights.map((insight, index) => (
               <Alert key={index} status={insight.type} size="md">
                 <Stack gap="sm">
-                  <Typography variant="h6">{insight.title}</Typography>
+                  <Typography variant="subtitle">{insight.title}</Typography>
                   <Typography variant="body">{insight.description}</Typography>
                   {insight.actionable && (
                     <Badge colorPalette="blue" variant="subtle" size="sm">

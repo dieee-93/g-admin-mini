@@ -10,7 +10,7 @@ import {
   calculateMenuEngineeringMatrix,
   DEFAULT_MATRIX_CONFIG,
   type ProductSalesData
-} from '../services/menuEngineeringCalculations';
+} from '@/pages/admin/supply-chain/products/services/menuEngineeringEngine';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';

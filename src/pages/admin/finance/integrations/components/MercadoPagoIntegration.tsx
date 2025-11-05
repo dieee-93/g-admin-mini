@@ -7,8 +7,34 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
+import {
+  BoltIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  XMarkIcon,
+  CheckIcon
+} from '@heroicons/react/24/outline';
 
 import { logger } from '@/lib/logging';
+
+// Types
+interface TestResults {
+  apiStatus: string;
+  accountId: string;
+  accountType: string;
+  country: string;
+  availablePaymentMethods: Array<{
+    id: string;
+    name: string;
+    type: string;
+  }>;
+  fees: Record<string, string>;
+}
+
+interface ErrorResult {
+  error: string;
+}
+
 // MercadoPago Configuration Schema
 const MercadoPagoConfigSchema = z.object({
   // API Credentials
@@ -46,14 +72,13 @@ type MercadoPagoConfig = z.infer<typeof MercadoPagoConfigSchema>;
 
 const MercadoPagoIntegration: React.FC = () => {
   const [connectionStatus, setConnectionStatus] = React.useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
-  const [testResults, setTestResults] = React.useState<any>(null);
+  const [testResults, setTestResults] = React.useState<TestResults | ErrorResult | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors, isSubmitting }
   } = useForm<MercadoPagoConfig>({
     resolver: zodResolver(MercadoPagoConfigSchema),
@@ -168,21 +193,21 @@ const MercadoPagoIntegration: React.FC = () => {
                 colorPalette="blue"
                 size="sm"
               >
-                <Icon name="BoltIcon" />
+                <Icon as={BoltIcon} />
                 Probar Conexión
               </Button>
             </Stack>
 
             {connectionStatus === 'connected' && (
               <Alert status="success">
-                <Icon name="CheckCircleIcon" />
+                <Icon as={CheckCircleIcon} />
                 Conexión exitosa con MercadoPago API
               </Alert>
             )}
 
             {connectionStatus === 'error' && (
               <Alert status="error">
-                <Icon name="ExclamationTriangleIcon" />
+                <Icon as={ExclamationTriangleIcon} />
                 Error de conexión. Verifica tus credenciales.
               </Alert>
             )}
@@ -383,7 +408,7 @@ const MercadoPagoIntegration: React.FC = () => {
                 <Stack gap="md">
                   {testResults.error ? (
                     <Alert status="error">
-                      <Icon name="ExclamationTriangleIcon" />
+                      <Icon as={ExclamationTriangleIcon} />
                       {testResults.error}
                     </Alert>
                   ) : (
@@ -403,7 +428,7 @@ const MercadoPagoIntegration: React.FC = () => {
                       <Stack>
                         <h4>Métodos de Pago Disponibles</h4>
                         <Stack gap="sm">
-                          {testResults.availablePaymentMethods?.map((method: any, index: number) => (
+                          {'availablePaymentMethods' in testResults && testResults.availablePaymentMethods?.map((method, index: number) => (
                             <Stack key={index} direction="row" justify="between" align="center">
                               <span>{method.name} ({method.type})</span>
                               <Badge colorPalette="gray" variant="outline" size="sm">
@@ -422,7 +447,7 @@ const MercadoPagoIntegration: React.FC = () => {
             {/* Submit Button */}
             <Stack direction="row" gap="md" justify="end">
               <Button variant="outline" type="button">
-                <Icon name="XMarkIcon" />
+                <Icon as={XMarkIcon} />
                 Cancelar
               </Button>
               <Button
@@ -430,7 +455,7 @@ const MercadoPagoIntegration: React.FC = () => {
                 colorPalette="blue"
                 loading={isSubmitting}
               >
-                <Icon name="CheckIcon" />
+                <Icon as={CheckIcon} />
                 Guardar Configuración
               </Button>
             </Stack>

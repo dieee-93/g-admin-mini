@@ -4,10 +4,8 @@ import { useState, useEffect } from 'react';
 // DESIGN SYSTEM IMPORTS
 import {
   // Layout & Structure
-  Stack,
   VStack,
   HStack,
-  SimpleGrid,
   
   // Typography
   Typography,
@@ -41,9 +39,6 @@ import {
   PrinterIcon,
   EyeIcon,
   TrashIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  ClockIcon
 } from '@heroicons/react/24/outline';
 
 // Fiscal imports

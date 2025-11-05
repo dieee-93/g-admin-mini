@@ -7,6 +7,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
+import {
+  CurrencyDollarIcon,
+  ChartBarIcon,
+  UserGroupIcon,
+  CogIcon,
+  ArchiveBoxIcon,
+  CalculatorIcon,
+  ArrowPathIcon,
+  SparklesIcon
+} from '@heroicons/react/24/outline';
 
 const nlpQuerySchema = z.object({
   query: z.string().min(5, 'La consulta debe tener al menos 5 caracteres'),
@@ -48,32 +58,32 @@ const NaturalLanguageBI: React.FC = () => {
     {
       query: "¿Cuáles son nuestros productos más rentables este mes?",
       context: "financial" as const,
-      icon: "CurrencyDollarIcon"
+      icon: CurrencyDollarIcon
     },
     {
       query: "Muéstrame las tendencias de ventas por categoría",
       context: "sales" as const,
-      icon: "ChartBarIcon"
+      icon: ChartBarIcon
     },
     {
       query: "¿Qué clientes tienen mayor valor de vida?",
       context: "customers" as const,
-      icon: "UserGroupIcon"
+      icon: UserGroupIcon
     },
     {
       query: "Analiza el rendimiento operacional del último trimestre",
       context: "operational" as const,
-      icon: "CogIcon"
+      icon: CogIcon
     },
     {
       query: "¿Cuáles son nuestros niveles de stock críticos?",
       context: "inventory" as const,
-      icon: "ArchiveBoxIcon"
+      icon: ArchiveBoxIcon
     },
     {
       query: "Compara ingresos vs gastos en los últimos 6 meses",
       context: "financial" as const,
-      icon: "CalculatorIcon"
+      icon: CalculatorIcon
     }
   ];
 
@@ -244,12 +254,12 @@ const NaturalLanguageBI: React.FC = () => {
                 >
                   {isProcessing ? (
                     <>
-                      <Icon name="ArrowPathIcon" className="animate-spin" />
+                      <Icon as={ArrowPathIcon} className="animate-spin" />
                       Procesando...
                     </>
                   ) : (
                     <>
-                      <Icon name="SparklesIcon" />
+                      <Icon as={SparklesIcon} />
                       Analizar con IA
                     </>
                   )}
@@ -270,7 +280,7 @@ const NaturalLanguageBI: React.FC = () => {
                     onClick={() => useSuggestedQuery(suggested)}
                     className="text-left justify-start h-auto p-3"
                   >
-                    <Icon name={suggested.icon} />
+                    <Icon as={suggested.icon} />
                     <span className="text-xs leading-tight">{suggested.query}</span>
                   </Button>
                 ))}
@@ -299,7 +309,7 @@ const NaturalLanguageBI: React.FC = () => {
                           value={metric.value}
                           change={metric.change}
                           trend={metric.trend}
-                          icon="ChartBarIcon"
+                          icon={ChartBarIcon}
                         />
                       ))}
                     </CardGrid>

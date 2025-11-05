@@ -8,8 +8,9 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { BaseCalendarAdapter, AdapterConstructor, AdapterRegistry } from '../adapters/BaseCalendarAdapter';
-import {
+import { BaseCalendarAdapter } from '../adapters/BaseCalendarAdapter';
+import type { AdapterConstructor, AdapterRegistry } from '../adapters/BaseCalendarAdapter';
+import type {
   CalendarConfig,
   ValidationResult,
   ConflictResult,

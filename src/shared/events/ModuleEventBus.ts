@@ -4,6 +4,7 @@
  */
 import EventBus from '@/lib/events/EventBus';
 import type { EventPattern } from '@/lib/events/types';
+import { logger } from '@/lib/logging';
 
 // Create instance
 const eventBus = EventBus;
@@ -209,7 +210,7 @@ export class ModuleIntegrations {
   private static setupCustomerIntegrations() {
     // When customer is created, initialize analytics
     moduleEventBus.on('customer.created', ({ customerId, customerData }) => {
-      console.log(`[EventBus] Customer created: ${customerId}`);
+      logger.info('ModuleEventBus', `Customer created: ${customerId}`);
 
       // Trigger customer analytics initialization
       moduleEventBus.emit('analytics.generated', {
@@ -221,7 +222,7 @@ export class ModuleIntegrations {
 
     // When customer RFM is updated, notify other modules
     moduleEventBus.on('customer.rfm_updated', ({ customerId, segment, scores }) => {
-      console.log(`[EventBus] Customer ${customerId} segment updated to: ${segment}`);
+      logger.debug('ModuleEventBus', `Customer ${customerId} segment updated to: ${segment}`);
 
       if (segment === 'At Risk') {
         moduleEventBus.emit('analytics.insight_created', {
@@ -239,7 +240,7 @@ export class ModuleIntegrations {
   private static setupInventoryIntegrations() {
     // When stock goes low, notify relevant modules
     moduleEventBus.on('material.stock_low', ({ materialId, currentStock, minStock }) => {
-      console.log(`[EventBus] Stock low for material ${materialId}: ${currentStock}/${minStock}`);
+      logger.debug('ModuleEventBus', `Stock low for material ${materialId}: ${currentStock}/${minStock}`);
 
       moduleEventBus.emit('analytics.insight_created', {
         module: 'materials',
@@ -250,7 +251,7 @@ export class ModuleIntegrations {
 
     // When stock goes critical, create high priority alerts
     moduleEventBus.on('material.stock_critical', ({ materialId, currentStock, minStock }) => {
-      console.log(`[EventBus] CRITICAL stock for material ${materialId}: ${currentStock}/${minStock}`);
+      logger.error('ModuleEventBus', `CRITICAL stock for material ${materialId}: ${currentStock}/${minStock}`);
 
       moduleEventBus.emit('analytics.insight_created', {
         module: 'materials',
@@ -269,7 +270,7 @@ export class ModuleIntegrations {
 
     // When materials are created, check if they affect recipes
     moduleEventBus.on('material.created', ({ materialId, materialData }) => {
-      console.log(`[EventBus] New material created: ${materialId}`);
+      logger.info('ModuleEventBus', `New material created: ${materialId}`);
 
       // This would trigger recipe recalculations if needed
       moduleEventBus.emit('analytics.generated', {
@@ -286,7 +287,7 @@ export class ModuleIntegrations {
   private static setupSalesIntegrations() {
     // When sale is completed, update multiple systems
     moduleEventBus.on('sale.completed', ({ saleId, total, customerId, items }) => {
-      console.log(`[EventBus] Sale completed: ${saleId} for $${total}`);
+      logger.info('ModuleEventBus', `Sale completed: ${saleId} for ${total}`);
 
       // Update customer analytics if customer is known
       if (customerId) {
@@ -315,7 +316,7 @@ export class ModuleIntegrations {
 
     // When payment is processed, log for analytics
     moduleEventBus.on('sale.payment_processed', ({ saleId, paymentMethod, amount }) => {
-      console.log(`[EventBus] Payment processed: ${paymentMethod} for $${amount}`);
+      logger.debug('ModuleEventBus', `Payment processed: ${paymentMethod} for ${amount}`);
 
       moduleEventBus.emit('analytics.generated', {
         module: 'sales',
@@ -335,7 +336,7 @@ export class ModuleIntegrations {
   private static setupBillingIntegrations() {
     // When subscription is created, update customer analytics and MRR
     moduleEventBus.on('billing.subscription_created', ({ subscriptionId, subscriptionData, customerId }) => {
-      console.log(`[EventBus] Subscription created: ${subscriptionId}`);
+      logger.info('ModuleEventBus', `Subscription created: ${subscriptionId}`);
 
       // Update customer data if available
       if (customerId) {
@@ -365,7 +366,7 @@ export class ModuleIntegrations {
 
     // When subscription is cancelled, update customer and create churn analytics
     moduleEventBus.on('billing.subscription_cancelled', ({ subscriptionId, reason, customerId }) => {
-      console.log(`[EventBus] Subscription cancelled: ${subscriptionId}, reason: ${reason}`);
+      logger.debug('ModuleEventBus', `Subscription cancelled: ${subscriptionId}, reason: ${reason}`);
 
       if (customerId) {
         // Update customer status
@@ -385,7 +386,7 @@ export class ModuleIntegrations {
 
     // When payment fails, create risk alerts and schedule retries
     moduleEventBus.on('billing.payment_failed', ({ subscriptionId, invoiceId, attempt, reason }) => {
-      console.log(`[EventBus] Payment failed: ${invoiceId}, attempt ${attempt}, reason: ${reason}`);
+      logger.error('ModuleEventBus', `Payment failed: ${invoiceId}, attempt ${attempt}, reason: ${reason}`);
 
       // Create analytics insight for failed payment
       moduleEventBus.emit('analytics.insight_created', {
@@ -406,7 +407,7 @@ export class ModuleIntegrations {
 
     // When payment succeeds after failure, create success analytics
     moduleEventBus.on('billing.payment_succeeded', ({ subscriptionId, invoiceId, amount, customerId }) => {
-      console.log(`[EventBus] Payment succeeded: ${invoiceId} for $${amount}`);
+      logger.debug('ModuleEventBus', `Payment succeeded: ${invoiceId} for ${amount}`);
 
       // Update customer analytics with successful payment
       if (customerId) {
@@ -429,7 +430,7 @@ export class ModuleIntegrations {
 
     // When churn risk is detected, create targeted interventions
     moduleEventBus.on('billing.churn_risk_detected', ({ customerId, subscriptionId, riskLevel }) => {
-      console.log(`[EventBus] Churn risk detected: ${customerId}, level: ${riskLevel}`);
+      logger.debug('ModuleEventBus', `Churn risk detected: ${customerId}, level: ${riskLevel}`);
 
       // Create high-priority insight for intervention
       moduleEventBus.emit('analytics.insight_created', {
@@ -484,7 +485,7 @@ export class ModuleIntegrations {
 
     // When dunning is triggered, coordinate with customer service
     moduleEventBus.on('billing.dunning_triggered', ({ subscriptionId, customerId, overdueDays }) => {
-      console.log(`[EventBus] Dunning triggered for customer ${customerId}, ${overdueDays} days overdue`);
+      logger.debug('ModuleEventBus', `Dunning triggered for customer ${customerId}, ${overdueDays} days overdue`);
 
       // Create customer service alert
       moduleEventBus.emit('analytics.recommendation_created', {
@@ -510,7 +511,7 @@ export class ModuleIntegrations {
   private static setupMembershipIntegrations() {
     // When membership is created, update customer data and create billing if needed
     moduleEventBus.on('membership.created', ({ membershipId, membershipData, customerId }) => {
-      console.log(`[EventBus] Membership created: ${membershipId}`);
+      logger.info('ModuleEventBus', `Membership created: ${membershipId}`);
 
       // Update customer data with membership info
       if (customerId) {
@@ -553,7 +554,7 @@ export class ModuleIntegrations {
 
     // When membership is cancelled, update customer and billing
     moduleEventBus.on('membership.cancelled', ({ membershipId, customerId, reason }) => {
-      console.log(`[EventBus] Membership cancelled: ${membershipId}, reason: ${reason}`);
+      logger.debug('ModuleEventBus', `Membership cancelled: ${membershipId}, reason: ${reason}`);
 
       // Update customer status
       moduleEventBus.emit('customer.updated', {
@@ -582,7 +583,7 @@ export class ModuleIntegrations {
 
     // When member visits facility, track engagement and analytics
     moduleEventBus.on('membership.visit_logged', ({ membershipId, customerId, facility, duration }) => {
-      console.log(`[EventBus] Member visit logged: ${customerId} at ${facility} for ${duration} min`);
+      logger.debug('ModuleEventBus', `Member visit logged: ${customerId} at ${facility} for ${duration} min`);
 
       // Update customer engagement data
       moduleEventBus.emit('customer.updated', {
@@ -611,7 +612,7 @@ export class ModuleIntegrations {
 
     // When churn risk is detected, create intervention strategies
     moduleEventBus.on('membership.churn_risk_detected', ({ membershipId, customerId, riskLevel, inactivityDays }) => {
-      console.log(`[EventBus] Membership churn risk detected: ${customerId}, level: ${riskLevel}, inactive for ${inactivityDays} days`);
+      logger.debug('ModuleEventBus', `Membership churn risk detected: ${customerId}, level: ${riskLevel}, inactive for ${inactivityDays} days`);
 
       // Create high-priority insight for retention
       moduleEventBus.emit('analytics.insight_created', {
@@ -651,7 +652,7 @@ export class ModuleIntegrations {
 
     // When membership expires, handle renewal or termination
     moduleEventBus.on('membership.expired', ({ membershipId, customerId, expiredDate }) => {
-      console.log(`[EventBus] Membership expired: ${membershipId} on ${expiredDate}`);
+      logger.debug('ModuleEventBus', `Membership expired: ${membershipId} on ${expiredDate}`);
 
       // Update customer status
       moduleEventBus.emit('customer.updated', {
@@ -679,7 +680,7 @@ export class ModuleIntegrations {
 
     // When upgrade is requested, handle cross-selling opportunity
     moduleEventBus.on('membership.upgrade_requested', ({ membershipId, customerId, fromType, toType }) => {
-      console.log(`[EventBus] Membership upgrade requested: ${customerId} from ${fromType} to ${toType}`);
+      logger.debug('ModuleEventBus', `Membership upgrade requested: ${customerId} from ${fromType} to ${toType}`);
 
       // Update customer data with upgrade intent
       moduleEventBus.emit('customer.updated', {
@@ -714,7 +715,7 @@ export class ModuleIntegrations {
 
     // When engagement score is updated, track member satisfaction
     moduleEventBus.on('membership.engagement_score_updated', ({ membershipId, customerId, score, previousScore }) => {
-      console.log(`[EventBus] Engagement score updated: ${customerId} from ${previousScore} to ${score}`);
+      logger.debug('ModuleEventBus', `Engagement score updated: ${customerId} from ${previousScore} to ${score}`);
 
       const scoreChange = score - previousScore;
 
@@ -753,7 +754,7 @@ export class ModuleIntegrations {
 
     // When payment is overdue, coordinate with billing and create urgency
     moduleEventBus.on('membership.payment_overdue', ({ membershipId, customerId, overdueDays, amount }) => {
-      console.log(`[EventBus] Membership payment overdue: ${customerId}, ${overdueDays} days, $${amount}`);
+      logger.debug('ModuleEventBus', `Membership payment overdue: ${customerId}, ${overdueDays} days, ${amount}`);
 
       // Update customer payment status
       moduleEventBus.emit('customer.updated', {
@@ -796,7 +797,7 @@ export class ModuleIntegrations {
   private static setupRentalIntegrations() {
     // When rental is created, update customer data and track asset utilization
     moduleEventBus.on('rental.created', ({ rentalId, rentalData, customerId, assetId }) => {
-      console.log(`[EventBus] Rental created: ${rentalId} for asset ${assetId}`);
+      logger.info('ModuleEventBus', `Rental created: ${rentalId} for asset ${assetId}`);
 
       // Update customer data with rental history
       if (customerId) {
@@ -833,7 +834,7 @@ export class ModuleIntegrations {
 
     // When rental starts, track asset status and utilization
     moduleEventBus.on('rental.started', ({ rentalId, customerId, assetId, startTime }) => {
-      console.log(`[EventBus] Rental started: ${rentalId} for asset ${assetId}`);
+      logger.info('ModuleEventBus', `Rental started: ${rentalId} for asset ${assetId}`);
 
       // Update customer engagement
       moduleEventBus.emit('customer.updated', {
@@ -860,7 +861,7 @@ export class ModuleIntegrations {
 
     // When rental is completed, process final analytics and update customer value
     moduleEventBus.on('rental.completed', ({ rentalId, customerId, assetId, endTime, finalCost }) => {
-      console.log(`[EventBus] Rental completed: ${rentalId}, final cost: $${finalCost}`);
+      logger.info('ModuleEventBus', `Rental completed: ${rentalId}, final cost: ${finalCost}`);
 
       // Update customer lifetime value and rental statistics
       moduleEventBus.emit('customer.updated', {
@@ -905,7 +906,7 @@ export class ModuleIntegrations {
 
     // When rental is cancelled, track reasons and manage asset availability
     moduleEventBus.on('rental.cancelled', ({ rentalId, customerId, assetId, reason, cancellationFee }) => {
-      console.log(`[EventBus] Rental cancelled: ${rentalId}, reason: ${reason}`);
+      logger.debug('ModuleEventBus', `Rental cancelled: ${rentalId}, reason: ${reason}`);
 
       // Update customer cancellation data
       if (customerId) {
@@ -948,7 +949,7 @@ export class ModuleIntegrations {
 
     // When asset is damaged, coordinate with customer service and maintenance
     moduleEventBus.on('rental.asset_damaged', ({ rentalId, assetId, customerId, damageDescription, repairCost }) => {
-      console.log(`[EventBus] Asset damaged: ${assetId} in rental ${rentalId}`);
+      logger.debug('ModuleEventBus', `Asset damaged: ${assetId} in rental ${rentalId}`);
 
       // Update customer damage history
       moduleEventBus.emit('customer.updated', {
@@ -987,7 +988,7 @@ export class ModuleIntegrations {
 
     // When rental is overdue, coordinate with billing and customer management
     moduleEventBus.on('rental.overdue', ({ rentalId, customerId, assetId, overdueDays, lateFees }) => {
-      console.log(`[EventBus] Rental overdue: ${rentalId}, ${overdueDays} days, fees: $${lateFees}`);
+      logger.debug('ModuleEventBus', `Rental overdue: ${rentalId}, ${overdueDays} days, fees: ${lateFees}`);
 
       // Update customer overdue status
       moduleEventBus.emit('customer.updated', {
@@ -1025,7 +1026,7 @@ export class ModuleIntegrations {
 
     // When asset utilization is updated, track performance metrics
     moduleEventBus.on('rental.utilization_updated', ({ assetId, utilizationRate, revenue, period }) => {
-      console.log(`[EventBus] Asset utilization updated: ${assetId}, ${utilizationRate}% for ${period}`);
+      logger.debug('ModuleEventBus', `Asset utilization updated: ${assetId}, ${utilizationRate}% for ${period}`);
 
       // Generate utilization analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1060,7 +1061,7 @@ export class ModuleIntegrations {
 
     // When payment is processed, update customer payment history
     moduleEventBus.on('rental.payment_processed', ({ rentalId, amount, paymentMethod, customerId }) => {
-      console.log(`[EventBus] Rental payment processed: ${rentalId}, $${amount} via ${paymentMethod}`);
+      logger.debug('ModuleEventBus', `Rental payment processed: ${rentalId}, ${amount} via ${paymentMethod}`);
 
       if (customerId) {
         // Update customer payment profile
@@ -1092,7 +1093,7 @@ export class ModuleIntegrations {
 
     // When payment fails, create alerts and coordinate recovery
     moduleEventBus.on('rental.payment_failed', ({ rentalId, amount, reason, customerId }) => {
-      console.log(`[EventBus] Rental payment failed: ${rentalId}, $${amount}, reason: ${reason}`);
+      logger.error('ModuleEventBus', `Rental payment failed: ${rentalId}, ${amount}, reason: ${reason}`);
 
       if (customerId) {
         // Update customer payment issues
@@ -1129,7 +1130,7 @@ export class ModuleIntegrations {
   private static setupAssetIntegrations() {
     // When asset is created, initialize tracking and analytics
     moduleEventBus.on('asset.created', ({ assetId, assetData, category }) => {
-      console.log(`[EventBus] Asset created: ${assetId} in category ${category}`);
+      logger.info('ModuleEventBus', `Asset created: ${assetId} in category ${category}`);
 
       // Generate portfolio analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1161,7 +1162,7 @@ export class ModuleIntegrations {
 
     // When asset condition changes, update maintenance and rental availability
     moduleEventBus.on('asset.condition_changed', ({ assetId, previousCondition, newCondition, reason }) => {
-      console.log(`[EventBus] Asset condition changed: ${assetId} from ${previousCondition} to ${newCondition}`);
+      logger.debug('ModuleEventBus', `Asset condition changed: ${assetId} from ${previousCondition} to ${newCondition}`);
 
       // Generate condition analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1200,7 +1201,7 @@ export class ModuleIntegrations {
 
     // When maintenance is scheduled, coordinate with operations
     moduleEventBus.on('asset.maintenance_scheduled', ({ assetId, maintenanceDate, maintenanceType, cost }) => {
-      console.log(`[EventBus] Maintenance scheduled: ${assetId} on ${maintenanceDate}`);
+      logger.debug('ModuleEventBus', `Maintenance scheduled: ${assetId} on ${maintenanceDate}`);
 
       // Generate maintenance analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1235,7 +1236,7 @@ export class ModuleIntegrations {
 
     // When maintenance is completed, update asset status and costs
     moduleEventBus.on('asset.maintenance_completed', ({ assetId, completionDate, cost, notes }) => {
-      console.log(`[EventBus] Maintenance completed: ${assetId}, cost: $${cost}`);
+      logger.info('ModuleEventBus', `Maintenance completed: ${assetId}, cost: ${cost}`);
 
       // Update asset condition tracking
       moduleEventBus.emit('asset.condition_changed', {
@@ -1269,7 +1270,7 @@ export class ModuleIntegrations {
 
     // When maintenance is overdue, create urgent alerts
     moduleEventBus.on('asset.maintenance_overdue', ({ assetId, scheduledDate, overdueDays }) => {
-      console.log(`[EventBus] Maintenance overdue: ${assetId}, ${overdueDays} days`);
+      logger.debug('ModuleEventBus', `Maintenance overdue: ${assetId}, ${overdueDays} days`);
 
       // Create high-priority maintenance alert
       moduleEventBus.emit('analytics.insight_created', {
@@ -1303,7 +1304,7 @@ export class ModuleIntegrations {
 
     // When asset utilization is updated, track performance metrics
     moduleEventBus.on('asset.utilization_updated', ({ assetId, utilizationRate, revenue, period }) => {
-      console.log(`[EventBus] Asset utilization updated: ${assetId}, ${utilizationRate}% for ${period}`);
+      logger.debug('ModuleEventBus', `Asset utilization updated: ${assetId}, ${utilizationRate}% for ${period}`);
 
       // Generate utilization analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1338,7 +1339,7 @@ export class ModuleIntegrations {
 
     // When depreciation is calculated, update financial tracking
     moduleEventBus.on('asset.depreciation_calculated', ({ assetId, currentValue, depreciationAmount, period }) => {
-      console.log(`[EventBus] Depreciation calculated: ${assetId}, $${depreciationAmount} for ${period}`);
+      logger.debug('ModuleEventBus', `Depreciation calculated: ${assetId}, ${depreciationAmount} for ${period}`);
 
       // Generate financial analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1366,7 +1367,7 @@ export class ModuleIntegrations {
 
     // When asset is retired, finalize analytics and coordination
     moduleEventBus.on('asset.retired', ({ assetId, retirementDate, reason, salvageValue }) => {
-      console.log(`[EventBus] Asset retired: ${assetId}, reason: ${reason}`);
+      logger.debug('ModuleEventBus', `Asset retired: ${assetId}, reason: ${reason}`);
 
       // Generate retirement analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1401,7 +1402,7 @@ export class ModuleIntegrations {
 
     // When damage is reported, coordinate with rental and maintenance
     moduleEventBus.on('asset.damage_reported', ({ assetId, damageDescription, severity, repairCost }) => {
-      console.log(`[EventBus] Asset damage reported: ${assetId}, severity: ${severity}`);
+      logger.debug('ModuleEventBus', `Asset damage reported: ${assetId}, severity: ${severity}`);
 
       // Update asset condition based on damage severity
       const newCondition = severity === 'critical' ? 'out_of_service' :
@@ -1440,7 +1441,7 @@ export class ModuleIntegrations {
 
     // When warranty is expiring, create proactive alerts
     moduleEventBus.on('asset.warranty_expiring', ({ assetId, expirationDate, daysRemaining }) => {
-      console.log(`[EventBus] Warranty expiring: ${assetId}, ${daysRemaining} days remaining`);
+      logger.debug('ModuleEventBus', `Warranty expiring: ${assetId}, ${daysRemaining} days remaining`);
 
       // Create warranty expiration alert
       moduleEventBus.emit('analytics.insight_created', {
@@ -1474,7 +1475,7 @@ export class ModuleIntegrations {
 
     // When asset location changes, update tracking and coordination
     moduleEventBus.on('asset.location_changed', ({ assetId, previousLocation, newLocation, reason }) => {
-      console.log(`[EventBus] Asset location changed: ${assetId} from ${previousLocation} to ${newLocation}`);
+      logger.debug('ModuleEventBus', `Asset location changed: ${assetId} from ${previousLocation} to ${newLocation}`);
 
       // Generate location tracking analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1517,7 +1518,7 @@ export class ModuleIntegrations {
   private static setupReportingIntegrations() {
     // When report is created, initialize tracking and setup data sources
     moduleEventBus.on('reporting.created', ({ reportId, reportName, type, modules, dataPoints }) => {
-      console.log(`[EventBus] Report created: ${reportId} (${type}) with ${dataPoints} data points`);
+      logger.info('ModuleEventBus', `Report created: ${reportId} (${type}) with ${dataPoints} data points`);
 
       // Generate creation analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1556,7 +1557,7 @@ export class ModuleIntegrations {
 
     // When report is generated, track performance and success metrics
     moduleEventBus.on('reporting.generated', ({ reportId, status, generationTime, size }) => {
-      console.log(`[EventBus] Report generated: ${reportId}, status: ${status}, time: ${generationTime}`);
+      logger.debug('ModuleEventBus', `Report generated: ${reportId}, status: ${status}, time: ${generationTime}`);
 
       // Generate performance analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1604,7 +1605,7 @@ export class ModuleIntegrations {
 
     // When report is scheduled, coordinate with system and notifications
     moduleEventBus.on('reporting.scheduled', ({ reportId, frequency, nextRun, recipients }) => {
-      console.log(`[EventBus] Report scheduled: ${reportId}, frequency: ${frequency}, next: ${nextRun}`);
+      logger.debug('ModuleEventBus', `Report scheduled: ${reportId}, frequency: ${frequency}, next: ${nextRun}`);
 
       // Generate scheduling analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1639,7 +1640,7 @@ export class ModuleIntegrations {
 
     // When report is shared, track collaboration and access patterns
     moduleEventBus.on('reporting.shared', ({ reportId, sharedWith, accessLevel }) => {
-      console.log(`[EventBus] Report shared: ${reportId} with ${sharedWith.length} users (${accessLevel} access)`);
+      logger.debug('ModuleEventBus', `Report shared: ${reportId} with ${sharedWith.length} users (${accessLevel} access)`);
 
       // Generate sharing analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1674,7 +1675,7 @@ export class ModuleIntegrations {
 
     // When report is exported, track usage and distribution
     moduleEventBus.on('reporting.exported', ({ reportId, format, destination, fileSize }) => {
-      console.log(`[EventBus] Report exported: ${reportId} as ${format} (${fileSize})`);
+      logger.debug('ModuleEventBus', `Report exported: ${reportId} as ${format} (${fileSize})`);
 
       // Generate export analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1703,7 +1704,7 @@ export class ModuleIntegrations {
 
     // When template is created, track reusability patterns
     moduleEventBus.on('reporting.template_created', ({ templateId, templateName, baseReportId }) => {
-      console.log(`[EventBus] Report template created: ${templateId} from ${baseReportId}`);
+      logger.info('ModuleEventBus', `Report template created: ${templateId} from ${baseReportId}`);
 
       // Generate template analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1736,7 +1737,7 @@ export class ModuleIntegrations {
 
     // When reporting error occurs, coordinate with system monitoring
     moduleEventBus.on('reporting.error', ({ reportId, errorMessage, errorType }) => {
-      console.log(`[EventBus] Reporting error: ${reportId}, type: ${errorType}`);
+      logger.error('ModuleEventBus', `Reporting error: ${reportId}, type: ${errorType}`);
 
       // Create error alert
       moduleEventBus.emit('analytics.insight_created', {
@@ -1777,7 +1778,7 @@ export class ModuleIntegrations {
 
     // When performance alert is triggered, coordinate optimization
     moduleEventBus.on('reporting.performance_alert', ({ reportId, metric, value, threshold }) => {
-      console.log(`[EventBus] Performance alert: ${reportId}, ${metric} = ${value} (threshold: ${threshold})`);
+      logger.debug('ModuleEventBus', `Performance alert: ${reportId}, ${metric} = ${value} (threshold: ${threshold})`);
 
       // Create performance insight
       moduleEventBus.emit('analytics.insight_created', {
@@ -1856,7 +1857,7 @@ export class ModuleIntegrations {
 
     // When insight is generated by reporting AI, track quality and adoption
     moduleEventBus.on('reporting.insight_generated', ({ reportId, insightType, confidence, businessValue }) => {
-      console.log(`[EventBus] Reporting insight generated: ${reportId}, type: ${insightType}, confidence: ${confidence}%`);
+      logger.debug('ModuleEventBus', `Reporting insight generated: ${reportId}, type: ${insightType}, confidence: ${confidence}%`);
 
       // Generate insight quality analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1894,7 +1895,7 @@ export class ModuleIntegrations {
 
     // When report is cancelled, track reasons and patterns
     moduleEventBus.on('reporting.cancelled', ({ reportId, reason }) => {
-      console.log(`[EventBus] Report cancelled: ${reportId}, reason: ${reason}`);
+      logger.debug('ModuleEventBus', `Report cancelled: ${reportId}, reason: ${reason}`);
 
       // Generate cancellation analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1933,7 +1934,7 @@ export class ModuleIntegrations {
   private static setupExecutiveIntegrations() {
     // When NLP query is processed, generate insights
     moduleEventBus.on('executive.nlp_query_processed', ({ query, context, responseType, processingTime, confidence }) => {
-      console.log(`[EventBus] NLP Query processed: ${query} in ${processingTime}ms`);
+      logger.debug('ModuleEventBus', `NLP Query processed: ${query} in ${processingTime}ms`);
 
       // Generate query analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1963,7 +1964,7 @@ export class ModuleIntegrations {
 
     // When external data source is added, validate and track
     moduleEventBus.on('executive.external_data_source_added', ({ sourceId, name, type, endpoint }) => {
-      console.log(`[EventBus] External data source added: ${name} (${type})`);
+      logger.debug('ModuleEventBus', `External data source added: ${name} (${type})`);
 
       // Generate data source analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1990,7 +1991,7 @@ export class ModuleIntegrations {
 
     // When external data is synced, track performance
     moduleEventBus.on('executive.external_data_synced', ({ sourceId, status, recordsProcessed, timestamp }) => {
-      console.log(`[EventBus] External data synced: ${sourceId}, status: ${status}, records: ${recordsProcessed}`);
+      logger.info('ModuleEventBus', `External data synced: ${sourceId}, status: ${status}, records: ${recordsProcessed}`);
 
       // Generate sync analytics
       moduleEventBus.emit('analytics.generated', {
@@ -2027,7 +2028,7 @@ export class ModuleIntegrations {
 
     // When chart is exported, track usage patterns
     moduleEventBus.on('executive.chart_exported', ({ chartId, format, timestamp, fileSize }) => {
-      console.log(`[EventBus] Chart exported: ${chartId} as ${format}, size: ${fileSize}KB`);
+      logger.debug('ModuleEventBus', `Chart exported: ${chartId} as ${format}, size: ${fileSize}KB`);
 
       // Generate export analytics
       moduleEventBus.emit('analytics.generated', {
@@ -2053,7 +2054,7 @@ export class ModuleIntegrations {
 
     // When KPI threshold is breached, create alerts
     moduleEventBus.on('executive.kpi_threshold_breached', ({ kpi, value, threshold, severity }) => {
-      console.log(`[EventBus] KPI threshold breached: ${kpi}, value: ${value}, threshold: ${threshold}`);
+      logger.debug('ModuleEventBus', `KPI threshold breached: ${kpi}, value: ${value}, threshold: ${threshold}`);
 
       // Generate threshold breach analytics
       moduleEventBus.emit('analytics.generated', {
@@ -2087,7 +2088,7 @@ export class ModuleIntegrations {
 
     // When forecast is updated, validate accuracy
     moduleEventBus.on('executive.forecast_updated', ({ metric, forecastPeriod, accuracy, lastUpdate }) => {
-      console.log(`[EventBus] Forecast updated: ${metric}, accuracy: ${accuracy}%, period: ${forecastPeriod}`);
+      logger.debug('ModuleEventBus', `Forecast updated: ${metric}, accuracy: ${accuracy}%, period: ${forecastPeriod}`);
 
       // Generate forecast analytics
       moduleEventBus.emit('analytics.generated', {
@@ -2129,25 +2130,25 @@ export class ModuleIntegrations {
   private static setupAnalyticsIntegrations() {
     // When analytics are generated, log for system monitoring
     moduleEventBus.on('analytics.generated', ({ module, analyticsData, timestamp }) => {
-      console.log(`[EventBus] Analytics generated for ${module} at ${timestamp}`);
+      logger.debug('ModuleEventBus', `Analytics generated for ${module} at ${timestamp}`);
 
       // Could trigger dashboard updates, cache invalidation, etc.
     });
 
     // When insights are created, handle based on priority
     moduleEventBus.on('analytics.insight_created', ({ module, insight, priority }) => {
-      console.log(`[EventBus] ${priority.toUpperCase()} insight from ${module}: ${insight}`);
+      logger.debug('ModuleEventBus', `${priority.toUpperCase()} insight from ${module}: ${insight}`);
 
       // High priority insights could trigger notifications, emails, etc.
       if (priority === 'high') {
         // This would integrate with notification system
-        console.warn(`🚨 HIGH PRIORITY INSIGHT: ${insight}`);
+        logger.warn('ModuleEventBus', `🚨 HIGH PRIORITY INSIGHT: ${insight}`);
       }
     });
 
     // When recommendations are created, log for follow-up
     moduleEventBus.on('analytics.recommendation_created', ({ module, recommendation, actionable }) => {
-      console.log(`[EventBus] Recommendation from ${module}: ${recommendation} (actionable: ${actionable})`);
+      logger.debug('ModuleEventBus', `Recommendation from ${module}: ${recommendation} (actionable: ${actionable})`);
 
       if (actionable) {
         // Could trigger workflow automation, task creation, etc.
@@ -2161,19 +2162,19 @@ export class ModuleIntegrations {
   private static setupSystemIntegrations() {
     // Monitor module loading
     moduleEventBus.on('system.module_loaded', ({ moduleName, timestamp }) => {
-      console.log(`[EventBus] Module loaded: ${moduleName} at ${timestamp}`);
+      logger.info('ModuleEventBus', `Module loaded: ${moduleName} at ${timestamp}`);
     });
 
     // Handle module errors
     moduleEventBus.on('system.module_error', ({ moduleName, error, timestamp }) => {
-      console.error(`[EventBus] Module error in ${moduleName} at ${timestamp}: ${error}`);
+      logger.error('ModuleEventBus', `Module error in ${moduleName} at ${timestamp}: ${error}`);
 
       // Could trigger error recovery, logging, monitoring alerts
     });
 
     // Handle performance alerts
     moduleEventBus.on('system.performance_alert', ({ module, metric, value, threshold }) => {
-      console.warn(`[EventBus] Performance alert in ${module}: ${metric} = ${value} (threshold: ${threshold})`);
+      logger.warn('ModuleEventBus', `Performance alert in ${module}: ${metric} = ${value} (threshold: ${threshold})`);
 
       // Could trigger optimization routines, scaling, alerts
     });

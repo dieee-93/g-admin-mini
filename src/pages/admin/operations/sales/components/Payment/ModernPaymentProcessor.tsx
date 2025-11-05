@@ -1,6 +1,6 @@
 // src/features/sales/components/Payment/ModernPaymentProcessor.tsx
 // 🚀 PAYMENT REVOLUTION - Modern Payment Processing System
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Box,
   Text,
@@ -29,7 +29,6 @@ import {
   PaymentType,
   PaymentMethod,
   PaymentTransactionStatus,
-  SplitBill,
   SplitBillType,
   TipConfiguration,
   DEFAULT_TIP_PERCENTAGES,
@@ -176,7 +175,7 @@ export function ModernPaymentProcessor({
         ...(tipConfiguration?.allow_no_tip ? [{ value: '0', label: 'No Tip' }] : [])
       ]
     });
-  }, [tipConfiguration, subtotal]);
+  }, [tipConfiguration, calculatedSubtotal]);
 
   // Add payment method
   const addPaymentMethod = (type: PaymentType) => {
@@ -203,11 +202,12 @@ export function ModernPaymentProcessor({
   };
 
   // Update payment amount
-  const updatePaymentAmount = (index: number, amount: number) => {
-    const updated = [...selectedPayments];
-    updated[index] = { ...updated[index], amount };
-    setSelectedPayments(updated);
-  };
+  // TODO: Implement amount editing UI
+  // const updatePaymentAmount = (index: number, amount: number) => {
+  //   const updated = [...selectedPayments];
+  //   updated[index] = { ...updated[index], amount };
+  //   setSelectedPayments(updated);
+  // };
 
   // Setup split bill
   const setupSplitBill = (type: SplitBillType) => {

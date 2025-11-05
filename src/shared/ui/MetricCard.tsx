@@ -8,14 +8,12 @@
  */
 
 import React from 'react';
-import {
-  Stack,
-  Typography,
-  CardWrapper,
-  Button,
-  Badge,
-  Icon
-} from '.';
+import { Stack } from './Stack';
+import { Typography } from './Typography';
+import { CardWrapper } from './CardWrapper';
+import { Button } from './Button';
+import { Badge } from './Badge';
+import { Icon } from './Icon';
 import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
@@ -85,9 +83,9 @@ export function MetricCard({
         shadow: "lg"
       } : {}}
       transition="all 0.2s ease"
-      p={6} // Padding explícito
+      p="6" // Padding explícito
     >
-      <Stack gap={4} align="start" width="full">
+      <Stack gap="4" align="start" width="full">
         {/* Header Row: Icon + Badge */}
         <Stack direction="row" justify="space-between" align="center" width="full">
           <Icon
@@ -107,7 +105,7 @@ export function MetricCard({
         </Stack>
 
         {/* Main Value */}
-        <Stack gap={1} align="start" width="full">
+        <Stack gap="1" align="start" width="full">
           <Typography
             variant="heading"
             size="4xl"
@@ -120,7 +118,7 @@ export function MetricCard({
 
           {/* Change/Trend - if provided */}
           {(change || trend) && (
-            <Stack direction="row" gap={2} align="center">
+            <Stack direction="row" gap="2" align="center">
               {getTrendIcon() && (
                 <Icon
                   icon={getTrendIcon()!}
@@ -143,7 +141,7 @@ export function MetricCard({
         </Stack>
 
         {/* Title and Subtitle */}
-        <Stack gap={1} align="start" width="full">
+        <Stack gap="1" align="start" width="full">
           <Typography
             variant="body"
             size="md"

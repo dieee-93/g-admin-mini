@@ -17,13 +17,17 @@
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useCapabilityStore } from '@/store/capabilityStore';
-import { getSlotsForTarget } from '@/config/FeatureRegistry';
 import { useDashboardConfig, type DashboardWidget } from './useDashboardConfig';
 import { useSalesStore } from '@/store/salesStore';
 import { useMaterialsStore } from '@/store/materialsStore';
 import { useStaffStore } from '@/store/staffStore';
 import { useCustomersStore } from '@/store/customersStore';
 import { logger } from '@/lib/logging';
+
+/**
+ * NOTE: SlotRegistry system removed. Dashboard widgets now use Hook System.
+ * This hook temporarily disabled until full migration to Hook System.
+ */
 
 /**
  * Métricas agregadas por módulo desde stores de Zustand
@@ -77,8 +81,6 @@ export function useDynamicDashboardWidgets() {
   // useCapabilities() retorna nuevo objeto → causa loop infinito
   // useCapabilityStore(selector) solo cambia si el valor cambia → estable
   const activeFeatures = useCapabilityStore(state => state.features.activeFeatures);
-  const completedMilestones = useCapabilityStore(state => state.features.completedMilestones);
-  const pendingMilestones = useCapabilityStore(state => state.features.pendingMilestones);
 
   // 🔍 DEBUG: Log cada render del hook
   logger.debug('App', '[useDynamicDashboardWidgets] Hook rendered', {
@@ -87,18 +89,14 @@ export function useDynamicDashboardWidgets() {
   });
 
   /**
-   * Obtener slots dinámicos según features activas
-   * Solo widgets que el usuario tiene habilitados por sus capabilities
+   * LEGACY SYSTEM DISABLED
+   * Slots are now managed via Hook System (Module Registry)
+   * Dashboard widgets register via manifest hooks, not SlotRegistry
    */
   const availableSlots = useMemo(() => {
-    const slots = getSlotsForTarget(activeFeatures, 'dashboard-widgets');
-    logger.debug('App', '[useDynamicDashboardWidgets] availableSlots useMemo executed', {
-      slotsCount: slots.length,
-      slotIds: slots.map(s => s.id),
-      activeFeaturesRef: activeFeatures
-    });
-    return slots;
-  }, [activeFeatures]);
+    logger.debug('App', '[useDynamicDashboardWidgets] Legacy slots system disabled');
+    return []; // Empty - widgets now use Hook System
+  }, []);
 
   // ============================================
   // DRAG & DROP: Layout Configuration

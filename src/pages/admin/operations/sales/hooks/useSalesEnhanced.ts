@@ -73,8 +73,8 @@ export function useSalesEnhanced() {
         amount: sale.subtotal || 0,
         tax_amount: sale.tax || 0,
         total_amount: sale.total || sale.amount || 0,
-        payment_method: (sale.payment_method as any) || 'cash',
-        status: (sale.status as any) || 'completed',
+        payment_method: (sale.payment_method as string) || 'cash',
+        status: (sale.status as string) || 'completed',
         items: sale.items || [],
         created_at: sale.created_at,
         updated_at: sale.updated_at,
@@ -206,7 +206,7 @@ export function useSalesEnhanced() {
   // CRUD operations using standardized handlers
   const createSale = async (saleData: Partial<SaleTransaction>) => {
     return await CRUDHandlers.create(
-      () => originalSalesHook.createSale(saleData as any),
+      () => originalSalesHook.createSale(saleData as Partial<Sale>),
       'Venta',
       refreshSales
     );
@@ -214,7 +214,7 @@ export function useSalesEnhanced() {
 
   const updateSale = async (id: string, saleData: Partial<SaleTransaction>) => {
     return await CRUDHandlers.update(
-      () => originalSalesHook.updateSale(id, saleData as any),
+      () => originalSalesHook.updateSale(id, saleData as Partial<Sale>),
       'Venta',
       refreshSales
     );

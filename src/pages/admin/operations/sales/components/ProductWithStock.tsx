@@ -1,24 +1,18 @@
 // src/features/sales/components/ProductWithStock.tsx
 import { useState, useEffect } from 'react';
-import { 
+import {
   Stack,
-  Typography, 
-  Button, 
+  Typography,
+  Button,
   Badge,
-  InputField,
   NumberField,
-  CardWrapper ,
+  CardWrapper,
   Alert,
-  Icon
+  Skeleton
 } from '@/shared/ui';
-import { Skeleton } from '@chakra-ui/react';
 import { notify } from '@/lib/notifications';
-import { 
-  ShoppingCartIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  InformationCircleIcon
+import {
+  ShoppingCartIcon
 } from '@heroicons/react/24/outline';
 import { 
   CheckCircleIcon as CheckCircleSolid,
@@ -27,7 +21,8 @@ import {
 } from '@heroicons/react/24/solid';
 
 import { fetchProductsWithAvailability } from '../services/saleApi';
-import { useSaleStockValidation } from '@/hooks/useSaleStockValidation';
+// TODO: Implementar useSaleStockValidation hook
+// import { useSaleStockValidation } from '@/hooks/useSaleStockValidation';
 
 import { logger } from '@/lib/logging';
 interface ProductWithAvailability {
@@ -37,6 +32,7 @@ interface ProductWithAvailability {
   type: string;
   description?: string;
   cost: number;
+  price?: number; // Precio de venta (para servicios)
   availability: number;
   components_count: number;
 }
@@ -57,19 +53,22 @@ interface ProductWithStockProps {
   offlineMode?: boolean;
 }
 
-export function ProductWithStock({ 
+export function ProductWithStock({
   onAddToCart,
   onQuantityChange,
-  currentCart = [],
-  disabled = false,
-  offlineMode = false
+  disabled = false
 }: ProductWithStockProps) {
+  // currentCart and offlineMode props are available but not yet implemented
+  // TODO: Implement cart synchronization and offline mode UI indicators
   const [products, setProducts] = useState<ProductWithAvailability[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [prices, setPrices] = useState<Record<string, number>>({});
-  
-  const { validateStock, validationResult, isValidating } = useSaleStockValidation();
+
+  // TODO: Implementar useSaleStockValidation hook
+  // const { validationResult, isValidating } = useSaleStockValidation();
+  const validationResult = null;
+  const isValidating = false;
 
   // Cargar productos con disponibilidad
   useEffect(() => {
@@ -82,10 +81,16 @@ export function ProductWithStock({
       const data = await fetchProductsWithAvailability();
       setProducts(data as ProductWithAvailability[]);
       
-      // Inicializar precios con costo + margen
+      // Inicializar precios según tipo de producto
       const initialPrices: Record<string, number> = {};
       data.forEach(product => {
-        initialPrices[product.id] = Math.round((product.cost || 0) * 1.5); // 50% margen default
+        // Para servicios: usar price directamente
+        // Para productos elaborados: calcular margen sobre cost
+        if (product.type === 'SERVICE') {
+          initialPrices[product.id] = Number(product.price) || 0;
+        } else {
+          initialPrices[product.id] = Math.round((product.cost || 0) * 1.5); // 50% margen default
+        }
       });
       setPrices(initialPrices);
       
@@ -100,19 +105,20 @@ export function ProductWithStock({
     }
   };
 
-  // Validar stock en tiempo real cuando cambian las cantidades
-  useEffect(() => {
-    const saleItems = Object.entries(quantities)
-      .filter(([_, qty]) => qty > 0)
-      .map(([productId, quantity]) => ({
-        product_id: productId,
-        quantity
-      }));
-
-    if (saleItems.length > 0) {
-      validateStock(saleItems);
-    }
-  }, [quantities, validateStock]);
+  // TODO: Validar stock en tiempo real cuando cambian las cantidades
+  // This will be implemented when useSaleStockValidation hook is ready
+  // useEffect(() => {
+  //   const saleItems = Object.entries(quantities)
+  //     .filter(([_, qty]) => qty > 0)
+  //     .map(([productId, quantity]) => ({
+  //       product_id: productId,
+  //       quantity
+  //     }));
+  //
+  //   if (saleItems.length > 0) {
+  //     validateStock(saleItems);
+  //   }
+  // }, [quantities, validateStock]);
 
   const handleQuantityChange = (productId: string, value: string) => {
     const quantity = parseInt(value) || 0;
@@ -178,24 +184,34 @@ export function ProductWithStock({
     });
   };
 
+  /**
+   * ✅ REFACTORED: Stock status calculation
+   *
+   * NOTE: Currently simplified - only checks availability number.
+   * TODO: Load MaterialItem data to use StockCalculation.getStockStatus()
+   * with proper min_stock thresholds from database instead of hardcoded 5.
+   *
+   * For full implementation, see: src/business-logic/inventory/stockCalculation.ts
+   */
   const getStockStatus = (availability: number) => {
+    // Map to StockCalculation status types
     if (availability === 0) {
       return {
-        status: 'sin-stock',
+        status: 'out',
         color: 'error',
         icon: XCircleSolid,
         text: 'Sin Stock'
       };
-    } else if (availability <= 5) {
+    } else if (availability <= 5) { // FIXME: Should use min_stock from MaterialItem
       return {
-        status: 'stock-bajo',
+        status: 'low',
         color: 'warning',
         icon: ExclamationTriangleSolid,
         text: 'Stock Bajo'
       };
     } else {
       return {
-        status: 'disponible',
+        status: 'ok',
         color: 'success',
         icon: CheckCircleSolid,
         text: 'Disponible'
@@ -354,7 +370,7 @@ export function ProductWithStock({
                     </div>
 
                     <Button
-                      colorPalette="info"
+                      colorPalette="blue"
                       onClick={() => handleAddToCart(product)}
                       disabled={
                         disabled || 

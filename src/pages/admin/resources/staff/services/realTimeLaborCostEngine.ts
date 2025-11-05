@@ -4,6 +4,7 @@
  */
 
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import type Decimal from 'decimal.js';
 
 export interface LiveCostCalculation {
   employee_id: string;
@@ -119,8 +120,8 @@ export function calculateLaborCosts(
   const thresholdDec = DecimalUtils.fromValue(overtimeThreshold, 'inventory');
   const multiplierDec = DecimalUtils.fromValue(overtimeMultiplier, 'financial');
 
-  let regularHoursDec: any;
-  let overtimeHoursDec: any;
+  let regularHoursDec: Decimal;
+  let overtimeHoursDec: Decimal;
 
   // Calculate regular and overtime hours
   const hoursNum = DecimalUtils.toNumber(hoursDec);
@@ -474,7 +475,7 @@ export function analyzeBudgetVariance(
  */
 export function calculateLaborEfficiency(
   employeeCosts: LiveCostCalculation[],
-  targetProductivity: number = 100 // target output per hour
+  _targetProductivity: number = 100 // Reserved for future productivity calculations
 ): {
   overall_efficiency: number;
   cost_per_hour: number;

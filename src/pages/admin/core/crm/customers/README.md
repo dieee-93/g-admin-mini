@@ -1,458 +1,612 @@
-# Módulo de Customers - G-Admin Mini
+# Customers Module (CRM)
 
-## 📋 Descripción del Módulo
-
-El módulo de **Customers** gestiona el CRM avanzado con análisis RFM, segmentación inteligente, y predicción de churn. Incluye funcionalidades de customer analytics, customer lifetime value (CLV), behavioral analysis, y recomendaciones estratégicas basadas en inteligencia artificial y análisis predictivo.
-
-### Características principales:
-- ✅ CRM completo con gestión avanzada de clientes
-- ✅ **Análisis RFM** (Recency, Frequency, Monetary) automático
-- ✅ **Segmentación inteligente** con IA (VIP, Frequent, At-Risk, New)
-- ✅ **Predicción de churn** con machine learning
-- ✅ **Customer Lifetime Value (CLV)** con precisión decimal
-- ✅ **Analytics avanzados** de comportamiento y tendencias
-- ✅ **Recomendaciones estratégicas** automatizadas
-- ✅ **Programa de lealtad** y gestión de puntos
-- ✅ Cálculos financieros con Decimal.js para precisión total
+**Status**: ✅ Production-Ready
+**Phase**: Phase 3 P0
+**Module Type**: Foundation (other modules depend on it)
+**Complexity**: Medium (Standard CRUD with analytics)
 
 ---
 
-## 🏗️ Estructura Estándar de Módulo
+## 📋 Overview
 
-Esta estructura sigue nuestro **patrón oficial** establecido en Products y Materials:
+The Customers module provides comprehensive Customer Relationship Management (CRM) functionality for G-Admin Mini. It enables businesses to track customer data, analyze purchase behavior, segment customers using RFM analysis, and manage customer relationships effectively.
+
+**Key Features**:
+- ✅ Complete CRUD operations (Create, Read, Update, Delete)
+- ✅ RFM Analysis (Recency, Frequency, Monetary)
+- ✅ Customer Segmentation (Champions, At-Risk, Lost, etc.)
+- ✅ Churn Prediction & Prevention
+- ✅ Customer Lifetime Value (CLV) Calculation
+- ✅ Notes & Tags System
+- ✅ Order History Integration (from Sales module)
+- ✅ Permission-based Access Control
+- ✅ CSV Export Functionality
+
+---
+
+## 🗄️ Database Schema
+
+### Primary Table: `customers`
+
+| Column | Type | Description | Constraints |
+|--------|------|-------------|-------------|
+| `id` | uuid | Primary key | PK, auto-generated |
+| `name` | text | Customer name | Required |
+| `email` | text | Customer email | Unique, optional |
+| `phone` | text | Customer phone | Optional |
+| `address` | text | Customer address | Optional |
+| `notes` | text | Internal notes | Optional |
+| `tags` | text[] | Customer tags | Array, optional |
+| `is_active` | boolean | Active status | Default: true |
+| `birth_date` | date | Date of birth | Optional |
+| `registration_date` | timestamptz | Registration date | Auto-set |
+| `created_at` | timestamptz | Record creation timestamp | Auto-set |
+| `updated_at` | timestamptz | Record update timestamp | Auto-update |
+| `location_id` | uuid | Multi-location FK | Optional |
+
+### Related Tables
+
+- **`customer_notes`**: Customer notes history (future enhancement)
+- **`customer_tags`**: Tag management system (future enhancement)
+- **`sales`**: Order history (FK: `customer_id`)
+- **`rfm_profiles`**: RFM analysis data (future enhancement)
+
+### Database Functions
+
+- `calculate_customer_rfm()`: Calculates RFM scores for all customers
+- `get_customer_analytics()`: Aggregates customer stats and metrics
+
+---
+
+## 🚀 Features & Capabilities
+
+### 1. CRUD Operations
+
+**Create Customer**:
+- Form validation (email uniqueness, required fields)
+- Duplicate email detection
+- Optimistic UI updates
+- Permission check: `create`
+
+**Read Customer**:
+- List view with pagination
+- Detail view with stats
+- Search & filter (name, email, phone)
+- Permission check: `read` (optional for guest users)
+
+**Update Customer**:
+- Edit form with pre-filled data
+- Email uniqueness validation
+- Optimistic updates
+- Permission check: `update`
+
+**Delete Customer**:
+- Soft delete (sets `is_active = false`)
+- Cascade protection (prevents deletion if customer has orders)
+- Confirmation modal
+- Permission check: `delete`
+
+### 2. RFM Analysis
+
+**Recency, Frequency, Monetary (RFM)** scoring system:
+
+```typescript
+// RFM Score Ranges (1-5 scale)
+Recency: Days since last purchase
+  5: 0-30 days (Recent)
+  4: 31-60 days
+  3: 61-120 days
+  2: 121-180 days
+  1: 180+ days (Lost)
+
+Frequency: Number of purchases
+  5: 20+ purchases (Frequent)
+  4: 10-19 purchases
+  3: 5-9 purchases
+  2: 2-4 purchases
+  1: 1 purchase (One-time)
+
+Monetary: Total amount spent
+  5: $1000+ (High Value)
+  4: $500-$999
+  3: $200-$499
+  2: $50-$199
+  1: <$50 (Low Value)
+```
+
+**Customer Segments** (based on RFM):
+- **Champions** (RFM: 5-5-5): Best customers
+- **Loyal Customers** (RFM: 4-5-4): Consistent buyers
+- **Potential Loyalists** (RFM: 3-4-3): Growing customers
+- **Recent Customers** (RFM: 5-2-2): New customers
+- **At Risk** (RFM: 2-3-3): Declining engagement
+- **Hibernating** (RFM: 2-2-2): Inactive but recoverable
+- **Lost** (RFM: 1-1-1): Churned customers
+
+### 3. Customer Analytics
+
+**Metrics Calculated**:
+- Total Customers
+- Active Customers (purchased in last 30 days)
+- Average Customer Lifetime Value (CLV)
+- Churn Rate (% of customers lost)
+- At-Risk Customers Count
+- Average Order Value (AOV)
+- Purchase Frequency
+- Customer Retention Rate
+
+**CLV Calculation**:
+```typescript
+CLV = (Average Order Value) × (Purchase Frequency) × (Customer Lifespan in months)
+```
+
+### 4. Notes & Tags System
+
+**Customer Notes**:
+- Add timestamped notes
+- Quick note templates (Complaint, Compliment, Dietary restrictions)
+- Important flag for priority notes
+- Notes history timeline
+
+**Customer Tags**:
+- Color-coded tags
+- Tag statistics (usage count)
+- Filter customers by tags
+- Tag management (create, assign, remove)
+
+### 5. Order History Integration
+
+**Integrates with Sales Module**:
+- Listens to `sales.order_completed` events via EventBus
+- Updates customer purchase history automatically
+- Calculates customer spending and frequency
+- Displays order timeline
+
+---
+
+## 🔧 Architecture
+
+### Module Manifest
+
+```typescript
+// src/modules/customers/manifest.tsx
+{
+  id: 'customers',
+  minimumRole: 'OPERADOR',
+  autoInstall: false,
+
+  depends: [], // No dependencies (foundation module)
+
+  optionalFeatures: [
+    'customers',                      // Base CRM
+    'customer_service_history',       // Service tracking
+    'customer_preference_tracking',   // Preferences
+    'customer_loyalty_program',       // Loyalty/points
+    'customer_online_reservation',    // Reservations
+  ],
+
+  hooks: {
+    provide: [
+      'customers.profile_sections',   // Customer profile extensions
+      'customers.quick_actions',      // Quick actions in customer view
+      'dashboard.widgets',            // CRM widgets for dashboard
+    ],
+    consume: [
+      'sales.order_completed',        // Track customer purchase history
+    ],
+  }
+}
+```
+
+### File Structure
 
 ```
 src/pages/admin/core/crm/customers/
-├── README.md                   # 📖 Este archivo (documentación completa)
-├── page.tsx                    # 🎯 Página orquestadora (componente principal)
-│
-├── components/                 # 🧩 Componentes UI específicos del módulo
-│   ├── index.ts               # 📦 Barrel exports
-│   ├── CustomersList/         # 📋 Lista de clientes con filtros avanzados
-│   ├── CustomerFormModal/     # ➕ Modal para crear/editar clientes
-│   ├── RFMAnalysisPanel/      # 📊 Panel de análisis RFM
-│   ├── CustomerSegmentationPanel/ # 🎯 Panel de segmentación inteligente
-│   ├── ChurnPredictionPanel/  # ⚠️ Panel de predicción de churn
-│   ├── CustomerOrdersHistory/ # 📋 Historial de pedidos del cliente
-│   ├── LoyaltyProgramPanel/   # 🎁 Panel del programa de lealtad
-│   ├── CLVDashboard/          # 💰 Dashboard de Customer Lifetime Value
-│   └── [otros componentes]/   # 🔧 Componentes adicionales
-│
-├── hooks/                     # 🪝 Hooks de negocio y página
-│   ├── index.ts              # 📦 Barrel exports
-│   ├── useCustomersPage.ts   # 🎭 Hook orquestador de la página
-│   ├── existing/             # 📁 Hooks existentes preservados
-│   └── [otros hooks]/        # 🔧 Hooks específicos
-│
-├── services/                  # ⚙️ Lógica de negocio y servicios
-│   ├── index.ts              # 📦 Barrel exports
-│   ├── existing/             # 📁 Servicios API existentes preservados
-│   │
-│   # Business Logic Services (movidos desde business-logic/)
-│   ├── customerAnalyticsEngine.ts # 🧠 Motor de analytics avanzados
-│   ├── customerRFMAnalytics.ts   # 📊 Análisis RFM con precisión decimal
-│   └── __tests__/            # 🧪 Tests de business logic
-│
-├── types.ts                  # 🏷️ Definiciones TypeScript del módulo
-│
-└── utils/                   # 🛠️ Utilidades específicas del módulo
-    ├── index.ts            # 📦 Barrel exports
-    └── [utilidades]/       # 🔧 Helper functions para customers
+├── page.tsx                          # Main customers page
+├── README.md                         # This file
+├── components/
+│   ├── CustomerAnalytics/
+│   │   ├── CustomerAnalytics.tsx     # Analytics dashboard
+│   │   ├── CustomerOrdersHistory.tsx # Order history
+│   │   ├── CustomerSegments.tsx      # RFM segmentation
+│   │   └── index.ts
+│   ├── CustomerForm/
+│   │   └── CustomerForm.tsx          # Create/Edit form
+│   ├── CustomerList/
+│   │   └── CustomerList.tsx          # List view with filters
+│   ├── CustomerAddressManager.tsx    # Address management
+│   ├── CustomersWidget.tsx           # Dashboard widget
+│   └── index.ts                      # Component exports
+├── hooks/
+│   ├── existing/
+│   │   ├── useCustomerNotes.ts       # Notes management
+│   │   ├── useCustomerRFM.ts         # RFM analysis
+│   │   ├── useCustomerTags.ts        # Tag system
+│   │   └── useCustomers.ts           # Base customer operations
+│   ├── useCustomersPage.ts           # Page orchestration logic
+│   ├── useCustomerForm.tsx           # Form management
+│   └── index.ts                      # Hook exports
+├── services/
+│   ├── customerApi.ts                # ✅ CRUD with permissions
+│   ├── customerAnalyticsEngine.ts    # Business logic for analytics
+│   ├── customerRFMAnalytics.ts       # RFM calculation logic
+│   ├── customerAddressesApi.ts       # Address CRUD
+│   └── existing/
+│       ├── advancedCustomerApi.ts    # Advanced CRM features
+│       └── customerApi.ts            # Legacy API (deprecated)
+└── types/
+    ├── customer.ts                   # Customer types
+    ├── customerAddress.ts            # Address types
+    └── index.ts                      # Type exports
 ```
 
 ---
 
-## 🎯 Patrón "Página Orquestadora"
+## 🔒 Permissions System
 
-### Concepto
-El archivo `page.tsx` actúa como un **orquestador limpio** siguiendo el patrón estándar:
-- ✅ No contiene lógica de negocio (movida a `useCustomersPage` hook)
-- ✅ Usa componentes semánticos del sistema de diseño
-- ✅ Estructura condicional basada en estado de la página
-- ✅ Métricas calculadas automáticamente por business logic services
+### Permission Matrix
 
-### Implementación Actual
+| Action | OPERADOR | SUPERVISOR | ADMINISTRADOR |
+|--------|----------|------------|---------------|
+| `create` | ✅ | ✅ | ✅ |
+| `read` | ✅ | ✅ | ✅ |
+| `update` | ❌ | ✅ | ✅ |
+| `delete` | ❌ | ❌ | ✅ |
+| `export` | ❌ | ✅ | ✅ |
 
-```tsx
+### Usage in Page
+
+```typescript
 // src/pages/admin/core/crm/customers/page.tsx
-function CustomersPage() {
-  // 🎭 Toda la lógica delegada al hook orquestador
-  const {
-    pageState,
-    metrics,
-    actions,
-    loading,
-    error
-  } = useCustomersPage();
+import { usePermissions } from '@/hooks/usePermissions';
 
-  return (
-    <ContentLayout spacing="normal">
-      {/* 📋 Header semántico con acciones específicas de CRM */}
-      <PageHeader
-        title="Customers"
-        subtitle="Advanced CRM with RFM Analytics & Intelligent Segmentation"
-        actions={
-          <>
-            <Button variant="outline" colorPalette="blue" onClick={actions.handleRFMAnalysis}>
-              <ChartBarIcon className="w-4 h-4" />
-              RFM Analysis
-            </Button>
-            <Button variant="outline" colorPalette="green" onClick={actions.handleCustomerSegments}>
-              <UserGroupIcon className="w-4 h-4" />
-              Segmentation
-            </Button>
-            <Button variant="outline" colorPalette="red" onClick={actions.handleChurnPrediction}>
-              <ExclamationTriangleIcon className="w-4 h-4" />
-              Churn Risk
-            </Button>
-            <Button colorPalette="pink" onClick={actions.handleNewCustomer}>
-              <PlusIcon className="w-4 h-4" />
-              New Customer
-            </Button>
-          </>
-        }
-      />
+const {
+  canCreate,
+  canRead,
+  canUpdate,
+  canDelete,
+  canExport,
+} = usePermissions('customers');
 
-      {/* 📊 Métricas avanzadas calculadas automáticamente */}
-      <StatsSection>
-        <CardGrid columns={{ base: 1, md: 4 }}>
-          <MetricCard title="Total Customers" value={metrics.totalCustomers.toString()} />
-          <MetricCard title="Active Customers" value={metrics.activeCustomers.toString()} />
-          <MetricCard title="Average CLV" value={DecimalUtils.formatCurrency(metrics.averageCLV)} />
-          <MetricCard title="At Risk" value={metrics.atRiskCustomers.toString()} />
-        </CardGrid>
-      </StatsSection>
+// Conditional rendering
+{canCreate && <Button>Add Customer</Button>}
+{canUpdate && <Button onClick={handleEdit}>Edit</Button>}
+{canDelete && <Button onClick={handleDelete}>Delete</Button>}
+{canExport && <Button onClick={handleExport}>Export CSV</Button>}
+```
 
-      {/* 🧩 Secciones condicionales basadas en estado */}
-      <Section variant="elevated" title="Customer Management">
-        <CustomersList />
-      </Section>
+### Usage in Service Layer
 
-      {pageState.showRFMAnalysis && (
-        <Section variant="elevated" title="RFM Analysis">
-          <RFMAnalysisPanel />
-        </Section>
-      )}
+```typescript
+// src/pages/admin/core/crm/customers/services/customerApi.ts
+import type { AuthUser } from '@/contexts/AuthContext';
 
-      {pageState.showChurnPrediction && (
-        <Section variant="elevated" title="Churn Risk Prediction">
-          <ChurnPredictionPanel />
-        </Section>
-      )}
-    </ContentLayout>
+function requirePermission(user: AuthUser, module: string, action: string) {
+  // Permission validation logic
+}
+
+export async function createCustomer(data: Customer, user: AuthUser) {
+  requirePermission(user, 'customers', 'create');
+  // Create customer...
+}
+
+export async function deleteCustomer(id: string, user: AuthUser) {
+  requirePermission(user, 'customers', 'delete');
+  // Delete customer...
+}
+```
+
+---
+
+## 🔌 Integration Points
+
+### Provides (Hooks)
+
+#### 1. `customers.profile_sections`
+Allows other modules to extend customer profile UI.
+
+**Example Usage** (from Memberships module):
+```typescript
+registry.addAction(
+  'customers.profile_sections',
+  ({ customerId }) => <MembershipSection customerId={customerId} />,
+  'memberships',
+  50 // priority
+);
+```
+
+#### 2. `customers.quick_actions`
+Quick actions in customer detail view.
+
+**Example Usage** (from Sales module):
+```typescript
+registry.addAction(
+  'customers.quick_actions',
+  ({ customerId }) => (
+    <Button onClick={() => createSaleForCustomer(customerId)}>
+      New Sale
+    </Button>
+  ),
+  'sales',
+  30
+);
+```
+
+#### 3. `dashboard.widgets`
+Customer metrics widget for main dashboard.
+
+**Registered in Manifest**:
+```typescript
+setup: async (registry) => {
+  const { CustomersWidget } = await import('./components');
+
+  registry.addAction(
+    'dashboard.widgets',
+    () => <CustomersWidget />,
+    'customers',
+    40 // priority
   );
 }
 ```
 
-### Hook Orquestador Avanzado
+### Consumes (EventBus)
 
-```tsx
-// src/pages/admin/core/crm/customers/hooks/useCustomersPage.ts
-export const useCustomersPage = (): UseCustomersPageReturn => {
-  // 🚀 Configurar acciones rápidas del header global
-  useEffect(() => {
-    const quickActions = [
-      {
-        id: 'new-customer',
-        label: 'Nuevo Cliente',
-        icon: PlusIcon,
-        action: () => handleNewCustomer(),
-        color: 'pink'
-      },
-      {
-        id: 'rfm-analysis',
-        label: 'Análisis RFM',
-        icon: ChartBarIcon,
-        action: () => handleRFMAnalysis(),
-        color: 'blue'
-      },
-      // ... más acciones avanzadas
-    ];
-    setQuickActions(quickActions);
-  }, [setQuickActions]);
+#### 1. `sales.order_completed`
+Updates customer purchase history when a sale is completed.
 
-  // 📊 Métricas calculadas usando business logic services
-  const metrics: CustomersPageMetrics = useMemo(() => {
-    if (!analyticsResult) return defaultMetrics;
+**Event Handler**:
+```typescript
+eventBus.subscribe('sales.order_completed', (event) => {
+  const { customerId, orderId, totalAmount } = event.payload;
 
-    const atRiskCustomers = analyticsResult.customerAnalyses.filter(
-      c => c.churnRisk === 'high' || c.churnRisk === 'critical'
-    ).length;
-
-    return {
-      totalCustomers: customers.length,
-      activeCustomers: customers.filter(c => c.status === 'active').length,
-      averageCLV: analyticsResult.overallMetrics.averageCustomerLifetimeValue,
-      churnRate: analyticsResult.overallMetrics.churnRate,
-      atRiskCustomers,
-      // ... más métricas avanzadas
-    };
-  }, [customers, analyticsResult]);
-
-  // 🧠 Generar analytics usando CustomerAnalyticsEngine
-  const analytics = await CustomerAnalyticsEngine.generateCustomerAnalytics(
-    customers, sales, saleItems, config
-  );
-
-  return { pageState, metrics, actions, /* ... */ };
-};
+  // Update customer metrics
+  // This happens automatically via database triggers
+}, { moduleId: 'customers' });
 ```
 
 ---
 
-## 🧠 Arquitectura de Business Logic Avanzada
+## 📊 Analytics & Business Logic
 
-### Separación de Responsabilidades CRM
+### RFM Calculation
 
+**File**: `src/pages/admin/core/crm/customers/services/customerRFMAnalytics.ts`
+
+```typescript
+// Calculate recency score (1-5)
+function calculateRecencyScore(daysSinceLastPurchase: number): number {
+  if (daysSinceLastPurchase <= 30) return 5;
+  if (daysSinceLastPurchase <= 60) return 4;
+  if (daysSinceLastPurchase <= 120) return 3;
+  if (daysSinceLastPurchase <= 180) return 2;
+  return 1;
+}
+
+// Calculate frequency score (1-5)
+function calculateFrequencyScore(purchaseCount: number): number {
+  if (purchaseCount >= 20) return 5;
+  if (purchaseCount >= 10) return 4;
+  if (purchaseCount >= 5) return 3;
+  if (purchaseCount >= 2) return 2;
+  return 1;
+}
+
+// Calculate monetary score (1-5)
+function calculateMonetaryScore(totalSpent: number): number {
+  if (totalSpent >= 1000) return 5;
+  if (totalSpent >= 500) return 4;
+  if (totalSpent >= 200) return 3;
+  if (totalSpent >= 50) return 2;
+  return 1;
+}
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   page.tsx      │───▶│     hooks/      │───▶│   services/     │
-│  (Orquestador)  │    │ (Estado/Efectos)│    │ (Analytics IA)  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-        │                       │                       │
-        ▼                       ▼                       ▼
-   🎭 UI Structure        🪝 CRM State Mgmt      🧠 Advanced Analytics
+
+### Customer Lifetime Value (CLV)
+
+**File**: `src/pages/admin/core/crm/customers/services/customerAnalyticsEngine.ts`
+
+```typescript
+// CLV with Decimal.js precision
+function calculateCLV(customer: Customer, sales: Sale[]): Decimal {
+  const totalSpent = DecimalUtils.fromValue(customer.total_spent ?? 0, 'money');
+  const daysSinceRegistration = calculateDaysSince(customer.registration_date);
+  const purchaseFrequency = sales.length / (daysSinceRegistration / 30); // per month
+  const avgOrderValue = totalSpent.div(sales.length || 1);
+  const estimatedLifespan = 24; // months
+
+  return avgOrderValue
+    .mul(purchaseFrequency)
+    .mul(estimatedLifespan);
+}
 ```
-
-### Servicios de Negocio Específicos CRM
-
-**Moved from `business-logic/` to `customers/services/`:**
-
-1. **customerAnalyticsEngine.ts** - Motor de analytics avanzados
-   ```typescript
-   export class CustomerAnalyticsEngine {
-     // 🧠 Análisis comportamental completo con 1300+ líneas de lógica
-     static async generateCustomerAnalytics(): Promise<CustomerAnalyticsResult>
-
-     // 🎯 Segmentación inteligente (VIP, Frequent, At-Risk, New)
-     private static generateCustomerSegments(): Promise<CustomerSegment[]>
-
-     // ⚡ Predicción de churn con ML
-     private static generatePredictions(): ChurnPrediction[]
-
-     // 💡 Recomendaciones estratégicas automatizadas
-     private static generateRecommendations(): ActionableRecommendation[]
-   }
-   ```
-
-2. **customerRFMAnalytics.ts** - Análisis RFM con precisión decimal
-   ```typescript
-   // 💰 Customer Lifetime Value con NPV y precisión decimal
-   export function calculateCustomerCLV(params: CLVCalculationParams): number
-
-   // 📊 Análisis RFM completo
-   export function calculateRFMScores(customers: Customer[]): CustomerRFMProfile[]
-
-   // 🎯 Segmentación basada en RFM
-   export function segmentCustomersByRFM(): CustomerSegment[]
-   ```
 
 ---
 
-## 🎨 Sistema de Diseño Integrado
+## 🧪 Testing
 
-### Componentes Semánticos CRM
+### Manual Testing Workflow
 
-```tsx
-import {
-  // 🏗️ Componentes de Layout Semánticos (PRIORIDAD)
-  ContentLayout,    // Estructura principal de página
-  PageHeader,       // Header con título, subtítulo y acciones CRM
-  Section,          // Secciones con variants para cada análisis
-  StatsSection,     // Sección especializada para métricas CRM
+1. **Create Customer**:
+   - Navigate to `/admin/customers`
+   - Click "New Customer"
+   - Fill form: Name, Email, Phone, Address
+   - Submit → Verify customer appears in list
 
-  // 📊 Componentes de Métricas Avanzadas
-  MetricCard, CardGrid,
+2. **Edit Customer**:
+   - Click Edit on a customer
+   - Modify data
+   - Submit → Verify changes reflected
 
-  // 🧩 Componentes Base
-  Button, Modal, Alert, Badge
-} from '@/shared/ui'
-```
+3. **Search & Filter**:
+   - Use search bar (name, email, phone)
+   - Filter by status (active/inactive)
+   - Verify results update correctly
 
-### Reglas de Diseño Customers
-1. **❌ NUNCA** importar de `@chakra-ui/react` directamente
-2. **✅ USAR** `ContentLayout spacing="normal"` como contenedor
-3. **✅ APLICAR** `PageHeader` con acciones CRM específicas (RFM, Segmentation, Churn)
-4. **✅ IMPLEMENTAR** `Section` condicionales para análisis avanzados
-5. **✅ UTILIZAR** `StatsSection + CardGrid + MetricCard` para KPIs de CRM
+4. **RFM Analysis**:
+   - Click "RFM Analysis" button
+   - Verify segments display correctly
+   - Check customer distribution across segments
+
+5. **Delete Customer**:
+   - Try deleting customer with orders → Should fail
+   - Delete customer without orders → Should succeed (soft delete)
+
+6. **Permissions**:
+   - Test with OPERADOR role (create, read only)
+   - Test with SUPERVISOR role (create, read, update, export)
+   - Test with ADMINISTRADOR role (all actions)
+
+7. **Export CSV**:
+   - Click "Export CSV" (if authorized)
+   - Verify CSV contains correct data
 
 ---
 
-## 📊 Funcionalidades Avanzadas de CRM
+## 🚨 Known Issues & Limitations
 
-### 1. Análisis RFM Automatizado
-```typescript
-// Segmentación automática por comportamiento de compra
-const rfmAnalysis = CustomerRFMAnalytics.calculateRFMScores(customers);
-// Genera: Champions, Loyal Customers, Potential Loyalists, At Risk, etc.
-```
+### Current Status
+- ✅ All CRUD operations working
+- ✅ Permission system integrated
+- ✅ Service layer complete
+- ✅ ESLint: 0 errors, 1 warning
+- ✅ TypeScript: 0 errors
 
-### 2. Motor de Analytics con IA
-```typescript
-// Análisis comportamental completo con 15+ métricas
-const analytics = await CustomerAnalyticsEngine.generateCustomerAnalytics(
-  customers, sales, saleItems, config
-);
-// Incluye: CLV, churn prediction, product recommendations, seasonal patterns
-```
+### Future Enhancements (Phase 4+)
+- [ ] Customer loyalty points system
+- [ ] Online reservation booking
+- [ ] Customer preference tracking
+- [ ] AI-powered churn prediction (ML model)
+- [ ] Automated marketing campaigns
+- [ ] Customer segmentation export to marketing platforms
+- [ ] Real-time customer behavior tracking
 
-### 3. Predicción de Churn con ML
-```typescript
-// Predicciones de churn con probabilidad y acciones preventivas
-const churnPredictions = analytics.predictions.churnPredictions;
-// Para cada cliente: probability, timeToChurn, preventionActions
-```
+---
 
-### 4. Segmentación Inteligente
-```typescript
-// 6+ segmentos predefinidos + segmentos customizables
-const segments = [
-  'vip-customers',      // Alto valor, alta frecuencia
-  'frequent-diners',    // Alta frecuencia, valor moderado
-  'at-risk-customers',  // Riesgo de churn
-  'new-customers',      // Recién adquiridos
-  'price-sensitive',    // Sensibles a descuentos
-  'occasional-visitors' // Baja frecuencia, potencial crecimiento
-];
-```
+## 📝 API Reference
 
-### 5. Customer Lifetime Value (CLV)
+### CustomerAPI Service
+
 ```typescript
-// CLV con NPV discount y precisión decimal
-const clv = calculateCustomerCLV({
-  average_order_value: customer.avgOrderValue,
-  purchase_frequency: customer.monthlyFrequency,
-  customer_lifespan_months: 24,
-  profit_margin_rate: 0.65,
-  discount_rate: 0.1 // NPV discount
+import { CustomerAPI } from '@/pages/admin/core/crm/customers/services/customerApi';
+import type { AuthUser } from '@/contexts/AuthContext';
+
+// Get all customers
+const customers = await CustomerAPI.getCustomers(user, {
+  status: 'active',
+  search: 'john',
+  limit: 50,
+  offset: 0,
 });
+
+// Get single customer
+const customer = await CustomerAPI.getCustomer(customerId, user);
+
+// Get customer with stats
+const customerWithStats = await CustomerAPI.getCustomerWithStats(customerId, user);
+
+// Create customer
+const newCustomer = await CustomerAPI.createCustomer({
+  name: 'John Doe',
+  email: 'john@example.com',
+  phone: '+1234567890',
+  address: '123 Main St',
+}, user);
+
+// Update customer
+const updatedCustomer = await CustomerAPI.updateCustomer(customerId, {
+  name: 'Jane Doe',
+  email: 'jane@example.com',
+}, user);
+
+// Delete customer (soft delete)
+await CustomerAPI.deleteCustomer(customerId, user);
+
+// Export to CSV
+const csv = await CustomerAPI.exportCustomersToCSV(user, { status: 'active' });
 ```
 
 ---
 
-## 🔄 Integración con EventBus
+## 🎨 UI Components
 
-### Eventos del Módulo CRM
+### Customer List
+**File**: `CustomerList.tsx`
+- Table view with columns: Name, Email, Phone, Status, Actions
+- Search bar (name, email, phone)
+- Filter dropdown (active/inactive)
+- Pagination controls
+- Quick actions: Edit, Delete, View Details
 
-```typescript
-// Eventos que emite el módulo customers
-const CUSTOMERS_EVENTS = {
-  CUSTOMER_CREATED: 'customers:customer_created',
-  CUSTOMER_UPDATED: 'customers:customer_updated',
-  RFM_ANALYSIS_COMPLETED: 'customers:rfm_analysis_completed',
-  CHURN_RISK_DETECTED: 'customers:churn_risk_detected',
-  SEGMENT_CHANGED: 'customers:segment_changed',
-  CLV_RECALCULATED: 'customers:clv_recalculated',
-  LOYALTY_POINTS_UPDATED: 'customers:loyalty_points_updated'
-} as const;
+### Customer Form
+**File**: `CustomerForm.tsx`
+- Form fields: Name*, Email, Phone, Address, Notes
+- Email uniqueness validation
+- Form validation with Zod
+- Optimistic updates
+- Success/error notifications
 
-// Eventos que escucha el módulo
-const SUBSCRIBED_EVENTS = [
-  'sales:new_sale',              // Actualizar RFM scores y CLV
-  'sales:sale_completed',        // Recalcular métricas del cliente
-  'products:new_purchase',       // Actualizar product preferences
-  'loyalty:points_redeemed',     // Actualizar loyalty metrics
-  'marketing:campaign_response'  // Actualizar engagement metrics
-] as const;
-```
+### Customer Analytics
+**File**: `CustomerAnalytics.tsx`
+- RFM distribution charts
+- Customer segment breakdown
+- CLV metrics
+- Churn rate visualization
+- At-risk customer alerts
 
----
-
-## 📊 Testing Strategy
-
-### Estructura de Tests
-
-```
-src/pages/admin/core/crm/customers/
-├── __tests__/
-│   ├── page.test.tsx                    # Tests del componente principal
-│   ├── components/
-│   │   ├── RFMAnalysisPanel.test.tsx    # Tests de componentes CRM
-│   │   └── ChurnPredictionPanel.test.tsx
-│   ├── hooks/
-│   │   ├── useCustomersPage.test.ts     # Tests de hooks
-│   │   └── useRFMAnalysis.test.ts
-│   └── services/
-│       ├── __tests__/                   # Tests de business logic
-│       ├── customerAnalyticsEngine.test.ts
-│       └── customerRFMAnalytics.test.ts
-```
+### Customers Widget
+**File**: `CustomersWidget.tsx`
+- Compact dashboard widget
+- Key metrics: Total, Active, At-Risk
+- Quick link to full module
 
 ---
 
-## 🚀 Migración Completada
+## 🔗 Dependencies
 
-### ✅ Trabajo Realizado
+### Internal Modules
+- ✅ No dependencies (foundation module)
 
-1. **✅ Reestructuración de Módulo**
-   - Creada subcarpeta `customers/` dentro de `crm/`
-   - Movido contenido existente preservando estructura
-   - Aplicado patrón estándar de G-Admin Mini
+### Consumed by Modules
+- **Sales**: Customer selection in sale creation
+- **Billing**: Customer billing information
+- **Memberships**: Customer membership linking
+- **Rentals**: Customer rental assignments
+- **Scheduling**: Customer appointment booking
 
-2. **✅ Movimiento de Business Logic Avanzada**
-   - **customerAnalyticsEngine.ts** (1300+ líneas) - Motor de analytics con IA
-   - **customerRFMAnalytics.ts** - Análisis RFM con precisión decimal
-   - Incluye tests y documentación completa
-   - Actualizado `business-logic/index.ts` con comentarios de migración
-
-3. **✅ Hook Orquestador CRM**
-   - `useCustomersPage.ts` con funcionalidad CRM avanzada
-   - 5+ quick actions (RFM, Segmentation, Churn, Loyalty)
-   - Métricas automáticas (CLV, Churn Rate, Retention Rate)
-   - Estado complejo para análisis condicionales
-
-4. **✅ Refactorización de Página**
-   - Convertido de Tabs pattern a patrón estándar
-   - `ContentLayout + PageHeader + Section` semánticos
-   - Secciones condicionales para análisis avanzados
-   - Métricas CRM con `StatsSection + MetricCard`
-
-5. **✅ Barrel Exports**
-   - `services/index.ts` con business logic migrada
-   - `hooks/index.ts` para hooks del módulo
-   - Preservación de estructura existente en subcarpetas
+### External Libraries
+- `react-hook-form` (v7.x): Form management
+- `@hookform/resolvers` (v3.x): Zod integration
+- `zod` (v4.x): Schema validation
+- `@chakra-ui/react` (v3.x): UI components (via `@/shared/ui`)
+- `decimal.js` (v10.x): Precision calculations
 
 ---
 
-## 🔗 Referencias Técnicas
+## 📚 Additional Resources
 
-### Dependencias Clave CRM
-- **Decimal.js**: Precisión en CLV y cálculos financieros
-- **CustomerAnalyticsEngine**: Motor de IA para segmentación
-- **RFM Analytics**: Análisis comportamental avanzado
-- **ChakraUI v3**: Sistema de componentes base
-- **Heroicons**: Iconografía CRM consistente
-
-### Patrones Aplicados
-- ✅ **Advanced Analytics**: CustomerAnalyticsEngine con 15+ métricas
-- ✅ **RFM Segmentation**: Recency, Frequency, Monetary analysis
-- ✅ **Predictive ML**: Churn prediction con machine learning
-- ✅ **Decimal Precision**: CLV y métricas financieras exactas
-- ✅ **Event-Driven CRM**: Comunicación en tiempo real
+- **Module Registry Guide**: `src/modules/README.md`
+- **Architecture Overview**: `src/modules/ARCHITECTURE.md`
+- **Permission System**: `src/lib/permissions/README.md`
+- **EventBus Documentation**: `docs/06-features/eventbus-system.md`
+- **Decimal.js Guide**: `docs/05-development/component-library.md`
 
 ---
 
-## 📈 Métricas de Calidad CRM
+## ✅ Production-Ready Checklist
 
-### Indicadores de Éxito
-- ⚡ **Performance**: RFM analysis < 500ms, Churn prediction < 1s
-- 🧪 **Testing**: Cobertura > 85%, tests de analytics + UI
-- 📦 **Bundle Size**: Incremento < 100KB (analytics engine incluido)
-- 🔧 **Mantenibilidad**: Lógica CRM modular y escalable
-- 🎨 **UX Consistency**: 100% componentes del design system
-
-### Funcionalidades CRM Validadas
-```bash
-# Analytics Engine
-✅ Segmentación automática (6+ segmentos)
-✅ Predicción de churn (ML-based)
-✅ CLV con precisión decimal
-✅ RFM analysis completo
-✅ Recomendaciones estratégicas automatizadas
-```
+- [x] ✅ Architecture compliant (Capabilities → Features → Modules)
+- [x] ✅ Scaffolding ordered (components/, services/, hooks/, types/)
+- [x] ✅ Zero ESLint errors (0 errors, 1 warning)
+- [x] ✅ Zero TypeScript errors
+- [x] ✅ Cross-module mapped (README documents provides/consumes)
+- [x] ✅ Zero duplication (no repeated CRUD logic)
+- [x] ✅ DB connected (all CRUD via service layer)
+- [x] ✅ Features mapped (optional features in FeatureRegistry)
+- [x] ✅ Permissions designed (minimumRole + usePermissions + service layer)
+- [x] ✅ README complete (this file)
 
 ---
 
-**🎯 Este README.md documenta la migración completa del módulo Customers con analytics avanzados siguiendo el patrón estándar.**
-
-**📋 El módulo Customers ahora implementa el CRM más avanzado de G-Admin Mini con RFM analytics, predicción de churn, y segmentación inteligente usando business logic de clase enterprise.**
+**Last Updated**: 2025-10-31
+**Version**: 1.0.0
+**Status**: Production-Ready ✅

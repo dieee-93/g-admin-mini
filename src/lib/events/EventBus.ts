@@ -305,12 +305,13 @@ class EventBus implements IEventBus {
       }, { persistent: false });
       
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.initPromise = null; // Clear promise on error
-      EventBusLogger.error('Failed to initialize event bus:', { error: error.message, stack: error.stack });
+      EventBusLogger.error('Failed to initialize event bus:', { error: err.message, stack: err.stack });
       throw new EventBusError(
-        `Failed to initialize EventBus: ${error.message}`,
+        `Failed to initialize EventBus: ${err.message}`,
         EventBusErrorCode.PERSISTENCE_ERROR,
-        { originalError: error }
+        { originalError: err }
       );
     }
   }
@@ -477,16 +478,17 @@ class EventBus implements IEventBus {
       EventBusLogger.debug(`Event processed: ${pattern} (${latency}ms)`);
       
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       const latency = Date.now() - startTime;
-      this.metricsCollector.recordError(error.message);
-      
-      EventBusLogger.error(`Error emitting event ${pattern}:`, { error: error.message, stack: error.stack });
-      
+      this.metricsCollector.recordError(err.message);
+
+      EventBusLogger.error(`Error emitting event ${pattern}:`, { error: err.message, stack: err.stack });
+
       // Emit error event (avoid infinite recursion)
       if (pattern !== 'global.eventbus.error') {
         await this.emit('global.eventbus.error', {
           originalPattern: pattern,
-          error: error.message,
+          error: err.message,
           latency
         }, { persistent: false });
       }
@@ -546,6 +548,18 @@ class EventBus implements IEventBus {
     
     // Return unsubscribe function
     return () => this.removeSubscription(subscription);
+  }
+
+  /**
+   * Alias for on() - for backward compatibility
+   * Many modules use subscribe() instead of on()
+   */
+  subscribe<TPayload = any>(
+    pattern: EventPattern,
+    handler: EventHandler<TPayload>,
+    options: SubscribeOptions = {}
+  ): UnsubscribeFn {
+    return this.on(pattern, handler, options);
   }
 
   once<TPayload = any>(
@@ -1233,7 +1247,7 @@ class EventBus implements IEventBus {
     
     // Fallback: return a placeholder if handler not found
     logger.warn('EventBus', `Handler not found: ${handlerName}`, { moduleId });
-    return async (_event) => {
+    return async (event) => {
       logger.debug('EventBus', `Placeholder handler called: ${moduleId}.${handlerName}`, {
         pattern: event.pattern
       });

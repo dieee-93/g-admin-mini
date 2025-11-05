@@ -5,7 +5,7 @@
 import { Box, Heading, Button, HStack, Separator } from '@chakra-ui/react';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Breadcrumb } from '../navigation/Breadcrumb';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationState, useNavigationActions } from '@/contexts/NavigationContext';
 import { Icon } from '../ui';
 
 interface ModuleHeaderProps {
@@ -21,7 +21,7 @@ export function ModuleHeader({
   onBack,
   rightActions 
 }: ModuleHeaderProps) {
-  const { breadcrumbs, navigateBack, canNavigateBack } = useNavigation();
+  const navState = useNavigationState(); const navActions = useNavigationActions(); const { breadcrumbs, canNavigateBack } = navState; const { navigateBack } = navActions;
   
   return (
     <Box>
@@ -30,11 +30,11 @@ export function ModuleHeader({
         bg="bg.canvas"
         borderLeft={`4px solid`} 
         borderColor={`${color}.400`}
-        p={4} 
-        mb={6}
+        p="4" 
+        mb="6"
       >
         <HStack justify="space-between" align="center">
-          <HStack gap={3}>
+          <HStack gap="3">
             {/* Usar navegación unificada si no se proporciona onBack personalizado */}
             {(onBack || canNavigateBack) && (
               <Button

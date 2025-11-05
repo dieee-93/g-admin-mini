@@ -40,17 +40,17 @@ export const RecipeFormIngredients: React.FC<RecipeFormIngredientsProps> = ({
 }) => {
   return (
     <Box>
-      <HStack justify="space-between" mb={3}>
+      <HStack justify="space-between" mb="3">
         <Text fontSize="sm" fontWeight="medium" color="gray.700">
           Ingredientes
         </Text>
-        <Badge colorScheme="purple" variant="subtle">
+        <Badge colorPalette="purple" variant="subtle">
           {ingredients.filter(ing => ing.item_id && ing.quantity).length} ingredientes
         </Badge>
       </HStack>
 
       {errors.ingredients && (
-        <Text color="red.500" fontSize="sm" mb={3}>
+        <Text color="red.500" fontSize="sm" mb="3">
           {errors.ingredients}
         </Text>
       )}
@@ -106,7 +106,7 @@ export const RecipeFormIngredients: React.FC<RecipeFormIngredientsProps> = ({
 
                 <Button
                   size="sm"
-                  colorScheme="red"
+                  colorPalette="red"
                   variant="ghost"
                   onClick={() => removeIngredient(index)}
                   disabled={ingredients.length === 1}
@@ -116,15 +116,15 @@ export const RecipeFormIngredients: React.FC<RecipeFormIngredientsProps> = ({
               </HStack>
 
               {selectedItem && ingredient.quantity && (
-                <HStack justify="space-between" fontSize="xs" px={2}>
+                <HStack justify="space-between" fontSize="xs" px="2">
                   <HStack gap="2">
                     {hasStockIssue && (
-                      <Badge colorScheme="red" size="sm">
+                      <Badge colorPalette="red" size="sm">
                         ⚠️ Stock insuficiente
                       </Badge>
                     )}
                     {hasNoCost && (
-                      <Badge colorScheme="orange" size="sm">
+                      <Badge colorPalette="orange" size="sm">
                         💰 Sin costo
                       </Badge>
                     )}
@@ -143,7 +143,7 @@ export const RecipeFormIngredients: React.FC<RecipeFormIngredientsProps> = ({
         <Button
           size="sm"
           variant="outline"
-          colorScheme="purple"
+          colorPalette="purple"
           onClick={addIngredient}
           alignSelf="flex-start"
         >

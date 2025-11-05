@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
 import {
   Box,
   Stack,
   Alert,
-  Section
+  Section,
+  Switch
 } from '@/shared/ui';
-import { Field, Flex, NumberInput, Text } from '@chakra-ui/react';
+import { Field, Flex, NumberInput, Text } from '@/shared/ui';
 import { FormCalculations } from '@/pages/admin/supply-chain/materials/services';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { type ItemFormData } from '@/pages/admin/supply-chain/materials/types';
 interface CountableStockFieldsProps {
   formData: ItemFormData;
@@ -19,8 +18,6 @@ interface CountableStockFieldsProps {
   usePackaging: boolean;
   packageQuantity: number;
   setPackageQuantity: (qty: number) => void;
-  unitPrice: number;
-  setUnitPrice: (price: number) => void;
 }
 
 export const CountableStockFields = ({
@@ -32,20 +29,55 @@ export const CountableStockFields = ({
   setAddToStockNow,
   usePackaging,
   packageQuantity,
-  setPackageQuantity,
-  unitPrice,
-  setUnitPrice
+  setPackageQuantity
 }: CountableStockFieldsProps) => {
   return (
     <Section variant="elevated" title="💰 Configuración de Stock y Precios" w="full">
         <Stack gap="4">
-          <Text fontSize="sm" color="text.muted">
-            {usePackaging ?
-              'Ingresa la cantidad de paquetes y el precio total de tu compra' :
-              'Ingresa la cantidad de unidades y el precio total de tu compra'
-            }
-          </Text>
-          <Stack gap="4" pt="4" borderTop="1px solid" borderColor="border">
+          {/* Toggle: Add stock now vs later */}
+          <Box
+            p="3"
+            bg="blue.50"
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="blue.200"
+          >
+            <Flex justify="space-between" align="center">
+              <Box>
+                <Text fontSize="sm" fontWeight="semibold" color="blue.900">
+                  ¿Agregar stock inicial ahora?
+                </Text>
+                <Text fontSize="xs" color="blue.700" mt="1">
+                  {addToStockNow
+                    ? 'Se creará el material CON stock y precio. Puedes modificarlo después.'
+                    : 'Se creará el material SIN stock (0 unidades). Podrás agregarlo después.'}
+                </Text>
+              </Box>
+              <Switch.Root
+                checked={addToStockNow}
+                onCheckedChange={(e) => setAddToStockNow(e.checked)}
+                disabled={disabled}
+                size="lg"
+                colorPalette="blue"
+              >
+                <Switch.HiddenInput />
+                <Switch.Control>
+                  <Switch.Thumb />
+                </Switch.Control>
+              </Switch.Root>
+            </Flex>
+          </Box>
+
+          {/* Only show stock fields if addToStockNow is enabled */}
+          {addToStockNow && (
+            <>
+              <Text fontSize="sm" color="text.muted">
+                {usePackaging ?
+                  'Ingresa la cantidad de paquetes y el precio total de tu compra' :
+                  'Ingresa la cantidad de unidades y el precio total de tu compra'
+                }
+              </Text>
+              <Stack gap="4" pt="4" borderTop="1px solid" borderColor="border">
             {usePackaging && formData.packaging?.package_size ? (
               // Modo CON PACKAGING
               <Stack gap="4">
@@ -309,6 +341,8 @@ export const CountableStockFields = ({
               <CostSummaryCard formData={formData} usePackaging={usePackaging} />
             )}
           </Stack>
+            </>
+          )}
         </Stack>
     </Section>
   );
@@ -405,12 +439,10 @@ const CostSummaryCard = ({
 };
 
 // Componente de estadísticas de packaging
-const PackagingStatisticsCard = ({ 
-  formData,
-  usePackaging 
-}: { 
+const PackagingStatisticsCard = ({
+  formData
+}: {
   formData: ItemFormData;
-  usePackaging: boolean;
 }) => {
   const stockQuantity = formData.initial_stock || 0;
   const totalCost = formData.unit_cost || 0;
@@ -426,7 +458,6 @@ const PackagingStatisticsCard = ({
   // Estadísticas de eficiencia
   const costPer5Units = costPerUnit * 5;
   const costPer10Units = costPerUnit * 10;
-  const costPer25Units = costPerUnit * 25;
   
   return (
     <Section variant="outline">

@@ -157,9 +157,9 @@ export const RadioItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(
 export const RadioItemControl = React.forwardRef<HTMLDivElement, { children?: ReactNode; [key: string]: any }>(
   function RadioItemControl({ children, ...props }, ref) {
     return (
-      <div ref={ref} {...props}>
+      <ChakraRadioGroup.ItemControl ref={ref} {...props}>
         {children || <Radiomark />}
-      </div>
+      </ChakraRadioGroup.ItemControl>
     )
   }
 )
@@ -306,3 +306,46 @@ export type {
   ThemeRadioGroupProps,
   RadioProps
 }
+
+// =============================================================================
+// USAGE EXAMPLE
+// =============================================================================
+/**
+ * @example Basic RadioGroup
+ * ```tsx
+ * import { RadioGroup, RadioItem } from '@/shared/ui'
+ *
+ * function PaymentMethodSelector() {
+ *   const [method, setMethod] = useState('cash')
+ *
+ *   return (
+ *     <RadioGroup
+ *       value={method}
+ *       onValueChange={(value) => setMethod(value)}
+ *       colorPalette="blue"
+ *     >
+ *       <RadioItem value="cash">Efectivo</RadioItem>
+ *       <RadioItem value="card">Tarjeta</RadioItem>
+ *       <RadioItem value="transfer">Transferencia</RadioItem>
+ *     </RadioGroup>
+ *   )
+ * }
+ * ```
+ *
+ * @example OptionsRadioGroup (with descriptions)
+ * ```tsx
+ * import { OptionsRadioGroup } from '@/shared/ui'
+ *
+ * const deliveryOptions = [
+ *   { value: 'pickup', label: 'Recoger en tienda', description: 'Sin costo adicional' },
+ *   { value: 'delivery', label: 'Delivery', description: 'Envío a domicilio' }
+ * ]
+ *
+ * <OptionsRadioGroup
+ *   options={deliveryOptions}
+ *   label="Método de entrega"
+ *   value={selectedDelivery}
+ *   onValueChange={(value) => setSelectedDelivery(value)}
+ * />
+ * ```
+ */

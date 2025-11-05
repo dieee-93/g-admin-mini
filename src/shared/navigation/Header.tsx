@@ -16,7 +16,7 @@ import {
   ArrowRightEndOnRectangleIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationState, useNavigationActions } from '@/contexts/NavigationContext';
 import { Icon } from '@/shared/ui/Icon';
 import { Typography } from '@/shared/ui/Typography';
 import { Stack } from '@/shared/ui/Stack';
@@ -24,13 +24,38 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { ConnectionStatus } from '@/lib/offline/OfflineMonitor';
+import { useCart } from '@/modules/sales/ecommerce/hooks/useCart';
+import { useNavigate as useRouterNavigate } from 'react-router-dom';
+import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 
 import { logger } from '@/lib/logging';
 export function Header() {
-  const { currentModule, modules, navigate } = useNavigation();
+  const navState = useNavigationState();
+  const navActions = useNavigationActions();
+  const { currentModule, modules } = navState;
+  const { navigate } = navActions;
   const { user, signOut } = useAuth();
+  const routerNavigate = useRouterNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+
+  // Session storage helper for guest carts
+  const getGuestSessionId = () => {
+    let sessionId = sessionStorage.getItem('guest_session_id');
+    if (!sessionId) {
+      sessionId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      sessionStorage.setItem('guest_session_id', sessionId);
+    }
+    return sessionId;
+  };
+
+  // Get cart for customer users (not admin)
+  const isCustomer = user?.role === 'customer';
+  const { itemCount } = useCart({
+    customerId: isCustomer ? user?.id : undefined,
+    sessionId: isCustomer && !user ? getGuestSessionId() : undefined,
+    autoLoad: isCustomer,
+  });
 
   // Listen for sidebar hover state
   React.useEffect(() => {
@@ -57,7 +82,7 @@ export function Header() {
     if (currentModule) {
       return currentModule.title;
     }
-    return 'G-Admin';
+    return 'Dashboard'; // Changed from 'G-Admin' to avoid redundancy
   };
 
   return (
@@ -92,11 +117,11 @@ export function Header() {
             transform={isSidebarHovered ? 'translateX(8px)' : 'translateX(0px)'}
             transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
           >
-            <Typography 
+            <Typography
               variant="body"
-              size="sm" 
-              fontWeight="medium" 
-              color="text.secondary"
+              size="sm"
+              fontWeight="medium"
+              color="fg.muted"
               cursor="pointer"
               transition="color 0.2s ease"
               display={{ base: 'none', sm: 'block' }}
@@ -104,32 +129,32 @@ export function Header() {
             >
               G-Admin
             </Typography>
-            <Typography 
+            <Typography
               variant="body"
               size="sm"
-              color="text.muted"
+              color="fg.subtle"
               display={{ base: 'none', sm: 'block' }}
             >/</Typography>
-            <Typography 
+            <Typography
               variant="body"
-              size="sm" 
-              fontWeight="semibold" 
-              color="text.primary"
+              size="sm"
+              fontWeight="semibold"
+              color="fg.default"
             >
               {getHeaderTitle()}
             </Typography>
             {currentModule && (
               <>
-                <Typography 
+                <Typography
                   variant="body"
                   size="sm"
-                  color="text.muted"
+                  color="fg.subtle"
                   display={{ base: 'none', md: 'block' }}
                 >·</Typography>
-                <Typography 
+                <Typography
                   variant="body"
-                  size="xs" 
-                  color="text.secondary"
+                  size="xs"
+                  color="fg.muted"
                   fontStyle="italic"
                   display={{ base: 'none', md: 'block' }}
                   maxWidth={{ base: '150px', lg: '300px' }}
@@ -147,6 +172,41 @@ export function Header() {
         <Stack direction="row" gap="4">
           {/* ✅ Connection Status integrado */}
           <ConnectionStatus />
+
+          {/* 🛒 Shopping Cart (Customer only) */}
+          {isCustomer && (
+            <Box position="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => routerNavigate('/app/cart')}
+              >
+                <Icon icon={ShoppingCartIcon} size="md" />
+              </Button>
+
+              {itemCount > 0 && (
+                <Box
+                  position="absolute"
+                  top="-2px"
+                  right="-2px"
+                  bg="red.500"
+                  color="white"
+                  borderRadius="full"
+                  fontSize="xs"
+                  fontWeight="bold"
+                  minWidth="18px"
+                  height="18px"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  border="2px solid"
+                  borderColor="bg.surface"
+                >
+                  {itemCount > 99 ? '99+' : itemCount}
+                </Box>
+              )}
+            </Box>
+          )}
 
           {/* ✅ Notifications con design system */}
           <Box position="relative">

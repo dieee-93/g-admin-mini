@@ -17,9 +17,9 @@ import {
   InputField,
   Alert,
   Tabs,
-  TabList,
-  Tab,
-  TabPanel,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
   Box
 } from '@/shared/ui';
 
@@ -221,9 +221,9 @@ export default function APIInspectorPage() {
             variant="line"
             colorPalette="blue"
           >
-            <TabList>
+            <TabsList>
               {tabs.map(tab => (
-                <Tab
+                <TabsTrigger
                   key={tab.id}
                   value={tab.id}
                   icon={<span>{tab.icon}</span>}
@@ -234,14 +234,14 @@ export default function APIInspectorPage() {
                       {errorRequests.length}
                     </Badge>
                   )}
-                </Tab>
+                </TabsTrigger>
               ))}
-            </TabList>
+            </TabsList>
 
             <div style={{ marginTop: '20px' }}>
-              <TabPanel value="requests" padding="md">
+              <TabsContent value="requests" padding="md">
                 <Stack spacing="sm">
-                  <Typography variant="h6">HTTP Requests ({filteredRequests.length})</Typography>
+                  <Typography variant="subtitle">HTTP Requests ({filteredRequests.length})</Typography>
 
                   {filteredRequests.map(request => (
                     <Card key={request.id} variant="elevated">
@@ -348,11 +348,11 @@ export default function APIInspectorPage() {
                     </Card>
                   )}
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="cache" padding="md">
+              <TabsContent value="cache" padding="md">
                 <Stack spacing="sm">
-                  <Typography variant="h6">Cached Requests ({cachedRequests.length})</Typography>
+                  <Typography variant="subtitle">Cached Requests ({cachedRequests.length})</Typography>
 
                   {cachedRequests.map(request => (
                     <Card key={request.id} variant="elevated">
@@ -385,11 +385,11 @@ export default function APIInspectorPage() {
                     </Card>
                   )}
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="errors" padding="md">
+              <TabsContent value="errors" padding="md">
                 <Stack spacing="sm">
-                  <Typography variant="h6">Failed Requests ({errorRequests.length})</Typography>
+                  <Typography variant="subtitle">Failed Requests ({errorRequests.length})</Typography>
 
                   {errorRequests.map(request => (
                     <Card key={request.id} variant="elevated" style={{ borderLeft: '4px solid #ef4444' }}>
@@ -431,11 +431,11 @@ export default function APIInspectorPage() {
                     </Card>
                   )}
                 </Stack>
-              </TabPanel>
+              </TabsContent>
 
-              <TabPanel value="stats" padding="md">
+              <TabsContent value="stats" padding="md">
                 <Stack spacing="md">
-                  <Typography variant="h6">Request Statistics</Typography>
+                  <Typography variant="subtitle">Request Statistics</Typography>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                     <Card variant="elevated">
@@ -483,7 +483,7 @@ export default function APIInspectorPage() {
                     </Card>
                   </div>
                 </Stack>
-              </TabPanel>
+              </TabsContent>
             </div>
           </Tabs>
         </Stack>

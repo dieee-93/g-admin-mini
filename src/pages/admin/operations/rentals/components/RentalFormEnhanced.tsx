@@ -4,9 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   ContentLayout, FormSection, Button, Stack, CardGrid, MetricCard,
-  Alert, Badge
+  Alert, Badge, Typography
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import { PlusIcon, EyeIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
 import { logger } from '@/lib/logging';
@@ -214,7 +215,7 @@ export const RentalFormEnhanced: React.FC = () => {
                 title="Margen Estimado"
                 value={`${rentalMetrics.profitMargin.toFixed(1)}%`}
                 change={rentalMetrics.profitMargin > 60 ? 10 : rentalMetrics.profitMargin > 40 ? 5 : -5}
-                icon="TrendingUpIcon"
+                icon="ArrowTrendingUpIcon"
               />
               <MetricCard
                 title="Duración"
@@ -495,19 +496,19 @@ export const RentalFormEnhanced: React.FC = () => {
               <CardGrid columns={{ base: 1, md: 4 }} gap="sm">
                 <Stack align="center" gap="xs">
                   <Typography variant="caption" color="muted">Subtotal</Typography>
-                  <Typography variant="h6">${rentalMetrics.subtotal.toLocaleString()}</Typography>
+                  <Typography variant="subtitle">${rentalMetrics.subtotal.toLocaleString()}</Typography>
                 </Stack>
                 <Stack align="center" gap="xs">
                   <Typography variant="caption" color="muted">Descuento</Typography>
-                  <Typography variant="h6" color="green.600">-${rentalMetrics.discountAmount.toLocaleString()}</Typography>
+                  <Typography variant="subtitle" color="green.600">-${rentalMetrics.discountAmount.toLocaleString()}</Typography>
                 </Stack>
                 <Stack align="center" gap="xs">
                   <Typography variant="caption" color="muted">Impuestos</Typography>
-                  <Typography variant="h6">${rentalMetrics.taxAmount.toLocaleString()}</Typography>
+                  <Typography variant="subtitle">${rentalMetrics.taxAmount.toLocaleString()}</Typography>
                 </Stack>
                 <Stack align="center" gap="xs">
                   <Typography variant="caption" color="muted">Total</Typography>
-                  <Typography variant="h6" color="blue.600">${rentalMetrics.totalAmount.toLocaleString()}</Typography>
+                  <Typography variant="subtitle" color="blue.600">${rentalMetrics.totalAmount.toLocaleString()}</Typography>
                 </Stack>
               </CardGrid>
             </Stack>
@@ -634,15 +635,15 @@ export const RentalFormEnhanced: React.FC = () => {
               loading={isSubmitting}
               size="lg"
             >
-              <Icon name="PlusIcon" />
+              <Icon as={PlusIcon} />
               Crear Rental
             </Button>
             <Button variant="outline" size="lg">
-              <Icon name="EyeIcon" />
+              <Icon as={EyeIcon} />
               Vista Previa
             </Button>
             <Button variant="outline" size="lg">
-              <Icon name="DocumentDuplicateIcon" />
+              <Icon as={DocumentDuplicateIcon} />
               Duplicar
             </Button>
           </Stack>

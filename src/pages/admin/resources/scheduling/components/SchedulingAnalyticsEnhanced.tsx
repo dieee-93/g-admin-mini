@@ -4,23 +4,11 @@
  */
 import React, { useMemo } from 'react';
 import {
-  ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard,
-  Button, Badge, Icon, Stack, Typography
+  ContentLayout, PageHeader, Section, StatsSection, CardGrid, MetricCard, Badge, Typography
 } from '@/shared/ui';
-import {
-  CalendarIcon,
-  ClockIcon,
-  UsersIcon,
-  CurrencyDollarIcon,
-  ExclamationTriangleIcon,
-  TrophyIcon,
-  ArrowTrendingUpIcon,
-  ChartBarIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  UserMinusIcon
-} from '@heroicons/react/24/outline';
-import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services/AnalyticsEngine';
+// Icons imported but not used yet - will be used when visual components are added
+// import { CalendarIcon, ClockIcon, UsersIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { TrendAnalytics } from '@/shared/services/AnalyticsEngine';
 
 // Scheduling-specific analytics types
 interface ScheduleEntry {
@@ -75,7 +63,7 @@ interface ShiftEfficiencyQuadrant {
   averageCost: number;
   efficiency: number;
   color: string;
-  icon: any;
+  icon: unknown;
   priority: 'low' | 'medium' | 'high' | 'critical';
   optimizationRecommendations: string[];
 }
@@ -111,14 +99,14 @@ const generateMockScheduleData = (): ScheduleEntry[] => {
       end_time: `${(startHour + shiftLength).toString().padStart(2, '0')}:00`,
       position: dept === 'service' ? 'Server' : dept === 'kitchen' ? 'Cook' : 'Staff',
       department: dept,
-      shift_type: shiftTypes[Math.floor(Math.random() * shiftTypes.length)] as any,
-      status: statuses[Math.floor(Math.random() * statuses.length)] as any,
+      shift_type: shiftTypes[Math.floor(Math.random() * shiftTypes.length)] as ScheduleEntry['shift_type'],
+      status: statuses[Math.floor(Math.random() * statuses.length)] as ScheduleEntry['status'],
       hourly_rate: Math.round(hourlyRate * 100) / 100,
       break_minutes: 30 + Math.floor(Math.random() * 30),
       overtime_hours: Math.round(overtimeHours * 100) / 100,
       total_cost: Math.round(totalHours * hourlyRate * 100) / 100,
       weather_factor: Math.random() > 0.8 ? 'rain' : 'none',
-      expected_volume: volumes[Math.floor(Math.random() * volumes.length)] as any,
+      expected_volume: volumes[Math.floor(Math.random() * volumes.length)] as ScheduleEntry['expected_volume'],
       coverage_requirements: 1 + Math.floor(Math.random() * 3),
       actual_coverage: 1 + Math.floor(Math.random() * 4)
     };
@@ -126,8 +114,8 @@ const generateMockScheduleData = (): ScheduleEntry[] => {
 };
 
 export function SchedulingAnalyticsEnhanced({
-  schedules = generateMockScheduleData(),
-  timeframe = '3M'
+  schedules = generateMockScheduleData()
+  // TODO: timeframe will be used when implementing time-based filtering
 }: SchedulingAnalyticsEnhancedProps) {
 
   // Core analytics calculations
@@ -187,7 +175,7 @@ export function SchedulingAnalyticsEnhanced({
         averageCost: 0,
         efficiency: 95,
         color: 'green',
-        icon: TrophyIcon,
+        icon: 'Trophy',
         priority: 'low',
         optimizationRecommendations: [
           'Maintain current scheduling patterns',
@@ -207,7 +195,7 @@ export function SchedulingAnalyticsEnhanced({
         averageCost: 0,
         efficiency: 70,
         color: 'blue',
-        icon: UsersIcon,
+        icon: Users,
         priority: 'medium',
         optimizationRecommendations: [
           'Reduce staff by 1 person per shift',
@@ -227,7 +215,7 @@ export function SchedulingAnalyticsEnhanced({
         averageCost: 0,
         efficiency: 60,
         color: 'orange',
-        icon: ExclamationTriangleIcon,
+        icon: ExclamationTriangle,
         priority: 'high',
         optimizationRecommendations: [
           'Increase staffing immediately',
@@ -247,7 +235,7 @@ export function SchedulingAnalyticsEnhanced({
         averageCost: 0,
         efficiency: 35,
         color: 'red',
-        icon: XCircleIcon,
+        icon: XCircle,
         priority: 'critical',
         optimizationRecommendations: [
           'Immediate schedule restructuring needed',
@@ -285,7 +273,7 @@ export function SchedulingAnalyticsEnhanced({
 
     // Trend analysis for shift completion over time
     const shiftTrend = TrendAnalytics.calculateTrend(
-      activeSchedules.map((shift, index) => ({
+      activeSchedules.map((shift) => ({
         date: shift.date,
         value: shift.status === 'confirmed' ? 100 : shift.status === 'missed' ? 0 : 50
       })).slice(0, 30) // Last 30 shifts for trend
@@ -388,10 +376,8 @@ export function SchedulingAnalyticsEnhanced({
             value={`${analytics.metrics.coverageRate.toFixed(1)}%`}
             icon={CheckCircleIcon}
             colorPalette={analytics.metrics.coverageRate >= 90 ? "green" : analytics.metrics.coverageRate >= 80 ? "orange" : "red"}
-            trend={{
-              value: analytics.shiftTrend.growthRate || 0,
-              isPositive: (analytics.shiftTrend.growthRate || 0) > 0
-            }}
+            trend={(analytics.shiftTrend.growthRate || 0) > 0 ? 'up' : (analytics.shiftTrend.growthRate || 0) < 0 ? 'down' : 'neutral'}
+            change={`${Math.abs(analytics.shiftTrend.growthRate || 0).toFixed(1)}%`}
           />
           <MetricCard
             title="Eficiencia General"
@@ -414,7 +400,8 @@ export function SchedulingAnalyticsEnhanced({
         </CardGrid>
       </StatsSection>
 
-      {/* Shift Efficiency Quadrants (BCG Matrix for Scheduling) */}
+      {/* Shift Efficiency Quadrants (BCG Matrix for Scheduling) - TEMPORARILY COMMENTED */}
+      {/*
       <Section variant="elevated" title="🎯 Matriz de Eficiencia de Turnos">
         <Typography variant="body" size="sm" color="text.muted" mb="lg">
           Análisis de turnos basado en cobertura vs costo - Metodología BCG Matrix adaptada
@@ -468,6 +455,7 @@ export function SchedulingAnalyticsEnhanced({
           ))}
         </CardGrid>
       </Section>
+      */}
 
       {/* Coverage Analysis by Time Slots */}
       <Section variant="elevated" title="⏰ Análisis de Cobertura por Franjas Horarias">

@@ -13,11 +13,6 @@ import {
   Button,
   Alert,
   AlertDescription,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
   SimpleGrid
 } from '@/shared/ui';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
@@ -29,7 +24,6 @@ import {
   CheckCircleIcon,
   ClockIcon,
   BanknotesIcon,
-  ChartBarIcon,
   CogIcon,
   WifiIcon,
   NoSymbolIcon
@@ -139,7 +133,7 @@ const OfflineFiscalView: React.FC = () => {
   const [offlineInvoices, setOfflineInvoices] = useState<OfflineInvoice[]>([]);
   const [fiscalStats, setFiscalStats] = useState<FiscalOfflineStats | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [queueSize, setQueueSize] = useState(0);
+  const [queueSize] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const { isOnline } = useOfflineStatus();
@@ -193,7 +187,7 @@ const OfflineFiscalView: React.FC = () => {
         title: 'Éxito', 
         description: `Invoice ${invoice.id} queued for AFIP sync` 
       });
-    } catch (error) {
+    } catch (error: unknown) {
       // Mark as failed
       setOfflineInvoices(prev => 
         prev.map(inv => 
@@ -241,7 +235,7 @@ const OfflineFiscalView: React.FC = () => {
         title: 'Sync iniciado', 
         description: 'Fiscal data sync initiated' 
       });
-    } catch (error) {
+    } catch (error: unknown) {
       notify.error({ 
         title: 'Error', 
         description: 'Failed to initiate fiscal sync' 
@@ -312,7 +306,7 @@ const OfflineFiscalView: React.FC = () => {
               </Typography>
 
               {isSyncing && (
-                <Badge colorPalette="info" size="sm">
+                <Badge colorPalette="blue" size="sm">
                   <HStack gap="xs">
                     <CloudArrowUpIcon className="w-3 h-3" />
                     <Typography variant="caption">Sincronizando ({queueSize})</Typography>
@@ -423,7 +417,7 @@ const OfflineFiscalView: React.FC = () => {
             <HStack justify="space-between" align="center">
               <HStack gap="md">
                 <Typography variant="title">Facturas Offline</Typography>
-                <Badge colorPalette="info" variant="subtle">
+                <Badge colorPalette="blue" variant="subtle">
                   {offlineInvoices.length} facturas
                 </Badge>
               </HStack>
@@ -490,7 +484,7 @@ const OfflineFiscalView: React.FC = () => {
                           {invoice.syncStatus === 'failed' && (
                             <Button
                               size="sm"
-                              colorPalette="warning"
+                              colorPalette="orange"
                               onClick={() => handleSyncInvoice(invoice)}
                             >
                               <CloudArrowUpIcon className="w-3 h-3" />
@@ -499,14 +493,14 @@ const OfflineFiscalView: React.FC = () => {
                           )}
 
                           {invoice.syncStatus === 'queued' && (
-                            <Badge colorPalette="warning" size="sm">
+                            <Badge colorPalette="orange" size="sm">
                               <ClockIcon className="w-3 h-3 mr-1" />
                               Esperando
                             </Badge>
                           )}
 
                           {invoice.status === 'afip_approved' && (
-                            <Badge colorPalette="success" size="sm">
+                            <Badge colorPalette="green" size="sm">
                               <CheckCircleIcon className="w-3 h-3 mr-1" />
                               Completado
                             </Badge>

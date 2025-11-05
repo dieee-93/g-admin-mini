@@ -1,14 +1,13 @@
 // TimeOffManager - Manage time-off requests, approvals, and PTO tracking
 import { useState, useEffect } from 'react';
 import {
-  Stack, VStack, HStack, Button, Badge, Grid, SimpleGrid, Typography, Section,
-  Icon, SelectField, InputField, CardWrapper, MetricCard, CardGrid, Box, createListCollection
+  Stack, VStack, HStack, Button, Badge, SimpleGrid, Typography,
+  InputField, CardWrapper, Box, createListCollection
 } from '@/shared/ui';
 import { Table, IconButton, Select } from '@chakra-ui/react';
-import { 
-  CheckIcon, 
-  XMarkIcon, 
-  ClockIcon,
+import {
+  CheckIcon,
+  XMarkIcon,
   CalendarDaysIcon,
   UserIcon,
   ExclamationTriangleIcon,

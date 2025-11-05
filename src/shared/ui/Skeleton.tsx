@@ -1,92 +1,133 @@
-import { Skeleton as ChakraSkeleton, SkeletonText as ChakraSkeletonText } from '@chakra-ui/react'
+import { Skeleton as ChakraSkeleton, Stack } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
+import React from 'react'
 
 interface SkeletonProps {
   isLoaded?: boolean
+  loading?: boolean
   children?: ReactNode
   height?: string | number
   width?: string | number
-  startColor?: string
-  endColor?: string
-  fadeDuration?: number
-  speed?: number
+  variant?: 'pulse' | 'shine' | 'none'
+  colorPalette?: 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'cyan' | 'purple' | 'pink'
   className?: string
-  [key: string]: any // Allow additional Chakra props
+  [key: string]: any
 }
 
 interface SkeletonTextProps {
   isLoaded?: boolean
+  loading?: boolean
   children?: ReactNode
   noOfLines?: number
-  spacing?: string | number
-  skeletonHeight?: string | number
-  startColor?: string
-  endColor?: string
-  fadeDuration?: number
-  speed?: number
+  gap?: string | number
   className?: string
-  [key: string]: any // Allow additional Chakra props
+  [key: string]: any
 }
 
 export function Skeleton({
   isLoaded = false,
+  loading,
   children,
   height = '20px',
   width = '100%',
-  startColor,
-  endColor,
-  fadeDuration,
-  speed,
+  variant = 'pulse',
+  colorPalette = 'gray',
   className,
   ...rest
 }: SkeletonProps) {
+  // Convert isLoaded to loading if not explicitly provided
+  const isLoading = loading !== undefined ? loading : !isLoaded
+
+  if (!isLoading && children) {
+    return <>{children}</>
+  }
+
   return (
     <ChakraSkeleton
-      isLoaded={isLoaded}
+      loading={isLoading}
       height={height}
       width={width}
-      startColor={startColor}
-      endColor={endColor}
-      fadeDuration={fadeDuration}
-      speed={speed}
+      variant={variant}
+      colorPalette={colorPalette}
       className={className}
       {...rest}
-    >
-      {children}
-    </ChakraSkeleton>
+    />
   )
 }
 
 export function SkeletonText({
   isLoaded = false,
+  loading,
   children,
   noOfLines = 3,
-  spacing = '3',
-  skeletonHeight = '4',
-  startColor,
-  endColor,
-  fadeDuration,
-  speed,
+  gap = '3',
   className,
   ...rest
 }: SkeletonTextProps) {
+  // Convert isLoaded to loading if not explicitly provided
+  const isLoading = loading !== undefined ? loading : !isLoaded
+
+  if (!isLoading && children) {
+    return <>{children}</>
+  }
+
   return (
-    <ChakraSkeletonText
-      isLoaded={isLoaded}
-      noOfLines={noOfLines}
-      spacing={spacing}
-      skeletonHeight={skeletonHeight}
-      startColor={startColor}
-      endColor={endColor}
-      fadeDuration={fadeDuration}
-      speed={speed}
-      className={className}
-      {...rest}
-    >
-      {children}
-    </ChakraSkeletonText>
+    <Stack gap={gap} width="full" className={className}>
+      {Array.from({ length: noOfLines }).map((_, index) => (
+        <ChakraSkeleton
+          key={index}
+          height="4"
+          loading={isLoading}
+          _last={{ maxW: '80%' }}
+          {...rest}
+        />
+      ))}
+    </Stack>
   )
 }
 
 // Compound component pattern
 Skeleton.Text = SkeletonText
+
+// =============================================================================
+// USAGE EXAMPLE
+// =============================================================================
+/**
+ * @example Basic Skeleton
+ * ```tsx
+ * import { Skeleton } from '@/shared/ui'
+ *
+ * function LoadingCard() {
+ *   const { data, isLoading } = useQuery()
+ *
+ *   return (
+ *     <Skeleton isLoaded={!isLoading} height="200px">
+ *       <Card>{data?.title}</Card>
+ *     </Skeleton>
+ *   )
+ * }
+ * ```
+ *
+ * @example SkeletonText for multiple lines
+ * ```tsx
+ * import { SkeletonText } from '@/shared/ui'
+ *
+ * function LoadingContent() {
+ *   const { isLoading } = useData()
+ *
+ *   return (
+ *     <SkeletonText
+ *       isLoaded={!isLoading}
+ *       noOfLines={4}
+ *       gap="4"
+ *     />
+ *   )
+ * }
+ * ```
+ *
+ * @example Skeleton with variants
+ * ```tsx
+ * <Skeleton variant="shine" height="100px" width="full" />
+ * <Skeleton variant="pulse" height="50px" colorPalette="blue" />
+ * ```
+ */

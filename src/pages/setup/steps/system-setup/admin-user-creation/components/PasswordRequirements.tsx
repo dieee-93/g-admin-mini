@@ -33,10 +33,10 @@ export function PasswordRequirements({ password }: PasswordRequirementsProps) {
 
   return (
     <Box>
-      <Text fontSize="sm" color="gray.600" mb={2}>
+      <Text fontSize="sm" color="gray.600" mb="2">
         {requirements.title}
       </Text>
-      <VStack gap={1} align="start" fontSize="xs">
+      <VStack gap="1" align="start" fontSize="xs">
         {requirements_list.map((requirement, index) => (
           <Text
             key={index}

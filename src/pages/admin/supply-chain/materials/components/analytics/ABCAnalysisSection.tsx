@@ -16,7 +16,6 @@ import {
 } from '@chakra-ui/react';
 import {
   ChartBarIcon,
-  CurrencyDollarIcon,
   ArrowTrendingUpIcon,
   DocumentChartBarIcon,
   ExclamationTriangleIcon,

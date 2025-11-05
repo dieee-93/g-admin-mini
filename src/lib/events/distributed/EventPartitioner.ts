@@ -1,7 +1,7 @@
 // EventPartitioner.ts - Event partitioning with ordering guarantees
 // Ensures ordered delivery within partitions for distributed event processing
 
-import { NamespacedEvent } from '../types';
+import type { NamespacedEvent } from '../types';
 import { SecureLogger } from '../utils/SecureLogger';
 
 export interface EventPartitionerConfig {
@@ -107,9 +107,10 @@ export class EventPartitioner {
         partitionKey
       });
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Failed to route event to partition', {
         eventId: event.id,
-        error: error.message
+        error: err.message
       });
       throw error;
     }
@@ -396,11 +397,12 @@ export class EventPartitioner {
         // Move to next expected sequence
         this.nextExpectedSequence.set(partition, nextExpected + 1);
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         SecureLogger.error('EventBus', 'Error processing partitioned event', {
           eventId: event.id,
           partition,
           sequenceNumber: event.sequenceNumber,
-          error: error.message
+          error: err.message
         });
         
         // Re-queue the event for retry (or implement dead letter queue)
@@ -438,11 +440,12 @@ export class EventPartitioner {
         // Update metrics
         this.updatePartitionMetrics(partition, endTime - startTime, event.sequenceNumber);
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         SecureLogger.error('EventBus', 'Error processing partitioned event', {
           eventId: event.id,
           partition,
           sequenceNumber: event.sequenceNumber,
-          error: error.message
+          error: err.message
         });
       }
     }
@@ -486,21 +489,22 @@ export class EventPartitioner {
     // Process all events regardless of order
     const handler = this.partitionHandlers.get(partition);
     if (handler) {
-      queue.forEach(async (_event) => {
+      queue.forEach(async (event) => {
         try {
           const startTime = Date.now();
           await handler(event);
           const endTime = Date.now();
-          
+
           // Mark as sequence gap
           metrics.sequenceGaps++;
-          
+
           this.updatePartitionMetrics(partition, endTime - startTime, event.sequenceNumber);
         } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
           SecureLogger.error('EventBus', 'Error processing out-of-order event', {
             eventId: event.id,
             partition,
-            error: error.message
+            error: err.message
           });
         }
       });

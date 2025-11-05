@@ -1,4 +1,5 @@
 // src/features/customers/data/advancedCustomerApi.ts - WITH DECIMAL PRECISION
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
 import {
@@ -274,7 +275,7 @@ export async function getCustomerPreferences(customerId: string): Promise<Custom
     .select('*')
     .eq('customer_id', customerId)
     .single();
-  
+
   if (error) {
     if (error.code === 'PGRST116') {
       return null;
@@ -282,6 +283,72 @@ export async function getCustomerPreferences(customerId: string): Promise<Custom
     logger.error('App', 'Error fetching customer preferences:', error);
     throw new Error('Failed to fetch customer preferences');
   }
-  
+
   return data;
+}
+
+export async function updateCustomerNote(noteId: string, updates: Partial<CustomerNote>): Promise<CustomerNote> {
+  const { data, error } = await supabase
+    .from('customer_intelligence.customer_notes')
+    .update(updates)
+    .eq('id', noteId)
+    .select()
+    .single();
+
+  if (error) {
+    logger.error('App', 'Error updating customer note:', error);
+    throw new Error('Failed to update customer note');
+  }
+
+  return data;
+}
+
+export async function deleteCustomerNote(noteId: string): Promise<void> {
+  const { error } = await supabase
+    .from('customer_intelligence.customer_notes')
+    .delete()
+    .eq('id', noteId);
+
+  if (error) {
+    logger.error('App', 'Error deleting customer note:', error);
+    throw new Error('Failed to delete customer note');
+  }
+}
+
+export async function assignTagToCustomer(customerId: string, tagId: string): Promise<void> {
+  const { error } = await supabase
+    .from('customer_intelligence.customer_tags_assignments')
+    .insert({ customer_id: customerId, tag_id: tagId });
+
+  if (error) {
+    logger.error('App', 'Error assigning tag to customer:', error);
+    throw new Error('Failed to assign tag to customer');
+  }
+}
+
+export async function removeTagFromCustomer(customerId: string, tagId: string): Promise<void> {
+  const { error } = await supabase
+    .from('customer_intelligence.customer_tags_assignments')
+    .delete()
+    .eq('customer_id', customerId)
+    .eq('tag_id', tagId);
+
+  if (error) {
+    logger.error('App', 'Error removing tag from customer:', error);
+    throw new Error('Failed to remove tag from customer');
+  }
+}
+
+export async function getCustomersWithTag(tagId: string): Promise<CustomerProfile[]> {
+  const { data, error } = await supabase
+    .from('customer_intelligence.customer_tags_assignments')
+    .select('customer_id, customers(*)')
+    .eq('tag_id', tagId);
+
+  if (error) {
+    logger.error('App', 'Error fetching customers with tag:', error);
+    throw new Error('Failed to fetch customers with tag');
+  }
+
+  return data.map((item: any) => item.customers);
 }

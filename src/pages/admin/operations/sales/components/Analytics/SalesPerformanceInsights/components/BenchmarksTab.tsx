@@ -16,13 +16,13 @@ interface BenchmarksTabProps {
 
 export const BenchmarksTab: React.FC<BenchmarksTabProps> = ({ performance }) => {
   return (
-    <VStack align="stretch" gap={6}>
+    <VStack align="stretch" gap="6">
       <CardWrapper>
         <CardWrapper.Header>
           <Text fontSize="lg" fontWeight="semibold">Industry Benchmarks</Text>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <VStack align="stretch" gap={4}>
+          <VStack align="stretch" gap="4">
             <HStack justify="space-between">
               <Text>Your Performance</Text>
               <Badge colorPalette="green" size="lg">{performance.overall_score}</Badge>
@@ -61,7 +61,7 @@ export const BenchmarksTab: React.FC<BenchmarksTabProps> = ({ performance }) => 
           <Text fontSize="lg" fontWeight="semibold">Competitive Position</Text>
         </CardWrapper.Header>
         <CardWrapper.Body>
-          <VStack align="center" gap={4}>
+          <VStack align="center" gap="4">
             <ShieldCheckIcon className="w-16 h-16 text-green-500" />
             <Text fontSize="2xl" fontWeight="bold" color="green.600" textTransform="capitalize">
               {performance.benchmarks.your_position.replace('_', ' ')} Performer

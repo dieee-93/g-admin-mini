@@ -28,11 +28,6 @@ import {
 
 import { getFeature } from '@/config/FeatureRegistry';
 
-import {
-  checkAllValidations,
-  getValidationsForFeature
-} from '@/config/RequirementsRegistry';
-
 import { logger } from '@/lib/logging';
 
 // Compatibility alias
@@ -128,66 +123,22 @@ export function resolveFeatures(
 
 /**
  * Verifica qué features están bloqueadas por validations
+ * @deprecated - Use new Achievements system with blocksAction instead
  */
 export function checkFeatureValidations(
   features: FeatureId[],
   userProfile: any,
   systemConfig: any
 ): ValidationCheckResult {
-  const blockedFeatures: FeatureId[] = [];
-  const failedValidations: string[] = [];
-  const errorMessages: Array<{ field: string; message: string; redirectTo: string }> = [];
-
-  // Verificar cada feature
-  features.forEach(featureId => {
-    const validations = getValidationsForFeature(featureId);
-
-    if (validations.length === 0) {
-      // Sin validaciones, feature no bloqueada
-      return;
-    }
-
-    // Verificar cada validación de esta feature
-    validations.forEach(validation => {
-      const isValid = validation.validator(
-        validation.field.includes('business') ||
-        validation.field.includes('tax') ||
-        validation.field.includes('website') ||
-        validation.field.includes('mobile') ||
-        validation.field.includes('license')
-          ? userProfile
-          : systemConfig
-      );
-
-      if (!isValid) {
-        // Validación falló
-        if (!blockedFeatures.includes(featureId)) {
-          blockedFeatures.push(featureId);
-        }
-
-        if (!failedValidations.includes(validation.id)) {
-          failedValidations.push(validation.id);
-          errorMessages.push({
-            field: validation.field,
-            message: validation.message,
-            redirectTo: validation.redirectTo
-          });
-        }
-      }
-    });
-  });
-
-  logger.info('FeatureEngine', '🔒 Validation check complete:', {
-    totalFeatures: features.length,
-    blockedFeatures: blockedFeatures.length,
-    failedValidations: failedValidations.length
-  });
+  // DEPRECATED: Old blocksFeatures system removed
+  // Use new Achievements system with ModuleRegistry hooks
+  logger.warn('FeatureEngine', '⚠️ checkFeatureValidations is deprecated - use Achievements system');
 
   return {
-    valid: blockedFeatures.length === 0,
-    blockedFeatures,
-    failedValidations,
-    errorMessages
+    valid: true,
+    blockedFeatures: [],
+    failedValidations: [],
+    errorMessages: []
   };
 }
 
@@ -326,6 +277,7 @@ export class FeatureActivationEngine {
 
   /**
    * Desbloquea feature al completar validation
+   * @deprecated - Use new Achievements system with ModuleRegistry hooks
    */
   public static unlockFeatureByValidation(
     validationId: string,
@@ -336,41 +288,12 @@ export class FeatureActivationEngine {
     unlockedFeatures: FeatureId[];
     stillBlocked: FeatureId[];
   } {
-    logger.info('FeatureEngine', '🔓 Attempting to unlock features after validation:', {
-      validationId
-    });
+    logger.warn('FeatureEngine', '⚠️ unlockFeatureByValidation is deprecated - use Achievements system');
 
-    const unlockedFeatures: FeatureId[] = [];
-    const stillBlocked: FeatureId[] = [];
-
-    // Re-verificar cada feature bloqueada
-    currentlyBlocked.forEach(featureId => {
-      const featureValidations = getValidationsForFeature(featureId);
-
-      // Verificar si todas las validaciones de esta feature ahora pasan
-      const allValid = featureValidations.every(validation =>
-        validation.validator(
-          validation.field.includes('business') ||
-          validation.field.includes('tax') ||
-          validation.field.includes('website') ||
-          validation.field.includes('mobile') ||
-          validation.field.includes('license')
-            ? userProfile
-            : systemConfig
-        )
-      );
-
-      if (allValid) {
-        unlockedFeatures.push(featureId);
-        logger.info('FeatureEngine', '✅ Feature unlocked:', { featureId });
-      } else {
-        stillBlocked.push(featureId);
-      }
-    });
-
+    // DEPRECATED: Old blocksFeatures system removed
     return {
-      unlockedFeatures,
-      stillBlocked
+      unlockedFeatures: [],
+      stillBlocked: []
     };
   }
 

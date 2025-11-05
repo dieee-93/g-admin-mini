@@ -6,9 +6,8 @@ import {
   Field,
   Flex,
   Select,
-  IconButton,
   Collapsible
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { CardWrapper, InputField  } from '@/shared/ui';
 import { PlusIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
@@ -63,7 +62,7 @@ export const SupplierFields = ({
     if (isVisible && suppliers.length === 0) {
       loadSuppliers();
     }
-  }, [isVisible]);
+  }, [isVisible, suppliers.length]);
 
   const loadSuppliers = async () => {
     setLoading(true);

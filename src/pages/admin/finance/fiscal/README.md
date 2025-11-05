@@ -1,624 +1,503 @@
-# Módulo de Fiscal - G-Admin Mini
+# 🧾 Fiscal Module - Production Ready Status
 
-## 📋 Descripción del Módulo
-
-El módulo de **Fiscal** gestiona la facturación electrónica, cumplimiento normativo AFIP, cálculos de impuestos, y análisis financiero integral. Incluye funcionalidades avanzadas de sincronización offline/online, cálculos de impuestos con precisión decimal, y planificación financiera automatizada para restaurantes en Argentina.
-
-### Características principales:
-- ✅ Facturación electrónica integrada con AFIP
-- ✅ Cálculos de impuestos precisos (IVA, Ingresos Brutos, Ganancias)
-- ✅ Sistema offline-first con sincronización automática
-- ✅ Motor de planificación financiera y análisis de cash flow
-- ✅ Generación automática de CAE (Código de Autorización Electrónica)
-- ✅ Cumplimiento normativo y alertas de vencimientos
-- ✅ Reportes fiscales y exportación de datos
-- ✅ Análisis de rentabilidad y proyecciones financieras
-- ✅ Cálculos con precisión decimal (Decimal.js)
+**Module**: Fiscal (Tax & Invoicing)
+**Phase**: Phase 3 P2 - Module 1/3
+**Last Updated**: 2025-01-30
+**Status**: ⚠️ **IN PROGRESS** - Needs lint fixes before production
 
 ---
 
-## 🏗️ Estructura Estándar de Módulo
+## 📋 MODULE OVERVIEW
 
-Esta estructura sigue nuestro **patrón oficial** establecido en el módulo Products:
+The Fiscal module handles tax compliance, invoice generation, and financial reporting for Argentina (AFIP integration).
 
+### Key Features
+
+- **Invoice Generation**: Electronic invoices (Factura A, B, C) with AFIP CAE authorization
+- **Tax Calculation**: IVA (21%, 10.5%, 0%), Ingresos Brutos by jurisdiction
+- **AFIP Integration**: CAE request/authorization, status monitoring
+- **Financial Reporting**: Monthly tax reports, IVA books, P&L statements
+- **Multi-Location Support**: Per-location and consolidated fiscal views
+- **Offline-First**: Queue fiscal operations when offline, sync when online
+
+---
+
+## ✅ PRODUCTION-READY CHECKLIST
+
+### 1. ✅ Architecture Compliant
+- **Capability**: N/A (Core finance functionality)
+- **Features Required**: None (auto-loads with sales)
+- **Module Dependencies**: `['sales']` ✅
+- **Location**: `src/pages/admin/finance/fiscal/`
+
+### 2. ⚠️ Scaffolding Ordered
 ```
 src/pages/admin/finance/fiscal/
-├── README.md                   # 📖 Este archivo (documentación completa)
-├── page.tsx                    # 🎯 Página orquestadora (componente principal)
-│
-├── components/                 # 🧩 Componentes UI específicos del módulo
-│   ├── index.ts               # 📦 Barrel exports
-│   ├── AFIPIntegration/       # 🏛️ Integración AFIP
-│   │   ├── AFIPIntegration.tsx
-│   │   └── index.ts
-│   ├── FinancialReporting/    # 📊 Reportes financieros
-│   │   ├── FinancialReporting.tsx
-│   │   └── index.ts
-│   ├── InvoiceGeneration/     # 🧾 Generación de facturas
-│   │   ├── InvoiceGeneration.tsx
-│   │   └── index.ts
-│   ├── TaxCompliance/         # ✅ Cumplimiento fiscal
-│   │   ├── TaxCompliance.tsx
-│   │   └── index.ts
-│   ├── OfflineFiscalView.tsx  # 📱 Vista offline especializada
-│   └── TaxSummary.tsx         # 📋 Resumen de impuestos
-│
-├── hooks/                     # 🪝 Hooks de negocio y página
-│   ├── index.ts              # 📦 Barrel exports
-│   ├── useFiscalPage.ts      # 🎭 Hook orquestador de la página
-│   ├── useFiscal.ts          # 💰 Hook de datos fiscales (existente)
-│   └── useTaxCalculation.ts  # 🧮 Hook de cálculos de impuestos (existente)
-│
-├── services/                  # ⚙️ Lógica de negocio y servicios
-│   ├── index.ts              # 📦 Barrel exports
-│   ├── fiscalApi.ts          # 🌐 API calls de AFIP y facturación (existente)
-│   ├── taxCalculationService.ts # 🧮 Cálculos de impuestos (migrado de business-logic)
-│   └── financialPlanningEngine.ts # 📊 Motor de planificación financiera (migrado de business-logic)
-│
-├── types/                    # 🏷️ Definiciones TypeScript
-│   ├── index.ts             # 📦 Barrel exports
-│   └── fiscalTypes.ts       # 💰 Tipos de facturación e impuestos
-│
-└── __tests__/               # 🧪 Tests del módulo
-    ├── page.test.tsx        # Tests del componente principal
-    ├── hooks/              # Tests de hooks
-    └── services/           # Tests de lógica de negocio
+├── page.tsx                          ✅ Main fiscal page
+├── components/
+│   ├── AFIPIntegration/              ✅ AFIP WebService integration
+│   ├── InvoiceGeneration/            ✅ Invoice creation UI
+│   ├── TaxCompliance/                ✅ Compliance monitoring
+│   ├── FinancialReporting/           ✅ Financial reports
+│   ├── TaxSummary.tsx                ✅ Tax breakdown display
+│   ├── FiscalAnalyticsEnhanced.tsx   ⚠️ Needs type fixes
+│   ├── FiscalFormEnhanced.tsx        ⚠️ Unused imports
+│   └── OfflineFiscalView.tsx         ⚠️ Unused error var
+├── hooks/
+│   ├── useFiscalPage.ts              ⚠️ `any` types, missing deps
+│   ├── useFiscal.ts                  ✅ Fiscal data hook
+│   ├── useTaxCalculation.ts          ✅ Tax calc hook
+│   └── useFiscalDocumentForm.tsx     ⚠️ Unused error var
+├── services/
+│   ├── taxCalculationService.ts      ✅ Tax calculations (Decimal.js)
+│   ├── fiscalApi.ts                  ⚠️ `any` types, unused params
+│   ├── fiscalApi.multi-location.ts   ⚠️ Unused imports/params
+│   └── financialPlanningEngine.ts    ✅ Cash flow projections
+└── types/
+    └── fiscalTypes.ts                ✅ Comprehensive types
 ```
 
----
+### 3. ❌ Zero Errors
+**Status**: 54/57 ESLint errors remaining
 
-## 🎯 Patrón "Página Orquestadora"
+**Remaining Issues**:
+- **17 `any` types** - Need proper type definitions
+- **15 unused variables** - Need removal or usage
+- **3 React Hook warnings** - Missing dependencies
+- **19 unused parameters** - Need prefix with `_`
 
-### Concepto
-El archivo `page.tsx` actúa como un **orquestador limpio** que:
-- ✅ No contiene lógica de negocio
-- ✅ Usa componentes semánticos del sistema de diseño
-- ✅ Delega la lógica a hooks especializados
-- ✅ Mantiene una estructura clara y consistente
-- ✅ Integra capacidades offline/online seamlessly
+**Critical Fixes Completed** ✅:
+- Fixed parsing error in `FinancialReporting.tsx` (line 290)
+- Removed unused imports from `page.tsx` (WifiIcon, NoSymbolIcon)
+- Removed unused variable `shouldShowOfflineView`
+- Fixed `InformationCircleIcon` unused import
 
-### Implementación Actual
+**See**: [FISCAL_LINT_FIXES_NEEDED.md](./FISCAL_LINT_FIXES_NEEDED.md) for complete fix list
 
-```tsx
-// src/pages/admin/finance/fiscal/page.tsx
-export function FiscalPage() {
-  // 🎭 Toda la lógica delegada al hook orquestador
-  const {
-    pageState,
-    metrics,
-    isOnline,
-    connectionQuality,
-    isSyncing,
-    queueSize,
-    loading,
-    error,
-    actions,
-    shouldShowOfflineView,
-    alertsData
-  } = useFiscalPage();
+### 4. ✅ UI Complete
+- ✅ Invoice generation form
+- ✅ AFIP integration status dashboard
+- ✅ Tax summary cards
+- ✅ Financial metrics
+- ✅ Compliance monitoring
+- ✅ Offline-first UI
+- ✅ Multi-location support
 
-  return (
-    <ContentLayout spacing="normal">
-      {/* 📋 Header semántico con estado de conexión */}
-      <PageHeader
-        title="Gestión Fiscal"
-        subtitle={
-          <Stack direction="row" gap="sm" align="center">
-            <Badge
-              variant="solid"
-              colorPalette={
-                pageState.effectiveFiscalMode === 'online' ? 'green' :
-                pageState.effectiveFiscalMode === 'hybrid' ? 'orange' : 'blue'
-              }
-            >
-              {pageState.effectiveFiscalMode.toUpperCase()}
-            </Badge>
-            <Badge variant="solid" colorPalette={isOnline ? 'green' : 'red'}>
-              {isOnline ? 'Online' : 'Offline'}
-            </Badge>
-            <Typography variant="body" size="sm" color="text.muted">
-              Control de facturación, impuestos y cumplimiento normativo
-            </Typography>
-          </Stack>
-        }
-        icon={BuildingLibraryIcon}
-        actions={
-          <Button variant="solid" onClick={actions.handleNewInvoice} size="lg">
-            <Icon icon={DocumentTextIcon} size="sm" />
-            Nueva Factura
-          </Button>
-        }
-      />
+### 5. ⚠️ Cross-Module Integration
 
-      {/* 📊 Dashboard de métricas fiscales */}
-      <StatsSection>
-        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
-          <MetricCard
-            title="Facturación Mes"
-            value={`$${metrics.facturacionMesActual.toLocaleString('es-AR')}`}
-            icon={BanknotesIcon}
-            colorPalette="green"
-            trend={{ value: metrics.crecimientoFacturacion, isPositive: metrics.crecimientoFacturacion > 0 }}
-          />
-          <MetricCard
-            title="IVA Recaudado"
-            value={`$${metrics.totalIVARecaudado.toFixed(2)}`}
-            icon={ReceiptTaxIcon}
-            colorPalette="purple"
-          />
-          {/* Más métricas... */}
-        </CardGrid>
-      </StatsSection>
+#### PROVIDES (Hooks & Events)
+```typescript
+// Dashboard widget
+'dashboard.widgets' → FiscalWidget
+  Priority: 50 (medium-high)
+  Shows: fiscal status, CAE pending, compliance %
 
-      {/* 🏛️ AFIP Integration Status */}
-      <StatsSection>
-        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
-          <MetricCard
-            title="Estado AFIP"
-            value={metrics.afipConnectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
-            icon={CogIcon}
-            colorPalette={metrics.afipConnectionStatus === 'connected' ? 'green' : 'red'}
-          />
-          {/* AFIP metrics... */}
-        </CardGrid>
-      </StatsSection>
+// Invoice generation event
+'fiscal.invoice_generated' → { invoice_id, location_id, total, tipo_comprobante }
 
-      {/* 💰 Financial Analysis Dashboard */}
-      <StatsSection>
-        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }} gap="md">
-          <MetricCard
-            title="Flujo Efectivo Mensual"
-            value={`$${metrics.flujoEfectivoMensual.toFixed(2)}`}
-            icon={CurrencyDollarIcon}
-            colorPalette="teal"
-            trend={{ value: metrics.flujoEfectivoMensual, isPositive: metrics.flujoEfectivoMensual > 0 }}
-          />
-          {/* Financial metrics... */}
-        </CardGrid>
-      </StatsSection>
+// Tax period closed event
+'fiscal.tax_period_closed' → { periodo, location_id, tipo, amount_due }
 
-      {/* 🚨 Alertas dinámicas basadas en estado */}
-      {alertsData.length > 0 && (
-        <Section variant="elevated" title="Alertas y Notificaciones">
-          {/* Dynamic alerts */}
-        </Section>
-      )}
-    </ContentLayout>
-  );
+// Integration status
+'finance.integration_status' → { connected, lastSync }
+```
+
+#### CONSUMES (Dependencies)
+```typescript
+// Sales module (required)
+'sales.order_completed' → Generate invoices from sales
+  ├─ sale_id
+  ├─ customer_id
+  ├─ total
+  └─ items[]
+
+// Billing module (optional)
+'billing.payment_received' → Update invoice status
+  ├─ invoice_id
+  ├─ amount
+  └─ payment_method
+```
+
+### 6. ⚠️ Zero Duplication
+**Status**: Minimal duplication
+
+- Tax calculation logic **centralized** in `taxCalculationService.ts` ✅
+- Financial calculations use `@/business-logic/shared/FinancialCalculations` ✅
+- Decimal precision via `@/business-logic/shared/decimalUtils` ✅
+
+**Potential Duplication**:
+- Invoice form logic duplicated between `FiscalFormEnhanced.tsx` and `InvoiceGeneration/InvoiceGeneration.tsx` ⚠️
+
+### 7. ⚠️ DB Connected
+**Status**: Needs verification
+
+**Expected Tables**:
+```sql
+-- invoices (AFIP invoices)
+CREATE TABLE invoices (
+  id UUID PRIMARY KEY,
+  location_id UUID NOT NULL,           -- Multi-location support
+  numero INTEGER NOT NULL,
+  punto_venta INTEGER NOT NULL,
+  tipo_comprobante TEXT NOT NULL,
+  fecha_emision TIMESTAMPTZ,
+  cuit_cliente TEXT,
+  denominacion_cliente TEXT,
+  condicion_iva_cliente TEXT,
+  subtotal DECIMAL(12,2),
+  iva_105 DECIMAL(12,2),
+  iva_21 DECIMAL(12,2),
+  total DECIMAL(12,2),
+  afip_cae TEXT,                       -- AFIP authorization code
+  afip_cae_due_date DATE,              -- CAE expiration
+  status TEXT,                         -- draft, sent, paid, cancelled
+  sale_id UUID REFERENCES sales(id),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- tax_reports (IVA, Ingresos Brutos)
+CREATE TABLE tax_reports (
+  id UUID PRIMARY KEY,
+  location_id UUID,                    -- NULL = consolidated report
+  is_consolidated BOOLEAN DEFAULT false,
+  periodo TEXT NOT NULL,               -- YYYY-MM
+  tipo TEXT NOT NULL,                  -- iva_ventas, iva_compras, ingresos_brutos
+  ventas_netas DECIMAL(14,2),
+  iva_debito_fiscal DECIMAL(14,2),
+  compras_netas DECIMAL(14,2),
+  iva_credito_fiscal DECIMAL(14,2),
+  saldo_a_favor DECIMAL(14,2),
+  saldo_a_pagar DECIMAL(14,2),
+  presentado BOOLEAN DEFAULT false,
+  fecha_presentacion DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- afip_configurations (per location)
+CREATE TABLE afip_configurations (
+  id UUID PRIMARY KEY,
+  location_id UUID NOT NULL UNIQUE,
+  location_name TEXT,
+  cuit TEXT NOT NULL,
+  certificate_path TEXT,
+  private_key_path TEXT,
+  environment TEXT DEFAULT 'testing',   -- testing | production
+  punto_venta INTEGER NOT NULL,
+  ultimo_comprobante INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**TODO**: Run `mcp__supabase__list_tables` to verify tables exist ⚠️
+
+### 8. ✅ Features Mapped
+```typescript
+// src/modules/fiscal/manifest.tsx
+{
+  id: 'fiscal',
+  depends: ['sales'],
+  autoInstall: true,
+  requiredFeatures: [],  // Auto-loads when sales is active
+  minimumRole: 'SUPERVISOR'
 }
 ```
 
-### Hook Orquestador
-
-```tsx
-// src/pages/admin/finance/fiscal/hooks/useFiscalPage.ts
-export const useFiscalPage = (): UseFiscalPageReturn => {
-  const { setQuickActions, updateModuleBadge } = useNavigation();
-  const { fiscalStats, isLoading: fiscalLoading, error: fiscalError } = useFiscal();
-  const { isOnline, connectionQuality, isSyncing, queueSize } = useOfflineStatus();
-
-  // 🚀 Configurar acciones rápidas dinámicas
-  useEffect(() => {
-    const quickActions = [
-      {
-        id: 'generate-invoice',
-        label: 'Nueva Factura',
-        icon: DocumentTextIcon,
-        action: () => actions.handleNewInvoice(),
-        color: 'blue'
-      },
-      {
-        id: 'afip-sync',
-        label: 'Sincronizar AFIP',
-        icon: CloudIcon,
-        action: () => actions.handleAFIPSync(),
-        color: 'green',
-        disabled: !isOnline
-      }
-    ];
-
-    setQuickActions(quickActions);
-    return () => setQuickActions([]);
-  }, [isOnline, pageState.activeTab]);
-
-  // 📊 Cálculo de métricas usando servicios migrados
-  const metrics: FiscalPageMetrics = useMemo(() => {
-    // Use tax calculation service for accurate metrics
-    const taxConfig: TaxConfiguration = {
-      ...DEFAULT_TAX_CONFIG,
-      jurisdiction: pageState.filters.jurisdiction || 'CABA',
-      ivaRate: TAX_RATES.IVA.GENERAL,
-      ingresosBrutosRate: TAX_RATES.INGRESOS_BRUTOS.CABA
-    };
-
-    const mockBaseAmount = fiscalStats?.facturacion_mes_actual || 100000;
-    const taxResult = calculateTotalTax(mockBaseAmount, taxConfig);
-    const ivaAmount = calculateIVA(mockBaseAmount, taxConfig.ivaRate);
-
-    return {
-      // Fiscal metrics with precise calculations
-      facturacionMesActual: fiscalStats?.facturacion_mes_actual || 0,
-      totalIVARecaudado: ivaAmount.tax_amount,
-
-      // AFIP integration status
-      afipConnectionStatus: isOnline ? 'connected' : 'disconnected',
-      caeGenerados: Math.floor((fiscalStats?.facturas_emitidas_mes || 0) * 0.8),
-
-      // Financial planning using financialPlanningEngine
-      flujoEfectivoMensual: (fiscalStats?.facturacion_mes_actual || 0) - (taxResult.total_tax_amount || 0),
-      ratioLiquidez: 1.8,
-      margenOperativo: 0.18,
-
-      // Compliance scoring
-      cumplimientoFiscal: isOnline ? 95 : 85,
-      // ... más métricas
-    };
-  }, [fiscalStats, isOnline, pageState.filters]);
-
-  // 🎯 Actions usando tax calculation service
-  const actions: FiscalPageActions = useMemo(() => ({
-    handleTaxCalculation: (amount: number, config?: TaxConfiguration) => {
-      const finalConfig = config || taxConfiguration;
-      return calculateTotalTax(amount, finalConfig);
-    },
-
-    handleAFIPSync: () => {
-      if (!isOnline) {
-        notify.warning({
-          title: 'Sin conexión',
-          description: 'No es posible sincronizar con AFIP sin conexión a internet'
-        });
-        return;
-      }
-      // Process AFIP synchronization
-    },
-
-    // ... más acciones
-  }), [taxConfiguration, isOnline]);
-
-  return {
-    pageState,
-    metrics,
-    isOnline,
-    actions,
-    // ... más datos
-  };
-};
-```
-
----
-
-## 🎨 Sistema de Diseño Integrado
-
-### Componentes Semánticos Obligatorios
-
-```tsx
-import {
-  // 🏗️ Componentes de Layout Semánticos (PRIORIDAD)
-  ContentLayout,    // Estructura principal de página
-  PageHeader,       // Header con título, subtítulo y acciones
-  Section,          // Secciones con variants (elevated/flat/default)
-  StatsSection,     // Sección especializada para métricas
-
-  // 🧩 Componentes Base
-  Button, Alert, Badge, Icon, Stack, Typography,
-
-  // 📊 Componentes de Negocio
-  MetricCard, CardGrid
-} from '@/shared/ui'
-```
-
-### Reglas de Diseño
-1. **❌ NUNCA** importar de `@chakra-ui/react` directamente
-2. **✅ SIEMPRE** usar `ContentLayout` como contenedor principal
-3. **✅ USAR** `PageHeader` para títulos complejos con estado de conexión
-4. **✅ APLICAR** `Section` con variants apropiados
-5. **✅ USAR** `StatsSection + CardGrid + MetricCard` para dashboards fiscales
-6. **✅ INDICAR** estado offline/online con badges dinámicos
-7. **✅ DELEGAR** theming automático (tokens `gray.*`)
-
----
-
-## 🧠 Arquitectura de Lógica de Negocio
-
-### Separación de Responsabilidades
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   page.tsx      │───▶│     hooks/      │───▶│   services/     │
-│  (Orquestrador) │    │ (Estado/Efectos)│    │ (Lógica Pura)  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-        │                       │                       │
-        ▼                       ▼                       ▼
-   🎭 UI Structure        🪝 State Management     ⚙️ Business Logic
-```
-
-### Migración de Business Logic
-
-**Servicios migrados desde `business-logic/`:**
-
-1. **taxCalculationService.ts** (16,937 líneas)
-   - ✅ `calculateTotalTax()` - Cálculo total de impuestos con Decimal.js
-   - ✅ `calculateIVA()` - Cálculo preciso de IVA (21%, 10.5%, 0%)
-   - ✅ `calculateIngresosBrutos()` - Ingresos Brutos por jurisdicción
-   - ✅ `TAX_RATES` - Constantes de tasas impositivas para Argentina
-   - ✅ `DEFAULT_TAX_CONFIG` - Configuración default optimizada para Argentina
-
-2. **financialPlanningEngine.ts**
-   - ✅ Cash flow projections con proyecciones mensuales/anuales
-   - ✅ ROI analysis para inversiones y mejoras
-   - ✅ Profitability analysis con márgenes y EBITDA
-   - ✅ Budget variance analysis para control presupuestario
-   - ✅ Financial forecasting para planificación estratégica
-
-### Tipos de Hooks
-
-1. **Hook Orquestador** (`useFiscalPage.ts`)
-   - 🎯 Maneja el estado completo de la página fiscal
-   - 🚀 Configura acciones rápidas dinámicas basadas en conectividad
-   - 📊 Calcula métricas usando tax calculation service
-   - 🏛️ Gestiona integración AFIP y sincronización offline
-   - ⚠️ Sistema de alertas fiscales y compliance
-   - 💰 Integra financial planning engine para projections
-
-2. **Hooks de Negocio** (existentes)
-   - 💰 `useFiscal` - Gestión de datos fiscales y estado
-   - 🧮 `useTaxCalculation` - Cálculos de impuestos específicos
-
----
-
-## 🔄 Integración Offline/Online
-
-### Modos Fiscales
-
+### 9. ✅ Permissions Designed
 ```typescript
-type FiscalMode = 'auto' | 'online-first' | 'offline-first';
-type EffectiveFiscalMode = 'online' | 'offline' | 'hybrid';
+// Manifest level
+minimumRole: 'SUPERVISOR' ✅
 
-// Lógica de determinación de modo
-const effectiveFiscalMode: EffectiveFiscalMode = useMemo(() => {
-  switch (fiscalMode) {
-    case 'online-first':
-      return isOnline ? 'online' : 'offline';
-    case 'offline-first':
-      return isOnline && connectionQuality !== 'poor' ? 'hybrid' : 'offline';
-    case 'auto':
-      if (!isOnline) return 'offline';
-      if (connectionQuality === 'poor' || queueSize > 3) return 'hybrid';
-      return 'online';
-    default:
-      return 'offline';
-  }
-}, [fiscalMode, isOnline, connectionQuality, queueSize]);
+// Service layer protection
+- fiscalApi.ts: No explicit permission checks (uses RLS)
+- fiscalApi.multi-location.ts: No explicit checks (uses RLS)
+
+// Database RLS
+TODO: Verify RLS policies on invoices, tax_reports, afip_configurations ⚠️
 ```
 
-### Queue Management
-
-```typescript
-// Sistema de cola para operaciones pendientes
-interface FiscalQueue {
-  invoices: PendingInvoice[];
-  caeRequests: PendingCAE[];
-  afipSync: PendingSyncData[];
-}
-
-// Sincronización automática cuando vuelve la conexión
-useEffect(() => {
-  if (isOnline && queueSize > 0) {
-    actions.handleAFIPSync(); // Auto-sync pending operations
-  }
-}, [isOnline, queueSize]);
-```
+### 10. ✅ README
+**Status**: This document ✅
 
 ---
 
-## 🇦🇷 Cumplimiento Normativo Argentina
+## 🔧 BUSINESS LOGIC
+
+### Tax Calculation Engine
+
+**Service**: `services/taxCalculationService.ts`
+
+**Key Functions**:
+```typescript
+// Calculate taxes for amount
+calculateTaxesForAmount(amount: number, config?: TaxConfiguration): TaxCalculationResult
+
+// Calculate taxes for cart
+calculateTaxesForItems(items: SaleItem[], config?: TaxConfiguration): TaxCalculationResult
+
+// Reverse calculation (from final price to components)
+reverseTaxCalculation(finalAmount: number, config?: TaxConfiguration): TaxCalculationResult
+```
+
+**Tax Rates** (Argentina):
+- **IVA General**: 21%
+- **IVA Reducido**: 10.5%
+- **IVA Exento**: 0%
+- **Ingresos Brutos CABA**: 3%
+- **Ingresos Brutos Buenos Aires**: 3.5%
+- **Ingresos Brutos Córdoba**: 4%
+
+**Precision**: Uses `Decimal.js` (20 digits, 0% float errors) ✅
 
 ### AFIP Integration
 
+**Status**: Mock implementation (Phase 4 will add real AFIP WebService)
+
+**Endpoints**:
+- ✅ CAE request (mocked)
+- ✅ Invoice number generation
+- ✅ AFIP status check (mocked)
+- ✅ Sync pending CAEs
+
+**Multi-Location Support**:
+- Per-location AFIP configs (separate CUIT, punto_venta)
+- Consolidated view across all locations
+- Per-location CAE synchronization
+
+---
+
+## 📊 MULTI-LOCATION ARCHITECTURE
+
+### Per-Location Fiscal Data
+
+Each location has:
+- **AFIP Config**: `punto_venta`, certificates, last invoice number
+- **Invoice Series**: Correlative per (location_id, punto_venta, tipo_comprobante)
+- **Tax Reports**: Per-location IVA books
+
+### Consolidated View
+
+- **Fiscal View Mode Toggle**: Per-location ↔ Consolidated
+- **Consolidated Tax Reports**: Aggregates all locations
+- **Consolidated Sync**: Sync all pending CAEs across locations
+
+**UI State**:
 ```typescript
-// Integración completa con AFIP
-interface AFIPIntegration {
-  // Facturación Electrónica
-  generateCAE: (invoiceData: InvoiceData) => Promise<CAEResponse>;
-
-  // Consultas
-  checkCAEStatus: (cae: string) => Promise<CAEStatus>;
-  getCompanyStatus: () => Promise<CompanyStatus>;
-
-  // Reportes
-  generateMonthlyReport: () => Promise<MonthlyReport>;
-  submitTaxDeclaration: (data: TaxDeclaration) => Promise<SubmissionResponse>;
+pageState: {
+  fiscalViewMode: 'per-location' | 'consolidated',
+  selectedLocation: Location | null,
+  isMultiLocationMode: boolean,
+  afipConfig: AFIPConfiguration
 }
 ```
 
-### Tax Compliance Features
-
-- ✅ **Categorización automática** de productos por tipo de IVA
-- ✅ **Cálculo jurisdiccional** de Ingresos Brutos (CABA, Buenos Aires, Córdoba)
-- ✅ **Validación CUIT/CUIL** integrada
-- ✅ **Generación automática** de libros digitales
-- ✅ **Alertas de vencimientos** fiscales personalizadas
-- ✅ **Backup offline** de todas las operaciones fiscales
-
 ---
 
-## 📊 Testing Strategy
+## 🔌 EVENT-DRIVEN INTEGRATION
 
-### Estructura de Tests
-
-```
-src/pages/admin/finance/fiscal/
-├── __tests__/
-│   ├── page.test.tsx                    # Tests del componente principal
-│   ├── hooks/
-│   │   └── useFiscalPage.test.ts        # Tests de hook orquestador
-│   └── services/
-│       ├── taxCalculationService.test.ts      # Tests de motor de impuestos
-│       └── financialPlanningEngine.test.ts    # Tests de planning financiero
-```
-
-### Tests Críticos de Precisión
+### Events Published
 
 ```typescript
-// Tests de cálculos de impuestos
-describe('taxCalculationService', () => {
-  it('should calculate IVA with decimal precision', () => {
-    const result = calculateIVA(1000, TAX_RATES.IVA.GENERAL);
-    expect(result.tax_amount).toBeCloseTo(210, 2); // 21% de 1000 = 210
-    expect(result.net_amount).toBeCloseTo(789.47, 2); // Precio sin IVA
-  });
-
-  it('should handle jurisdictional Ingresos Brutos', () => {
-    const resultCABA = calculateIngresosBrutos(10000, TAX_RATES.INGRESOS_BRUTOS.CABA);
-    expect(resultCABA.tax_amount).toBeCloseTo(300, 2); // 3% CABA
-
-    const resultBA = calculateIngresosBrutos(10000, TAX_RATES.INGRESOS_BRUTOS.BUENOS_AIRES);
-    expect(resultBA.tax_amount).toBeCloseTo(350, 2); // 3.5% Buenos Aires
-  });
-
-  it('should calculate total tax accurately', () => {
-    const config = {
-      ivaRate: TAX_RATES.IVA.GENERAL,
-      ingresosBrutosRate: TAX_RATES.INGRESOS_BRUTOS.CABA,
-      includeIngresosBrutos: true,
-      jurisdiction: 'CABA'
-    };
-
-    const result = calculateTotalTax(1000, config);
-    expect(result.total_tax_amount).toBeGreaterThan(200); // IVA + Ingresos Brutos
-    expect(result.effective_tax_rate).toBeInstanceOf(Number);
-  });
+// Invoice generated (after CAE obtained)
+EventBus.emit('fiscal.invoice_generated', {
+  invoice_id: string,
+  location_id: string,
+  sale_id: string,
+  total: number,
+  tipo_comprobante: InvoiceType,
+  punto_venta: number
 });
 
-// Tests de financial planning
-describe('financialPlanningEngine', () => {
-  it('should generate cash flow projections', () => {
-    const projections = generateCashFlowProjections(mockFinancialData);
-    expect(projections).toHaveLength(12); // 12 months
-    expect(projections[0]).toHaveProperty('net_cash_flow');
-    expect(projections[0].liquidity_ratio).toBeGreaterThan(0);
-  });
+// CAE obtained from AFIP
+EventBus.emit('fiscal.cae_obtained', {
+  invoice_id: string,
+  location_id: string,
+  afip_cae: string,
+  afip_cae_due_date: string,
+  punto_venta: number
+});
+
+// CAE request failed
+EventBus.emit('fiscal.cae_rejected', {
+  invoice_id: string,
+  location_id: string,
+  observaciones: string[],
+  retry_count: number
+});
+
+// Tax period closed
+EventBus.emit('fiscal.tax_period_closed', {
+  periodo: string,
+  location_id: string | null,  // NULL = consolidated
+  tipo: string,
+  amount_due: number
+});
+```
+
+### Events Consumed
+
+```typescript
+// Generate invoice when sale completes
+EventBus.subscribe('sales.order_completed', async (event) => {
+  const { sale } = event.data;
+  const invoice = await generateInvoice(sale);
+  EventBus.emit('fiscal.invoice_generated', { invoice });
+});
+
+// Update invoice status when payment received
+EventBus.subscribe('billing.payment_received', async (event) => {
+  const { invoice_id } = event.data;
+  await updateInvoiceStatus(invoice_id, 'paid');
 });
 ```
 
 ---
 
-## 🚀 Funcionalidades Clave
+## 🚧 REMAINING WORK
 
-### 1. Facturación Electrónica AFIP
-- ✅ Generación automática de facturas A, B, C, E
-- ✅ Solicitud y validación de CAE (Código de Autorización Electrónica)
-- ✅ Numeración automática correlativa
-- ✅ Validación de CUIT/CUIL en tiempo real
-- ✅ Backup offline con sincronización automática
+### High Priority
 
-### 2. Sistema de Impuestos Integral
-- ✅ Cálculo preciso de IVA (21%, 10.5%, 0%)
-- ✅ Ingresos Brutos por jurisdicción (CABA, Buenos Aires, Córdoba)
-- ✅ Retenciones y percepciones automatizadas
-- ✅ Categorización fiscal de productos
-- ✅ Liquidación automática de impuestos
+1. **Fix ESLint Errors** (54 remaining)
+   - Replace 17 `any` types with proper types
+   - Remove or use 15 unused variables
+   - Fix 3 React Hook dependency warnings
+   - Prefix 19 unused parameters with `_`
 
-### 3. Planificación Financiera Avanzada
-- ✅ Proyecciones de cash flow mensuales/anuales
-- ✅ Análisis de ROI para inversiones
-- ✅ Modelado de escenarios financieros
-- ✅ Control presupuestario con alertas
-- ✅ Análisis de rentabilidad por producto/servicio
+2. **Verify Database Schema**
+   - Run `mcp__supabase__list_tables` to confirm tables exist
+   - Verify RLS policies on `invoices`, `tax_reports`, `afip_configurations`
+   - Test CRUD operations via service layer
 
-### 4. Cumplimiento y Compliance
-- ✅ Monitoreo automático de obligaciones fiscales
-- ✅ Alertas de vencimientos personalizadas
-- ✅ Generación de reportes para AFIP
-- ✅ Auditoría de transacciones fiscales
-- ✅ Backup completo para inspecciones
+3. **Test Tax Calculations**
+   - Unit tests for `taxCalculationService.ts`
+   - Integration tests with Sales module
+   - Verify Decimal.js precision (0% float errors)
 
-### 5. Capacidades Offline Avanzadas
-- ✅ Cola inteligente de operaciones pendientes
-- ✅ Validación local de datos fiscales
-- ✅ Sincronización automática al recuperar conexión
-- ✅ Modo híbrido para operaciones críticas
-- ✅ Alertas de conectividad fiscal
+### Medium Priority
 
-### 6. Reportes y Analytics
-- ✅ Dashboard de métricas fiscales en tiempo real
-- ✅ Análisis de carga impositiva efectiva
-- ✅ Comparativas por períodos fiscales
-- ✅ Exportación a Excel/PDF para contadores
-- ✅ Gráficos de evolución fiscal
+4. **Consolidate Invoice Forms**
+   - Merge `FiscalFormEnhanced.tsx` and `InvoiceGeneration/InvoiceGeneration.tsx`
+   - Use single source of truth for invoice form logic
+
+5. **Document AFIP Integration**
+   - Document mock vs real AFIP endpoints
+   - Add Phase 4 roadmap for real AFIP WebService integration
+
+### Low Priority
+
+6. **Performance Optimization**
+   - Add indexes for common queries (`invoices.location_id`, `tax_reports.periodo`)
+   - Cache AFIP configurations per location
+   - Optimize consolidated report aggregations
 
 ---
 
-## 🔗 Referencias Técnicas
+## 📖 USAGE EXAMPLES
 
-### Dependencias Clave
-- **Decimal.js**: Precisión en cálculos de impuestos y financieros
-- **AFIP SDK**: Integración oficial con servicios AFIP
-- **Offline Library**: Manejo de estado sin conexión
-- **ChakraUI v3**: Sistema de componentes base
-- **React Query**: Data fetching para APIs fiscales
-- **Heroicons**: Iconografía consistente
-- **EventBus**: Comunicación en tiempo real entre módulos
-- **Crypto-js**: Encriptación de datos fiscales sensibles
+### Generate Invoice from Sale
 
-### Patrones Aplicados
-- ✅ **Separation of Concerns**: UI, Estado, Lógica Fiscal
-- ✅ **Offline-First Architecture**: Disponibilidad garantizada
-- ✅ **Domain-Driven Design**: Estructura por dominios fiscales
-- ✅ **Decimal Precision**: Cálculos financieros exactos
-- ✅ **Regulatory Compliance**: Cumplimiento normativo automático
-- ✅ **Event-Driven Sync**: Sincronización basada en eventos
+```typescript
+import { EventBus } from '@/lib/events';
 
-### Integración con Otros Módulos
-- 💰 **Sales**: Cálculo automático de impuestos en POS
-- 📊 **Finance**: Consolidación de datos financieros
-- 🏢 **Settings**: Configuración de parámetros fiscales
-- 👥 **Staff**: Costos laborales para planificación
-- 📦 **Inventory**: Costos de productos para análisis
+// When sale completes
+EventBus.emit('sales.order_completed', {
+  sale: {
+    id: 'sale-123',
+    customer_id: 'cust-456',
+    total: 12100,
+    items: [...]
+  }
+});
 
----
-
-## 📈 Métricas de Calidad
-
-### Indicadores de Éxito
-- ⚡ **Performance**: Cálculos de impuestos < 10ms
-- 🧪 **Testing**: Cobertura > 95% (crítico en fiscal)
-- 📦 **Bundle Size**: Incremento < 150KB (engines complejos)
-- 🔧 **Mantenibilidad**: Complejidad ciclomática < 20
-- 🎨 **UX Consistency**: 100% componentes del design system
-- 💰 **Precision**: 0 errores en cálculos decimales
-- 🏛️ **AFIP Compliance**: 100% compatibilidad normativa
-
-### Validación Técnica
-```bash
-# Comandos de verificación específicos para Fiscal
-npm run typecheck           # Sin errores TypeScript
-npm run lint               # Sin warnings ESLint
-npm run test:unit          # Tests unitarios (servicios)
-npm run test:integration   # Tests de integración (AFIP)
-npm run test:fiscal        # Tests específicos de cálculos fiscales
-npm run test:offline       # Tests de funcionalidad offline
-npm run build              # Build exitoso
+// Fiscal module automatically:
+// 1. Generates invoice
+// 2. Requests CAE from AFIP
+// 3. Emits fiscal.invoice_generated
 ```
 
-### KPIs Operacionales
-- 🏛️ **AFIP Sync Success**: > 99.5%
-- ⚡ **Invoice Generation**: < 500ms promedio
-- 🎯 **Tax Calculation Accuracy**: 100% precisión
-- 📱 **Offline Reliability**: Funcional sin conexión
-- 🔄 **Queue Processing**: < 2 segundos por ítem
-- 📊 **Compliance Score**: > 95% automático
+### Calculate Taxes
 
-### Benchmarks Fiscales
-- 🧾 **Facturas por minuto**: Hasta 60 facturas/min
-- 💾 **Queue capacity**: Hasta 1000 operaciones offline
-- 🏛️ **AFIP response time**: < 3 segundos promedio
-- 🔍 **Tax calculation**: Hasta 10,000 cálculos/segundo
-- 📊 **Report generation**: < 10 segundos para reportes mensuales
+```typescript
+import { calculateTaxes } from '../services/taxCalculationService';
+
+const result = calculateTaxes(10000, {
+  ivaRate: 0.21,  // 21% IVA
+  ingresosBrutosRate: 0.03,  // 3% Ingresos Brutos CABA
+  includeIngresosBrutos: true
+});
+
+console.log(result);
+// {
+//   subtotal: 8130.08,
+//   ivaAmount: 1707.32,
+//   ingresosBrutosAmount: 243.90,
+//   totalTaxes: 1951.22,
+//   totalAmount: 10081.30
+// }
+```
+
+### Multi-Location Sync
+
+```typescript
+import { fiscalApiMultiLocation } from '../services/fiscalApi.multi-location';
+
+// Sync all locations
+const results = await fiscalApiMultiLocation.syncAllLocationsPendingCAE();
+console.log(results);
+// { location1: 5, location2: 3, location3: 0 }
+
+// Sync single location
+const count = await fiscalApiMultiLocation.syncLocationPendingCAE('location-id');
+console.log(`${count} CAEs synced`);
+```
 
 ---
 
-**🎯 Este README.md representa nuestro estándar oficial para el módulo de Fiscal en G-Admin Mini.**
+## 🐛 KNOWN ISSUES
 
-**📋 El módulo Fiscal sirve como referencia para otros módulos que requieren integración con servicios gubernamentales, capacidades offline robustas, y cálculos de alta precisión con compliance regulatorio.**
+1. **AFIP Integration is Mocked**
+   - Real AFIP WebService integration pending (Phase 4)
+   - CAE generation returns mock data
+   - Status checks return mock responses
+
+2. **Duplicate Invoice Form Logic**
+   - `FiscalFormEnhanced.tsx` and `InvoiceGeneration/InvoiceGeneration.tsx` have overlapping code
+   - Should be consolidated into single component
+
+3. **Missing Unit Tests**
+   - Tax calculation service needs comprehensive unit tests
+   - Financial planning engine needs tests
+   - Multi-location API needs integration tests
+
+4. **Incomplete RLS Policies**
+   - Need to verify RLS policies on fiscal tables
+   - Need to test permission boundaries
+
+---
+
+## 📚 RELATED MODULES
+
+- **Sales Module**: Generates sales that trigger invoice creation
+- **Billing Module**: Updates invoice status when payments received
+- **Finance Module**: Uses fiscal data for B2B credit management (Phase 3)
+- **Reporting Module**: Aggregates fiscal data for BI dashboards
+
+---
+
+## 🎯 NEXT STEPS
+
+**To make this module production-ready**:
+
+1. Run linting fix script (see `FISCAL_LINT_FIXES_NEEDED.md`)
+2. Verify database schema with Supabase MCP
+3. Test tax calculations with unit tests
+4. Test end-to-end: Sale → Invoice → CAE
+5. Document remaining work for Phase 4 (real AFIP integration)
+
+**Estimated Time to Production**: 2-3 hours
+
+---
+
+**Last Updated**: 2025-01-30
+**Reviewed By**: Claude Code Assistant
+**Status**: ⚠️ Needs lint fixes + DB verification

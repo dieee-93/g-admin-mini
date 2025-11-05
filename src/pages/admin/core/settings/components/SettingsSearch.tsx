@@ -8,17 +8,13 @@ import {
   Icon,
   Badge,
   Button,
-  Separator
-} from '@/shared/ui';
-import { 
+  Separator,
   Text,
   Input,
-  InputGroup,
-  InputElement,
   Kbd,
   Portal
-} from '@chakra-ui/react';
-import { 
+} from '@/shared/ui';
+import {
   MagnifyingGlassIcon,
   XMarkIcon,
   CommandLineIcon,
@@ -123,8 +119,8 @@ export function SettingsSearch({ isOpen, onClose }: SettingsSearchProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* 📱 Header */}
-        <Box p={4} borderBottomWidth="1px" borderColor="border.muted">
-          <HStack spacing={3}>
+        <Box p="4" borderBottomWidth="1px" borderColor="border.muted">
+          <HStack gap="3">
             <Icon icon={MagnifyingGlassIcon} size="md" color="text.muted" />
             
             <Box flex={1} position="relative">
@@ -160,8 +156,8 @@ export function SettingsSearch({ isOpen, onClose }: SettingsSearchProps) {
         <Box maxH="400px" overflowY="auto">
           {/* 🔍 Resultados de búsqueda */}
           {isSearching && searchResults.length > 0 && (
-            <VStack spacing={0} align="stretch">
-              <Box p={3} bg="bg.muted">
+            <VStack gap="0" align="stretch">
+              <Box p="3" bg="bg.muted">
                 <Text fontSize="sm" color="text.muted">
                   {searchResults.length} resultado{searchResults.length !== 1 ? 's' : ''} encontrado{searchResults.length !== 1 ? 's' : ''}
                 </Text>
@@ -173,7 +169,7 @@ export function SettingsSearch({ isOpen, onClose }: SettingsSearchProps) {
                 return (
                   <Box
                     key={item.id}
-                    p={4}
+                    p="4"
                     borderBottomWidth={index < searchResults.length - 1 ? "1px" : "0"}
                     borderColor="border.muted"
                     cursor="pointer"
@@ -183,9 +179,9 @@ export function SettingsSearch({ isOpen, onClose }: SettingsSearchProps) {
                       onClose();
                     }}
                   >
-                    <HStack spacing={3} align="start">
+                    <HStack gap="3" align="start">
                       <Box
-                        p={2}
+                        p="2"
                         borderRadius="md"
                         bg={`${getSectionColor(item.section)}.50`}
                       >
@@ -196,8 +192,8 @@ export function SettingsSearch({ isOpen, onClose }: SettingsSearchProps) {
                         />
                       </Box>
                       
-                      <VStack spacing={1} align="start" flex={1}>
-                        <HStack spacing={2}>
+                      <VStack gap="1" align="start" flex={1}>
+                        <HStack gap="2">
                           <Text fontWeight="medium" fontSize="sm">
                             {item.title}
                           </Text>
@@ -221,9 +217,9 @@ export function SettingsSearch({ isOpen, onClose }: SettingsSearchProps) {
 
           {/* ❌ Sin resultados */}
           {isSearching && searchResults.length === 0 && (
-            <Box p={8} textAlign="center">
-              <Icon icon={MagnifyingGlassIcon} size="xl" color="text.muted" mb={3} />
-              <Text fontSize="md" fontWeight="medium" mb={1}>
+            <Box p="8" textAlign="center">
+              <Icon icon={MagnifyingGlassIcon} size="xl" color="text.muted" mb="3" />
+              <Text fontSize="md" fontWeight="medium" mb="1">
                 Sin resultados
               </Text>
               <Text fontSize="sm" color="text.muted">
@@ -234,15 +230,15 @@ export function SettingsSearch({ isOpen, onClose }: SettingsSearchProps) {
 
           {/* 🎯 Estado inicial - Búsquedas populares */}
           {!isSearching && (
-            <VStack spacing={4} p={6} align="stretch">
-              <HStack spacing={2}>
+            <VStack gap="4" p="6" align="stretch">
+              <HStack gap="2">
                 <Icon icon={ClockIcon} size="sm" color="text.muted" />
                 <Text fontSize="sm" fontWeight="medium" color="text.muted">
                   Búsquedas populares
                 </Text>
               </HStack>
               
-              <HStack spacing={2} flexWrap="wrap">
+              <HStack gap="2" flexWrap="wrap">
                 {popularSearches.map((search) => (
                   <Button
                     key={search}
@@ -260,7 +256,7 @@ export function SettingsSearch({ isOpen, onClose }: SettingsSearchProps) {
               <Separator />
               
               {/* 📊 Stats rápidas */}
-              <HStack spacing={4} fontSize="xs" color="text.muted">
+              <HStack gap="4" fontSize="xs" color="text.muted">
                 <Text>📋 {searchStats.totalItems} configuraciones</Text>
                 <Text>🏢 {searchStats.sectionsCount.perfil} perfil</Text>
                 <Text>💰 {searchStats.sectionsCount.fiscal} fiscal</Text>
@@ -273,22 +269,22 @@ export function SettingsSearch({ isOpen, onClose }: SettingsSearchProps) {
 
         {/* 🔧 Footer con shortcuts */}
         <Box 
-          p={3} 
+          p="3" 
           borderTopWidth="1px" 
           borderColor="border.muted"
           bg="bg.muted"
           borderBottomRadius="xl"
         >
-          <HStack spacing={4} fontSize="xs" color="text.muted">
-            <HStack spacing={1}>
+          <HStack gap="4" fontSize="xs" color="text.muted">
+            <HStack gap="1">
               <Kbd>⏎</Kbd>
               <Text>seleccionar</Text>
             </HStack>
-            <HStack spacing={1}>
+            <HStack gap="1">
               <Kbd>Esc</Kbd>
               <Text>cerrar</Text>
             </HStack>
-            <HStack spacing={1}>
+            <HStack gap="1">
               <Icon icon={CommandLineIcon} size="xs" />
               <Text>Búsqueda inteligente activa</Text>
             </HStack>

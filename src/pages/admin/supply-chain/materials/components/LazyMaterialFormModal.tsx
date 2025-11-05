@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Box, Spinner, VStack } from '@chakra-ui/react';
+import { Box, Spinner, VStack } from '@/shared/ui';
 
 // Lazy load the heavy modal component
 const MaterialFormDialog = lazy(() =>
@@ -21,10 +21,10 @@ const ModalLoadingFallback = () => (
   >
     <VStack 
       bg="white" 
-      p={8} 
+      p="8" 
       borderRadius="lg" 
       boxShadow="xl"
-      gap={4}
+      gap="4"
     >
       <Spinner size="lg" color="blue.500" />
       <Box textAlign="center" color="gray.600">

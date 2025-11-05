@@ -10,22 +10,16 @@ import {
   CardGrid,
   MetricCard,
   Typography,
-  Button,
-  Badge,
-  Alert
+  Button
 } from '@/shared/ui';
 import {
   CubeIcon,
   ChartBarIcon,
   CurrencyDollarIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
-  StarIcon,
-  ArrowPathIcon,
-  ExclamationTriangleIcon
+  ArrowTrendingUpIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
-import { AnalyticsEngine, RFMAnalytics, TrendAnalytics } from '@/shared/services/AnalyticsEngine';
-import { FinancialCalculations, QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
+import { AnalyticsEngine } from '@/shared/services/AnalyticsEngine';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 import { logger } from '@/lib/logging';
@@ -56,22 +50,29 @@ interface MenuEngineeringQuadrant {
   color: string;
 }
 
+interface CategoryBreakdownData {
+  revenue: number;
+  count: number;
+  avgMargin: number;
+}
+
 interface ProductAnalytics {
   totalProducts: number;
   averagePrice: number;
   averageCost: number;
   averageProfitMargin: number;
   totalRevenue: number;
-  categoryBreakdown: Record<string, number>;
+  categoryBreakdown: Record<string, CategoryBreakdownData>;
   menuEngineeringMatrix: MenuEngineeringQuadrant[];
   topPerformers: ProductData[];
   underperformers: ProductData[];
   profitabilityDistribution: { high: number; medium: number; low: number };
+  profitabilityAnalysis: { high: number; medium: number; low: number };
 }
 
 export function ProductAnalyticsEnhanced() {
   const [products, setProducts] = useState<ProductData[]>([]);
-  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [analyticsData, setAnalyticsData] = useState<ProductAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Mock product data (would come from API)
@@ -113,6 +114,7 @@ export function ProductAnalyticsEnhanced() {
   useEffect(() => {
     setProducts(mockProducts);
     generateProductAnalytics(mockProducts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const generateProductAnalytics = async (productData: ProductData[]) => {
@@ -334,7 +336,7 @@ export function ProductAnalyticsEnhanced() {
             title="Precio Promedio"
             value={customMetrics ? DecimalUtils.formatCurrency(customMetrics.avgPrice) : '$0'}
             subtitle="ticket promedio"
-            icon={TrendingUpIcon}
+            icon={ArrowTrendingUpIcon}
           />
           <MetricCard
             title="Productos Activos"
@@ -417,7 +419,7 @@ export function ProductAnalyticsEnhanced() {
       {analyticsData?.categoryBreakdown && (
         <Section variant="elevated" title="📈 Performance por Categoría">
           <CardGrid columns={{ base: 1, md: 3 }}>
-            {Object.entries(analyticsData.categoryBreakdown).map(([category, data]: [string, any]) => (
+            {Object.entries(analyticsData.categoryBreakdown).map(([category, data]: [string, CategoryBreakdownData]) => (
               <div key={category} style={{
                 padding: '16px',
                 border: '1px solid var(--border-subtle)',

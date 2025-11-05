@@ -5,7 +5,6 @@ import React from 'react';
 import {
   Section, Stack, Button, Icon
 } from '@/shared/ui';
-import { CapabilityGate } from '@/lib/capabilities';
 import {
   PlusIcon,
   Cog6ToothIcon,
@@ -36,7 +35,6 @@ export function SchedulingActions({
   onCopyWeek = () => {},
   onFindCoverage = () => {},
   onBulkOperations = () => {},
-  hasCapability,
   isMobile = false,
   loading = false
 }: SchedulingActionsProps) {
@@ -49,7 +47,6 @@ export function SchedulingActions({
       <Stack direction={buttonDirection} gap="md" flexWrap="wrap">
 
         {/* Acción Principal */}
-        <CapabilityGate capability="schedule_management">
           <Button
             variant="solid"
             onClick={onAddShift}
@@ -60,10 +57,8 @@ export function SchedulingActions({
             <Icon icon={PlusIcon} size="sm" />
             Nuevo Turno
           </Button>
-        </CapabilityGate>
 
         {/* Auto-Programar */}
-        <CapabilityGate capability="schedule_management">
           <Button
             variant="outline"
             onClick={onAutoSchedule}
@@ -74,7 +69,6 @@ export function SchedulingActions({
             <Icon icon={Cog6ToothIcon} size="sm" />
             Auto-Programar
           </Button>
-        </CapabilityGate>
 
         {/* Exportar Horarios */}
         <Button
@@ -107,7 +101,6 @@ export function SchedulingActions({
               Buscar Cobertura
             </Button>
 
-            <CapabilityGate capability="view_labor_costs">
               <Button
                 variant="ghost"
                 onClick={onGenerateReport}
@@ -116,7 +109,6 @@ export function SchedulingActions({
                 <Icon icon={DocumentTextIcon} size="sm" />
                 Reporte Costos
               </Button>
-            </CapabilityGate>
           </>
         )}
 
@@ -146,12 +138,10 @@ export function SchedulingActions({
                 <Icon icon={UsersIcon} size="xs" />
                 Cobertura
               </Button>
-              <CapabilityGate capability="view_labor_costs">
                 <Button size="sm" variant="ghost" onClick={onGenerateReport}>
                   <Icon icon={DocumentTextIcon} size="xs" />
                   Reporte
                 </Button>
-              </CapabilityGate>
             </Stack>
           </Section>
         </Stack>

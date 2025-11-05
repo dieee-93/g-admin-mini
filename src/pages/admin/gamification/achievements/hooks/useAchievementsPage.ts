@@ -7,7 +7,8 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { AchievementsEngine } from '../services/AchievementsEngine';
+// DEPRECATED: AchievementsEngine removed - use Module Registry system
+// import { AchievementsEngine } from '../services/AchievementsEngine';
 import { logger } from '@/lib/logging';
 import type { 
   MasteryAchievementDefinition, 

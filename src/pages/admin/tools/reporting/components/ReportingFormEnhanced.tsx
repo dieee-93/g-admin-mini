@@ -3,6 +3,7 @@ import {
   ContentLayout, FormSection, Stack, Button, Badge
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import { EyeIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -474,7 +475,7 @@ const ReportingFormEnhanced: React.FC = () => {
           {/* Submit Button */}
           <Stack direction="row" gap="md" justify="end">
             <Button variant="outline" type="button">
-              <Icon name="EyeIcon" />
+              <Icon as={EyeIcon} />
               Vista Previa
             </Button>
             <Button
@@ -482,7 +483,7 @@ const ReportingFormEnhanced: React.FC = () => {
               colorPalette="blue"
               loading={isSubmitting || (generationProgress > 0 && generationProgress < 100)}
             >
-              <Icon name="DocumentArrowDownIcon" />
+              <Icon as={DocumentArrowDownIcon} />
               {generationProgress === 100 ? 'Reporte Generado' : 'Generar Reporte'}
             </Button>
           </Stack>

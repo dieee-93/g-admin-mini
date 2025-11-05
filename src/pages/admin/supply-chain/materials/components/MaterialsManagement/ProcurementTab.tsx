@@ -18,10 +18,10 @@ export function ProcurementTab() {
   const criticalItems = materials.filter(item => item.stock < item.minStock * 0.5);
   const classAItems = materials.filter(item => item.abcClass === 'A' && item.stock <= item.minStock * 1.5);
 
-  const getPriorityLevel = (item: any) => {
-    if (item.stock < item.minStock * 0.5) return 'critical';
-    if (item.stock <= item.minStock && item.abcClass === 'A') return 'high';
-    if (item.stock <= item.minStock) return 'medium';
+  const getPriorityLevel = (item: MaterialItem & { abcClass?: string }) => {
+    if (item.stock < (item.minStock || 0) * 0.5) return 'critical';
+    if (item.stock <= (item.minStock || 0) && item.abcClass === 'A') return 'high';
+    if (item.stock <= (item.minStock || 0)) return 'medium';
     return 'low';
   };
 
@@ -34,9 +34,10 @@ export function ProcurementTab() {
     }
   };
 
-  const getRecommendedQuantity = (item: any) => {
-    const safetyStock = Math.ceil(item.minStock * 0.5);
-    const optimalStock = item.minStock * 2;
+  const getRecommendedQuantity = (item: MaterialItem) => {
+    const minStock = item.minStock || 0;
+    const safetyStock = Math.ceil(minStock * 0.5);
+    const optimalStock = minStock * 2;
     return optimalStock + safetyStock - item.stock;
   };
 

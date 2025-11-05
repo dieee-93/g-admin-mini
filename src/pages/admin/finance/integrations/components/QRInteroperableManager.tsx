@@ -3,6 +3,10 @@ import {
   ContentLayout, FormSection, Section, Stack, Button, Badge, Alert
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import {
+  ArrowPathIcon, CheckIcon, ClipboardIcon, EyeIcon, InformationCircleIcon, QrCodeIcon, SparklesIcon, XMarkIcon
+} from '@heroicons/react/24/outline';
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -54,8 +58,7 @@ interface QRCodeData {
 
 const QRInteroperableManager: React.FC = () => {
   const [generatedQRs, setGeneratedQRs] = React.useState<QRCodeData[]>([]);
-  const [selectedQR, setSelectedQR] = React.useState<QRCodeData | null>(null);
-  const [qrStats, setQrStats] = React.useState({
+  const [qrStats] = React.useState({
     totalGenerated: 45,
     activeQRs: 12,
     paymentsToday: 23,
@@ -66,7 +69,6 @@ const QRInteroperableManager: React.FC = () => {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors, isSubmitting }
   } = useForm<QRConfig>({
     resolver: zodResolver(QRConfigSchema),
@@ -239,7 +241,7 @@ const QRInteroperableManager: React.FC = () => {
             </Stack>
 
             <Alert status="info">
-              <Icon name="InformationCircleIcon" />
+              <Icon as={InformationCircleIcon} />
               QR Interoperable cumple con estándares BCRA y es compatible con todas las billeteras argentinas
             </Alert>
           </Stack>
@@ -254,7 +256,7 @@ const QRInteroperableManager: React.FC = () => {
                 colorPalette="blue"
                 disabled={!watchedValues.enableStaticQR}
               >
-                <Icon name="QrCodeIcon" />
+                <Icon as={QrCodeIcon} />
                 Generar QR Estático
               </Button>
               <Button
@@ -262,14 +264,14 @@ const QRInteroperableManager: React.FC = () => {
                 colorPalette="green"
                 disabled={!watchedValues.enableDynamicQR}
               >
-                <Icon name="SparklesIcon" />
+                <Icon as={SparklesIcon} />
                 Generar QR Dinámico
               </Button>
               <Button
                 onClick={loadMockQRs}
                 variant="outline"
               >
-                <Icon name="ArrowPathIcon" />
+                <Icon as={ArrowPathIcon} />
                 Refrescar Lista
               </Button>
             </Stack>
@@ -490,7 +492,7 @@ const QRInteroperableManager: React.FC = () => {
             {/* Submit Button */}
             <Stack direction="row" gap="md" justify="end">
               <Button variant="outline" type="button">
-                <Icon name="XMarkIcon" />
+                <Icon as={XMarkIcon} />
                 Cancelar
               </Button>
               <Button
@@ -498,7 +500,7 @@ const QRInteroperableManager: React.FC = () => {
                 colorPalette="purple"
                 loading={isSubmitting}
               >
-                <Icon name="CheckIcon" />
+                <Icon as={CheckIcon} />
                 Guardar Configuración QR
               </Button>
             </Stack>
@@ -530,7 +532,7 @@ const QRInteroperableManager: React.FC = () => {
                     justifyContent: 'center',
                     borderRadius: '4px'
                   }}>
-                    <Icon name="QrCodeIcon" color="white" size="lg" />
+                    <Icon as={QrCodeIcon} color="white" size="lg" />
                   </div>
 
                   <Stack gap="xs">
@@ -558,11 +560,11 @@ const QRInteroperableManager: React.FC = () => {
 
                 <Stack direction="row" gap="sm">
                   <Button
-                    onClick={() => setSelectedQR(qr)}
+                    onClick={() => logger.info('App', 'Viewing QR:', qr.id)}
                     variant="outline"
                     size="sm"
                   >
-                    <Icon name="EyeIcon" />
+                    <Icon as={EyeIcon} />
                     Ver QR
                   </Button>
 
@@ -571,7 +573,7 @@ const QRInteroperableManager: React.FC = () => {
                     variant="outline"
                     size="sm"
                   >
-                    <Icon name="ClipboardIcon" />
+                    <Icon as={ClipboardIcon} />
                     Copiar
                   </Button>
 
@@ -582,7 +584,7 @@ const QRInteroperableManager: React.FC = () => {
                       variant="outline"
                       size="sm"
                     >
-                      <Icon name="XMarkIcon" />
+                      <Icon as={XMarkIcon} />
                       Deshabilitar
                     </Button>
                   )}
@@ -592,7 +594,7 @@ const QRInteroperableManager: React.FC = () => {
 
             {generatedQRs.length === 0 && (
               <Alert status="info">
-                <Icon name="InformationCircleIcon" />
+                <Icon as={InformationCircleIcon} />
                 No hay códigos QR generados. Usa los botones de arriba para crear tu primer QR.
               </Alert>
             )}

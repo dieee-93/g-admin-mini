@@ -9,12 +9,9 @@ import {
   ExclamationTriangleIcon,
   BanknotesIcon,
   CalendarDaysIcon,
-  WifiIcon,
-  NoSymbolIcon,
   CloudIcon,
   CurrencyDollarIcon,
   BuildingLibraryIcon,
-  ReceiptTaxIcon,
   ArrowTrendingUpIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
@@ -31,9 +28,11 @@ export function FiscalPage() {
     loading,
     error,
     actions,
-    shouldShowOfflineView,
     alertsData
   } = useFiscalPage();
+
+  // 🆕 Destructure multi-location state
+  const { selectedLocation, isMultiLocationMode, afipConfig, fiscalViewMode } = pageState;
 
   if (loading) {
     return (
@@ -65,7 +64,22 @@ export function FiscalPage() {
       <PageHeader
         title="Gestión Fiscal"
         subtitle={
-          <Stack direction="row" gap="sm" align="center">
+          <Stack direction="row" gap="sm" align="center" flexWrap="wrap">
+            {/* 🆕 Location Badge */}
+            {selectedLocation && (
+              <Badge variant="solid" colorPalette="blue">
+                📍 {selectedLocation.name}
+              </Badge>
+            )}
+
+            {/* 🆕 PDV Badge */}
+            {afipConfig && (
+              <Badge variant="outline" colorPalette="purple">
+                PDV {String(afipConfig.punto_venta).padStart(5, '0')}
+              </Badge>
+            )}
+
+            {/* Fiscal Mode Badges */}
             <Badge
               variant="solid"
               colorPalette={
@@ -78,6 +92,14 @@ export function FiscalPage() {
             <Badge variant="solid" colorPalette={isOnline ? 'green' : 'red'}>
               {isOnline ? 'Online' : 'Offline'}
             </Badge>
+
+            {/* 🆕 Fiscal View Mode Badge (only in multi-location) */}
+            {isMultiLocationMode && (
+              <Badge variant="subtle" colorPalette="teal">
+                {fiscalViewMode === 'consolidated' ? '🌐 Consolidado' : '🏢 Por Local'}
+              </Badge>
+            )}
+
             <Typography variant="body" size="sm" color="text.muted">
               Control de facturación, impuestos y cumplimiento normativo
             </Typography>
@@ -85,10 +107,29 @@ export function FiscalPage() {
         }
         icon={BuildingLibraryIcon}
         actions={
-          <Button variant="solid" onClick={actions.handleNewInvoice} size="lg">
-            <Icon icon={DocumentTextIcon} size="sm" />
-            Nueva Factura
-          </Button>
+          <Stack direction="row" gap="sm">
+            {/* 🆕 Fiscal View Mode Toggle (only in multi-location) */}
+            {isMultiLocationMode && (
+              <Button
+                variant="outline"
+                onClick={() => actions.setFiscalViewMode(
+                  fiscalViewMode === 'per-location' ? 'consolidated' : 'per-location'
+                )}
+                size="sm"
+              >
+                {fiscalViewMode === 'consolidated' ? '🏢 Ver por Local' : '🌐 Ver Consolidado'}
+              </Button>
+            )}
+            <Button
+              variant="solid"
+              onClick={actions.handleNewInvoice}
+              size="lg"
+              disabled={isMultiLocationMode && !selectedLocation}
+            >
+              <Icon icon={DocumentTextIcon} size="sm" />
+              Nueva Factura
+            </Button>
+          </Stack>
         }
       />
 
@@ -133,7 +174,7 @@ export function FiscalPage() {
           <MetricCard
             title="IVA Recaudado"
             value={`$${metrics.totalIVARecaudado.toFixed(2)}`}
-            icon={ReceiptTaxIcon}
+            icon={DocumentTextIcon}
             colorPalette="purple"
           />
           <MetricCard
@@ -236,8 +277,6 @@ export function FiscalPage() {
             variant={pageState.fiscalMode === 'offline-first' ? 'solid' : 'outline'}
             colorPalette="blue"
             onClick={() => actions.setFiscalMode('offline-first')}
-            flex="1"
-            minW="200px"
           >
             Offline First
           </Button>
@@ -245,8 +284,6 @@ export function FiscalPage() {
             variant={pageState.fiscalMode === 'auto' ? 'solid' : 'outline'}
             colorPalette="blue"
             onClick={() => actions.setFiscalMode('auto')}
-            flex="1"
-            minW="200px"
           >
             Automático
           </Button>
@@ -254,8 +291,6 @@ export function FiscalPage() {
             variant={pageState.fiscalMode === 'online-first' ? 'solid' : 'outline'}
             colorPalette="green"
             onClick={() => actions.setFiscalMode('online-first')}
-            flex="1"
-            minW="200px"
           >
             Online First
           </Button>
@@ -268,8 +303,6 @@ export function FiscalPage() {
           <Button
             variant="outline"
             onClick={actions.handleNewInvoice}
-            flex="1"
-            minW="200px"
           >
             <Icon icon={DocumentTextIcon} size="sm" />
             Nueva Factura
@@ -277,8 +310,6 @@ export function FiscalPage() {
           <Button
             variant="outline"
             onClick={actions.handleBulkInvoicing}
-            flex="1"
-            minW="200px"
           >
             <Icon icon={DocumentTextIcon} size="sm" />
             Facturación Masiva
@@ -293,8 +324,6 @@ export function FiscalPage() {
             variant="outline"
             onClick={actions.handleAFIPSync}
             disabled={!isOnline}
-            flex="1"
-            minW="200px"
           >
             <Icon icon={CloudIcon} size="sm" />
             Sincronizar AFIP
@@ -302,8 +331,6 @@ export function FiscalPage() {
           <Button
             variant="outline"
             onClick={actions.handleAFIPStatusCheck}
-            flex="1"
-            minW="200px"
           >
             <Icon icon={CogIcon} size="sm" />
             Estado AFIP
@@ -317,8 +344,6 @@ export function FiscalPage() {
           <Button
             variant="outline"
             onClick={actions.handleComplianceCheck}
-            flex="1"
-            minW="200px"
           >
             <Icon icon={ExclamationTriangleIcon} size="sm" />
             Verificar Cumplimiento
@@ -326,8 +351,6 @@ export function FiscalPage() {
           <Button
             variant="outline"
             onClick={() => actions.handleGenerateReport('tax', 'month')}
-            flex="1"
-            minW="200px"
           >
             <Icon icon={ChartBarIcon} size="sm" />
             Reporte Fiscal
@@ -335,8 +358,6 @@ export function FiscalPage() {
           <Button
             variant="outline"
             onClick={() => actions.handleExportData('pdf')}
-            flex="1"
-            minW="200px"
           >
             <Icon icon={DocumentTextIcon} size="sm" />
             Exportar Datos
@@ -351,8 +372,6 @@ export function FiscalPage() {
             <Button
               variant="outline"
               onClick={actions.handleCashFlowAnalysis}
-              flex="1"
-              minW="200px"
             >
               <Icon icon={CurrencyDollarIcon} size="sm" />
               Análisis Flujo de Efectivo
@@ -360,8 +379,6 @@ export function FiscalPage() {
             <Button
               variant="outline"
               onClick={actions.handleProfitabilityAnalysis}
-              flex="1"
-              minW="200px"
             >
               <Icon icon={ArrowTrendingUpIcon} size="sm" />
               Análisis Rentabilidad
@@ -369,8 +386,6 @@ export function FiscalPage() {
             <Button
               variant="outline"
               onClick={actions.handleBudgetVarianceAnalysis}
-              flex="1"
-              minW="200px"
             >
               <Icon icon={ChartBarIcon} size="sm" />
               Análisis Presupuesto
@@ -385,8 +400,6 @@ export function FiscalPage() {
           <Button
             variant="outline"
             onClick={actions.toggleAnalytics}
-            flex="1"
-            minW="200px"
           >
             <Icon icon={ChartBarIcon} size="sm" />
             {pageState.showAnalytics ? 'Ocultar' : 'Ver'} Analytics
@@ -394,10 +407,8 @@ export function FiscalPage() {
           <Button
             variant="outline"
             onClick={actions.handleBulkTaxUpdate}
-            flex="1"
-            minW="200px"
           >
-            <Icon icon={ReceiptTaxIcon} size="sm" />
+            <Icon icon={DocumentTextIcon} size="sm" />
             Actualizar Impuestos
           </Button>
         </Stack>

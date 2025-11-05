@@ -85,7 +85,7 @@ export function ConnectionBadge({
           cursor="help"
           display="flex"
           alignItems="center"
-          gap={1}
+          gap="1"
         >
           {showIcon && (
             <Box display="flex" alignItems="center">

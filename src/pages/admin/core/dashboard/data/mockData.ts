@@ -415,26 +415,141 @@ export const generateMockCompetitiveData = () => {
       {
         id: 'comp_1',
         name: 'Restaurant A',
-        marketShare: 12.3,
-        avgRating: 4.2,
-        priceRange: 'medium',
-        strengths: ['Location', 'Speed'],
-        weaknesses: ['Quality', 'Variety']
+        type: 'direct' as const,
+        category: 'Italian Restaurant',
+        location: {
+          address: '123 Main St',
+          distance: 2.5,
+          zone: 'Downtown'
+        },
+        businessMetrics: {
+          estimatedRevenue: 450000,
+          marketShare: 12.3,
+          customerBase: 2500,
+          operatingHours: '11:00-23:00',
+          deliveryRadius: 5,
+          averageTicket: 28.50
+        },
+        menuAnalysis: {
+          totalItems: 45,
+          categories: ['Pasta', 'Pizza', 'Salads', 'Desserts'],
+          priceRange: { min: 8, max: 35, average: 22 },
+          uniqueItems: 12,
+          seasonalItems: 5
+        },
+        pricingIntelligence: [],
+        performance: {
+          customerRating: 4.2,
+          reviewCount: 245,
+          responseTime: 15,
+          deliveryTime: 35,
+          popularityTrend: 'stable' as const,
+          marketPosition: 'challenger' as const
+        },
+        digitalPresence: {
+          website: true,
+          socialMedia: { instagram: 5200, facebook: 8400, tiktok: 1200 },
+          onlineOrdering: true,
+          deliveryApps: ['Uber Eats', 'DoorDash'],
+          marketingBudget: 25000
+        },
+        analysis: {
+          strengths: ['Location', 'Speed', 'Delivery'],
+          weaknesses: ['Quality', 'Variety', 'Ambiance'],
+          opportunities: ['Catering', 'Premium offerings'],
+          threats: ['New competitors', 'Rising costs']
+        },
+        lastUpdated: new Date().toISOString(),
+        dataQuality: 85
       },
       {
-        id: 'comp_2', 
+        id: 'comp_2',
         name: 'Restaurant B',
-        marketShare: 8.7,
-        avgRating: 4.5,
-        priceRange: 'high',
-        strengths: ['Quality', 'Ambiance'],
-        weaknesses: ['Price', 'Speed']
+        type: 'direct' as const,
+        category: 'Fine Dining',
+        location: {
+          address: '456 Oak Ave',
+          distance: 3.2,
+          zone: 'Uptown'
+        },
+        businessMetrics: {
+          estimatedRevenue: 680000,
+          marketShare: 8.7,
+          customerBase: 1800,
+          operatingHours: '17:00-24:00',
+          deliveryRadius: 3,
+          averageTicket: 65.00
+        },
+        menuAnalysis: {
+          totalItems: 32,
+          categories: ['Gourmet', 'Wine', 'Desserts'],
+          priceRange: { min: 25, max: 95, average: 58 },
+          uniqueItems: 18,
+          seasonalItems: 12
+        },
+        pricingIntelligence: [],
+        performance: {
+          customerRating: 4.5,
+          reviewCount: 189,
+          responseTime: 10,
+          deliveryTime: 45,
+          popularityTrend: 'up' as const,
+          marketPosition: 'leader' as const
+        },
+        digitalPresence: {
+          website: true,
+          socialMedia: { instagram: 12000, facebook: 15000, tiktok: 3500 },
+          onlineOrdering: false,
+          deliveryApps: [],
+          marketingBudget: 45000
+        },
+        analysis: {
+          strengths: ['Quality', 'Ambiance', 'Service'],
+          weaknesses: ['Price', 'Speed', 'Limited delivery'],
+          opportunities: ['Online expansion', 'Events'],
+          threats: ['Economic downturn', 'Competition']
+        },
+        lastUpdated: new Date().toISOString(),
+        dataQuality: 92
       }
     ],
     marketTrends: [
-      { trend: 'Plant-based options', growth: '+23%', opportunity: 'high' },
-      { trend: 'Delivery optimization', growth: '+18%', opportunity: 'medium' },
-      { trend: 'Sustainability focus', growth: '+15%', opportunity: 'high' }
+      {
+        id: 'trend_1',
+        category: 'Plant-based options',
+        trend: 'growing' as const,
+        growthRate: 23,
+        timeframe: 'year' as const,
+        description: 'Increasing demand for vegan and vegetarian options',
+        impact: 'high' as const,
+        opportunity: 'Expand plant-based menu offerings',
+        recommendedActions: ['Add 5-7 plant-based dishes', 'Partner with local suppliers'],
+        dataPoints: []
+      },
+      {
+        id: 'trend_2',
+        category: 'Delivery optimization',
+        trend: 'growing' as const,
+        growthRate: 18,
+        timeframe: 'quarter' as const,
+        description: 'Focus on faster delivery times and better packaging',
+        impact: 'medium' as const,
+        opportunity: 'Improve delivery infrastructure',
+        recommendedActions: ['Optimize delivery routes', 'Upgrade packaging'],
+        dataPoints: []
+      },
+      {
+        id: 'trend_3',
+        category: 'Sustainability focus',
+        trend: 'growing' as const,
+        growthRate: 15,
+        timeframe: 'year' as const,
+        description: 'Customers prefer eco-friendly practices',
+        impact: 'high' as const,
+        opportunity: 'Implement sustainable practices',
+        recommendedActions: ['Use biodegradable packaging', 'Source locally'],
+        dataPoints: []
+      }
     ]
   };
 };

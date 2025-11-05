@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { type ProductWithIntelligence, type ProductComponent } from '../modules/products/types';
+import { type ProductWithIntelligence, type ProductComponent } from '@/pages/admin/supply-chain/products/types';
 
 export interface ProductsState {
   // Data
@@ -51,7 +51,7 @@ export const useProductsStore = create<ProductsState>()(
         })),
         
         setLoading: (isLoading) => set({ isLoading }),
-        setError: (_error) => set({ error }),
+        setError: (_error) => set({ error: _error }),
         
         // Computed getters
         getProductById: (id) => {

@@ -2,35 +2,50 @@
 // SMART ALERTS ADAPTER - Integration Bridge
 // ============================================================================
 // Adaptador para integrar Smart Alerts Engine con el sistema de alertas unificado
+// ✅ REFACTORIZADO para usar shared/alerts/utils (2025-01-30)
 
 import { SmartAlertsEngine, type SmartAlert } from './smartAlertsEngine';
 import { type MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import { logger } from '@/lib/logging';
-import type { 
-  CreateAlertInput, 
-  Alert, 
+import type {
+  CreateAlertInput,
+  Alert,
   AlertAction,
   AlertMetadata,
   AlertSeverity as SystemAlertSeverity,
-  AlertType as SystemAlertType 
+  AlertType as SystemAlertType
 } from '@/shared/alerts/types';
+
+// ============================================================================
+// SHARED UTILITIES - Lógica reutilizable ✅
+// ============================================================================
+
+import {
+  // Severity mapping
+  mapSeverity,
+  shouldBePersistent,
+
+  // Formatting
+  enrichDescription as enrichAlert,
+  getABCClassDescription,
+  getABCClassEmoji,
+  getPriorityText,
+
+  // Lifecycle
+  getStockAlertExpiration,
+
+  // Types
+  type EnrichableAlert
+} from '@/shared/alerts/utils';
 
 // ============================================================================
 // MAPPING TYPES
 // ============================================================================
 
-// Mapeo de severidades: Smart Alerts → Sistema Unificado
-const SEVERITY_MAP: Record<string, SystemAlertSeverity> = {
-  'urgent': 'critical',
-  'critical': 'high', 
-  'warning': 'medium',
-  'info': 'low'
-};
-
-// Mapeo de tipos: Smart Alerts → Sistema Unificado  
+// Mapeo de tipos: Smart Alerts → Sistema Unificado
 const TYPE_MAP: Record<string, SystemAlertType> = {
   'low_stock': 'stock',
-  'out_of_stock': 'stock', 
+  'out_of_stock': 'stock',
   'overstocked': 'stock',
   'slow_moving': 'business',
   'price_variance': 'business',
@@ -62,21 +77,28 @@ export class SmartAlertsAdapter {
       
       return unifiedAlerts;
     } catch (error) {
-      logger.error('MaterialsStore', 'Error generating smart alerts:', error);
+      // ✅ FIX: Improved error logging with detailed information
+      logger.error('MaterialsStore', 'Error generating smart alerts:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        materialsCount: materials?.length || 0,
+        errorType: error?.constructor?.name
+      });
       return [];
     }
   }
 
   /**
    * Convierte una SmartAlert al formato CreateAlertInput del sistema unificado
+   * ✅ USA SHARED UTILITIES para evitar duplicación
    */
   private static convertSmartAlertToUnified(smartAlert: SmartAlert): CreateAlertInput {
-    // Mapear severidad
-    const severity = SEVERITY_MAP[smartAlert.severity] || 'medium';
-    
+    // ✅ Usar mapSeverity de shared utils
+    const severity = mapSeverity(smartAlert.severity);
+
     // Mapear tipo
     const type = TYPE_MAP[smartAlert.type] || 'stock';
-    
+
     // Crear metadata específica para alertas de stock
     const metadata: AlertMetadata = {
       itemId: smartAlert.itemId,
@@ -91,10 +113,12 @@ export class SmartAlertsAdapter {
 
     // Crear acciones basadas en las recomendaciones
     const actions = this.createActionsFromRecommendation(smartAlert);
-    
-    // Determinar si debe persistir y tiempo de expiración
-    const persistent = smartAlert.severity === 'urgent' || smartAlert.severity === 'critical';
-    const autoExpire = this.getAutoExpireTime(smartAlert);
+
+    // ✅ Usar shouldBePersistent de shared utils
+    const persistent = shouldBePersistent(severity);
+
+    // ✅ Usar getStockAlertExpiration de shared utils
+    const autoExpire = getStockAlertExpiration(severity) / 60000; // Convertir a minutos
 
     return {
       type,
@@ -112,27 +136,28 @@ export class SmartAlertsAdapter {
 
   /**
    * Enriquece la descripción con información adicional
+   * ✅ USA SHARED UTILITY enrichDescription
    */
   private static enrichDescription(smartAlert: SmartAlert): string {
-    let description = smartAlert.description;
-    
-    // Agregar información de clase ABC
-    description += `\n\n📊 **Clase ABC**: ${smartAlert.abcClass} (${this.getClassDescription(smartAlert.abcClass)})`;
-    
-    // Agregar desviación del threshold
-    if (smartAlert.deviation > 0) {
-      description += `\n📈 **Desviación**: ${smartAlert.deviation}% ${smartAlert.currentValue > smartAlert.thresholdValue ? 'por encima' : 'por debajo'} del umbral`;
-    }
-    
-    // Agregar prioridad de acción
-    description += `\n⏰ **Prioridad**: ${this.getPriorityText(smartAlert.actionPriority)} (${smartAlert.timeToAction.replace('_', ' ')})`;
-    
-    // Agregar recomendación
-    if (smartAlert.recommendedAction) {
-      description += `\n\n💡 **Recomendación**: ${smartAlert.recommendedAction}`;
-    }
-    
-    return description;
+    // Adaptar SmartAlert a EnrichableAlert format
+    const enrichable: EnrichableAlert = {
+      description: smartAlert.description,
+      category: `${getABCClassEmoji(smartAlert.abcClass)} Clase ${smartAlert.abcClass} - ${getABCClassDescription(smartAlert.abcClass)}`,
+      deviation: smartAlert.deviation,
+      currentValue: smartAlert.currentValue,
+      thresholdValue: smartAlert.thresholdValue,
+      actionPriority: smartAlert.actionPriority,
+      recommendedAction: smartAlert.recommendedAction
+    };
+
+    // ✅ Usar enrichDescription de shared utils
+    return enrichAlert(enrichable, {
+      showCategory: true,
+      showDeviation: true,
+      showPriority: true,
+      showRecommendation: true,
+      emojis: true
+    });
   }
 
   /**
@@ -231,6 +256,7 @@ export class SmartAlertsAdapter {
 
   /**
    * Calcula tiempo estimado de resolución en minutos
+   * (Mantener - es específico de dominio Materials)
    */
   private static getEstimatedResolutionTime(smartAlert: SmartAlert): number {
     switch (smartAlert.timeToAction) {
@@ -242,41 +268,11 @@ export class SmartAlertsAdapter {
     }
   }
 
-  /**
-   * Determina tiempo de auto-expiración en minutos
-   */
-  private static getAutoExpireTime(smartAlert: SmartAlert): number {
-    switch (smartAlert.severity) {
-      case 'urgent': return 60;        // 1 hora
-      case 'critical': return 240;     // 4 horas
-      case 'warning': return 1440;     // 24 horas
-      case 'info': return 2880;        // 48 horas
-      default: return 1440; // 24 horas por defecto
-    }
-  }
-
-  /**
-   * Obtiene descripción de clase ABC
-   */
-  private static getClassDescription(abcClass: string): string {
-    switch (abcClass) {
-      case 'A': return 'Crítico - Alto valor';
-      case 'B': return 'Importante - Valor medio';
-      case 'C': return 'Ordinario - Bajo valor';
-      default: return 'Desconocido';
-    }
-  }
-
-  /**
-   * Convierte prioridad numérica a texto
-   */
-  private static getPriorityText(priority: number): string {
-    if (priority >= 5) return 'Urgente';
-    if (priority >= 4) return 'Alta';
-    if (priority >= 3) return 'Media';
-    if (priority >= 2) return 'Baja';
-    return 'Muy Baja';
-  }
+  // ❌ ELIMINADOS - Ahora usan shared/alerts/utils:
+  // - getAutoExpireTime() → getStockAlertExpiration()
+  // - getClassDescription() → getABCClassDescription()
+  // - getPriorityText() → getPriorityText() (ya importado)
+  // - mapSeverity via SEVERITY_MAP → mapSeverity()
 
   // ============================================================================
   // UTILITY METHODS
@@ -331,8 +327,9 @@ export class SmartAlertsAdapter {
       );
       
       if (currentAlert) {
-        const newSeverity = SEVERITY_MAP[currentAlert.severity];
-        
+        // ✅ Usar mapSeverity de shared utils
+        const newSeverity = mapSeverity(currentAlert.severity);
+
         // Si la severidad cambió, actualizar
         if (newSeverity !== existingAlert.severity) {
           updates.push({

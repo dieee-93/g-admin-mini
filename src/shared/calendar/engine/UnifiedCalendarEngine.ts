@@ -8,7 +8,7 @@
  * @breaking-change Replaces all legacy calendar/scheduling logic
  */
 
-import {
+import type {
   ISODateString,
   ISOTimeString,
   ISODateTimeString,
@@ -45,7 +45,7 @@ import {
   getUserTimezone
 } from '../utils/dateTimeUtils';
 
-import { BaseCalendarAdapter } from '../adapters/BaseCalendarAdapter';
+import type { BaseCalendarAdapter } from '../adapters/BaseCalendarAdapter';
 
 import { logger } from '@/lib/logging';
 // ===============================

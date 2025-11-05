@@ -33,5 +33,13 @@
     // "erasableSyntaxOnly": true, // Will enable after enum fixes
     
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/__tests__/**",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/test/**",
+    "src/store/__tests__/**",
+    "src/**/__mocks__/**"
+  ]
 }

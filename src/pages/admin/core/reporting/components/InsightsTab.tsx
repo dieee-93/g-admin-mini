@@ -14,14 +14,14 @@ interface InsightsTabProps {
 
 export function InsightsTab({ insights, templates }: InsightsTabProps) {
   return (
-    <VStack gap={4} align="stretch">
+    <VStack gap="4" align="stretch">
       {insights.map((insight) => (
         <CardWrapper key={insight.id} variant="outline">
-          <CardWrapper.Body p={4}>
-            <VStack align="stretch" gap={3}>
+          <CardWrapper.Body p="4">
+            <VStack align="stretch" gap="3">
               {/* Header */}
               <HStack justify="space-between">
-                <HStack gap={2}>
+                <HStack gap="2">
                   <Badge colorPalette="purple">
                     {insight.type === 'trend' ? 'Tendencia' :
                      insight.type === 'anomaly' ? 'Anomalía' :
@@ -44,7 +44,7 @@ export function InsightsTab({ insights, templates }: InsightsTabProps) {
               </HStack>
 
               {/* Content */}
-              <VStack align="start" gap={2}>
+              <VStack align="start" gap="2">
                 <Text fontSize="md" fontWeight="bold">
                   {insight.title}
                 </Text>

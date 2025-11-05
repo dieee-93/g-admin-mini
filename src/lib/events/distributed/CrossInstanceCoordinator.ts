@@ -1,7 +1,7 @@
 // CrossInstanceCoordinator.ts - Cross-instance event propagation via BroadcastChannel
 // Handles direct communication between EventBus instances in different tabs/windows
 
-import { NamespacedEvent } from '../types';
+import type { NamespacedEvent } from '../types';
 import { SecureLogger } from '../utils/SecureLogger';
 
 export interface CrossInstanceConfig {
@@ -139,11 +139,12 @@ export class CrossInstanceCoordinator {
         compressed: message.compressed
       });
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.stats.messagesDropped++;
       SecureLogger.error('EventBus', 'Failed to propagate event', {
         eventId: event.id,
         pattern: event.pattern,
-        error: error.message
+        error: err.message
       });
       throw error;
     }
@@ -196,7 +197,7 @@ export class CrossInstanceCoordinator {
    * Setup message handling
    */
   private setupMessageHandling(): void {
-    this.broadcastChannel.addEventListener('message', (_event) => {
+    this.broadcastChannel.addEventListener('message', (event) => {
       if (this.isDestroyed) return;
 
       const message = event.data as CrossInstanceMessage;
@@ -256,10 +257,11 @@ export class CrossInstanceCoordinator {
           break;
       }
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       SecureLogger.error('EventBus', 'Error handling cross-instance message', {
         messageType: message.type,
         senderId: message.senderId,
-        error: error.message
+        error: err.message
       });
     }
   }
@@ -302,6 +304,7 @@ export class CrossInstanceCoordinator {
       try {
         callback(eventData as NamespacedEvent);
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         SecureLogger.error('EventBus', 'Error in remote event callback', { error });
       }
     });
@@ -434,6 +437,7 @@ export class CrossInstanceCoordinator {
       try {
         await this.sendMessage(pingMessage);
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         SecureLogger.error('EventBus', 'Failed to send ping', { error });
       }
     }, 10000); // Ping every 10 seconds
@@ -475,6 +479,7 @@ export class CrossInstanceCoordinator {
         this.broadcastChannel.postMessage(message);
         return; // Success
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         lastError = error as Error;
         
         if (attempt < this.config.retryAttempts) {

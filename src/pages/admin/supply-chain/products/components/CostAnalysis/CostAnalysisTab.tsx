@@ -1,36 +1,31 @@
 // src/features/products/ui/CostAnalysisTab.tsx
 // Advanced Cost Analysis Calculator - DESIGN SYSTEM VERSION
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 // SOLO Design System Components - SIGUIENDO LAS REGLAS
 import {
   // Layout & Structure
   Stack, HStack,
-  
+
   // Components del Design System
   CardWrapper ,
-  Typography, 
+  Typography,
   Alert, AlertDescription,
   Badge,
-  SelectField, createListCollection,
+  SelectField,
   NumberField,
   Button,
-  Tabs, TabList, Tab, TabPanels, TabPanel,
-  
+  Tabs,
+
   // Context para defaults automáticos
-  
+
 } from '@/shared/ui';
 
 import {
-  CurrencyDollarIcon,
   CalculatorIcon,
   ChartBarIcon,
-  DocumentTextIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon
+  DocumentTextIcon
 } from '@heroicons/react/24/outline';
 
 import { notify } from '@/lib/notifications';
@@ -38,7 +33,7 @@ import { notify } from '@/lib/notifications';
 // Import REAL data connections - NO MORE MOCK DATA
 import { useCostAnalysis, type RealCostAnalysisResult, type RealCostCalculationInput } from '../../hooks/useCostAnalysis';
 import { logger } from '@/lib/logging';
-// import { useCostCalculations } from '../hooks/useCostCalculations'; // Commented out - hook not found
+// import { useCostCalculations } from '@/pages/admin/supply-chain/products/hooks/useCostCalculations'; // Commented out - hook not found
 
 export function CostAnalysisTab() {
   // REAL data hooks - connected to MaterialsStore and ProductsStore
@@ -61,7 +56,8 @@ export function CostAnalysisTab() {
   });
   const [selectedProductId, setSelectedProductId] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('calculator');
+  // activeTab state available for future tab navigation implementation
+  // const [activeTab, setActiveTab] = useState('calculator');
 
   // Product options for select (REAL data)
   const productOptions = availableProducts.map(product => ({
@@ -149,25 +145,24 @@ export function CostAnalysisTab() {
         </Stack>
 
         {/* Tabs usando Design System */}
-        <Tabs defaultValue="calculator" variant="line">
-          <TabList>
-            <Tab value="calculator">
+        <Tabs.Root defaultValue="calculator">
+          <Tabs.List>
+            <Tabs.Trigger value="calculator">
               <CalculatorIcon className="w-4 h-4" />
               Cost Calculator
-            </Tab>
-            <Tab value="analysis">
+            </Tabs.Trigger>
+            <Tabs.Trigger value="analysis">
               <ChartBarIcon className="w-4 h-4" />
               Analysis Results
-            </Tab>
-            <Tab value="scenarios">
+            </Tabs.Trigger>
+            <Tabs.Trigger value="scenarios">
               <DocumentTextIcon className="w-4 h-4" />
               Pricing Scenarios
-            </Tab>
-          </TabList>
+            </Tabs.Trigger>
+          </Tabs.List>
 
-          <TabPanels>
             {/* Calculator Tab */}
-            <TabPanel value="calculator">
+            <Tabs.Content value="calculator">
               <HStack gap="lg" align="start">
                 {/* Left Panel - Input Form */}
                 <CardWrapper variant="elevated" padding="lg" width="full">
@@ -331,7 +326,7 @@ export function CostAnalysisTab() {
                                 {breakdown.map((item, index) => (
                                   <HStack key={index} justify="space-between" align="center">
                                     <Typography variant="body">{item.label}</Typography>
-                                    <Badge variant="subtle" colorPalette={item.color as any}>
+                                    <Badge variant="subtle" colorPalette={item.color as "gray" | "red" | "green" | "blue" | "yellow" | "purple" | "pink" | "cyan" | "orange" | "teal"}>
                                       ${item.value.toFixed(2)}
                                     </Badge>
                                   </HStack>
@@ -364,7 +359,7 @@ export function CostAnalysisTab() {
                                 </HStack>
                                 <HStack justify="space-between">
                                   <Typography variant="body">Profit Margin</Typography>
-                                  <Badge variant="subtle" colorPalette="success">
+                                  <Badge variant="subtle" colorPalette="green">
                                     {latest.profit_margin.toFixed(1)}%
                                   </Badge>
                                 </HStack>
@@ -399,10 +394,10 @@ export function CostAnalysisTab() {
                   </CardWrapper.Body>
                 </CardWrapper>
               </HStack>
-            </TabPanel>
+            </Tabs.Content>
 
             {/* Analysis Results Tab */}
-            <TabPanel value="analysis">
+            <Tabs.Content value="analysis">
               <CardWrapper variant="elevated" padding="lg">
                 <CardWrapper.Header>
                   <Typography variant="title">Historical Cost Analysis</Typography>
@@ -453,10 +448,10 @@ export function CostAnalysisTab() {
                   )}
                 </CardWrapper.Body>
               </CardWrapper>
-            </TabPanel>
+            </Tabs.Content>
 
             {/* Pricing Scenarios Tab */}
-            <TabPanel value="scenarios">
+            <Tabs.Content value="scenarios">
               <CardWrapper variant="elevated" padding="lg">
                 <CardWrapper.Header>
                   <Typography variant="title">Pricing Scenarios</Typography>
@@ -471,9 +466,8 @@ export function CostAnalysisTab() {
                   </Stack>
                 </CardWrapper.Body>
               </CardWrapper>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+            </Tabs.Content>
+        </Tabs.Root>
       </Stack>
     
   );

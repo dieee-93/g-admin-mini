@@ -4,12 +4,23 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Content Security Policy - Google Fonts & Supabase -->
+    <!-- Note: frame-ancestors no funciona en meta tags, debe ser en HTTP headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com;">
+
     <title>G-Admin Mini</title>
-    
+
+    <!-- ✅ PERFORMANCE: Preconnect to critical origins (saves ~200ms on first request) -->
+    <link rel="preconnect" href="https://ocwjrkxjwqmxvhckgtud.supabase.co">
+    <link rel="dns-prefetch" href="https://ocwjrkxjwqmxvhckgtud.supabase.co">
+
     <!-- Modern UI Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&family=Geist+Mono:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- ✅ PERFORMANCE: Preload critical fonts to avoid FOUT (Flash of Unstyled Text) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&family=Geist+Mono:wght@100;200;300;400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&family=Geist+Mono:wght@100;200;300;400;500;600;700;800;900&display=swap"></noscript>
     
     <!-- Theme initialization script -->
     <script>

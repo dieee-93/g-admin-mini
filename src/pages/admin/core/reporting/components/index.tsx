@@ -6,8 +6,9 @@ import {
   Text,
   Tabs,
   Skeleton,
-  SimpleGrid
-} from '@chakra-ui/react';
+  SimpleGrid,
+  Button
+} from '@/shared/ui';
 import {
   DocumentChartBarIcon,
   PlusIcon,
@@ -15,7 +16,6 @@ import {
   CogIcon,
   ChartBarIcon,
 } from '@heroicons/react/24/outline';
-import { Button } from '@/shared/ui';
 
 import { useReportingData } from '../hooks/useReportingData';
 import { useReportGeneration } from '../hooks/useReportGeneration';
@@ -37,8 +37,10 @@ export function CustomReporting() {
     automations,
     insights,
     loading,
+    error,
     reportingSummary,
     toggleAutomation,
+    retry,
   } = useReportingData();
 
   const { isGenerating, generateReport } = useReportGeneration({
@@ -77,12 +79,33 @@ export function CustomReporting() {
     }
   };
 
+  if (error) {
+    return (
+      <Box p="6">
+        <VStack gap="6" align="center" py="16">
+          <Text fontSize="xl" fontWeight="bold" color="red.500">
+            Error al cargar reportes
+          </Text>
+          <Text color="gray.600">{error}</Text>
+          <HStack gap="4">
+            <Button variant="outline" onClick={() => window.location.href = '/admin/dashboard'}>
+              Ir al Dashboard
+            </Button>
+            <Button colorPalette="blue" onClick={retry}>
+              Reintentar
+            </Button>
+          </HStack>
+        </VStack>
+      </Box>
+    );
+  }
+
   if (loading) {
     return (
-      <Box p={6}>
-        <VStack gap={6} align="stretch">
+      <Box p="6">
+        <VStack gap="6" align="stretch">
           <Skeleton height="80px" />
-          <SimpleGrid columns={{ base: 2, md: 3 }} gap={4}>
+          <SimpleGrid columns={{ base: 2, md: 3 }} gap="4">
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} height="120px" />
             ))}
@@ -93,28 +116,56 @@ export function CustomReporting() {
     );
   }
 
+  // Empty state cuando no hay reportes
+  if (templates.length === 0 && generatedReports.length === 0) {
+    return (
+      <Box p="6">
+        <VStack gap="6" align="center" py="16">
+          <DocumentChartBarIcon className="w-20 h-20 text-gray-400" />
+          <VStack gap="2" align="center">
+            <Text fontSize="xl" fontWeight="semibold">No hay reportes aún</Text>
+            <Text color="gray.400" textAlign="center">
+              Crea reportes personalizados para analizar tus datos
+            </Text>
+          </VStack>
+          <Button
+            colorPalette="blue"
+      
+            onClick={() => {
+              setActiveTab('builder');
+              setBuilderStep('basic');
+            }}
+          >
+            <PlusIcon className="w-4 h-4" />
+            Crear Primer Reporte
+          </Button>
+        </VStack>
+      </Box>
+    );
+  }
+
   return (
-    <Box p={6}>
-      <VStack gap={6} align="stretch">
+    <Box p="6">
+      <VStack gap="6" align="stretch">
         {/* Header */}
-        <VStack align="start" gap={3}>
+        <VStack align="start" gap="3">
           <HStack justify="space-between" w="full">
-            <VStack align="start" gap={1}>
+            <VStack align="start" gap="1">
               <Text fontSize="3xl" fontWeight="bold">📊 Custom Reporting</Text>
               <Text color="gray.600">
                 Constructor de reportes flexible con automatización y análisis inteligente
               </Text>
             </VStack>
 
-            <HStack gap={2}>
+            <HStack gap="2">
               <Button
                 colorPalette="blue"
-                leftIcon={<PlusIcon className="w-4 h-4" />}
                 onClick={() => {
                   setActiveTab('builder');
                   setBuilderStep('basic');
                 }}
               >
+                <PlusIcon className="w-4 h-4" />
                 Nuevo Reporte
               </Button>
             </HStack>
@@ -127,42 +178,42 @@ export function CustomReporting() {
         <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
           <Tabs.List>
             <Tabs.Trigger value="templates">
-              <HStack gap={2}>
+              <HStack gap="2">
                 <DocumentChartBarIcon className="w-4 h-4" />
                 <Text>Plantillas</Text>
               </HStack>
             </Tabs.Trigger>
 
             <Tabs.Trigger value="generated">
-              <HStack gap={2}>
+              <HStack gap="2">
                 <ArrowDownTrayIcon className="w-4 h-4" />
                 <Text>Reportes Generados</Text>
               </HStack>
             </Tabs.Trigger>
 
             <Tabs.Trigger value="automation">
-              <HStack gap={2}>
+              <HStack gap="2">
                 <CogIcon className="w-4 h-4" />
                 <Text>Automatización</Text>
               </HStack>
             </Tabs.Trigger>
 
             <Tabs.Trigger value="insights">
-              <HStack gap={2}>
+              <HStack gap="2">
                 <ChartBarIcon className="w-4 h-4" />
                 <Text>Insights</Text>
               </HStack>
             </Tabs.Trigger>
 
             <Tabs.Trigger value="builder">
-              <HStack gap={2}>
+              <HStack gap="2">
                 <PlusIcon className="w-4 h-4" />
                 <Text>Constructor</Text>
               </HStack>
             </Tabs.Trigger>
           </Tabs.List>
 
-          <Box mt={6}>
+          <Box mt="6">
             <Tabs.Content value="templates">
               <TemplatesTab
                 templates={templates}

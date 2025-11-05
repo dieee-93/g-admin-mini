@@ -23,27 +23,28 @@ interface SelectFieldProps {
   defaultValue?: string | number | string[]
   onChange?: (value: string | string[]) => void
   onValueChange?: (details: { value: string[] }) => void
-  
+
   // Opciones simples (modo básico)
   options?: Array<SimpleOption>
-  
+
   // Colección Chakra (modo avanzado)
   collection?: ReturnType<typeof createListCollection>
-  
+
   error?: string
+  helperText?: string
   required?: boolean
   disabled?: boolean
   size?: 'sm' | 'md' | 'lg'
-  variant?: 'outline' | 'subtle' 
+  variant?: 'outline' | 'subtle'
   colorPalette?: 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'cyan' | 'purple' | 'pink'
   // Estilos del trigger
   height?: string
   width?: string
-  
+
   // Renderizado custom
   children?: ReactNode
   renderItem?: (item: CollectionOption) => ReactNode
-  
+
   // Para usar dentro de Dialogs/Modals donde Portal puede causar problemas
   noPortal?: boolean
 }
@@ -58,6 +59,7 @@ export function SelectField({
   options,
   collection,
   error,
+  helperText,
   required = false,
   disabled = false,
   size = 'md',
@@ -98,7 +100,7 @@ export function SelectField({
   return (
     <div>
       <Select.Root
-        collection={finalCollection}
+        collection={finalCollection!}
         value={valueArray}
         defaultValue={defaultValueArray}
         onValueChange={handleValueChange}
@@ -122,12 +124,15 @@ export function SelectField({
 {noPortal ? (
           <Select.Positioner>
             <Select.Content>
-              {finalCollection.items.map((item: unknown) => (
-                <Select.Item item={item} key={item.value}>
-                  {renderItem ? renderItem(item) : item.label}
-                  <Select.ItemIndicator />
-                </Select.Item>
-              ))}
+              {finalCollection.items.map((item: unknown) => {
+                const typedItem = item as CollectionOption;
+                return (
+                  <Select.Item item={typedItem} key={typedItem.value}>
+                    {renderItem ? renderItem(typedItem) : typedItem.label}
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                );
+              })}
               {children}
             </Select.Content>
           </Select.Positioner>
@@ -135,12 +140,15 @@ export function SelectField({
           <Portal>
             <Select.Positioner>
               <Select.Content>
-                {finalCollection.items.map((item: unknown) => (
-                  <Select.Item item={item} key={item.value}>
-                    {renderItem ? renderItem(item) : item.label}
-                    <Select.ItemIndicator />
-                  </Select.Item>
-                ))}
+                {finalCollection.items.map((item: unknown) => {
+                  const typedItem = item as CollectionOption;
+                  return (
+                    <Select.Item item={typedItem} key={typedItem.value}>
+                      {renderItem ? renderItem(typedItem) : typedItem.label}
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  );
+                })}
                 {children}
               </Select.Content>
             </Select.Positioner>
@@ -150,6 +158,11 @@ export function SelectField({
       {error && (
         <div style={{ color: 'red', fontSize: '0.875rem', marginTop: '0.25rem' }}>
           {error}
+        </div>
+      )}
+      {helperText && !error && (
+        <div style={{ color: 'gray', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+          {helperText}
         </div>
       )}
     </div>

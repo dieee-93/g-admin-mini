@@ -361,7 +361,7 @@ export const useDashboardConfig = () => {
         clearTimeout(timeoutId);
       };
     }
-  }, [state.isDirty, state.isLoading, saveConfig]);
+  }, [state.isDirty, state.isLoading, state.layout.widgetConfigs.length, saveConfig]);
 
   // ===============================
   // MEMOIZED COMPUTED VALUES

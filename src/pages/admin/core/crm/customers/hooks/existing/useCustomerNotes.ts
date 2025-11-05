@@ -1,14 +1,14 @@
 // src/features/customers/logic/useCustomerNotes.ts
 import { useState, useEffect, useCallback } from 'react';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import { CustomerNote } from '../types';
+import type { CustomerNote } from '../../types';
 import { logger } from '@/lib/logging';
 import {
   getCustomerNotes,
   createCustomerNote,
   updateCustomerNote,
   deleteCustomerNote
-} from '../services/advancedCustomerApi';
+} from '../../services/existing/advancedCustomerApi';
 
 export function useCustomerNotes(customerId?: string) {
   const [notes, setNotes] = useState<CustomerNote[]>([]);
@@ -150,6 +150,7 @@ export function useCustomerNotes(customerId?: string) {
 
   useEffect(() => {
     loadNotes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId]);
 
   return {

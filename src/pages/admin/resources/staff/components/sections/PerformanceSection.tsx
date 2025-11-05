@@ -1,51 +1,75 @@
 // Staff Performance Section - Real Analytics with Interactive Charts
 import { useState, useEffect } from 'react';
-import { 
-  VStack, 
-  HStack, 
+import {
+  VStack,
+  HStack,
   SimpleGrid,
   Badge,
   Avatar,
   CardWrapper,
-  Alert,
-  Tabs
-} from '../../../../../../shared/ui';
-import { 
-  Box, 
+  Tabs,
+  Box,
   Text,
   Button,
   Spinner,
-  Progress,
-  Select
-} from '@chakra-ui/react';
-import { 
-  ChartBarIcon,
+  Progress
+} from '../../../../../../shared/ui';
+import {
   TrophyIcon,
   ClockIcon,
   CheckCircleIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
-  StarIcon,
-  UserGroupIcon,
-  CalendarIcon,
-  EyeIcon
+  StarIcon
 } from '@heroicons/react/24/outline';
 import { Icon } from '../../../../../../shared/ui/Icon';
 import { useStaffWithLoader } from '../../../../../../hooks/useStaffData';
 import staffApi from '../../../../../../services/staff/staffApi';
 import type { StaffViewState } from '../../types';
-
 import { logger } from '@/lib/logging';
+
+// Performance data types
+interface PerformanceTrend {
+  month: string;
+  avgPerformance: number;
+  avgAttendance: number;
+  employeeCount: number;
+  turnoverRate: number;
+}
+
+interface DepartmentPerformance {
+  department: string;
+  employees: number;
+  avgPerformance: number;
+  avgAttendance: number;
+  efficiency: number;
+}
+
+interface TopPerformer {
+  id: string;
+  name: string;
+  position: string;
+  department: string;
+  performance_score: number;
+  attendance_rate: number;
+  tenure_months: number;
+  efficiency: number;
+  rank: number;
+}
+
 interface PerformanceSectionProps {
   viewState: StaffViewState;
   onViewStateChange: (state: StaffViewState) => void;
 }
 
+// TODO: Implement MiniBarChart when chart visualization is needed
+// TODO: Implement Select dropdown for period filtering UI
+
 // Simple chart components (since we don't have a chart library installed)
 function MiniBarChart({ data, color = 'blue' }: { data: number[], color?: string }) {
   const max = Math.max(...data);
   return (
-    <HStack gap="1" align="end" h="40px">
+    <Stack direction="row" gap="1" align="end" h="40px">
       {data.map((value, index) => (
         <Box
           key={index}
@@ -56,18 +80,18 @@ function MiniBarChart({ data, color = 'blue' }: { data: number[], color?: string
           minH="4px"
         />
       ))}
-    </HStack>
+    </Stack>
   );
 }
 
-function SimpleLineChart({ data, label }: { data: any[], label: string }) {
+function SimpleLineChart({ data, label }: { data: PerformanceTrend[], label: string }) {
   return (
-    <VStack gap="2" align="stretch">
+    <Stack direction="column" gap="2" align="stretch">
       <Text fontSize="sm" fontWeight="medium" color="gray.600">{label}</Text>
       <Box h="120px" bg="gray.50" borderRadius="md" p="3" position="relative">
-        <HStack justify="space-between" align="end" h="full">
+        <Stack direction="row" justify="space-between" align="end" h="full">
           {data.slice(-6).map((item, index) => (
-            <VStack key={index} gap="1" align="center" flex="1">
+            <Stack direction="column" key={index} gap="1" align="center" flex="1">
               <Box
                 w="20px"
                 bg="blue.500"
@@ -75,24 +99,24 @@ function SimpleLineChart({ data, label }: { data: any[], label: string }) {
                 h={`${Math.max(10, item.avgPerformance)}%`}
               />
               <Text fontSize="xs" color="gray.600">{item.month}</Text>
-            </VStack>
+            </Stack>
           ))}
-        </HStack>
+        </Stack>
       </Box>
-    </VStack>
+    </Stack>
   );
 }
 
-export function PerformanceSection({ viewState, onViewStateChange }: PerformanceSectionProps) {
+export function PerformanceSection({ viewState: _viewState, onViewStateChange: _onViewStateChange }: PerformanceSectionProps) {
   const { staff, loading: staffLoading } = useStaffWithLoader();
   const [loading, setLoading] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('6');
   const [activeTab, setActiveTab] = useState('overview');
   
   // Analytics data
-  const [departmentPerformance, setDepartmentPerformance] = useState<any[]>([]);
-  const [performanceTrends, setPerformanceTrends] = useState<any[]>([]);
-  const [topPerformers, setTopPerformers] = useState<any[]>([]);
+  const [departmentPerformance, setDepartmentPerformance] = useState<DepartmentPerformance[]>([]);
+  const [performanceTrends, setPerformanceTrends] = useState<PerformanceTrend[]>([]);
+  const [topPerformers, setTopPerformers] = useState<TopPerformer[]>([]);
 
   // Load analytics data
   useEffect(() => {
@@ -142,22 +166,22 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
 
   if (staffLoading || loading) {
     return (
-      <VStack gap="4" py="8">
+      <Stack direction="column" gap="4" py="8">
         <Spinner size="lg" />
         <Text>Cargando analytics de rendimiento...</Text>
-      </VStack>
+      </Stack>
     );
   }
 
   return (
-    <VStack gap="6" align="stretch">
+    <Stack direction="column" gap="6" align="stretch">
       {/* Header Controls */}
-      <HStack justify="space-between" align="center" flexWrap="wrap">
+      <Stack direction="row" justify="space-between" align="center" flexWrap="wrap">
         <Text fontSize="lg" fontWeight="semibold">
           Analytics de Rendimiento
         </Text>
-        <HStack gap="4">
-          <HStack gap="2">
+        <Stack direction="row" gap="4">
+          <Stack direction="row" gap="2">
             <Text fontSize="sm" color="gray.600">Período:</Text>
             <select
               value={selectedPeriod}
@@ -168,12 +192,12 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
               <option value="6">6 meses</option>
               <option value="12">12 meses</option>
             </select>
-          </HStack>
+          </Stack>
           <Button size="sm" variant="outline" onClick={loadAnalytics}>
             Actualizar
           </Button>
-        </HStack>
-      </HStack>
+        </Stack>
+      </Stack>
 
       {/* Overall KPI Cards */}
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
@@ -183,7 +207,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
             <Text fontSize="2xl" fontWeight="bold">{overallMetrics.avgPerformance}%</Text>
             <Text fontSize="sm" color="gray.600">Rendimiento Promedio</Text>
             {performanceTrends.length > 1 && (
-              <HStack gap="1" justify="center" mt="1">
+              <Stack direction="row" gap="1" justify="center" mt="1">
                 {getPerformanceTrend(
                   performanceTrends[performanceTrends.length - 1]?.avgPerformance || 0,
                   performanceTrends[performanceTrends.length - 2]?.avgPerformance || 0
@@ -193,7 +217,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                   <Icon icon={ArrowTrendingDownIcon} size="xs" color="var(--chakra-colors-red-500)" />
                 )}
                 <Text fontSize="xs" color="gray.500">vs mes anterior</Text>
-              </HStack>
+              </Stack>
             )}
           </CardWrapper.Body>
         </CardWrapper>
@@ -235,7 +259,7 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
         </Tabs.List>
 
         <Tabs.Content value="overview">
-          <VStack gap="6" align="stretch">
+          <Stack direction="column" gap="6" align="stretch">
             {/* Performance Trends Chart */}
             <CardWrapper variant="elevated" padding="md">
               <CardWrapper.Body>
@@ -247,13 +271,13 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
             <CardWrapper variant="elevated" padding="md">
               <CardWrapper.Body>
                 <Text fontSize="lg" fontWeight="semibold" mb="4">Empleados por Rango de Rendimiento</Text>
-                <VStack gap="3" align="stretch">
-                  <HStack justify="space-between" align="center">
-                    <HStack gap="2">
+                <Stack direction="column" gap="3" align="stretch">
+                  <Stack direction="row" justify="space-between" align="center">
+                    <Stack direction="row" gap="2">
                       <Box w="3" h="3" bg="green.500" borderRadius="full" />
                       <Text>Excelente (90-100%)</Text>
-                    </HStack>
-                    <HStack gap="2">
+                    </Stack>
+                    <Stack direction="row" gap="2">
                       <Text fontWeight="medium">{staff.filter(s => s.performance_score >= 90).length}</Text>
                       <Progress 
                         value={(staff.filter(s => s.performance_score >= 90).length / staff.length) * 100}
@@ -261,15 +285,15 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                         w="100px"
                         colorPalette="green"
                       />
-                    </HStack>
-                  </HStack>
+                    </Stack>
+                  </Stack>
 
-                  <HStack justify="space-between" align="center">
-                    <HStack gap="2">
+                  <Stack direction="row" justify="space-between" align="center">
+                    <Stack direction="row" gap="2">
                       <Box w="3" h="3" bg="blue.500" borderRadius="full" />
                       <Text>Bueno (75-89%)</Text>
-                    </HStack>
-                    <HStack gap="2">
+                    </Stack>
+                    <Stack direction="row" gap="2">
                       <Text fontWeight="medium">{staff.filter(s => s.performance_score >= 75 && s.performance_score < 90).length}</Text>
                       <Progress 
                         value={(staff.filter(s => s.performance_score >= 75 && s.performance_score < 90).length / staff.length) * 100}
@@ -277,15 +301,15 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                         w="100px"
                         colorPalette="blue"
                       />
-                    </HStack>
-                  </HStack>
+                    </Stack>
+                  </Stack>
 
-                  <HStack justify="space-between" align="center">
-                    <HStack gap="2">
+                  <Stack direction="row" justify="space-between" align="center">
+                    <Stack direction="row" gap="2">
                       <Box w="3" h="3" bg="orange.500" borderRadius="full" />
                       <Text>Necesita Mejora (&lt;75%)</Text>
-                    </HStack>
-                    <HStack gap="2">
+                    </Stack>
+                    <Stack direction="row" gap="2">
                       <Text fontWeight="medium">{staff.filter(s => s.performance_score < 75).length}</Text>
                       <Progress 
                         value={(staff.filter(s => s.performance_score < 75).length / staff.length) * 100}
@@ -293,54 +317,54 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                         w="100px"
                         colorPalette="orange"
                       />
-                    </HStack>
-                  </HStack>
-                </VStack>
+                    </Stack>
+                  </Stack>
+                </Stack>
               </CardWrapper.Body>
             </CardWrapper>
-          </VStack>
+          </Stack>
         </Tabs.Content>
 
         <Tabs.Content value="departments">
           <CardWrapper variant="elevated" padding="md">
             <CardWrapper.Body>
               <Text fontSize="lg" fontWeight="semibold" mb="4">Rendimiento por Departamento</Text>
-              <VStack gap="4" align="stretch">
+              <Stack direction="column" gap="4" align="stretch">
                 {departmentPerformance.map((dept, index) => (
                   <CardWrapper key={index} variant="flat" padding="sm">
                     <CardWrapper.Body>
-                      <HStack justify="space-between" align="center">
-                        <VStack align="start" gap="1">
+                      <Stack direction="row" justify="space-between" align="center">
+                        <Stack direction="column" align="start" gap="1">
                           <Text fontWeight="medium" textTransform="capitalize">{dept.department}</Text>
                           <Text fontSize="sm" color="gray.600">{dept.employees} empleados</Text>
-                        </VStack>
-                        <VStack gap="2" align="end">
-                          <HStack gap="4">
-                            <VStack gap="0" align="center">
+                        </Stack>
+                        <Stack direction="column" gap="2" align="end">
+                          <Stack direction="row" gap="4">
+                            <Stack direction="column" gap="0" align="center">
                               <Text fontSize="sm" fontWeight="medium">{dept.avgPerformance}%</Text>
                               <Text fontSize="xs" color="gray.500">Rendimiento</Text>
-                            </VStack>
-                            <VStack gap="0" align="center">
+                            </Stack>
+                            <Stack direction="column" gap="0" align="center">
                               <Text fontSize="sm" fontWeight="medium">{dept.avgAttendance}%</Text>
                               <Text fontSize="xs" color="gray.500">Asistencia</Text>
-                            </VStack>
-                            <VStack gap="0" align="center">
+                            </Stack>
+                            <Stack direction="column" gap="0" align="center">
                               <Text fontSize="sm" fontWeight="medium">{dept.efficiency}%</Text>
                               <Text fontSize="xs" color="gray.500">Eficiencia</Text>
-                            </VStack>
-                          </HStack>
+                            </Stack>
+                          </Stack>
                           <Progress 
                             value={dept.efficiency} 
                             size="sm" 
                             w="200px"
                             colorPalette={dept.efficiency >= 85 ? 'green' : dept.efficiency >= 70 ? 'blue' : 'orange'}
                           />
-                        </VStack>
-                      </HStack>
+                        </Stack>
+                      </Stack>
                     </CardWrapper.Body>
                   </CardWrapper>
                 ))}
-              </VStack>
+              </Stack>
             </CardWrapper.Body>
           </CardWrapper>
         </Tabs.Content>
@@ -365,16 +389,16 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
                       <tr key={index} className="border-b hover:bg-gray-50">
                         <td className="p-2">{trend.month}</td>
                         <td className="p-2">
-                          <HStack gap="2">
+                          <Stack direction="row" gap="2">
                             <Text>{trend.avgPerformance}%</Text>
                             <Progress value={trend.avgPerformance} size="sm" w="60px" />
-                          </HStack>
+                          </Stack>
                         </td>
                         <td className="p-2">
-                          <HStack gap="2">
+                          <Stack direction="row" gap="2">
                             <Text>{trend.avgAttendance}%</Text>
                             <Progress value={trend.avgAttendance} size="sm" w="60px" />
-                          </HStack>
+                          </Stack>
                         </td>
                         <td className="p-2">{trend.employeeCount}</td>
                         <td className="p-2">{trend.turnoverRate}%</td>
@@ -391,61 +415,61 @@ export function PerformanceSection({ viewState, onViewStateChange }: Performance
           <CardWrapper variant="elevated" padding="md">
             <CardWrapper.Body>
               <Text fontSize="lg" fontWeight="semibold" mb="4">Top 5 Empleados</Text>
-              <VStack gap="4" align="stretch">
+              <Stack direction="column" gap="4" align="stretch">
                 {topPerformers.map((performer, index) => (
                   <CardWrapper key={performer.id} variant="flat" padding="md">
                     <CardWrapper.Body>
-                      <HStack justify="space-between" align="center">
-                        <HStack gap="3">
+                      <Stack direction="row" justify="space-between" align="center">
+                        <Stack direction="row" gap="3">
                           <Badge colorPalette={index === 0 ? 'yellow' : index === 1 ? 'gray' : 'orange'} size="lg">
                             #{performer.rank}
                           </Badge>
                           <Avatar name={performer.name} size="md" />
-                          <VStack align="start" gap="1">
+                          <Stack direction="column" align="start" gap="1">
                             <Text fontWeight="semibold">{performer.name}</Text>
                             <Text fontSize="sm" color="gray.600">{performer.position}</Text>
                             <Badge size="sm" colorPalette="blue">
                               {performer.department}
                             </Badge>
-                          </VStack>
-                        </HStack>
-                        <VStack gap="2" align="end">
-                          <HStack gap="4">
-                            <VStack gap="0" align="center">
+                          </Stack>
+                        </Stack>
+                        <Stack direction="column" gap="2" align="end">
+                          <Stack direction="row" gap="4">
+                            <Stack direction="column" gap="0" align="center">
                               <Text fontSize="lg" fontWeight="bold" color="green.600">
                                 {performer.performance_score}%
                               </Text>
                               <Text fontSize="xs" color="gray.500">Rendimiento</Text>
-                            </VStack>
-                            <VStack gap="0" align="center">
+                            </Stack>
+                            <Stack direction="column" gap="0" align="center">
                               <Text fontSize="sm" fontWeight="medium">
                                 {performer.attendance_rate}%
                               </Text>
                               <Text fontSize="xs" color="gray.500">Asistencia</Text>
-                            </VStack>
-                            <VStack gap="0" align="center">
+                            </Stack>
+                            <Stack direction="column" gap="0" align="center">
                               <Text fontSize="sm" fontWeight="medium">
                                 {performer.tenure_months}m
                               </Text>
                               <Text fontSize="xs" color="gray.500">Antigüedad</Text>
-                            </VStack>
-                          </HStack>
+                            </Stack>
+                          </Stack>
                           <Progress 
                             value={performer.efficiency} 
                             size="sm" 
                             w="150px"
                             colorPalette="green"
                           />
-                        </VStack>
-                      </HStack>
+                        </Stack>
+                      </Stack>
                     </CardWrapper.Body>
                   </CardWrapper>
                 ))}
-              </VStack>
+              </Stack>
             </CardWrapper.Body>
           </CardWrapper>
         </Tabs.Content>
       </Tabs>
-    </VStack>
+    </Stack>
   );
 }

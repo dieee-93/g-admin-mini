@@ -480,7 +480,7 @@ function CustomStaffManagement() {
     <div>
       <StaffForm
         onSuccess={() => logger.info('App', 'Employee created!')}
-        onCancel={() => console.log('Cancelled')}
+        onCancel={() => logger.debug('StaffModuleExample', 'Cancelled')}
       />
       <StaffList />
       <StaffAnalytics />

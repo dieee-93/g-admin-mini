@@ -28,11 +28,12 @@ export {
 
 // Feature System
 export { FeatureActivationEngine } from '@/lib/features/FeatureEngine';
-export type { FeatureId, CoreFeature, ConditionalFeature } from '@/config/FeatureRegistry';
+export type { FeatureId } from '@/config/FeatureRegistry';
 export type { BusinessActivityId, InfrastructureId } from '@/config/BusinessModelRegistry';
 
 // Components
-export { CapabilityGate, useCapabilityCheck } from './components/CapabilityGate';
+// NOTE: CapabilityGate removed - use Module Registry hooks instead
+// Conditional rendering now handled via Hook System, not wrapper components
 
 // ============================================
 // BACKWARD COMPATIBILITY ALIASES

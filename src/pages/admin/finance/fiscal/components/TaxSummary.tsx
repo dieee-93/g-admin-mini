@@ -12,10 +12,9 @@ import {
 } from '@/shared/ui';
 import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
 import { Separator } from '@chakra-ui/react';
-import { 
+import {
   DocumentTextIcon,
   CalculatorIcon,
-  InformationCircleIcon,
   CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
 
@@ -185,7 +184,7 @@ export function TaxSummary({
               <Typography variant="heading" className="text-lg font-semibold">
                 {title}
               </Typography>
-              <Badge colorPalette="info" size="sm">
+              <Badge colorPalette="blue" size="sm">
                 AFIP Compliant
               </Badge>
             </HStack>
@@ -205,7 +204,7 @@ export function TaxSummary({
                   <HStack justify="space-between" className="py-2">
                     <HStack gap="xs">
                       <Typography variant="body" className="text-sm">IVA</Typography>
-                      <Badge colorPalette="info" size="xs">{(config.ivaRate * 100).toFixed(1)}%</Badge>
+                      <Badge colorPalette="blue" size="xs">{(config.ivaRate * 100).toFixed(1)}%</Badge>
                     </HStack>
                     <Typography variant="body" className="text-sm font-medium text-blue-600">
                       {formatted.ivaAmount}
@@ -216,7 +215,7 @@ export function TaxSummary({
                     <HStack justify="space-between" className="py-2">
                       <HStack gap="xs">
                         <Typography variant="body" className="text-sm">Ingresos Brutos</Typography>
-                        <Badge colorPalette="warning" size="xs">{(config.ingresosBrutosRate * 100).toFixed(2)}%</Badge>
+                        <Badge colorPalette="orange" size="xs">{(config.ingresosBrutosRate * 100).toFixed(2)}%</Badge>
                       </HStack>
                       <Typography variant="body" className="text-sm font-medium text-orange-600">
                         {formatted.ingresosBrutosAmount}

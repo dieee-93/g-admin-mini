@@ -41,7 +41,7 @@ export function AuthPage() {
     <Box
       minH="100vh"
       bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-      py={8}
+      py="8"
     >
       <Container maxW="lg">
         <Center>

@@ -2,7 +2,8 @@
 // 🎯 PROVIDER CENTRAL DEL SISTEMA DE ALERTAS
 // Maneja el estado global de todas las alertas de la aplicación
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import type { ReactNode } from 'react';
 import type { 
   Alert, 
   AlertsContextValue, 
@@ -37,6 +38,7 @@ const DEFAULT_CONFIG: AlertsConfiguration = {
 };
 
 const AlertsContext = createContext<AlertsContextValue | null>(null);
+AlertsContext.displayName = 'AlertsContext';
 
 interface AlertsProviderProps {
   children: ReactNode;

@@ -146,7 +146,7 @@ export function HeroMetricCard({
               <Button
                 variant="solid"
                 size="sm"
-                colorPalette="info"
+                colorPalette="blue"
                 onClick={actions.primary.onClick}
               >
                 <Stack direction="row" align="center" gap="xs">

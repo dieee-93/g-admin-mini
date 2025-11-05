@@ -3,9 +3,10 @@ import React, { type ReactNode } from 'react'
 
 interface CardProps {
   children: ReactNode
-  variant?: 'elevated' | 'outline' | 'subtle' 
+  variant?: 'elevated' | 'outline' | 'subtle'
   size?: 'sm' | 'md' | 'lg'
   colorPalette?: 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'cyan' | 'purple' | 'pink'
+  color?: string // Text color prop
   bg?: string // Background color prop
   className?: string
   [key: string]: any

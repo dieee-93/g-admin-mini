@@ -26,14 +26,13 @@ export type BusinessCapabilityId =
   | 'delivery_shipping'      // Envío a domicilio del cliente
 
   // PRODUCTION CAPABILITY (Transformación de materiales)
-  | 'requires_preparation'   // Cocina/producción/manufactura
+  | 'production_workflow'   // Production/assembly/preparation workflows
 
   // SERVICE MODES (Modos de servicio)
   | 'appointment_based'      // Servicios con cita previa (agendamiento)
-  | 'walkin_service'         // Servicios sin cita (walk-in)
 
   // SPECIAL OPERATIONS (Operaciones especiales)
-  | 'async_operations'       // Venta asincrónica 24/7 (e-commerce)
+  | 'online_store'       // E-commerce 24/7 (was: async_operations)
   | 'corporate_sales'        // Ventas corporativas B2B
   | 'mobile_operations';     // Operaciones móviles (food truck, servicios a domicilio)
 
@@ -55,18 +54,18 @@ export type InfrastructureId =
 export type UserChoiceId = BusinessCapabilityId | InfrastructureId;
 
 // ============================================
-// FEATURE IDS (86 features)
+// FEATURE IDS (88 features)
 // ============================================
 
 /**
- * Feature Tag IDs - 86 features granulares del sistema
+ * Feature Tag IDs - 88 features granulares del sistema
  *
  * Organizadas por DOMAIN para código, pero activadas por CAPABILITIES.
  * Nomenclatura: {domain}_{entity}_{operation_type}
  */
 export type FeatureId =
   // ============================================
-  // SALES DOMAIN (24 features)
+  // SALES DOMAIN (26 features)
   // ============================================
 
   // Core sales
@@ -81,7 +80,7 @@ export type FeatureId =
 
   // E-commerce
   | 'sales_catalog_ecommerce'
-  | 'sales_async_order_processing'
+  | 'sales_online_order_processing'
   | 'sales_online_payment_gateway'
   | 'sales_cart_management'
   | 'sales_checkout_process'
@@ -105,6 +104,10 @@ export type FeatureId =
   | 'sales_split_payment'
   | 'sales_tip_management'
   | 'sales_coupon_management'
+
+  // Fulfillment modes (nuevas 2025)
+  | 'sales_pickup_orders'
+  | 'sales_delivery_orders'
 
   // ============================================
   // INVENTORY DOMAIN (13 features)
@@ -132,8 +135,8 @@ export type FeatureId =
   // PRODUCTION DOMAIN (4 features)
   // ============================================
 
-  | 'production_recipe_management'
-  | 'production_kitchen_display'
+  | 'production_bom_management'
+  | 'production_display_system'
   | 'production_order_queue'
   | 'production_capacity_planning'  // Nueva 2024
 
@@ -177,8 +180,7 @@ export type FeatureId =
   | 'customer_service_history'
   | 'customer_preference_tracking'
   | 'customer_loyalty_program'
-  | 'customer_online_reservation'      // Nueva 2024
-  | 'customer_reservation_reminders'   // Nueva 2024
+  | 'customer_online_accounts'      // Nueva 2024
 
   // ============================================
   // FINANCE DOMAIN (4 features)
@@ -193,11 +195,9 @@ export type FeatureId =
   // MOBILE DOMAIN (5 features)
   // ============================================
 
-  | 'mobile_pos_offline'
   | 'mobile_location_tracking'
   | 'mobile_route_planning'
   | 'mobile_inventory_constraints'
-  | 'mobile_sync_management'
 
   // ============================================
   // MULTISITE DOMAIN (5 features)

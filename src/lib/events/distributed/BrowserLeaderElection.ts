@@ -174,7 +174,7 @@ export class BrowserLeaderElection {
    * Setup message handling for leader election
    */
   private setupMessageHandling(): void {
-    this.broadcastChannel.addEventListener('message', (_event) => {
+    this.broadcastChannel.addEventListener('message', (event) => {
       if (this.isDestroyed) return;
 
       const message = event.data as LeaderElectionMessage;
@@ -419,6 +419,7 @@ export class BrowserLeaderElection {
         try {
           callback(message.senderId);
         } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
           logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Error in heartbeat callback:`, error);
         }
       });
@@ -474,6 +475,7 @@ export class BrowserLeaderElection {
       try {
         callback(message.senderId);
       } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
         logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Error in shutdown callback for ${message.senderId}:`, error);
       }
     });
@@ -792,6 +794,7 @@ export class BrowserLeaderElection {
           try {
             callback(instanceId);
           } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
             logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Error in shutdown callback for ${instanceId}:`, error);
           }
         });
@@ -860,10 +863,11 @@ export class BrowserLeaderElection {
       
       this.broadcastChannel.postMessage(message);
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Failed to send message:`, error);
       SecureLogger.error('EventBus', 'Failed to send leader election message', {
         messageType: message.type,
-        error: error.message,
+        error: err.message,
         instanceId: this.config.instanceId
       });
       
@@ -894,6 +898,7 @@ export class BrowserLeaderElection {
           callback(isLeader, previousLeader);
           logger.debug('EventBus', `[DEBUG] ${this.config.instanceId}: Callback ${index} completed successfully`);
         } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
           logger.error('EventBus', `[DEBUG] ${this.config.instanceId}: Callback ${index} failed on attempt ${attempt}:`, error);
           
           // Retry once after a short delay

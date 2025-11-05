@@ -30,7 +30,7 @@ interface SchedulingStats {
 interface SchedulingAlertsProps {
   context: 'scheduling' | 'dashboard' | 'realtime';
   schedulingStats?: SchedulingStats;
-  onAlertAction?: (action: string, data?: any) => void;
+  onAlertAction?: (action: string, data?: unknown) => void;
   showTitle?: boolean;
   maxAlerts?: number;
   enablePredictive?: boolean;
@@ -286,7 +286,7 @@ function mapAlertTypeToStatus(alertType: string): 'error' | 'warning' | 'info' |
   return 'info';
 }
 
-function calculateAverageConfidence(alerts: any[]): number {
+function calculateAverageConfidence(alerts: unknown[]): number {
   if (alerts.length === 0) return 100;
 
   const totalConfidence = alerts.reduce((sum, alert) =>

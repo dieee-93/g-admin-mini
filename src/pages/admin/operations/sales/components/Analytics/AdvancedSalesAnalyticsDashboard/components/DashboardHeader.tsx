@@ -44,17 +44,17 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   return (
     <CardWrapper bg="gradient-to-r from-blue-600 to-purple-700" color="white">
-      <CardWrapper.Body p={6}>
-        <VStack align="stretch" gap={4}>
+      <CardWrapper.Body p="6">
+        <VStack align="stretch" gap="4">
           <HStack justify="space-between" align="center">
-            <HStack gap={3}>
+            <HStack gap="3">
               <ChartBarIcon className="w-8 h-8" />
-              <VStack align="start" gap={0}>
+              <VStack align="start" gap="0">
                 <Text fontSize="2xl" fontWeight="bold">Advanced Sales Intelligence</Text>
                 <Text opacity={0.9}>Real-time analytics with predictive insights</Text>
               </VStack>
             </HStack>
-            <HStack gap={2}>
+            <HStack gap="2">
               <Select.Root
                 collection={dateRangeCollection}
                 value={[dateRange]}
@@ -93,15 +93,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </HStack>
 
           {analytics && (
-            <HStack justify="center" gap={8}>
-              <VStack gap={1}>
+            <HStack justify="center" gap="8">
+              <VStack gap="1">
                 <Text fontSize="3xl" fontWeight="bold">
                   ${analytics.revenue.total.toLocaleString()}
                 </Text>
                 <Text opacity={0.8}>Total Revenue</Text>
               </VStack>
-              <VStack gap={1}>
-                <HStack gap={2}>
+              <VStack gap="1">
+                <HStack gap="2">
                   <Text fontSize="2xl" fontWeight="bold">
                     +{analytics.revenue.growth.toFixed(1)}%
                   </Text>

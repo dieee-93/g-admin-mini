@@ -1,8 +1,30 @@
+/**
+ * Memberships Management Page - Membership & Engagement Tracking
+ *
+ * SEMANTIC v3.0 - WCAG AA Compliant:
+ * ✅ Skip link for keyboard navigation (WCAG 2.4.1 Level A)
+ * ✅ Semantic main content wrapper with ARIA label
+ * ✅ Proper section headings for screen readers
+ * ✅ Nav pattern for tab navigation
+ * ✅ 3-Layer Architecture (Semantic → Layout → Primitives)
+ *
+ * FEATURES:
+ * - Membership lifecycle management
+ * - Engagement tracking and retention analytics
+ * - Check-in/check-out system
+ * - Cross-module integration (Customers, Analytics, Billing)
+ * - EventBus integration
+ */
+
 import React from 'react';
 import {
-  ContentLayout, PageHeader, Section, Stack, Button, Badge, Tabs
+  ContentLayout, Section, Stack, Button, Badge, Tabs, SkipLink, HStack
 } from '@/shared/ui';
 import { Icon } from '@/shared/ui';
+import {
+  ChartBarIcon, ClockIcon, CogIcon, HomeIcon, UserPlusIcon, UsersIcon
+} from '@heroicons/react/24/outline';
+
 import MembershipFormEnhanced from './components/MembershipFormEnhanced';
 import MembershipAnalyticsEnhanced from './components/MembershipAnalyticsEnhanced';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
@@ -14,41 +36,6 @@ const MembershipPage: React.FC = () => {
     // Emit module loaded event
     ModuleEventUtils.system.moduleLoaded('membership');
   }, []);
-
-  const quickActions = (
-    <Stack direction="row" gap="sm">
-      <Button
-        onClick={() => setActiveTab('create')}
-        colorPalette="blue"
-        size="sm"
-      >
-        <Icon name="UserPlusIcon" />
-        Nueva Membresía
-      </Button>
-      <Button
-        onClick={() => setActiveTab('analytics')}
-        variant="outline"
-        size="sm"
-      >
-        <Icon name="ChartBarIcon" />
-        Analytics
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-      >
-        <Icon name="ClockIcon" />
-        Check-in
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-      >
-        <Icon name="CogIcon" />
-        Configuración
-      </Button>
-    </Stack>
-  );
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -66,39 +53,89 @@ const MembershipPage: React.FC = () => {
   };
 
   return (
-    <ContentLayout spacing="normal">
-      <PageHeader
-        title="Gestión de Membresías"
-        subtitle="Sistema integral de membresías, engagement tracking y analytics de retención"
-        icon="UserGroupIcon"
-        actions={quickActions}
-      />
+    <>
+      {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
+      <SkipLink />
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-        <Tabs.List>
-          <Tabs.Trigger value="dashboard">
-            <Icon name="HomeIcon" />
-            Dashboard
-          </Tabs.Trigger>
-          <Tabs.Trigger value="create">
-            <Icon name="UserPlusIcon" />
-            Nueva Membresía
-          </Tabs.Trigger>
-          <Tabs.Trigger value="manage">
-            <Icon name="UsersIcon" />
-            Gestionar Miembros
-          </Tabs.Trigger>
-          <Tabs.Trigger value="analytics">
-            <Icon name="ChartBarIcon" />
-            Analytics
-          </Tabs.Trigger>
-        </Tabs.List>
+      {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
+      <ContentLayout spacing="normal" mainLabel="Membership Management">
 
-        <Tabs.Content value={activeTab}>
-          {renderTabContent()}
-        </Tabs.Content>
-      </Tabs>
-    </ContentLayout>
+        {/* ✅ HEADER SECTION - Title and actions */}
+        <Section
+          variant="flat"
+          title="Gestión de Membresías"
+          subtitle="Sistema integral de membresías, engagement tracking y analytics de retención"
+          semanticHeading="Membership Management Dashboard"
+          actions={
+            <HStack gap="2">
+              <Button
+                onClick={() => setActiveTab('create')}
+                colorPalette="blue"
+                size="sm"
+              >
+                <Icon as={UserPlusIcon} />
+                Nueva Membresía
+              </Button>
+              <Button
+                onClick={() => setActiveTab('analytics')}
+                variant="outline"
+                size="sm"
+              >
+                <Icon as={ChartBarIcon} />
+                Analytics
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+              >
+                <Icon as={ClockIcon} />
+                Check-in
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+              >
+                <Icon as={CogIcon} />
+                Configuración
+              </Button>
+            </HStack>
+          }
+        />
+
+        {/* ✅ TAB NAVIGATION SECTION - Semantic nav pattern */}
+        <Section
+          as="nav"
+          variant="elevated"
+          semanticHeading="Membership Management Sections"
+        >
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'dashboard' | 'create' | 'manage' | 'analytics')}>
+            <Tabs.List>
+              <Tabs.Trigger value="dashboard">
+                <Icon as={HomeIcon} />
+                Dashboard
+              </Tabs.Trigger>
+              <Tabs.Trigger value="create">
+                <Icon as={UserPlusIcon} />
+                Nueva Membresía
+              </Tabs.Trigger>
+              <Tabs.Trigger value="manage">
+                <Icon as={UsersIcon} />
+                Gestionar Miembros
+              </Tabs.Trigger>
+              <Tabs.Trigger value="analytics">
+                <Icon as={ChartBarIcon} />
+                Analytics
+              </Tabs.Trigger>
+            </Tabs.List>
+
+            <Tabs.Content value={activeTab}>
+              {renderTabContent()}
+            </Tabs.Content>
+          </Tabs>
+        </Section>
+
+      </ContentLayout>
+    </>
   );
 };
 
@@ -106,7 +143,7 @@ const MembershipPage: React.FC = () => {
 const MembershipDashboard: React.FC = () => {
   return (
     <Stack gap="lg">
-      <Section title="Estado del Sistema" variant="elevated">
+      <Section title="Estado del Sistema" variant="elevated" semanticHeading="Membership System Status Overview">
         <Stack gap="md">
           <Stack direction="row" gap="md" wrap="wrap">
             <Badge colorPalette="green" variant="subtle" size="lg">
@@ -158,7 +195,7 @@ const MembershipDashboard: React.FC = () => {
 // Member Manager component
 const MembershipManager: React.FC = () => {
   return (
-    <Section title="Gestión de Miembros" variant="elevated">
+    <Section title="Gestión de Miembros" variant="elevated" semanticHeading="Member Management Panel">
       <Stack gap="md">
         <p><strong>Panel de gestión de membresías existentes</strong></p>
 

@@ -1,6 +1,7 @@
-import { lazy, Suspense, useEffect, useState, ComponentType, ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import { Box, Skeleton, VStack } from '@chakra-ui/react';
-import { LazyComponentOptions } from './types';
+import type { LazyComponentOptions } from './types';
 import { errorHandler } from '@/lib/error-handling';
 
 import { logger } from '@/lib/logging';
@@ -184,8 +185,8 @@ export function withLazyLoading<P extends object>(
  * Default fallback component
  */
 const DefaultFallback = () => (
-  <Box p={4}>
-    <VStack gap={3}>
+  <Box p="4">
+    <VStack gap="3">
       <Skeleton height="40px" width="100%" />
       <Skeleton height="20px" width="80%" />
       <Skeleton height="20px" width="60%" />
@@ -211,7 +212,7 @@ export const createLazyRoute = (
         justifyContent="center" 
         minH="400px"
       >
-        <VStack gap={4}>
+        <VStack gap="4">
           <Skeleton height="60px" width="300px" />
           <Skeleton height="40px" width="200px" />
           <Skeleton height="40px" width="250px" />
@@ -233,8 +234,8 @@ export const createLazyFeature = (
     preload: true, // Features can be preloaded
     retries: 2,
     fallback: () => (
-      <Box p={6} textAlign="center">
-        <VStack gap={3}>
+      <Box p="6" textAlign="center">
+        <VStack gap="3">
           <Skeleton height="30px" width="200px" />
           <Skeleton height="15px" width="300px" />
           <Skeleton height="15px" width="250px" />

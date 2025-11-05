@@ -3,6 +3,23 @@ import {
   ContentLayout, Section, Stack, Button, Badge, Typography,
   CardGrid, MetricCard, Icon
 } from '@/shared/ui';
+import {
+  ChartBarIcon,
+  UserGroupIcon,
+  CogIcon,
+  GlobeAltIcon,
+  ArrowTrendingUpIcon,
+  ArrowPathIcon,
+  PhotoIcon,
+  DocumentIcon,
+  TableCellsIcon,
+  LightBulbIcon,
+  CurrencyDollarIcon,
+  PresentationChartLineIcon,
+  ExclamationTriangleIcon,
+  Squares2X2Icon,
+  ArrowDownTrayIcon
+} from '@heroicons/react/24/outline';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 
 const AdvancedVisualization: React.FC = () => {
@@ -19,42 +36,42 @@ const AdvancedVisualization: React.FC = () => {
       id: 'financial-overview',
       title: 'Panorama Financiero',
       type: 'multi-line',
-      icon: 'CurrencyDollarIcon',
+      icon: CurrencyDollarIcon,
       description: 'Ingresos, gastos y utilidad neta en el tiempo'
     },
     {
       id: 'customer-segments',
       title: 'Segmentación de Clientes',
       type: 'sunburst',
-      icon: 'UserGroupIcon',
+      icon: UserGroupIcon,
       description: 'Distribución de clientes por valor y comportamiento'
     },
     {
       id: 'operational-efficiency',
       title: 'Eficiencia Operacional',
       type: 'radar',
-      icon: 'CogIcon',
+      icon: CogIcon,
       description: 'KPIs operacionales en múltiples dimensiones'
     },
     {
       id: 'market-analysis',
       title: 'Análisis de Mercado',
       type: 'heatmap',
-      icon: 'GlobeAltIcon',
+      icon: GlobeAltIcon,
       description: 'Performance por región y segmento'
     },
     {
       id: 'predictive-trends',
       title: 'Tendencias Predictivas',
       type: 'forecast',
-      icon: 'TrendingUpIcon',
+      icon: ArrowTrendingUpIcon,
       description: 'Proyecciones basadas en IA y machine learning'
     },
     {
       id: 'portfolio-performance',
       title: 'Performance de Portfolio',
       type: 'treemap',
-      icon: 'ChartBarIcon',
+      icon: ChartBarIcon,
       description: 'Rendimiento de productos y servicios'
     }
   ];
@@ -134,7 +151,7 @@ const AdvancedVisualization: React.FC = () => {
           <div className="space-y-4">
             <div className="h-64 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 flex items-center justify-center border">
               <div className="text-center">
-                <Icon name="ChartBarIcon" className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                <Icon as={ChartBarIcon} className="h-16 w-16 text-blue-500 mx-auto mb-4" />
                 <Typography variant="subtitle" color="blue.600">
                   Gráfico Multi-línea: {config.title}
                 </Typography>
@@ -168,7 +185,7 @@ const AdvancedVisualization: React.FC = () => {
           <div className="space-y-4">
             <div className="h-64 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 flex items-center justify-center border">
               <div className="text-center">
-                <Icon name="UserGroupIcon" className="h-16 w-16 text-purple-500 mx-auto mb-4" />
+                <Icon as={UserGroupIcon} className="h-16 w-16 text-purple-500 mx-auto mb-4" />
                 <Typography variant="subtitle" color="purple.600">
                   Segmentación Sunburst: {config.title}
                 </Typography>
@@ -201,7 +218,7 @@ const AdvancedVisualization: React.FC = () => {
           <div className="space-y-4">
             <div className="h-64 bg-gradient-to-br from-green-50 to-teal-50 rounded-lg p-4 flex items-center justify-center border">
               <div className="text-center">
-                <Icon name="CogIcon" className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                <Icon as={CogIcon} className="h-16 w-16 text-green-500 mx-auto mb-4" />
                 <Typography variant="subtitle" color="green.600">
                   Gráfico Radar: {config.title}
                 </Typography>
@@ -239,7 +256,7 @@ const AdvancedVisualization: React.FC = () => {
         return (
           <div className="h-64 bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg p-4 flex items-center justify-center border">
             <div className="text-center">
-              <Icon name={config.icon} className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+              <Icon as={config.icon} className="h-16 w-16 text-gray-500 mx-auto mb-4" />
               <Typography variant="subtitle" color="gray.600">
                 {config.title}
               </Typography>
@@ -281,9 +298,9 @@ const AdvancedVisualization: React.FC = () => {
                 disabled={isExporting}
               >
                 {isExporting ? (
-                  <Icon name="ArrowPathIcon" className="animate-spin" />
+                  <Icon as={ArrowPathIcon} className="animate-spin" />
                 ) : (
-                  <Icon name="PhotoIcon" />
+                  <Icon as={PhotoIcon} />
                 )}
                 PNG
               </Button>
@@ -293,7 +310,7 @@ const AdvancedVisualization: React.FC = () => {
                 onClick={() => exportChart('pdf')}
                 disabled={isExporting}
               >
-                <Icon name="DocumentIcon" />
+                <Icon as={DocumentIcon} />
                 PDF
               </Button>
               <Button
@@ -302,7 +319,7 @@ const AdvancedVisualization: React.FC = () => {
                 onClick={() => exportChart('excel')}
                 disabled={isExporting}
               >
-                <Icon name="TableCellsIcon" />
+                <Icon as={TableCellsIcon} />
                 Excel
               </Button>
             </div>
@@ -320,7 +337,7 @@ const AdvancedVisualization: React.FC = () => {
                     onClick={() => setSelectedChart(chart.id)}
                     className="justify-start text-left h-auto p-3"
                   >
-                    <Icon name={chart.icon} />
+                    <Icon as={chart.icon} />
                     <div>
                       <div className="font-medium text-sm">{chart.title}</div>
                       <div className="text-xs text-gray-500 mt-1">{chart.description}</div>
@@ -339,7 +356,7 @@ const AdvancedVisualization: React.FC = () => {
                     <Stack gap="sm">
                       {insights.map((insight, index) => (
                         <div key={index} className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <Icon name="LightBulbIcon" className="text-blue-500 mt-0.5" />
+                          <Icon as={LightBulbIcon} className="text-blue-500 mt-0.5" />
                           <Typography fontSize="sm">{insight}</Typography>
                         </div>
                       ))}
@@ -356,7 +373,7 @@ const AdvancedVisualization: React.FC = () => {
                 title="Gráficos Creados"
                 value="24"
                 subtitle="este mes"
-                icon="ChartBarIcon"
+                icon={ChartBarIcon}
                 trend="up"
                 change="+6"
               />
@@ -364,7 +381,7 @@ const AdvancedVisualization: React.FC = () => {
                 title="Dashboards Activos"
                 value="8"
                 subtitle="en uso"
-                icon="PresentationChartLineIcon"
+                icon={PresentationChartLineIcon}
                 trend="up"
                 change="+2"
               />
@@ -372,7 +389,7 @@ const AdvancedVisualization: React.FC = () => {
                 title="Exportaciones"
                 value="156"
                 subtitle="último período"
-                icon="ArrowDownTrayIcon"
+                icon={ArrowDownTrayIcon}
                 trend="up"
                 change="+23%"
               />
@@ -382,14 +399,14 @@ const AdvancedVisualization: React.FC = () => {
               <Typography variant="subtitle" className="mb-4">Templates Disponibles</Typography>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { name: 'Executive Summary', type: 'Multi-KPI', icon: 'PresentationChartLineIcon' },
-                  { name: 'Financial Analysis', type: 'Time Series', icon: 'CurrencyDollarIcon' },
-                  { name: 'Customer Journey', type: 'Sankey', icon: 'UserGroupIcon' },
-                  { name: 'Market Comparison', type: 'Bubble Chart', icon: 'GlobeAltIcon' },
-                  { name: 'Performance Matrix', type: 'Scatter Plot', icon: 'ChartBarIcon' },
-                  { name: 'Risk Assessment', type: 'Heat Map', icon: 'ExclamationTriangleIcon' },
-                  { name: 'Trend Forecast', type: 'Predictive', icon: 'TrendingUpIcon' },
-                  { name: 'Portfolio View', type: 'Tree Map', icon: 'Squares2X2Icon' }
+                  { name: 'Executive Summary', type: 'Multi-KPI', icon: PresentationChartLineIcon },
+                  { name: 'Financial Analysis', type: 'Time Series', icon: CurrencyDollarIcon },
+                  { name: 'Customer Journey', type: 'Sankey', icon: UserGroupIcon },
+                  { name: 'Market Comparison', type: 'Bubble Chart', icon: GlobeAltIcon },
+                  { name: 'Performance Matrix', type: 'Scatter Plot', icon: ChartBarIcon },
+                  { name: 'Risk Assessment', type: 'Heat Map', icon: ExclamationTriangleIcon },
+                  { name: 'Trend Forecast', type: 'Predictive', icon: ArrowTrendingUpIcon },
+                  { name: 'Portfolio View', type: 'Tree Map', icon: Squares2X2Icon }
                 ].map((template, index) => (
                   <Button
                     key={index}
@@ -397,7 +414,7 @@ const AdvancedVisualization: React.FC = () => {
                     size="sm"
                     className="h-auto p-3 text-left justify-start"
                   >
-                    <Icon name={template.icon} />
+                    <Icon as={template.icon} />
                     <div>
                       <div className="font-medium text-sm">{template.name}</div>
                       <div className="text-xs text-gray-500">{template.type}</div>

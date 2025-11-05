@@ -5,6 +5,7 @@
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { logger } from '@/lib/logging';
 
 const execAsync = promisify(exec);
 
@@ -20,7 +21,7 @@ class StaffTestRunner {
   private results: TestResult[] = [];
 
   async runSuite(suitePath: string, suiteName: string): Promise<TestResult> {
-    console.log(`🧪 Running ${suiteName}...`);
+    logger.debug('Test-runner', `🧪 Running ${suiteName}...`);
     
     const startTime = Date.now();
     
@@ -45,15 +46,15 @@ class StaffTestRunner {
       this.results.push(testResult);
       
       if (testResult.failed === 0) {
-        console.log(`✅ ${suiteName} - ${testResult.passed} tests passed (${duration}ms)`);
+        logger.info('Test-runner', `✅ ${suiteName} - ${testResult.passed} tests passed (${duration}ms)`);
       } else {
-        console.log(`❌ ${suiteName} - ${testResult.failed} tests failed, ${testResult.passed} passed`);
+        logger.error('Test-runner', `❌ ${suiteName} - ${testResult.failed} tests failed, ${testResult.passed} passed`);
       }
       
       return testResult;
       
     } catch (error) {
-      console.error(`💥 ${suiteName} - Error running tests:`, error);
+      logger.error('Test-runner', `💥 ${suiteName} - Error running tests:`, error);
       
       const testResult: TestResult = {
         suite: suiteName,
@@ -75,7 +76,7 @@ class StaffTestRunner {
         return JSON.parse(jsonMatch[0]);
       }
     } catch (error) {
-      console.warn('Could not parse test output as JSON');
+      logger.warn('Test-runner', 'Could not parse test output as JSON');
     }
     
     // Fallback parsing
@@ -91,7 +92,7 @@ class StaffTestRunner {
   }
 
   async runAllTests(): Promise<void> {
-    console.log('🚀 Starting Staff Module Test Suite\n');
+    logger.info('Test-runner', '🚀 Starting Staff Module Test Suite\n');
     
     const testSuites = [
       {
@@ -129,7 +130,7 @@ class StaffTestRunner {
   }
 
   private printSummary(): void {
-    console.log('📊 Test Summary');
+    logger.debug('Test-runner', '📊 Test Summary');
     console.log('=' .repeat(50));
     
     const totalPassed = this.results.reduce((sum, result) => sum + result.passed, 0);
@@ -137,44 +138,44 @@ class StaffTestRunner {
     const totalDuration = this.results.reduce((sum, result) => sum + result.duration, 0);
     const avgCoverage = this.results.reduce((sum, result) => sum + result.coverage, 0) / this.results.length;
     
-    console.log(`Total Tests: ${totalPassed + totalFailed}`);
-    console.log(`✅ Passed: ${totalPassed}`);
-    console.log(`❌ Failed: ${totalFailed}`);
-    console.log(`⏱️  Duration: ${totalDuration}ms`);
-    console.log(`📈 Avg Coverage: ${avgCoverage.toFixed(1)}%`);
+    logger.error('Test-runner', `Total Tests: ${totalPassed + totalFailed}`);
+    logger.info('Test-runner', `✅ Passed: ${totalPassed}`);
+    logger.error('Test-runner', `❌ Failed: ${totalFailed}`);
+    logger.debug('Test-runner', `⏱️  Duration: ${totalDuration}ms`);
+    logger.debug('Test-runner', `📈 Avg Coverage: ${avgCoverage.toFixed(1)}%`);
     console.log('');
 
     // Detailed breakdown
     this.results.forEach(result => {
       const status = result.failed === 0 ? '✅' : '❌';
-      console.log(`${status} ${result.suite}: ${result.passed}/${result.passed + result.failed} (${result.coverage}%)`);
+      logger.error('Test-runner', `${status} ${result.suite}: ${result.passed}/${result.passed + result.failed} (${result.coverage}%)`);
     });
 
     console.log('');
     
     if (totalFailed === 0) {
-      console.log('🎉 All tests passed! Staff module is ready for production.');
+      logger.info('Test-runner', '🎉 All tests passed! Staff module is ready for production.');
     } else {
-      console.log(`⚠️  ${totalFailed} test(s) failed. Please review and fix issues.`);
+      logger.error('Test-runner', `⚠️  ${totalFailed} test(s) failed. Please review and fix issues.`);
     }
 
     // Coverage recommendations
     if (avgCoverage < 80) {
-      console.log('💡 Consider adding more tests to improve coverage (target: 80%+)');
+      logger.debug('Test-runner', '💡 Consider adding more tests to improve coverage (target: 80%+)');
     }
 
     // Performance recommendations
     const slowSuites = this.results.filter(r => r.duration > 5000);
     if (slowSuites.length > 0) {
-      console.log('⚡ Consider optimizing slow test suites:');
+      logger.warn('Test-runner', '⚡ Consider optimizing slow test suites:');
       slowSuites.forEach(suite => {
-        console.log(`   - ${suite.suite}: ${suite.duration}ms`);
+        logger.debug('Test-runner', `   - ${suite.suite}: ${suite.duration}ms`);
       });
     }
   }
 
   async runCoverageAnalysis(): Promise<void> {
-    console.log('📈 Running Coverage Analysis...');
+    logger.debug('Test-runner', '📈 Running Coverage Analysis...');
     
     try {
       const { stdout } = await execAsync(
@@ -182,16 +183,16 @@ class StaffTestRunner {
       );
       
       // Parse coverage data
-      console.log('Coverage Report:');
+      logger.debug('Test-runner', 'Coverage Report:');
       console.log(stdout);
       
     } catch (error) {
-      console.error('Error running coverage analysis:', error);
+      logger.error('Test-runner', 'Error running coverage analysis:', error);
     }
   }
 
   async runPerformanceBenchmark(): Promise<void> {
-    console.log('⚡ Running Performance Benchmarks...');
+    logger.debug('Test-runner', '⚡ Running Performance Benchmarks...');
     
     const benchmarks = [
       'Large dataset handling (1000+ records)',
@@ -202,13 +203,13 @@ class StaffTestRunner {
     ];
 
     for (const benchmark of benchmarks) {
-      console.log(`🔍 ${benchmark}...`);
+      logger.debug('Test-runner', `🔍 ${benchmark}...`);
       
       try {
         await execAsync('npx vitest run src/services/staff/__tests__/performance.test.ts --reporter=verbose');
-        console.log('✅ Benchmark passed');
+        logger.info('Test-runner', '✅ Benchmark passed');
       } catch (error) {
-        console.log('❌ Benchmark failed');
+        logger.error('Test-runner', '❌ Benchmark failed');
       }
     }
   }

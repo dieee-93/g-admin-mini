@@ -19,10 +19,10 @@ interface CustomersTabProps {
 
 export const CustomersTab: React.FC<CustomersTabProps> = ({ analytics }) => {
   return (
-    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
+    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
       <CardWrapper borderTop="4px solid" borderTopColor="green.400">
-        <CardWrapper.Body p={4} textAlign="center">
-          <VStack gap={3}>
+        <CardWrapper.Body p="4" textAlign="center">
+          <VStack gap="3">
             <UsersIcon className="w-12 h-12 text-green-500" />
             <Text fontSize="2xl" fontWeight="bold">{analytics.customers.total_unique}</Text>
             <Text color="gray.600">Total Unique Customers</Text>
@@ -32,8 +32,8 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ analytics }) => {
       </CardWrapper>
 
       <CardWrapper borderTop="4px solid" borderTopColor="blue.400">
-        <CardWrapper.Body p={4} textAlign="center">
-          <VStack gap={3}>
+        <CardWrapper.Body p="4" textAlign="center">
+          <VStack gap="3">
             <TrophyIcon className="w-12 h-12 text-blue-500" />
             <Text fontSize="2xl" fontWeight="bold">{analytics.customers.returning_customers}</Text>
             <Text color="gray.600">Returning Customers</Text>
@@ -43,8 +43,8 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ analytics }) => {
       </CardWrapper>
 
       <CardWrapper borderTop="4px solid" borderTopColor="purple.400">
-        <CardWrapper.Body p={4} textAlign="center">
-          <VStack gap={3}>
+        <CardWrapper.Body p="4" textAlign="center">
+          <VStack gap="3">
             <FireIcon className="w-12 h-12 text-purple-500" />
             <Text fontSize="2xl" fontWeight="bold">{analytics.customers.new_customers}</Text>
             <Text color="gray.600">New Customers</Text>

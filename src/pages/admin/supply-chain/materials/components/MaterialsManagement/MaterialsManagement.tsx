@@ -1,7 +1,10 @@
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@/shared/ui';
-import { InventoryTab } from './InventoryTab';
-import { ABCAnalysisTab } from './ABCAnalysisTab';
+import { Tabs } from '@/shared/ui';
+import { InventoryTabEnhanced } from './InventoryTabEnhanced';
+import { AnalyticsTabEnhanced } from './AnalyticsTabEnhanced';
 import { ProcurementTab } from './ProcurementTab';
+import { TransfersTab } from './TransfersTab';
+import { HookPoint } from '@/lib/modules';
+import { useCallback, memo } from 'react';
 
 interface MaterialsManagementProps {
   activeTab: string;
@@ -12,7 +15,8 @@ interface MaterialsManagementProps {
   performanceMode?: boolean;
 }
 
-export function MaterialsManagement({
+// ✅ PERFORMANCE: Memoize to prevent unnecessary re-renders
+export const MaterialsManagement = memo(function MaterialsManagement({
   activeTab,
   onTabChange,
   onStockUpdate,
@@ -20,46 +24,82 @@ export function MaterialsManagement({
   onAddMaterial,
   performanceMode = false
 }: MaterialsManagementProps) {
+  // ✅ PERFORMANCE: Stabilize onValueChange callback to prevent TabsContext thrashing
+  const handleTabChange = useCallback((details: { value: string }) => {
+    onTabChange(details.value);
+  }, [onTabChange]);
+
   return (
-    <Tabs
+    <Tabs.Root
       value={activeTab}
-      onValueChange={onTabChange}
+      onValueChange={handleTabChange}
       variant="line"
       colorPalette="blue"
       size="md"
-      isLazy
-      lazyBehavior="keepMounted"
+      lazyMount
+      unmountOnExit={false}
     >
-      <TabList gap="sm">
-        <Tab value="inventory">
+      <Tabs.List gap="sm">
+        <Tabs.Trigger value="inventory">
           Inventario
-        </Tab>
-        <Tab value="analytics">
+        </Tabs.Trigger>
+        <Tabs.Trigger value="analytics">
           Análisis ABC
-        </Tab>
-        <Tab value="procurement">
+        </Tabs.Trigger>
+        <Tabs.Trigger value="procurement">
           Compras
-        </Tab>
-      </TabList>
+        </Tabs.Trigger>
+        <Tabs.Trigger value="transfers">
+          Transferencias 🏢
+        </Tabs.Trigger>
 
-      <TabPanels>
-        <TabPanel value="inventory" padding="md">
-          <InventoryTab
-            onStockUpdate={onStockUpdate}
-            onBulkAction={onBulkAction}
-            onAddMaterial={onAddMaterial}
-            performanceMode={performanceMode}
-          />
-        </TabPanel>
+        {/* Hook point for cross-module tabs (e.g., Suppliers tab, Products tab) */}
+        <HookPoint
+          name="materials.tabs"
+          data={{ activeTab, onTabChange }}
+          direction="row"
+          gap="0"
+          fallback={null}
+        />
+      </Tabs.List>
 
-        <TabPanel value="analytics" padding="md">
-          <ABCAnalysisTab />
-        </TabPanel>
+      <Tabs.Content value="inventory" padding="md">
+        <InventoryTabEnhanced
+          onStockUpdate={onStockUpdate}
+          onBulkAction={onBulkAction}
+          onAddMaterial={onAddMaterial}
+          performanceMode={performanceMode}
+        />
+      </Tabs.Content>
 
-        <TabPanel value="procurement" padding="md">
-          <ProcurementTab />
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+      <Tabs.Content value="analytics" padding="md">
+        <AnalyticsTabEnhanced />
+      </Tabs.Content>
+
+      <Tabs.Content value="procurement" padding="md">
+        <ProcurementTab />
+      </Tabs.Content>
+
+      <Tabs.Content value="transfers" padding="md">
+        <TransfersTab />
+      </Tabs.Content>
+
+      {/* Hook point for cross-module tab content (e.g., Suppliers content, Products content) */}
+      <HookPoint
+        name="materials.tab_content"
+        data={{ activeTab }}
+        fallback={null}
+      />
+    </Tabs.Root>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent re-renders when props haven't meaningfully changed
+  return (
+    prevProps.activeTab === nextProps.activeTab &&
+    prevProps.onTabChange === nextProps.onTabChange &&
+    prevProps.onStockUpdate === nextProps.onStockUpdate &&
+    prevProps.onBulkAction === nextProps.onBulkAction &&
+    prevProps.onAddMaterial === nextProps.onAddMaterial &&
+    prevProps.performanceMode === nextProps.performanceMode
+  );
+});

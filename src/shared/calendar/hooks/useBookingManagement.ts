@@ -10,7 +10,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useCalendarEngine } from './useCalendarEngine';
 import { useCalendarAdapter } from './useCalendarAdapter';
-import {
+import type {
   ISODateString,
   ISOTimeString,
   DurationMinutes,
@@ -22,7 +22,7 @@ import {
   ConflictResult,
   CalendarConfig
 } from '../types/DateTimeTypes';
-import { QueryOptions, EngineResult } from '../engine/UnifiedCalendarEngine';
+import type { QueryOptions, EngineResult } from '../engine/UnifiedCalendarEngine';
 
 // ===============================
 // BOOKING INTERFACES

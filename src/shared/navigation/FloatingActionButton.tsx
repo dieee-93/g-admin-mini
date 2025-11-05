@@ -1,13 +1,13 @@
 // ====================================
-// src/components/navigation/FloatingActionButton.tsx - MIGRADO AL DESIGN SYSTEM
+// src/components/navState/FloatingActionButton.tsx - MIGRADO AL DESIGN SYSTEM
 // ====================================
 
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useNavigationState } from '@/contexts/NavigationContext';
 import { Button, Icon } from '@/shared/ui';
 
 export function FloatingActionButton() {
-  const { quickActions, currentModule } = useNavigation();
+  const navState = useNavigationState(); const { currentModule } = navState; const quickActions: any[] = [];
   
   const primaryAction = quickActions[0];
   

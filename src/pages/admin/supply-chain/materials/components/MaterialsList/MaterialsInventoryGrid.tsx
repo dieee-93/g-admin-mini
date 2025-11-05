@@ -1,10 +1,9 @@
 // MaterialsInventoryGrid.tsx - Virtualized inventory grid with smart filtering
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
-  Section, Stack, Typography, InputField, SelectField, CardGrid, Alert, Badge, Button, createListCollection
+  Section, Stack, Typography, InputField, SelectField, Alert, Badge, Button
 } from '@/shared/ui';
 import {
-  MagnifyingGlassIcon,
   ExclamationTriangleIcon,
   CubeIcon,
   PencilIcon,
@@ -120,7 +119,7 @@ export function MaterialsInventoryGrid({
     }
   };
 
-  const renderItem = ({ item, index }: { item: InventoryItem; index: number }) => (
+  const renderItem = ({ item }: { item: InventoryItem; index: number }) => (
     <ModernItemCard
       key={item.id}
       item={item}
@@ -203,13 +202,13 @@ const ModernItemCard = React.memo(({
   getTypeIcon,
   getTypeColor
 }: {
-  item: InventoryItem & { syncStatus?: string; isOfflineItem?: boolean; localModifications?: any[] };
+  item: InventoryItem & { syncStatus?: string; isOfflineItem?: boolean; localModifications?: Array<Record<string, unknown>> };
   onEdit: (item: InventoryItem) => void;
   onAddStock: (item: InventoryItem) => void;
   onViewDetails: (item: InventoryItem) => void;
   formatQuantity: (quantity: number, unit: string, item: InventoryItem) => string;
   getStockStatus: (item: InventoryItem) => { color: string; label: string; severity: string };
-  getTypeIcon: (type: string) => any;
+  getTypeIcon: (type: string) => React.ElementType;
   getTypeColor: (type: string) => string;
 }) => {
   const TypeIcon = getTypeIcon(item.type);

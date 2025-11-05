@@ -24,15 +24,16 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmError, setConfirmError] = useState('');
-  
-  const { signUp, isLoading, error, clearError } = useAuth();
+  const [error, setError] = useState('');
+
+  const { signUp, loading } = useAuth();
 
   const validateForm = () => {
     let isValid = true;
     setEmailError('');
     setPasswordError('');
     setConfirmError('');
-    
+
     if (!email?.trim()) {
       setEmailError('El email es requerido');
       isValid = false;
@@ -40,7 +41,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       setEmailError('Formato de email inválido');
       isValid = false;
     }
-    
+
     if (!password?.trim()) {
       setPasswordError('La contraseña es requerida');
       isValid = false;
@@ -48,7 +49,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       setPasswordError('La contraseña debe tener al menos 6 caracteres');
       isValid = false;
     }
-    
+
     if (!confirmPassword?.trim()) {
       setConfirmError('Confirmar contraseña es requerido');
       isValid = false;
@@ -56,34 +57,32 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       setConfirmError('Las contraseñas no coinciden');
       isValid = false;
     }
-    
+
     return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
-    
+    setError('');
+
     if (!validateForm()) {
       return;
     }
 
-    const success = await signUp({
-      email,
-      password,
-      full_name: fullName,
-    });
-    
-    if (success) {
+    const { error: signUpError } = await signUp(email, password, fullName);
+
+    if (signUpError) {
+      setError(signUpError);
+    } else {
       logger.info('App', 'Registration successful');
     }
   };
 
   return (
     <CardWrapper>
-      <Box maxW="md" mx="auto" mt={8}>
-        <VStack gap={6}>
-          <VStack gap={2}>
+      <Box maxW="md" mx="auto" mt="8">
+        <VStack gap="6">
+          <VStack gap="2">
             <Heading size="lg" color="blue.500">
               G-Mini
             </Heading>
@@ -93,11 +92,11 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
           </VStack>
           
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-            <VStack gap={4}>
+            <VStack gap="4">
               {error && (
                 <Box 
                   w="full" 
-                  p={3} 
+                  p="3" 
                   bg="red.50" 
                   border="1px solid" 
                   borderColor="red.200" 
@@ -149,9 +148,9 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
               <Button
                 type="submit"
-                colorPalette="brand"
+                colorPalette="purple"
                 fullWidth
-                loading={isLoading}
+                loading={loading}
               >
                 Crear Cuenta
               </Button>
@@ -173,7 +172,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                 </>
               )}
 
-              <Box mt={4}>
+              <Box mt="4">
                 <Text fontSize="xs" color="gray.500" textAlign="center">
                   Al registrarte, aceptas nuestros términos y condiciones
                 </Text>
