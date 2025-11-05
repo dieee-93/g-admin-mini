@@ -3,18 +3,18 @@ import { BuildingOffice2Icon } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
 
 /**
- * Finance Module Manifest
+ * Finance Corporate Module Manifest
  *
  * B2B Finance module for corporate accounts, credit management,
  * and payment terms. Enables businesses to manage B2B customers
  * with credit lines and NET payment terms.
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
-export const financeManifest: ModuleManifest = {
-  id: 'finance',
-  name: 'Finance',
-  version: '1.0.0',
+export const financeCorporateManifest: ModuleManifest = {
+  id: 'finance-corporate',
+  name: 'Finance Corporate',
+  version: '2.0.0',
 
   // ============================================
   // FEATURES
@@ -31,7 +31,7 @@ export const financeManifest: ModuleManifest = {
   // DEPENDENCIES
   // ============================================
 
-  depends: ['customers', 'fiscal', 'billing'],
+  depends: ['customers', 'finance-fiscal', 'finance-billing'],
   autoInstall: false,
 
   // ============================================
@@ -120,7 +120,7 @@ export const financeManifest: ModuleManifest = {
             logger.error('Finance', 'Error validating credit for order', error);
           }
         },
-        { moduleId: 'finance' }
+        { moduleId: 'finance-corporate' }
       );
 
       // Listen to fiscal invoices - update account balance
@@ -143,7 +143,7 @@ export const financeManifest: ModuleManifest = {
             logger.error('Finance', 'Error recording invoice', error);
           }
         },
-        { moduleId: 'finance' }
+        { moduleId: 'finance-corporate' }
       );
 
       // Listen to billing payments - update account balance
@@ -167,7 +167,7 @@ export const financeManifest: ModuleManifest = {
             logger.error('Finance', 'Error recording payment', error);
           }
         },
-        { moduleId: 'finance' }
+        { moduleId: 'finance-corporate' }
       );
 
       logger.info('App', '✅ Finance module setup complete', {
@@ -222,11 +222,11 @@ export const financeManifest: ModuleManifest = {
   // ============================================
 
   metadata: {
-    category: 'finance',
+    category: 'b2b',
     description: 'B2B corporate accounts with credit management and payment terms',
     tags: ['finance', 'b2b', 'credit', 'corporate', 'accounts-receivable'],
     navigation: {
-      route: '/admin/finance',
+      route: '/admin/finance/corporate',
       icon: BuildingOffice2Icon,
       color: 'green',
       domain: 'finance',

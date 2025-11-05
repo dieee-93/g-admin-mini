@@ -1,10 +1,10 @@
 /**
- * FISCAL MODULE MANIFEST
+ * FINANCE FISCAL MODULE MANIFEST
  *
  * Fiscal and tax management including AFIP integration.
  * Handles invoicing, receipts, and tax compliance.
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 import React, { lazy } from 'react';
@@ -13,10 +13,10 @@ import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
 import { ReceiptPercentIcon } from '@heroicons/react/24/outline';
 
-export const fiscalManifest: ModuleManifest = {
-  id: 'fiscal',
+export const financeFiscalManifest: ModuleManifest = {
+  id: 'finance-fiscal',
   name: 'Fiscal & Tax',
-  version: '1.0.0',
+  version: '2.0.0',
 
   depends: ['sales'], // Fiscal processes sales transactions
   autoInstall: true, // Auto-install when sales is active
@@ -52,7 +52,7 @@ export const fiscalManifest: ModuleManifest = {
             <FiscalWidget />
           </React.Suspense>
         ),
-        'fiscal',
+        'finance-fiscal',
         50 // Medium-high priority widget
       );
 
@@ -79,7 +79,7 @@ export const fiscalManifest: ModuleManifest = {
   },
 
   metadata: {
-    category: 'business',
+    category: 'compliance',
     description: 'Fiscal management and AFIP integration (Argentina)',
     author: 'G-Admin Team',
     tags: ['fiscal', 'tax', 'afip', 'invoicing'],
@@ -93,4 +93,4 @@ export const fiscalManifest: ModuleManifest = {
   },
 };
 
-export default fiscalManifest;
+export default financeFiscalManifest;

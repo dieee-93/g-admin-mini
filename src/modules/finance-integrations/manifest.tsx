@@ -4,7 +4,7 @@
  * Financial system integrations (banks, payment gateways, accounting).
  * Manages connections to external financial services.
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 import { logger } from '@/lib/logging';
@@ -15,9 +15,9 @@ import { LinkIcon } from '@heroicons/react/24/outline';
 export const financeIntegrationsManifest: ModuleManifest = {
   id: 'finance-integrations',
   name: 'Finance Integrations',
-  version: '1.0.0',
+  version: '2.0.0',
 
-  depends: ['fiscal', 'billing'], // Integrations work with fiscal/billing data
+  depends: ['finance-fiscal', 'finance-billing'], // Integrations work with fiscal/billing data
   autoInstall: true, // Auto-activate when dependencies active
 
   requiredFeatures: [] as FeatureId[],
@@ -80,10 +80,10 @@ export const financeIntegrationsManifest: ModuleManifest = {
   },
 
   metadata: {
-    category: 'integrations',
-    description: 'Financial system integrations (banks, payment gateways, accounting)',
+    category: 'payments',
+    description: 'Multi-model payment gateways and accounting integrations',
     author: 'G-Admin Team',
-    tags: ['integrations', 'finance', 'banking', 'accounting'],
+    tags: ['integrations', 'finance', 'banking', 'accounting', 'payments'],
     navigation: {
       route: '/admin/finance/integrations',
       icon: LinkIcon,

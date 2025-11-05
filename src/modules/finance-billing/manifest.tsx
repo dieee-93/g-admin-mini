@@ -1,10 +1,10 @@
 /**
- * BILLING MODULE MANIFEST
+ * FINANCE BILLING MODULE MANIFEST
  *
  * Billing and subscription management.
  * Handles recurring billing, subscriptions, and payment plans.
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 import React, { lazy } from 'react';
@@ -13,10 +13,10 @@ import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
 import { CreditCardIcon } from '@heroicons/react/24/outline';
 
-export const billingManifest: ModuleManifest = {
-  id: 'billing',
-  name: 'Billing & Subscriptions',
-  version: '1.0.0',
+export const financeBillingManifest: ModuleManifest = {
+  id: 'finance-billing',
+  name: 'Billing & Invoicing',
+  version: '2.0.0',
 
   depends: ['customers'], // Billing tracks customer accounts
   autoInstall: true, // Auto-activate when customers active
@@ -58,7 +58,7 @@ export const billingManifest: ModuleManifest = {
             <BillingWidget />
           </React.Suspense>
         ),
-        'billing',
+        'finance-billing',
         35 // Medium priority widget
       );
 
@@ -78,12 +78,12 @@ export const billingManifest: ModuleManifest = {
       logger.debug('App', 'Generating invoice', { customerId, items });
 
       // Calculate total from items using Decimal.js for precision
-      const { calculateInvoiceTotal } = await import('@/pages/admin/finance/billing/services');
+      const { calculateInvoiceTotal } = await import('@/pages/admin/finance-billing/services');
       const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
       const { amount, taxAmount, totalAmount } = calculateInvoiceTotal(subtotal, 0.21); // 21% IVA
 
       // Generate invoice using billingApi
-      const { generateInvoice: createInvoice } = await import('@/pages/admin/finance/billing/services');
+      const { generateInvoice: createInvoice } = await import('@/pages/admin/finance-billing/services');
       const { data: invoice, error } = await createInvoice(customerId, {
         amount,
         taxAmount,
@@ -98,7 +98,7 @@ export const billingManifest: ModuleManifest = {
       logger.debug('App', 'Processing payment', { invoiceId, paymentData });
 
       // Process payment using billingApi
-      const { processPayment: makePayment } = await import('@/pages/admin/finance/billing/services');
+      const { processPayment: makePayment } = await import('@/pages/admin/finance-billing/services');
       const { data: payment, error } = await makePayment(invoiceId, {
         ...paymentData,
         currency: 'ARS'
@@ -109,8 +109,8 @@ export const billingManifest: ModuleManifest = {
   },
 
   metadata: {
-    category: 'business',
-    description: 'Billing, subscriptions, and payment management',
+    category: 'invoicing',
+    description: 'Multi-model billing, subscriptions, and payment management',
     author: 'G-Admin Team',
     tags: ['billing', 'subscriptions', 'payments', 'invoices'],
     navigation: {
@@ -123,4 +123,4 @@ export const billingManifest: ModuleManifest = {
   },
 };
 
-export default billingManifest;
+export default financeBillingManifest;

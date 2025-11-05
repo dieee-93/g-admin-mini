@@ -78,10 +78,10 @@ import { schedulingManifest } from './scheduling/manifest';
 // ============================================
 // FINANCE DOMAIN - Financial management
 // ============================================
-import { fiscalManifest } from './fiscal/manifest';
-import { billingManifest } from './billing/manifest';
+import { financeCorporateManifest } from './finance-corporate/manifest';
+import { financeFiscalManifest } from './finance-fiscal/manifest';
+import { financeBillingManifest } from './finance-billing/manifest';
 import { financeIntegrationsManifest } from './finance-integrations/manifest';
-import { financeManifest } from './finance/manifest';
 
 // ============================================
 // GAMIFICATION DOMAIN - Achievements & progress
@@ -147,11 +147,18 @@ export const ALL_MODULE_MANIFESTS = [
   productsManifest,      // ✅ Depends on: materials
   productsAnalyticsManifest, // ✅ NEW: Products analytics sub-module (Menu Engineering, Cost Analysis)
   productionManifest,    // ✅ RENAMED from kitchen - Depends on: materials
-  billingManifest,       // ✅ Depends on: customers
-  fiscalManifest,        // ✅ Depends on: sales
 
   // ============================================
-  // TIER 3: Second-level dependencies
+  // TIER 3: Finance Domain (all independent)
+  // ============================================
+
+  financeBillingManifest,        // ✅ Depends on: customers
+  financeFiscalManifest,         // ✅ Depends on: sales
+  financeCorporateManifest,      // ✅ Depends on: customers, finance-fiscal, finance-billing
+  financeIntegrationsManifest,   // ✅ Depends on: finance-fiscal, finance-billing
+
+  // ============================================
+  // TIER 4: Second-level dependencies
   // ============================================
 
   supplierOrdersManifest,      // ✅ Depends on: suppliers + materials
@@ -160,20 +167,18 @@ export const ALL_MODULE_MANIFESTS = [
   fulfillmentPickupManifest,  // ✅ NEW: Pickup orders sub-module
   fulfillmentDeliveryManifest, // ✅ NEW: Delivery orders sub-module
   mobileManifest,             // ✅ NEW Phase 2: Mobile operations (GPS, routes, inventory)
-  financeManifest,            // ✅ NEW Phase 3: B2B Finance (corporate accounts, credit)
-  financeIntegrationsManifest, // ✅ Depends on: fiscal + billing
   
 
   // ============================================
-  // TIER 4: Third-level dependencies
+  // TIER 5: Third-level dependencies
   // ============================================
 
-  membershipsManifest,   // ✅ Depends on: customers + billing
+  membershipsManifest,   // ✅ Depends on: customers + finance-billing
   rentalsManifest,       // ✅ Depends on: customers + scheduling
   assetsManifest,        // ✅ Depends on: (optional: rentals)
 
   // ============================================
-  // TIER 5: Cross-cutting modules (aggregate data)
+  // TIER 6: Cross-cutting modules (aggregate data)
   // ============================================
 
   // DISABLED: kitchen module is obsolete
@@ -229,9 +234,9 @@ export {
   schedulingManifest,
 
   // Finance domain
-  fiscalManifest,
-  billingManifest,
-  financeManifest,
+  financeCorporateManifest,
+  financeFiscalManifest,
+  financeBillingManifest,
   financeIntegrationsManifest,
 
   // Cross-cutting domains
@@ -253,14 +258,14 @@ export type { ModuleManifest } from '@/lib/modules/types';
  * Module count by domain (for debugging/monitoring)
  */
 export const MODULE_STATS = {
-  total: ALL_MODULE_MANIFESTS.length, // 31 modules (was 30, +1 finance added in Phase 3)
+  total: ALL_MODULE_MANIFESTS.length, // 31 modules
   byDomain: {
     system: 1,        // achievements (TIER 0)
     core: 6,          // dashboard, settings, debug, customers, reporting, intelligence
     supplyChain: 5,   // materials, suppliers, supplier-orders, products, production
     operations: 8,    // sales (includes ecommerce), fulfillment (onsite/pickup/delivery), mobile, kitchen, memberships, rentals, assets
     resources: 2,     // staff, scheduling
-    finance: 4,       // fiscal, billing, finance (NEW), finance-integrations
+    finance: 4,       // finance-corporate, finance-fiscal, finance-billing, finance-integrations
     gamification: 1,  // gamification
     executive: 1,     // executive
   },

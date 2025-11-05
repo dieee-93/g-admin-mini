@@ -143,10 +143,10 @@ export const LazySchedulingPage = createLazyComponent(
 // NOTE: Recipes functionality migrated to services/recipe and dashboard
 // LazyRecipesPage removed - use RecipeForm from services/recipe instead
 
-// Lazy-loaded Fiscal Page (pages/admin/finance/fiscal/page.tsx)
+// Lazy-loaded Fiscal Page (pages/admin/finance-fiscal/page.tsx)
 export const LazyFiscalPage = createLazyComponent(
-  () => import('../../pages/admin/finance/fiscal/page'),
-  'fiscal',
+  () => import('../../pages/admin/finance-fiscal/page'),
+  'finance-fiscal',
   {
     chunkName: 'fiscal-module',
     preload: false,
@@ -344,10 +344,10 @@ export const LazyExecutivePage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Finance Billing Page (pages/admin/finance/billing/page.tsx)
+// Lazy-loaded Finance Billing Page (pages/admin/finance-billing/page.tsx)
 export const LazyBillingPage = createLazyComponent(
-  () => import('../../pages/admin/finance/billing/page'),
-  'billing',
+  () => import('../../pages/admin/finance-billing/page'),
+  'finance-billing',
   {
     chunkName: 'billing-module',
     preload: false,
@@ -356,10 +356,10 @@ export const LazyBillingPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Finance Integrations Page (pages/admin/finance/integrations/page.tsx)
+// Lazy-loaded Finance Integrations Page (pages/admin/finance-integrations/page.tsx)
 export const LazyIntegrationsPage = createLazyComponent(
-  () => import('../../pages/admin/finance/integrations/page'),
-  'integrations',
+  () => import('../../pages/admin/finance-integrations/page'),
+  'finance-integrations',
   {
     chunkName: 'integrations-module',
     preload: false,
