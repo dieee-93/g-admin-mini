@@ -88,7 +88,7 @@ src/pages/admin/finance/billing/
 ### Creating a Subscription
 
 ```typescript
-import { RecurringBillingFormData } from '@/pages/admin/finance/billing/types';
+import { RecurringBillingFormData } from '@/pages/admin/finance-billing/types';
 
 const subscription: RecurringBillingFormData = {
   subscriptionName: 'Premium Plan',
