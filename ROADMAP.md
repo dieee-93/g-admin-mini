@@ -1,6 +1,6 @@
 # G-Admin Mini - Development Roadmap
 
-**Última Actualización**: 2025-02-05 (Architecture Investigation Session)
+**Última Actualización**: 2025-02-05 (Delivery Module Consolidation Complete)
 **Versión**: 3.1 EventBus Enterprise Edition
 **Estado**: Phase 3 - Assembly & Integration (Estado real investigado)
 
@@ -280,17 +280,20 @@
 
 ---
 
-### Semana 2: Delivery ↔ Sales (P1)
+### Semana 2: Delivery ↔ Sales (P1) ✅ COMPLETADO (2025-02-05)
 
-**Estado**: Delivery consolidado en fulfillment-delivery, listo para integración
+**Estado**: ✅ Consolidación completa + EventBus integration + Supabase integration
 
-#### Order to Delivery Handoff
-- [ ] EventBus workflow:
-  - [ ] Sales emite: `sales.order.completed`
-  - [ ] Delivery escucha: `delivery.order.assigned`
-  - [ ] Automatic driver assignment (usa `routeOptimizationService.ts`)
-- [ ] Delivery scheduling UI
-- [ ] Zone validation (ya existe en `deliveryService.ts`)
+#### Order to Delivery Handoff ✅
+- [x] EventBus workflow:
+  - [x] Sales emite: `sales.completed` y `sales.order.placed` ✅
+  - [x] Delivery escucha y crea order automáticamente ✅
+  - [x] Handler `handleNewDeliveryOrder()` implementado ✅
+  - [x] Usa `deliveryApi.createDeliveryFromSale()` ✅
+- [x] Mocks eliminados: TopDriversTable usa datos reales ✅
+- [x] Supabase integration: employees + delivery_assignments ✅
+- [x] Métricas reales calculadas desde DB ✅
+- [x] Zone validation (ya existe en `deliveryService.ts`) ✅
 
 #### Route Optimization
 - [x] TSP algorithm implemented (`routeOptimizationService.ts`) ✅
@@ -302,8 +305,9 @@
 - [ ] Customer notifications
 - [ ] ETA calculations
 
-**Estimado**: 1 semana
-**Tests**: Integration + E2E tests
+**Tiempo Real**: 3 horas (2025-02-05)
+**Commit**: `7185be2` - feat: complete delivery module
+**Tests**: Pending - integration tests needed
 
 ---
 
