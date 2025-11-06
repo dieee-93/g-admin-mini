@@ -1,8 +1,13 @@
 # G-Admin Mini - Development Roadmap
 
-**Última Actualización**: 2025-02-05 (Delivery Module Consolidation Complete)
+**Última Actualización**: 2025-11-05 (Assets Module Reorganization - Moved to SUPPLY-CHAIN domain)
 **Versión**: 3.1 EventBus Enterprise Edition
 **Estado**: Phase 3 - Assembly & Integration (Estado real investigado)
+
+**2025-11-05 Update**: Assets module moved from OPERATIONS to SUPPLY-CHAIN domain
+- Reasoning: Is inventory management (durable goods), not revenue generation
+- Pattern: materials (consumables), assets (durables) → both supply-chain
+- No breaking changes - only organizational restructuring
 
 ---
 
@@ -34,15 +39,39 @@
 - [x] Procesamiento de pagos básico
 - [ ] Integración con impresoras fiscales
 
-#### 🔧 Alerts System Refactoring (NUEVO - P0)
-**Problema**: Sales tiene su propio `useSalesAlerts` hook que duplica funcionalidad
+#### ✅ EventBus Integration (COMPLETED 2025-02-05)
+**Estado**: Core EventBus integration complete, listeners implemented
 
-- [ ] **P0-HIGH**: Refactor Sales Alerts (4h)
-  - [ ] Eliminar `useState<SalesAlert[]>` duplicado en `useSalesAlerts.ts`
-  - [ ] Usar `useAlerts({ context: 'sales' })` del sistema unificado
-  - [ ] Mantener `SalesAlertsAdapter` pero que retorne `CreateAlertInput[]`
-  - [ ] Fix TODOs en `SalesAlertsAdapter.ts` (líneas 205-219)
-  - [ ] Validar integración con EventBus
+- [x] **P0-CRITICAL**: EventBus Emissions (2.5h) ✅
+  - [x] Fix B2B finance module imports (30min) - `@/modules/finance-corporate/services`
+  - [x] Emit `sales.order_placed` in `orderService.ts` (1h)
+  - [x] Emit `sales.order_completed` in `checkoutService.ts` (30min)
+  - [x] Emit `sales.payment_received` in `financeIntegration.ts` (30min)
+- [x] **P0-HIGH**: EventBus Listeners (1.5h) ✅
+  - [x] Listen to `materials.stock_updated` in `manifest.tsx` (45min)
+  - [x] Listen to `production.order_ready` in `manifest.tsx` (45min)
+- [x] **P0-HIGH**: Replace console.* with logger (30min) ✅
+  - [x] 7 instances replaced in ecommerce services
+
+**Impact**: 16 modules can now receive sales events (Fulfillment, Production, Materials, Finance, Customers, Products, Gamification)
+
+#### ✅ Alerts System Integration (COMPLETED 2025-02-05)
+**Estado**: Sales fully integrated with global alerts system (`src/shared/alerts/`)
+
+- [x] **P1-HIGH**: Integrate Unified Alerts System (4h) ✅
+  - [x] Created `salesAlertsAdapter.ts` with 9 alert types (2h)
+    - orderCreationFailed, creditLimitExceeded, stockUnavailable
+    - paymentFailed, checkoutValidationFailed, lowStockWarning
+    - orderReadyNotification, quoteApprovalNeeded, cartExpirationWarning
+  - [x] Integrated `useAlerts({ context: 'sales' })` in hooks (1.5h)
+    - `useOnlineOrders.ts` - Replaced error state with alerts
+    - `useCart.ts` - Replaced error state with alerts (7 operations)
+  - [x] Removed local error state from hooks (30min)
+    - All errors now flow through global alerts system
+    - Consistent UX across Sales module
+
+**Pattern**: ✅ FIRST module to use global alerts system correctly
+**Reference**: Sales is now the Gold Standard for alerts integration
 
 #### B2B Sales Integration
 **Estado**: Database ✅, Backend ✅, QuoteBuilder ✅, Tiered Pricing pendiente
@@ -187,9 +216,9 @@
 
 ---
 
-### Semana 5: Customers Module Validation (P0) ⏳
+### Semana 5: Customers Module Validation (P0) 🔄 IN PROGRESS
 
-**Estado**: Marcado como funcional, requiere validación EventBus y README
+**Estado**: EventBus y Alerts Integration COMPLETO ✅ (2025-11-05)
 
 **Why P0**: Foundation module - Billing, Memberships, Rentals, Sales dependen de él
 
@@ -199,16 +228,29 @@
 - [x] Customer segmentation ✅
 - [x] Service layer completo (`customerApi.ts`, `advancedCustomerApi.ts`)
 - [x] Manifest con hooks definidos ✅
+- [x] **EventBus Integration** ✅ (2025-11-05)
+  - [x] Listener: `sales.order_completed` → RFM updates (manifest.tsx línea 74-83)
+  - [x] EventBus registered in manifest setup
+- [x] **Alerts Integration** ✅ (2025-11-05)
+  - [x] customersAlertsAdapter.ts created (8 alert types)
+  - [x] useCustomerRFM.ts integrated (2 hooks)
+  - [x] useCustomersPage.ts integrated
+  - [x] useCustomerNotes.ts integrated (2 hooks)
+  - [x] **Total: 5 hooks migrated to useAlerts**
 
-#### 🔍 Validation Tasks (4-5h total)
-- [ ] **EventBus Integration Audit** (2h)
-  - [ ] Verify: Customers escucha `sales.order_completed` (manifest línea ~85)
-  - [ ] Check if Customers DEBE emitir events (¿`customers.profile_updated`?)
-  - [ ] Validate hook implementations en manifest.tsx
+#### 🔍 Validation Tasks (2-3h remaining)
+- [x] **EventBus Integration Audit** ✅ COMPLETO (2025-11-05)
+  - [x] Verified: Customers listens to `sales.order_completed` (manifest línea 74)
+  - [x] No emissions needed (CRM data, not triggering business flows)
+  - [x] EventBus properly registered in manifest setup
+- [x] **Alerts System Integration** ✅ COMPLETO (2025-11-05)
+  - [x] customersAlertsAdapter.ts created with 8 alert types
+  - [x] All hooks migrated from useState<Error> to useAlerts
+  - [x] Pattern matches Sales Gold Standard
 - [ ] **Cross-Module Hooks Validation** (1h)
   - [ ] Test `customers.profile_sections` (Memberships, Billing should inject)
   - [ ] Test `customers.quick_actions` (Sales, Rentals should inject)
-  - [ ] Test `dashboard.widgets` (Customer CRM widget)
+  - [x] Test `dashboard.widgets` (Customer CRM widget) ✅
 - [ ] **Documentation** (1.5h)
   - [ ] Create comprehensive README.md (follow Materials pattern)
   - [ ] Document cross-module integration (provides/consumes)
@@ -221,8 +263,8 @@
 
 **Deliverable**: README.md similar a Materials (600+ líneas, arquitectura documentada)
 
-**Estimado**: 1 sesión (4-5 horas)
-**Prerequisito**: Materials EventBus debe estar completo primero
+**Estimado**: 2-3 horas remaining
+**Progress**: 60% complete (EventBus + Alerts done)
 
 ---
 

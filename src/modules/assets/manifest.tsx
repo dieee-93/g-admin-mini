@@ -81,14 +81,14 @@ export const assetsManifest: ModuleManifest = {
 
   metadata: {
     category: 'business',
-    description: 'Physical asset management and tracking',
+    description: 'Physical asset inventory management (equipment, tools, machinery)',
     author: 'G-Admin Team',
-    tags: ['assets', 'equipment', 'maintenance', 'tracking'],
+    tags: ['assets', 'equipment', 'inventory', 'maintenance', 'tracking'],
     navigation: {
-      route: '/admin/operations/assets',
+      route: '/admin/supply-chain/assets',
       icon: CubeTransparentIcon,
-      color: 'gray',
-      domain: 'operations',
+      color: 'teal',
+      domain: 'supply-chain',
       isExpandable: false,
     },
   },

@@ -49,6 +49,7 @@ import { suppliersManifest } from './suppliers/manifest';
 import { supplierOrdersManifest } from './supplier-orders/manifest';
 import { productsManifest } from './products/manifest';
 import { productsAnalyticsManifest } from './products/analytics/manifest';
+import { assetsManifest } from './assets/manifest';
 
 // ============================================
 // OPERATIONS DOMAIN - Daily operations
@@ -66,8 +67,6 @@ import { productionManifest } from './production/manifest';
 import { mobileManifest } from './mobile/manifest';
 import { membershipsManifest } from './memberships/manifest';
 import { rentalsManifest } from './rentals/manifest';
-import { assetsManifest } from './assets/manifest';
-
 
 // ============================================
 // RESOURCES DOMAIN - Staff & scheduling
@@ -147,6 +146,7 @@ export const ALL_MODULE_MANIFESTS = [
   productsManifest,      // ✅ Depends on: materials
   productsAnalyticsManifest, // ✅ NEW: Products analytics sub-module (Menu Engineering, Cost Analysis)
   productionManifest,    // ✅ RENAMED from kitchen - Depends on: materials
+  assetsManifest,        // ✅ Inventory durable (equipment, tools, machinery)
 
   // ============================================
   // TIER 3: Finance Domain (all independent)
@@ -175,7 +175,6 @@ export const ALL_MODULE_MANIFESTS = [
 
   membershipsManifest,   // ✅ Depends on: customers + finance-billing
   rentalsManifest,       // ✅ Depends on: customers + scheduling
-  assetsManifest,        // ✅ Depends on: (optional: rentals)
 
   // ============================================
   // TIER 6: Cross-cutting modules (aggregate data)
@@ -212,6 +211,7 @@ export {
   supplierOrdersManifest,
   productsManifest,
   productionManifest,
+  assetsManifest,
 
   // Operations domain
   salesManifest,
@@ -226,8 +226,6 @@ export {
   // deliveryManifest,
   membershipsManifest,
   rentalsManifest,
-  assetsManifest,
-  
 
   // Resources domain
   staffManifest,
@@ -262,8 +260,8 @@ export const MODULE_STATS = {
   byDomain: {
     system: 1,        // achievements (TIER 0)
     core: 6,          // dashboard, settings, debug, customers, reporting, intelligence
-    supplyChain: 5,   // materials, suppliers, supplier-orders, products, production
-    operations: 8,    // sales (includes ecommerce), fulfillment (onsite/pickup/delivery), mobile, kitchen, memberships, rentals, assets
+    supplyChain: 6,   // materials, suppliers, supplier-orders, products, production, assets
+    operations: 7,    // sales (includes ecommerce), fulfillment (onsite/pickup/delivery), mobile, memberships, rentals
     resources: 2,     // staff, scheduling
     finance: 4,       // finance-corporate, finance-fiscal, finance-billing, finance-integrations
     gamification: 1,  // gamification
