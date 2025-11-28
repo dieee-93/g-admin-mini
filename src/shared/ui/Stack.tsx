@@ -3,6 +3,7 @@ import {
   HStack as ChakraHStack, 
   Stack as ChakraStack 
 } from '@chakra-ui/react'
+import { memo } from 'react'
 import type { ReactNode, CSSProperties } from 'react'
 import type { ResponsiveValue, SpacingProp } from './types'
 import { getSpacingToken } from './types'
@@ -63,7 +64,8 @@ interface CenterProps {
 }
 
 // Main Stack component with responsive direction support
-export function Stack({
+// 🛠️ PERFORMANCE: Memoized to prevent Chakra CSS-in-JS re-generating classes
+export const Stack = memo(function Stack({
   children,
   direction = 'column',
   gap = 'md', // Default semantic token
@@ -92,10 +94,11 @@ export function Stack({
       {children}
     </ChakraStack>
   )
-}
+});
 
 // VStack component
-export function VStack({
+// 🛠️ PERFORMANCE: Memoized to prevent Chakra CSS-in-JS re-generating classes
+export const VStack = memo(function VStack({
   children,
   gap = 'md', // Default semantic token
   align = 'stretch',
@@ -118,10 +121,11 @@ export function VStack({
       {children}
     </ChakraVStack>
   )
-}
+});
 
 // HStack component
-export function HStack({
+// 🛠️ PERFORMANCE: Memoized to prevent Chakra CSS-in-JS re-generating classes
+export const HStack = memo(function HStack({
   children,
   gap = 'md', // Default semantic token
   align = 'center',
@@ -148,7 +152,7 @@ export function HStack({
       {children}
     </ChakraHStack>
   )
-}
+});
 
 // Cluster for wrapping layouts
 export function Cluster({

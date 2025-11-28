@@ -1,6 +1,6 @@
 import { useCallback, memo } from 'react';
 import { Stack, Typography } from '@/shared/ui';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsStore } from '@/store/materialsStore';
 import { notify } from '@/lib/notifications';
 import { logger } from '@/lib/logging';
 
@@ -32,7 +32,8 @@ const InventoryTabEnhancedContent = memo(function InventoryTabEnhancedContent({
   onAddMaterial,
   performanceMode = false
 }: InventoryTabEnhancedProps) {
-  const { openModal, deleteItem } = useMaterials();
+  const openModal = useMaterialsStore((s) => s.openModal);
+  const deleteItem = useMaterialsStore((s) => s.deleteItem);
 
   // Use inventory state hook
   const {

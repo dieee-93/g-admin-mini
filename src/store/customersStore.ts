@@ -2,25 +2,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
-export interface Customer {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  birth_date?: string;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-  
-  // Customer analytics
-  total_orders: number;
-  total_spent: number;
-  last_order_date?: string;
-  average_order_value: number;
-  loyalty_tier: 'bronze' | 'silver' | 'gold' | 'platinum';
-  status: 'active' | 'inactive' | 'vip';
-}
+import { type Customer, LoyaltyTier } from '@/pages/admin/core/crm/customers/types/customer';
 
 export interface CustomerFilters {
   search: string;
@@ -43,49 +25,49 @@ export interface CustomerStats {
 export interface CustomersState {
   // Data
   customers: Customer[];
-  
+
   // UI State
   loading: boolean;
   error: string | null;
   filters: CustomerFilters;
   selectedCustomers: string[];
-  
+
   // Modal states
   isModalOpen: boolean;
   modalMode: 'add' | 'edit' | 'view';
   currentCustomer: Customer | null;
-  
+
   // Analytics
   stats: CustomerStats;
-  
+
   // Actions
   setCustomers: (customers: Customer[]) => void;
   addCustomer: (customer: Omit<Customer, 'id' | 'created_at' | 'updated_at' | 'total_orders' | 'total_spent' | 'average_order_value' | 'loyalty_tier' | 'status'>) => void;
   updateCustomer: (id: string, updates: Partial<Customer>) => void;
   deleteCustomer: (id: string) => void;
-  
+
   // Customer analytics
   updateCustomerStats: (customerId: string, orderValue: number) => void;
   calculateLoyaltyTier: (customer: Customer) => Customer['loyalty_tier'];
-  
+
   // UI actions
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setFilters: (filters: Partial<CustomerFilters>) => void;
   resetFilters: () => void;
-  
+
   selectCustomer: (id: string) => void;
   deselectCustomer: (id: string) => void;
   selectAllCustomers: () => void;
   deselectAllCustomers: () => void;
-  
+
   // Modal actions
   openModal: (mode: 'add' | 'edit' | 'view', customer?: Customer) => void;
   closeModal: () => void;
-  
+
   // Stats
   refreshStats: () => void;
-  
+
   // Computed selectors
   getFilteredCustomers: () => Customer[];
   getTopCustomers: (limit?: number) => Customer[];
@@ -107,16 +89,16 @@ export const useCustomersStore = create<CustomersState>()(
       immer((set, get) => ({
         // Initial state
         customers: [],
-        
+
         loading: false,
         error: null,
         filters: initialFilters,
         selectedCustomers: [],
-        
+
         isModalOpen: false,
         modalMode: 'add',
         currentCustomer: null,
-        
+
         stats: {
           totalCustomers: 0,
           activeCustomers: 0,
@@ -154,7 +136,7 @@ export const useCustomersStore = create<CustomersState>()(
               total_orders: 0,
               total_spent: 0,
               average_order_value: 0,
-              loyalty_tier: 'bronze',
+              loyalty_tier: LoyaltyTier.BRONZE,
               status: 'active'
             };
             state.customers.push(newCustomer);
@@ -206,10 +188,10 @@ export const useCustomersStore = create<CustomersState>()(
         },
 
         calculateLoyaltyTier: (customer) => {
-          if (customer.total_spent >= 100000) return 'platinum';
-          if (customer.total_spent >= 50000) return 'gold';
-          if (customer.total_spent >= 20000) return 'silver';
-          return 'bronze';
+          if (customer.total_spent >= 100000) return LoyaltyTier.PLATINUM;
+          if (customer.total_spent >= 50000) return LoyaltyTier.GOLD;
+          if (customer.total_spent >= 20000) return LoyaltyTier.SILVER;
+          return LoyaltyTier.BRONZE;
         },
 
         // UI actions
@@ -288,11 +270,11 @@ export const useCustomersStore = create<CustomersState>()(
           const threeMonthsAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
           const activeCustomers = customers.filter(customer => customer.status === 'active');
-          const newThisMonth = customers.filter(customer => 
+          const newThisMonth = customers.filter(customer =>
             new Date(customer.created_at) >= monthStart
           );
           const vipCustomers = customers.filter(customer => customer.status === 'vip');
-          
+
           const recentCustomers = customers.filter(customer =>
             customer.last_order_date && new Date(customer.last_order_date) >= threeMonthsAgo
           );
@@ -300,7 +282,7 @@ export const useCustomersStore = create<CustomersState>()(
           const loyaltyDistribution = customers.reduce((acc, customer) => {
             acc[customer.loyalty_tier] += 1;
             return acc;
-          }, { bronze: 0, silver: 0, gold: 0, platinum: 0 });
+          }, { [LoyaltyTier.BRONZE]: 0, [LoyaltyTier.SILVER]: 0, [LoyaltyTier.GOLD]: 0, [LoyaltyTier.PLATINUM]: 0 });
 
           const stats: CustomerStats = {
             totalCustomers: customers.length,
@@ -310,7 +292,7 @@ export const useCustomersStore = create<CustomersState>()(
             averageLifetimeValue: customers.length > 0
               ? customers.reduce((sum, customer) => sum + customer.total_spent, 0) / customers.length
               : 0,
-            retentionRate: customers.length > 0 
+            retentionRate: customers.length > 0
               ? (recentCustomers.length / customers.length) * 100
               : 0,
             loyaltyDistribution
@@ -349,7 +331,7 @@ export const useCustomersStore = create<CustomersState>()(
           // Sort
           filtered.sort((a, b) => {
             let aValue, bValue;
-            
+
             switch (filters.sortBy) {
               case 'total_spent':
                 aValue = a.total_spent;
@@ -399,9 +381,9 @@ export const useCustomersStore = create<CustomersState>()(
           const { customers } = get();
           const threeMonthsAgo = new Date();
           threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-          
-          return customers.filter(customer => 
-            !customer.last_order_date || 
+
+          return customers.filter(customer =>
+            !customer.last_order_date ||
             new Date(customer.last_order_date) < threeMonthsAgo
           );
         }
@@ -427,16 +409,16 @@ function determineCustomerStatus(customer: Customer): Customer['status'] {
   if (customer.total_spent >= 100000 || customer.total_orders >= 50) {
     return 'vip';
   }
-  
+
   if (customer.last_order_date) {
     const daysSinceLastOrder = Math.floor(
       (Date.now() - new Date(customer.last_order_date).getTime()) / (1000 * 60 * 60 * 24)
     );
-    
+
     if (daysSinceLastOrder > 90) {
       return 'inactive';
     }
   }
-  
+
   return 'active';
 }

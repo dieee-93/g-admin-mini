@@ -10,9 +10,10 @@ import {
   Modal,
   Alert,
   Icon,
-  Field,
-  NativeSelect
+  SelectField,
+  createListCollection
 } from '../../../../../shared/ui';
+import { Field } from '@chakra-ui/react';
 import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { useStaffWithLoader } from '../../../../../hooks/useStaffData';
 import { useEmployeeValidation } from '../../../../../hooks/useEmployeeValidation';
@@ -250,21 +251,21 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                       </Field.Root>
 
                       {/* Department */}
-                      <Field.Root invalid={!!fieldErrors.department} flex="1">
-                        <Field.Label>Departamento *</Field.Label>
-                        <NativeSelect.Root {...register('department')}>
-                          <NativeSelect.Field placeholder="Seleccionar...">
-                            <option value="kitchen">Cocina</option>
-                            <option value="service">Servicio</option>
-                            <option value="admin">Administración</option>
-                            <option value="cleaning">Limpieza</option>
-                            <option value="management">Gerencia</option>
-                          </NativeSelect.Field>
-                        </NativeSelect.Root>
-                        {fieldErrors.department && (
-                          <Field.ErrorText>{fieldErrors.department}</Field.ErrorText>
-                        )}
-                      </Field.Root>
+                      <SelectField
+                        label="Departamento *"
+                        placeholder="Seleccionar..."
+                        error={fieldErrors.department}
+                        collection={createListCollection({
+                          items: [
+                            { value: 'kitchen', label: 'Cocina' },
+                            { value: 'service', label: 'Servicio' },
+                            { value: 'admin', label: 'Administración' },
+                            { value: 'cleaning', label: 'Limpieza' },
+                            { value: 'management', label: 'Gerencia' },
+                          ]
+                        })}
+                        {...register('department')}
+                      />
                     </HStack>
 
                     <HStack gap="4">
@@ -272,7 +273,6 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                       <Field.Root invalid={!!fieldErrors.hire_date} flex="1">
                         <Field.Label>Fecha de Contratación *</Field.Label>
                         <Input
-                          type="date"
                           {...register('hire_date')}
                         />
                         {fieldErrors.hire_date && (
@@ -281,20 +281,20 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
                       </Field.Root>
 
                       {/* Employment Type */}
-                      <Field.Root invalid={!!fieldErrors.employment_type} flex="1">
-                        <Field.Label>Tipo de Empleo *</Field.Label>
-                        <NativeSelect.Root {...register('employment_type')}>
-                          <NativeSelect.Field placeholder="Seleccionar...">
-                            <option value="full_time">Tiempo Completo</option>
-                            <option value="part_time">Tiempo Parcial</option>
-                            <option value="contractor">Contratista</option>
-                            <option value="temp">Temporal</option>
-                          </NativeSelect.Field>
-                        </NativeSelect.Root>
-                        {fieldErrors.employment_type && (
-                          <Field.ErrorText>{fieldErrors.employment_type}</Field.ErrorText>
-                        )}
-                      </Field.Root>
+                      <SelectField
+                        label="Tipo de Empleo *"
+                        placeholder="Seleccionar..."
+                        error={fieldErrors.employment_type}
+                        collection={createListCollection({
+                          items: [
+                            { value: 'full_time', label: 'Tiempo Completo' },
+                            { value: 'part_time', label: 'Tiempo Parcial' },
+                            { value: 'contractor', label: 'Contratista' },
+                            { value: 'temp', label: 'Temporal' },
+                          ]
+                        })}
+                        {...register('employment_type')}
+                      />
                     </HStack>
 
                     <HStack gap="4">

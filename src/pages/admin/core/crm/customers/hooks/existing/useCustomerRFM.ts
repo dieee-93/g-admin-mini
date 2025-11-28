@@ -2,6 +2,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import { logger } from '@/lib/logging';
+import { useAlerts } from '@/shared/alerts';
+import { customersAlertsAdapter } from '../../services/customersAlertsAdapter';
 import type {
   CustomerRFMProfile,
   CustomerSegment,
@@ -17,7 +19,7 @@ import {
 export function useCustomerRFM() {
   const [rfmProfiles, setRFMProfiles] = useState<CustomerRFMProfile[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { actions } = useAlerts({ context: 'customers', autoFilter: true });
 
   // RFM Calculation Logic (client-side for real-time updates)
   const calculateRFMScores = useMemo(() => ({
@@ -157,20 +159,20 @@ export function useCustomerRFM() {
   }, []);
 
   // Load RFM profiles from database
-  const loadRFMProfiles = async () => {
+  const loadRFMProfiles = useCallback(async () => {
     setLoading(true);
-    setError(null);
-    
+
     try {
       const profiles = await calculateCustomerRFM();
       setRFMProfiles(profiles);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading RFM profiles');
+      const error = err instanceof Error ? err : new Error('Error loading RFM profiles');
+      await actions.create(customersAlertsAdapter.rfmProfileLoadFailed(error));
       logger.error('App', 'Error loading RFM profiles:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [actions]);
 
   // Get RFM profile for specific customer
   const getCustomerRFM = useCallback(async (customerId: string): Promise<CustomerRFMProfile | null> => {
@@ -229,24 +231,23 @@ export function useCustomerRFM() {
 
   useEffect(() => {
     loadRFMProfiles();
-  }, []);
+  }, [loadRFMProfiles]);
 
   return {
     rfmProfiles,
     loading,
-    error,
-    
+
     // Calculation functions
     calculateRFMScores,
     determineSegment,
     assessChurnRisk,
     calculateCLV,
-    
+
     // Data operations
     loadRFMProfiles,
     getCustomerRFM,
     recalculateCustomerRFM,
-    
+
     // Analytics
     segmentStats: getSegmentStats
   };
@@ -255,22 +256,22 @@ export function useCustomerRFM() {
 export function useCustomerAnalytics() {
   const [analytics, setAnalytics] = useState<CustomerAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { actions } = useAlerts({ context: 'customers', autoFilter: true });
 
-  const loadAnalytics = async () => {
+  const loadAnalytics = useCallback(async () => {
     setLoading(true);
-    setError(null);
-    
+
     try {
       const data = await getCustomerAnalyticsDashboard();
       setAnalytics(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading analytics');
+      const error = err instanceof Error ? err : new Error('Error loading analytics');
+      await actions.create(customersAlertsAdapter.analyticsLoadFailed(error));
       logger.error('App', 'Error loading customer analytics:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [actions]);
 
   // Get customers by segment
   const getCustomersBySegment = useCallback((segment: CustomerSegment) => {
@@ -292,17 +293,16 @@ export function useCustomerAnalytics() {
 
   useEffect(() => {
     loadAnalytics();
-  }, []);
+  }, [loadAnalytics]);
 
   return {
     analytics,
     loading,
-    error,
-    
-    // Data operations  
+
+    // Data operations
     loadAnalytics,
     reloadAnalytics: loadAnalytics,
-    
+
     // Computed analytics
     getCustomersBySegment,
     getHighValueCustomers,

@@ -18,7 +18,7 @@ import {
   Alert,
   Icon,
   Text,
-  NativeSelect,
+  SelectField,
   Spinner,
   Table,
 } from '@/shared/ui';
@@ -121,34 +121,34 @@ export function OnlineOrdersTab() {
 
       {/* Filters */}
       <Stack direction="row" gap="md">
-        <NativeSelect.Root
-          value={filters.status || 'all'}
-          onValueChange={(details) => setFilters({ ...filters, status: details.value as 'all' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' })}
+        <SelectField
+          options={[
+            { value: 'all', label: 'All Orders' },
+            { value: 'pending', label: 'Pending' },
+            { value: 'processing', label: 'Processing' },
+            { value: 'shipped', label: 'Shipped' },
+            { value: 'delivered', label: 'Delivered' },
+            { value: 'cancelled', label: 'Cancelled' }
+          ]}
+          value={[filters.status || 'all']}
+          onValueChange={(details) => setFilters({ ...filters, status: details.value[0] as 'all' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' })}
           width="200px"
-        >
-          <NativeSelect.Field placeholder="Filter by status">
-            <option value="all">All Orders</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </NativeSelect.Field>
-        </NativeSelect.Root>
+          noPortal
+        />
 
-        <NativeSelect.Root
-          value={filters.payment_status || 'all'}
-          onValueChange={(details) => setFilters({ ...filters, payment_status: details.value as 'all' | 'pending' | 'paid' | 'failed' | 'refunded' })}
+        <SelectField
+          options={[
+            { value: 'all', label: 'All Payments' },
+            { value: 'pending', label: 'Pending Payment' },
+            { value: 'paid', label: 'Paid' },
+            { value: 'failed', label: 'Failed' },
+            { value: 'refunded', label: 'Refunded' }
+          ]}
+          value={[filters.payment_status || 'all']}
+          onValueChange={(details) => setFilters({ ...filters, payment_status: details.value[0] as 'all' | 'pending' | 'paid' | 'failed' | 'refunded' })}
           width="200px"
-        >
-          <NativeSelect.Field placeholder="Filter by payment">
-            <option value="all">All Payments</option>
-            <option value="pending">Pending Payment</option>
-            <option value="paid">Paid</option>
-            <option value="failed">Failed</option>
-            <option value="refunded">Refunded</option>
-          </NativeSelect.Field>
-        </NativeSelect.Root>
+          noPortal
+        />
       </Stack>
 
       {/* Error Alert */}
@@ -210,23 +210,23 @@ export function OnlineOrdersTab() {
                 <Table.Cell>{getPaymentStatusBadge(order.payment_status)}</Table.Cell>
                 <Table.Cell>
                   <Stack direction="row" gap="2">
-                    <NativeSelect.Root
-                      value={order.order_status}
+                    <SelectField
+                      options={[
+                        { value: 'PENDING', label: 'Pending' },
+                        { value: 'PROCESSING', label: 'Processing' },
+                        { value: 'SHIPPED', label: 'Shipped' },
+                        { value: 'DELIVERED', label: 'Delivered' },
+                        { value: 'CANCELLED', label: 'Cancelled' }
+                      ]}
+                      value={[order.order_status]}
                       onValueChange={(details) =>
-                        handleStatusUpdate(order.id, 'order_status', details.value)
+                        handleStatusUpdate(order.id, 'order_status', details.value[0])
                       }
                       width="150px"
                       size="sm"
                       disabled={processingId === order.id}
-                    >
-                      <NativeSelect.Field>
-                        <option value="PENDING">Pending</option>
-                        <option value="PROCESSING">Processing</option>
-                        <option value="SHIPPED">Shipped</option>
-                        <option value="DELIVERED">Delivered</option>
-                        <option value="CANCELLED">Cancelled</option>
-                      </NativeSelect.Field>
-                    </NativeSelect.Root>
+                      noPortal
+                    />
                   </Stack>
                 </Table.Cell>
               </Table.Row>

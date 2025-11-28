@@ -44,6 +44,29 @@ export const executiveManifest: ModuleManifest = {
     logger.info('App', '📈 Setting up Executive module');
 
     try {
+      // ============================================
+      // DASHBOARD INSIGHT WIDGETS
+      // ============================================
+
+      const { PremiumCustomersInsight, InventoryInsight } = await import('./widgets');
+
+      // Premium Customers Insight (priority: 60)
+      registry.addAction(
+        'dashboard.widgets',
+        () => <PremiumCustomersInsight key="premium-customers-insight" />,
+        'executive',
+        60
+      );
+
+      // Inventory Insight (priority: 59)
+      registry.addAction(
+        'dashboard.widgets',
+        () => <InventoryInsight key="inventory-insight" />,
+        'executive',
+        59
+      );
+
+      logger.debug('App', 'Registered dashboard.widgets hooks (2 insights)');
       logger.info('App', '✅ Executive module setup complete');
     } catch (error) {
       logger.error('App', '❌ Executive module setup failed', error);

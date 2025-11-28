@@ -7,8 +7,8 @@
  * @module sales/b2b/services/tieredPricingService
  */
 
-import Decimal from 'decimal.js';
 import { logger } from '@/lib/logging';
+import { DecimalUtils, FinancialDecimal } from '@/business-logic/shared/decimalUtils';
 import type {
   TieredPricing,
   PricingTier,
@@ -16,6 +16,9 @@ import type {
   // PricingTierType,
   CalculatedPrice,
 } from '../types';
+
+// Type alias for Decimal compatibility
+type DecimalType = InstanceType<typeof FinancialDecimal>;
 
 // ============================================
 // PRICE CALCULATION
@@ -30,12 +33,13 @@ import type {
  * @returns Calculated price with discount applied
  */
 export const calculateTieredPrice = (
-  basePrice: string | Decimal,
+  basePrice: string | DecimalType,
   quantity: number,
   tieredPricing: TieredPricing
 ): CalculatedPrice => {
   try {
-    const originalPrice = new Decimal(basePrice);
+    // ✅ PRECISION FIX: Use DecimalUtils instead of Decimal.js directly
+    const originalPrice = DecimalUtils.fromValue(basePrice, 'financial');
 
     // Find applicable tier
     const applicableTier = findApplicableTier(quantity, tieredPricing);
@@ -45,18 +49,18 @@ export const calculateTieredPrice = (
       return {
         original_price: originalPrice,
         discount_percentage: 0,
-        discount_amount: new Decimal(0),
+        discount_amount: DecimalUtils.fromValue(0, 'financial'),
         final_price: originalPrice,
       };
     }
 
     // Check if tier has fixed price
     if (applicableTier.fixed_price) {
-      const fixedPrice = new Decimal(applicableTier.fixed_price);
-      const discountAmount = originalPrice.minus(fixedPrice);
+      const fixedPrice = DecimalUtils.fromValue(applicableTier.fixed_price, 'financial');
+      const discountAmount = DecimalUtils.subtract(originalPrice, fixedPrice, 'financial');
       const discountPercentage = originalPrice.isZero()
         ? 0
-        : discountAmount.dividedBy(originalPrice).times(100).toNumber();
+        : DecimalUtils.calculatePercentage(discountAmount, originalPrice, 'financial').toNumber();
 
       return {
         original_price: originalPrice,
@@ -69,8 +73,12 @@ export const calculateTieredPrice = (
 
     // Calculate percentage discount
     const discountPercentage = applicableTier.discount_percentage;
-    const discountAmount = originalPrice.times(discountPercentage).dividedBy(100);
-    const finalPrice = originalPrice.minus(discountAmount);
+    const discountAmount = DecimalUtils.applyPercentage(
+      originalPrice,
+      discountPercentage,
+      'financial'
+    );
+    const finalPrice = DecimalUtils.subtract(originalPrice, discountAmount, 'financial');
 
     return {
       original_price: originalPrice,
@@ -133,42 +141,51 @@ export const calculateOrderWithTiers = (
   }>,
   tieredPricings: Record<string, TieredPricing> // Keyed by product_id
 ): {
-  subtotal: Decimal;
-  total_discount: Decimal;
-  final_total: Decimal;
+  subtotal: DecimalType;
+  total_discount: DecimalType;
+  final_total: DecimalType;
   items_with_pricing: Array<{
     product_id: string;
     quantity: number;
-    unit_price: Decimal;
+    unit_price: DecimalType;
     calculated_price: CalculatedPrice;
-    line_total: Decimal;
+    line_total: DecimalType;
   }>;
 } => {
-  let subtotal = new Decimal(0);
-  let totalDiscount = new Decimal(0);
+  // ✅ PRECISION FIX: Use DecimalUtils for aggregations
+  let subtotal = DecimalUtils.fromValue(0, 'financial');
+  let totalDiscount = DecimalUtils.fromValue(0, 'financial');
 
   const itemsWithPricing = items.map(item => {
     const tier = tieredPricings[item.product_id];
     const calculatedPrice = tier
       ? calculateTieredPrice(item.unit_price, item.quantity, tier)
       : {
-          original_price: new Decimal(item.unit_price),
+          original_price: DecimalUtils.fromValue(item.unit_price, 'financial'),
           discount_percentage: 0,
-          discount_amount: new Decimal(0),
-          final_price: new Decimal(item.unit_price),
+          discount_amount: DecimalUtils.fromValue(0, 'financial'),
+          final_price: DecimalUtils.fromValue(item.unit_price, 'financial'),
         };
 
-    const lineTotal = calculatedPrice.final_price.times(item.quantity);
-
-    subtotal = subtotal.plus(lineTotal);
-    totalDiscount = totalDiscount.plus(
-      calculatedPrice.discount_amount.times(item.quantity)
+    const lineTotal = DecimalUtils.multiply(
+      calculatedPrice.final_price,
+      item.quantity.toString(),
+      'financial'
     );
+
+    subtotal = DecimalUtils.add(subtotal, lineTotal, 'financial');
+
+    const itemDiscount = DecimalUtils.multiply(
+      calculatedPrice.discount_amount,
+      item.quantity.toString(),
+      'financial'
+    );
+    totalDiscount = DecimalUtils.add(totalDiscount, itemDiscount, 'financial');
 
     return {
       product_id: item.product_id,
       quantity: item.quantity,
-      unit_price: new Decimal(item.unit_price),
+      unit_price: DecimalUtils.fromValue(item.unit_price, 'financial'),
       calculated_price: calculatedPrice,
       line_total: lineTotal,
     };

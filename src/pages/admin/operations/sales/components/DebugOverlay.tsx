@@ -7,6 +7,7 @@ import { useLocation } from '@/contexts/LocationContext';
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
+import { logger } from '@/lib/logging';
 
 interface DebugOverlayProps {
   metrics: any;
@@ -97,7 +98,10 @@ export function DebugOverlay({ metrics, actions, pageState }: DebugOverlayProps)
     // Deep check EVERY property - show which ones changed
     if (capContext) {
       const keys = Object.keys(capContext);
-      console.log('🔍 CapContext keys:', keys.length, keys.slice(0, 10));
+      logger.debug('SalesStore', 'CapContext keys', { 
+        count: keys.length, 
+        sample: keys.slice(0, 10) 
+      });
 
       let changedCount = 0;
       keys.forEach(key => {
@@ -111,36 +115,36 @@ export function DebugOverlay({ metrics, actions, pageState }: DebugOverlayProps)
             if (Array.isArray(oldVal) && JSON.stringify(oldVal) === JSON.stringify(newVal)) {
               const msg = `  └─ ${key}: array ref ≠ [${newVal.length}] SAME`;
               changes.push(msg);
-              console.log('🔍', msg);
+              logger.debug('SalesStore', msg);
             } else {
               const msg = `  └─ ${key}: array ≠ [${oldVal?.length || 0}→${newVal.length}]`;
               changes.push(msg);
-              console.log('🔍', msg);
+              logger.debug('SalesStore', msg);
             }
           }
           // Check if it's an object
           else if (typeof newVal === 'object' && newVal !== null) {
             const msg = `  └─ ${key}: object ref ≠`;
             changes.push(msg);
-            console.log('🔍', msg);
+            logger.debug('SalesStore', msg);
           }
           // Check if it's a function
           else if (typeof newVal === 'function') {
             const msg = `  └─ ${key}: fn ref ≠`;
             changes.push(msg);
-            console.log('🔍', msg);
+            logger.debug('SalesStore', msg);
           }
           // Primitive value
           else {
             const msg = `  └─ ${key}: ${oldVal}→${newVal}`;
             changes.push(msg);
-            console.log('🔍', msg);
+            logger.debug('SalesStore', msg);
           }
         }
       });
-      console.log('🔍 Total changed props:', changedCount);
+      logger.debug('SalesStore', 'Total changed props', { changedCount });
     } else {
-      console.log('🔍 capContext is null/undefined!');
+      logger.debug('SalesStore', 'capContext is null/undefined');
     }
   }
 

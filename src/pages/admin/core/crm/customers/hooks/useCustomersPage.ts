@@ -8,6 +8,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAlerts } from '@/shared/alerts';
+import { customersAlertsAdapter } from '../services/customersAlertsAdapter';
 import { CustomerAnalyticsEngine } from '../services';
 import { CustomerAPI } from '../services/customerApi';
 import type { Customer, Sale, SaleItem, CustomerAnalyticsResult, CustomerRFMProfile } from '../types';
@@ -105,6 +107,7 @@ export interface UseCustomersPageReturn {
 export const useCustomersPage = (): UseCustomersPageReturn => {
   const { setQuickActions, updateModuleBadge } = useNavigationActions();
   const { user } = useAuth();
+  const { actions: alertActions } = useAlerts({ context: 'customers', autoFilter: true });
 
   // State
   const [pageState, setPageState] = useState<CustomersPageState>({
@@ -121,7 +124,6 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
   const [analyticsResult, setAnalyticsResult] = useState<CustomerAnalyticsResult | null>(null);
   const [rfmProfiles, setRfmProfiles] = useState<CustomerRFMProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Helper to set active section
   const setActiveSection = useCallback((section: CustomerPageSection) => {
@@ -261,7 +263,6 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
   const loadCustomerData = useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
 
       // ✅ REAL API CALL - Fetch customers from database
       const fetchedCustomers = await CustomerAPI.getCustomers(user, {
@@ -273,14 +274,46 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
 
       // Generate analytics using business logic
       if (fetchedCustomers.length > 0) {
-        // TODO: Fetch real sales data from Sales module
-        const mockSales: Sale[] = [];
-        const mockSaleItems: SaleItem[] = [];
+        // Fetch real sales data from Sales module
+        const customerIds = fetchedCustomers.map(c => c.id);
+
+        const { data: salesData, error: salesError } = await supabase
+          .from('sales')
+          .select('*, sale_items(*)')
+          .in('customer_id', customerIds);
+
+        if (salesError) {
+          logger.error('App', 'Error loading sales data for analytics:', salesError);
+        }
+
+        // Map sales data to expected format
+        const sales: Sale[] = salesData?.map(sale => ({
+          id: sale.id,
+          customer_id: sale.customer_id,
+          total: Number(sale.total || 0),
+          subtotal: Number(sale.subtotal || 0),
+          tax: Number(sale.tax || 0),
+          discount: Number(sale.discount || 0),
+          created_at: sale.created_at,
+          payment_method: sale.payment_method,
+          status: sale.status,
+        })) || [];
+
+        const saleItems: SaleItem[] = salesData?.flatMap(sale =>
+          (sale.sale_items || []).map((item: Record<string, unknown>) => ({
+            id: item.id,
+            sale_id: item.sale_id,
+            product_id: item.product_id,
+            quantity: Number(item.quantity || 0),
+            unit_price: Number(item.unit_price || 0),
+            subtotal: Number(item.subtotal || 0),
+          }))
+        ) || [];
 
         const analytics = await CustomerAnalyticsEngine.generateCustomerAnalytics(
           fetchedCustomers,
-          mockSales,
-          mockSaleItems,
+          sales,
+          saleItems,
           {
             analysisMonths: pageState.analyticsTimeRange === 'month' ? 1 :
                           pageState.analyticsTimeRange === 'quarter' ? 3 : 12,
@@ -292,18 +325,48 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
 
         setAnalyticsResult(analytics);
 
-        // Generate RFM profiles
-        // TODO: Implement RFM calculation using customerRFMAnalytics service
-        const mockRfmProfiles: CustomerRFMProfile[] = [];
-        setRfmProfiles(mockRfmProfiles);
+        // Fetch real RFM profiles from database
+        const { data: rfmData, error: rfmError } = await supabase
+          .from('customer_rfm_profiles')
+          .select('*')
+          .in('customer_id', customerIds);
+
+        if (rfmError) {
+          logger.error('App', 'Error loading RFM profiles:', rfmError);
+        }
+
+        const rfmProfiles: CustomerRFMProfile[] = rfmData?.map(profile => ({
+          customer_id: profile.customer_id,
+          customer_name: profile.customer_name || '',
+          email: profile.email,
+          recency: profile.recency || 0,
+          frequency: profile.frequency || 0,
+          monetary: Number(profile.monetary || 0),
+          recency_score: profile.recency_score || 0,
+          frequency_score: profile.frequency_score || 0,
+          monetary_score: profile.monetary_score || 0,
+          rfm_score: profile.rfm_score || '',
+          segment: profile.segment || 'Unknown',
+          total_orders: profile.total_orders || 0,
+          total_spent: Number(profile.total_spent || 0),
+          avg_order_value: Number(profile.avg_order_value || 0),
+          first_purchase_date: profile.first_purchase_date || '',
+          last_purchase_date: profile.last_purchase_date || '',
+          clv_estimate: Number(profile.clv_estimate || 0),
+          churn_risk: profile.churn_risk || 'Low',
+          recommended_action: profile.recommended_action || 'Monitor',
+        })) || [];
+
+        setRfmProfiles(rfmProfiles);
       }
     } catch (err) {
+      const error = err instanceof Error ? err : new Error('Error loading customer data');
+      await alertActions.create(customersAlertsAdapter.analyticsLoadFailed(error));
       logger.error('App', 'Error loading customer data:', err);
-      setError(err instanceof Error ? err.message : 'Error loading customer data');
     } finally {
       setLoading(false);
     }
-  }, [pageState.analyticsTimeRange, user]);
+  }, [pageState.analyticsTimeRange, user, alertActions]);
 
   // Initialize data loading
   useEffect(() => {
@@ -456,7 +519,7 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
     analyticsResult,
     rfmProfiles,
     loading,
-    error,
+    error: null, // Deprecated - using useAlerts now
     actions,
     getCustomersBySegment,
     getHighValueCustomers,

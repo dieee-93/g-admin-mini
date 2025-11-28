@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supplierAnalyticsService } from '../services/supplierAnalyticsService';
 import { suppliersService } from '../services/suppliersService';
 import { inventoryApi } from '@/pages/admin/supply-chain/materials/services/inventoryApi';
-import { supplierOrdersApi } from '@/pages/admin/supply-chain/supplier-orders/services/supplierOrdersApi';
+import { supplierOrdersApi } from '@/pages/admin/supply-chain/materials/procurement/services/supplierOrdersApi';
 import type { SupplierAnalysisResult } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
 import { logger } from '@/lib/logging';
 

@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Stack,
   Text,
-  Field,
   Flex,
-  Select,
   Collapsible
 } from '@/shared/ui';
-import { CardWrapper, InputField  } from '@/shared/ui';
+import { CardWrapper, InputField, SelectField, createListCollection } from '@/shared/ui';
 import { PlusIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 import { logger } from '@/lib/logging';
@@ -27,7 +25,7 @@ interface SupplierData {
   invoice_number?: string;
   delivery_date?: string;
   quality_rating?: number;
-  
+
   // Para crear nuevo supplier
   new_supplier?: {
     name: string;
@@ -71,7 +69,7 @@ export const SupplierFields = ({
       const { suppliersApi } = await import('@/pages/admin/supply-chain/materials/services');
       const suppliersData = await suppliersApi.getActiveSuppliers();
       logger.info('MaterialsStore', 'Suppliers loaded from API:', suppliersData); // Debug
-      
+
       if (suppliersData && suppliersData.length > 0) {
         setSuppliers(suppliersData);
       } else {
@@ -115,9 +113,9 @@ export const SupplierFields = ({
       <CardWrapper.Body>
         <Collapsible.Root open={!isCollapsed} onOpenChange={(details) => setIsCollapsed(!details.open)}>
           <Collapsible.Trigger asChild>
-            <Flex 
-              justify="space-between" 
-              align="center" 
+            <Flex
+              justify="space-between"
+              align="center"
               cursor="pointer"
               _hover={{ bg: "gray.50" }}
               borderRadius="md"
@@ -146,50 +144,29 @@ export const SupplierFields = ({
             <Stack gap="4" mt="4" pt="4" borderTop="1px solid" borderColor="border">
               {/* Selector de Proveedor */}
               <Box>
-                <Field.Root invalid={!!fieldErrors.supplier_id}>
-                  <Field.Label fontSize="sm" fontWeight="medium" mb="2">
-                    Proveedor
-                  </Field.Label>
-                  <Flex gap="2">
-                    <Select.Root
-                      value={supplierData.supplier_id || ''}
-                      onValueChange={(details) => {
-                        logger.info('MaterialsStore', 'Select change:', details); // Debug
-                        const selectedValue = details.value?.[0] || details.value;
-                        handleSupplierChange(selectedValue as string);
-                      }}
-                      disabled={disabled || loading}
-                      flex="1"
-                    >
-                      <Select.Trigger>
-                        <Select.ValueText placeholder="Seleccionar proveedor..." />
-                      </Select.Trigger>
-                      <Select.Content>
-                        {suppliers.map((supplier) => (
-                          <Select.Item key={supplier.id} item={supplier.id}>
-                            <Select.ItemText>
-                              {supplier.name}
-                              {supplier.rating && (
-                                <Text as="span" fontSize="xs" color="text.muted" ml="2">
-                                  ({supplier.rating.toFixed(1)} ⭐)
-                                </Text>
-                              )}
-                            </Select.ItemText>
-                          </Select.Item>
-                        ))}
-                        <Select.Item item="new">
-                          <Select.ItemText>
-                            <Flex align="center" gap="2">
-                              <PlusIcon width="16px" height="16px" />
-                              Crear nuevo proveedor
-                            </Flex>
-                          </Select.ItemText>
-                        </Select.Item>
-                      </Select.Content>
-                    </Select.Root>
-                  </Flex>
-                  <Field.ErrorText>{fieldErrors.supplier_id}</Field.ErrorText>
-                </Field.Root>
+                <SelectField
+                  label="Proveedor"
+                  collection={useMemo(() => createListCollection({
+                    items: [
+                      ...suppliers.map(s => ({
+                        value: s.id,
+                        label: s.rating
+                          ? `${s.name} (${s.rating.toFixed(1)} ⭐)`
+                          : s.name
+                      })),
+                      { value: 'new', label: '➕ Crear nuevo proveedor' }
+                    ]
+                  }), [suppliers])}
+                  value={supplierData.supplier_id ? [supplierData.supplier_id] : []}
+                  onValueChange={(details) => {
+                    logger.info('MaterialsStore', 'Select change:', details);
+                    const selectedValue = details.value?.[0] || details.value;
+                    handleSupplierChange(selectedValue as string);
+                  }}
+                  disabled={disabled || loading}
+                  error={fieldErrors.supplier_id}
+                  placeholder="Seleccionar proveedor..."
+                />
               </Box>
 
               {/* Formulario de Nuevo Proveedor */}
@@ -200,13 +177,13 @@ export const SupplierFields = ({
                       <Text fontWeight="semibold" fontSize="sm" color="blue.700">
                         Crear Nuevo Proveedor
                       </Text>
-                      
+
                       <Flex gap="4" direction={{ base: "column", md: "row" }}>
                         <Box flex="1">
-                          <Field.Root invalid={!!fieldErrors['new_supplier.name']}>
-                            <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+                          <Stack gap="2">
+                            <Text fontSize="sm" fontWeight="medium">
                               Nombre del Proveedor *
-                            </Field.Label>
+                            </Text>
                             <InputField
                               value={supplierData.new_supplier?.name || ''}
                               onChange={(e) => updateSupplierData({
@@ -218,15 +195,19 @@ export const SupplierFields = ({
                               placeholder="Ej: Distribuidora ABC"
                               disabled={disabled}
                             />
-                            <Field.ErrorText>{fieldErrors['new_supplier.name']}</Field.ErrorText>
-                          </Field.Root>
+                            {fieldErrors['new_supplier.name'] && (
+                              <Text fontSize="sm" color="red.500">
+                                {fieldErrors['new_supplier.name']}
+                              </Text>
+                            )}
+                          </Stack>
                         </Box>
-                        
+
                         <Box flex="1">
-                          <Field.Root>
-                            <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+                          <Stack gap="2">
+                            <Text fontSize="sm" fontWeight="medium">
                               Persona de Contacto
-                            </Field.Label>
+                            </Text>
                             <InputField
                               value={supplierData.new_supplier?.contact_person || ''}
                               onChange={(e) => updateSupplierData({
@@ -238,16 +219,16 @@ export const SupplierFields = ({
                               placeholder="Nombre del contacto"
                               disabled={disabled}
                             />
-                          </Field.Root>
+                          </Stack>
                         </Box>
                       </Flex>
 
                       <Flex gap="4" direction={{ base: "column", md: "row" }}>
                         <Box flex="1">
-                          <Field.Root invalid={!!fieldErrors['new_supplier.email']}>
-                            <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+                          <Stack gap="2">
+                            <Text fontSize="sm" fontWeight="medium">
                               Email
-                            </Field.Label>
+                            </Text>
                             <InputField
                               type="email"
                               value={supplierData.new_supplier?.email || ''}
@@ -260,15 +241,19 @@ export const SupplierFields = ({
                               placeholder="contacto@proveedor.com"
                               disabled={disabled}
                             />
-                            <Field.ErrorText>{fieldErrors['new_supplier.email']}</Field.ErrorText>
-                          </Field.Root>
+                            {fieldErrors['new_supplier.email'] && (
+                              <Text fontSize="sm" color="red.500">
+                                {fieldErrors['new_supplier.email']}
+                              </Text>
+                            )}
+                          </Stack>
                         </Box>
-                        
+
                         <Box flex="1">
-                          <Field.Root>
-                            <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+                          <Stack gap="2">
+                            <Text fontSize="sm" fontWeight="medium">
                               Teléfono
-                            </Field.Label>
+                            </Text>
                             <InputField
                               value={supplierData.new_supplier?.phone || ''}
                               onChange={(e) => updateSupplierData({
@@ -280,11 +265,11 @@ export const SupplierFields = ({
                               placeholder="+54 11 4555-0123"
                               disabled={disabled}
                             />
-                          </Field.Root>
+                          </Stack>
                         </Box>
                       </Flex>
                     </Stack>
-                  </CardWrapper .Body>
+                  </CardWrapper.Body>
                 </CardWrapper>
               )}
 
@@ -293,86 +278,71 @@ export const SupplierFields = ({
                 <Text fontWeight="semibold" fontSize="sm" color="blue.700">
                   Detalles de la Compra
                 </Text>
-                
+
                 <Flex gap="4" direction={{ base: "column", md: "row" }}>
                   <Box flex="1">
-                    <Field.Root>
-                      <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+                    <Stack gap="2">
+                      <Text fontSize="sm" fontWeight="medium">
                         Fecha de Compra
-                      </Field.Label>
+                      </Text>
                       <InputField
                         type="date"
                         value={supplierData.purchase_date || new Date().toISOString().split('T')[0]}
                         onChange={(e) => updateSupplierData({ purchase_date: e.target.value })}
                         disabled={disabled}
                       />
-                    </Field.Root>
+                    </Stack>
                   </Box>
-                  
+
                   <Box flex="1">
-                    <Field.Root>
-                      <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+                    <Stack gap="2">
+                      <Text fontSize="sm" fontWeight="medium">
                         Número de Factura
-                      </Field.Label>
+                      </Text>
                       <InputField
                         value={supplierData.invoice_number || ''}
                         onChange={(e) => updateSupplierData({ invoice_number: e.target.value })}
                         placeholder="Ej: FC-2024-001234"
                         disabled={disabled}
                       />
-                    </Field.Root>
+                    </Stack>
                   </Box>
                 </Flex>
 
                 <Flex gap="4" direction={{ base: "column", md: "row" }}>
                   <Box flex="1">
-                    <Field.Root>
-                      <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+                    <Stack gap="2">
+                      <Text fontSize="sm" fontWeight="medium">
                         Fecha de Entrega
-                      </Field.Label>
+                      </Text>
                       <InputField
                         type="date"
                         value={supplierData.delivery_date || ''}
                         onChange={(e) => updateSupplierData({ delivery_date: e.target.value })}
                         disabled={disabled}
                       />
-                    </Field.Root>
+                    </Stack>
                   </Box>
-                  
+
                   <Box flex="1">
-                    <Field.Root>
-                      <Field.Label fontSize="sm" fontWeight="medium" mb="2">
-                        Calidad (1-5)
-                      </Field.Label>
-                      <Select.Root
-                        value={supplierData.quality_rating?.toString() || ''}
-                        onValueChange={(details) => updateSupplierData({ 
-                          quality_rating: details.value[0] ? parseInt(details.value[0]) : undefined 
-                        })}
-                        disabled={disabled}
-                      >
-                        <Select.Trigger>
-                          <Select.ValueText placeholder="Calificar calidad..." />
-                        </Select.Trigger>
-                        <Select.Content>
-                          <Select.Item item="5">
-                            <Select.ItemText>5 - Excelente ⭐⭐⭐⭐⭐</Select.ItemText>
-                          </Select.Item>
-                          <Select.Item item="4">
-                            <Select.ItemText>4 - Muy Buena ⭐⭐⭐⭐</Select.ItemText>
-                          </Select.Item>
-                          <Select.Item item="3">
-                            <Select.ItemText>3 - Buena ⭐⭐⭐</Select.ItemText>
-                          </Select.Item>
-                          <Select.Item item="2">
-                            <Select.ItemText>2 - Regular ⭐⭐</Select.ItemText>
-                          </Select.Item>
-                          <Select.Item item="1">
-                            <Select.ItemText>1 - Mala ⭐</Select.ItemText>
-                          </Select.Item>
-                        </Select.Content>
-                      </Select.Root>
-                    </Field.Root>
+                    <SelectField
+                      label="Calidad (1-5)"
+                      collection={useMemo(() => createListCollection({
+                        items: [
+                          { value: '5', label: '5 - Excelente ⭐⭐⭐⭐⭐' },
+                          { value: '4', label: '4 - Muy Buena ⭐⭐⭐⭐' },
+                          { value: '3', label: '3 - Buena ⭐⭐⭐' },
+                          { value: '2', label: '2 - Regular ⭐⭐' },
+                          { value: '1', label: '1 - Mala ⭐' }
+                        ]
+                      }), [])}
+                      value={supplierData.quality_rating ? [supplierData.quality_rating.toString()] : []}
+                      onValueChange={(details) => updateSupplierData({
+                        quality_rating: details.value[0] ? parseInt(details.value[0]) : undefined
+                      })}
+                      disabled={disabled}
+                      placeholder="Calificar calidad..."
+                    />
                   </Box>
                 </Flex>
               </Stack>

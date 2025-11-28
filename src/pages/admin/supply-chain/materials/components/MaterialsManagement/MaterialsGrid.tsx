@@ -3,7 +3,8 @@ import {
   CardGrid, Stack, Typography, Section, Icon
 } from '@/shared/ui';
 import { CubeIcon } from '@heroicons/react/24/outline';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsData } from '../../hooks/useMaterialsData';
+import { useMaterialsComputed } from '../../hooks/useMaterialsComputed';
 import { useAuth } from '@/contexts/AuthContext';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
 import type { MaterialItem } from '../../types';
@@ -19,7 +20,8 @@ interface MaterialsGridProps {
 
 export const MaterialsGrid: React.FC<MaterialsGridProps> = ({ onEdit, onView, onDelete }) => {
   // 🎯 Use the main hook directly for better reactivity
-  const { getFilteredItems, loading } = useMaterials();
+  const { loading } = useMaterialsData();
+  const { getFilteredItems } = useMaterialsComputed();
   const items = getFilteredItems();
 
   // 🔒 PERMISSIONS: Check user permissions for update and delete actions

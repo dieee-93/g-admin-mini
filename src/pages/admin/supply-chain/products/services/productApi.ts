@@ -112,13 +112,23 @@ export async function updateProduct(productData: UpdateProductData, user: AuthUs
 
     const { id, ...updates } = productData;
 
-    // Get old product data for price change detection
-    const { data: oldProduct } = await supabase
+    // Get old product data before update for comparison
+    const { data: oldProduct, error: fetchError } = await supabase
       .from("products")
       .select('*')
       .eq("id", id)
       .single();
 
+    if (fetchError) {
+      logger.error('App', "Error fetching product for update:", fetchError);
+      throw fetchError;
+    }
+
+    if (!oldProduct) {
+      throw new Error(`Product with id ${id} not found`);
+    }
+
+    // Update product in database
     const { data, error } = await supabase
       .from("products")
       .update(updates)
@@ -126,9 +136,16 @@ export async function updateProduct(productData: UpdateProductData, user: AuthUs
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      logger.error('App', "Error updating product:", error);
+      throw error;
+    }
 
-    logger.info('App', 'Product updated', { productId: id, userId: user.id });
+    logger.info('App', 'Product updated', { 
+      productId: id, 
+      userId: user.id,
+      fieldsUpdated: Object.keys(updates)
+    });
 
     // 📡 EVENTBUS: Emit product_updated event
     eventBus.emit('products.product_updated', {
@@ -143,7 +160,7 @@ export async function updateProduct(productData: UpdateProductData, user: AuthUs
     });
 
     // 📡 EVENTBUS: Emit price_changed event if price was updated
-    if (updates.price && oldProduct && oldProduct.price !== updates.price) {
+    if (updates.price !== undefined && updates.price !== oldProduct.price) {
       eventBus.emit('products.price_changed', {
         productId: id,
         productName: data.name,
@@ -153,6 +170,20 @@ export async function updateProduct(productData: UpdateProductData, user: AuthUs
         userId: user.id
       }, {
         priority: EventPriority.HIGH,
+        moduleId: 'products'
+      });
+    }
+
+    // 📡 EVENTBUS: Emit publish_toggled event if is_published was updated
+    if (updates.is_published !== undefined && updates.is_published !== oldProduct.is_published) {
+      eventBus.emit('products.publish_toggled', {
+        productId: id,
+        productName: data.name,
+        isPublished: updates.is_published,
+        timestamp: new Date().toISOString(),
+        userId: user.id
+      }, {
+        priority: EventPriority.MEDIUM,
         moduleId: 'products'
       });
     }
@@ -352,5 +383,86 @@ export const productsService = {
       logger.error('App', "Error in loadProducts:", error);
       throw error;
     }
+  },
+
+  async updateProduct(productData: UpdateProductData, user: AuthUser) {
+    try {
+      const { useProductsStore } = await import('@/store/productsStore');
+      const { updateProduct: updateInStore } = useProductsStore.getState();
+
+      // Update in database first
+      const updatedProduct = await updateProduct(productData, user);
+
+      // Update in store (optimistic update already done by UI, but ensure consistency)
+      updateInStore(updatedProduct.id, updatedProduct);
+
+      return updatedProduct;
+    } catch (error) {
+      const { useProductsStore } = await import('@/store/productsStore');
+      const { setError } = useProductsStore.getState();
+
+      setError(error instanceof Error ? error.message : 'Error updating product');
+      logger.error('App', "Error in updateProduct service:", error);
+      throw error;
+    }
   }
 };
+
+// ============================================
+// SERVICES MANAGEMENT (Service Products)
+// ============================================
+
+/**
+ * Fetch service products (products with type='SERVICE')
+ */
+export async function getServiceProducts(
+  organizationId: string,
+  user: AuthUser
+): Promise<Product[]> {
+  requirePermission(user, 'products', 'read');
+
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('type', 'SERVICE')
+    .eq('organization_id', organizationId)
+    .order('name');
+
+  if (error) {
+    logger.error('App', 'Error fetching service products', error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+/**
+ * Create a service product (reuses createProduct with type='SERVICE')
+ */
+export async function createServiceProduct(
+  serviceData: CreateProductData,
+  user: AuthUser
+): Promise<Product> {
+  return createProduct({ ...serviceData, type: 'SERVICE' }, user);
+}
+
+/**
+ * Update a service product (reuses updateProduct)
+ */
+export async function updateServiceProduct(
+  id: string,
+  updates: Partial<CreateProductData>,
+  user: AuthUser
+): Promise<Product> {
+  return updateProduct(id, updates, user);
+}
+
+/**
+ * Delete a service product (reuses deleteProduct)
+ */
+export async function deleteServiceProduct(
+  id: string,
+  user: AuthUser
+): Promise<void> {
+  return deleteProduct(id, user);
+}

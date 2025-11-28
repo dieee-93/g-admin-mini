@@ -152,7 +152,7 @@ export function Section({
   // ===== VISUAL STYLING (Layer 2 responsibility) =====
   const variantStyles = {
     default: {
-      bg: 'gray.00',
+      bg: 'gray.100',
       color: 'text.primary',
       border: '1px solid',
       borderColor: 'border.default',

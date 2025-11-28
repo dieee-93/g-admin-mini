@@ -43,27 +43,62 @@ if (import.meta.env.DEV && typeof window !== 'undefined') {
       // Core Settings
       enabled: true,
       showToolbar: true,
-      animationSpeed: 'fast',
+      animationSpeed: 'slow', // Cambio a 'slow' para ver mejor los flashes
 
-      // Filtering (CRITICAL for reducing noise)
-      renderCountThreshold: 5,  // Only show components rendering 5+ times
-      resetCountTimeout: 5000,  // Reset counts every 5 seconds
+      // Filtering (REDUCIR threshold para ver más actividad)
+      renderCountThreshold: 0,  // Mostrar TODOS los renders (0 = sin filtro)
+      resetCountTimeout: 10000,  // AUMENTAR a 10 segundos para capturar más renders
 
-      // Performance Settings (start conservative)
-      log: false,  // Enable via Shift+L or toolbar when needed
-      trackUnnecessaryRenders: false,  // Enable via Shift+U when needed
-      playSound: true,  // Geiger counter for renders
+      // Performance Settings (ACTIVAR para debugging)
+      log: true,  // ACTIVADO por defecto para ver en consola
+      trackUnnecessaryRenders: true,  // ACTIVADO por defecto
+      playSound: false,  // Desactivado para no ser molesto
+
+      // 🎯 FILTRAR componentes de Chakra UI y mostrar solo tus componentes
+      includeChildren: false, // No mostrar hijos internos de componentes
+      exclude: [
+        // Excluir todos los componentes internos de Chakra UI
+        /^chakra\./,
+        /^Chakra/,
+        /^Box$/,
+        /^Stack$/,
+        /^Text$/,
+        /^Button$/,
+        /^Flex$/,
+        /^Grid$/,
+        /^Center$/,
+        /^Container$/,
+        /^Heading$/,
+        /^Card/,
+        /^Badge$/,
+        /^Icon/,
+        /^Spinner$/,
+        // Excluir componentes de React Router
+        /^Router/,
+        /^Route/,
+        /^Link$/,
+        /^Navigate/,
+        // Excluir providers y wrappers genéricos
+        /Provider$/,
+        /Context$/,
+        /Wrapper$/,
+      ],
 
       // Infinite Loop Auto-Detection
       onRender: (fiber, renders) => {
-        const componentName = fiber.type?.name || 'Anonymous';
+        const componentName = fiber.type?.name || fiber.type?.displayName || 'Anonymous';
         const count = renders.length;
+
+        // 🎯 MOSTRAR SIEMPRE si hay más de 10 renders
+        if (count > 10) {
+          console.warn(`⚠️ [React Scan] ${componentName} renderizó ${count} veces en 10s`);
+        }
 
         // Alert for potential infinite loops
         if (count > 50) {
-          console.error(`🔥 POTENTIAL INFINITE LOOP: ${componentName} (${count} renders in 5s)`);
+          console.error(`🔥 POTENTIAL INFINITE LOOP: ${componentName} (${count} renders en 10s)`);
           console.log('Component fiber:', fiber);
-          console.log('Render history (last 10):', renders.slice(-10));
+          console.log('Render history (últimos 10):', renders.slice(-10));
 
           // Break to inspect state
           if (import.meta.env.DEV) {
@@ -74,6 +109,11 @@ if (import.meta.env.DEV && typeof window !== 'undefined') {
         // Warning for high render counts
         if (count > 20 && count <= 50) {
           console.warn(`⚠️ High render count: ${componentName} (${count} renders)`);
+        }
+
+        // 🎯 LOG cada 5 renders para tracking continuo
+        if (count % 5 === 0 && count > 5) {
+          console.log(`📊 [React Scan] ${componentName}: ${count} renders acumulados`);
         }
       }
     });

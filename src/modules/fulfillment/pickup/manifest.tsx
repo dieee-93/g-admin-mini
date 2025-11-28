@@ -27,6 +27,8 @@ export const fulfillmentPickupManifest: ModuleManifest = {
   name: 'Fulfillment - Pickup Orders',
   version: '1.0.0',
 
+  permissionModule: 'operations', // ✅ Uses 'operations' permission
+
   // ============================================
   // DEPENDENCIES
   // ============================================

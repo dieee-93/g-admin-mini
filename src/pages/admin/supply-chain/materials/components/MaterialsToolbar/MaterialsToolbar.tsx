@@ -240,6 +240,7 @@ export const MaterialsToolbar = memo(function MaterialsToolbar({
       </Stack>
     </Stack>
   );
+MaterialsToolbar.displayName = 'MaterialsToolbar';
 }, (prevProps, nextProps) => {
   // ✅ PERFORMANCE: Custom comparison to prevent MenuRoot re-renders from TabsContext changes
   return (

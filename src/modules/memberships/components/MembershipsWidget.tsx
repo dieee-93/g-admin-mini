@@ -10,12 +10,12 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography, Icon, Button, Spinner } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { UserGroupIcon } from '@heroicons/react/24/outline';
 import { getMembershipMetrics } from '@/pages/admin/operations/memberships/services';
 import { logger } from '@/lib/logging';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 interface MembershipsStats {
   activeMembers: number;
@@ -24,7 +24,7 @@ interface MembershipsStats {
 }
 
 export default function MembershipsWidget() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
   const [stats, setStats] = useState<MembershipsStats>({
     activeMembers: 0,
     newThisMonth: 0,
@@ -138,7 +138,7 @@ export default function MembershipsWidget() {
             size="sm"
             colorPalette="purple"
             variant="outline"
-            onClick={() => navigate('/admin/operations/memberships')}
+            onClick={() => navigate('memberships')}
           >
             Ver Membresías
           </Button>

@@ -5,7 +5,8 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
-import { useMaterials } from '@/hooks/useZustandStores';
+import { useMaterialsFilters } from '../../hooks/useMaterialsFilters';
+import { useMaterialsStore } from '@/store/materialsStore';
 
 const statusOptions = [
   { value: 'all', label: 'Todos los estados' },
@@ -28,12 +29,8 @@ const orderOptions = [
 ];
 
 export const MaterialsFilters = () => {
-  const { 
-    filters, 
-    categories, 
-    setFilters, 
-    resetFilters 
-  } = useMaterials();
+  const { filters, setFilters, resetFilters } = useMaterialsFilters();
+  const categories = useMaterialsStore((s) => s.categories);
 
   const categoryOptions = [
     { value: 'all', label: 'Todas las categorías' },

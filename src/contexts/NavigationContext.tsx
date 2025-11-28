@@ -369,6 +369,13 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     moduleState: {}
   });
 
+  logger.debug('NavigationContext', 'Provider render', {
+    pathname: location.pathname,
+    isAuthenticated,
+    userRole: user?.role,
+    currentModule: navigationState.currentModule
+  });
+
   const [layoutState, dispatchLayout] = useReducer(layoutReducer, {
     isMobile: false,
     isTablet: false,
@@ -401,14 +408,14 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     dispatchLayout({ type: 'SET_DESKTOP', payload: debouncedIsDesktop });
   }, [debouncedIsDesktop]);
 
-  // Auto-collapse/expand sidebar based on screen size
+  // Auto-collapse sidebar on mobile/tablet (hover-only on desktop)
+  // ✅ FIX: Always keep collapsed on desktop (hover-only behavior)
   useEffect(() => {
-    if (debouncedIsTablet) {
+    if (debouncedIsTablet || debouncedIsMobile) {
       dispatchLayout({ type: 'SET_SIDEBAR_COLLAPSED', payload: true });
-    } else if (debouncedIsDesktop) {
-      dispatchLayout({ type: 'SET_SIDEBAR_COLLAPSED', payload: false });
     }
-  }, [debouncedIsTablet, debouncedIsDesktop]);
+    // Desktop: Keep collapsed (hover-only), don't auto-expand
+  }, [debouncedIsTablet, debouncedIsMobile]);
 
   // ============================================
   // MODULE NAVIGATION
@@ -450,8 +457,41 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
 
   // Update modules in state when they change
   useEffect(() => {
+    logger.debug('NavigationContext', 'Modules updated', {
+      moduleCount: modules.length,
+      moduleIds: modules.map(m => m.id),
+      userRole: user?.role,
+      isAuthenticated
+    });
     dispatchNavigation({ type: 'SET_MODULES', payload: modules });
-  }, [modules]);
+  }, [modules, user?.role, isAuthenticated]);
+
+  // DEBUG: Monitor location changes to detect navigation failures
+  const lastLocationRef = useRef(location.pathname);
+  useEffect(() => {
+    const lock = navigationLockRef.current;
+
+    if (location.pathname !== lastLocationRef.current) {
+      logger.debug('NavigationContext', 'Location changed', {
+        from: lastLocationRef.current,
+        to: location.pathname,
+        wasNavigating: lock.isNavigating,
+        timestamp: new Date().toISOString()
+      });
+
+      // Release navigation lock when location changes
+      if (lock.isNavigating) {
+        logger.debug('NavigationContext', 'Navigation lock released (location changed)', {
+          targetModuleId: lock.lastModuleId,
+          newPath: location.pathname
+        });
+        lock.isNavigating = false;
+        lock.attemptCount = 0; // Reset attempt counter on successful navigation
+      }
+
+      lastLocationRef.current = location.pathname;
+    }
+  }, [location.pathname]);
 
   // ============================================
   // QUICK ACTIONS (Stored in ref to avoid re-renders)
@@ -584,29 +624,187 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   // ACTIONS (All memoized with useCallback)
   // ============================================
 
+  // 🚀 PERFORMANCE FIX: Use ref to avoid deps on navigationState.modules
+  // React.dev pattern: "use refs to avoid stale closures with empty deps"
   const handleNavigate = useCallback((moduleId: string, subPath?: string, query?: string) => {
-    const module = navigationState.modules.find(m => m.id === moduleId);
+    logger.debug('NavigationContext', 'handleNavigate called', {
+      moduleId,
+      subPath,
+      query,
+      availableModules: navigationStateRef.current.modules.map(m => m.id)
+    });
+
+    // ✅ Use ref - stable reference, no re-creation
+    const module = navigationStateRef.current.modules.find(m => m.id === moduleId);
     if (module) {
       let targetPath = subPath ? `${module.path}${subPath}` : module.path;
       if (query) {
         targetPath += `?${query.replace(/^\?/, '')}`;
       }
+      logger.info('NavigationContext', 'Navigating to module', {
+        moduleId,
+        targetPath,
+        hasSubPath: !!subPath,
+        hasQuery: !!query
+      });
       navigate(targetPath);
+    } else {
+      logger.warn('NavigationContext', 'Module not found', {
+        requestedModuleId: moduleId,
+        availableModules: navigationStateRef.current.modules.map(m => ({ id: m.id, path: m.path }))
+      });
     }
-  }, [navigate, navigationState.modules]);
+  }, [navigate]); // ✅ Only navigate - stable deps
+
+  // Navigation lock to prevent rapid-fire navigation attempts
+  const navigationLockRef = useRef<{
+    isNavigating: boolean;
+    lastModuleId: string | null;
+    lastTimestamp: number;
+    attemptCount: number;
+  }>({
+    isNavigating: false,
+    lastModuleId: null,
+    lastTimestamp: 0,
+    attemptCount: 0
+  });
+
+  // 🛠️ PERFORMANCE FIX: Use refs to avoid recreating callback on every modules/location change
+  const navigationStateRef = useRef(navigationState);
+  const locationRef = useRef(location);
+
+  useEffect(() => {
+    navigationStateRef.current = navigationState;
+  }, [navigationState]);
+
+  useEffect(() => {
+    locationRef.current = location;
+  }, [location]);
 
   const handleNavigateToModule = useCallback((moduleId: string) => {
-    const module = navigationState.modules.find(m => m.id === moduleId);
-    if (module) {
-      navigate(module.path);
+    const now = Date.now();
+    const lock = navigationLockRef.current;
+    const timeSinceLastAttempt = now - lock.lastTimestamp;
+
+    // DEBUG: Log every call with detailed context
+    logger.debug('NavigationContext', 'handleNavigateToModule called', {
+      moduleId,
+      availableModules: navigationStateRef.current.modules.map(m => m.id),
+      lockStatus: {
+        isNavigating: lock.isNavigating,
+        lastModuleId: lock.lastModuleId,
+        timeSinceLastAttempt,
+        attemptCount: lock.attemptCount
+      },
+      currentLocation: locationRef.current.pathname,
+      timestamp: new Date(now).toISOString(),
+      // Stack trace to see who's calling this
+      callStack: new Error().stack?.split('\n').slice(2, 5).join(' | ')
+    });
+
+    // Detect rapid-fire attempts (possible bug)
+    if (lock.lastModuleId === moduleId && timeSinceLastAttempt < 1000) {
+      lock.attemptCount++;
+
+      if (lock.attemptCount >= 3) {
+        logger.warn('NavigationContext', '🐛 BUG DETECTED: Rapid navigation attempts', {
+          moduleId,
+          attemptCount: lock.attemptCount,
+          timeSinceLastAttempt,
+          isNavigating: lock.isNavigating,
+          currentPath: locationRef.current.pathname,
+          targetModule: navigationStateRef.current.modules.find(m => m.id === moduleId),
+          timestamp: new Date(now).toISOString()
+        });
+      }
+
+      // If already navigating to this module, ignore
+      if (lock.isNavigating && timeSinceLastAttempt < 500) {
+        logger.warn('NavigationContext', 'Navigation in progress, ignoring duplicate call', {
+          moduleId,
+          attemptCount: lock.attemptCount,
+          timeSinceLastAttempt
+        });
+        return;
+      }
+    } else {
+      // Reset counter for new module or after cooldown
+      lock.attemptCount = 1;
     }
-  }, [navigate, navigationState.modules]);
+
+    lock.lastModuleId = moduleId;
+    lock.lastTimestamp = now;
+
+    const module = navigationStateRef.current.modules.find(m => m.id === moduleId);
+    if (module) {
+      // Check if we're already at this path
+      if (locationRef.current.pathname === module.path) {
+        logger.info('NavigationContext', 'Already at target module path, skipping navigation', {
+          moduleId,
+          path: module.path,
+          currentPath: locationRef.current.pathname
+        });
+        lock.isNavigating = false;
+        return;
+      }
+
+      lock.isNavigating = true;
+
+      logger.info('NavigationContext', 'Navigating to module root', {
+        moduleId,
+        targetPath: module.path,
+        currentPath: locationRef.current.pathname,
+        attemptNumber: lock.attemptCount
+      });
+
+      try {
+        navigate(module.path);
+
+        // Reset lock after navigation completes (with timeout as safety)
+        setTimeout(() => {
+          if (navigationLockRef.current.isNavigating) {
+            logger.debug('NavigationContext', 'Navigation lock released (timeout)', {
+              moduleId,
+              targetPath: module.path
+            });
+            navigationLockRef.current.isNavigating = false;
+          }
+        }, 1000);
+      } catch (error) {
+        logger.error('NavigationContext', 'Navigation failed', {
+          moduleId,
+          targetPath: module.path,
+          error: error instanceof Error ? error.message : String(error)
+        });
+        lock.isNavigating = false;
+      }
+    } else {
+      logger.warn('NavigationContext', 'Module not found in navigateToModule', {
+        requestedModuleId: moduleId,
+        availableModules: navigationStateRef.current.modules.map(m => ({ id: m.id, path: m.path }))
+      });
+      lock.isNavigating = false;
+    }
+  }, [navigate]); // 🎯 Only depends on navigate - stable reference
 
   const handleNavigateBack = useCallback(() => {
-    if (navigationState.navigationHistory.length > 1) {
+    logger.debug('NavigationContext', 'handleNavigateBack called', {
+      historyLength: navigationStateRef.current.navigationHistory.length,
+      canGoBack: navigationStateRef.current.navigationHistory.length > 1
+    });
+
+    if (navigationStateRef.current.navigationHistory.length > 1) {
+      logger.info('NavigationContext', 'Navigating back', {
+        fromPath: navigationStateRef.current.navigationHistory[navigationStateRef.current.navigationHistory.length - 1]
+      });
       navigate(-1);
+    } else {
+      logger.warn('NavigationContext', 'Cannot navigate back', {
+        reason: 'No history available',
+        historyLength: navigationStateRef.current.navigationHistory.length
+      });
     }
-  }, [navigate, navigationState.navigationHistory.length]);
+  }, [navigate]); // 🎯 Only depends on navigate - stable reference
 
   const toggleModuleExpansion = useCallback((moduleId: string) => {
     dispatchNavigation({ type: 'TOGGLE_MODULE_EXPANSION', payload: moduleId });
@@ -625,20 +823,54 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   }, []);
 
   // ============================================
-  // CONTEXT VALUES (Memoized)
+  // CONTEXT VALUES (Memoized with Primitives)
   // ============================================
+  // 🚀 PERFORMANCE FIX: Extract primitives to minimize re-renders
+  // React.dev: "minimize props changes - use individual values instead of objects"
+
+  // Extract primitive values for stable comparison
+  const currentModuleId = navigationState.currentModule?.id;
+  const modulesCount = navigationState.modules.length;
+  const modulesHash = navigationState.modules.map(m => m.id).join(',');
+  const historyLength = navigationState.navigationHistory.length;
+  const breadcrumbsLength = navigationState.breadcrumbs.length;
+
+  // Memoize currentModule (only changes when ID changes)
+  const memoizedCurrentModule = useMemo(
+    () => navigationState.currentModule,
+    [currentModuleId]
+  );
+
+  // Memoize modules (only changes when count or IDs change)
+  const memoizedModules = useMemo(
+    () => navigationState.modules,
+    [modulesCount, modulesHash]
+  );
+
+  // Memoize navigationHistory (only changes when length changes)
+  const memoizedHistory = useMemo(
+    () => navigationState.navigationHistory,
+    [historyLength]
+  );
+
+  // Memoize breadcrumbs (only changes when length changes)
+  const memoizedBreadcrumbs = useMemo(
+    () => navigationState.breadcrumbs,
+    [breadcrumbsLength]
+  );
 
   const stateValue = useMemo<NavigationStateContextValue>(() => ({
-    currentModule: navigationState.currentModule,
-    breadcrumbs: navigationState.breadcrumbs,
-    modules: navigationState.modules,
-    navigationHistory: navigationState.navigationHistory,
-    canNavigateBack: navigationState.navigationHistory.length > 1
+    currentModule: memoizedCurrentModule,
+    breadcrumbs: memoizedBreadcrumbs,
+    modules: memoizedModules,
+    navigationHistory: memoizedHistory,
+    canNavigateBack: historyLength > 1
   }), [
-    navigationState.currentModule,
-    navigationState.breadcrumbs,
-    navigationState.modules,
-    navigationState.navigationHistory
+    memoizedCurrentModule,
+    memoizedBreadcrumbs,
+    memoizedModules,
+    memoizedHistory,
+    historyLength
   ]);
 
   const layoutValue = useMemo<NavigationLayoutContextValue>(() => ({
@@ -648,14 +880,16 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     sidebarCollapsed: layoutState.sidebarCollapsed
   }), [layoutState.isMobile, layoutState.sidebarCollapsed]);
 
+  // 🚀 PERFORMANCE: Actions with stable callbacks (empty deps pattern)
+  // All callbacks use refs → no re-creation → actionsValue stays stable
   const actionsValue = useMemo<NavigationActionsContextValue>(() => ({
-    navigate: handleNavigate,
-    navigateToModule: handleNavigateToModule,
-    navigateBack: handleNavigateBack,
-    toggleModuleExpansion,
-    setSidebarCollapsed,
-    updateModuleBadge,
-    setQuickActions
+    navigate: handleNavigate,               // ✅ [navigate] - stable
+    navigateToModule: handleNavigateToModule, // ✅ [navigate] - stable
+    navigateBack: handleNavigateBack,       // ✅ [] - stable
+    toggleModuleExpansion,                  // ✅ [] - stable
+    setSidebarCollapsed,                    // ✅ [] - stable
+    updateModuleBadge,                      // ✅ [] - stable
+    setQuickActions                         // ✅ [] - stable
   }), [
     handleNavigate,
     handleNavigateToModule,

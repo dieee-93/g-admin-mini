@@ -46,7 +46,7 @@ describe.skip('InventoryTransfersService Integration', () => {
 
     // Create test item in location A
     const { data: item, error: itemError } = await supabase
-      .from('items')
+      .from('materials')
       .insert({
         name: 'Test Transfer Item',
         type: 'COUNTABLE',
@@ -70,7 +70,7 @@ describe.skip('InventoryTransfersService Integration', () => {
     logger.debug('TransfersService.integration.test', 'Cleaning up test data...');
 
     if (testItemId) {
-      await supabase.from('items').delete().eq('id', testItemId);
+      await supabase.from('materials').delete().eq('id', testItemId);
       logger.debug('TransfersService.integration.test', `Deleted test item: ${testItemId}`);
     }
 
@@ -113,7 +113,7 @@ describe.skip('InventoryTransfersService Integration', () => {
 
     // Verify source stock unchanged (transfer just pending)
     const { data: sourceItemAfterInit } = await supabase
-      .from('items')
+      .from('materials')
       .select('stock')
       .eq('id', testItemId)
       .eq('location_id', testLocationA)
@@ -137,7 +137,7 @@ describe.skip('InventoryTransfersService Integration', () => {
 
     // Verify source stock deducted
     const { data: sourceItemAfterApprove } = await supabase
-      .from('items')
+      .from('materials')
       .select('stock')
       .eq('id', testItemId)
       .eq('location_id', testLocationA)
@@ -161,7 +161,7 @@ describe.skip('InventoryTransfersService Integration', () => {
 
     // Verify destination stock added
     const { data: destItem } = await supabase
-      .from('items')
+      .from('materials')
       .select('stock')
       .eq('id', testItemId)
       .eq('location_id', testLocationB)
@@ -172,7 +172,7 @@ describe.skip('InventoryTransfersService Integration', () => {
 
     // Verify source stock still 70
     const { data: sourceItemFinal } = await supabase
-      .from('items')
+      .from('materials')
       .select('stock')
       .eq('id', testItemId)
       .eq('location_id', testLocationA)
@@ -203,7 +203,7 @@ describe.skip('InventoryTransfersService Integration', () => {
 
     // Get stock before rejection
     const { data: stockBefore } = await supabase
-      .from('items')
+      .from('materials')
       .select('stock')
       .eq('id', testItemId)
       .eq('location_id', testLocationA)
@@ -223,7 +223,7 @@ describe.skip('InventoryTransfersService Integration', () => {
 
     // Verify stock unchanged
     const { data: stockAfter } = await supabase
-      .from('items')
+      .from('materials')
       .select('stock')
       .eq('id', testItemId)
       .eq('location_id', testLocationA)

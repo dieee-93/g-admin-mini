@@ -10,6 +10,8 @@
  * MIGRATION: Eventually remove this file and update all imports to use new paths
  */
 
+import { logger } from '@/lib/logging';
+
 // ============================================
 // STORE & HOOKS (Primary Interface)
 // ============================================
@@ -59,6 +61,8 @@ export const useCapability = (featureId: string) => {
  * @deprecated Use useCapabilities().visibleModules instead
  */
 export const useModuleAccess = (moduleId: string) => {
+  // Note: No useShallow needed here because we're calling .includes() on the result
+  // The comparison happens immediately, so we don't pass the array to a component
   const modules = useCapabilityStore(state => state.getActiveModules());
   const hasAccess = modules.includes(moduleId);
 
@@ -117,15 +121,8 @@ export const getSystemHealth = () => {
 
 export const logSystemInfo = () => {
   if (process.env.NODE_ENV === 'development') {
-    console.info(`
-🚀 G-Admin Feature System v${CAPABILITY_SYSTEM_VERSION} loaded
-
-✅ New 3-layer architecture active
-   Layer 1: User Choices (BusinessModelRegistry)
-   Layer 2: System Features (FeatureRegistry)
-   Layer 3: Requirements & Progression (RequirementsRegistry)
-
-📦 Core: FeatureActivationEngine + capabilityStore
-    `);
+    logger.info('CapabilitySystem', `Feature System v${CAPABILITY_SYSTEM_VERSION} loaded`);
+    logger.info('CapabilitySystem', 'New 3-layer architecture active');
+    logger.debug('CapabilitySystem', 'Layers: User Choices, System Features, Requirements & Progression');
   }
 };

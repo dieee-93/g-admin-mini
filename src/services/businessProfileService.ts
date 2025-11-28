@@ -108,7 +108,7 @@ export async function loadProfileFromDB(): Promise<CapabilityProfile | null> {
         currency: data.currency,
 
         // V4.0 fields
-        selectedActivities: data.selected_activities || [],
+        selectedCapabilities: data.active_capabilities || [], // ✅ Load from active_capabilities
         selectedInfrastructure: data.selected_infrastructure || ['single_location'],
 
         setupCompleted: data.setup_completed,
@@ -118,7 +118,7 @@ export async function loadProfileFromDB(): Promise<CapabilityProfile | null> {
 
       logger.info('BusinessProfileService', '✅ Profile loaded from database', {
         businessName: profile.businessName,
-        activities: profile.selectedActivities.length,
+        capabilities: profile.selectedCapabilities.length,
         infrastructure: profile.selectedInfrastructure.length,
         setupCompleted: profile.setupCompleted
       });
@@ -143,7 +143,7 @@ export async function saveProfileToDB(profile: CapabilityProfile): Promise<void>
   try {
     logger.info('BusinessProfileService', '💾 Saving profile to database...', {
       businessName: profile.businessName,
-      activities: profile.selectedActivities?.length || 0,
+      capabilities: profile.selectedCapabilities?.length || 0,
       infrastructure: profile.selectedInfrastructure?.length || 0
     });
 
@@ -158,13 +158,12 @@ export async function saveProfileToDB(profile: CapabilityProfile): Promise<void>
       currency: profile.currency,
 
       // V4.0 fields
-      selected_activities: profile.selectedActivities || [],
+      active_capabilities: profile.selectedCapabilities || [], // ✅ Save selectedCapabilities!
       selected_infrastructure: profile.selectedInfrastructure || ['single_location'],
       completed_milestones: profile.completedMilestones || [],
       is_first_time_dashboard: profile.isFirstTimeInDashboard ?? true,
 
       // Legacy fields (kept for backward compatibility)
-      active_capabilities: [],
       business_structure: profile.selectedInfrastructure?.[0] || 'single_location',
       computed_configuration: {},
       auto_resolved_capabilities: [],

@@ -8,15 +8,24 @@
 // ===== CORE CUSTOMER TYPES =====
 
 export interface Customer {
-  // Basic Information (existing)
+  // Basic Information
   id: string;
   name: string;
   phone?: string;
   email?: string;
   address?: string;
   note?: string;
+  birth_date?: string; // Added to match store
   created_at: string;
   updated_at: string;
+
+  // Analytics & Status (Unified from Store)
+  total_orders: number;
+  total_spent: number;
+  average_order_value: number;
+  last_order_date?: string;
+  loyalty_tier: LoyaltyTier;
+  status: 'active' | 'inactive' | 'vip';
 }
 
 export interface CustomerProfile extends Customer {
@@ -25,23 +34,23 @@ export interface CustomerProfile extends Customer {
   notes: CustomerNote[];
   preferences: CustomerPreferences;
   special_occasions: SpecialOccasion[];
-  
+
   // Engagement Tracking
   communication_preferences: CommunicationPreferences;
-  
+
   // Analytics Data
   rfm_profile: CustomerRFMProfile;
   last_visit: Date;
   total_visits: number;
   total_spent: number;
   favorite_items: string[]; // Product IDs most ordered
-  
+
   // Status & Flags
   is_vip: boolean;
   loyalty_tier: LoyaltyTier;
   blacklisted: boolean;
   churn_risk: ChurnRisk;
-  
+
   // Compatibility fields for legacy components
   customer_id?: string; // alias for id
   segment?: CustomerSegment; // flattened segment from rfm_profile
@@ -58,10 +67,10 @@ export interface CustomerRFMProfile {
     monetary_score: number;      // 1-5 (total spending/average)
     segment: CustomerSegment;    // Calculated segment
   };
-  
+
   // Compatibility field for legacy components
   segment?: CustomerSegment;
-  
+
   // JSONB intelligence structure
   intelligence: {
     lifetime_value: number;      // CLV calculated
@@ -72,21 +81,21 @@ export interface CustomerRFMProfile {
     seasonal_patterns: string[];    // summer, holidays
     price_sensitivity: PriceSensitivity;
   };
-  
+
   // JSONB status structure
   status: {
     is_vip: boolean;
     loyalty_tier: LoyaltyTier;
     blacklisted: boolean;
   };
-  
+
   // JSONB raw data structure
   raw_data: {
     recency_days: number;
     frequency_count: number;
     monetary_total: number;
   };
-  
+
   // Metadata timestamps
   calculated_at: Date;
   created_at: Date;
@@ -160,7 +169,7 @@ export interface CustomerPreferences {
     favorite_cuisines: string[];
     disliked_items: string[];
   };
-  
+
   // JSONB preferences structure
   preferences: {
     seating?: string;         // booth, window, outdoor
@@ -169,13 +178,13 @@ export interface CustomerPreferences {
     service_pace?: 'quick' | 'standard' | 'leisurely';
     special_requests: string[]; // no ice, sauce on side
   };
-  
+
   // JSONB communication structure
   communication: {
     preferred_contact_time?: string;  // morning, afternoon, evening
     contact_frequency?: 'weekly' | 'monthly' | 'rarely';
   };
-  
+
   // Metadata timestamps
   created_at: Date;
   updated_at: Date;
@@ -209,7 +218,7 @@ export interface CustomerAnalytics {
   new_customers_this_month: number;
   active_customers: number;        // Visited in last 90 days
   customer_retention_rate: number;
-  
+
   // RFM Distribution
   segment_distribution: {
     [K in CustomerSegment]: {
@@ -219,18 +228,18 @@ export interface CustomerAnalytics {
       revenue_contribution: number;
     }
   };
-  
+
   // Business Intelligence
   top_customers: CustomerProfile[];
   at_risk_customers: CustomerProfile[];
   customer_acquisition_trends: MonthlyTrend[];
-  
+
   // Actionable Insights
   churn_predictions: ChurnPrediction[];
   upsell_opportunities: UpsellOpportunity[];
-  
+
   calculated_at: Date;
-  
+
   // Legacy compatibility fields
   average_clv?: number;
   churn_rate?: number;

@@ -1,5 +1,4 @@
 // src/features/customers/logic/useCustomerRFM.test.ts
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useCustomerRFM, useCustomerSegmentation } from './useCustomerRFM'

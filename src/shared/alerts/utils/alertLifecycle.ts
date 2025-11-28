@@ -125,7 +125,13 @@ export function calculateExpiration(
 /**
  * Determina si una alerta debe ser persistente basándose en su severidad
  *
- * Por defecto, solo alertas críticas y de alta prioridad son persistentes
+ * 🎯 UPDATED: Ahora persiste critical, high Y medium
+ * Las alertas low e info NO se persisten (son informativas/temporales)
+ *
+ * RATIONALE:
+ * - critical/high: Requieren acción inmediata → persisten
+ * - medium: Alertas de negocio importantes (stock bajo) → persisten ✅
+ * - low/info: Informativas, pueden auto-expirar
  *
  * @param severity - Severidad de la alerta
  * @returns true si debe ser persistente
@@ -134,11 +140,14 @@ export function calculateExpiration(
  * ```typescript
  * shouldBePersistent('critical')  // → true
  * shouldBePersistent('high')      // → true
- * shouldBePersistent('medium')    // → false
+ * shouldBePersistent('medium')    // → true ✅ NEW
+ * shouldBePersistent('low')       // → false
+ * shouldBePersistent('info')      // → false
  * ```
  */
 export function shouldBePersistent(severity: AlertSeverity): boolean {
-  return severity === 'critical' || severity === 'high';
+  // ✅ Persist critical, high AND medium (business-important alerts)
+  return severity === 'critical' || severity === 'high' || severity === 'medium';
 }
 
 /**

@@ -97,7 +97,7 @@ export const suppliersApi = {
   // Check if supplier has associated materials
   async hasAssociatedMaterials(supplierId: string): Promise<boolean> {
     const { count, error } = await supabase
-      .from('items')
+      .from('materials')
       .select('id', { count: 'exact', head: true })
       .eq('supplier_id', supplierId);
 

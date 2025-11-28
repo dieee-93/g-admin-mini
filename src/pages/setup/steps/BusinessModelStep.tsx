@@ -1,30 +1,71 @@
 /**
- * BUSINESS MODEL STEP - v5.0 ATOMIC
+ * BUSINESS MODEL STEP - v6.0 REORGANIZED
  *
- * Permite al usuario seleccionar capabilities atómicas e infrastructure.
- * Conectado con el sistema de atomic capabilities v2.0.
+ * Nuevo diseño de 4 secciones:
+ * 1. ¿Qué ofreces? (Business Model)
+ * 2. ¿Cómo entregas? (Fulfillment Methods)
+ * 3. ¿Dónde operás? (Infrastructure)
+ * 4. Potenciá tu negocio (Add-ons)
  *
- * @version 5.0.0 - Atomic Capabilities System
- * @see docs/ATOMIC_CAPABILITIES_DESIGN.md
+ * Auto-activación de Production y Scheduling según selección.
+ *
+ * @version 6.0.0 - Reorganized Capability Taxonomy
  */
 
-import React, { useState } from 'react';
-import { ContentLayout, Section, Stack, Button, Badge } from '@/shared/ui';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { ContentLayout, Section, Stack, Button, Badge, Heading, Text } from '@/shared/ui';
 import { useCapabilities } from '@/store/capabilityStore';
-import type { BusinessCapabilityId, InfrastructureId } from '@/config/types';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 import {
   getAllCapabilities,
   getAllInfrastructures
 } from '@/config/BusinessModelRegistry';
+import type { BusinessCapabilityId, InfrastructureId } from '@/config/BusinessModelRegistry';
+
+// ============================================
+// NUEVA TAXONOMÍA DE CAPABILITIES
+// ============================================
+
+// Sección 1: ¿Qué ofreces? (Core Business Model)
+const BUSINESS_MODELS: BusinessCapabilityId[] = [
+  'physical_products',           // 🍕 Productos físicos (auto-activa production)
+  'professional_services',       // 👨‍⚕️ Servicios profesionales (auto-activa scheduling)
+  'asset_rental',                // 🔑 Alquiler de activos
+  'membership_subscriptions',    // 💳 Membresías y suscripciones
+  'digital_products'             // 💾 Productos digitales
+];
+
+// Sección 2: ¿Cómo entregas? (Fulfillment Methods)
+const FULFILLMENT_METHODS: BusinessCapabilityId[] = [
+  'onsite_service',              // En mi local
+  'pickup_orders',               // Retiro en local
+  'delivery_shipping'            // Envío a domicilio
+  // ❌ ELIMINADO: 'appointment_based' (se auto-activa con services/rentals/memberships)
+];
+
+// Sección 3: ¿Dónde operás? (Infrastructure)
+// Nota: fixed_location y multi_location serán capabilities nuevas
+// Por ahora usamos las infrastructure existentes
+const INFRASTRUCTURE_OPTIONS: InfrastructureId[] = [
+  'single_location',             // 🏪 Local fijo (multi_location se muestra anidado)
+  'mobile_business'              // 🚚 Operaciones móviles
+  // ❌ ELIMINADO: 'online_only' (redundante)
+  // ❌ multi_location se muestra como sub-opción de single_location
+];
+
+// Sección 4: Potenciá tu negocio (Add-ons)
+const ADD_ONS: BusinessCapabilityId[] = [
+  'async_operations',                // 🛒 E-commerce (será renombrado a ecommerce_store)
+  'corporate_sales'              // 🏢 Ventas B2B
+];
 
 export default function BusinessModelStep() {
-  const navigate = useNavigate();
-  const { profile, setCapabilities, setInfrastructure, initializeProfile, completeSetup } = useCapabilities();
+  const { navigate } = useNavigationActions();
+  const { profile, toggleCapability, toggleInfrastructure, initializeProfile, completeSetup } = useCapabilities();
 
-  // Obtener capabilities e infrastructures del registry
-  const CAPABILITIES = getAllCapabilities();
-  const INFRASTRUCTURE = getAllInfrastructures();
+  // Obtener capabilities completas del registry
+  const ALL_CAPABILITIES = getAllCapabilities();
+  const ALL_INFRASTRUCTURE = getAllInfrastructures();
 
   // Initialize profile if not exists
   React.useEffect(() => {
@@ -36,8 +77,8 @@ export default function BusinessModelStep() {
         phone: '',
         country: 'Argentina',
         currency: 'ARS',
-        selectedActivities: [], // Legacy - será migrado a selectedCapabilities
-        selectedInfrastructure: ['single_location'],
+        selectedCapabilities: [],
+        selectedInfrastructure: [],
         setupCompleted: false,
         isFirstTimeInDashboard: false,
         onboardingStep: 0
@@ -45,45 +86,34 @@ export default function BusinessModelStep() {
     }
   }, [profile, initializeProfile]);
 
-  // State local para las selecciones
-  const [selectedCapabilities, setSelectedCapabilities] = useState<BusinessCapabilityId[]>(
-    profile?.selectedActivities || []
-  );
-
-  const [selectedInfra, setSelectedInfra] = useState<InfrastructureId>(
-    profile?.selectedInfrastructure?.[0] || 'single_location'
-  );
-
   const handleCapabilityToggle = (capabilityId: BusinessCapabilityId) => {
-    setSelectedCapabilities(prev => {
-      if (prev.includes(capabilityId)) {
-        return prev.filter(id => id !== capabilityId);
-      } else {
-        return [...prev, capabilityId];
-      }
-    });
+    toggleCapability(capabilityId);
   };
 
-  const handleInfraChange = (infraId: InfrastructureId) => {
-    setSelectedInfra(infraId);
+  const handleInfraToggle = (infraId: InfrastructureId) => {
+    toggleInfrastructure(infraId);
   };
 
   const handleContinue = async () => {
-    // Guardar selecciones en el store
-    setCapabilities(selectedCapabilities);
-    setInfrastructure(selectedInfra);
-
-    // Mark setup as completed
     await completeSetup();
-
-    // Navigate to dashboard with first-time flag
-    navigate('/admin/dashboard', {
-      state: { isFirstTime: true },
-      replace: true
-    });
+    navigate('dashboard');
   };
 
-  const isCapabilitySelected = (id: BusinessCapabilityId) => selectedCapabilities.includes(id);
+  const isCapabilitySelected = (id: BusinessCapabilityId) => profile?.selectedCapabilities.includes(id) ?? false;
+  const isInfraSelected = (id: InfrastructureId) => profile?.selectedInfrastructure.includes(id) ?? false;
+
+  const selectedCapabilities = profile?.selectedCapabilities || [];
+  const selectedInfra = profile?.selectedInfrastructure || [];
+
+  // Helper para obtener capability info
+  const getCapabilityInfo = (id: BusinessCapabilityId) => {
+    return ALL_CAPABILITIES.find(c => c.id === id);
+  };
+
+  // Helper para obtener infrastructure info
+  const getInfraInfo = (id: InfrastructureId) => {
+    return ALL_INFRASTRUCTURE.find(i => i.id === id);
+  };
 
   return (
     <ContentLayout spacing="normal">
@@ -91,124 +121,340 @@ export default function BusinessModelStep() {
         {/* Header */}
         <Section variant="flat">
           <Stack gap="3">
-            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1a202c' }}>
-              🎯 ¿Cómo opera tu negocio?
-            </h2>
-            <p style={{ fontSize: '16px', color: '#718096' }}>
-              Seleccioná las capacidades que necesitás. El sistema activará automáticamente las funcionalidades correspondientes.
-            </p>
+            <Heading size="2xl">
+              🎯 Configurá tu modelo de negocio
+            </Heading>
+            <Text color="fg.muted" fontSize="lg">
+              Seleccioná las opciones que mejor describan tu negocio. Podés combinar varias.
+            </Text>
           </Stack>
         </Section>
 
-        {/* Capabilities Selection */}
-        <Section variant="elevated" title="Capacidades de Negocio">
+        {/* ============================================ */}
+        {/* SECCIÓN 1: ¿QUÉ OFRECES? */}
+        {/* ============================================ */}
+        <Section variant="elevated">
           <Stack gap="4">
-            <p style={{ fontSize: '14px', color: '#718096', marginBottom: '12px' }}>
-              Podés combinar libremente las capacidades que necesites
-            </p>
+            <Stack gap="2">
+              <Heading size="lg">
+                1️⃣ ¿Qué ofrece tu negocio?
+              </Heading>
+              <Text color="fg.muted" fontSize="sm">
+                Seleccioná todas las opciones que apliquen
+              </Text>
+            </Stack>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-              {CAPABILITIES.map((capability) => (
-                <div
-                  key={capability.id}
-                  onClick={() => handleCapabilityToggle(capability.id)}
-                  style={{
-                    padding: '20px',
-                    borderWidth: '2px',
-                    borderStyle: 'solid',
-                    borderColor: isCapabilitySelected(capability.id) ? '#3182ce' : '#e2e8f0',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    backgroundColor: isCapabilitySelected(capability.id) ? '#ebf8ff' : 'white',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <Stack gap="2">
-                    <div style={{ fontSize: '32px' }}>{capability.icon}</div>
-                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#2d3748' }}>
-                      {capability.name}
-                    </div>
-                    <div style={{ fontSize: '14px', color: '#718096' }}>
-                      {capability.description}
-                    </div>
-                    {isCapabilitySelected(capability.id) && (
-                      <Badge colorPalette="blue" style={{ width: 'fit-content' }}>
-                        ✓ Seleccionado
-                      </Badge>
-                    )}
-                  </Stack>
-                </div>
-              ))}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '16px'
+            }}>
+              {BUSINESS_MODELS.map((capId) => {
+                const capability = getCapabilityInfo(capId);
+                if (!capability) return null;
+
+                const isSelected = isCapabilitySelected(capId);
+
+                return (
+                  <div
+                    key={capId}
+                    onClick={() => handleCapabilityToggle(capId)}
+                    style={{
+                      padding: '20px',
+                      borderWidth: '2px',
+                      borderStyle: 'solid',
+                      borderColor: isSelected ? '#3182ce' : '#e2e8f0',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      backgroundColor: isSelected ? '#ebf8ff' : 'white',
+                      transition: 'all 0.2s',
+                      position: 'relative'
+                    }}
+                  >
+                    <Stack gap="2">
+                      <div style={{ fontSize: '32px' }}>{capability.icon}</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#2d3748' }}>
+                        {capability.name}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#718096' }}>
+                        {capability.description}
+                      </div>
+                      {isSelected && (
+                        <Badge colorPalette="blue" size="sm" style={{ width: 'fit-content' }}>
+                          ✓ Seleccionado
+                        </Badge>
+                      )}
+                    </Stack>
+                  </div>
+                );
+              })}
             </div>
           </Stack>
         </Section>
 
-        {/* Infrastructure Selection */}
-        <Section variant="elevated" title="Infraestructura">
+        {/* ============================================ */}
+        {/* SECCIÓN 2: ¿CÓMO ENTREGAS? */}
+        {/* ============================================ */}
+        <Section variant="elevated">
           <Stack gap="4">
-            <p style={{ fontSize: '14px', color: '#718096', marginBottom: '12px' }}>
-              Seleccioná cómo opera físicamente tu negocio
-            </p>
+            <Stack gap="2">
+              <Heading size="lg">
+                2️⃣ ¿Cómo entregas o prestás tu oferta?
+              </Heading>
+              <Text color="fg.muted" fontSize="sm">
+                Seleccioná todos los métodos que uses
+              </Text>
+            </Stack>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '16px' }}>
-              {INFRASTRUCTURE.map((infra) => (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+              gap: '16px'
+            }}>
+              {FULFILLMENT_METHODS.map((capId) => {
+                const capability = getCapabilityInfo(capId);
+                if (!capability) return null;
+
+                const isSelected = isCapabilitySelected(capId);
+
+                return (
+                  <div
+                    key={capId}
+                    onClick={() => handleCapabilityToggle(capId)}
+                    style={{
+                      padding: '20px',
+                      borderWidth: '2px',
+                      borderStyle: 'solid',
+                      borderColor: isSelected ? '#38a169' : '#e2e8f0',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      backgroundColor: isSelected ? '#f0fff4' : 'white',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Stack gap="2">
+                      <div style={{ fontSize: '32px' }}>{capability.icon}</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#2d3748' }}>
+                        {capability.name}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#718096' }}>
+                        {capability.description}
+                      </div>
+                      {isSelected && (
+                        <Badge colorPalette="green" size="sm" style={{ width: 'fit-content' }}>
+                          ✓ Seleccionado
+                        </Badge>
+                      )}
+                    </Stack>
+                  </div>
+                );
+              })}
+            </div>
+          </Stack>
+        </Section>
+
+        {/* ============================================ */}
+        {/* SECCIÓN 3: ¿DÓNDE OPERÁS? */}
+        {/* ============================================ */}
+        <Section variant="elevated">
+          <Stack gap="4">
+            <Stack gap="2">
+              <Heading size="lg">
+                3️⃣ ¿Dónde operás?
+              </Heading>
+              <Text color="fg.muted" fontSize="sm">
+                Infraestructura física de tu negocio
+              </Text>
+            </Stack>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+              gap: '16px'
+            }}>
+              {INFRASTRUCTURE_OPTIONS.map((infraId) => {
+                const infra = getInfraInfo(infraId);
+                if (!infra) return null;
+
+                const isSelected = isInfraSelected(infraId);
+
+                return (
+                  <div
+                    key={infraId}
+                    onClick={() => handleInfraToggle(infraId)}
+                    style={{
+                      padding: '20px',
+                      borderWidth: '2px',
+                      borderStyle: 'solid',
+                      borderColor: isSelected ? '#805ad5' : '#e2e8f0',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      backgroundColor: isSelected ? '#faf5ff' : 'white',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Stack gap="2">
+                      <div style={{ fontSize: '32px' }}>{infra.icon}</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#2d3748' }}>
+                        {infra.name}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#718096' }}>
+                        {infra.description}
+                      </div>
+                      {isSelected && (
+                        <Badge colorPalette="purple" size="sm" style={{ width: 'fit-content' }}>
+                          ✓ Seleccionado
+                        </Badge>
+                      )}
+                    </Stack>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Sub-option: Multi-location (solo si single_location está seleccionado) */}
+            {isInfraSelected('single_location') && (
+              <div style={{
+                marginLeft: '24px',
+                marginTop: '8px',
+                paddingLeft: '24px',
+                borderLeft: '3px solid #cbd5e0'
+              }}>
                 <div
-                  key={infra.id}
-                  onClick={() => handleInfraChange(infra.id)}
+                  onClick={() => handleInfraToggle('multi_location')}
                   style={{
-                    padding: '20px',
+                    padding: '16px',
                     borderWidth: '2px',
                     borderStyle: 'solid',
-                    borderColor: selectedInfra === infra.id ? '#38a169' : '#e2e8f0',
+                    borderColor: isInfraSelected('multi_location') ? '#805ad5' : '#e2e8f0',
                     borderRadius: '8px',
                     cursor: 'pointer',
-                    backgroundColor: selectedInfra === infra.id ? '#f0fff4' : 'white',
+                    backgroundColor: isInfraSelected('multi_location') ? '#faf5ff' : 'white',
                     transition: 'all 0.2s',
-                    opacity: infra.conflicts && infra.conflicts.length > 0 ? 1 : 1 // Preparado para mostrar conflicts
+                    maxWidth: '400px'
                   }}
                 >
                   <Stack gap="2">
-                    <div style={{ fontSize: '32px' }}>{infra.icon}</div>
-                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#2d3748' }}>
-                      {infra.name}
+                    <div style={{ fontSize: '24px' }}>🏢</div>
+                    <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#2d3748' }}>
+                      Tengo múltiples locales
                     </div>
-                    <div style={{ fontSize: '14px', color: '#718096' }}>
-                      {infra.description}
+                    <div style={{ fontSize: '13px', color: '#718096' }}>
+                      Cadena, franquicia o sucursales
                     </div>
-                    {selectedInfra === infra.id && (
-                      <Badge colorPalette="green" style={{ width: 'fit-content' }}>
+                    {isInfraSelected('multi_location') && (
+                      <Badge colorPalette="purple" size="sm" style={{ width: 'fit-content' }}>
                         ✓ Seleccionado
                       </Badge>
                     )}
                   </Stack>
                 </div>
-              ))}
+              </div>
+            )}
+          </Stack>
+        </Section>
+
+        {/* ============================================ */}
+        {/* SECCIÓN 4: POTENCIÁ TU NEGOCIO */}
+        {/* ============================================ */}
+        <Section variant="elevated">
+          <Stack gap="4">
+            <Stack gap="2">
+              <Heading size="lg">
+                4️⃣ Potenciá tu negocio
+              </Heading>
+              <Text color="fg.muted" fontSize="sm">
+                Canales y capacidades adicionales (opcional)
+              </Text>
+            </Stack>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+              gap: '16px'
+            }}>
+              {ADD_ONS.map((capId) => {
+                const capability = getCapabilityInfo(capId);
+                if (!capability) return null;
+
+                const isSelected = isCapabilitySelected(capId);
+
+                return (
+                  <div
+                    key={capId}
+                    onClick={() => handleCapabilityToggle(capId)}
+                    style={{
+                      padding: '20px',
+                      borderWidth: '2px',
+                      borderStyle: 'solid',
+                      borderColor: isSelected ? '#d69e2e' : '#e2e8f0',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      backgroundColor: isSelected ? '#fefcbf' : 'white',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Stack gap="2">
+                      <div style={{ fontSize: '32px' }}>{capability.icon}</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#2d3748' }}>
+                        {capability.name}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#718096' }}>
+                        {capability.description}
+                      </div>
+                      {isSelected && (
+                        <Badge colorPalette="yellow" size="sm" style={{ width: 'fit-content' }}>
+                          ✓ Seleccionado
+                        </Badge>
+                      )}
+                    </Stack>
+                  </div>
+                );
+              })}
             </div>
           </Stack>
         </Section>
 
-        {/* Summary & Continue */}
+        {/* ============================================ */}
+        {/* RESUMEN Y CONTINUAR */}
+        {/* ============================================ */}
         <Section variant="flat">
           <Stack gap="4">
             <div style={{
-              padding: '16px',
+              padding: '20px',
               backgroundColor: '#edf2f7',
               borderRadius: '8px',
               borderLeft: '4px solid #3182ce'
             }}>
-              <Stack gap="2">
-                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#2d3748' }}>
-                  Resumen de tu selección:
-                </div>
+              <Stack gap="3">
+                <Heading size="sm" color="fg.emphasized">
+                  📋 Resumen de tu configuración
+                </Heading>
+
                 <div style={{ fontSize: '14px', color: '#4a5568' }}>
-                  • {selectedCapabilities.length} capacidad{selectedCapabilities.length !== 1 ? 'es' : ''} seleccionada{selectedCapabilities.length !== 1 ? 's' : ''}
+                  <strong>{selectedCapabilities.length}</strong> capacidad{selectedCapabilities.length !== 1 ? 'es' : ''} seleccionada{selectedCapabilities.length !== 1 ? 's' : ''}
                 </div>
+
                 <div style={{ fontSize: '14px', color: '#4a5568' }}>
-                  • Infraestructura: {INFRASTRUCTURE.find(i => i.id === selectedInfra)?.name}
+                  <strong>Infraestructura:</strong> {selectedInfra.map(id => getInfraInfo(id)?.name).join(', ')}
                 </div>
+
                 {selectedCapabilities.length > 0 && (
-                  <div style={{ fontSize: '13px', color: '#718096', marginTop: '8px', fontStyle: 'italic' }}>
-                    El sistema activará automáticamente las funcionalidades necesarias para tus capacidades seleccionadas
+                  <div style={{
+                    fontSize: '13px',
+                    color: '#718096',
+                    marginTop: '8px',
+                    fontStyle: 'italic',
+                    padding: '12px',
+                    backgroundColor: '#e6fffa',
+                    borderRadius: '6px'
+                  }}>
+                    ✨ El sistema activará automáticamente:
+                    <ul style={{ marginTop: '8px', marginLeft: '20px' }}>
+                      <li>Production (si vendés productos físicos)</li>
+                      <li>Scheduling (si ofrecés servicios o alquileres)</li>
+                      <li>Y todas las funcionalidades necesarias para tus capacidades</li>
+                    </ul>
                   </div>
                 )}
               </Stack>
@@ -218,16 +464,16 @@ export default function BusinessModelStep() {
               size="lg"
               colorPalette="blue"
               onClick={handleContinue}
-              isDisabled={selectedCapabilities.length === 0}
+              disabled={selectedCapabilities.length === 0}
               style={{ marginTop: '16px' }}
             >
-              Continuar →
+              Continuar al Dashboard →
             </Button>
 
             {selectedCapabilities.length === 0 && (
-              <p style={{ fontSize: '14px', color: '#e53e3e', textAlign: 'center' }}>
-                Seleccioná al menos una capacidad para continuar
-              </p>
+              <Text color="fg.error" textAlign="center" fontSize="sm">
+                ⚠️ Seleccioná al menos una capacidad para continuar
+              </Text>
             )}
           </Stack>
         </Section>

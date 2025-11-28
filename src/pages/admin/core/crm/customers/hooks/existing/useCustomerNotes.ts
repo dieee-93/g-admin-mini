@@ -1,6 +1,8 @@
 // src/features/customers/logic/useCustomerNotes.ts
 import { useState, useEffect, useCallback } from 'react';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { useAlerts } from '@/shared/alerts';
+import { customersAlertsAdapter } from '../../services/customersAlertsAdapter';
 import type { CustomerNote } from '../../types';
 import { logger } from '@/lib/logging';
 import {
@@ -13,20 +15,25 @@ import {
 export function useCustomerNotes(customerId?: string) {
   const [notes, setNotes] = useState<CustomerNote[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { actions } = useAlerts({ context: 'customers', autoFilter: true });
 
   // Load notes for specific customer
   const loadNotes = async () => {
     if (!customerId) return;
-    
+
     setLoading(true);
-    setError(null);
-    
+
     try {
       const data = await getCustomerNotes(customerId);
       setNotes(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading notes');
+      const error = err instanceof Error ? err : new Error('Error loading notes');
+      await actions.create(customersAlertsAdapter.customerDataSyncFailed(
+        error,
+        customerId,
+        'Customer',
+        'notes-api'
+      ));
       logger.error('App', 'Error loading customer notes:', err);
     } finally {
       setLoading(false);
@@ -156,21 +163,20 @@ export function useCustomerNotes(customerId?: string) {
   return {
     notes,
     loading,
-    error,
-    
+
     // CRUD operations
     createNote,
     updateNote,
     deleteNote,
     loadNotes,
-    
+
     // Filtering and analysis
     getNotesByType,
     getImportantNotes,
     getRecentNotes,
     getNotesStats,
     getNoteTypeInfo,
-    
+
     // Quick actions
     addQuickNote,
     addServiceNote,
@@ -184,24 +190,29 @@ export function useCustomerNotes(customerId?: string) {
 export function useAllCustomerNotes() {
   const [allNotes, setAllNotes] = useState<CustomerNote[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { actions } = useAlerts({ context: 'customers', autoFilter: true });
 
   // Load all notes (for admin/manager view)
-  const loadAllNotes = async () => {
+  const loadAllNotes = useCallback(async () => {
     setLoading(true);
-    setError(null);
-    
+
     try {
       // This would fetch all notes across customers
       // Implementation depends on API design
       setAllNotes([]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading all notes');
+      const error = err instanceof Error ? err : new Error('Error loading all notes');
+      await actions.create(customersAlertsAdapter.customerDataSyncFailed(
+        error,
+        'all-customers',
+        'All Customers',
+        'notes-api'
+      ));
       logger.error('App', 'Error loading all customer notes:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [actions]);
 
   // Get recent complaints across all customers
   const getRecentComplaints = useCallback((days: number = 7) => {
@@ -252,16 +263,15 @@ export function useAllCustomerNotes() {
 
   useEffect(() => {
     loadAllNotes();
-  }, []);
+  }, [loadAllNotes]);
 
   return {
     allNotes,
     loading,
-    error,
-    
+
     // Operations
     loadAllNotes,
-    
+
     // Analytics
     getRecentComplaints,
     getDietaryAlerts,

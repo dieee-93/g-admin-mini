@@ -1,24 +1,29 @@
 /**
  * AlertsView - Vista de alertas operacionales del dashboard
  *
- * Wrapper del CollapsibleAlertStack existente.
- * Vista por defecto del HeaderSwitch en el Dashboard Evolutivo.
+ * INTEGRADO CON SISTEMA UNIFICADO DE ALERTAS v2.0
  *
  * Features:
- * - Integración con sistemas de alertas existentes
- * - Priorización por severidad
- * - Agrupación inteligente
- * - Links de acción directa
+ * - ✅ Integración real con AlertsProvider (NO mock data)
+ * - ✅ Priorización automática por severidad
+ * - ✅ Filtrado de alertas para dashboard y global
+ * - ✅ Links de acción directa a módulos
+ * - ✅ Actualización reactiva cuando cambian las alertas
  *
- * Data sources:
+ * Data sources (via AlertsProvider):
  * - Material alerts (stock bajo, vencimientos)
  * - Sales alerts (pagos pendientes, mesas esperando)
  * - Staff alerts (ausencias, conflictos de horarios)
  * - Operations alerts (órdenes atrasadas, equipos)
+ * - Global system alerts
+ *
+ * Architecture:
+ * - Uses useAlerts hook for reactive alert consumption
+ * - Converts unified Alert format → CollapsibleAlertStack format
+ * - Performance optimized with useMemo
  */
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo, useCallback, memo } from 'react';
 import {
   Stack,
   Typography,
@@ -28,7 +33,10 @@ import {
   Heading
 } from '@/shared/ui';
 import { CollapsibleAlertStack } from '@/shared/ui/CollapsibleAlertStack';
+import { useNavigationActions } from '@/contexts/NavigationContext';
+import { useAlerts } from '@/shared/alerts/hooks/useAlerts';
 import type { AlertItem } from '@/shared/ui/CollapsibleAlertStack';
+import type { Alert, AlertSeverity } from '@/shared/alerts/types';
 import { logger } from '@/lib/logging';
 
 // ===============================
@@ -41,78 +49,133 @@ export interface AlertsViewProps {
 }
 
 // ===============================
+// HELPERS
+// ===============================
+
+/**
+ * Maps unified Alert severity to CollapsibleAlertStack status
+ */
+const severityToStatus = (severity: AlertSeverity): AlertItem['status'] => {
+  const mapping: Record<AlertSeverity, AlertItem['status']> = {
+    critical: 'error',
+    high: 'error',
+    medium: 'warning',
+    low: 'warning',
+    info: 'info'
+  };
+  return mapping[severity];
+};
+
+/**
+ * Gets navigation target module from alert context
+ */
+const getNavigationModule = (context: string): string => {
+  const mapping: Record<string, string> = {
+    materials: 'materials',
+    sales: 'sales',
+    operations: 'fulfillment',
+    customers: 'customers',
+    staff: 'staff',
+    fiscal: 'fiscal',
+    dashboard: 'dashboard',
+    global: 'dashboard'
+  };
+  return mapping[context] || 'dashboard';
+};
+
+// ===============================
+// MEMOIZED ALERT BUTTON COMPONENT
+// ===============================
+
+/**
+ * 🎯 PERFORMANCE: Memoized button component to prevent re-renders
+ * Each alert button is memoized separately
+ */
+const AlertActionButton = memo(function AlertActionButton({
+  context,
+  alertId,
+  onNavigate
+}: {
+  context: string;
+  alertId: string;
+  onNavigate: (moduleId: string, alertId: string) => void;
+}) {
+  // 🎯 PERFORMANCE: useCallback to stabilize handler
+  const handleClick = useCallback(() => {
+    const targetModule = getNavigationModule(context);
+    onNavigate(targetModule, alertId);
+  }, [context, alertId, onNavigate]);
+
+  return (
+    <Stack direction="row" gap="2" mt="2">
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handleClick}
+      >
+        Ver Detalles →
+      </Button>
+    </Stack>
+  );
+});
+
+// ===============================
 // COMPONENT
 // ===============================
 
-export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
-  const navigate = useNavigate();
+// 🎯 PERFORMANCE: Memoize entire component to prevent unnecessary re-renders
+export const AlertsView = memo(function AlertsView({ refreshTrigger }: AlertsViewProps) {
+  const { navigate } = useNavigationActions();
 
-  // Estado local
-  const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // ✅ REAL DATA: Connect to unified alerts system
+  // Filter for dashboard-relevant alerts (dashboard context + global context)
+  const { alerts, count, loading } = useAlerts({
+    context: ['dashboard', 'global'],
+    status: ['active', 'acknowledged'], // Exclude resolved/dismissed
+    autoFilter: true
+  });
 
   // ===============================
-  // DATA FETCHING
+  // HANDLERS
   // ===============================
 
-  useEffect(() => {
-    const loadAlerts = async () => {
-      try {
-        setIsLoading(true);
+  // 🎯 PERFORMANCE: Stable navigation handler with useCallback
+  const handleAlertNavigation = useCallback((moduleId: string, alertId: string) => {
+    logger.info('Dashboard', `Navigating to ${moduleId} from alert`, { alertId });
+    navigate(moduleId);
+  }, [navigate]); // ✅ navigate is stable from NavigationActions
 
-        // TODO: Implementar fetching real desde stores/servicios
-        // Por ahora, datos mock para demostración
+  // 🎯 PERFORMANCE: Stable handlers for quick action buttons
+  const handleNavigateToMaterials = useCallback(() => navigate('materials'), [navigate]);
+  const handleNavigateToSales = useCallback(() => navigate('sales'), [navigate]);
+  const handleNavigateToStaff = useCallback(() => navigate('staff'), [navigate]);
 
-        const mockAlerts: AlertItem[] = [
-          {
-            status: 'warning',
-            title: 'Stock Bajo',
-            description: 'Harina (2kg restantes)',
-            children: (
-              <Stack direction="row" gap="2" mt="2">
-                <button
-                  onClick={() => navigate('/admin/materials')}
-                  style={{
-                    padding: '4px 12px',
-                    fontSize: '0.875rem',
-                    borderRadius: '4px',
-                    border: '1px solid #cbd5e0',
-                    background: 'white',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Ver Inventario →
-                </button>
-              </Stack>
-            )
-          },
-          {
-            status: 'info',
-            title: 'Sin Alertas Críticas',
-            description: 'Todas las operaciones funcionan normalmente'
-          }
-        ];
+  // ===============================
+  // DATA TRANSFORMATION
+  // ===============================
 
-        setAlerts(mockAlerts);
-
-        logger.info('Dashboard', 'Alerts loaded', { count: mockAlerts.length });
-
-      } catch (error) {
-        logger.error('Dashboard', 'Error loading alerts', error);
-        setAlerts([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadAlerts();
-  }, [refreshTrigger, navigate]);
+  // 🎯 PERFORMANCE: Convert unified Alert[] → AlertItem[] for CollapsibleAlertStack
+  // Uses memoized AlertActionButton component to prevent button re-creation
+  const alertItems: AlertItem[] = useMemo(() => {
+    return alerts.map((alert: Alert) => ({
+      status: severityToStatus(alert.severity),
+      title: alert.title,
+      description: alert.description,
+      children: (
+        <AlertActionButton
+          context={alert.context}
+          alertId={alert.id}
+          onNavigate={handleAlertNavigation}
+        />
+      )
+    }));
+  }, [alerts, handleAlertNavigation]); // ✅ handleAlertNavigation is stable via useCallback
 
   // ===============================
   // RENDER
   // ===============================
 
-  if (isLoading) {
+  if (loading) {
     return (
       <Card.Root size="sm">
         <Card.Body>
@@ -142,10 +205,10 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
       <Card.Body pt="2">
         <Stack gap="3">
           {/* Alerts - Más compactas */}
-          {alerts.length > 0 ? (
+          {alertItems.length > 0 ? (
             <Box maxW="full">
               <CollapsibleAlertStack
-                alerts={alerts}
+                alerts={alertItems}
                 defaultOpen={false}
                 title="Alertas del Sistema"
                 showCount={true}
@@ -180,7 +243,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => navigate('/admin/materials')}
+                onClick={handleNavigateToMaterials}
                 colorPalette="blue"
               >
                 📦 Inventario
@@ -188,7 +251,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => navigate('/admin/operations/sales')}
+                onClick={handleNavigateToSales}
                 colorPalette="green"
               >
                 💰 Ventas
@@ -196,7 +259,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => navigate('/admin/staff')}
+                onClick={handleNavigateToStaff}
                 colorPalette="purple"
               >
                 👥 Staff
@@ -207,4 +270,4 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ refreshTrigger }) => {
       </Card.Body>
     </Card.Root>
   );
-};
+}); // End memo

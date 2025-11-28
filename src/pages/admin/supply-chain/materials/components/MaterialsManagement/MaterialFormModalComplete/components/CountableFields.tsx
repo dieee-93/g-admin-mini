@@ -4,10 +4,10 @@ import {
   Stack,
   Text,
   Alert,
-  Field,
   Flex,
   NumberInput,
-  RadioGroup
+  RadioGroup,
+  RadioItem
 } from '@/shared/ui';
 import { SelectField, CardWrapper, InputField } from '@/shared/ui';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
@@ -27,9 +27,9 @@ interface CountableFieldsProps {
 // Tipos de configuración de stock
 type StockConfigType = 'none' | 'individual' | 'packages';
 
-export const CountableFields = ({ 
-  formData, 
-  setFormData, 
+export const CountableFields = ({
+  formData,
+  setFormData,
   errors,
   disabled = false,
   addToStockNow,
@@ -100,9 +100,9 @@ export const CountableFields = ({
           placeholder="¿A qué categoría pertenece?"
           collection={CATEGORY_COLLECTION}
           value={formData.category ? [formData.category] : []}
-          onValueChange={(details) => 
-            setFormData({ 
-              ...formData, 
+          onValueChange={(details) =>
+            setFormData({
+              ...formData,
               category: details.value[0]
             })
           }
@@ -120,7 +120,7 @@ export const CountableFields = ({
           <InformationCircleIcon style={{ width: '16px', height: '16px' }} />
         </Alert.Indicator>
         <Alert.Description>
-          Items contables se miden en <strong>unidades individuales</strong>. 
+          Items contables se miden en <strong>unidades individuales</strong>.
           Puedes crearlos sin stock inicial o agregar stock de diferentes maneras.
         </Alert.Description>
       </Alert.Root>
@@ -131,52 +131,39 @@ export const CountableFields = ({
           <Stack gap="4">
             <Box>
               <Text fontWeight="semibold" mb="3">Configuración de Stock Inicial</Text>
-              <RadioGroup.Root
+              <RadioGroup
                 value={stockConfigType}
-                onValueChange={(details) => setStockConfigType(details.value as StockConfigType)}
+                onValueChange={(value) => setStockConfigType(value as StockConfigType)}
                 disabled={disabled}
+                colorPalette="blue"
               >
-                <Stack gap="3">
-                  <RadioGroup.Item value="none">
-                    <RadioGroup.ItemHiddenInput />
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText>
-                      <Stack gap="1">
-                        <Text fontWeight="medium">Solo crear el item (sin stock inicial)</Text>
-                        <Text fontSize="sm" color="text.muted">
-                          Crea el item en el catálogo sin agregar stock al inventario
-                        </Text>
-                      </Stack>
-                    </RadioGroup.ItemText>
-                  </RadioGroup.Item>
+                <RadioItem value="none">
+                  <Stack gap="1">
+                    <Text fontWeight="medium">Solo crear el item (sin stock inicial)</Text>
+                    <Text fontSize="sm" color="text.muted">
+                      Crea el item en el catálogo sin agregar stock al inventario
+                    </Text>
+                  </Stack>
+                </RadioItem>
 
-                  <RadioGroup.Item value="individual">
-                    <RadioGroup.ItemHiddenInput />
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText>
-                      <Stack gap="1">
-                        <Text fontWeight="medium">Agregar por unidades individuales</Text>
-                        <Text fontSize="sm" color="text.muted">
-                          Ideal para items sueltos o cuando no vienen empaquetados
-                        </Text>
-                      </Stack>
-                    </RadioGroup.ItemText>
-                  </RadioGroup.Item>
+                <RadioItem value="individual">
+                  <Stack gap="1">
+                    <Text fontWeight="medium">Agregar por unidades individuales</Text>
+                    <Text fontSize="sm" color="text.muted">
+                      Ideal para items sueltos o cuando no vienen empaquetados
+                    </Text>
+                  </Stack>
+                </RadioItem>
 
-                  <RadioGroup.Item value="packages">
-                    <RadioGroup.ItemHiddenInput />
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText>
-                      <Stack gap="1">
-                        <Text fontWeight="medium">Agregar por paquetes/cajas</Text>
-                        <Text fontSize="sm" color="text.muted">
-                          Para items que vienen empaquetados (cajas, bandejas, docenas, etc.)
-                        </Text>
-                      </Stack>
-                    </RadioGroup.ItemText>
-                  </RadioGroup.Item>
-                </Stack>
-              </RadioGroup.Root>
+                <RadioItem value="packages">
+                  <Stack gap="1">
+                    <Text fontWeight="medium">Agregar por paquetes/cajas</Text>
+                    <Text fontSize="sm" color="text.muted">
+                      Para items que vienen empaquetados (cajas, bandejas, docenas, etc.)
+                    </Text>
+                  </Stack>
+                </RadioItem>
+              </RadioGroup>
             </Box>
 
             {/* Configuración de packaging - Solo cuando se selecciona packages */}
@@ -185,16 +172,16 @@ export const CountableFields = ({
                 <Text fontWeight="medium" color="blue.700">
                   📦 Configuración de Packaging
                 </Text>
-                
+
                 <Flex gap="4" direction={{ base: "column", md: "row" }}>
                   <Box flex="1">
-                    <Field.Root>
-                      <Field.Label>Unidades por paquete</Field.Label>
+                    <Stack gap="2">
+                      <Text fontSize="sm" fontWeight="medium">Unidades por paquete</Text>
                       <NumberInput.Root
                         value={formData.packaging?.package_size?.toString() || ''}
-                        onValueChange={(details) => 
-                          !disabled && setFormData({ 
-                            ...formData, 
+                        onValueChange={(details) =>
+                          !disabled && setFormData({
+                            ...formData,
                             packaging: {
                               ...formData.packaging,
                               package_size: parseInt(details.value) || 0,
@@ -210,7 +197,7 @@ export const CountableFields = ({
                           <NumberInput.IncrementTrigger />
                           <NumberInput.DecrementTrigger />
                         </NumberInput.Control>
-                        <NumberInput.Input 
+                        <NumberInput.Input
                           placeholder="ej: 30"
                           height="44px"
                           fontSize="md"
@@ -218,18 +205,18 @@ export const CountableFields = ({
                           borderRadius="md"
                         />
                       </NumberInput.Root>
-                    </Field.Root>
+                    </Stack>
                   </Box>
-                  
+
                   <Box flex="1">
-                    <Field.Root>
-                      <Field.Label>Tipo de paquete</Field.Label>
+                    <Stack gap="2">
+                      <Text fontSize="sm" fontWeight="medium">Tipo de paquete</Text>
                       <InputField
                         placeholder="ej: bandeja, caja, docena"
                         value={formData.packaging?.package_unit || ''}
-                        onChange={(e) => 
-                          !disabled && setFormData({ 
-                            ...formData, 
+                        onChange={(e) =>
+                          !disabled && setFormData({
+                            ...formData,
                             packaging: {
                               ...formData.packaging,
                               package_size: formData.packaging?.package_size || 0,
@@ -244,10 +231,10 @@ export const CountableFields = ({
                         px="3"
                         borderRadius="md"
                       />
-                    </Field.Root>
+                    </Stack>
                   </Box>
                 </Flex>
-                
+
                 {formData.packaging?.package_size && formData.packaging?.package_unit && (
                   <Alert.Root status="success" variant="subtle">
                     <Alert.Indicator>

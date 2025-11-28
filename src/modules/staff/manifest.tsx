@@ -18,6 +18,7 @@ import type { ModuleManifest, ModuleRegistry } from '@/lib/modules/types';
 import { Badge, Stack, Typography } from '@/shared/ui';
 import { UsersIcon } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
+import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 
 // ============================================
 // MODULE MANIFEST
@@ -57,7 +58,7 @@ export const staffManifest: ModuleManifest = {
   },
 
   // Setup function - register hooks
-  setup: (registry: ModuleRegistry) => {
+  setup: async (registry: ModuleRegistry) => {
     // Hook 1: Calendar Events - Render staff shifts
     registry.addAction(
       'calendar.events',
@@ -112,6 +113,18 @@ export const staffManifest: ModuleManifest = {
       75 // High priority widget
     );
 
+
+    // ✅ Hook 3: Dashboard KPI Widget - Staff Stat Card
+    const { StaffStatWidget } = await import('./widgets');
+
+    registry.addAction(
+      'dashboard.widgets',
+      () => <StaffStatWidget key="staff-stat-widget" />,
+      'staff',
+      98 // Tercera posición
+    );
+
+    logger.debug('App', 'Registered dashboard.widgets hook (Staff KPI)');
     logger.info('App', '✅ Staff module setup complete');
 
     // Hook 3: Scheduling Toolbar Action - Availability button
@@ -142,6 +155,38 @@ export const staffManifest: ModuleManifest = {
 
   // Public API exports
   exports: {
+    /**
+     * React Hooks for Staff data fetching
+     * Follows Module Exports pattern from CROSS_MODULE_DATA_STRATEGY.md
+     */
+    hooks: {
+      /**
+       * Hook factory for employees list
+       * Returns the actual hook that components can use
+       *
+       * @example
+       * ```tsx
+       * const registry = ModuleRegistry.getInstance();
+       * const staffModule = registry.getExports('staff');
+       * const useEmployeesList = staffModule.hooks.useEmployeesList;
+       *
+       * function MyComponent() {
+       *   const { items: employees, loading } = useEmployeesList();
+       *   // ...
+       * }
+       * ```
+       */
+      useEmployeesList: () => {
+        return useCrudOperations({
+          tableName: 'employees',
+          selectQuery: 'id, first_name, last_name, position, hourly_rate, is_active, checked_in, checked_in_at',
+          cacheKey: 'employees-list',
+          cacheTime: 5 * 60 * 1000, // 5 minutes
+          enableRealtime: true,
+        });
+      }
+    },
+
     // Functions that other modules can call
     getStaffAvailability: async () => {
       // Mock implementation - real version would query database
@@ -152,6 +197,7 @@ export const staffManifest: ModuleManifest = {
       ];
     },
 
+/**     * Get currently active (checked-in) staff     * Used by ShiftControlWidget to display active staff count     *     * @returns Promise<Employee[]> Array of checked-in employees     * @example     * ```tsx     * const staffModule = registry.getExports('staff');     * const activeStaff = await staffModule.getActiveStaff();     * console.log(`${activeStaff.length} employees checked in`);     * ```     */    getActiveStaff: async () => {      const { supabase } = await import('@/lib/supabase/client');      const { data, error } = await supabase        .from('employees')        .select('id, first_name, last_name, position, hourly_rate, checked_in, checked_in_at')        .eq('is_active', true)        .eq('checked_in', true);      if (error) {        logger.error('Staff', 'Failed to fetch active staff', error);        return [];      }      return data || [];    },
     calculateLaborCost: (hours: number, rate: number) => {
       return hours * rate;
     }
@@ -178,3 +224,38 @@ export const staffManifest: ModuleManifest = {
 // ============================================
 
 export default staffManifest;
+
+// ============================================
+// TYPE DEFINITIONS
+// ============================================
+
+/**
+ * Staff module public API types
+ */
+export interface StaffAPI {
+  hooks: {
+    useEmployeesList: () => () => {
+      items: Array<{
+        id: string;
+        first_name: string;
+        last_name: string;
+        position?: string;
+        hourly_rate?: number;
+        is_active?: boolean;
+      }>;
+      loading: boolean;
+      error: string | null;
+      fetchAll: () => Promise<any[]>;
+      refresh: () => Promise<void>;
+    };
+  };
+  getStaffAvailability: () => Promise<
+    Array<{
+      id: string;
+      name: string;
+      available: boolean;
+      skills: string[];
+    }>
+  >;
+  calculateLaborCost: (hours: number, rate: number) => number;
+}

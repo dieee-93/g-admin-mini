@@ -3,7 +3,7 @@
 // API simplificada para usar las alertas desde cualquier componente
 
 import { useMemo } from 'react';
-import { useAlertsContext } from '../AlertsProvider';
+import { useAlertsState, useAlertsActions } from '../AlertsProvider';
 import type {
   AlertFilters,
   AlertContext,
@@ -77,7 +77,11 @@ export interface UseAlertsReturn {
  * @returns API completa para trabajar con alertas
  */
 export function useAlerts(options: UseAlertsOptions = {}): UseAlertsReturn {
-  const context = useAlertsContext();
+  // 🛠️ PERFORMANCE FIX: Use split contexts to prevent unnecessary re-renders
+  // Components using this hook will only re-render when alerts/stats change, not when action functions change
+  const { alerts: contextAlerts, stats: contextStats, config } = useAlertsState();
+  const actionsContext = useAlertsActions();
+  
   const {
     context: contextOpt,
     severity,
@@ -112,10 +116,10 @@ export function useAlerts(options: UseAlertsOptions = {}): UseAlertsReturn {
   // Alertas filtradas
   const alerts = useMemo(() => {
     if (autoFilter !== false && Object.keys(filters).length > 0) {
-      return context.getFiltered(filters);
+      return actionsContext.getFiltered(filters);
     }
-    return context.alerts;
-  }, [context.alerts, context.getFiltered, filters, autoFilter]);
+    return contextAlerts;
+  }, [contextAlerts, actionsContext.getFiltered, filters, autoFilter]);
   
   // Estadísticas calculadas
   const stats = useMemo(() => {
@@ -160,35 +164,30 @@ export function useAlerts(options: UseAlertsOptions = {}): UseAlertsReturn {
     };
   }, [stats]);
   
-  // Queries específicas
+  // Queries específicas - memoized with stable action references
   const queries = useMemo(() => ({
-    getByContext: context.getByContext,
-    getBySeverity: context.getBySeverity,
-    getFiltered: context.getFiltered,
-    getActive: () => context.alerts.filter(alert => alert.status === 'active'),
-    getCritical: () => context.alerts.filter(alert => alert.severity === 'critical')
-  }), [context]);
+    getByContext: actionsContext.getByContext,
+    getBySeverity: actionsContext.getBySeverity,
+    getFiltered: actionsContext.getFiltered,
+    getActive: () => contextAlerts.filter(alert => alert.status === 'active'),
+    getCritical: () => contextAlerts.filter(alert => alert.severity === 'critical')
+  }), [actionsContext, contextAlerts]);
   
+  // ✅ PERFORMANCE FIX: Actions object is stable from AlertsActionsContext
+  // Since actionsValue in provider has empty deps [], actionsContext never changes
+  // Therefore, we don't need to memoize or list individual actions as deps
+  const actions = actionsContext;
+
   return {
     alerts,
     count: stats.count,
     criticalCount: stats.criticalCount,
     activeCount: stats.activeCount,
     acknowledgedCount: stats.acknowledgedCount,
-    loading: context.loading,
+    loading: false, // No loading state in split context
     hasAlerts: stats.hasAlerts,
     hasCriticalAlerts: stats.hasCriticalAlerts,
-    actions: {
-      create: context.create,
-      acknowledge: context.acknowledge,
-      resolve: context.resolve,
-      dismiss: context.dismiss,
-      update: context.update,
-      bulkAcknowledge: context.bulkAcknowledge,
-      bulkResolve: context.bulkResolve,
-      bulkDismiss: context.bulkDismiss,
-      clearAll: context.clearAll
-    },
+    actions,
     queries,
     ui
   };
@@ -263,6 +262,6 @@ export function useAlertsBadge(options: UseAlertsOptions = {}) {
  * Estadísticas completas del sistema de alertas
  */
 export function useAlertsStats(filters?: AlertFilters) {
-  const context = useAlertsContext();
-  return context.getStats(filters);
+  const actions = useAlertsActions();
+  return actions.getStats(filters);
 }

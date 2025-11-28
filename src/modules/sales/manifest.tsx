@@ -116,6 +116,7 @@ export const salesManifest: ModuleManifest = {
       'sales.toolbar.actions', // Provides toolbar actions (TakeAway toggle, etc.)
       'sales.tabs', // NEW - ecommerce will inject here
       'sales.tab_content', // NEW - ecommerce tab content
+      'products.detail.sections', // Sales History widget in product detail
     ],
 
     /**
@@ -127,6 +128,7 @@ export const salesManifest: ModuleManifest = {
       'production.order_ready',         // Listen to production status (RENAMED: kitchen → production)
       'scheduling.toolbar.actions',     // Add sales forecast button to scheduling
       'scheduling.top_metrics',         // Add sales forecast widget
+      'products.price_changed',         // Update cart if price changed
     ],
   },
 
@@ -161,7 +163,7 @@ export const salesManifest: ModuleManifest = {
         logger.debug('App', 'Registrando TakeAway requirements...');
 
         registry.doAction('achievements.register_requirement', {
-          capability: 'pickup_counter',
+          capability: 'pickup_orders',
           requirements: TAKEAWAY_MANDATORY
         });
 
@@ -324,7 +326,7 @@ export const salesManifest: ModuleManifest = {
       // ============================================
 
       /**
-       * Register ecommerce sub-module hooks if online_store capability active
+       * Register ecommerce sub-module hooks if async_operations capability active
        */
       if (hasFeature('sales_catalog_ecommerce')) {
         logger.debug('App', 'Registering ecommerce hooks...');
@@ -362,18 +364,112 @@ export const salesManifest: ModuleManifest = {
       }
 
       // ============================================
-      // EXAMPLE 5: Listen to inventory changes
+      // EVENTBUS LISTENERS: React to cross-module events
+      // ============================================
+
+      const { eventBus } = await import('@/lib/events');
+
+      /**
+       * Listen to materials.stock_updated
+       * React to inventory changes to update available products
+       */
+      eventBus.subscribe('materials.stock_updated', async (event) => {
+        logger.info('SalesModule', 'Stock updated notification received', event.payload);
+
+        // TODO: Implement product availability updates
+        // - If stock drops to 0, mark product as unavailable in sales UI
+        // - If stock increases, mark product as available
+        // - Alerts are created in React hooks (useCart, useOnlineOrders) when they detect stock issues
+      });
+
+      /**
+       * Listen to production.order_ready
+       * Notify customer when production completes their order
+       */
+      eventBus.subscribe('production.order_ready', async (event) => {
+        logger.info('SalesModule', 'Production order ready notification received', event.payload);
+
+        // TODO: Implement customer notifications
+        // - Alerts are created in React components using useAlerts hook
+        // - Update order status to "ready for fulfillment"
+        // - Trigger delivery/pickup flow
+      });
+
+      logger.debug('App', '✅ EventBus listeners registered in Sales module');
+
+      // ============================================
+      // INJECTION: Products Detail Sections - Sales History
+      // ============================================
+      logger.info('App', 'Registering products.detail.sections injection (Sales)');
+
+      // Widget component not yet implemented - using fallback
+      const ProductSalesHistoryWidget = () => (
+        <Section variant="elevated">
+          <Stack direction="row" align="center" gap="2">
+            <ChartBarIcon className="w-5 h-5 text-blue-500" />
+            <Typography variant="heading" size="sm" fontWeight="semibold">
+              Sales History
+            </Typography>
+          </Stack>
+          <Typography variant="body" size="sm" color="text.muted" mt="2">
+            Sales history widget coming soon...
+          </Typography>
+        </Section>
+      );
+
+      registry.addAction(
+        'products.detail.sections',
+        (data) => {
+          const { productId } = data || {};
+
+          if (!productId) return null;
+
+          return (
+            <React.Suspense
+              key="sales-history"
+              fallback={<div>Loading sales data...</div>}
+            >
+              <ProductSalesHistoryWidget productId={productId} />
+            </React.Suspense>
+          );
+        },
+        'sales',
+        8
+      );
+
+      logger.debug('App', 'Registered products.detail.sections injection (Sales)');
+      // ============================================
+      // DASHBOARD WIDGETS
       // ============================================
 
       /**
-       * Hook: materials.stock_updated (consume)
-       * React to inventory changes to update available products
+       * Hook: dashboard.widgets
+       * Inyecta Revenue y Sales KPI widgets en el dashboard principal
        */
-      // Note: Consuming hooks would be registered by materials module
-      // This is just for documentation - actual consumption happens via EventBus
+      const { RevenueStatWidget, SalesStatWidget } = await import('./widgets');
+
+      // Revenue Widget
+      registry.addAction(
+        'dashboard.widgets',
+        () => <RevenueStatWidget key="revenue-stat-widget" />,
+        'sales',
+        100 // Alta prioridad - primero en el grid
+      );
+
+      // Sales Widget
+      registry.addAction(
+        'dashboard.widgets',
+        () => <SalesStatWidget key="sales-stat-widget" />,
+        'sales',
+        99 // Segunda posición
+      );
+
+      logger.debug('App', 'Registered dashboard.widgets hooks (Revenue + Sales KPIs)');
+
+
 
       logger.info('App', '✅ Sales module setup complete', {
-        hooksProvided: 7, // sales.toolbar.actions + materials.row.actions + scheduling hooks + sales.tabs + sales.tab_content
+        hooksProvided: 9, // sales.toolbar.actions + materials.row.actions + scheduling hooks + sales.tabs + sales.tab_content
         hooksConsumed: 2,
         requirementsRegistered: TAKEAWAY_MANDATORY.length,
       });

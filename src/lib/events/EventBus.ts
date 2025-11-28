@@ -6,15 +6,12 @@ import { EventStoreIndexedDB } from './EventStore';
 import { DeduplicationManager } from './DeduplicationManager';
 import { ModuleRegistry } from './ModuleRegistry';
 import { createTestEventHandlers } from './__tests__/helpers/test-modules';
-import SecureLogger, { EventBusLogger, SecurityLogger } from './utils/SecureLogger';
-import SecureEventProcessor from './utils/SecureEventProcessor';
-import PayloadValidator from './utils/PayloadValidator';
+import SecureLogger, { EventBusLogger } from './utils/SecureLogger';
+// Note: SecurityLogger removed - security logging moved to infrastructure level
 import WeakSubscriptionManager from './utils/WeakSubscriptionManager';
 import PatternCache from './utils/PatternCache';
-import SecureRandomGenerator from './utils/SecureRandomGenerator';
-import EncryptedEventStore from './utils/EncryptedEventStore';
-import RateLimiter from './utils/RateLimiter';
-import ContentSecurityPolicy from './utils/ContentSecurityPolicy';
+// Removed: SecureEventProcessor, PayloadValidator, SecureRandomGenerator, EncryptedEventStore, RateLimiter, ContentSecurityPolicy
+// Reason: Security should be handled at infrastructure level (Vercel/Supabase), not client-side
 import type {
   IEventBus,
   NamespacedEvent,
@@ -146,15 +143,12 @@ class EventBus implements IEventBus {
   private metricsCollector: MetricsCollector;
   private weakSubscriptionManager: WeakSubscriptionManager;
   private patternCache: PatternCache;
-  private secureRandom: SecureRandomGenerator;
-  
-  // Security components - Enterprise Security Layer
-  private encryptedEventStore: EncryptedEventStore;
-  private rateLimiter: RateLimiter;
-  private contentSecurityPolicy: ContentSecurityPolicy;
   
   // Configuration
   private config: EventBusConfig;
+  
+  // Simple handler timeout (reliability, not security)
+  private handlerTimeoutMs: number;
   
   // Event handling state
   private processingQueue = new Map<string, ProcessingContext>();
@@ -187,68 +181,17 @@ class EventBus implements IEventBus {
       enableMetrics: true
     });
     
-    // Initialize secure random generator
-    this.secureRandom = SecureRandomGenerator.getInstance();
+    // REFACTORED: Removed client-side security theater
+    // Security is properly handled at infrastructure level:
+    // - Vercel: DDoS mitigation, Edge firewall, rate limiting
+    // - Supabase: RLS, server-side rate limits, CAPTCHA
+    // Client-side security measures were:
+    // 1. Bypassable (attacker controls client code)
+    // 2. Performance overhead
+    // 3. False sense of security
     
-    // Initialize Enterprise Security Layer
-    this.encryptedEventStore = new EncryptedEventStore({
-      enabled: this.config.security?.enableEncryption ?? true,
-      sensitivePatterns: [
-        'payment.*',
-        'customer.pii.*',
-        'auth.*',
-        'sensitive.*',
-        '*.password.*',
-        '*.token.*'
-      ],
-      compressionEnabled: true,
-      keyDerivationIterations: 100000
-    });
-    
-    this.rateLimiter = new RateLimiter({
-      globalRequestsPerMinute: 10000,
-      ipRequestsPerMinute: 100,
-      userRequestsPerMinute: 1000,
-      eventPatternLimits: {
-        'payment.*': { requestsPerMinute: 50, burstLimit: 10 },
-        'auth.*': { requestsPerMinute: 20, burstLimit: 5 },
-        'system.critical.*': { requestsPerMinute: 10, burstLimit: 3 }
-      },
-      ddosDetectionThreshold: 500,
-      enableAdaptiveLimiting: true,
-      suspiciousPatternDetection: true
-    });
-    
-    this.contentSecurityPolicy = new ContentSecurityPolicy({
-      enabled: this.config.security?.enableCSP ?? true,
-      enforceMode: true,
-      directives: {
-        'default-src': ["'self'"],
-        'script-src': ["'self'", "'unsafe-inline'"],
-        'style-src': ["'self'", "'unsafe-inline'"],
-        'connect-src': ["'self'"],
-        'object-src': ["'none'"],
-        'upgrade-insecure-requests': true
-      }
-    });
-    
-    // Configure secure event processing
-    SecureEventProcessor.configure({
-      defaultTimeoutMs: this.config.handlerTimeoutMs || 5000,
-      maxTimeoutMs: 10000,
-      warningThresholdMs: 1000,
-      enableCircuitBreaker: true
-    });
-    
-    // Configure payload validation (relaxed for test mode)
-    PayloadValidator.configure({
-      enableXSSProtection: !this.config.testModeEnabled,
-      enableSQLInjectionProtection: !this.config.testModeEnabled,
-      enableHTMLSanitization: !this.config.testModeEnabled,
-      maxStringLength: this.config.testModeEnabled ? 100000 : 10000,
-      maxObjectDepth: 10,
-      maxArrayLength: 1000
-    });
+    // Simple timeout for event handlers (reliability, not security)
+    this.handlerTimeoutMs = this.config.handlerTimeoutMs || 5000;
     
     this.initialize();
   }
@@ -274,9 +217,6 @@ class EventBus implements IEventBus {
       if (this.config.persistenceEnabled) {
         await this.eventStore.init();
       }
-      
-      // Initialize Enterprise Security Layer
-      await this.encryptedEventStore.initialize();
       
       // Setup metrics collection
       if (this.config.metricsEnabled) {
@@ -386,27 +326,8 @@ class EventBus implements IEventBus {
     // Validate event pattern
     this.validateEventPattern(pattern);
     
-    // Security Layer 1: Rate Limiting & DDoS Protection (skip in test mode)
-    if (!this.config.testModeEnabled) {
-      const clientIP = options.clientIP || '127.0.0.1';
-      const rateLimitResult = await this.rateLimiter.checkLimit(
-        pattern,
-        clientIP,
-        options.userId,
-        options.userAgent,
-        options.geographic
-      );
-      
-      if (!rateLimitResult.allowed) {
-        SecurityLogger.threat('Event emission blocked by rate limiter', {
-          pattern,
-          reason: rateLimitResult.reason,
-          clientIP,
-          suspicionScore: rateLimitResult.suspicionScore
-        });
-        throw new Error(`Rate limit exceeded: ${rateLimitResult.reason}`);
-      }
-    }
+    // Note: Rate limiting moved to infrastructure level (Vercel Edge + Supabase server-side)
+    // Client-side rate limiting removed as it's bypassable and creates false sense of security
     
     const startTime = Date.now();
     
@@ -414,26 +335,9 @@ class EventBus implements IEventBus {
       // Create event
       const event = await this.createEvent(pattern, payload, options);
       
-      // Security Layer 2: Payload Encryption for Sensitive Events
-      if (this.encryptedEventStore.shouldEncrypt(pattern)) {
-        try {
-          const encryptedPayload = await this.encryptedEventStore.encryptPayload(payload, pattern);
-          event.payload = encryptedPayload;
-          event.metadata.encrypted = true;
-          
-          SecurityLogger.security('Event payload encrypted', {
-            pattern,
-            eventId: event.id,
-            payloadSize: encryptedPayload.encryptedSize
-          });
-        } catch (encryptionError) {
-          SecurityLogger.anomaly('Failed to encrypt sensitive payload', {
-            pattern,
-            error: encryptionError.message
-          });
-          // Continue without encryption in case of error (fail-safe)
-        }
-      }
+      // Note: Payload encryption removed - sensitive data should be encrypted at rest in Supabase
+      // Application-level encryption handled by Supabase's built-in encryption features
+      event.metadata.encrypted = false; // No longer encrypting at app level
       
       // Handle test mode - still process events but track for testing
       if (this.testMode) {
@@ -575,17 +479,16 @@ class EventBus implements IEventBus {
       hasBeenCalled = true;
       
       try {
-        // Execute with timeout protection
-        const executionResult = await SecureEventProcessor.executeHandler(
-          handler,
-          event,
-          `once_${Date.now()}_${crypto.getRandomValues(new Uint8Array(4)).join('')}`,
-          options?.timeoutMs
+        // Execute handler directly with timeout protection
+        const timeoutMs = options?.timeoutMs || 5000;
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Handler timeout')), timeoutMs)
         );
         
-        if (!executionResult.success) {
-          throw executionResult.error;
-        }
+        await Promise.race([
+          handler(event),
+          timeoutPromise
+        ]);
       } finally {
         // Auto-unsubscribe after first call
         if (unsubscribeFn) {
@@ -721,12 +624,6 @@ class EventBus implements IEventBus {
       this.deduplicationManager.destroy();
       await this.eventStore.destroy();
       
-      // Cleanup Enterprise Security Layer
-      this.encryptedEventStore.destroy();
-      this.rateLimiter.destroy();
-      this.contentSecurityPolicy.destroy();
-      SecureEventProcessor.destroy();
-      
       // Cleanup weak subscription manager
       this.weakSubscriptionManager.destroy();
       
@@ -781,53 +678,15 @@ class EventBus implements IEventBus {
     return this.config;
   }
 
-  async getSecurityMetrics(): Promise<{
-    rateLimiting: any;
-    encryption: any;
-    contentSecurityPolicy: any;
-  }> {
-    const rateLimitingStats = this.rateLimiter.getStats();
-    const encryptionStats = this.encryptedEventStore.getStats();
-    const cspStats = this.contentSecurityPolicy.getStats();
-    
-    return {
-      rateLimiting: rateLimitingStats,
-      encryption: encryptionStats,
-      contentSecurityPolicy: cspStats
-    };
-  }
+  // Note: getSecurityMetrics() removed - security metrics now at infrastructure level
+  // Use Vercel Analytics and Supabase Dashboard for DDoS/rate limiting monitoring
 
-  /**
-   * Get CSP header for web responses
-   */
-  getCSPHeader(): { name: string; value: string } {
-    return this.contentSecurityPolicy.generateCSPHeader();
-  }
+  // Note: CSP methods removed - Content-Security-Policy should be set as HTTP headers
+  // Configure CSP in vercel.json or Next.js headers configuration
+  // See: https://vercel.com/docs/concepts/edge-network/headers
 
-  /**
-   * Process CSP violation report
-   */
-  async processCSPViolation(
-    report: any,
-    clientIP: string,
-    userAgent: string
-  ): Promise<void> {
-    await this.contentSecurityPolicy.processViolationReport(report, clientIP, userAgent);
-  }
-
-  /**
-   * Manually block an IP address
-   */
-  blockIP(ip: string, reason: string, durationMs?: number): void {
-    this.rateLimiter.blockIP(ip, reason, durationMs);
-  }
-
-  /**
-   * Manually unblock an IP address
-   */
-  unblockIP(ip: string, reason: string): void {
-    this.rateLimiter.unblockIP(ip, reason);
-  }
+  // Note: blockIP/unblockIP removed - IP blocking should be handled at infrastructure level
+  // Use Vercel Firewall rules or Supabase Auth banned_users table for IP management
 
   async clearHistory(beforeTimestamp?: string): Promise<number> {
     if (!this.config.persistenceEnabled) return 0;
@@ -947,30 +806,13 @@ class EventBus implements IEventBus {
       }
     };
 
-    // Validate and sanitize payload
-    const validationResult = PayloadValidator.validateAndSanitize(tempEvent);
+    // Note: Client-side payload validation removed - proper validation done at API boundaries
+    // Supabase RLS policies handle authorization, TypeScript provides type safety
     
-    if (!validationResult.isValid) {
-      throw new Error(`Event payload validation failed: Event blocked due to security violations`);
-    }
-    
-    if (validationResult.violations.length > 0) {
-      SecurityLogger.violation('Payload sanitized during event creation', {
-        pattern,
-        eventId: tempEvent.id,
-        violations: validationResult.violations.length,
-        sizeBefore: validationResult.originalSize,
-        sizeAfter: validationResult.sanitizedSize
-      });
-    }
-    
-    // Use sanitized payload
-    const sanitizedPayload = validationResult.sanitizedPayload;
-    
-    // Generate deduplication metadata with sanitized payload
+    // Generate deduplication metadata
     const deduplicationMetadata = await this.deduplicationManager.generateMetadata({
       pattern,
-      payload: sanitizedPayload,
+      payload: payload, // Use original payload directly
       source: options.userId || 'system'
     } as any);
     
@@ -984,7 +826,7 @@ class EventBus implements IEventBus {
     const event: NamespacedEvent<TPayload> = {
       id: tempEvent.id, // Reuse the same ID from validation
       pattern,
-      payload: sanitizedPayload, // Use sanitized payload
+      payload: payload, // Use original payload directly
       timestamp: tempEvent.timestamp, // Reuse the same timestamp
       source: 'eventbus-v2',
       version: '1.0.0',
@@ -1013,35 +855,14 @@ class EventBus implements IEventBus {
       subscriptions: matchingSubscriptions.length
     });
     
-    // Security Layer 3: Decrypt payload before processing if needed
-    let processableEvent = event;
-    if (event.metadata?.encrypted && this.encryptedEventStore.isEncrypted(event.payload)) {
-      try {
-        const decryptedPayload = await this.encryptedEventStore.decryptPayload(event.payload);
-        processableEvent = {
-          ...event,
-          payload: decryptedPayload
-        };
-        
-        SecurityLogger.security('Event payload decrypted for processing', {
-          pattern: event.pattern,
-          eventId: event.id
-        });
-      } catch (decryptionError) {
-        SecurityLogger.anomaly('Failed to decrypt event payload', {
-          pattern: event.pattern,
-          eventId: event.id,
-          error: decryptionError.message
-        });
-        // Continue with encrypted payload (handler should handle gracefully)
-      }
-    }
+    // Note: Event payload encryption removed - data encrypted at rest in Supabase
+    const processableEvent = event;
     
     const context: ProcessingContext = {
       event: processableEvent,
       subscriptions: matchingSubscriptions,
       startTime: Date.now(),
-      traceId: processableEvent.metadata?.tracing?.traceId || this.secureRandom.generateTraceId()
+      traceId: processableEvent.metadata?.tracing?.traceId || this.generateTraceId()
     };
     
     this.processingQueue.set(event.id, context);
@@ -1076,49 +897,31 @@ class EventBus implements IEventBus {
       // Update subscription metrics
       subscription.lastTriggered = new Date();
       
-      // Execute handler with timeout protection
-      const executionResult = await SecureEventProcessor.executeHandler(
-        subscription.handler,
-        event,
-        subscription.id,
-        subscription.timeoutMs
+      // Execute handler with basic timeout protection
+      const timeoutMs = subscription.timeoutMs || 5000;
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Handler execution timeout')), timeoutMs)
       );
       
-      // Handle execution results
-      if (!executionResult.success) {
-        if (executionResult.circuitBreakerTriggered) {
-          SecurityLogger.threat('Handler blocked by circuit breaker', {
-            subscriptionId: subscription.id,
-            moduleId: subscription.moduleId,
-            pattern: event.pattern
-          });
-          return; // Skip error handling for circuit breaker
-        }
-        
-        if (executionResult.timedOut) {
-          SecurityLogger.threat('Handler execution timeout', {
-            subscriptionId: subscription.id,
-            moduleId: subscription.moduleId,
-            pattern: event.pattern,
-            executionTimeMs: executionResult.executionTimeMs
-          });
-        }
-        
-        throw executionResult.error;
-      }
+      const executionStart = Date.now();
+      await Promise.race([
+        subscription.handler(event),
+        timeoutPromise
+      ]);
+      const executionTimeMs = Date.now() - executionStart;
       
       // Update module metrics
       if (subscription.moduleId) {
         this.moduleRegistry.updateModuleMetrics(subscription.moduleId, {
           eventsProcessed: 1,
-          avgProcessingTimeMs: executionResult.executionTimeMs
+          avgProcessingTimeMs: executionTimeMs
         } as any);
       }
       
     } catch (error) {
       const processingTime = Date.now() - startTime;
       
-      SecurityLogger.threat(`Handler error in subscription ${subscription.id}`, { 
+      logger.error('EventBus', `Handler error in subscription ${subscription.id}`, { 
         subscriptionId: subscription.id,
         pattern: subscription.pattern,
         moduleId: subscription.moduleId,
@@ -1301,21 +1104,21 @@ class EventBus implements IEventBus {
     }
   }
 
-  // ID generators - using cryptographically secure generation
+  // ID generators - using native crypto.randomUUID() for secure random IDs
   private generateEventId(): string {
-    return this.secureRandom.generateEventId();
+    return crypto.randomUUID();
   }
 
   private generateSubscriptionId(): string {
-    return this.secureRandom.generateSubscriptionId();
+    return crypto.randomUUID();
   }
 
   private generateTraceId(): string {
-    return this.secureRandom.generateTraceId();
+    return crypto.randomUUID();
   }
 
   private generateSpanId(): string {
-    return this.secureRandom.generateSpanId();
+    return crypto.randomUUID();
   }
 }
 

@@ -5,15 +5,15 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Stack, Text, Grid } from '@chakra-ui/react';
+import { Stack, Text, Grid, Field } from '@chakra-ui/react';
 import {
   Dialog,
   Button,
-  Field,
-  Input,
-  Textarea,
+  InputField,
+  TextareaField,
+  NumberField,
   Switch,
-  NativeSelect,
+  SelectField,
   Icon,
 } from '@/shared/ui';
 import {
@@ -229,59 +229,43 @@ export function ServiceConfigurationManager({
                   Basic Information
                 </Text>
 
-                <Field.Root required>
-                  <Field.Label>Service Name</Field.Label>
-                  <Input
-                    value={formData.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
-                    placeholder="e.g., Haircut, Massage, Personal Training"
-                  />
-                  <Field.HelperText>
-                    Service name as displayed to customers
-                  </Field.HelperText>
-                </Field.Root>
+                <InputField
+                  label="Service Name"
+                  required
+                  value={formData.name}
+                  onChange={(e) => handleChange('name', e.target.value)}
+                  placeholder="e.g., Haircut, Massage, Personal Training"
+                  helperText="Service name as displayed to customers"
+                />
 
-                <Field.Root>
-                  <Field.Label>Description</Field.Label>
-                  <Textarea
-                    value={formData.description || ''}
-                    onChange={(e) => handleChange('description', e.target.value)}
-                    placeholder="Describe what's included in this service..."
-                    rows={3}
-                  />
-                  <Field.HelperText>
-                    Detailed description shown to customers
-                  </Field.HelperText>
-                </Field.Root>
+                <TextareaField
+                  label="Description"
+                  value={formData.description || ''}
+                  onChange={(e) => handleChange('description', e.target.value)}
+                  placeholder="Describe what's included in this service..."
+                  rows={3}
+                  helperText="Detailed description shown to customers"
+                />
 
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="4">
-                  <Field.Root required>
-                    <Field.Label>Category</Field.Label>
-                    <NativeSelect.Root
-                      value={formData.category || ''}
-                      onValueChange={(details) => handleChange('category', details.value)}
-                    >
-                      <NativeSelect.Field placeholder="Select category">
-                        {SERVICE_CATEGORIES.map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat}
-                          </option>
-                        ))}
-                      </NativeSelect.Field>
-                    </NativeSelect.Root>
-                    <Field.HelperText>Service category</Field.HelperText>
-                  </Field.Root>
+                  <SelectField
+                    label="Category"
+                    required
+                    options={SERVICE_CATEGORIES.map(cat => ({ value: cat, label: cat }))}
+                    value={formData.category ? [formData.category] : []}
+                    onValueChange={(details) => handleChange('category', details.value[0])}
+                    placeholder="Select category"
+                    helperText="Service category"
+                  />
 
-                  <Field.Root>
-                    <Field.Label>Image URL</Field.Label>
-                    <Input
-                      type="url"
-                      value={formData.image_url || ''}
-                      onChange={(e) => handleChange('image_url', e.target.value)}
-                      placeholder="https://example.com/image.jpg"
-                    />
-                    <Field.HelperText>Service image</Field.HelperText>
-                  </Field.Root>
+                  <InputField
+                    label="Image URL"
+                    type="url"
+                    value={formData.image_url || ''}
+                    onChange={(e) => handleChange('image_url', e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                    helperText="Service image"
+                  />
                 </Grid>
               </Stack>
 
@@ -291,23 +275,16 @@ export function ServiceConfigurationManager({
                   Pricing
                 </Text>
 
-                <Field.Root required>
-                  <Field.Label>Price</Field.Label>
-                  <Stack direction="row" gap="2" align="center">
-                    <Icon icon={CurrencyDollarIcon} size="md" color="text.muted" />
-                    <Input
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) => handleChange('price', parseFloat(e.target.value) || 0)}
-                      min={0}
-                      step={0.01}
-                      placeholder="0.00"
-                    />
-                  </Stack>
-                  <Field.HelperText>
-                    Service price (before tax)
-                  </Field.HelperText>
-                </Field.Root>
+                <NumberField
+                  label="Price"
+                  required
+                  value={formData.price}
+                  onChange={(val) => handleChange('price', val)}
+                  min={0}
+                  step={0.01}
+                  placeholder="0.00"
+                  helperText="Service price (before tax)"
+                />
               </Stack>
 
               {/* Service Settings */}
@@ -317,40 +294,24 @@ export function ServiceConfigurationManager({
                 </Text>
 
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="4">
-                  <Field.Root required>
-                    <Field.Label>Duration (minutes)</Field.Label>
-                    <Stack direction="row" gap="2" align="center">
-                      <Icon icon={ClockIcon} size="md" color="text.muted" />
-                      <Input
-                        type="number"
-                        value={formData.duration_minutes}
-                        onChange={(e) =>
-                          handleChange('duration_minutes', parseInt(e.target.value) || 15)
-                        }
-                        min={15}
-                        step={15}
-                      />
-                    </Stack>
-                    <Field.HelperText>
-                      Service duration (15-360 min)
-                    </Field.HelperText>
-                  </Field.Root>
+                  <NumberField
+                    label="Duration (minutes)"
+                    required
+                    value={formData.duration_minutes}
+                    onChange={(val) => handleChange('duration_minutes', val)}
+                    min={15}
+                    step={15}
+                    helperText="Service duration (15-360 min)"
+                  />
 
-                  <Field.Root>
-                    <Field.Label>Preparation Time (minutes)</Field.Label>
-                    <Input
-                      type="number"
-                      value={formData.preparation_time || 0}
-                      onChange={(e) =>
-                        handleChange('preparation_time', parseInt(e.target.value) || 0)
-                      }
-                      min={0}
-                      step={5}
-                    />
-                    <Field.HelperText>
-                      Setup time before service
-                    </Field.HelperText>
-                  </Field.Root>
+                  <NumberField
+                    label="Preparation Time (minutes)"
+                    value={formData.preparation_time || 0}
+                    onChange={(val) => handleChange('preparation_time', val)}
+                    min={0}
+                    step={5}
+                    helperText="Setup time before service"
+                  />
                 </Grid>
 
                 <Field.Root>
@@ -377,27 +338,18 @@ export function ServiceConfigurationManager({
                   Booking Policy
                 </Text>
 
-                <Field.Root>
-                  <Field.Label>Cancellation Policy</Field.Label>
-                  <NativeSelect.Root
-                    value={formData.cancellation_policy}
-                    onValueChange={(details) =>
-                      handleChange('cancellation_policy', details.value as CancellationPolicy)
-                    }
-                  >
-                    <NativeSelect.Field>
-                      {CANCELLATION_POLICIES.map((policy) => (
-                        <option key={policy.value} value={policy.value}>
-                          {policy.label}
-                        </option>
-                      ))}
-                    </NativeSelect.Field>
-                  </NativeSelect.Root>
-                  <Field.HelperText>
-                    {CANCELLATION_POLICIES.find((p) => p.value === formData.cancellation_policy)
-                      ?.description}
-                  </Field.HelperText>
-                </Field.Root>
+                <SelectField
+                  label="Cancellation Policy"
+                  options={CANCELLATION_POLICIES.map(policy => ({ value: policy.value, label: policy.label }))}
+                  value={formData.cancellation_policy ? [formData.cancellation_policy] : []}
+                  onValueChange={(details) =>
+                    handleChange('cancellation_policy', details.value[0] as CancellationPolicy)
+                  }
+                  helperText={
+                    CANCELLATION_POLICIES.find((p) => p.value === formData.cancellation_policy)
+                      ?.description
+                  }
+                />
 
                 <Field.Root>
                   <Switch

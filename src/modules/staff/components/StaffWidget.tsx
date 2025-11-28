@@ -10,12 +10,12 @@
  */
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography, Icon, Button } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { UsersIcon } from '@heroicons/react/24/outline';
 import { useShallow } from 'zustand/react/shallow';
 import { useStaffStore } from '@/store/staffStore';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 interface StaffStats {
   activeStaff: number;
@@ -24,7 +24,7 @@ interface StaffStats {
 }
 
 export default function StaffWidget() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // ✅ Usar useShallow de Zustand v5 para evitar loop infinito
   const { staff } = useStaffStore(useShallow(state => ({
@@ -109,7 +109,7 @@ export default function StaffWidget() {
             size="sm"
             colorPalette="blue"
             variant="outline"
-            onClick={() => navigate('/admin/resources/staff')}
+            onClick={() => navigate('staff')}
           >
             Ver Staff
           </Button>

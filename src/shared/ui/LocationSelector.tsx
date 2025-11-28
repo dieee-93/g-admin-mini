@@ -5,7 +5,7 @@
 // Usage: Place in Navbar for app-wide location selection
 // ================================================================
 
-import { Stack, Text, Badge, Box, NativeSelect } from '@/shared/ui';
+import { Stack, Text, Badge, Box, SelectField } from '@/shared/ui';
 import { useLocation } from '@/contexts/LocationContext';
 import { BuildingOffice2Icon } from '@heroicons/react/24/outline';
 
@@ -52,26 +52,26 @@ export function LocationSelector() {
     <Stack direction="row" align="center" gap="2" px="3" py="2">
       <BuildingOffice2Icon className="w-4 h-4 text-gray-500" />
 
-      <NativeSelect.Root size="sm" width="200px">
-        <NativeSelect.Field
-          value={selectedLocation?.id || 'all'}
-          onChange={(e) => {
-            if (e.target.value === 'all') {
-              selectAllLocations();
-            } else {
-              selectLocation(e.target.value);
-            }
-          }}
-        >
-          <option value="all">📊 All Locations</option>
-          {locations.map(location => (
-            <option key={location.id} value={location.id}>
-              {location.code} - {location.name}
-            </option>
-          ))}
-        </NativeSelect.Field>
-        <NativeSelect.Indicator />
-      </NativeSelect.Root>
+      <SelectField
+        size="sm"
+        options={[
+          { value: 'all', label: '📊 All Locations' },
+          ...locations.map(location => ({
+            value: location.id,
+            label: `${location.code} - ${location.name}`
+          }))
+        ]}
+        value={selectedLocation?.id ? [selectedLocation.id] : ['all']}
+        onValueChange={(details) => {
+          const value = details.value[0];
+          if (value === 'all') {
+            selectAllLocations();
+          } else {
+            selectLocation(value);
+          }
+        }}
+        noPortal
+      />
 
       {selectedLocation?.punto_venta_afip && (
         <Badge variant="subtle" colorPalette="blue" size="sm">

@@ -37,7 +37,7 @@ export const validateCreditForQuote = async (
     logger.debug('B2B', 'Validating credit for quote', { customerId, quoteAmount });
 
     // Import Finance module services dynamically
-    const { validateCustomerCredit } = await import('@/modules/finance/services');
+    const { validateCustomerCredit } = await import('@/modules/finance-corporate/services');
 
     const result = await validateCustomerCredit(customerId, quoteAmount);
 
@@ -79,7 +79,7 @@ export const validateCreditForOrder = async (
   try {
     logger.info('B2B', 'Validating credit for order', { customerId, orderAmount });
 
-    const { validateCustomerCredit } = await import('@/modules/finance/services');
+    const { validateCustomerCredit } = await import('@/modules/finance-corporate/services');
 
     const result = await validateCustomerCredit(customerId, orderAmount);
 
@@ -121,7 +121,7 @@ export const createInvoiceForOrder = async (order: B2BOrder): Promise<void> => {
     }
 
     // Import Finance module services
-    const { recordInvoice } = await import('@/modules/finance/services');
+    const { recordInvoice } = await import('@/modules/finance-corporate/services');
 
     // Record invoice in Finance module
     await recordInvoice(
@@ -159,19 +159,30 @@ export const recordOrderPayment = async (
   try {
     logger.info('B2B', 'Recording payment for order', { orderId, paymentAmount });
 
-    const { recordPayment } = await import('@/modules/finance/services');
+    const { recordPayment } = await import('@/modules/finance-corporate/services');
 
     await recordPayment(corporateAccountId, paymentAmount, paymentId);
 
     logger.info('B2B', 'Payment recorded successfully', { orderId });
 
-    // Emit event
+    // Emit events for cross-module integration
     const { eventBus } = await import('@/lib/events');
+
+    // Emit to finance namespace (for Finance module)
     eventBus.emit('finance.payment_received', {
       accountId: corporateAccountId,
       orderId,
       amount: paymentAmount,
       paymentId,
+    });
+
+    // Also emit to sales namespace (for other modules listening to sales events)
+    eventBus.emit('sales.payment_received', {
+      orderId,
+      customerId: corporateAccountId, // Using account as customer identifier
+      amount: paymentAmount,
+      paymentId,
+      timestamp: Date.now()
     });
   } catch (error) {
     logger.error('B2B', 'Error recording payment', error);
@@ -192,7 +203,7 @@ export const getCorporateAccountForCustomer = async (customerId: string) => {
   try {
     logger.debug('B2B', 'Fetching corporate account for customer', { customerId });
 
-    const { getCorporateAccountByCustomerId } = await import('@/modules/finance/services');
+    const { getCorporateAccountByCustomerId } = await import('@/modules/finance-corporate/services');
 
     const account = await getCorporateAccountByCustomerId(customerId);
 
@@ -225,7 +236,7 @@ export const calculateOrderDueDate = async (
   paymentTermsDays: number
 ): Promise<string> => {
   try {
-    const { calculateDueDate } = await import('@/modules/finance/services');
+    const { calculateDueDate } = await import('@/modules/finance-corporate/services');
 
     return calculateDueDate(orderDate, paymentTermsDays);
   } catch (error) {

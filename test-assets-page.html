@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Assets Page</title>
+</head>
+<body>
+    <h1>Manual Test - Assets Page</h1>
+    <p>Por favor, sigue estos pasos para verificar el fix del módulo Assets:</p>
+
+    <ol>
+        <li>Abre tu navegador con el dev server: <a href="http://localhost:5173" target="_blank">http://localhost:5173</a></li>
+        <li>Inicia sesión con tus credenciales</li>
+        <li>Navega a: <a href="http://localhost:5173/admin/supply-chain/assets" target="_blank">/admin/supply-chain/assets</a></li>
+        <li>Verifica que:
+            <ul>
+                <li>✅ La página carga sin congelarse</li>
+                <li>✅ No hay bucle infinito en la consola</li>
+                <li>✅ Los componentes se renderizan correctamente</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h2>Cambios aplicados:</h2>
+    <ul>
+        <li>✅ Fix del bucle infinito en useAssetsPage.ts (uso de selectores Zustand)</li>
+        <li>✅ Eliminación de ruta duplicada en App.tsx</li>
+        <li>✅ Corrección de ruta en AssetsWidget.tsx</li>
+        <li>✅ Limpieza de imports no usados</li>
+    </ul>
+
+    <h2>Archivos modificados:</h2>
+    <pre>
+src/pages/admin/supply-chain/assets/hooks/useAssetsPage.ts
+src/App.tsx (línea 640 - eliminada ruta duplicada)
+src/modules/assets/components/AssetsWidget.tsx (línea 94)
+src/store/assetsStore.ts (limpieza de imports)
+    </pre>
+
+    <script>
+        console.log('✅ Archivo de prueba cargado');
+        console.log('🔍 Para probar, abre las DevTools (F12) y navega a la página de Assets');
+        console.log('📍 URL: http://localhost:5173/admin/supply-chain/assets');
+    </script>
+</body>
+</html>

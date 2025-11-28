@@ -5,7 +5,7 @@
 
 import { describe, test, expect } from 'vitest';
 import { ABCAnalysisEngine } from '../pages/admin/supply-chain/materials/services/abcAnalysisEngine';
-import { SmartAlertsEngine } from '../pages/admin/supply-chain/materials/services/smartAlertsEngine';
+import { materialsAlertsEngine } from '../modules/materials/alerts/engine';
 import { ProcurementRecommendationsEngine } from '../pages/admin/supply-chain/materials/services/procurementRecommendationsEngine';
 import { DemandForecastingEngine } from '../pages/admin/supply-chain/materials/services/demandForecastingEngine';
 import { SupplierAnalysisEngine } from '../pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
@@ -26,7 +26,7 @@ describe('🔧 STOCKLAB BASIC INTEGRATION', () => {
 
   test('should import all engines successfully', () => {
     expect(ABCAnalysisEngine).toBeDefined();
-    expect(SmartAlertsEngine).toBeDefined();
+    expect(materialsAlertsEngine).toBeDefined();
     expect(ProcurementRecommendationsEngine).toBeDefined();
     expect(DemandForecastingEngine).toBeDefined();
     expect(SupplierAnalysisEngine).toBeDefined();

@@ -17,7 +17,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Section,
   Stack,
@@ -28,6 +27,7 @@ import {
   Progress
 } from '@/shared/ui';
 import { supabase } from '@/lib/supabase/client';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 import { logger } from '@/lib/logging';
 import eventBus from '@/lib/events/EventBus';
 import { notify } from '@/lib/notifications';
@@ -90,7 +90,7 @@ const TIER_CONFIG = {
 // ===============================
 
 export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }) => {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // Estado local
   const [recentAchievements, setRecentAchievements] = useState<Achievement[]>([]);
@@ -396,7 +396,7 @@ export const AchievementsWidget: React.FC<AchievementsWidgetProps> = ({ userId }
           variant="outline"
           colorPalette="blue"
           size="md"
-          onClick={() => navigate('/admin/achievements')}
+          onClick={() => navigate('gamification', '/achievements')}
           width="full"
         >
           Ver Todos los Logros →

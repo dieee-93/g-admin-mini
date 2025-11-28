@@ -37,7 +37,11 @@ export { Box } from './Box';
 export { Flex } from './Flex';
 export { Circle } from './Circle';
 export { Container } from './Container';
+// Card - Basic Chakra UI re-exports (for backwards compatibility)
 export { Card, CardHeader, CardBody, CardFooter } from './Card';
+
+// CardWrapper - Our enhanced wrapper with compound pattern
+// Use CardWrapper.Body, CardWrapper.Title, etc.
 export { CardWrapper } from './CardWrapper';
 export {
   Stack,
@@ -51,6 +55,11 @@ export {
   SimpleGrid,
   SimpleGrid as CardGrid  // Semantic alias for common dashboard layouts
 } from './Grid';
+
+// ===== PERFORMANCE COMPONENTS =====
+// Virtual scrolling for large lists (50+ items)
+export { VirtualList, VirtualGrid } from './VirtualList';
+export type { VirtualListProps, VirtualGridProps } from './VirtualList';
 
 // Grid Presets - REMOVED (use Chakra Grid directly)
 
@@ -78,37 +87,20 @@ export { LocationSelector, LocationSelectorCompact, LocationBadge } from './Loca
 export { Separator } from './Separator';
 
 // Form Components
-export { Field } from './Field';
+// ⚠️ IMPORTANT: Do NOT export Field namespace directly!
+// Field.Root, Field.Label, etc. should only be used in advanced cases
+// where you need full manual control. For normal use cases, use the wrappers below.
+//
+// If you need Field.Root for custom form controls, import it directly:
+// import { Field } from '@chakra-ui/react'
+//
+// ✅ ALWAYS USE THESE WRAPPERS FOR FORMS:
 export { Input, InputField } from './Input';
 export { NumberField } from './NumberField';
+export { SelectField, createListCollection } from './SelectField';
+export { TextareaField, Textarea } from './TextareaField';
 // Re-export NumberInput from wrapper (prevents TDZ errors in vendor-ui bundle)
 export { NumberInput, NumberInputRoot, NumberInputControl, NumberInputIncrementTrigger, NumberInputDecrementTrigger } from './NumberInput';
-export { SelectField, createListCollection } from './SelectField';
-export {
-  Select,
-  SelectRoot,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValueText,
-  SelectLabel,
-  SelectControl,
-  SelectIndicator,
-  SelectIndicatorGroup,
-  SelectPositioner,
-  SelectItemIndicator,
-  SelectHiddenSelect,
-  SelectItemText,
-  SelectClearTrigger
-} from './Select';
-export type { SelectRootProps } from './Select';
-export {
-  NativeSelect,
-  NativeSelectRoot,
-  NativeSelectField,
-  NativeSelectIndicator
-} from './NativeSelect';
-export { TextareaField, Textarea } from './TextareaField';
 export {
   Checkbox,
   CheckboxRoot,
@@ -226,6 +218,15 @@ export {
 } from './Fieldset';
 
 export {
+  Accordion,
+  AccordionRoot,
+  AccordionItem,
+  AccordionItemTrigger,
+  AccordionItemContent,
+  AccordionItemIndicator
+} from './Accordion';
+
+export {
   Menu,
   MenuRoot,
   MenuTrigger,
@@ -295,6 +296,19 @@ export type {
   AlertItem,
   CollapsibleAlertStackProps
 } from './CollapsibleAlertStack';
+
+// Alert Wrappers - Para mejor trazabilidad en React Scan
+export {
+  AlertContainer,
+  AlertStack,
+  AlertActions,
+  AlertHeader,
+  AlertButton,
+  AlertBadge,
+  AlertListItem,
+  AlertMetadata,
+  AlertComponents
+} from './wrappers/AlertComponents';
 
 export {
   Badge,

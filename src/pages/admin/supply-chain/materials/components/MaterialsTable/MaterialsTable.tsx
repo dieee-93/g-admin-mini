@@ -209,6 +209,7 @@ export const MaterialsTable = memo(function MaterialsTable({
   enablePagination = true
 }: MaterialsTableProps) {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+MaterialsTable.displayName = 'MaterialsTable';
 
   // ✅ Phase 3: Pagination integration
   const pagination = usePagination(materials, pageSize, {

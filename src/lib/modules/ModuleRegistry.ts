@@ -39,6 +39,7 @@
  */
 
 import { logger } from '@/lib/logging';
+import eventBus from '@/lib/events/EventBus';
 import type {
   IModuleRegistry,
   ModuleManifest,
@@ -140,7 +141,7 @@ export class ModuleRegistry implements IModuleRegistry {
 
       this.modules.set(manifest.id, instance);
 
-      logger.info('App', `Module registered: ${manifest.id} v${manifest.version}`, {
+      logger.debug('App', `Module registered: ${manifest.id} v${manifest.version}`, {
         depends: manifest.depends,
         requiredFeatures: manifest.requiredFeatures,
       });
@@ -151,7 +152,11 @@ export class ModuleRegistry implements IModuleRegistry {
           .then(() => {
             const duration = performance.now() - startTime;
             this.performanceMetrics.set(manifest.id, duration);
-            logger.performance('App', `Module setup: ${manifest.id}`, duration);
+            
+            // Only log slow setups to reduce console noise
+            if (duration > 500) {
+              logger.warn('App', `Module setup: ${manifest.id} took ${duration.toFixed(2)}ms (threshold: 500ms)`);
+            }
           })
           .catch((error) => {
             instance.errors?.push(error);
@@ -581,6 +586,21 @@ export class ModuleRegistry implements IModuleRegistry {
       errors,
       warnings,
     };
+  }
+
+  // ============================================
+  // EVENTBUS ACCESS
+  // ============================================
+
+  /**
+   * Get EventBus instance for module setup
+   * 
+   * @returns EventBus singleton instance
+   */
+  public getEventBus() {
+    // Return EventBus singleton instance
+    // Import is at the top of the file to avoid circular dependency issues
+    return eventBus;
   }
 
   // ============================================

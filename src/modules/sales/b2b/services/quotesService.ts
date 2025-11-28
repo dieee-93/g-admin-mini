@@ -8,8 +8,8 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
-import Decimal from 'decimal.js';
 import { logger } from '@/lib/logging';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import type {
   B2BQuote,
   QuoteFormData,
@@ -35,26 +35,43 @@ const generateQuoteNumber = (): string => {
 
 /**
  * Calculate quote totals
+ *
+ * ✅ PRECISION: Uses DecimalUtils with financial domain
  */
 const calculateQuoteTotals = (items: QuoteFormData['items']) => {
-  let subtotal = new Decimal(0);
+  // ✅ PRECISION FIX: Use DecimalUtils instead of Decimal.js directly
+  let subtotalDec = DecimalUtils.fromValue(0, 'financial');
 
   items.forEach(item => {
     const price = item.tiered_price || item.unit_price;
-    const lineTotal = new Decimal(price).times(item.quantity);
-    subtotal = subtotal.plus(lineTotal);
+    const lineTotalDec = DecimalUtils.multiply(
+      price.toString(),
+      item.quantity.toString(),
+      'financial'
+    );
+    subtotalDec = DecimalUtils.add(subtotalDec, lineTotalDec, 'financial');
   });
 
   // TODO: Apply discounts and taxes
-  const discountAmount = new Decimal(0);
-  const taxAmount = new Decimal(0);
-  const totalAmount = subtotal.minus(discountAmount).plus(taxAmount);
+  const discountAmountDec = DecimalUtils.fromValue(0, 'financial');
+  const taxAmountDec = DecimalUtils.fromValue(0, 'financial');
+
+  const totalAmountDec = DecimalUtils.subtract(
+    subtotalDec,
+    discountAmountDec,
+    'financial'
+  );
+  const finalTotalDec = DecimalUtils.add(
+    totalAmountDec,
+    taxAmountDec,
+    'financial'
+  );
 
   return {
-    subtotal: subtotal.toFixed(2),
-    discount_amount: discountAmount.toFixed(2),
-    tax_amount: taxAmount.toFixed(2),
-    total_amount: totalAmount.toFixed(2),
+    subtotal: subtotalDec.toFixed(2),
+    discount_amount: discountAmountDec.toFixed(2),
+    tax_amount: taxAmountDec.toFixed(2),
+    total_amount: finalTotalDec.toFixed(2),
   };
 };
 
@@ -149,9 +166,12 @@ export const createQuote = async (
             quantity: item.quantity,
             unit_price: item.unit_price,
             tiered_price: item.tiered_price,
-            subtotal: new Decimal(item.tiered_price || item.unit_price)
-              .times(item.quantity)
-              .toFixed(2),
+            // ✅ PRECISION FIX: Use DecimalUtils instead of Decimal.js directly
+            subtotal: DecimalUtils.multiply(
+              (item.tiered_price || item.unit_price).toString(),
+              item.quantity.toString(),
+              'financial'
+            ).toFixed(2),
           }))
         );
 

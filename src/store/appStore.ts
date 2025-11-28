@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { StateCreator } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { errorHandler } from '@/lib/error-handling';
+import { logger } from '@/lib/logging';
 
 export interface AppState {
   // User session
@@ -19,6 +20,9 @@ export interface AppState {
     loading: boolean;
     notifications: Notification[];
   };
+
+  // Module initialization state
+  modulesInitialized: boolean;
 
   // Network state
   network: {
@@ -45,19 +49,20 @@ export interface AppState {
   // Actions
   setUser: (user: Partial<AppState['user']>) => void;
   logout: () => void;
-  
+
   toggleSidebar: () => void;
   setTheme: (theme: AppState['ui']['theme']) => void;
   setLoading: (loading: boolean) => void;
+  setModulesInitialized: (initialized: boolean) => void;
   addNotification: (notification: Omit<Notification, 'id'>) => void;
   removeNotification: (id: string) => void;
-  
+
   setNetworkStatus: (isOnline: boolean) => void;
   updateLastSync: () => void;
   setPendingSyncs: (count: number) => void;
-  
+
   updateSettings: (settings: Partial<AppState['settings']>) => void;
-  
+
   // Error handling
   handleError: (error: Error, context?: Record<string, any>) => void;
 }
@@ -72,146 +77,158 @@ interface Notification {
 }
 
 export const appStoreInitializer: StateCreator<AppState, [["zustand/devtools", never], ["zustand/persist", unknown]]> = (set, get) => ({
-        // Initial state
-        user: {
-          id: null,
-          email: null,
-          role: null,
-          permissions: []
-        },
+  // Initial state
+  user: {
+    id: null,
+    email: null,
+    role: null,
+    permissions: []
+  },
 
-        ui: {
-          sidebarCollapsed: false,
-          theme: 'system' as const,
-          loading: false,
-          notifications: []
-        },
+  ui: {
+    sidebarCollapsed: false,
+    theme: 'system' as const,
+    loading: false,
+    notifications: []
+  },
 
-        network: {
-          isOnline: navigator.onLine,
-          lastSyncTimestamp: null,
-          pendingSyncs: 0
-        },
+  network: {
+    isOnline: navigator.onLine,
+    lastSyncTimestamp: null,
+    pendingSyncs: 0
+  },
 
-        settings: {
-          businessName: 'Mi Negocio',
-          currency: 'ARS',
-          timezone: 'America/Argentina/Buenos_Aires',
-          language: 'es',
-          // Optional shared config (undefined until configured)
-          address: undefined,
-          logoUrl: undefined,
-          contactEmail: undefined,
-          contactPhone: undefined
-        },
+  modulesInitialized: false,
 
-        // User actions
-        setUser: (userData) => {
-          set((state) => ({
-            user: { ...state.user, ...userData }
-          }), false, 'setUser');
-        },
+  settings: {
+    businessName: 'Mi Negocio',
+    currency: 'ARS',
+    timezone: 'America/Argentina/Buenos_Aires',
+    language: 'es',
+    // Optional shared config (undefined until configured)
+    address: undefined,
+    logoUrl: undefined,
+    contactEmail: undefined,
+    contactPhone: undefined
+  },
 
-        logout: () => {
-          set({
-            user: {
-              id: null,
-              email: null,
-              role: null,
-              permissions: []
-            }
-          }, false, 'logout');
-        },
+  // User actions
+  setUser: (userData) => {
+    set((state) => ({
+      user: { ...state.user, ...userData }
+    }), false, 'setUser');
+  },
 
-        // UI actions
-        toggleSidebar: () => {
-          set((state) => ({
-            ui: { ...state.ui, sidebarCollapsed: !state.ui.sidebarCollapsed }
-          }), false, 'toggleSidebar');
-        },
+  logout: () => {
+    set({
+      user: {
+        id: null,
+        email: null,
+        role: null,
+        permissions: []
+      }
+    }, false, 'logout');
+  },
 
-        setTheme: (theme) => {
-          set((state) => ({
-            ui: { ...state.ui, theme }
-          }), false, 'setTheme');
-        },
+  // UI actions
+  toggleSidebar: () => {
+    set((state) => ({
+      ui: { ...state.ui, sidebarCollapsed: !state.ui.sidebarCollapsed }
+    }), false, 'toggleSidebar');
+  },
 
-        setLoading: (loading) => {
-          set((state) => ({
-            ui: { ...state.ui, loading }
-          }), false, 'setLoading');
-        },
+  setTheme: (theme) => {
+    set((state) => ({
+      ui: { ...state.ui, theme }
+    }), false, 'setTheme');
+  },
 
-        addNotification: (notification) => {
-          const newNotification: Notification = {
-            ...notification,
-            id: crypto.randomUUID(),
-            timestamp: new Date()
-          };
+  setLoading: (loading) => {
+    set((state) => ({
+      ui: { ...state.ui, loading }
+    }), false, 'setLoading');
+  },
 
-          set((state) => ({
-            ui: {
-              ...state.ui,
-              notifications: [...(state.ui.notifications || []), newNotification]
-            }
-          }), false, 'addNotification');
+  setModulesInitialized: (initialized) => {
+    const previousValue = get().modulesInitialized;
+    logger.info('AppStore', `📦 setModulesInitialized(${initialized}) called`, {
+      previousValue,
+      newValue: initialized,
+      timestamp: new Date().toISOString()
+    });
+    set({ modulesInitialized: initialized }, false, 'setModulesInitialized');
+  },
 
-          // Auto-remove notification after 5 seconds if autoClose is true
-          if (notification.autoClose !== false) {
-            setTimeout(() => {
-              get().removeNotification(newNotification.id);
-            }, 5000);
-          }
-        },
+  addNotification: (notification) => {
+    const newNotification: Notification = {
+      ...notification,
+      id: crypto.randomUUID(),
+      timestamp: new Date()
+    };
 
-        removeNotification: (id) => {
-          set((state) => ({
-            ui: {
-              ...state.ui,
-              notifications: (state.ui.notifications || []).filter(n => n.id !== id)
-            }
-          }), false, 'removeNotification');
-        },
+    set((state) => ({
+      ui: {
+        ...state.ui,
+        notifications: [...(state.ui.notifications || []), newNotification]
+      }
+    }), false, 'addNotification');
 
-        // Network actions
-        setNetworkStatus: (isOnline) => {
-          set((state) => ({
-            network: { ...state.network, isOnline }
-          }), false, 'setNetworkStatus');
-        },
+    // Auto-remove notification after 5 seconds if autoClose is true
+    if (notification.autoClose !== false) {
+      setTimeout(() => {
+        get().removeNotification(newNotification.id);
+      }, 5000);
+    }
+  },
 
-        updateLastSync: () => {
-          set((state) => ({
-            network: { ...state.network, lastSyncTimestamp: new Date() }
-          }), false, 'updateLastSync');
-        },
+  removeNotification: (id) => {
+    set((state) => ({
+      ui: {
+        ...state.ui,
+        notifications: (state.ui.notifications || []).filter(n => n.id !== id)
+      }
+    }), false, 'removeNotification');
+  },
 
-        setPendingSyncs: (count) => {
-          set((state) => ({
-            network: { ...state.network, pendingSyncs: count }
-          }), false, 'setPendingSyncs');
-        },
+  // Network actions
+  setNetworkStatus: (isOnline) => {
+    set((state) => ({
+      network: { ...state.network, isOnline }
+    }), false, 'setNetworkStatus');
+  },
 
-        // Settings actions
-        updateSettings: (newSettings) => {
-          set((state) => ({
-            settings: { ...state.settings, ...newSettings }
-          }), false, 'updateSettings');
-        },
+  updateLastSync: () => {
+    set((state) => ({
+      network: { ...state.network, lastSyncTimestamp: new Date() }
+    }), false, 'updateLastSync');
+  },
 
-        // Error handling
-        handleError: (error, context) => {
-          const appError = errorHandler.handle(error, context);
+  setPendingSyncs: (count) => {
+    set((state) => ({
+      network: { ...state.network, pendingSyncs: count }
+    }), false, 'setPendingSyncs');
+  },
 
-          get().addNotification({
-            type: 'error',
-            title: 'Error',
-            message: appError.message,
-            timestamp: new Date(),
-            autoClose: appError.severity === 'low'
-          });
-        }
-      });
+  // Settings actions
+  updateSettings: (newSettings) => {
+    set((state) => ({
+      settings: { ...state.settings, ...newSettings }
+    }), false, 'updateSettings');
+  },
+
+  // Error handling
+  handleError: (error, context) => {
+    const appError = errorHandler.handle(error, context);
+
+    get().addNotification({
+      type: 'error',
+      title: 'Error',
+      message: appError.message,
+      timestamp: new Date(),
+      autoClose: appError.severity === 'low'
+    });
+  }
+});
 
 export const useAppStore = create<AppState>()(
   devtools(

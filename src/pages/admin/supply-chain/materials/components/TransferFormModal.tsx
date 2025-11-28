@@ -13,7 +13,7 @@ import {
   Button,
   Input,
   Textarea,
-  NativeSelect,
+  SelectField,
   Alert
 } from '@/shared/ui';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -152,65 +152,75 @@ export function TransferFormModal({
               {/* From Location */}
               <Stack gap="2">
                 <Text fontWeight="600">Ubicación de Origen *</Text>
-                <NativeSelect.Root
-                  value={formData.from_location_id}
-                  onChange={(e) => setFormData({ ...formData, from_location_id: e.target.value, item_id: '' })}
-                >
-                  <NativeSelect.Field placeholder="Seleccionar ubicación de origen">
-                    <option value="">Seleccionar ubicación</option>
-                    {locations.map(loc => (
-                      <option key={loc.id} value={loc.id}>
-                        {loc.name} ({loc.code})
-                      </option>
-                    ))}
-                  </NativeSelect.Field>
-                  <NativeSelect.Indicator />
-                </NativeSelect.Root>
+                <SelectField
+                  placeholder="Seleccionar ubicación de origen"
+                  options={[
+                    { value: '', label: 'Seleccionar ubicación' },
+                    ...locations.map(loc => ({
+                      value: loc.id,
+                      label: `${loc.name} (${loc.code})`
+                    }))
+                  ]}
+                  value={[formData.from_location_id]}
+                  onValueChange={(details) => setFormData({ 
+                    ...formData, 
+                    from_location_id: details.value[0] || '', 
+                    item_id: '' 
+                  })}
+                  noPortal
+                />
               </Stack>
 
               {/* To Location */}
               <Stack gap="2">
                 <Text fontWeight="600">Ubicación de Destino *</Text>
-                <NativeSelect.Root
-                  value={formData.to_location_id}
-                  onChange={(e) => setFormData({ ...formData, to_location_id: e.target.value })}
-                >
-                  <NativeSelect.Field placeholder="Seleccionar ubicación de destino">
-                    <option value="">Seleccionar ubicación</option>
-                    {locations
+                <SelectField
+                  placeholder="Seleccionar ubicación de destino"
+                  options={[
+                    { value: '', label: 'Seleccionar ubicación' },
+                    ...locations
                       .filter(loc => loc.id !== formData.from_location_id)
-                      .map(loc => (
-                        <option key={loc.id} value={loc.id}>
-                          {loc.name} ({loc.code})
-                        </option>
-                      ))}
-                  </NativeSelect.Field>
-                  <NativeSelect.Indicator />
-                </NativeSelect.Root>
+                      .map(loc => ({
+                        value: loc.id,
+                        label: `${loc.name} (${loc.code})`
+                      }))
+                  ]}
+                  value={[formData.to_location_id]}
+                  onValueChange={(details) => setFormData({ 
+                    ...formData, 
+                    to_location_id: details.value[0] || '' 
+                  })}
+                  noPortal
+                />
               </Stack>
 
               {/* Item */}
               <Stack gap="2">
                 <Text fontWeight="600">Material *</Text>
-                <NativeSelect.Root
-                  value={formData.item_id}
-                  onChange={(e) => setFormData({ ...formData, item_id: e.target.value })}
-                  disabled={!formData.from_location_id}
-                >
-                  <NativeSelect.Field placeholder="Seleccionar material">
-                    <option value="">
-                      {!formData.from_location_id
+                <SelectField
+                  placeholder={!formData.from_location_id 
+                    ? 'Primero seleccione ubicación de origen' 
+                    : 'Seleccionar material'}
+                  options={[
+                    { 
+                      value: '', 
+                      label: !formData.from_location_id
                         ? 'Primero seleccione ubicación de origen'
-                        : 'Seleccionar material'}
-                    </option>
-                    {filteredMaterials.map(item => (
-                      <option key={item.id} value={item.id}>
-                        {item.name} - Stock: {item.stock} {item.unit}
-                      </option>
-                    ))}
-                  </NativeSelect.Field>
-                  <NativeSelect.Indicator />
-                </NativeSelect.Root>
+                        : 'Seleccionar material'
+                    },
+                    ...filteredMaterials.map(item => ({
+                      value: item.id,
+                      label: `${item.name} - Stock: ${item.stock} ${item.unit}`
+                    }))
+                  ]}
+                  value={[formData.item_id]}
+                  onValueChange={(details) => setFormData({ 
+                    ...formData, 
+                    item_id: details.value[0] || '' 
+                  })}
+                  disabled={!formData.from_location_id}
+                  noPortal
+                />
               </Stack>
 
               {/* Quantity */}
@@ -264,7 +274,7 @@ export function TransferFormModal({
           </Dialog.Body>
 
           <Dialog.Footer>
-            <Stack direction="row" gap="3" justify="flex-end">
+            <Stack direction="row" gap="3" justify="end">
               <Button variant="outline" onClick={onClose} disabled={loading}>
                 Cancelar
               </Button>

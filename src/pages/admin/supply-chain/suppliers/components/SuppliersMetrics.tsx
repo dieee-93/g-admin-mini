@@ -2,7 +2,7 @@
 // SUPPLIERS METRICS - KPIs top bar
 // ============================================
 
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { Stack, MetricCard } from '@/shared/ui';
 import type { SupplierMetrics } from '../types/supplierTypes';
 import {
@@ -19,7 +19,36 @@ interface SuppliersMetricsProps {
   onMetricClick?: (metric: string) => void;
 }
 
-export function SuppliersMetrics({ metrics, loading, onMetricClick }: SuppliersMetricsProps) {
+/**
+ * PERFORMANCE OPTIMIZATION:
+ * Using useCallback for onClick handlers prevents MetricCard re-renders when parent updates.
+ * Without useCallback: inline arrow functions create new references every render → memo() fails
+ * With useCallback: stable function references → memo() prevents unnecessary re-renders
+ * Pattern from React.dev: https://react.dev/reference/react/useCallback
+ */
+export const SuppliersMetrics = memo(function SuppliersMetrics({ metrics, loading, onMetricClick }: SuppliersMetricsProps) {
+  // Stable handlers using useCallback - prevents MetricCard re-renders
+  const handleTotalClick = useCallback(() => {
+    onMetricClick?.('total_suppliers');
+SuppliersMetrics.displayName = 'SuppliersMetrics';
+  }, [onMetricClick]);
+
+  const handleActiveClick = useCallback(() => {
+    onMetricClick?.('active_suppliers');
+  }, [onMetricClick]);
+
+  const handleAverageRatingClick = useCallback(() => {
+    onMetricClick?.('average_rating');
+  }, [onMetricClick]);
+
+  const handleNoRatingClick = useCallback(() => {
+    onMetricClick?.('suppliers_without_rating');
+  }, [onMetricClick]);
+
+  const handleNoContactClick = useCallback(() => {
+    onMetricClick?.('suppliers_without_contact');
+  }, [onMetricClick]);
+
   return (
     <Stack direction="row" gap="3" wrap="wrap">
       {/* Total Suppliers */}
@@ -29,7 +58,7 @@ export function SuppliersMetrics({ metrics, loading, onMetricClick }: SuppliersM
         icon={BuildingStorefrontIcon}
         colorPalette="blue"
         loading={loading}
-        onClick={() => onMetricClick?.('total_suppliers')}
+        onClick={handleTotalClick}
       />
 
       {/* Active Suppliers */}
@@ -39,7 +68,7 @@ export function SuppliersMetrics({ metrics, loading, onMetricClick }: SuppliersM
         icon={CheckCircleIcon}
         colorPalette="green"
         loading={loading}
-        onClick={() => onMetricClick?.('active_suppliers')}
+        onClick={handleActiveClick}
       />
 
       {/* Average Rating */}
@@ -49,7 +78,7 @@ export function SuppliersMetrics({ metrics, loading, onMetricClick }: SuppliersM
         icon={StarIcon}
         colorPalette="yellow"
         loading={loading}
-        onClick={() => onMetricClick?.('average_rating')}
+        onClick={handleAverageRatingClick}
       />
 
       {/* Without Rating */}
@@ -60,7 +89,7 @@ export function SuppliersMetrics({ metrics, loading, onMetricClick }: SuppliersM
           icon={ExclamationTriangleIcon}
           colorPalette="orange"
           loading={loading}
-          onClick={() => onMetricClick?.('without_rating')}
+          onClick={handleNoRatingClick}
         />
       )}
 
@@ -72,9 +101,9 @@ export function SuppliersMetrics({ metrics, loading, onMetricClick }: SuppliersM
           icon={PhoneIcon}
           colorPalette="red"
           loading={loading}
-          onClick={() => onMetricClick?.('without_contact')}
+          onClick={handleNoContactClick}
         />
       )}
     </Stack>
   );
-}
+});

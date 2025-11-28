@@ -38,14 +38,14 @@ export const CountableFields = ({
     if (formData.type === 'COUNTABLE' && !formData.unit) {
       setFormData({ ...formData, unit: 'unidad' });
     }
-  }, [formData.type, formData.unit, formData, setFormData]);
+  }, [formData.type, formData.unit]); // ✅ FIX GAP 2: Remove formData, setFormData (causes infinite loop)
 
   useEffect(() => {
     if (!usePackaging) {
-      setFormData({ ...formData, packaging: undefined });
+      setFormData((prev) => ({ ...prev, packaging: undefined }));
       setPackageQuantity(1);
     }
-  }, [usePackaging, formData, setFormData]);
+  }, [usePackaging, setFormData]); // ✅ FIX GAP 2: Use functional update, remove formData dep
 
   useEffect(() => {
     if (formData.packaging?.package_size && formData.initial_stock) {
@@ -71,9 +71,9 @@ export const CountableFields = ({
           placeholder="¿A qué categoría pertenece?"
           collection={CATEGORY_COLLECTION}
           value={formData.category ? [formData.category] : []}
-          onValueChange={(details) => 
-            setFormData({ 
-              ...formData, 
+          onValueChange={(details) =>
+            setFormData({
+              ...formData,
               category: details.value[0]
             })
           }
@@ -91,7 +91,7 @@ export const CountableFields = ({
           <InformationCircleIcon style={{ width: '16px', height: '16px' }} />
         </Alert.Indicator>
         <Alert.Description>
-          Items contables se miden en <strong>unidades individuales</strong>. 
+          Items contables se miden en <strong>unidades individuales</strong>.
           Si vienen empaquetados, configura el packaging abajo para facilitar el conteo.
         </Alert.Description>
       </Alert.Root>
@@ -107,14 +107,11 @@ export const CountableFields = ({
                   Activa si el item viene en cajas, bandejas, docenas, etc.
                 </Text>
               </Stack>
-              <Switch.Root
+              <Switch
                 checked={usePackaging}
-                onCheckedChange={(details) => !disabled && setUsePackaging(details.checked)}
+                onChange={(checked) => !disabled && setUsePackaging(checked)}
                 disabled={disabled}
-              >
-                <Switch.HiddenInput />
-                <Switch.Control />
-              </Switch.Root>
+              />
             </Flex>
 
             {usePackaging && (
@@ -125,9 +122,9 @@ export const CountableFields = ({
                       placeholder="ej: 30"
                       type="number"
                       value={formData.packaging?.package_size || ''}
-                      onChange={(e) => 
-                        !disabled && setFormData({ 
-                          ...formData, 
+                      onChange={(e) =>
+                        !disabled && setFormData({
+                          ...formData,
                           packaging: {
                             ...formData.packaging,
                             package_size: parseInt(e.target.value) || 0,
@@ -142,14 +139,14 @@ export const CountableFields = ({
                       px="3"
                     />
                   </Box>
-                  
+
                   <Box flex="1">
                     <InputField
                       placeholder="ej: bandeja, caja, docena"
                       value={formData.packaging?.package_unit || ''}
-                      onChange={(e) => 
-                        !disabled && setFormData({ 
-                          ...formData, 
+                      onChange={(e) =>
+                        !disabled && setFormData({
+                          ...formData,
                           packaging: {
                             ...formData.packaging,
                             package_size: formData.packaging?.package_size || 0,
@@ -165,7 +162,7 @@ export const CountableFields = ({
                     />
                   </Box>
                 </Flex>
-                
+
                 {formData.packaging?.package_size && formData.packaging?.package_unit && (
                   <Alert.Root status="success" variant="subtle">
                     <Alert.Indicator>

@@ -1,10 +1,10 @@
 import { Stack, Typography, Badge, CardGrid, MetricCard, CardWrapper } from '@/shared/ui';
 import { ChartBarIcon, CurrencyDollarIcon, CubeIcon } from '@heroicons/react/24/outline';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsComputed } from '../../hooks/useMaterialsComputed';
 import { formatCurrency, formatPercentage } from '@/business-logic/shared/decimalUtils';
 
 export function ABCAnalysisTab() {
-  const { getFilteredItems } = useMaterials();
+  const { getFilteredItems } = useMaterialsComputed();
   const materials = getFilteredItems();
 
   // Calculate ABC analysis

@@ -7,6 +7,10 @@ import type { Schedule, DailyRule, TimeBlock } from '@/types/schedule';
 const dayNames = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 const dayMap: DailyRule['dayOfWeek'][] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
+// 🚀 PERFORMANCE FIX: Stable empty array to prevent re-renders
+// React.dev: "Calculate during rendering" - avoid creating new [] each render
+const EMPTY_RULES: DailyRule[] = [];
+
 interface WeeklyScheduleEditorProps {
   schedule: Partial<Schedule>;
   onChange: (newSchedule: Partial<Schedule>) => void;
@@ -15,7 +19,11 @@ interface WeeklyScheduleEditorProps {
 export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEditorProps) {
   const [selectedDays, setSelectedDays] = useState<Set<DailyRule['dayOfWeek']>>(new Set());
 
-  const weeklyRules = useMemo(() => schedule.weeklyRules || [], [schedule.weeklyRules]);
+  // ✅ Use stable constant instead of creating new array
+  const weeklyRules = useMemo(
+    () => schedule.weeklyRules || EMPTY_RULES, 
+    [schedule.weeklyRules]
+  );
 
   const handleDayClick = (day: DailyRule['dayOfWeek']) => {
     const newSelectedDays = new Set(selectedDays);

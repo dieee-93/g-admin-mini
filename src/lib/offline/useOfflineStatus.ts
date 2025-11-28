@@ -13,25 +13,25 @@ interface OfflineStatusHook {
   isConnecting: boolean;
   connectionQuality: 'excellent' | 'good' | 'poor' | 'offline';
   lastOnline: Date | null;
-  
+
   // Sync status
   isSyncing: boolean;
   syncProgress: number;
   queueSize: number;
-  
+
   // Operations
   queueOperation: (operation: unknown) => Promise<string>;
   forceSync: () => Promise<void>;
   clearQueue: () => void;
-  
+
   // Storage
   cacheData: (key: string, data: any, ttl?: number) => Promise<void>;
   getCachedData: (key: string) => Promise<any>;
-  
+
   // Monitoring
   networkInfo: NetworkInfo | null;
   storageInfo: StorageInfo;
-  
+
   // Events
   onOnline: (callback: () => void) => void;
   onOffline: (callback: () => void) => void;
@@ -86,17 +86,17 @@ export const useOfflineStatus = (): OfflineStatusHook => {
     if (online) {
       setLastOnline(new Date());
       setIsConnecting(false);
-      
+
       // Test connection quality
       try {
         const start = Date.now();
-        await fetch('/api/health', { 
+        await fetch('/api/health', {
           method: 'HEAD',
           cache: 'no-cache',
           signal: AbortSignal.timeout(5000)
         });
         const responseTime = Date.now() - start;
-        
+
         if (responseTime < 200) {
           setConnectionQuality('excellent');
         } else if (responseTime < 1000) {
@@ -107,7 +107,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
       } catch {
         setConnectionQuality('poor');
       }
-      
+
       // Trigger online callbacks
       eventCallbacks.current.online.forEach(callback => {
         try {
@@ -119,7 +119,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
     } else {
       setConnectionQuality('offline');
       setIsConnecting(false);
-      
+
       // Trigger offline callbacks
       eventCallbacks.current.offline.forEach(callback => {
         try {
@@ -133,17 +133,30 @@ export const useOfflineStatus = (): OfflineStatusHook => {
 
   // Update network information
   const updateNetworkInfo = useCallback(() => {
-    const connection = (navigator as any).connection || 
-                      (navigator as any).mozConnection || 
-                      (navigator as any).webkitConnection;
+    const connection = (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection;
 
     if (connection) {
-      setNetworkInfo({
+      const newInfo = {
         type: connection.type || 'unknown',
         effectiveType: connection.effectiveType || 'unknown',
         downlink: connection.downlink || 0,
         rtt: connection.rtt || 0,
         saveData: connection.saveData || false
+      };
+
+      // Only update if values actually changed
+      setNetworkInfo(prev => {
+        if (!prev) return newInfo;
+        if (prev.type !== newInfo.type ||
+          prev.effectiveType !== newInfo.effectiveType ||
+          prev.downlink !== newInfo.downlink ||
+          prev.rtt !== newInfo.rtt ||
+          prev.saveData !== newInfo.saveData) {
+          return newInfo;
+        }
+        return prev;
       });
     }
   }, []);
@@ -153,7 +166,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
     try {
       const stats = await localStorage.getStorageStats();
       let totalItems = 0;
-      
+
       Object.values(stats).forEach((storeStat: unknown) => {
         if (typeof storeStat === 'object' && storeStat.count) {
           totalItems += storeStat.count;
@@ -167,17 +180,30 @@ export const useOfflineStatus = (): OfflineStatusHook => {
         const available = estimate.quota || 0;
         const percentage = available > 0 ? (used / available) * 100 : 0;
 
-        setStorageInfo({
+        const newInfo = {
           used,
           available,
           percentage,
           itemCount: totalItems
+        };
+
+        // Only update if values actually changed (with tolerance for percentage)
+        setStorageInfo(prev => {
+          if (prev.used !== newInfo.used ||
+            prev.available !== newInfo.available ||
+            Math.abs(prev.percentage - newInfo.percentage) > 0.01 ||
+            prev.itemCount !== newInfo.itemCount) {
+            return newInfo;
+          }
+          return prev;
         });
       } else {
-        setStorageInfo(prev => ({
-          ...prev,
-          itemCount: totalItems
-        }));
+        setStorageInfo(prev => {
+          if (prev.itemCount !== totalItems) {
+            return { ...prev, itemCount: totalItems };
+          }
+          return prev;
+        });
       }
     } catch (error) {
       logger.error('OfflineSync', '[OfflineStatus] Error updating storage info:', error);
@@ -290,7 +316,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      
+
       if (connection) {
         connection.removeEventListener('change', handleConnectionChange);
       }
@@ -301,7 +327,7 @@ export const useOfflineStatus = (): OfflineStatusHook => {
 
       clearInterval(statusInterval);
       clearInterval(networkInterval);
-      
+
       // Clear callbacks
       eventCallbacks.current = {
         online: [],
@@ -317,25 +343,25 @@ export const useOfflineStatus = (): OfflineStatusHook => {
     isConnecting,
     connectionQuality,
     lastOnline,
-    
+
     // Sync status
     isSyncing: syncStatus?.isSyncing || false,
     syncProgress: syncStatus?.syncProgress || 0,
     queueSize: syncStatus?.queueSize || 0,
-    
+
     // Operations
     queueOperation,
     forceSync,
     clearQueue,
-    
+
     // Storage
     cacheData,
     getCachedData,
-    
+
     // Monitoring
     networkInfo,
     storageInfo,
-    
+
     // Events
     onOnline,
     onOffline,

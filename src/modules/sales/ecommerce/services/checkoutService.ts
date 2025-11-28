@@ -1,6 +1,8 @@
 // TODO: Uncomment CreateOrderParams when implementing checkout order creation
 import { orderService, /* type CreateOrderParams, */ type Order } from './orderService';
 import { cartService } from './cartService';
+import { eventBus } from '@/lib/events';
+import { logger } from '@/lib/logging';
 
 export interface ProcessCheckoutParams {
   customerId: string;
@@ -53,10 +55,28 @@ export const checkoutService = {
         paymentMethod,
       });
 
-      // 4. TODO: Send order confirmation email (Week 5)
+      // 4. Emit sales.order_completed event for cross-module integration
+      try {
+        await eventBus.emit('sales.order_completed', {
+          orderId: order.id,
+          customerId: order.customer_id,
+          total: order.total,
+          paymentMethod: order.payment_method,
+          timestamp: Date.now()
+        });
+
+        logger.info('SalesModule', 'Order completed event emitted', {
+          orderId: order.id
+        });
+      } catch (err) {
+        logger.error('SalesModule', 'Failed to emit order_completed event', err);
+        // Don't fail the checkout if event emission fails
+      }
+
+      // 5. TODO: Send order confirmation email (Week 5)
       // await emailService.sendOrderConfirmation(order);
 
-      // 5. TODO: Trigger inventory deduction (if applicable)
+      // 6. TODO: Trigger inventory deduction (if applicable)
       // await inventoryService.deductStock(order);
 
       return {
@@ -64,7 +84,10 @@ export const checkoutService = {
         order,
       };
     } catch (error) {
-      console.error('Error processing checkout:', error);
+      logger.error('SalesModule', 'Error processing checkout', {
+        error,
+        customerId: params.customerId
+      });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to process checkout',
@@ -99,7 +122,10 @@ export const checkoutService = {
         errors,
       };
     } catch (error) {
-      console.error('Error validating checkout:', error);
+      logger.error('SalesModule', 'Error validating checkout', {
+        error,
+        customerId
+      });
       return {
         valid: false,
         errors: ['Failed to validate checkout'],

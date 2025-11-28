@@ -451,7 +451,7 @@ export class ModuleIntegrations {
 
     // When MRR is updated, track business growth
     moduleEventBus.on('billing.mrr_updated', ({ previousMrr, currentMrr, change, timestamp }) => {
-      console.log(`[EventBus] MRR updated: $${currentMrr} (${change > 0 ? '+' : ''}${change})`);
+      logger.info('ModuleEventBus', `MRR updated: $${currentMrr} (${change > 0 ? '+' : ''}${change})`);
 
       // Generate growth analytics
       moduleEventBus.emit('analytics.generated', {
@@ -1820,7 +1820,7 @@ export class ModuleIntegrations {
 
     // When data source is updated, coordinate with affected modules
     moduleEventBus.on('reporting.data_source_updated', ({ reportId, modulesChanged, dataPointsAdded }) => {
-      console.log(`[EventBus] Data source updated: ${reportId}, modules: ${modulesChanged.join(', ')}, +${dataPointsAdded} data points`);
+      logger.info('ModuleEventBus', `Data source updated: ${reportId}, modules: ${modulesChanged.join(', ')}, +${dataPointsAdded} data points`);
 
       // Generate data source analytics
       moduleEventBus.emit('analytics.generated', {

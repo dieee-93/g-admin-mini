@@ -11,9 +11,9 @@
  */
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, VStack, HStack, Heading, Text, Button, Badge, Stack } from '@/shared/ui';
 import { useProductsStore } from '@/store/productsStore';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 /**
  * Estadísticas básicas de productos
@@ -29,7 +29,7 @@ interface ProductStats {
  * Main Widget Component - Exported for lazy loading
  */
 export default function ProductsWidget() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
   const { products, getProductsWithRecipes } = useProductsStore();
 
   // Calcular estadísticas
@@ -130,7 +130,7 @@ export default function ProductsWidget() {
           size="sm"
           colorPalette="orange"
           variant="outline"
-          onClick={() => navigate('/admin/supply-chain/products')}
+          onClick={() => navigate('products')}
         >
           Ver Catálogo
         </Button>

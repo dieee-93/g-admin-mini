@@ -1,45 +1,33 @@
 // src/shared/alerts/components/GlobalAlertsDisplay.tsx
-// 🎯 DISPLAY AUTOMÁTICO DE ALERTAS GLOBALES
-// Reemplaza GlobalAlerts con arquitectura más limpia
+// 🎯 TOAST STACK UNIFICADO - Sistema de Notificaciones Moderno
+// Inspirado en Vercel/Linear/Notion (2025 UX Best Practices)
+//
+// 🔧 TECHNICAL NOTE: Progress Tracking Architecture
+// This component uses Dan Abramov's useInterval pattern to avoid infinite render loops.
+// See: docs/alert/USEINTERVAL_PATTERN.md for full explanation.
+//
+// Key insight: setInterval with state dependencies creates cascading re-renders.
+// Solution: useRef + stable dependencies = declarative intervals without render loops.
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo, useMemo } from 'react';
 import {
   Box,
   VStack,
-  HStack,
-  Text,
-  IconButton,
-  Badge,
   Portal,
-  Collapsible,
 } from '@chakra-ui/react';
-import {
-  ChevronUpIcon,
-  ChevronDownIcon,
-  XMarkIcon,
-  CogIcon
-} from '@heroicons/react/24/outline';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AlertDisplay } from './AlertDisplay';
 import { useAlerts } from '../hooks/useAlerts';
 import { useAlertsContext } from '../AlertsProvider';
-import { CardWrapper, Icon } from '@/shared/ui';
+import { useInterval } from '@/shared/hooks/useInterval';
 import { logger } from '@/lib/logging';
 export interface GlobalAlertsDisplayProps {
   maxVisible?: number;
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
-  autoCollapse?: boolean;
-  collapseAfter?: number; // seconds
-  showOnlyActive?: boolean;
-  showConfiguration?: boolean;
 }
 
-export function GlobalAlertsDisplay({
-  maxVisible,
-  position,
-  autoCollapse,
-  collapseAfter,
-  showOnlyActive = true,
-  showConfiguration = false
+// 🛠️ PERFORMANCE: Memoize component to prevent unnecessary re-renders
+export const GlobalAlertsDisplay = memo(function GlobalAlertsDisplay({
+  maxVisible
 }: GlobalAlertsDisplayProps) {
   const context = useAlertsContext();
   const { 
@@ -49,270 +37,239 @@ export function GlobalAlertsDisplay({
     activeCount,
     actions 
   } = useAlerts({
-    status: showOnlyActive ? 'active' : ['active', 'acknowledged'],
+    status: 'active',
     autoFilter: true
   });
 
-  // Local state
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
-
   // Use config from context or props
-  const finalMaxVisible = maxVisible ?? context.config.maxVisibleAlerts;
-  const finalPosition = position ?? context.config.position;
-  const finalAutoCollapse = autoCollapse ?? context.config.autoCollapse;
-  const finalCollapseAfter = collapseAfter ?? context.config.collapseAfter;
-
-  // Auto-collapse after specified time
-  useEffect(() => {
-    if (finalAutoCollapse && alerts.length > 0 && !isCollapsed) {
-      const timer = setTimeout(() => {
-        setIsCollapsed(true);
-      }, finalCollapseAfter * 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [alerts.length, finalAutoCollapse, finalCollapseAfter, isCollapsed]);
-
-  // Reset collapsed state when new critical alerts arrive
-  useEffect(() => {
-    if (criticalCount > 0 && isCollapsed) {
-      setIsCollapsed(false);
-    }
-  }, [criticalCount, isCollapsed]);
-
-  // Position styles
-  const positionStyles = {
-    'top-right': { top: 4, right: 4 },
-    'top-left': { top: 4, left: 4 },
-    'bottom-right': { bottom: 4, right: 4 },
-    'bottom-left': { bottom: 4, left: 4 }
+  const finalMaxVisible = maxVisible ?? context.config.toastStackMax ?? 3;
+  const toastDuration = context.config.toastDuration ?? {
+    info: 3000,
+    success: 3000,
+    warning: 5000,
+    error: 8000,
+    critical: Infinity
   };
 
-  // Don't render if no alerts or dismissed
-  if (alerts.length === 0 || isDismissed) {
+  // 🎯 STATE: Progress tracking for auto-dismiss toasts
+  // - progress: Visual progress bar percentage (0-100)
+  // - toastStartTimes: Timestamp when each toast entered visible stack
+  const [progress, setProgress] = useState<Record<string, number>>({});
+  const [toastStartTimes, setToastStartTimes] = useState<Record<string, number>>({});
+
+  // Get visible alerts (top N) - Keep stable until they finish or are dismissed
+  const visibleAlerts = useMemo(() => {
+    // Strategy: Keep showing alerts that are already visible until they auto-dismiss
+    // Only replace them when they're gone (not just when new ones arrive)
+    const tracked = Object.keys(toastStartTimes);
+    
+    // Keep alerts that are already being tracked
+    const stillVisible = alerts.filter(a => tracked.includes(a.id));
+    
+    // If we have space, add new alerts up to the limit
+    if (stillVisible.length < finalMaxVisible) {
+      const newAlerts = alerts.filter(a => !tracked.includes(a.id));
+      const slotsAvailable = finalMaxVisible - stillVisible.length;
+      return [...stillVisible, ...newAlerts.slice(0, slotsAvailable)];
+    }
+    
+    return stillVisible;
+  }, [alerts, finalMaxVisible, toastStartTimes]);
+
+  // Debug: Log initial state
+  useEffect(() => {
+    logger.info('GlobalAlertsDisplay', 'Component mounted', {
+      totalAlerts: alerts.length,
+      visibleCount: visibleAlerts.length,
+      maxVisible: finalMaxVisible,
+      toastDuration
+    });
+  }, []); // Only on mount
+
+  // 📍 LIFECYCLE: Track when alerts enter the visible stack
+  // Important: We track when toasts APPEAR, not when alerts are CREATED
+  // This ensures duration starts from visibility, not from creation time
+  useEffect(() => {
+    const now = Date.now();
+    setToastStartTimes(prev => {
+      const updated = { ...prev };
+      visibleAlerts.forEach(alert => {
+        // Only set start time if not already tracking
+        if (!updated[alert.id]) {
+          updated[alert.id] = now;
+          logger.debug('GlobalAlertsDisplay', `Started tracking toast ${alert.id.substring(0, 8)}`, {
+            alertId: alert.id,
+            severity: alert.severity,
+            startTime: now,
+            createdAt: alert.createdAt.getTime()
+          });
+        }
+      });
+      return updated;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleAlerts.map(a => a.id).join(',')]); // Only when alert IDs change
+
+  // 🎯 DAN ABRAMOV PATTERN: Declarative interval with useInterval hook
+  // 
+  // WHY THIS PATTERN?
+  // - Avoids infinite render loops (state changes don't restart interval)
+  // - Callback always has access to latest state via closure
+  // - Interval only restarts if delay changes (100ms is constant)
+  // - Clean separation: interval lifecycle vs callback updates
+  //
+  // See: docs/alert/USEINTERVAL_PATTERN.md for full explanation
+  //
+  // WHAT IT DOES:
+  // 1. Calculate progress for each visible toast (elapsed / duration * 100)
+  // 2. Auto-dismiss toasts when progress reaches 100%
+  // 3. Clean up tracking data for dismissed toasts
+  useInterval(() => {
+    setProgress(prev => {
+      const updated: Record<string, number> = {};
+      let hasChanges = false;
+
+      visibleAlerts.forEach(alert => {
+        const duration = toastDuration[alert.severity] ?? toastDuration.info ?? 3000;
+        if (duration === Infinity) {
+          return; // No progress bar for critical alerts (manual dismiss only)
+        }
+
+        // Calculate elapsed time from when toast APPEARED (not created)
+        const startTime = toastStartTimes[alert.id];
+        
+        if (!startTime) {
+          return; // Skip if not tracking yet
+        }
+        
+        const elapsed = Date.now() - startTime;
+        const newProgress = Math.min((elapsed / duration) * 100, 100);
+        
+        if (prev[alert.id] !== newProgress) {
+          hasChanges = true;
+        }
+        updated[alert.id] = newProgress;
+
+        // Auto-dismiss when progress reaches 100%
+        if (newProgress >= 100 && alert.status === 'active') {
+          logger.info('GlobalAlertsDisplay', `Auto-dismissing toast ${alert.id.substring(0, 8)}`, {
+            progress: newProgress,
+            elapsed,
+            duration
+          });
+          actions.dismiss(alert.id);
+          // Clean up tracking
+          setToastStartTimes(times => {
+            const copy = { ...times };
+            delete copy[alert.id];
+            logger.debug('GlobalAlertsDisplay', `Cleaned up tracking for ${alert.id.substring(0, 8)}`);
+            return copy;
+          });
+        }
+      });
+
+      return hasChanges ? updated : prev;
+    });
+  }, 100); // Fixed 100ms interval for smooth progress (60fps-friendly)
+
+  // Don't render if no alerts
+  if (alerts.length === 0) {
     return null;
   }
-
-  // Get visible alerts
-  const visibleAlerts = alerts.slice(0, finalMaxVisible);
-  const hasMoreAlerts = alerts.length > finalMaxVisible;
-
-  // Determine header color based on severity
-  const getHeaderColor = () => {
-    if (criticalCount > 0) return 'red';
-    if (activeCount > 0) return 'orange';
-    return 'blue';
-  };
-
-  const headerColor = getHeaderColor();
 
   return (
     <Portal>
       <Box
         position="fixed"
-        {...positionStyles[finalPosition]}
-        zIndex={1100}
-        w="350px"
-        maxW="90vw"
-        pointerEvents="auto"
+        top={4}
+        right={4}
+        zIndex={9999}
+        maxW="400px"
+        w="full"
+        px={4}
+        pointerEvents="none"
       >
-        <VStack gap="2" align="stretch">
-          {/* Header */}
-          <CardWrapper
-            bg={`${headerColor}.500`}
-            color="white"
-            size="sm"
-          >
-            <CardWrapper.Body p="3">
-              <HStack justify="space-between" align="center">
-                <HStack gap="2" flex="1">
-                  <Text fontSize="sm" fontWeight="bold">
-                    {criticalCount > 0 
-                      ? `${criticalCount} Alertas Críticas`
-                      : `${count} Alertas`
-                    }
-                  </Text>
-                  
-                  {hasMoreAlerts && (
-                    <Badge bg={`${headerColor}.600`} color="white" size="xs">
-                      +{alerts.length - finalMaxVisible}
-                    </Badge>
-                  )}
-                </HStack>
-
-                <HStack gap="1">
-                  {showConfiguration && (
-                    <IconButton
-                      size="xs"
-                      variant="ghost"
-                      color="white"
-                      onClick={() => {
-                        // TODO: Open alerts configuration
-                        logger.info('App', 'Open alerts configuration');
-                      }}
-                      aria-label="Configurar alertas"
-                    >
-                      <Icon icon={CogIcon} size="xs" />
-                    </IconButton>
-                  )}
-
-                  <IconButton
-                    size="xs"
-                    variant="ghost"
-                    color="white"
-                    onClick={() => setIsCollapsed(!isCollapsed)}
-                    aria-label={isCollapsed ? 'Expandir alertas' : 'Colapsar alertas'}
-                  >
-                    {isCollapsed ? 
-                      <Icon icon={ChevronDownIcon} size="xs" /> : 
-                      <Icon icon={ChevronUpIcon} size="xs" />
-                    }
-                  </IconButton>
-
-                  <IconButton
-                    size="xs"
-                    variant="ghost"
-                    color="white"
-                    onClick={() => setIsDismissed(true)}
-                    aria-label="Cerrar panel de alertas"
-                  >
-                    <Icon icon={XMarkIcon} size="xs" />
-                  </IconButton>
-                </HStack>
-              </HStack>
-            </CardWrapper.Body>
-          </CardWrapper>
-
-          {/* Alerts List */}
-          <Collapsible.Root open={!isCollapsed}>
-            <Collapsible.Content>
-              <VStack gap="2" align="stretch">
-                {visibleAlerts.map((alert) => (
-                  <AlertDisplay
-                    key={alert.id}
-                    alert={alert}
-                    variant="card"
-                    size="sm"
-                    showActions={true}
-                    showMetadata={true}
-                    onAcknowledge={actions.acknowledge}
-                    onResolve={actions.resolve}
-                    onDismiss={actions.dismiss}
-                    onAction={async (actionId, alertId) => {
-                      // Find and execute the action
-                      const alert = alerts.find(a => a.id === alertId);
-                      const action = alert?.actions?.find(a => a.id === actionId);
-                      
-                      if (action) {
-                        try {
-                          await action.action();
-                          
-                          // Auto-resolve if configured
-                          if (action.autoResolve) {
-                            await actions.resolve(alertId, `Resuelto por acción: ${action.label}`);
-                          }
-                        } catch (error) {
-                          logger.error('App', 'Error executing alert action:', error);
+        <VStack gap={2} align="stretch">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {visibleAlerts.map((alert, index) => (
+              <motion.div
+                key={alert.id}
+                layout
+                initial={{ opacity: 0, x: 100, scale: 0.9 }}
+                animate={{ 
+                  opacity: index < finalMaxVisible ? 1 : 0.7,
+                  x: 0,
+                  scale: index < finalMaxVisible ? 1 : 0.95,
+                  y: index * -2  // Slight stagger for stacked effect
+                }}
+                exit={{ 
+                  opacity: 0, 
+                  x: 100, 
+                  scale: 0.8,
+                  transition: { duration: 0.2 }
+                }}
+                transition={{ 
+                  type: 'spring', 
+                  stiffness: 500, 
+                  damping: 30,
+                  opacity: { duration: 0.2 }
+                }}
+                style={{ pointerEvents: 'auto' }}
+              >
+                <AlertDisplay
+                  alert={alert}
+                  variant="card"
+                  size="sm"
+                  showActions={true}
+                  showMetadata={false}
+                  progress={progress[alert.id]}
+                  onAcknowledge={actions.acknowledge}
+                  onResolve={actions.resolve}
+                  onDismiss={actions.dismiss}
+                  onAction={async (actionId, alertId) => {
+                    // Find and execute the action
+                    const alertData = alerts.find(a => a.id === alertId);
+                    const action = alertData?.actions?.find(a => a.id === actionId);
+                    
+                    if (action) {
+                      try {
+                        await action.action();
+                        
+                        // Auto-resolve if configured
+                        if (action.autoResolve) {
+                          await actions.resolve(alertId, `Resuelto por acción: ${action.label}`);
                         }
+                      } catch (error) {
+                        logger.error('App', 'Error executing alert action:', error);
                       }
-                    }}
-                  />
-                ))}
-
-                {/* View All Button */}
-                {hasMoreAlerts && (
-                  <CardWrapper variant="outline" size="sm">
-                    <CardWrapper.Body p="3" textAlign="center">
-                      <Text
-                        fontSize="sm"
-                        color="blue.600"
-                        cursor="pointer"
-                        onClick={() => {
-                          // TODO: Navigate to alerts page
-                          window.location.href = '/alerts';
-                        }}
-                        _hover={{ textDecoration: 'underline' }}
-                      >
-                        Ver todas las alertas ({alerts.length})
-                      </Text>
-                    </CardWrapper.Body>
-                  </CardWrapper>
-                )}
-
-                {/* Quick Actions */}
-                {alerts.length > 1 && (
-                  <CardWrapper variant="outline" size="sm">
-                    <CardWrapper.Body p="2">
-                      <HStack justify="center" gap="2">
-                        <Text
-                          fontSize="xs"
-                          color="blue.600"
-                          cursor="pointer"
-                          onClick={() => actions.bulkAcknowledge(visibleAlerts.map(a => a.id))}
-                          _hover={{ textDecoration: 'underline' }}
-                        >
-                          Reconocer todas
-                        </Text>
-                        
-                        <Text fontSize="xs" color="gray.400">•</Text>
-                        
-                        <Text
-                          fontSize="xs"
-                          color="green.600"
-                          cursor="pointer"
-                          onClick={() => actions.bulkResolve(visibleAlerts.map(a => a.id))}
-                          _hover={{ textDecoration: 'underline' }}
-                        >
-                          Resolver todas
-                        </Text>
-                        
-                        <Text fontSize="xs" color="gray.400">•</Text>
-                        
-                        <Text
-                          fontSize="xs"
-                          color="red.600"
-                          cursor="pointer"
-                          onClick={() => actions.bulkDismiss(visibleAlerts.map(a => a.id))}
-                          _hover={{ textDecoration: 'underline' }}
-                        >
-                          Descartar todas
-                        </Text>
-                      </HStack>
-                    </CardWrapper.Body>
-                  </CardWrapper>
-                )}
-              </VStack>
-            </Collapsible.Content>
-          </Collapsible.Root>
+                    }
+                  }}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </VStack>
       </Box>
     </Portal>
   );
-}
+}); // End memo
 
 /**
  * 🎯 WRAPPER QUE SE INCLUYE AUTOMÁTICAMENTE EN EL PROVIDER
- * Este componente se renderiza automáticamente cuando hay alertas
+ * Este componente se renderiza automáticamente cuando hay alertas activas
+ * Ahora es un toast stack moderno (top-right fixed)
  */
-export function AutoGlobalAlertsDisplay() {
-  const { alerts, config } = useAlertsContext();
+export const AutoGlobalAlertsDisplay = memo(function AutoGlobalAlertsDisplay() {
+  const { alerts } = useAlertsContext();
   
-  // Solo renderizar si hay alertas activas
-  const hasActiveAlerts = alerts.some(alert => alert.status === 'active');
+  // Solo renderizar si hay alertas activas (no snoozed, no archived)
+  const hasActiveAlerts = alerts.some(
+    alert => alert.status === 'active' && !alert.archivedAt
+  );
   
   if (!hasActiveAlerts) {
     return null;
   }
 
-  return (
-    <GlobalAlertsDisplay
-      maxVisible={config.maxVisibleAlerts}
-      position={config.position}
-      autoCollapse={config.autoCollapse}
-      collapseAfter={config.collapseAfter}
-      showOnlyActive={true}
-      showConfiguration={false}
-    />
-  );
-}
+  return <GlobalAlertsDisplay />;
+});

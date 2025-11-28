@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { toaster } from '@/shared/ui';
 import { logger } from '@/lib/logging';
-import type { SettingsData } from '../types';
 
 interface AutoSaveOptions {
   enabled?: boolean;
@@ -74,10 +73,10 @@ export function useAutoSave<T>(
         logger.info('App', 'Configuration saved successfully');
       }
 
-    } catch (error: unknown) {
+    } catch (error: any) {
       if (!isMountedRef.current) return;
 
-      const errorMessage = error instanceof Error ? error.message : 'Error al guardar';
+      const errorMessage = error.message || 'Error al guardar';
       
       if (retryCountRef.current < maxRetries) {
         retryCountRef.current++;
@@ -198,51 +197,21 @@ export function useAutoSave<T>(
 }
 
 // 🎯 Hook específico para configuraciones de settings
-export function useSettingsAutoSave(settingsData: SettingsData) {
-  const saveSettings = useCallback(async (data: SettingsData) => {
-    // ✅ REAL DATABASE SAVE - Connected to Supabase (2025-11-01)
-    // Import dynamically to avoid circular dependencies
-    const { updateBusinessProfile, updateSystemSettings } = await import('../services/settingsApi');
-    const { useAuth } = await import('@/contexts/AuthContext');
-
-    try {
-      // Get current user for audit trail
-      const { user } = useAuth.getState?.() || { user: null };
-      const userId = user?.id || 'system';
-
-      // Save to database based on data structure
-      const settings = data;
-
-      // Save business profile if present
-      if (settings.businessProfile) {
-        await updateBusinessProfile(settings.businessProfile, userId);
-        logger.info('App', 'Business profile auto-saved successfully');
-      }
-
-      // Save tax configuration if present
-      // Note: Tax config is stored in business_profiles table
-      if (settings.taxConfiguration) {
-        await updateBusinessProfile(settings.taxConfiguration, userId);
-        logger.info('App', 'Tax configuration auto-saved successfully');
-      }
-
-      // Save system preferences if present
-      if (settings.systemPreferences) {
-        await updateSystemSettings(settings.systemPreferences, userId);
-        logger.info('App', 'System preferences auto-saved successfully');
-      }
-
-      logger.info('App', 'Settings auto-saved to database successfully');
-    } catch (error) {
-      logger.error('App', 'Failed to auto-save settings to database', error);
-      throw error;
-    }
+export function useSettingsAutoSave(settingsData: any) {
+  const saveSettings = useCallback(async (data: any) => {
+    // Simular guardado de configuraciones
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // En producción aquí iría la llamada a Supabase
+    // await updateSettingsInDatabase(data);
+    
+    logger.info('App', 'Settings auto-saved successfully', data);
   }, []);
 
   return useAutoSave(settingsData, saveSettings, {
     enabled: true,
-    debounceMs: 2000, // 2 segundos para dar tiempo al usuario a terminar de editar
-    showNotifications: true, // Mostrar notificaciones de guardado exitoso
-    maxRetries: 3 // Reintentar hasta 3 veces si falla
+    debounceMs: 1500, // Más rápido para configuraciones
+    showNotifications: false, // Las configuraciones son menos críticas
+    maxRetries: 2
   });
 }

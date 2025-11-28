@@ -42,8 +42,9 @@ export default function TakeAwayToggle() {
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
 
   // Modal state from achievements store
-  const showSetupModal = useAchievementsStore(state => state.showSetupModal);
-  const setShowSetupModal = useAchievementsStore(state => state.setShowSetupModal);
+  const isSetupModalOpen = useAchievementsStore(state => state.isSetupModalOpen);
+  const openSetupModal = useAchievementsStore(state => state.openSetupModal);
+  const closeSetupModal = useAchievementsStore(state => state.closeSetupModal);
 
   // Solo mostrar si la feature está activa
   if (!hasFeature('sales_pickup_orders')) {
@@ -74,7 +75,7 @@ export default function TakeAwayToggle() {
     logger.debug('Sales', 'Validando requirements TakeAway...');
 
     const results = registry.doAction('achievements.validate_commercial_operation', {
-      capability: 'pickup_counter',
+      capability: 'pickup_orders',
       action: 'takeaway:toggle_public',
       context
     });
@@ -102,7 +103,7 @@ export default function TakeAwayToggle() {
     } else {
       // ❌ VALIDACIÓN FALLIDA - Mostrar modal con requirements faltantes
       setValidationResult(result);
-      setShowSetupModal(true);
+      openSetupModal({ validationResult: result });
 
       logger.warn('Sales', '❌ No se puede activar TakeAway - Faltan configuraciones', {
         missing: result.missingRequirements?.length || 0,
@@ -140,7 +141,7 @@ export default function TakeAwayToggle() {
                   TakeAway Público
                 </Text>
                 {isTakeAwayActive && (
-                  <Badge colorPalette="green" size="sm">
+                  <Badge colorPalette="green" size="sm" data-testid="takeaway-status-badge">
                     Activo
                   </Badge>
                 )}
@@ -152,6 +153,7 @@ export default function TakeAwayToggle() {
           </HStack>
 
           <Switch
+            data-testid="toggle-takeaway-public"
             checked={isTakeAwayActive}
             onCheckedChange={handleToggle}
             colorPalette="green"
@@ -162,8 +164,8 @@ export default function TakeAwayToggle() {
 
       {/* Modal de Setup Requerido */}
       <SetupRequiredModal
-        open={showSetupModal}
-        onClose={() => setShowSetupModal(false)}
+        open={isSetupModalOpen}
+        onClose={closeSetupModal}
         validationResult={validationResult || undefined}
         title="Configuración TakeAway Requerida"
         message="Necesitas completar la configuración básica antes de aceptar pedidos públicos TakeAway."

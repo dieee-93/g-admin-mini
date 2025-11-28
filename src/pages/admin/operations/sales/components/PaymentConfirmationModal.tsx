@@ -17,11 +17,14 @@ import {
   Typography,
   Alert,
   Icon,
-  Field,
-  Input,
+  InputField,
+  NumberField,
+  SelectField,
+  createListCollection,
   NativeSelect,
   Separator
 } from '@/shared/ui';
+import { Field } from '@chakra-ui/react'; // Solo para casos especiales con Field.Root
 import {
   XMarkIcon,
   CheckCircleIcon,
@@ -234,37 +237,28 @@ export function PaymentConfirmationModal({
               {/* PAGO SIMPLE */}
               {paymentMode === 'simple' && (
                 <Stack direction="column" gap="md">
-                  <Field.Root>
-                    <Field.Label>Método de Pago</Field.Label>
-                    <NativeSelect.Root
-                      value={simpleMethod}
-                      onValueChange={(e) => setSimpleMethod(e.value[0] as 'cash' | 'card' | 'transfer')}
-                    >
-                      <NativeSelect.Field>
-                        {PAYMENT_OPTIONS.map(opt => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </NativeSelect.Field>
-                    </NativeSelect.Root>
-                  </Field.Root>
+                  <SelectField
+                    label="Método de Pago"
+                    value={simpleMethod}
+                    onChange={(e) => setSimpleMethod(e.target.value as 'cash' | 'card' | 'transfer')}
+                  >
+                    {PAYMENT_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </SelectField>
 
                   {simpleMethod === 'cash' && (
                     <>
-                      <Field.Root>
-                        <Field.Label>Efectivo Recibido</Field.Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={cashReceived}
-                          onChange={(e) => setCashReceived(e.target.value)}
-                        />
-                        <Field.HelperText>
-                          Ingresa el monto que recibiste del cliente
-                        </Field.HelperText>
-                      </Field.Root>
+                      <NumberField
+                        label="Efectivo Recibido"
+                        placeholder="0.00"
+                        value={cashReceived}
+                        onChange={(e) => setCashReceived(e.target.value)}
+                        helperText="Ingresa el monto que recibiste del cliente"
+                        step={0.01}
+                      />
 
                       {cashChange > 0 && (
                         <Alert status="success" title="Cambio a Entregar">
@@ -303,36 +297,31 @@ export function PaymentConfirmationModal({
                         borderWidth="1px"
                         borderRadius="sm"
                       >
-                        <Field.Root flex="1">
-                          <Field.Label>Método {index + 1}</Field.Label>
-                          <NativeSelect.Root
-                            value={payment.type}
-                            onValueChange={(e) =>
-                              handleUpdatePaymentMethod(payment.id, 'type', e.value[0])
-                            }
-                          >
-                            <NativeSelect.Field>
-                              {PAYMENT_OPTIONS.map(opt => (
-                                <option key={opt.value} value={opt.value}>
-                                  {opt.label}
-                                </option>
-                              ))}
-                            </NativeSelect.Field>
-                          </NativeSelect.Root>
-                        </Field.Root>
+                        <SelectField
+                          label={`Método ${index + 1}`}
+                          value={payment.type}
+                          onChange={(e) =>
+                            handleUpdatePaymentMethod(payment.id, 'type', e.target.value)
+                          }
+                          flex="1"
+                        >
+                          {PAYMENT_OPTIONS.map(opt => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </SelectField>
 
-                        <Field.Root flex="1">
-                          <Field.Label>Monto</Field.Label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            value={payment.amount || ''}
-                            onChange={(e) =>
-                              handleUpdatePaymentMethod(payment.id, 'amount', e.target.value)
-                            }
-                          />
-                        </Field.Root>
+                        <NumberField
+                          label="Monto"
+                          placeholder="0.00"
+                          value={payment.amount || ''}
+                          onChange={(e) =>
+                            handleUpdatePaymentMethod(payment.id, 'amount', e.target.value)
+                          }
+                          flex="1"
+                          step={0.01}
+                        />
 
                         {mixedPayments.length > 1 && (
                           <Button

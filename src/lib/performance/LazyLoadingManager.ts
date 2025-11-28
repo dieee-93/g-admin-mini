@@ -365,8 +365,14 @@ export class LazyLoadingManager {
         const entries = list.getEntries();
         entries.forEach(entry => {
           if (entry.entryType === 'navigation' || entry.entryType === 'resource') {
-            // Process performance entries
-            console.debug('Performance entry:', entry);
+            // Process performance entries silently
+            // 🔇 Removed console.debug to prevent console spam
+            // Previously: console.debug('Performance entry:', entry);
+            
+            // Only log slow resources (> 500ms)
+            if (entry.entryType === 'resource' && entry.duration > 500) {
+              logger.warn('Performance', `Slow resource: ${entry.name} (${Math.round(entry.duration)}ms)`);
+            }
           }
         });
       });
@@ -413,7 +419,8 @@ export class LazyLoadingManager {
   private shouldRetry(error: Error): boolean {
     // Don't retry syntax errors or import failures
     if (error.message.includes('Unexpected token') || 
-        error.message.includes('Failed to fetch')) {
+        error.message.includes('Failed to fetch') ||
+        error.message.includes('ChunkLoadError')) { // ✅ Added: Don't retry webpack chunk errors
       return false;
     }
     return true;

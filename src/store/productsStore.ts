@@ -14,6 +14,7 @@ export interface ProductsState {
   setProducts: (products: ProductWithIntelligence[]) => void;
   addProduct: (product: ProductWithIntelligence) => void;
   updateProduct: (id: string, updates: Partial<ProductWithIntelligence>) => void;
+  togglePublished: (id: string) => void;
   removeProduct: (id: string) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -43,6 +44,12 @@ export const useProductsStore = create<ProductsState>()(
         updateProduct: (id, updates) => set(state => ({
           products: state.products.map(product =>
             product.id === id ? { ...product, ...updates } : product
+          )
+        })),
+        
+        togglePublished: (id) => set(state => ({
+          products: state.products.map(product =>
+            product.id === id ? { ...product, is_published: !product.is_published } : product
           )
         })),
         

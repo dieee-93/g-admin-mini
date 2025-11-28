@@ -19,7 +19,7 @@ import type { Achievement, CapabilityNames, CapabilityIcons } from './types';
 // ============================================
 
 /**
- * TAKEAWAY REQUIREMENTS (Capability: pickup_counter)
+ * TAKEAWAY REQUIREMENTS (Capability: pickup_orders)
  *
  * Requisitos obligatorios para activar TakeAway público.
  * Validación en: Toggle "Aceptar Pedidos TakeAway"
@@ -28,7 +28,7 @@ export const TAKEAWAY_MANDATORY: Achievement[] = [
   {
     id: 'takeaway_business_name',
     tier: 'mandatory',
-    capability: 'pickup_counter',
+    capability: 'pickup_orders',
     name: 'Configurar nombre del negocio',
     description: 'Define el nombre comercial de tu negocio',
     icon: '🏪',
@@ -41,7 +41,7 @@ export const TAKEAWAY_MANDATORY: Achievement[] = [
   {
     id: 'takeaway_address',
     tier: 'mandatory',
-    capability: 'pickup_counter',
+    capability: 'pickup_orders',
     name: 'Configurar dirección del local',
     description: 'Los clientes necesitan saber dónde retirar',
     icon: '📍',
@@ -54,7 +54,7 @@ export const TAKEAWAY_MANDATORY: Achievement[] = [
   {
     id: 'takeaway_pickup_hours',
     tier: 'mandatory',
-    capability: 'pickup_counter',
+    capability: 'pickup_orders',
     name: 'Definir horarios de retiro',
     description: 'Establece cuándo pueden retirar los pedidos',
     icon: '🕐',
@@ -71,7 +71,7 @@ export const TAKEAWAY_MANDATORY: Achievement[] = [
   {
     id: 'takeaway_min_products',
     tier: 'mandatory',
-    capability: 'pickup_counter',
+    capability: 'pickup_orders',
     name: 'Publicar al menos 5 productos',
     description: 'Tu catálogo debe tener productos disponibles',
     icon: '📦',
@@ -87,14 +87,14 @@ export const TAKEAWAY_MANDATORY: Achievement[] = [
   {
     id: 'takeaway_payment_method',
     tier: 'mandatory',
-    capability: 'pickup_counter',
+    capability: 'pickup_orders',
     name: 'Configurar método de pago',
     description: 'Define cómo recibirás los pagos',
     icon: '💳',
     category: 'setup',
     blocksAction: 'takeaway:toggle_public',
     validator: (ctx) => (ctx.paymentMethods?.length || 0) > 0,
-    redirectUrl: '/admin/finance/integrations',
+    redirectUrl: '/admin/settings/payment-methods',
     estimatedMinutes: 10,
   },
 ];
@@ -192,7 +192,7 @@ export const DINEIN_MANDATORY: Achievement[] = [
 ];
 
 /**
- * E-COMMERCE REQUIREMENTS (Capability: online_store)
+ * ASYNC OPERATIONS REQUIREMENTS (Capability: async_operations)
  *
  * Requisitos obligatorios para activar tienda online.
  * Validación en: Toggle "Tienda Pública"
@@ -201,7 +201,7 @@ export const ECOMMERCE_MANDATORY: Achievement[] = [
   {
     id: 'ecommerce_business_name',
     tier: 'mandatory',
-    capability: 'online_store',
+    capability: 'async_operations',
     name: 'Configurar nombre comercial',
     icon: '🏪',
     category: 'setup',
@@ -213,7 +213,7 @@ export const ECOMMERCE_MANDATORY: Achievement[] = [
   {
     id: 'ecommerce_logo',
     tier: 'mandatory',
-    capability: 'online_store',
+    capability: 'async_operations',
     name: 'Subir logo del negocio',
     description: 'Tu tienda necesita identidad visual',
     icon: '🎨',
@@ -226,7 +226,7 @@ export const ECOMMERCE_MANDATORY: Achievement[] = [
   {
     id: 'ecommerce_min_products',
     tier: 'mandatory',
-    capability: 'online_store',
+    capability: 'async_operations',
     name: 'Publicar al menos 10 productos',
     description: 'Una tienda necesita variedad',
     icon: '📦',
@@ -242,7 +242,7 @@ export const ECOMMERCE_MANDATORY: Achievement[] = [
   {
     id: 'ecommerce_payment_gateway',
     tier: 'mandatory',
-    capability: 'online_store',
+    capability: 'async_operations',
     name: 'Integrar pasarela de pago online',
     description: 'MercadoPago, MODO u otra plataforma',
     icon: '💳',
@@ -257,7 +257,7 @@ export const ECOMMERCE_MANDATORY: Achievement[] = [
   {
     id: 'ecommerce_shipping_policy',
     tier: 'mandatory',
-    capability: 'online_store',
+    capability: 'async_operations',
     name: 'Definir política de envío/retiro',
     description: 'Cómo entregarás los productos',
     icon: '🚚',
@@ -270,7 +270,7 @@ export const ECOMMERCE_MANDATORY: Achievement[] = [
   {
     id: 'ecommerce_terms_conditions',
     tier: 'mandatory',
-    capability: 'online_store',
+    capability: 'async_operations',
     name: 'Publicar términos y condiciones',
     description: 'Obligatorio legalmente',
     icon: '📄',
@@ -283,7 +283,7 @@ export const ECOMMERCE_MANDATORY: Achievement[] = [
   {
     id: 'ecommerce_contact_info',
     tier: 'mandatory',
-    capability: 'online_store',
+    capability: 'async_operations',
     name: 'Información de contacto',
     description: 'Email, teléfono para consultas',
     icon: '📞',
@@ -370,6 +370,511 @@ export const DELIVERY_MANDATORY: Achievement[] = [
 ];
 
 /**
+ * PHYSICAL PRODUCTS REQUIREMENTS (Capability: physical_products)
+ *
+ * Requisitos obligatorios para negocios que venden productos físicos.
+ * Validación en: Publicar catálogo / Activar ventas
+ *
+ * ✅ FASE 1: Validar solo stores existentes
+ * TODO FASE 2: Descomentar validaciones de suppliers cuando exista suppliersStore
+ */
+export const PHYSICAL_PRODUCTS_MANDATORY: Achievement[] = [
+  {
+    id: 'physical_business_name',
+    tier: 'mandatory',
+    capability: 'physical_products',
+    name: 'Configurar nombre del negocio',
+    description: 'Define el nombre comercial de tu negocio',
+    icon: '🏪',
+    category: 'setup',
+    blocksAction: 'catalog:publish',
+    validator: (ctx) => !!ctx.profile?.businessName?.trim(),
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 2,
+  },
+  {
+    id: 'physical_min_materials',
+    tier: 'mandatory',
+    capability: 'physical_products',
+    name: 'Registrar al menos 1 material/insumo',
+    description: 'Necesitas materiales para producir tus productos',
+    icon: '📦',
+    category: 'setup',
+    blocksAction: 'catalog:publish',
+    validator: (ctx) => (ctx.materials?.length || 0) >= 1,
+    redirectUrl: '/admin/supply-chain/materials',
+    estimatedMinutes: 5,
+  },
+  {
+    id: 'physical_min_suppliers',
+    tier: 'mandatory',
+    capability: 'physical_products',
+    name: 'Registrar al menos 1 proveedor activo',
+    description: 'Necesitas proveedores para abastecer materiales',
+    icon: '🚚',
+    category: 'setup',
+    blocksAction: 'catalog:publish',
+    validator: (ctx) => (ctx.suppliers?.length || 0) >= 1,
+    redirectUrl: '/admin/supply-chain/suppliers',
+    estimatedMinutes: 5,
+  },
+  {
+    id: 'physical_min_products',
+    tier: 'mandatory',
+    capability: 'physical_products',
+    name: 'Crear al menos 3 productos',
+    description: 'Tu catálogo debe tener productos disponibles',
+    icon: '🍕',
+    category: 'setup',
+    blocksAction: 'catalog:publish',
+    validator: (ctx) => (ctx.products?.length || 0) >= 3,
+    redirectUrl: '/admin/supply-chain/products',
+    estimatedMinutes: 15,
+  },
+  {
+    id: 'physical_payment_method',
+    tier: 'mandatory',
+    capability: 'physical_products',
+    name: 'Configurar método de pago',
+    description: 'Define cómo recibirás los pagos',
+    icon: '💳',
+    category: 'setup',
+    blocksAction: 'catalog:publish',
+    validator: (ctx) => (ctx.paymentMethods?.length || 0) > 0,
+    redirectUrl: '/admin/finance/integrations',
+    estimatedMinutes: 10,
+  },
+];
+
+/**
+ * PROFESSIONAL SERVICES REQUIREMENTS (Capability: professional_services)
+ *
+ * Requisitos obligatorios para negocios de servicios profesionales.
+ * Validación en: Aceptar reservas / Publicar servicios
+ */
+export const PROFESSIONAL_SERVICES_MANDATORY: Achievement[] = [
+  {
+    id: 'services_business_name',
+    tier: 'mandatory',
+    capability: 'professional_services',
+    name: 'Configurar nombre del negocio',
+    icon: '🏪',
+    category: 'setup',
+    blocksAction: 'services:accept_bookings',
+    validator: (ctx) => !!ctx.profile?.businessName?.trim(),
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 2,
+  },
+  {
+    id: 'services_operating_hours',
+    tier: 'mandatory',
+    capability: 'professional_services',
+    name: 'Definir horarios de atención',
+    description: 'Establece cuándo brindas servicios',
+    icon: '🕐',
+    category: 'setup',
+    blocksAction: 'services:accept_bookings',
+    validator: (ctx) => {
+      return (
+        ctx.profile?.operatingHours &&
+        Object.keys(ctx.profile.operatingHours).length > 0
+      );
+    },
+    redirectUrl: '/admin/settings/hours',
+    estimatedMinutes: 5,
+  },
+  {
+    id: 'services_min_professionals',
+    tier: 'mandatory',
+    capability: 'professional_services',
+    name: 'Registrar al menos 1 profesional',
+    description: 'Necesitas profesionales para brindar servicios',
+    icon: '👨‍⚕️',
+    category: 'setup',
+    blocksAction: 'services:accept_bookings',
+    validator: (ctx) => {
+      // Buscar staff con role 'professional' o cualquier staff activo
+      const professionals = ctx.staff?.filter(s =>
+        s.is_active && (s.role === 'professional' || s.role === 'staff')
+      ) || [];
+      return professionals.length >= 1;
+    },
+    redirectUrl: '/admin/resources/staff',
+    estimatedMinutes: 10,
+  },
+  {
+    id: 'services_min_offerings',
+    tier: 'mandatory',
+    capability: 'professional_services',
+    name: 'Publicar al menos 2 servicios',
+    description: 'Define los servicios que ofreces',
+    icon: '💼',
+    category: 'setup',
+    blocksAction: 'services:accept_bookings',
+    validator: (ctx) => {
+      // Filtrar productos tipo 'service' con duración configurada
+      const services = ctx.products?.filter(p =>
+        (p as any).type === 'service' && (p as any).duration_minutes > 0
+      ) || [];
+      return services.length >= 2;
+    },
+    redirectUrl: '/admin/supply-chain/products',
+    estimatedMinutes: 15,
+  },
+  {
+    id: 'services_payment_method',
+    tier: 'mandatory',
+    capability: 'professional_services',
+    name: 'Configurar método de pago',
+    icon: '💳',
+    category: 'setup',
+    blocksAction: 'services:accept_bookings',
+    validator: (ctx) => (ctx.paymentMethods?.length || 0) > 0,
+    redirectUrl: '/admin/finance/integrations',
+    estimatedMinutes: 10,
+  },
+];
+
+/**
+ * ASSET RENTAL REQUIREMENTS (Capability: asset_rental)
+ *
+ * Requisitos obligatorios para negocios de alquiler de activos.
+ * Validación en: Aceptar reservas de alquiler
+ */
+export const ASSET_RENTAL_MANDATORY: Achievement[] = [
+  {
+    id: 'rental_business_name',
+    tier: 'mandatory',
+    capability: 'asset_rental',
+    name: 'Configurar nombre del negocio',
+    icon: '🏪',
+    category: 'setup',
+    blocksAction: 'rental:accept_bookings',
+    validator: (ctx) => !!ctx.profile?.businessName?.trim(),
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 2,
+  },
+  {
+    id: 'rental_min_assets',
+    tier: 'mandatory',
+    capability: 'asset_rental',
+    name: 'Registrar al menos 1 activo disponible',
+    description: 'Necesitas activos para alquilar',
+    icon: '🎬',
+    category: 'setup',
+    blocksAction: 'rental:accept_bookings',
+    validator: (ctx) => (ctx.assets?.length || 0) >= 1,
+    redirectUrl: '/admin/supply-chain/assets',
+    estimatedMinutes: 10,
+  },
+  {
+    id: 'rental_pricing_configured',
+    tier: 'mandatory',
+    capability: 'asset_rental',
+    name: 'Configurar precios de alquiler',
+    description: 'Define tarifas por hora/día/semana en productos',
+    icon: '💰',
+    category: 'setup',
+    blocksAction: 'rental:accept_bookings',
+    validator: (ctx) => {
+      // Verificar que hay productos tipo 'rental' con precio
+      const rentalProducts = ctx.products?.filter(p =>
+        (p as any).type === 'rental' && (p as any).price > 0
+      ) || [];
+      return rentalProducts.length >= 1;
+    },
+    redirectUrl: '/admin/supply-chain/products',
+    estimatedMinutes: 10,
+  },
+  {
+    id: 'rental_contact_info',
+    tier: 'mandatory',
+    capability: 'asset_rental',
+    name: 'Información de contacto completa',
+    description: 'Email y teléfono para consultas de alquiler',
+    icon: '📞',
+    category: 'setup',
+    blocksAction: 'rental:accept_bookings',
+    validator: (ctx) => {
+      return !!ctx.profile?.contactEmail && !!ctx.profile?.contactPhone;
+    },
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 3,
+  },
+];
+
+/**
+ * MEMBERSHIP/SUBSCRIPTIONS REQUIREMENTS (Capability: membership_subscriptions)
+ *
+ * Requisitos obligatorios para negocios de membresías.
+ * Validación en: Aceptar suscripciones
+ */
+export const MEMBERSHIP_MANDATORY: Achievement[] = [
+  {
+    id: 'membership_business_name',
+    tier: 'mandatory',
+    capability: 'membership_subscriptions',
+    name: 'Configurar nombre del negocio',
+    icon: '🏪',
+    category: 'setup',
+    blocksAction: 'membership:accept_subscriptions',
+    validator: (ctx) => !!ctx.profile?.businessName?.trim(),
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 2,
+  },
+  {
+    id: 'membership_min_plans',
+    tier: 'mandatory',
+    capability: 'membership_subscriptions',
+    name: 'Crear al menos 1 plan de membresía',
+    description: 'Define los planes que ofreces',
+    icon: '🎫',
+    category: 'setup',
+    blocksAction: 'membership:accept_subscriptions',
+    validator: (ctx) => {
+      // Verificar productos tipo 'membership'
+      const membershipProducts = ctx.products?.filter(p =>
+        (p as any).type === 'membership'
+      ) || [];
+      return membershipProducts.length >= 1;
+    },
+    redirectUrl: '/admin/supply-chain/products',
+    estimatedMinutes: 15,
+  },
+  {
+    id: 'membership_payment_gateway',
+    tier: 'mandatory',
+    capability: 'membership_subscriptions',
+    name: 'Configurar gateway de pagos recurrentes',
+    description: 'Necesario para cobros automáticos mensuales',
+    icon: '💳',
+    category: 'setup',
+    blocksAction: 'membership:accept_subscriptions',
+    validator: (ctx) => {
+      // Verificar que hay gateway configurado (cualquiera sirve por ahora)
+      return (ctx.paymentGateways?.length || 0) > 0;
+    },
+    redirectUrl: '/admin/finance/integrations',
+    estimatedMinutes: 15,
+  },
+  {
+    id: 'membership_contact_info',
+    tier: 'mandatory',
+    capability: 'membership_subscriptions',
+    name: 'Información de contacto completa',
+    description: 'Email y teléfono para soporte a miembros',
+    icon: '📞',
+    category: 'setup',
+    blocksAction: 'membership:accept_subscriptions',
+    validator: (ctx) => {
+      return !!ctx.profile?.contactEmail && !!ctx.profile?.contactPhone;
+    },
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 3,
+  },
+];
+
+/**
+ * DIGITAL PRODUCTS REQUIREMENTS (Capability: digital_products)
+ *
+ * Requisitos obligatorios para venta de productos digitales.
+ * Validación en: Publicar productos digitales
+ */
+export const DIGITAL_PRODUCTS_MANDATORY: Achievement[] = [
+  {
+    id: 'digital_business_name',
+    tier: 'mandatory',
+    capability: 'digital_products',
+    name: 'Configurar nombre del negocio',
+    icon: '🏪',
+    category: 'setup',
+    blocksAction: 'digital:accept_orders',
+    validator: (ctx) => !!ctx.profile?.businessName?.trim(),
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 2,
+  },
+  {
+    id: 'digital_min_products',
+    tier: 'mandatory',
+    capability: 'digital_products',
+    name: 'Crear al menos 1 producto digital',
+    description: 'Cursos, ebooks, descargas, etc.',
+    icon: '💾',
+    category: 'setup',
+    blocksAction: 'digital:accept_orders',
+    validator: (ctx) => {
+      const digitalProducts = ctx.products?.filter(p =>
+        (p as any).type === 'digital'
+      ) || [];
+      return digitalProducts.length >= 1;
+    },
+    redirectUrl: '/admin/supply-chain/products',
+    estimatedMinutes: 20,
+  },
+  {
+    id: 'digital_payment_gateway',
+    tier: 'mandatory',
+    capability: 'digital_products',
+    name: 'Integrar gateway de pago online',
+    description: 'Necesario para procesar ventas digitales',
+    icon: '💳',
+    category: 'setup',
+    blocksAction: 'digital:accept_orders',
+    validator: (ctx) => {
+      return (ctx.paymentGateways?.length || 0) > 0;
+    },
+    redirectUrl: '/admin/finance/integrations',
+    estimatedMinutes: 15,
+  },
+  {
+    id: 'digital_contact_email',
+    tier: 'mandatory',
+    capability: 'digital_products',
+    name: 'Configurar email de soporte',
+    description: 'Para enviar productos y atender consultas',
+    icon: '📧',
+    category: 'setup',
+    blocksAction: 'digital:accept_orders',
+    validator: (ctx) => !!ctx.profile?.contactEmail,
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 2,
+  },
+];
+
+/**
+ * CORPORATE SALES (B2B) REQUIREMENTS (Capability: corporate_sales)
+ *
+ * Requisitos obligatorios para ventas corporativas B2B.
+ * Validación en: Aceptar pedidos corporativos
+ */
+export const CORPORATE_SALES_MANDATORY: Achievement[] = [
+  {
+    id: 'b2b_business_name',
+    tier: 'mandatory',
+    capability: 'corporate_sales',
+    name: 'Configurar nombre del negocio',
+    icon: '🏪',
+    category: 'setup',
+    blocksAction: 'b2b:accept_corporate_orders',
+    validator: (ctx) => !!ctx.profile?.businessName?.trim(),
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 2,
+  },
+  {
+    id: 'b2b_tax_id',
+    tier: 'mandatory',
+    capability: 'corporate_sales',
+    name: 'Configurar CUIT/datos fiscales',
+    description: 'Necesario para facturación B2B',
+    icon: '🏛️',
+    category: 'setup',
+    blocksAction: 'b2b:accept_corporate_orders',
+    validator: (ctx) => !!ctx.profile?.taxId,
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 5,
+  },
+  {
+    id: 'b2b_min_products',
+    tier: 'mandatory',
+    capability: 'corporate_sales',
+    name: 'Al menos 5 productos en catálogo B2B',
+    description: 'Catálogo mínimo para clientes corporativos',
+    icon: '📦',
+    category: 'setup',
+    blocksAction: 'b2b:accept_corporate_orders',
+    validator: (ctx) => {
+      // Verificar productos disponibles para B2B
+      const b2bProducts = ctx.products?.filter(p =>
+        (p as any).available_online !== false // Si no está excluido de online, puede ser B2B
+      ) || [];
+      return b2bProducts.length >= 5;
+    },
+    redirectUrl: '/admin/supply-chain/products',
+    estimatedMinutes: 20,
+  },
+  {
+    id: 'b2b_contact_info',
+    tier: 'mandatory',
+    capability: 'corporate_sales',
+    name: 'Información de contacto comercial',
+    description: 'Email y teléfono para clientes corporativos',
+    icon: '📞',
+    category: 'setup',
+    blocksAction: 'b2b:accept_corporate_orders',
+    validator: (ctx) => {
+      return !!ctx.profile?.contactEmail && !!ctx.profile?.contactPhone;
+    },
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 3,
+  },
+];
+
+/**
+ * MOBILE OPERATIONS REQUIREMENTS (Capability: mobile_operations)
+ *
+ * Requisitos obligatorios para operaciones móviles (food truck, servicios móviles).
+ * Validación en: Iniciar operación móvil
+ */
+export const MOBILE_OPERATIONS_MANDATORY: Achievement[] = [
+  {
+    id: 'mobile_business_name',
+    tier: 'mandatory',
+    capability: 'mobile_operations',
+    name: 'Configurar nombre del negocio',
+    icon: '🏪',
+    category: 'setup',
+    blocksAction: 'mobile:start_operations',
+    validator: (ctx) => !!ctx.profile?.businessName?.trim(),
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 2,
+  },
+  {
+    id: 'mobile_min_products',
+    tier: 'mandatory',
+    capability: 'mobile_operations',
+    name: 'Al menos 3 productos disponibles',
+    description: 'Catálogo para operación móvil',
+    icon: '📦',
+    category: 'setup',
+    blocksAction: 'mobile:start_operations',
+    validator: (ctx) => (ctx.products?.length || 0) >= 3,
+    redirectUrl: '/admin/supply-chain/products',
+    estimatedMinutes: 15,
+  },
+  {
+    id: 'mobile_contact_phone',
+    tier: 'mandatory',
+    capability: 'mobile_operations',
+    name: 'Teléfono de contacto configurado',
+    description: 'Para que clientes puedan ubicarte',
+    icon: '📱',
+    category: 'setup',
+    blocksAction: 'mobile:start_operations',
+    validator: (ctx) => !!ctx.profile?.contactPhone,
+    redirectUrl: '/admin/settings/business',
+    estimatedMinutes: 2,
+  },
+  {
+    id: 'mobile_operating_hours',
+    tier: 'mandatory',
+    capability: 'mobile_operations',
+    name: 'Definir horarios de operación',
+    description: 'Cuándo estarás disponible',
+    icon: '🕐',
+    category: 'setup',
+    blocksAction: 'mobile:start_operations',
+    validator: (ctx) => {
+      return (
+        ctx.profile?.operatingHours &&
+        Object.keys(ctx.profile.operatingHours).length > 0
+      );
+    },
+    redirectUrl: '/admin/settings/hours',
+    estimatedMinutes: 5,
+  },
+];
+
+/**
  * Todos los requirements mandatory
  */
 export const ALL_MANDATORY_REQUIREMENTS: Achievement[] = [
@@ -377,6 +882,13 @@ export const ALL_MANDATORY_REQUIREMENTS: Achievement[] = [
   ...DINEIN_MANDATORY,
   ...ECOMMERCE_MANDATORY,
   ...DELIVERY_MANDATORY,
+  ...PHYSICAL_PRODUCTS_MANDATORY,
+  ...PROFESSIONAL_SERVICES_MANDATORY,
+  ...ASSET_RENTAL_MANDATORY,
+  ...MEMBERSHIP_MANDATORY,
+  ...DIGITAL_PRODUCTS_MANDATORY,
+  ...CORPORATE_SALES_MANDATORY,
+  ...MOBILE_OPERATIONS_MANDATORY,
 ];
 
 // ============================================
@@ -468,7 +980,7 @@ export const CUMULATIVE_ACHIEVEMENTS: Achievement[] = [
   {
     id: 'cumulative_catalog_10',
     tier: 'cumulative',
-    capability: 'online_store',
+    capability: 'async_operations',
     name: 'Catálogo de 10',
     description: 'Has creado 10 productos',
     icon: '📦',
@@ -479,7 +991,7 @@ export const CUMULATIVE_ACHIEVEMENTS: Achievement[] = [
   {
     id: 'cumulative_catalog_50',
     tier: 'cumulative',
-    capability: 'online_store',
+    capability: 'async_operations',
     name: 'Catálogo amplio',
     description: 'Has creado 50 productos',
     icon: '📚',
@@ -497,32 +1009,34 @@ export const CUMULATIVE_ACHIEVEMENTS: Achievement[] = [
  * Nombres amigables de capabilities (para UI)
  */
 export const CAPABILITY_NAMES: CapabilityNames = {
-  pickup_counter: 'TakeAway',
+  pickup_orders: 'TakeAway',
   onsite_service: 'Dine-In',
-  online_store: 'E-commerce',
+  async_operations: 'Operaciones Async',
   delivery_shipping: 'Delivery',
   corporate_sales: 'B2B',
-  appointment_booking: 'Reservas',
-  subscription_services: 'Suscripciones',
-  rental_services: 'Alquileres',
-  marketplace_aggregator: 'Marketplace',
-  hospitality_lodging: 'Hospedaje',
+  physical_products: 'Productos Físicos',
+  professional_services: 'Servicios Profesionales',
+  asset_rental: 'Alquileres',
+  membership_subscriptions: 'Membresías',
+  digital_products: 'Productos Digitales',
+  mobile_operations: 'Móvil',
 };
 
 /**
  * Iconos de capabilities
  */
 export const CAPABILITY_ICONS: CapabilityIcons = {
-  pickup_counter: '🏪',
+  pickup_orders: '🏪',
   onsite_service: '🍽️',
-  online_store: '🌐',
+  async_operations: '🌙',
   delivery_shipping: '🚚',
   corporate_sales: '🏢',
-  appointment_booking: '📅',
-  subscription_services: '🔄',
-  rental_services: '🎬',
-  marketplace_aggregator: '🛍️',
-  hospitality_lodging: '🏨',
+  physical_products: '📦',
+  professional_services: '💼',
+  asset_rental: '🎬',
+  membership_subscriptions: '🔄',
+  digital_products: '💾',
+  mobile_operations: '🚐',
 };
 
 // ============================================

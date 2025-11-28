@@ -30,7 +30,7 @@ import {
   DialogCloseTrigger,
   Input,
   Textarea,
-  NativeSelect,
+  SelectField,
 } from '@/shared/ui';
 import {
   FolderIcon,
@@ -309,20 +309,20 @@ export function CatalogManagement() {
 
                 <Stack gap="2">
                   <Text fontWeight="medium">Catalog Type</Text>
-                  <NativeSelect.Root
-                    value={formData.type}
+                  <SelectField
+                    options={[
+                      { value: 'default', label: 'Default' },
+                      { value: 'location', label: 'Location-Specific' },
+                      { value: 'tier', label: 'Customer Tier' },
+                      { value: 'season', label: 'Seasonal' },
+                      { value: 'promotion', label: 'Promotional' }
+                    ]}
+                    value={[formData.type]}
                     onValueChange={(details) =>
-                      setFormData({ ...formData, type: details.value })
+                      setFormData({ ...formData, type: details.value[0] })
                     }
-                  >
-                    <NativeSelect.Field>
-                      <option value="default">Default</option>
-                      <option value="location">Location-Specific</option>
-                      <option value="tier">Customer Tier</option>
-                      <option value="season">Seasonal</option>
-                      <option value="promotion">Promotional</option>
-                    </NativeSelect.Field>
-                  </NativeSelect.Root>
+                    noPortal
+                  />
                 </Stack>
               </Stack>
             </DialogBody>

@@ -1,0 +1,41 @@
+{
+  "cookies": [
+    {
+      "name": "g-admin-auth-token",
+      "value": "base64-eyJhY2Nlc3NfdG9rZW4iOiJleUpoYkdjaU9pSklVekkxTmlJc0ltdHBaQ0k2SWs1Vk1XSkpWazlJWVZGUGFVNU9ZVFVpTENKMGVYQWlPaUpLVjFRaWZRLmV5SmhZV3dpT2lKaFlXd3hJaXdpWVcxeUlqcGJleUp0WlhSb2IyUWlPaUp3WVhOemQyOXlaQ0lzSW5ScGJXVnpkR0Z0Y0NJNk1UYzJNek0wTXpNd09YMWRMQ0poY0hCZmJXVjBZV1JoZEdFaU9uc2ljSEp2ZG1sa1pYSWlPaUpuTFdGa2JXbHVJaXdpY205c1pWOXpiM1Z5WTJVaU9pSmtZWFJoWW1GelpTSjlMQ0poZFdRaU9pSmhkWFJvWlc1MGFXTmhkR1ZrSWl3aVpXMWhhV3dpT2lKa2FXVmxaUzQ1TTBCbmJXRnBiQzVqYjIwaUxDSmxlSEFpT2pFM05qTXpORFk1TURrc0ltbGhkQ0k2TVRjMk16TTBNek13T1N3aWFYTmZZV04wYVhabElqcDBjblZsTENKcGMxOWhibTl1ZVcxdmRYTWlPbVpoYkhObExDSnBjM01pT2lKb2RIUndjem92TDI5amQycHlhM2hxZDNGdGVIWm9ZMnRuZEhWa0xuTjFjR0ZpWVhObExtTnZMMkYxZEdndmRqRWlMQ0p3YUc5dVpTSTZJaUlzSW5KdmJHVWlPaUpoZFhSb1pXNTBhV05oZEdWa0lpd2ljbTlzWlY5MWNHUmhkR1ZrWDJGMElqb3hOell6TXpRek16QTVMakF6TWl3aWMyVnpjMmx2Ymw5cFpDSTZJakUwTXpBMFl6RTRMVFExT0RndE5ERTVaaTA1Wm1VeUxXSTJNVEJrTmpjNU0ySXlPQ0lzSW5OMVlpSTZJbUkwTWpNMlpUSmlMVE14TVdZdE5HWmtZaTFpTnpJM0xUZGxabUZoTjJWbE1UZzVZeUlzSW5WelpYSmZiV1YwWVdSaGRHRWlPbnNpWlcxaGFXd2lPaUprYVdWbFpTNDVNMEJuYldGcGJDNWpiMjBpTENKbGJXRnBiRjkyWlhKcFptbGxaQ0k2ZEhKMVpTd2lablZzYkY5dVlXMWxJam9pUkdsbFoyOGdVMjl5YnlJc0luQm9iMjVsWDNabGNtbG1hV1ZrSWpwbVlXeHpaU3dpYzNWaUlqb2lZalF5TXpabE1tSXRNekV4WmkwMFptUmlMV0kzTWpjdE4yVm1ZV0UzWldVeE9EbGpJbjBzSW5WelpYSmZjbTlzWlNJNklsTlZVRVZTWDBGRVRVbE9JbjAuVUZzb3ctbW9QMnR5bXVOMjVyOV82bW9iaE5mZkxiTHRSOVZ1YkJoRS1YOCIsInRva2VuX3R5cGUiOiJiZWFyZXIiLCJleHBpcmVzX2luIjozNjAwLCJleHBpcmVzX2F0IjoxNzYzMzQ2OTA5LCJyZWZyZXNoX3Rva2VuIjoiYXBieGthaDZzbGNhIiwidXNlciI6eyJpZCI6ImI0MjM2ZTJiLTMxMWYtNGZkYi1iNzI3LTdlZmFhN2VlMTg5YyIsImF1ZCI6ImF1dGhlbnRpY2F0ZWQiLCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImVtYWlsIjoiZGllZWUuOTNAZ21haWwuY29tIiwiZW1haWxfY29uZmlybWVkX2F0IjoiMjAyNS0wOC0yMVQwMjozNzoxMS41MjYwMDVaIiwicGhvbmUiOiIiLCJjb25maXJtYXRpb25fc2VudF9hdCI6IjIwMjUtMDgtMjFUMDI6MzU6MzguMjc3Nzc0WiIsImNvbmZpcm1lZF9hdCI6IjIwMjUtMDgtMjFUMDI6Mzc6MTEuNTI2MDA1WiIsImxhc3Rfc2lnbl9pbl9hdCI6IjIwMjUtMTEtMTdUMDE6MzU6MDkuMDY0MTE3MzcyWiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsIjoiZGllZWUuOTNAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IkRpZWdvIFNvcm8iLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImI0MjM2ZTJiLTMxMWYtNGZkYi1iNzI3LTdlZmFhN2VlMTg5YyJ9LCJpZGVudGl0aWVzIjpbeyJpZGVudGl0eV9pZCI6IjZiN2Y2Mjg1LTUwZGEtNGVhMS1iYzU4LWM4MWU1NmU1NzI3NCIsImlkIjoiYjQyMzZlMmItMzExZi00ZmRiLWI3MjctN2VmYWE3ZWUxODljIiwidXNlcl9pZCI6ImI0MjM2ZTJiLTMxMWYtNGZkYi1iNzI3LTdlZmFhN2VlMTg5YyIsImlkZW50aXR5X2RhdGEiOnsiZW1haWwiOiJkaWVlZS45M0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZnVsbF9uYW1lIjoiRGllZ28gU29ybyIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiYjQyMzZlMmItMzExZi00ZmRiLWI3MjctN2VmYWE3ZWUxODljIn0sInByb3ZpZGVyIjoiZW1haWwiLCJsYXN0X3NpZ25faW5fYXQiOiIyMDI1LTA4LTIxVDAyOjM1OjM4LjI2MDMwOFoiLCJjcmVhdGVkX2F0IjoiMjAyNS0wOC0yMVQwMjozNTozOC4yNjE1NTdaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDgtMjFUMDI6MzU6MzguMjYxNTU3WiIsImVtYWlsIjoiZGllZWUuOTNAZ21haWwuY29tIn1dLCJjcmVhdGVkX2F0IjoiMjAyNS0wOC0yMVQwMjozNTozOC4yMjQ1OTVaIiwidXBkYXRlZF9hdCI6IjIwMjUtMTEtMTdUMDE6MzU6MDkuMTMxNTA1WiIsImlzX2Fub255bW91cyI6ZmFsc2V9LCJ3ZWFrX3Bhc3N3b3JkIjpudWxsfQ",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1797903308.850566,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:5173",
+      "localStorage": [
+        {
+          "name": "react-scan-widget-settings-v2",
+          "value": "{\"corner\":\"bottom-right\",\"dimensions\":{\"isFullWidth\":false,\"isFullHeight\":false,\"width\":550,\"height\":350,\"position\":{\"x\":24,\"y\":24}},\"lastDimensions\":{\"isFullWidth\":false,\"isFullHeight\":false,\"width\":550,\"height\":350,\"position\":{\"x\":24,\"y\":24}},\"componentsTree\":{\"width\":240}}"
+        },
+        {
+          "name": "capability-store-v4",
+          "value": "{\"state\":{\"profile\":null,\"features\":{\"activeFeatures\":[],\"blockedFeatures\":[],\"pendingMilestones\":[],\"completedMilestones\":[],\"validationErrors\":[],\"activeSlots\":[]}},\"version\":4}"
+        },
+        {
+          "name": "react-scan-options",
+          "value": "{\"enabled\":true,\"log\":true,\"showToolbar\":true,\"animationSpeed\":\"fast\",\"dangerouslyForceRunInProduction\":false,\"showFPS\":true,\"showNotificationCount\":true,\"allowInIframe\":false}"
+        },
+        {
+          "name": "selected_location_id",
+          "value": "2d7b2e3b-bea3-462c-90b8-34b83f1e843d"
+        },
+        {
+          "name": "react-scan-notifications-audio",
+          "value": "false"
+        }
+      ]
+    }
+  ]
+}

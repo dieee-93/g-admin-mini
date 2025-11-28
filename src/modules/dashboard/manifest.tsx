@@ -104,7 +104,7 @@ export const dashboardManifest: ModuleManifest = {
   /**
    * Setup function - register hook handlers
    */
-  setup: async () => {
+  setup: async (registry) => {
     logger.info('App', '🏠 Setting up Dashboard module');
 
     try {
@@ -112,7 +112,87 @@ export const dashboardManifest: ModuleManifest = {
       // The actual widget rendering is handled by the Dashboard page component
       // which uses HookPoint to render all registered widgets
 
+
+      // ============================================
+      // DASHBOARD CHART WIDGETS
+      // ============================================
+
+      /**
+       * Hook: dashboard.widgets
+       * Inyecta charts en el dashboard principal
+       */
+      const {
+        QuickActionsWidget,
+        ActivityFeedWidget,
+        SalesTrendChartWidget,
+        DistributionChartWidget,
+        RevenueAreaChartWidget,
+        MetricsBarChartWidget
+      } = await import('./widgets');
+
+      // ============================================
+      // ACTION WIDGETS (Top priority)
+      // ============================================
+
+      // Quick Actions Grid (priority: 105)
+      registry.addAction(
+        'dashboard.widgets',
+        () => <QuickActionsWidget key="quick-actions" />,
+        'dashboard',
+        105
+      );
+
+      // ============================================
+      // CHART WIDGETS (Medium priority)
+      // ============================================
+
+      // Sales Trend Chart (col-span 8)
+      registry.addAction(
+        'dashboard.widgets',
+        () => <SalesTrendChartWidget key="sales-trend-chart" />,
+        'dashboard',
+        80
+      );
+
+      // Distribution Chart (col-span 4)
+      registry.addAction(
+        'dashboard.widgets',
+        () => <DistributionChartWidget key="distribution-chart" />,
+        'dashboard',
+        79
+      );
+
+      // Revenue Area Chart (col-span 7)
+      registry.addAction(
+        'dashboard.widgets',
+        () => <RevenueAreaChartWidget key="revenue-area-chart" />,
+        'dashboard',
+        70
+      );
+
+      // Metrics Bar Chart (col-span 5)
+      registry.addAction(
+        'dashboard.widgets',
+        () => <MetricsBarChartWidget key="metrics-bar-chart" />,
+        'dashboard',
+        69
+      );
+
+      // ============================================
+      // ACTIVITY WIDGETS (Lower priority)
+      // ============================================
+
+      // Activity Feed (priority: 50)
+      registry.addAction(
+        'dashboard.widgets',
+        () => <ActivityFeedWidget key="activity-feed" />,
+        'dashboard',
+        50
+      );
+
+      logger.debug('App', 'Registered dashboard.widgets hooks (6 total: 1 action + 4 charts + 1 activity)');
       logger.info('App', '✅ Dashboard module setup complete', {
+        widgetsInjected: 6,
         hooksProvided: 4,
         hooksConsumed: 5,
       });

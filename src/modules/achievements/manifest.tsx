@@ -24,6 +24,7 @@
 import React, { lazy } from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
+import { ModuleRegistry } from '@/lib/modules';
 import type { BusinessCapabilityId } from '@/config/types';
 import type {
   Achievement,
@@ -51,6 +52,8 @@ export const achievementsManifest: ModuleManifest = {
   id: 'achievements',
   name: 'Achievements & Requirements System',
   version: '1.0.0',
+
+  permissionModule: 'gamification', // ✅ Uses 'gamification' permission
 
   // ============================================
   // DEPENDENCIES
@@ -423,7 +426,6 @@ export const achievementsManifest: ModuleManifest = {
       capability: BusinessCapabilityId,
       context: ValidationContext
     ): CapabilityProgress => {
-      const { ModuleRegistry } = require('@/lib/modules');
       const registry = ModuleRegistry.getInstance();
 
       const results = registry.doAction('achievements.get_progress', {
@@ -449,7 +451,6 @@ export const achievementsManifest: ModuleManifest = {
       capability: BusinessCapabilityId,
       context: ValidationContext
     ): boolean => {
-      const { ModuleRegistry } = require('@/lib/modules');
       const registry = ModuleRegistry.getInstance();
 
       const results = registry.doAction('achievements.get_progress', {

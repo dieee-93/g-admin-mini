@@ -2,7 +2,7 @@
 // 🎯 COMPONENTE UNIFICADO DE BADGE DE ALERTAS - OPTIMIZED FOR PERFORMANCE
 // Reemplaza AlertsBadge y todas sus variantes
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import {
   HStack,
   Badge,
@@ -18,6 +18,8 @@ import {
   FireIcon
 } from '@heroicons/react/24/outline';
 import { useAlertsBadge, UseAlertsOptions } from '../hooks/useAlerts';
+import { useAlertsBadgeOptimized } from '../hooks/useAlertsBadgeOptimized';
+import { useAlertsActions } from '../AlertsProvider';
 
 export interface AlertBadgeProps extends UseAlertsOptions {
   variant?: 'minimal' | 'detailed' | 'counter-only' | 'icon-only';
@@ -83,8 +85,8 @@ export const AlertBadge = memo(function AlertBadge({
     [showAnimation, hasCritical]
   );
 
-  // Si no hay alertas, no mostrar nada (a menos que sea explícitamente forzado)
-  if (!shouldShow) {
+  // Si no hay alertas, no mostrar nada EXCEPTO para icon-only (siempre visible)
+  if (!shouldShow && variant !== 'icon-only') {
     return null;
   }
 
@@ -113,14 +115,24 @@ export const AlertBadge = memo(function AlertBadge({
         cursor={onClick ? 'pointer' : 'default'}
         onClick={onClick}
         className={className}
+        padding="2"
+        borderRadius="md"
+        transition="all 0.2s"
+        _hover={onClick ? { 
+          bg: 'gray.100',
+          transform: 'scale(1.05)'
+        } : {}}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
       >
         {icon}
         
         {count > 0 && (
           <Badge
             position="absolute"
-            top="-2"
-            right="-2"
+            top="0"
+            right="0"
             colorPalette={color}
             variant="solid"
             fontSize="xs"
@@ -131,6 +143,7 @@ export const AlertBadge = memo(function AlertBadge({
             alignItems="center"
             justifyContent="center"
             style={pulseAnimation}
+            pointerEvents="none"
           >
             {count > 99 ? '99+' : count}
           </Badge>
@@ -232,37 +245,74 @@ export const AlertBadge = memo(function AlertBadge({
 
 /**
  * 🎯 Badge para navegación principal - OPTIMIZED
+ * @param openNotificationCenter - Si es true, abre automáticamente el NotificationCenter al hacer click
+ * @param onClick - Handler personalizado (si openNotificationCenter es true, este se ignora)
  */
 export const NavAlertBadge = memo(function NavAlertBadge({ 
-  onClick 
+  onClick,
+  openNotificationCenter = false
 }: { 
-  onClick?: () => void 
+  onClick?: () => void;
+  openNotificationCenter?: boolean;
 }) {
+  const actions = useAlertsActions();
+  
+  // 🚀 PERFORMANCE: Use optimized hook that only re-renders when stats change
+  const badgeData = useAlertsBadgeOptimized();
+  
+  const handleClick = useCallback(() => {
+    console.log('[NavAlertBadge] Click detected', { openNotificationCenter, hasCustomOnClick: !!onClick });
+    
+    if (openNotificationCenter) {
+      console.log('[NavAlertBadge] Opening NotificationCenter');
+      actions.openNotificationCenter();
+    } else if (onClick) {
+      console.log('[NavAlertBadge] Calling custom onClick');
+      onClick();
+    }
+  }, [openNotificationCenter, onClick, actions]);
+  
   return (
     <AlertBadge 
       variant="icon-only"
       size="sm"
-      onClick={onClick}
+      onClick={handleClick}
       showAnimation={true}
+      // Pass badgeData directly to avoid hook call inside AlertBadge
+      {...badgeData}
     />
   );
 });
 
 /**
  * 🎯 Badge para sidebar - OPTIMIZED
+ * @param openNotificationCenter - Si es true, abre automáticamente el NotificationCenter al hacer click
+ * @param onClick - Handler personalizado (si openNotificationCenter es true, este se ignora)
  */
 export const SidebarAlertBadge = memo(function SidebarAlertBadge({ 
-  onClick 
+  onClick,
+  openNotificationCenter = false
 }: { 
-  onClick?: () => void 
+  onClick?: () => void;
+  openNotificationCenter?: boolean;
 }) {
+  const actions = useAlertsActions();
+  
+  const handleClick = useCallback(() => {
+    if (openNotificationCenter) {
+      actions.openNotificationCenter();
+    } else if (onClick) {
+      onClick();
+    }
+  }, [openNotificationCenter, onClick, actions]);
+  
   return (
     <AlertBadge 
       variant="minimal"
       size="sm"
       showIcon={true}
       showText={true}
-      onClick={onClick}
+      onClick={handleClick}
     />
   );
 });

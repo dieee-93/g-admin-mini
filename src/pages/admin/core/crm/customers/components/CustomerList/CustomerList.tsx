@@ -2,7 +2,7 @@
 // MIGRATED: Now uses centralized financial calculations
 import {
   Stack,
-  CardWrapper ,
+  CardWrapper,
   Typography,
   Button,
   Badge,
@@ -13,18 +13,25 @@ import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations
 // TODO: Implement virtualization for large customer lists (1000+ records)
 // import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
 import { useState } from 'react';
+import { useCustomersStore } from '@/store/customersStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useCustomers, useCustomerSearch } from '../../hooks/existing/useCustomers';
-import { type Customer } from '../../types';
+import { type Customer } from '../../types/customer';
 import { CustomerForm } from '../CustomerForm/CustomerForm';
 import { notify } from '@/lib/notifications';
 
 export function CustomerList() {
-  const { customers, customersWithStats, loading, loadingStats, removeCustomer } = useCustomers();
+  const { customers, loading, loadingStats, removeCustomer } = useCustomers();
   const { searchResults, loading: searchLoading, query, search, clearSearch } = useCustomerSearch();
 
-  
+  // ✅ ENTERPRISE PATTERN: Modal state from store
+  const isModalOpen = useCustomersStore((state) => state.isModalOpen);
+  const currentCustomer = useCustomersStore((state) => state.currentCustomer);
+  const openModal = useCustomersStore((state) => state.openModal);
+  const closeModal = useCustomersStore((state) => state.closeModal);
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  // const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null); // Removed local state
   const [showStats, setShowStats] = useState(false);
 
   if (loading) return (
@@ -46,8 +53,8 @@ export function CustomerList() {
       try {
         await search(value);
       } catch {
-        notify.error({title: 'ERROR', description:'Error buscando clientes'});
-        
+        notify.error({ title: 'ERROR', description: 'Error buscando clientes' });
+
       }
     } else {
       clearSearch();
@@ -61,42 +68,42 @@ export function CustomerList() {
 
     try {
       await removeCustomer(customer.id);
-  
-      notify.success({title: 'CLIENT_DELETED', description:'Cliente eliminado correctamente'})
-    
+
+      notify.success({ title: 'CLIENT_DELETED', description: 'Cliente eliminado correctamente' })
+
     } catch {
-       notify.error({title: 'ERROR', description:'Error eliminando cliente'})
+      notify.error({ title: 'ERROR', description: 'Error eliminando cliente' })
 
     }
   };
 
   const handleEdit = (customer: Customer) => {
-    setEditingCustomer(customer);
+    // Customer now has unified type, no casting needed
+    openModal('edit', customer);
   };
 
   const handleEditSuccess = () => {
-    setEditingCustomer(null);
+    closeModal();
   };
 
   const handleEditCancel = () => {
-    setEditingCustomer(null);
+    closeModal();
   };
 
   // Determinar qué lista mostrar
   const displayCustomers = query ? searchResults : customers;
-  const displayCustomersWithStats = query ? [] : customersWithStats;
 
   return (
     <Stack p="lg">
       {/* Modal de edición */}
-      {editingCustomer && (
-        <Stack 
-          position="fixed" 
-          top="0" 
-          left="0" 
-          right="0" 
-          bottom="0" 
-          bg="blackAlpha.600" 
+      {isModalOpen && currentCustomer && (
+        <Stack
+          position="fixed"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          bg="blackAlpha.600"
           zIndex="overlay"
           direction="row"
           align="center"
@@ -105,8 +112,8 @@ export function CustomerList() {
         >
           <CardWrapper padding="md" width="full">
             <div style={{ maxWidth: '600px', maxHeight: '90vh', overflow: 'auto' }}>
-              <CustomerForm 
-                customer={editingCustomer}
+              <CustomerForm
+                customer={currentCustomer}
                 onSuccess={handleEditSuccess}
                 onCancel={handleEditCancel}
               />
@@ -122,7 +129,7 @@ export function CustomerList() {
             👥 Gestión de Clientes
           </Typography>
           <Stack direction="row" gap="md">
-            <Badge colorPalette="accent" variant="subtle">
+            <Badge colorPalette="blue" variant="subtle">
               {customers.length} clientes
             </Badge>
             {showStats && !loadingStats && (
@@ -162,9 +169,9 @@ export function CustomerList() {
             }}
           />
           {query && (
-            <Button 
-              size="sm" 
-              variant="ghost" 
+            <Button
+              size="sm"
+              variant="ghost"
               onClick={() => {
                 setSearchQuery('');
                 clearSearch();
@@ -175,7 +182,7 @@ export function CustomerList() {
           )}
           {searchLoading && <Typography size="sm">⏳</Typography>}
         </Stack>
-        
+
         {query && (
           <Typography size="sm" color="text.muted" mt="xs">
             Mostrando {searchResults.length} resultado(s) para "{query}"
@@ -221,8 +228,7 @@ export function CustomerList() {
           </Table.Header>
           <Table.Body>
             {displayCustomers.map((customer) => {
-              const customerWithStats = displayCustomersWithStats.find(c => c.id === customer.id);
-              
+
               return (
                 <Table.Row key={customer.id}>
                   <Table.Cell>
@@ -233,7 +239,7 @@ export function CustomerList() {
                       </Typography>
                     </Stack>
                   </Table.Cell>
-                  
+
                   <Table.Cell>
                     <Stack direction="column" align="start" gap="xs">
                       {customer.phone && (
@@ -247,45 +253,45 @@ export function CustomerList() {
                       )}
                     </Stack>
                   </Table.Cell>
-                  
+
                   <Table.Cell>
                     <Typography size="sm">
                       {customer.address || '-'}
                     </Typography>
                   </Table.Cell>
-                  
+
                   {showStats && !query && (
                     <>
                       <Table.Cell>
                         <Stack direction="column" align="start" gap="none">
                           <Typography fontWeight="medium">
-                            {customerWithStats?.stats?.purchase_count || 0}
+                            {customer.total_orders || 0}
                           </Typography>
                           <Typography size="xs" color="text.muted">
                             compras
                           </Typography>
                         </Stack>
                       </Table.Cell>
-                      
+
                       <Table.Cell>
                         <Stack direction="column" align="start" gap="none">
                           <Typography fontWeight="medium" >
-                            {QuickCalculations.formatCurrency(customerWithStats?.stats?.total_spent || 0)}
+                            {QuickCalculations.formatCurrency(customer.total_spent || 0)}
                           </Typography>
                           <Typography size="xs" color="text.muted">
                             total
                           </Typography>
                         </Stack>
                       </Table.Cell>
-                      
+
                       <Table.Cell>
                         <Typography size="sm">
-                          {formatDate(customerWithStats?.stats?.last_purchase_date)}
+                          {formatDate(customer.last_order_date)}
                         </Typography>
                       </Table.Cell>
                     </>
                   )}
-                  
+
                   <Table.Cell>
                     <Stack direction="row" gap="xs">
                       <Button
@@ -296,7 +302,7 @@ export function CustomerList() {
                       >
                         ✏️
                       </Button>
-                      
+
                       <Button
                         size="xs"
                         colorPalette="red"
@@ -317,7 +323,7 @@ export function CustomerList() {
       {/* Información adicional */}
       {!query && showStats && !loadingStats && (
         <Alert variant="subtle">
-          Las estadísticas muestran datos basados en las ventas registradas. 
+          Las estadísticas muestran datos basados en las ventas registradas.
           Activa el módulo de ventas para obtener información más detallada.
         </Alert>
       )}

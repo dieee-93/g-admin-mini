@@ -11,7 +11,8 @@ import {
 import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsStore } from '@/store/materialsStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useDebounce } from '@/shared/hooks';
 import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
@@ -31,10 +32,12 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
   excludeIds = [],
   filterByStock = true
 }) => {
-  const { items, loading } = useMaterials();
+  // ✅ FIX: Use atomic selectors to prevent re-renders when modal state changes
+  const items = useMaterialsStore(useShallow(state => state.items));
+  const loading = useMaterialsStore(state => state.loading);
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const debouncedQuery = useDebounce(query, 300);
 
   // Helper functions - now using centralized StockCalculation
@@ -44,7 +47,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
 
   const getDisplayText = useCallback((material: MaterialItem): string => {
     const stock = material.stock || 0;
-    
+
     if (material.type === 'MEASURABLE') {
       const measurable = material as MeasurableItem;
       return `${stock} ${measurable.unit}`;
@@ -102,7 +105,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
           onFocus={() => query && setIsOpen(filteredMaterials.length > 0)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
         />
-        
+
         <Box
           position="absolute"
           right="3"
@@ -113,12 +116,12 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
           {loading ? (
             <Spinner size="sm" />
           ) : (
-            <MagnifyingGlassIcon 
-              style={{ 
-                width: '16px', 
-                height: '16px', 
-                color: 'var(--chakra-colors-gray-400)' 
-              }} 
+            <MagnifyingGlassIcon
+              style={{
+                width: '16px',
+                height: '16px',
+                color: 'var(--chakra-colors-gray-400)'
+              }}
             />
           )}
         </Box>
@@ -153,7 +156,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
                   <Box fontSize="lg">
                     {getTypeIcon(material.type)}
                   </Box>
-                  
+
                   <Stack gap="0" flex="1" minW="0">
                     <Text fontWeight="medium" noOfLines={1}>
                       {material.name}
@@ -189,7 +192,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
         >
           <CardWrapper.Body p="4" textAlign="center">
             <Text fontSize="sm" color="gray.600">
-              {filterByStock 
+              {filterByStock
                 ? 'No se encontraron materiales con stock disponible'
                 : 'No se encontraron materiales'
               }

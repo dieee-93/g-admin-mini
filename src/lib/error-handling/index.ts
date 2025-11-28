@@ -12,3 +12,4 @@ export {
 
 export { useErrorHandler } from './useErrorHandler';
 export { ErrorBoundary } from './ErrorBoundary';
+export { ErrorBoundaryWrapper } from './ErrorBoundaryWrapper';

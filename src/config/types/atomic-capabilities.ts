@@ -20,19 +20,23 @@
  * Cada capability activa un conjunto específico de features.
  */
 export type BusinessCapabilityId =
-  // FULFILLMENT METHODS (Métodos de entrega/consumo)
+  // CORE BUSINESS MODELS (Sección 1 - Lo que ofreces)
+  | 'physical_products'      // Productos físicos (comida, retail, manufactura)
+  | 'professional_services'  // Servicios profesionales (consultoría, salud, belleza)
+  | 'asset_rental'           // Alquiler de activos (equipos, espacios, vehículos)
+  | 'membership_subscriptions' // Membresías y suscripciones recurrentes
+  | 'digital_products'       // Productos digitales descargables
+
+  // FULFILLMENT METHODS (Sección 2 - Cómo entregas)
   | 'onsite_service'         // Servicio/consumo en el local (mesas, cabinas)
   | 'pickup_orders'          // Cliente retira pedidos en local
   | 'delivery_shipping'      // Envío a domicilio del cliente
 
-  // PRODUCTION CAPABILITY (Transformación de materiales)
-  | 'production_workflow'   // Production/assembly/preparation workflows
+  // ❌ ELIMINADO: production_workflow (se auto-activa con physical_products en FeatureActivationEngine)
+  // ❌ ELIMINADO: appointment_based (se auto-activa con professional_services en FeatureActivationEngine)
 
-  // SERVICE MODES (Modos de servicio)
-  | 'appointment_based'      // Servicios con cita previa (agendamiento)
-
-  // SPECIAL OPERATIONS (Operaciones especiales)
-  | 'online_store'       // E-commerce 24/7 (was: async_operations)
+  // SPECIAL OPERATIONS (Sección 4 - Potenciadores)
+  | 'async_operations'           // Operaciones asíncronas fuera de horario (was: online_store)
   | 'corporate_sales'        // Ventas corporativas B2B
   | 'mobile_operations';     // Operaciones móviles (food truck, servicios a domicilio)
 
@@ -45,8 +49,8 @@ export type BusinessCapabilityId =
 export type InfrastructureId =
   | 'single_location'   // Local único fijo
   | 'multi_location'    // Múltiples locales (cadena/franquicia)
-  | 'mobile_business'   // Negocio móvil (food truck, servicios móviles)
-  | 'online_only';      // Solo online (sin presencia física)
+  | 'mobile_business';  // Negocio móvil (food truck, servicios móviles)
+  // ❌ ELIMINADO: online_only (redundante - se logra con delivery + ecommerce sin local)
 
 /**
  * User Choice ID - Union type de todas las opciones seleccionables
@@ -141,6 +145,18 @@ export type FeatureId =
   | 'production_capacity_planning'  // Nueva 2024
 
   // ============================================
+  // PRODUCTS DOMAIN (7 features)
+  // ============================================
+
+  | 'products_recipe_management'
+  | 'products_catalog_menu'
+  | 'products_catalog_ecommerce'
+  | 'products_package_management'
+  | 'products_availability_calculation'
+  | 'products_cost_intelligence'
+  | 'products_dynamic_materials'
+
+  // ============================================
   // OPERATIONS DOMAIN (15 features)
   // ============================================
 
@@ -225,7 +241,48 @@ export type FeatureId =
   | 'staff_time_tracking'
   | 'staff_performance_tracking'
   | 'staff_training_management'
-  | 'staff_labor_cost_tracking';
+  | 'staff_labor_cost_tracking'
+
+  // ============================================
+  // RENTAL DOMAIN (5 features)
+  // ============================================
+
+  | 'rental_item_management'
+  | 'rental_booking_calendar'
+  | 'rental_availability_tracking'
+  | 'rental_pricing_by_duration'
+  | 'rental_late_fees'
+
+  // ============================================
+  // MEMBERSHIP DOMAIN (5 features)
+  // ============================================
+
+  | 'membership_subscription_plans'
+  | 'membership_recurring_billing'
+  | 'membership_access_control'
+  | 'membership_usage_tracking'
+  | 'membership_benefits_management'
+
+  // ============================================
+  // DIGITAL PRODUCTS DOMAIN (4 features)
+  // ============================================
+
+  | 'digital_file_delivery'
+  | 'digital_license_management'
+  | 'digital_download_tracking'
+  | 'digital_version_control'
+
+  // ============================================
+  // CORE DOMAIN (7 features)
+  // ============================================
+
+  | 'customers'
+  | 'dashboard'
+  | 'settings'
+  | 'gamification'
+  | 'debug'
+  | 'executive'
+  | 'can_view_menu_engineering';
 
 // ============================================
 // CONFIGURATION INTERFACES
@@ -330,6 +387,7 @@ export interface Feature {
     | 'SALES'
     | 'INVENTORY'
     | 'PRODUCTION'
+    | 'PRODUCTS'
     | 'OPERATIONS'
     | 'SCHEDULING'
     | 'CUSTOMER'
@@ -337,7 +395,10 @@ export interface Feature {
     | 'MOBILE'
     | 'MULTISITE'
     | 'ANALYTICS'
-    | 'STAFF'; // Added for HR module integration
+    | 'STAFF'
+    | 'RENTAL'      // Added for rental/asset management
+    | 'MEMBERSHIP'  // Added for membership/subscription systems
+    | 'DIGITAL';    // Added for digital products
 
   /**
    * Tipo de feature según su función

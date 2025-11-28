@@ -100,6 +100,47 @@ export interface ValidationContext {
   loyaltyProgram?: {
     active: boolean;
   };
+
+  // ============================================
+  // NEW FIELDS FOR ADDITIONAL CAPABILITIES
+  // ============================================
+
+  // Materials/Inventory (for physical_products)
+  // ✅ IMPLEMENTED: materialsStore exists
+  materials?: Array<{
+    id: string;
+    name: string;
+    type: 'MEASURABLE' | 'COUNTABLE' | 'ELABORATED';
+  }>;
+
+  // Assets (for asset_rental)
+  // ✅ IMPLEMENTED: assetsStore exists
+  assets?: Array<{
+    id: string;
+    name: string;
+    is_available?: boolean;
+  }>;
+
+  // Suppliers (for physical_products)
+  // ✅ IMPLEMENTED: suppliersStore exists
+  suppliers?: Array<{
+    id: string;
+    name: string;
+    is_active: boolean;
+  }>;
+
+  // TODO FASE 2: Implementar estos stores y descomentar en useValidationContext
+  // appointments?: Array<{
+  //   id: string;
+  //   professional_id?: string;
+  //   duration_minutes?: number;
+  // }>;
+
+  // membershipPlans?: Array<{
+  //   id: string;
+  //   name: string;
+  //   recurring_billing?: boolean;
+  // }>;
 }
 
 // ============================================

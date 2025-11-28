@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import {
   Box,
-  Field,
+  Stack,
   Text,
   Spinner,
   Flex
@@ -70,12 +70,12 @@ export const ValidatedField = ({
   };
 
   return (
-    <Field.Root invalid={!!error}>
-      <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+    <Stack gap="2">
+      <Text fontSize="sm" fontWeight="medium">
         {label}
         {required && <Text as="span" color="red.500" ml="1">*</Text>}
-      </Field.Label>
-      
+      </Text>
+
       <Box position="relative">
         <InputField
           value={value}
@@ -98,7 +98,7 @@ export const ValidatedField = ({
             boxShadow: `0 0 0 1px ${error ? 'var(--colors-red-500)' : warning ? 'var(--colors-orange-500)' : 'var(--colors-blue-500)'}`
           }}
         />
-        
+
         {/* Validation Icon */}
         <Flex
           position="absolute"
@@ -115,9 +115,9 @@ export const ValidatedField = ({
 
       {/* Error Message */}
       {error && (
-        <Field.ErrorText mt="1" fontSize="sm">
+        <Text color="red.500" fontSize="sm" mt="1">
           {error}
-        </Field.ErrorText>
+        </Text>
       )}
 
       {/* Warning Message */}
@@ -126,6 +126,6 @@ export const ValidatedField = ({
           {warning}
         </Text>
       )}
-    </Field.Root>
+    </Stack>
   );
 };

@@ -18,6 +18,8 @@ export const financeBillingManifest: ModuleManifest = {
   name: 'Billing & Invoicing',
   version: '2.0.0',
 
+  permissionModule: 'billing', // ✅ Uses 'billing' permission
+
   depends: ['customers'], // Billing tracks customer accounts
   autoInstall: true, // Auto-activate when customers active
 
@@ -41,6 +43,7 @@ export const financeBillingManifest: ModuleManifest = {
     consume: [
       'sales.order_completed',      // Generate invoices
       'customers.account_created',  // Setup billing profile
+      'customers.profile_sections', // Inject billing info in customer profiles
     ],
   },
 
@@ -61,6 +64,22 @@ export const financeBillingManifest: ModuleManifest = {
         'finance-billing',
         35 // Medium priority widget
       );
+
+      // ✅ Customer Profile Section - Billing info
+      const CustomerBillingSection = lazy(() => import('./components/CustomerBillingSection'));
+
+      registry.addAction(
+        'customers.profile_sections',
+        ({ customerId }: { customerId: string }) => (
+          <React.Suspense fallback={<div>Cargando facturación...</div>}>
+            <CustomerBillingSection customerId={customerId} />
+          </React.Suspense>
+        ),
+        'finance-billing',
+        70 // Medium-high priority
+      );
+
+      logger.debug('App', 'Registered customers.profile_sections hook (Billing info)');
 
       logger.info('App', '✅ Billing module setup complete');
     } catch (error) {

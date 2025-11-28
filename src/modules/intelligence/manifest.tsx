@@ -18,6 +18,8 @@ export const intelligenceManifest: ModuleManifest = {
   name: 'Competitive Intelligence',
   version: '1.0.0',
 
+  permissionModule: 'reporting', // ✅ Uses 'reporting' permission
+
   depends: [],
   autoInstall: true, // Always available for market insights
 

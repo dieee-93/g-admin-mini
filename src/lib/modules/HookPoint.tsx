@@ -38,6 +38,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { hasPermission } from '@/config/PermissionsRegistry';
 import type { HookPointProps } from './types';
 import type { UserRole, ModuleName, PermissionAction } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logging';
 
 // ============================================
 // HOOKPOINT COMPONENT
@@ -91,7 +92,7 @@ export const HookPoint = <T = any,>(props: HookPointProps<T>): React.ReactElemen
       );
 
       if (!allowed && debug) {
-        console.log(`[HookPoint] Hook filtered (no permission): ${name}`, {
+        logger.debug('ModuleEventBus', `Hook filtered (no permission): ${name}`, {
           moduleId: hook.context.moduleId,
           requiredPermission: permission,
           userRole: user.role
@@ -107,7 +108,7 @@ export const HookPoint = <T = any,>(props: HookPointProps<T>): React.ReactElemen
     const duration = performance.now() - startTime;
 
     if (debug) {
-      console.log(`[HookPoint] Executed hook: ${name}`, {
+      logger.debug('ModuleEventBus', `Executed hook: ${name}`, {
         totalHooks: allHooks.length,
         permittedHooks: permittedHooks.length,
         filteredOut: allHooks.length - permittedHooks.length,
@@ -122,7 +123,7 @@ export const HookPoint = <T = any,>(props: HookPointProps<T>): React.ReactElemen
   // Handle empty results
   if (results.length === 0) {
     if (debug) {
-      console.log(`[HookPoint] No hooks registered for: ${name}`);
+      logger.debug('ModuleEventBus', `No hooks registered for: ${name}`);
     }
     return fallback as React.ReactElement | null;
   }

@@ -10,10 +10,10 @@
  */
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography, Icon, Button } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { KeyIcon } from '@heroicons/react/24/outline';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 interface RentalsStats {
   activeRentals: number;
@@ -22,7 +22,7 @@ interface RentalsStats {
 }
 
 export default function RentalsWidget() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // ✅ MOCK DATA - Replace with actual store when available
   const stats: RentalsStats = useMemo(() => ({
@@ -91,7 +91,7 @@ export default function RentalsWidget() {
             size="sm"
             colorPalette="cyan"
             variant="outline"
-            onClick={() => navigate('/admin/operations/rentals')}
+            onClick={() => navigate('rentals')}
           >
             Ver Alquileres
           </Button>

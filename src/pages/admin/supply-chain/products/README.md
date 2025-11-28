@@ -433,6 +433,186 @@ try {
 
 ---
 
+## 🎯 Product Types & Flexibility
+
+### Supported Product Types
+
+Products module supports **11 business models** through flexible configuration:
+
+1. **FOOD/BEVERAGE** (with recipe): Hamburgers, pizzas
+2. **RETAIL_GOODS** (no recipe): Coca-Cola, electronics
+3. **BEAUTY_SERVICE** (with materials): Hair coloring
+4. **PROFESSIONAL_SERVICE** (no materials): Massages, consultations
+5. **REPAIR_SERVICE** (dynamic materials): Car repair, maintenance
+6. **EVENT** (digital): Webinars, conferences
+7. **COURSE** (hybrid): Courses with physical materials
+8. **DIGITAL_PRODUCT** (pure digital): E-books, downloads
+9. **RENTAL** (time-based): Equipment rental
+10. **MEMBERSHIP** (recurring): Gym memberships, subscriptions
+11. **CUSTOM** (flexible): Custom product types
+
+### Product Configuration System
+
+```typescript
+interface ProductConfig {
+  // Materials (BOM)
+  has_components: boolean;          // Uses materials?
+  components_required: boolean;     // Are they mandatory?
+  allow_dynamic_materials: boolean; // Can add during service?
+
+  // Production
+  requires_production: boolean;     // Needs Production module?
+  production_type?: "kitchen" | "assembly" | "preparation";
+
+  // Staff
+  requires_staff: boolean;          // Needs personnel?
+  staff_allocation?: StaffAllocation[];
+
+  // Booking
+  requires_booking: boolean;        // Needs Scheduling?
+  booking_window_days?: number;
+  concurrent_capacity?: number;
+
+  // Digital
+  is_digital: boolean;              // Has digital component?
+  digital_delivery?: DigitalDeliveryConfig;
+
+  // Retail
+  is_retail: boolean;               // Is resale?
+  retail_details?: RetailConfig;
+}
+```
+
+### Example Configurations
+
+#### Hamburger (Food with recipe)
+```typescript
+{
+  name: "Classic Burger",
+  category: "FOOD",
+  config: {
+    has_components: true,
+    components_required: true,
+    requires_production: true,
+    production_type: "kitchen",
+    requires_staff: true,
+    staff_allocation: [
+      { role: "chef", count: 1, duration_minutes: 10 }
+    ]
+  },
+  components: [
+    { item_id: "bread", quantity: 2 },
+    { item_id: "meat", quantity: 0.15 }
+  ]
+}
+```
+
+#### Massage (Service without materials)
+```typescript
+{
+  name: "60min Massage",
+  category: "PROFESSIONAL_SERVICE",
+  config: {
+    has_components: false,        // ← NO materials
+    requires_staff: true,
+    staff_allocation: [
+      { role: "masseuse", count: 1, duration_minutes: 60 }
+    ],
+    requires_booking: true,
+    booking_window_days: 1,
+    concurrent_capacity: 3
+  },
+  components: []                  // ← EMPTY is valid
+}
+```
+
+#### Webinar (Digital only)
+```typescript
+{
+  name: "Marketing Webinar",
+  category: "EVENT",
+  config: {
+    has_components: false,        // ← NO physical materials
+    is_digital: true,
+    digital_delivery: {
+      delivery_type: "event",
+      access_url: "zoom.us/xxx",
+      max_participants: 100,
+      platform: "Zoom"
+    },
+    requires_staff: true,
+    staff_allocation: [
+      { role: "instructor", count: 1, duration_minutes: 120 }
+    ]
+  }
+}
+```
+
+---
+
+## 🔄 Architectural Decisions
+
+### Products vs Production Separation
+
+**Products Module** (CATALOG - Layer 2):
+- **Owns**: Recipe DEFINITION, BOM composition, costing, pricing
+- **Exports**: `calculateRecipeCost()`, `canProduceRecipe()`
+- **Stakeholder**: Product Manager, Marketing
+
+**Production Module** (EXECUTION - Layer 2.5):
+- **Owns**: Recipe EXECUTION, production orders, kitchen display
+- **Uses**: Products API (no duplicate logic)
+- **Stakeholder**: Kitchen Manager, Chef
+
+### Feature Naming Convention
+
+**Pattern**: `{domain}_{concern}`
+
+**Products Domain Features**:
+- `products_recipe_management` ✅ (not production_bom_management)
+- `products_catalog_menu` ✅ (not sales_catalog_menu)
+- `products_catalog_ecommerce` ✅ (not sales_catalog_ecommerce)
+- `products_package_management` ✅ (not sales_package_management)
+- `products_cost_intelligence` ✅
+- `products_availability_calculation` ✅
+- `products_dynamic_materials` ✅
+- `products_digital_delivery` ✅
+
+**Production Domain Features**:
+- `production_order_management` ✅ (execution, not definition)
+- `production_display_system` ✅
+- `production_order_queue` ✅
+- `production_capacity_planning` ✅
+
+### Cross-Module Injections
+
+**Products provides hook points**:
+- `products.row.actions` → Production injects "Produce Batch" button
+- `products.detail.sections` → Sales injects "Sales History", Production injects "Production Info"
+- `products.form.fields` → Scheduling injects booking config, Staff injects allocation
+
+**Products injects into**:
+- `materials.row.actions` → "Recipe Usage" button
+- `dashboard.widgets` → Products performance widget
+
+---
+
+## 📊 Responsibility Matrix
+
+| Module | Responsibility | Products Interface |
+|--------|-----------------|-------------------|
+| **Products** | Catalog definition, BOM, costing | Owner |
+| **Materials** | Stock tracking, reorder | `components[]` field |
+| **Production** | Kitchen orders, execution | `config.requires_production` |
+| **Sales** | Cart, checkout, payment | `pricing` + availability API |
+| **Scheduling** | Appointments, slots | `config.requires_booking` |
+| **Staff** | Employee allocation | `config.staff_allocation[]` |
+| **Finance** | COGS, margins | `pricing.base_cost` |
+
+**Products defines and coordinates, does NOT execute**
+
+---
+
 ## 📊 Testing Strategy
 
 ### Estructura de Tests

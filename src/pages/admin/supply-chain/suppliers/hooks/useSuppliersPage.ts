@@ -3,6 +3,7 @@
 // ============================================
 
 import { useState, useMemo, useCallback } from 'react';
+import { useSuppliersStore } from '@/store/suppliersStore';
 import { useSuppliers } from './useSuppliers';
 import { suppliersService } from '../services/suppliersService';
 import type {
@@ -60,9 +61,15 @@ export function useSuppliersPage() {
   // UI STATE
   // ============================================
 
+  // ✅ ENTERPRISE PATTERN: Modal state in store with atomic selectors
+  const isModalOpen = useSuppliersStore((state) => state.isModalOpen);
+  const modalMode = useSuppliersStore((state) => state.modalMode);
+  const currentSupplier = useSuppliersStore((state) => state.currentSupplier);
+  const openModal = useSuppliersStore((state) => state.openModal);
+  const closeModal = useSuppliersStore((state) => state.closeModal);
+
+  // Local UI state (not modal-related)
   const [activeTab, setActiveTab] = useState<SupplierTab>('list');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState<string | null>(null);
   const [filters, setFilters] = useState<SupplierFilters>(DEFAULT_FILTERS);
   const [sort, setSort] = useState<SupplierSort>(DEFAULT_SORT);
 
@@ -98,21 +105,21 @@ export function useSuppliersPage() {
 
   const handleOpenCreate = useCallback(() => {
     logger.debug('useSuppliersPage', 'Opening create modal');
-    setEditingSupplier(null);
-    setIsModalOpen(true);
-  }, []);
+    openModal('add');
+  }, [openModal]);
 
   const handleOpenEdit = useCallback((supplierId: string) => {
     logger.debug('useSuppliersPage', `Opening edit modal for supplier: ${supplierId}`);
-    setEditingSupplier(supplierId);
-    setIsModalOpen(true);
-  }, []);
+    const supplier = suppliers.find(s => s.id === supplierId);
+    if (supplier) {
+      openModal('edit', supplier);
+    }
+  }, [openModal, suppliers]);
 
   const handleCloseModal = useCallback(() => {
     logger.debug('useSuppliersPage', 'Closing modal');
-    setIsModalOpen(false);
-    setEditingSupplier(null);
-  }, []);
+    closeModal();
+  }, [closeModal]);
 
   // ============================================
   // FILTER ACTIONS
@@ -183,7 +190,8 @@ export function useSuppliersPage() {
     // UI State
     activeTab,
     isModalOpen,
-    editingSupplier,
+    modalMode,
+    currentSupplier,
     filters,
     sort,
 

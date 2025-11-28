@@ -120,7 +120,7 @@ export const inventoryTransfersApi = {
 
       // Check stock availability in source location
       const { data: item, error } = await supabase
-        .from('items')
+        .from('materials')
         .select('stock, name, unit')
         .eq('id', transferData.item_id)
         .eq('location_id', transferData.from_location_id)
@@ -144,7 +144,7 @@ export const inventoryTransfersApi = {
 
       // Check if destination location has the item (if not, warn)
       const { data: destItem } = await supabase
-        .from('items')
+        .from('materials')
         .select('id')
         .eq('id', transferData.item_id)
         .eq('location_id', transferData.to_location_id)
@@ -199,7 +199,7 @@ export const inventoryTransfersApi = {
 
       // Get item unit
       const { data: item } = await supabase
-        .from('items')
+        .from('materials')
         .select('unit')
         .eq('id', transferData.item_id)
         .single();

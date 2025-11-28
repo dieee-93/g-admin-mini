@@ -8,6 +8,7 @@
 
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import type {
   Subscription,
   BillingCycle,
@@ -462,21 +463,31 @@ export async function getMRR() {
     if (error) throw error;
 
     // Calculate MRR based on billing type
-    const mrr = data.reduce((total, sub) => {
-      let monthlyAmount = 0;
+    // ✅ PRECISION FIX: Use FinancialDecimal for MRR/ARR calculations
+    const mrrDec = data.reduce((totalDec, sub) => {
+      const amountDec = DecimalUtils.fromValue(sub.amount || 0, 'financial');
+      let monthlyAmountDec;
+
       switch (sub.billing_type) {
         case 'monthly':
-          monthlyAmount = sub.amount;
+          monthlyAmountDec = amountDec;
           break;
         case 'quarterly':
-          monthlyAmount = sub.amount / 3;
+          // Divide by 3 for quarterly subscriptions
+          monthlyAmountDec = DecimalUtils.divide(amountDec, '3', 'financial');
           break;
         case 'annual':
-          monthlyAmount = sub.amount / 12;
+          // Divide by 12 for annual subscriptions
+          monthlyAmountDec = DecimalUtils.divide(amountDec, '12', 'financial');
           break;
+        default:
+          monthlyAmountDec = DecimalUtils.fromValue(0, 'financial');
       }
-      return total + monthlyAmount;
-    }, 0);
+
+      return DecimalUtils.add(totalDec, monthlyAmountDec, 'financial');
+    }, DecimalUtils.fromValue(0, 'financial'));
+
+    const mrr = mrrDec.toNumber();
 
     return { data: mrr, error: null };
   } catch (error) {

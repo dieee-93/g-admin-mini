@@ -42,6 +42,12 @@ import { EventBus } from '@/lib/events';
 
 
 import { logger } from '@/lib/logging';
+
+// ✅ Module-level guard to prevent duplicate 'initialized' event logging
+// Pattern recommended by React.dev for singleton initialization
+// See: https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application
+let offlineSyncInitListenerRegistered = false;
+
 // Connection status types
 interface ConnectionStatus {
   isOnline: boolean;
@@ -152,10 +158,16 @@ export const ConnectionStatus = memo(() => {
     offlineSync.on('syncStarted', updateSyncStatus);
     offlineSync.on('syncCompleted', updateSyncStatus);
     offlineSync.on('batchProcessed', updateSyncStatus); // ✅ Added to track progress during sync
-    offlineSync.on('initialized', (data: { queueSize: number }) => {
-      logger.info('OfflineSync', `[OfflineMonitor] OfflineSync initialized with ${data.queueSize} operations`);
-      updateSyncStatus();
-    });
+    
+    // ✅ Register 'initialized' listener ONLY ONCE using module-level guard
+    // Prevents duplicate logs when component mounts multiple times (Strict Mode + multiple instances)
+    if (!offlineSyncInitListenerRegistered) {
+      offlineSyncInitListenerRegistered = true;
+      offlineSync.on('initialized', (data: { queueSize: number }) => {
+        logger.info('OfflineSync', `[OfflineMonitor] OfflineSync initialized with ${data.queueSize} operations`);
+        updateSyncStatus();
+      });
+    }
 
     // Initial updates
     updateConnectionStatus();
@@ -174,7 +186,8 @@ export const ConnectionStatus = memo(() => {
       offlineSync.off('syncStarted', updateSyncStatus);
       offlineSync.off('syncCompleted', updateSyncStatus);
       offlineSync.off('batchProcessed', updateSyncStatus);
-      offlineSync.off('initialized', updateSyncStatus);
+      // ✅ DO NOT remove 'initialized' listener - it's registered at module level with guard
+      // offlineSync.off('initialized', updateSyncStatus); // REMOVED
     };
   }, []);
 

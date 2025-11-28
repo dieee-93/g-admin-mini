@@ -45,6 +45,7 @@ export function Sidebar() {
   // Get modules grouped by domain
   const modulesByDomain = useModuleNavigationByDomain();
 
+  console.log('🚨 [Sidebar] modulesByDomain:', modulesByDomain);
   // Handler para toggle de expansión
   const handleToggleExpansion = (moduleId: string) => {
     toggleModuleExpansion(moduleId);
@@ -56,6 +57,7 @@ export function Sidebar() {
   // Merge with module state from NavigationContext for expansion and badges
   const modulesWithState = useMemo(() => {
     const allModules = Object.values(modulesByDomain).flat();
+    console.log('🚨 [Sidebar] allModules count:', allModules.length, 'IDs:', allModules.map(m => m.id));
     return allModules.map(module => {
       // Find matching module in context modules to get state
       const contextModule = modules.find(m => m.id === module.id);
@@ -267,143 +269,143 @@ export function Sidebar() {
 
   return (
     <Box
-        position="fixed"
-        height="100vh"
-        width={actualShowExpanded ? "15rem" : "3rem"}
-        left="0"
-        top="0"
-        zIndex="9999"
-        onMouseEnter={() => {
-          logger.info('App', '🎯 Sidebar hover ENTER'); // Debug
-          setIsHovering(true);
-          window.dispatchEvent(new CustomEvent('sidebarHover', { detail: { isHovering: true } }));
-        }}
-        onMouseLeave={() => {
-          logger.info('App', '🎯 Sidebar hover LEAVE'); // Debug
-          setIsHovering(false);
-          window.dispatchEvent(new CustomEvent('sidebarHover', { detail: { isHovering: false } }));
-        }}
-      >
-        <SidebarContainer isExpanded={actualShowExpanded} isHovering={isHovering}>
-          
-          {/* Header Section - Ultra minimal like GitHub - Perfect alignment */}
-          <div 
-            style={{
-              height: "60px",
-              display: "flex",
-              alignItems: "center",
-              padding: actualShowExpanded ? "0 12px" : "0 8px", // 🎨 Border consistente
-              flexShrink: 0
-            }}
-          >
-            <Stack direction="row" align="center" justify="space-between">
-              <Stack direction="row" align="center" gap="2">
-                <div 
-                  style={{
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "4px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0
-                  }}
+      position="fixed"
+      height="100vh"
+      width={actualShowExpanded ? "15rem" : "3rem"}
+      left="0"
+      top="0"
+      zIndex="9999"
+      onMouseEnter={() => {
+        logger.info('App', '🎯 Sidebar hover ENTER'); // Debug
+        setIsHovering(true);
+        window.dispatchEvent(new CustomEvent('sidebarHover', { detail: { isHovering: true } }));
+      }}
+      onMouseLeave={() => {
+        logger.info('App', '🎯 Sidebar hover LEAVE'); // Debug
+        setIsHovering(false);
+        window.dispatchEvent(new CustomEvent('sidebarHover', { detail: { isHovering: false } }));
+      }}
+    >
+      <SidebarContainer isExpanded={actualShowExpanded} isHovering={isHovering}>
+
+        {/* Header Section - Ultra minimal like GitHub - Perfect alignment */}
+        <div
+          style={{
+            height: "60px",
+            display: "flex",
+            alignItems: "center",
+            padding: actualShowExpanded ? "0 12px" : "0 8px", // 🎨 Border consistente
+            flexShrink: 0
+          }}
+        >
+          <Stack direction="row" align="center" justify="space-between">
+            <Stack direction="row" align="center" gap="2">
+              <div
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  borderRadius: "4px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}
+              >
+                <Typography
+                  variant="heading"
+                  level={5}
+                  weight="bold"
+                  fontSize="xs"
                 >
-                  <Typography 
-                    variant="heading" 
-                    level={5}
-                    weight="bold"
-                    fontSize="xs"
-                  >
-                    G
-                  </Typography>
-                </div>
-                
-                {actualShowExpanded && (
-                  <Typography variant="body" weight="medium" size="sm">
-                    G-Admin
-                  </Typography>
-                )}
-              </Stack>
+                  G
+                </Typography>
+              </div>
 
-{/* Toggle button removed - hover-only sidebar */}
+              {actualShowExpanded && (
+                <Typography variant="body" weight="medium" size="sm">
+                  G-Admin
+                </Typography>
+              )}
             </Stack>
-          </div>
 
-          {/* 🏢 Location Selector - Only in multi-location mode */}
-          {isMultiLocationMode && (
-            <div
-              style={{
-                padding: actualShowExpanded ? "8px 12px" : "8px 8px",
-                borderBottom: "1px solid",
-                borderColor: "var(--chakra-colors-border-default)",
-                opacity: 0.3
-              }}
-            >
-              <LocationSelector />
-            </div>
-          )}
+            {/* Toggle button removed - hover-only sidebar */}
+          </Stack>
+        </div>
 
-          {/* Navigation Section - Grouped by Domain */}
-          <div style={{ flex: 1, padding: "8px", paddingTop: "4px", overflow: "auto" }}>
-            <Stack direction="column" gap="2" align="stretch">
-              {domainOrder.map((domain, domainIndex) => {
-                const domainModules = modulesWithStateByDomain[domain];
-
-                // Skip empty domains
-                if (!domainModules || domainModules.length === 0) return null;
-
-                return (
-                  <Fragment key={domain}>
-                    {/* Domain separator (except before first domain) */}
-                    {domainIndex > 0 && actualShowExpanded && (
-                      <Box
-                        height="1px"
-                        bg="border.default"
-                        opacity={0.3}
-                        margin="8px 4px 4px 4px"
-                      />
-                    )}
-
-                    {/* Domain label (only when expanded) */}
-                    {actualShowExpanded && (
-                      <Box paddingX="8px" paddingY="4px">
-                        <Typography
-                          variant="caption"
-                          size="xs"
-                          weight="semibold"
-                          color="fg.subtle"
-                          textTransform="uppercase"
-                          letterSpacing="wide"
-                        >
-                          {DOMAIN_LABELS[domain]}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {/* Domain modules */}
-                    <Stack direction="column" gap="0" align="stretch">
-                      {domainModules.map(module => renderModule(module))}
-                    </Stack>
-                  </Fragment>
-                );
-              })}
-            </Stack>
-          </div>
-
-          {/* Theme Toggle Footer - Ultra minimal */}
-          <div 
+        {/* 🏢 Location Selector - Only in multi-location mode */}
+        {isMultiLocationMode && (
+          <div
             style={{
-              marginTop: "auto",
-              padding: "8px"
+              padding: actualShowExpanded ? "8px 12px" : "8px 8px",
+              borderBottom: "1px solid",
+              borderColor: "var(--chakra-colors-border-default)",
+              opacity: 0.3
             }}
           >
-            <Stack direction="row" justify={actualShowExpanded ? "flex-end" : "center"}>
-              <QuickThemeToggle />
-            </Stack>
+            <LocationSelector />
           </div>
-          
-        </SidebarContainer>
+        )}
+
+        {/* Navigation Section - Grouped by Domain */}
+        <div style={{ flex: 1, padding: "8px", paddingTop: "4px", overflow: "auto" }}>
+          <Stack direction="column" gap="2" align="stretch">
+            {domainOrder.map((domain, domainIndex) => {
+              const domainModules = modulesWithStateByDomain[domain];
+
+              // Skip empty domains
+              if (!domainModules || domainModules.length === 0) return null;
+
+              return (
+                <Fragment key={domain}>
+                  {/* Domain separator (except before first domain) */}
+                  {domainIndex > 0 && actualShowExpanded && (
+                    <Box
+                      height="1px"
+                      bg="border.default"
+                      opacity={0.3}
+                      margin="8px 4px 4px 4px"
+                    />
+                  )}
+
+                  {/* Domain label (only when expanded) */}
+                  {actualShowExpanded && (
+                    <Box paddingX="8px" paddingY="4px">
+                      <Typography
+                        variant="caption"
+                        size="xs"
+                        weight="semibold"
+                        color="fg.subtle"
+                        textTransform="uppercase"
+                        letterSpacing="wide"
+                      >
+                        {DOMAIN_LABELS[domain]}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {/* Domain modules */}
+                  <Stack direction="column" gap="0" align="stretch">
+                    {domainModules.map(module => renderModule(module))}
+                  </Stack>
+                </Fragment>
+              );
+            })}
+          </Stack>
+        </div>
+
+        {/* Theme Toggle Footer - Ultra minimal */}
+        <div
+          style={{
+            marginTop: "auto",
+            padding: "8px"
+          }}
+        >
+          <Stack direction="row" justify={actualShowExpanded ? "flex-end" : "center"}>
+            <QuickThemeToggle />
+          </Stack>
+        </div>
+
+      </SidebarContainer>
     </Box>
   );
 }

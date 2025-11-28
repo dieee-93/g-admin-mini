@@ -67,7 +67,7 @@ production/
 ## Integration
 
 ### Required Features
-- `production_workflow` - Core production capability
+- `physical_products` - Core production capability (auto-activates production features)
 - `production_bom_management` - Bill of Materials system
 - `production_display_system` - Kitchen Display System (KDS)
 - `production_batch_tracking` - Batch production tracking

@@ -56,8 +56,8 @@ export default function SuppliersPage() {
     loading,
     error,
     isModalOpen,
-    editingSupplier,
-    allSuppliers,
+    modalMode,
+    currentSupplier,
     closeModal
   } = pageState;
 
@@ -93,52 +93,52 @@ export default function SuppliersPage() {
   // ============================================
 
   return (
-      <>
-        {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
-        <SkipLink />
+    <>
+      {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
+      <SkipLink />
 
-        {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
-        <ContentLayout spacing="normal" mainLabel="Supplier Relationship Management">
+      {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
+      <ContentLayout spacing="normal" mainLabel="Supplier Relationship Management">
 
-          {/* ✅ OFFLINE WARNING SECTION - ARIA live region */}
-          {!isOnline && (
-            <Section
-              variant="flat"
-              semanticHeading="System Status Alert"
-              live="polite"
-              atomic
-            >
-              <Alert status="warning" title="Modo Offline">
-                Los cambios se sincronizarán cuando recuperes la conexión
-              </Alert>
-            </Section>
-          )}
-
-          {/* ✅ METRICS SECTION - Complementary aside pattern */}
+        {/* ✅ OFFLINE WARNING SECTION - ARIA live region */}
+        {!isOnline && (
           <Section
-            as="aside"
             variant="flat"
-            semanticHeading="Supplier Metrics Overview"
+            semanticHeading="System Status Alert"
+            live="polite"
+            atomic
           >
-            <SuppliersMetrics metrics={metrics} loading={loading} />
+            <Alert status="warning" title="Modo Offline">
+              Los cambios se sincronizarán cuando recuperes la conexión
+            </Alert>
           </Section>
+        )}
 
-          {/* ✅ MAIN MANAGEMENT SECTION - Primary content area */}
-          <Section
-            variant="elevated"
-            semanticHeading="Supplier Management Tools"
-          >
-            <SuppliersManagement pageState={pageState} />
-          </Section>
+        {/* ✅ METRICS SECTION - Complementary aside pattern */}
+        <Section
+          as="aside"
+          variant="flat"
+          semanticHeading="Supplier Metrics Overview"
+        >
+          <SuppliersMetrics metrics={metrics} loading={loading} />
+        </Section>
 
-          {/* FORM MODAL - Now handles submission internally */}
-          <SupplierFormModal
-            isOpen={isModalOpen}
-            onClose={closeModal}
-            supplier={editingSupplier ? allSuppliers.find(s => s.id === editingSupplier) : null}
-          />
+        {/* ✅ MAIN MANAGEMENT SECTION - Primary content area */}
+        <Section
+          variant="elevated"
+          semanticHeading="Supplier Management Tools"
+        >
+          <SuppliersManagement pageState={pageState} />
+        </Section>
 
-        </ContentLayout>
-      </>
+        {/* FORM MODAL - Uses currentSupplier from store */}
+        <SupplierFormModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          supplier={currentSupplier}
+        />
+
+      </ContentLayout>
+    </>
   );
 }

@@ -42,7 +42,7 @@ import type { BusinessCapabilityId } from '@/config/types';
 const CAPABILITY_NAMES: Record<BusinessCapabilityId, string> = {
   onsite_service: 'Dine-In (Servicio en Mesas)',
   pickup_counter: 'TakeAway (Para Llevar)',
-  online_store: 'E-commerce (Tienda Online)',
+  async_operations: 'Operaciones Asíncronas',
   delivery_shipping: 'Delivery (Envíos a Domicilio)',
   corporate_sales: 'B2B (Ventas Corporativas)',
   manufacturing: 'Producción Industrial',

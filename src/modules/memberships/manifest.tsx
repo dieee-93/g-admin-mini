@@ -18,11 +18,19 @@ export const membershipsManifest: ModuleManifest = {
   name: 'Memberships',
   version: '1.0.0',
 
-  depends: ['customers', 'billing'], // Members are customers with billing
-  autoInstall: true, // Auto-activate when dependencies active
+  permissionModule: 'operations', // ✅ Uses 'operations' permission
 
-  requiredFeatures: [] as FeatureId[],
+  depends: ['customers'], // ✅ FIXED: Removed 'billing' to break circular dependency (communicate via EventBus instead)
+  autoInstall: false, // ✅ FIXED: Controlled by membership_subscriptions capability
+
+  requiredFeatures: [
+    'membership_subscription_plans',
+    'membership_recurring_billing'
+  ] as FeatureId[],
   optionalFeatures: [
+    'membership_access_control',
+    'membership_usage_tracking',
+    'membership_benefits_management',
     'customer_loyalty_program',
     'finance_payment_terms',
   ] as FeatureId[],
@@ -62,6 +70,22 @@ export const membershipsManifest: ModuleManifest = {
         'memberships',
         30 // Medium priority widget
       );
+
+      // ✅ Customer Profile Section - Membership info
+      const CustomerMembershipSection = lazy(() => import('./components/CustomerMembershipSection'));
+
+      registry.addAction(
+        'customers.profile_sections',
+        ({ customerId }: { customerId: string }) => (
+          <React.Suspense fallback={<div>Cargando membresía...</div>}>
+            <CustomerMembershipSection customerId={customerId} />
+          </React.Suspense>
+        ),
+        'memberships',
+        80 // High priority
+      );
+
+      logger.debug('App', 'Registered customers.profile_sections hook (Membership info)');
 
       // ✅ EventBus Integration - Billing payments
       eventBus.subscribe('billing.payment_received', async (event) => {

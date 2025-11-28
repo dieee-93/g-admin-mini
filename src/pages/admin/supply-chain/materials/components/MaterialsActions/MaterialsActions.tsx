@@ -19,6 +19,7 @@ import {
   ArrowPathIcon, CogIcon
 } from '@heroicons/react/24/outline';
 import { HookPoint } from '@/lib/modules';
+import { memo } from 'react';
 
 interface MaterialsActionsProps {
   onAddMaterial?: () => void;
@@ -34,7 +35,7 @@ interface MaterialsActionsProps {
   };
 }
 
-export function MaterialsActions({
+export const MaterialsActions = memo(function MaterialsActions({
   onAddMaterial,
   onBulkOperations,
   onGenerateReport,
@@ -54,6 +55,7 @@ export function MaterialsActions({
     (permissions.canExport && onGenerateReport) ||
     (permissions.canConfigure && onSyncInventory)
   );
+MaterialsActions.displayName = 'MaterialsActions';
 
   // Don't render section if no actions available
   if (!hasAnyAction) {
@@ -136,4 +138,4 @@ export function MaterialsActions({
       </Stack>
     </Section>
   );
-}
+});

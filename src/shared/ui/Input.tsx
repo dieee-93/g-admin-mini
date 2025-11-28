@@ -11,6 +11,7 @@ interface InputProps extends Omit<ChakraInputProps, 'size' | 'variant'> {
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url'
   error?: string
+  helperText?: string
   required?: boolean
   disabled?: boolean
   size?: 'sm' | 'md' | 'lg'
@@ -27,6 +28,7 @@ export function Input({
   onChange,
   type = 'text',
   error,
+  helperText,
   required = false,
   disabled = false,
   size = 'md',
@@ -57,6 +59,11 @@ export function Input({
         disabled={disabled}
         {...inputProps} // ✅ Spread props adicionales como borderColor, focusBorderColor, etc.
       />
+      {helperText && !error && (
+        <Field.HelperText fontSize="sm">
+          {helperText}
+        </Field.HelperText>
+      )}
       {error && (
         <Field.ErrorText fontSize="sm">
           {error}

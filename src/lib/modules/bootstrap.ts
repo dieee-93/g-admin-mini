@@ -36,6 +36,7 @@ import type {
   ModuleValidationResult,
   IModuleRegistry,
 } from './types';
+import { SecureEventProcessor } from '@/lib/events/utils/SecureEventProcessor';
 
 // ============================================
 // TOPOLOGICAL SORT (Kahn's Algorithm)
@@ -523,7 +524,7 @@ export async function initializeModules(
 
       initialized.push(manifest.id);
 
-      logger.info('App', `✅ Module registered: ${manifest.id}`, {
+      logger.debug('App', `✅ Module registered: ${manifest.id}`, {
         duration: `${moduleDuration.toFixed(2)}ms`,
         depends: manifest.depends,
       });
@@ -557,6 +558,16 @@ export async function initializeModules(
       failed: failed.map((f) => f.moduleId),
     });
   }
+
+  // ============================================
+  // STEP 6: Mark initialization phase complete
+  // ============================================
+
+  // Switch EventBus from INITIALIZATION to RUNTIME phase
+  // This enables normal timeout enforcement (30s module events, 5s regular events)
+  // During INITIALIZATION, system events have no timeout to allow for legitimate
+  // 10+ second startup time with 30 modules × 100+ subscriptions
+  SecureEventProcessor.markInitializationComplete();
 
   return {
     initialized,

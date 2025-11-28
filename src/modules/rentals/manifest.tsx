@@ -18,11 +18,19 @@ export const rentalsManifest: ModuleManifest = {
   name: 'Rentals',
   version: '1.0.0',
 
-  depends: ['customers', 'scheduling'], // Rentals book time slots
-  autoInstall: true, // Auto-activate when dependencies active
+  permissionModule: 'operations', // ✅ Uses 'operations' permission
 
-  requiredFeatures: [] as FeatureId[],
+  depends: ['customers', 'scheduling'], // Rentals book time slots
+  autoInstall: false, // ✅ FIXED: Controlled by asset_rental capability
+
+  requiredFeatures: [
+    'rental_item_management',
+    'rental_booking_calendar',
+    'rental_availability_tracking'
+  ] as FeatureId[],
   optionalFeatures: [
+    'rental_pricing_by_duration',
+    'rental_late_fees',
     'scheduling_appointment_booking',
     'scheduling_calendar_management',
   ] as FeatureId[],
@@ -34,11 +42,15 @@ export const rentalsManifest: ModuleManifest = {
     provide: [
       'rentals.availability',        // Rental item availability
       'rentals.reservation_created', // Reservation events
+      'rentals.asset_rented',        // Event: Asset rented out
       'dashboard.widgets',           // Rental metrics
     ],
     consume: [
       'scheduling.slot_booked',      // Reserve rental slots
       'billing.payment_received',    // Confirm rental on payment
+      'assets.row.actions',          // Inject rental actions in asset grid
+      'assets.form.fields',          // Inject rental fields in asset form
+      'assets.detail.sections',      // Inject rental sections in asset detail
     ],
   },
 
@@ -61,6 +73,36 @@ export const rentalsManifest: ModuleManifest = {
         ),
         'rentals',
         25 // Medium priority widget
+      );
+
+      // ✅ UI Injection - Add "Rent" button to Assets grid (row actions)
+      const { RentAssetButton } = await import('./integrations');
+
+      registry.addAction(
+        'assets.row.actions',
+        (asset: any) => <RentAssetButton asset={asset} />,
+        'rentals',
+        10
+      );
+
+      // ✅ UI Injection - Add rental fields to Assets form
+      const { RentalFieldsGroup } = await import('./integrations');
+
+      registry.addAction(
+        'assets.form.fields',
+        (params: any) => <RentalFieldsGroup {...params} />,
+        'rentals',
+        20
+      );
+
+      // ✅ UI Injection - Add rental history section to Asset detail
+      const { RentalHistorySection } = await import('./integrations');
+
+      registry.addAction(
+        'assets.detail.sections',
+        (asset: any) => <RentalHistorySection asset={asset} />,
+        'rentals',
+        30
       );
 
       // ✅ EventBus Integration - Listen to payment events

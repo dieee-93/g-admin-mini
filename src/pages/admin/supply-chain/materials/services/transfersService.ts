@@ -84,7 +84,7 @@ export class InventoryTransfersService {
 
       // Get source item to validate stock
       const { data: sourceItem, error: itemError } = await supabase
-        .from('items')
+        .from('materials')
         .select('*')
         .eq('id', request.item_id)
         .eq('location_id', request.from_location_id)
@@ -183,7 +183,7 @@ export class InventoryTransfersService {
       if (approval.approved) {
         // APPROVE: Deduct stock from source location
         const { data: sourceItem } = await supabase
-          .from('items')
+          .from('materials')
           .select('stock')
           .eq('id', transfer.item_id)
           .eq('location_id', transfer.from_location_id)
@@ -201,7 +201,7 @@ export class InventoryTransfersService {
         // Update source item stock
         const newSourceStock = (sourceItem.stock || 0) - transfer.quantity;
         await supabase
-          .from('items')
+          .from('materials')
           .update({
             stock: newSourceStock,
             updated_at: new Date().toISOString()
@@ -313,7 +313,7 @@ export class InventoryTransfersService {
 
       // Get or create destination item
       const { data: destItem, error: destError } = await supabase
-        .from('items')
+        .from('materials')
         .select('*')
         .eq('id', transfer.item_id)
         .eq('location_id', transfer.to_location_id)
@@ -327,7 +327,7 @@ export class InventoryTransfersService {
         // Update existing item
         const newDestStock = (destItem.stock || 0) + receipt.quantity_received;
         await supabase
-          .from('items')
+          .from('materials')
           .update({
             stock: newDestStock,
             updated_at: new Date().toISOString()
@@ -337,7 +337,7 @@ export class InventoryTransfersService {
       } else {
         // Create new item at destination (copy from source)
         const { data: sourceItem } = await supabase
-          .from('items')
+          .from('materials')
           .select('*')
           .eq('id', transfer.item_id)
           .eq('location_id', transfer.from_location_id)
@@ -348,7 +348,7 @@ export class InventoryTransfersService {
         }
 
         await supabase
-          .from('items')
+          .from('materials')
           .insert({
             ...sourceItem,
             id: transfer.item_id, // Keep same ID

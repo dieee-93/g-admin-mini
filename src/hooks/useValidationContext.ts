@@ -31,7 +31,16 @@ import { useOperationsStore } from '@/store/operationsStore';
 import { useSalesStore } from '@/store/salesStore';
 import { useAppStore } from '@/store/appStore';
 import { useFiscalStore } from '@/store/fiscalStore';
+import { useMaterialsStore } from '@/store/materialsStore';
+import { useAssetsStore } from '@/store/assetsStore';
+import { usePaymentsStore } from '@/store/paymentsStore';
+import { useSuppliersStore } from '@/store/suppliersStore';
 import type { ValidationContext } from '@/modules/achievements/types';
+import type { ProductWithIntelligence } from '@/pages/admin/supply-chain/products/types';
+import type { StaffMember } from '@/store/staffStore';
+import type { MaterialItem } from '@/store/materialsStore';
+import type { Asset } from '@/pages/admin/supply-chain/assets/types';
+import type { Supplier } from '@/store/suppliersStore';
 
 /**
  * Hook que combina datos de múltiples stores en un ValidationContext
@@ -81,7 +90,7 @@ export function useValidationContext(): ValidationContext {
   // Transformation happens only when length changes (add/remove)
   const products = useMemo(
     () =>
-      productsRaw.map((p: any) => ({
+      productsRaw.map((p: ProductWithIntelligence) => ({
         id: p.id,
         name: p.name,
         is_published: p.is_published ?? false,
@@ -99,11 +108,11 @@ export function useValidationContext(): ValidationContext {
 
   const staff = useMemo(
     () =>
-      staffRaw.map((s: any) => ({
+      staffRaw.map((s: StaffMember) => ({
         id: s.id,
         name: s.name,
-        is_active: s.is_active ?? true,
-        role: s.role,
+        is_active: s.status === 'active',
+        role: s.position,
       })),
     [staffLength] // Stable primitive dependency
   );
@@ -112,12 +121,12 @@ export function useValidationContext(): ValidationContext {
   // OPERATIONS STORE
   // ============================================
 
-  const tablesRaw = useOperationsStore((state) => (state as any).tables || []);
+  const tablesRaw = useOperationsStore((state) => (state as { tables?: Array<{ id: string; name: string; capacity?: number }> }).tables || []);
   const tablesLength = tablesRaw.length;
 
   const tables = useMemo(
     () =>
-      tablesRaw.map((t: any) => ({
+      tablesRaw.map((t) => ({
         id: t.id,
         name: t.name,
         capacity: t.capacity || 4,
@@ -191,30 +200,32 @@ export function useValidationContext(): ValidationContext {
   // PAYMENT METHODS & GATEWAYS
   // ============================================
 
-  // TODO: Cuando exista paymentStore, descomentar:
-  // const paymentMethods = usePaymentStore(state => state.methods);
-  // const paymentGateways = usePaymentStore(state => state.gateways);
+  // ✅ FASE 2.1: Using paymentsStore for real data
+  const paymentMethodsLength = usePaymentsStore((state) => state.paymentMethods.length);
+  const paymentMethodsRaw = usePaymentsStore((state) => state.paymentMethods);
+  const paymentGatewaysLength = usePaymentsStore((state) => state.paymentGateways.length);
+  const paymentGatewaysRaw = usePaymentsStore((state) => state.paymentGateways);
 
-  // ✅ BEST PRACTICE 6: useMemo for empty arrays to maintain reference stability
-  // Prevents infinite loops when these are used as dependencies elsewhere
+  // ✅ BEST PRACTICE: useMemo with length dependency for stable references
   const paymentMethods = useMemo(
     () =>
-      [] as Array<{
-        id: string;
-        name: string;
-        is_active: boolean;
-      }>,
-    []
+      paymentMethodsRaw.map((m) => ({
+        id: m.id,
+        name: m.name,
+        is_active: m.is_active,
+      })),
+    [paymentMethodsLength]
   );
 
   const paymentGateways = useMemo(
     () =>
-      [] as Array<{
-        id: string;
-        type: string;
-        is_active: boolean;
-      }>,
-    []
+      paymentGatewaysRaw.map((g) => ({
+        id: g.id,
+        type: g.type,
+        is_active: g.is_active,
+        supports_subscriptions: g.supports_subscriptions,
+      })),
+    [paymentGatewaysLength]
   );
 
   // ============================================
@@ -244,6 +255,57 @@ export function useValidationContext(): ValidationContext {
   const loyaltyProgram = useMemo(() => undefined as { active: boolean } | undefined, []);
 
   // ============================================
+  // MATERIALS STORE (New for physical_products)
+  // ============================================
+
+  const materialsLength = useMaterialsStore((state) => state.items.length);
+  const materialsRaw = useMaterialsStore((state) => state.items);
+
+  const materials = useMemo(
+    () =>
+      materialsRaw.map((item: MaterialItem) => ({
+        id: item.id,
+        name: item.name,
+        type: item.type as 'MEASURABLE' | 'COUNTABLE' | 'ELABORATED',
+      })),
+    [materialsLength]
+  );
+
+  // ============================================
+  // ASSETS STORE (New for asset_rental)
+  // ============================================
+
+  const assetsLength = useAssetsStore((state) => state.items.length);
+  const assetsRaw = useAssetsStore((state) => state.items);
+
+  const assets = useMemo(
+    () =>
+      assetsRaw.map((asset: Asset) => ({
+        id: asset.id,
+        name: asset.name,
+        is_available: asset.is_available ?? true,
+      })),
+    [assetsLength]
+  );
+
+  // ============================================
+  // SUPPLIERS STORE (New for physical_products)
+  // ============================================
+
+  const suppliersLength = useSuppliersStore((state) => state.suppliers.length);
+  const suppliersRaw = useSuppliersStore((state) => state.suppliers);
+
+  const suppliers = useMemo(
+    () =>
+      suppliersRaw.map((supplier: Supplier) => ({
+        id: supplier.id,
+        name: supplier.name,
+        is_active: supplier.is_active,
+      })),
+    [suppliersLength]
+  );
+
+  // ============================================
   // RETURN VALIDATION CONTEXT
   // ============================================
 
@@ -261,6 +323,14 @@ export function useValidationContext(): ValidationContext {
       deliveryZones,
       salesCount,
       loyaltyProgram,
+      // NEW FIELDS (FASE 1)
+      materials,
+      assets,
+      // NEW FIELDS (FASE 2.2)
+      suppliers,
+      // TODO FASE 2: Agregar cuando existan los stores
+      // appointments,
+      // membershipPlans,
     }),
     [
       // All dependencies are now stable primitives or memoized objects
@@ -268,6 +338,9 @@ export function useValidationContext(): ValidationContext {
       productsLength, // Use primitive instead of products
       staffLength, // Use primitive instead of staff
       tablesLength, // Use primitive instead of tables
+      materialsLength, // NEW
+      assetsLength, // NEW
+      suppliersLength, // NEW FASE 2.2
       salesCount,
       // paymentMethods, paymentGateways, deliveryZones, loyaltyProgram are empty memoized arrays
       // so they don't need to be in dependencies

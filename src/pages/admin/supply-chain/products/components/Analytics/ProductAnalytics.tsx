@@ -1,7 +1,3 @@
-/**
- * Product Analytics Enhanced using AnalyticsEngine
- * Specialized for menu engineering, profitability analysis, and product performance
- */
 import React, { useEffect, useState } from 'react';
 import {
   ContentLayout,
@@ -21,7 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { AnalyticsEngine } from '@/shared/services/AnalyticsEngine';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-
+import { fetchProductsWithIntelligence } from '../../services/productApi';
 import { logger } from '@/lib/logging';
 interface ProductData {
   id: string;
@@ -75,46 +71,43 @@ export function ProductAnalyticsEnhanced() {
   const [analyticsData, setAnalyticsData] = useState<ProductAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Mock product data (would come from API)
-  const mockProducts: ProductData[] = [
-    {
-      id: '1', name: 'Pizza Margherita', category: 'Pizzas',
-      price: 25.00, estimated_cost: 8.00, popularity_score: 85,
-      sales_volume: 120, total_revenue: 3000, preparation_time: 15,
-      difficulty_level: 'easy', is_active: true,
-      created_at: '2024-01-01T00:00:00Z',
-      total_value: 3000, profit_margin: 68, last_activity: '2024-01-15T12:00:00Z'
-    },
-    {
-      id: '2', name: 'Hamburguesa Premium', category: 'Hamburguesas',
-      price: 32.00, estimated_cost: 15.00, popularity_score: 92,
-      sales_volume: 80, total_revenue: 2560, preparation_time: 12,
-      difficulty_level: 'medium', is_active: true,
-      created_at: '2024-01-01T00:00:00Z',
-      total_value: 2560, profit_margin: 53, last_activity: '2024-01-14T18:30:00Z'
-    },
-    {
-      id: '3', name: 'Ensalada César', category: 'Ensaladas',
-      price: 18.00, estimated_cost: 6.00, popularity_score: 45,
-      sales_volume: 30, total_revenue: 540, preparation_time: 8,
-      difficulty_level: 'easy', is_active: true,
-      created_at: '2024-01-01T00:00:00Z',
-      total_value: 540, profit_margin: 67, last_activity: '2024-01-12T14:20:00Z'
-    },
-    {
-      id: '4', name: 'Risotto Trufa', category: 'Pasta',
-      price: 45.00, estimated_cost: 18.00, popularity_score: 25,
-      sales_volume: 15, total_revenue: 675, preparation_time: 25,
-      difficulty_level: 'hard', is_active: true,
-      created_at: '2024-01-01T00:00:00Z',
-      total_value: 675, profit_margin: 60, last_activity: '2024-01-10T20:00:00Z'
-    }
-  ];
-
+  // Load products from database
   useEffect(() => {
-    setProducts(mockProducts);
-    generateProductAnalytics(mockProducts);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const loadProductsData = async () => {
+      try {
+        setLoading(true);
+        const productsData = await fetchProductsWithIntelligence();
+        
+        // Transform to analytics format
+        const analyticsProducts: ProductData[] = productsData.map(p => ({
+          id: p.id,
+          name: p.name,
+          category: p.type || 'ELABORATED', // Default category
+          price: 0, // TODO: Add price field to products table
+          estimated_cost: p.cost || 0,
+          popularity_score: 50, // TODO: Calculate from sales data
+          profit_margin: 0, // Will be calculated
+          sales_volume: 0, // TODO: Get from sales history
+          total_revenue: 0, // TODO: Calculate from sales
+          preparation_time: 15, // TODO: Add field to products
+          difficulty_level: 'medium' as const, // TODO: Add field to products
+          is_active: true,
+          created_at: p.created_at,
+          updated_at: p.updated_at,
+          last_activity: p.updated_at,
+          total_value: 0 // TODO: Calculate
+        }));
+
+        setProducts(analyticsProducts);
+        generateProductAnalytics(analyticsProducts);
+      } catch (error) {
+        logger.error('App', 'Error loading products for analytics:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProductsData();
   }, []);
 
   const generateProductAnalytics = async (productData: ProductData[]) => {

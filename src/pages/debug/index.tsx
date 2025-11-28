@@ -41,6 +41,15 @@ const debugTools: DebugTool[] = [
     status: 'stable'
   },
   {
+    id: 'eventbus',
+    title: 'EventBus Monitor',
+    description: 'Real-time event monitoring, metrics, and module health',
+    icon: '📡',
+    path: '/debug/eventbus',
+    category: 'system',
+    status: 'stable'
+  },
+  {
     id: 'navigation',
     title: 'Navigation Inspector',
     description: 'Inspect navigation state, routes, and modules',
@@ -66,6 +75,15 @@ const debugTools: DebugTool[] = [
     description: 'Test themes, tokens, and design system components',
     icon: '🎨',
     path: '/debug/theme',
+    category: 'ui',
+    status: 'stable'
+  },
+  {
+    id: 'alerts',
+    title: 'Alerts System Testing',
+    description: 'Test toast stack, NotificationCenter, badges, and animations',
+    icon: '🧪',
+    path: '/debug/alerts',
     category: 'ui',
     status: 'stable'
   },

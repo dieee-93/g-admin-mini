@@ -1,0 +1,185 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - img [ref=e8]
+      - paragraph [ref=e11]: G-Admin Mini
+    - generic [ref=e13]:
+      - banner [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e17]:
+            - paragraph [ref=e18] [cursor=pointer]: G-Admin
+            - paragraph [ref=e19]: /
+            - paragraph [ref=e20]: Debug Tools
+            - paragraph [ref=e21]: ·
+            - paragraph [ref=e22]: Development and diagnostic tools (dev mode only)
+          - generic [ref=e23]:
+            - img [ref=e26]
+            - button [ref=e29] [cursor=pointer]:
+              - img [ref=e30]
+            - button "d dieee.93@gmail.com SUPER_ADMIN" [ref=e32] [cursor=pointer]:
+              - generic [ref=e33]:
+                - generic [ref=e35]: d
+                - generic [ref=e36]:
+                  - paragraph [ref=e37]: dieee.93@gmail.com
+                  - paragraph [ref=e38]: SUPER_ADMIN
+      - generic [ref=e41]:
+        - heading "G" [level=5] [ref=e46]
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - button [ref=e52] [cursor=pointer]:
+              - img [ref=e55]
+            - button [ref=e59] [cursor=pointer]:
+              - img [ref=e62]
+            - button [ref=e66] [cursor=pointer]:
+              - img [ref=e69]
+            - button [ref=e73] [cursor=pointer]:
+              - img [ref=e76]
+            - button [ref=e80] [cursor=pointer]:
+              - img [ref=e84]
+            - button [ref=e88] [cursor=pointer]:
+              - img [ref=e91]
+          - button [ref=e97] [cursor=pointer]:
+            - img [ref=e100]
+          - generic [ref=e102]:
+            - button [ref=e105] [cursor=pointer]:
+              - img [ref=e108]
+            - button [ref=e112] [cursor=pointer]:
+              - img [ref=e115]
+        - button [ref=e119] [cursor=pointer]:
+          - img [ref=e120]
+      - main [ref=e123]:
+        - main [ref=e124]:
+          - generic [ref=e125]:
+            - paragraph [ref=e129]: 🧪 Alerts System Testing
+            - region [ref=e130]:
+              - paragraph [ref=e134]: 📊 System Stats
+              - generic [ref=e137]:
+                - generic [ref=e138]:
+                  - paragraph [ref=e139]: Total
+                  - generic [ref=e140]: "1"
+                - paragraph [ref=e142]: Active
+                - generic [ref=e144]:
+                  - paragraph [ref=e145]: Unread
+                  - generic [ref=e146]: "1"
+                - generic [ref=e147]:
+                  - paragraph [ref=e148]: Critical
+                  - generic [ref=e149]: "0"
+                - paragraph [ref=e151]: Errors
+                - paragraph [ref=e154]: Warnings
+                - generic [ref=e156]:
+                  - paragraph [ref=e157]: NC Open
+                  - generic [ref=e158]: "No"
+            - region [ref=e159]:
+              - paragraph [ref=e163]: ⚡ Quick Tests
+              - generic [ref=e165]:
+                - button "Create INFO" [active] [ref=e166] [cursor=pointer]
+                - button "Create SUCCESS" [ref=e167] [cursor=pointer]
+                - button "Create WARNING" [ref=e168] [cursor=pointer]
+                - button "Create ERROR" [ref=e169] [cursor=pointer]
+                - button "Create CRITICAL" [ref=e170] [cursor=pointer]
+            - region [ref=e171]:
+              - paragraph [ref=e175]: 🎨 Custom Alert
+              - generic [ref=e177]:
+                - textbox "Alert title *" [ref=e178]
+                - textbox "Alert description (optional)" [ref=e179]
+                - generic [ref=e180]:
+                  - paragraph [ref=e181]: "Severity:"
+                  - button "Info" [ref=e182] [cursor=pointer]
+                  - button "Success" [ref=e183] [cursor=pointer]
+                  - button "Warning" [ref=e184] [cursor=pointer]
+                  - button "Error" [ref=e185] [cursor=pointer]
+                  - button "Critical" [ref=e186] [cursor=pointer]
+                - button "Create Custom Alert" [ref=e187] [cursor=pointer]
+            - region [ref=e188]:
+              - paragraph [ref=e192]: 📦 Bulk Operations
+              - generic [ref=e194]:
+                - button "Create 5 Alerts (Sequential)" [ref=e195] [cursor=pointer]
+                - button "Bulk Create 10 Alerts" [ref=e196] [cursor=pointer]
+                - button "Mark All Read" [ref=e197] [cursor=pointer]
+                - button "Archive All" [ref=e198] [cursor=pointer]
+                - button "Snooze First (1 min)" [ref=e199] [cursor=pointer]
+            - region [ref=e200]:
+              - paragraph [ref=e204]: 🏷️ Badge Variants
+              - generic [ref=e206]:
+                - generic [ref=e207]:
+                  - paragraph [ref=e208]: "Nav Badge (opens NotificationCenter):"
+                  - generic [ref=e209]:
+                    - generic [ref=e210] [cursor=pointer]:
+                      - img [ref=e211]
+                      - generic [ref=e213]: "1"
+                    - paragraph [ref=e214]: Click to open NotificationCenter
+                - separator [ref=e215]
+                - generic [ref=e216]:
+                  - paragraph [ref=e217]: "Sidebar Badge (opens NotificationCenter):"
+                  - generic [ref=e218]:
+                    - generic [ref=e219] [cursor=pointer]:
+                      - img [ref=e221]
+                      - generic [ref=e223]: "1"
+                      - paragraph [ref=e224]: 1 activas
+                    - paragraph [ref=e225]: Click to open NotificationCenter
+                - separator [ref=e226]
+                - generic [ref=e227]:
+                  - paragraph [ref=e228]: "Stock Alert Badge:"
+                  - paragraph [ref=e230]: "Filtered by context: stock"
+                - separator [ref=e231]
+                - generic [ref=e232]:
+                  - paragraph [ref=e233]: "Critical Alert Badge:"
+                  - paragraph [ref=e235]: Only critical severity
+            - region [ref=e236]:
+              - paragraph [ref=e240]: 🔔 NotificationCenter Control
+              - generic [ref=e242]:
+                - button "Open NotificationCenter" [ref=e243] [cursor=pointer]
+                - button "Close NotificationCenter" [disabled] [ref=e244]
+            - region [ref=e245]:
+              - paragraph [ref=e249]: ✅ Testing Checklist
+              - generic [ref=e251]:
+                - paragraph [ref=e254]: Toast stack appears in top-right
+                - paragraph [ref=e257]: Auto-dismiss works (3s/3s/5s/8s/∞)
+                - paragraph [ref=e260]: Progress bar visible and animated
+                - paragraph [ref=e263]: Max 3 toasts visible simultaneously
+                - paragraph [ref=e266]: Animations smooth (Framer Motion)
+                - paragraph [ref=e269]: NotificationCenter opens/closes
+                - paragraph [ref=e272]: Tabs filter correctly (All, Unread, Critical, Acknowledged)
+                - paragraph [ref=e275]: Search filters results
+                - paragraph [ref=e278]: Timeline grouping works (Today, Yesterday, etc.)
+                - paragraph [ref=e281]: Bulk actions work (Mark all read, Clear all)
+                - paragraph [ref=e284]: Badge click opens NotificationCenter
+                - paragraph [ref=e287]: Badge count updates in real-time
+                - paragraph [ref=e290]: Mark as read updates unread count
+                - paragraph [ref=e293]: Snooze reappears after delay (1 minute)
+                - paragraph [ref=e296]: Archive removes from active list
+            - region [ref=e297]:
+              - paragraph [ref=e301]: 📖 Testing Instructions
+              - generic [ref=e304]:
+                - paragraph [ref=e305]: "How to test:"
+                - paragraph [ref=e306]: 1. Click "Create INFO/SUCCESS/WARNING/ERROR/CRITICAL" to test individual severities
+                - paragraph [ref=e307]: 2. Watch toast stack appear in top-right corner
+                - paragraph [ref=e308]: 3. Observe progress bars and auto-dismiss timing
+                - paragraph [ref=e309]: 4. Click badges to open NotificationCenter
+                - paragraph [ref=e310]: 5. Test tabs, search, and timeline grouping in NotificationCenter
+                - paragraph [ref=e311]: 6. Try bulk operations (Mark all read, Archive all)
+                - paragraph [ref=e312]: 7. Test snooze (alert should reappear after 1 minute)
+                - paragraph [ref=e313]: 8. Check console.log for debug information
+  - generic [ref=e317]:
+    - generic [ref=e318]:
+      - generic [ref=e319]:
+        - img [ref=e321]
+        - generic [ref=e323]:
+          - generic [ref=e324]:
+            - paragraph [ref=e325]: Test INFO Alert
+            - generic [ref=e326]: Info
+          - paragraph [ref=e327]: This is a test info alert with auto-dismiss
+      - generic [ref=e328]:
+        - paragraph [ref=e329]: Hace un momento
+        - paragraph [ref=e331]: testing
+    - generic [ref=e332]:
+      - button "Reconocer alerta" [ref=e333] [cursor=pointer]:
+        - img [ref=e334]
+      - button "Resolver alerta" [ref=e336] [cursor=pointer]:
+        - img [ref=e337]
+      - button "Descartar alerta" [ref=e339] [cursor=pointer]:
+        - img [ref=e340]
+```

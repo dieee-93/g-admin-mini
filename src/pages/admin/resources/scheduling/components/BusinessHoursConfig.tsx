@@ -6,7 +6,8 @@
 
 import { useState, useEffect } from 'react';
 import { Stack, Text, Table } from '@chakra-ui/react';
-import { Button, CardWrapper, Switch, Field, Input, Alert, Icon } from '@/shared/ui';
+import { Button, CardWrapper, Switch, Input, Alert, Icon } from '@/shared/ui';
+import { Field } from '@chakra-ui/react';
 import { ClockIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import {
   useAvailabilityRules,

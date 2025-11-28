@@ -20,6 +20,7 @@ export default defineConfig({
       'Content-Security-Policy': [
         "default-src 'self'",
         "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.supabase.co", // unsafe-inline for theme script in index.html
+        "worker-src 'self' blob:", // ✅ Allow Web Workers
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // unsafe-inline needed for Chakra UI
         "img-src 'self' data: https: blob:",
         "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com",
@@ -79,7 +80,8 @@ export default defineConfig({
           'vendor-charts': ['chart.js', 'react-chartjs-2'],
 
           // ✅ Icons - heroicons is used throughout the app
-          'vendor-icons': ['@heroicons/react'],
+          // FIX: Match actual import paths (v2 uses /24/outline, /24/solid, etc.)
+          'vendor-icons': ['@heroicons/react/24/outline', '@heroicons/react/24/solid', '@heroicons/react/20/solid'],
         },
 
         // ⚠️ DO NOT use function-based manualChunks for React

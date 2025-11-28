@@ -77,6 +77,19 @@ export interface ModuleManifest {
   /** Auto-install if all dependencies are active */
   autoInstall?: boolean;
 
+  /**
+   * Permission module for RBAC
+   *
+   * Specifies which ModuleName from PermissionsRegistry this module uses.
+   * If not defined, the module ID is used directly (must be a valid ModuleName).
+   *
+   * @example
+   * permissionModule: 'billing'      // finance-billing uses 'billing' permission
+   * permissionModule: 'fiscal'       // cash-management uses 'fiscal' permission
+   * permissionModule: 'gamification' // achievements uses 'gamification' permission
+   */
+  permissionModule?: string; // Using string to avoid circular dependency with AuthContext
+
   /** Required features from FeatureRegistry */
   requiredFeatures: FeatureId[];
 
@@ -188,6 +201,9 @@ export interface IModuleRegistry {
 
   // Exports API (VS Code pattern)
   getExports<T = any>(moduleId: string): T | undefined;
+
+  // EventBus access
+  getEventBus(): any;
 
   // Introspection
   getDependencyGraph(moduleId: string): string[];

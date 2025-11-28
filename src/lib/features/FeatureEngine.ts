@@ -30,8 +30,6 @@ import { getFeature } from '@/config/FeatureRegistry';
 
 import { logger } from '@/lib/logging';
 
-// Compatibility alias
-type BusinessActivityId = BusinessCapabilityId;
 
 // ============================================
 // TYPES
@@ -52,26 +50,6 @@ export interface FeatureResolutionResult {
   blockingValidations: string[];
 }
 
-export interface ValidationCheckResult {
-  /** Si todas las validaciones pasaron */
-  valid: boolean;
-  /** Features que están bloqueadas */
-  blockedFeatures: FeatureId[];
-  /** Validaciones que fallaron */
-  failedValidations: string[];
-  /** Mensajes de error */
-  errorMessages: Array<{ field: string; message: string; redirectTo: string }>;
-}
-
-export interface MilestoneCompletionResult {
-  /** Feature desbloqueada (si alguna) */
-  unlockedFeature?: FeatureId;
-  /** Si se completó el último milestone de una feature */
-  featureFullyUnlocked: boolean;
-  /** Milestones restantes para esa feature */
-  remainingMilestones: string[];
-}
-
 // ============================================
 // FEATURE RESOLUTION ENGINE
 // ============================================
@@ -84,7 +62,7 @@ export interface MilestoneCompletionResult {
  * @returns Resultado con features a activar, bloqueadas, y milestones pendientes
  */
 export function resolveFeatures(
-  capabilities: BusinessActivityId[],
+  capabilities: BusinessCapabilityId[],
   infrastructure: InfrastructureId[]
 ): FeatureResolutionResult {
   logger.info('FeatureEngine', '🔍 Resolving features for user choices:', {
@@ -122,27 +100,6 @@ export function resolveFeatures(
 }
 
 /**
- * Verifica qué features están bloqueadas por validations
- * @deprecated - Use new Achievements system with blocksAction instead
- */
-export function checkFeatureValidations(
-  features: FeatureId[],
-  userProfile: any,
-  systemConfig: any
-): ValidationCheckResult {
-  // DEPRECATED: Old blocksFeatures system removed
-  // Use new Achievements system with ModuleRegistry hooks
-  logger.warn('FeatureEngine', '⚠️ checkFeatureValidations is deprecated - use Achievements system');
-
-  return {
-    valid: true,
-    blockedFeatures: [],
-    failedValidations: [],
-    errorMessages: []
-  };
-}
-
-/**
  * Obtiene features activas (no bloqueadas)
  */
 export function getActiveFeatures(
@@ -150,32 +107,6 @@ export function getActiveFeatures(
   blockedFeatures: FeatureId[]
 ): FeatureId[] {
   return allFeatures.filter(f => !blockedFeatures.includes(f));
-}
-
-/**
- * Procesa la completación de un milestone
- *
- * NOTA: Foundational milestones NO están implementados actualmente.
- * Esta función existe para compatibilidad de API pero siempre retorna
- * un resultado vacío. Planificado para sistema de gamificación futuro.
- *
- * @deprecated Sistema de milestones fundacionales no implementado
- */
-export function processMilestoneCompletion(
-  milestoneId: string,
-  allMilestonesCompleted: string[],
-  pendingFeatures: FeatureId[]
-): MilestoneCompletionResult {
-  logger.info('FeatureEngine', '⚠️ Milestone system not implemented yet:', {
-    milestoneId,
-    note: 'Foundational milestones planned for future gamification system'
-  });
-
-  // Foundational milestones no implementados - retornar resultado vacío
-  return {
-    featureFullyUnlocked: false,
-    remainingMilestones: []
-  };
 }
 
 /**
@@ -188,7 +119,7 @@ export function processMilestoneCompletion(
  * @param infrastructure - Infrastructure seleccionada
  */
 export function validateUserChoices(
-  capabilities: BusinessActivityId[],
+  capabilities: BusinessCapabilityId[],
   infrastructure: InfrastructureId[]
 ): {
   valid: boolean;
@@ -225,91 +156,34 @@ export class FeatureActivationEngine {
    * Activa features según user choices
    */
   public static activateFeatures(
-    activities: BusinessActivityId[],
-    infrastructure: InfrastructureId[],
-    userProfile: any,
-    systemConfig: any
+    capabilities: BusinessCapabilityId[],
+    infrastructure: InfrastructureId[]
   ): {
     activeFeatures: FeatureId[];
-    blockedFeatures: FeatureId[];
-    pendingMilestones: string[];
-    validationErrors: Array<{ field: string; message: string; redirectTo: string }>;
   } {
     logger.info('FeatureEngine', '🚀 Activating features...');
 
     // 1. Validar user choices
-    const choiceValidation = validateUserChoices(activities, infrastructure);
+    const choiceValidation = validateUserChoices(capabilities, infrastructure);
     if (!choiceValidation.valid) {
       logger.error('FeatureEngine', '❌ Invalid user choices:', choiceValidation.errors);
       throw new Error('Invalid user choices: ' + JSON.stringify(choiceValidation.errors));
     }
 
     // 2. Resolver features
-    const resolution = resolveFeatures(activities, infrastructure);
+    const resolution = resolveFeatures(capabilities, infrastructure);
 
-    // 3. Verificar blocking validations
-    const validation = checkFeatureValidations(
-      resolution.featuresToActivate,
-      userProfile,
-      systemConfig
-    );
-
-    // 4. Features activas = todas - bloqueadas
-    const activeFeatures = getActiveFeatures(
-      resolution.featuresToActivate,
-      validation.blockedFeatures
-    );
+    // 3. En el nuevo sistema simplificado, todas las features resueltas están activas.
+    const activeFeatures = resolution.featuresToActivate;
 
     logger.info('FeatureEngine', '✅ Feature activation complete:', {
-      totalFeatures: resolution.featuresToActivate.length,
+      totalFeatures: activeFeatures.length,
       activeFeatures: activeFeatures.length,
-      blockedFeatures: validation.blockedFeatures.length,
-      pendingMilestones: resolution.pendingMilestones.length
     });
 
     return {
       activeFeatures,
-      blockedFeatures: validation.blockedFeatures,
-      pendingMilestones: resolution.pendingMilestones,
-      validationErrors: validation.errorMessages
     };
-  }
-
-  /**
-   * Desbloquea feature al completar validation
-   * @deprecated - Use new Achievements system with ModuleRegistry hooks
-   */
-  public static unlockFeatureByValidation(
-    validationId: string,
-    currentlyBlocked: FeatureId[],
-    userProfile: any,
-    systemConfig: any
-  ): {
-    unlockedFeatures: FeatureId[];
-    stillBlocked: FeatureId[];
-  } {
-    logger.warn('FeatureEngine', '⚠️ unlockFeatureByValidation is deprecated - use Achievements system');
-
-    // DEPRECATED: Old blocksFeatures system removed
-    return {
-      unlockedFeatures: [],
-      stillBlocked: []
-    };
-  }
-
-  /**
-   * Desbloquea feature al completar milestone
-   */
-  public static unlockFeatureByMilestone(
-    milestoneId: string,
-    completedMilestones: string[],
-    currentlyPendingFeatures: FeatureId[]
-  ): MilestoneCompletionResult {
-    return processMilestoneCompletion(
-      milestoneId,
-      completedMilestones,
-      currentlyPendingFeatures
-    );
   }
 }
 
@@ -321,47 +195,11 @@ export class FeatureActivationEngine {
  * Shorthand para activar features
  */
 export function activateFeatures(
-  activities: BusinessActivityId[],
-  infrastructure: InfrastructureId[],
-  userProfile: any,
-  systemConfig: any
+  capabilities: BusinessCapabilityId[],
+  infrastructure: InfrastructureId[]
 ) {
   return FeatureActivationEngine.activateFeatures(
-    activities,
-    infrastructure,
-    userProfile,
-    systemConfig
-  );
-}
-
-/**
- * Shorthand para desbloquear por validation
- */
-export function unlockByValidation(
-  validationId: string,
-  blockedFeatures: FeatureId[],
-  userProfile: any,
-  systemConfig: any
-) {
-  return FeatureActivationEngine.unlockFeatureByValidation(
-    validationId,
-    blockedFeatures,
-    userProfile,
-    systemConfig
-  );
-}
-
-/**
- * Shorthand para desbloquear por milestone
- */
-export function unlockByMilestone(
-  milestoneId: string,
-  completedMilestones: string[],
-  pendingFeatures: FeatureId[]
-) {
-  return FeatureActivationEngine.unlockFeatureByMilestone(
-    milestoneId,
-    completedMilestones,
-    pendingFeatures
+    capabilities,
+    infrastructure
   );
 }

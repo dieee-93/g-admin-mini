@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Badge } from '@/shared/ui';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsStore } from '@/store/materialsStore';
+import { useMaterialsData } from '../../../../hooks/useMaterialsData';
+import { useMaterialsActions } from '../../../../hooks/useMaterialsActions';
 import { useMaterialValidation } from '@/hooks';
 import { logger } from '@/lib/logging';
 import {
@@ -23,17 +25,14 @@ import {
 } from '@/shared/ui';
 
 export const useMaterialForm = () => {
-  const { 
-    isModalOpen, 
-    modalMode, 
-    currentItem, 
-    closeModal,
-    addItem,
-    updateItem,
-    alerts,
-    alertSummary,
-    items
-  } = useMaterials();
+  const { items } = useMaterialsData();
+  const { addItem, updateItem } = useMaterialsActions();
+  const isModalOpen = useMaterialsStore((s) => s.isModalOpen);
+  const modalMode = useMaterialsStore((s) => s.modalMode);
+  const currentItem = useMaterialsStore((s) => s.currentItem);
+  const closeModal = useMaterialsStore((s) => s.closeModal);
+  const alerts = useMaterialsStore((s) => s.alerts);
+  const alertSummary = useMaterialsStore((s) => s.alertSummary);
   
   const [formData, setFormData] = useState<ItemFormData>({
     name: '',

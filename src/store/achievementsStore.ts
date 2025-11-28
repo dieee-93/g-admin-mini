@@ -24,7 +24,7 @@
 
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { produce } from 'immer';
+import { produce, enableMapSet } from 'immer';
 import { logger } from '@/lib/logging';
 import type {
   Achievement,
@@ -32,6 +32,9 @@ import type {
   CapabilityProgress,
 } from '@/modules/achievements/types';
 import type { BusinessCapabilityId } from '@/config/types';
+
+// Enable Immer support for Map and Set
+enableMapSet();
 
 // ============================================
 // STATE INTERFACE

@@ -4,6 +4,16 @@
 import type { NamespacedEvent, EventHandler } from '../types';
 import { SecurityLogger } from './SecureLogger';
 
+/**
+ * System phase for phase-aware timeout calculation
+ * INITIALIZATION: System startup, module loading (30+ modules, 100+ subscriptions)
+ * RUNTIME: Normal operation after initialization complete
+ */
+enum SystemPhase {
+  INITIALIZATION = 'INITIALIZATION',
+  RUNTIME = 'RUNTIME'
+}
+
 interface TimeoutConfig {
   defaultTimeoutMs: number;
   maxTimeoutMs: number;
@@ -41,6 +51,7 @@ export class SecureEventProcessor {
   private static handlerStats = new Map<string, HandlerStats>();
   private static circuitBreakerTripped = new Set<string>();
   private static circuitBreakerTimers = new Map<string, number>(); // Track reset timers
+  private static systemPhase: SystemPhase = SystemPhase.INITIALIZATION;
   
   /**
    * Configure timeout and security settings
@@ -50,6 +61,43 @@ export class SecureEventProcessor {
     SecurityLogger.anomaly('SecureEventProcessor configured', {
       defaultTimeoutMs: this.config.defaultTimeoutMs,
       circuitBreakerEnabled: this.config.enableCircuitBreaker
+    });
+  }
+
+  /**
+   * Calculate timeout based on system phase and event pattern
+   * INITIALIZATION phase: No timeout for system events (legitimate 10+ second startup)
+   * RUNTIME phase: 30s for module events, 5s for regular events
+   */
+  private static calculateTimeout(pattern: string): number {
+    if (this.systemPhase === SystemPhase.INITIALIZATION) {
+      // During initialization, system events can legitimately take 10+ seconds
+      // 30 modules × 100+ subscriptions = cumulative execution > 10s
+      if (pattern.includes('system.') || pattern.includes('module.')) {
+        return Number.MAX_SAFE_INTEGER; // No timeout during initialization
+      }
+    }
+    
+    // RUNTIME phase: Normal timeouts
+    if (pattern.includes('module_loaded') || pattern.includes('module.')) {
+      return 30000; // 30 seconds for module events
+    }
+    
+    return this.config.defaultTimeoutMs; // 5 seconds for regular events
+  }
+
+  /**
+   * Mark system initialization as complete, switching to RUNTIME phase
+   * Should be called by ModuleRegistry after all modules are loaded
+   */
+  static markInitializationComplete(): void {
+    const previousPhase = this.systemPhase;
+    this.systemPhase = SystemPhase.RUNTIME;
+    
+    SecurityLogger.anomaly('System initialization complete - switching to RUNTIME phase', {
+      previousPhase,
+      currentPhase: this.systemPhase,
+      timestamp: new Date().toISOString()
     });
   }
 
@@ -85,17 +133,19 @@ export class SecureEventProcessor {
       };
     }
 
-    // Create timeout promise
+    // Calculate timeout based on system phase and event pattern
+    const dynamicTimeout = this.calculateTimeout(event.pattern);
+    
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => {
         SecurityLogger.threat('Handler execution timeout - possible DoS attack', {
           handlerId,
           pattern: event.pattern,
-          timeoutMs,
+          timeoutMs: dynamicTimeout,
           eventId: event.id
         });
-        reject(new Error(`Handler execution timed out after ${timeoutMs}ms`));
-      }, timeoutMs);
+        reject(new Error(`Handler execution timed out after ${dynamicTimeout}ms`));
+      }, dynamicTimeout);
     });
 
     // Create handler execution promise
@@ -131,7 +181,7 @@ export class SecureEventProcessor {
 
     } catch (error) {
       const executionTime = performance.now() - startTime;
-      const timedOut = error.message.includes('timed out');
+      const timedOut = error instanceof Error && error.message.includes('timed out');
       
       // Update handler stats (failure)
       this.updateHandlerStats(handlerId, executionTime, true, timedOut);
@@ -329,7 +379,7 @@ export class SecureEventProcessor {
     // Auto-reset after 30 seconds (tracked for cleanup)
     const resetTimerId = setTimeout(() => {
       this.resetCircuitBreaker(handlerId);
-    }, 30000);
+    }, 30000) as unknown as number;
     
     this.circuitBreakerTimers.set(handlerId, resetTimerId);
   }

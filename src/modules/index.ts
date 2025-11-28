@@ -45,8 +45,8 @@ import { intelligenceManifest } from './intelligence/manifest';
 // SUPPLY-CHAIN DOMAIN - Inventory & procurement
 // ============================================
 import { materialsManifest } from './materials/manifest';
+import { materialsProcurementManifest } from './materials/procurement/manifest';
 import { suppliersManifest } from './suppliers/manifest';
-import { supplierOrdersManifest } from './supplier-orders/manifest';
 import { productsManifest } from './products/manifest';
 import { productsAnalyticsManifest } from './products/analytics/manifest';
 import { assetsManifest } from './assets/manifest';
@@ -81,6 +81,7 @@ import { financeCorporateManifest } from './finance-corporate/manifest';
 import { financeFiscalManifest } from './finance-fiscal/manifest';
 import { financeBillingManifest } from './finance-billing/manifest';
 import { financeIntegrationsManifest } from './finance-integrations/manifest';
+import { cashManagementManifest } from './cash-management/manifest';
 
 // ============================================
 // GAMIFICATION DOMAIN - Achievements & progress
@@ -147,6 +148,7 @@ export const ALL_MODULE_MANIFESTS = [
   productsAnalyticsManifest, // ✅ NEW: Products analytics sub-module (Menu Engineering, Cost Analysis)
   productionManifest,    // ✅ RENAMED from kitchen - Depends on: materials
   assetsManifest,        // ✅ Inventory durable (equipment, tools, machinery)
+  materialsProcurementManifest, // ✅ NEW: Materials procurement submodule (purchase orders)
 
   // ============================================
   // TIER 3: Finance Domain (all independent)
@@ -156,12 +158,12 @@ export const ALL_MODULE_MANIFESTS = [
   financeFiscalManifest,         // ✅ Depends on: sales
   financeCorporateManifest,      // ✅ Depends on: customers, finance-fiscal, finance-billing
   financeIntegrationsManifest,   // ✅ Depends on: finance-fiscal, finance-billing
+  cashManagementManifest,        // ✅ Cash flow, sessions, double-entry accounting
 
   // ============================================
   // TIER 4: Second-level dependencies
   // ============================================
 
-  supplierOrdersManifest,      // ✅ Depends on: suppliers + materials
   fulfillmentManifest,        // ✅ NEW: Unified fulfillment system
   fulfillmentOnsiteManifest,  // ✅ NEW: Onsite service (from floor)
   fulfillmentPickupManifest,  // ✅ NEW: Pickup orders sub-module
@@ -206,9 +208,9 @@ export {
 
   // Supply-chain domain
   materialsManifest,
+  materialsProcurementManifest,
   suppliersManifest,
   productsAnalyticsManifest,
-  supplierOrdersManifest,
   productsManifest,
   productionManifest,
   assetsManifest,
@@ -236,6 +238,7 @@ export {
   financeFiscalManifest,
   financeBillingManifest,
   financeIntegrationsManifest,
+  cashManagementManifest,
 
   // Cross-cutting domains
   gamificationManifest,
@@ -256,14 +259,14 @@ export type { ModuleManifest } from '@/lib/modules/types';
  * Module count by domain (for debugging/monitoring)
  */
 export const MODULE_STATS = {
-  total: ALL_MODULE_MANIFESTS.length, // 31 modules
+  total: ALL_MODULE_MANIFESTS.length, // 32 modules
   byDomain: {
     system: 1,        // achievements (TIER 0)
     core: 6,          // dashboard, settings, debug, customers, reporting, intelligence
-    supplyChain: 6,   // materials, suppliers, supplier-orders, products, production, assets
-    operations: 7,    // sales (includes ecommerce), fulfillment (onsite/pickup/delivery), mobile, memberships, rentals
+    supplyChain: 7,   // materials, materials-procurement, suppliers, products, products-analytics, production, assets
+    operations: 8,    // sales, fulfillment, fulfillment-onsite, fulfillment-pickup, fulfillment-delivery, mobile, memberships, rentals
     resources: 2,     // staff, scheduling
-    finance: 4,       // finance-corporate, finance-fiscal, finance-billing, finance-integrations
+    finance: 5,       // finance-corporate, finance-fiscal, finance-billing, finance-integrations, cash-management
     gamification: 1,  // gamification
     executive: 1,     // executive
   },

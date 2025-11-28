@@ -4,11 +4,10 @@ import {
   Stack,
   Text,
   Switch,
-  Field,
   NumberInput,
   Flex
 } from '@/shared/ui';
-import { CardWrapper  } from '@/shared/ui';
+import { CardWrapper } from '@/shared/ui';
 import { FormCalculations } from '@/pages/admin/supply-chain/materials/services';
 import { type ItemFormData } from '@/pages/admin/supply-chain/materials/types';
 interface MeasurableStockFieldsProps {
@@ -56,24 +55,21 @@ export const MeasurableStockFields = ({
                 Si está marcado, se agregará stock inmediatamente al crear el item
               </Text>
             </Stack>
-            <Switch.Root
+            <Switch
               checked={addToStockNow}
-              onCheckedChange={(details) => !disabled && setAddToStockNow(details.checked)}
+              onChange={(checked) => !disabled && setAddToStockNow(checked)}
               disabled={disabled}
-            >
-              <Switch.HiddenInput />
-              <Switch.Control />
-            </Switch.Root>
+            />
           </Flex>
 
           {addToStockNow && (
             <Stack gap="4" pt="4" borderTop="1px solid" borderColor="border">
               <Flex gap="6" direction={{ base: "column", md: "row" }}>
                 <Box flex="1">
-                  <Field.Root invalid={!!fieldErrors.initial_stock}>
-                    <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+                  <Stack gap="2">
+                    <Text fontSize="sm" fontWeight="medium">
                       Cantidad Inicial {formData.unit && `(${formData.unit})`}
-                    </Field.Label>
+                    </Text>
                     <Flex>
                       <NumberInput.Root
                         value={formData.initial_stock?.toString() || '0'}
@@ -94,16 +90,16 @@ export const MeasurableStockFields = ({
                           <NumberInput.IncrementTrigger />
                           <NumberInput.DecrementTrigger />
                         </NumberInput.Control>
-                        <NumberInput.Input 
-                          height="44px" 
-                          fontSize="md" 
+                        <NumberInput.Input
+                          height="44px"
+                          fontSize="md"
                           px="3"
                           borderRadius="md"
                           borderRightRadius="0"
                         />
                       </NumberInput.Root>
                       {formData.unit && (
-                        <Box 
+                        <Box
                           height="44px"
                           px="3"
                           bg="bg.canvas"
@@ -121,17 +117,21 @@ export const MeasurableStockFields = ({
                         </Box>
                       )}
                     </Flex>
-                    <Field.ErrorText>{fieldErrors.initial_stock}</Field.ErrorText>
-                  </Field.Root>
+                    {fieldErrors.initial_stock && (
+                      <Text fontSize="sm" color="red.500">
+                        {fieldErrors.initial_stock}
+                      </Text>
+                    )}
+                  </Stack>
                 </Box>
 
                 <Box flex="1">
-                  <Field.Root invalid={!!fieldErrors.unit_cost}>
-                    <Field.Label fontSize="sm" fontWeight="medium" mb="2">
+                  <Stack gap="2">
+                    <Text fontSize="sm" fontWeight="medium">
                       Costo Total del Lote (ARS$)
-                    </Field.Label>
+                    </Text>
                     <Flex>
-                      <Box 
+                      <Box
                         height="44px"
                         px="3"
                         bg="bg.canvas"
@@ -163,14 +163,14 @@ export const MeasurableStockFields = ({
                           <NumberInput.IncrementTrigger />
                           <NumberInput.DecrementTrigger />
                         </NumberInput.Control>
-                        <NumberInput.Input 
-                          height="44px" 
-                          fontSize="md" 
+                        <NumberInput.Input
+                          height="44px"
+                          fontSize="md"
                           px="3"
                           borderRadius="0"
                         />
                       </NumberInput.Root>
-                      <Box 
+                      <Box
                         height="44px"
                         px="3"
                         bg="bg.canvas"
@@ -187,8 +187,12 @@ export const MeasurableStockFields = ({
                         ARS
                       </Box>
                     </Flex>
-                    <Field.ErrorText>{fieldErrors.unit_cost}</Field.ErrorText>
-                  </Field.Root>
+                    {fieldErrors.unit_cost && (
+                      <Text fontSize="sm" color="red.500">
+                        {fieldErrors.unit_cost}
+                      </Text>
+                    )}
+                  </Stack>
                 </Box>
               </Flex>
 
@@ -197,14 +201,14 @@ export const MeasurableStockFields = ({
                 <Box mt="6">
                   <Stack gap="4">
                     {/* Resumen principal */}
-                    <StockSummaryCard 
+                    <StockSummaryCard
                       formData={formData}
                       totalPurchasePrice={totalPurchasePrice}
                     />
 
                     {/* Estadísticas útiles para peso */}
                     {formData.unit && ['kg', 'g'].includes(formData.unit) && (
-                      <WeightStatisticsCard 
+                      <WeightStatisticsCard
                         formData={formData}
                         totalPurchasePrice={totalPurchasePrice}
                       />
@@ -212,7 +216,7 @@ export const MeasurableStockFields = ({
 
                     {/* Estadísticas útiles para volumen */}
                     {formData.unit && ['l', 'ml'].includes(formData.unit) && (
-                      <VolumeStatisticsCard 
+                      <VolumeStatisticsCard
                         formData={formData}
                         totalPurchasePrice={totalPurchasePrice}
                       />
@@ -229,27 +233,27 @@ export const MeasurableStockFields = ({
 };
 
 // Componentes auxiliares para las tarjetas de resumen y conversiones
-const StockSummaryCard = ({ 
-  formData, 
-  totalPurchasePrice 
-}: { 
-  formData: ItemFormData; 
-  totalPurchasePrice: number; 
+const StockSummaryCard = ({
+  formData,
+  totalPurchasePrice
+}: {
+  formData: ItemFormData;
+  totalPurchasePrice: number;
 }) => {
   const stockQuantity = formData.initial_stock || 0;
   const unitCost = stockQuantity > 0 ? totalPurchasePrice / stockQuantity : 0;
-  
+
   return (
     <CardWrapper variant="elevated" padding="md">
       <CardWrapper.Body>
         <Stack gap="3">
           <Flex align="center" gap="2">
-            <Box 
-              w="8" h="8" 
-               
-              rounded="full" 
-              display="flex" 
-              alignItems="center" 
+            <Box
+              w="8" h="8"
+
+              rounded="full"
+              display="flex"
+              alignItems="center"
               justifyContent="center"
             >
               💰
@@ -258,10 +262,10 @@ const StockSummaryCard = ({
               Resumen de Costos
             </Text>
           </Flex>
-          
-          <Flex 
-            direction={{ base: "column", md: "row" }} 
-            gap="4" 
+
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            gap="4"
             justify="space-between"
           >
             <CardWrapper variant="outline" padding="sm">
@@ -277,7 +281,7 @@ const StockSummaryCard = ({
                 </Text>
               </CardWrapper.Body>
             </CardWrapper>
-            
+
             <CardWrapper variant="outline" padding="sm">
               <CardWrapper.Body>
                 <Text fontSize="xs" color="green.600" fontWeight="medium">
@@ -291,7 +295,7 @@ const StockSummaryCard = ({
                 </Text>
               </CardWrapper.Body>
             </CardWrapper>
-            
+
             <CardWrapper variant="outline" padding="sm">
               <CardWrapper.Body>
                 <Text fontSize="xs" color="green.600" fontWeight="medium">
@@ -312,33 +316,33 @@ const StockSummaryCard = ({
   );
 };
 
-const WeightStatisticsCard = ({ 
-  formData, 
-  totalPurchasePrice 
-}: { 
-  formData: ItemFormData; 
-  totalPurchasePrice: number; 
+const WeightStatisticsCard = ({
+  formData,
+  totalPurchasePrice
+}: {
+  formData: ItemFormData;
+  totalPurchasePrice: number;
 }) => {
   const stockAmount = formData.initial_stock || 0;
   const unit = formData.unit as 'kg' | 'g';
   const unitCost = stockAmount > 0 ? totalPurchasePrice / stockAmount : 0;
-  
+
   // Calcular estadísticas útiles
   const costPer100g = unit === 'kg' ? unitCost / 10 : unitCost * 10;        // 1kg = 10 × 100g
   const costPer500g = unit === 'kg' ? unitCost / 2 : unitCost * 500;        // 1kg = 2 × 500g  
   const costPer1kg = unit === 'kg' ? unitCost : unitCost * 1000;            // 1kg = 1000g
-  
+
   return (
     <CardWrapper variant="outline" padding="md">
       <CardWrapper.Body>
         <Stack gap="3">
           <Flex align="center" gap="2">
-            <Box 
-              w="8" h="8" 
-              bg="blue.100" 
-              rounded="full" 
-              display="flex" 
-              alignItems="center" 
+            <Box
+              w="8" h="8"
+              bg="blue.100"
+              rounded="full"
+              display="flex"
+              alignItems="center"
               justifyContent="center"
             >
               📊
@@ -347,10 +351,10 @@ const WeightStatisticsCard = ({
               Estadísticas de Precio por Peso
             </Text>
           </Flex>
-          
-          <Flex 
-            direction={{ base: "column", md: "row" }} 
-            gap="3" 
+
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            gap="3"
             justify="space-between"
           >
             <CardWrapper variant="subtle" padding="sm">
@@ -363,7 +367,7 @@ const WeightStatisticsCard = ({
                 </Text>
               </CardWrapper.Body>
             </CardWrapper>
-            
+
             <CardWrapper variant="subtle" padding="sm">
               <CardWrapper.Body>
                 <Text fontSize="xs" color="blue.600" fontWeight="medium" textAlign="center">
@@ -374,7 +378,7 @@ const WeightStatisticsCard = ({
                 </Text>
               </CardWrapper.Body>
             </CardWrapper>
-            
+
             <CardWrapper variant="subtle" padding="sm">
               <CardWrapper.Body>
                 <Text fontSize="xs" color="blue.600" fontWeight="medium" textAlign="center">
@@ -392,34 +396,34 @@ const WeightStatisticsCard = ({
   );
 };
 
-const VolumeStatisticsCard = ({ 
-  formData, 
-  totalPurchasePrice 
-}: { 
-  formData: ItemFormData; 
-  totalPurchasePrice: number; 
+const VolumeStatisticsCard = ({
+  formData,
+  totalPurchasePrice
+}: {
+  formData: ItemFormData;
+  totalPurchasePrice: number;
 }) => {
   const stockAmount = formData.initial_stock || 0;
   const unit = formData.unit as 'l' | 'ml';
   const unitCost = stockAmount > 0 ? totalPurchasePrice / stockAmount : 0;
-  
+
   // Calcular estadísticas útiles
   const costPer100ml = unit === 'l' ? unitCost / 10 : unitCost * 10;        // 1L = 10 × 100ml
   const costPer250ml = unit === 'l' ? unitCost / 4 : unitCost * 250;        // 1L = 4 × 250ml
   const costPer500ml = unit === 'l' ? unitCost / 2 : unitCost * 500;        // 1L = 2 × 500ml
   const costPer1l = unit === 'l' ? unitCost : unitCost * 1000;              // 1L = 1000ml
-  
+
   return (
     <CardWrapper variant="outline" padding="md">
       <CardWrapper.Body>
         <Stack gap="3">
           <Flex align="center" gap="2">
-            <Box 
-              w="8" h="8" 
-              bg="purple.100" 
-              rounded="full" 
-              display="flex" 
-              alignItems="center" 
+            <Box
+              w="8" h="8"
+              bg="purple.100"
+              rounded="full"
+              display="flex"
+              alignItems="center"
               justifyContent="center"
             >
               📊
@@ -428,10 +432,10 @@ const VolumeStatisticsCard = ({
               Estadísticas de Precio por Volumen
             </Text>
           </Flex>
-          
-          <Flex 
-            direction={{ base: "column", md: "row" }} 
-            gap="3" 
+
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            gap="3"
             justify="space-between"
           >
             <CardWrapper variant="subtle" padding="sm">
@@ -444,7 +448,7 @@ const VolumeStatisticsCard = ({
                 </Text>
               </CardWrapper.Body>
             </CardWrapper>
-            
+
             <CardWrapper variant="subtle" padding="sm">
               <CardWrapper.Body>
                 <Text fontSize="xs" color="purple.600" fontWeight="medium" textAlign="center">
@@ -455,7 +459,7 @@ const VolumeStatisticsCard = ({
                 </Text>
               </CardWrapper.Body>
             </CardWrapper>
-            
+
             <CardWrapper variant="subtle" padding="sm">
               <CardWrapper.Body>
                 <Text fontSize="xs" color="purple.600" fontWeight="medium" textAlign="center">
@@ -466,7 +470,7 @@ const VolumeStatisticsCard = ({
                 </Text>
               </CardWrapper.Body>
             </CardWrapper>
-            
+
             <CardWrapper variant="subtle" padding="sm">
               <CardWrapper.Body>
                 <Text fontSize="xs" color="purple.600" fontWeight="medium" textAlign="center">

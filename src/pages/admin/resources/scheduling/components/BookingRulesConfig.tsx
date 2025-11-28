@@ -6,7 +6,8 @@
 
 import { useState, useEffect } from 'react';
 import { Stack, Text, Grid } from '@chakra-ui/react';
-import { Button, CardWrapper, Field, Input, Alert, Icon, NativeSelect } from '@/shared/ui';
+import { Button, CardWrapper, Input, Alert, Icon, SelectField } from '@/shared/ui';
+import { Field } from '@chakra-ui/react';
 import {
   Cog6ToothIcon,
   ClockIcon,
@@ -212,18 +213,18 @@ export function BookingRulesConfig({ location_id }: BookingRulesConfigProps) {
             <Stack gap="4">
               <Field.Root>
                 <Field.Label>Slot Duration (minutes)</Field.Label>
-                <NativeSelect.Root
-                  value={config.slot_duration_minutes.toString()}
+                <SelectField
+                  options={[
+                    { value: '15', label: '15 minutes' },
+                    { value: '30', label: '30 minutes' },
+                    { value: '60', label: '1 hour' }
+                  ]}
+                  value={[config.slot_duration_minutes.toString()]}
                   onValueChange={(details) =>
-                    handleChange('slot_duration_minutes', parseInt(details.value))
+                    handleChange('slot_duration_minutes', parseInt(details.value[0]))
                   }
-                >
-                  <NativeSelect.Field>
-                    <option value="15">15 minutes</option>
-                    <option value="30">30 minutes</option>
-                    <option value="60">1 hour</option>
-                  </NativeSelect.Field>
-                </NativeSelect.Root>
+                  noPortal
+                />
                 <Field.HelperText>
                   Default time slot interval for bookings
                 </Field.HelperText>
@@ -259,20 +260,17 @@ export function BookingRulesConfig({ location_id }: BookingRulesConfigProps) {
           <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap="4">
             <Field.Root>
               <Field.Label>Cancellation Policy</Field.Label>
-              <NativeSelect.Root
-                value={config.cancellation_policy || 'flexible'}
+              <SelectField
+                options={CANCELLATION_POLICIES.map(policy => ({
+                  value: policy.value,
+                  label: policy.label
+                }))}
+                value={[config.cancellation_policy || 'flexible']}
                 onValueChange={(details) =>
-                  handleChange('cancellation_policy', details.value as CancellationPolicy)
+                  handleChange('cancellation_policy', details.value[0] as CancellationPolicy)
                 }
-              >
-                <NativeSelect.Field>
-                  {CANCELLATION_POLICIES.map((policy) => (
-                    <option key={policy.value} value={policy.value}>
-                      {policy.label}
-                    </option>
-                  ))}
-                </NativeSelect.Field>
-              </NativeSelect.Root>
+                noPortal
+              />
               <Field.HelperText>
                 {CANCELLATION_POLICIES.find((p) => p.value === config.cancellation_policy)
                   ?.description}

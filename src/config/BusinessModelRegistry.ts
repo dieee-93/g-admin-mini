@@ -9,6 +9,7 @@
  * @see docs/ATOMIC_CAPABILITIES_TECHNICAL_SPEC.md
  */
 
+import { logger } from '@/lib/logging';
 import type {
   BusinessCapabilityId,
   InfrastructureId,
@@ -22,6 +23,93 @@ import type {
 // ============================================
 
 const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
+  // ============================================
+  // CORE BUSINESS MODELS (Sección 1)
+  // ============================================
+
+  'physical_products': {
+    id: 'physical_products',
+    name: 'Productos Físicos',
+    description: 'Comida, retail, manufactura, artículos tangibles',
+    icon: '🍕',
+    type: 'business_model',
+
+    activatesFeatures: [
+      // PRODUCTION - Auto-activado para productos físicos
+      'production_bom_management',
+      'production_display_system',
+      'production_order_queue',
+      'production_capacity_planning',
+
+      // INVENTORY - Todo negocio físico necesita inventario
+      'inventory_stock_tracking',
+      'inventory_alert_system',
+      'inventory_purchase_orders',
+      'inventory_supplier_management',
+      'inventory_low_stock_auto_reorder',
+      'inventory_sku_management',
+      'inventory_barcode_scanning',
+      'inventory_multi_unit_tracking',
+
+      // PRODUCTS - Gestión de productos y recetas
+      'products_recipe_management',
+      'products_catalog_menu',
+      'products_cost_intelligence',
+      'products_availability_calculation',
+
+      // SALES - Necesario para vender
+      'sales_order_management',
+      'sales_payment_processing'
+    ],
+
+    blockingRequirements: []
+  },
+
+  'professional_services': {
+    id: 'professional_services',
+    name: 'Servicios Profesionales',
+    description: 'Consultoría, salud, belleza, reparaciones',
+    icon: '👨‍⚕️',
+    type: 'business_model',
+
+    activatesFeatures: [
+      // SCHEDULING - Auto-activado para servicios
+      'scheduling_appointment_booking',
+      'scheduling_calendar_management',
+      'scheduling_reminder_system',
+      'scheduling_availability_rules',
+
+      // PRODUCTION - Algunos servicios tienen "recetas" (BOM light)
+      'production_bom_management',
+      'production_order_queue',
+
+      // CUSTOMER - Historial de servicios
+      'customer_service_history',
+      'customer_preference_tracking',
+
+      // SALES - Necesario para cobrar
+      'sales_order_management',
+      'sales_payment_processing',
+      'sales_package_management',
+
+      // PRODUCTS - Service packages
+      'products_package_management',
+
+      // STAFF - Profesionales prestadores del servicio
+      'staff_employee_management',
+      'staff_shift_management',
+      'staff_time_tracking',
+      'staff_performance_tracking',
+      'staff_labor_cost_tracking'
+    ],
+
+    blockingRequirements: []
+  },
+
+  // ============================================
+  // FULFILLMENT METHODS (Sección 2)
+  // ============================================
+
   'onsite_service': {
     id: 'onsite_service',
     name: 'Servicio en Local',
@@ -40,11 +128,15 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'sales_tip_management',
       'sales_coupon_management',
 
+      // PRODUCTS - Need product catalog for menu
+      'products_catalog_menu',
+
       // OPERATIONS
       'operations_table_management',
       'operations_table_assignment',
       'operations_floor_plan_config',
       'operations_waitlist_management',
+      'operations_bill_splitting',
 
       // INVENTORY
       'inventory_stock_tracking',
@@ -79,6 +171,10 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'sales_pickup_orders',
       'sales_split_payment',
       'sales_coupon_management',
+
+      // PRODUCTS - Need product catalog
+      'products_catalog_menu',
+
       'operations_pickup_scheduling',
       'operations_notification_system',
       'inventory_stock_tracking',
@@ -112,6 +208,10 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'sales_delivery_orders',
       'sales_split_payment',
       'sales_coupon_management',
+
+      // PRODUCTS - Need product catalog
+      'products_catalog_menu',
+
       'operations_delivery_zones',
       'operations_delivery_tracking',
       'operations_notification_system',
@@ -133,71 +233,14 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
     ]
   },
 
-  'production_workflow': {
-    id: 'production_workflow',
-    name: 'Production Workflow',
-    description: 'Businesses that require production/assembly/preparation workflows',
-    icon: '👨‍🍳',
-    type: 'production',
+  // ❌ ELIMINADO: production_workflow - ahora se auto-activa con physical_products
+  // ❌ ELIMINADO: appointment_based - ahora se auto-activa con professional_services/rentals/memberships
 
-    activatesFeatures: [
-      'production_bom_management',      // RENAMED from production_recipe_management
-      'production_display_system',      // RENAMED from production_kitchen_display
-      'production_order_queue',
-      'production_capacity_planning',
-      'inventory_purchase_orders',
-      'inventory_supplier_management',
-      'inventory_demand_forecasting',
-      'inventory_batch_lot_tracking',
-      'inventory_expiration_tracking',
-      'operations_vendor_performance',
-
-      // STAFF - Production staff, supervisors, operators
-      'staff_employee_management',
-      'staff_shift_management',
-      'staff_time_tracking',
-      'staff_performance_tracking',
-      'staff_training_management'
-    ],
-
-    blockingRequirements: []
-  },
-
-  'appointment_based': {
-    id: 'appointment_based',
-    name: 'Servicios con Cita',
-    description: 'Servicios que requieren cita previa',
-    icon: '📅',
-    type: 'service_mode',
-
-    activatesFeatures: [
-      'scheduling_appointment_booking',
-      'scheduling_calendar_management',
-      'scheduling_reminder_system',
-      'scheduling_availability_rules',
-      'customer_service_history',
-      'customer_preference_tracking',
-      'customer_online_accounts',
-      'sales_package_management',
-
-      // STAFF - Profesionales, técnicos, prestadores de servicio
-      'staff_employee_management',
-      'staff_shift_management',
-      'staff_time_tracking',
-      'staff_performance_tracking'
-    ],
-
-    blockingRequirements: [
-      'service_types_required',
-      'available_hours_required'
-    ]
-  },
-
-  'online_store': { // ✅ RENAMED: async_operations → online_store
-    id: 'online_store',
-    name: 'Tienda Online',
-    description: 'E-commerce 24/7 con fulfillment diferido',
-    icon: '🌐',
+  'async_operations': { // ✅ RENAMED: online_store → async_operations
+    id: 'async_operations',
+    name: 'Operaciones Asíncronas',
+    description: 'Recibe pedidos, reservas y citas fuera del horario operativo',
+    icon: '🌙',
     type: 'special_operation',
 
     activatesFeatures: [
@@ -207,6 +250,11 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'sales_cart_management',
       'sales_checkout_process',
       'sales_coupon_management',
+
+      // PRODUCTS - E-commerce catalog
+      'products_catalog_ecommerce',
+      'products_availability_calculation',
+
       'analytics_ecommerce_metrics',
       'analytics_conversion_tracking',
       'operations_deferred_fulfillment',
@@ -238,6 +286,11 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'sales_quote_to_order',
       'sales_bulk_pricing',
       'sales_quote_generation',
+
+      // PRODUCTS - B2B catalog with bulk pricing
+      'products_catalog_ecommerce',
+      'products_cost_intelligence',
+
       'inventory_available_to_promise',
       'inventory_demand_forecasting',
       'operations_vendor_performance',
@@ -264,6 +317,9 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
       'mobile_route_planning',
       'mobile_inventory_constraints',
 
+      // PRODUCTS - Mobile operations sell products
+      'products_catalog_menu',
+
       // STAFF - Conductor, asistente, personal móvil
       'staff_employee_management',
       'staff_shift_management',
@@ -274,6 +330,84 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
     blockingRequirements: [
       'mobile_equipment_required'
     ]
+  },
+
+  'asset_rental': {
+    id: 'asset_rental',
+    name: 'Alquiler de Activos',
+    description: 'Renta de equipos, espacios o vehículos',
+    icon: '🔑',
+    type: 'special_operation',
+
+    activatesFeatures: [
+      'rental_item_management',
+      'rental_booking_calendar',
+      'rental_availability_tracking',
+      'rental_pricing_by_duration',
+      'rental_late_fees',
+
+      // CUSTOMER - Necesario para gestionar clientes que rentan
+      'customer_service_history',
+      'customer_preference_tracking'
+    ],
+
+    blockingRequirements: []
+  },
+
+  'membership_subscriptions': {
+    id: 'membership_subscriptions',
+    name: 'Membresías y Suscripciones',
+    description: 'Acceso recurrente a servicios o espacios',
+    icon: '💳',
+    type: 'special_operation',
+
+    activatesFeatures: [
+      'membership_subscription_plans',
+      'membership_recurring_billing',
+      'membership_access_control',
+      'membership_usage_tracking',
+      'membership_benefits_management',
+
+      // CUSTOMER - Gestión de miembros
+      'customer_service_history',
+      'customer_preference_tracking',
+      'customer_loyalty_program',
+      'customer_online_accounts',
+
+      // FINANCE - Facturación recurrente
+      'finance_credit_management',
+      'finance_invoice_scheduling',
+      'finance_payment_terms'
+    ],
+
+    blockingRequirements: []
+  },
+
+  'digital_products': {
+    id: 'digital_products',
+    name: 'Productos Digitales',
+    description: 'Venta de archivos, licencias y contenido digital',
+    icon: '💾',
+    type: 'special_operation',
+
+    activatesFeatures: [
+      'digital_file_delivery',
+      'digital_license_management',
+      'digital_download_tracking',
+      'digital_version_control',
+
+      // ONLINE STORE - Necesario para distribución digital
+      'sales_catalog_ecommerce',
+      'sales_online_order_processing',
+      'sales_online_payment_gateway',
+      'sales_cart_management',
+
+      // ANALYTICS - Tracking de descargas y conversiones
+      'analytics_ecommerce_metrics',
+      'analytics_conversion_tracking'
+    ],
+
+    blockingRequirements: []
   }
 };
 
@@ -284,12 +418,12 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
 const INFRASTRUCTURE: Record<InfrastructureId, Infrastructure> = {
   'single_location': {
     id: 'single_location',
-    name: 'Local Único',
-    description: 'Opera desde una sola ubicación fija',
+    name: 'Local Fijo',
+    description: 'Opera desde una ubicación física fija',
     icon: '🏪',
     type: 'infrastructure',
 
-    conflicts: ['multi_location'], // ✅ FIXED: Solo conflicto con multi_location
+    conflicts: [], // ✅ Sin conflictos - combinable con multi_location y mobile
 
     activatesFeatures: [],
 
@@ -305,7 +439,7 @@ const INFRASTRUCTURE: Record<InfrastructureId, Infrastructure> = {
     icon: '🏢',
     type: 'infrastructure',
 
-    conflicts: ['single_location'], // ✅ FIXED: Solo conflicto con single_location
+    conflicts: [], // ✅ Sin conflictos - requiere single_location implícitamente
 
     activatesFeatures: [
       'multisite_location_management',
@@ -337,21 +471,9 @@ const INFRASTRUCTURE: Record<InfrastructureId, Infrastructure> = {
     blockingRequirements: [
       'mobile_equipment_required'
     ]
-  },
-
-  'online_only': {
-    id: 'online_only',
-    name: 'Solo Online',
-    description: 'Sin presencia física',
-    icon: '🌐',
-    type: 'infrastructure',
-
-    conflicts: [],
-
-    activatesFeatures: [],
-
-    blockingRequirements: []
   }
+
+  // ❌ ELIMINADO: online_only - redundante (se logra con delivery + ecommerce sin local fijo)
 };
 
 // ============================================
@@ -362,6 +484,10 @@ export const BUSINESS_MODEL_REGISTRY = {
   capabilities: CAPABILITIES,
   infrastructure: INFRASTRUCTURE
 };
+
+// Export individual registries for direct access
+export const BUSINESS_CAPABILITIES_REGISTRY = CAPABILITIES;
+export const INFRASTRUCTURE_REGISTRY = INFRASTRUCTURE;
 
 // ============================================
 // UTILITY FUNCTIONS
@@ -435,7 +561,7 @@ export function getActivatedFeatures(
   capabilities.forEach(capId => {
     const capability = CAPABILITIES[capId];
     if (!capability) {
-      console.warn(`[BusinessModelRegistry] Unknown capability ID: ${capId}`);
+      logger.warn('BusinessModelRegistry', `Unknown capability ID: ${capId}`);
       return; // Skip invalid capability
     }
     capability.activatesFeatures.forEach(f => features.add(f));
@@ -445,7 +571,7 @@ export function getActivatedFeatures(
   infrastructure.forEach(infraId => {
     const infra = INFRASTRUCTURE[infraId];
     if (!infra) {
-      console.warn(`[BusinessModelRegistry] Unknown infrastructure ID: ${infraId}`);
+      logger.warn('BusinessModelRegistry', `Unknown infrastructure ID: ${infraId}`);
       return; // Skip invalid infrastructure
     }
     infra.activatesFeatures.forEach(f => features.add(f));
@@ -466,7 +592,7 @@ export function getBlockingRequirements(
   capabilities.forEach(capId => {
     const capability = CAPABILITIES[capId];
     if (!capability) {
-      console.warn(`[BusinessModelRegistry] Unknown capability ID in getBlockingRequirements: ${capId}`);
+      logger.warn('BusinessModelRegistry', `Unknown capability ID in getBlockingRequirements: ${capId}`);
       return;
     }
     if (capability.blockingRequirements) {
@@ -477,7 +603,7 @@ export function getBlockingRequirements(
   infrastructure.forEach(infraId => {
     const infra = INFRASTRUCTURE[infraId];
     if (!infra) {
-      console.warn(`[BusinessModelRegistry] Unknown infrastructure ID in getBlockingRequirements: ${infraId}`);
+      logger.warn('BusinessModelRegistry', `Unknown infrastructure ID in getBlockingRequirements: ${infraId}`);
       return;
     }
     if (infra.blockingRequirements) {

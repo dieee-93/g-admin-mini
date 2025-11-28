@@ -92,12 +92,12 @@ export const LazySuppliersPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Supplier Orders Page (pages/admin/supply-chain/supplier-orders/page.tsx)
+// Lazy-loaded Materials Procurement Page (pages/admin/supply-chain/materials/procurement/page.tsx)
 export const LazySupplierOrdersPage = createLazyComponent(
-  () => import('../../pages/admin/supply-chain/supplier-orders/page'),
-  'supplier-orders',
+  () => import('../../pages/admin/supply-chain/materials/procurement/page'),
+  'materials-procurement',
   {
-    chunkName: 'supplier-orders-module',
+    chunkName: 'materials-procurement-module',
     preload: false,
     priority: 'medium',
     cacheStrategy: 'both'
@@ -155,6 +155,18 @@ export const LazyFiscalPage = createLazyComponent(
   }
 );
 
+// Lazy-loaded Cash Management Page (pages/admin/finance/cash/page.tsx)
+export const LazyCashPage = createLazyComponent(
+  () => import('../../pages/admin/finance/cash/page'),
+  'cash-management',
+  {
+    chunkName: 'cash-module',
+    preload: false,
+    priority: 'high', // Critical for cash flow and accounting
+    cacheStrategy: 'both'
+  }
+);
+
 // Lazy-loaded Products Page (pages/admin/supply-chain/products/page.tsx)
 export const LazyProductsPage = createLazyComponent(
   () => import('../../pages/admin/supply-chain/products/page'),
@@ -164,6 +176,19 @@ export const LazyProductsPage = createLazyComponent(
     preload: false,
     priority: 'medium',
     cacheStrategy: 'both'
+  }
+);
+
+// Lazy-loaded Product Form Page (pages/admin/supply-chain/products/ProductFormPage.tsx)
+// NEW: v3.0 Wizard-based form for creating/editing products
+export const LazyProductFormPage = createLazyComponent(
+  () => import('../../pages/admin/supply-chain/products/ProductFormPage').then(m => ({ default: m.ProductFormPage })),
+  'product-form',
+  {
+    chunkName: 'product-form-wizard',
+    preload: false,
+    priority: 'medium',
+    cacheStrategy: 'memory' // Form data should not persist across sessions
   }
 );
 
@@ -185,6 +210,17 @@ export const LazyDebugDashboard = createLazyComponent(
   'debug-dashboard',
   {
     chunkName: 'debug-dashboard',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyAlertsTestingPage = createLazyComponent(
+  () => import('../../pages/debug/alerts/index'),
+  'alerts-testing',
+  {
+    chunkName: 'alerts-testing',
     preload: false,
     priority: 'low',
     cacheStrategy: 'memory'
@@ -394,7 +430,7 @@ export const LazyRentalsPage = createLazyComponent(
 
 // Lazy-loaded Assets Page (pages/admin/operations/assets/page.tsx)
 export const LazyAssetsPage = createLazyComponent(
-  () => import('../../pages/admin/operations/assets/page'),
+  () => import('../../pages/admin/supply-chain/assets/page'),
   'assets',
   {
     chunkName: 'assets-module',
@@ -538,10 +574,12 @@ export const lazyModules = {
   LazySuppliersPage,
   LazySupplierOrdersPage,
   LazyProductsPage,
+  LazyProductFormPage,
   LazyStaffPage,
   LazyCustomersPage,
   LazySchedulingPage,
   LazyFiscalPage,
+  LazyCashPage,
   LazySettingsPage,
   LazyGamificationPage,
   LazyExecutivePage,

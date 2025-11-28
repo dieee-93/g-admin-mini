@@ -19,7 +19,7 @@ import eventBus from '@/lib/events/EventBus';
 
 // NEW SYSTEM - Layer 1: User Choices
 import type {
-  BusinessActivityId,
+  BusinessCapabilityId,
   InfrastructureId
 } from '@/config/BusinessModelRegistry';
 
@@ -79,13 +79,16 @@ export interface UserProfile {
   currency: string;
 
   // NEW: Separate user choices
-  selectedActivities: BusinessActivityId[];
+  selectedCapabilities: BusinessCapabilityId[];
   selectedInfrastructure: InfrastructureId[];
 
   // Setup status
   setupCompleted: boolean;
   isFirstTimeInDashboard: boolean;
   onboardingStep: number;
+  
+  // Optional: Milestones tracking (v4.0)
+  completedMilestones?: string[];
 }
 
 export interface FeatureState {
@@ -108,8 +111,8 @@ export interface FeatureState {
     redirectTo: string;
   }>;
 
+  /** ✅ REFACTOR: activeModules removed - use getActiveModules() getter instead */
   /** Cached computed values (memoized) */
-  activeModules: string[];
   activeSlots: Array<{ id: string; component: string; priority: number }>;
 }
 
@@ -120,12 +123,12 @@ export interface CapabilityStoreState {
 
   // Actions
   initializeProfile: (data: Partial<UserProfile>) => void;
-  toggleActivity: (activityId: BusinessActivityId) => void;
-  setCapabilities: (capabilities: BusinessActivityId[]) => void;
+  toggleCapability: (capabilityId: BusinessCapabilityId) => void;
+  setCapabilities: (capabilities: BusinessCapabilityId[]) => void;
   setInfrastructure: (infraId: InfrastructureId) => void;
+  toggleInfrastructure: (infraId: InfrastructureId) => void;
+  updateProfile: (updates: Partial<UserProfile>) => void;
   completeSetup: () => void;
-  completeMilestone: (milestoneId: string) => void;
-  satisfyValidation: (validationId: string) => void;
   dismissWelcome: () => void;
   resetProfile: () => void;
 
@@ -152,7 +155,7 @@ const DEFAULT_PROFILE: UserProfile = {
   phone: '',
   country: 'Argentina',
   currency: 'ARS',
-  selectedActivities: [],
+  selectedCapabilities: [],
   selectedInfrastructure: ['single_location'],
   setupCompleted: false,
   isFirstTimeInDashboard: false,
@@ -165,7 +168,7 @@ const DEFAULT_FEATURES: FeatureState = {
   pendingMilestones: [],
   completedMilestones: [],
   validationErrors: [],
-  activeModules: [],
+  // ✅ REFACTOR: activeModules removed - use getActiveModules() getter
   activeSlots: []
 };
 
@@ -194,32 +197,29 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
 
           // Activar features según user choices
           try {
-            const activationResult = FeatureActivationEngine.activateFeatures(
-              newProfile.selectedActivities,
-              newProfile.selectedInfrastructure,
-              newProfile,
-              {} // systemConfig - TODO: load from DB if needed
+            const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+              newProfile.selectedCapabilities,
+              newProfile.selectedInfrastructure
             );
 
             logger.info('CapabilityStore', '🚀 Profile initialized:', {
-              activities: newProfile.selectedActivities.length,
+              capabilities: newProfile.selectedCapabilities.length,
               infrastructure: newProfile.selectedInfrastructure.length,
-              activeFeatures: activationResult.activeFeatures.length,
-              blockedFeatures: activationResult.blockedFeatures.length
+              activeFeatures: activeFeatures.length,
             });
 
-            const newActiveModules = getModulesForActiveFeatures(activationResult.activeFeatures);
+            // ✅ REFACTOR: activeModules calculation removed - use getActiveModules() getter
 
             return {
               ...state,
               profile: newProfile,
               features: {
-                activeFeatures: activationResult.activeFeatures,
-                blockedFeatures: activationResult.blockedFeatures,
-                pendingMilestones: activationResult.pendingMilestones,
+                activeFeatures: activeFeatures,
+                blockedFeatures: [],
+                pendingMilestones: [],
                 completedMilestones: [],
-                validationErrors: activationResult.validationErrors,
-                activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules),
+                validationErrors: [],
+                // activeModules removed - use getActiveModules() getter
                 activeSlots: [] // Legacy system removed - use Hook System instead
               }
             };
@@ -230,88 +230,86 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
         });
       },
 
-      toggleActivity: (activityId) => {
-        logger.info('CapabilityStore', '🔄 toggleActivity START', {
-          activityId,
-          currentActivities: get().profile?.selectedActivities || []
+      toggleCapability: (capabilityId) => {
+        logger.info('CapabilityStore', '🔄 toggleCapability START', {
+          capabilityId,
+          currentCapabilities: get().profile?.selectedCapabilities || []
         });
 
         set((state) => {
           if (!state.profile) {
-            logger.warn('CapabilityStore', '⚠️ No profile found, cannot toggle activity');
+            logger.warn('CapabilityStore', '⚠️ No profile found, cannot toggle capability');
             return state;
           }
 
-          const currentActivities = state.profile.selectedActivities;
-          const isAdding = !currentActivities.includes(activityId);
-          const rawNewActivities = currentActivities.includes(activityId)
-            ? currentActivities.filter(id => id !== activityId)
-            : [...currentActivities, activityId];
+          const currentCapabilities = state.profile.selectedCapabilities;
+          const isAdding = !currentCapabilities.includes(capabilityId);
+          const rawNewCapabilities = currentCapabilities.includes(capabilityId)
+            ? currentCapabilities.filter(id => id !== capabilityId)
+            : [...currentCapabilities, capabilityId];
 
           // 🔧 FIX: Preserve array reference if content unchanged
-          const newActivities = getUpdatedArrayIfChanged(currentActivities, rawNewActivities);
+          const newCapabilities = getUpdatedArrayIfChanged(currentCapabilities, rawNewCapabilities);
 
-          logger.info('CapabilityStore', `${isAdding ? '➕' : '➖'} ${isAdding ? 'Adding' : 'Removing'} activity`, {
-            activityId,
-            oldCount: currentActivities.length,
-            newCount: newActivities.length,
-            newActivities
+          logger.info('CapabilityStore', `${isAdding ? '➕' : '➖'} ${isAdding ? 'Adding' : 'Removing'} capability`, {
+            capabilityId,
+            oldCount: currentCapabilities.length,
+            newCount: newCapabilities.length,
+            newCapabilities
           });
 
           const updatedProfile = {
             ...state.profile,
-            selectedActivities: newActivities
+            selectedCapabilities: newCapabilities
           };
 
           // Persist to database (async, don't wait)
-          saveProfileToDB(updatedProfile)
-            .then(() => {
-              logger.info('CapabilityStore', '✅ Profile persisted to DB successfully');
-            })
-            .catch(err => {
-              logger.error('CapabilityStore', '❌ Error persisting activity toggle to DB:', err);
-            });
+          // Note: BusinessProfileService already logs success/error
+          saveProfileToDB(updatedProfile).catch(err => {
+            logger.error('CapabilityStore', '❌ Error persisting capability toggle to DB:', err);
+          });
 
           // Re-activar features
           try {
-            const activationResult = FeatureActivationEngine.activateFeatures(
-              newActivities,
-              updatedProfile.selectedInfrastructure,
-              updatedProfile,
-              {}
+            const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+              newCapabilities,
+              updatedProfile.selectedInfrastructure
             );
 
             logger.info('CapabilityStore', '⚙️ Features reactivated', {
-              activeFeatures: activationResult.activeFeatures.length,
-              blockedFeatures: activationResult.blockedFeatures.length,
-              pendingMilestones: activationResult.pendingMilestones.length
+              activeFeatures: activeFeatures.length,
             });
 
-            // Emit event si se agregó una nueva activity
-            if (!currentActivities.includes(activityId)) {
-              eventBus.emit('user_choice.activity_selected', {
-                activityId,
+            // Emit event si se agregó una nueva capability
+            if (!currentCapabilities.includes(capabilityId)) {
+              eventBus.emit('user_choice.capability_selected', {
+                capabilityId,
                 timestamp: Date.now()
               });
             }
 
-            const newActiveModules = getModulesForActiveFeatures(activationResult.activeFeatures);
+            // ✅ REFACTOR: activeModules calculation removed - use getActiveModules() getter
+
+            logger.info('CapabilityStore', '🔍 DEBUG toggleCapability - features:', {
+              capabilityId,
+              activeFeatures: activeFeatures.length,
+            });
 
             return {
               ...state,
               profile: updatedProfile,
               features: {
-                activeFeatures: activationResult.activeFeatures,
-                blockedFeatures: activationResult.blockedFeatures,
-                pendingMilestones: activationResult.pendingMilestones,
+                activeFeatures: activeFeatures,
+                blockedFeatures: [],
+                pendingMilestones: [],
                 completedMilestones: state.features.completedMilestones,
-                validationErrors: activationResult.validationErrors,
-                activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules),
+                validationErrors: [],
+                // activeModules removed - use getActiveModules() getter
                 activeSlots: [] // Legacy system removed - use Hook System instead
               }
             };
           } catch (error) {
-            logger.error('CapabilityStore', '❌ Error toggling activity:', error);
+            logger.error('CapabilityStore', '❌ Error toggling capability:', error);
             return state;
           }
         });
@@ -322,14 +320,14 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
           if (!state.profile) return state;
 
           // 🔧 FIX: Preserve array reference if content unchanged
-          const selectedActivities = getUpdatedArrayIfChanged(
-            state.profile.selectedActivities,
+          const selectedCapabilities = getUpdatedArrayIfChanged(
+            state.profile.selectedCapabilities,
             capabilities
           );
 
           const updatedProfile = {
             ...state.profile,
-            selectedActivities
+            selectedCapabilities
           };
 
           // Persist to database (async, don't wait)
@@ -339,30 +337,28 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
 
           // Re-activar features
           try {
-            const activationResult = FeatureActivationEngine.activateFeatures(
+            const { activeFeatures } = FeatureActivationEngine.activateFeatures(
               capabilities,
-              updatedProfile.selectedInfrastructure,
-              updatedProfile,
-              {}
+              updatedProfile.selectedInfrastructure
             );
 
             logger.info('CapabilityStore', '🎯 Capabilities set:', {
               count: capabilities.length,
-              activeFeatures: activationResult.activeFeatures.length
+              activeFeatures: activeFeatures.length
             });
 
-            const newActiveModules = getModulesForActiveFeatures(activationResult.activeFeatures);
+            // ✅ REFACTOR: activeModules calculation removed - use getActiveModules() getter
 
             return {
               ...state,
               profile: updatedProfile,
               features: {
-                activeFeatures: activationResult.activeFeatures,
-                blockedFeatures: activationResult.blockedFeatures,
-                pendingMilestones: activationResult.pendingMilestones,
+                activeFeatures: activeFeatures,
+                blockedFeatures: [],
+                pendingMilestones: [],
                 completedMilestones: state.features.completedMilestones,
-                validationErrors: activationResult.validationErrors,
-                activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules),
+                validationErrors: [],
+                // activeModules removed - use getActiveModules() getter
                 activeSlots: [] // Legacy system removed - use Hook System instead
               }
             };
@@ -389,43 +385,113 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
             selectedInfrastructure
           };
 
+          return {
+            ...state,
+            profile: updatedProfile
+          };
+        });
+      },
+
+      /**
+       * Toggle infrastructure (multi-select)
+       * Permite combinar infrastructures (ej: local fijo + móvil)
+       */
+      toggleInfrastructure: (infraId) => {
+        set((state) => {
+          if (!state.profile) return state;
+
+          const current = state.profile.selectedInfrastructure;
+          const isSelected = current.includes(infraId);
+
+          let newInfrastructure: InfrastructureId[];
+
+          if (isSelected) {
+            // Remove
+            newInfrastructure = current.filter(id => id !== infraId);
+          } else {
+            // Add
+            newInfrastructure = [...current, infraId];
+          }
+
+          // 🔧 FIX: Preserve array reference if content unchanged
+          const selectedInfrastructure = getUpdatedArrayIfChanged(
+            state.profile.selectedInfrastructure,
+            newInfrastructure
+          );
+
+          const updatedProfile = {
+            ...state.profile,
+            selectedInfrastructure
+          };
+
           // Persist to database (async, don't wait)
           saveProfileToDB(updatedProfile).catch(err => {
-            logger.error('CapabilityStore', '❌ Error persisting infrastructure change to DB:', err);
+            logger.error('CapabilityStore', '❌ Error persisting infrastructure toggle to DB:', err);
           });
 
+          // Recompute features with ALL selected infrastructure
           try {
-            const activationResult = FeatureActivationEngine.activateFeatures(
-              updatedProfile.selectedActivities,
-              [infraId],
-              updatedProfile,
-              {}
+            const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+              updatedProfile.selectedCapabilities,
+              updatedProfile.selectedInfrastructure
             );
 
-            eventBus.emit('user_choice.infrastructure_selected', {
+            eventBus.emit('user_choice.infrastructure_toggled', {
               infraId,
+              isSelected: !isSelected,
               timestamp: Date.now()
             });
 
-            const newActiveModules = getModulesForActiveFeatures(activationResult.activeFeatures);
+            // ✅ REFACTOR: activeModules calculation removed - use getActiveModules() getter
 
             return {
               ...state,
               profile: updatedProfile,
               features: {
-                activeFeatures: activationResult.activeFeatures,
-                blockedFeatures: activationResult.blockedFeatures,
-                pendingMilestones: activationResult.pendingMilestones,
+                activeFeatures: activeFeatures,
+                blockedFeatures: [],
+                pendingMilestones: [],
                 completedMilestones: state.features.completedMilestones,
-                validationErrors: activationResult.validationErrors,
-                activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules),
-                activeSlots: [] // Legacy system removed - use Hook System instead
+                validationErrors: [],
+                // activeModules removed - use getActiveModules() getter
+                activeSlots: []
               }
             };
           } catch (error) {
             logger.error('CapabilityStore', '❌ Error setting infrastructure:', error);
             return state;
           }
+        });
+      },
+
+      updateProfile: (updates) => {
+        set((state) => {
+          if (!state.profile) {
+            logger.warn('CapabilityStore', '⚠️ No profile found, cannot update');
+            return state;
+          }
+
+          const updatedProfile = {
+            ...state.profile,
+            ...updates
+          };
+
+          // Persist to database (async, don't wait)
+          saveProfileToDB(updatedProfile as any).catch(err => {
+            logger.error('CapabilityStore', '❌ Error persisting profile update to DB:', err);
+          });
+
+          logger.info('CapabilityStore', '✏️ Profile updated:', {
+            updates: Object.keys(updates),
+            businessName: updatedProfile.businessName,
+            email: updatedProfile.email,
+            phone: updatedProfile.phone
+          });
+
+          return {
+            ...state,
+            profile: updatedProfile
+          };
         });
       },
 
@@ -454,7 +520,7 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
           });
 
           logger.info('CapabilityStore', '✅ Setup completed:', {
-            activities: updatedProfile.selectedActivities.length,
+            capabilities: updatedProfile.selectedCapabilities.length,
             infrastructure: updatedProfile.selectedInfrastructure.length,
             activeFeatures: state.features.activeFeatures.length,
             pendingMilestones: state.features.pendingMilestones.length
@@ -463,124 +529,6 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
           return {
             ...state,
             profile: updatedProfile
-          };
-        });
-      },
-
-      completeMilestone: (milestoneId) => {
-        set((state) => {
-          if (!state.profile) return state;
-
-          const newCompletedMilestones = [
-            ...state.features.completedMilestones,
-            milestoneId
-          ];
-
-          // Verificar si se desbloquea alguna feature
-          const unlockResult = FeatureActivationEngine.unlockFeatureByMilestone(
-            milestoneId,
-            newCompletedMilestones,
-            state.features.blockedFeatures
-          );
-
-          logger.info('CapabilityStore', '🎯 Milestone completed:', {
-            milestoneId,
-            unlockedFeature: unlockResult.unlockedFeature,
-            featureFullyUnlocked: unlockResult.featureFullyUnlocked
-          });
-
-          // Si se desbloqueó una feature, moverla de blocked a active
-          let newActiveFeatures = state.features.activeFeatures;
-          let newBlockedFeatures = state.features.blockedFeatures;
-
-          if (unlockResult.unlockedFeature) {
-            newActiveFeatures = [
-              ...state.features.activeFeatures,
-              unlockResult.unlockedFeature
-            ];
-            newBlockedFeatures = state.features.blockedFeatures.filter(
-              f => f !== unlockResult.unlockedFeature
-            );
-
-            // Emit feature unlocked event
-            eventBus.emit('feature.unlocked', {
-              featureId: unlockResult.unlockedFeature,
-              unlockedBy: 'milestone',
-              milestoneId,
-              timestamp: Date.now()
-            });
-          }
-
-          // Persist to database (async, don't wait)
-          updateCompletedMilestonesInDB(newCompletedMilestones).catch(err => {
-            logger.error('CapabilityStore', '❌ Error persisting milestone to DB:', err);
-          });
-
-          const newActiveModules = getModulesForActiveFeatures(newActiveFeatures);
-
-          return {
-            ...state,
-            features: {
-              ...state.features,
-              activeFeatures: newActiveFeatures,
-              blockedFeatures: newBlockedFeatures,
-              completedMilestones: newCompletedMilestones,
-              pendingMilestones: state.features.pendingMilestones.filter(
-                m => m !== milestoneId
-              ),
-              activeModules: getUpdatedArrayIfChanged(state.features.activeModules, newActiveModules)
-              // Note: activeSlots removed - Slot system deprecated in favor of Module Registry
-            }
-          };
-        });
-      },
-
-      satisfyValidation: (validationId) => {
-        set((state) => {
-          if (!state.profile) return state;
-
-          // Verificar qué features se desbloquean
-          const unlockResult = FeatureActivationEngine.unlockFeatureByValidation(
-            validationId,
-            state.features.blockedFeatures,
-            state.profile,
-            {}
-          );
-
-          logger.info('CapabilityStore', '🔓 Validation satisfied:', {
-            validationId,
-            unlockedFeatures: unlockResult.unlockedFeatures.length
-          });
-
-          // Mover features desbloqueadas
-          const newActiveFeatures = [
-            ...state.features.activeFeatures,
-            ...unlockResult.unlockedFeatures
-          ];
-
-          // Emit events para cada feature desbloqueada
-          unlockResult.unlockedFeatures.forEach(featureId => {
-            eventBus.emit('feature.unlocked', {
-              featureId,
-              unlockedBy: 'validation',
-              validationId,
-              timestamp: Date.now()
-            });
-          });
-
-          // Remover errores de validación satisfechos
-          const newValidationErrors = state.features.validationErrors.filter(
-            err => err.field !== validationId
-          );
-
-          return {
-            ...state,
-            features: {
-              ...state.features,
-              activeFeatures: newActiveFeatures,
-              blockedFeatures: unlockResult.stillBlocked,
-              validationErrors: newValidationErrors
-            }
           };
         });
       },
@@ -628,8 +576,36 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
           const profileFromDB = await loadProfileFromDB();
 
           if (profileFromDB) {
-            // TODO: Convert old format to new format if needed
-            // For now, initialize with default structure
+            const currentProfile = get().profile;
+            
+            // ⚠️ ANTI-OVERWRITE PROTECTION:
+            // Si la DB tiene arrays vacíos PERO localStorage tiene datos,
+            // significa que el usuario ya activó capabilities en esta sesión
+            // → NO sobrescribir con datos vacíos de la DB
+            const dbIsEmpty = (
+              (!profileFromDB.selectedCapabilities || profileFromDB.selectedCapabilities.length === 0) &&
+              (!profileFromDB.selectedInfrastructure || profileFromDB.selectedInfrastructure.length === 0)
+            );
+            
+            const localStorageHasData = currentProfile && (
+              (currentProfile.selectedCapabilities && currentProfile.selectedCapabilities.length > 0) ||
+              (currentProfile.selectedInfrastructure && currentProfile.selectedInfrastructure.length > 0)
+            );
+            
+            if (dbIsEmpty && localStorageHasData) {
+              logger.warn('CapabilityStore', '⚠️ DB is empty but localStorage has data - NOT overwriting!', {
+                dbProfile: profileFromDB,
+                currentProfile: currentProfile
+              });
+              
+              // Guardar el perfil actual (de localStorage) a la DB
+              get().saveToDB();
+              
+              set({ isLoading: false });
+              return false; // No cargamos desde DB
+            }
+            
+            // Si la DB tiene datos, cargar normalmente
             get().initializeProfile(profileFromDB as any);
 
             logger.info('CapabilityStore', '✅ Profile loaded from DB');
@@ -698,6 +674,21 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
     {
       name: 'capability-store-v4',
       version: 4,
+      // ✅ ZUSTAND V5 BEST PRACTICE: Use partialize to specify what to persist
+      // This prevents unnecessary data from being saved and ensures clean localStorage
+      partialize: (state) => ({
+        profile: state.profile,
+        features: {
+          activeFeatures: state.features.activeFeatures,
+          // activeModules removed - computed via getActiveModules()
+          blockedFeatures: state.features.blockedFeatures,
+          pendingMilestones: state.features.pendingMilestones,
+          completedMilestones: state.features.completedMilestones,
+          validationErrors: state.features.validationErrors,
+          activeSlots: state.features.activeSlots,
+        }
+        // isLoading is NOT persisted (transient state only)
+      }),
       migrate: (persistedState: any, version: number) => {
         if (version < 4) {
           logger.info('CapabilityStore', '🔄 Migrating to v4 - resetting data');
@@ -708,10 +699,165 @@ export const useCapabilityStore = create<CapabilityStoreState>()(
           };
         }
         return persistedState;
+      },
+      onRehydrateStorage: () => {
+        logger.info('CapabilityStore', '💧 Rehydration starting...');
+        
+        // ✅ ZUSTAND V5 BEST PRACTICE: Return function for post-hydration logic
+        return (state, error) => {
+          if (error) {
+            logger.error('CapabilityStore', '❌ Hydration error:', error);
+            return;
+          }
+
+          if (!state) {
+            logger.warn('CapabilityStore', '⚠️ No state to rehydrate');
+            return;
+          }
+
+          logger.info('CapabilityStore', '✅ Hydration complete', {
+            hasProfile: !!state.profile,
+            capabilities: state.profile?.selectedCapabilities?.length || 0,
+            features: state.features?.activeFeatures?.length || 0
+          });
+        };
       }
     }
   )
 );
+
+// ============================================
+// ============================================================================
+// 4. HYDRATION TRACKING
+// ============================================================================
+// ✅ ZUSTAND V5 OFFICIAL PATTERN from docs:
+// 1. Register onFinishHydration FIRST (at module level, before hydration starts)
+// 2. Use hasHydrated() as fallback for synchronous checks
+// 3. Both patterns work together (see useHydration hook in docs)
+// Docs: https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md
+// ============================================================================
+
+logger.debug('CapabilityStore', 'capabilityStore.ts module is loading');
+logger.debug('CapabilityStore', 'Environment check', { 
+  isWindow: typeof window !== 'undefined',
+  hasStore: !!useCapabilityStore,
+  hasPersist: !!useCapabilityStore?.persist
+});
+
+// ✅ STEP 1: Register onFinishHydration listener IMMEDIATELY (module level)
+// This MUST be at module scope to catch the hydration event
+// If registered inside window check, hydration may complete before registration
+const hydrationUnsubscribe = useCapabilityStore.persist.onFinishHydration((state) => {
+  logger.info('CapabilityStore', '🏁 onFinishHydration callback FIRED!', {
+    hasState: !!state,
+    hasProfile: !!state?.profile,
+    selectedCapabilities: state?.profile?.selectedCapabilities?.length || 0,
+    activeFeatures: state?.features?.activeFeatures?.length || 0,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Recalculate features if profile exists but features are empty
+  if (state.profile && (!state.features?.activeFeatures || state.features.activeFeatures.length === 0)) {
+    logger.warn('CapabilityStore', '⚠️ [onFinishHydration] Profile exists but features empty - recalculating...');
+    
+    try {
+      const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+        state.profile.selectedCapabilities || [],
+        state.profile.selectedInfrastructure || []
+      );
+      // ✅ REFACTOR: activeModules calculation removed - use getActiveModules() getter
+
+      logger.info('CapabilityStore', '🔄 [onFinishHydration] Recalculated features:', {
+        activeFeatures: activeFeatures.length,
+      });
+
+      useCapabilityStore.setState({
+        features: {
+          ...state.features,
+          activeFeatures,
+          // activeModules removed - use getActiveModules() getter
+        }
+      });
+
+      logger.info('CapabilityStore', '✅ [onFinishHydration] Features recalculated successfully');
+    } catch (error) {
+      logger.error('CapabilityStore', '❌ [onFinishHydration] Error recalculating features:', error);
+    }
+  }
+});
+
+logger.debug('CapabilityStore', 'onFinishHydration listener registered');
+
+if (typeof window !== 'undefined') {
+  logger.debug('CapabilityStore', 'Entering window check block');
+  
+  // Store unsubscribe function for cleanup
+  (window as any).__CAPABILITY_STORE_HYDRATION_UNSUB__ = hydrationUnsubscribe;
+  
+  // ✅ STEP 2: Synchronous check if already hydrated (fallback pattern from docs)
+  const checkIfAlreadyHydrated = () => {
+    const hasHydrated = useCapabilityStore.persist.hasHydrated();
+    logger.info('CapabilityStore', '🔍 Module load - Checking hydration status', {
+      hasHydrated,
+      timestamp: new Date().toISOString()
+    });
+    
+    if (hasHydrated) {
+      logger.info('CapabilityStore', '⚡ Store already hydrated on module load - running immediate check');
+      const state = useCapabilityStore.getState();
+      
+    logger.info('CapabilityStore', '📊 Current state on module load:', {
+      hasProfile: !!state.profile,
+      selectedCapabilities: state.profile?.selectedCapabilities?.length || 0,
+      activeFeatures: state.features?.activeFeatures?.length || 0
+    });      if (state.profile && (!state.features?.activeFeatures || state.features.activeFeatures.length === 0)) {
+        logger.warn('CapabilityStore', '⚠️ [IMMEDIATE] Profile exists but features empty - recalculating...', {
+          selectedCapabilities: state.profile.selectedCapabilities,
+          selectedInfrastructure: state.profile.selectedInfrastructure
+        });
+        
+        try {
+          const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+            state.profile.selectedCapabilities || [],
+            state.profile.selectedInfrastructure || []
+          );
+          // ✅ REFACTOR: activeModules calculation removed - use getActiveModules() getter
+
+          logger.info('CapabilityStore', '🔄 [IMMEDIATE] Recalculated features:', {
+            activeFeatures: activeFeatures.length,
+          });
+
+          useCapabilityStore.setState({
+            features: {
+              ...state.features,
+              activeFeatures,
+              // activeModules removed - use getActiveModules() getter
+            }
+          });
+
+          logger.info('CapabilityStore', '✅ [IMMEDIATE] Features recalculated');
+        } catch (error) {
+          logger.error('CapabilityStore', '❌ [IMMEDIATE] Error recalculating features:', error);
+        }
+      }
+    } else {
+      logger.info('CapabilityStore', '⏳ Store not yet hydrated - will wait for onFinishHydration callback');
+    }
+  };
+  
+  // STEP 3: Execute immediate check (fallback for edge cases where hydration already completed)
+  checkIfAlreadyHydrated();
+  
+  logger.info('CapabilityStore', '🎯 Hydration tracking initialized', {
+    hasUnsubscribe: typeof hydrationUnsubscribe === 'function'
+  });
+  
+  logger.debug('CapabilityStore', 'Hydration tracking code executed successfully');
+} else {
+  logger.debug('CapabilityStore', 'Skipped hydration tracking (window undefined)');
+}
+
+logger.debug('CapabilityStore', 'capabilityStore.ts module loading complete');
 
 // ============================================
 // CONVENIENCE HOOKS
@@ -735,20 +881,20 @@ export const useCapabilities = () => {
     validationErrors: store.features.validationErrors,
     isLoading: store.isLoading,
 
-    // Computed (memoized in state, not function calls)
-    visibleModules: store.features.activeModules,
+    // Computed (use getters, not stored values)
+    // ✅ REFACTOR: Use getActiveModules() instead of state.features.activeModules
+    visibleModules: store.getActiveModules(),
     activeSlots: store.features.activeSlots,
     isSetupComplete: store.profile?.setupCompleted ?? false,
     isFirstTime: store.profile?.isFirstTimeInDashboard ?? false,
 
     // Actions
     initializeProfile: store.initializeProfile,
-    toggleActivity: store.toggleActivity,
+    toggleCapability: store.toggleCapability,
     setCapabilities: store.setCapabilities,
     setInfrastructure: store.setInfrastructure,
+    toggleInfrastructure: store.toggleInfrastructure,
     completeSetup: store.completeSetup,
-    completeMilestone: store.completeMilestone,
-    satisfyValidation: store.satisfyValidation,
     dismissWelcome: store.dismissWelcome,
     resetProfile: store.resetProfile,
 
@@ -774,7 +920,8 @@ export const useCapabilities = () => {
     store.features.completedMilestones,
     store.features.validationErrors,
     store.isLoading,
-    store.features.activeModules,
+    // ✅ REFACTOR: activeModules removed - computed via getActiveModules()
+    // visibleModules depends on activeFeatures (already tracked above)
     store.features.activeSlots,
     // Functions are stable from Zustand, no need to include them
   ]);
@@ -809,6 +956,7 @@ export const useFeature = (featureId: FeatureId) => {
 
 /**
  * Hook para verificar acceso a un módulo
+ * Note: No useShallow needed - we immediately call .includes() on the result
  */
 export const useModuleAccess = (moduleId: string) => {
   const activeModules = useCapabilityStore(state => state.getActiveModules());

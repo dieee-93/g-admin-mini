@@ -11,7 +11,7 @@ import type {
 import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import type { Supplier, ProcurementRecommendation } from '../types/supplierTypes';
 import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
-import type { SupplierOrderWithDetails } from '@/pages/admin/supply-chain/supplier-orders/types';
+import type { SupplierOrderWithDetails } from '@/pages/admin/supply-chain/materials/procurement/types';
 import { logger } from '@/lib/logging';
 import Decimal from 'decimal.js';
 

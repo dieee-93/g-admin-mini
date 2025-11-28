@@ -6,7 +6,7 @@
 // ================================================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { Stack, Button, NativeSelect, Text } from '@/shared/ui';
+import { Stack, Button, SelectField, Text } from '@/shared/ui';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import {
   TransfersTable,
@@ -14,14 +14,14 @@ import {
   TransferDetailsModal
 } from '..';
 import { inventoryTransfersApi } from '../../services/inventoryTransfersApi';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsData } from '../../hooks/useMaterialsData';
 import { useLocation } from '@/contexts/LocationContext';
 import { notify } from '@/lib/notifications';
 import type { InventoryTransfer, TransferFilters } from '../../types/inventoryTransferTypes';
 import { logger } from '@/lib/logging';
 
 export function TransfersTab() {
-  const { items } = useMaterials();
+  const { items } = useMaterialsData();
   const { locations, selectedLocation } = useLocation();
 
   const [transfers, setTransfers] = useState<InventoryTransfer[]>([]);
@@ -89,21 +89,19 @@ export function TransfersTab() {
             <Text fontSize="xs" fontWeight="600" color="gray.600">
               Ubicación Origen
             </Text>
-            <NativeSelect.Root
+            <SelectField
               size="sm"
-              value={filters.from_location_id || ''}
-              onChange={(e) => setFilters({ ...filters, from_location_id: e.target.value || undefined })}
-            >
-              <NativeSelect.Field>
-                <option value="">Todas</option>
-                {locations.map(loc => (
-                  <option key={loc.id} value={loc.id}>
-                    {loc.name}
-                  </option>
-                ))}
-              </NativeSelect.Field>
-              <NativeSelect.Indicator />
-            </NativeSelect.Root>
+              options={[
+                { value: '', label: 'Todas' },
+                ...locations.map(loc => ({
+                  value: loc.id,
+                  label: loc.name
+                }))
+              ]}
+              value={[filters.from_location_id || '']}
+              onValueChange={(details) => setFilters({ ...filters, from_location_id: details.value[0] || undefined })}
+              noPortal
+            />
           </Stack>
 
           {/* Location Filter - To */}
@@ -111,21 +109,19 @@ export function TransfersTab() {
             <Text fontSize="xs" fontWeight="600" color="gray.600">
               Ubicación Destino
             </Text>
-            <NativeSelect.Root
+            <SelectField
               size="sm"
-              value={filters.to_location_id || ''}
-              onChange={(e) => setFilters({ ...filters, to_location_id: e.target.value || undefined })}
-            >
-              <NativeSelect.Field>
-                <option value="">Todas</option>
-                {locations.map(loc => (
-                  <option key={loc.id} value={loc.id}>
-                    {loc.name}
-                  </option>
-                ))}
-              </NativeSelect.Field>
-              <NativeSelect.Indicator />
-            </NativeSelect.Root>
+              options={[
+                { value: '', label: 'Todas' },
+                ...locations.map(loc => ({
+                  value: loc.id,
+                  label: loc.name
+                }))
+              ]}
+              value={[filters.to_location_id || '']}
+              onValueChange={(details) => setFilters({ ...filters, to_location_id: details.value[0] || undefined })}
+              noPortal
+            />
           </Stack>
 
           {/* Status Filter */}
@@ -133,21 +129,20 @@ export function TransfersTab() {
             <Text fontSize="xs" fontWeight="600" color="gray.600">
               Estado
             </Text>
-            <NativeSelect.Root
+            <SelectField
               size="sm"
-              value={filters.status || ''}
-              onChange={(e) => setFilters({ ...filters, status: (e.target.value || undefined) as 'pending' | 'approved' | 'rejected' | 'completed' | undefined })}
-            >
-              <NativeSelect.Field>
-                <option value="">Todos</option>
-                <option value="pending">Pendiente</option>
-                <option value="approved">Aprobado</option>
-                <option value="in_transit">En Tránsito</option>
-                <option value="completed">Completado</option>
-                <option value="cancelled">Cancelado</option>
-              </NativeSelect.Field>
-              <NativeSelect.Indicator />
-            </NativeSelect.Root>
+              options={[
+                { value: '', label: 'Todos' },
+                { value: 'pending', label: 'Pendiente' },
+                { value: 'approved', label: 'Aprobado' },
+                { value: 'in_transit', label: 'En Tránsito' },
+                { value: 'completed', label: 'Completado' },
+                { value: 'cancelled', label: 'Cancelado' }
+              ]}
+              value={[filters.status || '']}
+              onValueChange={(details) => setFilters({ ...filters, status: (details.value[0] || undefined) as 'pending' | 'approved' | 'rejected' | 'completed' | undefined })}
+              noPortal
+            />
           </Stack>
         </Stack>
 

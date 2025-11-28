@@ -130,6 +130,11 @@ export const useThemeStore = create<ThemeState>()(
     }),
     {
       name: 'g-admin-theme',
+      partialize: (state) => ({
+        theme: state.theme,
+        currentTheme: state.currentTheme,
+        currentColorPalette: state.currentColorPalette
+      }),
       onRehydrateStorage: () => (state) => {
         if (state) {
           applyThemeToDOM(state.theme)

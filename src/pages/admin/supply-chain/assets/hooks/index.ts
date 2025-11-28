@@ -1,0 +1,1 @@
+export { useAssetsPage } from './useAssetsPage';

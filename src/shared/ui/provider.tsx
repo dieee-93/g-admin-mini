@@ -30,7 +30,7 @@ export function Provider({ children }: ProviderProps) {
 
       // Verify the system has the required structure
       if (dynamicSystem && dynamicSystem._config) {
-        console.log(`✅ Theme system loaded: ${currentTheme?.id || 'default'}`)
+        logger.info('Provider', `Theme system loaded: ${currentTheme?.id || 'default'}`)
         return dynamicSystem
       } else {
         logger.warn('Provider', 'Dynamic system invalid, falling back to default config')

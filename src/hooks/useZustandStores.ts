@@ -15,7 +15,7 @@ export const useApp = () => {
   const ui = useAppStore(state => state.ui);
   const network = useAppStore(state => state.network);
   const settings = useAppStore(state => state.settings);
-  
+
   // Individual action selectors to avoid object recreation
   const setUser = useAppStore(state => state.setUser);
   const logout = useAppStore(state => state.logout);
@@ -51,6 +51,24 @@ export const useApp = () => {
 };
 
 // Materials Store Hook (new preferred name)
+/**
+ * @deprecated Consider using atomic selectors directly from `useMaterialsStore()` for better performance.
+ * 
+ * @warning This hook subscribes to ALL store properties, which can cause unnecessary re-renders.
+ * When you destructure from this hook (e.g., `const { items } = useMaterials()`), your component
+ * will re-render whenever ANY part of the store changes, including modal state, filters, etc.
+ * 
+ * @example
+ * // ❌ BAD: Re-renders when modal opens/closes, filters change, etc.
+ * const { items, loading } = useMaterials();
+ * 
+ * @example
+ * // ✅ GOOD: Only re-renders when items or loading change
+ * const items = useMaterialsStore(useShallow(state => state.items));
+ * const loading = useMaterialsStore(state => state.loading);
+ * 
+ * @see {@link https://docs.pmnd.rs/zustand/guides/prevent-rerenders-with-use-shallow useShallow docs}
+ */
 export const useMaterials = () => {
   // 🔧 FIX: Usar useShallow para arrays que pueden cambiar de referencia
   const items = useMaterialsStore(useShallow(state => state.items));
@@ -63,7 +81,7 @@ export const useMaterials = () => {
   const isModalOpen = useMaterialsStore(state => state.isModalOpen);
   const modalMode = useMaterialsStore(state => state.modalMode);
   const currentItem = useMaterialsStore(state => state.currentItem);
-  
+
   // Individual action selectors to avoid object recreation
   const setItems = useMaterialsStore(state => state.setItems);
   const addItem = useMaterialsStore(state => state.addItem);
@@ -134,7 +152,7 @@ export const useSales = () => {
   const stats = useSalesStore(state => state.stats);
   const kitchenOrders = useSalesStore(state => state.kitchenOrders);
   const activeKitchenOrder = useSalesStore(state => state.activeKitchenOrder);
-  
+
   // Individual modal state selectors
   const isCheckoutModalOpen = useSalesStore(state => state.isCheckoutModalOpen);
   const isReceiptModalOpen = useSalesStore(state => state.isReceiptModalOpen);
@@ -219,6 +237,15 @@ export const useSales = () => {
 };
 
 // Customers Store Hook
+/**
+ * @deprecated Consider using atomic selectors directly from `useCustomersStore()` for better performance.
+ * 
+ * @warning This hook subscribes to ALL store properties.
+ * 
+ * @example
+ * // ✅ GOOD: Only re-renders when modal state changes
+ * const isModalOpen = useCustomersStore(state => state.isModalOpen);
+ */
 export const useCustomers = () => {
   const customers = useCustomersStore(state => state.customers);
   const loading = useCustomersStore(state => state.loading);
@@ -226,7 +253,7 @@ export const useCustomers = () => {
   const filters = useCustomersStore(state => state.filters);
   const stats = useCustomersStore(state => state.stats);
   const selectedCustomers = useCustomersStore(state => state.selectedCustomers);
-  
+
   // Individual modal state selectors
   const isModalOpen = useCustomersStore(state => state.isModalOpen);
   const modalMode = useCustomersStore(state => state.modalMode);
@@ -301,7 +328,7 @@ export const useStaff = () => {
   const filters = useStaffStore(state => state.filters);
   const stats = useStaffStore(state => state.stats);
   const selectedStaff = useStaffStore(state => state.selectedStaff);
-  
+
   // Individual modal state selectors
   const isStaffModalOpen = useStaffStore(state => state.isStaffModalOpen);
   const isScheduleModalOpen = useStaffStore(state => state.isScheduleModalOpen);

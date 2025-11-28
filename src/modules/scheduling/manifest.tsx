@@ -140,34 +140,91 @@ export const schedulingManifest: ModuleManifest = {
   // Public API exports
   exports: {
     /**
-     * Get weekly schedule for all staff
-     * @param week - ISO week string (YYYY-Www)
-     * @returns Array of shifts for the week
+     * React Hooks for Scheduling management
+     *
+     * @example
+     * ```tsx
+     * import { ModuleRegistry } from '@/lib/modules';
+     *
+     * async function MyComponent() {
+     *   const registry = ModuleRegistry.getInstance();
+     *   const schedulingModule = registry.getExports('scheduling');
+     *
+     *   // Dynamic import of the hook
+     *   const { useScheduling } = await schedulingModule.hooks.useScheduling();
+     *
+     *   const {
+     *     shifts,
+     *     schedules,
+     *     timeOffRequests,
+     *     loading,
+     *     createShift,
+     *     updateShift,
+     *     deleteShift,
+     *     publishSchedule,
+     *     refreshData
+     *   } = useScheduling();
+     *
+     *   // Use the hook...
+     * }
+     * ```
      */
-    getWeeklySchedule: async (week: string) => {
-      // Mock implementation - real version would query database
-      logger.debug('Scheduling', `Fetching weekly schedule for: ${week}`);
-      return [
-        { id: '1', employee_id: '1', date: '2025-10-13', start: '09:00', end: '17:00' },
-        { id: '2', employee_id: '2', date: '2025-10-14', start: '10:00', end: '18:00' }
-      ];
+    hooks: {
+      /**
+       * Hook for unified scheduling management
+       * Returns a dynamic import of the useScheduling hook
+       *
+       * Pattern: Dynamic Import (following finance-corporate pattern)
+       * Benefits: Lazy loading, tree-shaking, better code splitting
+       *
+       * Features:
+       * - Shift management (create, update, delete, bulk operations)
+       * - Schedule management (create, publish, copy, optimize)
+       * - Time-off management (create, approve, deny requests)
+       * - Real-time features (available slots, dashboard, labor costs, coverage analysis)
+       * - Filters and navigation (date ranges, week/day navigation)
+       *
+       * State Management: Uses useState (not Zustand)
+       * Hook Size: 499 lines (complex hook)
+       */
+      useScheduling: () => import('./hooks/index').then(module => ({ useScheduling: module.useScheduling })),
     },
 
     /**
-     * Calculate total labor costs for shifts
-     * @param shifts - Array of shift objects with start_time and end_time
-     * @returns Total cost in dollars
+     * Service functions for direct API calls (without hooks)
+     * Used when you need to call scheduling operations outside React components
      */
-    calculateLaborCosts: (shifts: Array<{ start_time: string; end_time: string }>) => {
-      const totalHours = shifts.reduce((sum, shift) => {
-        const start = new Date(`2000-01-01T${shift.start_time}`);
-        const end = new Date(`2000-01-01T${shift.end_time}`);
-        const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-        return sum + hours;
-      }, 0);
+    services: {
+      /**
+       * Get weekly schedule for all staff
+       * @param week - ISO week string (YYYY-Www)
+       * @returns Array of shifts for the week
+       */
+      getWeeklySchedule: async (week: string) => {
+        // Mock implementation - real version would query database
+        logger.debug('Scheduling', `Fetching weekly schedule for: ${week}`);
+        return [
+          { id: '1', employee_id: '1', date: '2025-10-13', start: '09:00', end: '17:00' },
+          { id: '2', employee_id: '2', date: '2025-10-14', start: '10:00', end: '18:00' }
+        ];
+      },
 
-      const avgRate = 15; // $15/hour average
-      return totalHours * avgRate;
+      /**
+       * Calculate total labor costs for shifts
+       * @param shifts - Array of shift objects with start_time and end_time
+       * @returns Total cost in dollars
+       */
+      calculateLaborCosts: (shifts: Array<{ start_time: string; end_time: string }>) => {
+        const totalHours = shifts.reduce((sum, shift) => {
+          const start = new Date(`2000-01-01T${shift.start_time}`);
+          const end = new Date(`2000-01-01T${shift.end_time}`);
+          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+          return sum + hours;
+        }, 0);
+
+        const avgRate = 15; // $15/hour average
+        return totalHours * avgRate;
+      }
     }
   },
 

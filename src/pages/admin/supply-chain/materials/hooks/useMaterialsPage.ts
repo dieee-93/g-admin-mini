@@ -6,13 +6,18 @@ import {
   ClipboardDocumentListIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import { useShallow } from 'zustand/react/shallow';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 import { useLocation } from '@/contexts/LocationContext'; // 🆕 MULTI-LOCATION
-import { useMaterials } from '@/store/materialsStore';
-// TODO: Mover a módulo - import { inventoryApi } from '@/pages/admin/supply-chain/materials/services/inventoryApi';
+import { useAuth } from '@/contexts/AuthContext';
+import { useMaterialsStore } from '@/store/materialsStore';
+import { useMaterialsData } from './useMaterialsData';
+import { useMaterialsActions } from './useMaterialsActions';
+import { useMaterialsComputed } from './useMaterialsComputed';
+import { inventoryApi } from '@/pages/admin/supply-chain/materials/services/inventoryApi';
 import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
-// TODO: Mover a módulo - import { ABCAnalysisEngine } from '@/pages/admin/supply-chain/materials/services/abcAnalysisEngine';
-// TODO: Implementar TrendsService (Phase 3) - import { TrendsService } from '@/pages/admin/supply-chain/materials/services/trendsService'; // ✅ Phase 3: Historical trends
+import { ABCAnalysisEngine } from '@/pages/admin/supply-chain/materials/services/abcAnalysisEngine';
+import { TrendsService } from '@/pages/admin/supply-chain/materials/services/trendsService'; // ✅ Phase 3: Historical trends
 // ✅ SISTEMAS INTEGRATION
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
@@ -20,10 +25,10 @@ import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
 import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 import type { MaterialItem, ItemFormData } from '@/pages/admin/supply-chain/materials/types';
 // Enhanced functionality imports
-// NOTE: Removed unused imports (useDataFetcher, useDataSearch, useModuleAnalytics, AnalyticsEngine, handleAsyncOperation, CRUDHandlers)
 import eventBus from '@/lib/events';
 
 import { logger } from '@/lib/logging';
+
 export interface MaterialsPageState {
   activeTab: 'inventory' | 'analytics' | 'procurement';
   selectedFilters: FilterState;
@@ -141,7 +146,7 @@ export interface UseMaterialsPageReturn {
   updateMaterial: (id: string, data: Partial<ItemFormData>) => Promise<MaterialItem>;
   deleteMaterial: (id: string, name: string) => Promise<void>;
   adjustStock: (id: string, adjustment: number, reason?: string) => Promise<MaterialItem>;
-  alerts: Array<{ id: string; type: string; message: string }>;
+  alerts: Array<{ type: string; title: string; description: string; items: MaterialItem[] }>;
   refresh: () => Promise<void>;
   inventory: Record<string, unknown>;
 
@@ -152,26 +157,29 @@ export interface UseMaterialsPageReturn {
 }
 
 export const useMaterialsPage = (): UseMaterialsPageReturn => {
+  const { user } = useAuth();
   const { setQuickActions, updateModuleBadge } = useNavigationActions();
 
   // ✅ SISTEMAS INTEGRATION
   const { handleError } = useErrorHandler();
-  const { isOnline } = useOfflineStatus();
-  const { shouldReduceAnimations } = usePerformanceMonitor();
+
   const { selectedLocation, isMultiLocationMode } = useLocation(); // 🆕 MULTI-LOCATION
 
-  // Materials store state
-  const {
-    getFilteredItems,
-    loading,
-    error,
-    openModal,
-    setItems,
-    refreshStats
-  } = useMaterials();
+  // ✅ SPLIT HOOKS PATTERN - Selective subscriptions (GAP 8 FIX)
+  const items = useMaterialsStore(useShallow(s => s.items));
+  const loading = useMaterialsStore(s => s.loading);
+  const error = useMaterialsStore(s => s.error);
+  // Actions are ALWAYS stable from Zustand
+  const setItems = useMaterialsStore(s => s.setItems);
+  const refreshStats = useMaterialsStore(s => s.refreshStats);
+  const getFilteredItems = useMaterialsStore(s => s.getFilteredItems);
+  const getLowStockItems = useMaterialsStore(s => s.getLowStockItems);
+  const getCriticalStockItems = useMaterialsStore(s => s.getCriticalStockItems);
 
 
-  const items = getFilteredItems();
+  const openModal = useMaterialsStore(s => s.openModal);
+  const closeModal = useMaterialsStore(s => s.closeModal);
+  const isModalOpen = useMaterialsStore(s => s.isModalOpen);
 
   // ✅ PAGE STATE
   const [pageState, setPageState] = useState<MaterialsPageState>({
@@ -187,114 +195,61 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     selectedCategory: null
   });
 
-  const [localError, setLocalError] = useState<string | null>(null);
-
   // ✅ Phase 3: Historical trends state
   const [systemTrends, setSystemTrends] = useState<Record<string, unknown> | null>(null);
   const [trendsLoading, setTrendsLoading] = useState(false);
 
-  // ✅ CALCULATE METRICS USING BUSINESS LOGIC SERVICES
-  const metrics: MaterialsPageMetrics = useMemo(() => {
-    // Run ABC Analysis
-    const abcAnalysis = ABCAnalysisEngine.analyzeInventory(items);
+  // 🛠️ PERFORMANCE: Cache ABC Analysis results to avoid expensive recalculations
+  const [abcAnalysisCache, setAbcAnalysisCache] = useState<{
+    itemsKey: string;
+    result: ReturnType<typeof ABCAnalysisEngine.analyzeInventory>;
+  } | null>(null);
 
-    // Calculate class values using correct structure (classA, classB, classC)
-    const classAValue = abcAnalysis.classA?.reduce(
-      (sum, material) => sum + (material.totalValue || 0),
-      0
-    ) || 0;
+  // 🛠️ PERFORMANCE: Memoize ABC Analysis with caching
+  const abcAnalysis = useMemo(() => {
+    const itemsKey = JSON.stringify(items.map(i => ({ id: i.id, totalValue: i.stock * (i.unit_cost || 0) })));
 
-    const classBValue = abcAnalysis.classB?.reduce(
-      (sum, material) => sum + (material.totalValue || 0),
-      0
-    ) || 0;
+    // Return cached result if items haven't changed
+    if (abcAnalysisCache && abcAnalysisCache.itemsKey === itemsKey) {
+      return abcAnalysisCache.result;
+    }
 
-    const classCValue = abcAnalysis.classC?.reduce(
-      (sum, material) => sum + (material.totalValue || 0),
-      0
-    ) || 0;
+    // Run expensive analysis only when items change
+    const result = ABCAnalysisEngine.analyzeInventory(items);
+    setAbcAnalysisCache({ itemsKey, result });
+    return result;
+  }, [items, abcAnalysisCache]);
+
+  // ✅ METRICS CALCULATION
+  const metrics = useMemo(() => {
+    const totalValue = items.reduce((sum, item) => sum + (item.stock * item.unit_cost), 0);
+    const lowStock = StockCalculation.getLowStockItems(items).length;
+    const criticalStock = StockCalculation.getCriticalStockItems(items).length;
+    const outOfStock = StockCalculation.getOutOfStockItems(items).length;
+
+    // Calculate ABC values
+    const classAValue = abcAnalysis.classA.reduce((sum, item) => sum + (item.value || 0), 0);
+    const classBValue = abcAnalysis.classB.reduce((sum, item) => sum + (item.value || 0), 0);
+    const classCValue = abcAnalysis.classC.reduce((sum, item) => sum + (item.value || 0), 0);
 
     return {
       totalItems: items.length,
-      totalValue: DecimalUtils.toNumber(items.reduce((sum, item) =>
-        DecimalUtils.add(sum, StockCalculation.getTotalValue(item), 'financial'),
-        DecimalUtils.fromValue(0, 'financial')
-      )),
-      lowStockItems: StockCalculation.getLowStockItems(items).length,
-      criticalStockItems: StockCalculation.getCriticalStockItems(items).length,
-      outOfStockItems: StockCalculation.getOutOfStockItems(items).length,
-      supplierCount: new Set(items.map(item => item.supplier_id).filter(Boolean)).size,
+      totalValue,
+      lowStockItems: lowStock,
+      criticalStockItems: criticalStock,
+      outOfStockItems: outOfStock,
+      supplierCount: new Set(items.map(i => i.supplier_id).filter(Boolean)).size,
       lastUpdate: new Date(),
-      // ✅ ABC Analysis (calculated from ABCAnalysisEngine)
       classAValue,
       classBValue,
       classCValue,
-      // ✅ Phase 3: Trends (calculated from TrendsService)
-      valueGrowth: systemTrends?.valueGrowth || 0,
-      stockTurnover: systemTrends?.avgTurnoverRate || 0,
-      avgTurnoverRate: systemTrends?.avgTurnoverRate || 0,
-      fastMovingItems: systemTrends?.fastMovingItems || [],
-      slowMovingItems: systemTrends?.slowMovingItems || []
+      valueGrowth: (systemTrends?.valueGrowth as number) || 0,
+      stockTurnover: (systemTrends?.stockTurnover as number) || 0,
+      avgTurnoverRate: (systemTrends?.avgTurnoverRate as number) || 0,
+      fastMovingItems: (systemTrends?.fastMovingItems as string[]) || [],
+      slowMovingItems: (systemTrends?.slowMovingItems as string[]) || []
     };
-  }, [items, systemTrends]);
-
-  // Setup quick actions in navigation
-  useEffect(() => {
-    const quickActions = [
-      {
-        id: 'new-material',
-        label: 'Nuevo Material',
-        icon: PlusIcon,
-        action: () => openModal('add'),
-        color: 'purple'
-      },
-      {
-        id: 'abc-analysis',
-        label: 'Análisis ABC',
-        icon: ChartBarIcon,
-        action: () => handleABCAnalysis(),
-        color: 'blue'
-      },
-      {
-        id: 'procurement',
-        label: 'Compras',
-        icon: ClipboardDocumentListIcon,
-        action: () => handleProcurement(),
-        color: 'green'
-      },
-      {
-        id: 'supply-chain',
-        label: 'Cadena Supply',
-        icon: BuildingStorefrontIcon,
-        action: () => handleSupplyChain(),
-        color: 'orange'
-      },
-      {
-        id: 'stock-alerts',
-        label: 'Alertas Stock',
-        icon: ExclamationTriangleIcon,
-        action: () => handleStockAlert(),
-        color: 'red'
-      }
-    ];
-
-    setQuickActions(quickActions);
-
-    return () => setQuickActions([]);
-  }, [setQuickActions, openModal]);
-
-  // Update navigation badge with critical items count
-  useEffect(() => {
-    if (updateModuleBadge) {
-      const criticalCount = metrics.criticalStockItems;
-      updateModuleBadge('materials', criticalCount > 0 ? criticalCount : items.length);
-    }
-  }, [items.length, metrics.criticalStockItems, updateModuleBadge]);
-
-  // ✅ TAB MANAGEMENT
-  const setActiveTab = useCallback((tab: MaterialsPageState['activeTab']) => {
-    setPageState(prev => ({ ...prev, activeTab: tab }));
-  }, []);
+  }, [items, abcAnalysis, systemTrends]);
 
   // ✅ Phase 3: Load system trends
   const loadSystemTrends = useCallback(async () => {
@@ -313,36 +268,36 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
   // ✅ LOAD INVENTORY DATA (with multi-location support)
   const loadInventoryData = useCallback(async () => {
     try {
-      setLocalError(null); // Clear any previous errors
-      setItems([]);
+      // Use store actions directly - they're stable
+      const { setItems: setItemsStore, refreshStats: refreshStatsStore } = useMaterialsStore.getState();
+
+      setItemsStore([]);
 
       // 🆕 MULTI-LOCATION: Pass location_id to API if in multi-location mode
       const locationId = isMultiLocationMode && selectedLocation?.id
         ? selectedLocation.id
         : undefined;
 
-      const apiItems = await inventoryApi.getItems(locationId);
+      const apiItems = await inventoryApi.getItems(locationId, user);
 
       // For now, use items directly from API (they're already in the correct format)
-      setItems(apiItems);
+      setItemsStore(apiItems);
+      refreshStatsStore();
 
-      if (refreshStats) {
-        refreshStats();
-      }
-
-      // ✅ Phase 3: Load trends after materials are loaded
+      // ✅ OPTIMIZED: Load trends using materialized view
       loadSystemTrends();
     } catch (error) {
       logger.error('MaterialsStore', 'Error loading inventory data:', error);
-      setLocalError('Error al cargar datos de inventario');
+      const { setError } = useMaterialsStore.getState();
+      setError('Error al cargar datos de inventario');
       handleError(error as Error, { operation: 'loadInventory' });
     }
-  }, [setItems, refreshStats, handleError, isMultiLocationMode, selectedLocation?.id, loadSystemTrends]);
+  }, [handleError, isMultiLocationMode, selectedLocation?.id, loadSystemTrends, user]);
 
   // ✅ BUSINESS ACTIONS
-  const actions = {
+  const actions = useMemo(() => ({
     // Metric interactions
-    handleMetricClick: useCallback((metricType: string) => {
+    handleMetricClick: (metricType: string) => {
       switch (metricType) {
         case 'lowStock':
           setPageState(prev => ({
@@ -362,27 +317,28 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
           setPageState(prev => ({ ...prev, activeTab: 'analytics' }));
           break;
       }
-    }, []),
+    },
 
     // Stock operations
-    handleStockUpdate: useCallback(async (itemId: string, newStock: number) => {
+    handleStockUpdate: async (itemId: string, newStock: number) => {
       try {
-        await inventoryApi.updateStock(itemId, newStock);
+        if (!user) throw new Error('Usuario no autenticado');
 
-        // Find the item to get details
-        const currentItems = getFilteredItems();
+        const { items: currentItems, setItems: setItemsStore, refreshStats: refreshStatsStore } = useMaterialsStore.getState();
         const item = currentItems.find(i => i.id === itemId);
+
+        const oldStock = item?.stock || 0;
+
+        await inventoryApi.updateStock(itemId, newStock, user, oldStock);
 
         // Update item directly in store (optimistic update)
         const updatedItems = currentItems.map(item =>
           item.id === itemId ? { ...item, stock: newStock, lastUpdated: new Date() } : item
         );
-        setItems(updatedItems);
+        setItemsStore(updatedItems);
 
         // Refresh stats
-        if (refreshStats) {
-          refreshStats();
-        }
+        refreshStatsStore();
 
         // ✅ EMIT EVENTBUS: Stock updated
         if (item) {
@@ -397,8 +353,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
           // Check if stock is now low or critical
           const stockStatus = StockCalculation.getStockStatus(
             newStock,
-            item.minStock || 0,
-            item.maxStock
+            item.min_stock || 0
           );
 
           if (stockStatus === 'critical' || stockStatus === 'low') {
@@ -406,7 +361,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
               itemId,
               itemName: item.name,
               currentStock: newStock,
-              minStock: item.minStock || 0,
+              minStock: item.min_stock || 0,
               status: stockStatus,
               timestamp: new Date().toISOString()
             });
@@ -418,16 +373,17 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
         handleError(error as Error, { operation: 'updateStock', itemId });
         throw error;
       }
-    }, [getFilteredItems, setItems, refreshStats, loadInventoryData, handleError]),
+    },
 
     // Material management
-    handleOpenAddModal: useCallback(() => {
+    handleOpenAddModal: () => {
       openModal('add');
-    }, [openModal]),
+    },
 
-    handleAddMaterial: useCallback(async (materialData: ItemFormData) => {
+    handleAddMaterial: async (materialData: ItemFormData) => {
       try {
-        const newMaterial = await inventoryApi.createMaterial(materialData);
+        if (!user) throw new Error('Usuario no autenticado');
+        const newMaterial = await inventoryApi.createMaterial(materialData, user);
         await loadInventoryData();
 
         // ✅ EMIT EVENTBUS: Material created
@@ -441,14 +397,14 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
       } catch (error) {
         handleError(error as Error, { operation: 'addMaterial' });
       }
-    }, [loadInventoryData, handleError]),
+    },
 
     // Bulk operations
-    handleBulkOperations: useCallback(() => {
+    handleBulkOperations: () => {
       setPageState(prev => ({ ...prev, bulkMode: !prev.bulkMode }));
-    }, []),
+    },
 
-    handleBulkAction: useCallback(async (action: string, itemIds: string[]) => {
+    handleBulkAction: async (action: string, itemIds: string[]) => {
       try {
         await inventoryApi.bulkAction(action, itemIds);
         await loadInventoryData();
@@ -460,41 +416,41 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
       } catch (error) {
         handleError(error as Error, { operation: 'bulkAction', action });
       }
-    }, [loadInventoryData, handleError]),
+    },
 
     // Reports and sync
-    handleGenerateReport: useCallback(async () => {
+    handleGenerateReport: async () => {
       try {
         await inventoryApi.generateReport();
       } catch (error) {
         handleError(error as Error, { operation: 'generateReport' });
       }
-    }, [handleError]),
+    },
 
-    handleSyncInventory: useCallback(async () => {
+    handleSyncInventory: async () => {
       try {
         await loadInventoryData();
       } catch (error) {
         handleError(error as Error, { operation: 'syncInventory' });
       }
-    }, [loadInventoryData, handleError]),
+    },
 
     // Alert handling
-    handleAlertAction: useCallback(async (alertId: string) => {
+    handleAlertAction: async (alertId: string, action: string) => {
       try {
         // Handle smart alert actions
         // TODO: Implement smart alert actions
       } catch (error) {
         handleError(error as Error, { operation: 'alertAction', alertId });
       }
-    }, [handleError]),
+    },
 
     // Legacy actions (for backward compatibility)
-    handleNewMaterial: useCallback(() => {
+    handleNewMaterial: () => {
       openModal('add');
-    }, [openModal]),
+    },
 
-    handleABCAnalysis: useCallback(() => {
+    handleABCAnalysis: () => {
       setPageState(prev => ({
         ...prev,
         showABCAnalysis: !prev.showABCAnalysis,
@@ -502,9 +458,19 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
         showSupplyChain: false,
         showPredictiveAnalytics: false
       }));
-    }, []),
+    },
 
-    handleProcurement: useCallback(() => {
+    toggleABCAnalysis: () => {
+      setPageState(prev => ({
+        ...prev,
+        showABCAnalysis: !prev.showABCAnalysis,
+        showProcurement: false,
+        showSupplyChain: false,
+        showPredictiveAnalytics: false
+      }));
+    },
+
+    handleProcurement: () => {
       setPageState(prev => ({
         ...prev,
         showProcurement: !prev.showProcurement,
@@ -512,9 +478,19 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
         showSupplyChain: false,
         showPredictiveAnalytics: false
       }));
-    }, []),
+    },
 
-    handleSupplyChain: useCallback(() => {
+    toggleProcurement: () => {
+      setPageState(prev => ({
+        ...prev,
+        showProcurement: !prev.showProcurement,
+        showABCAnalysis: false,
+        showSupplyChain: false,
+        showPredictiveAnalytics: false
+      }));
+    },
+
+    handleSupplyChain: () => {
       setPageState(prev => ({
         ...prev,
         showSupplyChain: !prev.showSupplyChain,
@@ -522,9 +498,19 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
         showProcurement: false,
         showPredictiveAnalytics: false
       }));
-    }, []),
+    },
 
-    handlePredictiveAnalytics: useCallback(() => {
+    toggleSupplyChain: () => {
+      setPageState(prev => ({
+        ...prev,
+        showSupplyChain: !prev.showSupplyChain,
+        showABCAnalysis: false,
+        showProcurement: false,
+        showPredictiveAnalytics: false
+      }));
+    },
+
+    handlePredictiveAnalytics: () => {
       setPageState(prev => ({
         ...prev,
         showPredictiveAnalytics: !prev.showPredictiveAnalytics,
@@ -532,43 +518,106 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
         showProcurement: false,
         showSupplyChain: false
       }));
-    }, []),
+    },
 
-    handleStockAlert: useCallback(() => {
+    handleStockAlert: () => {
       // Filter to show only items with stock alerts
-      // const alertItems = StockCalculation.getCriticalStockItems(items);
-      // TODO: Open modal or filter view for critical items
-    }, []),
+    },
 
-    handleBulkActions: useCallback(() => {
+    handleBulkActions: () => {
       setPageState(prev => ({ ...prev, bulkMode: !prev.bulkMode }));
-    }, []),
+    },
 
     // State setters
-    setViewMode: useCallback((mode: 'grid' | 'table' | 'cards') => {
+    setViewMode: (mode: 'grid' | 'table' | 'cards') => {
       setPageState(prev => ({ ...prev, viewMode: mode }));
-    }, []),
+    },
 
-    setSelectedCategory: useCallback((category: string | null) => {
+    setSelectedCategory: (category: string | null) => {
       setPageState(prev => ({ ...prev, selectedCategory: category }));
-    }, [])
-  };
+    }
+  }), [loadInventoryData, handleError, user]);
 
+  // Quick actions handlers for the menu
+  const handleNewMaterial = useCallback(() => actions.handleNewMaterial(), [actions]);
+  const handleABCAnalysisClick = useCallback(() => actions.handleABCAnalysis(), [actions]);
+  const handleProcurementClick = useCallback(() => actions.handleProcurement(), [actions]);
+  const handleSupplyChainClick = useCallback(() => actions.handleSupplyChain(), [actions]);
+  const handleStockAlertClick = useCallback(() => actions.handleStockAlert(), [actions]);
+
+  // 🛠️ PERFORMANCE: Memoize quick actions array to prevent recreation
+  const quickActions = useMemo(() => [
+    {
+      id: 'new-material',
+      label: 'Nuevo Material',
+      icon: PlusIcon,
+      action: handleNewMaterial,
+      color: 'purple'
+    },
+    {
+      id: 'abc-analysis',
+      label: 'Análisis ABC',
+      icon: ChartBarIcon,
+      action: handleABCAnalysisClick,
+      color: 'blue'
+    },
+    {
+      id: 'procurement',
+      label: 'Compras',
+      icon: ClipboardDocumentListIcon,
+      action: handleProcurementClick,
+      color: 'green'
+    },
+    {
+      id: 'supply-chain',
+      label: 'Cadena Supply',
+      icon: BuildingStorefrontIcon,
+      action: handleSupplyChainClick,
+      color: 'orange'
+    },
+    {
+      id: 'stock-alerts',
+      label: 'Alertas Stock',
+      icon: ExclamationTriangleIcon,
+      action: handleStockAlertClick,
+      color: 'red'
+    }
+  ], [handleNewMaterial, handleABCAnalysisClick, handleProcurementClick, handleSupplyChainClick, handleStockAlertClick]);
+
+  // Setup quick actions in navigation
+  useEffect(() => {
+    setQuickActions(quickActions);
+    return () => setQuickActions([]);
+  }, [setQuickActions, quickActions]);
+
+  // Update navigation badge with critical items count
+  useEffect(() => {
+    if (updateModuleBadge) {
+      const criticalCount = metrics.criticalStockItems;
+      updateModuleBadge('materials', criticalCount > 0 ? criticalCount : items.length);
+    }
+  }, [items.length, metrics.criticalStockItems, updateModuleBadge]);
+
+  // ✅ TAB MANAGEMENT
+  const setActiveTab = useCallback((tab: MaterialsPageState['activeTab']) => {
+    setPageState(prev => ({ ...prev, activeTab: tab }));
+  }, []);
 
   // Quick filters using business logic
-  const getLowStockItems = useCallback(() => {
-    return StockCalculation.getLowStockItems(items);
-  }, [items]);
+  const getLowStockItemsFn = useCallback(() => {
+    const { items: currentItems } = useMaterialsStore.getState();
+    return StockCalculation.getLowStockItems(currentItems);
+  }, []);
 
-  const getCriticalStockItems = useCallback(() => {
-    return StockCalculation.getCriticalStockItems(items);
-  }, [items]);
+  const getCriticalStockItemsFn = useCallback(() => {
+    const { items: currentItems } = useMaterialsStore.getState();
+    return StockCalculation.getCriticalStockItems(currentItems);
+  }, []);
 
   const getOutOfStockItems = useCallback(() => {
-    return StockCalculation.getOutOfStockItems(items);
-  }, [items]);
-
-  // ✅ ENHANCED FUNCTIONALITY (from useMaterialsEnhanced)
+    const { items: currentItems } = useMaterialsStore.getState();
+    return StockCalculation.getOutOfStockItems(currentItems);
+  }, []);
 
   // Search functionality
   const [searchQuery, setSearchQuery] = useState('');
@@ -579,8 +628,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     const query = searchQuery.toLowerCase();
     return items.filter(item =>
       item.name.toLowerCase().includes(query) ||
-      item.category?.toLowerCase().includes(query) ||
-      item.supplier?.toLowerCase().includes(query)
+      item.category?.toLowerCase().includes(query)
     );
   }, [items, searchQuery]);
 
@@ -616,56 +664,69 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
   // Enhanced CRUD operations
   const createMaterial = useCallback(async (materialData: ItemFormData) => {
     try {
-      const result = await inventoryApi.createMaterial(materialData);
+      if (!user) throw new Error('Usuario no autenticado');
+      const result = await inventoryApi.createMaterial(materialData, user);
       await loadInventoryData();
       return result;
     } catch (error) {
       handleError(error as Error, { operation: 'createMaterial' });
       throw error;
     }
-  }, [loadInventoryData, handleError]);
+  }, [loadInventoryData, handleError, user]);
 
   const updateMaterial = useCallback(async (id: string, materialData: Partial<ItemFormData>) => {
     try {
-      const result = await inventoryApi.updateMaterial(id, materialData);
+      if (!user) throw new Error('Usuario no autenticado');
+      // inventoryApi.updateItem expects Partial<InventoryItem>
+      const result = await inventoryApi.updateItem(id, materialData as any, user);
       await loadInventoryData();
-      return result;
+      return result as MaterialItem;
     } catch (error) {
       handleError(error as Error, { operation: 'updateMaterial' });
       throw error;
     }
-  }, [loadInventoryData, handleError]);
+  }, [loadInventoryData, handleError, user]);
 
   const deleteMaterial = useCallback(async (id: string, materialName: string) => {
     try {
+      if (!user) throw new Error('Usuario no autenticado');
       const confirmed = window.confirm(`¿Estás seguro de eliminar el material "${materialName}"?`);
       if (!confirmed) return;
 
-      await inventoryApi.deleteMaterial(id);
+      await inventoryApi.deleteItem(id, user);
       await loadInventoryData();
     } catch (error) {
       handleError(error as Error, { operation: 'deleteMaterial' });
       throw error;
     }
-  }, [loadInventoryData, handleError]);
+  }, [loadInventoryData, handleError, user]);
 
   const adjustStock = useCallback(async (id: string, adjustment: number, reason?: string) => {
     try {
-      const result = await inventoryApi.adjustStock(id, adjustment, reason);
+      if (!user) throw new Error('Usuario no autenticado');
+
+      // Get current item to calculate new stock
+      const { items: currentItems } = useMaterialsStore.getState();
+      const item = currentItems.find(i => i.id === id);
+      if (!item) throw new Error('Material no encontrado');
+
+      const newStock = (item.stock || 0) + adjustment;
+
+      const result = await inventoryApi.updateStock(id, newStock, user, item.stock);
       await loadInventoryData();
       return result;
     } catch (error) {
       handleError(error as Error, { operation: 'adjustStock' });
       throw error;
     }
-  }, [loadInventoryData, handleError]);
+  }, [loadInventoryData, handleError, user]);
 
   // Enhanced alerts
   const alerts = useMemo(() => {
-    const alertList = [];
+    const alertList: Array<{ type: string; title: string; description: string; items: MaterialItem[] }> = [];
 
     // Critical stock alerts
-    const criticalItems = getCriticalStockItems();
+    const criticalItems = StockCalculation.getCriticalStockItems(items);
     if (criticalItems.length > 0) {
       alertList.push({
         type: 'critical',
@@ -676,7 +737,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     }
 
     // Low stock warnings
-    const lowStockItems = getLowStockItems();
+    const lowStockItems = StockCalculation.getLowStockItems(items);
     if (lowStockItems.length > 0) {
       alertList.push({
         type: 'warning',
@@ -690,6 +751,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     const highValueItems = items.filter(item =>
       (item.stock || 0) * (item.unit_cost || 0) > 10000
     );
+
     if (highValueItems.length > 0) {
       alertList.push({
         type: 'info',
@@ -700,7 +762,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     }
 
     return alertList;
-  }, [items, getCriticalStockItems, getLowStockItems]);
+  }, [items]);
 
   const refresh = useCallback(async () => {
     await loadInventoryData();
@@ -717,7 +779,7 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     pageState,
     metrics,
     loading,
-    error: error || localError,
+    error,
 
     // Tab management
     activeTab: pageState.activeTab,
@@ -726,16 +788,13 @@ export const useMaterialsPage = (): UseMaterialsPageReturn => {
     // Actions
     actions,
 
-    // Performance awareness
-    shouldReduceAnimations,
-    isOnline,
 
-    // Data operations (legacy)
+    // Data operations (legacy - kept for compatibility)
     items,
     loadInventoryData,
-    getFilteredItems,
-    getLowStockItems,
-    getCriticalStockItems,
+    getFilteredItems, // From store
+    getLowStockItems: getLowStockItemsFn, // ✅ Renamed to avoid confusion
+    getCriticalStockItems: getCriticalStockItemsFn, // ✅ Renamed to avoid confusion
     getOutOfStockItems,
 
     // Enhanced functionality (from useMaterialsEnhanced)

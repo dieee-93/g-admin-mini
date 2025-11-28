@@ -8,16 +8,17 @@ import { useMemo } from 'react';
 import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 import { EntitySchemas } from '@/lib/validation/zod/CommonSchemas';
 import { logger } from '@/lib/logging';
-import { 
-  type Customer, 
+import {
+  type Customer,
   type CreateCustomerData,
   type UpdateCustomerData,
   type CustomerWithStats
 } from '../../types';
 
 export function useCustomers() {
-  // Use our unified CRUD system - eliminates 80+ lines of boilerplate!
-  const crud = useCrudOperations<Customer>({
+  // Use our unified CRUD system
+  // Using any here because the schema validates basic fields, but we return full Customer with analytics
+  const crud = useCrudOperations<any>({
     tableName: 'customers',
     selectQuery: `
       *,
@@ -31,74 +32,93 @@ export function useCustomers() {
     enableRealtime: true,
     cacheKey: 'customers',
     cacheTime: 5 * 60 * 1000, // 5 minutes
-    
-    // Success/error callbacks to match original behavior
+
     onSuccess: (action) => {
-      if (action === 'create') {
-        logger.info('App', 'Customer created successfully');
-      } else if (action === 'update') {
-        logger.info('App', 'Customer updated successfully');
-      } else if (action === 'delete') {
-        logger.info('App', 'Customer deleted successfully');
-      }
+      if (action === 'create') logger.info('App', 'Customer created successfully');
+      else if (action === 'update') logger.info('App', 'Customer updated successfully');
+      else if (action === 'delete') logger.info('App', 'Customer deleted successfully');
     },
-    
+
     onError: (action, error) => {
       logger.error('App', `Error ${action} customer:`, error);
     }
   });
 
-  // Business-specific derived data
-  const customersWithStats = useMemo<CustomerWithStats[]>(() => {
-    return crud.items.map(customer => {
-      // Calculate customer stats - would typically come from business logic
-      const customerWithSales = customer as Customer & { sales?: Array<{ total: number; created_at: string }> };
-      const sales = customerWithSales.sales || [];
-      
+  // Transform raw data to full Customer type with analytics
+  const customers = useMemo<Customer[]>(() => {
+    return crud.items.map(item => {
+      // Cast to any to access joined sales data which is not in the base type
+      const itemWithSales = item as any;
+      const sales = itemWithSales.sales || [];
+
+      const totalOrders = sales.length;
+      const totalSpent = sales.reduce((sum: number, sale: any) => sum + (sale.total || 0), 0);
+
       return {
-        ...customer,
-        stats: {
-          totalSales: sales.length,
-          totalRevenue: sales.reduce((sum, sale) => sum + (sale.total || 0), 0),
-          averageOrderValue: sales.length > 0 ? 
-            sales.reduce((sum, sale) => sum + (sale.total || 0), 0) / sales.length : 0,
-          lastOrderDate: sales.length > 0 ? 
-            sales[sales.length - 1]?.created_at : null,
-          customerLifetimeValue: 0, // Would use RFM analytics
-          rfmScore: { recency: 0, frequency: 0, monetary: 0 }
-        }
-      } as CustomerWithStats;
+        ...item,
+        // Analytics fields (Mandatory in new type)
+        total_orders: totalOrders,
+        total_spent: totalSpent,
+        average_order_value: totalOrders > 0 ? totalSpent / totalOrders : 0,
+        last_order_date: sales.length > 0 ? sales[sales.length - 1]?.created_at : undefined,
+        loyalty_tier: calculateLoyaltyTier(totalSpent),
+        status: determineCustomerStatus(item.created_at, sales.length > 0 ? sales[sales.length - 1]?.created_at : undefined, totalSpent),
+
+        // Ensure optional fields are handled
+        birth_date: item.birth_date || undefined,
+      } as Customer;
     });
   }, [crud.items]);
 
-  // Maintain exact same interface as original hook
-  return { 
-    // Original interface - mapped from unified system
-    customers: crud.items,
-    customersWithStats,
+  return {
+    customers, // Now returns full Customer objects
+    customersWithStats: customers, // Alias for backward compatibility
     loading: crud.loading,
-    loadingStats: crud.loading, // Same loading state for backward compatibility
-    
-    // Original methods - using unified system internally
+    loadingStats: crud.loading,
+
     addCustomer: async (customerData: CreateCustomerData): Promise<Customer> => {
       return await crud.create(customerData as Customer);
     },
-    
+
     editCustomer: async (customerData: UpdateCustomerData): Promise<Customer> => {
-      if (!customerData.id) {
-        throw new Error('Customer ID is required for update');
-      }
+      if (!customerData.id) throw new Error('Customer ID is required for update');
       return await crud.update(customerData.id, customerData as Partial<Customer>);
     },
-    
+
     removeCustomer: async (id: string): Promise<void> => {
       return await crud.remove(id);
     },
-    
-    // Original reload methods - using unified system
+
     reloadCustomers: crud.refresh,
-    reloadCustomersWithStats: crud.refresh // Same refresh function
+    reloadCustomersWithStats: crud.refresh
   };
+}
+
+// Helper functions (moved from store/logic)
+function calculateLoyaltyTier(totalSpent: number): 'bronze' | 'silver' | 'gold' | 'platinum' {
+  if (totalSpent >= 100000) return 'platinum';
+  if (totalSpent >= 50000) return 'gold';
+  if (totalSpent >= 20000) return 'silver';
+  return 'bronze';
+}
+
+function determineCustomerStatus(createdAt: string, lastOrderDate: string | undefined, totalSpent: number): 'active' | 'inactive' | 'vip' {
+  if (totalSpent >= 100000) return 'vip';
+
+  if (lastOrderDate) {
+    const daysSinceLastOrder = Math.floor(
+      (Date.now() - new Date(lastOrderDate).getTime()) / (1000 * 60 * 60 * 24)
+    );
+    if (daysSinceLastOrder > 90) return 'inactive';
+  } else {
+    // New customer without orders, check creation date
+    const daysSinceCreation = Math.floor(
+      (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24)
+    );
+    if (daysSinceCreation > 90) return 'inactive';
+  }
+
+  return 'active';
 }
 
 export function useCustomerSearch() {
@@ -114,7 +134,7 @@ export function useCustomerSearch() {
     if (!searchQuery.trim()) {
       return [];
     }
-    
+
     // Use unified search across multiple fields
     return searchCustomers(searchQuery, ['name', 'email', 'phone', 'address']);
   };
@@ -139,14 +159,14 @@ export function useCustomerSearch() {
 export function useCustomerStats(customerId?: string) {
   const { customers, loading } = useCustomers();
 
-  const customer = useMemo(() => 
-    customerId ? customers.find(c => c.id === customerId) : null, 
+  const customer = useMemo(() =>
+    customerId ? customers.find(c => c.id === customerId) : null,
     [customers, customerId]
   );
 
   const stats = useMemo(() => {
     if (!customer) return null;
-    
+
     // Use our RFM analytics or other business logic here
     return {
       totalOrders: 0,

@@ -26,7 +26,12 @@ export type {
 export { ALERT_EVENTS } from './types';
 
 // Provider and Context
-export { AlertsProvider, useAlertsContext } from './AlertsProvider';
+export { 
+  AlertsProvider, 
+  useAlertsContext,
+  useAlertsState,
+  useAlertsActions 
+} from './AlertsProvider';
 
 // Main Hooks
 export {
@@ -63,6 +68,9 @@ export {
   AutoGlobalAlertsDisplay
 } from './components/GlobalAlertsDisplay';
 export type { GlobalAlertsDisplayProps } from './components/GlobalAlertsDisplay';
+
+// NotificationCenter Component
+export { NotificationCenter } from './components/NotificationCenter';
 
 // Utility functions and helpers
 export const AlertUtils = {

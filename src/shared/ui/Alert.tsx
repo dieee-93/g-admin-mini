@@ -94,7 +94,8 @@ const AlertComponent = React.forwardRef<HTMLDivElement, AlertProps>(
 
     return (
       <ChakraAlert.Root ref={ref} {...rest}>
-        {startElement || <ChakraAlert.Indicator>{icon}</ChakraAlert.Indicator>}
+        {/* AlertIndicator does not accept children in Chakra v3, use default indicator */}
+        {startElement || <ChakraAlert.Indicator />}
         {finalDescription ? (
           <ChakraAlert.Content>
             <ChakraAlert.Title>{title}</ChakraAlert.Title>

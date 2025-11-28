@@ -252,8 +252,15 @@ class OfflineSync {
   }
 
   // Initialize the sync system with persistent storage
+  // SINGLETON GUARD: Prevents multiple concurrent initializations
+  // Pattern from React docs: https://react.dev/learn/you-might-not-need-an-effect
+  private initializationLock: boolean = false;
+  
   private async initialize(): Promise<void> {
-    if (this.isInitialized) return;
+    // Guard against concurrent initialization attempts
+    if (this.isInitialized || this.initializationLock) return;
+    
+    this.initializationLock = true;
     
     try {
       // Initialize IndexedDB
@@ -280,6 +287,7 @@ class OfflineSync {
       }
       
       this.isInitialized = true;
+      this.initializationLock = false; // Release lock after successful init
       
       // Initialize event listeners and start sync interval
       this.initializeEventListeners();
@@ -295,6 +303,7 @@ class OfflineSync {
       logger.error('OfflineSync', 'Failed to initialize persistent storage', error);
       // Fall back to memory-only mode
       this.isInitialized = true;
+      this.initializationLock = false; // Release lock even on failure
       this.initializeEventListeners();
       this.startSyncInterval();
     }

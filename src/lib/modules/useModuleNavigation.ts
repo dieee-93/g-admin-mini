@@ -11,7 +11,7 @@
  * - Groups by business domains
  * - Single source of truth
  *
- * @version 2.0.0 - Navigation System Refactor
+ * @version 3.0.0 - Clean Navigation System (permissionModule-based)
  */
 
 import React, { useMemo } from 'react';
@@ -21,6 +21,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/contexts/AuthContext';
 import { MODULE_FEATURE_MAP } from '@/config/FeatureRegistry';
 import { logger } from '@/lib/logging';
+import { useAppStore } from '@/store/appStore';
 import type { ModuleName } from '@/contexts/AuthContext';
 
 // ============================================
@@ -74,55 +75,51 @@ export interface NavigationByDomain {
  *
  * @returns Accessible navigation modules
  */
-// Helper to compare arrays by content and preserve reference
-function getUpdatedArrayIfChanged<T>(oldArray: T[], newArray: T[], compareFn?: (a: T, b: T) => boolean): T[] {
-  if (oldArray.length !== newArray.length) {
-    return newArray;
-  }
-
-  const isEqual = compareFn
-    ? oldArray.every((val, idx) => compareFn(val, newArray[idx]))
-    : oldArray.every((val, idx) => val === newArray[idx]);
-
-  if (isEqual) {
-    logger.debug('NavigationGeneration', '⚡ Array unchanged, preserving reference to prevent re-renders');
-    return oldArray;
-  }
-
-  logger.debug('NavigationGeneration', '🔄 Array content changed, returning new reference');
-  return newArray;
-}
-
-// Helper to deep compare NavigationModule objects
-function compareNavigationModules(a: NavigationModule, b: NavigationModule): boolean {
-  return a.id === b.id &&
-    a.title === b.title &&
-    a.path === b.path &&
-    a.color === b.color &&
-    a.domain === b.domain;
-}
-
 export function useModuleNavigation() {
+  console.log('🚨 [useModuleNavigation] HOOK CALLED!');
   const { canAccessModule, isAuthenticated } = useAuth();
-  // 🔧 FIX: Usar useShallow para prevenir re-renders por cambio de referencia del array
+
+  // ✅ REFACTOR: Use getActiveModules() getter (computed from activeFeatures)
+  // ⚡ PERFORMANCE: useShallow prevents re-renders when array reference changes but content is same
   const activeModules = useCapabilityStore(
-    useShallow(state => state.features.activeModules)
+    useShallow(state => state.getActiveModules())
   );
 
-  // Store previous result to compare
-  const prevModulesRef = React.useRef<NavigationModule[]>([]);
+  // ✅ React to modulesInitialized flag to re-compute when modules are ready
+  const modulesInitialized = useAppStore(state => state.modulesInitialized);
 
   const modules = useMemo(() => {
     const startTime = performance.now();
+    logger.debug('NavigationGeneration', `🔄 USEMEMO TRIGGERED`, {
+      isAuthenticated,
+      modulesInitialized,
+      activeModulesCount: activeModules.length,
+      timestamp: new Date().toISOString()
+    });
+    console.log('🔄 [NavigationGeneration] USEMEMO TRIGGERED:', { isAuthenticated, modulesInitialized, activeModulesCount: activeModules.length });
 
     if (!isAuthenticated) {
       logger.debug('NavigationGeneration', 'User not authenticated, returning empty modules');
       return [];
     }
 
+    // Wait for modules to be initialized
+    if (!modulesInitialized) {
+      logger.debug('NavigationGeneration', 'Modules not yet initialized, returning empty array');
+      return [];
+    }
+
     // Get ModuleRegistry instance
     const registry = ModuleRegistry.getInstance();
     const registeredModules = registry.getAll();
+
+    logger.info('NavigationGeneration', `🎯 PASSED ALL CHECKS!`, {
+      isAuthenticated,
+      modulesInitialized,
+      registeredModulesCount: registeredModules.length,
+      activeModulesCount: activeModules.length
+    });
+    console.log('🎯 [NavigationGeneration] PASSED ALL CHECKS!', { isAuthenticated, modulesInitialized, registeredModulesCount: registeredModules.length, activeModulesCount: activeModules.length });
 
     logger.debug('NavigationGeneration', `Found ${registeredModules.length} registered modules`);
 
@@ -137,65 +134,25 @@ export function useModuleNavigation() {
           return false;
         }
 
-        // Map module ID to ModuleName for role checking
-        // ============================================
-        // CORE MODULES
-        // ============================================
-        const adminModuleNameMap: Record<string, ModuleName> = {
-          // Core
-          'dashboard': 'dashboard',
-          'settings': 'settings',
-          'customers': 'sales',
-          'intelligence': 'reporting',
+        /**
+         * ✨ NEW: Get ModuleName for permission check
+         *
+         * Uses manifest.permissionModule if defined, otherwise falls back to module ID.
+         * Modules MUST either:
+         * 1. Define permissionModule if ID != ModuleName
+         * 2. Have an ID that matches a valid ModuleName
+         */
+        const moduleName = (manifest.permissionModule || manifest.id) as ModuleName;
 
-          // Operations
-          'sales': 'sales',
-          'production': 'operations',
-          'production-kitchen': 'operations', // Legacy: renamed to production
-          'fulfillment': 'operations',
-          'fulfillment-onsite': 'operations',
-          'fulfillment-pickup': 'operations',
-          'fulfillment-delivery': 'operations',
-          'delivery': 'operations',
-          'memberships': 'operations',
-          'rentals': 'operations',
-          'assets': 'operations',
-
-          // Supply Chain
-          'materials': 'materials',
-          'products': 'products',
-          'products-analytics': 'products', // Submodule
-          'suppliers': 'materials',
-          'supplier-orders': 'materials',
-
-          // Finance
-          'fiscal': 'fiscal',
-          'billing': 'billing',
-          'finance': 'billing',
-          'finance-integrations': 'billing',
-
-          // Resources
-          'staff': 'staff',
-          'scheduling': 'scheduling',
-
-          // Advanced
-          'reporting': 'reporting',
-          'gamification': 'gamification',
-          'executive': 'executive',
-          'mobile': 'operations',
-          'debug': 'debug'
-        };
-
-        const moduleName = adminModuleNameMap[manifest.id];
         if (!moduleName) {
-          logger.warn('NavigationGeneration', `Module ${manifest.id} not mapped to ModuleName, denying access`);
+          logger.error('NavigationGeneration', `Module ${manifest.id} has no permissionModule and ID is not valid`);
           return false;
         }
 
         // 🔒 LAYER 1: Role-based security filter
         const hasRoleAccess = canAccessModule(moduleName);
         if (!hasRoleAccess) {
-          logger.debug('NavigationGeneration', `User lacks role access to ${manifest.id}`);
+          logger.debug('NavigationGeneration', `User lacks role access to ${manifest.id} (permission: ${moduleName})`);
           return false;
         }
 
@@ -271,18 +228,11 @@ export function useModuleNavigation() {
     logger.performance('NavigationGeneration', 'Module navigation generation', endTime - startTime, 10);
     logger.info('NavigationGeneration', `Generated ${accessibleModules.length} accessible modules`);
 
-    // ✅ FIX: Preserve array reference if content hasn't changed
-    const finalModules = getUpdatedArrayIfChanged(
-      prevModulesRef.current,
-      accessibleModules,
-      compareNavigationModules
-    );
+    console.log('🚨 [NavigationGeneration] RETURNING MODULES:', accessibleModules.map(m => m.id));
 
-    // Update ref for next comparison
-    prevModulesRef.current = finalModules;
-
-    return finalModules;
-  }, [canAccessModule, isAuthenticated, activeModules]);
+    // Return new array - useMemo handles optimization
+    return accessibleModules;
+  }, [canAccessModule, isAuthenticated, activeModules, modulesInitialized]);
 
   return modules;
 }

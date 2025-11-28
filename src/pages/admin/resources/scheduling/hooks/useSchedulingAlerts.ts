@@ -5,10 +5,13 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 
 // ✅ INTELLIGENT SYSTEM
 import {
-  SchedulingAlertsAdapter,
   createSchedulingAlertsAdapter
 } from '../services/SchedulingAlertsAdapter';
 import type { SchedulingData } from '../services/SchedulingIntelligenceEngine';
+
+// ✅ GLOBAL ALERTS SYSTEM
+import { useAlerts } from '@/shared/alerts';
+import { schedulingAlertsAdapter } from '../services/schedulingAlertsAdapter';
 
 // ✅ SHARED TYPES
 import type { Alert } from '@/shared/types/alerts';
@@ -41,7 +44,7 @@ interface UseSchedulingAlertsResult {
 
   // 🎯 ACCIONES
   refreshAlerts: () => Promise<void>;
-  handleAlertAction: (alertId: string, actionId: string, context?: any) => Promise<void>;
+  handleAlertAction: (alertId: string, actionId: string, context?: Record<string, unknown>) => Promise<void>;
   dismissAlert: (alertId: string) => void;
 
   // 🔄 CONTROL
@@ -54,24 +57,8 @@ interface UseSchedulingAlertsResult {
   businessImpactSummary: string;
 }
 
-// ✅ MODULE CONFIGURATION - ESTABILIZADO FUERA DEL HOOK
-const SCHEDULING_ALERTS_CONFIG = {
-  capabilities: ['schedule_management', 'view_labor_costs'],
-  events: {
-    emits: [
-      'scheduling.alerts_generated',
-      'scheduling.alert_action_triggered',
-      'scheduling.critical_alert_overtime_detected'
-    ],
-    listens: [
-      'staff.availability_updated',
-      'sales.volume_forecast'
-    ]
-  }
-} as const;
-
 export function useSchedulingAlerts(
-  schedulingStats: any,
+  schedulingStats: Record<string, unknown>,
   optionsParam?: Partial<UseSchedulingAlertsOptions>
 ): UseSchedulingAlertsResult {
 
@@ -89,11 +76,11 @@ export function useSchedulingAlerts(
 
   // ✅ ARCHITECTURAL INTEGRATION
   const { handleError } = useErrorHandler();
+  const { actions: alertActions } = useAlerts({ context: 'scheduling', autoFilter: true });
 
   // 📊 ESTADO LOCAL
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [enablePredictive, setEnablePredictive] = useState(options.enablePredictive ?? true);
   const [maxAlerts, setMaxAlertsState] = useState(options.maxAlerts ?? 10);
 
@@ -111,7 +98,6 @@ export function useSchedulingAlerts(
     if (!schedulingStats) return;
 
     setLoading(true);
-    setError(null);
 
     try {
       // 📊 PREPARAR DATOS PARA ANÁLISIS - SIMPLIFIED TO PREVENT REACTIVE DEPENDENCIES
@@ -158,8 +144,8 @@ export function useSchedulingAlerts(
       setAlerts(filteredAlerts);
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error generando alertas';
-      setError(errorMessage);
+      const error = err instanceof Error ? err : new Error('Error generando alertas');
+      await alertActions.create(schedulingAlertsAdapter.analyticsCalculationFailed(error));
       handleError(err, 'useSchedulingAlerts.generateIntelligentAlerts');
     } finally {
       setLoading(false);
@@ -170,7 +156,8 @@ export function useSchedulingAlerts(
     enablePredictive,
     maxAlerts,
     options.context,
-    handleError
+    handleError,
+    alertActions
   ]); // REDUCED DEPENDENCIES - removed store dependencies
 
   /**
@@ -179,7 +166,7 @@ export function useSchedulingAlerts(
   const handleAlertAction = useCallback(async (
     alertId: string,
     actionId: string,
-    context?: any
+    context?: Record<string, unknown>
   ) => {
     try {
       const result = await alertsAdapter.handleAlertAction(alertId, actionId, {
@@ -207,7 +194,7 @@ export function useSchedulingAlerts(
     } catch (err) {
       handleError(err, 'useSchedulingAlerts.handleAlertAction');
     }
-  }, [alertsAdapter, options.context]);
+  }, [alertsAdapter, options.context, handleError]);
 
   /**
    * Descarta una alerta específica
@@ -227,7 +214,7 @@ export function useSchedulingAlerts(
    */
   const refreshAlerts = useCallback(async () => {
     await generateIntelligentAlerts();
-  }, []);
+  }, [generateIntelligentAlerts]);
 
   /**
    * Toggle análisis predictivo
@@ -248,20 +235,21 @@ export function useSchedulingAlerts(
     if (!options.autoRefresh) return;
 
     const interval = setInterval(() => {
-      // Solo auto-refresh si no está cargando y no hay errores críticos
-      if (!loading && (!error || !error.includes('critical'))) {
+      // Solo auto-refresh si no está cargando
+      if (!loading) {
         // generateIntelligentAlerts(); // DISABLED - causing infinite loops
       }
     }, options.refreshInterval);
 
     return () => clearInterval(interval);
-  }, [options.autoRefresh, options.refreshInterval, loading, error]);
+  }, [options.autoRefresh, options.refreshInterval, loading]);
 
   // ✅ INITIAL LOAD - CONDITIONAL TO PREVENT LOOPS
   useEffect(() => {
     if (schedulingStats) {
       generateIntelligentAlerts();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schedulingStats?.total_shifts_this_week]); // Only trigger when actual data changes
 
   // ✅ EFFECT EVENTS - Non-reactive event emission (React 2024 best practice)
@@ -298,6 +286,7 @@ export function useSchedulingAlerts(
 
       return () => clearTimeout(timeoutId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alerts.length, options.context]); // Stable dependencies only
 
   // 📊 MÉTRICAS COMPUTADAS
@@ -336,7 +325,7 @@ export function useSchedulingAlerts(
     // 📊 ESTADO
     alerts,
     loading,
-    error,
+    error: null, // Deprecated - using global alerts now
 
     // 📈 MÉTRICAS
     ...metrics,

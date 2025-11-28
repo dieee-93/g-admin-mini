@@ -4,10 +4,7 @@
 // Sistema inteligente de alertas para análisis de revenue patterns,
 // conversion optimization y customer behavior analytics
 
-// import { FinancialDecimal } from '@/config/decimal-config'; // TODO: Use for decimal operations
-// import { DECIMAL_CONSTANTS } from '@/config/decimal-config'; // TODO: Use for constants
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
-// import { safeAdd, safeMul, safeDiv } from '@/business-logic/shared/decimalUtils'; // TODO: Use for calculations
+import { formatCurrency, DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 // ============================================================================
 // TYPES
@@ -243,8 +240,13 @@ export class SalesIntelligenceEngine {
     const { todayRevenue, targetRevenue } = data;
     const { thresholds } = config;
 
-    // Calcular desviación del target
-    const revenueDeviation = ((targetRevenue - todayRevenue) / targetRevenue) * 100;
+    // ✅ PRECISION FIX: Use DecimalUtils.calculatePercentage for revenue deviation
+    const revenueDeviationDec = DecimalUtils.calculatePercentage(
+      targetRevenue - todayRevenue,
+      targetRevenue,
+      'financial'
+    );
+    const revenueDeviation = revenueDeviationDec.toNumber();
 
     if (revenueDeviation >= thresholds.criticalRevenueThreshold) {
       // Revenue crítico
@@ -325,7 +327,13 @@ export class SalesIntelligenceEngine {
 
     // Conversion rate analysis
     if (conversionRate < thresholds.lowConversionThreshold) {
-      const conversionDeviation = ((thresholds.minConversionRate - conversionRate) / thresholds.minConversionRate) * 100;
+      // ✅ PRECISION FIX: Use DecimalUtils.calculatePercentage for conversion deviation
+      const conversionDeviationDec = DecimalUtils.calculatePercentage(
+        thresholds.minConversionRate - conversionRate,
+        thresholds.minConversionRate,
+        'financial'
+      );
+      const conversionDeviation = conversionDeviationDec.toNumber();
 
       alerts.push({
         id: `conversion_low_${timestamp}`,
@@ -409,7 +417,13 @@ export class SalesIntelligenceEngine {
 
     // Table efficiency analysis
     if (tablesTurnover < thresholds.minTableTurnover) {
-      const turnoverDeviation = ((thresholds.minTableTurnover - tablesTurnover) / thresholds.minTableTurnover) * 100;
+      // ✅ PRECISION FIX: Use DecimalUtils.calculatePercentage for turnover deviation
+      const turnoverDeviationDec = DecimalUtils.calculatePercentage(
+        thresholds.minTableTurnover - tablesTurnover,
+        thresholds.minTableTurnover,
+        'financial'
+      );
+      const turnoverDeviation = turnoverDeviationDec.toNumber();
 
       alerts.push({
         id: `table_inefficiency_${timestamp}`,
@@ -460,7 +474,17 @@ export class SalesIntelligenceEngine {
 
     // Stock impact on sales
     if (materialsStockCritical > 0) {
-      const potentialSalesLoss = materialsStockCritical * (data.averageOrderValue * 0.2); // Estimación
+      // ✅ PRECISION FIX: Use DecimalUtils for compound multiplication
+      const potentialSalesLossDec = DecimalUtils.multiply(
+        materialsStockCritical.toString(),
+        DecimalUtils.multiply(
+          data.averageOrderValue.toString(),
+          '0.2',
+          'financial'
+        ),
+        'financial'
+      );
+      const potentialSalesLoss = potentialSalesLossDec.toNumber();
 
       alerts.push({
         id: `cross_module_stock_impact_${timestamp}`,
@@ -615,8 +639,13 @@ export class SalesIntelligenceEngine {
 
   // Helper methods
   private static calculateWeeklyTrend(data: SalesAnalysisData): number {
-    // Simplified trend calculation
-    return ((data.todayRevenue - data.lastWeekRevenue) / data.lastWeekRevenue) * 100;
+    // ✅ PRECISION FIX: Use DecimalUtils.calculatePercentage for weekly trend
+    const trendDec = DecimalUtils.calculatePercentage(
+      data.todayRevenue - data.lastWeekRevenue,
+      data.lastWeekRevenue,
+      'financial'
+    );
+    return trendDec.toNumber();
   }
 
   private static getSeasonalFactor(): number {

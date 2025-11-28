@@ -6,161 +6,447 @@
 
 **Frontend Stack**: React 19.1+ + TypeScript 5.8.3+ + Vite 7.0+ + Chakra UI v3.23.0 + Zustand v5.0.7  
 **Backend**: Supabase (PostgreSQL, auth, realtime) + Row Level Security (RLS)  
-**Testing**: Vitest v3.2.4 with JSdom environment and comprehensive test suites  
-**Key Systems**: EventBus v2 Enterprise, Offline-First, Capabilities System, Gamification
+**Testing**: Vitest v3.2.4 with JSdom environment  
+**Key Systems**: EventBus v2 Enterprise, Offline-First, Capabilities/Features System, Gamification
 
 ### 📁 Project Structure (Screaming Architecture)
 
 **Business domains under `src/pages/admin/`**:
 - `core/` - Dashboard, CRM, Settings, Intelligence
-- `operations/` - Sales, Operations Hub
-- `supply-chain/` - Materials (StockLab), Products  
-- `finance/` - Fiscal management, AFIP integration
+- `operations/` - Sales, Fulfillment, Kitchen/Production
+- `supply-chain/` - Materials (StockLab), Products, Suppliers, Assets
+- `finance-*/` - Fiscal, Billing, Corporate, Integrations (split modules)
 - `resources/` - Staff, Scheduling
 - `gamification/` - Achievements, OnboardingGuide
+- `tools/` - Reporting utilities
 
-**Route mapping**: `src/config/routeMap.ts` provides automated domain ↔ route mapping  
-**Shared systems**: `src/shared/` contains UI components, alerts, business logic  
-**Core libraries**: `src/lib/` contains events, capabilities, offline, error-handling, performance
+**Route mapping**: `src/config/routeMap.ts` - automated domain ↔ route mapping with `domainRouteMap` and `routeToFileMap`  
+**Shared systems**: `src/shared/` - UI (`ui/`), alerts (`alerts/`), layouts (`layout/`)  
+**Core libraries**: `src/lib/` - events, capabilities/features, offline, error-handling, performance, logging  
+**State**: `src/store/` - Zustand stores per domain (appStore, materialsStore, salesStore, etc.)  
+**Business logic**: `src/business-logic/` - domain calculations using Decimal.js  
+**Services**: `src/services/` - Supabase API wrappers
 
 ### 🏛️ Enterprise Core Systems
 
-**EventBus v2 Enterprise** (`src/lib/events/`):
-- Distributed event system with deduplication and offline-first support
-- Module lifecycle management with health monitoring  
-- Security hardening with encryption and rate limiting
+**EventBus v2 Enterprise** (`src/lib/events/EventBus.ts`):
+- Distributed event system with deduplication (`DeduplicationManager`) and offline support (`EventStoreIndexedDB`)
+- Module lifecycle via `ModuleRegistry` with health monitoring
+- Security: `SecureEventProcessor`, `EncryptedEventStore`, `RateLimiter`, `ContentSecurityPolicy`
 - Pattern: `domain.entity.action` (e.g., `sales.order.completed`)
-- Testing: 70.5% passing (93/132 tests) organized in unit/integration/performance/stress categories
+- Test organization: `__tests__/unit/`, `integration/`, `performance/`, `stress/`, `business/`
+- Usage: `eventBus.emit(pattern, payload, options)` and `eventBus.on(pattern, handler)`
 
-**Capabilities System** (`src/lib/capabilities/`):
-- Business capabilities for progressive disclosure vs role-based permissions
-- React patterns: `<CapabilityGate capability="advanced_analytics">` and `useCapabilities()` hook
-- BusinessDNA compositional model replacing archetypal approaches
-- 22 foundational milestones unlock capabilities through gamification
+**Capabilities/Features System** (`src/lib/capabilities/`, `src/config/`):
+- **NEW v4.0**: `FeatureActivationEngine` (`src/lib/features/`) replaces old CapabilityEngine
+- Registries: `BusinessModelRegistry`, `FeatureRegistry`, `RequirementsRegistry` (in `src/config/`)
+- Store: `useCapabilityStore` (`src/store/capabilityStore.ts`) - unified Zustand store
+- Hook: `useCapabilities()` returns `{ hasFeature, getActiveModules, ... }`
+- **Migration note**: Old `CapabilityGate` component removed - use hook-based conditional rendering
 
-**Offline-First Architecture** (`src/lib/offline/`):
-- OfflineSync engine with IndexedDB queue and conflict resolution
-- Optimistic updates pattern: UI updates immediately, sync later if offline
-- Priority system: orders > payments > inventory for sync order
-- Anti-flapping protection for unstable connections
+**Offline-First Architecture** (`src/lib/offline/OfflineSync.ts`):
+- `OfflineSyncDB` (IndexedDB) + `OfflineSync` singleton class
+- Optimistic updates: UI updates immediately, sync when online
+- Priority queue: orders > payments > inventory
+- Anti-flapping: connection state stabilization before sync
+- Integration: `offlineSync.queueOperation(syncOperation)` from modules
 
 **Error Handling System** (`src/lib/error-handling/`):
-- ErrorHandler singleton with batch processing and audit trail
-- `useErrorHandler()` hook with operation context
-- ErrorBoundary components with custom fallback UI
-- Integration with notifications: `notify.success()`, `handleApiError()`
+- `ErrorHandler` singleton with batch processing
+- Hook: `useErrorHandler()` provides `handleError(error, context)`
+- `ErrorBoundaryWrapper` component wraps App.tsx
+- Integration with alerts: errors automatically show UI notifications
 
 **Gamification System** (`src/pages/admin/gamification/achievements/`):
-- **Dual system**: 22 foundational milestones (activate capabilities) + mastery achievements (reward usage)
-- **AchievementsEngine**: Listens to 40+ EventBus patterns for automatic progress tracking
-- **BusinessDNA compositional model**: Replaces archetypal approaches with independent capabilities
-- **OnboardingGuide widget**: Interactive gamified activation system
-- **Achievement types**: Sales (First Seller → Sales Master), Materials (Organizer → Inventory Master), Staff (Emerging Leader → HR Master)
+- Dual system: 22 foundational milestones (unlock capabilities) + mastery achievements
+- `AchievementsEngine`: Auto-tracks 40+ EventBus patterns
+- BusinessDNA model: Compositional capabilities vs archetypes
+- `OnboardingGuide` widget: Gamified progressive disclosure
 
 **Performance Monitoring** (`src/lib/performance/`):
-- Real-time FPS monitoring with auto-optimization when FPS < 30
-- Bundle optimization: Framer Motion reduced from 34kb to 4.6kb (-86%)
-- `usePerformanceMonitor()` for adaptive animations
-- GPU acceleration with transform/opacity for hardware rendering
+- `PerformanceProvider` + `usePerformanceMonitor()` hook
+- FPS monitoring with auto-optimization when < 30fps
+- Bundle analysis: Framer Motion optimized from 34kb → 4.6kb
+- Pattern: Use `transform`/`opacity` for GPU acceleration
 
 ### 💻 Developer Workflows
 
-**Package manager**: pnpm (see `pnpm-lock.yaml`)  
+**Package manager**: `pnpm` (check `pnpm-lock.yaml`)
+
 **Key commands**:
-- `pnpm install` - Install dependencies
-- `pnpm dev` - Start Vite dev server
-- `pnpm build` - Production build with TypeScript check
-- `pnpm -s exec eslint .` - Lint with ESLint (CI uses explicit commands)
-- `pnpm -s exec tsc --noEmit` - Type check only
-- `pnpm test` - Run tests (excludes performance/stress)
-- `pnpm test:eventbus:full` - Full EventBus test suite including performance/stress
+```powershell
+pnpm install                   # Install dependencies
+pnpm dev                       # Vite dev server
+pnpm build                     # Production build (includes tsc check)
+pnpm -s exec eslint .          # Lint (explicit exec for CI)
+pnpm -s exec tsc --noEmit      # Type check only
+pnpm test                      # Run tests (excludes performance/stress)
+pnpm test:eventbus:full        # Full EventBus tests with performance/stress
+pnpm test:coverage             # Run tests with coverage report
+```
 
-**Testing Strategy**:
-- Vitest v3.2.4 with JSdom environment (`vitest.config.ts`)
-- Coverage reporting: text, JSON, HTML outputs
-- EventBus tests organized: `unit/`, `integration/`, `performance/`, `stress/`, `business/`
-- Custom testing utilities: `EventBusTestingHarness`, `MockEventStore`
-- E2E workflows for Staff, Materials, Customer modules
+**Testing**:
+- Config: `vitest.config.ts` with JSdom environment
+- Setup: `src/setupTests.ts` for global test configuration
+- Test files: `*.test.ts` or `*.test.tsx` alongside source
+- EventBus tests: Comprehensive suite in `src/lib/events/__tests__/`
+- Utilities: `EventBusTestingHarness`, `MockEventStore` for testing
 
-**Quality Gates**:
-1. `pnpm install` - Install dependencies
-2. `pnpm dev` - Test UI changes in development
-3. `pnpm -s exec eslint .` - ESLint validation
-4. `pnpm -s exec tsc --noEmit` - TypeScript strict checking
-5. `pnpm test` - Run core test suite
+**Quality workflow**:
+1. Install: `pnpm install`
+2. Dev: `pnpm dev` - test changes in browser
+3. Lint: `pnpm -s exec eslint .`
+4. Type check: `pnpm -s exec tsc --noEmit`
+5. Test: `pnpm test`
+
+**ESLint rules** (`eslint.config.js`):
+- ❌ `no-console` enforced - use `logger.*` from `@/lib/logging` instead
+- TypeScript strict rules via `typescript-eslint`
+- React hooks rules enforced
 
 ### 🎯 Project-Specific Patterns
 
-**UI Components**:
-- Custom wrapper system in `src/shared/ui/` - check imports before assuming Chakra props
-- Import pattern: `import { ContentLayout, PageHeader, Stack, Button } from '@/shared/ui'`
-- Form patterns: See `MaterialFormModal.tsx`, `UniversalItemForm.tsx` for validation/state
-- Component organization follows domain structure under `src/pages/admin/[domain]/`
-- **NEVER** import directly from `@chakra-ui/react` - always use semantic wrappers
+**UI Components** (`src/shared/ui/`):
+```typescript
+// ✅ CORRECT - Always import from @/shared/ui
+import { ContentLayout, PageHeader, Stack, Button, Dialog, FormSection } from '@/shared/ui';
 
-**Module Construction Templates** (`docs/05-development/UI_MODULE_CONSTRUCTION_MASTER_GUIDE.md`):
-- **Enterprise modules**: ContentLayout + business metrics + offline-first patterns
-- **Settings modules**: Vertical tabs + form sections + validation
-- **Analytics modules**: StatsSection + performance monitoring integration
-- Architecture: App.tsx handles global wrappers, modules only use ContentLayout
+// ❌ WRONG - Never import directly from @chakra-ui/react
+import { Box } from '@chakra-ui/react'; // Will fail - props differ
+```
 
-**Design System Conventions** (`docs/05-development/MODULE_DESIGN_CONVENTIONS.md`):
-- **"One Pattern per Purpose"** - Single official pattern for each UI need
-- **Mandatory templates**: Enterprise (Sales/Staff/Materials), Settings (Config/Admin), Analytics (Dashboard/Reports)
-- **Form patterns**: Standardized ModuleForm component structure with Modal + FormSection
-- **Import enforcement**: Only `@/shared/ui` imports allowed, never direct Chakra imports
+**3-Layer UI Architecture**:
+- **Layer 3**: Semantic components (`Main`, `SemanticSection`, `SkipLink`) - WCAG AAA
+- **Layer 2.5**: Helpers (`Form`, `DialogHelpers`) - composition patterns
+- **Layer 2**: Layout components (`ContentLayout`, `PageHeader`, `Section`, `FormSection`, `StatsSection`)
+- **Layer 1**: Primitives (Chakra wrappers: `Box`, `Flex`, `Stack`, `Button`, etc.)
 
-**Business Logic** (`src/business-logic/`):
-- Domain-specific logic separated from UI components
-- Decimal.js for banking-level precision (0% float errors, 20-digit precision)
-- SQL functions for complex calculations (`database/functions/`)
-- Service layer in `src/services/` for Supabase operations
+**Page Structure Pattern**:
+```tsx
+// App.tsx handles: Provider, Toaster, ErrorBoundaryWrapper, ResponsiveLayout
+// Individual pages ONLY use ContentLayout, never duplicate wrappers
 
-**Type System**:
-- Domain-specific types in module-local `types.ts` files
-- Update types when changing data shapes in business logic
-- Strict TypeScript with comprehensive error checking
-- Zod v4.1.5 for validation with `@hookform/resolvers` integration (already configured)
+export default function MyPage() {
+  return (
+    <ContentLayout spacing="normal">
+      <PageHeader title="My Module" />
+      <Section title="Stats">
+        <StatsSection>
+          <MetricCard label="Total" value={100} />
+        </StatsSection>
+      </Section>
+    </ContentLayout>
+  );
+}
+```
+
+**Form Modal Pattern** (see `src/pages/admin/supply-chain/suppliers/components/SupplierFormModal.tsx`):
+```tsx
+// Pattern: Business logic in hook, UI is presentational
+import { Dialog, FormSection, InputField, Button } from '@/shared/ui';
+
+export function FormModal({ isOpen, onClose, item }) {
+  const {
+    formData,
+    handleFieldChange,
+    fieldErrors,
+    isSubmitting,
+    handleSubmit
+  } = useFormHook({ isOpen, onClose, item });
+
+  return (
+    <Dialog.Root open={isOpen} onOpenChange={...}>
+      <Dialog.Content>
+        <Dialog.Header><Dialog.Title>...</Dialog.Title></Dialog.Header>
+        <Dialog.Body>
+          <FormSection title="Section">
+            <InputField
+              label="Field *"
+              value={formData.field}
+              onChange={(e) => handleFieldChange('field')(e.target.value)}
+              style={{ borderColor: fieldErrors.field ? 'var(--colors-error)' : undefined }}
+            />
+          </FormSection>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <Button onClick={handleSubmit} disabled={isSubmitting}>Submit</Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog.Root>
+  );
+}
+```
+
+**State Management** (`src/store/`):
+```typescript
+// Zustand v5 with devtools + persist middleware
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+
+export const useMyStore = create<MyState>()(
+  devtools(
+    persist(
+      (set, get) => ({
+        // state
+        items: [],
+        // actions
+        addItem: (item) => set((state) => ({ items: [...state.items, item] })),
+      }),
+      { name: 'my-store' }
+    ),
+    { name: 'MyStore' }
+  )
+);
+```
+
+**Business Logic with Decimal.js** (`src/business-logic/`):
+```typescript
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+
+// Banking-level precision (20 digits, 0% float errors)
+const total = items.reduce((acc, item) => {
+  const itemValue = DecimalUtils.calculateStockValue(item.stock, item.unit_cost);
+  return DecimalUtils.add(acc, itemValue, 'inventory');
+}, DecimalUtils.fromValue(0, 'inventory'));
+
+const formatted = DecimalUtils.formatCurrency(total); // "11,000.31"
+```
+
+**Supabase Service Pattern** (`src/services/`):
+```typescript
+import { supabase } from '@/lib/supabase/client';
+import { logger } from '@/lib/logging';
+
+export async function fetchItems() {
+  const { data, error } = await supabase
+    .from('items')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    logger.error('ItemsService', 'Failed to fetch items', error);
+    throw error;
+  }
+  return data;
+}
+```
+
+**Database Migrations** (`database/migrations/`):
+```sql
+-- Pattern: Use .sql files for schema changes via Supabase MCP
+-- Naming: YYYYMMDDHHMMSS_description.sql (timestamp format)
+-- Example: 20251106174442_create_assets_table.sql
+
+-- 1. Create table with constraints
+CREATE TABLE IF NOT EXISTS public.assets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  asset_code VARCHAR(100) UNIQUE NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'available',
+  -- CHECK constraints for data integrity
+  CHECK (status IN ('available', 'in_use', 'maintenance', 'retired')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Enable RLS (Row Level Security)
+ALTER TABLE public.assets ENABLE ROW LEVEL SECURITY;
+
+-- 3. Create RLS policies
+CREATE POLICY "Assets viewable by authenticated users"
+  ON public.assets FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Assets manageable by admins"
+  ON public.assets FOR ALL
+  USING (
+    auth.jwt() ->> 'role' = 'admin' OR
+    auth.jwt() ->> 'role' = 'manager'
+  );
+```
+
+**RLS Patterns** (Row Level Security):
+```sql
+-- Pattern 1: User-owned data (customers, addresses)
+CREATE POLICY "Users view own data"
+  ON public.customers FOR SELECT
+  USING (auth.uid() = id);
+
+-- Pattern 2: Organization-scoped data (multi-tenant)
+CREATE POLICY "Organization members view data"
+  ON public.items FOR SELECT
+  USING (
+    auth.uid() IN (
+      SELECT user_id FROM organization_members
+      WHERE organization_id = items.organization_id
+    )
+  );
+
+-- Pattern 3: Role-based access (admin/manager/staff)
+CREATE POLICY "Role-based access"
+  ON public.sales FOR ALL
+  USING (
+    auth.jwt() ->> 'role' IN ('admin', 'manager', 'cashier')
+  );
+
+-- Pattern 4: Combined conditions (location + role)
+CREATE POLICY "Location staff access"
+  ON public.shifts FOR SELECT
+  USING (
+    location_id IN (
+      SELECT home_location_id FROM employees
+      WHERE id = auth.uid()
+    )
+    OR auth.jwt() ->> 'role' = 'admin'
+  );
+```
+
+**Supabase Service Patterns** (`src/services/`):
+```typescript
+// Pattern 1: Basic CRUD with error handling
+import { supabase } from '@/lib/supabase/client';
+import { logger } from '@/lib/logging';
+
+export async function fetchSuppliers() {
+  const { data, error } = await supabase
+    .from('suppliers')
+    .select('*')
+    .eq('is_active', true)
+    .order('name', { ascending: true });
+
+  if (error) {
+    logger.error('SuppliersService', 'Failed to fetch suppliers', error);
+    throw error;
+  }
+  return data;
+}
+
+// Pattern 2: Joins and relations
+export async function fetchOrdersWithItems() {
+  const { data, error } = await supabase
+    .from('orders')
+    .select(`
+      *,
+      customer:customers(name, email),
+      items:order_items(
+        id,
+        quantity,
+        product:products(name, price)
+      )
+    `)
+    .eq('status', 'pending');
+
+  if (error) throw error;
+  return data;
+}
+
+// Pattern 3: Upsert (insert or update)
+export async function upsertProduct(product: Product) {
+  const { data, error } = await supabase
+    .from('products')
+    .upsert(product, { onConflict: 'id' })
+    .select()
+    .single();
+
+  if (error) {
+    logger.error('ProductsService', 'Upsert failed', error);
+    throw error;
+  }
+  return data;
+}
+
+// Pattern 4: Transactions (using RPC functions)
+export async function transferInventory(transfer: Transfer) {
+  const { data, error } = await supabase
+    .rpc('execute_inventory_transfer', {
+      from_location: transfer.fromLocationId,
+      to_location: transfer.toLocationId,
+      item_id: transfer.itemId,
+      quantity: transfer.quantity
+    });
+
+  if (error) throw error;
+  return data;
+}
+```
 
 ### 🔌 Integration Points
 
-**Supabase** (`src/lib/supabase/client.ts`):
-- Singleton client pattern with persistent auth
-- Service hooks in `src/services/` for database operations
-- Real-time subscriptions for live data updates
-
-**State Management**:
-- Zustand stores: `useAppStore`, `useMaterialsStore`, `useSalesStore`, etc.
-- Immer for immutable state updates
-- Domain-specific stores aligned with page organization
-
 **EventBus Communication**:
-- Module-to-module communication via EventBus v2
-- Distributed events with offline support
-- Use `ModuleRegistry` for dynamic module loading
-- Event patterns: `domain.entity.action` (e.g., `sales.order.completed`)
-- Health monitoring with automatic module lifecycle management
+```typescript
+// Module A emits
+await eventBus.emit('sales.order.completed', { orderId: '123', total: 100 }, {
+  priority: 'high',
+  correlationId: 'tx-456'
+});
 
-### ⚠️ Common Patterns & Gotchas
+// Module B subscribes
+const unsubscribe = eventBus.on('sales.order.*', async (event) => {
+  logger.info('OrderHandler', 'Order event received', event);
+  // handle event
+});
+```
 
-**Before editing**:
-- Check if importing from `src/shared/ui` vs `@chakra-ui/react` - props may differ
-- Run `pnpm -s exec tsc --noEmit` after edits to catch type errors
-- DB changes require SQL migrations in `database/` or `database-updates/`
+**Module Registry** (`src/lib/modules/ModuleRegistry.ts`):
+```typescript
+import { ModuleRegistry, HookPoint } from '@/lib/modules';
 
-**Key examples**:
-- Form patterns: `src/pages/admin/supply-chain/materials/components/MaterialFormModal.tsx`
-- Store usage: Check `src/store/` for existing domain stores before creating new state
-- SQL business logic: `database/functions/recipe_intelligence_functions.sql`
+// Register hook
+ModuleRegistry.registerHook({
+  hookPoint: HookPoint.SALES_ORDER_CREATED,
+  moduleId: 'inventory-tracker',
+  handler: async (data) => { /* update inventory */ }
+});
 
-**Critical Anti-Patterns to Avoid**:
-- ❌ Never import directly from `@chakra-ui/react` (use `@/shared/ui` wrappers)
-- ❌ Don't duplicate ErrorBoundary/ResponsiveLayout in individual pages
-- ❌ Avoid mixed state management (useState + Zustand for same data)
-- ❌ Don't bypass security patterns (always use `secureApiCall()` for critical operations)
-- ❌ Never hardcode theme colors (use dynamic theming system with 25+ themes)
+// Execute hooks
+await ModuleRegistry.executeHooks(HookPoint.SALES_ORDER_CREATED, orderData);
+```
 
-**Validation workflow**:
-- Install: `pnpm install`
-- Dev server: `pnpm dev` and test UI changes
-- Quality checks: `pnpm -s exec eslint .` and `pnpm -s exec tsc --noEmit`
+**Offline Sync**:
+```typescript
+import offlineSync from '@/lib/offline/OfflineSync';
+
+// Queue operation for offline support
+await offlineSync.queueOperation({
+  id: uuid(),
+  type: 'create',
+  entity: 'orders',
+  payload: orderData,
+  priority: 'high',
+  timestamp: Date.now()
+});
+```
+
+### ⚠️ Critical Patterns & Anti-Patterns
+
+**✅ DO**:
+- Import from `@/shared/ui` (never `@chakra-ui/react`)
+- Use `logger.*` from `@/lib/logging` (never `console.log`)
+- Type check: `pnpm -s exec tsc --noEmit` after edits
+- Use Decimal.js for financial calculations
+- Use `ContentLayout` in pages (App.tsx has global wrappers)
+- Store domain state in Zustand stores (`src/store/`)
+- SQL migrations for DB changes (`database/migrations/`)
+- Use `useCapabilities().hasFeature()` for progressive disclosure
+
+**❌ DON'T**:
+- Import `@chakra-ui/react` directly (use `@/shared/ui` wrappers)
+- Use `console.log` (ESLint error - use `logger.*`)
+- Duplicate `ErrorBoundaryWrapper`/`ResponsiveLayout` in pages
+- Mix useState + Zustand for same domain data
+- Use `secureApiCall()` (deprecated - modern modules use Supabase RLS)
+- Hardcode colors (use dynamic theming system)
+- Use `CapabilityGate` component (removed - use hooks instead)
+
+**Examples to reference**:
+- Form pattern: `src/pages/admin/supply-chain/suppliers/components/SupplierFormModal.tsx`
+- Store: `src/store/appStore.ts`, `src/store/materialsStore.ts`
+- EventBus tests: `src/lib/events/__tests__/unit/EventBus.test.ts`
+- Business logic: `src/business-logic/__test__/integration.test.ts`
+
+### 📚 Additional Resources
+
+- Architecture V2 redesign: `docs/architecture-v2/deliverables/MIGRATION_PLAN.md`
+- Route mapping: `src/config/routeMap.ts` - domain/route/file relationships
+- Module manifests: `src/modules/` (check `ALL_MODULE_MANIFESTS`)
+- Zustand v5 patterns: `docs/05-development/ZUSTAND_V5_STORE_AUDIT_REPORT.md`

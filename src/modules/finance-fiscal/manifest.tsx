@@ -18,6 +18,8 @@ export const financeFiscalManifest: ModuleManifest = {
   name: 'Fiscal & Tax',
   version: '2.0.0',
 
+  permissionModule: 'fiscal', // ✅ Uses 'fiscal' permission
+
   depends: ['sales'], // Fiscal processes sales transactions
   autoInstall: true, // Auto-install when sales is active
 

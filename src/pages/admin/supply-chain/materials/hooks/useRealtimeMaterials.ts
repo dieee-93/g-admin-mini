@@ -23,7 +23,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsStore } from '@/store/materialsStore';
 import { MaterialsDataNormalizer } from '@/pages/admin/supply-chain/materials/services/materialsDataNormalizer';
 import { logger } from '@/lib/logging';
 import eventBus from '@/lib/events';
@@ -50,10 +50,10 @@ interface UseRealtimeMaterialsOptions {
 export function useRealtimeMaterials(options: UseRealtimeMaterialsOptions = {}) {
   const { locationId, debug = false, disabled = false } = options;
   const channelRef = useRef<RealtimeChannel | null>(null);
-  const { items, addItem, updateItem, removeItem } = useMaterials();
 
   /**
    * Handle real-time database changes
+   * ✅ FIX GAP 1: Remove `items` from deps, use getState() for fresh values
    */
   const handleRealtimeChange = useCallback((payload: RealtimePostgresChangesPayload<MaterialItem>) => {
     const { eventType, new: newRecord, old: oldRecord } = payload;
@@ -63,6 +63,9 @@ export function useRealtimeMaterials(options: UseRealtimeMaterialsOptions = {}) 
     }
 
     try {
+      // ✅ FIX: Get fresh values from store instead of closure
+      const { items, addItem, updateItem, removeItem } = useMaterialsStore.getState();
+
       switch (eventType) {
         case 'INSERT': {
           // New material added by another user
@@ -125,7 +128,7 @@ export function useRealtimeMaterials(options: UseRealtimeMaterialsOptions = {}) 
     } catch (error) {
       logger.error('useRealtimeMaterials', 'Error handling real-time change', error);
     }
-  }, [items, addItem, updateItem, removeItem, debug]);
+  }, [debug]); // ✅ FIX GAP 1: Only debug in deps, items removed
 
   useEffect(() => {
     // Don't subscribe if disabled

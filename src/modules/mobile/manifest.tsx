@@ -1,10 +1,14 @@
 import type { ModuleManifest } from '@/lib/modules/types';
 import { logger } from '@/lib/logging';
+import { lazy, Suspense } from 'react';
+import { Spinner, Center } from '@/shared/ui';
 
 export const mobileManifest: ModuleManifest = {
   id: 'mobile',
   name: 'Mobile Operations',
   version: '1.0.0',
+
+  permissionModule: 'operations', // ✅ Uses 'operations' permission
 
   requiredFeatures: ['mobile_location_tracking'], // GPS tracking is essential
   optionalFeatures: [
@@ -36,101 +40,113 @@ export const mobileManifest: ModuleManifest = {
 
     try {
       // ============================================
-      // REGISTER DASHBOARD WIDGET
+      // OPTIMIZED: Parallel imports for critical dependencies
       // ============================================
+      const [{ useCapabilityStore }, { eventBus }] = await Promise.all([
+        import('@/store/capabilityStore'),
+        import('@/lib/events')
+      ]);
 
-      const { useCapabilityStore } = await import('@/store/capabilityStore');
       const hasFeature = useCapabilityStore.getState().hasFeature;
 
+      // ============================================
+      // REGISTER DASHBOARD WIDGET (React.lazy pattern)
+      // ============================================
       if (hasFeature('mobile_location_tracking')) {
-        // Lazy load mobile operations widget
-        const { MobileOperationsWidget } = await import('./components/MobileOperationsWidget');
+        // ✅ FIX: Move lazy() to module level (React best practice)
+        // React.lazy must be declared outside of render, not inside a function called during render
+        // See: https://react.dev/reference/react/lazy#troubleshooting
+        const MobileOperationsWidget = lazy(() =>
+          import('./components/MobileOperationsWidget').then((m) => ({
+            default: m.MobileOperationsWidget
+          }))
+        );
 
+        // Register widget with registry - handler returns stable JSX
         registry.addAction(
           'dashboard.widgets',
-          () => <MobileOperationsWidget />,
+          () => (
+            <Suspense
+              fallback={
+                <Center minH="100px">
+                  <Spinner size="sm" />
+                </Center>
+              }
+            >
+              <MobileOperationsWidget />
+            </Suspense>
+          ),
           'mobile',
           15 // Priority after fulfillment (10)
         );
 
-        logger.debug('App', '✅ Mobile operations widget registered');
+        logger.debug('App', '✅ Mobile operations widget registered (lazy)');
       }
 
       // ============================================
-      // LISTEN TO DELIVERY EVENTS (for route planning)
+      // DEFERRED: EventBus subscriptions (microtask queue)
+      // Prevents blocking module setup - subscriptions run after registration
       // ============================================
+      queueMicrotask(() => {
+        // Subscription 1: Route planning
+        if (hasFeature('mobile_route_planning')) {
+          eventBus.subscribe(
+            'fulfillment.delivery.queued',
+            async (event) => {
+              logger.debug('App', '🔔 New delivery queued for mobile route', event.payload);
+              // TODO: Auto-suggest adding to existing route or create new route
+            },
+            { moduleId: 'mobile' }
+          );
+          logger.debug('App', '✅ Mobile route planning event listeners registered');
+        }
 
-      const { eventBus } = await import('@/lib/events');
-
-      if (hasFeature('mobile_route_planning')) {
-        // Auto-add delivery to route when queued
+        // Subscription 2: Driver availability
         eventBus.subscribe(
-          'fulfillment.delivery.queued',
-          async (event) => {
-            logger.debug('App', '🔔 New delivery queued for mobile route', event.payload);
-
-            // TODO: Auto-suggest adding to existing route or create new route
-            // This is a future enhancement
+          'staff.driver_available',
+          (event) => {
+            logger.debug('App', '🔔 Driver became available', event.payload);
+            // TODO: Check if any routes need assignment
           },
           { moduleId: 'mobile' }
         );
 
-        logger.debug('App', '✅ Mobile route planning event listeners registered');
-      }
+        // Subscription 3: Inventory sync
+        if (hasFeature('mobile_inventory_constraints')) {
+          eventBus.subscribe(
+            'materials.stock_updated',
+            async (event) => {
+              logger.debug('App', '🔔 Stock updated in warehouse', event.payload);
+              // TODO: Notify mobile vehicles if low stock needs restocking
+            },
+            { moduleId: 'mobile' }
+          );
+          logger.debug('App', '✅ Mobile inventory event listeners registered');
+        }
+      });
 
       // ============================================
-      // LISTEN TO DRIVER AVAILABILITY (for route assignment)
+      // DEFERRED: GPS tracking check (async, non-blocking)
+      // Check active routes in background after module registration
       // ============================================
+      queueMicrotask(async () => {
+        try {
+          const { getTodaysActiveRoutes } = await import('./services/mobileService');
+          const { data: activeRoutes } = await getTodaysActiveRoutes();
 
-      eventBus.subscribe(
-        'staff.driver_available',
-        (event) => {
-          logger.debug('App', '🔔 Driver became available', event.payload);
+          if (activeRoutes && activeRoutes.length > 0) {
+            logger.info('App', `📍 Found ${activeRoutes.length} active route(s), GPS tracking ready`);
+            eventBus.emit('mobile.routes_active', {
+              count: activeRoutes.length,
+              routes: activeRoutes.map((r) => r.id)
+            });
+          }
+        } catch (error) {
+          logger.error('App', '❌ Error checking active routes', error);
+        }
+      });
 
-          // TODO: Check if any routes need assignment
-          // This is a future enhancement
-        },
-        { moduleId: 'mobile' }
-      );
-
-      // ============================================
-      // LISTEN TO STOCK UPDATES (for mobile inventory sync)
-      // ============================================
-
-      if (hasFeature('mobile_inventory_constraints')) {
-        eventBus.subscribe(
-          'materials.stock_updated',
-          async (event) => {
-            logger.debug('App', '🔔 Stock updated in warehouse', event.payload);
-
-            // TODO: Notify mobile vehicles if low stock needs restocking
-            // This is a future enhancement
-          },
-          { moduleId: 'mobile' }
-        );
-
-        logger.debug('App', '✅ Mobile inventory event listeners registered');
-      }
-
-      // ============================================
-      // GPS TRACKING AUTO-START (for active routes)
-      // ============================================
-
-      // On module load, check for active routes and start GPS tracking
-      const { getTodaysActiveRoutes } = await import('./services/mobileService');
-      const { data: activeRoutes } = await getTodaysActiveRoutes();
-
-      if (activeRoutes.length > 0) {
-        logger.info('App', `📍 Found ${activeRoutes.length} active route(s), GPS tracking ready`);
-
-        // Emit event to notify UI
-        eventBus.emit('mobile.routes_active', {
-          count: activeRoutes.length,
-          routes: activeRoutes.map((r) => r.id)
-        });
-      }
-
-      logger.info('App', '✅ Mobile Operations module setup complete');
+      logger.info('App', '✅ Mobile Operations module setup complete (optimized)');
     } catch (error) {
       logger.error('App', '❌ Error setting up Mobile Operations module', error);
     }

@@ -19,7 +19,8 @@ import { toaster } from '@/shared/ui/toaster';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
 import { Button, Icon, Stack, Badge } from '@/shared/ui';
-import { CubeIcon } from '@heroicons/react/24/outline';
+import { CubeIcon, ArchiveBoxIcon } from '@heroicons/react/24/outline';
+import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 
 /**
  * Materials Module Manifest
@@ -116,7 +117,7 @@ export const materialsManifest: ModuleManifest = {
       'products.recipe_updated',          // Recalculate material requirements
       'production.order.created',         // Reserve materials for production
       'production.order.completed',       // Update stock after production
-      'supplier_orders.received',         // Auto-update stock on delivery
+      'materials.procurement.po_received', // Auto-update stock on delivery
     ],
   },
 
@@ -142,20 +143,18 @@ export const materialsManifest: ModuleManifest = {
        * - 🔒 PERMISSIONS: Requires 'read' permission on 'materials' module
        */
 
-      // Lazy load widget to avoid loading materials store on dashboard mount
-      const { InventoryWidget } = await import(
-        '@/pages/admin/supply-chain/materials/components/InventoryWidget'
-      );
+      // Lazy load KPI widget for dashboard
+      const { PendingOrdersWidget } = await import('./widgets');
 
       registry.addAction(
         'dashboard.widgets',
-        () => <InventoryWidget key="inventory-widget" />,
+        () => <PendingOrdersWidget key="pending-orders-widget" />,
         'materials',
-        8, // Slightly lower priority than sales
+        97, // Fourth position (after Revenue, Sales, Staff)
         { requiredPermission: { module: 'materials', action: 'read' } }
       );
 
-      logger.debug('App', 'Registered dashboard.widgets hook (InventoryWidget)');
+      logger.debug('App', 'Registered dashboard.widgets hook (PendingOrdersWidget)');
 
       // ============================================
       // HOOK 2: Materials Grid Row Actions
@@ -522,6 +521,38 @@ export const materialsManifest: ModuleManifest = {
    */
   exports: {
     /**
+     * React Hook to fetch materials list
+     * Exports a function that returns a hook to avoid premature initialization
+     *
+     * @example
+     * ```tsx
+     * const registry = ModuleRegistry.getInstance();
+     * const materialsModule = registry.getExports('materials');
+     * const useMaterialsList = materialsModule.hooks.useMaterialsList;
+     *
+     * function MyComponent() {
+     *   const { items, loading } = useMaterialsList();
+     *   // ...
+     * }
+     * ```
+     */
+    hooks: {
+      /**
+       * Hook factory for materials list
+       * Returns the actual hook that components can use
+       */
+      useMaterialsList: () => {
+        return useCrudOperations({
+          tableName: 'items',
+          selectQuery: 'id, name, unit, unit_cost, category, stock, is_active',
+          cacheKey: 'materials-list',
+          cacheTime: 5 * 60 * 1000, // 5 minutes
+          enableRealtime: true,
+        });
+      }
+    },
+
+    /**
      * Get current stock level for a material
      */
     getStockLevel: async (materialId: string) => {
@@ -626,7 +657,7 @@ export const materialsManifest: ModuleManifest = {
     tags: ['inventory', 'materials', 'stock', 'procurement'],
     navigation: {
       route: '/admin/supply-chain/materials',
-      icon: CubeIcon,
+      icon: ArchiveBoxIcon,
       color: 'green',
       domain: 'supply-chain',
       isExpandable: false
@@ -647,6 +678,23 @@ export default materialsManifest;
  * Materials module public API types
  */
 export interface MaterialsAPI {
+  hooks: {
+    useMaterialsList: () => () => {
+      items: Array<{
+        id: string;
+        name: string;
+        unit?: string;
+        unit_cost?: number;
+        category?: string;
+        stock?: number;
+        is_active?: boolean;
+      }>;
+      loading: boolean;
+      error: string | null;
+      fetchAll: () => Promise<any[]>;
+      refresh: () => Promise<void>;
+    };
+  };
   getStockLevel: (
     materialId: string
   ) => Promise<{ quantity: number; unit: string }>;

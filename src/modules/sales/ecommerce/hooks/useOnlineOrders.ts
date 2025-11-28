@@ -6,6 +6,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
+import { useAlerts } from '@/shared/alerts';
+import { salesAlertsAdapter } from '../../services/salesAlertsAdapter';
 import type { OnlineOrdersFilters } from '../types';
 
 export interface OnlineOrderExtended {
@@ -27,17 +29,21 @@ export interface OnlineOrderExtended {
 export function useOnlineOrders() {
   const [orders, setOrders] = useState<OnlineOrderExtended[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
   const [filters, setFilters] = useState<OnlineOrdersFilters>({
     status: 'all',
     payment_status: 'all',
+  });
+
+  // Connect to global alerts system
+  const { actions: alertActions } = useAlerts({
+    context: 'sales',
+    autoFilter: true,
   });
 
   // Fetch online orders with filters
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
 
       let query = supabase
         .from('sales')
@@ -89,11 +95,23 @@ export function useOnlineOrders() {
     } catch (err) {
       const error = err as Error;
       logger.error('EcommerceModule', '❌ Error loading online orders:', error);
-      setError(error);
+
+      // Create alert using global alerts system
+      await alertActions.create({
+        type: 'operational',
+        context: 'sales',
+        severity: 'medium',
+        title: 'Failed to Load Orders',
+        description: `Error loading online orders: ${error.message}`,
+        metadata: {
+          errorCode: error.name,
+        },
+        autoExpire: 10,
+      });
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, alertActions]);
 
   // Update order status
   const updateOrderStatus = async (
@@ -128,6 +146,22 @@ export function useOnlineOrders() {
     } catch (err) {
       const error = err as Error;
       logger.error('EcommerceModule', '❌ Error updating order status:', error);
+
+      // Create alert using global alerts system
+      await alertActions.create({
+        type: 'operational',
+        context: 'sales',
+        severity: 'medium',
+        title: 'Failed to Update Order',
+        description: `Error updating order ${orderId}: ${error.message}`,
+        metadata: {
+          itemId: orderId,
+          errorCode: error.name,
+          relatedUrl: `/sales/orders/${orderId}`,
+        },
+        autoExpire: 15,
+      });
+
       throw error;
     }
   };
@@ -140,7 +174,6 @@ export function useOnlineOrders() {
   return {
     orders,
     loading,
-    error,
     filters,
     setFilters,
     fetchOrders,

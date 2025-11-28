@@ -1,19 +1,18 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsFilters } from '../../../hooks/useMaterialsFilters';
+import { useMaterialsComputed } from '../../../hooks/useMaterialsComputed';
+import { useMaterialsStore } from '@/store/materialsStore';
 import type { ItemType } from '../../../types';
 
 export function useInventoryState() {
-  // Store
-  const {
-    getFilteredItems,
-    filters,
-    setFilters,
-    selectedItems,
-    selectItem,
-    deselectItem,
-    selectAll,
-    deselectAll
-  } = useMaterials();
+  // Store - split subscriptions
+  const { filters, setFilters } = useMaterialsFilters();
+  const { getFilteredItems } = useMaterialsComputed();
+  const selectedItems = useMaterialsStore((s) => s.selectedItems);
+  const selectItem = useMaterialsStore((s) => s.selectItem);
+  const deselectItem = useMaterialsStore((s) => s.deselectItem);
+  const selectAll = useMaterialsStore((s) => s.selectAll);
+  const deselectAll = useMaterialsStore((s) => s.deselectAll);
 
   // Local UI state
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');

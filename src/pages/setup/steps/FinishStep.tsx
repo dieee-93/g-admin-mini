@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Box, Stack, Text, Button } from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom';
 import { useSetupStore } from '../../../store/setupStore';
 import { useCapabilities } from '../../../store/capabilityStore';
 import { logger } from '@/lib/logging';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 export function FinishStep() {
   const { userName } = useSetupStore();
   const { completeSetup, saveToDB, profile } = useCapabilities();
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
   const [isCompleting, setIsCompleting] = useState(false);
 
   const handleFinishSetup = async () => {
@@ -32,15 +32,12 @@ export function FinishStep() {
       });
 
       // 3. Navigate to dashboard with first-time flag
-      navigate('/admin/dashboard', {
-        state: { isFirstTime: true },
-        replace: true
-      });
+      navigate('dashboard');
 
     } catch (error) {
       logger.error('SetupWizard', '❌ Error completing setup:', error);
       // Still navigate even if there's an error
-      navigate('/admin/dashboard', { replace: true });
+      navigate('dashboard');
     } finally {
       setIsCompleting(false);
     }

@@ -2,6 +2,16 @@
 // Integrado con business logic centralizada y decimal.js para máxima precisión
 
 import React, { useState, useMemo } from 'react';
+import {
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  DocumentChartBarIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  ChartBarSquareIcon
+} from '@heroicons/react/24/outline';
+
+// Design System v2.0 - ALWAYS use @/shared/ui wrappers
 import { 
   Box, 
   VStack, 
@@ -12,23 +22,16 @@ import {
   Badge, 
   Button,
   Table,
-  Progress
-} from '@chakra-ui/react';
-import {
-  ChartBarIcon,
-  ArrowTrendingUpIcon,
-  DocumentChartBarIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
-  ChartBarSquareIcon
-} from '@heroicons/react/24/outline';
-
-// Design System v2.0
-import { CardWrapper, ContentLayout, PageHeader, Section } from '@/shared/ui';
+  Progress,
+  CardWrapper, 
+  ContentLayout, 
+  PageHeader, 
+  Section 
+} from '@/shared/ui';
 
 // Business Logic Imports
 import { ABCAnalysisEngine } from '../../services/abcAnalysisEngine';
-import { useMaterials } from '@/hooks/useMaterials';
+import { useMaterialsData } from '../../hooks/useMaterialsData';
 import type { 
   ABCCategory, 
   MaterialABC, 
@@ -45,7 +48,7 @@ const ABCAnalysisSection: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   // Hooks para datos reales
-  const { items: materialItems, loading: materialsLoading } = useMaterials();
+  const { items: materialItems, loading: materialsLoading } = useMaterialsData();
   
   // Configuración del análisis
   const analysisConfig: Partial<ABCAnalysisConfig> = useMemo(() => ({

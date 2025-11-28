@@ -1,5 +1,6 @@
 import { Icon as ChakraIcon } from '@chakra-ui/react';
 import type { IconProps as ChakraIconProps, ConditionalValue } from '@chakra-ui/react';
+import { memo } from 'react';
 import type { ElementType } from 'react';
 
 interface IconProps extends Omit<ChakraIconProps, 'size'> {
@@ -29,38 +30,30 @@ interface IconProps extends Omit<ChakraIconProps, 'size'> {
  *   <CustomSvgIcon />
  * </Icon>
  */
-export const Icon = ({
+// 🛠️ PERFORMANCE: Memoized to prevent re-renders when props don't change
+export const Icon = memo(function Icon({
   icon: IconComponent,
   as: AsComponent,
   size = 'md',
   children,
   ...props
-}: IconProps) => {
+}: IconProps) {
   // Prioridad: as > icon > children
   // Si tenemos `as` o `icon` prop, usamos ese componente
   const IconToRender = AsComponent || IconComponent;
 
-  // FIX: Validar que sea un componente React válido
-  // Si es string, undefined, null, o cualquier cosa que no sea función, no usar ChakraIcon
-  if (typeof IconToRender !== 'function') {
-    // Renderizar como texto simple (emojis, strings, etc)
-    const sizeMap = { 'xs': '12px', 'sm': '14px', 'md': '16px', 'lg': '20px', 'xl': '24px', '2xl': '28px' };
-    const fontSize = sizeMap[size as keyof typeof sizeMap] || '16px';
-    return (
-      <span style={{ fontSize, display: 'inline-block', lineHeight: 1 }}>
-        {typeof IconToRender === 'string' ? IconToRender : '?'}
-      </span>
-    );
+  // Validar que sea un componente React válido
+  // Heroicons usa React.forwardRef, que retorna un objeto con $$typeof, no una función
+  const isValidReactComponent =
+    typeof IconToRender === 'function' ||
+    (IconToRender && typeof IconToRender === 'object' && IconToRender.$$typeof);
+
+  // CASO 1: Tenemos un componente válido (as o icon prop)
+  if (isValidReactComponent) {
+    return <ChakraIcon as={IconToRender} size={size} {...props} />;
   }
 
-  // Si llegamos aquí, IconToRender ES una función (componente React válido)
-  if (IconToRender) {
-    return (
-      <ChakraIcon as={IconToRender} size={size} {...props} />
-    );
-  }
-
-  // Si tenemos children, usamos el patrón children
+  // CASO 2: Tenemos children
   if (children) {
     return (
       <ChakraIcon size={size} {...props}>
@@ -69,9 +62,20 @@ export const Icon = ({
     );
   }
 
-  // Fallback - Icon vacío
+  // CASO 3: Tenemos un string (emoji, texto)
+  if (typeof IconToRender === 'string') {
+    const sizeMap = { 'xs': '12px', 'sm': '14px', 'md': '16px', 'lg': '20px', 'xl': '24px', '2xl': '28px' };
+    const fontSize = sizeMap[size as keyof typeof sizeMap] || '16px';
+    return (
+      <span style={{ fontSize, display: 'inline-block', lineHeight: 1 }}>
+        {IconToRender}
+      </span>
+    );
+  }
+
+  // CASO 4: Fallback - Icono vacío (no hay nada válido)
   return <ChakraIcon size={size} {...props} />;
-};
+});
 
 // Variantes especializadas para diferentes contextos
 /**

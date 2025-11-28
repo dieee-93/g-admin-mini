@@ -40,6 +40,7 @@ interface SaleCompletedEvent {
 }
 import { taxService } from './taxCalculationService';
 import { errorHandler, createNetworkError, createBusinessError } from '@/lib/error-handling';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 // ===== CRUD BÁSICO DE VENTAS =====
 
@@ -329,7 +330,17 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
     }
 
     // Calcular impuestos
-    const subtotal = saleData.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+    // ✅ PRECISION FIX: Use DecimalUtils for sales calculations
+    const subtotalDec = saleData.items.reduce((sumDec, item) => {
+      const itemTotalDec = DecimalUtils.multiply(
+        item.quantity.toString(),
+        item.unit_price.toString(),
+        'financial'
+      );
+      return DecimalUtils.add(sumDec, itemTotalDec, 'financial');
+    }, DecimalUtils.fromValue(0, 'financial'));
+
+    const subtotal = subtotalDec.toNumber();
     const taxResult = taxService.calculateTaxes(subtotal, saleData.tax_rate || 0.21);
 
     // Preparar datos de venta con location_id

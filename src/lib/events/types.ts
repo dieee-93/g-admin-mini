@@ -340,6 +340,7 @@ export interface EventBusConfig {
   
   // Monitoring configuration
   metricsEnabled: boolean;
+  enableMetricsCollection?: boolean;  // Control metrics interval emission
   healthCheckIntervalMs: number;
   
   // Testing configuration

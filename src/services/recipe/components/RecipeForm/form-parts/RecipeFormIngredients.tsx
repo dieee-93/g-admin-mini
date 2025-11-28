@@ -9,6 +9,7 @@ import {
 } from '@chakra-ui/react';
 import { InputField } from '@/shared/ui';
 import type { InventoryItem } from '@/pages/admin/supply-chain/materials/types';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 interface RecipeIngredientForm {
   item_id: string;
@@ -61,7 +62,14 @@ export const RecipeFormIngredients: React.FC<RecipeFormIngredientsProps> = ({
           const requiredQty = parseFloat(ingredient.quantity || '0');
           const hasStockIssue = selectedItem && requiredQty > selectedItem.stock;
           const hasNoCost = selectedItem && (!selectedItem.unit_cost || selectedItem.unit_cost <= 0);
-          const ingredientCost = selectedItem?.unit_cost ? selectedItem.unit_cost * requiredQty : 0;
+          // ✅ PRECISION FIX: Use DecimalUtils for recipe ingredient cost
+          const ingredientCost = selectedItem?.unit_cost
+            ? DecimalUtils.multiply(
+                selectedItem.unit_cost.toString(),
+                requiredQty.toString(),
+                'recipe'
+              ).toNumber()
+            : 0;
 
           return (
             <VStack key={index} gap="2" width="100%" align="stretch">

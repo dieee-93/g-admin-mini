@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Stack, Typography, Button, Icon, Badge, Card, Box } from '@/shared/ui';
 import { CubeIcon, PlusIcon, ExclamationTriangleIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { Collapsible } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsComputed } from '../../hooks/useMaterialsComputed';
 import { formatCurrency, formatQuantity } from '@/business-logic/shared/decimalUtils';
 import { notify } from '@/lib/notifications';
 
@@ -65,13 +65,14 @@ export function InventoryTab({
   const [lowPage, setLowPage] = useState(1);
   const [healthyPage, setHealthyPage] = useState(1);
 
-  const { getFilteredItems } = useMaterials();
+  const { getFilteredItems } = useMaterialsComputed();
   const materials = getFilteredItems();
 
   // ✅ Virtualization config
   const ITEMS_PER_PAGE = 20;
 
-  const handleQuickUpdate = async (itemId: string, newStock: number, itemName: string) => {
+  // 🎯 PERFORMANCE: Memoize callback to prevent recreating on every render
+  const handleQuickUpdate = useCallback(async (itemId: string, newStock: number, itemName: string) => {
     setIsLoading(true);
     try {
       await onStockUpdate(itemId, newStock);
@@ -89,7 +90,7 @@ export function InventoryTab({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [onStockUpdate, materials]); // Dependencies: only recreate when these change
 
   // Group materials by criticality with pagination support
   const groupedMaterials = useMemo(() => {
@@ -126,10 +127,30 @@ export function InventoryTab({
     };
   }, [materials, criticalPage, lowPage, healthyPage, ITEMS_PER_PAGE]);
 
-  // Render material card (reusable component)
-  const renderMaterialCard = (item: MaterialWithStock) => {
+  // 🎯 PERFORMANCE: Memoize render function to prevent creating new functions on every render
+  const renderMaterialCard = useCallback((item: MaterialWithStock) => {
     const status = getStockStatus(item);
     const statusColor = getStatusColor(status);
+
+    // 🎯 PERFORMANCE: Define handlers inline but memoized by useCallback above
+    const handleDecrement = () => {
+      if (item.stock > 0) {
+        handleQuickUpdate(item.id, item.stock - 1, item.name);
+      } else {
+        notify.warning({
+          title: 'Stock mínimo alcanzado',
+          description: 'No puedes reducir el stock por debajo de 0'
+        });
+      }
+    };
+
+    const handleIncrement = () => {
+      handleQuickUpdate(item.id, item.stock + 1, item.name);
+    };
+
+    const handleSetMin = () => {
+      handleQuickUpdate(item.id, item.minStock, item.name);
+    };
 
     return (
       <Card.Root key={item.id} variant="outline" size="sm">
@@ -168,16 +189,7 @@ export function InventoryTab({
                 size="sm"
                 variant="outline"
                 disabled={isLoading || item.stock <= 0}
-                onClick={() => {
-                  if (item.stock > 0) {
-                    handleQuickUpdate(item.id, item.stock - 1, item.name);
-                  } else {
-                    notify.warning({
-                      title: 'Stock mínimo alcanzado',
-                      description: 'No puedes reducir el stock por debajo de 0'
-                    });
-                  }
-                }}
+                onClick={handleDecrement}
               >
                 -1
               </Button>
@@ -185,7 +197,7 @@ export function InventoryTab({
                 size="sm"
                 variant="outline"
                 disabled={isLoading}
-                onClick={() => handleQuickUpdate(item.id, item.stock + 1, item.name)}
+                onClick={handleIncrement}
               >
                 +1
               </Button>
@@ -193,7 +205,7 @@ export function InventoryTab({
                 size="sm"
                 variant="solid"
                 disabled={isLoading}
-                onClick={() => handleQuickUpdate(item.id, item.minStock, item.name)}
+                onClick={handleSetMin}
               >
                 Min
               </Button>
@@ -202,7 +214,29 @@ export function InventoryTab({
         </Card.Body>
       </Card.Root>
     );
-  };
+  }, [handleQuickUpdate, isLoading]); // Only recreate when these dependencies change
+
+  // 🎯 PERFORMANCE: Memoize toggle handlers for Collapsible sections
+  const toggleLowStock = useCallback(() => {
+    setIsLowStockOpen(prev => !prev);
+  }, []);
+
+  const toggleHealthyStock = useCallback(() => {
+    setIsHealthyOpen(prev => !prev);
+  }, []);
+
+  // 🎯 PERFORMANCE: Memoize pagination handlers
+  const handleLoadMoreCritical = useCallback(() => {
+    setCriticalPage(p => p + 1);
+  }, []);
+
+  const handleLoadMoreLow = useCallback(() => {
+    setLowPage(p => p + 1);
+  }, []);
+
+  const handleLoadMoreHealthy = useCallback(() => {
+    setHealthyPage(p => p + 1);
+  }, []);
 
   return (
     <Stack direction="column" gap="xl">
@@ -296,7 +330,7 @@ export function InventoryTab({
                 borderColor="yellow.500"
                 mb="md"
                 cursor="pointer"
-                onClick={() => setIsLowStockOpen(!isLowStockOpen)}
+                onClick={toggleLowStock}
                 _hover={{ bg: 'yellow.100' }}
               >
                 <Stack direction="row" align="center" gap="sm">
@@ -317,13 +351,13 @@ export function InventoryTab({
                     {isLowStockOpen && (
                       <>
                         {groupedMaterials.low.paged.map(renderMaterialCard)}
-                        {groupedMaterials.low.hasMore && (
+                        {groupedMaterials.critical.hasMore && (
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setLowPage(p => p + 1)}
+                            onClick={handleLoadMoreCritical}
                           >
-                            Cargar más ({groupedMaterials.low.total - groupedMaterials.low.paged.length} restantes)
+                            Cargar más ({groupedMaterials.critical.total - groupedMaterials.critical.paged.length} restantes)
                           </Button>
                         )}
                       </>
@@ -348,7 +382,7 @@ export function InventoryTab({
                 borderColor="green.500"
                 mb="md"
                 cursor="pointer"
-                onClick={() => setIsHealthyOpen(!isHealthyOpen)}
+                onClick={toggleHealthyStock}
                 _hover={{ bg: 'green.100' }}
               >
                 <Stack direction="row" align="center" gap="sm">
@@ -373,7 +407,7 @@ export function InventoryTab({
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setHealthyPage(p => p + 1)}
+                            onClick={handleLoadMoreHealthy}
                           >
                             Cargar más ({groupedMaterials.healthy.total - groupedMaterials.healthy.paged.length} restantes)
                           </Button>

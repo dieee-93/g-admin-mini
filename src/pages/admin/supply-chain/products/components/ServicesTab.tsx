@@ -13,8 +13,7 @@ import {
   Icon,
   Badge,
   Alert,
-  Input,
-  Field,
+  InputField,
 } from '@/shared/ui';
 import {
   PlusIcon,
@@ -28,8 +27,15 @@ import {
 } from '@heroicons/react/24/outline';
 import { ServiceConfigurationManager } from './ServiceConfigurationManager';
 import type { ServiceFormData } from './ServiceConfigurationManager';
-import { supabase } from '@/lib/supabase/client';
 import { notify } from '@/lib/notifications';
+import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logging';
+import {
+  getServiceProducts,
+  createServiceProduct,
+  updateServiceProduct,
+  deleteServiceProduct
+} from '../services/productApi';
 
 interface Service extends ServiceFormData {
   id: string;
@@ -45,26 +51,26 @@ const CANCELLATION_POLICY_LABELS: Record<string, string> = {
 };
 
 export function ServicesTab() {
+  const { user } = useAuth();
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [editingService, setEditingService] = useState<Service | undefined>();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch services
+  // Fetch services using service layer
   const fetchServices = useCallback(async () => {
+    if (!user || !user.organization_id) {
+      logger.warn('App', 'Cannot fetch services: user or organization_id missing');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('type', 'SERVICE')
-        .order('name');
-
-      if (error) throw error;
-      setServices((data || []) as Service[]);
+      const data = await getServiceProducts(user.organization_id, user);
+      setServices(data as Service[]);
     } catch (error) {
-      console.error('Error fetching services:', error);
+      logger.error('App', 'Error fetching services', error);
       notify.error({
         title: 'Failed to load services',
         description: error instanceof Error ? error.message : 'Unknown error',
@@ -72,23 +78,21 @@ export function ServicesTab() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchServices();
   }, [fetchServices]);
 
-  // Create service
+  // Create service using service layer
   const createService = async (serviceData: ServiceFormData) => {
+    if (!user) {
+      logger.error('App', 'Cannot create service: user not authenticated');
+      throw new Error('User not authenticated');
+    }
+
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .insert([serviceData])
-        .select()
-        .single();
-
-      if (error) throw error;
-
+      const data = await createServiceProduct(serviceData, user);
       await fetchServices(); // Refresh list
       notify.success({
         title: 'Service created',
@@ -97,6 +101,7 @@ export function ServicesTab() {
       return data;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred while creating the service.';
+      logger.error('App', 'Failed to create service', error);
       notify.error({
         title: 'Failed to create service',
         description: errorMessage,
@@ -105,18 +110,15 @@ export function ServicesTab() {
     }
   };
 
-  // Update service
+  // Update service using service layer
   const updateService = async ({ id, serviceData }: { id: string; serviceData: ServiceFormData }) => {
+    if (!user) {
+      logger.error('App', 'Cannot update service: user not authenticated');
+      throw new Error('User not authenticated');
+    }
+
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .update(serviceData)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-
+      const data = await updateServiceProduct(id, serviceData, user);
       await fetchServices(); // Refresh list
       notify.success({
         title: 'Service updated',
@@ -125,6 +127,7 @@ export function ServicesTab() {
       return data;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred while updating the service.';
+      logger.error('App', 'Failed to update service', error);
       notify.error({
         title: 'Failed to update service',
         description: errorMessage,
@@ -133,13 +136,15 @@ export function ServicesTab() {
     }
   };
 
-  // Delete service
+  // Delete service using service layer
   const deleteService = async (id: string) => {
+    if (!user) {
+      logger.error('App', 'Cannot delete service: user not authenticated');
+      throw new Error('User not authenticated');
+    }
+
     try {
-      const { error } = await supabase.from('products').delete().eq('id', id);
-
-      if (error) throw error;
-
+      await deleteServiceProduct(id, user);
       await fetchServices(); // Refresh list
       notify.success({
         title: 'Service deleted',
@@ -147,6 +152,7 @@ export function ServicesTab() {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred while deleting the service.';
+      logger.error('App', 'Failed to delete service', error);
       notify.error({
         title: 'Failed to delete service',
         description: errorMessage,
@@ -283,18 +289,13 @@ export function ServicesTab() {
       />
 
       {/* Search */}
-      <Field.Root>
-        <Input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search services by name, description, or category..."
-          size="md"
-        />
-        <Field.HelperText>
-          <Icon icon={MagnifyingGlassIcon} size="sm" />
-          Filter services
-        </Field.HelperText>
-      </Field.Root>
+      <InputField
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search services by name, description, or category..."
+        size="md"
+        helperText="Filter services"
+      />
 
       {/* Services Table */}
       <CardWrapper>

@@ -5,14 +5,15 @@
  */
 
 import { useEffect } from 'react';
-import { useAlerts } from '@/shared/alerts/hooks/useAlerts';
+import { useAlertsActions } from '@/shared/alerts';
 import { achievementNotificationService } from './AchievementNotificationService';
 
 /**
  * Hook que inicializa las notificaciones de logros
  */
 export function useAchievementNotifications() {
-  const { actions } = useAlerts();
+  // 🛠️ PERFORMANCE: Use useAlertsActions to avoid re-renders when alerts change
+  const actions = useAlertsActions();
 
   useEffect(() => {
     // Registrar la función global para crear alertas

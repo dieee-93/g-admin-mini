@@ -24,10 +24,13 @@ export const productsManifest: ModuleManifest = {
   autoInstall: false,
 
   requiredFeatures: [] as FeatureId[], // Optional - user activates
-  optionalFeatures: ['production_bom_management',
-    'sales_catalog_menu',
-    'sales_catalog_ecommerce',
-    'sales_package_management',
+  optionalFeatures: [
+    'products_recipe_management',
+    'products_catalog_menu',
+    'products_catalog_ecommerce',
+    'products_package_management',
+    'products_cost_intelligence',
+    'products_availability_calculation',
   ] as FeatureId[],
 
   // 🔒 PERMISSIONS: Employees can view products
@@ -35,13 +38,16 @@ export const productsManifest: ModuleManifest = {
 
   hooks: {
     provide: [
-      'products.menu_items',        // Menu items for POS
-      'products.recipe_costing',    // Recipe cost calculation
-      'dashboard.widgets',          // Product performance widgets
+      'products.menu_items',            // Menu items for POS
+      'products.recipe_costing',        // Recipe cost calculation
+      'products.availability_updated',  // Event: Product availability changed
+      'products.sales_recorded',        // Event: Product sale recorded
+      'dashboard.widgets',              // Product performance widgets
+      'materials.row.actions',          // Recipe Usage button in materials grid
     ],
     consume: [
-      'materials.stock_updated',    // Update recipe availability
-      'sales.order_completed',      // Track product sales
+      'materials.stock_updated',        // Update recipe availability
+      'sales.order_completed',          // Track product sales
     ],
   },
 
@@ -119,6 +125,115 @@ export const productsManifest: ModuleManifest = {
 
       logger.debug('App', 'Registered materials.row.actions for Recipe Usage button');
 
+      // ============================================
+      // EVENTBUS LISTENERS: React to cross-module events
+      // ============================================
+
+      const { eventBus, EventPriority } = await import('@/lib/events');
+      const { supabase } = await import('@/lib/supabase/client');
+
+      /**
+       * LISTENER 1: materials.stock_updated
+       * When materials stock changes, recalculate product availability
+       */
+      eventBus.subscribe('materials.stock_updated', async (event) => {
+        const { materialId, newStock, operation } = event.payload || {};
+
+        logger.info('Products', 'Material stock updated', {
+          materialId,
+          newStock,
+          operation
+        });
+
+        try {
+          // Find products using this material
+          const { data: affectedProducts, error } = await supabase
+            .from('product_components')
+            .select('product_id')
+            .eq('item_id', materialId);
+
+          if (error) throw error;
+
+          if (affectedProducts && affectedProducts.length > 0) {
+            logger.info('Products', `Found ${affectedProducts.length} products affected by material change`, {
+              materialId,
+              productCount: affectedProducts.length
+            });
+
+            // Emit event to notify other modules (Sales, Production)
+            eventBus.emit('products.availability_updated', {
+              productIds: affectedProducts.map(p => p.product_id),
+              trigger: 'materials_stock_changed',
+              materialId,
+              timestamp: new Date().toISOString()
+            }, {
+              priority: EventPriority.MEDIUM,
+              moduleId: 'products'
+            });
+
+            logger.debug('Products', 'Emitted products.availability_updated event');
+          }
+        } catch (error) {
+          logger.error('Products', 'Error handling materials.stock_updated', error);
+        }
+      }, {
+        moduleId: 'products',
+        priority: 100 // High priority - affects availability
+      });
+
+      logger.debug('App', 'Registered materials.stock_updated listener');
+
+      /**
+       * LISTENER 2: sales.order_completed
+       * When sales complete, update product sales metrics for Menu Engineering
+       */
+      eventBus.subscribe('sales.order_completed', async (event) => {
+        const { items, orderId, orderTotal } = event.payload || {};
+
+        logger.info('Products', 'Sales order completed', {
+          orderId,
+          itemCount: items?.length || 0,
+          orderTotal
+        });
+
+        try {
+          // Update product sales metrics
+          if (items && Array.isArray(items)) {
+            for (const item of items) {
+              if (item.product_id) {
+                logger.debug('Products', 'Updating sales metrics', {
+                  productId: item.product_id,
+                  quantity: item.quantity,
+                  revenue: item.total || item.price * item.quantity
+                });
+
+                // TODO: Increment sales counter in product_sales_metrics table
+                // TODO: Update Menu Engineering BCG matrix data
+                // For now, just emit event for potential future consumers
+                eventBus.emit('products.sales_recorded', {
+                  productId: item.product_id,
+                  quantity: item.quantity,
+                  revenue: item.total || item.price * item.quantity,
+                  orderId,
+                  timestamp: new Date().toISOString()
+                }, {
+                  priority: EventPriority.LOW,
+                  moduleId: 'products'
+                });
+              }
+            }
+          }
+        } catch (error) {
+          logger.error('Products', 'Error handling sales.order_completed', error);
+        }
+      }, {
+        moduleId: 'products',
+        priority: 50 // Lower priority - analytics can be async
+      });
+
+      logger.debug('App', 'Registered sales.order_completed listener');
+      logger.debug('App', '✅ EventBus listeners registered in Products module');
+
       logger.info('App', '✅ Products module setup complete');
     } catch (error) {
       logger.error('App', '❌ Products module setup failed', error);
@@ -133,11 +248,93 @@ export const productsManifest: ModuleManifest = {
   exports: {
     getProduct: async (productId: string) => {
       logger.debug('App', 'Getting product', { productId });
-      return { product: null };
+      const { supabase } = await import('@/lib/supabase/client');
+
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .single();
+
+      if (error) {
+        logger.error('App', 'Error fetching product', error);
+        return { product: null };
+      }
+
+      return { product: data };
     },
+
     calculateRecipeCost: async (recipeId: string) => {
       logger.debug('App', 'Calculating recipe cost', { recipeId });
-      return { cost: 0, margin: 0 };
+      const { supabase } = await import('@/lib/supabase/client');
+
+      // Get product components (BOM)
+      const { data: components, error } = await supabase
+        .from('product_components')
+        .select(`
+          quantity,
+          items:item_id (
+            name,
+            cost
+          )
+        `)
+        .eq('product_id', recipeId);
+
+      if (error) {
+        logger.error('App', 'Error calculating recipe cost', error);
+        return { cost: 0, margin: 0 };
+      }
+
+      // Calculate total cost
+      const totalCost = (components || []).reduce((sum, comp: any) => {
+        const itemCost = comp.items?.cost || 0;
+        return sum + (itemCost * comp.quantity);
+      }, 0);
+
+      return { cost: totalCost, margin: 0 };
+    },
+
+    canProduceRecipe: async (recipeId: string, quantity: number) => {
+      logger.debug('App', 'Checking recipe production viability', { recipeId, quantity });
+      const { supabase } = await import('@/lib/supabase/client');
+
+      // Get product components (BOM)
+      const { data: components, error } = await supabase
+        .from('product_components')
+        .select(`
+          item_id,
+          quantity,
+          items:item_id (
+            name,
+            current_stock
+          )
+        `)
+        .eq('product_id', recipeId);
+
+      if (error) {
+        logger.error('App', 'Error checking recipe viability', error);
+        throw error;
+      }
+
+      // Check if we have enough stock for each component
+      const missingMaterials: string[] = [];
+      let canProduce = true;
+
+      for (const comp of components || []) {
+        const requiredStock = comp.quantity * quantity;
+        const currentStock = comp.items?.current_stock || 0;
+
+        if (currentStock < requiredStock) {
+          canProduce = false;
+          missingMaterials.push(comp.items?.name || 'Unknown');
+        }
+      }
+
+      return {
+        canProduce,
+        missingMaterials,
+        quantity
+      };
     },
   },
 

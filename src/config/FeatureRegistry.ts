@@ -41,8 +41,24 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
 
   'sales_catalog_menu': {
     id: 'sales_catalog_menu',
-    name: 'Catálogo de Menú',
-    description: 'Catálogo base de productos/servicios',
+    name: 'Catálogo para Menú',
+    description: 'Catálogo estilo menú para ventas en local',
+    domain: 'SALES',
+    category: 'conditional'
+  },
+
+  'sales_catalog_ecommerce': {
+    id: 'sales_catalog_ecommerce',
+    name: 'Catálogo E-commerce',
+    description: 'Catálogo avanzado para tienda online',
+    domain: 'SALES',
+    category: 'conditional'
+  },
+
+  'sales_package_management': {
+    id: 'sales_package_management',
+    name: 'Gestión de Paquetes',
+    description: 'Bundles y paquetes de productos/servicios',
     domain: 'SALES',
     category: 'conditional'
   },
@@ -71,13 +87,6 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
     category: 'conditional'
   },
 
-  'sales_catalog_ecommerce': {
-    id: 'sales_catalog_ecommerce',
-    name: 'Catálogo E-commerce',
-    description: 'Catálogo avanzado para tienda online',
-    domain: 'SALES',
-    category: 'conditional'
-  },
 
   'sales_online_order_processing': {
     id: 'sales_online_order_processing',
@@ -143,13 +152,6 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
     category: 'conditional'
   },
 
-  'sales_package_management': {
-    id: 'sales_package_management',
-    name: 'Gestión de Paquetes',
-    description: 'Paquetes de servicios/productos',
-    domain: 'SALES',
-    category: 'conditional'
-  },
 
   'sales_contract_management': {
     id: 'sales_contract_management',
@@ -330,7 +332,7 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
   'production_bom_management': {
     id: 'production_bom_management',
     name: 'BOM Management',
-    description: 'Manage production workflows (recipes, assemblies, service protocols)',
+    description: 'Bill of Materials management for production',
     domain: 'PRODUCTION',
     category: 'conditional'
   },
@@ -358,6 +360,74 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
     domain: 'PRODUCTION',
     category: 'conditional'
   },
+
+  // ============================================
+  // PRODUCTS DOMAIN (8 features)
+  // ============================================
+
+  'products_recipe_management': {
+    id: 'products_recipe_management',
+    name: 'Recipe Management',
+    description: 'Product recipe/BOM definition, costing, and pricing',
+    domain: 'PRODUCTS',
+    category: 'conditional'
+  },
+
+  'products_catalog_menu': {
+    id: 'products_catalog_menu',
+    name: 'Menu Catalog',
+    description: 'Menu-style product catalog for onsite sales',
+    domain: 'PRODUCTS',
+    category: 'conditional'
+  },
+
+  'products_catalog_ecommerce': {
+    id: 'products_catalog_ecommerce',
+    name: 'E-commerce Catalog',
+    description: 'Advanced product catalog for online store',
+    domain: 'PRODUCTS',
+    category: 'conditional'
+  },
+
+  'products_package_management': {
+    id: 'products_package_management',
+    name: 'Package Management',
+    description: 'Product bundles and packages',
+    domain: 'PRODUCTS',
+    category: 'conditional'
+  },
+
+  'products_availability_calculation': {
+    id: 'products_availability_calculation',
+    name: 'Availability Calculation',
+    description: 'Real-time product availability based on materials',
+    domain: 'PRODUCTS',
+    category: 'conditional'
+  },
+
+  'products_cost_intelligence': {
+    id: 'products_cost_intelligence',
+    name: 'Cost Intelligence',
+    description: 'Automated recipe costing and margin analysis',
+    domain: 'PRODUCTS',
+    category: 'conditional'
+  },
+
+  'products_dynamic_materials': {
+    id: 'products_dynamic_materials',
+    name: 'Dynamic Materials',
+    description: 'Add materials during service delivery',
+    domain: 'PRODUCTS',
+    category: 'conditional'
+  },
+
+  // 'products_digital_delivery': {
+  //   id: 'products_digital_delivery',
+  //   name: 'Digital Delivery',
+  //   description: 'Digital product delivery and access management',
+  //   domain: 'PRODUCTS',
+  //   category: 'conditional'
+  // },
 
   // ============================================
   // OPERATIONS DOMAIN (15 features)
@@ -712,6 +782,190 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
     description: 'Análisis y tracking de costos de personal',
     domain: 'STAFF',
     category: 'conditional'
+  },
+
+  // ============================================
+  // RENTAL DOMAIN (5 features)
+  // ============================================
+
+  'rental_item_management': {
+    id: 'rental_item_management',
+    name: 'Gestión de Items en Alquiler',
+    description: 'Catálogo de activos disponibles para rentar',
+    domain: 'RENTAL',
+    category: 'conditional'
+  },
+
+  'rental_booking_calendar': {
+    id: 'rental_booking_calendar',
+    name: 'Calendario de Reservas',
+    description: 'Gestión de disponibilidad y reservas',
+    domain: 'RENTAL',
+    category: 'conditional'
+  },
+
+  'rental_availability_tracking': {
+    id: 'rental_availability_tracking',
+    name: 'Seguimiento de Disponibilidad',
+    description: 'Control de disponibilidad en tiempo real',
+    domain: 'RENTAL',
+    category: 'conditional'
+  },
+
+  'rental_pricing_by_duration': {
+    id: 'rental_pricing_by_duration',
+    name: 'Precios por Duración',
+    description: 'Pricing variable según tiempo de alquiler',
+    domain: 'RENTAL',
+    category: 'conditional'
+  },
+
+  'rental_late_fees': {
+    id: 'rental_late_fees',
+    name: 'Cargos por Mora',
+    description: 'Penalidades por devolución tardía',
+    domain: 'RENTAL',
+    category: 'conditional'
+  },
+
+  // ============================================
+  // MEMBERSHIP DOMAIN (5 features)
+  // ============================================
+
+  'membership_subscription_plans': {
+    id: 'membership_subscription_plans',
+    name: 'Planes de Suscripción',
+    description: 'Gestión de planes y niveles de membresía',
+    domain: 'MEMBERSHIP',
+    category: 'conditional'
+  },
+
+  'membership_recurring_billing': {
+    id: 'membership_recurring_billing',
+    name: 'Facturación Recurrente',
+    description: 'Cobros automáticos periódicos',
+    domain: 'MEMBERSHIP',
+    category: 'conditional'
+  },
+
+  'membership_access_control': {
+    id: 'membership_access_control',
+    name: 'Control de Acceso',
+    description: 'Gestión de permisos por nivel de membresía',
+    domain: 'MEMBERSHIP',
+    category: 'conditional'
+  },
+
+  'membership_usage_tracking': {
+    id: 'membership_usage_tracking',
+    name: 'Seguimiento de Uso',
+    description: 'Tracking de visitas/uso de servicios',
+    domain: 'MEMBERSHIP',
+    category: 'conditional'
+  },
+
+  'membership_benefits_management': {
+    id: 'membership_benefits_management',
+    name: 'Gestión de Beneficios',
+    description: 'Beneficios y promociones por membresía',
+    domain: 'MEMBERSHIP',
+    category: 'conditional'
+  },
+
+  // ============================================
+  // DIGITAL PRODUCTS DOMAIN (4 features)
+  // ============================================
+
+  'digital_file_delivery': {
+    id: 'digital_file_delivery',
+    name: 'Entrega de Archivos',
+    description: 'Sistema de descarga de productos digitales',
+    domain: 'DIGITAL',
+    category: 'conditional'
+  },
+
+  'digital_license_management': {
+    id: 'digital_license_management',
+    name: 'Gestión de Licencias',
+    description: 'Generación y validación de licencias',
+    domain: 'DIGITAL',
+    category: 'conditional'
+  },
+
+  'digital_download_tracking': {
+    id: 'digital_download_tracking',
+    name: 'Tracking de Descargas',
+    description: 'Seguimiento y límites de descarga',
+    domain: 'DIGITAL',
+    category: 'conditional'
+  },
+
+  'digital_version_control': {
+    id: 'digital_version_control',
+    name: 'Control de Versiones',
+    description: 'Gestión de versiones de productos digitales',
+    domain: 'DIGITAL',
+    category: 'conditional'
+  },
+
+  // ============================================
+  // CORE DOMAIN (7 features)
+  // ============================================
+
+  'customers': {
+    id: 'customers',
+    name: 'Gestión de Clientes',
+    description: 'Módulo de gestión de clientes',
+    domain: 'CORE',
+    category: 'always_active'
+  },
+
+  'dashboard': {
+    id: 'dashboard',
+    name: 'Dashboard',
+    description: 'Panel de control principal',
+    domain: 'CORE',
+    category: 'always_active'
+  },
+
+  'settings': {
+    id: 'settings',
+    name: 'Configuración',
+    description: 'Configuración del sistema',
+    domain: 'CORE',
+    category: 'always_active'
+  },
+
+  'gamification': {
+    id: 'gamification',
+    name: 'Gamificación',
+    description: 'Sistema de gamificación y logros',
+    domain: 'ENGAGEMENT',
+    category: 'always_active'
+  },
+
+  'debug': {
+    id: 'debug',
+    name: 'Herramientas de Debug',
+    description: 'Herramientas de desarrollo y debugging',
+    domain: 'DEV',
+    category: 'always_active'
+  },
+
+  'executive': {
+    id: 'executive',
+    name: 'Dashboard Ejecutivo',
+    description: 'Reportes y métricas ejecutivas',
+    domain: 'ANALYTICS',
+    category: 'conditional'
+  },
+
+  'can_view_menu_engineering': {
+    id: 'can_view_menu_engineering',
+    name: 'Ver Ingeniería de Menú',
+    description: 'Acceso a análisis de ingeniería de menú',
+    domain: 'ANALYTICS',
+    category: 'conditional'
   }
 };
 
@@ -854,7 +1108,27 @@ export const MODULE_FEATURE_MAP: Record<string, {
       'sales_order_management',
       'sales_payment_processing',
       'sales_catalog_menu',
-      'sales_pos_onsite'
+      'sales_pos_onsite',
+      'sales_dine_in_orders',
+      'sales_order_at_table',
+      'sales_online_order_processing',
+      'sales_online_payment_gateway',
+      'sales_cart_management',
+      'sales_checkout_process',
+      'sales_multicatalog_management',
+      'sales_bulk_pricing',
+      'sales_quote_generation',
+      'sales_product_retail',
+      'sales_contract_management',
+      'sales_tiered_pricing',
+      'sales_approval_workflows',
+      'sales_quote_to_order',
+      'sales_split_payment',
+      'sales_tip_management',
+      'sales_coupon_management',
+      'sales_pickup_orders',
+      'sales_delivery_orders',
+      'sales_package_management'
     ],
     description: 'Módulo de ventas - activo con cualquier feature de SALES'
   },
@@ -863,25 +1137,48 @@ export const MODULE_FEATURE_MAP: Record<string, {
     optionalFeatures: [
       'inventory_stock_tracking',
       'inventory_alert_system',
-      'inventory_purchase_orders'
+      'inventory_purchase_orders',
+      'inventory_supplier_management',
+      'inventory_low_stock_auto_reorder',
+      'inventory_demand_forecasting',
+      'inventory_batch_lot_tracking',
+      'inventory_expiration_tracking',
+      'inventory_available_to_promise'
     ],
     description: 'Módulo de inventario - activo con cualquier feature de INVENTORY'
   },
 
   'products': {
     optionalFeatures: [
+      // Products features
+      'products_recipe_management',
+      'products_catalog_menu',
+      'products_catalog_ecommerce',
+      'products_package_management',
+      'products_cost_intelligence',
+      'products_availability_calculation',
+      'products_dynamic_materials',
+      'sales_order_management',
+      'sales_catalog_menu',
+      'sales_catalog_ecommerce',
+      'sales_package_management',
       'production_bom_management',
-      'production_display_system',
-      'production_order_queue'
+      'production_display_system'
     ],
-    description: 'Módulo de productos - activo con cualquier feature de PRODUCTION'
+    description: 'Módulo de productos - activo si vendes o produces algo'
   },
 
   'operations': {
     optionalFeatures: [
       'operations_table_management',
+      'operations_table_assignment',
+      'operations_floor_plan_config',
+      'operations_waitlist_management',
+      'operations_delivery_zones',
       'operations_delivery_tracking',
-      'operations_pickup_scheduling'
+      'operations_pickup_scheduling',
+      'operations_notification_system',
+      'operations_vendor_performance'
     ],
     description: 'Módulo de operaciones - activo con cualquier feature de OPERATIONS'
   },
@@ -890,7 +1187,7 @@ export const MODULE_FEATURE_MAP: Record<string, {
     optionalFeatures: [
       'scheduling_appointment_booking',
       'scheduling_calendar_management',
-      'staff_shift_management' // Staff scheduling también activa este módulo
+      'staff_shift_management'
     ],
     description: 'Módulo de programación - activo con features de SCHEDULING o STAFF shifts'
   },
@@ -900,7 +1197,8 @@ export const MODULE_FEATURE_MAP: Record<string, {
       'staff_employee_management',
       'staff_shift_management',
       'staff_time_tracking',
-      'staff_performance_tracking'
+      'staff_performance_tracking',
+      'staff_training_management'
     ],
     description: 'Módulo de personal - activo con cualquier feature de STAFF'
   },
@@ -910,7 +1208,7 @@ export const MODULE_FEATURE_MAP: Record<string, {
       'customer_loyalty_program',
       'customer_service_history',
       'customer_preference_tracking',
-      'sales_order_management' // Si vende, necesita gestionar clientes
+      'sales_order_management'
     ],
     description: 'Módulo de clientes - activo con features de CUSTOMER o SALES'
   },
@@ -945,10 +1243,12 @@ export const MODULE_FEATURE_MAP: Record<string, {
 
   'production': { // RENAMED: kitchen → production
     requiredFeatures: [
+      'production_bom_management',
       'production_display_system',
       'production_order_queue'
     ],
-    description: 'Módulo de cocina - requiere TODAS las features de kitchen (production_workflow capability)'
+    // ✅ FIX Bug #1: Updated obsolete capability reference
+    description: 'Módulo de producción - activado por physical_products o professional_services capabilities'
   },
 
   'floor': {
@@ -965,6 +1265,7 @@ export const MODULE_FEATURE_MAP: Record<string, {
 
   'executive': {
     optionalFeatures: [
+      'executive',
       'analytics_ecommerce_metrics',
       'analytics_conversion_tracking',
       'multisite_comparative_analytics'
@@ -977,7 +1278,7 @@ export const MODULE_FEATURE_MAP: Record<string, {
       'analytics_ecommerce_metrics',
       'analytics_conversion_tracking',
       'multisite_comparative_analytics',
-      'sales_order_management' // Reportes de ventas
+      'sales_order_management'
     ],
     description: 'Sistema de reportes y analytics - activo con cualquier feature de analytics'
   },
@@ -994,7 +1295,8 @@ export const MODULE_FEATURE_MAP: Record<string, {
 
   'products-analytics': {
     optionalFeatures: [
-      'production_bom_management',
+      'can_view_menu_engineering',
+      'products_recipe_management',
       'production_order_queue',
       'sales_product_retail',
       'inventory_demand_forecasting',
@@ -1023,7 +1325,14 @@ export const MODULE_FEATURE_MAP: Record<string, {
   },
 
   'memberships': {
+    requiredFeatures: [
+      'membership_subscription_plans',
+      'membership_recurring_billing'
+    ],
     optionalFeatures: [
+      'membership_access_control',
+      'membership_usage_tracking',
+      'membership_benefits_management',
       'customer_loyalty_program',
       'scheduling_appointment_booking',
       'finance_invoice_scheduling'
@@ -1032,7 +1341,14 @@ export const MODULE_FEATURE_MAP: Record<string, {
   },
 
   'rentals': {
+    requiredFeatures: [
+      'rental_item_management',
+      'rental_booking_calendar',
+      'rental_availability_tracking'
+    ],
     optionalFeatures: [
+      'rental_pricing_by_duration',
+      'rental_late_fees',
       'inventory_stock_tracking',
       'scheduling_appointment_booking',
       'operations_vendor_performance',
@@ -1152,15 +1468,20 @@ export function getModulesForActiveFeatures(features: FeatureId[]): string[] {
     }
 
     // Case 2: Modules with required features (AND logic - all must be present)
+    // ✅ FIX Bug #0: If requiredFeatures exist, they MUST be met
+    // optionalFeatures should NOT activate the module if required are not met
     if (config.requiredFeatures && config.requiredFeatures.length > 0) {
       const hasAllRequired = config.requiredFeatures.every(f => features.includes(f));
       if (hasAllRequired) {
         activeModules.add(moduleId);
-        return; // Continue to next module
+        // optionalFeatures are bonus features, not needed for activation
       }
+      // ✅ If required features not met, don't activate even if optional are present
+      return;
     }
 
-    // Case 3: Modules with optional features (OR logic - at least one must be present)
+    // Case 3: Modules with ONLY optional features (OR logic - at least one must be present)
+    // Only executed for modules WITHOUT requiredFeatures (like materials)
     if (config.optionalFeatures && config.optionalFeatures.length > 0) {
       const hasAnyOptional = config.optionalFeatures.some(f => features.includes(f));
       if (hasAnyOptional) {

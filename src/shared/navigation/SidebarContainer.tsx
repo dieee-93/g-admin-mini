@@ -2,7 +2,7 @@
 // SIDEBAR CONTAINER - Contenedor especializado para navegación responsiva
 // ====================================
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Stack, Box } from '@/shared/ui';
 
 interface SidebarContainerProps {
@@ -11,10 +11,11 @@ interface SidebarContainerProps {
   isHovering: boolean;
 }
 
-export function SidebarContainer({ 
-  children, 
-  isExpanded, 
-  isHovering 
+// ⚡ PERFORMANCE: Memoize to prevent re-renders when props don't change
+export const SidebarContainer = memo(function SidebarContainer({
+  children,
+  isExpanded,
+  isHovering
 }: SidebarContainerProps) {
   return (
     <Box
@@ -36,10 +37,10 @@ export function SidebarContainer({
       </Stack>
     </Box>
   );
-}
+});
 
-// Navigation Item Container
-export function NavItemContainer({
+// ⚡ PERFORMANCE: Memoize NavItemContainer too
+export const NavItemContainer = memo(function NavItemContainer({
   children,
   isActive,
   isExpanded,
@@ -100,4 +101,4 @@ export function NavItemContainer({
       </Stack>
     </Box>
   );
-}
+});

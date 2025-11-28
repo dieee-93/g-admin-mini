@@ -44,11 +44,23 @@ export type LogModule =
   | 'SalesStore'
   | 'StaffStore'
   | 'CapabilityStore'
+  | 'ProductsStore'
+  | 'SuppliersStore'
+  | 'OperationsStore'
+  | 'AppStore'
+  // Modules/Services
+  | 'Materials'
+  | 'Products'
+  | 'Sales'
+  | 'SmartAlertsEngine'
   // UI Components
   | 'Layout'
   | 'Modal'
   | 'Form'
   | 'Provider'
+  // Pages
+  | 'Settings'
+  | 'Hours'
   // Performance
   | 'Performance'
   | 'LazyLoading'

@@ -41,12 +41,14 @@ import {
   Box,
   Stack,
   Badge,
+  Icon,
   SegmentGroup,
   SegmentGroupItem,
   SegmentGroupItemText,
   SegmentGroupItemHiddenInput,
   SegmentGroupIndicator
 } from '@/shared/ui';
+import { BellIcon, TrophyIcon } from '@heroicons/react/24/outline';
 
 // ===============================
 // INTERFACES
@@ -246,13 +248,13 @@ export const DashboardSwitch: React.FC<{
   const positions: SwitchPosition[] = [
     {
       id: 'alerts',
-      icon: '🔔',
+      icon: <Icon as={BellIcon} color="blue.500" />,
       label: 'Alertas',
       badge: alertsBadge
     },
     {
       id: setupComplete ? 'achievements' : 'setup',
-      icon: '🏆',
+      icon: <Icon as={TrophyIcon} color="yellow.500" />,
       label: setupComplete ? 'Logros' : 'Setup',
       badge: setupBadge
     }

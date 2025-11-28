@@ -8,3 +8,10 @@ export * from './useMenuEngineering';
 export * from './useCostAnalysis';
 export * from './useProductComponents';
 export * from './useProductsPage';
+
+// Export new product form hooks (v3.0)
+export {
+  useAvailableProductTypes,
+  useIsProductTypeAvailable,
+  useRequiredCapabilitiesForType
+} from './useAvailableProductTypes';

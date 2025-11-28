@@ -1,5 +1,23 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# 🎯 Precision Validation - Prevent native arithmetic in financial code
+echo "🎯 Running precision validation..."
+pnpm run lint:precision || {
+  echo ""
+  echo "❌ Precision validation failed!"
+  echo ""
+  echo "Issues found:"
+  echo "  - Native arithmetic operators detected in financial code"
+  echo "  - Use DecimalUtils.add/subtract/multiply/divide() instead"
+  echo ""
+  echo "Documentation: docs/eslint-precision-rules.md"
+  echo "Guide: docs/guides/decimal-utils-guide.md"
+  echo ""
+  exit 1
+}
+
+echo "✅ Precision validation passed"
+
 npm test
 pnpm run lint-staged

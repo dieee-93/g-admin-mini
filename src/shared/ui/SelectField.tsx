@@ -1,11 +1,21 @@
+/**
+ * SELECT FIELD - Universal Chakra UI v3 Select Wrapper
+ *
+ * Wrapper unificado para Select avanzado de Chakra
+ * Soporta todas las props nativas de Select.Root
+ *
+ * Para select HTML nativo simple, usar NativeSelect directamente
+ */
+
 import { Select, createListCollection, Portal } from '@chakra-ui/react'
+import type { SelectRootProps } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
 
-import { logger } from '@/lib/logging';
 // Tipo para opciones simples
 interface SimpleOption {
   value: string | number
   label: string
+  disabled?: boolean
 }
 
 // Tipo para opciones con colección (patrón Chakra completo)
@@ -13,33 +23,24 @@ interface CollectionOption {
   value: string | number
   label: string
   description?: string
+  disabled?: boolean
   [key: string]: any
 }
 
-interface SelectFieldProps {
+interface SelectFieldProps extends Omit<SelectRootProps, 'collection'> {
   label?: string
   placeholder?: string
-  value?: string | number | string[]
-  defaultValue?: string | number | string[]
-  onChange?: (value: string | string[]) => void
-  onValueChange?: (details: { value: string[] }) => void
 
   // Opciones simples (modo básico)
   options?: Array<SimpleOption>
 
   // Colección Chakra (modo avanzado)
-  collection?: ReturnType<typeof createListCollection>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  collection?: any
 
   error?: string
   helperText?: string
   required?: boolean
-  disabled?: boolean
-  size?: 'sm' | 'md' | 'lg'
-  variant?: 'outline' | 'subtle'
-  colorPalette?: 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'cyan' | 'purple' | 'pink'
-  // Estilos del trigger
-  height?: string
-  width?: string
 
   // Renderizado custom
   children?: ReactNode
@@ -52,116 +53,108 @@ interface SelectFieldProps {
 export function SelectField({
   label,
   placeholder = "Selecciona una opción",
-  value,
-  defaultValue,
-  onChange,
-  onValueChange,
   options,
-  collection,
+  collection: collectionProp,
   error,
   helperText,
   required = false,
-  disabled = false,
-  size = 'md',
-  colorPalette,
-  variant = 'outline',
-  height = 'auto',
-  width = 'full',
   renderItem,
   children,
   noPortal = false,
+  // Todas las props de Select.Root
+  value,
+  defaultValue,
+  onValueChange,
+  disabled,
+  invalid,
+  size = 'md',
+  variant = 'outline',
+  colorPalette,
+  positioning,
+  multiple,
+  closeOnSelect,
+  deselectable,
+  name,
+  ...restProps
 }: SelectFieldProps) {
-  // ✅ Recipes handle theming automatically
-  
-  // Convert value to array format for Chakra
-  const valueArray = Array.isArray(value) ? value.map(String) : value ? [String(value)] : []
-  const defaultValueArray = Array.isArray(defaultValue) ? defaultValue.map(String) : defaultValue ? [String(defaultValue)] : []
-  
-  // Handle value change
-  const handleValueChange = (details: { value: string[] }) => {
-    const newValue = details.value
-    onValueChange?.(details)
-    onChange?.(newValue.length === 1 ? newValue[0] : newValue)
-  }
-  
   // Si se pasan opciones simples, crear colección
-  const finalCollection = collection || (options ? createListCollection({
+  const collection = collectionProp || (options ? createListCollection({
     items: options.map(opt => ({
       value: opt.value.toString(),
-      label: opt.label
+      label: opt.label,
+      disabled: opt.disabled
     }))
   }) : undefined)
-  
-  if (!finalCollection) {
+
+  if (!collection) {
     console.warn('SelectField: Debes proporcionar "options" o "collection"')
     return null
   }
 
+  const selectContent = (
+    <Select.Positioner>
+      <Select.Content>
+        {collection.items.map((item: unknown) => {
+          const typedItem = item as CollectionOption
+          return (
+            <Select.Item
+              item={typedItem}
+              key={typedItem.value}
+            >
+              {renderItem ? renderItem(typedItem) : typedItem.label}
+              <Select.ItemIndicator />
+            </Select.Item>
+          )
+        })}
+        {children}
+      </Select.Content>
+    </Select.Positioner>
+  )
+
   return (
     <div>
       <Select.Root
-        collection={finalCollection!}
-        value={valueArray}
-        defaultValue={defaultValueArray}
-        onValueChange={handleValueChange}
+        collection={collection}
+        value={value}
+        defaultValue={defaultValue}
+        onValueChange={onValueChange}
+        disabled={disabled}
+        invalid={invalid || !!error}
         size={size}
         variant={variant}
-        disabled={disabled}
-        width={width}
-        
         colorPalette={colorPalette}
+        positioning={positioning}
+        multiple={multiple}
+        closeOnSelect={closeOnSelect}
+        deselectable={deselectable}
+        name={name}
+        {...restProps}
       >
         <Select.HiddenSelect />
-        {label && <Select.Label>{label}{required && ' *'}</Select.Label>}
+        {label && (
+          <Select.Label>
+            {label}
+            {required && <span style={{ color: 'red', marginLeft: '0.25rem' }}>*</span>}
+          </Select.Label>
+        )}
         <Select.Control>
-          <Select.Trigger height={height}>
+          <Select.Trigger>
             <Select.ValueText placeholder={placeholder} />
           </Select.Trigger>
           <Select.IndicatorGroup>
             <Select.Indicator />
           </Select.IndicatorGroup>
         </Select.Control>
-{noPortal ? (
-          <Select.Positioner>
-            <Select.Content>
-              {finalCollection.items.map((item: unknown) => {
-                const typedItem = item as CollectionOption;
-                return (
-                  <Select.Item item={typedItem} key={typedItem.value}>
-                    {renderItem ? renderItem(typedItem) : typedItem.label}
-                    <Select.ItemIndicator />
-                  </Select.Item>
-                );
-              })}
-              {children}
-            </Select.Content>
-          </Select.Positioner>
-        ) : (
-          <Portal>
-            <Select.Positioner>
-              <Select.Content>
-                {finalCollection.items.map((item: unknown) => {
-                  const typedItem = item as CollectionOption;
-                  return (
-                    <Select.Item item={typedItem} key={typedItem.value}>
-                      {renderItem ? renderItem(typedItem) : typedItem.label}
-                      <Select.ItemIndicator />
-                    </Select.Item>
-                  );
-                })}
-                {children}
-              </Select.Content>
-            </Select.Positioner>
-          </Portal>
-        )}
+        {noPortal ? selectContent : <Portal>{selectContent}</Portal>}
       </Select.Root>
+
       {error && (
-        <div style={{ color: 'red', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+        <div style={{ color: 'var(--colors-red-500)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
           {error}
         </div>
       )}
       {helperText && !error && (
-        <div style={{ color: 'gray', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+        <div style={{ color: 'var(--colors-gray-500)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
           {helperText}
         </div>
       )}

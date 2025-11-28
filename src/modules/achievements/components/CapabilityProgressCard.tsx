@@ -14,7 +14,6 @@
  * @version 1.0.0
  */
 
-import { useNavigate } from 'react-router-dom';
 import {
   Box,
   VStack,
@@ -25,6 +24,8 @@ import {
   Badge,
   Icon
 } from '@/shared/ui';
+import { useNavigate } from 'react-router-dom';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 import type { CapabilityProgress } from '../types';
 import type { Achievement } from '../types';
 import type { BusinessCapabilityId } from '@/config/types';
@@ -32,15 +33,24 @@ import type { BusinessCapabilityId } from '@/config/types';
 /**
  * Mapeo de capabilities a nombres e iconos
  */
+// ✅ FIX Bug #3: Removed obsolete capabilities and added new ones
 const CAPABILITY_CONFIG: Record<BusinessCapabilityId, { name: string; icon: string }> = {
+  // Core business models
+  physical_products: { name: 'Productos Físicos', icon: '🍕' },
+  professional_services: { name: 'Servicios Profesionales', icon: '👨‍⚕️' },
+  asset_rental: { name: 'Alquiler de Activos', icon: '🔑' },
+  membership_subscriptions: { name: 'Membresías y Suscripciones', icon: '💳' },
+  digital_products: { name: 'Productos Digitales', icon: '💻' },
+
+  // Fulfillment methods
   onsite_service: { name: 'Servicio en el Local (Dine-In)', icon: '🍽️' },
   pickup_orders: { name: 'Retiro en el Local (TakeAway)', icon: '🥡' },
-  online_store: { name: 'Comercio Electrónico', icon: '🛒' },
   delivery_shipping: { name: 'Envío a Domicilio', icon: '🚚' },
+
+  // Special operations
+  async_operations: { name: 'Operaciones Asíncronas', icon: '🛒' },
   corporate_sales: { name: 'Ventas Corporativas (B2B)', icon: '🏢' },
-  production_workflow: { name: 'Producción', icon: '🏭' },
-  appointment_based: { name: 'Servicios con Cita Previa', icon: '📅' },
-  mobile_operations: { name: 'Operaciones Móviles', icon: '🚚' }
+  mobile_operations: { name: 'Operaciones Móviles', icon: '🚛' }
 };
 
 interface CapabilityProgressCardProps extends CapabilityProgress {
@@ -73,7 +83,7 @@ export default function CapabilityProgressCard({
   variant = 'default',
   onRequirementClick
 }: CapabilityProgressCardProps) {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
   const config = CAPABILITY_CONFIG[capability];
 
   if (!config) {
@@ -223,7 +233,7 @@ export default function CapabilityProgressCard({
             colorPalette="orange"
             variant="outline"
             w="full"
-            onClick={() => navigate('/admin/gamification/achievements')}
+            onClick={() => navigate('gamification', '/achievements')}
           >
             Completar Configuración ({total - completed} pendientes)
           </Button>
@@ -266,6 +276,9 @@ function RequirementRow({
       cursor={onClick ? 'pointer' : 'default'}
       onClick={() => onClick?.(requirement)}
       _hover={onClick ? { bg: 'gray.100', _dark: { bg: 'gray.600' } } : {}}
+      data-testid="requirement-item"
+      data-requirement-id={requirement.id}
+      className={isCompleted ? 'completed' : ''}
     >
       {/* Checkbox Icon */}
       <Box
@@ -320,10 +333,11 @@ function RequirementRow({
           size="xs"
           variant="ghost"
           colorPalette="blue"
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={() => {
+            // Navigate on button click, not on row click
             navigate(requirement.redirectUrl!);
           }}
+          data-testid={`requirement-${requirement.id}`}
         >
           Configurar →
         </Button>

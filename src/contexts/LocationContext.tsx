@@ -5,7 +5,7 @@
 // Pattern: React Context + localStorage persistence
 // ================================================================
 
-import { createContext, useContext, useState, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef, type ReactNode } from 'react';
 import { locationsApi } from '@/services/locationsApi';
 import EventBus from '@/lib/events';
 import type { Location } from '@/types/location';
@@ -213,15 +213,42 @@ export function LocationProvider({ children }: LocationProviderProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locations, isLoading]); // ✅ FIX: Remove selectedLocationId to prevent loop
 
-  const value: LocationContextValue = {
-    locations,
+  // 🚀 PERFORMANCE FIX: Memoize context value with primitives to prevent cascading re-renders
+  // React.dev: "minimize props changes - use individual values instead of objects"
+  
+  // Extract primitives for stable comparison
+  const locationsCount = locations.length;
+  const selectedLocationIdValue = selectedLocationId;
+  const isLoadingValue = isLoading;
+  const hasError = !!error;
+  
+  // Memoize locations array (only changes when count changes)
+  const memoizedLocations = useMemo(() => locations, [locationsCount]);
+  
+  // Memoize selectedLocation (already memoized above, just use it)
+  // selectedLocation useMemo at line 118 is good ✅
+  
+  // Memoize callbacks to prevent re-creation
+  const stableSelectLocation = useCallback(selectLocation, [locations]);
+  const stableSelectAllLocations = useCallback(selectAllLocations, []);
+
+  const value = useMemo<LocationContextValue>(() => ({
+    locations: memoizedLocations,
     selectedLocation,
-    selectLocation,
-    selectAllLocations,
+    selectLocation: stableSelectLocation,
+    selectAllLocations: stableSelectAllLocations,
     isMultiLocationMode,
-    isLoading,
+    isLoading: isLoadingValue,
     error,
-  };
+  }), [
+    memoizedLocations,
+    selectedLocation,
+    stableSelectLocation,
+    stableSelectAllLocations,
+    isMultiLocationMode,
+    isLoadingValue,
+    hasError
+  ]);
 
   return (
     <LocationContext.Provider value={value}>

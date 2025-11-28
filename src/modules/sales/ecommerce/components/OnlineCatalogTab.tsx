@@ -18,7 +18,7 @@ import {
   Alert,
   Icon,
   Text,
-  NativeSelect,
+  SelectField,
   Spinner,
   Table,
 } from '@/shared/ui';
@@ -113,18 +113,18 @@ export function OnlineCatalogTab() {
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
           width="300px"
         />
-        <NativeSelect.Root
-          value={filters.visibility || 'all'}
-          onValueChange={(details) => setFilters({ ...filters, visibility: details.value as 'all' | 'visible' | 'featured' | 'hidden' })}
+        <SelectField
+          options={[
+            { value: 'all', label: 'All Products' },
+            { value: 'visible', label: 'Online Only' },
+            { value: 'featured', label: 'Featured Only' },
+            { value: 'hidden', label: 'Hidden Only' }
+          ]}
+          value={[filters.visibility || 'all']}
+          onValueChange={(details) => setFilters({ ...filters, visibility: details.value[0] as 'all' | 'visible' | 'featured' | 'hidden' })}
           width="200px"
-        >
-          <NativeSelect.Field placeholder="Filter by visibility">
-            <option value="all">All Products</option>
-            <option value="visible">Online Only</option>
-            <option value="featured">Featured Only</option>
-            <option value="hidden">Hidden Only</option>
-          </NativeSelect.Field>
-        </NativeSelect.Root>
+          noPortal
+        />
       </Stack>
 
       {/* Error Alert */}

@@ -16,6 +16,8 @@ export const financeCorporateManifest: ModuleManifest = {
   name: 'Finance Corporate',
   version: '2.0.0',
 
+  permissionModule: 'fiscal', // ✅ Maps to 'fiscal' permission (corporate accounting)
+
   // ============================================
   // FEATURES
   // ============================================

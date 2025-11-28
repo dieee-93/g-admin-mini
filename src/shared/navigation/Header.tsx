@@ -2,72 +2,42 @@
 // src/components/navigation/Header.tsx - MIGRADO AL DESIGN SYSTEM
 // ====================================
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { 
-  Dialog,
   Menu,
   Avatar,
   Portal,
   Box
 } from '@chakra-ui/react';
 import { 
-  BellIcon, 
   Cog6ToothIcon,
   ArrowRightEndOnRectangleIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
-import { useNavigationState, useNavigationActions } from '@/contexts/NavigationContext';
+import { useNavigationState, useNavigationActions, useNavigationLayout } from '@/contexts/NavigationContext'; // ADD useNavigationLayout
 import { Icon } from '@/shared/ui/Icon';
 import { Typography } from '@/shared/ui/Typography';
 import { Stack } from '@/shared/ui/Stack';
 import { Button } from '@/shared/ui/Button';
-import { Badge } from '@/shared/ui/Badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { ConnectionStatus } from '@/lib/offline/OfflineMonitor';
-import { useCart } from '@/modules/sales/ecommerce/hooks/useCart';
-import { useNavigate as useRouterNavigate } from 'react-router-dom';
-import { ShoppingCartIcon } from '@heroicons/react/24/outline';
-
 import { logger } from '@/lib/logging';
-export function Header() {
+
+interface HeaderProps {
+  actions?: React.ReactNode;
+}
+
+// ⚡ PERFORMANCE: Memoize Header to prevent unnecessary re-renders
+export const Header = memo(function Header({ actions }: HeaderProps) {
   const navState = useNavigationState();
   const navActions = useNavigationActions();
+  const { sidebarCollapsed } = useNavigationLayout(); // GET sidebarCollapsed from context
   const { currentModule, modules } = navState;
   const { navigate } = navActions;
   const { user, signOut } = useAuth();
-  const routerNavigate = useRouterNavigate();
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
-
-  // Session storage helper for guest carts
-  const getGuestSessionId = () => {
-    let sessionId = sessionStorage.getItem('guest_session_id');
-    if (!sessionId) {
-      sessionId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      sessionStorage.setItem('guest_session_id', sessionId);
-    }
-    return sessionId;
-  };
-
-  // Get cart for customer users (not admin)
-  const isCustomer = user?.role === 'customer';
-  const { itemCount } = useCart({
-    customerId: isCustomer ? user?.id : undefined,
-    sessionId: isCustomer && !user ? getGuestSessionId() : undefined,
-    autoLoad: isCustomer,
-  });
-
-  // Listen for sidebar hover state
-  React.useEffect(() => {
-    const handleSidebarHover = (event: CustomEvent) => {
-      setIsSidebarHovered(event.detail.isHovering);
-    };
-    
-    window.addEventListener('sidebarHover', handleSidebarHover as EventListener);
-    return () => window.removeEventListener('sidebarHover', handleSidebarHover as EventListener);
-  }, []);
-
-  const totalBadges = modules.reduce((total, module) => total + (module.badge || 0), 0);
+  
+  // REMOVED: isSidebarHovered state and useEffect
+  // const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+  // React.useEffect(() => { /* ... */ }, []);
 
   const handleSignOut = async () => {
     try {
@@ -113,8 +83,8 @@ export function Header() {
             direction="row" 
             align="center" 
             gap="4"
-            opacity={isSidebarHovered ? 0.3 : 1}
-            transform={isSidebarHovered ? 'translateX(8px)' : 'translateX(0px)'}
+            opacity={sidebarCollapsed ? 1 : 0.3} // Use !sidebarCollapsed to reverse logic
+            transform={sidebarCollapsed ? 'translateX(0px)' : 'translateX(8px)'} // Use !sidebarCollapsed to reverse logic
             transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
           >
             <Typography
@@ -169,75 +139,8 @@ export function Header() {
           </Stack>
         </Stack>
 
-        <Stack direction="row" gap="4">
-          {/* ✅ Connection Status integrado */}
-          <ConnectionStatus />
-
-          {/* 🛒 Shopping Cart (Customer only) */}
-          {isCustomer && (
-            <Box position="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => routerNavigate('/app/cart')}
-              >
-                <Icon icon={ShoppingCartIcon} size="md" />
-              </Button>
-
-              {itemCount > 0 && (
-                <Box
-                  position="absolute"
-                  top="-2px"
-                  right="-2px"
-                  bg="red.500"
-                  color="white"
-                  borderRadius="full"
-                  fontSize="xs"
-                  fontWeight="bold"
-                  minWidth="18px"
-                  height="18px"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  border="2px solid"
-                  borderColor="bg.surface"
-                >
-                  {itemCount > 99 ? '99+' : itemCount}
-                </Box>
-              )}
-            </Box>
-          )}
-
-          {/* ✅ Notifications con design system */}
-          <Box position="relative">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowNotifications(true)}
-            >
-              <Icon icon={BellIcon} size="md" />
-            </Button>
-            
-            {totalBadges > 0 && (
-              <Box
-                position="absolute"
-                top="-2px"
-                right="-2px"
-                color="white"
-                borderRadius="full"
-                fontSize="xs"
-                fontWeight="bold"
-                minWidth="18px"
-                height="18px"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                border="2px solid"
-              >
-                {totalBadges > 99 ? '99+' : totalBadges}
-              </Box>
-            )}
-          </Box>
+        <Stack direction="row" align="center" gap="4">
+          {actions}
 
           {/* User Menu */}
           <Menu.Root>
@@ -294,67 +197,7 @@ export function Header() {
         </Stack>
       </Stack>
 
-      {/* ✅ Notifications Dialog */}
-      <Dialog.Root 
-        open={showNotifications} 
-        onOpenChange={(details: { open: boolean }) => setShowNotifications(details.open)}
-      >
-        <Portal>
-          <Dialog.Backdrop />
-          <Dialog.Positioner>
-            <Dialog.Content>
-            <Dialog.Header>
-              <Dialog.Title>Notificaciones</Dialog.Title>
-            </Dialog.Header>
-            <Dialog.Body>
-              <Stack gap="md" align="start">
-                {modules
-                  .filter(module => module.badge && module.badge > 0)
-                  .map(module => (
-                    <Stack key={module.id} direction="row" gap="md" align="center" width="100%">
-                      <Box 
-                        width="32px"
-                        height="32px"
-                        borderRadius="md"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        <Icon icon={module.icon} size="sm" />
-                      </Box>
-                      <Box flex="1">
-                        <Stack direction="column" gap="none">
-                          <Typography variant="body" size="sm" fontWeight="semibold">
-                            {module.title}
-                          </Typography>
-                          <Typography variant="body" size="xs" color="text.secondary">
-                            {module.badge || 0} {(module.badge || 0) === 1 ? 'alerta' : 'alertas'} pendiente{(module.badge || 0) > 1 ? 's' : ''}
-                          </Typography>
-                        </Stack>
-                      </Box>
-                      <Badge colorPalette="green" size="sm">
-                        {module.badge}
-                      </Badge>
-                    </Stack>
-                  ))
-                }
-                
-                {totalBadges === 0 && (
-                  <Typography variant="body" size="sm" color="text.muted" textAlign="center" width="100%">
-                    No hay notificaciones pendientes
-                  </Typography>
-                )}
-              </Stack>
-            </Dialog.Body>
-            <Dialog.Footer>
-              <Dialog.CloseTrigger asChild>
-                <Button variant="outline">Cerrar</Button>
-              </Dialog.CloseTrigger>
-            </Dialog.Footer>
-            </Dialog.Content>
-          </Dialog.Positioner>
-        </Portal>
-      </Dialog.Root>
+
     </Box>
   );
-}
+});

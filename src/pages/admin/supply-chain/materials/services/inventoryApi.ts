@@ -8,9 +8,8 @@ import { BulkOperationsService } from './bulkOperationsService'; // ✅ Bulk ope
 import { CacheService, invalidateMaterialsListCache, invalidateMaterialCache } from './cacheService'; // ✅ Caching
 import type { InventoryItem, StockEntry } from '@/pages/admin/supply-chain/materials/types';
 import type { MaterialItem } from '../types/materialTypes';
-import { secureApiCall } from '@/lib/validation'; // ✅ Secure API wrapper
 
-// 🔒 PERMISSIONS: Service layer validation
+// 🔒 PERMISSIONS: RLS handles authorization in Supabase
 import { requirePermission, requireModuleAccess } from '@/lib/permissions';
 import type { AuthUser } from '@/contexts/AuthContext';
 
@@ -38,9 +37,9 @@ export const inventoryApi = {
     // Try cache first, then fetch if needed
     return CacheService.withCache(
       cacheKey,
-      () => secureApiCall(async () => {
+      async () => {
         let query = supabase
-          .from('items')
+          .from('materials')
           .select('*')
           .order('name');
 
@@ -52,16 +51,18 @@ export const inventoryApi = {
         const { data, error } = await query;
 
         if (error) {
-          logger.error('MaterialsStore', 'Error loading materials from Supabase:', error);
+          logger.error('MaterialsStore', 'Error loading materials from Supabase:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+          });
           throw error;
         }
 
         // Normalize data from Supabase format to MaterialItem format
         return data ? MaterialsDataNormalizer.normalizeArray(data) : [];
-      }, {
-        operation: 'getItems',
-        context: { locationId, userId: user?.id }
-      }),
+      },
       3 * 60 * 1000 // 3 minutes TTL
     );
   },
@@ -106,24 +107,21 @@ export const inventoryApi = {
       return MaterialsMockService.createMaterial(item);
     }
 
-    const result = await secureApiCall(async () => {
-      const { data, error } = await supabase
-        .from('items')
-        .insert([item])
-        .select()
-        .single();
+    const { data, error } = await supabase
+      .from('materials')
+      .insert([item])
+      .select()
+      .single();
 
-      if (error) throw error;
-      return data;
-    }, {
-      operation: 'createItem',
-      context: { name: item.name }
-    });
+    if (error) {
+      logger.error('MaterialsStore', 'Error creating material:', error);
+      throw error;
+    }
 
     // Invalidate cache after creating item
     invalidateMaterialsListCache();
 
-    return result;
+    return data;
   },
 
   async getItem(id: string): Promise<MaterialItem | null> {
@@ -131,19 +129,18 @@ export const inventoryApi = {
       return MaterialsMockService.getItem(id);
     }
 
-    return secureApiCall(async () => {
-      const { data, error } = await supabase
-        .from('items')
-        .select('*')
-        .eq('id', id)
-        .single();
+    const { data, error } = await supabase
+      .from('materials')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-      if (error) throw error;
-      return data;
-    }, {
-      operation: 'getItem',
-      context: { id }
-    });
+    if (error) {
+      logger.error('MaterialsStore', 'Error getting material:', error);
+      throw error;
+    }
+
+    return data;
   },
 
   async updateStock(id: string, newStock: number, user: AuthUser, oldStock?: number): Promise<MaterialItem> {
@@ -155,20 +152,19 @@ export const inventoryApi = {
     }
 
     // 🎯 OPTIMIZED: Single query - get old stock from result if not provided
-    const result = await secureApiCall(async () => {
-      const { data, error} = await supabase
-        .from('items')
-        .update({ stock: newStock, updated_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single();
+    const { data, error } = await supabase
+      .from('materials')
+      .update({ stock: newStock, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
 
-      if (error) throw error;
-      return data;
-    }, {
-      operation: 'updateStock',
-      context: { id, newStock, userId: user.id }
-    });
+    if (error) {
+      logger.error('MaterialsStore', 'Error updating stock:', error);
+      throw error;
+    }
+
+    const result = data;
 
     // Calculate old stock: use provided value or fetch from cache/result
     // Note: Supabase UPDATE returns the NEW data, so oldStock must be provided or fetched before
@@ -268,7 +264,7 @@ export const inventoryApi = {
     requirePermission(user, 'materials', 'update');
 
     const { data, error } = await supabase
-      .from('items')
+      .from('materials')
       .update(updates)
       .eq('id', id)
       .select()
@@ -349,7 +345,7 @@ export const inventoryApi = {
     try {
       // First, check if item exists and get its info
       const { data: itemData, error: itemError } = await supabase
-        .from('items')
+        .from('materials')
         .select('id, name, type, category, stock, unit_cost')
         .eq('id', id)
         .single();
@@ -371,7 +367,7 @@ export const inventoryApi = {
 
       // Now delete the item itself
       const { error: deleteError } = await supabase
-        .from('items')
+        .from('materials')
         .delete()
         .eq('id', id);
 

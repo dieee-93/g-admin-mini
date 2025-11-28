@@ -8,6 +8,8 @@ export const fulfillmentOnsiteManifest: ModuleManifest = {
   name: 'Fulfillment - Onsite Service',
   version: '2.0.0',
 
+  permissionModule: 'operations', // ✅ Uses 'operations' permission
+
   requiredFeatures: ['operations_table_management'],
   optionalFeatures: ['operations_table_assignment', 'operations_floor_plan_config'],
 

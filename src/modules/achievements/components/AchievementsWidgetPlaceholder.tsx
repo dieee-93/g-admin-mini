@@ -8,13 +8,13 @@
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, VStack, HStack, Heading, Text, Button } from '@/shared/ui';
 import { useCapabilityStore } from '@/store/capabilityStore';
 import { useShallow } from 'zustand/react/shallow';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 export default function AchievementsWidgetPlaceholder() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // ✅ Solo leer activeFeatures - NO usar useValidationContext
   // 🔧 FIX: Usar useShallow para prevenir re-renders por cambio de referencia del array
@@ -55,7 +55,7 @@ export default function AchievementsWidgetPlaceholder() {
           size="lg"
           colorPalette="purple"
           w="full"
-          onClick={() => navigate('/admin/gamification/achievements')}
+          onClick={() => navigate('gamification', '/achievements')}
         >
           Ver Logros y Configuración
         </Button>

@@ -11,12 +11,12 @@
  */
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography, Icon, Button, Badge } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { TrophyIcon } from '@heroicons/react/24/outline';
 import { useShallow } from 'zustand/react/shallow';
 import { useAchievementsStore } from '@/store/achievementsStore';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 interface GamificationStats {
   level: number;
@@ -26,7 +26,7 @@ interface GamificationStats {
 }
 
 export default function GamificationWidget() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // ✅ Usar useShallow de Zustand v5 para evitar loop infinito
   const { completedAchievements, totalPoints, unlockedBadges } = useAchievementsStore(useShallow(state => ({
@@ -140,7 +140,7 @@ export default function GamificationWidget() {
             size="sm"
             colorPalette="yellow"
             variant="outline"
-            onClick={() => navigate('/admin/gamification/achievements')}
+            onClick={() => navigate('gamification', '/achievements')}
           >
             Ver Logros
           </Button>

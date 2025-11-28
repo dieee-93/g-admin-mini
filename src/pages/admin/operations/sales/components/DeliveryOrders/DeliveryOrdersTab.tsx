@@ -2,15 +2,15 @@
 // UPDATED: Using consolidated fulfillment-delivery module
 import { useState, useEffect } from 'react';
 import { Stack, Button, Alert } from '@/shared/ui';
-import { useNavigate } from 'react-router-dom';
 import { useSalesStore } from '@/store/salesStore';
 import { transformSalesToDeliveryOrders } from '@/modules/fulfillment/delivery/utils/deliveryTransformer';
 import { DeliveryOrderCard } from './DeliveryOrderCard';
 import { logger } from '@/lib/logging';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 import type { DeliveryOrder } from '@/modules/fulfillment/delivery/types/deliveryTypes';
 
 export function DeliveryOrdersTab() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
   const sales = useSalesStore((state) => state.sales);
 
   // Filter states
@@ -65,7 +65,7 @@ export function DeliveryOrdersTab() {
         <Alert status="info" title="No hay deliveries">
           No se encontraron órdenes con entrega a domicilio.
         </Alert>
-        <Button onClick={() => navigate('/admin/operations/sales')}>
+        <Button onClick={() => navigate('sales')}>
           Crear Nueva Venta
         </Button>
       </Stack>
@@ -119,7 +119,7 @@ export function DeliveryOrdersTab() {
           <Button
             variant="solid"
             colorPalette="blue"
-            onClick={() => navigate('/admin/operations/fulfillment/delivery')}
+            onClick={() => navigate('fulfillment-delivery')}
           >
             Ir a Delivery Management
           </Button>

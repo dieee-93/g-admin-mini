@@ -31,15 +31,17 @@ export const productionManifest: ModuleManifest = {
   name: 'Production Management',
   version: '1.0.0',
 
-  // Requires materials module for inventory tracking
-  depends: ['materials'],
+  permissionModule: 'operations', // ✅ Uses 'operations' permission
+
+  // Requires materials module for inventory tracking and products for recipe data
+  depends: ['materials', 'products'],
 
   // Requires kitchen display feature
   requiredFeatures: ['production_display_system'],
 
   // Optional features enhance functionality
   optionalFeatures: [
-    'production_bom_management',
+    'production_order_management',
     'production_order_queue',
     'production_capacity_planning'
   ],
@@ -62,11 +64,15 @@ export const productionManifest: ModuleManifest = {
   hooks: {
     provide: [
       'calendar.events',        // Render production schedule
-      'materials.row.actions'   // "Use in Kitchen" button in materials table
+      'materials.row.actions',  // "Use in Kitchen" button in materials table
+      'products.row.actions',   // "Produce Batch" button in products table
+      'products.detail.sections' // "Production Info" section in product detail
     ],
     consume: [
       'sales.order_placed',     // React to new orders
-      'materials.stock_updated' // Adjust recipes when stock changes
+      'materials.stock_updated', // Adjust recipes when stock changes
+      'products.product_updated', // Recipe changed
+      'products.price_changed'   // Cost changed
     ]
   },
 
@@ -173,9 +179,120 @@ export const productionManifest: ModuleManifest = {
       15 // High priority - shows before other actions
     );
 
+    // ============================================
+    // INJECTION 1: Products Row Actions - "Produce Batch" Button
+    // ============================================
+    logger.info('App', 'Registering products.row.actions injection (Production)');
+
+    registry.addAction(
+      'products.row.actions',
+      (data) => {
+        const { product } = data || {};
+
+        if (!product) return null;
+
+        // Only show for products that require production
+        const requiresProduction = product.config?.requires_production ||
+                                   product.type === 'ELABORATED';
+
+        if (!requiresProduction) return null;
+
+        return (
+          <Button
+            key="produce-batch"
+            size="xs"
+            variant="ghost"
+            colorPalette="purple"
+            onClick={() => {
+              logger.info('Production', 'Creating production order', {
+                productId: product.id,
+                productName: product.name
+              });
+
+              toaster.create({
+                title: '🏭 Production Order',
+                description: `Creating batch for ${product.name}`,
+                type: 'info',
+                duration: 2000
+              });
+
+              // TODO: Open production order modal
+            }}
+          >
+            <Icon icon={CogIcon} size="xs" />
+            Produce Batch
+          </Button>
+        );
+      },
+      'production',
+      8
+    );
+
+    logger.debug('App', 'Registered products.row.actions injection');
+
+    // ============================================
+    // INJECTION 2: Products Detail Sections - "Production Info"
+    // ============================================
+    logger.info('App', 'Registering products.detail.sections injection (Production)');
+
+    registry.addAction(
+      'products.detail.sections',
+      (data) => {
+        const { product } = data || {};
+
+        if (!product) return null;
+
+        const requiresProduction = product.config?.requires_production ||
+                                   product.type === 'ELABORATED';
+
+        if (!requiresProduction) return null;
+
+        return (
+          <Section key="production-info" variant="elevated">
+            <Stack direction="row" align="center" gap="2">
+              <BeakerIcon className="w-5 h-5 text-purple-500" />
+              <Typography variant="heading" size="sm" fontWeight="semibold">
+                Production Information
+              </Typography>
+            </Stack>
+            <Stack direction="column" gap="2" mt="4">
+              <Stack direction="row" justify="space-between">
+                <Typography variant="body" size="sm" color="text.muted">
+                  Kitchen capacity
+                </Typography>
+                <Badge variant="solid" colorPalette="purple">
+                  50 units/hour
+                </Badge>
+              </Stack>
+              <Stack direction="row" justify="space-between">
+                <Typography variant="body" size="sm" color="text.muted">
+                  Avg prep time
+                </Typography>
+                <Badge variant="solid" colorPalette="blue">
+                  {product.config?.duration_minutes || 10} minutes
+                </Badge>
+              </Stack>
+              <Stack direction="row" justify="space-between">
+                <Typography variant="body" size="sm" color="text.muted">
+                  Production type
+                </Typography>
+                <Badge variant="outline" colorPalette="green">
+                  {product.config?.production_type || 'kitchen'}
+                </Badge>
+              </Stack>
+            </Stack>
+          </Section>
+        );
+      },
+      'production',
+      7
+    );
+
+    logger.debug('App', 'Registered products.detail.sections injection');
+
     logger.info('Production', '✅ Production module hooks registered', {
-      hooksProvided: 3,
-      hooksConsumed: 2
+      hooksProvided: 5,
+      hooksConsumed: 4
     });
   },
 
@@ -187,26 +304,71 @@ export const productionManifest: ModuleManifest = {
   // Public API exports
   exports: {
     /**
-     * Calculate recipe cost based on materials
-     * @param recipeId - Recipe identifier
-     * @returns Total cost in dollars
-     */
-    calculateRecipeCost: async (recipeId: string) => {
-      // Mock implementation - real version would query database
-      console.log(`[Production] Calculating cost for recipe: ${recipeId}`);
-      return 12.50; // Mock cost
-    },
-
-    /**
-     * Check if recipe can be produced with current stock
-     * @param recipeId - Recipe identifier
+     * Create a production order
+     * Uses Products API for recipe data and cost calculation
+     * @param recipeId - Recipe/Product identifier
      * @param quantity - Number of units to produce
-     * @returns Boolean indicating if production is possible
+     * @returns Production order object
      */
-    canProduceRecipe: async (recipeId: string, quantity: number) => {
-      // Mock implementation - real version would check stock levels
-      console.log(`[Production] Checking if ${quantity} units of ${recipeId} can be produced`);
-      return true; // Mock response
+    createProductionOrder: async (recipeId: string, quantity: number) => {
+      logger.info('Production', 'Creating production order', { recipeId, quantity });
+
+      try {
+        // Get module registry to access Products API
+        const { moduleRegistry } = await import('@/lib/modules');
+
+        // Use Products API for recipe data (no duplicate logic)
+        const productsAPI = moduleRegistry.getExports('products');
+        if (!productsAPI) {
+          throw new Error('Products module not available');
+        }
+
+        // Get recipe/product data
+        const { product } = await productsAPI.getProduct(recipeId);
+        if (!product) {
+          throw new Error(`Product ${recipeId} not found`);
+        }
+
+        // Calculate recipe cost using Products API
+        const { cost: recipeCost } = await productsAPI.calculateRecipeCost(recipeId);
+
+        // Check if we can produce using Products API
+        const { canProduce, missingMaterials } = await productsAPI.canProduceRecipe(recipeId, quantity);
+
+        if (!canProduce) {
+          throw new Error(`Cannot produce: Missing materials - ${missingMaterials.join(', ')}`);
+        }
+
+        // Create production order (mock - real implementation would insert to DB)
+        const order = {
+          id: `prod-${Date.now()}`,
+          recipe_id: recipeId,
+          recipe_name: product.name,
+          quantity,
+          estimated_cost: recipeCost * quantity,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        };
+
+        logger.info('Production', 'Production order created', { orderId: order.id });
+
+        // Emit event
+        const { eventBus, EventPriority } = await import('@/lib/events');
+        eventBus.emit('production.order_created', {
+          orderId: order.id,
+          recipeId,
+          quantity,
+          estimatedCost: order.estimated_cost
+        }, {
+          priority: EventPriority.HIGH,
+          moduleId: 'production'
+        });
+
+        return order;
+      } catch (error) {
+        logger.error('Production', 'Error creating production order', error);
+        throw error;
+      }
     }
   },
 

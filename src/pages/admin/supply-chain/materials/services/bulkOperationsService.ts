@@ -141,7 +141,7 @@ export class BulkOperationsService {
       for (const itemId of itemIds) {
         try {
           const { error } = await supabase
-            .from('items')
+            .from('materials')
             .update({
               category: newCategory.trim(),
               updated_at: new Date().toISOString()
@@ -230,7 +230,7 @@ export class BulkOperationsService {
 
           // Delete the item
           const { error } = await supabase
-            .from('items')
+            .from('materials')
             .delete()
             .eq('id', itemId);
 
@@ -290,7 +290,7 @@ export class BulkOperationsService {
       // Single update for all items (more efficient)
       try {
         const { error } = await supabase
-          .from('items')
+          .from('materials')
           .update({
             is_active: isActive,
             updated_at: new Date().toISOString()

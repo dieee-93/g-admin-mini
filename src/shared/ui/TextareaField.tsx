@@ -10,6 +10,7 @@ interface TextareaFieldProps extends Omit<ChakraTextareaProps, 'size' | 'variant
   defaultValue?: string
   onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void
   error?: string
+  helperText?: string
   required?: boolean
   disabled?: boolean
   size?: 'sm' | 'md' | 'lg'
@@ -26,6 +27,7 @@ export function TextareaField({
   defaultValue,
   onChange,
   error,
+  helperText,
   required = false,
   disabled = false,
   size = 'md',
@@ -36,7 +38,7 @@ export function TextareaField({
   ...textareaProps // Spread todas las demás props de Chakra Textarea
 }: TextareaFieldProps) {
   // Recipes handle all theming automatically - no manual props needed
-  
+
   return (
     <Field.Root invalid={!!error}>
       {label && (
@@ -57,6 +59,11 @@ export function TextareaField({
         resize={resize}
         {...textareaProps} // Spread props adicionales
       />
+      {helperText && !error && (
+        <Field.HelperText fontSize="sm">
+          {helperText}
+        </Field.HelperText>
+      )}
       {error && (
         <Field.ErrorText fontSize="sm">
           {error}

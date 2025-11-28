@@ -12,12 +12,12 @@
  */
 
 import { useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography, Icon, Button } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { ClockIcon } from '@heroicons/react/24/outline';
 import { useScheduling } from '@/pages/admin/resources/scheduling/hooks/useScheduling';
 import { SchedulingCalculations } from '@/business-logic/scheduling/schedulingCalculations';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 interface SchedulingStats {
   totalShifts: number;
@@ -26,7 +26,7 @@ interface SchedulingStats {
 }
 
 export default function SchedulingWidget() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // ✅ v3.0: Use unified scheduling hook
   const { shifts, loading, refreshData } = useScheduling();
@@ -122,7 +122,7 @@ export default function SchedulingWidget() {
             size="sm"
             colorPalette="orange"
             variant="outline"
-            onClick={() => navigate('/admin/resources/scheduling')}
+            onClick={() => navigate('scheduling')}
           >
             Ver Turnos
           </Button>

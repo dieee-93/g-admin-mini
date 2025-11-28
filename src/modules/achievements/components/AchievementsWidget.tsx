@@ -9,27 +9,36 @@
  */
 
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, VStack, HStack, Heading, Text, Button, Badge } from '@/shared/ui';
 import { useCapabilities } from '@/lib/capabilities';
 import { useValidationContext } from '@/hooks/useValidationContext';
 import { ModuleRegistry } from '@/lib/modules';
 import { useAchievementsStore } from '@/store/achievementsStore';
 import { logger } from '@/lib/logging';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 import type { CapabilityProgress } from '../types';
 import type { BusinessCapabilityId } from '@/config/types';
 
 /**
  * Mapeo de IDs de capabilities a nombres legibles
  */
+// ✅ FIX Bug #2: Removed obsolete capabilities (production_workflow, appointment_based)
 const CAPABILITY_NAMES: Record<BusinessCapabilityId, string> = {
+  // Core business models
+  physical_products: 'Productos Físicos',
+  professional_services: 'Servicios Profesionales',
+  asset_rental: 'Alquiler de Activos',
+  membership_subscriptions: 'Membresías',
+  digital_products: 'Productos Digitales',
+
+  // Fulfillment methods
   onsite_service: 'Dine-In',
   pickup_orders: 'TakeAway',
-  online_store: 'E-commerce',
   delivery_shipping: 'Delivery',
+
+  // Special operations
+  async_operations: 'Operaciones Async',
   corporate_sales: 'B2B',
-  production_workflow: 'Producción',
-  appointment_based: 'Citas',
   mobile_operations: 'Móvil'
 };
 
@@ -217,7 +226,7 @@ function AchievementsProminentView({
 }: {
   progress: CapabilityProgress[]
 }) {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // Calcular progreso global
   const totalRequirements = progress.reduce((sum, cp) => sum + cp.total, 0);
@@ -293,7 +302,7 @@ function AchievementsProminentView({
           size="lg"
           colorPalette="purple"
           w="full"
-          onClick={() => navigate('/admin/gamification/achievements')}
+          onClick={() => navigate('gamification', '/achievements')}
         >
           Ver Todos los Pasos ({totalRequirements - totalCompleted} pendientes)
         </Button>
@@ -313,7 +322,7 @@ function AchievementsCompactView({
 }: {
   progress: CapabilityProgress[]
 }) {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
   const totalPoints = useAchievementsStore(state => state.totalPoints);
   const completedAchievements = useAchievementsStore(state => state.completedAchievements);
 
@@ -354,7 +363,7 @@ function AchievementsCompactView({
             size="sm"gap="2"
             variant="ghost"
             colorPalette="gray"
-            onClick={() => navigate('/admin/gamification/achievements')}
+            onClick={() => navigate('gamification', '/achievements')}
           >
             Ver Todos
           </Button>

@@ -25,6 +25,8 @@ export const customersManifest: ModuleManifest = {
   name: 'Customers (CRM)',
   version: '1.0.0',
 
+  permissionModule: 'sales', // ✅ Uses 'sales' permission (CRM)
+
   depends: [],
   autoInstall: false,
 
@@ -55,6 +57,8 @@ export const customersManifest: ModuleManifest = {
     logger.info('App', '👥 Setting up Customers module');
 
     try {
+      const eventBus = registry.getEventBus();
+
       // Register dashboard widget
       const { CustomersWidget } = await import('@/pages/admin/core/crm/customers/components');
 
@@ -65,7 +69,60 @@ export const customersManifest: ModuleManifest = {
         40 // Priority - adjust as needed
       );
 
-      logger.info('App', '✅ Customers module setup complete - Dashboard widget registered');
+      /**
+       * Listen to sales.order_completed
+       * Update customer RFM scores when they complete purchases
+       */
+      eventBus.subscribe('sales.order_completed', async (event) => {
+        logger.info('CustomersModule', 'Order completed notification received', event.payload);
+
+        const { customerId, total, timestamp } = event.payload;
+
+        if (!customerId) {
+          logger.warn('CustomersModule', 'No customer ID in order completed event', event.payload);
+          return;
+        }
+
+        try {
+          // Import supabase client dynamically
+          const { supabase } = await import('@/lib/supabase/client');
+
+          // Add to RFM update queue for batch processing
+          const { error: queueError } = await supabase
+            .from('customer_rfm_update_queue')
+            .insert({
+              customer_id: customerId,
+              trigger_event: 'sale_completed',
+              event_data: {
+                sale_total: total,
+                sale_timestamp: timestamp,
+              },
+              status: 'pending',
+            });
+
+          if (queueError) {
+            logger.error('CustomersModule', 'Failed to queue RFM update', queueError);
+            return;
+          }
+
+          // Trigger immediate RFM recalculation for this customer
+          const { error: rfmError } = await supabase.rpc('calculate_customer_rfm_profiles', {
+            customer_ids: [customerId],
+          });
+
+          if (rfmError) {
+            logger.error('CustomersModule', 'Failed to calculate RFM', rfmError);
+          } else {
+            logger.info('CustomersModule', 'Customer RFM scores updated successfully', { customerId });
+          }
+        } catch (error) {
+          logger.error('CustomersModule', 'Error updating customer RFM', error);
+        }
+      });
+
+      logger.debug('App', '✅ EventBus listeners registered in Customers module');
+
+      logger.info('App', '✅ Customers module setup complete - Dashboard widget and EventBus configured');
     } catch (error) {
       logger.error('App', '❌ Customers module setup failed', error);
       throw error;

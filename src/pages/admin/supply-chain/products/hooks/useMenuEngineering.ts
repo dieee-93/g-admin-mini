@@ -131,8 +131,13 @@ export const useMenuEngineering = (
           const productData = productSalesMap.get(item.product_id);
           if (productData) {
             productData.unitsSold += item.quantity;
-            // Use line_total if available, otherwise calculate from quantity * unit_price
-            productData.totalRevenue += item.line_total || (item.quantity * item.unit_price);
+            // ✅ PRECISION FIX: Use DecimalUtils for line total calculation
+            const itemRevenue = item.line_total || DecimalUtils.multiply(
+              item.quantity.toString(),
+              item.unit_price.toString(),
+              'financial'
+            ).toNumber();
+            productData.totalRevenue += itemRevenue;
             productData.salesDates.push(new Date(sale.created_at));
           }
         });

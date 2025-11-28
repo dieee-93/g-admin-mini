@@ -1,5 +1,5 @@
 import { Tabs } from '@/shared/ui';
-import { InventoryTabEnhanced } from './InventoryTabEnhanced';
+import { InventoryTab } from './index'; // ✅ Virtual scrolling version (auto-switches at 50+ items)
 import { AnalyticsTabEnhanced } from './AnalyticsTabEnhanced';
 import { ProcurementTab } from './ProcurementTab';
 import { TransfersTab } from './TransfersTab';
@@ -27,6 +27,7 @@ export const MaterialsManagement = memo(function MaterialsManagement({
   // ✅ PERFORMANCE: Stabilize onValueChange callback to prevent TabsContext thrashing
   const handleTabChange = useCallback((details: { value: string }) => {
     onTabChange(details.value);
+MaterialsManagement.displayName = 'MaterialsManagement';
   }, [onTabChange]);
 
   return (
@@ -64,7 +65,7 @@ export const MaterialsManagement = memo(function MaterialsManagement({
       </Tabs.List>
 
       <Tabs.Content value="inventory" padding="md">
-        <InventoryTabEnhanced
+        <InventoryTab
           onStockUpdate={onStockUpdate}
           onBulkAction={onBulkAction}
           onAddMaterial={onAddMaterial}

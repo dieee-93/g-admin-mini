@@ -17,7 +17,7 @@
  * - EventBus integration (13 systems)
  */
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useCallback, memo } from 'react';
 import {
   ContentLayout, Section, Button, Alert, Icon, CollapsibleAlertStack, type AlertItem, Stack, Badge, SkipLink
 } from '@/shared/ui';
@@ -44,9 +44,54 @@ import {
 
 // ✅ HOOKS ESPECIALIZADOS
 import { useMaterialsPage, useRealtimeMaterials } from './hooks';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsStore } from '@/store/materialsStore';
 
 import { logger } from '@/lib/logging';
+
+// 🔧 PERFORMANCE: Move event handlers outside component to prevent recreation on every render
+// These are pure event handlers with no component dependencies, so they can be module-level
+const eventHandlers = {
+  'sales.order_placed': async (data: Record<string, unknown>) => {
+    logger.info('MaterialsStore', '🛒 Sales order placed, reserving stock...', data);
+    // Reserve stock (create pending stock_entries with type='reserved')
+    // In production, this would call inventoryApi.reserveStock()
+    logger.debug('MaterialsStore', '📦 Stock reservation system ready for implementation');
+  },
+
+  'sales.completed': (data: Record<string, unknown>) => {
+    logger.info('MaterialsStore', '✅ Sale completed, converting reservation to deduction...', data);
+    // Auto-reduce stock based on sale
+    // In production: Convert reserved entries to actual deductions
+  },
+
+  'sales.order_cancelled': async (data: Record<string, unknown>) => {
+    logger.info('MaterialsStore', '♻️ Sales order cancelled, releasing stock...', data);
+    // Release reserved stock
+    // In production: Delete reserved stock entries
+  },
+
+  'products.recipe_updated': (data: Record<string, unknown>) => {
+    logger.debug('MaterialsStore', '📝 Recipe updated, recalculating requirements...', data);
+    // Recalculate material requirements
+  },
+
+  'production.order.created': (data: Record<string, unknown>) => {
+    logger.info('MaterialsStore', '🏭 Production order created, reserving materials...', data);
+    // Reserve materials for production
+  },
+
+  'production.order.completed': (data: Record<string, unknown>) => {
+    logger.info('MaterialsStore', '✅ Production completed, updating stock...', data);
+    // Deduct raw materials, add produced goods
+  },
+
+  'materials.procurement.po_received': async (data: Record<string, unknown>) => {
+    logger.info('MaterialsStore', '📦 Purchase order received, auto-updating stock...', data);
+    // Auto-update stock based on purchase order delivery
+    // In production: Call inventoryApi.bulkAdjustStock()
+  }
+} as const;
+
 // ✅ MODULE CONFIGURATION
 const MATERIALS_MODULE_CONFIG = {
   capabilities: ['inventory_tracking', 'supplier_management', 'purchase_orders'],
@@ -66,52 +111,10 @@ const MATERIALS_MODULE_CONFIG = {
       'products.recipe_updated',   // ✅ Existing - Recalculate material requirements
       'production.order.created',  // 🆕 RENAMED from kitchen.item_consumed
       'production.order.completed',// 🆕 NEW - Update stock after production
-      'supplier_orders.received'   // 🆕 NEW - Auto-update stock on delivery
+      'materials.procurement.po_received' // 🆕 NEW - Auto-update stock on delivery
     ]
   },
-  eventHandlers: {
-    'sales.order_placed': async (data: Record<string, unknown>) => {
-      logger.info('MaterialsStore', '🛒 Sales order placed, reserving stock...', data);
-
-      // Reserve stock (create pending stock_entries with type='reserved')
-      // In production, this would call inventoryApi.reserveStock()
-      // For now, just log the intent
-      logger.debug('MaterialsStore', '📦 Stock reservation system ready for implementation');
-    },
-
-    'sales.completed': (data: Record<string, unknown>) => {
-      logger.info('MaterialsStore', '✅ Sale completed, converting reservation to deduction...', data);
-      // Auto-reduce stock based on sale
-      // In production: Convert reserved entries to actual deductions
-    },
-
-    'sales.order_cancelled': async (data: Record<string, unknown>) => {
-      logger.info('MaterialsStore', '♻️ Sales order cancelled, releasing stock...', data);
-      // Release reserved stock
-      // In production: Delete reserved stock entries
-    },
-
-    'products.recipe_updated': (data: Record<string, unknown>) => {
-      logger.debug('MaterialsStore', '📝 Recipe updated, recalculating requirements...', data);
-      // Recalculate material requirements
-    },
-
-    'production.order.created': (data: Record<string, unknown>) => {
-      logger.info('MaterialsStore', '🏭 Production order created, reserving materials...', data);
-      // Reserve materials for production
-    },
-
-    'production.order.completed': (data: Record<string, unknown>) => {
-      logger.info('MaterialsStore', '✅ Production completed, updating stock...', data);
-      // Deduct raw materials, add produced goods
-    },
-
-    'supplier_orders.received': async (data: Record<string, unknown>) => {
-      logger.info('MaterialsStore', '📦 Supplier delivery received, auto-updating stock...', data);
-      // Auto-update stock based on supplier delivery
-      // In production: Call inventoryApi.bulkAdjustStock()
-    }
-  }
+  eventHandlers // Use the module-level handlers
 } as const;
 
 export default function MaterialsPage() {
@@ -142,8 +145,25 @@ export default function MaterialsPage() {
     setActiveTab
   } = useMaterialsPage();
 
-  // ✅ MODAL STATE
-  const { isModalOpen, closeModal } = useMaterials();
+  // ✅ MODAL STATE - Use selective subscription
+  // ✅ FIX: Don't use useMaterials() here - it subscribes to ENTIRE store again!
+  const isModalOpen = useMaterialsStore((state) => state.isModalOpen);
+  const closeModal = useMaterialsStore((state) => state.closeModal);
+
+  // 🔒 Memoize permissions object to prevent breaking child memoization
+  const permissions = useMemo(() => ({
+    canCreate,
+    canUpdate,
+    canDelete,
+    canExport
+  }), [canCreate, canUpdate, canDelete, canExport]);
+
+  const actionsPermissions = useMemo(() => ({
+    canCreate,
+    canUpdate,
+    canExport,
+    canConfigure
+  }), [canCreate, canUpdate, canExport, canConfigure]);
 
   // ✅ REAL-TIME SYNC: Enable Supabase subscriptions for multi-user scenarios
   useRealtimeMaterials({
@@ -153,24 +173,25 @@ export default function MaterialsPage() {
   });
 
   // ✅ EVENTBUS INTEGRATION: Connect MODULE_CONFIG event handlers
+  // 🔧 PERFORMANCE FIX: Handlers are now module-level constants, preventing recreation
   useEffect(() => {
     logger.debug('MaterialsStore', '📡 Subscribing to cross-module events...');
 
     const unsubscribers = [
       // Sales events
-      EventBus.on('sales.order_placed', MATERIALS_MODULE_CONFIG.eventHandlers['sales.order_placed']),
-      EventBus.on('sales.completed', MATERIALS_MODULE_CONFIG.eventHandlers['sales.completed']),
-      EventBus.on('sales.order_cancelled', MATERIALS_MODULE_CONFIG.eventHandlers['sales.order_cancelled']),
+      EventBus.on('sales.order_placed', eventHandlers['sales.order_placed']),
+      EventBus.on('sales.completed', eventHandlers['sales.completed']),
+      EventBus.on('sales.order_cancelled', eventHandlers['sales.order_cancelled']),
 
       // Product/Recipe events
-      EventBus.on('products.recipe_updated', MATERIALS_MODULE_CONFIG.eventHandlers['products.recipe_updated']),
+      EventBus.on('products.recipe_updated', eventHandlers['products.recipe_updated']),
 
       // Production events
-      EventBus.on('production.order.created', MATERIALS_MODULE_CONFIG.eventHandlers['production.order.created']),
-      EventBus.on('production.order.completed', MATERIALS_MODULE_CONFIG.eventHandlers['production.order.completed']),
+      EventBus.on('production.order.created', eventHandlers['production.order.created']),
+      EventBus.on('production.order.completed', eventHandlers['production.order.completed']),
 
-      // Supplier events
-      EventBus.on('supplier_orders.received', MATERIALS_MODULE_CONFIG.eventHandlers['supplier_orders.received'])
+      // Procurement events
+      EventBus.on('materials.procurement.po_received', eventHandlers['materials.procurement.po_received'])
     ];
 
     logger.info('MaterialsStore', `✅ Subscribed to ${unsubscribers.length} cross-module events`);
@@ -179,7 +200,7 @@ export default function MaterialsPage() {
       logger.debug('MaterialsStore', '🔌 Unsubscribing from cross-module events...');
       unsubscribers.forEach(unsub => unsub());
     };
-  }, []);
+  }, []); // Empty deps - handlers are now stable module-level functions
 
   // ✅ ERROR HANDLING
   if (error) {
@@ -293,12 +314,7 @@ export default function MaterialsPage() {
               onAddMaterial={canCreate ? actions.handleOpenAddModal : undefined}
               performanceMode={shouldReduceAnimations}
               // 🔒 Pass permissions to child component for granular control
-              permissions={{
-                canCreate,
-                canUpdate,
-                canDelete,
-                canExport
-              }}
+              permissions={permissions}
             />
           </Section>
         )}
@@ -318,12 +334,7 @@ export default function MaterialsPage() {
               onSyncInventory={canConfigure ? actions.handleSyncInventory : undefined}
               isMobile={isMobile}
               // 🔒 Pass permissions for fine-grained access control
-              permissions={{
-                canCreate,
-                canUpdate,
-                canExport,
-                canConfigure
-              }}
+              permissions={actionsPermissions}
             />
           </Section>
         )}

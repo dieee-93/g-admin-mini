@@ -11,6 +11,7 @@ import {
   type ConversionResult,
   type UnitHelper
 } from '@/pages/admin/supply-chain/materials/types';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 // ============================================================================
 // 🔍 DETECCIÓN DE CATEGORÍA DE UNIDAD
@@ -47,13 +48,30 @@ export function convertUnit(
   }
   
   const conversions = UNIT_CONVERSIONS[fromCategory];
-  
+
+  // ✅ PRECISION FIX: Use DecimalUtils for unit conversions
   // Convertir a unidad base y luego a unidad destino
-  const baseValue = value * conversions[fromUnit as keyof typeof conversions];
-  const convertedValue = baseValue / conversions[toUnit as keyof typeof conversions];
-  const conversionFactor = conversions[fromUnit as keyof typeof conversions] / 
-                          conversions[toUnit as keyof typeof conversions];
-  
+  const fromFactor = conversions[fromUnit as keyof typeof conversions];
+  const toFactor = conversions[toUnit as keyof typeof conversions];
+
+  const baseValue = DecimalUtils.multiply(
+    value.toString(),
+    fromFactor.toString(),
+    'inventory'
+  ).toNumber();
+
+  const convertedValue = DecimalUtils.divide(
+    baseValue.toString(),
+    toFactor.toString(),
+    'inventory'
+  ).toNumber();
+
+  const conversionFactor = DecimalUtils.divide(
+    fromFactor.toString(),
+    toFactor.toString(),
+    'inventory'
+  ).toNumber();
+
   return {
     originalValue: value,
     originalUnit: fromUnit,
@@ -70,17 +88,35 @@ export function convertUnit(
 export function normalizeToBase(value: number, unit: MeasurableUnit): number {
   const category = getUnitCategory(unit);
   if (!category) return value;
-  
+
+  // ✅ PRECISION FIX: Use DecimalUtils for normalization
   const conversions = UNIT_CONVERSIONS[category];
-  return Math.round(value * conversions[unit as keyof typeof conversions]);
+  const factor = conversions[unit as keyof typeof conversions];
+
+  const result = DecimalUtils.multiply(
+    value.toString(),
+    factor.toString(),
+    'inventory'
+  ).toNumber();
+
+  return Math.round(result);
 }
 
 export function denormalizeFromBase(baseValue: number, targetUnit: MeasurableUnit): number {
   const category = getUnitCategory(targetUnit);
   if (!category) return baseValue;
-  
+
+  // ✅ PRECISION FIX: Use DecimalUtils for denormalization
   const conversions = UNIT_CONVERSIONS[category];
-  return Math.round(baseValue / conversions[targetUnit as keyof typeof conversions]);
+  const factor = conversions[targetUnit as keyof typeof conversions];
+
+  const result = DecimalUtils.divide(
+    baseValue.toString(),
+    factor.toString(),
+    'inventory'
+  ).toNumber();
+
+  return Math.round(result);
 }
 
 // ============================================================================

@@ -45,7 +45,8 @@ export { TransferDetailsModal } from './TransferDetailsModal';
 // ============================================
 
 export * from './MaterialsCharts';
-export { default as LazyAnalytics } from './LazyAnalytics';
+// TEMPORALMENTE DESHABILITADO - ABCAnalysisSection tiene imports directos de @chakra-ui/react que causan errores
+// export { default as LazyAnalytics } from './LazyAnalytics';
 
 // ============================================
 // REMOVED (2025-01-16 Gap Analysis Cleanup)

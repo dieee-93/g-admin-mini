@@ -10,18 +10,18 @@
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Stack, Badge, Typography, Icon } from '@/shared/ui';
 import { CubeIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsData } from '../hooks';
 import { DecimalUtils, DECIMAL_CONSTANTS } from '@/business-logic/shared/decimalUtils';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 export const InventoryWidget: React.FC = () => {
-  const { items, loading } = useMaterials();
-  const navigate = useNavigate();
+  const { items, loading } = useMaterialsData();
+  const { navigate } = useNavigationActions();
 
   const handleClick = () => {
-    navigate('/admin/supply-chain/materials');
+    navigate('materials');
   };
 
   // 🎯 OPTIMIZED: Memoize calculations to avoid re-computation on every render

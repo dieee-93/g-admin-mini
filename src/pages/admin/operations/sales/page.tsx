@@ -80,12 +80,12 @@ const SALES_MODULE_CONFIG = {
 } as const;
 
 function SalesPage() {
-  console.log('🚀 [SalesPage] COMPONENT MOUNT - FIRST LINE');
+  logger.info('SalesStore', 'SalesPage component mount');
 
   try {
     logger.debug('SalesStore', '🔍 SalesPage Component rendering');
   } catch (e) {
-    console.error('❌ [SalesPage] Logger failed:', e);
+    logger.error('SalesStore', 'Logger failed', { error: e });
   }
 
   // ✅ SISTEMAS INTEGRATION
@@ -122,7 +122,7 @@ function SalesPage() {
     activeTab,
     setActiveTab
   } = useSalesPage();
-  console.log('✅ [SalesPage] useSalesPage data loaded', { metrics, loading, error });
+  logger.debug('SalesStore', 'useSalesPage data loaded', { metrics, loading, error });
 
   logger.debug('SalesStore', '🔍 SalesPage useSalesPage completed:', {
     hasMetrics: !!metrics,

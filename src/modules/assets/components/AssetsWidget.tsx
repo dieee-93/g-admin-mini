@@ -10,10 +10,10 @@
  */
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography, Icon, Button } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { CubeTransparentIcon } from '@heroicons/react/24/outline';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 interface AssetsStats {
   totalAssets: number;
@@ -22,7 +22,7 @@ interface AssetsStats {
 }
 
 export default function AssetsWidget() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // ✅ MOCK DATA - Replace with actual store when available
   const stats: AssetsStats = useMemo(() => ({
@@ -91,7 +91,7 @@ export default function AssetsWidget() {
             size="sm"
             colorPalette="gray"
             variant="outline"
-            onClick={() => navigate('/admin/operations/assets')}
+            onClick={() => navigate('assets')}
           >
             Ver Activos
           </Button>

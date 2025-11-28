@@ -19,8 +19,8 @@ import type { BusinessCapabilityId } from '@/config/types';
  *
  * Cada tipo se activa según la capability del negocio:
  * - staff_shift: onsite_service, pickup_orders, delivery_shipping
- * - production: production_workflow
- * - appointment: appointment_based
+ * - production: physical_products (production features auto-activate)
+ * - appointment: professional_services (appointment_based auto-activates)
  * - delivery: delivery_shipping
  * - time_off: Todas (gestión de personal)
  * - maintenance: Todas (operaciones)

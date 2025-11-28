@@ -20,12 +20,13 @@ import {
   Table,
   HStack,
   VStack,
+  Icon,
 } from '@/shared/ui';
-import { FiPlus, FiTrash2, FiSave } from 'react-icons/fi';
+import { PlusIcon, TrashIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import type { QuoteFormData } from '../types';
-import { createQuote } from '../services/quotesService';
+import { createQuote, calculateQuoteTotals } from '../services/quotesService';
 import { logger } from '@/lib/logging';
-import Decimal from 'decimal.js';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 interface QuoteBuilderProps {
   customerId?: string;
@@ -91,26 +92,34 @@ export const QuoteBuilder: React.FC<QuoteBuilderProps> = ({
     };
 
     // Recalculate subtotal
+    // ✅ PRECISION FIX: Use DecimalUtils instead of direct Decimal.js
     if (field === 'quantity' || field === 'unit_price') {
       const price = newItems[index].tiered_price || newItems[index].unit_price;
-      newItems[index].subtotal = new Decimal(price)
-        .times(newItems[index].quantity)
-        .toNumber();
+      newItems[index].subtotal = DecimalUtils.multiply(
+        price.toString(),
+        newItems[index].quantity.toString(),
+        'financial'
+      ).toNumber();
     }
 
     setItems(newItems);
   };
 
   // Calculate totals
+  // ✅ PRECISION FIX: Use service layer calculation (quotesService already refactored in Phase 2)
   const calculateTotals = () => {
-    const subtotal = items.reduce((sum, item) => sum.plus(item.subtotal), new Decimal(0));
-    const tax = subtotal.times(0.21); // 21% IVA
-    const total = subtotal.plus(tax);
+    // Use the service layer that already has DecimalUtils implementation
+    const totalsResult = calculateQuoteTotals(items.map(item => ({
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      tiered_price: item.tiered_price,
+    })));
 
     return {
-      subtotal: subtotal.toFixed(2),
-      tax: tax.toFixed(2),
-      total: total.toFixed(2),
+      subtotal: totalsResult.subtotal.toFixed(2),
+      tax: totalsResult.tax.toFixed(2),
+      total: totalsResult.total.toFixed(2),
     };
   };
 
@@ -170,11 +179,11 @@ export const QuoteBuilder: React.FC<QuoteBuilderProps> = ({
         <HStack justify="space-between" mb={4}>
           <Heading size="md">Quote Items</Heading>
           <Button
-            leftIcon={<FiPlus />}
             onClick={addItem}
             size="sm"
             colorScheme="blue"
           >
+            <Icon icon={PlusIcon} size="sm" />
             Add Item
           </Button>
         </HStack>
@@ -235,7 +244,7 @@ export const QuoteBuilder: React.FC<QuoteBuilderProps> = ({
                       variant="ghost"
                       onClick={() => removeItem(index)}
                     >
-                      <FiTrash2 />
+                      <Icon icon={TrashIcon} size="sm" />
                     </IconButton>
                   </Table.Cell>
                 </Table.Row>
@@ -303,12 +312,12 @@ export const QuoteBuilder: React.FC<QuoteBuilderProps> = ({
           </Button>
         )}
         <Button
-          leftIcon={<FiSave />}
           colorScheme="blue"
           onClick={handleSubmit}
           loading={loading}
           disabled={items.length === 0 || !customerId}
         >
+          <Icon icon={DocumentArrowDownIcon} size="sm" />
           Create Quote
         </Button>
       </HStack>

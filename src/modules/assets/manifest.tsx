@@ -18,6 +18,8 @@ export const assetsManifest: ModuleManifest = {
   name: 'Asset Management',
   version: '1.0.0',
 
+  permissionModule: 'operations', // ✅ Uses 'operations' permission
+
   depends: [], // Standalone module
   autoInstall: true, // Always available
 
@@ -29,9 +31,12 @@ export const assetsManifest: ModuleManifest = {
 
   hooks: {
     provide: [
-      'assets.status_updated',       // Asset status changes
-      'assets.maintenance_due',      // Maintenance alerts
-      'dashboard.widgets',           // Asset health widgets
+      'assets.status_updated',       // Event: Asset status changes
+      'assets.maintenance_due',      // Event: Maintenance alerts
+      'dashboard.widgets',           // Hook: Asset health widgets
+      'assets.row.actions',          // Hook: Buttons in asset grid
+      'assets.form.fields',          // Hook: Fields in asset form
+      'assets.detail.sections',      // Hook: Sections in asset detail
     ],
     consume: [
       'rentals.asset_rented',        // Track rental usage

@@ -54,17 +54,94 @@ import type {
   CreateCustomerAddressData,
   UpdateCustomerAddressData,
 } from '../types/customerAddress';
+import type { AuthUser } from '@/contexts/AuthContext';
+
+// ===== SECURITY HELPERS =====
+
+/**
+ * Validates UUID format to prevent injection attacks
+ */
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
+/**
+ * Permission check helper - verifies user can access customer addresses
+ */
+function requirePermission(user: AuthUser, action: 'read' | 'create' | 'update' | 'delete') {
+  if (!user) {
+    throw new Error(`Authentication required for ${action} on customer addresses`);
+  }
+
+  const role = user.role || 'OPERADOR';
+
+  const canPerform = (action: string, role: string): boolean => {
+    if (role === 'ADMINISTRADOR') return true;
+    if (role === 'SUPERVISOR' && ['read', 'create', 'update'].includes(action)) return true;
+    if (role === 'OPERADOR' && ['read'].includes(action)) return true;
+    return false;
+  };
+
+  if (!canPerform(action, role)) {
+    throw new Error(`Insufficient permissions: ${role} cannot ${action} customer addresses`);
+  }
+}
+
+/**
+ * Audit log for address access (GDPR compliance)
+ */
+async function auditAddressAccess(
+  userId: string,
+  customerId: string,
+  action: string,
+  addressId?: string
+): Promise<void> {
+  try {
+    await supabase.from('customer_update_log').insert({
+      customer_id: customerId,
+      updated_by: userId,
+      update_type: `address_${action}`,
+      changes: addressId ? { address_id: addressId } : {},
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.warn('customerAddressesApi', 'Failed to log audit trail', error);
+    // Non-critical, don't throw
+  }
+}
+
+/**
+ * Masks sensitive data for logging
+ */
+function maskSensitiveData(address: Partial<CustomerAddress>): Record<string, unknown> {
+  return {
+    id: address.id,
+    customer_id: address.customer_id,
+    street: address.street?.substring(0, 10) + '***',
+    coordinates_present: !!(address.latitude && address.longitude),
+    has_instructions: !!address.delivery_instructions,
+  };
+}
 
 // ===== FETCH =====
 
 export async function getCustomerAddresses(
-  customerId: string
+  customerId: string,
+  user: AuthUser
 ): Promise<CustomerAddress[]> {
-  // TODO: SECURITY - Add permission check: verify current user can access this customer's data
-  // TODO: SECURITY - Validate customerId format (UUID) to prevent injection
-  // TODO: SECURITY - Add audit log: who accessed which customer's addresses
+  // ✅ SECURITY: Permission check
+  requirePermission(user, 'read');
+
+  // ✅ SECURITY: Validate UUID format
+  if (!isValidUUID(customerId)) {
+    throw new Error('Invalid customer ID format');
+  }
 
   try {
+    // ✅ SECURITY: Audit log
+    await auditAddressAccess(user.id, customerId, 'read');
+
     const { data, error } = await supabase
       .from('customer_addresses')
       .select('*')
@@ -74,10 +151,20 @@ export async function getCustomerAddresses(
 
     if (error) throw error;
 
-    // TODO: SECURITY - Mask sensitive data in logs (coordinates, delivery_instructions)
+    // ✅ SECURITY: Masked logging
+    logger.debug('customerAddressesApi', 'Addresses fetched', {
+      count: data?.length || 0,
+      customer_id: customerId,
+      accessed_by: user.email,
+    });
+
     return data || [];
   } catch (error) {
-    logger.error('customerAddressesApi', 'Error fetching addresses', error);
+    logger.error('customerAddressesApi', 'Error fetching addresses', {
+      customer_id: maskSensitiveData({ customer_id: customerId }),
+      user: user.email,
+      error,
+    });
     throw error;
   }
 }
@@ -122,8 +209,29 @@ export async function getAddressById(
 // ===== CREATE =====
 
 export async function createCustomerAddress(
-  addressData: CreateCustomerAddressData
+  addressData: CreateCustomerAddressData,
+  user: AuthUser
 ): Promise<CustomerAddress> {
+  // ✅ SECURITY: Permission check
+  requirePermission(user, 'create');
+
+  // ✅ SECURITY: Validate customer ID
+  if (!isValidUUID(addressData.customer_id)) {
+    throw new Error('Invalid customer ID format');
+  }
+
+  // ✅ SECURITY: Validate coordinates if provided
+  if (addressData.latitude !== null && addressData.latitude !== undefined) {
+    if (addressData.latitude < -90 || addressData.latitude > 90) {
+      throw new Error('Invalid latitude: must be between -90 and 90');
+    }
+  }
+  if (addressData.longitude !== null && addressData.longitude !== undefined) {
+    if (addressData.longitude < -180 || addressData.longitude > 180) {
+      throw new Error('Invalid longitude: must be between -180 and 180');
+    }
+  }
+
   try {
     // If this is set as default, unset other defaults first
     if (addressData.is_default) {
@@ -138,10 +246,20 @@ export async function createCustomerAddress(
 
     if (error) throw error;
 
-    logger.info('customerAddressesApi', 'Address created', { id: data.id });
+    // ✅ SECURITY: Audit log
+    await auditAddressAccess(user.id, addressData.customer_id, 'create', data.id);
+
+    logger.info('customerAddressesApi', 'Address created', {
+      address: maskSensitiveData(data),
+      created_by: user.email,
+    });
     return data;
   } catch (error) {
-    logger.error('customerAddressesApi', 'Error creating address', error);
+    logger.error('customerAddressesApi', 'Error creating address', {
+      customer_id: addressData.customer_id,
+      user: user.email,
+      error,
+    });
     throw error;
   }
 }
@@ -198,9 +316,24 @@ export async function incrementAddressUsage(
 // ===== DELETE =====
 
 export async function deleteCustomerAddress(
-  addressId: string
+  addressId: string,
+  user: AuthUser
 ): Promise<void> {
+  // ✅ SECURITY: Permission check
+  requirePermission(user, 'delete');
+
+  // ✅ SECURITY: Validate address ID
+  if (!isValidUUID(addressId)) {
+    throw new Error('Invalid address ID format');
+  }
+
   try {
+    // Get address first to log customer_id
+    const address = await getAddressById(addressId);
+    if (!address) {
+      throw new Error('Address not found');
+    }
+
     const { error } = await supabase
       .from('customer_addresses')
       .delete()
@@ -208,9 +341,19 @@ export async function deleteCustomerAddress(
 
     if (error) throw error;
 
-    logger.info('customerAddressesApi', 'Address deleted', { id: addressId });
+    // ✅ SECURITY: Audit log
+    await auditAddressAccess(user.id, address.customer_id, 'delete', addressId);
+
+    logger.info('customerAddressesApi', 'Address deleted', {
+      id: addressId,
+      deleted_by: user.email,
+    });
   } catch (error) {
-    logger.error('customerAddressesApi', 'Error deleting address', error);
+    logger.error('customerAddressesApi', 'Error deleting address', {
+      address_id: addressId,
+      user: user.email,
+      error,
+    });
     throw error;
   }
 }

@@ -3,7 +3,7 @@
 // ============================================
 // Service for retrieving and analyzing supplier historical data
 
-import type { SupplierOrderWithDetails } from '@/pages/admin/supply-chain/supplier-orders/types';
+import type { SupplierOrderWithDetails } from '@/pages/admin/supply-chain/materials/procurement/types';
 import { logger } from '@/lib/logging';
 
 export interface SupplierHistoryMetrics {

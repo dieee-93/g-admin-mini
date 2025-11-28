@@ -2,7 +2,7 @@
 // 🎯 COMPONENTE BASE UNIFICADO PARA MOSTRAR ALERTAS
 // Reemplaza AlertCard y otros componentes similares
 
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Alert,
   VStack,
@@ -35,6 +35,7 @@ export interface AlertDisplayProps {
   size?: 'sm' | 'md' | 'lg';
   showActions?: boolean;
   showMetadata?: boolean;
+  progress?: number;  // 0-100, para progress bar de auto-dismiss
   onAcknowledge?: (id: string) => void;
   onResolve?: (id: string, notes?: string) => void;
   onDismiss?: (id: string) => void;
@@ -48,7 +49,10 @@ const severityColorMap: Record<AlertSeverity, string> = {
   high: 'orange', 
   medium: 'yellow',
   low: 'blue',
-  info: 'gray'
+  info: 'gray',
+  success: 'green',
+  warning: 'orange',
+  error: 'red'
 };
 
 // Mapeo de severidades a iconos
@@ -57,7 +61,10 @@ const severityIconMap: Record<AlertSeverity, React.ComponentType<any>> = {
   high: ExclamationTriangleIcon,
   medium: ShieldExclamationIcon,
   low: InformationCircleIcon,
-  info: InformationCircleIcon
+  info: InformationCircleIcon,
+  success: CheckCircleIcon,
+  warning: ExclamationTriangleIcon,
+  error: FireIcon
 };
 
 // Mapeo de tipos a iconos
@@ -75,15 +82,44 @@ const statusTextMap = {
   active: 'Activa',
   acknowledged: 'Reconocida', 
   resolved: 'Resuelta',
-  dismissed: 'Descartada'
+  dismissed: 'Descartada',
+  snoozed: 'Pospuesta'
 };
 
-export function AlertDisplay({
+// Mapeo de severidades a texto en español
+const severityLabelMap: Record<AlertSeverity, string> = {
+  critical: 'Crítica',
+  high: 'Alta',
+  medium: 'Media',
+  low: 'Baja',
+  info: 'Información',
+  success: 'Éxito',
+  warning: 'Advertencia',
+  error: 'Error'
+};
+
+// Helper: Formato de tiempo relativo
+const getRelativeTime = (date: Date): string => {
+  const now = Date.now();
+  const diff = now - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  
+  if (minutes < 1) return 'Ahora';
+  if (minutes < 60) return `Hace ${minutes}m`;
+  if (hours < 24) return `Hace ${hours}h`;
+  return `Hace ${days}d`;
+};
+
+// 🛠️ PERFORMANCE: Memoize component to prevent unnecessary re-renders
+export const AlertDisplay = memo(function AlertDisplay({
   alert,
   variant = 'card',
   size = 'md',
   showActions = true,
   showMetadata = true,
+  progress,
   onAcknowledge,
   onResolve,
   onDismiss,
@@ -92,7 +128,7 @@ export function AlertDisplay({
 }: AlertDisplayProps) {
   const severityColor = severityColorMap[alert.severity];
   const SeverityIcon = severityIconMap[alert.severity];
-  const TypeIcon = typeIconMap[alert.type];
+  const TypeIcon = alert.type ? typeIconMap[alert.type] : undefined;
 
   // Helper para formatear tiempo relativo
   const getRelativeTime = (date: Date) => {
@@ -249,6 +285,31 @@ export function AlertDisplay({
     ) : null;
   };
 
+  // 🎯 NEW: Render progress bar para auto-dismiss
+  const renderProgressBar = () => {
+    if (!progress || alert.status !== 'active') return null;
+    
+    return (
+      <Box
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        h="2px"
+        bg="gray.200"
+        overflow="hidden"
+        borderBottomRadius="inherit"
+      >
+        <Box
+          h="full"
+          bg={`${severityColor}.500`}
+          w={`${progress}%`}
+          transition="width 0.1s linear"
+        />
+      </Box>
+    );
+  };
+
   // Variants de renderizado
   if (variant === 'minimal') {
     return (
@@ -257,8 +318,11 @@ export function AlertDisplay({
         <Text fontSize="sm" fontWeight="medium" flex="1">
           {alert.title}
         </Text>
-        <Badge colorPalette={severityColor} size="xs">
-          {statusTextMap[alert.status]}
+        <Badge colorPalette={severityColor} size="xs" variant="solid">
+          {severityLabelMap[alert.severity]}
+        </Badge>
+        <Badge colorPalette="gray" size="xs" variant="subtle">
+          {getRelativeTime(alert.createdAt)}
         </Badge>
       </HStack>
     );
@@ -303,15 +367,20 @@ export function AlertDisplay({
           <HStack gap="3" align="start" flex="1">
             <Icon icon={SeverityIcon} size="md" color={`var(--chakra-colors-${severityColor}-500)`} style={{marginTop: '2px'}} />
             <VStack align="start" gap="1" flex="1">
-              <HStack gap="2" align="center">
+              <HStack gap="2" align="center" flexWrap="wrap">
                 <Text fontWeight="medium" fontSize="sm">
                   {alert.title}
                 </Text>
-                <Badge colorPalette={severityColor} size="xs">
-                  {alert.severity === 'critical' ? 'Crítica' :
-                   alert.severity === 'high' ? 'Alta' :
-                   alert.severity === 'medium' ? 'Media' :
-                   alert.severity === 'low' ? 'Baja' : 'Info'}
+                <Badge colorPalette={severityColor} size="xs" variant="solid">
+                  {severityLabelMap[alert.severity]}
+                </Badge>
+                {alert.context && (
+                  <Badge colorPalette="gray" size="xs" variant="outline">
+                    {alert.context}
+                  </Badge>
+                )}
+                <Badge colorPalette="gray" size="xs" variant="subtle">
+                  {getRelativeTime(alert.createdAt)}
                 </Badge>
               </HStack>
               
@@ -338,7 +407,13 @@ export function AlertDisplay({
 
   // Default: card variant
   return (
-    <CardWrapper size={size} variant="outline" borderColor={`${severityColor}.200`}>
+    <CardWrapper 
+      size={size} 
+      variant="outline" 
+      borderColor={`${severityColor}.200`}
+      position="relative"  // 🎯 NEW: For absolute positioning of progress bar
+      overflow="hidden"     // 🎯 NEW: Clip progress bar to card bounds
+    >
       <CardWrapper.Body>
         <VStack align="stretch" gap="3">
           {/* Header */}
@@ -354,18 +429,25 @@ export function AlertDisplay({
                     {alert.title}
                   </Text>
                   
-                  <Badge colorPalette={severityColor} size="xs">
-                    {alert.severity === 'critical' ? 'Crítica' :
-                     alert.severity === 'high' ? 'Alta' :
-                     alert.severity === 'medium' ? 'Media' :
-                     alert.severity === 'low' ? 'Baja' : 'Info'}
+                  <Badge colorPalette={severityColor} size="xs" variant="solid">
+                    {severityLabelMap[alert.severity]}
                   </Badge>
                   
+                  {alert.context && (
+                    <Badge colorPalette="gray" size="xs" variant="outline">
+                      {alert.context}
+                    </Badge>
+                  )}
+                  
                   {alert.isRecurring && (
-                    <Badge colorPalette="purple" size="xs">
+                    <Badge colorPalette="purple" size="xs" variant="solid">
                       Recurrente ({alert.occurrenceCount})
                     </Badge>
                   )}
+                  
+                  <Badge colorPalette="gray" size="xs" variant="subtle">
+                    {getRelativeTime(alert.createdAt)}
+                  </Badge>
                 </HStack>
 
                 {alert.description && (
@@ -381,7 +463,7 @@ export function AlertDisplay({
                 {getRelativeTime(alert.createdAt)}
               </Text>
               <HStack gap="1">
-                <Icon icon={TypeIcon} size="sm" color="gray.400" />
+                {TypeIcon && <Icon icon={TypeIcon} size="sm" color="gray.400" />}
                 <Text fontSize="xs" color="gray.500" textTransform="capitalize">
                   {alert.context}
                 </Text>
@@ -396,6 +478,9 @@ export function AlertDisplay({
           {renderActions()}
         </VStack>
       </CardWrapper.Body>
+      
+      {/* 🎯 NEW: Progress bar for auto-dismiss */}
+      {renderProgressBar()}
     </CardWrapper>
   );
-}
+}); // End memo

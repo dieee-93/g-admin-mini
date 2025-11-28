@@ -12,16 +12,30 @@
  * UBICACIÓN: Montar en App.tsx dentro de AuthProvider
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useCapabilityStore } from '@/store/capabilityStore';
 import { logger } from '@/lib/logging';
+
+// ⚠️ Flag global para evitar sync duplicado
+// (porque CapabilitySync está dentro de AuthProvider que re-renderiza)
+let syncCompleted = false;
 
 export function CapabilitySync() {
   const loadFromDB = useCapabilityStore(state => state.loadFromDB);
   const profile = useCapabilityStore(state => state.profile);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const syncAttempted = useRef(false);
 
   useEffect(() => {
+    // ⚠️ PREVENIR MÚLTIPLES SYNC
+    // Si ya se completó el sync O ya intentamos en este componente, salir
+    if (syncCompleted || syncAttempted.current) {
+      logger.info('CapabilitySync', '⏭️ Sync already completed, skipping');
+      return;
+    }
+
+    syncAttempted.current = true;
+
     async function syncCapabilities() {
       setSyncStatus('loading');
 
@@ -38,9 +52,13 @@ export function CapabilitySync() {
           logger.info('CapabilitySync', '📭 No DB profile, using localStorage');
           setSyncStatus('success');
         }
+
+        // Marcar como completado globalmente
+        syncCompleted = true;
       } catch (error) {
         logger.error('CapabilitySync', '❌ Sync error, falling back to localStorage', { error });
         setSyncStatus('error');
+        syncCompleted = true; // Evitar reintentos infinitos
       }
     }
 
@@ -53,7 +71,7 @@ export function CapabilitySync() {
     if (syncStatus === 'success' && profile) {
       logger.info('CapabilitySync', '✅ Capability sync completed', {
         businessName: profile.businessName || 'Not set',
-        activities: profile.selectedActivities?.length || 0,
+        capabilities: profile.selectedCapabilities?.length || 0,
         infrastructure: profile.selectedInfrastructure?.length || 0,
         setupCompleted: profile.setupCompleted
       });
@@ -62,4 +80,12 @@ export function CapabilitySync() {
 
   // Este componente no renderiza nada (solo lógica)
   return null;
+}
+
+/**
+ * Reset sync flag (para testing o forzar re-sync)
+ */
+export function resetCapabilitySyncFlag() {
+  syncCompleted = false;
+  logger.info('CapabilitySync', '🔄 Sync flag reset');
 }

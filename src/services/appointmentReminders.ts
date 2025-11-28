@@ -168,14 +168,16 @@ class AppointmentReminderService {
       }
 
       if (!appointments || appointments.length === 0) {
-        console.log(
-          `[AppointmentReminders] No reminders for ${rule.hours_before}h rule`
+        logger.debug(
+          'appointmentReminders',
+          `No reminders for ${rule.hours_before}h rule`
         );
         return;
       }
 
-      console.log(
-        `[AppointmentReminders] Sending ${appointments.length} reminders (${rule.hours_before}h before)`
+      logger.info(
+        'appointmentReminders',
+        `Sending ${appointments.length} reminders (${rule.hours_before}h before)`
       );
 
       for (const appointment of appointments as unknown as AppointmentWithRelations[]) {
@@ -223,8 +225,9 @@ class AppointmentReminderService {
           rescheduleLink: `${window.location.origin}/app/appointments/${appointment.id}/reschedule`,
         });
 
-        console.log(
-          `[AppointmentReminders] ✓ Email sent to ${customer.email} for appointment ${appointment.id}`
+        logger.info(
+          'API',
+          `Email sent to ${customer.email} for appointment ${appointment.id}`
         );
       }
 
@@ -257,13 +260,15 @@ class AppointmentReminderService {
         .eq('id', appointment.id);
 
       if (updateError) {
-        console.error(
-          `[AppointmentReminders] Failed to update ${rule.column_name}:`,
-          updateError
+        logger.error(
+          'API',
+          `Failed to update ${rule.column_name}`,
+          { error: updateError }
         );
       } else {
-        console.log(
-          `[AppointmentReminders] ✓ Marked ${rule.column_name} for appointment ${appointment.id}`
+        logger.debug(
+          'API',
+          `Marked ${rule.column_name} for appointment ${appointment.id}`
         );
       }
 
@@ -276,13 +281,15 @@ class AppointmentReminderService {
         timestamp: new Date().toISOString(),
       });
 
-      console.log(
-        `[AppointmentReminders] ✅ Sent reminder for appointment ${appointment.id} (${rule.hours_before}h before)`
+      logger.info(
+        'API',
+        `Sent reminder for appointment ${appointment.id} (${rule.hours_before}h before)`
       );
     } catch (error) {
-      console.error(
-        `[AppointmentReminders] Failed to send reminder for ${appointment.id}:`,
-        error
+      logger.error(
+        'API',
+        `Failed to send reminder for ${appointment.id}`,
+        { error }
       );
 
       // Emit error event

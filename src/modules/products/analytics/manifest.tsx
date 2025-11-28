@@ -22,6 +22,7 @@ import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
 import { logger } from '@/lib/logging';
 import { Tabs, Section } from '@/shared/ui';
+import { ChartBarIcon } from '@heroicons/react/24/outline';
 
 // Lazy load heavy analytics components
 const MenuEngineeringMatrix = lazy(() =>
@@ -48,6 +49,8 @@ export const productsAnalyticsManifest: ModuleManifest = {
   id: 'products-analytics',
   name: 'Products Analytics',
   version: '1.0.0',
+
+  permissionModule: 'products', // ✅ Uses 'products' permission (analytics submodule)
 
   // ============================================
   // DEPENDENCIES
@@ -255,11 +258,12 @@ export const productsAnalyticsManifest: ModuleManifest = {
     navigation: {
       // No separate route - integrates into Products page via hooks
       route: null,
-      icon: null,
+      icon: ChartBarIcon,
       color: 'orange',
       domain: 'supply-chain',
       isExpandable: false
-    }
+    },
+    
   }
 };
 

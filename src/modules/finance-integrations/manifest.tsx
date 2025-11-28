@@ -17,6 +17,8 @@ export const financeIntegrationsManifest: ModuleManifest = {
   name: 'Finance Integrations',
   version: '2.0.0',
 
+  permissionModule: 'billing', // ✅ Uses 'billing' permission
+
   depends: ['finance-fiscal', 'finance-billing'], // Integrations work with fiscal/billing data
   autoInstall: true, // Auto-activate when dependencies active
 

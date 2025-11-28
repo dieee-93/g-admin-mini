@@ -31,6 +31,8 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
   name: 'Fulfillment - Delivery Orders',
   version: '1.0.0',
 
+  permissionModule: 'operations', // ✅ Uses 'operations' permission
+
   // ============================================
   // DEPENDENCIES
   // ============================================

@@ -8,8 +8,11 @@
  * - TTL (Time To Live) per entry
  * - Maximum cache size with LRU eviction
  * - Cache key generation from request params
+ * - Pattern-based invalidation
  * - Manual invalidation support
  * - Cache statistics tracking
+ *
+ * Architecture Note: Single cache instance shared across all API functions.
  */
 
 import { logger } from '@/lib/logging';
@@ -349,7 +352,7 @@ function generateCacheKey(
  *   'materials:all',
  *   async () => {
  *     // This only runs on cache miss
- *     const { data } = await supabase.from('items').select('*');
+ *     const { data } = await supabase.from('materials').select('*');
  *     return data;
  *   },
  *   3 * 60 * 1000 // 3 minutes
@@ -368,12 +371,23 @@ async function withCache<T>(
   }
 
   // Cache miss - execute operation
-  const result = await operation();
+  try {
+    const result = await operation();
 
-  // Store in cache
-  materialsCache.set(cacheKey, result, ttl);
+    // Store in cache
+    materialsCache.set(cacheKey, result, ttl);
 
-  return result;
+    return result;
+  } catch (error) {
+    logger.error('CacheService', 'withCache operation failed:', {
+      cacheKey,
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorStack: error instanceof Error ? error.stack : undefined,
+      rawError: error
+    });
+    throw error;
+  }
 }
 
 // ============================================

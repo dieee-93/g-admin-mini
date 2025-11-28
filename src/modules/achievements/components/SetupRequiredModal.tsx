@@ -18,7 +18,6 @@
  * @version 1.0.0
  */
 
-import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   VStack,
@@ -28,6 +27,7 @@ import {
   Button,
   Box
 } from '@/shared/ui';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 import type { Achievement, ValidationResult } from '../types';
 import { RequirementRow } from './CapabilityProgressCard';
 
@@ -68,7 +68,7 @@ export default function SetupRequiredModal({
   title = 'Configuración Requerida',
   message
 }: SetupRequiredModalProps) {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   if (!validationResult?.missingRequirements) {
     return null; // No mostrar modal si no hay requirements faltantes
@@ -86,7 +86,7 @@ export default function SetupRequiredModal({
     <Dialog.Root open={open} onOpenChange={({ open }) => !open && onClose()}>
       <Dialog.Backdrop />
       <Dialog.Positioner>
-        <Dialog.Content maxW="600px">
+        <Dialog.Content maxW="600px" data-testid="requirements-modal">
           <Dialog.Header>
             <VStack align="start" gap="2" w="full">
               <HStack gap="3">
@@ -147,10 +147,10 @@ export default function SetupRequiredModal({
               {/* Missing Requirements List */}
               <VStack w="full" gap="3">
                 <HStack justify="space-between" w="full">
-                  <Text fontSize="sm" fontWeight="medium" color="gray.700" _dark={{ color: 'gray.300' }}>
+                  <Text fontSize="sm" fontWeight="medium" color="gray.700" _dark={{ color: 'gray.300' }} data-testid="missing-count">
                     Pasos Pendientes ({totalMissing})
                   </Text>
-                  <Text fontSize="xs" color="gray.600" _dark={{ color: 'gray.400' }}>
+                  <Text fontSize="xs" color="gray.600" _dark={{ color: 'gray.400' }} data-testid="total-estimated-time">
                     Tiempo estimado: {calculateTotalTime(missingRequirements)} min
                   </Text>
                 </HStack>
@@ -208,7 +208,7 @@ export default function SetupRequiredModal({
               <Button
                 colorPalette="orange"
                 onClick={() => {
-                  navigate('/admin/gamification/achievements');
+                  navigate('gamification', '/achievements');
                   onClose();
                 }}
               >

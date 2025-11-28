@@ -305,13 +305,16 @@ export function PerformanceProvider({ children }: { children: React.ReactNode })
     return () => clearInterval(interval);
   }, []);
 
-  const contextValue: PerformanceContextType = {
+  // 🚀 PERFORMANCE FIX: Memoize context value
+  // React.dev Rule: "wrap the object creation into useMemo"
+  // Without this: IRONY - performance context causes performance issues!
+  const contextValue = useMemo<PerformanceContextType>(() => ({
     metrics,
     startMeasurement,
     endMeasurement,
     recordRender,
     getComponentStats
-  };
+  }), [metrics, startMeasurement, endMeasurement, recordRender, getComponentStats]);
 
   return (
     <PerformanceContext.Provider value={contextValue}>

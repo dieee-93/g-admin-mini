@@ -10,10 +10,10 @@
  */
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography, Icon, Button } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { CreditCardIcon } from '@heroicons/react/24/outline';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 interface BillingStats {
   pendingInvoices: number;
@@ -22,7 +22,7 @@ interface BillingStats {
 }
 
 export default function BillingWidget() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // ✅ MOCK DATA - Replace with actual store when available
   const stats: BillingStats = useMemo(() => ({
@@ -91,7 +91,7 @@ export default function BillingWidget() {
             size="sm"
             colorPalette="green"
             variant="outline"
-            onClick={() => navigate('/admin/finance/billing')}
+            onClick={() => navigate('billing')}
           >
             Ver Facturación
           </Button>

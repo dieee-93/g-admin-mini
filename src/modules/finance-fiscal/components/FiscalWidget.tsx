@@ -10,12 +10,12 @@
  */
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography, Icon, Button } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { ReceiptPercentIcon } from '@heroicons/react/24/outline';
 import { useShallow } from 'zustand/react/shallow';
 import { useFiscalStore } from '@/store/fiscalStore';
+import { useNavigationActions } from '@/contexts/NavigationContext';
 
 interface FiscalStats {
   pendingInvoices: number;
@@ -24,7 +24,7 @@ interface FiscalStats {
 }
 
 export default function FiscalWidget() {
-  const navigate = useNavigate();
+  const { navigate } = useNavigationActions();
 
   // ✅ Usar useShallow de Zustand v5 para evitar loop infinito
   const { isLoading } = useFiscalStore(useShallow(state => ({
@@ -104,7 +104,7 @@ export default function FiscalWidget() {
             size="sm"
             colorPalette="teal"
             variant="outline"
-            onClick={() => navigate('/admin/finance/fiscal')}
+            onClick={() => navigate('fiscal')}
           >
             Ver Fiscal
           </Button>

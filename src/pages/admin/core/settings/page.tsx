@@ -1,28 +1,14 @@
-/**
- * Settings Page - System Configuration & Business Setup
- *
- * SEMANTIC v3.0 - WCAG AA Compliant:
- * ✅ Skip link for keyboard navigation (WCAG 2.4.1 Level A)
- * ✅ Semantic main content wrapper with ARIA label
- * ✅ Proper section headings for screen readers
- * ✅ ARIA live region for auto-save status
- * ✅ 3-Layer Architecture (Semantic → Layout → Primitives)
- *
- * FEATURES:
- * - Auto-save with visual feedback
- * - Searchable settings
- * - Form sections with semantic structure
- */
-
+// ⚙️ PATRÓN DE CONFIGURACIÓN G-ADMIN - Migrado a v2.1
+// Siguiendo PLANTILLA: "Módulo de Configuración" desde G_ADMIN_PAGE_CONSTRUCTION_GUIDE.md
 import {
-  ContentLayout, Section, FormSection, Alert, Stack, Button, HStack, Icon, Spinner, Typography, SkipLink
+  ContentLayout, Section, FormSection, Alert, Stack, Button, HStack, Icon
 } from '@/shared/ui';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { CogIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
 import { useSettingsPage } from './hooks';
 
 // Components de configuración
-import {
+import { 
   BusinessProfileSection,
   TaxConfigurationSection,
   UserPermissionsSection,
@@ -32,60 +18,18 @@ import { SettingsSearch } from './components/SettingsSearch';
 import { AutoSaveIndicator, AutoSaveStatusBadge } from './components/AutoSaveIndicator';
 
 export default function SettingsPage() {
-  const { isLoading, error, isDirty, handlers, isSearchOpen, autoSave } = useSettingsPage();
+  const { isLoading, error, isDirty, metrics, handlers, icons, isSearchOpen, autoSave, settingsData } = useSettingsPage();
 
-  if (isLoading) {
-    return (
-      <>
-        <SkipLink />
-        <ContentLayout spacing="normal" mainLabel="System Configuration">
-          <Section variant="flat" title="Configuración del Sistema" semanticHeading="System Settings Loading">
-            <Stack gap="6" py="16" align="center">
-              <Spinner size="xl" colorPalette="blue" />
-              <Stack gap="2" align="center">
-                <Typography fontSize="lg" fontWeight="medium">Cargando configuración...</Typography>
-                <Typography fontSize="sm" color="gray.400">
-                  Esto puede tomar unos segundos
-                </Typography>
-              </Stack>
-            </Stack>
-          </Section>
-        </ContentLayout>
-      </>
-    );
-  }
-
+  if (isLoading) return <div>Cargando configuración...</div>;
   if (error) {
     ModuleEventUtils.system.moduleError("settings", error);
-    return (
-      <>
-        <SkipLink />
-        <ContentLayout spacing="normal" mainLabel="System Configuration Error">
-          <Alert status="error" title="Error de configuración">
-            {error}
-          </Alert>
-          <Button onClick={handlers.handleRetry} mt="4" colorPalette="blue">Reintentar</Button>
-        </ContentLayout>
-      </>
-    );
+    return <Alert variant="subtle" title="Error de configuración">{error}</Alert>;
   }
 
   return (
-    <>
-      {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
-      <SkipLink />
-
-      {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
-      <ContentLayout spacing="normal" mainLabel="System Configuration">
-        <Stack gap="6">
-          {/* ✅ SETTINGS SECTION - Main configuration area with ARIA live for auto-save */}
-          <Section
-            variant="flat"
-            title="Configuración del Sistema"
-            semanticHeading="System Configuration Dashboard"
-            live="polite"
-            relevant="additions removals"
-          >
+    <ContentLayout spacing="normal">
+      <Stack gap="6">
+        <Section variant="flat" title="Configuración del Sistema">
           {/* 🔍 Barra de búsqueda y estado de auto-save */}
           <HStack justify="space-between" mb="6">
             <Button
@@ -169,16 +113,14 @@ export default function SettingsPage() {
               </Button>
             </HStack>
           </Stack>
-          </Section>
-        </Stack>
+        </Section>
+      </Stack>
 
-        {/* 🔍 Componente de búsqueda */}
-        <SettingsSearch
-          isOpen={isSearchOpen}
-          onClose={handlers.closeSearch}
-        />
-
-      </ContentLayout>
-    </>
+      {/* 🔍 Componente de búsqueda */}
+      <SettingsSearch 
+        isOpen={isSearchOpen} 
+        onClose={handlers.closeSearch} 
+      />
+    </ContentLayout>
   );
 }

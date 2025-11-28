@@ -6,11 +6,11 @@ import {
   CalendarIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { useMaterials } from '@/store/materialsStore';
+import { useMaterialsComputed } from '../../hooks/useMaterialsComputed';
 import { formatCurrency } from '@/business-logic/shared/decimalUtils';
 
 export function ProcurementTab() {
-  const { getFilteredItems } = useMaterials();
+  const { getFilteredItems } = useMaterialsComputed();
   const materials = getFilteredItems();
 
   // Generate procurement recommendations

@@ -255,6 +255,7 @@ export const FilterDrawer = memo(function FilterDrawer({
                 colorPalette="blue"
                 onClick={() => {
                   onApply();
+FilterDrawer.displayName = 'FilterDrawer';
                   onClose();
                 }}
               >

@@ -39,6 +39,8 @@ export const suppliersManifest: ModuleManifest = {
   name: 'Supplier Management',
   version: '1.0.0',
 
+  permissionModule: 'materials', // ✅ Uses 'materials' permission (supplier management)
+
   // ============================================
   // DEPENDENCIES
   // ============================================

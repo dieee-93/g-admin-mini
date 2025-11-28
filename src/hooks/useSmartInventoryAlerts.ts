@@ -14,27 +14,57 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { useAlerts } from '@/shared/alerts';
+import { useAlertsActions } from '@/shared/alerts';
 import { useMaterialsStore } from '@/store/materialsStore';
-import { SmartAlertsAdapter } from '@/pages/admin/supply-chain/materials/services/smartAlertsAdapter';
+import { useAlertsWorker } from './useAlertsWorker';
 import { logger } from '@/lib/logging';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+
+/**
+ * Converts MaterialItem[] to MaterialABC[] with default ABC classification
+ * Materials without ABC analysis get assigned default class 'C' with basic metrics
+ */
+function convertToMaterialABC(materials: MaterialItem[]): MaterialABC[] {
+  return materials.map(material => {
+    // If material already has ABC classification, return as-is
+    if ('abcClass' in material && material.abcClass) {
+      return material as MaterialABC;
+    }
+
+    // Otherwise, create MaterialABC with default values
+    const materialABC: MaterialABC = {
+      ...material,
+      // Default to class 'C' (lowest priority) for materials without classification
+      abcClass: 'C',
+
+      // Analysis metrics (defaults)
+      annualConsumption: 0,
+      annualValue: 0,
+      revenuePercentage: 0,
+      cumulativeRevenue: 0,
+
+      // Current stock
+      currentStock: material.stock || 0,
+
+      // Optional fields with safe defaults
+      consumptionFrequency: 0,
+      monthlyConsumption: 0,
+      totalStockValue: (material.stock || 0) * (material.unit_cost || 0)
+    };
+
+    return materialABC;
+  });
+}
 
 /**
  * Hook for generating and managing smart inventory alerts
+ * Now uses Web Worker for non-blocking calculation
  *
  * @returns Object with alert generation methods and state
- *
- * @example
- * ```typescript
- * const { generateAndUpdateAlerts, isGenerating } = useSmartInventoryAlerts();
- *
- * useEffect(() => {
- *   generateAndUpdateAlerts();
- * }, [generateAndUpdateAlerts]);
- * ```
  */
 export function useSmartInventoryAlerts() {
-  const { actions } = useAlerts();
+  // 🛠️ PERFORMANCE: Use useAlertsActions to avoid re-renders when alerts change
+  const actions = useAlertsActions();
   // 🔧 FIX: Usar useShallow para prevenir re-renders por cambio de referencia del array
   const materials = useMaterialsStore(
     useShallow(state => state.items)
@@ -44,78 +74,65 @@ export function useSmartInventoryAlerts() {
   const lastGenerationRef = useRef<number>(0);
   const MIN_GENERATION_INTERVAL = 3000; // 3 seconds minimum between generations
 
-  /**
-   * Generate and update inventory alerts based on current stock levels
-   *
-   * Features:
-   * - Low stock detection (below min_stock threshold)
-   * - Out of stock alerts (critical)
-   * - Overstock warnings
-   * - Slow-moving inventory detection
-   * - ABC analysis-based prioritization
-   */
-  const generateAndUpdateAlerts = useCallback(async () => {
-    try {
-      logger.debug('Materials', '[useSmartInventoryAlerts] Generating smart alerts...', {
-        timestamp: new Date().toISOString(),
-        materialCount: materials.length
-      });
+  // 🚀 PERFORMANCE: Web Worker for non-blocking alert calculation
+  const { calculateInventoryAlerts } = useAlertsWorker({
+    onAlertsCalculated: async (alerts) => {
+      try {
+        // Clear previous materials alerts
+        await actions.clearAll({ context: 'materials' });
 
-      // 1. Clear previous materials alerts to avoid duplicates
-      // ✅ FIX: Usar clearAll con filtro de context (API correcta)
-      await actions.clearAll({ context: 'materials' });
-
-      // 2. Generate alerts via SmartAlertsAdapter
-      // The adapter converts SmartAlert[] → CreateAlertInput[] (unified format)
-      const alerts = await SmartAlertsAdapter.generateMaterialsAlerts(materials);
-
-      // 3. Add alerts to unified system
-      // ✅ FIX: Usar actions.create en lugar de addAlert
-      for (const alert of alerts) {
-        await actions.create(alert);
+        // Add new alerts via bulk create
+        if (alerts.length > 0) {
+          await actions.bulkCreate(alerts);
+          
+          logger.info('Materials', `✅ [Web Worker] Bulk created ${alerts.length} alerts`, {
+            alertCount: alerts.length,
+            severities: alerts.reduce((acc, alert) => {
+              acc[alert.severity] = (acc[alert.severity] || 0) + 1;
+              return acc;
+            }, {} as Record<string, number>)
+          });
+        }
+      } catch (error) {
+        logger.error('Materials', '❌ Error processing worker alerts:', error);
       }
-
-      logger.info('Materials', `Generated ${alerts.length} smart inventory alerts`, {
-        alertCount: alerts.length,
-        severities: alerts.reduce((acc, alert) => {
-          acc[alert.severity] = (acc[alert.severity] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>)
-      });
-
-    } catch (error) {
-      logger.error('Materials', 'Error generating smart inventory alerts:', error);
+    },
+    onError: (error) => {
+      logger.error('Materials', '❌ Web Worker error:', error);
     }
-  }, [materials, actions]);
+  });
 
   // Auto-generate alerts when materials change
-  // ✅ FIX: Remove generateAndUpdateAlerts from deps to prevent circular dependency
-  // The function is stable because it's wrapped in useCallback with [materials, actions]
   // ✅ Circuit Breaker: Rate limit to prevent infinite loops
+  // ⚡ PERFORMANCE: Web Worker runs in separate thread (non-blocking)
   useEffect(() => {
     const now = Date.now();
     const timeSinceLastGeneration = now - lastGenerationRef.current;
 
     if (materials.length > 0 && timeSinceLastGeneration >= MIN_GENERATION_INTERVAL) {
       lastGenerationRef.current = now;
-      generateAndUpdateAlerts();
+      
+      // 🚀 PERFORMANCE FIX: Calculate in Web Worker (separate thread)
+      // No need for startTransition - already non-blocking
+      calculateInventoryAlerts(materials);
 
-      logger.debug('Materials', '[useSmartInventoryAlerts] Alert generation allowed', {
+      logger.debug('Materials', '🔧 [Web Worker] Alert calculation dispatched', {
         timeSinceLastGeneration: `${timeSinceLastGeneration}ms`,
         materialsCount: materials.length
       });
     } else if (materials.length > 0) {
-      logger.warn('Materials', '[useSmartInventoryAlerts] Alert generation throttled', {
+      logger.debug('Materials', '[useSmartInventoryAlerts] Alert generation throttled', {
         timeSinceLastGeneration: `${timeSinceLastGeneration}ms`,
         minInterval: `${MIN_GENERATION_INTERVAL}ms`,
         message: 'Preventing excessive re-renders'
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [materials]);
+  }, [materials, calculateInventoryAlerts]);
 
   return {
-    generateAndUpdateAlerts
+    // Expose for manual triggering if needed
+    triggerAlertCalculation: () => calculateInventoryAlerts(materials)
   };
 }
 

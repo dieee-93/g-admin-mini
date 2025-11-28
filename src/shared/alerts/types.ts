@@ -2,13 +2,61 @@
 // 🎯 SISTEMA UNIFICADO DE ALERTAS
 // Tipos y interfaces centralizadas para todo el sistema de alertas
 
-export type AlertStatus = 'active' | 'acknowledged' | 'resolved' | 'dismissed';
+export type AlertStatus = 'active' | 'acknowledged' | 'resolved' | 'dismissed' | 'snoozed';
 
-export type AlertSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
+export type AlertSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info' | 'success' | 'warning' | 'error';
 
 export type AlertType = 'stock' | 'system' | 'validation' | 'business' | 'security' | 'operational' | 'achievement';
 
-export type AlertContext = 'materials' | 'sales' | 'operations' | 'dashboard' | 'global' | 'customers' | 'staff' | 'fiscal' | 'gamification';
+/**
+ * Intelligence level classification (3-layer system)
+ * - simple: Layer 1 - User actions, system events (auto-expire)
+ * - smart: Layer 2 - Business intelligence, context-aware (persistent)
+ * - predictive: Layer 3 - ML predictions, anomaly detection (future)
+ */
+export type IntelligenceLevel = 'simple' | 'smart' | 'predictive';
+
+// ✅ COMPLETE: All active modules from ALL_MODULE_MANIFESTS
+export type AlertContext =
+  // Core
+  | 'dashboard'
+  | 'global'
+  | 'settings'
+  | 'debug'
+
+  // Supply Chain
+  | 'materials'
+  | 'suppliers'
+  | 'products'
+  | 'production'
+  | 'assets'
+
+  // Sales & Operations
+  | 'sales'
+  | 'fulfillment'
+  | 'mobile'
+
+  // Customer & Finance
+  | 'customers'
+  | 'memberships'
+  | 'rentals'
+  | 'fiscal'
+  | 'billing'
+  | 'corporate'
+  | 'integrations'
+
+  // Resources
+  | 'staff'
+  | 'scheduling'
+
+  // Analytics
+  | 'reporting'
+  | 'intelligence'
+  | 'executive'
+
+  // System
+  | 'gamification'
+  | 'achievements';
 
 // Acción que puede ejecutar el usuario en una alerta
 export interface AlertAction {
@@ -60,6 +108,9 @@ export interface Alert {
   severity: AlertSeverity;
   status: AlertStatus;
   context: AlertContext;
+  
+  // NEW: Intelligence classification (3-layer system)
+  intelligence_level: IntelligenceLevel;
 
   // Contenido
   title: string;
@@ -74,6 +125,11 @@ export interface Alert {
   resolvedAt?: Date;
   resolvedBy?: string;
   resolutionNotes?: string;
+  
+  // Notification Center timestamps
+  readAt?: Date;           // Timestamp cuando usuario leyó la alerta
+  snoozedUntil?: Date;     // Snooze hasta esta fecha
+  archivedAt?: Date;       // Archivado del notification center
 
   // Configuración
   persistent?: boolean; // Si debe persistir entre sesiones
@@ -88,6 +144,11 @@ export interface Alert {
   recurrencePattern?: string;
   occurrenceCount?: number;
   lastOccurrence?: Date;
+  
+  // ML/Prediction fields (Layer 3 - future)
+  confidence?: number; // 0.0 to 1.0
+  predictedDate?: Date;
+  modelVersion?: string;
 }
 
 // Para crear nuevas alertas
@@ -95,6 +156,7 @@ export interface CreateAlertInput {
   type: AlertType;
   severity: AlertSeverity;
   context: AlertContext;
+  intelligence_level: IntelligenceLevel;
   title: string;
   description?: string;
   metadata?: AlertMetadata;
@@ -103,6 +165,11 @@ export interface CreateAlertInput {
   actions?: Omit<AlertAction, 'id'>[];
   isRecurring?: boolean;
   recurrencePattern?: string;
+  
+  // ML/Prediction fields (Layer 3 - future)
+  confidence?: number;
+  predictedDate?: Date;
+  modelVersion?: string;
 }
 
 // Filtros para queries
@@ -111,6 +178,7 @@ export interface AlertFilters {
   severity?: AlertSeverity | AlertSeverity[];
   type?: AlertType | AlertType[];
   context?: AlertContext | AlertContext[];
+  intelligence_level?: IntelligenceLevel | IntelligenceLevel[]; // NEW: Filter by intelligence level
   createdAfter?: Date;
   createdBefore?: Date;
   search?: string;
@@ -119,6 +187,7 @@ export interface AlertFilters {
 // Estadísticas de alertas
 export interface AlertStats {
   total: number;
+  unread: number;  // Count de alertas no leídas (para notification center)
   byStatus: Record<AlertStatus, number>;
   bySeverity: Record<AlertSeverity, number>;
   byType: Record<AlertType, number>;
@@ -128,6 +197,18 @@ export interface AlertStats {
   recurringCount: number;
 }
 
+// Toast duration configuration (ms)
+export interface ToastDurationConfig {
+  info: number;      // Default: 3000ms (3s)
+  success: number;   // Default: 3000ms (3s)
+  warning: number;   // Default: 5000ms (5s)
+  error: number;     // Default: 8000ms (8s)
+  critical: number;  // Default: Infinity (no auto-dismiss)
+  high?: number;     // Optional: Defaults to error duration
+  medium?: number;   // Optional: Defaults to warning duration
+  low?: number;      // Optional: Defaults to info duration
+}
+
 // Configuración del sistema de alertas
 export interface AlertsConfiguration {
   // Display settings
@@ -135,6 +216,11 @@ export interface AlertsConfiguration {
   position: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
   autoCollapse: boolean;
   collapseAfter: number; // segundos
+
+  // Toast stack settings
+  toastDuration?: ToastDurationConfig;
+  toastStackMax?: number;           // Max toasts visibles simultáneamente (default: 3)
+  notificationCenterMax?: number;    // Max alertas en historial (default: 50)
 
   // Notification settings
   soundEnabled: boolean;
@@ -164,13 +250,22 @@ export interface AlertsContextValue {
   stats: AlertStats;
   config: AlertsConfiguration;
   loading: boolean;
+  isNotificationCenterOpen: boolean;  // Notification center drawer state
   
   // Actions
   create: (input: CreateAlertInput) => Promise<string>; // Returns alert ID
+  bulkCreate: (inputs: CreateAlertInput[]) => Promise<string[]>; // 🚀 Bulk creation - returns alert IDs
   acknowledge: (id: string, notes?: string) => Promise<void>;
   resolve: (id: string, notes?: string) => Promise<void>;
   dismiss: (id: string) => Promise<void>;
   update: (id: string, updates: Partial<Alert>) => Promise<void>;
+  
+  // Notification Center actions
+  markAsRead: (id: string) => Promise<void>;
+  snooze: (id: string, duration: number) => Promise<void>; // duration in ms
+  archive: (id: string) => Promise<void>;
+  openNotificationCenter: () => void;
+  closeNotificationCenter: () => void;
   
   // Queries
   getByContext: (context: AlertContext) => Alert[];
@@ -190,13 +285,13 @@ export interface AlertsContextValue {
 
 // Event types para el sistema de eventos
 export const ALERT_EVENTS = {
-  CREATED: 'alert:created',
-  ACKNOWLEDGED: 'alert:acknowledged', 
-  RESOLVED: 'alert:resolved',
-  DISMISSED: 'alert:dismissed',
-  UPDATED: 'alert:updated',
-  EXPIRED: 'alert:expired',
-  ESCALATED: 'alert:escalated'
+  CREATED: 'alerts.alert.created',
+  ACKNOWLEDGED: 'alerts.alert.acknowledged', 
+  RESOLVED: 'alerts.alert.resolved',
+  DISMISSED: 'alerts.alert.dismissed',
+  UPDATED: 'alerts.alert.updated',
+  EXPIRED: 'alerts.alert.expired',
+  ESCALATED: 'alerts.alert.escalated'
 } as const;
 
 export type AlertEvent = typeof ALERT_EVENTS[keyof typeof ALERT_EVENTS];

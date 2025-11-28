@@ -110,14 +110,15 @@ export function FeatureUIMappingDebugger() {
     },
 
     {
-      id: 'kitchen-module',
-      name: 'Kitchen Display',
+      id: 'production-module',
+      name: 'Production Display',
       type: 'activity',
-      requiredCapabilities: ['production_workflow'],
-      checkVisibility: () => visibleModules.includes('kitchen'),
+      // ✅ FIX Bug #4: Updated obsolete capability
+      requiredCapabilities: ['physical_products'],
+      checkVisibility: () => visibleModules.includes('production'),
       location: 'Navigation sidebar',
       get expectedVisible() {
-        return profile?.selectedActivities?.includes('production_workflow') || false;
+        return profile?.selectedCapabilities?.includes('physical_products') || false;
       }
     },
 

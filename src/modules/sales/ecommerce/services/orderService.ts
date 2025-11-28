@@ -1,5 +1,8 @@
 import { supabase } from '@/lib/supabase/client';
 import { cartService } from './cartService';
+import { eventBus } from '@/lib/events';
+import { logger } from '@/lib/logging';
+import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
 
 export interface CreateOrderParams {
   customerId: string;
@@ -59,7 +62,11 @@ export const orderService = {
         .single();
 
       if (saleError) {
-        console.error('Error creating sale:', saleError);
+        logger.error('SalesModule', 'Failed to create sale', {
+          error: saleError,
+          customerId,
+          orderType: 'ECOMMERCE'
+        });
         throw new Error(`Failed to create order: ${saleError.message}`);
       }
 
@@ -69,7 +76,12 @@ export const orderService = {
         product_id: item.product_id,
         quantity: item.quantity,
         unit_price: item.price,
-        subtotal: item.price * item.quantity,
+        // ✅ PRECISION FIX: Use DecimalUtils for financial calculations
+        subtotal: DecimalUtils.multiply(
+          item.price.toString(),
+          item.quantity.toString(),
+          'financial'
+        ).toNumber(),
       }));
 
       const { error: itemsError } = await supabase
@@ -77,7 +89,11 @@ export const orderService = {
         .insert(saleItems);
 
       if (itemsError) {
-        console.error('Error creating sale items:', itemsError);
+        logger.error('SalesModule', 'Failed to create sale items', {
+          error: itemsError,
+          saleId: sale.id,
+          itemsCount: saleItems.length
+        });
         // Rollback: delete the sale
         await supabase.from('sales').delete().eq('id', sale.id);
         throw new Error(`Failed to create order items: ${itemsError.message}`);
@@ -86,9 +102,36 @@ export const orderService = {
       // 5. Clear cart after successful order
       await cartService.clearCart(cart.id);
 
+      // 6. Emit sales.order_placed event for cross-module integration
+      try {
+        await eventBus.emit('sales.order_placed', {
+          orderId: sale.id,
+          customerId: sale.customer_id,
+          total: sale.total,
+          items: saleItems.map(item => ({
+            productId: item.product_id,
+            quantity: item.quantity,
+            price: item.unit_price
+          })),
+          orderType: 'ECOMMERCE',
+          timestamp: Date.now()
+        });
+
+        logger.info('SalesModule', 'Order placed event emitted', {
+          orderId: sale.id,
+          customerId: sale.customer_id
+        });
+      } catch (err) {
+        logger.error('SalesModule', 'Failed to emit order_placed event', err);
+        // Don't fail the order if event emission fails
+      }
+
       return sale;
     } catch (error) {
-      console.error('Error in createOrderFromCart:', error);
+      logger.error('SalesModule', 'Error in createOrderFromCart', {
+        error,
+        customerId: params.customerId
+      });
       throw error;
     }
   },
@@ -108,7 +151,10 @@ export const orderService = {
 
       return data;
     } catch (error) {
-      console.error('Error fetching order:', error);
+      logger.error('SalesModule', 'Error fetching order', {
+        error,
+        orderId
+      });
       return null;
     }
   },
@@ -129,7 +175,10 @@ export const orderService = {
 
       return data || [];
     } catch (error) {
-      console.error('Error fetching customer orders:', error);
+      logger.error('SalesModule', 'Error fetching customer orders', {
+        error,
+        customerId
+      });
       return [];
     }
   },

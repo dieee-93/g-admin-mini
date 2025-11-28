@@ -20,6 +20,7 @@ export type ModuleName =
   | 'sales'
   | 'customers'
   | 'materials'
+  | 'materials-procurement'
   | 'products'
   | 'staff'
   | 'scheduling'
@@ -172,6 +173,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }
 
+  // ✅ FIX: Create deterministic hash for session comparison
+  const getSessionHash = useCallback((session: Session | null): string => {
+    if (!session) return 'null';
+
+    // Hash critical session properties that define uniqueness
+    const criticalData = {
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+      expires_at: session.expires_at,
+      user_id: session.user?.id
+    };
+
+    // Simple hash function (better than JSON.stringify for performance)
+    return JSON.stringify(criticalData);
+  }, []);
+
   // Enhanced function to get user role with JWT claims priority
   const getUserRoleFromMultipleSources = async (currentSession: Session): Promise<{
     role: UserRole;
@@ -181,7 +198,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 1. Try to get role from JWT claims first
     if (currentSession.access_token) {
       const claims = decodeJWTClaims(currentSession.access_token);
-      
+
       if (claims && claims.user_role && !claims.error) {
         logger.info('AuthContext', 'Role from JWT:', claims.user_role);
         return {
@@ -190,7 +207,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           source: 'jwt'
         };
       }
-      
+
       if (claims?.error) {
         logger.error('AuthContext', 'JWT claims error:', claims.error);
       }
@@ -232,13 +249,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // 🔥 PERFORMANCE FIX: Only update session if it's actually different
       setSession(prevSession => {
         // Compare by reference first (fast path)
-        if (prevSession === currentSession) return prevSession;
-
-        // Compare by access token (definitive check)
-        if (prevSession?.access_token === currentSession.access_token) {
-          return prevSession; // PRESERVE OLD REFERENCE
+        if (prevSession === currentSession) {
+          logger.debug('AuthContext', '🔄 Session reference unchanged');
+          return prevSession;
         }
 
+        // 🔐 HASH COMPARISON: Compare session hashes to detect actual changes
+        const prevHash = getSessionHash(prevSession);
+        const currentHash = getSessionHash(currentSession);
+
+        if (prevHash === currentHash) {
+          logger.debug('AuthContext', '🔄 Session hash unchanged, preserving reference', {
+            hash: currentHash.substring(0, 50) + '...'
+          });
+          return prevSession; // PRESERVE OLD REFERENCE - prevents cascade renders
+        }
+
+        logger.debug('AuthContext', '✨ Session changed, updating', {
+          prevHash: prevHash.substring(0, 50) + '...',
+          currentHash: currentHash.substring(0, 50) + '...'
+        });
         return currentSession; // New session
       });
 
@@ -283,7 +313,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         roleSource: 'fallback'
       });
     }
-  }, []); // Empty deps: uses setters which are stable
+  }, [getSessionHash, getUserRoleFromMultipleSources]); // Include dependencies
 
   useEffect(() => {
     let mounted = true;
@@ -291,7 +321,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initializeAuth = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
-        
+
         if (mounted) {
           if (initialSession) {
             await handleAuthState(initialSession);
@@ -461,36 +491,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // CRUD Permission Checks
   const canCreateImpl = useCallback((module: ModuleName): boolean =>
     canPerformActionImpl(module, 'create')
-  , [canPerformActionImpl]);
+    , [canPerformActionImpl]);
 
   const canReadImpl = useCallback((module: ModuleName): boolean =>
     canPerformActionImpl(module, 'read')
-  , [canPerformActionImpl]);
+    , [canPerformActionImpl]);
 
   const canUpdateImpl = useCallback((module: ModuleName): boolean =>
     canPerformActionImpl(module, 'update')
-  , [canPerformActionImpl]);
+    , [canPerformActionImpl]);
 
   const canDeleteImpl = useCallback((module: ModuleName): boolean =>
     canPerformActionImpl(module, 'delete')
-  , [canPerformActionImpl]);
+    , [canPerformActionImpl]);
 
   // Special Action Permission Checks
   const canVoidImpl = useCallback((module: ModuleName): boolean =>
     canPerformActionImpl(module, 'void')
-  , [canPerformActionImpl]);
+    , [canPerformActionImpl]);
 
   const canApproveImpl = useCallback((module: ModuleName): boolean =>
     canPerformActionImpl(module, 'approve')
-  , [canPerformActionImpl]);
+    , [canPerformActionImpl]);
 
   const canConfigureImpl = useCallback((module: ModuleName): boolean =>
     canPerformActionImpl(module, 'configure')
-  , [canPerformActionImpl]);
+    , [canPerformActionImpl]);
 
   const canExportImpl = useCallback((module: ModuleName): boolean =>
     canPerformActionImpl(module, 'export')
-  , [canPerformActionImpl]);
+    , [canPerformActionImpl]);
 
 
   // ✅ FIX: Memoize contextValue to prevent re-creating object on every render
@@ -539,6 +569,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     canConfigureImpl,
     canExportImpl,
   ]);
+
+  // 🔍 DEBUG: Track authentication state changes
+  useEffect(() => {
+    const authState = {
+      isAuthenticated,
+      loading,
+      userEmail: user?.email || 'null',
+      userRole: user?.role || 'null',
+      timestamp: new Date().toISOString()
+    };
+    logger.info('AuthContext', `Auth state changed:`, authState);
+    console.log('🔐 [AuthContext] Auth state changed:', authState);
+  }, [isAuthenticated, loading, user]);
 
   return (
     <AuthContext.Provider value={contextValue}>

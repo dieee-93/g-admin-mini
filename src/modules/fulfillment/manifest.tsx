@@ -14,6 +14,8 @@ export const fulfillmentManifest: ModuleManifest = {
   name: 'Fulfillment',
   version: '1.0.0',
 
+  permissionModule: 'operations', // ✅ Uses 'operations' permission
+
   requiredFeatures: ['sales_order_management'], // At least one fulfillment feature
   optionalFeatures: [
     // Onsite features
