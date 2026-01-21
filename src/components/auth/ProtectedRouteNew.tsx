@@ -15,23 +15,23 @@ interface ProtectedRouteProps {
  * ProtectedRoute component using new auth system
  * Protects routes based on authentication and optional role requirements
  */
-export function ProtectedRouteNew({ 
-  children, 
-  requiredRoles, 
+export function ProtectedRouteNew({
+  children,
+  requiredRoles,
   fallback,
-  redirectTo = '/login' 
+  redirectTo = '/login'
 }: ProtectedRouteProps) {
   const { user, loading, isAuthenticated, hasRole } = useAuth();
 
   // Show loading state while checking authentication
   if (loading) {
     return (
-      <Box 
-        minH="100vh" 
-        display="flex" 
-        alignItems="center" 
+      <Box
+        minH="100vh"
+        display="flex"
+        alignItems="center"
         justifyContent="center"
-        bg="bg.canvas"
+        bg="gray.50"
       >
         <Stack direction="column" gap="4">
           <Spinner size="xl" color="blue.500" />
@@ -53,7 +53,7 @@ export function ProtectedRouteNew({
     if (fallback) {
       return <>{fallback}</>;
     }
-    
+
     // Default access denied component
     return (
       <Box p="8" minH="50vh" display="flex" alignItems="center" justifyContent="center">
@@ -85,10 +85,10 @@ export function ProtectedRouteNew({
  */
 export function useRouteAccess(requiredRoles?: UserRole[]) {
   const { isAuthenticated, hasRole } = useAuth();
-  
+
   if (!isAuthenticated) return false;
   if (requiredRoles && !hasRole(requiredRoles)) return false;
-  
+
   return true;
 }
 
@@ -103,10 +103,10 @@ interface RoleGuardProps {
 
 export function RoleGuardNew({ children, allowedRoles, fallback = null }: RoleGuardProps) {
   const { hasRole } = useAuth();
-  
+
   if (!hasRole(allowedRoles)) {
     return <>{fallback}</>;
   }
-  
+
   return <>{children}</>;
 }

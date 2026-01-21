@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSmartRedirect } from '@/hooks/useSmartRedirect';
+import { useSmartRedirect } from '@/hooks';
 
 interface PublicOnlyRouteProps {
   children: React.ReactNode;

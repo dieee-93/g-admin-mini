@@ -1,14 +1,17 @@
 import React from 'react';
-import { Box, Stack } from '@chakra-ui/react';
-import { Typography, CardWrapper } from '@/shared/ui';;
+import { Box, Stack } from '@/shared/ui';
+import { Typography, CardWrapper } from '@/shared/ui';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlags } from '@/lib/capabilities';
 import type { UserRole, ModuleName, PermissionAction } from '@/contexts/AuthContext';
+import { ModuleNotAvailable } from './ModuleNotAvailable';
 
 interface RoleGuardProps {
   children: React.ReactNode;
   requiredRoles?: UserRole[];
   requiredModule?: ModuleName;
   requiredAction?: PermissionAction;
+  requireModuleActive?: boolean; // NEW: Default true
   fallback?: React.ReactNode;
 }
 
@@ -20,9 +23,11 @@ export function RoleGuard({
   requiredRoles,
   requiredModule,
   requiredAction,
+  requireModuleActive = true,
   fallback
 }: RoleGuardProps) {
   const { hasRole, canAccessModule, canPerformAction, isAuthenticated } = useAuth();
+  const { isModuleActive } = useFeatureFlags();
 
   // If user is not authenticated, show nothing (handled by ProtectedRoute)
   if (!isAuthenticated) {
@@ -34,9 +39,20 @@ export function RoleGuard({
     return fallback || <AccessDenied reason="Rol insuficiente" />;
   }
 
-  // Check module access
+  // Check module access (permission-based)
   if (requiredModule && !canAccessModule(requiredModule)) {
     return fallback || <AccessDenied reason="Sin acceso al módulo" />;
+  }
+
+  // Check module activation (NEW - capability-based)
+  if (requiredModule && requireModuleActive && !isModuleActive(requiredModule)) {
+    return (
+      <ModuleNotAvailable
+        moduleName={requiredModule}
+        message="This module is not included in your current business profile."
+        action="Contact your administrator or upgrade your plan to access this feature."
+      />
+    );
   }
 
   // Check specific action permissions
