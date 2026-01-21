@@ -21,10 +21,6 @@ export const intelligenceManifest: ModuleManifest = {
   permissionModule: 'reporting', // ✅ Uses 'reporting' permission
 
   depends: [],
-  autoInstall: true, // Always available for market insights
-
-  requiredFeatures: [] as FeatureId[],
-  optionalFeatures: [] as FeatureId[],
 
   // 🔒 PERMISSIONS: Only ADMINISTRADOR for competitive intelligence
   minimumRole: 'ADMINISTRADOR' as const,

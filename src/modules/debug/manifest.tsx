@@ -50,21 +50,7 @@ export const debugManifest: ModuleManifest = {
    */
   depends: [],
 
-  autoInstall: true, // Always available (visibility filtered by role in navigation)
-
-  // ============================================
-  // FEATURE REQUIREMENTS
-  // ============================================
-
-  /**
-   * No required features - available in dev mode
-   */
-  requiredFeatures: [] as FeatureId[],
-
-  /**
-   * Optional features that enhance functionality
-   */
-  optionalFeatures: ['debug'] as FeatureId[],
+  // ✅ CORE MODULE: No activatedBy needed (always loaded)
 
   // ============================================
   // PERMISSIONS & ROLES

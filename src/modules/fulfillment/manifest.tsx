@@ -15,29 +15,11 @@ export const fulfillmentManifest: ModuleManifest = {
   version: '1.0.0',
 
   permissionModule: 'operations', // ✅ Uses 'operations' permission
+  activatedBy: 'sales_order_management',
 
-  requiredFeatures: ['sales_order_management'], // At least one fulfillment feature
-  optionalFeatures: [
-    // Onsite features
-    'operations_table_management',
-    'operations_table_assignment',
-    'operations_floor_plan_config',
-    'operations_waitlist_management',
-    // Pickup features
-    'operations_pickup_scheduling',
-    'sales_pickup_orders',
-    // Delivery features
-    'operations_delivery_zones',
-    'operations_delivery_tracking',
-    'sales_delivery_orders',
-    // Shared fulfillment features
-    'sales_payment_processing',
-    'sales_fulfillment_queue'
-  ],
 
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   depends: ['sales', 'staff', 'materials'],
-  autoInstall: false,
-
   // 🔒 PERMISSIONS: Operadores can manage fulfillment
   minimumRole: 'OPERADOR' as const,
 
@@ -62,12 +44,27 @@ export const fulfillmentManifest: ModuleManifest = {
       // REGISTER DASHBOARD WIDGET
       // ============================================
 
-      const { useCapabilityStore } = await import('@/store/capabilityStore');
-      const hasFeature = useCapabilityStore.getState().hasFeature;
+      // ⚡ PERFORMANCE: Parallel imports
+      const [
+        { queryClient },
+        { businessProfileKeys },
+        { FeatureActivationEngine },
+        { FulfillmentQueueWidget }
+      ] = await Promise.all([
+        import('@/App'),
+        import('@/lib/business-profile/hooks/useBusinessProfile'),
+        import('@/lib/features/FeatureEngine'),
+        import('./components/FulfillmentQueueWidget')
+      ]);
+
+      const profile = queryClient.getQueryData<any>(businessProfileKeys.detail());
+      const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+        profile?.selectedCapabilities || [],
+        profile?.selectedInfrastructure || []
+      );
+      const hasFeature = (featureId: string) => activeFeatures.includes(featureId as any);
 
       if (hasFeature('sales_order_management')) {
-        // Lazy load widget only if needed
-        const { FulfillmentQueueWidget } = await import('./components/FulfillmentQueueWidget');
 
         registry.addAction(
           'dashboard.widgets',

@@ -23,9 +23,6 @@ export const assetsManifest: ModuleManifest = {
   depends: [], // Standalone module
   autoInstall: true, // Always available
 
-  requiredFeatures: [] as FeatureId[],
-  optionalFeatures: [] as FeatureId[],
-
   // 🔒 PERMISSIONS: Supervisors can manage assets
   minimumRole: 'SUPERVISOR' as const,
 

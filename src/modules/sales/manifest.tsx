@@ -20,16 +20,15 @@ import { logger } from '@/lib/logging';
 import { toaster } from '@/shared/ui/toaster';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
-import { Button, Icon, Stack, Badge } from '@/shared/ui';
+import { Button, Icon, Stack, Badge, Section, Typography } from '@/shared/ui';
 import { ChartBarIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
-import { TAKEAWAY_MANDATORY } from '@/modules/achievements/constants';
-import { TakeAwayToggle } from './components';
 
-// Ecommerce sub-module exports
-export * from './ecommerce/components';
-export * from './ecommerce/hooks';
-export * from './ecommerce/services';
-export * from './ecommerce/types';
+// ⚡ PERFORMANCE: Lazy load heavy components only when needed
+// TakeAwayToggle will be imported dynamically in setup function
+
+// ⚡ PERFORMANCE: Ecommerce sub-module exports moved to lazy loading
+// Don't export synchronously - this loads all ecommerce code immediately (9s delay)
+// Import these modules only when needed using dynamic imports
 
 /**
  * Sales Module Manifest
@@ -59,30 +58,7 @@ export const salesManifest: ModuleManifest = {
    */
   depends: [],
 
-  /**
-   * Auto-install when dependencies are available?
-   * False for base modules (manual activation via features)
-   */
-  autoInstall: false,
-
-  // ============================================
-  // FEATURE REQUIREMENTS
-  // ============================================
-
-  /**
-   * Required features from FeatureRegistry
-   * Module only activates if ALL required features are active
-   */
-  requiredFeatures: ['sales_order_management'] as FeatureId[],
-
-  /**
-   * Optional features (enhance functionality if present)
-   */
-  optionalFeatures: [
-    'sales_payment_processing',
-    'sales_pos_onsite',
-    'sales_dine_in_orders',
-  ] as FeatureId[],
+  // ✅ CORE MODULE: No activatedBy needed (always loaded)
 
   // ============================================
   // PERMISSIONS & ROLES
@@ -116,6 +92,7 @@ export const salesManifest: ModuleManifest = {
       'sales.toolbar.actions', // Provides toolbar actions (TakeAway toggle, etc.)
       'sales.tabs', // NEW - ecommerce will inject here
       'sales.tab_content', // NEW - ecommerce tab content
+      'sales.pos.context_selector', // NEW - Onsite/Delivery/Pickup inject context selectors
       'products.detail.sections', // Sales History widget in product detail
     ],
 
@@ -149,26 +126,67 @@ export const salesManifest: ModuleManifest = {
 
     try {
       // ============================================
-      // ACHIEVEMENTS: Registrar Requirements TakeAway
+      // ⚡ PERFORMANCE OPTIMIZATION: Load all imports in PARALLEL
+      // ============================================
+      // Previously: Sequential imports caused 9.3s delay
+      // Now: All imports load simultaneously (faster)
+      
+      const [
+        { queryClient },
+        { businessProfileKeys },
+        { FeatureActivationEngine },
+        { PICKUP_ORDERS_REQUIREMENTS },
+        { TakeAwayToggle },
+        { eventBus },
+        { salesEventHandlers },
+        { RevenueStatWidget, SalesStatWidget }
+      ] = await Promise.all([
+        import('@/App'),
+        import('@/lib/business-profile/hooks/useBusinessProfile'),
+        import('@/lib/features/FeatureEngine'),
+        import('./requirements'),
+        import('./components'),
+        import('@/lib/events'),
+        import('./handlers'),
+        import('./widgets')
+      ]);
+
+      const profile = queryClient.getQueryData<any>(businessProfileKeys.detail());
+      const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+        profile?.selectedCapabilities || [],
+        profile?.selectedInfrastructure || []
+      );
+      const hasFeature = (featureId: string) => activeFeatures.includes(featureId as any);
+
+      // ============================================
+      // HOOK: Requirements Registry (Dynamic System v3.0)
       // ============================================
 
       /**
-       * Registrar requirements obligatorios para TakeAway
-       * Solo si la feature está activa
+       * Register requirements for pickup_orders capability.
+       * 
+       * ARCHITECTURE:
+       * - Import requirements by REFERENCE from @/shared/requirements
+       * - Automatic deduplication via JavaScript reference equality
+       * - No metadata needed (self-documenting via imports)
+       * 
+       * When achievements module calls doAction('achievements.get_requirements_registry'),
+       * it will receive this array and deduplicate shared requirements automatically.
        */
-      const { useCapabilityStore } = await import('@/store/capabilityStore');
-      const hasFeature = useCapabilityStore.getState().hasFeature;
-
-      if (hasFeature('sales_pickup_orders')) {
-        logger.debug('App', 'Registrando TakeAway requirements...');
-
-        registry.doAction('achievements.register_requirement', {
+      
+      registry.addAction(
+        'achievements.get_requirements_registry',
+        () => ({
           capability: 'pickup_orders',
-          requirements: TAKEAWAY_MANDATORY
-        });
+          requirements: PICKUP_ORDERS_REQUIREMENTS,
+          moduleId: 'sales',
+          timestamp: Date.now(),
+        }),
+        'sales',
+        10 // Normal priority
+      );
 
-        logger.debug('App', `✅ Registrados ${TAKEAWAY_MANDATORY.length} requirements TakeAway`);
-      }
+      logger.debug('App', `✅ Registered ${PICKUP_ORDERS_REQUIREMENTS.length} requirements for pickup_orders`);
 
       // ============================================
       // HOOK: TakeAway Toggle (Toolbar Action)
@@ -180,6 +198,7 @@ export const salesManifest: ModuleManifest = {
        *
        * 🔒 PERMISSIONS: Requires 'create' permission on 'sales' module
        */
+      
       registry.addAction(
         'sales.toolbar.actions',
         () => {
@@ -331,8 +350,14 @@ export const salesManifest: ModuleManifest = {
       if (hasFeature('sales_catalog_ecommerce')) {
         logger.debug('App', 'Registering ecommerce hooks...');
 
-        const { OnlineOrdersTab } = await import('./ecommerce/components');
-        const { ShoppingCartIcon } = await import('@heroicons/react/24/outline');
+        // ⚡ PERFORMANCE: Load ecommerce components in parallel
+        const [
+          { OnlineOrdersTab },
+          { ShoppingCartIcon }
+        ] = await Promise.all([
+          import('./ecommerce/components'),
+          import('@heroicons/react/24/outline')
+        ]);
 
         // Inject Online Orders tab in Sales
         registry.addAction(
@@ -350,7 +375,8 @@ export const salesManifest: ModuleManifest = {
 
         registry.addAction(
           'sales.tab_content',
-          ({ activeTab }: { activeTab: string }) => {
+          (data) => {
+            const { activeTab } = data || { activeTab: '' };
             if (activeTab === 'online-orders') {
               return <OnlineOrdersTab />;
             }
@@ -367,33 +393,17 @@ export const salesManifest: ModuleManifest = {
       // EVENTBUS LISTENERS: React to cross-module events
       // ============================================
 
-      const { eventBus } = await import('@/lib/events');
-
       /**
        * Listen to materials.stock_updated
        * React to inventory changes to update available products
        */
-      eventBus.subscribe('materials.stock_updated', async (event) => {
-        logger.info('SalesModule', 'Stock updated notification received', event.payload);
-
-        // TODO: Implement product availability updates
-        // - If stock drops to 0, mark product as unavailable in sales UI
-        // - If stock increases, mark product as available
-        // - Alerts are created in React hooks (useCart, useOnlineOrders) when they detect stock issues
-      });
+      eventBus.subscribe('materials.stock_updated', salesEventHandlers.onStockUpdated);
 
       /**
        * Listen to production.order_ready
        * Notify customer when production completes their order
        */
-      eventBus.subscribe('production.order_ready', async (event) => {
-        logger.info('SalesModule', 'Production order ready notification received', event.payload);
-
-        // TODO: Implement customer notifications
-        // - Alerts are created in React components using useAlerts hook
-        // - Update order status to "ready for fulfillment"
-        // - Trigger delivery/pickup flow
-      });
+      eventBus.subscribe('production.order_ready', salesEventHandlers.onProductionOrderReady);
 
       logger.debug('App', '✅ EventBus listeners registered in Sales module');
 
@@ -403,7 +413,7 @@ export const salesManifest: ModuleManifest = {
       logger.info('App', 'Registering products.detail.sections injection (Sales)');
 
       // Widget component not yet implemented - using fallback
-      const ProductSalesHistoryWidget = () => (
+      const ProductSalesHistoryWidget = ({ productId }: { productId: string }) => (
         <Section variant="elevated">
           <Stack direction="row" align="center" gap="2">
             <ChartBarIcon className="w-5 h-5 text-blue-500" />
@@ -446,7 +456,7 @@ export const salesManifest: ModuleManifest = {
        * Hook: dashboard.widgets
        * Inyecta Revenue y Sales KPI widgets en el dashboard principal
        */
-      const { RevenueStatWidget, SalesStatWidget } = await import('./widgets');
+      // ⚡ PERFORMANCE: Widgets already loaded in parallel at top of setup function
 
       // Revenue Widget
       registry.addAction(
@@ -471,7 +481,7 @@ export const salesManifest: ModuleManifest = {
       logger.info('App', '✅ Sales module setup complete', {
         hooksProvided: 9, // sales.toolbar.actions + materials.row.actions + scheduling hooks + sales.tabs + sales.tab_content
         hooksConsumed: 2,
-        requirementsRegistered: TAKEAWAY_MANDATORY.length,
+        requirementsRegistered: 'centralized', // Now handled by achievements module
       });
     } catch (error) {
       logger.error('App', '❌ Sales module setup failed', error);
@@ -505,12 +515,24 @@ export const salesManifest: ModuleManifest = {
    */
   exports: {
     // Example API methods
+    /**
+     * Create a new sales order
+     * 
+     * @param orderData - Order data including items, customer, etc.
+     * @returns Promise resolving to object with order ID and status
+     */
     createOrder: async (orderData: OrderData) => {
       logger.debug('App', 'Creating order via public API', orderData);
       // Implementation would be here
       return { id: 'order-123', status: 'created' };
     },
 
+    /**
+     * Get the status of an existing order
+     * 
+     * @param orderId - The ID of the order to check
+     * @returns Promise resolving to object with status
+     */
     getOrderStatus: async (orderId: string) => {
       logger.debug('App', 'Getting order status', { orderId });
       return { status: 'pending' };

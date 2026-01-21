@@ -44,8 +44,6 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
    * - staff: for driver management (optional but recommended)
    */
   depends: ['fulfillment', 'sales'],
-  autoInstall: false,
-
   // ============================================
   // FEATURE REQUIREMENTS
   // ============================================
@@ -54,18 +52,13 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
    * Required features from FeatureRegistry
    * Both delivery order sales AND delivery zones must be active
    */
-  requiredFeatures: ['sales_delivery_orders', 'operations_delivery_zones'],
+  activatedBy: 'sales_delivery_orders',
 
+
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   /**
    * Optional features (enhance functionality if present)
    */
-  optionalFeatures: [
-    'operations_delivery_tracking',      // GPS tracking
-    'mobile_location_tracking',          // Mobile driver app location
-    'sales_payment_processing',          // Payment integration
-    'operations_deferred_fulfillment',   // Scheduled deliveries
-    'mobile_notifications'               // Customer notifications
-  ],
 
   // ============================================
   // HOOK POINTS
@@ -112,10 +105,18 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
       // Note: No feature checks needed - Module Registry validates requiredFeatures
       // before calling setup(). If we're here, all required features are active.
 
-      const { eventBus } = await import('@/lib/events');
-      const { deliveryService } = await import('./services/deliveryService');
-      const { routeOptimizationService } = await import('./services/routeOptimizationService');
-      const { setupDeliveryEventListeners } = await import('./services/deliveryEvents');
+      // ⚡ PERFORMANCE: Parallel imports (4 imports)
+      const [
+        { eventBus },
+        { deliveryService },
+        { routeOptimizationService },
+        { setupDeliveryEventListeners }
+      ] = await Promise.all([
+        import('@/lib/events'),
+        import('./services/deliveryService'),
+        import('./services/routeOptimizationService'),
+        import('./services/deliveryEvents')
+      ]);
 
       // Note: gpsTrackingService is available at '@/lib/tracking' for mobile app integration
       // It's exported in this module's exports for other modules to use
@@ -479,8 +480,106 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
        */
       setupDeliveryEventListeners();
 
+      // ============================================
+      // HOOK: Delivery Hours Editor
+      // ============================================
+
+      /**
+       * Hook: settings.hours.tabs + settings.hours.content
+       * Inject delivery hours editor into HoursPage
+       */
+      const { DeliveryHoursTabTrigger, DeliveryHoursTabContent } = await import(
+        './components/DeliveryHoursEditor'
+      );
+
+      registry.addAction(
+        'settings.hours.tabs',
+        () => <DeliveryHoursTabTrigger key="delivery-tab" />,
+        'fulfillment-delivery',
+        80 // After pickup hours
+      );
+
+      registry.addAction(
+        'settings.hours.content',
+        () => <DeliveryHoursTabContent key="delivery-content" />,
+        'fulfillment-delivery',
+        80
+      );
+
+      logger.debug('App', '✅ Delivery hours hooks registered');
+
+      // ============================================
+      // HOOK: Settings Specialized Card
+      // ============================================
+
+      /**
+       * Hook: settings.specialized.cards
+       * Inject "Zonas de Entrega" card into Settings page
+       */
+      const { SettingCard } = await import('@/shared/components');
+      const { MapIcon } = await import('@heroicons/react/24/outline');
+
+      registry.addAction(
+        'settings.specialized.cards',
+        () => (
+          <SettingCard
+            key="delivery-zones-card"
+            title="Zonas de Entrega"
+            description="Define áreas de cobertura y tarifas de envío"
+            icon={MapIcon}
+            href="/admin/operations/fulfillment/delivery/zones"
+            status="configured"
+          />
+        ),
+        'fulfillment-delivery',
+        90, // After operating hours
+        { requiredPermission: { module: 'operations', action: 'update' } }
+      );
+
+      logger.debug('App', '✅ Settings specialized card registered');
+
+      // ============================================
+      // HOOK: Delivery POS View (Context View)
+      // ============================================
+
+      /**
+       * Hook: sales.pos.context_view
+       * Inject DeliveryPOSView when PHYSICAL + delivery fulfillment is selected
+       * Provides 4-step flow: Customer → Address → Products → Confirm
+       */
+      const { DeliveryPOSView } = await import('./components/DeliveryPOSView');
+
+      registry.addAction(
+        'sales.pos.context_view',
+        (data) => {
+          // Only render for PHYSICAL + delivery fulfillment (Opción B: ProductType-first)
+          if (data?.productType !== 'PHYSICAL' || data?.selectedFulfillment !== 'delivery') return null;
+
+          return (
+            <DeliveryPOSView
+              key="delivery-pos-view"
+              cart={data?.cart || []}
+              onAddToCart={data?.onAddToCart}
+              onRemoveItem={data?.onRemoveItem}
+              onClearCart={data?.onClearCart}
+              totals={data?.totals}
+              onBack={data?.onBack}
+              onConfirmDelivery={(deliveryInfo) => {
+                logger.info('Delivery', 'Delivery confirmed', deliveryInfo);
+                // Will emit event for order processing
+              }}
+            />
+          );
+        },
+        'fulfillment-delivery',
+        90, // High priority
+        { requiredPermission: { module: 'operations', action: 'create' } }
+      );
+
+      logger.debug('App', '✅ Delivery POS context view registered');
+
       logger.info('App', '✅ Delivery module setup complete', {
-        hooksProvided: 2,
+        hooksProvided: 4, // 2 existing + 2 new hours hooks
         eventsConsumed: 4
       });
 

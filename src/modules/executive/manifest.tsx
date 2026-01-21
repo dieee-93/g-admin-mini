@@ -21,9 +21,6 @@ export const executiveManifest: ModuleManifest = {
   depends: [], // Aggregates data from all modules
   autoInstall: true, // Always available for executives
 
-  requiredFeatures: [] as FeatureId[],
-  optionalFeatures: ['executive'] as FeatureId[],
-
   // 🔒 PERMISSIONS: Only ADMINISTRADOR for executive dashboard
   minimumRole: 'ADMINISTRADOR' as const,
 

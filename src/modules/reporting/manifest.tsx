@@ -19,10 +19,6 @@ export const reportingManifest: ModuleManifest = {
   version: '1.0.0',
 
   depends: [],
-  autoInstall: true, // Always available for custom reports
-
-  requiredFeatures: [] as FeatureId[],
-  optionalFeatures: [] as FeatureId[],
 
   // 🔒 PERMISSIONS: Supervisors can generate reports
   minimumRole: 'SUPERVISOR' as const,

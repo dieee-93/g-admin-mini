@@ -69,21 +69,15 @@ export const achievementsManifest: ModuleManifest = {
    * Auto-install: TRUE
    * Este módulo se activa automáticamente en todos los casos
    */
-  autoInstall: true,
-
   // ============================================
   // FEATURE REQUIREMENTS
   // ============================================
 
   /**
    * Sin features requeridas - siempre activo
-   */
-  requiredFeatures: [],
-
-  /**
+   *//**
    * Sin features opcionales
    */
-  optionalFeatures: [],
 
   // ============================================
   // PERMISSIONS & ROLES
@@ -104,9 +98,10 @@ export const achievementsManifest: ModuleManifest = {
      * Otros módulos llaman a estos hooks
      */
     provide: [
-      'achievements.register_requirement', // Registrar requirements
+      'achievements.register_requirement', // Registrar requirements (DEPRECATED)
       'achievements.validate_commercial_operation', // Validar operación
       'achievements.get_progress', // Obtener progreso
+      'achievements.get_requirements_registry', // ← NUEVO: Hook para registro dinámico
       'dashboard.widgets', // Widget dashboard
     ],
 
@@ -129,92 +124,67 @@ export const achievementsManifest: ModuleManifest = {
   /**
    * Setup: Inicializar sistema de achievements
    *
-   * CRITICAL: Este setup DEBE completarse ANTES que otros módulos
-   * se registren, para que puedan registrar sus requirements.
+   * ⚠️ REFACTORED v2.0:
+   * - Requirements ahora son estáticos (en requirements/)
+   * - NO hay registry en store (los requirements están en archivos)
+   * - Progress se computa on-demand (progressCalculator service)
+   * - Store solo maneja UI state
+   *
+   * ✅ PERFORMANCE FIX: Deferred initialization pattern
+   * - Critical hooks registered immediately (< 50ms)
+   * - Heavy imports/EventBus deferred with setTimeout
+   * - Target: Reduce 749ms → < 100ms blocking time
+   *
+   * CRITICAL: Este setup configura los hooks que BLOQUEAN operaciones
    */
   setup: async (registry) => {
-    logger.info('App', '🏆 Setting up Achievements module');
+    logger.info('App', '🏆 Setting up Achievements module (v2.0) - Fast path');
 
     // ============================================
-    // STORAGE
+    // PHASE 1: CRITICAL PATH (Synchronous - < 50ms)
     // ============================================
+    // Register essential hooks immediately to prevent blocking operations
 
-    /**
-     * Storage Map para requirements registrados
-     * Map<capability, Requirement[]>
-     */
-    const requirementsMap = new Map<BusinessCapabilityId, Requirement[]>();
-
-    // ============================================
-    // HOOK 1: Register Requirement
-    // ============================================
-
-    /**
-     * Hook para que módulos registren sus requirements
-     *
-     * @example
-     * registry.doAction('achievements.register_requirement', {
-     *   capability: 'pickup_counter',
-     *   requirements: TAKEAWAY_MANDATORY
-     * });
-     */
+    // HOOK 1: Register Requirement (DEPRECATED - lightweight stub)
     registry.addAction(
       'achievements.register_requirement',
-      (data: RegisterRequirementHandler) => {
-        const { capability, requirements } = data;
-
-        // Inicializar array si no existe
-        if (!requirementsMap.has(capability)) {
-          requirementsMap.set(capability, []);
-        }
-
-        // Agregar requirements
-        const existing = requirementsMap.get(capability)!;
-        existing.push(...requirements);
-
-        logger.debug('App', `✅ Registered ${requirements.length} requirements for ${capability}`, {
-          capability,
-          count: requirements.length,
-          total: existing.length,
-        });
-
+      () => {
+        logger.warn(
+          'App', 
+          '⚠️ achievements.register_requirement is deprecated. Requirements are now static in requirements/'
+        );
         return { success: true };
       },
       'achievements',
       10
     );
 
-    // ============================================
-    // HOOK 2: Validate Commercial Operation
-    // ============================================
-
-    /**
-     * Hook para validar una operación comercial
-     *
-     * @example
-     * const result = registry.doAction('achievements.validate_commercial_operation', {
-     *   capability: 'pickup_counter',
-     *   action: 'takeaway:toggle_public',
-     *   context: validationContext
-     * });
-     *
-     * if (!result[0].allowed) {
-     *   showSetupModal(result[0].missingRequirements);
-     * }
-     */
+    // HOOK 2: Validate Commercial Operation (CRITICAL - must be available immediately)
+    // Use lazy evaluation - defer heavy imports until first use
+    let requirementsModule: any = null;
+    
     registry.addAction(
       'achievements.validate_commercial_operation',
-      (data: ValidateOperationHandler): ValidationResult => {
+      (data?: ValidateOperationHandler): ValidationResult => {
+        if (!data) {
+          return { allowed: false, reason: 'Invalid data' };
+        }
+
         const { capability, action, context } = data;
 
         logger.debug('App', `🔍 Validating operation: ${action} for ${capability}`);
 
-        // Obtener requirements de esta capability
-        const capabilityRequirements = requirementsMap.get(capability) || [];
+        // Lazy load requirements on first use (not during setup)
+        if (!requirementsModule) {
+          logger.warn('App', '⚠️ Requirements not yet loaded - allowing operation');
+          return { allowed: true }; // Fail-open during initialization
+        }
 
-        // Filtrar solo los que bloquean esta acción
+        const { getRequirements } = requirementsModule;
+        const capabilityRequirements = getRequirements(capability);
+
         const relevantRequirements = capabilityRequirements.filter(
-          (req) => req.blocksAction === action
+          (req: Requirement) => req.blocksAction === action
         );
 
         if (relevantRequirements.length === 0) {
@@ -222,105 +192,365 @@ export const achievementsManifest: ModuleManifest = {
           return { allowed: true };
         }
 
-        // Ejecutar validators
         const incomplete = relevantRequirements.filter(
-          (req) => !req.validator(context)
+          (req: Requirement) => !req.validator(context)
         );
 
         if (incomplete.length > 0) {
           const progressPercentage = Math.round(
             ((relevantRequirements.length - incomplete.length) /
               relevantRequirements.length) *
-              100
+            100
           );
 
           logger.warn(
             'App',
             `❌ Operation blocked: ${action} - ${incomplete.length} requirements missing`,
             {
-              missing: incomplete.map((r) => r.id),
+              missing: incomplete.map((r: Requirement) => r.id),
               progress: progressPercentage,
             }
           );
 
           return {
             allowed: false,
-            reason: `Debes completar ${incomplete.length} configuraciones antes de continuar`,
+            reason: `Configuración incompleta (${progressPercentage}%)`,
             missingRequirements: incomplete,
             progressPercentage,
           };
         }
 
-        logger.info('App', `✅ Operation allowed: ${action} - All requirements met`);
-
-        return {
-          allowed: true,
-          progressPercentage: 100,
-        };
+        logger.debug('App', `✅ All requirements met for action: ${action}`);
+        return { allowed: true };
       },
       'achievements',
       10
     );
 
+    logger.info('App', '✅ Achievements module critical hooks registered (fast path complete)');
+
     // ============================================
-    // HOOK 3: Get Progress
+    // PHASE 2: DEFERRED INITIALIZATION (Async - non-blocking)
+    // ============================================
+    // Defer heavy imports and EventBus setup to not block startup
+    
+    setTimeout(async () => {
+      logger.info('App', '⏱️ Starting deferred achievements initialization');
+      const deferredStart = performance.now();
+
+      try {
+        // ============================================
+        // IMPORT DEPENDENCIES (Refactored Architecture)
+        // ============================================
+        // IMPORT DEPENDENCIES (Deferred - non-blocking)
+        // ============================================
+
+        /**
+         * REFACTORED: Requirements son estáticos, no se "registran"
+         * La fuente de verdad está en requirements/index.ts
+         */
+        // ⚡ PERFORMANCE: Parallel imports (2 imports)
+        const [
+          { getRequirements: getRequirementsFn, ALL_MANDATORY_REQUIREMENTS },
+          { computeProgress }
+        ] = await Promise.all([
+          import('./requirements'),
+          import('./services/progressCalculator')
+        ]);
+
+        // ✅ Store requirements module for lazy validation
+        requirementsModule = { getRequirements: getRequirementsFn, ALL_MANDATORY_REQUIREMENTS, computeProgress };
+
+        const requirementsCount = ALL_MANDATORY_REQUIREMENTS?.length || 0;
+        logger.info('App', `📋 Loaded ${requirementsCount} mandatory requirements (deferred)`);
+
+        // ============================================
+        // HOOK 3: Get Progress (Non-critical)
+        // ============================================
+
+        /**
+         * Hook para obtener progreso de una capability.
+         * 
+         * REFACTORED v2.0:
+         * - Usa computeProgress() desde services/progressCalculator.ts
+         * - NO usa store
+         */
+        registry.addAction(
+          'achievements.get_progress',
+          (data?: GetProgressHandler): CapabilityProgress => {
+            if (!data) {
+              return {
+                capability: 'pickup_orders',
+                total: 0,
+                completed: 0,
+                percentage: 0,
+                isOperational: false,
+              };
+            }
+
+            const { capability, context } = data;
+            const progress = computeProgress(capability, context);
+
+            logger.debug('App', `📊 Progress for ${capability}: ${progress.percentage}%`, {
+              completed: progress.completed,
+              total: progress.total,
+              isOperational: progress.isOperational,
+            });
+
+            return progress;
+          },
+          'achievements',
+          10
+        );
+
+        // ============================================
+        // HOOK 4: Get Requirements Registry (NEW - Dynamic)
     // ============================================
 
     /**
-     * Hook para obtener progreso de una capability
-     *
+     * Hook para que módulos registren dinámicamente sus requirements.
+     * 
+     * Este es el hook CLAVE del nuevo sistema dinámico.
+     * Cada módulo (sales, delivery, floor, etc.) registra sus requirements via este hook.
+     * 
+     * ARQUITECTURA:
+     * - Cada módulo llama a este hook en su setup()
+     * - Achievements module NO conoce de antemano qué requirements existen
+     * - Component consume este hook para obtener requirements dinámicamente
+     * - Deduplicación automática de shared requirements
+     * 
      * @example
-     * const progress = registry.doAction('achievements.get_progress', {
-     *   capability: 'pickup_counter',
-     *   context: validationContext
-     * });
-     *
-     * console.log(`Progress: ${progress[0].percentage}%`);
+     * // Sales module registra sus requirements
+     * registry.addAction(
+     *   'achievements.get_requirements_registry',
+     *   () => ({
+     *     capability: 'pickup_orders',
+     *     requirements: TAKEAWAY_MANDATORY,
+     *     moduleId: 'sales'
+     *   }),
+     *   'sales'
+     * );
+     * 
+     * // Component consume todos los requirements registrados
+     * const allRegistrations = registry.doAction('achievements.get_requirements_registry');
+     * const deduplicated = deduplicateRequirements(allRegistrations);
+     * 
+     * @version 3.0.0 - Dynamic Hook System
      */
-    registry.addAction(
-      'achievements.get_progress',
-      (data: GetProgressHandler): CapabilityProgress => {
-        const { capability, context } = data;
+    logger.info('App', '🎣 Achievements module ready to receive requirements from other modules');
 
-        // Obtener requirements mandatory de esta capability
-        const capabilityRequirements = requirementsMap.get(capability) || [];
-        const mandatoryRequirements = capabilityRequirements.filter(
-          (r) => r.tier === 'mandatory'
-        );
+    // NOTE: Este hook NO tiene handler en achievements module.
+    // Los handlers son agregados por OTROS módulos cuando se registran.
+    // Achievements module solo CONSUME los resultados de este hook.
+    
+    // ============================================
+    // EVENTBUS INTEGRATION (Phase 2 - NEW)
+    // ============================================
 
-        // Contar completados
-        const completed = mandatoryRequirements.filter((req) =>
-          req.validator(context)
-        ).length;
+    /**
+     * EventBus Integration para reactividad automática.
+     * 
+     * ARQUITECTURA:
+     * - Escucha eventos de otros módulos (products, sales, staff, settings)
+     * - Invalida TanStack Query cache cuando datos relevantes cambian
+     * - Detecta cuando achievements se completan
+     * - Emite notificaciones al usuario
+     * 
+     * EVENTOS ESCUCHADOS:
+     * - products.created/updated/deleted → Invalida progress de capabilities
+     * - sales.order_completed → Invalida progress + detecta logros acumulativos
+     * - staff.member_added → Invalida progress de staff requirements
+     * - settings.updated → Invalida todos los progress (config changes)
+     * - payments.method_configured → Invalida progress de payment requirements
+     * 
+     * @version 2.0.0
+     */
 
-        const total = mandatoryRequirements.length;
-        const percentage =
-          total > 0 ? Math.round((completed / total) * 100) : 0;
+    logger.info('App', '🔌 Setting up EventBus integration for achievements...');
 
-        const missing = mandatoryRequirements.filter(
-          (req) => !req.validator(context)
-        );
+    // ⚡ PERFORMANCE: Parallel imports (3 imports)
+    const [
+      { eventBus, EventPriority },
+      { notify },
+      { PRODUCT_MILESTONES, SALES_MILESTONES }
+    ] = await Promise.all([
+      import('@/lib/events'),
+      import('@/lib/notifications'),
+      import('./types/events')
+    ]);
+    const getQueryClient = () => (window as any).__queryClient;
 
-        const progress: CapabilityProgress = {
-          capability,
-          total,
-          completed,
-          percentage,
-          isOperational: percentage === 100,
-          missing: missing.length > 0 ? missing : undefined,
+    eventBus.subscribe('products.created', async (event) => {
+      const { product, totalCount, previousCount } = event.payload || {};
+
+      logger.info('App', 'Product created - checking achievements', {
+        productId: product?.id,
+        productName: product?.name,
+        totalCount,
+        previousCount,
+      });
+
+      const queryClient = getQueryClient();
+      if (queryClient) {
+        await queryClient.invalidateQueries({ queryKey: ['achievements'] });
+        await queryClient.invalidateQueries({ queryKey: ['products'] });
+        logger.debug('App', 'Invalidated achievements cache');
+      }
+
+      if (!totalCount) return;
+
+      const newMilestones = PRODUCT_MILESTONES.filter(
+        m => (previousCount || 0) < m && totalCount >= m
+      );
+
+      for (const milestone of newMilestones) {
+        const messages: Record<number, string> = {
+          1: 'Has creado tu primer producto',
+          5: 'Tu catálogo está creciendo',
+          10: '¡Excelente progreso!',
+          20: 'Tu variedad está aumentando',
+          50: '¡Gran catálogo de productos!',
+          100: '¡Centenario de productos!',
+          500: '¡Eres un maestro del inventario!',
         };
 
-        logger.debug('App', `📊 Progress for ${capability}: ${percentage}%`, {
-          completed,
-          total,
-          isOperational: progress.isOperational,
+        notify.success({
+          title: `¡Logro desbloqueado! 🎉`,
+          description: `${milestone} productos creados - ${messages[milestone]}`,
+          duration: 5000,
         });
 
-        return progress;
-      },
-      'achievements',
-      10
-    );
+        logger.info('App', `Achievement unlocked: ${milestone} products`, {
+          milestone,
+          totalCount,
+          previousCount,
+        });
+      }
+    }, {
+      moduleId: 'achievements',
+      priority: EventPriority.NORMAL,
+    });
+
+    eventBus.subscribe('sales.order_completed', async (event) => {
+      const { orderId, orderTotal, items, totalSales, previousTotalSales } = event.payload || {};
+
+      logger.info('App', 'Sale completed - checking achievements', {
+        orderId,
+        orderTotal,
+        itemCount: items?.length || 0,
+        totalSales,
+        previousTotalSales,
+      });
+
+      const queryClient = getQueryClient();
+      if (queryClient) {
+        await queryClient.invalidateQueries({ queryKey: ['achievements'] });
+        logger.debug('App', 'Invalidated achievements cache');
+      }
+
+      if (!totalSales) return;
+
+      const newMilestones = SALES_MILESTONES.filter(
+        m => (previousTotalSales || 0) < m && totalSales >= m
+      );
+
+      for (const milestone of newMilestones) {
+        const messages: Record<number, string> = {
+          1: 'Primera venta completada',
+          10: 'Tu negocio está creciendo',
+          50: 'Vas por buen camino',
+          100: '¡Centenario de ventas!',
+          500: '¡Eres una máquina de ventas!',
+          1000: '¡Milestone épico alcanzado!',
+        };
+
+        notify.success({
+          title: `¡${milestone} venta${milestone > 1 ? 's' : ''} completada${milestone > 1 ? 's' : ''}! 🎯`,
+          description: messages[milestone],
+          duration: 5000,
+        });
+
+        logger.info('App', `Achievement unlocked: ${milestone} sales`, {
+          milestone,
+          totalSales,
+          previousTotalSales,
+        });
+      }
+    }, {
+      moduleId: 'achievements',
+      priority: EventPriority.NORMAL,
+    });
+
+    eventBus.subscribe('staff.member_added', async (event) => {
+      const { staffId, staffName, totalStaff, previousTotalStaff } = event.payload || {};
+
+      logger.info('App', 'Staff member added - checking achievements', {
+        staffId,
+        staffName,
+        totalStaff,
+        previousTotalStaff,
+      });
+
+      const queryClient = getQueryClient();
+      if (queryClient) {
+        await queryClient.invalidateQueries({ queryKey: ['achievements'] });
+        await queryClient.invalidateQueries({ queryKey: ['staff'] });
+        logger.debug('App', 'Invalidated achievements cache');
+      }
+
+      if (totalStaff === 1 && previousTotalStaff === 0) {
+        notify.success({
+          title: '¡Primer empleado agregado! 👥',
+          description: 'Tu equipo está creciendo',
+          duration: 5000,
+        });
+
+        logger.info('App', 'Achievement unlocked: First staff member');
+      }
+    }, {
+      moduleId: 'achievements',
+      priority: EventPriority.NORMAL,
+    });
+
+    eventBus.subscribe('settings.updated', async (event) => {
+      const { setting } = event.payload || {};
+
+      logger.info('App', 'Settings updated - invalidating progress', { setting });
+
+      const queryClient = getQueryClient();
+      if (queryClient) {
+        await queryClient.invalidateQueries({ queryKey: ['achievements'] });
+        await queryClient.invalidateQueries({ queryKey: ['settings'] });
+        logger.debug('App', 'Invalidated achievements cache');
+      }
+    }, {
+      moduleId: 'achievements',
+      priority: EventPriority.NORMAL,
+    });
+
+    eventBus.subscribe('payments.method_configured', async (event) => {
+      const { method } = event.payload || {};
+
+      logger.info('App', 'Payment method configured', { method });
+
+      const queryClient = getQueryClient();
+      if (queryClient) {
+        await queryClient.invalidateQueries({ queryKey: ['achievements'] });
+        await queryClient.invalidateQueries({ queryKey: ['payments'] });
+        logger.debug('App', 'Invalidated achievements cache');
+      }
+
+      notify.success({
+        title: '¡Método de pago configurado! 💳',
+        description: 'Ya puedes aceptar pagos',
+        duration: 5000,
+      });
+    }, {
+      moduleId: 'achievements',
+      priority: EventPriority.NORMAL,
+    });
+
+    logger.info('App', '✅ EventBus integration complete - 5 listeners registered');
 
     // ============================================
     // HOOK 4: Dashboard Widget
@@ -350,26 +580,36 @@ export const achievementsManifest: ModuleManifest = {
      *
      * CURRENT STATE: Using simplified placeholder widget
      */
-    const AchievementsWidgetPlaceholder = lazy(() =>
-      import('./components/AchievementsWidgetPlaceholder')
-    );
+        // ============================================
+        // HOOK 5: Dashboard Widget (Deferred - non-critical)
+        // ============================================
 
-    registry.addAction(
-      'dashboard.widgets',
-      () => {
-        return (
-          <React.Suspense fallback={<div>Cargando logros...</div>}>
-            <AchievementsWidgetPlaceholder />
-          </React.Suspense>
+        const AchievementsWidgetPlaceholder = lazy(() =>
+          import('./components/AchievementsWidgetPlaceholder')
         );
-      },
-      'achievements',
-      100 // Highest priority - setup guidance is critical
-    );
 
-    logger.warn('App', '⚠️ Using placeholder AchievementsWidget (full version requires refactor)');
+        registry.addAction(
+          'dashboard.widgets',
+          () => {
+            return (
+              <React.Suspense fallback={<div>Cargando logros...</div>}>
+                <AchievementsWidgetPlaceholder />
+              </React.Suspense>
+            );
+          },
+          'achievements',
+          100 // Highest priority - setup guidance is critical
+        );
 
-    logger.info('App', '✅ Achievements module setup complete');
+        const deferredDuration = performance.now() - deferredStart;
+        logger.info('App', `✅ Achievements deferred initialization complete in ${deferredDuration.toFixed(2)}ms`);
+        logger.warn('App', '⚠️ Using placeholder AchievementsWidget (full version requires refactor)');
+        
+      } catch (error) {
+        logger.error('App', '❌ Achievements deferred initialization failed', error);
+      }
+    }, 0); // Defer to next tick (non-blocking)
+    
   },
 
   // ============================================
@@ -467,23 +707,23 @@ export const achievementsManifest: ModuleManifest = {
   // ============================================
 
   metadata: {
-    category: 'system',
+    category: 'core',
     description: 'Requirements and achievements tracking system',
     author: 'G-Admin Team',
     tags: ['achievements', 'requirements', 'gamification', 'validation'],
   },
 
   // ============================================
-  // NAVIGATION
+  // NAVIGATION (Optional - commented until needed)
   // ============================================
 
-  navigation: {
-    title: 'Logros',
-    icon: '🏆',
-    path: '/admin/gamification/achievements',
-    section: 'gamification',
-    order: 10,
-  },
+  // navigation: {
+  //   title: 'Logros',
+  //   icon: '🏆',
+  //   path: '/admin/gamification/achievements',
+  //   section: 'gamification',
+  //   order: 10,
+  // },
 };
 
 /**

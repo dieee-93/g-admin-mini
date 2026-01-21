@@ -22,19 +22,10 @@ export const membershipsManifest: ModuleManifest = {
 
   depends: ['customers'], // ✅ FIXED: Removed 'billing' to break circular dependency (communicate via EventBus instead)
   autoInstall: false, // ✅ FIXED: Controlled by membership_subscriptions capability
+  activatedBy: 'membership_subscription_plans',
 
-  requiredFeatures: [
-    'membership_subscription_plans',
-    'membership_recurring_billing'
-  ] as FeatureId[],
-  optionalFeatures: [
-    'membership_access_control',
-    'membership_usage_tracking',
-    'membership_benefits_management',
-    'customer_loyalty_program',
-    'finance_payment_terms',
-  ] as FeatureId[],
 
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   // 🔒 PERMISSIONS: Supervisors can manage memberships
   minimumRole: 'SUPERVISOR' as const,
 

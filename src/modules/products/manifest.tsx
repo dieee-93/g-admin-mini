@@ -21,17 +21,10 @@ export const productsManifest: ModuleManifest = {
   version: '1.0.0',
 
   depends: ['materials'], // Products use materials in recipes
-  autoInstall: false,
 
-  requiredFeatures: [] as FeatureId[], // Optional - user activates
-  optionalFeatures: [
-    'products_recipe_management',
-    'products_catalog_menu',
-    'products_catalog_ecommerce',
-    'products_package_management',
-    'products_cost_intelligence',
-    'products_availability_calculation',
-  ] as FeatureId[],
+  activatedBy: 'products_recipe_management',
+
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
 
   // 🔒 PERMISSIONS: Employees can view products
   minimumRole: 'OPERADOR' as const,
@@ -129,8 +122,14 @@ export const productsManifest: ModuleManifest = {
       // EVENTBUS LISTENERS: React to cross-module events
       // ============================================
 
-      const { eventBus, EventPriority } = await import('@/lib/events');
-      const { supabase } = await import('@/lib/supabase/client');
+      // ⚡ PERFORMANCE: Parallel imports (2 imports)
+      const [
+        { eventBus, EventPriority },
+        { supabase }
+      ] = await Promise.all([
+        import('@/lib/events'),
+        import('@/lib/supabase/client')
+      ]);
 
       /**
        * LISTENER 1: materials.stock_updated

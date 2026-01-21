@@ -13,6 +13,7 @@
  */
 
 import type { FeatureId, Feature } from './types';
+import { ModuleRegistry } from '@/lib/modules/ModuleRegistry';
 
 // ============================================
 // FEATURE DEFINITIONS (88 features)
@@ -912,45 +913,13 @@ const FEATURE_REGISTRY: Record<FeatureId, Feature> = {
   // CORE DOMAIN (7 features)
   // ============================================
 
-  'customers': {
-    id: 'customers',
-    name: 'Gestión de Clientes',
-    description: 'Módulo de gestión de clientes',
-    domain: 'CORE',
-    category: 'always_active'
-  },
-
-  'dashboard': {
-    id: 'dashboard',
-    name: 'Dashboard',
-    description: 'Panel de control principal',
-    domain: 'CORE',
-    category: 'always_active'
-  },
-
-  'settings': {
-    id: 'settings',
-    name: 'Configuración',
-    description: 'Configuración del sistema',
-    domain: 'CORE',
-    category: 'always_active'
-  },
-
-  'gamification': {
-    id: 'gamification',
-    name: 'Gamificación',
-    description: 'Sistema de gamificación y logros',
-    domain: 'ENGAGEMENT',
-    category: 'always_active'
-  },
-
-  'debug': {
-    id: 'debug',
-    name: 'Herramientas de Debug',
-    description: 'Herramientas de desarrollo y debugging',
-    domain: 'DEV',
-    category: 'always_active'
-  },
+  // ============================================
+  // REMOVED: 'always_active' features
+  // ============================================
+  // Previously: customers, dashboard, settings, gamification, debug
+  // These are now CORE modules (not features) loaded via CORE_MODULES array
+  // See: src/lib/modules/constants.ts for CORE_MODULES definition
+  // ============================================
 
   'executive': {
     id: 'executive',
@@ -1050,25 +1019,55 @@ export function countFeaturesByDomain(): Record<Feature['domain'], number> {
 }
 
 // ============================================
-// MODULE ↔ FEATURE BIDIRECTIONAL MAPPING
+// CORE FEATURES (Industry Standard Pattern)
 // ============================================
 
 /**
- * Mapeo bidireccional entre módulos de navegación y features del sistema.
+ * CORE_FEATURES - Features that are ALWAYS active regardless of capabilities
+ * 
+ * DESIGN DECISION (validated with industry research):
+ * - WordPress has "core plugins" (always installed)
+ * - Odoo has "base" module (always installed)
+ * - Martin Fowler categorizes these as "Permissioning Toggles" (long-lived, years)
+ * 
+ * REMOVED: CORE_FEATURES array
  *
- * Este mapeo resuelve el problema de módulos que nunca aparecían en la navegación
- * porque no tenían features asociadas o tenían nombres diferentes.
+ * Previously: Features that were always active regardless of business model
+ * Now: CORE modules loaded directly via CORE_MODULES array in bootstrap.ts
  *
- * - `alwaysActive`: Módulos que SIEMPRE deben mostrarse (dashboard, settings)
- * - `requiredFeatures`: Features que DEBEN estar activas (AND logic - todas requeridas)
- * - `optionalFeatures`: Features que PUEDEN activar el módulo (OR logic - al menos una)
+ * @see src/lib/modules/constants.ts for CORE_MODULES definition
+ * @see docs/plans/2026-01-19-capabilities-architecture-simplification.md
+ */
+// export const CORE_FEATURES: REMOVED - See comment above
+
+// ============================================
+// MODULE FEATURE MAP
+// ============================================
+
+/**
+ * @deprecated MODULE_FEATURE_MAP - LEGACY STATIC MAPPING
  *
- * @version 1.0.0 - Navigation Integration Fix
+ * ⚠️ DEPRECATION NOTICE (2026-01-19):
+ * This map is NO LONGER USED in production code.
+ * Module loading is now handled by:
+ * - CORE_MODULES array (src/lib/modules/constants.ts)
+ * - OPTIONAL_MODULES mapping (src/lib/modules/constants.ts)
+ * - Bootstrap logic (src/lib/modules/bootstrap.ts)
+ *
+ * This map is ONLY used in legacy tests and should be removed in a future refactor.
+ *
+ * LEGACY PROPERTIES (no longer relevant):
+ * - alwaysActive → REPLACED by CORE_MODULES array
+ * - activatedBy → NOW in manifest.activatedBy (for OPTIONAL modules)
+ * - enhancedBy → REMOVED (over-engineering, not used)
+ *
+ * @see src/lib/modules/constants.ts for current module loading logic
+ * @see docs/plans/2026-01-19-capabilities-architecture-simplification.md
  */
 export const MODULE_FEATURE_MAP: Record<string, {
   alwaysActive?: boolean;
-  requiredFeatures?: FeatureId[];
-  optionalFeatures?: FeatureId[];
+  activatedBy?: FeatureId;
+  enhancedBy?: FeatureId[];
   description?: string;
 }> = {
   // ============================================
@@ -1094,399 +1093,225 @@ export const MODULE_FEATURE_MAP: Record<string, {
     alwaysActive: true,
     description: 'Herramientas de debug - visible solo para SUPER_ADMIN (filtrado por role)'
   },
-  'achievements': {
+
+  // ============================================
+  // BUSINESS MODULES - Staff & Resources
+  // ============================================
+
+  'shift-control': {
     alwaysActive: true,
-    description: 'Sistema de logros y requisitos - siempre visible para mostrar progreso'
-  },
-
-  // ============================================
-  // BUSINESS MODULES (Feature-dependent)
-  // ============================================
-
-  'sales': {
-    optionalFeatures: [
-      'sales_order_management',
-      'sales_payment_processing',
-      'sales_catalog_menu',
-      'sales_pos_onsite',
-      'sales_dine_in_orders',
-      'sales_order_at_table',
-      'sales_online_order_processing',
-      'sales_online_payment_gateway',
-      'sales_cart_management',
-      'sales_checkout_process',
-      'sales_multicatalog_management',
-      'sales_bulk_pricing',
-      'sales_quote_generation',
-      'sales_product_retail',
-      'sales_contract_management',
-      'sales_tiered_pricing',
-      'sales_approval_workflows',
-      'sales_quote_to_order',
-      'sales_split_payment',
-      'sales_tip_management',
-      'sales_coupon_management',
-      'sales_pickup_orders',
-      'sales_delivery_orders',
-      'sales_package_management'
-    ],
-    description: 'Módulo de ventas - activo con cualquier feature de SALES'
-  },
-
-  'materials': {
-    optionalFeatures: [
-      'inventory_stock_tracking',
-      'inventory_alert_system',
-      'inventory_purchase_orders',
-      'inventory_supplier_management',
-      'inventory_low_stock_auto_reorder',
-      'inventory_demand_forecasting',
-      'inventory_batch_lot_tracking',
-      'inventory_expiration_tracking',
-      'inventory_available_to_promise'
-    ],
-    description: 'Módulo de inventario - activo con cualquier feature de INVENTORY'
-  },
-
-  'products': {
-    optionalFeatures: [
-      // Products features
-      'products_recipe_management',
-      'products_catalog_menu',
-      'products_catalog_ecommerce',
-      'products_package_management',
-      'products_cost_intelligence',
-      'products_availability_calculation',
-      'products_dynamic_materials',
-      'sales_order_management',
-      'sales_catalog_menu',
-      'sales_catalog_ecommerce',
-      'sales_package_management',
-      'production_bom_management',
-      'production_display_system'
-    ],
-    description: 'Módulo de productos - activo si vendes o produces algo'
-  },
-
-  'operations': {
-    optionalFeatures: [
-      'operations_table_management',
-      'operations_table_assignment',
-      'operations_floor_plan_config',
-      'operations_waitlist_management',
-      'operations_delivery_zones',
-      'operations_delivery_tracking',
-      'operations_pickup_scheduling',
-      'operations_notification_system',
-      'operations_vendor_performance'
-    ],
-    description: 'Módulo de operaciones - activo con cualquier feature de OPERATIONS'
-  },
-
-  'scheduling': {
-    optionalFeatures: [
-      'scheduling_appointment_booking',
-      'scheduling_calendar_management',
-      'staff_shift_management'
-    ],
-    description: 'Módulo de programación - activo con features de SCHEDULING o STAFF shifts'
+    description: 'Sistema de control de turnos - coordinación centralizada'
   },
 
   'staff': {
-    optionalFeatures: [
-      'staff_employee_management',
-      'staff_shift_management',
-      'staff_time_tracking',
-      'staff_performance_tracking',
-      'staff_training_management'
-    ],
-    description: 'Módulo de personal - activo con cualquier feature de STAFF'
+    activatedBy: 'staff_employee_management',
+    enhancedBy: ['staff_labor_cost_tracking'],
+    description: 'Módulo de personal - gestión de empleados y turnos'
   },
 
-  'customers': {
-    optionalFeatures: [
-      'customer_loyalty_program',
-      'customer_service_history',
-      'customer_preference_tracking',
-      'sales_order_management'
-    ],
-    description: 'Módulo de clientes - activo con features de CUSTOMER o SALES'
-  },
-
-  'fiscal': {
-    optionalFeatures: [
-      'finance_invoice_scheduling',
-      'finance_corporate_accounts',
-      'finance_credit_management',
-      'finance_payment_terms'
-    ],
-    description: 'Módulo fiscal/finanzas - activo con cualquier feature de FINANCE'
-  },
-
-  'finance': {
-    requiredFeatures: ['finance_corporate_accounts'],
-    optionalFeatures: [
-      'finance_credit_management',
-      'finance_invoice_scheduling',
-      'finance_payment_terms'
-    ],
-    description: 'Módulo Finance B2B - gestión de cuentas corporativas y crédito'
-  },
-
-  'delivery': {
-    requiredFeatures: [
-      'operations_delivery_zones',
-      'operations_delivery_tracking'
-    ],
-    description: 'Módulo de delivery - requiere TODAS las features de delivery (delivery_shipping capability)'
-  },
-
-  'production': { // RENAMED: kitchen → production
-    requiredFeatures: [
-      'production_bom_management',
-      'production_display_system',
-      'production_order_queue'
-    ],
-    // ✅ FIX Bug #1: Updated obsolete capability reference
-    description: 'Módulo de producción - activado por physical_products o professional_services capabilities'
-  },
-
-  'floor': {
-    requiredFeatures: [
-      'operations_table_management',
-      'operations_floor_plan_config'
-    ],
-    description: 'Módulo de piso/mesas - requiere TODAS las features de floor (onsite_service capability)'
+  'scheduling': {
+    activatedBy: 'staff_shift_management',
+    enhancedBy: ['staff_time_tracking', 'staff_labor_cost_tracking'],
+    description: 'Módulo de programación - turnos y calendarios'
   },
 
   // ============================================
-  // ADVANCED MODULES (Feature-dependent)
+  // SUPPLY CHAIN MODULES
   // ============================================
 
-  'executive': {
-    optionalFeatures: [
-      'executive',
-      'analytics_ecommerce_metrics',
-      'analytics_conversion_tracking',
-      'multisite_comparative_analytics'
-    ],
-    description: 'Business Intelligence ejecutivo - requiere analytics avanzados'
+  'materials': {
+    activatedBy: 'inventory_stock_tracking',
+    description: 'Módulo de inventario - gestión de materiales y stock'
   },
 
-  'reporting': {
-    optionalFeatures: [
-      'analytics_ecommerce_metrics',
-      'analytics_conversion_tracking',
-      'multisite_comparative_analytics',
-      'sales_order_management'
-    ],
-    description: 'Sistema de reportes y analytics - activo con cualquier feature de analytics'
+  'suppliers': {
+    activatedBy: 'inventory_supplier_management',
+    enhancedBy: ['inventory_demand_forecasting'],
+    description: 'Módulo de gestión de proveedores'
   },
 
-  'intelligence': {
-    optionalFeatures: [
-      'analytics_ecommerce_metrics',
-      'analytics_conversion_tracking',
-      'sales_catalog_ecommerce',
-      'sales_product_retail'
-    ],
-    description: 'Inteligencia de mercado y competencia - análisis de tendencias y competidores'
+  'products': {
+    alwaysActive: true,
+    description: 'Módulo de productos - catálogos y gestión (core: all businesses have products)'
+  },
+
+  'recipe': {
+    activatedBy: 'products_recipe_management',
+    description: 'Gestión de recetas y BOM'
   },
 
   'products-analytics': {
-    optionalFeatures: [
-      'can_view_menu_engineering',
-      'products_recipe_management',
-      'production_order_queue',
-      'sales_product_retail',
-      'inventory_demand_forecasting',
-      'analytics_ecommerce_metrics'
-    ],
-    description: 'Analytics de productos - análisis de producción y rentabilidad'
+    activatedBy: 'products_cost_intelligence',
+    enhancedBy: ['can_view_menu_engineering'],
+    description: 'Analytics de productos - análisis de costos y rentabilidad'
   },
 
-  'billing': {
-    optionalFeatures: [
-      'finance_invoice_scheduling',
-      'finance_payment_terms',
-      'customer_loyalty_program',
-      'finance_credit_management'
-    ],
+  // ============================================
+  // OPERATIONS MODULES
+  // ============================================
+
+  'sales': {
+    alwaysActive: true,
+    enhancedBy: ['sales_payment_processing', 'sales_pos_onsite', 'sales_dine_in_orders'],
+    description: 'Módulo de ventas - gestión de órdenes y pagos (core: sales_order_management)'
+  },
+
+  'customers': {
+    alwaysActive: true,
+    description: 'Módulo CRM - gestión de clientes (core: all businesses have customers)'
+  },
+
+  'fulfillment': {
+    alwaysActive: true,
+    enhancedBy: ['sales_payment_processing'],
+    description: 'Módulo unificado de fulfillment - gestiona órdenes onsite, pickup y delivery'
+  },
+
+  'fulfillment-onsite': {
+    activatedBy: 'operations_table_management',
+    enhancedBy: ['operations_table_assignment', 'operations_floor_plan_config'],
+    description: 'Fulfillment onsite - gestión de mesas y servicio en local'
+  },
+
+  'fulfillment-pickup': {
+    activatedBy: 'sales_pickup_orders',
+    enhancedBy: ['operations_pickup_scheduling'],
+    description: 'Fulfillment pickup - gestión de órdenes para retirar'
+  },
+
+  // ============================================
+  // FINANCE MODULES
+  // ============================================
+
+  'finance-billing': {
+    activatedBy: 'finance_invoice_scheduling',
+    enhancedBy: ['customer_loyalty_program'],
     description: 'Billing recurrente y suscripciones - facturas programadas'
   },
 
+  'finance-fiscal': {
+    activatedBy: 'finance_invoice_scheduling',
+    description: 'Módulo fiscal - cumplimiento tributario e impuestos'
+  },
+
+  'finance-corporate': {
+    activatedBy: 'finance_corporate_accounts',
+    enhancedBy: ['finance_credit_management', 'finance_payment_terms'],
+    description: 'Finance B2B - gestión de cuentas corporativas y crédito'
+  },
+
   'finance-integrations': {
-    optionalFeatures: [
-      'sales_online_payment_gateway',
-      'sales_payment_processing',
-      'finance_payment_terms'
-    ],
+    alwaysActive: true,
+    enhancedBy: ['operations_shipping_integration'],
     description: 'Integraciones de pago - MercadoPago, MODO, pasarelas'
   },
 
+  'cash-management': {
+    alwaysActive: true,
+    description: 'Gestión de caja - sesiones, movimientos, conciliación (core financial operation)'
+  },
+
+  // ============================================
+  // ADVANCED MODULES
+  // ============================================
+
   'memberships': {
-    requiredFeatures: [
-      'membership_subscription_plans',
-      'membership_recurring_billing'
-    ],
-    optionalFeatures: [
-      'membership_access_control',
-      'membership_usage_tracking',
-      'membership_benefits_management',
-      'customer_loyalty_program',
-      'scheduling_appointment_booking',
-      'finance_invoice_scheduling'
-    ],
+    activatedBy: 'membership_subscription_plans',
+    enhancedBy: ['membership_recurring_billing', 'finance_payment_terms'],
     description: 'Gestión de membresías y suscripciones - planes y cobros recurrentes'
   },
 
   'rentals': {
-    requiredFeatures: [
-      'rental_item_management',
-      'rental_booking_calendar',
-      'rental_availability_tracking'
-    ],
-    optionalFeatures: [
-      'rental_pricing_by_duration',
-      'rental_late_fees',
-      'inventory_stock_tracking',
-      'scheduling_appointment_booking',
-      'operations_vendor_performance',
-      'inventory_available_to_promise'
-    ],
+    activatedBy: 'rental_item_management',
+    enhancedBy: ['rental_booking_calendar', 'rental_availability_tracking', 'scheduling_calendar_management'],
     description: 'Gestión de alquileres - equipos, espacios, recursos'
   },
 
   'assets': {
-    optionalFeatures: [
-      'inventory_stock_tracking',
-      'operations_vendor_performance',
-      'staff_employee_management',
-      'scheduling_calendar_management'
-    ],
+    alwaysActive: true,
     description: 'Gestión de activos - equipos, vehículos, mantenimiento'
   },
 
-  'finance-advanced': {
-    optionalFeatures: [
-      'finance_invoice_scheduling',
-      'finance_payment_terms'
-    ],
-    description: 'Finanzas avanzadas - billing recurrente e integraciones'
-  },
-
-  'operations-advanced': {
-    optionalFeatures: [
-      'operations_vendor_performance',
-      'multisite_location_management'
-    ],
-    description: 'Operaciones avanzadas - membresías, alquileres, activos'
-  },
-
-  'advanced-tools': {
-    optionalFeatures: [
-      'analytics_ecommerce_metrics',
-      'analytics_conversion_tracking'
-    ],
-    description: 'Herramientas avanzadas - reportes con IA'
-  },
-
   // ============================================
-  // INFRASTRUCTURE MODULES (Feature-dependent)
+  // ANALYTICS MODULES
   // ============================================
 
-  'mobile': {
-    optionalFeatures: [
-      'mobile_location_tracking',       // GPS tracking
-      'mobile_route_planning',          // Route planning
-      'mobile_inventory_constraints'    // Capacity limits
-    ],
-    description: 'Módulo móvil - activo con features de MOBILE'
+  'reporting': {
+    alwaysActive: true,
+    description: 'Sistema de reportes y analytics'
   },
 
-  'multisite': {
-    optionalFeatures: [
-      'multisite_location_management',
-      'multisite_centralized_inventory',
-      'multisite_transfer_orders'
-    ],
-    description: 'Multi-ubicación - activo con features de MULTISITE'
+  'intelligence': {
+    alwaysActive: true,
+    description: 'Inteligencia de mercado y competencia - análisis de tendencias'
   },
 
-  // ============================================
-  // SUPPLY CHAIN MODULES (Added - Navigation Fix)
-  // ============================================
-
-  'suppliers': {
-    optionalFeatures: [
-      'inventory_supplier_management',
-      'inventory_purchase_orders',
-      'operations_vendor_performance'
-    ],
-    description: 'Módulo de gestión de proveedores'
-  },
-
-  'supplier-orders': {
-    requiredFeatures: ['inventory_supplier_management'],
-    optionalFeatures: [
-      'inventory_purchase_orders',
-      'inventory_demand_forecasting'
-    ],
-    description: 'Órdenes de compra a proveedores'
+  'executive': {
+    alwaysActive: true,
+    enhancedBy: ['executive'],
+    description: 'Business Intelligence ejecutivo - analytics avanzados'
   }
 };
+
+// ============================================
+// ARCHITECTURE DECISION: STATIC MAP + TEST VALIDATION
+// ============================================
+
+/**
+ * DECISION: We use a static MODULE_FEATURE_MAP instead of dynamic generation
+ * 
+ * WHY:
+ * - Industry standard (ESLint, Babel, Webpack all do this)
+ * - Simple: No build scripts, no AST parsing, no import resolution issues
+ * - Fast: No runtime overhead
+ * - Validated: Test ensures map stays in sync with manifests
+ * 
+ * TRADE-OFF:
+ * - Intentional duplication between MODULE_FEATURE_MAP and module manifests
+ * - Validated by: src/__tests__/module-feature-map-validation.test.ts
+ * 
+ * MAINTAINING:
+ * 1. When you add/modify a module manifest, update MODULE_FEATURE_MAP
+ * 2. Run: pnpm test src/__tests__/module-feature-map-validation.test.ts
+ * 3. CI will fail if they drift out of sync
+ * 
+ * @see src/__tests__/module-feature-map-validation.test.ts
+ */
 
 // ============================================
 // FEATURE → UI MAPPING FUNCTIONS
 // ============================================
 
 /**
- * Obtiene módulos activos para un conjunto de features (v2.0 - Navigation Integration Fix)
+ * Obtiene módulos activos para un conjunto de features
  *
- * Módulos son las rutas/secciones principales de la aplicación que se muestran
- * en la navegación según las features activas.
- *
- * Esta función usa MODULE_FEATURE_MAP para determinar qué módulos activar,
- * solucionando el problema de módulos que nunca aparecían.
+ * NUEVA ARQUITECTURA (clean, validated with industry research):
+ * - alwaysActive → module always in navigation
+ * - activatedBy → module appears if user has this ONE feature
+ * - enhancedBy → extra features that add functionality (but don't activate module)
  *
  * @param features - Array de FeatureIds activas
- * @returns Array de module IDs (routes) incluyendo always-active modules
+ * @returns Array de module IDs (routes) que deberían aparecer en navegación
  *
  * @example
  * const modules = getModulesForActiveFeatures(['sales_order_management']);
- * // Returns: ['dashboard', 'settings', 'gamification', 'sales', ...]
+ * // Returns: ['dashboard', 'settings', 'sales', 'customers', 'fulfillment', ...]
  */
 export function getModulesForActiveFeatures(features: FeatureId[]): string[] {
   const activeModules = new Set<string>();
 
-  // Iterate over all module definitions
   Object.entries(MODULE_FEATURE_MAP).forEach(([moduleId, config]) => {
-    // Case 1: Always-active modules (dashboard, settings, gamification, debug)
+    // Case 1: Always-active modules (dashboard, settings, customers, etc.)
     if (config.alwaysActive) {
       activeModules.add(moduleId);
       return;
     }
 
-    // Case 2: Modules with required features (AND logic - all must be present)
-    // ✅ FIX Bug #0: If requiredFeatures exist, they MUST be met
-    // optionalFeatures should NOT activate the module if required are not met
-    if (config.requiredFeatures && config.requiredFeatures.length > 0) {
-      const hasAllRequired = config.requiredFeatures.every(f => features.includes(f));
-      if (hasAllRequired) {
-        activeModules.add(moduleId);
-        // optionalFeatures are bonus features, not needed for activation
-      }
-      // ✅ If required features not met, don't activate even if optional are present
-      return;
-    }
-
-    // Case 3: Modules with ONLY optional features (OR logic - at least one must be present)
-    // Only executed for modules WITHOUT requiredFeatures (like materials)
-    if (config.optionalFeatures && config.optionalFeatures.length > 0) {
-      const hasAnyOptional = config.optionalFeatures.some(f => features.includes(f));
-      if (hasAnyOptional) {
-        activeModules.add(moduleId);
-      }
+    // Case 2: Modules activated by a single feature
+    // (Odoo pattern: single 'depends' feature)
+    if (config.activatedBy && features.includes(config.activatedBy)) {
+      activeModules.add(moduleId);
+      // Note: enhancedBy features don't affect activation, only add functionality
     }
   });
 

@@ -45,21 +45,7 @@ export const dashboardManifest: ModuleManifest = {
    */
   depends: [],
 
-  autoInstall: true, // Always available
-
-  // ============================================
-  // FEATURE REQUIREMENTS
-  // ============================================
-
-  /**
-   * No required features - always active
-   */
-  requiredFeatures: [] as FeatureId[],
-
-  /**
-   * Optional features that enhance functionality
-   */
-  optionalFeatures: ['dashboard'] as FeatureId[],
+  // ✅ CORE MODULE: No activatedBy needed (always loaded)
 
   // ============================================
   // PERMISSIONS & ROLES
@@ -127,8 +113,30 @@ export const dashboardManifest: ModuleManifest = {
         SalesTrendChartWidget,
         DistributionChartWidget,
         RevenueAreaChartWidget,
-        MetricsBarChartWidget
+        MetricsBarChartWidget,
+        MarginCalculatorWidget
       } = await import('./widgets');
+
+      // ============================================
+      // HERO WIDGETS (Highest priority)
+      // ============================================
+
+      // Shift Control Widget (priority: 110 - HERO)
+      logger.info('App', '🔄 Importing ShiftControlWidget...');
+      const { ShiftControlWidget } = await import('@/modules/shift-control/components/ShiftControlWidget');
+      logger.info('App', '✅ ShiftControlWidget imported successfully', { ShiftControlWidget });
+
+      logger.info('App', '🔄 Registering ShiftControlWidget in dashboard.widgets...');
+      registry.addAction(
+        'dashboard.widgets',
+        () => {
+          logger.debug('App', '🎨 ShiftControlWidget render function called');
+          return <ShiftControlWidget key="shift-control" />;
+        },
+        'dashboard',
+        110
+      );
+      logger.info('App', '✅ ShiftControlWidget registered with priority 110');
 
       // ============================================
       // ACTION WIDGETS (Top priority)
@@ -190,9 +198,22 @@ export const dashboardManifest: ModuleManifest = {
         50
       );
 
-      logger.debug('App', 'Registered dashboard.widgets hooks (6 total: 1 action + 4 charts + 1 activity)');
+      // ============================================
+      // EDUCATIONAL WIDGETS (Lower priority)
+      // ============================================
+
+      // Margin Calculator (priority: 45)
+      // Educational tool to understand Markup vs Margin difference
+      registry.addAction(
+        'dashboard.widgets',
+        () => <MarginCalculatorWidget key="margin-calculator" />,
+        'dashboard',
+        45
+      );
+
+      logger.debug('App', 'Registered dashboard.widgets hooks (8 total: 1 hero + 1 action + 4 charts + 1 activity + 1 educational)');
       logger.info('App', '✅ Dashboard module setup complete', {
-        widgetsInjected: 6,
+        widgetsInjected: 8,
         hooksProvided: 4,
         hooksConsumed: 5,
       });

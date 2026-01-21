@@ -59,8 +59,6 @@ export const kitchenManifest: LinkModuleManifest = {
    * CRITICAL: Link modules MUST have autoInstall: true
    * They activate automatically when all dependencies are available
    */
-  autoInstall: true,
-
   // ============================================
   // FEATURE REQUIREMENTS
   // ============================================
@@ -68,19 +66,13 @@ export const kitchenManifest: LinkModuleManifest = {
   /**
    * Required features - needs BOTH sales and production
    */
-  requiredFeatures: [
-    'sales_order_management', // From sales module
-    'production_display_system', // Kitchen-specific feature
-  ] as FeatureId[],
+  activatedBy: 'sales_order_management',
 
+
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   /**
    * Optional features that enhance functionality
    */
-  optionalFeatures: [
-    'production_bom_management',
-    'production_order_queue',
-    'inventory_stock_tracking',
-  ] as FeatureId[],
 
   // ============================================
   // HOOK POINTS

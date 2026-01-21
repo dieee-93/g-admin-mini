@@ -21,21 +21,16 @@ export const financeCorporateManifest: ModuleManifest = {
   // ============================================
   // FEATURES
   // ============================================
+  
+  activatedBy: 'finance_corporate_accounts',
 
-  requiredFeatures: ['finance_corporate_accounts'],
-  optionalFeatures: [
-    'finance_credit_management',
-    'finance_invoice_scheduling',
-    'finance_payment_terms',
-  ],
 
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   // ============================================
   // DEPENDENCIES
   // ============================================
 
   depends: ['customers', 'finance-fiscal', 'finance-billing'],
-  autoInstall: false,
-
   // ============================================
   // PERMISSIONS & ROLES
   // ============================================
@@ -75,8 +70,22 @@ export const financeCorporateManifest: ModuleManifest = {
       // REGISTER DASHBOARD WIDGET
       // ============================================
 
-      const { useCapabilityStore } = await import('@/store/capabilityStore');
-      const hasFeature = useCapabilityStore.getState().hasFeature;
+      const [
+        { queryClient },
+        { businessProfileKeys },
+        { FeatureActivationEngine }
+      ] = await Promise.all([
+        import('@/App'),
+        import('@/lib/business-profile/hooks/useBusinessProfile'),
+        import('@/lib/features/FeatureEngine')
+      ]);
+
+      const profile = queryClient.getQueryData<any>(businessProfileKeys.detail());
+      const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+        profile?.selectedCapabilities || [],
+        profile?.selectedInfrastructure || []
+      );
+      const hasFeature = (featureId: string) => activeFeatures.includes(featureId as any);
 
       if (hasFeature('finance_corporate_accounts')) {
         // Lazy load widget only if needed
@@ -96,9 +105,14 @@ export const financeCorporateManifest: ModuleManifest = {
       // LISTEN TO ORDER EVENTS
       // ============================================
 
-      const { eventBus } = await import('@/lib/events');
-      const { validateCustomerCredit } = await import('./services/creditManagementService');
-      const { recordInvoice } = await import('./services/creditManagementService');
+      // ⚡ PERFORMANCE: Parallel imports (2 unique imports)
+      const [
+        { eventBus },
+        { validateCustomerCredit, recordInvoice }
+      ] = await Promise.all([
+        import('@/lib/events'),
+        import('./services/creditManagementService')
+      ]);
 
       // Listen to sales orders - validate credit before placing
       eventBus.subscribe(

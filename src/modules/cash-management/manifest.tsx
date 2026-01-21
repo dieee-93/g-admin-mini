@@ -20,14 +20,6 @@ export const cashManagementManifest: ModuleManifest = {
   permissionModule: 'fiscal', // ✅ Uses 'fiscal' permission (cash flow & accounting)
 
   depends: [], // Independent module
-  autoInstall: true,
-
-  requiredFeatures: [] as FeatureId[],
-  optionalFeatures: [
-    'sales_pos',
-    'finance_accounting',
-    'multi_location',
-  ] as FeatureId[],
 
   // 🔒 PERMISSIONS: Accessible by cashiers and above
   minimumRole: 'CAJERO' as const,
@@ -40,6 +32,7 @@ export const cashManagementManifest: ModuleManifest = {
       'cash.discrepancy.detected',
       'cash.drop.recorded',
       'dashboard.widgets',
+      'shift-control.indicators',
     ],
     consume: [
       'sales.payment.completed',
@@ -63,16 +56,34 @@ export const cashManagementManifest: ModuleManifest = {
         10
       );
 
+      // ❌ DISABLED: Invalid format - returns object instead of JSX
+      // TODO: Create CashBalanceWidget component and fix this
+      // Correct pattern: () => <CashBalanceWidget />
+      // registry.addAction(
+      //   'dashboard.widgets',
+      //   () => ({
+      //     id: 'cash-balance-widget',
+      //     title: 'Cash Balance',
+      //     component: 'CashBalanceWidget',
+      //     priority: 20,
+      //   }),
+      //   'cash-management',
+      //   20
+      // );
+
+      // ============================================
+      // SHIFT CONTROL INTEGRATION
+      // ============================================
+
+      // ⚡ PERFORMANCE: Single import - no need for Promise.all()
+      const { CashSessionIndicator } = await import('./widgets/CashSessionIndicator');
+
+      // Inject cash session indicator into ShiftControl
       registry.addAction(
-        'dashboard.widgets',
-        () => ({
-          id: 'cash-balance-widget',
-          title: 'Cash Balance',
-          component: 'CashBalanceWidget',
-          priority: 20,
-        }),
+        'shift-control.indicators',
+        ({ cashSession }) => <CashSessionIndicator cashSession={cashSession} key="cash-indicator" />,
         'cash-management',
-        20
+        90  // High priority
       );
 
       logger.info('App', '✅ Cash Management module setup complete');

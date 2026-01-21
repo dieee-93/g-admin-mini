@@ -12,7 +12,7 @@
  *
  * USAGE:
  * ```tsx
- * import { ALL_MODULE_MANIFESTS, staffManifest } from '@/modules';
+ * import { ALL_MODULE_MANIFESTS, teamManifest } from '@/modules';
  * import { getModuleRegistry } from '@/lib/modules';
  *
  * // Register all modules
@@ -45,10 +45,11 @@ import { intelligenceManifest } from './intelligence/manifest';
 // SUPPLY-CHAIN DOMAIN - Inventory & procurement
 // ============================================
 import { materialsManifest } from './materials/manifest';
-import { materialsProcurementManifest } from './materials/procurement/manifest';
+// NOTE: Procurement deprecated - now integrated as tab in Suppliers module
 import { suppliersManifest } from './suppliers/manifest';
 import { productsManifest } from './products/manifest';
 import { productsAnalyticsManifest } from './products/analytics/manifest';
+import { recipeManifest } from './recipe/manifest';
 import { assetsManifest } from './assets/manifest';
 
 // ============================================
@@ -69,10 +70,11 @@ import { membershipsManifest } from './memberships/manifest';
 import { rentalsManifest } from './rentals/manifest';
 
 // ============================================
-// RESOURCES DOMAIN - Staff & scheduling
+// RESOURCES DOMAIN - Team & scheduling
 // ============================================
-import { staffManifest } from './staff/manifest';
+import { teamManifest } from './team/manifest';
 import { schedulingManifest } from './scheduling/manifest';
+import { shiftControlManifest } from './shift-control/manifest';
 
 // ============================================
 // FINANCE DOMAIN - Financial management
@@ -106,8 +108,8 @@ import { executiveManifest } from './executive/manifest';
  * - 5 sub-modules (fulfillment-onsite, fulfillment-pickup, fulfillment-delivery, fulfillment-pickup, production-kitchen)
  *
  * DEPENDENCY ORDER:
- * 1. Foundation modules (no dependencies): dashboard, settings, debug, staff, materials, suppliers, sales, customers
- * 2. First-level dependencies: scheduling (staff), products (materials), billing (customers)
+ * 1. Foundation modules (no dependencies): dashboard, settings, debug, team, materials, suppliers, sales, customers
+ * 2. First-level dependencies: scheduling (team), products (materials), billing (customers)
  * 3. Second-level dependencies: supplier-orders (suppliers+materials), ecommerce (sales+products)
  * 4. Third-level dependencies: memberships/rentals (customers+billing+scheduling)
  * 5. Cross-cutting: gamification, executive, reporting (aggregate all)
@@ -118,6 +120,7 @@ export const ALL_MODULE_MANIFESTS = [
   // ============================================
 
   achievementsManifest,  // ✅ Requirements & validation system (auto-install)
+  shiftControlManifest,  // ✅ Shift control coordination (auto-install)
 
   // ============================================
   // TIER 1: Foundation modules (no dependencies)
@@ -129,7 +132,7 @@ export const ALL_MODULE_MANIFESTS = [
   debugManifest,         // ✅ Debug tools (dev only)
 
   // Business domains - Foundation
-  staffManifest,         // ✅ Staff/HR management
+  teamManifest,          // ✅ Team/HR management
   materialsManifest,     // ✅ Inventory & materials
   suppliersManifest,     // ✅ Supplier management
   salesManifest,         // ✅ Sales & POS
@@ -143,12 +146,13 @@ export const ALL_MODULE_MANIFESTS = [
   // TIER 2: First-level dependencies
   // ============================================
 
-  schedulingManifest,    // ✅ Depends on: staff
+  schedulingManifest,    // ✅ Depends on: team
   productsManifest,      // ✅ Depends on: materials
   productsAnalyticsManifest, // ✅ NEW: Products analytics sub-module (Menu Engineering, Cost Analysis)
+  recipeManifest,        // ✅ Recipe builder & BOM management (transversal)
   productionManifest,    // ✅ RENAMED from kitchen - Depends on: materials
   assetsManifest,        // ✅ Inventory durable (equipment, tools, machinery)
-  materialsProcurementManifest, // ✅ NEW: Materials procurement submodule (purchase orders)
+  // NOTE: materialsProcurementManifest deprecated - supplier orders now integrated in suppliersManifest
 
   // ============================================
   // TIER 3: Finance Domain (all independent)
@@ -208,10 +212,11 @@ export {
 
   // Supply-chain domain
   materialsManifest,
-  materialsProcurementManifest,
+  // NOTE: materialsProcurementManifest deprecated - integrated in suppliers
   suppliersManifest,
   productsAnalyticsManifest,
   productsManifest,
+  recipeManifest,
   productionManifest,
   assetsManifest,
 
@@ -230,8 +235,9 @@ export {
   rentalsManifest,
 
   // Resources domain
-  staffManifest,
+  teamManifest,
   schedulingManifest,
+  shiftControlManifest,
 
   // Finance domain
   financeCorporateManifest,
@@ -259,22 +265,17 @@ export type { ModuleManifest } from '@/lib/modules/types';
  * Module count by domain (for debugging/monitoring)
  */
 export const MODULE_STATS = {
-  total: ALL_MODULE_MANIFESTS.length, // 32 modules
+  total: ALL_MODULE_MANIFESTS.length, // 34 modules
   byDomain: {
-    system: 1,        // achievements (TIER 0)
+    system: 2,        // achievements, shift-control (TIER 0)
     core: 6,          // dashboard, settings, debug, customers, reporting, intelligence
-    supplyChain: 7,   // materials, materials-procurement, suppliers, products, products-analytics, production, assets
+    supplyChain: 8,   // materials, suppliers, products, products-analytics, recipe, production, assets
     operations: 8,    // sales, fulfillment, fulfillment-onsite, fulfillment-pickup, fulfillment-delivery, mobile, memberships, rentals
-    resources: 2,     // staff, scheduling
+    resources: 2,     // team, scheduling
     finance: 5,       // finance-corporate, finance-fiscal, finance-billing, finance-integrations, cash-management
     gamification: 1,  // gamification
     executive: 1,     // executive
   },
-  autoInstall: [
-    'achievements',   // ✅ PRIMERO - Requirements validation system
-    'dashboard',
-    'settings',
-    'gamification',
-    'kitchen',
-  ],
+  // Note: CORE modules loaded via CORE_MODULES array in bootstrap.ts
+  // See: src/lib/modules/constants.ts
 } as const;

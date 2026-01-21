@@ -28,16 +28,8 @@ export const customersManifest: ModuleManifest = {
   permissionModule: 'sales', // ✅ Uses 'sales' permission (CRM)
 
   depends: [],
-  autoInstall: false,
 
-  requiredFeatures: [] as FeatureId[], // No required - user activates manually
-  optionalFeatures: [
-    'customers',
-    'customer_service_history',
-    'customer_preference_tracking',
-    'customer_loyalty_program',
-    'customer_online_accounts',
-  ] as FeatureId[],
+  // ✅ CORE MODULE: No activatedBy needed (always loaded)
 
   // 🔒 PERMISSIONS: Employees can create/view customers
   minimumRole: 'OPERADOR' as const,

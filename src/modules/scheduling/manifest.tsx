@@ -34,16 +34,10 @@ export const schedulingManifest: ModuleManifest = {
   depends: ['staff'],
 
   // Requires shift management feature
-  requiredFeatures: ['staff_shift_management'],
+  activatedBy: 'staff_shift_management',
 
-  // Optional features enhance functionality
-  optionalFeatures: [
-    'staff_time_tracking',
-    'staff_labor_cost_tracking',
-    'scheduling_appointment_booking',
-    'scheduling_calendar_management'
-  ],
 
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   // 🔒 PERMISSIONS: Supervisors can manage schedules
   minimumRole: 'SUPERVISOR' as const,
 
@@ -58,6 +52,10 @@ export const schedulingManifest: ModuleManifest = {
 
       // Global integration
       'dashboard.widgets',            // Scheduling stats widget
+
+      // POS Integration (SERVICE flow)
+      'sales.pos.product_flow',       // SERVICE product flow (DateTimePickerLite)
+      'sales.metrics',                // SERVICE metrics for POS dashboard
 
       // Extensibility
       'scheduling.filters.custom'     // Custom filter options
@@ -129,7 +127,113 @@ export const schedulingManifest: ModuleManifest = {
       70 // Medium priority widget
     );
 
-    logger.info('Scheduling', '✅ Scheduling module setup complete - hooks registered');
+    // ============================================
+    // POS INTEGRATION HOOKS (SERVICE flow)
+    // ============================================
+
+    // ✅ Hook 3: SERVICE POS Flow - DateTimePickerLite
+    registry.addAction(
+      'sales.pos.product_flow',
+      (data) => {
+        // Only render for SERVICE products
+        if (data?.productType !== 'SERVICE') return null;
+
+        // Lazy load DateTimePickerLite component
+        const DateTimePickerLite = lazy(() =>
+          import('@/shared/ui/components/business/DateTimePickerLite')
+            .then(module => ({ default: module.DateTimePickerLite }))
+        );
+
+        return (
+          <React.Suspense fallback={<div>Cargando selector de fecha...</div>}>
+            <DateTimePickerLite
+              serviceId={data?.selectedProduct?.id || ''}
+              onSelect={(datetime) => {
+                // Notify parent component that flow is complete
+                data?.onFlowComplete?.({
+                  datetime,
+                  serviceId: data?.selectedProduct?.id
+                });
+              }}
+              compactMode={true}
+              title="Seleccionar Fecha y Hora del Servicio"
+            />
+          </React.Suspense>
+        );
+      },
+      'scheduling',
+      90, // High priority - SERVICE is a primary use case
+      {
+        requiredPermission: { module: 'scheduling', action: 'create' }
+      }
+    );
+
+    // ✅ Hook 4: SERVICE Metrics for POS Dashboard
+    registry.addAction(
+      'sales.metrics',
+      () => {
+        // TODO: Replace with real ServiceMetrics component
+        return (
+          <Stack direction="column" gap="2" key="scheduling-service-metrics">
+            <Badge variant="solid" colorPalette="purple">
+              <Stack direction="row" align="center" gap="2">
+                <CalendarIcon className="w-4 h-4" />
+                <Typography variant="body" size="sm">
+                  Appointments Hoy: 12
+                </Typography>
+              </Stack>
+            </Badge>
+          </Stack>
+        );
+      },
+      'scheduling',
+      80, // Medium-high priority
+      {
+        requiredPermission: { module: 'scheduling', action: 'read' }
+      }
+    );
+
+    logger.info('Scheduling', '✅ Scheduling module setup complete - POS hooks registered');
+
+    // ============================================
+    // HOOK 5: Appointment POS View (Context View)
+    // ============================================
+
+    /**
+     * Hook: sales.pos.context_view
+     * Inject AppointmentPOSView when 'appointment' context is selected
+     */
+    const AppointmentPOSView = lazy(() =>
+      import('./components/AppointmentPOSView')
+        .then(module => ({ default: module.AppointmentPOSView }))
+    );
+
+    registry.addAction(
+      'sales.pos.context_view',
+      (data) => {
+        // Only render for SERVICE products (Opción B: ProductType-first)
+        if (data?.productType !== 'SERVICE') return null;
+
+        return (
+          <React.Suspense fallback={<div>Cargando citas...</div>}>
+            <AppointmentPOSView
+              key="appointment-pos-view"
+              cart={data?.cart || []}
+              onAddToCart={data?.onAddToCart}
+              onRemoveItem={data?.onRemoveItem}
+              onClearCart={data?.onClearCart}
+              totals={data?.totals}
+              onConfirmBooking={data?.onConfirmBooking}
+            />
+          </React.Suspense>
+        );
+      },
+      'scheduling',
+      90, // High priority
+      { requiredPermission: { module: 'scheduling', action: 'create' } }
+    );
+
+    logger.debug('Scheduling', '✅ Appointment POS context view registered');
   },
 
   // Teardown function - cleanup

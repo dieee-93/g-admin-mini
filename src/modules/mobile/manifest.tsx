@@ -9,16 +9,12 @@ export const mobileManifest: ModuleManifest = {
   version: '1.0.0',
 
   permissionModule: 'operations', // ✅ Uses 'operations' permission
+  
+  activatedBy: 'mobile_location_tracking',
 
-  requiredFeatures: ['mobile_location_tracking'], // GPS tracking is essential
-  optionalFeatures: [
-    'mobile_route_planning', // Daily route optimization
-    'mobile_inventory_constraints' // Capacity limits for vehicles
-  ],
 
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   depends: ['staff', 'fulfillment', 'materials'],
-  autoInstall: false,
-
   // 🔒 PERMISSIONS: Operadores can use mobile operations
   minimumRole: 'OPERADOR' as const,
 
@@ -42,12 +38,24 @@ export const mobileManifest: ModuleManifest = {
       // ============================================
       // OPTIMIZED: Parallel imports for critical dependencies
       // ============================================
-      const [{ useCapabilityStore }, { eventBus }] = await Promise.all([
-        import('@/store/capabilityStore'),
+      const [
+        { queryClient },
+        { businessProfileKeys },
+        { FeatureActivationEngine },
+        { eventBus }
+      ] = await Promise.all([
+        import('@/App'),
+        import('@/lib/business-profile/hooks/useBusinessProfile'),
+        import('@/lib/features/FeatureEngine'),
         import('@/lib/events')
       ]);
 
-      const hasFeature = useCapabilityStore.getState().hasFeature;
+      const profile = queryClient.getQueryData<any>(businessProfileKeys.detail());
+      const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+        profile?.selectedCapabilities || [],
+        profile?.selectedInfrastructure || []
+      );
+      const hasFeature = (featureId: string) => activeFeatures.includes(featureId as any);
 
       // ============================================
       // REGISTER DASHBOARD WIDGET (React.lazy pattern)

@@ -20,10 +20,8 @@ export const gamificationManifest: ModuleManifest = {
   version: '1.0.0',
 
   depends: [], // Listens to all modules via EventBus
-  autoInstall: true, // Always active, tracking achievements
 
-  requiredFeatures: [] as FeatureId[],
-  optionalFeatures: ['gamification'] as FeatureId[],
+  // ✅ CORE MODULE: No activatedBy needed (always loaded)
 
   // 🔒 PERMISSIONS: Operadores can view gamification
   minimumRole: 'OPERADOR' as const,

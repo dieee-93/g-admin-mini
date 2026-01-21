@@ -49,16 +49,16 @@ export const materialsManifest: ModuleManifest = {
    */
   depends: [],
 
-  autoInstall: false,
-
   // ============================================
   // FEATURE REQUIREMENTS
   // ============================================
 
   /**
-   * Required features from FeatureRegistry
+   * Single feature that activates this module
    */
-  requiredFeatures: ['inventory_stock_tracking'] as FeatureId[],
+  activatedBy: 'inventory_stock_tracking',
+
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
 
   // ============================================
   // PERMISSIONS & ROLES
@@ -73,15 +73,6 @@ export const materialsManifest: ModuleManifest = {
    * Granular permissions checked at component level via usePermissions()
    */
   minimumRole: 'OPERADOR' as const, // Employee level and above
-
-  /**
-   * Optional features that enhance functionality
-   */
-  optionalFeatures: [
-    'inventory_alert_system',
-    'inventory_purchase_orders',
-    'inventory_supplier_management',
-  ] as FeatureId[],
 
   // ============================================
   // HOOK POINTS
@@ -155,6 +146,26 @@ export const materialsManifest: ModuleManifest = {
       );
 
       logger.debug('App', 'Registered dashboard.widgets hook (PendingOrdersWidget)');
+
+      // ============================================
+      // SHIFT CONTROL INTEGRATION
+      // ============================================
+
+      const { StockAlertIndicator } = await import('./widgets/StockAlertIndicator');
+
+      registry.addAction(
+        'shift-control.indicators',
+        ({ stockAlerts }) => (
+          <StockAlertIndicator 
+            lowStockAlerts={stockAlerts?.length || 0}
+            key="stock-alert-indicator"
+          />
+        ),
+        'materials',
+        70
+      );
+
+      logger.debug('App', 'Registered shift-control.indicators hook (StockAlertIndicator)');
 
       // ============================================
       // HOOK 2: Materials Grid Row Actions
@@ -521,6 +532,33 @@ export const materialsManifest: ModuleManifest = {
    */
   exports: {
     /**
+     * Service layer exports
+     * Provides access to all business logic engines and API services
+     * 
+     * @example
+     * ```tsx
+     * const materialsAPI = registry.getExports('materials');
+     * const abcAnalysis = materialsAPI.services.ABCAnalysisEngine.analyzeInventory(items);
+     * ```
+     */
+    services: {} as typeof import('./services'),
+
+    /**
+     * Zustand store for Materials UI state
+     * 
+     * @example
+     * ```tsx
+     * import { useMaterialsStore } from '@/modules/materials/store';
+     * 
+     * function MyComponent() {
+     *   const { filters, setFilter } = useMaterialsStore();
+     *   // ...
+     * }
+     * ```
+     */
+    store: {} as typeof import('./store'),
+
+    /**
      * React Hook to fetch materials list
      * Exports a function that returns a hook to avoid premature initialization
      *
@@ -610,7 +648,7 @@ export const materialsManifest: ModuleManifest = {
         // Check stock for each item
         for (const item of orderItems) {
           const { data: material } = await supabase
-            .from('items')
+            .from('materials')
             .select('id, name, stock')
             .eq('id', item.material_id)
             .single();

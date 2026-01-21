@@ -16,8 +16,7 @@
 
 import React, { useMemo } from 'react';
 import { ModuleRegistry } from './ModuleRegistry';
-import { useCapabilityStore } from '@/store/capabilityStore';
-import { useShallow } from 'zustand/react/shallow';
+import { useFeatureFlags } from '@/lib/capabilities';
 import { useAuth } from '@/contexts/AuthContext';
 import { MODULE_FEATURE_MAP } from '@/config/FeatureRegistry';
 import { logger } from '@/lib/logging';
@@ -79,11 +78,8 @@ export function useModuleNavigation() {
   console.log('🚨 [useModuleNavigation] HOOK CALLED!');
   const { canAccessModule, isAuthenticated } = useAuth();
 
-  // ✅ REFACTOR: Use getActiveModules() getter (computed from activeFeatures)
-  // ⚡ PERFORMANCE: useShallow prevents re-renders when array reference changes but content is same
-  const activeModules = useCapabilityStore(
-    useShallow(state => state.getActiveModules())
-  );
+  // ✅ MIGRATED: Get active modules from feature flags
+  const { activeModules } = useFeatureFlags();
 
   // ✅ React to modulesInitialized flag to re-compute when modules are ready
   const modulesInitialized = useAppStore(state => state.modulesInitialized);
@@ -119,7 +115,13 @@ export function useModuleNavigation() {
       registeredModulesCount: registeredModules.length,
       activeModulesCount: activeModules.length
     });
-    console.log('🎯 [NavigationGeneration] PASSED ALL CHECKS!', { isAuthenticated, modulesInitialized, registeredModulesCount: registeredModules.length, activeModulesCount: activeModules.length });
+    console.log('🎯 [NavigationGeneration] PASSED ALL CHECKS!', {
+      isAuthenticated,
+      modulesInitialized,
+      registeredModulesCount: registeredModules.length,
+      activeModulesCount: activeModules.length,
+      registeredModuleIds: registeredModules.map(m => m.manifest.id)
+    });
 
     logger.debug('NavigationGeneration', `Found ${registeredModules.length} registered modules`);
 
@@ -157,34 +159,10 @@ export function useModuleNavigation() {
         }
 
         // 🎯 LAYER 2: Capability-based filter
-        const moduleConfig = MODULE_FEATURE_MAP[manifest.id];
+        // Check if module is in activeModules list (loaded by bootstrap)
+        const isModuleActive = activeModules.includes(manifest.id);
 
-        // Always-active modules (dashboard, settings, gamification, debug)
-        if (moduleConfig?.alwaysActive) {
-          logger.debug('NavigationGeneration', `${manifest.id} is always-active`);
-          return true;
-        }
-
-        // ✨ NEW: Auto-install modules (always visible when role permits)
-        if (manifest.autoInstall === true) {
-          logger.debug('NavigationGeneration', `${manifest.id} has autoInstall=true`);
-          return true;
-        }
-
-        // Check if module's required features are active
-        if (moduleConfig?.requiredFeatures && moduleConfig.requiredFeatures.length > 0) {
-          const hasAllRequired = moduleConfig.requiredFeatures.every(f =>
-            manifest.requiredFeatures.includes(f)
-          );
-          if (!hasAllRequired) {
-            logger.debug('NavigationGeneration', `${manifest.id} missing required features`);
-            return false;
-          }
-        }
-
-        // Check if module is in activeModules list
-        const hasCapabilityAccess = activeModules.includes(manifest.id);
-        if (!hasCapabilityAccess) {
+        if (!isModuleActive) {
           logger.debug('NavigationGeneration', `${manifest.id} not in activeModules`);
           return false;
         }
@@ -228,7 +206,12 @@ export function useModuleNavigation() {
     logger.performance('NavigationGeneration', 'Module navigation generation', endTime - startTime, 10);
     logger.info('NavigationGeneration', `Generated ${accessibleModules.length} accessible modules`);
 
-    console.log('🚨 [NavigationGeneration] RETURNING MODULES:', accessibleModules.map(m => m.id));
+    console.log('🚨 [NavigationGeneration] RETURNING MODULES:', {
+      count: accessibleModules.length,
+      ids: accessibleModules.map(m => m.id),
+      withNavigation: registeredModules.filter(m => m.manifest.metadata?.navigation).map(m => m.manifest.id),
+      withoutNavigation: registeredModules.filter(m => !m.manifest.metadata?.navigation).map(m => m.manifest.id)
+    });
 
     // Return new array - useMemo handles optimization
     return accessibleModules;

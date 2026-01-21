@@ -24,7 +24,7 @@
  *   name: 'Sales Analytics',
  *   version: '1.0.0',
  *   depends: ['sales'],
- *   requiredFeatures: ['sales_management'],
+ *   activatedBy: ['sales_management'],
  *   setup: async (registry) => {
  *     registry.addAction('dashboard.widgets', () => <AnalyticsWidget />);
  *   }
@@ -105,9 +105,10 @@ export class ModuleRegistry implements IModuleRegistry {
    * Register a module with validation
    *
    * @param manifest - Module manifest definition
+   * @returns Promise that resolves when module setup completes
    * @throws Error if manifest is invalid or dependencies are circular
    */
-  public register(manifest: ModuleManifest): void {
+  public async register(manifest: ModuleManifest): Promise<void> {
     const startTime = performance.now();
 
     try {
@@ -141,27 +142,28 @@ export class ModuleRegistry implements IModuleRegistry {
 
       this.modules.set(manifest.id, instance);
 
+      console.log('✅ [ModuleRegistry.register] Module registered:', manifest.id, 'Total modules:', this.modules.size);
       logger.debug('App', `Module registered: ${manifest.id} v${manifest.version}`, {
         depends: manifest.depends,
-        requiredFeatures: manifest.requiredFeatures,
+        activatedBy: manifest.activatedBy,
       });
 
-      // 5. Run setup function (async supported)
+      // 5. Run setup function and AWAIT it (critical for HookPoint timing)
       if (manifest.setup) {
-        Promise.resolve(manifest.setup(this))
-          .then(() => {
-            const duration = performance.now() - startTime;
-            this.performanceMetrics.set(manifest.id, duration);
-            
-            // Only log slow setups to reduce console noise
-            if (duration > 500) {
-              logger.warn('App', `Module setup: ${manifest.id} took ${duration.toFixed(2)}ms (threshold: 500ms)`);
-            }
-          })
-          .catch((error) => {
-            instance.errors?.push(error);
-            logger.error('App', `Module setup failed: ${manifest.id}`, error);
-          });
+        try {
+          await manifest.setup(this);
+          const duration = performance.now() - startTime;
+          this.performanceMetrics.set(manifest.id, duration);
+
+          // Only log slow setups to reduce console noise
+          if (duration > 500) {
+            logger.warn('App', `Module setup: ${manifest.id} took ${duration.toFixed(2)}ms (threshold: 500ms)`);
+          }
+        } catch (error) {
+          instance.errors?.push(error as Error);
+          logger.error('App', `Module setup failed: ${manifest.id}`, error);
+          throw error;
+        }
       } else {
         const duration = performance.now() - startTime;
         this.performanceMetrics.set(manifest.id, duration);
@@ -233,7 +235,12 @@ export class ModuleRegistry implements IModuleRegistry {
    * @returns Array of all ModuleInstances
    */
   public getAll(): ModuleInstance[] {
-    return Array.from(this.modules.values());
+    const modules = Array.from(this.modules.values());
+    console.log('🔍 [ModuleRegistry.getAll] Returning modules:', {
+      count: modules.length,
+      ids: modules.map(m => m.manifest.id)
+    });
+    return modules;
   }
 
   // ============================================
@@ -506,13 +513,6 @@ export class ModuleRegistry implements IModuleRegistry {
       });
     }
 
-    if (!Array.isArray(manifest.requiredFeatures)) {
-      errors.push({
-        moduleId: manifest.id,
-        type: 'invalid_manifest',
-        message: 'Module requiredFeatures must be an array',
-      });
-    }
 
     // Warnings
     if (manifest.depends.length === 0) {

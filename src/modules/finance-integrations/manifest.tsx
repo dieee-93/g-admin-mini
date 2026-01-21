@@ -10,7 +10,8 @@
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
-import { LinkIcon } from '@heroicons/react/24/outline';
+import { LinkIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import { SettingCard } from '@/shared/components';
 
 export const financeIntegrationsManifest: ModuleManifest = {
   id: 'finance-integrations',
@@ -21,12 +22,6 @@ export const financeIntegrationsManifest: ModuleManifest = {
 
   depends: ['finance-fiscal', 'finance-billing'], // Integrations work with fiscal/billing data
   autoInstall: true, // Auto-activate when dependencies active
-
-  requiredFeatures: [] as FeatureId[],
-  optionalFeatures: [
-    'sales_online_payment_gateway',
-    'operations_shipping_integration',
-  ] as FeatureId[],
 
   // 🔒 PERMISSIONS: Only administrators can manage integrations
   minimumRole: 'ADMINISTRADOR' as const,
@@ -46,6 +41,29 @@ export const financeIntegrationsManifest: ModuleManifest = {
     logger.info('App', '🔗 Setting up Finance Integrations module');
 
     try {
+      // Register specialized settings card for Payment Methods
+      registry.addAction(
+        'settings.specialized.cards',
+        () => (
+          <SettingCard
+            title="Métodos de Pago"
+            description="Configure formas de pago y gateways de procesamiento"
+            icon={CreditCardIcon}
+            href="/admin/settings/payment-methods"
+            status="configured"
+          />
+        ),
+        'finance-integrations',
+        80,
+        {
+          requiredPermission: {
+            module: 'billing',
+            action: 'update',
+          },
+        }
+      );
+      logger.info('App', '✅ Finance Integrations: Payment Methods settings card registered');
+
       // Register integration settings panel
       registry.addAction(
         'settings.integrations',

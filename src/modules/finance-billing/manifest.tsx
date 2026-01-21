@@ -23,14 +23,6 @@ export const financeBillingManifest: ModuleManifest = {
   depends: ['customers'], // Billing tracks customer accounts
   autoInstall: true, // Auto-activate when customers active
 
-  requiredFeatures: [] as FeatureId[],
-  optionalFeatures: [
-    'finance_corporate_accounts',
-    'finance_credit_management',
-    'finance_invoice_scheduling',
-    'finance_payment_terms',
-  ] as FeatureId[],
-
   // 🔒 PERMISSIONS: Supervisors can manage billing
   minimumRole: 'SUPERVISOR' as const,
 
@@ -97,12 +89,12 @@ export const financeBillingManifest: ModuleManifest = {
       logger.debug('App', 'Generating invoice', { customerId, items });
 
       // Calculate total from items using Decimal.js for precision
-      const { calculateInvoiceTotal } = await import('@/pages/admin/finance-billing/services');
+      const { calculateInvoiceTotal } = await import('@/pages/admin/finance/billing/services');
       const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
       const { amount, taxAmount, totalAmount } = calculateInvoiceTotal(subtotal, 0.21); // 21% IVA
 
       // Generate invoice using billingApi
-      const { generateInvoice: createInvoice } = await import('@/pages/admin/finance-billing/services');
+      const { generateInvoice: createInvoice } = await import('@/pages/admin/finance/billing/services');
       const { data: invoice, error } = await createInvoice(customerId, {
         amount,
         taxAmount,
@@ -117,7 +109,7 @@ export const financeBillingManifest: ModuleManifest = {
       logger.debug('App', 'Processing payment', { invoiceId, paymentData });
 
       // Process payment using billingApi
-      const { processPayment: makePayment } = await import('@/pages/admin/finance-billing/services');
+      const { processPayment: makePayment } = await import('@/pages/admin/finance/billing/services');
       const { data: payment, error } = await makePayment(invoiceId, {
         ...paymentData,
         currency: 'ARS'

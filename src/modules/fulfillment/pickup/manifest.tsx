@@ -38,8 +38,6 @@ export const fulfillmentPickupManifest: ModuleManifest = {
    * Also requires sales module for order integration
    */
   depends: ['fulfillment', 'sales'],
-  autoInstall: false,
-
   // ============================================
   // FEATURE REQUIREMENTS
   // ============================================
@@ -48,16 +46,13 @@ export const fulfillmentPickupManifest: ModuleManifest = {
    * Required features from FeatureRegistry
    * Both pickup order sales AND pickup scheduling must be active
    */
-  requiredFeatures: ['sales_pickup_orders', 'operations_pickup_scheduling'],
+  activatedBy: 'sales_pickup_orders',
 
+
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   /**
    * Optional features (enhance functionality if present)
    */
-  optionalFeatures: [
-    'sales_payment_processing',
-    'operations_deferred_fulfillment',
-    'mobile_notifications'
-  ],
 
   // ============================================
   // HOOK POINTS
@@ -99,8 +94,22 @@ export const fulfillmentPickupManifest: ModuleManifest = {
       // CHECK FEATURE AVAILABILITY
       // ============================================
 
-      const { useCapabilityStore } = await import('@/store/capabilityStore');
-      const hasFeature = useCapabilityStore.getState().hasFeature;
+      const [
+        { queryClient },
+        { businessProfileKeys },
+        { FeatureActivationEngine }
+      ] = await Promise.all([
+        import('@/App'),
+        import('@/lib/business-profile/hooks/useBusinessProfile'),
+        import('@/lib/features/FeatureEngine')
+      ]);
+
+      const profile = queryClient.getQueryData<any>(businessProfileKeys.detail());
+      const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+        profile?.selectedCapabilities || [],
+        profile?.selectedInfrastructure || []
+      );
+      const hasFeature = (featureId: string) => activeFeatures.includes(featureId as any);
 
       if (!hasFeature('sales_pickup_orders')) {
         logger.warn('App', 'Pickup orders feature not active');
@@ -111,8 +120,14 @@ export const fulfillmentPickupManifest: ModuleManifest = {
       // EVENT SUBSCRIPTIONS
       // ============================================
 
-      const { eventBus } = await import('@/lib/events');
-      const { fulfillmentService } = await import('../services/fulfillmentService');
+      // ⚡ PERFORMANCE: Parallel imports (2 imports)
+      const [
+        { eventBus },
+        { fulfillmentService }
+      ] = await Promise.all([
+        import('@/lib/events'),
+        import('../services/fulfillmentService')
+      ]);
 
       /**
        * Listen to sales.order_placed
@@ -188,8 +203,42 @@ export const fulfillmentPickupManifest: ModuleManifest = {
        */
       // This will be consumed by the pickup page itself
 
+      // ============================================
+      // HOOK: Pickup Hours Editor
+      // ============================================
+
+      /**
+       * Hook: settings.hours.tabs + settings.hours.content
+       * Inject pickup hours editor into HoursPage
+       */
+      const { getModuleRegistry } = await import('@/lib/modules');
+      const registry = getModuleRegistry();
+
+      if (registry) {
+        const { PickupHoursTabTrigger, PickupHoursTabContent } = await import(
+          './components/PickupHoursEditor'
+        );
+
+        registry.addAction(
+          'settings.hours.tabs',
+          () => <PickupHoursTabTrigger key="pickup-tab" />,
+          'fulfillment-pickup',
+          90 // After operating hours
+        );
+
+        registry.addAction(
+          'settings.hours.content',
+          () => <PickupHoursTabContent key="pickup-content" />,
+          'fulfillment-pickup',
+          90
+        );
+
+        logger.debug('App', '✅ Pickup hours hooks registered');
+      }
+
       logger.info('App', '✅ Pickup module setup complete', {
         eventSubscriptions: 2,
+        hooksRegistered: registry ? 2 : 0,
         features: {
           pickup_orders: hasFeature('sales_pickup_orders'),
           pickup_scheduling: hasFeature('operations_pickup_scheduling'),

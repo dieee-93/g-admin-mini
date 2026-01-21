@@ -17,10 +17,11 @@
 
 import React from 'react';
 import type { ModuleManifest, ModuleRegistry } from '@/lib/modules/types';
-import { Badge, Stack, Typography, Button, Icon } from '@/shared/ui';
-import { BeakerIcon, FireIcon } from '@heroicons/react/24/outline';
+import { Badge, Stack, Typography, Button, Icon, Section } from '@/shared/ui';
+import { BeakerIcon, FireIcon, CogIcon } from '@heroicons/react/24/outline';
 import { toaster } from '@/shared/ui/toaster';
 import { logger } from '@/lib/logging';
+import { DecimalUtils } from '@/lib/decimal/decimalUtils';
 
 // ============================================
 // MODULE MANIFEST
@@ -37,15 +38,10 @@ export const productionManifest: ModuleManifest = {
   depends: ['materials', 'products'],
 
   // Requires kitchen display feature
-  requiredFeatures: ['production_display_system'],
+  activatedBy: 'production_display_system',
 
-  // Optional features enhance functionality
-  optionalFeatures: [
-    'production_order_management',
-    'production_order_queue',
-    'production_capacity_planning'
-  ],
 
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   // ============================================
   // PERMISSIONS & ROLES
   // ============================================
@@ -124,7 +120,7 @@ export const productionManifest: ModuleManifest = {
           label: 'Use in Production',
           icon: 'BeakerIcon',
           onClick: (materialId: string) => {
-            console.log(`[Production] Using material in production: ${materialId}`);
+            logger.info('Production', 'Using material in production', { materialId });
             // Trigger production modal or action
           }
         };
@@ -298,7 +294,7 @@ export const productionManifest: ModuleManifest = {
 
   // Teardown function - cleanup
   teardown: () => {
-    console.log('[Production Module] Cleanup complete');
+    logger.info('Production', 'Module cleanup complete');
   },
 
   // Public API exports
@@ -315,7 +311,8 @@ export const productionManifest: ModuleManifest = {
 
       try {
         // Get module registry to access Products API
-        const { moduleRegistry } = await import('@/lib/modules');
+        const { getModuleRegistry } = await import('@/lib/modules');
+        const moduleRegistry = getModuleRegistry();
 
         // Use Products API for recipe data (no duplicate logic)
         const productsAPI = moduleRegistry.getExports('products');
@@ -345,7 +342,11 @@ export const productionManifest: ModuleManifest = {
           recipe_id: recipeId,
           recipe_name: product.name,
           quantity,
-          estimated_cost: recipeCost * quantity,
+          estimated_cost: DecimalUtils.multiply(
+            recipeCost.toString(),
+            quantity.toString(),
+            'recipe'
+          ).toNumber(),
           status: 'pending',
           created_at: new Date().toISOString()
         };
@@ -360,8 +361,7 @@ export const productionManifest: ModuleManifest = {
           quantity,
           estimatedCost: order.estimated_cost
         }, {
-          priority: EventPriority.HIGH,
-          moduleId: 'production'
+          priority: EventPriority.HIGH
         });
 
         return order;

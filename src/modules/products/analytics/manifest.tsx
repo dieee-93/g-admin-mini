@@ -60,8 +60,6 @@ export const productsAnalyticsManifest: ModuleManifest = {
    * Must have products module active
    */
   depends: ['products'],
-  autoInstall: false,
-
   // ============================================
   // FEATURE REQUIREMENTS
   // ============================================
@@ -70,15 +68,6 @@ export const productsAnalyticsManifest: ModuleManifest = {
    * Requires at least ONE analytics feature to be active
    * Module Registry will check this before loading
    */
-  requiredFeatures: [] as FeatureId[], // At least one optional feature must be present
-
-  /**
-   * Optional features - tabs only show if feature is active
-   */
-  optionalFeatures: [
-    'can_view_menu_engineering',  // Menu Engineering Matrix
-    'can_view_cost_analysis'      // Cost Analysis Dashboard
-  ] as FeatureId[],
 
   // ============================================
   // HOOK POINTS
@@ -114,8 +103,22 @@ export const productsAnalyticsManifest: ModuleManifest = {
 
     try {
       // Check which features are active
-      const { useCapabilityStore } = await import('@/store/capabilityStore');
-      const hasFeature = useCapabilityStore.getState().hasFeature;
+      const [
+        { queryClient },
+        { businessProfileKeys },
+        { FeatureActivationEngine }
+      ] = await Promise.all([
+        import('@/App'),
+        import('@/lib/business-profile/hooks/useBusinessProfile'),
+        import('@/lib/features/FeatureEngine')
+      ]);
+
+      const profile = queryClient.getQueryData<any>(businessProfileKeys.detail());
+      const { activeFeatures } = FeatureActivationEngine.activateFeatures(
+        profile?.selectedCapabilities || [],
+        profile?.selectedInfrastructure || []
+      );
+      const hasFeature = (featureId: string) => activeFeatures.includes(featureId as any);
 
       const hasMenuEngineering = hasFeature('can_view_menu_engineering');
       const hasCostAnalysis = hasFeature('can_view_cost_analysis');

@@ -16,7 +16,8 @@ import type React from 'react';
 import { logger } from '@/lib/logging';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
-import { Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { Cog6ToothIcon, BellAlertIcon, ListBulletIcon, ArchiveBoxIcon, UserGroupIcon, CubeIcon } from '@heroicons/react/24/outline';
+import { SettingCard } from '@/shared/components';
 
 /**
  * Settings Module Manifest
@@ -46,21 +47,7 @@ export const settingsManifest: ModuleManifest = {
    */
   depends: [],
 
-  autoInstall: true, // Always available
-
-  // ============================================
-  // FEATURE REQUIREMENTS
-  // ============================================
-
-  /**
-   * No required features - always active
-   */
-  requiredFeatures: [] as FeatureId[],
-
-  /**
-   * Optional features that enhance functionality
-   */
-  optionalFeatures: ['settings'] as FeatureId[],
+  // ✅ CORE MODULE: No activatedBy needed (always loaded)
 
   // ============================================
   // PERMISSIONS & ROLES
@@ -101,15 +88,62 @@ export const settingsManifest: ModuleManifest = {
   /**
    * Setup function - register hook handlers
    */
-  setup: async () => {
+  setup: async (registry) => {
     logger.info('App', '⚙️ Setting up Settings module');
 
     try {
+      // Register Notification Settings specialized card
+      registry.addAction(
+        'settings.specialized.cards',
+        () => (
+          <SettingCard
+            title="Configuración de Notificaciones"
+            description="Gestiona alertas de inventario, personal, clientes, finanzas y sistema"
+            icon={BellAlertIcon}
+            href="/admin/settings/notifications"
+            status="configured"
+          />
+        ),
+        'settings',
+        70, // Priority
+        {
+          requiredPermission: {
+            module: 'settings',
+            action: 'update',
+          },
+        }
+      );
+      logger.info('App', '✅ Settings: Notification Settings card registered');
+
+      // Register System Enums Settings card
+      registry.addAction(
+        'settings.specialized.cards',
+        () => (
+          <SettingCard
+            title="Gestión de Valores Configurables"
+            description="Administra departamentos, tipos de productos, categorías y más"
+            icon={ListBulletIcon}
+            href="/admin/settings/enums"
+            status="configured"
+          />
+        ),
+        'settings',
+        60, // Priority
+        {
+          requiredPermission: {
+            module: 'settings',
+            action: 'update',
+          },
+        }
+      );
+      logger.info('App', '✅ Settings: System Enums Settings card registered');
+
       // Settings provides hooks for other modules to inject their configuration panels
       // Each module can register its own settings section
 
       logger.info('App', '✅ Settings module setup complete', {
         hooksProvided: 4,
+        cardsRegistered: 2,
       });
     } catch (error) {
       logger.error('App', '❌ Settings module setup failed', error);

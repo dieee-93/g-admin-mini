@@ -17,7 +17,7 @@ import { logger } from '@/lib/logging';
 import { toaster } from '@/shared/ui/toaster';
 import type { ModuleManifest } from '@/lib/modules/types';
 import type { FeatureId } from '@/config/types';
-import { Button, Icon, Stack, Badge } from '@/shared/ui';
+import { Button, Icon, Stack, Badge, Text } from '@/shared/ui';
 import { BuildingStorefrontIcon, StarIcon, TruckIcon } from '@heroicons/react/24/outline';
 import { SuppliersWidget } from './components';
 
@@ -30,6 +30,13 @@ import { SuppliersWidget } from './components';
  * - Integration with Materials
  * - Dashboard widgets
  */
+
+// Lazy load the form content
+const SupplierFormContent = React.lazy(() =>
+  import('@/pages/admin/supply-chain/suppliers/components/SupplierFormContent')
+    .then(module => ({ default: module.SupplierFormContent }))
+);
+
 export const suppliersManifest: ModuleManifest = {
   // ============================================
   // CORE METADATA
@@ -50,9 +57,6 @@ export const suppliersManifest: ModuleManifest = {
    * But works best with materials module
    */
   depends: [],
-
-  autoInstall: false,
-
   // ============================================
   // FEATURE REQUIREMENTS
   // ============================================
@@ -60,16 +64,13 @@ export const suppliersManifest: ModuleManifest = {
   /**
    * Required features from FeatureRegistry
    */
-  requiredFeatures: ['inventory_supplier_management'] as FeatureId[],
+  activatedBy: 'inventory_supplier_management',
 
+
+  // ✅ OPTIONAL MODULE: Only loaded when required feature is active
   /**
    * Optional features that enhance functionality
    */
-  optionalFeatures: [
-    'inventory_purchase_orders',
-    'inventory_demand_forecasting',
-    'operations_vendor_performance'
-  ] as FeatureId[],
 
   // ============================================
   // PERMISSIONS & ROLES
@@ -94,7 +95,8 @@ export const suppliersManifest: ModuleManifest = {
       'suppliers.supplier_deleted',       // Emitted when supplier is deleted
       'suppliers.supplier_status_changed', // Emitted when status changes
       'dashboard.widgets',                // Provides supplier widgets
-      'materials.supplier.actions'        // Provides actions for materials-supplier integration
+      'materials.supplier.actions',       // Provides actions for materials-supplier integration
+      'suppliers.form-content'            // Provides reusable form component for cross-module use
     ],
 
     /**
@@ -190,7 +192,7 @@ export const suppliersManifest: ModuleManifest = {
                 });
               }}
             >
-              <Icon icon={BuildingStorefrontIcon} size="xs" />
+              <Icon icon={BuildingStorefrontIcon} />
               Ver Proveedor
             </Button>
           );
@@ -227,7 +229,7 @@ export const suppliersManifest: ModuleManifest = {
               align="center"
               gap="1"
             >
-              <Icon icon={StarIcon} size="xs" color="yellow.500" />
+              <Icon icon={StarIcon} color="yellow.500" />
               <Badge size="xs" colorPalette="yellow">
                 {supplier.rating.toFixed(1)}
               </Badge>
@@ -264,25 +266,19 @@ export const suppliersManifest: ModuleManifest = {
             <Button
               key="create-po-from-material"
               size="xs"
-              variant="outline"
-              colorPalette="blue"
+              variant="ghost"
               onClick={() => {
-                logger.info('App', 'Creating PO from material', {
-                  materialId: material.id,
-                  materialName: material.name
-                });
-
-                // TODO: Open PO creation modal with material pre-filled
+                logger.info('App', 'Create PO for material', { materialId: material.id });
+                // Placeholder for PO creation logic
                 toaster.create({
-                  title: '📦 Crear Orden de Compra',
-                  description: `Preparando PO para ${material.name}`,
+                  title: 'Funcionalidad en desarrollo',
+                  description: 'La creación de órdenes de compra estará disponible pronto',
                   type: 'info',
-                  duration: 2000
                 });
               }}
             >
-              <Icon icon={TruckIcon} size="xs" />
-              PO
+              <Icon icon={TruckIcon} />
+              Crear Orden
             </Button>
           );
         },
@@ -291,21 +287,34 @@ export const suppliersManifest: ModuleManifest = {
         { requiredPermission: { module: 'suppliers', action: 'create' } }
       );
 
-      logger.debug('App', 'Registered materials.row.actions for Create PO button');
-
       // ============================================
-      // CONSUME: Listen to materials events
+      // HOOK 5: Form Content Provider
       // ============================================
 
       /**
-       * NOTE: In production, event subscriptions would be done via EventBus:
-       * eventBus.on('materials.low_stock_alert', handleLowStockAlert);
-       *
-       * This allows automatic supplier notifications or PO generation
+       * Provides the SupplierFormContent component for use in other modules (e.g. wizards)
+       * Uses React.Suspense because the component is lazy loaded.
        */
+      registry.addAction(
+        'suppliers.form-content',
+        (data) => {
+          return (
+            <React.Suspense fallback={<Text>Cargando formulario...</Text>}>
+              <SupplierFormContent
+                onSuccess={data.onSuccess}
+                onCancel={data.onCancel}
+                supplier={data.supplier}
+              />
+            </React.Suspense>
+          );
+        },
+        'suppliers',
+        100,
+        { requiredPermission: { module: 'suppliers', action: 'read' } }
+      );
 
       logger.info('App', '✅ Suppliers module setup complete', {
-        hooksProvided: 5,  // dashboard.widgets + 4 materials hooks
+        hooksProvided: 5,
         hooksConsumed: 3
       });
     } catch (error) {

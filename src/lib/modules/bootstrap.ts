@@ -37,6 +37,7 @@ import type {
   IModuleRegistry,
 } from './types';
 import { SecureEventProcessor } from '@/lib/events/utils/SecureEventProcessor';
+import { CORE_MODULES, OPTIONAL_MODULES, isCoreModule, isOptionalModule, getRequiredFeature } from './constants';
 
 // ============================================
 // TOPOLOGICAL SORT (Kahn's Algorithm)
@@ -299,28 +300,18 @@ export function validateModuleManifests(manifests: ModuleManifest[]): ModuleVali
       });
     }
 
-    if (!Array.isArray(manifest.requiredFeatures)) {
-      errors.push({
-        moduleId: manifest.id,
-        type: 'invalid_manifest',
-        message: 'Module requiredFeatures must be an array',
-      });
-    }
-
-    // Warnings
-    if (manifest.depends.length === 0 && !manifest.autoInstall) {
-      warnings.push(`Module "${manifest.id}" has no dependencies and is not auto-install`);
-    }
-
-    // ⚠️ Only warn if module has NO feature configuration at all
-    // (not alwaysActive, not requiredFeatures, not optionalFeatures)
-    if (
-      manifest.requiredFeatures.length === 0 &&
-      (!manifest.optionalFeatures || manifest.optionalFeatures.length === 0) &&
-      !manifest.autoInstall
-    ) {
+    // Warnings for OPTIONAL modules
+    // CORE modules don't need activatedBy, but OPTIONAL modules must have it
+    if (isOptionalModule(manifest.id) && !manifest.activatedBy) {
       warnings.push(
-        `Module "${manifest.id}" has no feature requirements (not alwaysActive, no requiredFeatures, no optionalFeatures)`
+        `Module "${manifest.id}" is in OPTIONAL_MODULES but has no activatedBy feature`
+      );
+    }
+
+    // CORE modules should NOT have activatedBy (they are always loaded)
+    if (isCoreModule(manifest.id) && manifest.activatedBy) {
+      warnings.push(
+        `Module "${manifest.id}" is a CORE module but has activatedBy="${manifest.activatedBy}" (should be removed)`
       );
     }
   }
@@ -406,29 +397,76 @@ export async function initializeModules(
   // STEP 1: Filter by active features
   // ============================================
 
-  const filteredManifests = manifests.filter((manifest) => {
-    // Check if module has required features
-    const hasRequiredFeatures = manifest.requiredFeatures.every((featureId) =>
-      activeFeatures.includes(featureId)
-    );
-
-    if (!hasRequiredFeatures) {
-      logger.debug('App', `Module "${manifest.id}" skipped - missing required features`, {
-        required: manifest.requiredFeatures,
-        active: activeFeatures,
-      });
-      return false;
-    }
-
-    return true;
+  console.log('📋 [STEP 1] Filtering modules by active features:', {
+    totalManifests: manifests.length,
+    activeFeaturesCount: activeFeatures.length,
+    activeFeatures: activeFeatures.slice(0, 10), // Show first 10 to avoid spam
   });
 
+  let filterIndex = 0;
+  const filteredManifests = manifests.filter((manifest) => {
+    filterIndex++;
+
+    console.log(`🔍 [STEP 1.${filterIndex}] Processing module:`, manifest.id, {
+      isCoreModule: isCoreModule(manifest.id),
+      isOptionalModule: isOptionalModule(manifest.id),
+      activatedBy: manifest.activatedBy,
+    });
+
+    // NEW SIMPLIFIED LOGIC:
+    // 1. CORE modules → ALWAYS load (no feature check)
+    // 2. OPTIONAL modules → Load IF required feature is active
+
+    // Check if it's a CORE module (always load)
+    if (isCoreModule(manifest.id)) {
+      console.log(`✅ [STEP 1.${filterIndex}] ${manifest.id}: CORE module (always loaded)`);
+      return true;
+    }
+
+    // Check if it's an OPTIONAL module (conditional loading)
+    if (isOptionalModule(manifest.id)) {
+      const requiredFeature = getRequiredFeature(manifest.id);
+
+      if (!requiredFeature) {
+        logger.warn('App', `Module "${manifest.id}" is in OPTIONAL_MODULES but has no requiredFeature mapping`, {
+          moduleId: manifest.id,
+        });
+        return false;
+      }
+
+      const hasRequiredFeature = activeFeatures.includes(requiredFeature);
+
+      console.log(`${hasRequiredFeature ? '✅' : '❌'} [STEP 1.${filterIndex}] ${manifest.id}: OPTIONAL module requires feature="${requiredFeature}" → ${hasRequiredFeature ? 'ACTIVE' : 'INACTIVE'}`);
+
+      if (!hasRequiredFeature) {
+        logger.debug('App', `Module "${manifest.id}" skipped - required feature not active`, {
+          requiredFeature,
+          activeFeatures,
+        });
+        return false;
+      }
+
+      return true;
+    }
+
+    // Module is neither CORE nor OPTIONAL - log warning and skip
+    logger.warn('App', `Module "${manifest.id}" is not registered in CORE_MODULES or OPTIONAL_MODULES - skipping`, {
+      moduleId: manifest.id,
+    });
+    return false;
+  });
+
+  console.log('✅ [STEP 1] Filtering complete:', {
+    filteredCount: filteredManifests.length,
+    filteredIds: filteredManifests.map(m => m.id),
+  });
   logger.info('App', `Filtered to ${filteredManifests.length} modules with required features`);
 
   // ============================================
   // STEP 2: Validate manifests
   // ============================================
 
+  console.log('🔍 [STEP 2] Validating manifests...');
   const validation = validateModuleManifests(filteredManifests);
 
   if (!validation.valid) {
@@ -468,7 +506,13 @@ export async function initializeModules(
   // STEP 3: Topological sort
   // ============================================
 
+  console.log('🔀 [STEP 3] Starting topological sort...');
   const sortResult = topologicalSort(filteredManifests);
+  console.log('✅ [STEP 3] Sort complete:', {
+    sortedCount: sortResult.sorted.length,
+    sortedIds: sortResult.sorted.map(m => m.id),
+    cycles: sortResult.cycles,
+  });
 
   if (sortResult.cycles.length > 0) {
     logger.error('App', 'Cannot initialize modules - circular dependencies detected', {
@@ -494,6 +538,11 @@ export async function initializeModules(
   // STEP 4: Register modules in dependency order
   // ============================================
 
+  console.log('🔄 [STEP 4] Starting module registration loop:', {
+    modulesToRegister: sortResult.sorted.length,
+    moduleIds: sortResult.sorted.map(m => m.id),
+  });
+
   const initialized: string[] = [];
   const failed: Array<{ moduleId: string; error: Error }> = [];
   const skipped: string[] = manifests
@@ -516,10 +565,12 @@ export async function initializeModules(
       }
 
       // Register module
+      console.log(`🎯 [STEP 4] Attempting to register: ${manifest.id}`);
       logger.debug('App', `Registering module: ${manifest.id} v${manifest.version}`);
 
       const moduleStartTime = performance.now();
-      registry.register(manifest);
+      await registry.register(manifest);
+      console.log(`✅ [STEP 4] Successfully registered: ${manifest.id}`);
       const moduleDuration = performance.now() - moduleStartTime;
 
       initialized.push(manifest.id);
@@ -529,6 +580,18 @@ export async function initializeModules(
         depends: manifest.depends,
       });
     } catch (error) {
+      console.error(`❌ [STEP 4] FAILED to register ${manifest.id}:`, {
+        error,
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : undefined,
+        manifest: {
+          id: manifest.id,
+          version: manifest.version,
+          depends: manifest.depends,
+          activatedBy: manifest.activatedBy,
+        }
+      });
+      
       logger.error('App', `❌ Failed to register module: ${manifest.id}`, error);
 
       failed.push({

@@ -1,5 +1,5 @@
 /**
- * STAFF MODULE MANIFEST
+ * TEAM MODULE MANIFEST
  *
  * Real staff management module from src/pages/admin/resources/team
  * Provides teamMember management, performance tracking, and time tracking.
@@ -24,9 +24,9 @@ import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 // MODULE MANIFEST
 // ============================================
 
-export const staffManifest: ModuleManifest = {
+export const teamManifest: ModuleManifest = {
   id: 'staff',
-  name: 'Staff Management',
+  name: 'Team Management',
   version: '1.0.0',
 
   // No dependencies - staff is a foundational module
@@ -35,7 +35,9 @@ export const staffManifest: ModuleManifest = {
   // Requires basic staff management feature
   activatedBy: 'staff_employee_management',
 
+
   // ✅ OPTIONAL MODULE: Only loaded when required feature is active
+  // Optional features enhance functionality
 
   // 🔒 PERMISSIONS: Supervisors and above can manage staff
   minimumRole: 'SUPERVISOR' as const,
@@ -44,10 +46,10 @@ export const staffManifest: ModuleManifest = {
   hooks: {
     provide: [
       'calendar.events',           // Render staff shifts on calendar
-      'dashboard.widgets',         // Staff performance widget
-      'scheduling.toolbar.actions' // "View Staff Availability" button
+      'dashboard.widgets',         // Team performance widget
+      'scheduling.toolbar.actions' // "View Team Availability" button
     ],
-    consume: [] // Staff module doesn't consume hooks from others
+    consume: [] // Team module doesn't consume hooks from others
   },
 
   // Setup function - register hooks
@@ -65,7 +67,7 @@ export const staffManifest: ModuleManifest = {
             <Stack direction="row" align="center" gap="2">
               <UsersIcon className="w-5 h-5 text-blue-500" />
               <Typography variant="heading" size="sm" fontWeight="semibold">
-                Staff Shifts ({staffShifts.length})
+                Team Shifts ({staffShifts.length})
               </Typography>
             </Stack>
             <Stack direction="column" gap="1">
@@ -92,65 +94,65 @@ export const staffManifest: ModuleManifest = {
       100 // Highest priority - staff shifts render first
     );
 
-    // ✅ Hook 2: Dashboard Widget - Staff performance
-    const StaffWidget = lazy(() => import('@/pages/admin/core/dashboard/components/widgets/StaffWidget'));
+    // ❌ DISABLED: TeamWidget file doesn't exist
+    // TODO: Create TeamWidget in src/pages/admin/core/dashboard/components/widgets/TeamWidget.tsx
+    // const TeamWidget = lazy(() => import('@/pages/admin/core/dashboard/components/widgets/TeamWidget'));
+    // registry.addAction(
+    //   'dashboard.widgets',
+    //   () => (
+    //     <React.Suspense fallback={<div>Cargando staff...</div>}>
+    //       <TeamWidget />
+    //     </React.Suspense>
+    //   ),
+    //   'staff',
+    //   75 // High priority widget
+    // );
+
+
+    // ✅ Hook 3: Dashboard KPI Widget - Team Stat Card
+    const { TeamStatWidget } = await import('./widgets');
 
     registry.addAction(
       'dashboard.widgets',
-      () => (
-        <React.Suspense fallback={<div>Cargando staff...</div>}>
-          <StaffWidget />
-        </React.Suspense>
-      ),
-      'staff',
-      75 // High priority widget
-    );
-
-
-    // ✅ Hook 3: Dashboard KPI Widget - Staff Stat Card
-    const { StaffStatWidget } = await import('./widgets');
-
-    registry.addAction(
-      'dashboard.widgets',
-      () => <StaffStatWidget key="staff-stat-widget" />,
+      () => <TeamStatWidget key="staff-stat-widget" />,
       'staff',
       98 // Tercera posición
     );
 
-    logger.debug('App', 'Registered dashboard.widgets hook (Staff KPI)');
+    logger.debug('App', 'Registered dashboard.widgets hook (Team KPI)');
 
     // ============================================
     // SHIFT CONTROL INTEGRATION
     // ============================================
 
-    const { StaffIndicator } = await import('./widgets/StaffIndicator');
+    const { TeamIndicator } = await import('./widgets/TeamIndicator');
 
     registry.addAction(
       'shift-control.indicators',
-      ({ activeStaffCount }) => (
-        <StaffIndicator 
-          activeStaffCount={activeStaffCount}
-          key="staff-indicator"
+      ({ activeTeamCount }) => (
+        <TeamIndicator
+          activeTeamCount={activeTeamCount}
+          key="team-indicator"
         />
       ),
-      'staff',
+      'team',
       80
     );
 
-    logger.debug('App', 'Registered shift-control.indicators hook (StaffIndicator)');
-    logger.info('App', '✅ Staff module setup complete');
+    logger.debug('App', 'Registered shift-control.indicators hook (TeamIndicator)');
+    logger.info('App', '✅ Team module setup complete');
 
     // Hook 3: Scheduling Toolbar Action - Availability button
     registry.addAction(
       'scheduling.toolbar.actions',
-      (data?: { onViewStaffAvailability?: () => void }) => {
+      (data?: { onViewTeamAvailability?: () => void }) => {
         return (
           <button
             key="staff-availability-action"
-            onClick={data?.onViewStaffAvailability}
+            onClick={data?.onViewTeamAvailability}
             className="px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
           >
-            View Staff Availability
+            View Team Availability
           </button>
         );
       },
@@ -158,18 +160,18 @@ export const staffManifest: ModuleManifest = {
       100 // High priority action
     );
 
-    console.log('[Staff Module] Hooks registered successfully');
+    console.log('[Team Module] Hooks registered successfully');
   },
 
   // Teardown function - cleanup
   teardown: () => {
-    console.log('[Staff Module] Cleanup complete');
+    console.log('[Team Module] Cleanup complete');
   },
 
   // Public API exports
   exports: {
     /**
-     * React Hooks for Staff data fetching
+     * React Hooks for Team data fetching
      * Follows Module Exports pattern from CROSS_MODULE_DATA_STRATEGY.md
      */
     hooks: {
@@ -181,19 +183,19 @@ export const staffManifest: ModuleManifest = {
        * ```tsx
        * const registry = ModuleRegistry.getInstance();
        * const staffModule = registry.getExports('staff');
-       * const useEmployeesList = staffModule.hooks.useEmployeesList;
+       * const useTeamMembersList = staffModule.hooks.useTeamMembersList;
        *
        * function MyComponent() {
-       *   const { items: teamMembers, loading } = useEmployeesList();
+       *   const { items: teamMembers, loading } = useTeamMembersList();
        *   // ...\
        * }
        * ```
        */
-      useEmployeesList: () => {
+      useTeamMembersList: () => {
         return useCrudOperations({
-          tableName: 'teamMembers',
-          selectQuery: 'id, first_name, last_name, position, hourly_rate, is_active, checked_in, checked_in_at, staff_role_id, user_id',
-          cacheKey: 'teamMembers-list',
+          tableName: 'team_members',
+          selectQuery: 'id, first_name, last_name, position, hourly_rate, is_active, checked_in, checked_in_at, job_role_id, user_id',
+          cacheKey: 'team-members-list',
           cacheTime: 5 * 60 * 1000, // 5 minutes
           enableRealtime: true,
         });
@@ -203,7 +205,7 @@ export const staffManifest: ModuleManifest = {
        * Hook factory for staff roles list
        * Returns active staff roles for allocation/costing
        */
-      useStaffRoles: () => {
+      useJobRoles: () => {
         return useCrudOperations({
           tableName: 'job_roles',
           selectQuery: 'id, name, department, default_hourly_rate, loaded_factor, is_active, sort_order',
@@ -223,10 +225,10 @@ export const staffManifest: ModuleManifest = {
        * Get all active staff roles for allocation selectors
        */
       getRolesForAllocation: async () => {
-        const { getStaffRolesForAllocation } = await import(
+        const { getJobRolesForAllocation } = await import(
           '@/modules/team/services'
         );
-        return getStaffRolesForAllocation();
+        return getJobRolesForAllocation();
       },
 
       /**
@@ -242,11 +244,11 @@ export const staffManifest: ModuleManifest = {
       /**
        * Get a single staff role by ID
        */
-      getStaffRole: async (roleId: string) => {
-        const { getStaffRole } = await import(
+      getJobRole: async (roleId: string) => {
+        const { getJobRole } = await import(
           '@/modules/team/services'
         );
-        return getStaffRole(roleId);
+        return getJobRole(roleId);
       },
 
       /**
@@ -275,7 +277,7 @@ export const staffManifest: ModuleManifest = {
           '@/modules/team/services'
         );
         
-        // Map to StaffAllocation format
+        // Map to TeamAllocation format
         const staffAllocations = allocations.map(a => ({
           product_id: '', // Not needed for calculation
           role_id: a.role_id,
@@ -291,7 +293,7 @@ export const staffManifest: ModuleManifest = {
     },
 
     // Functions that other modules can call
-    getStaffAvailability: async () => {
+    getTeamAvailability: async () => {
       // Mock implementation - real version would query database
       // TODO: Implement real database query with date parameter
       return [
@@ -304,11 +306,11 @@ export const staffManifest: ModuleManifest = {
      * Get currently active (checked-in) staff
      * Used by ShiftControlWidget to display active staff count
      */
-    getActiveStaff: async () => {
+    getActiveTeam: async () => {
       const { supabase } = await import('@/lib/supabase/client');
       const { data, error } = await supabase
         .from('teamMembers')
-        .select('id, first_name, last_name, position, hourly_rate, checked_in, checked_in_at, staff_role_id')
+        .select('id, first_name, last_name, position, hourly_rate, checked_in, checked_in_at, job_role_id')
         .eq('is_active', true)
         .eq('checked_in', true);
 
@@ -345,18 +347,18 @@ export const staffManifest: ModuleManifest = {
 // DEFAULT EXPORT
 // ============================================
 
-export default staffManifest;
+export default teamManifest;
 
 // ============================================
 // TYPE DEFINITIONS
 // ============================================
 
 /**
- * Staff module public API types
+ * Team module public API types
  */
-export interface StaffAPI {
+export interface TeamAPI {
   hooks: {
-    useEmployeesList: () => {
+    useTeamMembersList: () => {
       items: Array<{
         id: string;
         first_name: string;
@@ -364,7 +366,7 @@ export interface StaffAPI {
         position?: string;
         hourly_rate?: number;
         is_active?: boolean;
-        staff_role_id?: string;
+        job_role_id?: string;
         user_id?: string;
       }>;
       loading: boolean;
@@ -372,7 +374,7 @@ export interface StaffAPI {
       fetchAll: () => Promise<unknown[]>;
       refresh: () => Promise<void>;
     };
-    useStaffRoles: () => {
+    useJobRoles: () => {
       items: Array<{
         id: string;
         name: string;
@@ -397,7 +399,7 @@ export interface StaffAPI {
       loaded_hourly_cost: number;
     }>>;
     getRoleHourlyCost: (roleId: string) => Promise<number>;
-    getStaffRole: (roleId: string) => Promise<{
+    getJobRole: (roleId: string) => Promise<{
       id: string;
       name: string;
       default_hourly_rate?: number | null;
@@ -417,7 +419,7 @@ export interface StaffAPI {
       breakdown: Array<{ role_id: string; hours: number; cost: number }>;
     }>;
   };
-  getStaffAvailability: () => Promise<
+  getTeamAvailability: () => Promise<
     Array<{
       id: string;
       name: string;
@@ -425,14 +427,14 @@ export interface StaffAPI {
       skills: string[];
     }>
   >;
-  getActiveStaff: () => Promise<
+  getActiveTeam: () => Promise<
     Array<{
       id: string;
       first_name: string;
       last_name: string;
       position?: string;
       hourly_rate?: number;
-      staff_role_id?: string;
+      job_role_id?: string;
     }>
   >;
   /** @deprecated Use costing.calculateLaborCost instead */

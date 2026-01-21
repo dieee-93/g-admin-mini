@@ -23,9 +23,6 @@ export const financeFiscalManifest: ModuleManifest = {
   depends: ['sales'], // Fiscal processes sales transactions
   autoInstall: true, // Auto-install when sales is active
 
-  requiredFeatures: [] as FeatureId[],
-  optionalFeatures: [] as FeatureId[],
-
   // 🔒 PERMISSIONS: Supervisors and above can manage fiscal documents
   minimumRole: 'SUPERVISOR' as const,
 
