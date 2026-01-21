@@ -90,7 +90,7 @@ function CardWrapper({
   size = 'md',
   color = 'gray.900',
   colorPalette,
-  bg = 'gray.50', // Default gray background for cards
+  bg = 'bg.surface', // Default surface background for cards
   ...props 
 }: CardProps) {
   return (
@@ -100,6 +100,10 @@ function CardWrapper({
       color={color}
       colorPalette={colorPalette}
       bg={bg}
+      shadow="md"
+      borderRadius="lg"
+      borderWidth="1px"
+      borderColor="border.default"
       {...props}
     >
       {children}
