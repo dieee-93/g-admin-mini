@@ -12,12 +12,12 @@
 import React from 'react';
 import { Stack, Badge, Typography, Icon } from '@/shared/ui';
 import { CubeIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { useMaterialsData } from '../hooks';
-import { DecimalUtils, DECIMAL_CONSTANTS } from '@/business-logic/shared/decimalUtils';
+import { useMaterials } from '@/modules/materials/hooks';
+import { DecimalUtils, DECIMAL_CONSTANTS } from '@/lib/decimal';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 
 export const InventoryWidget: React.FC = () => {
-  const { items, loading } = useMaterialsData();
+  const { data: items = [], isLoading: loading } = useMaterials();
   const { navigate } = useNavigationActions();
 
   const handleClick = () => {

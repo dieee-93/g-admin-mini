@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Badge } from '@/shared/ui';
-import { useMaterialsStore } from '@/store/materialsStore';
-import { useMaterialsData } from '../../../../hooks/useMaterialsData';
+import { useMaterials } from '@/modules/materials/hooks';
 import { useMaterialsActions } from '../../../../hooks/useMaterialsActions';
-import { useMaterialValidation } from '@/hooks';
+import { useMaterialValidation } from '@/modules/materials/hooks';
 import { logger } from '@/lib/logging';
 import {
   type ItemFormData,
@@ -24,15 +23,29 @@ import {
     Text,
 } from '@/shared/ui';
 
-export const useMaterialForm = () => {
-  const { items } = useMaterialsData();
+export interface UseMaterialFormParams {
+  isOpen: boolean;
+  onClose: () => void;
+  mode: 'add' | 'edit' | 'view';
+  item: MaterialItem | null;
+}
+
+export const useMaterialForm = (params: UseMaterialFormParams) => {
+  const { isOpen, onClose, mode, item: currentItem } = params;
+  
+  const { data: items = [] } = useMaterials();
   const { addItem, updateItem } = useMaterialsActions();
-  const isModalOpen = useMaterialsStore((s) => s.isModalOpen);
-  const modalMode = useMaterialsStore((s) => s.modalMode);
-  const currentItem = useMaterialsStore((s) => s.currentItem);
-  const closeModal = useMaterialsStore((s) => s.closeModal);
-  const alerts = useMaterialsStore((s) => s.alerts);
-  const alertSummary = useMaterialsStore((s) => s.alertSummary);
+  
+  // ⚠️ NO MORE Zustand subscriptions for UI state - passed via props!
+  // const isModalOpen = useMaterialsStore((s) => s.isModalOpen); // ❌ REMOVED
+  // const modalMode = useMaterialsStore((s) => s.modalMode); // ❌ REMOVED
+  // const currentItem = useMaterialsStore((s) => s.currentItem); // ❌ REMOVED
+  // const closeModal = useMaterialsStore((s) => s.closeModal); // ❌ REMOVED
+  
+  // ❌ REMOVED: No need to subscribe to alerts from store for modal
+  // Only MaterialsAlerts component needs them
+  // const alerts = useMaterialsStore((s) => s.alerts);
+  // const alertSummary = useMaterialsStore((s) => s.alertSummary);
   
   const [formData, setFormData] = useState<ItemFormData>({
     name: '',
@@ -49,7 +62,6 @@ export const useMaterialForm = () => {
     fieldErrors,
     fieldWarnings,
     validationState,
-    validateField,
     validateForm: optimizedValidateForm,
     clearValidation
   } = useMaterialValidation(formData, items, {
@@ -57,20 +69,24 @@ export const useMaterialForm = () => {
     debounceMs: 300
   });
 
+  // NO useEffect - let useMaterialValidation handle registration internally
+  // We only sync on change, not on every render
+
   const updateFormData = useCallback((updates: Partial<ItemFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
-  }, [setFormData]);
+    // Validation will sync automatically via useMaterialValidation watching formData
+  }, []); // ✅ Empty deps - setFormData is stable from useState
 
   const handleFieldChange = useCallback((field: keyof ItemFormData) =>
     (value: unknown) => {
       setFormData(prev => ({ ...prev, [field]: value as ItemFormData[typeof field] }));
-      validateField(field as string, value);
-    }, [validateField, setFormData]
+      // Validation happens automatically via useMaterialValidation
+    }, [] // ✅ Empty deps - setFormData is stable
   );
 
   const handleNameChange = useCallback((name: string) => {
-    handleFieldChange('name')(name);
-  }, [handleFieldChange]);
+    setFormData(prev => ({ ...prev, name }));
+  }, []); // ✅ Empty deps - setFormData is stable
 
   const handleTypeChange = useCallback((type: ItemType) => {
     updateFormData({ 
@@ -80,8 +96,7 @@ export const useMaterialForm = () => {
       packaging: undefined,
       recipe_id: undefined
     });
-    validateField('type', type);
-  }, [updateFormData, validateField]);
+  }, [updateFormData]);
 
   const updateSupplierData = useCallback((updates: Partial<SupplierFormData>) => {
     setFormData(prev => ({
@@ -91,10 +106,11 @@ export const useMaterialForm = () => {
         ...updates
       }
     }));
-  }, []);
+  }, []); // ✅ Already correct - empty deps with updater function
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addToStockNow, setAddToStockNow] = useState(false);
+  const [showEventSourcingConfirmation, setShowEventSourcingConfirmation] = useState(false);
 
   const [loadingStates, setLoadingStates] = useState({
     initializing: false,
@@ -109,8 +125,8 @@ export const useMaterialForm = () => {
     validationPassed: false
   });
 
-  const isEditMode = modalMode === 'edit';
-  const isViewMode = modalMode === 'view';
+  const isEditMode = mode === 'edit';
+  const isViewMode = mode === 'view';
   // Helper function to get unit from MaterialItem
   const getItemUnit = useCallback((item: MaterialItem): AllUnit => {
     if (isMeasurable(item)) return item.unit;
@@ -128,7 +144,7 @@ export const useMaterialForm = () => {
   }, [formData.type]);
 
   useEffect(() => {
-    if (isModalOpen && currentItem) {
+    if (isOpen && currentItem) {
       const itemFormData: ItemFormData = {
         name: currentItem.name,
         type: currentItem.type,
@@ -146,7 +162,7 @@ export const useMaterialForm = () => {
       }
 
       setFormData(itemFormData);
-    } else if (isModalOpen) {
+    } else if (isOpen) {
       setFormData({
         name: '',
         type: '' as ItemType,
@@ -158,13 +174,13 @@ export const useMaterialForm = () => {
         }
       });
     }
-  }, [isModalOpen, currentItem, getItemUnit]);
+  }, [isOpen, currentItem, getItemUnit]);
 
   useEffect(() => {
-    if (!isModalOpen) {
+    if (!isOpen) {
       clearValidation();
     }
-  }, [isModalOpen, clearValidation]);
+  }, [isOpen, clearValidation]);
 
   const validateForm = useCallback(async () => {
     return await optimizedValidateForm();
@@ -172,8 +188,18 @@ export const useMaterialForm = () => {
 
   const handleSubmit = useCallback(async () => {
     const isValid = await validateForm();
-    if (!isValid) return;
+    
+    if (!isValid) {
+      return;
+    }
 
+    // If adding to stock, show Event Sourcing confirmation first (don't set isSubmitting yet)
+    if (addToStockNow && !isEditMode) {
+      setShowEventSourcingConfirmation(true);
+      return; // Exit early - confirmAndSubmit will handle the actual submission
+    }
+
+    // Only set loading states if we're actually submitting (not showing confirmation)
     setIsSubmitting(true);
     setLoadingStates(prev => ({ ...prev, validating: true }));
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -206,7 +232,7 @@ export const useMaterialForm = () => {
       }
       
       await new Promise(resolve => setTimeout(resolve, 800));
-      closeModal();
+      onClose();
     } catch (error) {
       logger.error('MaterialsStore', 'Error al guardar:', error);
     } finally {
@@ -223,16 +249,58 @@ export const useMaterialForm = () => {
         validationPassed: false
       });
     }
-  }, [validateForm, isEditMode, currentItem, updateItem, formData, addToStockNow, addItem, closeModal]);
+  }, [validateForm, isEditMode, currentItem, updateItem, formData, addToStockNow, addItem, onClose]);
+
+  const confirmAndSubmit = useCallback(async () => {
+    setShowEventSourcingConfirmation(false);
+    
+    setIsSubmitting(true);
+    
+    setLoadingStates(prev => ({ ...prev, validating: true }));
+    await new Promise(resolve => setTimeout(resolve, 300));
+    setLoadingStates(prev => ({ ...prev, validating: false }));
+    setSuccessStates(prev => ({ ...prev, validationPassed: true }));
+
+    try {
+      setLoadingStates(prev => ({ ...prev, savingToStock: true }));
+      
+      await addItem(formData);
+      
+      setLoadingStates(prev => ({ ...prev, savingToStock: false }));
+      setSuccessStates(prev => ({ 
+        ...prev, 
+        itemCreated: true, 
+        stockAdded: true 
+      }));
+      
+      await new Promise(resolve => setTimeout(resolve, 800));
+      onClose();
+    } catch (error) {
+      logger.error('MaterialsStore', 'Error al guardar:', error);
+    } finally {
+      setIsSubmitting(false);
+      setLoadingStates({
+        initializing: false,
+        validating: false,
+        calculating: false,
+        savingToStock: false
+      });
+      setSuccessStates({
+        itemCreated: false,
+        stockAdded: false,
+        validationPassed: false
+      });
+    }
+  }, [formData, addItem, onClose]);
 
   const modalTitle = useMemo(() => {
-    switch (modalMode) {
+    switch (mode) {
       case 'add': return 'Crear Nuevo Material';
       case 'edit': return 'Editar Material';
       case 'view': return 'Ver Material';
       default: return 'Material';
     }
-  }, [modalMode]);
+  }, [mode]);
 
   const submitButtonContent = useMemo(() => {
     if (loadingStates.validating) {
@@ -335,10 +403,10 @@ export const useMaterialForm = () => {
     fieldErrors,
     fieldWarnings,
     validationState,
-    modalMode,
-    isModalOpen,
-    alerts,
-    alertSummary,
+    // ❌ REMOVED: modalMode, isModalOpen, closeModal (now props)
+    // ❌ REMOVED: alerts, alertSummary (not needed in modal)
+    alertSummary: undefined, // Keep for backward compat, remove later
+    showEventSourcingConfirmation,
     updateFormData,
     handleFieldChange,
     handleNameChange,
@@ -346,6 +414,7 @@ export const useMaterialForm = () => {
     updateSupplierData,
     setAddToStockNow,
     handleSubmit,
-    closeModal,
+    confirmAndSubmit,
+    setShowEventSourcingConfirmation,
   };
 };

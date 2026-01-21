@@ -31,7 +31,7 @@ import {
 
 // Business Logic Imports
 import { ABCAnalysisEngine } from '../../services/abcAnalysisEngine';
-import { useMaterialsData } from '../../hooks/useMaterialsData';
+import { useMaterials } from '@/modules/materials/hooks';
 import type { 
   ABCCategory, 
   MaterialABC, 
@@ -39,7 +39,7 @@ import type {
   AnalysisType,
   ABCAnalysisConfig 
 } from '../../types/abc-analysis';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 import { logger } from '@/lib/logging';
 const ABCAnalysisSection: React.FC = () => {
@@ -48,7 +48,7 @@ const ABCAnalysisSection: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   // Hooks para datos reales
-  const { items: materialItems, loading: materialsLoading } = useMaterialsData();
+  const { data: materialItems = [], isLoading: materialsLoading } = useMaterials();
   
   // Configuración del análisis
   const analysisConfig: Partial<ABCAnalysisConfig> = useMemo(() => ({

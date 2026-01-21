@@ -14,14 +14,14 @@ import {
   TransferDetailsModal
 } from '..';
 import { inventoryTransfersApi } from '../../services/inventoryTransfersApi';
-import { useMaterialsData } from '../../hooks/useMaterialsData';
+import { useMaterials } from '@/modules/materials/hooks';
 import { useLocation } from '@/contexts/LocationContext';
 import { notify } from '@/lib/notifications';
 import type { InventoryTransfer, TransferFilters } from '../../types/inventoryTransferTypes';
 import { logger } from '@/lib/logging';
 
 export function TransfersTab() {
-  const { items } = useMaterialsData();
+  const { data: items = [] } = useMaterials();
   const { locations, selectedLocation } = useLocation();
 
   const [transfers, setTransfers] = useState<InventoryTransfer[]>([]);

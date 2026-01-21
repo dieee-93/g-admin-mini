@@ -3,10 +3,10 @@ import {
   CardGrid, Stack, Typography, Section, Icon
 } from '@/shared/ui';
 import { CubeIcon } from '@heroicons/react/24/outline';
-import { useMaterialsData } from '../../hooks/useMaterialsData';
+import { useMaterials } from '@/modules/materials/hooks';
 import { useMaterialsComputed } from '../../hooks/useMaterialsComputed';
 import { useAuth } from '@/contexts/AuthContext';
-import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
+import { StockCalculation } from '@/modules/materials/services/stockCalculation';
 import type { MaterialItem } from '../../types';
 import { MaterialCard } from '../MaterialCard'; 
 
@@ -20,7 +20,7 @@ interface MaterialsGridProps {
 
 export const MaterialsGrid: React.FC<MaterialsGridProps> = ({ onEdit, onView, onDelete }) => {
   // 🎯 Use the main hook directly for better reactivity
-  const { loading } = useMaterialsData();
+  const { isLoading: loading } = useMaterials();
   const { getFilteredItems } = useMaterialsComputed();
   const items = getFilteredItems();
 
