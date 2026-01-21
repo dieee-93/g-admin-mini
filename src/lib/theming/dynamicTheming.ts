@@ -205,52 +205,56 @@ const getThemeColors = (themeId: string) => {
     },
     // Professional dark themes - INVERTIDOS de sus contrapartes light
     'corporate-dark': {
-      50: { value: "#0f172a" },   // Fondo oscuro (texto de corporate)
-      100: { value: "#1e293b" },  // Superficie oscura (superficie secundaria de corporate)
-      200: { value: "#1e3a8a" },  // Bordes oscuros (divisores de corporate)
-      300: { value: "#1d4ed8" },  // Elementos oscuros (hover de corporate)
-      400: { value: "#1e40af" },  // Activos oscuros (primary de corporate)
-      500: { value: "#60a5fa" },  // Primary invertido (elementos activos de corporate)
-      600: { value: "#93c5fd" },  // Acento fuerte (elementos de corporate)
-      700: { value: "#bfdbfe" },  // Divisores claros (bordes de corporate)
-      800: { value: "#dbeafe" },  // Superficie clara (superficie de corporate)
-      900: { value: "#eff6ff" },  // Texto claro (fondo de corporate)
+      // Paleta rediseñada con mayor diferenciación gradual para fondos (50-300)
+      50: { value: "#0a0f1a" },  // Fondo base - muy oscuro, casi negro con tono azul
+      100: { value: "#121b2e" }, // Superficie - azul muy oscuro
+      200: { value: "#1a2642" }, // Paneles - azul oscuro
+      300: { value: "#243456" }, // Bordes/elementos - azul medio oscuro
+      400: { value: "#2e446a" }, // Elementos activos
+      500: { value: "#3b5998" }, // Primary - azul corporativo
+      600: { value: "#60a5fa" }, // Acento fuerte
+      700: { value: "#93c5fd" }, // Acentos claros
+      800: { value: "#dbeafe" }, // Texto secundario claro
+      900: { value: "#eff6ff" }, // Texto principal claro
     },
     'nature-dark': {
-      50: { value: "#0f3d1a" }, // Fondo oscuro (era 900 de nature)
-      100: { value: "#14532d" }, // Superficie oscura (era 800 de nature)
-      200: { value: "#166534" }, // Bordes oscuros (era 700 de nature)
-      300: { value: "#15803d" }, // Elementos oscuros (era 600 de nature)
-      400: { value: "#16a34a" }, // Activos oscuros (era 500 de nature)
-      500: { value: "#4ade80" }, // Primary invertido (era 400 de nature)
-      600: { value: "#86efac" }, // Acento fuerte (era 300 de nature)
-      700: { value: "#bbf7d0" }, // Divisores claros (era 200 de nature)
-      800: { value: "#dcfce7" }, // Superficie clara (era 100 de nature)
-      900: { value: "#f0fdf4" }, // Texto claro (era 50 de nature)
+      // Paleta rediseñada con mayor diferenciación para fondos (50-300)
+      50: { value: "#0a1f0f" },  // Fondo base - muy oscuro, casi negro con tono verde
+      100: { value: "#142d18" }, // Superficie - verde muy oscuro
+      200: { value: "#1f4022" }, // Paneles - verde oscuro
+      300: { value: "#2d5a2f" }, // Bordes/elementos - verde medio
+      400: { value: "#3d7a3f" }, // Elementos activos - verde
+      500: { value: "#16a34a" }, // Primary - verde brillante
+      600: { value: "#4ade80" }, // Acento fuerte
+      700: { value: "#86efac" }, // Acentos claros
+      800: { value: "#bbf7d0" }, // Texto secundario claro
+      900: { value: "#f0fdf4" }, // Texto principal claro
     },
     'sunset-dark': {
-      50: { value: "#7c2d12" }, // Fondo oscuro (era 900 de sunset)
-      100: { value: "#9a3412" }, // Superficie oscura (era 800 de sunset)
-      200: { value: "#c2410c" }, // Bordes oscuros (era 700 de sunset)
-      300: { value: "#dc2626" }, // Elementos oscuros (era 600 de sunset)
-      400: { value: "#ea580c" }, // Activos oscuros (era 500 de sunset)
-      500: { value: "#fb923c" }, // Primary invertido (era 400 de sunset)
-      600: { value: "#fdba74" }, // Acento fuerte (era 300 de sunset)
-      700: { value: "#fed7aa" }, // Divisores claros (era 200 de sunset)
-      800: { value: "#ffedd5" }, // Superficie clara (era 100 de sunset)
-      900: { value: "#fff7ed" }, // Texto claro (era 50 de sunset)
+      // Paleta rediseñada con mayor diferenciación para fondos (50-300)
+      50: { value: "#1a0f0a" },  // Fondo base - muy oscuro, casi negro con tono cálido
+      100: { value: "#2d1a12" }, // Superficie - marrón muy oscuro
+      200: { value: "#4a2a1c" }, // Paneles - marrón oscuro
+      300: { value: "#6b3d28" }, // Bordes/elementos - marrón medio
+      400: { value: "#8c4f33" }, // Elementos activos - marrón/naranja
+      500: { value: "#c2410c" }, // Primary - naranja intenso
+      600: { value: "#ea580c" }, // Acento fuerte
+      700: { value: "#fb923c" }, // Acentos claros
+      800: { value: "#fdba74" }, // Texto secundario claro
+      900: { value: "#fff7ed" }, // Texto principal claro
     },
     'ocean-dark': {
-      50: { value: "#083344" }, // Fondo oscuro (era 900 de ocean)
-      100: { value: "#164e63" }, // Superficie oscura (era 800 de ocean)
-      200: { value: "#155e75" }, // Bordes oscuros (era 700 de ocean)
-      300: { value: "#0e7490" }, // Elementos oscuros (era 600 de ocean)
-      400: { value: "#0891b2" }, // Activos oscuros (era 500 de ocean)
-      500: { value: "#22d3ee" }, // Primary invertido (era 400 de ocean)
-      600: { value: "#67e8f9" }, // Acento fuerte (era 300 de ocean)
-      700: { value: "#a5f3fc" }, // Divisores claros (era 200 de ocean)
-      800: { value: "#cffafe" }, // Superficie clara (era 100 de ocean)
-      900: { value: "#ecfeff" }, // Texto claro (era 50 de ocean)
+      // Paleta rediseñada con mayor diferenciación para fondos (50-300)
+      50: { value: "#061820" },  // Fondo base - muy oscuro, casi negro con tono cyan
+      100: { value: "#0c2a38" }, // Superficie - azul muy oscuro
+      200: { value: "#144050" }, // Paneles - azul oscuro
+      300: { value: "#1e5a70" }, // Bordes/elementos - azul medio
+      400: { value: "#0891b2" }, // Elementos activos - cyan
+      500: { value: "#22d3ee" }, // Primary - cyan brillante
+      600: { value: "#67e8f9" }, // Acento fuerte
+      700: { value: "#a5f3fc" }, // Acentos claros
+      800: { value: "#cffafe" }, // Texto secundario claro
+      900: { value: "#ecfeff" }, // Texto principal claro
     },
     // 🌌 Nord Theme - Popular Scandinavian palette
     'nord': {
@@ -305,8 +309,95 @@ const getThemeColors = (themeId: string) => {
       900: { value: "#581c87" },  // Very dark purple
     }
   }
-  
+
   return themeColors[themeId] || null
+}
+
+/**
+ * 🎨 Palette Overrides por Tema
+ * 
+ * Para temas donde ciertos colores de feedback (red, green) conflictan
+ * con el color primario del tema, definimos paletas alternativas.
+ * 
+ * Ejemplo: En sunset-dark (fondo rojo/naranja), red no contrasta.
+ * Solución: Usar magenta/fucsia en lugar de rojo.
+ */
+const paletteOverridesPerTheme: Record<string, Record<string, Record<string, { value: string }>>> = {
+  // 🌅 Sunset Dark: Fondo rojo/naranja - reemplazar red con magenta
+  'sunset-dark': {
+    red: {
+      50: { value: "#fdf4ff" },   // Muy claro magenta
+      100: { value: "#fae8ff" },  // Claro magenta
+      200: { value: "#f5d0fe" },  // Suave magenta
+      300: { value: "#f0abfc" },  // Medio magenta
+      400: { value: "#e879f9" },  // Activo magenta
+      500: { value: "#d946ef" },  // Primary magenta (buen contraste con naranja)
+      600: { value: "#c026d3" },  // Fuerte magenta
+      700: { value: "#a21caf" },  // Oscuro magenta
+      800: { value: "#86198f" },  // Muy oscuro magenta
+      900: { value: "#701a75" },  // Intenso magenta
+    },
+  },
+  // 🌅 Sunset: Similar al dark, también necesita contraste
+  'sunset': {
+    red: {
+      50: { value: "#fdf4ff" },
+      100: { value: "#fae8ff" },
+      200: { value: "#f5d0fe" },
+      300: { value: "#f0abfc" },
+      400: { value: "#e879f9" },
+      500: { value: "#d946ef" },
+      600: { value: "#c026d3" },
+      700: { value: "#a21caf" },
+      800: { value: "#86198f" },
+      900: { value: "#701a75" },
+    },
+  },
+  // 🌿 Nature Dark: Fondo verde - reemplazar green con cyan
+  'nature-dark': {
+    green: {
+      50: { value: "#ecfeff" },   // Muy claro cyan
+      100: { value: "#cffafe" },  // Claro cyan
+      200: { value: "#a5f3fc" },  // Suave cyan
+      300: { value: "#67e8f9" },  // Medio cyan
+      400: { value: "#22d3ee" },  // Activo cyan
+      500: { value: "#06b6d4" },  // Primary cyan (buen contraste con verde)
+      600: { value: "#0891b2" },  // Fuerte cyan
+      700: { value: "#0e7490" },  // Oscuro cyan
+      800: { value: "#155e75" },  // Muy oscuro cyan
+      900: { value: "#164e63" },  // Intenso cyan
+    },
+  },
+  // 🌿 Nature: Similar al dark
+  'nature': {
+    green: {
+      50: { value: "#ecfeff" },
+      100: { value: "#cffafe" },
+      200: { value: "#a5f3fc" },
+      300: { value: "#67e8f9" },
+      400: { value: "#22d3ee" },
+      500: { value: "#06b6d4" },
+      600: { value: "#0891b2" },
+      700: { value: "#0e7490" },
+      800: { value: "#155e75" },
+      900: { value: "#164e63" },
+    },
+  },
+}
+
+/**
+ * Helper para obtener una paleta de color, aplicando overrides si existen para el tema
+ */
+const getPaletteForTheme = (
+  themeId: string,
+  paletteName: string,
+  defaultPalette: Record<string, { value: string }>
+): Record<string, { value: string }> => {
+  const overrides = paletteOverridesPerTheme[themeId]
+  if (overrides && overrides[paletteName]) {
+    return overrides[paletteName]
+  }
+  return defaultPalette
 }
 
 /**
@@ -315,7 +406,7 @@ const getThemeColors = (themeId: string) => {
  */
 export const createThemeSystem = (themeId: string) => {
   const theme = availableThemes.find(t => t.id === themeId)
-  
+
   if (!theme) {
     console.warn(`Theme ${themeId} not found, using default system`)
     return createSystem(defaultConfig)
@@ -327,57 +418,53 @@ export const createThemeSystem = (themeId: string) => {
   }
 
   const themeColors = getThemeColors(themeId)
-  
+
   if (!themeColors) {
     console.warn(`No colors defined for theme ${themeId}, using default system`)
     return createSystem(defaultConfig)
   }
-  
+
   // 🎯 ENFOQUE UNIFICADO: Solo mapear gray.* con los colores del tema
   // Los semantic tokens se adaptan automáticamente porque referencian gray.*
   // Todos los componentes por defecto usan gray.* automáticamente
   const config = defineConfig({
-  // 🎨 Estilos globales para barras de scroll adaptadas a cada tema
-  globalCss: {
-    // Webkit browsers (Chrome, Safari, Edge)
-    '::-webkit-scrollbar': {
-      width: '10px',                   // Aumentamos el ancho para mejor visibilidad
-      height: '10px',
-    },
-    '::-webkit-scrollbar-track': {
-      bg: '{colors.bg.muted}',         // Fondo más oscuro para mayor contraste
-      borderRadius: '6px',
-      border: '1px solid {colors.border.subtle}',
-    },
-    '::-webkit-scrollbar-thumb': {
-      bg: '{colors.fg.muted}',         // Thumb más contrastado
-      borderRadius: '6px',
-      border: '2px solid {colors.bg.muted}',  // Borde más grueso
-      _hover: {
-        bg: '{colors.fg.default}',     // Hover más visible
-        border: '2px solid {colors.bg.subtle}',
+    // 🎨 Estilos globales para barras de scroll adaptadas a cada tema
+    globalCss: {
+      // Webkit browsers (Chrome, Safari, Edge)
+      '::-webkit-scrollbar': {
+        width: '8px',
+        height: '8px',
       },
-    },
-    '::-webkit-scrollbar-thumb:active': {
-      bg: '{colors.accent.default}',   // Activo con color de acento para máximo contraste
-      border: '2px solid {colors.bg.default}',
-    },
-    '::-webkit-scrollbar-corner': {
-      bg: '{colors.bg.muted}',         // Esquina igual al track
-    },
-    
-    // Firefox - mayor contraste también
-    html: {
-      scrollbarWidth: 'thin',
-      scrollbarColor: '{colors.fg.muted} {colors.bg.muted}',  // Thumb y track más contrastados
-    },
-    
-    // Estilos adicionales para elementos con scroll personalizado
-    '.custom-scrollbar': {
-      scrollbarWidth: 'thin',
-      scrollbarColor: '{colors.fg.muted} {colors.bg.muted}',
-    },
-  },    theme: {
+      '::-webkit-scrollbar-track': {
+        bg: '{colors.gray.100}',
+        borderRadius: '4px',
+      },
+      '::-webkit-scrollbar-thumb': {
+        bg: '{colors.gray.400}',
+        borderRadius: '4px',
+        _hover: {
+          bg: '{colors.gray.500}',
+        },
+      },
+      '::-webkit-scrollbar-thumb:active': {
+        bg: '{colors.gray.600}',
+      },
+      '::-webkit-scrollbar-corner': {
+        bg: '{colors.gray.100}',
+      },
+
+      // Firefox
+      html: {
+        scrollbarWidth: 'thin',
+        scrollbarColor: '{colors.gray.400} {colors.gray.100}',
+      },
+
+      // Estilos adicionales para elementos con scroll personalizado
+      '.custom-scrollbar': {
+        scrollbarWidth: 'thin',
+        scrollbarColor: '{colors.gray.400} {colors.gray.100}',
+      },
+    }, theme: {
       tokens: {
         colors: {
           // ✅ CLAVE: Mapear SOLO gray.* con nuestros colores de tema  
@@ -394,6 +481,10 @@ export const createThemeSystem = (themeId: string) => {
             900: { value: themeColors[900].value }, // Texto (light) / Texto (dark)
           },
 
+          // ✅ Tokens white/black requeridos para semantic tokens de contraste
+          white: { value: "#ffffff" },
+          black: { value: "#000000" },
+
           // ✅ Mantener paletas estándar para colorPalette props
           blue: {
             50: { value: "#eff6ff" },
@@ -407,7 +498,7 @@ export const createThemeSystem = (themeId: string) => {
             800: { value: "#1e40af" },
             900: { value: "#1e3a8a" },
           },
-          green: {
+          green: getPaletteForTheme(themeId, 'green', {
             50: { value: "#f0fdf4" },
             100: { value: "#dcfce7" },
             200: { value: "#bbf7d0" },
@@ -418,8 +509,8 @@ export const createThemeSystem = (themeId: string) => {
             700: { value: "#15803d" },
             800: { value: "#166534" },
             900: { value: "#14532d" },
-          },
-          red: {
+          }),
+          red: getPaletteForTheme(themeId, 'red', {
             50: { value: "#fef2f2" },
             100: { value: "#fee2e2" },
             200: { value: "#fecaca" },
@@ -430,7 +521,7 @@ export const createThemeSystem = (themeId: string) => {
             700: { value: "#b91c1c" },
             800: { value: "#991b1b" },
             900: { value: "#7f1d1d" },
-          },
+          }),
           purple: {
             50: { value: "#faf5ff" },
             100: { value: "#f3e8ff" },
@@ -442,6 +533,67 @@ export const createThemeSystem = (themeId: string) => {
             700: { value: "#7c3aed" },
             800: { value: "#6b21a8" },
             900: { value: "#581c87" },
+          },
+          // ✅ Paletas adicionales requeridas por Chakra UI
+          orange: {
+            50: { value: "#fff7ed" },
+            100: { value: "#ffedd5" },
+            200: { value: "#fed7aa" },
+            300: { value: "#fdba74" },
+            400: { value: "#fb923c" },
+            500: { value: "#f97316" },
+            600: { value: "#ea580c" },
+            700: { value: "#c2410c" },
+            800: { value: "#9a3412" },
+            900: { value: "#7c2d12" },
+          },
+          teal: {
+            50: { value: "#f0fdfa" },
+            100: { value: "#ccfbf1" },
+            200: { value: "#99f6e4" },
+            300: { value: "#5eead4" },
+            400: { value: "#2dd4bf" },
+            500: { value: "#14b8a6" },
+            600: { value: "#0d9488" },
+            700: { value: "#0f766e" },
+            800: { value: "#115e59" },
+            900: { value: "#134e4a" },
+          },
+          cyan: {
+            50: { value: "#ecfeff" },
+            100: { value: "#cffafe" },
+            200: { value: "#a5f3fc" },
+            300: { value: "#67e8f9" },
+            400: { value: "#22d3ee" },
+            500: { value: "#06b6d4" },
+            600: { value: "#0891b2" },
+            700: { value: "#0e7490" },
+            800: { value: "#155e75" },
+            900: { value: "#164e63" },
+          },
+          yellow: {
+            50: { value: "#fefce8" },
+            100: { value: "#fef9c3" },
+            200: { value: "#fef08a" },
+            300: { value: "#fde047" },
+            400: { value: "#facc15" },
+            500: { value: "#eab308" },
+            600: { value: "#ca8a04" },
+            700: { value: "#a16207" },
+            800: { value: "#854d0e" },
+            900: { value: "#713f12" },
+          },
+          pink: {
+            50: { value: "#fdf2f8" },
+            100: { value: "#fce7f3" },
+            200: { value: "#fbcfe8" },
+            300: { value: "#f9a8d4" },
+            400: { value: "#f472b6" },
+            500: { value: "#ec4899" },
+            600: { value: "#db2777" },
+            700: { value: "#be185d" },
+            800: { value: "#9d174d" },
+            900: { value: "#831843" },
           },
         },
       },
@@ -458,26 +610,30 @@ export const createThemeSystem = (themeId: string) => {
             'subtle': { value: "{colors.gray.200}" },    // Superficie sutil
             'muted': { value: "{colors.gray.300}" },     // Superficie muted
           },
-          
+
           // Texto - Referencian gray.* tokens (se adaptan automáticamente al tema)
           'text': {
             'primary': { value: "{colors.gray.900}" },   // Texto principal (oscuro en light, claro en dark)
             'secondary': { value: "{colors.gray.800}" }, // Texto secundario
             'muted': { value: "{colors.gray.600}" },     // Texto muted
           },
-          
+
           // Foreground - Token que usan muchos componentes de Chakra para texto
           'fg': {
             'DEFAULT': { value: "{colors.gray.900}" },   // Foreground principal = text.primary
             'muted': { value: "{colors.gray.600}" },     // Foreground muted = text.muted
             'subtle': { value: "{colors.gray.700}" },    // Foreground sutil
           },
-          
+
           // Bordes - Referencian gray.* tokens (se adaptan automáticamente al tema)
           'border': {
             'subtle': { value: "{colors.gray.200}" },    // Bordes sutiles
             'default': { value: "{colors.gray.300}" },   // Bordes default
           },
+
+          // ⚠️ NO definir colorPalette semantic tokens (gray/red/blue.border etc)
+          // Dejamos que mergeConfigs preserve los tokens de Chakra defaultConfig
+          // Solo sobrescribimos bg/text/fg/border que necesitamos para nuestros temas
         },
       },
 
@@ -596,7 +752,7 @@ export const getCurrentThemeSystem = (currentTheme: any) => {
     console.warn('No valid theme provided, using default system')
     return createSystem(defaultConfig)
   }
-  
+
   try {
     return createThemeSystem(currentTheme.id)
   } catch (error) {
