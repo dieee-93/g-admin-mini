@@ -1,4 +1,4 @@
-import { Skeleton as ChakraSkeleton, Stack } from '@chakra-ui/react'
+import { Skeleton as ChakraSkeleton, Stack, Box } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
 import React from 'react'
 
@@ -22,6 +22,15 @@ interface SkeletonTextProps {
   gap?: string | number
   className?: string
   [key: string]: any
+}
+
+interface SkeletonCardProps {
+  lines?: number
+}
+
+interface SkeletonTableProps {
+  rows?: number
+  columns?: number
 }
 
 export function Skeleton({
@@ -86,8 +95,56 @@ export function SkeletonText({
   )
 }
 
+/**
+ * Skeleton para cards
+ */
+export function SkeletonCard({ lines = 3 }: SkeletonCardProps) {
+  return (
+    <Box
+      bg="bg.surface"
+      p="6"
+      borderRadius="lg"
+      shadow="md"
+      borderWidth="1px"
+      borderColor="border.default"
+    >
+      <Stack gap="4">
+        <Skeleton height="20px" width="60%" />
+        <SkeletonText noOfLines={lines} gap="3" />
+      </Stack>
+    </Box>
+  )
+}
+
+/**
+ * Skeleton para tablas
+ */
+export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
+  return (
+    <Stack gap="2">
+      {/* Header */}
+      <Stack direction="row" gap="4">
+        {Array.from({ length: columns }).map((_, i) => (
+          <Skeleton key={i} height="20px" flex="1" />
+        ))}
+      </Stack>
+      {/* Rows */}
+      {Array.from({ length: rows }).map((_, rowIndex) => (
+        <Stack key={rowIndex} direction="row" gap="4">
+          {Array.from({ length: columns }).map((_, colIndex) => (
+            <Skeleton key={colIndex} height="16px" flex="1" />
+          ))}
+        </Stack>
+      ))}
+    </Stack>
+  )
+}
+
 // Compound component pattern
 Skeleton.Text = SkeletonText
+Skeleton.Card = SkeletonCard
+Skeleton.Table = SkeletonTable
+
 
 // =============================================================================
 // USAGE EXAMPLE

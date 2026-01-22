@@ -10,10 +10,10 @@
 
 import React, { useMemo } from 'react';
 import { Box, VStack, HStack, Heading, Text, Button, Badge } from '@/shared/ui';
-import { useCapabilities } from '@/lib/capabilities';
-import { useValidationContext } from '@/hooks/useValidationContext';
+import { useBusinessProfile } from '@/lib/capabilities';
+import { useValidationContext } from '@/hooks';
 import { ModuleRegistry } from '@/lib/modules';
-import { useAchievementsStore } from '@/store/achievementsStore';
+import { useAchievementsStore } from '@/modules/achievements/store/achievementsStore';
 import { logger } from '@/lib/logging';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 import type { CapabilityProgress } from '../types';
@@ -48,7 +48,8 @@ const CAPABILITY_NAMES: Record<BusinessCapabilityId, string> = {
 export default function AchievementsWidget() {
   logger.debug('App', '🎯 AchievementsWidget render');
 
-  const { activeCapabilities } = useCapabilities();
+  const { profile } = useBusinessProfile();
+  const activeCapabilities = profile?.selectedCapabilities || [];
 
   // ✅ FIX CRÍTICO: NO llamar useValidationContext en el render
   // En su lugar, obtener context solo cuando se necesite (dentro del useEffect)
@@ -92,107 +93,113 @@ export default function AchievementsWidget() {
         // ✅ CRITICAL FIX: Obtener context AQUÍ, no en el render
         // Esto evita suscripciones innecesarias de Zustand
         // Usar getState() en lugar de hooks para acceso directo sin subscription
-        import('@/hooks/useValidationContext').then(({ useValidationContext }) => {
+        import('@/hooks/system/useValidationContext').then(({ useValidationContext }) => {
           // Acceder a los stores directamente sin hooks
-          import('@/store/productsStore').then(({ useProductsStore }) => {
-            import('@/store/staffStore').then(({ useStaffStore }) => {
+          import('@/modules/products/hooks/useProducts').then(({ useProducts }) => {
+            import('@/modules/team/store/teamStore').then(({ useTeamStore }) => {
               import('@/store/operationsStore').then(({ useOperationsStore }) => {
                 import('@/store/salesStore').then(({ useSalesStore }) => {
                   import('@/store/appStore').then(({ useAppStore }) => {
+                    import('@tanstack/react-query').then(({ useQueryClient }) => {
 
-                    // ✅ Usar getState() para acceso directo sin subscription
-                    const products = useProductsStore.getState().products;
-                    const staff = useStaffStore.getState().staff;
-                    const tables = (useOperationsStore.getState() as any).tables || [];
-                    const sales = useSalesStore.getState().sales;
-                    const settings = useAppStore.getState().settings;
+                      // ✅ Get products from TanStack Query cache
+                      // Note: This approach is not ideal - should use useValidationContext instead
+                      const queryClient = typeof window !== 'undefined' ? (window as any).__queryClient : null;
+                      const productsData = queryClient?.getQueryData(['products', 'intelligence']) || [];
 
-                    const context = {
-                      profile: {
-                        businessName: settings?.businessName,
-                        address: undefined,
-                        logoUrl: undefined,
-                        taxId: undefined,
-                        contactEmail: undefined,
-                        contactPhone: undefined,
-                        operatingHours: undefined,
-                        pickupHours: undefined,
-                        deliveryHours: undefined,
-                        shippingPolicy: undefined,
-                        termsAndConditions: undefined,
-                      },
-                      products: products.map((p: any) => ({
-                        id: p.id,
-                        name: p.name,
-                        is_published: p.is_published ?? false,
-                        images: p.images || [],
-                      })),
-                      staff: staff.map((s: any) => ({
-                        id: s.id,
-                        name: s.name,
-                        is_active: s.is_active ?? true,
-                        role: s.role,
-                      })),
-                      tables: tables.map((t: any) => ({
-                        id: t.id,
-                        name: t.name,
-                        capacity: t.capacity || 4,
-                      })),
-                      paymentMethods: [],
-                      paymentGateways: [],
-                      deliveryZones: [],
-                      salesCount: sales?.length || 0,
-                      loyaltyProgram: undefined,
-                    };
+                      const staff = useTeamStore.getState().staff;
+                      const tables = (useOperationsStore.getState() as any).tables || [];
+                      const settings = useAppStore.getState().settings;
 
-                    // Obtener progreso de cada capability activa
-                    const results = activeCapabilities.map((capability) => {
-                      logger.debug('App', `📊 Getting progress for: ${capability}`);
+                      const context = {
+                        profile: {
+                          businessName: settings?.businessName,
+                          address: undefined,
+                          logoUrl: undefined,
+                          taxId: undefined,
+                          contactEmail: undefined,
+                          contactPhone: undefined,
+                          operatingHours: undefined,
+                          pickupHours: undefined,
+                          deliveryHours: undefined,
+                          shippingPolicy: undefined,
+                          termsAndConditions: undefined,
+                        },
+                        products: productsData.map((p: any) => ({
+                          id: p.id,
+                          name: p.name,
+                          is_published: p.is_published ?? false,
+                          images: p.images || [],
+                        })),
+                        staff: staff.map((s: any) => ({
+                          id: s.id,
+                          name: s.name,
+                          is_active: s.is_active ?? true,
+                          role: s.role,
+                        })),
+                        tables: tables.map((t: any) => ({
+                          id: t.id,
+                          name: t.name,
+                          capacity: t.capacity || 4,
+                        })),
+                        paymentMethods: [],
+                        paymentGateways: [],
+                        deliveryZones: [],
+                        salesCount: 0, // Sales data is now in TanStack Query
+                        loyaltyProgram: undefined,
+                      };
 
-                      const actionResults = registry.doAction('achievements.get_progress', {
-                        capability,
-                        context,
-                      });
+                      // Obtener progreso de cada capability activa
+                      const results = activeCapabilities.map((capability) => {
+                        logger.debug('App', `📊 Getting progress for: ${capability}`);
 
-                      logger.debug('App', `📊 doAction result for ${capability}:`, actionResults);
+                        const actionResults = registry.doAction('achievements.get_progress', {
+                          capability,
+                          context,
+                        });
 
-                      // doAction retorna array, tomar el primer resultado
-                      return actionResults[0] as CapabilityProgress;
-                    }).filter(Boolean); // Filtrar undefined/null
+                        logger.debug('App', `📊 doAction result for ${capability}:`, actionResults);
 
-                    logger.debug('App', '📊 Total results:', results);
+                        // doAction retorna array, tomar el primer resultado
+                        return actionResults[0] as CapabilityProgress;
+                      }).filter(Boolean); // Filtrar undefined/null
 
-                    // Solo actualizar si realmente cambió y componente sigue montado
-                    if (isMounted) {
-                      setCapabilitiesProgress(prevResults => {
-                        // Comparar por longitud y IDs
-                        if (prevResults.length !== results.length) {
-                          logger.debug('App', '🔄 Length changed, updating state');
-                          return results;
-                        }
+                      logger.debug('App', '📊 Total results:', results);
 
-                        const hasChanged = results.some((r, i) =>
-                          r?.capability !== prevResults[i]?.capability ||
-                          r?.completed !== prevResults[i]?.completed
-                        );
+                      // Solo actualizar si realmente cambió y componente sigue montado
+                      if (isMounted) {
+                        setCapabilitiesProgress(prevResults => {
+                          // Comparar por longitud y IDs
+                          if (prevResults.length !== results.length) {
+                            logger.debug('App', '🔄 Length changed, updating state');
+                            return results;
+                          }
 
-                        if (hasChanged) {
-                          logger.debug('App', '🔄 Progress changed, updating state');
-                        } else {
-                          logger.debug('App', '✅ No changes detected, keeping previous state');
-                        }
+                          const hasChanged = results.some((r, i) =>
+                            r?.capability !== prevResults[i]?.capability ||
+                            r?.completed !== prevResults[i]?.completed
+                          );
 
-                        return hasChanged ? results : prevResults;
-                      });
-                    }
+                          if (hasChanged) {
+                            logger.debug('App', '🔄 Progress changed, updating state');
+                          } else {
+                            logger.debug('App', '✅ No changes detected, keeping previous state');
+                          }
+
+                          return hasChanged ? results : prevResults;
+                        });
+                      }
+                    });
                   });
                 });
               });
             });
+          }).catch((error) => {
+            logger.error('App', '❌ Error fetching progress:', error);
           });
         });
       } catch (error) {
-        logger.error('App', '❌ Error fetching progress:', error);
+        logger.error('App', '❌ Error in useEffect:', error);
       }
     }, 100); // Debounce 100ms
 
@@ -277,7 +284,7 @@ function AchievementsProminentView({
             _dark={{ bg: 'gray.700' }}
           >
             <Box
-              h="full"gap="2"
+              h="full" gap="2"
               w={`${globalPercentage}%`}
               bg="purple.500"
               transition="width 0.3s"
@@ -301,7 +308,6 @@ function AchievementsProminentView({
         <Button
           size="lg"
           colorPalette="purple"
-          w="full"
           onClick={() => navigate('gamification', '/achievements')}
         >
           Ver Todos los Pasos ({totalRequirements - totalCompleted} pendientes)
@@ -323,8 +329,11 @@ function AchievementsCompactView({
   progress: CapabilityProgress[]
 }) {
   const { navigate } = useNavigationActions();
-  const totalPoints = useAchievementsStore(state => state.totalPoints);
-  const completedAchievements = useAchievementsStore(state => state.completedAchievements);
+  // TODO PHASE 3: Re-enable gamification
+  // const totalPoints = useGamificationStore(state => state.totalPoints);
+  // const completedAchievements = useGamificationStore(state => state.completedAchievements);
+  const totalPoints = 0;
+  const completedAchievements = new Set<string>();
 
   return (
     <Box
@@ -355,12 +364,12 @@ function AchievementsCompactView({
               </Heading>
             </HStack>
             <Text fontSize="xs" color="gray.500" _dark={{ color: 'gray.500' }}>
-              {completedAchievements.length} achievements
+              {completedAchievements.size} achievements
             </Text>
           </VStack>
 
           <Button
-            size="sm"gap="2"
+            size="sm"
             variant="ghost"
             colorPalette="gray"
             onClick={() => navigate('gamification', '/achievements')}
@@ -374,7 +383,7 @@ function AchievementsCompactView({
           <Text fontSize="xs" color="gray.600" _dark={{ color: 'gray.400' }} mb="2">
             Capabilities Activas
           </Text>
-          <HStack wrap="wrap" gap="2">
+          <HStack flexWrap="wrap" gap="2">
             {progress.map(cap => (
               <Badge
                 key={cap.capability}

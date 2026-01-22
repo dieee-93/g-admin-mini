@@ -20,16 +20,20 @@
  * ```
  */
 
+console.log('🔍 [LazyModuleInitializer.tsx] MODULE FILE LOADED! (top-level execution)');
+
 import { useEffect, useRef } from 'react';
-import { useCapabilityStore } from '@/store/capabilityStore';
+import { useFeatureFlags } from '@/lib/capabilities';
 import { useAppStore } from '@/store/appStore';
 import { initializeModulesForCapabilities } from './integration';
 import { ALL_MODULE_MANIFESTS } from '@/modules';
 import { logger } from '@/lib/logging';
 
+console.log('🔍 [LazyModuleInitializer.tsx] All imports completed successfully');
+
 export default function LazyModuleInitializer() {
   console.log('🚨 [LazyModuleInitializer] COMPONENT RENDERED!');
-  const activeFeatures = useCapabilityStore(state => state.features.activeFeatures);
+  const { activeFeatures } = useFeatureFlags();
   const setModulesInitialized = useAppStore(state => state.setModulesInitialized);
   const hasInitialized = useRef(false);
 
@@ -50,9 +54,14 @@ export default function LazyModuleInitializer() {
     const init = async () => {
       console.log('🚨 [LazyModuleInitializer] INSIDE init() function!');
       try {
-        console.log('🚨 [LazyModuleInitializer] About to call initializeModulesForCapabilities...');
-        // ✅ Async initialization - doesn't block render
-        const result = await initializeModulesForCapabilities(ALL_MODULE_MANIFESTS);
+        console.log('🚨 [LazyModuleInitializer] About to call initializeModulesForCapabilities...', {
+          activeFeaturesCount: activeFeatures.length
+        });
+
+        const result = await initializeModulesForCapabilities(
+          activeFeatures,
+          ALL_MODULE_MANIFESTS
+        );
 
         const duration = performance.now() - startTime;
         console.log('🚨 [LazyModuleInitializer] initializeModulesForCapabilities COMPLETED!', { duration, result });

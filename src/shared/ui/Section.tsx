@@ -152,7 +152,7 @@ export function Section({
   // ===== VISUAL STYLING (Layer 2 responsibility) =====
   const variantStyles = {
     default: {
-      bg: 'gray.100',
+      bg: 'bg.subtle',
       color: 'text.primary',
       border: '1px solid',
       borderColor: 'border.default',
@@ -162,7 +162,7 @@ export function Section({
       shadow: 'sm'
     },
     elevated: {
-      bg: 'gray.50',
+      bg: 'bg.surface',
       color: 'text.primary',
       border: '1px solid',
       borderColor: 'border.default',
@@ -210,7 +210,7 @@ export function Section({
               <Typography
                 variant="body"
                 size="md"
-                color="text.muted"
+                color="text.secondary"
                 lineHeight="1.4"
               >
                 {subtitle}

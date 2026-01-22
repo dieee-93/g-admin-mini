@@ -78,7 +78,7 @@ const sizeMap = {
   lg: 'lg',
   xl: 'xl',
   full: 'full',
-}
+} as const
 
 export function Modal({
   children,
@@ -132,6 +132,9 @@ export function ModalContent({
       <DialogBackdrop />
       <DialogPositioner>
         <DialogContent
+          bg="bg.surface"
+          color="text.primary"
+          shadow="2xl"
           className={className}
           {...rest}
         >
@@ -160,6 +163,8 @@ export function ModalHeader({
       display="flex"
       alignItems={alignMap[align]}
       p={paddingMap[padding]}
+      borderBottomWidth="1px"
+      borderColor="border.default"
       className={className}
       {...rest}
     >
@@ -215,6 +220,8 @@ export function ModalFooter({
       justifyContent={justifyMap[justify]}
       gap="sm"
       p={paddingMap[padding]}
+      borderTopWidth="1px"
+      borderColor="border.default"
       className={className}
       {...rest}
     >

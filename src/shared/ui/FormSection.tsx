@@ -28,6 +28,9 @@ export function FormSection({
   return (
     <Section
       variant="elevated"
+      bg="bg.surface"
+      borderColor="border.default"
+      color="text.primary"
       colorPalette={colorPalette}
       className={className}
       {...chakraProps}

@@ -84,9 +84,9 @@ export function Badge({
     <HStack gap="1" align="center">
       {dot && (
         <Box
-          width="6px"
-          height="6px"
+          boxSize="1.5"
           borderRadius="full"
+          bg="currentColor"
           animation={pulse ? 'pulse 2s infinite' : undefined}
         />
       )}

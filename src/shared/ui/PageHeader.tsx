@@ -1,4 +1,4 @@
-import { Box, Heading, Button } from '@chakra-ui/react'
+import { Box, Button } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
 import { Stack } from './Stack'
 import { Typography } from './Typography'
@@ -54,7 +54,7 @@ export function PageHeader({
       <Stack gap="1">
         <Stack direction="row" align="center" gap="2">
           {icon && <Icon icon={icon} size={'2xl'} color={`${color}.500`} />}
-          <Typography variant="heading" size="2xl" weight="bold">
+          <Typography variant="heading" size="2xl" weight="bold" color="text.primary">
             {title}
           </Typography>
         </Stack>

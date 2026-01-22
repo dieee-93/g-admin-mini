@@ -78,7 +78,7 @@ export { Kbd } from './Kbd';
 // Basic Components (Chakra Wrappers)
 export { Heading } from './Heading';
 export { Spinner } from './Spinner';
-export { Skeleton, SkeletonText } from './Skeleton';
+export { Skeleton, SkeletonText, SkeletonCard, SkeletonTable } from './Skeleton';
 export { Image } from './Image';
 export type { ImageProps } from './Image';
 
@@ -94,11 +94,52 @@ export { Separator } from './Separator';
 // If you need Field.Root for custom form controls, import it directly:
 // import { Field } from '@chakra-ui/react'
 //
+// ⚠️ TEMPORARY: Re-exporting Field namespace for backwards compatibility
+// TODO: Remove after migrating all uses to InputField/SelectField/TextareaField
+export { Field } from './Field';
+export type { FieldRootProps, FieldLabelProps, FieldHelperTextProps, FieldErrorTextProps } from './Field';
+//
 // ✅ ALWAYS USE THESE WRAPPERS FOR FORMS:
 export { Input, InputField } from './Input';
 export { NumberField } from './NumberField';
 export { SelectField, createListCollection } from './SelectField';
 export { TextareaField, Textarea } from './TextareaField';
+
+// ✅ SELECT COMPONENT (Chakra UI v3)
+// Export Select namespace and subcomponents
+export { 
+  Select,
+  SelectRoot,
+  SelectTrigger,
+  SelectContent,
+  SelectValueText,
+  SelectControl,
+  SelectIndicator,
+  SelectIndicatorGroup,
+  SelectItem,
+  SelectItemText,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectPositioner,
+  SelectHiddenSelect,
+  SelectClearTrigger,
+  SelectItemGroup,
+  SelectItemGroupLabel
+} from './Select';
+
+export type {
+  SelectRootProps,
+  SelectTriggerProps,
+  SelectContentProps,
+  SelectValueTextProps,
+  SelectControlProps,
+  SelectIndicatorProps,
+  SelectItemProps,
+  SelectLabelProps
+} from './Select';
+
+// ✅ SPECIALIZED FIELDS (Argentine data types)
+export { DNIField, PhoneField, MobileField, AREA_CODES, MOBILE_AREA_CODES } from './fields';
 // Re-export NumberInput from wrapper (prevents TDZ errors in vendor-ui bundle)
 export { NumberInput, NumberInputRoot, NumberInputControl, NumberInputIncrementTrigger, NumberInputDecrementTrigger } from './NumberInput';
 export {
@@ -158,10 +199,13 @@ export { Button } from './Button';
 export { IconButton } from './IconButton';
 export { ActionButton } from './ActionButton';
 export { MetricCard } from './MetricCard';
+export { Pagination } from './Pagination';
+export type { PaginationProps } from './Pagination';
 
 // ✅ BUSINESS COMPONENTS - Scheduling & Staff Management
 export {
   WeeklyCalendar,
+  SchedulingCalendar,
   TimeSlotPicker,
   EmployeeAvailabilityCard
 } from './components/business';
@@ -170,6 +214,9 @@ export type {
   CalendarShift,
   DayData,
   WeeklyCalendarProps,
+  SchedulableEvent,
+  SchedulingCalendarConfig,
+  SchedulingCalendarProps,
   TimeSlot,
   TimeSlotPickerProps,
   EmployeeAvailability,
@@ -248,6 +295,46 @@ export {
   MenuArrow,
   MenuArrowTip
 } from './Menu';
+
+export {
+  Popover,
+  PopoverRoot,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
+  PopoverHeader,
+  PopoverFooter,
+  PopoverTitle,
+  PopoverDescription,
+  PopoverCloseTrigger,
+  PopoverArrow,
+  PopoverArrowTip,
+  PopoverAnchor,
+  PopoverPositioner
+} from './Popover';
+
+export {
+  Tooltip,
+  TooltipRoot,
+  TooltipTrigger,
+  TooltipPositioner,
+  TooltipContent,
+  TooltipArrow,
+  TooltipArrowTip,
+  useTooltipContext
+} from './Tooltip';
+
+export type {
+  TooltipProps,
+  TooltipRootProps,
+  TooltipTriggerProps,
+  TooltipContentProps,
+  TooltipPositionerProps,
+  TooltipArrowProps,
+  TooltipArrowTipProps,
+  TooltipPlacement,
+  TooltipPositioning
+} from './Tooltip';
 
 export {
   Drawer,

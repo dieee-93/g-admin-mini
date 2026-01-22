@@ -20,10 +20,11 @@
 
 import { useState } from 'react';
 import { HStack, Text, Switch, Badge, Box } from '@/shared/ui';
-import { useValidationContext } from '@/hooks/useValidationContext';
-import { useCapabilities } from '@/lib/capabilities';
+import { useValidationContext } from '@/hooks';
+import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
+import { hasFeature } from '@/lib/capabilities';
 import { ModuleRegistry } from '@/lib/modules';
-import { useAchievementsStore } from '@/store/achievementsStore';
+import { useAchievementsStore } from '@/modules/achievements/store/achievementsStore';
 import { SetupRequiredModal } from '@/modules/achievements/components';
 import { logger } from '@/lib/logging';
 import { toaster } from '@/shared/ui/toaster';
@@ -33,7 +34,7 @@ import type { ValidationResult } from '@/modules/achievements/types';
  * TakeAway Toggle Component
  */
 export default function TakeAwayToggle() {
-  const { hasFeature } = useCapabilities();
+  const { activeFeatures } = useFeatureFlags();
   const context = useValidationContext();
   const registry = ModuleRegistry.getInstance();
 
@@ -47,7 +48,7 @@ export default function TakeAwayToggle() {
   const closeSetupModal = useAchievementsStore(state => state.closeSetupModal);
 
   // Solo mostrar si la feature está activa
-  if (!hasFeature('sales_pickup_orders')) {
+  if (!hasFeature(activeFeatures, 'sales_pickup_orders')) {
     return null;
   }
 
@@ -103,7 +104,12 @@ export default function TakeAwayToggle() {
     } else {
       // ❌ VALIDACIÓN FALLIDA - Mostrar modal con requirements faltantes
       setValidationResult(result);
-      openSetupModal({ validationResult: result });
+      openSetupModal({
+        title: 'Configuración TakeAway Requerida',
+        missing: result.missingRequirements || [],
+        progress: result.progressPercentage || 0,
+        capability: 'pickup_orders'
+      });
 
       logger.warn('Sales', '❌ No se puede activar TakeAway - Faltan configuraciones', {
         missing: result.missingRequirements?.length || 0,

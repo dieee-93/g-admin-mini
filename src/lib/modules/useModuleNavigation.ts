@@ -16,9 +16,8 @@
 
 import React, { useMemo } from 'react';
 import { ModuleRegistry } from './ModuleRegistry';
-import { useFeatureFlags } from '@/lib/capabilities';
+import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { MODULE_FEATURE_MAP } from '@/config/FeatureRegistry';
 import { logger } from '@/lib/logging';
 import { useAppStore } from '@/store/appStore';
 import type { ModuleName } from '@/contexts/AuthContext';
@@ -77,11 +76,7 @@ export interface NavigationByDomain {
 export function useModuleNavigation() {
   console.log('🚨 [useModuleNavigation] HOOK CALLED!');
   const { canAccessModule, isAuthenticated } = useAuth();
-
-  // ✅ MIGRATED: Get active modules from feature flags
   const { activeModules } = useFeatureFlags();
-
-  // ✅ React to modulesInitialized flag to re-compute when modules are ready
   const modulesInitialized = useAppStore(state => state.modulesInitialized);
 
   const modules = useMemo(() => {

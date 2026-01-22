@@ -6,6 +6,8 @@
 
 import { Tabs as ChakraTabs } from '@chakra-ui/react';
 import type { TabsRootProps } from '@chakra-ui/react';
+import { forwardRef } from 'react';
+import type { ComponentProps } from 'react';
 
 // ============================================
 // ROOT
@@ -25,7 +27,14 @@ export const TabsRoot = ChakraTabs.Root;
  * Tabs List Component
  * Container for tab triggers
  */
-export const TabsList = ChakraTabs.List;
+export const TabsList = forwardRef<HTMLDivElement, ComponentProps<typeof ChakraTabs.List>>((props, ref) => (
+  <ChakraTabs.List 
+    ref={ref} 
+    borderColor="border.default" 
+    {...props} 
+  />
+));
+TabsList.displayName = "TabsList";
 
 // ============================================
 // TRIGGER
@@ -35,7 +44,19 @@ export const TabsList = ChakraTabs.List;
  * Tabs Trigger Component
  * Individual tab button
  */
-export const TabsTrigger = ChakraTabs.Trigger;
+export const TabsTrigger = forwardRef<HTMLButtonElement, ComponentProps<typeof ChakraTabs.Trigger>>((props, ref) => (
+  <ChakraTabs.Trigger
+    ref={ref}
+    color="text.secondary"
+    _hover={{ bg: 'bg.subtle' }}
+    _selected={{ 
+      color: 'interactive.primary',
+      ...props._selected
+    }}
+    {...props}
+  />
+));
+TabsTrigger.displayName = "TabsTrigger";
 
 // ============================================
 // CONTENT
@@ -55,7 +76,14 @@ export const TabsContent = ChakraTabs.Content;
  * Tabs Indicator Component
  * Visual indicator for active tab
  */
-export const TabsIndicator = ChakraTabs.Indicator;
+export const TabsIndicator = forwardRef<HTMLDivElement, ComponentProps<typeof ChakraTabs.Indicator>>((props, ref) => (
+  <ChakraTabs.Indicator 
+    ref={ref} 
+    bg="interactive.primary" 
+    {...props} 
+  />
+));
+TabsIndicator.displayName = "TabsIndicator";
 
 // ============================================
 // CONTENT GROUP

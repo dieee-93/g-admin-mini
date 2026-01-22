@@ -7,6 +7,25 @@
 import { Alert as ChakraAlert } from '@chakra-ui/react';
 import type { AlertRootProps } from '@chakra-ui/react';
 import * as React from 'react';
+import { tokens } from '../../theme/tokens';
+
+type AlertStatus = 'info' | 'warning' | 'success' | 'error' | 'loading';
+
+// ============================================
+// HELPERS
+// ============================================
+
+const getStatusPalette = (status: AlertStatus = 'info') => {
+  const map: Record<string, keyof typeof tokens.colors> = {
+    info: 'primary',
+    success: 'success',
+    warning: 'warning',
+    error: 'error',
+    loading: 'primary',
+  };
+  const key = (status && map[status]) || 'primary';
+  return tokens.colors[key as keyof typeof tokens.colors];
+};
 
 // ============================================
 // ROOT
@@ -16,7 +35,25 @@ import * as React from 'react';
  * Alert Root Component
  * Main container for alert messages
  */
-export const AlertRoot = ChakraAlert.Root;
+export const AlertRoot = React.forwardRef<HTMLDivElement, AlertRootProps>(
+  (props, ref) => {
+    const { status = 'info', ...rest } = props;
+    // Cast status to string for helper, or ensure AlertRootProps status matches my type
+    const palette = getStatusPalette(status as AlertStatus);
+
+    return (
+      <ChakraAlert.Root
+        ref={ref}
+        status={status}
+        bg={palette[50]}
+        borderColor={palette[500]}
+        borderWidth="1px"
+        color={palette[900]}
+        {...rest}
+      />
+    );
+  }
+);
 
 // ============================================
 // INDICATOR
@@ -91,11 +128,15 @@ const AlertComponent = React.forwardRef<HTMLDivElement, AlertProps>(
     // Support both 'description' and 'children' for alert content
     const finalEndElement = action || endElement;
     const finalDescription = description || children;
+    
+    // Get status palette for manual icon coloring
+    const status = (rest.status as AlertStatus) || 'info';
+    const palette = getStatusPalette(status);
 
     return (
-      <ChakraAlert.Root ref={ref} {...rest}>
+      <AlertRoot ref={ref} {...rest}>
         {/* AlertIndicator does not accept children in Chakra v3, use default indicator */}
-        {startElement || <ChakraAlert.Indicator />}
+        {startElement || <ChakraAlert.Indicator color={palette[500]} />}
         {finalDescription ? (
           <ChakraAlert.Content>
             <ChakraAlert.Title>{title}</ChakraAlert.Title>
@@ -105,7 +146,7 @@ const AlertComponent = React.forwardRef<HTMLDivElement, AlertProps>(
           <ChakraAlert.Title flex="1">{title}</ChakraAlert.Title>
         )}
         {finalEndElement}
-      </ChakraAlert.Root>
+      </AlertRoot>
     );
   }
 );

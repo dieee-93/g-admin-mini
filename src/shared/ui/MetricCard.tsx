@@ -67,14 +67,16 @@ export function MetricCard({
   };
 
   const getTrendColor = () => {
-    if (trend === 'up') return 'green.500';
-    if (trend === 'down') return 'red.500';
+    if (trend === 'up') return 'green.600';
+    if (trend === 'down') return 'red.600';
     return 'gray.500';
   };
 
   return (
     <CardWrapper
       variant="elevated"
+      bg="bg.surface"
+      borderColor="border.default"
       colorPalette={colorPalette}
       onClick={onClick}
       cursor={onClick ? "pointer" : "default"}

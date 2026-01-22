@@ -1,4 +1,5 @@
 import { Textarea, Field } from '@chakra-ui/react'
+import { memo } from 'react'
 import type { ChangeEvent, ReactNode } from 'react'
 import type { TextareaProps as ChakraTextareaProps } from '@chakra-ui/react'
 import { Typography } from './Typography' // Usar nuestro Typography wrapper
@@ -20,7 +21,7 @@ interface TextareaFieldProps extends Omit<ChakraTextareaProps, 'size' | 'variant
   colorPalette?: 'theme' | 'default' // Added theme support
 }
 
-export function TextareaField({
+export const TextareaField = memo(function TextareaField({
   label,
   placeholder,
   value,
@@ -42,9 +43,9 @@ export function TextareaField({
   return (
     <Field.Root invalid={!!error}>
       {label && (
-        <Field.Label fontSize="sm" fontWeight="medium">
+        <Field.Label fontSize="sm" fontWeight="medium" color="text.primary">
           {label}
-          {required && <Typography as="span" style={{ marginLeft: '4px', color: 'var(--chakra-colors-error-500)' }}>*</Typography>}
+          {required && <Typography as="span" ml="1" color="status.error">*</Typography>}
         </Field.Label>
       )}
       <Textarea
@@ -57,21 +58,25 @@ export function TextareaField({
         disabled={disabled}
         rows={rows}
         resize={resize}
+        bg="bg.surface"
+        color="text.primary"
+        borderColor="border.default"
+        _placeholder={{ color: 'text.muted' }}
         {...textareaProps} // Spread props adicionales
       />
       {helperText && !error && (
-        <Field.HelperText fontSize="sm">
+        <Field.HelperText fontSize="sm" color="text.muted">
           {helperText}
         </Field.HelperText>
       )}
       {error && (
-        <Field.ErrorText fontSize="sm">
+        <Field.ErrorText fontSize="sm" color="status.error">
           {error}
         </Field.ErrorText>
       )}
     </Field.Root>
   )
-}
+})
 
 // Re-export Textarea directly for cases where field wrapper is not needed
 export { Textarea } from '@chakra-ui/react'

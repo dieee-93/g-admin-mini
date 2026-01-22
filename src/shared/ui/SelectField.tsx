@@ -7,7 +7,8 @@
  * Para select HTML nativo simple, usar NativeSelect directamente
  */
 
-import { Select, createListCollection, Portal } from '@chakra-ui/react'
+import { Select, createListCollection, Portal, Text } from '@chakra-ui/react'
+import { forwardRef, useMemo, memo } from 'react';
 import type { SelectRootProps } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
 
@@ -50,7 +51,7 @@ interface SelectFieldProps extends Omit<SelectRootProps, 'collection'> {
   noPortal?: boolean
 }
 
-export function SelectField({
+export const SelectField = memo(function SelectField({
   label,
   placeholder = "Selecciona una opción",
   options,
@@ -78,13 +79,21 @@ export function SelectField({
   ...restProps
 }: SelectFieldProps) {
   // Si se pasan opciones simples, crear colección
-  const collection = collectionProp || (options ? createListCollection({
-    items: options.map(opt => ({
-      value: opt.value.toString(),
-      label: opt.label,
-      disabled: opt.disabled
-    }))
-  }) : undefined)
+  const collection = useMemo(() => {
+    if (collectionProp) return collectionProp
+
+    if (options) {
+      return createListCollection({
+        items: options.map(opt => ({
+          value: opt.value.toString(),
+          label: opt.label,
+          disabled: opt.disabled
+        }))
+      })
+    }
+
+    return undefined
+  }, [collectionProp, options])
 
   if (!collection) {
     console.warn('SelectField: Debes proporcionar "options" o "collection"')
@@ -93,13 +102,15 @@ export function SelectField({
 
   const selectContent = (
     <Select.Positioner>
-      <Select.Content>
+      <Select.Content bg="bg.surface">
         {collection.items.map((item: unknown) => {
           const typedItem = item as CollectionOption
           return (
             <Select.Item
               item={typedItem}
               key={typedItem.value}
+              _hover={{ bg: "bg.muted" }}
+              cursor="pointer"
             >
               {renderItem ? renderItem(typedItem) : typedItem.label}
               <Select.ItemIndicator />
@@ -132,13 +143,13 @@ export function SelectField({
       >
         <Select.HiddenSelect />
         {label && (
-          <Select.Label>
+          <Select.Label color="text.secondary">
             {label}
-            {required && <span style={{ color: 'red', marginLeft: '0.25rem' }}>*</span>}
+            {required && <Text as="span" color="status.error" ml="1">*</Text>}
           </Select.Label>
         )}
         <Select.Control>
-          <Select.Trigger>
+          <Select.Trigger bg="bg.surface" color="text.primary" borderColor="border.default">
             <Select.ValueText placeholder={placeholder} />
           </Select.Trigger>
           <Select.IndicatorGroup>
@@ -149,18 +160,18 @@ export function SelectField({
       </Select.Root>
 
       {error && (
-        <div style={{ color: 'var(--colors-red-500)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+        <Text color="status.error" fontSize="sm" mt="1">
           {error}
-        </div>
+        </Text>
       )}
       {helperText && !error && (
-        <div style={{ color: 'var(--colors-gray-500)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+        <Text color="text.muted" fontSize="sm" mt="1">
           {helperText}
-        </div>
+        </Text>
       )}
     </div>
   )
-}
+})
 
 // Re-export para compatibilidad
 export { createListCollection }

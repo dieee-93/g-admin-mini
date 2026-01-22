@@ -5,7 +5,7 @@
 
 import type { ReactNode } from 'react'
 import { HStack, VStack } from '@chakra-ui/react'
-import { Typography, Button, Badge, Icon, Layout } from './index'
+import { Typography, Badge } from './index'
 
 // 📊 METRIC CARD - CardWrapper de métrica instantáneo con iconos (Dashboard-style)
 // 🏷️ QUICK STATUS - Badge de estado instantáneo  
@@ -16,11 +16,11 @@ export function QuickStatus({
   status: 'active' | 'inactive' | 'pending' | 'error'
   children: ReactNode 
 }) {
-  const colorMap = {
-    active: 'success',
+  const colorMap: Record<string, "green" | "gray" | "orange" | "red"> = {
+    active: 'green',
     inactive: 'gray',
-    pending: 'warning',
-    error: 'error'
+    pending: 'orange',
+    error: 'red'
   }
   
   return (
@@ -43,7 +43,7 @@ export function PageTitle({
   return (
     <HStack gap="3" align="center">
       <VStack gap="1" align="start" flex={1}>
-        <Typography variant="heading" level={1}>
+        <Typography variant="heading" level={1} color="text.primary">
           {title}
         </Typography>
         {subtitle && (
@@ -95,10 +95,13 @@ export function ListItem({
       align="center" 
       p="3"
       borderRadius="md"
+      bg="bg.surface"
+      borderWidth="1px"
+      borderColor="border.default"
       _hover={{ bg: "bg.subtle" }}
     >
       <VStack gap="1" align="start" flex={1}>
-        <Typography variant="body" weight="medium">
+        <Typography variant="body" weight="medium" color="text.primary">
           {title}
         </Typography>
         {subtitle && (
@@ -127,7 +130,17 @@ export function EmptyState({
   action?: ReactNode
 }) {
   return (
-    <VStack gap="4" align="center" py="12">
+    <VStack 
+      gap="4" 
+      align="center" 
+      py="12" 
+      px="8"
+      bg="bg.subtle"
+      borderWidth="1px"
+      borderColor="border.default"
+      borderStyle="dashed"
+      borderRadius="lg"
+    >
       <VStack gap="2" align="center">
         <Typography variant="heading" level={3} color="text.muted">
           {title}
