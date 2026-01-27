@@ -39,6 +39,7 @@ export type LogModule =
   | 'CapabilitySystem'
   | 'CapabilitySync'
   | 'FeatureEngine'
+  | 'FeatureFlagContext' // Feature flag context provider
   // Stores
   | 'MaterialsStore'
   | 'SalesStore'
@@ -51,13 +52,22 @@ export type LogModule =
   // Modules/Services
   | 'Materials'
   | 'Products'
+  | 'Production'
   | 'Sales'
+  | 'CashModule'
+  | 'SuppliersService'
   | 'SmartAlertsEngine'
+  | 'BusinessProfileHooks' // Business profile TanStack Query hooks
+  | 'FeatureActivationService' // Feature activation service layer
   // UI Components
   | 'Layout'
   | 'Modal'
   | 'Form'
   | 'Provider'
+  // APIs
+  | 'ServiceContextApi'
+  | 'FulfillmentPoliciesApi'
+  | 'StaffRolesApi'
   // Pages
   | 'Settings'
   | 'Hours'

@@ -13,4 +13,5 @@ export { DigitalDeliverySection } from './DigitalDeliverySection';
 export { RecurringConfigSection } from './RecurringConfigSection';
 export { AssetConfigSection } from './AssetConfigSection';
 export { RentalTermsSection } from './RentalTermsSection';
-export { ProductionConfigSection } from './ProductionConfigSection';
+export { ProductOperationsSection } from './ProductOperationsSection';
+export { RecipeConfigSection } from './RecipeConfigSection';

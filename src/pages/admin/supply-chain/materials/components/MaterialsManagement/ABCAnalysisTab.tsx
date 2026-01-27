@@ -1,7 +1,7 @@
 import { Stack, Typography, Badge, CardGrid, MetricCard, CardWrapper } from '@/shared/ui';
 import { ChartBarIcon, CurrencyDollarIcon, CubeIcon } from '@heroicons/react/24/outline';
 import { useMaterialsComputed } from '../../hooks/useMaterialsComputed';
-import { formatCurrency, formatPercentage } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency, formatPercentage } from '@/lib/decimal';
 
 export function ABCAnalysisTab() {
   const { getFilteredItems } = useMaterialsComputed();

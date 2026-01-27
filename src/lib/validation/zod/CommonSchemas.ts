@@ -37,82 +37,82 @@ export const BaseSchemas = {
   // String fields
   requiredString: z.string().min(1, ValidationMessages.required),
   optionalString: z.string().optional(),
-  
+
   // Name fields
   personName: z.string()
     .min(2, ValidationMessages.minLength(2))
     .max(100, ValidationMessages.maxLength(100))
     .regex(/^[a-zA-Z\s\-\'áéíóúÁÉÍÓÚñÑüÜ]+$/, ValidationMessages.name),
-  
+
   optionalPersonName: z.string()
     .min(2, ValidationMessages.minLength(2))
     .max(100, ValidationMessages.maxLength(100))
     .regex(/^[a-zA-Z\s\-\'áéíóúÁÉÍÓÚñÑüÜ]+$/, ValidationMessages.name)
     .optional()
     .or(z.literal('')),
-  
+
   // Contact fields
   email: z.string()
     .min(1, ValidationMessages.required)
     .email(ValidationMessages.email),
-  
+
   optionalEmail: z.string()
     .email(ValidationMessages.email)
     .optional()
     .or(z.literal('')),
-  
+
   phoneAR: z.string()
     .min(1, ValidationMessages.required)
     .regex(/^(\+54\s?)?(\(?\d{2,4}\)?[\s.-]?)?\d{6,8}$/, ValidationMessages.phone),
-  
+
   optionalPhoneAR: z.string()
     .regex(/^(\+54\s?)?(\(?\d{2,4}\)?[\s.-]?)?\d{6,8}$/, ValidationMessages.phone)
     .optional()
     .or(z.literal('')),
-  
+
   // Numeric fields
   positiveNumber: z.number()
     .positive(ValidationMessages.positive),
-  
+
   positiveInt: z.number()
     .int('Debe ser un número entero')
     .positive(ValidationMessages.positive),
-  
+
   currency: z.number()
     .nonnegative('No puede ser negativo')
     .max(999999.99, ValidationMessages.maxValue(999999.99)),
-  
+
   percentage: z.number()
     .min(0, ValidationMessages.minValue(0))
     .max(100, ValidationMessages.maxValue(100)),
-  
+
   // Business fields
   productName: z.string()
     .min(2, ValidationMessages.minLength(2))
     .max(200, ValidationMessages.maxLength(200))
     .regex(/^[a-zA-Z0-9\s\-\.]+$/, ValidationMessages.alphanumeric),
-  
+
   materialName: z.string()
     .min(2, ValidationMessages.minLength(2))
     .max(150, ValidationMessages.maxLength(150)),
-  
+
   description: z.string()
     .max(1000, ValidationMessages.maxLength(1000))
     .optional()
     .or(z.literal('')),
-  
+
   shortDescription: z.string()
     .max(255, ValidationMessages.maxLength(255))
     .optional()
     .or(z.literal('')),
-  
+
   // ID fields
   uuid: z.string().uuid('ID inválido'),
-  
+
   // Dates
   dateString: z.string().min(1, ValidationMessages.required),
   optionalDateString: z.string().optional(),
-  
+
   // Boolean fields
   requiredBoolean: z.boolean(),
   optionalBoolean: z.boolean().optional(),
@@ -120,10 +120,10 @@ export const BaseSchemas = {
   // 🆕 Argentina-specific fields
   cuit: z.string()
     .min(1, ValidationMessages.required)
-    .regex(/^\d{2}-\d{8}-\d{1}$/, ValidationMessages.cuit),
+    .regex(/^\d{11}$/, ValidationMessages.cuit),
 
   optionalCuit: z.string()
-    .regex(/^\d{2}-\d{8}-\d{1}$/, ValidationMessages.cuit)
+    .regex(/^\d{11}$/, ValidationMessages.cuit)
     .optional()
     .or(z.literal('')),
 
@@ -168,7 +168,27 @@ export const EntitySchemas = {
   customer: z.object({
     name: BaseSchemas.personName,
     email: BaseSchemas.optionalEmail,
-    phone: BaseSchemas.optionalPhoneAR,
+    // Phone (landline): accepts 6-10 digits (cleans spaces/dashes before validating)
+    phone: z.string()
+      .refine(
+        (val) => val === '' || /^\d{6,10}$/.test(val.replace(/\D/g, '')),
+        'El teléfono debe tener entre 6 y 10 dígitos'
+      )
+      .optional()
+      .or(z.literal('')),
+    // Mobile (cell phone): accepts 6-10 digits
+    mobile: z.string()
+      .refine(
+        (val) => val === '' || /^\d{6,10}$/.test(val.replace(/\D/g, '')),
+        'El celular debe tener entre 6 y 10 dígitos'
+      )
+      .optional()
+      .or(z.literal('')),
+    // DNI: accepts 7-8 digits, optionally with dots (12.345.678)
+    dni: z.string()
+      .regex(/^(\d{7,8}|\d{1,2}\.\d{3}\.\d{3})$/, 'El DNI debe tener 7 u 8 dígitos')
+      .optional()
+      .or(z.literal('')),
     address: z.string()
       .max(200, ValidationMessages.maxLength(200))
       .optional()
@@ -183,7 +203,9 @@ export const EntitySchemas = {
     email: BaseSchemas.optionalEmail,
     phone: BaseSchemas.optionalPhoneAR,
     address: z.string().max(500, ValidationMessages.maxLength(500)).optional().or(z.literal('')),
-    tax_id: BaseSchemas.optionalCUIT,
+    tax_id: BaseSchemas.optionalCuit,  // ✅ Fixed: was 'optionalCUIT' (uppercase)
+    iibb_number: z.string().max(20, ValidationMessages.maxLength(20)).optional().or(z.literal('')),
+    iibb_condition: z.enum(['local', 'multilateral', 'simplified', 'exempt']).optional(),
     payment_terms: z.string().max(100, ValidationMessages.maxLength(100)).optional().or(z.literal('')),
     rating: z.number().min(1, 'La calificación debe ser entre 1 y 5').max(5, 'La calificación debe ser entre 1 y 5').optional().nullable(),
     notes: BaseSchemas.description,
@@ -211,25 +233,25 @@ export const EntitySchemas = {
     supplier: z.string().optional().or(z.literal('')),
     description: BaseSchemas.description
   })
-  .superRefine((data, ctx) => {
-    // Conditional validation based on type
-    if ((data.type === 'MEASURABLE' || data.type === 'ELABORATED') && !data.unit) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['unit'],
-        message: 'Debes especificar la unidad para este tipo de material'
-      });
-    }
-    
-    if (data.type === 'MEASURABLE' && !data.category) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['category'],
-        message: 'Debes seleccionar una categoría de medición'
-      });
-    }
-  }),
-  
+    .superRefine((data, ctx) => {
+      // Conditional validation based on type
+      if ((data.type === 'MEASURABLE' || data.type === 'ELABORATED') && !data.unit) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['unit'],
+          message: 'Debes especificar la unidad para este tipo de material'
+        });
+      }
+
+      if (data.type === 'MEASURABLE' && !data.category) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['category'],
+          message: 'Debes seleccionar una categoría de medición'
+        });
+      }
+    }),
+
   // Product schema
   product: z.object({
     name: BaseSchemas.productName,
@@ -238,7 +260,7 @@ export const EntitySchemas = {
     category: z.string().min(1, ValidationMessages.required),
     is_active: BaseSchemas.requiredBoolean
   }),
-  
+
   // Employee schema
   employee: z.object({
     name: BaseSchemas.personName,
@@ -249,7 +271,7 @@ export const EntitySchemas = {
     department: z.string().min(1, ValidationMessages.required),
     hire_date: BaseSchemas.dateString
   }),
-  
+
   // Recipe ingredient schema
   recipeIngredient: z.object({
     item_id: BaseSchemas.uuid,
@@ -257,7 +279,7 @@ export const EntitySchemas = {
     unit: z.string().min(1, ValidationMessages.required),
     notes: BaseSchemas.shortDescription
   }),
-  
+
   // Financial transaction schema
   transaction: z.object({
     amount: BaseSchemas.currency,
@@ -322,27 +344,27 @@ export const EntitySchemas = {
       special_instructions: z.string().optional()
     })).min(1, 'Debes agregar al menos un producto')
   })
-  .superRefine((data, ctx) => {
-    // Cart validation: calculate total
-    const total = data.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+    .superRefine((data, ctx) => {
+      // Cart validation: calculate total
+      const total = data.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
 
-    if (total <= 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['items'],
-        message: 'El total de la venta debe ser mayor a cero'
-      });
-    }
+      if (total <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['items'],
+          message: 'El total de la venta debe ser mayor a cero'
+        });
+      }
 
-    // Validate delivery requires address
-    if (data.fulfillment_type === 'delivery' && !data.customer_id) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['customer_id'],
-        message: 'Debes seleccionar un cliente para entregas a domicilio'
-      });
-    }
-  }),
+      // Validate delivery requires address
+      if (data.fulfillment_type === 'delivery' && !data.customer_id) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['customer_id'],
+          message: 'Debes seleccionar un cliente para entregas a domicilio'
+        });
+      }
+    }),
 
   // 🆕 Fiscal Document schema (PRIORITY: HIGH)
   fiscalDocument: z.object({
@@ -375,27 +397,27 @@ export const EntitySchemas = {
       subtotal: BaseSchemas.currency
     })).min(1, 'Debes agregar al menos un ítem')
   })
-  .superRefine((data, ctx) => {
-    // Validate totals match
-    const calculatedSubtotal = data.items.reduce((sum, item) => sum + item.subtotal, 0);
+    .superRefine((data, ctx) => {
+      // Validate totals match
+      const calculatedSubtotal = data.items.reduce((sum, item) => sum + item.subtotal, 0);
 
-    if (Math.abs(calculatedSubtotal - data.subtotal) > 0.01) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['subtotal'],
-        message: 'El subtotal no coincide con la suma de los ítems'
-      });
-    }
+      if (Math.abs(calculatedSubtotal - data.subtotal) > 0.01) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['subtotal'],
+          message: 'El subtotal no coincide con la suma de los ítems'
+        });
+      }
 
-    const calculatedTotal = data.subtotal + data.iva_amount;
-    if (Math.abs(calculatedTotal - data.total) > 0.01) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['total'],
-        message: 'El total no coincide con subtotal + IVA'
-      });
-    }
-  }),
+      const calculatedTotal = data.subtotal + data.iva_amount;
+      if (Math.abs(calculatedTotal - data.total) > 0.01) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['total'],
+          message: 'El total no coincide con subtotal + IVA'
+        });
+      }
+    }),
 
   // ========================================================================
   // 🔥 NEW SCHEMAS - PHASE 2 (MEDIUM PRIORITY)
@@ -416,19 +438,19 @@ export const EntitySchemas = {
       total: BaseSchemas.currency
     })).min(1, 'Debes agregar al menos un material')
   })
-  .superRefine((data, ctx) => {
-    // Validate expected delivery date is future
-    const orderDate = new Date(data.order_date);
-    const deliveryDate = new Date(data.expected_delivery_date);
+    .superRefine((data, ctx) => {
+      // Validate expected delivery date is future
+      const orderDate = new Date(data.order_date);
+      const deliveryDate = new Date(data.expected_delivery_date);
 
-    if (deliveryDate < orderDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['expected_delivery_date'],
-        message: 'La fecha de entrega debe ser posterior a la fecha del pedido'
-      });
-    }
-  }),
+      if (deliveryDate < orderDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['expected_delivery_date'],
+          message: 'La fecha de entrega debe ser posterior a la fecha del pedido'
+        });
+      }
+    }),
 
   // 🆕 Inventory Transfer schema
   inventoryTransfer: z.object({
@@ -442,16 +464,16 @@ export const EntitySchemas = {
     status: z.enum(['pending', 'in_transit', 'completed', 'cancelled']),
     transfer_date: BaseSchemas.dateString.optional()
   })
-  .superRefine((data, ctx) => {
-    // Validate different locations
-    if (data.from_location_id === data.to_location_id) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['to_location_id'],
-        message: 'La ubicación de destino debe ser diferente a la de origen'
-      });
-    }
-  }),
+    .superRefine((data, ctx) => {
+      // Validate different locations
+      if (data.from_location_id === data.to_location_id) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['to_location_id'],
+          message: 'La ubicación de destino debe ser diferente a la de origen'
+        });
+      }
+    }),
 
   // 🆕 Address schema (reusable for customers, suppliers, etc.)
   addressComplete: z.object({
@@ -480,22 +502,22 @@ export const EntitySchemas = {
     notes: BaseSchemas.shortDescription,
     status: z.enum(['scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled'])
   })
-  .superRefine((data, ctx) => {
-    // Validate end time is after start time
-    const [startHour, startMin] = data.start_time.split(':').map(Number);
-    const [endHour, endMin] = data.end_time.split(':').map(Number);
+    .superRefine((data, ctx) => {
+      // Validate end time is after start time
+      const [startHour, startMin] = data.start_time.split(':').map(Number);
+      const [endHour, endMin] = data.end_time.split(':').map(Number);
 
-    const startMinutes = startHour * 60 + startMin;
-    const endMinutes = endHour * 60 + endMin;
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
 
-    if (endMinutes <= startMinutes) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['end_time'],
-        message: 'La hora de finalización debe ser posterior a la de inicio'
-      });
-    }
-  }),
+      if (endMinutes <= startMinutes) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['end_time'],
+          message: 'La hora de finalización debe ser posterior a la de inicio'
+        });
+      }
+    }),
 
   // ========================================================================
   // 🔥 NEW SCHEMAS - PHASE 3 (LOW PRIORITY)
@@ -526,19 +548,19 @@ export const EntitySchemas = {
     status: z.enum(['reserved', 'active', 'completed', 'cancelled']),
     notes: BaseSchemas.description
   })
-  .superRefine((data, ctx) => {
-    // Validate end date is after start date
-    const startDate = new Date(data.start_date);
-    const endDate = new Date(data.end_date);
+    .superRefine((data, ctx) => {
+      // Validate end date is after start date
+      const startDate = new Date(data.start_date);
+      const endDate = new Date(data.end_date);
 
-    if (endDate <= startDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['end_date'],
-        message: 'La fecha de finalización debe ser posterior a la de inicio'
-      });
-    }
-  }),
+      if (endDate <= startDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['end_date'],
+          message: 'La fecha de finalización debe ser posterior a la de inicio'
+        });
+      }
+    }),
 
   // 🆕 Membership schema
   membership: z.object({
@@ -604,16 +626,16 @@ export const EntitySchemas = {
     schedule: z.enum(['manual', 'daily', 'weekly', 'monthly']),
     recipients: z.array(BaseSchemas.email).optional()
   })
-  .superRefine((data, ctx) => {
-    // Validate custom date range
-    if (data.date_range === 'custom' && (!data.custom_start_date || !data.custom_end_date)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['date_range'],
-        message: 'Debes especificar fechas de inicio y fin para rango personalizado'
-      });
-    }
-  })
+    .superRefine((data, ctx) => {
+      // Validate custom date range
+      if (data.date_range === 'custom' && (!data.custom_start_date || !data.custom_end_date)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['date_range'],
+          message: 'Debes especificar fechas de inicio y fin para rango personalizado'
+        });
+      }
+    })
 } as const;
 
 /**
@@ -625,20 +647,20 @@ export const FormSchemas = {
     email: BaseSchemas.email,
     password: z.string().min(1, ValidationMessages.required)
   }),
-  
+
   // Quick customer creation (fewer required fields)
   quickCustomer: z.object({
     name: BaseSchemas.personName,
     phone: BaseSchemas.phoneAR
   }),
-  
+
   // Material quick entry
   quickMaterial: z.object({
     name: BaseSchemas.materialName,
     unit: z.string().min(1, ValidationMessages.required),
     cost: BaseSchemas.currency
   }),
-  
+
   // Recipe basic info
   recipeBasic: z.object({
     name: BaseSchemas.productName,
@@ -646,7 +668,7 @@ export const FormSchemas = {
     prep_time: BaseSchemas.positiveInt.optional(),
     description: BaseSchemas.description
   }),
-  
+
   // Search/filter forms
   searchFilter: z.object({
     query: z.string().optional().or(z.literal('')),
@@ -691,7 +713,7 @@ export const DataTransformers = {
     });
     return result;
   },
-  
+
   numberify: <T extends Record<string, any>>(data: T, fields: (keyof T)[]): T => {
     const result = { ...data };
     fields.forEach(field => {
@@ -704,7 +726,7 @@ export const DataTransformers = {
     });
     return result;
   },
-  
+
   emptyStringToUndefined: <T extends Record<string, any>>(data: T): T => {
     const result = { ...data };
     Object.keys(result).forEach(key => {

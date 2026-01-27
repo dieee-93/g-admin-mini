@@ -74,9 +74,6 @@ export interface ModuleManifest {
   /** Module dependencies (other module IDs) */
   depends: string[];
 
-  /** Auto-install if all dependencies are active */
-  autoInstall?: boolean;
-
   /**
    * Permission module for RBAC
    *
@@ -90,11 +87,23 @@ export interface ModuleManifest {
    */
   permissionModule?: string; // Using string to avoid circular dependency with AuthContext
 
-  /** Required features from FeatureRegistry */
-  requiredFeatures: FeatureId[];
+  /**
+   * Single feature that activates this module (OPTIONAL modules only)
+   *
+   * ARCHITECTURE (validated with industry research 2026-01-19):
+   * - Inspired by Odoo's `depends` + VS Code activation events
+   * - CORE modules: NO activatedBy (always loaded)
+   * - OPTIONAL modules: activatedBy required
+   *
+   * @example
+   * activatedBy: 'staff_employee_management'  // Staff module (OPTIONAL)
+   * activatedBy: 'inventory_stock_tracking'   // Materials module (OPTIONAL)
+   * activatedBy: undefined                    // Dashboard module (CORE)
+   */
+  activatedBy?: FeatureId;
 
-  /** Optional features (enhance functionality if present) */
-  optionalFeatures?: FeatureId[];
+  /** Minimum role required to access this module */
+  minimumRole?: string;
 
   /** Hook points this module provides */
   hooks?: {
@@ -177,7 +186,7 @@ export interface ModuleInstance {
  */
 export interface IModuleRegistry {
   // Module lifecycle
-  register(manifest: ModuleManifest): void;
+  register(manifest: ModuleManifest): Promise<void>;
   unregister(moduleId: string): void;
   has(moduleId: string): boolean;
   getModule(moduleId: string): ModuleInstance | undefined;
@@ -188,7 +197,14 @@ export interface IModuleRegistry {
     hookName: string,
     handler: HookHandler<T, R>,
     moduleId?: string,
-    priority?: number
+    priority?: number,
+    options?: {
+      requiredPermission?: {
+        module: string;
+        action: string;
+      };
+      metadata?: Record<string, any>;
+    }
   ): void;
 
   doAction<T = any, R = ReactNode>(
@@ -284,29 +300,6 @@ export interface TopologicalSortResult {
 
   /** Detected circular dependencies */
   cycles: string[][];
-}
-
-// ============================================
-// LINK MODULE TYPES (Odoo pattern)
-// ============================================
-
-/**
- * Link module manifest
- * Auto-installs when all dependencies are active
- */
-export interface LinkModuleManifest extends ModuleManifest {
-  /** Always true for link modules */
-  autoInstall: true;
-
-  /** At least 2 dependencies required */
-  depends: [string, string, ...string[]];
-
-  /** Link module metadata */
-  metadata: {
-    category: 'integration';
-    /** Modules this links together */
-    links: string[];
-  };
 }
 
 // ============================================

@@ -13,7 +13,7 @@ import { renderWithProviders, mockSupabaseData, clearMockData } from '../utils/t
 import { mockStaffData, mockScheduleData, mockTimeEntryData } from '../mocks/staffMockData';
 
 // Components to test
-import StaffPage from '@/pages/admin/resources/staff/page';
+import StaffPage from '@/pages/admin/resources/team/page';
 import SchedulingPage from '@/pages/admin/resources/scheduling/page'; 
 // Services
 import { realTimeLaborCosts } from '../../../../services/staff/realTimeLaborCosts';

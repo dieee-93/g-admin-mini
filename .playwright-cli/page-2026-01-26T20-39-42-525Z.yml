@@ -1,0 +1,52 @@
+- generic [ref=e2]:
+  - generic [ref=e17]:
+    - generic [ref=e19]:
+      - img [ref=e22]
+      - paragraph [ref=e25]: G-Admin Mini
+    - generic [ref=e27]:
+      - link "Volver al inicio" [ref=e29] [cursor=pointer]:
+        - /url: /
+        - img [ref=e30]
+        - text: Volver al inicio
+      - generic [ref=e33]:
+        - generic [ref=e35]:
+          - img [ref=e37]
+          - generic [ref=e39]:
+            - paragraph [ref=e40]: ¡Bienvenido de vuelta!
+            - paragraph [ref=e41]: Inicia sesión para hacer tu pedido favorito
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - group [ref=e46]:
+              - generic [ref=e47]:
+                - text: Tu Email
+                - generic [ref=e48]: "*"
+              - textbox "Tu Email *" [ref=e49]:
+                - /placeholder: tu@email.com
+            - generic [ref=e50]:
+              - group [ref=e51]:
+                - generic [ref=e52]:
+                  - text: Tu Contraseña
+                  - generic [ref=e53]: "*"
+                - textbox "Tu Contraseña *" [ref=e54]:
+                  - /placeholder: ••••••••
+              - button "Mostrar contraseña" [ref=e56] [cursor=pointer]:
+                - img [ref=e57]
+          - button "Iniciar Sesión" [disabled] [ref=e60]:
+            - generic [ref=e61]:
+              - img [ref=e62]
+              - paragraph [ref=e64]: Iniciar Sesión
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - paragraph [ref=e68]: ¿Primera vez en La Gigante?
+            - button "Crear Cuenta Nueva" [ref=e69] [cursor=pointer]
+          - generic [ref=e70]:
+            - paragraph [ref=e71]: ¿Problemas para acceder?
+            - button "Ayuda" [ref=e72] [cursor=pointer]
+          - generic [ref=e73]:
+            - paragraph [ref=e74]: 🍕
+            - paragraph [ref=e75]: Protegido y seguro
+            - paragraph [ref=e76]: 🔒
+  - generic [ref=e77]:
+    - img [ref=e79]
+    - button "Open Tanstack query devtools" [ref=e127] [cursor=pointer]:
+      - img [ref=e128]

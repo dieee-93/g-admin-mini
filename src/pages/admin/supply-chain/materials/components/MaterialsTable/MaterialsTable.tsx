@@ -9,9 +9,9 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
-import { formatCurrency, formatQuantity } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency, formatQuantity } from '@/lib/decimal';
 import { HookPoint } from '@/lib/modules';
-import { usePagination } from '@/hooks/usePagination'; // ✅ Phase 3: Pagination
+import { usePagination } from '@/hooks';
 import type { MaterialItem } from '../../types';
 
 // ✅ PERFORMANCE: Memoize style objects to prevent CSS regeneration
@@ -311,7 +311,7 @@ MaterialsTable.displayName = 'MaterialsTable';
   }
 
   return (
-    <Stack gap="md">
+    <Stack gap="md" data-testid="materials-grid">
       <Box overflowX="auto" borderRadius="lg" borderWidth="1px" borderColor="gray.200">
         <Table.Root size="sm" variant="outline">
           <Table.Header>
@@ -322,6 +322,7 @@ MaterialsTable.displayName = 'MaterialsTable';
                 checked={allSelected}
                 indeterminate={someSelected ? true : undefined}
                 onChange={allSelected ? onDeselectAll : onSelectAll}
+                data-testid="select-all-checkbox"
               />
             </Table.ColumnHeader>
 
@@ -356,12 +357,14 @@ MaterialsTable.displayName = 'MaterialsTable';
                 onMouseLeave={() => setHoveredRow(null)}
                 _hover={hoverStyle}
                 cursor="pointer"
+                data-testid={`material-row-${material.id}`}
               >
                 {/* Checkbox */}
                 <Table.Cell>
                   <Checkbox
                     checked={isSelected}
                     onChange={() => onSelect(material.id)}
+                    data-testid="select-checkbox"
                   />
                 </Table.Cell>
 

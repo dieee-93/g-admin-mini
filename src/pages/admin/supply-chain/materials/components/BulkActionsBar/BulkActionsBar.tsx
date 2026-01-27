@@ -1,3 +1,5 @@
+// ✅ PERFORMANCE: React.memo (Phase 2 Round 2)
+import { memo } from 'react';
 import { Stack, Typography, Button, Icon, Badge } from '@/shared/ui';
 import {
   ArrowUpTrayIcon,
@@ -21,7 +23,7 @@ interface BulkActionsBarProps {
   disabled?: boolean;
 }
 
-export function BulkActionsBar({
+export const BulkActionsBar = memo<BulkActionsBarProps>(function BulkActionsBar({
   selectedCount,
   onExport,
   onBulkEdit,
@@ -51,10 +53,11 @@ export function BulkActionsBar({
       bottom="20px"
       zIndex="sticky"
       boxShadow="lg"
+      data-testid="bulk-actions-bar"
     >
       {/* Selection Info */}
       <Stack direction="row" align="center" gap="md">
-        <Badge size="lg" colorPalette="blue" variant="solid">
+        <Badge size="lg" colorPalette="blue" variant="solid" data-testid="selected-count">
           {selectedCount}
         </Badge>
         <Typography variant="body" size="sm" fontWeight="600" color="blue.700">
@@ -161,4 +164,6 @@ export function BulkActionsBar({
       </Stack>
     </Stack>
   );
-}
+});
+
+BulkActionsBar.displayName = 'BulkActionsBar';

@@ -15,6 +15,8 @@ import { CustomerAPI } from '../services/customerApi';
 import type { Customer, Sale, SaleItem, CustomerAnalyticsResult, CustomerRFMProfile } from '../types';
 
 import { logger } from '@/lib/logging';
+import { useCustomersStore } from '@/modules/customers/store';
+import { supabase } from '@/lib/supabase/client';
 export type CustomerPageSection = 'management' | 'analytics' | 'orders' | 'loyalty';
 
 export interface CustomersPageState {
@@ -108,6 +110,7 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
   const { setQuickActions, updateModuleBadge } = useNavigationActions();
   const { user } = useAuth();
   const { actions: alertActions } = useAlerts({ context: 'customers', autoFilter: true });
+  const openModal = useCustomersStore((state) => state.openModal);
 
   // State
   const [pageState, setPageState] = useState<CustomersPageState>({
@@ -133,9 +136,9 @@ export const useCustomersPage = (): UseCustomersPageReturn => {
   // Action handlers - defined before useEffect
   const handleNewCustomer = useCallback(() => {
     setActiveSection('management');
-    // TODO: Open customer creation modal
+    openModal('create', null);
     logger.info('App', 'Opening new customer modal');
-  }, [setActiveSection]);
+  }, [setActiveSection, openModal]);
 
   const handleRFMAnalysis = useCallback(() => {
     setActiveSection('analytics');

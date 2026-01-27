@@ -35,7 +35,8 @@ import React from 'react';
 import { ModuleRegistry } from './ModuleRegistry';
 import { Stack } from '@/shared/ui';
 import { useAuth } from '@/contexts/AuthContext';
-import { hasPermission } from '@/config/PermissionsRegistry';
+import { useAppStore } from '@/store/appStore';
+import { hasPermission, ROLE_PERMISSIONS } from '@/config/PermissionsRegistry';
 import type { HookPointProps } from './types';
 import type { UserRole, ModuleName, PermissionAction } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logging';
@@ -64,15 +65,41 @@ export const HookPoint = <T = any,>(props: HookPointProps<T>): React.ReactElemen
   // Get current user for permission checking
   const { user } = useAuth();
 
+  // ✅ FIX: Force re-render when modules are initialized
+  const modulesInitialized = useAppStore(state => state.modulesInitialized);
+
+  // ✅ FIX: Use state to force re-render after module registration
+  const [refreshKey, setRefreshKey] = React.useState(0);
+
   // Get registry instance
   const registry = React.useMemo(() => ModuleRegistry.getInstance(), []);
 
+  // ✅ FIX: Re-render when modules finish initializing
+  React.useEffect(() => {
+    if (modulesInitialized) {
+      // Force refresh after a small delay to ensure all setup() functions completed
+      const timer = setTimeout(() => {
+        setRefreshKey(prev => prev + 1);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [modulesInitialized]);
+
   // Execute hooks with permission filtering
+  // ✅ FIX: Add refreshKey to dependencies
   const results = React.useMemo(() => {
     const startTime = performance.now();
 
     // Get all hooks for this point
     const allHooks = registry['hooks'].get(name) || [];
+
+    if (debug) {
+      logger.debug('ModuleEventBus', `[HookPoint] Getting hooks for: ${name}`, {
+        totalHooks: allHooks.length,
+        modulesInitialized,
+        hooksByPriority: allHooks.map(h => ({ module: h.context.moduleId, priority: h.context.priority }))
+      });
+    }
 
     // Filter by permissions
     const permittedHooks = allHooks.filter(hook => {
@@ -90,6 +117,19 @@ export const HookPoint = <T = any,>(props: HookPointProps<T>): React.ReactElemen
         permission.module as ModuleName,
         permission.action as PermissionAction
       );
+
+      // DEBUG: Always log permission checks for suppliers.form-content
+      if (name === 'suppliers.form-content') {
+        console.log('🔒 HookPoint Permission Check:', {
+          hookName: name,
+          moduleId: hook.context.moduleId,
+          userRole: user.role,
+          requiredModule: permission.module,
+          requiredAction: permission.action,
+          allowed,
+          allPermissionsForModule: ROLE_PERMISSIONS[user.role as UserRole]?.[permission.module as ModuleName]
+        });
+      }
 
       if (!allowed && debug) {
         logger.debug('ModuleEventBus', `Hook filtered (no permission): ${name}`, {
@@ -118,7 +158,7 @@ export const HookPoint = <T = any,>(props: HookPointProps<T>): React.ReactElemen
     }
 
     return hookResults;
-  }, [registry, name, data, user, debug]);
+  }, [registry, name, data, user, debug, refreshKey]); // ✅ FIX: Added refreshKey
 
   // Handle empty results
   if (results.length === 0) {

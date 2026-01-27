@@ -21,7 +21,6 @@ export const rentalsManifest: ModuleManifest = {
   permissionModule: 'operations', // ✅ Uses 'operations' permission
 
   depends: ['customers', 'scheduling'], // Rentals book time slots
-  autoInstall: false, // ✅ FIXED: Controlled by asset_rental capability
   activatedBy: 'rental_item_management',
 
 

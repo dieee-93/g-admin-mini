@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { logger } from '@/lib/logging/Logger';
 import { EventBus } from '@/lib/events/EventBus';
 import type {
@@ -109,9 +109,43 @@ export async function openCashSession(
 }
 
 /**
- * Cierra una sesión de caja con arqueo ciego
+ * Cierra una sesión de caja con arqueo ciego (con idempotency opcional)
+ *
+ * @param sessionId ID de la sesión a cerrar
+ * @param input Datos de cierre (actual_cash, notes)
+ * @param userId Usuario que cierra
+ * @param operationId UUID opcional para idempotency (generado en cliente)
+ * @returns Sesión cerrada
  */
 export async function closeCashSession(
+  sessionId: string,
+  input: CloseCashSessionInput,
+  userId: string,
+  operationId?: string
+): Promise<CashSessionRow> {
+
+  // Si hay operationId, usar idempotency
+  if (operationId) {
+    const { IdempotencyService } = await import('@/lib/idempotency/IdempotencyService');
+
+    return IdempotencyService.execute({
+      operationId,
+      operationType: 'close_cash_session',
+      operation: () => closeCashSessionInternal(sessionId, input, userId),
+      userId,
+      params: { sessionId, actualCash: input.actual_cash },
+    });
+  }
+
+  // Sin operationId, ejecutar normalmente (backwards compatible)
+  return closeCashSessionInternal(sessionId, input, userId);
+}
+
+/**
+ * Implementación interna de closeCashSession (sin idempotency)
+ * Esta función contiene la lógica real de cierre
+ */
+async function closeCashSessionInternal(
   sessionId: string,
   input: CloseCashSessionInput,
   userId: string
@@ -173,13 +207,19 @@ export async function closeCashSession(
   const actualCash = DecimalUtils.fromValue(input.actual_cash, 'financial');
   const variance = DecimalUtils.subtract(actualCash, expected, 'financial');
 
-  const expectedNumber = DecimalUtils.toNumber(expected);
-  const varianceNumber = DecimalUtils.toNumber(variance);
-  const varianceAbs = Math.abs(varianceNumber);
+  // ✅ FIXED [2.5]: Keep Decimal until end, use DecimalUtils.abs() instead of Math.abs()
+  const varianceAbs = DecimalUtils.abs(variance);
 
   // Determinar status (diferencia > $50 = DISCREPANCY)
   const DISCREPANCY_THRESHOLD = 50;
-  const finalStatus = varianceAbs > DISCREPANCY_THRESHOLD ? 'DISCREPANCY' : 'CLOSED';
+  const thresholdDecimal = DecimalUtils.fromValue(DISCREPANCY_THRESHOLD, 'financial');
+  const finalStatus = DecimalUtils.greaterThan(varianceAbs, thresholdDecimal) 
+    ? 'DISCREPANCY' 
+    : 'CLOSED';
+
+  // Convert to number only for storage
+  const expectedNumber = DecimalUtils.toNumber(expected);
+  const varianceNumber = DecimalUtils.toNumber(variance);
 
   // Actualizar sesión
   const { data: closedSession, error: updateError } = await supabase
@@ -239,8 +279,10 @@ export async function closeCashSession(
           // Crear journal entry de ajuste
           // Si variance < 0: faltante (cash disminuye)
           // Si variance > 0: sobrante (cash aumenta)
-          const isFaltante = varianceNumber < 0;
-          const absVariance = Math.abs(varianceNumber);
+          
+          // ✅ FIXED [2.5]: Keep Decimal until end for comparison
+          const isFaltante = DecimalUtils.lessThan(variance, 0, 'financial');
+          const absVariance = DecimalUtils.toNumber(varianceAbs);
 
           await createJournalEntry(
             {
@@ -343,6 +385,42 @@ export async function recordCashSale(
   }
 
   logger.info('CashModule', 'Cash sale recorded', {
+    sessionId: session.id,
+    amount,
+  });
+}
+
+/**
+ * Registra devolución/refund en efectivo en sesión activa
+ */
+export async function recordCashRefund(
+  moneyLocationId: string,
+  amount: number
+): Promise<void> {
+  const session = await getActiveCashSession(moneyLocationId);
+
+  if (!session) {
+    logger.warn('CashModule', 'No active session for cash refund', { moneyLocationId });
+    throw new Error('No hay sesión de caja activa para registrar devolución');
+  }
+
+  const currentRefunds = DecimalUtils.fromValue(session.cash_refunds || 0, 'financial');
+  const refundAmount = DecimalUtils.fromValue(amount, 'financial');
+  const newRefunds = DecimalUtils.add(currentRefunds, refundAmount, 'financial');
+
+  const { error } = await supabase
+    .from('cash_sessions')
+    .update({
+      cash_refunds: DecimalUtils.toNumber(newRefunds),
+    })
+    .eq('id', session.id);
+
+  if (error) {
+    logger.error('CashModule', 'Failed to record cash refund', { error });
+    throw error;
+  }
+
+  logger.info('CashModule', 'Cash refund recorded', {
     sessionId: session.id,
     amount,
   });

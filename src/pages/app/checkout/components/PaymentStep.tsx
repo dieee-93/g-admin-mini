@@ -1,4 +1,5 @@
 import { Stack, Text, Button, RadioGroup, Alert } from '@/shared/ui';
+import { useActivePaymentMethods } from '@/modules/finance-integrations/hooks/usePayments';
 
 interface PaymentStepProps {
   selectedPaymentMethod: string | null;
@@ -8,28 +9,16 @@ interface PaymentStepProps {
   isProcessing?: boolean;
 }
 
-const PAYMENT_METHODS = [
-  {
-    id: 'cash',
-    name: 'Cash on Delivery',
-    description: 'Pay with cash when your order arrives',
-    icon: '💵',
-  },
-  {
-    id: 'card',
-    name: 'Credit/Debit Card',
-    description: 'Payment gateway integration coming soon',
-    icon: '💳',
-    disabled: true,
-  },
-  {
-    id: 'mercadopago',
-    name: 'Mercado Pago',
-    description: 'Payment gateway integration coming soon',
-    icon: '🔵',
-    disabled: true,
-  },
-];
+// Icon mapping for different payment method codes
+const PAYMENT_METHOD_ICONS: Record<string, string> = {
+  cash: '💵',
+  credit_card: '💳',
+  debit_card: '💳',
+  mercadopago: '🔵',
+  bank_transfer: '🏦',
+  qr_payment: '📱',
+  digital_wallet: '💼',
+};
 
 export function PaymentStep({
   selectedPaymentMethod,
@@ -38,6 +27,35 @@ export function PaymentStep({
   onBack,
   isProcessing,
 }: PaymentStepProps) {
+  const { data: paymentMethods, isLoading, error } = useActivePaymentMethods();
+
+  if (isLoading) {
+    return (
+      <Stack gap="6">
+        <Text>Loading payment methods...</Text>
+      </Stack>
+    );
+  }
+
+  if (error) {
+    return (
+      <Stack gap="6">
+        <Alert.Root status="error">
+          <Alert.Icon />
+          <Stack gap="1">
+            <Alert.Title>Error Loading Payment Methods</Alert.Title>
+            <Alert.Description>
+              {error instanceof Error ? error.message : 'Failed to load payment methods'}
+            </Alert.Description>
+          </Stack>
+        </Alert.Root>
+        <Button onClick={onBack}>Back</Button>
+      </Stack>
+    );
+  }
+
+  const availableMethods = paymentMethods || [];
+
   return (
     <Stack gap="6">
       <Stack gap="2">
@@ -49,52 +67,63 @@ export function PaymentStep({
         </Text>
       </Stack>
 
-      <Alert.Root status="info">
-        <Alert.Icon />
-        <Stack gap="1">
-          <Alert.Title>Week 4 - Limited Payment Options</Alert.Title>
-          <Alert.Description>
-            Full payment gateway integration (MercadoPago, Stripe) will be added in Week 5.
-            For now, only Cash on Delivery is available.
-          </Alert.Description>
-        </Stack>
-      </Alert.Root>
+      {availableMethods.length === 0 && (
+        <Alert.Root status="warning">
+          <Alert.Icon />
+          <Stack gap="1">
+            <Alert.Title>No Payment Methods Available</Alert.Title>
+            <Alert.Description>
+              Please contact support to configure payment methods.
+            </Alert.Description>
+          </Stack>
+        </Alert.Root>
+      )}
 
-      <RadioGroup.Root
-        value={selectedPaymentMethod || ''}
-        onValueChange={(e) => onPaymentMethodSelect(e.value)}
-      >
-        <Stack gap="3">
-          {PAYMENT_METHODS.map((method) => (
-            <RadioGroup.Item
-              key={method.id}
-              value={method.id}
-              p="4"
-              borderWidth="1px"
-              borderRadius="md"
-              cursor={method.disabled ? 'not-allowed' : 'pointer'}
-              opacity={method.disabled ? 0.5 : 1}
-              _hover={method.disabled ? {} : { borderColor: 'blue.500' }}
-              disabled={method.disabled}
-            >
-              <Stack direction="row" gap="3" align="flex-start">
-                <RadioGroup.ItemControl />
-                <Stack direction="row" gap="3" flex="1" align="center">
-                  <Text fontSize="2xl">{method.icon}</Text>
-                  <Stack gap="1" flex="1">
-                    <RadioGroup.ItemText fontWeight="medium">
-                      {method.name}
-                    </RadioGroup.ItemText>
-                    <Text fontSize="sm" color="gray.600">
-                      {method.description}
-                    </Text>
+      {availableMethods.length > 0 && (
+        <RadioGroup.Root
+          value={selectedPaymentMethod || ''}
+          onValueChange={(e) => onPaymentMethodSelect(e.value)}
+        >
+          <Stack gap="3">
+            {availableMethods.map((method) => {
+              const icon = PAYMENT_METHOD_ICONS[method.code] || '💰';
+              const isMercadoPago = method.gateway_id !== null && method.code.toLowerCase().includes('mercadopago');
+
+              return (
+                <RadioGroup.Item
+                  key={method.id}
+                  value={method.code}
+                  p="4"
+                  borderWidth="1px"
+                  borderRadius="md"
+                  cursor="pointer"
+                  _hover={{ borderColor: 'blue.500' }}
+                >
+                  <Stack direction="row" gap="3" align="flex-start">
+                    <RadioGroup.ItemControl />
+                    <Stack direction="row" gap="3" flex="1" align="center">
+                      <Text fontSize="2xl">{icon}</Text>
+                      <Stack gap="1" flex="1">
+                        <RadioGroup.ItemText fontWeight="medium">
+                          {method.display_name}
+                        </RadioGroup.ItemText>
+                        <Text fontSize="sm" color="gray.600">
+                          {method.description ||
+                            (isMercadoPago
+                              ? 'Pay securely with Mercado Pago'
+                              : `Pay with ${method.display_name.toLowerCase()}`
+                            )
+                          }
+                        </Text>
+                      </Stack>
+                    </Stack>
                   </Stack>
-                </Stack>
-              </Stack>
-            </RadioGroup.Item>
-          ))}
-        </Stack>
-      </RadioGroup.Root>
+                </RadioGroup.Item>
+              );
+            })}
+          </Stack>
+        </RadioGroup.Root>
+      )}
 
       <Stack direction="row" gap="4">
         <Button
@@ -109,10 +138,13 @@ export function PaymentStep({
           colorPalette="blue"
           onClick={onNext}
           flex="1"
-          disabled={!selectedPaymentMethod || isProcessing}
+          disabled={!selectedPaymentMethod || isProcessing || availableMethods.length === 0}
           loading={isProcessing}
         >
-          Place Order
+          {selectedPaymentMethod?.toLowerCase().includes('mercadopago')
+            ? 'Continue to Mercado Pago'
+            : 'Place Order'
+          }
         </Button>
       </Stack>
     </Stack>

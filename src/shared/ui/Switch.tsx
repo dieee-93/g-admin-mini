@@ -1,4 +1,5 @@
 import { Switch as ChakraSwitch } from '@chakra-ui/react'
+import { memo } from 'react'
 import type { ReactNode } from 'react'
 import { Stack } from './Stack'
 import { Text } from './Text'
@@ -46,7 +47,7 @@ const sizeMap = {
 }
 
 
-export function Switch({
+export const Switch = memo(function Switch({
   checked,
   defaultChecked,
   onChange,
@@ -85,18 +86,18 @@ export function Switch({
       {labelPlacement === 'start' && displayLabel && (
         <ChakraSwitch.Label>{displayLabel}</ChakraSwitch.Label>
       )}
-      
+
       <ChakraSwitch.HiddenInput />
       <ChakraSwitch.Control>
         <ChakraSwitch.Thumb />
       </ChakraSwitch.Control>
-      
+
       {labelPlacement === 'end' && displayLabel && (
         <ChakraSwitch.Label>{displayLabel}</ChakraSwitch.Label>
       )}
     </ChakraSwitch.Root>
   )
-}
+})
 
 export function SwitchGroup({
   children,

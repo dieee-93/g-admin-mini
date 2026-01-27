@@ -90,7 +90,7 @@ export function useRentalValidation(
     }
 
     return warnings;
-  }, [form.watch, calculateTotalCost]);
+  }, [calculateTotalCost]);
 
   const validationState = useMemo(() => ({
     hasErrors: Object.keys(fieldErrors).length > 0,

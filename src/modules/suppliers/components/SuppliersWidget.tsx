@@ -11,7 +11,7 @@
 import React from 'react';
 import { Card, Stack, Text, HStack, Badge, Icon, VStack, Skeleton } from '@/shared/ui';
 import { BuildingStorefrontIcon, StarIcon } from '@heroicons/react/24/outline';
-import { useSuppliers } from '@/pages/admin/supply-chain/suppliers/hooks/useSuppliers';
+import { useSuppliers } from '@/modules/suppliers/hooks';
 import { suppliersService } from '@/pages/admin/supply-chain/suppliers/services/suppliersService';
 
 interface SuppliersWidgetProps {
@@ -32,7 +32,8 @@ interface SuppliersWidgetProps {
  * Used in dashboard.widgets hook point
  */
 export function SuppliersWidget({ onClick }: SuppliersWidgetProps) {
-  const { suppliers, loading } = useSuppliers();
+  // ✅ TanStack Query hook - returns { data, isLoading, error }
+  const { data: suppliers = [], isLoading: loading } = useSuppliers();
 
   // Calculate metrics
   const metrics = React.useMemo(() => {

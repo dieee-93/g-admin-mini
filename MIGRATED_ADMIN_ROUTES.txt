@@ -1,0 +1,373 @@
+{/* ✅ ALL ADMIN CHILD ROUTES - Migrated to Nested Pattern */}
+{/* These routes render inside <AppShell> via <Outlet /> */}
+{/* NO ProtectedRouteNew wrapper (parent has it) */}
+{/* NO AdminLayout wrapper (AppShell replaces it) */}
+{/* YES RoleGuard, Suspense, LazyWithErrorBoundary preserved */}
+
+{/* 🏠 CORE - Dashboard */}
+<Route 
+  path="dashboard" 
+  element={
+    <DashboardRoleRouter>
+      <Suspense fallback={<LoadingFallback />}>
+        <LazyDashboardPage />
+      </Suspense>
+    </DashboardRoleRouter>
+  } 
+/>
+<Route 
+  path="dashboard/cross-analytics" 
+  element={
+    <Suspense fallback={<LoadingFallback />}>
+      <LazyDashboardPage />
+    </Suspense>
+  } 
+/>
+
+{/* 📊 CORE - Reporting & Intelligence */}
+<Route 
+  path="reporting" 
+  element={
+    <Suspense fallback={<LoadingFallback />}>
+      <LazyCustomReporting />
+    </Suspense>
+  } 
+/>
+<Route 
+  path="intelligence" 
+  element={
+    <Suspense fallback={<LoadingFallback />}>
+      <LazyCompetitiveIntelligence />
+    </Suspense>
+  } 
+/>
+
+{/* 🏢 OPERATIONS */}
+<Route 
+  path="operations/sales" 
+  element={
+    <RoleGuard requiredModule="sales">
+      <Suspense fallback={<div>Cargando Ventas...</div>}>
+        <LazySalesPage />
+      </Suspense>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="operations/fulfillment" 
+  element={
+    <RoleGuard requiredModule="operations">
+      <LazyWithErrorBoundary moduleName="Fulfillment">
+        <LazyFulfillmentPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="operations/kitchen" 
+  element={
+    <RoleGuard requiredModule="operations">
+      <LazyWithErrorBoundary moduleName="Kitchen Display">
+        <LazyProductionPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="operations/fulfillment/delivery" 
+  element={
+    <RoleGuard requiredModule="operations">
+      <LazyWithErrorBoundary moduleName="Delivery Management">
+        <LazyDeliveryPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="operations/delivery" 
+  element={<Navigate to="/admin/operations/fulfillment/delivery" replace />} 
+/>
+<Route 
+  path="operations/memberships/*" 
+  element={
+    <RoleGuard requiredModule="memberships">
+      <LazyWithErrorBoundary moduleName="Memberships">
+        <LazyMembershipsPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="operations/rentals/*" 
+  element={
+    <RoleGuard requiredModule="rentals">
+      <LazyWithErrorBoundary moduleName="Rentals">
+        <LazyRentalsPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+
+{/* 👥 CUSTOMERS */}
+<Route 
+  path="customers" 
+  element={
+    <RoleGuard requiredModule="sales">
+      <LazyWithErrorBoundary moduleName="Clientes">
+        <LazyCustomersPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+
+{/* 🏭 SUPPLY CHAIN */}
+<Route 
+  path="supply-chain/materials" 
+  element={
+    <RoleGuard requiredModule="materials">
+      <LazyWithErrorBoundary moduleName="StockLab">
+        <LazyStockLab />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="materials/abc-analysis" 
+  element={
+    <RoleGuard requiredModule="materials">
+      <Suspense fallback={<LoadingFallback />}>
+        <LazyABCAnalysisView />
+      </Suspense>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="supply-chain/suppliers" 
+  element={
+    <RoleGuard requiredModule="materials">
+      <LazyWithErrorBoundary moduleName="Proveedores">
+        <LazySuppliersPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="supply-chain/products" 
+  element={
+    <RoleGuard requiredModule="products">
+      <LazyProductsPage />
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="supply-chain/products/new" 
+  element={
+    <RoleGuard requiredModule="products">
+      <LazyProductFormPage />
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="supply-chain/products/:id/edit" 
+  element={
+    <RoleGuard requiredModule="products">
+      <LazyProductFormPage />
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="supply-chain/products/:id/view" 
+  element={
+    <RoleGuard requiredModule="products">
+      <LazyProductFormPage />
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="supply-chain/recipes" 
+  element={
+    <RoleGuard requiredModule="recipe">
+      <LazyRecipesPage />
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="supply-chain/assets" 
+  element={
+    <RoleGuard requiredModule="assets">
+      <LazyAssetsPage />
+    </RoleGuard>
+  } 
+/>
+
+{/* 💰 FINANCE */}
+<Route 
+  path="finance/fiscal" 
+  element={
+    <RoleGuard requiredModule="fiscal">
+      <LazyFiscalPage />
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="finance/cash" 
+  element={
+    <RoleGuard requiredModule="fiscal">
+      <LazyCashPage />
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="finance/billing/*" 
+  element={
+    <RoleGuard requiredModule="billing">
+      <LazyWithErrorBoundary moduleName="Billing">
+        <LazyBillingPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="finance/integrations/*" 
+  element={
+    <RoleGuard requiredModule="integrations">
+      <LazyWithErrorBoundary moduleName="Finance Integrations">
+        <LazyFinanceIntegrationsPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+
+{/* 👨‍💼 RESOURCES */}
+<Route 
+  path="resources/team" 
+  element={
+    <RoleGuard requiredModule="staff">
+      <LazyStaffPage />
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="resources/scheduling" 
+  element={
+    <RoleGuard requiredModule="scheduling">
+      <LazySchedulingPage />
+    </RoleGuard>
+  } 
+/>
+
+{/* 🎮 GAMIFICATION */}
+<Route 
+  path="gamification/*" 
+  element={
+    <RoleGuard requiredModule="gamification">
+      <LazyWithErrorBoundary moduleName="Gamificación">
+        <LazyGamificationPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+
+{/* 📈 EXECUTIVE BI */}
+<Route 
+  path="executive/*" 
+  element={
+    <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
+      <LazyWithErrorBoundary moduleName="Executive Dashboard">
+        <LazyExecutivePage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+
+{/* 🔧 TOOLS */}
+<Route 
+  path="tools/reporting/*" 
+  element={
+    <RoleGuard requiredModule="reporting">
+      <LazyWithErrorBoundary moduleName="Reporting Tools">
+        <LazyReportingToolsPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+
+{/* ⚙️ SETTINGS */}
+<Route 
+  path="settings" 
+  element={
+    <LazyWithErrorBoundary moduleName="Settings">
+      <LazySettingsPage />
+    </LazyWithErrorBoundary>
+  } 
+/>
+<Route 
+  path="settings/business" 
+  element={
+    <LazyWithErrorBoundary moduleName="Business Settings">
+      <LazyBusinessSettingsPage />
+    </LazyWithErrorBoundary>
+  } 
+/>
+<Route 
+  path="settings/diagnostics" 
+  element={
+    <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+      <LazyWithErrorBoundary moduleName="Diagnostics">
+        <LazyDiagnosticsPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="settings/enterprise" 
+  element={
+    <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
+      <LazyWithErrorBoundary moduleName="Enterprise Settings">
+        <LazyEnterpriseSettingsPage />
+      </LazyWithErrorBoundary>
+    </RoleGuard>
+  } 
+/>
+<Route 
+  path="settings/hours" 
+  element={
+    <LazyWithErrorBoundary moduleName="Business Hours">
+      <LazyBusinessHoursPage />
+    </LazyWithErrorBoundary>
+  } 
+/>
+<Route 
+  path="settings/integrations" 
+  element={
+    <LazyWithErrorBoundary moduleName="Integrations">
+      <LazyIntegrationsPage />
+    </LazyWithErrorBoundary>
+  } 
+/>
+<Route 
+  path="settings/payment-methods" 
+  element={
+    <LazyWithErrorBoundary moduleName="Payment Methods">
+      <LazyPaymentMethodsPage />
+    </LazyWithErrorBoundary>
+  } 
+/>
+<Route 
+  path="settings/reporting" 
+  element={
+    <LazyWithErrorBoundary moduleName="Reporting Settings">
+      <LazyReportingSettingsPage />
+    </LazyWithErrorBoundary>
+  } 
+/>
+
+{/* 🐛 DEBUG */}
+<Route 
+  path="debug/theme-test" 
+  element={
+    <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+      <LazyThemeTestPage />
+    </RoleGuard>
+  } 
+/>

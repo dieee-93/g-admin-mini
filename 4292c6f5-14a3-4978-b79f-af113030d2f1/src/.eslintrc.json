@@ -1,0 +1,61 @@
+
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": ["react", "@typescript-eslint"],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "JSXAttribute[name.name='padding'][value.type='Literal']",
+        "message": "❌ No uses valores hardcoded para padding. Usa tokens: p='6' (24px), p='4' (16px), etc."
+      },
+      {
+        "selector": "JSXAttribute[name.name='margin'][value.type='Literal']",
+        "message": "❌ No uses valores hardcoded para margin. Usa tokens: m='6', m='4', etc."
+      },
+      {
+        "selector": "JSXAttribute[name.name='gap'][value.type='Literal']",
+        "message": "❌ No uses valores hardcoded para gap. Usa tokens: gap='4' (16px), gap='2' (8px), etc."
+      },
+      {
+        "selector": "JSXAttribute[name.name='fontSize'][value.type='Literal']",
+        "message": "❌ No uses valores hardcoded para fontSize. Usa tokens: fontSize='md', fontSize='lg', etc."
+      },
+      {
+        "selector": "JSXAttribute[name.name='borderRadius'][value.type='Literal']",
+        "message": "❌ No uses valores hardcoded para borderRadius. Usa tokens: borderRadius='lg' (8px), borderRadius='md' (6px), etc."
+      }
+    ],
+    
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "@chakra-ui/react",
+            "message": "❌ NO importes directamente de Chakra UI. Usa: import { Box, Button } from '@/shared/ui'"
+          }
+        ]
+      }
+    ]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

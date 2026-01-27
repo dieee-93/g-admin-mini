@@ -4,32 +4,14 @@
  */
 
 import { Box, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
-import { fetchChartOfAccounts, buildAccountTree } from '../services';
-import { logger } from '@/lib/logging';
+import { memo } from 'react';
+import { buildAccountTree } from '../services';
+import { useChartOfAccounts } from '../hooks';
 import type { ChartOfAccountsNode } from '../types';
 
 export function ChartOfAccountsTree() {
-  const [accounts, setAccounts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    async function loadAccounts() {
-      try {
-        setIsLoading(true);
-        const data = await fetchChartOfAccounts();
-        setAccounts(data);
-      } catch (err) {
-        logger.error('CashModule', 'Error loading chart of accounts', { error: err });
-        setError(err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadAccounts();
-  }, []);
-  });
+  // ✅ REFACTORED: Use custom hook for data fetching
+  const { accounts, isLoading, error } = useChartOfAccounts();
 
   if (isLoading) {
     return (
@@ -69,7 +51,8 @@ interface AccountNodeProps {
   account: ChartOfAccountsNode;
 }
 
-function AccountNode({ account }: AccountNodeProps) {
+// ✅ PERFORMANCE: Memoized to prevent unnecessary re-renders
+const AccountNode = memo(function AccountNode({ account }: AccountNodeProps) {
   const { code, name, is_group, account_type, children, level } = account;
 
   const indent = level * 24;
@@ -109,7 +92,9 @@ function AccountNode({ account }: AccountNodeProps) {
       ))}
     </Box>
   );
-}
+});
+
+AccountNode.displayName = 'AccountNode';
 
 function getAccountTypeColor(type: string): string {
   switch (type) {

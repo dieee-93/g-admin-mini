@@ -25,6 +25,9 @@ import {
 import { Icon, InputField, CardWrapper } from '@/shared/ui';
 import { supabase } from '@/lib/supabase/client';
 import { notify } from '@/lib/notifications';
+import { QROrderConfirmation } from './QROrderConfirmation';
+import { QROrderCustomerForm } from './QROrderCustomerForm';
+import { QROrderCartSummary } from './QROrderCartSummary';
 
 import { logger } from '@/lib/logging';
 interface Product {
@@ -103,7 +106,7 @@ export function QROrderPage() {
     try {
       // In real implementation, get table info from QR code or URL params
       const tableId = new URLSearchParams(window.location.search).get('table_id') || 'table_1';
-      
+
       const { data, error } = await supabase
         .from('tables')
         .select('id, number')
@@ -123,7 +126,7 @@ export function QROrderPage() {
       });
     } catch (error) {
       logger.error('SalesStore', 'Error loading QR data:', error);
-      notify.error({title:'Failed to load table information'});
+      notify.error({ title: 'Failed to load table information' });
     }
   };
 
@@ -143,7 +146,7 @@ export function QROrderPage() {
       if (productsError) throw productsError;
 
       // Filter only available products for customer ordering
-      const availableProducts = productsData?.filter((product: unknown) => 
+      const availableProducts = productsData?.filter((product: unknown) =>
         product.availability > 0 && product.is_available !== false
       ) || [];
 
@@ -151,7 +154,7 @@ export function QROrderPage() {
       setProducts(availableProducts);
     } catch (error) {
       logger.error('SalesStore', 'Error loading menu:', error);
-      notify.error({title:'Failed to load menu'});
+      notify.error({ title: 'Failed to load menu' });
     } finally {
       setLoading(false);
     }
@@ -160,7 +163,7 @@ export function QROrderPage() {
   const addToCart = (product: Product, quantity: number = 1) => {
     setCart(currentCart => {
       const existingItem = currentCart.find(item => item.product_id === product.id);
-      
+
       if (existingItem) {
         return currentCart.map(item =>
           item.product_id === product.id
@@ -177,7 +180,7 @@ export function QROrderPage() {
       }
     });
 
-    notify.success({title:`${product.name} added to cart`});
+    notify.success({ title: `${product.name} added to cart` });
   };
 
   const updateCartQuantity = (productId: string, quantity: number) => {
@@ -213,15 +216,15 @@ export function QROrderPage() {
   // };
 
   const calculateOrderSummary = (): OrderSummary => {
-    const subtotal = cart.reduce((sum, item) => 
+    const subtotal = cart.reduce((sum, item) =>
       sum + (item.product.cost || 0) * item.quantity, 0
     );
-    
+
     const estimatedPrepTime = Math.max(
       ...cart.map(item => (item.product.preparation_time || 15) * item.quantity),
       15 // minimum 15 minutes
     );
-    
+
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
     return {
@@ -233,12 +236,12 @@ export function QROrderPage() {
 
   const submitOrder = async () => {
     if (cart.length === 0) {
-      notify.error({title:'Please add items to your order'});
+      notify.error({ title: 'Please add items to your order' });
       return;
     }
 
     if (!customerName.trim()) {
-      notify.error({title:'Please enter your name'});
+      notify.error({ title: 'Please enter your name' });
       return;
     }
 
@@ -270,8 +273,8 @@ export function QROrderPage() {
 
       setOrderNumber(data.order_number);
       setOrderSubmitted(true);
-      
-      notify.success({title:'Order submitted successfully!'});
+
+      notify.success({ title: 'Order submitted successfully!' });
 
       // Clear cart
       setCart([]);
@@ -281,7 +284,7 @@ export function QROrderPage() {
 
     } catch (error) {
       logger.error('SalesStore', 'Error submitting order:', error);
-      notify.error({title:'Failed to submit order. Please try again.'});
+      notify.error({ title: 'Failed to submit order. Please try again.' });
     } finally {
       setSubmitting(false);
     }
@@ -307,63 +310,20 @@ export function QROrderPage() {
 
   if (orderSubmitted) {
     return (
-      <Box p="6" textAlign="center" maxW="md" mx="auto">
-        <VStack gap="6">
-          <Icon icon={CheckCircleIcon} size="2xl" className="text-green-500" />
-          
-          <VStack gap="2">
-            <Heading size="lg" color="green.600">Order Confirmed!</Heading>
-            <Text color="gray.600">
-              Your order has been sent to the kitchen
-            </Text>
-          </VStack>
-
-          <CardWrapper w="full" p="4" >
-            <VStack gap="3">
-              <HStack justify="space-between" w="full">
-                <Text fontWeight="bold">Order Number:</Text>
-                <Badge colorPalette="green" fontSize="md" p="2">
-                  {orderNumber}
-                </Badge>
-              </HStack>
-              
-              <HStack justify="space-between" w="full">
-                <Text fontWeight="bold">Table:</Text>
-                <Text>{qrData?.table_number}</Text>
-              </HStack>
-              
-              <HStack justify="space-between" w="full">
-                <Text fontWeight="bold">Estimated Time:</Text>
-                <Text>{Math.ceil(orderSummary.estimated_prep_time)} minutes</Text>
-              </HStack>
-            </VStack>
-          </CardWrapper>
-
-          <VStack gap="2" textAlign="center">
-            <Text fontSize="sm" color="gray.600">
-              Your order is being prepared. You'll be notified when it's ready.
-            </Text>
-            <Text fontSize="xs" color="gray.500">
-              Need help? Please speak with your server.
-            </Text>
-          </VStack>
-
-          <Button 
-            onClick={() => {
-              setOrderSubmitted(false);
-              setOrderNumber('');
-            }}
-            variant="outline"
-          >
-            Order More Items
-          </Button>
-        </VStack>
-      </Box>
+      <QROrderConfirmation
+        orderNumber={orderNumber}
+        tableNumber={qrData?.table_number || ''}
+        estimatedPrepTime={orderSummary.estimated_prep_time}
+        onOrderMore={() => {
+          setOrderSubmitted(false);
+          setOrderNumber('');
+        }}
+      />
     );
   }
 
   return (
-    <Box minH="100vh" bg="bg.canvas">
+    <Box minH="100vh" bg="gray.50">
       {/* Header */}
       <Box bg="white" shadow="sm" p="4" position="sticky" top={0} zIndex={10}>
         <VStack gap="2">
@@ -371,7 +331,7 @@ export function QROrderPage() {
             <Icon icon={QrCodeIcon} size="lg" className="text-blue-500" />
             <Heading size="md">{qrData?.restaurant_info?.name}</Heading>
           </HStack>
-          
+
           {qrData && (
             <HStack gap="4" fontSize="sm" color="gray.600">
               <Text>Table {qrData.table_number}</Text>
@@ -386,7 +346,7 @@ export function QROrderPage() {
       <Box p="4" pb={cart.length > 0 ? '120px' : '4'}>
         {/* Category Tabs */}
         <Box mb="4">
-          <Tabs.Root 
+          <Tabs.Root
             value={activeCategory}
             onValueChange={(details) => setActiveCategory(details.value)}
             variant="line"
@@ -409,8 +369,8 @@ export function QROrderPage() {
             const inCart = !!cartItem;
 
             return (
-              <CardWrapper 
-                key={product.id} 
+              <CardWrapper
+                key={product.id}
                 _hover={{ transform: 'translateY(-2px)', shadow: 'md' }}
                 transition="all 0.2s"
               >
@@ -418,20 +378,20 @@ export function QROrderPage() {
                   <VStack align="stretch" gap="3">
                     {/* Product Image Placeholder */}
                     {product.image_url ? (
-                      <Image 
-                        src={product.image_url} 
+                      <Image
+                        src={product.image_url}
                         alt={product.name}
-                        borderRadius="md" 
-                        h="120px" 
-                        objectFit="cover" 
+                        borderRadius="md"
+                        h="120px"
+                        objectFit="cover"
                       />
                     ) : (
-                      <Box 
-                        h="120px" 
-                        bg="bg.surface" 
-                        borderRadius="md" 
-                        display="flex" 
-                        alignItems="center" 
+                      <Box
+                        h="120px"
+                        bg="bg.surface"
+                        borderRadius="md"
+                        display="flex"
+                        alignItems="center"
                         justifyContent="center"
                       >
                         <Text fontSize="sm" color="gray.500">No Image</Text>
@@ -529,104 +489,26 @@ export function QROrderPage() {
 
         {/* Customer Information Form */}
         {cart.length > 0 && (
-          <CardWrapper mb="4">
-            <CardWrapper.Header>
-              <Text fontWeight="bold" fontSize="lg">Your Information</Text>
-            </CardWrapper.Header>
-            <CardWrapper.Body>
-              <VStack gap="4" align="stretch">
-                <Box>
-                  <Text mb="2" fontSize="sm" fontWeight="medium">
-                    Name <Text as="span" color="red.500">*</Text>
-                  </Text>
-                  <InputField
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Enter your name"
-                  />
-                </Box>
-
-                <Box>
-                  <Text mb="2" fontSize="sm" fontWeight="medium">
-                    Phone (Optional)
-                  </Text>
-                  <InputField
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    placeholder="Enter your phone number"
-                  />
-                </Box>
-
-                <Box>
-                  <Text mb="2" fontSize="sm" fontWeight="medium">
-                    Special Requests (Optional)
-                  </Text>
-                  <Textarea
-                    value={specialRequests}
-                    onChange={(e) => setSpecialRequests(e.target.value)}
-                    placeholder="Any allergies, dietary restrictions, or special requests..."
-                    rows={3}
-                  />
-                </Box>
-              </VStack>
-            </CardWrapper.Body>
-          </CardWrapper>
+          <QROrderCustomerForm
+            customerName={customerName}
+            setCustomerName={setCustomerName}
+            customerPhone={customerPhone}
+            setCustomerPhone={setCustomerPhone}
+            specialRequests={specialRequests}
+            setSpecialRequests={setSpecialRequests}
+          />
         )}
       </Box>
 
       {/* Cart Summary - Fixed Bottom */}
       {cart.length > 0 && (
-        <Box
-          position="fixed"
-          bottom={0}
-          left={0}
-          right={0}
-          bg="white"
-          shadow="lg"
-          p="4"
-          borderTop="1px solid"
-          borderColor="border.default"
-        >
-          <VStack gap="3">
-            {/* Order Summary */}
-            <HStack justify="space-between" w="full">
-              <VStack align="start" gap="0">
-                <Text fontSize="sm" color="gray.600">
-                  {orderSummary.total_items} items
-                </Text>
-                <Text fontSize="lg" fontWeight="bold">
-                  ${orderSummary.subtotal.toFixed(2)}
-                </Text>
-              </VStack>
-              
-              <VStack align="end" gap="0">
-                <Text fontSize="sm" color="gray.600">
-                  Est. {Math.ceil(orderSummary.estimated_prep_time)} min
-                </Text>
-                <HStack>
-                  <Icon icon={ShoppingCartIcon} size="sm" />
-                  <Text fontSize="sm" fontWeight="medium">
-                    {cart.length} different items
-                  </Text>
-                </HStack>
-              </VStack>
-            </HStack>
-
-            {/* Submit Order Button */}
-            <Button
-              colorPalette="green"
-              size="lg"
-              w="full"
-              onClick={submitOrder}
-              loading={submitting}
-              loadingText="Submitting Order..."
-              disabled={!customerName.trim() || cart.length === 0}
-            >
-              <Icon icon={CheckCircleIcon} size="sm" />
-              Place Order
-            </Button>
-          </VStack>
-        </Box>
+        <QROrderCartSummary
+          cartLength={cart.length}
+          orderSummary={orderSummary}
+          customerName={customerName}
+          submitting={submitting}
+          onSubmit={submitOrder}
+        />
       )}
 
       {/* Empty Cart Message */}

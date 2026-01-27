@@ -9,7 +9,7 @@ import {
   Grid
 } from '@/shared/ui';
 import { fetchSales } from '@/pages/admin/operations/sales/services/saleApi';
-import { useCustomers } from '../../hooks/existing/useCustomers';
+import { useCustomers } from '@/modules/customers/hooks';
 import type { Sale } from '@/pages/admin/operations/sales/types';
 
 import { logger } from '@/lib/logging';

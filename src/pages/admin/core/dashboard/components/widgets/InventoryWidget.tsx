@@ -15,7 +15,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { Box, Stack, Typography, Icon, Badge } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { useMaterialsStore } from '@/store/materialsStore';
+import { useMaterialsStore } from '@/modules/materials/store';
 
 export function InventoryWidget() {
   // ✅ CRITICAL FIX: Usar useShallow de Zustand v5 para evitar loop infinito

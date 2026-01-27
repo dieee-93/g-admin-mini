@@ -36,3 +36,6 @@ export {
   deleteProductFromForm,
   listProducts
 } from './productFormApi';
+
+// Export service context API (for costing per delivery channel)
+export * from './serviceContextApi';

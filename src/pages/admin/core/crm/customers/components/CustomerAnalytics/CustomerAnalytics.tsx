@@ -9,7 +9,7 @@ import {
   Button,
   Alert
 } from '@/shared/ui';
-import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
+import { QuickCalculations } from '@/lib/decimal';
 import {
   ChartBarIcon,
   UsersIcon,
@@ -21,8 +21,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { CustomerSegment, ChurnRisk, LoyaltyTier } from '../../types';
-import { useCustomers } from '../../hooks/existing/useCustomers';
-import { useCustomerRFM, useCustomerAnalytics, useCustomerSegmentation } from '../../hooks/existing/useCustomerRFM';
+import { useCustomers } from '@/modules/customers/hooks';
+import { useCustomerRFM, useCustomerAnalytics, useCustomerSegmentation } from '@/modules/customers/hooks';
 
 export function CustomerAnalytics() {
   const { customers, loading } = useCustomers();

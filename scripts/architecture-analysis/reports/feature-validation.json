@@ -1,0 +1,2929 @@
+{
+  "timestamp": "2026-01-10T00:50:25.307Z",
+  "summary": {
+    "totalFeatures": 110,
+    "implemented": 103,
+    "partial": 7,
+    "missing": 0,
+    "unknown": 0,
+    "implementationRate": 94,
+    "byDomain": {
+      "SALES": {
+        "implemented": 22,
+        "partial": 3,
+        "missing": 0,
+        "total": 25
+      },
+      "INVENTORY": {
+        "implemented": 10,
+        "partial": 2,
+        "missing": 0,
+        "total": 12
+      },
+      "PRODUCTION": {
+        "implemented": 4,
+        "partial": 0,
+        "missing": 0,
+        "total": 4
+      },
+      "PRODUCTS": {
+        "implemented": 6,
+        "partial": 2,
+        "missing": 0,
+        "total": 8
+      },
+      "OPERATIONS": {
+        "implemented": 12,
+        "partial": 0,
+        "missing": 0,
+        "total": 12
+      },
+      "SCHEDULING": {
+        "implemented": 4,
+        "partial": 0,
+        "missing": 0,
+        "total": 4
+      },
+      "CUSTOMER": {
+        "implemented": 4,
+        "partial": 0,
+        "missing": 0,
+        "total": 4
+      },
+      "FINANCE": {
+        "implemented": 4,
+        "partial": 0,
+        "missing": 0,
+        "total": 4
+      },
+      "MOBILE": {
+        "implemented": 3,
+        "partial": 0,
+        "missing": 0,
+        "total": 3
+      },
+      "MULTISITE": {
+        "implemented": 5,
+        "partial": 0,
+        "missing": 0,
+        "total": 5
+      },
+      "ANALYTICS": {
+        "implemented": 4,
+        "partial": 0,
+        "missing": 0,
+        "total": 4
+      },
+      "STAFF": {
+        "implemented": 6,
+        "partial": 0,
+        "missing": 0,
+        "total": 6
+      },
+      "RENTAL": {
+        "implemented": 5,
+        "partial": 0,
+        "missing": 0,
+        "total": 5
+      },
+      "MEMBERSHIP": {
+        "implemented": 5,
+        "partial": 0,
+        "missing": 0,
+        "total": 5
+      },
+      "DIGITAL": {
+        "implemented": 4,
+        "partial": 0,
+        "missing": 0,
+        "total": 4
+      },
+      "CORE": {
+        "implemented": 3,
+        "partial": 0,
+        "missing": 0,
+        "total": 3
+      },
+      "ENGAGEMENT": {
+        "implemented": 1,
+        "partial": 0,
+        "missing": 0,
+        "total": 1
+      },
+      "DEV": {
+        "implemented": 1,
+        "partial": 0,
+        "missing": 0,
+        "total": 1
+      }
+    }
+  },
+  "validations": [
+    {
+      "feature": {
+        "id": "sales_order_management",
+        "name": "Gestión de Órdenes",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_order_management",
+        "feature_id: sales_order_management",
+        "feature_id: sales_order_management",
+        "feature_id: sales_order_management",
+        "feature_id: sales_order_management",
+        "feature_id: sales_order_management",
+        "feature_id: sales_order_management",
+        "feature_id: sales_order_management",
+        "feature_id: sales_order_management",
+        "feature_id: sales_order_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\lib\\modules\\bootstrap.ts",
+        "src\\lib\\modules\\index.ts",
+        "src\\modules\\fulfillment\\manifest.tsx",
+        "src\\modules\\production\\kitchen\\manifest.tsx",
+        "src\\modules\\sales\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts",
+        "src\\pages\\debug\\feature-ui-mapping\\FeatureUIMappingDebugger.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_payment_processing",
+        "name": "Procesamiento de Pagos",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_payment_processing",
+        "feature_id: sales_payment_processing",
+        "feature_id: sales_payment_processing",
+        "feature_id: sales_payment_processing",
+        "feature_id: sales_payment_processing",
+        "feature_id: sales_payment_processing",
+        "feature_id: sales_payment_processing",
+        "feature_id: sales_payment_processing"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\delivery\\manifest.tsx",
+        "src\\modules\\fulfillment\\manifest.tsx",
+        "src\\modules\\fulfillment\\pickup\\manifest.tsx",
+        "src\\modules\\sales\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_catalog_menu",
+        "name": "Catálogo para Menú",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_catalog_menu",
+        "feature_id: sales_catalog_menu",
+        "feature_id: sales_catalog_menu"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_catalog_ecommerce",
+        "name": "Catálogo E-commerce",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_catalog_ecommerce",
+        "feature_id: sales_catalog_ecommerce",
+        "feature_id: sales_catalog_ecommerce",
+        "feature_id: sales_catalog_ecommerce"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\sales\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_package_management",
+        "name": "Gestión de Paquetes",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_package_management",
+        "feature_id: sales_package_management",
+        "feature_id: sales_package_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_pos_onsite",
+        "name": "POS en Local",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_pos_onsite",
+        "feature_id: sales_pos_onsite",
+        "feature_id: sales_pos_onsite",
+        "feature_id: sales_pos_onsite",
+        "feature_id: sales_pos_onsite"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\sales\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_dine_in_orders",
+        "name": "Órdenes para Consumo en Local",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_dine_in_orders",
+        "feature_id: sales_dine_in_orders",
+        "feature_id: sales_dine_in_orders",
+        "feature_id: sales_dine_in_orders",
+        "feature_id: sales_dine_in_orders"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\sales\\manifest.tsx",
+        "src\\pages\\admin\\operations\\sales\\hooks\\useSaleForm.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_order_at_table",
+        "name": "Pedidos en Mesa",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "PARTIAL",
+      "confidence": 0.7,
+      "evidence": [
+        "feature_id: sales_order_at_table",
+        "feature_id: sales_order_at_table"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_online_order_processing",
+        "name": "Procesamiento Asincrónico",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_online_order_processing",
+        "feature_id: sales_online_order_processing",
+        "feature_id: sales_online_order_processing"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_online_payment_gateway",
+        "name": "Gateway de Pagos Online",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_online_payment_gateway",
+        "feature_id: sales_online_payment_gateway",
+        "feature_id: sales_online_payment_gateway",
+        "feature_id: sales_online_payment_gateway"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\finance-integrations\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_cart_management",
+        "name": "Gestión de Carrito",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_cart_management",
+        "feature_id: sales_cart_management",
+        "feature_id: sales_cart_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_checkout_process",
+        "name": "Proceso de Checkout",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_checkout_process",
+        "feature_id: sales_checkout_process",
+        "feature_id: sales_checkout_process"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_multicatalog_management",
+        "name": "Gestión Multi-Catálogo",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "PARTIAL",
+      "confidence": 0.7,
+      "evidence": [
+        "feature_id: sales_multicatalog_management",
+        "feature_id: sales_multicatalog_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_bulk_pricing",
+        "name": "Precios por Volumen",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_bulk_pricing",
+        "feature_id: sales_bulk_pricing",
+        "feature_id: sales_bulk_pricing"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_quote_generation",
+        "name": "Generación de Cotizaciones",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_quote_generation",
+        "feature_id: sales_quote_generation",
+        "feature_id: sales_quote_generation"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_product_retail",
+        "name": "Venta de Productos Retail",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "PARTIAL",
+      "confidence": 0.7,
+      "evidence": [
+        "feature_id: sales_product_retail",
+        "feature_id: sales_product_retail"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_contract_management",
+        "name": "Gestión de Contratos",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_contract_management",
+        "feature_id: sales_contract_management",
+        "feature_id: sales_contract_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_tiered_pricing",
+        "name": "Precios Diferenciados",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_tiered_pricing",
+        "feature_id: sales_tiered_pricing",
+        "feature_id: sales_tiered_pricing"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\sales\\b2b\\components\\index.ts",
+        "src\\modules\\sales\\b2b\\components\\TieredPricingManager.tsx",
+        "src\\modules\\sales\\b2b\\services\\index.ts",
+        "src\\modules\\sales\\b2b\\services\\tieredPricingService.ts",
+        "src\\modules\\sales\\b2b\\types\\index.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_approval_workflows",
+        "name": "Flujos de Aprobación",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_approval_workflows",
+        "feature_id: sales_approval_workflows",
+        "feature_id: sales_approval_workflows"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\sales\\b2b\\services\\approvalWorkflowService.ts",
+        "src\\modules\\sales\\b2b\\services\\index.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_quote_to_order",
+        "name": "Cotización a Orden",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_quote_to_order",
+        "feature_id: sales_quote_to_order",
+        "feature_id: sales_quote_to_order"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\sales\\b2b\\services\\index.ts",
+        "src\\modules\\sales\\b2b\\services\\quotesService.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_split_payment",
+        "name": "Pago Dividido",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_split_payment",
+        "feature_id: sales_split_payment",
+        "feature_id: sales_split_payment"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_tip_management",
+        "name": "Gestión de Propinas",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_tip_management",
+        "feature_id: sales_tip_management",
+        "feature_id: sales_tip_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_coupon_management",
+        "name": "Gestión de Cupones",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_coupon_management",
+        "feature_id: sales_coupon_management",
+        "feature_id: sales_coupon_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_pickup_orders",
+        "name": "Pedidos para Retirar",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_pickup_orders",
+        "feature_id: sales_pickup_orders",
+        "feature_id: sales_pickup_orders",
+        "feature_id: sales_pickup_orders",
+        "feature_id: sales_pickup_orders",
+        "feature_id: sales_pickup_orders",
+        "feature_id: sales_pickup_orders"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\manifest.tsx",
+        "src\\modules\\fulfillment\\pickup\\manifest.tsx",
+        "src\\modules\\sales\\components\\TakeAwayToggle.tsx",
+        "src\\pages\\admin\\operations\\sales\\hooks\\useSaleForm.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "sales_delivery_orders",
+        "name": "Pedidos a Domicilio",
+        "domain": "SALES",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: sales_delivery_orders",
+        "feature_id: sales_delivery_orders",
+        "feature_id: sales_delivery_orders",
+        "feature_id: sales_delivery_orders",
+        "feature_id: sales_delivery_orders",
+        "feature_id: sales_delivery_orders",
+        "feature_id: sales_delivery_orders"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\delivery\\manifest.tsx",
+        "src\\modules\\fulfillment\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts",
+        "src\\pages\\admin\\operations\\sales\\hooks\\useSaleForm.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_stock_tracking",
+        "name": "Seguimiento de Stock",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_stock_tracking",
+        "feature_id: inventory_stock_tracking",
+        "feature_id: inventory_stock_tracking",
+        "feature_id: inventory_stock_tracking",
+        "feature_id: inventory_stock_tracking",
+        "feature_id: inventory_stock_tracking",
+        "feature_id: inventory_stock_tracking",
+        "feature_id: inventory_stock_tracking",
+        "feature_id: inventory_stock_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\lib\\modules\\bootstrap.ts",
+        "src\\modules\\materials\\manifest.tsx",
+        "src\\modules\\production\\kitchen\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts",
+        "src\\pages\\admin\\supply-chain\\products\\components\\sections\\MaterialsSection.tsx",
+        "src\\pages\\admin\\supply-chain\\products\\config\\formSectionsRegistry.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_alert_system",
+        "name": "Sistema de Alertas",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_alert_system",
+        "feature_id: inventory_alert_system",
+        "feature_id: inventory_alert_system",
+        "feature_id: inventory_alert_system",
+        "feature_id: inventory_alert_system"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\materials\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_purchase_orders",
+        "name": "Órdenes de Compra",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_purchase_orders",
+        "feature_id: inventory_purchase_orders",
+        "feature_id: inventory_purchase_orders",
+        "feature_id: inventory_purchase_orders",
+        "feature_id: inventory_purchase_orders"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\materials\\manifest.tsx",
+        "src\\modules\\suppliers\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_supplier_management",
+        "name": "Gestión de Proveedores",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_supplier_management",
+        "feature_id: inventory_supplier_management",
+        "feature_id: inventory_supplier_management",
+        "feature_id: inventory_supplier_management",
+        "feature_id: inventory_supplier_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\materials\\manifest.tsx",
+        "src\\modules\\suppliers\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_sku_management",
+        "name": "Gestión de SKUs",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_sku_management",
+        "feature_id: inventory_sku_management",
+        "feature_id: inventory_sku_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_barcode_scanning",
+        "name": "Escaneo de Códigos",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_barcode_scanning",
+        "feature_id: inventory_barcode_scanning",
+        "feature_id: inventory_barcode_scanning"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_multi_unit_tracking",
+        "name": "Seguimiento Multi-Unidad",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_multi_unit_tracking",
+        "feature_id: inventory_multi_unit_tracking",
+        "feature_id: inventory_multi_unit_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_low_stock_auto_reorder",
+        "name": "Reorden Automático",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_low_stock_auto_reorder",
+        "feature_id: inventory_low_stock_auto_reorder",
+        "feature_id: inventory_low_stock_auto_reorder"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_demand_forecasting",
+        "name": "Pronóstico de Demanda",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_demand_forecasting",
+        "feature_id: inventory_demand_forecasting",
+        "feature_id: inventory_demand_forecasting",
+        "feature_id: inventory_demand_forecasting"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\suppliers\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_available_to_promise",
+        "name": "Disponible para Prometer (ATP)",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: inventory_available_to_promise",
+        "feature_id: inventory_available_to_promise",
+        "feature_id: inventory_available_to_promise"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_batch_lot_tracking",
+        "name": "Seguimiento de Lotes",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "PARTIAL",
+      "confidence": 0.7,
+      "evidence": [
+        "feature_id: inventory_batch_lot_tracking",
+        "feature_id: inventory_batch_lot_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "inventory_expiration_tracking",
+        "name": "Seguimiento de Vencimientos",
+        "domain": "INVENTORY",
+        "category": "conditional"
+      },
+      "status": "PARTIAL",
+      "confidence": 0.7,
+      "evidence": [
+        "feature_id: inventory_expiration_tracking",
+        "feature_id: inventory_expiration_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "production_bom_management",
+        "name": "BOM Management",
+        "domain": "PRODUCTION",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: production_bom_management",
+        "feature_id: production_bom_management",
+        "feature_id: production_bom_management",
+        "feature_id: production_bom_management",
+        "feature_id: production_bom_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\production\\kitchen\\manifest.tsx",
+        "src\\pages\\admin\\supply-chain\\products\\config\\formSectionsRegistry.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "production_display_system",
+        "name": "Production Display System",
+        "domain": "PRODUCTION",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: production_display_system",
+        "feature_id: production_display_system",
+        "feature_id: production_display_system",
+        "feature_id: production_display_system",
+        "feature_id: production_display_system"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\production\\kitchen\\manifest.tsx",
+        "src\\modules\\production\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "production_order_queue",
+        "name": "Cola de Órdenes",
+        "domain": "PRODUCTION",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: production_order_queue",
+        "feature_id: production_order_queue",
+        "feature_id: production_order_queue",
+        "feature_id: production_order_queue",
+        "feature_id: production_order_queue"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\production\\kitchen\\manifest.tsx",
+        "src\\modules\\production\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "production_capacity_planning",
+        "name": "Planificación de Capacidad",
+        "domain": "PRODUCTION",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: production_capacity_planning",
+        "feature_id: production_capacity_planning",
+        "feature_id: production_capacity_planning",
+        "feature_id: production_capacity_planning"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\production\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "products_recipe_management",
+        "name": "Recipe Management",
+        "domain": "PRODUCTS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: products_recipe_management",
+        "feature_id: products_recipe_management",
+        "feature_id: products_recipe_management",
+        "feature_id: products_recipe_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\products\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "products_catalog_menu",
+        "name": "Menu Catalog",
+        "domain": "PRODUCTS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: products_catalog_menu",
+        "feature_id: products_catalog_menu",
+        "feature_id: products_catalog_menu",
+        "feature_id: products_catalog_menu"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\products\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "products_catalog_ecommerce",
+        "name": "E-commerce Catalog",
+        "domain": "PRODUCTS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: products_catalog_ecommerce",
+        "feature_id: products_catalog_ecommerce",
+        "feature_id: products_catalog_ecommerce",
+        "feature_id: products_catalog_ecommerce"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\products\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "products_package_management",
+        "name": "Package Management",
+        "domain": "PRODUCTS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: products_package_management",
+        "feature_id: products_package_management",
+        "feature_id: products_package_management",
+        "feature_id: products_package_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\products\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "products_availability_calculation",
+        "name": "Availability Calculation",
+        "domain": "PRODUCTS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: products_availability_calculation",
+        "feature_id: products_availability_calculation",
+        "feature_id: products_availability_calculation",
+        "feature_id: products_availability_calculation"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\products\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "products_cost_intelligence",
+        "name": "Cost Intelligence",
+        "domain": "PRODUCTS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: products_cost_intelligence",
+        "feature_id: products_cost_intelligence",
+        "feature_id: products_cost_intelligence",
+        "feature_id: products_cost_intelligence"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\products\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "products_dynamic_materials",
+        "name": "Dynamic Materials",
+        "domain": "PRODUCTS",
+        "category": "conditional"
+      },
+      "status": "PARTIAL",
+      "confidence": 0.7,
+      "evidence": [
+        "feature_id: products_dynamic_materials",
+        "feature_id: products_dynamic_materials"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "products_digital_delivery",
+        "name": "Digital Delivery",
+        "domain": "PRODUCTS",
+        "category": "conditional"
+      },
+      "status": "PARTIAL",
+      "confidence": 0.7,
+      "evidence": [
+        "feature_id: products_digital_delivery"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_pickup_scheduling",
+        "name": "Programación de Retiros",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_pickup_scheduling",
+        "feature_id: operations_pickup_scheduling",
+        "feature_id: operations_pickup_scheduling",
+        "feature_id: operations_pickup_scheduling",
+        "feature_id: operations_pickup_scheduling"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\manifest.tsx",
+        "src\\modules\\fulfillment\\pickup\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_notification_system",
+        "name": "Sistema de Notificaciones",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_notification_system",
+        "feature_id: operations_notification_system",
+        "feature_id: operations_notification_system"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_delivery_zones",
+        "name": "Zonas de Entrega",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_delivery_zones",
+        "feature_id: operations_delivery_zones",
+        "feature_id: operations_delivery_zones",
+        "feature_id: operations_delivery_zones",
+        "feature_id: operations_delivery_zones",
+        "feature_id: operations_delivery_zones"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\delivery\\manifest.tsx",
+        "src\\modules\\fulfillment\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts",
+        "src\\pages\\admin\\operations\\fulfillment\\delivery\\hooks\\useDeliveryPageEnhanced.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_delivery_tracking",
+        "name": "Seguimiento de Entregas",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_delivery_tracking",
+        "feature_id: operations_delivery_tracking",
+        "feature_id: operations_delivery_tracking",
+        "feature_id: operations_delivery_tracking",
+        "feature_id: operations_delivery_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\delivery\\manifest.tsx",
+        "src\\modules\\fulfillment\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_shipping_integration",
+        "name": "Integración con Couriers",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_shipping_integration",
+        "feature_id: operations_shipping_integration",
+        "feature_id: operations_shipping_integration"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\finance-integrations\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_deferred_fulfillment",
+        "name": "Cumplimiento Diferido",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_deferred_fulfillment",
+        "feature_id: operations_deferred_fulfillment",
+        "feature_id: operations_deferred_fulfillment",
+        "feature_id: operations_deferred_fulfillment",
+        "feature_id: operations_deferred_fulfillment"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\delivery\\manifest.tsx",
+        "src\\modules\\fulfillment\\pickup\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_table_management",
+        "name": "Gestión de Mesas",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_table_management",
+        "feature_id: operations_table_management",
+        "feature_id: operations_table_management",
+        "feature_id: operations_table_management",
+        "feature_id: operations_table_management",
+        "feature_id: operations_table_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\manifest.tsx",
+        "src\\modules\\fulfillment\\onsite\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_table_assignment",
+        "name": "Asignación de Mesas",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_table_assignment",
+        "feature_id: operations_table_assignment",
+        "feature_id: operations_table_assignment",
+        "feature_id: operations_table_assignment",
+        "feature_id: operations_table_assignment"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\manifest.tsx",
+        "src\\modules\\fulfillment\\onsite\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_floor_plan_config",
+        "name": "Configuración de Plano",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_floor_plan_config",
+        "feature_id: operations_floor_plan_config",
+        "feature_id: operations_floor_plan_config",
+        "feature_id: operations_floor_plan_config",
+        "feature_id: operations_floor_plan_config"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\manifest.tsx",
+        "src\\modules\\fulfillment\\onsite\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_bill_splitting",
+        "name": "División de Cuentas",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_bill_splitting",
+        "feature_id: operations_bill_splitting",
+        "feature_id: operations_bill_splitting"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_waitlist_management",
+        "name": "Lista de Espera",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_waitlist_management",
+        "feature_id: operations_waitlist_management",
+        "feature_id: operations_waitlist_management",
+        "feature_id: operations_waitlist_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "operations_vendor_performance",
+        "name": "Performance de Proveedores",
+        "domain": "OPERATIONS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: operations_vendor_performance",
+        "feature_id: operations_vendor_performance",
+        "feature_id: operations_vendor_performance",
+        "feature_id: operations_vendor_performance"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\suppliers\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "scheduling_appointment_booking",
+        "name": "Reserva de Citas",
+        "domain": "SCHEDULING",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: scheduling_appointment_booking",
+        "feature_id: scheduling_appointment_booking",
+        "feature_id: scheduling_appointment_booking",
+        "feature_id: scheduling_appointment_booking",
+        "feature_id: scheduling_appointment_booking",
+        "feature_id: scheduling_appointment_booking",
+        "feature_id: scheduling_appointment_booking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\rentals\\manifest.tsx",
+        "src\\modules\\scheduling\\components\\Appointments\\AppointmentBookingModal.tsx",
+        "src\\modules\\scheduling\\components\\Appointments\\index.ts",
+        "src\\modules\\scheduling\\components\\index.ts",
+        "src\\modules\\scheduling\\manifest.tsx",
+        "src\\pages\\admin\\operations\\sales\\hooks\\useSaleForm.tsx",
+        "src\\pages\\admin\\supply-chain\\products\\config\\formSectionsRegistry.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "scheduling_calendar_management",
+        "name": "Gestión de Calendario",
+        "domain": "SCHEDULING",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: scheduling_calendar_management",
+        "feature_id: scheduling_calendar_management",
+        "feature_id: scheduling_calendar_management",
+        "feature_id: scheduling_calendar_management",
+        "feature_id: scheduling_calendar_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\rentals\\manifest.tsx",
+        "src\\modules\\scheduling\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "scheduling_reminder_system",
+        "name": "Sistema de Recordatorios",
+        "domain": "SCHEDULING",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: scheduling_reminder_system",
+        "feature_id: scheduling_reminder_system",
+        "feature_id: scheduling_reminder_system"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "scheduling_availability_rules",
+        "name": "Reglas de Disponibilidad",
+        "domain": "SCHEDULING",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: scheduling_availability_rules",
+        "feature_id: scheduling_availability_rules",
+        "feature_id: scheduling_availability_rules"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\scheduling\\components\\BookingRulesConfig.tsx",
+        "src\\modules\\scheduling\\components\\BusinessHoursConfig.tsx",
+        "src\\modules\\scheduling\\hooks\\useAvailability.ts",
+        "src\\modules\\scheduling\\services\\availabilityApi.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "customer_service_history",
+        "name": "Historial de Servicios",
+        "domain": "CUSTOMER",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: customer_service_history",
+        "feature_id: customer_service_history",
+        "feature_id: customer_service_history",
+        "feature_id: customer_service_history"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\customers\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "customer_preference_tracking",
+        "name": "Seguimiento de Preferencias",
+        "domain": "CUSTOMER",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: customer_preference_tracking",
+        "feature_id: customer_preference_tracking",
+        "feature_id: customer_preference_tracking",
+        "feature_id: customer_preference_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\customers\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "customer_loyalty_program",
+        "name": "Programa de Lealtad",
+        "domain": "CUSTOMER",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: customer_loyalty_program",
+        "feature_id: customer_loyalty_program",
+        "feature_id: customer_loyalty_program",
+        "feature_id: customer_loyalty_program",
+        "feature_id: customer_loyalty_program"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\customers\\manifest.tsx",
+        "src\\modules\\memberships\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "customer_online_accounts",
+        "name": "Reservas Online",
+        "domain": "CUSTOMER",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: customer_online_accounts",
+        "feature_id: customer_online_accounts",
+        "feature_id: customer_online_accounts",
+        "feature_id: customer_online_accounts"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\customers\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "finance_corporate_accounts",
+        "name": "Cuentas Corporativas",
+        "domain": "FINANCE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: finance_corporate_accounts",
+        "feature_id: finance_corporate_accounts",
+        "feature_id: finance_corporate_accounts",
+        "feature_id: finance_corporate_accounts",
+        "feature_id: finance_corporate_accounts",
+        "feature_id: finance_corporate_accounts"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\cash\\manifest.tsx",
+        "src\\modules\\finance-billing\\manifest.tsx",
+        "src\\modules\\finance-corporate\\manifest.tsx",
+        "src\\pages\\admin\\finance\\corporate\\page.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "finance_credit_management",
+        "name": "Gestión de Crédito",
+        "domain": "FINANCE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: finance_credit_management",
+        "feature_id: finance_credit_management",
+        "feature_id: finance_credit_management",
+        "feature_id: finance_credit_management",
+        "feature_id: finance_credit_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\finance-billing\\manifest.tsx",
+        "src\\modules\\finance-corporate\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "finance_invoice_scheduling",
+        "name": "Programación de Facturas",
+        "domain": "FINANCE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: finance_invoice_scheduling",
+        "feature_id: finance_invoice_scheduling",
+        "feature_id: finance_invoice_scheduling",
+        "feature_id: finance_invoice_scheduling",
+        "feature_id: finance_invoice_scheduling"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\finance-billing\\manifest.tsx",
+        "src\\modules\\finance-corporate\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "finance_payment_terms",
+        "name": "Términos de Pago",
+        "domain": "FINANCE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: finance_payment_terms",
+        "feature_id: finance_payment_terms",
+        "feature_id: finance_payment_terms",
+        "feature_id: finance_payment_terms",
+        "feature_id: finance_payment_terms",
+        "feature_id: finance_payment_terms"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\finance-billing\\manifest.tsx",
+        "src\\modules\\finance-corporate\\manifest.tsx",
+        "src\\modules\\memberships\\manifest.tsx",
+        "src\\pages\\admin\\finance\\billing\\components\\RecurringBillingFormEnhanced.tsx",
+        "src\\pages\\admin\\finance\\billing\\services\\billingApi.ts",
+        "src\\pages\\admin\\finance\\billing\\types\\index.ts",
+        "src\\pages\\admin\\finance\\fiscal\\components\\FiscalFormEnhanced.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "mobile_location_tracking",
+        "name": "Seguimiento de Ubicación",
+        "domain": "MOBILE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: mobile_location_tracking",
+        "feature_id: mobile_location_tracking",
+        "feature_id: mobile_location_tracking",
+        "feature_id: mobile_location_tracking",
+        "feature_id: mobile_location_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\fulfillment\\delivery\\manifest.tsx",
+        "src\\modules\\mobile\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "mobile_route_planning",
+        "name": "Planificación de Rutas",
+        "domain": "MOBILE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: mobile_route_planning",
+        "feature_id: mobile_route_planning",
+        "feature_id: mobile_route_planning",
+        "feature_id: mobile_route_planning"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\mobile\\manifest.tsx",
+        "src\\modules\\mobile\\services\\index.ts",
+        "src\\modules\\mobile\\services\\mobileService.ts",
+        "src\\modules\\mobile\\services\\routePlanningService.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "mobile_inventory_constraints",
+        "name": "Restricciones de Inventario",
+        "domain": "MOBILE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: mobile_inventory_constraints",
+        "feature_id: mobile_inventory_constraints",
+        "feature_id: mobile_inventory_constraints",
+        "feature_id: mobile_inventory_constraints",
+        "feature_id: mobile_inventory_constraints"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\mobile\\manifest.tsx",
+        "src\\modules\\mobile\\services\\mobileInventoryService.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "multisite_location_management",
+        "name": "Gestión de Ubicaciones",
+        "domain": "MULTISITE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: multisite_location_management",
+        "feature_id: multisite_location_management",
+        "feature_id: multisite_location_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "multisite_centralized_inventory",
+        "name": "Inventario Centralizado",
+        "domain": "MULTISITE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: multisite_centralized_inventory",
+        "feature_id: multisite_centralized_inventory",
+        "feature_id: multisite_centralized_inventory"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "multisite_transfer_orders",
+        "name": "Órdenes de Transferencia",
+        "domain": "MULTISITE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: multisite_transfer_orders",
+        "feature_id: multisite_transfer_orders",
+        "feature_id: multisite_transfer_orders"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "multisite_comparative_analytics",
+        "name": "Analytics Comparativo",
+        "domain": "MULTISITE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: multisite_comparative_analytics",
+        "feature_id: multisite_comparative_analytics",
+        "feature_id: multisite_comparative_analytics"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "multisite_configuration_per_site",
+        "name": "Configuración por Local",
+        "domain": "MULTISITE",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: multisite_configuration_per_site",
+        "feature_id: multisite_configuration_per_site",
+        "feature_id: multisite_configuration_per_site"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "analytics_ecommerce_metrics",
+        "name": "Métricas E-commerce",
+        "domain": "ANALYTICS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: analytics_ecommerce_metrics",
+        "feature_id: analytics_ecommerce_metrics",
+        "feature_id: analytics_ecommerce_metrics"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "analytics_conversion_tracking",
+        "name": "Seguimiento de Conversión",
+        "domain": "ANALYTICS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: analytics_conversion_tracking",
+        "feature_id: analytics_conversion_tracking",
+        "feature_id: analytics_conversion_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "staff_employee_management",
+        "name": "Gestión de Empleados",
+        "domain": "STAFF",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: staff_employee_management",
+        "feature_id: staff_employee_management",
+        "feature_id: staff_employee_management",
+        "feature_id: staff_employee_management",
+        "feature_id: staff_employee_management",
+        "feature_id: staff_employee_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\shift-control\\services\\shiftService.ts",
+        "src\\modules\\staff\\manifest.tsx",
+        "src\\pages\\debug\\feature-ui-mapping\\FeatureUIMappingDebugger.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "staff_shift_management",
+        "name": "Gestión de Turnos",
+        "domain": "STAFF",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: staff_shift_management",
+        "feature_id: staff_shift_management",
+        "feature_id: staff_shift_management",
+        "feature_id: staff_shift_management",
+        "feature_id: staff_shift_management",
+        "feature_id: staff_shift_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\scheduling\\manifest.tsx",
+        "src\\modules\\staff\\manifest.tsx",
+        "src\\pages\\debug\\feature-ui-mapping\\FeatureUIMappingDebugger.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "staff_time_tracking",
+        "name": "Registro de Tiempo",
+        "domain": "STAFF",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: staff_time_tracking",
+        "feature_id: staff_time_tracking",
+        "feature_id: staff_time_tracking",
+        "feature_id: staff_time_tracking",
+        "feature_id: staff_time_tracking",
+        "feature_id: staff_time_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\scheduling\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts",
+        "src\\modules\\staff\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "staff_performance_tracking",
+        "name": "Seguimiento de Desempeño",
+        "domain": "STAFF",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: staff_performance_tracking",
+        "feature_id: staff_performance_tracking",
+        "feature_id: staff_performance_tracking",
+        "feature_id: staff_performance_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\staff\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "staff_training_management",
+        "name": "Gestión de Capacitación",
+        "domain": "STAFF",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: staff_training_management",
+        "feature_id: staff_training_management",
+        "feature_id: staff_training_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\staff\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "staff_labor_cost_tracking",
+        "name": "Seguimiento de Costos Laborales",
+        "domain": "STAFF",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: staff_labor_cost_tracking",
+        "feature_id: staff_labor_cost_tracking",
+        "feature_id: staff_labor_cost_tracking",
+        "feature_id: staff_labor_cost_tracking",
+        "feature_id: staff_labor_cost_tracking",
+        "feature_id: staff_labor_cost_tracking",
+        "feature_id: staff_labor_cost_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\scheduling\\manifest.tsx",
+        "src\\modules\\staff\\manifest.tsx",
+        "src\\pages\\admin\\supply-chain\\products\\components\\sections\\StaffSection.tsx",
+        "src\\pages\\admin\\supply-chain\\products\\config\\formSectionsRegistry.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "rental_item_management",
+        "name": "Gestión de Items en Alquiler",
+        "domain": "RENTAL",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: rental_item_management",
+        "feature_id: rental_item_management",
+        "feature_id: rental_item_management",
+        "feature_id: rental_item_management",
+        "feature_id: rental_item_management",
+        "feature_id: rental_item_management",
+        "feature_id: rental_item_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\rentals\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts",
+        "src\\pages\\admin\\operations\\sales\\hooks\\useSaleForm.tsx",
+        "src\\pages\\admin\\supply-chain\\products\\config\\formSectionsRegistry.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "rental_booking_calendar",
+        "name": "Calendario de Reservas",
+        "domain": "RENTAL",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: rental_booking_calendar",
+        "feature_id: rental_booking_calendar",
+        "feature_id: rental_booking_calendar",
+        "feature_id: rental_booking_calendar",
+        "feature_id: rental_booking_calendar"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\rentals\\manifest.tsx",
+        "src\\modules\\shift-control\\services\\shiftService.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "rental_availability_tracking",
+        "name": "Seguimiento de Disponibilidad",
+        "domain": "RENTAL",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: rental_availability_tracking",
+        "feature_id: rental_availability_tracking",
+        "feature_id: rental_availability_tracking",
+        "feature_id: rental_availability_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\rentals\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "rental_pricing_by_duration",
+        "name": "Precios por Duración",
+        "domain": "RENTAL",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: rental_pricing_by_duration",
+        "feature_id: rental_pricing_by_duration",
+        "feature_id: rental_pricing_by_duration",
+        "feature_id: rental_pricing_by_duration"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\rentals\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "rental_late_fees",
+        "name": "Cargos por Mora",
+        "domain": "RENTAL",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: rental_late_fees",
+        "feature_id: rental_late_fees",
+        "feature_id: rental_late_fees",
+        "feature_id: rental_late_fees"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\rentals\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "membership_subscription_plans",
+        "name": "Planes de Suscripción",
+        "domain": "MEMBERSHIP",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: membership_subscription_plans",
+        "feature_id: membership_subscription_plans",
+        "feature_id: membership_subscription_plans",
+        "feature_id: membership_subscription_plans"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\memberships\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "membership_recurring_billing",
+        "name": "Facturación Recurrente",
+        "domain": "MEMBERSHIP",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: membership_recurring_billing",
+        "feature_id: membership_recurring_billing",
+        "feature_id: membership_recurring_billing",
+        "feature_id: membership_recurring_billing",
+        "feature_id: membership_recurring_billing"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\memberships\\manifest.tsx",
+        "src\\pages\\admin\\supply-chain\\products\\config\\formSectionsRegistry.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "membership_access_control",
+        "name": "Control de Acceso",
+        "domain": "MEMBERSHIP",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: membership_access_control",
+        "feature_id: membership_access_control",
+        "feature_id: membership_access_control",
+        "feature_id: membership_access_control"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\memberships\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "membership_usage_tracking",
+        "name": "Seguimiento de Uso",
+        "domain": "MEMBERSHIP",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: membership_usage_tracking",
+        "feature_id: membership_usage_tracking",
+        "feature_id: membership_usage_tracking",
+        "feature_id: membership_usage_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\memberships\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "membership_benefits_management",
+        "name": "Gestión de Beneficios",
+        "domain": "MEMBERSHIP",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: membership_benefits_management",
+        "feature_id: membership_benefits_management",
+        "feature_id: membership_benefits_management",
+        "feature_id: membership_benefits_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\memberships\\manifest.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "digital_file_delivery",
+        "name": "Entrega de Archivos",
+        "domain": "DIGITAL",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: digital_file_delivery",
+        "feature_id: digital_file_delivery",
+        "feature_id: digital_file_delivery",
+        "feature_id: digital_file_delivery",
+        "feature_id: digital_file_delivery"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\pages\\admin\\operations\\sales\\hooks\\useSaleForm.tsx",
+        "src\\pages\\admin\\supply-chain\\products\\config\\formSectionsRegistry.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "digital_license_management",
+        "name": "Gestión de Licencias",
+        "domain": "DIGITAL",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: digital_license_management",
+        "feature_id: digital_license_management",
+        "feature_id: digital_license_management"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "digital_download_tracking",
+        "name": "Tracking de Descargas",
+        "domain": "DIGITAL",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: digital_download_tracking",
+        "feature_id: digital_download_tracking",
+        "feature_id: digital_download_tracking"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "digital_version_control",
+        "name": "Control de Versiones",
+        "domain": "DIGITAL",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: digital_version_control",
+        "feature_id: digital_version_control",
+        "feature_id: digital_version_control"
+      ],
+      "relatedFiles": [
+        "src\\config\\BusinessModelRegistry.ts",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "customers",
+        "name": "Gestión de Clientes",
+        "domain": "CORE",
+        "category": "always_active"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers",
+        "feature_id: customers"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\routeMap.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\contexts\\AuthContext.tsx",
+        "src\\hooks\\useCustomers.ts",
+        "src\\hooks\\useModuleBadgeSync.ts",
+        "src\\hooks\\useRouteBasedPreloading.ts",
+        "src\\hooks\\useSystemSetup.ts",
+        "src\\lib\\events\\types.ts",
+        "src\\lib\\events\\__tests__\\helpers\\test-modules.ts",
+        "src\\lib\\integrations\\appointmentReminders.ts",
+        "src\\lib\\lazy\\LazyModules.ts",
+        "src\\lib\\offline\\OfflineSync.ts",
+        "src\\lib\\performance\\LazyLoadingManager.ts",
+        "src\\lib\\supabase\\database.types.ts",
+        "src\\modules\\customers\\manifest.tsx",
+        "src\\modules\\finance-billing\\manifest.tsx",
+        "src\\modules\\finance-corporate\\manifest.tsx",
+        "src\\modules\\memberships\\manifest.tsx",
+        "src\\modules\\rentals\\manifest.tsx",
+        "src\\modules\\sales\\services\\posApi.ts",
+        "src\\modules\\sales\\services\\tableApi.ts",
+        "src\\pages\\admin\\core\\crm\\customers\\components\\CustomerList\\CustomerList.tsx",
+        "src\\pages\\admin\\core\\crm\\customers\\hooks\\existing\\useCustomerNotes.ts",
+        "src\\pages\\admin\\core\\crm\\customers\\hooks\\existing\\useCustomerRFM.ts",
+        "src\\pages\\admin\\core\\crm\\customers\\hooks\\existing\\useCustomers.ts",
+        "src\\pages\\admin\\core\\crm\\customers\\hooks\\useCustomersPage.ts",
+        "src\\pages\\admin\\core\\crm\\customers\\page.tsx",
+        "src\\pages\\admin\\core\\crm\\customers\\services\\customerApi.ts",
+        "src\\pages\\admin\\core\\crm\\customers\\services\\customersAlertsAdapter.ts",
+        "src\\pages\\admin\\core\\dashboard\\components\\AlertsView.tsx",
+        "src\\pages\\admin\\core\\settings\\components\\UserPermissions\\UserPermissionsSection.tsx",
+        "src\\pages\\admin\\core\\settings\\pages\\notifications\\components\\NotificationRuleFormModal.tsx",
+        "src\\pages\\admin\\core\\settings\\pages\\notifications\\page.tsx",
+        "src\\pages\\admin\\core\\settings\\services\\notificationRulesApi.ts",
+        "src\\pages\\admin\\core\\settings\\services\\notificationsApi.ts",
+        "src\\pages\\admin\\executive\\dashboards\\components\\NaturalLanguageBI.tsx",
+        "src\\pages\\admin\\operations\\sales\\components\\Analytics\\AdvancedSalesAnalyticsDashboard\\index.tsx",
+        "src\\pages\\admin\\operations\\sales\\components\\OfflineSalesView.tsx",
+        "src\\pages\\admin\\operations\\sales\\hooks\\useSales.ts",
+        "src\\pages\\admin\\operations\\sales\\services\\saleApi.ts",
+        "src\\pages\\admin\\operations\\sales\\services\\tableApi.ts",
+        "src\\pages\\admin\\tools\\reporting\\components\\ReportingAnalyticsEnhanced.tsx",
+        "src\\pages\\admin\\tools\\reporting\\components\\ReportingFormEnhanced.tsx",
+        "src\\shared\\alerts\\AlertsProvider.tsx",
+        "src\\shared\\alerts\\types.ts",
+        "src\\shared\\charts\\KPIChart.tsx",
+        "src\\shared\\events\\ModuleEventBus.ts",
+        "src\\types\\app.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "domain": "CORE",
+        "category": "always_active"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard",
+        "feature_id: dashboard"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\routeMap.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\contexts\\AuthContext.tsx",
+        "src\\contexts\\NavigationContext.tsx",
+        "src\\hooks\\useModuleBadgeSync.ts",
+        "src\\hooks\\useRouteBasedPreloading.ts",
+        "src\\modules\\dashboard\\manifest.tsx",
+        "src\\modules\\dashboard\\widgets\\ActivityFeedWidget.tsx",
+        "src\\modules\\dashboard\\widgets\\DistributionChartWidget.tsx",
+        "src\\modules\\dashboard\\widgets\\index.ts",
+        "src\\modules\\dashboard\\widgets\\MetricsBarChartWidget.tsx",
+        "src\\modules\\dashboard\\widgets\\QuickActionsWidget.tsx",
+        "src\\modules\\dashboard\\widgets\\RevenueAreaChartWidget.tsx",
+        "src\\modules\\dashboard\\widgets\\SalesTrendChartWidget.tsx",
+        "src\\modules\\index.ts",
+        "src\\modules\\scheduling\\components\\SchedulingAlerts\\SchedulingAlerts.tsx",
+        "src\\modules\\scheduling\\hooks\\useSchedulingAlerts.ts",
+        "src\\pages\\admin\\core\\dashboard\\components\\AchievementsWidget.tsx",
+        "src\\pages\\admin\\core\\dashboard\\components\\AlertsAchievementsSection.tsx",
+        "src\\pages\\admin\\core\\dashboard\\components\\AlertsView.tsx",
+        "src\\pages\\admin\\core\\dashboard\\page.tsx",
+        "src\\pages\\admin\\core\\reporting\\components\\ReportBuilder.tsx",
+        "src\\pages\\admin\\core\\reporting\\hooks\\useReportBuilder.ts",
+        "src\\pages\\admin\\core\\reporting\\types\\index.ts",
+        "src\\pages\\admin\\executive\\dashboards\\components\\NaturalLanguageBI.tsx",
+        "src\\pages\\admin\\finance\\billing\\page.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\GalaxyView\\GalaxyView.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\GridView\\GridView.tsx",
+        "src\\pages\\admin\\operations\\assets\\page.tsx",
+        "src\\pages\\admin\\operations\\memberships\\page.tsx",
+        "src\\pages\\admin\\operations\\rentals\\page.tsx",
+        "src\\pages\\admin\\tools\\reporting\\page.tsx",
+        "src\\pages\\setup\\steps\\BusinessModelStep.tsx",
+        "src\\pages\\setup\\steps\\FinishStep.tsx",
+        "src\\shared\\alerts\\AlertsProvider.tsx",
+        "src\\shared\\alerts\\types.ts",
+        "src\\shared\\navigation\\Breadcrumb.tsx",
+        "src\\shared\\navigation\\Header.tsx",
+        "src\\types\\app.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "settings",
+        "name": "Configuración",
+        "domain": "CORE",
+        "category": "always_active"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings",
+        "feature_id: settings"
+      ],
+      "relatedFiles": [
+        "src\\App.tsx",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\routeMap.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\contexts\\AuthContext.tsx",
+        "src\\contexts\\NavigationContext.tsx",
+        "src\\hooks\\useInventoryAlerts.ts",
+        "src\\hooks\\useModuleBadgeSync.ts",
+        "src\\hooks\\useProductCatalog.ts",
+        "src\\hooks\\useRouteBasedPreloading.ts",
+        "src\\lib\\lazy\\LazyModules.ts",
+        "src\\lib\\logging\\Logger.ts",
+        "src\\lib\\offline\\index.ts",
+        "src\\lib\\performance\\codeSplitting.ts",
+        "src\\lib\\performance\\LazyLoadingManager.ts",
+        "src\\modules\\achievements\\manifest.tsx",
+        "src\\modules\\gamification\\hooks\\useGamificationData.ts",
+        "src\\modules\\index.ts",
+        "src\\modules\\scheduling\\components\\AutoSchedulingModal.tsx",
+        "src\\modules\\settings\\manifest.tsx",
+        "src\\pages\\admin\\core\\dashboard\\components\\QuickActionsWidget.tsx",
+        "src\\pages\\admin\\core\\settings\\hooks\\useSettingsPage.ts",
+        "src\\pages\\admin\\core\\settings\\page.tsx",
+        "src\\pages\\admin\\core\\settings\\pages\\business\\page.tsx",
+        "src\\pages\\admin\\core\\settings\\pages\\payment-methods\\page.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\GalaxyView\\GalaxyView.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\GridView\\GridView.tsx",
+        "src\\pages\\admin\\operations\\fulfillment\\pickup\\page.tsx",
+        "src\\pages\\admin\\resources\\staff\\components\\sections\\ManagementSection.tsx",
+        "src\\pages\\admin\\resources\\staff\\components\\sections\\TimeTrackingSection.tsx",
+        "src\\pages\\debug\\theme\\DesignSystemShowcase.tsx",
+        "src\\pages\\setup\\layout\\SetupHeader.tsx",
+        "src\\shared\\alerts\\AlertsProvider.tsx",
+        "src\\shared\\alerts\\types.ts",
+        "src\\shared\\navigation\\Header.tsx",
+        "src\\store\\appStore.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "gamification",
+        "name": "Gamificación",
+        "domain": "ENGAGEMENT",
+        "category": "always_active"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification",
+        "feature_id: gamification"
+      ],
+      "relatedFiles": [
+        "src\\App.tsx",
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\routeMap.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\contexts\\AuthContext.tsx",
+        "src\\hooks\\useModuleBadgeSync.ts",
+        "src\\lib\\achievements\\AchievementNotificationService.ts",
+        "src\\lib\\lazy\\LazyModules.ts",
+        "src\\lib\\modules\\types.ts",
+        "src\\modules\\achievements\\components\\AchievementsWidget.tsx",
+        "src\\modules\\achievements\\components\\AchievementsWidgetPlaceholder.tsx",
+        "src\\modules\\achievements\\components\\CapabilityProgressCard.tsx",
+        "src\\modules\\achievements\\components\\SetupRequiredModal.tsx",
+        "src\\modules\\achievements\\manifest.tsx",
+        "src\\modules\\gamification\\components\\AchievementNotificationsInit.tsx",
+        "src\\modules\\gamification\\components\\GamificationWidget.tsx",
+        "src\\modules\\gamification\\hooks\\index.ts",
+        "src\\modules\\gamification\\hooks\\useGamificationData.ts",
+        "src\\modules\\gamification\\manifest.tsx",
+        "src\\modules\\index.ts",
+        "src\\pages\\admin\\core\\dashboard\\components\\AchievementsWidget.tsx",
+        "src\\pages\\admin\\core\\dashboard\\components\\CrossModuleInsights.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\AchievementCard.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\ConstellationView.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\CosmicBackground\\CosmicBackground.optimized.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\CosmicBackground\\CosmicBackground.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\CosmicBackground\\index.ts",
+        "src\\pages\\admin\\gamification\\achievements\\components\\FoundationalProgress\\FoundationalProgress.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\FoundationalProgress\\index.ts",
+        "src\\pages\\admin\\gamification\\achievements\\components\\GalaxyView\\GalaxyView.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\GalaxyView\\index.ts",
+        "src\\pages\\admin\\gamification\\achievements\\components\\GridView\\GridView.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\components\\GridView\\index.ts",
+        "src\\pages\\admin\\gamification\\achievements\\components\\index.ts",
+        "src\\pages\\admin\\gamification\\achievements\\components\\OnboardingGuide.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\hooks\\index.ts",
+        "src\\pages\\admin\\gamification\\achievements\\hooks\\useAchievements.ts",
+        "src\\pages\\admin\\gamification\\achievements\\hooks\\useAchievementsPage.ts",
+        "src\\pages\\admin\\gamification\\achievements\\index.ts",
+        "src\\pages\\admin\\gamification\\achievements\\page-backup.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\page-cosmic-backup.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\page-requirements.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\page-simple.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\page.tsx",
+        "src\\pages\\admin\\gamification\\achievements\\types\\index.ts",
+        "src\\pages\\admin\\gamification\\page.tsx",
+        "src\\shared\\alerts\\AlertsProvider.tsx",
+        "src\\shared\\alerts\\types.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "debug",
+        "name": "Herramientas de Debug",
+        "domain": "DEV",
+        "category": "always_active"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug",
+        "feature_id: debug"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\PermissionsRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\contexts\\AuthContext.tsx",
+        "src\\hooks\\useModuleBadgeSync.ts",
+        "src\\hooks\\useNavigationDebugger.ts",
+        "src\\lib\\events\\utils\\SecureLogger.ts",
+        "src\\lib\\logging\\ConsoleHelper.ts",
+        "src\\lib\\logging\\Logger.ts",
+        "src\\lib\\modules\\types.ts",
+        "src\\lib\\modules\\useModuleNavigation.ts",
+        "src\\modules\\debug\\manifest.tsx",
+        "src\\pages\\admin\\debug\\page.tsx",
+        "src\\shared\\alerts\\AlertsProvider.tsx",
+        "src\\shared\\alerts\\types.ts",
+        "src\\shared\\navigation\\Sidebar.tsx"
+      ]
+    },
+    {
+      "feature": {
+        "id": "executive",
+        "name": "Dashboard Ejecutivo",
+        "domain": "ANALYTICS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive",
+        "feature_id: executive"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\routeMap.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\contexts\\AuthContext.tsx",
+        "src\\hooks\\useModuleBadgeSync.ts",
+        "src\\lib\\lazy\\LazyModules.ts",
+        "src\\lib\\performance\\codeSplitting.ts",
+        "src\\modules\\executive\\manifest.tsx",
+        "src\\modules\\executive\\widgets\\index.ts",
+        "src\\modules\\executive\\widgets\\InventoryInsight.tsx",
+        "src\\modules\\executive\\widgets\\PremiumCustomersInsight.tsx",
+        "src\\pages\\admin\\executive\\dashboards\\components\\AdvancedVisualization.tsx",
+        "src\\pages\\admin\\executive\\dashboards\\components\\ExecutiveDashboard.tsx",
+        "src\\pages\\admin\\executive\\dashboards\\components\\ExternalDataIntegration.tsx",
+        "src\\pages\\admin\\executive\\dashboards\\components\\NaturalLanguageBI.tsx",
+        "src\\pages\\admin\\executive\\dashboards\\page.tsx",
+        "src\\pages\\admin\\tools\\reporting\\components\\ReportingAnalyticsEnhanced.tsx",
+        "src\\pages\\admin\\tools\\reporting\\components\\ReportingFormEnhanced.tsx",
+        "src\\shared\\alerts\\AlertsProvider.tsx",
+        "src\\shared\\alerts\\types.ts",
+        "src\\shared\\events\\ModuleEventBus.ts"
+      ]
+    },
+    {
+      "feature": {
+        "id": "can_view_menu_engineering",
+        "name": "Ver Ingeniería de Menú",
+        "domain": "ANALYTICS",
+        "category": "conditional"
+      },
+      "status": "IMPLEMENTED",
+      "confidence": 0.9,
+      "evidence": [
+        "feature_id: can_view_menu_engineering",
+        "feature_id: can_view_menu_engineering",
+        "feature_id: can_view_menu_engineering"
+      ],
+      "relatedFiles": [
+        "src\\config\\FeatureRegistry.ts",
+        "src\\config\\types\\atomic-capabilities.ts",
+        "src\\modules\\products\\analytics\\manifest.tsx"
+      ]
+    }
+  ]
+}

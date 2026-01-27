@@ -1,6 +1,6 @@
 import { type ItemFormData, type MeasurableUnit } from '@/pages/admin/supply-chain/materials/types';
 import { InventoryDecimal } from '@/config/decimal-config';
-import { safeDecimal } from '@/business-logic/shared/decimalUtils';
+import { safeDecimal } from '@/lib/decimal';
 
 /**
  * Utility functions for material form calculations

@@ -20,7 +20,7 @@ import type {
   StaffAllocation,
   OverheadConfig
 } from '../types/productForm';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 // ============================================
 // MAIN COST CALCULATION
@@ -132,9 +132,13 @@ export function calculateMaterialsCost(
 // ============================================
 
 /**
- * Calcula el costo de mano de obra
+ * Calcula el costo de mano de obra (versión síncrona básica)
  *
  * Formula: (duration_minutes / 60) × hourly_rate × count
+ * 
+ * NOTE: Esta es la versión simple que usa rates pre-cargados.
+ * Para cálculos con loaded factors y jerarquía de rates,
+ * usar calculateLaborCostWithLoadedFactors()
  *
  * @example
  * ```ts
@@ -152,9 +156,12 @@ export function calculateLaborCost(
   }
 
   // ✅ PRECISION FIX: Use RecipeDecimal for labor cost calculations
+  // Note: This is a simplified calculation. For full loaded_factor support,
+  // use calculateLaborCostWithLoadedFactors() which resolves rates from staff_roles
   const totalDec = staff_allocation.reduce((sumDec, allocation) => {
     const durationMinutes = allocation.duration_minutes || 0;
-    const rate = allocation.hourly_rate || 0;
+    // Support both old hourly_rate and new hourly_rate_override
+    const rate = allocation.hourly_rate_override ?? allocation.effective_hourly_rate ?? 0;
     const count = allocation.count || 1;
 
     // Convert minutes to hours: hours = duration / 60
@@ -181,6 +188,76 @@ export function calculateLaborCost(
   }, DecimalUtils.fromValue(0, 'recipe'));
 
   return totalDec.toNumber();
+}
+
+/**
+ * Calcula el costo de mano de obra con loaded factors (versión async completa)
+ * 
+ * Esta versión:
+ * - Resuelve hourly rates desde staff_roles si no se proveen
+ * - Aplica loaded factors según jerarquía (allocation → role → org → system)
+ * - Soporta asignación de empleados específicos
+ * - Retorna breakdown detallado
+ *
+ * @see docs/product/COSTING_ARCHITECTURE.md (Section 5)
+ *
+ * @example
+ * ```ts
+ * const result = await calculateLaborCostWithLoadedFactors([
+ *   { role_id: 'uuid-cocinero', duration_minutes: 10, count: 1 },
+ *   { role_id: 'uuid-ayudante', duration_minutes: 5, count: 2 },
+ * ]);
+ * // Returns: { total_cost: 5.42, total_hours: 0.33, breakdown: [...] }
+ * ```
+ */
+export async function calculateLaborCostWithLoadedFactors(
+  staff_allocation: StaffAllocation[]
+): Promise<{
+  total_cost: number;
+  total_hours: number;
+  breakdown: Array<{
+    role_name: string;
+    hours: number;
+    hourly_rate: number;
+    loaded_factor: number;
+    loaded_hourly_cost: number;
+    cost: number;
+  }>;
+}> {
+  if (!staff_allocation || staff_allocation.length === 0) {
+    return { total_cost: 0, total_hours: 0, breakdown: [] };
+  }
+
+  // Dynamically import to avoid circular dependencies
+  const { calculateLaborCost: calculateWithFactors } = await import(
+    '@/pages/admin/resources/team/services/laborCostCalculation'
+  );
+
+  // Map to the expected format
+  const allocations = staff_allocation.map(alloc => ({
+    product_id: '', // Not needed for calculation
+    role_id: alloc.role_id,
+    employee_id: alloc.employee_id,
+    duration_minutes: alloc.duration_minutes,
+    count: alloc.count || 1,
+    hourly_rate: alloc.hourly_rate_override ?? alloc.effective_hourly_rate,
+    loaded_factor_override: alloc.loaded_factor_override,
+  }));
+
+  const result = await calculateWithFactors(allocations);
+
+  return {
+    total_cost: result.total_cost,
+    total_hours: result.total_hours,
+    breakdown: result.breakdown.map(item => ({
+      role_name: item.role_name,
+      hours: item.hours,
+      hourly_rate: item.hourly_rate,
+      loaded_factor: item.loaded_factor,
+      loaded_hourly_cost: item.loaded_hourly_cost,
+      cost: item.cost,
+    })),
+  };
 }
 
 // ============================================
@@ -252,6 +329,8 @@ export function calculateProductionOverhead(
 /**
  * Convierte minutos a horas
  *
+ * ✅ PRECISION: Uses RecipeDecimal for time conversions
+ *
  * @example
  * ```ts
  * convertTimeToHours(90)
@@ -259,11 +338,18 @@ export function calculateProductionOverhead(
  * ```
  */
 export function convertTimeToHours(minutes: number): number {
-  return minutes / 60;
+  const hoursDec = DecimalUtils.divide(
+    minutes.toString(),
+    '60',
+    'recipe'
+  );
+  return hoursDec.toNumber();
 }
 
 /**
  * Convierte horas a minutos
+ *
+ * ✅ PRECISION: Uses RecipeDecimal for time conversions
  *
  * @example
  * ```ts
@@ -272,7 +358,12 @@ export function convertTimeToHours(minutes: number): number {
  * ```
  */
 export function convertTimeToMinutes(hours: number): number {
-  return hours * 60;
+  const minutesDec = DecimalUtils.multiply(
+    hours.toString(),
+    '60',
+    'recipe'
+  );
+  return minutesDec.toNumber();
 }
 
 // ============================================
@@ -358,6 +449,8 @@ export function suggestPrice(cost: number, marginPercentage: number): number {
 /**
  * Sugiere un precio basado en costo y markup deseado
  *
+ * ✅ PRECISION: Uses FinancialDecimal for pricing calculations
+ *
  * @example
  * ```ts
  * suggestPriceFromMarkup(100, 50)  // 50% markup
@@ -365,7 +458,14 @@ export function suggestPrice(cost: number, marginPercentage: number): number {
  * ```
  */
 export function suggestPriceFromMarkup(cost: number, markupPercentage: number): number {
-  return cost * (1 + markupPercentage / 100);
+  const costDec = DecimalUtils.fromValue(cost, 'financial');
+  const markupDec = DecimalUtils.fromValue(markupPercentage, 'financial');
+
+  const markupFractionDec = DecimalUtils.divide(markupDec, '100', 'financial');
+  const multiplierDec = DecimalUtils.add('1', markupFractionDec, 'financial');
+  const priceDec = DecimalUtils.multiply(costDec, multiplierDec, 'financial');
+
+  return priceDec.toNumber();
 }
 
 // ============================================

@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react';
+// ✅ PERFORMANCE: React.memo (Phase 2 Round 2)
+import { useState, useCallback, memo, useMemo } from 'react';
+import { useDebounce } from '@/hooks';
 import {
   Box,
   Stack,
@@ -9,8 +11,13 @@ import {
 import { InputField } from '@/shared/ui';
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
+// ⚡ PERFORMANCE: Hoist inline icon styles to module constants
+const ERROR_ICON_STYLE = { width: '16px', height: '16px', color: 'var(--colors-red-500)' } as const;
+const WARNING_ICON_STYLE = { width: '16px', height: '16px', color: 'var(--colors-orange-500)' } as const;
+const SUCCESS_ICON_STYLE = { width: '16px', height: '16px', color: 'var(--colors-green-500)' } as const;
+
 interface ValidatedFieldProps {
-  label: string;
+  label: React.ReactNode;
   value: string;
   onChange: (value: string) => void;
   onValidate?: (field: string, value: string) => void;
@@ -21,9 +28,10 @@ interface ValidatedFieldProps {
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
+  validateOnChange?: boolean; // NEW: Control validation trigger
 }
 
-export const ValidatedField = ({
+export const ValidatedField = memo<ValidatedFieldProps>(function ValidatedField({
   label,
   value,
   onChange,
@@ -34,33 +42,55 @@ export const ValidatedField = ({
   isValidating = false,
   placeholder,
   required = false,
-  disabled = false
-}: ValidatedFieldProps) => {
+  disabled = false,
+  validateOnChange = false, // ⚡ DEFAULT: Only validate on blur for better performance
+  "data-testid": dataTestId
+}: ValidatedFieldProps & { "data-testid"?: string }) {
   const [isFocused, setIsFocused] = useState(false);
+
+  // ⚡ PERFORMANCE: Debounce validation if validateOnChange is true
+  const debouncedValidate = useDebounce((fieldName: string, fieldValue: string) => {
+    if (onValidate) {
+      onValidate(fieldName, fieldValue);
+    }
+  }, 300);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     onChange(newValue);
-    if (onValidate) {
-      onValidate(field, newValue);
+    
+    // ⚡ PERFORMANCE: Only validate on change if explicitly enabled
+    if (validateOnChange && onValidate) {
+      debouncedValidate(field, newValue);
     }
-  }, [onChange, onValidate, field]);
+  }, [onChange, validateOnChange, onValidate, field, debouncedValidate]);
 
-  const getValidationIcon = () => {
+  // ⚡ PERFORMANCE: Validate on blur for better UX and performance
+  const handleBlur = useCallback(() => {
+    setIsFocused(false);
+    
+    // Always validate on blur (best practice)
+    if (onValidate && value) {
+      onValidate(field, value);
+    }
+  }, [onValidate, field, value]);
+
+  // ⚡ PERFORMANCE: Memoize validation icon to avoid recreating on every render
+  const validationIcon = useMemo(() => {
     if (isValidating) {
       return <Spinner size="xs" color="blue.500" />;
     }
     if (error) {
-      return <ExclamationTriangleIcon style={{ width: '16px', height: '16px', color: 'var(--colors-red-500)' }} />;
+      return <ExclamationTriangleIcon style={ERROR_ICON_STYLE} />;
     }
     if (warning) {
-      return <ExclamationTriangleIcon style={{ width: '16px', height: '16px', color: 'var(--colors-orange-500)' }} />;
+      return <ExclamationTriangleIcon style={WARNING_ICON_STYLE} />;
     }
     if (value && !error && !warning) {
-      return <CheckCircleIcon style={{ width: '16px', height: '16px', color: 'var(--colors-green-500)' }} />;
+      return <CheckCircleIcon style={SUCCESS_ICON_STYLE} />;
     }
     return null;
-  };
+  }, [isValidating, error, warning, value]);
 
   const getBorderColor = () => {
     if (error) return 'red.500';
@@ -81,9 +111,10 @@ export const ValidatedField = ({
           value={value}
           onChange={handleChange}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onBlur={handleBlur}
           placeholder={placeholder}
           disabled={disabled}
+          data-testid={dataTestId}
           height="44px"
           fontSize="md"
           px="3"
@@ -109,7 +140,7 @@ export const ValidatedField = ({
           justify="center"
           pointerEvents="none"
         >
-          {getValidationIcon()}
+          {validationIcon}
         </Flex>
       </Box>
 
@@ -128,4 +159,6 @@ export const ValidatedField = ({
       )}
     </Stack>
   );
-};
+});
+
+ValidatedField.displayName = 'ValidatedField';;

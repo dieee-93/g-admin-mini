@@ -24,7 +24,6 @@ export { Dialog as DialogHelpers } from './helpers';
 
 // ===== LAYER 2: LAYOUT COMPONENTS =====
 // Combines Layer 3 semantics with visual styling
-export { Layout } from './Layout';
 export { ContentLayout } from './ContentLayout';
 export { Section } from './Section';
 export { FormSection } from './FormSection';

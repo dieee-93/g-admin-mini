@@ -1,0 +1,52 @@
+- generic [ref=e2]:
+  - generic [ref=e116]:
+    - generic [ref=e118]:
+      - img [ref=e121]
+      - paragraph [ref=e124]: G-Admin Mini
+    - generic [ref=e126]:
+      - link "Volver al inicio" [ref=e128] [cursor=pointer]:
+        - /url: /
+        - img [ref=e129]
+        - text: Volver al inicio
+      - generic [ref=e132]:
+        - generic [ref=e134]:
+          - img [ref=e136]
+          - generic [ref=e138]:
+            - paragraph [ref=e139]: ¡Bienvenido de vuelta!
+            - paragraph [ref=e140]: Inicia sesión para hacer tu pedido favorito
+        - generic [ref=e143]:
+          - generic [ref=e144]:
+            - group [ref=e145]:
+              - generic [ref=e146]:
+                - text: Tu Email
+                - generic [ref=e147]: "*"
+              - textbox "Tu Email *" [ref=e148]:
+                - /placeholder: tu@email.com
+            - generic [ref=e149]:
+              - group [ref=e150]:
+                - generic [ref=e151]:
+                  - text: Tu Contraseña
+                  - generic [ref=e152]: "*"
+                - textbox "Tu Contraseña *" [ref=e153]:
+                  - /placeholder: ••••••••
+              - button "Mostrar contraseña" [ref=e155] [cursor=pointer]:
+                - img [ref=e156]
+          - button "Iniciar Sesión" [disabled] [ref=e159]:
+            - generic [ref=e160]:
+              - img [ref=e161]
+              - paragraph [ref=e163]: Iniciar Sesión
+        - generic [ref=e165]:
+          - generic [ref=e166]:
+            - paragraph [ref=e167]: ¿Primera vez en La Gigante?
+            - button "Crear Cuenta Nueva" [ref=e168] [cursor=pointer]
+          - generic [ref=e169]:
+            - paragraph [ref=e170]: ¿Problemas para acceder?
+            - button "Ayuda" [ref=e171] [cursor=pointer]
+          - generic [ref=e172]:
+            - paragraph [ref=e173]: 🍕
+            - paragraph [ref=e174]: Protegido y seguro
+            - paragraph [ref=e175]: 🔒
+  - generic [ref=e17]:
+    - img [ref=e19]
+    - button "Open Tanstack query devtools" [ref=e67] [cursor=pointer]:
+      - img [ref=e68]

@@ -13,18 +13,14 @@
  */
 
 import React from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { Box, Stack, Typography, Icon, Badge } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { UserGroupIcon, StarIcon } from '@heroicons/react/24/outline';
-import { useCustomersStore } from '@/store/customersStore';
+import { useCustomerStats } from '@/modules/customers/hooks';
 
 export function CustomersWidget() {
-  // ✅ Usar useShallow de Zustand v5 para evitar loop infinito
-  const { stats, loading } = useCustomersStore(useShallow(state => ({
-    stats: state.stats,
-    loading: state.loading
-  })));
+  // ✅ Use TanStack Query hook for server state (MIGRATED)
+  const { data: stats, isLoading: loading } = useCustomerStats();
 
   const totalCustomers = stats?.totalCustomers || 0;
   const activeCustomers = stats?.activeCustomers || 0;

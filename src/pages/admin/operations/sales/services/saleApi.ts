@@ -11,10 +11,14 @@ import {
   type SalesSummary
 } from '../types';
 import { EventBus } from '@/lib/events';
+import { logger } from '@/lib/logging/Logger';
 
 // 🔒 PERMISSIONS: Service layer validation
 import { requirePermission, requireModuleAccess } from '@/lib/permissions';
 import type { AuthUser } from '@/contexts/AuthContext';
+
+// 🏗️ CROSS-MODULE: Import CustomerAPI from CRM module (proper architecture)
+import { CustomerAPI } from '@/pages/admin/core/crm/customers/services/customerApi';
 
 // Event payload type for sale completion
 interface SaleCompletedEvent {
@@ -38,9 +42,46 @@ interface SaleCompletedEvent {
   }>;
   timestamp: string;
 }
-import { taxService } from './taxCalculationService';
+
+// 🏗️ CROSS-MODULE: Import tax service from Cash module (proper modular architecture)
+import { taxService } from '@/modules/cash/services';
 import { errorHandler, createNetworkError, createBusinessError } from '@/lib/error-handling';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
+
+// ===== HELPER FUNCTIONS =====
+
+/**
+ * 🏗️ CROSS-MODULE: Enrich sales with customer data using CustomerAPI
+ * This follows proper modular architecture - Sales module doesn't directly JOIN customers table
+ */
+async function enrichSalesWithCustomers(sales: Sale[]): Promise<Sale[]> {
+  if (!sales.length) return sales;
+
+  // Extract unique customer IDs
+  const customerIds = [...new Set(
+    sales
+      .map(sale => sale.customer_id)
+      .filter((id): id is string => id != null)
+  )];
+
+  if (!customerIds.length) return sales;
+
+  try {
+    // 🏗️ Use CustomerAPI instead of direct DB query (proper cross-module communication)
+    const customers = await CustomerAPI.getCustomers(undefined);
+    const customerMap = new Map(customers.map(c => [c.id, c]));
+
+    // Enrich sales with customer data
+    return sales.map(sale => ({
+      ...sale,
+      customer: sale.customer_id ? customerMap.get(sale.customer_id) : undefined
+    }));
+  } catch (error) {
+    logger.error('SalesAPI', 'Failed to enrich sales with customer data', error);
+    // Return sales without customer data rather than failing completely
+    return sales;
+  }
+}
 
 // ===== CRUD BÁSICO DE VENTAS =====
 
@@ -51,11 +92,12 @@ export async function fetchSales(filters?: SalesListFilters, user?: AuthUser | n
   }
 
   try {
+    // 🏗️ ARCHITECTURE FIX: Query sales WITHOUT customer JOIN
+    // Customer data will be loaded via CustomerAPI (proper cross-module pattern)
     let query = supabase
       .from('sales')
       .select(`
         *,
-        customer:customers(id, name, phone, email, address),
         sale_items(
           id,
           product_id,
@@ -97,13 +139,15 @@ export async function fetchSales(filters?: SalesListFilters, user?: AuthUser | n
     }
 
     const { data, error } = await query;
-    
+
     if (error) {
       errorHandler.handle(createNetworkError(`Error fetching sales: ${error.message}`, { error, filters }));
       throw error;
     }
-    
-    return data || [];
+
+    // 🏗️ CROSS-MODULE: Enrich with customer data using CustomerAPI
+    const enrichedSales = await enrichSalesWithCustomers(data || []);
+    return enrichedSales;
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'fetchSales', filters });
     throw error;
@@ -112,11 +156,11 @@ export async function fetchSales(filters?: SalesListFilters, user?: AuthUser | n
 
 export async function fetchSaleById(id: string): Promise<Sale> {
   try {
+    // 🏗️ ARCHITECTURE FIX: Query sale WITHOUT customer JOIN
     const { data, error } = await supabase
       .from('sales')
       .select(`
         *,
-        customer:customers(id, name, phone, email, address),
         sale_items(
           id,
           product_id,
@@ -128,15 +172,20 @@ export async function fetchSaleById(id: string): Promise<Sale> {
       `)
       .eq('id', id)
       .single();
-    
+
     if (error) {
-      errorHandler.handle(createNetworkError(`Error fetching sale by ID: ${error.message}`, { error, saleId: id }));
+      logger.error('Sales', `Error fetching sale by ID: ${error.message}`, { error, saleId: id });
       throw error;
     }
-    
-    return data;
+
+    // 🏗️ CROSS-MODULE: Enrich with customer data using CustomerAPI
+    const [enrichedSale] = await enrichSalesWithCustomers([data]);
+    return enrichedSale;
   } catch (error) {
-    errorHandler.handle(error as Error, { operation: 'fetchSaleById', saleId: id });
+    // Only log if not already logged (avoid double logging)
+    if (!(error instanceof Error) || !error.message.includes('subcomponent')) {
+      logger.error('Sales', `fetchSaleById failed: ${(error as Error).message}`, { saleId: id });
+    }
     throw error;
   }
 }
@@ -155,10 +204,10 @@ export async function deleteSale(id: string): Promise<void> {
 
 export async function validateSaleStock(items: { product_id: string; quantity: number }[]): Promise<SaleValidation> {
   const { data, error } = await supabase
-    .rpc('validate_sale_stock', { 
+    .rpc('validate_sale_stock', {
       items_array: JSON.stringify(items)
-    });
-  
+    } as any);
+
   if (error) throw error;
   return data;
 }
@@ -168,8 +217,8 @@ export async function getSalesSummary(dateFrom: string, dateTo: string): Promise
     .rpc('get_sales_summary', {
       date_from: dateFrom,
       date_to: dateTo
-    });
-  
+    } as any);
+
   if (error) throw error;
   return data;
 }
@@ -181,18 +230,60 @@ export async function fetchCustomers(): Promise<Customer[]> {
     .from('customers')
     .select('*')
     .order('name', { ascending: true });
-  
+
   if (error) throw error;
   return data || [];
 }
 
 export async function fetchProductsWithAvailability(): Promise<Product[]> {
-  // ✅ Usar la función normalizada de Supabase
-  const { data, error } = await supabase
-    .rpc('get_products_with_availability');
+  try {
+    // 🔍 Direct query to products table instead of broken RPC
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('is_active', true) // Only active products
+      .order('name');
 
-  if (error) throw error;
-  return data || [];
+    if (error) {
+      logger.error('Sales', '❌ Error fetching products:', error);
+      throw error;
+    }
+
+    if (!data) return [];
+
+    // 🔄 Map database fields to Product interface
+    return data.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      // Map category
+      category_id: item.category,
+      type: item.category, // Backward compatibility
+
+      // Map pricing from JSONB
+      cost: item.pricing?.base_cost || item.cost || 0,
+      price: item.pricing?.price || item.price || 0,
+      profit_margin: item.pricing?.profit_margin || 0,
+
+      // Map availability from JSONB
+      availability: item.availability?.can_produce_quantity || 0,
+      is_available: item.availability?.status === 'available' || item.availability?.status === 'low_stock',
+
+      // Other fields
+      allergens: item.allergens || [],
+      preparation_time: item.preparation_time,
+      kitchen_station: item.kitchen_station,
+      popularity_score: item.popularity_score || 0,
+      image_url: item.image_url,
+
+      // Timestamps
+      created_at: item.created_at,
+      updated_at: item.updated_at
+    })) as Product[];
+  } catch (err) {
+    logger.error('Sales', '❌ Failed to fetch products with availability', err);
+    throw err;
+  }
 }
 
 // ===== TRANSACCIONES Y ÓRDENES =====
@@ -226,7 +317,7 @@ export async function fetchTransactions(period: string = 'today'): Promise<Sale[
 
     return await fetchSales({ dateFrom });
   } catch (error) {
-    errorHandler.handle(error as Error, { operation: 'fetchTransactions', period });
+    logger.error('Sales', `fetchTransactions failed for period ${period}`, error);
     throw error;
   }
 }
@@ -323,7 +414,8 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
     if (!stockValidation.is_valid) {
       return {
         success: false,
-        sale: null,
+        sale: undefined,
+        message: 'Stock check failed',
         error: 'Stock insuficiente para algunos productos',
         validation: stockValidation
       };
@@ -341,7 +433,7 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
     }, DecimalUtils.fromValue(0, 'financial'));
 
     const subtotal = subtotalDec.toNumber();
-    const taxResult = taxService.calculateTaxes(subtotal, saleData.tax_rate || 0.21);
+    const taxResult = taxService.calculateTaxesForAmount(subtotal, { ivaRate: saleData.tax_rate || 0.21 });
 
     // Preparar datos de venta con location_id
     const saleToCreate = {
@@ -352,7 +444,7 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
       tax_amount: taxResult.taxAmount,
       tax_rate: taxResult.taxRate,
       payment_method: saleData.payment_method || 'cash',
-      notes: saleData.notes || saleData.note || '',
+      notes: saleData.note || '',
       created_at: new Date().toISOString()
     };
 
@@ -361,13 +453,14 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
       .rpc('process_complete_sale', {
         sale_data: JSON.stringify(saleToCreate),
         items_data: JSON.stringify(saleData.items)
-      });
+      } as any);
 
     if (error) {
       errorHandler.handle(createBusinessError(`Error procesando venta: ${error.message}`, { error, saleData }));
       return {
         success: false,
-        sale: null,
+        sale: undefined,
+        message: error.message,
         error: error.message,
         validation: stockValidation
       };
@@ -377,8 +470,17 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
     const saleEvent: SaleCompletedEvent = {
       saleId: processedSale.id,
       customerId: saleData.customer_id,
-      total: taxResult.total,
-      items: saleData.items,
+      customerId: saleData.customer_id,
+      totalAmount: taxResult.totalAmount,
+      subtotal: taxResult.subtotal,
+      taxes: taxResult.totalTaxes,
+      paymentMethods: saleData.payment_methods || [],
+      items: saleData.items.map(item => ({
+        productId: item.product_id,
+        quantity: item.quantity,
+        unitPrice: item.unit_price,
+        totalPrice: item.quantity * item.unit_price
+      })),
       timestamp: new Date().toISOString()
     };
 

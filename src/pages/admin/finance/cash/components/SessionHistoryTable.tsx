@@ -4,7 +4,7 @@
  */
 
 import { Box, Heading, Stack, Table, Text, Badge } from '@chakra-ui/react';
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency } from '@/lib/decimal';
 import type { SessionHistoryReport, SessionHistoryRow } from '@/modules/cash/types/reports';
 import { Button } from '@/shared/ui';
 

@@ -24,9 +24,9 @@ const defaultMetrics: KPIMetric[] = [
   { label: 'Avg Order', value: '$85.86', change: 0, trend: 'stable', color: 'gray' }
 ];
 
-export default function KPIChart({ 
+export default function KPIChart({
   metrics = defaultMetrics,
-  title = "Key Performance Indicators" 
+  title = "Key Performance Indicators"
 }: KPIChartProps) {
   const getTrendIcon = (trend: string) => {
     switch (trend) {
@@ -50,7 +50,7 @@ export default function KPIChart({
             <Box
               key={index}
               p="4"
-              bg="bg.canvas"
+              bg="gray.50"
               borderRadius="md"
               textAlign="center"
             >
@@ -62,7 +62,7 @@ export default function KPIChart({
                   {metric.value}
                 </Text>
                 {metric.change !== undefined && (
-                  <Badge 
+                  <Badge
                     colorPalette={metric.trend === 'up' ? 'green' : metric.trend === 'down' ? 'red' : 'gray'}
                     variant="subtle"
                     size="sm"

@@ -7,7 +7,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
-import { useInventoryTransferValidation } from '@/hooks/useInventoryTransferValidation';
+import { useInventoryTransferValidation } from '@/modules/materials';
 import type { InventoryTransferFormData } from '@/lib/validation/zod/CommonSchemas';
 
 export interface InventoryTransfer {
@@ -87,13 +87,13 @@ export function useInventoryTransferForm({
 
     const transferUrgency: 'urgent' | 'normal' | 'low' =
       status === 'pending' ? 'urgent' :
-      status === 'in_transit' ? 'normal' :
-      'low';
+        status === 'in_transit' ? 'normal' :
+          'low';
 
     const transferRisk: 'high' | 'medium' | 'low' =
       isLargeQuantity && !notes ? 'high' :
-      isLargeQuantity || !reason ? 'medium' :
-      'low';
+        isLargeQuantity || !reason ? 'medium' :
+          'low';
 
     return {
       isLargeQuantity,

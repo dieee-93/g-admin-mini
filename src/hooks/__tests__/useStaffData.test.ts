@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useStaffData, useStaffDataRange, useStaffWithLoader, usePerformanceAnalytics } from '../useStaffData';
-import { useStaffStore } from '../../../store/staffStore';
+import { useTeamStore } from '../../../store/staffStore';
 
 // Mock the staff store
 const mockStaffStore = {
@@ -26,7 +26,7 @@ const mockStaffStore = {
   }))
 };
 
-vi.mocked(useStaffStore).mockReturnValue(mockStaffStore);
+vi.mocked(useTeamStore).mockReturnValue(mockStaffStore);
 
 // Mock the staff API
 vi.mock('../../../services/staff/staffApi', () => ({

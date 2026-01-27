@@ -48,7 +48,7 @@ export function PerformanceDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  
+
   // Performance data
   const [lazyLoadingMetrics, setLazyLoadingMetrics] = useState(getPerformanceMetrics());
   const [bundleAnalysis, setBundleAnalysis] = useState<any>(null);
@@ -78,7 +78,7 @@ export function PerformanceDashboard() {
     setLazyLoadingMetrics(getPerformanceMetrics());
     setChunkStats(getChunkLoadStats());
     setRuntimeMetrics(bundleOptimizer.monitorRuntimePerformance());
-    
+
     try {
       const bundleData = await analyzeBundleSize();
       setBundleAnalysis(bundleData);
@@ -90,16 +90,16 @@ export function PerformanceDashboard() {
   // Performance score calculation
   const performanceScore = useMemo(() => {
     let score = 100;
-    
+
     // Lazy loading performance
     if (lazyLoadingMetrics.averageLoadTime > 2000) score -= 20;
     if (lazyLoadingMetrics.errorRate > 0.1) score -= 30;
     if (lazyLoadingMetrics.cacheHitRate < 0.8) score -= 15;
-    
+
     // Runtime performance
     if (runtimeMetrics.memoryUsage > 50 * 1024 * 1024) score -= 15; // >50MB
     if (runtimeMetrics.renderTime > 3000) score -= 20; // >3s
-    
+
     return Math.max(0, score);
   }, [lazyLoadingMetrics, runtimeMetrics]);
 
@@ -170,9 +170,9 @@ export function PerformanceDashboard() {
               <Icon icon={ArrowPathIcon} size="sm" />
               {autoRefresh ? 'Auto ON' : 'Auto OFF'}
             </Button>
-            
+
             <Button
-              variant="outline" 
+              variant="outline"
               size="sm"
               onClick={refreshData}
             >
@@ -182,7 +182,7 @@ export function PerformanceDashboard() {
 
             <Button
               colorPalette="blue"
-              size="sm" 
+              size="sm"
               onClick={exportReport}
             >
               <Icon icon={DocumentArrowDownIcon} size="sm" />
@@ -192,7 +192,7 @@ export function PerformanceDashboard() {
         </HStack>
 
         {/* Performance Score Overview */}
-        <CardWrapper p="4" bg="bg.canvas">
+        <CardWrapper p="4" bg="gray.50">
           <HStack justify="space-between" align="center">
             <VStack align="start" gap="1">
               <Text fontSize="lg" fontWeight="semibold">
@@ -204,26 +204,26 @@ export function PerformanceDashboard() {
             </VStack>
 
             <VStack align="end" gap="2">
-              <Text 
-                fontSize="3xl" 
-                fontWeight="bold" 
+              <Text
+                fontSize="3xl"
+                fontWeight="bold"
                 color={`${getScoreColor(performanceScore)}.500`}
               >
                 {performanceScore}
               </Text>
-              <Badge 
+              <Badge
                 colorPalette={getScoreColor(performanceScore)}
                 size="sm"
               >
-                {performanceScore >= 85 ? 'Excellent' : 
-                 performanceScore >= 70 ? 'Good' : 
-                 performanceScore >= 50 ? 'Fair' : 'Poor'}
+                {performanceScore >= 85 ? 'Excellent' :
+                  performanceScore >= 70 ? 'Good' :
+                    performanceScore >= 50 ? 'Fair' : 'Poor'}
               </Badge>
             </VStack>
           </HStack>
-          
-          <Progress.Root 
-            value={performanceScore} 
+
+          <Progress.Root
+            value={performanceScore}
             colorPalette={getScoreColor(performanceScore)}
             size="lg"
             mt="4"
@@ -399,7 +399,7 @@ export function PerformanceDashboard() {
                   <Box maxH="300px" overflowY="auto">
                     <VStack gap="2" align="stretch">
                       {lazyLoadingManager.getLoadingStats().slice(-10).map((stat, index) => (
-                        <HStack key={index} justify="space-between" p="2" bg="bg.canvas" borderRadius="md">
+                        <HStack key={index} justify="space-between" p="2" bg="gray.50" borderRadius="md">
                           <Text fontSize="sm" fontWeight="medium">
                             {stat.module}
                           </Text>
@@ -407,7 +407,7 @@ export function PerformanceDashboard() {
                             <Text fontSize="xs" color="gray.600">
                               {formatTime(stat.loadTime)}
                             </Text>
-                            <Badge 
+                            <Badge
                               colorPalette={stat.success ? 'green' : 'red'}
                               size="xs"
                             >
@@ -489,7 +489,7 @@ export function PerformanceDashboard() {
                         <Text fontWeight="semibold">Largest Modules</Text>
                         <VStack gap="2" align="stretch">
                           {bundleAnalysis.largestModules.slice(0, 5).map((module: any, index: number) => (
-                            <HStack key={index} justify="space-between" p="2" bg="bg.canvas" borderRadius="md">
+                            <HStack key={index} justify="space-between" p="2" bg="gray.50" borderRadius="md">
                               <Text fontSize="sm" fontWeight="medium">
                                 {module.name}
                               </Text>
@@ -582,7 +582,7 @@ export function PerformanceDashboard() {
                   </Alert.Indicator>
                   <Alert.Title>High Memory Usage</Alert.Title>
                   <Alert.Description>
-                    Current memory usage ({formatBytes(runtimeMetrics.memoryUsage)}) is above recommended threshold. 
+                    Current memory usage ({formatBytes(runtimeMetrics.memoryUsage)}) is above recommended threshold.
                     Consider implementing memory optimization strategies.
                   </Alert.Description>
                 </Alert.Root>

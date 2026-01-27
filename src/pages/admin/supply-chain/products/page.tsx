@@ -1,253 +1,255 @@
 /**
  * Products Page - Product Catalog & Menu Engineering
  *
- * SEMANTIC v3.0 - WCAG AA Compliant + SESSION_5 Requirements
- * ✅ Skip link for keyboard navigation (WCAG 2.4.1 Level A)
- * ✅ Semantic main content wrapper with ARIA label
- * ✅ Proper section headings for screen readers
- * ✅ Nav pattern for tab navigation
- * ✅ HookPoint integration for extensibility
- * ✅ 3-Layer Architecture (Semantic → Layout → Primitives)
- * ✅ Dynamic ProductFormModal with flexible ProductConfig
- * ✅ Enhanced ProductList with filters
- * ✅ Metrics visualization
- *
- * FEATURES:
- * - 11 product categories support
- * - Flexible ProductConfig system
- * - Dynamic form sections
- * - Rich product visualization
- * - Menu engineering analytics
- * - Cost analysis
- * - Module extension via HookPoints
+ * REFACTORED v6.0 - MAGIC PATTERNS DESIGN
+ * Design Principles:
+ * - Decorative background blobs for visual depth
+ * - Gradient metric cards with top border accents (3px)
+ * - Elevated content cards with modern shadows
+ * - Responsive grid layouts (SimpleGrid)
+ * - Clean spacing system (gap="6/8", p="6/8")
+ * - No maxW restrictions (w="100%")
+ * 
+ * Features:
+ * - TanStack Query for server state
+ * - Zustand for UI state
+ * - Facade hook pattern
  */
 
 import {
-  ContentLayout,
-  Section,
+  Box,
+  Flex,
+  SimpleGrid,
+  Stack,
+  Text
+} from '@chakra-ui/react';
+import {
   Button,
   Tabs,
   SkipLink,
-  HStack,
-  Stack,
   Badge,
-  Alert
+  Alert,
+  Icon
 } from '@/shared/ui';
-import { PlusIcon, ChartBarIcon, CogIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, ChartBarIcon, CogIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { HookPoint } from '@/lib/modules';
+import { useNavigate } from 'react-router-dom';
 
-// Import components and hooks using barrel exports
 import {
   ProductList,
-  ProductFormModal
 } from './components';
-import { useProductsPage } from './hooks';
 
-// Note: MenuEngineeringMatrix and CostAnalysisTab moved to products-analytics sub-module
-// They will be injected via HookPoints if analytics features are active
+// ✅ TABS
+import { CatalogConfigTab } from './tabs/catalog-config';
+
+// ✅ NEW: Import from clean module architecture
+import { useProductsPage } from '@/modules/products';
 
 export function ProductsPage() {
-  // ✅ PAGE ORCHESTRATION - All logic delegated to hook
+  const navigate = useNavigate();
+
+  // ✅ Using clean module hook
   const {
-    pageState,
     metrics,
-    loading,
+    isLoading,
     error,
     activeTab,
     setActiveTab,
-    actions,
     filteredProducts,
+    filters,
+    setFilters,
+    clearFilters,
+    selectProduct,
+    togglePublish,
+    deleteProduct,
   } = useProductsPage();
 
   return (
     <>
-      {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
       <SkipLink />
+      
+      {/* Decorative background elements */}
+      <Box position="fixed" top="-10%" right="-5%" w="500px" h="500px" borderRadius="full" bg="purple.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" zIndex="-1" />
+      <Box position="fixed" bottom="-10%" left="-5%" w="400px" h="400px" borderRadius="full" bg="pink.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" zIndex="-1" />
 
-      {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
-      <ContentLayout spacing="normal" mainLabel="Product Catalog Management">
+      <Box p={{ base: "6", md: "8" }}>
+        <Stack gap="8" w="100%">
 
-        {/* ✅ ERROR SECTION - Show errors if any */}
-        {error && (
-          <Section variant="flat">
-            <Alert status="error" title="Error">
-              {error}
-            </Alert>
-          </Section>
-        )}
+          {/* Error Alert */}
+          {error && (
+            <Alert status="error" title="Error">{error}</Alert>
+          )}
 
-        {/* ✅ HEADER SECTION - Title, subtitle and actions */}
-        <Section
-          variant="flat"
-          title="Products"
-          subtitle="Catalog, recipes & pricing"
-          semanticHeading="Product Catalog Dashboard"
-          actions={
-            <HStack gap="2">
-              <Button
-                variant="outline"
-                colorPalette="blue"
-                onClick={actions.handleMenuEngineering}
-                size="md"
-              >
-                <ChartBarIcon className="w-4 h-4" />
+          {/* ═══════════════════════════════════════════════════════════════
+              HEADER - Title + Actions
+              ═══════════════════════════════════════════════════════════════ */}
+          <Flex justify="space-between" align="center" flexWrap="wrap" gap="4">
+            <Flex align="center" gap="3">
+              <Box bg="linear-gradient(135deg, var(--chakra-colors-purple-500) 0%, var(--chakra-colors-purple-600) 100%)" p="3" borderRadius="xl" shadow="lg">
+                <Text fontSize="2xl">🛍️</Text>
+              </Box>
+              <Box>
+                <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="extrabold" color="purple.600">
+                  Catálogo de Productos
+                </Text>
+                <Text color="text.muted" fontSize="sm">Menu Engineering & Pricing</Text>
+              </Box>
+            </Flex>
+
+            <Flex gap="2" flexWrap="wrap">
+              <Button variant="outline" colorPalette="blue" size="md" onClick={() => setActiveTab('analytics')}>
+                <Icon icon={ChartBarIcon} size="sm" />
                 Menu Engineering
               </Button>
-              <Button
-                variant="outline"
-                colorPalette="green"
-                onClick={actions.handleCostAnalysis}
-                size="md"
-              >
-                <CogIcon className="w-4 h-4" />
+              <Button variant="outline" colorPalette="green" size="md" onClick={() => setActiveTab('cost-analysis')}>
+                <Icon icon={CogIcon} size="sm" />
                 Cost Analysis
               </Button>
-              <Button
-                colorPalette="purple"
-                onClick={actions.handleNewProduct}
-                size="md"
-              >
-                <PlusIcon className="w-4 h-4" />
-                New Product
+              <Button colorPalette="purple" size="lg" onClick={() => navigate('/admin/supply-chain/products/new')}>
+                <Icon icon={PlusIcon} size="sm" />
+                Nuevo Producto
               </Button>
-            </HStack>
-          }
-        />
+            </Flex>
+          </Flex>
 
-        {/* ✅ METRICS SECTION - Quick overview */}
-        <Section
-          as="aside"
-          variant="flat"
-          semanticHeading="Product Metrics Overview"
-        >
-          <HStack gap="4" flexWrap="wrap">
-            <Stack gap="1" minW="150px">
-              <span className="text-sm text-gray-600">Total Products</span>
-              <span className="text-2xl font-semibold text-purple-600">{metrics.totalProducts}</span>
-            </Stack>
+          {/* ═══════════════════════════════════════════════════════════════
+              METRICS CARDS - Gradient style
+              ═══════════════════════════════════════════════════════════════ */}
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 5 }} gap="4">
+            {/* Total Products */}
+            <Box position="relative" overflow="hidden" bg="bg.surface" p="4" borderRadius="xl" shadow="md" transition="all 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "lg" }}>
+              <Box position="absolute" top={0} left={0} right={0} h="3px" bg="linear-gradient(90deg, var(--chakra-colors-purple-400) 0%, var(--chakra-colors-purple-600) 100%)" />
+              <Text fontSize="xs" fontWeight="semibold" color="text.muted" textTransform="uppercase" mb="1">Total Products</Text>
+              <Text fontSize="2xl" fontWeight="bold" color="purple.600">{metrics.totalProducts}</Text>
+            </Box>
 
-            <Stack gap="1" minW="150px">
-              <span className="text-sm text-gray-600">Categories</span>
-              <span className="text-2xl font-semibold text-blue-600">{metrics.totalCategories}</span>
-            </Stack>
+            {/* Elaborated */}
+            <Box position="relative" overflow="hidden" bg="bg.surface" p="4" borderRadius="xl" shadow="md" transition="all 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "lg" }}>
+              <Box position="absolute" top={0} left={0} right={0} h="3px" bg="linear-gradient(90deg, var(--chakra-colors-blue-400) 0%, var(--chakra-colors-blue-600) 100%)" />
+              <Text fontSize="xs" fontWeight="semibold" color="text.muted" textTransform="uppercase" mb="1">Elaborated</Text>
+              <Text fontSize="2xl" fontWeight="bold" color="blue.600">{metrics.elaboratedProducts}</Text>
+            </Box>
 
-            <Stack gap="1" minW="150px">
-              <span className="text-sm text-gray-600">With Recipes</span>
-              <span className="text-2xl font-semibold text-green-600">{metrics.productsWithRecipes}</span>
-            </Stack>
+            {/* With Recipes */}
+            <Box position="relative" overflow="hidden" bg="bg.surface" p="4" borderRadius="xl" shadow="md" transition="all 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "lg" }}>
+              <Box position="absolute" top={0} left={0} right={0} h="3px" bg="linear-gradient(90deg, var(--chakra-colors-green-400) 0%, var(--chakra-colors-green-600) 100%)" />
+              <Text fontSize="xs" fontWeight="semibold" color="text.muted" textTransform="uppercase" mb="1">With Recipes</Text>
+              <Text fontSize="2xl" fontWeight="bold" color="green.600">{metrics.productsWithRecipes}</Text>
+            </Box>
 
-            <Stack gap="1" minW="150px">
-              <span className="text-sm text-gray-600">Services</span>
-              <span className="text-2xl font-semibold text-orange-600">{metrics.serviceProducts}</span>
-            </Stack>
+            {/* Services */}
+            <Box position="relative" overflow="hidden" bg="bg.surface" p="4" borderRadius="xl" shadow="md" transition="all 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "lg" }}>
+              <Box position="absolute" top={0} left={0} right={0} h="3px" bg="linear-gradient(90deg, var(--chakra-colors-orange-400) 0%, var(--chakra-colors-orange-600) 100%)" />
+              <Text fontSize="xs" fontWeight="semibold" color="text.muted" textTransform="uppercase" mb="1">Services</Text>
+              <Text fontSize="2xl" fontWeight="bold" color="orange.600">{metrics.serviceProducts}</Text>
+            </Box>
 
-            <Stack gap="1" minW="150px">
-              <span className="text-sm text-gray-600">Digital</span>
-              <span className="text-2xl font-semibold text-cyan-600">{metrics.digitalProducts}</span>
-            </Stack>
-          </HStack>
-        </Section>
+            {/* Digital */}
+            <Box position="relative" overflow="hidden" bg="bg.surface" p="4" borderRadius="xl" shadow="md" transition="all 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "lg" }}>
+              <Box position="absolute" top={0} left={0} right={0} h="3px" bg="linear-gradient(90deg, var(--chakra-colors-cyan-400) 0%, var(--chakra-colors-cyan-600) 100%)" />
+              <Text fontSize="xs" fontWeight="semibold" color="text.muted" textTransform="uppercase" mb="1">Digital</Text>
+              <Text fontSize="2xl" fontWeight="bold" color="cyan.600">{metrics.digitalProducts}</Text>
+            </Box>
+          </SimpleGrid>
 
-        {/* ✅ TAB NAVIGATION SECTION - Semantic nav pattern */}
-        <Section
-          as="nav"
-          variant="elevated"
-          semanticHeading="Product Management Sections"
-        >
-          <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as typeof activeTab)}>
-            <Tabs.List>
-              <Tabs.Trigger value="products">
-                Products
-                {filteredProducts.length > 0 && (
-                  <Badge colorPalette="purple" ml="2" size="sm">
-                    {filteredProducts.length}
-                  </Badge>
-                )}
-              </Tabs.Trigger>
+          {/* ═══════════════════════════════════════════════════════════════
+              MAIN CONTENT - Elevated Tabs Card
+              ═══════════════════════════════════════════════════════════════ */}
+          <Box bg="bg.surface" p="6" borderRadius="2xl" shadow="xl">
+            <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as typeof activeTab)}>
+              <Tabs.List>
+                <Tabs.Trigger value="products">
+                  Products
+                  {filteredProducts.length > 0 && (
+                    <Badge colorPalette="purple" size="sm" ml="2">
+                      {filteredProducts.length}
+                    </Badge>
+                  )}
+                </Tabs.Trigger>
 
-              {/* 🎯 HOOK POINT: Analytics tabs injected by products-analytics sub-module */}
-              {/* Includes: Menu Engineering, Cost Analysis (if features active) */}
-              <HookPoint
-                name="products.analytics_tabs"
-                data={{ activeTab, setActiveTab }}
-                direction="row"
-                gap="0"
-                fallback={null}
-              />
+                <Tabs.Trigger value="catalog-config">
+                  <Icon icon={Cog6ToothIcon} size="sm" />
+                  Config. Catálogo
+                </Tabs.Trigger>
 
-              {/* 🎯 HOOK POINT: Other modules can inject additional tabs */}
-              <HookPoint
-                name="products.tabs"
-                data={{ activeTab, setActiveTab }}
-                direction="row"
-                gap="0"
-                fallback={null}
-              />
-            </Tabs.List>
-
-            {/* ✅ Tab Content: Products - Main section with ProductList */}
-            <Tabs.Content value="products">
-              <Section
-                variant="flat"
-                semanticHeading="Product Catalog List"
-              >
-                <ProductList
-                  products={filteredProducts}
-                  loading={loading}
-                  filters={pageState.selectedFilters}
-                  onFilterChange={actions.handleFilterChange}
-                  onClearFilters={actions.handleClearFilters}
-                  onEdit={actions.handleEditProduct}
-                  onDelete={actions.handleDeleteProduct}
-                  onViewDetails={actions.handleViewDetails}
-                  onTogglePublish={actions.handleTogglePublish}
+                <HookPoint
+                  name="products.analytics_tabs"
+                  data={{ activeTab, setActiveTab }}
+                  direction="row"
+                  gap="0"
+                  fallback={null}
                 />
-              </Section>
-            </Tabs.Content>
 
-            {/* 🎯 HOOK POINT: Analytics tab content injected by products-analytics sub-module */}
-            {/* Includes: Menu Engineering, Cost Analysis content (if features active) */}
-            <HookPoint
-              name="products.analytics_content"
-              data={{ activeTab, setActiveTab }}
-              direction="column"
-              gap="4"
-              fallback={null}
-            />
+                <HookPoint
+                  name="products.tabs"
+                  data={{ activeTab, setActiveTab }}
+                  direction="row"
+                  gap="0"
+                  fallback={null}
+                />
+              </Tabs.List>
 
-            {/* 🎯 HOOK POINT: Other modules can inject additional tab content */}
-            <HookPoint
-              name="products.tab_content"
-              data={{ activeTab, setActiveTab }}
-              direction="column"
-              gap="4"
-              fallback={null}
-            />
-          </Tabs.Root>
-        </Section>
+              {/* Tab Content: Products */}
+              <Tabs.Content value="products">
+                <Box pt="6">
+                  <ProductList
+                    products={filteredProducts}
+                    loading={isLoading}
+                    filters={filters}
+                    onFilterChange={setFilters}
+                    onClearFilters={clearFilters}
+                    onEdit={(product) => selectProduct(product.id)}
+                    onDelete={deleteProduct}
+                    onViewDetails={(product) => selectProduct(product.id)}
+                    onTogglePublish={async (productId) => {
+                      const product = filteredProducts.find(p => p.id === productId);
+                      if (product) {
+                        await togglePublish({ 
+                          productId, 
+                          isPublished: !product.is_published 
+                        });
+                      }
+                    }}
+                  />
+                </Box>
+              </Tabs.Content>
 
-        {/* 🪟 PRODUCT FORM MODAL - Dynamic sections based on category */}
-        {pageState.isFormOpen && (
-          <ProductFormModal
-            isOpen={pageState.isFormOpen}
-            mode={pageState.formMode}
-            product={pageState.selectedProduct}
-            onClose={actions.handleCloseForm}
-            // onSave will be implemented when we integrate with the service
+              {/* Catalog Configuration Tab */}
+              <Tabs.Content value="catalog-config">
+                <Box pt="6">
+                  <CatalogConfigTab />
+                </Box>
+              </Tabs.Content>
+
+              <HookPoint
+                name="products.analytics_content"
+                data={{ activeTab, setActiveTab }}
+                direction="column"
+                gap="4"
+                fallback={null}
+              />
+
+              <HookPoint
+                name="products.tab_content"
+                data={{ activeTab, setActiveTab }}
+                direction="column"
+                gap="4"
+                fallback={null}
+              />
+            </Tabs.Root>
+          </Box>
+
+          <HookPoint
+            name="products.page_sections"
+            data={{ products: filteredProducts }}
+            direction="column"
+            gap="4"
+            fallback={null}
           />
-        )}
 
-        {/* 🎯 HOOK POINT: Other modules can inject additional page sections */}
-        <HookPoint
-          name="products.page_sections"
-          data={{ products: filteredProducts }}
-          direction="column"
-          gap="4"
-          fallback={null}
-        />
-
-      </ContentLayout>
-    </>
+        </Stack>
+      </Box>
+    </Box>
   );
 }
 

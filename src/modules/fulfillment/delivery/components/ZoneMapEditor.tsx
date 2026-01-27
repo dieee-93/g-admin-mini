@@ -2,32 +2,19 @@
  * Zone Map Editor - Polygon drawing for delivery zones
  *
  * Uses Leaflet + Leaflet Draw for interactive polygon creation
- * Phase 1 - Task 10: Map integration
+ * Optimized for rendering inside modals and tabs using vanilla Leaflet
+ * 
+ * @see https://leafletjs.com/reference.html - Leaflet API
+ * @see https://github.com/Leaflet/Leaflet.draw - Leaflet Draw plugin
  */
 
-import { useEffect, useRef, useState } from 'react';
-import { MapContainer, TileLayer, FeatureGroup, useMap } from 'react-leaflet';
-import { EditControl } from 'react-leaflet-draw';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { Box, Stack, Text, Alert } from '@/shared/ui';
-import { logger } from '@/lib/logging';
 import type { Coordinates, DeliveryZone } from '../types';
-
-// Leaflet Draw event types
-interface LeafletDrawEvent {
-  layerType: string;
-  layer: L.Layer & {
-    getLatLngs: () => L.LatLng[][];
-  };
-}
-
-interface LeafletLayersEvent {
-  layers: L.LayerGroup & {
-    eachLayer: (callback: (layer: L.Layer) => void) => void;
-  };
-}
 
 interface ZoneMapEditorProps {
   /**
@@ -55,120 +42,221 @@ interface ZoneMapEditorProps {
 const DEFAULT_CENTER: [number, number] = [-34.6037, -58.3816]; // Buenos Aires
 const DEFAULT_ZOOM = 12;
 
-// Map controller to handle zone loading
-function MapController({ zone }: { zone?: DeliveryZone }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!zone || !zone.boundaries || zone.boundaries.length === 0) return;
-
-    // Convert zone boundaries to Leaflet LatLngBounds
-    const bounds = L.latLngBounds(
-      zone.boundaries.map(coord => [coord.lat, coord.lng] as [number, number])
-    );
-
-    // Fit map to zone boundaries
-    map.fitBounds(bounds, { padding: [50, 50] });
-  }, [zone, map]);
-
-  return null;
-}
-
+/**
+ * ZoneMapEditor Component
+ * 
+ * Best practices implemented:
+ * 1. Proper cleanup with map.remove() on unmount
+ * 2. IntersectionObserver to detect visibility changes
+ * 3. invalidateSize() when container becomes visible
+ * 4. Separate effect for loading zone data
+ * 5. Prevents multiple map instances on same container
+ */
 export function ZoneMapEditor({
   zone,
   onPolygonChange,
   center = DEFAULT_CENTER,
   zoom = DEFAULT_ZOOM
 }: ZoneMapEditorProps) {
-  const featureGroupRef = useRef<L.FeatureGroup>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const drawnItemsRef = useRef<L.FeatureGroup | null>(null);
+  const drawControlRef = useRef<L.Control.Draw | null>(null);
+  const isInitializedRef = useRef(false);
+  
   const [hasPolygon, setHasPolygon] = useState(false);
+  const [isMapReady, setIsMapReady] = useState(false);
 
   /**
-   * Load existing zone polygon on mount
+   * Initialize map instance
+   * Called when container becomes visible
    */
-  useEffect(() => {
-    if (!zone || !zone.boundaries || zone.boundaries.length === 0) return;
-    if (!featureGroupRef.current) return;
+  const initializeMap = useCallback(() => {
+    if (!mapContainerRef.current) return;
+    if (isInitializedRef.current) return;
+    if (mapRef.current) return;
 
-    // Clear existing layers
-    featureGroupRef.current.clearLayers();
+    // Create map with initial settings
+    const map = L.map(mapContainerRef.current, {
+      center,
+      zoom,
+      scrollWheelZoom: true,
+      dragging: true,
+      zoomControl: true
+    });
 
-    // Create polygon from zone boundaries
-    const polygon = L.polygon(
-      zone.boundaries.map(coord => [coord.lat, coord.lng] as [number, number]),
-      {
-        color: zone.color || '#3b82f6',
-        weight: 3,
-        opacity: 0.8,
-        fillOpacity: 0.2
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Create feature group for editable layers
+    const drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+    drawnItemsRef.current = drawnItems;
+
+    // Configure Leaflet Draw control
+    console.log('L.Control.Draw available:', L.Control.Draw);
+    console.log('L.Draw available:', L.Draw);
+    
+    const drawControl = new L.Control.Draw({
+      position: 'topright',
+      draw: {
+        polygon: {
+          allowIntersection: false, // Restrict to simple polygons
+          drawError: {
+            color: '#e74c3c',
+            message: '<strong>Error:</strong> Los bordes no pueden intersectarse'
+          },
+          shapeOptions: {
+            color: zone?.color || '#3b82f6',
+            weight: 3,
+            opacity: 0.8,
+            fillOpacity: 0.2
+          }
+        },
+        rectangle: false,
+        circle: false,
+        circlemarker: false,
+        marker: false,
+        polyline: false
+      },
+      edit: {
+        featureGroup: drawnItems // REQUIRED for editing
       }
-    );
-
-    // Add to feature group
-    featureGroupRef.current.addLayer(polygon);
-    setHasPolygon(true);
-
-    logger.debug('ZoneMapEditor', 'Loaded existing zone polygon', {
-      zoneId: zone.id,
-      pointsCount: zone.boundaries.length
     });
-  }, [zone]);
+    
+    console.log('Draw control created:', drawControl);
+    map.addControl(drawControl);
+    console.log('Draw control added to map');
+    drawControlRef.current = drawControl;
 
-  /**
-   * Handle polygon created
-   */
-  const handleCreated = (e: LeafletDrawEvent) => {
-    logger.debug('ZoneMapEditor', 'Polygon created', { layerType: e.layerType });
+    // Event: Shape created
+    map.on(L.Draw.Event.CREATED, (e: any) => {
+      const layer = e.layer;
+      
+      // Clear previous polygon (only one at a time)
+      drawnItems.clearLayers();
+      drawnItems.addLayer(layer);
 
-    const layer = e.layer;
-    const latLngs = layer.getLatLngs()[0]; // Get outer ring
-
-    // Convert to Coordinates array
-    const boundaries: Coordinates[] = latLngs.map((latLng: L.LatLng) => ({
-      lat: latLng.lat,
-      lng: latLng.lng
-    }));
-
-    logger.info('ZoneMapEditor', 'Polygon boundaries extracted', {
-      pointsCount: boundaries.length
-    });
-
-    setHasPolygon(true);
-    onPolygonChange(boundaries);
-  };
-
-  /**
-   * Handle polygon edited
-   */
-  const handleEdited = (e: LeafletLayersEvent) => {
-    logger.debug('ZoneMapEditor', 'Polygon edited');
-
-    const layers = e.layers;
-    layers.eachLayer((layer: L.Layer & { getLatLngs: () => L.LatLng[][] }) => {
-      const latLngs = layer.getLatLngs()[0]; // Get outer ring
-
-      // Convert to Coordinates array
+      // Extract coordinates
+      const latLngs = layer.getLatLngs()[0];
       const boundaries: Coordinates[] = latLngs.map((latLng: L.LatLng) => ({
         lat: latLng.lat,
         lng: latLng.lng
       }));
 
-      logger.info('ZoneMapEditor', 'Polygon edited', {
-        pointsCount: boundaries.length
-      });
-
+      setHasPolygon(true);
       onPolygonChange(boundaries);
     });
-  };
+
+    // Event: Shape edited
+    map.on(L.Draw.Event.EDITED, (e: any) => {
+      const layers = e.layers;
+      layers.eachLayer((layer: any) => {
+        const latLngs = layer.getLatLngs()[0];
+        const boundaries: Coordinates[] = latLngs.map((latLng: L.LatLng) => ({
+          lat: latLng.lat,
+          lng: latLng.lng
+        }));
+
+        onPolygonChange(boundaries);
+      });
+    });
+
+    // Event: Shape deleted
+    map.on(L.Draw.Event.DELETED, () => {
+      setHasPolygon(false);
+      onPolygonChange([]);
+    });
+
+    mapRef.current = map;
+    isInitializedRef.current = true;
+    setIsMapReady(true);
+
+    // Invalidate size to handle initial render in hidden containers
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+  }, [center, zoom, zone?.color, onPolygonChange]);
 
   /**
-   * Handle polygon deleted
+   * Main effect: Setup IntersectionObserver and initialization
    */
-  const handleDeleted = () => {
-    logger.debug('ZoneMapEditor', 'Polygon deleted');
-    setHasPolygon(false);
-    onPolygonChange([]);
-  };
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+
+    // Use IntersectionObserver to detect when container becomes visible
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Container is visible, initialize map if needed
+            initializeMap();
+            
+            // Recalculate size if map already exists
+            if (mapRef.current) {
+              mapRef.current.invalidateSize();
+            }
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(mapContainerRef.current);
+
+    // Cleanup
+    return () => {
+      observer.disconnect();
+      
+      if (mapRef.current) {
+        mapRef.current.off(); // Remove all event listeners
+        mapRef.current.remove(); // Destroy the map instance
+        mapRef.current = null;
+      }
+      
+      drawnItemsRef.current = null;
+      drawControlRef.current = null;
+      isInitializedRef.current = false;
+      setIsMapReady(false);
+    };
+  }, [initializeMap]);
+
+  /**
+   * Effect: Load existing zone polygon
+   */
+  useEffect(() => {
+    if (!mapRef.current || !drawnItemsRef.current || !isMapReady) return;
+    if (!zone || !zone.boundaries || zone.boundaries.length === 0) return;
+
+    const map = mapRef.current;
+    const drawnItems = drawnItemsRef.current;
+
+    // Clear existing layers
+    drawnItems.clearLayers();
+
+    // Create polygon from zone boundaries
+    const latlngs: L.LatLngExpression[] = zone.boundaries.map((coord) => [
+      coord.lat,
+      coord.lng
+    ]);
+
+    const polygon = L.polygon(latlngs, {
+      color: zone.color || '#3b82f6',
+      weight: 3,
+      opacity: 0.8,
+      fillOpacity: 0.2
+    });
+
+    drawnItems.addLayer(polygon);
+    setHasPolygon(true);
+
+    // Fit map to zone boundaries
+    const bounds = L.latLngBounds(latlngs as [number, number][]);
+    map.fitBounds(bounds, { padding: [50, 50] });
+  }, [zone, isMapReady]);
 
   return (
     <Stack gap="sm" height="100%">
@@ -193,62 +281,22 @@ export function ZoneMapEditor({
       {/* Map */}
       <Box
         flex={1}
+        minHeight="400px"
         borderRadius="md"
         overflow="hidden"
         position="relative"
         border="1px solid"
         borderColor="gray.200"
       >
-        <MapContainer
-          center={center}
-          zoom={zoom}
-          style={{ height: '100%', width: '100%' }}
-          zoomControl={true}
-          scrollWheelZoom={true}
-        >
-          {/* OpenStreetMap tiles */}
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            maxZoom={19}
-          />
-
-          {/* Map controller for zone loading */}
-          <MapController zone={zone} />
-
-          {/* Drawing controls */}
-          <FeatureGroup ref={featureGroupRef}>
-            <EditControl
-              position="topright"
-              onCreated={handleCreated}
-              onEdited={handleEdited}
-              onDeleted={handleDeleted}
-              draw={{
-                // Enable polygon drawing
-                polygon: {
-                  allowIntersection: false,
-                  shapeOptions: {
-                    color: zone?.color || '#3b82f6',
-                    weight: 3,
-                    opacity: 0.8,
-                    fillOpacity: 0.2
-                  }
-                },
-                // Disable other shapes
-                rectangle: false,
-                circle: false,
-                circlemarker: false,
-                marker: false,
-                polyline: false
-              }}
-              edit={{
-                // Enable editing
-                edit: true,
-                remove: true
-              }}
-            />
-          </FeatureGroup>
-        </MapContainer>
+        <div
+          ref={mapContainerRef}
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+            zIndex: 0
+          }}
+        />
       </Box>
 
       {/* Status indicator */}

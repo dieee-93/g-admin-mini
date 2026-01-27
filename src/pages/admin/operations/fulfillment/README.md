@@ -15,6 +15,14 @@ Unified order fulfillment system supporting **3 independent sub-modes**:
 
 Each sub-mode has its own workflow, UI, and database tables, but shares a common **fulfillment queue** and **service layer** for consistency.
 
+### 🗺️ Feature & Route Map
+
+| Route (Relative) | Feature Area | Components | Description |
+|------------------|--------------|------------|-------------|
+| **`/onsite`** | **Onsite (Dine-in)** | `FloorPlanView`, `FloorStats` | Table management, reservations, and floor plan visualization. |
+| **`/pickup`** | **Pickup** | `PickupQueue`, `PickupQRGenerator` | Self-service pickup queue, time slots, and QR code management. |
+| **`/delivery`** | **Delivery** | `LiveDeliveryTracker`, `DeliveryQueue` | Driver assignment, GPS ranking, and zone management. |
+
 ---
 
 ## Architecture

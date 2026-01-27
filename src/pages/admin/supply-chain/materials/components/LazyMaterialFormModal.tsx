@@ -1,5 +1,15 @@
 import { lazy, Suspense } from 'react';
 import { Box, Spinner, VStack } from '@/shared/ui';
+import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
+
+// Props interface
+export interface MaterialFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  mode: 'add' | 'edit' | 'view';
+  item: MaterialItem | null;
+  readOnly?: boolean;
+}
 
 // Lazy load the heavy modal component
 const MaterialFormDialog = lazy(() =>
@@ -13,7 +23,7 @@ const ModalLoadingFallback = () => (
   <Box 
     position="fixed" 
     inset="0" 
-    bg="blackAlpha.300" 
+    bg="gray.100" 
     display="flex" 
     alignItems="center" 
     justifyContent="center"
@@ -37,10 +47,13 @@ const ModalLoadingFallback = () => (
 /**
  * Lazy-loaded wrapper for MaterialFormModalComplete
  * Only loads the heavy modal component when needed
+ * 
+ * Performance: Uses React.lazy + Suspense for code splitting
+ * Props are passed through to avoid Zustand subscriptions
  */
-export const LazyMaterialFormModal = () => (
+export const LazyMaterialFormModal = (props: MaterialFormModalProps) => (
   <Suspense fallback={<ModalLoadingFallback />}>
-    <MaterialFormDialog />
+    <MaterialFormDialog {...props} />
   </Suspense>
 );
 

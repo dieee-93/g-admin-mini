@@ -3,6 +3,7 @@
 
 export * from './product';
 export * from './menu-engineering';
+export * from './serviceContext';
 
 // Export new product form types (v3.0)
 export type {

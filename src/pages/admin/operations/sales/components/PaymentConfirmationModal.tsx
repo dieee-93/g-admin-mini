@@ -18,13 +18,10 @@ import {
   Alert,
   Icon,
   InputField,
-  NumberField,
-  SelectField,
-  createListCollection,
-  NativeSelect,
-  Separator
+  Input,
+  Separator,
+  Box
 } from '@/shared/ui';
-import { Field } from '@chakra-ui/react'; // Solo para casos especiales con Field.Root
 import {
   XMarkIcon,
   CheckCircleIcon,
@@ -36,7 +33,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { notify } from '@/lib/notifications';
-import { safeDecimal } from '@/business-logic/shared/decimalUtils';
+import { safeDecimal } from '@/lib/decimal';
 
 interface PaymentMethod {
   id: string;
@@ -198,10 +195,10 @@ export function PaymentConfirmationModal({
               {/* Total a pagar */}
               <Stack
                 direction="column"
-                gap="xs"
-                p="md"
+                gap="1"
+                p="6"
                 borderWidth="2px"
-                borderRadius="md"
+                borderRadius="xl"
                 borderColor="blue.500"
                 bg="blue.50"
                 _dark={{ bg: 'blue.950' }}
@@ -209,69 +206,102 @@ export function PaymentConfirmationModal({
                 <Typography variant="body" size="sm" color="text.muted">
                   Total a Pagar
                 </Typography>
-                <Typography variant="heading" size="2xl" weight="bold" colorPalette="blue">
+                <Typography variant="heading" size="2xl" fontWeight="bold" colorPalette="blue">
                   ${total.toFixed(2)}
                 </Typography>
               </Stack>
 
               {/* Selector de modo */}
-              <Stack direction="row" gap="md">
-                <Button
-                  variant={paymentMode === 'simple' ? 'solid' : 'outline'}
-                  onClick={() => setPaymentMode('simple')}
-                  flex="1"
-                >
-                  Pago Simple
-                </Button>
-                <Button
-                  variant={paymentMode === 'mixed' ? 'solid' : 'outline'}
-                  onClick={() => setPaymentMode('mixed')}
-                  flex="1"
-                >
-                  Pago Mixto
-                </Button>
+              <Stack direction="row" gap="4">
+                <Box flex="1">
+                  <Button
+                    variant={paymentMode === 'simple' ? 'solid' : 'outline'}
+                    onClick={() => setPaymentMode('simple')}
+                    width="full"
+                    size="lg"
+                  >
+                    Pago Simple
+                  </Button>
+                </Box>
+                <Box flex="1">
+                  <Button
+                    variant={paymentMode === 'mixed' ? 'solid' : 'outline'}
+                    onClick={() => setPaymentMode('mixed')}
+                    width="full"
+                    size="lg"
+                  >
+                    Pago Mixto
+                  </Button>
+                </Box>
               </Stack>
 
               <Separator />
 
               {/* PAGO SIMPLE */}
               {paymentMode === 'simple' && (
-                <Stack direction="column" gap="md">
-                  <SelectField
-                    label="Método de Pago"
-                    value={simpleMethod}
-                    onChange={(e) => setSimpleMethod(e.target.value as 'cash' | 'card' | 'transfer')}
-                  >
-                    {PAYMENT_OPTIONS.map(opt => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </SelectField>
+                <Stack direction="column" gap="4">
+                  <Stack direction="column" gap="2">
+                    <Typography variant="body" size="sm" fontWeight="medium">Método de Pago</Typography>
+                    <select
+                      value={simpleMethod}
+                      onChange={(e) => setSimpleMethod(e.target.value as 'cash' | 'card' | 'transfer')}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--chakra-colors-border-default)',
+                        background: 'var(--chakra-colors-bg-surface)',
+                        fontSize: '14px'
+                      }}
+                    >
+                      {PAYMENT_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </Stack>
 
                   {simpleMethod === 'cash' && (
                     <>
-                      <NumberField
-                        label="Efectivo Recibido"
-                        placeholder="0.00"
-                        value={cashReceived}
-                        onChange={(e) => setCashReceived(e.target.value)}
-                        helperText="Ingresa el monto que recibiste del cliente"
-                        step={0.01}
-                      />
+                      <Stack direction="column" gap="2">
+                        <Typography variant="body" size="sm" fontWeight="medium">Efectivo Recibido</Typography>
+                        <input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={cashReceived}
+                          onChange={(e) => setCashReceived(e.target.value)}
+                          style={{
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            border: '1px solid var(--chakra-colors-border-default)',
+                            background: 'var(--chakra-colors-bg-surface)',
+                            fontSize: '14px'
+                          }}
+                        />
+                        <Typography variant="body" size="xs" color="text.muted">
+                          Ingresa el monto que recibiste del cliente
+                        </Typography>
+                      </Stack>
 
                       {cashChange > 0 && (
-                        <Alert status="success" title="Cambio a Entregar">
-                          <Typography variant="heading" size="lg" weight="bold">
-                            ${cashChange.toFixed(2)}
-                          </Typography>
-                        </Alert>
+                        <Alert.Root status="success">
+                          <Alert.Title>Cambio a Entregar</Alert.Title>
+                          <Alert.Description>
+                            <Typography variant="heading" size="lg" fontWeight="bold">
+                              ${cashChange.toFixed(2)}
+                            </Typography>
+                          </Alert.Description>
+                        </Alert.Root>
                       )}
 
                       {cashReceived && cashReceivedDecimal.lessThan(totalDecimal) && (
-                        <Alert status="error" title="Monto Insuficiente">
-                          Falta ${totalDecimal.minus(cashReceivedDecimal).toFixed(2)}
-                        </Alert>
+                        <Alert.Root status="error">
+                          <Alert.Title>Monto Insuficiente</Alert.Title>
+                          <Alert.Description>
+                            Falta ${totalDecimal.minus(cashReceivedDecimal).toFixed(2)}
+                          </Alert.Description>
+                        </Alert.Root>
                       )}
                     </>
                   )}
@@ -280,48 +310,65 @@ export function PaymentConfirmationModal({
 
               {/* PAGO MIXTO */}
               {paymentMode === 'mixed' && (
-                <Stack direction="column" gap="md">
+                <Stack direction="column" gap="4">
                   <Typography variant="body" size="sm" color="text.muted">
                     Distribuye el total entre diferentes métodos de pago
                   </Typography>
 
                   {mixedPayments.map((payment, index) => {
-                    // const PaymentIcon = getPaymentIcon(payment.type); // TODO: Use when implementing icon display
                     return (
                       <Stack
                         key={payment.id}
                         direction="row"
-                        gap="md"
+                        gap="4"
                         align="end"
-                        p="sm"
+                        p="4"
                         borderWidth="1px"
-                        borderRadius="sm"
+                        borderRadius="lg"
+                        borderColor="border.default"
                       >
-                        <SelectField
-                          label={`Método ${index + 1}`}
-                          value={payment.type}
-                          onChange={(e) =>
-                            handleUpdatePaymentMethod(payment.id, 'type', e.target.value)
-                          }
-                          flex="1"
-                        >
-                          {PAYMENT_OPTIONS.map(opt => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </SelectField>
+                        <Stack direction="column" gap="2" flex="1">
+                          <Typography variant="body" size="sm" fontWeight="medium">Método {index + 1}</Typography>
+                          <select
+                            value={payment.type}
+                            onChange={(e) =>
+                              handleUpdatePaymentMethod(payment.id, 'type', e.target.value)
+                            }
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: '1px solid var(--chakra-colors-border-default)',
+                              background: 'var(--chakra-colors-bg-surface)',
+                              fontSize: '14px'
+                            }}
+                          >
+                            {PAYMENT_OPTIONS.map(opt => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </Stack>
 
-                        <NumberField
-                          label="Monto"
-                          placeholder="0.00"
-                          value={payment.amount || ''}
-                          onChange={(e) =>
-                            handleUpdatePaymentMethod(payment.id, 'amount', e.target.value)
-                          }
-                          flex="1"
-                          step={0.01}
-                        />
+                        <Stack direction="column" gap="2" flex="1">
+                          <Typography variant="body" size="sm" fontWeight="medium">Monto</Typography>
+                          <input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            value={payment.amount || ''}
+                            onChange={(e) =>
+                              handleUpdatePaymentMethod(payment.id, 'amount', e.target.value)
+                            }
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: '1px solid var(--chakra-colors-border-default)',
+                              background: 'var(--chakra-colors-bg-surface)',
+                              fontSize: '14px'
+                            }}
+                          />
+                        </Stack>
 
                         {mixedPayments.length > 1 && (
                           <Button
@@ -348,16 +395,16 @@ export function PaymentConfirmationModal({
                   {/* Resumen mixto */}
                   <Stack
                     direction="column"
-                    gap="xs"
-                    p="md"
+                    gap="2"
+                    p="6"
                     borderWidth="1px"
-                    borderRadius="sm"
-                    bg="gray.50"
-                    _dark={{ bg: 'gray.900' }}
+                    borderRadius="xl"
+                    borderColor="border.default"
+                    bg="bg.muted"
                   >
                     <Stack direction="row" justify="space-between">
                       <Typography variant="body" size="sm">Total pagos:</Typography>
-                      <Typography variant="body" size="sm" weight="bold">
+                      <Typography variant="body" size="sm" fontWeight="bold">
                         ${mixedTotal.toFixed(2)}
                       </Typography>
                     </Stack>
@@ -366,7 +413,7 @@ export function PaymentConfirmationModal({
                       <Typography
                         variant="body"
                         size="sm"
-                        weight="bold"
+                        fontWeight="bold"
                         colorPalette={mixedRemaining.equals(0) ? 'green' : 'red'}
                       >
                         ${mixedRemaining.toFixed(2)}
@@ -375,15 +422,21 @@ export function PaymentConfirmationModal({
                   </Stack>
 
                   {mixedRemaining.greaterThan(0) && (
-                    <Alert status="warning" title="Pago Incompleto">
-                      Falta completar ${mixedRemaining.toFixed(2)}
-                    </Alert>
+                    <Alert.Root status="warning">
+                      <Alert.Title>Pago Incompleto</Alert.Title>
+                      <Alert.Description>
+                        Falta completar ${mixedRemaining.toFixed(2)}
+                      </Alert.Description>
+                    </Alert.Root>
                   )}
 
                   {mixedRemaining.lessThan(0) && (
-                    <Alert status="error" title="Monto Excedido">
-                      Sobran ${mixedRemaining.abs().toFixed(2)}
-                    </Alert>
+                    <Alert.Root status="error">
+                      <Alert.Title>Monto Excedido</Alert.Title>
+                      <Alert.Description>
+                        Sobran ${mixedRemaining.abs().toFixed(2)}
+                      </Alert.Description>
+                    </Alert.Root>
                   )}
                 </Stack>
               )}

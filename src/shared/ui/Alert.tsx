@@ -122,7 +122,7 @@ export interface AlertProps extends Omit<AlertRootProps, 'title'> {
  */
 const AlertComponent = React.forwardRef<HTMLDivElement, AlertProps>(
   function Alert(props, ref) {
-    const { title, children, description, icon, startElement, endElement, action, ...rest } = props;
+    const { title, children, description, startElement, endElement, action, ...rest } = props;
 
     // Support both 'action' (semantic) and 'endElement' (explicit)
     // Support both 'description' and 'children' for alert content

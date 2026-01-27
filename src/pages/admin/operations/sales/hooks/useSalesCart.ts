@@ -1,8 +1,13 @@
 // src/features/sales/logic/useSalesCart.ts (Enhanced Version)
+/**
+ * @deprecated Use usePOSCart from '@/modules/sales/hooks' instead
+ * This hook is deprecated and will be removed in a future version.
+ * Migrate to: import { usePOSCart } from '@/modules/sales/hooks';
+ */
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { toaster } from '@/shared/ui/toaster';
 import { supabase } from '@/lib/supabase/client';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 import { logger } from '@/lib/logging';
 export interface SaleItem {

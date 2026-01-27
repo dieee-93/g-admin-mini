@@ -151,3 +151,5 @@ ehthumbs.db
 
 # MCP Configuration (contains secrets)
 .mcp.json
+opencode.json
+.vercel

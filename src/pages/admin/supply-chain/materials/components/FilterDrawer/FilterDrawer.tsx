@@ -1,10 +1,8 @@
 import { memo } from 'react';
-import { Stack, Typography, Button, Icon, Checkbox, Badge } from '@/shared/ui';
-import { Drawer } from '@/shared/ui';
+import { Stack, Typography, Button, Icon, Checkbox, Badge, Drawer, Slider } from '@/shared/ui';
 import { XMarkIcon, FunnelIcon } from '@heroicons/react/24/outline';
-import { Slider } from '@chakra-ui/react';
 import type { ItemType } from '../../types';
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency } from '@/lib/decimal';
 
 interface FilterDrawerProps {
   isOpen: boolean;
@@ -125,6 +123,7 @@ export const FilterDrawer = memo(function FilterDrawer({
               </Stack>
 
               {/* Price Range */}
+              {/* Price Range */}
               <Stack direction="column" gap="md">
                 <Stack direction="row" justify="space-between" align="center">
                   <Typography variant="heading" size="sm">
@@ -134,21 +133,14 @@ export const FilterDrawer = memo(function FilterDrawer({
                     {formatCurrency(priceRange[0])} - {formatCurrency(priceRange[1])}
                   </Typography>
                 </Stack>
-                <Slider.Root
+                <Slider
                   min={0}
                   max={maxPrice}
                   value={priceRange}
-                  onValueChange={({ value }) => onPriceRangeChange(value as [number, number])}
+                  onValueChange={(value) => onPriceRangeChange(value as [number, number])}
                   minStepsBetweenThumbs={100}
-                >
-                  <Slider.Control>
-                    <Slider.Track>
-                      <Slider.Range />
-                    </Slider.Track>
-                    <Slider.Thumb index={0} />
-                    <Slider.Thumb index={1} />
-                  </Slider.Control>
-                </Slider.Root>
+                  colorPalette="blue"
+                />
               </Stack>
 
               {/* Stock Status */}
@@ -159,7 +151,7 @@ export const FilterDrawer = memo(function FilterDrawer({
                 <Stack direction="column" gap="sm">
                   <Checkbox
                     checked={showCritical}
-                    onChange={(e) => onToggleCritical(e.target.checked)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onToggleCritical(e.target.checked)}
                   >
                     <Stack direction="row" align="center" gap="xs">
                       Crítico
@@ -168,13 +160,13 @@ export const FilterDrawer = memo(function FilterDrawer({
                   </Checkbox>
                   <Checkbox
                     checked={showLowStock}
-                    onChange={(e) => onToggleLowStock(e.target.checked)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onToggleLowStock(e.target.checked)}
                   >
                     Stock Bajo
                   </Checkbox>
                   <Checkbox
                     checked={showOutOfStock}
-                    onChange={(e) => onToggleOutOfStock(e.target.checked)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onToggleOutOfStock(e.target.checked)}
                   >
                     Agotado
                   </Checkbox>
@@ -243,19 +235,16 @@ export const FilterDrawer = memo(function FilterDrawer({
           <Drawer.Footer>
             <Stack direction="row" gap="md" width="100%">
               <Button
-                flex="1"
                 variant="outline"
                 onClick={onClear}
               >
                 Limpiar Filtros
               </Button>
               <Button
-                flex="1"
                 variant="solid"
                 colorPalette="blue"
                 onClick={() => {
                   onApply();
-FilterDrawer.displayName = 'FilterDrawer';
                   onClose();
                 }}
               >

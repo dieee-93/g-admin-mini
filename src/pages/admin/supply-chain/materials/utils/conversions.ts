@@ -11,7 +11,7 @@ import {
   type ConversionResult,
   type UnitHelper
 } from '@/pages/admin/supply-chain/materials/types';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 // ============================================================================
 // 🔍 DETECCIÓN DE CATEGORÍA DE UNIDAD

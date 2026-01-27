@@ -79,7 +79,7 @@ export const PredictiveAnalyticsEngine: React.FC = () => {
         ) : null}
 
         {/* Status */}
-        <CardWrapper bg="bg.canvas">
+        <CardWrapper bg="gray.50">
           <CardWrapper.Body p="3">
             <HStack justify="center" gap="4">
               <HStack gap="2">

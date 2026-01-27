@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { 
-  Layout, Stack, VStack, HStack, Typography, Button, CardWrapper, Badge, Center
+  Box, Stack, VStack, HStack, Typography, Button, CardWrapper, Badge, Center
 } from '@/shared/ui';
 import { 
   PhoneIcon, 
@@ -18,7 +18,7 @@ function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    <Layout variant="container" padding="xl">
+    <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
       <Stack direction="row" align="center" justify="space-between" gap="xl">
         <Stack gap="xl" width="50%">
           <Stack gap="md">
@@ -73,7 +73,7 @@ function HeroSection() {
           </CardWrapper>
         </Center>
       </Stack>
-    </Layout>
+    </Box>
   );
 }
 
@@ -115,7 +115,7 @@ function FeaturedMenu() {
   ];
 
   return (
-    <Layout variant="container" padding="xl">
+    <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
       <Stack gap="xl">
         <Stack gap="sm" align="center">
           <Typography variant="heading" color="text.primary" textAlign="center">
@@ -160,14 +160,14 @@ function FeaturedMenu() {
           ))}
         </div>
       </Stack>
-    </Layout>
+    </Box>
   );
 }
 
 // Sección acerca del restaurante
 function AboutSection() {
   return (
-    <Layout variant="container" padding="xl">
+    <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
       <CardWrapper variant="subtle" padding="xl">
         <Stack direction="row" align="center" gap="xl">
           <Stack gap="lg" width="60%">
@@ -228,7 +228,7 @@ function AboutSection() {
           </Center>
         </Stack>
       </CardWrapper>
-    </Layout>
+    </Box>
   );
 }
 
@@ -259,7 +259,7 @@ function TestimonialsSection() {
   ];
 
   return (
-    <Layout variant="container" padding="xl">
+    <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
       <Stack gap="xl">
         <Stack gap="sm" align="center">
           <Typography variant="heading" color="text.primary" textAlign="center">
@@ -300,14 +300,14 @@ function TestimonialsSection() {
           ))}
         </div>
       </Stack>
-    </Layout>
+    </Box>
   );
 }
 
 // Sección de contacto
 function ContactSection() {
   return (
-    <Layout variant="container" padding="xl">
+    <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
       <CardWrapper variant="subtle" padding="xl">
         <Stack direction="row" justify="space-between" gap="xl">
           <Stack gap="lg" width="50%">
@@ -386,14 +386,14 @@ function ContactSection() {
           </Stack>
         </Stack>
       </CardWrapper>
-    </Layout>
+    </Box>
   );
 }
 
 // Footer comercial
 function Footer() {
   return (
-    <Layout variant="panel" padding="lg" style={{ background: '#2d3748', color: 'white' }}>
+    <Box p={{ base: 4, md: 6 }} style={{ background: '#2d3748', color: 'white' }}>
       <Stack gap="md" align="center">
         <HStack gap="xl" justify="center">
           <Typography variant="title" color="white">
@@ -408,7 +408,7 @@ function Footer() {
           © 2025 La Gigante. Todos los derechos reservados. | Powered by G-Admin
         </Typography>
       </Stack>
-    </Layout>
+    </Box>
   );
 }
 

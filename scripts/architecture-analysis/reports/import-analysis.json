@@ -1,0 +1,2612 @@
+{
+  "timestamp": "2026-01-10T00:48:48.716Z",
+  "summary": {
+    "filesAnalyzed": 1663,
+    "totalIssues": 324,
+    "bySeverity": {
+      "CRITICAL": 0,
+      "HIGH": 302,
+      "MEDIUM": 22,
+      "LOW": 0
+    },
+    "byType": {
+      "DIRECT_CHAKRA_IMPORT": 302,
+      "TIGHT_COUPLING": 22,
+      "SERVER_DATA_IN_STORE": 0
+    }
+  },
+  "issues": [
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\components\\auth\\AuthPage.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\components\\auth\\LoginForm.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\components\\auth\\ProtectedRoute.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\components\\auth\\ProtectedRouteNew.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\components\\auth\\RegisterForm.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\components\\auth\\ResetPasswordForm.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\components\\auth\\RoleGuard.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\components\\debug\\TokenTest.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\components\\ui\\ThemedButton.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\hooks\\useSaleValidation.ts",
+      "line": 22,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/cash/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\hooks\\useSaleValidation.ts",
+      "line": 23,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/cash/services'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\layouts\\AdminLayout.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\layouts\\CustomerLayout.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\lib\\error-handling\\ErrorBoundary.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\lib\\offline\\OfflineMonitor.tsx",
+      "line": 25,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\lib\\performance\\components\\CodeSplittingReport.tsx",
+      "line": 16,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\lib\\performance\\components\\LazyWrapper.tsx",
+      "line": 17,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\lib\\performance\\components\\PerformanceDashboard.tsx",
+      "line": 16,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\lib\\performance\\lazyLoading.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\lib\\performance\\virtualization\\VirtualizedList.tsx",
+      "line": 12,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\lib\\theming\\dynamicTheming.ts",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\cash\\components\\ChartOfAccountsTree.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\cash\\components\\MoneyLocationsList.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\finance-billing\\components\\CustomerBillingSection.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\fulfillment\\delivery\\components\\Drivers\\DriversTab.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\fulfillment\\delivery\\components\\Drivers\\LoadingSkeleton.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\fulfillment\\delivery\\components\\ZoneEditorEnhanced.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\fulfillment\\delivery\\components\\ZoneFormModal.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\fulfillment\\delivery\\components\\Zones\\ZoneEditor.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\memberships\\components\\CustomerMembershipSection.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\recipe\\__tests__\\testUtils.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\rentals\\integrations\\RentalFieldsGroup.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\sales\\ecommerce\\components\\ShoppingCartHeaderIcon.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\AvailabilityTab.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\BookingRulesConfig.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\BookingRulesConfig.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\BusinessHoursConfig.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\BusinessHoursConfig.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\Coverage\\CoveragePlanner.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\LaborCosts\\LaborCostTracker.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\ProfessionalAvailabilityManager.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\RealTime\\RealTimeLaborTracker.tsx",
+      "line": 11,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\TimeOff\\TimeOffManager.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\modules\\scheduling\\components\\WeeklySchedule\\WeeklyScheduleView.tsx",
+      "line": 11,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\crm\\customers\\components\\CustomerForm\\CustomerForm.tsx",
+      "line": 17,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\dashboard\\components\\CapabilityAccordionItem.tsx",
+      "line": 30,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\dashboard\\components\\DashboardSkeletons.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\dashboard\\components\\recipes\\RecipeIntelligenceDashboard.tsx",
+      "line": 14,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\dashboard\\components\\widgets\\MilestoneTracker.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\intelligence\\components\\CompetitorsTable.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\intelligence\\components\\MarketInsightsPanel.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\intelligence\\components\\MarketOverviewDashboard.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\intelligence\\components\\MarketTrendsPanel.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\intelligence\\components\\PricingAnalysisPanel.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\intelligence\\constants\\index.ts",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\reporting\\components\\AutomationTab.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\reporting\\components\\constants\\collections.ts",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\reporting\\components\\GeneratedReportsTab.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\reporting\\components\\InsightsTab.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\reporting\\components\\ReportingSummary.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\reporting\\components\\TemplateCard.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\reporting\\components\\TemplatesTab.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\settings\\components\\SettingsSearch.tsx",
+      "line": 20,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\core\\settings\\components\\System\\SystemSection.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\BalanceSheetReport.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\CashFlowReport.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\CashSessionManager.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\CloseSessionModal.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\JournalEntriesViewer-backup.tsx",
+      "line": 17,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\JournalEntriesViewer-backup.tsx",
+      "line": 24,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/cash/services'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\JournalEntriesViewer.tsx",
+      "line": 18,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\JournalEntriesViewer.tsx",
+      "line": 25,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/cash/services'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\OpenSessionModal.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\ProfitAndLossReport.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\ReportFilters.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\cash\\components\\SessionHistoryTable.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\finance\\cash\\hooks\\useCashPage.ts",
+      "line": 23,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/cash/services'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\fiscal\\components\\FinancialReporting\\FinancialReporting.tsx",
+      "line": 21,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\fiscal\\components\\TaxCompliance\\TaxCompliance.tsx",
+      "line": 22,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\fiscal\\components\\TaxSummary.tsx",
+      "line": 14,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\finance\\integrations\\components\\MercadoPagoConfigForm.tsx",
+      "line": 22,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\gamification\\achievements\\components\\CosmicBackground\\CosmicBackground.optimized.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\gamification\\achievements\\components\\CosmicBackground\\CosmicBackground.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\gamification\\achievements\\components\\FoundationalProgress\\FoundationalProgress.tsx",
+      "line": 18,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\gamification\\achievements\\components\\GalaxyView\\GalaxyView.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\gamification\\achievements\\components\\GridView\\GridView.tsx",
+      "line": 18,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\gamification\\achievements\\page-backup.tsx",
+      "line": 27,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\gamification\\achievements\\page-cosmic-backup.tsx",
+      "line": 13,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\gamification\\achievements\\page-simple.tsx",
+      "line": 25,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\fulfillment\\delivery\\tabs\\Drivers\\DriversTab.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\fulfillment\\delivery\\tabs\\Drivers\\LoadingSkeleton.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\fulfillment\\delivery\\tabs\\Zones\\ZoneEditor.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\fulfillment\\delivery\\tabs\\Zones\\ZonesTab.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\fulfillment\\onsite\\__tests__\\test-utils.tsx",
+      "line": 12,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\production\\components\\KitchenDisplay.tsx",
+      "line": 17,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\AdvancedSalesAnalyticsDashboard\\components\\CustomersTab.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\AdvancedSalesAnalyticsDashboard\\components\\DashboardHeader.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\AdvancedSalesAnalyticsDashboard\\components\\OverviewTab.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\AdvancedSalesAnalyticsDashboard\\components\\PerformanceTab.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\AdvancedSalesAnalyticsDashboard\\components\\PredictionsTab.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\AdvancedSalesAnalyticsDashboard\\index.tsx",
+      "line": 12,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\PredictiveAnalyticsEngine\\components\\AIRecommendations.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\PredictiveAnalyticsEngine\\components\\CustomerIntelligence.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\PredictiveAnalyticsEngine\\components\\DemandForecasting.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\PredictiveAnalyticsEngine\\components\\EngineHeader.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\PredictiveAnalyticsEngine\\components\\MarketIntelligence.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\PredictiveAnalyticsEngine\\components\\OperationalIntelligence.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\PredictiveAnalyticsEngine\\components\\RevenueForecast.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\PredictiveAnalyticsEngine\\index.tsx",
+      "line": 12,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesIntelligenceDashboard\\components\\BusinessAlerts.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesIntelligenceDashboard\\components\\DashboardHeader.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesIntelligenceDashboard\\components\\MenuPerformance.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesIntelligenceDashboard\\components\\MetricCardsGrid.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesIntelligenceDashboard\\components\\PeakHoursAnalysis.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesIntelligenceDashboard\\components\\RealTimeMetrics.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesIntelligenceDashboard\\constants\\index.ts",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesPerformanceInsights\\components\\BenchmarksTab.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesPerformanceInsights\\components\\InsightsTab.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesPerformanceInsights\\components\\OverviewTab.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesPerformanceInsights\\components\\PerformanceHeader.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesPerformanceInsights\\components\\RecommendationsTab.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Analytics\\SalesPerformanceInsights\\index.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\AppointmentsCalendarView.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\AppointmentsTab.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\AppointmentsTable.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\OrderManagement\\Kitchen\\KitchenHeader.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\OrderManagement\\Kitchen\\KitchenOrderCard.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\OrderManagement\\Kitchen\\KitchenStationStats.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\OrderManagement\\KitchenDisplaySystem.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Payment\\ModernPaymentProcessor.tsx",
+      "line": 4,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Payment\\PaymentActionButton.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Payment\\PaymentMethodSelection.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Payment\\PaymentProcessingStatus.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Payment\\PaymentSummary.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Payment\\SelectedPaymentMethods.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Payment\\SplitBillSetup.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\Payment\\TipConfiguration.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\PaymentConfirmationModal.tsx",
+      "line": 27,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\QROrdering\\Generator\\ActiveQRCodes.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\QROrdering\\Generator\\QRCodeModal.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\QROrdering\\Generator\\QRGenerationForm.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\QROrdering\\QRCodeGenerator.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\components\\QROrdering\\QROrderPage.tsx",
+      "line": 17,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\operations\\sales\\page.tsx",
+      "line": 12,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\operations\\sales\\services\\saleApi.ts",
+      "line": 47,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/cash/services'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\resources\\staff\\components\\EmployeeForm.tsx",
+      "line": 16,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\resources\\staff\\components\\sections\\DirectorySection.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\resources\\staff\\components\\sections\\ManagementSection.tsx",
+      "line": 18,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\resources\\staff\\components\\sections\\TimeTrackingSection.tsx",
+      "line": 20,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\resources\\staff\\components\\StaffAppointmentSettings.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\supply-chain\\materials\\components\\FilterDrawer\\FilterDrawer.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\supply-chain\\materials\\components\\MaterialsManagement\\InventoryTab.tsx",
+      "line": 4,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\supply-chain\\materials\\components\\MaterialsManagement\\InventoryTabVirtualized.tsx",
+      "line": 17,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\materials\\components\\MaterialsManagement\\MaterialFormModalComplete\\components\\StockInitialFields\\CountableStockFields.tsx",
+      "line": 13,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\materials\\components\\MaterialsManagement\\MaterialFormModalComplete\\components\\StockInitialFields\\StockInitialFields.tsx",
+      "line": 12,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\materials\\components\\TransferDetailsModal.tsx",
+      "line": 27,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\materials\\hooks\\useMaterialsPage.ts",
+      "line": 13,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\materials\\hooks\\useRealtimeMaterials.ts",
+      "line": 27,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\supply-chain\\products\\components\\sections\\BookingSection.tsx",
+      "line": 19,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\supply-chain\\products\\components\\sections\\DigitalDeliverySection.tsx",
+      "line": 24,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\supply-chain\\products\\components\\sections\\PricingSection.tsx",
+      "line": 11,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\supply-chain\\products\\components\\sections\\ProductionSection.tsx",
+      "line": 24,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\supply-chain\\products\\components\\sections\\RecurringConfigSection.tsx",
+      "line": 23,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\components\\analytics\\ConsolidationOpportunities.tsx",
+      "line": 8,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\components\\analytics\\PortfolioMetricsCards.tsx",
+      "line": 8,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\components\\analytics\\RiskFactorsPanel.tsx",
+      "line": 7,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\components\\analytics\\StrategicRecommendations.tsx",
+      "line": 7,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\components\\analytics\\SupplierComparisonChart.tsx",
+      "line": 7,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\components\\analytics\\SupplierPerformanceCard.tsx",
+      "line": 7,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\components\\analytics\\SupplierPerformanceGrid.tsx",
+      "line": 8,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\components\\SupplierFormContent.tsx",
+      "line": 24,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\hooks\\useSupplierAnalytics.ts",
+      "line": 9,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\hooks\\useSupplierAnalytics.ts",
+      "line": 11,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\services\\supplierAnalyticsService.ts",
+      "line": 6,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "TIGHT_COUPLING",
+      "file": "src\\pages\\admin\\supply-chain\\suppliers\\services\\supplierAnalyticsService.ts",
+      "line": 10,
+      "severity": "MEDIUM",
+      "message": "Direct module import found. Consider using ModuleRegistry.getExports().",
+      "pattern": "from '@/modules/materials/services'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\admin\\tools\\AlertsTestingPage.tsx",
+      "line": 16,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\appointments\\page.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\booking\\components\\BookingConfirmation.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\booking\\components\\CalendarPicker.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\booking\\components\\ProfessionalSelection.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\booking\\components\\ServiceSelection.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\booking\\page.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\menu.tsx",
+      "line": 14,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\orders.tsx",
+      "line": 15,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\portal.tsx",
+      "line": 12,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\app\\settings.tsx",
+      "line": 16,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\CustomerPortal.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\alerts\\index.tsx",
+      "line": 15,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\theme\\DesignSystemShowcase.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\theme\\index.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\theme\\showcases\\AlertStackShowcase.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\theme\\showcases\\BusinessBadgesShowcase.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\theme\\showcases\\FormShowcase.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\theme\\showcases\\QuickComponentsShowcase.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\theme\\showcases\\SectionLayoutShowcase.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\theme\\showcases\\StatsShowcase.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\debug\\theme\\showcases\\TableShowcase.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\public\\admin-login.tsx",
+      "line": 13,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\public\\login.tsx",
+      "line": 13,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\dev\\DeveloperControls.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\layout\\SetupHeader.tsx",
+      "line": 14,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\layout\\SetupProgressBar.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\layout\\SetupSidebar.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\SetupWizard.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\basic-system-config\\BasicSystemConfig.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\FinishStep.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\infrastructure\\supabase-connection\\components\\ActionButtons.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\infrastructure\\supabase-connection\\components\\CredentialsForm.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\infrastructure\\supabase-connection\\components\\ErrorDisplay.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\infrastructure\\supabase-connection\\components\\InstructionsSection.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\infrastructure\\supabase-connection\\components\\WhatHappensNext.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\infrastructure\\supabase-connection\\SupabaseConnectionStep.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\setup-summary\\SetupSummary.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\system-setup\\admin-user-creation\\AdminUserCreationStep.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\system-setup\\admin-user-creation\\components\\ActionButtons.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\system-setup\\admin-user-creation\\components\\AdminUserForm.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\system-setup\\admin-user-creation\\components\\HeaderSection.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\system-setup\\admin-user-creation\\components\\InfoAlert.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\system-setup\\admin-user-creation\\components\\PasswordRequirements.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\system-verification\\SystemVerification.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\pages\\setup\\steps\\welcome\\WelcomeScreen.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\alerts\\components\\AlertBadge.tsx",
+      "line": 13,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\alerts\\components\\AlertDisplay.tsx",
+      "line": 15,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\alerts\\components\\GlobalAlertsDisplay.tsx",
+      "line": 17,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\calendar\\components\\CalendarSidebar.tsx",
+      "line": 20,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\charts\\KPIChart.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\charts\\RevenueChart.tsx",
+      "line": 4,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\charts\\SalesAnalyticsChart.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\components\\CustomerSelector.tsx",
+      "line": 26,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\components\\ErrorBoundary.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\components\\LazyWithErrorBoundary.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\components\\ProductSelector.tsx",
+      "line": 19,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\components\\SmartCostCalculator\\SmartCostCalculator.tsx",
+      "line": 19,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\components\\WeeklyScheduleEditor.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\layout\\DesktopLayout.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\layout\\MobileLayout.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\layout\\ModuleHeader.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\layout\\ResponsiveLayout.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\navigation\\Breadcrumb.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\navigation\\Header.tsx",
+      "line": 11,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Accordion.tsx",
+      "line": 23,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Alert.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Alert.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Alert.tsx",
+      "line": 204,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\AppContainer.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Avatar.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Badge.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Box.tsx",
+      "line": 4,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Button.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Card.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\CardWrapper.tsx",
+      "line": 42,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Checkbox.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Circle.tsx",
+      "line": 4,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\CircularProgress.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Collapsible.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Collapsible.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\CollapsibleAlertStack.tsx",
+      "line": 25,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\components\\business\\SchedulingCalendar.tsx",
+      "line": 50,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\components\\business\\WeeklyCalendar.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\ConnectionBadge.tsx",
+      "line": 13,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Container.tsx",
+      "line": 4,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Dialog.tsx",
+      "line": 217,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Drawer.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Field.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\fields\\DNIField.tsx",
+      "line": 20,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\fields\\MobileField.tsx",
+      "line": 21,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\fields\\PhoneField.tsx",
+      "line": 20,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Fieldset.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Fieldset.tsx",
+      "line": 13,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Flex.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Flex.tsx",
+      "line": 11,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Grid.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Heading.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Icon.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Icon.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\IconButton.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\IconButton.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Image.tsx",
+      "line": 59,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Image.tsx",
+      "line": 62,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Input.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Input.tsx",
+      "line": 4,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Kbd.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Kbd.tsx",
+      "line": 2,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Layout.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Menu.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Modal.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\NumberField.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\NumberInput.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\PageHeader.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Popover.tsx",
+      "line": 9,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Portal.tsx",
+      "line": 4,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Presence.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Presence.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\ProductionCalendar.tsx",
+      "line": 11,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Progress.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\provider.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\QuickComponents.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\RadioGroup.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Section.tsx",
+      "line": 59,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\SegmentGroup.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\SelectField.tsx",
+      "line": 10,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\SelectField.tsx",
+      "line": 12,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\semantic\\Main.tsx",
+      "line": 39,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\semantic\\Section.tsx",
+      "line": 52,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\semantic\\SkipLink.tsx",
+      "line": 47,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Separator.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Skeleton.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Slider.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Spinner.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Stack.tsx",
+      "line": 5,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Stat.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Switch.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Tabs.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Tabs.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Text.tsx",
+      "line": 6,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\TextareaField.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\TextareaField.tsx",
+      "line": 4,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\TextareaField.tsx",
+      "line": 78,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\toaster.tsx",
+      "line": 8,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from \"@chakra-ui/react\""
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Tooltip.tsx",
+      "line": 16,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\Typography.tsx",
+      "line": 1,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\shared\\ui\\wrappers\\AlertComponents.tsx",
+      "line": 24,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\test\\test-utils.tsx",
+      "line": 3,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    },
+    {
+      "type": "DIRECT_CHAKRA_IMPORT",
+      "file": "src\\test-utils.tsx",
+      "line": 7,
+      "severity": "HIGH",
+      "message": "Direct Chakra import found. Use @/shared/ui instead.",
+      "pattern": "from '@chakra-ui/react'"
+    }
+  ]
+}

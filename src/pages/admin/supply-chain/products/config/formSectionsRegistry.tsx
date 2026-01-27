@@ -12,12 +12,12 @@
  */
 
 import { useMemo } from 'react';
-import { useCapabilityStore } from '@/store/capabilityStore';
+import { useBusinessProfile, useFeatureFlags } from '@/lib/capabilities';
 import type { FormSection, ProductType } from '../types/productForm';
 import type { FeatureId } from '@/config/FeatureRegistry';
 
 // Import components
-import { BasicInfoSection, PricingSection, BookingSection, DigitalDeliverySection, RecurringConfigSection, AssetConfigSection, RentalTermsSection, ProductionConfigSection } from '../components/sections';
+import { BasicInfoSection, PricingSection, BookingSection, DigitalDeliverySection, RecurringConfigSection, AssetConfigSection, RentalTermsSection, ProductOperationsSection, RecipeConfigSection } from '../components/sections';
 
 // ============================================
 // REGISTRY DEFINITION
@@ -59,7 +59,7 @@ export const FORM_SECTIONS_REGISTRY: Record<string, FormSection> = {
   production_config: {
     id: 'production_config',
     label: 'Recursos y Operación',
-    component: ProductionConfigSection,
+    component: ProductOperationsSection,
     requiredFeatures: ['inventory_stock_tracking', 'staff_labor_cost_tracking'],
     visibilityRule: (type, activeFeatures) => {
       // ✅ Visible para: physical_product, service, rental
@@ -77,6 +77,26 @@ export const FORM_SECTIONS_REGISTRY: Record<string, FormSection> = {
       return ['physical_product', 'service', 'rental'].includes(type);
     },
     order: 2
+  },
+
+  recipe_config: {
+    id: 'recipe_config',
+    label: 'Bill of Materials (BOM)',
+    component: RecipeConfigSection,
+    requiredFeatures: ['production_bom_management'],
+    visibilityRule: (type, activeFeatures) => {
+      // ✅ Requiere la feature de BOM
+      if (!activeFeatures.includes('production_bom_management')) {
+        return false;
+      }
+
+      // ✅ Visible para physical_product (productos con BOM o kits)
+      // Casos de uso:
+      // - Producto con BOM: Hamburguesa (pan + carne + lechuga)
+      // - Kit de productos: Combo (burger + fries + drink)
+      return type === 'physical_product';
+    },
+    order: 3
   },
 
   booking: {
@@ -191,9 +211,7 @@ export const FORM_SECTIONS_REGISTRY: Record<string, FormSection> = {
 export function useVisibleFormSections(
   productType: ProductType
 ): FormSection[] {
-  const activeFeatures = useCapabilityStore(state =>
-    state.features?.activeFeatures || []
-  );
+  const { activeFeatures } = useFeatureFlags();
 
   return useMemo(() => {
     // Filtrar secciones según visibilityRule

@@ -1,0 +1,4 @@
+{
+  "storageState": "playwright/.auth/user.json",
+  "baseURL": "http://localhost:5173"
+}

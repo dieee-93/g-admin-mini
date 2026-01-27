@@ -1,9 +1,20 @@
-# TODO: Refactorización Estratégica a Futuro
+# Intelligence Module (`/admin/core/intelligence`)
 
-Este módulo (`CompetitiveIntelligence`) se ha aislado aquí de forma temporal para limpiar el `dashboard`.
-La decisión estratégica a largo plazo es descomponer sus funcionalidades e integrarlas en los módulos de negocio donde aportan más valor:
+## Overview
+The Intelligence module focuses on Competitive Intelligence and Market Analysis, providing tools to track market trends and competitor activity.
 
-1.  **Análisis de Precios**: La lógica y la UI del `PricingAnalysisPanel` deberían moverse al módulo `supply-chain/products` para informar directamente las estrategias de precios de los productos.
-2.  **Análisis de Tendencias y Mercado**: Los paneles `MarketTrendsPanel` y `MarketInsightsPanel` podrían convertirse en componentes del módulo `operations/sales` o widgets para el dashboard principal.
+## Access Control
+- **Roles**: `ADMINISTRADOR`, `GERENTE`
+- **Permissions Required**: `intelligence.view`
 
-Esta descomposición debe planificarse en un sprint futuro para asegurar que la lógica de negocio esté lo más cerca posible del dominio que la utiliza.
+## Feature & Route Map
+| Feature | Sub-route | Component | Description |
+|---------|-----------|-----------|-------------|
+| **Market Analysis** | `/` | `CompetitiveIntelligence` | Dashboard for competitive insights. |
+
+## Key Sections
+- **Market Analysis**: Main dashboard displaying competitive data and market tracking metrics.
+
+## Dependencies
+- `shared/ui`: Standard UI components.
+- `CompetitiveIntelligence` component (internal).

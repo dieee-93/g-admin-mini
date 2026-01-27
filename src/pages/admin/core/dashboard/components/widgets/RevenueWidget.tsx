@@ -12,23 +12,16 @@
  */
 
 import React from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { Stack, Typography, Icon, Badge } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { ChartBarIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
-import { useSalesStore } from '@/store/salesStore';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { useSalesData } from '@/pages/admin/operations/sales/hooks/useSalesData';
+import { DecimalUtils } from '@/lib/decimal';
 
 export function RevenueWidget() {
-  // ✅ Usar useShallow de Zustand v5 para evitar loop infinito
-  const { stats, loading } = useSalesStore(useShallow(state => ({
-    stats: state.stats,
-    loading: state.loading
-  })));
+  const { metrics, loading } = useSalesData();
+  const { weekTotal, monthTotal, todayTotal } = metrics;
 
-  const weekTotal = stats?.weekTotal || 0;
-  const monthTotal = stats?.monthTotal || 0;
-  const todayTotal = stats?.todayTotal || 0;
 
   // Calcular % del mes que llevamos (aprox. semana = 25% del mes)
   const weekPercentageOfMonth = monthTotal > 0

@@ -1,0 +1,1 @@
+export { useFiscalDocumentValidation } from './useFiscalDocumentValidation';

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  VStack, 
-  HStack, 
-  Text, 
-  Badge, 
+import {
+  Box,
+  VStack,
+  HStack,
+  Text,
+  Badge,
   Grid,
   Progress,
   Alert,
@@ -19,8 +19,8 @@ import {
   FireIcon
 } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
-import type { Recipe, RecipeWithCost } from '@/services/recipe/types';
-import { fetchRecipesWithCosts } from '@/services/recipe/api/recipeApi';
+import type { Recipe, RecipeWithCost } from '@/modules/recipe/types';
+import { fetchRecipesWithCosts } from '@/modules/recipe/services/recipeApi';
 import { CardWrapper } from '@/shared/ui';
 
 import { logger } from '@/lib/logging';
@@ -47,12 +47,12 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
     try {
       setLoading(true);
       const costsData = await fetchRecipesWithCosts();
-      
+
       if (costsData.length > 0) {
         const totalCost = costsData.reduce((sum, r) => sum + (r.total_cost || 0), 0);
         const averageCost = totalCost / costsData.length;
         const viableRecipes = costsData.filter(r => r.is_viable).length;
-        
+
         // Calculate profitability with 2.5x markup assumption
         const averageProfitability = costsData.reduce((sum, r) => {
           const estimatedPrice = (r.cost_per_unit || 0) * 2.5;
@@ -116,7 +116,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
               <Text fontSize="md" opacity={0.9}>
                 Real-time Cost Analysis + Menu Engineering + Performance Intelligence
               </Text>
-              
+
               {/* Real-time Metrics */}
               <HStack gap="8" mt="4">
                 <VStack gap="1">
@@ -144,8 +144,8 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                   <Text fontSize="sm" opacity={0.8}>Avg Cost</Text>
                 </VStack>
                 <VStack gap="1">
-                  <CircularProgress 
-                    value={analytics?.menuHealthScore || 0} 
+                  <CircularProgress
+                    value={analytics?.menuHealthScore || 0}
                     size="60px"
                     color="rgba(255,255,255,0.9)"
                     trackColor="rgba(255,255,255,0.3)"
@@ -176,10 +176,10 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 </HStack>
                 {!loading && analytics && (
                   <>
-                    <Progress.Root 
+                    <Progress.Root
                       value={recipes.length > 0 ? (analytics.totalViableRecipes / recipes.length) * 100 : 0}
-                      colorPalette="green" 
-                      size="sm" 
+                      colorPalette="green"
+                      size="sm"
                     >
                       <Progress.Track>
                         <Progress.Range />
@@ -217,7 +217,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
             <CardWrapper.Body p="4">
               <VStack align="stretch" gap="3">
                 <Text fontWeight="semibold" color="gray.700">Menu Health</Text>
-                <CircularProgress 
+                <CircularProgress
                   value={analytics?.menuHealthScore || 0}
                   size="80px"
                   color="purple.400"
@@ -243,7 +243,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 {!loading && analytics?.topPerformingRecipes.length ? (
                   <VStack align="stretch" gap="2">
                     {analytics.topPerformingRecipes.slice(0, 3).map((recipe) => (
-                      <HStack key={recipe.id} justify="space-between" p="2" bg="bg.canvas" borderRadius="md">
+                      <HStack key={recipe.id} justify="space-between" p="2" bg="gray.50" borderRadius="md">
                         <VStack align="start" gap="0">
                           <Text fontSize="sm" fontWeight="medium" css={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {recipe.name}
@@ -276,7 +276,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 <Text fontSize="lg" fontWeight="semibold">Menu Engineering Categories</Text>
                 <Badge colorPalette="blue" size="sm">Based on Cost + Sales Data</Badge>
               </HStack>
-              
+
               <Grid templateColumns="repeat(4, 1fr)" gap="4">
                 <CardWrapper bg="yellow.50" borderColor="yellow.200" borderWidth="1px">
                   <CardWrapper.Body p="4">
@@ -290,7 +290,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                     </VStack>
                   </CardWrapper.Body>
                 </CardWrapper>
-                
+
                 <CardWrapper bg="blue.50" borderColor="blue.200" borderWidth="1px">
                   <CardWrapper.Body p="4">
                     <VStack gap="2">
@@ -303,7 +303,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                     </VStack>
                   </CardWrapper.Body>
                 </CardWrapper>
-                
+
                 <CardWrapper bg="orange.50" borderColor="orange.200" borderWidth="1px">
                   <CardWrapper.Body p="4">
                     <VStack gap="2">
@@ -330,10 +330,10 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                   </CardWrapper.Body>
                 </CardWrapper>
               </Grid>
-              
+
               <Alert.Root status="info" variant="subtle">
                 <Alert.Description fontSize="sm">
-                  Menu engineering analysis requires sales data to determine popularity metrics. 
+                  Menu engineering analysis requires sales data to determine popularity metrics.
                   Connect to sales data for complete category classification.
                 </Alert.Description>
               </Alert.Root>
@@ -342,11 +342,11 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
         </CardWrapper>
 
         {/* Action Center */}
-        <CardWrapper bg="bg.canvas">
+        <CardWrapper bg="gray.50">
           <CardWrapper.Body p="4">
             <HStack justify="center" gap="4">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 colorPalette="blue"
                 onClick={loadRecipeAnalytics}
                 loading={loading}
@@ -354,7 +354,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
                 <Icon icon={ClockIcon} size="sm" />
                 Refresh Analytics
               </Button>
-              <Button 
+              <Button
                 colorPalette="blue"
               >
                 <Icon icon={FireIcon} size="sm" />
@@ -366,7 +366,7 @@ export const RecipeIntelligenceDashboard: React.FC<RecipeIntelligenceDashboardPr
 
         {/* Status Footer */}
         <Text fontSize="sm" color="gray.500" textAlign="center" fontStyle="italic">
-          Enhanced recipe management with real-time costing, yield analysis, and menu engineering intelligence. 
+          Enhanced recipe management with real-time costing, yield analysis, and menu engineering intelligence.
           Last updated: {new Date().toLocaleString()}
         </Text>
       </VStack>

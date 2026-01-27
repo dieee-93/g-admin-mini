@@ -47,7 +47,7 @@ import type {
   FulfillmentType
 } from '../services/fulfillmentService';
 import { supabase } from '@/lib/supabase/client';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { logger } from '@/lib/logging';
 import { notify } from '@/lib/notifications';
 

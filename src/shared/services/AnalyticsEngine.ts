@@ -2,7 +2,7 @@
  * Unified Analytics Engine
  * Consolidates RFM, trends, predictions from customers, sales, materials modules
  */
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 export interface AnalyticsConfig {
   module: string;

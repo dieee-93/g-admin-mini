@@ -20,8 +20,10 @@ export type ModuleName =
   | 'sales'
   | 'customers'
   | 'materials'
+  | 'suppliers'
   | 'materials-procurement'
   | 'products'
+  | 'recipe'
   | 'staff'
   | 'scheduling'
   | 'fiscal'
@@ -189,8 +191,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return JSON.stringify(criticalData);
   }, []);
 
+  // ✅ FIX: Memoize getUserRoleFromMultipleSources to prevent re-creation
   // Enhanced function to get user role with JWT claims priority
-  const getUserRoleFromMultipleSources = async (currentSession: Session): Promise<{
+  const getUserRoleFromMultipleSources = useCallback(async (currentSession: Session): Promise<{
     role: UserRole;
     isActive: boolean;
     source: 'jwt' | 'database' | 'fallback';
@@ -240,7 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isActive: false,
       source: 'fallback'
     };
-  };
+  }, []); // No dependencies - stable function
 
   // ✅ FIX: Memoize handleAuthState to prevent re-creation
   // Handle authentication state and fetch user role
@@ -369,9 +372,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [handleAuthState]);
 
   // ✅ FIX: Memoize auth functions to prevent re-creation
+  // ⚡ PERFORMANCE: Throttle token refresh to prevent excessive calls
+  const lastRefreshTimeRef = useRef<number>(0);
+  const REFRESH_THROTTLE_MS = 60000; // Min 60s between refreshes
+
   // Force refresh user role
   const refreshRole = useCallback(async () => {
     if (!session) return;
+
+    // ⚡ PERFORMANCE: Check throttle
+    const now = Date.now();
+    const timeSinceLastRefresh = now - lastRefreshTimeRef.current;
+    
+    if (timeSinceLastRefresh < REFRESH_THROTTLE_MS) {
+      logger.debug('AuthContext', `⏱️ Refresh throttled (${Math.round(timeSinceLastRefresh / 1000)}s since last refresh)`);
+      return;
+    }
+
+    logger.debug('AuthContext', '🔄 Refreshing session token...');
+    lastRefreshTimeRef.current = now;
 
     const { data, error } = await supabase.auth.refreshSession();
 
@@ -379,6 +398,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logger.error('AuthContext', 'Error refreshing session:', error);
       await handleAuthState(session);
     } else if (data.session) {
+      logger.debug('AuthContext', '✅ Session refreshed successfully');
       await handleAuthState(data.session);
     }
   }, [session, handleAuthState]);
@@ -571,6 +591,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ]);
 
   // 🔍 DEBUG: Track authentication state changes
+  // ✅ FIX: Use only primitive values in dependencies to prevent re-render loops
   useEffect(() => {
     const authState = {
       isAuthenticated,
@@ -581,7 +602,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     logger.info('AuthContext', `Auth state changed:`, authState);
     console.log('🔐 [AuthContext] Auth state changed:', authState);
-  }, [isAuthenticated, loading, user]);
+  }, [isAuthenticated, loading, user?.email, user?.role, user?.id]); // ✅ Only primitive values
 
   return (
     <AuthContext.Provider value={contextValue}>

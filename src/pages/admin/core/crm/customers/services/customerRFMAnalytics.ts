@@ -4,7 +4,7 @@
  * Advanced customer analytics with mathematical precision for CLV, RFM scores, and segmentation
  */
 
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 export interface CustomerRFMProfile {
   customer_id: string;

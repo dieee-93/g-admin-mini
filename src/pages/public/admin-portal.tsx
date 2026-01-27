@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { 
-  Layout, Stack, VStack, HStack, Typography, Button, CardWrapper, Badge 
+  Box, Stack, VStack, HStack, Typography, Button, CardWrapper, Badge 
 } from '@/shared/ui';
 import { 
   ShieldCheckIcon,
@@ -18,7 +18,7 @@ import {
 // Header administrativo
 function AdminHeader() {
   return (
-    <Layout variant="panel" padding="lg" style={{ borderBottom: '1px solid #e2e8f0' }}>
+    <Box p={{ base: 4, md: 6 }} style={{ borderBottom: '1px solid #e2e8f0' }}>
       <HStack justify="space-between" align="center">
         <HStack gap="md" align="center">
           <div style={{
@@ -50,14 +50,14 @@ function AdminHeader() {
           Sitio público
         </Button>
       </HStack>
-    </Layout>
+    </Box>
   );
 }
 
 // Sección principal de login para staff
 function LoginSection() {
   return (
-    <Layout variant="container" padding="xl">
+    <Box maxW="1200px" mx="auto" p={{ base: 4, md: 8 }}>
       <Stack direction="row" align="center" justify="center" gap="xl">
         <CardWrapper variant="elevated" padding="xl" width="50%" maxW="400px">
           <Stack gap="lg" align="center">
@@ -158,7 +158,7 @@ function LoginSection() {
           </CardWrapper>
         </Stack>
       </Stack>
-    </Layout>
+    </Box>
   );
 }
 
@@ -172,7 +172,7 @@ function SystemStatus() {
   ];
 
   return (
-    <Layout variant="container" padding="lg">
+    <Box maxW="1200px" mx="auto" p={{ base: 4, md: 6 }}>
       <CardWrapper variant="subtle" padding="lg">
         <Stack gap="md">
           <HStack justify="space-between" align="center">
@@ -210,14 +210,14 @@ function SystemStatus() {
           </div>
         </Stack>
       </CardWrapper>
-    </Layout>
+    </Box>
   );
 }
 
 // Contacto técnico
 function SupportContact() {
   return (
-    <Layout variant="container" padding="lg">
+    <Box maxW="1200px" mx="auto" p={{ base: 4, md: 6 }}>
       <CardWrapper variant="outline" padding="lg">
         <Stack gap="md" align="center">
           <HStack gap="sm" align="center">
@@ -247,14 +247,14 @@ function SupportContact() {
           </Stack>
         </Stack>
       </CardWrapper>
-    </Layout>
+    </Box>
   );
 }
 
 // Footer administrativo
 function AdminFooter() {
   return (
-    <Layout variant="panel" padding="md" style={{ 
+    <Box p={4} style={{ 
       background: '#f7fafc', 
       borderTop: '1px solid #e2e8f0',
       marginTop: 'auto'
@@ -282,7 +282,7 @@ function AdminFooter() {
           Sistema de gestión empresarial para restaurantes y servicios gastronómicos
         </Typography>
       </Stack>
-    </Layout>
+    </Box>
   );
 }
 

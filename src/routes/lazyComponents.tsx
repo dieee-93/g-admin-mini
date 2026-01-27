@@ -28,7 +28,7 @@ export const LazyCustomersPage = React.lazy(() => import('@/pages/admin/core/crm
 // OPERATIONS
 // ============================================
 export const LazySalesPage = React.lazy(() => import('@/pages/admin/operations/sales/page'));
-export const LazyFulfillmentOnsitePage = React.lazy(() => import('@/pages/admin/operations/floor/page'));
+export const LazyFulfillmentOnsitePage = React.lazy(() => import('@/pages/admin/operations/fulfillment/onsite/page'));
 export const LazyProductionPage = React.lazy(() => import('@/pages/admin/operations/kitchen/page'));
 export const LazyDeliveryPage = React.lazy(() => import('@/pages/admin/operations/delivery/page'));
 export const LazyMembershipsPage = React.lazy(() => import('@/pages/admin/operations/memberships/page'));
@@ -51,7 +51,7 @@ export const LazyABCAnalysisView = lazy(() =>
 // ============================================
 // WORKFORCE (RESOURCES)
 // ============================================
-export const LazyStaffPage = React.lazy(() => import('@/pages/admin/resources/staff/page'));
+export const LazyStaffPage = React.lazy(() => import('@/pages/admin/resources/team/page'));
 export const LazySchedulingPage = React.lazy(() => import('@/pages/admin/resources/scheduling/page'));
 
 // ============================================
@@ -65,6 +65,12 @@ export const LazyIntegrationsPage = React.lazy(() => import('@/pages/admin/finan
 // SETTINGS
 // ============================================
 export const LazySettingsPage = React.lazy(() => import('@/pages/admin/core/settings/page'));
+
+// Settings Sub-pages
+export const LazyHoursPage = React.lazy(() => import('@/pages/admin/core/settings/pages/hours/page'));
+export const LazyBusinessPage = React.lazy(() => import('@/pages/admin/core/settings/pages/business/page'));
+export const LazyPaymentMethodsPage = React.lazy(() => import('@/pages/admin/core/settings/pages/payment-methods/page'));
+
 export const LazyDiagnosticsView = lazy(() =>
   import('@/pages/admin/core/settings').then(m => ({ default: m.DiagnosticsView }))
 );

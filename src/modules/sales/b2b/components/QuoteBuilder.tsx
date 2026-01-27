@@ -26,7 +26,7 @@ import { PlusIcon, TrashIcon, DocumentArrowDownIcon } from '@heroicons/react/24/
 import type { QuoteFormData } from '../types';
 import { createQuote, calculateQuoteTotals } from '../services/quotesService';
 import { logger } from '@/lib/logging';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 interface QuoteBuilderProps {
   customerId?: string;

@@ -3,8 +3,8 @@
 // ============================================
 
 import { useState, useMemo, useCallback } from 'react';
-import { useSuppliersStore } from '@/store/suppliersStore';
-import { useSuppliers } from './useSuppliers';
+import { useSuppliersStore } from '@/modules/suppliers/store';
+import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier } from '@/modules/suppliers/hooks';
 import { suppliersService } from '../services/suppliersService';
 import type {
   SupplierTab,
@@ -46,16 +46,29 @@ export function useSuppliersPage() {
   // DATA LAYER
   // ============================================
 
-  const {
-    suppliers,
-    loading,
-    error,
-    createSupplier,
-    updateSupplier,
-    toggleActive,
-    deleteSupplier,
-    refreshData
-  } = useSuppliers();
+  // ✅ TanStack Query hooks
+  const { data: suppliers = [], isLoading: loading, error, refetch: refreshData } = useSuppliers();
+  const createMutation = useCreateSupplier();
+  const updateMutation = useUpdateSupplier();
+  const deleteMutation = useDeleteSupplier();
+
+  // Wrapper functions for backward compatibility
+  const createSupplier = useCallback(async (data: any) => {
+    return await createMutation.mutateAsync(data);
+  }, [createMutation]);
+
+  const updateSupplier = useCallback(async (id: string, data: any) => {
+    return await updateMutation.mutateAsync({ id, data });
+  }, [updateMutation]);
+
+  const deleteSupplier = useCallback(async (id: string) => {
+    return await deleteMutation.mutateAsync(id);
+  }, [deleteMutation]);
+
+  // TODO: Implement toggleActive mutation
+  const toggleActive = useCallback(async (id: string) => {
+    logger.warn('useSuppliersPage', 'toggleActive not yet implemented in TanStack Query');
+  }, []);
 
   // ============================================
   // UI STATE
@@ -179,6 +192,11 @@ export function useSuppliersPage() {
   // RETURN
   // ============================================
 
+  // ✅ PERFORMANCE FIX: Return raw object instead of wrapping in useMemo
+  // All callbacks are already memoized with useCallback (stable references)
+  // Primitive values and data objects only change when actual data changes
+  // Previous pattern created new object on ANY of 37 dependency changes
+  // This caused TabsContext thrashing (323 re-renders)
   return {
     // Data
     suppliers: processedSuppliers,

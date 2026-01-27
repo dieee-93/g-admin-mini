@@ -1,9 +1,9 @@
 // Menu Engineering Matrix Calculations
 // Strategic Business Intelligence Engine for G-Admin Mini
 
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { 
-  MenuCategory, 
+  MenuEngineeringCategory,
   TrendDirection, 
   StrategyPriority,
   RiskLevel,
@@ -21,11 +21,7 @@ export const DEFAULT_MATRIX_CONFIG: MatrixConfiguration = {
   popularityThreshold: 0.5,        // 50% of average popularity
   profitabilityThreshold: 0.5,     // 50% of average profitability  
   analysisPeriodDays: 30,
-  minimumSalesForAnalysis: 5,
-  confidenceThreshold: 0.6,
-  includeSeasonalAdjustment: false,
-  weightRecentSales: true,
-  excludePromotionalPeriods: false
+  minimumSalesVolume: 5,
 };
 
 // Product sales data interface (from database)
@@ -200,14 +196,14 @@ function determineMenuCategory(
   profitabilityIndex: number,
   popularityThreshold: number,
   profitabilityThreshold: number
-): MenuCategory {
+): MenuEngineeringCategory {
   const isHighPopularity = popularityIndex >= popularityThreshold;
   const isHighProfitability = profitabilityIndex >= profitabilityThreshold;
 
-  if (isHighPopularity && isHighProfitability) return MenuCategory.STARS;
-  if (isHighPopularity && !isHighProfitability) return MenuCategory.PLOWHORSES;
-  if (!isHighPopularity && isHighProfitability) return MenuCategory.PUZZLES;
-  return MenuCategory.DOGS;
+  if (isHighPopularity && isHighProfitability) return MenuEngineeringCategory.STARS;
+  if (isHighPopularity && !isHighProfitability) return MenuEngineeringCategory.PLOWHORSES;
+  if (!isHighPopularity && isHighProfitability) return MenuEngineeringCategory.PUZZLES;
+  return MenuEngineeringCategory.DOGS;
 }
 
 /**
@@ -225,10 +221,10 @@ function determineTrendDirection(product: ProductSalesData): TrendDirection {
  * Classify products into matrix categories
  */
 function classifyProducts(menuData: MenuEngineeringData[]): Omit<MenuEngineeringMatrix, 'performanceMetrics' | 'benchmarkAnalysis' | 'trendAnalysis' | 'strategicActions' | 'lastUpdated' | 'analysisPeriod' | 'totalProducts' | 'totalRevenue'> {
-  const stars = menuData.filter(p => p.menuCategory === MenuCategory.STARS);
-  const plowhorses = menuData.filter(p => p.menuCategory === MenuCategory.PLOWHORSES);
-  const puzzles = menuData.filter(p => p.menuCategory === MenuCategory.PUZZLES);
-  const dogs = menuData.filter(p => p.menuCategory === MenuCategory.DOGS);
+  const stars = menuData.filter(p => p.menuCategory === MenuEngineeringCategory.STARS);
+  const plowhorses = menuData.filter(p => p.menuCategory === MenuEngineeringCategory.PLOWHORSES);
+  const puzzles = menuData.filter(p => p.menuCategory === MenuEngineeringCategory.PUZZLES);
+  const dogs = menuData.filter(p => p.menuCategory === MenuEngineeringCategory.DOGS);
 
   return { stars, plowhorses, puzzles, dogs };
 }
@@ -240,31 +236,31 @@ function calculatePerformanceMetrics(
   menuData: MenuEngineeringData[]
 ): PerformanceMetrics {
   const revenueByCategory = {
-    stars: menuData.filter(p => p.menuCategory === MenuCategory.STARS).reduce((sum, p) => sum + p.totalRevenue, 0),
-    plowhorses: menuData.filter(p => p.menuCategory === MenuCategory.PLOWHORSES).reduce((sum, p) => sum + p.totalRevenue, 0),
-    puzzles: menuData.filter(p => p.menuCategory === MenuCategory.PUZZLES).reduce((sum, p) => sum + p.totalRevenue, 0),
-    dogs: menuData.filter(p => p.menuCategory === MenuCategory.DOGS).reduce((sum, p) => sum + p.totalRevenue, 0)
+    stars: menuData.filter(p => p.menuCategory === MenuEngineeringCategory.STARS).reduce((sum, p) => sum + p.totalRevenue, 0),
+    plowhorses: menuData.filter(p => p.menuCategory === MenuEngineeringCategory.PLOWHORSES).reduce((sum, p) => sum + p.totalRevenue, 0),
+    puzzles: menuData.filter(p => p.menuCategory === MenuEngineeringCategory.PUZZLES).reduce((sum, p) => sum + p.totalRevenue, 0),
+    dogs: menuData.filter(p => p.menuCategory === MenuEngineeringCategory.DOGS).reduce((sum, p) => sum + p.totalRevenue, 0)
   };
 
   const profitByCategory = {
-    stars: menuData.filter(p => p.menuCategory === MenuCategory.STARS).reduce((sum, p) => sum + p.contributionMargin, 0),
-    plowhorses: menuData.filter(p => p.menuCategory === MenuCategory.PLOWHORSES).reduce((sum, p) => sum + p.contributionMargin, 0),
-    puzzles: menuData.filter(p => p.menuCategory === MenuCategory.PUZZLES).reduce((sum, p) => sum + p.contributionMargin, 0),
-    dogs: menuData.filter(p => p.menuCategory === MenuCategory.DOGS).reduce((sum, p) => sum + p.contributionMargin, 0)
+    stars: menuData.filter(p => p.menuCategory === MenuEngineeringCategory.STARS).reduce((sum, p) => sum + p.contributionMargin, 0),
+    plowhorses: menuData.filter(p => p.menuCategory === MenuEngineeringCategory.PLOWHORSES).reduce((sum, p) => sum + p.contributionMargin, 0),
+    puzzles: menuData.filter(p => p.menuCategory === MenuEngineeringCategory.PUZZLES).reduce((sum, p) => sum + p.contributionMargin, 0),
+    dogs: menuData.filter(p => p.menuCategory === MenuEngineeringCategory.DOGS).reduce((sum, p) => sum + p.contributionMargin, 0)
   };
 
   // Calculate menu health score (0-100)
-  const starsCount = menuData.filter(p => p.menuCategory === MenuCategory.STARS).length;
-  const dogsCount = menuData.filter(p => p.menuCategory === MenuCategory.DOGS).length;
+  const starsCount = menuData.filter(p => p.menuCategory === MenuEngineeringCategory.STARS).length;
+  const dogsCount = menuData.filter(p => p.menuCategory === MenuEngineeringCategory.DOGS).length;
   const menuHealthScore = Math.max(0, Math.min(100, 
     ((starsCount * 25) + ((menuData.length - dogsCount) * 10)) / menuData.length * 4
   ));
 
   // Count optimization opportunities
   const optimizationOpportunities = menuData.filter(p => 
-    p.menuCategory === MenuCategory.PLOWHORSES || 
-    p.menuCategory === MenuCategory.PUZZLES || 
-    p.menuCategory === MenuCategory.DOGS
+    p.menuCategory === MenuEngineeringCategory.PLOWHORSES || 
+    p.menuCategory === MenuEngineeringCategory.PUZZLES || 
+    p.menuCategory === MenuEngineeringCategory.DOGS
   ).length;
 
   return {
@@ -348,10 +344,10 @@ function generateStrategicRecommendations(menuData: MenuEngineeringData[]): Stra
  */
 function generateProductRecommendation(product: MenuEngineeringData): StrategyRecommendation | null {
   switch (product.menuCategory) {
-    case MenuCategory.STARS:
+    case MenuEngineeringCategory.STARS:
       return {
         productId: product.productId,
-        category: MenuCategory.STARS,
+        category: MenuEngineeringCategory.STARS,
         priority: StrategyPriority.SHORT_TERM,
         action: 'Highlight and Promote',
         description: `${product.productName} is performing excellently with high profit and popularity. Consider highlighting it more prominently.`,
@@ -368,10 +364,10 @@ function generateProductRecommendation(product: MenuEngineeringData): StrategyRe
         }
       };
 
-    case MenuCategory.PLOWHORSES:
+    case MenuEngineeringCategory.PLOWHORSES:
       return {
         productId: product.productId,
-        category: MenuCategory.PLOWHORSES,
+        category: MenuEngineeringCategory.PLOWHORSES,
         priority: StrategyPriority.IMMEDIATE,
         action: 'Optimize Profitability',
         description: `${product.productName} is popular but has low profitability. Focus on cost reduction or price optimization.`,
@@ -387,10 +383,10 @@ function generateProductRecommendation(product: MenuEngineeringData): StrategyRe
         }
       };
 
-    case MenuCategory.PUZZLES:
+    case MenuEngineeringCategory.PUZZLES:
       return {
         productId: product.productId,
-        category: MenuCategory.PUZZLES,
+        category: MenuEngineeringCategory.PUZZLES,
         priority: StrategyPriority.SHORT_TERM,
         action: 'Boost Popularity',
         description: `${product.productName} is highly profitable but not popular. Focus on marketing and repositioning.`,
@@ -406,10 +402,10 @@ function generateProductRecommendation(product: MenuEngineeringData): StrategyRe
         }
       };
 
-    case MenuCategory.DOGS:
+    case MenuEngineeringCategory.DOGS:
       return {
         productId: product.productId,
-        category: MenuCategory.DOGS,
+        category: MenuEngineeringCategory.DOGS,
         priority: StrategyPriority.IMMEDIATE,
         action: 'Consider Removal',
         description: `${product.productName} has low profit and popularity. Consider removal or major reformulation.`,
@@ -472,12 +468,12 @@ function createEmptyMatrix(): MenuEngineeringMatrix {
 /**
  * Get category color for UI styling
  */
-export function getCategoryColor(category: MenuCategory): string {
+export function getCategoryColor(category: MenuEngineeringCategory): string {
   switch (category) {
-    case MenuCategory.STARS: return 'gold.400';
-    case MenuCategory.PLOWHORSES: return 'blue.400';
-    case MenuCategory.PUZZLES: return 'orange.400';
-    case MenuCategory.DOGS: return 'red.400';
+    case MenuEngineeringCategory.STARS: return 'gold.400';
+    case MenuEngineeringCategory.PLOWHORSES: return 'blue.400';
+    case MenuEngineeringCategory.PUZZLES: return 'orange.400';
+    case MenuEngineeringCategory.DOGS: return 'red.400';
     default: return 'gray.400';
   }
 }
@@ -485,12 +481,12 @@ export function getCategoryColor(category: MenuCategory): string {
 /**
  * Get category icon for UI
  */
-export function getCategoryIcon(category: MenuCategory): string {
+export function getCategoryIcon(category: MenuEngineeringCategory): string {
   switch (category) {
-    case MenuCategory.STARS: return '⭐';
-    case MenuCategory.PLOWHORSES: return '🐎';
-    case MenuCategory.PUZZLES: return '🧩';
-    case MenuCategory.DOGS: return '🐕';
+    case MenuEngineeringCategory.STARS: return '⭐';
+    case MenuEngineeringCategory.PLOWHORSES: return '🐎';
+    case MenuEngineeringCategory.PUZZLES: return '🧩';
+    case MenuEngineeringCategory.DOGS: return '🐕';
     default: return '❓';
   }
 }
@@ -498,12 +494,12 @@ export function getCategoryIcon(category: MenuCategory): string {
 /**
  * Get category display name
  */
-export function getCategoryDisplayName(category: MenuCategory): string {
+export function getCategoryDisplayName(category: MenuEngineeringCategory): string {
   switch (category) {
-    case MenuCategory.STARS: return 'Estrellas';
-    case MenuCategory.PLOWHORSES: return 'Caballos de Trabajo';
-    case MenuCategory.PUZZLES: return 'Rompecabezas';
-    case MenuCategory.DOGS: return 'Perros';
+    case MenuEngineeringCategory.STARS: return 'Estrellas';
+    case MenuEngineeringCategory.PLOWHORSES: return 'Caballos de Trabajo';
+    case MenuEngineeringCategory.PUZZLES: return 'Rompecabezas';
+    case MenuEngineeringCategory.DOGS: return 'Perros';
     default: return 'Sin Categoría';
   }
 }

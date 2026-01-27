@@ -3,23 +3,28 @@
  * Manages online product catalog operations
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
 import type { OnlineProduct, OnlineCatalogFilters } from '../types';
 
+export const PRODUCT_CATALOG_QUERY_KEY = ['product-catalog'];
+
 export function useProductCatalog() {
-  const [products, setProducts] = useState<OnlineProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState<OnlineCatalogFilters>({});
 
   // Fetch products with filters
-  const fetchProducts = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
+  const { 
+    data: products = [], 
+    isLoading: loading, 
+    error 
+  } = useQuery({
+    queryKey: [...PRODUCT_CATALOG_QUERY_KEY, filters],
+    queryFn: async () => {
+      logger.debug('App', 'Fetching product catalog', filters);
+      
       let query = supabase
         .from('products')
         .select('*')
@@ -41,74 +46,63 @@ export function useProductCatalog() {
 
       const { data, error: fetchError } = await query;
 
-      if (fetchError) {
-        throw fetchError;
-      }
-
-      setProducts(data || []);
-      logger.info('EcommerceModule', `✅ Loaded ${data?.length || 0} products for online catalog`);
-    } catch (err) {
-      const error = err as Error;
-      logger.error('EcommerceModule', '❌ Error loading products:', error);
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+      if (fetchError) throw fetchError;
+      return data as OnlineProduct[];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   // Update product online visibility
-  const updateProductVisibility = async (
-    productId: string,
-    updates: {
-      available_online?: boolean;
-      online_visibility?: 'visible' | 'hidden' | 'featured';
-      online_price?: number;
-      online_stock?: number;
-    }
-  ) => {
-    try {
-      const { error: updateError } = await supabase
-        .from('products')
+  const updateProductMutation = useMutation({
+    mutationFn: async ({ 
+      productId, 
+      updates 
+    }: { 
+      productId: string, 
+      updates: {
+        available_online?: boolean;
+        online_visibility?: 'visible' | 'hidden' | 'featured';
+        online_price?: number;
+        online_stock?: number;
+      } 
+    }) => {
+      const { error: updateError } = await (supabase
+        .from('products') as any)
         .update({
           ...updates,
           updated_at: new Date().toISOString(),
         })
         .eq('id', productId);
 
-      if (updateError) {
-        throw updateError;
-      }
-
-      // Update local state
-      setProducts(prevProducts =>
-        prevProducts.map(p =>
-          p.id === productId ? { ...p, ...updates } : p
-        )
-      );
-
-      logger.info('EcommerceModule', `✅ Updated product ${productId} visibility`);
-      return { success: true };
-    } catch (err) {
-      const error = err as Error;
-      logger.error('EcommerceModule', '❌ Error updating product visibility:', error);
-      throw error;
+      if (updateError) throw updateError;
+      return { productId, updates };
+    },
+    onSuccess: ({ productId, updates }) => {
+      queryClient.invalidateQueries({ queryKey: PRODUCT_CATALOG_QUERY_KEY });
+      logger.info('App', `✅ Updated product ${productId} visibility`, updates);
+    },
+    onError: (err: any) => {
+      logger.error('App', '❌ Error updating product visibility:', err);
     }
-  };
+  });
 
   // Toggle product online availability
   const toggleProductOnline = async (productId: string, currentValue: boolean) => {
-    const result = await updateProductVisibility(productId, {
-      available_online: !currentValue,
-      // If enabling, set default visibility
-      ...(currentValue ? {} : { online_visibility: 'visible' }),
+    await updateProductMutation.mutateAsync({
+      productId,
+      updates: {
+        available_online: !currentValue,
+        // If enabling, set default visibility
+        ...(currentValue ? {} : { online_visibility: 'visible' }),
+      }
     });
 
     // AUTO-CATALOG ASSIGNMENT: Add to default catalog when going online
     if (!currentValue) {
       try {
         // Get default catalog
-        const { data: defaultCatalog } = await supabase
-          .from('catalogs')
+        const { data: defaultCatalog } = await (supabase
+          .from('catalogs') as any)
           .select('id')
           .eq('is_default', true)
           .eq('is_active', true)
@@ -116,8 +110,8 @@ export function useProductCatalog() {
 
         if (defaultCatalog) {
           // Check if product already in catalog
-          const { data: existing } = await supabase
-            .from('catalog_products')
+          const { data: existing } = await (supabase
+            .from('catalog_products') as any)
             .select('*')
             .eq('catalog_id', defaultCatalog.id)
             .eq('product_id', productId)
@@ -125,15 +119,17 @@ export function useProductCatalog() {
 
           if (!existing) {
             // Add product to default catalog
-            await supabase.from('catalog_products').insert({
-              catalog_id: defaultCatalog.id,
-              product_id: productId,
-              sort_order: 0,
-              is_featured: false,
-            });
+            await (supabase
+              .from('catalog_products') as any)
+              .insert({
+                catalog_id: defaultCatalog.id,
+                product_id: productId,
+                sort_order: 0,
+                is_featured: false,
+              });
 
             logger.info(
-              'EcommerceModule',
+              'App',
               '✅ Auto-added product to default catalog',
               { productId }
             );
@@ -141,35 +137,32 @@ export function useProductCatalog() {
         }
       } catch (error) {
         // Don't fail if catalog assignment fails - just log
-        logger.warn('EcommerceModule', 'Failed to auto-add product to catalog:', error);
+        logger.warn('App', 'Failed to auto-add product to catalog:', error);
       }
     }
-
-    return result;
   };
 
   // Set product as featured
   const toggleFeatured = async (productId: string, currentVisibility: string) => {
     const newVisibility = currentVisibility === 'featured' ? 'visible' : 'featured';
-    return updateProductVisibility(productId, {
-      online_visibility: newVisibility as 'visible' | 'featured',
-      available_online: true, // Auto-enable when featuring
+    return updateProductMutation.mutateAsync({
+      productId,
+      updates: {
+        online_visibility: newVisibility as 'visible' | 'featured',
+        available_online: true, // Auto-enable when featuring
+      }
     });
   };
-
-  // Load products on mount and when filters change
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
 
   return {
     products,
     loading,
-    error,
+    error: error as Error | null,
     filters,
     setFilters,
-    fetchProducts,
-    updateProductVisibility,
+    fetchProducts: async () => { await queryClient.invalidateQueries({ queryKey: PRODUCT_CATALOG_QUERY_KEY }) },
+    updateProductVisibility: (productId: string, updates: any) => 
+      updateProductMutation.mutateAsync({ productId, updates }),
     toggleProductOnline,
     toggleFeatured,
   };

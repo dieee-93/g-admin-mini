@@ -1,66 +1,159 @@
 /**
- * Dashboard Page - Executive Command Center with Tab Navigation
+ * Dashboard Page - Executive Command Center
  *
- * REFACTORED v5.0 - TAB-BASED NAVIGATION:
- * ✅ Tab System inspired by newdashboard/Dashboard.tsx
- * ✅ 4 Tabs: Overview, Analytics, Operations, Activity
- * ✅ Hero: OperationalStatusWidget (always visible)
- * ✅ Alerts & Achievements Section (always visible)
+ * REFACTORED v6.0 - MAGIC PATTERNS DESIGN:
+ * ✅ Clean layout inspired by Magic Patterns design system
+ * ✅ Decorative background elements (subtle blobs)
+ * ✅ Modern metric cards with gradient accents
+ * ✅ Elevated cards with hover effects
+ * ✅ Spacing following Magic Patterns tokens (p="6", gap="6")
+ * ✅ Mobile-first responsive design
  * ✅ Dynamic Widgets Grid via Hook Registry
- * ✅ WCAG 2.4.1 Level A compliant (Bypass Blocks)
+ * ✅ WCAG 2.4.1 Level A compliant
  *
- * TAB STRUCTURE:
- * - Overview: QuickActions + KPIs + Charts preview + Insights
- * - Analytics: All charts (SalesTrend, Distribution, Revenue, Metrics)
- * - Operations: Module stats (Integrated modules, Active connections)
- * - Activity: Activity feed (Recent events timeline)
+ * Design Pattern:
+ * - Background: Decorative blurred circles
+ * - Header: Icon + Title + Subtitle (clean, no gradients yet)
+ * - Metrics Grid: 4 cards with top accent borders
+ * - Content Cards: 2-column grid with elevated cards
+ * - Stats Banner: Gradient background with centered stats
+ * - Dynamic Widgets: Hook-based injection system
  *
- * Based on:
- * - newdashboard/src/components/dashboard/Dashboard.tsx
- * - Progressive Disclosure pattern (NN/G)
- * - Atomic Capabilities v2.0 (Dynamic Slot System)
+ * Based on: 4292c6f5-14a3-4978-b79f-af113030d2f1/src/App.tsx
  */
 
-import React, { useState } from 'react';
-import { ContentLayout, Section, SkipLink, Box, Stack, Typography, Tabs, Icon, SimpleGrid } from '@/shared/ui';
-import { StatCard } from '@/shared/widgets/StatCard';
-import { InsightCard } from '@/shared/widgets/InsightCard';
-import { AlertsAchievementsSection } from './components/AlertsAchievementsSection';
-import { OperationalStatusWidget } from './components/OperationalStatusWidget';
-import { QuickActionsWidget } from './components/QuickActionsWidget';
-import { ActivityFeedWidget } from './components/ActivityFeedWidget';
-import { SalesTrendChart } from './components/charts/SalesTrendChart';
-import { DistributionChart } from './components/charts/DistributionChart';
-import { RevenueAreaChart } from './components/charts/RevenueAreaChart';
-import { MetricsBarChart } from './components/charts/MetricsBarChart';
+import React from 'react';
+import { Box, Stack, SimpleGrid, Flex, Badge } from '@/shared/ui';
+import { HookPoint } from '@/lib/modules';
+import { Typography } from '@/shared/ui';
+import { Button } from '@/shared/ui';
 import {
-  HomeIcon,
-  ChartBarIcon,
-  CogIcon,
-  ClockIcon,
   CurrencyDollarIcon,
   ShoppingCartIcon,
   UsersIcon,
-  CubeIcon,
+  StarIcon,
+  SparklesIcon,
+  BoltIcon,
   CheckCircleIcon,
-  SignalIcon,
-  ArrowTrendingUpIcon,
+  ChartBarIcon,
+  DocumentTextIcon,
+  BellAlertIcon,
+  ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
+import { OperationalStatusWidget } from './components/OperationalStatusWidget';
+import { AlertsAchievementsSection } from './components/AlertsAchievementsSection';
 
 // ===============================
-// COMPONENT
+// TYPES
+// ===============================
+
+interface MetricCardProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  change?: string;
+  changeType?: 'increase' | 'decrease' | 'neutral';
+  gradient: string;
+}
+
+interface StatItemProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}
+
+// ===============================
+// HELPER COMPONENTS (Magic Patterns Style)
+// ===============================
+
+/**
+ * MetricCard - Card with gradient top border and metric data
+ * Adapted from Magic Patterns design with Chakra v3 syntax
+ */
+const MetricCard: React.FC<MetricCardProps> = ({ icon: Icon, label, value, change, changeType, gradient }) => {
+  const changeColor = changeType === 'increase' ? 'green.500' : changeType === 'decrease' ? 'red.500' : 'gray.500';
+  
+  return (
+    <Box
+      bg="bg.surface"
+      p="6"
+      borderRadius="2xl"
+      shadow="md"
+      position="relative"
+      overflow="hidden"
+      _hover={{ shadow: 'lg', transform: 'translateY(-2px)' }}
+      transition="all 0.2s"
+    >
+      {/* Top gradient border */}
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        h="3px"
+        bg={gradient}
+      />
+      
+      <Stack gap={4}>
+        <Flex justify="space-between" align="start">
+          <Box
+            p="3"
+            borderRadius="xl"
+            bg={`${gradient.split('.')[0]}.100`}
+          >
+            <Icon style={{ width: '24px', height: '24px', color: `var(--chakra-colors-${gradient.replace('.', '-')})` }} />
+          </Box>
+          {change && (
+            <Badge colorPalette={changeType === 'increase' ? 'green' : 'red'} size="sm">
+              {change}
+            </Badge>
+          )}
+        </Flex>
+        <Stack gap={1}>
+          <Typography variant="body" size="sm" color="text.muted">
+            {label}
+          </Typography>
+          <Typography variant="heading" size="2xl" fontWeight="bold">
+            {value}
+          </Typography>
+        </Stack>
+      </Stack>
+    </Box>
+  );
+};
+
+/**
+ * StatItem - Centered stat display for banner
+ */
+const StatItem: React.FC<StatItemProps> = ({ icon: Icon, label, value }) => (
+  <Stack gap={2} align="center">
+    <Icon style={{ width: '32px', height: '32px', color: 'white' }} />
+    <Typography variant="heading" size="3xl" fontWeight="bold" color="white">
+      {value}
+    </Typography>
+    <Typography variant="body" size="sm" color="whiteAlpha.900">
+      {label}
+    </Typography>
+  </Stack>
+);
+
+/**
+ * FeatureItem - Simple icon + text row
+ */
+const FeatureItem: React.FC<{ icon: React.ComponentType<{ className?: string }>; text: string }> = ({ icon: Icon, text }) => (
+  <Flex align="center" gap={3}>
+    <Icon style={{ width: '20px', height: '20px', color: 'var(--chakra-colors-purple-500)' }} />
+    <Typography variant="body" size="md">{text}</Typography>
+  </Flex>
+);
+
+// ===============================
+// MAIN COMPONENT
 // ===============================
 
 const DashboardPage: React.FC = () => {
-  // ===============================
-  // STATE
-  // ===============================
-  const [activeTab, setActiveTab] = useState<number>(0);
-
-  // ===============================
-  // MOCK DATA (TODO: Connect to real data)
-  // ===============================
+  // Mock data (TODO: Connect to real Zustand stores)
   const operationalStatus = {
     isOpen: true,
     currentShift: 'Turno Tarde',
@@ -72,25 +165,98 @@ const DashboardPage: React.FC = () => {
     alerts: 2,
   };
 
-  // ===============================
-  // RENDER
-  // ===============================
-
   return (
-    <>
-      {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
-      <SkipLink />
+    <Box position="relative" minH="100vh" bg="bg.canvas" overflow="hidden">
+      {/* ✅ DECORATIVE BACKGROUND BLOBS */}
+      <Box
+        position="absolute"
+        top="-100px"
+        left="-100px"
+        width="400px"
+        height="400px"
+        borderRadius="full"
+        bg="purple.100"
+        filter="blur(80px)"
+        opacity={0.6}
+        pointerEvents="none"
+      />
+      <Box
+        position="absolute"
+        bottom="-150px"
+        right="-150px"
+        width="500px"
+        height="500px"
+        borderRadius="full"
+        bg="blue.100"
+        filter="blur(80px)"
+        opacity={0.6}
+        pointerEvents="none"
+      />
 
-      {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
-      <ContentLayout spacing="compact" mainLabel="Executive Dashboard">
+      {/* ✅ MAIN CONTENT - Padding wrapper (Magic Patterns pattern) */}
+      <Box position="relative" zIndex={1} p={{ base: "6", md: "8" }}>
+        <Stack gap={8} w="100%">
+        
+        {/* ✅ HEADER SECTION */}
+        <Box>
+          <Flex align="center" gap={4} mb={2}>
+            <Box
+              p="4"
+              borderRadius="2xl"
+              bg="linear-gradient(135deg, var(--chakra-colors-purple-500) 0%, var(--chakra-colors-purple-700) 100%)"
+              shadow="lg"
+            >
+              <SparklesIcon style={{ width: '32px', height: '32px', color: 'white' }} />
+            </Box>
+            <Stack gap={1}>
+              <Typography variant="heading" size="3xl" fontWeight="bold">
+                Executive Dashboard
+              </Typography>
+              <Typography variant="body" size="md" color="text.muted">
+                Real-time business intelligence and operational metrics
+              </Typography>
+            </Stack>
+          </Flex>
+        </Box>
 
-        {/* ✅ HERO WIDGET - Operational Status (always visible) */}
-        <Section
-          variant="flat"
-          semanticHeading="Operational Status Overview"
-          live="polite"
-          atomic
-        >
+        {/* ✅ METRICS GRID - 4 columns responsive */}
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={6}>
+          <MetricCard
+            icon={CurrencyDollarIcon}
+            label="Total Revenue"
+            value="$98,550"
+            change="+17.0%"
+            changeType="increase"
+            gradient="purple.500"
+          />
+          <MetricCard
+            icon={ShoppingCartIcon}
+            label="Total Orders"
+            value="1,234"
+            change="+12.5%"
+            changeType="increase"
+            gradient="blue.500"
+          />
+          <MetricCard
+            icon={UsersIcon}
+            label="Active Customers"
+            value="854"
+            change="+5.2%"
+            changeType="increase"
+            gradient="green.500"
+          />
+          <MetricCard
+            icon={StarIcon}
+            label="Avg Rating"
+            value="4.8"
+            change="+0.3"
+            changeType="increase"
+            gradient="yellow.500"
+          />
+        </SimpleGrid>
+
+        {/* ✅ OPERATIONAL STATUS - Always visible hero widget */}
+        <Box>
           <OperationalStatusWidget
             isOpen={operationalStatus.isOpen}
             currentShift={operationalStatus.currentShift}
@@ -102,194 +268,136 @@ const DashboardPage: React.FC = () => {
             alerts={operationalStatus.alerts}
             onToggleStatus={() => logger.info('Dashboard', 'Toggle operational status')}
           />
-        </Section>
-
-        {/* ✅ ALERTS & ACHIEVEMENTS SECTION (always visible) */}
-        <Section
-          variant="flat"
-          semanticHeading="Operational Alerts and Business Progress"
-          live="polite"
-          atomic
-        >
-          <AlertsAchievementsSection />
-        </Section>
-
-        {/* ✅ TABS NAVIGATION */}
-        <Box mt={6}>
-          <Tabs.Root value={activeTab.toString()} onValueChange={(details) => setActiveTab(Number(details.value))}>
-            <Tabs.List>
-              <Tabs.Trigger value="0">
-                <Icon as={HomeIcon} mr={2} />
-                Overview
-              </Tabs.Trigger>
-              <Tabs.Trigger value="1">
-                <Icon as={ChartBarIcon} mr={2} />
-                Analytics
-              </Tabs.Trigger>
-              <Tabs.Trigger value="2">
-                <Icon as={CogIcon} mr={2} />
-                Operaciones
-              </Tabs.Trigger>
-              <Tabs.Trigger value="3">
-                <Icon as={ClockIcon} mr={2} />
-                Actividad
-              </Tabs.Trigger>
-            </Tabs.List>
-
-            <Tabs.Content value="0">
-              {/* TAB 1: OVERVIEW */}
-              <Stack direction="column" gap={6} pt={6}>
-                {/* Quick Actions */}
-                <Box>
-                  <QuickActionsWidget />
-                </Box>
-
-                {/* KPI Cards */}
-                <Box>
-                  <Typography variant="body" size="sm" fontWeight="bold" color="text.muted" mb={4} textTransform="uppercase" letterSpacing="wider">
-                    Métricas Principales
-                  </Typography>
-                  <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={6}>
-                    <StatCard
-                      title="Revenue Hoy"
-                      value="$12,450"
-                      icon={<Icon as={CurrencyDollarIcon} />}
-                      trend={{ value: '+12.5%', isPositive: true }}
-                      footer="vs ayer"
-                    />
-                    <StatCard
-                      title="Ventas Hoy"
-                      value="47"
-                      icon={<Icon as={ShoppingCartIcon} />}
-                      trend={{ value: '+8.2%', isPositive: true }}
-                      footer="vs ayer"
-                    />
-                    <StatCard
-                      title="Staff Activo"
-                      value="6/9"
-                      icon={<Icon as={UsersIcon} />}
-                      footer="Performance"
-                      footerValue="94%"
-                    />
-                    <StatCard
-                      title="Órdenes Pendientes"
-                      value="12"
-                      icon={<Icon as={CubeIcon} />}
-                      footer="En proceso"
-                    />
-                  </SimpleGrid>
-                </Box>
-
-                {/* Charts Preview */}
-                <Box>
-                  <Typography variant="body" size="sm" fontWeight="bold" color="text.muted" mb={4} textTransform="uppercase" letterSpacing="wider">
-                    Tendencias
-                  </Typography>
-                  <SimpleGrid columns={{ base: 1, lg: 12 }} gap={6}>
-                    <Box gridColumn={{ base: 'span 1', lg: 'span 8' }}>
-                      <SalesTrendChart />
-                    </Box>
-                    <Box gridColumn={{ base: 'span 1', lg: 'span 4' }}>
-                      <DistributionChart />
-                    </Box>
-                  </SimpleGrid>
-                </Box>
-
-                {/* Insights */}
-                <Box>
-                  <Stack direction="row" justify="space-between" align="center" mb={6}>
-                    <Stack direction="row" align="center" gap={3}>
-                      <Icon as={ArrowTrendingUpIcon} color="blue.400" />
-                      <Typography variant="heading" size="lg" fontWeight="bold">
-                        Insights Inteligentes
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                  <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-                    <InsightCard
-                      title="Clientes Premium generan 68% del Revenue"
-                      description="Los clientes con membresías activas tienen 3.2x mayor valor promedio"
-                      metric="+$180K"
-                      metricLabel="potencial anual"
-                      tags={['CRM', 'Memberships', 'Sales']}
-                      actionLabel="Ver Detalles"
-                      positive
-                    />
-                    <InsightCard
-                      title="Stock bajo en 3 materiales críticos"
-                      description="Se necesita reabastecimiento urgente para mantener producción"
-                      metric="15 días"
-                      metricLabel="hasta desabastecimiento"
-                      tags={['Inventory', 'Production']}
-                      actionLabel="Ordenar Ahora"
-                      positive={false}
-                    />
-                  </SimpleGrid>
-                </Box>
-              </Stack>
-            </Tabs.Content>
-
-            <Tabs.Content value="1">
-              {/* TAB 2: ANALYTICS */}
-              <Box pt={6}>
-                <SimpleGrid columns={{ base: 1, lg: 12 }} gap="6">
-                  {/* Sales Trend */}
-                  <Box gridColumn={{ base: 'span 1', lg: 'span 8' }}>
-                    <SalesTrendChart />
-                  </Box>
-                  {/* Distribution */}
-                  <Box gridColumn={{ base: 'span 1', lg: 'span 4' }}>
-                    <DistributionChart />
-                  </Box>
-                  {/* Revenue Area */}
-                  <Box gridColumn={{ base: 'span 1', lg: 'span 7' }}>
-                    <RevenueAreaChart />
-                  </Box>
-                  {/* Metrics Bar */}
-                  <Box gridColumn={{ base: 'span 1', lg: 'span 5' }}>
-                    <MetricsBarChart />
-                  </Box>
-                </SimpleGrid>
-              </Box>
-            </Tabs.Content>
-
-            <Tabs.Content value="2">
-              {/* TAB 3: OPERATIONS */}
-              <Box pt={6}>
-                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
-                  <StatCard
-                    title="Módulos Integrados"
-                    value="23"
-                    subtitle="Sistema completo"
-                    icon={<Icon as={CheckCircleIcon} />}
-                  />
-                  <StatCard
-                    title="Conexiones Activas"
-                    value="18"
-                    subtitle="En tiempo real"
-                    icon={<Icon as={SignalIcon} />}
-                  />
-                  <StatCard
-                    title="Última Sincronización"
-                    value="2 min ago"
-                    subtitle="Todos los módulos"
-                    icon={<Icon as={ClockIcon} />}
-                  />
-                </SimpleGrid>
-              </Box>
-            </Tabs.Content>
-
-            <Tabs.Content value="3">
-              {/* TAB 4: ACTIVITY */}
-              <Box pt={6}>
-                <ActivityFeedWidget />
-              </Box>
-            </Tabs.Content>
-          </Tabs.Root>
         </Box>
 
-      </ContentLayout>
-    </>
+        {/* ✅ CONTENT CARDS - 2 columns responsive */}
+        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
+          {/* Welcome Card */}
+          <Box
+            bg="bg.surface"
+            p="8"
+            borderRadius="2xl"
+            shadow="xl"
+            position="relative"
+            overflow="hidden"
+          >
+            <Box
+              position="absolute"
+              top={0}
+              left={0}
+              right={0}
+              h="4px"
+              bg="linear-gradient(90deg, var(--chakra-colors-purple-500) 0%, var(--chakra-colors-blue-500) 100%)"
+            />
+            <Stack gap={4}>
+              <Flex align="center" gap={3}>
+                <BoltIcon style={{ width: '28px', height: '28px', color: 'var(--chakra-colors-purple-500)' }} />
+                <Typography variant="heading" size="xl" fontWeight="bold">
+                  Welcome Back!
+                </Typography>
+              </Flex>
+              <Typography variant="body" size="md" color="text.muted">
+                Here's what's happening with your business today. All systems operational.
+              </Typography>
+              <Stack gap={3} mt={2}>
+                <FeatureItem icon={CheckCircleIcon} text="All modules active and synchronized" />
+                <FeatureItem icon={ChartBarIcon} text="Real-time analytics tracking" />
+                <FeatureItem icon={BellAlertIcon} text="2 active alerts require attention" />
+              </Stack>
+              <Button colorPalette="purple" size="md" mt={4}>
+                View Detailed Report
+              </Button>
+            </Stack>
+          </Box>
+
+          {/* Dynamic Widgets Card */}
+          <Box
+            bg="bg.surface"
+            p="8"
+            borderRadius="2xl"
+            shadow="xl"
+            position="relative"
+            overflow="hidden"
+          >
+            <Box
+              position="absolute"
+              top={0}
+              left={0}
+              right={0}
+              h="4px"
+              bg="linear-gradient(90deg, var(--chakra-colors-blue-500) 0%, var(--chakra-colors-green-500) 100%)"
+            />
+            <Stack gap={4}>
+              <Flex align="center" gap={3}>
+                <ClipboardDocumentListIcon style={{ width: '28px', height: '28px', color: 'var(--chakra-colors-blue-500)' }} />
+                <Typography variant="heading" size="xl" fontWeight="bold">
+                  Dynamic Widgets
+                </Typography>
+              </Flex>
+              <Typography variant="body" size="md" color="text.muted">
+                Module-injected widgets appear here dynamically based on active capabilities.
+              </Typography>
+              
+              {/* HookPoint for dynamic widget injection */}
+              <Box mt={2}>
+                <HookPoint
+                  name="dashboard.widgets"
+                  data={{}}
+                  direction="column"
+                  gap="4"
+                  debug={false}
+                  fallback={
+                    <Box p={4} borderWidth="1px" borderRadius="lg" borderColor="border.muted" bg="bg.muted">
+                      <Typography variant="body" size="sm" color="text.muted">
+                        No widgets registered. Install modules to see dynamic content here.
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </Box>
+            </Stack>
+          </Box>
+        </SimpleGrid>
+
+        {/* ✅ STATS BANNER - Gradient background with overlay */}
+        <Box
+          position="relative"
+          overflow="hidden"
+          borderRadius="2xl"
+        >
+          {/* Gradient background */}
+          <Box
+            position="absolute"
+            inset={0}
+            bg="linear-gradient(135deg, var(--chakra-colors-purple-600) 0%, var(--chakra-colors-blue-600) 100%)"
+          />
+          
+          {/* Blur overlay */}
+          <Box
+            position="absolute"
+            inset={0}
+            bg="whiteAlpha.200"
+            backdropFilter="blur(8px)"
+          />
+
+          {/* Content */}
+          <Box position="relative" p="8">
+            <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
+              <StatItem icon={ChartBarIcon} label="Daily Transactions" value="348" />
+              <StatItem icon={DocumentTextIcon} label="Pending Tasks" value="12" />
+              <StatItem icon={UsersIcon} label="Team Members" value="9" />
+            </SimpleGrid>
+          </Box>
+        </Box>
+
+        {/* ✅ ALERTS & ACHIEVEMENTS SECTION */}
+        <Box>
+          <AlertsAchievementsSection />
+        </Box>
+
+        </Stack>
+      </Box>
+    </Box>
   );
 };
 

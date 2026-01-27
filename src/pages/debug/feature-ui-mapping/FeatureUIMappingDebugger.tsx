@@ -22,7 +22,7 @@ import {
   SimpleGrid,
   Box
 } from '@/shared/ui';
-import { useCapabilities } from '@/store/capabilityStore';
+import { useBusinessProfile, useFeatureFlags } from '@/lib/capabilities';
 import { useLocation } from '@/contexts/LocationContext';
 
 // ============================================

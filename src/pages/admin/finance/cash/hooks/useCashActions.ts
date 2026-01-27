@@ -1,29 +1,22 @@
-/**
- * useCashActions Hook
- *
- * ✅ SPLIT HOOKS PATTERN - Actions Slice
- * Selective subscription to cash store actions
- *
- * Performance:
- * - Actions are stable (Zustand guarantees this)
- * - No re-renders (actions don't change)
- * - Uses useShallow for safety
- */
-
-import { useShallow } from 'zustand/react/shallow';
-import { useCashStore } from '@/store/cashStore';
+import { useCashUIActions } from '@/modules/cash/store/cashStore';
+import { 
+  useOpenCashSession, 
+  useCloseCashSession 
+} from '@/modules/cash/hooks/useCashSessions';
+import type { OpenCashSessionInput, CloseCashSessionInput } from '@/modules/cash/types';
 
 export function useCashActions() {
-  return useCashStore(
-    useShallow((state) => ({
-      setMoneyLocations: state.setMoneyLocations,
-      setActiveSessions: state.setActiveSessions,
-      setSessionHistory: state.setSessionHistory,
-      addSession: state.addSession,
-      updateSession: state.updateSession,
-      removeSession: state.removeSession,
-      setLoading: state.setLoading,
-      setError: state.setError,
-    }))
-  );
+  const uiActions = useCashUIActions();
+  const openMutation = useOpenCashSession();
+  const closeMutation = useCloseCashSession();
+
+  return {
+    ...uiActions,
+    openSession: async (input: OpenCashSessionInput) => {
+      return await openMutation.mutateAsync(input);
+    },
+    closeSession: async (sessionId: string, input: CloseCashSessionInput) => {
+      return await closeMutation.mutateAsync({ sessionId, input });
+    },
+  };
 }

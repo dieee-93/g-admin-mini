@@ -19,7 +19,7 @@ import {
   Typography,
   SelectField
 } from '@/shared/ui';
-import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { usePasswordValidation } from '@/hooks';
 import { logger } from '@/lib/logging';
 
 type AdminRole = 'OPERADOR' | 'SUPERVISOR' | 'ADMINISTRADOR';

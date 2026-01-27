@@ -11,40 +11,40 @@ export const domainRouteMap = {
   'dashboard': '/admin/dashboard',
   'reporting': '/admin/reporting',
   'intelligence': '/admin/intelligence',
-  
+
   // Business Operations Domain
   'sales': '/admin/operations/sales',
   'operations': '/admin/operations',
   'customers': '/admin/customers',
-  'floor': '/admin/operations/floor',
   'kitchen': '/admin/operations/kitchen',
   'delivery': '/admin/operations/delivery',
   'memberships': '/admin/operations/memberships',
   'rentals': '/admin/operations/rentals',
-  
+
   // Supply Chain Domain
   'materials': '/admin/supply-chain/materials',
   'products': '/admin/supply-chain/products',
+  'recipes': '/admin/supply-chain/recipes',
   'suppliers': '/admin/supply-chain/suppliers',
   'assets': '/admin/supply-chain/assets',
-  
+
   // Financial Domain
   'fiscal': '/admin/finance/fiscal',
   'billing': '/admin/finance/billing',
   'integrations': '/admin/finance/integrations',
   'cash': '/admin/finance/cash',
-  
+
   // Workforce Domain
-  'staff': '/admin/resources/staff',
+  'staff': '/admin/resources/team',
   'scheduling': '/admin/resources/scheduling',
-  
+
   // Tools & Settings
   'settings': '/admin/settings',
   'tools': '/admin/tools',
-  
+
   // Gamification Domain
   'gamification': '/admin/gamification',
-  
+
   // Executive Domain
   'executive': '/admin/executive'
 } as const;
@@ -67,7 +67,7 @@ export const routeToFileMap = {
 
   // Operations
   '/admin/operations/sales': 'pages/admin/operations/sales/page',
-  '/admin/operations/floor': 'pages/admin/operations/floor/page',
+  '/admin/operations/fulfillment/onsite': 'pages/admin/operations/fulfillment/onsite/page',
   '/admin/operations/kitchen': 'pages/admin/operations/kitchen/page',
   '/admin/operations/delivery': 'pages/admin/operations/delivery/page',
   '/admin/operations/fulfillment/delivery': 'pages/admin/operations/fulfillment/delivery/page',
@@ -76,7 +76,7 @@ export const routeToFileMap = {
 
   // Supply Chain
   '/admin/supply-chain/materials': 'pages/admin/supply-chain/materials/page',
-  '/admin/supply-chain/materials/procurement': 'pages/admin/supply-chain/materials/procurement',
+
   '/admin/materials/abc-analysis': 'pages/admin/supply-chain/materials/abc-analysis',
   '/admin/materials/supply-chain': 'pages/admin/supply-chain/materials/supply-chain',
   '/admin/materials/procurement': 'pages/admin/supply-chain/materials/procurement',
@@ -85,6 +85,7 @@ export const routeToFileMap = {
   '/admin/supply-chain/products/new': 'pages/admin/supply-chain/products/ProductFormPage',
   '/admin/supply-chain/products/:id/edit': 'pages/admin/supply-chain/products/ProductFormPage',
   '/admin/supply-chain/products/:id/view': 'pages/admin/supply-chain/products/ProductFormPage',
+  '/admin/supply-chain/recipes': 'pages/admin/supply-chain/recipes/page',
   '/admin/supply-chain/suppliers': 'pages/admin/supply-chain/suppliers/page',
   '/admin/supply-chain/assets': 'pages/admin/supply-chain/assets/page',
 
@@ -95,7 +96,7 @@ export const routeToFileMap = {
   '/admin/finance/cash': 'pages/admin/finance/cash/page',
 
   // Resources
-  '/admin/resources/staff': 'pages/admin/resources/staff/page',
+  '/admin/resources/team': 'pages/admin/resources/team/page',
   '/admin/resources/scheduling': 'pages/admin/resources/scheduling/page',
 
   // Gamification & Executive
@@ -110,6 +111,7 @@ export const routeToFileMap = {
   '/admin/settings/business': 'pages/admin/core/settings/pages/business/page',
   '/admin/settings/hours': 'pages/admin/core/settings/pages/hours/page',
   '/admin/settings/payment-methods': 'pages/admin/core/settings/pages/payment-methods/page',
+
   '/admin/settings/integrations': 'pages/admin/core/settings/integrations',
   '/admin/settings/diagnostics': 'pages/admin/core/settings/diagnostics',
   '/admin/settings/reporting': 'pages/admin/core/settings/reporting',
@@ -159,7 +161,7 @@ export const routeToComponentMap = {
 
   // Operations
   '/admin/operations/sales': 'LazySalesPage',
-  '/admin/operations/floor': 'LazyFulfillmentOnsitePage',
+  '/admin/operations/fulfillment/onsite': 'LazyFulfillmentOnsitePage',
   '/admin/operations/kitchen': 'LazyProductionPage',
   '/admin/operations/delivery': 'LazyDeliveryPage',
   '/admin/operations/fulfillment/delivery': 'LazyDeliveryPage',
@@ -168,7 +170,7 @@ export const routeToComponentMap = {
 
   // Supply Chain
   '/admin/supply-chain/materials': 'LazyStockLab',
-  '/admin/supply-chain/materials/procurement': 'LazySupplierOrdersPage',
+
   '/admin/materials/abc-analysis': 'LazyABCAnalysis',
   '/admin/materials/supply-chain': 'LazySupplyChainView',
   '/admin/materials/procurement': 'LazyProcurementPage',
@@ -187,7 +189,7 @@ export const routeToComponentMap = {
   '/admin/finance/cash': 'LazyCashPage',
 
   // Resources
-  '/admin/resources/staff': 'LazyStaffPage',
+  '/admin/resources/team': 'LazyStaffPage',
   '/admin/resources/scheduling': 'LazySchedulingPage',
 
   // Gamification & Executive
@@ -202,6 +204,7 @@ export const routeToComponentMap = {
   '/admin/settings/business': 'LazyBusinessPage',
   '/admin/settings/hours': 'LazyHoursPage',
   '/admin/settings/payment-methods': 'LazyPaymentMethodsPage',
+
   '/admin/settings/integrations': 'LazySettingsIntegrations',
   '/admin/settings/diagnostics': 'LazySettingsDiagnostics',
   '/admin/settings/reporting': 'LazySettingsReporting',
@@ -250,11 +253,11 @@ export function getComponentFromRoute(route: RoutePathAdmin): ComponentName {
 export function getDomainFromRoute(route: string): DomainKey | null {
   const segments = route.split('/');
   const domain = segments[2]; // /admin/[domain]
-  
+
   if (domain && domain in domainRouteMap) {
     return domain as DomainKey;
   }
-  
+
   return null;
 }
 
@@ -270,6 +273,6 @@ export function findModuleByRoute(route: string): string {
   logger.info('App', `Component: ${getComponentFromRoute(route as RoutePathAdmin)}`);
   logger.info('App', `Domain: ${getDomainFromRoute(route)}`);
   console.groupEnd();
-  
+
   return getFilePathFromRoute(route as RoutePathAdmin);
 }

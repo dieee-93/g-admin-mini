@@ -1,335 +1,471 @@
 /**
  * Sales Page - Point of Sale & Order Management
  *
- * SEMANTIC v3.0 - WCAG AA Compliant:
- * ✅ Skip link for keyboard navigation (WCAG 2.4.1 Level A)
- * ✅ Semantic main content wrapper with ARIA label
- * ✅ Proper section headings for screen readers
- * ✅ ARIA live region for sales alerts
- * ✅ Aside pattern for metrics
- * ✅ 3-Layer Architecture (Semantic → Layout → Primitives)
- *
- * FEATURES:
- * - Real-time POS system
- * - Multi-location support
- * - Payment processing
- * - Order tracking
- * - Kitchen integration
- * - EventBus integration (13 systems)
+ * REFACTORED v6.0 - MAGIC PATTERNS DESIGN
+ * Design Principles:
+ * - Decorative background blobs for visual depth
+ * - Gradient metric cards with top border accents (3px)
+ * - Elevated content cards with modern shadows
+ * - Responsive grid layouts (SimpleGrid)
+ * - Clean spacing system (gap="6/8", p="6/8")
+ * - No maxW restrictions (w="100%")
  */
 
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import {
-  ContentLayout, Section, Button, Alert, Icon, Stack, Badge, SkipLink, HStack
+  Box,
+  Stack,
+  Text,
+  Flex,
+  SimpleGrid,
+  Button,
+  Badge,
+  SkipLink,
+  Icon,
+  Tabs,
+  Alert,
+  Section
 } from '@/shared/ui';
+import { Typography } from '@/shared/ui';
 import { HookPoint } from '@/lib/modules';
 import {
-  ArrowPathIcon
+  ArrowPathIcon,
+  CurrencyDollarIcon,
+  CreditCardIcon,
+  ArrowTrendingUpIcon,
+  ClipboardDocumentListIcon,
+  CalendarIcon,
+  DocumentTextIcon,
+  PlusIcon,
+  CheckCircleIcon
 } from '@heroicons/react/24/outline';
 
-// ✅ 14 SISTEMAS INTEGRADOS (+ PERMISSIONS)
+// Systems
 import EventBus from '@/lib/events';
-// Capabilities checked at module load time via Module Registry
 import { useErrorHandler } from '@/lib/error-handling';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
-import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
-import { useNavigationLayout } from '@/contexts/NavigationContext';
-import { useLocation } from '@/contexts/LocationContext'; // 🆕 MULTI-LOCATION
-import { usePermissions } from '@/hooks/usePermissions'; // 🆕 PERMISSIONS SYSTEM
+import { usePermissions } from '@/hooks';
 
-// ✅ COMPONENTES ESPECIALIZADOS - TESTING FOR DECIMAL ERROR
-import {
-  SalesMetrics,
-  SalesManagement,
-  SalesActions,
-  SalesAlerts,
-  LazySaleFormModal,
-  DebugOverlay
-} from './components';
-
-// ✅ HOOKS ESPECIALIZADOS - TESTING ONE BY ONE
+// Components & Hooks
+import { AppointmentsTab } from './components/AppointmentsTab';
+import { LazySaleFormModal } from './components';
 import { useSalesPage } from './hooks';
 import { useModalState } from '@/store/salesStore';
-
 import { logger } from '@/lib/logging';
-// ✅ MODULE CONFIGURATION
-interface EventData {
-  [key: string]: unknown;
+
+// ===============================
+// METRIC CARD COMPONENT (Magic Patterns Style)
+// ===============================
+interface MetricCardProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  change?: string;
+  changeType?: 'increase' | 'decrease' | 'neutral';
+  gradient: string;
+  loading?: boolean;
 }
 
-const SALES_MODULE_CONFIG = {
-  capabilities: ['sells_products', 'pos_system', 'payment_processing', 'customer_management'],
-  events: {
-    emits: ['sales.order_placed', 'sales.payment_completed', 'sales.sale_completed', 'sales.customer_registered'],
-    listens: ['materials.stock_updated', 'materials.low_stock_alert', 'kitchen.order_ready']
-  },
-  eventHandlers: {
-    'materials.stock_updated': (data: EventData) => {
-      // Auto-update product availability based on stock changes
-      logger.info('SalesStore', '🛒 Sales: Stock updated, updating product availability...', data);
-    },
-    'materials.low_stock_alert': (data: EventData) => {
-      // Auto-disable products with critical stock levels
-      logger.info('SalesStore', '🚨 Sales: Low stock alert received, adjusting POS...', data);
-    },
-    'kitchen.order_ready': (data: EventData) => {
-      // Real-time order status updates
-      logger.info('SalesStore', '✅ Sales: Order ready notification...', data);
-    }
-  }
-} as const;
+const MetricCard: React.FC<MetricCardProps> = ({ icon: Icon, label, value, change, changeType, gradient, loading }) => {
+  return (
+    <Box
+      bg="bg.surface"
+      p="6"
+      borderRadius="2xl"
+      shadow="md"
+      position="relative"
+      overflow="hidden"
+      _hover={{ shadow: 'lg', transform: 'translateY(-2px)' }}
+      transition="all 0.2s"
+    >
+      {/* Top gradient border */}
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        h="3px"
+        bg={gradient}
+      />
+      
+      <Stack gap="4">
+        <Flex justify="space-between" align="start">
+          <Box
+            p="3"
+            borderRadius="xl"
+            bg={`${gradient.split('.')[0]}.100`}
+          >
+            <Icon style={{ width: '24px', height: '24px', color: `var(--chakra-colors-${gradient.replace('.', '-')})` }} />
+          </Box>
+          {change && (
+            <Badge colorPalette={changeType === 'increase' ? 'green' : 'red'} size="sm">
+              {change}
+            </Badge>
+          )}
+        </Flex>
+        <Stack gap="1">
+          <Typography variant="body" size="sm" color="text.muted">
+            {label}
+          </Typography>
+          <Typography variant="heading" size="2xl" fontWeight="bold">
+            {loading ? '---' : value}
+          </Typography>
+        </Stack>
+      </Stack>
+    </Box>
+  );
+};
+
+// Event handlers
+const EVENT_HANDLERS = {
+  'materials.stock_updated': () => logger.info('Sales', 'Stock updated'),
+  'materials.low_stock_alert': () => logger.info('Sales', 'Low stock alert'),
+  'kitchen.order_ready': () => logger.info('Sales', 'Order ready')
+};
 
 function SalesPage() {
-  logger.info('SalesStore', 'SalesPage component mount');
+  // Permissions
+  const { canCreate, canRead, canUpdate, canDelete, canVoid, canExport } = usePermissions('sales');
 
-  try {
-    logger.debug('SalesStore', '🔍 SalesPage Component rendering');
-  } catch (e) {
-    logger.error('SalesStore', 'Logger failed', { error: e });
-  }
-
-  // ✅ SISTEMAS INTEGRATION
-  // Capabilities checked at module load time via Module Registry
-  // 🔧 FIX: Only consume hooks that don't update too frequently
-  // usePerformanceMonitor updates 60x/second - DO NOT USE in critical pages
-  // const { shouldReduceAnimations } = usePerformanceMonitor();
-  const { isMobile } = useNavigationLayout();
-  const shouldReduceAnimations = false; // Hardcoded for now
-  const selectedLocation = null; // const { selectedLocation, isMultiLocationMode } = useLocation();
-  const isMultiLocationMode = false;
-
-  // 🔒 PERMISSIONS SYSTEM - Check user permissions for sales module
-  const {
-    canCreate,
-    canRead,
-    canUpdate,
-    canDelete,
-    canVoid,
-    canExport,
-    canConfigure
-  } = usePermissions('sales');
-  
-  // ✅ ERROR HANDLING SYSTEM
+  // Error & offline
   const { handleError } = useErrorHandler();
   const { isOnline } = useOfflineStatus();
 
-  const {
-    metrics,
-    pageState,
-    actions,
-    loading,
-    error,
-    activeTab,
-    setActiveTab
-  } = useSalesPage();
-  logger.debug('SalesStore', 'useSalesPage data loaded', { metrics, loading, error });
+  // Page data
+  const { metrics, pageState, actions, loading, error, activeTab, setActiveTab } = useSalesPage();
 
-  logger.debug('SalesStore', '🔍 SalesPage useSalesPage completed:', {
-    hasMetrics: !!metrics,
-    hasActions: !!actions,
-    loading,
-    error
-  });
-
-  // ✅ MODAL STATE
-  logger.debug('SalesStore', '🔍 SalesPage Getting modal state...');
+  // Modal
   const { isModalOpen, closeModal } = useModalState();
 
-  logger.debug('SalesStore', '🔍 SalesPage All hooks completed successfully!');
-
-  // ✅ EVENTBUS SUBSCRIPTION - Subscribe to cross-module events
+  // EventBus
   useEffect(() => {
-    logger.debug('SalesStore', '🔍 Subscribing to EventBus events...');
-
-    const subscriptions = Object.entries(SALES_MODULE_CONFIG.eventHandlers).map(([eventName, handler]) => {
-      logger.debug('SalesStore', `📡 Subscribing to: ${eventName}`);
-      return EventBus.subscribe(eventName, (event) => {
-        handler(event.payload || {});
-      });
-    });
-
-    logger.debug('SalesStore', `✅ Subscribed to ${subscriptions.length} events`);
-
-    // Cleanup subscriptions on unmount
-    return () => {
-      logger.debug('SalesStore', '🧹 Unsubscribing from EventBus events...');
-      subscriptions.forEach(unsub => unsub());
-    };
+    const subs = Object.entries(EVENT_HANDLERS).map(([name, handler]) =>
+      EventBus.subscribe(name, () => handler())
+    );
+    return () => subs.forEach(unsub => unsub());
   }, []);
 
-  // ✅ ERROR HANDLING WITH RECOVERY
-  // Note: Removed pageState from dependencies to prevent infinite loop
-  // pageState is an object that recreates on every render, causing the effect to run infinitely
+  // Error handling
   useEffect(() => {
     if (error && handleError) {
-      logger.error('SalesStore', '🚨 Error detected in SalesPage:', error);
-      handleError(error, {
-        context: 'SalesPage',
-        pageState: pageState || {},
-        recoverable: true
-      });
+      handleError(error, { context: 'SalesPage', pageState, recoverable: true });
     }
   }, [error, handleError]);
 
-  // ✅ ERROR UI
+  // Error state
   if (error) {
-    logger.error('SalesStore', '🔍 SalesPage Error detected:', error);
     return (
-      <>
+      <Box p="6">
         <SkipLink />
-        <ContentLayout spacing="normal" mainLabel="Sales Management Error">
-          <Alert status="error" title="Error de carga del módulo">
-            {error}
-          </Alert>
-          <Button onClick={() => window.location.reload()}>
-            <Icon icon={ArrowPathIcon} size="sm" />
-            Recargar página
-          </Button>
-        </ContentLayout>
-      </>
+        <Alert status="error" title="Error de carga">{error}</Alert>
+        <Button onClick={() => window.location.reload()} mt="4">
+          <Icon icon={ArrowPathIcon} size="sm" /> Recargar
+        </Button>
+      </Box>
     );
   }
 
-  logger.debug('SalesStore', '🔍 SalesPage Starting render...');
-
   return (
-    <>
-      {/* 🐛 DEBUG OVERLAY - DISABLED: Causes infinite re-renders via setRenderInfo */}
-      {/* <DebugOverlay metrics={metrics} actions={actions} pageState={pageState} /> */}
-
-      {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
+    <Box position="relative" minH="100vh" bg="bg.canvas" overflow="hidden">
       <SkipLink />
+      
+      {/* Decorative background elements */}
+      <Box position="absolute" top="-10%" right="-5%" width="500px" height="500px" borderRadius="full" bg="teal.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" />
+      <Box position="absolute" bottom="-10%" left="-5%" width="400px" height="400px" borderRadius="full" bg="purple.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" />
 
-      {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
-      <ContentLayout spacing="normal" mainLabel="Sales Point of Sale Management">
+      <Box position="relative" zIndex="1" p={{ base: "6", md: "8" }}>
+        <Stack gap="8" w="100%">
 
-        {/* ✅ OFFLINE WARNING SECTION - ARIA live region */}
-        {!isOnline && (
-          <Section
-            variant="flat"
-            semanticHeading="System Status Alert"
-            live="polite"
-            atomic
-          >
-            <Alert variant="warning" title="Modo Offline">
-              Los cambios se sincronizarán cuando recuperes la conexión
-            </Alert>
-          </Section>
-        )}
+          {/* ═══════════════════════════════════════════════════════════════
+              HEADER - Magic Patterns Style
+              ═══════════════════════════════════════════════════════════════ */}
+          <Flex justify="space-between" align="center" flexWrap="wrap" gap="4">
+            <Flex align="center" gap="4">
+              <Box
+                p="4"
+                borderRadius="2xl"
+                bg="linear-gradient(135deg, var(--chakra-colors-teal-500) 0%, var(--chakra-colors-teal-700) 100%)"
+                shadow="lg"
+              >
+                <CurrencyDollarIcon style={{ width: '32px', height: '32px', color: 'white' }} />
+              </Box>
+              <Stack gap="1">
+                <Typography variant="heading" size="3xl" fontWeight="bold">
+                  Punto de Venta
+                </Typography>
+                <Flex align="center" gap="2">
+                  <Typography variant="body" size="md" color="text.muted">
+                    Sistema de ventas y transacciones
+                  </Typography>
+                  {isOnline ? (
+                    <Badge colorPalette="green" size="sm">
+                      <Icon icon={CheckCircleIcon} size="xs" />
+                      Online
+                    </Badge>
+                  ) : (
+                    <Badge colorPalette="orange" size="sm">Offline</Badge>
+                  )}
+                </Flex>
+              </Stack>
+            </Flex>
 
-        {/* 🆕 MULTI-LOCATION: Location Badges */}
-        {isMultiLocationMode && selectedLocation && (
-          <Section variant="flat" semanticHeading="Current Location Information">
-            <Stack direction="row" gap="sm" align="center" flexWrap="wrap">
-              <Badge variant="solid" colorPalette="blue">
-                📍 {selectedLocation.name}
-              </Badge>
-              <Badge variant="outline" colorPalette="green">
-                {selectedLocation.code}
-              </Badge>
-            </Stack>
-          </Section>
-        )}
+            {canCreate && (
+              <Button colorPalette="teal" size="lg" onClick={actions.handleNewSale}>
+                <Icon icon={PlusIcon} size="sm" />
+                Nueva Venta
+              </Button>
+            )}
+          </Flex>
 
-        {/* 🎯 TOOLBAR ACTIONS - Hook System Injection Point */}
-        <Section variant="flat" semanticHeading="Sales Toolbar Actions">
-          <HStack gap="3" flexWrap="wrap">
-            {/* HookPoint: sales.toolbar.actions */}
-            {/* Modules can inject actions here (e.g., TakeAway toggle, Dine-In toggle) */}
-            <HookPoint name="sales.toolbar.actions" fallback={null} />
-          </HStack>
-        </Section>
-
-        {/* ✅ METRICS SECTION - Complementary aside pattern */}
-        <Section
-          as="aside"
-          variant="flat"
-          semanticHeading="Sales Metrics Overview"
-        >
-          <SalesMetrics
-            metrics={metrics}
-            onMetricClick={actions.handleMetricClick}
-            loading={loading}
-          />
-        </Section>
-
-        {/* ✅ CRITICAL ALERTS SECTION - ARIA live region */}
-        <Section
-          variant="flat"
-          semanticHeading="Sales Alerts and Notifications"
-          live="polite"
-          atomic
-        >
-          <SalesAlerts
-            onAlertAction={actions.handleAlertAction}
-            context="sales"
-            metrics={metrics}
-          />
-        </Section>
-
-        {/* ✅ MAIN MANAGEMENT SECTION - Primary content area */}
-        {/* 🔒 PERMISSIONS: User must have at least READ permission to view */}
-        {canRead && (
-          <Section
-            variant="elevated"
-            title="Gestión de Ventas"
-            semanticHeading="Sales Management Tools"
-          >
-            <SalesManagement
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              onOrderPlace={canCreate ? actions.handleOrderPlace : undefined}
-              onPaymentProcess={canUpdate ? actions.handlePaymentProcess : undefined}
-              onNewSale={canCreate ? actions.handleNewSale : undefined}
-              performanceMode={shouldReduceAnimations}
-              // 🔒 Pass permissions to child component for granular control
-              permissions={{
-                canCreate,
-                canUpdate,
-                canDelete,
-                canVoid,
-                canExport
-              }}
+          {/* ═══════════════════════════════════════════════════════════════
+              METRICS CARDS - Magic Patterns Style
+              ═══════════════════════════════════════════════════════════════ */}
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap="6">
+            <MetricCard
+              icon={CurrencyDollarIcon}
+              label="Revenue Hoy"
+              value={`$${metrics.todayRevenue.toLocaleString('es-AR')}`}
+              change={metrics.salesGrowth > 0 ? `+${metrics.salesGrowth}%` : `${metrics.salesGrowth}%`}
+              changeType={metrics.salesGrowth > 0 ? 'increase' : 'decrease'}
+              gradient="linear-gradient(90deg, var(--chakra-colors-green-400) 0%, var(--chakra-colors-green-600) 100%)"
+              loading={loading}
             />
-          </Section>
-        )}
-
-        {/* ✅ QUICK ACTIONS SECTION - Aside pattern for tools */}
-        {/* 🔒 PERMISSIONS: Show section only if user has any action permission */}
-        {(canCreate || canExport || canConfigure) && (
-          <Section
-            as="aside"
-            variant="flat"
-            semanticHeading="Quick Action Tools"
-          >
-            <SalesActions
-              onNewSale={canCreate ? actions.handleNewSale : undefined}
-              onQRGeneration={canConfigure ? actions.handleQRGeneration : undefined}
-              onShowAnalytics={canRead ? actions.handleShowAnalytics : undefined}
-              onKitchenDisplay={canRead ? actions.handleKitchenDisplay : undefined}
-              isMobile={isMobile}
+            <MetricCard
+              icon={CreditCardIcon}
+              label="Transacciones"
+              value={metrics.todayTransactions.toString()}
+              gradient="linear-gradient(90deg, var(--chakra-colors-blue-400) 0%, var(--chakra-colors-blue-600) 100%)"
+              loading={loading}
             />
-          </Section>
-        )}
+            <MetricCard
+              icon={ArrowTrendingUpIcon}
+              label="Ticket Promedio"
+              value={`$${metrics.averageOrderValue.toLocaleString('es-AR')}`}
+              gradient="linear-gradient(90deg, var(--chakra-colors-purple-400) 0%, var(--chakra-colors-purple-600) 100%)"
+              loading={loading}
+            />
 
-        {/* 🪟 MODAL - AGREGAR/PROCESAR VENTA */}
-        {/* 🔒 PERMISSIONS: Only show modal if user has create or update permission */}
-        {isModalOpen && (canCreate || canUpdate) && (
-          <LazySaleFormModal
-            isOpen={isModalOpen}
-            onClose={closeModal}
-            readOnly={!canCreate && !canUpdate} // Read-only mode if no permissions
-          />
-        )}
+            {/* Dynamic metrics via HookPoint */}
+            <HookPoint name="sales.metrics.cards" data={{ metrics }} fallback={null} />
+          </SimpleGrid>
 
-      </ContentLayout>
-    </>
+          {/* ═══════════════════════════════════════════════════════════════
+              MAIN CONTENT - Elevated Tabs Card (Magic Patterns Style)
+              ═══════════════════════════════════════════════════════════════ */}
+          {canRead && (
+            <Box bg="bg.surface" p="8" borderRadius="2xl" shadow="xl">
+              <Tabs.Root
+                value={activeTab}
+                onValueChange={(d) => setActiveTab(d.value)}
+                lazyMount
+                unmountOnExit={false}
+              >
+                <Tabs.List mb="6">
+                  <Tabs.Trigger value="pos">
+                    <Icon icon={CreditCardIcon} size="sm" />
+                    POS
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value="orders">
+                    <Icon icon={ClipboardDocumentListIcon} size="sm" />
+                    Órdenes
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value="agenda">
+                    <Icon icon={CalendarIcon} size="sm" />
+                    Agenda
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value="reports">
+                    <Icon icon={DocumentTextIcon} size="sm" />
+                    Reportes
+                  </Tabs.Trigger>
+                </Tabs.List>
+
+                {/* POS Tab */}
+                <Tabs.Content value="pos">
+                  <Stack gap="6">
+                    <Box>
+                      <Typography variant="heading" size="xl" fontWeight="bold" mb="2">
+                        Sistema de Punto de Venta
+                      </Typography>
+                      <Typography variant="body" size="md" color="text.muted">
+                        Selecciona un tipo de venta para comenzar o usa el botón "Nueva Venta" en el header.
+                      </Typography>
+                    </Box>
+
+                    {/* Quick action buttons - Magic Patterns Style */}
+                    <SimpleGrid columns={{ base: 1, md: 3 }} gap="6">
+                      <Box
+                        p="6"
+                        bg="teal.50"
+                        borderRadius="xl"
+                        borderWidth="2px"
+                        borderColor="teal.200"
+                        cursor="pointer"
+                        transition="all 0.2s"
+                        _hover={{ borderColor: "teal.400", transform: "translateY(-2px)", shadow: "md" }}
+                        onClick={actions.handleNewSale}
+                      >
+                        <Icon icon={PlusIcon} size="lg" color="teal.600" mb="3" />
+                        <Typography variant="body" size="md" fontWeight="bold" mb="1">Producto Físico</Typography>
+                        <Typography variant="body" size="sm" color="text.muted">Venta de productos del inventario</Typography>
+                      </Box>
+
+                      <Box
+                        p="6"
+                        bg="blue.50"
+                        borderRadius="xl"
+                        borderWidth="2px"
+                        borderColor="blue.200"
+                        cursor="pointer"
+                        transition="all 0.2s"
+                        _hover={{ borderColor: "blue.400", transform: "translateY(-2px)", shadow: "md" }}
+                      >
+                        <Text fontSize="2xl" mb="3">🛠️</Text>
+                        <Typography variant="body" size="md" fontWeight="bold" mb="1">Servicio</Typography>
+                        <Typography variant="body" size="sm" color="text.muted">Reservas y servicios profesionales</Typography>
+                      </Box>
+
+                      <Box
+                        p="6"
+                        bg="purple.50"
+                        borderRadius="xl"
+                        borderWidth="2px"
+                        borderColor="purple.200"
+                        cursor="pointer"
+                        transition="all 0.2s"
+                        _hover={{ borderColor: "purple.400", transform: "translateY(-2px)", shadow: "md" }}
+                      >
+                        <Text fontSize="2xl" mb="3">💻</Text>
+                        <Typography variant="body" size="md" fontWeight="bold" mb="1">Digital</Typography>
+                        <Typography variant="body" size="sm" color="text.muted">Productos digitales y descargas</Typography>
+                      </Box>
+                    </SimpleGrid>
+
+                    {/* HookPoint for module-specific actions */}
+                    <HookPoint name="sales.pos.quick_actions" fallback={null} />
+                  </Stack>
+                </Tabs.Content>
+
+                {/* Orders Tab */}
+                <Tabs.Content value="orders">
+                  <Stack gap="6">
+                    <Flex justify="space-between" align="center" flexWrap="wrap" gap="4">
+                      <Box>
+                        <Typography variant="heading" size="xl" fontWeight="bold">Historial de Órdenes</Typography>
+                        <Typography variant="body" size="sm" color="text.muted">Gestiona todas las órdenes: ventas, delivery, pickup y servicios</Typography>
+                      </Box>
+                      <Flex gap="2" flexWrap="wrap">
+                        <Button size="sm" variant="solid" colorPalette="teal">Todas</Button>
+                        <Button size="sm" variant="outline">Pendientes</Button>
+                        <Button size="sm" variant="outline">Completadas</Button>
+                        <Button size="sm" variant="outline">Delivery</Button>
+                      </Flex>
+                    </Flex>
+                    {/* TODO: OrdersTable component */}
+                    <Box p="12" textAlign="center" borderRadius="xl" borderWidth="2px" borderStyle="dashed" borderColor="border.default" bg="bg.muted">
+                      <Text fontSize="4xl" mb="3">📋</Text>
+                      <Typography variant="body" size="md" fontWeight="semibold" mb="2">Tabla de Órdenes</Typography>
+                      <Typography variant="body" size="sm" color="text.muted">Component pendiente de implementación</Typography>
+                    </Box>
+                  </Stack>
+                </Tabs.Content>
+
+                {/* Agenda Tab */}
+                <Tabs.Content value="agenda">
+                  <AppointmentsTab />
+                </Tabs.Content>
+
+                {/* Reports Tab */}
+                <Tabs.Content value="reports">
+                  <Stack gap="6">
+                    <Box>
+                      <Typography variant="heading" size="xl" fontWeight="bold" mb="2">Reportes y Analytics</Typography>
+                      <Typography variant="body" size="md" color="text.muted">
+                        Genera reportes de ventas y visualiza métricas de rendimiento
+                      </Typography>
+                    </Box>
+
+                    <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="6">
+                      <Box
+                        p="6"
+                        bg="bg.surface"
+                        borderRadius="xl"
+                        borderWidth="1px"
+                        borderColor="border.default"
+                        cursor="pointer"
+                        transition="all 0.2s"
+                        _hover={{ shadow: "md", transform: "translateY(-2px)" }}
+                        textAlign="center"
+                      >
+                        <Icon icon={DocumentTextIcon} size="lg" color="purple.500" mb="3" />
+                        <Typography variant="body" size="md" fontWeight="bold">Reporte del Día</Typography>
+                      </Box>
+                      <Box
+                        p="6"
+                        bg="bg.surface"
+                        borderRadius="xl"
+                        borderWidth="1px"
+                        borderColor="border.default"
+                        cursor="pointer"
+                        transition="all 0.2s"
+                        _hover={{ shadow: "md", transform: "translateY(-2px)" }}
+                        textAlign="center"
+                      >
+                        <Text fontSize="2xl" mb="3">📊</Text>
+                        <Typography variant="body" size="md" fontWeight="bold">Reporte Semanal</Typography>
+                      </Box>
+                      <Box
+                        p="6"
+                        bg="bg.surface"
+                        borderRadius="xl"
+                        borderWidth="1px"
+                        borderColor="border.default"
+                        cursor="pointer"
+                        transition="all 0.2s"
+                        _hover={{ shadow: "md", transform: "translateY(-2px)" }}
+                        textAlign="center"
+                      >
+                        <Text fontSize="2xl" mb="3">📈</Text>
+                        <Typography variant="body" size="md" fontWeight="bold">Reporte Mensual</Typography>
+                      </Box>
+                      {canExport && (
+                        <Box
+                          p="6"
+                          bg="bg.surface"
+                          borderRadius="xl"
+                          borderWidth="1px"
+                          borderColor="border.default"
+                          cursor="pointer"
+                          transition="all 0.2s"
+                          _hover={{ shadow: "md", transform: "translateY(-2px)" }}
+                          textAlign="center"
+                        >
+                          <Text fontSize="2xl" mb="3">💾</Text>
+                          <Typography variant="body" size="md" fontWeight="bold">Exportar CSV</Typography>
+                        </Box>
+                      )}
+                    </SimpleGrid>
+                  </Stack>
+                </Tabs.Content>
+              </Tabs.Root>
+            </Box>
+          )}
+
+          {/* Sale Modal */}
+          {isModalOpen && (canCreate || canUpdate) && (
+            <LazySaleFormModal
+              isOpen={isModalOpen}
+              onClose={closeModal}
+            />
+          )}
+
+        </Stack>
+      </Box>
+    </Box>
   );
 }
 
 export default SalesPage;
 
-// 🔍 Enable Why Did You Render tracking for debugging infinite loops
 if (import.meta.env.DEV) {
   SalesPage.whyDidYouRender = true;
 }

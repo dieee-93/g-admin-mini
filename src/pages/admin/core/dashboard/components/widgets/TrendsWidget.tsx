@@ -12,26 +12,16 @@
  */
 
 import React from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { Box, Stack, Typography, Icon, Badge } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { SparklesIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
-import { useSalesStore } from '@/store/salesStore';
-import { useMaterialsStore } from '@/store/materialsStore';
 
 export function TrendsWidget() {
-  // ✅ Usar useShallow de Zustand v5 para evitar loop infinito
-  const { salesStats, salesLoading } = useSalesStore(useShallow(state => ({
-    salesStats: state.stats,
-    salesLoading: state.loading
-  })));
-
-  const { materialsAlerts, materialsLoading } = useMaterialsStore(useShallow(state => ({
-    materialsAlerts: state.alerts,
-    materialsLoading: state.loading
-  })));
-
-  const loading = salesLoading || materialsLoading;
+  // TODO: Migrate to TanStack Query - need useSales() and useMaterials() hooks with stats
+  // For now, return empty/safe data to prevent crashes
+  const loading = false;
+  const salesStats = { growth: 0, trend: 'stable' as const };
+  const materialsAlerts = [];
 
   // Calcular tendencia de ventas (comparar semana vs mes)
   const weekTotal = salesStats?.weekTotal || 0;

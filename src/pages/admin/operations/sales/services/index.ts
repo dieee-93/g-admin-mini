@@ -1,23 +1,56 @@
-// API Services (existing)
-export * from './saleApi';
-export * from './tableApi';
+/**
+ * Sales Page Services - Re-exports from Module
+ * 
+ * This file re-exports services from the sales module for backward compatibility.
+ * New code should import directly from @/modules/sales
+ */
 
-// Re-export commonly used functions explicitly for better IDE support
+// ⚠️ DEPRECATED: Import from @/modules/sales/services instead
+// Keeping for backward compatibility with existing page code
+
+// POS Sales API - Now in module
 export {
+  fetchSales,
+  fetchSaleById,
+  deleteSale,
+  validateSaleStock,
+  getSalesSummary,
+  fetchCustomers,
+  fetchProductsWithAvailability,
+  fetchTransactions,
+  fetchOrders,
+  getTopSellingProducts,
+  getCustomerPurchases,
+  processSale,
+} from '@/modules/sales/services/posApi';
+
+// Table Management - Now in module
+export { 
   fetchTables,
+  fetchTableById,
   seatParty,
-  clearTable
-} from './tableApi';
+  clearTable,
+  updateTableStatus,
+  logServiceEvent,
+  getServiceTimeline
+} from '@/modules/sales/services/tableApi';
 
-// Business Logic Services (moved from business-logic/)
-export * from './salesAnalytics';
-export * from './taxCalculationService';
+// Sales Analytics - Now in module
+export * from '@/modules/sales/services/salesAnalytics';
 
-// ✅ SALES INTELLIGENCE SYSTEM - NEW
-export { SalesIntelligenceEngine } from './SalesIntelligenceEngine';
-export { SalesAlertsAdapter, salesAlertsAdapter } from './SalesAlertsAdapter';
+// Sales Intelligence - Now in module
+export { 
+  SalesIntelligenceEngine 
+} from '@/modules/sales/services/salesIntelligenceEngine';
 
-// Types exports
+// Tax Calculations - Now in cash module
+export { 
+  taxService,
+  TAX_RATES,
+  DEFAULT_TAX_CONFIG
+} from '@/modules/cash/services/taxCalculationService';
+
+// Types - Now in module
 export type {
   SalesAlert,
   SalesAlertSeverity,
@@ -25,4 +58,8 @@ export type {
   SalesAnalysisData,
   RevenueThresholds,
   SalesIntelligenceConfig
-} from './SalesIntelligenceEngine';
+} from '@/modules/sales/services/salesIntelligenceEngine';
+
+// Alerts Adapter - Page-specific (needs consolidation with module version)
+export * from './SalesAlertsAdapter';
+

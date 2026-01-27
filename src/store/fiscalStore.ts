@@ -1,25 +1,43 @@
+/**
+ * Fiscal Store - UI State Only
+ * 
+ * ⚠️ DEPRECATED FOR SERVER DATA
+ * Server state has been migrated to TanStack Query hooks:
+ * - Tax config → useTaxConfig() in finance-fiscal/hooks
+ * - AFIP config → useAFIPConfig() in finance-fiscal/hooks
+ * 
+ * This store is kept ONLY for UI state (filters, selections, view modes, etc.)
+ * 
+ * @deprecated Use TanStack Query hooks for server data
+ */
+
 import { create } from 'zustand';
-import { persist, devtools } from 'zustand/middleware';
+import { devtools } from 'zustand/middleware';
 
 // ============================================
-// STATE
+// UI STATE ONLY
 // ============================================
 
 export interface FiscalState {
-  // Fiscal config (domain-specific)
-  taxId?: string;              // Tax identification number (generic)
-  afipCuit?: string;           // CUIT for Argentina (AFIP)
-  invoicingEnabled: boolean;   // Whether invoicing is enabled
+  // UI State - Current view
+  selectedView: 'general' | 'afip' | 'invoices';
+  
+  // UI State - Invoice filters
+  invoiceFilters: {
+    status: 'all' | 'pending' | 'approved' | 'rejected';
+    dateFrom: string | null;
+    dateTo: string | null;
+    searchQuery: string;
+  };
 
-  // State
-  isLoading: boolean;
-  error: string | null;
+  // UI State - Selections
+  selectedInvoiceId: string | null;
 
   // Actions
-  setTaxId: (taxId: string) => void;
-  setAfipCuit: (cuit: string) => void;
-  setInvoicingEnabled: (enabled: boolean) => void;
-  updateFiscalConfig: (config: Partial<Pick<FiscalState, 'taxId' | 'afipCuit' | 'invoicingEnabled'>>) => void;
+  setSelectedView: (view: 'general' | 'afip' | 'invoices') => void;
+  setInvoiceFilters: (filters: Partial<FiscalState['invoiceFilters']>) => void;
+  resetInvoiceFilters: () => void;
+  setSelectedInvoiceId: (id: string | null) => void;
 }
 
 // ============================================
@@ -28,46 +46,39 @@ export interface FiscalState {
 
 export const useFiscalStore = create<FiscalState>()(
   devtools(
-    persist(
-      (set, get) => ({
-        // Initial state
-        taxId: undefined,
-        afipCuit: undefined,
-        invoicingEnabled: false,
-        isLoading: false,
-        error: null,
+    (set) => ({
+      // Initial UI state
+      selectedView: 'general',
+      invoiceFilters: {
+        status: 'all',
+        dateFrom: null,
+        dateTo: null,
+        searchQuery: '',
+      },
+      selectedInvoiceId: null,
 
-        // Actions
-        setTaxId: (taxId) => {
-          set({ taxId }, false, 'setTaxId');
-        },
+      // Actions
+      setSelectedView: (view) => set({ selectedView: view }),
+      
+      setInvoiceFilters: (filters) => {
+        set((state) => ({
+          invoiceFilters: { ...state.invoiceFilters, ...filters }
+        }));
+      },
 
-        setAfipCuit: (cuit) => {
-          set({ afipCuit: cuit }, false, 'setAfipCuit');
-        },
+      resetInvoiceFilters: () => {
+        set({
+          invoiceFilters: {
+            status: 'all',
+            dateFrom: null,
+            dateTo: null,
+            searchQuery: '',
+          }
+        });
+      },
 
-        setInvoicingEnabled: (enabled) => {
-          set({ invoicingEnabled: enabled }, false, 'setInvoicingEnabled');
-        },
-
-        updateFiscalConfig: (config) => {
-          set((state) => ({
-            ...state,
-            ...config
-          }), false, 'updateFiscalConfig');
-        }
-      }),
-      {
-        name: 'g-mini-fiscal-storage',
-        partialize: (state) => ({
-          taxId: state.taxId,
-          afipCuit: state.afipCuit,
-          invoicingEnabled: state.invoicingEnabled
-        })
-      }
-    ),
-    {
-      name: 'FiscalStore'
-    }
+      setSelectedInvoiceId: (id) => set({ selectedInvoiceId: id }),
+    }),
+    { name: 'FiscalStore' }
   )
 );

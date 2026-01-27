@@ -27,10 +27,15 @@ export function RoleGuard({
   fallback
 }: RoleGuardProps) {
   const { hasRole, canAccessModule, canPerformAction, isAuthenticated } = useAuth();
-  const { isModuleActive } = useFeatureFlags();
+  const { isModuleActive, isLoading } = useFeatureFlags();
 
   // If user is not authenticated, show nothing (handled by ProtectedRoute)
   if (!isAuthenticated) {
+    return null;
+  }
+
+  // If capabilities are still loading, show nothing (prevent flashing "Module Not Available")
+  if (isLoading) {
     return null;
   }
 

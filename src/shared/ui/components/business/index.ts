@@ -10,6 +10,13 @@ export type {
   WeeklyCalendarProps
 } from './WeeklyCalendar';
 
+export { SchedulingCalendar } from './SchedulingCalendar';
+export type {
+  SchedulableEvent,
+  SchedulingCalendarConfig,
+  SchedulingCalendarProps
+} from './SchedulingCalendar';
+
 export { TimeSlotPicker } from './TimeSlotPicker';
 export type {
   TimeSlot,

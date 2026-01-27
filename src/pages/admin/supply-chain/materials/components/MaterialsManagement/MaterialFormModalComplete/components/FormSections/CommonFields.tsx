@@ -1,3 +1,5 @@
+// ✅ PERFORMANCE: React.memo (Phase 2 Round 2)
+import { memo } from 'react';
 import { Box, Stack, Text } from '@/shared/ui';
 import type { ItemType, ItemFormData } from '@/pages/admin/supply-chain/materials/types'; 
 import { TypeSelector } from '../TypeSelector';
@@ -11,13 +13,13 @@ interface CommonFieldsProps {
   editingItem?: boolean;
 }
 
-export const CommonFields = ({
+export const CommonFields = memo<CommonFieldsProps>(function CommonFields({
   formData,
   updateFormField,
   fieldErrors,
   isSubmitting = false,
   editingItem = false
-}: CommonFieldsProps) => {
+}) {
   return (
     <Stack gap="6">
       <Box>
@@ -50,4 +52,6 @@ export const CommonFields = ({
       />
     </Stack>
   );
-};
+});
+
+CommonFields.displayName = 'CommonFields';;

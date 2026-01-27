@@ -42,6 +42,7 @@
 - Registries: `BusinessModelRegistry`, `FeatureRegistry`, `RequirementsRegistry` (in `src/config/`)
 - Store: `useCapabilityStore` (`src/store/capabilityStore.ts`) - unified Zustand store
 - Hook: `useCapabilities()` returns `{ hasFeature, getActiveModules, ... }`
+- **v3.0 Dynamic Module Map**: `getDynamicModuleFeatureMap()` generates module-to-feature mapping automatically from manifests (eliminates manual `MODULE_FEATURE_MAP` maintenance)
 - **Migration note**: Old `CapabilityGate` component removed - use hook-based conditional rendering
 
 **Offline-First Architecture** (`src/lib/offline/OfflineSync.ts`):
@@ -428,6 +429,7 @@ await offlineSync.queueOperation({
 - Store domain state in Zustand stores (`src/store/`)
 - SQL migrations for DB changes (`database/migrations/`)
 - Use `useCapabilities().hasFeature()` for progressive disclosure
+- **NEW**: Define module features ONLY in manifest - `getDynamicModuleFeatureMap()` auto-generates mapping
 
 **❌ DON'T**:
 - Import `@chakra-ui/react` directly (use `@/shared/ui` wrappers)
@@ -437,8 +439,10 @@ await offlineSync.queueOperation({
 - Use `secureApiCall()` (deprecated - modern modules use Supabase RLS)
 - Hardcode colors (use dynamic theming system)
 - Use `CapabilityGate` component (removed - use hooks instead)
+- **NEW**: Edit `MODULE_FEATURE_MAP` manually (deprecated - use manifest only)
 
 **Examples to reference**:
+- Module creation: See `DYNAMIC_MODULE_FEATURE_MAP_MIGRATION.md` for auto-generation pattern
 - Form pattern: `src/pages/admin/supply-chain/suppliers/components/SupplierFormModal.tsx`
 - Store: `src/store/appStore.ts`, `src/store/materialsStore.ts`
 - EventBus tests: `src/lib/events/__tests__/unit/EventBus.test.ts`
@@ -446,6 +450,7 @@ await offlineSync.queueOperation({
 
 ### 📚 Additional Resources
 
+- **NEW**: Dynamic module mapping: `DYNAMIC_MODULE_FEATURE_MAP_MIGRATION.md`
 - Architecture V2 redesign: `docs/architecture-v2/deliverables/MIGRATION_PLAN.md`
 - Route mapping: `src/config/routeMap.ts` - domain/route/file relationships
 - Module manifests: `src/modules/` (check `ALL_MODULE_MANIFESTS`)

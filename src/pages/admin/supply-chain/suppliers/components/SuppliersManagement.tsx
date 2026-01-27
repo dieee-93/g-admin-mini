@@ -15,13 +15,16 @@ import {
 import { PlusIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { SuppliersTable } from './SuppliersTable';
 import { AnalyticsTab } from './analytics';
+import { OrdersList } from './orders/OrdersList';
 import type { useSuppliersPage } from '../hooks/useSuppliersPage';
 
 interface SuppliersManagementProps {
   pageState: ReturnType<typeof useSuppliersPage>;
 }
 
-export function SuppliersManagement({ pageState }: SuppliersManagementProps) {
+// ⚡ PERFORMANCE: Wrap in React.memo to prevent re-renders when parent re-renders
+// Component only re-renders if pageState prop actually changes
+export const SuppliersManagement = React.memo(function SuppliersManagement({ pageState }: SuppliersManagementProps) {
   const {
     suppliers,
     loading,
@@ -44,15 +47,20 @@ export function SuppliersManagement({ pageState }: SuppliersManagementProps) {
         onValueChange={(e) => setActiveTab(e.value)}
         variant="line"
         colorPalette="blue"
+        lazyMount
+        unmountOnExit={false}
       >
         {/* Tab Headers */}
         <Stack direction="row" justify="space-between" align="center" marginBottom={4}>
           <Tabs.List>
             <Tabs.Trigger value="list">
-              Lista de Proveedores
+              Proveedores
+            </Tabs.Trigger>
+            <Tabs.Trigger value="orders">
+              Órdenes de Compra
             </Tabs.Trigger>
             <Tabs.Trigger value="analytics">
-              Análisis
+              Analytics
             </Tabs.Trigger>
             <Tabs.Trigger value="performance">
               Performance
@@ -69,60 +77,63 @@ export function SuppliersManagement({ pageState }: SuppliersManagementProps) {
           </Button>
         </Stack>
 
-        {/* Tab: List */}
-        <Tabs.Content value="list">
-          <Stack direction="column" gap="4">
-            {/* Filters */}
-            <Stack direction="row" gap="3" align="center">
-              <InputField
-                placeholder="Buscar proveedores..."
-                value={filters.searchText}
-                onChange={(e) => setFilters({ searchText: e.target.value })}
-                style={{ maxWidth: '320px' }}
+        {/* Tab Content - Using Content.Group to prevent rerenders */}
+        <Tabs.ContentGroup>
+          {/* List Tab */}
+          <Tabs.Content value="list">
+            <Stack direction="column" gap="4">
+              {/* Filters */}
+              <Stack direction="row" gap="3">
+                <InputField
+                  placeholder="Buscar proveedores..."
+                  value={filters.searchText}
+                  onChange={(e) =>
+                    setFilters({ searchText: e.target.value })
+                  }
+                  flex={1}
+                />
+                <Button variant="outline" size="sm">
+                  <Icon icon={FunnelIcon} size="xs" />
+                  Filtros
+                </Button>
+              </Stack>
+
+              {/* Table */}
+              <SuppliersTable
+                suppliers={suppliers}
+                loading={loading}
+                sort={sort}
+                onSortChange={setSort}
+                onEdit={openEditModal}
+                onToggleActive={toggleActive}
+                onDelete={deleteSupplier}
               />
-
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setFilters({ isActive: filters.isActive === null ? true : null })}
-              >
-                <Icon icon={FunnelIcon} size="xs" />
-                {filters.isActive === null ? 'Todos' : filters.isActive ? 'Activos' : 'Inactivos'}
-              </Button>
             </Stack>
+          </Tabs.Content>
 
-            {/* Table */}
-            <SuppliersTable
-              suppliers={suppliers}
-              loading={loading}
-              sort={sort}
-              onEdit={openEditModal}
-              onToggleActive={toggleActive}
-              onDelete={deleteSupplier}
-              onSortChange={setSort}
-            />
-          </Stack>
-        </Tabs.Content>
+          {/* Orders Tab - Supplier Orders (replaces old Procurement) */}
+          <Tabs.Content value="orders">
+            <OrdersList />
+          </Tabs.Content>
 
-        {/* Tab: Analytics */}
-        <Tabs.Content value="analytics">
-          <AnalyticsTab />
-        </Tabs.Content>
+          {/* Analytics Tab - Lazy loaded */}
+          <Tabs.Content value="analytics">
+            <AnalyticsTab suppliers={suppliers} />
+          </Tabs.Content>
 
-        {/* Tab: Performance */}
-        <Tabs.Content value="performance">
-          <Stack direction="column" align="center" justify="center" py="16" gap="3">
+          {/* Performance Tab - Lazy loaded */}
+          <Tabs.Content value="performance">
             <Text fontSize="xl" fontWeight="semibold">
-              Performance de Proveedores
+              Dashboard de Performance
             </Text>
             <Text color="fg.muted">
-              Métricas de calidad, entregas, y riesgos (próximamente)
+              Métricas de rendimiento en desarrollo...
             </Text>
-          </Stack>
-        </Tabs.Content>
+          </Tabs.Content>
+        </Tabs.ContentGroup>
       </Tabs.Root>
     </Section>
   );
-}
+});
 
 export default SuppliersManagement;

@@ -10,6 +10,10 @@ export { ModuleRegistry, getModuleRegistry } from './ModuleRegistry';
 // Hook system components
 export { HookPoint } from './HookPoint';
 
+// React hooks
+export { useModuleRegistry } from './useModuleRegistry';
+export { useModuleNavigation } from './useModuleNavigation';
+
 // Bootstrap and integration
 export * from './bootstrap';
 export * from './integration';
@@ -41,7 +45,7 @@ export type {
  *   name: 'Sales Module',
  *   version: '1.0.0',
  *   depends: ['inventory'],
- *   requiredFeatures: ['sales_order_management'],
+ *   activatedBy: 'sales_order_management',  // OPTIONAL module
  *   hooks: {
  *     provide: ['dashboard.widgets', 'calendar.events'],
  *     consume: ['inventory.stock_updated']

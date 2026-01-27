@@ -12,7 +12,7 @@ import {
   FinancialCalculations,
   QuickCalculations,
   type PricingScenario
-} from '@/business-logic/shared/FinancialCalculations';
+} from '@/lib/decimal';
 import type { ProductComponent } from '../../types';
 
 // Type safety with Zod schema

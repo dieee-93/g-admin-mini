@@ -119,7 +119,7 @@ export function useRecurringBillingValidation(
     }
 
     return warnings;
-  }, [form.watch]);
+  }, []);
 
   const validationState = useMemo(() => ({
     hasErrors: Object.keys(fieldErrors).length > 0,

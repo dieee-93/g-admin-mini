@@ -2,6 +2,7 @@ import { Box, Stack, Text } from '@/shared/ui';
 import { SelectField } from '@/shared/ui';
 import { type ItemType } from '../../../../types';
 import { ITEM_TYPE_COLLECTION } from '../constants';
+import { memo } from 'react';
 
 interface TypeSelectorProps {
   value: ItemType | '';
@@ -10,12 +11,13 @@ interface TypeSelectorProps {
   disabled?: boolean;
 }
 
-export const TypeSelector = ({ 
+// ⚡ PERFORMANCE: React.memo prevents re-renders when props don't change
+export const TypeSelector = memo(function TypeSelector({ 
   value, 
   onChange, 
   errors,
   disabled = false
-}: TypeSelectorProps) => {
+}: TypeSelectorProps) {
   return (
     <Box w="full">
       <SelectField
@@ -38,4 +40,4 @@ export const TypeSelector = ({
       />
     </Box>
   );
-}
+});

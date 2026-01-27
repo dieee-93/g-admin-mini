@@ -127,7 +127,7 @@ const ABCAnalysisSection: React.FC = () => {
 
   return (
     <ContentLayout spacing="normal">
-      <VStack align="start" gap="6">
+      <VStack align="start" gap="6" data-testid="abc-analysis-section">
         
         {/* Header con métricas generales */}
         <PageHeader
@@ -135,6 +135,7 @@ const ABCAnalysisSection: React.FC = () => {
           subtitle={`${analysisResult.totalItemsAnalyzed} items analizados • Valor total: ${DecimalUtils.formatCurrency(analysisResult.totalValue)}`}
           icon={<ChartBarIcon className="w-6 h-6" />}
         />
+        <Box display="none" data-testid="total-inventory-value">{DecimalUtils.formatCurrency(analysisResult.totalValue)}</Box>
 
         {/* Selector de criterio de análisis */}
         <Section title="Configuración de Análisis">
@@ -155,10 +156,10 @@ const ABCAnalysisSection: React.FC = () => {
         </Section>
 
         {/* ABC Categories Overview Cards */}
-        <Section title="Resumen por Categorías ABC">
+        <Section title="Resumen por Categorías ABC" data-testid="abc-chart">
           <SimpleGrid columns={{ base: 1, md: 3 }} gap="6">
             {categoryData.map((category) => (
-              <CardWrapper key={category.category} variant="elevated">
+              <CardWrapper key={category.category} variant="elevated" data-testid={`category-${category.category}`}>
                 <VStack align="start" gap="4">
                   
                   {/* Header con badge y número */}
@@ -170,7 +171,7 @@ const ABCAnalysisSection: React.FC = () => {
                     >
                       Clase {category.category}
                     </Badge>
-                    <Text fontSize="2xl" fontWeight="bold">
+                    <Text fontSize="2xl" fontWeight="bold" data-testid="category-count">
                       {category.items}
                     </Text>
                   </HStack>
@@ -226,6 +227,7 @@ const ABCAnalysisSection: React.FC = () => {
                 size="sm"
                 variant={selectedCategory === 'all' ? 'solid' : 'outline'}
                 onClick={() => setSelectedCategory('all')}
+                data-testid="clear-abc-filter"
               >
                 Todos
               </Button>
@@ -236,6 +238,7 @@ const ABCAnalysisSection: React.FC = () => {
                   variant={selectedCategory === cat ? 'solid' : 'outline'}
                   colorPalette={cat === 'A' ? 'red' : cat === 'B' ? 'yellow' : 'green'}
                   onClick={() => setSelectedCategory(cat)}
+                  data-testid={`category-${cat}`}
                 >
                   Clase {cat}
                 </Button>
@@ -244,71 +247,73 @@ const ABCAnalysisSection: React.FC = () => {
           </HStack>
 
           {/* Tabla de materiales */}
-          <Table.Root size="sm">
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeader>Material</Table.ColumnHeader>
-                <Table.ColumnHeader>Clase ABC</Table.ColumnHeader>
-                <Table.ColumnHeader>Stock Actual</Table.ColumnHeader>
-                <Table.ColumnHeader>Costo Unitario</Table.ColumnHeader>
-                <Table.ColumnHeader>Consumo Anual</Table.ColumnHeader>
-                <Table.ColumnHeader>Valor Anual</Table.ColumnHeader>
-                <Table.ColumnHeader>% Facturación</Table.ColumnHeader>
-                <Table.ColumnHeader>% Acumulado</Table.ColumnHeader>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {filteredMaterials.map((material) => (
-                <Table.Row key={material.id}>
-                  <Table.Cell>
-                    <VStack align="start" gap="1">
-                      <Text fontWeight="medium">{material.name}</Text>
-                      <Text fontSize="xs" color="gray.500">
-                        {material.category}
-                      </Text>
-                    </VStack>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Badge 
-                      colorPalette={
-                        material.abcClass === 'A' ? 'red' : 
-                        material.abcClass === 'B' ? 'yellow' : 'green'
-                      }
-                      variant="subtle"
-                    >
-                      Clase {material.abcClass}
-                    </Badge>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {DecimalUtils.formatQuantity(
-                      material.currentStock, 
-                      getDisplayUnit(material)
-                    )}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {DecimalUtils.formatCurrency(material.unit_cost || 0)}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {DecimalUtils.formatQuantity(
-                      material.annualConsumption, 
-                      getDisplayUnit(material)
-                    )}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {DecimalUtils.formatCurrency(material.annualValue)}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {material.revenuePercentage}%
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Text fontWeight="medium">
-                      {material.cumulativeRevenue}%
-                    </Text>
-                  </Table.Cell>
+          <Box data-testid="materials-grid">
+            <Table.Root size="sm">
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeader>Material</Table.ColumnHeader>
+                  <Table.ColumnHeader>Clase ABC</Table.ColumnHeader>
+                  <Table.ColumnHeader>Stock Actual</Table.ColumnHeader>
+                  <Table.ColumnHeader>Costo Unitario</Table.ColumnHeader>
+                  <Table.ColumnHeader>Consumo Anual</Table.ColumnHeader>
+                  <Table.ColumnHeader>Valor Anual</Table.ColumnHeader>
+                  <Table.ColumnHeader>% Facturación</Table.ColumnHeader>
+                  <Table.ColumnHeader>% Acumulado</Table.ColumnHeader>
                 </Table.Row>
-              ))}
-            </Table.Body>
-          </Table.Root>
+              </Table.Header>
+              <Table.Body>
+                {filteredMaterials.map((material) => (
+                  <Table.Row key={material.id}>
+                    <Table.Cell>
+                      <VStack align="start" gap="1">
+                        <Text fontWeight="medium">{material.name}</Text>
+                        <Text fontSize="xs" color="gray.500">
+                          {material.category}
+                        </Text>
+                      </VStack>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Badge 
+                        colorPalette={
+                          material.abcClass === 'A' ? 'red' : 
+                          material.abcClass === 'B' ? 'yellow' : 'green'
+                        }
+                        variant="subtle"
+                      >
+                        Clase {material.abcClass}
+                      </Badge>
+                    </Table.Cell>
+                    <Table.Cell>
+                      {DecimalUtils.formatQuantity(
+                        material.currentStock, 
+                        getDisplayUnit(material)
+                      )}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {DecimalUtils.formatCurrency(material.unit_cost || 0)}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {DecimalUtils.formatQuantity(
+                        material.annualConsumption, 
+                        getDisplayUnit(material)
+                      )}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {DecimalUtils.formatCurrency(material.annualValue)}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {material.revenuePercentage}%
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Text fontWeight="medium">
+                        {material.cumulativeRevenue}%
+                      </Text>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Root>
+          </Box>
 
         </Section>
 

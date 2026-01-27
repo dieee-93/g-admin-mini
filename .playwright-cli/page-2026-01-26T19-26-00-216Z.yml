@@ -1,0 +1,208 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e5]:
+        - img [ref=e8]
+        - paragraph [ref=e11]: G-Admin Mini
+      - generic [ref=e13]:
+        - banner [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e17]:
+              - paragraph [ref=e18] [cursor=pointer]: G-Admin
+              - paragraph [ref=e19]: /
+              - paragraph [ref=e20]: Dashboard
+              - paragraph [ref=e1366]: ·
+              - paragraph [ref=e1367]: Central dashboard with aggregated metrics and widgets from all modules
+            - generic [ref=e21]:
+              - generic [ref=e22]:
+                - img [ref=e25]
+                - img [ref=e28] [cursor=pointer]
+              - button "d dieee.93@gmail.com SUPER_ADMIN" [ref=e30] [cursor=pointer]:
+                - generic [ref=e31]:
+                  - generic [ref=e33]: d
+                  - generic [ref=e34]:
+                    - paragraph [ref=e35]: dieee.93@gmail.com
+                    - paragraph [ref=e36]: SUPER_ADMIN
+        - generic [ref=e39]:
+          - heading "G" [level=5] [ref=e44]
+          - generic [ref=e1368]:
+            - generic [ref=e1369]:
+              - button [ref=e1372] [cursor=pointer]:
+                - img [ref=e1375]
+              - button [ref=e1379] [cursor=pointer]:
+                - img [ref=e1382]
+              - button [ref=e1386] [cursor=pointer]:
+                - img [ref=e1389]
+              - button [ref=e1393] [cursor=pointer]:
+                - img [ref=e1397]
+              - button [ref=e1401] [cursor=pointer]:
+                - img [ref=e1404]
+              - button [ref=e1408] [cursor=pointer]:
+                - img [ref=e1411]
+            - button [ref=e1417] [cursor=pointer]:
+              - img [ref=e1420]
+            - generic [ref=e1422]:
+              - button [ref=e1425] [cursor=pointer]:
+                - img [ref=e1428]
+              - button [ref=e1432] [cursor=pointer]:
+                - img [ref=e1435]
+              - button [ref=e1439] [cursor=pointer]:
+                - img [ref=e1442]
+            - generic [ref=e1444]:
+              - button [ref=e1447] [cursor=pointer]:
+                - img [ref=e1450]
+              - button [ref=e1454] [cursor=pointer]:
+                - img [ref=e1457]
+              - button [ref=e1461] [cursor=pointer]:
+                - img [ref=e1464]
+              - button [ref=e1468] [cursor=pointer]:
+                - img [ref=e1471]
+            - generic [ref=e1473]:
+              - button [ref=e1476] [cursor=pointer]:
+                - img [ref=e1479]
+              - button [ref=e1483] [cursor=pointer]:
+                - img [ref=e1486]
+          - button [ref=e48] [cursor=pointer]:
+            - img [ref=e49]
+        - main [ref=e51]:
+          - generic [ref=e151]:
+            - link "Skip to main content" [ref=e152] [cursor=pointer]:
+              - /url: "#main-content"
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - generic [ref=e156]:
+                  - img [ref=e158]
+                  - generic [ref=e160]:
+                    - paragraph [ref=e161]: StockLab - Inventario
+                    - paragraph [ref=e163]: Control de materiales y stock
+                - button "Nuevo Material" [ref=e164] [cursor=pointer]:
+                  - img [ref=e165]
+                  - text: Nuevo Material
+              - region [ref=e167]:
+                - generic [ref=e169]:
+                  - generic [ref=e171] [cursor=pointer]:
+                    - img [ref=e173]
+                    - paragraph [ref=e176]: $147583.00
+                    - generic [ref=e177]:
+                      - paragraph [ref=e178]: Valor Total Inventario
+                      - paragraph [ref=e179]: inversión en stock
+                  - generic [ref=e181] [cursor=pointer]:
+                    - img [ref=e183]
+                    - paragraph [ref=e186]: "27"
+                    - generic [ref=e187]:
+                      - paragraph [ref=e188]: Items Totales
+                      - paragraph [ref=e189]: en inventario
+                  - generic [ref=e191] [cursor=pointer]:
+                    - img [ref=e193]
+                    - paragraph [ref=e196]: "3"
+                    - generic [ref=e197]:
+                      - paragraph [ref=e198]: Stock Crítico
+                      - paragraph [ref=e199]: requieren atención
+                  - generic [ref=e201] [cursor=pointer]:
+                    - img [ref=e203]
+                    - paragraph [ref=e206]: "0"
+                    - generic [ref=e207]:
+                      - paragraph [ref=e208]: Proveedores Activos
+                      - paragraph [ref=e209]: en la red
+              - generic [ref=e211]:
+                - tablist [ref=e212]:
+                  - tab "Inventario" [selected] [ref=e213] [cursor=pointer]:
+                    - img [ref=e214]
+                    - text: Inventario
+                  - tab "Config. Alertas" [ref=e216] [cursor=pointer]:
+                    - img [ref=e217]
+                    - text: Config. Alertas
+                - tabpanel "Inventario" [ref=e219]:
+                  - generic [ref=e220]:
+                    - generic [ref=e221]:
+                      - tablist [ref=e222]:
+                        - tab "Inventario" [ref=e223] [cursor=pointer]
+                        - tab "Análisis ABC" [active] [selected] [ref=e224] [cursor=pointer]
+                        - tab "Compras" [ref=e225] [cursor=pointer]
+                        - tab "Transferencias 🏢" [ref=e226] [cursor=pointer]
+                      - tabpanel "Análisis ABC" [ref=e1585]:
+                        - generic [ref=e1586]:
+                          - paragraph [ref=e1587]: Analytics & Análisis ABC (27 items)
+                          - generic [ref=e1588]:
+                            - generic [ref=e1590]:
+                              - img [ref=e1592]
+                              - paragraph [ref=e1595]: 0 items
+                              - generic [ref=e1596]:
+                                - paragraph [ref=e1597]: Clase A - Alto Valor
+                                - paragraph [ref=e1598]: $0.00
+                            - generic [ref=e1600]:
+                              - img [ref=e1602]
+                              - paragraph [ref=e1605]: 0 items
+                              - generic [ref=e1606]:
+                                - paragraph [ref=e1607]: Clase B - Valor Medio
+                                - paragraph [ref=e1608]: $0.00
+                            - generic [ref=e1610]:
+                              - img [ref=e1612]
+                              - paragraph [ref=e1615]: 0 items
+                              - generic [ref=e1616]:
+                                - paragraph [ref=e1617]: Clase C - Bajo Valor
+                                - paragraph [ref=e1618]: $0.00
+                          - generic [ref=e1619]:
+                            - generic [ref=e1620]:
+                              - generic [ref=e1622]:
+                                - paragraph [ref=e1623]: Distribución ABC del Inventario
+                                - paragraph [ref=e1624]: Valor total por clasificación
+                              - application [ref=e1630]
+                            - generic [ref=e1631]:
+                              - generic [ref=e1633]:
+                                - paragraph [ref=e1634]: Evolución del Valor de Inventario
+                                - paragraph [ref=e1635]: Últimos 7 días
+                              - application [ref=e1640]:
+                                - generic [ref=e1644]:
+                                  - generic [ref=e1646]: 20-ene
+                                  - generic [ref=e1648]: 21-ene
+                                  - generic [ref=e1650]: 22-ene
+                                  - generic [ref=e1652]: 23-ene
+                                  - generic [ref=e1654]: 24-ene
+                                  - generic [ref=e1656]: 25-ene
+                                  - generic [ref=e1658]: 26-ene
+                                - generic [ref=e1660]:
+                                  - generic [ref=e1662]: "0"
+                                  - generic [ref=e1664]: 40 k
+                                  - generic [ref=e1666]: 80 k
+                                  - generic [ref=e1668]: 120 k
+                                  - generic [ref=e1670]: 160 k
+                          - generic [ref=e1681]:
+                            - generic [ref=e1683]:
+                              - paragraph [ref=e1684]: Top 10 Materiales por Valor
+                              - paragraph [ref=e1685]: Materiales con mayor valor en stock
+                            - application [ref=e1690]:
+                              - generic [ref=e1694]:
+                                - generic [ref=e1696]: Pollo Entero
+                                - generic [ref=e1698]: Leche Entera
+                                - generic [ref=e1700]: Carne de Cerdo
+                                - generic [ref=e1702]: Chorizo
+                                - generic [ref=e1704]: Papa
+                              - generic [ref=e1706]:
+                                - generic [ref=e1708]: "0"
+                                - generic [ref=e1710]: 9 K
+                                - generic [ref=e1712]: 18 k
+                                - generic [ref=e1714]: 27 k
+                                - generic [ref=e1716]: 36 k
+                          - paragraph [ref=e1718]: Análisis Detallado por Clase
+                          - paragraph [ref=e1719]: "Clasificación ABC: A (Alto valor, 70-80% del valor) • B (Valor medio, 15-25%) • C (Bajo valor, 5-10%)"
+                    - region [ref=e1313]:
+                      - paragraph [ref=e1317]: Acciones Rápidas
+                      - generic [ref=e1319]:
+                        - button "Agregar Material" [ref=e1320] [cursor=pointer]:
+                          - img [ref=e1321]
+                          - text: Agregar Material
+                        - button "Operaciones Masivas" [ref=e1323] [cursor=pointer]:
+                          - img [ref=e1324]
+                          - text: Operaciones Masivas
+                        - button "Generar Reporte" [ref=e1326] [cursor=pointer]:
+                          - img [ref=e1327]
+                          - text: Generar Reporte
+                        - button "Sincronizar" [ref=e1329] [cursor=pointer]:
+                          - img [ref=e1330]
+                          - text: Sincronizar
+    - generic [ref=e52]:
+      - img [ref=e54]
+      - button "Open Tanstack query devtools" [ref=e102] [cursor=pointer]:
+        - img [ref=e103]
+  - generic [ref=e1720]: 9 K

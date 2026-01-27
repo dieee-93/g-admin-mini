@@ -1,0 +1,1 @@
+src/modules/finance-fiscal/hooks/useTaxConfig.ts(11,100): error TS1002: Unterminated string literal.

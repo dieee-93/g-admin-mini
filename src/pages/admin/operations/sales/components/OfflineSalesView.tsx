@@ -36,9 +36,19 @@ import { ProductWithStock } from './ProductWithStock';
 import { StockValidationAlert } from './StockValidationAlert';
 import { CartValidationSummary, CartQuickAlert } from './CartValidationSummary';
 import { fetchCustomers, processSale } from '../services/saleApi';
-import { useSalesCart } from '../hooks/useSalesCart';
+import { usePOSCart } from '@/modules/sales/hooks';
 import { EventBus } from '@/lib/events';
 import type { CreateSaleData } from '../types';
+
+// Extracted components
+import {
+  OfflineSalesHeader,
+  OfflineSalesAlerts,
+  OfflineSalesMainLayout,
+  OfflineSalesCheckoutModal,
+  OfflineSalesStatusModal,
+} from './OfflineSales';
+import type { CheckoutStep } from './OfflineSales';
 
 // Event payload type for order placement
 interface OrderPlacedEvent {
@@ -111,7 +121,7 @@ export function OfflineSalesView() {
   const [note, setNote] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
-  const [checkoutStep, setCheckoutStep] = useState<'validation' | 'details' | 'confirmation'>('validation');
+  const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>('validation');
   
   // Offline-specific state
   const [offlineSales, setOfflineSales] = useState<OfflineSale[]>([]);
@@ -132,12 +142,9 @@ export function OfflineSalesView() {
     clearCart,
     validateCartStock,
     getSaleData
-  } = useSalesCart({
+  } = usePOSCart({
     enableRealTimeValidation: true,
     validationDebounceMs: 800,
-    enableProactiveWarnings: true,
-    warningThreshold: 0.8
-    // Note: Offline-specific options removed as they don't exist in current interface
   });
 
   // Separate setup functions to avoid dependency issues
@@ -487,337 +494,70 @@ export function OfflineSalesView() {
     }
   };
 
-  const getConnectionStatusColor = () => {
-    if (!isOnline) return 'error';
-    if (connectionQuality === 'excellent') return 'success';
-    if (connectionQuality === 'good') return 'warning';
-    return 'warning';
-  };
-
-  const getConnectionStatusText = () => {
-    if (!isOnline) return 'Offline';
-    if (isConnecting) return 'Conectando...';
-    return `Online (${connectionQuality})`;
-  };
-
   return (
     <Stack direction="column" gap="lg" p="lg" maxW="7xl" mx="auto">
       <Stack direction="column" gap="lg" align="stretch">
-        {/* Enhanced Header with Connection Status */}
-        <Stack direction="row" justify="space-between" align="center">
-          <Stack direction="column" align="start" gap="xs">
-            <Stack direction="row" align="center" gap="sm">
-              <Typography variant="heading" size="xl" weight="bold">
-                POS Offline-First
-              </Typography>
-              <Badge 
-                colorPalette={getConnectionStatusColor()} 
-                variant="subtle"
-              >
-                <Stack direction="row" gap="xs" align="center">
-                  {isOnline ? <WifiIcon className="w-3 h-3" /> : <WifiOffIcon className="w-3 h-3" />}
-                  <Typography variant="body" size="xs">{getConnectionStatusText()}</Typography>
-                </Stack>
-              </Badge>
-            </Stack>
-            <Typography variant="body" size="md" color="text.muted">
-              Sistema de ventas con capacidad offline completa
-            </Typography>
-          </Stack>
-          
-          <Stack direction="row" gap="md">
-            {/* Offline Sales Indicator */}
-            {offlineSales.length > 0 && (
-              <Button
-                variant="outline"
-                colorPalette="orange"
-                onClick={() => setShowOfflineStatus(true)}
-                title={`${offlineSales.length} ventas pendientes de sincronización`}
-              >
-                <ClockIcon className="w-4 h-4" />
-                {offlineSales.length} Offline
-              </Button>
-            )}
-
-            {/* Sync Progress */}
-            {isSyncing && (
-              <Stack direction="column" minW="120px" gap="xs">
-                <Typography variant="body" size="xs">Sincronizando...</Typography>
-                <Typography variant="body" size="xs">{syncProgress}%</Typography>
-              </Stack>
-            )}
-
-            {/* Manual Sync Button */}
-            {queueSize > 0 && (
-              <Button
-                variant="outline"
-                colorPalette="blue"
-                onClick={handleForceSyncOfflineSales}
-                loading={isSyncing}
-              >
-                <CloudIcon className="w-4 h-4" />
-                Sincronizar ({queueSize})
-              </Button>
-            )}
-
-            {/* Stock Validation */}
-            <Button
-              variant="outline"
-              colorPalette="blue"
-              onClick={() => validateCartStock()}
-              loading={isValidating}
-              disabled={!summary.hasItems}
-            >
-              <ArrowPathIcon className="w-4 h-4" />
-              Revalidar Stock
-            </Button>
-            
-            {/* Checkout Button */}
-            <Button
-              colorPalette="green"
-              onClick={handleOpenCheckout}
-              disabled={!summary.hasItems || isValidating}
-              loading={isProcessing}
-            >
-              <CreditCardIcon className="w-4 h-4" />
-              Finalizar Venta ({summary.itemCount})
-            </Button>
-          </Stack>
-        </Stack>
-
-        {/* Offline Mode Alert */}
-        {!isOnline && (
-          <Alert status="warning">
-            <ExclamationTriangleIcon className="w-5 h-5" />
-            <Alert.Title>Modo Offline Activo</Alert.Title>
-            <Alert.Description>
-              Las ventas se guardarán localmente y se sincronizarán automáticamente cuando se restablezca la conexión.
-            </Alert.Description>
-          </Alert>
-        )}
-
-        {/* Cart Alert */}
-        <CartQuickAlert 
-          validationResult={validationResult}
+        {/* Header with Connection Status and Actions */}
+        <OfflineSalesHeader
+          isOnline={isOnline}
+          isConnecting={isConnecting}
+          connectionQuality={connectionQuality}
+          isSyncing={isSyncing}
+          syncProgress={syncProgress}
+          queueSize={queueSize}
+          offlineSalesCount={offlineSales.length}
+          cartItemCount={summary.itemCount}
+          hasItems={summary.hasItems}
           isValidating={isValidating}
-          isOffline={!isOnline}
+          isProcessing={isProcessing}
+          onShowOfflineStatus={() => setShowOfflineStatus(true)}
+          onForceSync={handleForceSyncOfflineSales}
+          onValidateStock={() => validateCartStock()}
+          onOpenCheckout={handleOpenCheckout}
         />
 
-        {/* Main Layout */}
-        <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap="lg">
-          {/* Products */}
-          <Stack>
-            <Stack gap="lg" direction="column" align="stretch">
-              <Typography fontSize="lg" fontWeight="semibold">
-                Productos Disponibles
-              </Typography>
-              
-              <ProductWithStock 
-                onAddToCart={addToCart}
-                onQuantityChange={updateQuantity}
-                currentCart={cart}
-                disabled={isProcessing}
-                offlineMode={!isOnline}
-              />
-            </Stack>
-          </Stack>
+        {/* Alerts: Offline Mode & Cart Validation */}
+        <OfflineSalesAlerts
+          isOnline={isOnline}
+          validationResult={validationResult}
+          isValidating={isValidating}
+        />
 
-          {/* Cart Summary */}
-          <Stack>
-            <CartValidationSummary
-              cart={cart}
-              summary={summary}
-              validationResult={validationResult}
-              isValidating={isValidating}
-              onProceedToCheckout={handleOpenCheckout}
-              onValidateCart={() => validateCartStock()}
-              disabled={isProcessing}
-              isOffline={!isOnline}
-            />
-          </Stack>
-        </Grid>
+        {/* Main Layout: Products & Cart */}
+        <OfflineSalesMainLayout
+          cart={cart}
+          summary={summary}
+          validationResult={validationResult}
+          isValidating={isValidating}
+          isOnline={isOnline}
+          isProcessing={isProcessing}
+          addToCart={addToCart}
+          updateQuantity={updateQuantity}
+          validateCartStock={validateCartStock}
+          onProceedToCheckout={handleOpenCheckout}
+        />
       </Stack>
 
       {/* Enhanced Checkout Dialog with Offline Support */}
-      <Modal isOpen={showCheckout} onClose={() => !isProcessing && setShowCheckout(false)}>
-        <ModalContent>
-          <ModalHeader>
-            <ModalTitle>
-              {checkoutStep === 'validation' && 'Validación de Stock'}
-              {checkoutStep === 'details' && 'Detalles de Venta'}
-              {checkoutStep === 'confirmation' && 'Confirmar Venta'}
-              {!isOnline && (
-                <Badge colorPalette="orange" variant="subtle">
-                  Modo Offline
-                </Badge>
-              )}
-            </ModalTitle>
-            {!isProcessing && <ModalClose />}
-          </ModalHeader>
-
-          <ModalBody>
-              <Stack gap="lg" direction="column" align="stretch">
-                {/* Validation Step */}
-                {checkoutStep === 'validation' && (
-                  <Stack gap="lg" direction="column" align="stretch">
-                    {!isOnline ? (
-                      <Alert status="info">
-                        <Alert.Title>Modo Offline</Alert.Title>
-                        <Alert.Description>
-                          La validación de stock se realizará con datos locales. La venta se sincronizará automáticamente.
-                        </Alert.Description>
-                      </Alert>
-                    ) : (
-                      <>
-                        <Typography>
-                          Verificando disponibilidad de stock para todos los productos...
-                        </Typography>
-                        
-                        <StockValidationAlert
-                          validationResult={validationResult!}
-                        />
-
-                        {validationResult?.is_valid && (
-                          <Alert status="success">
-                            <Alert.Title>Stock confirmado</Alert.Title>
-                            <Alert.Description>
-                              Todos los productos tienen stock disponible. Puedes continuar con la venta.
-                            </Alert.Description>
-                          </Alert>
-                        )}
-                      </>
-                    )}
-                  </Stack>
-                )}
-
-                {/* Details Step */}
-                {checkoutStep === 'details' && (
-                  <Stack gap="lg" direction="column" align="stretch">
-                    <Stack>
-                      <Typography variant="body" mb="2" fontWeight="medium">Cliente</Typography>
-                      <div>
-                        {/* Select component needs to be implemented */}
-                        <input 
-                          placeholder="Seleccionar cliente (opcional)"
-                          value={selectedCustomerId || ''}
-                          onChange={(e) => setSelectedCustomerId(e.target.value)}
-                        />
-                      </div>
-                    </Stack>
-
-                    <Stack>
-                      <Typography variant="body" mb="2" fontWeight="medium">Nota (Opcional)</Typography>
-                        {/* Simple input placeholder for now */}
-                        <input
-                          placeholder="Nota adicional para la venta..."
-                          value={note}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNote(e.target.value)}
-                          style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-                        />
-                    </Stack>
-                  </Stack>
-                )}
-
-                {/* Confirmation Step */}
-                {checkoutStep === 'confirmation' && (
-                  <Stack gap="lg" direction="column" align="stretch">
-                    <Alert status={isOnline ? "info" : "warning"}>
-                      <Alert.Title>
-                        {isOnline ? 'Confirmar venta' : 'Confirmar venta offline'}
-                      </Alert.Title>
-                      <Alert.Description>
-                        {isOnline 
-                          ? '¿Estás seguro de procesar esta venta? Esta acción reducirá el stock automáticamente.'
-                          : '¿Estás seguro de procesar esta venta offline? Se guardará localmente y se sincronizará cuando haya conexión.'
-                        }
-                      </Alert.Description>
-                    </Alert>
-
-                    <CardWrapper>
-                      <Stack gap="sm" direction="column" align="stretch">
-                        <Stack direction="row" justify="space-between">
-                          <Typography fontWeight="medium">Total de productos:</Typography>
-                          <Typography>{cartStats.totalItems}</Typography>
-                        </Stack>
-                        <Stack direction="row" justify="space-between">
-                          <Typography fontWeight="medium">Monto total:</Typography>
-                          <Typography fontSize="lg" fontWeight="bold" >
-                            ${summary.totalAmount.toFixed(2)}
-                          </Typography>
-                        </Stack>
-                        {selectedCustomerId && (
-                          <Stack direction="row" justify="space-between">
-                            <Typography fontWeight="medium">Cliente:</Typography>
-                            <Typography>
-                              {customers.find(c => c.id === selectedCustomerId)?.name || 'N/A'}
-                            </Typography>
-                          </Stack>
-                        )}
-                        <Stack direction="row" justify="space-between">
-                          <Typography fontWeight="medium">Estado:</Typography>
-                          <Badge colorPalette={isOnline ? 'success' : 'warning'}>
-                            {isOnline ? 'Procesamiento inmediato' : 'Procesamiento offline'}
-                          </Badge>
-                        </Stack>
-                      </Stack>
-                    </CardWrapper>
-                  </Stack>
-                )}
-              </Stack>
-            </ModalBody>
-
-            <ModalFooter>
-              <Stack gap="md" direction="row" justify="space-between" w="full">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCheckout(false)}
-                  disabled={isProcessing}
-                >
-                  Cancelar
-                </Button>
-
-                <Stack gap="sm" direction="row">
-                  {checkoutStep !== 'validation' && (
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        if (checkoutStep === 'details') setCheckoutStep('validation');
-                        if (checkoutStep === 'confirmation') setCheckoutStep('details');
-                      }}
-                      disabled={isProcessing}
-                    >
-                      Atrás
-                    </Button>
-                  )}
-
-                  {checkoutStep !== 'confirmation' ? (
-                    <Button
-                      colorPalette="blue"
-                      onClick={handleProceedToNextStep}
-                      disabled={
-                        (checkoutStep === 'validation' && isOnline && (!validationResult?.is_valid || isValidating)) ||
-                        isProcessing
-                      }
-                      loading={isValidating}
-                    >
-                      {checkoutStep === 'validation' ? 'Continuar' : 'Siguiente'}
-                    </Button>
-                  ) : (
-                    <Button
-                      colorPalette="green"
-                      onClick={handleProcessSale}
-                      loading={isProcessing}
-                      disabled={false} // Allow offline processing
-                    >
-                      <CheckSolid className="w-4 h-4" />
-                      {isOnline ? 'Procesar Venta' : 'Procesar Offline'}
-                    </Button>
-                  )}
-                </Stack>
-              </Stack>
-            </ModalFooter>
-          </ModalContent>
-      </Modal>
+      <OfflineSalesCheckoutModal
+        isOpen={showCheckout}
+        onClose={() => setShowCheckout(false)}
+        checkoutStep={checkoutStep}
+        setCheckoutStep={setCheckoutStep}
+        isOnline={isOnline}
+        validationResult={validationResult}
+        isValidating={isValidating}
+        summary={summary}
+        cartStats={cartStats}
+        customers={customers}
+        selectedCustomerId={selectedCustomerId}
+        setSelectedCustomerId={setSelectedCustomerId}
+        note={note}
+        setNote={setNote}
+        isProcessing={isProcessing}
+        onProceedToNextStep={handleProceedToNextStep}
+        onProcessSale={handleProcessSale}
+      />
 
       {/* Offline Sales Status Modal */}
       <OfflineSalesStatusModal
@@ -830,99 +570,5 @@ export function OfflineSalesView() {
     </Stack>
   );
 }
-
-// Offline Sales Status Modal Component
-const OfflineSalesStatusModal = ({
-  isOpen,
-  onClose,
-  offlineSales,
-  onForceSync,
-  isSyncing
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  offlineSales: OfflineSale[];
-  onForceSync: () => void;
-  isSyncing: boolean;
-}) => {
-  return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalContent>
-        <ModalHeader>
-          <ModalTitle>Ventas Offline Pendientes</ModalTitle>
-          <ModalClose />
-        </ModalHeader>
-
-        <ModalBody>
-            <Stack gap="lg" direction="column" align="stretch">
-              <Typography color="text.muted">
-                {offlineSales.length} venta(s) pendiente(s) de sincronización
-              </Typography>
-
-              <Stack maxH="400px" overflowY="auto">
-                <Stack gap="md" direction="column" align="stretch">
-                  {offlineSales.map((sale) => (
-                    <CardWrapper key={sale.id}>
-                      <Stack direction="row" justify="space-between" mb="2">
-                        <Stack direction="column" align="start">
-                          <Typography fontWeight="medium">
-                            ${sale.totalAmount.toFixed(2)}
-                          </Typography>
-                          <Typography fontSize="sm" color="text.muted">
-                            {new Date(sale.timestamp).toLocaleString()}
-                          </Typography>
-                        </Stack>
-                        <Badge
-                          colorPalette={
-                            sale.status === 'synced' ? 'success' :
-                            sale.status === 'syncing' ? 'info' :
-                            sale.status === 'failed' ? 'error' : 'warning'
-                          }
-                        >
-                          {sale.status === 'pending' && 'Pendiente'}
-                          {sale.status === 'syncing' && 'Sincronizando'}
-                          {sale.status === 'synced' && 'Sincronizada'}
-                          {sale.status === 'failed' && 'Error'}
-                        </Badge>
-                      </Stack>
-                      
-                      <Typography fontSize="sm" color="text.muted">
-                        {sale.items.length} producto(s)
-                        {sale.customer && ` • ${sale.customer.name}`}
-                        {sale.note && ` • ${sale.note}`}
-                      </Typography>
-
-                      {sale.retryCount > 0 && (
-                        <Typography fontSize="xs"  mt="1">
-                          Reintentado {sale.retryCount} veces
-                        </Typography>
-                      )}
-                    </CardWrapper>
-                  ))}
-                </Stack>
-              </Stack>
-            </Stack>
-          </ModalBody>
-
-          <ModalFooter>
-            <Stack gap="sm" direction="row">
-              <Button variant="outline" onClick={onClose}>
-                Cerrar
-              </Button>
-              <Button
-                colorPalette="blue"
-                onClick={onForceSync}
-                loading={isSyncing}
-                disabled={offlineSales.length === 0}
-              >
-                <CloudIcon className="w-4 h-4" />
-                Forzar Sincronización
-              </Button>
-            </Stack>
-          </ModalFooter>
-        </ModalContent>
-    </Modal>
-  );
-};
 
 export default OfflineSalesView;

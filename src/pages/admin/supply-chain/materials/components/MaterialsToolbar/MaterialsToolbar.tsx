@@ -72,6 +72,7 @@ export const MaterialsToolbar = memo(function MaterialsToolbar({
       position="sticky"
       top="0"
       zIndex="sticky"
+      data-testid="filters-panel"
     >
       {/* Top Row: Search + Primary Actions */}
       <Stack direction="row" gap="md" align="center" wrap="wrap">
@@ -84,6 +85,7 @@ export const MaterialsToolbar = memo(function MaterialsToolbar({
           flex="1"
           minW="250px"
           disabled={disabled}
+          data-testid="search-input"
         />
 
         {/* View Toggle */}
@@ -113,6 +115,7 @@ export const MaterialsToolbar = memo(function MaterialsToolbar({
           colorPalette="blue"
           onClick={onAddMaterial}
           disabled={disabled || !onAddMaterial}
+          data-testid="new-material-button"
         >
           <Icon icon={PlusIcon} size="sm" />
           Nuevo Material
@@ -170,7 +173,7 @@ export const MaterialsToolbar = memo(function MaterialsToolbar({
         {/* Category Filter */}
         <MenuRoot>
           <MenuTrigger asChild>
-            <Button size="sm" variant="outline" disabled={disabled}>
+            <Button size="sm" variant="outline" disabled={disabled} data-testid="category-filter">
               Categoría: {selectedCategory === 'all' ? 'Todas' : selectedCategory}
               {selectedCategory !== 'all' && (
                 <Badge size="xs" colorPalette="blue" ml="xs">1</Badge>
@@ -196,7 +199,7 @@ export const MaterialsToolbar = memo(function MaterialsToolbar({
         {/* Stock Status Filter */}
         <MenuRoot>
           <MenuTrigger asChild>
-            <Button size="sm" variant="outline" disabled={disabled}>
+            <Button size="sm" variant="outline" disabled={disabled} data-testid="stock-filter">
               Stock: {selectedStockStatus === 'all' ? 'Todos' : selectedStockStatus}
               {selectedStockStatus !== 'all' && (
                 <Badge size="xs" colorPalette="blue" ml="xs">1</Badge>

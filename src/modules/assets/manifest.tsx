@@ -21,7 +21,6 @@ export const assetsManifest: ModuleManifest = {
   permissionModule: 'operations', // ✅ Uses 'operations' permission
 
   depends: [], // Standalone module
-  autoInstall: true, // Always available
 
   // 🔒 PERMISSIONS: Supervisors can manage assets
   minimumRole: 'SUPERVISOR' as const,

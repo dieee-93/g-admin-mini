@@ -3,11 +3,11 @@
 // ============================================
 // Wrapper service for SupplierAnalysisEngine integration
 
-import { SupplierAnalysisEngine } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import { SupplierAnalysisEngine } from '@/modules/materials/services';
 import type {
   SupplierAnalysisResult,
   SupplierAnalysis
-} from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+} from '@/modules/materials/services';
 import type { MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 import type { Supplier, ProcurementRecommendation } from '../types/supplierTypes';
 import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';

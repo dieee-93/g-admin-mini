@@ -1,0 +1,10 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - img [ref=e8]
+      - paragraph [ref=e11]: G-Admin Mini
+    - paragraph [ref=e16]: Verificando autenticación...
+  - generic [ref=e17]:
+    - img [ref=e19]
+    - button "Open Tanstack query devtools" [ref=e67] [cursor=pointer]:
+      - img [ref=e68]

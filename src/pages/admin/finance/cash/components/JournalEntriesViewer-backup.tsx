@@ -20,7 +20,7 @@ import {
   ChevronRightIcon,
   ChevronDownIcon,
 } from '@heroicons/react/24/outline';
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency } from '@/lib/decimal';
 import { fetchJournalEntries, getJournalEntry } from '@/modules/cash/services';
 import { logger } from '@/lib/logging';
 import type { JournalEntryRow, JournalEntryWithLines } from '@/modules/cash/types';

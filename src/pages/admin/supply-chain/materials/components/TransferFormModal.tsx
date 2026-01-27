@@ -3,9 +3,10 @@
 // ================================================================
 // Purpose: Form to create new inventory transfers between locations
 // Pattern: Modal with validation + location/item selectors
+// ✅ PERFORMANCE: React.memo (Phase 2 Round 2)
 // ================================================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import {
   Dialog,
   Stack,
@@ -29,7 +30,7 @@ interface TransferFormModalProps {
   materials: MaterialItem[];
 }
 
-export function TransferFormModal({
+export const TransferFormModal = memo<TransferFormModalProps>(function TransferFormModal({
   isOpen,
   onClose,
   onSuccess,
@@ -298,4 +299,6 @@ export function TransferFormModal({
       </Dialog.Positioner>
     </Dialog.Root>
   );
-}
+});
+
+TransferFormModal.displayName = 'TransferFormModal';

@@ -11,6 +11,14 @@ El módulo de **Products** gestiona la creación, análisis y optimización de p
 - ✅ Cálculo de rentabilidad y márgenes
 - ✅ Recomendaciones estratégicas automatizadas
 
+### 🗺️ Feature & Route Map
+
+| Route (Relative) | Feature Area | Components | Description |
+|------------------|--------------|------------|-------------|
+| **`/`** | **Product Management** | `ProductList`, `ProductFormModal` | Core catalog management. Create, edit, and organize products. |
+| **`/`** (Section) | **Menu Engineering** | `MenuEngineeringMatrix` | Strategic analysis of menu item performance (Profitability vs. Popularity). |
+| **`/`** (Section) | **Cost Analysis** | `CostAnalysisTab`, `ProductCostService` | Detailed breakdown of recipe costs and margins. |
+
 ---
 
 ## 🏗️ Estructura Estándar de Módulo

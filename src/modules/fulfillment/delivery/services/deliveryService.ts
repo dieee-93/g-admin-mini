@@ -22,7 +22,7 @@ import type {
   DeliveryMetrics,
   Coordinates
 } from '../types';
-import type { FulfillmentQueueItem, QueueFilters } from '../../services/fulfillmentService';
+import type { QueueItem, QueueFilters, QueueStatus } from '../../services/fulfillmentService';
 
 class DeliveryService {
   // ============================================
@@ -42,7 +42,7 @@ class DeliveryService {
       priority?: 'normal' | 'high' | 'urgent';
       notes?: string;
     }
-  ): Promise<FulfillmentQueueItem> {
+  ): Promise<QueueItem> {
     logger.info('DeliveryService', 'Queuing delivery order', { orderId });
 
     return fulfillmentService.queueOrder(
@@ -88,9 +88,9 @@ class DeliveryService {
   }
 
   /**
-   * Transform FulfillmentQueueItem to DeliveryOrder
+   * Transform QueueItem to DeliveryOrder
    */
-  private transformToDeliveryOrder(item: FulfillmentQueueItem): DeliveryOrder {
+  private transformToDeliveryOrder(item: QueueItem): DeliveryOrder {
     const metadata = item.metadata as DeliveryMetadata;
 
     return {
@@ -116,18 +116,26 @@ class DeliveryService {
 
   /**
    * Get all delivery zones
+   * @param activeOnly - Only fetch active zones
+   * @param locationId - Filter by location (optional for multi-location support)
    */
-  async getZones(activeOnly = true): Promise<DeliveryZone[]> {
+  async getZones(activeOnly = true, locationId?: string): Promise<DeliveryZone[]> {
     try {
-      logger.info('DeliveryService', 'Fetching delivery zones');
+      logger.info('DeliveryService', 'Fetching delivery zones', { activeOnly, locationId });
 
       let query = supabase
         .from('delivery_zones')
         .select('*')
+        .order('priority', { ascending: false, nullsFirst: false }) // Ordenar por prioridad primero
         .order('name');
 
       if (activeOnly) {
         query = query.eq('is_active', true);
+      }
+
+      // Filtro multi-location: zonas de sucursal + zonas globales
+      if (locationId) {
+        query = query.or(`location_id.eq.${locationId},location_id.is.null`);
       }
 
       const { data, error } = await query;
@@ -149,7 +157,10 @@ class DeliveryService {
    */
   async createZone(zoneData: CreateDeliveryZoneData): Promise<DeliveryZone> {
     try {
-      logger.info('DeliveryService', 'Creating delivery zone', { name: zoneData.name });
+      logger.info('DeliveryService', 'Creating delivery zone', { 
+        name: zoneData.name,
+        location_id: zoneData.location_id 
+      });
 
       const { data, error } = await supabase
         .from('delivery_zones')
@@ -161,6 +172,8 @@ class DeliveryService {
           delivery_fee: zoneData.delivery_fee,
           min_order_amount: zoneData.min_order_amount,
           estimated_time_minutes: zoneData.estimated_time_minutes,
+          location_id: zoneData.location_id || null, // NULL = zona global
+          priority: zoneData.priority || 0, // Default priority = 0
           is_active: true
         })
         .select()
@@ -168,7 +181,10 @@ class DeliveryService {
 
       if (error) throw error;
 
-      logger.info('DeliveryService', 'Zone created successfully', { id: data.id });
+      logger.info('DeliveryService', 'Zone created successfully', { 
+        id: data.id,
+        location_id: data.location_id 
+      });
       return data;
     } catch (error) {
       logger.error('DeliveryService', 'Failed to create zone', { error });

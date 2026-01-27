@@ -12,6 +12,14 @@ Enterprise-grade Kitchen Display System (KDS) for managing kitchen orders, stati
 - ✅ Station filtering & sorting
 - ✅ Special instructions & allergy warnings
 - ✅ Modifications tracking
+
+### 🗺️ Feature & Route Map
+
+| Route (Relative) | Feature Area | Components | Description |
+|------------------|--------------|------------|-------------|
+| **`/`** | **Kitchen Display** | `KitchenDisplay` | Main KDS view. Orders flow from Sales to here. |
+| **`(drawer)`** | **Configuration** | `KitchenConfigDrawer` | Settings for offline mode, printer routing, and station config. |
+
 - 🚧 EventBus integration (needs activation)
 - 🚧 Offline/Online mode configuration (migrated from Hub, needs refactor)
 

@@ -20,7 +20,7 @@ import {
   CardWrapper
 } from '@/shared/ui';
 import { useNavigationState, useNavigationLayout, useNavigationActions } from '@/contexts/NavigationContext';
-import { useCapabilities } from '@/store/capabilityStore';
+import { useBusinessProfile, useFeatureFlags } from '@/lib/capabilities';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 type NavTab = 'current-route' | 'modules' | 'capabilities' | 'routing-tree';
@@ -33,7 +33,8 @@ export default function NavigationDebugPage() {
   const navState = useNavigationState();
   const navLayout = useNavigationLayout();
   const navActions = useNavigationActions();
-  const capabilities = useCapabilities();
+  const { profile } = useBusinessProfile();
+  const featureFlags = useFeatureFlags();
   const location = useLocation();
   const navigate = useNavigate();
 

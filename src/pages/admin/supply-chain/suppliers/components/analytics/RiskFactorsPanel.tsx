@@ -4,7 +4,7 @@
 // Panel displaying supplier risk factors with mitigation actions
 
 import { VStack, Text, Alert, HStack, Badge, Collapsible, Stack } from '@/shared/ui';
-import type { SupplierAnalysis, SupplierRiskFactor } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import type { SupplierAnalysis, SupplierRiskFactor } from '@/modules/materials/services';
 import { useMemo } from 'react';
 import {
   ShieldExclamationIcon

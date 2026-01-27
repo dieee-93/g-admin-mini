@@ -13,6 +13,15 @@ El módulo de **Sales** gestiona el sistema completo de punto de venta (POS), an
 - ✅ Generación de códigos QR para mesas
 - ✅ Dashboard de métricas en tiempo real
 
+- ✅ Dashboard de métricas en tiempo real
+
+### 🗺️ Feature & Route Map
+
+| Route (Relative) | Feature Area | Components | Description |
+|------------------|--------------|------------|-------------|
+| **`/`** | **POS System** | `POSSystem`, `SalesAnalytics` | Main orchestration page. Handles Point of Sale, Table Management, and Real-time Analytics. |
+| **`/b2b`** | **Corporate Sales** | `B2BPortal` | Dedicated interface for wholesale and corporate client management. |
+
 ---
 
 ## 🏗️ Estructura Estándar de Módulo

@@ -37,7 +37,6 @@ import type {
   IModuleRegistry,
 } from './types';
 import { SecureEventProcessor } from '@/lib/events/utils/SecureEventProcessor';
-import { CORE_MODULES, OPTIONAL_MODULES, isCoreModule, isOptionalModule, getRequiredFeature } from './constants';
 
 // ============================================
 // TOPOLOGICAL SORT (Kahn's Algorithm)
@@ -300,20 +299,8 @@ export function validateModuleManifests(manifests: ModuleManifest[]): ModuleVali
       });
     }
 
-    // Warnings for OPTIONAL modules
-    // CORE modules don't need activatedBy, but OPTIONAL modules must have it
-    if (isOptionalModule(manifest.id) && !manifest.activatedBy) {
-      warnings.push(
-        `Module "${manifest.id}" is in OPTIONAL_MODULES but has no activatedBy feature`
-      );
-    }
-
-    // CORE modules should NOT have activatedBy (they are always loaded)
-    if (isCoreModule(manifest.id) && manifest.activatedBy) {
-      warnings.push(
-        `Module "${manifest.id}" is a CORE module but has activatedBy="${manifest.activatedBy}" (should be removed)`
-      );
-    }
+    // NEW ARCHITECTURE: activatedBy is optional (CORE modules don't have it)
+    // No need to validate - undefined means CORE module, string means OPTIONAL module
   }
 
   // 2. Validate dependency references
@@ -394,7 +381,7 @@ export async function initializeModules(
   });
 
   // ============================================
-  // STEP 1: Filter by active features
+  // STEP 1: Filter by active features (NEW ARCHITECTURE)
   // ============================================
 
   console.log('📋 [STEP 1] Filtering modules by active features:', {
@@ -406,54 +393,31 @@ export async function initializeModules(
   let filterIndex = 0;
   const filteredManifests = manifests.filter((manifest) => {
     filterIndex++;
-
-    console.log(`🔍 [STEP 1.${filterIndex}] Processing module:`, manifest.id, {
-      isCoreModule: isCoreModule(manifest.id),
-      isOptionalModule: isOptionalModule(manifest.id),
-      activatedBy: manifest.activatedBy,
-    });
-
-    // NEW SIMPLIFIED LOGIC:
-    // 1. CORE modules → ALWAYS load (no feature check)
-    // 2. OPTIONAL modules → Load IF required feature is active
-
-    // Check if it's a CORE module (always load)
-    if (isCoreModule(manifest.id)) {
+    
+    // NEW ARCHITECTURE:
+    // - CORE modules: activatedBy === undefined → always include
+    // - OPTIONAL modules: activatedBy === FeatureId → include if feature is active
+    
+    if (!manifest.activatedBy) {
+      // CORE module - always loaded
       console.log(`✅ [STEP 1.${filterIndex}] ${manifest.id}: CORE module (always loaded)`);
       return true;
     }
 
-    // Check if it's an OPTIONAL module (conditional loading)
-    if (isOptionalModule(manifest.id)) {
-      const requiredFeature = getRequiredFeature(manifest.id);
+    // OPTIONAL module - check if activation feature is active
+    const isActive = activeFeatures.includes(manifest.activatedBy);
+    
+    console.log(`${isActive ? '✅' : '❌'} [STEP 1.${filterIndex}] ${manifest.id}: activatedBy="${manifest.activatedBy}" isActive=${isActive}`);
 
-      if (!requiredFeature) {
-        logger.warn('App', `Module "${manifest.id}" is in OPTIONAL_MODULES but has no requiredFeature mapping`, {
-          moduleId: manifest.id,
-        });
-        return false;
-      }
-
-      const hasRequiredFeature = activeFeatures.includes(requiredFeature);
-
-      console.log(`${hasRequiredFeature ? '✅' : '❌'} [STEP 1.${filterIndex}] ${manifest.id}: OPTIONAL module requires feature="${requiredFeature}" → ${hasRequiredFeature ? 'ACTIVE' : 'INACTIVE'}`);
-
-      if (!hasRequiredFeature) {
-        logger.debug('App', `Module "${manifest.id}" skipped - required feature not active`, {
-          requiredFeature,
-          activeFeatures,
-        });
-        return false;
-      }
-
-      return true;
+    if (!isActive) {
+      logger.debug('App', `Module "${manifest.id}" skipped - activation feature not active`, {
+        activatedBy: manifest.activatedBy,
+        activeFeatures: activeFeatures,
+      });
+      return false;
     }
 
-    // Module is neither CORE nor OPTIONAL - log warning and skip
-    logger.warn('App', `Module "${manifest.id}" is not registered in CORE_MODULES or OPTIONAL_MODULES - skipping`, {
-      moduleId: manifest.id,
-    });
-    return false;
+    return true;
   });
 
   console.log('✅ [STEP 1] Filtering complete:', {
@@ -580,18 +544,6 @@ export async function initializeModules(
         depends: manifest.depends,
       });
     } catch (error) {
-      console.error(`❌ [STEP 4] FAILED to register ${manifest.id}:`, {
-        error,
-        errorMessage: error instanceof Error ? error.message : String(error),
-        errorStack: error instanceof Error ? error.stack : undefined,
-        manifest: {
-          id: manifest.id,
-          version: manifest.version,
-          depends: manifest.depends,
-          activatedBy: manifest.activatedBy,
-        }
-      });
-      
       logger.error('App', `❌ Failed to register module: ${manifest.id}`, error);
 
       failed.push({

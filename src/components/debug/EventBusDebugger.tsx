@@ -27,7 +27,7 @@ import {
     Grid,
     Separator,
 } from '@/shared/ui';
-import { useEventBus } from '@/providers/EventBusProvider';
+import { useEventBus } from '@/lib/events/EventBusProvider';
 import { EventStoreIndexedDB } from '@/lib/events/EventStore';
 import type { NamespacedEvent, EventBusMetrics, ModuleHealth } from '@/lib/events/types';
 import { logger } from '@/lib/logging';

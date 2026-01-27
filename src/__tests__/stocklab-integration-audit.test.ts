@@ -6,7 +6,7 @@
 import { describe, test, expect } from 'vitest';
 import { AlertUtils } from '../shared/alerts';
 import { SmartAlertsEngine, type SmartAlert } from '../pages/admin/supply-chain/materials/services/smartAlertsEngine';
-import { SmartAlertsAdapter } from '../pages/admin/supply-chain/materials/services/smartAlertsAdapter';
+import MaterialsAlertsAdapter from '../modules/materials/alerts/adapter';
 import { DecimalUtils } from '../business-logic/shared/decimalUtils';
 import { StockCalculation } from '../business-logic/inventory/stockCalculation';
 import { ABCAnalysisEngine } from '../pages/admin/supply-chain/materials/services/abcAnalysisEngine';
@@ -48,7 +48,7 @@ describe('🚨 ALERTS SYSTEM INTEGRATION AUDIT', () => {
       expect(firstAlert).toHaveProperty('abcClass');
     });
 
-    test('should verify SmartAlertsAdapter converts to unified alert format', async () => {
+    test('should verify MaterialsAlertsAdapter converts to unified alert format', async () => {
       const mockMaterials: MaterialABC[] = [{
         id: 'test-2',
         name: 'Test Material 2',
@@ -62,7 +62,7 @@ describe('🚨 ALERTS SYSTEM INTEGRATION AUDIT', () => {
         valuePercentage: 10
       }];
 
-      const unifiedAlerts = await SmartAlertsAdapter.generateMaterialsAlerts(mockMaterials);
+      const unifiedAlerts = await MaterialsAlertsAdapter.generateAlerts(mockMaterials);
       expect(unifiedAlerts.length).toBeGreaterThan(0);
 
       const firstAlert = unifiedAlerts[0];
@@ -303,7 +303,7 @@ describe('🔗 INTEGRATION POINTS MAPPING AUDIT', () => {
       const smartAlerts = SmartAlertsEngine.generateSmartAlerts([classified]);
 
       // Step 3: Unified Alerts Conversion
-      const unifiedAlertsPromise = SmartAlertsAdapter.generateMaterialsAlerts([classified]);
+      const unifiedAlertsPromise = MaterialsAlertsAdapter.generateAlerts([classified]);
 
       expect(classified).toHaveProperty('abcClass');
       

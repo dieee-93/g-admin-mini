@@ -1,249 +1,344 @@
-import React from 'react';
-import { Stack, Grid, CardWrapper, Typography, Badge, Button } from '@/shared/ui';
-import { supabase } from '@/lib/supabase/client';
-import { EyeIcon, ClockIcon, UsersIcon } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
-import { logger } from '@/lib/logging';
-import { notify } from '@/lib/notifications';
+/**
+ * FloorPlanView - Interactive floor plan with optimized drag & drop
+ * 
+ * Optimizations applied (see docs/optimization/dndkit-best-practices.md):
+ * - DragOverlay for smooth dragging and scroll handling
+ * - Announcements for screen reader accessibility
+ * - Memoized content components
+ * - Hardware acceleration
+ */
 
-interface Table {
-  id: string;
-  number: number;
-  capacity: number;
-  status: 'available' | 'occupied' | 'reserved' | 'cleaning' | 'ready_for_bill' | 'maintenance';
-  location: string;
-  priority: 'normal' | 'vip' | 'urgent' | 'attention_needed';
-  color_code: string;
-  turn_count: number;
-  daily_revenue: number;
-  current_party?: {
-    size: number;
-    primary_customer_name?: string;
-    seated_at: string;
-    estimated_duration: number;
-    total_spent: number;
-    status: string;
-  };
-}
+import React, { useState, useMemo, useCallback } from 'react';
+import { Grid, Stack, Typography } from '@/shared/ui';
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type {
+  DragEndEvent,
+  DragStartEvent,
+  Announcements,
+  UniqueIdentifier
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
 
-interface FloorPlanViewProps {
+// Module imports (following project conventions)
+import { useFloorManagement, useOnsiteEventListeners } from '@/modules/fulfillment/onsite/hooks';
+import type { Table, SeatPartyData, TableStatus } from '@/modules/fulfillment/onsite/types';
+
+// Local components
+import { SortableTableCard, TableCardContent } from './SortableTableCard';
+import { TableDetailsModal } from './TableDetailsModal';
+import { SeatPartyModal } from './SeatPartyModal';
+import { BillModal } from './BillModal';
+
+// Sales integration
+import { SaleFormModal } from '@/pages/admin/operations/sales/components/SaleFormModal';
+import type { OnsiteSaleContext } from '@/modules/fulfillment/onsite/events';
+
+// Toast for notifications
+import { toaster } from '@/shared/ui/toaster';
+
+// Payment types
+import type { PaymentMethod } from '@/pages/admin/operations/sales/types';
+
+// ============================================
+// ANNOUNCEMENTS FOR SCREEN READERS
+// ============================================
+
+const announcements: Announcements = {
+  onDragStart({ active }) {
+    return `Arrastrando mesa ${active.id}. Usa las flechas para mover.`;
+  },
+  onDragOver({ active, over }) {
+    if (over) {
+      return `Mesa ${active.id} sobre posición de mesa ${over.id}`;
+    }
+    return undefined;
+  },
+  onDragEnd({ active, over }) {
+    if (over && active.id !== over.id) {
+      return `Mesa ${active.id} movida a posición de mesa ${over.id}`;
+    }
+    return `Mesa ${active.id} devuelta a su posición original`;
+  },
+  onDragCancel({ active }) {
+    return `Arrastre cancelado. Mesa ${active.id} volvió a su posición original.`;
+  },
+};
+
+// ============================================
+// COMPONENT
+// ============================================
+
+export interface FloorPlanViewProps {
   refreshTrigger?: number;
 }
 
 export function FloorPlanView({ refreshTrigger }: FloorPlanViewProps) {
-  const [tables, setTables] = React.useState<Table[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  // Use orchestration hook
+  const {
+    tables,
+    loading,
+    error,
+    updateStatus,
+    seatParty,
+    reorderTables,
+    completeParty
+  } = useFloorManagement({ refreshTrigger, realtime: true });
 
-  React.useEffect(() => {
-    loadTableData();
+  // Activate event listeners for sales integration
+  useOnsiteEventListeners({ enabled: true });
 
-    // Real-time subscription
-    const subscription = supabase
-      .channel('tables-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tables' }, () => {
-        loadTableData();
-      })
-      .subscribe();
+  // Drag state for DragOverlay
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
-    return () => {
-      subscription.unsubscribe();
+  // Modal State - Store only ID to keep reference fresh
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [seatModalOpen, setSeatModalOpen] = useState(false);
+  const [billModalOpen, setBillModalOpen] = useState(false);
+  const [salesModalOpen, setSalesModalOpen] = useState(false);
+  const [saleInitialContext, setSaleInitialContext] = useState<OnsiteSaleContext | undefined>(undefined);
+
+  // Derive selected table from current tables array (always fresh)
+  const selectedTable = useMemo(() => {
+    if (!selectedTableId) return null;
+    return tables.find(t => t.id === selectedTableId) || null;
+  }, [selectedTableId, tables]);
+
+  // Get the active table for DragOverlay
+  const activeTable = useMemo(() => {
+    if (!activeId) return null;
+    return tables.find(t => t.id === activeId) || null;
+  }, [activeId, tables]);
+
+  // DND Sensors with sortableKeyboardCoordinates for a11y
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  );
+
+  // Handlers
+  const handleOpenView = useCallback((table: Table) => {
+    setSelectedTableId(table.id);
+    setViewModalOpen(true);
+  }, []);
+
+  const handleOpenSeat = useCallback((table: Table) => {
+    setSelectedTableId(table.id);
+    setSeatModalOpen(true);
+  }, []);
+
+  const handleStatusChange = useCallback(async (tableId: string, newStatus: TableStatus | string): Promise<void> => {
+    await updateStatus(tableId, newStatus);
+  }, [updateStatus]);
+
+  const handleMarkReady = useCallback(async (table: Table) => {
+    await updateStatus(table.id, 'available');
+  }, [updateStatus]);
+
+  // Handler for taking order from a table (opens POS with table pre-selected)
+  const handleTakeOrder = useCallback((table: Table) => {
+    if (!table.current_party) {
+      toaster.error({ title: 'Sin comensales', description: 'Esta mesa no tiene un grupo activo.' });
+      return;
+    }
+
+    // Set the initial context for SaleFormModal
+    const context: OnsiteSaleContext = {
+      type: 'onsite',
+      tableId: table.id,
+      tableNumber: table.number,
+      partyId: table.current_party.id,
+      partySize: table.current_party.size,
+      customerName: table.current_party.customer_name
     };
-  }, [refreshTrigger]);
 
-  const loadTableData = async () => {
-    try {
-      setLoading(true);
-      const { data, error} = await supabase
-        .from('tables')
-        .select(`
-          *,
-          parties (
-            size,
-            customer_name,
-            seated_at,
-            estimated_duration,
-            total_spent,
-            status
-          )
-        `)
-        .eq('is_active', true)
-        .order('number');
+    setSaleInitialContext(context);
+    setSalesModalOpen(true);
+  }, []);
 
-      if (error) throw error;
+  const handleSeatParty = useCallback(async (tableId: string, partyData: SeatPartyData): Promise<void> => {
+    await seatParty(tableId, partyData);
+  }, [seatParty]);
 
-      interface PartyData {
-        status: string;
-        size: number;
-        customer_name: string;
-        seated_at: string;
-        estimated_duration?: number;
+  const handleOpenBill = useCallback((table: Table) => {
+    if (!table.current_party) {
+      toaster.error({ title: 'Sin comensales', description: 'Esta mesa no tiene un grupo activo.' });
+      return;
+    }
+    setSelectedTableId(table.id);
+    setBillModalOpen(true);
+  }, []);
+
+  const handlePaymentComplete = useCallback(async (payments: PaymentMethod[]) => {
+    if (selectedTable?.current_party) {
+      try {
+        await completeParty(selectedTable.current_party.id, selectedTable.id, payments);
+        toaster.success({
+          title: '✅ Pago procesado',
+          description: `Mesa ${selectedTable.number} liberada correctamente.`
+        });
+      } catch (err) {
+        toaster.error({ title: 'Error al cerrar mesa', description: String(err) });
       }
-
-      interface TableData {
-        section?: string;
-        parties?: PartyData[];
-        [key: string]: unknown;
-      }
-
-      const formattedTables = data.map((table: TableData) => ({
-        ...table,
-        location: table.section || 'main', // Map section → location for code compatibility
-        current_party: table.parties?.find((p: PartyData) =>
-          p.status === 'seated' || p.status === 'active'
-        ) ? {
-          size: table.parties[0].size,
-          primary_customer_name: table.parties[0].customer_name,
-          seated_at: table.parties[0].seated_at,
-          estimated_duration: table.parties[0].estimated_duration || 60,
-          total_spent: table.parties[0].total_spent || 0,
-          status: table.parties[0].status
-        } : null
-      }));
-
-      setTables(formattedTables);
-    } catch (error) {
-      logger.error('FloorPlanView', 'Error loading tables:', error);
-      notify.error({ title: 'Error loading table data' });
-    } finally {
-      setLoading(false);
     }
-  };
+    setBillModalOpen(false);
+    setSelectedTableId(null);
+  }, [selectedTable, completeParty]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'available': return 'success';
-      case 'occupied': return 'warning';
-      case 'reserved': return 'info';
-      case 'cleaning': return 'gray';
-      case 'ready_for_bill': return 'accent';
-      case 'maintenance': return 'error';
-      default: return 'gray';
+  const handlePaymentError = useCallback((error: string) => {
+    toaster.error({ title: 'Error de pago', description: error });
+  }, []);
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id);
+  }, []);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+
+    setActiveId(null);
+
+    if (over && active.id !== over.id) {
+      const oldIndex = tables.findIndex((t) => t.id === active.id);
+      const newIndex = tables.findIndex((t) => t.id === over.id);
+      const newOrder = arrayMove(tables, oldIndex, newIndex);
+      reorderTables(newOrder);
     }
-  };
+  }, [tables, reorderTables]);
 
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
-      case 'vip': return '👑';
-      case 'urgent': return '🚨';
-      case 'attention_needed': return '⚠️';
-      default: return '';
-    }
-  };
+  const handleDragCancel = useCallback(() => {
+    setActiveId(null);
+  }, []);
 
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-  };
+  // Memoized table IDs for SortableContext
+  const tableIds = useMemo(() => tables.map(t => t.id), [tables]);
 
+  // Loading state
   if (loading && !tables.length) {
     return (
       <Stack direction="row" align="center" justify="center" h="50vh">
-        <Typography>Loading table data...</Typography>
+        <Typography>Cargando mesas...</Typography>
+      </Stack>
+    );
+  }
+
+  // Error state
+  if (error && !tables.length) {
+    return (
+      <Stack direction="row" align="center" justify="center" h="50vh">
+        <Typography color="red.500">Error: {error}</Typography>
       </Stack>
     );
   }
 
   return (
-    <Grid templateColumns="repeat(auto-fill, minmax(280px, 1fr))" gap="md">
-      {tables.map((table) => (
-        <CardWrapper key={table.id}>
-          <Stack direction="column" align="start" gap="sm">
-            {/* Table Header */}
-            <Stack direction="row" justify="space-between" w="full">
-              <Stack direction="row">
-                <Typography size="lg" fontWeight="bold">
-                  Table {table.number}
-                </Typography>
-                {getPriorityIcon(table.priority) && (
-                  <Typography size="lg">{getPriorityIcon(table.priority)}</Typography>
-                )}
-              </Stack>
-              <Badge colorPalette={getStatusColor(table.status)}>
-                {table.status.replace('_', ' ').toUpperCase()}
-              </Badge>
-            </Stack>
+    <>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+        accessibility={{ announcements }}
+      >
+        <SortableContext
+          items={tableIds}
+          strategy={rectSortingStrategy}
+        >
+          <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap="6">
+            {tables.map((table) => (
+              <SortableTableCard
+                key={table.id}
+                table={table}
+                onOpenView={handleOpenView}
+                onOpenSeat={handleOpenSeat}
+                onOpenBill={handleOpenBill}
+                onMarkReady={handleMarkReady}
+                onTakeOrder={handleTakeOrder}
+              />
+            ))}
+          </Grid>
+        </SortableContext>
 
-            {/* Table Details */}
-            <Stack direction="row" justify="space-between" w="full">
-              <Stack direction="row">
-                <Icon icon={UsersIcon} size="sm" />
-                <Typography size="sm" color="text.muted">
-                  Capacity: {table.capacity}
-                </Typography>
-              </Stack>
-              <Typography size="sm" color="text.muted" textTransform="capitalize">
-                {table.location.replace('_', ' ')}
-              </Typography>
-            </Stack>
+        {/* DragOverlay - Renders the dragged item outside normal flow */}
+        <DragOverlay
+          dropAnimation={{
+            duration: 250,
+            easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+          }}
+        >
+          {activeTable && (
+            <div style={{
+              width: 300,
+              cursor: 'grabbing',
+              willChange: 'transform',
+              backfaceVisibility: 'hidden'
+            }}>
+              <TableCardContent
+                table={activeTable}
+                onOpenView={handleOpenView}
+                onOpenSeat={handleOpenSeat}
+                onOpenBill={handleOpenBill}
+                onMarkReady={handleMarkReady}
+                onTakeOrder={handleTakeOrder}
+                isDragging
+              />
+            </div>
+          )}
+        </DragOverlay>
+      </DndContext>
 
-            {/* Current Party Info */}
-            {table.current_party && (
-              <>
-                <hr />
-                <Stack direction="column" align="start" gap="xs" w="full">
-                  <Stack direction="row" justify="space-between" w="full">
-                    <Typography size="sm" fontWeight="medium">
-                      Party of {table.current_party.size}
-                    </Typography>
-                    <Typography size="sm" color="text.muted">
-                      {DecimalUtils.formatCurrency(table.current_party.total_spent)}
-                    </Typography>
-                  </Stack>
+      <TableDetailsModal
+        table={selectedTable}
+        isOpen={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        onStatusChange={handleStatusChange}
+      />
 
-                  {table.current_party.primary_customer_name && (
-                    <Typography size="sm" color="text.muted">
-                      {table.current_party.primary_customer_name}
-                    </Typography>
-                  )}
+      <SeatPartyModal
+        table={selectedTable}
+        isOpen={seatModalOpen}
+        onClose={() => setSeatModalOpen(false)}
+        onSeatParty={handleSeatParty}
+      />
 
-                  <Stack direction="row" justify="space-between" w="full">
-                    <Stack direction="row">
-                      <Icon icon={ClockIcon} size="sm" />
-                      <Typography size="sm" color="text.muted">
-                        {formatDuration(
-                          Math.floor(
-                            (new Date().getTime() - new Date(table.current_party.seated_at).getTime()) / 60000
-                          )
-                        )}
-                      </Typography>
-                    </Stack>
-                    <Typography size="sm" color="text.muted">
-                      Est: {formatDuration(table.current_party.estimated_duration)}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </>
-            )}
+      {selectedTable?.current_party && (
+        <BillModal
+          isOpen={billModalOpen}
+          onClose={() => setBillModalOpen(false)}
+          table={selectedTable}
+          party={selectedTable.current_party}
+          onPaymentComplete={handlePaymentComplete}
+          onPaymentError={handlePaymentError}
+        />
+      )}
 
-            {/* Performance Stats */}
-            <hr />
-            <Stack direction="row" justify="space-between" w="full" fontSize="sm" color="text.muted">
-              <Typography>Turns: {table.turn_count}</Typography>
-              <Typography>Revenue: {DecimalUtils.formatCurrency(table.daily_revenue)}</Typography>
-            </Stack>
-
-            {/* Action Buttons */}
-            <Stack direction="row" justify="end" w="full" pt="2">
-              <Button size="sm" variant="ghost">
-                <Icon icon={EyeIcon} size="sm" />
-                View
-              </Button>
-              {table.status === 'available' && (
-                <Button size="sm" colorPalette="blue">
-                  Seat Party
-                </Button>
-              )}
-              {table.status === 'occupied' && table.color_code === 'red' && (
-                <Button size="sm" colorPalette="red">
-                  Check Status
-                </Button>
-              )}
-            </Stack>
-          </Stack>
-        </CardWrapper>
-      ))}
-    </Grid>
+      {/* POS Modal - Opens when taking order from table */}
+      <SaleFormModal
+        isOpen={salesModalOpen}
+        onClose={() => {
+          setSalesModalOpen(false);
+          setSaleInitialContext(undefined);
+        }}
+        initialContext={saleInitialContext}
+      />
+    </>
   );
 }

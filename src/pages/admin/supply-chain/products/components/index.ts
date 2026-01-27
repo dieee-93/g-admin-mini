@@ -17,7 +17,3 @@ export * from './CostAnalysis/CostCalculator';
 
 // Menu Engineering
 export * from './MenuEngineeringMatrix';
-
-// Appointment Services (Week 4)
-export * from './ServiceConfigurationManager';
-export * from './ServicesTab';

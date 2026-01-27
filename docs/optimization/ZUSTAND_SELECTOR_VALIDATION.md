@@ -52,6 +52,146 @@ const items = useMaterialsStore(state => state.items);
 
 ---
 
+## 3. Immer Middleware - Critical Pattern
+
+**Fuente**: [zustand.docs.pmnd.rs/integrations/immer-middleware](https://zustand.docs.pmnd.rs/integrations/immer-middleware)
+
+> **"If you are using Immer, make sure you are actually following the rules of Immer. [...] Zustand checks if the state has actually changed, so since both the current state and the next state are equal, Zustand will skip calling the subscriptions."**
+
+### ❌ ANTI-PATTERN: Using `produce()` without Immer middleware
+
+```typescript
+import { produce } from 'immer';
+import { create } from 'zustand';
+
+// ❌ PROBLEMA: produce() sin middleware de Zustand
+export const useStore = create<State>()(
+  devtools(
+    persist(
+      (set) => ({
+        items: [],
+        setItems: (items) => {
+          set(
+            produce((state) => {
+              state.items = items; // Muta pero no crea nueva referencia
+            })
+          );
+        },
+      }),
+      { name: 'store' }
+    )
+  )
+);
+```
+
+**Por qué falla**:
+- `produce()` muta el estado sin usar el middleware oficial de Zustand
+- Zustand no detecta el cambio (misma referencia de objeto)
+- Los selectores NO se notifican → componentes NO re-renderizan
+- **Síntoma**: Store tiene datos actualizados pero UI no refleja cambios
+
+### ✅ SOLUCIÓN 1: Usar middleware oficial `immer`
+
+```typescript
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+
+export const useStore = create<State>()(
+  devtools(
+    persist(
+      immer((set) => ({
+        items: [],
+        setItems: (items) =>
+          set((state) => {
+            state.items = items; // ✅ Middleware detecta cambio
+          }),
+      })),
+      { name: 'store' }
+    )
+  )
+);
+```
+
+### ✅ SOLUCIÓN 2: Patrón inmutable estándar (RECOMENDADO)
+
+```typescript
+import { create } from 'zustand';
+
+export const useStore = create<State>()(
+  devtools(
+    persist(
+      (set) => ({
+        items: [],
+        // ✅ Spread operator crea nueva referencia
+        setItems: (items) => set({ items: [...items] }),
+        
+        addItem: (item) =>
+          set((state) => ({
+            items: [...state.items, item],
+          })),
+        
+        updateItem: (id, updates) =>
+          set((state) => ({
+            items: state.items.map((i) => (i.id === id ? { ...i, ...updates } : i)),
+          })),
+        
+        deleteItem: (id) =>
+          set((state) => ({
+            items: state.items.filter((i) => i.id !== id),
+          })),
+      }),
+      { name: 'store' }
+    )
+  )
+);
+```
+
+**Ventajas de Solución 2**:
+- ✅ No requiere dependencia extra de Immer
+- ✅ Patrón inmutable explícito y predecible
+- ✅ Mejor compatibilidad con persist middleware
+- ✅ Mismo patrón que React `useState`
+
+### 🐛 Caso Real: Bug en SuppliersStore
+
+**Antes (ROTO)**:
+```typescript
+// ❌ produce() sin middleware → store no notifica cambios
+setSuppliers: (suppliers) => {
+  set(
+    produce((state: SuppliersState) => {
+      state.suppliers = suppliers.map((s) => ({
+        ...s,
+        updated_at: s.updated_at || new Date().toISOString(),
+      }));
+    })
+  );
+},
+```
+
+**Después (FUNCIONA)**:
+```typescript
+// ✅ Spread operator → nueva referencia → Zustand detecta cambio
+setSuppliers: (suppliers) => {
+  set({
+    suppliers: suppliers.map((supplier) => ({
+      ...supplier,
+      updated_at: supplier.updated_at || new Date().toISOString(),
+    })),
+  });
+},
+```
+
+**Síntomas detectados**:
+- Store tenía 3 suppliers pero SelectField solo mostraba 2
+- Console logs confirmaban store actualizado
+- `useShallow` selector no detectaba cambios
+- Al crear nuevo supplier, UI no se actualizaba
+
+**Lección**: Usar `produce()` sin el middleware oficial de Zustand rompe la reactividad.
+
+---
+
 ## Validación de Best Practices Industria
 
 ### Medium Article: "Zustand Performance Best Practices"
@@ -285,3 +425,75 @@ Revisé código público de:
 - Vercel dashboard (code review)
 - Linear app (blog posts)
 - Excalidraw (architecture docs)
+
+---
+
+## ✅ Zustand Store Checklist (g-mini Project)
+
+### Antes de crear/modificar una store, verificar:
+
+#### 1. ❌ NO usar `produce()` sin middleware
+```typescript
+// ❌ INCORRECTO
+import { produce } from 'immer';
+set(produce((state) => { state.items = [...]; }));
+
+// ✅ CORRECTO - Opción 1: Middleware oficial
+import { immer } from 'zustand/middleware/immer';
+create(immer((set) => ({ /* ... */ })));
+
+// ✅ CORRECTO - Opción 2: Patrón inmutable (RECOMENDADO)
+set((state) => ({ items: [...state.items, newItem] }));
+```
+
+#### 2. ✅ Usar selectores atómicos en componentes
+```typescript
+// ❌ INCORRECTO: Hook wrapper que retorna todo
+const { items, isOpen, stats } = useMaterials();
+
+// ✅ CORRECTO: Selectores directos y atómicos
+const items = useMaterialsStore(useShallow(state => state.items));
+const isOpen = useMaterialsStore(state => state.isModalOpen);
+```
+
+#### 3. ✅ `useShallow` para arrays/objects
+```typescript
+// ❌ INCORRECTO: Nueva referencia causa re-render
+const items = useMaterialsStore(state => state.items);
+
+// ✅ CORRECTO: Shallow comparison evita re-renders innecesarios
+const items = useMaterialsStore(useShallow(state => state.items));
+```
+
+#### 4. ✅ Acciones usan funciones de store directamente
+```typescript
+// ❌ INCORRECTO: Selector + destructuring
+const { addItem, updateItem } = useMaterials();
+
+// ✅ CORRECTO: Acciones son estables, no necesitan useShallow
+const addItem = useMaterialsStore(state => state.addItem);
+const updateItem = useMaterialsStore(state => state.updateItem);
+```
+
+#### 5. ✅ Patrón inmutable para arrays
+```typescript
+// ✅ ADD
+set((state) => ({ items: [...state.items, newItem] }));
+
+// ✅ UPDATE
+set((state) => ({
+  items: state.items.map((i) => (i.id === id ? { ...i, updates } : i)),
+}));
+
+// ✅ DELETE
+set((state) => ({ items: state.items.filter((i) => i.id !== id) }));
+```
+
+### Stores auditadas y corregidas:
+- ✅ `suppliersStore.ts` - Diciembre 2025 (migrado de `produce()` a patrón inmutable)
+- ⚠️ `materialsStore.ts` - Requiere auditoría (usa `produce()`)
+- ⚠️ Otras stores con `produce()` - Pendiente revisión
+
+### Regla de oro:
+> **Si tu store usa `produce()` sin el middleware `immer` de Zustand, está roto.**  
+> Migra a patrón inmutable estándar con spread operator.

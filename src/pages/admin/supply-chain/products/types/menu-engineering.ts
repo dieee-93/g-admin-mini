@@ -1,10 +1,34 @@
 // Menu Engineering Types for Products Module
-// Re-exports from services + additional product-specific types
+// BCG Matrix categories for menu engineering analysis
 
-export {
-  MenuCategory,
-  type MenuEngineeringData
-} from '@/services/recipe/types/menu-engineering';
+// ===== MENU ENGINEERING CATEGORY ENUM =====
+
+/**
+ * Menu Engineering Matrix Categories
+ * Based on Boston Consulting Group Matrix adapted for food service
+ */
+export enum MenuEngineeringCategory {
+  STARS = 'STARS',           // High popularity, high profitability
+  PLOWHORSES = 'PLOWHORSES', // High popularity, low profitability
+  PUZZLES = 'PUZZLES',       // Low popularity, high profitability
+  DOGS = 'DOGS'              // Low popularity, low profitability
+}
+
+// ===== MENU ENGINEERING DATA INTERFACE =====
+
+export interface MenuEngineeringData {
+  productId: string;
+  productName: string;
+  category: MenuEngineeringCategory;
+  popularityIndex: number;
+  profitabilityIndex: number;
+  contributionMargin: number;
+  unitsSold: number;
+  revenue: number;
+  cost: number;
+  menuMixPercentage: number;
+  classification: 'star' | 'plowhorse' | 'puzzle' | 'dog';
+}
 
 // ===== ENUMS =====
 
@@ -105,14 +129,14 @@ export interface TrendAnalysis {
     stable: number;
   };
   riskFactors: Array<{
-    category: MenuCategory;
+    category: MenuEngineeringCategory;
     riskLevel: RiskLevel;
     description: string;
   }>;
 }
 
 export interface StrategyRecommendation {
-  category: MenuCategory;
+  category: MenuEngineeringCategory;
   priority: StrategyPriority;
   action: string;
   expectedImpact: string;

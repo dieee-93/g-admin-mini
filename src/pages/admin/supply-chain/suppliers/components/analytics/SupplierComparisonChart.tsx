@@ -4,7 +4,7 @@
 // Visual comparison of multiple suppliers using Recharts
 
 import { VStack, Text, Card, HStack, Badge, Box, Tabs } from '@/shared/ui';
-import type { SupplierAnalysis } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import type { SupplierAnalysis } from '@/modules/materials/services';
 import { useMemo } from 'react';
 import {
   RadarChart,

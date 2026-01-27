@@ -13,8 +13,8 @@ import {
 } from '@chakra-ui/react';
 import { EyeIcon, EyeSlashIcon, ShoppingBagIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSmartRedirect } from '@/hooks/useSmartRedirect';
-import { CardWrapper, Button, InputField, Layout, Typography, Stack } from '@/shared/ui';
+import { useSmartRedirect } from '@/hooks';
+import { CardWrapper, Button, InputField, Typography, Stack } from '@/shared/ui';
 
 export default function CustomerLoginPage() {
   const [email, setEmail] = useState('');

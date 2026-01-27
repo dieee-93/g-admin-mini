@@ -1,3 +1,5 @@
+// ✅ PERFORMANCE: React.memo for chart optimization (Phase 2 Round 2)
+import { memo } from 'react';
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -26,7 +28,7 @@ interface LineChartProps {
   height?: number;
 }
 
-export function LineChart({
+export const LineChart = memo<LineChartProps>(function LineChart({
   data,
   dataKey = 'value',
   xAxisKey = 'name',
@@ -103,4 +105,6 @@ export function LineChart({
       </RechartsLineChart>
     </ResponsiveContainer>
   );
-}
+});
+
+LineChart.displayName = 'LineChart';

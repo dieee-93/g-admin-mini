@@ -85,7 +85,15 @@ interface UseModuleRegistryReturn {
  */
 export const useModuleRegistry = (): UseModuleRegistryReturn => {
   // Memoize registry instance (singleton, so this is stable)
-  const registry = useMemo(() => ModuleRegistry.getInstance(), []);
+  const registry = useMemo(() => {
+    const instance = ModuleRegistry.getInstance();
+    console.log('🔍 [useModuleRegistry] getInstance() called:', {
+      instance,
+      stats: instance.getStats(),
+      hasSettingsHours: instance.hasHook('settings.hours.tabs')
+    });
+    return instance;
+  }, []);
 
   // Memoize helper methods
   const addAction = useCallback(

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  MenuCategory,
+  MenuEngineeringCategory,
   type MenuEngineeringMatrix,
   type MenuEngineeringData,
   type StrategyRecommendation,
@@ -11,7 +11,7 @@ import {
   DEFAULT_MATRIX_CONFIG,
   type ProductSalesData
 } from '@/pages/admin/supply-chain/products/services/menuEngineeringEngine';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { notify } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase/client';
 
@@ -36,7 +36,7 @@ interface UseMenuEngineeringReturn {
   refreshData: () => Promise<void>;
   
   // Filtered data
-  getProductsByCategory: (category: MenuCategory) => MenuEngineeringData[];
+  getProductsByCategory: (category: MenuEngineeringCategory) => MenuEngineeringData[];
   getTopRecommendations: (limit?: number) => StrategyRecommendation[];
   
   // Analytics
@@ -278,14 +278,14 @@ export const useMenuEngineering = (
   }, [calculateMatrix]);
 
   // Get products by category
-  const getProductsByCategory = useCallback((category: MenuCategory): MenuEngineeringData[] => {
+  const getProductsByCategory = useCallback((category: MenuEngineeringCategory): MenuEngineeringData[] => {
     if (!matrix) return [];
     
     switch (category) {
-      case MenuCategory.STARS: return matrix.stars;
-      case MenuCategory.PLOWHORSES: return matrix.plowhorses;
-      case MenuCategory.PUZZLES: return matrix.puzzles;
-      case MenuCategory.DOGS: return matrix.dogs;
+      case MenuEngineeringCategory.STARS: return matrix.stars;
+      case MenuEngineeringCategory.PLOWHORSES: return matrix.plowhorses;
+      case MenuEngineeringCategory.PUZZLES: return matrix.puzzles;
+      case MenuEngineeringCategory.DOGS: return matrix.dogs;
       default: return [];
     }
   }, [matrix]);

@@ -1,25 +1,24 @@
-/**
- * useCashData Hook
- *
- * ✅ SPLIT HOOKS PATTERN - Data Slice
- * Selective subscription to cash store data
- *
- * Performance:
- * - Only subscribes to data, not actions
- * - Uses useShallow for stable references
- * - No unnecessary re-renders
- */
-
-import { useShallow } from 'zustand/react/shallow';
-import { useCashStore } from '@/store/cashStore';
+import { useMoneyLocationsWithAccount } from '@/modules/cash/hooks/useMoneyLocations';
+import { useCashSessionHistory } from '@/modules/cash/hooks/useCashSessions';
+import { useSelectedLocationId } from '@/modules/cash/store/cashStore';
 
 export function useCashData() {
-  return useCashStore(
-    useShallow((state) => ({
-      moneyLocations: state.moneyLocations,
-      activeSessions: state.activeSessions,
-      loading: state.loading,
-      error: state.error,
-    }))
-  );
+  const selectedLocationId = useSelectedLocationId();
+
+  const { 
+    data: moneyLocations = [], 
+    isLoading: locationsLoading 
+  } = useMoneyLocationsWithAccount();
+  
+  const { 
+    data: sessionHistory = [], 
+    isLoading: historyLoading 
+  } = useCashSessionHistory(selectedLocationId || undefined);
+
+  return {
+    moneyLocations,
+    sessionHistory,
+    loading: locationsLoading || historyLoading,
+    error: null,
+  };
 }

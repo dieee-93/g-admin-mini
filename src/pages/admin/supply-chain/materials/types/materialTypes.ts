@@ -1,5 +1,7 @@
 // Material Types - Core type definitions for materials module
 
+import type { Brand } from '../../shared/brands';
+
 // Base item types
 export type ItemType = 'MEASURABLE' | 'COUNTABLE' | 'ELABORATED';
 
@@ -16,6 +18,8 @@ export interface MaterialItem {
   target_stock?: number;
   supplier_id?: string;
   category?: string;
+  brand_id?: string; // 🆕 BRANDS: Brand foreign key
+  brand?: Brand; // 🆕 BRANDS: Joined brand data
   package_size?: number;
   packaging?: {
     package_size: number;
@@ -67,6 +71,8 @@ export interface ItemFormData {
   target_stock?: number;
   supplier_id?: string;
   category?: string;
+  description?: string; // 🆕 Optional description
+  brand_id?: string; // 🆕 BRANDS: Brand foreign key
   package_size?: number;
 
   // Packaging fields (for COUNTABLE items)

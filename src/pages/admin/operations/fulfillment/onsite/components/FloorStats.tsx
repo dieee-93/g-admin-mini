@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack, Grid, CardWrapper, Typography, Badge, Alert } from '@/shared/ui';
 import { supabase } from '@/lib/supabase/client';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { logger } from '@/lib/logging';
 import { notify } from '@/lib/notifications';
 

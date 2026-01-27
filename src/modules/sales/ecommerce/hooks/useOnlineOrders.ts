@@ -3,11 +3,11 @@
  * Manages online orders from e-commerce channel
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
 import { useAlerts } from '@/shared/alerts';
-import { salesAlertsAdapter } from '../../services/salesAlertsAdapter';
 import type { OnlineOrdersFilters } from '../types';
 
 export interface OnlineOrderExtended {
@@ -26,9 +26,10 @@ export interface OnlineOrderExtended {
   };
 }
 
+export const ONLINE_ORDERS_QUERY_KEY = ['online-orders'];
+
 export function useOnlineOrders() {
-  const [orders, setOrders] = useState<OnlineOrderExtended[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState<OnlineOrdersFilters>({
     status: 'all',
     payment_status: 'all',
@@ -41,10 +42,15 @@ export function useOnlineOrders() {
   });
 
   // Fetch online orders with filters
-  const fetchOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-
+  const { 
+    data: orders = [], 
+    isLoading: loading, 
+    error 
+  } = useQuery({
+    queryKey: [...ONLINE_ORDERS_QUERY_KEY, filters],
+    queryFn: async () => {
+      logger.debug('App', 'Fetching online orders', filters);
+      
       let query = supabase
         .from('sales')
         .select(`
@@ -81,102 +87,87 @@ export function useOnlineOrders() {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        // Create alert
+        await alertActions.create({
+          type: 'operational',
+          context: 'sales',
+          severity: 'medium',
+          title: 'Failed to Load Orders',
+          description: `Error loading online orders: ${fetchError.message}`,
+          metadata: {
+            errorCode: fetchError.code,
+          },
+          autoExpire: 10,
+          intelligence_level: 'simple', 
+        });
         throw fetchError;
       }
 
       // Transform data to match interface
-      const transformedData = (data || []).map(order => ({
+      // Note: Casting 'order' to any to avoid spread errors with unknown types
+      const transformedData = (data || []).map((order: any) => ({
         ...order,
         customer: Array.isArray(order.customer) ? order.customer[0] : order.customer,
       }));
 
-      setOrders(transformedData as OnlineOrderExtended[]);
-      logger.info('EcommerceModule', `✅ Loaded ${transformedData.length} online orders`);
-    } catch (err) {
-      const error = err as Error;
-      logger.error('EcommerceModule', '❌ Error loading online orders:', error);
-
-      // Create alert using global alerts system
-      await alertActions.create({
-        type: 'operational',
-        context: 'sales',
-        severity: 'medium',
-        title: 'Failed to Load Orders',
-        description: `Error loading online orders: ${error.message}`,
-        metadata: {
-          errorCode: error.name,
-        },
-        autoExpire: 10,
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, alertActions]);
+      return transformedData as OnlineOrderExtended[];
+    },
+    staleTime: 60 * 1000, // 1 minute
+  });
 
   // Update order status
-  const updateOrderStatus = async (
-    orderId: string,
-    updates: {
-      order_status?: string;
-      payment_status?: string;
-    }
-  ) => {
-    try {
-      const { error: updateError } = await supabase
-        .from('sales')
+  const updateOrderStatusMutation = useMutation({
+    mutationFn: async ({ 
+      orderId, 
+      updates 
+    }: { 
+      orderId: string, 
+      updates: { order_status?: string; payment_status?: string } 
+    }) => {
+      // @ts-ignore
+      const { error: updateError } = await (supabase
+        .from('sales') as any)
         .update({
           ...updates,
           updated_at: new Date().toISOString(),
         })
         .eq('id', orderId);
 
-      if (updateError) {
-        throw updateError;
-      }
-
-      // Update local state
-      setOrders(prevOrders =>
-        prevOrders.map(o =>
-          o.id === orderId ? { ...o, ...updates } : o
-        )
-      );
-
-      logger.info('EcommerceModule', `✅ Updated order ${orderId} status`);
-      return { success: true };
-    } catch (err) {
-      const error = err as Error;
-      logger.error('EcommerceModule', '❌ Error updating order status:', error);
-
-      // Create alert using global alerts system
-      await alertActions.create({
+      if (updateError) throw updateError;
+      return { orderId, updates };
+    },
+    onSuccess: ({ orderId, updates }) => {
+      queryClient.invalidateQueries({ queryKey: ONLINE_ORDERS_QUERY_KEY });
+      logger.info('App', `✅ Updated order ${orderId} status`, updates);
+    },
+    onError: (err: any, variables) => {
+      logger.error('App', '❌ Error updating order status:', err);
+      
+      alertActions.create({
         type: 'operational',
         context: 'sales',
         severity: 'medium',
         title: 'Failed to Update Order',
-        description: `Error updating order ${orderId}: ${error.message}`,
+        description: `Error updating order ${variables.orderId}: ${err.message}`,
         metadata: {
-          itemId: orderId,
-          errorCode: error.name,
-          relatedUrl: `/sales/orders/${orderId}`,
+          itemId: variables.orderId,
+          errorCode: err.name,
+          relatedUrl: `/sales/orders/${variables.orderId}`,
         },
         autoExpire: 15,
+        intelligence_level: 'simple',
       });
-
-      throw error;
     }
-  };
-
-  // Load orders on mount and when filters change
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+  });
 
   return {
     orders,
     loading,
+    error: error as Error | null,
     filters,
     setFilters,
-    fetchOrders,
-    updateOrderStatus,
+    fetchOrders: async () => { await queryClient.invalidateQueries({ queryKey: ONLINE_ORDERS_QUERY_KEY }) },
+    updateOrderStatus: (orderId: string, updates: { order_status?: string; payment_status?: string }) => 
+      updateOrderStatusMutation.mutateAsync({ orderId, updates }),
   };
 }

@@ -19,7 +19,6 @@ export const executiveManifest: ModuleManifest = {
   version: '1.0.0',
 
   depends: [], // Aggregates data from all modules
-  autoInstall: true, // Always available for executives
 
   // 🔒 PERMISSIONS: Only ADMINISTRADOR for executive dashboard
   minimumRole: 'ADMINISTRADOR' as const,

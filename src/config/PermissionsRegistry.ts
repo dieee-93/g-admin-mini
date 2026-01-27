@@ -79,7 +79,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, ResourcePermissions> = {
     // Core Operations
     sales: ['create', 'read', 'update', 'delete', 'void', 'configure', 'export'],
     materials: ['create', 'read', 'update', 'delete', 'configure', 'export'],
+    suppliers: ['create', 'read', 'update', 'delete', 'configure', 'export'],
     products: ['create', 'read', 'update', 'delete', 'configure', 'export'],
+    recipe: ['create', 'read', 'update', 'delete', 'configure', 'export'],
 
     // Operations
     operations: ['create', 'read', 'update', 'delete', 'configure'],
@@ -124,7 +126,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, ResourcePermissions> = {
     // Inherits all ADMIN permissions + debug access
     sales: ['create', 'read', 'update', 'delete', 'void', 'configure', 'export'],
     materials: ['create', 'read', 'update', 'delete', 'configure', 'export'],
+    suppliers: ['create', 'read', 'update', 'delete', 'configure', 'export'],
     products: ['create', 'read', 'update', 'delete', 'configure', 'export'],
+    recipe: ['create', 'read', 'update', 'delete', 'configure', 'export'],
     operations: ['create', 'read', 'update', 'delete', 'configure'],
     staff: ['create', 'read', 'update', 'delete', 'approve', 'configure', 'export'],
     scheduling: ['create', 'read', 'update', 'delete', 'approve', 'configure'],
@@ -155,6 +159,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, ResourcePermissions> = {
     sales: ['create', 'read', 'update', 'void'],
     materials: ['create', 'read', 'update'],
     products: ['create', 'read', 'update'],
+    recipe: ['create', 'read', 'update'],
     operations: ['create', 'read', 'update'],
 
     // Resources (limited)
@@ -197,6 +202,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, ResourcePermissions> = {
     sales: ['create', 'read', 'update'], // Can create/view/update sales
     materials: ['read', 'update'], // Can view/update inventory
     products: ['read'], // View-only for products
+    recipe: ['read'], // View-only for recipes
     operations: ['read', 'update'],
 
     // Resources (view-only)
@@ -239,6 +245,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, ResourcePermissions> = {
     sales: [],
     materials: [],
     products: [],
+    recipe: [],
     operations: [],
     staff: [],
     scheduling: [],

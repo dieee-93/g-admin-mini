@@ -103,7 +103,7 @@ useEffect(() => {
 
 ---
 
-### GAP 3: **MaterialsStore Actions - Closure Patterns** 🟢
+### GAP 3: **MaterialsStore Actions - Closure Patterns** 🟡
 
 **Ubicación:** `src/store/materialsStore.ts` - 20+ `set()` calls
 
@@ -117,13 +117,31 @@ addItem: (itemData) => {
 }
 ```
 
-**Análisis:**
-- ✅ Usa Immer's `produce` para immutability
+**Análisis (ACTUALIZADO Dic 2025)**:
+- ⚠️ **BUG POTENCIAL**: Usa `produce()` de Immer **sin middleware oficial de Zustand**
+- ❌ Según [docs oficiales](https://zustand.docs.pmnd.rs/integrations/immer-middleware):
+  > "Zustand checks if the state has actually changed, so since both the current state and the next state are equal, Zustand will skip calling the subscriptions."
 - ✅ `set()` es Zustand primitive (siempre estable)
 - ✅ NO usa closures externos (todo dentro de produce)
 - ✅ EventBus emissions usan parámetros locales (no closures)
 
-**Conclusión:** ✅ **NO HAY BUGS** - Store actions son seguras
+**Impacto Real**:
+- Bug confirmado en `suppliersStore.ts` (Dic 2025): Store actualizaba pero UI no re-renderizaba
+- Síntoma: SelectField no mostraba nuevo supplier creado a pesar de estar en store
+- Root cause: `produce()` sin middleware no crea nuevas referencias → Zustand no detecta cambio
+
+**Solución Aplicada**:
+```typescript
+// ✅ CORRECTO: Patrón inmutable estándar
+addItem: (itemData) => {
+  set((state) => ({
+    items: [...state.items, newItem],
+  }));
+  // ... emit events
+}
+```
+
+**Conclusión:** ⚠️ **REQUIERE REFACTOR** - Todas las stores usando `produce()` sin middleware deben migrar a patrón inmutable estándar
 
 ---
 

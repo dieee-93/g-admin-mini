@@ -12,9 +12,9 @@ import {
   FinancialCalculations,
   QuickCalculations,
   type PricingScenario
-} from '@/business-logic/shared/FinancialCalculations';
+} from '@/lib/decimal';
 import { useProductValidation } from '@/hooks/useProductValidation';
-import { useProductsStore } from '@/store/productsStore';
+import { useProductsStore } from '@/modules/products';
 import { notify } from '@/lib/notifications';
 import type { ProductComponent } from '../../types';
 

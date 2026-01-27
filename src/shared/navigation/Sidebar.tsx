@@ -274,6 +274,7 @@ export function Sidebar() {
       width={actualShowExpanded ? "15rem" : "3rem"}
       left="0"
       top="0"
+      bg="gray.50"
       zIndex="9999"
       onMouseEnter={() => {
         logger.info('App', '🎯 Sidebar hover ENTER'); // Debug
@@ -308,22 +309,24 @@ export function Sidebar() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  flexShrink: 0
+                  flexShrink: 0,
+
                 }}
               >
                 <Typography
                   variant="heading"
                   level={5}
                   weight="bold"
-                  fontSize="xs"
+                  fontSize="md"
+                  color="gray.800"
                 >
                   G
                 </Typography>
               </div>
 
               {actualShowExpanded && (
-                <Typography variant="body" weight="medium" size="sm">
-                  G-Admin
+                <Typography color="gray.800" variant="body" weight="medium" size="sm">
+                  - ADMIN
                 </Typography>
               )}
             </Stack>

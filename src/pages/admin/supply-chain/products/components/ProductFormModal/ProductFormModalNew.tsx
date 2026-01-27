@@ -37,7 +37,7 @@ import {
   PRODUCT_CATEGORIES
 } from '../../types';
 import { ProductValidation } from '../../services/productValidation';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { logger } from '@/lib/logging';
 
 export interface ProductFormModalProps {

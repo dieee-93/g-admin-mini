@@ -7,12 +7,12 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Box, VStack, Heading, Text, Badge } from '@/shared/ui';
-import { useProductsStore } from '@/store/productsStore';
-import { useStaffStore } from '@/store/staffStore';
+import { useProducts } from '@/modules/products';
+import { useTeamStore } from '@/modules/team/store';
 import { useOperationsStore } from '@/store/operationsStore';
 import { useSalesStore } from '@/store/salesStore';
 import { useAppStore } from '@/store/appStore';
-import { useCapabilityStore } from '@/store/capabilityStore';
+import { useBusinessProfile, useFeatureFlags } from '@/lib/capabilities';
 import { logger } from '@/lib/logging';
 
 export function StoreDebugger() {
@@ -30,13 +30,13 @@ export function StoreDebugger() {
 
   // Test 1: Products Store
   logger.debug('App', '🧪 Testing ProductsStore...');
-  const products = useProductsStore((state) => state.products);
+  const { data: products = [] } = useProducts();
   logger.debug('App', `✅ ProductsStore OK - ${products.length} products`);
 
-  // Test 2: Staff Store
-  logger.debug('App', '🧪 Testing StaffStore...');
-  const staff = useStaffStore((state) => state.staff);
-  logger.debug('App', `✅ StaffStore OK - ${staff.length} staff`);
+  // Test 2: Staff Store (UI state only)
+  logger.debug('App', '🧪 Testing StaffStore (UI only)...');
+  const staffFilters = useTeamStore((state) => state.filters);
+  logger.debug('App', `✅ StaffStore OK - filters active: ${staffFilters.search}`);
 
   // Test 3: Operations Store
   logger.debug('App', '🧪 Testing OperationsStore...');
@@ -45,18 +45,19 @@ export function StoreDebugger() {
 
   // Test 4: Sales Store
   logger.debug('App', '🧪 Testing SalesStore...');
-  const sales = useSalesStore((state) => state.sales);
-  logger.debug('App', `✅ SalesStore OK - ${sales?.length || 0} sales`);
+  const salesCart = useSalesStore((state) => state.cart);
+  logger.debug('App', `✅ SalesStore OK - ${salesCart?.length || 0} cart items`);
 
   // Test 5: App Store
   logger.debug('App', '🧪 Testing AppStore...');
   const settings = useAppStore((state) => state.settings);
   logger.debug('App', `✅ AppStore OK`);
 
-  // Test 6: Capability Store (SOSPECHOSO)
-  logger.debug('App', '🧪 Testing CapabilityStore...');
-  const capStore = useCapabilityStore((state) => state);
-  logger.debug('App', `✅ CapabilityStore OK - ${capStore.features.activeFeatures.length} features`);
+  // Test 6: Business Profile & Feature Flags
+  logger.debug('App', '🧪 Testing BusinessProfile & FeatureFlags...');
+  const { profile } = useBusinessProfile();
+  const { activeFeatures } = useFeatureFlags();
+  logger.debug('App', `✅ BusinessProfile & FeatureFlags OK - ${activeFeatures.length} features`);
 
   useEffect(() => {
     if (renderCount.current > 15) {
@@ -89,9 +90,9 @@ export function StoreDebugger() {
 
         <VStack align="start" gap="2" w="full">
           <Text fontSize="sm" fontFamily="mono">Products: {products.length}</Text>
-          <Text fontSize="sm" fontFamily="mono">Staff: {staff.length}</Text>
-          <Text fontSize="sm" fontFamily="mono">Sales: {sales?.length || 0}</Text>
-          <Text fontSize="sm" fontFamily="mono">Features: {capStore.features.activeFeatures.length}</Text>
+          <Text fontSize="sm" fontFamily="mono">Staff Filters: {staffFilters.department}</Text>
+          <Text fontSize="sm" fontFamily="mono">Cart Items: {salesCart?.length || 0}</Text>
+          <Text fontSize="sm" fontFamily="mono">Features: {activeFeatures.length}</Text>
         </VStack>
 
         <Text fontSize="xs" color="gray.600">

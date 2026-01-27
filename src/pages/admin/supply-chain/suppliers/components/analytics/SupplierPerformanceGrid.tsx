@@ -5,7 +5,7 @@
 
 import { VStack, Text, SimpleGrid, Separator } from '@/shared/ui';
 import { SupplierPerformanceCard } from './SupplierPerformanceCard';
-import type { SupplierAnalysis } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import type { SupplierAnalysis } from '@/modules/materials/services';
 import { supplierAnalyticsService } from '../../services/supplierAnalyticsService';
 import { useMemo } from 'react';
 import type { SupplierAnalysisResultForService } from '../../types/supplierTypes';

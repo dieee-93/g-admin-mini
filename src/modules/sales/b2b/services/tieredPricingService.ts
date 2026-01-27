@@ -8,7 +8,7 @@
  */
 
 import { logger } from '@/lib/logging';
-import { DecimalUtils, FinancialDecimal } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils, FinancialDecimal } from '@/lib/decimal';
 import type {
   TieredPricing,
   PricingTier,

@@ -4,7 +4,7 @@
 // Tests quirúrgicos de precisión decimal según masterplan
 
 import { describe, test, expect, beforeEach } from 'vitest';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { ABCAnalysisEngine } from '@/pages/admin/supply-chain/inventory/abcAnalysisEngine';
 import { ProcurementRecommendationsEngine } from '@/pages/admin/supply-chain/inventory/procurementRecommendationsEngine';
 import { DemandForecastingEngine } from '@/pages/admin/supply-chain/inventory/demandForecastingEngine';

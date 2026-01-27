@@ -1,0 +1,41 @@
+### Page
+- Page URL: http://localhost:5173/admin/supply-chain/materials
+- Page Title: G-Admin Mini
+### Snapshot
+- [snapshot](.playwright-cli\page-2026-01-26T19-21-01-641Z.yml)
+### Events
+- [LOG] [90m16:20:04,964[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,965[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,965[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,965[0m [34mℹ️ [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [WARNING] [90m16:20:04,965[0m [33m⚠️ [WARN][0m...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] ✅ [STEP 4] Successfully registered: executiv...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,966[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] 🎯 [STEP 4] Attempting to register: finance-...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,966[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] ✅ [ModuleRegistry.register] Module registere...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,966[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,967[0m [34mℹ️ [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,967[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,967[0m [34mℹ️ [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] ✅ [STEP 4] Successfully registered: finance-...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,968[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] 🎯 [STEP 4] Attempting to register: fulfillm...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,968[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] ✅ [ModuleRegistry.register] Module registere...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,969[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,969[0m [34mℹ️ [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,971[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:04,972[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:08,930[0m [34mℹ️ [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:08,948[0m [34mℹ️ [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] 🔧 [fulfillment-onsite] About to register se...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:21,760[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:21,760[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] ✅ [fulfillment-onsite] Operating hours hooks...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] 📊 [fulfillment-onsite] Registry stats after...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:21,761[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:39,446[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:39,446[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:57,564[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:20:57,566[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38

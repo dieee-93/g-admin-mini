@@ -1,0 +1,269 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - img [ref=e8]
+      - paragraph [ref=e11]: G-Admin Mini
+    - generic [ref=e13]:
+      - banner [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e17]:
+            - paragraph [ref=e18] [cursor=pointer]: G-Admin
+            - paragraph [ref=e19]: /
+            - paragraph [ref=e20]: Dashboard
+            - paragraph [ref=e1366]: ·
+            - paragraph [ref=e1367]: Central dashboard with aggregated metrics and widgets from all modules
+          - generic [ref=e21]:
+            - generic [ref=e22]:
+              - img [ref=e25]
+              - img [ref=e28] [cursor=pointer]
+            - button "d dieee.93@gmail.com SUPER_ADMIN" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31]:
+                - generic [ref=e33]: d
+                - generic [ref=e34]:
+                  - paragraph [ref=e35]: dieee.93@gmail.com
+                  - paragraph [ref=e36]: SUPER_ADMIN
+      - generic [ref=e39]:
+        - heading "G" [level=5] [ref=e44]
+        - generic [ref=e1368]:
+          - generic [ref=e1369]:
+            - button [ref=e1372] [cursor=pointer]:
+              - img [ref=e1375]
+            - button [ref=e1379] [cursor=pointer]:
+              - img [ref=e1382]
+            - button [ref=e1386] [cursor=pointer]:
+              - img [ref=e1389]
+            - button [ref=e1393] [cursor=pointer]:
+              - img [ref=e1397]
+            - button [ref=e1401] [cursor=pointer]:
+              - img [ref=e1404]
+            - button [ref=e1408] [cursor=pointer]:
+              - img [ref=e1411]
+          - button [ref=e1417] [cursor=pointer]:
+            - img [ref=e1420]
+          - generic [ref=e1422]:
+            - button [ref=e1425] [cursor=pointer]:
+              - img [ref=e1428]
+            - button [ref=e1432] [cursor=pointer]:
+              - img [ref=e1435]
+            - button [ref=e1439] [cursor=pointer]:
+              - img [ref=e1442]
+          - generic [ref=e1444]:
+            - button [ref=e1447] [cursor=pointer]:
+              - img [ref=e1450]
+            - button [ref=e1454] [cursor=pointer]:
+              - img [ref=e1457]
+            - button [ref=e1461] [cursor=pointer]:
+              - img [ref=e1464]
+            - button [ref=e1468] [cursor=pointer]:
+              - img [ref=e1471]
+          - generic [ref=e1473]:
+            - button [ref=e1476] [cursor=pointer]:
+              - img [ref=e1479]
+            - button [ref=e1483] [cursor=pointer]:
+              - img [ref=e1486]
+        - button [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+      - main [ref=e51]:
+        - generic [ref=e151]:
+          - link "Skip to main content" [ref=e152] [cursor=pointer]:
+            - /url: "#main-content"
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - generic [ref=e156]:
+                - img [ref=e158]
+                - generic [ref=e160]:
+                  - paragraph [ref=e161]: StockLab - Inventario
+                  - paragraph [ref=e163]: Control de materiales y stock
+              - button "Nuevo Material" [ref=e164] [cursor=pointer]:
+                - img [ref=e165]
+                - text: Nuevo Material
+            - region [ref=e167]:
+              - generic [ref=e169]:
+                - generic [ref=e171] [cursor=pointer]:
+                  - img [ref=e173]
+                  - paragraph [ref=e176]: $147583.00
+                  - generic [ref=e177]:
+                    - paragraph [ref=e178]: Valor Total Inventario
+                    - paragraph [ref=e179]: inversión en stock
+                - generic [ref=e181] [cursor=pointer]:
+                  - img [ref=e183]
+                  - paragraph [ref=e186]: "27"
+                  - generic [ref=e187]:
+                    - paragraph [ref=e188]: Items Totales
+                    - paragraph [ref=e189]: en inventario
+                - generic [ref=e191] [cursor=pointer]:
+                  - img [ref=e193]
+                  - paragraph [ref=e196]: "3"
+                  - generic [ref=e197]:
+                    - paragraph [ref=e198]: Stock Crítico
+                    - paragraph [ref=e199]: requieren atención
+                - generic [ref=e201] [cursor=pointer]:
+                  - img [ref=e203]
+                  - paragraph [ref=e206]: "0"
+                  - generic [ref=e207]:
+                    - paragraph [ref=e208]: Proveedores Activos
+                    - paragraph [ref=e209]: en la red
+            - generic [ref=e211]:
+              - tablist [ref=e212]:
+                - tab "Inventario" [selected] [ref=e213] [cursor=pointer]:
+                  - img [ref=e214]
+                  - text: Inventario
+                - tab "Config. Alertas" [ref=e216] [cursor=pointer]:
+                  - img [ref=e217]
+                  - text: Config. Alertas
+              - tabpanel "Inventario" [ref=e219]:
+                - generic [ref=e220]:
+                  - generic [ref=e221]:
+                    - tablist [ref=e222]:
+                      - tab "Inventario" [selected] [ref=e223] [cursor=pointer]
+                      - tab "Análisis ABC" [ref=e224] [cursor=pointer]
+                      - tab "Compras" [ref=e225] [cursor=pointer]
+                      - tab "Transferencias 🏢" [ref=e226] [cursor=pointer]
+                    - tabpanel "Inventario" [ref=e227]:
+                      - generic [ref=e228]:
+                        - generic [ref=e229]:
+                          - generic [ref=e230]:
+                            - group [ref=e231]:
+                              - textbox "Buscar materiales..." [ref=e232]
+                            - generic [ref=e233]:
+                              - button [ref=e234] [cursor=pointer]:
+                                - img [ref=e235]
+                              - button [ref=e237] [cursor=pointer]:
+                                - img [ref=e238]
+                            - button "Nuevo Material" [ref=e240] [cursor=pointer]:
+                              - img [ref=e241]
+                              - text: Nuevo Material
+                            - button "Importar" [ref=e243] [cursor=pointer]:
+                              - img [ref=e244]
+                              - text: Importar
+                            - button "Exportar" [ref=e246] [cursor=pointer]:
+                              - img [ref=e247]
+                              - text: Exportar
+                          - generic [ref=e249]:
+                            - 'button "Tipo: Todos" [ref=e250] [cursor=pointer]'
+                            - 'button "Categoría: Todas" [ref=e251] [cursor=pointer]'
+                            - 'button "Stock: Todos" [ref=e252] [cursor=pointer]'
+                            - button "Filtros Avanzados 2" [ref=e253] [cursor=pointer]:
+                              - img [ref=e254]
+                              - text: Filtros Avanzados
+                              - generic [ref=e258]: "2"
+                        - paragraph [ref=e260]: Gestión de Inventario (27 items)
+                        - generic [ref=e261]:
+                          - table [ref=e264]:
+                            - rowgroup [ref=e265]:
+                              - row "Nombre Tipo Categoría Stock Min Costo ABC Estado Acciones" [ref=e266]:
+                                - columnheader [ref=e267]:
+                                  - generic [ref=e268]:
+                                    - img [ref=e270]
+                                    - checkbox [ref=e271]
+                                - columnheader "Nombre" [ref=e1488]:
+                                  - generic [ref=e1489]:
+                                    - paragraph [ref=e1490]: Nombre
+                                    - img [ref=e1491]
+                                - columnheader "Tipo" [ref=e1493]:
+                                  - paragraph [ref=e1495]: Tipo
+                                - columnheader "Categoría" [ref=e1496]:
+                                  - paragraph [ref=e1498]: Categoría
+                                - columnheader "Stock" [ref=e1499]:
+                                  - paragraph [ref=e1501]: Stock
+                                - columnheader "Min" [ref=e286]
+                                - columnheader "Costo" [ref=e1502]:
+                                  - paragraph [ref=e1504]: Costo
+                                - columnheader "ABC" [ref=e290]
+                                - columnheader "Estado" [ref=e291]
+                                - columnheader "Acciones" [ref=e292]
+                            - rowgroup [ref=e293]:
+                              - row "Yogurt Natural Med. volume 120.0 litros 0.0 litros $45.00 N/A OK" [ref=e1505]:
+                                - cell [ref=e1506]:
+                                  - generic [ref=e1507]:
+                                    - img [ref=e1509]
+                                    - checkbox [ref=e1510]
+                                - cell "Yogurt Natural" [ref=e1511]:
+                                  - paragraph [ref=e1512]: Yogurt Natural
+                                - cell "Med." [ref=e1513]:
+                                  - generic [ref=e1516]: Med.
+                                - cell "volume" [ref=e1517]:
+                                  - paragraph [ref=e1518]: volume
+                                - cell "120.0 litros" [ref=e1519]:
+                                  - paragraph [ref=e1520]: 120.0 litros
+                                - cell "0.0 litros" [ref=e1521]:
+                                  - paragraph [ref=e1522]: 0.0 litros
+                                - cell "$45.00" [ref=e1523]:
+                                  - paragraph [ref=e1524]: $45.00
+                                - cell "N/A" [ref=e1525]:
+                                  - generic [ref=e1528]: N/A
+                                - cell "OK" [ref=e1529]:
+                                  - generic [ref=e1532]: OK
+                                - cell [ref=e1533]:
+                                  - generic [ref=e1534]:
+                                    - button [ref=e1535] [cursor=pointer]:
+                                      - img [ref=e1536]
+                                    - button [ref=e1539] [cursor=pointer]:
+                                      - img [ref=e1540]
+                                    - button [ref=e1542] [cursor=pointer]:
+                                      - img [ref=e1543]
+                              - row "Zanahoria Med. weight 120.0 kg 0.0 kg $18.00 N/A OK" [ref=e1545]:
+                                - cell [ref=e1546]:
+                                  - generic [ref=e1547]:
+                                    - img [ref=e1549]
+                                    - checkbox [ref=e1550]
+                                - cell "Zanahoria" [ref=e1551]:
+                                  - paragraph [ref=e1552]: Zanahoria
+                                - cell "Med." [ref=e1553]:
+                                  - generic [ref=e1556]: Med.
+                                - cell "weight" [ref=e1557]:
+                                  - paragraph [ref=e1558]: weight
+                                - cell "120.0 kg" [ref=e1559]:
+                                  - paragraph [ref=e1560]: 120.0 kg
+                                - cell "0.0 kg" [ref=e1561]:
+                                  - paragraph [ref=e1562]: 0.0 kg
+                                - cell "$18.00" [ref=e1563]:
+                                  - paragraph [ref=e1564]: $18.00
+                                - cell "N/A" [ref=e1565]:
+                                  - generic [ref=e1568]: N/A
+                                - cell "OK" [ref=e1569]:
+                                  - generic [ref=e1572]: OK
+                                - cell [ref=e1573]:
+                                  - generic [ref=e1574]:
+                                    - button [ref=e1575] [cursor=pointer]:
+                                      - img [ref=e1576]
+                                    - button [ref=e1579] [cursor=pointer]:
+                                      - img [ref=e1580]
+                                    - button [ref=e1582] [cursor=pointer]:
+                                      - img [ref=e1583]
+                          - generic [ref=e1294]:
+                            - paragraph [ref=e1295]: Mostrando 26-27 of 27 materiales
+                            - generic [ref=e1296]:
+                              - button "Primera" [ref=e1297] [cursor=pointer]
+                              - button [ref=e1298] [cursor=pointer]:
+                                - img [ref=e1299]
+                              - paragraph [ref=e1301]: Página 2 de 2
+                              - button [disabled] [ref=e1302]:
+                                - img [ref=e1303]
+                              - button "Última" [disabled] [ref=e1305]
+                            - generic [ref=e1306]:
+                              - paragraph [ref=e1307]: "Por página:"
+                              - generic [ref=e1308]:
+                                - button "10" [ref=e1309] [cursor=pointer]
+                                - button "25" [ref=e1310] [cursor=pointer]
+                                - button "50" [ref=e1311] [cursor=pointer]
+                                - button "100" [ref=e1312] [cursor=pointer]
+                  - region [ref=e1313]:
+                    - paragraph [ref=e1317]: Acciones Rápidas
+                    - generic [ref=e1319]:
+                      - button "Agregar Material" [ref=e1320] [cursor=pointer]:
+                        - img [ref=e1321]
+                        - text: Agregar Material
+                      - button "Operaciones Masivas" [ref=e1323] [cursor=pointer]:
+                        - img [ref=e1324]
+                        - text: Operaciones Masivas
+                      - button "Generar Reporte" [ref=e1326] [cursor=pointer]:
+                        - img [ref=e1327]
+                        - text: Generar Reporte
+                      - button "Sincronizar" [ref=e1329] [cursor=pointer]:
+                        - img [ref=e1330]
+                        - text: Sincronizar
+  - generic [ref=e52]:
+    - img [ref=e54]
+    - button "Open Tanstack query devtools" [ref=e102] [cursor=pointer]:
+      - img [ref=e103]

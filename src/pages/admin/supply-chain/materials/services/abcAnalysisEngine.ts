@@ -18,7 +18,7 @@ import {
   getClassColor,
   getClassImportance
 } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { InventoryDecimal } from '@/config/decimal-config';
 
 /**
@@ -150,7 +150,7 @@ export class ABCAnalysisEngine {
           item.stock, 
           item.unit_cost || 0
         ).toNumber(),
-        monthlyConsumption: annualConsumption / 12,
+        monthlyConsumption: DecimalUtils.divide(annualConsumption, 12, 'inventory').toNumber(),
         consumptionFrequency: this.estimateConsumptionFrequency(item),
         lastUsedDate: this.estimateLastUsedDate(item)
       };
@@ -167,22 +167,41 @@ export class ABCAnalysisEngine {
    */
   private static estimateAnnualConsumption(item: MaterialItem, months: number = 12): number {
     // Proyectar al año completo basado en el período configurado
-    const monthlyConsumption = item.stock * (12 / months);
-    const baseConsumption = monthlyConsumption * 12;
+    const monthsInYear = DecimalUtils.fromValue(12, 'inventory');
+    const periodMonths = DecimalUtils.fromValue(months, 'inventory');
+    const stockValue = DecimalUtils.fromValue(item.stock, 'inventory');
+    
+    const monthlyConsumption = DecimalUtils.multiply(
+      stockValue,
+      DecimalUtils.divide(monthsInYear, periodMonths, 'inventory'),
+      'inventory'
+    ).toNumber();
+    
+    const baseConsumption = DecimalUtils.multiply(
+      monthlyConsumption,
+      12,
+      'inventory'
+    ).toNumber();
 
     // Factores por tipo de item
     switch (item.type) {
       case 'MEASURABLE':
         // Items conmensurables tienden a tener rotación alta (carnes, lácteos)
-        return Math.round(baseConsumption * 1.5);
+        return Math.round(
+          DecimalUtils.multiply(baseConsumption, 1.5, 'inventory').toNumber()
+        );
 
       case 'COUNTABLE':
         // Items contables varían según packaging
-        return Math.round(baseConsumption * 1.2);
+        return Math.round(
+          DecimalUtils.multiply(baseConsumption, 1.2, 'inventory').toNumber()
+        );
 
       case 'ELABORATED':
         // Items elaborados dependen de demanda de productos finales
-        return Math.round(baseConsumption * 0.8);
+        return Math.round(
+          DecimalUtils.multiply(baseConsumption, 0.8, 'inventory').toNumber()
+        );
 
       default:
         return Math.round(baseConsumption);
@@ -289,15 +308,23 @@ export class ABCAnalysisEngine {
     return [...materials].sort((a, b) => {
       switch (criteria) {
         case 'revenue':
-          return b.annualValue - a.annualValue;
+          return DecimalUtils.subtract(b.annualValue, a.annualValue, 'inventory').toNumber();
         case 'quantity':
-          return b.annualConsumption - a.annualConsumption;
+          return DecimalUtils.subtract(b.annualConsumption, a.annualConsumption, 'inventory').toNumber();
         case 'frequency':
-          return (b.consumptionFrequency || 0) - (a.consumptionFrequency || 0);
+          return DecimalUtils.subtract(
+            b.consumptionFrequency || 0,
+            a.consumptionFrequency || 0,
+            'inventory'
+          ).toNumber();
         case 'cost':
-          return (b.unit_cost || 0) - (a.unit_cost || 0);
+          return DecimalUtils.subtract(
+            b.unit_cost || 0,
+            a.unit_cost || 0,
+            'inventory'
+          ).toNumber();
         default:
-          return b.annualValue - a.annualValue;
+          return DecimalUtils.subtract(b.annualValue, a.annualValue, 'inventory').toNumber();
       }
     });
   }
@@ -368,10 +395,11 @@ export class ABCAnalysisEngine {
     // Recomendación 1: Optimización de stock clase A
     const classAItems = materials.filter(m => m.abcClass === 'A');
     if (classAItems.length > 0) {
-      const potentialSavings = DecimalUtils.fromValue(
-        classAItems.reduce((sum, item) => sum + (item.totalStockValue || 0) * 0.15, 0),
-        'inventory'
-      ).toNumber();
+      const potentialSavings = classAItems.reduce((sum, item) => {
+        const itemValue = DecimalUtils.fromValue(item.totalStockValue || 0, 'inventory');
+        const savingsPerItem = DecimalUtils.multiply(itemValue, 0.15, 'inventory');
+        return DecimalUtils.add(sum, savingsPerItem, 'inventory');
+      }, DecimalUtils.fromValue(0, 'inventory')).toNumber();
       
       recommendations.push({
         id: 'optimize-class-a-stock',
@@ -443,7 +471,11 @@ export class ABCAnalysisEngine {
         priority: 'low',
         title: 'Simplificar portafolio de productos',
         description: `Clase C tiene ${summary.C.itemCount} items (${summary.C.percentageOfItems.toFixed(1)}%) pero solo ${summary.C.percentageOfValue.toFixed(1)}% del valor. Reducir complejidad puede ahorrar costos administrativos.`,
-        potentialSavings: summary.C.totalValue * 0.05, // 5% savings on admin costs
+        potentialSavings: DecimalUtils.multiply(
+          summary.C.totalValue,
+          0.05,
+          'inventory'
+        ).toNumber(), // 5% savings on admin costs
         implementationEffort: 'medium',
         affectedItems: materials.filter(m => m.abcClass === 'C').map(m => m.id),
         actionItems: [

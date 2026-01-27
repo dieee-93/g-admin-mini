@@ -24,8 +24,8 @@ import { bundleOptimizer } from './BundleOptimizer';
 import { LazyWrapper } from './components/LazyWrapper';
 import { PerformanceDashboard } from './components/PerformanceDashboard';
 import { VirtualizedList } from './virtualization/VirtualizedList';
-import { useRouteBasedPreloading } from '../../hooks/useRouteBasedPreloading';
-import { usePerformance } from './RuntimeOptimizations'; 
+import { useRouteBasedPreloading } from '@/hooks';
+import { usePerformance } from './RuntimeOptimizations';
 import { logger } from '@/lib/logging';
 // ===== PERFORMANCE COMPONENTS =====
 export {
@@ -57,12 +57,6 @@ export {
   withPerformance
 } from './RuntimeOptimizations';
 
-// ===== HOOKS =====
-export {
-  useRouteBasedPreloading,
-  usePreloadingMetrics
-} from '../../hooks/useRouteBasedPreloading';
-
 // ===== LAZY MODULE SYSTEM =====
 export {
   lazyModules,
@@ -90,7 +84,7 @@ export interface PerformanceConfig {
     retryCount: number;
     timeout: number;
   };
-  
+
   // Bundle optimization
   bundleOptimization: {
     treeshaking: boolean;
@@ -98,7 +92,7 @@ export interface PerformanceConfig {
     minification: boolean;
     compression: boolean;
   };
-  
+
   // Runtime optimization
   runtime: {
     memoization: boolean;
@@ -106,7 +100,7 @@ export interface PerformanceConfig {
     virtualization: boolean;
     performanceMonitoring: boolean;
   };
-  
+
   // Monitoring configuration
   monitoring: {
     enabled: boolean;
@@ -123,18 +117,18 @@ export interface PerformanceMetrics {
   averageLoadTime: number;
   cacheHitRate: number;
   errorRate: number;
-  
+
   // Bundle metrics
   totalChunkSize: number;
   chunkCount: number;
   compressionRatio: number;
-  
+
   // Runtime metrics
   renderCount: number;
   averageRenderTime: number;
   memoryUsage: number;
   cpuUsage?: number;
-  
+
   // Performance score
   overallScore: number;
   recommendations: string[];
@@ -193,9 +187,9 @@ export function initializePerformanceSystem(config: Partial<PerformanceConfig> =
   };
 
   const finalConfig = { ...defaultConfig, ...config };
-  
+
   logger.info('Performance', '🚀 Performance system initialized with config:', finalConfig);
-  
+
   return finalConfig;
 }
 
@@ -212,11 +206,11 @@ export async function generatePerformanceReport(): Promise<{
   const lazyMetrics = lazyLoadingManager.getPerformanceMetrics();
   const bundleAnalysis = await bundleOptimizer.analyzeBundlePerformance();
   const runtimeAnalysis = bundleOptimizer.monitorRuntimePerformance();
-  
+
   // Calculate overall score
   let overallScore = 100;
   const recommendations: OptimizationRecommendation[] = [];
-  
+
   // Lazy loading analysis
   if (lazyMetrics.averageLoadTime > 2000) {
     overallScore -= 20;
@@ -230,7 +224,7 @@ export async function generatePerformanceReport(): Promise<{
       estimatedImprovement: '30-50% reduction in perceived load time'
     });
   }
-  
+
   if (lazyMetrics.errorRate > 0.1) {
     overallScore -= 30;
     recommendations.push({
@@ -243,7 +237,7 @@ export async function generatePerformanceReport(): Promise<{
       estimatedImprovement: '90% reduction in loading errors'
     });
   }
-  
+
   // Memory analysis
   if (runtimeAnalysis.memoryUsage > 50 * 1024 * 1024) {
     overallScore -= 15;
@@ -257,7 +251,7 @@ export async function generatePerformanceReport(): Promise<{
       estimatedImprovement: '25-40% memory reduction'
     });
   }
-  
+
   // Bundle size analysis  
   if (bundleAnalysis.totalSize > 1024 * 1024) {
     overallScore -= 10;
@@ -279,17 +273,17 @@ export async function generatePerformanceReport(): Promise<{
     averageLoadTime: 0,
     cacheHitRate: 0,
     errorRate: 0,
-    
+
     // Bundle metrics
     totalChunkSize: bundleAnalysis.totalSize,
     chunkCount: bundleAnalysis.chunkCount,
     compressionRatio: bundleAnalysis.gzippedSize / bundleAnalysis.totalSize,
-    
+
     // Runtime metrics
     renderCount: 0,
     averageRenderTime: runtimeAnalysis.renderTime,
     memoryUsage: runtimeAnalysis.memoryUsage,
-    
+
     // Performance score
     overallScore: Math.max(0, overallScore),
     recommendations: recommendations.map(r => r.title)
@@ -319,7 +313,7 @@ export function createPerformanceMonitor() {
     start: (label: string) => {
       measurements.set(label, performance.now());
     },
-    
+
     end: (label: string) => {
       const start = measurements.get(label);
       if (start) {
@@ -330,13 +324,13 @@ export function createPerformanceMonitor() {
       }
       return 0;
     },
-    
+
     mark: (label: string) => {
       const now = performance.now();
       logger.info('Performance', `📍 ${label}: ${(now - startTime).toFixed(2)}ms`);
       return now - startTime;
     },
-    
+
     reset: () => {
       startTime = performance.now();
       measurements.clear();
@@ -372,21 +366,21 @@ export default {
   // Managers
   lazyLoadingManager,
   bundleOptimizer,
-  
+
   // Components
   LazyWrapper,
   PerformanceDashboard,
   VirtualizedList,
-  
+
   // Hooks
   useRouteBasedPreloading,
   usePerformance,
-  
+
   // Utilities
   initializePerformanceSystem,
   generatePerformanceReport,
   createPerformanceMonitor,
-  
+
   // Constants
   PERFORMANCE_THRESHOLDS
 };

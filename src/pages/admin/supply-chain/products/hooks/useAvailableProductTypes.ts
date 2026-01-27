@@ -12,7 +12,7 @@
  */
 
 import { useMemo } from 'react';
-import { useCapabilityStore } from '@/store/capabilityStore';
+import { useBusinessProfile } from '@/lib/capabilities';
 import type { ProductTypeTemplate } from '../types/productForm';
 
 /**
@@ -26,9 +26,8 @@ import type { ProductTypeTemplate } from '../types/productForm';
  * ```
  */
 export function useAvailableProductTypes(): ProductTypeTemplate[] {
-  const activeCapabilities = useCapabilityStore(state =>
-    state.profile?.selectedCapabilities || []
-  );
+  const { profile } = useBusinessProfile();
+  const activeCapabilities = profile?.selectedCapabilities || [];
 
   return useMemo(() => {
     const templates: ProductTypeTemplate[] = [];

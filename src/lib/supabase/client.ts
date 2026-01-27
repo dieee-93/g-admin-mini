@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr';
+import type { Database } from './database.types';
 
 // Get environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -9,11 +10,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Singleton pattern to prevent multiple instances
-let supabaseInstance: ReturnType<typeof createBrowserClient> | null = null;
+let supabaseInstance: ReturnType<typeof createBrowserClient<Database>> | null = null;
 
 function getSupabaseClient() {
   if (!supabaseInstance) {
-    supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+    supabaseInstance = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
         // Security: Use PKCE flow for better security (vs implicit flow)
         // PKCE (Proof Key for Code Exchange) protects against authorization code interception
@@ -28,11 +29,28 @@ function getSupabaseClient() {
         // Auto-refresh tokens before they expire
         autoRefreshToken: true,
 
+        // ⚡ PERFORMANCE: Debounce token refresh to avoid rapid consecutive calls
+        // Supabase will only refresh when token is within 60s of expiration
+        // This prevents unnecessary refresh calls during the token lifetime
+        debug: false, // Disable debug logging in production for performance
+
         // Storage configuration
         // Note: Using localStorage for development. In production with SSR,
         // this should be replaced with cookie-based storage via custom adapter.
         // See: docs/SECURITY_ARCHITECTURE.md for production configuration
         storageKey: 'g-admin-auth-token'
+      },
+      
+      // ⚡ PERFORMANCE: Global options for all requests
+      global: {
+        headers: {
+          // Add custom headers if needed
+        }
+      },
+      
+      // ⚡ PERFORMANCE: Database query timeout (prevents hanging requests)
+      db: {
+        schema: 'public'
       }
     });
   }

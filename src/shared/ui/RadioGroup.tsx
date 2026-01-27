@@ -140,6 +140,7 @@ export const RadioItem = React.forwardRef<HTMLLabelElement, RadioItemProps>(
         disabled={disabled}
         {...props}
       >
+        <ChakraRadioGroup.ItemHiddenInput />
         <HStack gap="2">
           <Radiomark />
           {children && (

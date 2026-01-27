@@ -57,6 +57,8 @@ export interface ValidationContext {
     id: string;
     name: string;
     is_published: boolean;
+    type?: string; // "ELABORATED" | "SERVICE" | "DIGITAL" | etc.
+    cost?: number;
     images?: string[];
   }>;
 
@@ -104,6 +106,15 @@ export interface ValidationContext {
   // ============================================
   // NEW FIELDS FOR ADDITIONAL CAPABILITIES
   // ============================================
+
+  // Customers (for ecommerce, delivery, corporate_sales)
+  // TODO: Implementar customersStore
+  customers?: Array<{
+    id: string;
+    name: string;
+    email?: string;
+    is_active?: boolean;
+  }>;
 
   // Materials/Inventory (for physical_products)
   // ✅ IMPLEMENTED: materialsStore exists
@@ -159,8 +170,8 @@ export interface Achievement {
   /** Tier del achievement */
   tier: AchievementTier;
 
-  /** Capability asociada */
-  capability: BusinessCapabilityId;
+  /** Capability asociada (o 'shared' para requirements cross-capability) */
+  capability: BusinessCapabilityId | 'shared';
 
   /** Nombre visible al usuario */
   name: string;
@@ -173,6 +184,23 @@ export interface Achievement {
 
   /** Categoría para organización */
   category: AchievementCategory;
+
+  /** 
+   * Metadata adicional (opcional)
+   * Útil para shared requirements, debugging, etc.
+   */
+  metadata?: {
+    /** Capabilities que comparten este requirement (para shared requirements) */
+    sharedBy?: string[];
+    /** Si es un requirement base para TODAS las capabilities */
+    isBase?: boolean;
+    /** Umbral numérico (ej: min_products = 5) */
+    threshold?: number;
+    /** Estimación de tiempo en minutos */
+    estimatedMinutes?: number;
+    /** Otros datos custom */
+    [key: string]: any;
+  };
 
   // ============================================
   // VALIDATION

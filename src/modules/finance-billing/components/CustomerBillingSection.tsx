@@ -10,7 +10,7 @@ import { Box, Text, Badge, Stack, Skeleton, HStack } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 interface CustomerBillingSectionProps {
   customerId: string;

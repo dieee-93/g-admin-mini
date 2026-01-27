@@ -12,21 +12,16 @@
  */
 
 import React from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { Box, Stack, Typography, Icon } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { FireIcon } from '@heroicons/react/24/outline';
-import { useSalesStore } from '@/store/salesStore';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 export function ProductsWidget() {
-  // ✅ Usar useShallow de Zustand v5 para evitar loop infinito
-  const { stats, loading } = useSalesStore(useShallow(state => ({
-    stats: state.stats,
-    loading: state.loading
-  })));
-
-  const topProducts = stats?.topProducts || [];
+  // TODO: Migrate to TanStack Query - useSales() should provide topProducts stats
+  // For now, return empty data to prevent crashes
+  const loading = false;
+  const topProducts = [];
   const top3 = topProducts.slice(0, 3);
 
   return (

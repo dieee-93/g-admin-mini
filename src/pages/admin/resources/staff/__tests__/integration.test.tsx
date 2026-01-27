@@ -16,7 +16,7 @@ interface MockComponentProps {
   onClick?: (value: string) => void;
   [key: string]: unknown;
 }
-import { useStaffStore } from '../../../../../store/staffStore';
+import { useTeamStore } from '../../../../../store/staffStore';
 import { DirectorySection } from '../components/sections/DirectorySection';
 import { PerformanceSection } from '../components/sections/PerformanceSection';
 import { ManagementSection } from '../components/sections/ManagementSection';
@@ -163,7 +163,7 @@ describe('Staff Module Integration Tests', () => {
 
   afterEach(() => {
     // Clean up store state
-    const store = useStaffStore.getState();
+    const store = useTeamStore.getState();
     store.setState({
       staff: [],
       schedules: [],
@@ -490,7 +490,7 @@ describe('Staff Module Integration Tests', () => {
 
   describe('Real-time Updates Integration', () => {
     it('should reflect store updates across components', async () => {
-      const store = useStaffStore.getState();
+      const store = useTeamStore.getState();
       
       render(
         <div>

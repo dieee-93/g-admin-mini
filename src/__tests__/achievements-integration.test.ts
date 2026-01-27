@@ -25,7 +25,7 @@ import type { ValidationContext, Achievement } from '@/modules/achievements/type
 // ============================================
 
 // Mock stores
-vi.mock('@/store/productsStore', () => ({
+vi.mock('@/modules/products', () => ({
   useProductsStore: vi.fn((selector: any) => {
     if (typeof selector === 'function') {
       return selector({
@@ -37,7 +37,7 @@ vi.mock('@/store/productsStore', () => ({
 }));
 
 vi.mock('@/store/staffStore', () => ({
-  useStaffStore: vi.fn((selector: any) => {
+  useTeamStore: vi.fn((selector: any) => {
     if (typeof selector === 'function') {
       return selector({
         staff: [],

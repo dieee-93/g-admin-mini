@@ -1,7 +1,8 @@
 // 🔍 HOOK DE BÚSQUEDA DE CONFIGURACIONES G-ADMIN v2.1
 // Búsqueda inteligente en tiempo real para configuraciones del sistema
 import { useState, useMemo, useCallback } from 'react';
-import { 
+import { useNavigate } from 'react-router-dom';
+import {
   BuildingOfficeIcon,
   CurrencyDollarIcon,
   UserGroupIcon,
@@ -46,7 +47,7 @@ const SEARCHABLE_ITEMS: SearchableItem[] = [
     category: 'Empresarial',
     keywords: ['horarios', 'horas', 'operación', 'funcionamiento', 'días', 'apertura', 'cierre'],
     icon: ClockIcon,
-    path: '#business-hours',
+    path: '/admin/settings/hours',
     priority: 'high'
   },
   
@@ -157,6 +158,7 @@ const SEARCHABLE_ITEMS: SearchableItem[] = [
 ];
 
 export function useSettingsSearch() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
@@ -201,21 +203,27 @@ export function useSettingsSearch() {
   }, []);
 
   const handleSelectResult = useCallback((item: SearchableItem) => {
-    // Navegar a la sección
     if (item.path) {
-      const element = document.querySelector(item.path);
-      if (element) {
-        element.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
-        });
+      // Si es una ruta completa (empieza con /), navegar con react-router
+      if (item.path.startsWith('/')) {
+        navigate(item.path);
+      }
+      // Si es un anchor (empieza con #), hacer scroll
+      else if (item.path.startsWith('#')) {
+        const element = document.querySelector(item.path);
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
       }
     }
-    
+
     // Limpiar búsqueda
     setSearchQuery('');
     setIsSearching(false);
-  }, []);
+  }, [navigate]);
 
   const clearSearch = useCallback(() => {
     setSearchQuery('');

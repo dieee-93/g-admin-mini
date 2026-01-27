@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { logger } from '@/lib/logging/Logger';
 import { EventBus } from '@/lib/events/EventBus';
 import type {

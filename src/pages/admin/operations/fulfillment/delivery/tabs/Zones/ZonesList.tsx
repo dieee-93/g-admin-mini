@@ -1,18 +1,19 @@
 import { Stack, Box, Text, Badge, CardWrapper } from '@/shared/ui';
 import { CheckCircleIcon, XCircleIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import type { DeliveryZone } from '@/modules/fulfillment/delivery/types';
+import { useLocation } from '@/contexts/LocationContext';
 
 interface ZonesListProps {
   zones: DeliveryZone[];
-  selectedZone: DeliveryZone | null;
-  onSelectZone: (zone: DeliveryZone) => void;
+  onEdit: (zone: DeliveryZone) => void;
   loading: boolean;
 }
 
-export function ZonesList({ zones, selectedZone, onSelectZone, loading }: ZonesListProps) {
+export function ZonesList({ zones, onEdit, loading }: ZonesListProps) {
+  const { isMultiLocationMode, locations } = useLocation();
   if (loading) {
     return (
-      <Box width="40%" minWidth="300px">
+      <Box width="100%">
         <Text>Cargando zonas...</Text>
       </Box>
     );
@@ -23,7 +24,7 @@ export function ZonesList({ zones, selectedZone, onSelectZone, loading }: ZonesL
     zones.length > 0 ? zones.reduce((sum, z) => sum + z.delivery_fee, 0) / zones.length : 0;
 
   return (
-    <Box width="40%" minWidth="300px" height="100%" overflowY="auto">
+    <Box width="100%" height="100%" overflowY="auto">
       <Stack gap="md">
         <Text fontWeight="bold" fontSize="lg">
           Zonas de Delivery
@@ -34,11 +35,8 @@ export function ZonesList({ zones, selectedZone, onSelectZone, loading }: ZonesL
           {zones.map((zone) => (
             <CardWrapper
               key={zone.id}
-              onClick={() => onSelectZone(zone)}
+              onClick={() => onEdit(zone)}
               cursor="pointer"
-              borderWidth="2px"
-              borderColor={selectedZone?.id === zone.id ? 'blue.500' : 'transparent'}
-              bg={selectedZone?.id === zone.id ? 'blue.50' : 'white'}
               _hover={{ borderColor: 'blue.300', shadow: 'sm' }}
               transition="all 0.2s"
             >
@@ -67,6 +65,19 @@ export function ZonesList({ zones, selectedZone, onSelectZone, loading }: ZonesL
                     <Text>💵 ${zone.delivery_fee}</Text>
                     <Text>⏱️ {zone.estimated_time_minutes} min</Text>
                   </Stack>
+                  
+                  {/* Location Badge - only show if multi-location enabled */}
+                  {isMultiLocationMode && (
+                    <Box mt="xs">
+                      {zone.location_id ? (
+                        <Badge colorPalette="blue" size="sm">
+                          📍 {locations.find(l => l.id === zone.location_id)?.name || 'Sucursal'}
+                        </Badge>
+                      ) : (
+                        <Badge colorPalette="purple" size="sm">🌍 Global</Badge>
+                      )}
+                    </Box>
+                  )}
                 </Stack>
               </Stack>
             </CardWrapper>

@@ -22,13 +22,13 @@ export interface CrudConfig<T extends FieldValues> {
   // Table/API configuration
   tableName: string;
   selectQuery?: string;
-  
+
   // Validation
   schema?: z.ZodSchema<T>;
-  
+
   // Default values for forms
   defaultValues?: DefaultValues<T>;
-  
+
   // Zustand store integration
   store?: {
     items: T[];
@@ -41,19 +41,19 @@ export interface CrudConfig<T extends FieldValues> {
     error: string | null;
     setError: (error: string | null) => void;
   };
-  
+
   // Real-time subscriptions
   enableRealtime?: boolean;
   realtimeFilter?: string;
-  
+
   // Caching
   cacheKey?: string;
   cacheTime?: number; // milliseconds
-  
+
   // Callbacks
   onSuccess?: (action: 'create' | 'read' | 'update' | 'delete', data: T | T[]) => void;
   onError?: (action: 'create' | 'read' | 'update' | 'delete', error: Error) => void;
-  
+
   // Data transformations
   transformBeforeSave?: (data: T) => T;
   transformAfterLoad?: (data: T) => T;
@@ -68,42 +68,48 @@ export interface CrudOperationsResult<T extends FieldValues> {
   currentItem: T | null;
   loading: boolean;
   error: string | null;
-  
+
   // Form integration (React Hook Form)
   form: UseFormReturn<T, any, T>;
-  
+
   // CRUD operations
   fetchAll: () => Promise<T[]>;
   fetchById: (id: string) => Promise<T | null>;
   create: (data: T) => Promise<T>;
   update: (id: string, data: Partial<T>) => Promise<T>;
   remove: (id: string) => Promise<void>;
-  
+
   // Bulk operations
   createMany: (items: T[]) => Promise<T[]>;
   updateMany: (updates: Array<{ id: string; data: Partial<T> }>) => Promise<T[]>;
   removeMany: (ids: string[]) => Promise<void>;
-  
+
   // Form operations
   startCreate: () => void;
   startEdit: (item: T) => void;
   saveForm: () => Promise<T | null>;
   cancelForm: () => void;
   resetForm: () => void;
-  
+
   // Utility functions
   refresh: () => Promise<void>;
   clearError: () => void;
   clearCache: () => void;
-  
+
   // Search and filter (works with items)
   searchItems: (query: string, fields: (keyof T)[]) => T[];
   filterItems: (predicate: (item: T) => boolean) => T[];
   sortItems: (compareFn: (a: T, b: T) => number) => T[];
-  
+
+  // State setters (exposed for custom logic)
+  setItems: (items: T[]) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+
   // Real-time status
   isSubscribed: boolean;
 }
+
 
 /**
  * Main CRUD hook that eliminates all repetitive CRUD code
@@ -138,7 +144,7 @@ export function useCrudOperations<T extends FieldValues>(
   const items = store?.items ?? localItems;
   const loading = store?.loading ?? localLoading;
   const error = store?.error ?? localError;
-  
+
   // ✅ FIXED: Stable references using useCallback to prevent infinite re-renders
   const setItems = useCallback((items: T[]) => {
     if (store?.setItems) {
@@ -174,7 +180,7 @@ export function useCrudOperations<T extends FieldValues>(
   // Cache management
   const cache = useMemo(() => {
     if (!cacheKey) return null;
-    
+
     return {
       get: (): { data: T[]; timestamp: number } | null => {
         try {
@@ -227,7 +233,7 @@ export function useCrudOperations<T extends FieldValues>(
 
   const applyTransformAfterLoad = useCallback((data: T | T[]): T | T[] => {
     if (!transformAfterLoadRef.current) return data;
-    
+
     if (Array.isArray(data)) {
       return data.map(transformAfterLoadRef.current);
     }
@@ -315,9 +321,9 @@ export function useCrudOperations<T extends FieldValues>(
   const create = useCallback(async (data: T): Promise<T> => {
     try {
       setLoading(true);
-      
+
       const transformedData = applyTransformBeforeSave(data);
-      
+
       const { data: result, error } = await supabase
         .from(tableName)
         .insert([transformedData] as any)
@@ -327,14 +333,14 @@ export function useCrudOperations<T extends FieldValues>(
       if (error) throw error;
 
       const newItem = applyTransformAfterLoad(result) as T;
-      
+
       // Update state
       if (store?.addItem) {
         store.addItem(newItem);
       } else {
         setLocalItems(prev => [...prev, newItem]);
       }
-      
+
       // Clear cache
       if (cache) {
         localStorage.removeItem(`crud_cache_${cacheKey}`);
@@ -357,7 +363,7 @@ export function useCrudOperations<T extends FieldValues>(
 
       // Transform only if we have full data, otherwise pass partial directly
       const transformedData = transformBeforeSave && data
-        ? transformBeforeSave(data as T)
+        ? transformBeforeSave(data as unknown as T)
         : data;
 
       const { data: result, error } = await supabase
@@ -370,21 +376,21 @@ export function useCrudOperations<T extends FieldValues>(
       if (error) throw error;
 
       const updatedItem = applyTransformAfterLoad(result) as T;
-      
+
       // Update state
       if (store?.updateItem) {
         store.updateItem(id, updatedItem);
       } else {
-        setLocalItems(prev => prev.map(item => 
+        setLocalItems(prev => prev.map(item =>
           (item as any).id === id ? updatedItem : item
         ));
       }
-      
+
       // Update current item if it matches
       if (currentItem && (currentItem as any).id === id) {
         setCurrentItem(updatedItem);
       }
-      
+
       // Clear cache
       if (cache) {
         localStorage.removeItem(`crud_cache_${cacheKey}`);
@@ -418,12 +424,12 @@ export function useCrudOperations<T extends FieldValues>(
       } else {
         setLocalItems(prev => prev.filter(item => (item as any).id !== id));
       }
-      
+
       // Clear current item if it matches
       if (currentItem && (currentItem as any).id === id) {
         setCurrentItem(null);
       }
-      
+
       // Clear cache
       if (cache) {
         localStorage.removeItem(`crud_cache_${cacheKey}`);
@@ -442,7 +448,7 @@ export function useCrudOperations<T extends FieldValues>(
   const createMany = useCallback(async (newItems: T[]): Promise<T[]> => {
     try {
       setLoading(true);
-      
+
       const transformedItems = newItems.map(applyTransformBeforeSave);
 
       const { data, error } = await supabase
@@ -453,14 +459,14 @@ export function useCrudOperations<T extends FieldValues>(
       if (error) throw error;
 
       const results = applyTransformAfterLoad(data || []) as T[];
-      
+
       // Update state
       if (store?.setItems) {
         store.setItems([...items, ...results]);
       } else {
         setLocalItems(prev => [...prev, ...results]);
       }
-      
+
       // Clear cache
       if (cache) {
         localStorage.removeItem(`crud_cache_${cacheKey}`);
@@ -479,15 +485,15 @@ export function useCrudOperations<T extends FieldValues>(
   const updateMany = useCallback(async (updates: Array<{ id: string; data: Partial<T> }>): Promise<T[]> => {
     try {
       setLoading(true);
-      
+
       const results: T[] = [];
-      
+
       // Process updates sequentially to avoid conflicts
       for (const { id, data } of updates) {
         const result = await update(id, data);
         results.push(result);
       }
-      
+
       return results;
     } catch (error) {
       handleError('update', error as Error);
@@ -500,7 +506,7 @@ export function useCrudOperations<T extends FieldValues>(
   const removeMany = useCallback(async (ids: string[]): Promise<void> => {
     try {
       setLoading(true);
-      
+
       const { error } = await supabase
         .from(tableName)
         .delete()
@@ -514,7 +520,7 @@ export function useCrudOperations<T extends FieldValues>(
       } else {
         setLocalItems(prev => prev.filter(item => !ids.includes((item as any).id)));
       }
-      
+
       // Clear cache
       if (cache) {
         localStorage.removeItem(`crud_cache_${cacheKey}`);
@@ -545,7 +551,7 @@ export function useCrudOperations<T extends FieldValues>(
       if (!isValid) return null;
 
       const formData = form.getValues();
-      
+
       if (currentItem && (currentItem as any).id) {
         // Update existing item
         const result = await update((currentItem as any).id, formData);
@@ -593,10 +599,10 @@ export function useCrudOperations<T extends FieldValues>(
   // Search and filter functions
   const searchItems = useCallback((query: string, fields: (keyof T)[]): T[] => {
     if (!query.trim()) return items;
-    
+
     const lowercaseQuery = query.toLowerCase();
-    return items.filter(item => 
-      fields.some(field => 
+    return items.filter(item =>
+      fields.some(field =>
         String(item[field] || '').toLowerCase().includes(lowercaseQuery)
       )
     );
@@ -636,7 +642,7 @@ export function useCrudOperations<T extends FieldValues>(
 
   // Initial data load - ✅ OPTIMIZED: Stable dependency using useRef
   const hasFetchedInitialData = useRef(false);
-  
+
   useEffect(() => {
     if (!hasFetchedInitialData.current) {
       hasFetchedInitialData.current = true;
@@ -650,39 +656,44 @@ export function useCrudOperations<T extends FieldValues>(
     currentItem,
     loading,
     error,
-    
+
     // Form integration
     form,
-    
+
     // CRUD operations
     fetchAll,
     fetchById,
     create,
     update,
     remove,
-    
+
     // Bulk operations
     createMany,
     updateMany,
     removeMany,
-    
+
     // Form operations
     startCreate,
     startEdit,
     saveForm,
     cancelForm,
     resetForm,
-    
+
     // Utility functions
     refresh,
     clearError,
     clearCache,
-    
+
     // Search and filter
     searchItems,
     filterItems,
     sortItems,
-    
+
+    // State setters
+    setItems,
+    setLoading,
+    setError,
+
     // Real-time status
     isSubscribed
   };

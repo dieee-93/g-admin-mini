@@ -2,41 +2,27 @@
 // 🚀 QR CODE ORDERING - Tableside Digital Menu System
 import { useState, useEffect, useMemo } from 'react';
 import {
-  Box,
   Text,
-  Button,
   VStack,
   HStack,
-  Badge,
-  Grid,
-  Select,
-  Alert,
-  Dialog,
   createListCollection
 } from '@chakra-ui/react';
-import { InputField, CardWrapper} from '@/shared/ui';
+import { CardWrapper } from '@/shared/ui';
 import {
   QrCodeIcon,
-  PrinterIcon,
-  ClipboardDocumentIcon
 } from '@heroicons/react/24/outline';
-import { Table } from '../../types';
-
+import type { Table } from '../../types';
+import { QRGenerationForm } from './Generator/QRGenerationForm';
+import { ActiveQRCodes } from './Generator/ActiveQRCodes';
+import { QRCodeModal } from './Generator/QRCodeModal';
+import type { QRTableConfig } from './Generator/types';
 import { logger } from '@/lib/logging';
+
 interface QRCodeGeneratorProps {
   tables: Table[];
   onQRGenerated: (tableId: string, qrCode: string) => void;
   onQRRevoked: (tableId: string) => void;
   baseUrl?: string;
-}
-
-interface QRTableConfig {
-  tableId: string;
-  qrCode: string;
-  isActive: boolean;
-  expiresAt: string;
-  orderCount: number;
-  lastUsed?: string;
 }
 
 export function QRCodeGenerator({
@@ -88,7 +74,7 @@ export function QRCodeGenerator({
   // Generate QR code for table
   const generateQRCode = async (tableId: string) => {
     setIsGenerating(true);
-    
+
     try {
       const table = tables.find(t => t.id === tableId);
       if (!table) throw new Error('Table not found');
@@ -96,10 +82,10 @@ export function QRCodeGenerator({
       // Generate unique QR code identifier
       const qrCode = `qr_${tableId}_${Date.now()}`;
       const expiresAt = new Date(Date.now() + expirationHours * 60 * 60 * 1000).toISOString();
-      
+
       // Create QR URL
       const qrUrl = `${baseUrl}/order/${qrCode}`;
-      
+
       // Update configurations
       const existingIndex = qrConfigs.findIndex(config => config.tableId === tableId);
       const newConfig: QRTableConfig = {
@@ -121,10 +107,10 @@ export function QRCodeGenerator({
 
       saveQRConfigurations(updatedConfigs);
       onQRGenerated(tableId, qrCode);
-      
+
       setCurrentQR(qrUrl);
       setShowQRModal(true);
-      
+
     } catch (error) {
       logger.error('SalesStore', 'Error generating QR code:', error);
     } finally {
@@ -134,12 +120,12 @@ export function QRCodeGenerator({
 
   // Revoke QR code
   const revokeQRCode = (tableId: string) => {
-    const updatedConfigs = qrConfigs.map(config => 
-      config.tableId === tableId 
+    const updatedConfigs = qrConfigs.map(config =>
+      config.tableId === tableId
         ? { ...config, isActive: false }
         : config
     );
-    
+
     saveQRConfigurations(updatedConfigs);
     onQRRevoked(tableId);
   };
@@ -216,18 +202,6 @@ export function QRCodeGenerator({
     }
   };
 
-  // Check if QR code is expired
-  const isExpired = (expiresAt: string) => {
-    return new Date(expiresAt) < new Date();
-  };
-
-  // Get QR status
-  const getQRStatus = (config: QRTableConfig) => {
-    if (!config.isActive) return { label: 'Inactive', color: 'gray' };
-    if (isExpired(config.expiresAt)) return { label: 'Expired', color: 'red' };
-    return { label: 'Active', color: 'green' };
-  };
-
   return (
     <VStack gap="6" align="stretch">
       {/* Header */}
@@ -246,254 +220,39 @@ export function QRCodeGenerator({
       </CardWrapper>
 
       {/* QR Generation Form */}
-      <CardWrapper>
-        <CardWrapper.Header>
-          <Text fontWeight="bold">Generate New QR Code</Text>
-        </CardWrapper.Header>
-        <CardWrapper.Body>
-          <VStack gap="4" align="stretch">
-            <Grid templateColumns={{ base: "1fr", md: "2fr 1fr 1fr" }} gap="4">
-              <Box>
-                <Text mb="2" fontWeight="medium">Table</Text>
-                <Select.Root
-                  collection={availableTables}
-                  value={selectedTable ? [selectedTable] : []}
-                  onValueChange={(details) => setSelectedTable(details.value[0] || '')}
-                >
-                  <Select.Trigger>
-                    <Select.ValueText placeholder="Select table" />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {availableTables.items.map((table) => (
-                      <Select.Item key={table.value} item={table}>
-                        {table.label}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Root>
-              </Box>
-
-              <Box>
-                <Text mb="2" fontWeight="medium">Expires In (Hours)</Text>
-                <InputField
-                  type="number"
-                  min="1"
-                  max="24"
-                  value={expirationHours}
-                  onChange={(e) => setExpirationHours(parseInt(e.target.value) || 8)}
-                />
-              </Box>
-
-              <Box display="flex" alignItems="end">
-                <Button
-                  colorPalette="blue"
-                  onClick={() => generateQRCode(selectedTable)}
-                  disabled={!selectedTable || isGenerating}
-                  loading={isGenerating}
-                  loadingText="Generating..."
-                  w="full"
-                >
-                  <QrCodeIcon className="w-4 h-4" />
-                  Generate QR
-                </Button>
-              </Box>
-            </Grid>
-
-            <Alert.Root status="info">
-              <Alert.Indicator />
-              <Alert.Title>QR Code Ordering</Alert.Title>
-              <Alert.Description>
-                Customers can scan the QR code to access your digital menu, place orders, 
-                and even pay directly from their phones.
-              </Alert.Description>
-            </Alert.Root>
-          </VStack>
-        </CardWrapper.Body>
-      </CardWrapper>
+      <QRGenerationForm
+        availableTables={availableTables as any}
+        selectedTable={selectedTable}
+        onSelectTable={setSelectedTable}
+        expirationHours={expirationHours}
+        onExpirationChange={setExpirationHours}
+        isGenerating={isGenerating}
+        onGenerate={generateQRCode}
+      />
 
       {/* Active QR Codes */}
-      <CardWrapper>
-        <CardWrapper.Header>
-          <Text fontWeight="bold">Active QR Codes ({qrConfigs.length})</Text>
-        </CardWrapper.Header>
-        <CardWrapper.Body>
-          {qrConfigs.length === 0 ? (
-            <Text color="gray.600" textAlign="center" py="4">
-              No QR codes generated yet. Create one above to get started.
-            </Text>
-          ) : (
-            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="4">
-              {qrConfigs.map((config) => {
-                const table = tables.find(t => t.id === config.tableId);
-                const status = getQRStatus(config);
-                const qrUrl = `${baseUrl}/order/${config.qrCode}`;
-
-                return (
-                  <CardWrapper key={config.tableId} p="4" variant="outline">
-                    <VStack gap="3" align="stretch">
-                      <HStack justify="space-between" align="center">
-                        <VStack align="start" gap="0">
-                          <Text fontWeight="bold">
-                            Table {table?.number || 'Unknown'}
-                          </Text>
-                          <Text fontSize="sm" color="gray.600">
-                            {config.orderCount} orders placed
-                          </Text>
-                        </VStack>
-                        <Badge colorPalette={status.color} size="sm">
-                          {status.label}
-                        </Badge>
-                      </HStack>
-
-                      <VStack gap="2" align="stretch">
-                        <HStack justify="space-between">
-                          <Text fontSize="sm" color="gray.600">Expires:</Text>
-                          <Text fontSize="sm">
-                            {new Date(config.expiresAt).toLocaleDateString()} {' '}
-                            {new Date(config.expiresAt).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </Text>
-                        </HStack>
-                        
-                        {config.lastUsed && (
-                          <HStack justify="space-between">
-                            <Text fontSize="sm" color="gray.600">Last used:</Text>
-                            <Text fontSize="sm">
-                              {new Date(config.lastUsed).toLocaleDateString()}
-                            </Text>
-                          </HStack>
-                        )}
-                      </VStack>
-
-                      <HStack gap="2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyToClipboard(qrUrl)}
-                          flex="1"
-                        >
-                          <ClipboardDocumentIcon className="w-4 h-4" />
-                          Copy URL
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => printQRCode(config.tableId, qrUrl)}
-                          flex="1"
-                        >
-                          <PrinterIcon className="w-4 h-4" />
-                          Print
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setCurrentQR(qrUrl);
-                            setShowQRModal(true);
-                          }}
-                        >
-                          <QrCodeIcon className="w-4 h-4" />
-                          View
-                        </Button>
-                      </HStack>
-
-                      {config.isActive && !isExpired(config.expiresAt) && (
-                        <Button
-                          variant="outline"
-                          colorPalette="red"
-                          size="sm"
-                          onClick={() => revokeQRCode(config.tableId)}
-                        >
-                          Revoke QR Code
-                        </Button>
-                      )}
-                    </VStack>
-                  </CardWrapper>
-                );
-              })}
-            </Grid>
-          )}
-        </CardWrapper.Body>
-      </CardWrapper>
+      <ActiveQRCodes
+        qrConfigs={qrConfigs}
+        tables={tables}
+        baseUrl={baseUrl}
+        onCopy={copyToClipboard}
+        onPrint={printQRCode}
+        onView={(qrUrl) => {
+          setCurrentQR(qrUrl);
+          setShowQRModal(true);
+        }}
+        onRevoke={revokeQRCode}
+      />
 
       {/* QR Code Display Modal */}
-      <Dialog.Root 
-        open={showQRModal} 
-        onOpenChange={({ open }) => setShowQRModal(open)}
-      >
-        <Dialog.Backdrop />
-        <Dialog.Positioner>
-          <Dialog.Content maxW="md">
-            <Dialog.Header>
-              <Dialog.Title>QR Code</Dialog.Title>
-              <Dialog.CloseTrigger />
-            </Dialog.Header>
-
-            <Dialog.Body>
-              <VStack gap="4" align="center">
-                <Text textAlign="center" color="gray.600">
-                  Customers can scan this QR code to access your digital menu
-                </Text>
-                
-                <Box 
-                  p="4" 
-                  bg="white" 
-                  borderRadius="md" 
-                  border="1px solid" 
-                  borderColor="border.default"
-                  id="qr-display"
-                >
-                  {/* QR code will be rendered here */}
-                  <Text color="gray.400" textAlign="center">
-                    QR Code will be generated here
-                  </Text>
-                </Box>
-
-                <VStack gap="2" align="stretch" w="full">
-                  <Text fontSize="sm" fontWeight="medium">QR Code URL:</Text>
-                  <InputField
-                    value={currentQR}
-                    readOnly
-                    fontSize="sm"
-                    bg="bg.canvas"
-                  />
-                </VStack>
-              </VStack>
-            </Dialog.Body>
-
-            <Dialog.Footer>
-              <HStack gap="3" w="full">
-                <Button
-                  variant="outline"
-                  onClick={() => copyToClipboard(currentQR)}
-                  flex="1"
-                >
-                  <ClipboardDocumentIcon className="w-4 h-4" />
-                  Copy URL
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // Extract table ID from current QR for printing
-                    const config = qrConfigs.find(c => currentQR.includes(c.qrCode));
-                    if (config) {
-                      printQRCode(config.tableId, currentQR);
-                    }
-                  }}
-                  flex="1"
-                >
-                  <PrinterIcon className="w-4 h-4" />
-                  Print
-                </Button>
-              </HStack>
-            </Dialog.Footer>
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Dialog.Root>
+      <QRCodeModal
+        isOpen={showQRModal}
+        onClose={() => setShowQRModal(false)}
+        currentQR={currentQR}
+        qrConfigs={qrConfigs}
+        onCopy={copyToClipboard}
+        onPrint={printQRCode}
+      />
     </VStack>
   );
 }

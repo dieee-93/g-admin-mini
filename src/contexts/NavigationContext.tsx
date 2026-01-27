@@ -45,8 +45,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ModuleName } from '@/contexts/AuthContext';
-import { useCapabilityStore } from '@/store/capabilityStore';
-import { useShallow } from 'zustand/react/shallow';
+import { useFeatureFlags } from '@/lib/capabilities';
 import { logger } from '@/lib/logging';
 import { useModuleNavigation } from '@/lib/modules/useModuleNavigation';
 

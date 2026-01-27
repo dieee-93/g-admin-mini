@@ -112,11 +112,11 @@ export const AdvancedSalesAnalyticsDashboard: React.FC = () => {
         ) : null}
 
         {/* Real-time Status */}
-        <CardWrapper bg="bg.canvas">
+        <CardWrapper bg="gray.50">
           <CardWrapper.Body p="3">
             <HStack justify="center" gap="4">
               <HStack gap="2">
-                <Box width="8px" height="8px"  borderRadius="50%" />
+                <Box width="8px" height="8px" borderRadius="50%" />
                 <Text fontSize="sm" color="gray.600">
                   Last updated: {new Date().toLocaleTimeString()}
                 </Text>

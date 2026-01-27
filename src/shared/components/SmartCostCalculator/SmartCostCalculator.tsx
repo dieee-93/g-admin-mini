@@ -24,8 +24,9 @@ import {
   CheckCircleIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
-import { calculateRecipeCost } from '@/services/recipe/api/recipeApi'; 
-import type { Recipe } from '@/services/recipe/types';
+import { useRecipeCost } from '@/modules/recipe/hooks/useRecipeCosts';
+import type { Recipe } from '@/modules/recipe/types';
+import type { CalculateCostInput } from '@/modules/recipe/types/costing';
 import { CardWrapper, Icon } from '@/shared/ui';
 
 import { logger } from '@/lib/logging';
@@ -60,61 +61,58 @@ export const SmartCostCalculator: React.FC<SmartCostCalculatorProps> = ({
   onCostCalculated
 }) => {
   const [costBreakdown, setCostBreakdown] = useState<CostBreakdown | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedRecipeId, setSelectedRecipeId] = useState<string>(recipe?.id || '');
   const [laborRate, setLaborRate] = useState<number>(15); // $15/hour default
   const [overheadPercentage, setOverheadPercentage] = useState<number>(20); // 20% default
   const [targetProfitMargin, setTargetProfitMargin] = useState<number>(60); // 60% default
 
-  const calculateCost = async () => {
-    if (!selectedRecipeId) return;
+  // Build cost input from recipe
+  const costInput: CalculateCostInput | undefined = recipe ? {
+    recipeId: recipe.id,
+    inputs: recipe.inputs || [],
+    output: recipe.output,
+    costConfig: recipe.costConfig
+  } : undefined;
 
-    try {
-      setLoading(true);
-      setError(null);
-
-      const result = await calculateRecipeCost(selectedRecipeId);
-      
-      if (result) {
-        // Mock enhanced cost breakdown (since API returns basic data)
-        const mockBreakdown: CostBreakdown = {
-          ingredientCosts: [
-            { ingredient: 'Flour', quantity: 2, unitCost: 0.50, totalCost: 1.00, yieldFactor: 0.95, wasteFactor: 0.05 },
-            { ingredient: 'Eggs', quantity: 3, unitCost: 0.25, totalCost: 0.75, yieldFactor: 0.98, wasteFactor: 0.02 },
-            { ingredient: 'Milk', quantity: 1.5, unitCost: 0.60, totalCost: 0.90, yieldFactor: 1.0, wasteFactor: 0 }
-          ],
-          laborCost: (laborRate / 60) * 30, // 30 minutes prep time
-          overheadCost: 0,
-          totalCost: (result && typeof result === 'object') ? result.total_cost || 3.65 : (result || 3.65),
-          costPerPortion: (result && typeof result === 'object') ? result.cost_per_portion || 0.91 : ((result || 3.65) / 4),
-          profitabilityMetrics: {
-            suggestedPrice: ((result && typeof result === 'object') ? result.cost_per_portion || 0.91 : ((result || 3.65) / 4)) / (1 - targetProfitMargin / 100),
-            profitMargin: targetProfitMargin,
-            foodCostPercentage: (((result && typeof result === 'object') ? result.cost_per_portion || 0.91 : ((result || 3.65) / 4)) / (((result && typeof result === 'object') ? result.cost_per_portion || 0.91 : ((result || 3.65) / 4)) / (1 - targetProfitMargin / 100))) * 100
-          }
-        };
-
-        // Calculate overhead
-        mockBreakdown.overheadCost = (mockBreakdown.ingredientCosts.reduce((sum, item) => sum + item.totalCost, 0) + mockBreakdown.laborCost) * (overheadPercentage / 100);
-        
-        setCostBreakdown(mockBreakdown);
-        onCostCalculated?.(mockBreakdown.totalCost);
-      }
-    } catch (err) {
-      logger.error('App', 'Error calculating cost:', err);
-      setError('Failed to calculate recipe cost');
-    } finally {
-      setLoading(false);
+  // Use modern hook for cost calculation
+  const { data: result, isLoading: loading, error: queryError } = useRecipeCost(
+    costInput,
+    {
+      includeLabor: true,
+      includeOverhead: true,
+      laborCostPerHour: laborRate,
+      overheadPercentage: overheadPercentage
     }
-  };
+  );
 
+  const error = queryError ? 'Failed to calculate recipe cost' : null;
+
+  // Transform result to legacy CostBreakdown format
   useEffect(() => {
-    if (recipe?.id) {
-      setSelectedRecipeId(recipe.id);
-      calculateCost();
+    if (result) {
+      const breakdown: CostBreakdown = {
+        ingredientCosts: result.inputsBreakdown.map(input => ({
+          ingredient: input.itemName,
+          quantity: input.quantity,
+          unitCost: input.unitCost,
+          totalCost: input.totalCost,
+          yieldFactor: 1,
+          wasteFactor: 0
+        })),
+        laborCost: result.laborCost,
+        overheadCost: result.overheadCost,
+        totalCost: result.totalCost,
+        costPerPortion: result.costPerUnit,
+        profitabilityMetrics: {
+          suggestedPrice: result.costPerUnit / (1 - targetProfitMargin / 100),
+          profitMargin: targetProfitMargin,
+          foodCostPercentage: (result.costPerUnit / (result.costPerUnit / (1 - targetProfitMargin / 100))) * 100
+        }
+      };
+      
+      setCostBreakdown(breakdown);
+      onCostCalculated?.(breakdown.totalCost);
     }
-  }, [recipe?.id]);
+  }, [result, targetProfitMargin, onCostCalculated]);
 
   return (
     <Box>

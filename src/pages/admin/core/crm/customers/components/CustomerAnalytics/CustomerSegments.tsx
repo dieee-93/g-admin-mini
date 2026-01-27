@@ -7,9 +7,9 @@ import {
   Badge,
   Table
 } from '@/shared/ui';
-import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
+import { QuickCalculations } from '@/lib/decimal';
 import { useState, useMemo } from 'react';
-import { useCustomers } from '../../hooks/existing/useCustomers';
+import { useCustomers } from '@/modules/customers/hooks';
 import type { CustomerWithStats } from '../../types';
 
 interface CustomerSegment {

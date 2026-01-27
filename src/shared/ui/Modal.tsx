@@ -11,7 +11,6 @@ interface ModalProps {
   closeOnOverlayClick?: boolean
   closeOnEscape?: boolean
   blockScrollOnMount?: boolean
-  preserveScrollBarGap?: boolean
   className?: string
 }
 
@@ -89,7 +88,6 @@ export function Modal({
   closeOnOverlayClick = true,
   closeOnEscape = true,
   blockScrollOnMount = true,
-  preserveScrollBarGap = true,
   className,
   ...rest
 }: ModalProps) {
@@ -102,11 +100,10 @@ export function Modal({
         }
       }}
       size={sizeMap[size]}
-      centered={centered}
+      placement={centered ? "center" : "top"}
       closeOnInteractOutside={closeOnOverlayClick}
       closeOnEscape={closeOnEscape}
       preventScroll={blockScrollOnMount}
-      className={className}
       {...rest}
     >
       {children}

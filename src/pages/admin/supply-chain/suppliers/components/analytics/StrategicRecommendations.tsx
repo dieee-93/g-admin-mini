@@ -4,7 +4,7 @@
 // Displays strategic recommendations from supplier analysis engine
 
 import { VStack, Text, Card, HStack, Badge, Stack, Alert } from '@/shared/ui';
-import type { SupplierAnalysisResult } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import type { SupplierAnalysisResult } from '@/modules/materials/services';
 import {
   LightBulbIcon,
   ArrowTrendingUpIcon,

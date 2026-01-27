@@ -1,1 +1,1 @@
-export { SupplierFields } from './SupplierFields';
+export { default as SupplierFields } from './SupplierFields';

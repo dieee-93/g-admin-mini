@@ -16,7 +16,7 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { AnalyticsEngine } from '@/shared/services/AnalyticsEngine';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { fetchProductsWithIntelligence } from '../../services/productApi';
 import { logger } from '@/lib/logging';
 interface ProductData {

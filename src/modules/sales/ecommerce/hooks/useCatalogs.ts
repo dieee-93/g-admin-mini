@@ -9,22 +9,27 @@
  * - Manage featured products per catalog
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
 import type { Catalog, CatalogProduct } from '../types';
 
+export const CATALOGS_QUERY_KEY = ['catalogs'];
+export const CATALOG_PRODUCTS_QUERY_KEY = (catalogId: string) => ['catalogs', catalogId, 'products'];
+
 export function useCatalogs() {
-  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const queryClient = useQueryClient();
 
   // Fetch all catalogs
-  const fetchCatalogs = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
+  const { 
+    data: catalogs = [], 
+    isLoading: loading, 
+    error 
+  } = useQuery({
+    queryKey: CATALOGS_QUERY_KEY,
+    queryFn: async () => {
+      logger.debug('App', 'Fetching catalogs');
       const { data, error: fetchError } = await supabase
         .from('catalogs')
         .select('*')
@@ -32,20 +37,18 @@ export function useCatalogs() {
         .order('name');
 
       if (fetchError) throw fetchError;
-
-      setCatalogs(data || []);
-      logger.info('CatalogsHook', `✅ Loaded ${data?.length || 0} catalogs`);
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CatalogsHook', '❌ Error loading catalogs:', error);
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      return data as Catalog[];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   // Get default catalog
   const getDefaultCatalog = useCallback(async (): Promise<Catalog | null> => {
+    // Try to find in cache first
+    const cachedDefault = catalogs.find(c => c.is_default && c.is_active);
+    if (cachedDefault) return cachedDefault;
+
+    // Fallback to fetch
     try {
       const { data, error } = await supabase
         .from('catalogs')
@@ -55,31 +58,26 @@ export function useCatalogs() {
         .single();
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          // No default catalog found
-          logger.warn('CatalogsHook', 'No default catalog found');
-          return null;
-        }
+        if (error.code === 'PGRST116') return null;
         throw error;
       }
-
       return data as Catalog;
     } catch (err) {
-      logger.error('CatalogsHook', '❌ Error getting default catalog:', err);
+      logger.error('App', '❌ Error getting default catalog:', err);
       return null;
     }
-  }, []);
+  }, [catalogs]);
 
   // Create new catalog
-  const createCatalog = async (catalog: {
-    name: string;
-    description?: string;
-    type?: string;
-    is_active?: boolean;
-  }) => {
-    try {
-      const { data, error } = await supabase
-        .from('catalogs')
+  const createCatalogMutation = useMutation({
+    mutationFn: async (catalog: {
+      name: string;
+      description?: string;
+      type?: string;
+      is_active?: boolean;
+    }) => {
+      const { data, error } = await (supabase
+        .from('catalogs') as any)
         .insert({
           name: catalog.name,
           description: catalog.description,
@@ -91,24 +89,22 @@ export function useCatalogs() {
         .single();
 
       if (error) throw error;
-
-      // Refresh catalog list
-      await fetchCatalogs();
-
-      logger.info('CatalogsHook', '✅ Created catalog', { catalogId: data.id });
       return data as Catalog;
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CatalogsHook', '❌ Error creating catalog:', error);
-      throw error;
+    },
+    onSuccess: (newCatalog) => {
+      queryClient.invalidateQueries({ queryKey: CATALOGS_QUERY_KEY });
+      logger.info('App', '✅ Created catalog', { catalogId: newCatalog.id });
+    },
+    onError: (err) => {
+      logger.error('App', '❌ Error creating catalog:', err);
     }
-  };
+  });
 
   // Update catalog
-  const updateCatalog = async (catalogId: string, updates: Partial<Catalog>) => {
-    try {
-      const { data, error } = await supabase
-        .from('catalogs')
+  const updateCatalogMutation = useMutation({
+    mutationFn: async ({ catalogId, updates }: { catalogId: string, updates: Partial<Catalog> }) => {
+      const { data, error } = await (supabase
+        .from('catalogs') as any)
         .update({
           ...updates,
           updated_at: new Date().toISOString(),
@@ -118,69 +114,61 @@ export function useCatalogs() {
         .single();
 
       if (error) throw error;
-
-      // Refresh catalog list
-      await fetchCatalogs();
-
-      logger.info('CatalogsHook', '✅ Updated catalog', { catalogId });
       return data as Catalog;
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CatalogsHook', '❌ Error updating catalog:', error);
-      throw error;
+    },
+    onSuccess: (updatedCatalog) => {
+      queryClient.invalidateQueries({ queryKey: CATALOGS_QUERY_KEY });
+      logger.info('App', '✅ Updated catalog', { catalogId: updatedCatalog.id });
+    },
+    onError: (err) => {
+      logger.error('App', '❌ Error updating catalog:', err);
     }
-  };
+  });
 
   // Delete catalog
-  const deleteCatalog = async (catalogId: string) => {
-    try {
+  const deleteCatalogMutation = useMutation({
+    mutationFn: async (catalogId: string) => {
       const { error } = await supabase.from('catalogs').delete().eq('id', catalogId);
-
       if (error) throw error;
-
-      // Refresh catalog list
-      await fetchCatalogs();
-
-      logger.info('CatalogsHook', '✅ Deleted catalog', { catalogId });
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CatalogsHook', '❌ Error deleting catalog:', error);
-      throw error;
+      return catalogId;
+    },
+    onSuccess: (deletedId) => {
+      queryClient.invalidateQueries({ queryKey: CATALOGS_QUERY_KEY });
+      logger.info('App', '✅ Deleted catalog', { catalogId: deletedId });
+    },
+    onError: (err) => {
+      logger.error('App', '❌ Error deleting catalog:', err);
     }
-  };
+  });
 
   // Get products in catalog
   const getCatalogProducts = async (catalogId: string): Promise<CatalogProduct[]> => {
     try {
       const { data, error } = await supabase
         .from('catalog_products')
-        .select(
-          `
+        .select(`
           *,
           product:products(*)
-        `
-        )
+        `)
         .eq('catalog_id', catalogId)
         .order('sort_order');
 
       if (error) throw error;
-
-      logger.info('CatalogsHook', `✅ Loaded ${data?.length || 0} products for catalog ${catalogId}`);
       return data as CatalogProduct[];
     } catch (err) {
-      const error = err as Error;
-      logger.error('CatalogsHook', '❌ Error loading catalog products:', error);
-      throw error;
+      logger.error('App', '❌ Error loading catalog products:', err);
+      throw err;
     }
   };
 
   // Add product to catalog
-  const addProductToCatalog = async (catalogId: string, productId: string, options?: {
-    sort_order?: number;
-    is_featured?: boolean;
-  }) => {
-    try {
-      // Check if product already in catalog
+  const addProductMutation = useMutation({
+    mutationFn: async ({ catalogId, productId, options }: { 
+      catalogId: string, 
+      productId: string, 
+      options?: { sort_order?: number; is_featured?: boolean } 
+    }) => {
+      // Check if exists
       const { data: existing } = await supabase
         .from('catalog_products')
         .select('*')
@@ -188,14 +176,10 @@ export function useCatalogs() {
         .eq('product_id', productId)
         .single();
 
-      if (existing) {
-        logger.info('CatalogsHook', 'Product already in catalog', { catalogId, productId });
-        return existing;
-      }
+      if (existing) return existing;
 
-      // Add product to catalog
-      const { data, error } = await supabase
-        .from('catalog_products')
+      const { data, error } = await (supabase
+        .from('catalog_products') as any)
         .insert({
           catalog_id: catalogId,
           product_id: productId,
@@ -206,19 +190,22 @@ export function useCatalogs() {
         .single();
 
       if (error) throw error;
-
-      logger.info('CatalogsHook', '✅ Added product to catalog', { catalogId, productId });
       return data;
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CatalogsHook', '❌ Error adding product to catalog:', error);
-      throw error;
+    },
+    onSuccess: (_, variables) => {
+      logger.info('App', '✅ Added product to catalog', { 
+        catalogId: variables.catalogId, 
+        productId: variables.productId 
+      });
+    },
+    onError: (err) => {
+      logger.error('App', '❌ Error adding product to catalog:', err);
     }
-  };
+  });
 
   // Remove product from catalog
-  const removeProductFromCatalog = async (catalogId: string, productId: string) => {
-    try {
+  const removeProductMutation = useMutation({
+    mutationFn: async ({ catalogId, productId }: { catalogId: string, productId: string }) => {
       const { error } = await supabase
         .from('catalog_products')
         .delete()
@@ -226,24 +213,31 @@ export function useCatalogs() {
         .eq('product_id', productId);
 
       if (error) throw error;
-
-      logger.info('CatalogsHook', '✅ Removed product from catalog', { catalogId, productId });
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CatalogsHook', '❌ Error removing product from catalog:', error);
-      throw error;
+    },
+    onSuccess: (_, variables) => {
+      logger.info('App', '✅ Removed product from catalog', { 
+        catalogId: variables.catalogId, 
+        productId: variables.productId 
+      });
+    },
+    onError: (err) => {
+      logger.error('App', '❌ Error removing product from catalog:', err);
     }
-  };
+  });
 
-  // Update catalog product settings (sort order, featured)
-  const updateCatalogProduct = async (
-    catalogId: string,
-    productId: string,
-    updates: { sort_order?: number; is_featured?: boolean }
-  ) => {
-    try {
-      const { data, error } = await supabase
-        .from('catalog_products')
+  // Update catalog product settings
+  const updateProductMutation = useMutation({
+    mutationFn: async ({ 
+      catalogId, 
+      productId, 
+      updates 
+    }: { 
+      catalogId: string, 
+      productId: string, 
+      updates: { sort_order?: number; is_featured?: boolean } 
+    }) => {
+      const { data, error } = await (supabase
+        .from('catalog_products') as any)
         .update(updates)
         .eq('catalog_id', catalogId)
         .eq('product_id', productId)
@@ -251,33 +245,34 @@ export function useCatalogs() {
         .single();
 
       if (error) throw error;
-
-      logger.info('CatalogsHook', '✅ Updated catalog product', { catalogId, productId });
       return data;
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CatalogsHook', '❌ Error updating catalog product:', error);
-      throw error;
+    },
+    onSuccess: (_, variables) => {
+      logger.info('App', '✅ Updated catalog product', { 
+        catalogId: variables.catalogId, 
+        productId: variables.productId 
+      });
+    },
+    onError: (err) => {
+      logger.error('App', '❌ Error updating catalog product:', err);
     }
-  };
-
-  // Load catalogs on mount
-  useEffect(() => {
-    fetchCatalogs();
-  }, [fetchCatalogs]);
+  });
 
   return {
     catalogs,
     loading,
-    error,
-    fetchCatalogs,
+    error: error as Error | null,
+    fetchCatalogs: async () => { await queryClient.invalidateQueries({ queryKey: CATALOGS_QUERY_KEY }) },
     getDefaultCatalog,
-    createCatalog,
-    updateCatalog,
-    deleteCatalog,
+    createCatalog: createCatalogMutation.mutateAsync,
+    updateCatalog: (catalogId: string, updates: Partial<Catalog>) => updateCatalogMutation.mutateAsync({ catalogId, updates }),
+    deleteCatalog: deleteCatalogMutation.mutateAsync,
     getCatalogProducts,
-    addProductToCatalog,
-    removeProductFromCatalog,
-    updateCatalogProduct,
+    addProductToCatalog: (catalogId: string, productId: string, options?: { sort_order?: number; is_featured?: boolean }) => 
+      addProductMutation.mutateAsync({ catalogId, productId, options }),
+    removeProductFromCatalog: (catalogId: string, productId: string) => 
+      removeProductMutation.mutateAsync({ catalogId, productId }),
+    updateCatalogProduct: (catalogId: string, productId: string, updates: { sort_order?: number; is_featured?: boolean }) => 
+      updateProductMutation.mutateAsync({ catalogId, productId, updates }),
   };
 }

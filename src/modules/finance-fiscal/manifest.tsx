@@ -21,7 +21,6 @@ export const financeFiscalManifest: ModuleManifest = {
   permissionModule: 'fiscal', // ✅ Uses 'fiscal' permission
 
   depends: ['sales'], // Fiscal processes sales transactions
-  autoInstall: true, // Auto-install when sales is active
 
   // 🔒 PERMISSIONS: Supervisors and above can manage fiscal documents
   minimumRole: 'SUPERVISOR' as const,

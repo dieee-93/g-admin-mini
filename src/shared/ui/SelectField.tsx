@@ -8,7 +8,7 @@
  */
 
 import { Select, createListCollection, Portal, Text } from '@chakra-ui/react'
-import { forwardRef, useMemo, memo } from 'react';
+import { useMemo, memo } from 'react';
 import type { SelectRootProps } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
 

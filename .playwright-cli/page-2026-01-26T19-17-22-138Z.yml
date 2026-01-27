@@ -1,0 +1,600 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e17]:
+      - generic [ref=e19]:
+        - img [ref=e22]
+        - paragraph [ref=e25]: G-Admin Mini
+      - generic [ref=e27]:
+        - banner [ref=e28]:
+          - generic [ref=e29]:
+            - generic [ref=e31]:
+              - paragraph [ref=e32] [cursor=pointer]: G-Admin
+              - paragraph [ref=e33]: /
+              - paragraph [ref=e34]: Dashboard
+              - paragraph [ref=e35]: ·
+              - paragraph [ref=e36]: Central dashboard with aggregated metrics and widgets from all modules
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - img [ref=e41]
+                - img [ref=e44] [cursor=pointer]
+              - button "d dieee.93@gmail.com SUPER_ADMIN" [ref=e46] [cursor=pointer]:
+                - generic [ref=e47]:
+                  - generic [ref=e49]: d
+                  - generic [ref=e50]:
+                    - paragraph [ref=e51]: dieee.93@gmail.com
+                    - paragraph [ref=e52]: SUPER_ADMIN
+        - generic [ref=e55]:
+          - heading "G" [level=5] [ref=e60]
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - button [ref=e66] [cursor=pointer]:
+                - img [ref=e69]
+              - button [ref=e73] [cursor=pointer]:
+                - img [ref=e76]
+              - button [ref=e80] [cursor=pointer]:
+                - img [ref=e83]
+              - button [ref=e87] [cursor=pointer]:
+                - img [ref=e91]
+              - button [ref=e95] [cursor=pointer]:
+                - img [ref=e98]
+              - button [ref=e102] [cursor=pointer]:
+                - img [ref=e105]
+            - button [ref=e111] [cursor=pointer]:
+              - img [ref=e114]
+            - generic [ref=e116]:
+              - button [ref=e119] [cursor=pointer]:
+                - img [ref=e122]
+              - button [ref=e126] [cursor=pointer]:
+                - img [ref=e129]
+            - generic [ref=e131]:
+              - button [ref=e134] [cursor=pointer]:
+                - img [ref=e137]
+              - button [ref=e141] [cursor=pointer]:
+                - img [ref=e144]
+            - generic [ref=e146]:
+              - button [ref=e149] [cursor=pointer]:
+                - img [ref=e152]
+              - button [ref=e156] [cursor=pointer]:
+                - img [ref=e159]
+          - button [ref=e163] [cursor=pointer]:
+            - img [ref=e164]
+        - main [ref=e166]:
+          - generic [ref=e169]:
+            - generic [ref=e171]:
+              - img [ref=e173]
+              - generic [ref=e175]:
+                - paragraph [ref=e176]: Executive Dashboard
+                - paragraph [ref=e177]: Real-time business intelligence and operational metrics
+            - generic [ref=e178]:
+              - generic [ref=e181]:
+                - generic [ref=e182]:
+                  - img [ref=e184]
+                  - generic [ref=e188]: +17.0%
+                - generic [ref=e189]:
+                  - paragraph [ref=e190]: Total Revenue
+                  - paragraph [ref=e191]: $98,550
+              - generic [ref=e194]:
+                - generic [ref=e195]:
+                  - img [ref=e197]
+                  - generic [ref=e201]: +12.5%
+                - generic [ref=e202]:
+                  - paragraph [ref=e203]: Total Orders
+                  - paragraph [ref=e204]: 1,234
+              - generic [ref=e207]:
+                - generic [ref=e208]:
+                  - img [ref=e210]
+                  - generic [ref=e214]: +5.2%
+                - generic [ref=e215]:
+                  - paragraph [ref=e216]: Active Customers
+                  - paragraph [ref=e217]: "854"
+              - generic [ref=e220]:
+                - generic [ref=e221]:
+                  - img [ref=e223]
+                  - generic [ref=e227]: "+0.3"
+                - generic [ref=e228]:
+                  - paragraph [ref=e229]: Avg Rating
+                  - paragraph [ref=e230]: "4.8"
+            - generic [ref=e232]:
+              - generic [ref=e234]:
+                - generic [ref=e235]:
+                  - generic [ref=e236]:
+                    - img [ref=e237]
+                    - generic [ref=e239]:
+                      - paragraph [ref=e240]: Operativo
+                      - paragraph [ref=e241]: Turno Tarde
+                  - generic [ref=e244]: ● EN VIVO
+                - button "Cerrar" [ref=e245] [cursor=pointer]:
+                  - img [ref=e246]
+                  - text: Cerrar
+              - generic [ref=e249]:
+                - generic [ref=e250]:
+                  - generic [ref=e251]:
+                    - img [ref=e252]
+                    - paragraph [ref=e254]: Horas de Operación Hoy
+                  - paragraph [ref=e255]: 4.5h
+                  - paragraph [ref=e256]: 09:00 - 21:00
+                - generic [ref=e257]:
+                  - generic [ref=e258]:
+                    - img [ref=e259]
+                    - paragraph [ref=e261]: Staff Activo
+                  - paragraph [ref=e262]: 6/9
+                  - progressbar "67%" [ref=e264]
+                - generic [ref=e266]:
+                  - generic [ref=e267]:
+                    - img [ref=e268]
+                    - paragraph [ref=e270]: Alertas Activas
+                  - paragraph [ref=e271]: "2"
+                  - paragraph [ref=e272]: Requiere atención
+              - generic [ref=e274]:
+                - img [ref=e275]
+                - paragraph [ref=e277]: "Última actualización: Hace 2 min"
+            - generic [ref=e278]:
+              - generic [ref=e281]:
+                - generic [ref=e282]:
+                  - img [ref=e283]
+                  - paragraph [ref=e285]: Welcome Back!
+                - paragraph [ref=e286]: Here's what's happening with your business today. All systems operational.
+                - generic [ref=e287]:
+                  - generic [ref=e288]:
+                    - img [ref=e289]
+                    - paragraph [ref=e291]: All modules active and synchronized
+                  - generic [ref=e292]:
+                    - img [ref=e293]
+                    - paragraph [ref=e295]: Real-time analytics tracking
+                  - generic [ref=e296]:
+                    - img [ref=e297]
+                    - paragraph [ref=e299]: 2 active alerts require attention
+                - button "View Detailed Report" [ref=e300] [cursor=pointer]
+              - generic [ref=e303]:
+                - generic [ref=e304]:
+                  - img [ref=e305]
+                  - paragraph [ref=e307]: Dynamic Widgets
+                - paragraph [ref=e308]: Module-injected widgets appear here dynamically based on active capabilities.
+                - generic [ref=e310]:
+                  - generic [ref=e315]:
+                    - generic [ref=e316]:
+                      - paragraph [ref=e318]: 🕐 Sin Turno Activo
+                      - generic [ref=e321]: ○ Cerrado
+                    - separator [ref=e322]
+                    - button "▶️ Abrir Turno" [ref=e324] [cursor=pointer]
+                  - generic [ref=e325]:
+                    - paragraph [ref=e326]: ACCIONES RÁPIDAS
+                    - generic [ref=e327]:
+                      - button "Nueva Venta" [ref=e328] [cursor=pointer]:
+                        - generic [ref=e329]:
+                          - img [ref=e330]
+                          - paragraph [ref=e332]: Nueva Venta
+                      - button "Nueva Orden" [ref=e333] [cursor=pointer]:
+                        - generic [ref=e334]:
+                          - img [ref=e335]
+                          - paragraph [ref=e337]: Nueva Orden
+                      - button "Nuevo Cliente" [ref=e338] [cursor=pointer]:
+                        - generic [ref=e339]:
+                          - img [ref=e340]
+                          - paragraph [ref=e342]: Nuevo Cliente
+                      - button "Nuevo Producto" [ref=e343] [cursor=pointer]:
+                        - generic [ref=e344]:
+                          - img [ref=e345]
+                          - paragraph [ref=e347]: Nuevo Producto
+                      - button "Programar" [ref=e348] [cursor=pointer]:
+                        - generic [ref=e349]:
+                          - img [ref=e350]
+                          - paragraph [ref=e352]: Programar
+                      - button "Envío" [ref=e353] [cursor=pointer]:
+                        - generic [ref=e354]:
+                          - img [ref=e355]
+                          - paragraph [ref=e357]: Envío
+                      - button "Factura" [ref=e358] [cursor=pointer]:
+                        - generic [ref=e359]:
+                          - img [ref=e360]
+                          - paragraph [ref=e362]: Factura
+                      - button "Configurar" [ref=e363] [cursor=pointer]:
+                        - generic [ref=e364]:
+                          - img [ref=e365]
+                          - paragraph [ref=e368]: Configurar
+                  - generic [ref=e370]:
+                    - generic [ref=e371]:
+                      - paragraph [ref=e372]: 🎯
+                      - heading "Sistema de Logros" [level=2] [ref=e373]
+                    - paragraph [ref=e374]: Completa la configuración inicial para desbloquear todas las funcionalidades.
+                    - button "Ver Logros y Configuración" [ref=e375] [cursor=pointer]
+                    - paragraph [ref=e376]: ⚠️ Widget en modo simplificado (refactorización pendiente)
+                  - generic [ref=e377]:
+                    - generic [ref=e378]:
+                      - generic [ref=e379]:
+                        - paragraph [ref=e380]: Revenue Hoy
+                        - paragraph [ref=e381]: $12.450
+                      - img [ref=e383]
+                    - generic [ref=e385]:
+                      - paragraph [ref=e386]: ↑ +12.2%
+                      - paragraph [ref=e387]: vs período anterior
+                    - paragraph [ref=e389]: vs ayer
+                  - generic [ref=e390]:
+                    - generic [ref=e391]:
+                      - generic [ref=e392]:
+                        - paragraph [ref=e393]: Ventas Hoy
+                        - paragraph [ref=e394]: "47"
+                      - img [ref=e396]
+                    - generic [ref=e398]:
+                      - paragraph [ref=e399]: ↑ +9.3%
+                      - paragraph [ref=e400]: vs período anterior
+                    - paragraph [ref=e402]: vs ayer
+                  - generic [ref=e403]:
+                    - generic [ref=e404]:
+                      - generic [ref=e405]:
+                        - paragraph [ref=e406]: Tendencia de Ventas
+                        - paragraph [ref=e407]: Últimos 7 días
+                      - generic [ref=e408]:
+                        - generic [ref=e411]: Ventas
+                        - generic [ref=e414]: Órdenes
+                    - generic [ref=e416]:
+                      - list [ref=e418]:
+                        - listitem [ref=e419]:
+                          - img "ordenes legend icon" [ref=e420]
+                          - text: ordenes
+                        - listitem [ref=e422]:
+                          - img "ventas legend icon" [ref=e423]
+                          - text: ventas
+                      - application [ref=e425]:
+                        - generic [ref=e430]:
+                          - generic [ref=e432]: Lun
+                          - generic [ref=e434]: Mar
+                          - generic [ref=e436]: Mié
+                          - generic [ref=e438]: Jue
+                          - generic [ref=e440]: Vie
+                          - generic [ref=e442]: Sáb
+                          - generic [ref=e444]: Dom
+                        - generic [ref=e446]:
+                          - generic [ref=e448]: "0"
+                          - generic [ref=e450]: "20"
+                          - generic [ref=e452]: "40"
+                          - generic [ref=e454]: "60"
+                          - generic [ref=e456]: "80"
+                  - generic [ref=e477]:
+                    - generic [ref=e478]:
+                      - paragraph [ref=e479]: Distribución de Revenue
+                      - paragraph [ref=e480]: Por categoría
+                    - generic [ref=e481]:
+                      - application [ref=e485]
+                      - generic [ref=e496]:
+                        - generic [ref=e497]:
+                          - paragraph [ref=e500]: Productos
+                          - generic [ref=e503]: 45%
+                        - generic [ref=e504]:
+                          - paragraph [ref=e507]: Servicios
+                          - generic [ref=e510]: 30%
+                        - generic [ref=e511]:
+                          - paragraph [ref=e514]: Membresías
+                          - generic [ref=e517]: 15%
+                        - generic [ref=e518]:
+                          - paragraph [ref=e521]: Otros
+                          - generic [ref=e524]: 10%
+                  - generic [ref=e525]:
+                    - generic [ref=e526]:
+                      - generic [ref=e527]:
+                        - paragraph [ref=e528]: Revenue Acumulado
+                        - paragraph [ref=e529]: Últimos 12 meses
+                      - generic [ref=e530]:
+                        - img [ref=e531]
+                        - paragraph [ref=e533]: +24.5%
+                    - application [ref=e536]:
+                      - generic [ref=e541]:
+                        - generic [ref=e543]: Ene
+                        - generic [ref=e545]: Feb
+                        - generic [ref=e547]: Mar
+                        - generic [ref=e549]: Abr
+                        - generic [ref=e551]: May
+                        - generic [ref=e553]: Jun
+                        - generic [ref=e555]: Jul
+                        - generic [ref=e557]: Ago
+                        - generic [ref=e559]: Sep
+                        - generic [ref=e561]: Oct
+                        - generic [ref=e563]: Nov
+                        - generic [ref=e565]: Dic
+                      - generic [ref=e567]:
+                        - generic [ref=e569]: $0K
+                        - generic [ref=e571]: $8K
+                        - generic [ref=e573]: $16K
+                        - generic [ref=e575]: $24K
+                        - generic [ref=e577]: $32K
+                  - generic [ref=e582]:
+                    - generic [ref=e584]:
+                      - paragraph [ref=e585]: Performance vs Objetivos
+                      - paragraph [ref=e586]: Métricas del mes actual
+                    - generic [ref=e588]:
+                      - list [ref=e590]:
+                        - listitem [ref=e591]:
+                          - img "actual legend icon" [ref=e592]
+                          - text: actual
+                        - listitem [ref=e594]:
+                          - img "objetivo legend icon" [ref=e595]
+                          - text: objetivo
+                      - application [ref=e597]:
+                        - generic [ref=e602]:
+                          - generic [ref=e604]: Ventas
+                          - generic [ref=e606]: Clientes
+                          - generic [ref=e608]: Órdenes
+                          - generic [ref=e610]: Revenue
+                          - generic [ref=e612]: Satisfacción
+                        - generic [ref=e614]:
+                          - generic [ref=e616]: "0"
+                          - generic [ref=e618]: "25"
+                          - generic [ref=e620]: "50"
+                          - generic [ref=e622]: "75"
+                          - generic [ref=e624]: "100"
+                  - generic [ref=e653]:
+                    - generic [ref=e654]:
+                      - generic [ref=e655]:
+                        - img [ref=e656]
+                        - paragraph [ref=e658]: Your Progress
+                      - generic [ref=e661]: Nivel 1
+                    - generic [ref=e662]:
+                      - generic [ref=e664]:
+                        - paragraph [ref=e665]: Total Logros
+                        - paragraph [ref=e666]: "50"
+                      - generic [ref=e668]:
+                        - paragraph [ref=e669]: Desbloqueados
+                        - paragraph [ref=e670]: "0"
+                      - generic [ref=e672]:
+                        - paragraph [ref=e673]: Siguiente Milestone
+                        - paragraph [ref=e674]: Completa tu primer logro
+                    - button "Ver Logros" [ref=e675] [cursor=pointer]
+                  - generic [ref=e676]:
+                    - generic [ref=e677]:
+                      - generic [ref=e678]:
+                        - paragraph [ref=e679]: Clientes Premium generan 68% del Revenue
+                        - paragraph [ref=e680]: Los clientes con membresías activas tienen 3.2x mayor valor promedio de transacción
+                      - img [ref=e682]
+                    - generic [ref=e684]:
+                      - paragraph [ref=e685]: +$180K
+                      - paragraph [ref=e686]: potencial anual
+                    - generic [ref=e687]:
+                      - generic [ref=e690]: CRM
+                      - generic [ref=e693]: Memberships
+                      - generic [ref=e696]: Sales
+                    - button "Ver Detalles" [ref=e697] [cursor=pointer]
+                  - generic [ref=e698]:
+                    - generic [ref=e699]:
+                      - generic [ref=e700]:
+                        - paragraph [ref=e701]: Stock bajo en 3 materiales críticos
+                        - paragraph [ref=e702]: Se necesita reabastecimiento urgente para mantener producción
+                      - img [ref=e704]
+                    - generic [ref=e706]:
+                      - paragraph [ref=e707]: 15 días
+                      - paragraph [ref=e708]: hasta desabastecimiento
+                    - generic [ref=e709]:
+                      - generic [ref=e712]: Inventory
+                      - generic [ref=e715]: Production
+                    - button "Ordenar Ahora" [ref=e716] [cursor=pointer]
+                  - generic [ref=e717]:
+                    - paragraph [ref=e718]: Actividad Reciente
+                    - generic [ref=e719]:
+                      - generic [ref=e721]:
+                        - img [ref=e723]
+                        - generic [ref=e725]:
+                          - paragraph [ref=e726]: Nueva venta completada
+                          - paragraph [ref=e727]: "Venta #1234 por $450.00"
+                          - generic [ref=e728]:
+                            - generic [ref=e729]:
+                              - generic [ref=e730]: JP
+                              - paragraph [ref=e731]: Juan Pérez
+                            - paragraph [ref=e732]: Hace 2 minutos
+                        - generic [ref=e735]: sale
+                      - generic [ref=e737]:
+                        - img [ref=e739]
+                        - generic [ref=e741]:
+                          - paragraph [ref=e742]: Orden de producción creada
+                          - paragraph [ref=e743]: "Orden #567 - 50 unidades"
+                          - generic [ref=e744]:
+                            - generic [ref=e745]:
+                              - generic [ref=e746]: MG
+                              - paragraph [ref=e747]: María García
+                            - paragraph [ref=e748]: Hace 15 minutos
+                        - generic [ref=e751]: order
+                      - generic [ref=e753]:
+                        - img [ref=e755]
+                        - generic [ref=e757]:
+                          - paragraph [ref=e758]: Nuevo cliente registrado
+                          - paragraph [ref=e759]: Carlos Rodríguez - Premium
+                          - generic [ref=e760]:
+                            - generic [ref=e761]:
+                              - generic [ref=e762]: S
+                              - paragraph [ref=e763]: Sistema
+                            - paragraph [ref=e764]: Hace 30 minutos
+                        - generic [ref=e767]: customer
+                      - generic [ref=e769]:
+                        - img [ref=e771]
+                        - generic [ref=e773]:
+                          - paragraph [ref=e774]: Stock bajo en Material XYZ
+                          - paragraph [ref=e775]: Solo quedan 5 unidades
+                          - generic [ref=e776]:
+                            - generic [ref=e777]:
+                              - generic [ref=e778]: S
+                              - paragraph [ref=e779]: Sistema
+                            - paragraph [ref=e780]: Hace 1 hora
+                        - generic [ref=e783]: alert
+                      - generic [ref=e785]:
+                        - img [ref=e787]
+                        - generic [ref=e789]:
+                          - paragraph [ref=e790]: Sincronización completada
+                          - paragraph [ref=e791]: Todos los módulos actualizados
+                          - generic [ref=e792]:
+                            - generic [ref=e793]:
+                              - generic [ref=e794]: S
+                              - paragraph [ref=e795]: Sistema
+                            - paragraph [ref=e796]: Hace 2 horas
+                        - generic [ref=e799]: success
+                  - generic [ref=e802]:
+                    - generic [ref=e803]:
+                      - img [ref=e804]
+                      - paragraph [ref=e806]: Fiscal Status
+                    - generic [ref=e807]:
+                      - generic [ref=e809]:
+                        - paragraph [ref=e810]: Facturas Pendientes
+                        - paragraph [ref=e811]: "0"
+                      - generic [ref=e813]:
+                        - paragraph [ref=e814]: Revenue Hoy
+                        - paragraph [ref=e815]: $0
+                      - generic [ref=e817]:
+                        - paragraph [ref=e818]: Pasivo Fiscal
+                        - paragraph [ref=e819]: $0
+                    - button "Ver Fiscal" [ref=e820] [cursor=pointer]
+                  - generic [ref=e821]:
+                    - generic [ref=e822]:
+                      - generic [ref=e823]:
+                        - heading "Calculadora Markup vs Margin" [level=3] [ref=e824]
+                        - generic [ref=e827]: Educativa
+                      - paragraph [ref=e828]: Entiende la diferencia critica entre Markup y Margin
+                    - generic [ref=e830]:
+                      - group [ref=e831]:
+                        - generic [ref=e832]: Costo
+                        - group [ref=e833]:
+                          - spinbutton [ref=e834]: "100"
+                        - generic [ref=e835]: Costo base del producto (sin ganancia)
+                      - separator [ref=e836]
+                      - group [ref=e837]:
+                        - generic [ref=e838]: Markup (%)
+                        - group [ref=e839]:
+                          - spinbutton [ref=e840]: "50"
+                        - generic [ref=e841]:
+                          - text: Ganancia sobre el
+                          - strong [ref=e842]: COSTO
+                          - text: (ganancia / costo x 100)
+                      - group [ref=e843]:
+                        - generic [ref=e844]: Margin (%)
+                        - group [ref=e845]:
+                          - spinbutton [ref=e846]
+                        - generic [ref=e847]:
+                          - text: Ganancia sobre el
+                          - strong [ref=e848]: PRECIO
+                          - text: (ganancia / precio x 100)
+                      - separator [ref=e849]
+                      - generic [ref=e850]:
+                        - heading "Resultados Calculados" [level=2] [ref=e851]
+                        - generic [ref=e852]:
+                          - paragraph [ref=e853]: "Precio de Venta:"
+                          - paragraph [ref=e854]: $0.00
+                        - generic [ref=e855]:
+                          - paragraph [ref=e856]: "Ganancia:"
+                          - paragraph [ref=e857]: $0.00
+                        - separator [ref=e858]
+                        - generic [ref=e859]:
+                          - paragraph [ref=e860]:
+                            - strong [ref=e861]: "Costo:"
+                            - text: $100
+                          - paragraph [ref=e862]:
+                            - strong [ref=e863]: "Markup:"
+                            - text: 50% (ganancia / costo)
+                          - paragraph [ref=e864]:
+                            - strong [ref=e865]: "Margin:"
+                            - text: 0.00% (ganancia / precio)
+                      - generic [ref=e866]:
+                        - heading "Sabias que?" [level=2] [ref=e867]
+                        - paragraph [ref=e868]:
+                          - text: Un
+                          - strong [ref=e869]: 50% markup
+                          - text: equivale a solo un
+                          - strong [ref=e870]: 33.33% margin
+                          - text: . No son lo mismo!
+                        - paragraph [ref=e871]:
+                          - strong [ref=e872]: "Markup:"
+                          - text: "\"Vendo al doble del costo\" = 100% markup = 50% margin"
+                        - paragraph [ref=e873]:
+                          - strong [ref=e874]: "Margin:"
+                          - text: "\"Quiero 30% de ganancia del precio\" = 30% margin = 42.86% markup"
+                      - generic [ref=e875]:
+                        - heading "Targets por Industria" [level=2] [ref=e876]
+                        - generic [ref=e877]:
+                          - paragraph [ref=e878]:
+                            - strong [ref=e879]: "Software:"
+                          - paragraph [ref=e880]: 75-85% margin
+                        - generic [ref=e881]:
+                          - paragraph [ref=e882]:
+                            - strong [ref=e883]: "Food Service:"
+                          - paragraph [ref=e884]: 60-70% margin
+                        - generic [ref=e885]:
+                          - paragraph [ref=e886]:
+                            - strong [ref=e887]: "Retail:"
+                          - paragraph [ref=e888]: 20-55% margin
+                        - paragraph [ref=e889]: "Fuente: docs/teoria-administrativa/MATRIZ-CONCEPTOS-INDUSTRIAS.md"
+                  - generic [ref=e890]:
+                    - paragraph [ref=e894]: Customers
+                    - generic [ref=e895]:
+                      - generic [ref=e896]:
+                        - paragraph [ref=e897]: Total Customers
+                        - paragraph [ref=e898]: "3"
+                      - generic [ref=e899]:
+                        - paragraph [ref=e900]: Active (30d)
+                        - generic [ref=e903]: "0"
+                  - generic [ref=e906]:
+                    - generic [ref=e907]:
+                      - img [ref=e908]
+                      - paragraph [ref=e910]: Asset Management
+                    - generic [ref=e911]:
+                      - generic [ref=e913]:
+                        - paragraph [ref=e914]: Total Activos
+                        - paragraph [ref=e915]: "0"
+                      - generic [ref=e917]:
+                        - paragraph [ref=e918]: En Uso
+                        - paragraph [ref=e919]: "0"
+                      - generic [ref=e921]:
+                        - paragraph [ref=e922]: Mantenimiento Pendiente
+                        - paragraph [ref=e923]: "0"
+                    - button "Ver Activos" [ref=e924] [cursor=pointer]
+                  - generic [ref=e927]:
+                    - generic [ref=e928]:
+                      - img [ref=e929]
+                      - paragraph [ref=e931]: Billing Status
+                    - generic [ref=e932]:
+                      - generic [ref=e934]:
+                        - paragraph [ref=e935]: Facturas Pendientes
+                        - paragraph [ref=e936]: "0"
+                      - generic [ref=e938]:
+                        - paragraph [ref=e939]: Monto Vencido
+                        - paragraph [ref=e940]: $0
+                      - generic [ref=e942]:
+                        - paragraph [ref=e943]: Recurrente Mensual
+                        - paragraph [ref=e944]: $0
+                    - button "Ver Facturación" [ref=e945] [cursor=pointer]
+            - generic [ref=e950]:
+              - generic [ref=e951]:
+                - img [ref=e952]
+                - paragraph [ref=e954]: "348"
+                - paragraph [ref=e955]: Daily Transactions
+              - generic [ref=e956]:
+                - img [ref=e957]
+                - paragraph [ref=e959]: "12"
+                - paragraph [ref=e960]: Pending Tasks
+              - generic [ref=e961]:
+                - img [ref=e962]
+                - paragraph [ref=e964]: "9"
+                - paragraph [ref=e965]: Team Members
+            - generic [ref=e967]:
+              - generic [ref=e968]:
+                - generic [ref=e970] [cursor=pointer]:
+                  - img [ref=e971]
+                  - paragraph [ref=e973]: Alertas Operacionales
+                - generic [ref=e975] [cursor=pointer]:
+                  - img [ref=e976]
+                  - paragraph [ref=e978]: Progreso & Logros
+                  - generic [ref=e981]: 0/0
+              - generic [ref=e983]:
+                - generic [ref=e984]:
+                  - paragraph [ref=e985]: Información urgente y notificaciones del sistema
+                  - generic [ref=e986]:
+                    - generic [ref=e987]:
+                      - img [ref=e988]
+                      - paragraph [ref=e990]: Todo en orden
+                    - paragraph [ref=e991]: No hay alertas críticas en este momento
+                - generic [ref=e992]:
+                  - paragraph [ref=e993]: ACCIONES RÁPIDAS
+                  - generic [ref=e994]:
+                    - button "Inventario" [ref=e995] [cursor=pointer]
+                    - button "Ventas" [ref=e996] [cursor=pointer]
+                    - button "Staff" [ref=e997] [cursor=pointer]
+                    - button "Ver Todas" [ref=e998] [cursor=pointer]
+    - generic [ref=e999]:
+      - img [ref=e1001]
+      - button "Open Tanstack query devtools" [ref=e1049] [cursor=pointer]:
+        - img [ref=e1050]
+  - generic [ref=e1098]: "25"

@@ -1,0 +1,24 @@
+### Page
+- Page URL: http://localhost:5173/admin/dashboard
+- Page Title: G-Admin Mini
+### Snapshot
+- [snapshot](.playwright-cli\page-2026-01-26T19-17-22-138Z.yml)
+### Events
+- [LOG] [90m16:15:54,545[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:16:23,692[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:16:23,692[0m [90m🔍 [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [AlertsAchievementsSection] RENDER @ http://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [useValidationContext] HOOK CALLED @ http://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [useValidationContext] Returning context @ h...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [AlertsAchievementsSection] validationContex...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [AlertsAchievementsSection] selectedCapabili...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [AlertsAchievementsSection] operationalAlert...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [AlertsAchievementsSection] operationalAlert...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [AlertsAchievementsSection] RENDER @ http://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [useValidationContext] HOOK CALLED @ http://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [useValidationContext] Returning context @ h...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [AlertsAchievementsSection] validationContex...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [AlertsAchievementsSection] selectedCapabili...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:16:23,758[0m [34mℹ️ [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:16:23,760[0m [34mℹ️ [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:16:42,463[0m [34mℹ️ [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38

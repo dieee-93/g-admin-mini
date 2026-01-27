@@ -1,8 +1,8 @@
 import type { BusinessRule } from './types';
-import { useMaterialsStore } from '@/store/materialsStore';
+import { useMaterialsStore } from '@/modules/materials/store';
 import { useSalesStore } from '@/store/salesStore';
-import { useCustomersStore } from '@/store/customersStore';
-import { useStaffStore } from '@/store/staffStore';
+import { useCustomersStore } from '@/modules/customers/store';
+import { useTeamStore } from '@/modules/team/store';
 
 /**
  * Inventory business rules
@@ -215,7 +215,7 @@ export const staffRules: BusinessRule[] = [
     name: 'unique_email',
     description: 'El email de empleado debe ser único',
     validate: async (_data) => {
-      const { staff } = useStaffStore.getState();
+      const { staff } = useTeamStore.getState();
       const existingStaff = staff.find(s => 
         s.email.toLowerCase() === data.email.toLowerCase() && 
         s.id !== data.id

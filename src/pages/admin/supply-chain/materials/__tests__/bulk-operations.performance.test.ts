@@ -50,7 +50,7 @@ vi.mock('@/lib/validation', () => ({
 // Mock stores
 vi.mock('@/store/salesStore', () => ({ useSalesStore: vi.fn() }));
 vi.mock('@/store/customersStore', () => ({ useCustomersStore: vi.fn() }));
-vi.mock('@/store/staffStore', () => ({ useStaffStore: vi.fn() }));
+vi.mock('@/store/staffStore', () => ({ useTeamStore: vi.fn() }));
 
 describe('Bulk Operations Performance', () => {
   beforeEach(() => {

@@ -1,19 +1,21 @@
 import { Button as ChakraButton } from '@chakra-ui/react'
-import type { ReactNode } from 'react'
+import type { ReactNode, MouseEventHandler } from 'react'
 import type { InteractiveAccessibilityProps } from './types/accessibility'
 
 interface ButtonProps extends InteractiveAccessibilityProps {
   children: ReactNode
-  variant?: 'solid' | 'outline' | 'ghost' | 'subtle'
+  variant?: 'solid' | 'subtle' | 'surface' | 'outline' | 'ghost' | 'plain'
   colorPalette?: 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'cyan' | 'purple' | 'pink'
   spinner?: ReactNode | undefined
   spinnerPlacement?: 'start' | 'end' | undefined
   size?: '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
   loading?: boolean
   disabled?: boolean
-  onClick?: () => void
+  onClick?: MouseEventHandler<HTMLButtonElement>
   type?: 'button' | 'submit' | 'reset'
   fullWidth?: boolean
+  leftIcon?: ReactNode
+  rightIcon?: ReactNode
 }
 
 export function Button({
@@ -28,6 +30,8 @@ export function Button({
   onClick,
   type = 'button',
   fullWidth = false,
+  leftIcon,
+  rightIcon,
   // Accessibility props
   'aria-label': ariaLabel,
   'aria-describedby': ariaDescribedby,
@@ -58,7 +62,9 @@ export function Button({
       tabIndex={tabIndex}
       {...accessibilityProps}
     >
+      {leftIcon}
       {children}
+      {rightIcon}
     </ChakraButton>
   )
 }

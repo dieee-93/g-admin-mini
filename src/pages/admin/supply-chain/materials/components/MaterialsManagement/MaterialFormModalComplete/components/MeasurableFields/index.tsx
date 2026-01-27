@@ -1,1 +1,0 @@
-export { MeasurableStockFields } from './MeasurableStockFields';

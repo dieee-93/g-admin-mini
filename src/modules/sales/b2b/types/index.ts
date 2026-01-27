@@ -7,7 +7,10 @@
  * @module sales/b2b/types
  */
 
-import Decimal from 'decimal.js';
+import { FinancialDecimal } from '@/lib/decimal';
+
+// Type alias for FinancialDecimal instance
+export type FinancialDecimalType = InstanceType<typeof FinancialDecimal>;
 
 // ============================================
 // QUOTES
@@ -25,6 +28,21 @@ export enum QuoteStatus {
   REJECTED = 'rejected',
   EXPIRED = 'expired',
   CONVERTED = 'converted', // Converted to order
+}
+
+/**
+ * Quote line item
+ */
+export interface QuoteItem {
+  id: string;
+  quote_id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: string; // Base price
+  tiered_price?: string; // Price after volume discount
+  discount_percentage: number;
+  line_total: string; // Decimal.js string
 }
 
 /**
@@ -48,21 +66,6 @@ export interface B2BQuote {
   approved_by?: string;
   created_at: string;
   updated_at: string;
-}
-
-/**
- * Quote line item
- */
-export interface QuoteItem {
-  id: string;
-  quote_id: string;
-  product_id: string;
-  product_name: string;
-  quantity: number;
-  unit_price: string; // Base price
-  tiered_price?: string; // Price after volume discount
-  discount_percentage: number;
-  line_total: string; // Decimal.js string
 }
 
 /**
@@ -157,6 +160,19 @@ export enum PricingTierType {
 }
 
 /**
+ * Individual pricing tier
+ */
+export interface PricingTier {
+  id: string;
+  min_quantity?: number; // For VOLUME type
+  max_quantity?: number; // For VOLUME type (null = unlimited)
+  min_value?: string; // For VALUE type (Decimal.js)
+  max_value?: string; // For VALUE type (Decimal.js)
+  discount_percentage: number; // 0-100
+  fixed_price?: string; // Override price (Decimal.js)
+}
+
+/**
  * Tiered pricing configuration
  */
 export interface TieredPricing {
@@ -170,19 +186,6 @@ export interface TieredPricing {
   applicable_customers?: string[]; // Customer IDs (null = all customers)
   created_at: string;
   updated_at: string;
-}
-
-/**
- * Individual pricing tier
- */
-export interface PricingTier {
-  id: string;
-  min_quantity?: number; // For VOLUME type
-  max_quantity?: number; // For VOLUME type (null = unlimited)
-  min_value?: string; // For VALUE type (Decimal.js)
-  max_value?: string; // For VALUE type (Decimal.js)
-  discount_percentage: number; // 0-100
-  fixed_price?: string; // Override price (Decimal.js)
 }
 
 /**
@@ -201,11 +204,11 @@ export interface TieredPricingFormData {
  * Calculated price result
  */
 export interface CalculatedPrice {
-  original_price: Decimal;
+  original_price: FinancialDecimalType;
   tier_applied?: PricingTier;
   discount_percentage: number;
-  discount_amount: Decimal;
-  final_price: Decimal;
+  discount_amount: FinancialDecimalType;
+  final_price: FinancialDecimalType;
 }
 
 // ============================================
@@ -233,6 +236,19 @@ export enum ApprovalLevel {
 }
 
 /**
+ * Individual approval step
+ */
+export interface ApprovalStep {
+  id: string;
+  workflow_id: string;
+  level: ApprovalLevel;
+  approver_id?: string; // User ID
+  status: ApprovalStatus;
+  comments?: string;
+  approved_at?: string;
+}
+
+/**
  * Approval workflow
  */
 export interface ApprovalWorkflow {
@@ -245,19 +261,6 @@ export interface ApprovalWorkflow {
   approvals: ApprovalStep[];
   created_at: string;
   updated_at: string;
-}
-
-/**
- * Individual approval step
- */
-export interface ApprovalStep {
-  id: string;
-  workflow_id: string;
-  level: ApprovalLevel;
-  approver_id?: string; // User ID
-  status: ApprovalStatus;
-  comments?: string;
-  approved_at?: string;
 }
 
 /**
@@ -275,6 +278,21 @@ export interface ApprovalRule {
 // ============================================
 // B2B ORDERS
 // ============================================
+
+/**
+ * B2B Order line item
+ */
+export interface B2BOrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: string;
+  tiered_price_applied?: string;
+  discount_percentage: number;
+  line_total: string;
+}
 
 /**
  * B2B Order (extends regular sales order)
@@ -301,21 +319,6 @@ export interface B2BOrder {
   updated_at: string;
 }
 
-/**
- * B2B Order line item
- */
-export interface B2BOrderItem {
-  id: string;
-  order_id: string;
-  product_id: string;
-  product_name: string;
-  quantity: number;
-  unit_price: string;
-  tiered_price_applied?: string;
-  discount_percentage: number;
-  line_total: string;
-}
-
 // ============================================
 // ANALYTICS
 // ============================================
@@ -329,16 +332,16 @@ export interface B2BAnalytics {
   quote_conversion_rate: number; // Percentage
   active_contracts: number;
   contracts_by_type: Record<ContractType, number>;
-  average_order_value: Decimal;
+  average_order_value: FinancialDecimalType;
   top_customers: {
     customer_id: string;
     customer_name: string;
     total_orders: number;
-    total_value: Decimal;
+    total_value: FinancialDecimalType;
   }[];
   revenue_by_pricing_tier: {
     tier_name: string;
-    revenue: Decimal;
+    revenue: FinancialDecimalType;
     order_count: number;
   }[];
 }
@@ -351,8 +354,8 @@ export interface ContractPerformance {
   contract_number: string;
   customer_name: string;
   total_orders: number;
-  total_revenue: Decimal;
-  average_order_value: Decimal;
+  total_revenue: FinancialDecimalType;
+  average_order_value: FinancialDecimalType;
   compliance_rate: number; // % of orders meeting minimum values
   next_renewal_date?: string;
 }
@@ -379,37 +382,3 @@ export interface B2BSort {
   field: 'date' | 'amount' | 'customer' | 'status';
   direction: 'asc' | 'desc';
 }
-
-// ============================================
-// EXPORTS
-// ============================================
-
-export type {
-  B2BQuote,
-  QuoteItem,
-  QuoteFormData,
-  B2BContract,
-  ContractFormData,
-  TieredPricing,
-  PricingTier,
-  TieredPricingFormData,
-  CalculatedPrice,
-  ApprovalWorkflow,
-  ApprovalStep,
-  ApprovalRule,
-  B2BOrder,
-  B2BOrderItem,
-  B2BAnalytics,
-  ContractPerformance,
-  B2BFilters,
-  B2BSort,
-};
-
-export {
-  QuoteStatus,
-  ContractStatus,
-  ContractType,
-  PricingTierType,
-  ApprovalStatus,
-  ApprovalLevel,
-};

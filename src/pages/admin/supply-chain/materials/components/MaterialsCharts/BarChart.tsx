@@ -1,3 +1,5 @@
+// ✅ PERFORMANCE: React.memo for chart optimization (Phase 2 Round 2)
+import { memo } from 'react';
 import {
   BarChart as RechartsBarChart,
   Bar,
@@ -38,7 +40,7 @@ const DEFAULT_COLORS = [
   '#dd6b20', // orange.500
 ];
 
-export function BarChart({
+export const BarChart = memo<BarChartProps>(function BarChart({
   data,
   dataKey = 'value',
   xAxisKey = 'name',
@@ -154,4 +156,6 @@ export function BarChart({
       </RechartsBarChart>
     </ResponsiveContainer>
   );
-}
+});
+
+BarChart.displayName = 'BarChart';

@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
+import { SecureRandomGenerator } from '@/lib/events/utils/SecureRandomGenerator';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
 import { useNavigationActions } from '@/contexts/NavigationContext';
@@ -12,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from '@/contexts/LocationContext';
 import { useCashData } from './useCashData';
 import { useCashActions } from './useCashActions';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import {
   openCashSession,
   closeCashSession,
@@ -176,7 +177,16 @@ export function useCashPage(): UseCashPageReturn {
 
       try {
         setIsClosing(true);
-        const session = await closeCashSession(sessionId, input, user.id);
+
+        // ✅ Generar operationId en cliente para idempotency
+        const operationId = SecureRandomGenerator.generateUUID();
+        logger.debug('CashModule', 'Closing session with operationId', {
+          sessionId,
+          operationId,
+        });
+
+        // Llamar con operationId para prevenir duplicados
+        const session = await closeCashSession(sessionId, input, user.id, operationId);
         storeActions.removeSession(sessionId);
         await refreshSessions();
 
@@ -195,6 +205,7 @@ export function useCashPage(): UseCashPageReturn {
         logger.info('CashModule', 'Session closed successfully', {
           variance: session.variance,
           status: session.status,
+          operationId,
         });
         return session;
       } catch (error) {

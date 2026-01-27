@@ -32,7 +32,7 @@ export class ErrorHandler {
   private errorQueue: AppError[] = [];
   private maxQueueSize = 100;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): ErrorHandler {
     if (!ErrorHandler.instance) {
@@ -43,35 +43,51 @@ export class ErrorHandler {
 
   public handle(error: Error | AppError, context?: Record<string, any>): AppError {
     const appError = this.normalizeError(error, context);
-    
+
     // Add to queue for batch processing
     this.addToQueue(appError);
-    
+
     // Log based on severity
     this.logError(appError);
-    
+
     // Send to monitoring service for high/critical errors
     if (appError.severity === ErrorSeverity.HIGH || appError.severity === ErrorSeverity.CRITICAL) {
       this.sendToMonitoring(appError);
     }
-    
+
     return appError;
   }
 
   private normalizeError(error: Error | AppError, context?: Record<string, any>): AppError {
-    if ('id' in error) {
+    if (typeof error === 'object' && error !== null && 'id' in error) {
       return error as AppError;
     }
 
+    if (typeof error === 'string') {
+      return {
+        id: crypto.randomUUID(),
+        type: ErrorType.SYSTEM,
+        severity: ErrorSeverity.MEDIUM,
+        message: error,
+        details: error,
+        timestamp: new Date(),
+        context
+      } as AppError;
+    }
+
+    const isError = error instanceof Error;
+    const message = isError ? error.message : String(error);
+    const stack = isError ? error.stack : undefined;
+
     return {
       id: crypto.randomUUID(),
-      type: this.inferErrorType(error),
-      severity: this.inferSeverity(error),
-      message: error.message,
+      type: isError ? this.inferErrorType(error) : ErrorType.SYSTEM,
+      severity: isError ? this.inferSeverity(error) : ErrorSeverity.MEDIUM,
+      message,
       details: error,
       timestamp: new Date(),
       context,
-      stack: error.stack
+      stack
     };
   }
 
@@ -79,9 +95,9 @@ export class ErrorHandler {
     if (error.message.includes('fetch') || error.message.includes('network')) {
       return ErrorType.NETWORK;
     }
-    if (error.message.toLowerCase().includes('unauthorized') || 
-        error.message.toLowerCase().includes('forbidden') ||
-        error.message.toLowerCase().includes('access')) {
+    if (error.message.toLowerCase().includes('unauthorized') ||
+      error.message.toLowerCase().includes('forbidden') ||
+      error.message.toLowerCase().includes('access')) {
       return ErrorType.AUTH;
     }
     if (error.message.includes('validation') || error.name === 'ValidationError') {
@@ -94,8 +110,8 @@ export class ErrorHandler {
     if (error.name === 'ValidationError') return ErrorSeverity.LOW;
     if (error.message.includes('network')) return ErrorSeverity.MEDIUM;
     if (error.message.toLowerCase().includes('unauthorized') ||
-        error.message.toLowerCase().includes('forbidden') ||
-        error.message.toLowerCase().includes('access')) return ErrorSeverity.HIGH;
+      error.message.toLowerCase().includes('forbidden') ||
+      error.message.toLowerCase().includes('access')) return ErrorSeverity.HIGH;
     return ErrorSeverity.MEDIUM;
   }
 
@@ -118,18 +134,19 @@ export class ErrorHandler {
 
     switch (error.severity) {
       case ErrorSeverity.CRITICAL:
-        logger.error('App', '🚨 CRITICAL ERROR:', logData, error.stack);
+        logger.error('App', `🚨 CRITICAL ERROR: ${error.message}`, { logData, stack: error.stack });
         break;
       case ErrorSeverity.HIGH:
-        logger.error('App', '❌ HIGH ERROR:', logData);
+        logger.error('App', `❌ HIGH ERROR: ${error.message}`, logData);
         break;
       case ErrorSeverity.MEDIUM:
-        logger.error('App', '⚠️ MEDIUM ERROR:', logData);
+        logger.error('App', `⚠️ MEDIUM ERROR: ${error.message}`, logData);
         break;
       case ErrorSeverity.LOW:
-        logger.error('App', 'ℹ️ LOW ERROR:', logData);
+        logger.error('App', `ℹ️ LOW ERROR: ${error.message}`, logData);
         break;
     }
+
   }
 
   private async sendToMonitoring(error: AppError): Promise<void> {
@@ -140,17 +157,17 @@ export class ErrorHandler {
         ...error,
         timestamp: error.timestamp.toISOString()
       };
-      
+
       // Store in localStorage for now (replace with actual service)
       const existingLogs = localStorage.getItem('error-logs');
       const logs = existingLogs ? JSON.parse(existingLogs) : [];
       logs.push(errorLog);
-      
+
       // Keep only last 50 errors in localStorage
       if (logs.length > 50) {
         logs.splice(0, logs.length - 50);
       }
-      
+
       localStorage.setItem('error-logs', JSON.stringify(logs));
     } catch (e) {
       logger.error('App', 'Failed to send error to monitoring:', e);

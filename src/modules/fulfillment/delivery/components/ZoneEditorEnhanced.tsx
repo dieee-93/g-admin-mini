@@ -6,10 +6,11 @@
 
 import { useState, useEffect } from 'react';
 import { Stack, Button, CardWrapper, Text, Box, Alert, Tabs } from '@/shared/ui';
-import { Checkbox, Textarea, Input } from '@chakra-ui/react';
+import { Checkbox, Textarea, Input, Select } from '@chakra-ui/react';
 import { ZoneMapEditor } from './ZoneMapEditor';
 import type { DeliveryZone, Coordinates, CreateDeliveryZoneData, UpdateDeliveryZoneData } from '../types';
 import { logger } from '@/lib/logging';
+import { useLocation } from '@/contexts/LocationContext';
 
 interface ZoneEditorEnhancedProps {
   zone: DeliveryZone | null;
@@ -18,7 +19,11 @@ interface ZoneEditorEnhancedProps {
 }
 
 export function ZoneEditorEnhanced({ zone, onSave, onCancel }: ZoneEditorEnhancedProps) {
-  // Form state
+  // Multi-location support - consume global context
+  const { selectedLocation, isMultiLocationMode, locations } = useLocation();
+
+  // Form state - location initialized from global context
+  const [locationId, setLocationId] = useState<string | null>(selectedLocation?.id || null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [deliveryFee, setDeliveryFee] = useState('');
@@ -33,6 +38,7 @@ export function ZoneEditorEnhanced({ zone, onSave, onCancel }: ZoneEditorEnhance
   useEffect(() => {
     if (zone) {
       logger.debug('ZoneEditor', 'Loading zone for editing', { zoneId: zone.id });
+      setLocationId(zone.location_id || null);
       setName(zone.name);
       setDescription(zone.description || '');
       setDeliveryFee(zone.delivery_fee.toString());
@@ -42,13 +48,23 @@ export function ZoneEditorEnhanced({ zone, onSave, onCancel }: ZoneEditorEnhance
       setIsActive(zone.is_active);
       setBoundaries(zone.boundaries || []);
     } else {
-      // Reset for new zone
+      // Reset for new zone - use global location
       logger.debug('ZoneEditor', 'Resetting form for new zone');
       resetForm();
     }
   }, [zone]);
 
+  // Initialize location from global context for new zones
+  useEffect(() => {
+    if (!zone) {
+      // New zone: use globally selected location by default
+      setLocationId(selectedLocation?.id || null);
+    }
+  }, [zone, selectedLocation]);
+
   const resetForm = () => {
+    // Reset to global location instead of null
+    setLocationId(selectedLocation?.id || null);
     setName('');
     setDescription('');
     setDeliveryFee('');
@@ -100,6 +116,7 @@ export function ZoneEditorEnhanced({ zone, onSave, onCancel }: ZoneEditorEnhance
       const zoneData: CreateDeliveryZoneData | UpdateDeliveryZoneData = zone
         ? {
             id: zone.id,
+            location_id: locationId,
             name: name.trim(),
             description: description.trim() || undefined,
             boundaries,
@@ -109,6 +126,7 @@ export function ZoneEditorEnhanced({ zone, onSave, onCancel }: ZoneEditorEnhance
             estimated_time_minutes: parseInt(estimatedTime)
           }
         : {
+            location_id: locationId,
             name: name.trim(),
             description: description.trim() || undefined,
             boundaries,
@@ -189,6 +207,44 @@ export function ZoneEditorEnhanced({ zone, onSave, onCancel }: ZoneEditorEnhance
                     rows={2}
                   />
                 </Stack>
+
+                {/* Location Selector - only show if multi-location enabled */}
+                {isMultiLocationMode && (
+                  <Stack gap="xs">
+                    <Text fontWeight="medium" fontSize="sm">
+                      Sucursal
+                    </Text>
+                    <Select
+                      value={locationId || 'global'}
+                      onChange={(e) => setLocationId(e.target.value === 'global' ? null : e.target.value)}
+                    >
+                      <option value="global">🌍 Todas las sucursales (Global)</option>
+                      {locations.map(loc => (
+                        <option key={loc.id} value={loc.id}>
+                          📍 {loc.name} (PDV: {loc.punto_venta_afip})
+                        </option>
+                      ))}
+                    </Select>
+                    <Text fontSize="xs" color="gray.500">
+                      Las zonas globales se aplican a todas las sucursales
+                    </Text>
+
+                    {/* Warning when location diverges from global selection */}
+                    {locationId !== selectedLocation?.id && locationId !== null && (
+                      <Alert status="info">
+                        <Stack gap="xs">
+                          <Text fontWeight="medium" fontSize="sm">
+                            📍 Ubicación diferente seleccionada
+                          </Text>
+                          <Text fontSize="xs">
+                            Esta zona se {zone ? 'actualizará' : 'creará'} para una ubicación diferente
+                            a la seleccionada globalmente ({selectedLocation?.name || 'Ninguna'})
+                          </Text>
+                        </Stack>
+                      </Alert>
+                    )}
+                  </Stack>
+                )}
 
                 {/* Delivery Fee */}
                 <Stack gap="xs">

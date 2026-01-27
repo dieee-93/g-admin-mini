@@ -174,6 +174,19 @@ export const initializeOffline = async (config?: {
   let storageInitialized = false;
   
   try {
+    // 🚨 CRITICAL: Unregister Service Worker in development (prevents API interception)
+    // Fixes 408 errors on external APIs (Georef, Nominatim, etc.)
+    if (!enableServiceWorker && 'serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      if (registrations.length > 0) {
+        logger.warn('OfflineSync', '[Offline] Unregistering Service Workers (development mode)...');
+        for (const registration of registrations) {
+          await registration.unregister();
+          logger.info('OfflineSync', `[Offline] Unregistered SW: ${registration.scope}`);
+        }
+      }
+    }
+
     // Initialize Service Worker
     if (enableServiceWorker) {
       serviceWorker = await registerServiceWorker();

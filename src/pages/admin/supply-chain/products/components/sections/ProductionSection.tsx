@@ -23,7 +23,7 @@
 import { Stack, Switch, Text, HStack, SelectField, createListCollection, Alert, NumberField } from '@/shared/ui';
 import { Field } from '@chakra-ui/react';
 import type { FormSectionProps, ProductionFields, OverheadConfig } from '../../types/productForm';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 interface ProductionSectionProps extends Omit<FormSectionProps, 'data' | 'onChange'> {
   data: ProductionFields;

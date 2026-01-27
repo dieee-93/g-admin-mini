@@ -20,7 +20,7 @@ import {
   CalculatorIcon,
   DocumentTextIcon
 } from '@heroicons/react/24/outline';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { notify } from '@/lib/notifications';
 
 import { logger } from '@/lib/logging';

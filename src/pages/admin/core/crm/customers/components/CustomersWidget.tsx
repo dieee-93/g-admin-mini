@@ -6,7 +6,7 @@
 
 import { Stack, Text, Badge, HStack } from '@/shared/ui';
 import { UsersIcon, ExclamationTriangleIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { useState, useEffect } from 'react';
 import { CustomerAPI } from '../services/customerApi';
 import { useAuth } from '@/contexts/AuthContext';

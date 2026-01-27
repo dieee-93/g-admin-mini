@@ -106,7 +106,7 @@ export function DeliveryOrdersTab() {
             key={order.id}
             order={order}
             onViewFullTracking={() => navigate(`/admin/operations/fulfillment/delivery?order=${order.id}`)}
-            onViewDriver={order.driver_id ? () => navigate(`/admin/resources/staff/${order.driver_id}`) : undefined}
+            onViewDriver={order.driver_id ? () => navigate(`/admin/resources/team/${order.driver_id}`) : undefined}
             onViewCustomer={() => navigate(`/admin/core/customers/${order.customer_id}`)}
           />
         ))}

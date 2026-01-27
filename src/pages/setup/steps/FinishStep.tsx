@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Box, Stack, Text, Button } from '@chakra-ui/react';
 import { useSetupStore } from '../../../store/setupStore';
-import { useCapabilities } from '../../../store/capabilityStore';
+import { useBusinessProfile, useCompleteSetup } from '@/lib/capabilities';
 import { logger } from '@/lib/logging';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 
 export function FinishStep() {
   const { userName } = useSetupStore();
-  const { completeSetup, saveToDB, profile } = useCapabilities();
+  const { profile } = useBusinessProfile();
+  const { mutate: completeSetup } = useCompleteSetup();
   const { navigate } = useNavigationActions();
   const [isCompleting, setIsCompleting] = useState(false);
 
@@ -17,26 +18,17 @@ export function FinishStep() {
     try {
       logger.info('SetupWizard', '🎯 Finalizando setup...');
 
-      // 1. Complete setup (marks as done, emits setup.completed event)
       completeSetup();
 
-      // 2. Save to database
-      const saved = await saveToDB();
-      if (!saved) {
-        logger.warn('SetupWizard', '⚠️ Could not save to DB, but continuing');
-      }
-
       logger.info('SetupWizard', '✅ Setup completado:', {
-        activities: profile?.selectedActivities?.length ?? 0,
+        capabilities: profile?.selectedCapabilities?.length ?? 0,
         infrastructure: profile?.selectedInfrastructure?.length ?? 0
       });
 
-      // 3. Navigate to dashboard with first-time flag
       navigate('dashboard');
 
     } catch (error) {
       logger.error('SetupWizard', '❌ Error completing setup:', error);
-      // Still navigate even if there's an error
       navigate('dashboard');
     } finally {
       setIsCompleting(false);

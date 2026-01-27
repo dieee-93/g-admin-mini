@@ -4,13 +4,16 @@ export { MaterialsNormalizer } from './materialsNormalizer';
 export * from './inventoryApi';
 export * from './supplyChainDataService';
 
-// Business Logic Services (moved from business-logic/inventory)
-// Note: stockCalculation lives in @/business-logic/inventory/stockCalculation
-// TEMPORALMENTE DESHABILITADO - ABCAnalysisEngine causa errores de bundling con Chakra
-// export * from './abcAnalysisEngine';
-// export * from './demandForecastingEngine'; // TODO: Re-enable when implemented
+// Business Logic Services
+export * from './abcAnalysisEngine';
+export * from './bulkOperationsService';
 export * from './formCalculation';
-// export * from './procurementRecommendationsEngine'; // TODO: Re-enable when implemented
-export * from './smartAlertsAdapter';
-// export * from './smartAlertsEngine'; // TODO: File doesn't exist here - use smartAlertsAdapter instead
+export * from './inventoryTransfersApi';
+export * from './materialsApi';
+export * from './materialsDataNormalizer';
+export * from './materialsMockService';
+// export * from './smartAlertsEngine';
 export * from './supplierAnalysisEngine';
+export * from './transfersService';
+export * from './trendsService';
+export * from './cacheService';

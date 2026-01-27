@@ -16,6 +16,14 @@ El módulo de **Materials** gestiona el inventario completo de materias primas, 
 - ✅ Cálculos de stock con precisión decimal (Decimal.js)
 - ✅ **Integración completa con Supabase (tabla `items`)**
 
+### 🗺️ Feature & Route Map
+
+| Route (Relative) | Feature Area | Components | Description |
+|------------------|--------------|------------|-------------|
+| **`/`** | **Inventory Management** | `InventoryTabEnhanced`, `MaterialsTable` | Main inventory control. Search, filter, and manage stock items. |
+| **`/?tab=analytics`** | **Start Intelligent Analytics** | `AnalyticsTabEnhanced`, `MaterialsCharts` | ABC Analysis, visual charts for stock distribution and value evolution. |
+| **`/?tab=procurement`** | **Procurement** | `ProcurementTab` | Purchase recommendations and supplier management. |
+
 ---
 
 ## 🎨 Rediseño UI v2.1 - Professional Redesign (2025)
@@ -1141,10 +1149,7 @@ src/pages/admin/supply-chain/suppliers/
 <Tooltip content={item.supplier?.name || 'Sin proveedor'}>
   <Badge>{item.supplier?.name?.substring(0, 20)}</Badge>
 </Tooltip>
-```
 
-**EventBus integration**:
-```typescript
 // materials escucha eventos de suppliers
 eventBus.on('suppliers:price_updated', ({ supplierId, newPrice }) => {
   // Recalcular costos de materiales de ese proveedor

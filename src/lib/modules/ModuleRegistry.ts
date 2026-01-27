@@ -24,7 +24,7 @@
  *   name: 'Sales Analytics',
  *   version: '1.0.0',
  *   depends: ['sales'],
- *   activatedBy: ['sales_management'],
+ *   activatedBy: 'sales_management',  // OPTIONAL module
  *   setup: async (registry) => {
  *     registry.addAction('dashboard.widgets', () => <AnalyticsWidget />);
  *   }
@@ -513,6 +513,8 @@ export class ModuleRegistry implements IModuleRegistry {
       });
     }
 
+    // NEW ARCHITECTURE: activatedBy is optional (CORE modules don't have it)
+    // No validation needed - undefined means CORE module, string means OPTIONAL module
 
     // Warnings
     if (manifest.depends.length === 0) {

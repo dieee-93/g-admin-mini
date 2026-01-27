@@ -25,7 +25,7 @@ import {
 import { Icon } from '@/shared/ui/Icon';
 import { pickupService } from '../services/pickupService';
 import type { QRValidation, ConfirmationResult } from '../types';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { logger } from '@/lib/logging';
 import { notify } from '@/lib/notifications';
 

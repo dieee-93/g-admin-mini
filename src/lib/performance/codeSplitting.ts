@@ -27,8 +27,9 @@ export const CODE_SPLITTING_CONFIG = {
 
 // Lazy-loaded large components with proper chunking
 export const lazyComponents = {
-  RecipeForm: createLazyRoute(
-    () => import('@/services/recipe/components/LazyRecipeForm'),
+  // Recipe Builder - Main component for recipe management
+  RecipeBuilder: createLazyRoute(
+    () => import('@/modules/recipe/components/RecipeBuilder'),
     CODE_SPLITTING_CONFIG.CHUNK_NAMES.RECIPES
   ),
 
@@ -48,13 +49,10 @@ export const lazyComponents = {
     () => import('@/pages/admin/supply-chain/materials/components/MaterialsManagement/MaterialsGrid'),
     'MaterialsGrid'
   ),
-  RecipeBasicForm: createLazyFeature(
-    () => import('@/services/recipe/components/components/RecipeBasicForm'),
-    'RecipeBasicForm'
-  ),
-  RecipeAISuggestions: createLazyFeature(
-    () => import('@/services/recipe/components/components/RecipeAISuggestions'),
-    'RecipeAISuggestions'
+  // Recipe Builder - Modern unified component
+  RecipeBuilder: createLazyFeature(
+    () => import('@/modules/recipe/components/RecipeBuilder'),
+    'RecipeBuilder'
   ),
 };
 

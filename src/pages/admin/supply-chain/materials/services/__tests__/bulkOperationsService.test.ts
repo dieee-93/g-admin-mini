@@ -50,7 +50,7 @@ vi.mock('@/store/customersStore', () => ({
   useCustomersStore: vi.fn()
 }));
 vi.mock('@/store/staffStore', () => ({
-  useStaffStore: vi.fn()
+  useTeamStore: vi.fn()
 }));
 
 describe('BulkOperationsService', () => {

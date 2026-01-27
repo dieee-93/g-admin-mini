@@ -1,23 +1,27 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo, useState, memo } from 'react';
 import {
   Box,
   Stack,
   Text,
   Flex,
-  Collapsible
+  Collapsible,
 } from '@/shared/ui';
 import { CardWrapper, InputField, SelectField, createListCollection } from '@/shared/ui';
-import { PlusIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
-
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { useSuppliers } from '@/modules/suppliers/hooks';
 import { logger } from '@/lib/logging';
-interface Supplier {
-  id: string;
-  name: string;
-  contact_person?: string;
-  email?: string;
-  phone?: string;
-  rating?: number;
-}
+
+/**
+ * SupplierFields Component
+ * 
+ * ✅ ARCHITECTURE: TanStack Query Pattern (Industry Validated)
+ * - Server state via TanStack Query hooks
+ * - Optimal caching and background refetching
+ * - Automatic cross-module reactivity
+ * 
+ * @see src/hooks/useSuppliers.ts - TanStack Query hooks
+ * @see ZUSTAND_TANSTACK_MIGRATION_AUDIT.md - Migration guide
+ */
 
 interface SupplierData {
   supplier_id?: string;
@@ -41,69 +45,62 @@ interface SupplierFieldsProps {
   fieldErrors: Record<string, string>;
   disabled?: boolean;
   isVisible: boolean;
+  onCreateNew?: () => void; // Optional callback to trigger wizard
 }
 
-export const SupplierFields = ({
+// ⚡ PERFORMANCE: React.memo prevents re-renders when props don't change
+const SupplierFields = memo(function SupplierFields({
   supplierData,
   updateSupplierData,
   fieldErrors,
   disabled = false,
-  isVisible
-}: SupplierFieldsProps) => {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  isVisible,
+  onCreateNew
+}: SupplierFieldsProps) {
+  // ============================================================================
+  // ✅ TANSTACK QUERY - Server state management
+  // ============================================================================
+  // Fetch active suppliers (TanStack Query handles caching automatically)
+  const { data: suppliers = [], isLoading } = useSuppliers({ status: 'active' });
+
+  // Memoize the supplier collection for the select dropdown
+  const supplierCollection = useMemo(() => {
+    return createListCollection({
+      items: [
+        ...suppliers.map(s => ({
+          value: s.id,
+          label: s.rating
+            ? `${s.name} (${s.rating.toFixed(1)} ⭐)`
+            : s.name
+        })),
+        { value: 'new', label: '➕ Crear nuevo proveedor' }
+      ]
+    });
+  }, [suppliers]);
+
+  // ============================================================================
+  // LOCAL UI STATE
+  // ============================================================================
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [showNewSupplierForm, setShowNewSupplierForm] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  // Cargar suppliers desde la API
-  useEffect(() => {
-    if (isVisible && suppliers.length === 0) {
-      loadSuppliers();
-    }
-  }, [isVisible, suppliers.length]);
-
-  const loadSuppliers = async () => {
-    setLoading(true);
-    try {
-      // Usar la API real de suppliers
-      const { suppliersApi } = await import('@/pages/admin/supply-chain/materials/services');
-      const suppliersData = await suppliersApi.getActiveSuppliers();
-      logger.info('MaterialsStore', 'Suppliers loaded from API:', suppliersData); // Debug
-
-      if (suppliersData && suppliersData.length > 0) {
-        setSuppliers(suppliersData);
-      } else {
-        logger.info('MaterialsStore', 'No suppliers found in DB, using fallback data'); // Debug
-        // Fallback a mock data si no hay suppliers en DB
-        setSuppliers([
-          { id: 'mock-1', name: 'Distribuidora Central (Mock)', contact_person: 'Juan Pérez', email: 'juan@distcentral.com', rating: 4.5, is_active: true, created_at: '', updated_at: '' },
-          { id: 'mock-2', name: 'Mercado Mayorista Sur (Mock)', contact_person: 'María García', email: 'ventas@mayoristasur.com', rating: 4.2, is_active: true, created_at: '', updated_at: '' },
-          { id: 'mock-3', name: 'Panadería Industrial López (Mock)', contact_person: 'Carlos López', email: 'carlos@panlopez.com', rating: 4.8, is_active: true, created_at: '', updated_at: '' }
-        ] as Supplier[]);
-      }
-    } catch (error) {
-      logger.error('MaterialsStore', 'Error loading suppliers:', error);
-      // Fallback a mock data si la API falla
-      setSuppliers([
-        { id: 'mock-1', name: 'Distribuidora Central (Error Fallback)', contact_person: 'Juan Pérez', email: 'juan@distcentral.com', rating: 4.5, is_active: true, created_at: '', updated_at: '' },
-        { id: 'mock-2', name: 'Mercado Mayorista Sur (Error Fallback)', contact_person: 'María García', email: 'ventas@mayoristasur.com', rating: 4.2, is_active: true, created_at: '', updated_at: '' },
-        { id: 'mock-3', name: 'Panadería Industrial López (Error Fallback)', contact_person: 'Carlos López', email: 'carlos@panlopez.com', rating: 4.8, is_active: true, created_at: '', updated_at: '' }
-      ] as Supplier[]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // ============================================================================
+  // EVENT HANDLERS
+  // ============================================================================
   const handleSupplierChange = (supplierId: string) => {
-    logger.info('MaterialsStore', 'handleSupplierChange called with:', supplierId); // Debug
     if (supplierId === 'new') {
-      setShowNewSupplierForm(true);
-      updateSupplierData({ supplier_id: undefined });
+      if (onCreateNew) {
+        // Use wizard modal if callback provided
+        onCreateNew();
+      } else {
+        // Fallback to inline form
+        setShowNewSupplierForm(true);
+        updateSupplierData({ supplier_id: undefined });
+      }
     } else {
       setShowNewSupplierForm(false);
       updateSupplierData({ supplier_id: supplierId, new_supplier: undefined });
     }
-    logger.info('MaterialsStore', 'State updated, supplier_id should be:', supplierId); // Debug
   };
 
   if (!isVisible) return null;
@@ -146,26 +143,17 @@ export const SupplierFields = ({
               <Box>
                 <SelectField
                   label="Proveedor"
-                  collection={useMemo(() => createListCollection({
-                    items: [
-                      ...suppliers.map(s => ({
-                        value: s.id,
-                        label: s.rating
-                          ? `${s.name} (${s.rating.toFixed(1)} ⭐)`
-                          : s.name
-                      })),
-                      { value: 'new', label: '➕ Crear nuevo proveedor' }
-                    ]
-                  }), [suppliers])}
+                  collection={supplierCollection}
                   value={supplierData.supplier_id ? [supplierData.supplier_id] : []}
                   onValueChange={(details) => {
-                    logger.info('MaterialsStore', 'Select change:', details);
                     const selectedValue = details.value?.[0] || details.value;
                     handleSupplierChange(selectedValue as string);
                   }}
-                  disabled={disabled || loading}
+                  disabled={disabled || isLoading}
                   error={fieldErrors.supplier_id}
                   placeholder="Seleccionar proveedor..."
+                  height="44px"
+                  noPortal={true}
                 />
               </Box>
 
@@ -212,6 +200,7 @@ export const SupplierFields = ({
                               value={supplierData.new_supplier?.contact_person || ''}
                               onChange={(e) => updateSupplierData({
                                 new_supplier: {
+                                  name: supplierData.new_supplier?.name || '',
                                   ...supplierData.new_supplier,
                                   contact_person: e.target.value
                                 }
@@ -234,6 +223,7 @@ export const SupplierFields = ({
                               value={supplierData.new_supplier?.email || ''}
                               onChange={(e) => updateSupplierData({
                                 new_supplier: {
+                                  name: supplierData.new_supplier?.name || '',
                                   ...supplierData.new_supplier,
                                   email: e.target.value
                                 }
@@ -258,6 +248,7 @@ export const SupplierFields = ({
                               value={supplierData.new_supplier?.phone || ''}
                               onChange={(e) => updateSupplierData({
                                 new_supplier: {
+                                  name: supplierData.new_supplier?.name || '',
                                   ...supplierData.new_supplier,
                                   phone: e.target.value
                                 }
@@ -268,6 +259,8 @@ export const SupplierFields = ({
                           </Stack>
                         </Box>
                       </Flex>
+
+
                     </Stack>
                   </CardWrapper.Body>
                 </CardWrapper>
@@ -342,6 +335,8 @@ export const SupplierFields = ({
                       })}
                       disabled={disabled}
                       placeholder="Calificar calidad..."
+                      height="44px"
+                      noPortal={true}
                     />
                   </Box>
                 </Flex>
@@ -361,4 +356,8 @@ export const SupplierFields = ({
       </CardWrapper.Body>
     </CardWrapper>
   );
-};
+});
+
+// ✅ Already wrapped with memo in the component definition above
+export default SupplierFields;
+SupplierFields.displayName = 'SupplierFields';

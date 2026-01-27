@@ -11,7 +11,7 @@
 // - Service Worker caching interferes with hot reloading
 // - Causes 408 timeout errors on Vite dev server resources
 
-const CACHE_NAME = 'g-admin-mini-v3.1.1'; // Updated for CSP fix
+const CACHE_NAME = 'g-admin-mini-v3.1.2'; // Updated: Skip external APIs (Georef, USIG, Nominatim)
 const OFFLINE_URL = '/offline.html';
 
 // Critical assets to cache
@@ -23,7 +23,7 @@ const STATIC_ASSETS = [
 
 // Install Event - Cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing G-Admin Mini Service Worker v3.1.1');
+  console.log('[SW] Installing G-Admin Mini Service Worker v3.1.2');
 
   // Force immediate activation (skip waiting)
   self.skipWaiting();
@@ -54,7 +54,7 @@ self.addEventListener('install', (event) => {
 
 // Activate Event - Clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating G-Admin Mini Service Worker v3.1.1');
+  console.log('[SW] Activating G-Admin Mini Service Worker v3.1.2');
 
   // Take control of all clients immediately
   event.waitUntil(self.clients.claim());
@@ -99,6 +99,21 @@ self.addEventListener('fetch', (event) => {
   // Skip Google Fonts (always fetch fresh to respect CSP)
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     return;
+  }
+
+  // 🚨 CRITICAL: Skip external APIs (INDUSTRY STANDARD)
+  // Service Workers should NEVER intercept third-party APIs
+  // Refs: Workbox patterns, next-pwa, Vite PWA
+  const externalAPIs = [
+    'apis.datos.gob.ar',              // Georef AR
+    'servicios.usig.buenosaires.gob.ar', // USIG Buenos Aires
+    'nominatim.openstreetmap.org',    // Nominatim
+    'tile.openstreetmap.org',         // OpenStreetMap tiles
+  ];
+
+  if (externalAPIs.some(domain => url.hostname.includes(domain))) {
+    console.log(`[SW] Bypassing external API: ${url.hostname}`);
+    return; // Let browser handle it directly
   }
 
   // 🚨 CRITICAL: Skip Vite HMR resources (development mode detection)

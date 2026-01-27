@@ -17,6 +17,9 @@ import {
 import { useCheckout } from './hooks/useCheckout';
 import { checkoutService } from '@/modules/sales/ecommerce/services/checkoutService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMercadoPagoCheckout } from '@/modules/finance-integrations/hooks/useMercadoPagoCheckout';
+import { useActivePaymentMethods } from '@/modules/finance-integrations/hooks/usePayments';
+import { useCart } from '@/modules/sales/ecommerce/hooks/useCart';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -31,6 +34,18 @@ export default function CheckoutPage() {
     goToPreviousStep,
     updateCheckoutData,
   } = useCheckout();
+
+  // Load payment methods to determine if selected method requires gateway
+  const { data: paymentMethods } = useActivePaymentMethods();
+
+  // Load user's cart for Mercado Pago checkout
+  const { cart } = useCart({
+    customerId: user?.id,
+    autoLoad: true,
+  });
+
+  // Mercado Pago checkout hook
+  const { checkoutWithCart: mercadoPagoCheckout, isProcessing: isMercadoPagoProcessing } = useMercadoPagoCheckout();
 
   // Redirect if not logged in
   if (!user) {
@@ -56,21 +71,69 @@ export default function CheckoutPage() {
       setIsProcessing(true);
       setError(null);
 
-      const result = await checkoutService.processCheckout({
-        customerId: user.id,
-        deliveryAddressId: checkoutData.deliveryAddressId,
-        paymentMethod: checkoutData.paymentMethod,
-      });
+      // Find selected payment method details
+      const selectedMethod = paymentMethods?.find(
+        (m) => m.code === checkoutData.paymentMethod
+      );
 
-      if (!result.success || !result.order) {
-        throw new Error(result.error || 'Failed to place order');
+      // Check if payment method requires gateway (Mercado Pago, Stripe, etc.)
+      const requiresGateway = selectedMethod?.requires_gateway || false;
+
+      if (requiresGateway) {
+        // ============================================
+        // MERCADO PAGO CHECKOUT FLOW
+        // ============================================
+
+        // Validate cart exists and has items
+        if (!cart || !cart.items || cart.items.length === 0) {
+          throw new Error('Cart is empty. Please add items to your cart.');
+        }
+
+        // Transform cart items to Mercado Pago format
+        const cartItems = cart.items.map((item) => ({
+          id: item.product_id,
+          name: item.product_name || `Product ${item.product_id}`,
+          price: item.price,
+          quantity: item.quantity,
+        }));
+
+        // Get customer info (optional)
+        const customerInfo = {
+          email: user.email,
+          name: user.user_metadata?.full_name || user.email,
+        };
+
+        // Process checkout with Mercado Pago
+        const success = await mercadoPagoCheckout(cartItems, customerInfo);
+
+        if (!success) {
+          throw new Error('Failed to initiate Mercado Pago checkout');
+        }
+
+        // Note: If successful, user will be redirected to Mercado Pago
+        // They will return to /app/checkout/success or /app/checkout/failure
+
+      } else {
+        // ============================================
+        // TRADITIONAL CHECKOUT FLOW (Cash, etc.)
+        // ============================================
+
+        const result = await checkoutService.processCheckout({
+          customerId: user.id,
+          deliveryAddressId: checkoutData.deliveryAddressId,
+          paymentMethod: checkoutData.paymentMethod,
+        });
+
+        if (!result.success || !result.order) {
+          throw new Error(result.error || 'Failed to place order');
+        }
+
+        // Update checkout data with order ID
+        updateCheckoutData({ orderId: result.order.id });
+
+        // Move to confirmation step
+        goToNextStep();
       }
-
-      // Update checkout data with order ID
-      updateCheckoutData({ orderId: result.order.id });
-
-      // Move to confirmation step
-      goToNextStep();
     } catch (err) {
       console.error('Error placing order:', err);
       setError(err instanceof Error ? err.message : 'Failed to place order');
@@ -163,7 +226,7 @@ export default function CheckoutPage() {
             onPaymentMethodSelect={handlePaymentMethodSelect}
             onNext={handlePlaceOrder}
             onBack={goToPreviousStep}
-            isProcessing={isProcessing}
+            isProcessing={isProcessing || isMercadoPagoProcessing}
           />
         )}
 

@@ -38,7 +38,7 @@ import { PickupQueue } from '@/modules/fulfillment/pickup/components';
 import { PickupConfirmation } from '@/modules/fulfillment/pickup/components';
 import { logger } from '@/lib/logging';
 import { notify } from '@/lib/notifications';
-import { usePermissions } from '@/hooks/usePermissions';
+import { usePermissions } from '@/hooks';
 
 export default function PickupOrdersPage() {
   const [refreshTrigger, setRefreshTrigger] = React.useState(0);

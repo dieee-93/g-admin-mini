@@ -28,7 +28,11 @@
 // Importing 'react-scan' before React causes Emotion initialization errors in production builds
 // This is because scan() modifies React's internals and Terser minification breaks the order
 
-if (import.meta.env.DEV && typeof window !== 'undefined') {
+// 🎯 PLAYWRIGHT FIX: Disable React Scan during E2E tests for performance
+// React Scan causes massive FPS drops (60 FPS → 3 FPS) in headed mode
+const isPlaywrightTest = typeof navigator !== 'undefined' && navigator.webdriver;
+
+if (import.meta.env.DEV && typeof window !== 'undefined' && !isPlaywrightTest) {
   // 🔍 DEBUG: Track how many times this module loads
   if (!window.__WDYR_LOAD_COUNT__) {
     window.__WDYR_LOAD_COUNT__ = 0;
@@ -148,9 +152,14 @@ if (import.meta.env.DEV && typeof window !== 'undefined') {
   }).catch(error => {
     console.error('❌ [React Scan] Failed to initialize:', error);
   });
+} else if (isPlaywrightTest) {
+  // Playwright E2E tests - React Scan disabled for performance
+  console.log('ℹ️ [WDYR] Disabled - Using React Scan instead (better for visual debugging)');
+  console.log('🎭 [Playwright] React Scan disabled to maintain 60 FPS (was causing 3 FPS drop)');
+  console.log('💡 React Scan only runs in manual dev mode for debugging re-renders');
 } else {
   // Production mode - React Scan is disabled
-  console.log('ℹ️ [React Scan] Disabled in production mode');
+  console.log('ℹ️ [WDYR] Disabled - Using React Scan instead (better for visual debugging and API compatibility)');
   console.log('💡 For production monitoring, see: https://react-scan.com/monitoring');
 }
 

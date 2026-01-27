@@ -43,7 +43,7 @@ export const MaterialsGrid: React.FC<MaterialsGridProps> = ({ onEdit, onView, on
 
   if (loading) {
     return (
-      <Section variant="flat">
+      <Section variant="flat" data-testid="materials-grid-loading">
         <CardGrid columns={{ base: 1, md: 2, lg: 3 }}>
           {Array.from({ length: 6 }, (_, i) => (
             <div key={i} style={{ padding: '1rem', borderRadius: '8px', backgroundColor: 'var(--colors-bg-subtle)' }}>
@@ -60,7 +60,7 @@ export const MaterialsGrid: React.FC<MaterialsGridProps> = ({ onEdit, onView, on
 
   if (itemsWithStatus.length === 0) {
     return (
-      <Section variant="flat">
+      <Section variant="flat" data-testid="materials-grid-empty">
         <div style={{ padding: '2rem', textAlign: 'center' }}>
           <Stack align="center" gap="md">
             <Icon icon={CubeIcon} size="xl" color="gray.400" />
@@ -75,11 +75,12 @@ export const MaterialsGrid: React.FC<MaterialsGridProps> = ({ onEdit, onView, on
   }
 
   return (
-    <Section variant="flat">
+    <Section variant="flat" data-testid="materials-grid">
       <CardGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }}>
         {itemsWithStatus.map(({ item, status, displayUnit, minStock, totalValue }) => (
           <MaterialCard
             key={item.id}
+            data-testid={`material-card-${item.id}`}
             item={item}
             status={status}
             displayUnit={displayUnit}

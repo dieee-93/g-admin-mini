@@ -56,8 +56,8 @@ export const kitchenManifest: LinkModuleManifest = {
   depends: ['sales', 'materials'],
 
   /**
-   * CRITICAL: Link modules MUST have autoInstall: true
-   * They activate automatically when all dependencies are available
+   * CRITICAL: Link modules activate when their activation feature is active
+   * This module activates automatically when production_display_system feature is enabled
    */
   // ============================================
   // FEATURE REQUIREMENTS
@@ -468,9 +468,9 @@ export interface KitchenAPI {
 /**
  * LINK MODULE PATTERN - KEY CONCEPTS:
  *
- * 1. AUTO-INSTALLATION:
- *    - autoInstall: true
- *    - Activates when ALL dependencies are available
+ * 1. AUTOMATIC ACTIVATION:
+ *    - activatedBy: 'production_display_system'
+ *    - Activates when the activation feature is active
  *    - No manual activation needed
  *
  * 2. DEPENDENCY COUPLING:
@@ -492,8 +492,8 @@ export interface KitchenAPI {
  * USAGE EXAMPLE:
  *
  * ```typescript
- * // User activates sales and materials features in setup
- * // Kitchen module auto-installs (autoInstall: true)
+ * // User activates production_display_system feature in setup
+ * // Kitchen module activates automatically (activatedBy: 'production_display_system')
  * // No manual intervention needed!
  *
  * // Access kitchen API from another module

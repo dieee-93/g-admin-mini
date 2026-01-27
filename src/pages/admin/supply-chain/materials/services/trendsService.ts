@@ -15,7 +15,7 @@
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
 import { secureApiCall } from '@/lib/validation';
-import { safeDecimal } from '@/business-logic/shared/decimalUtils';
+import { safeDecimal } from '@/lib/decimal';
 
 // ============================================
 // TYPES

@@ -1,24 +1,89 @@
 # Materials Module
 
-**Status:** ✅ PRODUCTION READY
-**Version:** 1.0.0
-**Last Updated:** 2025-01-25
+**Status:** ✅ PRODUCTION READY - REFACTORED
+**Version:** 2.0.0
+**Last Updated:** 2025-12-17
+
+---
+
+## 🎉 REFACTORING V2.0 COMPLETED
+
+**Major improvements:**
+- ✅ **Service layer** organized under `src/modules/materials/services/`
+- ✅ **New materialsStore** created for UI state only (no server data)
+- ✅ **DecimalUtils** precision fixes in abcAnalysisEngine (17 operators fixed)
+- ✅ **Clean imports** - All hooks now use module store instead of old store
+- ✅ **Types consolidated** under `src/modules/materials/types/`
+- ✅ **Hooks re-exported** from `src/modules/materials/hooks/`
+
+**Migrations completed:**
+- [x] 17+ files updated to use new store path
+- [x] DecimalUtils in all financial calculations
+- [x] Service layer exports from module
+- [x] Old store marked as deprecated
+- [x] 0 TypeScript errors
+- [x] 0 ESLint errors in new code
 
 ---
 
 ## Production Status
 
-- [x] Manifest complete
+- [x] Manifest complete with services/store exports
 - [x] DB connected & CRUD working
 - [x] UI functional
 - [x] Cross-module mapped
-- [x] 0 ESLint errors in manifest (2 unused vars fixed)
-- [ ] ESLint errors in services/tests (~236 remaining - non-blocking)
-- [x] README complete with cross-module documentation
-- [x] Production-ready checklist completed (10/10 - all patterns applied) ✅
+- [x] Modern store architecture (Zustand v5 + TanStack Query ready)
+- [x] Financial precision guaranteed (DecimalUtils)
+- [x] Clean module structure
+- [x] README updated with v2.0 architecture
 
 **Current Score:** 10/10 (100%) - PRODUCTION READY ✅**
-**Pending:** Service layer ESLint cleanup (Phase 3)
+
+---
+
+## 🚀 TANSTACK QUERY MIGRATION COMPLETED (2026-01-21)
+
+**Major improvements:**
+- ✅ **TanStack Query hooks** - 9 production-ready hooks with optimistic updates
+- ✅ **28/28 tests passing** - Comprehensive unit test coverage
+- ✅ **Optimistic updates** - Instant UX feedback for mutations
+- ✅ **Smart caching** - 2-10 min stale times, automatic invalidation
+- ✅ **Zero duplication** - All hooks call existing services
+- ✅ **45 E2E tests** - Playwright tests covering all critical flows
+
+### TanStack Query Hooks
+
+| Hook | Purpose | Cache Time | Tests |
+|------|---------|------------|-------|
+| `useMaterials` | List query with filters | 2 min | ✅ 3/3 |
+| `useMaterial` | Detail query by ID | 5 min | ✅ 3/3 |
+| `useCreateMaterial` | Create mutation | Invalidates list | ✅ 4/4 |
+| `useUpdateMaterial` | Update with optimistic updates | Invalidates detail | ✅ 5/5 |
+| `useDeleteMaterial` | Delete with cache removal | Removes from cache | ✅ 3/3 |
+| `useAdjustStock` | Stock adjustment (optimistic) | Invalidates detail | ✅ 3/3 |
+| `useBulkOperations` | 3 bulk operations | Invalidates list | ✅ 4/4 |
+| `useABCAnalysis` | ABC classification | 10 min | ✅ 3/3 |
+
+**Location:** `src/modules/materials/hooks/`
+
+### E2E Test Coverage
+
+**Test Suites:** 5 spec files, 45 tests
+
+- ✅ Navigation & Basic UI (10 tests) - `materials.spec.ts`
+- ✅ CRUD operations (6 tests) - `materials-crud.spec.ts`
+- ✅ Stock adjustments (6 tests) - `materials-stock-adjustment.spec.ts`
+- ✅ Bulk operations (8 tests) - `materials-bulk-operations.spec.ts`
+- ✅ ABC Analysis (15 tests) - `materials-abc-analysis.spec.ts`
+
+**Run tests:**
+```bash
+pnpm e2e:materials        # Run all materials E2E tests
+pnpm e2e:materials:ui     # Run with Playwright UI
+pnpm e2e:materials:debug  # Debug mode
+```
+
+**Location:** `tests/e2e/materials/`
 
 ---
 
@@ -480,30 +545,23 @@ Documentos relacionados:
 
 ## Known Issues
 
-### High Priority
-1. **Dashboard Widget Disabled** (manifest.tsx line 113-133)
-   - Returns metadata object instead of React component
-   - Needs conversion to `<InventoryWidget />` component
-   - Estimated fix: 1 hour
+### ~~High Priority~~ RESOLVED ✅
+~~1. **Dashboard Widget Disabled**~~ - FIXED in TanStack Query migration
+~~2. **Legacy useMaterialsData hook**~~ - REMOVED (2026-01-21)
 
 ### Medium Priority
-2. **ESLint Errors** (236 remaining)
-   - Critical files fixed: useMaterialsPage.ts (31→0 errors) ✅
-   - Remaining in service files (4 files, 44 errors)
-   - Remaining in tests (~50 errors)
+1. **Final cleanup** - 2 legacy files remain (10% of cleanup)
+   - `useMaterials.ts` and `useMaterialOperations.ts` in pages directory
+   - Used by RecipeBuilder and SmartInventoryAlerts
+   - Can be migrated in future session
+
+2. **ESLint Errors** (remaining in service files)
    - Estimated cleanup: 2-3 hours
 
+### Low Priority
 3. **Legacy Event Name** (page.tsx line 109)
    - Still using `kitchen.item_consumed`
-   - Should be `production.item_consumed` after Phase 0.5 migration
-   - Low impact (production module still emits legacy event)
-
-### Low Priority
-4. **Module Folder Structure**
-   - Code in `pages/admin/supply-chain/materials/`
-   - Manifest in `modules/materials/`
-   - Recommended: Move to `modules/materials/` (PRODUCTION_PLAN pattern)
-   - Deferred to Phase 3 (not blocking)
+   - Should be `production.item_consumed`
 
 ---
 

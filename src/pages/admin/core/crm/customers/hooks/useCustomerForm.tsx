@@ -7,7 +7,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
-import { useCustomerValidation } from '@/hooks/useCustomerValidation';
+import { useCustomerValidation } from '@/modules/customers/hooks';
 import type { CustomerFormData } from '@/lib/validation/zod/CommonSchemas';
 
 export interface Customer {

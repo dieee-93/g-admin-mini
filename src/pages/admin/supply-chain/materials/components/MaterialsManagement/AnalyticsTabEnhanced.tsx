@@ -1,15 +1,24 @@
 import { Stack, Typography, Badge, CardGrid, MetricCard } from '@/shared/ui';
 import { ChartBarIcon, CurrencyDollarIcon, CubeIcon } from '@heroicons/react/24/outline';
-import { useMaterialsComputed } from '../../hooks/useMaterialsComputed';
-import { formatCurrency, formatPercentage } from '@/business-logic/shared/decimalUtils';
+import { useMaterials } from '@/modules/materials/hooks';
+import { formatCurrency, formatPercentage } from '@/lib/decimal';
 
 // Import chart components
 import { ChartCard, PieChart, BarChart, LineChart } from '../MaterialsCharts';
 import type { PieChartDataPoint, BarChartDataPoint, LineChartDataPoint } from '../MaterialsCharts';
 
 export function AnalyticsTabEnhanced() {
-  const { getFilteredItems } = useMaterialsComputed();
-  const materials = getFilteredItems();
+  const { data: materials = [], isLoading } = useMaterials();
+
+  if (isLoading) {
+    return (
+      <Stack direction="column" gap="xl" data-testid="abc-chart">
+        <Typography variant="body" color="gray.500">
+          Cargando análisis ABC...
+        </Typography>
+      </Stack>
+    );
+  }
 
   // Calculate ABC analysis
   const totalValue = materials.reduce((sum, item) => sum + (item.stock * (item.unit_cost || 0)), 0);
@@ -57,7 +66,7 @@ export function AnalyticsTabEnhanced() {
   });
 
   return (
-    <Stack direction="column" gap="xl">
+    <Stack direction="column" gap="xl" data-testid="abc-chart">
       {/* Title */}
       <Typography variant="heading" size="lg">
         Analytics & Análisis ABC ({materials.length} items)
@@ -75,6 +84,7 @@ export function AnalyticsTabEnhanced() {
             value: totalValue > 0 ? (valueA / totalValue) * 100 : 0,
             isPositive: true
           }}
+          data-testid="category-A"
         />
         <MetricCard
           title="Clase B - Valor Medio"
@@ -86,6 +96,7 @@ export function AnalyticsTabEnhanced() {
             value: totalValue > 0 ? (valueB / totalValue) * 100 : 0,
             isPositive: true
           }}
+          data-testid="category-B"
         />
         <MetricCard
           title="Clase C - Bajo Valor"
@@ -97,6 +108,7 @@ export function AnalyticsTabEnhanced() {
             value: totalValue > 0 ? (valueC / totalValue) * 100 : 0,
             isPositive: true
           }}
+          data-testid="category-C"
         />
       </CardGrid>
 

@@ -12,7 +12,7 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { SalesIntelligenceEngine } from '@/pages/admin/operations/sales/services/SalesIntelligenceEngine';
 import type { SalesAnalysisData } from '@/pages/admin/operations/sales/services/SalesIntelligenceEngine';
 

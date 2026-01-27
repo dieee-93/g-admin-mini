@@ -12,7 +12,7 @@ import {
   ClockIcon,
   BanknotesIcon,
 } from '@heroicons/react/24/outline';
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency } from '@/lib/decimal';
 import type { CashPageMetrics } from '../hooks/useCashPage';
 
 interface CashMetricsProps {

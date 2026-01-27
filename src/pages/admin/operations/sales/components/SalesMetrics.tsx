@@ -1,14 +1,10 @@
 import React, { memo, useCallback } from 'react';
-import { StatsSection, CardGrid, MetricCard } from '@/shared/ui';
+import { StatsSection, CardGrid, MetricCard, HStack } from '@/shared/ui';
+import { HookPoint } from '@/lib/modules';
 import {
   CurrencyDollarIcon,
   CreditCardIcon,
   ArrowTrendingUpIcon,
-  TableCellsIcon,
-  ClockIcon,
-  UsersIcon,
-  DocumentTextIcon,
-  ChartBarIcon
 } from '@heroicons/react/24/outline';
 import type { SalesPageMetrics } from '../hooks/useSalesPage';
 
@@ -19,18 +15,25 @@ interface SalesMetricsProps {
 }
 
 /**
- * PERFORMANCE OPTIMIZATION:
- * Using useCallback for onClick handlers prevents MetricCard re-renders when parent updates.
- * Without useCallback: inline arrow functions create new references every render → memo() fails
- * With useCallback: stable function references → memo() prevents unnecessary re-renders
- * Pattern from React.dev: https://react.dev/reference/react/useCallback
- * Expected impact: 60-80% reduction in re-renders
+ * SalesMetrics - Simplified Core Metrics
+ * 
+ * Shows 3 core metrics that are ALWAYS visible:
+ * - Revenue Hoy
+ * - Transacciones
+ * - Ticket Promedio
+ * 
+ * Additional capability-specific metrics are injected via HookPoint:
+ * - Onsite module: Mesas Activas, Ocupación
+ * - Delivery module: En Ruta, Tiempo Entrega
  */
-export const SalesMetrics = memo(function SalesMetrics({ metrics, onMetricClick, loading }: SalesMetricsProps) {
+export const SalesMetrics = memo(function SalesMetrics({
+  metrics,
+  onMetricClick,
+  loading
+}: SalesMetricsProps) {
   // Stable handlers using useCallback - prevents MetricCard re-renders
   const handleRevenueClick = useCallback(() => {
     onMetricClick?.('revenue', metrics.todayRevenue);
-SalesMetrics.displayName = 'SalesMetrics';
   }, [onMetricClick, metrics.todayRevenue]);
 
   const handleTransactionsClick = useCallback(() => {
@@ -41,31 +44,11 @@ SalesMetrics.displayName = 'SalesMetrics';
     onMetricClick?.('averageOrder', metrics.averageOrderValue);
   }, [onMetricClick, metrics.averageOrderValue]);
 
-  const handleActiveTablesClick = useCallback(() => {
-    onMetricClick?.('activeTables', metrics.activeTables);
-  }, [onMetricClick, metrics.activeTables]);
-
-  const handlePendingOrdersClick = useCallback(() => {
-    onMetricClick?.('pendingOrders', metrics.pendingOrders);
-  }, [onMetricClick, metrics.pendingOrders]);
-
-  const handleServiceTimeClick = useCallback(() => {
-    onMetricClick?.('serviceTime', metrics.averageServiceTime);
-  }, [onMetricClick, metrics.averageServiceTime]);
-
-  const handleProfitMarginClick = useCallback(() => {
-    onMetricClick?.('profitMargin', metrics.profitMargin);
-  }, [onMetricClick, metrics.profitMargin]);
-
-  const handleOccupancyClick = useCallback(() => {
-    onMetricClick?.('occupancy', metrics.tableOccupancy);
-  }, [onMetricClick, metrics.tableOccupancy]);
-
   if (loading) {
     return (
       <StatsSection>
-        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }}>
-          {[1, 2, 3, 4].map((i) => (
+        <CardGrid columns={{ base: 1, sm: 3 }}>
+          {[1, 2, 3].map((i) => (
             <MetricCard
               key={i}
               title="Cargando..."
@@ -82,7 +65,8 @@ SalesMetrics.displayName = 'SalesMetrics';
 
   return (
     <StatsSection>
-      <CardGrid columns={{ base: 1, sm: 2, lg: 4 }}>
+      {/* Core Metrics - Always visible (3 cards) */}
+      <CardGrid columns={{ base: 1, sm: 3 }}>
         <MetricCard
           title="Revenue Hoy"
           value={`$${metrics.todayRevenue.toLocaleString('es-AR')}`}
@@ -92,7 +76,7 @@ SalesMetrics.displayName = 'SalesMetrics';
           onClick={handleRevenueClick}
         />
         <MetricCard
-          title="Transacciones Activas"
+          title="Transacciones"
           value={metrics.todayTransactions}
           icon={CreditCardIcon}
           colorPalette="blue"
@@ -105,45 +89,16 @@ SalesMetrics.displayName = 'SalesMetrics';
           colorPalette="purple"
           onClick={handleAverageOrderClick}
         />
-        <MetricCard
-          title="Mesas Activas"
-          value={metrics.activeTables}
-          icon={TableCellsIcon}
-          colorPalette="teal"
-          onClick={handleActiveTablesClick}
-        />
-
-        {/* Segunda fila - Métricas operacionales */}
-        <MetricCard
-          title="Órdenes Pendientes"
-          value={metrics.pendingOrders}
-          icon={ClockIcon}
-          colorPalette="orange"
-          onClick={handlePendingOrdersClick}
-        />
-        <MetricCard
-          title="Tiempo Servicio"
-          value={`${metrics.averageServiceTime} min`}
-          icon={UsersIcon}
-          colorPalette="cyan"
-          onClick={handleServiceTimeClick}
-        />
-        <MetricCard
-          title="Margen Ganancia"
-          value={`${metrics.profitMargin.toFixed(1)}%`}
-          icon={ChartBarIcon}
-          colorPalette="green"
-          trend={{ value: metrics.profitMargin, isPositive: metrics.profitMargin > 0 }}
-          onClick={handleProfitMarginClick}
-        />
-        <MetricCard
-          title="Ocupación Mesas"
-          value={`${metrics.tableOccupancy.toFixed(1)}%`}
-          icon={DocumentTextIcon}
-          colorPalette="purple"
-          onClick={handleOccupancyClick}
-        />
       </CardGrid>
+
+      {/* Dynamic Metrics - Injected by capability modules via HookPoint */}
+      <HookPoint
+        name="sales.metrics.additional"
+        data={{ metrics, onMetricClick }}
+        fallback={null}
+      />
     </StatsSection>
   );
 });
+
+SalesMetrics.displayName = 'SalesMetrics';

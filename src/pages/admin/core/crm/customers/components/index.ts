@@ -8,8 +8,7 @@ export * from './CustomerForm';
 export * from './CustomerAnalytics';
 
 // Customer Address Components
-export { CustomerAddressManager } from './CustomerAddressManager';
-export { CustomerAddressFormModal } from './CustomerAddressFormModal';
+export { CustomerAddressManager, AddressFormModal, AddressMapPreview } from './AddressManager';
 
 // Dashboard Widget
 export { CustomersWidget } from './CustomersWidget';

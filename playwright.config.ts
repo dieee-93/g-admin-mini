@@ -42,14 +42,33 @@ export default defineConfig({
     // Screenshot on failure
     screenshot: 'only-on-failure',
     
-    // Video on failure
-    video: 'retain-on-failure',
+    // 🎯 PERFORMANCE: Disable video recording (heavy overhead)
+    // Video recording can reduce FPS from 60 to 3-5 FPS
+    // Enable only when debugging: video: 'retain-on-failure'
+    video: 'off',
     
     // Maximum time each action can take (10 seconds)
     actionTimeout: 10 * 1000,
     
     // Navigation timeout (15 seconds)
     navigationTimeout: 15 * 1000,
+    
+    // 🎯 Disable animations for stable element detection
+    // Chakra UI animations prevent Playwright from detecting "stable" state
+    // This reduces test time from 25-30s to 5-8s per test
+    stylePath: './tests/e2e/disable-animations.css',
+    
+    // 🎯 PERFORMANCE: Launch options for better performance
+    launchOptions: {
+      args: [
+        '--disable-blink-features=AutomationControlled',
+        '--enable-gpu',
+        '--ignore-gpu-blocklist',
+        '--enable-accelerated-2d-canvas',
+        '--disable-dev-shm-usage',
+        '--no-sandbox',
+      ],
+    },
   },
 
   // 🎯 Visual Testing Configuration

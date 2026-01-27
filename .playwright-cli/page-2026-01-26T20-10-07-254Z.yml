@@ -1,0 +1,5 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - img [ref=e8]
+    - paragraph [ref=e11]: G-Admin Mini
+  - paragraph [ref=e16]: Verificando autenticación...

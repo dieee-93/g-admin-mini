@@ -197,9 +197,10 @@ async function validateArchitecture(): Promise<ValidationResult> {
   console.log();
 
   // ============================================
-  // STEP 3: Check MODULE_FEATURE_MAP
+  // STEP 3: Check MODULE_FEATURE_MAP (DEPRECATED in v3.0)
   // ============================================
-  console.log('🗺️  Step 3: Validating MODULE_FEATURE_MAP...');
+  console.log('🗺️  Step 3: Validating MODULE_FEATURE_MAP (deprecated - now auto-generated)...');
+  console.log('   ℹ️  NOTE: v3.0 uses getDynamicModuleFeatureMap() - this validates legacy map only');
 
   const moduleFeatureMapMatch = featureRegistryContent.match(/export const MODULE_FEATURE_MAP[^{]*\{([\s\S]*?)\n\};/);
   const referencedInModuleMap = new Set<string>();
@@ -233,11 +234,12 @@ async function validateArchitecture(): Promise<ValidationResult> {
       });
     }
 
-    console.log(`   ✓ Found ${referencedInModuleMap.size} features in MODULE_FEATURE_MAP`);
+    console.log(`   ✓ Found ${referencedInModuleMap.size} features in MODULE_FEATURE_MAP (legacy)`);
+    console.log(`   ℹ️  Use getDynamicModuleFeatureMap() for current mappings`);
   } else {
     warnings.push({
       type: 'missing_activation',
-      message: 'MODULE_FEATURE_MAP not found in FeatureRegistry.ts',
+      message: 'MODULE_FEATURE_MAP not found (OK if using v3.0 dynamic generation)',
       location: 'FeatureRegistry.ts'
     });
   }

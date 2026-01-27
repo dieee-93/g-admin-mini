@@ -7,3 +7,4 @@ export * from './chartOfAccountsService';
 export * from './moneyLocationsService';
 export * from './cashSessionService';
 export * from './journalService';
+export * from './taxCalculationService';

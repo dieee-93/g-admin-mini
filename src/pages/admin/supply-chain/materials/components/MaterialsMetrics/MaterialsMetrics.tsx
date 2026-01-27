@@ -1,12 +1,12 @@
 import { memo, useCallback } from 'react';
 import {
-  StatsSection, CardGrid, MetricCard
+  StatsSection, CardGrid, MetricCard, Skeleton, CardWrapper, Stack
 } from '@/shared/ui';
 import {
   CubeIcon, ExclamationTriangleIcon, CurrencyDollarIcon,
   BuildingStorefrontIcon
 } from '@heroicons/react/24/outline';
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency } from '@/lib/decimal';
 import type { MaterialsPageMetrics } from '../../hooks/useMaterialsPage';
 
 interface MaterialsMetricsProps {
@@ -22,7 +22,6 @@ export const MaterialsMetrics = memo(function MaterialsMetrics({ metrics, onMetr
   // After: onClick={handleTotalValueClick} - stable reference, only recreates if onMetricClick changes
   // Impact: ~70% reduction in unnecessary MetricCard re-renders
   const handleTotalValueClick = useCallback(() => onMetricClick('totalValue'), [onMetricClick]);
-MaterialsMetrics.displayName = 'MaterialsMetrics';
   const handleTotalItemsClick = useCallback(() => onMetricClick('totalItems'), [onMetricClick]);
   const handleCriticalClick = useCallback(() => onMetricClick('critical'), [onMetricClick]);
   const handleSuppliersClick = useCallback(() => onMetricClick('suppliers'), [onMetricClick]);
@@ -32,7 +31,19 @@ MaterialsMetrics.displayName = 'MaterialsMetrics';
       <StatsSection>
         <CardGrid columns={{ base: 1, sm: 2, lg: 4 }}>
           {Array.from({ length: 4 }).map((_, i) => (
-            <MetricCard key={i} loading />
+            <CardWrapper key={i} p={6}>
+              <Stack gap="4">
+                <Stack direction="row" justify="space-between">
+                  <Skeleton height="32px" width="32px" borderRadius="full" />
+                  <Skeleton height="20px" width="40px" />
+                </Stack>
+                <Skeleton height="40px" width="120px" />
+                <Stack gap="1">
+                  <Skeleton height="16px" width="100px" />
+                  <Skeleton height="14px" width="80px" />
+                </Stack>
+              </Stack>
+            </CardWrapper>
           ))}
         </CardGrid>
       </StatsSection>

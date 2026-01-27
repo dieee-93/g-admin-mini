@@ -2,8 +2,7 @@
 import { useState } from 'react';
 import {
   Box,
-  VStack,
-  HStack,
+  Stack,
   Text,
   Select,
   Badge,
@@ -14,9 +13,11 @@ import {
   Switch,
   Table,
   Alert,
-  createListCollection
-} from '@chakra-ui/react';
-import { Icon, CardWrapper } from '@/shared/ui/';
+  createListCollection,
+  Icon,
+  IconButton,
+  CardWrapper
+} from '@/shared/ui';
 import {
   ShieldCheckIcon,
   CogIcon,
@@ -233,9 +234,9 @@ export function ManagementSection({ viewState: _viewState, onViewStateChange: _o
               ) : (
                 <Icon icon={EyeIcon} size="md" color="var(--chakra-colors-gray-500)" />
               )}
-              <Switch.Root
+              <Switch
                 checked={showSensitiveData}
-                onCheckedChange={(details) => setShowSensitiveData(details.checked)}
+                onChange={(checked) => setShowSensitiveData(checked)}
                 size="lg"
               />
             </Stack>
@@ -307,9 +308,7 @@ export function ManagementSection({ viewState: _viewState, onViewStateChange: _o
                           <Table.Row key={payroll.employee_id}>
                             <Table.Cell>
                               <Stack direction="row" gap="2">
-                                <Avatar.Root size="xs"  >
-                                  <Avatar.Fallback name={payroll.employee_id}/>
-                                </Avatar.Root>
+                                <Avatar name={payroll.employee_id} size="xs" />
                                 <Text fontSize="sm">{payroll.employee_id}</Text>
                               </Stack>
                             </Table.Cell>
@@ -690,7 +689,7 @@ export function ManagementSection({ viewState: _viewState, onViewStateChange: _o
                                 <Text fontSize="sm" fontWeight="medium">Autenticación de 2 Factores</Text>
                                 <Text fontSize="xs" color="gray.600">Requerida para acceso HR</Text>
                               </Stack>
-                              <Switch.Root defaultChecked size="sm" />
+                              <Switch defaultChecked size="sm" />
                             </Stack>
 
                             <Stack direction="row" justify="space-between">
@@ -698,7 +697,7 @@ export function ManagementSection({ viewState: _viewState, onViewStateChange: _o
                                 <Text fontSize="sm" fontWeight="medium">Enmascarar Datos Sensibles</Text>
                                 <Text fontSize="xs" color="gray.600">Por defecto ocultar salarios</Text>
                               </Stack>
-                              <Switch.Root defaultChecked size="sm" />
+                              <Switch defaultChecked size="sm" />
                             </Stack>
 
                             <Stack direction="row" justify="space-between">
@@ -706,7 +705,7 @@ export function ManagementSection({ viewState: _viewState, onViewStateChange: _o
                                 <Text fontSize="sm" fontWeight="medium">Registro de Auditoría</Text>
                                 <Text fontSize="xs" color="gray.600">Auditar todas las acciones</Text>
                               </Stack>
-                              <Switch.Root defaultChecked size="sm" />
+                              <Switch defaultChecked size="sm" />
                             </Stack>
 
                             <Stack direction="row" justify="space-between">

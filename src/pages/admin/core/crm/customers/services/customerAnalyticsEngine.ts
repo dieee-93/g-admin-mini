@@ -8,7 +8,7 @@
 // DecimalUtils: For CLV, AOV, and revenue calculations with banking precision
 // InventoryDecimal: For inventory-related customer analytics
 // DECIMAL_CONSTANTS: For rounding and precision configuration
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { InventoryDecimal, DECIMAL_CONSTANTS } from '@/config/decimal-config';
 
 // ============================================================================

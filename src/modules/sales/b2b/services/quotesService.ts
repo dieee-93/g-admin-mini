@@ -9,7 +9,7 @@
 
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import type {
   B2BQuote,
   QuoteFormData,

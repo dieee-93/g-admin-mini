@@ -29,7 +29,7 @@ import {
   Badge,
   Heading
 } from '@/shared/ui';
-import { useValidationContext } from '@/hooks/useValidationContext';
+import { useValidationContext } from '@/hooks';
 import type { Achievement, AchievementTier, ValidationContext } from '../types';
 
 interface RequirementChecklistProps {

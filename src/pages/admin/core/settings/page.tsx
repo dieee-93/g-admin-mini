@@ -3,22 +3,26 @@
 import {
   ContentLayout, Section, FormSection, Alert, Stack, Button, HStack, Icon
 } from '@/shared/ui';
-import { CogIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { CogIcon, MagnifyingGlassIcon, ClockIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { ModuleEventUtils } from '@/shared/events/ModuleEventBus';
+import { HookPoint } from '@/lib/modules';
 import { useSettingsPage } from './hooks';
+import { useNavigate } from 'react-router-dom';
 
 // Components de configuración
-import { 
+import {
   BusinessProfileSection,
   TaxConfigurationSection,
   UserPermissionsSection,
-  SystemSection
+  SystemSection,
+  NotificationRulesSection,
 } from './components';
 import { SettingsSearch } from './components/SettingsSearch';
 import { AutoSaveIndicator, AutoSaveStatusBadge } from './components/AutoSaveIndicator';
 
 export default function SettingsPage() {
   const { isLoading, error, isDirty, metrics, handlers, icons, isSearchOpen, autoSave, settingsData } = useSettingsPage();
+  const navigate = useNavigate();
 
   if (isLoading) return <div>Cargando configuración...</div>;
   if (error) {
@@ -57,6 +61,28 @@ export default function SettingsPage() {
             </HStack>
           </HStack>
 
+          {/* 🕐 Quick Access Cards */}
+          <Stack gap="4" mb="6">
+            <Alert
+              variant="outline"
+              status="info"
+              title="Configuraciones Especializadas"
+              description="Accede a configuraciones avanzadas específicas para cada área de tu negocio"
+            />
+            {/* ✅ HookPoint: Módulos inyectan sus settings cards aquí */}
+            <HookPoint 
+              name="settings.specialized.cards" 
+              direction="row" 
+              gap="4"
+              flexWrap="wrap"
+              fallback={
+                <Alert variant="subtle" status="info">
+                  No hay configuraciones especializadas disponibles. Activa capabilities para ver más opciones.
+                </Alert>
+              }
+            />
+          </Stack>
+
           <FormSection
             id="business-info"
             title="Perfil Empresarial"
@@ -79,6 +105,14 @@ export default function SettingsPage() {
             description="Gestión de roles y accesos del sistema"
           >
             <UserPermissionsSection />
+          </FormSection>
+
+          <FormSection
+            id="notification-rules"
+            title="Reglas de Notificación"
+            description="Configura cuándo y cómo recibir notificaciones del sistema"
+          >
+            <NotificationRulesSection />
           </FormSection>
 
           <FormSection

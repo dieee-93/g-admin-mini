@@ -16,7 +16,7 @@ import { useMemo, useEffect } from 'react';
 import { Box, Stack, Typography, Icon, Badge } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { CalendarIcon } from '@heroicons/react/24/outline';
-import { useScheduling } from '@/pages/admin/resources/scheduling/hooks/useScheduling';
+import { useScheduling } from '@/modules/scheduling/hooks/useScheduling';
 import { COMPONENT_TOKENS } from '@/theme/tokens';
 
 export function SchedulingWidget() {

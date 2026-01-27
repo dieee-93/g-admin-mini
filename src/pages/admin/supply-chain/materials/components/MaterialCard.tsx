@@ -6,16 +6,21 @@
  * - Demonstrates proper component extraction (DRY)
  * - Integrates permissions, theming, and hooks
  *
+ * ✅ PERFORMANCE OPTIMIZATIONS (Phase 2A):
+ * - React.memo for prevent unnecessary re-renders
+ * - useCallback for stable event handlers
+ * - displayName for better debugging
+ *
  * Usage: Used in MaterialsGrid and potentially other views
  */
 
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import {
-  Stack, Typography, Badge, Button, Alert, Icon
+  Stack, Typography, Badge, Button, Alert, Icon, Box, Flex
 } from '@/shared/ui';
 import { PencilIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { CubeIcon } from '@heroicons/react/24/outline';
-import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
+import { StockCalculation } from '@/modules/materials/services/stockCalculation';
 import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 import { isMeasurable } from '@/pages/admin/supply-chain/materials/types';
 import { HookPoint } from '@/lib/modules';
@@ -33,7 +38,7 @@ export interface MaterialCardProps {
   canDelete: boolean;
 }
 
-export const MaterialCard: React.FC<MaterialCardProps> = ({
+export const MaterialCard = memo<MaterialCardProps>(({
   item,
   status,
   displayUnit,
@@ -45,20 +50,26 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
   canUpdate,
   canDelete
 }) => {
+  // ✅ PERFORMANCE: Stable event handlers
+  const handleView = useCallback(() => onView(item), [onView, item]);
+  const handleEdit = useCallback(() => onEdit(item), [onEdit, item]);
+  const handleDelete = useCallback(() => onDelete(item), [onDelete, item]);
+  
   return (
-    <div
-      style={{
-        padding: '1rem',
-        borderRadius: '8px',
-        backgroundColor: 'var(--colors-bg-surface)',
-        boxShadow: 'var(--shadows-sm)',
-        border: '1px solid var(--colors-border-subtle)'
-      }}
+    <Box
+      p="4"
+      borderRadius="xl"
+      bg="bg.surface"
+      shadow="sm"
+      borderWidth="1px"
+      borderColor="border.subtle"
+      _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
+      transition="all 0.2s"
       tabIndex={0}
       role="article"
       aria-label={`${item.name} - ${isMeasurable(item) ? item.category : item.type.toLowerCase()}`}
     >
-      <Stack gap="sm">
+      <Stack gap="4">
         {/* Header: Name + Status Badge */}
         <Stack direction="row" justify="space-between" align="flex-start">
           <Stack gap="xs" style={{ flex: 1 }}>
@@ -116,18 +127,18 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
         )}
 
         {/* Actions */}
-        <div style={{
-          display: 'flex',
-          gap: '0.5rem',
-          paddingTop: '0.5rem',
-          borderTop: '1px solid var(--colors-border-subtle)'
-        }}>
+        <Flex
+          gap="2"
+          pt="3"
+          borderTopWidth="1px"
+          borderColor="border.subtle"
+        >
           {/* 🔓 Ver always visible (read permission assumed for viewing the list) */}
           <Button
             size="xs"
             variant="outline"
-            onClick={() => onView(item)}
-            style={{ flex: 1 }}
+            onClick={handleView}
+            flex="1"
             aria-label={`Ver ${item.name}`}
           >
             <Icon icon={EyeIcon} size="xs" />
@@ -139,8 +150,8 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
             <Button
               size="xs"
               variant="outline"
-              onClick={() => onEdit(item)}
-              style={{ flex: 1 }}
+              onClick={handleEdit}
+              flex="1"
               aria-label={`Editar ${item.name}`}
             >
               <Icon icon={PencilIcon} size="xs" />
@@ -154,7 +165,7 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
               size="xs"
               variant="outline"
               colorPalette="red"
-              onClick={() => onDelete(item)}
+              onClick={handleDelete}
               aria-label={`Eliminar ${item.name}`}
             >
               <Icon icon={TrashIcon} size="xs" />
@@ -166,13 +177,15 @@ export const MaterialCard: React.FC<MaterialCardProps> = ({
             name="materials.row.actions"
             data={{ material: item }}
             direction="row"
-            gap="0.5rem"
+            gap="2"
             fallback={null}
           />
-        </div>
+        </Flex>
       </Stack>
-    </div>
+    </Box>
   );
-};
+});
+
+MaterialCard.displayName = 'MaterialCard';
 
 export default MaterialCard;

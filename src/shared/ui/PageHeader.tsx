@@ -1,4 +1,4 @@
-import { Box, Button } from '@chakra-ui/react'
+import { Box } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
 import { Stack } from './Stack'
 import { Typography } from './Typography'

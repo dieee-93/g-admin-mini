@@ -19,7 +19,7 @@ vi.mock('@/lib/events/EventBus', () => ({
 }));
 
 // Mock database services
-vi.mock('@/services/businessProfileService', () => ({
+vi.mock('@/lib/business-profile/businessProfileService', () => ({
   loadProfileFromDB: vi.fn().mockResolvedValue(null),
   saveProfileToDB: vi.fn().mockResolvedValue(true),
   updateCompletedMilestonesInDB: vi.fn().mockResolvedValue(true),

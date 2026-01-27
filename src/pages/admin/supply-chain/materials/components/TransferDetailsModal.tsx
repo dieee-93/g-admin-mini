@@ -3,9 +3,10 @@
 // ================================================================
 // Purpose: Display transfer details and workflow actions
 // Pattern: Read-only details + action buttons based on status
+// ✅ PERFORMANCE: React.memo (Phase 2 Round 2)
 // ================================================================
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import {
   Dialog,
   Stack,
@@ -23,7 +24,7 @@ import {
   ArrowRightIcon
 } from '@heroicons/react/24/outline';
 import { TransferStatusBadge } from './TransferStatusBadge';
-import { inventoryTransfersApi } from '@/pages/admin/supply-chain/materials/services/inventoryTransfersApi';
+import { inventoryTransfersApi } from '@/modules/materials/services';
 import { notify } from '@/lib/notifications';
 import type { InventoryTransfer } from '../types/inventoryTransferTypes';
 import { format } from 'date-fns';
@@ -36,7 +37,7 @@ interface TransferDetailsModalProps {
   onSuccess: () => void;
 }
 
-export function TransferDetailsModal({
+export const TransferDetailsModal = memo<TransferDetailsModalProps>(function TransferDetailsModal({
   isOpen,
   onClose,
   transfer,
@@ -365,4 +366,6 @@ export function TransferDetailsModal({
       </Dialog.Positioner>
     </Dialog.Root>
   );
-}
+});
+
+TransferDetailsModal.displayName = 'TransferDetailsModal';

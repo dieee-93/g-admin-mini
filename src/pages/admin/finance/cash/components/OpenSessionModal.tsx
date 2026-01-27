@@ -8,7 +8,7 @@ import { Dialog } from '@/shared/ui';
 import { Button, Stack, Input, Textarea, Text } from '@chakra-ui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { MoneyLocationWithAccount, OpenCashSessionInput } from '@/modules/cash/types';
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency } from '@/lib/decimal';
 
 interface OpenSessionModalProps {
   isOpen: boolean;

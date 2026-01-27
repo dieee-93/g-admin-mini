@@ -1,17 +1,15 @@
 /**
  * CART SERVICE
- * Backend logic for shopping cart operations
+ * Business logic for shopping cart operations
  *
  * FEATURES:
  * - CRUD operations for carts
- * - Add/update/remove items
- * - Auto-calculate totals (via DB trigger)
- * - Guest cart (session_id) and customer cart (customer_id)
+ * - Add/update/remove items logic
  * - Cart migration on login
  */
 
-import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
+import { cartApi } from './cartApi';
 import type { Cart, CartItem } from '../types';
 
 export const cartService = {
@@ -20,30 +18,13 @@ export const cartService = {
    */
   async getCart(params: { customerId?: string; sessionId?: string }): Promise<Cart | null> {
     try {
-      let query = supabase.from('carts').select('*');
-
-      if (params.customerId) {
-        query = query.eq('customer_id', params.customerId);
-      } else if (params.sessionId) {
-        query = query.eq('session_id', params.sessionId);
-      } else {
-        throw new Error('Either customerId or sessionId is required');
+      const cart = await cartApi.getCart(params);
+      if (cart) {
+        logger.info('App', '✅ Retrieved cart', { cartId: cart.id });
       }
-
-      const { data, error } = await query.single();
-
-      if (error) {
-        // Cart doesn't exist yet - this is not an error
-        if (error.code === 'PGRST116') {
-          return null;
-        }
-        throw error;
-      }
-
-      logger.info('CartService', '✅ Retrieved cart', { cartId: data?.id });
-      return data as Cart;
+      return cart;
     } catch (error) {
-      logger.error('CartService', '❌ Error getting cart:', error);
+      logger.error('App', '❌ Error getting cart:', error);
       throw error;
     }
   },
@@ -57,26 +38,20 @@ export const cartService = {
     locationId?: string;
   }): Promise<Cart> {
     try {
-      const { data, error } = await supabase
-        .from('carts')
-        .insert({
-          customer_id: params.customerId || null,
-          session_id: params.sessionId || null,
-          location_id: params.locationId || null,
-          items: [],
-          subtotal: 0,
-          tax: 0,
-          total: 0,
-        })
-        .select()
-        .single();
+      const cart = await cartApi.createCart({
+        customer_id: params.customerId || null,
+        session_id: params.sessionId || null,
+        location_id: params.locationId || null,
+        items: [],
+        subtotal: 0,
+        tax: 0,
+        total: 0,
+      });
 
-      if (error) throw error;
-
-      logger.info('CartService', '✅ Created cart', { cartId: data.id });
-      return data as Cart;
+      logger.info('App', '✅ Created cart', { cartId: cart.id });
+      return cart;
     } catch (error) {
-      logger.error('CartService', '❌ Error creating cart:', error);
+      logger.error('App', '❌ Error creating cart:', error);
       throw error;
     }
   },
@@ -110,14 +85,7 @@ export const cartService = {
   ): Promise<Cart> {
     try {
       // Get current cart
-      const { data: cart, error: fetchError } = await supabase
-        .from('carts')
-        .select('items')
-        .eq('id', cartId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
+      const cart = await cartApi.getCartById(cartId);
       const currentItems = (cart.items as CartItem[]) || [];
 
       // Check if item already exists
@@ -136,20 +104,13 @@ export const cartService = {
         newItems = [...currentItems, item];
       }
 
-      // Update cart (trigger will recalculate totals)
-      const { data, error } = await supabase
-        .from('carts')
-        .update({ items: newItems })
-        .eq('id', cartId)
-        .select()
-        .single();
+      // Update cart
+      const updatedCart = await cartApi.updateCartItems(cartId, newItems);
 
-      if (error) throw error;
-
-      logger.info('CartService', '✅ Added item to cart', { cartId, productId: item.product_id });
-      return data as Cart;
+      logger.info('App', '✅ Added item to cart', { cartId, productId: item.product_id });
+      return updatedCart;
     } catch (error) {
-      logger.error('CartService', '❌ Error adding item to cart:', error);
+      logger.error('App', '❌ Error adding item to cart:', error);
       throw error;
     }
   },
@@ -160,14 +121,7 @@ export const cartService = {
   async updateItem(cartId: string, productId: string, quantity: number): Promise<Cart> {
     try {
       // Get current cart
-      const { data: cart, error: fetchError } = await supabase
-        .from('carts')
-        .select('items')
-        .eq('id', cartId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
+      const cart = await cartApi.getCartById(cartId);
       const currentItems = (cart.items as CartItem[]) || [];
 
       // Update quantity
@@ -175,20 +129,13 @@ export const cartService = {
         i.product_id === productId ? { ...i, quantity } : i
       );
 
-      // Update cart (trigger will recalculate totals)
-      const { data, error } = await supabase
-        .from('carts')
-        .update({ items: newItems })
-        .eq('id', cartId)
-        .select()
-        .single();
+      // Update cart
+      const updatedCart = await cartApi.updateCartItems(cartId, newItems);
 
-      if (error) throw error;
-
-      logger.info('CartService', '✅ Updated item in cart', { cartId, productId, quantity });
-      return data as Cart;
+      logger.info('App', '✅ Updated item in cart', { cartId, productId, quantity });
+      return updatedCart;
     } catch (error) {
-      logger.error('CartService', '❌ Error updating item in cart:', error);
+      logger.error('App', '❌ Error updating item in cart:', error);
       throw error;
     }
   },
@@ -199,33 +146,19 @@ export const cartService = {
   async removeItem(cartId: string, productId: string): Promise<Cart> {
     try {
       // Get current cart
-      const { data: cart, error: fetchError } = await supabase
-        .from('carts')
-        .select('items')
-        .eq('id', cartId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
+      const cart = await cartApi.getCartById(cartId);
       const currentItems = (cart.items as CartItem[]) || [];
 
       // Remove item
       const newItems = currentItems.filter((i) => i.product_id !== productId);
 
-      // Update cart (trigger will recalculate totals)
-      const { data, error } = await supabase
-        .from('carts')
-        .update({ items: newItems })
-        .eq('id', cartId)
-        .select()
-        .single();
+      // Update cart
+      const updatedCart = await cartApi.updateCartItems(cartId, newItems);
 
-      if (error) throw error;
-
-      logger.info('CartService', '✅ Removed item from cart', { cartId, productId });
-      return data as Cart;
+      logger.info('App', '✅ Removed item from cart', { cartId, productId });
+      return updatedCart;
     } catch (error) {
-      logger.error('CartService', '❌ Error removing item from cart:', error);
+      logger.error('App', '❌ Error removing item from cart:', error);
       throw error;
     }
   },
@@ -235,19 +168,11 @@ export const cartService = {
    */
   async clearCart(cartId: string): Promise<Cart> {
     try {
-      const { data, error } = await supabase
-        .from('carts')
-        .update({ items: [] })
-        .eq('id', cartId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      logger.info('CartService', '✅ Cleared cart', { cartId });
-      return data as Cart;
+      const updatedCart = await cartApi.updateCartItems(cartId, []);
+      logger.info('App', '✅ Cleared cart', { cartId });
+      return updatedCart;
     } catch (error) {
-      logger.error('CartService', '❌ Error clearing cart:', error);
+      logger.error('App', '❌ Error clearing cart:', error);
       throw error;
     }
   },
@@ -257,41 +182,32 @@ export const cartService = {
    */
   async deleteCart(cartId: string): Promise<void> {
     try {
-      const { error } = await supabase.from('carts').delete().eq('id', cartId);
-
-      if (error) throw error;
-
-      logger.info('CartService', '✅ Deleted cart', { cartId });
+      await cartApi.deleteCart(cartId);
+      logger.info('App', '✅ Deleted cart', { cartId });
     } catch (error) {
-      logger.error('CartService', '❌ Error deleting cart:', error);
+      logger.error('App', '❌ Error deleting cart:', error);
       throw error;
     }
   },
 
   /**
    * Migrate guest cart to customer cart on login
-   * Uses database function for atomic operation
    */
   async migrateCart(sessionId: string, customerId: string): Promise<string | null> {
     try {
-      const { data, error } = await supabase.rpc('migrate_session_cart_to_customer', {
-        p_session_id: sessionId,
-        p_customer_id: customerId,
-      });
+      const cartId = await cartApi.migrateCart(sessionId, customerId);
 
-      if (error) throw error;
-
-      if (data) {
-        logger.info('CartService', '✅ Migrated cart on login', {
+      if (cartId) {
+        logger.info('App', '✅ Migrated cart on login', {
           sessionId,
           customerId,
-          cartId: data,
+          cartId,
         });
       }
 
-      return data;
+      return cartId;
     } catch (error) {
-      logger.error('CartService', '❌ Error migrating cart:', error);
+      logger.error('App', '❌ Error migrating cart:', error);
       throw error;
     }
   },

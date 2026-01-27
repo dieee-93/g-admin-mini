@@ -16,7 +16,7 @@ import { supabase } from '@/lib/supabase/client';
 import { eventBus } from '@/lib/events';
 import { logger } from '@/lib/logging';
 import { notify } from '@/lib/notifications';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 // ============================================
 // TYPE DEFINITIONS

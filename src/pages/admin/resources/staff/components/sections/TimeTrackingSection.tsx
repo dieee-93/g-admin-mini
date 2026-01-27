@@ -4,21 +4,21 @@
 import { useState, useEffect } from 'react';
 import {
   Box,
-  VStack,
-  HStack,
-  Text,
+  Stack,
+  Typography,
   Button,
   Badge,
   Alert,
-  SimpleGrid,
   Dialog,
   Avatar,
   Progress,
   Tooltip,
   Tabs,
-  Textarea
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  Textarea,
+  CardWrapper,
+  Grid,
+  Icon
+} from '@/shared/ui';
 import {
   ClockIcon,
   PlayIcon,
@@ -144,7 +144,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
   const [offlineTimesheets, setOfflineTimesheets] = useState<TimeSheet[]>([]);
   const [offlineOperations, setOfflineOperations] = useState<OfflineTimeOperation[]>([]);
   const [currentShifts, setCurrentShifts] = useState<Map<string, TimeEntry>>(new Map());
-  
+
   // UI state
   const [activeTab, setActiveTab] = useState<'clock' | 'timesheets' | 'reports' | 'settings'>('clock');
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
@@ -170,7 +170,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
     loadOfflineOperations();
     const cleanup = setupTimeTrackingEventListeners();
     calculateTimeStats();
-    
+
     return cleanup;
   }, [isOnline]);
 
@@ -198,7 +198,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
         // Load from API when online
         // timeEntries = await timeTrackingApi.getTimeEntries();
         // timesheets = await timeTrackingApi.getTimesheets();
-        
+
         // Cache for offline use
         if (timeEntries.length > 0) {
           await cacheData('time_entries', timeEntries, 60 * 60 * 1000); // 1 hour TTL
@@ -212,7 +212,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
         const cachedSheets = await getCachedData('timesheets') || [];
         timeEntries = cachedEntries;
         timesheets = cachedSheets;
-        
+
         if (timeEntries.length > 0 || timesheets.length > 0) {
           notify.info('Showing cached time tracking data (offline mode)');
         }
@@ -221,22 +221,22 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
       // Load offline-only data and merge
       const offlineEntries = await localStorage.getAll('offline_time_entries') || [];
       const offlineSheets = await localStorage.getAll('offline_timesheets') || [];
-      
+
       setOfflineTimeEntries([...timeEntries, ...offlineEntries]);
       setOfflineTimesheets([...timesheets, ...offlineSheets]);
-      
+
       // Update current shifts
       updateCurrentShifts([...timeEntries, ...offlineEntries]);
 
     } catch (error) {
       logger.error('StaffStore', 'Error loading time tracking data:', error);
-      
+
       // Fallback to cached/offline data
       const cachedEntries = await getCachedData('time_entries') || [];
       const cachedSheets = await getCachedData('timesheets') || [];
       const offlineEntries = await localStorage.getAll('offline_time_entries') || [];
       const offlineSheets = await localStorage.getAll('offline_timesheets') || [];
-      
+
       if (cachedEntries.length > 0 || offlineEntries.length > 0) {
         setOfflineTimeEntries([...cachedEntries, ...offlineEntries]);
         setOfflineTimesheets([...cachedSheets, ...offlineSheets]);
@@ -275,7 +275,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
 
   const updateCurrentShifts = (timeEntries: TimeEntry[]) => {
     const shifts = new Map<string, TimeEntry>();
-    
+
     // Group by employee and find latest clock_in without clock_out
     const employeeEntries = timeEntries.reduce((acc, entry) => {
       if (!acc[entry.employee_id]) acc[entry.employee_id] = [];
@@ -285,16 +285,16 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
 
     Object.entries(employeeEntries).forEach(([employeeId, entries]) => {
       const sortedEntries = entries.sort((a, b) => b.timestamp - a.timestamp);
-      
+
       // Find if employee is currently clocked in
       for (const entry of sortedEntries) {
         if (entry.entry_type === 'clock_in') {
           // Check if there's a corresponding clock_out after this clock_in
-          const hasClockOut = sortedEntries.some(e => 
-            e.entry_type === 'clock_out' && 
+          const hasClockOut = sortedEntries.some(e =>
+            e.entry_type === 'clock_out' &&
             e.timestamp > entry.timestamp
           );
-          
+
           if (!hasClockOut) {
             shifts.set(employeeId, entry);
           }
@@ -309,7 +309,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
   const calculateTimeStats = () => {
     const today = new Date().toDateString();
     const thisWeek = getWeekStart(new Date());
-    
+
     let todayHours = 0;
     let weekHours = 0;
     let activeCount = 0;
@@ -320,16 +320,16 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
     // Calculate from timesheets and current shifts
     offlineTimesheets.forEach(sheet => {
       const sheetDate = new Date(sheet.date);
-      
+
       if (sheetDate.toDateString() === today) {
         todayHours += sheet.total_hours;
       }
-      
+
       if (sheetDate >= thisWeek) {
         weekHours += sheet.total_hours;
         overtimeWeek += sheet.overtime_hours;
       }
-      
+
       if (sheet.status === 'submitted') {
         pendingApprovals++;
       }
@@ -337,7 +337,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
 
     // Count active shifts
     activeCount = currentShifts.size;
-    
+
     // Count employees on break (simplified logic)
     const latestEntries = new Map<string, TimeEntry>();
     offlineTimeEntries.forEach(entry => {
@@ -427,6 +427,39 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
         // Try online first
         try {
           // await timeTrackingApi.createTimeEntry(entryData);
+
+          // Emit EventBus events for ShiftControl integration
+          const eventBus = EventBus.getInstance();
+
+          if (clockAction === 'in') {
+            await eventBus.emit('staff.employee.checked_in', {
+              employee_id: selectedEmployee.id,
+              employee_name: `${selectedEmployee.first_name} ${selectedEmployee.last_name}`,
+              checked_in_at: new Date().toISOString(),
+              shift_id: null, // Will be associated by ShiftControl based on active shift
+            });
+            logger.info('StaffModule', 'Emitted staff.employee.checked_in event', {
+              employee_id: selectedEmployee.id
+            });
+          } else if (clockAction === 'out') {
+            // Find the corresponding clock_in to calculate hours worked
+            const currentShift = currentShifts.get(selectedEmployee.id);
+            const hoursWorked = currentShift
+              ? (Date.now() - currentShift.timestamp) / (1000 * 60 * 60)
+              : 0;
+
+            await eventBus.emit('staff.employee.checked_out', {
+              employee_id: selectedEmployee.id,
+              checked_out_at: new Date().toISOString(),
+              shift_id: null, // Will be associated by ShiftControl based on active shift
+              hours_worked: Math.round(hoursWorked * 100) / 100, // Round to 2 decimals
+            });
+            logger.info('StaffModule', 'Emitted staff.employee.checked_out event', {
+              employee_id: selectedEmployee.id,
+              hours_worked: hoursWorked
+            });
+          }
+
           notify.success(`${getActionLabel(clockAction)} registered successfully`);
           handleClockDialogClose();
           return;
@@ -449,7 +482,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
   const getCurrentLocation = async (): Promise<{ latitude: number; longitude: number } | undefined> => {
     try {
       if (!navigator.geolocation) return undefined;
-      
+
       return new Promise((resolve) => {
         navigator.geolocation.getCurrentPosition(
           (position) => resolve({
@@ -482,7 +515,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
       const latestEntry = offlineTimeEntries
         .filter(entry => entry.employee_id === employeeId)
         .sort((a, b) => b.timestamp - a.timestamp)[0];
-      
+
       if (latestEntry?.entry_type === 'break_start') {
         return { status: 'on_break', label: 'On Break', color: 'yellow' };
       }
@@ -494,30 +527,30 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
   const getShiftHours = (employeeId: string) => {
     const currentShift = currentShifts.get(employeeId);
     if (!currentShift) return 0;
-    
+
     const now = Date.now();
     const shiftStart = currentShift.timestamp;
-    
+
     // Subtract break time
     const breaks = offlineTimeEntries
-      .filter(entry => 
-        entry.employee_id === employeeId && 
+      .filter(entry =>
+        entry.employee_id === employeeId &&
         entry.timestamp > shiftStart &&
         (entry.entry_type === 'break_start' || entry.entry_type === 'break_end')
       )
       .sort((a, b) => a.timestamp - b.timestamp);
-    
+
     let totalBreakTime = 0;
     for (let i = 0; i < breaks.length; i += 2) {
       const breakStart = breaks[i];
       const breakEnd = breaks[i + 1];
-      
+
       if (breakStart?.entry_type === 'break_start') {
         const breakEndTime = breakEnd?.entry_type === 'break_end' ? breakEnd.timestamp : now;
         totalBreakTime += breakEndTime - breakStart.timestamp;
       }
     }
-    
+
     const totalTime = now - shiftStart - totalBreakTime;
     return Math.max(0, totalTime / (1000 * 60 * 60)); // Convert to hours
   };
@@ -559,22 +592,22 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
       {/* Enhanced Header with Connection Status */}
       <Stack direction="row" justify="space-between" align="center">
         <Stack direction="row">
-          <Text fontSize="lg" fontWeight="semibold">Time Tracking</Text>
-          <Badge 
-            colorPalette={getConnectionStatusColor()} 
+          <Typography fontSize="lg" fontWeight="semibold">Time Tracking</Typography>
+          <Badge
+            colorPalette={getConnectionStatusColor()}
             variant="subtle"
             p={2}
           >
             <Stack direction="row" gap={1}>
-              {isOnline ? 
-                <WifiIcon className="w-3 h-3" /> : 
-                <NoSymbolIcon className="w-3 h-3" />
+              {isOnline ?
+                <Icon icon={WifiIcon} size="xs" /> :
+                <Icon icon={NoSymbolIcon} size="xs" />
               }
-              <Text fontSize="xs">
-                {!isOnline ? 'Offline' : 
-                 isConnecting ? 'Connecting...' : 
-                 `Online (${connectionQuality})`}
-              </Text>
+              <Typography fontSize="xs">
+                {!isOnline ? 'Offline' :
+                  isConnecting ? 'Connecting...' :
+                    `Online (${connectionQuality})`}
+              </Typography>
             </Stack>
           </Badge>
         </Stack>
@@ -582,14 +615,14 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
         <Stack direction="row" gap="2">
           {/* Offline Operations Indicator */}
           {offlineOperations.length > 0 && (
-            <Tooltip.Root aria-label={`${offlineOperations.length} operations pending sync` }>
+            <Tooltip.Root aria-label={`${offlineOperations.length} operations pending sync`}>
               <Button
                 variant="outline"
                 colorPalette="orange"
                 size="sm"
                 onClick={() => setShowOfflineModal(true)}
               >
-                <CircleStackIcon className="w-4 h-4" />
+                <Icon icon={CircleStackIcon} size="sm" />
                 {offlineOperations.length} Offline
               </Button>
             </Tooltip.Root>
@@ -598,7 +631,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
           {/* Sync Progress */}
           {isSyncing && (
             <Box minW="120px">
-              <Text fontSize="xs" mb={1}>Syncing...</Text>
+              <Typography fontSize="xs" mb={1}>Syncing...</Typography>
               <Progress.Root value={syncProgress} size="sm">
                 <Progress.Track>
                   <Progress.Range />
@@ -616,7 +649,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
               onClick={handleForceSyncTimeTracking}
               loading={isSyncing}
             >
-              <CloudIcon className="w-4 h-4" />
+              <Icon icon={CloudIcon} size="sm" />
               Sync ({queueSize})
             </Button>
           )}
@@ -627,7 +660,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
       {!isOnline && (
         <Alert.Root status="warning">
           <Alert.Indicator>
-            <NoSymbolIcon className="w-5 h-5" />
+            <Icon icon={NoSymbolIcon} size="md" />
           </Alert.Indicator>
           <Alert.Title>Time Tracking Offline Mode</Alert.Title>
           <Alert.Description>
@@ -637,13 +670,13 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
       )}
 
       {/* Time Tracking Stats */}
-      <SimpleGrid columns={{ base: 2, md: 4, lg: 6 }} gap="4">
+      <Grid  columns={{ base: 2, md: 4, lg: 6 }} gap="4">
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
             <Stack direction="column" gap="1">
-              <TimeIcon className="w-5 h-5 text-blue-500 mx-auto" />
-              <Text fontSize="lg" fontWeight="bold">{timeStats.today_total_hours.toFixed(1)}</Text>
-              <Text fontSize="xs" color="gray.600">Hours Today</Text>
+              <Icon icon={TimeIcon} size="md" color="blue.500" />
+              <Typography fontSize="lg" fontWeight="bold">{timeStats.today_total_hours.toFixed(1)}</Typography>
+              <Typography fontSize="xs" color="gray.600">Hours Today</Typography>
             </Stack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -651,9 +684,9 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
             <Stack direction="column" gap="1">
-              <CalendarIcon className="w-5 h-5 text-green-500 mx-auto" />
-              <Text fontSize="lg" fontWeight="bold">{timeStats.week_total_hours.toFixed(1)}</Text>
-              <Text fontSize="xs" color="gray.600">Hours This Week</Text>
+              <Icon icon={CalendarIcon} size="md" color="green.500" />
+              <Typography fontSize="lg" fontWeight="bold">{timeStats.week_total_hours.toFixed(1)}</Typography>
+              <Typography fontSize="xs" color="gray.600">Hours This Week</Typography>
             </Stack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -661,9 +694,9 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
             <Stack direction="column" gap="1">
-              <PlayIcon className="w-5 h-5 text-purple-500 mx-auto" />
-              <Text fontSize="lg" fontWeight="bold">{timeStats.active_employees}</Text>
-              <Text fontSize="xs" color="gray.600">Active Now</Text>
+              <Icon icon={PlayIcon} size="md" color="purple.500" />
+              <Typography fontSize="lg" fontWeight="bold">{timeStats.active_employees}</Typography>
+              <Typography fontSize="xs" color="gray.600">Active Now</Typography>
             </Stack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -671,9 +704,9 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
             <Stack direction="column" gap="1">
-              <PauseIcon className="w-5 h-5 text-orange-500 mx-auto" />
-              <Text fontSize="lg" fontWeight="bold">{timeStats.on_break}</Text>
-              <Text fontSize="xs" color="gray.600">On Break</Text>
+              <Icon icon={PauseIcon} size="md" color="orange.500" />
+              <Typography fontSize="lg" fontWeight="bold">{timeStats.on_break}</Typography>
+              <Typography fontSize="xs" color="gray.600">On Break</Typography>
             </Stack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -681,9 +714,9 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
             <Stack direction="column" gap="1">
-              <ArrowTrendingUpIcon className="w-5 h-5 text-red-500 mx-auto" />
-              <Text fontSize="lg" fontWeight="bold">{timeStats.overtime_this_week.toFixed(1)}</Text>
-              <Text fontSize="xs" color="gray.600">Overtime Week</Text>
+              <Icon icon={ArrowTrendingUpIcon} size="md" color="red.500" />
+              <Typography fontSize="lg" fontWeight="bold">{timeStats.overtime_this_week.toFixed(1)}</Typography>
+              <Typography fontSize="xs" color="gray.600">Overtime Week</Typography>
             </Stack>
           </CardWrapper.Body>
         </CardWrapper>
@@ -691,41 +724,41 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
         <CardWrapper size="sm">
           <CardWrapper.Body textAlign="center">
             <Stack direction="column" gap="1">
-              <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500 mx-auto" />
-              <Text fontSize="lg" fontWeight="bold">{timeStats.pending_approvals}</Text>
-              <Text fontSize="xs" color="gray.600">Pending Approval</Text>
+              <Icon icon={ExclamationTriangleIcon} size="md" color="yellow.500" />
+              <Typography fontSize="lg" fontWeight="bold">{timeStats.pending_approvals}</Typography>
+              <Typography fontSize="xs" color="gray.600">Pending Approval</Typography>
             </Stack>
           </CardWrapper.Body>
         </CardWrapper>
-      </SimpleGrid>
+      </Grid>
 
       {/* Time Tracking Tabs */}
       <CardWrapper>
         <CardWrapper.Body p="0">
           <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value as any)}>
-            <Tabs.List bg="bg.canvas" p="1" borderRadius="lg">
+            <Tabs.List bg="gray.50" p="1" borderRadius="lg">
               <Tabs.Trigger value="clock" gap="2" flex="1" minH="44px">
-                <ClockIcon className="w-5 h-5" />
-                <Text display={{ base: "none", sm: "block" }}>Clock</Text>
+                <Icon icon={ClockIcon} size="md" />
+                <Typography display={{ base: "none", sm: "block" }}>Clock</Typography>
                 {!isOnline && <Badge colorScheme="orange" size="xs">Offline</Badge>}
               </Tabs.Trigger>
-              
+
               <Tabs.Trigger value="timesheets" gap="2" flex="1" minH="44px">
-                <DocumentTextIcon className="w-5 h-5" />
-                <Text display={{ base: "none", sm: "block" }}>Timesheets</Text>
+                <Icon icon={DocumentTextIcon} size="md" />
+                <Typography display={{ base: "none", sm: "block" }}>Timesheets</Typography>
                 {timeStats.pending_approvals > 0 && (
                   <Badge colorScheme="yellow" size="xs">{timeStats.pending_approvals}</Badge>
                 )}
               </Tabs.Trigger>
-              
+
               <Tabs.Trigger value="reports" gap="2" flex="1" minH="44px">
-                <ChartBarIcon className="w-5 h-5" />
-                <Text display={{ base: "none", sm: "block" }}>Reports</Text>
+                <Icon icon={ChartBarIcon} size="md" />
+                <Typography display={{ base: "none", sm: "block" }}>Reports</Typography>
               </Tabs.Trigger>
-              
+
               <Tabs.Trigger value="settings" gap="2" flex="1" minH="44px">
-                <AdjustmentsHorizontalIcon className="w-5 h-5" />
-                <Text display={{ base: "none", sm: "block" }}>Settings</Text>
+                <Icon icon={AdjustmentsHorizontalIcon} size="md" />
+                <Typography display={{ base: "none", sm: "block" }}>Settings</Typography>
               </Tabs.Trigger>
             </Tabs.List>
 
@@ -733,34 +766,35 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
               {/* Clock Tab */}
               <Tabs.Content value="clock">
                 <Stack direction="column" gap="6" align="stretch">
-                  <Text fontSize="lg" fontWeight="semibold">Employee Clock</Text>
+                  <Typography fontSize="lg" fontWeight="semibold">Employee Clock</Typography>
 
                   {/* Current Shifts */}
-                  <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
+                  <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
                     {mockEmployees.map(employee => {
                       const status = getEmployeeStatus(employee.id);
                       const shiftHours = getShiftHours(employee.id);
-                      
+
                       return (
                         <CardWrapper key={employee.id}>
                           <CardWrapper.Body>
                             <Stack direction="column" align="stretch" gap="3">
                               <Stack direction="row" gap="3">
-                                <Avatar.Root size='sm'>
-                                  <Avatar.Fallback name={`${employee.first_name} ${employee.last_name}`}/>
-                                </Avatar.Root>
-                        
+                                <Avatar 
+                                  name={`${employee.first_name} ${employee.last_name}`}
+                                  size="sm"
+                                />
+
                                 <Stack direction="column" align="start" gap="0" flex="1">
-                                  <Text fontWeight="medium" fontSize="sm">
+                                  <Typography fontWeight="medium" fontSize="sm">
                                     {employee.first_name} {employee.last_name}
-                                  </Text>
-                                  <Text fontSize="xs" color="gray.600">
+                                  </Typography>
+                                  <Typography fontSize="xs" color="gray.600">
                                     {employee.position}
-                                  </Text>
+                                  </Typography>
                                 </Stack>
-                                <Badge 
-                                  colorPalette={status.color} 
-                                  variant="subtle" 
+                                <Badge
+                                  colorPalette={status.color}
+                                  variant="subtle"
                                   size="sm"
                                 >
                                   {status.label}
@@ -770,10 +804,10 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
                               {status.status !== 'off_duty' && (
                                 <Stack direction="column" align="stretch" gap="1">
                                   <Stack direction="row" justify="space-between">
-                                    <Text fontSize="xs" color="gray.600">Shift Time:</Text>
-                                    <Text fontSize="xs" fontWeight="medium">
+                                    <Typography fontSize="xs" color="gray.600">Shift Time:</Typography>
+                                    <Typography fontSize="xs" fontWeight="medium">
                                       {shiftHours.toFixed(1)} hrs
-                                    </Text>
+                                    </Typography>
                                   </Stack>
                                 </Stack>
                               )}
@@ -788,17 +822,17 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
                                 }}
                                 w="full"
                               >
-                                {status.status === 'off_duty' ? (
-                                  <>
-                                    <PlayIcon className="w-4 h-4" />
-                                    Clock In
-                                  </>
-                                ) : (
-                                  <>
-                                    <StopIcon className="w-4 h-4" />
-                                    Clock Out
-                                  </>
-                                )}
+                              {status.status === 'off_duty' ? (
+                                <>
+                                  <Icon icon={PlayIcon} size="sm" />
+                                  Clock In
+                                </>
+                              ) : (
+                                <>
+                                  <Icon icon={StopIcon} size="sm" />
+                                  Clock Out
+                                </>
+                              )}
                               </Button>
 
                               {status.status === 'working' && (
@@ -814,7 +848,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
                                     }}
                                     flex="1"
                                   >
-                                    <PauseIcon className="w-3 h-3" />
+                                    <Icon icon={PauseIcon} size="xs" />
                                     Break
                                   </Button>
                                 </Stack>
@@ -832,7 +866,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
                                   }}
                                   w="full"
                                 >
-                                  <PlayIcon className="w-3 h-3" />
+                                  <Icon icon={PlayIcon} size="xs" />
                                   End Break
                                 </Button>
                               )}
@@ -841,7 +875,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
                         </CardWrapper>
                       );
                     })}
-                  </SimpleGrid>
+                  </Grid>
                 </Stack>
               </Tabs.Content>
 
@@ -849,7 +883,7 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
               <Tabs.Content value="timesheets">
                 <Stack direction="column" gap="4" align="stretch">
                   <Stack direction="row" justify="space-between">
-                    <Text fontSize="lg" fontWeight="semibold">Timesheets</Text>
+                    <Typography fontSize="lg" fontWeight="semibold">Timesheets</Typography>
                     <Button size="sm" colorPalette="blue">
                       Generate Report
                     </Button>
@@ -857,9 +891,9 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
 
                   <CardWrapper>
                     <CardWrapper.Body>
-                      <Text color="gray.600" textAlign="center" py="8">
+                      <Typography color="gray.600" textAlign="center" py="8">
                         Timesheet management coming soon...
-                      </Text>
+                      </Typography>
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
@@ -868,13 +902,13 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
               {/* Reports Tab */}
               <Tabs.Content value="reports">
                 <Stack direction="column" gap="4" align="stretch">
-                  <Text fontSize="lg" fontWeight="semibold">Time Tracking Reports</Text>
+                  <Typography fontSize="lg" fontWeight="semibold">Time Tracking Reports</Typography>
 
                   <CardWrapper>
                     <CardWrapper.Body>
-                      <Text color="gray.600" textAlign="center" py="8">
+                      <Typography color="gray.600" textAlign="center" py="8">
                         Advanced reporting features coming soon...
-                      </Text>
+                      </Typography>
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
@@ -883,13 +917,13 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
               {/* Settings Tab */}
               <Tabs.Content value="settings">
                 <Stack direction="column" gap="4" align="stretch">
-                  <Text fontSize="lg" fontWeight="semibold">Time Tracking Settings</Text>
+                  <Typography fontSize="lg" fontWeight="semibold">Time Tracking Settings</Typography>
 
                   <CardWrapper>
                     <CardWrapper.Body>
-                      <Text color="gray.600" textAlign="center" py="8">
+                      <Typography color="gray.600" textAlign="center" py="8">
                         Configuration settings coming soon...
-                      </Text>
+                      </Typography>
                     </CardWrapper.Body>
                   </CardWrapper>
                 </Stack>
@@ -926,21 +960,21 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
 
                 <Stack direction="column" align="stretch" gap="3">
                   <Box>
-                    <Text fontSize="sm" fontWeight="medium" mb={2}>Action Type</Text>
-                    <Text fontSize="lg" fontWeight="bold" color="blue.600">
+                    <Typography fontSize="sm" fontWeight="medium" mb={2}>Action Type</Typography>
+                    <Typography fontSize="lg" fontWeight="bold" color="blue.600">
                       {getActionLabel(clockAction)}
-                    </Text>
+                    </Typography>
                   </Box>
 
                   <Box>
-                    <Text fontSize="sm" fontWeight="medium" mb={2}>Time</Text>
-                    <Text fontSize="lg">
+                    <Typography fontSize="sm" fontWeight="medium" mb={2}>Time</Typography>
+                    <Typography fontSize="lg">
                       {new Date().toLocaleTimeString()}
-                    </Text>
+                    </Typography>
                   </Box>
 
                   <Box>
-                    <Text fontSize="sm" fontWeight="medium" mb={2}>Notes (optional)</Text>
+                    <Typography fontSize="sm" fontWeight="medium" mb={2}>Notes (optional)</Typography>
                     <Textarea
                       value={clockNotes}
                       onChange={(e) => setClockNotes(e.target.value)}
@@ -957,8 +991,8 @@ export function TimeTrackingSection({ viewState: _viewState, onViewStateChange: 
                 <Button variant="outline" onClick={handleClockDialogClose}>
                   Cancel
                 </Button>
-                <Button 
-                  colorPalette="blue" 
+                <Button
+                  colorPalette="blue"
                   onClick={handleClockAction}
                 >
                   {isOnline ? 'Confirm' : 'Save Offline'}
@@ -1007,9 +1041,9 @@ const OfflineTimeOperationsModal = ({
 
           <Dialog.Body>
             <Stack direction="column" gap="4" align="stretch">
-              <Text color="gray.600">
+              <Typography color="gray.600">
                 {operations.length} time tracking operation(s) pending synchronization
-              </Text>
+              </Typography>
 
               <Box maxH="400px" overflowY="auto">
                 <Stack direction="column" gap="3" align="stretch">
@@ -1017,31 +1051,31 @@ const OfflineTimeOperationsModal = ({
                     <CardWrapper key={operation.id} p="4">
                       <Stack direction="row" justify="space-between" mb="2">
                         <Stack direction="column" align="start" spacing="1">
-                          <Text fontWeight="medium" textTransform="capitalize">
+                          <Typography fontWeight="medium" textTransform="capitalize">
                             {operation.type.replace('_', ' ')}
-                          </Text>
-                          <Text fontSize="sm" color="gray.600">
+                          </Typography>
+                          <Typography fontSize="sm" color="gray.600">
                             Employee: {operation.employee_id}
-                          </Text>
-                          <Text fontSize="sm" color="gray.600">
+                          </Typography>
+                          <Typography fontSize="sm" color="gray.600">
                             {new Date(operation.timestamp).toLocaleString()}
-                          </Text>
+                          </Typography>
                         </Stack>
                         <Badge
                           colorScheme={
                             operation.status === 'synced' ? 'green' :
-                            operation.status === 'syncing' ? 'blue' :
-                            operation.status === 'failed' ? 'red' : 'yellow'
+                              operation.status === 'syncing' ? 'blue' :
+                                operation.status === 'failed' ? 'red' : 'yellow'
                           }
                         >
                           {operation.status}
                         </Badge>
                       </Stack>
-                      
+
                       {operation.retryCount > 0 && (
-                        <Text fontSize="sm" color="orange.600">
+                        <Typography fontSize="sm" color="orange.600">
                           {operation.retryCount} retry attempts
-                        </Text>
+                        </Typography>
                       )}
                     </CardWrapper>
                   ))}
@@ -1061,8 +1095,8 @@ const OfflineTimeOperationsModal = ({
                 loading={isSyncing}
                 loadingText="Syncing..."
                 disabled={operations.length === 0}
-                leftIcon={<ArrowPathIcon className="w-4 h-4" />}
               >
+                <Icon icon={ArrowPathIcon} size="sm" />
                 Force Sync All
               </Button>
             </Stack>

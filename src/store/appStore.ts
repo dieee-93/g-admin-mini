@@ -44,6 +44,10 @@ export interface AppState {
     logoUrl?: string;        // Used by: Branding, Ecommerce
     contactEmail?: string;   // Used by: Ecommerce, Support
     contactPhone?: string;   // Used by: Ecommerce, Takeaway
+
+    // Legal config (for ecommerce/async_operations)
+    shippingPolicy?: string;       // Used by: Ecommerce
+    termsAndConditions?: string;   // Used by: Ecommerce
   };
 
   // Actions

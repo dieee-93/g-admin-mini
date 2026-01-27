@@ -11,7 +11,8 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { ContentLayout, Section, Button, Alert, Icon, Stack, Badge, Tabs } from '@/shared/ui';
+import { Box, Button, Alert, Icon, Stack, Badge, Tabs, Flex, SimpleGrid } from '@/shared/ui';
+import { useDisclosure } from '@/shared/hooks';
 import { PlusIcon, FunnelIcon, Cog6ToothIcon, CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { HookPoint } from '@/lib/modules';
 import { useLocation } from '@/contexts/LocationContext';
@@ -23,33 +24,33 @@ import {
   WeekCalendarGrid,
   DayCalendarTimeline,
   CalendarFiltersPanel
-} from './components/calendar';
+} from '@/modules/scheduling/components/calendar';
 
 // Top bar
-import { SchedulingTopBar } from './components/SchedulingTopBar';
+import { SchedulingTopBar } from '@/modules/scheduling/components/SchedulingTopBar';
 
 // Availability configuration
-import { AvailabilityTab } from './components/AvailabilityTab';
+import { AvailabilityTab } from '@/modules/scheduling/components/AvailabilityTab';
 
 // Modals
-import { ShiftEditorModal, AutoSchedulingModal, AppointmentBookingModal } from './components';
+import { ShiftEditorModal, AutoSchedulingModal, AppointmentBookingModal } from '@/modules/scheduling/components';
 
 // Types & Adapters
-import type { CalendarView, CalendarFilters, UnifiedScheduleEvent } from './types/calendar';
-import type { Appointment } from './types/appointments';
+import type { CalendarView, CalendarFilters, UnifiedScheduleEvent } from '@/modules/scheduling/types/calendar';
+import type { Appointment } from '@/modules/scheduling/types/appointments';
 import {
   staffShiftAdapter,
   deliveryAdapter,
   timeOffAdapter,
   maintenanceAdapter,
   appointmentAdapter
-} from './adapters';
-import { SchedulingUtils } from './adapters/SchedulingAdapter';
+} from '@/modules/scheduling/adapters';
+import { SchedulingUtils } from '@/modules/scheduling/adapters/SchedulingAdapter';
 
 // Hooks
-import { useSchedulingPage } from './hooks';
-import { useScheduling } from './hooks/useScheduling';
-import { useAppointments } from './hooks/useAppointments';
+import { useSchedulingPage } from '@/modules/scheduling/hooks';
+import { useScheduling } from '@/modules/scheduling/hooks';
+import { useAppointments } from '@/modules/scheduling/hooks';
 
 // Systems integration
 import { useErrorHandler } from '@/lib/error-handling';
@@ -82,7 +83,7 @@ export default function SchedulingPage() {
   const [activeTab, setActiveTab] = useState('calendar');
   const [calendarView, setCalendarView] = useState<CalendarView>('month');
   const [referenceDate, setReferenceDate] = useState<Date>(new Date());
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const filtersDrawer = useDisclosure();
 
   // ============================================
   // PAGE STATE
@@ -125,7 +126,7 @@ export default function SchedulingPage() {
   // const { maintenanceSchedules } = useMaintenance();
 
   // Phase 4: Appointment modal state
-  const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+  const appointmentModal = useDisclosure();
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
 
   // ============================================
@@ -283,12 +284,12 @@ export default function SchedulingPage() {
           ...filters,
           eventTypes: ['staff_shift']
         });
-        setIsFiltersOpen(true);
+        filtersDrawer.onOpen();
         break;
 
       case 'active_employees':
         // Show filter panel with employee selector
-        setIsFiltersOpen(true);
+        filtersDrawer.onOpen();
         break;
 
       case 'coverage_percentage':
@@ -316,7 +317,7 @@ export default function SchedulingPage() {
           eventTypes: ['time_off'],
           statuses: ['scheduled'] // Pending approval
         });
-        setIsFiltersOpen(true);
+        filtersDrawer.onOpen();
         break;
 
       case 'understaffed_shifts':
@@ -382,7 +383,7 @@ export default function SchedulingPage() {
         const appointment = appointments?.find(a => a.id === event.id);
         if (appointment) {
           setEditingAppointment(appointment);
-          setIsAppointmentModalOpen(true);
+          appointmentModal.onOpen();
           logger.info('Scheduling', 'Opening appointment editor', { appointmentId: appointment.id });
         } else {
           logger.warn('Scheduling', 'Appointment not found in local data', { eventId: event.id });
@@ -400,7 +401,7 @@ export default function SchedulingPage() {
       logger.debug('Scheduling', `Event ${eventId} dropped - new time: ${newStart.toISOString()} to ${newEnd.toISOString()}`);
 
       // Import API dynamically to avoid circular deps
-      const { shiftsApi } = await import('./services/schedulingApi');
+      const { shiftsApi } = await import('@/modules/scheduling/services/schedulingApi');
 
       // Update event time via API
       await shiftsApi.updateEventTime(eventId, newStart, newEnd);
@@ -434,7 +435,7 @@ export default function SchedulingPage() {
       statuses: ['scheduled'] // Show only scheduled (not in_progress/completed)
     });
 
-    setIsFiltersOpen(true);
+    filtersDrawer.onOpen();
   };
 
   /**
@@ -481,7 +482,7 @@ export default function SchedulingPage() {
    */
   const handleOpenCreateAppointment = () => {
     setEditingAppointment(null);
-    setIsAppointmentModalOpen(true);
+    appointmentModal.onOpen();
     logger.info('Scheduling', 'Opening create appointment modal');
   };
 
@@ -489,7 +490,7 @@ export default function SchedulingPage() {
    * Handler: Close appointment modal
    */
   const handleCloseAppointmentModal = () => {
-    setIsAppointmentModalOpen(false);
+    appointmentModal.onClose();
     setEditingAppointment(null);
   };
 
@@ -524,14 +525,16 @@ export default function SchedulingPage() {
 
   if (error) {
     return (
-      <ContentLayout spacing="normal">
-        <Alert status="error" title="Error de carga del módulo">
-          {error}
-        </Alert>
-        <Button onClick={() => window.location.reload()}>
-          Recargar página
-        </Button>
-      </ContentLayout>
+      <Box p={{ base: "6", md: "8" }}>
+        <Stack gap="4" w="100%">
+          <Alert status="error" title="Error de carga del módulo">
+            {error}
+          </Alert>
+          <Button onClick={() => window.location.reload()}>
+            Recargar página
+          </Button>
+        </Stack>
+      </Box>
     );
   }
 
@@ -540,213 +543,267 @@ export default function SchedulingPage() {
   // ============================================
 
   return (
-    <ContentLayout spacing="normal">
-      {/* OFFLINE WARNING */}
-      {!isOnline && (
-        <Alert variant="warning" title="Modo Offline">
-          Los cambios se sincronizarán cuando recuperes la conexión
-        </Alert>
-      )}
-
-      {/* 1. TOP BAR: Metrics + Critical Alerts */}
-      <SchedulingTopBar
-        stats={schedulingStats}
-        loading={loading}
-        onMetricClick={handleMetricClick}
+    <Box position="relative" minH="100vh" bg="bg.canvas" overflow="hidden">
+      {/* Decorative Background Blobs */}
+      <Box
+        position="absolute"
+        top="-10%"
+        right="-5%"
+        width="500px"
+        height="500px"
+        borderRadius="full"
+        bg="green.50"
+        opacity="0.4"
+        filter="blur(80px)"
+        pointerEvents="none"
+      />
+      <Box
+        position="absolute"
+        bottom="-10%"
+        left="-5%"
+        width="400px"
+        height="400px"
+        borderRadius="full"
+        bg="cyan.50"
+        opacity="0.4"
+        filter="blur(80px)"
+        pointerEvents="none"
       />
 
-      {/* 2. MAIN TABS: Calendar vs Availability Config */}
-      <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value)}>
-        <Tabs.List>
-          <Tabs.Trigger value="calendar">
-            <Icon icon={CalendarIcon} size="sm" />
-            Calendar & Shifts
-          </Tabs.Trigger>
-          <Tabs.Trigger value="availability">
-            <Icon icon={ClockIcon} size="sm" />
-            Availability Configuration
-          </Tabs.Trigger>
-        </Tabs.List>
+      <Box position="relative" zIndex="1" p={{ base: "6", md: "8" }}>
 
-        {/* CALENDAR TAB */}
-        <Tabs.Content value="calendar">
-          <Section variant="elevated">
-        <Stack direction="column" gap="4">
-          {/* Calendar Controls */}
-          <Stack direction="row" justify="space-between" align="center">
-            {/* Left: View Selector */}
-            <CalendarViewSelector
-              view={calendarView}
-              onViewChange={handleViewChange}
-              referenceDate={referenceDate}
-              onDateChange={handleDateChange}
-            />
+      <Stack gap="8" w="100%">
+        {/* Header */}
+        <Flex justify="space-between" align="center" flexWrap="wrap" gap="4">
+          <Flex align="center" gap="3">
+            <Box
+              p="3"
+              bg="linear-gradient(135deg, var(--chakra-colors-green-400), var(--chakra-colors-green-600))"
+              borderRadius="xl"
+              shadow="lg"
+            >
+              📅
+            </Box>
+            <Box>
+              <Flex align="center" gap="2" flexWrap="wrap">
+                <Box as="h1" fontSize="2xl" fontWeight="bold">
+                  Programación de Turnos
+                </Box>
+                {isMultiLocationMode && selectedLocation && (
+                  <Badge variant="solid" colorPalette="purple">
+                    {selectedLocation.name}
+                  </Badge>
+                )}
+              </Flex>
+            </Box>
+          </Flex>
+        </Flex>
 
-            {/* Right: Actions */}
-            <Stack direction="row" gap="2" align="center">
-              {/* Multi-Location Badge */}
-              {isMultiLocationMode && selectedLocation && (
-                <Badge variant="solid" colorPalette="purple">
-                  Location: {selectedLocation.name}
-                </Badge>
-              )}
+        {/* OFFLINE WARNING */}
+        {!isOnline && (
+          <Alert status="warning" title="Modo Offline">
+            Los cambios se sincronizarán cuando recuperes la conexión
+          </Alert>
+        )}
 
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setIsFiltersOpen(true)}
-              >
-                <Icon icon={FunnelIcon} size="xs" />
-                Filtros
-              </Button>
+        {/* 1. TOP BAR: Metrics + Critical Alerts */}
+        <SchedulingTopBar
+          stats={schedulingStats}
+          loading={loading}
+          onMetricClick={handleMetricClick}
+        />
 
-              <Button
-                size="sm"
-                colorPalette="blue"
-                onClick={handleOpenCreateShift}
-              >
-                <Icon icon={PlusIcon} size="xs" />
-                Nuevo Turno
-              </Button>
+        {/* 2. MAIN TABS: Calendar vs Availability Config */}
+        <Box bg="bg.surface" p="6" borderRadius="2xl" shadow="xl">
+          <Tabs.Root value={activeTab} onValueChange={(details) => setActiveTab(details.value)}>
+            <Tabs.List>
+              <Tabs.Trigger value="calendar">
+                <Icon icon={CalendarIcon} size="sm" />
+                Calendar & Shifts
+              </Tabs.Trigger>
+              <Tabs.Trigger value="availability">
+                <Icon icon={ClockIcon} size="sm" />
+                Availability Configuration
+              </Tabs.Trigger>
+            </Tabs.List>
 
-              <Button
-                size="sm"
-                colorPalette="green"
-                onClick={handleOpenCreateAppointment}
-              >
-                <Icon icon={CalendarIcon} size="xs" />
-                Nueva Cita
-              </Button>
+            {/* CALENDAR TAB */}
+            <Tabs.Content value="calendar">
+              <Box pt="6">
+                <Stack direction="column" gap="4">
+                  {/* Calendar Controls */}
+                  <Stack direction="row" justify="space-between" align="center" flexWrap="wrap" gap="4">
+                    {/* Left: View Selector */}
+                    <CalendarViewSelector
+                      view={calendarView}
+                      onViewChange={handleViewChange}
+                      referenceDate={referenceDate}
+                      onDateChange={handleDateChange}
+                    />
 
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setIsAutoSchedulingOpen(true)}
-              >
-                <Icon icon={Cog6ToothIcon} size="xs" />
-                Auto-Schedule
-              </Button>
+                    {/* Right: Actions */}
+                    <Stack direction="row" gap="2" align="center" flexWrap="wrap">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={filtersDrawer.onOpen}
+                      >
+                        <Icon icon={FunnelIcon} size="xs" />
+                        Filtros
+                      </Button>
 
-              {/* HOOKPOINT: Toolbar Actions - Cross-Module */}
-              <HookPoint
-                name="scheduling.toolbar.actions"
-                data={{
-                  referenceDate,
-                  calendarView,
-                  filters,
-                  selectedEvents: filteredEvents,
-                  // Callbacks for cross-module actions
-                  onViewStaffAvailability: handleViewStaffAvailability,
-                  onShowSalesForecast: handleShowSalesForecast,
-                  onCreateStockReception: handleCreateStockReception,
-                  onCreateProductionBlock: handleCreateProductionBlock
-                }}
-                fallback={null}
-                direction="row"
-                gap="2"
-              />
-            </Stack>
-          </Stack>
+                      <Button
+                        size="sm"
+                        colorPalette="blue"
+                        onClick={handleOpenCreateShift}
+                      >
+                        <Icon icon={PlusIcon} size="xs" />
+                        Nuevo Turno
+                      </Button>
 
-          {/* Calendar Grid */}
-          {calendarView === 'month' && (
-            <MonthCalendarGrid
-              referenceDate={referenceDate}
-              events={filteredEvents}
-              onDayClick={handleDayClick}
-              loading={loading}
-            />
-          )}
+                      <Button
+                        size="sm"
+                        colorPalette="green"
+                        onClick={handleOpenCreateAppointment}
+                      >
+                        <Icon icon={CalendarIcon} size="xs" />
+                        Nueva Cita
+                      </Button>
 
-          {calendarView === 'week' && (
-            <WeekCalendarGrid
-              referenceDate={referenceDate}
-              events={filteredEvents}
-              onEventClick={handleEventClick}
-              onEventDrop={handleEventDrop}
-              loading={loading}
-            />
-          )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setIsAutoSchedulingOpen(true)}
+                      >
+                        <Icon icon={Cog6ToothIcon} size="xs" />
+                        Auto-Schedule
+                      </Button>
 
-          {calendarView === 'day' && (
-            <DayCalendarTimeline
-              referenceDate={referenceDate}
-              events={filteredEvents}
-              onEventClick={handleEventClick}
-              onEventDrop={handleEventDrop}
-              loading={loading}
-            />
-          )}
+                      {/* HOOKPOINT: Toolbar Actions - Cross-Module */}
+                      <HookPoint
+                        name="scheduling.toolbar.actions"
+                        data={{
+                          referenceDate,
+                          calendarView,
+                          filters,
+                          selectedEvents: filteredEvents,
+                          // Callbacks for cross-module actions
+                          onViewStaffAvailability: handleViewStaffAvailability,
+                          onShowSalesForecast: handleShowSalesForecast,
+                          onCreateStockReception: handleCreateStockReception,
+                          onCreateProductionBlock: handleCreateProductionBlock
+                        }}
+                        fallback={null}
+                        direction="row"
+                        gap="2"
+                      />
+                    </Stack>
+                  </Stack>
 
-          {/* HOOKPOINT: Cross-Module Calendar Events */}
-          <HookPoint
-            name="calendar.events"
-            data={{
-              referenceDate,
-              calendarView,
-              filteredEvents,
-              onEventClick: handleEventClick
+                  {/* Calendar Grid */}
+                  {calendarView === 'month' && (
+                    <MonthCalendarGrid
+                      referenceDate={referenceDate}
+                      events={filteredEvents}
+                      onDayClick={handleDayClick}
+                      loading={loading}
+                    />
+                  )}
+
+                  {calendarView === 'week' && (
+                    <WeekCalendarGrid
+                      referenceDate={referenceDate}
+                      events={filteredEvents}
+                      onEventClick={handleEventClick}
+                      onEventDrop={handleEventDrop}
+                      loading={loading}
+                    />
+                  )}
+
+                  {calendarView === 'day' && (
+                    <DayCalendarTimeline
+                      referenceDate={referenceDate}
+                      events={filteredEvents}
+                      onEventClick={handleEventClick}
+                      onEventDrop={handleEventDrop}
+                      loading={loading}
+                    />
+                  )}
+
+                  {/* HOOKPOINT: Cross-Module Calendar Events */}
+                  <HookPoint
+                    name="calendar.events"
+                    data={{
+                      referenceDate,
+                      calendarView,
+                      filteredEvents,
+                      onEventClick: handleEventClick
+                    }}
+                    fallback={null}
+                    direction="column"
+                    gap="3"
+                  />
+                </Stack>
+              </Box>
+            </Tabs.Content>
+
+            {/* AVAILABILITY TAB */}
+            <Tabs.Content value="availability">
+              <Box pt="6">
+                <AvailabilityTab location_id={selectedLocation?.id} />
+              </Box>
+            </Tabs.Content>
+          </Tabs.Root>
+        </Box>
+
+        {/* 3. FILTERS PANEL (Slide-in from right) */}
+        <CalendarFiltersPanel
+          filters={filters}
+          onFiltersChange={setFilters}
+          allEvents={unifiedEvents}
+          isOpen={filtersDrawer.isOpen}
+          onClose={filtersDrawer.onClose}
+        />
+
+        {/* 4. MODALS */}
+
+        {/* Shift Editor Modal */}
+        {isShiftEditorOpen && (
+          <ShiftEditorModal
+            isOpen={isShiftEditorOpen}
+            onClose={handleCloseShiftEditor}
+            onSuccess={() => {
+              handleCloseShiftEditor();
+              refreshData();
             }}
-            fallback={null}
-            direction="column"
-            gap="3"
+            shift={editingShift}
+            prefilledDate={referenceDate.toISOString().split('T')[0]}
           />
-        </Stack>
-      </Section>
-        </Tabs.Content>
+        )}
 
-        {/* AVAILABILITY TAB */}
-        <Tabs.Content value="availability">
-          <AvailabilityTab location_id={selectedLocation?.id} />
-        </Tabs.Content>
-      </Tabs.Root>
+        {/* Auto Scheduling Modal */}
+        {isAutoSchedulingOpen && (
+          <AutoSchedulingModal
+            isOpen={isAutoSchedulingOpen}
+            onClose={() => setIsAutoSchedulingOpen(false)}
+            onScheduleGenerated={handleScheduleGenerated}
+            currentWeek={referenceDate.toISOString().split('T')[0]}
+          />
+        )}
 
-      {/* 3. FILTERS PANEL (Slide-in from right) */}
-      <CalendarFiltersPanel
-        filters={filters}
-        onFiltersChange={setFilters}
-        allEvents={unifiedEvents}
-        isOpen={isFiltersOpen}
-        onClose={() => setIsFiltersOpen(false)}
-      />
-
-      {/* 4. MODALS */}
-
-      {/* Shift Editor Modal */}
-      {isShiftEditorOpen && (
-        <ShiftEditorModal
-          isOpen={isShiftEditorOpen}
-          onClose={handleCloseShiftEditor}
-          onSuccess={() => {
-            handleCloseShiftEditor();
-            refreshData();
-          }}
-          shift={editingShift}
-          prefilledDate={referenceDate.toISOString().split('T')[0]}
-        />
-      )}
-
-      {/* Auto Scheduling Modal */}
-      {isAutoSchedulingOpen && (
-        <AutoSchedulingModal
-          isOpen={isAutoSchedulingOpen}
-          onClose={() => setIsAutoSchedulingOpen(false)}
-          onScheduleGenerated={handleScheduleGenerated}
-          currentWeek={referenceDate.toISOString().split('T')[0]}
-        />
-      )}
-
-      {/* Phase 4: Appointment Booking Modal */}
-      {isAppointmentModalOpen && (
-        <AppointmentBookingModal
-          isOpen={isAppointmentModalOpen}
-          onClose={handleCloseAppointmentModal}
-          onSuccess={handleAppointmentSuccess}
-          appointment={editingAppointment}
-          prefilledDate={referenceDate.toISOString().split('T')[0]}
-        />
-      )}
-    </ContentLayout>
+        {/* Phase 4: Appointment Booking Modal */}
+        {appointmentModal.isOpen && (
+          <AppointmentBookingModal
+            isOpen={appointmentModal.isOpen}
+            onClose={handleCloseAppointmentModal}
+            onSuccess={handleAppointmentSuccess}
+            appointment={editingAppointment}
+            prefilledDate={referenceDate.toISOString().split('T')[0]}
+          />
+        )}
+      </Stack>
+      </Box>
+    </Box>
   );
 }
 

@@ -1,276 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import {
-  Box,
   Stack,
-  Text,
-  Alert,
-  Flex,
-  NumberInput,
-  RadioGroup,
-  RadioItem
+  Alert
 } from '@/shared/ui';
-import { SelectField, CardWrapper, InputField } from '@/shared/ui';
+import { Text } from '@/shared/ui';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { type ItemFormData } from '@/pages/admin/supply-chain/materials/types';
-import { CATEGORY_COLLECTION } from '../constants';
-import { CountableStockFields } from './CountableFields/CountableStockFields';
 
 interface CountableFieldsProps {
   formData: ItemFormData;
   setFormData: (data: ItemFormData) => void;
   errors: Record<string, string>;
   disabled?: boolean;
-  addToStockNow: boolean;
-  setAddToStockNow: (value: boolean) => void;
 }
 
-// Tipos de configuración de stock
-type StockConfigType = 'none' | 'individual' | 'packages';
-
-export const CountableFields = ({
+// ⚡ PERFORMANCE: React.memo prevents re-renders when props don't change
+export const CountableFields = memo(function CountableFields({
   formData,
   setFormData,
-  errors,
   disabled = false,
-  addToStockNow,
-  setAddToStockNow
-}: CountableFieldsProps) => {
-  const [stockConfigType, setStockConfigType] = useState<StockConfigType>('none');
-  const [packageQuantity, setPackageQuantity] = useState(1);
-  const [unitPrice, setUnitPrice] = useState(0);
-
-  // Auto-set unit for countable items
+}: CountableFieldsProps) {
   useEffect(() => {
     if (formData.type === 'COUNTABLE' && !formData.unit) {
-      setFormData(prev => ({ ...prev, unit: 'unidad' }));
+      setFormData({ ...formData, unit: 'unidad' });
     }
-  }, [formData.type, formData.unit, setFormData]);
-
-  // Handle stock config type changes
-  useEffect(() => {
-    switch (stockConfigType) {
-      case 'none':
-        setAddToStockNow(false);
-        setFormData(prev => ({
-          ...prev,
-          packaging: undefined,
-          initial_stock: 0,
-          unit_cost: 0
-        }));
-        break;
-      case 'individual':
-        setAddToStockNow(true);
-        setFormData(prev => ({ ...prev, packaging: undefined }));
-        break;
-      case 'packages':
-        setAddToStockNow(true);
-        // Keep existing packaging if any
-        break;
-    }
-  }, [stockConfigType, setFormData, setAddToStockNow]);
-
-  // Auto-calculate from packaging
-  useEffect(() => {
-    if (stockConfigType === 'packages' && formData.packaging?.package_size && packageQuantity > 0) {
-      const totalUnits = packageQuantity * formData.packaging.package_size;
-      setFormData(prev => ({
-        ...prev,
-        initial_stock: totalUnits
-      }));
-    }
-  }, [stockConfigType, packageQuantity, formData.packaging?.package_size, setFormData]);
-
-  // Initialize stock config type based on current state
-  useEffect(() => {
-    if (!addToStockNow) {
-      setStockConfigType('none');
-    } else if (formData.packaging?.package_size) {
-      setStockConfigType('packages');
-    } else {
-      setStockConfigType('individual');
-    }
-  }, [addToStockNow, formData.packaging?.package_size]);
+  }, [formData.type, formData.unit]);
 
   return (
-    <Stack gap="6" w="full">
-      {/* Business Category */}
-      <Box w="full">
-        <SelectField
-          label="Categoría del Producto"
-          placeholder="¿A qué categoría pertenece?"
-          collection={CATEGORY_COLLECTION}
-          value={formData.category ? [formData.category] : []}
-          onValueChange={(details) =>
-            setFormData({
-              ...formData,
-              category: details.value[0]
-            })
-          }
-          disabled={disabled}
-          error={errors.category}
-          required
-          height="44px"
-          noPortal={true}
-        />
-      </Box>
-
+    <Stack gap="4" w="full">
       {/* Info sobre contables */}
       <Alert.Root status="info" variant="subtle">
         <Alert.Indicator>
           <InformationCircleIcon style={{ width: '16px', height: '16px' }} />
         </Alert.Indicator>
         <Alert.Description>
-          Items contables se miden en <strong>unidades individuales</strong>.
-          Puedes crearlos sin stock inicial o agregar stock de diferentes maneras.
+          <Text fontSize="sm">
+            Items contables se miden en <strong>unidades individuales</strong>.
+            La configuración de stock y packaging se realiza en la sección "Stock Inicial" si decides agregar stock ahora.
+          </Text>
         </Alert.Description>
       </Alert.Root>
-
-      {/* Nueva configuración unificada */}
-      <CardWrapper variant="outline" w="full">
-        <CardWrapper.Body>
-          <Stack gap="4">
-            <Box>
-              <Text fontWeight="semibold" mb="3">Configuración de Stock Inicial</Text>
-              <RadioGroup
-                value={stockConfigType}
-                onValueChange={(value) => setStockConfigType(value as StockConfigType)}
-                disabled={disabled}
-                colorPalette="blue"
-              >
-                <RadioItem value="none">
-                  <Stack gap="1">
-                    <Text fontWeight="medium">Solo crear el item (sin stock inicial)</Text>
-                    <Text fontSize="sm" color="text.muted">
-                      Crea el item en el catálogo sin agregar stock al inventario
-                    </Text>
-                  </Stack>
-                </RadioItem>
-
-                <RadioItem value="individual">
-                  <Stack gap="1">
-                    <Text fontWeight="medium">Agregar por unidades individuales</Text>
-                    <Text fontSize="sm" color="text.muted">
-                      Ideal para items sueltos o cuando no vienen empaquetados
-                    </Text>
-                  </Stack>
-                </RadioItem>
-
-                <RadioItem value="packages">
-                  <Stack gap="1">
-                    <Text fontWeight="medium">Agregar por paquetes/cajas</Text>
-                    <Text fontSize="sm" color="text.muted">
-                      Para items que vienen empaquetados (cajas, bandejas, docenas, etc.)
-                    </Text>
-                  </Stack>
-                </RadioItem>
-              </RadioGroup>
-            </Box>
-
-            {/* Configuración de packaging - Solo cuando se selecciona packages */}
-            {stockConfigType === 'packages' && (
-              <Stack gap="4" pt="4" borderTop="1px solid" borderColor="border">
-                <Text fontWeight="medium" color="blue.700">
-                  📦 Configuración de Packaging
-                </Text>
-
-                <Flex gap="4" direction={{ base: "column", md: "row" }}>
-                  <Box flex="1">
-                    <Stack gap="2">
-                      <Text fontSize="sm" fontWeight="medium">Unidades por paquete</Text>
-                      <NumberInput.Root
-                        value={formData.packaging?.package_size?.toString() || ''}
-                        onValueChange={(details) =>
-                          !disabled && setFormData({
-                            ...formData,
-                            packaging: {
-                              ...formData.packaging,
-                              package_size: parseInt(details.value) || 0,
-                              package_unit: formData.packaging?.package_unit || '',
-                              display_mode: 'individual'
-                            }
-                          })
-                        }
-                        min={1}
-                        disabled={disabled}
-                      >
-                        <NumberInput.Control>
-                          <NumberInput.IncrementTrigger />
-                          <NumberInput.DecrementTrigger />
-                        </NumberInput.Control>
-                        <NumberInput.Input
-                          placeholder="ej: 30"
-                          height="44px"
-                          fontSize="md"
-                          px="3"
-                          borderRadius="md"
-                        />
-                      </NumberInput.Root>
-                    </Stack>
-                  </Box>
-
-                  <Box flex="1">
-                    <Stack gap="2">
-                      <Text fontSize="sm" fontWeight="medium">Tipo de paquete</Text>
-                      <InputField
-                        placeholder="ej: bandeja, caja, docena"
-                        value={formData.packaging?.package_unit || ''}
-                        onChange={(e) =>
-                          !disabled && setFormData({
-                            ...formData,
-                            packaging: {
-                              ...formData.packaging,
-                              package_size: formData.packaging?.package_size || 0,
-                              package_unit: e.target.value,
-                              display_mode: 'individual'
-                            }
-                          })
-                        }
-                        disabled={disabled}
-                        height="44px"
-                        fontSize="md"
-                        px="3"
-                        borderRadius="md"
-                      />
-                    </Stack>
-                  </Box>
-                </Flex>
-
-                {formData.packaging?.package_size && formData.packaging?.package_unit && (
-                  <Alert.Root status="success" variant="subtle">
-                    <Alert.Indicator>
-                      <InformationCircleIcon style={{ width: '16px', height: '16px' }} />
-                    </Alert.Indicator>
-                    <Alert.Description>
-                      <Text>
-                        <strong>Configuración:</strong> {formData.packaging.package_size} unidades por {formData.packaging.package_unit}
-                        <br />
-                        <strong>Ejemplo:</strong> Si tienes 3 {formData.packaging.package_unit}s = {3 * formData.packaging.package_size} unidades
-                      </Text>
-                    </Alert.Description>
-                  </Alert.Root>
-                )}
-              </Stack>
-            )}
-          </Stack>
-        </CardWrapper.Body>
-      </CardWrapper>
-
-      {/* Stock Fields - Solo cuando se selecciona agregar stock */}
-      {stockConfigType !== 'none' && (
-        <CountableStockFields
-          formData={formData}
-          setFormData={setFormData}
-          errors={errors}
-          disabled={disabled}
-          addToStockNow={addToStockNow}
-          setAddToStockNow={setAddToStockNow}
-          usePackaging={stockConfigType === 'packages'}
-          packageQuantity={packageQuantity}
-          setPackageQuantity={setPackageQuantity}
-          unitPrice={unitPrice}
-          setUnitPrice={setUnitPrice}
-        />
-      )}
     </Stack>
   );
-};
+});

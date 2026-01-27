@@ -2,11 +2,11 @@
 // Provides real-time offline status, sync progress, and queue monitoring
 
 import { type ReactNode, memo, useState, useEffect, useCallback } from 'react';
-import { 
-  Box, 
-  HStack, 
-  Text, 
-  Badge, 
+import {
+  Box,
+  HStack,
+  Text,
+  Badge,
   VStack,
   Alert,
   Button,
@@ -24,11 +24,11 @@ import {
   createListCollection
 } from '@chakra-ui/react';
 import { Icon } from '@/shared/ui';
-import { 
-  WifiIcon, 
-  NoSymbolIcon, 
-  ArrowPathIcon, 
-  ClockIcon, 
+import {
+  WifiIcon,
+  NoSymbolIcon,
+  ArrowPathIcon,
+  ClockIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -95,15 +95,15 @@ export const ConnectionStatus = memo(() => {
   useEffect(() => {
     // Update connection status
     const updateConnectionStatus = () => {
-      const connection = (navigator as any).connection || 
-                        (navigator as any).mozConnection || 
-                        (navigator as any).webkitConnection;
+      const connection = (navigator as any).connection ||
+        (navigator as any).mozConnection ||
+        (navigator as any).webkitConnection;
 
       const isNowOnline = navigator.onLine;
-      
+
       setConnectionStatus(prevStatus => {
         const wasOffline = !prevStatus.isOnline;
-        
+
         // Trigger automatic sync when coming back online
         if (wasOffline && isNowOnline) {
           logger.info('OfflineSync', '[OfflineMonitor] Network restored, triggering automatic sync');
@@ -116,7 +116,7 @@ export const ConnectionStatus = memo(() => {
             }
           }, 2000);
         }
-        
+
         return {
           isOnline: isNowOnline,
           lastOnline: isNowOnline ? Date.now() : prevStatus.lastOnline,
@@ -158,7 +158,7 @@ export const ConnectionStatus = memo(() => {
     offlineSync.on('syncStarted', updateSyncStatus);
     offlineSync.on('syncCompleted', updateSyncStatus);
     offlineSync.on('batchProcessed', updateSyncStatus); // ✅ Added to track progress during sync
-    
+
     // ✅ Register 'initialized' listener ONLY ONCE using module-level guard
     // Prevents duplicate logs when component mounts multiple times (Strict Mode + multiple instances)
     if (!offlineSyncInitListenerRegistered) {
@@ -212,11 +212,11 @@ export const ConnectionStatus = memo(() => {
   return (
     <HStack gap="1" align="center">
       {/* Icono principal de conexión - más discreto */}
-      <Box 
-        w="6" 
-        h="6" 
-        display="flex" 
-        alignItems="center" 
+      <Box
+        w="6"
+        h="6"
+        display="flex"
+        alignItems="center"
         justifyContent="center"
         borderRadius="full"
         bg={connectionStatus.isOnline ? "green.50" : "red.50"}
@@ -279,7 +279,7 @@ export const SyncProgress = memo(() => {
     const updateSyncStatus = () => {
       const status = offlineSync.getSyncStatus();
       setSyncStatus(status);
-      
+
       if (status.isSyncing) {
         setSyncProgress(prev => ({
           ...prev,
@@ -338,12 +338,12 @@ export const SyncProgress = memo(() => {
             Details
           </Button>
         </HStack>
-        
+
         {syncStatus?.isSyncing && (
           <VStack gap="1" align="stretch">
-            <Progress.Root 
-              value={syncProgress.percentage} 
-              size="sm" 
+            <Progress.Root
+              value={syncProgress.percentage}
+              size="sm"
               colorPalette="blue"
               borderRadius="full"
             >
@@ -354,8 +354,8 @@ export const SyncProgress = memo(() => {
             <HStack justify="space-between" fontSize="xs" color="blue.600">
               <Text>{syncProgress.current} of {syncProgress.total}</Text>
               <Text>
-                {syncProgress.estimatedRemaining > 0 ? 
-                  `~${Math.round(syncProgress.estimatedRemaining / 1000)}s remaining` : 
+                {syncProgress.estimatedRemaining > 0 ?
+                  `~${Math.round(syncProgress.estimatedRemaining / 1000)}s remaining` :
                   'Finalizing...'
                 }
               </Text>
@@ -368,23 +368,23 @@ export const SyncProgress = memo(() => {
             <Text color="blue.600">
               {syncStatus.queueSize} operations pending
             </Text>
-            <Button 
-              size="xs" 
-              colorPalette="blue" 
+            <Button
+              size="xs"
+              colorPalette="blue"
               onClick={() => offlineSync.forceSync()}
-              
+
             >
-              <Icon icon={ArrowPathIcon} size="xs" style={{marginRight: '4px'}} />
+              <Icon icon={ArrowPathIcon} size="xs" style={{ marginRight: '4px' }} />
               Sync Now
             </Button>
           </HStack>
         )}
       </Box>
 
-      <SyncDetailsModal 
-        isOpen={open} 
-        onClose={onClose} 
-        syncStatus={syncStatus} 
+      <SyncDetailsModal
+        isOpen={open}
+        onClose={onClose}
+        syncStatus={syncStatus}
         syncProgress={syncProgress}
       />
     </>
@@ -439,7 +439,7 @@ export const OfflineAlert = memo(() => {
           {isOffline ? 'Working Offline' : 'Sync Pending'}
         </Alert.Title>
         <Alert.Description fontSize="xs">
-          {isOffline 
+          {isOffline
             ? `${queueSize} operations will sync when connection returns`
             : `${queueSize} operations waiting to sync`
           }
@@ -483,7 +483,7 @@ export const QueueMonitor = memo(() => {
   }
 
   return (
-    <Box bg="bg.canvas" borderRadius="md" p="3" border="1px" borderColor="border.default">
+    <Box bg="gray.50" borderRadius="md" p="3" border="1px" borderColor="border.default">
       <HStack justify="space-between" mb="2" cursor="pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <HStack>
           <Icon icon={CircleStackIcon} size="sm" />
@@ -550,15 +550,15 @@ const OperationItem = ({ operation }: { operation: QueuedOperation }) => {
 // Comprehensive Offline Status Component
 export const OfflineStatusBar = () => {
   // const bgColor = "white"; // ChakraUI v3 compatible
-  
+
   return (
-    <Box 
-      position="fixed" 
-      top="0" 
-      left="0" 
-      right="0" 
+    <Box
+      position="fixed"
+      top="0"
+      left="0"
+      right="0"
       zIndex={1002}
-      
+
       borderBottom="1px"
       borderColor="border.default"
       p="2"
@@ -574,11 +574,11 @@ export const OfflineStatusBar = () => {
 };
 
 // Sync Details Modal
-const SyncDetailsModal = ({ 
-  isOpen, 
-  onClose, 
-  syncStatus, 
-  syncProgress 
+const SyncDetailsModal = ({
+  isOpen,
+  onClose,
+  syncStatus,
+  syncProgress
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -627,7 +627,7 @@ const SyncDetailsModal = ({
                       {syncProgress.current} of {syncProgress.total} operations
                     </Text>
                     <Text fontSize="xs" color="gray.500">
-                      {syncProgress.estimatedRemaining > 0 
+                      {syncProgress.estimatedRemaining > 0
                         ? `~${Math.round(syncProgress.estimatedRemaining / 1000)}s remaining`
                         : 'Finalizing...'
                       }
@@ -652,7 +652,7 @@ const SyncDetailsModal = ({
                 <HStack justify="space-between">
                   <Text fontSize="sm">Last Sync:</Text>
                   <Text fontSize="sm" color="gray.500">
-                    {syncStatus?.lastSync 
+                    {syncStatus?.lastSync
                       ? new Date(syncStatus.lastSync).toLocaleString()
                       : 'Never'
                     }
@@ -684,12 +684,12 @@ const SyncDetailsModal = ({
             <Button colorPalette="red" size="sm" onClick={handleClearQueue}>
               Clear Queue
             </Button>
-            <Button 
-              colorPalette="blue" 
+            <Button
+              colorPalette="blue"
               onClick={handleForcSync}
               loading={syncStatus?.isSyncing}
             >
-              <Icon icon={ArrowPathIcon} size="sm" style={{marginRight: '8px'}} />
+              <Icon icon={ArrowPathIcon} size="sm" style={{ marginRight: '8px' }} />
               Force Sync
             </Button>
           </HStack>

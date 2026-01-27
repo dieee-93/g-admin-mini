@@ -6,7 +6,7 @@
 
 import type { Sale } from '@/pages/admin/operations/sales/types';
 import { OrderType } from '@/pages/admin/operations/sales/types';
-import type { Employee } from '@/pages/admin/resources/staff/types';
+import type { Employee } from '@/pages/admin/resources/team/types';
 
 // ============================================================================
 // Appointment Slot Types

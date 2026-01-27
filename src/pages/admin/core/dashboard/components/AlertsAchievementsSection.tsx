@@ -1,19 +1,8 @@
 /**
  * AlertsAchievementsSection - Vista unificada de alertas y logros
  *
- * DISEÑO INSPIRADO EN DASHBOARD.md (herramienta externa)
- * Adaptado a la arquitectura de G-Admin Mini
- *
- * Features:
- * - ✅ Tabs integrados en el componente (no separados)
- * - ✅ Vista de Alertas Operacionales
- * - ✅ Vista de Setup/Achievements agrupados por capability
- * - ✅ Barras de progreso por capability
- * - ✅ Accordions para agrupar milestones
- * - ✅ Integración con useAlerts() y useCapabilityStore()
- * - ✅ Iconos de heroicons
- *
- * @version 1.0.0
+ * Tabs de alertas operacionales y progreso de configuración.
+ * Integrado con el sistema de achievements para mostrar progreso en tiempo real.
  */
 
 import React, { useState, useMemo } from 'react';
@@ -39,113 +28,95 @@ import {
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import { useAlerts } from '@/shared/alerts/hooks/useAlerts';
-import { useCapabilityStore } from '@/store/capabilityStore';
+import { useBusinessProfile } from '@/lib/capabilities';
+import { useValidationContext } from '@/hooks';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 import { BUSINESS_CAPABILITIES_REGISTRY } from '@/config/BusinessModelRegistry';
 import { logger } from '@/lib/logging';
-
-// ===============================
-// TYPES
-// ===============================
+import { computeAllProgress } from '@/modules/achievements/services/progressCalculator';
+import { getRequirementsForCapabilities } from '@/modules/achievements/requirements';
+import type { CapabilityProgress } from '@/modules/achievements/types';
 
 type ViewMode = 'alerts' | 'setup';
 
-interface CapabilityProgressGroup {
-  capability: string;
-  name: string;
-  icon: string;
-  total: number;
-  completed: number;
-  percentage: number;
-  milestones: Array<{
-    id: string;
-    name: string;
-    completed: boolean;
-    redirectUrl?: string;
-  }>;
-}
-
-// ===============================
-// COMPONENT
-// ===============================
-
 export const AlertsAchievementsSection: React.FC = () => {
+  console.log('[AlertsAchievementsSection] RENDER');
   const [activeView, setActiveView] = useState<ViewMode>('alerts');
   const { alerts } = useAlerts();
   const { navigate } = useNavigationActions();
-
-  // Get capability data
-  const profile = useCapabilityStore(state => state.profile);
-  const pendingMilestones = useCapabilityStore(state => state.features.pendingMilestones);
-  const completedMilestones = useCapabilityStore(state => state.features.completedMilestones);
-
-  // ===============================
-  // COMPUTED: Alertas filtradas
-  // ===============================
+  
+  // ✅ MIGRATED: Get profile from useBusinessProfile (TanStack Query)
+  const { profile } = useBusinessProfile();
+  const selectedCapabilities = profile?.selectedCapabilities;
+  
+  const validationContext = useValidationContext();
+  console.log('[AlertsAchievementsSection] validationContext changed', validationContext);
+  console.log('[AlertsAchievementsSection] selectedCapabilities', selectedCapabilities);
 
   const operationalAlerts = useMemo(() => {
+    console.log('[AlertsAchievementsSection] operationalAlerts recalculated');
     return alerts.filter(alert =>
       alert.context === 'dashboard' ||
       alert.context === 'global' ||
       alert.severity === 'critical' ||
       alert.severity === 'high'
-    ).slice(0, 5); // Máximo 5 alertas
+    ).slice(0, 5);
   }, [alerts]);
 
-  // ===============================
-  // COMPUTED: Progress por capability
-  // ===============================
+  const allProgress = useMemo<CapabilityProgress[]>(() => {
+    console.log('[AlertsAchievementsSection] allProgress recalculated');
+    if (!selectedCapabilities || selectedCapabilities.length === 0) {
+      return [];
+    }
 
-  const capabilityProgress = useMemo<CapabilityProgressGroup[]>(() => {
-    if (!profile?.selectedCapabilities) return [];
+    return computeAllProgress(selectedCapabilities, validationContext);
+  }, [selectedCapabilities, validationContext]);
 
-    return profile.selectedCapabilities.map(capId => {
-      const capability = BUSINESS_CAPABILITIES_REGISTRY[capId];
+  // Enrich progress with capability metadata
+  const enrichedProgress = useMemo(() => {
+    console.log('[AlertsAchievementsSection] enrichedProgress recalculated');
+    return allProgress.map(progress => {
+      const capability = BUSINESS_CAPABILITIES_REGISTRY[progress.capability];
 
-      // Filter milestones for this capability
-      // Milestones IDs format: "capability_milestone_name"
-      const capMilestones = [...pendingMilestones, ...completedMilestones].filter(m =>
-        m.startsWith(capId)
-      );
-
-      const completedCount = capMilestones.filter(m =>
-        completedMilestones.includes(m)
-      ).length;
-
-      const totalCount = capMilestones.length;
-      const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+      const milestones = (progress.missing || []).map(req => ({
+        id: req.id,
+        name: req.name,
+        completed: false,
+        redirectUrl: req.redirectUrl,
+      }));
 
       return {
-        capability: capId,
-        name: capability?.name || capId,
+        ...progress,
+        name: capability?.name || progress.capability,
         icon: capability?.icon || '📦',
-        total: totalCount,
-        completed: completedCount,
-        percentage,
-        milestones: capMilestones.map(m => ({
-          id: m,
-          name: m.replace(`${capId}_`, '').replace(/_/g, ' '),
-          completed: completedMilestones.includes(m),
-          redirectUrl: '/admin/settings' // TODO: Map to actual URLs
-        }))
+        milestones,
       };
     });
-  }, [profile, pendingMilestones, completedMilestones]);
+  }, [allProgress]);
 
-  // ===============================
-  // HANDLERS
-  // ===============================
+  // Calculate deduplicated overall progress
+  // Uses getRequirementsForCapabilities to avoid counting shared requirements multiple times
+  const deduplicatedProgress = useMemo(() => {
+    console.log('[AlertsAchievementsSection] deduplicatedProgress recalculated');
+    if (!selectedCapabilities || selectedCapabilities.length === 0) {
+      return { total: 0, completed: 0, percentage: 0 };
+    }
+
+    const allRequirements = getRequirementsForCapabilities(selectedCapabilities);
+    const mandatoryReqs = allRequirements.filter((r) => r.tier === 'mandatory');
+    const completed = mandatoryReqs.filter((req) => req.validator(validationContext)).length;
+    const total = mandatoryReqs.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    return { total, completed, percentage };
+  }, [selectedCapabilities, validationContext]);
 
   const handleMilestoneClick = (redirectUrl?: string) => {
     if (redirectUrl) {
-      logger.info('AlertsAchievementsSection', 'Navigating to:', redirectUrl);
-      // TODO: Integrate with navigation system
+      logger.debug('App', 'Navigating to:', { url: redirectUrl });
+      navigate(redirectUrl);
     }
   };
-
-  // ===============================
-  // RENDER
-  // ===============================
 
   return (
     <Box
@@ -247,12 +218,11 @@ export const AlertsAchievementsSection: React.FC = () => {
               Progreso & Logros
             </Typography>
             <Badge
-              colorPalette={pendingMilestones.length === 0 ? 'green' : 'blue'}
+              colorPalette={deduplicatedProgress.percentage === 100 ? 'green' : 'blue'}
               variant="solid"
               size="sm"
-              borderRadius="full"
             >
-              {completedMilestones.length}/{pendingMilestones.length + completedMilestones.length}
+              {deduplicatedProgress.completed}/{deduplicatedProgress.total}
             </Badge>
           </Stack>
         </Box>
@@ -279,7 +249,7 @@ export const AlertsAchievementsSection: React.FC = () => {
 
               {operationalAlerts.length === 0 ? (
                 <Box
-                  bg="bg.canvas"
+                  bg="gray.50"
                   p={8}
                   borderRadius="2xl"
                   textAlign="center"
@@ -305,7 +275,7 @@ export const AlertsAchievementsSection: React.FC = () => {
                   {operationalAlerts.map((alert) => (
                     <Box
                       key={alert.id}
-                      bg="bg.canvas"
+                      bg="gray.50"
                       p={5}
                       borderRadius="2xl"
                       borderLeft="4px solid"
@@ -445,11 +415,7 @@ export const AlertsAchievementsSection: React.FC = () => {
                     weight="bold"
                     color="blue.500"
                   >
-                    {Math.round(
-                      (completedMilestones.length /
-                        Math.max(1, completedMilestones.length + pendingMilestones.length)) *
-                      100
-                    )}%
+                    {deduplicatedProgress.percentage}%
                   </Typography>
                   <Typography
                     variant="body"
@@ -463,11 +429,7 @@ export const AlertsAchievementsSection: React.FC = () => {
               </Stack>
 
               <Progress.Root
-                value={
-                  (completedMilestones.length /
-                    Math.max(1, completedMilestones.length + pendingMilestones.length)) *
-                  100
-                }
+                value={deduplicatedProgress.percentage}
                 colorPalette="blue"
                 size="md"
                 borderRadius="full"
@@ -479,9 +441,9 @@ export const AlertsAchievementsSection: React.FC = () => {
             </Box>
 
             {/* Capabilities Grouped by Accordion */}
-            {capabilityProgress.length === 0 ? (
+            {enrichedProgress.length === 0 ? (
               <Box
-                bg="bg.canvas"
+                bg="gray.50"
                 p={8}
                 borderRadius="2xl"
                 textAlign="center"
@@ -495,10 +457,10 @@ export const AlertsAchievementsSection: React.FC = () => {
             ) : (
               <Accordion.Root
                 multiple
-                defaultValue={[capabilityProgress[0]?.capability]}
+                defaultValue={[enrichedProgress[0]?.capability]}
                 variant="enclosed"
               >
-                {capabilityProgress.map((capProgress) => (
+                {enrichedProgress.map((capProgress) => (
                   <AccordionItem
                     key={capProgress.capability}
                     value={capProgress.capability}
@@ -538,7 +500,7 @@ export const AlertsAchievementsSection: React.FC = () => {
                         {capProgress.milestones.map((milestone) => (
                           <Box
                             key={milestone.id}
-                            bg="bg.canvas"
+                            bg="gray.50"
                             p={4}
                             borderRadius="xl"
                             borderLeft="4px solid"

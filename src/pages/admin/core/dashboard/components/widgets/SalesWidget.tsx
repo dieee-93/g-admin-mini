@@ -11,23 +11,16 @@
  */
 
 import React from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { Stack, Typography, Badge, Icon } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { CurrencyDollarIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
-import { useSalesStore } from '@/store/salesStore';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { useSalesData } from '@/pages/admin/operations/sales/hooks/useSalesData';
+import { DecimalUtils } from '@/lib/decimal';
 
 export function SalesWidget() {
-  // ✅ CRITICAL FIX: Usar useShallow de Zustand v5 para evitar loop infinito
-  const { stats, loading } = useSalesStore(useShallow(state => ({
-    stats: state.stats,
-    loading: state.loading
-  })));
+  const { metrics, loading } = useSalesData();
+  const { todayTotal, monthTotal, monthCount } = metrics;
 
-  const todayTotal = stats?.todayTotal || 0;
-  const monthTotal = stats?.monthTotal || 0;
-  const monthCount = stats?.monthCount || 0;
 
   // Calcular cambio vs mes anterior (simplificado por ahora)
   const change = monthTotal > 0 ? ((todayTotal / (monthTotal / 30) - 1) * 100) : 0;

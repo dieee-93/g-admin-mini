@@ -10,3 +10,4 @@ export { RevenueAreaChartWidget } from './RevenueAreaChartWidget';
 export { MetricsBarChartWidget } from './MetricsBarChartWidget';
 export { QuickActionsWidget } from './QuickActionsWidget';
 export { ActivityFeedWidget } from './ActivityFeedWidget';
+export { MarginCalculatorWidget } from './MarginCalculatorWidget';

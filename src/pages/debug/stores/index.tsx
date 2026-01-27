@@ -24,7 +24,7 @@ import {
 } from '@/shared/ui';
 // TODO: Refactorizar para usar el sistema de capabilities unificado
 // import { useBusinessCapabilities } from '@/store/businessCapabilitiesStore';
-import { useCapabilities } from '@/store/capabilityStore';
+import { useBusinessProfile } from '@/lib/capabilities';
 
 type StoreTab = 'business-capabilities' | 'localStorage' | 'sessionStorage' | 'live-state';
 
@@ -43,8 +43,8 @@ export default function StoreInspectorPage() {
   const [sessionStorageEntries, setSessionStorageEntries] = useState<StateEntry[]>([]);
   const [refreshCount, setRefreshCount] = useState(0);
 
-  // Get Zustand stores
-  const businessCapStore = useBusinessCapabilities();
+  // Get profile
+  const { profile } = useBusinessProfile();
 
   // Load storage data
   const loadStorageData = () => {

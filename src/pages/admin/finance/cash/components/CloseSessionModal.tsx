@@ -8,7 +8,7 @@ import { Dialog, Alert } from '@/shared/ui';
 import { Button, Stack, Input, Textarea, Text, Box } from '@chakra-ui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { CashSessionRow, CloseCashSessionInput } from '@/modules/cash/types';
-import { DecimalUtils, formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils, formatCurrency } from '@/lib/decimal';
 
 interface CloseSessionModalProps {
   isOpen: boolean;

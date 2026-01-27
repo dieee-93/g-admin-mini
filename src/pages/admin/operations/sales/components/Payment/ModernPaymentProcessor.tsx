@@ -1,40 +1,35 @@
 // src/features/sales/components/Payment/ModernPaymentProcessor.tsx
 // 🚀 PAYMENT REVOLUTION - Modern Payment Processing System
 import { useState, useMemo } from 'react';
-import {
-  Box,
-  Text,
-  Button,
-  VStack,
-  HStack,
-  Badge,
-  Grid,
-  Separator,
-  Alert,
-  Progress,
-  Select,
-  createListCollection
-} from '@chakra-ui/react';
-import { InputField, CardWrapper } from '@/shared/ui';
+import { VStack, createListCollection, Spinner, Text } from '@chakra-ui/react';
 import {
   CreditCardIcon,
   DevicePhoneMobileIcon,
   QrCodeIcon,
   BanknotesIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  ClockIcon
 } from '@heroicons/react/24/outline';
 import {
   PaymentType,
-  PaymentMethod,
   PaymentTransactionStatus,
   SplitBillType,
-  TipConfiguration,
   DEFAULT_TIP_PERCENTAGES,
   PAYMENT_PROCESSING_TIMES
 } from '../../types';
+import type {
+  PaymentMethod,
+  TipConfiguration,
+} from '../../types';
 import { EventBus } from '@/lib/events';
+import { useTaxCalculation } from '@/pages/admin/finance/fiscal/hooks/useTaxCalculation';
+import { useActivePaymentMethods } from '@/modules/finance-integrations/hooks/usePayments';
+import { PaymentSummary } from './PaymentSummary';
+import { TipConfiguration as TipConfigComponent } from './TipConfiguration';
+import { SplitBillSetup } from './SplitBillSetup';
+import { SelectedPaymentMethods } from './SelectedPaymentMethods';
+import { PaymentMethodSelection } from './PaymentMethodSelection';
+import { PaymentProcessingStatus } from './PaymentProcessingStatus';
+import { PaymentActionButton } from './PaymentActionButton';
+
 // Event payload type for payment completion
 interface PaymentCompletedEvent {
   paymentId: string;
@@ -46,7 +41,6 @@ interface PaymentCompletedEvent {
   timestamp: string;
   reference?: string;
 }
-import { useTaxCalculation } from '@/modules/fiscal/hooks/useTaxCalculation';
 
 interface ModernPaymentProcessorProps {
   saleId: string;
@@ -68,6 +62,27 @@ interface PaymentSelection {
   isContactless: boolean;
 }
 
+// Map DB payment method codes to POS PaymentType enum
+const PAYMENT_CODE_TO_TYPE_MAP: Record<string, PaymentType> = {
+  'cash': PaymentType.CASH,
+  'credit_card': PaymentType.CREDIT_CARD,
+  'debit_card': PaymentType.NFC_CARD, // Assume debit is contactless
+  'qr_payment': PaymentType.QR_CODE,
+  'digital_wallet': PaymentType.MOBILE_WALLET,
+  'bank_transfer': PaymentType.CREDIT_CARD, // Fallback to card
+};
+
+// Map PaymentType to handler method name (for salesPaymentHandler)
+const PAYMENT_TYPE_TO_HANDLER_MAP: Record<PaymentType, string> = {
+  [PaymentType.CASH]: 'CASH',
+  [PaymentType.CREDIT_CARD]: 'CARD',
+  [PaymentType.DEBIT_CARD]: 'CARD',
+  [PaymentType.NFC_CARD]: 'CARD',
+  [PaymentType.MOBILE_WALLET]: 'QR', // Mobile wallets use QR in Argentina
+  [PaymentType.QR_CODE]: 'QR',
+  [PaymentType.BANK_TRANSFER]: 'TRANSFER',
+};
+
 export function ModernPaymentProcessor({
   saleId,
   totalAmount,
@@ -81,7 +96,10 @@ export function ModernPaymentProcessor({
 }: ModernPaymentProcessorProps) {
   // Use centralized tax calculation for consistency
   const { helpers } = useTaxCalculation();
-  
+
+  // Load payment methods from database
+  const { data: dbPaymentMethods, isLoading: isLoadingPaymentMethods, error: paymentMethodsError } = useActivePaymentMethods();
+
   // Recalculate using fiscal service for consistency (fallback to props if service unavailable)
   const calculatedTaxes = helpers.getTaxAmount(totalAmount) || taxes;
   const calculatedSubtotal = helpers.getSubtotal(totalAmount) || subtotal;
@@ -107,60 +125,67 @@ export function ModernPaymentProcessor({
 
   // Calculate remaining amount to pay
   const remainingAmount = useMemo(() => {
-    const paidAmount = selectedPayments.reduce((sum, payment) => 
+    const paidAmount = selectedPayments.reduce((sum, payment) =>
       sum + payment.amount + payment.tipAmount, 0
     );
     return Math.max(0, finalTotal - paidAmount);
   }, [selectedPayments, finalTotal]);
 
-  // Payment method configurations
-  const paymentMethods = useMemo(() => [
-    {
-      type: PaymentType.CASH,
-      label: 'Cash',
-      icon: BanknotesIcon,
-      color: 'green',
-      processingTime: PAYMENT_PROCESSING_TIMES[PaymentType.CASH],
-      isContactless: false,
-      description: 'Traditional cash payment'
-    },
-    {
-      type: PaymentType.CREDIT_CARD,
-      label: 'Credit CardWrapper ',
-      icon: CreditCardIcon,
-      color: 'blue',
-      processingTime: PAYMENT_PROCESSING_TIMES[PaymentType.CREDIT_CARD],
-      isContactless: false,
-      description: 'Insert or swipe card'
-    },
-    {
-      type: PaymentType.NFC_CARD,
-      label: 'Tap to Pay',
-      icon: CreditCardIcon,
-      color: 'purple',
-      processingTime: PAYMENT_PROCESSING_TIMES[PaymentType.NFC_CARD],
-      isContactless: true,
-      description: 'Contactless card payment'
-    },
-    {
-      type: PaymentType.MOBILE_WALLET,
-      label: 'Mobile Wallet',
-      icon: DevicePhoneMobileIcon,
-      color: 'orange',
-      processingTime: PAYMENT_PROCESSING_TIMES[PaymentType.MOBILE_WALLET],
-      isContactless: true,
-      description: 'Apple Pay, Google Pay, Samsung Pay'
-    },
-    {
-      type: PaymentType.QR_CODE,
-      label: 'QR Code',
-      icon: QrCodeIcon,
-      color: 'cyan',
-      processingTime: PAYMENT_PROCESSING_TIMES[PaymentType.QR_CODE],
-      isContactless: true,
-      description: 'Scan QR code to pay'
-    }
-  ], []);
+  // Payment method configurations - transformed from DB
+  const paymentMethods = useMemo(() => {
+    if (!dbPaymentMethods) return [];
+
+    // Icon mapping
+    const iconMap: Record<PaymentType, any> = {
+      [PaymentType.CASH]: BanknotesIcon,
+      [PaymentType.CREDIT_CARD]: CreditCardIcon,
+      [PaymentType.DEBIT_CARD]: CreditCardIcon,
+      [PaymentType.NFC_CARD]: CreditCardIcon,
+      [PaymentType.MOBILE_WALLET]: DevicePhoneMobileIcon,
+      [PaymentType.QR_CODE]: QrCodeIcon,
+      [PaymentType.BANK_TRANSFER]: CreditCardIcon,
+    };
+
+    // Color mapping
+    const colorMap: Record<PaymentType, string> = {
+      [PaymentType.CASH]: 'green',
+      [PaymentType.CREDIT_CARD]: 'blue',
+      [PaymentType.DEBIT_CARD]: 'blue',
+      [PaymentType.NFC_CARD]: 'purple',
+      [PaymentType.MOBILE_WALLET]: 'orange',
+      [PaymentType.QR_CODE]: 'cyan',
+      [PaymentType.BANK_TRANSFER]: 'teal',
+    };
+
+    // Transform DB payment methods to POS format
+    return dbPaymentMethods
+      .map((dbMethod) => {
+        const type = PAYMENT_CODE_TO_TYPE_MAP[dbMethod.code];
+        if (!type) return null; // Skip unknown payment types
+
+        const isContactless = [
+          PaymentType.NFC_CARD,
+          PaymentType.MOBILE_WALLET,
+          PaymentType.QR_CODE
+        ].includes(type);
+
+        return {
+          type,
+          label: dbMethod.display_name,
+          icon: iconMap[type] || BanknotesIcon,
+          color: colorMap[type] || 'gray',
+          processingTime: PAYMENT_PROCESSING_TIMES[type] || 3,
+          isContactless,
+          description: dbMethod.description || `Pay with ${dbMethod.display_name.toLowerCase()}`,
+          // Store DB method info for later use
+          dbCode: dbMethod.code,
+          dbId: dbMethod.id,
+          requiresGateway: dbMethod.requires_gateway,
+          gatewayId: dbMethod.gateway_id,
+        };
+      })
+      .filter(Boolean); // Remove nulls
+  }, [dbPaymentMethods]);
 
   // Tip percentage options
   const tipOptions = useMemo(() => {
@@ -182,7 +207,7 @@ export function ModernPaymentProcessor({
     const method = paymentMethods.find(m => m.type === type);
     if (!method) return;
 
-    const paymentAmount = splitBillMode ? 
+    const paymentAmount = splitBillMode ?
       (splitAmounts[selectedPayments.length] || 0) : remainingAmount;
 
     const newPayment: PaymentSelection = {
@@ -212,14 +237,14 @@ export function ModernPaymentProcessor({
   // Setup split bill
   const setupSplitBill = (type: SplitBillType) => {
     setSplitBillMode(type);
-    
+
     if (type === SplitBillType.EVEN) {
       const splitAmount = Math.round((finalTotal / customerCount) * 100) / 100;
       setSplitAmounts(Array(customerCount).fill(splitAmount));
     } else {
       setSplitAmounts(Array(customerCount).fill(0));
     }
-    
+
     setSelectedPayments([]);
   };
 
@@ -231,20 +256,28 @@ export function ModernPaymentProcessor({
     }
 
     setIsProcessing(true);
-    
+
     try {
-      const paymentMethods: PaymentMethod[] = [];
-      
+      const paymentMethodsResult: PaymentMethod[] = [];
+
       for (let i = 0; i < selectedPayments.length; i++) {
         const payment = selectedPayments[i];
+
+        // Get payment method config from DB
+        const paymentConfig = paymentMethods.find(m => m.type === payment.type);
+
         setProcessingStep(`Processing ${payment.type} payment ${i + 1}/${selectedPayments.length}...`);
-        
-        // Simulate payment processing time
+
+        // Simulate payment processing time (visual feedback)
         await new Promise(resolve => setTimeout(resolve, payment.processingTime * 1000));
-        
-        // In a real implementation, you would call your payment processor here
+
+        // Generate payment ID and idempotency key
+        const paymentId = `pm_${Date.now()}_${i}`;
+        const idempotencyKey = `${saleId}-${payment.type}-${payment.amount + payment.tipAmount}-${Date.now()}`;
+
+        // Create payment method object (for UI/callback)
         const paymentMethod: PaymentMethod = {
-          id: `pm_${Date.now()}_${i}`,
+          id: paymentId,
           sale_id: saleId,
           type: payment.type,
           amount: payment.amount,
@@ -255,29 +288,53 @@ export function ModernPaymentProcessor({
           processed_at: new Date().toISOString(),
           created_at: new Date().toISOString()
         };
-        
-        paymentMethods.push(paymentMethod);
 
-        // Emitir evento PAYMENT_COMPLETED para cada método de pago
+        paymentMethodsResult.push(paymentMethod);
+
+        // Map POS PaymentType to handler method name (CASH, CARD, QR, TRANSFER)
+        const handlerMethod = PAYMENT_TYPE_TO_HANDLER_MAP[payment.type];
+
+        // ============================================
+        // EMIT REAL EVENT → salesPaymentHandler will:
+        // 1. Create journal entry
+        // 2. Create sale_payments record
+        // 3. Update cash_sessions (via trigger)
+        // 4. Update operational_shifts (via trigger)
+        // ============================================
         const paymentCompletedEvent: PaymentCompletedEvent = {
-          paymentId: paymentMethod.id,
-          orderId: undefined, // Will be set by higher-level component
+          paymentId: paymentId,
+          orderId: undefined, // Will be set by higher-level component if needed
           saleId: saleId,
           amount: payment.amount + payment.tipAmount,
-          paymentMethod: payment.type,
+          paymentMethod: handlerMethod, // 'CASH', 'CARD', 'QR', 'TRANSFER'
           customerId: undefined, // Will be set by higher-level component if available
           timestamp: new Date().toISOString(),
-          reference: paymentMethod.id
+          reference: paymentId,
+          idempotencyKey: idempotencyKey,
+          metadata: {
+            pos_payment_type: payment.type,
+            is_contactless: payment.isContactless,
+            processing_time: payment.processingTime,
+            tip_amount: payment.tipAmount,
+            db_payment_method_id: paymentConfig?.dbId,
+            db_payment_method_code: paymentConfig?.dbCode,
+            requires_gateway: paymentConfig?.requiresGateway,
+            gateway_id: paymentConfig?.gatewayId,
+          }
         };
 
         await EventBus.emit('sales.payment.completed', paymentCompletedEvent, 'PaymentModule');
+
+        // TODO: For gateway payments (CARD, QR), we should wait for webhook confirmation
+        // For now, we're marking all as COMPLETED immediately
+        // In production, CARD/QR payments would be INITIATED and wait for gateway callback
       }
-      
+
       setProcessingStep('Finalizing transaction...');
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      onPaymentComplete(paymentMethods);
-      
+
+      onPaymentComplete(paymentMethodsResult);
+
     } catch (error) {
       onPaymentError(error instanceof Error ? error.message : 'Payment processing failed');
     } finally {
@@ -286,299 +343,114 @@ export function ModernPaymentProcessor({
     }
   };
 
+  // Show loading state while payment methods are loading
+  if (isLoadingPaymentMethods) {
+    return (
+      <VStack gap="4" align="center" py="8">
+        <Spinner size="lg" />
+        <Text>Loading payment methods...</Text>
+      </VStack>
+    );
+  }
+
+  // Show error if payment methods failed to load
+  if (paymentMethodsError) {
+    return (
+      <VStack gap="4" align="center" py="8">
+        <Text color="red.500" fontWeight="bold">Error loading payment methods</Text>
+        <Text color="gray.600">
+          {paymentMethodsError instanceof Error ? paymentMethodsError.message : 'Unknown error'}
+        </Text>
+        <Text fontSize="sm" color="gray.500">Please check your payment methods configuration in settings.</Text>
+      </VStack>
+    );
+  }
+
+  // Show warning if no payment methods available
+  if (!paymentMethods || paymentMethods.length === 0) {
+    return (
+      <VStack gap="4" align="center" py="8">
+        <Text color="orange.500" fontWeight="bold">No payment methods available</Text>
+        <Text color="gray.600">
+          Please configure payment methods in the admin panel before processing sales.
+        </Text>
+      </VStack>
+    );
+  }
+
   return (
     <VStack gap="6" align="stretch">
       {/* Payment Summary */}
-      <CardWrapper p="4" bg="bg.canvas">
-        <VStack gap="3" align="stretch">
-          <HStack justify="space-between">
-            <Text fontWeight="medium">Subtotal:</Text>
-            <Text>${calculatedSubtotal.toFixed(2)}</Text>
-          </HStack>
-          <HStack justify="space-between">
-            <Text fontWeight="medium">Tax:</Text>
-            <Text>${calculatedTaxes.toFixed(2)}</Text>
-          </HStack>
-          <HStack justify="space-between">
-            <Text fontWeight="medium" color={tipAmount > 0 ? "green.600" : "gray.600"}>
-              Tip ({tipPercentage}%):
-            </Text>
-            <Text color={tipAmount > 0 ? "green.600" : "gray.600"}>
-              ${tipAmount.toFixed(2)}
-            </Text>
-          </HStack>
-          <Separator />
-          <HStack justify="space-between">
-            <Text fontSize="lg" fontWeight="bold">Total:</Text>
-            <Text fontSize="lg" fontWeight="bold" color="green.600">
-              ${finalTotal.toFixed(2)}
-            </Text>
-          </HStack>
-          {remainingAmount > 0 && (
-            <HStack justify="space-between">
-              <Text fontWeight="medium" color="red.600">Remaining:</Text>
-              <Text fontWeight="bold" color="red.600">
-                ${remainingAmount.toFixed(2)}
-              </Text>
-            </HStack>
-          )}
-        </VStack>
-      </CardWrapper>
+      <PaymentSummary
+        subtotal={calculatedSubtotal}
+        taxes={calculatedTaxes}
+        tipAmount={tipAmount}
+        tipPercentage={tipPercentage}
+        finalTotal={finalTotal}
+        remainingAmount={remainingAmount}
+      />
 
       {/* Tip Configuration */}
-      <CardWrapper>
-        <CardWrapper.Header>
-          <Text fontWeight="bold">Tip Amount</Text>
-        </CardWrapper.Header>
-        <CardWrapper.Body>
-          <VStack gap="4" align="stretch">
-            <Select.Root
-              collection={tipOptions}
-              value={[customTipAmount > 0 ? 'custom' : tipPercentage.toString()]}
-              onValueChange={(details) => {
-                const value = details.value[0];
-                if (value === 'custom') {
-                  // Keep current custom amount
-                } else {
-                  const percentage = parseInt(value);
-                  setTipPercentage(percentage);
-                  setCustomTipAmount(0);
-                }
-              }}
-            >
-              <Select.Trigger>
-                <Select.ValueText placeholder="Select tip percentage" />
-              </Select.Trigger>
-              <Select.Content>
-                {tipOptions.items.map((option) => (
-                  <Select.Item key={option.value} item={option}>
-                    {option.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
+      <TipConfigComponent
+        tipOptions={tipOptions}
+        tipPercentage={tipPercentage}
+        customTipAmount={customTipAmount}
+        onTipPercentageChange={(percentage) => {
+          setTipPercentage(percentage);
+          setCustomTipAmount(0);
+        }}
+        onCustomTipChange={setCustomTipAmount}
+      />
 
-            {(customTipAmount > 0 || tipOptions.items.find(item => item.value === 'custom')) && (
-              <Box>
-                <Text mb="2" fontSize="sm" fontWeight="medium">Custom Tip Amount</Text>
-                <InputField
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={customTipAmount}
-                  onChange={(e) => setCustomTipAmount(parseFloat(e.target.value) || 0)}
-                  placeholder="Enter custom tip amount"
-                />
-              </Box>
-            )}
-          </VStack>
-        </CardWrapper.Body>
-      </CardWrapper>
-
-      {/* Split Bill Options */}
-      {allowSplitBill && customerCount > 1 && !splitBillMode && (
-        <CardWrapper>
-          <CardWrapper.Header>
-            <Text fontWeight="bold">Split Bill ({customerCount} customers)</Text>
-          </CardWrapper.Header>
-          <CardWrapper.Body>
-            <HStack gap="3">
-              <Button
-                variant="outline"
-                onClick={() => setupSplitBill(SplitBillType.EVEN)}
-                flex="1"
-              >
-                Split Evenly
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setupSplitBill(SplitBillType.CUSTOM)}
-                flex="1"
-              >
-                Custom Split
-              </Button>
-            </HStack>
-          </CardWrapper.Body>
-        </CardWrapper>
-      )}
-
-      {/* Split Bill Setup */}
-      {splitBillMode && (
-        <CardWrapper>
-          <CardWrapper.Header>
-            <HStack justify="space-between">
-              <Text fontWeight="bold">
-                {splitBillMode === SplitBillType.EVEN ? 'Even Split' : 'Custom Split'}
-              </Text>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSplitBillMode(null);
-                  setSplitAmounts([]);
-                  setSelectedPayments([]);
-                }}
-              >
-                Cancel Split
-              </Button>
-            </HStack>
-          </CardWrapper.Header>
-          <CardWrapper.Body>
-            <VStack gap="3" align="stretch">
-              {splitAmounts.map((amount, index) => (
-                <HStack key={index} gap="3">
-                  <Text flex="1">Customer {index + 1}:</Text>
-                  <InputField
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={amount}
-                    onChange={(e) => {
-                      const newAmounts = [...splitAmounts];
-                      newAmounts[index] = parseFloat(e.target.value) || 0;
-                      setSplitAmounts(newAmounts);
-                    }}
-                    width="120px"
-                    disabled={splitBillMode === SplitBillType.EVEN}
-                  />
-                  <Text>${amount.toFixed(2)}</Text>
-                </HStack>
-              ))}
-              <Text fontSize="sm" color="gray.600">
-                Total split: ${splitAmounts.reduce((sum, amount) => sum + amount, 0).toFixed(2)}
-              </Text>
-            </VStack>
-          </CardWrapper.Body>
-        </CardWrapper>
+      {/* Split Bill Options & Setup */}
+      {allowSplitBill && customerCount > 1 && (
+        <SplitBillSetup
+          splitBillMode={splitBillMode}
+          customerCount={customerCount}
+          splitAmounts={splitAmounts}
+          onSetupSplitBill={setupSplitBill}
+          onCancelSplit={() => {
+            setSplitBillMode(null);
+            setSplitAmounts([]);
+            setSelectedPayments([]);
+          }}
+          onUpdateSplitAmount={(index, amount) => {
+            const newAmounts = [...splitAmounts];
+            newAmounts[index] = amount;
+            setSplitAmounts(newAmounts);
+          }}
+        />
       )}
 
       {/* Selected Payment Methods */}
-      {selectedPayments.length > 0 && (
-        <CardWrapper>
-          <CardWrapper.Header>
-            <Text fontWeight="bold">Selected Payment Methods</Text>
-          </CardWrapper.Header>
-          <CardWrapper.Body>
-            <VStack gap="3" align="stretch">
-              {selectedPayments.map((payment, index) => {
-                const method = paymentMethods.find(m => m.type === payment.type);
-                const Icon = method?.icon || CreditCardIcon;
-                
-                return (
-                  <HStack key={index} gap="3" p="3" bg="bg.canvas" borderRadius="md">
-                    <Icon className="w-5 h-5" />
-                    <VStack align="start" flex="1" gap="1">
-                      <Text fontWeight="medium">{method?.label}</Text>
-                      <Text fontSize="sm" color="gray.600">
-                        Amount: ${payment.amount.toFixed(2)}
-                        {payment.tipAmount > 0 && ` + $${payment.tipAmount.toFixed(2)} tip`}
-                      </Text>
-                    </VStack>
-                    {payment.isContactless && (
-                      <Badge colorPalette="green" size="sm">Contactless</Badge>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      colorPalette="red"
-                      onClick={() => removePaymentMethod(index)}
-                    >
-                      Remove
-                    </Button>
-                  </HStack>
-                );
-              })}
-            </VStack>
-          </CardWrapper.Body>
-        </CardWrapper>
-      )}
+      <SelectedPaymentMethods
+        selectedPayments={selectedPayments}
+        paymentMethods={paymentMethods}
+        onRemove={removePaymentMethod}
+      />
 
       {/* Payment Method Selection */}
-      <CardWrapper>
-        <CardWrapper.Header>
-          <Text fontWeight="bold">Payment Methods</Text>
-        </CardWrapper.Header>
-        <CardWrapper.Body>
-          <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="3">
-            {paymentMethods.map((method) => {
-              const Icon = method.icon;
-              const isDisabled = remainingAmount <= 0;
-              
-              return (
-                <Button
-                  key={method.type}
-                  variant="outline"
-                  p="4"
-                  h="auto"
-                  onClick={() => addPaymentMethod(method.type)}
-                  disabled={isDisabled || isProcessing}
-                  _hover={!isDisabled ? { borderColor: `${method.color}.300` } : {}}
-                >
-                  <VStack gap="2">
-                    <HStack gap="2">
-                      <Icon className="w-5 h-5" />
-                      <Text fontWeight="medium">{method.label}</Text>
-                      {method.isContactless && (
-                        <Badge colorPalette="green" size="sm">NFC</Badge>
-                      )}
-                    </HStack>
-                    <Text fontSize="xs" color="gray.600" textAlign="center">
-                      {method.description}
-                    </Text>
-                    <Text fontSize="xs" color="gray.500">
-                      ~{method.processingTime}s
-                    </Text>
-                  </VStack>
-                </Button>
-              );
-            })}
-          </Grid>
-        </CardWrapper.Body>
-      </CardWrapper>
+      <PaymentMethodSelection
+        paymentMethods={paymentMethods}
+        remainingAmount={remainingAmount}
+        isProcessing={isProcessing}
+        onSelectMethod={addPaymentMethod}
+      />
 
       {/* Processing Status */}
-      {isProcessing && (
-        <Alert.Root status="info">
-          <Alert.Indicator>
-            <ClockIcon className="w-4 h-4" />
-          </Alert.Indicator>
-          <VStack align="start" flex="1" gap="2">
-            <Alert.Title>Processing Payment...</Alert.Title>
-            <Alert.Description>{processingStep}</Alert.Description>
-            <Progress.Root value={33} size="sm" w="full">
-              <Progress.Track>
-                <Progress.Range />
-              </Progress.Track>
-            </Progress.Root>
-          </VStack>
-        </Alert.Root>
-      )}
+      <PaymentProcessingStatus
+        isProcessing={isProcessing}
+        processingStep={processingStep}
+      />
 
       {/* Process Payment Button */}
-      <Button
-        colorPalette="green"
-        size="lg"
-        onClick={processPayment}
-        disabled={remainingAmount > 0.01 || selectedPayments.length === 0 || isProcessing}
-        loading={isProcessing}
-        loadingText="Processing..."
-      >
-        <CheckCircleIcon className="w-5 h-5" />
-        Process Payment ${finalTotal.toFixed(2)}
-      </Button>
-
-      {/* Payment Validation */}
-      {remainingAmount > 0.01 && selectedPayments.length > 0 && (
-        <Alert.Root status="warning">
-          <Alert.Indicator>
-            <ExclamationTriangleIcon className="w-4 h-4" />
-          </Alert.Indicator>
-          <Alert.Title>Incomplete Payment</Alert.Title>
-          <Alert.Description>
-            Please add payment methods to cover the remaining ${remainingAmount.toFixed(2)}
-          </Alert.Description>
-        </Alert.Root>
-      )}
+      <PaymentActionButton
+        finalTotal={finalTotal}
+        remainingAmount={remainingAmount}
+        selectedPaymentsCount={selectedPayments.length}
+        isProcessing={isProcessing}
+        onProcessPayment={processPayment}
+      />
     </VStack>
   );
 }

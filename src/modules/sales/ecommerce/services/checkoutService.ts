@@ -1,8 +1,8 @@
-// TODO: Uncomment CreateOrderParams when implementing checkout order creation
-import { orderService, /* type CreateOrderParams, */ type Order } from './orderService';
+import { orderService, type Order } from './orderService';
 import { cartService } from './cartService';
 import { eventBus } from '@/lib/events';
 import { logger } from '@/lib/logging';
+import { supabase } from '@/lib/supabase/client';
 
 export interface ProcessCheckoutParams {
   customerId: string;
@@ -48,35 +48,57 @@ export const checkoutService = {
         throw new Error('Cart is empty');
       }
 
-      // 3. Create order from cart
+      // 3. Get current total sales count (for achievements)
+      const { count: previousTotalSales } = await supabase
+        .from('sales')
+        .select('*', { count: 'exact', head: true });
+
+      // 4. Create order from cart
       const order = await orderService.createOrderFromCart({
         customerId,
         deliveryAddressId,
         paymentMethod,
       });
 
-      // 4. Emit sales.order_completed event for cross-module integration
+      // 5. Get sale items for event payload
+      const { data: saleItems } = await supabase
+        .from('sale_items')
+        .select('product_id, quantity')
+        .eq('sale_id', order.id);
+
+      // 6. Calculate new total after order creation
+      const totalSales = (previousTotalSales || 0) + 1;
+
+      // 7. Emit sales.order_completed event for cross-module integration
       try {
         await eventBus.emit('sales.order_completed', {
           orderId: order.id,
-          customerId: order.customer_id,
-          total: order.total,
-          paymentMethod: order.payment_method,
-          timestamp: Date.now()
+          orderTotal: order.total,
+          items: (saleItems || []).map((item: any) => ({
+            productId: item.product_id,
+            quantity: item.quantity
+          })),
+          totalSales,
+          previousTotalSales: previousTotalSales || 0,
+          timestamp: Date.now(),
+          triggeredBy: 'manual' as const,
+          userId: customerId
         });
 
-        logger.info('SalesModule', 'Order completed event emitted', {
-          orderId: order.id
+        logger.info('App', 'Order completed event emitted', {
+          orderId: order.id,
+          totalSales,
+          previousTotalSales
         });
       } catch (err) {
-        logger.error('SalesModule', 'Failed to emit order_completed event', err);
+        logger.error('App', 'Failed to emit order_completed event', err);
         // Don't fail the checkout if event emission fails
       }
 
-      // 5. TODO: Send order confirmation email (Week 5)
+      // 8. TODO: Send order confirmation email (Week 5)
       // await emailService.sendOrderConfirmation(order);
 
-      // 6. TODO: Trigger inventory deduction (if applicable)
+      // 9. TODO: Trigger inventory deduction (if applicable)
       // await inventoryService.deductStock(order);
 
       return {
@@ -84,7 +106,7 @@ export const checkoutService = {
         order,
       };
     } catch (error) {
-      logger.error('SalesModule', 'Error processing checkout', {
+      logger.error('App', 'Error processing checkout', {
         error,
         customerId: params.customerId
       });
@@ -122,7 +144,7 @@ export const checkoutService = {
         errors,
       };
     } catch (error) {
-      logger.error('SalesModule', 'Error validating checkout', {
+      logger.error('App', 'Error validating checkout', {
         error,
         customerId
       });

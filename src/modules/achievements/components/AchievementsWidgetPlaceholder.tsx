@@ -9,19 +9,16 @@
 
 import React from 'react';
 import { Box, VStack, HStack, Heading, Text, Button } from '@/shared/ui';
-import { useCapabilityStore } from '@/store/capabilityStore';
-import { useShallow } from 'zustand/react/shallow';
+import { useBusinessProfile, useFeatureFlags } from '@/lib/capabilities';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 
 export default function AchievementsWidgetPlaceholder() {
   const { navigate } = useNavigationActions();
 
-  // ✅ Solo leer activeFeatures - NO usar useValidationContext
-  // 🔧 FIX: Usar useShallow para prevenir re-renders por cambio de referencia del array
-  const activeFeatures = useCapabilityStore(
-    useShallow((state) => state.features.activeFeatures)
-  );
-  const setupCompleted = useCapabilityStore((state) => state.profile?.setupCompleted ?? false);
+  // ✅ MIGRATED: Use new hooks
+  const { activeFeatures } = useFeatureFlags();
+  const { profile } = useBusinessProfile();
+  const setupCompleted = profile?.setupCompleted ?? false;
 
   return (
     <Box

@@ -6,7 +6,7 @@
 import { type Supplier } from '@/pages/admin/supply-chain/materials/types';
 import { type MaterialABC } from '@/pages/admin/supply-chain/materials/types/abc-analysis';
 // NOTE: ProcurementRecommendation import removed - not used after parameter cleanup
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 // NOTE: MaterialItem, InventoryDecimal, DECIMAL_CONSTANTS imports removed - not used
 
 // ============================================================================

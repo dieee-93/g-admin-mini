@@ -1,0 +1,83 @@
+{/* 📱 CUSTOMER APP - Unified AppShell with nested child routes */}
+                              <Route 
+                                path="/app" 
+                                element={<AppShell headerActions={<CustomerHeaderActions />} />}
+                              >
+                                {/* Protected Routes */}
+                                <Route path="portal" element={
+                                  <ProtectedRouteNew>
+                                    <Suspense fallback={<LoadingFallback />}>
+                                      <LazyCustomerPortal />
+                                    </Suspense>
+                                  </ProtectedRouteNew>
+                                } />
+                                <Route path="menu" element={
+                                  <ProtectedRouteNew>
+                                    <Suspense fallback={<LoadingFallback />}>
+                                      <LazyCustomerMenu />
+                                    </Suspense>
+                                  </ProtectedRouteNew>
+                                } />
+                                <Route path="orders" element={
+                                  <ProtectedRouteNew>
+                                    <Suspense fallback={<LoadingFallback />}>
+                                      <LazyMyOrders />
+                                    </Suspense>
+                                  </ProtectedRouteNew>
+                                } />
+                                <Route path="settings" element={
+                                  <ProtectedRouteNew>
+                                    <Suspense fallback={<LoadingFallback />}>
+                                      <LazyCustomerSettings />
+                                    </Suspense>
+                                  </ProtectedRouteNew>
+                                } />
+                                <Route path="booking" element={
+                                  <ProtectedRouteNew>
+                                    <Suspense fallback={<LoadingFallback />}>
+                                      <LazyBookingPage />
+                                    </Suspense>
+                                  </ProtectedRouteNew>
+                                } />
+                                <Route path="appointments" element={
+                                  <ProtectedRouteNew>
+                                    <Suspense fallback={<LoadingFallback />}>
+                                      <LazyAppointmentsPage />
+                                    </Suspense>
+                                  </ProtectedRouteNew>
+                                } />
+                                <Route path="checkout" element={
+                                  <ProtectedRouteNew>
+                                    <Suspense fallback={<LoadingFallback />}>
+                                      <LazyCheckoutPage />
+                                    </Suspense>
+                                  </ProtectedRouteNew>
+                                } />
+
+                                {/* Public Routes (Catalog, Cart, etc) */}
+                                <Route path="catalog" element={
+                                  <Suspense fallback={<LoadingFallback />}>
+                                    <LazyCatalogPage />
+                                  </Suspense>
+                                } />
+                                <Route path="cart" element={
+                                  <Suspense fallback={<LoadingFallback />}>
+                                    <LazyCartPage />
+                                  </Suspense>
+                                } />
+                                <Route path="checkout/success" element={
+                                  <Suspense fallback={<LoadingFallback />}>
+                                    <LazyCheckoutSuccessPage />
+                                  </Suspense>
+                                } />
+                                <Route path="checkout/failure" element={
+                                  <Suspense fallback={<LoadingFallback />}>
+                                    <LazyCheckoutFailurePage />
+                                  </Suspense>
+                                } />
+                                <Route path="delivery-coverage" element={
+                                  <Suspense fallback={<LoadingFallback />}>
+                                    <LazyDeliveryCoveragePage />
+                                  </Suspense>
+                                } />
+                              </Route>

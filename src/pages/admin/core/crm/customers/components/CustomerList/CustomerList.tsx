@@ -7,18 +7,21 @@ import {
   Button,
   Badge,
   Alert,
-  Table
+  Table,
+  Dialog
 } from '@/shared/ui';
-import { QuickCalculations } from '@/business-logic/shared/FinancialCalculations';
+import { QuickCalculations } from '@/lib/decimal';
 // TODO: Implement virtualization for large customer lists (1000+ records)
 // import { VirtualizedList } from '@/lib/performance/virtualization/VirtualizedList';
 import { useState } from 'react';
-import { useCustomersStore } from '@/store/customersStore';
+import { useCustomersStore } from '@/modules/customers/store';
 import { useShallow } from 'zustand/react/shallow';
-import { useCustomers, useCustomerSearch } from '../../hooks/existing/useCustomers';
+import { useCustomers, useCustomerSearch } from '@/modules/customers/hooks';
 import { type Customer } from '../../types/customer';
 import { CustomerForm } from '../CustomerForm/CustomerForm';
 import { notify } from '@/lib/notifications';
+import { getDefaultAddress, getAddressDisplay } from '../../utils/addressHelpers';
+import { usePermissions } from '@/hooks';
 
 export function CustomerList() {
   const { customers, loading, loadingStats, removeCustomer } = useCustomers();
@@ -29,6 +32,9 @@ export function CustomerList() {
   const currentCustomer = useCustomersStore((state) => state.currentCustomer);
   const openModal = useCustomersStore((state) => state.openModal);
   const closeModal = useCustomersStore((state) => state.closeModal);
+
+  // ✅ PERMISSIONS: Check user permissions
+  const { canUpdate, canDelete } = usePermissions('customers');
 
   const [searchQuery, setSearchQuery] = useState('');
   // const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null); // Removed local state
@@ -62,22 +68,49 @@ export function CustomerList() {
   };
 
   const handleDelete = async (customer: Customer) => {
+    // Verificar permisos primero
+    if (!canDelete) {
+      notify.error({
+        title: 'Sin permisos',
+        description: 'No tienes permisos para eliminar clientes'
+      });
+      return;
+    }
+
     if (!confirm(`¿Estás seguro de eliminar al cliente "${customer.name}"?`)) {
       return;
     }
 
+    console.log('🗑️ [CustomerList] Attempting to delete customer:', customer.id);
+
     try {
       await removeCustomer(customer.id);
+      console.log('✅ [CustomerList] Customer deleted successfully');
 
-      notify.success({ title: 'CLIENT_DELETED', description: 'Cliente eliminado correctamente' })
+      notify.success({ title: 'Cliente eliminado', description: 'Cliente eliminado correctamente' })
 
-    } catch {
-      notify.error({ title: 'ERROR', description: 'Error eliminando cliente' })
+    } catch (error) {
+      console.error('❌ [CustomerList] Error deleting customer:', error);
 
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+
+      notify.error({
+        title: 'Error al eliminar cliente',
+        description: errorMessage
+      })
     }
   };
 
   const handleEdit = (customer: Customer) => {
+    // Verificar permisos primero
+    if (!canUpdate) {
+      notify.error({
+        title: 'Sin permisos',
+        description: 'No tienes permisos para editar clientes'
+      });
+      return;
+    }
+
     // Customer now has unified type, no casting needed
     openModal('edit', customer);
   };
@@ -95,32 +128,37 @@ export function CustomerList() {
 
   return (
     <Stack p="lg">
-      {/* Modal de edición */}
-      {isModalOpen && currentCustomer && (
-        <Stack
-          position="fixed"
-          top="0"
-          left="0"
-          right="0"
-          bottom="0"
-          bg="blackAlpha.600"
-          zIndex="overlay"
-          direction="row"
-          align="center"
-          justify="center"
-          p="4"
-        >
-          <CardWrapper padding="md" width="full">
-            <div style={{ maxWidth: '600px', maxHeight: '90vh', overflow: 'auto' }}>
+      {/* Modal de creación/edición */}
+      <Dialog.Root
+        open={isModalOpen}
+        onOpenChange={(details) => {
+          if (!details.open) {
+            closeModal();
+          }
+        }}
+        size="xl"
+        placement="center"
+        motionPreset="slide-in-bottom"
+      >
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content minW={{ base: "90vw", md: "700px", lg: "800px" }} maxW="900px">
+            <Dialog.Header>
+              <Dialog.Title>
+                {currentCustomer ? 'Editar Cliente' : 'Nuevo Cliente'}
+              </Dialog.Title>
+              <Dialog.CloseTrigger />
+            </Dialog.Header>
+            <Dialog.Body maxHeight="75vh" overflowY="auto" pb="6">
               <CustomerForm
-                customer={currentCustomer}
+                customer={currentCustomer || undefined}
                 onSuccess={handleEditSuccess}
                 onCancel={handleEditCancel}
               />
-            </div>
-          </CardWrapper>
-        </Stack>
-      )}
+            </Dialog.Body>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
 
       {/* Header con búsqueda */}
       <Stack direction="row" justify="space-between" align="center" mb="lg" flexWrap="wrap" gap="md">
@@ -158,11 +196,11 @@ export function CustomerList() {
         <Stack direction="row" gap="sm">
           <input
             type="text"
-            placeholder="Buscar por nombre, teléfono o email..."
+            placeholder="Buscar por nombre, DNI, teléfono o email..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             style={{
-              maxWidth: '400px',
+              maxWidth: '450px',
               padding: '8px 12px',
               border: '1px solid #e2e2e2',
               borderRadius: '6px'
@@ -214,6 +252,7 @@ export function CustomerList() {
           <Table.Header>
             <Table.Row>
               <Table.ColumnHeader>Cliente</Table.ColumnHeader>
+              <Table.ColumnHeader>DNI</Table.ColumnHeader>
               <Table.ColumnHeader>Contacto</Table.ColumnHeader>
               <Table.ColumnHeader>Dirección</Table.ColumnHeader>
               {showStats && !query && (
@@ -237,18 +276,32 @@ export function CustomerList() {
                       <Typography size="xs" color="text.muted">
                         Cliente desde {formatDate(customer.created_at)}
                       </Typography>
+                      {customer.notes && (
+                        <Typography size="xs" color="text.muted" fontStyle="italic">
+                          📝 {customer.notes.length > 50 ? customer.notes.substring(0, 50) + '...' : customer.notes}
+                        </Typography>
+                      )}
                     </Stack>
+                  </Table.Cell>
+
+                  <Table.Cell>
+                    <Typography size="sm">
+                      {customer.dni || '-'}
+                    </Typography>
                   </Table.Cell>
 
                   <Table.Cell>
                     <Stack direction="column" align="start" gap="xs">
                       {customer.phone && (
-                        <Typography size="sm">📞 {customer.phone}</Typography>
+                        <Typography size="sm">☎️ {customer.phone}</Typography>
+                      )}
+                      {customer.mobile && (
+                        <Typography size="sm">📱 {customer.mobile}</Typography>
                       )}
                       {customer.email && (
                         <Typography size="sm">✉️ {customer.email}</Typography>
                       )}
-                      {!customer.phone && !customer.email && (
+                      {!customer.phone && !customer.mobile && !customer.email && (
                         <Typography size="sm" color="text.muted">Sin contacto</Typography>
                       )}
                     </Stack>
@@ -256,7 +309,7 @@ export function CustomerList() {
 
                   <Table.Cell>
                     <Typography size="sm">
-                      {customer.address || '-'}
+                      {getAddressDisplay(getDefaultAddress(customer))}
                     </Typography>
                   </Table.Cell>
 
@@ -294,23 +347,35 @@ export function CustomerList() {
 
                   <Table.Cell>
                     <Stack direction="row" gap="xs">
-                      <Button
-                        size="xs"
-                        colorPalette="blue"
-                        variant="ghost"
-                        onClick={() => handleEdit(customer)}
-                      >
-                        ✏️
-                      </Button>
+                      {canUpdate && (
+                        <Button
+                          size="xs"
+                          colorPalette="blue"
+                          variant="ghost"
+                          onClick={() => handleEdit(customer)}
+                          title="Editar cliente"
+                        >
+                          ✏️
+                        </Button>
+                      )}
 
-                      <Button
-                        size="xs"
-                        colorPalette="red"
-                        variant="ghost"
-                        onClick={() => handleDelete(customer)}
-                      >
-                        🗑️
-                      </Button>
+                      {canDelete && (
+                        <Button
+                          size="xs"
+                          colorPalette="red"
+                          variant="ghost"
+                          onClick={() => handleDelete(customer)}
+                          title="Eliminar cliente"
+                        >
+                          🗑️
+                        </Button>
+                      )}
+
+                      {!canUpdate && !canDelete && (
+                        <Typography size="xs" color="text.muted">
+                          Sin permisos
+                        </Typography>
+                      )}
                     </Stack>
                   </Table.Cell>
                 </Table.Row>

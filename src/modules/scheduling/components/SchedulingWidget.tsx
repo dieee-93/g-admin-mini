@@ -15,8 +15,8 @@ import { useMemo, useEffect } from 'react';
 import { Box, Stack, Typography, Icon, Button } from '@/shared/ui';
 import { CardWrapper } from '@/shared/ui/CardWrapper';
 import { ClockIcon } from '@heroicons/react/24/outline';
-import { useScheduling } from '@/pages/admin/resources/scheduling/hooks/useScheduling';
-import { SchedulingCalculations } from '@/business-logic/scheduling/schedulingCalculations';
+import { useScheduling } from '@/modules/scheduling/hooks';
+import { SchedulingCalculations } from '@/modules/scheduling/services/schedulingCalculations';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 
 interface SchedulingStats {

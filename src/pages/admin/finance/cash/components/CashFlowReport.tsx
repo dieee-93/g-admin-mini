@@ -6,7 +6,7 @@
 
 import { Box, Heading, Stack, Table, Text, Collapsible } from '@chakra-ui/react';
 import { useState } from 'react';
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency } from '@/lib/decimal';
 import type { CashFlowStatement, CashFlowActivity } from '@/modules/cash/types/reports';
 import { Button } from '@/shared/ui';
 

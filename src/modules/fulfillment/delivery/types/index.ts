@@ -5,7 +5,7 @@
  * Phase 1 - Part 3: Delivery Sub-Module
  */
 
-import type { FulfillmentQueueItem } from '../../services/fulfillmentService';
+import type { QueueItem } from '../../services/fulfillmentService';
 
 // ============================================
 // CORE TYPES (Compatible with FulfillmentQueue)
@@ -43,7 +43,7 @@ export interface DeliveryMetadata {
  * Extended DeliveryOrder that includes FulfillmentQueue data
  * Use this for UI components that need both fulfillment + delivery data
  */
-export interface DeliveryOrder extends FulfillmentQueueItem {
+export interface DeliveryOrder extends QueueItem {
   // Fulfillment base fields:
   // - id, order_id, customer_id, customer_name, status
   // - priority, scheduled_time, assigned_to, assigned_at
@@ -102,6 +102,7 @@ export interface Coordinates {
 
 export interface DeliveryZone {
   id: string;
+  location_id?: string | null;  // NULL = zona global (todas las sucursales)
   name: string;
   description?: string;
   boundaries: Coordinates[];  // Polygon points
@@ -109,9 +110,35 @@ export interface DeliveryZone {
   delivery_fee: number;
   min_order_amount?: number;
   estimated_time_minutes: number;
+  priority?: number;  // Para precedencia cuando múltiples zonas coinciden
   is_active: boolean;
   created_at: string;
   updated_at?: string;
+}
+
+/**
+ * Zona de delivery pública (sin información sensible)
+ * Para exponer a clientes sin autenticación
+ */
+export interface PublicDeliveryZone {
+  id: string;
+  name: string;
+  boundaries: Coordinates[];
+  delivery_fee: number;
+  estimated_time_minutes: number;
+  min_order_amount?: number;
+  color: string;
+}
+
+export interface ZoneValidation {
+  valid: boolean;
+  zone_id?: string;
+  zone_name?: string;
+  location_id?: string;  // Sucursal de la zona encontrada
+  delivery_fee?: number;
+  estimated_time_minutes?: number;
+  min_order_amount?: number;
+  error_message?: string;
 }
 
 export interface ZoneValidation {
@@ -220,6 +247,7 @@ export interface AssignDriverData {
 }
 
 export interface CreateDeliveryZoneData {
+  location_id?: string | null;  // NULL = zona global
   name: string;
   description?: string;
   boundaries: Coordinates[];
@@ -227,6 +255,7 @@ export interface CreateDeliveryZoneData {
   delivery_fee: number;
   min_order_amount?: number;
   estimated_time_minutes: number;
+  priority?: number;
 }
 
 export interface UpdateDeliveryZoneData extends Partial<CreateDeliveryZoneData> {

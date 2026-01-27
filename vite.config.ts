@@ -16,14 +16,38 @@ export default defineConfig({
   // WHY: vite-plugin-csp is obsolete (3 years old) and uses unreliable meta tags
   // BEST PRACTICE: CSP via HTTP headers is more secure and supports all directives
   server: {
+    port: 5173,
+    strictPort: true,
+    // Optimizaciones para desarrollo
+    hmr: {
+      overlay: true,
+    },
+    // Preload de módulos para mejor performance
+    warmup: {
+      clientFiles: [
+        './src/main.tsx',
+        './src/App.tsx',
+        './src/modules/**/manifest.tsx',
+      ],
+    },
+    // Proxy API requests to local Express server in development
+    // Pattern: https://github.com/internetdrew/vite-express-vercel
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path, // Keep the path as-is
+      },
+    },
     headers: {
       'Content-Security-Policy': [
         "default-src 'self'",
         "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.supabase.co", // unsafe-inline for theme script in index.html
         "worker-src 'self' blob:", // ✅ Allow Web Workers
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // unsafe-inline needed for Chakra UI
-        "img-src 'self' data: https: blob:",
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com",
+        "img-src 'self' data: https: blob: https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com", // ✅ OpenStreetMap tiles + Leaflet icons
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com https://apis.datos.gob.ar https://servicios.usig.buenosaires.gob.ar https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org", // ✅ Geocoding APIs
         "font-src 'self' data: https://fonts.gstatic.com",
         "object-src 'none'",
         "base-uri 'self'",
@@ -32,6 +56,17 @@ export default defineConfig({
         "upgrade-insecure-requests",
       ].join('; '),
     },
+  },
+  // Optimizaciones adicionales para desarrollo
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@chakra-ui/react',
+      '@tanstack/react-query',
+      'zustand',
+    ],
   },
   build: {
     // TEMPORARY: Enable sourcemaps for debugging

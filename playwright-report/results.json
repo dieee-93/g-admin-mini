@@ -50,7 +50,7 @@
         "testMatch": [
           "/.*\\.setup\\.spec\\.ts/"
         ],
-        "timeout": 120000
+        "timeout": 60000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -66,7 +66,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -82,7 +82,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -98,7 +98,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -114,7 +114,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -130,7 +130,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -146,7 +146,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -162,7 +162,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       }
     ],
     "shard": null,
@@ -179,95 +179,95 @@
   },
   "suites": [
     {
-      "title": "alerts-toast-progress.spec.ts",
-      "file": "alerts-toast-progress.spec.ts",
+      "title": "materials\\materials-crud-complete.spec.ts",
+      "file": "materials/materials-crud-complete.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Toast Progress Tracking",
-          "file": "alerts-toast-progress.spec.ts",
-          "line": 30,
+          "title": "Materials CRUD - Complete Test Suite",
+          "file": "materials/materials-crud-complete.spec.ts",
+          "line": 17,
           "column": 6,
-          "specs": [
+          "specs": [],
+          "suites": [
             {
-              "title": "new alerts should show progress from 0% to 100%",
-              "ok": false,
-              "tags": [],
-              "tests": [
+              "title": "Create Materials - Los 3 Tipos",
+              "file": "materials/materials-crud-complete.spec.ts",
+              "line": 32,
+              "column": 8,
+              "specs": [
                 {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "authenticated",
-                  "projectName": "authenticated",
-                  "results": [
+                  "title": "1. Crear MEASURABLE Material (kg, litros)",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 11028,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"alert\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"alert\"]').first()\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"alert\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"alert\"]').first()\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\alerts-toast-progress.spec.ts:53:25",
-                        "location": {
-                          "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\alerts-toast-progress.spec.ts",
-                          "column": 25,
-                          "line": 53
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 51 |\u001b[39m     \u001b[90m// Wait for toast to appear\u001b[39m\n \u001b[90m 52 |\u001b[39m     \u001b[36mconst\u001b[39m toast \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[role=\"alert\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m expect(toast)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \n \u001b[90m 55 |\u001b[39m     \u001b[90m// Check progress bar exists and starts near 0%\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mconst\u001b[39m progressBar \u001b[33m=\u001b[39m toast\u001b[33m.\u001b[39mlocator(\u001b[32m'[class*=\"progress\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\alerts-toast-progress.spec.ts",
-                            "column": 25,
-                            "line": 53
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"alert\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"alert\"]').first()\u001b[22m\n\n\n\u001b[0m \u001b[90m 51 |\u001b[39m     \u001b[90m// Wait for toast to appear\u001b[39m\n \u001b[90m 52 |\u001b[39m     \u001b[36mconst\u001b[39m toast \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[role=\"alert\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m expect(toast)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \n \u001b[90m 55 |\u001b[39m     \u001b[90m// Check progress bar exists and starts near 0%\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mconst\u001b[39m progressBar \u001b[33m=\u001b[39m toast\u001b[33m.\u001b[39mlocator(\u001b[32m'[class*=\"progress\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\alerts-toast-progress.spec.ts:53:25\u001b[22m"
-                        }
-                      ],
-                      "stdout": [
-                        {
-                          "text": "✅ Page loaded, ready to test alerts\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-19T17:00:41.749Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
+                      "expectedStatus": "passed",
+                      "projectId": "authenticated",
+                      "projectName": "authenticated",
+                      "results": [
                         {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\alerts-toast-progress-Toas-1e7d3-how-progress-from-0-to-100--authenticated\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\alerts-toast-progress-Toas-1e7d3-how-progress-from-0-to-100--authenticated\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\alerts-toast-progress-Toas-1e7d3-how-progress-from-0-to-100--authenticated\\error-context.md"
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 23521,
+                          "error": {
+                            "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Nuevo Material' }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"chakra-button css-1kyre1s\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n",
+                            "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Nuevo Material' }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"chakra-button css-1kyre1s\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:38:20",
+                            "location": {
+                              "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
+                              "column": 20,
+                              "line": 38
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 36 |\u001b[39m       \u001b[36mconst\u001b[39m button \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Nuevo Material'\u001b[39m })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m button\u001b[33m.\u001b[39mwaitFor({ state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 38 |\u001b[39m       \u001b[36mawait\u001b[39m button\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                    \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 39 |\u001b[39m       \n \u001b[90m 40 |\u001b[39m       \u001b[90m// Esperar a que el backdrop del modal aparezca (Chakra UI v3 Dialog)\u001b[39m\n \u001b[90m 41 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-part=\"backdrop\"]'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
+                                "column": 20,
+                                "line": 38
+                              },
+                              "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Nuevo Material' }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"chakra-button css-1kyre1s\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\n\n\u001b[0m \u001b[90m 36 |\u001b[39m       \u001b[36mconst\u001b[39m button \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Nuevo Material'\u001b[39m })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m button\u001b[33m.\u001b[39mwaitFor({ state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 38 |\u001b[39m       \u001b[36mawait\u001b[39m button\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                    \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 39 |\u001b[39m       \n \u001b[90m 40 |\u001b[39m       \u001b[90m// Esperar a que el backdrop del modal aparezca (Chakra UI v3 Dialog)\u001b[39m\n \u001b[90m 41 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-part=\"backdrop\"]'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:38:20\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-26T20:54:18.046Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\materials-materials-crud-c-e4456-SURABLE-Material-kg-litros--authenticated\\test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\materials-materials-crud-c-e4456-SURABLE-Material-kg-litros--authenticated\\error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
+                            "column": 20,
+                            "line": 38
+                          }
                         }
                       ],
-                      "errorLocation": {
-                        "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\alerts-toast-progress.spec.ts",
-                        "column": 25,
-                        "line": 53
-                      }
+                      "status": "unexpected"
                     }
                   ],
-                  "status": "unexpected"
+                  "id": "49c27bb20a52ce2852e8-7664bd91d2ec120d3b79",
+                  "file": "materials/materials-crud-complete.spec.ts",
+                  "line": 34,
+                  "column": 5
                 }
-              ],
-              "id": "3c04d34421fa427da82e-6a735c2cd398d26a9a63",
-              "file": "alerts-toast-progress.spec.ts",
-              "line": 47,
-              "column": 3
+              ]
             }
           ]
         }
@@ -276,8 +276,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-11-19T17:00:40.362Z",
-    "duration": 12999.809000000001,
+    "startTime": "2026-01-26T20:54:16.424Z",
+    "duration": 27053.922,
     "expected": 0,
     "skipped": 0,
     "unexpected": 1,

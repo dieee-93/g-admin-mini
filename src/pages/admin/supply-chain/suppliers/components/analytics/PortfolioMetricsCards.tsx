@@ -5,7 +5,7 @@
 
 import { SimpleGrid } from '@/shared/ui';
 import { MetricCard } from '@/shared/ui';
-import type { SupplierAnalysisResult } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import type { SupplierAnalysisResult } from '@/modules/materials/services';
 import {
   BuildingStorefrontIcon,
   StarIcon,

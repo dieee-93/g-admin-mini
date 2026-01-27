@@ -31,7 +31,7 @@ import {
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
 import { useCapabilities } from '@/lib/capabilities';
-import { useValidationContext } from '@/hooks/useValidationContext';
+import { useValidationContext } from '@/hooks';
 import { ModuleRegistry } from '@/lib/modules';
 import type { CapabilityProgress, Requirement } from '@/modules/achievements/types';
 import type { BusinessCapabilityId } from '@/config/types';

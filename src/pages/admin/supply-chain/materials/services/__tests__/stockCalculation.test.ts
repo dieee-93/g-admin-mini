@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { StockCalculation } from '@/business-logic/inventory/stockCalculation';
+import { StockCalculation } from '@/modules/materials/services/stockCalculation';
 import { type MaterialItem, type CountableItem } from '@/pages/admin/supply-chain/materials/types';
 
 /**

@@ -87,13 +87,12 @@ export const AppShell = memo(function AppShell({
       )}
 
       {/* ✅ Main Content - Child routes render here via <Outlet /> */}
+      {/* ⚠️ NO padding here - each page handles its own layout (Magic Patterns pattern) */}
       <Box
         as="main"
         mt="60px"                                              // Header height
         ml={isMobile ? "0" : { base: "0", md: "3rem" }}       // Sidebar width (desktop only)
         pb={isMobile ? "90px" : "0"}                          // Bottom nav height (mobile only)
-        px={isMobile ? "4" : { base: "4", md: "6" }}
-        py={isMobile ? "2" : { base: "2", md: "4" }}
         overflow={isMobile ? "auto" : "visible"}
         minH="calc(100vh - 60px)"
         w="100%"

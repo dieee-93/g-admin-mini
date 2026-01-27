@@ -71,6 +71,7 @@ interface InputProps extends Omit<ChakraInputProps, 'size' | 'variant'> {
   startAddon?: ReactNode
   /** Addon a renderizar fuera del input al final (derecha) */
   endAddon?: ReactNode
+  ref?: any
 }
 
 export function Input({
@@ -90,7 +91,6 @@ export function Input({
   endElement,
   startAddon,
   endAddon,
-  colorPalette = 'default',
   ...inputProps // ✅ Spread todas las demás props de Chakra Input
 }: InputProps) {
   // ✅ Recipes handle all theming automatically - no manual props needed

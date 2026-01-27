@@ -13,16 +13,15 @@ import React from 'react';
 import { ContentLayout, Section, Button, SkipLink, HStack, Alert } from '@/shared/ui';
 import { PlusIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
-import { HookPoint } from '@/lib/modules';
 import { FloorStats } from './components/FloorStats';
 import { FloorPlanView } from './components/FloorPlanView';
 import { ReservationsList } from './components/ReservationsList';
 import { notify } from '@/lib/notifications';
-import { usePermissions } from '@/hooks/usePermissions';
+import { usePermissions } from '@/hooks';
 
 export default function FloorManagementPage() {
   const [refreshTrigger, setRefreshTrigger] = React.useState(0);
-  const { canRead, canCreate, canUpdate } = usePermissions('fulfillment');
+  const { canRead, canCreate, canUpdate } = usePermissions('operations');
 
   // Check read permission
   if (!canRead) {
@@ -30,7 +29,7 @@ export default function FloorManagementPage() {
       <ContentLayout spacing="normal" mainLabel="Access Denied">
         <Section variant="elevated">
           <Alert status="warning" title="Access Denied">
-            You don't have permission to view fulfillment operations.
+            You don't have permission to view operations.
           </Alert>
         </Section>
       </ContentLayout>
@@ -58,12 +57,7 @@ export default function FloorManagementPage() {
           semanticHeading="Floor Management Dashboard"
         />
 
-        {/* ✅ HOOKPOINT: Toolbar Actions - Open Shift button with validation */}
-        <HookPoint
-          name="fulfillment.onsite.toolbar.actions"
-          fallback={null}
-        />
-
+        {/* NOTE: Open Shift is now handled by ShiftControlWidget in dashboard */}
         {/* ✅ ACTIONS SECTION - Standard actions */}
         <Section variant="flat">
           <HStack gap="2">

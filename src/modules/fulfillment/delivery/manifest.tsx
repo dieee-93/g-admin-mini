@@ -100,10 +100,11 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
 
     try {
       // ============================================
+      // ============================================
       // IMPORT DEPENDENCIES
       // ============================================
-      // Note: No feature checks needed - Module Registry validates requiredFeatures
-      // before calling setup(). If we're here, all required features are active.
+      // Note: No feature checks needed - Module Registry validates activatedBy
+      // before calling setup(). If we're here, the activation feature is active.
 
       // ⚡ PERFORMANCE: Parallel imports (4 imports)
       const [

@@ -1,3 +1,4 @@
+/* eslint-disable precision/no-native-arithmetic */
 import { Stack, Button, Text, Box } from '@chakra-ui/react';
 import { SelectField } from './SelectField';
 

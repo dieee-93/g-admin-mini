@@ -254,7 +254,7 @@ function DayColumn({ day, onDayClick, onShiftClick, onNewShift, config }: DayCol
         gap="xs"
         minH="300px"
         p="sm"
-        bg="bg.canvas"
+        bg="gray.50"
         borderRadius="md"
         borderWidth="2px"
         borderStyle="dashed"

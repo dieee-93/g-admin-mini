@@ -23,6 +23,22 @@ The **Settings** module is the central configuration hub for G-Admin Mini. It pr
 
 ---
 
+## Feature & Route Map
+| Feature | Sub-route | Component | Description |
+|---------|-----------|-----------|-------------|
+| **General Settings** | `/` | `page.tsx` | Main settings hub. |
+| **Business Profile** | `/pages/business` | `BusinessProfile/*` | Company details configuration and operating hours. |
+| **Tax Config** | `(drawer)` | `TaxConfiguration/*` | Fiscal/Tax setup (AFIP, IVA). |
+| **Users & Roles** | `(drawer)` | `UserPermissions/*` | Role-based access control. |
+| **System** | `(drawer)` | `System/*` | Global preferences (Theme, Lang). |
+| **Diagnostics** | `/pages/diagnostics` | `DiagnosticsPage` | System health and connection status. |
+| **Enterprise** | `/pages/enterprise` | `EnterprisePage` | Multi-location and franchise settings. |
+| **Integrations** | `/pages/integrations` | `IntegrationsPage` | External service connections. |
+| **Payment Methods** | `/pages/payment-methods` | `PaymentMethodsPage` | Payment gateway configuration. |
+| **Reporting Config** | `/pages/reporting` | `ReportingConfigPage` | Configuration for automated reports. |
+
+---
+
 ## 🏗️ Estructura Estándar de Módulo
 
 Esta estructura representa nuestro **patrón oficial** para todos los módulos de G-Admin Mini:

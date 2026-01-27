@@ -7,7 +7,7 @@ import {
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
 import { useMaterialsComputed } from '../../hooks/useMaterialsComputed';
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency } from '@/lib/decimal';
 
 export function ProcurementTab() {
   const { getFilteredItems } = useMaterialsComputed();

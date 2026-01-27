@@ -16,12 +16,12 @@
 
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { useCapabilityStore } from '@/store/capabilityStore';
+import { useFeatureFlags } from '@/lib/capabilities';
 import { useDashboardConfig, type DashboardWidget } from './useDashboardConfig';
 import { useSalesStore } from '@/store/salesStore';
-import { useMaterialsStore } from '@/store/materialsStore';
-import { useStaffStore } from '@/store/staffStore';
-import { useCustomersStore } from '@/store/customersStore';
+import { useMaterialsStore } from '@/modules/materials/store';
+import { useTeamStore } from '@/modules/team/store';
+import { useCustomersStore } from '@/modules/customers/store';
 import { logger } from '@/lib/logging';
 
 /**
@@ -77,10 +77,8 @@ export function useDynamicDashboardWidgets() {
   // DYNAMIC LOADING: Features → Slots → Widgets
   // ============================================
 
-  // ✅ CRITICAL FIX: Usar selector directo para evitar objeto nuevo en cada render
-  // useCapabilities() retorna nuevo objeto → causa loop infinito
-  // useCapabilityStore(selector) solo cambia si el valor cambia → estable
-  const activeFeatures = useCapabilityStore(state => state.features.activeFeatures);
+  // ✅ MIGRATED: Get active features
+  const { activeFeatures } = useFeatureFlags();
 
   // 🔍 DEBUG: Log cada render del hook
   logger.debug('App', '[useDynamicDashboardWidgets] Hook rendered', {
@@ -221,7 +219,7 @@ export function useDynamicDashboardWidgets() {
     loading: state.loading
   })));
 
-  const staffMetrics = useStaffStore(useShallow(state => ({
+  const staffMetrics = useTeamStore(useShallow(state => ({
     totalStaff: state.stats?.totalStaff || 0,
     activeStaff: state.stats?.activeStaff || 0,
     onShift: state.stats?.onShift || 0,

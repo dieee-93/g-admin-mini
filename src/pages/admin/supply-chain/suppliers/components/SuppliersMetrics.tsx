@@ -3,7 +3,8 @@
 // ============================================
 
 import React, { memo, useCallback } from 'react';
-import { Stack, MetricCard } from '@/shared/ui';
+import { SimpleGrid, Icon } from '@/shared/ui';
+import { StatCard } from '@/shared/widgets/StatCard';
 import type { SupplierMetrics } from '../types/supplierTypes';
 import {
   BuildingStorefrontIcon,
@@ -20,90 +21,77 @@ interface SuppliersMetricsProps {
 }
 
 /**
- * PERFORMANCE OPTIMIZATION:
- * Using useCallback for onClick handlers prevents MetricCard re-renders when parent updates.
- * Without useCallback: inline arrow functions create new references every render → memo() fails
- * With useCallback: stable function references → memo() prevents unnecessary re-renders
- * Pattern from React.dev: https://react.dev/reference/react/useCallback
+ * Suppliers Metrics Cards
+ * Using StatCard component (same as dashboard) for consistency
  */
-export const SuppliersMetrics = memo(function SuppliersMetrics({ metrics, loading, onMetricClick }: SuppliersMetricsProps) {
-  // Stable handlers using useCallback - prevents MetricCard re-renders
-  const handleTotalClick = useCallback(() => {
-    onMetricClick?.('total_suppliers');
-SuppliersMetrics.displayName = 'SuppliersMetrics';
-  }, [onMetricClick]);
+export const SuppliersMetrics = memo(function SuppliersMetrics({
+  metrics,
+  loading,
+  onMetricClick
+}: SuppliersMetricsProps) {
 
-  const handleActiveClick = useCallback(() => {
-    onMetricClick?.('active_suppliers');
-  }, [onMetricClick]);
+  // Calculate derived metrics
+  const activePercentage = metrics.totalSuppliers > 0
+    ? ((metrics.activeSuppliers / metrics.totalSuppliers) * 100).toFixed(0)
+    : '0';
 
-  const handleAverageRatingClick = useCallback(() => {
-    onMetricClick?.('average_rating');
-  }, [onMetricClick]);
-
-  const handleNoRatingClick = useCallback(() => {
-    onMetricClick?.('suppliers_without_rating');
-  }, [onMetricClick]);
-
-  const handleNoContactClick = useCallback(() => {
-    onMetricClick?.('suppliers_without_contact');
-  }, [onMetricClick]);
+  const inactiveCount = metrics.totalSuppliers - metrics.activeSuppliers;
+  const hasRating = metrics.averageRating > 0;
 
   return (
-    <Stack direction="row" gap="3" wrap="wrap">
+    <SimpleGrid columns={{ base: 1, sm: 2, lg: 5 }} gap="6">
       {/* Total Suppliers */}
-      <MetricCard
-        label="Total Proveedores"
-        value={metrics.totalSuppliers}
-        icon={BuildingStorefrontIcon}
-        colorPalette="blue"
-        loading={loading}
-        onClick={handleTotalClick}
+      <StatCard
+        title="Total Proveedores"
+        value={metrics.totalSuppliers.toString()}
+        icon={<Icon as={BuildingStorefrontIcon} boxSize={6} />}
+        accentColor="blue.500"
+        footer="Registrados"
+        onClick={onMetricClick ? () => onMetricClick('total_suppliers') : undefined}
       />
 
       {/* Active Suppliers */}
-      <MetricCard
-        label="Activos"
-        value={metrics.activeSuppliers}
-        icon={CheckCircleIcon}
-        colorPalette="green"
-        loading={loading}
-        onClick={handleActiveClick}
+      <StatCard
+        title="Proveedores Activos"
+        value={metrics.activeSuppliers.toString()}
+        icon={<Icon as={CheckCircleIcon} boxSize={6} />}
+        accentColor="green.500"
+        footer={inactiveCount > 0 ? `${inactiveCount} inactivo${inactiveCount > 1 ? 's' : ''}` : 'Todos activos'}
+        footerValue={`${activePercentage}%`}
+        footerColor="green.600"
+        onClick={onMetricClick ? () => onMetricClick('active_suppliers') : undefined}
       />
 
       {/* Average Rating */}
-      <MetricCard
-        label="Rating Promedio"
-        value={metrics.averageRating.toFixed(1)}
-        icon={StarIcon}
-        colorPalette="yellow"
-        loading={loading}
-        onClick={handleAverageRatingClick}
+      <StatCard
+        title="Rating Promedio"
+        value={hasRating ? metrics.averageRating.toFixed(1) : '—'}
+        subtitle={hasRating ? 'De 5.0 estrellas' : 'Sin evaluaciones'}
+        icon={<Icon as={StarIcon} boxSize={6} />}
+        accentColor="yellow.500"
+        footer="Calidad general"
+        onClick={onMetricClick ? () => onMetricClick('average_rating') : undefined}
       />
 
-      {/* Without Rating */}
-      {metrics.suppliersWithoutRating > 0 && (
-        <MetricCard
-          label="Sin Rating"
-          value={metrics.suppliersWithoutRating}
-          icon={ExclamationTriangleIcon}
-          colorPalette="orange"
-          loading={loading}
-          onClick={handleNoRatingClick}
-        />
-      )}
+      {/* Without Rating - Always visible */}
+      <StatCard
+        title="Sin Rating"
+        value={metrics.suppliersWithoutRating.toString()}
+        icon={<Icon as={ExclamationTriangleIcon} boxSize={6} />}
+        accentColor={metrics.suppliersWithoutRating > 0 ? 'orange.500' : 'gray.400'}
+        footer={metrics.suppliersWithoutRating > 0 ? 'Requieren evaluación' : 'Todo evaluado'}
+        onClick={onMetricClick ? () => onMetricClick('suppliers_without_rating') : undefined}
+      />
 
-      {/* Without Contact */}
-      {metrics.suppliersWithoutContact > 0 && (
-        <MetricCard
-          label="Sin Contacto"
-          value={metrics.suppliersWithoutContact}
-          icon={PhoneIcon}
-          colorPalette="red"
-          loading={loading}
-          onClick={handleNoContactClick}
-        />
-      )}
-    </Stack>
+      {/* Without Contact - Always visible */}
+      <StatCard
+        title="Sin Contacto"
+        value={metrics.suppliersWithoutContact.toString()}
+        icon={<Icon as={PhoneIcon} boxSize={6} />}
+        accentColor={metrics.suppliersWithoutContact > 0 ? 'red.500' : 'gray.400'}
+        footer={metrics.suppliersWithoutContact > 0 ? 'Información incompleta' : 'Todo completo'}
+        onClick={onMetricClick ? () => onMetricClick('suppliers_without_contact') : undefined}
+      />
+    </SimpleGrid>
   );
 });

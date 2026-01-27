@@ -11,7 +11,7 @@
  */
 
 import { useShallow } from 'zustand/react/shallow';
-import { useMaterialsStore } from '@/store/materialsStore';
+import { useMaterialsStore } from '@/modules/materials/store';
 
 export function useMaterialsActions() {
   return useMaterialsStore(

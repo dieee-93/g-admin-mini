@@ -84,7 +84,7 @@ export async function getCustomers(user?: AuthUser | null, filters?: {
     }
 
     if (filters?.search) {
-      query = query.or(`name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`);
+      query = query.or(`name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,phone.ilike.%${filters.search}%,mobile.ilike.%${filters.search}%,dni.ilike.%${filters.search}%`);
     }
 
     if (filters?.limit) {
@@ -230,9 +230,10 @@ export async function createCustomer(data: CreateCustomerData, user: AuthUser) {
       .insert({
         name: data.name,
         phone: data.phone,
+        mobile: data.mobile,
         email: data.email,
-        address: data.address,
-        note: data.note,
+        dni: data.dni,
+        notes: data.notes,
       })
       .select()
       .single();
@@ -279,9 +280,10 @@ export async function updateCustomer(id: string, data: UpdateCustomerData, user:
     const updateData: Partial<Customer> = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.phone !== undefined) updateData.phone = data.phone;
+    if (data.mobile !== undefined) updateData.mobile = data.mobile;
     if (data.email !== undefined) updateData.email = data.email;
-    if (data.address !== undefined) updateData.address = data.address;
-    if (data.note !== undefined) updateData.note = data.note;
+    if (data.dni !== undefined) updateData.dni = data.dni;
+    if (data.notes !== undefined) updateData.notes = data.notes;
 
     const { data: customer, error } = await supabase
       .from('customers')
@@ -365,13 +367,15 @@ export async function exportCustomersToCSV(user: AuthUser, filters?: {
     const customers = await getCustomers(user, filters);
 
     // Generate CSV
-    const headers = ['ID', 'Name', 'Email', 'Phone', 'Address', 'Created At', 'Status'];
+    const headers = ['ID', 'Name', 'Email', 'Phone', 'Mobile', 'DNI', 'Notes', 'Created At', 'Status'];
     const rows = customers.map(c => [
       c.id,
       c.name || '',
       c.email || '',
       c.phone || '',
-      c.address || '',
+      c.mobile || '',
+      c.dni || '',
+      c.notes || '',
       c.created_at || '',
       c.is_active ? 'Active' : 'Inactive'
     ]);

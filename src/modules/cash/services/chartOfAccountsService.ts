@@ -60,6 +60,29 @@ export async function getAccountById(
 
 /**
  * Construye árbol jerárquico del plan de cuentas
+ * 
+ * Toma una lista plana de cuentas y las organiza en una estructura de árbol
+ * basada en las relaciones parent_id. Cada nodo incluye sus hijos recursivamente
+ * y su nivel en la jerarquía.
+ * 
+ * @param accounts - Lista plana de cuentas del plan de cuentas
+ * @returns Array de nodos raíz (nivel 0) con sus hijos anidados
+ * 
+ * @example
+ * ```typescript
+ * const accounts = await fetchChartOfAccounts();
+ * const tree = buildAccountTree(accounts);
+ * // tree = [
+ * //   { id: '1', code: '1', name: 'Assets', level: 0, children: [
+ * //     { id: '2', code: '1.1', name: 'Current Assets', level: 1, children: [...] }
+ * //   ]}
+ * // ]
+ * ```
+ * 
+ * @remarks
+ * - Las cuentas sin parent_id se consideran raíz (nivel 0)
+ * - El nivel se calcula automáticamente basado en la profundidad
+ * - Si una cuenta referencia un parent_id que no existe, se ignora la relación
  */
 export function buildAccountTree(
   accounts: ChartOfAccountsRow[]

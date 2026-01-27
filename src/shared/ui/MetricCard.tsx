@@ -10,15 +10,12 @@
 import React from 'react';
 import { Stack } from './Stack';
 import { Typography } from './Typography';
-import { CardWrapper } from './CardWrapper';
-import { Button } from './Button';
 import { Badge } from './Badge';
 import { Icon } from './Icon';
+import { CardWrapper } from './CardWrapper';
 import {
   ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  EyeIcon,
-  ChartBarIcon
+  ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 
 interface BaseMetricProps {
@@ -36,7 +33,6 @@ interface BaseMetricProps {
     colorPalette: 'gray' | 'green' | 'orange' | 'red' | 'blue';
     variant?: 'solid' | 'subtle' | 'outline' | 'surface';
   };
-  isLoading?: boolean;
 }
 
 export function MetricCard({
@@ -49,8 +45,7 @@ export function MetricCard({
   onClick,
   trend,
   change,
-  badge,
-  isLoading = false
+  badge
 }: BaseMetricProps) {
 
   const formatValue = (val: string | number) => {

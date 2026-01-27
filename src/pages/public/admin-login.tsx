@@ -11,17 +11,17 @@ import {
   Heading,
   Alert
 } from '@chakra-ui/react';
-import { 
-  EyeIcon, 
-  EyeSlashIcon, 
-  ShieldCheckIcon, 
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  ShieldCheckIcon,
   ArrowLeftIcon,
   CogIcon,
-  ComputerDesktopIcon 
+  ComputerDesktopIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSmartRedirect } from '@/hooks/useSmartRedirect';
-import { CardWrapper, Button, InputField, Layout, Typography, Stack, Badge } from '@/shared/ui';
+import { useSmartRedirect } from '@/hooks';
+import { CardWrapper, Button, InputField, Typography, Stack, Badge } from '@/shared/ui';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -29,14 +29,14 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [formErrors, setFormErrors] = useState<{email?: string; password?: string}>({});
+  const [formErrors, setFormErrors] = useState<{ email?: string; password?: string }>({});
   const [mounted, setMounted] = useState(false);
-  
+
   const { signIn, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { redirectAfterLogin, getDefaultRouteForRole } = useSmartRedirect();
-  
+
   // Fallback path for admin/staff
   const from = location.state?.from?.pathname || '/admin/dashboard';
 
@@ -54,20 +54,20 @@ export default function AdminLoginPage() {
 
   // Validate form fields with stricter admin requirements
   const validateForm = () => {
-    const errors: {email?: string; password?: string} = {};
-    
+    const errors: { email?: string; password?: string } = {};
+
     if (!email) {
       errors.email = 'Email corporativo requerido';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       errors.email = 'Formato de email inválido';
     }
-    
+
     if (!password) {
       errors.password = 'Contraseña requerida';
     } else if (password.length < 6) {
       errors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -96,7 +96,7 @@ export default function AdminLoginPage() {
 
     try {
       const result = await signIn(email, password);
-      
+
       if (result.error) {
         setError(result.error);
       } else {
@@ -125,12 +125,12 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <Box 
-      minH="100vh" 
-      display="flex" 
-      alignItems="center" 
+    <Box
+      minH="100vh"
+      display="flex"
+      alignItems="center"
       justifyContent="center"
-      bg="bg.canvas"
+      bg="gray.50"
       p="md"
       position="relative"
     >
@@ -148,7 +148,7 @@ export default function AdminLoginPage() {
             <ArrowLeftIcon style={{ width: '16px', height: '16px' }} />
             Sitio público
           </Button>
-          
+
           <Badge colorPalette="blue" variant="subtle">
             <CogIcon style={{ width: '12px', height: '12px' }} />
             Panel Administrativo
@@ -161,9 +161,9 @@ export default function AdminLoginPage() {
         animationName={{ _open: "scale-fade-in", _closed: "scale-fade-out" }}
         animationDuration="moderate"
       >
-        <CardWrapper variant="elevated" 
+        <CardWrapper variant="elevated"
           padding="xl"
-          maxW="md" 
+          maxW="md"
           w="full"
           bg="white"
           borderTop="4px solid"
@@ -189,7 +189,7 @@ export default function AdminLoginPage() {
               </VStack>
             </VStack>
           </CardWrapper.Header>
-      
+
           <CardWrapper.Body>
             <form onSubmit={handleSubmit}>
               <VStack gap="lg">
@@ -204,7 +204,7 @@ export default function AdminLoginPage() {
                     </Alert.Description>
                   </Alert.Root>
                 </Presence>
-                
+
                 <VStack gap="md" w="full">
                   <InputField
                     label="Email Corporativo"
@@ -216,7 +216,7 @@ export default function AdminLoginPage() {
                     disabled={isLoading}
                     error={formErrors.email}
                   />
-                  
+
                   <Box w="full" position="relative">
                     <InputField
                       label="Contraseña de Acceso"
@@ -247,18 +247,18 @@ export default function AdminLoginPage() {
                           </Text>
                           <Text fontSize="sm" fontWeight="semibold" color={
                             getPasswordStrength() >= 75 ? "green.600" :
-                            getPasswordStrength() >= 50 ? "yellow.600" : "red.600"
+                              getPasswordStrength() >= 50 ? "yellow.600" : "red.600"
                           }>
                             {getPasswordStrength() >= 75 ? "Corporativo" :
-                             getPasswordStrength() >= 50 ? "Estándar" : "Insuficiente"}
+                              getPasswordStrength() >= 50 ? "Estándar" : "Insuficiente"}
                           </Text>
                         </HStack>
-                        <Progress.Root 
-                          value={getPasswordStrength()} 
-                          size="sm" 
+                        <Progress.Root
+                          value={getPasswordStrength()}
+                          size="sm"
                           colorPalette={
                             getPasswordStrength() >= 75 ? "green" :
-                            getPasswordStrength() >= 50 ? "yellow" : "red"
+                              getPasswordStrength() >= 50 ? "yellow" : "red"
                           }
                         >
                           <Progress.Track>
@@ -269,7 +269,7 @@ export default function AdminLoginPage() {
                     )}
                   </Box>
                 </VStack>
-            
+
                 <Button
                   type="submit"
                   w="full"
@@ -285,24 +285,24 @@ export default function AdminLoginPage() {
                     <Text>Acceder al Sistema</Text>
                   </HStack>
                 </Button>
-                
+
               </VStack>
             </form>
           </CardWrapper.Body>
-          
+
           <CardWrapper.Footer>
             <VStack gap="md" w="full" textAlign="center">
               <Stack gap="sm" align="center">
                 <Typography variant="caption" color="text.muted">
                   Solo personal autorizado. Sesiones monitoreadas.
                 </Typography>
-                
+
                 <HStack gap="sm">
                   <Typography variant="caption" color="text.muted">
                     ¿Problemas de acceso?
                   </Typography>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     color="blue.600"
                     onClick={() => alert('Contactar IT: admin@empresa.com')}
@@ -311,7 +311,7 @@ export default function AdminLoginPage() {
                   </Button>
                 </HStack>
               </Stack>
-              
+
               <HStack gap="xs" fontSize="sm" color="gray.500" justify="center">
                 <ShieldCheckIcon style={{ width: '16px', height: '16px' }} />
                 <Typography variant="caption" color="text.muted">

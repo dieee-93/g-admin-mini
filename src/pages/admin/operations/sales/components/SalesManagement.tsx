@@ -3,28 +3,14 @@ import { logger } from '@/lib/logging';
 import { HookPoint } from '@/lib/modules';
 import {
   CreditCardIcon,
-  ChartBarIcon,
   DocumentTextIcon,
-  TableCellsIcon,
   QrCodeIcon,
   PlusIcon,
   InformationCircleIcon,
-  TruckIcon,
+  ClipboardDocumentListIcon,
   CalendarIcon
 } from '@heroicons/react/24/outline';
-import { DeliveryOrdersTab } from './DeliveryOrders/DeliveryOrdersTab';
 import { AppointmentsTab } from './AppointmentsTab';
-
-// 🔍 DEBUG: Check imports
-logger.debug('SalesStore', '🔍 SalesManagement Imports:', {
-  Tabs: typeof Tabs,
-  Stack: typeof Stack,
-  Button: typeof Button,
-  Alert: typeof Alert,
-  Icon: typeof Icon,
-  Typography: typeof Typography,
-  Badge: typeof Badge
-});
 
 interface OrderData {
   items: Array<{ productId: string; quantity: number }>;
@@ -45,42 +31,58 @@ interface SalesManagementProps {
   onPaymentProcess?: (paymentData: PaymentData) => void;
   onNewSale?: () => void;
   performanceMode?: boolean;
+  permissions?: {
+    canCreate: boolean;
+    canUpdate: boolean;
+    canDelete: boolean;
+    canVoid: boolean;
+    canExport: boolean;
+  };
 }
 
+/**
+ * SalesManagement - Simplified Tab Structure
+ * 
+ * 4 clear tabs:
+ * - POS: Nueva venta (ProductTypeSelector + context views)
+ * - Órdenes: Historial + tracking (includes delivery orders)
+ * - Agenda: View appointments (renamed from Appointments)
+ * - Reportes: Reports + Analytics combined
+ */
 export function SalesManagement({
   activeTab,
   onTabChange,
-  onNewSale
+  onNewSale,
+  permissions
 }: SalesManagementProps) {
-  // onOrderPlace, onPaymentProcess, performanceMode are available but not yet implemented
-  // TODO: Implement order placement and payment processing handlers
-  logger.debug('SalesStore', '🔍 SalesManagement Rendering - Tabs API fixed to use .Tab and .Panel');
+  logger.debug('SalesStore', '🔍 SalesManagement Rendering with simplified 4-tab structure');
 
   return (
-    <Tabs.Root value={activeTab} onValueChange={(details) => onTabChange(details.value)}>
+    <Tabs.Root
+      value={activeTab}
+      onValueChange={(details) => onTabChange(details.value)}
+      lazyMount
+      unmountOnExit={false}
+    >
       <Tabs.List>
         <Tabs.Trigger value="pos">
           <Icon icon={CreditCardIcon} size="sm" />
           POS
         </Tabs.Trigger>
-        <Tabs.Trigger value="analytics">
-          <Icon icon={ChartBarIcon} size="sm" />
-          Analytics
+        <Tabs.Trigger value="orders">
+          <Icon icon={ClipboardDocumentListIcon} size="sm" />
+          Órdenes
+        </Tabs.Trigger>
+        <Tabs.Trigger value="agenda">
+          <Icon icon={CalendarIcon} size="sm" />
+          Agenda
         </Tabs.Trigger>
         <Tabs.Trigger value="reports">
           <Icon icon={DocumentTextIcon} size="sm" />
           Reportes
         </Tabs.Trigger>
-        <Tabs.Trigger value="delivery">
-          <Icon icon={TruckIcon} size="sm" />
-          Delivery Orders
-        </Tabs.Trigger>
-        <Tabs.Trigger value="appointments">
-          <Icon icon={CalendarIcon} size="sm" />
-          Appointments
-        </Tabs.Trigger>
 
-        {/* 🎯 HOOK POINT: External modules can inject tabs here */}
+        {/* HookPoint for external tab injection */}
         <HookPoint
           name="sales.tabs"
           data={{ activeTab, onTabChange }}
@@ -89,158 +91,130 @@ export function SalesManagement({
         />
       </Tabs.List>
 
+      {/* POS Tab - Main sales interface */}
       <Tabs.Content value="pos">
-        <Stack gap="lg">
-          {/* Sistema POS Principal */}
-          <Stack direction="row" gap="sm" align="center" mb="md">
+        <Stack gap="4">
+          {/* Header */}
+          <Stack direction="row" gap="2" align="center">
             <Icon icon={CreditCardIcon} size="lg" color="teal.600" />
-            <Badge variant="subtle" colorPalette="teal">Principal</Badge>
-            <Badge variant="solid" colorPalette="green">Live</Badge>
+            <Badge variant="subtle" colorPalette="teal">Punto de Venta</Badge>
+            <Badge variant="solid" colorPalette="green">Activo</Badge>
           </Stack>
 
-          <Typography variant="body" mb="md">
+          <Typography variant="body" color="text.muted">
             Sistema de punto de venta integrado con gestión de inventario en tiempo real.
           </Typography>
 
-          <Stack direction="row" gap="md" flexWrap="wrap">
-            <Button
-              variant="solid"
-              size="lg"
-              onClick={onNewSale}
-              colorPalette="teal"
-            >
-              <Icon icon={PlusIcon} size="sm" />
-              Nueva Venta
-            </Button>
+          {/* Action buttons */}
+          <Stack direction="row" gap="3" flexWrap="wrap">
+            {permissions?.canCreate && (
+              <Button
+                variant="solid"
+                size="lg"
+                onClick={onNewSale}
+                colorPalette="teal"
+              >
+                <Icon icon={PlusIcon} size="sm" />
+                Nueva Venta
+              </Button>
+            )}
             <Button
               variant="outline"
-              onClick={() => logger.info('SalesStore', 'Ver Historial')}
+              onClick={() => onTabChange('orders')}
             >
               Ver Historial
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => logger.debug('SalesManagement', 'Gestión Mesas')}
-            >
-              <Icon icon={TableCellsIcon} size="sm" />
-              Gestión Mesas
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => logger.debug('SalesManagement', 'Códigos QR')}
-            >
-              <Icon icon={QrCodeIcon} size="sm" />
-              Códigos QR
-            </Button>
+
+            {/* HookPoint for POS context actions (e.g., Gestión Mesas from onsite module) */}
+            <HookPoint
+              name="sales.pos.quick_actions"
+              data={{ onNewSale }}
+              fallback={null}
+            />
           </Stack>
 
-          {/* Información adicional */}
+          {/* POS System Status */}
           <Alert
             variant="subtle"
             icon={<Icon icon={InformationCircleIcon} size="sm" />}
             title="Punto de Venta Activo"
-            description="El sistema POS está funcionando correctamente. Todas las integraciones activas."
+            description="El sistema POS está funcionando correctamente."
           />
         </Stack>
       </Tabs.Content>
 
-      <Tabs.Content value="analytics">
-        <Stack gap="lg">
-          <Typography variant="heading" size="lg" mb="md">
-            Analytics de Ventas
+      {/* Orders Tab - All orders including delivery */}
+      <Tabs.Content value="orders">
+        <Stack gap="4">
+          <Typography variant="heading" size="lg">
+            Historial de Órdenes
           </Typography>
 
-          <Typography variant="body" color="text.muted" mb="lg">
-            Análisis en tiempo real de performance de ventas, tendencias y oportunidades de optimización.
+          <Typography variant="body" color="text.muted">
+            Gestiona todas las órdenes: ventas, delivery, pickup y appointments.
           </Typography>
 
-          <Stack direction="row" gap="md" flexWrap="wrap">
-            <Button
-              variant="solid"
-              colorPalette="blue"
-              onClick={() => logger.debug('SalesManagement', 'Análisis Profundo')}
-            >
-              <Icon icon={ChartBarIcon} size="sm" />
-              Análisis Profundo
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => logger.debug('SalesManagement', 'Revenue Trends')}
-            >
-              Revenue Trends
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => logger.debug('SalesManagement', 'Customer Insights')}
-            >
-              Customer Insights
-            </Button>
+          {/* Filter buttons */}
+          <Stack direction="row" gap="2" flexWrap="wrap">
+            <Button variant="outline" size="sm">Todas</Button>
+            <Button variant="ghost" size="sm">En Proceso</Button>
+            <Button variant="ghost" size="sm">Completadas</Button>
+            <Button variant="ghost" size="sm">Delivery</Button>
+            <Button variant="ghost" size="sm">Pickup</Button>
           </Stack>
 
+          {/* TODO: Integrate OrdersTable component */}
           <Alert
             variant="subtle"
-            title="Analytics Disponibles"
-            description="Revenue patterns, conversion rates, customer behavior y correlaciones cross-módulo."
+            title="Órdenes"
+            description="Aquí se mostrará el historial de órdenes con filtros."
           />
         </Stack>
       </Tabs.Content>
 
-      <Tabs.Content value="reports">
-        <Stack gap="lg">
-          <Typography variant="heading" size="lg" mb="md">
-            Reportes y Documentación
-          </Typography>
-
-          <Typography variant="body" color="text.muted" mb="lg">
-            Genera reportes detallados de ventas, performance y análisis financiero.
-          </Typography>
-
-          <Stack direction="row" gap="md" flexWrap="wrap">
-            <Button
-              variant="solid"
-              colorPalette="purple"
-              onClick={() => logger.debug('SalesManagement', 'Reporte Diario')}
-            >
-              <Icon icon={DocumentTextIcon} size="sm" />
-              Reporte Diario
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => logger.debug('SalesManagement', 'Reporte Semanal')}
-            >
-              Reporte Semanal
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => logger.debug('SalesManagement', 'Reporte Mensual')}
-            >
-              Reporte Mensual
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => logger.debug('SalesManagement', 'Export Data')}
-            >
-              Export Data
-            </Button>
-          </Stack>
-
-          <Alert
-            variant="subtle"
-            title="Reportes Programados"
-            description="Los reportes se generan automáticamente y están disponibles para descarga."
-          />
-        </Stack>
-      </Tabs.Content>
-
-      <Tabs.Content value="delivery">
-        <DeliveryOrdersTab />
-      </Tabs.Content>
-
-      <Tabs.Content value="appointments">
+      {/* Agenda Tab - Appointments view */}
+      <Tabs.Content value="agenda">
         <AppointmentsTab />
       </Tabs.Content>
 
-      {/* 🎯 HOOK POINT: External modules can inject tab content here */}
+      {/* Reports Tab - Combined analytics & reports */}
+      <Tabs.Content value="reports">
+        <Stack gap="4">
+          <Typography variant="heading" size="lg">
+            Reportes y Analytics
+          </Typography>
+
+          <Typography variant="body" color="text.muted">
+            Genera reportes y visualiza analytics de ventas.
+          </Typography>
+
+          <Stack direction="row" gap="3" flexWrap="wrap">
+            <Button variant="solid" colorPalette="purple">
+              <Icon icon={DocumentTextIcon} size="sm" />
+              Reporte del Día
+            </Button>
+            <Button variant="outline">
+              Reporte Semanal
+            </Button>
+            <Button variant="outline">
+              Reporte Mensual
+            </Button>
+            {permissions?.canExport && (
+              <Button variant="outline">
+                Exportar Datos
+              </Button>
+            )}
+          </Stack>
+
+          <Alert
+            variant="subtle"
+            title="Reportes Disponibles"
+            description="Revenue patterns, conversion rates, y análisis de ventas."
+          />
+        </Stack>
+      </Tabs.Content>
+
+      {/* HookPoint for external tab content */}
       <HookPoint
         name="sales.tab_content"
         data={{ activeTab, onTabChange }}

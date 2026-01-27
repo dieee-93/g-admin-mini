@@ -8,7 +8,7 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import {
   calculateMaterialsCost,
   calculateLaborCost,

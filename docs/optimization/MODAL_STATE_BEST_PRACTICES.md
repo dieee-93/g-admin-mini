@@ -1,12 +1,19 @@
-# Investigación Profunda: Estado de Modal en Proyectos Enterprise
+# Modal State & Performance Optimization - Unified Best Practices Guide
 
 ## Resumen Ejecutivo
 
-Basado en investigación exhaustiva de documentación oficial, proyectos enterprise reales, Stack Overflow, y artículos técnicos, **NO es normal que toda la página se re-renderice cuando un modal abre/cierra**. Esto es un anti-patrón de performance y la solución propuesta (mover estado a local) **NO VIOLA las convenciones del proyecto**.
+Este documento unifica las mejores prácticas para optimización de modals en g-mini, combinando:
+1. **Investigación enterprise**: Estado de modal en proyectos reales (GitHub, Airbnb, Linear)
+2. **Performance profiling**: Análisis de 586ms de latencia con 335+ re-renders
+3. **React official docs**: useCallback, useMemo, Context optimization, debouncing
+
+**Conclusión**: NO es normal que toda la página se re-renderice cuando un modal abre/cierra. La solución propuesta (local state + hooks optimization) **NO VIOLA las convenciones del proyecto** y está respaldada por documentación oficial de React y proyectos enterprise.
 
 ---
 
-## Pregunta 1: ¿Viola Convenciones del Proyecto?
+## Parte 1: Arquitectura de Estado - Enterprise Patterns
+
+### Pregunta 1: ¿Viola Convenciones del Proyecto?
 
 ### ❌ NO, la solución NO viola convenciones
 
@@ -304,3 +311,503 @@ Mover `isModalOpen`, `modalMode`, y `currentItem` a local state:
 3. **¿Es normal el re-render total?** → NO, es un bug de performance
 
 **Acción recomendada**: Proceder con la implementación propuesta. Es la solución correcta respaldada por toda la industria.
+
+---
+
+## Parte 2: React Hooks Performance Optimization
+
+### Performance Problem Analysis
+
+**Medición actual (React DevTools Profiler)**:
+- **Total interaction time**: 586ms (del teclado a frame presentado)
+  - React render time: 288ms (49%)
+  - Event handler JS: 212ms (36%)
+  - Prepaint/style: 79ms (13%)
+  - DOM commit: 7ms (1%)
+
+**Root causes identificados**:
+1. Dialog Context Propagation Storm (150+ div re-renders from DialogStylesContext/DialogContext/PresenceContext)
+2. Unstable Callbacks (6 recreations per keystroke - onClose:6x, onConfirm:6x, formData:6x)
+3. formData Not Memoized (SelectField: 18 re-renders with value:18x, onValueChange:18x)
+4. Expensive Validation Running on Every Keystroke (212ms JS time)
+
+### 1. useCallback Dependencies - React Official Best Practices
+
+#### ❌ ANTI-PATTERN: Unnecessary Dependencies
+
+```typescript
+// ❌ WRONG: setFormData is stable from useState, doesn't need to be in deps
+const updateFormData = useCallback((updates: Partial<ItemFormData>) => {
+  setFormData(prev => ({ ...prev, ...updates }));
+}, [setFormData]);  // ❌ setFormData is already stable
+```
+
+#### ✅ BEST PRACTICE: Empty Dependencies for Stable Setters
+
+**Fuente**: [React Official Docs - useCallback](https://react.dev/reference/react/useCallback#updating-state-from-a-memoized-callback)
+
+```typescript
+// ✅ CORRECT: Use updater function pattern with empty dependencies
+const updateFormData = useCallback((updates: Partial<ItemFormData>) => {
+  setFormData(prev => ({ ...prev, ...updates }));
+}, []); // ✅ Empty array - setState is stable by design
+
+// ✅ Alternative: Use updater function for complex state updates
+const handleAddTodo = useCallback((text: string) => {
+  const newTodo = { id: nextId++, text };
+  setTodos(todos => [...todos, newTodo]); // ✅ Reads previous state
+}, []); // ✅ No need for todos dependency
+```
+
+**React Official Guidance**:
+> "When you read some state only to calculate the next state, you can remove that dependency by passing an updater function instead"
+
+**Implementation for useMaterialForm.tsx**:
+```typescript
+// Fix all callbacks
+const updateFormData = useCallback((updates: Partial<ItemFormData>) => {
+  setFormData(prev => ({ ...prev, ...updates }));
+}, []); // ✅ Empty deps
+
+const handleFieldChange = useCallback((field: keyof ItemFormData) =>
+  (value: unknown) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []); // ✅ Empty deps
+
+const handleNameChange = useCallback((name: string) => {
+  setFormData(prev => ({ ...prev, name }));
+}, []); // ✅ Empty deps
+```
+
+### 2. Input Debouncing - Community Best Practices
+
+**Problem**: 6 re-renders per second with fast typing causing 212ms JS execution
+
+#### ❌ ANTI-PATTERN: Debounce Entire Callback
+
+```typescript
+// ❌ WRONG: Can't debounce controlled input onChange
+const onChange = (e) => {
+  setValue(e.target.value); // State must update immediately
+};
+const debouncedOnChange = debounce(onChange, 500); // ❌ Input won't work
+```
+
+#### ✅ BEST PRACTICE: Debounce Only Expensive Operations
+
+**Fuente**: [Developer Way - Debouncing in React](https://www.developerway.com/posts/debouncing-in-react)
+
+```typescript
+// ✅ CORRECT: Immediate UI update, debounced expensive operation
+const Input = () => {
+  const [value, setValue] = useState('');
+  
+  // Expensive operation (API call, validation)
+  const sendRequest = useCallback((value: string) => {
+    // Send to backend or validate
+  }, []);
+  
+  // Debounce only the expensive part
+  const debouncedSendRequest = useMemo(
+    () => debounce(sendRequest, 500),
+    [sendRequest]
+  );
+  
+  const onChange = (e) => {
+    const newValue = e.target.value;
+    setValue(newValue); // ✅ Immediate state update
+    debouncedSendRequest(newValue); // ✅ Debounced expensive operation
+  };
+  
+  return <input onChange={onChange} value={value} />;
+};
+```
+
+#### ✅ ADVANCED: Custom Hook with useRef for Latest State Access
+
+**Created**: `src/hooks/useDebounce.ts`
+
+```typescript
+/**
+ * Custom hook for debouncing callbacks with access to latest state
+ * 
+ * @see https://www.developerway.com/posts/debouncing-in-react
+ */
+export function useDebounce<T extends unknown[]>(
+  callback: (...args: T) => void,
+  delay: number = 500
+): (...args: T) => void {
+  const callbackRef = useRef(callback);
+
+  // Always update ref with latest callback to avoid stale closures
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  // Create debounced function ONCE - won't recreate on re-renders
+  const debouncedCallback = useMemo(() => {
+    const func = (...args: T) => {
+      // Access latest callback via ref (not closure)
+      callbackRef.current(...args);
+    };
+    return debounce(func, delay);
+  }, [delay]);
+
+  return debouncedCallback;
+}
+
+// Usage
+const MyComponent = () => {
+  const [value, setValue] = useState('');
+  
+  const debouncedValidation = useDebounce(() => {
+    // ✅ Has access to latest state via closure
+    validateField(value);
+  }, 500);
+  
+  const onChange = (e) => {
+    setValue(e.target.value);
+    debouncedValidation();
+  };
+  
+  return <input onChange={onChange} value={value} />;
+};
+```
+
+**React Official Warning**:
+> "Don't read or write ref.current during rendering" - Use useEffect to update refs
+
+### 3. Context Re-render Optimization
+
+**Problem**: DialogContext/SelectContext causing 204+ re-renders
+
+#### ❌ ANTI-PATTERN: Unstable Context Values
+
+```typescript
+// ❌ WRONG: New object on every render
+function MyApp() {
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  function login(response) {
+    setCurrentUser(response.user);
+  }
+  
+  // ❌ New object every render triggers all consumers
+  return (
+    <AuthContext value={{ currentUser, login }}>
+      <Page />
+    </AuthContext>
+  );
+}
+```
+
+#### ✅ BEST PRACTICE: Memoize Context Values
+
+**Fuente**: [React Docs - useContext Optimization](https://react.dev/reference/react/useContext#optimizing-re-renders-when-passing-objects-and-functions)
+
+```typescript
+// ✅ CORRECT: Memoized context value
+function MyApp() {
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  // ✅ Stable function reference
+  const login = useCallback((response) => {
+    setCurrentUser(response.user);
+  }, []);
+  
+  // ✅ Memoized context value
+  const contextValue = useMemo(
+    () => ({ currentUser, login }),
+    [currentUser, login]
+  );
+  
+  return (
+    <AuthContext value={contextValue}>
+      <Page />
+    </AuthContext>
+  );
+}
+```
+
+**React Official Guidance**:
+> "As a result of this change, even if MyApp needs to re-render, the components calling useContext(AuthContext) won't need to re-render unless currentUser has changed"
+
+### 4. useMemo for Object Props
+
+**Problem**: formData object recreation causing child re-renders (SelectField: 18 renders)
+
+#### ❌ ANTI-PATTERN: Passing Entire formData Object
+
+```typescript
+// ❌ WRONG: formData changes on every keystroke
+const typeSpecificFields = useMemo(() => {
+  if (formData.type === 'MEASURABLE') {
+    return (
+      <MeasurableFields
+        formData={formData} // ❌ Entire object - all fields change
+        updateFormData={updateFormData}
+      />
+    );
+  }
+}, [formData, updateFormData]); // ❌ formData always different
+```
+
+#### ✅ BEST PRACTICE: Memoize Object Subsets
+
+**Fuente**: [React Docs - useMemo Dependency Optimization](https://react.dev/reference/react/useMemo#memoizing-a-dependency-of-another-hook)
+
+```typescript
+// ✅ CORRECT: Only pass specific fields
+const measurableProps = useMemo(() => ({
+  unit: formData.unit,
+  min_stock: formData.min_stock,
+  // Only fields MeasurableFields actually needs
+}), [formData.unit, formData.min_stock]); // ✅ Specific deps
+
+const typeSpecificFields = useMemo(() => {
+  if (formData.type === 'MEASURABLE') {
+    return (
+      <MeasurableFields
+        {...measurableProps} // ✅ Memoized subset
+        updateFormData={updateFormData}
+      />
+    );
+  }
+}, [formData.type, measurableProps, updateFormData]);
+
+// ✅ ALTERNATIVE: Move object creation inside useMemo
+const typeSpecificFields = useMemo(() => {
+  if (formData.type === 'MEASURABLE') {
+    const props = {
+      unit: formData.unit,
+      min_stock: formData.min_stock,
+    }; // ✅ Created inside, no extra dependency
+    
+    return (
+      <MeasurableFields {...props} updateFormData={updateFormData} />
+    );
+  }
+}, [formData.type, formData.unit, formData.min_stock, updateFormData]);
+```
+
+**React Official Guidance**:
+> "Now your calculation depends on text directly (which is a string and can't 'accidentally' become different)"
+
+### 5. Avoid Expensive Calculations on Every Render
+
+**Problem**: Validation running on every keystroke (212ms JS time)
+
+#### ❌ ANTI-PATTERN: Synchronous Validation in useEffect
+
+```typescript
+// ❌ WRONG: Runs on every formData change
+useEffect(() => {
+  const errors = validateForm(formData); // ❌ Expensive operation
+  setFieldErrors(errors);
+}, [formData]); // ❌ Changes on every keystroke
+```
+
+#### ✅ BEST PRACTICE: Debounce Expensive Calculations
+
+**Fuente**: [React Docs - You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect#caching-expensive-calculations)
+
+```typescript
+// ✅ CORRECT: Cache expensive calculation
+const fieldErrors = useMemo(() => {
+  // Only re-run if specific fields change
+  return validateForm(formData);
+}, [formData.name, formData.type, formData.unit]); // ✅ Specific deps
+
+// ✅ BETTER: Debounce validation
+const validateDebounced = useDebounce(() => {
+  const errors = validateForm(formData);
+  setFieldErrors(errors);
+}, 300);
+
+useEffect(() => {
+  validateDebounced();
+}, [formData, validateDebounced]);
+
+// ✅ BEST: Validate on blur, not on change
+const handleBlur = () => {
+  const errors = validateForm(formData);
+  setFieldErrors(errors);
+};
+```
+
+**React Official Guidance**:
+> "You don't need Effects to transform data for rendering. Calculate it during rendering"
+
+### 6. React.memo Best Practices
+
+**Current Status**: 7 components already memoized ✅
+
+#### ✅ VERIFICATION: Check Props Stability
+
+```typescript
+// ✅ CORRECT: All props must be stable for memo to work
+const MeasurableFields = memo(function MeasurableFields({ 
+  formData,        // ✅ Should be memoized subset
+  updateFormData,  // ✅ Should be useCallback with empty deps
+  fieldErrors,     // ✅ Should be useMemo
+  disabled         // ✅ Primitive value
+}) {
+  // Component logic
+});
+
+// ✅ CUSTOM COMPARISON: For complex props
+const MaterialsManagement = memo(
+  function MaterialsManagement(props) {
+    // Component logic
+  },
+  (prevProps, nextProps) => {
+    // ✅ Custom comparison logic
+    return prevProps.items === nextProps.items &&
+           prevProps.filters === nextProps.filters;
+  }
+);
+```
+
+**React Official Warning**:
+> "You should only rely on useMemo as a performance optimization. If your code doesn't work without it, find the underlying problem and fix it first"
+
+---
+
+## Implementation Plan for Materials Modal
+
+### Priority 1: Critical Fixes (Target: 300ms → 100ms)
+
+```typescript
+// 1. Fix useCallback dependencies in useMaterialForm.tsx
+const updateFormData = useCallback((updates: Partial<ItemFormData>) => {
+  setFormData(prev => ({ ...prev, ...updates }));
+}, []); // ✅ Remove setFormData from deps
+
+const handleFieldChange = useCallback((field: keyof ItemFormData) =>
+  (value: unknown) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []); // ✅ Empty deps
+
+// 2. Debounce validation in useMaterialValidation.tsx
+const validateDebounced = useDebounce(() => {
+  const errors = validateForm(formData);
+  setFieldErrors(errors);
+}, 300);
+
+// 3. Memoize formData subsets for child components
+const measurableProps = useMemo(() => ({
+  unit: formData.unit,
+  min_stock: formData.min_stock,
+  max_stock: formData.max_stock,
+}), [formData.unit, formData.min_stock, formData.max_stock]);
+```
+
+### Priority 2: Context Optimization (Target: -100 re-renders)
+
+```typescript
+// 4. Memoize Dialog onOpenChange
+const handleOpenChange = useCallback((open: boolean) => {
+  if (!open) onClose();
+}, [onClose]);
+
+<Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
+  {/* ... */}
+</Dialog.Root>
+
+// 5. Memoize SelectField props
+const selectValue = useMemo(() => 
+  value ? [value] : [],
+  [value]
+);
+
+const handleValueChange = useCallback((details) => {
+  onChange(details.value[0]);
+}, [onChange]);
+```
+
+### Priority 3: Validation Strategy (Target: -150ms JS time)
+
+```typescript
+// 6. Change from onChange validation to onBlur
+// Before: validateForm runs on every keystroke
+// After: validateForm runs only when field loses focus
+
+const handleNameBlur = () => {
+  const nameError = validateName(formData.name);
+  setFieldErrors(prev => ({ ...prev, name: nameError }));
+};
+
+<InputField
+  label="Nombre"
+  value={formData.name}
+  onChange={handleNameChange}
+  onBlur={handleNameBlur} // ✅ Validate on blur
+/>
+```
+
+---
+
+## Testing Strategy
+
+### 1. React DevTools Profiler
+
+```typescript
+// Measure before/after with React DevTools
+// Expected improvements:
+// - Render time: 288ms → <100ms
+// - Component renders: 335 → <50
+// - Event handler time: 212ms → <80ms
+```
+
+### 2. Performance Markers
+
+```typescript
+// Add performance markers for validation
+performance.mark('validation-start');
+const errors = validateForm(formData);
+performance.mark('validation-end');
+performance.measure('validation', 'validation-start', 'validation-end');
+```
+
+### 3. Console Timing
+
+```typescript
+// Measure debounce effectiveness
+const debouncedValidation = useDebounce(() => {
+  console.time('validation');
+  const errors = validateForm(formData);
+  console.timeEnd('validation');
+  setFieldErrors(errors);
+}, 300);
+```
+
+---
+
+## Success Metrics
+
+### Target Improvements
+- ✅ Total interaction time: 586ms → <200ms (66% reduction)
+- ✅ React render time: 288ms → <100ms (65% reduction)
+- ✅ Event handler JS: 212ms → <80ms (62% reduction)
+- ✅ Component re-renders: 335 → <50 (85% reduction)
+- ✅ Context propagations: 204 → <30 (85% reduction)
+
+### Validation
+1. Type "Material" in name field (8 keystrokes)
+2. Before: 8 * 335 = 2,680 component renders
+3. After: 8 * 50 = 400 component renders
+4. **Improvement: 85% fewer renders** ✅
+
+---
+
+## References
+
+### Official React Documentation
+- [useCallback](https://react.dev/reference/react/useCallback)
+- [useMemo](https://react.dev/reference/react/useMemo)
+- [useContext Optimization](https://react.dev/reference/react/useContext#optimizing-re-renders-when-passing-objects-and-functions)
+- [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
+
+### Community Best Practices
+- [Developer Way - Debouncing in React](https://www.developerway.com/posts/debouncing-in-react)
+- [TkDodo - Zustand Best Practices](https://tkdodo.eu/blog/working-with-zustand)

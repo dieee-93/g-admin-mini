@@ -1,0 +1,10 @@
+### Page
+- Page URL: http://localhost:5173/admin/supply-chain/materials
+- Page Title: G-Admin Mini
+### Snapshot
+- [snapshot](.playwright-cli\page-2026-01-26T19-26-19-674Z.yml)
+### Events
+- [LOG] [90m16:26:03,277[0m [90m­ƒöì [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:26:03,277[0m [90m­ƒöì [DEBUG][0m [...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:26:03,285[0m [34mÔä╣´©Å [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38
+- [LOG] [90m16:26:03,286[0m [34mÔä╣´©Å [INFO][0m [3...://localhost:5173/src/lib/logging/ConsoleHelper.ts:38

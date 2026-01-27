@@ -5,7 +5,7 @@
  */
 
 import { Box, Heading, Stack, Table, Text } from '@chakra-ui/react';
-import { formatCurrency } from '@/business-logic/shared/decimalUtils';
+import { formatCurrency } from '@/lib/decimal';
 import type { ProfitAndLoss } from '@/modules/cash/types/reports';
 
 interface ProfitAndLossReportProps {

@@ -21,7 +21,6 @@ export const membershipsManifest: ModuleManifest = {
   permissionModule: 'operations', // ✅ Uses 'operations' permission
 
   depends: ['customers'], // ✅ FIXED: Removed 'billing' to break circular dependency (communicate via EventBus instead)
-  autoInstall: false, // ✅ FIXED: Controlled by membership_subscriptions capability
   activatedBy: 'membership_subscription_plans',
 
 

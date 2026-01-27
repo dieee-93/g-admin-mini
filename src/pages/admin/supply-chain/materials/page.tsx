@@ -1,39 +1,56 @@
 /**
  * Materials Page - Inventory Management & Stock Control
  *
- * SEMANTIC v3.0 - WCAG AA Compliant:
- * ✅ Skip link for keyboard navigation (WCAG 2.4.1 Level A)
- * ✅ Semantic main content wrapper with ARIA label
- * ✅ Proper section headings for screen readers
- * ✅ ARIA live region for stock alerts
- * ✅ Aside pattern for metrics
- * ✅ 3-Layer Architecture (Semantic → Layout → Primitives)
- *
+ * REFACTORED v6.0 - MAGIC PATTERNS DESIGN
+ * Design Principles:
+ * - Decorative background blobs for visual depth
+ * - Gradient metric cards with top border accents (3px)
+ * - Elevated content cards with modern shadows
+ * - Responsive grid layouts (SimpleGrid)
+ * - Clean spacing system (gap="6/8", p="6/8")
+ * - No maxW restrictions (w="100%")
+ * 
  * FEATURES:
  * - Real-time stock tracking (multi-location)
  * - Low stock alerts with ARIA announcements
  * - Bulk operations
  * - Offline-first support
- * - EventBus integration (13 systems)
+ * - EventBus integration
  */
 
-import { useEffect, useMemo, useCallback, memo } from 'react';
+import { useEffect, useMemo, useCallback, useState } from 'react';
 import {
-  ContentLayout, Section, Button, Alert, Icon, CollapsibleAlertStack, type AlertItem, Stack, Badge, SkipLink
+  Box,
+  Flex,
+  SimpleGrid,
+  Stack,
+  Text,
+  Button,
+  Alert,
+  Icon,
+  Badge,
+  SkipLink,
+  Tabs,
+  Typography
 } from '@/shared/ui';
+import type { MaterialItem } from '@/modules/materials/types';
 import {
-  ArrowPathIcon
+  ArrowPathIcon,
+  BellAlertIcon,
+  CubeIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline';
 
-// ✅ 14 SISTEMAS INTEGRADOS (+ PERMISSIONS)
+import { AlertsTab } from './tabs/alerts';
+
 import EventBus from '@/lib/events';
 import { useOfflineStatus } from '@/lib/offline/useOfflineStatus';
 import { usePerformanceMonitor } from '@/lib/performance/PerformanceMonitor';
 import { useNavigationLayout } from '@/contexts/NavigationContext';
-import { useLocation } from '@/contexts/LocationContext'; // 🆕 MULTI-LOCATION
-import { usePermissions } from '@/hooks/usePermissions'; // 🆕 PERMISSIONS SYSTEM
+import { useLocation } from '@/contexts/LocationContext';
+import { usePermissions } from '@/hooks';
+import { useDisclosure } from '@/shared/hooks';
 
-// ✅ COMPONENTES ESPECIALIZADOS
 import {
   MaterialsMetrics,
   MaterialsManagement,
@@ -42,90 +59,116 @@ import {
   LazyMaterialFormModal
 } from './components';
 
-// ✅ HOOKS ESPECIALIZADOS
-import { useMaterialsPage, useRealtimeMaterials } from './hooks';
-import { useMaterialsStore } from '@/store/materialsStore';
-
+import { useMaterialsPage } from '@/modules/materials/hooks';
 import { logger } from '@/lib/logging';
 
-// 🔧 PERFORMANCE: Move event handlers outside component to prevent recreation on every render
-// These are pure event handlers with no component dependencies, so they can be module-level
+// ============================================================================
+// METRIC CARD COMPONENT (Magic Patterns Style)
+// ============================================================================
+interface MetricCardProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  change?: string;
+  changeType?: 'increase' | 'decrease' | 'neutral';
+  gradient: string;
+  loading?: boolean;
+}
+
+const MetricCard: React.FC<MetricCardProps> = ({ icon: IconComponent, label, value, change, changeType, gradient, loading }) => {
+  return (
+    <Box
+      bg="bg.surface"
+      p="6"
+      borderRadius="2xl"
+      shadow="md"
+      position="relative"
+      overflow="hidden"
+      _hover={{ shadow: 'lg', transform: 'translateY(-2px)' }}
+      transition="all 0.2s"
+    >
+      {/* Top gradient border */}
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        h="3px"
+        bg={gradient}
+      />
+      
+      <Stack gap="4">
+        <Flex justify="space-between" align="start">
+          <Box
+            p="3"
+            borderRadius="xl"
+            bg={`${gradient.split('.')[0]}.100`}
+          >
+            <IconComponent className="w-6 h-6" />
+          </Box>
+          {change && (
+            <Badge colorPalette={changeType === 'increase' ? 'green' : 'red'} size="sm">
+              {change}
+            </Badge>
+          )}
+        </Flex>
+        <Stack gap="1">
+          <Typography variant="body" size="sm" color="text.muted">
+            {label}
+          </Typography>
+          <Typography variant="heading" size="2xl" fontWeight="bold">
+            {loading ? '---' : value}
+          </Typography>
+        </Stack>
+      </Stack>
+    </Box>
+  );
+};
+
+// ============================================================================
+// EVENT HANDLERS
+// ============================================================================
+
 const eventHandlers = {
   'sales.order_placed': async (data: Record<string, unknown>) => {
     logger.info('MaterialsStore', '🛒 Sales order placed, reserving stock...', data);
-    // Reserve stock (create pending stock_entries with type='reserved')
-    // In production, this would call inventoryApi.reserveStock()
-    logger.debug('MaterialsStore', '📦 Stock reservation system ready for implementation');
   },
 
   'sales.completed': (data: Record<string, unknown>) => {
     logger.info('MaterialsStore', '✅ Sale completed, converting reservation to deduction...', data);
-    // Auto-reduce stock based on sale
-    // In production: Convert reserved entries to actual deductions
   },
 
   'sales.order_cancelled': async (data: Record<string, unknown>) => {
     logger.info('MaterialsStore', '♻️ Sales order cancelled, releasing stock...', data);
-    // Release reserved stock
-    // In production: Delete reserved stock entries
   },
 
   'products.recipe_updated': (data: Record<string, unknown>) => {
     logger.debug('MaterialsStore', '📝 Recipe updated, recalculating requirements...', data);
-    // Recalculate material requirements
   },
 
   'production.order.created': (data: Record<string, unknown>) => {
     logger.info('MaterialsStore', '🏭 Production order created, reserving materials...', data);
-    // Reserve materials for production
   },
 
   'production.order.completed': (data: Record<string, unknown>) => {
     logger.info('MaterialsStore', '✅ Production completed, updating stock...', data);
-    // Deduct raw materials, add produced goods
   },
 
   'materials.procurement.po_received': async (data: Record<string, unknown>) => {
     logger.info('MaterialsStore', '📦 Purchase order received, auto-updating stock...', data);
-    // Auto-update stock based on purchase order delivery
-    // In production: Call inventoryApi.bulkAdjustStock()
   }
 } as const;
 
-// ✅ MODULE CONFIGURATION
-const MATERIALS_MODULE_CONFIG = {
-  capabilities: ['inventory_tracking', 'supplier_management', 'purchase_orders'],
-  events: {
-    emits: [
-      'materials.stock_updated',
-      'materials.low_stock_alert',
-      'materials.material_created',
-      'materials.material_updated',
-      'materials.material_deleted',
-      'materials.purchase_order_created'
-    ],
-    listens: [
-      'sales.order_placed',        // 🆕 NEW - Reserve stock when order placed
-      'sales.completed',           // ✅ Existing - Deduct stock when sale completed
-      'sales.order_cancelled',     // 🆕 NEW - Release reserved stock
-      'products.recipe_updated',   // ✅ Existing - Recalculate material requirements
-      'production.order.created',  // 🆕 RENAMED from kitchen.item_consumed
-      'production.order.completed',// 🆕 NEW - Update stock after production
-      'materials.procurement.po_received' // 🆕 NEW - Auto-update stock on delivery
-    ]
-  },
-  eventHandlers // Use the module-level handlers
-} as const;
+// ============================================================================
+// COMPONENT
+// ============================================================================
 
 export default function MaterialsPage() {
-  // ✅ SISTEMAS INTEGRATION
-  // Capabilities checked at module load time via Module Registry
   const { isOnline } = useOfflineStatus();
   const { shouldReduceAnimations } = usePerformanceMonitor();
   const { isMobile } = useNavigationLayout();
-  const { selectedLocation, isMultiLocationMode } = useLocation(); // 🆕 MULTI-LOCATION
+  const { selectedLocation, isMultiLocationMode } = useLocation();
 
-  // 🔒 PERMISSIONS SYSTEM - Check user permissions for materials module
   const {
     canCreate,
     canRead,
@@ -135,22 +178,41 @@ export default function MaterialsPage() {
     canConfigure
   } = usePermissions('materials');
 
-  // ✅ PAGE ORCHESTRATION
+  const materialModal = useDisclosure();
+  const [modalMode, setModalMode] = useState<'add' | 'edit' | 'view'>('add');
+  const [currentItem, setCurrentItem] = useState<MaterialItem | null>(null);
+  const [activeMainTab, setActiveMainTab] = useState<'inventory' | 'alerts'>('inventory');
+
+  const openModal = useCallback((mode: 'add' | 'edit' | 'view', item?: MaterialItem) => {
+    setModalMode(mode);
+    setCurrentItem(item || null);
+    materialModal.onOpen();
+  }, [materialModal]);
+
+  const closeModal = useCallback(() => {
+    materialModal.onClose();
+    setCurrentItem(null);
+  }, [materialModal]);
+
   const {
-    metrics,
-    actions,
+    materials,
+    filteredMaterials,
     loading,
     error,
-    activeTab,
-    setActiveTab
-  } = useMaterialsPage();
+    pageState,
+    setActiveTab,
+    setFilters,
+    toggleBulkMode,
+    metrics,
+    createMaterial,
+    updateMaterial,
+    deleteMaterial,
+    adjustStock,
+    bulkDelete,
+    abcAnalysis,
+    refresh,
+  } = useMaterialsPage({ openModal });
 
-  // ✅ MODAL STATE - Use selective subscription
-  // ✅ FIX: Don't use useMaterials() here - it subscribes to ENTIRE store again!
-  const isModalOpen = useMaterialsStore((state) => state.isModalOpen);
-  const closeModal = useMaterialsStore((state) => state.closeModal);
-
-  // 🔒 Memoize permissions object to prevent breaking child memoization
   const permissions = useMemo(() => ({
     canCreate,
     canUpdate,
@@ -165,33 +227,21 @@ export default function MaterialsPage() {
     canConfigure
   }), [canCreate, canUpdate, canExport, canConfigure]);
 
-  // ✅ REAL-TIME SYNC: Enable Supabase subscriptions for multi-user scenarios
-  useRealtimeMaterials({
-    locationId: isMultiLocationMode ? selectedLocation?.id : undefined,
-    debug: false, // Set to true for debugging
-    disabled: !isOnline // Disable when offline
-  });
+  // ============================================================================
+  // EVENTBUS INTEGRATION
+  // ============================================================================
 
-  // ✅ EVENTBUS INTEGRATION: Connect MODULE_CONFIG event handlers
-  // 🔧 PERFORMANCE FIX: Handlers are now module-level constants, preventing recreation
   useEffect(() => {
     logger.debug('MaterialsStore', '📡 Subscribing to cross-module events...');
 
     const unsubscribers = [
-      // Sales events
-      EventBus.on('sales.order_placed', eventHandlers['sales.order_placed']),
-      EventBus.on('sales.completed', eventHandlers['sales.completed']),
-      EventBus.on('sales.order_cancelled', eventHandlers['sales.order_cancelled']),
-
-      // Product/Recipe events
-      EventBus.on('products.recipe_updated', eventHandlers['products.recipe_updated']),
-
-      // Production events
-      EventBus.on('production.order.created', eventHandlers['production.order.created']),
-      EventBus.on('production.order.completed', eventHandlers['production.order.completed']),
-
-      // Procurement events
-      EventBus.on('materials.procurement.po_received', eventHandlers['materials.procurement.po_received'])
+      EventBus.on('sales.order_placed', eventHandlers['sales.order_placed'] as any),
+      EventBus.on('sales.completed', eventHandlers['sales.completed'] as any),
+      EventBus.on('sales.order_cancelled', eventHandlers['sales.order_cancelled'] as any),
+      EventBus.on('products.recipe_updated', eventHandlers['products.recipe_updated'] as any),
+      EventBus.on('production.order.created', eventHandlers['production.order.created'] as any),
+      EventBus.on('production.order.completed', eventHandlers['production.order.completed'] as any),
+      EventBus.on('materials.procurement.po_received', eventHandlers['materials.procurement.po_received'] as any)
     ];
 
     logger.info('MaterialsStore', `✅ Subscribed to ${unsubscribers.length} cross-module events`);
@@ -200,156 +250,209 @@ export default function MaterialsPage() {
       logger.debug('MaterialsStore', '🔌 Unsubscribing from cross-module events...');
       unsubscribers.forEach(unsub => unsub());
     };
-  }, []); // Empty deps - handlers are now stable module-level functions
+  }, []);
 
-  // ✅ ERROR HANDLING
+  // ============================================================================
+  // PAGE ACTIONS (Wrapped from hook)
+  // ============================================================================
+
+  const handleMetricClick = useCallback((metricType: string) => {
+    switch (metricType) {
+      case 'lowStock':
+        setFilters({ stockStatus: 'low' });
+        setActiveTab('inventory');
+        break;
+      case 'critical':
+        setFilters({ stockStatus: 'critical' });
+        setActiveTab('inventory');
+        break;
+      case 'abc':
+        setActiveTab('analytics');
+        break;
+    }
+  }, [setFilters, setActiveTab]);
+
+  const handleStockUpdate = useCallback(async (itemId: string, newStock: number) => {
+    const material = materials.find(m => m.id === itemId);
+    if (material) {
+      await adjustStock(itemId, newStock, material.stock);
+    }
+  }, [materials, adjustStock]);
+
+  const handleBulkAction = useCallback(async (action: string, itemIds: string[]) => {
+    if (action === 'delete') {
+      await bulkDelete(itemIds);
+    }
+  }, [bulkDelete]);
+
+  // ============================================================================
+  // ERROR HANDLING
+  // ============================================================================
+
   if (error) {
     return (
-      <>
+      <Box p={{ base: "6", md: "8" }}>
         <SkipLink />
-        <ContentLayout spacing="normal" mainLabel="Materials Inventory Error">
-          <Alert status="error" title="Error de carga del módulo">
-            {error}
-          </Alert>
+        <Alert status="error" title="Error de carga del módulo">
+          {error.message}
+        </Alert>
+        <Box marginTop="4">
           <Button onClick={() => window.location.reload()}>
             <Icon icon={ArrowPathIcon} size="sm" />
             Recargar página
           </Button>
-        </ContentLayout>
-      </>
+        </Box>
+      </Box>
     );
   }
 
-  // Prepare system alerts
-  const systemAlerts: AlertItem[] = [];
-
-  if (!isOnline) {
-    systemAlerts.push({
-      status: 'warning',
-      title: 'Modo Offline',
-      description: 'Los cambios se sincronizarán cuando recuperes la conexión'
-    });
-  }
+  // ============================================================================
+  // RENDER
+  // ============================================================================
 
   return (
-    <>
-      {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
+    <Box position="relative" minH="100vh" bg="bg.canvas" overflow="hidden" data-testid="materials-page">
       <SkipLink />
+      
+      {/* Decorative background blobs */}
+      <Box position="absolute" top="-10%" right="-5%" width="500px" height="500px" borderRadius="full" bg="blue.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" />
+      <Box position="absolute" bottom="-10%" left="-5%" width="400px" height="400px" borderRadius="full" bg="purple.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" />
 
-      {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
-      <ContentLayout spacing="normal" mainLabel="Materials Inventory Management">
+      <Box position="relative" zIndex="1" p={{ base: "6", md: "8" }}>
+        <Stack gap="8" w="100%">
 
-        {/* 🔒 1. SYSTEM ALERTS SECTION - ARIA live region for offline status */}
-        {systemAlerts.length > 0 && (
-          <Section
-            variant="flat"
-            semanticHeading="System Status Alerts"
-            live="polite"
-            atomic
-          >
-            <CollapsibleAlertStack
-              alerts={systemAlerts}
-              defaultOpen={false}
-              title="Alertas del Sistema"
-              variant="subtle"
-              size="md"
-              showCount
-            />
-          </Section>
-        )}
+          {/* ═══════════════════════════════════════════════════════════════
+              HEADER - Magic Patterns Style
+              ═══════════════════════════════════════════════════════════════ */}
+          <Flex justify="space-between" align="center" flexWrap="wrap" gap="4">
+            <Flex align="center" gap="4">
+              <Box
+                p="4"
+                borderRadius="2xl"
+                bg="linear-gradient(135deg, var(--chakra-colors-blue-500) 0%, var(--chakra-colors-blue-700) 100%)"
+                shadow="lg"
+              >
+                <CubeIcon style={{ width: '32px', height: '32px', color: 'white' }} />
+              </Box>
+              <Stack gap="1">
+                <Typography variant="heading" size="3xl" fontWeight="bold">
+                  StockLab - Inventario
+                </Typography>
+                <Flex align="center" gap="2">
+                  <Typography variant="body" size="md" color="text.muted">
+                    Control de materiales y stock
+                  </Typography>
+                  {!isOnline && (
+                    <Badge colorPalette="orange" size="sm">Offline</Badge>
+                  )}
+                  {isMultiLocationMode && selectedLocation && (
+                    <>
+                      <Badge colorPalette="blue" size="sm">
+                        📍 {selectedLocation.name}
+                      </Badge>
+                      <Badge variant="outline" colorPalette="green" size="sm">
+                        {selectedLocation.code}
+                      </Badge>
+                    </>
+                  )}
+                </Flex>
+              </Stack>
+            </Flex>
 
-        {/* 🆕 MULTI-LOCATION: Location Badges */}
-        {isMultiLocationMode && selectedLocation && (
-          <Section variant="flat" semanticHeading="Current Location Information">
-            <Stack direction="row" gap="sm" align="center" flexWrap="wrap">
-              <Badge variant="solid" colorPalette="blue">
-                📍 {selectedLocation.name}
-              </Badge>
-              <Badge variant="outline" colorPalette="green">
-                {selectedLocation.code}
-              </Badge>
-            </Stack>
-          </Section>
-        )}
+            {canCreate && (
+              <Button colorPalette="blue" size="lg" onClick={() => openModal('add')}>
+                <Icon icon={PlusIcon} size="sm" />
+                Nuevo Material
+              </Button>
+            )}
+          </Flex>
 
-        {/* ✅ 2. METRICS SECTION - Complementary aside pattern */}
-        <Section
-          as="aside"
-          variant="flat"
-          semanticHeading="Inventory Metrics Overview"
-        >
+          {/* ═══════════════════════════════════════════════════════════════
+              METRICS CARDS - Gradient style (rendered by MaterialsMetrics)
+              ═══════════════════════════════════════════════════════════════ */}
           <MaterialsMetrics
             metrics={metrics}
-            onMetricClick={actions.handleMetricClick}
+            onMetricClick={handleMetricClick}
             loading={loading}
           />
-        </Section>
 
-        {/* ✅ 3. CRITICAL ALERTS SECTION - ARIA live region for stock alerts */}
-          <Section
-            variant="flat"
-            semanticHeading="Stock Alerts and Warnings"
-            live="polite"
-            atomic
-          >
-            <MaterialsAlerts
-              onAlertAction={actions.handleAlertAction}
-              context="materials"
-            />
-          </Section>
-
-        {/* ✅ 4. MAIN MANAGEMENT SECTION - Primary content area */}
-        {/* 🔒 PERMISSIONS: User must have at least READ permission to view */}
-        {canRead && (
-          <Section
-            variant="elevated"
-            title="Gestión de Inventario"
-            semanticHeading="Materials Inventory Management Tools"
-          >
-            <MaterialsManagement
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              onStockUpdate={canUpdate ? actions.handleStockUpdate : undefined}
-              onBulkAction={canUpdate ? actions.handleBulkAction : undefined}
-              onAddMaterial={canCreate ? actions.handleOpenAddModal : undefined}
-              performanceMode={shouldReduceAnimations}
-              // 🔒 Pass permissions to child component for granular control
-              permissions={permissions}
-            />
-          </Section>
-        )}
-
-        {/* ✅ 5. QUICK ACTIONS SECTION - Aside pattern for tools */}
-        {/* 🔒 PERMISSIONS: Show section only if user has any action permission */}
-        {(canCreate || canExport || canConfigure) && (
-          <Section
-            as="aside"
-            variant="flat"
-            semanticHeading="Quick Action Tools"
-          >
-            <MaterialsActions
-              onAddMaterial={canCreate ? actions.handleOpenAddModal : undefined}
-              onBulkOperations={canUpdate ? actions.handleBulkOperations : undefined}
-              onGenerateReport={canExport ? actions.handleGenerateReport : undefined}
-              onSyncInventory={canConfigure ? actions.handleSyncInventory : undefined}
-              isMobile={isMobile}
-              // 🔒 Pass permissions for fine-grained access control
-              permissions={actionsPermissions}
-            />
-          </Section>
-        )}
-
-        {/* 🪟 MODAL - AGREGAR/EDITAR MATERIAL */}
-        {/* 🔒 PERMISSIONS: Only show modal if user has create or update permission */}
-        {isModalOpen && (canCreate || canUpdate) && (
-          <LazyMaterialFormModal
-            isOpen={isModalOpen}
-            onClose={closeModal}
-            readOnly={!canCreate && !canUpdate} // Read-only mode if no permissions
+          {/* ═══════════════════════════════════════════════════════════════
+              ALERTS SECTION
+              ═══════════════════════════════════════════════════════════════ */}
+          <MaterialsAlerts
+            onAlertAction={async () => {}}
+            context="materials"
           />
-        )}
 
-      </ContentLayout>
-    </>
+          {/* ═══════════════════════════════════════════════════════════════
+              MAIN CONTENT - Elevated Tabs Card (Magic Patterns Style)
+              ═══════════════════════════════════════════════════════════════ */}
+          <Box bg="bg.surface" p="8" borderRadius="2xl" shadow="xl">
+            <Tabs.Root
+              defaultValue="inventory"
+              value={activeMainTab}
+              onValueChange={(details) => setActiveMainTab(details.value as typeof activeMainTab)}
+            >
+              <Tabs.List mb="6">
+                <Tabs.Trigger value="inventory">
+                  <Icon icon={CubeIcon} size="sm" />
+                  Inventario
+                </Tabs.Trigger>
+                <Tabs.Trigger value="alerts">
+                  <Icon icon={BellAlertIcon} size="sm" />
+                  Config. Alertas
+                </Tabs.Trigger>
+              </Tabs.List>
+
+              <Tabs.Content value="inventory">
+                <Stack gap="6">
+                  {canRead && (
+                    <MaterialsManagement
+                      items={filteredMaterials}
+                      activeTab={pageState.activeTab}
+                      onTabChange={(tab) => setActiveTab(tab as any)}
+                      onStockUpdate={canUpdate ? handleStockUpdate : async () => {}}
+                      onBulkAction={canUpdate ? handleBulkAction : async () => {}}
+                      onAddMaterial={canCreate ? openModal.bind(null, 'add') : undefined}
+                      performanceMode={shouldReduceAnimations}
+                    />
+                  )}
+
+                  {(canCreate || canExport || canConfigure) && (
+                    <MaterialsActions
+                      onAddMaterial={canCreate ? openModal.bind(null, 'add') : undefined}
+                      onBulkOperations={canUpdate ? toggleBulkMode : undefined}
+                      onGenerateReport={canExport ? async () => {} : undefined}
+                      onSyncInventory={canConfigure ? async () => refresh() : undefined}
+                      isMobile={isMobile}
+                      permissions={actionsPermissions}
+                    />
+                  )}
+                </Stack>
+              </Tabs.Content>
+
+              <Tabs.Content value="alerts">
+                <Stack gap="6">
+                  <AlertsTab />
+                </Stack>
+              </Tabs.Content>
+
+            </Tabs.Root>
+          </Box>
+
+          {/* Material Modal */}
+          {materialModal.isOpen && (canCreate || canUpdate) && (
+            <LazyMaterialFormModal
+              isOpen={materialModal.isOpen}
+              onClose={closeModal}
+              mode={modalMode}
+              item={currentItem}
+              readOnly={!canCreate && !canUpdate}
+            />
+          )}
+
+        </Stack>
+      </Box>
+    </Box>
   );
 }

@@ -87,7 +87,7 @@ export const InsightsTab: React.FC<InsightsTabProps> = ({
                     </Badge>
                   </HStack>
 
-                  <Box p="3" bg="bg.canvas" borderRadius="md">
+                  <Box p="3" bg="gray.50" borderRadius="md">
                     <Text fontSize="sm" fontWeight="medium" color="blue.600">
                       💡 {insight.recommendation}
                     </Text>

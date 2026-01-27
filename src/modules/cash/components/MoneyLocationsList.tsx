@@ -4,18 +4,19 @@
  */
 
 import { Box, Heading, Spinner, Stack, Text, Badge } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { useEffect, memo } from 'react';
 import { useCashData } from '@/pages/admin/finance/cash/hooks/useCashData';
 import { useCashActions } from '@/pages/admin/finance/cash/hooks/useCashActions';
 import type { MoneyLocationWithAccount } from '../types';
 
 export function MoneyLocationsList() {
   const { moneyLocations, loading, error } = useCashData();
-  const { refreshLocations } = useCashActions();
+  // const { refreshLocations } = useCashActions();
 
-  useEffect(() => {
-    refreshLocations();
-  }, [refreshLocations]);
+  // TODO: Fix refreshLocations action
+  // useEffect(() => {
+  //   refreshLocations();
+  // }, [refreshLocations]);
 
   /*const { data: locations, isLoading, error } = useQuery({
     
@@ -46,12 +47,12 @@ export function MoneyLocationsList() {
       </Heading>
 
       <Stack gap={3}>
-        {locations?.map((location) => (
+        {moneyLocations?.map((location) => (
           <MoneyLocationCard key={location.id} location={location} />
         ))}
       </Stack>
 
-      {locations?.length === 0 && (
+      {moneyLocations?.length === 0 && (
         <Box p={8} textAlign="center" bg="gray.50" borderRadius="md">
           <Text color="gray.500">No hay ubicaciones configuradas</Text>
         </Box>
@@ -64,7 +65,8 @@ interface MoneyLocationCardProps {
   location: MoneyLocationWithAccount;
 }
 
-function MoneyLocationCard({ location }: MoneyLocationCardProps) {
+// ✅ PERFORMANCE: Memoized to prevent unnecessary re-renders
+const MoneyLocationCard = memo(function MoneyLocationCard({ location }: MoneyLocationCardProps) {
   const {
     name,
     code,
@@ -159,7 +161,9 @@ function MoneyLocationCard({ location }: MoneyLocationCardProps) {
       </Stack>
     </Box>
   );
-}
+});
+
+MoneyLocationCard.displayName = 'MoneyLocationCard';
 
 function getLocationTypeColor(type: string): string {
   switch (type) {

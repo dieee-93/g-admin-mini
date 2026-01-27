@@ -48,6 +48,8 @@ interface SaleItem {
 interface ProductWithStockProps {
   onAddToCart?: (item: SaleItem) => void;
   onQuantityChange?: (productId: string, quantity: number) => void;
+  /** Called when product needs additional configuration (SERVICE, RENTAL) */
+  onProductSelect?: (product: ProductWithAvailability) => void;
   currentCart?: SaleItem[];
   disabled?: boolean;
   offlineMode?: boolean;
@@ -56,6 +58,7 @@ interface ProductWithStockProps {
 export function ProductWithStock({
   onAddToCart,
   onQuantityChange,
+  onProductSelect,
   disabled = false
 }: ProductWithStockProps) {
   // currentCart and offlineMode props are available but not yet implemented

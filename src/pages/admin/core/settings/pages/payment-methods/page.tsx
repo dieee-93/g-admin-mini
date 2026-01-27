@@ -1,33 +1,14 @@
 /**
  * PAYMENT METHODS CONFIGURATION PAGE
  * 
- * Configuración unificada de métodos de pago y gateways de pago.
+ * ✅ CLEAN IMPLEMENTATION - No legacy code
+ * Uses TanStack Query hooks exclusively
  * 
- * CONTEXTO ARGENTINA 2025:
- * - Efectivo (Cash)
- * - Tarjetas (Débito/Crédito)
- * - Transferencias bancarias (CBU/CVU/Alias)
- * - Billeteras digitales (MercadoPago, MODO, Ualá, Naranja X)
- * - QR Interoperable (QR de COELSA)
- * - Cheques
- * - Crypto (Bitcoin, USDT - opcional)
- * 
- * CASOS DE USO:
- * - TakeAway: Al menos 1 método activo (requirement)
- * - Delivery: Al menos 1 método activo (requirement)
- * - Memberships: Métodos recurrentes (tarjetas, débito automático)
- * - E-commerce: Gateways online (MercadoPago, MODO)
- * - POS: Métodos presenciales (efectivo, tarjetas, QR)
- * 
- * INTEGRACIÓN:
- * - paymentsStore: Almacena paymentMethods y paymentGateways
- * - Achievements: Valida ctx.paymentMethods.length > 0
- * - Sales: usa payment_method para completar ventas
- * 
- * @version 1.0.0
+ * @see src/modules/finance-integrations/hooks/usePayments.ts
+ * @version 2.0.0 - TanStack Query Migration
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   ContentLayout,
   PageHeader,
@@ -41,11 +22,7 @@ import {
   Tabs,
   Card,
   Switch,
-  Text,
-  Dialog,
-  InputField,
-  SelectField,
-  TextareaField
+  Text
 } from '@/shared/ui';
 import {
   CreditCardIcon,
@@ -55,13 +32,23 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   PlusIcon,
-  PencilIcon,
   TrashIcon,
   QrCodeIcon
 } from '@heroicons/react/24/outline';
-import { usePaymentsStore, type PaymentMethod, type PaymentGateway } from '@/store/paymentsStore';
+import { 
+  usePaymentMethods, 
+  usePaymentGateways, 
+  usePaymentStats,
+  useCreatePaymentMethod,
+  useUpdatePaymentMethod,
+  useDeletePaymentMethod,
+  useCreatePaymentGateway,
+  useUpdatePaymentGateway,
+  useDeletePaymentGateway
+} from '@/modules/finance-integrations/hooks/usePayments';
 import { toaster } from '@/shared/ui/toaster';
 import { logger } from '@/lib/logging';
+import type { PaymentMethod, PaymentGateway } from '@/modules/finance-integrations/services/paymentsApi';
 
 // ============================================
 // ARGENTINA PAYMENT METHODS PRESETS
@@ -241,162 +228,106 @@ const AR_PAYMENT_GATEWAYS: GatewayPreset[] = [
 // ============================================
 
 export default function PaymentMethodsPage() {
-  // Store access
-  const paymentMethods = usePaymentsStore((state) => state.paymentMethods);
-  const paymentGateways = usePaymentsStore((state) => state.paymentGateways);
-  const stats = usePaymentsStore((state) => state.stats);
-  const addPaymentMethod = usePaymentsStore((state) => state.addPaymentMethod);
-  const updatePaymentMethod = usePaymentsStore((state) => state.updatePaymentMethod);
-  const deletePaymentMethod = usePaymentsStore((state) => state.deletePaymentMethod);
-  const addPaymentGateway = usePaymentsStore((state) => state.addPaymentGateway);
-  const updatePaymentGateway = usePaymentsStore((state) => state.updatePaymentGateway);
-  const deletePaymentGateway = usePaymentsStore((state) => state.deletePaymentGateway);
+  // ✅ TanStack Query hooks - no legacy store
+  const { data: methods = [], isLoading: methodsLoading, error: methodsError } = usePaymentMethods();
+  const { data: gateways = [], isLoading: gatewaysLoading, error: gatewaysError } = usePaymentGateways();
+  const stats = usePaymentStats();
+
+  // Mutations
+  const createMethod = useCreatePaymentMethod();
+  const updateMethod = useUpdatePaymentMethod();
+  const deleteMethod = useDeletePaymentMethod();
+  const createGateway = useCreatePaymentGateway();
+  const updateGateway = useUpdatePaymentGateway();
+  const deleteGateway = useDeletePaymentGateway();
 
   // UI State
   const [activeTab, setActiveTab] = useState<'methods' | 'gateways'>('methods');
-  const [isMethodModalOpen, setIsMethodModalOpen] = useState(false);
-  const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
-  const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
-  const [editingGateway, setEditingGateway] = useState<PaymentGateway | null>(null);
-
-  // Form state
-  const [methodForm, setMethodForm] = useState({
-    name: '',
-    type: 'cash' as PaymentMethod['type'],
-    is_active: true
-  });
-
-  const [gatewayForm, setGatewayForm] = useState({
-    name: '',
-    type: 'online' as PaymentGateway['type'],
-    is_active: true,
-    supports_subscriptions: false
-  });
 
   // Derived state
   const hasActiveMethods = stats.activeMethods > 0;
-  const needsSetup = paymentMethods.length === 0;
+  const needsSetup = methods.length === 0;
 
   // Quick add from preset
   const handleQuickAddMethod = (preset: PaymentMethodPreset) => {
-    const existingMethod = paymentMethods.find((m) => m.id === preset.id);
+    const existingMethod = methods.find((m) => m.id === preset.id);
     if (existingMethod) {
       toaster.create({
         title: 'Ya existe',
         description: `El método "${preset.name}" ya está configurado`,
-        type: 'info',
-        duration: 3000
+        type: 'info'
       });
       return;
     }
 
-    const newMethod: PaymentMethod = {
-      id: preset.id,
+    createMethod.mutate({
       name: preset.name,
       type: preset.type,
       is_active: true
-    };
-
-    addPaymentMethod(newMethod);
-
-    toaster.create({
-      title: '✅ Método agregado',
-      description: `${preset.name} está disponible para recibir pagos`,
-      type: 'success',
-      duration: 3000
     });
-
-    logger.info('Settings', 'Payment method added', { method: preset.name });
   };
 
   const handleToggleMethod = (id: string, isActive: boolean) => {
-    updatePaymentMethod(id, { is_active: isActive });
-    
-    const method = paymentMethods.find((m) => m.id === id);
-    logger.info('Settings', `Payment method ${isActive ? 'activated' : 'deactivated'}`, {
-      method: method?.name
-    });
+    updateMethod.mutate({ id, updates: { is_active: isActive } });
   };
 
   const handleDeleteMethod = (id: string) => {
-    const method = paymentMethods.find((m) => m.id === id);
-    deletePaymentMethod(id);
-
-    toaster.create({
-      title: 'Método eliminado',
-      description: `${method?.name} fue removido`,
-      type: 'info',
-      duration: 3000
-    });
-
+    const method = methods.find((m) => m.id === id);
+    deleteMethod.mutate(id);
     logger.info('Settings', 'Payment method deleted', { method: method?.name });
   };
 
   const handleQuickAddGateway = (preset: GatewayPreset) => {
-    const existingGateway = paymentGateways.find((g) => g.id === preset.id);
+    const existingGateway = gateways.find((g) => g.id === preset.id);
     if (existingGateway) {
       toaster.create({
         title: 'Ya existe',
         description: `El gateway "${preset.name}" ya está configurado`,
-        type: 'info',
-        duration: 3000
+        type: 'info'
       });
       return;
     }
 
-    const newGateway: PaymentGateway = {
-      id: preset.id,
+    createGateway.mutate({
       name: preset.name,
       type: preset.type,
       is_active: false, // Inactive by default (requires API keys)
       supports_subscriptions: preset.supports_subscriptions
-    };
-
-    addPaymentGateway(newGateway);
-
-    toaster.create({
-      title: 'Gateway agregado',
-      description: `${preset.name} necesita configuración de API keys`,
-      type: 'info',
-      duration: 4000
     });
-
-    logger.info('Settings', 'Payment gateway added', { gateway: preset.name });
   };
 
   const handleToggleGateway = (id: string, isActive: boolean) => {
-    updatePaymentGateway(id, { is_active: isActive });
-    
-    const gateway = paymentGateways.find((g) => g.id === id);
-    logger.info('Settings', `Payment gateway ${isActive ? 'activated' : 'deactivated'}`, {
-      gateway: gateway?.name
-    });
+    updateGateway.mutate({ id, updates: { is_active: isActive } });
   };
 
   const handleDeleteGateway = (id: string) => {
-    const gateway = paymentGateways.find((g) => g.id === id);
-    deletePaymentGateway(id);
-
-    toaster.create({
-      title: 'Gateway eliminado',
-      description: `${gateway?.name} fue removido`,
-      type: 'info',
-      duration: 3000
-    });
-
+    const gateway = gateways.find((g) => g.id === id);
+    deleteGateway.mutate(id);
     logger.info('Settings', 'Payment gateway deleted', { gateway: gateway?.name });
   };
 
   // Available presets (not already added)
   const availableMethodPresets = useMemo(
-    () => AR_PAYMENT_METHODS.filter((preset) => !paymentMethods.some((m) => m.id === preset.id)),
-    [paymentMethods]
+    () => AR_PAYMENT_METHODS.filter((preset) => !methods.some((m) => m.name === preset.name)),
+    [methods]
   );
 
   const availableGatewayPresets = useMemo(
-    () => AR_PAYMENT_GATEWAYS.filter((preset) => !paymentGateways.some((g) => g.id === preset.id)),
-    [paymentGateways]
+    () => AR_PAYMENT_GATEWAYS.filter((preset) => !gateways.some((g) => g.name === preset.name)),
+    [gateways]
   );
+
+  if (methodsError || gatewaysError) {
+    return (
+      <ContentLayout>
+        <Alert status="error" title="Error al cargar datos">
+          {(methodsError as Error)?.message || (gatewaysError as Error)?.message}
+        </Alert>
+      </ContentLayout>
+    );
+  }
+
+  const isLoading = methodsLoading || gatewaysLoading;
 
   return (
     <ContentLayout spacing="normal" data-testid="payment-methods-page">
@@ -535,13 +466,13 @@ export default function PaymentMethodsPage() {
               )}
 
               {/* Current Methods */}
-              {paymentMethods.length === 0 ? (
+              {methods.length === 0 ? (
                 <Alert status="info">
                   No hay métodos configurados aún. Agrega al menos uno para empezar.
                 </Alert>
               ) : (
                 <Stack gap="3">
-                  {paymentMethods.map((method) => {
+                  {methods.map((method) => {
                     const preset = AR_PAYMENT_METHODS.find((p) => p.id === method.id);
                     const IconComp = preset?.icon || BanknotesIcon;
 
@@ -716,10 +647,10 @@ export default function PaymentMethodsPage() {
               )}
 
               {/* Current Gateways */}
-              {paymentGateways.length > 0 && (
+              {gateways.length > 0 && (
                 <Stack gap="3">
                   <Text fontWeight="medium">Gateways configurados:</Text>
-                  {paymentGateways.map((gateway) => {
+                  {gateways.map((gateway) => {
                     const preset = AR_PAYMENT_GATEWAYS.find((p) => p.id === gateway.id);
 
                     return (
@@ -784,7 +715,7 @@ export default function PaymentMethodsPage() {
                 </Stack>
               )}
 
-              {paymentGateways.length === 0 && availableGatewayPresets.length === 0 && (
+              {gateways.length === 0 && availableGatewayPresets.length === 0 && (
                 <Alert status="success">
                   Todos los gateways disponibles ya fueron agregados.
                 </Alert>

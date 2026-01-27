@@ -21,7 +21,6 @@ export const financeBillingManifest: ModuleManifest = {
   permissionModule: 'billing', // ✅ Uses 'billing' permission
 
   depends: ['customers'], // Billing tracks customer accounts
-  autoInstall: true, // Auto-activate when customers active
 
   // 🔒 PERMISSIONS: Supervisors can manage billing
   minimumRole: 'SUPERVISOR' as const,

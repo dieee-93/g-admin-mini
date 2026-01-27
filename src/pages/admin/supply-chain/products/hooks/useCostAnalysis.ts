@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useProductsStore } from '@/store/productsStore';
-import { useMaterialsStore } from '@/store/materialsStore';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { useProductsStore } from '@/modules/products';
+import { useMaterialsStore } from '@/modules/materials/store';
+import { DecimalUtils } from '@/lib/decimal';
 // import { useCostCalculations } from './useCostCalculations'; // Hook not found after refactor
 
 /**

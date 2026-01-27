@@ -8,7 +8,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { logger } from '@/lib/logging/Logger';
 import type {
   BalanceSheet,
@@ -140,7 +140,11 @@ export async function generateBalanceSheet(
     totalLiabilitiesAndEquity,
     'financial'
   );
-  const balanced = DecimalUtils.abs(variance).toNumber() < 0.01; // Tolerancia de 1 centavo
+  
+  // ✅ FIXED [2.5]: Keep Decimal until end, compare Decimal directly
+  const varianceAbs = DecimalUtils.abs(variance);
+  const toleranceDecimal = DecimalUtils.fromValue(0.01, 'financial'); // Tolerancia de 1 centavo
+  const balanced = DecimalUtils.lessThan(varianceAbs, toleranceDecimal, 'financial');
 
   const report: BalanceSheet = {
     asOfDate: dateStr,
@@ -776,11 +780,12 @@ function sumTransactions(
   transactions: Array<{ amount: number }>
 ): number {
   const sum = transactions.reduce((acc, transaction) => {
-    return DecimalUtils.add(
-      acc,
-      DecimalUtils.fromValue(Math.abs(transaction.amount), 'financial'),
+    // ✅ FIXED [2.5]: Use DecimalUtils.abs() instead of Math.abs()
+    const transactionAmountAbs = DecimalUtils.abs(
+      DecimalUtils.fromValue(transaction.amount, 'financial'),
       'financial'
     );
+    return DecimalUtils.add(acc, transactionAmountAbs, 'financial');
   }, DecimalUtils.fromValue(0, 'financial'));
 
   return DecimalUtils.toNumber(sum);

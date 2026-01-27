@@ -15,22 +15,22 @@ interface ModuleHeaderProps {
   rightActions?: React.ReactNode;
 }
 
-export function ModuleHeader({ 
-  title, 
-  color = 'gray', 
+export function ModuleHeader({
+  title,
+  color = 'gray',
   onBack,
-  rightActions 
+  rightActions
 }: ModuleHeaderProps) {
   const navState = useNavigationState(); const navActions = useNavigationActions(); const { breadcrumbs, canNavigateBack } = navState; const { navigateBack } = navActions;
-  
+
   return (
     <Box>
       {/* Header Principal - Breadcrumb removed to avoid duplication */}
-      <Box 
-        bg="bg.canvas"
-        borderLeft={`4px solid`} 
+      <Box
+        bg="gray.50"
+        borderLeft={`4px solid`}
         borderColor={`${color}.400`}
-        p="4" 
+        p="4"
         mb="6"
       >
         <HStack justify="space-between" align="center">
@@ -48,18 +48,18 @@ export function ModuleHeader({
                 Volver
               </Button>
             )}
-            
+
             {(onBack || canNavigateBack) && <Separator orientation="vertical" h="6" />}
-            
-            <Heading 
-              size="lg" 
+
+            <Heading
+              size="lg"
               color="text.primary"
               fontWeight="bold"
             >
               {title}
             </Heading>
           </HStack>
-          
+
           {rightActions && (
             <Box>
               {rightActions}
@@ -68,4 +68,5 @@ export function ModuleHeader({
         </HStack>
       </Box>
     </Box>
-  )};
+  )
+};

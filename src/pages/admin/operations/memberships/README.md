@@ -16,6 +16,15 @@ Customer loyalty and subscription tier management system with real-time database
 - [x] Permission system integrated
 - [x] Cross-module documentation complete
 - [x] Automated membership lifecycle (payment → activation → expiration)
+- [x] Automated membership lifecycle (payment → activation → expiration)
+
+## 🗺️ Feature & Route Map
+| Feature | Sub-route | Component | Description |
+|---------|-----------|-----------|-------------|
+| **Memberships Dashboard** | `/` | `page.tsx` | Overview (Active, MRR, New Members). |
+| **Member List** | `(tab)` | `MembershipTable` | Management of individual member records. |
+| **Tiers Config** | `(modal)` | `TierConfigModal` | Configuration of tiers (Gold, Silver, etc.). |
+| **Analytics** | `(section)` | `MembershipAnalyticsEnhanced` | Deep dive into retention and revenue metrics. |
 
 ## 📊 Database Schema
 

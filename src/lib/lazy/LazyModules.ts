@@ -28,6 +28,18 @@ export const LazySalesPage = createLazyComponent(
   }
 );
 
+// Lazy-loaded Fulfillment Main Page
+export const LazyFulfillmentPage = createLazyComponent(
+  () => import('../../pages/admin/operations/fulfillment/page'),
+  'fulfillment',
+  {
+    chunkName: 'fulfillment-module',
+    preload: false,
+    priority: 'high',
+    cacheStrategy: 'both'
+  }
+);
+
 // Lazy-loaded Fulfillment Onsite Page
 export const LazyFulfillmentOnsitePage = createLazyComponent(
   () => import('../../pages/admin/operations/fulfillment/onsite/page'),
@@ -92,21 +104,12 @@ export const LazySuppliersPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Materials Procurement Page (pages/admin/supply-chain/materials/procurement/page.tsx)
-export const LazySupplierOrdersPage = createLazyComponent(
-  () => import('../../pages/admin/supply-chain/materials/procurement/page'),
-  'materials-procurement',
-  {
-    chunkName: 'materials-procurement-module',
-    preload: false,
-    priority: 'medium',
-    cacheStrategy: 'both'
-  }
-);
+// NOTE: Supplier Orders is now a tab within the Suppliers page
+// No separate lazy component needed - integrated into LazySuppliersPage
 
-// Lazy-loaded Staff Page (pages/admin/resources/staff/page.tsx)
+// Lazy-loaded Staff Page (pages/admin/resources/team/page.tsx)
 export const LazyStaffPage = createLazyComponent(
-  () => import('../../pages/admin/resources/staff/page'),
+  () => import('../../pages/admin/resources/team/page'),
   'staff',
   {
     chunkName: 'staff-module',
@@ -143,9 +146,9 @@ export const LazySchedulingPage = createLazyComponent(
 // NOTE: Recipes functionality migrated to services/recipe and dashboard
 // LazyRecipesPage removed - use RecipeForm from services/recipe instead
 
-// Lazy-loaded Fiscal Page (pages/admin/finance-fiscal/page.tsx)
+// Lazy-loaded Fiscal Page (pages/admin/finance/fiscal/page.tsx)
 export const LazyFiscalPage = createLazyComponent(
-  () => import('../../pages/admin/finance-fiscal/page'),
+  () => import('../../pages/admin/finance/fiscal/page'),
   'finance-fiscal',
   {
     chunkName: 'fiscal-module',
@@ -192,12 +195,102 @@ export const LazyProductFormPage = createLazyComponent(
   }
 );
 
+// Lazy-loaded Recipes Page (pages/admin/supply-chain/recipes/page.tsx)
+export const LazyRecipesPage = createLazyComponent(
+  () => import('../../pages/admin/supply-chain/recipes/page'),
+  'recipes',
+  {
+    chunkName: 'recipes-module',
+    preload: false,
+    priority: 'medium',
+    cacheStrategy: 'both'
+  }
+);
+
 // Lazy-loaded Settings Page (pages/admin/core/settings/page.tsx)
 export const LazySettingsPage = createLazyComponent(
   () => import('../../pages/admin/core/settings/page'),
   'settings',
   {
     chunkName: 'settings-module',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+// Lazy-loaded Settings Sub-pages
+export const LazyHoursPage = createLazyComponent(
+  () => import('../../pages/admin/core/settings/pages/hours/page'),
+  'settings-hours',
+  {
+    chunkName: 'settings-hours',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyBusinessPage = createLazyComponent(
+  () => import('../../pages/admin/core/settings/pages/business/page'),
+  'settings-business',
+  {
+    chunkName: 'settings-business',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazyPaymentMethodsPage = createLazyComponent(
+  () => import('../../pages/admin/core/settings/pages/payment-methods/page'),
+  'settings-payment-methods',
+  {
+    chunkName: 'settings-payment-methods',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazySettingsIntegrations = createLazyComponent(
+  () => import('../../pages/admin/core/settings/pages/integrations/page'),
+  'settings-integrations',
+  {
+    chunkName: 'settings-integrations',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazySettingsDiagnostics = createLazyComponent(
+  () => import('../../pages/admin/core/settings/pages/diagnostics/page'),
+  'settings-diagnostics',
+  {
+    chunkName: 'settings-diagnostics',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazySettingsReporting = createLazyComponent(
+  () => import('../../pages/admin/core/settings/pages/reporting/page'),
+  'settings-reporting',
+  {
+    chunkName: 'settings-reporting',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
+export const LazySettingsEnterprise = createLazyComponent(
+  () => import('../../pages/admin/core/settings/pages/enterprise/page'),
+  'settings-enterprise',
+  {
+    chunkName: 'settings-enterprise',
     preload: false,
     priority: 'low',
     cacheStrategy: 'memory'
@@ -380,9 +473,9 @@ export const LazyExecutivePage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Finance Billing Page (pages/admin/finance-billing/page.tsx)
+// Lazy-loaded Finance Billing Page (pages/admin/finance/billing/page.tsx)
 export const LazyBillingPage = createLazyComponent(
-  () => import('../../pages/admin/finance-billing/page'),
+  () => import('../../pages/admin/finance/billing/page'),
   'finance-billing',
   {
     chunkName: 'billing-module',
@@ -392,9 +485,9 @@ export const LazyBillingPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Finance Integrations Page (pages/admin/finance-integrations/page.tsx)
+// Lazy-loaded Finance Integrations Page (pages/admin/finance/integrations/page.tsx)
 export const LazyIntegrationsPage = createLazyComponent(
-  () => import('../../pages/admin/finance-integrations/page'),
+  () => import('../../pages/admin/finance/integrations/page'),
   'finance-integrations',
   {
     chunkName: 'integrations-module',
@@ -572,9 +665,9 @@ export const lazyModules = {
   LazyMaterialsPage,
   LazyStockLab,
   LazySuppliersPage,
-  LazySupplierOrdersPage,
   LazyProductsPage,
   LazyProductFormPage,
+  LazyRecipesPage,
   LazyStaffPage,
   LazyCustomersPage,
   LazySchedulingPage,

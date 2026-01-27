@@ -9,11 +9,10 @@
  * - Loading/error handling
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cartService } from '../services/cartService';
 import { logger } from '@/lib/logging';
 import { useAlerts } from '@/shared/alerts';
-import { salesAlertsAdapter } from '../../services/salesAlertsAdapter';
 import type { Cart } from '../types';
 
 interface UseCartParams {
@@ -23,9 +22,12 @@ interface UseCartParams {
   autoLoad?: boolean; // Auto-load cart on mount
 }
 
+export const CART_QUERY_KEY = (customerId?: string, sessionId?: string) => 
+  ['cart', { customerId, sessionId }];
+
 export function useCart(params: UseCartParams = {}) {
-  const [cart, setCart] = useState<Cart | null>(null);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const { customerId, sessionId, locationId, autoLoad } = params;
 
   // Connect to global alerts system
   const { actions: alertActions } = useAlerts({
@@ -33,293 +35,183 @@ export function useCart(params: UseCartParams = {}) {
     autoFilter: true,
   });
 
+  const queryKey = CART_QUERY_KEY(customerId, sessionId);
+  const isEnabled = !!(autoLoad && (customerId || sessionId));
+
   // Load or create cart
-  const loadCart = useCallback(async () => {
-    if (!params.customerId && !params.sessionId) {
-      logger.warn('CartHook', 'Cannot load cart without customerId or sessionId');
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const existingCart = await cartService.getOrCreateCart({
-        customerId: params.customerId,
-        sessionId: params.sessionId,
-        locationId: params.locationId,
-      });
-
-      setCart(existingCart);
-      logger.info('CartHook', '✅ Cart loaded', { cartId: existingCart.id });
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CartHook', '❌ Error loading cart:', error);
-
-      // Create alert using global alerts system
-      await alertActions.create({
-        type: 'operational',
-        context: 'sales',
-        severity: 'medium',
-        title: 'Failed to Load Cart',
-        description: `Error loading shopping cart: ${error.message}`,
-        metadata: {
-          errorCode: error.name,
-        },
-        autoExpire: 10,
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [params.customerId, params.sessionId, params.locationId, alertActions]);
-
-  // Add item to cart
-  const addItem = async (item: {
-    product_id: string;
-    quantity: number;
-    price: number;
-    product_name?: string;
-  }) => {
-    if (!cart) {
-      throw new Error('Cart not loaded');
-    }
-
-    try {
-      setLoading(true);
-
-      const updatedCart = await cartService.addItem(cart.id, item);
-      setCart(updatedCart);
-      logger.info('CartHook', '✅ Item added to cart');
-      return updatedCart;
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CartHook', '❌ Error adding item:', error);
-
-      // Create alert using global alerts system
-      await alertActions.create({
-        type: 'operational',
-        context: 'sales',
-        severity: 'medium',
-        title: 'Failed to Add Item to Cart',
-        description: `Error adding ${item.product_name || 'item'} to cart: ${error.message}`,
-        metadata: {
-          itemId: item.product_id,
-          itemName: item.product_name,
-          errorCode: error.name,
-        },
-        autoExpire: 10,
-      });
-
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Update item quantity
-  const updateItem = async (productId: string, quantity: number) => {
-    if (!cart) {
-      throw new Error('Cart not loaded');
-    }
-
-    try {
-      setLoading(true);
-
-      const updatedCart = await cartService.updateItem(cart.id, productId, quantity);
-      setCart(updatedCart);
-      logger.info('CartHook', '✅ Item updated in cart');
-      return updatedCart;
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CartHook', '❌ Error updating item:', error);
-
-      // Create alert using global alerts system
-      await alertActions.create({
-        type: 'operational',
-        context: 'sales',
-        severity: 'low',
-        title: 'Failed to Update Cart Item',
-        description: `Error updating item quantity: ${error.message}`,
-        metadata: {
-          itemId: productId,
-          errorCode: error.name,
-        },
-        autoExpire: 10,
-      });
-
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Remove item from cart
-  const removeItem = async (productId: string) => {
-    if (!cart) {
-      throw new Error('Cart not loaded');
-    }
-
-    try {
-      setLoading(true);
-
-      const updatedCart = await cartService.removeItem(cart.id, productId);
-      setCart(updatedCart);
-      logger.info('CartHook', '✅ Item removed from cart');
-      return updatedCart;
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CartHook', '❌ Error removing item:', error);
-
-      // Create alert using global alerts system
-      await alertActions.create({
-        type: 'operational',
-        context: 'sales',
-        severity: 'low',
-        title: 'Failed to Remove Cart Item',
-        description: `Error removing item from cart: ${error.message}`,
-        metadata: {
-          itemId: productId,
-          errorCode: error.name,
-        },
-        autoExpire: 10,
-      });
-
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Clear cart
-  const clearCart = async () => {
-    if (!cart) {
-      throw new Error('Cart not loaded');
-    }
-
-    try {
-      setLoading(true);
-
-      const updatedCart = await cartService.clearCart(cart.id);
-      setCart(updatedCart);
-      logger.info('CartHook', '✅ Cart cleared');
-      return updatedCart;
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CartHook', '❌ Error clearing cart:', error);
-
-      // Create alert using global alerts system
-      await alertActions.create({
-        type: 'operational',
-        context: 'sales',
-        severity: 'low',
-        title: 'Failed to Clear Cart',
-        description: `Error clearing cart: ${error.message}`,
-        metadata: {
-          errorCode: error.name,
-        },
-        autoExpire: 10,
-      });
-
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Delete cart permanently
-  const deleteCart = async () => {
-    if (!cart) {
-      throw new Error('Cart not loaded');
-    }
-
-    try {
-      setLoading(true);
-
-      await cartService.deleteCart(cart.id);
-      setCart(null);
-      logger.info('CartHook', '✅ Cart deleted');
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CartHook', '❌ Error deleting cart:', error);
-
-      // Create alert using global alerts system
-      await alertActions.create({
-        type: 'operational',
-        context: 'sales',
-        severity: 'medium',
-        title: 'Failed to Delete Cart',
-        description: `Error deleting cart: ${error.message}`,
-        metadata: {
-          errorCode: error.name,
-        },
-        autoExpire: 10,
-      });
-
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Migrate guest cart to customer cart
-  const migrateCart = async (sessionId: string, customerId: string) => {
-    try {
-      setLoading(true);
-
-      const cartId = await cartService.migrateCart(sessionId, customerId);
-      if (cartId) {
-        // Reload cart after migration
-        await loadCart();
+  const { 
+    data: cart = null, 
+    isLoading: loading, 
+    error,
+    refetch: loadCart
+  } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (!customerId && !sessionId) return null;
+      
+      logger.debug('App', 'Loading cart', { customerId, sessionId });
+      try {
+        return await cartService.getOrCreateCart({
+          customerId,
+          sessionId,
+          locationId,
+        });
+      } catch (err: any) {
+        // Create alert using global alerts system
+        await alertActions.create({
+          type: 'operational',
+          context: 'sales',
+          severity: 'medium',
+          title: 'Failed to Load Cart',
+          description: `Error loading shopping cart: ${err.message}`,
+          metadata: {
+            errorCode: err.name,
+          },
+          autoExpire: 10,
+          intelligence_level: 'simple',
+        });
+        throw err;
       }
-      logger.info('CartHook', '✅ Cart migrated');
-    } catch (err) {
-      const error = err as Error;
-      logger.error('CartHook', '❌ Error migrating cart:', error);
+    },
+    enabled: isEnabled,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
-      // Create alert using global alerts system
-      await alertActions.create({
-        type: 'operational',
-        context: 'sales',
-        severity: 'medium',
-        title: 'Failed to Migrate Cart',
-        description: `Error migrating guest cart to customer account: ${error.message}`,
-        metadata: {
-          itemId: customerId,
-          errorCode: error.name,
-        },
-        autoExpire: 15,
-      });
-
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+  // Generic error handler for mutations
+  const handleMutationError = (title: string, err: any, metadata: any = {}) => {
+    logger.error('App', `❌ ${title}:`, err);
+    alertActions.create({
+      type: 'operational',
+      context: 'sales',
+      severity: 'medium',
+      title,
+      description: err.message,
+      metadata: {
+        errorCode: err.name,
+        ...metadata,
+      },
+      autoExpire: 10,
+      intelligence_level: 'simple',
+    });
   };
+
+  // Add item mutation
+  const addItemMutation = useMutation({
+    mutationFn: async (item: { product_id: string; quantity: number; price: number; product_name?: string }) => {
+      if (!cart) throw new Error('Cart not loaded');
+      return await cartService.addItem(cart.id, item);
+    },
+    onSuccess: (updatedCart) => {
+      queryClient.setQueryData(queryKey, updatedCart);
+      logger.info('App', '✅ Item added to cart');
+    },
+    onError: (err: any, variables) => {
+      handleMutationError('Failed to Add Item to Cart', err, {
+        itemId: variables.product_id,
+        itemName: variables.product_name,
+      });
+    }
+  });
+
+  // Update item mutation
+  const updateItemMutation = useMutation({
+    mutationFn: async ({ productId, quantity }: { productId: string; quantity: number }) => {
+      if (!cart) throw new Error('Cart not loaded');
+      return await cartService.updateItem(cart.id, productId, quantity);
+    },
+    onSuccess: (updatedCart) => {
+      queryClient.setQueryData(queryKey, updatedCart);
+      logger.info('App', '✅ Item updated in cart');
+    },
+    onError: (err: any, variables) => {
+      handleMutationError('Failed to Update Cart Item', err, { itemId: variables.productId });
+    }
+  });
+
+  // Remove item mutation
+  const removeItemMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      if (!cart) throw new Error('Cart not loaded');
+      return await cartService.removeItem(cart.id, productId);
+    },
+    onSuccess: (updatedCart) => {
+      queryClient.setQueryData(queryKey, updatedCart);
+      logger.info('App', '✅ Item removed from cart');
+    },
+    onError: (err: any, variables) => {
+      handleMutationError('Failed to Remove Cart Item', err, { itemId: variables });
+    }
+  });
+
+  // Clear cart mutation
+  const clearCartMutation = useMutation({
+    mutationFn: async () => {
+      if (!cart) throw new Error('Cart not loaded');
+      return await cartService.clearCart(cart.id);
+    },
+    onSuccess: (updatedCart) => {
+      queryClient.setQueryData(queryKey, updatedCart);
+      logger.info('App', '✅ Cart cleared');
+    },
+    onError: (err: any) => {
+      handleMutationError('Failed to Clear Cart', err);
+    }
+  });
+
+  // Delete cart mutation
+  const deleteCartMutation = useMutation({
+    mutationFn: async () => {
+      if (!cart) throw new Error('Cart not loaded');
+      await cartService.deleteCart(cart.id);
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(queryKey, null);
+      logger.info('App', '✅ Cart deleted');
+    },
+    onError: (err: any) => {
+      handleMutationError('Failed to Delete Cart', err);
+    }
+  });
+
+  // Migrate cart mutation
+  const migrateCartMutation = useMutation({
+    mutationFn: async ({ sessionId, customerId }: { sessionId: string; customerId: string }) => {
+      return await cartService.migrateCart(sessionId, customerId);
+    },
+    onSuccess: async (cartId, variables) => {
+      if (cartId) {
+        // Invalidate queries to reload cart with new customer association
+        await queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY(variables.customerId, variables.sessionId) });
+        // Also invalidate just customer query
+        await queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY(variables.customerId, undefined) });
+        logger.info('App', '✅ Cart migrated');
+      }
+    },
+    onError: (err: any, variables) => {
+      handleMutationError('Failed to Migrate Cart', err, { itemId: variables.customerId });
+    }
+  });
 
   // Helper methods
   const itemCount = cart ? cartService.getItemCount(cart) : 0;
-  const hasProduct = (productId: string) =>
-    cart ? cartService.hasProduct(cart, productId) : false;
-  const getProductQuantity = (productId: string) =>
-    cart ? cartService.getProductQuantity(cart, productId) : 0;
-
-  // Auto-load cart on mount if autoLoad is true
-  useEffect(() => {
-    if (params.autoLoad && (params.customerId || params.sessionId)) {
-      loadCart();
-    }
-  }, [params.autoLoad, params.customerId, params.sessionId, loadCart]);
+  const hasProduct = (productId: string) => cart ? cartService.hasProduct(cart, productId) : false;
+  const getProductQuantity = (productId: string) => cart ? cartService.getProductQuantity(cart, productId) : 0;
 
   return {
     cart,
     loading,
+    error: error as Error | null,
     itemCount,
-    loadCart,
-    addItem,
-    updateItem,
-    removeItem,
-    clearCart,
-    deleteCart,
-    migrateCart,
+    loadCart: async () => { await loadCart() },
+    addItem: (item: { product_id: string; quantity: number; price: number; product_name?: string }) => 
+      addItemMutation.mutateAsync(item),
+    updateItem: (productId: string, quantity: number) => 
+      updateItemMutation.mutateAsync({ productId, quantity }),
+    removeItem: (productId: string) => removeItemMutation.mutateAsync(productId),
+    clearCart: clearCartMutation.mutateAsync,
+    deleteCart: deleteCartMutation.mutateAsync,
+    migrateCart: (sessionId: string, customerId: string) => 
+      migrateCartMutation.mutateAsync({ sessionId, customerId }),
     hasProduct,
     getProductQuantity,
   };

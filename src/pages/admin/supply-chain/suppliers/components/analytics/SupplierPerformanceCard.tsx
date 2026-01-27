@@ -4,7 +4,7 @@
 // Individual supplier performance metrics card
 
 import { Card, HStack, VStack, Text, Badge, SimpleGrid, Button } from '@/shared/ui';
-import type { SupplierAnalysis } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import type { SupplierAnalysis } from '@/modules/materials/services';
 import {
   CheckBadgeIcon,
   TruckIcon,
@@ -86,8 +86,8 @@ export function SupplierPerformanceCard({
                 supplier.metrics.averageLeadTime <= 7
                   ? 'green'
                   : supplier.metrics.averageLeadTime <= 14
-                  ? 'yellow'
-                  : 'orange'
+                    ? 'yellow'
+                    : 'orange'
               }
             />
           </SimpleGrid>
@@ -126,14 +126,14 @@ export function SupplierPerformanceCard({
 
           {/* Risk Level Badge */}
           {supplier.riskLevel !== 'low' && (
-            <HStack>
+            <HStack gap="2" align="center">
               <ExclamationTriangleIcon width={16} height={16} />
               <Text fontSize="sm" fontWeight="semibold">
-                Riesgo:{' '}
-                <Badge colorPalette={getRiskColor(supplier.riskLevel)} size="sm">
-                  {getRiskLabel(supplier.riskLevel)}
-                </Badge>
+                Riesgo:
               </Text>
+              <Badge colorPalette={getRiskColor(supplier.riskLevel)} size="sm">
+                {getRiskLabel(supplier.riskLevel)}
+              </Badge>
             </HStack>
           )}
 

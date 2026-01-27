@@ -5,7 +5,7 @@
 import { useDataFetcher, useDataSearch, useModuleAnalytics } from '@/shared/hooks/business';
 import { AnalyticsEngine } from '@/shared/services/AnalyticsEngine';
 import { handleAsyncOperation, CRUDHandlers } from '@/shared/utils/errorHandling';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { useSales as useSalesOriginal } from './useSales';
 import { useMemo } from 'react';
 

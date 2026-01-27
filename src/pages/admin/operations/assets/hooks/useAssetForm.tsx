@@ -13,7 +13,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
-import { useAssetValidation } from '@/hooks/useAssetValidation';
+import { useAssetValidation } from '@/modules/assets/hooks';
 import { notify } from '@/lib/notifications';
 import type { AssetFormData } from '@/lib/validation/zod/CommonSchemas';
 

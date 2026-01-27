@@ -1,7 +1,7 @@
 // Components only - Fast Refresh compatible
 export * from './components/TypeSelector';
-export * from './components/MeasurableFields';
-export * from './components/CountableFields';
+export { MeasurableFields } from './components/MeasurableFields';
+export { CountableFields } from './components/CountableFields';
 export * from './components/ElaboratedFields';
 export * from './components/FormSections/ValidatedField';
 export * from './MaterialFormDialog';

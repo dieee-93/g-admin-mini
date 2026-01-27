@@ -17,6 +17,13 @@ Central dashboard aggregating widgets and metrics from all modules using the Mod
 
 ---
 
+## Feature & Route Map
+| Feature | Sub-route | Component | Description |
+|---------|-----------|-----------|-------------|
+| **Dashboard** | `/` | `page.tsx` | Main dashboard aggregation view. |
+
+---
+
 ## 🎯 Purpose
 
 The Dashboard module serves as the **central command center** for the G-Admin system. It:

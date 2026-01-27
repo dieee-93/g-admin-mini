@@ -14,8 +14,15 @@
 
 import React from 'react';
 import { ContentLayout, Section, Stack, Button, Badge, Heading, Text } from '@/shared/ui';
-import { useCapabilities } from '@/store/capabilityStore';
+import {
+  useBusinessProfile,
+  useToggleCapability,
+  useInitializeProfile,
+  useCompleteSetup,
+  useUpdateProfile
+} from '@/lib/capabilities';
 import { useNavigationActions } from '@/contexts/NavigationContext';
+import { toggleInfrastructure as toggleInfraHelper } from '@/lib/capabilities';
 import {
   getAllCapabilities,
   getAllInfrastructures
@@ -61,7 +68,13 @@ const ADD_ONS: BusinessCapabilityId[] = [
 
 export default function BusinessModelStep() {
   const { navigate } = useNavigationActions();
-  const { profile, toggleCapability, toggleInfrastructure, initializeProfile, completeSetup } = useCapabilities();
+  
+  // TanStack Query hooks (v5 migration)
+  const { profile, isLoading } = useBusinessProfile();
+  const { toggleCapability } = useToggleCapability();
+  const { initializeProfile } = useInitializeProfile();
+  const { completeSetup } = useCompleteSetup();
+  const { updateProfile } = useUpdateProfile();
 
   // Obtener capabilities completas del registry
   const ALL_CAPABILITIES = getAllCapabilities();
@@ -69,7 +82,7 @@ export default function BusinessModelStep() {
 
   // Initialize profile if not exists
   React.useEffect(() => {
-    if (!profile) {
+    if (!profile && !isLoading) {
       initializeProfile({
         businessName: 'Mi Negocio',
         businessType: 'retail',
@@ -84,18 +97,29 @@ export default function BusinessModelStep() {
         onboardingStep: 0
       });
     }
-  }, [profile, initializeProfile]);
+  }, [profile, isLoading, initializeProfile]);
 
   const handleCapabilityToggle = (capabilityId: BusinessCapabilityId) => {
     toggleCapability(capabilityId);
   };
 
   const handleInfraToggle = (infraId: InfrastructureId) => {
-    toggleInfrastructure(infraId);
+    if (!profile) return;
+
+    // Use helper function to toggle infrastructure
+    const newInfra = toggleInfraHelper(
+      profile.selectedInfrastructure || [],
+      infraId
+    );
+
+    // Update profile with new infrastructure
+    updateProfile({
+      selectedInfrastructure: newInfra
+    });
   };
 
-  const handleContinue = async () => {
-    await completeSetup();
+  const handleContinue = () => {
+    completeSetup();
     navigate('dashboard');
   };
 
@@ -436,7 +460,7 @@ export default function BusinessModelStep() {
                 </div>
 
                 <div style={{ fontSize: '14px', color: '#4a5568' }}>
-                  <strong>Infraestructura:</strong> {selectedInfra.map(id => getInfraInfo(id)?.name).join(', ')}
+                  <strong>Infraestructura:</strong> {selectedInfra.map((id: InfrastructureId) => getInfraInfo(id)?.name).join(', ')}
                 </div>
 
                 {selectedCapabilities.length > 0 && (

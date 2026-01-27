@@ -23,6 +23,12 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }))
 
+// Mock de window.scrollTo (usado por Chakra UI y otros componentes)
+Object.defineProperty(window, 'scrollTo', {
+  writable: true,
+  value: vi.fn(),
+})
+
 // Mock de supabase
 vi.mock('./lib/supabase/client', () => {
   const createQueryBuilder = (initialData = { data: [], error: null }) => {
@@ -142,9 +148,9 @@ vi.mock('./store/materialsStore', () => ({
 
 vi.mock('./store/staffStore', () => {
   const { create: actualCreate } = vi.importActual('zustand');
-  const store = actualCreate(vi.importActual('./store/staffStore').useStaffStore);
+  const store = actualCreate(vi.importActual('./store/staffStore').useTeamStore);
   return {
-    useStaffStore: vi.fn((selector) => store(selector)),
+    useTeamStore: vi.fn((selector) => store(selector)),
   };
 });
 
@@ -177,3 +183,45 @@ global.indexedDB = {
   deleteDatabase: vi.fn(() => mockIDBRequest),
   databases: vi.fn(() => Promise.resolve([]))
 } as any
+
+// ============================================================================
+// Mock de localStorage para Zustand persist middleware
+// ============================================================================
+// CRITICAL: Zustand stores use persist middleware which requires localStorage.
+// Without this mock, tests hang indefinitely waiting for localStorage operations.
+
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+
+  return {
+    getItem: (key: string) => {
+      return store[key] || null;
+    },
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString();
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (index: number) => {
+      const keys = Object.keys(store);
+      return keys[index] || null;
+    },
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+  writable: true,
+});
+
+Object.defineProperty(window, 'sessionStorage', {
+  value: localStorageMock,
+  writable: true,
+});

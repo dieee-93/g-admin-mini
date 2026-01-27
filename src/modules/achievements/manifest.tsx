@@ -42,7 +42,7 @@ import type {
  * Achievements Module Manifest
  *
  * Módulo base del sistema de validaciones y logros.
- * Se activa SIEMPRE (autoInstall: true).
+ * Se activa SIEMPRE (CORE module).
  */
 export const achievementsManifest: ModuleManifest = {
   // ============================================

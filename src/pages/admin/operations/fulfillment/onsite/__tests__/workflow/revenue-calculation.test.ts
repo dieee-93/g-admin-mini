@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 /**
  * Revenue Calculation Tests - Financial Precision

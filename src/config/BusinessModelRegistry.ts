@@ -229,7 +229,8 @@ const CAPABILITIES: Record<BusinessCapabilityId, BusinessCapability> = {
 
     blockingRequirements: [
       'delivery_zones_required',
-      'delivery_fees_required'
+      'delivery_fees_required',
+      'delivery_hours_required'
     ]
   },
 

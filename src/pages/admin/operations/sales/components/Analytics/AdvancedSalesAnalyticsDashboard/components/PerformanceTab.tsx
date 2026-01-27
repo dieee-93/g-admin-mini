@@ -24,7 +24,7 @@ export const PerformanceTab: React.FC<PerformanceTabProps> = ({ analytics }) => 
         <CardWrapper.Body>
           <VStack align="stretch" gap="3">
             {analytics.performance.top_selling_items.map((item, index) => (
-              <HStack key={item.name} justify="space-between" p="3" bg="bg.canvas" borderRadius="md">
+              <HStack key={item.name} justify="space-between" p="3" bg="gray.50" borderRadius="md">
                 <HStack gap="3">
                   <Badge colorPalette="blue" size="sm">#{index + 1}</Badge>
                   <VStack align="start" gap="0">
@@ -49,7 +49,7 @@ export const PerformanceTab: React.FC<PerformanceTabProps> = ({ analytics }) => 
         <CardWrapper.Body>
           <VStack align="stretch" gap="3">
             {analytics.performance.peak_hours.map((hour, index) => (
-              <HStack key={hour.hour} justify="space-between" p="3" bg="bg.canvas" borderRadius="md">
+              <HStack key={hour.hour} justify="space-between" p="3" bg="gray.50" borderRadius="md">
                 <HStack gap="3">
                   <Badge colorPalette="orange" size="sm">#{index + 1}</Badge>
                   <VStack align="start" gap="0">

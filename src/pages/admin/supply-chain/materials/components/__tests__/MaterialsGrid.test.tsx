@@ -22,7 +22,7 @@ const mockMaterials: MaterialItem[] = [
     id: '2',
     name: 'Cebolla',
     type: 'MEASURABLE',
-    unit: 'kg', 
+    unit: 'kg',
     category: 'Verduras',
     precision: 2,
     stock: 3, // Stock bajo para testing
@@ -45,7 +45,7 @@ const mockMaterials: MaterialItem[] = [
 // 🎯 Mock handlers para las acciones
 const mockHandlers = {
   onEdit: vi.fn(),
-  onView: vi.fn(), 
+  onView: vi.fn(),
   onDelete: vi.fn()
 };
 
@@ -100,7 +100,7 @@ describe('MaterialsGrid', () => {
 
     // Buscar badges de estado usando funciones más específicas
     expect(screen.getByText('Stock Bajo')).toBeInTheDocument();
-    
+
     // Para "Sin Stock" hay múltiples elementos, usar getAllBy y verificar que hay al menos uno
     const sinStockElements = screen.getAllByText(/sin stock/i);
     expect(sinStockElements.length).toBeGreaterThan(0);
@@ -123,7 +123,7 @@ describe('MaterialsGrid', () => {
   it('should show loading skeletons when loading', () => {
     // Modificar el mock para simular loading
     mockMaterialsStore.loading = true;
-    
+
     render(
       <TestWrapper>
         <MaterialsGrid {...mockHandlers} />
@@ -131,7 +131,7 @@ describe('MaterialsGrid', () => {
     );
 
     // Verificar que se muestran skeletons de loading
-    // Los skeletons tienen bg="bg.canvas" y se generan 6 items
+    // Los skeletons tienen bg="gray.50" y se generan 6 items
     const skeletons = screen.getAllByRole('generic'); // Box elements
     expect(skeletons.length).toBeGreaterThan(0);
   });
@@ -141,7 +141,7 @@ describe('MaterialsGrid', () => {
     // Modificar el mock para simular lista vacía
     mockMaterialsStore.getFilteredItems.mockReturnValue([]);
     mockMaterialsStore.loading = false;
-    
+
     render(
       <TestWrapper>
         <MaterialsGrid {...mockHandlers} />
@@ -206,7 +206,7 @@ describe('MaterialsGrid', () => {
     // Verificar que se muestran valores de stock (formato más flexible)
     expect(screen.getByText(/10.*kg/)).toBeInTheDocument(); // Tomate: "10 kg"
     expect(screen.getByText(/3.*kg/)).toBeInTheDocument();  // Cebolla: "3 kg"
-    
+
     // Verificar elementos con 0 unidad
     const zeroUnidadElements = screen.getAllByText(/0.*unidad/);
     expect(zeroUnidadElements.length).toBeGreaterThan(0);
@@ -226,7 +226,7 @@ describe('MaterialsGrid', () => {
     // Verificar que se renderizan todos los items
     const materialCards = screen.getAllByRole('article');
     expect(materialCards).toHaveLength(3);
-    
+
     // Verificar que el contenedor principal existe y contiene los items
     const gridContainer = materialCards[0].parentElement;
     expect(gridContainer).toBeInTheDocument();

@@ -19,6 +19,15 @@ El módulo de **Customers** es el sistema CRM (Customer Relationship Management)
 
 ---
 
+## Feature & Route Map
+| Feature | Sub-route | Component | Description |
+|---------|-----------|-----------|-------------|
+| **Customer List** | `/` | `CustomerList.tsx` | Main grid with RFM status. |
+| **Analytics Dashboard** | `(tab/modal)` | `CustomerAnalytics.tsx` | RFM charts and metrics. |
+| **Customer Form** | `(modal)` | `CustomerForm.tsx` | Create/Edit customer details. |
+
+---
+
 ## 🏗️ Arquitectura del Módulo
 
 ### Estructura de Archivos

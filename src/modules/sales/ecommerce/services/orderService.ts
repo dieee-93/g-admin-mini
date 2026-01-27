@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase/client';
 import { cartService } from './cartService';
 import { eventBus } from '@/lib/events';
 import { logger } from '@/lib/logging';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 
 export interface CreateOrderParams {
   customerId: string;

@@ -12,7 +12,7 @@
 
 import { useMemo } from 'react';
 import { Box, VStack, HStack, Heading, Text, Button, Badge, Stack } from '@/shared/ui';
-import { useProductsStore } from '@/store/productsStore';
+import { useProducts, useProductsWithRecipes } from '@/modules/products';
 import { useNavigationActions } from '@/contexts/NavigationContext';
 
 /**
@@ -30,16 +30,17 @@ interface ProductStats {
  */
 export default function ProductsWidget() {
   const { navigate } = useNavigationActions();
-  const { products, getProductsWithRecipes } = useProductsStore();
+  
+  // Get products from TanStack Query
+  const { data: products = [] } = useProducts();
+  const { data: productsWithRecipes = [] } = useProductsWithRecipes();
 
   // Calcular estadísticas
   const stats: ProductStats = useMemo(() => {
-    const productsWithRecipes = getProductsWithRecipes();
-
     // Calcular margen promedio (basado en cost_per_unit si está disponible)
-    const productsWithCost = products.filter(p => p.cost_per_unit !== undefined && p.cost_per_unit > 0);
+    const productsWithCost = products.filter(p => p.cost !== undefined && p.cost > 0);
     const averageMargin = productsWithCost.length > 0
-      ? productsWithCost.reduce((sum, p) => sum + ((p.cost_per_unit || 0) * 100), 0) / productsWithCost.length
+      ? productsWithCost.reduce((sum, p) => sum + ((p.cost || 0) * 100), 0) / productsWithCost.length
       : 0;
 
     // Producto más vendido (basado en availability como proxy)
@@ -56,7 +57,7 @@ export default function ProductsWidget() {
       averageMargin,
       bestSellerName: bestSeller?.name || null,
     };
-  }, [products, getProductsWithRecipes]);
+  }, [products, productsWithRecipes]);
 
   return (
     <Box

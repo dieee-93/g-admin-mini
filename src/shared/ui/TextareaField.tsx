@@ -1,6 +1,6 @@
 import { Textarea, Field } from '@chakra-ui/react'
 import { memo } from 'react'
-import type { ChangeEvent, ReactNode } from 'react'
+import type { ChangeEvent } from 'react'
 import type { TextareaProps as ChakraTextareaProps } from '@chakra-ui/react'
 import { Typography } from './Typography' // Usar nuestro Typography wrapper
 
@@ -18,7 +18,6 @@ interface TextareaFieldProps extends Omit<ChakraTextareaProps, 'size' | 'variant
   variant?: 'outline' | 'flushed' | 'subtle'
   rows?: number
   resize?: 'none' | 'both' | 'horizontal' | 'vertical'
-  colorPalette?: 'theme' | 'default' // Added theme support
 }
 
 export const TextareaField = memo(function TextareaField({
@@ -35,7 +34,6 @@ export const TextareaField = memo(function TextareaField({
   variant = 'outline',
   rows = 4,
   resize = 'vertical',
-  colorPalette = 'default',
   ...textareaProps // Spread todas las demás props de Chakra Textarea
 }: TextareaFieldProps) {
   // Recipes handle all theming automatically - no manual props needed

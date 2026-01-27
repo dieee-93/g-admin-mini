@@ -14,13 +14,13 @@ export class SecureRandomGenerator {
 
   constructor() {
     this.cryptoAvailable = this.validateCryptoSupport();
-    
+
     if (!this.cryptoAvailable) {
       SecurityLogger.threat('Crypto API unavailable - refusing insecure fallback', {
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
         context: 'SecureRandomGenerator initialization'
       });
-      
+
       throw new Error(
         'SECURITY: Cryptographically secure random generation unavailable. ' +
         'Math.random() fallbacks are disabled for security compliance.'
@@ -29,7 +29,7 @@ export class SecureRandomGenerator {
 
     // Initialize entropy pool for high-performance scenarios
     this.initializeEntropyPool();
-    
+
     SecurityLogger.anomaly('SecureRandomGenerator initialized', {
       cryptoSupport: this.cryptoAvailable,
       entropyPoolSize: this.entropyPool?.length || 0
@@ -50,7 +50,7 @@ export class SecureRandomGenerator {
    * Generate cryptographically secure event ID
    */
   generateEventId(): string {
-    const uuid = this.generateSecureUUID();
+    const uuid = SecureRandomGenerator.generateUUID();
     const timestamp = Date.now();
     return `evt_${timestamp}_${uuid}`;
   }
@@ -68,7 +68,7 @@ export class SecureRandomGenerator {
    * Generate cryptographically secure trace ID
    */
   generateTraceId(): string {
-    const uuid = this.generateSecureUUID();
+    const uuid = SecureRandomGenerator.generateUUID();
     const timestamp = Date.now();
     return `trace_${timestamp}_${uuid}`;
   }
@@ -134,18 +134,18 @@ export class SecureRandomGenerator {
     const range = max - min + 1;
     const bytesNeeded = Math.ceil(Math.log2(range) / 8);
     const maxValidValue = Math.floor(256 ** bytesNeeded / range) * range - 1;
-    
+
     let randomValue: number;
     do {
       const randomBytes = new Uint8Array(bytesNeeded);
       crypto.getRandomValues(randomBytes);
-      
+
       randomValue = 0;
       for (let i = 0; i < bytesNeeded; i++) {
         randomValue = randomValue * 256 + randomBytes[i];
       }
     } while (randomValue > maxValidValue);
-    
+
     return min + (randomValue % range);
   }
 
@@ -156,10 +156,10 @@ export class SecureRandomGenerator {
     // Generate 32-bit random value for IEEE 754 precision
     const randomBytes = new Uint8Array(4);
     crypto.getRandomValues(randomBytes);
-    
-    const randomInt = (randomBytes[0] << 24) | (randomBytes[1] << 16) | 
-                     (randomBytes[2] << 8) | randomBytes[3];
-    
+
+    const randomInt = (randomBytes[0] << 24) | (randomBytes[1] << 16) |
+      (randomBytes[2] << 8) | randomBytes[3];
+
     // Convert to float between 0 and 1
     return (randomInt >>> 0) / (2 ** 32);
   }
@@ -183,16 +183,16 @@ export class SecureRandomGenerator {
     predictability: number;
   } {
     const samples: number[] = [];
-    
+
     for (let i = 0; i < sampleSize; i++) {
       samples.push(this.generateSecureFloat());
     }
-    
+
     // Calculate entropy metrics
     const entropy = this.calculateEntropy(samples);
     const uniformity = this.calculateUniformity(samples);
     const predictability = this.calculatePredictability(samples);
-    
+
     let quality: 'excellent' | 'good' | 'poor';
     if (entropy > 0.85 && uniformity > 0.8 && predictability < 0.15) {
       quality = 'excellent';
@@ -201,7 +201,7 @@ export class SecureRandomGenerator {
     } else {
       quality = 'poor';
     }
-    
+
     SecurityLogger.anomaly('Entropy test completed', {
       sampleSize,
       quality,
@@ -209,7 +209,7 @@ export class SecureRandomGenerator {
       uniformity,
       predictability
     });
-    
+
     return { quality, entropy, uniformity, predictability };
   }
 
@@ -230,7 +230,7 @@ export class SecureRandomGenerator {
       // Test crypto functionality
       const testArray = new Uint8Array(16);
       crypto.getRandomValues(testArray);
-      
+
       const testUUID = crypto.randomUUID();
       if (!testUUID || testUUID.length !== 36) {
         return false;
@@ -259,7 +259,7 @@ export class SecureRandomGenerator {
     }
   }
 
-  private generateSecureUUID(): string {
+  static generateUUID(): string {
     try {
       return crypto.randomUUID();
     } catch (error) {
@@ -273,12 +273,12 @@ export class SecureRandomGenerator {
   private generateSecureAlphanumeric(length: number): string {
     const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
     let result = '';
-    
+
     for (let i = 0; i < length; i++) {
       const randomIndex = this.generateSecureInteger(0, chars.length - 1);
       result += chars[randomIndex];
     }
-    
+
     return result;
   }
 
@@ -286,12 +286,12 @@ export class SecureRandomGenerator {
     // Shannon entropy calculation
     const bins = 100;
     const histogram = new Array(bins).fill(0);
-    
+
     for (const sample of samples) {
       const bin = Math.floor(sample * bins);
       histogram[Math.min(bin, bins - 1)]++;
     }
-    
+
     let entropy = 0;
     for (const count of histogram) {
       if (count > 0) {
@@ -299,7 +299,7 @@ export class SecureRandomGenerator {
         entropy -= probability * Math.log2(probability);
       }
     }
-    
+
     return entropy / Math.log2(bins); // Normalize to 0-1
   }
 
@@ -308,17 +308,17 @@ export class SecureRandomGenerator {
     const bins = 10;
     const expected = samples.length / bins;
     const histogram = new Array(bins).fill(0);
-    
+
     for (const sample of samples) {
       const bin = Math.floor(sample * bins);
       histogram[Math.min(bin, bins - 1)]++;
     }
-    
+
     let chiSquare = 0;
     for (const observed of histogram) {
       chiSquare += Math.pow(observed - expected, 2) / expected;
     }
-    
+
     // Convert to 0-1 scale (lower chi-square = higher uniformity)
     return Math.max(0, 1 - chiSquare / (bins * 10));
   }
@@ -327,11 +327,11 @@ export class SecureRandomGenerator {
     // Simple autocorrelation test
     let correlation = 0;
     const lag = 1;
-    
+
     for (let i = lag; i < samples.length; i++) {
       correlation += Math.abs(samples[i] - samples[i - lag]);
     }
-    
+
     // Normalize - lower correlation = lower predictability
     return Math.min(1, correlation / (samples.length - lag));
   }
@@ -344,7 +344,7 @@ export class SecureRandomGenerator {
       this.entropyPool.fill(0); // Clear entropy pool
       this.entropyPool = null;
     }
-    
+
     SecureRandomGenerator.instance = null;
     SecurityLogger.anomaly('SecureRandomGenerator destroyed');
   }

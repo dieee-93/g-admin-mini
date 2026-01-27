@@ -6,9 +6,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supplierAnalyticsService } from '../services/supplierAnalyticsService';
 import { suppliersService } from '../services/suppliersService';
-import { inventoryApi } from '@/pages/admin/supply-chain/materials/services/inventoryApi';
-import { supplierOrdersApi } from '@/pages/admin/supply-chain/materials/procurement/services/supplierOrdersApi';
-import type { SupplierAnalysisResult } from '@/pages/admin/supply-chain/materials/services/supplierAnalysisEngine';
+import { inventoryApi } from '@/modules/materials/services';
+import { supplierOrdersApi } from '../services/supplierOrdersApi';
+import type { SupplierAnalysisResult } from '@/modules/materials/services';
 import { logger } from '@/lib/logging';
 
 interface UseSupplierAnalyticsReturn {

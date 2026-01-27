@@ -25,7 +25,7 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { AnalyticsEngine, RFMAnalytics, /* TrendAnalytics */ } from '@/shared/services/AnalyticsEngine';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { useSales } from '../hooks/useSales';
 
 import { logger } from '@/lib/logging';

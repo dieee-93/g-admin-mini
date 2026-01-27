@@ -45,14 +45,14 @@ import type { FilterState } from '../../hooks/useProductsPage';
 const VIRTUALIZATION_THRESHOLD = 50;
 
 export interface ProductListVirtualizedProps {
-  products: ProductWithConfig[];
+  products: any[]; // Accepts both ProductWithConfig and ProductWithIntelligence
   loading?: boolean;
-  filters: FilterState;
-  onFilterChange: (filters: Partial<FilterState>) => void;
+  filters: any;
+  onFilterChange: (filters: any) => void;
   onClearFilters: () => void;
-  onEdit?: (product: ProductWithConfig) => void;
+  onEdit?: (product: any) => void;
   onDelete?: (productId: string) => void;
-  onViewDetails?: (product: ProductWithConfig) => void;
+  onViewDetails?: (product: any) => void;
   onTogglePublish?: (productId: string) => void;
 }
 
@@ -79,10 +79,10 @@ const ProductCard = memo(function ProductCard({
   onViewDetails,
   onTogglePublish,
 }: {
-  product: ProductWithConfig;
-  onEdit?: (product: ProductWithConfig) => void;
+  product: any;
+  onEdit?: (product: any) => void;
   onDelete?: (productId: string) => void;
-  onViewDetails?: (product: ProductWithConfig) => void;
+  onViewDetails?: (product: any) => void;
   onTogglePublish?: (productId: string) => void;
 }) {
   return (
@@ -209,7 +209,6 @@ export const ProductListVirtualized = memo(function ProductListVirtualized({
   // Handlers for filters
   const handleSearchChange = (search: string) => {
     onFilterChange({ search: search || undefined });
-ProductListVirtualized.displayName = 'ProductListVirtualized';
   };
 
   const handleCategoryChange = (category: string | null) => {
@@ -221,7 +220,7 @@ ProductListVirtualized.displayName = 'ProductListVirtualized';
 
   // Memoize card renderer
   const renderProduct = useMemo(
-    () => (product: ProductWithConfig) => (
+    () => (product: any) => (
       <ProductCard
         product={product}
         onEdit={onEdit}
@@ -339,3 +338,6 @@ ProductListVirtualized.displayName = 'ProductListVirtualized';
     </Stack>
   );
 });
+
+ProductListVirtualized.displayName = 'ProductListVirtualized';
+

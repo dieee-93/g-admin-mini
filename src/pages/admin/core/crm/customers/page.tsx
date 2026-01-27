@@ -39,9 +39,9 @@ import { CustomerList, CustomerAnalytics } from './components';
 
 // Page orchestration hook
 import { useCustomersPage } from './hooks';
-import { DecimalUtils } from '@/business-logic/shared/decimalUtils';
+import { DecimalUtils } from '@/lib/decimal';
 import { useAuth } from '@/contexts/AuthContext';
-import { usePermissions } from '@/hooks/usePermissions';
+import { usePermissions } from '@/hooks';
 
 function CustomersPage() {
   // Authentication and permissions

@@ -157,7 +157,7 @@ export const SmartAlertsBar: React.FC<SmartAlertsBarProps> = ({
           <Box
             borderTop="1px solid"
             borderColor="border.default"
-            bg="bg.canvas"
+            bg="gray.50"
             p={4}
           >
             <Stack gap={3}>

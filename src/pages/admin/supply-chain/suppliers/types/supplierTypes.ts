@@ -19,6 +19,8 @@ export interface Supplier {
   phone: string | null;
   address: string | null;
   tax_id: string | null;
+  iibb_number: string | null;
+  iibb_condition: 'local' | 'multilateral' | 'exempt' | 'simplified' | null;
   payment_terms: string | null;
   rating: number | null;
   notes: string | null;
@@ -37,6 +39,8 @@ export interface SupplierFormData {
   phone?: string;
   address?: string;
   tax_id?: string;
+  iibb_number?: string;
+  iibb_condition?: 'local' | 'multilateral' | 'exempt' | 'simplified';
   payment_terms?: string;
   rating?: number;
   notes?: string;
@@ -70,6 +74,8 @@ export const SupplierSchema = z.object({
   phone: z.string().max(50, 'Máximo 50 caracteres').optional().or(z.literal('')),
   address: z.string().max(500, 'Máximo 500 caracteres').optional().or(z.literal('')),
   tax_id: z.string().max(50, 'Máximo 50 caracteres').optional().or(z.literal('')),
+  iibb_number: z.string().max(50, 'Máximo 50 caracteres').optional().or(z.literal('')),
+  iibb_condition: z.enum(['local', 'multilateral', 'exempt', 'simplified']).optional().nullable(),
   payment_terms: z.string().max(100, 'Máximo 100 caracteres').optional().or(z.literal('')),
   rating: z.number().min(1).max(5).optional().nullable(),
   notes: z.string().max(1000, 'Máximo 1000 caracteres').optional().or(z.literal('')),

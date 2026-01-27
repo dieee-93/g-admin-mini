@@ -1,5 +1,6 @@
 import { Stack, Box, Text, Badge, CardWrapper } from '@/shared/ui';
 import { CheckCircleIcon, XCircleIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { useLocation } from '@/contexts/LocationContext';
 import type { DeliveryZone } from '../../types';
 
 interface ZonesListProps {
@@ -10,6 +11,13 @@ interface ZonesListProps {
 }
 
 export function ZonesList({ zones, selectedZone, onSelectZone, loading }: ZonesListProps) {
+  const { isMultiLocationMode, locations } = useLocation();
+  
+  // Helper function to get location name
+  const getLocationName = (locationId: string | null | undefined) => {
+    if (!locationId) return null;
+    return locations.find(loc => loc.id === locationId)?.name;
+  };
   if (loading) {
     return (
       <Box width="40%" minWidth="300px">
@@ -67,6 +75,20 @@ export function ZonesList({ zones, selectedZone, onSelectZone, loading }: ZonesL
                     <Text>💵 ${zone.delivery_fee}</Text>
                     <Text>⏱️ {zone.estimated_time_minutes} min</Text>
                   </Stack>
+                  {/* Location Badge - only show if multi-location mode */}
+                  {isMultiLocationMode && (
+                    <Box>
+                      {zone.location_id ? (
+                        <Badge colorPalette="blue" size="sm">
+                          📍 {getLocationName(zone.location_id) || 'Desconocida'}
+                        </Badge>
+                      ) : (
+                        <Badge colorPalette="purple" size="sm">
+                          🌍 Global
+                        </Badge>
+                      )}
+                    </Box>
+                  )}
                 </Stack>
               </Stack>
             </CardWrapper>

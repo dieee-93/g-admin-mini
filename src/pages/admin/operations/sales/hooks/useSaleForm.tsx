@@ -22,9 +22,17 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Badge, HStack, Spinner, Text } from '@/shared/ui';
 import { CheckCircleIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { useSalesStore } from '@/store/salesStore';
-import { useSaleValidation } from '@/hooks/useSaleValidation';
+import { useSaleValidation } from '@/modules/sales/hooks';
 import { logger } from '@/lib/logging';
 import { toaster } from '@/shared/ui/toaster';
+import { eventBus } from '@/lib/events';
+import { supabase } from '@/lib/supabase/client';
+
+// Capability detection
+import { useActiveFeatures, hasFeature } from '@/lib/capabilities';
+
+// Cross-module types
+import type { SaleContext } from '@/modules/fulfillment/onsite/events';
 
 interface PaymentData {
   payment_method: 'cash' | 'card' | 'transfer' | 'mixed';
@@ -33,17 +41,140 @@ interface PaymentData {
   cashChange?: number;
 }
 
+// ========================================================================
+// PRODUCT TYPE & SALE PATTERN (Capability-aware architecture)
+// ========================================================================
+
+/**
+ * ProductType - Types of products that determine the sale flow
+ * - PHYSICAL: Physical goods (cart-based, immediate or deferred fulfillment)
+ * - SERVICE: Professional services (booking-based, needs datetime)
+ * - DIGITAL: Digital products (cart-based, instant delivery)
+ * - RENTAL: Rental items (booking-based, needs period)
+ */
+export type ProductType = 'PHYSICAL' | 'SERVICE' | 'DIGITAL' | 'RENTAL';
+
+/**
+ * SalePattern - The UI/UX pattern for the sale
+ * - CART: Traditional cart with multiple items, checkout at end
+ * - DIRECT_ORDER: Items sent immediately (e.g., table order to kitchen)
+ * - BOOKING: Single service/rental booking with datetime selection
+ */
+export type SalePattern = 'CART' | 'DIRECT_ORDER' | 'BOOKING';
+
 interface UseSaleFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  /** Pre-selected context (e.g., table from FloorPlanView) */
+  initialContext?: SaleContext;
 }
 
 export function useSaleForm({
   isOpen,
   onClose,
-  onSuccess
+  onSuccess,
+  initialContext
 }: UseSaleFormProps) {
+  // ========================================================================
+  // CONTEXT DETECTION (Adaptive POS Architecture)
+  // ========================================================================
+  // The POS adapts by CONTEXT (Mesa, Delivery, TakeAway, Appointments, Rentals)
+  // Each context has a completely different flow and UI.
+  // @see POS_COMPONENT_ARCHITECTURE.md for full architecture
+
+  const activeFeatures = useActiveFeatures();
+
+  /**
+   * Available sale contexts based on active capabilities
+   * Each context maps to a specific fulfillment capability:
+   * - onsite: sales_dine_in_orders (table service)
+   * - delivery: sales_delivery_orders (delivery service)
+   * - pickup: sales_takeaway_orders (TakeAway/pickup)
+   * - appointment: scheduling_appointment_booking (service appointments)
+   * - rental: rental_item_management (equipment rental)
+   */
+  type SaleContextType = 'onsite' | 'delivery' | 'pickup' | 'appointment' | 'rental';
+
+  const availableContexts = useMemo((): SaleContextType[] => {
+    const contexts: SaleContextType[] = [];
+
+    // Check fulfillment capabilities
+    if (hasFeature(activeFeatures, 'sales_dine_in_orders')) {
+      contexts.push('onsite');
+    }
+    if (hasFeature(activeFeatures, 'sales_delivery_orders')) {
+      contexts.push('delivery');
+    }
+    if (hasFeature(activeFeatures, 'sales_pickup_orders')) {
+      contexts.push('pickup');
+    }
+    if (hasFeature(activeFeatures, 'scheduling_appointment_booking')) {
+      contexts.push('appointment');
+    }
+    if (hasFeature(activeFeatures, 'rental_item_management')) {
+      contexts.push('rental');
+    }
+
+    // If no specific context available, default to pickup (basic sale)
+    if (contexts.length === 0) {
+      contexts.push('pickup');
+    }
+
+    return contexts;
+  }, [activeFeatures]);
+
+  // Selected context - auto-select if only one available or if initialContext provided
+  const [selectedContext, setSelectedContext] = useState<SaleContextType | null>(() => {
+    // If initial context provided (e.g., from table click), use it
+    if (initialContext?.type === 'onsite') return 'onsite';
+    // Auto-select if only one context available
+    if (availableContexts.length === 1) return availableContexts[0];
+    return null;
+  });
+
+  // Legacy ProductType support (derived from context for backwards compatibility)
+  const availableProductTypes = useMemo((): ProductType[] => {
+    const types: ProductType[] = ['PHYSICAL']; // Always available
+    if (hasFeature(activeFeatures, 'scheduling_appointment_booking')) types.push('SERVICE');
+    if (hasFeature(activeFeatures, 'digital_file_delivery')) types.push('DIGITAL');
+    if (hasFeature(activeFeatures, 'rental_item_management')) types.push('RENTAL');
+    return types;
+  }, [activeFeatures]);
+
+  const [productType, setProductType] = useState<ProductType | null>(() =>
+    availableProductTypes.length === 1 ? availableProductTypes[0] : null
+  );
+
+  // Fulfillment for PHYSICAL products (Mesa, TakeAway, Delivery)
+  type FulfillmentType = 'onsite' | 'pickup' | 'delivery';
+
+  const availableFulfillments = useMemo((): FulfillmentType[] => {
+    const types: FulfillmentType[] = [];
+    if (hasFeature(activeFeatures, 'sales_dine_in_orders')) types.push('onsite');
+    if (hasFeature(activeFeatures, 'sales_pickup_orders')) types.push('pickup');
+    if (hasFeature(activeFeatures, 'sales_delivery_orders')) types.push('delivery');
+    // Default to pickup if no specific fulfillment
+    if (types.length === 0) types.push('pickup');
+    return types;
+  }, [activeFeatures]);
+
+  const [selectedFulfillment, setSelectedFulfillment] = useState<FulfillmentType | null>(() =>
+    availableFulfillments.length === 1 ? availableFulfillments[0] : null
+  );
+
+  // Reset fulfillment when productType changes
+  const handleProductTypeSelect = (type: ProductType) => {
+    setProductType(type);
+    setSelectedFulfillment(null); // Reset fulfillment when type changes
+  };
+
+  // Go back from fulfillment to productType selection
+  const handleBackToProductType = () => {
+    setProductType(null);
+    setSelectedFulfillment(null);
+  };
+
   // ========================================================================
   // CART STATE (from useSalesStore)
   // ========================================================================
@@ -100,6 +231,31 @@ export function useSaleForm({
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentConfirmation, setShowPaymentConfirmation] = useState(false);
+
+  // Sale context (table, delivery address, etc.) - injected via HookPoint
+  const [saleContext, setSaleContext] = useState<SaleContext | undefined>(initialContext);
+
+  /**
+   * Sale Pattern based on ProductType and context
+   * - CART: Standard cart for PHYSICAL and DIGITAL
+   * - DIRECT_ORDER: For onsite (table) orders - items sent immediately
+   * - BOOKING: For SERVICE and RENTAL - single item with datetime/period
+   */
+  const salePattern = useMemo((): SalePattern => {
+    switch (productType) {
+      case 'SERVICE':
+      case 'RENTAL':
+        return 'BOOKING';
+      case 'DIGITAL':
+      case 'PHYSICAL':
+      default:
+        // If we have a table context, use DIRECT_ORDER pattern
+        if (saleContext?.type === 'onsite') {
+          return 'DIRECT_ORDER';
+        }
+        return 'CART';
+    }
+  }, [productType, saleContext]);
 
   const [loadingStates, setLoadingStates] = useState({
     validatingStock: false,
@@ -268,8 +424,47 @@ export function useSaleForm({
       setLoadingStates(prev => ({ ...prev, processingPayment: false, completingSale: true }));
       setSuccessStates(prev => ({ ...prev, paymentConfirmed: true }));
 
-      await completeSale({
-        payment_method: paymentData.payment_method
+      // Get current total sales count before completing sale
+      const { count: previousTotalSales } = await supabase
+        .from('sales')
+        .select('*', { count: 'exact', head: true });
+
+      const sale = await completeSale({
+        payment_method: paymentData.payment_method,
+        metadata: saleContext
+      });
+
+      // Calculate new total
+      const totalSales = (previousTotalSales || 0) + 1;
+
+      // Emit event for cross-module integration (e.g., updating onsite table status)
+      if (saleContext) {
+        eventBus.emit('sales.order_placed', {
+          orderId: sale.id,
+          total: sale.total,
+          context: saleContext,
+          items: sale.items.map(item => ({
+            product_id: item.product_id,
+            product_name: item.product_name,
+            quantity: item.quantity,
+            unit_price: item.unit_price
+          }))
+        });
+      }
+
+      // Emit achievement event with optimized payload
+      await eventBus.emit('sales.order_completed', {
+        orderId: sale.id,
+        orderTotal: sale.total,
+        items: sale.items.map(item => ({
+          productId: item.product_id,
+          quantity: item.quantity
+        })),
+        totalSales,
+        previousTotalSales: previousTotalSales || 0,
+        timestamp: Date.now(),
+        triggeredBy: 'manual' as const,
+        userId: undefined
       });
 
       setLoadingStates(prev => ({ ...prev, completingSale: false }));
@@ -283,7 +478,7 @@ export function useSaleForm({
         ...(paymentData.cashChange && paymentData.cashChange > 0 && {
           action: {
             label: `Cambio: $${paymentData.cashChange.toFixed(2)}`,
-            onClick: () => {}
+            onClick: () => { }
           }
         })
       });
@@ -309,7 +504,7 @@ export function useSaleForm({
         completingSale: false
       });
     }
-  }, [completeSale, totals.total, onSuccess, onClose]);
+  }, [completeSale, totals.total, onSuccess, onClose, saleContext]);
 
   // ========================================================================
   // FORM INITIALIZATION
@@ -324,8 +519,70 @@ export function useSaleForm({
         paymentConfirmed: false,
         saleCompleted: false
       });
+      setSaleContext(undefined); // Reset context when modal closes
     }
   }, [isOpen, clearValidation]);
+
+  // Sync with initialContext when it changes (e.g., opened from table)
+  useEffect(() => {
+    if (initialContext) {
+      setSaleContext(initialContext);
+    }
+  }, [initialContext]);
+
+  // ========================================================================
+  // CONTEXT HANDLER (Called by HookPoint injected components)
+  // ========================================================================
+
+  const handleContextSelect = useCallback((context: SaleContext) => {
+    setSaleContext(context);
+    logger.debug('SaleForm', 'Context selected', context);
+  }, []);
+
+  // ========================================================================
+  // PRODUCT FLOW STATE (for SERVICE/RENTAL flows)
+  // ========================================================================
+
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [flowData, setFlowData] = useState<any>(null);
+
+  /**
+   * Handle product selection for flows that require additional configuration
+   * (e.g., SERVICE needs datetime, RENTAL needs period)
+   */
+  const handleProductSelect = useCallback((product: any) => {
+    setSelectedProduct(product);
+    setFlowData(null); // Reset flow data when product changes
+    logger.debug('SaleForm', 'Product selected for flow', product);
+  }, []);
+
+  /**
+   * Handle completion of product-specific flow
+   * Called by HookPoint injected components (DateTimePickerLite, PeriodPicker, etc.)
+   */
+  const handleFlowComplete = useCallback((data: any) => {
+    setFlowData(data);
+    logger.debug('SaleForm', 'Flow completed with data', data);
+
+    // Add to cart with flow data as metadata
+    if (selectedProduct) {
+      handleAddToCart(selectedProduct, {
+        ...data,
+        flowType: selectedProduct.product_type // SERVICE, RENTAL, etc.
+      });
+
+      // Reset flow state
+      setSelectedProduct(null);
+      setFlowData(null);
+
+      toaster.create({
+        title: 'Producto agregado',
+        description: `${selectedProduct.name} agregado al carrito`,
+        type: 'success',
+        duration: 2000
+      });
+    }
+  }, [selectedProduct, handleAddToCart]);
 
   // ========================================================================
   // COMPUTED VALUES
@@ -472,6 +729,64 @@ export function useSaleForm({
     cartStatusBadge,
 
     // Handlers
-    onClose
+    onClose,
+
+    // Context (for HookPoint injection)
+    saleContext,
+    handleContextSelect,
+
+    // Product Flow (for SERVICE/RENTAL flows)
+    selectedProduct,
+    handleProductSelect,
+    handleFlowComplete,
+    flowData,
+
+    // ========================================================================
+    // CAPABILITY-AWARE ARCHITECTURE (NEW - Adaptive POS)
+    // ========================================================================
+
+    /** Available ProductTypes based on active capabilities */
+    availableProductTypes,
+
+    /** Currently selected ProductType for this sale */
+    productType,
+
+    /** Handler to change ProductType */
+    setProductType,
+
+    /** Sale pattern based on ProductType and context (CART, DIRECT_ORDER, BOOKING) */
+    salePattern,
+
+    // ========================================================================
+    // CONTEXT-BASED ARCHITECTURE (REVISED - Correct Adaptive POS)
+    // ========================================================================
+
+    /** Available sale contexts based on active capabilities */
+    availableContexts,
+
+    /** Currently selected sale context */
+    selectedContext,
+
+    /** Handler to change sale context */
+    setSelectedContext,
+
+    // ========================================================================
+    // PRODUCTTYPE-FIRST ARCHITECTURE (NEW - Opción B)
+    // ========================================================================
+
+    /** Available fulfillment types for PHYSICAL products */
+    availableFulfillments,
+
+    /** Currently selected fulfillment for PHYSICAL products */
+    selectedFulfillment,
+
+    /** Handler to set fulfillment type */
+    setSelectedFulfillment,
+
+    /** Handler to select product type (resets fulfillment) */
+    handleProductTypeSelect,
+
+    /** Handler to go back from fulfillment to product type */
+    handleBackToProductType
   };
 }

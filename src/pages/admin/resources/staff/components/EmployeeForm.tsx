@@ -1,4 +1,4 @@
-// Employee Form - MIGRATED to Zod + React Hook Form validation
+// TeamMember Form - MIGRATED to Zod + React Hook Form validation
 import { useEffect } from 'react';
 import {
   VStack,
@@ -15,22 +15,22 @@ import {
 } from '../../../../../shared/ui';
 import { Field } from '@chakra-ui/react';
 import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { useStaffWithLoader } from '../../../../../hooks/useStaffData';
-import { useEmployeeValidation } from '../../../../../hooks/useEmployeeValidation';
-import type { Employee } from '../../../../../services/staff/staffApi';
+import { useStaffWithLoader } from '@/modules/team/hooks';
+import { useEmployeeValidation } from '@/modules/team/hooks';
+import type { TeamMember } from '../types';
 import type { EmployeeCompleteFormData } from '@/lib/validation/zod/CommonSchemas';
 
 interface EmployeeFormProps {
-  employee?: Employee;
+  teamMember?: TeamMember;
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (employee: Employee) => void;
+  onSuccess?: (teamMember: TeamMember) => void;
 }
 
-export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeFormProps) {
-  const { createEmployee, updateEmployee, loading, employees } = useStaffWithLoader();
+export function EmployeeForm({ teamMember, isOpen, onClose, onSuccess }: EmployeeFormProps) {
+  const { createEmployee, updateEmployee, loading, teamMembers } = useStaffWithLoader();
 
-  const isEditing = !!employee;
+  const isEditing = !!teamMember;
 
   // 🔥 NEW: Use validation hook with Zod + React Hook Form
   const {
@@ -41,24 +41,24 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
     validateForm
   } = useEmployeeValidation(
     {
-      employee_id: employee?.employee_id || '',
-      first_name: employee?.first_name || '',
-      last_name: employee?.last_name || '',
-      email: employee?.email || '',
-      phone: employee?.phone || '',
-      position: employee?.position || '',
-      department: (employee?.department || 'service') as 'kitchen' | 'service' | 'admin' | 'cleaning' | 'management',
-      hire_date: employee?.hire_date || new Date().toISOString().split('T')[0],
-      employment_type: (employee?.employment_type || 'full_time') as 'full_time' | 'part_time' | 'contract' | 'intern',
+      employee_id: teamMember?.employee_id || '',
+      first_name: teamMember?.first_name || '',
+      last_name: teamMember?.last_name || '',
+      email: teamMember?.email || '',
+      phone: teamMember?.phone || '',
+      position: teamMember?.position || '',
+      department: (teamMember?.department || 'service') as 'kitchen' | 'service' | 'admin' | 'cleaning' | 'management',
+      hire_date: teamMember?.hire_date || new Date().toISOString().split('T')[0],
+      employment_type: (teamMember?.employment_type || 'full_time') as 'full_time' | 'part_time' | 'contract' | 'intern',
       employment_status: 'active',
-      salary: employee?.salary,
-      hourly_rate: employee?.hourly_rate,
+      salary: teamMember?.salary,
+      hourly_rate: teamMember?.hourly_rate,
       weekly_hours: 40,
-      role: 'employee',
+      role: 'teamMember',
       can_work_multiple_locations: false
     },
-    employees || [],
-    employee?.id
+    teamMembers || [],
+    teamMember?.id
   );
 
   const { register, handleSubmit: createSubmitHandler, reset, formState: { errors } } = form;
@@ -101,10 +101,10 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
         can_work_multiple_locations: data.can_work_multiple_locations
       };
 
-      let result: Employee | null = null;
+      let result: TeamMember | null = null;
 
       if (isEditing) {
-        result = await updateEmployee(employee.id, employeeData);
+        result = await updateEmployee(teamMember.id, employeeData);
       } else {
         result = await createEmployee(employeeData);
       }
@@ -135,7 +135,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
         </Modal.Header>
 
         <Modal.Body>
-          <form onSubmit={handleSubmit} id="employee-form">
+          <form onSubmit={handleSubmit} id="teamMember-form">
             <VStack gap="4" align="stretch">
               {/* Root Error */}
               {errors.root && (
@@ -158,12 +158,12 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
               )}
 
               {/* Personal Information */}
-              <CardWrapper variant="flat" padding="md">
+              <CardWrapper variant="outline">
                 <CardWrapper.Body>
                   <VStack gap="4" align="stretch">
                     <Text fontWeight="semibold">Información Personal</Text>
 
-                    {/* Employee ID */}
+                    {/* TeamMember ID */}
                     <Field.Root invalid={!!fieldErrors.employee_id}>
                       <Field.Label>ID Empleado *</Field.Label>
                       <Input
@@ -232,7 +232,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
               </CardWrapper>
 
               {/* Job Information */}
-              <CardWrapper variant="flat" padding="md">
+              <CardWrapper variant="outline">
                 <CardWrapper.Body>
                   <VStack gap="4" align="stretch">
                     <Text fontWeight="semibold">Información Laboral</Text>
@@ -371,7 +371,7 @@ export function EmployeeForm({ employee, isOpen, onClose, onSuccess }: EmployeeF
             </Button>
             <Button
               type="submit"
-              form="employee-form"
+              form="teamMember-form"
               colorPalette="blue"
               loading={loading}
             >

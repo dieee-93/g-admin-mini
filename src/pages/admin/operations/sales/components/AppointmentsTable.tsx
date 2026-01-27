@@ -1,5 +1,4 @@
-import { Stack, Table, Text } from '@chakra-ui/react';
-import { Badge, Button } from '@/shared/ui';
+import { Stack, Table, Typography, Badge, Button, Box } from '@/shared/ui';
 import { Icon } from '@/shared/ui/Icon';
 import { EyeIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
@@ -41,12 +40,11 @@ export function AppointmentsTable({
     return (
       <Stack gap="2">
         {[1, 2, 3, 4, 5].map((i) => (
-          <Stack
+          <Box
             key={i}
-            direction="row"
             p="4"
-            bg="gray.50"
-            borderRadius="md"
+            bg="bg.muted"
+            borderRadius="xl"
             height="60px"
           />
         ))}
@@ -56,9 +54,10 @@ export function AppointmentsTable({
 
   if (!appointments || appointments.length === 0) {
     return (
-      <Stack align="center" justify="center" py="12">
-        <Text color="text.muted">No appointments found</Text>
-      </Stack>
+      <Box p="12" textAlign="center" borderRadius="xl" borderWidth="2px" borderStyle="dashed" borderColor="border.default" bg="bg.muted">
+        <Typography variant="body" size="4xl" mb="3">📅</Typography>
+        <Typography variant="body" size="md" color="text.muted">No appointments found</Typography>
+      </Box>
     );
   }
 
@@ -72,7 +71,7 @@ export function AppointmentsTable({
           <Table.ColumnHeader>Professional</Table.ColumnHeader>
           <Table.ColumnHeader>Status</Table.ColumnHeader>
           <Table.ColumnHeader>Total</Table.ColumnHeader>
-          <Table.ColumnHeader textAlign="right">Actions</Table.ColumnHeader>
+          <Table.ColumnHeader>Actions</Table.ColumnHeader>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -86,25 +85,25 @@ export function AppointmentsTable({
               {/* Date & Time */}
               <Table.Cell>
                 <Stack gap="0">
-                  <Text fontSize="sm" fontWeight="medium">
+                  <Typography variant="body" size="sm" fontWeight="medium">
                     {format(new Date(appointment.scheduled_time), 'MMM d, yyyy')}
-                  </Text>
-                  <Text fontSize="xs" color="text.muted">
+                  </Typography>
+                  <Typography variant="body" size="xs" color="text.muted">
                     {format(new Date(appointment.scheduled_time), 'h:mm a')}
-                  </Text>
+                  </Typography>
                 </Stack>
               </Table.Cell>
 
               {/* Customer */}
               <Table.Cell>
                 <Stack gap="0">
-                  <Text fontSize="sm" fontWeight="medium">
+                  <Typography variant="body" size="sm" fontWeight="medium">
                     {customer?.name || 'Walk-in'}
-                  </Text>
+                  </Typography>
                   {customer?.email && (
-                    <Text fontSize="xs" color="text.muted">
+                    <Typography variant="body" size="xs" color="text.muted">
                       {customer.email}
-                    </Text>
+                    </Typography>
                   )}
                 </Stack>
               </Table.Cell>
@@ -112,22 +111,22 @@ export function AppointmentsTable({
               {/* Service */}
               <Table.Cell>
                 <Stack gap="0">
-                  <Text fontSize="sm">{service?.name || 'Service'}</Text>
+                  <Typography variant="body" size="sm">{service?.name || 'Service'}</Typography>
                   {service?.duration_minutes && (
-                    <Text fontSize="xs" color="text.muted">
+                    <Typography variant="body" size="xs" color="text.muted">
                       {service.duration_minutes} min
-                    </Text>
+                    </Typography>
                   )}
                 </Stack>
               </Table.Cell>
 
               {/* Professional */}
               <Table.Cell>
-                <Text fontSize="sm">
+                <Typography variant="body" size="sm">
                   {staff
                     ? staff.name || `${staff.first_name} ${staff.last_name}`
                     : 'Any available'}
-                </Text>
+                </Typography>
               </Table.Cell>
 
               {/* Status */}
@@ -139,14 +138,14 @@ export function AppointmentsTable({
 
               {/* Total */}
               <Table.Cell>
-                <Text fontSize="sm" fontWeight="semibold" color="green.600">
+                <Typography variant="body" size="sm" fontWeight="semibold" color="green.600">
                   ${appointment.total.toFixed(2)}
-                </Text>
+                </Typography>
               </Table.Cell>
 
               {/* Actions */}
-              <Table.Cell textAlign="right">
-                <Stack direction="row" gap="1" justify="flex-end">
+              <Table.Cell>
+                <Stack direction="row" gap="1" justify="end">
                   {onView && (
                     <Button
                       size="sm"
@@ -158,7 +157,7 @@ export function AppointmentsTable({
                     </Button>
                   )}
 
-                  {appointment.order_status === 'CONFIRMED' && onComplete && (
+                  {['confirmed', 'CONFIRMED'].includes(appointment.order_status) && onComplete && (
                     <Button
                       size="sm"
                       variant="ghost"
@@ -170,8 +169,7 @@ export function AppointmentsTable({
                     </Button>
                   )}
 
-                  {appointment.order_status !== 'CANCELLED' &&
-                    appointment.order_status !== 'COMPLETED' &&
+                  {!['cancelled', 'CANCELLED', 'completed', 'COMPLETED'].includes(appointment.order_status) &&
                     onCancel && (
                       <Button
                         size="sm"

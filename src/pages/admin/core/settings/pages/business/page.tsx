@@ -40,7 +40,7 @@ import {
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { useAppStore } from '@/store/appStore';
-import { useCapabilityStore } from '@/store/capabilityStore';
+import { useBusinessProfile, useUpdateProfile } from '@/lib/capabilities';
 import { toaster } from '@/shared/ui/toaster';
 import { logger } from '@/lib/logging';
 
@@ -62,7 +62,8 @@ interface ValidationErrors {
 export default function BusinessPage() {
   const appSettings = useAppStore((state) => state.settings);
   const updateSettings = useAppStore((state) => state.updateSettings);
-  const capabilityProfile = useCapabilityStore((state) => state.profile);
+  const { profile } = useBusinessProfile();
+  const { updateProfile } = useUpdateProfile();
 
   // Form state
   const [formData, setFormData] = useState<BusinessFormData>({
@@ -80,13 +81,13 @@ export default function BusinessPage() {
   // Initialize form with data from stores
   useEffect(() => {
     setFormData({
-      businessName: appSettings.businessName || capabilityProfile?.businessName || '',
+      businessName: appSettings.businessName || profile?.businessName || '',
       address: appSettings.address || '',
-      contactPhone: appSettings.contactPhone || capabilityProfile?.phone || '',
-      contactEmail: appSettings.contactEmail || capabilityProfile?.email || '',
+      contactPhone: appSettings.contactPhone || profile?.phone || '',
+      contactEmail: appSettings.contactEmail || profile?.email || '',
       logoUrl: appSettings.logoUrl || ''
     });
-  }, [appSettings, capabilityProfile]);
+  }, [appSettings, profile]);
 
   const handleFieldChange = (field: keyof BusinessFormData) => (value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -148,12 +149,14 @@ export default function BusinessPage() {
         logoUrl: formData.logoUrl.trim()
       });
 
-      // Update capabilityStore profile (if exists)
-      const capabilityStore = useCapabilityStore.getState();
-      if (capabilityStore.profile) {
-        // TODO: Add updateProfile action to capabilityStore
-        // For now, profile updates will happen through the setup flow
-        logger.info('Settings', 'Profile update needed - implement capabilityStore.updateProfile()');
+      // Update profile via TanStack Query mutation
+      if (profile) {
+        updateProfile({
+          ...profile,
+          businessName: formData.businessName.trim(),
+          phone: formData.contactPhone.trim(),
+          email: formData.contactEmail.trim()
+        });
       }
 
       logger.info('Settings', 'Business configuration saved', {

@@ -13,6 +13,14 @@ The **Scheduling Module** provides comprehensive shift management, appointment b
 
 ### Key Features
 
+## Feature & Route Map
+| Feature | Sub-route | Component | Description |
+|---------|-----------|-----------|-------------|
+| **Shift Dashboard** | `/` | `page.tsx` | Weekly/Monthly roster view. |
+| **Shift Editor** | `(modal)` | `ShiftEditorModal` | Assignment of shifts to staff. |
+| **Availability** | `(tab)` | `AvailabilityTab` | Staff scheduling rules. |
+
+
 ✅ **Shift Management**
 - Create, edit, and delete staff shifts
 - Shift overlap detection with visual warnings

@@ -51,7 +51,12 @@
     "e2e:full": "playwright test --project=setup --project=authenticated --headed",
     "e2e:alerts": "playwright test tests/e2e/alerts-toast-progress.spec.ts --project=authenticated --headed",
     "e2e:alerts:ui": "playwright test tests/e2e/alerts-toast-progress.spec.ts --project=authenticated --ui",
-    "e2e:alerts:debug": "playwright test tests/e2e/alerts-toast-progress.spec.ts --project=authenticated --debug"
+    "e2e:alerts:debug": "playwright test tests/e2e/alerts-toast-progress.spec.ts --project=authenticated --debug",
+    "e2e:materials": "playwright test tests/e2e/materials --project=authenticated",
+    "e2e:materials:all": "playwright test tests/e2e/materials",
+    "e2e:materials:ui": "playwright test tests/e2e/materials --project=authenticated --ui",
+    "e2e:materials:debug": "playwright test tests/e2e/materials --project=authenticated --debug",
+    "seed:materials": "tsx tests/setup/seed-materials.ts"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.30.0",

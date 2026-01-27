@@ -7,7 +7,10 @@ export type { Product } from './useProductForm';
 export * from './useMenuEngineering';
 export * from './useCostAnalysis';
 export * from './useProductComponents';
-export * from './useProductsPage';
+
+// ⚠️ DEPRECATED: useProductsPage moved to @/modules/products
+// Old hook kept for reference: useProductsPage.legacy.ts
+// Use: import { useProductsPage } from '@/modules/products'; instead
 
 // Export new product form hooks (v3.0)
 export {

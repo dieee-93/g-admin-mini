@@ -159,7 +159,7 @@ export const MATERIALS_SLOW_MOVING_RULES: SmartAlertRule<MaterialABC>[] = [
     },
     severity: 'low',
     title: (item) => `🐌 Clase C sin movimiento: ${item.name}`,
-    description: (item) => 
+    description: () => 
       `Item de bajo valor sin movimiento significativo en 30+ días. Considere liquidación o descontinuación.`,
     metadata: (item) => ({
       itemId: item.id,

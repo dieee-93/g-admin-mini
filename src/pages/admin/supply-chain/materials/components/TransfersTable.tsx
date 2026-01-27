@@ -3,8 +3,10 @@
 // ================================================================
 // Purpose: Display inventory transfers with filtering and actions
 // Pattern: Table with status badges, location info, and workflow actions
+// ✅ PERFORMANCE: React.memo + useCallback (Phase 2B)
 // ================================================================
 
+import { memo, useCallback } from 'react';
 import { Stack, Text, Button, Icon, Box, Table } from '@/shared/ui';
 import {
   EyeIcon,
@@ -33,7 +35,7 @@ interface TransfersTableProps {
 
 type SortField = 'transfer_number' | 'created_at' | 'status' | 'quantity';
 
-export function TransfersTable({
+export const TransfersTable = memo<TransfersTableProps>(function TransfersTable({
   transfers,
   onView,
   onApprove,
@@ -43,8 +45,7 @@ export function TransfersTable({
   sortBy = 'created_at',
   sortOrder = 'desc',
   onSort
-}: TransfersTableProps) {
-  // const [hoveredRow, setHoveredRow] = useState<string | null>(null); // Disabled - hover functionality not implemented
+}) {
 
   const handleSort = (field: SortField) => {
     if (onSort) {
@@ -126,8 +127,6 @@ export function TransfersTable({
             <Table.Row
               key={transfer.id}
               _hover={{ bg: 'gray.50' }}
-              onMouseEnter={() => setHoveredRow(transfer.id)}
-              onMouseLeave={() => setHoveredRow(null)}
             >
               {/* Transfer Number */}
               <Table.Cell>
@@ -198,53 +197,45 @@ export function TransfersTable({
                 <Stack direction="row" gap="xs">
                   {/* View Details */}
                   {onView && (
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      onClick={() => onView(transfer)}
+                    <TransferActionButton
+                      icon={EyeIcon}
+                      onClick={onView}
+                      transfer={transfer}
                       title="Ver detalles"
-                    >
-                      <Icon icon={EyeIcon} size="sm" />
-                    </Button>
+                    />
                   )}
 
                   {/* Approve */}
                   {canApprove(transfer) && onApprove && (
-                    <Button
-                      size="xs"
-                      variant="ghost"
+                    <TransferActionButton
+                      icon={CheckIcon}
+                      onClick={onApprove}
+                      transfer={transfer}
                       colorPalette="green"
-                      onClick={() => onApprove(transfer)}
                       title="Aprobar"
-                    >
-                      <Icon icon={CheckIcon} size="sm" />
-                    </Button>
+                    />
                   )}
 
                   {/* Mark In Transit */}
                   {canComplete(transfer) && onComplete && (
-                    <Button
-                      size="xs"
-                      variant="ghost"
+                    <TransferActionButton
+                      icon={TruckIcon}
+                      onClick={onComplete}
+                      transfer={transfer}
                       colorPalette="blue"
-                      onClick={() => onComplete(transfer)}
                       title="Completar"
-                    >
-                      <Icon icon={TruckIcon} size="sm" />
-                    </Button>
+                    />
                   )}
 
                   {/* Cancel */}
                   {canCancel(transfer) && onCancel && (
-                    <Button
-                      size="xs"
-                      variant="ghost"
+                    <TransferActionButton
+                      icon={XMarkIcon}
+                      onClick={onCancel}
+                      transfer={transfer}
                       colorPalette="red"
-                      onClick={() => onCancel(transfer)}
                       title="Cancelar"
-                    >
-                      <Icon icon={XMarkIcon} size="sm" />
-                    </Button>
+                    />
                   )}
                 </Stack>
               </Table.Cell>
@@ -254,4 +245,37 @@ export function TransfersTable({
       </Table.Root>
     </Box>
   );
+});
+
+// ✅ PERFORMANCE: Extracted action button to prevent inline handlers
+interface TransferActionButtonProps {
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  onClick: (transfer: InventoryTransfer) => void;
+  transfer: InventoryTransfer;
+  colorPalette?: string;
+  title: string;
 }
+
+const TransferActionButton = memo<TransferActionButtonProps>(function TransferActionButton({
+  icon,
+  onClick,
+  transfer,
+  colorPalette,
+  title
+}) {
+  const handleClick = useCallback(() => {
+    onClick(transfer);
+  }, [onClick, transfer]);
+
+  return (
+    <Button
+      size="xs"
+      variant="ghost"
+      colorPalette={colorPalette}
+      onClick={handleClick}
+      title={title}
+    >
+      <Icon icon={icon} size="sm" />
+    </Button>
+  );
+});

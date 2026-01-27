@@ -23,6 +23,7 @@ interface ApiMaterialItem {
   target_stock?: number | string;
   supplier_id?: string;
   category?: string;
+  brand_id?: string;
   package_size?: number | string;
   package_unit?: string;
   package_cost?: number | string;
@@ -168,7 +169,8 @@ export class MaterialsNormalizer {
       ...base,
       type: 'COUNTABLE',
       unit: 'unidad',
-      category: api.category || 'Sin categoría' // Business category for all item types
+      category: api.category || 'Sin categoría', // Business category for all item types
+      brand_id: api.brand_id // 🆕 BRANDS: Include brand_id
     };
 
     // Handle packaging information if present
@@ -193,6 +195,7 @@ export class MaterialsNormalizer {
       ...base,
       type: 'MEASURABLE',
       unit: unit, // Default unit
+      brand_id: api.brand_id, // 🆕 BRANDS: Include brand_id
       category: api.category || 'Sin categoría', // Business category (Lácteos, Carnes, etc.)
       precision: this.validatePrecision(api.precision_digits)
     };
@@ -209,6 +212,7 @@ export class MaterialsNormalizer {
       type: 'ELABORATED',
       unit: api.unit || 'porción',
       category: api.category || 'Sin categoría', // Business category for all item types
+      brand_id: api.brand_id, // 🆕 BRANDS: Include brand_id
       requires_production: Boolean(api.requires_production ?? true),
       auto_calculate_cost: Boolean(api.auto_calculate_cost ?? true),
       ingredients_available: Boolean(api.ingredients_available ?? false)

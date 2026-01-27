@@ -1,5 +1,5 @@
 // src/features/sales/components/SalesWithStockView.tsx (Enhanced Version)
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Stack, 
   Button, 
@@ -31,7 +31,7 @@ import { ProductWithStock } from './ProductWithStock';
 import { StockValidationAlert } from './StockValidationAlert';
 import { CartValidationSummary, CartQuickAlert } from './CartValidationSummary';
 import { fetchCustomers } from '../services/saleApi';
-import { useSalesCart } from '../hooks/useSalesCart';
+import { usePOSCart } from '@/modules/sales/hooks';
 import { useSalesStore } from '@/store/salesStore';
 import { supabase } from '@/lib/supabase/client';
 
@@ -71,7 +71,7 @@ export function SalesWithStockView() {
     clearCart,
     validateCartStock,
     getSaleData
-  } = useSalesCart({
+  } = usePOSCart({
     enableRealTimeValidation: true,
     validationDebounceMs: 800,
   });
@@ -94,8 +94,8 @@ export function SalesWithStockView() {
     }
   };
 
-  // Collection para el select de clientes
-  const customersCollection = createListCollection({
+  // Collection para el select de clientes - MEMOIZED para evitar recreaciones
+  const customersCollection = useMemo(() => createListCollection({
     items: [
       { value: '', label: 'Sin cliente específico' },
       ...customers.map(customer => ({
@@ -103,7 +103,7 @@ export function SalesWithStockView() {
         label: `${customer.name}${customer.phone ? ` (${customer.phone})` : ''}`
       }))
     ]
-  });
+  }), [customers]); // Solo recalcular cuando customers cambie
 
   // Manejar apertura del checkout con validación previa
   const handleOpenCheckout = useCallback(async () => {
@@ -170,7 +170,7 @@ export function SalesWithStockView() {
     try {
       const saleData = getSaleData(selectedCustomerId || undefined, note || undefined);
 
-      const { error } = await supabase.rpc('pos_process_sale_with_order', {
+      const { error } = await (supabase.rpc as any)('pos_process_sale_with_order', {
         p_table_id: selectedTableId,
         p_customer_id: saleData.customer_id,
         p_items: saleData.items,
@@ -279,7 +279,7 @@ export function SalesWithStockView() {
             <ProductWithStock 
               onAddToCart={addToCart}
               onQuantityChange={updateQuantity}
-              currentCart={cart}
+              currentCart={cart as any}
               disabled={isProcessing || !selectedTableId}
             />
           </Stack>
@@ -287,7 +287,7 @@ export function SalesWithStockView() {
           {/* Resumen del carrito */}
           <Stack direction="column">
             <CartValidationSummary
-              cart={cart}
+              cart={cart as any}
               summary={summary}
               validationResult={validationResult}
               isValidating={isValidating}

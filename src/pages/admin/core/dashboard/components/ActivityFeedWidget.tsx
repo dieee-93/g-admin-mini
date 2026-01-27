@@ -155,7 +155,7 @@ export const ActivityFeedWidget: React.FC<ActivityFeedWidgetProps> = ({
           <Box
             key={activity.id}
             p={4}
-            bg="bg.canvas"
+            bg="gray.50"
             borderRadius="xl"
             borderLeft="3px solid"
             borderColor={activity.color}

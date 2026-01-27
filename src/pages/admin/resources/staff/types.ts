@@ -17,7 +17,7 @@ export interface Employee {
   department: string;
   hire_date: string;
   employment_status: 'active' | 'inactive' | 'terminated' | 'on_leave';
-  employment_type: 'full_time' | 'part_time' | 'contract' | 'intern';
+  employment_type: 'full_time' | 'part_time' | 'contract' | 'intern' | 'full_time_formal' | 'part_time_formal' | 'informal' | 'contractor' | 'family_helper';
   
   // Security & Access
   role: 'admin' | 'manager' | 'supervisor' | 'employee';
@@ -45,7 +45,12 @@ export interface Employee {
   salary?: number; // Only visible to HR/Admin
   hourly_rate?: number; // Only visible to HR/Admin
   social_security?: string; // Masked in UI
-  
+
+  // Argentine Context - Informal Employment Support
+  daily_cash_rate?: number; // For informal workers
+  track_payments?: boolean; // If false, only tracks presence not payments
+  tax_id?: string; // CUIT for contractors
+
   // Timestamps
   created_at: string;
   updated_at: string;

@@ -48,8 +48,11 @@ import { materialsManifest } from './materials/manifest';
 // NOTE: Procurement deprecated - now integrated as tab in Suppliers module
 import { suppliersManifest } from './suppliers/manifest';
 import { productsManifest } from './products/manifest';
-import { productsAnalyticsManifest } from './products/analytics/manifest';
-import { recipeManifest } from './recipe/manifest';
+
+// DISABLED: Sub-modules not supported in simplified architecture
+// import { productsAnalyticsManifest } from './products/analytics/manifest';
+// import { recipeManifest } from './recipe/manifest';
+
 import { assetsManifest } from './assets/manifest';
 
 // ============================================
@@ -148,8 +151,11 @@ export const ALL_MODULE_MANIFESTS = [
 
   schedulingManifest,    // ✅ Depends on: team
   productsManifest,      // ✅ Depends on: materials
-  productsAnalyticsManifest, // ✅ NEW: Products analytics sub-module (Menu Engineering, Cost Analysis)
-  recipeManifest,        // ✅ Recipe builder & BOM management (transversal)
+  
+  // DISABLED: Sub-modules not supported in simplified architecture
+  // productsAnalyticsManifest, // ❌ DISABLED: No sub-module support (depends on products which is OPTIONAL)
+  // recipeManifest,        // ❌ DISABLED: No sub-module support (depends on materials + products which are OPTIONAL)
+  
   productionManifest,    // ✅ RENAMED from kitchen - Depends on: materials
   assetsManifest,        // ✅ Inventory durable (equipment, tools, machinery)
   // NOTE: materialsProcurementManifest deprecated - supplier orders now integrated in suppliersManifest
@@ -214,9 +220,12 @@ export {
   materialsManifest,
   // NOTE: materialsProcurementManifest deprecated - integrated in suppliers
   suppliersManifest,
-  productsAnalyticsManifest,
+  
+  // DISABLED: Sub-modules not supported in simplified architecture
+  // productsAnalyticsManifest,  // ❌ DISABLED: No sub-module support
+  // recipeManifest,              // ❌ DISABLED: No sub-module support
+  
   productsManifest,
-  recipeManifest,
   productionManifest,
   assetsManifest,
 

@@ -2,7 +2,7 @@ export { MenuEngineeringMatrix } from './MenuEngineeringMatrix';
 
 // Re-export types AND values for convenience
 export {
-  MenuCategory,
+  MenuEngineeringCategory,
   TrendDirection,
   StrategyPriority,
   RiskLevel

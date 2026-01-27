@@ -1,8 +1,8 @@
 /**
- * Capabilities Debug Page v4.0 - Management Panel
+ * Capabilities Debug Page v5.0 - Management Panel
  * 
  * Panel de control para gestionar Business Capabilities e Infrastructure.
- * Conectado con CapabilityStore v4.0 (Atomic System)
+ * MIGRATED: Now uses new 3-layer architecture (Profile + Features + Setup)
  */
 
 import React, { useState } from 'react';
@@ -19,8 +19,14 @@ import {
   CardWrapper,
   Separator
 } from '@/shared/ui';
-import { useCapabilityStore } from '@/store/capabilityStore';
-import { useShallow } from 'zustand/react/shallow';
+import {
+  useBusinessProfile,
+  useToggleCapability,
+  useSetInfrastructure,
+  useActiveFeatures,
+  useActiveModules,
+  useUpdateProfile,
+} from '@/lib/capabilities';
 import { 
   BUSINESS_CAPABILITIES_REGISTRY,
   INFRASTRUCTURE_REGISTRY,
@@ -31,14 +37,17 @@ import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
 
 export default function CapabilitiesDebugPage() {
-  const profile = useCapabilityStore(state => state.profile);
-  const toggleCapability = useCapabilityStore(state => state.toggleCapability);
-  const setInfrastructure = useCapabilityStore(state => state.setInfrastructure);
-  const activeFeatures = useCapabilityStore(state => state.features.activeFeatures);
-  // ⚡ PERFORMANCE: useShallow prevents re-renders when array content is same but reference changes
-  const activeModules = useCapabilityStore(useShallow(state => state.getActiveModules()));
-  const loadFromDB = useCapabilityStore(state => state.loadFromDB);
-  const saveToDB = useCapabilityStore(state => state.saveToDB);
+  // NEW: Layer 1 - Business Profile
+  const { profile, refetch: loadFromDB } = useBusinessProfile();
+  const { updateProfile } = useUpdateProfile();
+  
+  // NEW: Layer 2 - Feature Flags
+  const activeFeatures = useActiveFeatures();
+  const activeModules = useActiveModules();
+  
+  // NEW: Mutation hooks
+  const { toggleCapability } = useToggleCapability();
+  const { setInfrastructure: setInfra } = useSetInfrastructure();
 
   const [expandedCapability, setExpandedCapability] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -52,7 +61,13 @@ export default function CapabilitiesDebugPage() {
   };
 
   const handleToggleInfrastructure = (infraId: InfrastructureId) => {
-    setInfrastructure(infraId);
+    setInfra(infraId);
+  };
+
+  // Save to DB - just trigger updateProfile (TanStack Query handles it)
+  const saveToDB = async () => {
+    if (!profile) return;
+    await updateProfile(profile);
   };
 
   const getCategoryColor = (type: string): 'blue' | 'gray' | 'purple' | 'green' | 'orange' | 'cyan' | 'pink' | 'red' | 'teal' | 'yellow' => {
@@ -72,9 +87,12 @@ export default function CapabilitiesDebugPage() {
       <Section variant="flat">
         <Stack gap="4">
           <Box>
-            <Heading size="xl">🎯 Capabilities System Debugger v4.0</Heading>
+            <Heading size="xl">🎯 Capabilities System Debugger v5.0</Heading>
             <Text color="fg.muted" mt="2">
               Gestiona Business Capabilities e Infrastructure. Los cambios se guardan automáticamente.
+            </Text>
+            <Text color="fg.muted" fontSize="xs" mt="1">
+              ✨ Nueva arquitectura: Profile (TanStack Query) + Features (Context) + Setup (Zustand)
             </Text>
           </Box>
 
@@ -440,7 +458,7 @@ export default function CapabilitiesDebugPage() {
       <Section variant="elevated" title="💾 Persistencia & Sincronización">
         <Stack gap="4">
           <Text color="fg.muted" fontSize="sm">
-            Debug de persistencia entre localStorage (Zustand) y Supabase.
+            Debug de persistencia con TanStack Query (auto-sync).
           </Text>
 
           {/* Sync Status */}
@@ -477,10 +495,10 @@ export default function CapabilitiesDebugPage() {
                     onClick={async () => {
                       setSyncStatus('loading');
                       try {
-                        const loaded = await loadFromDB();
+                        await loadFromDB();
                         setSyncStatus('success');
                         setLastSyncTime(new Date().toLocaleTimeString());
-                        logger.info('CapabilitySystem', 'Loaded from DB', { loaded });
+                        logger.info('CapabilitySystem', 'Loaded from DB (refetch)');
                       } catch (error) {
                         setSyncStatus('error');
                         logger.error('CapabilitySystem', 'Load error', { error });
@@ -514,38 +532,16 @@ export default function CapabilitiesDebugPage() {
                     size="sm"
                     colorPalette="purple"
                     onClick={() => {
-                      const stored = localStorage.getItem('capability-store-v4');
-                      const parsed = stored ? JSON.parse(stored) : null;
-                      logger.info('CapabilitySystem', 'localStorage data', { parsed });
-                      logger.info('CapabilitySystem', 'Current store state', {
+                      logger.info('CapabilitySystem', 'Current profile', {
+                        profile,
                         capabilities: selectedCapabilities,
                         infrastructure: selectedInfrastructure
                       });
                       
-                      // Show in UI
-                      alert(`LocalStorage:\n${JSON.stringify(parsed?.state?.profile?.selectedCapabilities || [], null, 2)}\n\nCurrent State:\n${JSON.stringify(selectedCapabilities, null, 2)}`);
+                      alert(`Profile:\n${JSON.stringify(profile, null, 2)}`);
                     }}
                   >
-                    🔍 Ver localStorage
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    colorPalette="orange"
-                    onClick={() => {
-                      // Force save current state to localStorage
-                      const currentState = useCapabilityStore.getState();
-                      localStorage.setItem('capability-store-v4', JSON.stringify({
-                        state: currentState,
-                        version: 4
-                      }));
-                      logger.info('CapabilitySystem', 'Force saved to localStorage', { 
-                        selectedCapabilities: currentState.profile?.selectedCapabilities 
-                      });
-                      alert('✅ Estado actual guardado forzosamente en localStorage');
-                    }}
-                  >
-                    🔧 Forzar guardado local
+                    🔍 Ver Profile
                   </Button>
                 </Box>
               </Stack>

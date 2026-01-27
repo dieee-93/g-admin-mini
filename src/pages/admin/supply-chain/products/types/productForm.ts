@@ -68,16 +68,38 @@ export interface StaffFields {
   staff_allocation?: StaffAllocation[];
 }
 
+/**
+ * Staff allocation for a product (PRODUCTION staff only)
+ * 
+ * This defines the staff time needed to PRODUCE the product, not to SERVE it.
+ * Service staff (waiter, delivery driver) is defined in DeliveryContext, not here.
+ * 
+ * @see docs/product/COSTING_ARCHITECTURE.md (Section 9.3)
+ */
 export interface StaffAllocation {
-  role_id: string;
-  role_name?: string;  // Para UI
-  count: number;
-  duration_minutes: number;  // ✅ Estandarizado a minutos
-  hourly_rate?: number;
-
-  // Calculated
-  total_hours?: number;
-  total_cost?: number;
+  id?: string;
+  
+  // Assignment: Role is required, Employee is optional for specific assignment
+  role_id: string;                   // FK to staff_roles (required)
+  employee_id?: string | null;       // FK to employees (optional, more specific)
+  
+  // Time requirements
+  duration_minutes: number;          // Duration in minutes
+  count: number;                     // Number of people needed (default: 1)
+  
+  // Costing overrides (optional - uses role defaults if not set)
+  hourly_rate_override?: number | null;     // Override the role's base rate
+  loaded_factor_override?: number | null;   // Override the role's loaded factor
+  
+  // Denormalized for display (populated on read, not stored)
+  role_name?: string;
+  employee_name?: string;
+  
+  // Calculated fields (computed, not stored)
+  effective_hourly_rate?: number;    // Rate used (after applying overrides)
+  loaded_hourly_cost?: number;       // effective_rate * loaded_factor
+  total_hours?: number;              // duration_minutes / 60 * count
+  total_cost?: number;               // total_hours * loaded_hourly_cost
 }
 
 // ============================================
@@ -475,6 +497,15 @@ export interface RecurringConfigFields {
 }
 
 // ============================================
+// RECIPE CONFIG FIELDS (BOM / Kit)
+// ============================================
+
+export interface RecipeConfigFields {
+  has_recipe: boolean;
+  recipe_id?: string;
+}
+
+// ============================================
 // UNIFIED PRODUCT FORM DATA
 // ============================================
 
@@ -493,6 +524,7 @@ export interface ProductFormData {
   staff?: StaffFields;
   booking?: BookingFields;
   production?: ProductionFields;
+  recipe_config?: RecipeConfigFields;
   pricing: PricingFields;
   asset_config?: AssetConfigFields;
   rental_terms?: RentalTermsFields;

@@ -6,12 +6,11 @@
 // ================================================================
 
 import { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef, type ReactNode } from 'react';
-import { locationsApi } from '@/services/locationsApi';
+import { locationsApi } from '@/lib/locations/locationsApi';
 import EventBus from '@/lib/events';
 import type { Location } from '@/types/location';
 import { logger } from '@/lib/logging';
-import { useCapabilityStore } from '@/store/capabilityStore';
-import { useShallow } from 'zustand/react/shallow';
+import { useBusinessProfile } from '@/lib/capabilities';
 
 interface LocationContextValue {
   locations: Location[];
@@ -23,7 +22,7 @@ interface LocationContextValue {
   error: Error | null;
 }
 
-const LocationContext = createContext<LocationContextValue | undefined>(undefined);
+export const LocationContext = createContext<LocationContextValue | undefined>(undefined);
 LocationContext.displayName = 'LocationContext';
 
 const STORAGE_KEY = 'selected_location_id';
@@ -59,11 +58,9 @@ export function LocationProvider({ children }: LocationProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Get selected infrastructure from CapabilityStore
-  // 🔧 FIX: Use useShallow to prevent re-renders from array reference changes
-  const selectedInfrastructure = useCapabilityStore(
-    useShallow(state => state.profile?.selectedInfrastructure || EMPTY_ARRAY)
-  );
+  // ✅ MIGRATED: Get selected infrastructure from useBusinessProfile (TanStack Query)
+  const { profile } = useBusinessProfile();
+  const selectedInfrastructure = profile?.selectedInfrastructure || [];
 
   // 🐛 DEBUG: Track if the array reference changes on each render
   const prevInfrastructureRef = useRef(selectedInfrastructure);

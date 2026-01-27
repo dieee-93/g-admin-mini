@@ -37,7 +37,8 @@ export default function DeliveryPage() {
     zones,
     metrics,
     loading,
-    error
+    error,
+    refreshZones
   } = useDeliveryPage();
 
   if (error) {
@@ -134,7 +135,7 @@ export default function DeliveryPage() {
               </Tabs.Content>
 
               <Tabs.Content value="zones">
-                <ZonesTab zones={zones} loading={loading} />
+                <ZonesTab zones={zones} loading={loading} onRefresh={refreshZones} />
               </Tabs.Content>
 
               <Tabs.Content value="analytics">

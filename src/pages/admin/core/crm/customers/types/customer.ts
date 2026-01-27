@@ -7,17 +7,43 @@
 
 // ===== CORE CUSTOMER TYPES =====
 
+export interface CustomerAddress {
+  id: string;
+  customer_id: string;
+  label: string;
+  address_line_1: string;
+  address_line_2?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string;
+  latitude?: number;
+  longitude?: number;
+  formatted_address?: string;
+  delivery_instructions?: string;
+  is_default: boolean;
+  is_verified: boolean;
+  last_used_at?: string;
+  usage_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Customer {
   // Basic Information
   id: string;
   name: string;
-  phone?: string;
+  phone?: string;    // Landline/fixed phone
+  mobile?: string;   // Mobile/cell phone
   email?: string;
-  address?: string;
-  note?: string;
+  dni?: string;  // Documento Nacional de Identidad
+  notes?: string;    // Changed from 'note' to match DB column
   birth_date?: string; // Added to match store
   created_at: string;
   updated_at: string;
+
+  // Addresses (new architecture)
+  customer_addresses?: CustomerAddress[];
 
   // Analytics & Status (Unified from Store)
   total_orders: number;
@@ -280,10 +306,11 @@ export interface UpsellOpportunity {
 
 export interface CreateCustomerData {
   name: string;
-  phone?: string;
+  phone?: string;                  // Landline/fixed phone
+  mobile?: string;                 // Mobile/cell phone
   email?: string;
-  address?: string;
-  note?: string;
+  dni?: string;                    // Documento Nacional de Identidad
+  notes?: string;                  // Changed from 'note' to match DB column
   tags?: number[];                 // Tag IDs to assign (now BIGINT)
   preferences?: Partial<CustomerPreferences>;
   communication_preferences?: Partial<CommunicationPreferences>;

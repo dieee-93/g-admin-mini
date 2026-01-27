@@ -40,7 +40,8 @@ export function useDeliveryPage() {
   const {
     zones,
     loading: zonesLoading,
-    error: zonesError
+    error: zonesError,
+    refresh: refreshZones
   } = useDeliveryZones();
 
   // Fetch metrics on mount
@@ -75,6 +76,7 @@ export function useDeliveryPage() {
     zones,
     metrics,
     loading,
-    error
+    error,
+    refreshZones
   };
 }

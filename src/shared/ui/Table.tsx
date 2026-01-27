@@ -65,11 +65,7 @@ const getTableStyles = (props: TableRootProps): React.CSSProperties & Record<str
   const {
     size = 'md',
     variant = 'line',
-    colorPalette = 'gray',
-    showColumnBorder = false,
-    striped = false,
-    interactive = false,
-    stickyHeader = false
+    showColumnBorder = false
   } = props;
 
   const sizeStyles = {
@@ -166,13 +162,9 @@ const TableRoot: React.FC<TableRootProps> = ({
   size,
   variant,
   showColumnBorder,
-  striped,
-  interactive,
-  stickyHeader,
-  colorPalette,
   ...htmlProps
 }) => {
-  const tableStyles = getTableStyles({ size, variant, showColumnBorder, striped, interactive, stickyHeader, colorPalette, children });
+  const tableStyles = getTableStyles({ size, variant, showColumnBorder, children });
 
   return (
     <div style={{ overflowX: 'auto', borderRadius: '0.375rem' }}>

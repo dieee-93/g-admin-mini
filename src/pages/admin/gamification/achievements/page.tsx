@@ -1,16 +1,17 @@
 /**
- * REQUIREMENTS & ACHIEVEMENTS PAGE
+ * ACHIEVEMENTS PAGE - Modern Redesign
  *
- * Página dedicada para visualizar y completar requirements del sistema.
- * Integrada con Module Registry y Achievements System.
+ * Página de logros y configuración del sistema.
+ * Usa achievementsStore directamente (Unified Architecture v2.0).
  *
  * CARACTERÍSTICAS:
- * - Vista de progreso por capability
- * - Checklist de requirements MANDATORY
- * - Enlaces directos a configuración
- * - Filtros por capability
+ * - ✅ Hero con progress ring global
+ * - ✅ Filtros por capability
+ * - ✅ Cards modernas con gradientes
+ * - ✅ Requirements con links directos
+ * - ✅ Animaciones sutiles
  *
- * @version 1.0.0 - Integration with Achievements System
+ * @version 2.0.0 - Unified Architecture + Modern Design
  */
 
 import { useMemo, useState } from 'react';
@@ -26,159 +27,181 @@ import {
   Button,
   Badge,
   Stack,
-  SkipLink
+  SkipLink,
+  SimpleGrid,
+  Progress,
+  Icon,
+  CircularProgress,
 } from '@/shared/ui';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
-import { useCapabilities } from '@/lib/capabilities';
-import { useValidationContext } from '@/hooks/useValidationContext';
-import { ModuleRegistry } from '@/lib/modules';
+import {
+  ChevronRightIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  SparklesIcon,
+  RocketLaunchIcon,
+} from '@heroicons/react/24/outline';
+import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
+import { useValidationContext } from '@/hooks';
+import { useBusinessProfile } from '@/lib/capabilities';
+import { useAchievementsStore } from '@/modules/achievements/store/achievementsStore';
+import { BUSINESS_CAPABILITIES_REGISTRY } from '@/config/BusinessModelRegistry';
 import type { CapabilityProgress, Requirement } from '@/modules/achievements/types';
 import type { BusinessCapabilityId } from '@/config/types';
 
 /**
- * Capability Names Mapping
- */
-const CAPABILITY_NAMES: Record<BusinessCapabilityId, string> = {
-  onsite_service: 'Dine-In (Servicio en Mesas)',
-  pickup_counter: 'TakeAway (Para Llevar)',
-  async_operations: 'Operaciones Asíncronas',
-  delivery_shipping: 'Delivery (Envíos a Domicilio)',
-  corporate_sales: 'B2B (Ventas Corporativas)',
-  manufacturing: 'Producción Industrial',
-  rental_service: 'Alquiler de Equipos',
-  membership_service: 'Membresías y Suscripciones',
-  event_hosting: 'Organización de Eventos',
-  consultation_service: 'Servicios de Consultoría'
-};
-
-/**
  * Main Page Component
  */
-export default function RequirementsAchievementsPage() {
-  const { activeCapabilities } = useCapabilities();
+export default function AchievementsPage() {
   const context = useValidationContext();
-  const registry = useMemo(() => ModuleRegistry.getInstance(), []);
   const navigate = useNavigate();
 
+  // Get capabilities from profile
+  const { profile } = useBusinessProfile();
+  const selectedCapabilities = profile?.selectedCapabilities || [];
+
   // Filter state
-  const [selectedCapability, setSelectedCapability] = useState<BusinessCapabilityId | 'all'>('all');
+  const [selectedCapability, setSelectedCapability] = useState<
+    BusinessCapabilityId | 'all'
+  >('all');
+
+  // ✅ Use achievementsStore directly (Unified Architecture)
+  const computeAllProgress = useAchievementsStore((s) => s.computeAllProgress);
 
   // Get progress for all active capabilities
   const capabilitiesProgress: CapabilityProgress[] = useMemo(() => {
-    if (activeCapabilities.length === 0) {
-      return [];
-    }
-
-    return activeCapabilities
-      .map((capability) => {
-        const results = registry.doAction('achievements.get_progress', {
-          capability,
-          context,
-        });
-        return results[0] as CapabilityProgress;
-      })
-      .filter(Boolean);
-  }, [activeCapabilities.length, registry]);
+    if (selectedCapabilities.length === 0) return [];
+    return computeAllProgress(context, selectedCapabilities);
+  }, [selectedCapabilities, context, computeAllProgress]);
 
   // Calculate global progress
   const globalProgress = useMemo(() => {
     const total = capabilitiesProgress.reduce((sum, cp) => sum + cp.total, 0);
-    const completed = capabilitiesProgress.reduce((sum, cp) => sum + cp.completed, 0);
+    const completed = capabilitiesProgress.reduce(
+      (sum, cp) => sum + cp.completed,
+      0
+    );
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-
     return { total, completed, percentage };
   }, [capabilitiesProgress]);
 
   // Filter progress by selected capability
   const filteredProgress = useMemo(() => {
-    if (selectedCapability === 'all') {
-      return capabilitiesProgress;
-    }
-    return capabilitiesProgress.filter(cp => cp.capability === selectedCapability);
+    if (selectedCapability === 'all') return capabilitiesProgress;
+    return capabilitiesProgress.filter(
+      (cp) => cp.capability === selectedCapability
+    );
   }, [capabilitiesProgress, selectedCapability]);
+
+  // Enrich with capability metadata
+  const enrichedProgress = useMemo(() => {
+    return filteredProgress.map((progress) => {
+      const cap = BUSINESS_CAPABILITIES_REGISTRY[progress.capability];
+      return {
+        ...progress,
+        name: cap?.name || progress.capability,
+        icon: cap?.icon || '📦',
+      };
+    });
+  }, [filteredProgress]);
+
+  const isComplete = globalProgress.percentage === 100;
 
   return (
     <>
       <SkipLink />
 
-      <ContentLayout spacing="normal" mainLabel="Requirements & Achievements">
-        {/* HEADER */}
-        <Section
-          variant="flat"
-          title="Configuración del Sistema"
-          subtitle="Completa estos pasos para comenzar a operar comercialmente"
-          semanticHeading="Requirements and Business Setup Progress"
-        />
-
-        {/* GLOBAL PROGRESS */}
-        <Section variant="elevated">
-          <VStack align="start" gap="4" w="full">
-            <HStack justify="space-between" w="full">
-              <Heading size="md">Progreso Global</Heading>
-              <Badge
-                colorPalette={globalProgress.percentage === 100 ? 'green' : 'orange'}
-                size="lg"
-              >
-                {globalProgress.completed} / {globalProgress.total} completados
-              </Badge>
-            </HStack>
-
-            {/* Progress Bar */}
-            <Box w="full">
-              <Box
-                h="12px"
-                w="full"
-                bg="gray.200"
-                borderRadius="full"
-                overflow="hidden"
-                _dark={{ bg: 'gray.700' }}
-              >
-                <Box
-                  h="full"
-                  w={`${globalProgress.percentage}%`}
-                  bg={globalProgress.percentage === 100 ? 'green.500' : 'orange.500'}
-                  transition="width 0.5s"
-                />
-              </Box>
-              <Text fontSize="sm" color="gray.600" _dark={{ color: 'gray.400' }} mt={2}>
-                {globalProgress.percentage}% completado
-              </Text>
-            </Box>
-
-            {globalProgress.percentage === 100 && (
-              <Box
-                w="full"
-                p="4"
-                bg="green.50"
-                borderRadius="md"
-                border="2px solid"
-                borderColor="green.200"
-                _dark={{ bg: 'green.900/20', borderColor: 'green.700' }}
-              >
-                <HStack gap="2">
-                  <Text fontSize="2xl">✅</Text>
-                  <VStack align="start" gap="1">
-                    <Text fontSize="sm" fontWeight="bold" color="green.700" _dark={{ color: 'green.300' }}>
-                      ¡Configuración Completa!
-                    </Text>
-                    <Text fontSize="xs" color="green.600" _dark={{ color: 'green.400' }}>
-                      Tu negocio está listo para operar comercialmente
-                    </Text>
-                  </VStack>
-                </HStack>
-              </Box>
-            )}
-          </VStack>
-        </Section>
-mb="8"
-        {/* FILTERS */}
+      <ContentLayout spacing="normal" mainLabel="Achievements & Setup">
+        {/* ==========================================
+            HERO SECTION
+            ========================================== */}
         <Section variant="flat">
-          <VStack align="start" gap="3" w="full">
-            <Text fontSize="sm" fontWeight="medium" color="gray.700" _dark={{ color: 'gray.300' }}>
-              Filtrar por Capability:
+          <Box
+            bg={isComplete ? 'green.50' : 'bg.subtle'}
+            borderRadius="2xl"
+            p={{ base: 6, md: 8 }}
+            border="1px solid"
+            borderColor={isComplete ? 'green.200' : 'border.default'}
+            _dark={{
+              bg: isComplete ? 'green.950' : 'gray.800',
+              borderColor: isComplete ? 'green.800' : 'gray.700',
+            }}
+          >
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              justify="space-between"
+              align={{ base: 'start', md: 'center' }}
+              gap={6}
+            >
+              {/* Left: Title & Description */}
+              <VStack align="start" gap={2} flex={1}>
+                <HStack gap={3}>
+                  <Box
+                    p={2}
+                    bg={isComplete ? 'green.100' : 'blue.100'}
+                    borderRadius="lg"
+                    _dark={{
+                      bg: isComplete ? 'green.900' : 'blue.900',
+                    }}
+                  >
+                    <Icon
+                      as={isComplete ? SparklesIcon : RocketLaunchIcon}
+                      boxSize={6}
+                      color={isComplete ? 'green.600' : 'blue.600'}
+                      _dark={{
+                        color: isComplete ? 'green.400' : 'blue.400',
+                      }}
+                    />
+                  </Box>
+                  <Heading size="xl">
+                    {isComplete
+                      ? '¡Configuración Completa!'
+                      : 'Configuración del Sistema'}
+                  </Heading>
+                </HStack>
+                <Text color="fg.muted" maxW="lg">
+                  {isComplete
+                    ? 'Tu negocio está listo para operar. Explora las opciones avanzadas para optimizar tu operación.'
+                    : 'Completa estos pasos fundacionales para activar todas las funcionalidades comerciales.'}
+                </Text>
+              </VStack>
+
+              {/* Right: Progress Ring */}
+              <Box textAlign="center" minW="140px">
+                <CircularProgress
+                  value={globalProgress.percentage}
+                  size="100px"
+                  color={isComplete ? 'var(--chakra-colors-green-500)' : 'var(--chakra-colors-blue-500)'}
+                  trackColor="var(--chakra-colors-gray-200)"
+                  strokeWidth={8}
+                >
+                  <Text fontSize="xl" fontWeight="bold">
+                    {globalProgress.percentage}%
+                  </Text>
+                </CircularProgress>
+                <Text fontSize="sm" color="fg.muted" mt="2">
+                  {globalProgress.completed} / {globalProgress.total} completados
+                </Text>
+              </Box>
+            </Stack>
+          </Box>
+        </Section>
+
+        {/* ==========================================
+            CAPABILITY FILTERS
+            ========================================== */}
+        {selectedCapabilities.length > 0 && (
+          <Section variant="flat">
+            <Text
+              fontSize="sm"
+              fontWeight="semibold"
+              color="fg.muted"
+              mb={3}
+              textTransform="uppercase"
+              letterSpacing="wider"
+            >
+              Filtrar por Área
             </Text>
-            <HStack wrap="wrap" gap="2">
+            <HStack wrap="wrap" gap={2}>
               <Button
                 size="sm"
                 variant={selectedCapability === 'all' ? 'solid' : 'outline'}
@@ -187,40 +210,59 @@ mb="8"
               >
                 Todas ({capabilitiesProgress.length})
               </Button>
-              {activeCapabilities.map(capability => (
-                <Button
-                  key={capability}
-                  size="sm"
-                  variant={selectedCapability === capability ? 'solid' : 'outline'}
-                  colorPalette={selectedCapability === capability ? 'blue' : 'gray'}
-                  onClick={() => setSelectedCapability(capability)}
-                >
-                  {CAPABILITY_NAMES[capability] || capability}
-                </Button>
-              ))}
+              {selectedCapabilities.map((capability) => {
+                const cap = BUSINESS_CAPABILITIES_REGISTRY[capability];
+                const progress = capabilitiesProgress.find(
+                  (p) => p.capability === capability
+                );
+                return (
+                  <Button
+                    key={capability}
+                    size="sm"
+                    variant={
+                      selectedCapability === capability ? 'solid' : 'outline'
+                    }
+                    colorPalette={
+                      selectedCapability === capability ? 'blue' : 'gray'
+                    }
+                    onClick={() => setSelectedCapability(capability)}
+                  >
+                    {cap?.icon} {cap?.name || capability}
+                    {progress && (
+                      <Badge
+                        ml={2}
+                        size="sm"
+                        colorPalette={
+                          progress.percentage === 100 ? 'green' : 'orange'
+                        }
+                      >
+                        {progress.percentage}%
+                      </Badge>
+                    )}
+                  </Button>
+                );
+              })}
             </HStack>
-          </VStack>
-        </Section>
+          </Section>
+        )}
 
-        {/* CAPABILITIES LIST */}
+        {/* ==========================================
+            CAPABILITY CARDS
+            ========================================== */}
         <Section variant="flat">
-          <VStack gap="4" w="full">
-            {filteredProgress.length === 0 ? (
-              <Box p="8" textAlign="center">
-                <Text color="gray.600" _dark={{ color: 'gray.400' }}>
-                  No hay capabilities activas. Activa capabilities desde la configuración del negocio.
-                </Text>
-              </Box>
-            ) : (
-              filteredProgress.map(progress => (
+          {enrichedProgress.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <VStack gap={4} w="full">
+              {enrichedProgress.map((progress) => (
                 <CapabilityCard
                   key={progress.capability}
                   progress={progress}
-                  onNavigate={navigate}mb="8"
+                  onNavigate={navigate}
                 />
-              ))
-            )}
-          </VStack>
+              ))}
+            </VStack>
+          )}
         </Section>
       </ContentLayout>
     </>
@@ -228,76 +270,132 @@ mb="8"
 }
 
 /**
+ * Empty State Component
+ */
+function EmptyState() {
+  return (
+    <Box
+      p={12}
+      textAlign="center"
+      bg="bg.subtle"
+      borderRadius="2xl"
+      border="2px dashed"
+      borderColor="border.default"
+    >
+      <Icon
+        as={ExclamationCircleIcon}
+        boxSize={12}
+        color="fg.muted"
+        mb={4}
+      />
+      <Heading size="md" mb={2}>
+        Sin Capabilities Activas
+      </Heading>
+      <Text color="fg.muted" maxW="md" mx="auto">
+        No hay capabilities configuradas para tu negocio. Ve a la configuración
+        del perfil comercial para activar las funcionalidades que necesitas.
+      </Text>
+    </Box>
+  );
+}
+
+/**
  * Capability Card Component
  */
 interface CapabilityCardProps {
-  progress: CapabilityProgress;
+  progress: CapabilityProgress & { name: string; icon: string };
   onNavigate: (url: string) => void;
 }
 
 function CapabilityCard({ progress, onNavigate }: CapabilityCardProps) {
-  const { capability, total, completed, percentage, missing } = progress;
+  const { capability, total, completed, percentage, missing, name, icon } =
+    progress;
   const isComplete = percentage === 100;
 
   return (
     <Box
       w="full"
-      p="5"
-      bg={isComplete ? 'green.50' : 'white'}
-      borderRadius="lg"
-      border="2px solid"
-      borderColor={isComplete ? 'green.200' : 'gray.200'}
+      bg="white"
+      borderRadius="xl"
+      border="1px solid"
+      borderColor={isComplete ? 'green.200' : 'border.default'}
+      overflow="hidden"
+      transition="all 0.2s"
+      _hover={{
+        boxShadow: 'md',
+        transform: 'translateY(-2px)',
+      }}
       _dark={{
-        bg: isComplete ? 'green.900/20' : 'gray.800',
-        borderColor: isComplete ? 'green.700' : 'gray.700'
+        bg: 'gray.800',
+        borderColor: isComplete ? 'green.700' : 'gray.700',
       }}
     >
-      <VStack align="start" gap="4" w="full">
-        {/* Header */}
-        <HStack justify="space-between" w="full">
-          <VStack align="start" gap="1">
-            <Text fontSize="lg" fontWeight="bold" color="gray.800" _dark={{ color: 'gray.200' }}>
-              {CAPABILITY_NAMES[capability] || capability}
-            </Text>
-            <Text fontSize="sm" color="gray.600" _dark={{ color: 'gray.400' }}>
-              {completed} de {total} configuraciones completadas
-            </Text>
-          </VStack>
+      {/* Header */}
+      <Box
+        p={5}
+        bg={isComplete ? 'green.50' : 'gray.50'}
+        _dark={{
+          bg: isComplete ? 'green.950' : 'gray.900',
+        }}
+      >
+        <HStack justify="space-between" align="center">
+          <HStack gap={3}>
+            <Text fontSize="2xl">{icon}</Text>
+            <VStack align="start" gap={0}>
+              <Heading size="md">{name}</Heading>
+              <Text fontSize="sm" color="fg.muted">
+                {completed} de {total} configuraciones
+              </Text>
+            </VStack>
+          </HStack>
 
-          <Badge
-            colorPalette={isComplete ? 'green' : 'orange'}
-            size="lg"
-          >
-            {isComplete ? '✓ Listo' : `${percentage}%`}
-          </Badge>
+          <HStack gap={3}>
+            <Badge
+              size="lg"
+              colorPalette={isComplete ? 'green' : 'blue'}
+              variant="solid"
+            >
+              {isComplete ? (
+                <HStack gap={1}>
+                  <Icon as={CheckCircleSolid} boxSize={4} />
+                  <Text>Listo</Text>
+                </HStack>
+              ) : (
+                `${percentage}%`
+              )}
+            </Badge>
+          </HStack>
         </HStack>
 
         {/* Progress Bar */}
-        <Box w="full">
-          <Box
-            h="8px"
-            w="full"
-            bg="gray.200"
-            borderRadius="full"
-            overflow="hidden"
-            _dark={{ bg: 'gray.700' }}
+        <Box mt={4}>
+          <Progress.Root
+            value={percentage}
+            colorPalette={isComplete ? 'green' : 'blue'}
+            size="sm"
           >
-            <Box
-              h="full"
-              w={`${percentage}%`}
-              bg={isComplete ? 'green.500' : 'orange.500'}
-              transition="width 0.3s"
-            />
-          </Box>
+            <Progress.Track borderRadius="full">
+              <Progress.Range />
+            </Progress.Track>
+          </Progress.Root>
         </Box>
+      </Box>
 
-        {/* Missing Requirements List */}
-        {!isComplete && missing && missing.length > 0 && (
-          <VStack align="start" gap="2" w="full">
-            <Text fontSize="sm" fontWeight="medium" color="gray.700" _dark={{ color: 'gray.300' }}>
-              Pasos Pendientes:
-            </Text>
-            {missing.map(req => (
+      {/* Requirements List */}
+      {!isComplete && missing && missing.length > 0 && (
+        <Box p={5} pt={4}>
+          <Text
+            fontSize="sm"
+            fontWeight="semibold"
+            color="fg.muted"
+            mb={3}
+            textTransform="uppercase"
+            letterSpacing="wider"
+          >
+            Pasos Pendientes ({missing.length})
+          </Text>
+          <VStack gap={2} w="full">
+            {missing.map((req) => (
               <RequirementItem
                 key={req.id}
                 requirement={req}
@@ -305,8 +403,8 @@ function CapabilityCard({ progress, onNavigate }: CapabilityCardProps) {
               />
             ))}
           </VStack>
-        )}
-      </VStack>
+        </Box>
+      )}
     </Box>
   );
 }
@@ -320,45 +418,63 @@ interface RequirementItemProps {
 }
 
 function RequirementItem({ requirement, onNavigate }: RequirementItemProps) {
+  const hasLink = !!requirement.redirectUrl;
+
   return (
     <HStack
       w="full"
-      p="3"
-      bg="white"
-      borderRadius="md"
+      p={3}
+      bg="bg.subtle"
+      borderRadius="lg"
       border="1px solid"
-      borderColor="gray.200"
-      _dark={{ bg: 'gray.900', borderColor: 'gray.700' }}
+      borderColor="border.default"
       justify="space-between"
-      _hover={{
-        borderColor: 'blue.300',
-        _dark: { borderColor: 'blue.600' }
-      }}
-      cursor="pointer"
-      onClick={() => requirement.redirectUrl && onNavigate(requirement.redirectUrl)}
+      cursor={hasLink ? 'pointer' : 'default'}
+      transition="all 0.2s"
+      _hover={
+        hasLink
+          ? {
+            borderColor: 'blue.300',
+            bg: 'blue.50',
+            _dark: { borderColor: 'blue.600', bg: 'blue.950' },
+          }
+          : undefined
+      }
+      onClick={() => hasLink && onNavigate(requirement.redirectUrl!)}
     >
-      <HStack gap="3">
-        <Text fontSize="xl">{requirement.icon}</Text>
-        <VStack align="start" gap="1">
-          <Text fontSize="sm" fontWeight="medium" color="gray.800" _dark={{ color: 'gray.200' }}>
-            {requirement.name}
-          </Text>
+      <HStack gap={3} flex={1}>
+        <Box
+          p={2}
+          bg="orange.100"
+          borderRadius="md"
+          _dark={{ bg: 'orange.900' }}
+        >
+          <Text fontSize="lg">{requirement.icon}</Text>
+        </Box>
+        <VStack align="start" gap={0} flex={1}>
+          <Text fontWeight="medium">{requirement.name}</Text>
           {requirement.description && (
-            <Text fontSize="xs" color="gray.600" _dark={{ color: 'gray.400' }}>
+            <Text fontSize="sm" color="fg.muted" lineClamp={1}>
               {requirement.description}
-            </Text>
-          )}
-          {requirement.estimatedMinutes && (
-            <Text fontSize="xs" color="gray.500" _dark={{ color: 'gray.500' }}>
-              ~{requirement.estimatedMinutes} minutos
             </Text>
           )}
         </VStack>
       </HStack>
 
-      {requirement.redirectUrl && (
-        <Icon icon={ChevronRightIcon} size="sm" color="gray.500" />
-      )}
+      <HStack gap={2}>
+        {requirement.estimatedMinutes && (
+          <Badge size="sm" colorPalette="gray" variant="subtle">
+            ~{requirement.estimatedMinutes} min
+          </Badge>
+        )}
+        {hasLink && (
+          <Icon
+            as={ChevronRightIcon}
+            boxSize={5}
+            color="fg.subtle"
+          />
+        )}
+      </HStack>
     </HStack>
   );
 }

@@ -65,13 +65,13 @@ export function KitchenDisplaySystem({
 
     // Filter by station
     if (!showAllStations && selectedStation !== 'all') {
-      filtered = filtered.filter(order => 
+      filtered = filtered.filter(order =>
         order.items.some(item => item.station === selectedStation));
     }
-  
+
     // Filter completed orders
     if (!showCompleted) {
-      filtered = filtered.filter(order => 
+      filtered = filtered.filter(order =>
         order.items.some(item => item.status !== KitchenItemStatus.SERVED)
       );
     }
@@ -113,11 +113,11 @@ export function KitchenDisplaySystem({
       order.items.forEach(item => {
         if (stats[item.station]) {
           const stat = stats[item.station];
-          
+
           if (item.status === KitchenItemStatus.PENDING || item.status === KitchenItemStatus.IN_PROGRESS) {
             stat.pendingItems++;
           }
-          
+
           if (item.status !== KitchenItemStatus.SERVED) {
             stat.activeOrders++;
           }
@@ -174,10 +174,10 @@ export function KitchenDisplaySystem({
     const orderTime = new Date(order.order_time);
     const now = new Date();
     const elapsedMinutes = Math.floor((now.getTime() - orderTime.getTime()) / (1000 * 60));
-    
+
     const estimatedTime = new Date(order.estimated_ready_time);
     const remainingMinutes = Math.floor((estimatedTime.getTime() - now.getTime()) / (1000 * 60));
-    
+
     return {
       elapsedMinutes,
       remainingMinutes,
@@ -189,7 +189,7 @@ export function KitchenDisplaySystem({
   // Handle item action
   const handleItemAction = (orderId: string, itemId: string, currentStatus: KitchenItemStatus) => {
     let nextStatus: KitchenItemStatus;
-    
+
     switch (currentStatus) {
       case KitchenItemStatus.PENDING:
         nextStatus = KitchenItemStatus.IN_PROGRESS;
@@ -203,7 +203,7 @@ export function KitchenDisplaySystem({
       default:
         return;
     }
-    
+
     onUpdateItemStatus(orderId, itemId, nextStatus);
   };
 
@@ -292,7 +292,7 @@ export function KitchenDisplaySystem({
                 </Text>
                 <VStack gap="1" align="center">
                   <Text fontSize="xs" color="gray.600">Pending Items</Text>
-                  <Badge 
+                  <Badge
                     colorPalette={stat.pendingItems > 5 ? 'red' : stat.pendingItems > 2 ? 'yellow' : 'green'}
                     size="sm"
                   >
@@ -306,8 +306,8 @@ export function KitchenDisplaySystem({
       )}
 
       {/* Kitchen Orders */}
-      <Grid 
-        templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" }} 
+      <Grid
+        templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" }}
         gap={{ base: "3", md: "4" }}
         role="grid"
         aria-label="Kitchen orders display"
@@ -315,7 +315,7 @@ export function KitchenDisplaySystem({
         {filteredOrders.map((order) => {
           const timing = getOrderTiming(order);
           const priorityColor = getPriorityColor(order.priority);
-          
+
           return (
             <CardWrapper
               key={order.order_id}
@@ -349,12 +349,12 @@ export function KitchenDisplaySystem({
                     <Text fontSize="sm" fontWeight="medium">
                       {timing.elapsedMinutes}m elapsed
                     </Text>
-                    <Text 
-                      fontSize="sm" 
+                    <Text
+                      fontSize="sm"
                       color={timing.isOverdue ? 'red.600' : 'gray.600'}
                     >
-                      {timing.isOverdue ? 
-                        `${Math.abs(timing.remainingMinutes)}m overdue` : 
+                      {timing.isOverdue ?
+                        `${Math.abs(timing.remainingMinutes)}m overdue` :
                         `${timing.remainingMinutes}m remaining`
                       }
                     </Text>
@@ -363,8 +363,8 @@ export function KitchenDisplaySystem({
 
                 {/* Progress Bar */}
                 <Box>
-                  <Progress.Root 
-                    value={timing.progressPercentage} 
+                  <Progress.Root
+                    value={timing.progressPercentage}
                     size="sm"
                     colorPalette={timing.isOverdue ? 'red' : 'blue'}
                   />
@@ -385,7 +385,7 @@ export function KitchenDisplaySystem({
                         </Alert.Description>
                       </Alert.Root>
                     )}
-                    
+
                     {(order.allergy_warnings?.length || 0) > 0 && (
                       <Alert.Root status="warning" size="sm">
                         <Alert.Indicator />
@@ -404,7 +404,7 @@ export function KitchenDisplaySystem({
                     .filter(item => selectedStation === 'all' || item.station === selectedStation)
                     .map((item) => {
                       const statusColor = getItemStatusColor(item.status);
-                      
+
                       return (
                         <CardWrapper key={item.item_id} p="3" variant="outline" size="sm">
                           <VStack gap="2" align="stretch">
@@ -417,7 +417,7 @@ export function KitchenDisplaySystem({
                                   {item.station} • ~{item.estimated_prep_time}m
                                 </Text>
                               </VStack>
-                              
+
                               <Badge colorPalette={statusColor} size="sm">
                                 {item.status?.replace('_', ' ') || 'Unknown'}
                               </Badge>
@@ -425,7 +425,7 @@ export function KitchenDisplaySystem({
 
                             {/* Item Modifications */}
                             {(item.modifications?.length || 0) > 0 && (
-                              <Box p="2" bg="bg.canvas" borderRadius="sm">
+                              <Box p="2" bg="gray.50" borderRadius="sm">
                                 <Text fontSize="xs" fontWeight="medium" mb="1">Modifications:</Text>
                                 {(item.modifications || []).map((mod, idx) => (
                                   <Text key={idx} fontSize="xs" color="gray.600">
@@ -458,8 +458,8 @@ export function KitchenDisplaySystem({
                                 size={{ base: "md", md: "sm" }}
                                 colorPalette={
                                   item.status === KitchenItemStatus.PENDING ? 'blue' :
-                                  item.status === KitchenItemStatus.IN_PROGRESS ? 'green' :
-                                  'purple'
+                                    item.status === KitchenItemStatus.IN_PROGRESS ? 'green' :
+                                      'purple'
                                 }
                                 onClick={() => handleItemAction(order.order_id, item.item_id, item.status)}
                                 variant={item.status === KitchenItemStatus.READY ? 'solid' : 'outline'}
@@ -483,7 +483,7 @@ export function KitchenDisplaySystem({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onPriorityChange(order.order_id, 
+                    onClick={() => onPriorityChange(order.order_id,
                       order.priority === PriorityLevel.RUSH ? PriorityLevel.NORMAL : PriorityLevel.RUSH
                     )}
                     colorPalette={order.priority === PriorityLevel.RUSH ? 'gray' : 'red'}

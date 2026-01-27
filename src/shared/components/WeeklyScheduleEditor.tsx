@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Stack, Button, Input, IconButton, Separator, Tag } from '@chakra-ui/react';
-import { Typography, Icon } from '@/shared/ui';
+import { Box, Stack, Input, Separator, Tag as ChakraTag } from '@chakra-ui/react';
+import { Typography, Icon, Button, IconButton } from '@/shared/ui';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { Schedule, DailyRule, TimeBlock } from '@/types/schedule';
 
@@ -97,19 +97,20 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
 
         <Typography variant="body" fontWeight="medium">Selecciona los días para editar el horario:</Typography>
         <Stack direction="row" gap="2">
-          {dayMap.map((day, index) => (
-            <Button
-              key={day}
-              onClick={() => handleDayClick(day)}
-              isActive={selectedDays.has(day)}
-              size="sm"
-              variant="outline"
-              colorPalette={selectedDays.has(day) ? 'blue' : 'gray'}
-              bg={selectedDays.has(day) ? 'blue.50' : 'white'}
-            >
-              {dayNames[index]}
-            </Button>
-          ))}
+          {dayMap.map((day, index) => {
+            const isSelected = selectedDays.has(day);
+            return (
+              <Button
+                key={day}
+                onClick={() => handleDayClick(day)}
+                size="sm"
+                variant={isSelected ? 'solid' : 'outline'}
+                colorPalette={isSelected ? 'blue' : 'gray'}
+              >
+                {dayNames[index]}
+              </Button>
+            );
+          })}
         </Stack>
 
         <Separator />
@@ -117,7 +118,8 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
         <Box>
           <Stack direction="row" mb="2" justify="space-between">
             <Typography variant="body" fontWeight="medium">Bloques de Horario:</Typography>
-            <Button leftIcon={<Icon icon={PlusIcon} size="sm" />} size="xs" variant="solid" colorPalette="blue" onClick={handleAddTimeBlock} isDisabled={selectedDays.size === 0}>
+            <Button size="xs" variant="solid" colorPalette="blue" onClick={handleAddTimeBlock} disabled={selectedDays.size === 0}>
+              <Icon icon={PlusIcon} size="sm" />
               Añadir Bloque
             </Button>
           </Stack>
@@ -132,7 +134,9 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
               const blocks = getBlocksForDay(day);
               return (
                 <Stack direction="row" key={day} gap="3" align="center">
-                  <Tag colorPalette={blocks.length > 0 ? 'green' : 'gray'} width="90px" justify="center">{day.substring(0, 3)}</Tag>
+                  <ChakraTag.Root colorPalette={blocks.length > 0 ? 'green' : 'gray'} width="90px" justifyContent="center">
+                    <ChakraTag.Label>{day.substring(0, 3)}</ChakraTag.Label>
+                  </ChakraTag.Root>
                   <Stack direction="column" align="stretch" width="100%">
                     {blocks.length > 0 ? blocks.map((block, index) => (
                        <Stack direction="row" key={index} gap="2">
@@ -141,11 +145,12 @@ export function WeeklyScheduleEditor({ schedule, onChange }: WeeklyScheduleEdito
                          <Input type="time" value={block.endTime} onChange={(e) => handleTimeChange(day, index, 'endTime', e.target.value)} bg="white"/>
                          <IconButton
                            aria-label="Remove time block"
-                           icon={<Icon icon={TrashIcon} size="sm" />}
                            size="sm"
                            variant="ghost"
                            onClick={() => handleRemoveTimeBlock(day, index)}
-                         />
+                         >
+                           <Icon icon={TrashIcon} size="sm" />
+                         </IconButton>
                        </Stack>
                     )) : <Typography variant="body" fontSize="sm" color="gray.400">Cerrado</Typography>}
                   </Stack>

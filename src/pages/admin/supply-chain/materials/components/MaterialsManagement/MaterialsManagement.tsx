@@ -7,6 +7,7 @@ import { HookPoint } from '@/lib/modules';
 import { useCallback, memo } from 'react';
 
 interface MaterialsManagementProps {
+  items: any[]; // ✅ Propagate items (typing as any[] temporarily to avoid deep imports, or import MaterialItem)
   activeTab: string;
   onTabChange: (tab: string) => void;
   onStockUpdate: (itemId: string, newStock: number) => Promise<void>;
@@ -17,6 +18,7 @@ interface MaterialsManagementProps {
 
 // ✅ PERFORMANCE: Memoize to prevent unnecessary re-renders
 export const MaterialsManagement = memo(function MaterialsManagement({
+  items, // ✅ Received from page
   activeTab,
   onTabChange,
   onStockUpdate,
@@ -27,7 +29,6 @@ export const MaterialsManagement = memo(function MaterialsManagement({
   // ✅ PERFORMANCE: Stabilize onValueChange callback to prevent TabsContext thrashing
   const handleTabChange = useCallback((details: { value: string }) => {
     onTabChange(details.value);
-MaterialsManagement.displayName = 'MaterialsManagement';
   }, [onTabChange]);
 
   return (
@@ -39,18 +40,19 @@ MaterialsManagement.displayName = 'MaterialsManagement';
       size="md"
       lazyMount
       unmountOnExit={false}
+      data-testid="materials-management-tabs"
     >
       <Tabs.List gap="sm">
-        <Tabs.Trigger value="inventory">
+        <Tabs.Trigger value="inventory" data-testid="tab-inventory">
           Inventario
         </Tabs.Trigger>
-        <Tabs.Trigger value="analytics">
+        <Tabs.Trigger value="analytics" data-testid="abc-analysis-tab">
           Análisis ABC
         </Tabs.Trigger>
-        <Tabs.Trigger value="procurement">
+        <Tabs.Trigger value="procurement" data-testid="tab-procurement">
           Compras
         </Tabs.Trigger>
-        <Tabs.Trigger value="transfers">
+        <Tabs.Trigger value="transfers" data-testid="tab-transfers">
           Transferencias 🏢
         </Tabs.Trigger>
 
@@ -66,6 +68,7 @@ MaterialsManagement.displayName = 'MaterialsManagement';
 
       <Tabs.Content value="inventory" padding="md">
         <InventoryTab
+          items={items} // ✅ Pass items
           onStockUpdate={onStockUpdate}
           onBulkAction={onBulkAction}
           onAddMaterial={onAddMaterial}
