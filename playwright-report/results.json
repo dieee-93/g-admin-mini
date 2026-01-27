@@ -214,38 +214,33 @@
                           "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 23521,
+                          "duration": 25752,
                           "error": {
-                            "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Nuevo Material' }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"chakra-button css-1kyre1s\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n",
-                            "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Nuevo Material' }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"chakra-button css-1kyre1s\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:38:20",
+                            "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-part=\"backdrop\"]') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-part=\"backdrop\"]') to be visible\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:41:18",
                             "location": {
                               "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                              "column": 20,
-                              "line": 38
+                              "column": 18,
+                              "line": 41
                             },
-                            "snippet": "\u001b[0m \u001b[90m 36 |\u001b[39m       \u001b[36mconst\u001b[39m button \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Nuevo Material'\u001b[39m })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m button\u001b[33m.\u001b[39mwaitFor({ state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 38 |\u001b[39m       \u001b[36mawait\u001b[39m button\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                    \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 39 |\u001b[39m       \n \u001b[90m 40 |\u001b[39m       \u001b[90m// Esperar a que el backdrop del modal aparezca (Chakra UI v3 Dialog)\u001b[39m\n \u001b[90m 41 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-part=\"backdrop\"]'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                            "snippet": "\u001b[0m \u001b[90m 39 |\u001b[39m       \n \u001b[90m 40 |\u001b[39m       \u001b[90m// Esperar a que el backdrop del modal aparezca (Chakra UI v3 Dialog)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 41 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-part=\"backdrop\"]'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 42 |\u001b[39m       \n \u001b[90m 43 |\u001b[39m       \u001b[90m// Esperar a que termine de cargar - esperar que el spinner desaparezca\u001b[39m\n \u001b[90m 44 |\u001b[39m       \u001b[90m// Chakra UI usa role=\"status\" para spinners\u001b[39m\u001b[0m"
                           },
                           "errors": [
                             {
                               "location": {
                                 "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                                "column": 20,
-                                "line": 38
+                                "column": 18,
+                                "line": 41
                               },
-                              "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Nuevo Material' }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"chakra-button css-1kyre1s\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\n\n\u001b[0m \u001b[90m 36 |\u001b[39m       \u001b[36mconst\u001b[39m button \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Nuevo Material'\u001b[39m })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m button\u001b[33m.\u001b[39mwaitFor({ state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 38 |\u001b[39m       \u001b[36mawait\u001b[39m button\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                    \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 39 |\u001b[39m       \n \u001b[90m 40 |\u001b[39m       \u001b[90m// Esperar a que el backdrop del modal aparezca (Chakra UI v3 Dialog)\u001b[39m\n \u001b[90m 41 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-part=\"backdrop\"]'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:38:20\u001b[22m"
+                              "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-part=\"backdrop\"]') to be visible\u001b[22m\n\n\n\u001b[0m \u001b[90m 39 |\u001b[39m       \n \u001b[90m 40 |\u001b[39m       \u001b[90m// Esperar a que el backdrop del modal aparezca (Chakra UI v3 Dialog)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 41 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-part=\"backdrop\"]'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 42 |\u001b[39m       \n \u001b[90m 43 |\u001b[39m       \u001b[90m// Esperar a que termine de cargar - esperar que el spinner desaparezca\u001b[39m\n \u001b[90m 44 |\u001b[39m       \u001b[90m// Chakra UI usa role=\"status\" para spinners\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:41:18\u001b[22m"
                             }
                           ],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-01-26T20:54:18.046Z",
+                          "startTime": "2026-01-27T14:26:04.915Z",
                           "annotations": [],
                           "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\materials-materials-crud-c-e4456-SURABLE-Material-kg-litros--authenticated\\test-failed-1.png"
-                            },
                             {
                               "name": "error-context",
                               "contentType": "text/markdown",
@@ -254,8 +249,8 @@
                           ],
                           "errorLocation": {
                             "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                            "column": 20,
-                            "line": 38
+                            "column": 18,
+                            "line": 41
                           }
                         }
                       ],
@@ -276,8 +271,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-01-26T20:54:16.424Z",
-    "duration": 27053.922,
+    "startTime": "2026-01-27T14:26:03.020Z",
+    "duration": 28265.482,
     "expected": 0,
     "skipped": 0,
     "unexpected": 1,

@@ -59,7 +59,6 @@ import { assetsManifest } from './assets/manifest';
 // OPERATIONS DOMAIN - Daily operations
 // ============================================
 import { salesManifest } from './sales/manifest';
-import { fulfillmentManifest } from './fulfillment/manifest';
 import { fulfillmentOnsiteManifest } from './fulfillment/onsite/manifest';
 import { fulfillmentPickupManifest } from './fulfillment/pickup/manifest';
 import { fulfillmentDeliveryManifest } from './fulfillment/delivery/manifest';
@@ -174,7 +173,6 @@ export const ALL_MODULE_MANIFESTS = [
   // TIER 4: Second-level dependencies
   // ============================================
 
-  fulfillmentManifest,        // ✅ NEW: Unified fulfillment system
   fulfillmentOnsiteManifest,  // ✅ NEW: Onsite service (from floor)
   fulfillmentPickupManifest,  // ✅ NEW: Pickup orders sub-module
   fulfillmentDeliveryManifest, // ✅ NEW: Delivery orders sub-module
@@ -231,7 +229,6 @@ export {
 
   // Operations domain
   salesManifest,
-  fulfillmentManifest,
   fulfillmentOnsiteManifest,
   fulfillmentPickupManifest,
   fulfillmentDeliveryManifest,

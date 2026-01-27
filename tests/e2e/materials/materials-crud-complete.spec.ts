@@ -32,10 +32,32 @@ test.describe('Materials CRUD - Complete Test Suite', () => {
   test.describe('Create Materials - Los 3 Tipos', () => {
     
     test('1. Crear MEASURABLE Material (kg, litros)', async ({ page }) => {
-      // Click en botón "Nuevo Material"
+      // Click en botón "Nuevo Material" - force:true para bypass Chakra UI overlays
       const button = page.getByRole('button', { name: 'Nuevo Material' }).first();
       await button.waitFor({ state: 'visible' });
-      await button.click();
+      
+      // DEBUG: Ver estado antes del click
+      console.log('🔍 Antes del click...');
+      await page.screenshot({ path: 'debug-before-click.png' });
+      
+      await button.click({ force: true });
+      
+      // DEBUG: Ver estado después del click
+      console.log('🔍 Después del click, esperando 2 segundos...');
+      await page.waitForTimeout(2000);
+      await page.screenshot({ path: 'debug-after-click.png' });
+      
+      // DEBUG: Ver qué elementos con data-part existen
+      const dataPartElements = await page.evaluate(() => {
+        const elements = Array.from(document.querySelectorAll('[data-part]'));
+        return elements.map(el => ({
+          dataPart: el.getAttribute('data-part'),
+          visible: el.offsetParent !== null,
+          display: window.getComputedStyle(el).display,
+          opacity: window.getComputedStyle(el).opacity
+        }));
+      });
+      console.log('🔍 Elementos con data-part:', JSON.stringify(dataPartElements, null, 2));
       
       // Esperar a que el backdrop del modal aparezca (Chakra UI v3 Dialog)
       await page.waitForSelector('[data-part="backdrop"]', { state: 'visible', timeout: 10000 });
