@@ -29,7 +29,7 @@ export const LazyCustomersPage = React.lazy(() => import('@/pages/admin/core/crm
 // ============================================
 export const LazySalesPage = React.lazy(() => import('@/pages/admin/operations/sales/page'));
 export const LazyFulfillmentOnsitePage = React.lazy(() => import('@/pages/admin/operations/fulfillment/onsite/page'));
-export const LazyProductionPage = React.lazy(() => import('@/pages/admin/operations/kitchen/page'));
+export const LazyProductionPage = React.lazy(() => import('@/pages/admin/operations/production/page'));
 export const LazyDeliveryPage = React.lazy(() => import('@/pages/admin/operations/delivery/page'));
 export const LazyMembershipsPage = React.lazy(() => import('@/pages/admin/operations/memberships/page'));
 export const LazyRentalsPage = React.lazy(() => import('@/pages/admin/operations/rentals/page'));
