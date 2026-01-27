@@ -15,7 +15,7 @@ const mainPages = [
   { path: '/admin/customers', name: 'CRM/Customers' },
   { path: '/admin/operations/sales', name: 'Sales' },
   { path: '/admin/operations/floor', name: 'Floor Management' },
-  { path: '/admin/operations/kitchen', name: 'Kitchen' },
+  { path: '/admin/operations/production', name: 'Production' },
   { path: '/admin/operations/delivery', name: 'Delivery' },
   { path: '/admin/supply-chain/materials', name: 'Materials (StockLab)' },
   { path: '/admin/supply-chain/products', name: 'Products' },
