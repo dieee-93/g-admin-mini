@@ -60,7 +60,9 @@ export const productionManifest: ModuleManifest = {
   hooks: {
     provide: [
       'calendar.events',        // Render production schedule
-      'materials.row.actions',  // "Use in Kitchen" button in materials table
+      'materials.row.actions',  // "Check Recipe Availability" button in materials table
+      'scheduling.toolbar.actions', // "Kitchen Capacity" button in scheduling toolbar
+      'sales.order.actions',    // "Send to Kitchen" button in sales orders
       'products.row.actions',   // "Produce Batch" button in products table
       'products.detail.sections' // "Production Info" section in product detail
     ],
@@ -74,33 +76,69 @@ export const productionManifest: ModuleManifest = {
 
   // Setup function - register hooks
   setup: (registry: ModuleRegistry) => {
-    // Hook 1: Calendar Events - Production schedule overlay
+    // ============================================
+    // HOOK 1: Materials Row Actions - "Check Recipe Availability"
+    // Migrated from kitchen/manifest.tsx (lines 178-195)
+    // ============================================
+    registry.addAction(
+      'materials.row.actions',
+      () => {
+        return {
+          id: 'check-recipe-availability',
+          label: 'Check Recipe Availability',
+          icon: 'ChefHat',
+          priority: 7,
+          onClick: (materialId: string) => {
+            logger.debug('App', `Checking recipe availability for: ${materialId}`);
+            // Would check which recipes use this ingredient
+            // and if there's enough stock to prepare them
+          },
+        };
+      },
+      'production',
+      7 // Medium priority
+    );
+
+    logger.debug('App', 'Extended materials.row.actions with production actions');
+
+    // ============================================
+    // HOOK 2: Calendar Events - Production Blocks
+    // Migrated from kitchen/manifest.tsx (lines 253-295)
+    // ============================================
     registry.addAction(
       'calendar.events',
       () => {
-        // Mock production schedule - real version would query database
-        const productionOrders = [
-          { id: '1', recipe: 'Classic Burger', quantity: 50, scheduled: '09:00' },
-          { id: '2', recipe: 'Caesar Salad', quantity: 30, scheduled: '10:30' }
+        // Mock production blocks - would query real production schedule
+        const productionBlocks = [
+          { time: '08:00-10:00', recipe: 'Pan dulce', batch: 50 },
+          { time: '10:00-12:00', recipe: 'Empanadas', batch: 200 }
         ];
 
         return (
-          <Stack direction="column" gap="2" key="production-calendar-events">
+          <Stack
+            key="kitchen-production-blocks"
+            direction="column"
+            gap="2"
+            p="3"
+            bg="purple.50"
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="purple.200"
+          >
             <Stack direction="row" align="center" gap="2">
-              <BeakerIcon className="w-5 h-5 text-purple-500" />
-              <Typography variant="heading" size="sm" fontWeight="semibold">
-                Production Schedule ({productionOrders.length})
-              </Typography>
+              <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#6B21A8' }}>
+                🍳 Producción Programada
+              </span>
             </Stack>
             <Stack direction="column" gap="1">
-              {productionOrders.map((order, idx) => (
+              {productionBlocks.map((block, idx) => (
                 <Stack key={idx} direction="row" align="center" gap="2">
-                  <Badge variant="solid" colorPalette="purple">
-                    {order.scheduled}
+                  <Badge size="sm" colorPalette="purple">
+                    {block.time}
                   </Badge>
-                  <Typography variant="body" size="xs" color="text.muted">
-                    {order.recipe} ({order.quantity} units)
-                  </Typography>
+                  <span style={{ fontSize: '0.75rem', color: '#7C3AED' }}>
+                    {block.recipe} (×{block.batch})
+                  </span>
                 </Stack>
               ))}
             </Stack>
@@ -108,26 +146,51 @@ export const productionManifest: ModuleManifest = {
         );
       },
       'production',
-      70 // Medium priority - renders after staff and scheduling
+      75 // Medium-high priority
     );
 
-    // Hook 2: Materials Row Actions - "Use in Kitchen" button
+    logger.debug('App', 'Registered calendar.events for production schedule');
+
+    // ============================================
+    // HOOK 3: Scheduling Toolbar - Kitchen Capacity
+    // Migrated from kitchen/manifest.tsx (lines 307-340)
+    // ============================================
     registry.addAction(
-      'materials.row.actions',
-      () => {
-        return {
-          id: 'use-in-production',
-          label: 'Use in Production',
-          icon: 'BeakerIcon',
-          onClick: (materialId: string) => {
-            logger.info('Production', 'Using material in production', { materialId });
-            // Trigger production modal or action
-          }
-        };
+      'scheduling.toolbar.actions',
+      (data) => {
+        return (
+          <Button
+            key="kitchen-capacity-btn"
+            size="sm"
+            variant="outline"
+            colorPalette="purple"
+            onClick={() => {
+              logger.info('App', 'Production Block clicked from scheduling', {
+                referenceDate: data?.referenceDate
+              });
+
+              // Call the callback provided by scheduling page
+              data?.onCreateProductionBlock?.();
+
+              // Show notification
+              toaster.create({
+                title: '🍳 Bloque de Producción',
+                description: 'Modal de producción pendiente de implementación',
+                type: 'info',
+                duration: 3000
+              });
+            }}
+          >
+            <Icon icon={BeakerIcon} size="xs" />
+            Kitchen
+          </Button>
+        );
       },
       'production',
-      80 // High priority action
+      75 // Medium-high priority
     );
+
+    logger.debug('App', 'Registered scheduling.toolbar.actions for kitchen capacity');
 
     // Hook 3: Sales Order Actions - "Send to Kitchen" button
     registry.addAction(
@@ -287,8 +350,8 @@ export const productionManifest: ModuleManifest = {
     logger.debug('App', 'Registered products.detail.sections injection');
 
     logger.info('Production', '✅ Production module hooks registered', {
-      hooksProvided: 5,
-      hooksConsumed: 4
+      hooksProvided: 6, // materials.row.actions, calendar.events, scheduling.toolbar.actions, sales.order.actions, products.row.actions, products.detail.sections
+      hooksConsumed: 4  // sales.order_placed, materials.stock_updated, products.product_updated, products.price_changed
     });
   },
 
