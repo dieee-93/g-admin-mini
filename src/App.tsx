@@ -483,15 +483,20 @@ function App() {
                                     </RoleGuard>
                                   } 
                                 />
-                                <Route 
-                                  path="operations/kitchen" 
+                                {/* Redirect legacy kitchen route to production */}
+                                <Route
+                                  path="operations/kitchen"
+                                  element={<Navigate to="/admin/operations/production" replace />}
+                                />
+                                <Route
+                                  path="operations/production"
                                   element={
                                     <RoleGuard requiredModule="operations">
-                                      <LazyWithErrorBoundary moduleName="Kitchen Display">
+                                      <LazyWithErrorBoundary moduleName="Production">
                                         <LazyProductionPage />
                                       </LazyWithErrorBoundary>
                                     </RoleGuard>
-                                  } 
+                                  }
                                 />
                                 <Route 
                                   path="operations/fulfillment/delivery" 

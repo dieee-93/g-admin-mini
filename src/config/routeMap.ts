@@ -16,7 +16,7 @@ export const domainRouteMap = {
   'sales': '/admin/operations/sales',
   'operations': '/admin/operations',
   'customers': '/admin/customers',
-  'kitchen': '/admin/operations/kitchen',
+  'production': '/admin/operations/production',
   'delivery': '/admin/operations/delivery',
   'memberships': '/admin/operations/memberships',
   'rentals': '/admin/operations/rentals',
@@ -68,7 +68,7 @@ export const routeToFileMap = {
   // Operations
   '/admin/operations/sales': 'pages/admin/operations/sales/page',
   '/admin/operations/fulfillment/onsite': 'pages/admin/operations/fulfillment/onsite/page',
-  '/admin/operations/kitchen': 'pages/admin/operations/kitchen/page',
+  '/admin/operations/production': 'pages/admin/operations/production/page',
   '/admin/operations/delivery': 'pages/admin/operations/delivery/page',
   '/admin/operations/fulfillment/delivery': 'pages/admin/operations/fulfillment/delivery/page',
   '/admin/operations/memberships/*': 'pages/admin/operations/memberships/page',
@@ -162,7 +162,7 @@ export const routeToComponentMap = {
   // Operations
   '/admin/operations/sales': 'LazySalesPage',
   '/admin/operations/fulfillment/onsite': 'LazyFulfillmentOnsitePage',
-  '/admin/operations/kitchen': 'LazyProductionPage',
+  '/admin/operations/production': 'LazyProductionPage',
   '/admin/operations/delivery': 'LazyDeliveryPage',
   '/admin/operations/fulfillment/delivery': 'LazyDeliveryPage',
   '/admin/operations/memberships/*': 'LazyMembershipsPage',
