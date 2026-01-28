@@ -158,10 +158,9 @@ export const OPTIONAL_MODULES: Readonly<Record<string, FeatureId>> = {
 
   'finance-billing': 'finance_recurring_invoicing',
   'finance-fiscal': 'finance_tax_compliance',
-  'finance-integrations': 'finance_payment_gateway',
+  'payment-gateways': 'finance_payment_gateway',
   'finance-corporate': 'finance_corporate_accounts',
-  'cash': 'finance_cash_flow_management',
-  'cash-management': 'finance_cash_session_management',
+  'accounting': 'finance_cash_session_management',
 
   // ============================================
   // ADVANCED BUSINESS

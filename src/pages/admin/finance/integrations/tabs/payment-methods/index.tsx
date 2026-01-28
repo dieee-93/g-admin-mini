@@ -32,7 +32,7 @@ import {
   BanknotesIcon,
   BuildingLibraryIcon,
 } from '@heroicons/react/24/outline';
-import { usePaymentMethods, useUpdatePaymentMethod, useDeletePaymentMethod } from '@/modules/finance-integrations/hooks/usePayments';
+import { usePaymentMethods, useUpdatePaymentMethod, useDeletePaymentMethod } from '@/modules/payment-gateways/hooks/usePayments';
 import { PaymentMethodFormModal } from './components/PaymentMethodFormModal';
 import { logger } from '@/lib/logging';
 

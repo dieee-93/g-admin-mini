@@ -56,7 +56,7 @@ export const handleCashSessionClosed = createShiftAwareHandler(
         type: 'cash',
         severity: Math.abs(discrepancy) > 50 ? 'error' : 'warning',
         message: `Diferencia de caja: $${discrepancy.toFixed(2)}`,
-        moduleId: 'cash-management',
+        moduleId: 'accounting',
         actionable: true,
         actionLabel: 'Ver Sesión',
       });

@@ -158,12 +158,12 @@ export const LazyFiscalPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Cash Management Page (pages/admin/finance/cash/page.tsx)
+// Lazy-loaded Accounting Page (pages/admin/finance/cash/page.tsx)
 export const LazyCashPage = createLazyComponent(
   () => import('../../pages/admin/finance/cash/page'),
-  'cash-management',
+  'accounting',
   {
-    chunkName: 'cash-module',
+    chunkName: 'accounting-module',
     preload: false,
     priority: 'high', // Critical for cash flow and accounting
     cacheStrategy: 'both'
@@ -485,12 +485,12 @@ export const LazyBillingPage = createLazyComponent(
   }
 );
 
-// Lazy-loaded Finance Integrations Page (pages/admin/finance/integrations/page.tsx)
+// Lazy-loaded Payment Gateways Page (pages/admin/finance/integrations/page.tsx)
 export const LazyIntegrationsPage = createLazyComponent(
   () => import('../../pages/admin/finance/integrations/page'),
-  'finance-integrations',
+  'payment-gateways',
   {
-    chunkName: 'integrations-module',
+    chunkName: 'payment-gateways-module',
     preload: false,
     priority: 'medium', // Important for Argentina payment ecosystem
     cacheStrategy: 'memory'

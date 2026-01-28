@@ -1200,13 +1200,13 @@ export const MODULE_FEATURE_MAP: Record<string, {
     description: 'Finance B2B - gestión de cuentas corporativas y crédito'
   },
 
-  'finance-integrations': {
+  'payment-gateways': {
     alwaysActive: true,
     enhancedBy: ['operations_shipping_integration'],
     description: 'Integraciones de pago - MercadoPago, MODO, pasarelas'
   },
 
-  'cash-management': {
+  'accounting': {
     alwaysActive: true,
     description: 'Gestión de caja - sesiones, movimientos, conciliación (core financial operation)'
   },
