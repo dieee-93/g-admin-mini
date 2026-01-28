@@ -1,6 +1,6 @@
 /**
- * Cash Management Module Exports
+ * Accounting Module Exports
  */
 
-export { cashManagementManifest } from './manifest';
+export { accountingManifest } from './manifest';
 export { default } from './manifest';

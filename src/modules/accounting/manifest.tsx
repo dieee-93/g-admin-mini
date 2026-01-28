@@ -170,4 +170,4 @@ export const accountingManifest: ModuleManifest = {
   },
 };
 
-export default cashManagementManifest;
+export default accountingManifest;
