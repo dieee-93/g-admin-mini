@@ -1,3 +1,5 @@
 export { billingManifest } from './manifest';
 
-// Component exports will be added as we migrate
+// Components (from finance-billing)
+export { BillingWidget } from './components/BillingWidget';
+export { CustomerBillingSection } from './components/CustomerBillingSection';
