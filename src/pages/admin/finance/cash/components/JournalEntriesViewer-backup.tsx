@@ -21,9 +21,9 @@ import {
   ChevronDownIcon,
 } from '@heroicons/react/24/outline';
 import { formatCurrency } from '@/lib/decimal';
-import { fetchJournalEntries, getJournalEntry } from '@/modules/cash/services';
+import { fetchJournalEntries, getJournalEntry } from '@/modules/accounting/services';
 import { logger } from '@/lib/logging';
-import type { JournalEntryRow, JournalEntryWithLines } from '@/modules/cash/types';
+import type { JournalEntryRow, JournalEntryWithLines } from '@/modules/accounting/types';
 
 interface JournalEntriesViewerProps {
   cashSessionId?: string;

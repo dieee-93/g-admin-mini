@@ -20,7 +20,7 @@ import {
   recordCashDrop,
   fetchMoneyLocationsWithAccount,
   getAllActiveSessions,
-} from '@/modules/cash/services';
+} from '@/modules/accounting/services';
 import { logger } from '@/lib/logging';
 import { notify } from '@/lib/notifications';
 import type {
@@ -28,7 +28,7 @@ import type {
   CashSessionRow,
   OpenCashSessionInput,
   CloseCashSessionInput,
-} from '@/modules/cash/types';
+} from '@/modules/accounting/types';
 
 export interface CashPageState {
   activeTab: 'sessions' | 'locations' | 'accounts' | 'history';

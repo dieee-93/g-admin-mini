@@ -16,7 +16,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { logger } from '@/lib/logging';
 import { DecimalUtils } from '@/lib/decimal';
-import type { CashSessionRow } from '@/modules/cash/types';
+import type { CashSessionRow } from '@/modules/accounting/types';
 import type {
   OperationalShift,
   ShiftUIState,

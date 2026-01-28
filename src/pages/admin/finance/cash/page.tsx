@@ -58,13 +58,13 @@ import {
   generateCashFlowStatement,
   generateProfitAndLoss,
   fetchSessionHistory,
-} from '@/modules/cash/services/reportsService';
+} from '@/modules/accounting/services/reportsService';
 import type {
   BalanceSheet,
   CashFlowStatement,
   ProfitAndLoss,
   SessionHistoryReport,
-} from '@/modules/cash/types/reports';
+} from '@/modules/accounting/types/reports';
 
 // Event handlers (module-level to prevent recreation)
 const eventHandlers = {

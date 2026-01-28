@@ -17,7 +17,7 @@ import * as shiftService from '../services/shiftService';
 import { getAllActiveSessions } from '@/modules/accounting/services/cashSessionService';
 import eventBus from '@/lib/events/EventBus';
 import { logger } from '@/lib/logging/Logger';
-import type { CashSessionRow } from '@/modules/cash/types';
+import type { CashSessionRow } from '@/modules/accounting/types';
 import type {
   OperationalShift,
   OpenShiftData,

@@ -6,7 +6,7 @@
 
 import { Box, Heading, Stack, Table, Text } from '@chakra-ui/react';
 import { formatCurrency } from '@/lib/decimal';
-import type { ProfitAndLoss } from '@/modules/cash/types/reports';
+import type { ProfitAndLoss } from '@/modules/accounting/types/reports';
 
 interface ProfitAndLossReportProps {
   data: ProfitAndLoss | null;

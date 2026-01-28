@@ -1,6 +1,6 @@
-import { useMoneyLocationsWithAccount } from '@/modules/cash/hooks/useMoneyLocations';
-import { useCashSessionHistory } from '@/modules/cash/hooks/useCashSessions';
-import { useSelectedLocationId } from '@/modules/cash/store/cashStore';
+import { useMoneyLocationsWithAccount } from '@/modules/accounting/hooks/useMoneyLocations';
+import { useCashSessionHistory } from '@/modules/accounting/hooks/useCashSessions';
+import { useSelectedLocationId } from '@/modules/accounting/store/cashStore';
 
 export function useCashData() {
   const selectedLocationId = useSelectedLocationId();

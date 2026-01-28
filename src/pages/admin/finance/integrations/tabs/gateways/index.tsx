@@ -32,7 +32,7 @@ import {
   BoltIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
-import { usePaymentGateways, useUpdatePaymentGateway, useDeletePaymentGateway } from '@/modules/payment-gateways/hooks/usePayments';
+import { usePaymentGateways, useUpdatePaymentGateway, useDeletePaymentGateway } from '@/modules/finance-integrations/hooks/usePayments';
 import { PaymentGatewayFormModal } from './components/PaymentGatewayFormModal';
 import { logger } from '@/lib/logging';
 

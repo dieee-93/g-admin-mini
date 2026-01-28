@@ -48,7 +48,7 @@ export {
   taxService,
   TAX_RATES,
   DEFAULT_TAX_CONFIG
-} from '@/modules/cash/services/taxCalculationService';
+} from '@/modules/accounting/services/taxCalculationService';
 
 // Types - Now in module
 export type {

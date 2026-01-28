@@ -5,7 +5,7 @@
 
 import { Box, Heading, Stack, Table, Text, Badge } from '@chakra-ui/react';
 import { formatCurrency } from '@/lib/decimal';
-import type { SessionHistoryReport, SessionHistoryRow } from '@/modules/cash/types/reports';
+import type { SessionHistoryReport, SessionHistoryRow } from '@/modules/accounting/types/reports';
 import { Button } from '@/shared/ui';
 
 interface SessionHistoryTableProps {

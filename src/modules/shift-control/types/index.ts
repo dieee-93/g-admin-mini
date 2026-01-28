@@ -7,7 +7,7 @@
  */
 
 import type { FeatureId } from '@/config/types';
-import type { CashSessionRow } from '@/modules/cash/types';
+import type { CashSessionRow } from '@/modules/accounting/types';
 
 // ============================================
 // CORE TYPES

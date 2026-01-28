@@ -44,7 +44,7 @@ interface SaleCompletedEvent {
 }
 
 // 🏗️ CROSS-MODULE: Import tax service from Cash module (proper modular architecture)
-import { taxService } from '@/modules/cash/services';
+import { taxService } from '@/modules/accounting/services';
 import { errorHandler, createNetworkError, createBusinessError } from '@/lib/error-handling';
 import { DecimalUtils } from '@/lib/decimal';
 

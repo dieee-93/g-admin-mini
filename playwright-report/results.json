@@ -200,7 +200,7 @@
               "specs": [
                 {
                   "title": "1. Crear MEASURABLE Material (kg, litros)",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -213,53 +213,18 @@
                         {
                           "workerIndex": 0,
                           "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 14034,
-                          "error": {
-                            "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('materials-toolbar-new-button')\u001b[22m\n",
-                            "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('materials-toolbar-new-button')\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:77:62",
-                            "location": {
-                              "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                              "column": 62,
-                              "line": 77
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 75 |\u001b[39m       \n \u001b[90m 76 |\u001b[39m       \u001b[90m// ========== Open modal (ONLY data-testid) ==========\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 77 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'materials-toolbar-new-button'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 78 |\u001b[39m       \n \u001b[90m 79 |\u001b[39m       \u001b[90m// Wait for lazy loading\u001b[39m\n \u001b[90m 80 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                                "column": 62,
-                                "line": 77
-                              },
-                              "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('materials-toolbar-new-button')\u001b[22m\n\n\n\u001b[0m \u001b[90m 75 |\u001b[39m       \n \u001b[90m 76 |\u001b[39m       \u001b[90m// ========== Open modal (ONLY data-testid) ==========\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 77 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'materials-toolbar-new-button'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 78 |\u001b[39m       \n \u001b[90m 79 |\u001b[39m       \u001b[90m// Wait for lazy loading\u001b[39m\n \u001b[90m 80 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:77:62\u001b[22m"
-                            }
-                          ],
+                          "status": "interrupted",
+                          "duration": 12,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-01-28T02:44:20.587Z",
+                          "startTime": "2026-01-28T04:14:25.966Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\materials-materials-crud-c-e4456-SURABLE-Material-kg-litros--authenticated\\test-failed-1.png"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\materials-materials-crud-c-e4456-SURABLE-Material-kg-litros--authenticated\\error-context.md"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                            "column": 62,
-                            "line": 77
-                          }
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "skipped"
                     }
                   ],
                   "id": "49c27bb20a52ce2852e8-7664bd91d2ec120d3b79",
@@ -276,11 +241,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-01-28T02:44:18.374Z",
-    "duration": 17033.027,
+    "startTime": "2026-01-28T04:14:24.392Z",
+    "duration": 9278.346999999998,
     "expected": 0,
-    "skipped": 0,
-    "unexpected": 1,
+    "skipped": 1,
+    "unexpected": 0,
     "flaky": 0
   }
 }

@@ -5,7 +5,7 @@
 
 import { useState, useCallback } from 'react';
 import { Box, Button, Stack, Text, Input } from '@chakra-ui/react';
-import type { ReportPeriod } from '@/modules/cash/types/reports';
+import type { ReportPeriod } from '@/modules/accounting/types/reports';
 
 interface ReportFiltersProps {
   onGenerateReport: (filters: {

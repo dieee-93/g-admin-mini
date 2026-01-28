@@ -6,7 +6,7 @@
 
 import { Box, Heading, Stack, Table, Text } from '@chakra-ui/react';
 import { formatCurrency } from '@/lib/decimal';
-import type { BalanceSheet } from '@/modules/cash/types/reports';
+import type { BalanceSheet } from '@/modules/accounting/types/reports';
 
 interface BalanceSheetReportProps {
   data: BalanceSheet | null;

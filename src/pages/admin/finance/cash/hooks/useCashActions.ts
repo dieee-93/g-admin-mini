@@ -1,9 +1,9 @@
-import { useCashUIActions } from '@/modules/cash/store/cashStore';
+import { useCashUIActions } from '@/modules/accounting/store/cashStore';
 import { 
   useOpenCashSession, 
   useCloseCashSession 
-} from '@/modules/cash/hooks/useCashSessions';
-import type { OpenCashSessionInput, CloseCashSessionInput } from '@/modules/cash/types';
+} from '@/modules/accounting/hooks/useCashSessions';
+import type { OpenCashSessionInput, CloseCashSessionInput } from '@/modules/accounting/types';
 
 export function useCashActions() {
   const uiActions = useCashUIActions();

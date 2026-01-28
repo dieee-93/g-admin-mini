@@ -17,8 +17,8 @@ import {
   generateCashFlowStatement,
   generateProfitAndLoss,
   fetchSessionHistory,
-} from '@/modules/cash/services/reportsService';
-import { createJournalEntry } from '@/modules/cash/services/journalService';
+} from '@/modules/accounting/services/reportsService';
+import { createJournalEntry } from '@/modules/accounting/services/journalService';
 
 describe('Cash Reports', () => {
   // Helper: Get test user ID
