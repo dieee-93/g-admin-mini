@@ -381,7 +381,7 @@ export const suppliersManifest: ModuleManifest = {
       route: '/admin/supply-chain/suppliers',
       icon: TruckIcon,
       color: 'blue',
-      domain: 'supply-chain',
+      domain: 'inventory',
       isExpandable: false
     }
   }

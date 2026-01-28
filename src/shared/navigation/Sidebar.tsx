@@ -20,7 +20,7 @@ import { logger } from '@/lib/logging';
 // Domain labels for navigation grouping
 const DOMAIN_LABELS: Record<string, string> = {
   'core': 'Core',
-  'supply-chain': 'Supply Chain',
+  'inventory': 'Inventory',
   'operations': 'Operations',
   'finance': 'Finance',
   'resources': 'Resources',
@@ -73,7 +73,7 @@ export function Sidebar() {
   const modulesWithStateByDomain = useMemo(() => {
     const grouped: Record<string, typeof modulesWithState> = {
       core: [],
-      'supply-chain': [],
+      'inventory': [],
       operations: [],
       finance: [],
       resources: [],
@@ -94,7 +94,7 @@ export function Sidebar() {
   // Domain order for rendering
   const domainOrder: Array<keyof typeof modulesByDomain> = [
     'core',
-    'supply-chain',
+    'inventory',
     'operations',
     'finance',
     'resources',

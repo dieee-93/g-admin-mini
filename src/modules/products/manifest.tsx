@@ -346,7 +346,7 @@ export const productsManifest: ModuleManifest = {
       route: '/admin/supply-chain/products',
       icon: RectangleStackIcon,
       color: 'orange',
-      domain: 'supply-chain',
+      domain: 'inventory',
       isExpandable: false,
     },
   },

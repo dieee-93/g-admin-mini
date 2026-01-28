@@ -697,7 +697,7 @@ export const materialsManifest: ModuleManifest = {
       route: '/admin/supply-chain/materials',
       icon: ArchiveBoxIcon,
       color: 'green',
-      domain: 'supply-chain',
+      domain: 'inventory',
       isExpandable: false
     }
   },

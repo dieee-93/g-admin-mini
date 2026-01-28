@@ -23,7 +23,7 @@ interface GalaxyViewProps {
 // Helper function para iconos de dominio
 const getDomainIcon = (domain: string): string => {
   const icons: Record<string, string> = {
-    'supply-chain': '🔗',
+    'inventory': '🔗',
     'materials': '📦',
     'products': '🍽️',
     'sales': '💰',
@@ -42,7 +42,7 @@ const getDomainIcon = (domain: string): string => {
 // Helper function para formatear nombres de dominio
 const formatDomainName = (domain: string): string => {
   const names: Record<string, string> = {
-    'supply-chain': 'Cadena de Suministro',
+    'inventory': 'Inventario',
     'materials': 'Materiales',
     'products': 'Productos',
     'sales': 'Ventas',

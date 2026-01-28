@@ -89,7 +89,7 @@ export const assetsManifest: ModuleManifest = {
       route: '/admin/supply-chain/assets',
       icon: CubeTransparentIcon,
       color: 'teal',
-      domain: 'supply-chain',
+      domain: 'inventory',
       isExpandable: false,
     },
   },

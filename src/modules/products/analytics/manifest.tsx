@@ -263,7 +263,7 @@ export const productsAnalyticsManifest: ModuleManifest = {
       route: null,
       icon: ChartBarIcon,
       color: 'orange',
-      domain: 'supply-chain',
+      domain: 'inventory',
       isExpandable: false
     },
     

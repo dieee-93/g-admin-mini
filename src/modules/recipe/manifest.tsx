@@ -120,7 +120,7 @@ export const recipeManifest: ModuleManifest = {
       route: '/admin/supply-chain/recipes',
       icon: BeakerIcon,
       color: 'purple',
-      domain: 'supply-chain',
+      domain: 'inventory',
       isExpandable: false
     }
   }

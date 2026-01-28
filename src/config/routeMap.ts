@@ -23,12 +23,12 @@ export const domainRouteMap = {
   'memberships': '/admin/operations/memberships',
   'rentals': '/admin/operations/rentals',
 
-  // Supply Chain Domain
-  'materials': '/admin/supply-chain/materials',
-  'products': '/admin/supply-chain/products',
-  'recipes': '/admin/supply-chain/recipes',
-  'suppliers': '/admin/supply-chain/suppliers',
-  'assets': '/admin/supply-chain/assets',
+  // Inventory Domain
+  'materials': '/admin/inventory/materials',
+  'products': '/admin/inventory/products',
+  'recipes': '/admin/inventory/recipes',
+  'suppliers': '/admin/inventory/suppliers',
+  'assets': '/admin/inventory/assets',
 
   // Financial Domain
   'fiscal': '/admin/finance/fiscal',
@@ -78,20 +78,20 @@ export const routeToFileMap = {
   '/admin/sales/onsite': 'pages/admin/operations/fulfillment/onsite/page',
   '/admin/sales/pickup': 'pages/admin/operations/fulfillment/pickup/page',
 
-  // Supply Chain
-  '/admin/supply-chain/materials': 'pages/admin/supply-chain/materials/page',
+  // Inventory
+  '/admin/inventory/materials': 'pages/admin/supply-chain/materials/page',
 
   '/admin/materials/abc-analysis': 'pages/admin/supply-chain/materials/abc-analysis',
   '/admin/materials/supply-chain': 'pages/admin/supply-chain/materials/supply-chain',
   '/admin/materials/procurement': 'pages/admin/supply-chain/materials/procurement',
   '/admin/materials/predictive-analytics': 'pages/admin/supply-chain/materials/predictive-analytics',
-  '/admin/supply-chain/products': 'pages/admin/supply-chain/products/page',
-  '/admin/supply-chain/products/new': 'pages/admin/supply-chain/products/ProductFormPage',
-  '/admin/supply-chain/products/:id/edit': 'pages/admin/supply-chain/products/ProductFormPage',
-  '/admin/supply-chain/products/:id/view': 'pages/admin/supply-chain/products/ProductFormPage',
-  '/admin/supply-chain/recipes': 'pages/admin/supply-chain/recipes/page',
-  '/admin/supply-chain/suppliers': 'pages/admin/supply-chain/suppliers/page',
-  '/admin/supply-chain/assets': 'pages/admin/supply-chain/assets/page',
+  '/admin/inventory/products': 'pages/admin/supply-chain/products/page',
+  '/admin/inventory/products/new': 'pages/admin/supply-chain/products/ProductFormPage',
+  '/admin/inventory/products/:id/edit': 'pages/admin/supply-chain/products/ProductFormPage',
+  '/admin/inventory/products/:id/view': 'pages/admin/supply-chain/products/ProductFormPage',
+  '/admin/inventory/recipes': 'pages/admin/supply-chain/recipes/page',
+  '/admin/inventory/suppliers': 'pages/admin/supply-chain/suppliers/page',
+  '/admin/inventory/assets': 'pages/admin/supply-chain/assets/page',
 
   // Finance
   '/admin/finance/fiscal': 'pages/admin/finance/fiscal/page',
@@ -172,19 +172,19 @@ export const routeToComponentMap = {
   '/admin/operations/memberships/*': 'LazyMembershipsPage',
   '/admin/operations/rentals/*': 'LazyRentalsPage',
 
-  // Supply Chain
-  '/admin/supply-chain/materials': 'LazyStockLab',
+  // Inventory
+  '/admin/inventory/materials': 'LazyStockLab',
 
   '/admin/materials/abc-analysis': 'LazyABCAnalysis',
   '/admin/materials/supply-chain': 'LazySupplyChainView',
   '/admin/materials/procurement': 'LazyProcurementPage',
   '/admin/materials/predictive-analytics': 'LazyPredictiveAnalytics',
-  '/admin/supply-chain/products': 'LazyProductsPage',
-  '/admin/supply-chain/products/new': 'LazyProductFormPage',
-  '/admin/supply-chain/products/:id/edit': 'LazyProductFormPage',
-  '/admin/supply-chain/products/:id/view': 'LazyProductFormPage',
-  '/admin/supply-chain/suppliers': 'LazySuppliersPage',
-  '/admin/supply-chain/assets': 'LazyAssetsPage',
+  '/admin/inventory/products': 'LazyProductsPage',
+  '/admin/inventory/products/new': 'LazyProductFormPage',
+  '/admin/inventory/products/:id/edit': 'LazyProductFormPage',
+  '/admin/inventory/products/:id/view': 'LazyProductFormPage',
+  '/admin/inventory/suppliers': 'LazySuppliersPage',
+  '/admin/inventory/assets': 'LazyAssetsPage',
 
   // Finance
   '/admin/finance/fiscal': 'LazyFiscalPage',

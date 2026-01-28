@@ -426,7 +426,7 @@ export const LazyBundleDebug = createLazyComponent(
   () => import('../../pages/admin/supply-chain/materials/components/Procurement').then(module => ({
     default: module.SupplyChainAnalysis
   })),
-  'supply-chain',
+  'inventory',
   {
     chunkName: 'supply-chain-module',
     preload: false,

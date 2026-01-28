@@ -46,12 +46,12 @@ export interface NavigationModule {
   isExpandable?: boolean;
   isExpanded?: boolean;
   subModules?: NavigationSubModule[];
-  domain?: 'core' | 'supply-chain' | 'operations' | 'finance' | 'resources' | 'advanced' | 'debug';
+  domain?: 'core' | 'inventory' | 'operations' | 'finance' | 'resources' | 'advanced' | 'debug';
 }
 
 export interface NavigationByDomain {
   core: NavigationModule[];
-  'supply-chain': NavigationModule[];
+  'inventory': NavigationModule[];
   operations: NavigationModule[];
   finance: NavigationModule[];
   resources: NavigationModule[];
@@ -186,7 +186,7 @@ export function useModuleNavigation() {
       })
       .sort((a, b) => {
         // Sort by domain first, then by title
-        const domainOrder = ['core', 'supply-chain', 'operations', 'finance', 'resources', 'advanced', 'debug'];
+        const domainOrder = ['core', 'inventory', 'operations', 'finance', 'resources', 'advanced', 'debug'];
         const aDomainIndex = domainOrder.indexOf(a.domain || 'core');
         const bDomainIndex = domainOrder.indexOf(b.domain || 'core');
 
@@ -226,7 +226,7 @@ export function useModuleNavigationByDomain(): NavigationByDomain {
   return useMemo(() => {
     const grouped: NavigationByDomain = {
       core: [],
-      'supply-chain': [],
+      'inventory': [],
       operations: [],
       finance: [],
       resources: [],

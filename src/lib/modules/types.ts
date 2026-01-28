@@ -147,7 +147,7 @@ export interface ModuleManifest {
       /** Display color/palette */
       color?: string;
       /** Business domain for grouping */
-      domain?: 'core' | 'supply-chain' | 'operations' | 'finance' | 'resources' | 'advanced' | 'debug';
+      domain?: 'core' | 'inventory' | 'operations' | 'finance' | 'resources' | 'advanced' | 'debug';
       /** Whether module has expandable submenu */
       isExpandable?: boolean;
       /** Submenu items if expandable */
