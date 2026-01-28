@@ -253,6 +253,7 @@ src/
 5. **useState for cross-module data** - Use Zustand stores
 6. **Running dev server** - User already has one on :5173
 7. **Creating test components** - Only if explicitly authorized
+8. **Toaster outside Provider** - Must be inside `<Provider>` (see `docs/alert/TOASTER_ARCHITECTURE_AUDIT.md`)
 
 ---
 

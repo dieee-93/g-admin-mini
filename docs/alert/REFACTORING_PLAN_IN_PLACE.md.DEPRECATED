@@ -1,0 +1,47 @@
+# ⚠️ DEPRECATION NOTICE
+
+**Este documento está OBSOLETO y ha sido reemplazado.**
+
+---
+
+## 🚫 NO Usar Este Documento
+
+**Fecha de Deprecación:** Enero 27, 2026  
+**Razón:** Consolidación de documentación en una guía única validada con código real
+
+---
+
+## ✅ Usa en su lugar:
+
+### 📘 [ALERTS_COMPLETE_GUIDE.md](./ALERTS_COMPLETE_GUIDE.md)
+
+**Guía Completa del Sistema de Alertas** - Validada con Código Real
+
+Esta guía consolida y actualiza TODA la información con:
+- ✅ Las 3 capas del sistema explicadas claramente
+- ✅ Ejemplos validados con el código actual
+- ✅ Patrones que realmente funcionan
+- ✅ Troubleshooting actualizado
+
+---
+
+## 📊 Problemas con Este Documento
+
+- ❌ Describe implementaciones que NO existen (ej: SmartAlertsEngine automatizado)
+- ❌ Contiene patrones obsoletos
+- ❌ No refleja la implementación actual del código
+- ❌ Puede causar confusión y bugs
+
+---
+
+## 📖 Para Más Información
+
+- **Guía Principal:** [ALERTS_COMPLETE_GUIDE.md](./ALERTS_COMPLETE_GUIDE.md)
+- **Quick Reference:** [TOAST_QUICK_REFERENCE.md](./TOAST_QUICK_REFERENCE.md)
+- **API Reference:** [QUICK_REFERENCE.md](./QUICK_REFERENCE.md)
+- **Índice General:** [README.md](./README.md)
+
+---
+
+**Última Actualización:** Enero 27, 2026  
+**Mantenido por:** Equipo de Desarrollo

@@ -17,8 +17,8 @@ import {
 import { useCheckout } from './hooks/useCheckout';
 import { checkoutService } from '@/modules/sales/ecommerce/services/checkoutService';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMercadoPagoCheckout } from '@/modules/finance-integrations/hooks/useMercadoPagoCheckout';
-import { useActivePaymentMethods } from '@/modules/finance-integrations/hooks/usePayments';
+import { useMercadoPagoCheckout } from '@/modules/payment-gateways/hooks/useMercadoPagoCheckout';
+import { useActivePaymentMethods } from '@/modules/payment-gateways/hooks/usePayments';
 import { useCart } from '@/modules/sales/ecommerce/hooks/useCart';
 
 export default function CheckoutPage() {

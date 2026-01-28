@@ -16,7 +16,7 @@ import {
   Alert,
   Tabs,
 } from '@/shared/ui';
-import { useCreatePaymentGateway, useUpdatePaymentGateway } from '@/modules/finance-integrations/hooks/usePayments';
+import { useCreatePaymentGateway, useUpdatePaymentGateway } from '@/modules/payment-gateways/hooks/usePayments';
 import { logger } from '@/lib/logging';
 import { MercadoPagoConfigForm, type MercadoPagoConfig } from '../../../components/MercadoPagoConfigForm';
 import { MODOConfigForm, type MODOConfig } from '../../../components/MODOConfigForm';

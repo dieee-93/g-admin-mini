@@ -187,18 +187,27 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
   }, [optimizedValidateForm]);
 
   const handleSubmit = useCallback(async () => {
+    console.log('🚀 [useMaterialForm] handleSubmit iniciado');
+    console.log('📋 [useMaterialForm] formData:', formData);
+    console.log('⚙️ [useMaterialForm] addToStockNow:', addToStockNow);
+    console.log('✏️ [useMaterialForm] isEditMode:', isEditMode);
+    
     const isValid = await validateForm();
+    console.log('✅ [useMaterialForm] Validación resultado:', isValid);
     
     if (!isValid) {
+      console.log('❌ [useMaterialForm] Validación falló, abortando submit');
       return;
     }
 
     // If adding to stock, show Event Sourcing confirmation first (don't set isSubmitting yet)
     if (addToStockNow && !isEditMode) {
+      console.log('📦 [useMaterialForm] Mostrando confirmación de Event Sourcing');
       setShowEventSourcingConfirmation(true);
       return; // Exit early - confirmAndSubmit will handle the actual submission
     }
 
+    console.log('💾 [useMaterialForm] Iniciando guardado...');
     // Only set loading states if we're actually submitting (not showing confirmation)
     setIsSubmitting(true);
     setLoadingStates(prev => ({ ...prev, validating: true }));
@@ -208,12 +217,15 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
 
     try {
       if (isEditMode && currentItem) {
+        console.log('✏️ [useMaterialForm] Modo edición, actualizando...');
         await updateItem(currentItem.id, formData as Partial<MaterialItem>);
         setSuccessStates(prev => ({ ...prev, itemCreated: true }));
       } else {
         if (addToStockNow) {
+          console.log('📦 [useMaterialForm] Creando con stock inicial...');
           setLoadingStates(prev => ({ ...prev, savingToStock: true }));
-          await addItem(formData);
+          // 🔧 CRITICAL: Include addToStockNow flag in formData for backend
+          await addItem({ ...formData, addToStockNow: true });
           setLoadingStates(prev => ({ ...prev, savingToStock: false }));
           setSuccessStates(prev => ({ 
             ...prev, 
@@ -221,6 +233,7 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
             stockAdded: true 
           }));
         } else {
+          console.log('📝 [useMaterialForm] Creando sin stock...');
           const itemDataWithoutStock = {
             ...formData,
             initial_stock: 0,
@@ -231,9 +244,11 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
         }
       }
       
+      console.log('✅ [useMaterialForm] Guardado exitoso, cerrando modal...');
       await new Promise(resolve => setTimeout(resolve, 800));
       onClose();
     } catch (error) {
+      console.error('❌ [useMaterialForm] Error en handleSubmit:', error);
       logger.error('MaterialsStore', 'Error al guardar:', error);
     } finally {
       setIsSubmitting(false);
@@ -252,6 +267,7 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
   }, [validateForm, isEditMode, currentItem, updateItem, formData, addToStockNow, addItem, onClose]);
 
   const confirmAndSubmit = useCallback(async () => {
+    console.log('🚀 [confirmAndSubmit] Starting submission...');
     setShowEventSourcingConfirmation(false);
     
     setIsSubmitting(true);
@@ -262,9 +278,13 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
     setSuccessStates(prev => ({ ...prev, validationPassed: true }));
 
     try {
+      console.log('🚀 [confirmAndSubmit] Calling addItem with formData:', formData);
+      console.log('🚀 [confirmAndSubmit] addToStockNow:', addToStockNow);
       setLoadingStates(prev => ({ ...prev, savingToStock: true }));
       
-      await addItem(formData);
+      // 🔧 CRITICAL: Include addToStockNow flag in formData for backend
+      const result = await addItem({ ...formData, addToStockNow: true });
+      console.log('✅ [confirmAndSubmit] addItem returned:', result);
       
       setLoadingStates(prev => ({ ...prev, savingToStock: false }));
       setSuccessStates(prev => ({ 
@@ -273,11 +293,16 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
         stockAdded: true 
       }));
       
+      console.log('✅ [confirmAndSubmit] Waiting before closing...');
       await new Promise(resolve => setTimeout(resolve, 800));
+      console.log('✅ [confirmAndSubmit] Calling onClose...');
       onClose();
+      console.log('✅ [confirmAndSubmit] Done!');
     } catch (error) {
+      console.error('❌ [confirmAndSubmit] Error caught:', error);
       logger.error('MaterialsStore', 'Error al guardar:', error);
     } finally {
+      console.log('🏁 [confirmAndSubmit] Finally block...');
       setIsSubmitting(false);
       setLoadingStates({
         initializing: false,

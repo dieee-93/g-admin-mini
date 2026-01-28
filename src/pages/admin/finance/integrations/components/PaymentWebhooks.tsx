@@ -7,7 +7,7 @@ import {
   ArrowPathIcon, BoltIcon, CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon
 } from '@heroicons/react/24/outline';
 
-import { useWebhookEvents, useWebhookStats } from '@/modules/finance-integrations/hooks/usePayments';
+import { useWebhookEvents, useWebhookStats } from '@/modules/payment-gateways/hooks/usePayments';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 

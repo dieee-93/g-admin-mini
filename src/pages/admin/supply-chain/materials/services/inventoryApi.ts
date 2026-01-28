@@ -68,11 +68,122 @@ export const inventoryApi = {
   },
 
   async createMaterial(item: Partial<MaterialItem>, user: AuthUser): Promise<MaterialItem> {
+    console.log('🔧 [inventoryApi.createMaterial] START', {
+      itemName: item.name,
+      itemType: item.type,
+      initial_stock: (item as any).initial_stock,
+      addToStockNow: (item as any).addToStockNow
+    });
+
     // 🔒 PERMISSIONS: Validate user can create materials
     requirePermission(user, 'materials', 'create');
 
-    // 🎯 DRY: Delegate to createItem for actual DB operation
-    const result = await this.createItem(item);
+    // Extract stock-related fields (these go to stock_entries table, NOT materials table)
+    const { initial_stock, addToStockNow, supplier_id: supplierId, metadata, supplier, ...materialData } = item as any;
+    
+    console.log('🔍 [inventoryApi.createMaterial] Extracted fields:', {
+      initial_stock,
+      addToStockNow,
+      supplierId,
+      hasMetadata: !!metadata,
+      hasSupplierObject: !!supplier
+    });
+
+    // 🧹 CLEAN: Remove undefined/null fields and type-specific fields that don't exist in DB
+    // - packaging: only for COUNTABLE type
+    // - recipe_id: only for ELABORATED type
+    // - category: only for MEASURABLE type
+    const cleanedData: any = { ...materialData };
+    
+    // Remove fields that are undefined or null
+    Object.keys(cleanedData).forEach(key => {
+      if (cleanedData[key] === undefined || cleanedData[key] === null) {
+        delete cleanedData[key];
+      }
+    });
+
+    // 🎯 DRY: Delegate to createItem for actual DB operation (without initial_stock)
+    const result = await this.createItem(cleanedData);
+
+    console.log('🔍 [inventoryApi.createMaterial] Stock entry conditions:', {
+      addToStockNow,
+      addToStockNowType: typeof addToStockNow,
+      initial_stock,
+      initial_stockType: typeof initial_stock,
+      hasInitialStock: initial_stock && initial_stock > 0,
+      shouldCreateEntry: addToStockNow && initial_stock && initial_stock > 0
+    });
+
+    logger.info('MaterialsStore', '🔍 Checking stock entry conditions', {
+      addToStockNow,
+      initial_stock,
+      hasInitialStock: initial_stock && initial_stock > 0,
+      shouldCreateEntry: addToStockNow && initial_stock && initial_stock > 0
+    });
+
+    // ✅ If initial stock is provided and addToStockNow is true, create stock entry
+    if (addToStockNow && initial_stock && initial_stock > 0) {
+      console.log('✅ [inventoryApi.createMaterial] ENTERING stock_entry creation block');
+      logger.info('MaterialsStore', '📦 Creating initial stock entry', {
+        materialId: result.id,
+        quantity: initial_stock,
+        unitCost: item.unit_cost,
+        supplierId
+      });
+
+      try {
+        console.log('📦 [inventoryApi.createMaterial] Calling createStockEntry with:', {
+          item_id: result.id,
+          supplier_id: supplierId || null,
+          quantity: initial_stock,
+          unit_cost: item.unit_cost || 0,
+          entry_type: 'purchase'
+        });
+
+        await this.createStockEntry({
+          item_id: result.id,
+          supplier_id: supplierId || null,
+          quantity: initial_stock,
+          unit_cost: item.unit_cost || 0,
+          entry_type: 'purchase',
+          metadata: metadata || {}, // Event Sourcing metadata from form
+          purchase_date: new Date().toISOString().split('T')[0]
+        });
+
+        console.log('✅ [inventoryApi.createMaterial] createStockEntry completed successfully');
+
+        // Update material stock after entry (triggers will handle this, but we do it explicitly)
+        const { data: updatedMaterial, error: updateError } = await supabase
+          .from('materials')
+          .update({ stock: initial_stock })
+          .eq('id', result.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          logger.error('MaterialsStore', '❌ Error updating material stock', updateError);
+        } else if (updatedMaterial) {
+          // Update result with new stock value
+          result.stock = updatedMaterial.stock;
+        }
+
+        logger.info('MaterialsStore', '✅ Initial stock entry created and stock updated', {
+          materialId: result.id,
+          quantity: initial_stock,
+          finalStock: result.stock
+        });
+      } catch (error) {
+        console.error('❌ [inventoryApi.createMaterial] Error creating stock_entry:', error);
+        logger.error('MaterialsStore', '❌ Error creating initial stock entry', error);
+        // Don't throw - material was created successfully
+      }
+    } else {
+      console.log('⚠️ [inventoryApi.createMaterial] NOT creating stock_entry because:', {
+        addToStockNow,
+        initial_stock,
+        conditionResult: addToStockNow && initial_stock && initial_stock > 0
+      });
+    }
 
     logger.info('MaterialsStore', '✅ Material created by user', {
       materialId: result.id,
@@ -88,7 +199,7 @@ export const inventoryApi = {
       category: result.category,
       unitCost: result.unit_cost,
       minStock: result.min_stock,
-      supplierId: result.supplier_id,
+      supplierId: supplierId,
       locationId: result.location_id,
       userId: user.id,
       timestamp: Date.now()

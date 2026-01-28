@@ -45,10 +45,10 @@ import {
   useCreatePaymentGateway,
   useUpdatePaymentGateway,
   useDeletePaymentGateway
-} from '@/modules/finance-integrations/hooks/usePayments';
+} from '@/modules/payment-gateways/hooks/usePayments';
 import { toaster } from '@/shared/ui/toaster';
 import { logger } from '@/lib/logging';
-import type { PaymentMethod, PaymentGateway } from '@/modules/finance-integrations/services/paymentsApi';
+import type { PaymentMethod, PaymentGateway } from '@/modules/payment-gateways/services/paymentsApi';
 
 // ============================================
 // ARGENTINA PAYMENT METHODS PRESETS

@@ -14,7 +14,7 @@ import { useLocation } from '@/contexts/LocationContext';
 import { useShiftStore } from '../store/shiftStore';
 import { useBusinessProfile } from '@/lib/capabilities';
 import * as shiftService from '../services/shiftService';
-import { getAllActiveSessions } from '@/modules/cash/services/cashSessionService';
+import { getAllActiveSessions } from '@/modules/accounting/services/cashSessionService';
 import eventBus from '@/lib/events/EventBus';
 import { logger } from '@/lib/logging/Logger';
 import type { CashSessionRow } from '@/modules/cash/types';

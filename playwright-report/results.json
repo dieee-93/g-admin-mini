@@ -50,7 +50,7 @@
         "testMatch": [
           "/.*\\.setup\\.spec\\.ts/"
         ],
-        "timeout": 60000
+        "timeout": 120000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -66,7 +66,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -82,7 +82,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -98,7 +98,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -114,7 +114,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -130,7 +130,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -146,7 +146,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       },
       {
         "outputDir": "I:/Programacion/Proyectos/g-mini/test-results",
@@ -162,7 +162,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       }
     ],
     "shard": null,
@@ -195,7 +195,7 @@
             {
               "title": "Create Materials - Los 3 Tipos",
               "file": "materials/materials-crud-complete.spec.ts",
-              "line": 32,
+              "line": 42,
               "column": 8,
               "specs": [
                 {
@@ -204,7 +204,7 @@
                   "tags": [],
                   "tests": [
                     {
-                      "timeout": 60000,
+                      "timeout": 30000,
                       "annotations": [],
                       "expectedStatus": "passed",
                       "projectId": "authenticated",
@@ -214,33 +214,38 @@
                           "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 25752,
+                          "duration": 14034,
                           "error": {
-                            "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-part=\"backdrop\"]') to be visible\u001b[22m\n",
-                            "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-part=\"backdrop\"]') to be visible\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:41:18",
+                            "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('materials-toolbar-new-button')\u001b[22m\n",
+                            "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('materials-toolbar-new-button')\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:77:62",
                             "location": {
                               "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                              "column": 18,
-                              "line": 41
+                              "column": 62,
+                              "line": 77
                             },
-                            "snippet": "\u001b[0m \u001b[90m 39 |\u001b[39m       \n \u001b[90m 40 |\u001b[39m       \u001b[90m// Esperar a que el backdrop del modal aparezca (Chakra UI v3 Dialog)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 41 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-part=\"backdrop\"]'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 42 |\u001b[39m       \n \u001b[90m 43 |\u001b[39m       \u001b[90m// Esperar a que termine de cargar - esperar que el spinner desaparezca\u001b[39m\n \u001b[90m 44 |\u001b[39m       \u001b[90m// Chakra UI usa role=\"status\" para spinners\u001b[39m\u001b[0m"
+                            "snippet": "\u001b[0m \u001b[90m 75 |\u001b[39m       \n \u001b[90m 76 |\u001b[39m       \u001b[90m// ========== Open modal (ONLY data-testid) ==========\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 77 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'materials-toolbar-new-button'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 78 |\u001b[39m       \n \u001b[90m 79 |\u001b[39m       \u001b[90m// Wait for lazy loading\u001b[39m\n \u001b[90m 80 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
                           },
                           "errors": [
                             {
                               "location": {
                                 "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                                "column": 18,
-                                "line": 41
+                                "column": 62,
+                                "line": 77
                               },
-                              "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-part=\"backdrop\"]') to be visible\u001b[22m\n\n\n\u001b[0m \u001b[90m 39 |\u001b[39m       \n \u001b[90m 40 |\u001b[39m       \u001b[90m// Esperar a que el backdrop del modal aparezca (Chakra UI v3 Dialog)\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 41 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-part=\"backdrop\"]'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 42 |\u001b[39m       \n \u001b[90m 43 |\u001b[39m       \u001b[90m// Esperar a que termine de cargar - esperar que el spinner desaparezca\u001b[39m\n \u001b[90m 44 |\u001b[39m       \u001b[90m// Chakra UI usa role=\"status\" para spinners\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:41:18\u001b[22m"
+                              "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('materials-toolbar-new-button')\u001b[22m\n\n\n\u001b[0m \u001b[90m 75 |\u001b[39m       \n \u001b[90m 76 |\u001b[39m       \u001b[90m// ========== Open modal (ONLY data-testid) ==========\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 77 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'materials-toolbar-new-button'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 78 |\u001b[39m       \n \u001b[90m 79 |\u001b[39m       \u001b[90m// Wait for lazy loading\u001b[39m\n \u001b[90m 80 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:77:62\u001b[22m"
                             }
                           ],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-01-27T14:26:04.915Z",
+                          "startTime": "2026-01-28T02:44:20.587Z",
                           "annotations": [],
                           "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\materials-materials-crud-c-e4456-SURABLE-Material-kg-litros--authenticated\\test-failed-1.png"
+                            },
                             {
                               "name": "error-context",
                               "contentType": "text/markdown",
@@ -249,8 +254,8 @@
                           ],
                           "errorLocation": {
                             "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                            "column": 18,
-                            "line": 41
+                            "column": 62,
+                            "line": 77
                           }
                         }
                       ],
@@ -259,7 +264,7 @@
                   ],
                   "id": "49c27bb20a52ce2852e8-7664bd91d2ec120d3b79",
                   "file": "materials/materials-crud-complete.spec.ts",
-                  "line": 34,
+                  "line": 44,
                   "column": 5
                 }
               ]
@@ -271,8 +276,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-01-27T14:26:03.020Z",
-    "duration": 28265.482,
+    "startTime": "2026-01-28T02:44:18.374Z",
+    "duration": 17033.027,
     "expected": 0,
     "skipped": 0,
     "unexpected": 1,

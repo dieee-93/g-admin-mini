@@ -1,22 +1,38 @@
 # 🧠 Smart Alerts Developer Guide
 
-**Version:** 2.0.0  
-**Last Updated:** November 18, 2025  
-**Audience:** Developers implementing smart alert systems
+> ## ⚠️ NOTA IMPORTANTE - Enero 2026
+> 
+> **Este guía describe `SmartAlertsEngine` que NO está implementado en el código real.**
+> 
+> **Para implementación actual de smart alerts, usa:** [ALERTS_COMPLETE_GUIDE.md](./ALERTS_COMPLETE_GUIDE.md)
+> 
+> **Realidad del código:**
+> - ❌ `SmartAlertsEngine` class NO existe (solo en tests como mock)
+> - ❌ Motor de reglas automatizado NO está implementado
+> - ✅ Smart alerts SÍ funcionan, pero con patrón manual
+> - ✅ Los conceptos y diseño aquí son válidos para futuro
+>
+> Este doc es útil como referencia de diseño futuro.
+
+**Version:** 3.0.0  
+**Last Updated:** January 27, 2026  
+**Audience:** Developers implementing smart alert systems  
+**Status:** 🟡 Conceptual - Implementación Manual Actual
 
 ---
 
 ## 📖 Table of Contents
 
 1. [Introduction](#introduction)
-2. [Smart Alerts vs Simple Alerts](#smart-alerts-vs-simple-alerts)
-3. [Creating Smart Alert Rules](#creating-smart-alert-rules)
-4. [SmartAlertsEngine Usage](#smartalertsengine-usage)
-5. [Integration with Modules](#integration-with-modules)
-6. [Testing Smart Alerts](#testing-smart-alerts)
-7. [Best Practices](#best-practices)
-8. [Common Patterns](#common-patterns)
-9. [Troubleshooting](#troubleshooting)
+2. [Toast System Architecture](#toast-system-architecture) ⭐ NEW
+3. [Smart Alerts vs Simple Alerts](#smart-alerts-vs-simple-alerts)
+4. [Creating Smart Alert Rules](#creating-smart-alert-rules)
+5. [SmartAlertsEngine Usage](#smartalertsengine-usage)
+6. [Integration with Modules](#integration-with-modules)
+7. [Testing Smart Alerts](#testing-smart-alerts)
+8. [Best Practices](#best-practices)
+9. [Common Patterns](#common-patterns)
+10. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -30,6 +46,71 @@ Unlike simple alerts (Layer 1) which are just user action feedback, smart alerts
 - 📊 **Actionable**: Guide users to specific problems
 - 🔄 **Persistent**: Remain until resolved or conditions change
 - ⚡ **Automated**: Generated in background, not tied to user actions
+
+---
+
+## Toast System Architecture
+
+**🍞 Toasts** are the foundation of our notification system (Layer 1 - Simple Alerts).
+
+### Quick Links
+- **Quick Reference:** [TOAST_QUICK_REFERENCE.md](./TOAST_QUICK_REFERENCE.md)
+- **Architecture Details:** [TOASTER_ARCHITECTURE_AUDIT.md](./TOASTER_ARCHITECTURE_AUDIT.md)
+
+### What Are Toasts?
+Toasts are temporary, non-blocking notifications that provide immediate user feedback:
+- ✅ "Item created successfully"
+- ❌ "Failed to save item"
+- ⏳ "Processing..."
+
+### Toast vs Smart Alert
+
+| Feature | Toast (Layer 1) | Smart Alert (Layer 2) |
+|---------|----------------|----------------------|
+| Duration | 3-15 seconds | Until resolved |
+| Persistence | Not saved | Saved to DB |
+| Purpose | User feedback | Business intelligence |
+| Examples | "Item saved" | "5 items low stock" |
+
+### Basic Usage
+```typescript
+import { toaster } from '@/shared/ui';
+
+// Success feedback
+toaster.create({
+  title: "Item Created",
+  description: "Material added successfully",
+  type: "success",
+  duration: 3000
+});
+
+// Error feedback
+toaster.create({
+  title: "Error",
+  description: "Failed to save item",
+  type: "error",
+  duration: 5000
+});
+```
+
+### Critical Requirements
+⚠️ **ARCHITECTURE REQUIREMENT**: The `<Toaster />` component MUST be inside `<Provider>` (ChakraProvider) in App.tsx.
+
+```tsx
+// ✅ CORRECT
+<Provider>
+  {/* app content */}
+  <Toaster />
+</Provider>
+
+// ❌ WRONG - Causes context error
+<Provider>
+  {/* app content */}
+</Provider>
+<Toaster />  {/* Outside Provider = ERROR */}
+```
+
+**See [TOASTER_ARCHITECTURE_AUDIT.md](./TOASTER_ARCHITECTURE_AUDIT.md) for complete details.**
 
 ---
 

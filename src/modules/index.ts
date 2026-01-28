@@ -38,8 +38,6 @@ import { dashboardManifest } from './dashboard/manifest';
 import { settingsManifest } from './settings/manifest';
 import { debugManifest } from './debug/manifest';
 import { customersManifest } from './customers/manifest';
-import { reportingManifest } from './reporting/manifest';
-import { intelligenceManifest } from './intelligence/manifest';
 
 // ============================================
 // SUPPLY-CHAIN DOMAIN - Inventory & procurement
@@ -84,18 +82,13 @@ import { shiftControlManifest } from './shift-control/manifest';
 import { financeCorporateManifest } from './finance-corporate/manifest';
 import { financeFiscalManifest } from './finance-fiscal/manifest';
 import { financeBillingManifest } from './finance-billing/manifest';
-import { financeIntegrationsManifest } from './finance-integrations/manifest';
-import { cashManagementManifest } from './cash-management/manifest';
+import { paymentGatewaysManifest } from './payment-gateways/manifest';
+import { accountingManifest } from './accounting/manifest';
 
 // ============================================
 // GAMIFICATION DOMAIN - Achievements & progress
 // ============================================
-import { gamificationManifest } from './gamification/manifest';
-
-// ============================================
-// EXECUTIVE DOMAIN - Strategic analytics
-// ============================================
-import { executiveManifest } from './executive/manifest';
+import { loyaltyManifest } from './loyalty/manifest';
 
 // ============================================
 // ALL MODULE MANIFESTS
@@ -140,10 +133,6 @@ export const ALL_MODULE_MANIFESTS = [
   salesManifest,         // ✅ Sales & POS
   customersManifest,     // ✅ CRM
 
-  // Analytics - Foundation
-  reportingManifest,     // ✅ Custom reporting
-  intelligenceManifest,  // ✅ Market intelligence
-
   // ============================================
   // TIER 2: First-level dependencies
   // ============================================
@@ -166,8 +155,8 @@ export const ALL_MODULE_MANIFESTS = [
   financeBillingManifest,        // ✅ Depends on: customers
   financeFiscalManifest,         // ✅ Depends on: sales
   financeCorporateManifest,      // ✅ Depends on: customers, finance-fiscal, finance-billing
-  financeIntegrationsManifest,   // ✅ Depends on: finance-fiscal, finance-billing
-  cashManagementManifest,        // ✅ Cash flow, sessions, double-entry accounting
+  paymentGatewaysManifest,       // ✅ Depends on: finance-fiscal, finance-billing
+  accountingManifest,        // ✅ Cash flow, sessions, double-entry accounting
 
   // ============================================
   // TIER 4: Second-level dependencies
@@ -194,8 +183,7 @@ export const ALL_MODULE_MANIFESTS = [
   // kitchenManifest,       // ✅ Links: sales + materials (auto-install)
   // DISABLED: delivery standalone module is obsolete, use fulfillmentDeliveryManifest instead
   // deliveryManifest,      // ❌ REMOVED - Consolidated into fulfillment-delivery submódulo
-  gamificationManifest,  // ✅ Listens to: all modules (auto-install)
-  executiveManifest,     // ✅ Aggregates: all modules
+  loyaltyManifest,  // ✅ Listens to: all modules (auto-install)
 ];
 
 // ============================================
@@ -211,8 +199,6 @@ export {
   settingsManifest,
   debugManifest,
   customersManifest,
-  reportingManifest,
-  intelligenceManifest,
 
   // Supply-chain domain
   materialsManifest,
@@ -249,12 +235,11 @@ export {
   financeCorporateManifest,
   financeFiscalManifest,
   financeBillingManifest,
-  financeIntegrationsManifest,
-  cashManagementManifest,
+  paymentGatewaysManifest,
+  accountingManifest,
 
   // Cross-cutting domains
-  gamificationManifest,
-  executiveManifest,
+  loyaltyManifest,
 };
 
 // ============================================

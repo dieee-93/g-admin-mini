@@ -5,7 +5,7 @@
  * Separates data fetching from state management (Store-First pattern).
  * 
  * RESPONSIBILITIES:
- * - CRUD operations for inventory items
+ * - CRUD operations for inventory materials
  * - Stock entry management
  * - Supplier relationship handling
  * - RPC calls for stock updates
@@ -77,11 +77,11 @@ export interface BulkStockUpdate {
 // ============================================
 
 /**
- * Fetch all inventory items from database
+ * Fetch all inventory materials from database
  * @returns Array of MaterialItem (normalized)
  */
 export async function fetchItems(): Promise<MaterialItem[]> {
-  logger.debug('MaterialsApi', 'Fetching all items');
+  logger.debug('MaterialsApi', 'Fetching all materials');
 
   const { data, error } = await supabase
     .from('materials')
@@ -89,7 +89,7 @@ export async function fetchItems(): Promise<MaterialItem[]> {
     .order('name', { ascending: true });
 
   if (error) {
-    logger.error('MaterialsApi', 'Failed to fetch items', error);
+    logger.error('MaterialsApi', 'Failed to fetch materials', error);
     throw new Error(`Error al cargar materiales: ${error.message}`);
   }
 
@@ -98,7 +98,7 @@ export async function fetchItems(): Promise<MaterialItem[]> {
     MaterialsNormalizer.normalizeApiItem(item)
   );
 
-  logger.info('MaterialsApi', `Fetched ${normalizedItems.length} items`);
+  logger.info('MaterialsApi', `Fetched ${normalizedItems.length} materials`);
   return normalizedItems;
 }
 
@@ -286,11 +286,11 @@ export async function updateStockRpc(
 }
 
 /**
- * Bulk update stock for multiple items
+ * Bulk update stock for multiple materials
  * @param updates - Array of { id, stock } updates
  */
 export async function bulkUpdateStock(updates: BulkStockUpdate[]): Promise<void> {
-  logger.debug('MaterialsApi', `Bulk updating stock for ${updates.length} items`);
+  logger.debug('MaterialsApi', `Bulk updating stock for ${updates.length} materials`);
 
   // Execute updates sequentially (Supabase doesn't support batch updates natively)
   const promises = updates.map(({ id, stock }) =>
@@ -299,7 +299,7 @@ export async function bulkUpdateStock(updates: BulkStockUpdate[]): Promise<void>
 
   await Promise.all(promises);
 
-  logger.info('MaterialsApi', `Bulk stock update completed for ${updates.length} items`);
+  logger.info('MaterialsApi', `Bulk stock update completed for ${updates.length} materials`);
 }
 
 // ============================================

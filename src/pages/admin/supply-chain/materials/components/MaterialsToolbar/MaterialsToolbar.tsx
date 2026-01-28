@@ -115,7 +115,7 @@ export const MaterialsToolbar = memo(function MaterialsToolbar({
           colorPalette="blue"
           onClick={onAddMaterial}
           disabled={disabled || !onAddMaterial}
-          data-testid="new-material-button"
+          data-testid="materials-toolbar-new-button"
         >
           <Icon icon={PlusIcon} size="sm" />
           Nuevo Material

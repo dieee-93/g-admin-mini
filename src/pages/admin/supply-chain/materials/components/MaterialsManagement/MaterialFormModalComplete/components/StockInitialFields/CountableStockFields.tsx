@@ -52,7 +52,7 @@ export const CountableStockFields = ({
                     colorPalette="blue"
                 >
                     <Stack gap="3">
-                        <RadioItem value="individual">
+                        <RadioItem value="individual" data-testid="stock-mode-individual">
                             <Stack gap="1">
                                 <Text fontWeight="medium">Agregar por unidades individuales</Text>
                                 <Text fontSize="sm" color="text.muted">
@@ -61,7 +61,7 @@ export const CountableStockFields = ({
                             </Stack>
                         </RadioItem>
 
-                        <RadioItem value="packages">
+                        <RadioItem value="packages" data-testid="stock-mode-packages">
                             <Stack gap="1">
                                 <Text fontWeight="medium">Agregar por paquetes/cajas</Text>
                                 <Text fontSize="sm" color="text.muted">
@@ -353,6 +353,7 @@ export const CountableStockFields = ({
                                                         px="3"
                                                         borderRadius="md"
                                                         borderRightRadius="0"
+                                                        data-testid="countable-quantity-input"
                                                     />
                                                 </NumberInput.Root>
                                                 <Box
@@ -420,6 +421,7 @@ export const CountableStockFields = ({
                                                         fontSize="md"
                                                         px="3"
                                                         borderRadius="0"
+                                                        data-testid="countable-cost-input"
                                                     />
                                                 </NumberInput.Root>
                                                 <Box

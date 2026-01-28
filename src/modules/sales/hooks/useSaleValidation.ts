@@ -19,8 +19,8 @@ import { EntitySchemas, type SaleFormData } from '@/lib/validation/zod/CommonSch
 import { useMaterialsStore } from '@/modules/materials/store';
 import { useShallow } from 'zustand/react/shallow';
 // 🏗️ CROSS-MODULE: Import tax service from Cash module (proper modular architecture)
-import { taxService } from '@/modules/cash/services';
-import type { TaxCalculationResult } from '@/modules/cash/services';
+import { taxService } from '@/modules/accounting/services';
+import type { TaxCalculationResult } from '@/modules/accounting/services';
 
 interface ValidationOptions {
   enableRealTime?: boolean;

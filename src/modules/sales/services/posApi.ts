@@ -42,7 +42,7 @@ interface SaleCompletedEvent {
   }>;
   timestamp: string;
 }
-import { taxService } from '@/modules/cash/services/taxCalculationService';
+import { taxService } from '@/modules/accounting/services/taxCalculationService';
 import { errorHandler, createNetworkError, createBusinessError } from '@/lib/error-handling';
 import { DecimalUtils } from '@/lib/decimal';
 

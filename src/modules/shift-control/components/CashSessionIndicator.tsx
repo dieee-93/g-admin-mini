@@ -10,7 +10,7 @@
 
 import { HStack, Text } from '@/shared/ui';
 import { useNavigate } from 'react-router-dom';
-import type { CashSessionRow } from '@/modules/cash/types';
+import type { CashSessionRow } from '@/modules/accounting/types';
 
 interface CashSessionIndicatorProps {
   /**

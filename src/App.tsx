@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Suspense, useEffect, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Provider } from '@/shared/ui';
+import { Provider, Toaster } from '@/shared/ui';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 
 // 🔄 TANSTACK QUERY - Server state management
@@ -903,6 +903,10 @@ function App() {
               </AuthProvider>
             </ErrorBoundaryWrapper>
           </Router>
+          
+          {/* 🍞 CHAKRA UI TOASTER - Global toast notifications */}
+          {/* ✅ CRITICAL: Must be inside Provider for Chakra context */}
+          <Toaster />
         </AlertsProvider>
       </Provider>
       

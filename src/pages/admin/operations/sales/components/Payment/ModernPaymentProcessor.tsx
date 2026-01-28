@@ -21,7 +21,7 @@ import type {
 } from '../../types';
 import { EventBus } from '@/lib/events';
 import { useTaxCalculation } from '@/pages/admin/finance/fiscal/hooks/useTaxCalculation';
-import { useActivePaymentMethods } from '@/modules/finance-integrations/hooks/usePayments';
+import { useActivePaymentMethods } from '@/modules/payment-gateways/hooks/usePayments';
 import { PaymentSummary } from './PaymentSummary';
 import { TipConfiguration as TipConfigComponent } from './TipConfiguration';
 import { SplitBillSetup } from './SplitBillSetup';

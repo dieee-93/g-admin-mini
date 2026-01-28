@@ -1,7 +1,7 @@
 import React from 'react';
 import { Section, Stack, Badge, Alert, EmptyState, SimpleGrid } from '@/shared/ui';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
-import { usePaymentAnalytics } from '@/modules/finance-integrations/hooks/usePayments';
+import { usePaymentAnalytics } from '@/modules/payment-gateways/hooks/usePayments';
 
 const IntegrationsAnalytics: React.FC = () => {
   // Fetch last 30 days by default

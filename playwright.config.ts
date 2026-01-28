@@ -36,6 +36,11 @@ export default defineConfig({
     // Base URL to use in actions like `await page.goto('/')`
     baseURL: 'http://localhost:5173',
     
+    // 🎯 Inject environment variable to disable React Scan
+    extraHTTPHeaders: {
+      'X-E2E-Test': 'true',
+    },
+    
     // Collect trace when retrying the failed test
     trace: 'on-first-retry',
     

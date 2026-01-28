@@ -188,7 +188,7 @@ export const AlertsTab = memo(function AlertsTab() {
                       <Badge colorPalette="red">
                         A
                       </Badge>
-                      <Text>Items de alto valor</Text>
+                      <Text>Materiales de alto valor</Text>
                     </Flex>
                     <Text fontWeight="semibold">
                       {settings.abc_analysis_thresholds.a_threshold}%
@@ -199,7 +199,7 @@ export const AlertsTab = memo(function AlertsTab() {
                       <Badge colorPalette="yellow">
                         B
                       </Badge>
-                      <Text>Items de valor medio</Text>
+                      <Text>Materiales de valor medio</Text>
                     </Flex>
                     <Text fontWeight="semibold">
                       {settings.abc_analysis_thresholds.b_threshold}%
@@ -210,7 +210,7 @@ export const AlertsTab = memo(function AlertsTab() {
                       <Badge colorPalette="green">
                         C
                       </Badge>
-                      <Text>Items de bajo valor</Text>
+                      <Text>Materiales de bajo valor</Text>
                     </Flex>
                     <Text fontWeight="semibold">
                       {settings.abc_analysis_thresholds.c_threshold}%

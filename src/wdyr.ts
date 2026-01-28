@@ -30,7 +30,18 @@
 
 // 🎯 PLAYWRIGHT FIX: Disable React Scan during E2E tests for performance
 // React Scan causes massive FPS drops (60 FPS → 3 FPS) in headed mode
-const isPlaywrightTest = typeof navigator !== 'undefined' && navigator.webdriver;
+// Multiple detection methods for reliability
+const isPlaywrightTest = typeof window !== 'undefined' && (
+  navigator.webdriver === true || 
+  (window as any).playwright !== undefined ||
+  (window as any).__playwright !== undefined ||
+  localStorage.getItem('playwright-test') === 'true'
+);
+
+// Set localStorage flag when Playwright is detected by other means
+if (typeof window !== 'undefined' && (navigator.webdriver || (window as any).playwright)) {
+  localStorage.setItem('playwright-test', 'true');
+}
 
 if (import.meta.env.DEV && typeof window !== 'undefined' && !isPlaywrightTest) {
   // 🔍 DEBUG: Track how many times this module loads

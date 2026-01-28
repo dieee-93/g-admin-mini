@@ -31,6 +31,7 @@ export const TypeSelector = memo(function TypeSelector({
         required
         height="44px"
         noPortal={true}
+        data-testid="material-type-select"
         renderItem={(item) => (
           <Stack gap="1">
             <Text>{item.label}</Text>

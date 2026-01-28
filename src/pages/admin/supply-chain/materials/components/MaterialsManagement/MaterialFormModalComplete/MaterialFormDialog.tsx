@@ -275,7 +275,7 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
                             placeholder="Ej: Harina 0000, Huevos tipo A, Sal fina, Relleno de carne..."
                             required={true}
                             disabled={isViewMode}
-                            data-testid="material-name"
+                            data-testid="material-name-input"
                           />
 
                           <Box>
@@ -288,15 +288,17 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
                               placeholder="¿A qué categoría pertenece?"
                               collection={CATEGORY_COLLECTION}
                               value={formData.category ? [formData.category] : []}
-                              onValueChange={(details) =>
-                                updateFormData({ category: details.value[0] })
-                              }
+                              onValueChange={(details) => {
+                                console.log('🔍 [MaterialFormDialog] Category onValueChange:', details);
+                                console.log('🔍 [MaterialFormDialog] Selected value:', details.value[0]);
+                                updateFormData({ category: details.value[0] });
+                              }}
                               disabled={isViewMode}
                               error={fieldErrors.category}
                               required
                               height="44px"
                               noPortal={true}
-                              data-testid="material-category"
+                              data-testid="material-category-select"
                             />
                           </Box>
                         </SimpleGrid>
@@ -360,6 +362,7 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
                                 onChange={(checked) => !isViewMode && setAddToStockNow(checked)}
                                 disabled={isViewMode}
                                 size="lg"
+                                data-testid="add-stock-switch"
                               />
                             </Flex>
                           </Box>

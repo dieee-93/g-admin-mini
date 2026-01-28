@@ -20,7 +20,7 @@ import {
   Switch,
   Textarea,
 } from '@/shared/ui';
-import { useCreatePaymentMethod, useUpdatePaymentMethod, usePaymentGateways } from '@/modules/finance-integrations/hooks/usePayments';
+import { useCreatePaymentMethod, useUpdatePaymentMethod, usePaymentGateways } from '@/modules/payment-gateways/hooks/usePayments';
 import { logger } from '@/lib/logging';
 
 interface PaymentMethodFormModalProps {

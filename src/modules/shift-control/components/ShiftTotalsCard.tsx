@@ -16,7 +16,7 @@
 
 import { useMemo } from 'react';
 import { Box, Stack, Flex, Text, Badge, SimpleGrid } from '@/shared/ui';
-import type { CashSessionRow } from '@/modules/cash/types';
+import type { CashSessionRow } from '@/modules/accounting/types';
 import { DecimalUtils } from '@/lib/decimal';
 import type { OperationalShift } from '../types';
 

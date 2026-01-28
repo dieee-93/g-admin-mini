@@ -97,6 +97,7 @@ export const StockInitialFields = ({
                                     borderRightRadius="0"
                                     placeholder="0"
                                     _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)" }}
+                                    data-testid="measurable-quantity-input"
                                 />
                             </NumberInput.Root>
                             {formData.unit && (
@@ -170,6 +171,7 @@ export const StockInitialFields = ({
                                     borderRadius="0"
                                     placeholder="0.00"
                                     _focus={{ borderColor: "green.500", boxShadow: "0 0 0 1px var(--chakra-colors-green-500)" }}
+                                    data-testid="measurable-cost-input"
                                 />
                             </NumberInput.Root>
                             <Box

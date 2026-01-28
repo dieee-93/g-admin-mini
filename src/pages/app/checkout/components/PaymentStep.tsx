@@ -1,5 +1,5 @@
 import { Stack, Text, Button, RadioGroup, Alert } from '@/shared/ui';
-import { useActivePaymentMethods } from '@/modules/finance-integrations/hooks/usePayments';
+import { useActivePaymentMethods } from '@/modules/payment-gateways/hooks/usePayments';
 
 interface PaymentStepProps {
   selectedPaymentMethod: string | null;

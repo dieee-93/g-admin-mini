@@ -1,8 +1,21 @@
 # 📋 Alert System V2: Implementation Summary
 
+> ## ⚠️ NOTA IMPORTANTE - Enero 2026
+> 
+> **Status de implementación ha cambiado desde este documento.**
+> 
+> **Para información actualizada, usa:** [ALERTS_COMPLETE_GUIDE.md](./ALERTS_COMPLETE_GUIDE.md)
+> 
+> **Cambios principales:**
+> - ❌ SmartAlertsEngine NO está implementado (estaba en "Completed" aquí, pero solo existen mocks)
+> - 🟡 Smart Alerts se implementan manualmente, no con engine automatizado
+> - ✅ Layer 1 (Toasts) y Layer 2a (Simple Alerts) SÍ funcionan
+>
+> Este doc es útil para entender el roadmap original.
+
 **Date:** November 18, 2025  
 **Version:** 2.0.0  
-**Status:** ✅ Ready for Implementation
+**Status:** 🟡 Parcialmente Actualizado
 
 > **Quick Navigation:**  
 > 📐 Full Architecture → [ALERT_ARCHITECTURE_V2.md](./ALERT_ARCHITECTURE_V2.md)  

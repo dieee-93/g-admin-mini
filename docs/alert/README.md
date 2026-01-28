@@ -1,72 +1,89 @@
 # 🔔 Documentación del Sistema de Alertas
 
-Documentación completa del Sistema Unificado de Alertas de G-Mini v3.1.
+**Versión:** 4.0.0 - Consolidada  
+**Última Actualización:** Enero 27, 2026
 
 ---
 
-## 📚 Documentos Disponibles
+## 🎯 START HERE - Guía Consolidada
 
-### 1. [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) 🎯 **START HERE**
-**Resumen Ejecutivo: Alert System V2** - 18 de noviembre, 2025
+### **[ALERTS_COMPLETE_GUIDE.md](./ALERTS_COMPLETE_GUIDE.md)** ⭐ **RECOMENDADO**
 
-Resumen ejecutivo para comenzar con el sistema de alertas V2:
+**📘 Guía Completa del Sistema de Alertas** - TODO en un solo lugar
 
-- 📋 **Executive Summary**: Qué cambió y por qué
-- 📊 **Implementation Status**: ✅ Completado y ⏳ Pendiente
-- 🏗️ **Architecture Highlights**: 3-Layer system en resumen
-- 💻 **Code Examples**: Copy-paste ready
-- 📈 **Performance Metrics**: Targets y estrategias
-- 🚀 **Implementation Timeline**: Plan de 4 semanas
-- 🎯 **Success Criteria**: Cómo validar
+Esta es la **guía definitiva** que explica TODO el sistema de alertas:
 
-**Audiencia:** Desarrolladores, project managers, stakeholders  
-**Lectura estimada:** 10-15 minutos  
-**Status:** ✅ Ready for implementation
+- ✅ **Las 3 Capas del Sistema** explicadas claramente
+- ✅ **¿Cuándo usar cada capa?** con flowchart y ejemplos
+- ✅ **Layer 1: Toasts** - Feedback inmediato (código real)
+- ✅ **Layer 2: Alerts** - Notificaciones persistentes (código real)
+- ✅ **Layer 3: Predictive** - Machine Learning (roadmap)
+- ✅ **Arquitectura Técnica** validada con codebase
+- ✅ **Ejemplos Prácticos Completos** de módulos reales
+- ✅ **Testing y Debugging** 
+- ✅ **Best Practices** con DO/DON'T
+- ✅ **Troubleshooting** de problemas comunes
 
----
-
-### 2. [ALERT_ARCHITECTURE_V2.md](./ALERT_ARCHITECTURE_V2.md) 🆕
-**Arquitectura V2: Sistema de 3 Capas** - 18 de noviembre, 2025
-
-Nueva arquitectura multi-módulo con clasificación de inteligencia:
-
-- 🏗️ **3-Layer Alert System**: Simple → Smart → Predictive
-- 📊 **Module Alert Matrix**: Configuración para 31 módulos
-- 🧠 **Smart Alert Rules**: Reglas de negocio por módulo
-- 🗄️ **Database Schema**: Tabla `alerts` con `intelligence_level`
-- 🎯 **Implementation Guide**: Plan paso a paso
-- 🔮 **Future Enhancements**: Roadmap ML/AI
-
-**Audiencia:** Arquitectos, líderes técnicos, desarrolladores senior  
-**Lectura estimada:** 45-60 minutos  
-**Status:** ✅ Aprobado para implementación
+**Audiencia:** Todos los desarrolladores  
+**Lectura estimada:** 30-40 minutos (pero es referencia permanente)  
+**Estado:** ✅ Validado con código real de la app
 
 ---
 
-### 3. [SMART_ALERTS_GUIDE.md](./SMART_ALERTS_GUIDE.md) 🆕
-**Guía Completa: Implementar Smart Alerts**
+## 📚 Documentación Complementaria
 
-Tutorial paso a paso para crear alertas inteligentes (Ver punto 5 más abajo).
+Después de leer la guía principal, consulta estos docs para casos específicos:
+
+### Quick References
+
+**1. [TOAST_QUICK_REFERENCE.md](./TOAST_QUICK_REFERENCE.md)**
+- Referencia rápida para Layer 1 (Toasts)
+- Patrones de uso comunes
+- Ejemplos copy-paste
+
+**2. [QUICK_REFERENCE.md](./QUICK_REFERENCE.md)**
+- API reference completa de useAlerts()
+- Todas las funciones y opciones
+- Tipos TypeScript
+
+### Documentación Técnica
+
+**3. [TOASTER_ARCHITECTURE_AUDIT.md](./TOASTER_ARCHITECTURE_AUDIT.md)**
+- Auditoría de arquitectura del Toaster
+- Fix del error de contexto (ChakraProvider)
+- Detalles técnicos de implementación
+
+**4. [USAGE_EXAMPLES.md](./USAGE_EXAMPLES.md)**
+- 8 ejemplos prácticos detallados
+- Implementaciones específicas por módulo
+
+**5. [MANUAL_TESTING_GUIDE.md](./MANUAL_TESTING_GUIDE.md)**
+- Cómo hacer testing manual del sistema
+- Checklist de validación
 
 ---
 
-### 3. [QUICK_REFERENCE.md](./QUICK_REFERENCE.md)
-**Referencia Rápida de la API**
+## 🗄️ Documentación Avanzada (Referencia Histórica)
 
-Guía de consulta rápida para uso cotidiano:
+> **⚠️ NOTA:** Los siguientes documentos contienen información histórica o detalles de arquitectura V2.
+> Para uso diario, usa **ALERTS_COMPLETE_GUIDE.md** que está actualizado con el código real.
 
-- 🚀 **Quick Start**: Ejemplo mínimo en 10 líneas
-- 📝 **Crear Alertas**: Simples, con acciones, bulk create
-- 🎯 **Filtros y Queries**: Por contexto, severidad, status
-- 🎨 **UI Components**: GlobalAlertsDisplay, badges, stacks
-- 🔧 **Acciones**: Acknowledge, resolve, dismiss, bulk ops
-- 📊 **Stats y Analytics**: Hooks de estadísticas, UI helpers
-- 🛠️ **Utilities**: AlertUtils helpers
-- 🎭 **Performance Patterns**: Split contexts, memoization, useShallow
-- 🔗 **EventBus Integration**: Escuchar/emitir eventos
-- 📋 **Tipos Principales**: Enums y interfaces clave
-- ⚡ **Performance Tips**: Mejores prácticas
-- 🐛 **Common Pitfalls**: Errores comunes y soluciones
+**6. [ALERT_ARCHITECTURE_V2.md](./ALERT_ARCHITECTURE_V2.md)**
+- Diseño de arquitectura V2 (Nov 2025)
+- Sistema de 3 capas (diseño original)
+- Module alert matrix (31 módulos)
+- ⚠️ **NOTA:** Algunas partes no están implementadas (ej: SmartAlertsEngine)
+
+**7. [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)**
+- Resumen ejecutivo de implementación V2
+- Status de implementación
+- Timeline y roadmap
+- ⚠️ **NOTA:** Algunos componentes en "Pending" no existen aún
+
+**8. [SMART_ALERTS_GUIDE.md](./SMART_ALERTS_GUIDE.md)**
+- Tutorial para crear smart alerts
+- Uso de SmartAlertsEngine (conceptual)
+- ⚠️ **NOTA:** SmartAlertsEngine NO está implementado, se usa patrón manual
 - 🔍 **Debugging**: Herramientas de depuración
 
 **Audiencia:** Desarrolladores implementando features  
@@ -74,30 +91,130 @@ Guía de consulta rápida para uso cotidiano:
 
 ---
 
-### 4. [USAGE_EXAMPLES.md](./USAGE_EXAMPLES.md)
-**Ejemplos Completos de Implementación**
+## 📁 Documentación Especializada
 
-Colección de 8 ejemplos prácticos listos para copiar/adaptar:
+### UI/UX
+- [MODERN_UX_PROPOSAL.md](./MODERN_UX_PROPOSAL.md) - Propuesta de UX moderna
+- [UI_UX_REFACTORING_COMPLETE.md](./UI_UX_REFACTORING_COMPLETE.md) - Refactoring UI completo
+- [QUICK_ANSWERS_UI_UX.md](./QUICK_ANSWERS_UI_UX.md) - Q&A sobre UI/UX
 
-1. **📦 Alertas de Stock Bajo (Materials)**: Hook completo + componente UI
-2. **🛒 Validación de Pedidos (Sales)**: Validación con alertas automáticas
-3. **👥 Alertas de Scheduling (Staff)**: Alertas predictivas de staffing
-4. **🎯 Dashboard Consolidado**: Vista agregada de todos los módulos
-5. **🔔 Alertas de Logros (Gamification)**: Notificaciones de achievements
-6. **🛠️ Smart Alerts Engine (Avanzado)**: Motor inteligente con ABC analysis
-7. **🎨 Alertas Custom UI**: Componente con diseño personalizado
-8. **📊 Analytics de Alertas**: Dashboard de analítica completo
+### Testing
+- [PLAYWRIGHT_TOAST_TESTING_GUIDE.md](./PLAYWRIGHT_TOAST_TESTING_GUIDE.md) - Testing con Playwright
 
-Cada ejemplo incluye:
-- Código completo funcional
-- Explicación del escenario
-- Notas de implementación
-- Variaciones posibles
+### Patterns
+- [USEINTERVAL_PATTERN.md](./USEINTERVAL_PATTERN.md) - Patrón useInterval para polling
 
-**Audiencia:** Desarrolladores aprendiendo el sistema  
-**Lectura estimada:** 15-20 minutos por ejemplo
+### Legacy (Archivo)
+- [archive/](./archive/) - Documentación histórica archivada
 
 ---
+
+## 🚀 Flujo de Aprendizaje Recomendado
+
+### Para Nuevos Desarrolladores
+
+1. **Lee primero:** [ALERTS_COMPLETE_GUIDE.md](./ALERTS_COMPLETE_GUIDE.md) (30-40 min)
+   - Entiende las 3 capas
+   - Aprende cuándo usar cada una
+   - Ve ejemplos prácticos
+
+2. **Referencia rápida:** [TOAST_QUICK_REFERENCE.md](./TOAST_QUICK_REFERENCE.md) (5 min)
+   - Para uso diario de toasts
+
+3. **API Reference:** [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) (10 min)
+   - Cuando necesites detalles de la API
+
+4. **Casos específicos:** [USAGE_EXAMPLES.md](./USAGE_EXAMPLES.md)
+   - Para implementaciones detalladas
+
+### Para Troubleshooting
+
+1. **Check:** [ALERTS_COMPLETE_GUIDE.md - Section Troubleshooting](./ALERTS_COMPLETE_GUIDE.md#troubleshooting)
+2. **Si es problema de Toaster:** [TOASTER_ARCHITECTURE_AUDIT.md](./TOASTER_ARCHITECTURE_AUDIT.md)
+3. **Para testing manual:** [MANUAL_TESTING_GUIDE.md](./MANUAL_TESTING_GUIDE.md)
+
+---
+
+## ⚠️ Documentación Deprecada
+
+Los siguientes documentos están **OBSOLETOS** o contienen información **INCOMPLETA/INCORRECTA**:
+
+### ❌ NO USAR:
+
+1. **REFACTORING_PLAN_IN_PLACE.md** - Plan obsoleto, ya completado
+2. **archive/SMART_ALERTS_V2_REFACTOR_COMPLETE.md** - Versión antigua
+3. **archive/ALERTS_SYSTEM_AUDIT.md** - Audit obsoleto
+4. **archive/CODE_AUDIT_REPORT.md** - Report viejo
+5. **archive/DOCUMENTATION_AUDIT_REPORT.md** - Audit viejo
+
+> **Estos archivos se mantienen solo como referencia histórica.**  
+> **Para uso actual, consulta ALERTS_COMPLETE_GUIDE.md**
+
+---
+
+## 🔍 Búsqueda Rápida
+
+### "¿Cómo hago X?"
+
+| Quiero... | Ve a... |
+|-----------|---------|
+| Mostrar confirmación de guardado | [ALERTS_COMPLETE_GUIDE.md - Layer 1](./ALERTS_COMPLETE_GUIDE.md#layer-1-toasts---feedback-inmediato) |
+| Crear alerta de stock bajo | [ALERTS_COMPLETE_GUIDE.md - Layer 2](./ALERTS_COMPLETE_GUIDE.md#layer-2-alerts---notificaciones-del-sistema) |
+| Saber qué capa usar | [ALERTS_COMPLETE_GUIDE.md - Decisión](./ALERTS_COMPLETE_GUIDE.md#cuándo-usar-cada-capa) |
+| Fix error de contexto | [TOASTER_ARCHITECTURE_AUDIT.md](./TOASTER_ARCHITECTURE_AUDIT.md) |
+| Ver ejemplos completos | [ALERTS_COMPLETE_GUIDE.md - Ejemplos](./ALERTS_COMPLETE_GUIDE.md#ejemplos-prácticos-completos) |
+| API completa | [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) |
+
+---
+
+## 📊 Estado del Sistema
+
+### ✅ Implementado (Layer 1 & 2a)
+- Toast System (Layer 1)
+- Alerts Provider (Layer 2)
+- Simple Alerts (Layer 2a)
+- Database schema con `intelligence_level`
+- NotificationCenter UI
+- Badges en módulos
+
+### 🚧 Parcialmente Implementado (Layer 2b)
+- Smart Alerts (Layer 2b)
+  - ✅ Tipos y schema de DB listos
+  - ✅ Patrones manuales funcionando
+  - ❌ SmartAlertsEngine NO implementado (solo docs/tests)
+  - ⚠️ Se usa patrón manual de detección
+
+### 🔮 Roadmap (Layer 3)
+- Predictive Alerts (Q1 2026)
+- ML/AI integration
+- Forecasting
+- Anomaly detection
+
+---
+
+## 📞 Soporte
+
+### ¿Tienes dudas?
+
+1. ✅ Lee [ALERTS_COMPLETE_GUIDE.md](./ALERTS_COMPLETE_GUIDE.md)
+2. ✅ Busca en [Troubleshooting](./ALERTS_COMPLETE_GUIDE.md#troubleshooting)
+3. ✅ Revisa [ejemplos prácticos](./ALERTS_COMPLETE_GUIDE.md#ejemplos-prácticos-completos)
+4. ✅ Consulta el código en `src/shared/alerts/`
+
+### ¿Encontraste un bug?
+
+1. Documenta el problema
+2. Check si está en [Troubleshooting](./ALERTS_COMPLETE_GUIDE.md#troubleshooting)
+3. Revisa los tipos en `src/shared/alerts/types.ts`
+4. Verifica implementación en `src/shared/alerts/AlertsProvider.tsx`
+
+---
+
+**Versión:** 4.0.0 - Consolidada  
+**Última Actualización:** Enero 27, 2026  
+**Mantenido por:** Equipo de Desarrollo
+
+
 
 ### 5. [SMART_ALERTS_GUIDE.md](./SMART_ALERTS_GUIDE.md) 🆕
 **Guía Completa: Implementar Smart Alerts**

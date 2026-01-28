@@ -1,8 +1,23 @@
 # Alert System Architecture V2 - Multi-Module Enterprise Design
 
+> ## ⚠️ NOTA IMPORTANTE - Enero 2026
+> 
+> **Este documento contiene el diseño original de la arquitectura V2, pero algunas partes NO están implementadas.**
+> 
+> **Para uso diario y código actual, usa:** [ALERTS_COMPLETE_GUIDE.md](./ALERTS_COMPLETE_GUIDE.md)
+> 
+> **Diferencias principales:**
+> - ❌ `SmartAlertsEngine` NO está implementado (solo existe en tests como mock)
+> - ❌ Motor automatizado de reglas NO existe (se usa patrón manual)
+> - ✅ Database schema SÍ está implementado
+> - ✅ Tipos TypeScript SÍ están implementados
+> - ✅ Sistema de 3 capas SÍ está implementado (conceptualmente)
+>
+> Este doc es útil para entender el diseño original y planes futuros.
+
 **Date:** November 18, 2025  
 **Version:** 2.0.0  
-**Status:** 🟢 Final Architecture  
+**Status:** 🟡 Parcialmente Implementado  
 **Scope:** 31 modules + future expansion
 
 ---

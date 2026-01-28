@@ -530,7 +530,7 @@ export const InventoryTab = memo(function InventoryTab({
               size="lg"
               onClick={onAddMaterial}
               disabled={isLoading || !onAddMaterial}
-              data-testid="new-material-button"
+              data-testid="inventory-tab-new-button"
             >
               <Icon icon={PlusIcon} size="md" />
               Agregar Item

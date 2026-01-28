@@ -76,7 +76,7 @@ MaterialsActions.displayName = 'MaterialsActions';
             onClick={onAddMaterial}
             size="lg"
             flex={isMobile ? "1" : "0"}
-            data-testid="new-material-button"
+            data-testid="materials-actions-new-button"
           >
             <Icon icon={PlusIcon} size="sm" />
             Agregar Material

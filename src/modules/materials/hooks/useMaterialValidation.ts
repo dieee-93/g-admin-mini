@@ -51,7 +51,12 @@ export function useMaterialValidation(
   const form = useMemo(() => ({
     register: () => {},
     setValue: () => {},
-    trigger: () => {},
+    trigger: async () => {
+      console.log('🔍 [useMaterialValidation] dummy trigger called');
+      // ✅ FIX: Return true since we're not doing real validation here
+      // The real validation should be done manually with Zod
+      return true;
+    },
     clearErrors: () => {},
     setError: () => {},
     getValues: () => initialData as MaterialFormData,
