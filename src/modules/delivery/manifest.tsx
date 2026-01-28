@@ -43,7 +43,7 @@ export const deliveryManifest: ModuleManifest = {
    * - sales: for order integration
    * - staff: for driver management (optional but recommended)
    */
-  depends: ['fulfillment', 'sales'],
+  depends: ['sales'],
   // ============================================
   // FEATURE REQUIREMENTS
   // ============================================

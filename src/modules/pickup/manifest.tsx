@@ -37,7 +37,7 @@ export const pickupManifest: ModuleManifest = {
    * Depends on parent fulfillment module
    * Also requires sales module for order integration
    */
-  depends: ['fulfillment', 'sales'],
+  depends: ['sales'],
   // ============================================
   // FEATURE REQUIREMENTS
   // ============================================

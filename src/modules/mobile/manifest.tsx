@@ -14,7 +14,7 @@ export const mobileManifest: ModuleManifest = {
 
 
   // ✅ OPTIONAL MODULE: Only loaded when required feature is active
-  depends: ['staff', 'fulfillment', 'materials'],
+  depends: ['staff', 'delivery', 'materials'],
   // 🔒 PERMISSIONS: Operadores can use mobile operations
   minimumRole: 'OPERADOR' as const,
 
@@ -171,7 +171,7 @@ export const mobileManifest: ModuleManifest = {
       mobileInventoryService: () => import('./services/mobileInventoryService')
     },
     hooks: {
-      useDriverLocation: () => import('@/modules/fulfillment/delivery/hooks/useDriverLocation')
+      useDriverLocation: () => import('@/modules/delivery/hooks/useDriverLocation')
     }
   }
 };
