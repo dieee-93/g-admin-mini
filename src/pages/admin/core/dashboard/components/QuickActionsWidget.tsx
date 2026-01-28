@@ -101,7 +101,7 @@ const defaultActions: QuickAction[] = [
     label: 'Factura',
     icon: BanknotesIcon,
     color: 'teal',
-    path: '/admin/finance-billing'
+    path: '/admin/finance/billing'
   },
   {
     id: 'settings',

@@ -82,8 +82,6 @@ import { shiftControlManifest } from './shift-control/manifest';
 // FINANCE DOMAIN - Financial management
 // ============================================
 import { financeCorporateManifest } from './finance-corporate/manifest';
-import { financeFiscalManifest } from './finance-fiscal/manifest';
-import { financeBillingManifest } from './finance-billing/manifest';
 import { paymentGatewaysManifest } from './payment-gateways/manifest';
 import { accountingManifest } from './accounting/manifest';
 import { billingManifest } from './billing/manifest';
@@ -157,10 +155,8 @@ export const ALL_MODULE_MANIFESTS = [
   // TIER 3: Finance Domain (all independent)
   // ============================================
 
-  financeBillingManifest,        // ✅ Depends on: customers
-  financeFiscalManifest,         // ✅ Depends on: sales
-  financeCorporateManifest,      // ✅ Depends on: customers, finance-fiscal, finance-billing
-  paymentGatewaysManifest,       // ✅ Depends on: finance-fiscal, finance-billing
+  financeCorporateManifest,      // ✅ Depends on: customers, billing
+  paymentGatewaysManifest,       // ✅ Depends on: billing
   accountingManifest,        // ✅ Cash flow, sessions, double-entry accounting
   billingManifest,           // ✅ NEW Phase 4: Consolidated billing + fiscal
 
@@ -180,7 +176,7 @@ export const ALL_MODULE_MANIFESTS = [
   // TIER 5: Third-level dependencies
   // ============================================
 
-  membershipsManifest,   // ✅ Depends on: customers + finance-billing
+  membershipsManifest,   // ✅ Depends on: customers + billing
   rentalsManifest,       // ✅ Depends on: customers + scheduling
 
   // ============================================
@@ -243,8 +239,6 @@ export {
 
   // Finance domain
   financeCorporateManifest,
-  financeFiscalManifest,
-  financeBillingManifest,
   paymentGatewaysManifest,
   accountingManifest,
   billingManifest,
@@ -274,7 +268,7 @@ export const MODULE_STATS = {
     supplyChain: 8,   // materials, suppliers, products, products-analytics, recipe, production, assets
     operations: 8,    // sales, fulfillment, fulfillment-onsite, fulfillment-pickup, fulfillment-delivery, mobile, memberships, rentals
     resources: 2,     // team, scheduling
-    finance: 5,       // finance-corporate, finance-fiscal, finance-billing, finance-integrations, cash-management
+    finance: 4,       // finance-corporate, payment-gateways, accounting, billing (consolidated)
     gamification: 1,  // gamification
     executive: 1,     // executive
   },
