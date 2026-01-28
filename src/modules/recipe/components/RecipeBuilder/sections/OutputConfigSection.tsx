@@ -306,6 +306,7 @@ function OutputConfigSectionComponent(props: OutputConfigSectionProps) {
               value={output.quantity ?? ''}
               onChange={(e) => updateOutput({ quantity: parseFloat(e.target.value) || 0 })}
               flex="1"
+              data-testid="recipe-output-quantity"
               css={{
                 fontFamily: 'var(--chakra-fonts-mono)',
                 fontSize: 'var(--chakra-fontSizes-md)',

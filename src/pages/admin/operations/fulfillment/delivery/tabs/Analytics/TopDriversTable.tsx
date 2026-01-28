@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Stack, Text, CardWrapper, Table, Badge, Spinner } from '@/shared/ui';
-import { deliveryApi } from '@/modules/fulfillment/delivery/services/deliveryApi';
-import type { DriverPerformance } from '@/modules/fulfillment/delivery/types';
+import { deliveryApi } from '@/modules/delivery/services/deliveryApi';
+import type { DriverPerformance } from '@/modules/delivery/types';
 import { logger } from '@/lib/logging';
 
 interface TopDriver {

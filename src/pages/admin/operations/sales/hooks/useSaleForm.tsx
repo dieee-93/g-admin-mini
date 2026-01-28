@@ -32,7 +32,7 @@ import { supabase } from '@/lib/supabase/client';
 import { useActiveFeatures, hasFeature } from '@/lib/capabilities';
 
 // Cross-module types
-import type { SaleContext } from '@/modules/fulfillment/onsite/events';
+import type { SaleContext } from '@/modules/onsite/events';
 
 interface PaymentData {
   payment_method: 'cash' | 'card' | 'transfer' | 'mixed';

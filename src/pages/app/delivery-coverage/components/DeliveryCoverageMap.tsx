@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Stack, Text, Badge, Spinner } from '@/shared/ui';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { DeliveryZone } from '@/modules/fulfillment/delivery/types';
+import type { DeliveryZone } from '@/modules/delivery/types';
 
 interface DeliveryCoverageMapProps {
   zones: DeliveryZone[];

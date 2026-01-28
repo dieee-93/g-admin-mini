@@ -16,7 +16,7 @@
  *       status="configured"
  *     />
  *   ),
- *   'fulfillment-onsite',
+ *   'onsite',
  *   100
  * );
  * ```

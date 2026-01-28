@@ -13,8 +13,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { logger } from '@/lib/logging';
 import { fulfillmentService } from '@/modules/fulfillment/services/fulfillmentService';
-import { deliveryService } from '@/modules/fulfillment/delivery/services/deliveryService';
-import type { DeliveryMetadata, Coordinates } from '@/modules/fulfillment/delivery/types';
+import { deliveryService } from '@/modules/delivery/services/deliveryService';
+import type { DeliveryMetadata, Coordinates } from '@/modules/delivery/types';
 
 // Mock Supabase client
 vi.mock('@/lib/supabase/client', () => ({

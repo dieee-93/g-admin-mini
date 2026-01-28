@@ -199,8 +199,8 @@
               "column": 8,
               "specs": [
                 {
-                  "title": "1. Crear MEASURABLE Material (kg, litros)",
-                  "ok": true,
+                  "title": "3. Crear ELABORATED Material (producto elaborado)",
+                  "ok": false,
                   "tags": [],
                   "tests": [
                     {
@@ -213,23 +213,53 @@
                         {
                           "workerIndex": 0,
                           "parallelIndex": 0,
-                          "status": "interrupted",
-                          "duration": 12,
-                          "errors": [],
+                          "status": "failed",
+                          "duration": 15803,
+                          "error": {
+                            "message": "TimeoutError: page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/admin/supply-chain/materials\", waiting until \"domcontentloaded\"\u001b[22m\n",
+                            "stack": "TimeoutError: page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/admin/supply-chain/materials\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:32:16",
+                            "location": {
+                              "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
+                              "column": 16,
+                              "line": 32
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 30 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m     \n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/admin/supply-chain/materials'\u001b[39m\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m     \n \u001b[90m 34 |\u001b[39m     \u001b[90m// Esperar renders de React y que la página esté interactiva\u001b[39m\n \u001b[90m 35 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m2000\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
+                                "column": 16,
+                                "line": 32
+                              },
+                              "message": "TimeoutError: page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/admin/supply-chain/materials\", waiting until \"domcontentloaded\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 30 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m     \n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/admin/supply-chain/materials'\u001b[39m\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m'domcontentloaded'\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m     \n \u001b[90m 34 |\u001b[39m     \u001b[90m// Esperar renders de React y que la página esté interactiva\u001b[39m\n \u001b[90m 35 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m2000\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:32:16\u001b[22m"
+                            }
+                          ],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-01-28T04:14:25.966Z",
+                          "startTime": "2026-01-28T17:24:59.946Z",
                           "annotations": [],
-                          "attachments": []
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\materials-materials-crud-c-ec869-aterial-producto-elaborado--authenticated\\test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
+                            "column": 16,
+                            "line": 32
+                          }
                         }
                       ],
-                      "status": "skipped"
+                      "status": "unexpected"
                     }
                   ],
-                  "id": "49c27bb20a52ce2852e8-7664bd91d2ec120d3b79",
+                  "id": "49c27bb20a52ce2852e8-0a3176907f06d2c4b6c6",
                   "file": "materials/materials-crud-complete.spec.ts",
-                  "line": 44,
+                  "line": 208,
                   "column": 5
                 }
               ]
@@ -241,11 +271,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-01-28T04:14:24.392Z",
-    "duration": 9278.346999999998,
+    "startTime": "2026-01-28T17:24:52.048Z",
+    "duration": 24478.752,
     "expected": 0,
-    "skipped": 1,
-    "unexpected": 0,
+    "skipped": 0,
+    "unexpected": 1,
     "flaky": 0
   }
 }

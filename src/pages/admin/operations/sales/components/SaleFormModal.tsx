@@ -27,7 +27,7 @@ import { DigitalCheckoutView } from './DigitalCheckoutView';
 import { useSaleForm } from '../hooks/useSaleForm';
 import { HookPoint } from '@/lib/modules';
 import { SaleFormHeader, SaleFormFooter, SaleFormFallbackView } from './SaleForm';
-import type { SaleContext } from '@/modules/fulfillment/onsite/events';
+import type { SaleContext } from '@/modules/onsite/events';
 
 interface SaleFormModalProps {
   isOpen: boolean;

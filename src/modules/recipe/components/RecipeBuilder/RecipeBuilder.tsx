@@ -355,14 +355,16 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
 
       {/* SECCIÓN 2: Materials / Components (REDESIGNED - Industrial Table) */}
       {sections.inputs && (
-        <InputsEditorSection
-          recipe={recipe}
-          updateRecipe={updateRecipe}
-          entityType={entityType}
-          features={mergedFeatures}
-          materials={materials}
-          materialsLoading={materialsLoading}
-        />
+        <Box data-testid="recipe-inputs-section">
+          <InputsEditorSection
+            recipe={recipe}
+            updateRecipe={updateRecipe}
+            entityType={entityType}
+            features={mergedFeatures}
+            materials={materials}
+            materialsLoading={materialsLoading}
+          />
+        </Box>
       )}
 
       {/* SECCIÓN 3: Staff Assignment (NEW - Industrial Wrapper) */}
@@ -375,14 +377,16 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
 
       {/* SECCIÓN 4: Output Configuration (REFORMED - Type selector + Cost Preview) */}
       {sections.output && (
-        <OutputConfigSection
-          recipe={recipe}
-          updateRecipe={updateRecipe}
-          features={mergedFeatures}
-          materialsCost={materialsCost}
-          laborCost={laborCost}
-          overhead={overhead}
-        />
+        <Box data-testid="recipe-output-section">
+          <OutputConfigSection
+            recipe={recipe}
+            updateRecipe={updateRecipe}
+            features={mergedFeatures}
+            materialsCost={materialsCost}
+            laborCost={laborCost}
+            overhead={overhead}
+          />
+        </Box>
       )}
 
       {/* SECCIÓN 5: Cost Summary (REDESIGNED - Invoice Style) */}
@@ -418,6 +422,7 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
           onClick={handleSave}
           loading={isSubmitting}
           disabled={!validation.isValid}
+          data-testid="recipe-save-button"
         >
           {mode === 'create' ? 'Crear Receta' : 'Guardar Cambios'}
         </Button>

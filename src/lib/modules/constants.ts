@@ -140,9 +140,9 @@ export const OPTIONAL_MODULES: Readonly<Record<string, FeatureId>> = {
   // ============================================
 
   'fulfillment': 'operations_table_management',
-  'fulfillment-onsite': 'operations_table_management',
-  'fulfillment-delivery': 'operations_delivery_zones',
-  'fulfillment-pickup': 'operations_pickup_scheduling',
+  'onsite': 'operations_table_management',
+  'delivery': 'operations_delivery_zones',
+  'pickup': 'operations_pickup_scheduling',
 
   // ============================================
   // STAFF & SCHEDULING

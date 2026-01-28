@@ -1,7 +1,7 @@
 import { Stack, Badge, CardWrapper, Text, Button, Box } from '@/shared/ui';
 import { UserIcon, TruckIcon, StarIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import { ClockIcon } from '@heroicons/react/24/outline';
-import type { DriverPerformance } from '@/modules/fulfillment/delivery/types';
+import type { DriverPerformance } from '@/modules/delivery/types';
 
 interface DriverCardProps {
   driver: DriverPerformance;

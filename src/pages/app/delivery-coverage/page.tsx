@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { ContentLayout, Section, Stack, Text, Tabs, Spinner, Alert } from '@/shared/ui';
 import { DeliveryCoverageMap, DeliveryChecker } from './components';
-import { usePublicDeliveryZones } from '@/modules/fulfillment/delivery/hooks/useDeliveryZones';
+import { usePublicDeliveryZones } from '@/modules/delivery/hooks/useDeliveryZones';
 import { useLocation } from '@/contexts/LocationContext';
 
 export default function DeliveryCoveragePage() {

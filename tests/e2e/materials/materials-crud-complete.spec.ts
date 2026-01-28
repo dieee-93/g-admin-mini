@@ -206,54 +206,97 @@ test.describe('Materials CRUD - Complete Test Suite', () => {
     });
 
     test('3. Crear ELABORATED Material (producto elaborado)', async ({ page }) => {
-      // Abrir modal
-      const newMaterialButton = page.getByRole('button', { name: 'Agregar Material' });
-      await newMaterialButton.dispatchEvent('click');
+      const testId = Date.now();
+      const materialName = `Pizza Mozzarella Test-${testId}`;
       
-      // Esperar lazy loading
+      // ========== Open modal (ONLY data-testid) ==========
+      await page.getByTestId('materials-toolbar-new-button').click();
+      
+      // Wait for lazy loading
       await expect(page.getByText('Cargando formulario...')).toBeVisible({ timeout: 5000 });
       await expect(page.getByText('Cargando formulario...')).toBeHidden({ timeout: 30000 });
       
       const dialog = page.locator('[role="dialog"]');
       await expect(dialog).toBeVisible();
       
-      // ========== Información Básica ==========
-      await dialog.locator('[data-testid="material-name"]').fill('Pizza Mozzarella');
+      // ========== Fill name ==========
+      await dialog.getByTestId('material-name-input').fill(materialName);
       
-      // ========== TIPO PRIMERO (handleTypeChange resetea category) ==========
-      const elaboratedButton = dialog.getByRole('button', { name: /elaborado/i });
-      await expect(elaboratedButton).toBeVisible();
-      await elaboratedButton.click();
+      // ========== Select type: ELABORATED ==========
+      await dialog.getByTestId('material-type-select').locator('[data-part="trigger"]').click();
+      await page.waitForTimeout(300);
+      await page.getByRole('option', { name: /Elaborado/i }).click();
       
-      // ========== CATEGORÍA DESPUÉS DEL TIPO ==========
-      const categoryTrigger = dialog.locator('[data-testid="material-category"] [data-part="trigger"]');
-      await categoryTrigger.click();
+      // ========== Verify ELABORATED-specific UI appears ==========
+      await expect(dialog.getByTestId('elaborated-header')).toBeVisible();
+      await expect(dialog.getByTestId('elaborated-info-alert')).toBeVisible();
+      
+      // ========== Select category (using global category selector) ==========
+      await dialog.getByTestId('material-category-select').locator('[data-part="trigger"]').click();
       await page.waitForTimeout(500);
-      await page.getByRole('option', { name: /Producto Elaborado/i }).click();
+      await page.getByRole('option').first().click();
       
-      // Verificar que aparecen campos de ELABORATED
-      // (Nota: Este tipo puede tener componentes de receta que requieren interacción adicional)
-      const elaboratedSection = dialog.getByText(/Componentes de la receta/i);
-      if (await elaboratedSection.isVisible()) {
-        // Si hay sección de receta, validar que está visible
-        await expect(elaboratedSection).toBeVisible();
+      // ========== Verify RecipeBuilder section ==========
+      await expect(dialog.getByTestId('recipe-builder-section')).toBeVisible();
+      await expect(dialog.getByTestId('production-module-status')).toBeVisible();
+      
+      // ========== Add ingredient to recipe ==========
+      await expect(dialog.getByTestId('recipe-inputs-section')).toBeVisible();
+      await dialog.getByTestId('recipe-add-input-button').click();
+      await page.waitForTimeout(500);
+      
+      // Search for material ingredient
+      const materialSearch = dialog.getByTestId('material-selector-search');
+      await expect(materialSearch).toBeVisible();
+      await materialSearch.fill('Harina');
+      await page.waitForTimeout(800); // Debounce + search
+      
+      // Select first material from results
+      const firstMaterial = dialog.locator('[data-testid^="material-option-"]').first();
+      await expect(firstMaterial).toBeVisible({ timeout: 5000 });
+      await firstMaterial.click();
+      await page.waitForTimeout(500);
+      
+      // Set quantity for ingredient
+      const quantityInput = dialog.getByTestId('recipe-input-quantity-0');
+      await expect(quantityInput).toBeVisible();
+      await quantityInput.fill('2.5');
+      
+      // ========== Configure output (production quantity) ==========
+      await expect(dialog.getByTestId('recipe-output-section')).toBeVisible();
+      const outputQuantity = dialog.getByTestId('recipe-output-quantity');
+      await expect(outputQuantity).toBeVisible();
+      await outputQuantity.fill('10');
+      
+      // ========== Save recipe ==========
+      const saveButton = dialog.getByTestId('recipe-save-button');
+      await expect(saveButton).toBeVisible();
+      await expect(saveButton).toBeEnabled();
+      await saveButton.click();
+      
+      // ========== Confirm Event Sourcing (if appears) ==========
+      await page.waitForTimeout(1000);
+      const confirmationDialog = page.locator('[role="dialog"]').filter({ 
+        hasText: 'Confirmar Creación con Event Sourcing' 
+      });
+      
+      if (await confirmationDialog.isVisible({ timeout: 2000 })) {
+        const confirmButton = confirmationDialog.getByRole('button', { 
+          name: 'Confirmar y Guardar →' 
+        });
+        await confirmButton.click();
       }
       
-      // Por ahora solo verificamos que se puede crear sin receta compleja
-      // (Los tests de receta compleja serían otro suite)
-      
-      // ========== Submit (sin stock inicial - ELABORATED no requiere) ==========
-      await dialog.getByRole('button', { name: /Crear Material/i }).click();
-      
-      // ========== Validar notificación ==========
-      const toast = page.locator('[role="status"]').filter({ hasText: /Item creado/i });
+      // ========== Validate success ==========
+      const toast = page.locator('[role="status"]').filter({ hasText: /Material creado/i });
       await expect(toast).toBeVisible({ timeout: 10000 });
-      await expect(toast).toContainText('Pizza Mozzarella se ha creado exitosamente');
       
-      // Verificar en grid
-      const materialCard = page.locator('[data-testid^="material-card"]')
-        .filter({ hasText: 'Pizza Mozzarella' });
-      await expect(materialCard).toBeVisible();
+      // Verify material appears in the table/list
+      await page.waitForTimeout(1000);
+      const materialRow = page.getByText(materialName);
+      await expect(materialRow).toBeVisible({ timeout: 5000 });
+      
+      console.log('✅ Test ELABORATED Material - Complete with recipe');
     });
   });
 

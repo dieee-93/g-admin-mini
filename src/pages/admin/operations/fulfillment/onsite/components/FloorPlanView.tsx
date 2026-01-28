@@ -33,8 +33,8 @@ import {
 } from '@dnd-kit/sortable';
 
 // Module imports (following project conventions)
-import { useFloorManagement, useOnsiteEventListeners } from '@/modules/fulfillment/onsite/hooks';
-import type { Table, SeatPartyData, TableStatus } from '@/modules/fulfillment/onsite/types';
+import { useFloorManagement, useOnsiteEventListeners } from '@/modules/onsite/hooks';
+import type { Table, SeatPartyData, TableStatus } from '@/modules/onsite/types';
 
 // Local components
 import { SortableTableCard, TableCardContent } from './SortableTableCard';
@@ -44,7 +44,7 @@ import { BillModal } from './BillModal';
 
 // Sales integration
 import { SaleFormModal } from '@/pages/admin/operations/sales/components/SaleFormModal';
-import type { OnsiteSaleContext } from '@/modules/fulfillment/onsite/events';
+import type { OnsiteSaleContext } from '@/modules/onsite/events';
 
 // Toast for notifications
 import { toaster } from '@/shared/ui/toaster';

@@ -43,7 +43,7 @@ export const LazyFulfillmentPage = createLazyComponent(
 // Lazy-loaded Fulfillment Onsite Page
 export const LazyFulfillmentOnsitePage = createLazyComponent(
   () => import('../../pages/admin/operations/fulfillment/onsite/page'),
-  'fulfillment-onsite',
+  'onsite',
   {
     chunkName: 'fulfillment-onsite-module',
     preload: false,
@@ -68,7 +68,7 @@ export const LazyProductionPage = createLazyComponent(
 // UPDATED: Consolidated into fulfillment-delivery module
 export const LazyDeliveryPage = createLazyComponent(
   () => import('../../pages/admin/operations/fulfillment/delivery/page'),
-  'fulfillment-delivery',
+  'delivery',
   {
     chunkName: 'fulfillment-delivery-module',
     preload: false,

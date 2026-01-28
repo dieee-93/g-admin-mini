@@ -7,8 +7,8 @@
 
 import { useState } from 'react';
 import { Stack, Box, Input, Button, Alert, Text, Badge } from '@/shared/ui';
-import { checkDeliveryAvailability } from '@/modules/fulfillment/delivery/services/publicZonesApi';
-import type { Coordinates } from '@/modules/fulfillment/delivery/types';
+import { checkDeliveryAvailability } from '@/modules/delivery/services/publicZonesApi';
+import type { Coordinates } from '@/modules/delivery/types';
 
 interface DeliveryCheckerProps {
   locationId?: string;

@@ -13,9 +13,9 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { logger } from '@/lib/logging';
-import { deliveryService } from '@/modules/fulfillment/delivery/services/deliveryService';
-import { routeOptimizationService } from '@/modules/fulfillment/delivery/services/routeOptimizationService';
-import type { DeliveryOrder, DriverPerformance, Coordinates } from '@/modules/fulfillment/delivery/types';
+import { deliveryService } from '@/modules/delivery/services/deliveryService';
+import { routeOptimizationService } from '@/modules/delivery/services/routeOptimizationService';
+import type { DeliveryOrder, DriverPerformance, Coordinates } from '@/modules/delivery/types';
 
 // Mock services
 vi.mock('@/lib/supabase/client');

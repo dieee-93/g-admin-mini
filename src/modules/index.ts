@@ -57,9 +57,9 @@ import { assetsManifest } from './assets/manifest';
 // OPERATIONS DOMAIN - Daily operations
 // ============================================
 import { salesManifest } from './sales/manifest';
-import { fulfillmentOnsiteManifest } from './fulfillment/onsite/manifest';
-import { fulfillmentPickupManifest } from './fulfillment/pickup/manifest';
-import { fulfillmentDeliveryManifest } from './fulfillment/delivery/manifest';
+import { onsiteManifest } from './onsite/manifest';
+import { pickupManifest } from './pickup/manifest';
+import { deliveryManifest } from './delivery/manifest';
 import { productionManifest } from './production/manifest';
 // DISABLED: kitchen module is obsolete, functionality merged into production
 // import { kitchenManifest } from './production/kitchen/manifest';
@@ -162,9 +162,9 @@ export const ALL_MODULE_MANIFESTS = [
   // TIER 4: Second-level dependencies
   // ============================================
 
-  fulfillmentOnsiteManifest,  // ✅ NEW: Onsite service (from floor)
-  fulfillmentPickupManifest,  // ✅ NEW: Pickup orders sub-module
-  fulfillmentDeliveryManifest, // ✅ NEW: Delivery orders sub-module
+  onsiteManifest,  // ✅ Onsite service (tables, floor)
+  pickupManifest,  // ✅ Pickup orders (take away)
+  deliveryManifest, // ✅ Delivery orders (motorcycles)
   mobileManifest,             // ✅ NEW Phase 2: Mobile operations (GPS, routes, inventory)
   
 
@@ -181,7 +181,7 @@ export const ALL_MODULE_MANIFESTS = [
 
   // DISABLED: kitchen module is obsolete
   // kitchenManifest,       // ✅ Links: sales + materials (auto-install)
-  // DISABLED: delivery standalone module is obsolete, use fulfillmentDeliveryManifest instead
+  // DISABLED: delivery standalone module is obsolete, use deliveryManifest instead
   // deliveryManifest,      // ❌ REMOVED - Consolidated into fulfillment-delivery submódulo
   loyaltyManifest,  // ✅ Listens to: all modules (auto-install)
 ];
@@ -215,9 +215,9 @@ export {
 
   // Operations domain
   salesManifest,
-  fulfillmentOnsiteManifest,
-  fulfillmentPickupManifest,
-  fulfillmentDeliveryManifest,
+  onsiteManifest,
+  pickupManifest,
+  deliveryManifest,
   mobileManifest,
   // DISABLED: kitchen module is obsolete
   // kitchenManifest,

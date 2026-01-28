@@ -18,13 +18,13 @@ import type { ModuleManifest } from '@/lib/modules/types';
 import { ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
 
-export const fulfillmentPickupManifest: ModuleManifest = {
+export const pickupManifest: ModuleManifest = {
   // ============================================
   // CORE METADATA
   // ============================================
 
-  id: 'fulfillment-pickup',
-  name: 'Fulfillment - Pickup Orders',
+  id: 'pickup',
+  name: 'Pickup Orders',
   version: '1.0.0',
 
   permissionModule: 'operations', // ✅ Uses 'operations' permission
@@ -154,7 +154,7 @@ export const fulfillmentPickupManifest: ModuleManifest = {
             logger.error('App', 'Error queuing pickup order', error);
           }
         }
-      }, { moduleId: 'fulfillment-pickup' });
+      }, { moduleId: 'pickup' });
 
       /**
        * Listen to production.order_ready
@@ -191,7 +191,7 @@ export const fulfillmentPickupManifest: ModuleManifest = {
             logger.info('App', '✅ Pickup order ready, customer notified');
           }
         }
-      }, { moduleId: 'fulfillment-pickup' });
+      }, { moduleId: 'pickup' });
 
       // ============================================
       // REGISTER TOOLBAR ACTIONS (OPTIONAL)
@@ -222,14 +222,14 @@ export const fulfillmentPickupManifest: ModuleManifest = {
         registry.addAction(
           'settings.hours.tabs',
           () => <PickupHoursTabTrigger key="pickup-tab" />,
-          'fulfillment-pickup',
+          'pickup',
           90 // After operating hours
         );
 
         registry.addAction(
           'settings.hours.content',
           () => <PickupHoursTabContent key="pickup-content" />,
-          'fulfillment-pickup',
+          'pickup',
           90
         );
 
@@ -264,8 +264,8 @@ export const fulfillmentPickupManifest: ModuleManifest = {
 
     // Unsubscribe from events
     import('@/lib/events').then(() => {
-      // TODO: Fix - eventBus.unsubscribe('sales.order_placed', { moduleId: 'fulfillment-pickup' });
-      // TODO: Fix - eventBus.unsubscribe('production.order_ready', { moduleId: 'fulfillment-pickup' });
+      // TODO: Fix - eventBus.unsubscribe('sales.order_placed', { moduleId: 'pickup' });
+      // TODO: Fix - eventBus.unsubscribe('production.order_ready', { moduleId: 'pickup' });
     });
   },
 
@@ -308,7 +308,7 @@ export const fulfillmentPickupManifest: ModuleManifest = {
 /**
  * Default export
  */
-export default fulfillmentPickupManifest;
+export default pickupManifest;
 
 /**
  * USAGE EXAMPLES:
@@ -334,7 +334,7 @@ export default fulfillmentPickupManifest;
  *
  * 3. Use pickup components:
  * ```typescript
- * import { PickupTimeSlotPicker } from '@/modules/fulfillment/pickup/components';
+ * import { PickupTimeSlotPicker } from '@/modules/pickup/components';
  *
  * <PickupTimeSlotPicker
  *   onSlotSelected={(slot) => console.log('Selected:', slot)}

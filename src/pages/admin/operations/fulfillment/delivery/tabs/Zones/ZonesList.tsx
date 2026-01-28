@@ -1,6 +1,6 @@
 import { Stack, Box, Text, Badge, CardWrapper } from '@/shared/ui';
 import { CheckCircleIcon, XCircleIcon, MapPinIcon } from '@heroicons/react/24/outline';
-import type { DeliveryZone } from '@/modules/fulfillment/delivery/types';
+import type { DeliveryZone } from '@/modules/delivery/types';
 import { useLocation } from '@/contexts/LocationContext';
 
 interface ZonesListProps {

@@ -34,8 +34,8 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { HookPoint } from '@/lib/modules';
-import { PickupQueue } from '@/modules/fulfillment/pickup/components';
-import { PickupConfirmation } from '@/modules/fulfillment/pickup/components';
+import { PickupQueue } from '@/modules/pickup/components';
+import { PickupConfirmation } from '@/modules/pickup/components';
 import { logger } from '@/lib/logging';
 import { notify } from '@/lib/notifications';
 import { usePermissions } from '@/hooks';

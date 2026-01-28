@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { Stack, Button, Alert } from '@/shared/ui';
 import { useSalesStore } from '@/store/salesStore';
-import { transformSalesToDeliveryOrders } from '@/modules/fulfillment/delivery/utils/deliveryTransformer';
+import { transformSalesToDeliveryOrders } from '@/modules/delivery/utils/deliveryTransformer';
 import { DeliveryOrderCard } from './DeliveryOrderCard';
 import { logger } from '@/lib/logging';
 import { useNavigationActions } from '@/contexts/NavigationContext';
-import type { DeliveryOrder } from '@/modules/fulfillment/delivery/types/deliveryTypes';
+import type { DeliveryOrder } from '@/modules/delivery/types/deliveryTypes';
 
 export function DeliveryOrdersTab() {
   const { navigate } = useNavigationActions();
@@ -119,7 +119,7 @@ export function DeliveryOrdersTab() {
           <Button
             variant="solid"
             colorPalette="blue"
-            onClick={() => navigate('fulfillment-delivery')}
+            onClick={() => navigate('delivery')}
           >
             Ir a Delivery Management
           </Button>

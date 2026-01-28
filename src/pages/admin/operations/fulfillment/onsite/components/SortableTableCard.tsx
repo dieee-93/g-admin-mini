@@ -18,7 +18,7 @@ import { EyeIcon, UsersIcon } from '@heroicons/react/24/outline';
 import { DecimalUtils } from '@/lib/decimal';
 
 // Module types
-import type { Table } from '@/modules/fulfillment/onsite/types';
+import type { Table } from '@/modules/onsite/types';
 
 // Utils
 import {

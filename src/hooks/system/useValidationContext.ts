@@ -29,9 +29,9 @@ import { useProducts } from '@/modules/products';
 import { useTeam } from '@/modules/team/hooks'; // ✅ TanStack Query hook
 import { usePaymentMethods, usePaymentGateways } from '@/modules/payment-gateways/hooks/usePayments'; // ✅ TanStack Query hooks
 import { useSuppliers } from '@/modules/suppliers/hooks'; // ✅ TanStack Query hook
-import { useTables } from '@/modules/fulfillment/onsite/hooks/useTables'; // ✅ TanStack Query hook
-import { useDeliveryZones } from '@/modules/fulfillment/delivery/hooks/useDeliveryZones'; // ✅ TanStack Query hook
-import { useOperatingHours } from '@/modules/fulfillment/onsite/hooks/useOperatingHours'; // ✅ TanStack Query hook
+import { useTables } from '@/modules/onsite/hooks/useTables'; // ✅ TanStack Query hook
+import { useDeliveryZones } from '@/modules/delivery/hooks/useDeliveryZones'; // ✅ TanStack Query hook
+import { useOperatingHours } from '@/modules/onsite/hooks/useOperatingHours'; // ✅ TanStack Query hook
 import { useSalesStore } from '@/store/salesStore';
 import { useAppStore } from '@/store/appStore';
 import { useFiscalStore } from '@/store/fiscalStore';

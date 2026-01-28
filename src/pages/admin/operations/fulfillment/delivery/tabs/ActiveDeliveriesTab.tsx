@@ -11,12 +11,12 @@ import { useState } from 'react';
 import { Stack, Text, Alert, Box, Button } from '@/shared/ui';
 import { MapIcon, ListBulletIcon } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
-import { DeliveryQueue } from '@/modules/fulfillment/delivery/components';
-import { LiveDeliveryTracker } from '@/modules/fulfillment/delivery/components';
+import { DeliveryQueue } from '@/modules/delivery/components';
+import { LiveDeliveryTracker } from '@/modules/delivery/components';
 import type {
   DeliveryOrder,
   DeliveryZone
-} from '@/modules/fulfillment/delivery/types';
+} from '@/modules/delivery/types';
 
 interface ActiveDeliveriesTabProps {
   deliveries: DeliveryOrder[];

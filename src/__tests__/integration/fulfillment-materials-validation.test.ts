@@ -13,7 +13,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { logger } from '@/lib/logging';
-import type { DeliveryOrder } from '@/modules/fulfillment/delivery/types';
+import type { DeliveryOrder } from '@/modules/delivery/types';
 
 // Mock types for materials
 interface MaterialItem {

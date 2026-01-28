@@ -1167,13 +1167,13 @@ export const MODULE_FEATURE_MAP: Record<string, {
     description: 'Módulo unificado de fulfillment - gestiona órdenes onsite, pickup y delivery'
   },
 
-  'fulfillment-onsite': {
+  'onsite': {
     activatedBy: 'operations_table_management',
     enhancedBy: ['operations_table_assignment', 'operations_floor_plan_config'],
     description: 'Fulfillment onsite - gestión de mesas y servicio en local'
   },
 
-  'fulfillment-pickup': {
+  'pickup': {
     activatedBy: 'sales_pickup_orders',
     enhancedBy: ['operations_pickup_scheduling'],
     description: 'Fulfillment pickup - gestión de órdenes para retirar'

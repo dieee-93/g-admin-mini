@@ -29,7 +29,7 @@ import type { PaymentMethod } from '@/pages/admin/operations/sales/types';
 import { useSalesStore } from '@/store/salesStore';
 
 // Module types
-import type { Table, Party } from '@/modules/fulfillment/onsite/types';
+import type { Table, Party } from '@/modules/onsite/types';
 
 // Utils
 import { DecimalUtils } from '@/lib/decimal';

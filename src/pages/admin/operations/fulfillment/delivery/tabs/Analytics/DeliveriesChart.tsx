@@ -1,5 +1,5 @@
 import { Stack, Box, Text, CardWrapper } from '@/shared/ui';
-import type { DeliveryMetrics } from '@/modules/fulfillment/delivery/types';
+import type { DeliveryMetrics } from '@/modules/delivery/types';
 
 interface DeliveriesChartProps {
   metrics: DeliveryMetrics;

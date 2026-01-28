@@ -1,6 +1,6 @@
 import { Stack, Text, Spinner, Box } from '@/shared/ui';
 import { TruckIcon } from '@heroicons/react/24/outline';
-import type { DeliveryOrder } from '@/modules/fulfillment/delivery/types';
+import type { DeliveryOrder } from '@/modules/delivery/types';
 import { DeliveryMiniCard } from './DeliveryMiniCard';
 
 interface DeliverySidebarProps {

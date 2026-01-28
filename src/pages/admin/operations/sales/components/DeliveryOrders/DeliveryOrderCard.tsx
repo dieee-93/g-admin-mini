@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { Stack, Button, Badge, CardWrapper, Text } from '@/shared/ui';
 import { HookPoint } from '@/lib/modules';
-import type { DeliveryOrder } from '@/modules/fulfillment/delivery/types/deliveryTypes';
-import { AssignDriverModal, StatusUpdateMenu } from '@/modules/fulfillment/delivery/components';
-import { deliveryApi, emitDriverAssigned, emitDeliveryStatusUpdated } from '@/modules/fulfillment/delivery/services';
-import { useDrivers } from '@/modules/fulfillment/delivery/hooks';
+import type { DeliveryOrder } from '@/modules/delivery/types/deliveryTypes';
+import { AssignDriverModal, StatusUpdateMenu } from '@/modules/delivery/components';
+import { deliveryApi, emitDriverAssigned, emitDeliveryStatusUpdated } from '@/modules/delivery/services';
+import { useDrivers } from '@/modules/delivery/hooks';
 import { logger } from '@/lib/logging';
 
 interface DeliveryOrderCardProps {

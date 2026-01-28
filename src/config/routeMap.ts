@@ -17,7 +17,9 @@ export const domainRouteMap = {
   'operations': '/admin/operations',
   'customers': '/admin/customers',
   'production': '/admin/operations/production',
-  'delivery': '/admin/operations/delivery',
+  'delivery': '/admin/sales/delivery',
+  'onsite': '/admin/sales/onsite',
+  'pickup': '/admin/sales/pickup',
   'memberships': '/admin/operations/memberships',
   'rentals': '/admin/operations/rentals',
 
@@ -67,12 +69,14 @@ export const routeToFileMap = {
 
   // Operations
   '/admin/operations/sales': 'pages/admin/operations/sales/page',
-  '/admin/operations/fulfillment/onsite': 'pages/admin/operations/fulfillment/onsite/page',
   '/admin/operations/production': 'pages/admin/operations/production/page',
-  '/admin/operations/delivery': 'pages/admin/operations/delivery/page',
-  '/admin/operations/fulfillment/delivery': 'pages/admin/operations/fulfillment/delivery/page',
   '/admin/operations/memberships/*': 'pages/admin/operations/memberships/page',
   '/admin/operations/rentals/*': 'pages/admin/operations/rentals/page',
+
+  // Sales & Fulfillment (promoted from fulfillment/)
+  '/admin/sales/delivery': 'pages/admin/operations/fulfillment/delivery/page',
+  '/admin/sales/onsite': 'pages/admin/operations/fulfillment/onsite/page',
+  '/admin/sales/pickup': 'pages/admin/operations/fulfillment/pickup/page',
 
   // Supply Chain
   '/admin/supply-chain/materials': 'pages/admin/supply-chain/materials/page',

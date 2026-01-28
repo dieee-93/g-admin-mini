@@ -22,7 +22,7 @@ import { ClockIcon, UsersIcon } from '@heroicons/react/24/outline';
 import { Icon } from '@/shared/ui/Icon';
 
 // Module types
-import type { Table, TableStatus } from '@/modules/fulfillment/onsite/types';
+import type { Table, TableStatus } from '@/modules/onsite/types';
 
 interface TableDetailsModalProps {
     table: Table | null;

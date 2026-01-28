@@ -210,10 +210,6 @@ export const ElaboratedFields = memo(function ElaboratedFields({
     });
   }, [formData, setFormData]);
 
-  // Derive status from formData
-  const categoryStatus = formData.category ? 'active' : 'inactive';
-  const categoryPalette = formData.category ? 'green' : 'gray';
-
   return (
     <Stack gap="6" w="full">
 
@@ -229,6 +225,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
             color="fg.muted"
             letterSpacing="widest"
             textTransform="uppercase"
+            data-testid="elaborated-header"
           >
             Material Elaborado
           </Typography>
@@ -248,40 +245,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
       </Stack>
 
       {/* ========================================
-          SECTION 2: Category Selector - Industrial Panel
-          ======================================== */}
-      <IndustrialContainer
-        title="Categoría de Negocio"
-        status={categoryStatus}
-        colorPalette={categoryPalette}
-        hasGradientTop={false}
-      >
-        <SelectField
-          placeholder="Selecciona categoría del material..."
-          collection={CATEGORY_COLLECTION}
-          value={formData.category ? [formData.category] : []}
-          onValueChange={(details) =>
-            setFormData({
-              ...formData,
-              category: details.value[0]
-            })
-          }
-          required
-          size="lg"
-          height="44px"
-          noPortal={true}
-          css={{
-            '& select, & input': {
-              fontFamily: 'var(--chakra-fonts-mono)',
-              fontSize: 'sm',
-              fontWeight: '600'
-            }
-          }}
-        />
-      </IndustrialContainer>
-
-      {/* ========================================
-          SECTION 3: Information Alert - Factory Warning Panel
+          SECTION 2: Information Alert - Factory Warning Panel
           ======================================== */}
       <Box
         p="5"
@@ -294,6 +258,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
         borderLeftColor="colorPalette.solid"
         boxShadow="md"
         position="relative"
+        data-testid="elaborated-info-alert"
         _before={{
           content: '""',
           position: 'absolute',
@@ -391,7 +356,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
       {/* ========================================
           SECTION 4: Recipe Builder - Main Production Module
           ======================================== */}
-      <Box>
+      <Box data-testid="recipe-builder-section">
         {/* Section Divider */}
         <SectionDivider label="Constructor de Receta" />
 
@@ -440,6 +405,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
               color="fg.muted"
               letterSpacing="wider"
               textTransform="uppercase"
+              data-testid="production-module-status"
             >
               Módulo de Producción Activo
             </Typography>

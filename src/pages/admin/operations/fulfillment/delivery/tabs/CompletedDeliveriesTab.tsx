@@ -9,8 +9,8 @@
 
 import { Stack, Text, Alert, StatRoot, StatLabel, StatValueText } from '@/shared/ui';
 import { logger } from '@/lib/logging';
-import { DeliveryQueue } from '@/modules/fulfillment/delivery/components';
-import type { DeliveryOrder } from '@/modules/fulfillment/delivery/types';
+import { DeliveryQueue } from '@/modules/delivery/components';
+import type { DeliveryOrder } from '@/modules/delivery/types';
 
 interface CompletedDeliveriesTabProps {
   deliveries: DeliveryOrder[];

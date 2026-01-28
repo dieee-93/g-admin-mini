@@ -12,12 +12,12 @@
 // RE-EXPORT Existing Services (from Fulfillment/delivery)
 // ============================================
 
-export { gpsTrackingService } from '@/modules/fulfillment/delivery/services/gpsTrackingService';
-export { routeOptimizationService } from '@/modules/fulfillment/delivery/services/routeOptimizationService';
-export { useDriverLocation } from '@/modules/fulfillment/delivery/hooks/useDriverLocation';
+export { gpsTrackingService } from '@/modules/delivery/services/gpsTrackingService';
+export { routeOptimizationService } from '@/modules/delivery/services/routeOptimizationService';
+export { useDriverLocation } from '@/modules/delivery/hooks/useDriverLocation';
 
-export type { GPSLocation } from '@/modules/fulfillment/delivery/services/gpsTrackingService';
-export type { DriverSuggestion } from '@/modules/fulfillment/delivery/types';
+export type { GPSLocation } from '@/modules/delivery/services/gpsTrackingService';
+export type { DriverSuggestion } from '@/modules/delivery/types';
 
 // ============================================
 // NEW: Mobile-specific Services

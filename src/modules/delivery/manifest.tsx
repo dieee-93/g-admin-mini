@@ -22,13 +22,13 @@ import { logger } from '@/lib/logging';
 import { Button, Icon, Stack } from '@/shared/ui';
 import { toaster } from '@/shared/ui/toaster';
 
-export const fulfillmentDeliveryManifest: ModuleManifest = {
+export const deliveryManifest: ModuleManifest = {
   // ============================================
   // CORE METADATA
   // ============================================
 
-  id: 'fulfillment-delivery',
-  name: 'Fulfillment - Delivery Orders',
+  id: 'delivery',
+  name: 'Delivery Orders',
   version: '1.0.0',
 
   permissionModule: 'operations', // ✅ Uses 'operations' permission
@@ -194,7 +194,7 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
             logger.error('App', 'Error queuing delivery order', error);
           }
         }
-      }, { moduleId: 'fulfillment-delivery', priority: 100 });
+      }, { moduleId: 'delivery', priority: 100 });
 
       /**
        * Listen to production.order_ready
@@ -270,7 +270,7 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
             logger.error('App', 'Error auto-assigning driver', error);
           }
         }
-      }, { moduleId: 'fulfillment-delivery', priority: 100 });
+      }, { moduleId: 'delivery', priority: 100 });
 
       /**
        * Listen to fulfillment.delivery.driver_assigned
@@ -311,7 +311,7 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
         } catch (error) {
           logger.error('App', 'Error updating delivery status', error);
         }
-      }, { moduleId: 'fulfillment-delivery' });
+      }, { moduleId: 'delivery' });
 
       /**
        * Listen to staff.driver_location_update
@@ -352,7 +352,7 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
         } catch (error) {
           logger.error('App', 'Error updating delivery location', error);
         }
-      }, { moduleId: 'fulfillment-delivery' });
+      }, { moduleId: 'delivery' });
 
       // ============================================
       // REGISTER HOOK ACTIONS
@@ -415,7 +415,7 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
             </Stack>
           );
         },
-        'fulfillment-delivery',
+        'delivery',
         100
       );
 
@@ -467,7 +467,7 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
             </Button>
           );
         },
-        'fulfillment-delivery',
+        'delivery',
         12 // Medium-high priority
       );
 
@@ -496,14 +496,14 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
       registry.addAction(
         'settings.hours.tabs',
         () => <DeliveryHoursTabTrigger key="delivery-tab" />,
-        'fulfillment-delivery',
+        'delivery',
         80 // After pickup hours
       );
 
       registry.addAction(
         'settings.hours.content',
         () => <DeliveryHoursTabContent key="delivery-content" />,
-        'fulfillment-delivery',
+        'delivery',
         80
       );
 
@@ -532,7 +532,7 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
             status="configured"
           />
         ),
-        'fulfillment-delivery',
+        'delivery',
         90, // After operating hours
         { requiredPermission: { module: 'operations', action: 'update' } }
       );
@@ -572,7 +572,7 @@ export const fulfillmentDeliveryManifest: ModuleManifest = {
             />
           );
         },
-        'fulfillment-delivery',
+        'delivery',
         90, // High priority
         { requiredPermission: { module: 'operations', action: 'create' } }
       );

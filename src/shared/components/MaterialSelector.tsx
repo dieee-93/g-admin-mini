@@ -385,6 +385,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
           pr="10"
           onFocus={() => query && setIsOpen(filteredMaterials.length > 0)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+          data-testid="material-selector-search"
         />
 
         <Box
@@ -443,6 +444,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
                     onClick={() => handleMaterialClick(material)}
                     align="center"
                     gap="3"
+                    data-testid={`material-option-${material.id}`}
                   >
                     <Box fontSize="lg">
                       {getTypeIcon(material.type)}

@@ -2,10 +2,10 @@ import { useState, useMemo } from 'react';
 import { Stack, Button, Text } from '@/shared/ui';
 import { NativeSelect } from '@chakra-ui/react';
 import { useLocation } from '@/contexts/LocationContext';
-import { deliveryService } from '@/modules/fulfillment/delivery/services/deliveryService';
-import type { DeliveryZone, CreateDeliveryZoneData, UpdateDeliveryZoneData } from '@/modules/fulfillment/delivery/types';
+import { deliveryService } from '@/modules/delivery/services/deliveryService';
+import type { DeliveryZone, CreateDeliveryZoneData, UpdateDeliveryZoneData } from '@/modules/delivery/types';
 import { ZonesList } from './ZonesList';
-import { ZoneFormModal } from '@/modules/fulfillment/delivery/components/ZoneFormModal';
+import { ZoneFormModal } from '@/modules/delivery/components/ZoneFormModal';
 import { useAlerts } from '@/shared/alerts';
 
 interface ZonesTabProps {

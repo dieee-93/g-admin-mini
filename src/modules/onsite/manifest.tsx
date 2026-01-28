@@ -3,9 +3,9 @@ import { BuildingStorefrontIcon } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
 // NOTE: DINEIN_MANDATORY import removed - requirements now auto-registered by achievements module
 
-export const fulfillmentOnsiteManifest: ModuleManifest = {
-  id: 'fulfillment-onsite',
-  name: 'Fulfillment - Onsite Service',
+export const onsiteManifest: ModuleManifest = {
+  id: 'onsite',
+  name: 'Onsite Service',
   version: '2.0.0',
 
   permissionModule: 'operations', // ✅ Uses 'operations' permission  activatedBy: 'operations_table_management',
@@ -54,14 +54,14 @@ export const fulfillmentOnsiteManifest: ModuleManifest = {
       registry.addAction(
         'settings.hours.tabs',
         () => <OperatingHoursTabTrigger key="operating-tab" />,
-        'fulfillment-onsite',
+        'onsite',
         100 // High priority - show first
       );
 
       registry.addAction(
         'settings.hours.content',
         () => <OperatingHoursTabContent key="operating-content" />,
-        'fulfillment-onsite',
+        'onsite',
         100
       );
 
@@ -92,7 +92,7 @@ export const fulfillmentOnsiteManifest: ModuleManifest = {
             status="configured"
           />
         ),
-        'fulfillment-onsite',
+        'onsite',
         100, // High priority
         { requiredPermission: { module: 'operations', action: 'update' } }
       );
@@ -120,7 +120,7 @@ export const fulfillmentOnsiteManifest: ModuleManifest = {
             initialContext={data?.initialContext}
           />
         ),
-        'fulfillment-onsite',
+        'onsite',
         100, // High priority - table is main context
         { requiredPermission: { module: 'operations', action: 'read' } }
       );
@@ -160,7 +160,7 @@ export const fulfillmentOnsiteManifest: ModuleManifest = {
             />
           );
         },
-        'fulfillment-onsite',
+        'onsite',
         100, // High priority
         { requiredPermission: { module: 'operations', action: 'read' } }
       );
@@ -193,7 +193,7 @@ export const fulfillmentOnsiteManifest: ModuleManifest = {
   metadata: {
     category: 'operations',
     description: 'Comprehensive floor management for restaurant operations including table tracking and reservations',
-    tags: ['fulfillment-onsite', 'tables', 'reservations'],
+    tags: ['onsite', 'tables', 'reservations'],
     navigation: {
       route: '/admin/operations/fulfillment/onsite',
       icon: BuildingStorefrontIcon,

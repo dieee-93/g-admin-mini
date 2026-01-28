@@ -11,8 +11,8 @@ import { useState } from 'react';
 import { Stack, Text, Alert, Button, Box } from '@/shared/ui';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { logger } from '@/lib/logging';
-import { ZoneEditorEnhanced } from '@/modules/fulfillment/delivery/components';
-import type { DeliveryZone } from '@/modules/fulfillment/delivery/types';
+import { ZoneEditorEnhanced } from '@/modules/delivery/components';
+import type { DeliveryZone } from '@/modules/delivery/types';
 
 interface ZonesTabProps {
   zones: DeliveryZone[];

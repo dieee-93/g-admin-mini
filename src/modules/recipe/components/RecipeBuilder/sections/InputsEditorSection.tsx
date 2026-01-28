@@ -556,6 +556,7 @@ function InputsEditorSectionComponent(props: InputsEditorSectionProps) {
                               quantity: parseFloat(e.target.value) || 0
                             })
                           }
+                          data-testid={`recipe-input-quantity-${index}`}
                           css={{
                             fontFamily: 'var(--chakra-fonts-mono)',
                             fontSize: 'var(--chakra-fontSizes-sm)',
@@ -648,7 +649,12 @@ function InputsEditorSectionComponent(props: InputsEditorSectionProps) {
         )}
 
         {/* Add Line Button */}
-        <Button variant="outline" onClick={handleAddInput} colorPalette="blue">
+        <Button 
+          variant="outline" 
+          onClick={handleAddInput} 
+          colorPalette="blue"
+          data-testid="recipe-add-input-button"
+        >
           <PlusIcon className="w-4 h-4" />
           AGREGAR LÍNEA
         </Button>

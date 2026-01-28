@@ -18,7 +18,7 @@ import {
 import { notify } from '@/lib/notifications';
 
 // Module types
-import type { Table, SeatPartyData } from '@/modules/fulfillment/onsite/types';
+import type { Table, SeatPartyData } from '@/modules/onsite/types';
 
 interface SeatPartyModalProps {
     table: Table | null;
