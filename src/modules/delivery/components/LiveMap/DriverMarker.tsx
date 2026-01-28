@@ -1,7 +1,7 @@
 // DriverMarker component for rendering driver markers on Leaflet
 import { useMemo } from 'react';
 import { CircleMarker, Popup } from 'react-leaflet';
-import { useDriverLocation } from '../fulfillment/hooks/useDriverLocation';
+import { useDriverLocation } from '../../fulfillment/hooks/useDriverLocation';
 
 interface DriverMarkerProps {
   driverId: string;
