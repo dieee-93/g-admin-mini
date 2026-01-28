@@ -156,8 +156,7 @@ export const OPTIONAL_MODULES: Readonly<Record<string, FeatureId>> = {
   // FINANCE
   // ============================================
 
-  'finance-billing': 'finance_recurring_invoicing',
-  'finance-fiscal': 'finance_tax_compliance',
+  'billing': 'finance_invoice_scheduling',
   'payment-gateways': 'finance_payment_gateway',
   'finance-corporate': 'finance_corporate_accounts',
   'accounting': 'finance_cash_session_management',

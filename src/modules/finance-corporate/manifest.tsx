@@ -30,7 +30,7 @@ export const financeCorporateManifest: ModuleManifest = {
   // DEPENDENCIES
   // ============================================
 
-  depends: ['customers', 'finance-fiscal', 'finance-billing'],
+  depends: ['customers', 'billing'],
   // ============================================
   // PERMISSIONS & ROLES
   // ============================================

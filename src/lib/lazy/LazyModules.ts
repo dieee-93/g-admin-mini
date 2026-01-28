@@ -149,7 +149,7 @@ export const LazySchedulingPage = createLazyComponent(
 // Lazy-loaded Fiscal Page (pages/admin/finance/fiscal/page.tsx)
 export const LazyFiscalPage = createLazyComponent(
   () => import('../../pages/admin/finance/fiscal/page'),
-  'finance-fiscal',
+  'billing',
   {
     chunkName: 'fiscal-module',
     preload: false,
@@ -476,7 +476,7 @@ export const LazyExecutivePage = createLazyComponent(
 // Lazy-loaded Finance Billing Page (pages/admin/finance/billing/page.tsx)
 export const LazyBillingPage = createLazyComponent(
   () => import('../../pages/admin/finance/billing/page'),
-  'finance-billing',
+  ,
   {
     chunkName: 'billing-module',
     preload: false,

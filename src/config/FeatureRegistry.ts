@@ -1183,15 +1183,10 @@ export const MODULE_FEATURE_MAP: Record<string, {
   // FINANCE MODULES
   // ============================================
 
-  'finance-billing': {
+  'billing': {
     activatedBy: 'finance_invoice_scheduling',
     enhancedBy: ['customer_loyalty_program'],
-    description: 'Billing recurrente y suscripciones - facturas programadas'
-  },
-
-  'finance-fiscal': {
-    activatedBy: 'finance_invoice_scheduling',
-    description: 'Módulo fiscal - cumplimiento tributario e impuestos'
+    description: 'Facturación e Impuestos - billing recurrente, suscripciones y cumplimiento tributario (consolidado)'
   },
 
   'finance-corporate': {

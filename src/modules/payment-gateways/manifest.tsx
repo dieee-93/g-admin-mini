@@ -20,7 +20,7 @@ export const paymentGatewaysManifest: ModuleManifest = {
 
   permissionModule: 'billing', // ✅ Uses 'billing' permission
 
-  depends: ['finance-fiscal', 'finance-billing'], // Integrations work with fiscal/billing data
+  depends: ['billing'], // Integrations work with billing data
 
   // 🔒 PERMISSIONS: Only administrators can manage integrations
   minimumRole: 'ADMINISTRADOR' as const,
