@@ -86,6 +86,7 @@ import { financeFiscalManifest } from './finance-fiscal/manifest';
 import { financeBillingManifest } from './finance-billing/manifest';
 import { paymentGatewaysManifest } from './payment-gateways/manifest';
 import { accountingManifest } from './accounting/manifest';
+import { billingManifest } from './billing/manifest';
 
 // ============================================
 // MARKETING DOMAIN - Loyalty, campaigns & social
@@ -161,6 +162,7 @@ export const ALL_MODULE_MANIFESTS = [
   financeCorporateManifest,      // ✅ Depends on: customers, finance-fiscal, finance-billing
   paymentGatewaysManifest,       // ✅ Depends on: finance-fiscal, finance-billing
   accountingManifest,        // ✅ Cash flow, sessions, double-entry accounting
+  billingManifest,           // ✅ NEW Phase 4: Consolidated billing + fiscal
 
   // ============================================
   // TIER 4: Second-level dependencies
@@ -245,6 +247,7 @@ export {
   financeBillingManifest,
   paymentGatewaysManifest,
   accountingManifest,
+  billingManifest,
 
   // Cross-cutting domains
   loyaltyManifest,
