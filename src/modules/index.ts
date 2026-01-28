@@ -60,6 +60,7 @@ import { salesManifest } from './sales/manifest';
 import { onsiteManifest } from './onsite/manifest';
 import { pickupManifest } from './pickup/manifest';
 import { deliveryManifest } from './delivery/manifest';
+import { storefrontManifest } from './storefront/manifest';
 import { productionManifest } from './production/manifest';
 // DISABLED: kitchen module is obsolete, functionality merged into production
 // import { kitchenManifest } from './production/kitchen/manifest';
@@ -165,6 +166,7 @@ export const ALL_MODULE_MANIFESTS = [
   onsiteManifest,  // ✅ Onsite service (tables, floor)
   pickupManifest,  // ✅ Pickup orders (take away)
   deliveryManifest, // ✅ Delivery orders (motorcycles)
+  storefrontManifest,  // ✅ NEW Phase 3: Storefront configuration & digital menu
   mobileManifest,             // ✅ NEW Phase 2: Mobile operations (GPS, routes, inventory)
   
 

@@ -20,6 +20,7 @@ export const domainRouteMap = {
   'delivery': '/admin/sales/delivery',
   'onsite': '/admin/sales/onsite',
   'pickup': '/admin/sales/pickup',
+  'storefront': '/admin/sales/storefront',
   'memberships': '/admin/operations/memberships',
   'rentals': '/admin/operations/rentals',
 
@@ -77,6 +78,7 @@ export const routeToFileMap = {
   '/admin/sales/delivery': 'pages/admin/operations/fulfillment/delivery/page',
   '/admin/sales/onsite': 'pages/admin/operations/fulfillment/onsite/page',
   '/admin/sales/pickup': 'pages/admin/operations/fulfillment/pickup/page',
+  '/admin/sales/storefront': 'modules/storefront/components/StorefrontPlaceholder',
 
   // Inventory
   '/admin/inventory/materials': 'pages/admin/supply-chain/materials/page',
