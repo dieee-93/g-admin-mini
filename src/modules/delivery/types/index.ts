@@ -5,7 +5,7 @@
  * Phase 1 - Part 3: Delivery Sub-Module
  */
 
-import type { QueueItem } from '../../services/fulfillmentService';
+import type { QueueItem } from '../fulfillment/services/fulfillmentService';
 
 // ============================================
 // CORE TYPES (Compatible with FulfillmentQueue)

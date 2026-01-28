@@ -5,7 +5,7 @@
  * Phase 1 - Part 3: Delivery Sub-Module
  */
 
-import { fulfillmentService } from '../../services/fulfillmentService';
+import { fulfillmentService } from '../fulfillment/services/fulfillmentService';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
 import type {
@@ -22,7 +22,7 @@ import type {
   DeliveryMetrics,
   Coordinates
 } from '../types';
-import type { QueueItem, QueueFilters, QueueStatus } from '../../services/fulfillmentService';
+import type { QueueItem, QueueFilters, QueueStatus } from '../fulfillment/services/fulfillmentService';
 
 class DeliveryService {
   // ============================================

@@ -10,8 +10,8 @@
  */
 
 import React from 'react';
-import { FulfillmentQueue } from '../../components/FulfillmentQueue';
-import type { FulfillmentQueueProps, QueueItem } from '../../components/FulfillmentQueue';
+import { FulfillmentQueue } from '../fulfillment/components/FulfillmentQueue';
+import type { FulfillmentQueueProps, QueueItem } from '../fulfillment/components/FulfillmentQueue';
 import { Button, Icon } from '@/shared/ui';
 import { QrCodeIcon, BellIcon } from '@heroicons/react/24/outline';
 import { pickupService } from '../services/pickupService';

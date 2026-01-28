@@ -7,10 +7,10 @@
 import { useState } from 'react';
 import { Button, Stack, Badge, Text } from '@/shared/ui';
 import { TruckIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/outline';
-import { FulfillmentQueue } from '../../components/FulfillmentQueue';
+import { FulfillmentQueue } from '../fulfillment/components/FulfillmentQueue';
 import { AssignDriverModal } from './AssignDriverModal';
 import type { DeliveryOrder, DeliveryMetadata } from '../types';
-import type { FulfillmentQueueItem } from '../../services/fulfillmentService';
+import type { FulfillmentQueueItem } from '../fulfillment/services/fulfillmentService';
 import { logger } from '@/lib/logging';
 
 interface DeliveryQueueProps {
