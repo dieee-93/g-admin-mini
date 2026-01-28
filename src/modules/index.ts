@@ -61,6 +61,7 @@ import { onsiteManifest } from './onsite/manifest';
 import { pickupManifest } from './pickup/manifest';
 import { deliveryManifest } from './delivery/manifest';
 import { storefrontManifest } from './storefront/manifest';
+import { shippingManifest } from './shipping/manifest';
 import { productionManifest } from './production/manifest';
 // DISABLED: kitchen module is obsolete, functionality merged into production
 // import { kitchenManifest } from './production/kitchen/manifest';
@@ -87,9 +88,11 @@ import { paymentGatewaysManifest } from './payment-gateways/manifest';
 import { accountingManifest } from './accounting/manifest';
 
 // ============================================
-// GAMIFICATION DOMAIN - Achievements & progress
+// MARKETING DOMAIN - Loyalty, campaigns & social
 // ============================================
 import { loyaltyManifest } from './loyalty/manifest';
+import { campaignsManifest } from './campaigns/manifest';
+import { socialManifest } from './social/manifest';
 
 // ============================================
 // ALL MODULE MANIFESTS
@@ -167,6 +170,7 @@ export const ALL_MODULE_MANIFESTS = [
   pickupManifest,  // ✅ Pickup orders (take away)
   deliveryManifest, // ✅ Delivery orders (motorcycles)
   storefrontManifest,  // ✅ NEW Phase 3: Storefront configuration & digital menu
+  shippingManifest,  // ✅ NEW Phase 3: External shipping (postal, couriers)
   mobileManifest,             // ✅ NEW Phase 2: Mobile operations (GPS, routes, inventory)
   
 
@@ -186,6 +190,8 @@ export const ALL_MODULE_MANIFESTS = [
   // DISABLED: delivery standalone module is obsolete, use deliveryManifest instead
   // deliveryManifest,      // ❌ REMOVED - Consolidated into fulfillment-delivery submódulo
   loyaltyManifest,  // ✅ Listens to: all modules (auto-install)
+  campaignsManifest,  // ✅ NEW Phase 3: Marketing campaigns & promotions
+  socialManifest,  // ✅ NEW Phase 3: Social media integrations
 ];
 
 // ============================================

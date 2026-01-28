@@ -21,6 +21,7 @@ export const domainRouteMap = {
   'onsite': '/admin/sales/onsite',
   'pickup': '/admin/sales/pickup',
   'storefront': '/admin/sales/storefront',
+  'shipping': '/admin/sales/shipping',
   'memberships': '/admin/operations/memberships',
   'rentals': '/admin/operations/rentals',
 
@@ -45,8 +46,10 @@ export const domainRouteMap = {
   'settings': '/admin/settings',
   'tools': '/admin/tools',
 
-  // Gamification Domain
+  // Marketing Domain
   'gamification': '/admin/gamification',
+  'campaigns': '/admin/marketing/campaigns',
+  'social': '/admin/marketing/social',
 
   // Executive Domain
   'executive': '/admin/executive'
@@ -79,6 +82,11 @@ export const routeToFileMap = {
   '/admin/sales/onsite': 'pages/admin/operations/fulfillment/onsite/page',
   '/admin/sales/pickup': 'pages/admin/operations/fulfillment/pickup/page',
   '/admin/sales/storefront': 'modules/storefront/components/StorefrontPlaceholder',
+  '/admin/sales/shipping': 'modules/shipping/components/ShippingPlaceholder',
+
+  // Marketing
+  '/admin/marketing/campaigns': 'modules/campaigns/components/CampaignsPlaceholder',
+  '/admin/marketing/social': 'modules/social/components/SocialPlaceholder',
 
   // Inventory
   '/admin/inventory/materials': 'pages/admin/supply-chain/materials/page',
