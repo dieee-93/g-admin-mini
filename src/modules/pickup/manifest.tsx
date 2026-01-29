@@ -126,7 +126,7 @@ export const pickupManifest: ModuleManifest = {
         { fulfillmentService }
       ] = await Promise.all([
         import('@/lib/events'),
-        import('../services/fulfillmentService')
+        import('../../fulfillment/services/fulfillmentService')
       ]);
 
       /**
