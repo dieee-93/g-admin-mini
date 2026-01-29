@@ -509,19 +509,26 @@ function InputsEditorSectionComponent(props: InputsEditorSectionProps) {
                           // Not selected - show dynamic selector
                           <>
                             {inputMode === 'material' ? (
-                              <MaterialSelector
-                                items={materials}
-                                loading={materialsLoading}
-                                onSelect={(material, quantity, unit) =>
-                                  handleMaterialSelect(index, material, quantity, unit)
-                                }
-                                selectedMaterialIds={
-                                  inputs
-                                    .map((i) => (typeof i.item === 'object' ? i.item?.id : ''))
-                                    .filter(Boolean) as string[]
-                                }
-                                filterByStock={false}
-                              />
+                              <>
+                                {console.log('[InputsEditor] Rendering MaterialSelector with:', {
+                                  materialsCount: materials?.length || 0,
+                                  materialsLoading,
+                                  materialsPreview: materials?.slice(0, 2).map(m => m.name) || []
+                                })}
+                                <MaterialSelector
+                                  items={materials}
+                                  loading={materialsLoading}
+                                  onSelect={(material, quantity, unit) =>
+                                    handleMaterialSelect(index, material, quantity, unit)
+                                  }
+                                  selectedMaterialIds={
+                                    inputs
+                                      .map((i) => (typeof i.item === 'object' ? i.item?.id : ''))
+                                      .filter(Boolean) as string[]
+                                  }
+                                  filterByStock={false}
+                                />
+                              </>
                             ) : (
                               <ProductSelector
                                 onProductSelected={(product) =>

@@ -40,12 +40,16 @@ export function useMaterials() {
   // Get filters from Zustand store (UI state)
   const filters = useMaterialsStore((state) => state.filters);
   
-  return useQuery<MaterialItem[], Error>({
+  console.log('[useMaterials] Hook called with filters:', filters);
+  
+  const queryResult = useQuery<MaterialItem[], Error>({
     queryKey: materialsKeys.list(filters),
     queryFn: async () => {
+      console.log('[useMaterials] queryFn executing...');
       // ✅ REUSE existing materialsApi.fetchItems()
       // This already handles: normalization, error logging, permissions (via RLS)
       const allItems = await materialsApi.fetchItems();
+      console.log('[useMaterials] Fetched items:', allItems?.length || 0);
       
       // Apply client-side filters
       let filtered = allItems;
@@ -152,5 +156,13 @@ export function useMaterials() {
     gcTime: 5 * 60 * 1000, // 5 minutes - cache garbage collection
     refetchOnWindowFocus: true, // Refetch when user returns to tab
     refetchOnMount: 'always', // Always refetch when component mounts
+  });  
+  console.log('[useMaterials] Query result:', {
+    data: queryResult.data?.length || 0,
+    isLoading: queryResult.isLoading,
+    isFetching: queryResult.isFetching,
+    error: queryResult.error,
+    status: queryResult.status
   });
-}
+  
+  return queryResult;}

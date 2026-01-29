@@ -252,6 +252,11 @@ export class RecipeCostEngine {
       }
 
       const itemId = typeof item === 'string' ? item : item.id
+      
+      // Guard: Skip if ID is empty/undefined (new ingredient lines without material selected)
+      if (!itemId || itemId.trim() === '') {
+        return 0
+      }
 
       // Query a Supabase para obtener unit_cost
       // NOTA: Esto asume que hay una tabla 'materials' o 'products' con unit_cost

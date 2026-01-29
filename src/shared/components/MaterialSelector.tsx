@@ -134,7 +134,15 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
   const [quantity, setQuantity] = useState<number>(1);
   const [unit, setUnit] = useState<string>('');
 
-  const debouncedQuery = useDebounce(query, 300);
+  const debouncedQuery = useDebounce(query, 500); // Increased from 300ms
+  
+  console.log('[MaterialSelector] State:', {
+    query,
+    debouncedQuery,
+    isOpen,
+    itemsReceived: items?.length || 0,
+    loading
+  });
 
   // ============================================================================
   // COMPUTED VALUES
@@ -194,10 +202,20 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
    * Filtered materials based on search query
    */
   const filteredMaterials = useMemo(() => {
-    if (!debouncedQuery.trim()) return [];
+    console.log('[MaterialSelector] Filtering:', {
+      debouncedQuery,
+      itemsCount: items?.length || 0,
+      filterByStock,
+      selectedMaterialIds
+    });
+    
+    if (!debouncedQuery.trim()) {
+      console.log('[MaterialSelector] Empty query, returning []');
+      return [];
+    }
 
     const searchQuery = debouncedQuery.toLowerCase();
-    return items
+    const filtered = items
       .filter(item => {
         // Exclude already selected
         if (selectedMaterialIds.includes(item.id)) return false;
@@ -209,6 +227,13 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
         return item.name.toLowerCase().includes(searchQuery);
       })
       .slice(0, 8); // Limit results
+    
+    console.log('[MaterialSelector] Filtered results:', {
+      count: filtered.length,
+      names: filtered.map(m => m.name)
+    });
+    
+    return filtered;
   }, [debouncedQuery, items, selectedMaterialIds, filterByStock]);
 
   // ============================================================================
@@ -234,6 +259,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
    */
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    console.log('[MaterialSelector] Input change:', value);
     setQuery(value);
     setIsOpen(value.trim().length > 0);
     

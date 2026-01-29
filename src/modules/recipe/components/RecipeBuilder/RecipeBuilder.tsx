@@ -137,7 +137,13 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
   // MATERIALS DATA (for MaterialSelector)
   // ============================================
 
-  const { items: materials, loading: materialsLoading } = useMaterials();
+  const { data: materials = [], isLoading: materialsLoading } = useMaterials();
+  
+  console.log('[RecipeBuilder] Materials from useMaterials:', {
+    count: materials?.length || 0,
+    loading: materialsLoading,
+    first3: materials?.slice(0, 3).map(m => ({ id: m.id, name: m.name, stock: m.stock })) || []
+  });
 
   // ============================================
   // STAFF ASSIGNMENT STATE (NEW)

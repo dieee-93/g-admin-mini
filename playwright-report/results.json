@@ -214,31 +214,31 @@
                           "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 13043,
+                          "duration": 16314,
                           "error": {
-                            "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('materials-toolbar-new-button')\u001b[22m\n",
-                            "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('materials-toolbar-new-button')\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:213:62",
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:256:35",
                             "location": {
                               "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                              "column": 62,
-                              "line": 213
+                              "column": 35,
+                              "line": 256
                             },
-                            "snippet": "\u001b[0m \u001b[90m 211 |\u001b[39m       \n \u001b[90m 212 |\u001b[39m       \u001b[90m// ========== Open modal (ONLY data-testid) ==========\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 213 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'materials-toolbar-new-button'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 214 |\u001b[39m       \n \u001b[90m 215 |\u001b[39m       \u001b[90m// Wait for lazy loading\u001b[39m\n \u001b[90m 216 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                            "snippet": "\u001b[0m \u001b[90m 254 |\u001b[39m       \u001b[90m// Select first material from results\u001b[39m\n \u001b[90m 255 |\u001b[39m       \u001b[36mconst\u001b[39m firstMaterial \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid^=\"material-option-\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 256 |\u001b[39m       \u001b[36mawait\u001b[39m expect(firstMaterial)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 257 |\u001b[39m       \u001b[36mawait\u001b[39m firstMaterial\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 258 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 259 |\u001b[39m       \u001b[0m"
                           },
                           "errors": [
                             {
                               "location": {
                                 "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                                "column": 62,
-                                "line": 213
+                                "column": 35,
+                                "line": 256
                               },
-                              "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('materials-toolbar-new-button')\u001b[22m\n\n\n\u001b[0m \u001b[90m 211 |\u001b[39m       \n \u001b[90m 212 |\u001b[39m       \u001b[90m// ========== Open modal (ONLY data-testid) ==========\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 213 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'materials-toolbar-new-button'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 214 |\u001b[39m       \n \u001b[90m 215 |\u001b[39m       \u001b[90m// Wait for lazy loading\u001b[39m\n \u001b[90m 216 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:213:62\u001b[22m"
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\u001b[22m\n\n\n\u001b[0m \u001b[90m 254 |\u001b[39m       \u001b[90m// Select first material from results\u001b[39m\n \u001b[90m 255 |\u001b[39m       \u001b[36mconst\u001b[39m firstMaterial \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid^=\"material-option-\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 256 |\u001b[39m       \u001b[36mawait\u001b[39m expect(firstMaterial)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 257 |\u001b[39m       \u001b[36mawait\u001b[39m firstMaterial\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 258 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 259 |\u001b[39m       \u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:256:35\u001b[22m"
                             }
                           ],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-01-28T21:02:58.849Z",
+                          "startTime": "2026-01-29T00:46:43.923Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -254,8 +254,8 @@
                           ],
                           "errorLocation": {
                             "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                            "column": 62,
-                            "line": 213
+                            "column": 35,
+                            "line": 256
                           }
                         }
                       ],
@@ -276,8 +276,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-01-28T21:02:57.455Z",
-    "duration": 15972.921999999999,
+    "startTime": "2026-01-29T00:46:42.477Z",
+    "duration": 20176.317,
     "expected": 0,
     "skipped": 0,
     "unexpected": 1,
