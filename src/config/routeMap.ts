@@ -39,7 +39,7 @@ export const domainRouteMap = {
   'cash': '/admin/finance/cash',
 
   // Workforce Domain
-  'staff': '/admin/resources/team',
+  'team': '/admin/resources/team',
   'scheduling': '/admin/resources/scheduling',
 
   // Tools & Settings

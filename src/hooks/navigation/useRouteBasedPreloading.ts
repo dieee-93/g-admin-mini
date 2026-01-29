@@ -7,7 +7,7 @@ import { lazyLoadingManager } from '@/lib/performance/LazyLoadingManager';
 import { modulePreloadingConfig } from '@/lib/lazy';
 
 // Types for navigation patterns
-type ModuleId = 'dashboard' | 'sales' | 'operations' | 'materials' | 'customers' | 'staff' | 'scheduling' | 'fiscal' | 'recipes' | 'settings';
+type ModuleId = 'dashboard' | 'sales' | 'operations' | 'materials' | 'customers' | 'team' | 'scheduling' | 'fiscal' | 'recipes' | 'settings';
 type AffinityMap = Record<ModuleId, Record<string, number>>;
 type PreloadPriority = 'high' | 'medium' | 'low';
 
@@ -24,7 +24,7 @@ const NAVIGATION_PATTERNS: NavigationPatterns = {
     ['dashboard', 'materials', 'sales'],
     ['sales', 'customers', 'sales'],
     ['materials', 'recipes', 'operations'],
-    ['staff', 'scheduling', 'staff']
+    ['team', 'scheduling', 'team']
   ],
 
   // Module affinity (how likely users are to visit module B after A)
@@ -53,7 +53,7 @@ function pathToModuleId(path: string): string {
     'operations': 'operations', // operations maps to operations module
     'sales': 'sales',
     'customers': 'customers',
-    'staff': 'staff',
+    'team': 'team',
     'scheduling': 'scheduling',
     'fiscal': 'fiscal',
     'settings': 'settings',
@@ -180,7 +180,7 @@ export function useRouteBasedPreloading() {
 
     // Administrative hours (2 PM - 5 PM): prioritize staff and settings
     else if (hour >= 14 && hour <= 17) {
-      lazyLoadingManager.preloadModule('staff', 'medium');
+      lazyLoadingManager.preloadModule('team', 'medium');
       lazyLoadingManager.preloadModule('settings', 'low');
     }
   }, []);

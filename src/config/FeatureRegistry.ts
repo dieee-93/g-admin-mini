@@ -1103,7 +1103,7 @@ export const MODULE_FEATURE_MAP: Record<string, {
     description: 'Sistema de control de turnos - coordinación centralizada'
   },
 
-  'staff': {
+  'team': {
     activatedBy: 'staff_employee_management',
     enhancedBy: ['staff_labor_cost_tracking'],
     description: 'Módulo de personal - gestión de empleados y turnos'

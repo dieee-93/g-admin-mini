@@ -18,6 +18,7 @@ import { materialsApi } from '@/modules/materials/services';
 import { useMaterialsStore } from '@/modules/materials/store';
 import { materialsKeys } from './queryKeys';
 import type { MaterialItem } from '@/modules/materials/types';
+import { useShallow } from 'zustand/react/shallow';
 
 /**
  * Fetch materials list with filters from Zustand store
@@ -38,7 +39,10 @@ import type { MaterialItem } from '@/modules/materials/types';
  */
 export function useMaterials() {
   // Get filters from Zustand store (UI state)
-  const filters = useMaterialsStore((state) => state.filters);
+  // Use useShallow to prevent infinite loop from object recreation
+  const filters = useMaterialsStore(
+    useShallow((state) => state.filters)
+  );
   
   console.log('[useMaterials] Hook called with filters:', filters);
   

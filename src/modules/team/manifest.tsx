@@ -25,11 +25,11 @@ import { useCrudOperations } from '@/hooks/core/useCrudOperations';
 // ============================================
 
 export const teamManifest: ModuleManifest = {
-  id: 'staff',
+  id: 'team',
   name: 'Team Management',
   version: '1.0.0',
 
-  // No dependencies - staff is a foundational module
+  // No dependencies - team is a foundational module
   depends: [],
 
   // Requires basic staff management feature

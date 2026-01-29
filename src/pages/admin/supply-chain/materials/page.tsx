@@ -392,6 +392,8 @@ export default function MaterialsPage() {
               defaultValue="inventory"
               value={activeMainTab}
               onValueChange={(details) => setActiveMainTab(details.value as typeof activeMainTab)}
+              lazyMount
+              unmountOnExit={false}
             >
               <Tabs.List mb="6">
                 <Tabs.Trigger value="inventory">

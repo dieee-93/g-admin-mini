@@ -137,12 +137,15 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
   // MATERIALS DATA (for MaterialSelector)
   // ============================================
 
-  const { data: materials = [], isLoading: materialsLoading } = useMaterials();
+  const queryResult = useMaterials();
+  const materials = queryResult.data || [];
+  const materialsLoading = queryResult.isLoading;
   
-  console.log('[RecipeBuilder] Materials from useMaterials:', {
-    count: materials?.length || 0,
+  console.log('[RecipeBuilder] After useMaterials:', {
+    queryData: queryResult.data?.length || 'undefined',
+    materials: materials.length,
     loading: materialsLoading,
-    first3: materials?.slice(0, 3).map(m => ({ id: m.id, name: m.name, stock: m.stock })) || []
+    first3Names: materials.slice(0, 3).map(m => m.name)
   });
 
   // ============================================

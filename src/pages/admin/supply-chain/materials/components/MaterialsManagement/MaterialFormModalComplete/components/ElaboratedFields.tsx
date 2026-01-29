@@ -201,6 +201,19 @@ export const ElaboratedFields = memo(function ElaboratedFields({
     };
   }, [formData.name, formData.unit]);
 
+  // ⚡ PERFORMANCE: Memoize recipe features to prevent RecipeBuilder re-renders
+  const recipeFeatures = useMemo(() => ({
+    showCostCalculation: true,
+    showScalingLite: true,
+    showInstructions: false,
+    allowProductInputs: false,
+  }), []);
+  
+  // ⚡ PERFORMANCE: Memoize outputQuantity
+  const outputQuantity = useMemo(() => 
+    formData.initial_stock || 1
+  , [formData.initial_stock]);
+
   // ⚡ PERFORMANCE: Memoize callback
   const handleRecipeSaved = useCallback((recipe: Recipe) => {
     setFormData({
@@ -416,15 +429,9 @@ export const ElaboratedFields = memo(function ElaboratedFields({
             mode="create"
             entityType="material"
             complexity="minimal"
-            features={{
-              showCostCalculation: true,
-              showScalingLite: true,
-              showInstructions: false,
-              allowProductInputs: false,
-              // 🚫 CRITICAL: Omit substitutions section
-            }}
+            features={recipeFeatures}
             outputItem={outputItem}
-            outputQuantity={formData.initial_stock || 1}
+            outputQuantity={outputQuantity}
             onSave={handleRecipeSaved}
           />
         </Box>

@@ -148,7 +148,7 @@ export const OPTIONAL_MODULES: Readonly<Record<string, FeatureId>> = {
   // STAFF & SCHEDULING
   // ============================================
 
-  'staff': 'staff_employee_management',
+  'team': 'staff_employee_management',
   'scheduling': 'scheduling_appointment_booking',
   'shift-control': 'staff_shift_management',
 

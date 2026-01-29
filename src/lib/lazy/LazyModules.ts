@@ -110,7 +110,7 @@ export const LazySuppliersPage = createLazyComponent(
 // Lazy-loaded Staff Page (pages/admin/resources/team/page.tsx)
 export const LazyStaffPage = createLazyComponent(
   () => import('../../pages/admin/resources/team/page'),
-  'staff',
+  'team',
   {
     chunkName: 'staff-module',
     preload: false,

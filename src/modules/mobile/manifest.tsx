@@ -14,7 +14,7 @@ export const mobileManifest: ModuleManifest = {
 
 
   // ✅ OPTIONAL MODULE: Only loaded when required feature is active
-  depends: ['staff', 'delivery', 'materials'],
+  depends: ['team', 'delivery', 'materials'],
   // 🔒 PERMISSIONS: Operadores can use mobile operations
   minimumRole: 'OPERADOR' as const,
 

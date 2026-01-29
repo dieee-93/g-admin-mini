@@ -205,7 +205,7 @@ export const STAFF_MASTERY_ACHIEVEMENTS: MasteryAchievementDefinition[] = [
     name: 'Primer Miembro del Equipo',
     description: 'Registra tu primer empleado',
     icon: 'user-plus',
-    domain: 'staff',
+    domain: 'team',
     trigger_event: 'staff:member_created',
     conditions: {
       type: 'single_event'
@@ -222,7 +222,7 @@ export const STAFF_MASTERY_ACHIEVEMENTS: MasteryAchievementDefinition[] = [
     name: 'Constructor de Equipos',
     description: 'Gestiona un equipo de 5 personas',
     icon: 'users',
-    domain: 'staff',
+    domain: 'team',
     trigger_event: 'staff:member_created',
     conditions: {
       type: 'cumulative',
@@ -242,7 +242,7 @@ export const STAFF_MASTERY_ACHIEVEMENTS: MasteryAchievementDefinition[] = [
     name: 'Maestro de Horarios',
     description: 'Programa 20 turnos de trabajo',
     icon: 'calendar',
-    domain: 'staff',
+    domain: 'team',
     trigger_event: 'staff:schedule_created',
     conditions: {
       type: 'cumulative',

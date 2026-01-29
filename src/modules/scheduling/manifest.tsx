@@ -30,8 +30,8 @@ export const schedulingManifest: ModuleManifest = {
   name: 'Scheduling Management',
   version: '1.0.0',
 
-  // Requires staff module to function
-  depends: ['staff'],
+  // Requires team module to function
+  depends: ['team'],
 
   // Requires shift management feature
   activatedBy: 'staff_shift_management',

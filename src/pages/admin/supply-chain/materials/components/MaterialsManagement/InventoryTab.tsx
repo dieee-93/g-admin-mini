@@ -385,6 +385,14 @@ export const InventoryTab = memo(function InventoryTab({
   }, [deleteMutation]);
 
   // ============================================================================
+  // MATERIALTABLE CALLBACKS (MEMOIZED FOR PERFORMANCE)
+  // ============================================================================
+  
+  const handleSelectAll = useCallback(() => {
+    selectAll(materials.map(m => m.id));
+  }, [materials, selectAll]);
+
+  // ============================================================================
   // FILTER DRAWER HANDLERS
   // ============================================================================
 
@@ -507,7 +515,7 @@ export const InventoryTab = memo(function InventoryTab({
             materials={materials as any[]} // Cast to any to avoid strict type mismatch with legacy table
             selectedIds={selectedItems}
             onSelect={selectItem}
-            onSelectAll={() => selectAll(materials.map(m => m.id))}
+            onSelectAll={handleSelectAll}
             onDeselectAll={deselectAll}
             onEdit={handleEdit as any}
             onView={handleView as any}

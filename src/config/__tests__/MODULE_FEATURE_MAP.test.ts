@@ -232,7 +232,7 @@ describe('getModulesForActiveFeatures - Function Tests', () => {
   it('should activate staff module with staff features', () => {
     const modules = getModulesForActiveFeatures(['staff_employee_management']);
 
-    expect(modules).toContain('staff');
+    expect(modules).toContain('team');
   });
 
   it('should activate customers module with customer features', () => {
@@ -258,7 +258,7 @@ describe('getModulesForActiveFeatures - Real-World Scenarios', () => {
     expect(modules).toContain('materials');
     expect(modules).toContain('sales');
     expect(modules).toContain('operations');
-    expect(modules).toContain('staff');
+    expect(modules).toContain('team');
     expect(modules).toContain('dashboard'); // Always active
   });
 
@@ -274,7 +274,7 @@ describe('getModulesForActiveFeatures - Real-World Scenarios', () => {
 
     expect(modules).toContain('scheduling');
     expect(modules).toContain('customers');
-    expect(modules).toContain('staff');
+    expect(modules).toContain('team');
     expect(modules).toContain('sales');
   });
 

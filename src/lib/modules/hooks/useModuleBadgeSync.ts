@@ -58,7 +58,7 @@ const ALERT_CONTEXT_TO_MODULE_ID: Record<AlertContext, string> = {
   integrations: 'integrations',
 
   // Resources
-  staff: 'staff',
+  team: 'team',
   scheduling: 'scheduling',
 
   // Analytics

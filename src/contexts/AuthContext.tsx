@@ -24,7 +24,7 @@ export type ModuleName =
   | 'materials-procurement'
   | 'products'
   | 'recipe'
-  | 'staff'
+  | 'team'
   | 'scheduling'
   | 'fiscal'
   | 'settings'
