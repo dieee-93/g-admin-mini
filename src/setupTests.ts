@@ -1,5 +1,18 @@
 import '@testing-library/jest-dom'
 import { vi } from 'vitest'
+import 'fake-indexeddb/auto'
+
+// Mock de logger
+vi.mock('./lib/logging', () => ({
+  logger: {
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+  Logger: vi.fn(),
+  ConsoleHelper: vi.fn(),
+}))
 
 // Mock de Web APIs que no están disponibles en jsdom
 Object.defineProperty(window, 'matchMedia', {
@@ -153,36 +166,6 @@ vi.mock('./store/staffStore', () => {
     useTeamStore: vi.fn((selector) => store(selector)),
   };
 });
-
-// Mock de IndexedDB para tests offline
-const mockIDBDatabase = {
-  transaction: vi.fn(() => ({
-    objectStore: vi.fn(() => ({
-      add: vi.fn(() => ({ onsuccess: null, onerror: null })),
-      get: vi.fn(() => ({ onsuccess: null, onerror: null })),
-      put: vi.fn(() => ({ onsuccess: null, onerror: null })),
-      delete: vi.fn(() => ({ onsuccess: null, onerror: null })),
-      clear: vi.fn(() => ({ onsuccess: null, onerror: null })),
-      createIndex: vi.fn(),
-      index: vi.fn(() => ({
-        get: vi.fn(() => ({ onsuccess: null, onerror: null }))
-      }))
-    }))
-  })),
-  close: vi.fn()
-}
-
-const mockIDBRequest = {
-  onsuccess: null,
-  onerror: null,
-  result: mockIDBDatabase
-}
-
-global.indexedDB = {
-  open: vi.fn(() => mockIDBRequest),
-  deleteDatabase: vi.fn(() => mockIDBRequest),
-  databases: vi.fn(() => Promise.resolve([]))
-} as any
 
 // ============================================================================
 // Mock de localStorage para Zustand persist middleware
