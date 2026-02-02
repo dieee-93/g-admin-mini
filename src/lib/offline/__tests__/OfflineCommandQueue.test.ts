@@ -107,4 +107,144 @@ describe('OfflineCommandQueue', () => {
     // Listener was removed, should not be called
     expect(mockListener).not.toHaveBeenCalled();
   });
+
+  describe('replayCommands', () => {
+    it('should process pending commands when online', async () => {
+      // Mock navigator.onLine
+      Object.defineProperty(navigator, 'onLine', {
+        writable: true,
+        value: true
+      });
+
+      // Enqueue a command
+      await queue.enqueue({
+        entityType: 'materials',
+        entityId: 'test-1',
+        operation: 'CREATE',
+        data: { name: 'Test Material' }
+      });
+
+      // Mock the sync method to succeed
+      const syncSpy = vi.spyOn(queue as any, 'syncCommand').mockResolvedValue({
+        success: true,
+        command: {}
+      });
+
+      // Trigger replay
+      await (queue as any).replayCommands();
+
+      expect(syncSpy).toHaveBeenCalledTimes(1);
+
+      // Verify command was processed
+      const stats = await queue.getStats();
+      expect(stats.pending).toBe(0);
+    });
+
+    it('should not process when offline', async () => {
+      // Mock navigator.onLine
+      Object.defineProperty(navigator, 'onLine', {
+        writable: true,
+        value: false
+      });
+
+      // Enqueue a command
+      await queue.enqueue({
+        entityType: 'materials',
+        entityId: 'test-2',
+        operation: 'CREATE',
+        data: { name: 'Test Material' }
+      });
+
+      const syncSpy = vi.spyOn(queue as any, 'syncCommand');
+
+      // Trigger replay
+      await (queue as any).replayCommands();
+
+      expect(syncSpy).not.toHaveBeenCalled();
+
+      // Command should still be pending
+      const stats = await queue.getStats();
+      expect(stats.pending).toBe(1);
+    });
+
+    it('should implement exponential backoff for retries', async () => {
+      Object.defineProperty(navigator, 'onLine', {
+        writable: true,
+        value: true
+      });
+
+      // Enqueue a command
+      const id = await queue.enqueue({
+        entityType: 'materials',
+        entityId: 'test-3',
+        operation: 'CREATE',
+        data: { name: 'Test' }
+      });
+
+      // Mock sync to fail with network error
+      const syncSpy = vi.spyOn(queue as any, 'syncCommand').mockResolvedValue({
+        success: false,
+        error: 'Network error',
+        errorType: 'network',
+        command: { id, retryCount: 0 }
+      });
+
+      // First replay attempt
+      await (queue as any).replayCommands();
+
+      expect(syncSpy).toHaveBeenCalledTimes(1);
+
+      // Command should be marked for retry with backoff
+      const stats = await queue.getStats();
+      expect(stats.failed).toBe(0); // Not failed yet, will retry
+      expect(stats.pending).toBe(1);
+    });
+
+    it('should mark command as failed after max retries', async () => {
+      Object.defineProperty(navigator, 'onLine', {
+        writable: true,
+        value: true
+      });
+
+      // Create queue with maxRetries: 2 and short delays for testing
+      const testQueue = new OfflineCommandQueue({
+        maxRetries: 2,
+        initialRetryDelay: 10,
+        maxRetryDelay: 100
+      });
+      await testQueue.init();
+
+      // Mock sync to always fail BEFORE enqueueing
+      const syncSpy = vi.spyOn(testQueue as any, 'syncCommand').mockResolvedValue({
+        success: false,
+        error: 'Network error',
+        errorType: 'network'
+      });
+
+      const id = await testQueue.enqueue({
+        entityType: 'materials',
+        entityId: 'test-4',
+        operation: 'CREATE',
+        data: { name: 'Test' }
+      });
+
+      expect(id).toBeGreaterThan(0);
+
+      // Attempt 1 (retryCount will be 1, backoff: 10ms)
+      await testQueue.replayCommands();
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Attempt 2 (retryCount will be 2, backoff: 20ms)
+      await testQueue.replayCommands();
+      await new Promise(resolve => setTimeout(resolve, 30));
+
+      // Attempt 3 (should mark as failed because retryCount >= maxRetries)
+      await testQueue.replayCommands();
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      const stats = await testQueue.getStats();
+      expect(stats.failed).toBeGreaterThan(0);
+      expect(syncSpy).toHaveBeenCalled();
+    }, 15000);
+  });
 });
