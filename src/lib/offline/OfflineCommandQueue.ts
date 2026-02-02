@@ -236,19 +236,136 @@ export class OfflineCommandQueue {
   }
 
   private async syncCommand(command: OfflineCommand): Promise<any> {
-    // Stub implementation - will be replaced in Task 5
-    // For now, just simulate success
     logger.debug('OfflineQueue', `Syncing command ${command.id}`, {
       operation: command.operation,
       entityType: command.entityType
     });
 
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 10));
+    try {
+      const { supabase } = await import('@/lib/supabase/client');
+
+      switch (command.operation) {
+        case 'CREATE':
+          return await this.syncCreate(command, supabase);
+
+        case 'UPDATE':
+          return await this.syncUpdate(command, supabase);
+
+        case 'DELETE':
+          return await this.syncDelete(command, supabase);
+
+        default:
+          return {
+            success: false,
+            command,
+            error: `Unknown operation: ${command.operation}`,
+            errorType: 'unknown'
+          };
+      }
+    } catch (error) {
+      // Network or other errors
+      logger.error('OfflineQueue', `Sync error for command ${command.id}`, error);
+
+      return {
+        success: false,
+        command,
+        error: String(error),
+        errorType: 'network'
+      };
+    }
+  }
+
+  private async syncCreate(command: OfflineCommand, supabase: any): Promise<any> {
+    const { data, error } = await supabase
+      .from(command.entityType)
+      .insert(command.data)
+      .select();
+
+    if (error) {
+      return this.handleSupabaseError(command, error);
+    }
+
+    logger.info('OfflineQueue', `CREATE synced successfully`, {
+      entityType: command.entityType,
+      entityId: command.entityId
+    });
+
+    return {
+      success: true,
+      command,
+      serverData: data
+    };
+  }
+
+  private async syncUpdate(command: OfflineCommand, supabase: any): Promise<any> {
+    const { data, error } = await supabase
+      .from(command.entityType)
+      .update(command.data)
+      .eq('id', command.entityId)
+      .select();
+
+    if (error) {
+      return this.handleSupabaseError(command, error);
+    }
+
+    logger.info('OfflineQueue', `UPDATE synced successfully`, {
+      entityType: command.entityType,
+      entityId: command.entityId
+    });
+
+    return {
+      success: true,
+      command,
+      serverData: data
+    };
+  }
+
+  private async syncDelete(command: OfflineCommand, supabase: any): Promise<any> {
+    const { error } = await supabase
+      .from(command.entityType)
+      .delete()
+      .eq('id', command.entityId);
+
+    if (error) {
+      return this.handleSupabaseError(command, error);
+    }
+
+    logger.info('OfflineQueue', `DELETE synced successfully`, {
+      entityType: command.entityType,
+      entityId: command.entityId
+    });
 
     return {
       success: true,
       command
+    };
+  }
+
+  private handleSupabaseError(command: OfflineCommand, error: any): any {
+    let errorType: 'network' | 'foreign_key' | 'validation' | 'conflict' | 'unknown' = 'unknown';
+
+    // Classify error by PostgreSQL error code
+    if (error.code === '23503') {
+      errorType = 'foreign_key';
+    } else if (error.code === '23502' || error.code === '23514') {
+      errorType = 'validation';
+    } else if (error.code === '23505') {
+      errorType = 'conflict';
+    } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+      errorType = 'network';
+    }
+
+    logger.warn('OfflineQueue', `Supabase error for command ${command.id}`, {
+      errorType,
+      code: error.code,
+      message: error.message
+    });
+
+    return {
+      success: false,
+      command,
+      error: error.message || String(error),
+      errorType
     };
   }
 }
