@@ -17,6 +17,9 @@ import { logger } from '@/lib/logging/Logger';
 import { requirePermission, requireModuleAccess } from '@/lib/permissions';
 import type { AuthUser } from '@/contexts/AuthContext';
 
+// ✅ OFFLINE-FIRST: Offline support helper
+import { executeWithOfflineSupport } from '@/lib/offline/executeWithOfflineSupport';
+
 // 🏗️ CROSS-MODULE: Import CustomerAPI from CRM module (proper architecture)
 import { CustomerAPI } from '@/pages/admin/core/crm/customers/services/customerApi';
 
@@ -189,13 +192,23 @@ export async function fetchSaleById(id: string): Promise<Sale> {
 }
 
 export async function deleteSale(id: string): Promise<void> {
-  // Los sale_items se eliminan automáticamente por CASCADE
-  const { error } = await supabase
-    .from('sales')
-    .delete()
-    .eq('id', id);
+  // ✅ OFFLINE-FIRST: Execute with offline support
+  await executeWithOfflineSupport({
+    entityType: 'sales',
+    entityId: id,
+    operation: 'DELETE',
+    execute: async () => {
+      // Los sale_items se eliminan automáticamente por CASCADE
+      const { error } = await supabase
+        .from('sales')
+        .delete()
+        .eq('id', id);
 
-  if (error) throw error;
+      if (error) throw error;
+      return { id };
+    },
+    data: { id }
+  });
 }
 
 // ===== FUNCIONES AVANZADAS (usando las funciones de Supabase) =====
@@ -446,28 +459,34 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
       created_at: new Date().toISOString()
     };
 
-    // Crear venta usando RPC para transacción atómica
-    const { data: processedSale, error } = await supabase
-      .rpc('process_complete_sale', {
-        sale_data: JSON.stringify(saleToCreate),
-        items_data: JSON.stringify(saleData.items)
-      } as any);
+    // ✅ OFFLINE-FIRST: Execute with offline support
+    const processedSale = await executeWithOfflineSupport({
+      entityType: 'sales',
+      operation: 'CREATE',
+      execute: async () => {
+        // Crear venta usando RPC para transacción atómica
+        const { data, error } = await supabase
+          .rpc('process_complete_sale', {
+            sale_data: JSON.stringify(saleToCreate),
+            items_data: JSON.stringify(saleData.items)
+          } as any);
 
-    if (error) {
-      errorHandler.handle(createBusinessError(`Error procesando venta: ${error.message}`, { error, saleData }));
-      return {
-        success: false,
-        sale: undefined,
-        message: error.message,
-        error: error.message,
-        validation: stockValidation
-      };
-    }
+        if (error) {
+          errorHandler.handle(createBusinessError(`Error procesando venta: ${error.message}`, { error, saleData }));
+          throw error;
+        }
+
+        return data;
+      },
+      data: {
+        sale: saleToCreate,
+        items: saleData.items
+      }
+    });
 
     // Emitir evento de venta completada
     const saleEvent: SaleCompletedEvent = {
       saleId: processedSale.id,
-      customerId: saleData.customer_id,
       customerId: saleData.customer_id,
       totalAmount: taxResult.totalAmount,
       subtotal: taxResult.subtotal,
@@ -477,7 +496,12 @@ export async function processSale(saleData: CreateSaleData): Promise<SaleProcess
         productId: item.product_id,
         quantity: item.quantity,
         unitPrice: item.unit_price,
-        totalPrice: item.quantity * item.unit_price
+        // ✅ PRECISION FIX: Use DecimalUtils for financial calculations
+        totalPrice: DecimalUtils.multiply(
+          item.quantity.toString(),
+          item.unit_price.toString(),
+          'financial'
+        ).toNumber()
       })),
       timestamp: new Date().toISOString()
     };
