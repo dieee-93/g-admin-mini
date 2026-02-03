@@ -15,6 +15,7 @@ import type { AuthUser } from '@/contexts/AuthContext';
 
 import { logger } from '@/lib/logging';
 import EventBus from '@/lib/events'; // ✅ EventBus for cross-module communication
+import { executeWithOfflineSupport } from '@/lib/offline/executeWithOfflineSupport'; // ✅ Offline-first support
 
 // ✅ DEVELOPMENT FLAG - Use mock data in development
 const USE_MOCK_DATA = false; // Changed to false to use real Supabase data
@@ -218,16 +219,26 @@ export const inventoryApi = {
       return MaterialsMockService.createMaterial(item);
     }
 
-    const { data, error } = await supabase
-      .from('materials')
-      .insert([item])
-      .select()
-      .single();
+    // ✅ OFFLINE-FIRST: Execute with offline support
+    const data = await executeWithOfflineSupport({
+      entityType: 'materials',
+      operation: 'CREATE',
+      execute: async () => {
+        const { data, error } = await supabase
+          .from('materials')
+          .insert([item])
+          .select()
+          .single();
 
-    if (error) {
-      logger.error('MaterialsStore', 'Error creating material:', error);
-      throw error;
-    }
+        if (error) {
+          logger.error('MaterialsStore', 'Error creating material:', error);
+          throw error;
+        }
+
+        return data;
+      },
+      data: item
+    });
 
     // Invalidate cache after creating item
     invalidateMaterialsListCache();
@@ -374,14 +385,24 @@ export const inventoryApi = {
     // 🔒 PERMISSIONS: Validate user can update materials
     requirePermission(user, 'materials', 'update');
 
-    const { data, error } = await supabase
-      .from('materials')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    // ✅ OFFLINE-FIRST: Execute with offline support
+    const data = await executeWithOfflineSupport({
+      entityType: 'materials',
+      entityId: id,
+      operation: 'UPDATE',
+      execute: async () => {
+        const { data, error } = await supabase
+          .from('materials')
+          .update(updates)
+          .eq('id', id)
+          .select()
+          .single();
 
-    if (error) throw error;
+        if (error) throw error;
+        return data;
+      },
+      data: { id, ...updates }
+    });
 
     // Invalidate cache after update
     invalidateMaterialCache(id);
@@ -428,13 +449,23 @@ export const inventoryApi = {
   },
 
   async createStockEntry(entry: Omit<StockEntry, 'id' | 'created_at' | 'updated_at'>): Promise<StockEntry> {
-    const { data, error } = await supabase
-      .from('stock_entries')
-      .insert([entry])
-      .select()
-      .single();
+    // ✅ OFFLINE-FIRST: Execute with offline support
+    const data = await executeWithOfflineSupport({
+      entityType: 'stock_entries',
+      operation: 'CREATE',
+      execute: async () => {
+        const { data, error } = await supabase
+          .from('stock_entries')
+          .insert([entry])
+          .select()
+          .single();
 
-    if (error) throw error;
+        if (error) throw error;
+        return data;
+      },
+      data: entry
+    });
+
     return data;
   },
 
@@ -465,24 +496,35 @@ export const inventoryApi = {
         throw new Error('Item no encontrado');
       }
 
-      // Delete all stock_entries for this item first (to avoid trigger conflicts)
-      const { error: stockError } = await supabase
-        .from('stock_entries')
-        .delete()
-        .eq('item_id', id);
+      // ✅ OFFLINE-FIRST: Execute with offline support
+      await executeWithOfflineSupport({
+        entityType: 'materials',
+        entityId: id,
+        operation: 'DELETE',
+        execute: async () => {
+          // Delete all stock_entries for this item first (to avoid trigger conflicts)
+          const { error: stockError } = await supabase
+            .from('stock_entries')
+            .delete()
+            .eq('item_id', id);
 
-      if (stockError) {
-        logger.error('MaterialsStore', 'Warning cleaning stock entries:', stockError);
-        // Continue anyway, the item deletion might still work
-      }
+          if (stockError) {
+            logger.error('MaterialsStore', 'Warning cleaning stock entries:', stockError);
+            // Continue anyway, the item deletion might still work
+          }
 
-      // Now delete the item itself
-      const { error: deleteError } = await supabase
-        .from('materials')
-        .delete()
-        .eq('id', id);
+          // Now delete the item itself
+          const { error: deleteError } = await supabase
+            .from('materials')
+            .delete()
+            .eq('id', id);
 
-      if (deleteError) throw deleteError;
+          if (deleteError) throw deleteError;
+
+          return { id };
+        },
+        data: { id }
+      });
 
       logger.info('MaterialsStore', '✅ Material deleted by user', {
         materialId: id,
