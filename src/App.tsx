@@ -39,7 +39,7 @@ import {
 } from '@/pages/public';
 
 // 📱 SISTEMA OFFLINE-FIRST
-import { initializeOffline, OfflineMonitorProvider } from '@/lib/offline';
+import { initializeOffline, OfflineMonitorProvider, SyncCacheInvalidator } from '@/lib/offline';
 
 // 🐛 DEBUG TOOLS (moved to /debug routes)
 
@@ -342,6 +342,9 @@ function DiagnosticSuspenseWrapper({ children }: { children: React.ReactNode }) 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      {/* ✅ Phase 4: Listen to Service Worker sync completion and invalidate cache */}
+      <SyncCacheInvalidator />
+
       <PerformanceProvider>
         <Provider>
           <AlertsProvider>
