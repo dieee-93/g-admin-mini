@@ -169,7 +169,7 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.56.1",
-    "workers": 6,
+    "workers": 1,
     "webServer": {
       "command": "pnpm dev",
       "url": "http://localhost:5173",
@@ -179,95 +179,494 @@
   },
   "suites": [
     {
-      "title": "materials\\materials-crud-complete.spec.ts",
-      "file": "materials/materials-crud-complete.spec.ts",
+      "title": "production-equipment\\material-with-equipment.spec.ts",
+      "file": "production-equipment/material-with-equipment.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Materials CRUD - Complete Test Suite",
-          "file": "materials/materials-crud-complete.spec.ts",
-          "line": 17,
+          "title": "Material with Production Equipment - Integration",
+          "file": "production-equipment/material-with-equipment.spec.ts",
+          "line": 13,
           "column": 6,
-          "specs": [],
-          "suites": [
+          "specs": [
             {
-              "title": "Create Materials - Los 3 Tipos",
-              "file": "materials/materials-crud-complete.spec.ts",
-              "line": 42,
-              "column": 8,
-              "specs": [
+              "title": "should add equipment to production config in ELABORATED material",
+              "ok": false,
+              "tags": [],
+              "tests": [
                 {
-                  "title": "3. Crear ELABORATED Material (producto elaborado)",
-                  "ok": false,
-                  "tags": [],
-                  "tests": [
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "authenticated",
+                  "projectName": "authenticated",
+                  "results": [
                     {
-                      "timeout": 30000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "authenticated",
-                      "projectName": "authenticated",
-                      "results": [
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 15352,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"dialog\"]').getByText(/Configuración de Producción/i)\nExpected: visible\nError: strict mode violation: locator('[role=\"dialog\"]').getByText(/Configuración de Producción/i) resolved to 2 elements:\n    1) <p class=\"css-i0rifh\">Configuración de Producción</p> aka getByText('Configuración de Producción').first()\n    2) <p class=\"css-pho84f\">Configuración de Producción</p> aka getByText('Configuración de Producción').nth(1)\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').getByText(/Configuración de Producción/i)\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"dialog\"]').getByText(/Configuración de Producción/i)\nExpected: visible\nError: strict mode violation: locator('[role=\"dialog\"]').getByText(/Configuración de Producción/i) resolved to 2 elements:\n    1) <p class=\"css-i0rifh\">Configuración de Producción</p> aka getByText('Configuración de Producción').first()\n    2) <p class=\"css-pho84f\">Configuración de Producción</p> aka getByText('Configuración de Producción').nth(1)\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').getByText(/Configuración de Producción/i)\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts:133:47",
+                        "location": {
+                          "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts",
+                          "column": 47,
+                          "line": 133
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 131 |\u001b[39m         \u001b[90m// ========== PRODUCTION CONFIG SECTION SHOULD NOW BE VISIBLE ==========\u001b[39m\n \u001b[90m 132 |\u001b[39m         \u001b[36mconst\u001b[39m productionConfigSection \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mgetByText(\u001b[35m/Configuración de Producción/i\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 133 |\u001b[39m         \u001b[36mawait\u001b[39m expect(productionConfigSection)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 134 |\u001b[39m\n \u001b[90m 135 |\u001b[39m         \u001b[90m// ========== Click \"Agregar Equipo\" button ==========\u001b[39m\n \u001b[90m 136 |\u001b[39m         \u001b[36mconst\u001b[39m addEquipmentButton \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Agregar Equipo/i\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
                         {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 16314,
-                          "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\u001b[22m\n",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:256:35",
-                            "location": {
-                              "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                              "column": 35,
-                              "line": 256
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 254 |\u001b[39m       \u001b[90m// Select first material from results\u001b[39m\n \u001b[90m 255 |\u001b[39m       \u001b[36mconst\u001b[39m firstMaterial \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid^=\"material-option-\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 256 |\u001b[39m       \u001b[36mawait\u001b[39m expect(firstMaterial)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 257 |\u001b[39m       \u001b[36mawait\u001b[39m firstMaterial\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 258 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 259 |\u001b[39m       \u001b[0m"
+                          "location": {
+                            "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts",
+                            "column": 47,
+                            "line": 133
                           },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                                "column": 35,
-                                "line": 256
-                              },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').locator('[data-testid^=\"material-option-\"]').first()\u001b[22m\n\n\n\u001b[0m \u001b[90m 254 |\u001b[39m       \u001b[90m// Select first material from results\u001b[39m\n \u001b[90m 255 |\u001b[39m       \u001b[36mconst\u001b[39m firstMaterial \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid^=\"material-option-\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 256 |\u001b[39m       \u001b[36mawait\u001b[39m expect(firstMaterial)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 257 |\u001b[39m       \u001b[36mawait\u001b[39m firstMaterial\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 258 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 259 |\u001b[39m       \u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts:256:35\u001b[22m"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-01-29T00:46:43.923Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\materials-materials-crud-c-ec869-aterial-producto-elaborado--authenticated\\test-failed-1.png"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\materials-materials-crud-c-ec869-aterial-producto-elaborado--authenticated\\error-context.md"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\materials\\materials-crud-complete.spec.ts",
-                            "column": 35,
-                            "line": 256
-                          }
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"dialog\"]').getByText(/Configuración de Producción/i)\nExpected: visible\nError: strict mode violation: locator('[role=\"dialog\"]').getByText(/Configuración de Producción/i) resolved to 2 elements:\n    1) <p class=\"css-i0rifh\">Configuración de Producción</p> aka getByText('Configuración de Producción').first()\n    2) <p class=\"css-pho84f\">Configuración de Producción</p> aka getByText('Configuración de Producción').nth(1)\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').getByText(/Configuración de Producción/i)\u001b[22m\n\n\n\u001b[0m \u001b[90m 131 |\u001b[39m         \u001b[90m// ========== PRODUCTION CONFIG SECTION SHOULD NOW BE VISIBLE ==========\u001b[39m\n \u001b[90m 132 |\u001b[39m         \u001b[36mconst\u001b[39m productionConfigSection \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mgetByText(\u001b[35m/Configuración de Producción/i\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 133 |\u001b[39m         \u001b[36mawait\u001b[39m expect(productionConfigSection)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 134 |\u001b[39m\n \u001b[90m 135 |\u001b[39m         \u001b[90m// ========== Click \"Agregar Equipo\" button ==========\u001b[39m\n \u001b[90m 136 |\u001b[39m         \u001b[36mconst\u001b[39m addEquipmentButton \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Agregar Equipo/i\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts:133:47\u001b[22m"
                         }
                       ],
-                      "status": "unexpected"
+                      "stdout": [
+                        {
+                          "text": "🧪 Creating ELABORATED material: Pizza Equipment Test-1770316962625\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] Category onValueChange: {value: Array(1), items: Array(1)}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] Selected value: Sin categoría\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad}\n"
+                        },
+                        {
+                          "text": "✅ Recipe created, now configuring production equipment\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-05T18:42:38.984Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\production-equipment-mater-48a29-nfig-in-ELABORATED-material-authenticated\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\production-equipment-mater-48a29-nfig-in-ELABORATED-material-authenticated\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts",
+                        "column": 47,
+                        "line": 133
+                      }
                     }
                   ],
-                  "id": "49c27bb20a52ce2852e8-0a3176907f06d2c4b6c6",
-                  "file": "materials/materials-crud-complete.spec.ts",
-                  "line": 208,
-                  "column": 5
+                  "status": "unexpected"
                 }
-              ]
+              ],
+              "id": "1935683b93f0f6a22e40-d10c30969191695bb732",
+              "file": "production-equipment/material-with-equipment.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            {
+              "title": "should configure labor and packaging costs",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "authenticated",
+                  "projectName": "authenticated",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 24800,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').getByTestId('recipe-save-button')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" data-testid=\"recipe-save-button\" class=\"chakra-button css-1emlydm\">Crear Receta</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    18 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').getByTestId('recipe-save-button')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" data-testid=\"recipe-save-button\" class=\"chakra-button css-1emlydm\">Crear Receta</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    18 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts:288:26",
+                        "location": {
+                          "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts",
+                          "column": 26,
+                          "line": 288
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 286 |\u001b[39m         \u001b[36mawait\u001b[39m outputQuantity\u001b[33m.\u001b[39mfill(\u001b[32m'5'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 287 |\u001b[39m         \u001b[36mconst\u001b[39m saveButton \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'recipe-save-button'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 288 |\u001b[39m         \u001b[36mawait\u001b[39m saveButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 289 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Receta creada exitosamente'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 290 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m1000\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 291 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts",
+                            "column": 26,
+                            "line": 288
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"dialog\"]').getByTestId('recipe-save-button')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" data-testid=\"recipe-save-button\" class=\"chakra-button css-1emlydm\">Crear Receta</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    18 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n\u001b[0m \u001b[90m 286 |\u001b[39m         \u001b[36mawait\u001b[39m outputQuantity\u001b[33m.\u001b[39mfill(\u001b[32m'5'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 287 |\u001b[39m         \u001b[36mconst\u001b[39m saveButton \u001b[33m=\u001b[39m dialog\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'recipe-save-button'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 288 |\u001b[39m         \u001b[36mawait\u001b[39m saveButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 289 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Receta creada exitosamente'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 290 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m1000\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 291 |\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts:288:26\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "🧪 Testing labor and packaging costs: Labor Config Test-1770316979910\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] Category onValueChange: {value: Array(1), items: Array(1)}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] Selected value: Sin categoría\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {unit: Debes especificar la unidad, initial_stock: Invalid input: expected number, received undefined}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-05T18:42:56.197Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\production-equipment-mater-b1289-e-labor-and-packaging-costs-authenticated\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\production-equipment-mater-b1289-e-labor-and-packaging-costs-authenticated\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts",
+                        "column": 26,
+                        "line": 288
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1935683b93f0f6a22e40-32d8830515547c4fae15",
+              "file": "production-equipment/material-with-equipment.spec.ts",
+              "line": 223,
+              "column": 5
+            },
+            {
+              "title": "should only show production config for ELABORATED materials with recipe",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "authenticated",
+                  "projectName": "authenticated",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 14030,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Cargando formulario...')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Cargando formulario...')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Cargando formulario...')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Cargando formulario...')\u001b[22m\n\n    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts:375:64",
+                        "location": {
+                          "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts",
+                          "column": 64,
+                          "line": 375
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 373 |\u001b[39m         \u001b[90m// ========== Test 2: ELABORATED without recipe should show message ==========\u001b[39m\n \u001b[90m 374 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'materials-toolbar-new-button'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 375 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 376 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeHidden({ timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 377 |\u001b[39m\n \u001b[90m 378 |\u001b[39m         dialog \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[role=\"dialog\"]'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts",
+                            "column": 64,
+                            "line": 375
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Cargando formulario...')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Cargando formulario...')\u001b[22m\n\n\n\u001b[0m \u001b[90m 373 |\u001b[39m         \u001b[90m// ========== Test 2: ELABORATED without recipe should show message ==========\u001b[39m\n \u001b[90m 374 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'materials-toolbar-new-button'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 375 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 376 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m'Cargando formulario...'\u001b[39m))\u001b[33m.\u001b[39mtoBeHidden({ timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 377 |\u001b[39m\n \u001b[90m 378 |\u001b[39m         dialog \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[role=\"dialog\"]'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts:375:64\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "🧪 Testing production config visibility rules\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "✅ Production config correctly hidden for MEASURABLE\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        },
+                        {
+                          "text": "[BROWSER] log: 🔍 [MaterialFormDialog] fieldErrors: {name: Invalid input: expected string, received undefined, type: Invalid option: expected one of \"MEASURABLE\"|\"COUNTABLE\"|\"ELABORATED\", initial_stock: Invalid input: expected number, received undefined}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-02-05T18:43:22.822Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\production-equipment-mater-8dba0-RATED-materials-with-recipe-authenticated\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "I:\\Programacion\\Proyectos\\g-mini\\test-results\\production-equipment-mater-8dba0-RATED-materials-with-recipe-authenticated\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "I:\\Programacion\\Proyectos\\g-mini\\tests\\e2e\\production-equipment\\material-with-equipment.spec.ts",
+                        "column": 64,
+                        "line": 375
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1935683b93f0f6a22e40-37dc02ed20c1d85de66f",
+              "file": "production-equipment/material-with-equipment.spec.ts",
+              "line": 347,
+              "column": 5
             }
           ]
         }
@@ -276,11 +675,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-01-29T00:46:42.477Z",
-    "duration": 20176.317,
+    "startTime": "2026-02-05T18:42:37.433Z",
+    "duration": 59990.207,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 3,
     "flaky": 0
   }
 }

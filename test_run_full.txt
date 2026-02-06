@@ -1,0 +1,731 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mI:/Programacion/Proyectos/g-mini[39m
+
+[90mstdout[2m | src/__tests__/navigation-integration/performance.test.ts[2m > [22m[2mPerformance Tests - Capability ÔåÆ Navigation Integration[2m > [22m[2mshould activate features in less than 50ms on average
+[22m[39mFeature Activation Performance:
+      Avg: 0.02ms
+      Max: 0.13ms
+      Min: 0.01ms
+      Threshold Avg: 50ms
+      Threshold Max: 200ms
+
+[90mstdout[2m | src/__tests__/navigation-integration/performance.test.ts[2m > [22m[2mPerformance Tests - Capability ÔåÆ Navigation Integration[2m > [22m[2mshould filter modules efficiently (< 30ms avg)
+[22m[39mModule Filtering Performance:
+      Avg: 0.01ms
+      Max: 0.06ms
+      Min: 0.01ms
+      Threshold Avg: 30ms
+      Threshold Max: 100ms
+
+[90mstdout[2m | src/__tests__/navigation-integration/performance.test.ts[2m > [22m[2mPerformance Tests - Capability ÔåÆ Navigation Integration[2m > [22m[2mshould handle multiple capability combinations efficiently
+[22m[39mSingle capability: 0.01ms avg (1 capabilities)
+Two capabilities: 0.01ms avg (2 capabilities)
+Three capabilities: 0.01ms avg (3 capabilities)
+Four capabilities: 0.01ms avg (4 capabilities)
+
+[90mstdout[2m | src/__tests__/navigation-integration/performance.test.ts[2m > [22m[2mPerformance Tests - Capability ÔåÆ Navigation Integration[2m > [22m[2mshould not have performance degradation over time
+[22m[39mPerformance over time (batches):
+      Batch 1: 0.02ms
+      Batch 2: 0.01ms
+      Batch 3: 0.01ms
+      Batch 4: 0.01ms
+      Batch 5: 0.01ms
+Performance degradation: -42.27%
+
+ [32mÔ£ô[39m src/__tests__/navigation-integration/performance.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+[90mstdout[2m | src/__tests__/navigation-integration/navigation-filtering.test.tsx[2m > [22m[2mNavigation Filtering[2m > [22m[2mshould only show navigation for active modules
+[22m[39m­ƒÜ¿ [useModuleNavigation] HOOK CALLED!
+­ƒöä [NavigationGeneration] USEMEMO TRIGGERED: {
+  isAuthenticated: [33mtrue[39m,
+  modulesInitialized: [33mtrue[39m,
+  activeModulesCount: [33m4[39m
+}
+­ƒÄ» [NavigationGeneration] PASSED ALL CHECKS! {
+  isAuthenticated: [33mtrue[39m,
+  modulesInitialized: [33mtrue[39m,
+  registeredModulesCount: [33m4[39m,
+  activeModulesCount: [33m4[39m,
+  registeredModuleIds: [ [32m'sales'[39m, [32m'materials'[39m, [32m'scheduling'[39m, [32m'background-service'[39m ]
+}
+­ƒÜ¿ [NavigationGeneration] RETURNING MODULES: {
+  count: [33m2[39m,
+  ids: [ [32m'materials'[39m, [32m'sales'[39m ],
+  withNavigation: [ [32m'sales'[39m, [32m'materials'[39m, [32m'scheduling'[39m ],
+  withoutNavigation: [ [32m'background-service'[39m ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/navigation-filtering.test.tsx[2m > [22m[2mNavigation Filtering[2m > [22m[2mshould exclude modules without navigation metadata
+[22m[39m­ƒÜ¿ [useModuleNavigation] HOOK CALLED!
+­ƒöä [NavigationGeneration] USEMEMO TRIGGERED: {
+  isAuthenticated: [33mtrue[39m,
+  modulesInitialized: [33mtrue[39m,
+  activeModulesCount: [33m3[39m
+}
+­ƒÄ» [NavigationGeneration] PASSED ALL CHECKS! {
+  isAuthenticated: [33mtrue[39m,
+  modulesInitialized: [33mtrue[39m,
+  registeredModulesCount: [33m4[39m,
+  activeModulesCount: [33m3[39m,
+  registeredModuleIds: [ [32m'sales'[39m, [32m'materials'[39m, [32m'scheduling'[39m, [32m'background-service'[39m ]
+}
+­ƒÜ¿ [NavigationGeneration] RETURNING MODULES: {
+  count: [33m2[39m,
+  ids: [ [32m'materials'[39m, [32m'sales'[39m ],
+  withNavigation: [ [32m'sales'[39m, [32m'materials'[39m, [32m'scheduling'[39m ],
+  withoutNavigation: [ [32m'background-service'[39m ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/navigation-filtering.test.tsx[2m > [22m[2mNavigation Filtering[2m > [22m[2mshould return modules with correct navigation structure
+[22m[39m­ƒÜ¿ [useModuleNavigation] HOOK CALLED!
+­ƒöä [NavigationGeneration] USEMEMO TRIGGERED: {
+  isAuthenticated: [33mtrue[39m,
+  modulesInitialized: [33mtrue[39m,
+  activeModulesCount: [33m1[39m
+}
+­ƒÄ» [NavigationGeneration] PASSED ALL CHECKS! {
+  isAuthenticated: [33mtrue[39m,
+  modulesInitialized: [33mtrue[39m,
+  registeredModulesCount: [33m4[39m,
+  activeModulesCount: [33m1[39m,
+  registeredModuleIds: [ [32m'sales'[39m, [32m'materials'[39m, [32m'scheduling'[39m, [32m'background-service'[39m ]
+}
+­ƒÜ¿ [NavigationGeneration] RETURNING MODULES: {
+  count: [33m1[39m,
+  ids: [ [32m'sales'[39m ],
+  withNavigation: [ [32m'sales'[39m, [32m'materials'[39m, [32m'scheduling'[39m ],
+  withoutNavigation: [ [32m'background-service'[39m ]
+}
+
+ [32mÔ£ô[39m src/__tests__/navigation-integration/navigation-filtering.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 69[2mms[22m[39m
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for physical_products capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'physical_products'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m18[39m,
+  features: [
+    [32m'production_bom_management'[39m,
+    [32m'production_display_system'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'production_capacity_planning'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_purchase_orders'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'inventory_sku_management'[39m,
+    [32m'inventory_barcode_scanning'[39m,
+    [32m'inventory_multi_unit_tracking'[39m,
+    [32m'products_recipe_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'products_cost_intelligence'[39m,
+    [32m'products_availability_calculation'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m18[39m,
+  moduleCount: [33m14[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'materials'[39m,
+    [32m'products'[39m,
+    [32m'suppliers'[39m,
+    [32m'production'[39m,
+    [32m'production-kitchen'[39m,
+    [32m'payment-gateways'[39m,
+    [32m'accounting'[39m,
+    [32m'products-analytics'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for combined capabilities
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'physical_products'[39m, [32m'professional_services'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m2[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m31[39m,
+  features: [
+    [32m'production_bom_management'[39m,
+    [32m'production_display_system'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'production_capacity_planning'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_purchase_orders'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'inventory_sku_management'[39m,
+    [32m'inventory_barcode_scanning'[39m,
+    [32m'inventory_multi_unit_tracking'[39m,
+    [32m'products_recipe_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'products_cost_intelligence'[39m,
+    [32m'products_availability_calculation'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'scheduling_appointment_booking'[39m,
+    [32m'scheduling_calendar_management'[39m,
+    [32m'scheduling_reminder_system'[39m,
+    [32m'scheduling_availability_rules'[39m,
+    [32m'customer_service_history'[39m,
+    [32m'customer_preference_tracking'[39m,
+    [32m'sales_package_management'[39m,
+    [32m'products_package_management'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m,
+    [32m'staff_performance_tracking'[39m,
+    [32m'staff_labor_cost_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m31[39m,
+  moduleCount: [33m17[39m,
+  modules: [
+    [32m'dashboard'[39m,          [32m'settings'[39m,
+    [32m'debug'[39m,              [32m'customers'[39m,
+    [32m'sales'[39m,              [32m'gamification'[39m,
+    [32m'materials'[39m,          [32m'products'[39m,
+    [32m'suppliers'[39m,          [32m'production'[39m,
+    [32m'production-kitchen'[39m, [32m'team'[39m,
+    [32m'scheduling'[39m,         [32m'shift-control'[39m,
+    [32m'payment-gateways'[39m,   [32m'accounting'[39m,
+    [32m'products-analytics'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for onsite_service capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'onsite_service'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m22[39m,
+  features: [
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'sales_catalog_menu'[39m,
+    [32m'sales_pos_onsite'[39m,
+    [32m'sales_dine_in_orders'[39m,
+    [32m'sales_split_payment'[39m,
+    [32m'sales_tip_management'[39m,
+    [32m'sales_coupon_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'operations_table_management'[39m,
+    [32m'operations_table_assignment'[39m,
+    [32m'operations_floor_plan_config'[39m,
+    [32m'operations_waitlist_management'[39m,
+    [32m'operations_bill_splitting'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m,
+    [32m'staff_performance_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m22[39m,
+  moduleCount: [33m13[39m,
+  modules: [
+    [32m'dashboard'[39m,     [32m'settings'[39m,
+    [32m'debug'[39m,         [32m'customers'[39m,
+    [32m'sales'[39m,         [32m'gamification'[39m,
+    [32m'materials'[39m,     [32m'suppliers'[39m,
+    [32m'onsite'[39m,        [32m'team'[39m,
+    [32m'shift-control'[39m, [32m'payment-gateways'[39m,
+    [32m'accounting'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for delivery_shipping capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'delivery_shipping'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m18[39m,
+  features: [
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'sales_catalog_menu'[39m,
+    [32m'sales_delivery_orders'[39m,
+    [32m'sales_split_payment'[39m,
+    [32m'sales_coupon_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'operations_delivery_zones'[39m,
+    [32m'operations_delivery_tracking'[39m,
+    [32m'operations_notification_system'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m,
+    [32m'staff_performance_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m18[39m,
+  moduleCount: [33m13[39m,
+  modules: [
+    [32m'dashboard'[39m,     [32m'settings'[39m,
+    [32m'debug'[39m,         [32m'customers'[39m,
+    [32m'sales'[39m,         [32m'gamification'[39m,
+    [32m'materials'[39m,     [32m'suppliers'[39m,
+    [32m'delivery'[39m,      [32m'team'[39m,
+    [32m'shift-control'[39m, [32m'payment-gateways'[39m,
+    [32m'accounting'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for pickup_orders capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'pickup_orders'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m16[39m,
+  features: [
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'sales_catalog_menu'[39m,
+    [32m'sales_pickup_orders'[39m,
+    [32m'sales_split_payment'[39m,
+    [32m'sales_coupon_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'operations_pickup_scheduling'[39m,
+    [32m'operations_notification_system'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m16[39m,
+  moduleCount: [33m13[39m,
+  modules: [
+    [32m'dashboard'[39m,     [32m'settings'[39m,
+    [32m'debug'[39m,         [32m'customers'[39m,
+    [32m'sales'[39m,         [32m'gamification'[39m,
+    [32m'materials'[39m,     [32m'suppliers'[39m,
+    [32m'pickup'[39m,        [32m'team'[39m,
+    [32m'shift-control'[39m, [32m'payment-gateways'[39m,
+    [32m'accounting'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for membership_subscriptions capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'membership_subscriptions'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m12[39m,
+  features: [
+    [32m'membership_subscription_plans'[39m,
+    [32m'membership_recurring_billing'[39m,
+    [32m'membership_access_control'[39m,
+    [32m'membership_usage_tracking'[39m,
+    [32m'membership_benefits_management'[39m,
+    [32m'customer_service_history'[39m,
+    [32m'customer_preference_tracking'[39m,
+    [32m'customer_loyalty_program'[39m,
+    [32m'customer_online_accounts'[39m,
+    [32m'finance_credit_management'[39m,
+    [32m'finance_invoice_scheduling'[39m,
+    [32m'finance_payment_terms'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m12[39m,
+  moduleCount: [33m8[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'billing'[39m,
+    [32m'memberships'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for professional_services capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'professional_services'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m17[39m,
+  features: [
+    [32m'scheduling_appointment_booking'[39m,
+    [32m'scheduling_calendar_management'[39m,
+    [32m'scheduling_reminder_system'[39m,
+    [32m'scheduling_availability_rules'[39m,
+    [32m'production_bom_management'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'customer_service_history'[39m,
+    [32m'customer_preference_tracking'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'sales_package_management'[39m,
+    [32m'products_package_management'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m,
+    [32m'staff_performance_tracking'[39m,
+    [32m'staff_labor_cost_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m17[39m,
+  moduleCount: [33m11[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'team'[39m,
+    [32m'scheduling'[39m,
+    [32m'shift-control'[39m,
+    [32m'payment-gateways'[39m,
+    [32m'accounting'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for asset_rental capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'asset_rental'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m7[39m,
+  features: [
+    [32m'rental_item_management'[39m,
+    [32m'rental_booking_calendar'[39m,
+    [32m'rental_availability_tracking'[39m,
+    [32m'rental_pricing_by_duration'[39m,
+    [32m'rental_late_fees'[39m,
+    [32m'customer_service_history'[39m,
+    [32m'customer_preference_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m7[39m,
+  moduleCount: [33m8[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'rentals'[39m,
+    [32m'assets'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould correctly report module activation status
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'physical_products'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m18[39m,
+  features: [
+    [32m'production_bom_management'[39m,
+    [32m'production_display_system'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'production_capacity_planning'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_purchase_orders'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'inventory_sku_management'[39m,
+    [32m'inventory_barcode_scanning'[39m,
+    [32m'inventory_multi_unit_tracking'[39m,
+    [32m'products_recipe_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'products_cost_intelligence'[39m,
+    [32m'products_availability_calculation'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m18[39m,
+  moduleCount: [33m14[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'materials'[39m,
+    [32m'products'[39m,
+    [32m'suppliers'[39m,
+    [32m'production'[39m,
+    [32m'production-kitchen'[39m,
+    [32m'payment-gateways'[39m,
+    [32m'accounting'[39m,
+    [32m'products-analytics'[39m
+  ]
+}
+
+ [32mÔ£ô[39m src/__tests__/navigation-integration/capability-navigation.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[32m 161[2mms[22m[39m
+[90mstdout[2m | src/__tests__/navigation-integration/route-protection.test.tsx
+[22m[39mÔä╣´©Å [Security] [SECURITY] ANOMALY: PatternCache initialized (01:42:24) { maxSize: [32m'1000'[39m, ttlMs: [32m'300000'[39m }
+Ôä╣´©Å [EventBus] Initializing enterprise event bus... (01:42:24)
+
+[90mstdout[2m | src/__tests__/navigation-integration/route-protection.test.tsx
+[22m[39mÔä╣´©Å [Security] [SECURITY] ANOMALY: Client ID stored securely (01:42:24) { storageType: [32m'sessionStorage'[39m, clientIdPrefix: [32m'4b690da7...'[39m }
+
+[90mstdout[2m | src/__tests__/navigation-integration/route-protection.test.tsx
+[22m[39mÔä╣´©Å [Security] [SECURITY] ANOMALY: New client ID generated (01:42:24) { reason: [32m'No valid existing ID found'[39m, newId: [32m'4b690da7...'[39m }
+
+[90mstdout[2m | src/__tests__/navigation-integration/route-protection.test.tsx
+[22m[39mÔä╣´©Å [Security] [SECURITY] ANOMALY: DeduplicationManager initialized with secure client ID (01:42:24)
+
+[90mstdout[2m | src/__tests__/navigation-integration/route-protection.test.tsx
+[22m[39mÔä╣´©Å [EventBus] Enterprise event bus initialized successfully (01:42:24) { isInitialized: [32m'true'[39m }
+
+[90mstdout[2m | src/__tests__/navigation-integration/route-protection.test.tsx[2m > [22m[2mRoute Protection Integration[2m > [22m[2mshould block access to inactive module routes
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'physical_products'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m18[39m,
+  features: [
+    [32m'production_bom_management'[39m,
+    [32m'production_display_system'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'production_capacity_planning'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_purchase_orders'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'inventory_sku_management'[39m,
+    [32m'inventory_barcode_scanning'[39m,
+    [32m'inventory_multi_unit_tracking'[39m,
+    [32m'products_recipe_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'products_cost_intelligence'[39m,
+    [32m'products_availability_calculation'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m18[39m,
+  moduleCount: [33m14[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'materials'[39m,
+    [32m'products'[39m,
+    [32m'suppliers'[39m,
+    [32m'production'[39m,
+    [32m'production-kitchen'[39m,
+    [32m'payment-gateways'[39m,
+    [32m'accounting'[39m,
+    [32m'products-analytics'[39m
+  ]
+}
+
+stderr | src/__tests__/navigation-integration/route-protection.test.tsx > Route Protection Integration > should block access to inactive module routes
+No valid theme provided, using default system
+
+[90mstdout[2m | src/__tests__/navigation-integration/route-protection.test.tsx[2m > [22m[2mRoute Protection Integration[2m > [22m[2mshould allow access to active module routes
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'physical_products'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m18[39m,
+  features: [
+    [32m'production_bom_management'[39m,
+    [32m'production_display_system'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'production_capacity_planning'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_purchase_orders'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'inventory_sku_management'[39m,
+    [32m'inventory_barcode_scanning'[39m,
+    [32m'inventory_multi_unit_tracking'[39m,
+    [32m'products_recipe_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'products_cost_intelligence'[39m,
+    [32m'products_availability_calculation'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m18[39m,
+  moduleCount: [33m14[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'materials'[39m,
+    [32m'products'[39m,
+    [32m'suppliers'[39m,
+    [32m'production'[39m,
+    [32m'production-kitchen'[39m,
+    [32m'payment-gateways'[39m,
+    [32m'accounting'[39m,
+    [32m'products-analytics'[39m
+  ]
+}
+
+stderr | src/__tests__/navigation-integration/route-protection.test.tsx > Route Protection Integration > should allow access to active module routes
+No valid theme provided, using default system
+
+[90mstdout[2m | src/__tests__/navigation-integration/route-protection.test.tsx[2m > [22m[2mRoute Protection Integration[2m > [22m[2mshould prevent direct URL navigation to inactive modules
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'physical_products'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m18[39m,
+  features: [
+    [32m'production_bom_management'[39m,
+    [32m'production_display_system'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'production_capacity_planning'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_purchase_orders'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'inventory_sku_management'[39m,
+    [32m'inventory_barcode_scanning'[39m,
+    [32m'inventory_multi_unit_tracking'[39m,
+    [32m'products_recipe_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'products_cost_intelligence'[39m,
+    [32m'products_availability_calculation'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m18[39m,
+  moduleCount: [33m14[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'materials'[39m,
+    [32m'products'[39m,
+    [32m'suppliers'[39m,
+    [32m'production'[39m,
+    [32m'production-kitchen'[39m,
+    [32m'payment-gateways'[39m,
+    [32m'accounting'[39m,
+    [32m'products-analytics'[39m
+  ]
+}
+
+stderr | src/__tests__/navigation-integration/route-protection.test.tsx > Route Protection Integration > should prevent direct URL navigation to inactive modules
+No valid theme provided, using default system
+
+ [32mÔ£ô[39m src/__tests__/navigation-integration/route-protection.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 437[2mms[22m[39m
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Unhandled Errors ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ» Unhandled Rejection ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+AbortError: A request was aborted, for example through a call to IDBTransaction.abort.
+ ÔØ» node_modules/.pnpm/fake-indexeddb@6.2.5/node_modules/fake-indexeddb/build/esm/FDBFactory.js:362:27
+ ÔØ» onComplete node_modules/.pnpm/fake-indexeddb@6.2.5/node_modules/fake-indexeddb/build/esm/FDBFactory.js:260:13
+ ÔØ» node_modules/.pnpm/fake-indexeddb@6.2.5/node_modules/fake-indexeddb/build/esm/FDBFactory.js:294:11
+ ÔØ» Immediate.<anonymous> node_modules/.pnpm/fake-indexeddb@6.2.5/node_modules/fake-indexeddb/build/esm/FDBFactory.js:229:11
+ ÔØ» processImmediate node:internal/timers:483:21
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+Serialized Error: { code: 20, INDEX_SIZE_ERR: 1, DOMSTRING_SIZE_ERR: 2, HIERARCHY_REQUEST_ERR: 3, WRONG_DOCUMENT_ERR: 4, INVALID_CHARACTER_ERR: 5, NO_DATA_ALLOWED_ERR: 6, NO_MODIFICATION_ALLOWED_ERR: 7, NOT_FOUND_ERR: 8, NOT_SUPPORTED_ERR: 9, INUSE_ATTRIBUTE_ERR: 10, INVALID_STATE_ERR: 11, SYNTAX_ERR: 12, INVALID_MODIFICATION_ERR: 13, NAMESPACE_ERR: 14, INVALID_ACCESS_ERR: 15, VALIDATION_ERR: 16, TYPE_MISMATCH_ERR: 17, SECURITY_ERR: 18, NETWORK_ERR: 19, ABORT_ERR: 20, URL_MISMATCH_ERR: 21, QUOTA_EXCEEDED_ERR: 22, TIMEOUT_ERR: 23, INVALID_NODE_TYPE_ERR: 24, DATA_CLONE_ERR: 25 }
+This error originated in "src/__tests__/navigation-integration/route-protection.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m19 passed[39m[22m[90m (19)[39m
+[2m     Errors [22m [1m[31m1 error[39m[22m
+[2m   Start at [22m 13:42:13
+[2m   Duration [22m 14.72s[2m (transform 1.70s, setup 2.14s, collect 13.52s, tests 685ms, environment 6.25s, prepare 1.18s)[22m
+

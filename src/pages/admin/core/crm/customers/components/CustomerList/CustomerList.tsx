@@ -8,7 +8,8 @@ import {
   Badge,
   Alert,
   Table,
-  Dialog
+  Dialog,
+  InputField
 } from '@/shared/ui';
 import { QuickCalculations } from '@/lib/decimal';
 // TODO: Implement virtualization for large customer lists (1000+ records)
@@ -127,7 +128,7 @@ export function CustomerList() {
   const displayCustomers = query ? searchResults : customers;
 
   return (
-    <Stack p="lg">
+    <Stack p="6" gap="6">
       {/* Modal de creación/edición */}
       <Dialog.Root
         open={isModalOpen}
@@ -161,12 +162,12 @@ export function CustomerList() {
       </Dialog.Root>
 
       {/* Header con búsqueda */}
-      <Stack direction="row" justify="space-between" align="center" mb="lg" flexWrap="wrap" gap="md">
-        <Stack direction="column" align="start" gap="xs">
+      <Stack direction="row" justify="space-between" align="center" mb="6" flexWrap="wrap" gap="4">
+        <Stack direction="column" align="start" gap="2">
           <Typography variant="heading" size="md" color="text.primary">
             👥 Gestión de Clientes
           </Typography>
-          <Stack direction="row" gap="md">
+          <Stack direction="row" gap="4">
             <Badge colorPalette="blue" variant="subtle">
               {customers.length} clientes
             </Badge>
@@ -178,7 +179,7 @@ export function CustomerList() {
           </Stack>
         </Stack>
 
-        <Stack direction="row" gap="sm">
+        <Stack direction="row" gap="2">
           <Button
             size="sm"
             variant={showStats ? "solid" : "outline"}
@@ -192,19 +193,15 @@ export function CustomerList() {
       </Stack>
 
       {/* Búsqueda */}
-      <Stack mb="md">
-        <Stack direction="row" gap="sm">
-          <input
+      <Stack mb="4" gap="2">
+        <Stack direction="row" gap="2">
+          <InputField
             type="text"
             placeholder="Buscar por nombre, DNI, teléfono o email..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            style={{
-              maxWidth: '450px',
-              padding: '8px 12px',
-              border: '1px solid #e2e2e2',
-              borderRadius: '6px'
-            }}
+            maxW="450px"
+            size="md"
           />
           {query && (
             <Button
@@ -222,7 +219,7 @@ export function CustomerList() {
         </Stack>
 
         {query && (
-          <Typography size="sm" color="text.muted" mt="xs">
+          <Typography size="sm" color="text.muted" mt="2">
             Mostrando {searchResults.length} resultado(s) para "{query}"
           </Typography>
         )}
@@ -271,7 +268,7 @@ export function CustomerList() {
               return (
                 <Table.Row key={customer.id}>
                   <Table.Cell>
-                    <Stack direction="column" align="start" gap="xs">
+                    <Stack direction="column" align="start" gap="1">
                       <Typography fontWeight="medium">{customer.name}</Typography>
                       <Typography size="xs" color="text.muted">
                         Cliente desde {formatDate(customer.created_at)}
@@ -346,7 +343,7 @@ export function CustomerList() {
                   )}
 
                   <Table.Cell>
-                    <Stack direction="row" gap="xs">
+                    <Stack direction="row" gap="2">
                       {canUpdate && (
                         <Button
                           size="xs"

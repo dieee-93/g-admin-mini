@@ -2,25 +2,26 @@
  * MIGRATED: Material Validation Hook
  * Now uses centralized validation system with Zod + React Hook Form
  * Eliminates ~220 lines of duplicated validation logic
+ *
+ * FIX v2.0: Implemented REAL validation using Zod schema instead of dummy return.
+ * UPDATE v3.0: Uses extended MaterialFormSchema with production_config and staff_assignments support
  */
 
-import { useCallback, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
-import type { UseFormReturn } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { EntitySchemas, type SchemaType } from '@/lib/validation/zod/CommonSchemas';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import { MaterialFormSchema, type MaterialFormData } from '@/pages/admin/supply-chain/materials/validation/materialFormSchema';
 import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types/materialTypes';
 
-// Infer the type from our Zod schema
-export type MaterialFormData = SchemaType<typeof EntitySchemas.material>;
+// Re-export type for convenience
+export type { MaterialFormData };
 
 interface ValidationOptions {
   enableRealTime?: boolean;
   debounceMs?: number;
+  excludeId?: string; // ID to exclude from duplicate checks (current item being edited)
 }
 
 interface UseMaterialValidationResult {
-  form: UseFormReturn<MaterialFormData>;
+  // form: UseFormReturn<MaterialFormData>; // Removed legacy form exposure to avoid confusion
   fieldErrors: Record<string, string | undefined>;
   fieldWarnings: Record<string, string>;
   validationState: {
@@ -43,37 +44,23 @@ export function useMaterialValidation(
   options: ValidationOptions = {}
 ): UseMaterialValidationResult {
   
-  const { enableRealTime = true, debounceMs = 300 } = options;
+  const { enableRealTime = true, debounceMs = 300, excludeId } = options;
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+  const isFirstRender = useRef(true);
 
-  // PERFORMANCE FIX: Don't use React Hook Form - it creates new object every render
-  // We only need Zod validation, not RHF's form management
-  // Create a dummy form object to satisfy the interface
-  const form = useMemo(() => ({
-    register: () => {},
-    setValue: () => {},
-    trigger: async () => {
-      console.log('🔍 [useMaterialValidation] dummy trigger called');
-      // ✅ FIX: Return true since we're not doing real validation here
-      // The real validation should be done manually with Zod
-      return true;
-    },
-    clearErrors: () => {},
-    setError: () => {},
-    getValues: () => initialData as MaterialFormData,
-    watch: () => initialData as any,
-    formState: { errors: {} }
-  } as any), [initialData]);
-
-  // Business logic validators (not handled by Zod)
+  // Business logic validators
   const checkForDuplicates = useCallback((name: string): string | null => {
     if (!name?.trim()) return null;
     
-    const isDuplicate = existingItems.some(item => 
-      item.name.toLowerCase().trim() === name.toLowerCase().trim()
-    );
+    const isDuplicate = existingItems.some(item => {
+      // Skip if it's the item we are editing
+      if (excludeId && item.id === excludeId) return false;
+      
+      return item.name.toLowerCase().trim() === name.toLowerCase().trim();
+    });
     
     return isDuplicate ? 'Ya existe un material con este nombre' : null;
-  }, [existingItems]);
+  }, [existingItems, excludeId]);
 
   const checkForSimilarItems = useCallback((name: string): string | null => {
     if (!name?.trim() || name.length < 3) return null;
@@ -90,93 +77,97 @@ export function useMaterialValidation(
     return null;
   }, [existingItems]);
 
-  // Custom field validation with business rules
-  const validateField = useCallback((field: keyof MaterialFormData, value: any) => {
-    // Clear previous custom errors
-    form.clearErrors(field);
-    
-    // Run Zod validation first
-    form.trigger(field);
-    
-    // Apply business logic validation
-    if (field === 'name' && typeof value === 'string') {
-      const duplicateError = checkForDuplicates(value);
-      if (duplicateError) {
-        form.setError('name', { type: 'custom', message: duplicateError });
-      }
-    }
-  }, [form, checkForDuplicates]);
-
-  // Enhanced form validation
+  // Validation function
   const validateForm = useCallback(async (): Promise<boolean> => {
-    // Run Zod validation
-    const isZodValid = await form.trigger();
+    // 1. Zod Validation using extended MaterialFormSchema
+    const result = MaterialFormSchema.safeParse(initialData);
     
-    // Run business logic validation
-    const formData = form.getValues();
-    const duplicateError = checkForDuplicates(formData.name);
-    
-    if (duplicateError) {
-      form.setError('name', { type: 'custom', message: duplicateError });
-      return false;
+    const newErrors: Record<string, string | undefined> = {};
+
+    if (!result.success) {
+      result.error.issues.forEach(issue => {
+        const field = issue.path[0] as string;
+        if (field && !newErrors[field]) {
+          newErrors[field] = issue.message;
+        }
+      });
     }
-    
-    return isZodValid;
-  }, [form, checkForDuplicates]);
 
-  // Clear validation state
-  const clearValidation = useCallback(() => {
-    form.clearErrors();
-  }, [form]);
-
-  // Field errors from React Hook Form
-  const fieldErrors = useMemo(() => {
-    const errors: Record<string, string | undefined> = {};
-    Object.entries(form.formState.errors).forEach(([field, error]) => {
-      if (error?.message) {
-        errors[field] = error.message;
+    // 2. Business Logic: Duplicates
+    if (initialData.name && !newErrors.name) {
+      const duplicateError = checkForDuplicates(initialData.name);
+      if (duplicateError) {
+        newErrors.name = duplicateError;
       }
-    });
-    return errors;
-  }, [form.formState.errors]);
+    }
 
-  // Field warnings (business logic hints)
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [initialData, checkForDuplicates]);
+
+  // Real-time validation effect
+  useEffect(() => {
+    if (enableRealTime) {
+      // Prevent validation on first render if form is essentially empty (Add mode)
+      if (isFirstRender.current) {
+        isFirstRender.current = false;
+        const isEmpty = !initialData.name && !initialData.type;
+        if (isEmpty) return;
+      }
+
+      const timeoutId = setTimeout(() => {
+        validateForm();
+      }, debounceMs);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [initialData, enableRealTime, debounceMs, validateForm]);
+
+  // Field validation (single field)
+  const validateField = useCallback((field: keyof MaterialFormData, value: any) => {
+    // We validate the whole form contextually but only update the specific field error
+    // This is simpler than schema picking for superRefine logic
+    // For now, we'll just clear the error for the field being edited to be optimistic
+    setErrors(prev => ({ ...prev, [field]: undefined }));
+  }, []);
+
+  const clearValidation = useCallback(() => {
+    setErrors({});
+  }, []);
+
+  // Field warnings
   const fieldWarnings = useMemo(() => {
     const warnings: Record<string, string> = {};
-    const formData = form.watch();
     
     // Name similarity warning
-    if (formData.name && !fieldErrors.name) {
-      const similarWarning = checkForSimilarItems(formData.name);
+    if (initialData.name && !errors.name) {
+      const similarWarning = checkForSimilarItems(initialData.name);
       if (similarWarning) {
         warnings.name = similarWarning;
       }
     }
     
     // High stock warning
-    if (formData.initial_stock > 100000) {
+    if (initialData.initial_stock && initialData.initial_stock > 100000) {
       warnings.initial_stock = 'Stock inicial muy alto, verifica el valor';
     }
     
     // High cost warning
-    if (formData.unit_cost > 50000) {
+    if (initialData.unit_cost && initialData.unit_cost > 50000) {
       warnings.unit_cost = 'Costo unitario muy alto, verifica el valor';
     }
     
     return warnings;
-  }, [fieldErrors, checkForSimilarItems]);
+  }, [initialData, errors, checkForSimilarItems]);
 
-  // Validation state summary
   const validationState = useMemo(() => ({
-    hasErrors: Object.keys(fieldErrors).length > 0,
+    hasErrors: Object.keys(errors).length > 0,
     hasWarnings: Object.keys(fieldWarnings).length > 0,
-    errorCount: Object.keys(fieldErrors).length,
+    errorCount: Object.keys(errors).length,
     warningCount: Object.keys(fieldWarnings).length
-  }), [fieldErrors, fieldWarnings]);
+  }), [errors, fieldWarnings]);
 
   return {
-    form,
-    fieldErrors,
+    fieldErrors: errors,
     fieldWarnings,
     validationState,
     validateField,
@@ -184,32 +175,6 @@ export function useMaterialValidation(
     clearValidation,
     checkForDuplicates,
     checkForSimilarItems
-  };
-}
-
-/**
- * Legacy interface support for gradual migration
- * @deprecated Use the new form-based interface instead
- */
-export function useMaterialValidationLegacy(
-  formData: any,
-  existingItems: MaterialItem[] = [],
-  options: ValidationOptions = {}
-) {
-  const validation = useMaterialValidation(formData, existingItems, options);
-  
-  // Adapt new interface to legacy interface
-  return {
-    fieldErrors: validation.fieldErrors,
-    fieldWarnings: validation.fieldWarnings,
-    validationState: validation.validationState,
-    validateField: (field: string, value: any) => {
-      validation.validateField(field as keyof MaterialFormData, value);
-    },
-    validateForm: async () => {
-      return await validation.validateForm();
-    },
-    clearValidation: validation.clearValidation
   };
 }
 

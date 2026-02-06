@@ -97,12 +97,20 @@ export function useModuleNavigation() {
     // Wait for modules to be initialized
     if (!modulesInitialized) {
       logger.debug('NavigationGeneration', 'Modules not yet initialized, returning empty array');
+      console.log('⏳ [NavigationGeneration] Modules NOT initialized yet. Waiting...');
       return [];
     }
 
     // Get ModuleRegistry instance
     const registry = ModuleRegistry.getInstance();
     const registeredModules = registry.getAll();
+
+    console.log('🔍 [NavigationGeneration] Registry state:', {
+      registeredCount: registeredModules.length,
+      registeredIds: registeredModules.map(m => m.manifest.id),
+      activeFeaturesCount: activeModules.length,
+      activeModules: activeModules
+    });
 
     logger.info('NavigationGeneration', `🎯 PASSED ALL CHECKS!`, {
       isAuthenticated,

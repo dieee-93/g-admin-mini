@@ -66,7 +66,7 @@ export function CustomersWidget() {
   if (loading) {
     return (
       <Stack gap="2" p="4">
-        <Text fontSize="sm" fontWeight="medium" color="fg.muted">
+        <Text fontSize="sm" fontWeight="medium" color="text.muted">
           Loading customer metrics...
         </Text>
       </Stack>
@@ -74,7 +74,7 @@ export function CustomersWidget() {
   }
 
   return (
-    <Stack gap="3" p="4">
+    <Stack gap="4" p="4">
       {/* Header */}
       <HStack justify="space-between" align="center">
         <HStack gap="2">
@@ -112,7 +112,7 @@ export function CustomersWidget() {
 
         {metrics.avgLifetimeValue > 0 && (
           <HStack justify="space-between">
-            <Text fontSize="xs" color="fg.muted">
+            <Text fontSize="xs" color="text.muted">
               <CurrencyDollarIcon className="w-3 h-3 inline mr-1" />
               Avg. CLV
             </Text>
@@ -124,7 +124,7 @@ export function CustomersWidget() {
 
         {metrics.atRisk > 0 && (
           <HStack justify="space-between">
-            <Text fontSize="xs" color="fg.muted">
+            <Text fontSize="xs" color="text.muted">
               <ExclamationTriangleIcon className="w-3 h-3 inline mr-1" />
               At Risk
             </Text>

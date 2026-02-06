@@ -44,13 +44,14 @@ export const NavItemContainer = memo(function NavItemContainer({
   children,
   isActive,
   isExpanded,
-  onClick
+  onClick,
+  ...rest
 }: {
   children: React.ReactNode;
   isActive: boolean;
   isExpanded: boolean;
   onClick?: () => void;
-}) {
+} & React.ComponentProps<typeof Box>) {
   return (
     <Box
       as="button"
@@ -75,6 +76,7 @@ export const NavItemContainer = memo(function NavItemContainer({
         outlineOffset: "1px"
       }}
       onClick={onClick}
+      {...rest}
     >
       {/* Indicador de estado activo */}
       {isActive && (

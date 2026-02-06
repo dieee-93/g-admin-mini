@@ -114,6 +114,13 @@ export function useMaterialsPage({ openModal }: UseMaterialsPageParams): UseMate
   const { selectedLocation, isMultiLocationMode } = useLocation();
   const { setQuickActions } = useNavigationActions();
   
+  // ✅ DEBUG: Track what's causing re-renders
+  console.log('[useMaterialsPage] RENDER START');
+  console.log('[useMaterialsPage] - user changed:', user?.id);
+  console.log('[useMaterialsPage] - selectedLocation:', selectedLocation?.id);
+  console.log('[useMaterialsPage] - isMultiLocationMode:', isMultiLocationMode);
+  console.log('[useMaterialsPage] - setQuickActions reference:', typeof setQuickActions);
+  
   const locationId = isMultiLocationMode && selectedLocation?.id ? selectedLocation.id : undefined;
   
   // ============================================================================
@@ -293,6 +300,7 @@ export function useMaterialsPage({ openModal }: UseMaterialsPageParams): UseMate
   // ============================================================================
   
   useEffect(() => {
+    console.log('[useMaterialsPage] useEffect triggered - setQuickActions changed');
     if (typeof setQuickActions === 'function') {
       setQuickActions([]);
     }

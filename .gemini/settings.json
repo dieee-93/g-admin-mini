@@ -1,0 +1,24 @@
+{
+    "mcpServers": {
+        "supabase": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@supabase/mcp-server-supabase@latest",
+                // enable RO to prevent gemini changing stuff in supabase
+                // "--read-only",
+                "--project-ref=ocwjrkxjwqmxvhckgtud"
+            ],
+            "env": {
+                "SUPABASE_ACCESS_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jd2pya3hqd3FteHZoY2tndHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MTQ2NDQsImV4cCI6MjA2OTM5MDY0NH0.2xKgIkDZ1ghSnD1zt1akW4EnILfJanIB7tNlUySPVfI"
+            }
+        },
+        "context7": {
+            "httpUrl": "https://mcp.context7.com/mcp",
+            "headers": {
+                "CONTEXT7_API_KEY": "ctx7sk-9130c795-3020-4731-8ab7-7e977c57b652",
+                "Accept": "application/json, text/event-stream"
+            }
+        }
+    }
+}

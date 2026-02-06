@@ -7,10 +7,20 @@ import { formatCurrency, formatPercentage } from '@/lib/decimal';
 import { ChartCard, PieChart, BarChart, LineChart } from '../MaterialsCharts';
 import type { PieChartDataPoint, BarChartDataPoint, LineChartDataPoint } from '../MaterialsCharts';
 
-export function AnalyticsTabEnhanced() {
-  const { data: materials = [], isLoading } = useMaterials();
+import type { MaterialItem } from '@/modules/materials/types';
 
-  if (isLoading) {
+interface AnalyticsTabProps {
+  items?: MaterialItem[];
+}
+
+export function AnalyticsTabEnhanced({ items }: AnalyticsTabProps) {
+  const { data: fetchedMaterials = [], isLoading } = useMaterials();
+
+  // Use props if available (from parent), otherwise use hook data
+  const materials = items || fetchedMaterials;
+  const isDataReady = items ? true : !isLoading;
+
+  if (!isDataReady) {
     return (
       <Stack direction="column" gap="xl" data-testid="abc-chart">
         <Typography variant="body" color="gray.500">
@@ -45,7 +55,7 @@ export function AnalyticsTabEnhanced() {
     .map(item => {
       const materialABC = item as MaterialWithABC;
       const abcColor = materialABC.abcClass === 'A' ? '#e53e3e' :
-                       materialABC.abcClass === 'B' ? '#dd6b20' : '#38a169';
+        materialABC.abcClass === 'B' ? '#dd6b20' : '#38a169';
       return {
         name: item.name.length > 20 ? item.name.substring(0, 20) + '...' : item.name,
         value: item.stock * (item.unit_cost || 0),
@@ -80,10 +90,8 @@ export function AnalyticsTabEnhanced() {
           subtitle={formatCurrency(valueA)}
           icon={CurrencyDollarIcon}
           colorPalette="red"
-          trend={{
-            value: totalValue > 0 ? (valueA / totalValue) * 100 : 0,
-            isPositive: true
-          }}
+          change={totalValue > 0 ? `${((valueA / totalValue) * 100).toFixed(1)}%` : '0%'}
+          trend="neutral"
           data-testid="category-A"
         />
         <MetricCard
@@ -92,10 +100,8 @@ export function AnalyticsTabEnhanced() {
           subtitle={formatCurrency(valueB)}
           icon={ChartBarIcon}
           colorPalette="orange"
-          trend={{
-            value: totalValue > 0 ? (valueB / totalValue) * 100 : 0,
-            isPositive: true
-          }}
+          change={totalValue > 0 ? `${((valueB / totalValue) * 100).toFixed(1)}%` : '0%'}
+          trend="neutral"
           data-testid="category-B"
         />
         <MetricCard
@@ -104,10 +110,8 @@ export function AnalyticsTabEnhanced() {
           subtitle={formatCurrency(valueC)}
           icon={CubeIcon}
           colorPalette="green"
-          trend={{
-            value: totalValue > 0 ? (valueC / totalValue) * 100 : 0,
-            isPositive: true
-          }}
+          change={totalValue > 0 ? `${((valueC / totalValue) * 100).toFixed(1)}%` : '0%'}
+          trend="neutral"
           data-testid="category-C"
         />
       </CardGrid>

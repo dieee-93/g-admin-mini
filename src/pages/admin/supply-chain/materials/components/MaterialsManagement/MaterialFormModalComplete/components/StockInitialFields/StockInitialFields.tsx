@@ -76,9 +76,7 @@ export const StockInitialFields = ({
                                 onValueChange={(details) => {
                                     const newQuantity = parseFloat(details.value) || 0;
                                     updateFormData({ initial_stock: newQuantity });
-                                    if (totalPurchasePrice > 0) {
-                                        updateUnitCostFromTotal(totalPurchasePrice);
-                                    }
+                                    // Total price updates via useEffect
                                 }}
                                 min={0}
                                 inputMode='decimal'

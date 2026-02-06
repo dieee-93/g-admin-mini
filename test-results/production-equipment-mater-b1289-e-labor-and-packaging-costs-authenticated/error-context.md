@@ -1,0 +1,1451 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - img
+          - generic:
+            - paragraph: G-Admin Mini
+      - generic:
+        - generic:
+          - banner:
+            - generic:
+              - generic:
+                - generic:
+                  - paragraph: G-Admin
+                  - paragraph: /
+                  - paragraph: Materials & Inventory
+                  - paragraph: ·
+                  - paragraph: Inventory and materials management module
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                  - generic:
+                    - img
+                - button:
+                  - generic:
+                    - generic:
+                      - generic: d
+                    - generic:
+                      - paragraph: dieee.93@gmail.com
+                      - paragraph: SUPER_ADMIN
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=5]: G
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button:
+                            - generic:
+                              - img
+                - generic:
+                  - generic:
+                    - button:
+                      - img
+          - main:
+            - generic:
+              - link:
+                - /url: "#main-content"
+                - text: Skip to main content
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - img
+                      - generic:
+                        - paragraph: StockLab - Inventario
+                        - generic:
+                          - paragraph: Control de materiales y stock
+                    - button:
+                      - img
+                      - text: Nuevo Material
+                  - region:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - img
+                            - generic:
+                              - paragraph: $2724853.00
+                            - generic:
+                              - paragraph: Valor Total Inventario
+                              - paragraph: inversión en stock
+                        - generic:
+                          - generic:
+                            - generic:
+                              - img
+                            - generic:
+                              - paragraph: "115"
+                            - generic:
+                              - paragraph: Items Totales
+                              - paragraph: en inventario
+                        - generic:
+                          - generic:
+                            - generic:
+                              - img
+                            - generic:
+                              - paragraph: "14"
+                            - generic:
+                              - paragraph: Stock Crítico
+                              - paragraph: requieren atención
+                        - generic:
+                          - generic:
+                            - generic:
+                              - img
+                            - generic:
+                              - paragraph: "0"
+                            - generic:
+                              - paragraph: Proveedores Activos
+                              - paragraph: en la red
+                  - generic:
+                    - generic:
+                      - tablist:
+                        - tab [selected]:
+                          - img
+                          - text: Inventario
+                        - tab:
+                          - img
+                          - text: Config. Alertas
+                      - tabpanel:
+                        - generic:
+                          - generic:
+                            - tablist:
+                              - tab [selected]: Inventario
+                              - tab: Análisis ABC
+                              - tab: Compras
+                              - tab: Transferencias 🏢
+                            - tabpanel:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - group:
+                                      - textbox:
+                                        - /placeholder: Buscar materiales...
+                                    - generic:
+                                      - button:
+                                        - img
+                                      - button:
+                                        - img
+                                    - button:
+                                      - img
+                                      - text: Nuevo Material
+                                    - button:
+                                      - img
+                                      - text: Importar
+                                    - button:
+                                      - img
+                                      - text: Exportar
+                                  - generic:
+                                    - button: "Tipo: Todos"
+                                    - button: "Categoría: Todas"
+                                    - button: "Stock: Todos"
+                                    - button:
+                                      - img
+                                      - text: Filtros Avanzados
+                                      - generic:
+                                        - generic:
+                                          - generic: "2"
+                                - generic:
+                                  - paragraph: Gestión de Inventario (115 items)
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - table:
+                                        - rowgroup:
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - generic:
+                                                - paragraph: Nombre
+                                                - img
+                                            - cell:
+                                              - generic:
+                                                - paragraph: Tipo
+                                            - cell:
+                                              - generic:
+                                                - paragraph: Categoría
+                                            - cell:
+                                              - generic:
+                                                - paragraph: Stock
+                                            - cell: Min
+                                            - cell:
+                                              - generic:
+                                                - paragraph: Costo
+                                            - cell: ABC
+                                            - cell: Estado
+                                            - cell: Acciones
+                                        - rowgroup:
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Aceite
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 8.0 litros
+                                            - cell:
+                                              - paragraph: 0.0 litros
+                                            - cell:
+                                              - paragraph: $120.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Agua Mineral
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 300.0 litros
+                                            - cell:
+                                              - paragraph: 0.0 litros
+                                            - cell:
+                                              - paragraph: $15.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Ají Molido
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 6.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $72.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Azúcar
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 5.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $25.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Banana
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 80.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $38.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Carne de Cerdo
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 35.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $180.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Carne de Res
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 80.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $450.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Cebolla
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 150.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $22.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Chorizo
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 25.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $220.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Coca Cola
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 200.0 litros
+                                            - cell:
+                                              - paragraph: 0.0 litros
+                                            - cell:
+                                              - paragraph: $28.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Crema de Leche
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 40.0 litros
+                                            - cell:
+                                              - paragraph: 0.0 litros
+                                            - cell:
+                                              - paragraph: $65.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: DeleteMe-1770138465152
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: Duration-1770060513404
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $1.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770138441560
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770139451920
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770140425900
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770140529484
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770140696300
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770140789710
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770141223980
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770141513301
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770141665382
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770146427876
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770146530271-Upd
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                          - row:
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - img
+                                                - checkbox
+                                            - cell:
+                                              - paragraph: EditMe-1770146594793-Upd
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: Med.
+                                            - cell:
+                                              - paragraph: Sin categoría
+                                            - cell:
+                                              - paragraph: 10.0 kg
+                                            - cell:
+                                              - paragraph: 0.0 kg
+                                            - cell:
+                                              - paragraph: $0.00
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: N/A
+                                            - cell:
+                                              - generic:
+                                                - generic:
+                                                  - generic: OK
+                                            - cell:
+                                              - generic:
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                                - button:
+                                                  - img
+                                  - generic:
+                                    - paragraph: Mostrando 1-25 of 115 materiales
+                                    - generic:
+                                      - button [disabled]: Primera
+                                      - button [disabled]:
+                                        - img
+                                      - paragraph: Página 1 de 5
+                                      - button:
+                                        - img
+                                      - button: Última
+                                    - generic:
+                                      - paragraph: "Por página:"
+                                      - generic:
+                                        - button: "10"
+                                        - button: "25"
+                                        - button: "50"
+                                        - button: "100"
+                          - region:
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - paragraph: Acciones Rápidas
+                            - generic:
+                              - generic:
+                                - button:
+                                  - img
+                                  - text: Agregar Material
+                                - button:
+                                  - img
+                                  - text: Operaciones Masivas
+                                - button:
+                                  - img
+                                  - text: Generar Reporte
+                                - button:
+                                  - img
+                                  - text: Sincronizar
+                  - dialog "Crear Nuevo Material" [ref=e1]:
+                    - heading "Crear Nuevo Material" [level=2] [ref=e4]
+                    - button
+                    - generic [ref=e6]:
+                      - generic [ref=e7]:
+                        - paragraph [ref=e9]: Crear Nuevo Material
+                        - generic [ref=e12]: Crea una receta
+                      - generic [ref=e13]:
+                        - generic [ref=e15]:
+                          - generic [ref=e16]:
+                            - img [ref=e18]
+                            - paragraph [ref=e20]: Información Básica
+                          - generic [ref=e21]:
+                            - generic [ref=e22]:
+                              - generic [ref=e23]:
+                                - paragraph [ref=e24]: Nombre del Item **
+                                - generic [ref=e25]:
+                                  - group [ref=e26]:
+                                    - 'textbox "Ej: Harina 0000, Huevos tipo A, Sal fina, Relleno de carne..." [ref=e27]': Labor Config Test-1770316979910
+                                  - generic:
+                                    - img
+                              - generic [ref=e30]:
+                                - combobox [ref=e31]
+                                - generic [ref=e32]: Categoría del Producto
+                                - generic [ref=e33]:
+                                  - combobox "Categoría del Producto" [ref=e34]:
+                                    - generic [ref=e35]: Sin categoría
+                                  - generic:
+                                    - generic:
+                                      - img
+                            - generic [ref=e37]:
+                              - combobox [ref=e38]
+                              - generic [ref=e39]: Marca
+                              - generic [ref=e40]:
+                                - combobox "Marca" [ref=e41]:
+                                  - generic [ref=e42]: Sin marca
+                                - generic:
+                                  - generic:
+                                    - img
+                            - generic [ref=e43]:
+                              - paragraph [ref=e44]: Descripción (opcional)
+                              - 'textbox "Detalla características importantes: tamaño, color, especificaciones técnicas..." [ref=e45]'
+                        - generic [ref=e47]:
+                          - generic [ref=e48]:
+                            - img [ref=e50]
+                            - paragraph [ref=e53]: Configuración
+                          - generic [ref=e54]:
+                            - generic [ref=e57]:
+                              - combobox [ref=e58]
+                              - generic [ref=e59]: Tipo de Item*
+                              - generic [ref=e60]:
+                                - combobox "Tipo de Item*" [ref=e61]:
+                                  - generic [ref=e62]: 🍳 Elaborado (tiene receta)
+                                - generic:
+                                  - generic:
+                                    - img
+                            - generic [ref=e63]:
+                              - generic [ref=e64]:
+                                - paragraph [ref=e67]: Material Elaborado
+                                - generic [ref=e70]: REQUIERE RECETA
+                              - generic [ref=e72]:
+                                - paragraph [ref=e75]: Información Importante
+                                - generic [ref=e76]:
+                                  - generic [ref=e77]:
+                                    - generic [ref=e78]: ▸
+                                    - paragraph [ref=e79]: Requiere receta con ingredientes y cantidades
+                                  - generic [ref=e80]:
+                                    - generic [ref=e81]: ▸
+                                    - paragraph [ref=e82]: Se ejecuta automáticamente al guardar el material
+                                  - generic [ref=e83]:
+                                    - generic [ref=e84]: ▸
+                                    - paragraph [ref=e85]: Genera el stock inicial del material elaborado
+                              - generic [ref=e86]:
+                                - paragraph [ref=e89]: Constructor de Receta
+                                - generic [ref=e91]:
+                                  - paragraph [ref=e94]: Módulo de Producción Activo
+                                  - generic [ref=e95]:
+                                    - generic [ref=e97]:
+                                      - generic [ref=e98]:
+                                        - paragraph [ref=e99]: ⚡ Inicio Rápido con Templates
+                                        - paragraph [ref=e100]: Usa una plantilla predefinida para comenzar más rápido (Hamburguesa, Pizza, Smoothie, etc.)
+                                      - button "📋 Ver Templates" [ref=e101] [cursor=pointer]
+                                    - generic [ref=e102]:
+                                      - img [ref=e104]
+                                      - generic [ref=e106]:
+                                        - generic [ref=e107]: Errores de validación
+                                        - generic [ref=e110]: "Input 1: El item es requerido"
+                                    - generic [ref=e113]:
+                                      - paragraph [ref=e115]: Materiales / Componentes
+                                      - table [ref=e118]:
+                                        - rowgroup [ref=e119]:
+                                          - row "# Material Cant. Unid Total % Acciones" [ref=e120]:
+                                            - cell "#" [ref=e121]:
+                                              - paragraph [ref=e122]: "#"
+                                            - cell "Material" [ref=e123]:
+                                              - paragraph [ref=e124]: Material
+                                            - cell "Cant." [ref=e125]:
+                                              - paragraph [ref=e126]: Cant.
+                                            - cell "Unid" [ref=e127]:
+                                              - paragraph [ref=e128]: Unid
+                                            - cell "Total" [ref=e129]:
+                                              - paragraph [ref=e130]: Total
+                                            - cell "%" [ref=e131]:
+                                              - paragraph [ref=e132]: "%"
+                                            - cell "Acciones" [ref=e133]:
+                                              - paragraph [ref=e134]: Acciones
+                                        - rowgroup [ref=e135]:
+                                          - row "01 Seleccionar... 1 unit $0.00 ░░░░░ 0.0% Editar Eliminar" [ref=e136]:
+                                            - cell "01" [ref=e137]:
+                                              - paragraph [ref=e138]: "01"
+                                            - cell "Seleccionar..." [ref=e139]:
+                                              - paragraph [ref=e141]: Seleccionar...
+                                            - cell "1" [ref=e142]:
+                                              - paragraph [ref=e143]: "1"
+                                            - cell "unit" [ref=e144]:
+                                              - paragraph [ref=e145]: unit
+                                            - cell "$0.00" [ref=e146]:
+                                              - paragraph [ref=e147]: $0.00
+                                            - cell "░░░░░ 0.0%" [ref=e148]:
+                                              - paragraph [ref=e149]: ░░░░░ 0.0%
+                                            - cell "Editar Eliminar" [ref=e150]:
+                                              - generic [ref=e151]:
+                                                - button "Editar" [ref=e152] [cursor=pointer]:
+                                                  - img [ref=e153]
+                                                - button "Eliminar" [ref=e155] [cursor=pointer]:
+                                                  - img [ref=e156]
+                                      - button "AGREGAR LÍNEA" [ref=e158] [cursor=pointer]:
+                                        - img [ref=e159]
+                                        - text: AGREGAR LÍNEA
+                                      - paragraph [ref=e162]: "SUBTOTAL MATERIALES: $0.00"
+                                    - generic [ref=e164]:
+                                      - paragraph [ref=e165]: Personal Asignado
+                                      - generic [ref=e170]:
+                                        - combobox [ref=e171]
+                                        - generic [ref=e172]:
+                                          - combobox [ref=e173]:
+                                            - generic [ref=e174]: Seleccionar rol...
+                                          - generic:
+                                            - generic:
+                                              - img
+                                    - generic [ref=e177]:
+                                      - paragraph [ref=e178]: Producción de la Receta
+                                      - group [ref=e179]:
+                                        - paragraph [ref=e181]: Item de Salida
+                                        - generic [ref=e184]: Nuevo Item
+                                        - generic [ref=e185]: Heredado del formulario de item padre
+                                      - group [ref=e186]:
+                                        - paragraph [ref=e188]: Tipo de Salida
+                                        - radiogroup [ref=e189]:
+                                          - generic [ref=e190]:
+                                            - generic [ref=e191]:
+                                              - radio "Medible (kg, L, m)" [ref=e192]
+                                              - paragraph [ref=e196]: Medible (kg, L, m)
+                                              - radio [ref=e197]
+                                            - generic [ref=e198]:
+                                              - radio "Unitario (piezas, cajas)" [ref=e199]
+                                              - paragraph [ref=e203]: Unitario (piezas, cajas)
+                                              - radio [checked] [ref=e204]
+                                      - group [ref=e205]:
+                                        - generic [ref=e207]:
+                                          - paragraph [ref=e208]: Cantidad de Producción
+                                          - button
+                                        - generic [ref=e210]:
+                                          - group [ref=e211]:
+                                            - spinbutton [active] [ref=e212]: "5"
+                                          - paragraph [ref=e215]: Unidades (u)
+                                        - generic [ref=e216]: Cantidad que produce esta receta
+                                      - generic [ref=e218]:
+                                        - paragraph [ref=e219]: Costo por Unidad (Preview)
+                                        - paragraph [ref=e220]: (Agregá materiales y personal primero para ver el costo)
+                                    - generic [ref=e222]:
+                                      - paragraph [ref=e223]: Resumen de Costos
+                                      - generic [ref=e225]:
+                                        - generic [ref=e226]:
+                                          - paragraph [ref=e227]: "Materiales:"
+                                          - paragraph [ref=e228]: $0.00
+                                        - generic [ref=e230]:
+                                          - paragraph [ref=e231]: "TOTAL:"
+                                          - paragraph [ref=e232]: $0.00
+                                        - generic [ref=e234]:
+                                          - paragraph [ref=e235]: "Producción:"
+                                          - paragraph [ref=e236]: 5 unit
+                                        - generic [ref=e237]:
+                                          - paragraph [ref=e238]: "Costo/Unidad:"
+                                          - paragraph [ref=e239]: $0.0000 / unit
+                                      - generic [ref=e240]:
+                                        - paragraph [ref=e241]: Desglose por Ingrediente
+                                        - generic [ref=e245]:
+                                          - generic [ref=e246]:
+                                            - paragraph [ref=e247]: Unknown
+                                            - paragraph [ref=e248]: 1 unit
+                                          - generic [ref=e249]:
+                                            - paragraph [ref=e250]: $0.00
+                                            - paragraph [ref=e251]: ░░░░░ 0.0%
+                                      - generic [ref=e253]:
+                                        - generic [ref=e254]:
+                                          - paragraph [ref=e255]: RENDIMIENTO
+                                          - paragraph [ref=e256]: 100.0%
+                                        - generic [ref=e257]:
+                                          - paragraph [ref=e258]: DESPERDICIO
+                                          - paragraph [ref=e259]: 0.0%
+                                        - generic [ref=e260]:
+                                          - paragraph [ref=e261]: EFICIENCIA
+                                          - paragraph [ref=e262]: 100/100
+                                    - region [ref=e263]:
+                                      - paragraph [ref=e267]: Ejecución de la Producción
+                                      - radiogroup [ref=e270]:
+                                        - generic [ref=e271]:
+                                          - generic [ref=e272]:
+                                            - radio "Solo definir receta" [ref=e273]
+                                            - generic [ref=e276]: Solo definir receta
+                                            - radio [checked] [ref=e277]
+                                          - generic [ref=e278]:
+                                            - radio "Producir ahora" [ref=e279]
+                                            - generic [ref=e282]: Producir ahora
+                                            - radio [ref=e283]
+                                          - generic [ref=e284]:
+                                            - radio "Programar producción" [ref=e285]
+                                            - generic [ref=e288]: Programar producción
+                                            - radio [ref=e289]
+                                    - generic [ref=e290]:
+                                      - button "Cancelar" [ref=e291] [cursor=pointer]
+                                      - button "Crear Receta" [disabled] [ref=e292]
+                              - generic [ref=e293]:
+                                - paragraph [ref=e296]: Configuración de Producción
+                                - paragraph [ref=e300]: Primero selecciona o crea una receta para configurar la producción
+                      - generic [ref=e301]:
+                        - button "Cancelar" [ref=e302] [cursor=pointer]
+                        - button "Crear y Agregar a Stock" [disabled] [ref=e303]:
+                          - generic [ref=e304]:
+                            - img [ref=e305]
+                            - paragraph [ref=e307]: Crear y Agregar a Stock
+    - generic:
+      - generic:
+        - img
+      - button:
+        - img
+  - region "bottom-end Notifications alt+T"
+```

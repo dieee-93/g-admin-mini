@@ -68,10 +68,11 @@ export function useCreateMaterial() {
       // Invalidate list queries to refetch with new item
       queryClient.invalidateQueries({ queryKey: materialsKeys.lists() });
       
-      notify.success({
-        title: 'Material creado',
-        description: `${data.name} ha sido creado exitosamente`,
-      });
+      if (data.name) {
+        notify.itemCreated(data.name);
+      } else {
+        notify.success({ title: 'Material creado' });
+      }
     },
     onError: (error) => {
       notify.error({

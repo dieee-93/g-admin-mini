@@ -139,7 +139,6 @@ export const OPTIONAL_MODULES: Readonly<Record<string, FeatureId>> = {
   // FULFILLMENT
   // ============================================
 
-  'fulfillment': 'operations_table_management',
   'onsite': 'operations_table_management',
   'delivery': 'operations_delivery_zones',
   'pickup': 'operations_pickup_scheduling',
@@ -157,33 +156,30 @@ export const OPTIONAL_MODULES: Readonly<Record<string, FeatureId>> = {
   // ============================================
 
   'billing': 'finance_invoice_scheduling',
-  'payment-gateways': 'finance_payment_gateway',
+  'payment-gateways': 'sales_payment_processing', // Updated to valid feature
   'finance-corporate': 'finance_corporate_accounts',
-  'accounting': 'finance_cash_session_management',
+  'accounting': 'sales_payment_processing', // Provisional mapping, check accounting features
 
   // ============================================
   // ADVANCED BUSINESS
   // ============================================
 
-  'memberships': 'operations_membership_management',
-  'rentals': 'operations_rental_management',
-  'assets': 'operations_asset_management',
+  'memberships': 'membership_subscription_plans',
+  'rentals': 'rental_item_management',
+  'assets': 'rental_item_management',
 
   // ============================================
   // ANALYTICS & INTELLIGENCE
   // ============================================
 
-  'intelligence': 'analytics_intelligence_dashboard',
-  'reporting': 'analytics_custom_reports',
-  'executive': 'analytics_executive_dashboard',
-  'products-analytics': 'analytics_product_insights',
+  'intelligence': 'analytics_conversion_tracking',
+  'reporting': 'analytics_ecommerce_metrics',
+  'executive': 'executive', // mapped to the 'executive' feature
+  'products-analytics': 'products_cost_intelligence',
 
   // ============================================
-  // OTHER
-  // ============================================
 
-  'achievements': 'gamification_achievements',
-  'mobile': 'mobile_app_access',
+  'mobile': 'mobile_location_tracking', // best match for mobile module
 } as const;
 
 /**

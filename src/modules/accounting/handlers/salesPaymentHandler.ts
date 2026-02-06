@@ -11,8 +11,8 @@
  */
 
 import { logger } from '@/lib/logging/Logger';
-import { EventBus } from '@/lib/events/EventBus';
-import type { EventHandler } from '@/lib/events/types';
+import { moduleEventBus } from '@/shared/events/ModuleEventBus';
+import type { EventHandler } from '@/shared/events/types';
 import {
   getActiveCashSession,
 } from '../services/cashSessionService';
@@ -342,7 +342,7 @@ export const handleSalesPaymentCompleted: EventHandler<PaymentCompletedEvent> =
       // STEP 7: Emit Confirmation Event
       // ============================================
 
-      await EventBus.emit(
+      await moduleEventBus.emit(
         'cash.payment.recorded',
         {
           paymentId: salePayment.id,
@@ -353,13 +353,12 @@ export const handleSalesPaymentCompleted: EventHandler<PaymentCompletedEvent> =
           shiftId,
           status: salePayment.status,
           timestamp: new Date().toISOString(),
-        },
-        'CashModule'
+        }
       );
 
       // Backwards compatibility event for CASH
       if (payload.paymentMethod === 'CASH') {
-        await EventBus.emit(
+        await moduleEventBus.emit(
           'cash.sale.recorded',
           {
             paymentId: salePayment.id,
@@ -367,8 +366,7 @@ export const handleSalesPaymentCompleted: EventHandler<PaymentCompletedEvent> =
             amount: payload.amount,
             sessionId: cashSessionId,
             timestamp: new Date().toISOString(),
-          },
-          'CashModule'
+          }
         );
       }
     } catch (error) {
@@ -379,15 +377,14 @@ export const handleSalesPaymentCompleted: EventHandler<PaymentCompletedEvent> =
       });
 
       // Emit error event
-      await EventBus.emit(
+      await moduleEventBus.emit(
         'cash.sale.failed',
         {
           paymentId: payload.paymentId,
           paymentMethod: payload.paymentMethod,
           error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date().toISOString(),
-        },
-        'CashModule'
+        }
       );
 
       throw error;
@@ -580,7 +577,7 @@ export const handleSalesOrderCancelled: EventHandler<OrderCancelledEvent> = asyn
     // STEP 5: Emit Event
     // ============================================
 
-    await EventBus.emit(
+    await moduleEventBus.emit(
       'cash.refund.recorded',
       {
         refundId: refundPayment.id,
@@ -589,8 +586,7 @@ export const handleSalesOrderCancelled: EventHandler<OrderCancelledEvent> = asyn
         amount: payload.amount,
         paymentMethod: originalPayment.payment_type,
         timestamp: new Date().toISOString(),
-      },
-      'CashModule'
+      }
     );
 
     logger.info('CashModule', 'Sale cancellation completed successfully', {
@@ -613,8 +609,8 @@ export function registerSalesHandlers(): () => void {
   logger.info('CashModule', 'Registering sales event handlers (Option B)');
 
   const unsubscribers = [
-    EventBus.on('sales.payment.completed', handleSalesPaymentCompleted),
-    EventBus.on('sales.order_cancelled', handleSalesOrderCancelled),
+    moduleEventBus.on('sales.payment.completed', handleSalesPaymentCompleted),
+    moduleEventBus.on('sales.order_cancelled', handleSalesOrderCancelled),
   ];
 
   return () => {

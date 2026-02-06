@@ -169,7 +169,7 @@ export const debugManifest: ModuleManifest = {
     author: 'G-Admin Team',
     tags: ['debug', 'development', 'diagnostics', 'performance'],
     navigation: {
-      route: '/debug',
+      route: '/admin/debug',
       icon: BugAntIcon,
       color: 'red',
       domain: 'core', // Or create a 'development' domain

@@ -50,7 +50,7 @@ export type InfrastructureId =
   | 'single_location'   // Local único fijo
   | 'multi_location'    // Múltiples locales (cadena/franquicia)
   | 'mobile_business';  // Negocio móvil (food truck, servicios móviles)
-  // ❌ ELIMINADO: online_only (redundante - se logra con delivery + ecommerce sin local)
+// ❌ ELIMINADO: online_only (redundante - se logra con delivery + ecommerce sin local)
 
 /**
  * User Choice ID - Union type de todas las opciones seleccionables
@@ -273,14 +273,9 @@ export type FeatureId =
   | 'digital_version_control'
 
   // ============================================
-  // CORE DOMAIN (7 features)
+  // CORE DOMAIN (1 feature)
   // ============================================
 
-  | 'customers'
-  | 'dashboard'
-  | 'settings'
-  | 'gamification'
-  | 'debug'
   | 'executive'
   | 'can_view_menu_engineering';
 
@@ -384,21 +379,21 @@ export interface Feature {
    * Usado para organizar archivos y componentes
    */
   domain:
-    | 'SALES'
-    | 'INVENTORY'
-    | 'PRODUCTION'
-    | 'PRODUCTS'
-    | 'OPERATIONS'
-    | 'SCHEDULING'
-    | 'CUSTOMER'
-    | 'FINANCE'
-    | 'MOBILE'
-    | 'MULTISITE'
-    | 'ANALYTICS'
-    | 'STAFF'
-    | 'RENTAL'      // Added for rental/asset management
-    | 'MEMBERSHIP'  // Added for membership/subscription systems
-    | 'DIGITAL';    // Added for digital products
+  | 'SALES'
+  | 'INVENTORY'
+  | 'PRODUCTION'
+  | 'PRODUCTS'
+  | 'OPERATIONS'
+  | 'SCHEDULING'
+  | 'CUSTOMER'
+  | 'FINANCE'
+  | 'MOBILE'
+  | 'MULTISITE'
+  | 'ANALYTICS'
+  | 'STAFF'
+  | 'RENTAL'      // Added for rental/asset management
+  | 'MEMBERSHIP'  // Added for membership/subscription systems
+  | 'DIGITAL';    // Added for digital products
 
   /**
    * Tipo de feature según su función

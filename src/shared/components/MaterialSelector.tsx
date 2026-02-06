@@ -1,23 +1,13 @@
 /**
- * MaterialSelector v2.0 - Reactive Material Picker
+ * MaterialSelector v5.1 - Focus Fix Implementation
  * 
- * FEATURES:
- * - ✅ Type-aware: Shows appropriate fields for COUNTABLE vs MEASURABLE
- * - ✅ Search with debounce
- * - ✅ Stock validation
- * - ✅ Clean architecture: Receives items as props (no direct store access)
- * 
- * USAGE:
- * ```tsx
- * <MaterialSelector
- *   items={materials}
- *   onSelect={(material, quantity, unit) => {...}}
- *   selectedMaterialIds={[...]}
- * />
- * ```
+ * CHANGES v5.1:
+ * - ⌨️ FIXED: Added autoFocus={false} to Popover.Content to prevent stealing focus on open
+ * - 🛡️ SAFETY: Added restoreFocus={false} to prevent jumping around
+ * - 🧠 LOGIC: Kept onOpenAutoFocus preventDefault as backup
  */
 
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
   Box,
   Stack,
@@ -25,13 +15,14 @@ import {
   Text,
   Badge,
   Spinner,
-  Input
+  Input,
+  Popover
 } from '@/shared/ui';
 import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import { useDebounce } from '@/shared/hooks';
-import type { MaterialItem, MeasurableItem, CountableItem } from '@/modules/materials/types';
+import type { MaterialItem, MeasurableItem, CountableItem } from '@/pages/admin/supply-chain/materials/types/materialTypes';
 import { StockCalculation } from '@/modules/materials/services/stockCalculation';
 import { CardWrapper } from '@/shared/ui';
 
@@ -40,78 +31,22 @@ import { CardWrapper } from '@/shared/ui';
 // ============================================================================
 
 export interface MaterialSelectorProps {
-  /**
-   * Array of materials to search from
-   * NOTE: Materials should come from useMaterials hook, not directly from store
-   */
   items: MaterialItem[];
-  
-  /**
-   * Callback when a material is selected with quantity and unit
-   */
-  onSelect: (material: MaterialItem, quantity: number, unit: string) => void;
-  
-  /**
-   * IDs of materials already selected (to exclude from results)
-   */
+  onSelect: (material: MaterialItem) => void;
   selectedMaterialIds?: string[];
-  
-  /**
-   * Only show materials with stock > 0
-   */
   filterByStock?: boolean;
-  
-  /**
-   * Placeholder text
-   */
   placeholder?: string;
-  
-  /**
-   * Disabled state
-   */
   disabled?: boolean;
-  
-  /**
-   * Loading state (external)
-   */
   loading?: boolean;
+  autoFocus?: boolean;
+  initialValue?: string;
+  'aria-label'?: string;
 }
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
-/**
- * MaterialSelector v2.0 - Type-aware material picker with search and validation
- * 
- * @component
- * @description
- * Searchable material selector that adapts UI based on material type:
- * - COUNTABLE: Shows unit/units fields
- * - MEASURABLE: Shows kg/L/g/ml fields
- * - ELABORATED: Shows portions field
- * 
- * Features:
- * - Debounced search (300ms)
- * - Stock validation
- * - Prevents selection of already-selected materials
- * - Two-step flow: Search → Select → Configure → Confirm
- * 
- * @example
- * ```tsx
- * <MaterialSelector
- *   items={materials}
- *   onSelect={(material, quantity, unit) => {
- *     console.log('Selected:', material.name, quantity, unit);
- *   }}
- *   selectedMaterialIds={['id1', 'id2']}
- *   filterByStock={true}
- * />
- * ```
- * 
- * @param {MaterialSelectorProps} props - Component props
- * @returns {React.ReactElement} Rendered component
- */
 export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
   items,
   onSelect,
@@ -119,428 +54,205 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
   filterByStock = true,
   placeholder = "Buscar materia prima...",
   disabled = false,
-  loading = false
+  loading = false,
+  autoFocus = false,
+  initialValue = '',
+  'aria-label': ariaLabel
 }) => {
   // ============================================================================
   // STATE
   // ============================================================================
-  
-  const [query, setQuery] = useState('');
+
+  const [query, setQuery] = useState(initialValue);
   const [isOpen, setIsOpen] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  
-  // For quantity/unit input after selecting a material
-  const [selectedMaterial, setSelectedMaterial] = useState<MaterialItem | null>(null);
-  const [quantity, setQuantity] = useState<number>(1);
-  const [unit, setUnit] = useState<string>('');
 
-  const debouncedQuery = useDebounce(query, 500); // Increased from 300ms
-  
-  console.log('[MaterialSelector] State:', {
-    query,
-    debouncedQuery,
-    isOpen,
-    itemsReceived: items?.length || 0,
-    loading
-  });
+  // Refs for focus management
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // ============================================================================
-  // COMPUTED VALUES
-  // ============================================================================
+  const debouncedQuery = useDebounce(query, 300);
 
-  /**
-   * Get stock status for badge
-   */
-  const getStockStatus = useCallback((material: MaterialItem) => {
-    return StockCalculation.getStockStatus(material);
-  }, []);
-
-  /**
-   * Get display text for stock
-   */
-  const getDisplayText = useCallback((material: MaterialItem): string => {
-    const stock = material.stock || 0;
-
-    if (material.type === 'MEASURABLE') {
-      const measurable = material as MeasurableItem;
-      return `${stock} ${measurable.unit}`;
-    } else if (material.type === 'COUNTABLE') {
-      const countable = material as CountableItem;
-      if (countable.packaging) {
-        const packages = Math.floor(stock / countable.packaging.package_size);
-        const loose = stock % countable.packaging.package_size;
-        let stockText = `${packages} ${countable.packaging.package_unit}s`;
-        if (loose > 0) stockText += ` + ${loose} sueltas`;
-        return stockText;
-      } else {
-        return `${stock} unidades`;
-      }
-    } else {
-      return `${stock} porciones`;
+  // Sync initialValue
+  useEffect(() => {
+    if (initialValue && query !== initialValue) {
+      setQuery(initialValue);
     }
-  }, []);
+  }, [initialValue]);
 
-  /**
-   * Get available units for selected material
-   */
-  const getAvailableUnits = useCallback((material: MaterialItem): string[] => {
-    if (material.type === 'MEASURABLE') {
-      const measurable = material as MeasurableItem;
-      // Return units based on base unit
-      if (measurable.unit === 'kg') return ['kg', 'g'];
-      if (measurable.unit === 'l') return ['l', 'ml'];
-      if (measurable.unit === 'g') return ['g', 'kg'];
-      if (measurable.unit === 'ml') return ['ml', 'l'];
-      return [measurable.unit];
-    } else if (material.type === 'COUNTABLE') {
-      return ['unit', 'piece', 'unidad'];
-    }
-    return ['portion', 'porción'];
-  }, []);
-
-  /**
-   * Filtered materials based on search query
-   */
+  // Filter Logic
   const filteredMaterials = useMemo(() => {
-    console.log('[MaterialSelector] Filtering:', {
-      debouncedQuery,
-      itemsCount: items?.length || 0,
-      filterByStock,
-      selectedMaterialIds
-    });
-    
-    if (!debouncedQuery.trim()) {
-      console.log('[MaterialSelector] Empty query, returning []');
-      return [];
-    }
+    if (!debouncedQuery.trim()) return [];
 
     const searchQuery = debouncedQuery.toLowerCase();
-    const filtered = items
+    return items
       .filter(item => {
-        // Exclude already selected
         if (selectedMaterialIds.includes(item.id)) return false;
-        
-        // Filter by stock if enabled
         if (filterByStock && (!item.stock || item.stock <= 0)) return false;
-        
-        // Search by name
         return item.name.toLowerCase().includes(searchQuery);
       })
-      .slice(0, 8); // Limit results
-    
-    console.log('[MaterialSelector] Filtered results:', {
-      count: filtered.length,
-      names: filtered.map(m => m.name)
-    });
-    
-    return filtered;
+      .slice(0, 8);
   }, [debouncedQuery, items, selectedMaterialIds, filterByStock]);
 
-  // ============================================================================
-  // HANDLERS
-  // ============================================================================
-
-  /**
-   * Handle material selection from search results
-   */
-  const handleMaterialClick = useCallback((material: MaterialItem) => {
-    setSelectedMaterial(material);
-    setQuery('');
-    setIsOpen(false);
-    
-    // Pre-fill unit with material's default unit
-    const units = getAvailableUnits(material);
-    setUnit(units[0]);
-    setQuantity(1);
-  }, [getAvailableUnits]);
-
-  /**
-   * Handle input change (search)
-   */
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    console.log('[MaterialSelector] Input change:', value);
     setQuery(value);
     setIsOpen(value.trim().length > 0);
-    
-    // Show searching indicator while waiting for debounce
-    if (value.trim().length > 0) {
-      setIsSearching(true);
+  }, []);
+
+  const handleSelect = useCallback((material: MaterialItem) => {
+    console.log('[DEBUG_UI] MaterialSelector Selected:', material.name);
+    onSelect(material);
+    setQuery(material.name);
+    setIsOpen(false);
+  }, [onSelect]);
+
+  const getDisplayText = (material: MaterialItem): string => {
+    const stock = material.stock || 0;
+    if (material.type === 'MEASURABLE') {
+      return `${stock} ${(material as MeasurableItem).unit}`;
+    } else if (material.type === 'COUNTABLE') {
+      const c = material as CountableItem;
+      if (c.packaging) {
+        return `${Math.floor(stock / c.packaging.package_size)} ${c.packaging.package_unit}s`;
+      }
+      return `${stock} un.`;
     }
-  }, []);
+    return `${stock} porc.`;
+  };
 
-  // Reset searching state when debounced query updates
-  React.useEffect(() => {
-    setIsSearching(false);
-  }, [debouncedQuery]);
-
-  /**
-   * Handle final selection confirmation
-   */
-  const handleConfirm = useCallback(() => {
-    if (!selectedMaterial || !quantity || !unit) return;
-    
-    onSelect(selectedMaterial, quantity, unit);
-    
-    // Reset
-    setSelectedMaterial(null);
-    setQuantity(1);
-    setUnit('');
-  }, [selectedMaterial, quantity, unit, onSelect]);
-
-  /**
-   * Handle cancel
-   */
-  const handleCancel = useCallback(() => {
-    setSelectedMaterial(null);
-    setQuantity(1);
-    setUnit('');
-  }, []);
-
-  // ============================================================================
-  // RENDER
-  // ============================================================================
-
-  // If a material is selected, show quantity/unit input
-  if (selectedMaterial) {
-    const units = getAvailableUnits(selectedMaterial);
-    const isMeasurable = selectedMaterial.type === 'MEASURABLE';
-    
-    return (
-      <CardWrapper variant="outlined">
-        <CardWrapper.Body p="4">
-          <Stack gap="3">
-            {/* Selected Material Info */}
-            <Flex align="center" gap="2" justify="space-between">
-              <Box>
-                <Text fontWeight="medium">{selectedMaterial.name}</Text>
-                <Text fontSize="sm" color="gray.600">
-                  {getDisplayText(selectedMaterial)}
-                </Text>
-              </Box>
-              <Badge
-                colorPalette={getStockBadgeColor(getStockStatus(selectedMaterial))}
-                size="sm"
-              >
-                {StockCalculation.getStatusLabel(getStockStatus(selectedMaterial))}
-              </Badge>
-            </Flex>
-
-            {/* Quantity Input */}
-            <Box>
-              <Text fontSize="sm" fontWeight="medium" mb="1">
-                {isMeasurable ? 'Cantidad' : 'Unidades'}
-              </Text>
-              <Input
-                type="number"
-                min="0"
-                step={isMeasurable ? "0.01" : "1"}
-                value={quantity}
-                onChange={(e) => setQuantity(parseFloat(e.target.value) || 0)}
-                placeholder={isMeasurable ? "Ej: 2.5" : "Ej: 10"}
-              />
-            </Box>
-
-            {/* Unit Selector */}
-            <Box>
-              <Text fontSize="sm" fontWeight="medium" mb="1">
-                Unidad de medida
-              </Text>
-              <select
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--chakra-colors-gray-300)',
-                  fontSize: '14px'
-                }}
-              >
-                {units.map(u => (
-                  <option key={u} value={u}>{u}</option>
-                ))}
-              </select>
-            </Box>
-
-            {/* Action Buttons */}
-            <Flex gap="2" justify="flex-end">
-              <button
-                onClick={handleCancel}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--chakra-colors-gray-300)',
-                  background: 'white',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirm}
-                disabled={!quantity || !unit}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: 'var(--chakra-colors-blue-500)',
-                  color: 'white',
-                  cursor: quantity && unit ? 'pointer' : 'not-allowed',
-                  opacity: quantity && unit ? 1 : 0.5
-                }}
-              >
-                Confirmar
-              </button>
-            </Flex>
-          </Stack>
-        </CardWrapper.Body>
-      </CardWrapper>
-    );
-  }
-
-  // Otherwise, show search input
   return (
-    <Box position="relative" w="full">
-      <Box position="relative">
-        <Input
-          value={query}
-          onChange={handleInputChange}
-          placeholder={placeholder}
-          disabled={disabled || loading}
-          pr="10"
-          onFocus={() => query && setIsOpen(filteredMaterials.length > 0)}
-          onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-          data-testid="material-selector-search"
-        />
+    <Popover.Root
+      open={isOpen && filteredMaterials.length > 0}
+      onOpenChange={(e) => setIsOpen(e.open)}
+      positioning={{ placement: "bottom-start", sameWidth: true, gutter: 4 }}
+      // Disable all automatic focus management
+      autoFocus={false}
+      restoreFocus={false}
+      closeOnInteractOutside={true}
+    >
+      <Popover.Trigger asChild>
+        <Box position="relative" w="full">
+          <Input
+            ref={inputRef}
+            value={query}
+            onChange={handleInputChange}
+            placeholder={placeholder}
+            disabled={disabled || loading}
+            autoFocus={autoFocus}
+            pr="10"
+            onFocus={() => {
+              if (query) setIsOpen(filteredMaterials.length > 0);
+            }}
+            data-testid="material-selector-search"
+            aria-label={ariaLabel || "Buscar material"}
+            size="sm"
+            autoComplete="off"
+            // Ensure input keeps focus
+            onBlur={(e) => {
+              // Optional: logic to close if related target is not popover
+            }}
+          />
 
-        <Box
-          position="absolute"
-          right="3"
-          top="50%"
-          transform="translateY(-50%)"
-          pointerEvents="none"
-        >
-          {loading ? (
-            <Spinner size="sm" />
-          ) : (
-            <MagnifyingGlassIcon
-              style={{
-                width: '16px',
-                height: '16px',
-                color: 'var(--chakra-colors-gray-400)'
-              }}
-            />
-          )}
-        </Box>
-      </Box>
-
-      {/* Results Dropdown */}
-      {isOpen && (
-        <CardWrapper
-          position="absolute"
-          top="100%"
-          left="0"
-          right="0"
-          zIndex="dropdown"
-          mt="1"
-          maxH="300px"
-          overflowY="auto"
-          variant="elevated"
-        >
-          <CardWrapper.Body p="2">
-            {/* Searching State */}
-            {isSearching ? (
-              <Flex align="center" justify="center" gap="2" p="4">
-                <Spinner size="sm" />
-                <Text fontSize="sm" color="gray.600">
-                  Buscando materiales...
-                </Text>
-              </Flex>
-            ) : filteredMaterials.length > 0 ? (
-              /* Results List */
-              <Stack gap="1">
-                {filteredMaterials.map((material) => (
-                  <Flex
-                    key={material.id}
-                    p="3"
-                    borderRadius="md"
-                    cursor="pointer"
-                    _hover={{ bg: "gray.50" }}
-                    onClick={() => handleMaterialClick(material)}
-                    align="center"
-                    gap="3"
-                    data-testid={`material-option-${material.id}`}
-                  >
-                    <Box fontSize="lg">
-                      {getTypeIcon(material.type)}
-                    </Box>
-
-                    <Stack gap="0" flex="1" minW="0">
-                      <Text fontWeight="medium" noOfLines={1}>
-                        {material.name}
-                      </Text>
-                      <Text fontSize="sm" color="gray.600">
-                        {getDisplayText(material)}
-                      </Text>
-                    </Stack>
-
-                    <Badge
-                      colorPalette={getStockBadgeColor(getStockStatus(material))}
-                      size="sm"
-                    >
-                      {StockCalculation.getStatusLabel(getStockStatus(material))}
-                    </Badge>
-                  </Flex>
-                ))}
-              </Stack>
+          <Box
+            position="absolute"
+            right="3"
+            top="50%"
+            transform="translateY(-50%)"
+            pointerEvents="none"
+          >
+            {loading ? (
+              <Spinner size="xs" />
             ) : (
-              /* No Results */
-              <Box p="4" textAlign="center">
-                <Text fontSize="sm" color="gray.600">
-                  {filterByStock
-                    ? 'No se encontraron materiales con stock disponible'
-                    : 'No se encontraron materiales'
-                  }
-                </Text>
-              </Box>
+              <MagnifyingGlassIcon style={{ width: '14px', color: 'var(--chakra-colors-gray-400)' }} />
             )}
-          </CardWrapper.Body>
-        </CardWrapper>
-      )}
-    </Box>
+          </Box>
+        </Box>
+      </Popover.Trigger>
+
+      <Popover.Positioner style={{ zIndex: 9999 }}>
+        <Popover.Content
+          width="auto"
+          minW="300px"
+          p="0"
+          // Explicitly disable auto focus on content too
+          autoFocus={false}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          onInteractOutside={(e) => {
+            // Let click outside close it normally
+          }}
+        >
+          <Popover.Body p="0">
+            <CardWrapper
+              variant="elevated"
+              maxH="300px"
+              overflowY="auto"
+              css={{ border: 'none', boxShadow: 'none' }}
+            >
+              <CardWrapper.Body p="1">
+                <Stack gap="0">
+                  {filteredMaterials.map((material) => (
+                    <Flex
+                      key={material.id}
+                      p="2"
+                      borderRadius="sm"
+                      cursor="pointer"
+                      _hover={{ bg: "blue.50" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelect(material);
+                      }}
+                      onMouseDown={(e) => e.preventDefault()}
+                      align="center"
+                      gap="3"
+                      transition="background 0.1s"
+                    >
+                      <Box fontSize="sm">{getTypeIcon(material.type)}</Box>
+
+                      <Stack gap="0" flex="1" minW="0">
+                        <Text fontSize="sm" fontWeight="medium" lineClamp={1}>
+                          {material.name}
+                        </Text>
+                        <Text fontSize="xs" color="gray.500">
+                          {getDisplayText(material)}
+                        </Text>
+                      </Stack>
+
+                      <Badge
+                        colorPalette={getStockBadgeColor(StockCalculation.getStockStatus(material))}
+                        size="xs"
+                        variant="surface"
+                      >
+                        {StockCalculation.getStatusLabel(StockCalculation.getStockStatus(material))}
+                      </Badge>
+                    </Flex>
+                  ))}
+                </Stack>
+              </CardWrapper.Body>
+            </CardWrapper>
+          </Popover.Body>
+        </Popover.Content>
+      </Popover.Positioner>
+    </Popover.Root>
   );
 };
 
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
+// Helpers
 const getTypeIcon = (type: string) => {
   switch (type) {
-    case 'MEASURABLE':
-      return '📏';
-    case 'COUNTABLE':
-      return '📦';
-    case 'ELABORATED':
-      return '🧪';
-    default:
-      return '📋';
+    case 'MEASURABLE': return '📏';
+    case 'COUNTABLE': return '📦';
+    case 'ELABORATED': return '🧪';
+    default: return '📋';
   }
 };
 
 const getStockBadgeColor = (status: string) => {
   switch (status) {
-    case 'ok':
-      return 'green';
-    case 'low':
-      return 'yellow';
-    case 'critical':
-      return 'orange';
-    case 'out':
-      return 'red';
-    default:
-      return 'gray';
+    case 'ok': return 'green';
+    case 'low': return 'yellow';
+    case 'critical': return 'orange';
+    case 'out': return 'red';
+    default: return 'gray';
   }
 };
 

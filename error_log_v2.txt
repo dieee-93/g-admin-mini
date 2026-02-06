@@ -1,0 +1,39 @@
+
+Running 1 test using 1 worker
+
+  Ô£ÿ  1 [authenticated] ÔÇ║ tests\e2e\materials\materials-crud-complete.spec.ts:181:5 ÔÇ║ Materials CRUD - Complete Test Suite ÔÇ║ Create Materials - Los 3 Tipos ÔÇ║ 3. Crear ELABORATED Material (producto elaborado) (13.7s)
+
+
+  1) [authenticated] ÔÇ║ tests\e2e\materials\materials-crud-complete.spec.ts:181:5 ÔÇ║ Materials CRUD - Complete Test Suite ÔÇ║ Create Materials - Los 3 Tipos ÔÇ║ 3. Crear ELABORATED Material (producto elaborado) 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('dialog').last().getByText('Harina')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('dialog').last().getByText('Harina')[22m
+
+
+      223 |       // RecipePage uses .first() because it has no parent modal. We must use .last() here.
+      224 |       const option = page.getByRole('dialog').last().getByText('Harina');
+    > 225 |       await expect(option).toBeVisible();
+          |                            ^
+      226 |       await option.click();
+      227 |
+      228 |       // Confirm row interactions - EXACT PATTERN FROM RecipePage.ts
+        at I:\Programacion\Proyectos\g-mini\tests\e2e\materials\materials-crud-complete.spec.ts:225:28
+
+    attachment #1: screenshot (image/png) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\materials-materials-crud-c-ec869-aterial-producto-elaborado--authenticated\test-failed-1.png
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error Context: test-results\materials-materials-crud-c-ec869-aterial-producto-elaborado--authenticated\error-context.md
+
+  1 failed
+    [authenticated] ÔÇ║ tests\e2e\materials\materials-crud-complete.spec.ts:181:5 ÔÇ║ Materials CRUD - Complete Test Suite ÔÇ║ Create Materials - Los 3 Tipos ÔÇ║ 3. Crear ELABORATED Material (producto elaborado) 
+
+[36m  Serving HTML report at http://localhost:53660. Press Ctrl+C to quit.[39m

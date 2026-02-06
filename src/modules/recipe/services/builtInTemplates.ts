@@ -5,7 +5,7 @@
  */
 
 import type { BuiltInTemplate } from '../types/templates'
-import { RecipeCategory, DifficultyLevel, QualityGrade } from '../types/recipe'
+import { DifficultyLevel, QualityGrade } from '../types/recipe'
 
 // ============================================
 // GASTRONOMÍA TEMPLATES
@@ -22,7 +22,6 @@ export const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
     tags: ['gastronomía', 'fast-food', 'popular'],
     recipeData: {
       name: 'Hamburguesa Clásica',
-      category: RecipeCategory.MAIN_COURSE,
       difficulty: DifficultyLevel.BEGINNER,
       preparationTime: 10,
       cookingTime: 5,
@@ -123,7 +122,6 @@ export const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
     tags: ['gastronomía', 'italiana', 'vegetariana'],
     recipeData: {
       name: 'Pizza Margarita',
-      category: RecipeCategory.MAIN_COURSE,
       difficulty: DifficultyLevel.INTERMEDIATE,
       preparationTime: 20,
       cookingTime: 12,
@@ -217,7 +215,6 @@ export const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
     tags: ['saludable', 'vegano-opcional', 'bebidas'],
     recipeData: {
       name: 'Smoothie Verde',
-      category: RecipeCategory.BEVERAGE,
       difficulty: DifficultyLevel.BEGINNER,
       preparationTime: 5,
       cookingTime: 0,
@@ -314,7 +311,6 @@ export const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
     tags: ['postre', 'chocolate', 'horneado'],
     recipeData: {
       name: 'Brownie de Chocolate',
-      category: RecipeCategory.DESSERT,
       difficulty: DifficultyLevel.INTERMEDIATE,
       preparationTime: 15,
       cookingTime: 25,

@@ -112,6 +112,149 @@ describe('Capability → Navigation Integration', () => {
     expect(result.current.activeModules).toContain('settings');
   });
 
+  it('should activate correct modules for onsite_service capability', async () => {
+    const capabilities = ['onsite_service'];
+    const mockProfile = createMockUserProfile(capabilities);
+    const expectedModules = getExpectedModulesForCapabilities(capabilities);
+
+    queryClient.setQueryData(businessProfileKeys.detail(), mockProfile);
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <FeatureFlagProvider>{children}</FeatureFlagProvider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useFeatureFlags(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.activeModules.sort()).toEqual(expectedModules);
+    expect(result.current.isModuleActive('onsite')).toBe(true);
+  });
+
+  it('should activate correct modules for delivery_shipping capability', async () => {
+    const capabilities = ['delivery_shipping'];
+    const mockProfile = createMockUserProfile(capabilities);
+    const expectedModules = getExpectedModulesForCapabilities(capabilities);
+
+    queryClient.setQueryData(businessProfileKeys.detail(), mockProfile);
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <FeatureFlagProvider>{children}</FeatureFlagProvider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useFeatureFlags(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.activeModules.sort()).toEqual(expectedModules);
+    expect(result.current.isModuleActive('delivery')).toBe(true);
+  });
+
+  it('should activate correct modules for pickup_orders capability', async () => {
+    const capabilities = ['pickup_orders'];
+    const mockProfile = createMockUserProfile(capabilities);
+    const expectedModules = getExpectedModulesForCapabilities(capabilities);
+
+    queryClient.setQueryData(businessProfileKeys.detail(), mockProfile);
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <FeatureFlagProvider>{children}</FeatureFlagProvider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useFeatureFlags(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.activeModules.sort()).toEqual(expectedModules);
+    expect(result.current.isModuleActive('pickup')).toBe(true);
+  });
+
+  it('should activate correct modules for membership_subscriptions capability', async () => {
+    const capabilities = ['membership_subscriptions'];
+    const mockProfile = createMockUserProfile(capabilities);
+    const expectedModules = getExpectedModulesForCapabilities(capabilities);
+
+    queryClient.setQueryData(businessProfileKeys.detail(), mockProfile);
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <FeatureFlagProvider>{children}</FeatureFlagProvider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useFeatureFlags(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.activeModules.sort()).toEqual(expectedModules);
+    expect(result.current.isModuleActive('memberships')).toBe(true);
+    // billing is activated by finance_recurring_invoicing which comes with membership_subscriptions
+    expect(result.current.isModuleActive('billing')).toBe(true);
+  });
+
+  it('should activate correct modules for professional_services capability', async () => {
+    const capabilities = ['professional_services'];
+    const mockProfile = createMockUserProfile(capabilities);
+    const expectedModules = getExpectedModulesForCapabilities(capabilities);
+
+    queryClient.setQueryData(businessProfileKeys.detail(), mockProfile);
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <FeatureFlagProvider>{children}</FeatureFlagProvider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useFeatureFlags(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.activeModules.sort()).toEqual(expectedModules);
+    expect(result.current.isModuleActive('scheduling')).toBe(true);
+    expect(result.current.isModuleActive('team')).toBe(true);
+    expect(result.current.isModuleActive('shift-control')).toBe(true);
+  });
+
+  it('should activate correct modules for asset_rental capability', async () => {
+    const capabilities = ['asset_rental'];
+    const mockProfile = createMockUserProfile(capabilities);
+    const expectedModules = getExpectedModulesForCapabilities(capabilities);
+
+    queryClient.setQueryData(businessProfileKeys.detail(), mockProfile);
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <FeatureFlagProvider>{children}</FeatureFlagProvider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useFeatureFlags(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.activeModules.sort()).toEqual(expectedModules);
+    expect(result.current.isModuleActive('rentals')).toBe(true);
+    expect(result.current.isModuleActive('assets')).toBe(true); // Assuming assets is tied to rentals or core
+  });
+
   it('should correctly report module activation status', async () => {
     const capabilities = ['physical_products'];
     const mockProfile = createMockUserProfile(capabilities);

@@ -45,7 +45,12 @@ export function Sidebar() {
   // Get modules grouped by domain
   const modulesByDomain = useModuleNavigationByDomain();
 
-  console.log('🚨 [Sidebar] modulesByDomain:', modulesByDomain);
+  console.log('🚨 [Sidebar] RENDER:', {
+    modulesByDomain,
+    core: modulesByDomain.core.length,
+    ops: modulesByDomain.operations.length,
+    modulesState: navState.modules.length
+  });
   // Handler para toggle de expansión
   const handleToggleExpansion = (moduleId: string) => {
     toggleModuleExpansion(moduleId);
@@ -61,6 +66,13 @@ export function Sidebar() {
     return allModules.map(module => {
       // Find matching module in context modules to get state
       const contextModule = modules.find(m => m.id === module.id);
+      if (module.id === 'products') {
+        console.log('🚨 [Sidebar] processing products module:', {
+          foundInContext: !!contextModule,
+          isActiveInContext: contextModule?.isActive,
+          id: module.id
+        });
+      }
       return {
         ...module,
         isExpanded: contextModule?.isExpanded ?? module.isExpanded,
@@ -114,6 +126,7 @@ export function Sidebar() {
             isActive={isActive}
             isExpanded={actualShowExpanded}
             onClick={() => navigateToModule(module.id)}
+            data-testid={`nav-item-${module.id}`}
           >
             <div
               style={{
@@ -286,6 +299,7 @@ export function Sidebar() {
         setIsHovering(false);
         window.dispatchEvent(new CustomEvent('sidebarHover', { detail: { isHovering: false } }));
       }}
+      data-testid="main-sidebar"
     >
       <SidebarContainer isExpanded={actualShowExpanded} isHovering={isHovering}>
 

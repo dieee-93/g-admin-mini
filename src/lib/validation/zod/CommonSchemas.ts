@@ -93,6 +93,7 @@ export const BaseSchemas = {
     .regex(/^[a-zA-Z0-9\s\-\.]+$/, ValidationMessages.alphanumeric),
 
   materialName: z.string()
+    .min(1, ValidationMessages.required)
     .min(2, ValidationMessages.minLength(2))
     .max(150, ValidationMessages.maxLength(150)),
 
@@ -221,7 +222,9 @@ export const EntitySchemas = {
       .refine((name) => name.length <= 100, {
         message: 'El nombre no puede exceder 100 caracteres'
       }),
-    type: z.string().min(1, 'Debes seleccionar un tipo de item'),
+    type: z.enum(['MEASURABLE', 'COUNTABLE', 'ELABORATED'], {
+      errorMap: () => ({ message: 'Debes seleccionar un tipo de item válido' })
+    }),
     category: z.string().optional(),
     unit: z.string().min(1, 'Debes especificar la unidad'),
     initial_stock: z.number()
@@ -240,14 +243,6 @@ export const EntitySchemas = {
           code: z.ZodIssueCode.custom,
           path: ['unit'],
           message: 'Debes especificar la unidad para este tipo de material'
-        });
-      }
-
-      if (data.type === 'MEASURABLE' && !data.category) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['category'],
-          message: 'Debes seleccionar una categoría de medición'
         });
       }
     }),

@@ -13,6 +13,8 @@ interface MaterialsManagementProps {
   onStockUpdate: (itemId: string, newStock: number) => Promise<void>;
   onBulkAction: (action: string, itemIds: string[]) => Promise<void>;
   onAddMaterial?: () => void;
+  onEdit?: (item: any) => void;
+  onDelete?: (item: any) => void;
   performanceMode?: boolean;
 }
 
@@ -24,6 +26,8 @@ export const MaterialsManagement = memo(function MaterialsManagement({
   onStockUpdate,
   onBulkAction,
   onAddMaterial,
+  onEdit,
+  onDelete,
   performanceMode = false
 }: MaterialsManagementProps) {
   // ✅ PERFORMANCE: Stabilize onValueChange callback to prevent TabsContext thrashing
@@ -72,12 +76,14 @@ export const MaterialsManagement = memo(function MaterialsManagement({
           onStockUpdate={onStockUpdate}
           onBulkAction={onBulkAction}
           onAddMaterial={onAddMaterial}
+          onEdit={onEdit}
+          onDelete={onDelete}
           performanceMode={performanceMode}
         />
       </Tabs.Content>
 
       <Tabs.Content value="analytics" padding="md">
-        <AnalyticsTabEnhanced />
+        <AnalyticsTabEnhanced items={items} />
       </Tabs.Content>
 
       <Tabs.Content value="procurement" padding="md">

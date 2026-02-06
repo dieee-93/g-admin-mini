@@ -14,7 +14,7 @@
  * </ContentLayout>
  */
 
-import { Stack } from './Stack';
+import { Box, Stack } from '@/shared/ui';
 import type { ReactNode } from 'react';
 
 export interface ContentLayoutProps {
@@ -60,8 +60,8 @@ export function ContentLayout({
 
   return (
     <Box p={{ base: "6", md: "8" }} w="100%">
-      <Stack 
-        gap={gap} 
+      <Stack
+        gap={gap}
         w="100%"
       >
         {children}

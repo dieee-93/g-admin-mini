@@ -12,12 +12,16 @@ import { Box, Stack, Typography, Badge, SelectField } from '@/shared/ui';
 import { type ItemFormData } from '../../../../types';
 import { CATEGORY_COLLECTION } from '../constants';
 import { RecipeBuilder } from '@/modules/recipe/components';
+import { ProductionConfigSection } from './ProductionConfigSection';
+import { MaterialFormProgressIndicator } from './MaterialFormProgressIndicator';
 import { memo, useCallback, useMemo } from 'react';
 import type { Recipe } from '@/modules/recipe/types';
+import type { ProductionConfig } from '../../../../types';
 
 interface ElaboratedFieldsProps {
   formData: ItemFormData;
   setFormData: (data: ItemFormData) => void;
+  isEditMode?: boolean;
 }
 
 /**
@@ -186,7 +190,8 @@ const SectionDivider = memo(function SectionDivider({ label }: SectionDividerPro
  */
 export const ElaboratedFields = memo(function ElaboratedFields({
   formData,
-  setFormData
+  setFormData,
+  isEditMode = false
 }: ElaboratedFieldsProps) {
 
   // ⚡ PERFORMANCE: Memoize outputItem to prevent recreation
@@ -194,12 +199,12 @@ export const ElaboratedFields = memo(function ElaboratedFields({
     if (!formData.name) return undefined;
 
     return {
-      id: 'temp',
+      id: formData.id || 'temp', // Use actual ID if available
       name: formData.name,
       type: 'material' as const,
       unit: formData.unit || 'unit',
     };
-  }, [formData.name, formData.unit]);
+  }, [formData.name, formData.unit, formData.id]);
 
   // ⚡ PERFORMANCE: Memoize recipe features to prevent RecipeBuilder re-renders
   const recipeFeatures = useMemo(() => ({
@@ -214,14 +219,28 @@ export const ElaboratedFields = memo(function ElaboratedFields({
     formData.initial_stock || 1
   , [formData.initial_stock]);
 
-  // ⚡ PERFORMANCE: Memoize callback
+  // ⚡ PERFORMANCE: Memoize callback with functional setState to avoid stale closures
   const handleRecipeSaved = useCallback((recipe: Recipe) => {
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       recipe_id: recipe.id,
       initial_stock: recipe.output.quantity || 1,
+    }));
+  }, [setFormData]);
+
+  // 🆕 Handler para production_config with functional setState and updater function support
+  const handleProductionConfigChange = useCallback((configOrUpdater: ProductionConfig | ((prev?: ProductionConfig) => ProductionConfig)) => {
+    setFormData(prev => {
+      const newConfig = typeof configOrUpdater === 'function'
+        ? configOrUpdater(prev.production_config)
+        : configOrUpdater;
+
+      return {
+        ...prev,
+        production_config: newConfig,
+      };
     });
-  }, [formData, setFormData]);
+  }, [setFormData]);
 
   return (
     <Stack gap="6" w="full">
@@ -258,7 +277,15 @@ export const ElaboratedFields = memo(function ElaboratedFields({
       </Stack>
 
       {/* ========================================
-          SECTION 2: Information Alert - Factory Warning Panel
+          SECTION 2: Progress Indicator - Visual Flow Tracker
+          ======================================== */}
+      <MaterialFormProgressIndicator
+        hasRecipe={!!formData.recipe_id}
+        hasProductionConfig={!!formData.production_config}
+      />
+
+      {/* ========================================
+          SECTION 3: Information Alert - Factory Warning Panel
           ======================================== */}
       <Box
         p="5"
@@ -367,7 +394,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
       </Box>
 
       {/* ========================================
-          SECTION 4: Recipe Builder - Main Production Module
+          SECTION 4: Recipe Builder - Main Production Module (No Submit Button)
           ======================================== */}
       <Box data-testid="recipe-builder-section">
         {/* Section Divider */}
@@ -424,15 +451,33 @@ export const ElaboratedFields = memo(function ElaboratedFields({
             </Typography>
           </Stack>
 
-          {/* RecipeBuilder Component - Maintained as-is */}
+          {/* RecipeBuilder Component - Embedded mode (no action buttons) */}
           <RecipeBuilder
-            mode="create"
+            mode={isEditMode ? 'edit' : 'create'}
+            recipeId={formData.recipe_id} // Pass recipe ID for loading data
             entityType="material"
             complexity="minimal"
             features={recipeFeatures}
             outputItem={outputItem}
             outputQuantity={outputQuantity}
             onSave={handleRecipeSaved}
+            hideActions={true}
+          />
+        </Box>
+      </Box>
+
+      {/* ========================================
+          SECTION 5: Production Configuration (NUEVO)
+          ======================================== */}
+      <Box data-testid="production-config-section">
+        {/* Section Divider */}
+        <SectionDivider label="Configuración de Producción" />
+
+        <Box mt="5">
+          <ProductionConfigSection
+            productionConfig={formData.production_config}
+            onChange={handleProductionConfigChange}
+            recipeId={formData.recipe_id}
           />
         </Box>
       </Box>

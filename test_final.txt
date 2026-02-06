@@ -1,0 +1,33 @@
+
+Running 1 test using 1 worker
+
+Navigate to recipes page...
+URL validated.
+Attempting to find New Recipe button...
+Clicked New Recipe button.
+  Ô£ÿ  1 [authenticated] ÔÇ║ tests\e2e\recipe\create-recipe.spec.ts:13:5 ÔÇ║ Recipe Builder - Create Recipe ÔÇ║ should verify happy path for creating a simple recipe (6.7s)
+
+
+  1) [authenticated] ÔÇ║ tests\e2e\recipe\create-recipe.spec.ts:13:5 ÔÇ║ Recipe Builder - Create Recipe ÔÇ║ should verify happy path for creating a simple recipe 
+
+    TypeError: page.getByPlaceholderText is not a function
+
+      24 |
+      25 |         // Now we should be in the builder. Verify header or key element.
+    > 26 |         await expect(page.getByPlaceholderText('Nombre de la receta')).toBeVisible();
+         |                           ^
+      27 |         console.log('Builder visible.');
+      28 |
+      29 |         // 1. Fill Basic Info
+        at I:\Programacion\Proyectos\g-mini\tests\e2e\recipe\create-recipe.spec.ts:26:27
+
+    attachment #1: screenshot (image/png) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\recipe-create-recipe-Recip-a88b5-or-creating-a-simple-recipe-authenticated\test-failed-1.png
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error Context: test-results\recipe-create-recipe-Recip-a88b5-or-creating-a-simple-recipe-authenticated\error-context.md
+
+  1 failed
+    [authenticated] ÔÇ║ tests\e2e\recipe\create-recipe.spec.ts:13:5 ÔÇ║ Recipe Builder - Create Recipe ÔÇ║ should verify happy path for creating a simple recipe 
+
+[36m  Serving HTML report at http://localhost:51558. Press Ctrl+C to quit.[39m

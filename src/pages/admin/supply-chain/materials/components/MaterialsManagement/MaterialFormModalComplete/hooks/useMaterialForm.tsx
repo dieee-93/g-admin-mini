@@ -48,6 +48,7 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
   // const alertSummary = useMaterialsStore((s) => s.alertSummary);
   
   const [formData, setFormData] = useState<ItemFormData>({
+    id: undefined,
     name: '',
     type: '' as ItemType,
     unit: '' as AllUnit,
@@ -66,7 +67,8 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
     clearValidation
   } = useMaterialValidation(formData, items, {
     enableRealTime: true,
-    debounceMs: 300
+    debounceMs: 300,
+    excludeId: currentItem?.id // Pass current ID to exclude from duplicate checks
   });
 
   // NO useEffect - let useMaterialValidation handle registration internally
@@ -146,6 +148,7 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
   useEffect(() => {
     if (isOpen && currentItem) {
       const itemFormData: ItemFormData = {
+        id: currentItem.id,
         name: currentItem.name,
         type: currentItem.type,
         unit: getItemUnit(currentItem),
@@ -158,12 +161,13 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
       } else if (isCountable(currentItem)) {
         itemFormData.packaging = currentItem.packaging;
       } else if (isElaborated(currentItem)) {
-        itemFormData.recipe_id = currentItem.recipe_id;
+        itemFormData.recipe_id = (currentItem as any).recipe_id;
       }
 
       setFormData(itemFormData);
     } else if (isOpen) {
       setFormData({
+        id: undefined,
         name: '',
         type: '' as ItemType,
         unit: '' as AllUnit,
@@ -218,7 +222,13 @@ export const useMaterialForm = (params: UseMaterialFormParams) => {
     try {
       if (isEditMode && currentItem) {
         console.log('✏️ [useMaterialForm] Modo edición, actualizando...');
-        await updateItem(currentItem.id, formData as Partial<MaterialItem>);
+        
+        // 🧹 SANITIZE PAYLOAD FOR UPDATE
+        // Remove fields that shouldn't be updated directly on the material table
+        // unit_cost might be editable if moved to main config, but initial_stock is definitely not
+        const { initial_stock, addToStockNow, unit_cost, ...cleanData } = formData as any;
+        
+        await updateItem(currentItem.id, cleanData as Partial<MaterialItem>);
         setSuccessStates(prev => ({ ...prev, itemCreated: true }));
       } else {
         if (addToStockNow) {

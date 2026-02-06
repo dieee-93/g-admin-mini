@@ -26,6 +26,7 @@ export interface MaterialItem {
     package_unit: string;
     package_cost?: number;
   };
+  production_config?: ProductionConfig; // 🆕 PRODUCTION: Equipment, labor, overhead (ELABORATED only)
   created_at?: string;
   updated_at?: string;
 }
@@ -57,10 +58,12 @@ export interface ElaboratedItem extends MaterialItem {
   recipe_id?: string;
   production_time?: number;
   batch_size?: number;
+  production_config?: ProductionConfig; // 🆕 PRODUCTION: Equipment, labor, overhead configuration
 }
 
 // Form data type
 export interface ItemFormData {
+  id?: string; // 🆕 Added for edit mode context
   location_id?: string; // 🆕 MULTI-LOCATION: Location where material will be stocked
   name: string;
   type: ItemType;
@@ -87,6 +90,7 @@ export interface ItemFormData {
   recipe_id?: string;
   requires_production?: boolean;
   auto_calculate_cost?: boolean;
+  production_config?: ProductionConfig; // 🆕 Production configuration (equipment, labor, overhead)
 
   // Supplier and stock entry fields
   supplier?: {
@@ -132,6 +136,38 @@ export interface Supplier {
   address?: string;
   performance?: number;
   reliability?: 'high' | 'medium' | 'low';
+}
+
+// Production Configuration Types (🆕 Equipment + Labor + Overhead)
+export interface ProductionEquipmentUsage {
+  id: string;
+  equipment_id: string;
+  equipment_name: string;
+  equipment_type: string;
+  hours_used: number;
+  hourly_cost_rate: number;
+  total_cost: number;
+  notes?: string;
+  recorded_at?: string;
+}
+
+export interface ProductionConfig {
+  equipment_usage?: ProductionEquipmentUsage[];
+  labor_hours?: number;
+  labor_cost_per_hour?: number;
+  labor_total_cost?: number;
+  overhead_percentage?: number;
+  overhead_fixed?: number;
+  overhead_total_cost?: number;
+  packaging_cost?: number;
+  materials_cost?: number;
+  equipment_cost?: number;
+  total_direct_cost?: number;
+  total_indirect_cost?: number;
+  total_cost?: number;
+  cost_per_unit?: number;
+  last_calculation_date?: string;
+  notes?: string;
 }
 
 // Type guard functions

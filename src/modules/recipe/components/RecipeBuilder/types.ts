@@ -67,6 +67,9 @@ export interface RecipeBuilderProps {
   onCancel?: () => void
   onChange?: (recipe: Partial<Recipe>) => void
 
+  // UI Control
+  hideActions?: boolean // Hide save/cancel buttons when embedded in a parent form
+
   // Validación
   validateOnChange?: boolean
   customValidation?: (recipe: Partial<Recipe>) => ValidationResult

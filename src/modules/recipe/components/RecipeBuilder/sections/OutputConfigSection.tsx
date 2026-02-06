@@ -124,8 +124,9 @@ function OutputConfigSectionComponent(props: OutputConfigSectionProps) {
     });
   }, [output, updateRecipe]);
 
-  const handleTypeChange = useCallback((value: string[]) => {
-    const newType = value[0] as 'measurable' | 'countable';
+  const handleTypeChange = useCallback((value: string) => {
+    console.log('[OutputConfigSection] Type Changed:', value);
+    const newType = value as 'measurable' | 'countable';
     const defaultUnit = newType === 'measurable' ? 'kg' : 'unit';
     updateOutput({ unit: defaultUnit });
   }, [updateOutput]);
@@ -256,26 +257,20 @@ function OutputConfigSectionComponent(props: OutputConfigSectionProps) {
             </Typography>
           </Field.Label>
           <RadioGroupRoot
-            value={[outputType]}
+            value={outputType}
             onValueChange={handleTypeChange}
             orientation="horizontal"
           >
             <HStack gap="4">
               <RadioItem value="measurable">
-                <RadioItemControl />
-                <RadioItemText>
-                  <Typography fontSize="sm" fontWeight="600">
-                    Medible (kg, L, m)
-                  </Typography>
-                </RadioItemText>
+                <Typography fontSize="sm" fontWeight="600">
+                  Medible (kg, L, m)
+                </Typography>
               </RadioItem>
               <RadioItem value="countable">
-                <RadioItemControl />
-                <RadioItemText>
-                  <Typography fontSize="sm" fontWeight="600">
-                    Unitario (piezas, cajas)
-                  </Typography>
-                </RadioItemText>
+                <Typography fontSize="sm" fontWeight="600">
+                  Unitario (piezas, cajas)
+                </Typography>
               </RadioItem>
             </HStack>
           </RadioGroupRoot>
@@ -301,7 +296,7 @@ function OutputConfigSectionComponent(props: OutputConfigSectionProps) {
             <Input
               type="number"
               min="0"
-              step="0.001"
+              step={outputType === 'measurable' ? '0.001' : '1'}
               placeholder="Ej: 1.0"
               value={output.quantity ?? ''}
               onChange={(e) => updateOutput({ quantity: parseFloat(e.target.value) || 0 })}
@@ -316,12 +311,18 @@ function OutputConfigSectionComponent(props: OutputConfigSectionProps) {
 
             {/* Dynamic Unit Selector - NEW */}
             <Box minW="150px">
-              <SelectField
-                value={[currentUnit]}
-                onValueChange={handleUnitChange}
-                options={unitOptions}
-                size="md"
-              />
+              {outputType === 'measurable' ? (
+                <SelectField
+                  value={[currentUnit]}
+                  onValueChange={handleUnitChange}
+                  options={unitOptions}
+                  size="md"
+                />
+              ) : (
+                <Flex height="40px" align="center" px="3" bg="bg.subtle" borderRadius="md" borderWidth="1px" borderColor="border.default">
+                   <Text fontSize="sm" fontWeight="600" color="fg.muted">Unidades (u)</Text>
+                </Flex>
+              )}
             </Box>
           </HStack>
           <Field.HelperText>

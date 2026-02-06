@@ -9,8 +9,6 @@
  * - Authentication edge cases
  */
 
-import { Page, expect } from '@playwright/test';
-import { logger } from '@/lib/logging';
 
 /**
  * Navigate to materials page and wait for full load
@@ -23,15 +21,15 @@ import { logger } from '@/lib/logging';
  */
 export async function navigateToMaterialsPage(page: Page) {
   console.log('🔍 [Helper] Navigating to materials page...');
-  
+
   // Navigate and wait for network idle
   await page.goto('/admin/supply-chain/materials', {
-    waitUntil: 'networkidle', // Wait for all network requests to complete
+    waitUntil: 'domcontentloaded', // Wait for all network requests to complete
     timeout: 30000
   });
-  
+
   console.log('✅ [Helper] Navigation complete, waiting for UI...');
-  
+
   // Wait for the page to actually load content
   // Try multiple strategies to ensure the page loaded
   try {
@@ -43,7 +41,7 @@ export async function navigateToMaterialsPage(page: Page) {
     console.log('✅ [Helper] Tabs container found');
   } catch (e) {
     console.error('❌ [Helper] Tabs container not found, trying alternative...');
-    
+
     // Strategy 2: Wait for ANY tab trigger (fallback)
     await page.waitForSelector('[role="tab"]', {
       state: 'visible',
@@ -51,10 +49,10 @@ export async function navigateToMaterialsPage(page: Page) {
     });
     console.log('✅ [Helper] Tab trigger found (fallback)');
   }
-  
+
   // Safety wait for animations (Chakra UI transitions)
   await page.waitForTimeout(500);
-  
+
   console.log('✅ [Helper] Materials page fully loaded');
 }
 
@@ -68,36 +66,36 @@ export async function navigateToMaterialsPage(page: Page) {
  */
 export async function navigateToABCAnalysisTab(page: Page, retries = 3) {
   console.log('🔍 [Helper] Navigating to ABC Analysis tab...');
-  
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       // Find the ABC Analysis tab trigger
       const abcTab = page.getByRole('tab', { name: /análisis abc/i });
-      
+
       // Wait for tab to be present
       await abcTab.waitFor({ state: 'visible', timeout: 10000 });
-      
+
       // Click with force to bypass animation stability issues
       await abcTab.click({ force: true, timeout: 10000 });
-      
+
       console.log(`✅ [Helper] Clicked ABC tab (attempt ${attempt}/${retries})`);
-      
+
       // Wait for the content to become visible
       await page.waitForSelector('[data-testid="abc-chart"]', {
         state: 'visible',
         timeout: 10000
       });
-      
+
       console.log('✅ [Helper] ABC Analysis tab content loaded');
       return; // Success!
-      
+
     } catch (error) {
       console.error(`❌ [Helper] Attempt ${attempt}/${retries} failed:`, error);
-      
+
       if (attempt === retries) {
         throw new Error(`Failed to navigate to ABC Analysis tab after ${retries} attempts`);
       }
-      
+
       // Wait before retry
       await page.waitForTimeout(1000);
     }
@@ -111,11 +109,11 @@ export async function navigateToABCAnalysisTab(page: Page, retries = 3) {
  */
 export async function waitForMaterialsGrid(page: Page) {
   console.log('🔍 [Helper] Waiting for materials grid...');
-  
+
   // Wait for grid container
   const grid = page.getByTestId('materials-grid');
   await grid.waitFor({ state: 'visible', timeout: 10000 });
-  
+
   // Wait for at least one material card to appear (indicates data loaded)
   try {
     await page.waitForSelector('[data-testid^="material-card-"]', {
@@ -133,14 +131,14 @@ export async function waitForMaterialsGrid(page: Page) {
  */
 export async function clickCategoryFilter(page: Page, category: 'A' | 'B' | 'C') {
   console.log(`🔍 [Helper] Clicking category ${category} filter...`);
-  
+
   const button = page.getByTestId(`category-${category}`);
   await button.waitFor({ state: 'visible', timeout: 5000 });
   await button.click({ force: true });
-  
+
   // Wait for filter to apply (grid updates)
   await page.waitForTimeout(500);
-  
+
   console.log(`✅ [Helper] Category ${category} filter applied`);
 }
 
@@ -150,21 +148,21 @@ export async function clickCategoryFilter(page: Page, category: 'A' | 'B' | 'C')
  */
 export async function verifyAuthentication(page: Page) {
   console.log('🔍 [Helper] Verifying authentication...');
-  
+
   // Check if we're redirected to login (auth failure)
   const currentUrl = page.url();
-  
+
   if (currentUrl.includes('/login')) {
     throw new Error('❌ Authentication failed - redirected to login page');
   }
-  
+
   // Check for "Access Denied" or similar messages
   const accessDenied = await page.getByText(/acceso denegado|access denied|sin permisos/i).isVisible().catch(() => false);
-  
+
   if (accessDenied) {
     throw new Error('❌ Authentication failed - access denied message visible');
   }
-  
+
   console.log('✅ [Helper] Authentication verified');
 }
 

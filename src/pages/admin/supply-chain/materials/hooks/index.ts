@@ -6,3 +6,7 @@ export type { InventoryTransfer } from './useInventoryTransferForm';
 export { useMaterialsActions } from './useMaterialsActions';
 export { useMaterialsFilters } from './useMaterialsFilters';
 export { useMaterialsComputed } from './useMaterialsComputed';
+
+// 🆕 Form validation hook with Zod
+export { useMaterialFormValidation } from './useMaterialFormValidation';
+export type { ValidationResult, FieldValidationResult } from './useMaterialFormValidation';

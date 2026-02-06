@@ -38,9 +38,6 @@ export const rentalsManifest: ModuleManifest = {
     consume: [
       'scheduling.slot_booked',      // Reserve rental slots
       'billing.payment_received',    // Confirm rental on payment
-      'assets.row.actions',          // Inject rental actions in asset grid
-      'assets.form.fields',          // Inject rental fields in asset form
-      'assets.detail.sections',      // Inject rental sections in asset detail
     ],
   },
 
@@ -56,12 +53,10 @@ export const rentalsManifest: ModuleManifest = {
       
       const [
         { eventBus },
-        { updateReservation },
-        { RentAssetButton, RentalFieldsGroup, RentalHistorySection }
+        { updateReservation }
       ] = await Promise.all([
         import('@/lib/events'),
-        import('@/pages/admin/operations/rentals/services'),
-        import('./integrations')
+        import('@/pages/admin/operations/rentals/services')
       ]);
 
       // ✅ Dashboard Widget - Rentals status
@@ -76,31 +71,6 @@ export const rentalsManifest: ModuleManifest = {
         ),
         'rentals',
         25 // Medium priority widget
-      );
-
-      // ✅ UI Injection - Add "Rent" button to Assets grid (row actions)
-      registry.addAction(
-        'assets.row.actions',
-        (asset: any) => <RentAssetButton asset={asset} />,
-        'rentals',
-        10
-      );
-
-      // ✅ UI Injection - Add rental fields to Assets form
-      registry.addAction(
-        'assets.form.fields',
-        (params: any) => <RentalFieldsGroup {...params} />,
-        'rentals',
-        20
-      );
-
-      // ✅ UI Injection - Add rental history section to Asset detail
-
-      registry.addAction(
-        'assets.detail.sections',
-        (asset: any) => <RentalHistorySection asset={asset} />,
-        'rentals',
-        30
       );
 
       // ✅ EventBus Integration - Listen to payment events

@@ -1,0 +1,32 @@
+
+Running 1 test using 1 worker
+
+  Ô£ÿ  1 [authenticated] ÔÇ║ tests\e2e\materials\materials-crud-complete.spec.ts:181:5 ÔÇ║ Materials CRUD - Complete Test Suite ÔÇ║ Create Materials - Los 3 Tipos ÔÇ║ 3. Crear ELABORATED Material (producto elaborado) (19.0s)
+
+
+  1) [authenticated] ÔÇ║ tests\e2e\materials\materials-crud-complete.spec.ts:181:5 ÔÇ║ Materials CRUD - Complete Test Suite ÔÇ║ Create Materials - Los 3 Tipos ÔÇ║ 3. Crear ELABORATED Material (producto elaborado) 
+
+    TimeoutError: locator.fill: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[role="dialog"]').locator('tr').filter({ has: locator('[role="dialog"]').getByLabel('Confirmar') }).getByLabel('Cantidad')[22m
+
+
+      235 |       // Handle Quantity Input (scoped to active row)
+      236 |       const quantityInput = activeRow.getByLabel('Cantidad');
+    > 237 |       await quantityInput.fill('2.5');
+          |                           ^
+      238 |
+      239 |       await confirmBtn.click();
+      240 |
+        at I:\Programacion\Proyectos\g-mini\tests\e2e\materials\materials-crud-complete.spec.ts:237:27
+
+    attachment #1: screenshot (image/png) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\materials-materials-crud-c-ec869-aterial-producto-elaborado--authenticated\test-failed-1.png
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error Context: test-results\materials-materials-crud-c-ec869-aterial-producto-elaborado--authenticated\error-context.md
+
+  1 failed
+    [authenticated] ÔÇ║ tests\e2e\materials\materials-crud-complete.spec.ts:181:5 ÔÇ║ Materials CRUD - Complete Test Suite ÔÇ║ Create Materials - Los 3 Tipos ÔÇ║ 3. Crear ELABORATED Material (producto elaborado) 
+
+[36m  Serving HTML report at http://localhost:61403. Press Ctrl+C to quit.[39m

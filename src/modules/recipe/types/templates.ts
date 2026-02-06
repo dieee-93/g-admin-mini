@@ -4,7 +4,7 @@
  * Permite crear recetas desde templates pre-configurados o guardados
  */
 
-import type { Recipe, RecipeCategory, RecipeEntityType } from './recipe'
+import type { Recipe, RecipeEntityType } from './recipe'
 
 // ============================================
 // TEMPLATE TYPES
@@ -17,7 +17,6 @@ export interface RecipeTemplate {
   id: string
   name: string
   description?: string
-  category: RecipeCategory
   entityType: RecipeEntityType
 
   // Template metadata
@@ -79,7 +78,6 @@ export interface BuiltInTemplate {
 export interface CreateTemplateInput {
   name: string
   description?: string
-  category: RecipeCategory
   entityType: RecipeEntityType
   recipeData: Partial<Recipe>
   isPublic?: boolean

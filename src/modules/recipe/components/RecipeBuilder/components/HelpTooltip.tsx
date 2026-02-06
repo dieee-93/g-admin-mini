@@ -99,10 +99,10 @@ export const RecipeTooltips = {
     />
   ),
 
-  recipeCategory: (
+  difficulty: (
     <HelpTooltip
-      content="Categoría de la receta. Ayuda a organizar y filtrar recetas en el sistema."
-      placement="top"
+      label="Complejidad de la receta"
+      description="Nivel de experiencia requerido para ejecutar esta receta."
     />
   ),
 

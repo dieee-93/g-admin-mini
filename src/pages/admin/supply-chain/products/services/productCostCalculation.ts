@@ -48,10 +48,10 @@ export function calculateProductTotalCost(
 
   const overheadCost = formData.production?.overhead_config
     ? calculateProductionOverhead(
-        formData.production.overhead_config,
-        materialsCost,
-        formData.production.production_time_minutes || 0
-      )
+      formData.production.overhead_config,
+      materialsCost,
+      formData.production.production_time_minutes || 0
+    )
     : 0;
 
   const total = materialsCost + laborCost + overheadCost;
@@ -230,7 +230,7 @@ export async function calculateLaborCostWithLoadedFactors(
 
   // Dynamically import to avoid circular dependencies
   const { calculateLaborCost: calculateWithFactors } = await import(
-    '@/pages/admin/resources/team/services/laborCostCalculation'
+    '@/modules/team/services/laborCostCalculation'
   );
 
   // Map to the expected format

@@ -33,22 +33,35 @@ console.log('🔍 [LazyModuleInitializer.tsx] All imports completed successfully
 
 export default function LazyModuleInitializer() {
   console.log('🚨 [LazyModuleInitializer] COMPONENT RENDERED!');
-  const { activeFeatures } = useFeatureFlags();
+  const { activeFeatures, isLoading } = useFeatureFlags();
   const setModulesInitialized = useAppStore(state => state.setModulesInitialized);
-  const hasInitialized = useRef(false);
+  // Use a ref to track if we have successfully started initialization
+  const hasStartedInit = useRef(false);
 
   useEffect(() => {
-    console.log('🚨 [LazyModuleInitializer] useEffect TRIGGERED!', { hasInitialized: hasInitialized.current });
-    // Prevent double initialization in React 18 StrictMode
-    if (hasInitialized.current) {
-      console.log('🚨 [LazyModuleInitializer] Skipping - already initialized');
+    console.log('🚨 [LazyModuleInitializer] useEffect TRIGGERED!', {
+      isLoading,
+      activeFeaturesCount: activeFeatures.length,
+      hasStartedInit: hasStartedInit.current
+    });
+
+    // 1. Wait for features to be loaded
+    if (isLoading) {
+      console.log('⏳ [LazyModuleInitializer] Waiting for features to load...');
       return;
     }
-    hasInitialized.current = true;
-    console.log('🚨 [LazyModuleInitializer] PAST hasInitialized check - will initialize!');
+
+    // 2. Prevent double initialization
+    if (hasStartedInit.current) {
+      console.log('🚨 [LazyModuleInitializer] Skipping - already started initialization');
+      return;
+    }
+
+    // 3. Mark as started to prevent re-entry
+    hasStartedInit.current = true;
+    console.log('🚨 [LazyModuleInitializer] PAST checks - will initialize!');
 
     const startTime = performance.now();
-    console.log('🚨 [LazyModuleInitializer] About to call init()');
     logger.info('App', '🚀 Starting background module initialization');
 
     const init = async () => {
@@ -95,7 +108,7 @@ export default function LazyModuleInitializer() {
 
     init();
     console.log('🚨 [LazyModuleInitializer] init() called (async execution)');
-  }, []); // Empty deps - run once on mount
+  }, [isLoading, activeFeatures, setModulesInitialized]); // Depend on loading state
 
   // No UI - just background initialization
   return null;

@@ -14,7 +14,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { useAlertsActions } from '@/shared/alerts';
-import { useMaterials } from '@/pages/admin/supply-chain/materials/hooks/useMaterials';
+import { useMaterials } from '@/modules/materials/hooks';
 import { useAlertsWorker } from '@/lib/alerts/hooks/useAlertsWorker';
 import { logger } from '@/lib/logging';
 import type { MaterialItem, MaterialABC } from '@/pages/admin/supply-chain/materials/types';

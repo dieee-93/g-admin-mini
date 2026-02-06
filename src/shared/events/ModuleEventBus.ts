@@ -32,6 +32,53 @@ export interface ModuleEvents {
   'sale.payment_processed': { saleId: string; paymentMethod: string; amount: number };
   'sale.analytics_updated': { totalSales: number; averageTicket: number; topItems: any[] };
 
+  // Sales Payment events (from Sales Module)
+  'sales.payment.completed': {
+    saleId: string;
+    paymentId: string;
+    amount: number;
+    paymentMethod: string;
+    timestamp: string;
+  };
+  'sales.order_cancelled': {
+    saleId: string;
+    reason?: string;
+    timestamp: string;
+  };
+
+  // Cash Management events (from Accounting Module)
+  'cash.payment.recorded': {
+    paymentId: string;
+    saleId: string;
+    amount: number;
+    paymentMethod: string;
+    sessionId: string;
+    shiftId: string;
+    status: string;
+    timestamp: string;
+  };
+  'cash.sale.recorded': {
+    paymentId: string;
+    saleId: string;
+    amount: number;
+    sessionId: string;
+    timestamp: string;
+  };
+  'cash.sale.failed': {
+    paymentId: string;
+    paymentMethod: string;
+    error: string;
+    timestamp: string;
+  };
+  'cash.refund.recorded': {
+    refundId: string;
+    saleId: string;
+    originalPaymentId: string;
+    amount: number;
+    paymentMethod: string;
+    timestamp: string;
+  };
+
   // Product events
   'product.created': { productId: string; productData: any };
   'product.updated': { productId: string; productData: any };
@@ -349,9 +396,9 @@ export class ModuleIntegrations {
       // Trigger MRR calculation update
       if (subscriptionData.amount) {
         const monthlyAmount = subscriptionData.billingType === 'monthly' ? subscriptionData.amount :
-                             subscriptionData.billingType === 'quarterly' ? subscriptionData.amount / 3 :
-                             subscriptionData.billingType === 'annual' ? subscriptionData.amount / 12 :
-                             subscriptionData.amount;
+          subscriptionData.billingType === 'quarterly' ? subscriptionData.amount / 3 :
+            subscriptionData.billingType === 'annual' ? subscriptionData.amount / 12 :
+              subscriptionData.amount;
 
         moduleEventBus.emit('analytics.generated', {
           module: 'billing',
@@ -1181,7 +1228,7 @@ export class ModuleIntegrations {
 
       // Create alerts based on condition deterioration
       if ((previousCondition === 'excellent' && newCondition !== 'excellent') ||
-          (previousCondition === 'good' && ['fair', 'poor', 'damaged'].includes(newCondition))) {
+        (previousCondition === 'good' && ['fair', 'poor', 'damaged'].includes(newCondition))) {
         moduleEventBus.emit('analytics.insight_created', {
           module: 'asset',
           insight: `Deterioro de condición en asset ${assetId}: ${previousCondition} → ${newCondition}${reason ? ` (${reason})` : ''}`,
@@ -1406,7 +1453,7 @@ export class ModuleIntegrations {
 
       // Update asset condition based on damage severity
       const newCondition = severity === 'critical' ? 'out_of_service' :
-                          severity === 'major' ? 'damaged' : 'fair';
+        severity === 'major' ? 'damaged' : 'fair';
 
       moduleEventBus.emit('asset.condition_changed', {
         assetId,

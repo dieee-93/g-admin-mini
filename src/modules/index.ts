@@ -51,7 +51,7 @@ import { productsManifest } from './products/manifest';
 // import { productsAnalyticsManifest } from './products/analytics/manifest';
 // import { recipeManifest } from './recipe/manifest';
 
-import { assetsManifest } from './assets/manifest';
+import { productionEquipmentManifest } from './production-equipment/manifest';
 
 // ============================================
 // OPERATIONS DOMAIN - Daily operations
@@ -142,13 +142,13 @@ export const ALL_MODULE_MANIFESTS = [
 
   schedulingManifest,    // ✅ Depends on: team
   productsManifest,      // ✅ Depends on: materials
-  
+
   // DISABLED: Sub-modules not supported in simplified architecture
   // productsAnalyticsManifest, // ❌ DISABLED: No sub-module support (depends on products which is OPTIONAL)
   // recipeManifest,        // ❌ DISABLED: No sub-module support (depends on materials + products which are OPTIONAL)
-  
+
   productionManifest,    // ✅ RENAMED from kitchen - Depends on: materials
-  assetsManifest,        // ✅ Inventory durable (equipment, tools, machinery)
+  productionEquipmentManifest,  // ✅ Production equipment with costing (depreciation, maintenance)
   // NOTE: materialsProcurementManifest deprecated - supplier orders now integrated in suppliersManifest
 
   // ============================================
@@ -170,7 +170,7 @@ export const ALL_MODULE_MANIFESTS = [
   storefrontManifest,  // ✅ NEW Phase 3: Storefront configuration & digital menu
   shippingManifest,  // ✅ NEW Phase 3: External shipping (postal, couriers)
   mobileManifest,             // ✅ NEW Phase 2: Mobile operations (GPS, routes, inventory)
-  
+
 
   // ============================================
   // TIER 5: Third-level dependencies
@@ -210,14 +210,14 @@ export {
   materialsManifest,
   // NOTE: materialsProcurementManifest deprecated - integrated in suppliers
   suppliersManifest,
-  
+
   // DISABLED: Sub-modules not supported in simplified architecture
   // productsAnalyticsManifest,  // ❌ DISABLED: No sub-module support
   // recipeManifest,              // ❌ DISABLED: No sub-module support
-  
+
   productsManifest,
   productionManifest,
-  assetsManifest,
+  productionEquipmentManifest,
 
   // Operations domain
   salesManifest,
@@ -261,17 +261,14 @@ export type { ModuleManifest } from '@/lib/modules/types';
  * Module count by domain (for debugging/monitoring)
  */
 export const MODULE_STATS = {
-  total: ALL_MODULE_MANIFESTS.length, // 34 modules
+  total: ALL_MODULE_MANIFESTS.length,
   byDomain: {
     system: 2,        // achievements, shift-control (TIER 0)
-    core: 6,          // dashboard, settings, debug, customers, reporting, intelligence
-    supplyChain: 8,   // materials, suppliers, products, products-analytics, recipe, production, assets
-    operations: 8,    // sales, fulfillment, fulfillment-onsite, fulfillment-pickup, fulfillment-delivery, mobile, memberships, rentals
+    core: 4,          // dashboard, settings, debug, customers
+    supplyChain: 7,   // materials, suppliers, products, production, assets, shipping, storefront
+    operations: 6,    // sales, onsite, pickup, delivery, mobile, memberships, rentals
     resources: 2,     // team, scheduling
-    finance: 4,       // finance-corporate, payment-gateways, accounting, billing (consolidated)
-    gamification: 1,  // gamification
-    executive: 1,     // executive
+    finance: 4,       // finance-corporate, payment-gateways, accounting, billing
+    marketing: 3,     // loyalty, campaigns, social
   },
-  // Note: CORE modules loaded via CORE_MODULES array in bootstrap.ts
-  // See: src/lib/modules/constants.ts
 } as const;

@@ -44,6 +44,9 @@ export function useMaterials() {
     useShallow((state) => state.filters)
   );
   
+  // ✅ DEBUG: Identify which component is calling this hook
+  const caller = new Error().stack?.split('\n')[2]?.trim() || 'unknown';
+  console.log('[useMaterials] Hook called from:', caller);
   console.log('[useMaterials] Hook called with filters:', filters);
   
   const queryResult = useQuery<MaterialItem[], Error>({

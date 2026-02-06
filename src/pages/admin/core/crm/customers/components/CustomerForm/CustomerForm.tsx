@@ -306,7 +306,7 @@ const CustomerFormComponent = ({ customer, onSuccess, onCancel }: CustomerFormPr
 
       {/* Action Buttons */}
       <Flex
-        gap="3"
+        gap="2"
         pt="4"
         justify={{ base: 'stretch', md: 'flex-end' }}
         direction={{ base: 'column-reverse', md: 'row' }}

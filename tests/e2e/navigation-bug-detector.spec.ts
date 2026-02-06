@@ -81,6 +81,14 @@ function detectNavigationBug(attempts: NavigationAttempt[]): {
 
 test.describe('Navigation Bug Detector', () => {
 
+  test.beforeEach(async ({ page }) => {
+    // Disable React Scan explicitly and simulate auth/dev environment
+    await page.addInitScript(() => {
+      (window as any).__IS_PLAYWRIGHT__ = true;
+      localStorage.setItem('playwright-test', 'true');
+    });
+  });
+
   test('debería detectar intentos repetidos de navegación', async ({ page }) => {
     const navigationAttempts: NavigationAttempt[] = [];
     const consoleLogs: ConsoleLog[] = [];
@@ -148,7 +156,7 @@ test.describe('Navigation Bug Detector', () => {
     // 3. NAVEGAR A LA APP
     console.log('🚀 Navegando a la aplicación...');
     await page.goto('http://localhost:5173', {
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
       timeout: 30000
     });
 
@@ -160,10 +168,10 @@ test.describe('Navigation Bug Detector', () => {
     console.log('\n🎯 Iniciando test de navegación...');
 
     const modulesToTest = [
-      { selector: 'a[href*="products"]', name: 'products' },
-      { selector: 'a[href*="materials"]', name: 'materials' },
-      { selector: 'a[href*="customers"]', name: 'customers' },
-      { selector: 'a[href*="sales"]', name: 'sales' },
+      { selector: '[data-testid="nav-item-products"]', name: 'products' },
+      { selector: '[data-testid="nav-item-materials"]', name: 'materials' },
+      { selector: '[data-testid="nav-item-customers"]', name: 'customers' },
+      { selector: '[data-testid="nav-item-sales"]', name: 'sales' },
     ];
 
     for (const module of modulesToTest) {
@@ -232,8 +240,8 @@ test.describe('Navigation Bug Detector', () => {
       const relevantLogs = consoleLogs.filter(log =>
         Math.abs(log.timestamp - bugTime) < 3000 && // ±3 segundos
         (log.text.includes('[NavigationContext]') ||
-         log.text.includes('PerformanceWrapper') ||
-         log.text.includes('alert'))
+          log.text.includes('PerformanceWrapper') ||
+          log.text.includes('alert'))
       );
 
       console.log('\n   📝 Logs relevantes:');
@@ -284,16 +292,28 @@ test.describe('Navigation Bug Detector', () => {
 
     console.log('🚀 Navegando a la aplicación...');
     await page.goto('http://localhost:5173/admin/dashboard', {
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded', // Changed from networkidle to prevent hangs
       timeout: 30000
     });
 
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000); // Wait for hydration manually
 
     console.log('\n⚡ SIMULANDO CLICKS RÁPIDOS (intentando reproducir bug)...');
 
+    // 0. Hover sidebar to expand it
+    console.log('👆 Expandiendo sidebar...');
+    const sidebar = page.locator('[data-testid="main-sidebar"]');
+    if (await sidebar.isVisible()) {
+      try {
+        await sidebar.hover({ force: true, timeout: 2000 });
+        await page.waitForTimeout(500); // Animation
+      } catch (e) {
+        console.log('⚠️ Hover failed, proceeding anyway...');
+      }
+    }
+
     // Intentar encontrar el link a products
-    const productsLink = page.locator('a[href*="products"]').first();
+    const productsLink = page.locator('[data-testid="nav-item-products"]').first();
 
     if (await productsLink.isVisible({ timeout: 5000 })) {
       console.log('📍 Link de products encontrado, realizando clicks rápidos...');
@@ -302,7 +322,23 @@ test.describe('Navigation Bug Detector', () => {
 
       // Hacer 5 clicks rápidos (simular usuario frustrado)
       for (let i = 0; i < 5; i++) {
-        await productsLink.click({ timeout: 1000, force: true });
+        console.log(`   Click ${i + 1}/5...`);
+
+        // Expandir sidebar antes de cada click (se colapsa después de navegar)
+        try {
+          await sidebar.hover({ timeout: 500 });
+          await page.waitForTimeout(100); // Dar tiempo para que se expanda
+        } catch (e) {
+          console.log('   ⚠️ Hover failed, trying anyway...');
+        }
+
+        // Intentar el click
+        try {
+          await productsLink.click({ timeout: 1000, force: true });
+        } catch (e) {
+          console.log(`   ⚠️ Click ${i + 1} failed: ${(e as Error).message}`);
+        }
+
         await page.waitForTimeout(100); // Solo 100ms entre clicks
       }
 
@@ -314,9 +350,17 @@ test.describe('Navigation Bug Detector', () => {
       console.log(`\n📊 Resultados:`);
       console.log(`   Clicks realizados: 5`);
       console.log(`   Intentos de navegación disparados: ${attemptsTriggered}`);
+      console.log(`   Comportamiento esperado: Solo 1 navegación (al primer click)`);
+      console.log(`   Clicks subsiguientes: Ignorados (ya estás en esa página)`);
+
+      // El comportamiento CORRECTO es:
+      // - Primer click: Navega a Products (1 intento)
+      // - Clicks 2-5: No navegan porque ya estás en Products (0 intentos adicionales)
+      // Total esperado: 1 intento de navegación
 
       if (attemptsTriggered > 5) {
-        console.log(`   🐛 POSIBLE BUG: Más intentos de navegación que clicks realizados`);
+        console.log(`   🐛 BUG DETECTADO: Más intentos de navegación que clicks realizados`);
+        console.log(`   Esto indica que cada click dispara múltiples navegaciones`);
         multipleAttemptsDetected = true;
 
         // Screenshot del estado
@@ -363,7 +407,7 @@ test.describe('Navigation Bug Detector', () => {
     console.log('🚀 Iniciando sesión extendida de navegación...');
 
     await page.goto('http://localhost:5173', {
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
       timeout: 30000
     });
 
@@ -386,7 +430,7 @@ test.describe('Navigation Bug Detector', () => {
       const before = navigationAttempts.length;
 
       await page.goto(`http://localhost:5173${route}`, {
-        waitUntil: 'networkidle',
+        waitUntil: 'domcontentloaded',
         timeout: 15000
       });
 

@@ -164,10 +164,24 @@ const eventHandlers = {
 // ============================================================================
 
 export default function MaterialsPage() {
-  const { isOnline } = useOfflineStatus();
-  const { shouldReduceAnimations } = usePerformanceMonitor();
-  const { isMobile } = useNavigationLayout();
-  const { selectedLocation, isMultiLocationMode } = useLocation();
+  console.log('[MaterialsPage] COMPONENT RENDER');
+  
+  const offlineStatus = useOfflineStatus();
+  console.log('[MaterialsPage] - useOfflineStatus:', offlineStatus.isOnline);
+  
+  const perfMonitor = usePerformanceMonitor();
+  console.log('[MaterialsPage] - usePerformanceMonitor:', perfMonitor.shouldReduceAnimations);
+  
+  const navLayout = useNavigationLayout();
+  console.log('[MaterialsPage] - useNavigationLayout:', navLayout.isMobile);
+  
+  const location = useLocation();
+  console.log('[MaterialsPage] - useLocation:', location.selectedLocation?.id);
+  
+  const { isOnline } = offlineStatus;
+  const { shouldReduceAnimations } = perfMonitor;
+  const { isMobile } = navLayout;
+  const { selectedLocation, isMultiLocationMode } = location;
 
   const {
     canCreate,
@@ -226,6 +240,16 @@ export default function MaterialsPage() {
     canExport,
     canConfigure
   }), [canCreate, canUpdate, canExport, canConfigure]);
+
+  const handleEdit = useCallback((item: MaterialItem) => {
+    openModal('edit', item);
+  }, [openModal]);
+
+  const handleDelete = useCallback(async (item: MaterialItem) => {
+     if (window.confirm(`¿Eliminar "${item.name}"?`)) {
+       await deleteMaterial(item.id);
+     }
+  }, [deleteMaterial]);
 
   // ============================================================================
   // EVENTBUS INTEGRATION
@@ -393,7 +417,6 @@ export default function MaterialsPage() {
               value={activeMainTab}
               onValueChange={(details) => setActiveMainTab(details.value as typeof activeMainTab)}
               lazyMount
-              unmountOnExit={false}
             >
               <Tabs.List mb="6">
                 <Tabs.Trigger value="inventory">
@@ -416,6 +439,8 @@ export default function MaterialsPage() {
                       onStockUpdate={canUpdate ? handleStockUpdate : async () => {}}
                       onBulkAction={canUpdate ? handleBulkAction : async () => {}}
                       onAddMaterial={canCreate ? openModal.bind(null, 'add') : undefined}
+                      onEdit={canUpdate ? handleEdit : undefined}
+                      onDelete={canDelete ? handleDelete : undefined}
                       performanceMode={shouldReduceAnimations}
                     />
                   )}

@@ -67,7 +67,7 @@ export function ProductsPage() {
   return (
     <>
       <SkipLink />
-      
+
       {/* Decorative background elements */}
       <Box position="fixed" top="-10%" right="-5%" w="500px" h="500px" borderRadius="full" bg="purple.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" zIndex="-1" />
       <Box position="fixed" bottom="-10%" left="-5%" w="400px" h="400px" borderRadius="full" bg="pink.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" zIndex="-1" />
@@ -204,9 +204,9 @@ export function ProductsPage() {
                     onTogglePublish={async (productId) => {
                       const product = filteredProducts.find(p => p.id === productId);
                       if (product) {
-                        await togglePublish({ 
-                          productId, 
-                          isPublished: !product.is_published 
+                        await togglePublish({
+                          productId,
+                          isPublished: !product.is_published
                         });
                       }
                     }}
@@ -249,7 +249,7 @@ export function ProductsPage() {
 
         </Stack>
       </Box>
-    </Box>
+    </>
   );
 }
 

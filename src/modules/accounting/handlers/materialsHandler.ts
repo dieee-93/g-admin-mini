@@ -5,7 +5,7 @@
  */
 
 import { logger } from '@/lib/logging/Logger';
-import { EventBus } from '@/lib/events/EventBus';
+import eventBus from '@/lib/events/EventBus';
 import type { EventHandler } from '@/lib/events/types';
 import { createJournalEntry } from '../services/journalService';
 import { getAccountByCode } from '../services/chartOfAccountsService';
@@ -97,15 +97,14 @@ export const handleMaterialsPurchaseApproved: EventHandler<
     });
 
     // Emitir evento de confirmación
-    await EventBus.emit(
+    await eventBus.emit(
       'cash.purchase.recorded',
       {
         supplierOrderId: payload.supplierOrderId,
         supplierId: payload.supplierId,
         amount: payload.total,
         timestamp: new Date().toISOString(),
-      },
-      'CashModule'
+      }
     );
   } catch (error) {
     logger.error('CashModule', 'Failed to process purchase approval', {
@@ -225,15 +224,14 @@ export const handleSupplierPaid: EventHandler<SupplierPaidEvent> = async (
     });
 
     // Emitir evento de confirmación
-    await EventBus.emit(
+    await eventBus.emit(
       'cash.supplier_payment.recorded',
       {
         paymentId: payload.paymentId,
         supplierId: payload.supplierId,
         amount: payload.amount,
         timestamp: new Date().toISOString(),
-      },
-      'CashModule'
+      }
     );
   } catch (error) {
     logger.error('CashModule', 'Failed to process supplier payment', {
@@ -250,8 +248,8 @@ export function registerMaterialsHandlers(): () => void {
   logger.info('CashModule', 'Registering materials event handlers');
 
   const unsubscribers = [
-    EventBus.on('materials.purchase.approved', handleMaterialsPurchaseApproved),
-    EventBus.on('materials.supplier.paid', handleSupplierPaid),
+    eventBus.on('materials.purchase.approved', handleMaterialsPurchaseApproved),
+    eventBus.on('materials.supplier.paid', handleSupplierPaid),
   ];
 
   return () => {

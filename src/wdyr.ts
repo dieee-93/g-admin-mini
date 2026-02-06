@@ -35,12 +35,17 @@ const isPlaywrightTest = typeof window !== 'undefined' && (
   navigator.webdriver === true || 
   (window as any).playwright !== undefined ||
   (window as any).__playwright !== undefined ||
+  (window as any).__IS_PLAYWRIGHT__ === true ||
   localStorage.getItem('playwright-test') === 'true'
 );
 
-// Set localStorage flag when Playwright is detected by other means
-if (typeof window !== 'undefined' && (navigator.webdriver || (window as any).playwright)) {
-  localStorage.setItem('playwright-test', 'true');
+// Debug detection
+if (typeof window !== 'undefined') {
+  console.log('🕵️ [WDYR] Detection:', {
+    webdriver: navigator.webdriver,
+    isPlaywright: isPlaywrightTest,
+    ls: localStorage.getItem('playwright-test')
+  });
 }
 
 if (import.meta.env.DEV && typeof window !== 'undefined' && !isPlaywrightTest) {

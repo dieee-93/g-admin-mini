@@ -1044,246 +1044,18 @@ export function countFeaturesByDomain(): Record<Feature['domain'], number> {
 // MODULE FEATURE MAP
 // ============================================
 
-/**
- * @deprecated MODULE_FEATURE_MAP - LEGACY STATIC MAPPING
- *
- * ⚠️ DEPRECATION NOTICE (2026-01-19):
- * This map is NO LONGER USED in production code.
- * Module loading is now handled by:
- * - CORE_MODULES array (src/lib/modules/constants.ts)
- * - OPTIONAL_MODULES mapping (src/lib/modules/constants.ts)
- * - Bootstrap logic (src/lib/modules/bootstrap.ts)
- *
- * This map is ONLY used in legacy tests and should be removed in a future refactor.
- *
- * LEGACY PROPERTIES (no longer relevant):
- * - alwaysActive → REPLACED by CORE_MODULES array
- * - activatedBy → NOW in manifest.activatedBy (for OPTIONAL modules)
- * - enhancedBy → REMOVED (over-engineering, not used)
- *
- * @see src/lib/modules/constants.ts for current module loading logic
- * @see docs/plans/2026-01-19-capabilities-architecture-simplification.md
- */
-export const MODULE_FEATURE_MAP: Record<string, {
-  alwaysActive?: boolean;
-  activatedBy?: FeatureId;
-  enhancedBy?: FeatureId[];
-  description?: string;
-}> = {
-  // ============================================
-  // CORE MODULES (Always Active)
-  // ============================================
-
-  'dashboard': {
-    alwaysActive: true,
-    description: 'Dashboard principal - siempre visible'
-  },
-
-  'settings': {
-    alwaysActive: true,
-    description: 'Configuración del sistema - siempre visible'
-  },
-
-  'gamification': {
-    alwaysActive: true,
-    description: 'Sistema de logros - siempre visible para motivar progreso'
-  },
-
-  'debug': {
-    alwaysActive: true,
-    description: 'Herramientas de debug - visible solo para SUPER_ADMIN (filtrado por role)'
-  },
-
-  // ============================================
-  // BUSINESS MODULES - Staff & Resources
-  // ============================================
-
-  'shift-control': {
-    alwaysActive: true,
-    description: 'Sistema de control de turnos - coordinación centralizada'
-  },
-
-  'team': {
-    activatedBy: 'staff_employee_management',
-    enhancedBy: ['staff_labor_cost_tracking'],
-    description: 'Módulo de personal - gestión de empleados y turnos'
-  },
-
-  'scheduling': {
-    activatedBy: 'staff_shift_management',
-    enhancedBy: ['staff_time_tracking', 'staff_labor_cost_tracking'],
-    description: 'Módulo de programación - turnos y calendarios'
-  },
-
-  // ============================================
-  // SUPPLY CHAIN MODULES
-  // ============================================
-
-  'materials': {
-    activatedBy: 'inventory_stock_tracking',
-    description: 'Módulo de inventario - gestión de materiales y stock'
-  },
-
-  'suppliers': {
-    activatedBy: 'inventory_supplier_management',
-    enhancedBy: ['inventory_demand_forecasting'],
-    description: 'Módulo de gestión de proveedores'
-  },
-
-  'products': {
-    alwaysActive: true,
-    description: 'Módulo de productos - catálogos y gestión (core: all businesses have products)'
-  },
-
-  'recipe': {
-    activatedBy: 'products_recipe_management',
-    description: 'Gestión de recetas y BOM'
-  },
-
-  'products-analytics': {
-    activatedBy: 'products_cost_intelligence',
-    enhancedBy: ['can_view_menu_engineering'],
-    description: 'Analytics de productos - análisis de costos y rentabilidad'
-  },
-
-  // ============================================
-  // OPERATIONS MODULES
-  // ============================================
-
-  'sales': {
-    alwaysActive: true,
-    enhancedBy: ['sales_payment_processing', 'sales_pos_onsite', 'sales_dine_in_orders'],
-    description: 'Módulo de ventas - gestión de órdenes y pagos (core: sales_order_management)'
-  },
-
-  'customers': {
-    alwaysActive: true,
-    description: 'Módulo CRM - gestión de clientes (core: all businesses have customers)'
-  },
-
-  'fulfillment': {
-    alwaysActive: true,
-    enhancedBy: ['sales_payment_processing'],
-    description: 'Módulo unificado de fulfillment - gestiona órdenes onsite, pickup y delivery'
-  },
-
-  'onsite': {
-    activatedBy: 'operations_table_management',
-    enhancedBy: ['operations_table_assignment', 'operations_floor_plan_config'],
-    description: 'Fulfillment onsite - gestión de mesas y servicio en local'
-  },
-
-  'pickup': {
-    activatedBy: 'sales_pickup_orders',
-    enhancedBy: ['operations_pickup_scheduling'],
-    description: 'Fulfillment pickup - gestión de órdenes para retirar'
-  },
-
-  // ============================================
-  // FINANCE MODULES
-  // ============================================
-
-  'billing': {
-    activatedBy: 'finance_invoice_scheduling',
-    enhancedBy: ['customer_loyalty_program'],
-    description: 'Facturación e Impuestos - billing recurrente, suscripciones y cumplimiento tributario (consolidado)'
-  },
-
-  'finance-corporate': {
-    activatedBy: 'finance_corporate_accounts',
-    enhancedBy: ['finance_credit_management', 'finance_payment_terms'],
-    description: 'Finance B2B - gestión de cuentas corporativas y crédito'
-  },
-
-  'payment-gateways': {
-    alwaysActive: true,
-    enhancedBy: ['operations_shipping_integration'],
-    description: 'Integraciones de pago - MercadoPago, MODO, pasarelas'
-  },
-
-  'accounting': {
-    alwaysActive: true,
-    description: 'Gestión de caja - sesiones, movimientos, conciliación (core financial operation)'
-  },
-
-  // ============================================
-  // ADVANCED MODULES
-  // ============================================
-
-  'memberships': {
-    activatedBy: 'membership_subscription_plans',
-    enhancedBy: ['membership_recurring_billing', 'finance_payment_terms'],
-    description: 'Gestión de membresías y suscripciones - planes y cobros recurrentes'
-  },
-
-  'rentals': {
-    activatedBy: 'rental_item_management',
-    enhancedBy: ['rental_booking_calendar', 'rental_availability_tracking', 'scheduling_calendar_management'],
-    description: 'Gestión de alquileres - equipos, espacios, recursos'
-  },
-
-  'assets': {
-    alwaysActive: true,
-    description: 'Gestión de activos - equipos, vehículos, mantenimiento'
-  },
-
-  // ============================================
-  // ANALYTICS MODULES
-  // ============================================
-
-  'reporting': {
-    alwaysActive: true,
-    description: 'Sistema de reportes y analytics'
-  },
-
-  'intelligence': {
-    alwaysActive: true,
-    description: 'Inteligencia de mercado y competencia - análisis de tendencias'
-  },
-
-  'executive': {
-    alwaysActive: true,
-    enhancedBy: ['executive'],
-    description: 'Business Intelligence ejecutivo - analytics avanzados'
-  }
-};
-
-// ============================================
-// ARCHITECTURE DECISION: STATIC MAP + TEST VALIDATION
-// ============================================
-
-/**
- * DECISION: We use a static MODULE_FEATURE_MAP instead of dynamic generation
- * 
- * WHY:
- * - Industry standard (ESLint, Babel, Webpack all do this)
- * - Simple: No build scripts, no AST parsing, no import resolution issues
- * - Fast: No runtime overhead
- * - Validated: Test ensures map stays in sync with manifests
- * 
- * TRADE-OFF:
- * - Intentional duplication between MODULE_FEATURE_MAP and module manifests
- * - Validated by: src/__tests__/module-feature-map-validation.test.ts
- * 
- * MAINTAINING:
- * 1. When you add/modify a module manifest, update MODULE_FEATURE_MAP
- * 2. Run: pnpm test src/__tests__/module-feature-map-validation.test.ts
- * 3. CI will fail if they drift out of sync
- * 
- * @see src/__tests__/module-feature-map-validation.test.ts
- */
-
 // ============================================
 // FEATURE → UI MAPPING FUNCTIONS
 // ============================================
+
+import { CORE_MODULES, OPTIONAL_MODULES } from '@/lib/modules/constants';
 
 /**
  * Obtiene módulos activos para un conjunto de features
  *
  * NUEVA ARQUITECTURA (clean, validated with industry research):
- * - alwaysActive → module always in navigation
- * - activatedBy → module appears if user has this ONE feature
- * - enhancedBy → extra features that add functionality (but don't activate module)
+ * - Uses CORE_MODULES from constants.ts (always active)
+ * - Uses OPTIONAL_MODULES from constants.ts (checked against active features)
  *
  * @param features - Array de FeatureIds activas
  * @returns Array de module IDs (routes) que deberían aparecer en navegación
@@ -1295,18 +1067,15 @@ export const MODULE_FEATURE_MAP: Record<string, {
 export function getModulesForActiveFeatures(features: FeatureId[]): string[] {
   const activeModules = new Set<string>();
 
-  Object.entries(MODULE_FEATURE_MAP).forEach(([moduleId, config]) => {
-    // Case 1: Always-active modules (dashboard, settings, customers, etc.)
-    if (config.alwaysActive) {
-      activeModules.add(moduleId);
-      return;
-    }
+  // 1. Add CORE modules (Always active)
+  CORE_MODULES.forEach(moduleId => {
+    activeModules.add(moduleId);
+  });
 
-    // Case 2: Modules activated by a single feature
-    // (Odoo pattern: single 'depends' feature)
-    if (config.activatedBy && features.includes(config.activatedBy)) {
+  // 2. Add OPTIONAL modules if their requirement is met
+  Object.entries(OPTIONAL_MODULES).forEach(([moduleId, requiredFeature]) => {
+    if (features.includes(requiredFeature)) {
       activeModules.add(moduleId);
-      // Note: enhancedBy features don't affect activation, only add functionality
     }
   });
 

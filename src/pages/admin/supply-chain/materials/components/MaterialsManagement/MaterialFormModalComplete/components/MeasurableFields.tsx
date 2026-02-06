@@ -23,7 +23,7 @@ export const MeasurableFields = memo(function MeasurableFields({
       {/* Measurement Unit - Only config field */}
       <SelectField
         label="Unidad de Medición"
-        placeholder="Selecciona la unidad de medición"
+        placeholder="Selecciona la unidad"
         collection={MEASURABLE_UNITS_COLLECTION}
         value={formData.unit ? [formData.unit] : []}
         onValueChange={(details) =>

@@ -33,6 +33,7 @@ interface BaseMetricProps {
     colorPalette: 'gray' | 'green' | 'orange' | 'red' | 'blue';
     variant?: 'solid' | 'subtle' | 'outline' | 'surface';
   };
+  [key: string]: any; // Allow other props like data-testid
 }
 
 export function MetricCard({
@@ -45,7 +46,8 @@ export function MetricCard({
   onClick,
   trend,
   change,
-  badge
+  badge,
+  ...rest
 }: BaseMetricProps) {
 
   const formatValue = (val: string | number) => {
@@ -81,6 +83,7 @@ export function MetricCard({
       } : {}}
       transition="all 0.2s ease"
       p="6" // Padding explícito
+      {...rest}
     >
       <Stack gap="4" align="start" width="full">
         {/* Header Row: Icon + Badge */}

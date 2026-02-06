@@ -82,6 +82,14 @@ vi.mock('@/store/appStore', () => ({
   useAppStore: (selector: any) => selector({ modulesInitialized: true }),
 }));
 
+vi.mock('@/contexts/FeatureFlagContext', () => ({
+  useFeatureFlags: () => ({
+    activeModules: mockActiveModules,
+    isLoading: false,
+    isModuleActive: (id: string) => mockActiveModules.includes(id),
+  }),
+}));
+
 vi.mock('@/config/FeatureRegistry', () => ({
   getDynamicModuleFeatureMap: () => ({
     sales: { requiredFeatures: [], alwaysActive: false },

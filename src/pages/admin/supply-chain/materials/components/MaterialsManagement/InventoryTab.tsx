@@ -83,6 +83,8 @@ interface InventoryTabProps {
   onStockUpdate: (itemId: string, newStock: number) => Promise<void>;
   onBulkAction: (action: string, itemIds: string[]) => Promise<void>;
   onAddMaterial?: () => void;
+  onEdit?: (item: any) => void;
+  onDelete?: (item: any) => void;
   performanceMode?: boolean;
 }
 
@@ -202,6 +204,8 @@ export const InventoryTab = memo(function InventoryTab({
   onStockUpdate,
   onBulkAction,
   onAddMaterial,
+  onEdit,
+  onDelete,
   performanceMode = false
 }: InventoryTabProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -367,14 +371,28 @@ export const InventoryTab = memo(function InventoryTab({
   // ============================================================================
 
   const handleEdit = useCallback((material: MaterialWithStock) => {
-    openMaterialForm('edit', material.id);
-  }, [openMaterialForm]);
+    if (onEdit) {
+      onEdit(material);
+    } else {
+      openMaterialForm('edit', material.id);
+    }
+  }, [onEdit, openMaterialForm]);
 
   const handleView = useCallback((material: MaterialWithStock) => {
-    openMaterialForm('edit', material.id);
-  }, [openMaterialForm]);
+    if (onEdit) {
+      // View uses edit modal for now
+      onEdit(material);
+    } else {
+      openMaterialForm('edit', material.id);
+    }
+  }, [onEdit, openMaterialForm]);
 
   const handleDelete = useCallback(async (material: MaterialWithStock) => {
+    if (onDelete) {
+      onDelete(material);
+      return;
+    }
+
     if (!window.confirm(`¿Eliminar "${material.name}"?`)) return;
     
     try {
@@ -382,7 +400,7 @@ export const InventoryTab = memo(function InventoryTab({
     } catch (error) {
       logger.error('MaterialsStore', 'Error deleting material:', error);
     }
-  }, [deleteMutation]);
+  }, [onDelete, deleteMutation]);
 
   // ============================================================================
   // MATERIALTABLE CALLBACKS (MEMOIZED FOR PERFORMANCE)
@@ -766,7 +784,9 @@ export const InventoryTab = memo(function InventoryTab({
     prevProps.onStockUpdate === nextProps.onStockUpdate &&
     prevProps.onBulkAction === nextProps.onBulkAction &&
     prevProps.onAddMaterial === nextProps.onAddMaterial &&
-    prevProps.performanceMode === nextProps.performanceMode
+    prevProps.performanceMode === nextProps.performanceMode &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete
   );
 });
 

@@ -28,6 +28,7 @@ import type { Supplier } from '@/pages/admin/supply-chain/suppliers/types/suppli
 import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 import { BrandSelectField } from '@/pages/admin/supply-chain/shared/brands';
 import { useMaterialForm } from './hooks/useMaterialForm';
+import { useMaterialFormValidation } from '../../hooks/useMaterialFormValidation';
 import { TypeSelector } from './components/TypeSelector';
 import { MeasurableFields } from './components/MeasurableFields';
 import { CountableFields } from './components/CountableFields';
@@ -37,6 +38,8 @@ import { SupplierFields } from './components/SupplierFields';
 import { SectionCard } from './components/SectionCard';
 import { StockInitialFields, CountableStockFields } from './components/StockInitialFields';
 import { EventSourcingConfirmation } from './components/EventSourcingConfirmation';
+import { ValidationSummaryAlert } from './components/ValidationSummaryAlert';
+import { MaterialFormProgressIndicator } from './components/MaterialFormProgressIndicator';
 import { CATEGORY_COLLECTION } from './constants';
 
 export interface MaterialFormDialogProps {
@@ -74,6 +77,9 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
     confirmAndSubmit,
   } = useMaterialForm({ isOpen, onClose, mode, item });
 
+  // 🆕 NEW: Validation hook for UI feedback
+  const { validation, getValidationSummary } = useMaterialFormValidation(formData);
+
   // Local states for CountableFields packaging
   const [packageQuantity, setPackageQuantity] = useState(1);
   const usePackaging = !!formData.packaging?.package_size;
@@ -102,7 +108,7 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
           formData={formData}
           updateFormData={updateFormData}
           fieldErrors={fieldErrors as Record<string, string>}
-          disabled={isViewMode}
+          disabled={isViewMode || mode === 'edit'}
         />
       );
     }
@@ -113,7 +119,7 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
           formData={formData}
           setFormData={updateFormData}
           errors={fieldErrors as Record<string, string>}
-          disabled={isViewMode}
+          disabled={isViewMode || mode === 'edit'}
         />
       );
     }
@@ -123,6 +129,7 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
         <ElaboratedFields
           formData={formData}
           setFormData={updateFormData}
+          isEditMode={mode === 'edit'}
         />
       );
     }
@@ -143,6 +150,9 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
     });
     setShowSupplierWizard(false);
   };
+
+  // DEBUG: Check field errors
+  console.log('🔍 [MaterialFormDialog] fieldErrors:', fieldErrors);
 
   return (
     <Dialog.Root
@@ -199,7 +209,15 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
               },
             }}
           >
-            <Stack gap="5">
+            {/* 🆕 SEMANTIC HTML: Form element for accessibility and Enter key support */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+              id="material-form"
+            >
+              <Stack gap="5">
               {/* Wizard Mode: Supplier Creation */}
               {showSupplierWizard ? (
                 <HookPoint
@@ -280,11 +298,7 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
 
                           <Box>
                             <SelectField
-                              label={
-                                <>
-                                  Categoría del Producto <Text as="span" color="red.500">*</Text>
-                                </>
-                              }
+                              label="Categoría del Producto"
                               placeholder="¿A qué categoría pertenece?"
                               collection={CATEGORY_COLLECTION}
                               value={formData.category ? [formData.category] : []}
@@ -295,7 +309,6 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
                               }}
                               disabled={isViewMode}
                               error={fieldErrors.category}
-                              required
                               height="44px"
                               noPortal={true}
                               data-testid="material-category-select"
@@ -334,21 +347,21 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
                       icon={<Cog6ToothIcon style={{ width: '20px', height: '20px' }} />}
                     >
                       <Stack gap={{ base: "4", md: "5" }}>
-                        {/* Type Selector First */}
+                        {/* Type Selector First - Locked in Edit Mode */}
                         {!isViewMode && (
                           <TypeSelector
                             value={formData.type || ''}
                             onChange={handleTypeChange}
                             errors={fieldErrors as Record<string, string>}
-                            disabled={isViewMode}
+                            disabled={isViewMode || mode === 'edit'}
                           />
                         )}
 
                         {/* ⚡ Type-Specific Fields (Memoized for performance) */}
                         {typeSpecificFields}
 
-                        {/* Stock Switch - Only for MEASURABLE & COUNTABLE */}
-                        {formData.type && formData.type !== 'ELABORATED' && (
+                        {/* Stock Switch - Only for MEASURABLE & COUNTABLE - HIDDEN IN EDIT MODE */}
+                        {mode !== 'edit' && formData.type && formData.type !== 'ELABORATED' && (
                           <Box mt="3" pt="3" borderTop="1px solid" borderColor="gray.300">
                             <Flex justify="space-between" align="center" gap="4">
                               <Stack gap="1" flex="1">
@@ -438,42 +451,47 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
                   )}
 
                   {!isViewMode && (
-                    <Flex
-                      gap="3"
-                      pt="5"
-                      justify={{ base: "stretch", md: "flex-end" }}
-                      direction={{ base: "column-reverse", md: "row" }}
-                      borderTop="1px solid"
-                      borderColor="gray.300"
-                    >
-                      <Button
-                        variant="outline"
-                        onClick={onClose}
-                        disabled={isSubmitting}
-                        size="lg"
-                        style={{ width: "100%", minWidth: "120px" }}
-                      >
-                        Cancelar
-                      </Button>
+                    <>
+                      {/* 🆕 VALIDATION SUMMARY: Show errors and warnings */}
+                      <ValidationSummaryAlert
+                        errors={getValidationSummary()}
+                        warnings={validation.warnings}
+                      />
 
-                      <Button
-                        colorPalette="blue"
-                        variant="solid"
-                        onClick={handleSubmit}
-                        disabled={
-                          !formData.name ||
-                          !formData.type ||
-                          isSubmitting ||
-                          validationState.hasErrors
-                        }
-                        size="lg"
-                        style={{ width: "100%", minWidth: "140px" }}
-                        fontWeight="600"
-                        data-testid="submit-material"
+                      <Flex
+                        gap="3"
+                        pt="5"
+                        justify={{ base: "stretch", md: "flex-end" }}
+                        direction={{ base: "column-reverse", md: "row" }}
+                        borderTop="1px solid"
+                        borderColor="gray.300"
                       >
-                        {isSubmitting ? "Guardando..." : submitButtonContent}
-                      </Button>
-                    </Flex>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={onClose}
+                          disabled={isSubmitting}
+                          size="lg"
+                          style={{ width: "100%", minWidth: "120px" }}
+                        >
+                          Cancelar
+                        </Button>
+
+                        <Button
+                          type="submit"
+                          form="material-form"
+                          colorPalette="blue"
+                          variant="solid"
+                          disabled={!validation.canSubmit || isSubmitting}
+                          size="lg"
+                          style={{ width: "100%", minWidth: "140px" }}
+                          fontWeight="600"
+                          data-testid="submit-material"
+                        >
+                          {isSubmitting ? "Guardando..." : submitButtonContent}
+                        </Button>
+                      </Flex>
+                    </>
                   )}
 
                   {isViewMode && (
@@ -490,7 +508,8 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
                   )}
                 </>
               )}
-            </Stack>
+              </Stack>
+            </form>
           </Dialog.Body>
         </Dialog.Content>
       </Dialog.Positioner>

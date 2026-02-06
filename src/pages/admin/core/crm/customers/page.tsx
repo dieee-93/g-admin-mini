@@ -17,8 +17,8 @@
  */
 
 import {
-  ContentLayout, Section, CardGrid, MetricCard, SkipLink,
-  Button, Alert, Badge, HStack, Stack
+  ContentLayout, Section, SkipLink,
+  Button, Alert, Badge, HStack, Stack, Box, Text, SimpleGrid, Flex
 } from '@/shared/ui';
 import {
   UsersIcon,
@@ -86,93 +86,102 @@ function CustomersPage() {
       {/* ✅ SKIP LINK - First focusable element (WCAG 2.4.1 Level A) */}
       <SkipLink />
 
+      {/* Decorative background elements */}
+      <Box position="fixed" top="-10%" right="-5%" w="500px" h="500px" borderRadius="full" bg="purple.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" zIndex="-1" />
+      <Box position="fixed" bottom="-10%" left="-5%" w="400px" h="400px" borderRadius="full" bg="pink.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" zIndex="-1" />
+
       {/* ✅ MAIN CONTENT - Semantic <main> with ARIA label */}
       <ContentLayout spacing="normal" mainLabel="Customer Management">
 
         {/* ✅ HEADER SECTION - Title and actions */}
-        <Section
-          variant="flat"
-          title="Customers"
-          subtitle="Advanced CRM with RFM Analytics & Intelligent Segmentation"
-          semanticHeading="Customer Relationship Management Dashboard"
-          actions={
-            <HStack gap="2">
-              <Button
-                variant="outline"
-                colorPalette="blue"
-                onClick={actions.handleRFMAnalysis}
-                size="md"
-              >
-                <ChartBarIcon className="w-4 h-4" />
-                RFM Analysis
-              </Button>
-              <Button
-                variant="outline"
-                colorPalette="green"
-                onClick={actions.handleCustomerSegments}
-                size="md"
-              >
-                <UserGroupIcon className="w-4 h-4" />
-                Segmentation
-              </Button>
-              <Button
-                variant="outline"
-                colorPalette="red"
-                onClick={actions.handleChurnPrediction}
-                size="md"
-              >
-                <ExclamationTriangleIcon className="w-4 h-4" />
-                Churn Risk
-              </Button>
-              {canCreate && (
-                <Button
-                  colorPalette="pink"
-                  onClick={actions.handleNewCustomer}
-                  size="md"
-                >
-                  <PlusIcon className="w-4 h-4" />
-                  New Customer
-                </Button>
-              )}
-            </HStack>
-          }
-        />
+        <Flex justify="space-between" align="center" flexWrap="wrap" gap="4" mb="6">
+          <Flex align="center" gap="3">
+            <Box bg="linear-gradient(135deg, var(--chakra-colors-pink-500) 0%, var(--chakra-colors-pink-600) 100%)" p="3" borderRadius="xl" shadow="lg">
+              <Text fontSize="2xl">👥</Text>
+            </Box>
+            <Box>
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="extrabold" color="pink.600">
+                Customers
+              </Text>
+              <Text color="text.muted" fontSize="sm">Advanced CRM with RFM Analytics & Intelligent Segmentation</Text>
+            </Box>
+          </Flex>
 
-        {/* ✅ METRICS SECTION - Complementary aside pattern */}
-        <Section
-          as="aside"
-          variant="flat"
-          semanticHeading="Customer Metrics Overview"
-        >
-          <CardGrid columns={{ base: 1, md: 4 }}>
-            <MetricCard
-              title="Total Customers"
-              value={metrics.totalCustomers.toString()}
-              subtitle="registered customers"
-              icon={UsersIcon}
-            />
-            <MetricCard
-              title="Active Customers"
-              value={metrics.activeCustomers.toString()}
-              subtitle="this month"
-              icon={ArrowTrendingUpIcon}
+          <Flex gap="2" flexWrap="wrap">
+            <Button
+              variant="outline"
+              colorPalette="blue"
+              onClick={actions.handleRFMAnalysis}
+              size="md"
+            >
+              <ChartBarIcon className="w-4 h-4" />
+              RFM Analysis
+            </Button>
+            <Button
+              variant="outline"
               colorPalette="green"
-            />
-            <MetricCard
-              title="Average CLV"
-              value={DecimalUtils.formatCurrency(metrics.averageCLV)}
-              subtitle="customer lifetime value"
-              icon={CurrencyDollarIcon}
-            />
-            <MetricCard
-              title="At Risk"
-              value={metrics.atRiskCustomers.toString()}
-              subtitle="churn risk"
-              icon={ExclamationTriangleIcon}
-              colorPalette={metrics.atRiskCustomers > 0 ? "red" : "green"}
-            />
-          </CardGrid>
-        </Section>
+              onClick={actions.handleCustomerSegments}
+              size="md"
+            >
+              <UserGroupIcon className="w-4 h-4" />
+              Segmentation
+            </Button>
+            <Button
+              variant="outline"
+              colorPalette="red"
+              onClick={actions.handleChurnPrediction}
+              size="md"
+            >
+              <ExclamationTriangleIcon className="w-4 h-4" />
+              Churn Risk
+            </Button>
+            {canCreate && (
+              <Button
+                colorPalette="pink"
+                onClick={actions.handleNewCustomer}
+                size="md"
+              >
+                <PlusIcon className="w-4 h-4" />
+                New Customer
+              </Button>
+            )}
+          </Flex>
+        </Flex>
+
+        {/* ✅ METRICS SECTION - Gradient metric cards */}
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="4" mb="6">
+          {/* Total Customers */}
+          <Box position="relative" overflow="hidden" bg="bg.surface" p="4" borderRadius="xl" shadow="md" transition="all 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "lg" }}>
+            <Box position="absolute" top={0} left={0} right={0} h="3px" bg="linear-gradient(90deg, var(--chakra-colors-pink-400) 0%, var(--chakra-colors-pink-600) 100%)" />
+            <Text fontSize="xs" fontWeight="semibold" color="text.muted" textTransform="uppercase" mb="1">Total Customers</Text>
+            <Text fontSize="2xl" fontWeight="bold" color="pink.600">{metrics.totalCustomers}</Text>
+            <Text fontSize="xs" color="text.muted" mt="1">registered customers</Text>
+          </Box>
+
+          {/* Active Customers */}
+          <Box position="relative" overflow="hidden" bg="bg.surface" p="4" borderRadius="xl" shadow="md" transition="all 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "lg" }}>
+            <Box position="absolute" top={0} left={0} right={0} h="3px" bg="linear-gradient(90deg, var(--chakra-colors-green-400) 0%, var(--chakra-colors-green-600) 100%)" />
+            <Text fontSize="xs" fontWeight="semibold" color="text.muted" textTransform="uppercase" mb="1">Active Customers</Text>
+            <Text fontSize="2xl" fontWeight="bold" color="green.600">{metrics.activeCustomers}</Text>
+            <Text fontSize="xs" color="text.muted" mt="1">this month</Text>
+          </Box>
+
+          {/* Average CLV */}
+          <Box position="relative" overflow="hidden" bg="bg.surface" p="4" borderRadius="xl" shadow="md" transition="all 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "lg" }}>
+            <Box position="absolute" top={0} left={0} right={0} h="3px" bg="linear-gradient(90deg, var(--chakra-colors-blue-400) 0%, var(--chakra-colors-blue-600) 100%)" />
+            <Text fontSize="xs" fontWeight="semibold" color="text.muted" textTransform="uppercase" mb="1">Average CLV</Text>
+            <Text fontSize="2xl" fontWeight="bold" color="blue.600">{DecimalUtils.formatCurrency(metrics.averageCLV)}</Text>
+            <Text fontSize="xs" color="text.muted" mt="1">customer lifetime value</Text>
+          </Box>
+
+          {/* At Risk */}
+          <Box position="relative" overflow="hidden" bg="bg.surface" p="4" borderRadius="xl" shadow="md" transition="all 0.2s" _hover={{ transform: "translateY(-2px)", shadow: "lg" }}>
+            <Box position="absolute" top={0} left={0} right={0} h="3px" bg="linear-gradient(90deg, var(--chakra-colors-red-400) 0%, var(--chakra-colors-red-600) 100%)" />
+            <Text fontSize="xs" fontWeight="semibold" color="text.muted" textTransform="uppercase" mb="1">At Risk</Text>
+            <Text fontSize="2xl" fontWeight="bold" color={metrics.atRiskCustomers > 0 ? "red.600" : "green.600"}>{metrics.atRiskCustomers}</Text>
+            <Text fontSize="xs" color="text.muted" mt="1">churn risk</Text>
+          </Box>
+        </SimpleGrid>
 
         {/* ✅ CUSTOMER MANAGEMENT SECTION - Main content area */}
         <Section

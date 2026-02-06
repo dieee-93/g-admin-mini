@@ -1,0 +1,517 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mI:/Programacion/Proyectos/g-mini[39m
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for physical_products capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'physical_products'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m18[39m,
+  features: [
+    [32m'production_bom_management'[39m,
+    [32m'production_display_system'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'production_capacity_planning'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_purchase_orders'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'inventory_sku_management'[39m,
+    [32m'inventory_barcode_scanning'[39m,
+    [32m'inventory_multi_unit_tracking'[39m,
+    [32m'products_recipe_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'products_cost_intelligence'[39m,
+    [32m'products_availability_calculation'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m18[39m,
+  moduleCount: [33m11[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'materials'[39m,
+    [32m'products'[39m,
+    [32m'suppliers'[39m,
+    [32m'production'[39m,
+    [32m'production-kitchen'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for combined capabilities
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'physical_products'[39m, [32m'professional_services'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m2[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m31[39m,
+  features: [
+    [32m'production_bom_management'[39m,
+    [32m'production_display_system'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'production_capacity_planning'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_purchase_orders'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'inventory_sku_management'[39m,
+    [32m'inventory_barcode_scanning'[39m,
+    [32m'inventory_multi_unit_tracking'[39m,
+    [32m'products_recipe_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'products_cost_intelligence'[39m,
+    [32m'products_availability_calculation'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'scheduling_appointment_booking'[39m,
+    [32m'scheduling_calendar_management'[39m,
+    [32m'scheduling_reminder_system'[39m,
+    [32m'scheduling_availability_rules'[39m,
+    [32m'customer_service_history'[39m,
+    [32m'customer_preference_tracking'[39m,
+    [32m'sales_package_management'[39m,
+    [32m'products_package_management'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m,
+    [32m'staff_performance_tracking'[39m,
+    [32m'staff_labor_cost_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m31[39m,
+  moduleCount: [33m14[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'materials'[39m,
+    [32m'products'[39m,
+    [32m'suppliers'[39m,
+    [32m'production'[39m,
+    [32m'production-kitchen'[39m,
+    [32m'team'[39m,
+    [32m'scheduling'[39m,
+    [32m'shift-control'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for onsite_service capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'onsite_service'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m22[39m,
+  features: [
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'sales_catalog_menu'[39m,
+    [32m'sales_pos_onsite'[39m,
+    [32m'sales_dine_in_orders'[39m,
+    [32m'sales_split_payment'[39m,
+    [32m'sales_tip_management'[39m,
+    [32m'sales_coupon_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'operations_table_management'[39m,
+    [32m'operations_table_assignment'[39m,
+    [32m'operations_floor_plan_config'[39m,
+    [32m'operations_waitlist_management'[39m,
+    [32m'operations_bill_splitting'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m,
+    [32m'staff_performance_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m22[39m,
+  moduleCount: [33m12[39m,
+  modules: [
+    [32m'dashboard'[39m,   [32m'settings'[39m,
+    [32m'debug'[39m,       [32m'customers'[39m,
+    [32m'sales'[39m,       [32m'gamification'[39m,
+    [32m'materials'[39m,   [32m'suppliers'[39m,
+    [32m'fulfillment'[39m, [32m'onsite'[39m,
+    [32m'team'[39m,        [32m'shift-control'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for delivery_shipping capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'delivery_shipping'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m18[39m,
+  features: [
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'sales_catalog_menu'[39m,
+    [32m'sales_delivery_orders'[39m,
+    [32m'sales_split_payment'[39m,
+    [32m'sales_coupon_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'operations_delivery_zones'[39m,
+    [32m'operations_delivery_tracking'[39m,
+    [32m'operations_notification_system'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m,
+    [32m'staff_performance_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m18[39m,
+  moduleCount: [33m11[39m,
+  modules: [
+    [32m'dashboard'[39m,     [32m'settings'[39m,
+    [32m'debug'[39m,         [32m'customers'[39m,
+    [32m'sales'[39m,         [32m'gamification'[39m,
+    [32m'materials'[39m,     [32m'suppliers'[39m,
+    [32m'delivery'[39m,      [32m'team'[39m,
+    [32m'shift-control'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for pickup_orders capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'pickup_orders'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m16[39m,
+  features: [
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'sales_catalog_menu'[39m,
+    [32m'sales_pickup_orders'[39m,
+    [32m'sales_split_payment'[39m,
+    [32m'sales_coupon_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'operations_pickup_scheduling'[39m,
+    [32m'operations_notification_system'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m16[39m,
+  moduleCount: [33m11[39m,
+  modules: [
+    [32m'dashboard'[39m,     [32m'settings'[39m,
+    [32m'debug'[39m,         [32m'customers'[39m,
+    [32m'sales'[39m,         [32m'gamification'[39m,
+    [32m'materials'[39m,     [32m'suppliers'[39m,
+    [32m'pickup'[39m,        [32m'team'[39m,
+    [32m'shift-control'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for membership_subscriptions capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'membership_subscriptions'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m12[39m,
+  features: [
+    [32m'membership_subscription_plans'[39m,
+    [32m'membership_recurring_billing'[39m,
+    [32m'membership_access_control'[39m,
+    [32m'membership_usage_tracking'[39m,
+    [32m'membership_benefits_management'[39m,
+    [32m'customer_service_history'[39m,
+    [32m'customer_preference_tracking'[39m,
+    [32m'customer_loyalty_program'[39m,
+    [32m'customer_online_accounts'[39m,
+    [32m'finance_credit_management'[39m,
+    [32m'finance_invoice_scheduling'[39m,
+    [32m'finance_payment_terms'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m12[39m,
+  moduleCount: [33m7[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'billing'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for professional_services capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'professional_services'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m17[39m,
+  features: [
+    [32m'scheduling_appointment_booking'[39m,
+    [32m'scheduling_calendar_management'[39m,
+    [32m'scheduling_reminder_system'[39m,
+    [32m'scheduling_availability_rules'[39m,
+    [32m'production_bom_management'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'customer_service_history'[39m,
+    [32m'customer_preference_tracking'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m,
+    [32m'sales_package_management'[39m,
+    [32m'products_package_management'[39m,
+    [32m'staff_employee_management'[39m,
+    [32m'staff_shift_management'[39m,
+    [32m'staff_time_tracking'[39m,
+    [32m'staff_performance_tracking'[39m,
+    [32m'staff_labor_cost_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m17[39m,
+  moduleCount: [33m9[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'team'[39m,
+    [32m'scheduling'[39m,
+    [32m'shift-control'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould activate correct modules for asset_rental capability
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'asset_rental'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m7[39m,
+  features: [
+    [32m'rental_item_management'[39m,
+    [32m'rental_booking_calendar'[39m,
+    [32m'rental_availability_tracking'[39m,
+    [32m'rental_pricing_by_duration'[39m,
+    [32m'rental_late_fees'[39m,
+    [32m'customer_service_history'[39m,
+    [32m'customer_preference_tracking'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m7[39m,
+  moduleCount: [33m6[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m
+  ]
+}
+
+[90mstdout[2m | src/__tests__/navigation-integration/capability-navigation.test.tsx[2m > [22m[2mCapability ÔåÆ Navigation Integration[2m > [22m[2mshould correctly report module activation status
+[22m[39m­ƒöì [LAYER 3: FeatureFlagContext] Computing activeFeatures... {
+  hasProfile: [33mtrue[39m,
+  capabilities: [ [32m'physical_products'[39m ],
+  infrastructure: [ [32m'single_location'[39m ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Features computed: {
+  capabilities: [33m1[39m,
+  infrastructure: [33m1[39m,
+  featuresCount: [33m18[39m,
+  features: [
+    [32m'production_bom_management'[39m,
+    [32m'production_display_system'[39m,
+    [32m'production_order_queue'[39m,
+    [32m'production_capacity_planning'[39m,
+    [32m'inventory_stock_tracking'[39m,
+    [32m'inventory_alert_system'[39m,
+    [32m'inventory_purchase_orders'[39m,
+    [32m'inventory_supplier_management'[39m,
+    [32m'inventory_low_stock_auto_reorder'[39m,
+    [32m'inventory_sku_management'[39m,
+    [32m'inventory_barcode_scanning'[39m,
+    [32m'inventory_multi_unit_tracking'[39m,
+    [32m'products_recipe_management'[39m,
+    [32m'products_catalog_menu'[39m,
+    [32m'products_cost_intelligence'[39m,
+    [32m'products_availability_calculation'[39m,
+    [32m'sales_order_management'[39m,
+    [32m'sales_payment_processing'[39m
+  ]
+}
+Ô£à [LAYER 3: FeatureFlagContext] Active modules computed: {
+  featureCount: [33m18[39m,
+  moduleCount: [33m11[39m,
+  modules: [
+    [32m'dashboard'[39m,
+    [32m'settings'[39m,
+    [32m'debug'[39m,
+    [32m'customers'[39m,
+    [32m'sales'[39m,
+    [32m'gamification'[39m,
+    [32m'materials'[39m,
+    [32m'products'[39m,
+    [32m'suppliers'[39m,
+    [32m'production'[39m,
+    [32m'production-kitchen'[39m
+  ]
+}
+
+ [31mÔØ»[39m src/__tests__/navigation-integration/capability-navigation.test.tsx [2m([22m[2m9 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 144[2mms[22m[39m
+   [32mÔ£ô[39m Capability ÔåÆ Navigation Integration[2m > [22mshould activate correct modules for physical_products capability[32m 36[2mms[22m[39m
+   [32mÔ£ô[39m Capability ÔåÆ Navigation Integration[2m > [22mshould activate correct modules for combined capabilities[32m 19[2mms[22m[39m
+   [32mÔ£ô[39m Capability ÔåÆ Navigation Integration[2m > [22mshould activate correct modules for onsite_service capability[32m 12[2mms[22m[39m
+[31m   [31m├ù[31m Capability ÔåÆ Navigation Integration[2m > [22mshould activate correct modules for delivery_shipping capability[39m[32m 23[2mms[22m[39m
+[31m     ÔåÆ expected false to be true // Object.is equality[39m
+[31m   [31m├ù[31m Capability ÔåÆ Navigation Integration[2m > [22mshould activate correct modules for pickup_orders capability[39m[32m 8[2mms[22m[39m
+[31m     ÔåÆ expected false to be true // Object.is equality[39m
+[31m   [31m├ù[31m Capability ÔåÆ Navigation Integration[2m > [22mshould activate correct modules for membership_subscriptions capability[39m[32m 7[2mms[22m[39m
+[31m     ÔåÆ expected false to be true // Object.is equality[39m
+   [32mÔ£ô[39m Capability ÔåÆ Navigation Integration[2m > [22mshould activate correct modules for professional_services capability[32m 10[2mms[22m[39m
+[31m   [31m├ù[31m Capability ÔåÆ Navigation Integration[2m > [22mshould activate correct modules for asset_rental capability[39m[32m 17[2mms[22m[39m
+[31m     ÔåÆ expected false to be true // Object.is equality[39m
+   [32mÔ£ô[39m Capability ÔåÆ Navigation Integration[2m > [22mshould correctly report module activation status[32m 11[2mms[22m[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 4 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  src/__tests__/navigation-integration/capability-navigation.test.tsx > Capability ÔåÆ Navigation Integration > should activate correct modules for delivery_shipping capability
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ÔØ» src/__tests__/navigation-integration/capability-navigation.test.tsx:160:58
+    158|     expect(result.current.activeModules.sort()).toEqual(expectedModuleÔÇª
+    159|     expect(result.current.isModuleActive('delivery')).toBe(true);
+    160|     expect(result.current.isModuleActive('fulfillment')).toBe(true);
+       |                                                          ^
+    161|   });
+    162| 
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/4]ÔÄ»
+
+ FAIL  src/__tests__/navigation-integration/capability-navigation.test.tsx > Capability ÔåÆ Navigation Integration > should activate correct modules for pickup_orders capability
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ÔØ» src/__tests__/navigation-integration/capability-navigation.test.tsx:184:58
+    182|     expect(result.current.activeModules.sort()).toEqual(expectedModuleÔÇª
+    183|     expect(result.current.isModuleActive('pickup')).toBe(true);
+    184|     expect(result.current.isModuleActive('fulfillment')).toBe(true);
+       |                                                          ^
+    185|   });
+    186| 
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/4]ÔÄ»
+
+ FAIL  src/__tests__/navigation-integration/capability-navigation.test.tsx > Capability ÔåÆ Navigation Integration > should activate correct modules for membership_subscriptions capability
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ÔØ» src/__tests__/navigation-integration/capability-navigation.test.tsx:207:58
+    205| 
+    206|     expect(result.current.activeModules.sort()).toEqual(expectedModuleÔÇª
+    207|     expect(result.current.isModuleActive('memberships')).toBe(true);
+       |                                                          ^
+    208|     // billing is activated by finance_recurring_invoicing which comesÔÇª
+    209|     expect(result.current.isModuleActive('billing')).toBe(true);
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/4]ÔÄ»
+
+ FAIL  src/__tests__/navigation-integration/capability-navigation.test.tsx > Capability ÔåÆ Navigation Integration > should activate correct modules for asset_rental capability
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ÔØ» src/__tests__/navigation-integration/capability-navigation.test.tsx:257:54
+    255| 
+    256|     expect(result.current.activeModules.sort()).toEqual(expectedModuleÔÇª
+    257|     expect(result.current.isModuleActive('rentals')).toBe(true);
+       |                                                      ^
+    258|     expect(result.current.isModuleActive('assets')).toBe(true); // AssÔÇª
+    259|   });
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[4/4]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 13:31:15
+[2m   Duration [22m 3.73s[2m (transform 300ms, setup 380ms, collect 1.09s, tests 144ms, environment 1.29s, prepare 348ms)[22m
+

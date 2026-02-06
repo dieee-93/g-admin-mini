@@ -1,5 +1,5 @@
 /**
- * BasicInfoSection v2.0 - Industrial Production Order Basic Info
+ * BasicInfoSection v2.1 - Industrial Production Order Basic Info
  *
  * REDESIGNED with industrial aesthetics matching OutputConfigSection:
  * - Blue gradient top bar (4px)
@@ -10,18 +10,14 @@
  * Campos:
  * - Nombre
  * - Descripción
- * - Categoría
  *
- * Architecture:
- * - Receives props (no context) following project pattern
- * - Memoized to prevent unnecessary re-renders
+ * CHANGES v2.1:
+ * - 🗑️ REMOVAL: Removed 'category' field as per business requirements.
  */
 
-import { memo, useMemo } from 'react'
-import { Stack, Input, TextareaField, SelectField, Flex, Box, Typography, Field } from '@/shared/ui'
-import { RecipeCategory } from '../../../types/recipe'
+import { memo, useId } from 'react'
+import { Stack, Input, TextareaField, Flex, Box, Typography, Field } from '@/shared/ui'
 import type { Recipe } from '../../../types/recipe'
-import { RecipeTooltips } from '../components/HelpTooltip'
 
 // ============================================
 // PROPS
@@ -34,106 +30,16 @@ interface BasicInfoSectionProps {
 }
 
 // ============================================
-// CATEGORY OPTIONS
-// ============================================
-
-const CATEGORY_OPTIONS: { value: RecipeCategory; label: string }[] = [
-  // Gastronomía
-  { value: RecipeCategory.APPETIZER, label: 'Entrada' },
-  { value: RecipeCategory.SOUP, label: 'Sopa' },
-  { value: RecipeCategory.SALAD, label: 'Ensalada' },
-  { value: RecipeCategory.MAIN_COURSE, label: 'Plato Principal' },
-  { value: RecipeCategory.SIDE_DISH, label: 'Guarnición' },
-  { value: RecipeCategory.DESSERT, label: 'Postre' },
-  { value: RecipeCategory.BEVERAGE, label: 'Bebida' },
-  { value: RecipeCategory.SAUCE, label: 'Salsa' },
-
-  // Producción
-  { value: RecipeCategory.ASSEMBLY, label: 'Ensamblaje' },
-  { value: RecipeCategory.MANUFACTURING, label: 'Manufactura' },
-  { value: RecipeCategory.PACKAGING, label: 'Empaquetado' },
-
-  // Servicios
-  { value: RecipeCategory.PROCEDURE, label: 'Procedimiento' },
-  { value: RecipeCategory.MAINTENANCE, label: 'Mantenimiento' },
-
-  // Otros
-  { value: RecipeCategory.KIT, label: 'Kit' },
-  { value: RecipeCategory.BUNDLE, label: 'Bundle' },
-  { value: RecipeCategory.OTHER, label: 'Otro' },
-]
-
-// ============================================
-// HELPER: Filter categories by entity type
-// ============================================
-
-function getAvailableCategories(entityType: string): typeof CATEGORY_OPTIONS {
-  if (entityType === 'material' || entityType === 'product') {
-    // Gastronomía + Producción
-    return CATEGORY_OPTIONS.filter((c) =>
-      [
-        RecipeCategory.APPETIZER,
-        RecipeCategory.SOUP,
-        RecipeCategory.SALAD,
-        RecipeCategory.MAIN_COURSE,
-        RecipeCategory.SIDE_DISH,
-        RecipeCategory.DESSERT,
-        RecipeCategory.BEVERAGE,
-        RecipeCategory.SAUCE,
-        RecipeCategory.ASSEMBLY,
-        RecipeCategory.MANUFACTURING,
-        RecipeCategory.PACKAGING,
-        RecipeCategory.OTHER,
-      ].includes(c.value)
-    )
-  } else if (entityType === 'kit') {
-    // Solo Kit/Bundle
-    return CATEGORY_OPTIONS.filter((c) =>
-      [RecipeCategory.KIT, RecipeCategory.BUNDLE, RecipeCategory.OTHER].includes(c.value)
-    )
-  } else if (entityType === 'service') {
-    // Solo Procedures
-    return CATEGORY_OPTIONS.filter((c) =>
-      [RecipeCategory.PROCEDURE, RecipeCategory.MAINTENANCE, RecipeCategory.OTHER].includes(
-        c.value
-      )
-    )
-  }
-
-  return CATEGORY_OPTIONS
-}
-
-// ============================================
 // COMPONENT
 // ============================================
 
 /**
- * BasicInfoSection v2.0 - Industrial basic info section
- *
- * @component
- * @description
- * Industrial production order section for basic recipe information.
- * Features heavy borders, blue gradient header, and professional typography.
- *
- * Design:
- * - Blue gradient top bar (4px)
- * - Heavy 3px borders
- * - Uppercase labels with increased letter spacing
- * - Monospace inputs for production data entry
- *
- * @param {BasicInfoSectionProps} props - Component props
- * @returns {React.ReactElement} Rendered section
+ * BasicInfoSection v2.1 - Industrial basic info section
  */
-function BasicInfoSectionComponent({ recipe, updateRecipe, entityType }: BasicInfoSectionProps) {
-  const availableCategories = getAvailableCategories(entityType)
-
-  // Create options for SelectField
-  const categoryOptions = useMemo(() => {
-    return availableCategories.map(cat => ({
-      value: cat.value,
-      label: cat.label,
-    }))
-  }, [availableCategories])
+function BasicInfoSectionComponent({ recipe, updateRecipe }: BasicInfoSectionProps) {
+  // Accessibility IDs
+  const nameId = useId();
+  const descriptionId = useId();
 
   return (
     <Box
@@ -172,7 +78,7 @@ function BasicInfoSectionComponent({ recipe, updateRecipe, entityType }: BasicIn
 
         {/* Nombre */}
         <Field.Root required>
-          <Field.Label>
+          <Field.Label htmlFor={nameId}>
             <Typography
               fontSize="xs"
               fontWeight="700"
@@ -184,6 +90,7 @@ function BasicInfoSectionComponent({ recipe, updateRecipe, entityType }: BasicIn
             </Typography>
           </Field.Label>
           <Input
+            id={nameId}
             placeholder="Ej: Hamburguesa Clásica"
             value={recipe.name ?? ''}
             onChange={(e) => updateRecipe({ name: e.target.value })}
@@ -200,7 +107,7 @@ function BasicInfoSectionComponent({ recipe, updateRecipe, entityType }: BasicIn
 
         {/* Descripción */}
         <Field.Root>
-          <Field.Label>
+          <Field.Label htmlFor={descriptionId}>
             <Typography
               fontSize="xs"
               fontWeight="700"
@@ -212,6 +119,7 @@ function BasicInfoSectionComponent({ recipe, updateRecipe, entityType }: BasicIn
             </Typography>
           </Field.Label>
           <TextareaField
+            id={descriptionId}
             placeholder="Describe esta receta..."
             value={recipe.description ?? ''}
             onChange={(e) => updateRecipe({ description: e.target.value })}
@@ -223,36 +131,6 @@ function BasicInfoSectionComponent({ recipe, updateRecipe, entityType }: BasicIn
           />
           <Field.HelperText>
             Breve descripción de la receta (opcional)
-          </Field.HelperText>
-        </Field.Root>
-
-        {/* Categoría */}
-        <Field.Root>
-          <Field.Label>
-            <Flex align="center" gap="2">
-              <Typography
-                fontSize="xs"
-                fontWeight="700"
-                letterSpacing="wider"
-                textTransform="uppercase"
-                color="fg.muted"
-              >
-                Categoría
-              </Typography>
-              {RecipeTooltips.recipeCategory}
-            </Flex>
-          </Field.Label>
-          <SelectField
-            placeholder="Selecciona una categoría"
-            options={categoryOptions}
-            value={recipe.category ? [recipe.category] : []}
-            onValueChange={(details) =>
-              updateRecipe({ category: details.value[0] as RecipeCategory | undefined })
-            }
-            size="md"
-          />
-          <Field.HelperText>
-            Categoría de la receta (opcional)
           </Field.HelperText>
         </Field.Root>
       </Stack>

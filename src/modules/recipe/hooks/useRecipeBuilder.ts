@@ -1,14 +1,16 @@
 /**
  * useRecipeBuilder - Custom hook for RecipeBuilder form logic
  *
- * Follows the project's architecture pattern (similar to useMaterialForm, useProductValidation)
- * Replaces RecipeBuilderProvider context pattern with custom hook
+ * CHANGES v3.0:
+ * - 🗑️ REMOVAL: Removed gastronomic fields and time mappings.
+ * - 🔄 SYNC: Auto-sync name from parent form.
+ * - 🏗️ ADAPTER: Flat mapping for API payload.
  */
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { logger } from '@/lib/logging/Logger'
 import { validateRecipe } from '../services/recipeValidation'
-import { useCreateRecipe, useUpdateRecipe } from './useRecipes'
+import { useCreateRecipe, useUpdateRecipe, useRecipe } from './useRecipes'
 import type { Recipe } from '../types/recipe'
 import type {
   RecipeBuilderComplexity,
@@ -17,11 +19,12 @@ import type {
 } from '../components/RecipeBuilder/types'
 
 // ============================================
-// HOOK PARAMS
+// PARAMS
 // ============================================
 
 export interface UseRecipeBuilderParams {
   initialData?: Partial<Recipe>
+  recipeId?: string // 🆕 Added for loading existing data
   mode: 'create' | 'edit'
   entityType: 'material' | 'product' | 'kit' | 'service'
   complexity?: RecipeBuilderComplexity
@@ -30,17 +33,13 @@ export interface UseRecipeBuilderParams {
   customValidation?: (recipe: Partial<Recipe>) => ValidationResult
 }
 
-// ============================================
-// DEFAULT FEATURES
-// ============================================
-
 const DEFAULT_FEATURES: Required<RecipeBuilderFeatures> = {
   showCostCalculation: true,
   showAnalytics: false,
   showInstructions: true,
   showYieldConfig: true,
   showQualityConfig: false,
-  allowSubstitutions: true,  // ✅ Habilitado por defecto
+  allowSubstitutions: true,
   enableAiSuggestions: false,
 }
 
@@ -51,6 +50,7 @@ const DEFAULT_FEATURES: Required<RecipeBuilderFeatures> = {
 export function useRecipeBuilder(params: UseRecipeBuilderParams) {
   const {
     initialData,
+    recipeId,
     mode,
     entityType,
     complexity = 'standard',
@@ -59,133 +59,120 @@ export function useRecipeBuilder(params: UseRecipeBuilderParams) {
     customValidation,
   } = params
 
-  // Merge features with defaults
-  const features = useMemo(
-    () => ({ ...DEFAULT_FEATURES, ...featuresProps }),
-    [featuresProps]
-  )
-
-  // ============================================
-  // STATE
-  // ============================================
+  const features = useMemo(() => ({ ...DEFAULT_FEATURES, ...featuresProps }), [featuresProps])
 
   const [recipe, setRecipe] = useState<Partial<Recipe>>(
     initialData ?? {
-      name: '',
-      description: '',
+      name: initialData?.name || '',
+      description: initialData?.description || '',
       entityType,
       inputs: [],
-      output: { quantity: 1, unit: 'unit' },
-      // Set executionMode based on entityType
+      output: { 
+        item: { id: 'temp', name: initialData?.name || 'Nuevo Item', type: 'material' },
+        quantity: 1, 
+        unit: 'unit' 
+      },
       executionMode: entityType === 'material' ? 'immediate' : 'on_demand',
     }
   )
 
-  // ============================================
-  // MUTATIONS
-  // ============================================
+  // 🆕 Load existing recipe if recipeId is provided
+  const { data: loadedRecipe, isLoading: isRecipeLoading } = useRecipe(recipeId);
+
+  // 🆕 Sync loaded recipe to state
+  useEffect(() => {
+    if (loadedRecipe && mode === 'edit') {
+      setRecipe(loadedRecipe);
+    }
+  }, [loadedRecipe, mode]);
+
+  // Sync name from parent
+  useEffect(() => {
+    if (initialData?.name && recipe.name !== initialData.name) {
+       setRecipe(prev => ({ ...prev, name: initialData.name }));
+    }
+  }, [initialData?.name, recipe.name]);
 
   const createRecipe = useCreateRecipe()
   const updateRecipeMutation = useUpdateRecipe()
-
   const isSubmitting = createRecipe.isPending || updateRecipeMutation.isPending
 
-  // ============================================
-  // VALIDATION
-  // ============================================
-
   const validateRecipeCallback = useCallback((): ValidationResult => {
-    try {
-      // Use custom validation if provided
-      if (customValidation) {
-        return customValidation(recipe)
-      }
-
-      // Use default validation
-      const validationResult = validateRecipe(recipe as Recipe)
-
-      return validationResult
-    } catch (error) {
-      logger.error('useRecipeBuilder' as any, 'Validation error', error)
-      return {
-        isValid: false,
-        errors: [`Validation failed: ${error}`],
-        warnings: [],
-      }
-    }
-  }, [recipe, customValidation])
+    if (customValidation) return customValidation(recipe);
+    return validateRecipe(recipe as Recipe);
+  }, [recipe, customValidation]);
 
   const validation = useMemo(() => validateRecipeCallback(), [validateRecipeCallback])
-
-  // ============================================
-  // UPDATE RECIPE
-  // ============================================
 
   const updateRecipe = useCallback((updates: Partial<Recipe>) => {
     setRecipe((prev) => ({ ...prev, ...updates }))
   }, [])
 
-  // ============================================
-  // SAVE RECIPE
-  // ============================================
-
   const saveRecipe = useCallback(async (): Promise<Recipe | null> => {
-    // Validate before saving
     const currentValidation = validateRecipeCallback()
-    if (!currentValidation.isValid) {
-      logger.warn('useRecipeBuilder' as any, 'Cannot save: validation failed', {
-        errors: currentValidation.errors,
-      })
-      return null
-    }
+    if (!currentValidation.isValid) return null;
 
     try {
-      let savedRecipe: Recipe
+      // TRANSFORM: UI State to API Payload (DTO)
+      const apiPayload: any = {
+        name: recipe.name,
+        description: recipe.description,
+        entityType: recipe.entityType,
+        executionMode: recipe.executionMode,
+        tags: recipe.tags,
+        difficulty: recipe.difficulty,
+        instructions: recipe.instructions,
+        notes: recipe.notes,
+        costConfig: recipe.costConfig,
+        imageUrl: recipe.imageUrl,
 
+        // Output Flat
+        outputItemId: typeof recipe.output?.item === 'object' ? (recipe.output.item as any).id : recipe.output?.item,
+        outputQuantity: recipe.output?.quantity,
+        outputUnit: recipe.output?.unit,
+        outputYieldPercentage: recipe.output?.yieldPercentage,
+        outputWastePercentage: recipe.output?.wastePercentage,
+        outputQualityGrade: recipe.output?.qualityGrade,
+
+        // Inputs Flat
+        inputs: recipe.inputs?.map(input => ({
+          itemId: typeof input.item === 'object' ? (input.item as any).id : input.item,
+          quantity: input.quantity,
+          unit: input.unit,
+          optional: input.optional,
+          substituteFor: input.substituteFor,
+          yieldPercentage: input.yieldPercentage,
+          wastePercentage: input.wastePercentage,
+          unitCostOverride: input.unitCostOverride,
+          conversionFactor: input.conversionFactor,
+          stage: input.stage,
+          stageName: input.stageName,
+          displayOrder: input.displayOrder
+        })) || []
+      };
+
+      let savedRecipe: Recipe;
       if (mode === 'edit' && recipe.id) {
-        // Update existing
-        logger.info('useRecipeBuilder' as any, 'Updating recipe', { id: recipe.id })
-        savedRecipe = await updateRecipeMutation.mutateAsync({
-          id: recipe.id,
-          updates: recipe,
-        })
+        savedRecipe = await updateRecipeMutation.mutateAsync({ id: recipe.id, updates: apiPayload });
       } else {
-        // Create new
-        logger.info('useRecipeBuilder' as any, 'Creating recipe', { name: recipe.name })
-        savedRecipe = await createRecipe.mutateAsync(recipe)
+        savedRecipe = await createRecipe.mutateAsync(apiPayload);
       }
 
-      // Call onSave callback
-      if (onSave) {
-        await onSave(savedRecipe)
-      }
-
-      logger.info('useRecipeBuilder' as any, 'Recipe saved', { id: savedRecipe.id })
-      return savedRecipe
+      if (onSave) await onSave(savedRecipe);
+      return savedRecipe;
     } catch (error) {
       logger.error('useRecipeBuilder' as any, 'Failed to save recipe', error)
       return null
     }
   }, [recipe, mode, validateRecipeCallback, createRecipe, updateRecipeMutation, onSave])
 
-  // ============================================
-  // RETURN
-  // ============================================
-
   return {
-    // State
     recipe,
     updateRecipe,
-
-    // Validation
     validation,
     validateRecipe: validateRecipeCallback,
-
-    // Submission
     isSubmitting,
     saveRecipe,
-
-    // Metadata
     mode,
     entityType,
     complexity,

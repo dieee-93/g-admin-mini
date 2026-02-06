@@ -48,17 +48,17 @@ const ActionButtons = memo(({ material, onView, onEdit, onDelete }: ActionButton
   return (
     <Stack direction="row" gap="xs">
       {onView && (
-        <Button size="xs" variant="ghost" onClick={handleView}>
+        <Button size="xs" variant="ghost" onClick={handleView} data-testid="material-view-button">
           <Icon icon={EyeIcon} size="sm" />
         </Button>
       )}
       {onEdit && (
-        <Button size="xs" variant="ghost" onClick={handleEdit}>
+        <Button size="xs" variant="ghost" onClick={handleEdit} data-testid="material-edit-button">
           <Icon icon={PencilIcon} size="sm" />
         </Button>
       )}
       {onDelete && (
-        <Button size="xs" variant="ghost" colorPalette="red" onClick={handleDelete}>
+        <Button size="xs" variant="ghost" colorPalette="red" onClick={handleDelete} data-testid="material-delete-button">
           <Icon icon={TrashIcon} size="sm" />
         </Button>
       )}

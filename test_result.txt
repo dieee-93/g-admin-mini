@@ -1,0 +1,45 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mI:/Programacion/Proyectos/g-mini[39m
+
+[90mstdout[2m | src/modules/recipe/components/RecipeBuilder/RecipeBuilder.test.tsx
+[22m[39mÔä╣´©Å [Security] [SECURITY] ANOMALY: PatternCache initialized (10:39:09) { maxSize: [32m'1000'[39m, ttlMs: [32m'300000'[39m }
+Ôä╣´©Å [EventBus] Initializing enterprise event bus... (10:39:09)
+
+[90mstdout[2m | src/modules/recipe/components/RecipeBuilder/RecipeBuilder.test.tsx
+[22m[39mÔä╣´©Å [Security] [SECURITY] ANOMALY: Client ID stored securely (10:39:09) { storageType: [32m'sessionStorage'[39m, clientIdPrefix: [32m'08fff027...'[39m }
+
+[90mstdout[2m | src/modules/recipe/components/RecipeBuilder/RecipeBuilder.test.tsx
+[22m[39mÔä╣´©Å [Security] [SECURITY] ANOMALY: New client ID generated (10:39:09) { reason: [32m'No valid existing ID found'[39m, newId: [32m'08fff027...'[39m }
+
+[90mstdout[2m | src/modules/recipe/components/RecipeBuilder/RecipeBuilder.test.tsx
+[22m[39mÔä╣´©Å [Security] [SECURITY] ANOMALY: DeduplicationManager initialized with secure client ID (10:39:09)
+
+[90mstdout[2m | src/modules/recipe/components/RecipeBuilder/RecipeBuilder.test.tsx
+[22m[39mÔä╣´©Å [EventBus] Enterprise event bus initialized successfully (10:39:09) { isInitialized: [32m'true'[39m }
+
+ [32mÔ£ô[39m src/modules/recipe/components/RecipeBuilder/RecipeBuilder.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 834[2mms[22m[39m
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Unhandled Errors ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ» Unhandled Rejection ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+AbortError: A request was aborted, for example through a call to IDBTransaction.abort.
+ ÔØ» node_modules/.pnpm/fake-indexeddb@6.2.5/node_modules/fake-indexeddb/build/esm/FDBFactory.js:362:27
+ ÔØ» onComplete node_modules/.pnpm/fake-indexeddb@6.2.5/node_modules/fake-indexeddb/build/esm/FDBFactory.js:260:13
+ ÔØ» node_modules/.pnpm/fake-indexeddb@6.2.5/node_modules/fake-indexeddb/build/esm/FDBFactory.js:294:11
+ ÔØ» Immediate.<anonymous> node_modules/.pnpm/fake-indexeddb@6.2.5/node_modules/fake-indexeddb/build/esm/FDBFactory.js:229:11
+ ÔØ» processImmediate node:internal/timers:483:21
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+Serialized Error: { code: 20, INDEX_SIZE_ERR: 1, DOMSTRING_SIZE_ERR: 2, HIERARCHY_REQUEST_ERR: 3, WRONG_DOCUMENT_ERR: 4, INVALID_CHARACTER_ERR: 5, NO_DATA_ALLOWED_ERR: 6, NO_MODIFICATION_ALLOWED_ERR: 7, NOT_FOUND_ERR: 8, NOT_SUPPORTED_ERR: 9, INUSE_ATTRIBUTE_ERR: 10, INVALID_STATE_ERR: 11, SYNTAX_ERR: 12, INVALID_MODIFICATION_ERR: 13, NAMESPACE_ERR: 14, INVALID_ACCESS_ERR: 15, VALIDATION_ERR: 16, TYPE_MISMATCH_ERR: 17, SECURITY_ERR: 18, NETWORK_ERR: 19, ABORT_ERR: 20, URL_MISMATCH_ERR: 21, QUOTA_EXCEEDED_ERR: 22, TIMEOUT_ERR: 23, INVALID_NODE_TYPE_ERR: 24, DATA_CLONE_ERR: 25 }
+This error originated in "src/modules/recipe/components/RecipeBuilder/RecipeBuilder.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m     Errors [22m [1m[31m1 error[39m[22m
+[2m   Start at [22m 22:39:00
+[2m   Duration [22m 12.71s[2m (transform 1.36s, setup 356ms, collect 9.54s, tests 834ms, environment 1.21s, prepare 295ms)[22m
+

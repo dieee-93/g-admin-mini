@@ -116,6 +116,7 @@ export const CAPABILITY_FEATURES: Readonly<Record<BusinessCapabilityId, readonly
 
     // Products
     'products_catalog_menu',
+    'products_recipe_management',
 
     // Operations
     'operations_table_management',
@@ -147,6 +148,7 @@ export const CAPABILITY_FEATURES: Readonly<Record<BusinessCapabilityId, readonly
 
     // Products
     'products_catalog_menu',
+    'products_recipe_management',
 
     'operations_pickup_scheduling',
     'operations_notification_system',
@@ -171,6 +173,7 @@ export const CAPABILITY_FEATURES: Readonly<Record<BusinessCapabilityId, readonly
 
     // Products
     'products_catalog_menu',
+    'products_recipe_management',
 
     'operations_delivery_zones',
     'operations_delivery_tracking',

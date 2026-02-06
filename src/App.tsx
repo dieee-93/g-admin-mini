@@ -264,14 +264,13 @@ function PerformanceWrapper({ children }: { children: React.ReactNode }) {
     // 🚨 CRITICAL: Service Worker ONLY in production to avoid conflicts with Vite HMR
     initializeOffline({
       enableServiceWorker: import.meta.env.PROD, // ✅ Only in production, NOT development
-      enableSync: true,
-      syncInterval: 30000,
+      enableBackgroundSync: true,
       maxRetries: 3
-    }).then(({ serviceWorker, syncInitialized, storageInitialized }) => {
+    }).then(({ serviceWorker, backgroundSyncSupported, queueInitialized }) => {
       logger.info('App', '[App] Offline system initialized:', {
         serviceWorker: !!serviceWorker,
-        syncInitialized,
-        storageInitialized,
+        backgroundSyncSupported,
+        queueInitialized,
         environment: import.meta.env.MODE
       });
     }).catch(error => {
@@ -317,7 +316,7 @@ function LoadingFallback() {
 // 🔍 DIAGNOSTIC: Suspense wrapper with logging
 function DiagnosticSuspenseWrapper({ children }: { children: React.ReactNode }) {
   console.log('🔍 [DiagnosticSuspenseWrapper] Rendering...');
-  
+
   React.useEffect(() => {
     console.log('🔍 [DiagnosticSuspenseWrapper] Mounted (children rendered successfully)');
     return () => {
@@ -326,7 +325,7 @@ function DiagnosticSuspenseWrapper({ children }: { children: React.ReactNode }) 
   }, []);
 
   return (
-    <React.Suspense 
+    <React.Suspense
       fallback={
         (() => {
           console.log('⏳ [DiagnosticSuspenseWrapper] FALLBACK TRIGGERED! Lazy component loading...');
@@ -349,576 +348,656 @@ function App() {
         <Provider>
           <AlertsProvider>
             <Router>
-            {/* 🛡️ ErrorBoundary INSIDE Router so useLocation works */}
-            <ErrorBoundaryWrapper>
-              <AuthProvider>
-                {/* 🔄 Sync capabilities from Supabase on app init */}
-                <CapabilitySync />
+              {/* 🛡️ ErrorBoundary INSIDE Router so useLocation works */}
+              <ErrorBoundaryWrapper>
+                <AuthProvider>
+                  {/* 🔄 Sync capabilities from Supabase on app init */}
+                  <CapabilitySync />
 
-                {/* 🎯 Feature Flag System - Computes active features from profile */}
-                <FeatureFlagProvider>
+                  {/* 🎯 Feature Flag System - Computes active features from profile */}
+                  <FeatureFlagProvider>
 
-                  {/* 🎮 Initialize gamification notifications via Module Registry */}
-                  <HookPoint name="app.init" />
+                    {/* 🎮 Initialize gamification notifications via Module Registry */}
+                    <HookPoint name="app.init" />
 
-                  {/* 🏢 Multi-Location Context - Available after auth */}
-                  <LocationProvider>
-                  <OfflineMonitorProvider>
+                    {/* 🏢 Multi-Location Context - Available after auth */}
+                    <LocationProvider>
+                      <OfflineMonitorProvider>
 
-                    {/* 🔗 INTEGRATION LAYER: EventBus + Navigation */}
-                    {/* NOTA: CapabilityProvider removido - nuevo sistema unificado usa Zustand */}
-                    <EventBusProvider debug={process.env.NODE_ENV === 'development'}>
-                      <NavigationProvider>
+                        {/* 🔗 INTEGRATION LAYER: EventBus + Navigation */}
+                        {/* NOTA: CapabilityProvider removido - nuevo sistema unificado usa Zustand */}
+                        <EventBusProvider debug={process.env.NODE_ENV === 'development'}>
+                          <NavigationProvider>
 
-                        {/* 🚀 INITIALIZATION HELL FIX: Lazy module initialization (non-blocking) */}
-                        {/* 🔍 DIAGNOSTIC: Wrapped with logging to trace Suspense behavior */}
-                        <DiagnosticSuspenseWrapper>
-                          <LazyModuleInitializer />
-                        </DiagnosticSuspenseWrapper>
+                            {/* 🚀 INITIALIZATION HELL FIX: Lazy module initialization (non-blocking) */}
+                            {/* 🔍 DIAGNOSTIC: Wrapped with logging to trace Suspense behavior */}
+                            <DiagnosticSuspenseWrapper>
+                              <LazyModuleInitializer />
+                            </DiagnosticSuspenseWrapper>
 
-                        {/* ✅ Content renders immediately while modules load in background */}
+                            {/* ✅ Content renders immediately while modules load in background */}
 
 
-                        <PerformanceWrapper>
-                          <Suspense fallback={<LoadingFallback />}>
-                            <Routes>
-                              {/* 🌐 RUTAS PÚBLICAS */}
-                              <Route path="/" element={
-                                <PublicOnlyRoute>
-                                  <LandingPage />
-                                </PublicOnlyRoute>
-                              } />
-                              <Route path="/admin" element={
-                                <PublicOnlyRoute>
-                                  <AdminPortalPage />
-                                </PublicOnlyRoute>
-                              } />
-                              <Route path="/login" element={
-                                <PublicOnlyRoute>
-                                  <CustomerLoginPage />
-                                </PublicOnlyRoute>
-                              } />
-                              <Route path="/admin/login" element={
-                                <PublicOnlyRoute>
-                                  <AdminLoginPage />
-                                </PublicOnlyRoute>
-                              } />
+                            <PerformanceWrapper>
+                              <Suspense fallback={<LoadingFallback />}>
+                                <Routes>
+                                  {/* 🌐 RUTAS PÚBLICAS */}
+                                  <Route path="/" element={
+                                    <PublicOnlyRoute>
+                                      <LandingPage />
+                                    </PublicOnlyRoute>
+                                  } />
+                                  <Route path="/admin" element={
+                                    <PublicOnlyRoute>
+                                      <AdminPortalPage />
+                                    </PublicOnlyRoute>
+                                  } />
+                                  <Route path="/login" element={
+                                    <PublicOnlyRoute>
+                                      <CustomerLoginPage />
+                                    </PublicOnlyRoute>
+                                  } />
+                                  <Route path="/admin/login" element={
+                                    <PublicOnlyRoute>
+                                      <AdminLoginPage />
+                                    </PublicOnlyRoute>
+                                  } />
 
-                              {/* 🔧 SETUP WIZARD - Configuration inicial del sistema */}
-                              <Route path="/setup" element={
-                                <Suspense fallback={<LoadingFallback />}>
-                                  <LazySetupWizard />
-                                </Suspense>
-                              } />
+                                  {/* 🔧 SETUP WIZARD - Configuration inicial del sistema */}
+                                  <Route path="/setup" element={
+                                    <Suspense fallback={<LoadingFallback />}>
+                                      <LazySetupWizard />
+                                    </Suspense>
+                                  } />
 
-                              {/* ✅ MIGRATED TO NESTED ROUTES - React Router Outlet Pattern */}
-                              {/* 🏠 ADMIN - Unified AppShell with nested child routes */}
-                              <Route 
-                                path="/admin" 
-                                element={
-                                  <ProtectedRouteNew>
-                                    <AppShell headerActions={<AdminHeaderActions />} />
-                                  </ProtectedRouteNew>
-                                }
-                              >
-                                {/* ✅ ALL ADMIN CHILD ROUTES - Migrated to Nested Pattern */}
-                                {/* These routes render inside <AppShell> via <Outlet /> */}
-                                {/* NO ProtectedRouteNew wrapper (parent has it) */}
-                                {/* NO AdminLayout wrapper (AppShell replaces it) */}
-                                {/* YES RoleGuard, Suspense, LazyWithErrorBoundary preserved */}
-                                
-                                {/* 🏠 CORE - Dashboard */}
-                                <Route 
-                                  path="dashboard" 
-                                  element={
-                                    <DashboardRoleRouter>
+                                  {/* ✅ MIGRATED TO NESTED ROUTES - React Router Outlet Pattern */}
+                                  {/* 🏠 ADMIN - Unified AppShell with nested child routes */}
+                                  <Route
+                                    path="/admin"
+                                    element={
+                                      <ProtectedRouteNew>
+                                        <AppShell headerActions={<AdminHeaderActions />} />
+                                      </ProtectedRouteNew>
+                                    }
+                                  >
+                                    {/* ✅ ALL ADMIN CHILD ROUTES - Migrated to Nested Pattern */}
+                                    {/* These routes render inside <AppShell> via <Outlet /> */}
+                                    {/* NO ProtectedRouteNew wrapper (parent has it) */}
+                                    {/* NO AdminLayout wrapper (AppShell replaces it) */}
+                                    {/* YES RoleGuard, Suspense, LazyWithErrorBoundary preserved */}
+
+                                    {/* 🏠 CORE - Dashboard */}
+                                    <Route
+                                      path="dashboard"
+                                      element={
+                                        <DashboardRoleRouter>
+                                          <Suspense fallback={<LoadingFallback />}>
+                                            <LazyDashboardPage />
+                                          </Suspense>
+                                        </DashboardRoleRouter>
+                                      }
+                                    />
+                                    <Route
+                                      path="dashboard/cross-analytics"
+                                      element={
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyDashboardPage />
+                                        </Suspense>
+                                      }
+                                    />
+
+                                    {/* 📊 CORE - Reporting & Intelligence */}
+                                    <Route
+                                      path="reporting"
+                                      element={
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyCustomReporting />
+                                        </Suspense>
+                                      }
+                                    />
+                                    <Route
+                                      path="intelligence"
+                                      element={
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyCompetitiveIntelligence />
+                                        </Suspense>
+                                      }
+                                    />
+
+                                    {/* 🏢 OPERATIONS */}
+                                    <Route
+                                      path="operations/sales"
+                                      element={
+                                        <RoleGuard requiredModule="sales">
+                                          <Suspense fallback={<div>Cargando Ventas...</div>}>
+                                            <LazySalesPage />
+                                          </Suspense>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="operations/fulfillment"
+                                      element={
+                                        <RoleGuard requiredModule="operations">
+                                          <LazyWithErrorBoundary moduleName="Fulfillment">
+                                            <LazyFulfillmentPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    {/* Redirect legacy kitchen route to production */}
+                                    <Route
+                                      path="operations/kitchen"
+                                      element={<Navigate to="/admin/operations/production" replace />}
+                                    />
+                                    <Route
+                                      path="operations/production"
+                                      element={
+                                        <RoleGuard requiredModule="operations">
+                                          <LazyWithErrorBoundary moduleName="Production">
+                                            <LazyProductionPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="operations/fulfillment/delivery"
+                                      element={
+                                        <RoleGuard requiredModule="operations">
+                                          <LazyWithErrorBoundary moduleName="Delivery Management">
+                                            <LazyDeliveryPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="operations/delivery"
+                                      element={<Navigate to="/admin/operations/fulfillment/delivery" replace />}
+                                    />
+                                    <Route
+                                      path="operations/memberships/*"
+                                      element={
+                                        <RoleGuard requiredModule="memberships">
+                                          <LazyWithErrorBoundary moduleName="Memberships">
+                                            <LazyMembershipsPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="operations/rentals/*"
+                                      element={
+                                        <RoleGuard requiredModule="rentals">
+                                          <LazyWithErrorBoundary moduleName="Rentals">
+                                            <LazyRentalsPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+
+                                    {/* 👥 CUSTOMERS */}
+                                    <Route
+                                      path="customers"
+                                      element={
+                                        <RoleGuard requiredModule="sales">
+                                          <LazyWithErrorBoundary moduleName="Clientes">
+                                            <LazyCustomersPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+
+                                    {/* 🏭 SUPPLY CHAIN */}
+                                    <Route
+                                      path="supply-chain/materials"
+                                      element={
+                                        <RoleGuard requiredModule="materials">
+                                          <LazyWithErrorBoundary moduleName="StockLab">
+                                            <LazyStockLab />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="materials/abc-analysis"
+                                      element={
+                                        <RoleGuard requiredModule="materials">
+                                          <Suspense fallback={<LoadingFallback />}>
+                                            <LazyABCAnalysisView />
+                                          </Suspense>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="supply-chain/suppliers"
+                                      element={
+                                        <RoleGuard requiredModule="materials">
+                                          <LazyWithErrorBoundary moduleName="Proveedores">
+                                            <LazySuppliersPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="supply-chain/products"
+                                      element={
+                                        <RoleGuard requiredModule="products">
+                                          <LazyProductsPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="supply-chain/products/new"
+                                      element={
+                                        <RoleGuard requiredModule="products">
+                                          <LazyProductFormPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="supply-chain/products/:id/edit"
+                                      element={
+                                        <RoleGuard requiredModule="products">
+                                          <LazyProductFormPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="supply-chain/products/:id/view"
+                                      element={
+                                        <RoleGuard requiredModule="products">
+                                          <LazyProductFormPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="supply-chain/recipes"
+                                      element={
+                                        <RoleGuard requiredModule="recipe">
+                                          <LazyRecipesPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="supply-chain/assets"
+                                      element={
+                                        <RoleGuard requiredModule="assets">
+                                          <LazyAssetsPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+
+                                    {/* 💰 FINANCE */}
+                                    <Route
+                                      path="finance/fiscal"
+                                      element={
+                                        <RoleGuard requiredModule="fiscal">
+                                          <LazyFiscalPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="finance/cash"
+                                      element={
+                                        <RoleGuard requiredModule="fiscal">
+                                          <LazyCashPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="finance/billing/*"
+                                      element={
+                                        <RoleGuard requiredModule="billing">
+                                          <LazyWithErrorBoundary moduleName="Billing">
+                                            <LazyBillingPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="finance/integrations/*"
+                                      element={
+                                        <RoleGuard requiredModule="integrations">
+                                          <LazyWithErrorBoundary moduleName="Finance Integrations">
+                                            <LazyIntegrationsPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+
+                                    {/* 👨‍💼 RESOURCES */}
+                                    <Route
+                                      path="resources/team"
+                                      element={
+                                        <RoleGuard requiredModule="staff">
+                                          <LazyStaffPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="resources/scheduling"
+                                      element={
+                                        <RoleGuard requiredModule="scheduling">
+                                          <LazySchedulingPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+
+                                    {/* 🎮 GAMIFICATION */}
+                                    <Route
+                                      path="gamification/*"
+                                      element={
+                                        <RoleGuard requiredModule="gamification">
+                                          <LazyWithErrorBoundary moduleName="Gamificación">
+                                            <LazyGamificationPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+
+                                    {/* 📈 EXECUTIVE BI */}
+                                    <Route
+                                      path="executive/*"
+                                      element={
+                                        <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
+                                          <LazyWithErrorBoundary moduleName="Executive Dashboard">
+                                            <LazyExecutivePage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+
+                                    {/* 🔧 TOOLS */}
+                                    <Route
+                                      path="tools/reporting/*"
+                                      element={
+                                        <RoleGuard requiredModule="reporting">
+                                          <LazyWithErrorBoundary moduleName="Reporting Tools">
+                                            <LazyReportingPage />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+
+                                    {/* ⚙️ SETTINGS */}
+                                    <Route
+                                      path="settings"
+                                      element={
+                                        <LazyWithErrorBoundary moduleName="Settings">
+                                          <LazySettingsPage />
+                                        </LazyWithErrorBoundary>
+                                      }
+                                    />
+                                    <Route
+                                      path="settings/business"
+                                      element={
+                                        <LazyWithErrorBoundary moduleName="Business Settings">
+                                          <LazyBusinessPage />
+                                        </LazyWithErrorBoundary>
+                                      }
+                                    />
+                                    <Route
+                                      path="settings/diagnostics"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyWithErrorBoundary moduleName="Diagnostics">
+                                            <LazyDiagnosticsView />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="settings/enterprise"
+                                      element={
+                                        <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
+                                          <LazyWithErrorBoundary moduleName="Enterprise Settings">
+                                            <LazyEnterpriseView />
+                                          </LazyWithErrorBoundary>
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="settings/hours"
+                                      element={
+                                        <LazyWithErrorBoundary moduleName="Business Hours">
+                                          <LazyHoursPage />
+                                        </LazyWithErrorBoundary>
+                                      }
+                                    />
+                                    <Route
+                                      path="settings/integrations"
+                                      element={
+                                        <LazyWithErrorBoundary moduleName="Integrations">
+                                          <LazyIntegrationsPage />
+                                        </LazyWithErrorBoundary>
+                                      }
+                                    />
+                                    <Route
+                                      path="settings/payment-methods"
+                                      element={
+                                        <LazyWithErrorBoundary moduleName="Payment Methods">
+                                          <LazyPaymentMethodsPage />
+                                        </LazyWithErrorBoundary>
+                                      }
+                                    />
+                                    <Route
+                                      path="settings/reporting"
+                                      element={
+                                        <LazyWithErrorBoundary moduleName="Reporting Settings">
+                                          <LazyReportingView />
+                                        </LazyWithErrorBoundary>
+                                      }
+                                    />
+
+                                    {/* 🐛 DEBUG - Development Tools */}
+                                    <Route
+                                      path="debug"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyDebugDashboard />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="debug/capabilities"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyCapabilitiesDebug />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="debug/theme"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyThemeDebug />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="debug/alerts"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyAlertsTestingPage />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="debug/stores"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyStoresDebug />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="debug/api"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyApiDebug />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="debug/performance"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyPerformanceDebug />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="debug/navigation"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyNavigationDebug />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="debug/components"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyComponentsDebug />
+                                        </RoleGuard>
+                                      }
+                                    />
+                                    <Route
+                                      path="debug/bundle"
+                                      element={
+                                        <RoleGuard requiredRoles={['SUPER_ADMIN']}>
+                                          <LazyBundleDebug />
+                                        </RoleGuard>
+                                      }
+                                    />
+
+                                  </Route>
+
+                                  {/* ✅ LEGACY ADMIN ROUTES REMOVED (Migrated to Nested Pattern) */}
+                                  {/* 📱 CUSTOMER APP - Unified AppShell with nested child routes */}
+                                  <Route
+                                    path="/app"
+                                    element={<AppShell headerActions={<CustomerHeaderActions />} />}
+                                  >
+                                    {/* Protected Routes */}
+                                    <Route path="portal" element={
+                                      <ProtectedRouteNew>
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyCustomerPortal />
+                                        </Suspense>
+                                      </ProtectedRouteNew>
+                                    } />
+                                    <Route path="menu" element={
+                                      <ProtectedRouteNew>
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyCustomerMenu />
+                                        </Suspense>
+                                      </ProtectedRouteNew>
+                                    } />
+                                    <Route path="orders" element={
+                                      <ProtectedRouteNew>
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyMyOrders />
+                                        </Suspense>
+                                      </ProtectedRouteNew>
+                                    } />
+                                    <Route path="settings" element={
+                                      <ProtectedRouteNew>
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyCustomerSettings />
+                                        </Suspense>
+                                      </ProtectedRouteNew>
+                                    } />
+                                    <Route path="booking" element={
+                                      <ProtectedRouteNew>
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyBookingPage />
+                                        </Suspense>
+                                      </ProtectedRouteNew>
+                                    } />
+                                    <Route path="appointments" element={
+                                      <ProtectedRouteNew>
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyAppointmentsPage />
+                                        </Suspense>
+                                      </ProtectedRouteNew>
+                                    } />
+                                    <Route path="checkout" element={
+                                      <ProtectedRouteNew>
+                                        <Suspense fallback={<LoadingFallback />}>
+                                          <LazyCheckoutPage />
+                                        </Suspense>
+                                      </ProtectedRouteNew>
+                                    } />
+
+                                    {/* Public Routes (Catalog, Cart, etc) */}
+                                    <Route path="catalog" element={
                                       <Suspense fallback={<LoadingFallback />}>
-                                        <LazyDashboardPage />
+                                        <LazyCatalogPage />
                                       </Suspense>
-                                    </DashboardRoleRouter>
-                                  } 
-                                />
-                                <Route 
-                                  path="dashboard/cross-analytics" 
-                                  element={
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyDashboardPage />
-                                    </Suspense>
-                                  } 
-                                />
-                                
-                                {/* 📊 CORE - Reporting & Intelligence */}
-                                <Route 
-                                  path="reporting" 
-                                  element={
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyCustomReporting />
-                                    </Suspense>
-                                  } 
-                                />
-                                <Route 
-                                  path="intelligence" 
-                                  element={
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyCompetitiveIntelligence />
-                                    </Suspense>
-                                  } 
-                                />
-                                
-                                {/* 🏢 OPERATIONS */}
-                                <Route 
-                                  path="operations/sales" 
-                                  element={
-                                    <RoleGuard requiredModule="sales">
-                                      <Suspense fallback={<div>Cargando Ventas...</div>}>
-                                        <LazySalesPage />
-                                      </Suspense>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="operations/fulfillment" 
-                                  element={
-                                    <RoleGuard requiredModule="operations">
-                                      <LazyWithErrorBoundary moduleName="Fulfillment">
-                                        <LazyFulfillmentPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                {/* Redirect legacy kitchen route to production */}
-                                <Route
-                                  path="operations/kitchen"
-                                  element={<Navigate to="/admin/operations/production" replace />}
-                                />
-                                <Route
-                                  path="operations/production"
-                                  element={
-                                    <RoleGuard requiredModule="operations">
-                                      <LazyWithErrorBoundary moduleName="Production">
-                                        <LazyProductionPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  }
-                                />
-                                <Route 
-                                  path="operations/fulfillment/delivery" 
-                                  element={
-                                    <RoleGuard requiredModule="operations">
-                                      <LazyWithErrorBoundary moduleName="Delivery Management">
-                                        <LazyDeliveryPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="operations/delivery" 
-                                  element={<Navigate to="/admin/operations/fulfillment/delivery" replace />} 
-                                />
-                                <Route 
-                                  path="operations/memberships/*" 
-                                  element={
-                                    <RoleGuard requiredModule="memberships">
-                                      <LazyWithErrorBoundary moduleName="Memberships">
-                                        <LazyMembershipsPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="operations/rentals/*" 
-                                  element={
-                                    <RoleGuard requiredModule="rentals">
-                                      <LazyWithErrorBoundary moduleName="Rentals">
-                                        <LazyRentalsPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                
-                                {/* 👥 CUSTOMERS */}
-                                <Route 
-                                  path="customers" 
-                                  element={
-                                    <RoleGuard requiredModule="sales">
-                                      <LazyWithErrorBoundary moduleName="Clientes">
-                                        <LazyCustomersPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                
-                                {/* 🏭 SUPPLY CHAIN */}
-                                <Route 
-                                  path="supply-chain/materials" 
-                                  element={
-                                    <RoleGuard requiredModule="materials">
-                                      <LazyWithErrorBoundary moduleName="StockLab">
-                                        <LazyStockLab />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="materials/abc-analysis" 
-                                  element={
-                                    <RoleGuard requiredModule="materials">
+                                    } />
+                                    <Route path="cart" element={
                                       <Suspense fallback={<LoadingFallback />}>
-                                        <LazyABCAnalysisView />
+                                        <LazyCartPage />
                                       </Suspense>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="supply-chain/suppliers" 
-                                  element={
-                                    <RoleGuard requiredModule="materials">
-                                      <LazyWithErrorBoundary moduleName="Proveedores">
-                                        <LazySuppliersPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="supply-chain/products" 
-                                  element={
-                                    <RoleGuard requiredModule="products">
-                                      <LazyProductsPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="supply-chain/products/new" 
-                                  element={
-                                    <RoleGuard requiredModule="products">
-                                      <LazyProductFormPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="supply-chain/products/:id/edit" 
-                                  element={
-                                    <RoleGuard requiredModule="products">
-                                      <LazyProductFormPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="supply-chain/products/:id/view" 
-                                  element={
-                                    <RoleGuard requiredModule="products">
-                                      <LazyProductFormPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="supply-chain/recipes" 
-                                  element={
-                                    <RoleGuard requiredModule="recipe">
-                                      <LazyRecipesPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="supply-chain/assets" 
-                                  element={
-                                    <RoleGuard requiredModule="assets">
-                                      <LazyAssetsPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                
-                                {/* 💰 FINANCE */}
-                                <Route 
-                                  path="finance/fiscal" 
-                                  element={
-                                    <RoleGuard requiredModule="fiscal">
-                                      <LazyFiscalPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="finance/cash" 
-                                  element={
-                                    <RoleGuard requiredModule="fiscal">
-                                      <LazyCashPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="finance/billing/*" 
-                                  element={
-                                    <RoleGuard requiredModule="billing">
-                                      <LazyWithErrorBoundary moduleName="Billing">
-                                        <LazyBillingPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="finance/integrations/*" 
-                                  element={
-                                    <RoleGuard requiredModule="integrations">
-                                      <LazyWithErrorBoundary moduleName="Finance Integrations">
-                                        <LazyIntegrationsPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                
-                                {/* 👨‍💼 RESOURCES */}
-                                <Route 
-                                  path="resources/team" 
-                                  element={
-                                    <RoleGuard requiredModule="staff">
-                                      <LazyStaffPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="resources/scheduling" 
-                                  element={
-                                    <RoleGuard requiredModule="scheduling">
-                                      <LazySchedulingPage />
-                                    </RoleGuard>
-                                  } 
-                                />
-                                
-                                {/* 🎮 GAMIFICATION */}
-                                <Route 
-                                  path="gamification/*" 
-                                  element={
-                                    <RoleGuard requiredModule="gamification">
-                                      <LazyWithErrorBoundary moduleName="Gamificación">
-                                        <LazyGamificationPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                
-                                {/* 📈 EXECUTIVE BI */}
-                                <Route 
-                                  path="executive/*" 
-                                  element={
-                                    <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
-                                      <LazyWithErrorBoundary moduleName="Executive Dashboard">
-                                        <LazyExecutivePage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                
-                                {/* 🔧 TOOLS */}
-                                <Route 
-                                  path="tools/reporting/*" 
-                                  element={
-                                    <RoleGuard requiredModule="reporting">
-                                      <LazyWithErrorBoundary moduleName="Reporting Tools">
-                                        <LazyReportingPage />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                
-                                {/* ⚙️ SETTINGS */}
-                                <Route 
-                                  path="settings" 
-                                  element={
-                                    <LazyWithErrorBoundary moduleName="Settings">
-                                      <LazySettingsPage />
-                                    </LazyWithErrorBoundary>
-                                  } 
-                                />
-                                <Route 
-                                  path="settings/business" 
-                                  element={
-                                    <LazyWithErrorBoundary moduleName="Business Settings">
-                                      <LazyBusinessPage />
-                                    </LazyWithErrorBoundary>
-                                  } 
-                                />
-                                <Route 
-                                  path="settings/diagnostics" 
-                                  element={
-                                    <RoleGuard requiredRoles={['SUPER_ADMIN']}>
-                                      <LazyWithErrorBoundary moduleName="Diagnostics">
-                                        <LazyDiagnosticsView />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="settings/enterprise" 
-                                  element={
-                                    <RoleGuard requiredRoles={['ADMINISTRADOR', 'SUPER_ADMIN']}>
-                                      <LazyWithErrorBoundary moduleName="Enterprise Settings">
-                                        <LazyEnterpriseView />
-                                      </LazyWithErrorBoundary>
-                                    </RoleGuard>
-                                  } 
-                                />
-                                <Route 
-                                  path="settings/hours" 
-                                  element={
-                                    <LazyWithErrorBoundary moduleName="Business Hours">
-                                      <LazyHoursPage />
-                                    </LazyWithErrorBoundary>
-                                  } 
-                                />
-                                <Route 
-                                  path="settings/integrations" 
-                                  element={
-                                    <LazyWithErrorBoundary moduleName="Integrations">
-                                      <LazyIntegrationsPage />
-                                    </LazyWithErrorBoundary>
-                                  } 
-                                />
-                                <Route 
-                                  path="settings/payment-methods" 
-                                  element={
-                                    <LazyWithErrorBoundary moduleName="Payment Methods">
-                                      <LazyPaymentMethodsPage />
-                                    </LazyWithErrorBoundary>
-                                  } 
-                                />
-                                <Route 
-                                  path="settings/reporting" 
-                                  element={
-                                    <LazyWithErrorBoundary moduleName="Reporting Settings">
-                                      <LazyReportingView />
-                                    </LazyWithErrorBoundary>
-                                  } 
-                                />
-                                
-                                {/* 🐛 DEBUG - ThemeTest removed */}
-                                
-                              </Route>
+                                    } />
+                                    <Route path="checkout/success" element={
+                                      <Suspense fallback={<LoadingFallback />}>
+                                        <LazyCheckoutSuccessPage />
+                                      </Suspense>
+                                    } />
+                                    <Route path="checkout/failure" element={
+                                      <Suspense fallback={<LoadingFallback />}>
+                                        <LazyCheckoutFailurePage />
+                                      </Suspense>
+                                    } />
+                                    <Route path="delivery-coverage" element={
+                                      <Suspense fallback={<LoadingFallback />}>
+                                        <LazyDeliveryCoveragePage />
+                                      </Suspense>
+                                    } />
+                                  </Route>
+                                  {/* �📱 CUSTOMER APP - Para usuarios CLIENTE */}
 
-                              {/* ✅ LEGACY ADMIN ROUTES REMOVED (Migrated to Nested Pattern) */}
-                              {/* 📱 CUSTOMER APP - Unified AppShell with nested child routes */}
-                              <Route 
-                                path="/app" 
-                                element={<AppShell headerActions={<CustomerHeaderActions />} />}
-                              >
-                                {/* Protected Routes */}
-                                <Route path="portal" element={
-                                  <ProtectedRouteNew>
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyCustomerPortal />
-                                    </Suspense>
-                                  </ProtectedRouteNew>
-                                } />
-                                <Route path="menu" element={
-                                  <ProtectedRouteNew>
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyCustomerMenu />
-                                    </Suspense>
-                                  </ProtectedRouteNew>
-                                } />
-                                <Route path="orders" element={
-                                  <ProtectedRouteNew>
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyMyOrders />
-                                    </Suspense>
-                                  </ProtectedRouteNew>
-                                } />
-                                <Route path="settings" element={
-                                  <ProtectedRouteNew>
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyCustomerSettings />
-                                    </Suspense>
-                                  </ProtectedRouteNew>
-                                } />
-                                <Route path="booking" element={
-                                  <ProtectedRouteNew>
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyBookingPage />
-                                    </Suspense>
-                                  </ProtectedRouteNew>
-                                } />
-                                <Route path="appointments" element={
-                                  <ProtectedRouteNew>
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyAppointmentsPage />
-                                    </Suspense>
-                                  </ProtectedRouteNew>
-                                } />
-                                <Route path="checkout" element={
-                                  <ProtectedRouteNew>
-                                    <Suspense fallback={<LoadingFallback />}>
-                                      <LazyCheckoutPage />
-                                    </Suspense>
-                                  </ProtectedRouteNew>
-                                } />
+                                  {/* 🚫 404 fallback */}
+                                  <Route path="*" element={
+                                    <div style={{
+                                      minHeight: '50vh',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      color: '#666',
+                                      fontSize: '14px'
+                                    }}>
+                                      Página no encontrada
+                                    </div>
+                                  } />
+                                </Routes>
+                              </Suspense>
+                            </PerformanceWrapper>
+                          </NavigationProvider>
+                        </EventBusProvider>
 
-                                {/* Public Routes (Catalog, Cart, etc) */}
-                                <Route path="catalog" element={
-                                  <Suspense fallback={<LoadingFallback />}>
-                                    <LazyCatalogPage />
-                                  </Suspense>
-                                } />
-                                <Route path="cart" element={
-                                  <Suspense fallback={<LoadingFallback />}>
-                                    <LazyCartPage />
-                                  </Suspense>
-                                } />
-                                <Route path="checkout/success" element={
-                                  <Suspense fallback={<LoadingFallback />}>
-                                    <LazyCheckoutSuccessPage />
-                                  </Suspense>
-                                } />
-                                <Route path="checkout/failure" element={
-                                  <Suspense fallback={<LoadingFallback />}>
-                                    <LazyCheckoutFailurePage />
-                                  </Suspense>
-                                } />
-                                <Route path="delivery-coverage" element={
-                                  <Suspense fallback={<LoadingFallback />}>
-                                    <LazyDeliveryCoveragePage />
-                                  </Suspense>
-                                } />
-                              </Route>
-                              {/* �📱 CUSTOMER APP - Para usuarios CLIENTE */}
+                      </OfflineMonitorProvider>
+                    </LocationProvider>
 
-                              {/* 🚫 404 fallback */}
-                              <Route path="*" element={
-                                <div style={{
-                                  minHeight: '50vh',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  color: '#666',
-                                  fontSize: '14px'
-                                }}>
-                                  Página no encontrada
-                                </div>
-                              } />
-                            </Routes>
-                          </Suspense>
-                        </PerformanceWrapper>
-                      </NavigationProvider>
-                    </EventBusProvider>
+                  </FeatureFlagProvider>
+                </AuthProvider>
+              </ErrorBoundaryWrapper>
+            </Router>
 
-                  </OfflineMonitorProvider>
-                </LocationProvider>
+            {/* 🍞 CHAKRA UI TOASTER - Global toast notifications */}
+            {/* ✅ CRITICAL: Must be inside Provider for Chakra context */}
+            <Toaster />
+          </AlertsProvider>
+        </Provider>
 
-                </FeatureFlagProvider>
-              </AuthProvider>
-            </ErrorBoundaryWrapper>
-          </Router>
-          
-          {/* 🍞 CHAKRA UI TOASTER - Global toast notifications */}
-          {/* ✅ CRITICAL: Must be inside Provider for Chakra context */}
-          <Toaster />
-        </AlertsProvider>
-      </Provider>
-      
-      {/* 🔍 TANSTACK QUERY DEVTOOLS - Development only */}
-      {process.env.NODE_ENV === 'development' && (
-        <ReactQueryDevtools initialIsOpen={false} position="bottom" />
-      )}
-    </PerformanceProvider>
-  </QueryClientProvider>
+        {/* 🔍 TANSTACK QUERY DEVTOOLS - Development only */}
+        {process.env.NODE_ENV === 'development' && (
+          <ReactQueryDevtools initialIsOpen={false} position="bottom" />
+        )}
+      </PerformanceProvider>
+    </QueryClientProvider>
   );
 }
 

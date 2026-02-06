@@ -20,27 +20,29 @@ import {
   executeRecipe as executeRecipeApi,
   checkRecipeViability
 } from '../services/recipeApi'
-import type { Recipe, RecipeEntityType, RecipeCategory, CreateRecipeInput, UpdateRecipeInput } from '../types/recipe'
-import type { RecipeViability, ExecuteRecipeInput } from '../types/execution'
+import type { Recipe, RecipeEntityType, CreateRecipeInput, UpdateRecipeInput } from '../types/recipe'
 
 // ============================================
-// QUERY KEYS FACTORY
+// TYPES
+// ============================================
+
+export interface RecipeFilters {
+  searchTerm?: string
+  entityType?: RecipeEntityType | 'all'
+}
+
+// ============================================
+// QUERY KEYS
 // ============================================
 
 export const recipeKeys = {
   all: ['recipes'] as const,
   lists: () => [...recipeKeys.all, 'list'] as const,
-  list: (filters?: RecipeFilters) => [...recipeKeys.lists(), filters] as const,
+  list: (filters?: RecipeFilters) => [...recipeKeys.lists(), { filters }] as const,
   details: () => [...recipeKeys.all, 'detail'] as const,
   detail: (id: string) => [...recipeKeys.details(), id] as const,
-  viability: (id: string) => [...recipeKeys.all, 'viability', id] as const,
-  executions: (id?: string) => [...recipeKeys.all, 'executions', id] as const,
-}
-
-export interface RecipeFilters {
-  search?: string
-  entityType?: RecipeEntityType | 'all'
-  category?: RecipeCategory | 'all'
+  viability: (id: string) => [...recipeKeys.detail(id), 'viability'] as const,
+  executions: (id: string) => [...recipeKeys.detail(id), 'executions'] as const,
 }
 
 // ============================================
@@ -64,10 +66,6 @@ export function useRecipes(filters?: RecipeFilters) {
 
         if (filters?.entityType && filters.entityType !== 'all') {
           filtered = filtered.filter(r => r.entityType === filters.entityType)
-        }
-
-        if (filters?.category && filters.category !== 'all') {
-          filtered = filtered.filter(r => r.category === filters.category)
         }
 
         if (filters?.search) {
@@ -166,11 +164,11 @@ export function useCreateRecipe() {
       // Set the new recipe in cache
       queryClient.setQueryData(recipeKeys.detail(recipe.id), recipe)
 
-      notify.success('Recipe created successfully')
+      notify.success({ title: 'Receta creada exitosamente' })
       logger.info('useCreateRecipe' as any, 'Recipe created', { id: recipe.id })
     },
     onError: (error: Error) => {
-      notify.error(`Failed to create recipe: ${error.message}`)
+      notify.error({ title: 'Error al crear receta', description: error.message })
     },
   })
 }
@@ -197,11 +195,11 @@ export function useUpdateRecipe() {
       queryClient.invalidateQueries({ queryKey: recipeKeys.lists() })
       queryClient.setQueryData(recipeKeys.detail(recipe.id), recipe)
 
-      notify.success('Recipe updated successfully')
+      notify.success({ title: 'Receta actualizada exitosamente' })
       logger.info('useUpdateRecipe' as any, 'Recipe updated', { id: recipe.id })
     },
     onError: (error: Error) => {
-      notify.error(`Failed to update recipe: ${error.message}`)
+      notify.error({ title: 'Error al actualizar receta', description: error.message })
     },
   })
 }
@@ -230,11 +228,11 @@ export function useDeleteRecipe() {
       queryClient.removeQueries({ queryKey: recipeKeys.detail(id) })
       queryClient.removeQueries({ queryKey: recipeKeys.viability(id) })
 
-      notify.success('Recipe deleted successfully')
+      notify.success({ title: 'Receta eliminada exitosamente' })
       logger.info('useDeleteRecipe' as any, 'Recipe deleted', { id })
     },
     onError: (error: Error) => {
-      notify.error(`Failed to delete recipe: ${error.message}`)
+      notify.error({ title: 'Error al eliminar receta', description: error.message })
     },
   })
 }
@@ -266,11 +264,11 @@ export function useExecuteRecipe() {
       queryClient.invalidateQueries({ queryKey: ['materials'] })
       queryClient.invalidateQueries({ queryKey: ['products'] })
 
-      notify.success('Recipe executed successfully')
+      notify.success({ title: 'Receta ejecutada exitosamente' })
       logger.info('useExecuteRecipe' as any, 'Recipe executed', { executionId: execution.id })
     },
     onError: (error: Error) => {
-      notify.error(`Failed to execute recipe: ${error.message}`)
+      notify.error({ title: 'Error al ejecutar receta', description: error.message })
     },
   })
 }

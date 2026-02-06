@@ -5,7 +5,7 @@
  */
 
 import { logger } from '@/lib/logging/Logger';
-import { EventBus } from '@/lib/events/EventBus';
+import eventBus from '@/lib/events/EventBus';
 import type { EventHandler } from '@/lib/events/types';
 import { createJournalEntry } from '../services/journalService';
 import { getAccountByCode } from '../services/chartOfAccountsService';
@@ -139,15 +139,14 @@ export const handlePayrollProcessed: EventHandler<PayrollProcessedEvent> =
       });
 
       // Emitir evento de confirmación
-      await EventBus.emit(
+      await eventBus.emit(
         'cash.payroll.recorded',
         {
           payrollPeriodId: payload.payrollPeriodId,
           amount: payload.totalNet,
           employeeCount: payload.employees.length,
           timestamp: new Date().toISOString(),
-        },
-        'CashModule'
+        }
       );
     } catch (error) {
       logger.error('CashModule', 'Failed to process payroll', {
@@ -271,9 +270,9 @@ export function registerPayrollHandlers(): () => void {
   logger.info('CashModule', 'Registering payroll event handlers');
 
   const unsubscribers = [
-    EventBus.on('staff.payroll.processed', handlePayrollProcessed),
-    EventBus.on('staff.payroll.cancelled', handlePayrollCancelled),
-    EventBus.on('staff.advance_payment', handleAdvancePayment),
+    eventBus.on('staff.payroll.processed', handlePayrollProcessed),
+    eventBus.on('staff.payroll.cancelled', handlePayrollCancelled),
+    eventBus.on('staff.advance_payment', handleAdvancePayment),
   ];
 
   return () => {

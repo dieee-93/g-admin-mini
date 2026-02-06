@@ -1,0 +1,43 @@
+
+Running 1 test using 1 worker
+
+Starting POM test...
+  Ô£ÿ  1 [authenticated] ÔÇ║ tests\e2e\recipe\create-recipe.spec.ts:5:5 ÔÇ║ Recipe Builder - Create Recipe ÔÇ║ should verify happy path for creating a simple recipe (16.4s)
+
+
+  1) [authenticated] ÔÇ║ tests\e2e\recipe\create-recipe.spec.ts:5:5 ÔÇ║ Recipe Builder - Create Recipe ÔÇ║ should verify happy path for creating a simple recipe 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByPlaceholder('Nombre de la receta')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByPlaceholder('Nombre de la receta')[22m
+
+
+       at pages\RecipePage.ts:41
+
+      39 |         await expect(this.newRecipeButton).toBeVisible();
+      40 |         await this.newRecipeButton.click();
+    > 41 |         await expect(this.nameInput).toBeVisible();
+         |                                      ^
+      42 |     }
+      43 |
+      44 |     async fillBasicInfo(name: string, description: string) {
+        at RecipePage.initiateCreation (I:\Programacion\Proyectos\g-mini\tests\e2e\pages\RecipePage.ts:41:38)
+        at I:\Programacion\Proyectos\g-mini\tests\e2e\recipe\create-recipe.spec.ts:14:9
+
+    attachment #1: screenshot (image/png) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    test-results\recipe-create-recipe-Recip-a88b5-or-creating-a-simple-recipe-authenticated\test-failed-1.png
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error Context: test-results\recipe-create-recipe-Recip-a88b5-or-creating-a-simple-recipe-authenticated\error-context.md
+
+  1 failed
+    [authenticated] ÔÇ║ tests\e2e\recipe\create-recipe.spec.ts:5:5 ÔÇ║ Recipe Builder - Create Recipe ÔÇ║ should verify happy path for creating a simple recipe 
+
+[36m  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.[39m

@@ -442,6 +442,10 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     }
 
     // Staff/Admin users get navigation from ModuleRegistry
+    console.log('🚨 [NavigationContext] adminModulesFromRegistry:', {
+      count: adminModulesFromRegistry.length,
+      ids: adminModulesFromRegistry.map(m => m.id)
+    });
     return adminModulesFromRegistry;
   }, [canAccessModule, isAuthenticated, user?.role, adminModulesFromRegistry]);
 

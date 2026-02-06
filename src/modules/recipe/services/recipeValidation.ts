@@ -1,9 +1,11 @@
 /**
  * Recipe Validation Service
  *
- * Validaciones de negocio para recetas según entityType
+ * Validaciones de negocio industriales para recetas según entityType.
  *
- * @module recipe/services/recipeValidation
+ * CHANGES v3.0:
+ * - 🗑️ REMOVAL: Removed validation for gastronomic fields and times.
+ * - ✅ FIX: Proper check for item types (MEASURABLE, COUNTABLE, ELABORATED).
  */
 
 import type {
@@ -22,8 +24,8 @@ export function validateRecipe(recipe: Partial<Recipe>): ValidationResult {
   const errors: string[] = []
   const warnings: string[] = []
 
-  // Validaciones básicas
-  if (!recipe.name || recipe.name.trim().length === 0) {
+  // Identity: Name is optional only for materials (intrinsic)
+  if ((!recipe.name || recipe.name.trim().length === 0) && recipe.entityType !== 'material') {
     errors.push('El nombre de la receta es requerido')
   }
 
@@ -39,7 +41,7 @@ export function validateRecipe(recipe: Partial<Recipe>): ValidationResult {
     errors.push('El modo de ejecución es requerido')
   }
 
-  // Validar output
+  // Output Validation
   if (!recipe.output) {
     errors.push('El output de la receta es requerido')
   } else {
@@ -54,7 +56,7 @@ export function validateRecipe(recipe: Partial<Recipe>): ValidationResult {
     }
   }
 
-  // Validar inputs
+  // Inputs Validation
   if (!recipe.inputs || recipe.inputs.length === 0) {
     errors.push('La receta debe tener al menos un ingrediente/componente')
   } else {
@@ -71,7 +73,7 @@ export function validateRecipe(recipe: Partial<Recipe>): ValidationResult {
     })
   }
 
-  // Validaciones específicas por entityType
+  // Entity-specific input rules
   if (recipe.entityType && recipe.inputs) {
     const entityValidation = validateRecipeInputsByEntityType(
       recipe.entityType,
@@ -81,7 +83,7 @@ export function validateRecipe(recipe: Partial<Recipe>): ValidationResult {
     warnings.push(...entityValidation.warnings)
   }
 
-  // Validar consistencia executionMode vs entityType
+  // Execution Mode consistency
   if (recipe.entityType && recipe.executionMode) {
     const modeValidation = validateExecutionMode(
       recipe.entityType,
@@ -99,7 +101,7 @@ export function validateRecipe(recipe: Partial<Recipe>): ValidationResult {
 }
 
 /**
- * Valida inputs según el entityType
+ * Valida inputs según el entityType (Reglas industriales)
  */
 export function validateRecipeInputsByEntityType(
   entityType: RecipeEntityType,
@@ -108,15 +110,17 @@ export function validateRecipeInputsByEntityType(
   const errors: string[] = []
   const warnings: string[] = []
 
+  const VALID_MATERIAL_TYPES = ['material', 'MEASURABLE', 'COUNTABLE', 'ELABORATED'];
+
   switch (entityType) {
     case 'material':
       // Materials elaborados solo pueden usar materials como inputs
       inputs.forEach((input, index) => {
         const itemType = typeof input.item === 'object' ? input.item.type : null
-        if (itemType && itemType !== 'material') {
+        if (itemType && !VALID_MATERIAL_TYPES.includes(itemType)) {
           errors.push(
             `Input ${index + 1} ("${input.item.name || input.item}"): ` +
-            `Material elaborado solo puede usar materials. ` +
+            `Material elaborado solo puede usar materias primas. ` +
             `Encontrado: ${itemType}`
           )
         }
@@ -124,13 +128,13 @@ export function validateRecipeInputsByEntityType(
       break
 
     case 'product':
-      // Products pueden usar materials y products
+      // Products pueden usar materials y otros productos (BOM anidado)
       inputs.forEach((input, index) => {
         const itemType = typeof input.item === 'object' ? input.item.type : null
-        if (itemType && !['material', 'product'].includes(itemType)) {
+        if (itemType && !['product', ...VALID_MATERIAL_TYPES].includes(itemType)) {
           errors.push(
             `Input ${index + 1} ("${input.item.name || input.item}"): ` +
-            `Producto solo puede usar materials o products como inputs. ` +
+            `Producto solo puede usar materiales o productos como componentes. ` +
             `Encontrado: ${itemType}`
           )
         }
@@ -138,28 +142,13 @@ export function validateRecipeInputsByEntityType(
       break
 
     case 'kit':
-      // Kits solo usan products
+      // Kits solo usan productos terminados
       inputs.forEach((input, index) => {
         const itemType = typeof input.item === 'object' ? input.item.type : null
         if (itemType && itemType !== 'product') {
           errors.push(
             `Input ${index + 1} ("${input.item.name || input.item}"): ` +
-            `Kit solo puede usar productos. ` +
-            `Encontrado: ${itemType}`
-          )
-        }
-      })
-      break
-
-    case 'service':
-      // Services pueden usar materials y assets
-      inputs.forEach((input, index) => {
-        const itemType = typeof input.item === 'object' ? input.item.type : null
-        if (itemType && !['material', 'asset'].includes(itemType)) {
-          errors.push(
-            `Input ${index + 1} ("${input.item.name || input.item}"): ` +
-            `Servicio solo puede usar materials o assets. ` +
-            `Encontrado: ${itemType}`
+            `Kit solo puede usar productos terminados.`
           )
         }
       })
@@ -185,21 +174,12 @@ export function validateExecutionMode(
 
   // Materials DEBEN tener executionMode='immediate'
   if (entityType === 'material' && executionMode !== 'immediate') {
-    errors.push(
-      'Material elaborado debe tener executionMode="immediate" ' +
-      '(se produce y consume stock al crear)'
-    )
+    errors.push('Material elaborado debe consumirse inmediatamente al producirse.')
   }
 
-  // Products, Kits, Services DEBEN tener executionMode='on_demand'
-  if (
-    ['product', 'kit', 'service'].includes(entityType) &&
-    executionMode !== 'on_demand'
-  ) {
-    errors.push(
-      `${entityType} debe tener executionMode="on_demand" ` +
-      '(se consume stock al vender/usar)'
-    )
+  // Products, Kits DEBEN tener executionMode='on_demand'
+  if (['product', 'kit'].includes(entityType) && executionMode !== 'on_demand') {
+    errors.push(`${entityType} debe consumirse al momento de la venta (on_demand).`)
   }
 
   return {
@@ -215,9 +195,6 @@ export function validateExecutionMode(
 export function validateCreateRecipeInput(
   input: CreateRecipeInput
 ): ValidationResult {
-  const errors: string[] = []
-  const warnings: string[] = []
-
   // Convertir a Recipe parcial para reutilizar validación
   const recipeForValidation: Partial<Recipe> = {
     name: input.name,
@@ -237,80 +214,26 @@ export function validateCreateRecipeInput(
       item: i.itemId,
       quantity: i.quantity,
       unit: i.unit,
-      optional: i.optional,
-      substituteFor: i.substituteFor,
       yieldPercentage: i.yieldPercentage,
       wastePercentage: i.wastePercentage,
-      unitCostOverride: i.unitCostOverride,
       conversionFactor: i.conversionFactor,
       stage: i.stage,
       stageName: i.stageName,
       displayOrder: i.displayOrder
     })),
-    category: input.category,
     tags: input.tags,
     difficulty: input.difficulty,
-    preparationTime: input.preparationTime,
-    cookingTime: input.cookingTime,
-    totalTime: input.preparationTime && input.cookingTime
-      ? input.preparationTime + input.cookingTime
-      : undefined,
     instructions: input.instructions,
     notes: input.notes,
     costConfig: input.costConfig,
     imageUrl: input.imageUrl
   }
 
-  const validation = validateRecipe(recipeForValidation)
-  errors.push(...validation.errors)
-  warnings.push(...validation.warnings)
-
-  // Validaciones adicionales específicas de CreateInput
-  if (input.outputYieldPercentage !== undefined) {
-    if (input.outputYieldPercentage < 0 || input.outputYieldPercentage > 100) {
-      errors.push('El porcentaje de rendimiento de output debe estar entre 0 y 100')
-    }
-  }
-
-  if (input.outputWastePercentage !== undefined) {
-    if (input.outputWastePercentage < 0 || input.outputWastePercentage > 100) {
-      errors.push('El porcentaje de desperdicio de output debe estar entre 0 y 100')
-    }
-  }
-
-  input.inputs.forEach((inputItem, index) => {
-    if (inputItem.yieldPercentage !== undefined) {
-      if (inputItem.yieldPercentage < 0 || inputItem.yieldPercentage > 100) {
-        errors.push(
-          `Input ${index + 1}: El porcentaje de rendimiento debe estar entre 0 y 100`
-        )
-      }
-    }
-
-    if (inputItem.wastePercentage !== undefined) {
-      if (inputItem.wastePercentage < 0 || inputItem.wastePercentage > 100) {
-        errors.push(
-          `Input ${index + 1}: El porcentaje de desperdicio debe estar entre 0 y 100`
-        )
-      }
-    }
-
-    if (inputItem.conversionFactor !== undefined && inputItem.conversionFactor <= 0) {
-      errors.push(
-        `Input ${index + 1}: El factor de conversión debe ser mayor a 0`
-      )
-    }
-  })
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-    warnings
-  }
+  return validateRecipe(recipeForValidation)
 }
 
 /**
- * Crea un RecipeValidationError desde un ValidationResult
+ * Crea un RecipeValidationError
  */
 export function createValidationError(
   validation: ValidationResult,
