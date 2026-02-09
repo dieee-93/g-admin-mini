@@ -419,20 +419,36 @@ export function validateField(
  * @param data - Form data to validate
  * @returns Map of field paths to error messages
  */
-export function getValidationErrors(data: Partial<MaterialFormData>): Record<string, string> {
-  const result = MaterialFormSchema.safeParse(data);
-
-  if (result.success) {
+export function getValidationErrors(data: Partial<MaterialFormData> | undefined): Record<string, string> {
+  // Early return if data is undefined or null
+  if (!data) {
     return {};
   }
 
-  const errors: Record<string, string> = {};
-  result.error.errors.forEach(err => {
-    const path = err.path.join('.');
-    errors[path] = err.message;
-  });
+  try {
+    const result = MaterialFormSchema.safeParse(data);
 
-  return errors;
+    if (result.success) {
+      return {};
+    }
+
+    // Additional safety check
+    if (!result.error || !result.error.errors) {
+      console.warn('Zod validation failed but no errors array found', result);
+      return {};
+    }
+
+    const errors: Record<string, string> = {};
+    result.error.errors.forEach(err => {
+      const path = err.path.join('.');
+      errors[path] = err.message;
+    });
+
+    return errors;
+  } catch (error) {
+    console.error('Error in getValidationErrors:', error);
+    return {};
+  }
 }
 
 /**

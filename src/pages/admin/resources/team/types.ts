@@ -1,59 +1,22 @@
-// Staff Management Module - Types Definition
+// Team Member Management Module - Types Definition
 // Security compliant types for teamMember data management
 
-export interface TeamMember {
-  id: string;
-  employee_id: string; // Human-readable ID (EMP001, etc.)
-  
-  // Basic Information
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone?: string;
-  avatar_url?: string;
-  
-  // Employment Details
-  position: string;
-  department: string;
-  hire_date: string;
-  employment_status: 'active' | 'inactive' | 'terminated' | 'on_leave';
-  employment_type: 'full_time' | 'part_time' | 'contract' | 'intern' | 'full_time_formal' | 'part_time_formal' | 'informal' | 'contractor' | 'family_helper';
-  
-  // Security & Access
-  role: 'admin' | 'manager' | 'supervisor' | 'teamMember';
-  permissions: string[];
-  last_login?: string;
-  
-  // Performance Data
-  performance_score?: number;
-  goals_completed?: number;
-  total_goals?: number;
-  
-  // Training Data
-  certifications?: string[];
-  training_completed?: number;
-  training_hours?: number;
-  
-  // Scheduling Data
-  availability?: EmployeeAvailability;
+
+import type { TeamMember as ApiTeamMember } from '@/modules/team/services';
+
+export interface TeamMember extends Omit<ApiTeamMember, 'department'> {
+  // Alias for compatibility if needed, but preferred to use teamMember_id
+  employee_id?: string;
+  department: string; // UI uses string but API uses union
 
   // Location Data (Multi-Location Support)
-  home_location_id?: string; // Primary location where teamMember works
-  can_work_multiple_locations: boolean; // Can be scheduled at any location
-
-  // Sensitive Data (masked in UI)
-  salary?: number; // Only visible to HR/Admin
-  hourly_rate?: number; // Only visible to HR/Admin
-  social_security?: string; // Masked in UI
+  home_location_id?: string;
+  can_work_multiple_locations?: boolean;
 
   // Argentine Context - Informal Employment Support
-  daily_cash_rate?: number; // For informal workers
-  track_payments?: boolean; // If false, only tracks presence not payments
-  tax_id?: string; // CUIT for contractors
-
-  // Timestamps
-  created_at: string;
-  updated_at: string;
+  daily_cash_rate?: number;
+  track_payments?: boolean;
+  tax_id?: string;
 }
 
 export interface EmployeeAvailability {
@@ -117,7 +80,7 @@ export interface Goal {
   updated_at: string;
 }
 
-export interface StaffStats {
+export interface TeamStats {
   total_employees: number;
   active_employees: number;
   on_shift: number;
@@ -135,22 +98,22 @@ export interface UserRole {
 }
 
 export interface Permission {
-  resource: 'staff' | 'performance' | 'training' | 'payroll' | 'scheduling';
+  resource: 'team' | 'performance' | 'training' | 'payroll' | 'scheduling';
   actions: ('read' | 'write' | 'delete' | 'manage')[];
 }
 
 // Filter and search types
-export interface StaffFilters {
+export interface TeamFilters {
   department?: string;
   position?: string;
   employment_status?: TeamMember['employment_status'];
   employment_type?: TeamMember['employment_type'];
-  role?: TeamMember['role'];
+  role?: string;
   location_id?: string; // Filter by home location
   search?: string;
 }
 
-export interface StaffSortOptions {
+export interface TeamSortOptions {
   field: 'name' | 'hire_date' | 'performance_score' | 'last_login';
   direction: 'asc' | 'desc';
 }
@@ -198,11 +161,11 @@ export interface TimeTrackingStats {
 }
 
 // UI State types
-export interface StaffViewState {
+export interface TeamViewState {
   activeTab: 'directory' | 'performance' | 'training' | 'management' | 'timetracking';
   selectedEmployee?: TeamMember;
-  filters: StaffFilters;
-  sortBy: StaffSortOptions;
+  filters: TeamFilters;
+  sortBy: TeamSortOptions;
   viewMode: 'grid' | 'list';
 }
 
@@ -238,7 +201,7 @@ export interface EmployeePermission {
   granted_at: string;
 }
 
-export interface EmployeeFormData {
+export interface TeamMemberFormData {
   first_name: string;
   last_name: string;
   email: string;
@@ -246,8 +209,8 @@ export interface EmployeeFormData {
   position: string;
   department: string;
   hire_date: string;
-  employment_type: TeamMember['employment_type'];
-  role: TeamMember['role'];
+  employment_type: string;
+  role: string;
   hourly_rate?: number;
   permissions: string[];
   salary?: number;

@@ -1,25 +1,25 @@
 /**
- * STAFF SELECTOR v1.0 - Reusable Staff Assignment Component
+ * TEAM SELECTOR v1.0 - Reusable Team Assignment Component
  * 
- * A compact, injectable component for assigning staff to tasks across modules.
+ * A compact, injectable component for assigning team members to tasks across modules.
  * Designed for products, production orders, recipes, services, and more.
  * 
  * FEATURES:
  * - Compact UI for forms (mobile-friendly)
  * - Two-selector pattern: Role first, TeamMember optional
- * - Labor cost calculation via staff module API
+ * - Labor cost calculation via team module API
  * - Cross-module data via ModuleRegistry (single source of truth)
  * 
  * ARCHITECTURE:
- * - Uses staff module exports for data (no duplicate API calls)
+ * - Uses team module exports for data (no duplicate API calls)
  * - Follows cross-module patterns from CROSS_MODULE_DATA_ARCHITECTURE.md
  * - Respects DecimalUtils for financial calculations
  * 
  * @example
  * ```tsx
- * <StaffSelector
- *   value={staffAssignments}
- *   onChange={setStaffAssignments}
+ * <TeamSelector
+ *   value={teamAssignments}
+ *   onChange={setTeamAssignments}
  *   variant="compact"
  *   showCost={true}
  *   onCostChange={(cost) => setTotalLaborCost(cost)}
@@ -51,13 +51,13 @@ import {
 import { ModuleRegistry } from '@/lib/modules';
 import { DecimalUtils } from '@/lib/decimal';
 import type {
-  StaffSelectorProps,
-  StaffAssignment,
-  StaffRoleOption,
+  TeamSelectorProps,
+  TeamAssignment,
+  TeamRoleOption,
   EmployeeOption,
   QuickAddState
 } from './types';
-import type { StaffAPI } from '@/modules/team/manifest';
+import type { TeamAPI } from '@/modules/team/manifest';
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -68,39 +68,39 @@ import type { StaffAPI } from '@/modules/team/manifest';
  * Uses DecimalUtils for financial precision
  */
 function calculateAssignmentCost(
-  assignment: StaffAssignment,
-  role?: StaffRoleOption
+  assignment: TeamAssignment,
+  role?: TeamRoleOption
 ): { hours: number; cost: number; loadedHourlyCost: number } {
   const durationMinutes = assignment.duration_minutes || 0;
   const count = assignment.count || 1;
-  
+
   // Calculate hours: duration_minutes / 60 * count
   const hours = DecimalUtils.multiply(
     DecimalUtils.divide(durationMinutes.toString(), '60', 'financial'),
     count.toString(),
     'financial'
   ).toNumber();
-  
+
   // Rate hierarchy: assignment override > role default > 0
   const baseRate = assignment.hourly_rate ?? role?.default_hourly_rate ?? 0;
-  
+
   // Loaded factor hierarchy: assignment override > role > 1.0
   const loadedFactor = assignment.loaded_factor ?? role?.loaded_factor ?? 1.0;
-  
+
   // Calculate loaded hourly cost: baseRate * loadedFactor
   const loadedHourlyCost = DecimalUtils.multiply(
     baseRate.toString(),
     loadedFactor.toString(),
     'financial'
   ).toNumber();
-  
+
   // Calculate total cost: hours * loadedHourlyCost
   const cost = DecimalUtils.multiply(
     hours.toString(),
     loadedHourlyCost.toString(),
     'financial'
   ).toNumber();
-  
+
   return { hours, cost, loadedHourlyCost };
 }
 
@@ -125,15 +125,15 @@ const AssignmentRow = memo(function AssignmentRow({
   onRemove,
   readOnly
 }: {
-  assignment: StaffAssignment;
-  roleOptions: StaffRoleOption[];
+  assignment: TeamAssignment;
+  roleOptions: TeamRoleOption[];
   showCost: boolean;
   onRemove: () => void;
   readOnly: boolean;
 }) {
   const role = roleOptions.find(r => r.id === assignment.role_id);
   const { cost, loadedHourlyCost } = calculateAssignmentCost(assignment, role);
-  
+
   return (
     <HStack
       gap="2"
@@ -156,7 +156,7 @@ const AssignmentRow = memo(function AssignmentRow({
             </Badge>
           )}
         </HStack>
-        
+
         {assignment.employee_name && (
           <HStack gap="1" align="center">
             <Icon icon={UserIcon} boxSize="3" color="fg.muted" />
@@ -166,7 +166,7 @@ const AssignmentRow = memo(function AssignmentRow({
           </HStack>
         )}
       </Stack>
-      
+
       {/* Count and Duration */}
       <HStack gap="2" flexShrink={0}>
         <Badge size="sm" variant="outline" colorPalette="blue">
@@ -177,7 +177,7 @@ const AssignmentRow = memo(function AssignmentRow({
           {assignment.duration_minutes}m
         </Badge>
       </HStack>
-      
+
       {/* Cost Badge */}
       {showCost && (
         <Box flexShrink={0}>
@@ -190,7 +190,7 @@ const AssignmentRow = memo(function AssignmentRow({
           </Badge>
         </Box>
       )}
-      
+
       {/* Remove Button */}
       {!readOnly && (
         <IconButton
@@ -211,7 +211,7 @@ const AssignmentRow = memo(function AssignmentRow({
 // MAIN COMPONENT
 // ============================================================================
 
-export const StaffSelector = memo(function StaffSelector({
+export const TeamSelector = memo(function TeamSelector({
   value = [],
   onChange,
   variant = 'compact',
@@ -226,35 +226,39 @@ export const StaffSelector = memo(function StaffSelector({
   maxAssignments,
   filterByDepartment,
   onCostChange
-}: StaffSelectorProps) {
+}: TeamSelectorProps) { // Using aliased prop type for now
   // ============================================================================
   // CROSS-MODULE DATA FETCHING
   // Following CROSS_MODULE_DATA_ARCHITECTURE.md patterns
   // ============================================================================
-  
+
   const registry = ModuleRegistry.getInstance();
-  const staffModule = registry.getExports<StaffAPI>('staff');
-  
-  // Get StaffRoles hook from staff module
-  const useStaffRoles = staffModule?.hooks?.useStaffRoles;
-  const rolesHook = useStaffRoles ? useStaffRoles() : null;
-  const allRoles = (rolesHook?.items || []) as StaffRoleOption[];
+  const teamModule = registry.getExports<TeamAPI>('team'); // Changed 'staff' to 'team'
+
+  // Get hooks from module with safe fallbacks
+  const { useJobRoles: useTeamRoles, useTeamMembersList: useEmployeesList } = teamModule?.hooks || {};
+
+  // Use hooks (with safe fallbacks for initial render/loading)
+  const rolesHook = useTeamRoles ? useTeamRoles() : { items: [], loading: false, error: null };
+  const employeesHook = useEmployeesList ? useEmployeesList() : { items: [], loading: false, error: null };
+  const allRoles = (rolesHook?.items || []) as TeamRoleOption[];
   const rolesLoading = rolesHook?.loading || false;
-  
-  // Get Employees hook from staff module
-  const useEmployeesList = staffModule?.hooks?.useEmployeesList;
-  const employeesHook = useEmployeesList ? useEmployeesList() : null;
+
   const teamMembers = (employeesHook?.items || []) as EmployeeOption[];
   const employeesLoading = employeesHook?.loading || false;
-  
+
+  // Helper to find role by ID
+  const getRoleById = (id: string): TeamRoleOption | undefined => {
+    return roleOptions.find(r => r.id === id);
+  };
   // Filter and prepare role options
-  const roleOptions: StaffRoleOption[] = useMemo(() => {
+  const roleOptions: TeamRoleOption[] = useMemo(() => {
     let filtered = allRoles.filter(r => r.is_active !== false);
-    
+
     if (filterByDepartment) {
       filtered = filtered.filter(r => r.department === filterByDepartment);
     }
-    
+
     // Calculate loaded_hourly_cost for each role
     return filtered.map(r => ({
       ...r,
@@ -265,18 +269,18 @@ export const StaffSelector = memo(function StaffSelector({
       ).toNumber()
     }));
   }, [allRoles, filterByDepartment]);
-  
+
   // ============================================================================
   // QUICK ADD STATE
   // ============================================================================
-  
+
   const [quickAdd, setQuickAdd] = useState<QuickAddState>({
     roleId: '',
     employeeId: '',
     duration: defaultDuration,
     count: 1
   });
-  
+
   // Employees filtered by selected role
   const filteredEmployees = useMemo(() => {
     if (!quickAdd.roleId) return [];
@@ -284,16 +288,16 @@ export const StaffSelector = memo(function StaffSelector({
       e => e.staff_role_id === quickAdd.roleId && e.is_active !== false
     );
   }, [quickAdd.roleId, teamMembers]);
-  
+
   // Reset teamMember when role changes
   useEffect(() => {
     setQuickAdd(prev => ({ ...prev, employeeId: '' }));
   }, [quickAdd.roleId]);
-  
+
   // ============================================================================
   // CALCULATED VALUES
   // ============================================================================
-  
+
   // Total labor cost
   const totalCost = useMemo(() => {
     return value.reduce((sum, assignment) => {
@@ -302,57 +306,74 @@ export const StaffSelector = memo(function StaffSelector({
       return DecimalUtils.add(sum.toString(), cost.toString(), 'financial').toNumber();
     }, 0);
   }, [value, roleOptions]);
-  
+
   // Notify parent of cost change
   useEffect(() => {
     if (onCostChange) {
       onCostChange(totalCost);
     }
   }, [totalCost, onCostChange]);
-  
+
   // ============================================================================
   // HANDLERS
   // ============================================================================
-  
+
   const handleQuickAdd = useCallback(() => {
     if (!quickAdd.roleId) return;
-    
+
     const role = roleOptions.find(r => r.id === quickAdd.roleId);
     if (!role) return;
-    
+
     const teamMember = quickAdd.employeeId
       ? teamMembers.find(e => e.id === quickAdd.employeeId)
       : null;
-    
-    const { cost, loadedHourlyCost } = calculateAssignmentCost(
-      {
-        id: '',
+
+    // If we have an existing assignment for this role, just update the count/duration
+    const existing = value.find((a: TeamAssignment) => a.role_id === quickAdd.roleId && !a.employee_id);
+
+    if (existing) {
+      const updated = value.map((a: TeamAssignment) => {
+        if (a.id === existing.id) {
+          return {
+            ...a,
+            count: a.count + quickAdd.count,
+            duration_minutes: quickAdd.duration // Update duration to most recent input
+          };
+        }
+        return a;
+      });
+      onChange(updated);
+    } else {
+      const { cost, loadedHourlyCost } = calculateAssignmentCost(
+        {
+          id: '',
+          role_id: quickAdd.roleId,
+          duration_minutes: quickAdd.duration,
+          count: quickAdd.count,
+          hourly_rate: teamMember?.hourly_rate ?? role.default_hourly_rate ?? undefined
+        },
+        role
+      );
+
+      const newAssignment: TeamAssignment = {
+        id: crypto.randomUUID(),
         role_id: quickAdd.roleId,
+        role_name: role.name,
+        employee_id: quickAdd.employeeId || null,
+        employee_name: teamMember
+          ? `${teamMember.first_name} ${teamMember.last_name}`
+          : undefined,
         duration_minutes: quickAdd.duration,
         count: quickAdd.count,
-        hourly_rate: teamMember?.hourly_rate ?? role.default_hourly_rate ?? undefined
-      },
-      role
-    );
-    
-    const newAssignment: StaffAssignment = {
-      id: crypto.randomUUID(),
-      role_id: quickAdd.roleId,
-      role_name: role.name,
-      employee_id: quickAdd.employeeId || null,
-      employee_name: teamMember
-        ? `${teamMember.first_name} ${teamMember.last_name}`
-        : undefined,
-      duration_minutes: quickAdd.duration,
-      count: quickAdd.count,
-      hourly_rate: teamMember?.hourly_rate ?? role.default_hourly_rate ?? undefined,
-      loaded_factor: role.loaded_factor,
-      loaded_hourly_cost: loadedHourlyCost,
-      total_cost: cost
-    };
-    
-    onChange([...value, newAssignment]);
-    
+        hourly_rate: teamMember?.hourly_rate ?? role.default_hourly_rate ?? undefined,
+        loaded_factor: role.loaded_factor,
+        loaded_hourly_cost: loadedHourlyCost,
+        total_cost: cost
+      };
+
+      onChange([...value, newAssignment]);
+    }
+
     // Reset quick add
     setQuickAdd({
       roleId: '',
@@ -361,41 +382,41 @@ export const StaffSelector = memo(function StaffSelector({
       count: 1
     });
   }, [quickAdd, roleOptions, teamMembers, value, onChange, defaultDuration]);
-  
-  const handleRemove = useCallback((id: string) => {
-    onChange(value.filter(a => a.id !== id));
-  }, [value, onChange]);
-  
+
+  const handleRemove = (id: string) => {
+    const updated = value.filter((assignment: TeamAssignment) => assignment.id !== id);
+    onChange(updated);
+  };
   // ============================================================================
   // SELECT OPTIONS
   // ============================================================================
-  
+
   const roleSelectOptions = useMemo(() => {
     return roleOptions.map(r => ({
       value: r.id,
       label: `${r.name}${r.department ? ` (${r.department})` : ''} - ${formatCurrency(r.loaded_hourly_cost)}/h`
     }));
   }, [roleOptions]);
-  
+
   const employeeSelectOptions = useMemo(() => {
     return filteredEmployees.map(e => ({
       value: e.id,
       label: `${e.first_name} ${e.last_name}${e.hourly_rate ? ` ($${e.hourly_rate}/h)` : ''}`
     }));
   }, [filteredEmployees]);
-  
+
   // ============================================================================
   // CHECK LIMITS
   // ============================================================================
-  
+
   const canAddMore = !maxAssignments || value.length < maxAssignments;
-  
+
   // ============================================================================
   // RENDER
   // ============================================================================
-  
+
   const isLoading = rolesLoading || employeesLoading;
-  
+
   return (
     <Stack gap="3" w="full">
       {/* Current Assignments */}
@@ -411,7 +432,7 @@ export const StaffSelector = memo(function StaffSelector({
               readOnly={readOnly}
             />
           ))}
-          
+
           {/* Total Cost */}
           {showCost && (
             <HStack justify="end" pt="1">
@@ -425,7 +446,7 @@ export const StaffSelector = memo(function StaffSelector({
           )}
         </Stack>
       )}
-      
+
       {/* Quick Add Form */}
       {!readOnly && canAddMore && (
         <Box
@@ -455,7 +476,7 @@ export const StaffSelector = memo(function StaffSelector({
                 options={roleSelectOptions}
                 size="sm"
               />
-              
+
               {/* Row 2: TeamMember (optional) + Count + Duration */}
               {quickAdd.roleId && (
                 <HStack gap="2" flexWrap="wrap">
@@ -481,7 +502,7 @@ export const StaffSelector = memo(function StaffSelector({
                       />
                     </Box>
                   )}
-                  
+
                   {/* Count */}
                   {showCount && (
                     <Box w="70px">
@@ -497,7 +518,7 @@ export const StaffSelector = memo(function StaffSelector({
                       />
                     </Box>
                   )}
-                  
+
                   {/* Duration */}
                   {showDuration && (
                     <Box w="80px">
@@ -512,7 +533,7 @@ export const StaffSelector = memo(function StaffSelector({
                       />
                     </Box>
                   )}
-                  
+
                   {/* Add Button */}
                   <Button
                     variant="solid"
@@ -534,14 +555,14 @@ export const StaffSelector = memo(function StaffSelector({
           )}
         </Box>
       )}
-      
+
       {/* Empty State */}
       {value.length === 0 && readOnly && (
         <Text fontSize="sm" color="fg.muted" textAlign="center" py="2">
           Sin personal asignado
         </Text>
       )}
-      
+
       {/* Max reached message */}
       {!readOnly && !canAddMore && (
         <Text fontSize="xs" color="orange.500" textAlign="center">
@@ -552,4 +573,4 @@ export const StaffSelector = memo(function StaffSelector({
   );
 });
 
-export default StaffSelector;
+export default TeamSelector;

@@ -241,6 +241,10 @@ export default function MaterialsPage() {
     canConfigure
   }), [canCreate, canUpdate, canExport, canConfigure]);
 
+  const handleView = useCallback((item: MaterialItem) => {
+    openModal('view', item);
+  }, [openModal]);
+
   const handleEdit = useCallback((item: MaterialItem) => {
     openModal('edit', item);
   }, [openModal]);
@@ -250,6 +254,10 @@ export default function MaterialsPage() {
        await deleteMaterial(item.id);
      }
   }, [deleteMaterial]);
+
+  const handleAddMaterial = useCallback(() => {
+    openModal('add');
+  }, [openModal]);
 
   // ============================================================================
   // EVENTBUS INTEGRATION
@@ -438,7 +446,8 @@ export default function MaterialsPage() {
                       onTabChange={(tab) => setActiveTab(tab as any)}
                       onStockUpdate={canUpdate ? handleStockUpdate : async () => {}}
                       onBulkAction={canUpdate ? handleBulkAction : async () => {}}
-                      onAddMaterial={canCreate ? openModal.bind(null, 'add') : undefined}
+                      onAddMaterial={canCreate ? handleAddMaterial : undefined}
+                      onView={canRead ? handleView : undefined}
                       onEdit={canUpdate ? handleEdit : undefined}
                       onDelete={canDelete ? handleDelete : undefined}
                       performanceMode={shouldReduceAnimations}
@@ -447,7 +456,7 @@ export default function MaterialsPage() {
 
                   {(canCreate || canExport || canConfigure) && (
                     <MaterialsActions
-                      onAddMaterial={canCreate ? openModal.bind(null, 'add') : undefined}
+                      onAddMaterial={canCreate ? handleAddMaterial : undefined}
                       onBulkOperations={canUpdate ? toggleBulkMode : undefined}
                       onGenerateReport={canExport ? async () => {} : undefined}
                       onSyncInventory={canConfigure ? async () => refresh() : undefined}

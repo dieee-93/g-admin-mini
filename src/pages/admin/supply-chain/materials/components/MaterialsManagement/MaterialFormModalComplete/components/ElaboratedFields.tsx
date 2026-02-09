@@ -22,6 +22,7 @@ interface ElaboratedFieldsProps {
   formData: ItemFormData;
   setFormData: (data: ItemFormData) => void;
   isEditMode?: boolean;
+  onRequestEquipmentSelector?: () => void;
 }
 
 /**
@@ -191,7 +192,8 @@ const SectionDivider = memo(function SectionDivider({ label }: SectionDividerPro
 export const ElaboratedFields = memo(function ElaboratedFields({
   formData,
   setFormData,
-  isEditMode = false
+  isEditMode = false,
+  onRequestEquipmentSelector
 }: ElaboratedFieldsProps) {
 
   // ⚡ PERFORMANCE: Memoize outputItem to prevent recreation
@@ -478,6 +480,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
             productionConfig={formData.production_config}
             onChange={handleProductionConfigChange}
             recipeId={formData.recipe_id}
+            onRequestEquipmentSelector={onRequestEquipmentSelector}
           />
         </Box>
       </Box>

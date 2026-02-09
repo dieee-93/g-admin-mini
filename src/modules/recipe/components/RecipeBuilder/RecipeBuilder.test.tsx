@@ -18,7 +18,7 @@ vi.mock('./sections', () => ({
             Inputs Section {features?.showCostCalculation ? '(Costs Active)' : ''}
         </div>
     ),
-    StaffAssignmentSection: () => <div data-testid="staff-section">Staff Section</div>,
+    TeamAssignmentSection: () => <div data-testid="team-section">Team Section</div>,
 }));
 
 vi.mock('./sections/OutputConfigSection', () => ({
@@ -82,7 +82,7 @@ describe('RecipeBuilder Component', () => {
 
         expect(screen.getByTestId('basic-info-section')).toBeInTheDocument();
         expect(screen.getByTestId('inputs-section')).toBeInTheDocument();
-        expect(screen.getByTestId('staff-section')).toBeInTheDocument();
+        expect(screen.getByTestId('team-section')).toBeInTheDocument();
         expect(screen.getByTestId('output-section')).toBeInTheDocument();
         expect(screen.getByTestId('recipe-save-button')).toBeInTheDocument();
     });

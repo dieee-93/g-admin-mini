@@ -221,7 +221,7 @@ class OfflineSync {
   private isSyncing: boolean = false;
   private syncInProgress: Map<string, boolean> = new Map();
   private clientId: string;
-  // ✅ EVENT-DRIVEN: Removed syncInterval - sync handled by OfflineCommandQueue events
+  private syncInterval: number | null = null;
   private eventListeners: Map<string, Function[]> = new Map();
   private db: OfflineSyncDB;
   private persistedConflicts: SyncConflict[] = [];
@@ -288,11 +288,11 @@ class OfflineSync {
       
       this.isInitialized = true;
       this.initializationLock = false; // Release lock after successful init
-
-      // Initialize event listeners
-      // ✅ EVENT-DRIVEN: No sync interval - sync triggered by OfflineCommandQueue
+      
+      // Initialize event listeners and start sync interval
       this.initializeEventListeners();
-
+      this.startSyncInterval();
+      
       // Emit initialization complete
       this.emitEvent('initialized', { 
         queueSize: this.syncQueue.length, 
@@ -305,7 +305,7 @@ class OfflineSync {
       this.isInitialized = true;
       this.initializationLock = false; // Release lock even on failure
       this.initializeEventListeners();
-      // ✅ EVENT-DRIVEN: No sync interval - sync triggered by OfflineCommandQueue
+      this.startSyncInterval();
     }
   }
 
@@ -329,9 +329,18 @@ class OfflineSync {
     return `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  // ✅ EVENT-DRIVEN: startSyncInterval() removed
-  // Sync is now triggered by OfflineCommandQueue events (online/offline/visibilitychange)
-  // Manual sync available via forceSync() method
+  // Start automatic sync interval
+  private startSyncInterval(): void {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+    }
+    
+    this.syncInterval = window.setInterval(() => {
+      if (this.isOnline && this.syncQueue.length > 0) {
+        this.syncPendingOperations();
+      }
+    }, this.config.syncInterval);
+  }
 
   // Add operation to sync queue
   public async queueOperation(operation: Omit<SyncOperation, 'id' | 'timestamp' | 'clientId' | 'clientOperationId' | 'retry'>): Promise<string> {
@@ -934,12 +943,14 @@ class OfflineSync {
 
   // Destroy instance
   public destroy(): void {
-    // ✅ EVENT-DRIVEN: No sync interval to clear
-
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+    }
+    
     window.removeEventListener('online', this.handleOnline.bind(this));
     window.removeEventListener('offline', this.handleOffline.bind(this));
     document.removeEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
-
+    
     this.eventListeners.clear();
   }
 
@@ -952,10 +963,9 @@ class OfflineSync {
 }
 
 // Create singleton instance
-// ✅ EVENT-DRIVEN: Removed syncInterval (no longer needed)
 const offlineSync = new OfflineSync({
   batchSize: 10,
-  syncInterval: 0, // Deprecated - sync now event-driven via OfflineCommandQueue
+  syncInterval: 30000,
   maxRetries: 3,
   conflictResolution: 'merge',
   enableOptimisticUpdates: true

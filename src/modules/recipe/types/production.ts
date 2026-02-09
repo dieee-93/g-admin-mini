@@ -14,7 +14,7 @@
 export interface ProductionBatch {
   id: string
   recipeId: string
-  materialId: string
+  materialId?: string
 
   // Scheduling
   scheduledAt?: Date

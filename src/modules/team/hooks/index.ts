@@ -19,7 +19,14 @@ export { useTeamData, useTeamDataRange, useTeamWithLoader, usePerformanceAnalyti
 /**
  * Core team management hook
  */
-export { useTeam } from './useTeam';
+export {
+  useTeam,
+  useTeamById,
+  useCreateTeam,
+  useUpdateTeam,
+  useDeleteTeam,
+  useTeamStats
+} from './useTeam';
 
 /**
  * TeamMember management hook

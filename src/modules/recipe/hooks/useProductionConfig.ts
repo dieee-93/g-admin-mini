@@ -12,16 +12,17 @@ import { logger } from '@/lib/logging'
 import eventBus from '@/lib/events/EventBus'
 import { createProductionBatch } from '../services/productionBatchesApi'
 import type { Recipe } from '../types/recipe'
-import type {
-  ProductionConfig,
+import {
+  type ProductionConfig,
   ProductionBatchStatus
 } from '../types/production'
+import { EventPriority } from '@/lib/events/types'
 
-const LOG_PREFIX = '[useProductionConfig]'
+const LOG_PREFIX = 'Recipe'
 
 export interface UseProductionConfigParams {
   recipe: Partial<Recipe>
-  entityType: 'material' | 'product' | 'service'
+  entityType: 'material' | 'product' | 'service' | 'kit'
 }
 
 export interface UseProductionConfigReturn {
@@ -70,11 +71,11 @@ export function useProductionConfig({
 
   // Allow production config for materials (even before saving the recipe)
   const canProduceNow = useMemo(() => {
-    return entityType === 'material'
+    return entityType === 'material' || entityType === 'kit'
   }, [entityType])
 
   const canSchedule = useMemo(() => {
-    return entityType === 'material'
+    return entityType === 'material' || entityType === 'kit'
   }, [entityType])
 
   const yieldPercentage = useMemo(() => {
@@ -205,7 +206,7 @@ export function useProductionConfig({
             notes: config.productionNotes,
             yieldPercentage
           },
-          { priority: 'high' }
+          { priority: EventPriority.HIGH }
         )
 
         logger.info(LOG_PREFIX, 'Immediate production requested', {
@@ -233,7 +234,7 @@ export function useProductionConfig({
             frequency: config.frequency!,
             expectedQuantity: config.expectedQuantity
           },
-          { priority: 'normal' }
+          { priority: EventPriority.NORMAL }
         )
 
         logger.info(LOG_PREFIX, 'Production scheduled', {

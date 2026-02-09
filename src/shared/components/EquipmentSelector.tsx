@@ -7,12 +7,13 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
-  Dialog,
+  DialogRoot,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogBody,
+  DialogCloseTrigger,
   Button,
   Stack,
   InputField,
@@ -121,7 +122,7 @@ export function EquipmentSelector({
   const canSubmit = selectedEquipment && hoursUsed > 0;
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <DialogRoot open onOpenChange={(e) => e.open === false && onClose()}>
       <DialogContent size="lg">
         <DialogHeader>
           <DialogTitle>Agregar Equipamiento</DialogTitle>
@@ -279,7 +280,7 @@ export function EquipmentSelector({
           </Button>
         </DialogFooter>
       </DialogContent>
-    </Dialog>
+    </DialogRoot>
   );
 }
 

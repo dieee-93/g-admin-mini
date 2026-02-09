@@ -1,8 +1,8 @@
 /**
- * StaffAssignmentSection - Industrial wrapper for StaffSelector
+ * TeamAssignmentSection - Industrial wrapper for TeamSelector
  *
  * Simple industrial-styled container that integrates the existing
- * StaffSelector component with production order aesthetics.
+ * TeamSelector component with production order aesthetics.
  *
  * Features:
  * - Industrial container with cyan gradient top bar
@@ -10,23 +10,26 @@
  * - Heavy borders and professional manufacturing feel
  *
  * Architecture:
- * - Wrapper around existing StaffSelector (no duplication)
+ * - Wrapper around existing TeamSelector (no duplication)
  * - Follows industrial design system
  * - Uses semantic tokens exclusively
  */
 
 import { memo, useMemo } from 'react';
 import { Box, Stack, Typography } from '@/shared/ui';
-import { StaffSelector } from '@/shared/components/StaffSelector/StaffSelector';
-import type { StaffAssignment } from '@/shared/components/StaffSelector/types';
+import { TeamSelector } from '@/shared/components/TeamSelector/TeamSelector';
+import type {
+  TeamSelectorProps,
+  TeamAssignment
+} from '@/shared/components/TeamSelector/types';
 
 // ============================================
 // PROPS
 // ============================================
 
-interface StaffAssignmentSectionProps {
-  staffAssignments: StaffAssignment[];
-  onStaffChange: (assignments: StaffAssignment[]) => void;
+interface TeamAssignmentSectionProps {
+  teamAssignments: TeamAssignment[];
+  onTeamChange: (assignments: TeamAssignment[]) => void;
   disabled?: boolean;
   readOnly?: boolean;
 }
@@ -36,12 +39,12 @@ interface StaffAssignmentSectionProps {
 // ============================================
 
 /**
- * StaffAssignmentSection - Industrial staff assignment interface
+ * TeamAssignmentSection - Industrial team assignment interface
  *
  * @component
  * @description
- * Industrial production order section for assigning staff to recipes.
- * Wraps the existing StaffSelector with heavy borders, gradient accents,
+ * Industrial production order section for assigning team members to recipes.
+ * Wraps the existing TeamSelector with heavy borders, gradient accents,
  * and monospace typography for a professional manufacturing aesthetic.
  *
  * Design:
@@ -52,28 +55,28 @@ interface StaffAssignmentSectionProps {
  *
  * @example
  * ```tsx
- * <StaffAssignmentSection
- *   staffAssignments={recipe.staffAssignments || []}
- *   onStaffChange={(assignments) => updateRecipe({ staffAssignments: assignments })}
+ * <TeamAssignmentSection
+ *   teamAssignments={recipe.teamAssignments || []}
+ *   onTeamChange={(assignments) => updateRecipe({ teamAssignments: assignments })}
  * />
  * ```
  *
- * @param {StaffAssignmentSectionProps} props - Component props
+ * @param {TeamAssignmentSectionProps} props - Component props
  * @returns {React.ReactElement} Rendered section
  */
-function StaffAssignmentSectionComponent({
-  staffAssignments,
-  onStaffChange,
+function TeamAssignmentSectionComponent({
+  teamAssignments,
+  onTeamChange,
   disabled = false,
   readOnly = false
-}: StaffAssignmentSectionProps) {
+}: TeamAssignmentSectionProps) {
 
   // Calculate total labor cost from assignments
   const totalLaborCost = useMemo(() => {
-    return staffAssignments.reduce((sum, assignment) => {
+    return teamAssignments.reduce((sum, assignment) => {
       return sum + (assignment.total_cost || 0);
     }, 0);
-  }, [staffAssignments]);
+  }, [teamAssignments]);
 
   return (
     <Box
@@ -110,10 +113,10 @@ function StaffAssignmentSectionComponent({
           Personal Asignado
         </Typography>
 
-        {/* StaffSelector Integration */}
-        <StaffSelector
-          value={staffAssignments}
-          onChange={onStaffChange}
+        {/* TeamSelector Integration */}
+        <TeamSelector
+          value={teamAssignments}
+          onChange={onTeamChange}
           variant="compact"
           showCost={true}
           disabled={disabled}
@@ -125,7 +128,7 @@ function StaffAssignmentSectionComponent({
         />
 
         {/* Subtotal - Industrial Style */}
-        {staffAssignments.length > 0 && (
+        {teamAssignments.length > 0 && (
           <Box
             textAlign="right"
             pt="3"
@@ -149,4 +152,4 @@ function StaffAssignmentSectionComponent({
 }
 
 // Export memoized version
-export const StaffAssignmentSection = memo(StaffAssignmentSectionComponent);
+export const TeamAssignmentSection = memo(TeamAssignmentSectionComponent);

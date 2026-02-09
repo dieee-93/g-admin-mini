@@ -7,7 +7,7 @@
 
 import { DecimalUtils } from '@/lib/decimal';
 import type { Recipe, RecipeInput } from '../types/recipe';
-import type { StaffAssignment } from '@/shared/components/StaffSelector/types';
+import type { TeamAssignment } from '@/shared/components/TeamSelector/types';
 
 /**
  * Calculate total cost of materials
@@ -35,10 +35,10 @@ export const calculateMaterialsCost = (inputs: RecipeInput[] = []): number => {
 /**
  * Calculate total cost of labor
  */
-export const calculateLaborCost = (staffAssignments: StaffAssignment[] = []): number => {
-    if (!staffAssignments || staffAssignments.length === 0) return 0;
+export const calculateLaborCost = (teamAssignments: TeamAssignment[] = []): number => {
+    if (!teamAssignments || teamAssignments.length === 0) return 0;
 
-    return staffAssignments.reduce((sum, assignment) => {
+    return teamAssignments.reduce((sum, assignment) => {
         return DecimalUtils.add(
             sum.toString(),
             (assignment.total_cost || 0).toString(),

@@ -51,7 +51,7 @@ export function useTeamMemberValidation(
 
   // React Hook Form with Zod validation
   const form = useForm<TeamMemberCompleteFormData>({
-    resolver: zodResolver(EntitySchemas.employeeComplete),
+    resolver: zodResolver(EntitySchemas.teamMemberComplete),
     defaultValues: {
       employee_id: '',
       first_name: '',
@@ -63,7 +63,7 @@ export function useTeamMemberValidation(
       hire_date: new Date().toISOString().split('T')[0],
       employment_type: 'full_time',
       employment_status: 'active', // Default value handled here, not in schema
-      role: 'teamMember', // Default value handled here, not in schema
+      role: 'employee', // Default value handled here, not in schema
       can_work_multiple_locations: false, // Default value handled here, not in schema
       ...initialData
     },

@@ -83,6 +83,7 @@ interface InventoryTabProps {
   onStockUpdate: (itemId: string, newStock: number) => Promise<void>;
   onBulkAction: (action: string, itemIds: string[]) => Promise<void>;
   onAddMaterial?: () => void;
+  onView?: (item: any) => void;
   onEdit?: (item: any) => void;
   onDelete?: (item: any) => void;
   performanceMode?: boolean;
@@ -204,6 +205,7 @@ export const InventoryTab = memo(function InventoryTab({
   onStockUpdate,
   onBulkAction,
   onAddMaterial,
+  onView,
   onEdit,
   onDelete,
   performanceMode = false
@@ -379,13 +381,15 @@ export const InventoryTab = memo(function InventoryTab({
   }, [onEdit, openMaterialForm]);
 
   const handleView = useCallback((material: MaterialWithStock) => {
-    if (onEdit) {
-      // View uses edit modal for now
+    if (onView) {
+      onView(material);
+    } else if (onEdit) {
+      // Fallback to edit modal if onView not provided
       onEdit(material);
     } else {
-      openMaterialForm('edit', material.id);
+      openMaterialForm('view', material.id);
     }
-  }, [onEdit, openMaterialForm]);
+  }, [onView, onEdit, openMaterialForm]);
 
   const handleDelete = useCallback(async (material: MaterialWithStock) => {
     if (onDelete) {

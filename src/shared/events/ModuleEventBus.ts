@@ -85,11 +85,11 @@ export interface ModuleEvents {
   'product.deleted': { productId: string };
   'product.recipe_updated': { productId: string; recipeId: string };
 
-  // Staff events
-  'staff.created': { staffId: string; staffData: any };
-  'staff.updated': { staffId: string; staffData: any };
-  'staff.schedule_changed': { staffId: string; scheduleData: any };
-  'staff.performance_updated': { staffId: string; metrics: any };
+  // Team events
+  'team.member.created': { teamMemberId: string; teamMemberData: any };
+  'team.member.updated': { teamMemberId: string; teamMemberData: any };
+  'team.member.schedule_changed': { teamMemberId: string; scheduleData: any };
+  'team.member.performance_updated': { teamMemberId: string; metrics: any };
 
   // Scheduling events
   'schedule.created': { scheduleId: string; staffId: string; scheduleData: any };

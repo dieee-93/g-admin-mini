@@ -1,5 +1,5 @@
 import {
-  ContentLayout, Section, StatsSection, CardGrid,
+  ContentLayout, Section, StatsSection,
   Button, Alert, Badge, Icon, Stack, Typography, Tabs, Dialog, SimpleGrid
 } from '@/shared/ui';
 import { StatCard } from '@/shared/widgets/StatCard';
@@ -9,23 +9,23 @@ import {
   PlusIcon,
   ClockIcon,
   TrophyIcon,
-  ShieldCheckIcon,
   CurrencyDollarIcon,
   ExclamationTriangleIcon,
   ArrowTrendingUpIcon,
-  CheckCircleIcon,
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 // Module Registry integration
 import EventBus from '@/lib/events';
+import { EventPriority } from '@/lib/events/types';
 import { HookPoint } from '@/lib/modules/HookPoint';
 import { useLocation } from '@/contexts/LocationContext';
 import { useEffect, useState } from 'react';
 import { logger } from '@/lib/logging';
 import { useDisclosure } from '@/shared/hooks';
 
-import { useStaffPage } from './hooks';
-import { useTeamStore } from '@/modules/team/store';
+import { useTeamPage } from './hooks';
+import { useDeleteTeam } from '@/modules/team/hooks';
+// import { useTeamStore } from '@/modules/team/store'; // Legacy
 
 // Tab sections
 import { DirectorySection } from './components/sections/DirectorySection';
@@ -37,8 +37,8 @@ import { StaffPoliciesTab } from './tabs/policies';
 import { StaffRolesPage } from './tabs/roles';
 
 // Forms and Modals
-import { EmployeeForm } from './components/EmployeeForm';
-import type { TeamMember } from './types';
+import { TeamMemberForm } from './components/TeamMemberForm';
+import type { TeamMember, TeamViewState } from './types';
 
 // EventBus payload types for cross-module communication
 interface KitchenAlertEventData {
@@ -63,7 +63,6 @@ interface ShiftReminderEventData {
 export default function StaffPage() {
   // Module integration (EventBus + Module Registry Hooks)
   const { selectedLocation, isMultiLocationMode } = useLocation();
-  const { loadStaff } = useTeamStore();
 
   const {
     pageState,
@@ -72,35 +71,35 @@ export default function StaffPage() {
     error,
     actions,
     alertsData
-  } = useStaffPage();
+  } = useTeamPage();
 
   // Local state for view configuration
-  const [viewState, setViewState] = useState({
-    viewMode: 'grid' as 'grid' | 'list',
-    sortBy: 'name',
-    sortDirection: 'asc' as 'asc' | 'desc'
+  const [viewState, setViewState] = useState<TeamViewState>({
+    activeTab: 'directory',
+    viewMode: 'grid',
+    filters: {},
+    sortBy: { field: 'name', direction: 'asc' }
   });
 
   // Modal state for teamMember forms
-  const employeeModal = useDisclosure();
-  const [editingEmployee, setEditingEmployee] = useState<TeamMember | undefined>(undefined);
+  const teamMemberModal = useDisclosure();
+  const [editingTeamMember, setEditingTeamMember] = useState<TeamMember | undefined>(undefined);
 
   // Delete confirmation state
   const deleteDialog = useDisclosure();
-  const [deletingEmployee, setDeletingEmployee] = useState<TeamMember | undefined>(undefined);
-  const { deleteTeamMember } = useTeamStore();
+  const [deletingTeamMember, setDeletingTeamMember] = useState<TeamMember | undefined>(undefined);
+  const { mutateAsync: deleteTeamMember } = useDeleteTeam();
 
   // Handle delete teamMember
-  const handleDeleteEmployee = async () => {
-    if (!deletingEmployee) return;
+  const handleDeleteTeamMember = async () => {
+    if (!deletingTeamMember) return;
 
     try {
-      await deleteTeamMember(deletingEmployee.id);
+      await deleteTeamMember(deletingTeamMember.id);
       deleteDialog.onClose();
-      setDeletingEmployee(undefined);
-      loadStaff(); // Refresh data
+      setDeletingTeamMember(undefined);
     } catch (error) {
-      logger.error('StaffPage', 'Error deleting teamMember', error);
+      logger.error('Team', 'Error deleting teamMember', error);
     }
   };
 
@@ -111,11 +110,9 @@ export default function StaffPage() {
       'production.alert.*',
       (event) => {
         const data = event.payload as KitchenAlertEventData;
-        logger.debug('StaffStore', '👥 Kitchen alert received, checking staff availability', data);
-        // TODO: Check if more kitchen staff needed during rush
-        // TODO: Trigger alert if understaffed
+        logger.debug('Team', '👥 Kitchen alert received, checking staff availability', data);
       },
-      { moduleId: 'staff', priority: 75 }
+      { moduleId: 'team', priority: EventPriority.NORMAL }
     );
 
     // Monitor sales orders to track staff workload
@@ -123,11 +120,9 @@ export default function StaffPage() {
       'sales.order.placed',
       (event) => {
         const data = event.payload as OrderPlacedEventData;
-        logger.info('StaffStore', '👥 Order placed, monitoring service load', data);
-        // TODO: Monitor staff workload for service optimization
-        // TODO: Alert if service staff overloaded
+        logger.info('Team', '👥 Order placed, monitoring service load', data);
       },
-      { moduleId: 'staff', priority: 50 }
+      { moduleId: 'team', priority: EventPriority.HIGH }
     );
 
     // Handle shift reminders
@@ -135,11 +130,9 @@ export default function StaffPage() {
       'scheduling.shift.reminder',
       (event) => {
         const data = event.payload as ShiftReminderEventData;
-        logger.info('StaffStore', '👥 Shift reminder for teamMember', data);
-        // TODO: Send notifications to staff about upcoming shifts
-        // TODO: Update UI to show pending shift starts
+        logger.info('Team', '👥 Shift reminder for teamMember', data);
       },
-      { moduleId: 'staff', priority: 100 }
+      { moduleId: 'team', priority: EventPriority.CRITICAL }
     );
 
     return () => {
@@ -148,13 +141,6 @@ export default function StaffPage() {
       unsubScheduling();
     };
   }, []);
-
-  // Staff event emitters - Available for future use when implementing tab sections
-  // These will be used when DirectorySection, TimeTrackingSection, etc. are implemented
-  // const handleShiftChange = (staffId: string, shiftData: ShiftChangeData) => { ... };
-  // const handleClockIn = (staffId: string, location: string) => { ... };
-  // const handleClockOut = (staffId: string) => { ... };
-  // const handlePerformanceAlert = (staffId: string, alertType: string, severity: 'low' | 'medium' | 'high') => { ... };
 
   if (loading) {
     return (
@@ -185,9 +171,11 @@ export default function StaffPage() {
               <Badge variant="solid" colorPalette="blue">Security Compliant</Badge>
               <Badge variant="solid" colorPalette="green">{metrics.activeStaff} Activos</Badge>
               {isMultiLocationMode && selectedLocation && (
-                <Badge variant="solid" colorPalette="purple">
-                  📍 {selectedLocation.name}
-                </Badge>
+                <div className="ml-2">
+                  <Badge size="xs" colorPalette="orange">
+                    {selectedLocation.name}
+                  </Badge>
+                </div>
               )}
               <Typography variant="body" size="sm" color="text.muted" display={{ base: 'none', md: 'block' }}>
                 Personal, Costos & Rendimiento
@@ -196,10 +184,10 @@ export default function StaffPage() {
             <Button
               variant="solid"
               onClick={() => {
-                setEditingEmployee(undefined);
-                employeeModal.onOpen();
+                setEditingTeamMember(undefined);
+                teamMemberModal.onOpen();
               }}
-              size={{ base: 'md', md: 'lg' }}
+              size="lg"
             >
               <Icon icon={PlusIcon} size="sm" />
               <Typography display={{ base: 'none', sm: 'inline' }}>Nuevo Empleado</Typography>
@@ -207,7 +195,7 @@ export default function StaffPage() {
           </Stack>
 
           {/* Consolidated Responsive Grid: 1 col mobile → 2 col tablet → 4 col desktop → 6 col wide */}
-          <SimpleGrid columns={{ base: 1, sm: 2, lg: 4, xl: 6 }} gap={6}>
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 4, xl: 6 }} gap="6">
             {/* Staff Metrics */}
             <StatCard
               title="Total Personal"
@@ -274,8 +262,8 @@ export default function StaffPage() {
         {/* 📑 CONSOLIDATED TAB NAVIGATION - 7 → 5 tabs */}
         <Tabs.Root
           defaultValue="directory"
-          value={pageState.activeTab}
-          onValueChange={(details) => actions.setActiveTab(details.value as typeof pageState.activeTab)}
+          value={viewState.activeTab || 'directory'}
+          onValueChange={(details) => setViewState(prev => ({ ...prev, activeTab: details.value as any }))}
           variant="enclosed"
           size="lg"
         >
@@ -299,7 +287,9 @@ export default function StaffPage() {
             <Tabs.Trigger value="training" flex={{ base: '1 1 45%', md: 'auto' }}>
               <Icon icon={AcademicCapIcon} size="sm" />
               <Typography variant="body" size="sm" display={{ base: 'none', sm: 'inline' }}>Capacitación</Typography>
-              <Badge colorPalette="orange" size="xs" ml="1">Beta</Badge>
+              <div className="ml-1">
+                <Badge colorPalette="orange" size="xs">Beta</Badge>
+              </div>
             </Tabs.Trigger>
             <Tabs.Indicator />
           </Tabs.List>
@@ -310,11 +300,11 @@ export default function StaffPage() {
               viewState={viewState}
               onViewStateChange={setViewState}
               onEditEmployee={(teamMember: TeamMember) => {
-                setEditingEmployee(teamMember);
-                employeeModal.onOpen();
+                setEditingTeamMember(teamMember);
+                teamMemberModal.onOpen();
               }}
               onDeleteEmployee={(teamMember: TeamMember) => {
-                setDeletingEmployee(teamMember);
+                setDeletingTeamMember(teamMember);
                 deleteDialog.onOpen();
               }}
             />
@@ -332,8 +322,6 @@ export default function StaffPage() {
                   </Alert.Description>
                 </Stack>
               </Alert.Root>
-
-              {/* Performance Section Content */}
               <PerformanceSection
                 viewState={viewState}
                 onViewStateChange={setViewState}
@@ -417,28 +405,26 @@ export default function StaffPage() {
       </Stack>
 
       {/* TeamMember Form Modal */}
-      <EmployeeForm
-        teamMember={editingEmployee}
-        isOpen={employeeModal.isOpen}
+      <TeamMemberForm
+        teamMember={editingTeamMember}
+        isOpen={teamMemberModal.isOpen}
         onClose={() => {
-          employeeModal.onClose();
-          setEditingEmployee(undefined);
+          teamMemberModal.onClose();
+          setEditingTeamMember(undefined);
         }}
         onSuccess={() => {
-          employeeModal.onClose();
-          setEditingEmployee(undefined);
-          // Refresh staff data from database
-          loadStaff();
+          teamMemberModal.onClose();
+          setEditingTeamMember(undefined);
         }}
       />
 
       {/* Delete Confirmation Dialog */}
       <Dialog.Root
         open={deleteDialog.isOpen}
-        onOpenChange={(e) => {
+        onOpenChange={(e: any) => {
           if (!e.open) {
             deleteDialog.onClose();
-            setDeletingEmployee(undefined);
+            setDeletingTeamMember(undefined);
           }
         }}
       >
@@ -451,7 +437,7 @@ export default function StaffPage() {
             <Dialog.Body>
               <Typography variant="body">
                 ¿Estás seguro de que deseas eliminar a{' '}
-                <strong>{deletingEmployee?.first_name} {deletingEmployee?.last_name}</strong>?
+                <strong>{deletingTeamMember?.first_name} {deletingTeamMember?.last_name}</strong>?
               </Typography>
               <Typography variant="body" size="sm" color="text.muted" mt="2">
                 Esta acción marcará al empleado como inactivo. No se eliminarán datos de forma permanente.
@@ -462,7 +448,7 @@ export default function StaffPage() {
                 <Dialog.CloseTrigger asChild>
                   <Button variant="outline">Cancelar</Button>
                 </Dialog.CloseTrigger>
-                <Button colorPalette="red" onClick={handleDeleteEmployee}>
+                <Button colorPalette="red" onClick={handleDeleteTeamMember}>
                   Eliminar
                 </Button>
               </Stack>
@@ -471,6 +457,7 @@ export default function StaffPage() {
           </Dialog.Content>
         </Dialog.Positioner>
       </Dialog.Root>
+
     </ContentLayout>
   );
 }

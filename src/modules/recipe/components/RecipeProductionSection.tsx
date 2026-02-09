@@ -31,7 +31,7 @@ import { ScheduledProductionForm } from './ScheduledProductionForm'
 // ============================================
 
 export interface RecipeProductionSectionProps {
-  entityType: 'material' | 'product' | 'service'
+  entityType: 'material' | 'product' | 'service' | 'kit'
   recipe: Partial<Recipe>
   updateRecipe?: (updates: Partial<Recipe>) => void
 }
@@ -105,9 +105,9 @@ export function RecipeProductionSection({
     if (config.scheduleProduction) return 'scheduled'
     return 'none'
   }, [config.produceNow, config.scheduleProduction])
-  
+
   // Debug: Log current mode
-  logger.debug('RecipeProductionSection', `Current mode: ${mode}, produceNow: ${config.produceNow}, scheduleProduction: ${config.scheduleProduction}`)
+  logger.debug('Recipe', `Current mode: ${mode}, produceNow: ${config.produceNow}, scheduleProduction: ${config.scheduleProduction}`)
 
   const yieldColor = useMemo(() => {
     if (yieldPercentage >= 95) return 'var(--colors-success)'
@@ -131,20 +131,20 @@ export function RecipeProductionSection({
 
   const estimatedCost = useMemo(() => {
     if (!recipe.inputs || recipe.inputs.length === 0) return 0
-    
-    return recipe.inputs.reduce((sum, input) => {
-      const unitCost = typeof input.item === 'object' && input.item.unitCost 
-        ? input.item.unitCost 
+
+    return recipe.inputs.reduce((sum: number, input) => {
+      const unitCost = typeof input.item === 'object' && input.item.unitCost
+        ? input.item.unitCost
         : 0
-      
+
       // Use DecimalUtils for financial precision
       const itemCost = DecimalUtils.multiply(
         DecimalUtils.multiply(unitCost, input.quantity, 'inventory'),
         config.expectedQuantity,
         'inventory'
       )
-      
-      return DecimalUtils.add(sum, itemCost, 'inventory')
+
+      return DecimalUtils.add(sum, itemCost, 'inventory').toNumber()
     }, 0)
   }, [recipe.inputs, config.expectedQuantity])
 
@@ -153,9 +153,9 @@ export function RecipeProductionSection({
   // ============================================
 
   const handleModeChange = useCallback((value: string) => {
-    logger.info('RecipeProductionSection', `handleModeChange called with: ${value}`)
+    logger.info('Recipe', `handleModeChange called with: ${value}`)
     const newMode = value as ProductionMode
-    
+
     // Update config based on mode (this triggers re-render via hook)
     if (newMode === 'none') {
       handleProduceNowChange(false)
@@ -247,7 +247,7 @@ export function RecipeProductionSection({
             borderColor="var(--colors-error)"
           >
             <Text fontSize="sm" color="var(--colors-error)">
-              {fieldErrors.general} 
+              {fieldErrors.general}
             </Text>
           </Box>
         )}

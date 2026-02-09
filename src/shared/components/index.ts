@@ -5,12 +5,15 @@ export { ErrorBoundary } from './ErrorBoundary';
 export { LazyWithErrorBoundary } from './LazyWithErrorBoundary';
 export { MaterialSelector } from './MaterialSelector';
 export { CustomerSelector } from './CustomerSelector';
-export { StaffSelector } from './StaffSelector';
-export type { 
-  StaffSelectorProps, 
+export { TeamSelector, StaffSelector } from './TeamSelector';
+export type {
+  TeamSelectorProps,
+  TeamAssignment,
+  TeamRoleOption,
+  EmployeeOption,
+  StaffSelectorProps,
   StaffAssignment,
-  StaffRoleOption,
-  EmployeeOption 
-} from './StaffSelector';
+  StaffRoleOption
+} from './TeamSelector';
 export { SettingCard } from './SettingCard';
 export type { SettingCardProps } from './SettingCard';

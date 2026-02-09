@@ -256,8 +256,8 @@ export const EntitySchemas = {
     is_active: BaseSchemas.requiredBoolean
   }),
 
-  // Employee schema
-  employee: z.object({
+  // TeamMember schema
+  teamMember: z.object({
     name: BaseSchemas.personName,
     email: BaseSchemas.email,
     phone: BaseSchemas.optionalPhoneAR,
@@ -289,8 +289,8 @@ export const EntitySchemas = {
   // 🔥 NEW SCHEMAS - PHASE 1 (HIGH PRIORITY)
   // ========================================================================
 
-  // 🆕 Staff/Employee schema (PRIORITY: HIGH)
-  employeeComplete: z.object({
+  // 🆕 TeamMember schema (PRIORITY: HIGH)
+  teamMemberComplete: z.object({
     employee_id: z.string().min(1, ValidationMessages.required),
     first_name: BaseSchemas.personName,
     last_name: BaseSchemas.personName,
@@ -743,11 +743,11 @@ export type CustomerFormData = SchemaType<typeof EntitySchemas.customer>;
 export type SupplierFormData = SchemaType<typeof EntitySchemas.supplier>;
 export type MaterialFormData = SchemaType<typeof EntitySchemas.material>;
 export type ProductFormData = SchemaType<typeof EntitySchemas.product>;
-export type EmployeeFormData = SchemaType<typeof EntitySchemas.employee>;
+export type TeamMemberFormData = SchemaType<typeof EntitySchemas.teamMember>;
 export type LoginFormData = SchemaType<typeof FormSchemas.login>;
 
 // 🆕 NEW TYPES - Phase 1 (High Priority)
-export type EmployeeCompleteFormData = SchemaType<typeof EntitySchemas.employeeComplete>;
+export type TeamMemberCompleteFormData = SchemaType<typeof EntitySchemas.teamMemberComplete>;
 export type SaleFormData = SchemaType<typeof EntitySchemas.sale>;
 export type FiscalDocumentFormData = SchemaType<typeof EntitySchemas.fiscalDocument>;
 

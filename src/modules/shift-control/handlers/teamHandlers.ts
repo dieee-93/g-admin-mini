@@ -16,22 +16,22 @@ import type { EventPayload } from '@/lib/events/EventBus';
 const MODULE_ID = 'ShiftControl';
 
 // ============================================================================
-// STAFF CHECKED IN
+// TEAM MEMBER CHECKED IN
 // ============================================================================
 
 /**
- * Handle staff.employee.checked_in event
+ * Handle team.member.checked_in event
  * Increments the active staff count
  */
 export const handleStaffCheckedIn = createShiftAwareHandler(
-  'staff.employee.checked_in',
+  'team.member.checked_in',
   async (event: EventPayload) => {
     const { employee_id, employee_name } = event.data;
 
     // Increment staff count
     useShiftStore.getState().incrementActiveStaffCount();
 
-    logger.info(MODULE_ID, 'Staff checked in', {
+    logger.info(MODULE_ID, 'Team member checked in', {
       employeeId: employee_id,
       employeeName: employee_name,
       newCount: useShiftStore.getState().activeStaffCount,
@@ -40,15 +40,15 @@ export const handleStaffCheckedIn = createShiftAwareHandler(
 );
 
 // ============================================================================
-// STAFF CHECKED OUT
+// TEAM MEMBER CHECKED OUT
 // ============================================================================
 
 /**
- * Handle staff.employee.checked_out event
+ * Handle team.member.checked_out event
  * Decrements the active staff count
  */
 export const handleStaffCheckedOut = createShiftAwareHandler(
-  'staff.employee.checked_out',
+  'team.member.checked_out',
   async (event: EventPayload) => {
     const { employee_id, hours_worked } = event.data;
 

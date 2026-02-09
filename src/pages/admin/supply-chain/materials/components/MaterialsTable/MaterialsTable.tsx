@@ -83,6 +83,153 @@ const ActionButtons = memo(({ material, onView, onEdit, onDelete }: ActionButton
 });
 ActionButtons.displayName = 'MaterialActionButtons';
 
+// ✅ PERFORMANCE: Memoized Table Row component (React best practice for lists)
+// Reference: https://react.dev/reference/react/memo#minimizing-props-changes
+interface MaterialRowProps {
+  material: MaterialItem;
+  isSelected: boolean;
+  isHovered: boolean;
+  onSelect: (id: string) => void;
+  onView?: (material: MaterialItem) => void;
+  onEdit?: (material: MaterialItem) => void;
+  onDelete?: (material: MaterialItem) => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  getStockStatus: (item: MaterialItem) => 'ok' | 'low' | 'critical' | 'out';
+  getStockBadgeColor: (status: string) => 'red' | 'yellow' | 'green';
+  getABCColor: (abcClass?: string) => 'red' | 'yellow' | 'green' | 'gray';
+}
+
+const MaterialRow = memo(function MaterialRow({
+  material,
+  isSelected,
+  isHovered,
+  onSelect,
+  onView,
+  onEdit,
+  onDelete,
+  onMouseEnter,
+  onMouseLeave,
+  getStockStatus,
+  getStockBadgeColor,
+  getABCColor
+}: MaterialRowProps) {
+  const stockStatus = getStockStatus(material);
+  const rowBg = isSelected ? SELECTED_ROW_BG : isHovered ? HOVERED_ROW_BG : DEFAULT_ROW_BG;
+  const hoverStyle = isSelected ? { bg: SELECTED_ROW_BG } : { bg: HOVERED_ROW_BG };
+
+  return (
+    <Table.Row
+      bg={rowBg}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      _hover={hoverStyle}
+      cursor="pointer"
+      data-testid={`material-row-${material.id}`}
+    >
+      {/* Checkbox */}
+      <Table.Cell>
+        <Checkbox
+          checked={isSelected}
+          onChange={() => onSelect(material.id)}
+          data-testid="select-checkbox"
+        />
+      </Table.Cell>
+
+      {/* Name */}
+      <Table.Cell onClick={() => onView?.(material)}>
+        <Typography variant="body" size="sm" fontWeight="500">
+          {material.name}
+        </Typography>
+      </Table.Cell>
+
+      {/* Type */}
+      <Table.Cell>
+        <Badge size="sm" colorPalette="blue">
+          {material.type === 'MEASURABLE' ? 'Med.' :
+           material.type === 'COUNTABLE' ? 'Cont.' : 'Elab.'}
+        </Badge>
+      </Table.Cell>
+
+      {/* Category */}
+      <Table.Cell>
+        <Typography variant="body" size="sm" color="gray.600">
+          {material.category || '-'}
+        </Typography>
+      </Table.Cell>
+
+      {/* Stock */}
+      <Table.Cell>
+        <Typography variant="body" size="sm" fontWeight="500">
+          {formatQuantity(material.stock, material.unit, 1)}
+        </Typography>
+      </Table.Cell>
+
+      {/* Min Stock */}
+      <Table.Cell>
+        <Typography variant="body" size="sm" color="gray.500">
+          {formatQuantity(material.min_stock || 0, material.unit, 1)}
+        </Typography>
+      </Table.Cell>
+
+      {/* Cost */}
+      <Table.Cell>
+        <Typography variant="body" size="sm">
+          {formatCurrency(material.unit_cost || 0)}
+        </Typography>
+      </Table.Cell>
+
+      {/* ABC Class */}
+      <Table.Cell>
+        <Badge
+          size="sm"
+          colorPalette={getABCColor((material as MaterialItem & { abcClass?: string }).abcClass)}
+        >
+          {(material as MaterialItem & { abcClass?: string }).abcClass || 'N/A'}
+        </Badge>
+      </Table.Cell>
+
+      {/* Stock Status */}
+      <Table.Cell>
+        <Badge
+          size="sm"
+          colorPalette={getStockBadgeColor(stockStatus)}
+        >
+          {stockStatus === 'out' ? 'Agotado' :
+           stockStatus === 'critical' ? 'Crítico' :
+           stockStatus === 'low' ? 'Bajo' : 'OK'}
+        </Badge>
+      </Table.Cell>
+
+      {/* Actions */}
+      <Table.Cell>
+        <ActionButtons
+          material={material}
+          onView={onView}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      </Table.Cell>
+    </Table.Row>
+  );
+}, (prevProps, nextProps) => {
+  // Custom comparison: Only re-render if these specific props change
+  return (
+    prevProps.material.id === nextProps.material.id &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.isHovered === nextProps.isHovered &&
+    prevProps.onSelect === nextProps.onSelect &&
+    prevProps.onView === nextProps.onView &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete &&
+    // Skip comparing utility functions - they're stable via useCallback
+    prevProps.material.stock === nextProps.material.stock &&
+    prevProps.material.min_stock === nextProps.material.min_stock &&
+    prevProps.material.unit_cost === nextProps.material.unit_cost
+  );
+});
+MaterialRow.displayName = 'MaterialRow';
+
 // ✅ PERFORMANCE: Memoized pagination component to prevent re-renders
 const PAGE_SIZES = [10, 25, 50, 100] as const;
 
@@ -343,106 +490,23 @@ MaterialsTable.displayName = 'MaterialsTable';
           {displayedMaterials.map((material) => {
             const isSelected = selectedIds.includes(material.id);
             const isHovered = hoveredRow === material.id;
-            const stockStatus = getStockStatus(material);
-
-            // ✅ PERFORMANCE: Compute row background once
-            const rowBg = isSelected ? SELECTED_ROW_BG : isHovered ? HOVERED_ROW_BG : DEFAULT_ROW_BG;
-            const hoverStyle = isSelected ? hoverStyleSelected : hoverStyleUnselected;
 
             return (
-              <Table.Row
+              <MaterialRow
                 key={material.id}
-                bg={rowBg}
+                material={material}
+                isSelected={isSelected}
+                isHovered={isHovered}
+                onSelect={onSelect}
+                onView={onView}
+                onEdit={onEdit}
+                onDelete={onDelete}
                 onMouseEnter={() => setHoveredRow(material.id)}
                 onMouseLeave={() => setHoveredRow(null)}
-                _hover={hoverStyle}
-                cursor="pointer"
-                data-testid={`material-row-${material.id}`}
-              >
-                {/* Checkbox */}
-                <Table.Cell>
-                  <Checkbox
-                    checked={isSelected}
-                    onChange={() => onSelect(material.id)}
-                    data-testid="select-checkbox"
-                  />
-                </Table.Cell>
-
-                {/* Name */}
-                <Table.Cell onClick={() => onView?.(material)}>
-                  <Typography variant="body" size="sm" fontWeight="500">
-                    {material.name}
-                  </Typography>
-                </Table.Cell>
-
-                {/* Type */}
-                <Table.Cell>
-                  <Badge size="sm" colorPalette="blue">
-                    {material.type === 'MEASURABLE' ? 'Med.' :
-                     material.type === 'COUNTABLE' ? 'Cont.' : 'Elab.'}
-                  </Badge>
-                </Table.Cell>
-
-                {/* Category */}
-                <Table.Cell>
-                  <Typography variant="body" size="sm" color="gray.600">
-                    {material.category || '-'}
-                  </Typography>
-                </Table.Cell>
-
-                {/* Stock */}
-                <Table.Cell>
-                  <Typography variant="body" size="sm" fontWeight="500">
-                    {formatQuantity(material.stock, material.unit, 1)}
-                  </Typography>
-                </Table.Cell>
-
-                {/* Min Stock */}
-                <Table.Cell>
-                  <Typography variant="body" size="sm" color="gray.500">
-                    {formatQuantity(material.min_stock || 0, material.unit, 1)}
-                  </Typography>
-                </Table.Cell>
-
-                {/* Cost */}
-                <Table.Cell>
-                  <Typography variant="body" size="sm">
-                    {formatCurrency(material.unit_cost || 0)}
-                  </Typography>
-                </Table.Cell>
-
-                {/* ABC Class */}
-                <Table.Cell>
-                  <Badge
-                    size="sm"
-                    colorPalette={getABCColor((material as MaterialItem & { abcClass?: string }).abcClass)}
-                  >
-                    {(material as MaterialItem & { abcClass?: string }).abcClass || 'N/A'}
-                  </Badge>
-                </Table.Cell>
-
-                {/* Stock Status */}
-                <Table.Cell>
-                  <Badge
-                    size="sm"
-                    colorPalette={getStockBadgeColor(stockStatus)}
-                  >
-                    {stockStatus === 'out' ? 'Agotado' :
-                     stockStatus === 'critical' ? 'Crítico' :
-                     stockStatus === 'low' ? 'Bajo' : 'OK'}
-                  </Badge>
-                </Table.Cell>
-
-                {/* Actions */}
-                <Table.Cell>
-                  <ActionButtons
-                    material={material}
-                    onView={onView}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                  />
-                </Table.Cell>
-              </Table.Row>
+                getStockStatus={getStockStatus}
+                getStockBadgeColor={getStockBadgeColor}
+                getABCColor={getABCColor}
+              />
             );
           })}
         </Table.Body>

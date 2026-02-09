@@ -44,6 +44,7 @@ export type LogModule =
   | 'MaterialsStore'
   | 'SalesStore'
   | 'StaffStore'
+  | 'TeamStore'
   | 'CapabilityStore'
   | 'ProductsStore'
   | 'SuppliersStore'
@@ -54,9 +55,11 @@ export type LogModule =
   | 'Products'
   | 'Production'
   | 'Sales'
+  | 'Recipe'
   | 'CashModule'
   | 'SuppliersService'
   | 'SmartAlertsEngine'
+  | 'Team' // Team management module
   | 'BusinessProfileHooks' // Business profile TanStack Query hooks
   | 'FeatureActivationService' // Feature activation service layer
   // UI Components

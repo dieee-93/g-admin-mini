@@ -12,7 +12,7 @@ export { createShiftAwareHandler } from './utils';
 
 // Export event handlers by category
 export * from './cashHandlers';
-export * from './staffHandlers';
+export * from './teamHandlers';
 export * from './materialsHandlers';
 export * from './operationsHandlers';
 
@@ -25,7 +25,7 @@ import {
 import {
   handleStaffCheckedIn,
   handleStaffCheckedOut,
-} from './staffHandlers';
+} from './teamHandlers';
 
 import {
   handleStockLow,

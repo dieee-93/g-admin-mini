@@ -1,8 +1,8 @@
 # 🚀 RESUME AQUÍ - Material Form Refactor
 
-**Última actualización:** 2026-02-05
-**Sesión:** Phase 1 COMPLETA ✅
-**Próximo paso:** Fase 2 - Labor/Staff Unification
+**Última actualización:** 2026-02-06
+**Sesión:** Phase 2 COMPLETA ✅
+**Próximo paso:** Testing + Optional Staff→Team Renaming
 
 ---
 
@@ -11,6 +11,7 @@
 ### ✅ Lo que YA está COMPLETO
 
 **Fase 1 (4 horas):** Critical UX Fixes - **100% DONE**
+**Fase 2 (2 horas):** Labor/Staff Unification - **100% DONE**
 
 1. ✅ **Stale Closures Arreglados**
    - ElaboratedFields: functional setState
@@ -35,6 +36,13 @@
    - ProductionConfig ya NO requiere recipeId
    - Recipe y ProductionConfig son independientes
 
+6. ✅ **Labor/Staff System Unified** (Fase 2)
+   - Eliminados inputs simples (labor_hours, labor_cost_per_hour)
+   - Integrado StaffSelector component
+   - Calculation con loaded_factor (1.325)
+   - staff_assignments array en ProductionConfig
+   - calculateLaborCost() para cálculos precisos
+
 ---
 
 ## 🧪 Verificación Rápida
@@ -53,52 +61,62 @@ ls -la src/pages/admin/supply-chain/materials/hooks/useMaterialFormValidation.ts
 cat docs/materials/Phase1-COMPLETE.md
 ```
 
-**Archivos clave creados:**
+**Archivos clave creados (Fase 1):**
 - `validation/materialFormSchema.ts` - Schema Zod extendido
 - `hooks/useMaterialFormValidation.ts` - Hook de validación UI
 - `components/ValidationSummaryAlert.tsx` - Alert de errores
 - `components/MaterialFormProgressIndicator.tsx` - Progress indicator
 
-**Archivos modificados:**
+**Archivos modificados (Fase 1):**
 - `MaterialFormDialog.tsx` - Added form + validation feedback
 - `ElaboratedFields.tsx` - Added progress indicator + fixed closures
 - `ProductionConfigSection.tsx` - Fixed closures + removed restriction
 
+**Archivos modificados (Fase 2):**
+- `types/materialTypes.ts` - Added staff_assignments field
+- `ProductionConfigSection.tsx` - Replaced labor inputs with StaffSelector
+- `MaterialFormDialog.tsx` - Fixed import path
+
 ---
 
-## 🎯 PRÓXIMO PASO: Fase 2
+## 🎯 PRÓXIMO PASO: Testing & Optional Renaming
 
-### **Labor/Staff System Unification** (5 horas estimadas)
+### **Testing de Fase 2** (30 min)
+- [ ] Crear material elaborado con ProductionConfig
+- [ ] Agregar staff assignments (role, employee, duration, count)
+- [ ] Verificar que totals incluyen loaded_factor
+- [ ] Guardar y verificar que se persiste en DB
+- [ ] Editar material y verificar que staff_assignments se cargan
 
-**Problema:** Duplicación de lógica labor
-- ProductionConfig: usa `labor_hours × labor_cost_per_hour` (simple, SIN loaded_factor)
-- Team Module: usa `StaffAssignment[]` con loaded_factor=1.325 (sofisticado, CORRECTO)
-
-**Solución:**
-1. Reemplazar labor input fields con `<StaffSelector />`
-2. Eliminar `labor_hours` y `labor_cost_per_hour` de ProductionConfig
-3. Usar `staff_assignments: StaffAssignment[]`
-4. Calcular con `calculateLaborCost()` del módulo recipe
-
-**Doc completo:** `docs/materials/Labor-Staff-Unification-Analysis.md`
+### **Optional: Staff → Team Renaming** (3-4 horas, usar agente)
+- Renombrar StaffSelector → TeamSelector
+- Renombrar StaffAssignment → TeamAssignment
+- 79+ referencias en 6 módulos
+- **Doc completo:** `docs/materials/Staff-to-Team-Renaming-Reference.md`
 
 ---
 
 ## 📋 Inicio de Próxima Sesión
 
-### Comando para Claude:
+### Comando para Testing:
 
 ```
-Lee docs/materials/RESUME-AQUI.md y docs/materials/Labor-Staff-Unification-Analysis.md
+Lee docs/materials/RESUME-AQUI.md
 
-Implementa Fase 2: Labor/Staff Unification siguiendo el plan en Labor-Staff-Unification-Analysis.md
+La Fase 2 está completa. Necesito hacer testing manual:
+1. Abrir app en localhost:5173
+2. Ir a Materials
+3. Crear material elaborado
+4. Configurar ProductionConfig con staff assignments
+5. Verificar que se guarda correctamente
+```
 
-Checklist:
-1. Update ProductionConfig type (remove labor_hours, add staff_assignments)
-2. Import StaffSelector in ProductionConfigSection
-3. Replace labor input fields (lines 265-313) with StaffSelector
-4. Update totals calculation to use calculateLaborCost()
-5. Test integration
+### Comando para Renaming (opcional, usar agente):
+
+```
+Lee docs/materials/Staff-to-Team-Renaming-Reference.md
+
+Ejecuta el renombrado completo de Staff → Team siguiendo las fases 1-8.
 ```
 
 ---
@@ -256,11 +274,12 @@ Production Equipment Implementation
 ├── ✅ Service Layer (100%)
 ├── ✅ UI Components (100%)
 ├── ✅ Cleanup Legacy (100%)
-├── ✅ Phase 1: Critical Fixes (100%)  ← YOU ARE HERE
-├── ⏳ Phase 2: Labor/Staff (0%)       ← NEXT STEP
-└── ⏳ Phase 3: Testing (0%)
+├── ✅ Phase 1: Critical Fixes (100%)
+├── ✅ Phase 2: Labor/Staff (100%)     ← YOU ARE HERE
+├── ⏳ Phase 3: Testing (0%)           ← NEXT STEP
+└── ⏳ Optional: Staff→Team Rename (0%)
 
-Overall: 85% Complete
+Overall: 95% Complete
 ```
 
 ---
@@ -275,6 +294,6 @@ Overall: 85% Complete
 
 ---
 
-**Total Time Invested:** 4 hours (Phase 1)
-**Remaining Work:** ~7 hours (Phase 2: 5h + Phase 3: 2h)
-**Status:** 🟢 Clean checkpoint, ready to continue
+**Total Time Invested:** 6 hours (Phase 1: 4h + Phase 2: 2h)
+**Remaining Work:** ~30 min (Testing) + Optional 3-4h (Renaming)
+**Status:** 🟢 Phase 2 complete, ready for testing

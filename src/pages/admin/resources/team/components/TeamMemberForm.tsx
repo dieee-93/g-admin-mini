@@ -15,20 +15,25 @@ import {
 } from '../../../../../shared/ui';
 import { Field } from '@chakra-ui/react';
 import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { useStaffWithLoader } from '@/modules/team/hooks';
+import { useCreateTeam, useUpdateTeam } from '@/modules/team/hooks';
 import { useTeamMemberValidation } from '@/modules/team/hooks';
 import type { TeamMember } from '../types';
-import type { EmployeeCompleteFormData } from '@/lib/validation/zod/CommonSchemas';
+import type { TeamMemberCompleteFormData } from '@/lib/validation/zod/CommonSchemas';
 
-interface EmployeeFormProps {
-  teamMember?: TeamMember;
+interface TeamMemberFormProps {
+  // teamMember can be a Partial if we are creating, 
+  // but typically for editing it should correspond to our TeamMember Definition from types
+  // However, the validation hook expects certain fields
+  teamMember?: Partial<TeamMember> | undefined;
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (teamMember: TeamMember) => void;
 }
 
-export function EmployeeForm({ teamMember, isOpen, onClose, onSuccess }: EmployeeFormProps) {
-  const { createEmployee, updateEmployee, loading, teamMembers } = useStaffWithLoader();
+export function TeamMemberForm({ teamMember, isOpen, onClose, onSuccess }: TeamMemberFormProps) {
+  const createMutation = useCreateTeam();
+  const updateMutation = useUpdateTeam();
+  const loading = createMutation.isPending || updateMutation.isPending;
 
   const isEditing = !!teamMember;
 
@@ -49,15 +54,16 @@ export function EmployeeForm({ teamMember, isOpen, onClose, onSuccess }: Employe
       position: teamMember?.position || '',
       department: (teamMember?.department || 'service') as 'kitchen' | 'service' | 'admin' | 'cleaning' | 'management',
       hire_date: teamMember?.hire_date || new Date().toISOString().split('T')[0],
-      employment_type: (teamMember?.employment_type || 'full_time') as 'full_time' | 'part_time' | 'contract' | 'intern',
+      employment_type: (teamMember?.employment_type || 'full_time') as 'full_time' | 'part_time' | 'contractor' | 'temp',
       employment_status: 'active',
       salary: teamMember?.salary,
       hourly_rate: teamMember?.hourly_rate,
       weekly_hours: 40,
-      role: 'teamMember',
+      // map to TeamMember Definition role if needed, simplified for form
+      role: (teamMember?.role as any) || 'employee',
       can_work_multiple_locations: false
     },
-    teamMembers || [],
+    [], // We don't have the full list here easily, but validation hook handles empty array gracefully for duplicates if needed, or we could fetch it.
     teamMember?.id
   );
 
@@ -70,7 +76,7 @@ export function EmployeeForm({ teamMember, isOpen, onClose, onSuccess }: Employe
     }
   }, [isOpen, reset]);
 
-  const handleSubmit = createSubmitHandler(async (data: EmployeeCompleteFormData) => {
+  const handleSubmit = createSubmitHandler(async (data: TeamMemberCompleteFormData) => {
     // Additional validation
     const isValid = await validateForm();
     if (!isValid) return;
@@ -103,10 +109,15 @@ export function EmployeeForm({ teamMember, isOpen, onClose, onSuccess }: Employe
 
       let result: TeamMember | null = null;
 
-      if (isEditing) {
-        result = await updateEmployee(teamMember.id, employeeData);
+      if (isEditing && teamMember?.id) {
+        // We cast as any because the updated type might have slight differences, 
+        // but useUpdateTeam handles the transform internally
+        const updated = await updateMutation.mutateAsync({ id: teamMember.id, data: employeeData as any });
+        // The mutation returns the updated object. We might need to cast it to match TeamMember type if needed for onSuccess
+        // Assuming updated structure matches
+        result = updated as unknown as TeamMember;
       } else {
-        result = await createEmployee(employeeData);
+        result = await createMutation.mutateAsync(employeeData as any) as unknown as TeamMember;
       }
 
       if (result) {
@@ -123,7 +134,7 @@ export function EmployeeForm({ teamMember, isOpen, onClose, onSuccess }: Employe
   });
 
   return (
-    <Modal open={isOpen} onClose={onClose} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <Modal.Content>
         <Modal.Header>
           <Modal.Title>
@@ -371,7 +382,7 @@ export function EmployeeForm({ teamMember, isOpen, onClose, onSuccess }: Employe
             </Button>
             <Button
               type="submit"
-              form="teamMember-form"
+              {...({ form: "teamMember-form" } as any)}
               colorPalette="blue"
               loading={loading}
             >

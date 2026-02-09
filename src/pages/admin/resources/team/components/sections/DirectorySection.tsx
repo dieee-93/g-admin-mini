@@ -1,5 +1,5 @@
-// Staff Directory Section - Editorial Brutalist Redesign
-// Clean, modern staff directory with distinctive card design
+// Team Directory Section - Editorial Brutalist Redesign
+// Clean, modern team directory with distinctive card design
 import { useState } from 'react';
 import { Spinner } from '@chakra-ui/react';
 import {
@@ -25,32 +25,32 @@ import {
   XMarkIcon,
   AdjustmentsHorizontalIcon,
 } from '@heroicons/react/24/outline';
-import { useStaffWithLoader } from '@/modules/team/hooks';
-import type { StaffFilters } from '@/modules/team/hooks/useStaff';
+import { useTeamWithLoader } from '@/modules/team/hooks';
+import type { TeamFilters } from '@/modules/team/hooks/useTeam';
 import type { TeamMember } from '@/modules/team/store';
-import { EmployeeForm } from '../EmployeeForm';
-import { StaffCard, StaffListItem } from '../StaffCard';
-import type { StaffViewState, TeamMember } from '../../types';
+import { TeamMemberForm } from '../TeamMemberForm';
+import { TeamCard, TeamListItem } from '../TeamCard';
+import type { TeamViewState, TeamMember as TeamMemberDefinition } from '../../types';
 
 // Helper to transform TeamMember to TeamMember format for the form
-function staffMemberToEmployee(staff: TeamMember): Partial<TeamMember> {
-  const [firstName, ...lastNameParts] = staff.name.split(' ');
+function teamMemberToEmployee(member: TeamMember): Partial<TeamMemberDefinition> {
+  const [firstName, ...lastNameParts] = member.name.split(' ');
   return {
-    id: staff.id,
+    id: member.id,
     employee_id: '', // Will be generated
     first_name: firstName || '',
     last_name: lastNameParts.join(' ') || '',
-    email: staff.email,
-    phone: staff.phone,
-    avatar_url: staff.avatar,
-    position: staff.position,
-    department: staff.department,
-    hire_date: staff.hire_date,
-    employment_status: staff.status,
-    performance_score: staff.performance_score,
-    salary: staff.salary,
-    created_at: staff.created_at,
-    updated_at: staff.updated_at,
+    email: member.email,
+    phone: member.phone,
+    avatar_url: member.avatar,
+    position: member.position,
+    department: member.department,
+    hire_date: member.hire_date,
+    employment_status: member.status,
+    performance_score: member.performance_score,
+    salary: member.salary,
+    created_at: member.created_at,
+    updated_at: member.updated_at,
   };
 }
 
@@ -77,26 +77,31 @@ const STATUSES = [
 // COMPONENT
 // ═══════════════════════════════════════════════════════════════
 interface DirectorySectionProps {
-  viewState: StaffViewState;
-  onViewStateChange: (state: StaffViewState) => void;
+  viewState: TeamViewState;
+  onViewStateChange: (state: TeamViewState) => void;
+  onEditEmployee: (teamMember: TeamMemberDefinition) => void;
+  onDeleteEmployee: (teamMember: TeamMemberDefinition) => void;
 }
 
-export function DirectorySection({ viewState, onViewStateChange }: DirectorySectionProps) {
+export function DirectorySection({
+  viewState,
+  onViewStateChange,
+  onEditEmployee,
+  onDeleteEmployee
+}: DirectorySectionProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
-  const [showEmployeeForm, setShowEmployeeForm] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState<Partial<TeamMember> | undefined>();
 
   // Query filters
-  const filters: StaffFilters = {
+  const filters: TeamFilters = {
     search: searchTerm || undefined,
-    department: (selectedDepartment !== 'all' ? selectedDepartment : undefined) as StaffFilters['department'],
-    status: (selectedStatus !== 'all' ? selectedStatus : undefined) as StaffFilters['status'],
+    department: (selectedDepartment !== 'all' ? selectedDepartment : undefined) as TeamFilters['department'],
+    status: (selectedStatus !== 'all' ? selectedStatus : undefined) as TeamFilters['status'],
   };
 
-  const { staff, loading, error } = useStaffWithLoader(filters);
+  const { team: teamMembers, loading, error } = useTeamWithLoader(filters);
 
   // Check if any filter is active
   const hasActiveFilters = selectedDepartment !== 'all' || selectedStatus !== 'all' || searchTerm;
@@ -115,8 +120,10 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
   };
 
   const handleEdit = (teamMember: TeamMember) => {
-    setEditingEmployee(staffMemberToEmployee(teamMember));
-    setShowEmployeeForm(true);
+    // Transform store TeamMember back to likely definition if needed, 
+    // or better yet, just pass what we have if types align enough, 
+    // but here we use the helper to match expected type
+    onEditEmployee(teamMemberToEmployee(teamMember) as TeamMemberDefinition);
   };
 
   const handleContact = (teamMember: TeamMember, method: 'whatsapp' | 'call' | 'email') => {
@@ -128,12 +135,22 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
     // TODO: Open incident modal
   };
 
+  // Transform API TeamMember to Store TeamMember
+  const mapToStoreMember = (member: any): import('@/modules/team/store').TeamMember => ({
+    ...member,
+    name: `${member.first_name} ${member.last_name}`,
+    status: member.employment_status || 'inactive',
+    avatar: member.avatar_url || '',
+  } as unknown as import('@/modules/team/store').TeamMember);
+
+  const storeTeamMembers = teamMembers.map(mapToStoreMember);
+
   // ─────────────────────────────────────────────────────────────
   // LOADING STATE
   // ─────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <Stack direction="column" gap="4" py="16" align="center">
+      <Stack direction={{ base: 'column', md: 'row' }} gap="4" alignItems="end">
         <Spinner size="lg" color="gray.400" />
         <Text color="gray.500" fontSize="14px">Cargando equipo...</Text>
       </Stack>
@@ -156,7 +173,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
   // ─────────────────────────────────────────────────────────────
   // EMPTY STATE
   // ─────────────────────────────────────────────────────────────
-  if (staff.length === 0 && !hasActiveFilters) {
+  if (teamMembers.length === 0 && !hasActiveFilters) {
     return (
       <Stack direction="column" gap="6" py="20" align="center">
         <Box
@@ -178,8 +195,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
         <Button
           colorPalette="blue"
           size="lg"
-          onClick={() => setShowEmployeeForm(true)}
-          borderRadius="2px"
+          onClick={() => onEditEmployee({} as TeamMemberDefinition)}
         >
           <Icon icon={PlusIcon} boxSize="5" mr="2" />
           Agregar Empleado
@@ -224,13 +240,12 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
           variant={showFilters ? 'solid' : 'outline'}
           size="sm"
           onClick={() => setShowFilters(!showFilters)}
-          borderRadius="2px"
           colorPalette={showFilters ? 'blue' : 'gray'}
         >
           <Icon icon={showFilters ? AdjustmentsHorizontalIcon : FunnelIcon} boxSize="4" />
           Filtros
           {hasActiveFilters && (
-            <Badge ml="2" colorPalette="blue" size="sm" borderRadius="full">
+            <Badge colorPalette="blue" size="sm">
               {[selectedDepartment !== 'all', selectedStatus !== 'all'].filter(Boolean).length}
             </Badge>
           )}
@@ -240,13 +255,12 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
         <Stack direction="row" gap="1" bg="gray.100" p="1" borderRadius="2px" _dark={{ bg: 'gray.800' }}>
           <IconButton
             aria-label="Vista cuadricula"
-            variant={viewState.viewMode === 'grid' ? 'solid' : 'ghost'}
-            size="xs"
+            variant={viewState.viewMode === 'grid' ? 'solid' : 'outline'}
+            size="sm"
             onClick={() => onViewStateChange({ ...viewState, viewMode: 'grid' })}
-            borderRadius="2px"
+            css={{ borderRadius: 'md', borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
             colorPalette={viewState.viewMode === 'grid' ? 'blue' : 'gray'}
-          >
-            <Icon icon={Squares2X2Icon} boxSize="4" />
+          >          <Icon icon={Squares2X2Icon} boxSize="4" />
           </IconButton>
           <IconButton
             aria-label="Vista lista"
@@ -261,16 +275,16 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
         </Stack>
 
         {/* Add button */}
-        <Button
-          colorPalette="blue"
-          size="sm"
-          onClick={() => setShowEmployeeForm(true)}
-          borderRadius="2px"
-          ml="auto"
-        >
-          <Icon icon={PlusIcon} boxSize="4" />
-          Agregar
-        </Button>
+        <Box ml="auto">
+          <Button
+            colorPalette="blue"
+            size="sm"
+            onClick={() => onEditEmployee({} as TeamMemberDefinition)} // Empty for new
+          >
+            <Icon icon={PlusIcon} boxSize="4" />
+            Agregar
+          </Button>
+        </Box>
       </Stack>
 
       {/* ═══════════════════════════════════════════════════════ */}
@@ -283,7 +297,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
           p="4"
           bg="gray.50"
           borderRadius="2px"
-          align="flex-end"
+          alignItems="end"
           flexWrap="wrap"
           _dark={{ bg: 'gray.900' }}
         >
@@ -294,7 +308,10 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
             </Text>
             <SegmentGroup
               value={selectedDepartment}
-              onValueChange={(e) => setSelectedDepartment(e.value)}
+              onValueChange={(e) => {
+                if (e.value && e.value.length > 0) setSelectedDepartment(e.value[0]);
+                else setSelectedDepartment('all');
+              }}
               size="sm"
             >
               {DEPARTMENTS.map((dept) => (
@@ -312,7 +329,10 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
             </Text>
             <SegmentGroup
               value={selectedStatus}
-              onValueChange={(e) => setSelectedStatus(e.value)}
+              onValueChange={(e) => {
+                if (e.value && e.value.length > 0) setSelectedStatus(e.value[0]);
+                else setSelectedStatus('all');
+              }}
               size="sm"
             >
               {STATUSES.map((status) => (
@@ -329,7 +349,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
               variant="ghost"
               size="sm"
               onClick={clearFilters}
-              color="gray.500"
+              colorPalette="gray"
             >
               <Icon icon={XMarkIcon} boxSize="4" mr="1" />
               Limpiar
@@ -344,9 +364,9 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
       <Stack direction="row" justify="space-between" align="center">
         <Text fontSize="13px" color="gray.500">
           <Text as="span" fontWeight="600" color="gray.700" _dark={{ color: 'gray.300' }}>
-            {staff.length}
+            {storeTeamMembers.length}
           </Text>
-          {' '}empleado{staff.length !== 1 ? 's' : ''}
+          {' '}empleado{storeTeamMembers.length !== 1 ? 's' : ''}
           {hasActiveFilters && ' (filtrado)'}
         </Text>
       </Stack>
@@ -354,12 +374,12 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
       {/* ═══════════════════════════════════════════════════════ */}
       {/* NO RESULTS */}
       {/* ═══════════════════════════════════════════════════════ */}
-      {staff.length === 0 && hasActiveFilters && (
+      {storeTeamMembers.length === 0 && hasActiveFilters && (
         <Stack direction="column" gap="4" py="12" align="center">
           <Text fontSize="15px" color="gray.500">
             No se encontraron empleados con estos filtros
           </Text>
-          <Button variant="outline" size="sm" onClick={clearFilters} borderRadius="2px">
+          <Button variant="outline" size="sm" onClick={clearFilters}>
             Limpiar filtros
           </Button>
         </Stack>
@@ -368,10 +388,10 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
       {/* ═══════════════════════════════════════════════════════ */}
       {/* GRID VIEW */}
       {/* ═══════════════════════════════════════════════════════ */}
-      {viewState.viewMode === 'grid' && staff.length > 0 && (
+      {viewState.viewMode === 'grid' && storeTeamMembers.length > 0 && (
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} gap="4">
-          {staff.map((teamMember) => (
-            <StaffCard
+          {storeTeamMembers.map((teamMember) => (
+            <TeamCard
               key={teamMember.id}
               teamMember={teamMember}
               onView={handleView}
@@ -386,7 +406,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
       {/* ═══════════════════════════════════════════════════════ */}
       {/* LIST VIEW */}
       {/* ═══════════════════════════════════════════════════════ */}
-      {viewState.viewMode === 'list' && staff.length > 0 && (
+      {viewState.viewMode === 'list' && storeTeamMembers.length > 0 && (
         <Stack
           direction="column"
           gap="0"
@@ -399,7 +419,7 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
           {/* List header */}
           <Stack
             direction="row"
-            align="center"
+            alignItems="end"
             gap="16px"
             py="10px"
             pl="20px"
@@ -426,8 +446,8 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
           </Stack>
 
           {/* List items */}
-          {staff.map((teamMember) => (
-            <StaffListItem
+          {storeTeamMembers.map((teamMember) => (
+            <TeamListItem
               key={teamMember.id}
               teamMember={teamMember}
               onView={handleView}
@@ -440,19 +460,9 @@ export function DirectorySection({ viewState, onViewStateChange }: DirectorySect
       )}
 
       {/* ═══════════════════════════════════════════════════════ */}
-      {/* EMPLOYEE FORM MODAL */}
+      {/* EMPLOYEE FORM MODAL - Removed, lifted to parent */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <EmployeeForm
-        teamMember={editingEmployee as TeamMember | undefined}
-        isOpen={showEmployeeForm}
-        onClose={() => {
-          setShowEmployeeForm(false);
-          setEditingEmployee(undefined);
-        }}
-        onSuccess={() => {
-          setEditingEmployee(undefined);
-        }}
-      />
+      {/* <TeamMemberForm ... /> */}
     </Stack>
   );
 }

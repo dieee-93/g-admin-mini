@@ -7,7 +7,7 @@
 export { BasicInfoSection } from './BasicInfoSection'
 export { OutputConfigSection } from './OutputConfigSection'
 export { InputsEditorSection } from './InputsEditorSection'
-export { StaffAssignmentSection } from './StaffAssignmentSection'
+export { TeamAssignmentSection } from './TeamAssignmentSection'
 export { CostSummarySection } from './CostSummarySection'
 export { InstructionsSection } from './InstructionsSection'
 export { AdvancedOptionsSection } from './AdvancedOptionsSection'

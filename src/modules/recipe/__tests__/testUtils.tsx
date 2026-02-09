@@ -4,10 +4,12 @@
  * Helpers, mocks, and factories for testing recipe components
  */
 
-import { vi } from 'vitest'
+import { vi, expect } from 'vitest'
 import { type ReactNode } from 'react'
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { Recipe, RecipeInput, RecipeOutput } from '../types/recipe'
+import { RecipeEntityType, RecipeExecutionMode } from '../types/recipe'
 import type { ValidationResult } from '../components/RecipeBuilder/types'
 
 // ============================================
@@ -18,7 +20,19 @@ import type { ValidationResult } from '../components/RecipeBuilder/types'
  * Wrapper component that provides ChakraProvider for UI tests
  */
 export function TestWrapper({ children }: { children: ReactNode }) {
-  return <ChakraProvider value={defaultSystem}>{children}</ChakraProvider>
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  })
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ChakraProvider value={defaultSystem}>{children}</ChakraProvider>
+    </QueryClientProvider>
+  )
 }
 
 // ============================================
@@ -33,9 +47,10 @@ export function createMockRecipe(overrides?: Partial<Recipe>): Recipe {
     id: 'test-recipe-1',
     name: 'Test Recipe',
     description: 'A test recipe',
-    entityType: 'product',
-    executionMode: 'on_demand',
+    entityType: RecipeEntityType.PRODUCT,
+    executionMode: RecipeExecutionMode.ON_DEMAND,
     output: {
+      item: 'test-item-id',
       quantity: 1,
       unit: 'unit',
     },
@@ -76,6 +91,7 @@ export function createMockRecipeInput(overrides?: Partial<RecipeInput>): RecipeI
  */
 export function createMockRecipeOutput(overrides?: Partial<RecipeOutput>): RecipeOutput {
   return {
+    item: 'test-item-id',
     quantity: 1,
     unit: 'unit',
     ...overrides,

@@ -48,9 +48,9 @@ export const shiftControlManifest: ModuleManifest = {
       'cash.session.opened',
       'cash.session.closed',
 
-      // Staff events
-      'staff.employee.checked_in',
-      'staff.employee.checked_out',
+      // Team events
+      'team.member.checked_in',
+      'team.member.checked_out',
 
       // Table events (POS)
       'tables.table.opened',

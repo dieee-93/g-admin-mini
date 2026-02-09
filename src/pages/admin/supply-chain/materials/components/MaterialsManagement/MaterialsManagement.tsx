@@ -13,6 +13,7 @@ interface MaterialsManagementProps {
   onStockUpdate: (itemId: string, newStock: number) => Promise<void>;
   onBulkAction: (action: string, itemIds: string[]) => Promise<void>;
   onAddMaterial?: () => void;
+  onView?: (item: any) => void;
   onEdit?: (item: any) => void;
   onDelete?: (item: any) => void;
   performanceMode?: boolean;
@@ -26,6 +27,7 @@ export const MaterialsManagement = memo(function MaterialsManagement({
   onStockUpdate,
   onBulkAction,
   onAddMaterial,
+  onView,
   onEdit,
   onDelete,
   performanceMode = false
@@ -76,6 +78,7 @@ export const MaterialsManagement = memo(function MaterialsManagement({
           onStockUpdate={onStockUpdate}
           onBulkAction={onBulkAction}
           onAddMaterial={onAddMaterial}
+          onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
           performanceMode={performanceMode}

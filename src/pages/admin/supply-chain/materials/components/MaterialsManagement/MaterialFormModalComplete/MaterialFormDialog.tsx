@@ -28,7 +28,7 @@ import type { Supplier } from '@/pages/admin/supply-chain/suppliers/types/suppli
 import type { MaterialItem } from '@/pages/admin/supply-chain/materials/types';
 import { BrandSelectField } from '@/pages/admin/supply-chain/shared/brands';
 import { useMaterialForm } from './hooks/useMaterialForm';
-import { useMaterialFormValidation } from '../../hooks/useMaterialFormValidation';
+import { useMaterialFormValidation } from '../../../hooks/useMaterialFormValidation';
 import { TypeSelector } from './components/TypeSelector';
 import { MeasurableFields } from './components/MeasurableFields';
 import { CountableFields } from './components/CountableFields';
@@ -41,6 +41,8 @@ import { EventSourcingConfirmation } from './components/EventSourcingConfirmatio
 import { ValidationSummaryAlert } from './components/ValidationSummaryAlert';
 import { MaterialFormProgressIndicator } from './components/MaterialFormProgressIndicator';
 import { CATEGORY_COLLECTION } from './constants';
+import { EquipmentSelectorInline } from '@/shared/components/EquipmentSelectorInline';
+import type { ProductionEquipmentUsage } from '@/shared/components/EquipmentSelector';
 
 export interface MaterialFormDialogProps {
   isOpen: boolean;
@@ -78,7 +80,8 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
   } = useMaterialForm({ isOpen, onClose, mode, item });
 
   // 🆕 NEW: Validation hook for UI feedback
-  const { validation, getValidationSummary } = useMaterialFormValidation(formData);
+  // Pass formData even if undefined - the hook handles it
+  const { validation, getValidationSummary } = useMaterialFormValidation(formData || undefined);
 
   // Local states for CountableFields packaging
   const [packageQuantity, setPackageQuantity] = useState(1);
@@ -86,6 +89,7 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
 
   // Wizard mode state
   const [showSupplierWizard, setShowSupplierWizard] = useState(false);
+  const [showEquipmentSelector, setShowEquipmentSelector] = useState(false);
 
   // ⚡ PERFORMANCE: Memoize Dialog callbacks to prevent context re-renders
   const handleOpenChange = useCallback((details: { open: boolean }) => {
@@ -130,6 +134,7 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
           formData={formData}
           setFormData={updateFormData}
           isEditMode={mode === 'edit'}
+          onRequestEquipmentSelector={() => setShowEquipmentSelector(true)}
         />
       );
     }
@@ -151,6 +156,21 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
     setShowSupplierWizard(false);
   };
 
+  // Handler when equipment is selected
+  const handleEquipmentSelected = useCallback((equipment: ProductionEquipmentUsage) => {
+    updateFormData({
+      production_config: {
+        ...formData.production_config,
+        equipment_usage: [
+          ...(formData.production_config?.equipment_usage || []),
+          equipment
+        ],
+        equipment_cost: (formData.production_config?.equipment_cost || 0) + equipment.total_cost
+      }
+    });
+    setShowEquipmentSelector(false);
+  }, [formData.production_config, updateFormData]);
+
   // DEBUG: Check field errors
   console.log('🔍 [MaterialFormDialog] fieldErrors:', fieldErrors);
 
@@ -166,12 +186,15 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
         <Dialog.Content>
           <Dialog.Header>
             <Flex align="center" gap="2">
-              {showSupplierWizard && (
+              {(showSupplierWizard || showEquipmentSelector) && (
                 <IconButton
                   aria-label="Volver"
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowSupplierWizard(false)}
+                  onClick={() => {
+                    setShowSupplierWizard(false);
+                    setShowEquipmentSelector(false);
+                  }}
                   mr="2"
                 >
                   <ArrowLeftIcon style={{ width: '16px', height: '16px' }} />
@@ -183,6 +206,12 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
                     <Text color="gray.500" fontWeight="medium">Nuevo Material</Text>
                     <Text color="gray.400">/</Text>
                     <Text fontWeight="bold">Crear Proveedor</Text>
+                  </Flex>
+                ) : showEquipmentSelector ? (
+                  <Flex align="center" gap="2" fontSize="lg">
+                    <Text color="gray.500" fontWeight="medium">Nuevo Material</Text>
+                    <Text color="gray.400">/</Text>
+                    <Text fontWeight="bold">Agregar Equipamiento</Text>
                   </Flex>
                 ) : (
                   modalTitle
@@ -238,6 +267,13 @@ export const MaterialFormDialog = (props: MaterialFormDialogProps) => {
                       </Alert.Description>
                     </Alert.Root>
                   }
+                />
+              ) : showEquipmentSelector ? (
+                /* Wizard Mode: Equipment Selection */
+                <EquipmentSelectorInline
+                  onSelect={handleEquipmentSelected}
+                  onCancel={() => setShowEquipmentSelector(false)}
+                  selectedEquipmentIds={formData.production_config?.equipment_usage?.map(eq => eq.equipment_id) || []}
                 />
               ) : (
                 <>

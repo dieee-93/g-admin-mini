@@ -13,9 +13,9 @@ import type { Database } from '@/lib/supabase/database.types';
 // DATABASE TYPES (from Supabase)
 // =============================================================================
 
-export type StaffRoleRow = Database['public']['Tables']['job_roles']['Row'];
-export type StaffRoleInsert = Database['public']['Tables']['job_roles']['Insert'];
-export type StaffRoleUpdate = Database['public']['Tables']['job_roles']['Update'];
+export type TeamRoleRow = Database['public']['Tables']['job_roles']['Row'];
+export type TeamRoleInsert = Database['public']['Tables']['job_roles']['Insert'];
+export type TeamRoleUpdate = Database['public']['Tables']['job_roles']['Update'];
 
 // =============================================================================
 // DOMAIN TYPES
@@ -29,22 +29,22 @@ export type StaffRoleUpdate = Database['public']['Tables']['job_roles']['Update'
  * NOT to be confused with SystemRole (ADMIN, SUPERVISOR, etc.) which controls
  * panel access permissions.
  */
-export interface JobRole {
+export interface TeamRole {
   id: string;
   organization_id: string;
-  
+
   // Identity
   name: string;                    // "Cocinero", "Mesero", "Barbero"
   department?: string | null;
   description?: string | null;
-  
+
   // Costing
   default_hourly_rate?: number | null;  // Base hourly rate for this role
   loaded_factor: number;                 // Burden rate multiplier (default 1.0)
-  
+
   // Calculated (not stored, computed on read)
   loaded_hourly_cost?: number;     // default_hourly_rate * loaded_factor
-  
+
   // Metadata
   is_active: boolean;
   sort_order: number;
@@ -55,7 +55,7 @@ export interface JobRole {
 /**
  * JobRole option for selectors (lightweight)
  */
-export interface StaffRoleOption {
+export interface TeamRoleOption {
   id: string;
   name: string;
   department?: string | null;
@@ -74,7 +74,7 @@ export interface StaffRoleOption {
 export interface LaborCostingConfig {
   /** Default loaded factor for all roles (e.g., 1.325 = 32.5% burden) */
   default_loaded_factor: number;
-  
+
   /** Override factors by employment type */
   factors_by_employment_type?: {
     full_time?: number;
@@ -82,10 +82,10 @@ export interface LaborCostingConfig {
     contract?: number;
     intern?: number;
   };
-  
+
   /** Decimal precision for calculations (default 4) */
   calculation_precision?: number;
-  
+
   /** Round final cost to cents (default true) */
   round_to_cents?: boolean;
 }
@@ -114,23 +114,23 @@ export const DEFAULT_LABOR_COSTING_CONFIG: LaborCostingConfig = {
 export interface StaffAllocation {
   id?: string;
   product_id: string;
-  
+
   // Assignment (role required, teamMember optional for specific assignment)
   role_id: string;                 // FK to job_roles
   employee_id?: string | null;     // FK to teamMembers (optional, more specific)
-  
+
   // Time requirements
   duration_minutes: number;
   count: number;                   // Number of people needed
-  
+
   // Costing overrides (optional)
   hourly_rate?: number | null;            // Override the role's rate
   loaded_factor_override?: number | null; // Override the role's factor
-  
+
   // Denormalized for display (populated on read)
   role_name?: string;
   employee_name?: string;
-  
+
   // Calculated fields (computed, not stored)
   effective_hourly_rate?: number;  // Rate used (with overrides applied)
   loaded_hourly_cost?: number;     // effective_hourly_rate * loaded_factor
@@ -148,10 +148,10 @@ export interface StaffAllocation {
 export interface LaborCostResult {
   /** Total labor cost (sum of all allocations) */
   total_cost: number;
-  
+
   /** Total hours (sum of all allocations) */
   total_hours: number;
-  
+
   /** Breakdown by allocation */
   breakdown: LaborCostBreakdownItem[];
 }
@@ -165,16 +165,16 @@ export interface LaborCostBreakdownItem {
   role_name: string;
   employee_id?: string;
   employee_name?: string;
-  
+
   // Inputs
   count: number;
   duration_minutes: number;
-  
+
   // Rates used
   hourly_rate: number;
   loaded_factor: number;
   loaded_hourly_cost: number;
-  
+
   // Results
   hours: number;
   cost: number;
@@ -187,7 +187,7 @@ export interface LaborCostBreakdownItem {
 /**
  * Form data for creating/editing a JobRole
  */
-export interface StaffRoleFormData {
+export interface TeamRoleFormData {
   name: string;
   department?: string;
   description?: string;
@@ -201,7 +201,7 @@ export interface StaffRoleFormData {
 // FILTER TYPES
 // =============================================================================
 
-export interface StaffRoleFilters {
+export interface TeamRoleFilters {
   department?: string;
   is_active?: boolean;
   search?: string;

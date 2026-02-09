@@ -24,6 +24,7 @@ import {
 vi.mock('../../../hooks/useRecipes', () => ({
   useCreateRecipe: vi.fn(),
   useUpdateRecipe: vi.fn(),
+  useRecipe: vi.fn(),
 }))
 
 vi.mock('../../../services/recipeValidation', () => ({
@@ -39,7 +40,7 @@ vi.mock('@/lib/logging/Logger', () => ({
   },
 }))
 
-import { useCreateRecipe, useUpdateRecipe } from '../../../hooks/useRecipes'
+import { useCreateRecipe, useUpdateRecipe, useRecipe } from '../../../hooks/useRecipes'
 import { validateRecipe } from '../../../services/recipeValidation'
 
 // ============================================
@@ -53,6 +54,7 @@ describe('RecipeBuilder', () => {
     // Setup default mocks
     vi.mocked(useCreateRecipe).mockReturnValue(mockUseCreateRecipe() as any)
     vi.mocked(useUpdateRecipe).mockReturnValue(mockUseUpdateRecipe() as any)
+    vi.mocked(useRecipe).mockReturnValue({ data: null, isLoading: false } as any)
     vi.mocked(validateRecipe).mockReturnValue(createMockValidationResult())
   })
 

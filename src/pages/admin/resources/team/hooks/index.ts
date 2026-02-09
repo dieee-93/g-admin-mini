@@ -3,4 +3,4 @@
 export { useStaffForm } from './useStaffForm';
 export type { TeamMember } from './useStaffForm';
 
-export * from './useStaffPage';
+export * from './useTeamPage';

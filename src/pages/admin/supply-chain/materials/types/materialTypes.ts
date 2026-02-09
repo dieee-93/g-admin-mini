@@ -151,11 +151,21 @@ export interface ProductionEquipmentUsage {
   recorded_at?: string;
 }
 
+// Re-export StaffAssignment from shared components for convenience
+export type { TeamAssignment as StaffAssignment } from '@/shared/components/TeamSelector';
+
 export interface ProductionConfig {
   equipment_usage?: ProductionEquipmentUsage[];
+
+  // 🆕 PHASE 2: Unified staff assignments (replaces simple labor fields)
+  staff_assignments?: import('@/shared/components/TeamSelector').TeamAssignment[];
+
+  // @deprecated Use staff_assignments instead (kept for backward compatibility during migration)
   labor_hours?: number;
+  // @deprecated Use staff_assignments instead (kept for backward compatibility during migration)
   labor_cost_per_hour?: number;
-  labor_total_cost?: number;
+
+  labor_total_cost?: number; // Calculated from staff_assignments
   overhead_percentage?: number;
   overhead_fixed?: number;
   overhead_total_cost?: number;

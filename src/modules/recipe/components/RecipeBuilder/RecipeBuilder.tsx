@@ -13,7 +13,7 @@ import { useRecipeBuilder } from '../../hooks/useRecipeBuilder';
 import { useMaterials } from '@/modules/materials/hooks/useMaterials';
 import type { RecipeBuilderProps } from './types';
 import type { Recipe } from '../../types/recipe';
-import type { StaffAssignment } from '@/shared/components/StaffSelector/types';
+import type { TeamAssignment } from '@/shared/components/TeamSelector/types';
 import { DecimalUtils } from '@/lib/decimal';
 
 // NEW: Import Cost Utilities
@@ -27,7 +27,7 @@ import {
 // CORE SECTIONS (Immediately Loaded)
 // ============================================
 
-import { BasicInfoSection, InputsEditorSection, StaffAssignmentSection } from './sections';
+import { BasicInfoSection, InputsEditorSection, TeamAssignmentSection } from './sections';
 import { RecipeProductionSection } from '../RecipeProductionSection';
 import { OutputConfigSection } from './sections/OutputConfigSection';
 import { CostSummarySection } from './sections/CostSummarySection';
@@ -100,20 +100,20 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
   const materialsLoading = queryResult.isLoading;
 
   // ============================================
-  // STAFF ASSIGNMENT STATE
+  // TEAM ASSIGNMENT STATE
   // ============================================
 
-  // Initialize staff assignments from recipe or empty array
-  const staffAssignments = useMemo(() => {
-    // @ts-expect-error - staffAssignments is a custom field, not in Recipe type yet
-    return (recipe.staffAssignments as StaffAssignment[]) || [];
+  // Initialize team assignments from recipe or empty array
+  const teamAssignments = useMemo(() => {
+    // @ts-expect-error - teamAssignments is a custom field, not in Recipe type yet
+    return (recipe.teamAssignments as TeamAssignment[]) || [];
   }, [recipe]);
 
-  const handleStaffChange = useCallback(
-    (assignments: StaffAssignment[]) => {
+  const handleTeamChange = useCallback(
+    (assignments: TeamAssignment[]) => {
       updateRecipe({
-        // @ts-expect-error - staffAssignments is a custom field
-        staffAssignments: assignments
+        // @ts-expect-error - teamAssignments is a custom field
+        teamAssignments: assignments
       });
     },
     [updateRecipe]
@@ -128,8 +128,8 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
     [recipe.inputs]);
 
   const laborCost = useMemo(() =>
-    calculateLaborCost(staffAssignments),
-    [staffAssignments]);
+    calculateLaborCost(teamAssignments),
+    [teamAssignments]);
 
   const overhead = useMemo(() =>
     calculateOverheadCost(materialsCost, recipe.costConfig),
@@ -146,7 +146,7 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
     return {
       basicInfo: !isMinimalMaterial,
       inputs: true,
-      staff: true,
+      team: true,
       output: true,
       production: true,
       costs: mergedFeatures.showCostCalculation && hasInputs,
@@ -202,7 +202,6 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
               variant="solid"
               colorPalette="blue"
               onClick={() => setIsTemplateSelectorOpen(true)}
-              flexShrink={0}
             >
               📋 Ver Templates
             </Button>
@@ -271,10 +270,10 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
         </Box>
       )}
 
-      {sections.staff && (
-        <StaffAssignmentSection
-          staffAssignments={staffAssignments}
-          onStaffChange={handleStaffChange}
+      {sections.team && (
+        <TeamAssignmentSection
+          teamAssignments={teamAssignments}
+          onTeamChange={handleTeamChange}
         />
       )}
 

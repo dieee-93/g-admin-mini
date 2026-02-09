@@ -7,7 +7,7 @@ import {
     calculateUnitCost
 } from './costCalculations';
 import type { RecipeInput } from '../types/recipe';
-import type { StaffAssignment } from '@/shared/components/StaffSelector/types';
+import type { TeamAssignment } from '@/shared/components/TeamSelector/types';
 
 describe('Cost Calculations Utils', () => {
 

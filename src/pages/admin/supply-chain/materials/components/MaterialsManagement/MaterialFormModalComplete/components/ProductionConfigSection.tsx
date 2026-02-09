@@ -5,7 +5,7 @@
  * Se usa SOLO en materiales/productos ELABORADOS
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Box,
   Stack,
@@ -15,36 +15,21 @@ import {
   Badge,
 } from '@/shared/ui';
 import { PlusIcon, TrashIcon, CalculatorIcon } from '@heroicons/react/24/outline';
-import { EquipmentSelector } from '@/shared/components/EquipmentSelector';
 import type { ProductionEquipmentUsage } from '@/shared/components/EquipmentSelector';
+import { TeamSelector } from '@/shared/components/TeamSelector';
+import type { TeamAssignment } from '@/shared/components/TeamSelector';
+import { calculateLaborCost } from '@/modules/recipe/utils/costCalculations';
+import type { ProductionConfig } from '../../../../types/materialTypes';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export interface ProductionConfig {
-  equipment_usage?: ProductionEquipmentUsage[];
-  labor_hours?: number;
-  labor_cost_per_hour?: number;
-  labor_total_cost?: number;
-  overhead_percentage?: number;
-  overhead_fixed?: number;
-  overhead_total_cost?: number;
-  packaging_cost?: number;
-  materials_cost?: number;
-  equipment_cost?: number;
-  total_direct_cost?: number;
-  total_indirect_cost?: number;
-  total_cost?: number;
-  cost_per_unit?: number;
-  last_calculation_date?: string;
-  notes?: string;
-}
-
 interface ProductionConfigSectionProps {
   productionConfig?: ProductionConfig;
   onChange: (configOrUpdater: ProductionConfig | ((prev?: ProductionConfig) => ProductionConfig)) => void;
   recipeId?: string;
+  onRequestEquipmentSelector?: () => void;
 }
 
 // ============================================================================
@@ -55,8 +40,8 @@ export function ProductionConfigSection({
   productionConfig,
   onChange,
   recipeId,
+  onRequestEquipmentSelector,
 }: ProductionConfigSectionProps) {
-  const [showEquipmentSelector, setShowEquipmentSelector] = useState(false);
 
   // Equipment usage list
   const equipmentUsage = useMemo(
@@ -68,16 +53,15 @@ export function ProductionConfigSection({
   const totals = useMemo(() => {
     const equipmentCost = equipmentUsage.reduce((sum, eq) => sum + eq.total_cost, 0);
 
-    const laborCost =
-      (productionConfig?.labor_hours || 0) *
-      (productionConfig?.labor_cost_per_hour || 0);
+    // Use sophisticated labor calculation with loaded_factor
+    const laborCost = calculateLaborCost(productionConfig?.staff_assignments || []);
 
     return {
       equipment: equipmentCost,
       labor: laborCost,
       direct: equipmentCost + laborCost,
     };
-  }, [equipmentUsage, productionConfig]);
+  }, [equipmentUsage, productionConfig?.staff_assignments]);
 
   // Handlers - Using functional updates to avoid stale closures
   const handleAddEquipment = useCallback(
@@ -91,7 +75,6 @@ export function ProductionConfigSection({
           equipment_cost: updatedUsage.reduce((sum, eq) => sum + eq.total_cost, 0),
         };
       });
-      setShowEquipmentSelector(false);
     },
     [onChange]
   );
@@ -111,24 +94,6 @@ export function ProductionConfigSection({
     [onChange]
   );
 
-  const handleLaborChange = useCallback(
-    (field: 'labor_hours' | 'labor_cost_per_hour', value: number) => {
-      onChange(prev => {
-        const hours = field === 'labor_hours' ? value : prev?.labor_hours || 0;
-        const rate =
-          field === 'labor_cost_per_hour'
-            ? value
-            : prev?.labor_cost_per_hour || 0;
-
-        return {
-          ...prev,
-          [field]: value,
-          labor_total_cost: hours * rate,
-        };
-      });
-    },
-    [onChange]
-  );
 
   const handleOverheadChange = useCallback(
     (field: 'overhead_percentage' | 'overhead_fixed', value: number) => {
@@ -190,7 +155,8 @@ export function ProductionConfigSection({
             <Button
               size="sm"
               colorPalette="purple"
-              onClick={() => setShowEquipmentSelector(true)}
+              onClick={onRequestEquipmentSelector}
+              disabled={!onRequestEquipmentSelector}
             >
               <PlusIcon style={{ width: 16, height: 16 }} />
               Agregar Equipo
@@ -269,43 +235,40 @@ export function ProductionConfigSection({
         borderColor="border.emphasized"
         borderRadius="xl"
         boxShadow="lg"
+        borderLeftWidth="4px"
+        borderLeftColor="colorPalette.solid"
+        colorPalette="blue"
       >
         <Stack gap="4">
           <Typography fontSize="sm" fontWeight="700" color="fg.default">
-            Mano de Obra
+            Personal Asignado
           </Typography>
 
-          <Stack direction="row" gap="4">
-            <InputField
-              label="Horas de trabajo"
-              type="number"
-              step="0.01"
-              min="0"
-              value={productionConfig?.labor_hours || ''}
-              onChange={(e) =>
-                handleLaborChange('labor_hours', parseFloat(e.target.value) || 0)
-              }
-            />
-
-            <InputField
-              label="Costo por hora ($)"
-              type="number"
-              step="0.01"
-              min="0"
-              value={productionConfig?.labor_cost_per_hour || ''}
-              onChange={(e) =>
-                handleLaborChange('labor_cost_per_hour', parseFloat(e.target.value) || 0)
-              }
-            />
-          </Stack>
+          <TeamSelector
+            value={productionConfig?.staff_assignments || []}
+            onChange={(assignments) => {
+              const totalCost = calculateLaborCost(assignments);
+              onChange(prev => ({
+                ...prev,
+                staff_assignments: assignments,
+                labor_total_cost: totalCost,
+              }));
+            }}
+            variant="compact"
+            showCost={true}
+            showEmployeeSelector={true}
+            showDuration={true}
+            showCount={true}
+            defaultDuration={60}
+          />
 
           {totals.labor > 0 && (
-            <Box p="3" bg="bg.subtle" borderRadius="md">
+            <Box p="3" bg="colorPalette.subtle" colorPalette="blue" borderRadius="md">
               <Stack direction="row" align="center" justify="space-between">
-                <Typography fontSize="sm" fontWeight="600">
+                <Typography fontSize="sm" fontWeight="700">
                   Total Mano de Obra
                 </Typography>
-                <Typography fontSize="sm" fontWeight="700">
+                <Typography fontSize="sm" fontWeight="700" color="colorPalette.fg">
                   ${totals.labor.toFixed(2)}
                 </Typography>
               </Stack>
@@ -429,15 +392,6 @@ export function ProductionConfigSection({
             </Stack>
           </Stack>
         </Box>
-      )}
-
-      {/* Equipment Selector Modal */}
-      {showEquipmentSelector && (
-        <EquipmentSelector
-          onSelect={handleAddEquipment}
-          onClose={() => setShowEquipmentSelector(false)}
-          selectedEquipmentIds={equipmentUsage.map((eq) => eq.equipment_id)}
-        />
       )}
     </Stack>
   );

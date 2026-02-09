@@ -1,5 +1,5 @@
-// StaffCard - Editorial Brutalist Design
-// Distinctive staff card with strong typography and color-coded status bar
+// TeamCard - Editorial Brutalist Design
+// Distinctive team member card with strong typography and color-coded status bar
 import { useState } from 'react';
 import {
   Box,
@@ -54,9 +54,9 @@ const DEPT_LABELS: Record<string, string> = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// STAFF CARD COMPONENT - Grid View
+// TEAM MEMBER CARD COMPONENT - Grid View
 // ═══════════════════════════════════════════════════════════════
-interface StaffCardProps {
+interface TeamCardProps {
   teamMember: TeamMember;
   onView?: (teamMember: TeamMember) => void;
   onEdit?: (teamMember: TeamMember) => void;
@@ -64,13 +64,13 @@ interface StaffCardProps {
   onIncident?: (teamMember: TeamMember) => void;
 }
 
-export function StaffCard({
+export function TeamCard({
   teamMember,
   onView,
   onEdit,
   onContact,
   onIncident
-}: StaffCardProps) {
+}: TeamCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const status = STATUS_COLORS[teamMember.status] || STATUS_COLORS.inactive;
@@ -137,13 +137,12 @@ export function StaffCard({
       {/* MAIN CONTENT */}
       <Box pl="20px" pr="16px" py="20px">
         {/* Header: Avatar + Identity */}
-        <Stack direction="row" gap="14px" align="flex-start" mb="16px">
+        <Stack direction="row" gap="14px" align="start" mb="16px">
           <Box position="relative">
             <Avatar
               name={teamMember.name}
               src={teamMember.avatar}
               size="lg"
-              borderRadius="2px"
             />
             {/* Online indicator */}
             {teamMember.status === 'active' && (
@@ -191,8 +190,6 @@ export function StaffCard({
               <Badge
                 size="sm"
                 variant="subtle"
-                px="8px"
-                py="2px"
                 borderRadius="2px"
                 fontSize="10px"
                 fontWeight="600"
@@ -201,6 +198,10 @@ export function StaffCard({
                 style={{
                   backgroundColor: `${deptColor}15`,
                   color: deptColor,
+                  paddingLeft: '8px',
+                  paddingRight: '8px',
+                  paddingTop: '2px',
+                  paddingBottom: '2px'
                 }}
               >
                 {deptLabel}
@@ -230,7 +231,7 @@ export function StaffCard({
                 <PencilIcon width={16} height={16} />
                 <Text ml="8px">Editar</Text>
               </MenuItem>
-              <MenuItem value="schedule" onClick={() => {}}>
+              <MenuItem value="schedule" onClick={() => { }}>
                 <CalendarIcon width={16} height={16} />
                 <Text ml="8px">Asignar turno</Text>
               </MenuItem>
@@ -246,7 +247,7 @@ export function StaffCard({
         <Stack
           direction="row"
           justify="space-between"
-          align="flex-end"
+          align="end"
           pt="12px"
           borderTop="1px solid"
           borderColor="gray.100"
@@ -353,17 +354,17 @@ export function StaffCard({
 }
 
 // ═══════════════════════════════════════════════════════════════
-// STAFF LIST ITEM - Compact List View
+// TEAM LIST ITEM - Compact List View
 // ═══════════════════════════════════════════════════════════════
-type StaffListItemProps = StaffCardProps;
+type TeamListItemProps = TeamCardProps;
 
-export function StaffListItem({
+export function TeamListItem({
   teamMember,
   onView,
   onEdit,
   onContact,
   onIncident
-}: StaffListItemProps) {
+}: TeamListItemProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const status = STATUS_COLORS[teamMember.status] || STATUS_COLORS.inactive;
@@ -421,7 +422,6 @@ export function StaffListItem({
           name={teamMember.name}
           src={teamMember.avatar}
           size="sm"
-          borderRadius="2px"
         />
 
         {/* Identity */}
@@ -450,16 +450,18 @@ export function StaffListItem({
           <Badge
             size="sm"
             variant="subtle"
-            px="6px"
-            py="1px"
-            borderRadius="2px"
             fontSize="10px"
             fontWeight="600"
             textTransform="uppercase"
-            letterSpacing="0.04em"
+            letterSpacing="0.05em"
             style={{
-              backgroundColor: `${deptColor}12`,
+              backgroundColor: `${deptColor}15`,
               color: deptColor,
+              paddingLeft: '6px', // Matches the original px="6px"
+              paddingRight: '6px',
+              paddingTop: '2px',
+              paddingBottom: '2px', // Matches py="1px" approx or generic padding
+              borderRadius: '2px'
             }}
           >
             {deptLabel}

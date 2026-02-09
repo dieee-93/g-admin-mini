@@ -121,12 +121,14 @@ export default function SuppliersPage() {
       <Box p={{ base: "6", md: "8" }}>
         <SkipLink />
         <Alert status="error" title="Error de carga del módulo">
-          {error}
+          {error instanceof Error ? error.message : String(error)}
         </Alert>
-        <Button onClick={() => window.location.reload()} mt="4">
-          <Icon icon={ArrowPathIcon} size="sm" />
-          Recargar página
-        </Button>
+        <Box mt="4">
+          <Button onClick={() => window.location.reload()}>
+            <Icon icon={ArrowPathIcon} size="sm" />
+            Recargar página
+          </Button>
+        </Box>
       </Box>
     );
   }
@@ -138,7 +140,7 @@ export default function SuppliersPage() {
   return (
     <>
       <SkipLink />
-      
+
       {/* Decorative background elements */}
       <Box position="fixed" top="-10%" right="-5%" w="500px" h="500px" borderRadius="full" bg="orange.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" zIndex="-1" />
       <Box position="fixed" bottom="-10%" left="-5%" w="400px" h="400px" borderRadius="full" bg="yellow.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" zIndex="-1" />
@@ -192,7 +194,7 @@ export default function SuppliersPage() {
           />
 
         </Stack>
-      </Box>
-    </Box>
+      </Box >
+    </>
   );
 }

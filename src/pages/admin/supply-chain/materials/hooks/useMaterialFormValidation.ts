@@ -83,7 +83,7 @@ export interface FieldValidationResult {
  * <Input error={getFieldError('name')} />
  * ```
  */
-export function useMaterialFormValidation(formData: ItemFormData) {
+export function useMaterialFormValidation(formData: ItemFormData | undefined) {
   // ========================================================================
   // VALIDATION STATE
   // ========================================================================
@@ -93,6 +93,19 @@ export function useMaterialFormValidation(formData: ItemFormData) {
    * Runs full Zod validation on every form data change
    */
   const validation = useMemo((): ValidationResult => {
+    // Early return if formData is not yet initialized or is invalid
+    if (!formData || typeof formData !== 'object') {
+      return {
+        isValid: false,
+        errors: {},
+        errorMessages: [],
+        warnings: [],
+        hasCriticalErrors: false,
+        hasWarnings: false,
+        canSubmit: false,
+      };
+    }
+
     // Run Zod validation
     const errors = getValidationErrors(formData as Partial<MaterialFormData>);
     const isValid = Object.keys(errors).length === 0;
@@ -132,6 +145,14 @@ export function useMaterialFormValidation(formData: ItemFormData) {
    * @returns Validation result for this field
    */
   const validateField = useCallback((fieldName: keyof ItemFormData): FieldValidationResult => {
+    if (!formData) {
+      return {
+        isValid: false,
+        error: null,
+        warning: null,
+      };
+    }
+
     const error = validation.errors[fieldName] || null;
     const warning = getFieldWarning(fieldName, formData);
 
@@ -319,7 +340,11 @@ function formatFieldName(fieldName: string): string {
  * @param data - Form data
  * @returns Array of warning messages
  */
-function generateWarnings(data: ItemFormData): string[] {
+function generateWarnings(data: ItemFormData | undefined): string[] {
+  if (!data) {
+    return [];
+  }
+
   const warnings: string[] = [];
 
   // Warning: ELABORATED without production_config
