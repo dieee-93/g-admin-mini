@@ -2,21 +2,39 @@
  * 🏭 ElaboratedFields Component - Industrial Precision Design
  *
  * Manufacturing control aesthetic for elaborated materials
- * Features: LED indicators, thick borders, industrial typography
+ * Features: Progressive cost display, LED indicators, industrial typography
  *
  * Design Inspiration: Factory automation, precision manufacturing interfaces
  * Aesthetic: Brutalist refinement with strong visual hierarchy
+ *
+ * ARCHITECTURE:
+ * - Progressive disclosure: User sees costs build up step by step
+ * - Immediate feedback: SubtotalCard after each cost section
+ * - Comprehensive summary: CostSummaryCard at the end
+ * - Production execution: RecipeProductionSection moved to end (Task #8)
  */
 
-import { Box, Stack, Typography, Badge, SelectField } from '@/shared/ui';
+import { Box, Stack, Typography, Badge } from '@/shared/ui';
 import { type ItemFormData } from '../../../../types';
-import { CATEGORY_COLLECTION } from '../constants';
-import { RecipeBuilder } from '@/modules/recipe/components';
-import { ProductionConfigSection } from './ProductionConfigSection';
 import { MaterialFormProgressIndicator } from './MaterialFormProgressIndicator';
 import { memo, useCallback, useMemo } from 'react';
 import type { Recipe } from '@/modules/recipe/types';
-import type { ProductionConfig } from '../../../../types';
+import type { ProductionConfig } from '../../../../types/materialTypes';
+
+// Recipe sections (extracted from RecipeBuilder)
+import { InputsEditorSection, TeamAssignmentSection } from '@/modules/recipe/components/RecipeBuilder/sections';
+
+// New components (Phase 1)
+import { SubtotalCard } from './SubtotalCard';
+import { CostSummaryCard } from './CostSummaryCard';
+import { EquipmentSection } from './EquipmentSection';
+import { OverheadSection } from './OverheadSection';
+
+// Cost calculations
+import { calculateMaterialsCost, calculateLaborCost } from '@/modules/recipe/utils/costCalculations';
+import { DecimalUtils } from '@/lib/decimal';
+import type { TeamAssignment } from '@/shared/components/TeamSelector/types';
+import type { ProductionEquipmentUsage } from '@/shared/components/EquipmentSelector';
 
 interface ElaboratedFieldsProps {
   formData: ItemFormData;
@@ -93,7 +111,7 @@ interface IndustrialContainerProps {
   children: React.ReactNode;
   title?: string;
   status?: 'active' | 'inactive' | 'warning';
-  colorPalette?: 'blue' | 'green' | 'orange' | 'gray';
+  colorPalette?: 'blue' | 'green' | 'orange' | 'purple' | 'gray';
   hasGradientTop?: boolean;
 }
 
@@ -187,7 +205,7 @@ const SectionDivider = memo(function SectionDivider({ label }: SectionDividerPro
 
 /**
  * 🏭 ElaboratedFields - Main Component
- * Industrial precision form for elaborated materials
+ * Industrial precision form with progressive cost display
  */
 export const ElaboratedFields = memo(function ElaboratedFields({
   formData,
@@ -196,52 +214,67 @@ export const ElaboratedFields = memo(function ElaboratedFields({
   onRequestEquipmentSelector
 }: ElaboratedFieldsProps) {
 
-  // ⚡ PERFORMANCE: Memoize outputItem to prevent recreation
-  const outputItem = useMemo(() => {
-    if (!formData.name) return undefined;
+  // ============================================
+  // COST CALCULATIONS (Progressive)
+  // ============================================
 
-    return {
-      id: formData.id || 'temp', // Use actual ID if available
-      name: formData.name,
-      type: 'material' as const,
-      unit: formData.unit || 'unit',
-    };
-  }, [formData.name, formData.unit, formData.id]);
+  const materialsCost = useMemo(() => {
+    const inputs = formData.recipe?.inputs || [];
+    return calculateMaterialsCost(inputs);
+  }, [formData.recipe?.inputs]);
 
-  // ⚡ PERFORMANCE: Memoize recipe features to prevent RecipeBuilder re-renders
-  const recipeFeatures = useMemo(() => ({
-    showCostCalculation: true,
-    showScalingLite: true,
-    showInstructions: false,
-    allowProductInputs: false,
-  }), []);
-  
-  // ⚡ PERFORMANCE: Memoize outputQuantity
-  const outputQuantity = useMemo(() => 
-    formData.initial_stock || 1
-  , [formData.initial_stock]);
+  const laborCost = useMemo(() => {
+    const teamAssignments = (formData.recipe?.teamAssignments as TeamAssignment[]) || [];
+    return calculateLaborCost(teamAssignments);
+  }, [formData.recipe?.teamAssignments]);
 
-  // ⚡ PERFORMANCE: Memoize callback with functional setState to avoid stale closures
-  const handleRecipeSaved = useCallback((recipe: Recipe) => {
+  const equipmentCost = useMemo(() => {
+    const equipment = formData.production_config?.equipment_usage || [];
+    return equipment.reduce((sum, eq) => sum + eq.total_cost, 0);
+  }, [formData.production_config?.equipment_usage]);
+
+  // Calculate labor hours for overhead
+  const laborHours = useMemo(() => {
+    const teamAssignments = (formData.recipe?.teamAssignments as TeamAssignment[]) || [];
+    return teamAssignments.reduce((sum, assignment) => {
+      const hours = assignment.durationMinutes / 60;
+      return sum + hours;
+    }, 0);
+  }, [formData.recipe?.teamAssignments]);
+
+  // Overhead calculation (automatic from Settings - Phase 2)
+  const overheadRate = 15.0; // TODO: Get from Settings hook (Phase 2)
+  const overheadCost = laborHours * overheadRate;
+
+  const totalCost = useMemo(() =>
+    DecimalUtils.add(
+      DecimalUtils.add(materialsCost, laborCost, 'financial'),
+      DecimalUtils.add(equipmentCost, overheadCost, 'financial'),
+      'financial'
+    ).toNumber(),
+    [materialsCost, laborCost, equipmentCost, overheadCost]
+  );
+
+  // ============================================
+  // HANDLERS
+  // ============================================
+
+  const handleRecipeUpdate = useCallback((updates: Partial<Recipe>) => {
     setFormData(prev => ({
       ...prev,
-      recipe_id: recipe.id,
-      initial_stock: recipe.output.quantity || 1,
+      recipe: { ...prev.recipe, ...updates } as Recipe
     }));
   }, [setFormData]);
 
-  // 🆕 Handler para production_config with functional setState and updater function support
-  const handleProductionConfigChange = useCallback((configOrUpdater: ProductionConfig | ((prev?: ProductionConfig) => ProductionConfig)) => {
-    setFormData(prev => {
-      const newConfig = typeof configOrUpdater === 'function'
-        ? configOrUpdater(prev.production_config)
-        : configOrUpdater;
-
-      return {
-        ...prev,
-        production_config: newConfig,
-      };
-    });
+  const handleEquipmentChange = useCallback((equipment: ProductionEquipmentUsage[]) => {
+    setFormData(prev => ({
+      ...prev,
+      production_config: {
+        ...prev.production_config,
+        equipment_usage: equipment,
+        equipment_cost: equipment.reduce((sum, eq) => sum + eq.total_cost, 0)
+      }
+    }));
   }, [setFormData]);
 
   return (
@@ -279,7 +312,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
       </Stack>
 
       {/* ========================================
-          SECTION 2: Progress Indicator - Visual Flow Tracker
+          SECTION 2: Progress Indicator
           ======================================== */}
       <MaterialFormProgressIndicator
         hasRecipe={!!formData.recipe_id}
@@ -287,7 +320,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
       />
 
       {/* ========================================
-          SECTION 3: Information Alert - Factory Warning Panel
+          SECTION 3: Information Alert
           ======================================== */}
       <Box
         p="5"
@@ -342,7 +375,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
             </Typography>
           </Stack>
 
-          {/* Alert Content - Bullet Points */}
+          {/* Alert Content */}
           <Stack gap="1" pl="2">
             <Stack direction="row" align="flex-start" gap="2">
               <Box
@@ -372,7 +405,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
                 ▸
               </Box>
               <Typography fontSize="2xs" color="fg.muted" lineHeight="relaxed">
-                Se ejecuta automáticamente al guardar el material
+                Costos se calculan automáticamente desde Settings
               </Typography>
             </Stack>
 
@@ -388,7 +421,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
                 ▸
               </Box>
               <Typography fontSize="2xs" color="fg.muted" lineHeight="relaxed">
-                Genera el stock inicial del material elaborado
+                Verás subtotales progresivos mientras configuras
               </Typography>
             </Stack>
           </Stack>
@@ -396,94 +429,131 @@ export const ElaboratedFields = memo(function ElaboratedFields({
       </Box>
 
       {/* ========================================
-          SECTION 4: Recipe Builder - Main Production Module (No Submit Button)
+          SECTION 4: BOM (Bill of Materials)
           ======================================== */}
-      <Box data-testid="recipe-builder-section">
-        {/* Section Divider */}
-        <SectionDivider label="Constructor de Receta" />
+      <Box data-testid="bom-section">
+        <SectionDivider label="1️⃣ LISTA DE MATERIALES (BOM)" />
 
-        {/* Recipe Builder Container with Industrial Wrapper */}
-        <Box
-          mt="5"
-          p="6"
-          bg="bg.subtle"
-          borderWidth="3px"
-          borderColor="border.emphasized"
-          borderRadius="xl"
-          boxShadow="lg"
-          position="relative"
-          transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-          _hover={{
-            boxShadow: 'xl'
-          }}
-          css={{
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: '0',
-              left: '0',
-              right: '0',
-              height: '4px',
-              background: 'linear-gradient(90deg, var(--chakra-colors-blue-emphasized), var(--chakra-colors-blue-fg))',
-              borderTopLeftRadius: 'var(--chakra-radii-xl)',
-              borderTopRightRadius: 'var(--chakra-radii-xl)'
-            }
-          }}
-        >
-          {/* Production Status Indicator */}
-          <Stack
-            direction="row"
-            align="center"
-            gap="2"
-            mb="4"
-            pb="3"
-            borderBottomWidth="1px"
-            borderBottomColor="border.subtle"
+        <Box mt="5">
+          <IndustrialContainer
+            title="Ingredientes"
+            status="active"
+            colorPalette="green"
+            hasGradientTop
           >
-            <StatusIndicator status="active" size="sm" />
-            <Typography
-              fontSize="2xs"
-              fontWeight="700"
-              color="fg.muted"
-              letterSpacing="wider"
-              textTransform="uppercase"
-              data-testid="production-module-status"
-            >
-              Módulo de Producción Activo
-            </Typography>
-          </Stack>
+            <InputsEditorSection
+              recipe={formData.recipe || { inputs: [] } as Recipe}
+              updateRecipe={handleRecipeUpdate}
+              entityType="material"
+              features={{
+                showCostCalculation: true,
+                showScalingLite: true,
+                showInstructions: false,
+                allowProductInputs: false
+              }}
+              materials={[]}
+              materialsLoading={false}
+            />
+          </IndustrialContainer>
 
-          {/* RecipeBuilder Component - Embedded mode (no action buttons) */}
-          <RecipeBuilder
-            mode={isEditMode ? 'edit' : 'create'}
-            recipeId={formData.recipe_id} // Pass recipe ID for loading data
-            entityType="material"
-            complexity="minimal"
-            features={recipeFeatures}
-            outputItem={outputItem}
-            outputQuantity={outputQuantity}
-            onSave={handleRecipeSaved}
-            hideActions={true}
+          <Box mt="4">
+            <SubtotalCard
+              label="Materiales"
+              value={materialsCost}
+              icon="💰"
+              colorPalette="green"
+            />
+          </Box>
+        </Box>
+      </Box>
+
+      {/* ========================================
+          SECTION 5: MANO DE OBRA
+          ======================================== */}
+      <Box data-testid="labor-section">
+        <SectionDivider label="2️⃣ MANO DE OBRA" />
+
+        <Box mt="5">
+          <IndustrialContainer
+            title="Personal"
+            status="active"
+            colorPalette="blue"
+            hasGradientTop
+          >
+            <TeamAssignmentSection
+              teamAssignments={(formData.recipe?.teamAssignments as TeamAssignment[]) || []}
+              onTeamChange={(assignments) => handleRecipeUpdate({ teamAssignments: assignments as any })}
+            />
+          </IndustrialContainer>
+
+          <Box mt="4">
+            <SubtotalCard
+              label="Mano de Obra"
+              value={laborCost}
+              icon="👷"
+              colorPalette="blue"
+            />
+          </Box>
+        </Box>
+      </Box>
+
+      {/* ========================================
+          SECTION 6: EQUIPAMIENTO
+          ======================================== */}
+      <Box data-testid="equipment-section">
+        <SectionDivider label="3️⃣ EQUIPAMIENTO" />
+
+        <Box mt="5">
+          <EquipmentSection
+            equipment={formData.production_config?.equipment_usage || []}
+            onChange={handleEquipmentChange}
+            onRequestEquipmentSelector={onRequestEquipmentSelector}
+          />
+
+          <Box mt="4">
+            <SubtotalCard
+              label="Equipamiento"
+              value={equipmentCost}
+              icon="🏭"
+              colorPalette="purple"
+            />
+          </Box>
+        </Box>
+      </Box>
+
+      {/* ========================================
+          SECTION 7: OVERHEAD
+          ======================================== */}
+      <Box data-testid="overhead-section">
+        <SectionDivider label="4️⃣ OVERHEAD (Costos Indirectos)" />
+
+        <Box mt="5">
+          <OverheadSection
+            laborHours={laborHours}
+            overheadRate={overheadRate}
           />
         </Box>
       </Box>
 
       {/* ========================================
-          SECTION 5: Production Configuration (NUEVO)
+          SECTION 8: RESUMEN DE COSTOS
           ======================================== */}
-      <Box data-testid="production-config-section">
-        {/* Section Divider */}
-        <SectionDivider label="Configuración de Producción" />
-
-        <Box mt="5">
-          <ProductionConfigSection
-            productionConfig={formData.production_config}
-            onChange={handleProductionConfigChange}
-            recipeId={formData.recipe_id}
-            onRequestEquipmentSelector={onRequestEquipmentSelector}
+      <Box data-testid="cost-summary-section">
+        <Box mt="6" mb="6">
+          <CostSummaryCard
+            materialsCost={materialsCost}
+            laborCost={laborCost}
+            equipmentCost={equipmentCost}
+            overheadCost={overheadCost}
+            totalCost={totalCost}
           />
         </Box>
       </Box>
+
+      {/* ========================================
+          SECTION 9: EJECUCIÓN DE PRODUCCIÓN
+          (To be added in Task #8)
+          ======================================== */}
 
     </Stack>
   );
