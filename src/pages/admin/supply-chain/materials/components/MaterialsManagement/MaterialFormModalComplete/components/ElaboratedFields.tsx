@@ -23,6 +23,7 @@ import type { ProductionConfig } from '../../../../types/materialTypes';
 
 // Recipe sections (extracted from RecipeBuilder)
 import { InputsEditorSection, TeamAssignmentSection } from '@/modules/recipe/components/RecipeBuilder/sections';
+import { RecipeProductionSection } from '@/modules/recipe/components/RecipeProductionSection';
 
 // New components (Phase 1)
 import { SubtotalCard } from './SubtotalCard';
@@ -552,8 +553,18 @@ export const ElaboratedFields = memo(function ElaboratedFields({
 
       {/* ========================================
           SECTION 9: EJECUCIÓN DE PRODUCCIÓN
-          (To be added in Task #8)
           ======================================== */}
+      <Box data-testid="production-execution-section">
+        <SectionDivider label="5️⃣ EJECUCIÓN DE PRODUCCIÓN" />
+
+        <Box mt="5">
+          <RecipeProductionSection
+            entityType="material"
+            recipe={formData.recipe || {} as Recipe}
+            updateRecipe={handleRecipeUpdate}
+          />
+        </Box>
+      </Box>
 
     </Stack>
   );
