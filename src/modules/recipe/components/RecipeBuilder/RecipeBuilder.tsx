@@ -147,8 +147,8 @@ export const RecipeBuilder = memo(function RecipeBuilder(props: RecipeBuilderPro
       basicInfo: !isMinimalMaterial,
       inputs: true,
       team: true,
-      output: true,
-      production: true,
+      output: false, // ❌ Removed - handled in parent form (ElaboratedFields)
+      production: false, // ❌ Removed - moved to end of parent form
       costs: mergedFeatures.showCostCalculation && hasInputs,
       instructions: mergedFeatures.showInstructions && !isMinimalMaterial
     };
