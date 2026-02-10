@@ -562,6 +562,7 @@ export const ElaboratedFields = memo(function ElaboratedFields({
             entityType="material"
             recipe={formData.recipe || {} as Recipe}
             updateRecipe={handleRecipeUpdate}
+            totalCost={totalCost}
           />
         </Box>
       </Box>
