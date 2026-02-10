@@ -15,17 +15,18 @@
 import { Box, Stack, Typography, Button, Flex } from '@/shared/ui';
 import { CogIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { memo } from 'react';
+import { useOverheadRate } from '@/pages/admin/core/settings/hooks';
 
 interface OverheadSectionProps {
   laborHours: number;
-  overheadRate?: number; // From Settings (default will be provided)
 }
 
 export const OverheadSection = memo(function OverheadSection({
-  laborHours,
-  overheadRate = 15.0 // TODO: Get from Settings hook when implemented
+  laborHours
 }: OverheadSectionProps) {
 
+  // Get overhead rate from Settings
+  const overheadRate = useOverheadRate();
   const overheadCost = laborHours * overheadRate;
 
   return (

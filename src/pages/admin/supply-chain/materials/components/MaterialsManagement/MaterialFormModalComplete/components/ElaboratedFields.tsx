@@ -36,6 +36,7 @@ import { calculateMaterialsCost, calculateLaborCost } from '@/modules/recipe/uti
 import { DecimalUtils } from '@/lib/decimal';
 import type { TeamAssignment } from '@/shared/components/TeamSelector/types';
 import type { ProductionEquipmentUsage } from '@/shared/components/EquipmentSelector';
+import { useOverheadRate } from '@/pages/admin/core/settings/hooks';
 
 interface ElaboratedFieldsProps {
   formData: ItemFormData;
@@ -243,8 +244,8 @@ export const ElaboratedFields = memo(function ElaboratedFields({
     }, 0);
   }, [formData.recipe?.teamAssignments]);
 
-  // Overhead calculation (automatic from Settings - Phase 2)
-  const overheadRate = 15.0; // TODO: Get from Settings hook (Phase 2)
+  // Overhead calculation (automatic from Settings)
+  const overheadRate = useOverheadRate();
   const overheadCost = laborHours * overheadRate;
 
   const totalCost = useMemo(() =>
@@ -531,7 +532,6 @@ export const ElaboratedFields = memo(function ElaboratedFields({
         <Box mt="5">
           <OverheadSection
             laborHours={laborHours}
-            overheadRate={overheadRate}
           />
         </Box>
       </Box>
