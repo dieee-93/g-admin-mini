@@ -5,3 +5,4 @@ export { UserPermissionsSection } from './UserPermissions';
 export { SystemSection } from './System';
 export { EnterpriseSection } from './Enterprise';
 export { NotificationRulesSection } from './NotificationRulesSection';
+export { OverheadConfigSection } from './Overhead';
