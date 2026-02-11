@@ -11,6 +11,7 @@ export { OfflineCommandQueue } from './OfflineCommandQueue';
 export { getOfflineQueue, resetOfflineQueue } from './queueInstance';
 export { executeWithOfflineSupport } from './executeWithOfflineSupport';
 export { OfflineMonitorProvider } from './OfflineMonitor';
+export { SyncCacheInvalidator } from './SyncCacheInvalidator';
 export { default as offlineSync } from './OfflineSync';
 
 export type {

@@ -1,3 +1,105 @@
 
+> g-mini@0.0.0 test
+> vitest --exclude='**/performance/**' --exclude='**/stress/**' src/lib/alerts/__tests__/UniversalRuleEngine.test.ts --run
+
+
 [1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mI:/Programacion/Proyectos/g-mini[39m
+
+ [31mÔØ»[39m src/lib/alerts/__tests__/UniversalRuleEngine.test.ts [2m([22m[2m35 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 33[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mBasic Operators[2m > [22mshould evaluate > operator correctly[32m 3[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mBasic Operators[2m > [22mshould evaluate < operator correctly[32m 1[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mBasic Operators[2m > [22mshould evaluate >= operator correctly[32m 1[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mBasic Operators[2m > [22mshould evaluate <= operator correctly[32m 1[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mBasic Operators[2m > [22mshould evaluate = operator correctly[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mBasic Operators[2m > [22mshould evaluate != operator correctly[32m 1[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mbetween Operator[2m > [22mshould evaluate between with valid range[32m 1[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mbetween Operator[2m > [22mshould handle string to number coercion in between[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mbetween Operator[2m > [22mshould reject invalid range (non-array)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mbetween Operator[2m > [22mshould reject invalid range (wrong array length)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22min Operator[2m > [22mshould find value in small array (<100) using includes()[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22min Operator[2m > [22mshould find value in large array (ÔëÑ100) using Set optimization[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22min Operator[2m > [22mshould cache Set for repeated large array lookups[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22min Operator[2m > [22mshould reject non-array value for in operator[32m 1[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mMulti-Condition Logic[2m > [22mshould evaluate simple AND condition (all true)[32m 1[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mMulti-Condition Logic[2m > [22mshould evaluate simple AND condition (one false - short-circuit)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mMulti-Condition Logic[2m > [22mshould evaluate simple OR condition (one true - short-circuit)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mMulti-Condition Logic[2m > [22mshould evaluate simple OR condition (all false)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mMulti-Condition Logic[2m > [22mshould evaluate nested AND/OR (3 levels deep)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mMulti-Condition Logic[2m > [22mshould evaluate DNF pattern (OR at top, AND nested)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mTemplate Interpolation[2m > [22mshould replace single placeholder {field}[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mTemplate Interpolation[2m > [22mshould replace multiple placeholders[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mTemplate Interpolation[2m > [22mshould handle nested fields {object.property}[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mTemplate Interpolation[2m > [22mshould preserve placeholder if field missing[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mTemplate Interpolation[2m > [22mshould escape HTML to prevent XSS[32m 1[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mComplexity Validation[2m > [22mshould accept valid rule (2 levels deep)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mComplexity Validation[2m > [22mshould reject rule exceeding max depth (4 levels)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mComplexity Validation[2m > [22mshould reject rule exceeding max conditions per level (11)[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mError Handling[2m > [22mshould handle missing field gracefully[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mError Handling[2m > [22mshould handle null values gracefully[32m 0[2mms[22m[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mError Handling[2m > [22mshould handle undefined values gracefully[32m 0[2mms[22m[39m
+[31m   [31m├ù[31m UniversalRuleEngine[2m > [22mError Handling[2m > [22mshould increment error counter on evaluation failures[39m[32m 10[2mms[22m[39m
+[31m     ÔåÆ expected 0 to be greater than 0[39m
+[31m   [31m├ù[31m UniversalRuleEngine[2m > [22mIntegration[2m > [22mshould track statistics correctly[39m[32m 4[2mms[22m[39m
+[31m     ÔåÆ expected undefined to be 4 // Object.is equality[39m
+   [32mÔ£ô[39m UniversalRuleEngine[2m > [22mIntegration[2m > [22mshould handle multiple rules in single evaluation[32m 1[2mms[22m[39m
+[31m   [31m├ù[31m UniversalRuleEngine[2m > [22mIntegration[2m > [22mshould clear cache properly[39m[32m 1[2mms[22m[39m
+[31m     ÔåÆ expected undefined to be +0 // Object.is equality[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 3 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  src/lib/alerts/__tests__/UniversalRuleEngine.test.ts > UniversalRuleEngine > Error Handling > should increment error counter on evaluation failures
+AssertionError: expected 0 to be greater than 0
+ ÔØ» src/lib/alerts/__tests__/UniversalRuleEngine.test.ts:721:45
+    719| 
+    720|             const stats = engine.getStats();
+    721|             expect(stats.errorsEncountered).toBeGreaterThan(0);
+       |                                             ^
+    722|         });
+    723|     });
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/3]ÔÄ»
+
+ FAIL  src/lib/alerts/__tests__/UniversalRuleEngine.test.ts > UniversalRuleEngine > Integration > should track statistics correctly
+AssertionError: expected undefined to be 4 // Object.is equality
+
+- Expected: 
+4
+
++ Received: 
+undefined
+
+ ÔØ» src/lib/alerts/__tests__/UniversalRuleEngine.test.ts:751:42
+    749|             const stats = engine.getStats();
+    750| 
+    751|             expect(stats.rulesEvaluated).toBe(4); // 2 rules ├ù 2 conteÔÇª
+       |                                          ^
+    752|             expect(stats.rulesTriggered).toBe(2); // 1 per context
+    753|             expect(stats.evaluationTimeMs).toBeGreaterThan(0);
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/3]ÔÄ»
+
+ FAIL  src/lib/alerts/__tests__/UniversalRuleEngine.test.ts > UniversalRuleEngine > Integration > should clear cache properly
+AssertionError: expected undefined to be +0 // Object.is equality
+
+- Expected: 
+0
+
++ Received: 
+undefined
+
+ ÔØ» src/lib/alerts/__tests__/UniversalRuleEngine.test.ts:777:42
+    775|             const stats = engine.getStats();
+    776| 
+    777|             expect(stats.rulesEvaluated).toBe(0);
+       |                                          ^
+    778|             expect(stats.rulesTriggered).toBe(0);
+    779|             expect(stats.errorsEncountered).toBe(0);
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/3]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m32 passed[39m[22m[90m (35)[39m
+[2m   Start at [22m 21:08:10
+[2m   Duration [22m 2.28s[2m (transform 176ms, setup 349ms, collect 163ms, tests 33ms, environment 1.08s, prepare 225ms)[22m
 

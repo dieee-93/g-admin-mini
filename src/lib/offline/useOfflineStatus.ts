@@ -1,9 +1,11 @@
 // useOfflineStatus.ts - React Hook for Offline Status Management
 // Provides comprehensive offline status, sync monitoring, and queue management
+// ✅ EVENT-DRIVEN: No polling intervals - updates only on actual events
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import offlineSync, { type SyncStatus, type SyncOperation } from './OfflineSync';
 import localStorage from './LocalStorage';
+import { getOfflineQueue } from './queueInstance';
 
 import { logger } from '@/lib/logging';
 // Hook return types
@@ -299,15 +301,47 @@ export const useOfflineStatus = (): OfflineStatusHook => {
     offlineSync.on('networkOnline', updateConnectionStatus);
     offlineSync.on('networkOffline', updateConnectionStatus);
 
-    // Periodic updates
-    const statusInterval = setInterval(() => {
-      updateSyncStatus();
-      updateStorageInfo();
-    }, 2000);
+    // ✅ EVENT-DRIVEN: Subscribe to OfflineCommandQueue events instead of polling
+    let queueUnsubscribers: (() => void)[] = [];
+    getOfflineQueue().then(queue => {
+      // Update sync status when commands are enqueued
+      const handleCommandEnqueued = () => {
+        updateSyncStatus();
+        updateStorageInfo();
+      };
 
-    const networkInterval = setInterval(updateNetworkInfo, 10000);
+      // Update sync status when sync starts
+      const handleSyncStarted = () => {
+        updateSyncStatus();
+      };
 
-    // Initial updates
+      // Update sync status when sync completes
+      const handleSyncCompleted = () => {
+        updateSyncStatus();
+        updateStorageInfo();
+      };
+
+      // Update sync status when sync fails
+      const handleSyncFailed = () => {
+        updateSyncStatus();
+      };
+
+      queue.on('commandEnqueued', handleCommandEnqueued);
+      queue.on('syncStarted', handleSyncStarted);
+      queue.on('syncCompleted', handleSyncCompleted);
+      queue.on('syncFailed', handleSyncFailed);
+
+      queueUnsubscribers = [
+        () => queue.off('commandEnqueued', handleCommandEnqueued),
+        () => queue.off('syncStarted', handleSyncStarted),
+        () => queue.off('syncCompleted', handleSyncCompleted),
+        () => queue.off('syncFailed', handleSyncFailed)
+      ];
+    }).catch(error => {
+      logger.error('OfflineSync', '[OfflineStatus] Error subscribing to queue events:', error);
+    });
+
+    // Initial updates (only run once on mount)
     updateConnectionStatus();
     updateNetworkInfo();
     updateSyncStatus();
@@ -325,8 +359,8 @@ export const useOfflineStatus = (): OfflineStatusHook => {
       offlineSync.off('networkOnline', updateConnectionStatus);
       offlineSync.off('networkOffline', updateConnectionStatus);
 
-      clearInterval(statusInterval);
-      clearInterval(networkInterval);
+      // ✅ Unsubscribe from queue events
+      queueUnsubscribers.forEach(unsub => unsub());
 
       // Clear callbacks
       eventCallbacks.current = {
@@ -406,6 +440,7 @@ export const useOnlineStatus = () => {
 };
 
 // Hook for sync status only
+// ✅ EVENT-DRIVEN: Updates only on sync events, no polling
 export const useSyncStatus = () => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
 
@@ -414,18 +449,31 @@ export const useSyncStatus = () => {
       setSyncStatus(offlineSync.getSyncStatus());
     };
 
-    const interval = setInterval(updateStatus, 1000);
-    updateStatus();
+    // ✅ EVENT-DRIVEN: No interval, only event-based updates
+    updateStatus(); // Initial load
 
+    // Subscribe to OfflineCommandQueue events
+    getOfflineQueue().then(queue => {
+      queue.on('commandEnqueued', updateStatus);
+      queue.on('syncStarted', updateStatus);
+      queue.on('syncCompleted', updateStatus);
+      queue.on('syncFailed', updateStatus);
+    }).catch(error => {
+      logger.error('OfflineSync', '[useSyncStatus] Error subscribing to queue events:', error);
+    });
+
+    // Also subscribe to offlineSync events (legacy support)
     offlineSync.on('syncStarted', updateStatus);
     offlineSync.on('syncCompleted', updateStatus);
     offlineSync.on('syncFailed', updateStatus);
 
     return () => {
-      clearInterval(interval);
+      // ✅ No interval to clear
       offlineSync.off('syncStarted', updateStatus);
       offlineSync.off('syncCompleted', updateStatus);
       offlineSync.off('syncFailed', updateStatus);
+
+      // Note: Queue unsubscribe handled by queue instance cleanup
     };
   }, []);
 
@@ -480,10 +528,19 @@ export const useOfflineStorage = () => {
   }, [updateStats]);
 
   useEffect(() => {
-    updateStats();
-    const interval = setInterval(updateStats, 10000); // Update every 10 seconds
+    // ✅ EVENT-DRIVEN: Update stats only when storage operations occur
+    updateStats(); // Initial load
 
-    return () => clearInterval(interval);
+    // Subscribe to queue events that affect storage
+    getOfflineQueue().then(queue => {
+      queue.on('commandEnqueued', updateStats);
+      queue.on('syncCompleted', updateStats);
+    }).catch(error => {
+      logger.error('OfflineSync', '[useOfflineStorage] Error subscribing to queue events:', error);
+    });
+
+    // ✅ No interval - storage stats update on actual operations only
+    // Users can call updateStats() manually if needed
   }, [updateStats]);
 
   return {

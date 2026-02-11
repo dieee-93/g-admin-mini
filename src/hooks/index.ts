@@ -22,6 +22,11 @@ export { useLocation } from './useLocation';
 export { useOrganization } from './useOrganization';
 
 // ===================================
+// Alert Hooks
+// ===================================
+export * from './alerts';
+
+// ===================================
 // Validation Hooks (Remaining - awaiting modules)
 // ===================================
 // These hooks are temporarily in root until their modules are created:

@@ -75,16 +75,17 @@ export interface AlertMetadata {
   currentStock?: number;
   minThreshold?: number;
   unit?: string;
+  category?: string; // Omni-Channel Category (capacity, financial, cx, etc)
 
   // Para alertas de sistema
   systemComponent?: string;
   errorCode?: string;
-  
+
   // Para alertas de negocio
   affectedRevenue?: number;
   estimatedImpact?: string;
   timeToResolve?: number; // minutos estimados
-  
+
   // Para alertas de validación
   fieldName?: string;
   validationRule?: string;
@@ -108,7 +109,13 @@ export interface Alert {
   severity: AlertSeverity;
   status: AlertStatus;
   context: AlertContext;
-  
+
+  // Database fields
+  organization_id?: string;
+  module_name?: string;
+  entity_id?: string;
+  rule_id?: string;
+
   // NEW: Intelligence classification (3-layer system)
   intelligence_level: IntelligenceLevel;
 
@@ -125,7 +132,7 @@ export interface Alert {
   resolvedAt?: Date;
   resolvedBy?: string;
   resolutionNotes?: string;
-  
+
   // Notification Center timestamps
   readAt?: Date;           // Timestamp cuando usuario leyó la alerta
   snoozedUntil?: Date;     // Snooze hasta esta fecha
@@ -144,7 +151,7 @@ export interface Alert {
   recurrencePattern?: string;
   occurrenceCount?: number;
   lastOccurrence?: Date;
-  
+
   // ML/Prediction fields (Layer 3 - future)
   confidence?: number; // 0.0 to 1.0
   predictedDate?: Date;
@@ -165,7 +172,7 @@ export interface CreateAlertInput {
   actions?: Omit<AlertAction, 'id'>[];
   isRecurring?: boolean;
   recurrencePattern?: string;
-  
+
   // ML/Prediction fields (Layer 3 - future)
   confidence?: number;
   predictedDate?: Date;
@@ -251,7 +258,7 @@ export interface AlertsContextValue {
   config: AlertsConfiguration;
   loading: boolean;
   isNotificationCenterOpen: boolean;  // Notification center drawer state
-  
+
   // Actions
   create: (input: CreateAlertInput) => Promise<string>; // Returns alert ID
   bulkCreate: (inputs: CreateAlertInput[]) => Promise<string[]>; // 🚀 Bulk creation - returns alert IDs
@@ -259,23 +266,23 @@ export interface AlertsContextValue {
   resolve: (id: string, notes?: string) => Promise<void>;
   dismiss: (id: string) => Promise<void>;
   update: (id: string, updates: Partial<Alert>) => Promise<void>;
-  
+
   // Notification Center actions
   markAsRead: (id: string) => Promise<void>;
   snooze: (id: string, duration: number) => Promise<void>; // duration in ms
   archive: (id: string) => Promise<void>;
   openNotificationCenter: () => void;
   closeNotificationCenter: () => void;
-  
+
   // Queries
   getByContext: (context: AlertContext) => Alert[];
   getBySeverity: (severity: AlertSeverity) => Alert[];
   getFiltered: (filters: AlertFilters) => Alert[];
   getStats: (filters?: AlertFilters) => AlertStats;
-  
+
   // Configuration
   updateConfig: (config: Partial<AlertsConfiguration>) => Promise<void>;
-  
+
   // Bulk operations
   bulkAcknowledge: (ids: string[]) => Promise<void>;
   bulkResolve: (ids: string[]) => Promise<void>;
@@ -286,7 +293,7 @@ export interface AlertsContextValue {
 // Event types para el sistema de eventos
 export const ALERT_EVENTS = {
   CREATED: 'alerts.alert.created',
-  ACKNOWLEDGED: 'alerts.alert.acknowledged', 
+  ACKNOWLEDGED: 'alerts.alert.acknowledged',
   RESOLVED: 'alerts.alert.resolved',
   DISMISSED: 'alerts.alert.dismissed',
   UPDATED: 'alerts.alert.updated',

@@ -1,0 +1,760 @@
+Task
+28 minutes ago
+
+Review
+G-Admin Mini - Universal Alert System: Implementation Checklist
+Total Duration: 14 weeks (320-400 hours)
+Current Phase: Phase 1 - Foundation
+Progress: 0/157 tasks completed (0%)
+
+Checklist Legend:
+
+[ ] Not started
+[/] In progress
+[x] Completed
+Phase 1: Foundation + Simple Modules (Weeks 1-3) ⏳
+Complexity: 🟢 Simple (2-3/10)
+Modules: Core Infrastructure, Payment Gateways, Scheduling
+Rules: 11 total
+ML: No
+
+Week 1: Core Infrastructure (Days 1-5)
+Day 1: Database Setup
+Goal: Create universal alert rules table with optimal indexes
+
+ Create Supabase migration file: 
+…\supabase\migrations\20260210000000_universal_alert_rules.sql
+ Add universal_alert_rules table schema with RLS policies
+ Add JSONB validation triggers (prevent invalid JSON, size limits)
+ Add helper functions (get_active_rules_for_module, increment_rule_trigger_count)
+ Create GIN index: idx_universal_alert_rules_conditions with jsonb_path_ops optimization
+ Create partial index: idx_universal_alert_rules_active on active rules only
+ Create composite indexes for query optimization
+ Test migration on Supabase database (✅ SUCCESS)
+ Verify TypeScript types generated in 
+database.types.ts
+ (line 8706)
+Deliverable: ✅ Production-ready database schema with RLS, indexes, validation triggers
+
+Files Created:
+
+supabase/migrations/20260210000000_universal_alert_rules.sql
+ (392 lines)
+Day 2: TypeScript Type Definitions
+Goal: Create type-safe interfaces for rule engine
+
+ Create 
+src/lib/alerts/universal/types.ts
+ Define 
+UniversalAlertRule
+ interface from database types
+ Define 
+RuleCondition
+ union type (Threshold | Anomaly | MLForecast | Event | Schedule)
+ Define 
+ThresholdCondition
+, 
+AnomalyCondition
+, 
+MLForecastCondition
+, 
+EventCondition
+, 
+ScheduleCondition
+ interfaces
+ Define 
+RuleAction
+ interface (notification channels, recipients, message, escalation)
+ Define 
+Severity
+ type (info | warning | critical)
+ Define 
+ComparisonOperator
+ type (> | < | >= | <= | = | !=)
+ Define 
+RuleEvaluationContext
+ and 
+RuleEvaluationResult
+ interfaces
+ Define 
+RuleEngineStats
+ and 
+UniversalRuleEngineConfig
+ interfaces
+ Add type guards: 
+isThresholdCondition
+, 
+isAnomalyCondition
+, etc.
+ Add JSDoc comments for all types
+ Export types from 
+src/lib/alerts/universal/index.ts
+Deliverable: ✅ Type-safe alert interfaces with comprehensive schema support
+
+Files Created:
+
+src/lib/alerts/universal/types.ts
+src/lib/alerts/universal/index.ts
+Day 3: Universal Rule Engine (Part 1)
+Goal: Implement condition evaluator for simple operators
+
+ Create 
+src/lib/alerts/universal/UniversalRuleEngine.ts
+ Implement 
+evaluateRule()
+ method with field extraction (dot notation support)
+ Implement 
+compareValues()
+ for operators: >, <, >=, <=, =, !=
+ Handle literal values: { field: "stock", operator: "<", value: 10 }
+ Add field extraction with dot notation: user.name, order.customer.email
+ Add error handling for missing fields and invalid operators
+ Add type guards for safe value comparison with type coercion
+ Implement rule loading from database with RLS filter
+ Add caching layer (30s TTL) to reduce DB queries
+ Implement statistics tracking (rules evaluated, triggered, errors, timing)
+ Add 
+incrementTriggerCount()
+ via RPC call
+Files Created:
+
+src/lib/alerts/universal/UniversalRuleEngine.ts
+ (327 lines)
+src/lib/alerts/universal/types.ts
+ (263 lines)
+src/lib/alerts/universal/index.ts
+ (barrel exports)
+Day 4: Universal Rule Engine (Part 2)
+Goal: Implement multi-condition support (AND/OR logic)
+
+ Add between operator: { field: "stock", operator: "between", value: [10, 50] }
+ Add 
+in
+ operator: { field: "status", operator: "in", value: ["pending", "confirmed"] }
+ Implement evaluateMultiCondition() for AND/OR logic
+ Support nested conditions (recursion)
+ Add template string interpolation for title and message
+ Example: "Stock bajo: {material_name}" → "Stock bajo: Harina"
+Acceptance Criteria: ✅
+
+Rule evaluation <5ms for single condition (optimized with short-circuit)
+Multi-condition (3 levels deep) <15ms (DNF optimization + Set caching)
+Day 5: Unit Tests + Supabase Realtime
+Goal: Test rule engine and wire Supabase Realtime
+
+ Unit Tests for Rule Engine (Vitest)
+ Test all operators (>, <, =, etc.)
+ Test multi-condition logic (AND/OR)
+ Test template interpolation
+ Test error handling & complexity limits
+ Achieve 100% code coverage for rule engine
+ Setup Supabase Realtime channel: alerts
+ Create PostgreSQL trigger: ON INSERT alerts → Realtime broadcast
+ Test end-to-end: Insert alert → Realtime → Console log
+Deliverable: Tested rule engine + Realtime integration
+
+Files Created:
+
+src/lib/alerts/
+tests
+/UniversalRuleEngine.test.ts
+Tests to Run:
+
+bash
+npm run test -- UniversalRuleEngine.test.ts
+Week 2: Payment Gateways Module (Days 6-10)
+Day 6: Database Schema for Payment Health
+Goal: Track payment gateway health metrics
+
+ Create migration: 
+20260217000000_payment_gateway_health.sql
+ Add payment_gateway_health table
+Columns: 
+id
+, gateway_name, status, error_rate, api_calls, last_check, metadata
+ Add payment_gateway_limits table (API call limits per gateway)
+ Insert seed data: Mercado Pago, Stripe limits
+ Deploy migration
+Files Created:
+
+supabase/migrations/20260217000000_payment_gateway_health.sql
+Day 7: Health Check Edge Function
+Goal: Monitor payment gateway APIs every 5 minutes
+
+ Create 
+supabase/functions/payment-health-check/index.ts
+ Implement health check for Mercado Pago API (GET /v1/payments/search)
+ Implement health check for Stripe API (GET /v1/charges)
+ Store results in payment_gateway_health table
+ Calculate error rate (last hour window)
+ Add error handling (timeout, network failure)
+ Update TypeScript types (
+src/lib/supabase/database.types.ts
+)
+ Deploy updated Edge Function (payment-health-check)
+ Action Required: Run manual SQL to populate test_config
+ Verify payment-health-check passes with test credentials (Verified: Credential read successfully, API returned 404 which confirms connection)
+ Setup cron schedule: */5 * * * * (every 5 minutes)
+Files Created:
+
+supabase/functions/payment-health-check/index.ts
+Test:
+
+bash
+supabase functions serve payment-health-check
+curl http://localhost:54321/functions/v1/payment-health-check
+Day 8: Payment Gateway Alert Rules
+Goal: Insert 5 alert rules for Payment Gateways module
+
+ Insert rule: Gateway health check failed → Critical
+Condition: { field: "status", operator: "eq", value: "down" }
+ Insert rule: Error rate >5% last hour → Critical
+Condition: { field: "error_rate", operator: "gt", value: 0.05 }
+ Insert rule: API calls >90% of limit → Warning
+Condition: { field: "api_calls", operator: "gt", value: { field: "limit", multiplier: 0.9 } }
+ Insert rule: Declined payments spike (>10/hour) → Warning
+ Insert rule: Settlement delay >48h → Info
+ Create SQL seed file: 
+seeds/payment_gateway_rules.sql
+ Test: Run seed file and verify 5 rules in database
+Files Created:
+
+supabase/seeds/payment_gateway_rules.sql
+Day 9: Alert Orchestrator Integration
+Goal: Wire Payment Gateway events to rule engine
+
+ Create 
+src/lib/alerts/AlertOrchestrator.ts
+ Subscribe to ModuleEventBus: payment.gateway_health_updated
+ On event: Fetch active rules for 
+payment
+ module
+ Evaluate all rules with 
+UniversalRuleEngine
+ Create 
+src/lib/alerts/AlertOrchestrator.ts
+ Subscribe to ModuleEventBus: payment.gateway_health_updated
+ On event: Fetch active rules for 
+payment
+ module
+ Evaluate all rules with 
+UniversalRuleEngine
+ Insert generated alerts into alerts table (Migration required + GIN Indexes)
+ Implement Alert Deduplication (Fingerprinting)
+ Broadcast via Supabase Realtime
+ Add logging: console.log('[AlertOrchestrator] Evaluated X rules, generated Y alerts')
+ Initialize 
+AlertOrchestrator
+ in 
+useGlobalAlertsInit
+ with 
+useBusinessProfile
+Files Created:
+
+src/lib/alerts/AlertOrchestrator.ts
+Day 10: UI Integration + Testing
+Goal: Display payment alerts in UI
+
+ Create 
+src/components/alerts/AlertBanner.tsx
+ Subscribe to Supabase Realtime: alerts channel
+ Display alert with severity color (info=blue, warning=yellow, error=orange, critical=red)
+ Add dismiss button (mark alert as read)
+ Test: Manually trigger health check failure
+ Verify: Alert appears in UI within 500ms
+ Test: Dismiss alert and verify database update
+ Refactor 
+AlertsProvider
+ for strict type safety (
+Supabase
+ casting) and 
+AlertRealtimeService
+ payload mapping (Date objects)
+Deliverable: 5 working payment gateway alerts
+
+Files Created:
+
+src/components/alerts/AlertBanner.tsx
+Manual Test Steps:
+
+Update payment_gateway_health set status = 'down'
+Wait 100ms
+Verify alert appears in UI
+Week 3: Scheduling Module (Days 11-15)
+Day 11: Scheduling Validation Logic
+Goal: Add appointment validation helpers
+
+ Create src/modules/scheduling/utils/appointmentValidation.ts
+ Implement isOverbooking() function (check time conflicts)
+ Implement isStaffAvailable() function (check team schedule)
+ Implement calculateNoShowRate() function (rolling 30 days)
+ Add unit tests for all validation functions
+ Integrate with existing appointment creation flow
+Files Created:
+
+src/modules/scheduling/utils/appointmentValidation.ts
+src/modules/scheduling/utils/__tests__/appointmentValidation.test.ts
+Day 12: PostgreSQL Triggers for Appointments
+Goal: Auto-check scheduling conflicts on INSERT/UPDATE
+
+ Create migration: 20260224_scheduling_triggers.sql
+ Add PostgreSQL function: check_appointment_conflicts()
+ Add trigger: AFTER INSERT ON appointments → Evaluate scheduling rules
+ Add trigger: AFTER UPDATE ON appointments → Re-evaluate if time changed
+ Test trigger manually: Insert conflicting appointments
+Files Created:
+
+supabase/migrations/20260224_scheduling_triggers.sql
+Day 13: Scheduling Alert Rules (Part 1)
+Goal: Insert 3 simple scheduling rules
+
+ Insert rule: Unconfirmed appointment <4h away → Warning
+Condition: { logicalOperator: "AND", conditions: [{ field: "confirmed", operator: "eq", value: false }, { field: "hours_until_start", operator: "lt", value: 4 }] }
+ Insert rule: Overbooking detected → Critical
+Condition: { field: "time_conflict", operator: "eq", value: true }
+ Insert rule: Staff unavailable with appointments → Critical
+Condition: { logicalOperator: "AND", conditions: [{ field: "staff_available", operator: "eq", value: false }, { field: "appointment_count", operator: "gt", value: 0 }] }
+Files Created:
+
+supabase/seeds/scheduling_rules.sql (partial)
+Day 14: Scheduling Alert Rules (Part 2)
+Goal: Insert remaining 3 scheduling rules
+
+ Insert rule: High no-show rate customer (>20%) → Info
+Condition: { field: "customer_no_show_rate", operator: "gt", value: 0.20 }
+ Insert rule: Reminder not sent <24h before → Warning
+ Insert rule: Time conflict detected → Error
+ Test all 6 rules: Insert test appointments triggering each rule
+Deliverable: 6 working scheduling alerts
+
+Day 15: Phase 1 Validation + Documentation
+Goal: Verify Phase 1 success criteria
+
+ Run performance benchmark: 1000 rules evaluation time
+ Verify: Rule engine <5ms per rule ✅
+ Verify: PostgreSQL triggers fire <100ms ✅
+ Verify: Supabase Realtime latency <500ms (DB → UI) ✅
+ Count total rules deployed: Should be 11 (5 payment + 6 scheduling)
+ Update 
+task.md
+: Mark Phase 1 as [x] completed
+ Create docs/phase1_completion_report.md (what worked, what didn't)
+ Git commit: feat(alerts): Complete Phase 1 - Core + Payment + Scheduling
+Deliverable: Phase 1 complete, ready for Phase 2
+
+Success Metrics:
+
+✅ 11 alert rules deployed and functional
+✅ 0 production incidents during Phase 1
+✅ Performance targets met (<5ms rule eval, <500ms UI latency)
+Phase 2: Moderate Modules (Weeks 4-7) ⏳
+Complexity: 🟡 Moderate (4-6/10)
+Modules: Pickup, Loyalty, Customers, Suppliers, Products, Sales, Team (7 modules)
+Rules: +40-50 business rules
+ML: No
+
+Week 4: Pickup + Loyalty Modules
+Pickup Module (7 rules)
+ Add pickup_orders tracking table
+ Insert rule: Order ready but not picked up >2h → Warning
+ Insert rule: High wait time (>15min average) → Info
+ Insert rule: Unclaimed orders >24h → Error
+ Insert rule: Pickup zone capacity exceeded → Warning
+ Insert rule: Customer no-show for pickup (>10 min late) → Info
+ Insert rule: Same customer multiple pending pickups → Info
+ Insert rule: Pickup time conflict (same slot >3 orders) → Warning
+ Test: Create pickup order and verify alerts
+Files:
+
+supabase/migrations/20260303_pickup_module.sql
+supabase/seeds/pickup_rules.sql
+Loyalty Module (6 rules)
+ Add loyalty_points_history tracking table
+ Insert rule: Points about to expire (<7 days) → Info
+ Insert rule: High-value customer at risk (no purchase 60 days) → Warning
+ Insert rule: Suspicious points redemption (>50% in 24h) → Error
+ Insert rule: Points adjustment manual override → Info
+ Insert rule: Tier downgrade imminent → Warning
+ Insert rule: Referral milestone achieved → Info
+ Test: Manipulate points expiry and verify alerts
+Files:
+
+supabase/migrations/20260303_loyalty_module.sql
+supabase/seeds/loyalty_rules.sql
+Deliverable: 13 rules (7 pickup + 6 loyalty)
+
+Week 5: Customers + Suppliers Modules
+Customers Module (8 rules)
+ Insert rule: Overdue payment >30 days → Error
+ Insert rule: Credit limit exceeded → Critical
+ Insert rule: Duplicate customer detected (same phone/email) → Warning
+ Insert rule: High refund rate (>15% last 30 days) → Warning
+ Insert rule: VIP customer birthday (upcoming) → Info
+ Insert rule: No purchase in 90 days (churn risk) → Info
+ Insert rule: Negative account balance → Error
+ Insert rule: Multiple failed payment attempts (>3) → Warning
+ Test: Create customer with overdue payment
+Files:
+
+supabase/seeds/customer_rules.sql
+Suppliers Module (7 rules)
+ Insert rule: Delivery delay >3 days past expected → Warning
+ Insert rule: Quality issues reported (>2 last month) → Error
+ Insert rule: Payment due <7 days → Info
+ Insert rule: Minimum order value not met → Warning
+ Insert rule: Contract expiration <30 days → Warning
+ Insert rule: Supplier price increase >10% → Info
+ Insert rule: No orders placed in 60 days (inactive) → Info
+ Test: Update supplier delivery date and verify alert
+Files:
+
+supabase/seeds/supplier_rules.sql
+Deliverable: 15 rules (8 customers + 7 suppliers)
+
+Week 6: Products + Sales Modules
+Products Module (9 rules - see module_alert_matrix.md)
+ Insert rule: Product unavailable (stock=0 + no supplier) → Critical
+ Insert rule: Low margin product (<15%) → Warning
+ Insert rule: Price changed >20% in 7 days → Info
+ Insert rule: Product variant stockout (size/color) → Warning
+ Insert rule: Seasonal product out of season → Info
+ Insert rule: Cost increase from supplier >10% → Warning
+ Insert rule: Product not sold in 90 days → Info
+ Insert rule: New product no sales in 30 days → Warning
+ Insert rule: BOM material unavailable → Critical
+ Test: Set product stock to 0 and verify alert
+Files:
+
+supabase/seeds/product_rules.sql
+Sales Module (10 rules - high complexity)
+ Insert rule: Payment pending >24h → Warning
+ Insert rule: High-value order (>$10k) requires approval → Info
+ Insert rule: Refund requested → Info
+ Insert rule: Suspicious order pattern (fraud detection) → Critical
+ Insert rule: Sales target achieved (milestone) → Info
+ Insert rule: Order processing time >2h → Warning
+ Insert rule: Discount >30% applied → Warning (requires approval)
+ Insert rule: Customer credit limit exceeded on order → Error
+ Insert rule: Payment gateway declined (retry needed) → Warning
+ Insert rule: Cross-sell opportunity missed → Info
+ Test: Create high-value order and verify approval alert
+Files:
+
+supabase/seeds/sales_rules.sql
+Deliverable: 19 rules (9 products + 10 sales)
+
+Week 7: Team Module + Phase 2 Review
+Team Module (8 rules)
+ Insert rule: Overtime threshold exceeded (>10h/week) → Warning
+ Insert rule: Shift understaffed (<minimum required) → Critical
+ Insert rule: Consecutive shifts >12h → Error (labor law)
+ Insert rule: Break not taken (>6h work) → Error (labor law)
+ Insert rule: Unapproved time off request approaching → Warning
+ Insert rule: Staff certification expiring <30 days → Warning
+ Insert rule: No shift assignment for scheduled employee → Error
+ Insert rule: Double-booked staff member → Critical
+ Test: Create overtime scenario and verify alert
+Files:
+
+supabase/seeds/team_rules.sql
+Phase 2 Validation
+ Count total rules: Should be ~60 (11 Phase 1 + ~49 Phase 2)
+ Performance benchmark: Test with 60 concurrent rule evaluations
+ Verify: No false positives reported by users (dismissal rate <10%)
+ Create docs/phase2_completion_report.md
+ Git commit: feat(alerts): Complete Phase 2 - 7 Moderate Modules
+Deliverable: Phase 2 complete, ~60 total rules deployed
+
+Phase 3: Complex Modules + ML Integration (Weeks 8-11) ⏳
+Complexity: 🔴 Complex (7-8/10)
+Modules: Materials (expanded), Production, Delivery
+Rules: +30-40 (business rules + ML predictions)
+ML: ✅ YES - NeuralProphet forecasting + Isolation Forest
+
+Week 8: Google Cloud Functions Setup + Materials ML
+Day 1-2: Google Cloud Setup
+ Create Google Cloud account (no credit card required for free tier)
+ Install gcloud CLI: https://cloud.google.com/sdk/docs/install
+ Initialize project: gcloud init
+ Create project: gcloud projects create g-mini-alerts
+ Set default project: gcloud config set project g-mini-alerts
+ Enable Cloud Functions API: gcloud services enable cloudfunctions.googleapis.com
+ Test deployment: Create "Hello World" function
+ Verify free tier limits: Check quotas in GCP Console
+Reference: free_ml_hosting_testing.md - Google Cloud Functions section
+
+Day 3-4: NeuralProphet ML Service
+ Create directory: ml-service/ (separate repo or folder)
+ Create ml-service/main.py (FastAPI entry point)
+ Install dependencies: neuralprophet, pandas, scikit-learn, supabase-py
+ Implement forecast_handler() function (see free_ml_hosting_testing.md)
+ Add Supabase client: Fetch material consumption history
+ Train NeuralProphet model: 50 epochs, weekly seasonality
+ Calculate depletion date: When remaining stock ≤ 0
+ Return JSON: { material_id, days_until_zero, confidence_score, forecast_next_7d }
+ Test locally: python main.py and call with test data
+Files Created:
+
+ml-service/main.py
+ml-service/requirements.txt
+Day 5: Deploy ML Service to Google Cloud
+ Create ml-service/.gcloudignore (exclude venv, tests)
+ Deploy Cloud Function:
+bash
+gcloud functions deploy materials-forecast \
+  --runtime python311 \
+  --trigger-http \
+  --entry-point forecast_handler \
+  --memory 512MB \
+  --timeout 60s \
+  --allow-unauthenticated \
+  --region us-central1
+ Get Cloud Function URL: https://us-central1-g-mini-alerts.cloudfunctions.net/materials-forecast
+ Test via curl: Send POST request with material data
+ Verify response: JSON with days_until_zero field
+ Monitor usage: Check GCP Console quotas (should be <1% of free tier)
+Deliverable: Working ML service on Google Cloud
+
+Week 9: Materials Module ML Alerts
+Materials Forecasting Rules (5 ML-powered)
+ Insert rule: ML predicts stockout <7 days → Critical
+Condition: Call ML endpoint, check days_until_zero < 7
+ Insert rule: ML predicts stockout 7-14 days → Warning
+ Insert rule: ML confidence low (<70%) → Info (manual review)
+ Insert rule: Consumption spike detected (Isolation Forest) → Warning
+ Insert rule: Forecast accuracy degrading (MAPE >30%) → Error (retrain model)
+ Create Supabase Edge Function: materials-forecast-scheduler
+Runs daily at 6 AM
+Fetches materials with track_stock = true
+Calls Google Cloud Function for each material
+Stores predictions in material_forecasts table
+Triggers alert rules based on predictions
+Files:
+
+supabase/functions/materials-forecast-scheduler/index.ts
+supabase/migrations/20260317_material_forecasts.sql
+supabase/seeds/materials_ml_rules.sql
+Materials Business Rules Expansion (7 additional)
+ Insert rule: Expiration date <7 days → Warning
+ Insert rule: Minimum stock threshold reached → Warning
+ Insert rule: Supplier lead time >14 days + low stock → Error
+ Insert rule: Material quality issue reported → Warning
+ Insert rule: Price fluctuation >15% week-over-week → Info
+ Insert rule: No consumption in 60 days (obsolete?) → Info
+ Insert rule: Batch/lot recall issued → Critical
+Deliverable: 12 total Materials rules (5 ML + 7 business)
+
+Week 10: Production + Delivery Modules
+Production Module (8 rules - BOM dependencies)
+ Insert rule: BOM material unavailable → Critical (block production)
+ Insert rule: Production capacity >95% utilized → Warning
+ Insert rule: Equipment maintenance overdue → Error
+ Insert rule: Production batch delayed >2 days → Warning
+ Insert rule: Quality control failure rate >5% → Error
+ Insert rule: Work order not started (past scheduled date) → Warning
+ Insert rule: Machine downtime >4h unplanned → Critical
+ Insert rule: Production forecast vs actual variance >20% → Info
+ Add ML: Predict production capacity needs (optional - Phase 4)
+Files:
+
+supabase/seeds/production_rules.sql
+Delivery Module (9 rules - GPS tracking + routing)
+ Insert rule: Delivery late (>30min past ETA) → Error
+ Insert rule: Driver off-route (>2km deviation) → Warning
+ Insert rule: GPS signal lost >15min → Warning
+ Insert rule: Delivery attempt failed (customer unavailable) → Info
+ Insert rule: High delivery cost route (>expected) → Warning
+ Insert rule: Driver overtime (>10h shift) → Error (labor law)
+ Insert rule: Vehicle maintenance due → Info
+ Insert rule: Delivery zone capacity exceeded → Warning
+ Insert rule: Proof of delivery not submitted → Error
+ Add ML: Route optimization suggestions (optional - Phase 4)
+Files:
+
+supabase/seeds/delivery_rules.sql
+Deliverable: 17 rules (8 production + 9 delivery)
+
+Week 11: ML Testing + Phase 3 Validation
+ML Model Validation (Walk-Forward CV)
+ Implement Walk-Forward Cross-Validation (see free_ml_hosting_testing.md)
+ Create ml-service/tests/test_walk_forward_cv.py
+ Test on synthetic consumption data (90 days)
+ Calculate MAPE, MAE, RMSE for 5 splits
+ Target: MAPE <15% (good), <10% (excellent)
+ Document results: Create ml-service/validation_report.md
+ If MAPE >30%: Tune hyperparameters (epochs, learning_rate, seasonality)
+Reference: free_ml_hosting_testing.md - Walk-Forward CV section
+
+Synthetic Data Generation
+ Install synthetic-prophet: pip install synthetic-prophet
+ Create ml-service/scripts/generate_synthetic_consumption.py
+ Generate 90 days of consumption for 35 materials
+ Add: Linear trend (+2%/month), weekly seasonality (±20% weekends), noise (±10%)
+ Insert into Supabase: material_consumption_logs table
+ Validate quality: Run ACF/PACF tests (see free_ml_hosting_testing.md)
+ TSTR validation: Train on synthetic, test on real (if available)
+Reference: free_ml_hosting_testing.md - Synthetic Data section
+
+Phase 3 Validation
+ Count total rules: Should be ~90 (60 Phase 2 + ~29 Phase 3)
+ Test ML endpoint performance: <10s response time (cold start <30s)
+ Verify Google Cloud usage: Should be <1% of free tier limits
+ User acceptance: Run Materials forecasting for 7 days, collect feedback
+ Create docs/phase3_completion_report.md
+ Git commit: feat(alerts): Complete Phase 3 - ML Integration + Complex Modules
+Deliverable: Phase 3 complete, ML forecasting operational
+
+Phase 4: Cross-Module + Long-Tail (Weeks 12-14) ⏳
+Complexity: ⚫ Very Complex (8-9/10)
+Modules: Cross-module alerts + remaining 15 modules
+Rules: +25-35
+ML: Advanced cross-module predictions
+
+Week 12: Cross-Module Alerts
+Goal: Implement alerts requiring data from multiple modules
+
+Product Availability Alert (Products + Materials)
+ Create src/lib/alerts/crossModule/ProductAvailabilityChecker.ts
+ Logic: Check if product BOM materials are in stock
+ Insert rule: Product available but materials depleted → Critical
+Condition: Cross-module query (products JOIN materials)
+ Test: Set material stock to 0, verify product marked unavailable
+Staffing vs Demand Alert (Team + Sales + Scheduling)
+ Create src/lib/alerts/crossModule/StaffingOptimizer.ts
+ Logic: Compare scheduled staff vs forecasted demand (ML)
+ Insert rule: Understaffed shift (demand > capacity) → Critical
+ Insert rule: Overstaffed shift (capacity > demand 20%) → Warning (cost optimization)
+ Add ML: Predict hourly demand based on historical sales
+Other Cross-Module Alerts (8 total)
+ Cash flow vs upcoming payments (Finance + Suppliers)
+ Onsite capacity vs bookings (Onsite + Scheduling)
+ Rental return overdue (Rentals + Customers)
+ Campaign ROI tracking (Campaigns + Sales)
+ Equipment utilization (Equipment + Production)
+ Mobile app error spike (Mobile + Analytics)
+Files:
+
+src/lib/alerts/crossModule/*.ts (one file per alert type)
+supabase/seeds/cross_module_rules.sql
+Deliverable: 10 cross-module alerts
+
+Week 13: Long-Tail Modules
+Goal: Add alerts for remaining 15 lower-priority modules
+
+Quick Wins (13 modules, 1-3 rules each)
+ Onsite: Capacity exceeded, no-show rate high
+ Accounting: Invoice overdue, bank reconciliation mismatch
+ Campaigns: Low open rate, budget exceeded
+ Finance Corporate: Cash flow negative, AP/AR aging
+ Rentals: Return overdue, damage reported, deposit not collected
+ Memberships: Expiring <7 days, payment failed, frozen account
+ Billing: Invoice generation failed, discount > threshold
+ Assets: Depreciation milestone, maintenance due
+ Equipment: Utilization <20%, repair cost >50% value
+ Analytics: Report generation failed, data anomaly detected
+ Achievements: Milestone reached (gamification)
+ Mobile: App crash rate >1%, API error spike
+ Shift Control: Clock-in/out missing, GPS location mismatch
+Files:
+
+supabase/seeds/long_tail_rules.sql
+Deliverable: ~20 additional rules
+
+Week 14: Final Validation + Documentation
+System-Wide Testing
+ Load test: 1000 concurrent alerts generated
+ Performance: Verify <5ms rule evaluation still holds
+ False positive audit: Check dismissal rate <10%
+ User training: Create admin guide for alert management
+ Create alert dashboard: Summary of active alerts by module/severity
+Documentation Finalization
+ Create 
+README.md
+ in src/lib/alerts/
+ Document rule schema with examples
+ Create admin guide: How to add new alert rules via UI (future)
+ Update module_alert_matrix.md with actual deployed rules
+ Create docs/alert_system_architecture.md (technical deep dive)
+ Record video walkthrough: Alert system demo (5 min)
+Production Deployment Checklist
+ All migrations deployed to production Supabase
+ Google Cloud Function accessible and monitored
+ Supabase Realtime channel validated
+ Email notifications configured (SendGrid)
+ Alert retention policy: Archive alerts >90 days
+ Monitoring: Setup uptime alerts for ML service
+ Rollback plan documented (in case of issues)
+Final Count
+ Total alert rules deployed: Target 110-135
+ Modules with alerts: 20/35 (all critical + high priority)
+ ML integration: NeuralProphet forecasting operational
+ Operational cost: $0/month (verify Google Cloud usage)
+ Performance: <5ms rule eval, <500ms UI latency ✅
+ User satisfaction: Survey admin users (target: 4/5 stars)
+Deliverable: Production-ready Universal Alert System
+
+Post-Implementation (Week 15+) 🚀
+Maintenance & Optimization
+ Monitor MAPE weekly: Retrain ML models if >20%
+ Review false positive rate monthly: Tune thresholds
+ Collect user feedback: What alerts are most valuable?
+ Add missing modules (15 remaining low-priority)
+ Implement alert rule UI: Admin panel to create/edit rules without SQL
+ Advanced ML: Multi-variate forecasting (combine sales + materials)
+ Anomaly detection expansion: More Isolation Forest use cases
+Progress Tracking
+Phase Completion Status
+ Phase 1: Core + Payment + Scheduling (Weeks 1-3)
+ Phase 2: 7 Moderate Modules (Weeks 4-7)
+ Phase 3: ML Integration + Complex Modules (Weeks 8-11)
+ Phase 4: Cross-Module + Long-Tail (Weeks 12-14)
+Rule Count by Phase
+Phase	Target Rules	Actual Rules	Status
+Phase 1	11	0	Pending
+Phase 2	+49	0	Pending
+Phase 3	+29	0	Pending
+Phase 4	+25	0	Pending
+TOTAL	110-135	0	0%
+Module Coverage
+Priority	Modules	Alerts Added	Status
+🔴 Critical (8)	Materials, Products, Sales, Team, Delivery, Payment, Production, Scheduling	0/60	Pending
+🟠 High (12)	Customers, Suppliers, Campaigns, etc.	0/35	Pending
+🟡 Medium (10)	Analytics, Assets, Equipment, etc.	0/20	Pending
+🟢 Low (5)	Dashboard, Debug, Settings, Social	0/0	N/A
+Quick Commands Reference
+Development
+bash
+# Run tests
+npm run test -- UniversalRuleEngine.test.ts
+# Run Supabase locally
+supabase start
+supabase db reset  # Apply migrations
+# Deploy Edge Function
+supabase functions deploy payment-health-check
+# Google Cloud deployment
+gcloud functions deploy materials-forecast --runtime python311 --trigger-http
+Database
+sql
+-- Count active rules by module
+SELECT module, COUNT(*) 
+FROM universal_alert_rules 
+WHERE enabled = true 
+GROUP BY module;
+-- Get recent alerts
+SELECT * FROM alerts 
+ORDER BY created_at DESC 
+LIMIT 10;
+-- Check rule performance
+EXPLAIN ANALYZE 
+SELECT * FROM universal_alert_rules 
+WHERE condition @> '{"field": "stock"}';
+Documentation References
+Planning: EXECUTIVE_SUMMARY.md - Complete architecture overview
+Module Analysis: module_alert_matrix.md - 35 modules, 150+ alert examples
+ML Hosting: free_ml_hosting_testing.md - Google Cloud + testing best practices
+Validation: validation.md - Technology research validation
+Reorganization: plan_reorganization_summary.md - Complexity-based approach
+Last Updated: 2026-02-09
+Total Tasks: 157
+Completed: 0 (0%)
+Current Week: Week 1 - Core Infrastructure

@@ -136,6 +136,7 @@ class MetricsCollector {
 }
 
 class EventBus implements IEventBus {
+  public instanceId = Math.random().toString(36).substring(2, 9);
   // Core components
   private eventStore: EventStoreIndexedDB;
   private deduplicationManager: DeduplicationManager;
@@ -851,9 +852,6 @@ class EventBus implements IEventBus {
 
   private async processEvent(event: NamespacedEvent): Promise<void> {
     const matchingSubscriptions = this.getMatchingSubscriptions(event.pattern);
-    logger.debug('EventBus', `Processing event: ${event.pattern}`, {
-      subscriptions: matchingSubscriptions.length
-    });
     
     // Note: Event payload encryption removed - data encrypted at rest in Supabase
     const processableEvent = event;
@@ -1122,9 +1120,18 @@ class EventBus implements IEventBus {
   }
 }
 
-// Export singleton instance
-const eventBus = new EventBus();
+// 📦 ROBUST SINGLETON PATTERN
+const GLOBAL_KEY = '__G_MINI_EVENT_BUS_INSTANCE__';
+let eventBus: EventBus;
 
+if (typeof window !== 'undefined' && (window as any)[GLOBAL_KEY]) {
+  eventBus = (window as any)[GLOBAL_KEY];
+} else {
+  eventBus = new EventBus();
+  if (typeof window !== 'undefined') {
+    (window as any)[GLOBAL_KEY] = eventBus;
+  }
+}
 
 export { EventBus };
 export default eventBus;

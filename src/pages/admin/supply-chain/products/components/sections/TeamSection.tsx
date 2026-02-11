@@ -17,20 +17,20 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  Stack, Switch, Button, IconButton, Text, Box, HStack, Alert, Icon, 
-  SelectField, NumberField, Table, Badge, Tooltip 
+import {
+  Stack, Switch, Button, IconButton, Text, Box, HStack, Alert, Icon,
+  SelectField, NumberField, Table, Badge, Tooltip
 } from '@/shared/ui';
 import type { FormSectionProps, StaffFields, StaffAllocation, ProductType } from '../../types/productForm';
 import { PlusIcon, TrashIcon, UserIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { ModuleRegistry } from '@/lib/modules';
-import type { StaffAPI } from '@/modules/team/manifest';
+import type { TeamAPI } from '@/modules/team/manifest';
 
 // ============================================
 // TYPES
 // ============================================
 
-interface StaffSectionProps extends Omit<FormSectionProps, 'data' | 'onChange'> {
+interface TeamSectionProps extends Omit<FormSectionProps, 'data' | 'onChange'> {
   data: StaffFields;
   productType: ProductType;
   hasBooking?: boolean;  // If booking is active, duration is REQUIRED
@@ -69,16 +69,16 @@ function calculateAllocationCost(
   role?: StaffRoleOption
 ): { hours: number; cost: number; loadedHourlyCost: number } {
   const hours = (allocation.duration_minutes / 60) * (allocation.count || 1);
-  
+
   // Rate hierarchy: override > role default > 0
   const baseRate = allocation.hourly_rate_override ?? role?.default_hourly_rate ?? 0;
-  
+
   // Loaded factor hierarchy: override > role > 1.0
   const loadedFactor = allocation.loaded_factor_override ?? role?.loaded_factor ?? 1.0;
-  
+
   const loadedHourlyCost = baseRate * loadedFactor;
   const cost = hours * loadedHourlyCost;
-  
+
   return { hours, cost, loadedHourlyCost };
 }
 
@@ -102,30 +102,30 @@ function getHelperText(productType: ProductType): string {
 // MAIN COMPONENT
 // ============================================
 
-export function StaffSection({
+export function TeamSection({
   data,
   productType,
   hasBooking = false,
   onChange,
   errors = [],
   readOnly = false
-}: StaffSectionProps) {
+}: TeamSectionProps) {
   // ============================================
   // CROSS-MODULE DATA FETCHING
   // ============================================
-  
+
   const registry = ModuleRegistry.getInstance();
-  const staffModule = registry.getExports<StaffAPI>('staff');
-  
+  const teamModule = registry.getExports<TeamAPI>('team');
+
   // StaffRoles (primary selector)
-  const useStaffRoles = staffModule?.hooks?.useStaffRoles;
-  const rolesHook = useStaffRoles ? useStaffRoles() : null;
+  const useJobRoles = teamModule?.hooks?.useJobRoles;
+  const rolesHook = useJobRoles ? useJobRoles() : null;
   const roles = (rolesHook?.items || []) as StaffRoleOption[];
   const rolesLoading = rolesHook?.loading || false;
-  
+
   // Employees (secondary selector, filtered by role)
-  const useEmployeesList = staffModule?.hooks?.useEmployeesList;
-  const employeesHook = useEmployeesList ? useEmployeesList() : null;
+  const useTeamMembersList = teamModule?.hooks?.useTeamMembersList;
+  const employeesHook = useTeamMembersList ? useTeamMembersList() : null;
   const teamMembers = (employeesHook?.items || []) as EmployeeOption[];
   const employeesLoading = employeesHook?.loading || false;
 
@@ -140,7 +140,7 @@ export function StaffSection({
   // ============================================
   // QUICK ADD STATE
   // ============================================
-  
+
   const [quickAddRoleId, setQuickAddRoleId] = useState<string>('');
   const [quickAddEmployeeId, setQuickAddEmployeeId] = useState<string>('');
   const [quickAddCount, setQuickAddCount] = useState<number>(1);
@@ -159,7 +159,7 @@ export function StaffSection({
   // ============================================
   // HANDLERS
   // ============================================
-  
+
   const handleChange = <K extends keyof StaffFields>(
     field: K,
     value: StaffFields[K]
@@ -188,7 +188,7 @@ export function StaffSection({
     const role = roleOptions.find(r => r.id === quickAddRoleId);
     if (!role) return;
 
-    const teamMember = quickAddEmployeeId 
+    const teamMember = quickAddEmployeeId
       ? (teamMembers as EmployeeOption[]).find(e => e.id === quickAddEmployeeId)
       : null;
 
@@ -224,7 +224,7 @@ export function StaffSection({
   // ============================================
   // CALCULATIONS
   // ============================================
-  
+
   const totalLaborCost = (data.staff_allocation || []).reduce((sum, alloc) => {
     const role = roleOptions.find(r => r.id === alloc.role_id);
     const { cost } = calculateAllocationCost(alloc, role);
@@ -238,7 +238,7 @@ export function StaffSection({
   // ============================================
   // PREPARE SELECT OPTIONS
   // ============================================
-  
+
   const roleSelectOptions = roleOptions.map(r => ({
     value: r.id,
     label: `${r.name}${r.department ? ` (${r.department})` : ''} - $${r.loaded_hourly_cost.toFixed(2)}/h`
@@ -252,7 +252,7 @@ export function StaffSection({
   // ============================================
   // RENDER
   // ============================================
-  
+
   return (
     <Stack gap="4">
       {/* Header with info tooltip */}
@@ -382,7 +382,7 @@ export function StaffSection({
                       />
                     </Box>
                   </HStack>
-                  
+
                   {/* Row 2: Count, Duration, Add button */}
                   <HStack gap="2">
                     <Box flex={0.5}>
@@ -480,9 +480,9 @@ function StaffTableRow({
   readOnly = false
 }: StaffTableRowProps) {
   const [isEditing, setIsEditing] = useState(false);
-  
+
   const selectedRole = roleOptions.find(r => r.id === allocation.role_id);
-  const selectedEmployee = allocation.employee_id 
+  const selectedEmployee = allocation.employee_id
     ? teamMembers.find(e => e.id === allocation.employee_id)
     : null;
 

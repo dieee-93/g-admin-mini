@@ -96,7 +96,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ icon: IconComponent, label, val
         h="3px"
         bg={gradient}
       />
-      
+
       <Stack gap="4">
         <Flex justify="space-between" align="start">
           <Box
@@ -165,20 +165,23 @@ const eventHandlers = {
 
 export default function MaterialsPage() {
   console.log('[MaterialsPage] COMPONENT RENDER');
-  
+
   const offlineStatus = useOfflineStatus();
   console.log('[MaterialsPage] - useOfflineStatus:', offlineStatus.isOnline);
-  
+
+  // ✅ PERFORMANCE: Extract only needed value to prevent re-renders from other offlineStatus changes
+  const isOnline = useMemo(() => offlineStatus.isOnline, [offlineStatus.isOnline]);
+
   const perfMonitor = usePerformanceMonitor();
   console.log('[MaterialsPage] - usePerformanceMonitor:', perfMonitor.shouldReduceAnimations);
-  
+
   const navLayout = useNavigationLayout();
   console.log('[MaterialsPage] - useNavigationLayout:', navLayout.isMobile);
-  
+
   const location = useLocation();
   console.log('[MaterialsPage] - useLocation:', location.selectedLocation?.id);
-  
-  const { isOnline } = offlineStatus;
+
+  // ✅ PERFORMANCE: Extract only needed values to minimize re-renders
   const { shouldReduceAnimations } = perfMonitor;
   const { isMobile } = navLayout;
   const { selectedLocation, isMultiLocationMode } = location;
@@ -250,9 +253,9 @@ export default function MaterialsPage() {
   }, [openModal]);
 
   const handleDelete = useCallback(async (item: MaterialItem) => {
-     if (window.confirm(`¿Eliminar "${item.name}"?`)) {
-       await deleteMaterial(item.id);
-     }
+    if (window.confirm(`¿Eliminar "${item.name}"?`)) {
+      await deleteMaterial(item.id);
+    }
   }, [deleteMaterial]);
 
   const handleAddMaterial = useCallback(() => {
@@ -345,7 +348,7 @@ export default function MaterialsPage() {
   return (
     <Box position="relative" minH="100vh" bg="bg.canvas" overflow="hidden" data-testid="materials-page">
       <SkipLink />
-      
+
       {/* Decorative background blobs */}
       <Box position="absolute" top="-10%" right="-5%" width="500px" height="500px" borderRadius="full" bg="blue.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" />
       <Box position="absolute" bottom="-10%" left="-5%" width="400px" height="400px" borderRadius="full" bg="purple.50" opacity="0.4" filter="blur(80px)" pointerEvents="none" />
@@ -412,14 +415,30 @@ export default function MaterialsPage() {
               ALERTS SECTION
               ═══════════════════════════════════════════════════════════════ */}
           <MaterialsAlerts
-            onAlertAction={async () => {}}
+            onAlertAction={async () => { }}
             context="materials"
           />
 
           {/* ═══════════════════════════════════════════════════════════════
               MAIN CONTENT - Elevated Tabs Card (Magic Patterns Style)
               ═══════════════════════════════════════════════════════════════ */}
-          <Box bg="bg.surface" p="8" borderRadius="2xl" shadow="xl">
+          <Box
+            position="relative"
+            overflow="hidden"
+            bg="bg.surface"
+            p="8"
+            borderRadius="2xl"
+            shadow="xl"
+          >
+            {/* ⭐ MAGICPATTERNS SIGNATURE: 4px gradient top border for elevated content */}
+            <Box
+              position="absolute"
+              top={0}
+              left={0}
+              right={0}
+              h="4px"
+              bg="linear-gradient(90deg, var(--chakra-colors-purple-500) 0%, var(--chakra-colors-pink-500) 50%, var(--chakra-colors-purple-600) 100%)"
+            />
             <Tabs.Root
               defaultValue="inventory"
               value={activeMainTab}
@@ -444,8 +463,8 @@ export default function MaterialsPage() {
                       items={filteredMaterials}
                       activeTab={pageState.activeTab}
                       onTabChange={(tab) => setActiveTab(tab as any)}
-                      onStockUpdate={canUpdate ? handleStockUpdate : async () => {}}
-                      onBulkAction={canUpdate ? handleBulkAction : async () => {}}
+                      onStockUpdate={canUpdate ? handleStockUpdate : async () => { }}
+                      onBulkAction={canUpdate ? handleBulkAction : async () => { }}
                       onAddMaterial={canCreate ? handleAddMaterial : undefined}
                       onView={canRead ? handleView : undefined}
                       onEdit={canUpdate ? handleEdit : undefined}
@@ -458,7 +477,7 @@ export default function MaterialsPage() {
                     <MaterialsActions
                       onAddMaterial={canCreate ? handleAddMaterial : undefined}
                       onBulkOperations={canUpdate ? toggleBulkMode : undefined}
-                      onGenerateReport={canExport ? async () => {} : undefined}
+                      onGenerateReport={canExport ? async () => { } : undefined}
                       onSyncInventory={canConfigure ? async () => refresh() : undefined}
                       isMobile={isMobile}
                       permissions={actionsPermissions}

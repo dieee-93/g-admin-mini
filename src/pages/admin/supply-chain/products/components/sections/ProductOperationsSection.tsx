@@ -16,7 +16,7 @@
 import { Stack, Text, Tabs } from '@/shared/ui';
 import type { FormSectionProps, ProductFormData, ProductType } from '../../types/productForm';
 import { MaterialsSection } from './MaterialsSection';
-import { StaffSection } from './StaffSection';
+import { TeamSection } from './TeamSection';
 import { ProductionSection } from './ProductionSection';
 
 interface ProductOperationsSectionProps extends Omit<FormSectionProps, 'data' | 'onChange'> {
@@ -90,7 +90,7 @@ export function ProductOperationsSection({
 
         <Tabs.Content value="staff">
           <Stack gap={4} pt={4}>
-            <StaffSection
+            <TeamSection
               data={data.staff || { has_staff_requirements: false }}
               productType={productType}
               hasBooking={data.booking?.requires_booking || false}

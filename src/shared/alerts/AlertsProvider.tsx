@@ -4,23 +4,30 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
-import type { 
-  Alert, 
-  AlertsContextValue, 
-  CreateAlertInput, 
-  AlertFilters, 
+import type {
+  Alert,
+  AlertsContextValue,
+  CreateAlertInput,
+  AlertFilters,
   AlertStats,
   AlertsConfiguration,
   AlertStatus,
   AlertSeverity,
   AlertContext,
-  AlertType, 
+  AlertType,
+  IntelligenceLevel,
+  AlertMetadata,
 } from './types';
 import { ALERT_EVENTS } from './types';
 import { EventBus } from '@/lib/events';
 import { useDebouncedCallback } from '../hooks';
+import { useGlobalAlertsInit } from '@/hooks';
 
 import { logger } from '@/lib/logging';
+import { alertRealtimeService } from '@/lib/alerts/AlertRealtimeService';
+import { supabase } from '@/lib/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import type { Database } from '@/lib/supabase/database.types';
 // Default configuration
 const DEFAULT_CONFIG: AlertsConfiguration = {
   maxVisibleAlerts: 5,
@@ -51,8 +58,8 @@ const DEFAULT_CONFIG: AlertsConfiguration = {
 
 // 🛠️ PERFORMANCE: Split context into State and Actions to prevent unnecessary re-renders
 // Components consuming only actions won't re-render when alerts/config change
-const AlertsStateContext = createContext<{ alerts: Alert[]; stats: AlertStats; config: AlertsConfiguration } | null>(null);
-const AlertsActionsContext = createContext<Omit<AlertsContextValue, 'alerts' | 'stats' | 'config'> | null>(null);
+const AlertsStateContext = createContext<{ alerts: Alert[]; stats: AlertStats; config: AlertsConfiguration; loading: boolean; isNotificationCenterOpen: boolean } | null>(null);
+const AlertsActionsContext = createContext<Omit<AlertsContextValue, 'alerts' | 'stats' | 'config' | 'loading' | 'isNotificationCenterOpen'> | null>(null);
 
 const AlertsContext = createContext<AlertsContextValue | null>(null);
 AlertsContext.displayName = 'AlertsContext';
@@ -74,6 +81,134 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
   const alertsRef = useRef(alerts);
   alertsRef.current = alerts;
+
+  // Realtime Integration
+  const { user, session, loading: authLoading } = useAuth();
+  const [organizationId, setOrganizationId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Initialize Global Alert Orchestrator & Listeners
+  useGlobalAlertsInit(organizationId);
+
+  // Initialize Organisation ID from session/user
+  useEffect(() => {
+    const getOrgId = async () => {
+      if (!user || !session) return;
+
+      // 1. Try metadata
+      let orgId = user.user_metadata?.organization_id || user.user_metadata?.business_id;
+
+      // 2. Fallback to DB if not in metadata (checking business_profiles which we saw exists)
+      if (!orgId) {
+        try {
+          const { data: businessProfile } = await (supabase
+            .from('business_profiles') as any)
+            .select('id')
+            .single();
+          orgId = businessProfile?.id;
+        } catch (e) {
+          logger.warn('Alerts', 'Failed to fetch business ID from DB', e);
+        }
+      }
+
+      if (orgId) {
+        logger.info('Alerts', `🎯 Alert System matched to Org/Business: ${orgId}`);
+        setOrganizationId(orgId);
+      } else {
+        // 🚀 FALLBACK: Use default organization ID if none found
+        const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000001';
+        logger.info('Alerts', 'No organization ID found, using default fallback', { DEFAULT_ORG_ID });
+        setOrganizationId(DEFAULT_ORG_ID);
+      }
+    };
+
+    getOrgId();
+  }, [user, session]);
+
+  // Fetch initial alerts from DB
+  const fetchDbAlerts = useCallback(async (orgId: string) => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await (supabase
+        .from('alerts') as any)
+        .select('*')
+        .eq('organization_id', orgId)
+        //.eq('status', 'active') // Fetch all or just active? Maybe just active for initial load to save bandwidth
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+
+      if (data) {
+        // Map DB alerts to local Alert type
+        const dbAlerts: Alert[] = data.map((dbAlert: any) => ({
+          id: dbAlert.id,
+          title: dbAlert.title,
+          description: dbAlert.description,
+          severity: dbAlert.severity as AlertSeverity,
+          type: dbAlert.type as AlertType,
+          status: dbAlert.status as AlertStatus,
+          context: (typeof dbAlert.context === 'string' ? dbAlert.context : 'global') as AlertContext,
+          intelligence_level: (dbAlert.intelligence_level as IntelligenceLevel) || 'simple',
+          metadata: dbAlert.metadata as AlertMetadata,
+          createdAt: new Date(dbAlert.created_at),
+          updatedAt: new Date(dbAlert.updated_at),
+          readAt: dbAlert.status === 'read' ? new Date(dbAlert.updated_at) : undefined,
+          organization_id: dbAlert.organization_id,
+          module_name: dbAlert.module_name,
+          entity_id: dbAlert.entity_id,
+          rule_id: dbAlert.rule_id,
+          actions: [],
+          tags: []
+        }));
+
+        setAlerts(dbAlerts);
+      }
+    } catch (err) {
+      logger.error('Alerts', 'Failed to fetch DB alerts', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Subscribe to Realtime
+  useEffect(() => {
+    if (!organizationId) {
+      logger.warn('Alerts', 'Realtime subscription skipped: No organizationId');
+      return;
+    }
+
+    logger.info('Alerts', 'Initializing Realtime subscription', { organizationId });
+
+    // Initial Fetch
+    fetchDbAlerts(organizationId);
+
+    // Subscribe
+    const unsubscribe = alertRealtimeService.subscribe(organizationId, (newAlert) => {
+      logger.info('Alerts', 'New alert received via Realtime', { alertId: newAlert.id, title: newAlert.title });
+      
+      // Add new alert to state
+      setAlerts(prev => {
+        // Check if already exists to avoid dupes
+        if (prev.some(a => a.id === newAlert.id)) {
+          logger.debug('Alerts', 'Duplicate alert ignored', { alertId: newAlert.id });
+          return prev;
+        }
+        return [newAlert, ...prev];
+      });
+
+      // Play sound if enabled
+      if (config.soundEnabled) {
+        // playSound(); // TODO: Implement playSound
+      }
+    });
+
+    return () => {
+      logger.info('Alerts', 'Cleaning up Realtime subscription');
+      unsubscribe();
+    };
+  }, [organizationId, fetchDbAlerts, config.soundEnabled]);
 
   // 🎯 PERFORMANCE: Stable generateId function with no dependencies
   const generateId = useCallback(() => {
@@ -114,11 +249,14 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
   }, []);
 
   const loadPersistedAlerts = async () => {
+    // Legacy load skipped if we are using Realtime/DB
+    if (organizationId) return;
+
     try {
       const stored = localStorage.getItem('g-mini-alerts');
       if (stored) {
         const parsed = JSON.parse(stored);
-        const deserializedAlerts = parsed.map((alert: unknown) => ({
+        const deserializedAlerts = parsed.map((alert: any) => ({
           ...alert,
           createdAt: new Date(alert.createdAt),
           updatedAt: new Date(alert.updatedAt),
@@ -126,12 +264,12 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
           resolvedAt: alert.resolvedAt ? new Date(alert.resolvedAt) : undefined,
           lastOccurrence: alert.lastOccurrence ? new Date(alert.lastOccurrence) : undefined
         }));
-        
+
         // Only load active and acknowledged alerts
-        const activeAlerts = deserializedAlerts.filter((alert: Alert) => 
+        const activeAlerts = deserializedAlerts.filter((alert: Alert) =>
           alert.status === 'active' || alert.status === 'acknowledged'
         );
-        
+
         setAlerts(activeAlerts);
       }
     } catch (error) {
@@ -145,7 +283,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
       const alertsToPersist = alerts
         .filter(alert => alert.persistent && (alert.status === 'active' || alert.status === 'acknowledged'))
         .slice(0, config.maxStoredAlerts);
-        
+
       localStorage.setItem('g-mini-alerts', JSON.stringify(alertsToPersist));
     } catch (error) {
       logger.error('App', 'Error persisting alerts:', error);
@@ -175,7 +313,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
 
     // Check for recurring alerts
     if (input.isRecurring) {
-      const existingRecurring = alertsRef.current.find(alert => 
+      const existingRecurring = alertsRef.current.find(alert =>
         alert.type === input.type &&
         alert.context === input.context &&
         alert.title === input.title &&
@@ -184,21 +322,21 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
 
       if (existingRecurring) {
         // Update existing recurring alert
-        setAlerts(prev => prev.map(alert => 
+        setAlerts(prev => prev.map(alert =>
           alert.id === existingRecurring.id
             ? {
-                ...alert,
-                occurrenceCount: (alert.occurrenceCount || 0) + 1,
-                lastOccurrence: now,
-                updatedAt: now,
-                status: 'active' // Reactivate if it was acknowledged
-              }
+              ...alert,
+              occurrenceCount: (alert.occurrenceCount || 0) + 1,
+              lastOccurrence: now,
+              updatedAt: now,
+              status: 'active' // Reactivate if it was acknowledged
+            }
             : alert
         ));
 
-        await EventBus.emit(ALERT_EVENTS.UPDATED, { 
-          alertId: existingRecurring.id, 
-          recurring: true 
+        await EventBus.emit(ALERT_EVENTS.UPDATED, {
+          alertId: existingRecurring.id,
+          recurring: true
         });
 
         return existingRecurring.id;
@@ -209,12 +347,40 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     setAlerts(prev => [newAlert, ...prev]);
 
     // Emit created event
-    await EventBus.emit(ALERT_EVENTS.CREATED, { 
+    await EventBus.emit(ALERT_EVENTS.CREATED, {
       alertId,
       type: input.type,
       severity: input.severity,
-      context: input.context 
+      context: input.context
     });
+
+    // Sync with DB if persistent and orgId available
+    if (input.persistent && organizationId) {
+      try {
+        // We fire and forget DB insert, assuming Realtime will confirm it or it's just for history
+        // Actually, if we insert to DB, the Trigger will send it back via Realtime.
+        // To avoid double-display, we might want to wait for Realtime?
+        // Or just Optimistic UI (done above) and handle deduping in Realtime subscription (done above).
+
+        await supabase.from('alerts').insert({
+          id: alertId, // Ensure ID matches
+          organization_id: organizationId,
+          title: input.title,
+          description: input.description,
+          severity: input.severity,
+          type: input.type,
+          status: 'active',
+          context: input.context,
+          intelligence_level: input.intelligence_level || 'simple',
+          metadata: input.metadata as any, // Cast to JSON
+          created_at: now.toISOString(),
+          updated_at: now.toISOString()
+        });
+
+      } catch (e) {
+        logger.error('Alerts', 'Failed to persist alert to DB', e);
+      }
+    }
 
     return alertId;
   }, []); // ✅ Empty deps - all state updates use functional form
@@ -237,16 +403,16 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
       alertIds.push(alertId);
 
       // Check for recurring alerts
-      if (input.recurring?.enabled) {
+      if (input.isRecurring) {
         const existingRecurring = alertsRef.current.find(
-          alert => 
-            alert.isRecurring && 
-            alert.recurringId === input.recurring?.id &&
+          alert =>
+            alert.isRecurring &&
+            alert.recurrencePattern === input.recurrencePattern &&
             alert.status !== 'resolved'
         );
 
         if (existingRecurring) {
-          logger.debug('Alerts', `Skipping recurring alert: ${input.title}`, existingRecurring);
+          logger.debug('Alerts', 'Skipping recurring alert: ' + input.title, existingRecurring);
           continue;
         }
       }
@@ -260,21 +426,18 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
         status: 'active',
         context: input.context || 'global',
         metadata: input.metadata,
+        intelligence_level: input.intelligence_level || 'simple',
         actions: input.actions?.map(action => ({
           ...action,
           id: crypto.randomUUID()
         })) || [],
-        isRecurring: input.recurring?.enabled ?? false,
-        recurringId: input.recurring?.id,
-        recurringConfig: input.recurring,
+        isRecurring: input.isRecurring ?? false,
+        recurrencePattern: input.recurrencePattern,
         createdAt: now,
         updatedAt: now,
-        expiresAt: input.expiresAt,
-        priority: input.priority,
-        tags: input.tags || [],
-        relatedEntities: input.relatedEntities || [],
-        escalationLevel: 0,
-        notificationSent: false
+        // Remove fields not in CreateAlertInput
+        // expiresAt, priority, tags, relatedEntities - these valid only if CreateAlertInput has them
+        // Assuming CreateAlertInput might be narrower than Alert
       };
 
       newAlerts.push(newAlert);
@@ -285,7 +448,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
 
     // Emit events for all created alerts (can be done async)
     Promise.all(
-      alertIds.map((id, index) => 
+      alertIds.map((id, index) =>
         EventBus.emit(ALERT_EVENTS.CREATED, {
           alertId: id,
           type: inputs[index].type,
@@ -297,9 +460,34 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
       logger.error('Alerts', 'Error emitting bulk create events', error);
     });
 
+    // Sync with DB if persistent and orgId available
+    if (organizationId && newAlerts.length > 0) {
+      try {
+        const dbAlerts = newAlerts.map(alert => ({
+          id: alert.id,
+          organization_id: organizationId,
+          title: alert.title,
+          description: alert.description,
+          severity: alert.severity,
+          type: alert.type,
+          status: 'active',
+          context: alert.context,
+          intelligence_level: alert.intelligence_level || 'simple',
+          metadata: alert.metadata as any,
+          created_at: alert.createdAt.toISOString(),
+          updated_at: alert.updatedAt.toISOString()
+        }));
+
+        const { error } = await supabase.from('alerts').insert(dbAlerts);
+        if (error) throw error;
+      } catch (e) {
+        logger.error('Alerts', 'Failed to persist bulk alerts to DB', e);
+      }
+    }
+
     logger.info('Alerts', `Bulk created ${newAlerts.length} alerts in single update`);
     return alertIds;
-  }, []); // 🎯 Empty deps - stable reference
+  }, [organizationId]); // Added dep
 
   // 🎯 PERFORMANCE: Mark alert as read
   const markAsRead = useCallback(async (id: string) => {
@@ -307,13 +495,19 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
 
     setAlerts(prev => prev.map(alert =>
       alert.id === id && !alert.readAt
-        ? { ...alert, readAt: now, updatedAt: now }
+        ? { ...alert, readAt: now, updatedAt: now, status: 'acknowledged' } // Also update status for consistency
         : alert
     ));
 
     await EventBus.emit(ALERT_EVENTS.UPDATED, { alertId: id, action: 'read' });
+
+    // Sync with DB
+    if (organizationId) {
+      alertRealtimeService.markAsRead(id).catch(e => logger.error('Alerts', 'DB sync failed for markAsRead', e));
+    }
+
     logger.debug('Alerts', `Alert marked as read: ${id}`);
-  }, []); // 🎯 Empty deps - stable reference
+  }, [organizationId]); // Added dep
 
   // 🎯 PERFORMANCE: Snooze alert
   const snooze = useCallback(async (id: string, duration: number) => {
@@ -322,12 +516,12 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
 
     setAlerts(prev => prev.map(alert =>
       alert.id === id
-        ? { 
-            ...alert, 
-            status: 'snoozed' as AlertStatus, 
-            snoozedUntil,
-            updatedAt: now
-          }
+        ? {
+          ...alert,
+          status: 'snoozed' as AlertStatus,
+          snoozedUntil,
+          updatedAt: now
+        }
         : alert
     ));
 
@@ -338,12 +532,12 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     setTimeout(() => {
       setAlerts(prev => prev.map(alert =>
         alert.id === id && alert.status === 'snoozed'
-          ? { 
-              ...alert, 
-              status: 'active' as AlertStatus, 
-              snoozedUntil: undefined,
-              updatedAt: new Date()
-            }
+          ? {
+            ...alert,
+            status: 'active' as AlertStatus,
+            snoozedUntil: undefined,
+            updatedAt: new Date()
+          }
           : alert
       ));
       logger.info('Alerts', `Alert reactivated after snooze: ${id}`);
@@ -379,22 +573,43 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
   // 🎯 PERFORMANCE: All action callbacks with empty deps - use functional setState
   const acknowledge = useCallback(async (id: string, notes?: string) => {
     const now = new Date();
+    logger.info('Alerts', `[AlertsProvider] Acknowledging alert: ${id}`);
 
+    // 1. Optimistic Update
     setAlerts(prev => prev.map(alert =>
       alert.id === id
         ? {
-            ...alert,
-            status: 'acknowledged' as AlertStatus,
-            acknowledgedAt: now,
-            acknowledgedBy: 'Current User', // TODO: Get from auth context
-            resolutionNotes: notes,
-            updatedAt: now
-          }
+          ...alert,
+          status: 'acknowledged' as AlertStatus,
+          acknowledgedAt: now,
+          updatedAt: now
+        }
         : alert
     ));
 
     await EventBus.emit(ALERT_EVENTS.ACKNOWLEDGED, { alertId: id, notes });
-  }, []); // ✅ Empty deps - stable reference
+
+    // 2. Persistent Sync
+    if (organizationId) {
+      try {
+        const { error, data } = await supabase.from('alerts')
+          .update({
+            status: 'acknowledged',
+            updated_at: now.toISOString()
+          })
+          .eq('id', id)
+          .select();
+
+        if (error) {
+          logger.error('Alerts', '❌ DB sync failed for acknowledge', error);
+        } else {
+          logger.info('Alerts', '✅ DB sync successful for acknowledge', data);
+        }
+      } catch (e) {
+        logger.error('Alerts', 'Exception in acknowledge sync', e);
+      }
+    }
+  }, [organizationId]); // Added dep
 
   const resolve = useCallback(async (id: string, notes?: string) => {
     const now = new Date();
@@ -402,18 +617,32 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     setAlerts(prev => prev.map(alert =>
       alert.id === id
         ? {
-            ...alert,
-            status: 'resolved' as AlertStatus,
-            resolvedAt: now,
-            resolvedBy: 'Current User', // TODO: Get from auth context
-            resolutionNotes: notes,
-            updatedAt: now
-          }
+          ...alert,
+          status: 'resolved' as AlertStatus,
+          resolvedAt: now,
+          resolvedBy: 'Current User', // TODO: Get from auth context
+          resolutionNotes: notes,
+          updatedAt: now
+        }
         : alert
     ));
 
     await EventBus.emit(ALERT_EVENTS.RESOLVED, { alertId: id, notes });
-  }, []); // ✅ Empty deps - stable reference
+
+    // Sync with DB
+    if (organizationId) {
+      try {
+        await supabase.from('alerts')
+          .update({
+            status: 'resolved',
+            updated_at: now.toISOString()
+          })
+          .eq('id', id);
+      } catch (e) {
+        logger.error('Alerts', 'DB sync failed for resolve', e);
+      }
+    }
+  }, [organizationId]); // Added dep
 
   const dismiss = useCallback(async (id: string) => {
     const now = new Date();
@@ -421,15 +650,21 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     setAlerts(prev => prev.map(alert =>
       alert.id === id
         ? {
-            ...alert,
-            status: 'dismissed' as AlertStatus,
-            updatedAt: now
-          }
+          ...alert,
+          status: 'dismissed' as AlertStatus,
+          updatedAt: now
+        }
         : alert
     ));
 
     await EventBus.emit(ALERT_EVENTS.DISMISSED, { alertId: id });
-  }, []); // ✅ Empty deps - stable reference
+
+    // Sync with DB
+    if (organizationId) {
+      alertRealtimeService.dismiss(id).catch(e => logger.error('Alerts', 'DB sync failed for dismiss', e));
+    }
+
+  }, [organizationId]); // Added dep
 
   const update = useCallback(async (id: string, updates: Partial<Alert>) => {
     const now = new Date();
@@ -437,15 +672,32 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
     setAlerts(prev => prev.map(alert =>
       alert.id === id
         ? {
-            ...alert,
-            ...updates,
-            updatedAt: now
-          }
+          ...alert,
+          ...updates,
+          updatedAt: now
+        }
         : alert
     ));
 
     await EventBus.emit(ALERT_EVENTS.UPDATED, { alertId: id, updates });
-  }, []); // ✅ Empty deps - stable reference
+
+    // Sync with DB
+    if (organizationId) {
+      try {
+        // Map some fields back to DB columns if necessary, for now just basic update
+        // This uses a partial update. Be careful with field mapping.
+        const dbUpdates: any = { updated_at: now.toISOString() };
+        if (updates.status) dbUpdates.status = updates.status;
+        if (updates.title) dbUpdates.title = updates.title;
+        if (updates.description) dbUpdates.description = updates.description;
+        if (updates.metadata) dbUpdates.metadata = updates.metadata;
+
+        await supabase.from('alerts').update(dbUpdates).eq('id', id);
+      } catch (e) {
+        logger.error('Alerts', 'DB sync failed for update', e);
+      }
+    }
+  }, [organizationId]); // Added dep
 
   // Query helpers
   const getByContext = useCallback((context: AlertContext) => {
@@ -462,34 +714,34 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
         const statuses = Array.isArray(filters.status) ? filters.status : [filters.status];
         if (!statuses.includes(alert.status)) return false;
       }
-      
+
       if (filters.severity) {
         const severities = Array.isArray(filters.severity) ? filters.severity : [filters.severity];
         if (!severities.includes(alert.severity)) return false;
       }
-      
+
       if (filters.type) {
         const types = Array.isArray(filters.type) ? filters.type : [filters.type];
         if (!types.includes(alert.type)) return false;
       }
-      
+
       if (filters.context) {
         const contexts = Array.isArray(filters.context) ? filters.context : [filters.context];
         if (!contexts.includes(alert.context)) return false;
       }
-      
+
       if (filters.createdAfter && alert.createdAt < filters.createdAfter) return false;
       if (filters.createdBefore && alert.createdAt > filters.createdBefore) return false;
-      
+
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         const matchesTitle = alert.title.toLowerCase().includes(searchLower);
         const matchesDescription = alert.description?.toLowerCase().includes(searchLower) ?? false;
         const matchesMetadata = alert.metadata?.itemName?.toLowerCase().includes(searchLower) ?? false;
-        
+
         if (!matchesTitle && !matchesDescription && !matchesMetadata) return false;
       }
-      
+
       return true;
     });
   }, []);
@@ -497,22 +749,25 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
   // Calculate stats
   const getStats = useCallback((filters?: AlertFilters): AlertStats => {
     const filteredAlerts = filters ? getFiltered(filters) : alertsRef.current;
-    
+
     const byStatus = {
       active: 0,
       acknowledged: 0,
       resolved: 0,
       dismissed: 0
     } as Record<AlertStatus, number>;
-    
+
     const bySeverity = {
       critical: 0,
       high: 0,
       medium: 0,
       low: 0,
-      info: 0
+      info: 0,
+      success: 0,
+      warning: 0,
+      error: 0
     } as Record<AlertSeverity, number>;
-    
+
     const byType = {
       stock: 0,
       system: 0,
@@ -521,7 +776,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
       security: 0,
       operational: 0
     } as Record<AlertType, number>;
-    
+
     // ✅ COMPLETE: Initialize counters for ALL AlertContext types
     const byContext = {
       // Core
@@ -575,15 +830,15 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
       bySeverity[alert.severity]++;
       byType[alert.type]++;
       byContext[alert.context]++;
-      
+
       if (alert.escalationLevel && alert.escalationLevel > 0) {
         escalatedCount++;
       }
-      
+
       if (alert.isRecurring) {
         recurringCount++;
       }
-      
+
       if (alert.resolvedAt && alert.createdAt) {
         const resolutionTime = alert.resolvedAt.getTime() - alert.createdAt.getTime();
         totalResolutionTime += resolutionTime;
@@ -593,6 +848,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
 
     return {
       total: filteredAlerts.length,
+      unread: filteredAlerts.filter(a => !a.readAt && a.status !== 'dismissed').length,
       byStatus,
       bySeverity,
       byType,
@@ -625,7 +881,7 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
   // 🛠️ PERFORMANCE FIX: Use functional update to avoid dependency on config
   const updateConfig = useCallback(async (newConfig: Partial<AlertsConfiguration>) => {
     setConfig(prev => ({ ...prev, ...newConfig }));
-    
+
     // Persist config - use setTimeout to avoid closure over config
     setTimeout(() => {
       try {
@@ -659,7 +915,10 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
         low: filtered.filter((a) => a.severity === 'low').length,
         medium: filtered.filter((a) => a.severity === 'medium').length,
         high: filtered.filter((a) => a.severity === 'high').length,
-        critical: filtered.filter((a) => a.severity === 'critical').length
+        critical: filtered.filter((a) => a.severity === 'critical').length,
+        success: filtered.filter((a) => a.severity === 'success').length,
+        warning: filtered.filter((a) => a.severity === 'warning').length,
+        error: filtered.filter((a) => a.severity === 'error').length
       },
       byType: {
         stock: filtered.filter((a) => a.type === 'stock').length,
@@ -720,25 +979,26 @@ export function AlertsProvider({ children, initialConfig }: AlertsProviderProps)
   // 🛠️ PERFORMANCE: Split context values with individual memoization
   // React.dev pattern: Memoize each value individually, then memoize the object
   // This prevents unnecessary re-renders when object reference changes but values don't
-  
+
   // 🎯 CRITICAL: Memoize alerts array reference stability
   // Only create new reference when actual alerts change (deep comparison would be expensive)
   const memoizedAlerts = useMemo(() => alerts, [alerts]);
-  
+
   // 🎯 CRITICAL: Memoize config object stability
   const memoizedConfig = useMemo(() => config, [config]);
-  
+
   // 🎯 CRITICAL: Memoize isOpen boolean
   const memoizedIsOpen = useMemo(() => isNotificationCenterOpen, [isNotificationCenterOpen]);
-  
+
   // State value - NOW only changes when memoized values actually change
   // React.dev: "components calling useContext won't need to re-render unless currentUser has changed"
   const stateValue = useMemo(() => ({
     alerts: memoizedAlerts,
     stats, // Already memoized with useMemo above
     config: memoizedConfig,
+    loading,
     isNotificationCenterOpen: memoizedIsOpen
-  }), [memoizedAlerts, stats, memoizedConfig, memoizedIsOpen]);
+  }), [memoizedAlerts, stats, memoizedConfig, loading, memoizedIsOpen]);
 
   // Actions value - STABLE, never changes (all callbacks have empty deps)
   const actionsValue = useMemo(() => ({

@@ -20,7 +20,7 @@ import { useOperationalLockWatcher } from '@/lib/operations/hooks';
 import { PerformanceProvider, initializePerformanceSystem } from '@/lib/performance';
 
 // 🚨 SISTEMA UNIFICADO DE ALERTAS
-import { AlertsProvider, AutoGlobalAlertsDisplay, NotificationCenter } from '@/shared/alerts';
+import { AlertsProvider, AlertBanner, NotificationCenter } from '@/shared/alerts';
 
 // 🔐 SISTEMA DE AUTENTICACIÓN
 import { RoleGuard, DashboardRoleRouter, PublicOnlyRoute } from '@/components/auth';
@@ -346,11 +346,13 @@ function App() {
 
       <PerformanceProvider>
         <Provider>
-          <AlertsProvider>
-            <Router>
-              {/* 🛡️ ErrorBoundary INSIDE Router so useLocation works */}
-              <ErrorBoundaryWrapper>
-                <AuthProvider>
+          <Router>
+            {/* 🛡️ ErrorBoundary INSIDE Router so useLocation works */}
+            <ErrorBoundaryWrapper>
+              <AuthProvider>
+                <AlertsProvider>
+                  <AlertBanner />
+                  <NotificationCenter />
                   {/* 🔄 Sync capabilities from Supabase on app init */}
                   <CapabilitySync />
 
@@ -982,14 +984,14 @@ function App() {
                     </LocationProvider>
 
                   </FeatureFlagProvider>
-                </AuthProvider>
-              </ErrorBoundaryWrapper>
-            </Router>
+                </AlertsProvider>
+              </AuthProvider>
+            </ErrorBoundaryWrapper>
+          </Router>
 
-            {/* 🍞 CHAKRA UI TOASTER - Global toast notifications */}
-            {/* ✅ CRITICAL: Must be inside Provider for Chakra context */}
-            <Toaster />
-          </AlertsProvider>
+          {/* 🍞 CHAKRA UI TOASTER - Global toast notifications */}
+          {/* ✅ CRITICAL: Must be inside Provider for Chakra context */}
+          <Toaster />
         </Provider>
 
         {/* 🔍 TANSTACK QUERY DEVTOOLS - Development only */}
@@ -997,7 +999,7 @@ function App() {
           <ReactQueryDevtools initialIsOpen={false} position="bottom" />
         )}
       </PerformanceProvider>
-    </QueryClientProvider>
+    </QueryClientProvider >
   );
 }
 

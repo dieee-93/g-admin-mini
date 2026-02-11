@@ -1,9 +1,28 @@
+/**
+ * MaterialsMetrics - MagicPatterns v6.0 Aesthetic
+ * 
+ * REFACTORED: Nov 2025 - Migrated from wrapper components to inline MagicPatterns pattern
+ * Matches Dashboard and Products aesthetic with gradient top borders and hover effects
+ * 
+ * Design Tokens:
+ * - Gradient top border: 3px height
+ * - Hover effect: translateY(-2px) + shadow elevation
+ * - Spacing: gap="4" for grid, p="4" for cards
+ * - Border radius: xl (consistent with system)
+ * 
+ * Color Gradients by Metric:
+ * - Total Value: green.400 → green.600 (money/success)
+ * - Total Items: blue.400 → blue.600 (inventory/data)
+ * - Critical Stock: red.400 → red.600 (alert/danger)
+ * - Suppliers: purple.400 → purple.600 (network/connections)
+ */
+
 import { memo, useCallback } from 'react';
+import { SimpleGrid, Box, Text, Skeleton, Stack } from '@/shared/ui';
 import {
-  StatsSection, CardGrid, MetricCard, Skeleton, CardWrapper, Stack
-} from '@/shared/ui';
-import {
-  CubeIcon, ExclamationTriangleIcon, CurrencyDollarIcon,
+  CubeIcon,
+  ExclamationTriangleIcon,
+  CurrencyDollarIcon,
   BuildingStorefrontIcon
 } from '@heroicons/react/24/outline';
 import { formatCurrency } from '@/lib/decimal';
@@ -15,7 +34,11 @@ interface MaterialsMetricsProps {
   loading?: boolean;
 }
 
-export const MaterialsMetrics = memo(function MaterialsMetrics({ metrics, onMetricClick, loading }: MaterialsMetricsProps) {
+export const MaterialsMetrics = memo(function MaterialsMetrics({
+  metrics,
+  onMetricClick,
+  loading
+}: MaterialsMetricsProps) {
   // ✅ PERFORMANCE FIX (Nov 2025): useCallback prevents inline arrow functions that break memo()
   // Pattern: Create one useCallback per metric to maintain stable function references
   // Before: onClick={() => onMetricClick('totalValue')} - new function every render
@@ -28,75 +51,206 @@ export const MaterialsMetrics = memo(function MaterialsMetrics({ metrics, onMetr
 
   if (loading) {
     return (
-      <StatsSection>
-        <CardGrid columns={{ base: 1, sm: 2, lg: 4 }}>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <CardWrapper key={i} p={6}>
-              <Stack gap="4">
-                <Stack direction="row" justify="space-between">
-                  <Skeleton height="32px" width="32px" borderRadius="full" />
-                  <Skeleton height="20px" width="40px" />
-                </Stack>
-                <Skeleton height="40px" width="120px" />
-                <Stack gap="1">
-                  <Skeleton height="16px" width="100px" />
-                  <Skeleton height="14px" width="80px" />
-                </Stack>
-              </Stack>
-            </CardWrapper>
-          ))}
-        </CardGrid>
-      </StatsSection>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Box
+            key={i}
+            position="relative"
+            overflow="hidden"
+            bg="bg.surface"
+            p="4"
+            borderRadius="xl"
+            shadow="md"
+          >
+            <Stack gap="2">
+              <Skeleton height="14px" width="100px" />
+              <Skeleton height="32px" width="120px" />
+              <Skeleton height="12px" width="80px" />
+            </Stack>
+          </Box>
+        ))}
+      </SimpleGrid>
     );
   }
 
   return (
-    <StatsSection>
-      <CardGrid columns={{ base: 1, sm: 2, lg: 4 }}>
-        {/* METRIC 1: Total Inventory Value - PRIMARY BUSINESS METRIC */}
-        <MetricCard
-          title="Valor Total Inventario"
-          value={formatCurrency(metrics.totalValue)}
-          subtitle="inversión en stock"
-          icon={CurrencyDollarIcon}
-          colorPalette="green"
-          trend={{
-            value: metrics.valueGrowth,
-            isPositive: metrics.valueGrowth > 0
-          }}
-          onClick={handleTotalValueClick}
+    <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap="4">
+      {/* METRIC 1: Total Inventory Value - PRIMARY BUSINESS METRIC */}
+      <Box
+        position="relative"
+        overflow="hidden"
+        bg="bg.surface"
+        p="4"
+        borderRadius="xl"
+        shadow="md"
+        transition="all 0.2s"
+        _hover={{ transform: "translateY(-2px)", shadow: "lg" }}
+        cursor="pointer"
+        onClick={handleTotalValueClick}
+      >
+        {/* ⭐ MAGICPATTERNS SIGNATURE: Gradient top border */}
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          h="3px"
+          bg="linear-gradient(90deg, var(--chakra-colors-green-400) 0%, var(--chakra-colors-green-600) 100%)"
         />
 
-        {/* METRIC 2: Active Operations - BUSINESS ACTIVITY */}
-        <MetricCard
-          title="Items Totales"
-          value={metrics.totalItems.toString()}
-          subtitle="en inventario"
-          icon={CubeIcon}
-          colorPalette="blue"
-          onClick={handleTotalItemsClick}
+        <Text
+          fontSize="xs"
+          fontWeight="semibold"
+          color="text.muted"
+          textTransform="uppercase"
+          mb="1"
+        >
+          Valor Total Inventario
+        </Text>
+        <Text fontSize="2xl" fontWeight="bold" color="green.600">
+          {formatCurrency(metrics.totalValue)}
+        </Text>
+        {metrics.valueGrowth !== 0 && (
+          <Text
+            fontSize="xs"
+            color={metrics.valueGrowth > 0 ? "green.600" : "red.600"}
+            mt="1"
+          >
+            {metrics.valueGrowth > 0 ? '+' : ''}{metrics.valueGrowth.toFixed(1)}%
+          </Text>
+        )}
+        <Text fontSize="xs" color="text.subtle" mt="1">
+          inversión en stock
+        </Text>
+      </Box>
+
+      {/* METRIC 2: Total Items - INVENTORY COUNT */}
+      <Box
+        position="relative"
+        overflow="hidden"
+        bg="bg.surface"
+        p="4"
+        borderRadius="xl"
+        shadow="md"
+        transition="all 0.2s"
+        _hover={{ transform: "translateY(-2px)", shadow: "lg" }}
+        cursor="pointer"
+        onClick={handleTotalItemsClick}
+      >
+        {/* ⭐ MAGICPATTERNS SIGNATURE: Gradient top border */}
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          h="3px"
+          bg="linear-gradient(90deg, var(--chakra-colors-blue-400) 0%, var(--chakra-colors-blue-600) 100%)"
         />
 
-        {/* METRIC 3: Efficiency Indicator - PERFORMANCE */}
-        <MetricCard
-          title="Stock Crítico"
-          value={metrics.criticalStockItems.toString()}
-          subtitle="requieren atención"
-          icon={ExclamationTriangleIcon}
-          colorPalette={metrics.criticalStockItems > 0 ? "red" : "green"}
-          onClick={handleCriticalClick}
+        <Text
+          fontSize="xs"
+          fontWeight="semibold"
+          color="text.muted"
+          textTransform="uppercase"
+          mb="1"
+        >
+          Items Totales
+        </Text>
+        <Text fontSize="2xl" fontWeight="bold" color="blue.600">
+          {metrics.totalItems}
+        </Text>
+        <Text fontSize="xs" color="text.subtle" mt="1">
+          en inventario
+        </Text>
+      </Box>
+
+      {/* METRIC 3: Critical Stock - ALERT INDICATOR */}
+      <Box
+        position="relative"
+        overflow="hidden"
+        bg="bg.surface"
+        p="4"
+        borderRadius="xl"
+        shadow="md"
+        transition="all 0.2s"
+        _hover={{ transform: "translateY(-2px)", shadow: "lg" }}
+        cursor="pointer"
+        onClick={handleCriticalClick}
+      >
+        {/* ⭐ MAGICPATTERNS SIGNATURE: Gradient top border - Dynamic color based on status */}
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          h="3px"
+          bg={
+            metrics.criticalStockItems > 0
+              ? "linear-gradient(90deg, var(--chakra-colors-red-400) 0%, var(--chakra-colors-red-600) 100%)"
+              : "linear-gradient(90deg, var(--chakra-colors-green-400) 0%, var(--chakra-colors-green-600) 100%)"
+          }
         />
 
-        {/* METRIC 4: Today's Transactions - ACTIVITY */}
-        <MetricCard
-          title="Proveedores Activos"
-          value={metrics.supplierCount.toString()}
-          subtitle="en la red"
-          icon={BuildingStorefrontIcon}
-          colorPalette="purple"
-          onClick={handleSuppliersClick}
+        <Text
+          fontSize="xs"
+          fontWeight="semibold"
+          color="text.muted"
+          textTransform="uppercase"
+          mb="1"
+        >
+          Stock Crítico
+        </Text>
+        <Text
+          fontSize="2xl"
+          fontWeight="bold"
+          color={metrics.criticalStockItems > 0 ? "red.600" : "green.600"}
+        >
+          {metrics.criticalStockItems}
+        </Text>
+        <Text fontSize="xs" color="text.subtle" mt="1">
+          requieren atención
+        </Text>
+      </Box>
+
+      {/* METRIC 4: Active Suppliers - NETWORK HEALTH */}
+      <Box
+        position="relative"
+        overflow="hidden"
+        bg="bg.surface"
+        p="4"
+        borderRadius="xl"
+        shadow="md"
+        transition="all 0.2s"
+        _hover={{ transform: "translateY(-2px)", shadow: "lg" }}
+        cursor="pointer"
+        onClick={handleSuppliersClick}
+      >
+        {/* ⭐ MAGICPATTERNS SIGNATURE: Gradient top border */}
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          h="3px"
+          bg="linear-gradient(90deg, var(--chakra-colors-purple-400) 0%, var(--chakra-colors-purple-600) 100%)"
         />
-      </CardGrid>
-    </StatsSection>
+
+        <Text
+          fontSize="xs"
+          fontWeight="semibold"
+          color="text.muted"
+          textTransform="uppercase"
+          mb="1"
+        >
+          Proveedores Activos
+        </Text>
+        <Text fontSize="2xl" fontWeight="bold" color="purple.600">
+          {metrics.supplierCount}
+        </Text>
+        <Text fontSize="xs" color="text.subtle" mt="1">
+          en la red
+        </Text>
+      </Box>
+    </SimpleGrid>
   );
 });

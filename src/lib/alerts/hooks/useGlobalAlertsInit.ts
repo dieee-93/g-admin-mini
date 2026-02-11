@@ -14,6 +14,8 @@ import { useEffect } from 'react';
 import { useSmartInventoryAlerts } from '@/modules/materials';
 import { useSmartProductsAlerts } from '@/modules/products/hooks';
 import { logger } from '@/lib/logging';
+import { useBusinessProfile } from '@/lib/business-profile/hooks/useBusinessProfile';
+import { AlertOrchestrator } from '../AlertOrchestrator';
 
 /**
  * Hook to initialize all module alert systems at the App level
@@ -31,6 +33,10 @@ import { logger } from '@/lib/logging';
  *    - Alertas PERSISTEN en AlertsProvider (localStorage)
  *    - Badge se actualiza después de primera visita
  *    - Badge PERSISTE al salir del módulo
+ *
+ * ✅ Universal Alert Orchestrator:
+ *    - Initializes event subscriptions
+ *    - Manages cross-module alerts
  *
  * WHY NOT LOAD PRODUCTS AT START?
  * - Innecesario: El usuario puede nunca ir a Products
@@ -53,6 +59,8 @@ import { logger } from '@/lib/logging';
  * ```
  */
 export function useGlobalAlertsInit() {
+  const { profile } = useBusinessProfile();
+
   // ✅ Mount alert hooks (they stay active throughout app lifecycle)
   // Each hook has internal useEffect that reacts to data changes
 
@@ -64,6 +72,13 @@ export function useGlobalAlertsInit() {
   // - When user navigates to Products module → data loads → alerts generate
   // - Alerts persist in AlertsProvider → badge updates
   // - User navigates away → alerts REMAIN (persisted)
+
+  // ✅ Initialize Universal Alert Orchestrator
+  useEffect(() => {
+    if (profile?.businessId) {
+      AlertOrchestrator.getInstance().initialize(profile.businessId);
+    }
+  }, [profile?.businessId]);
 
   // Log initialization (for debugging)
   useEffect(() => {

@@ -93,8 +93,8 @@ interface MaterialRowProps {
   onView?: (material: MaterialItem) => void;
   onEdit?: (material: MaterialItem) => void;
   onDelete?: (material: MaterialItem) => void;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
+  onMouseEnter: (materialId: string) => void; // ✅ Changed: receives ID, not inline function
+  onMouseLeave: () => void; // ✅ Stable function
   getStockStatus: (item: MaterialItem) => 'ok' | 'low' | 'critical' | 'out';
   getStockBadgeColor: (status: string) => 'red' | 'yellow' | 'green';
   getABCColor: (abcClass?: string) => 'red' | 'yellow' | 'green' | 'gray';
@@ -118,10 +118,15 @@ const MaterialRow = memo(function MaterialRow({
   const rowBg = isSelected ? SELECTED_ROW_BG : isHovered ? HOVERED_ROW_BG : DEFAULT_ROW_BG;
   const hoverStyle = isSelected ? { bg: SELECTED_ROW_BG } : { bg: HOVERED_ROW_BG };
 
+  // ✅ PERFORMANCE: Create stable handlers inside row to avoid prop changes
+  const handleMouseEnter = useCallback(() => {
+    onMouseEnter(material.id);
+  }, [material.id, onMouseEnter]);
+
   return (
     <Table.Row
       bg={rowBg}
-      onMouseEnter={onMouseEnter}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={onMouseLeave}
       _hover={hoverStyle}
       cursor="pointer"
@@ -409,6 +414,16 @@ MaterialsTable.displayName = 'MaterialsTable';
     }
   }, []);
 
+  // ✅ PERFORMANCE: Stable callbacks for mouse events (prevents creating 50 new functions per render)
+  // Reference: https://react.dev/reference/react/useCallback
+  const handleMouseEnter = useCallback((materialId: string) => {
+    setHoveredRow(materialId);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setHoveredRow(null);
+  }, []);
+
   const handleSort = useCallback((field: SortField) => {
     if (onSort) {
       onSort(field);
@@ -501,8 +516,8 @@ MaterialsTable.displayName = 'MaterialsTable';
                 onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
-                onMouseEnter={() => setHoveredRow(material.id)}
-                onMouseLeave={() => setHoveredRow(null)}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
                 getStockStatus={getStockStatus}
                 getStockBadgeColor={getStockBadgeColor}
                 getABCColor={getABCColor}

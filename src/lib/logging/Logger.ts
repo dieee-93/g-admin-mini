@@ -59,6 +59,7 @@ export type LogModule =
   | 'CashModule'
   | 'SuppliersService'
   | 'SmartAlertsEngine'
+  | 'Alerts' // Universal alert system
   | 'Team' // Team management module
   | 'BusinessProfileHooks' // Business profile TanStack Query hooks
   | 'FeatureActivationService' // Feature activation service layer

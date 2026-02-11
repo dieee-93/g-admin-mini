@@ -5,7 +5,7 @@
 
 export { BasicInfoSection } from './BasicInfoSection';
 export { MaterialsSection } from './MaterialsSection';
-export { StaffSection } from './StaffSection';
+export { TeamSection } from './TeamSection';
 export { PricingSection } from './PricingSection';
 export { BookingSection } from './BookingSection';
 export { ProductionSection } from './ProductionSection';

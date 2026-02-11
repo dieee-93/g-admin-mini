@@ -23,14 +23,26 @@ export type {
   AlertEvent
 } from './types';
 
+// Import types for local usage in AlertUtils
+import type {
+  CreateAlertInput,
+  AlertSeverity,
+  AlertStatus,
+  AlertType,
+  AlertContext,
+  AlertMetadata,
+  IntelligenceLevel
+} from './types';
+
+
 export { ALERT_EVENTS } from './types';
 
 // Provider and Context
-export { 
-  AlertsProvider, 
+export {
+  AlertsProvider,
   useAlertsContext,
   useAlertsState,
-  useAlertsActions 
+  useAlertsActions
 } from './AlertsProvider';
 
 // Main Hooks
@@ -53,7 +65,7 @@ export type {
 export { AlertDisplay } from './components/AlertDisplay';
 export type { AlertDisplayProps } from './components/AlertDisplay';
 
-export { 
+export {
   AlertBadge,
   NavAlertBadge,
   SidebarAlertBadge,
@@ -63,7 +75,11 @@ export {
 } from './components/AlertBadge';
 export type { AlertBadgeProps } from './components/AlertBadge';
 
-export { 
+// Alert Banner (New)
+export { AlertBanner } from '../../components/alerts/AlertBanner';
+
+
+export {
   GlobalAlertsDisplay,
   AutoGlobalAlertsDisplay
 } from './components/GlobalAlertsDisplay';
@@ -82,9 +98,10 @@ export const AlertUtils = {
     severity: currentStock === 0 ? 'critical' : currentStock <= minThreshold * 0.5 ? 'high' : 'medium',
     context: 'materials',
     title: currentStock === 0 ? `Stock agotado: ${itemName}` : `Stock bajo: ${itemName}`,
-    description: currentStock === 0 
+    description: currentStock === 0
       ? `El producto ${itemName} está completamente agotado`
       : `Solo quedan ${currentStock} unidades de ${itemName}`,
+    intelligence_level: 'simple',
     metadata: {
       itemId,
       itemName,
@@ -121,6 +138,7 @@ export const AlertUtils = {
     context: 'global',
     title,
     description,
+    intelligence_level: 'simple',
     persistent: true
   }),
 
@@ -133,6 +151,7 @@ export const AlertUtils = {
     context: 'global',
     title: `Error en ${fieldName}`,
     description: message,
+    intelligence_level: 'simple',
     metadata: {
       fieldName,
       validationRule: message
@@ -147,7 +166,7 @@ export const AlertUtils = {
   formatRelativeTime: (date: Date): string => {
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
+
     if (diffInMinutes < 1) return 'Hace un momento';
     if (diffInMinutes < 60) return `Hace ${diffInMinutes}m`;
     if (diffInMinutes < 1440) return `Hace ${Math.floor(diffInMinutes / 60)}h`;
@@ -158,12 +177,15 @@ export const AlertUtils = {
    * Determinar color basado en severidad
    */
   getSeverityColor: (severity: AlertSeverity): string => {
-    const colorMap = {
+    const colorMap: Record<AlertSeverity, string> = {
       critical: 'red',
       high: 'orange',
       medium: 'yellow',
       low: 'blue',
-      info: 'gray'
+      info: 'gray',
+      success: 'green',
+      warning: 'orange',
+      error: 'red'
     };
     return colorMap[severity];
   },
@@ -172,12 +194,15 @@ export const AlertUtils = {
    * Determinar texto en español para severidad
    */
   getSeverityText: (severity: AlertSeverity): string => {
-    const textMap = {
+    const textMap: Record<AlertSeverity, string> = {
       critical: 'Crítica',
       high: 'Alta',
       medium: 'Media',
       low: 'Baja',
-      info: 'Info'
+      info: 'Info',
+      success: 'Éxito',
+      warning: 'Advertencia',
+      error: 'Error'
     };
     return textMap[severity];
   },
@@ -186,11 +211,12 @@ export const AlertUtils = {
    * Determinar texto en español para estado
    */
   getStatusText: (status: AlertStatus): string => {
-    const textMap = {
+    const textMap: Record<AlertStatus, string> = {
       active: 'Activa',
       acknowledged: 'Reconocida',
       resolved: 'Resuelta',
-      dismissed: 'Descartada'
+      dismissed: 'Descartada',
+      snoozed: 'Pospuesta'
     };
     return textMap[status];
   }

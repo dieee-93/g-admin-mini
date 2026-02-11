@@ -32,6 +32,28 @@ export interface ModuleEvents {
   'sale.payment_processed': { saleId: string; paymentMethod: string; amount: number };
   'sale.analytics_updated': { totalSales: number; averageTicket: number; topItems: any[] };
 
+  // Payment Gateway events
+  'payment.gateway_health_updated': {
+    gatewayId: string;
+    gatewayName: string;
+    status: 'operational' | 'degraded' | 'down' | 'maintenance';
+    latency: number;
+    errorRate: number;
+    timestamp: string;
+    metadata?: any;
+    apiCalls?: number;
+    limit?: number;
+  };
+
+  // Fulfillment events
+  'fulfillment.queue_updated': {
+    orderId?: string;
+    type?: 'pickup' | 'delivery' | 'onsite';
+    status?: string;
+    action?: string;
+    timestamp: string;
+  };
+
   // Sales Payment events (from Sales Module)
   'sales.payment.completed': {
     saleId: string;
@@ -199,25 +221,44 @@ export interface ModuleEvents {
  * Type-safe event emitter wrapper
  */
 class TypedEventBus {
-  emit<K extends keyof ModuleEvents>(event: K, data: ModuleEvents[K]): void {
-    eventBus.emit(event as EventPattern, data);
+  private handlerWrappers = new Map<string, Set<any>>();
+
+  emit<K extends keyof ModuleEvents>(event: K, data: ModuleEvents[K]): Promise<void> {
+    logger.debug('EventBus', `[TypedEventBus] Emitting ${event}`, data);
+    return eventBus.emit(event as EventPattern, data);
   }
 
   on<K extends keyof ModuleEvents>(
     event: K,
     handler: (data: ModuleEvents[K]) => void
   ): () => void {
-    const unsubscribe = eventBus.on(event as EventPattern, (eventData) => {
+    // Create a wrapper that extracts the payload
+    const wrapper = (eventData: any) => {
       handler(eventData.payload);
-    });
-    return unsubscribe;
+    };
+
+    // 🛡️ CRITICAL: Store a strong reference to the wrapper to prevent GC
+    if (!this.handlerWrappers.has(event)) {
+      this.handlerWrappers.set(event, new Set());
+    }
+    this.handlerWrappers.get(event)!.add(wrapper);
+
+    const unsubscribe = eventBus.on(event as EventPattern, wrapper);
+
+    return () => {
+      const wrappers = this.handlerWrappers.get(event);
+      if (wrappers) {
+        wrappers.delete(wrapper);
+      }
+      unsubscribe();
+    };
   }
 
   off<K extends keyof ModuleEvents>(
     event: K,
-    handler: (data: ModuleEvents[K]) => void
+    _handler: (data: ModuleEvents[K]) => void
   ): void {
-    // EventBus off method removes all handlers for pattern if no handler specified
+    this.handlerWrappers.delete(event);
     eventBus.off(event as EventPattern);
   }
 
@@ -225,13 +266,34 @@ class TypedEventBus {
     event: K,
     handler: (data: ModuleEvents[K]) => void
   ): void {
-    eventBus.once(event as EventPattern, (eventData) => {
+    const wrapper = (eventData: any) => {
+      this.handlerWrappers.get(event)?.delete(wrapper);
       handler(eventData.payload);
-    });
+    };
+
+    if (!this.handlerWrappers.has(event)) {
+      this.handlerWrappers.set(event, new Set());
+    }
+    this.handlerWrappers.get(event)!.add(wrapper);
+
+    eventBus.once(event as EventPattern, wrapper);
   }
 }
 
-export const moduleEventBus = new TypedEventBus();
+export const moduleEventBus: TypedEventBus = (() => {
+  const GLOBAL_KEY = '__G_MINI_TYPED_EVENT_BUS__';
+
+  if (typeof window !== 'undefined' && (window as any)[GLOBAL_KEY]) {
+    return (window as any)[GLOBAL_KEY];
+  }
+
+  const instance = new TypedEventBus();
+  if (typeof window !== 'undefined') {
+    (window as any)[GLOBAL_KEY] = instance;
+    (window as any).moduleEventBus = instance;
+  }
+  return instance;
+})();
 
 /**
  * Event-driven integrations between modules
@@ -2300,20 +2362,20 @@ export const ModuleEventUtils = {
   },
 
   /**
-   * Emit staff events
+   * Emit staff/team events
    */
   staff: {
     created: (staffId: string, staffData: any) => {
-      moduleEventBus.emit('staff.created', { staffId, staffData });
+      moduleEventBus.emit('team.member.created', { teamMemberId: staffId, teamMemberData: staffData });
     },
     updated: (staffId: string, staffData: any) => {
-      moduleEventBus.emit('staff.updated', { staffId, staffData });
+      moduleEventBus.emit('team.member.updated', { teamMemberId: staffId, teamMemberData: staffData });
     },
     scheduleChanged: (staffId: string, scheduleData: any) => {
-      moduleEventBus.emit('staff.schedule_changed', { staffId, scheduleData });
+      moduleEventBus.emit('team.member.schedule_changed', { teamMemberId: staffId, scheduleData });
     },
     performanceUpdated: (staffId: string, metrics: any) => {
-      moduleEventBus.emit('staff.performance_updated', { staffId, metrics });
+      moduleEventBus.emit('team.member.performance_updated', { teamMemberId: staffId, metrics });
     }
   },
 
