@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { ADMIN_USER_CONFIG, AdminUserData, FormErrors } from '../config/constants';
+import type { AdminUserData, FormErrors } from '../config/constants';
+import { ADMIN_USER_CONFIG } from '../config/constants';
 
 import { logger } from '@/lib/logging';
 export interface UseAdminUserFormReturn {
@@ -7,27 +8,27 @@ export interface UseAdminUserFormReturn {
   email: string;
   password: string;
   confirmPassword: string;
-  fullName: string;
-  
+  full_name: string;
+
   // Error state
   errors: FormErrors;
-  
+
   // Processing state
   isCreating: boolean;
-  
+
   // Form actions
   setEmail: (value: string) => void;
   setPassword: (value: string) => void;
   setConfirmPassword: (value: string) => void;
-  setFullName: (value: string) => void;
-  
+  setFull_Name: (value: string) => void;
+
   // Validation
   validateField: (field: keyof FormErrors) => boolean;
   validateAllFields: () => boolean;
-  
+
   // Form submission
   handleSubmit: () => Promise<void>;
-  
+
   // Computed state
   canProceed: boolean;
 }
@@ -40,12 +41,12 @@ export function useAdminUserForm({ onComplete }: UseAdminUserFormProps): UseAdmi
   const [email, setEmailState] = useState('');
   const [password, setPasswordState] = useState('');
   const [confirmPassword, setConfirmPasswordState] = useState('');
-  const [fullName, setFullNameState] = useState('');
+  const [full_name, setFull_NameState] = useState('');
   const [isCreating, setIsCreating] = useState(false);
-  
+
   const [errors, setErrors] = useState<FormErrors>({
     email: '',
-    fullName: '',
+    full_name: '',
     password: '',
     confirmPassword: ''
   });
@@ -65,16 +66,16 @@ export function useAdminUserForm({ onComplete }: UseAdminUserFormProps): UseAdmi
     return true;
   }, []);
 
-  const validateFullName = useCallback((nameValue: string): boolean => {
+  const validateFull_Name = useCallback((nameValue: string): boolean => {
     if (!nameValue?.trim()) {
-      setErrors(prev => ({ ...prev, fullName: TEXTS.validation.nameRequired }));
+      setErrors(prev => ({ ...prev, full_name: TEXTS.validation.nameRequired }));
       return false;
     }
     if (nameValue.trim().length < VALIDATION.MIN_NAME_LENGTH) {
-      setErrors(prev => ({ ...prev, fullName: TEXTS.validation.nameMinLength }));
+      setErrors(prev => ({ ...prev, full_name: TEXTS.validation.nameMinLength }));
       return false;
     }
-    setErrors(prev => ({ ...prev, fullName: '' }));
+    setErrors(prev => ({ ...prev, full_name: '' }));
     return true;
   }, []);
 
@@ -116,8 +117,8 @@ export function useAdminUserForm({ onComplete }: UseAdminUserFormProps): UseAdmi
     switch (field) {
       case 'email':
         return validateEmail(email);
-      case 'fullName':
-        return validateFullName(fullName);
+      case 'full_name':
+        return validateFull_Name(full_name);
       case 'password':
         return validatePassword(password);
       case 'confirmPassword':
@@ -125,16 +126,16 @@ export function useAdminUserForm({ onComplete }: UseAdminUserFormProps): UseAdmi
       default:
         return true;
     }
-  }, [email, fullName, password, confirmPassword, validateEmail, validateFullName, validatePassword, validateConfirmPassword]);
+  }, [email, full_name, password, confirmPassword, validateEmail, validateFull_Name, validatePassword, validateConfirmPassword]);
 
   const validateAllFields = useCallback((): boolean => {
     const isEmailValid = validateEmail(email);
-    const isNameValid = validateFullName(fullName);
+    const isNameValid = validateFull_Name(full_name);
     const isPasswordValid = validatePassword(password);
     const isConfirmValid = validateConfirmPassword(confirmPassword);
 
     return isEmailValid && isNameValid && isPasswordValid && isConfirmValid;
-  }, [email, fullName, password, confirmPassword, validateEmail, validateFullName, validatePassword, validateConfirmPassword]);
+  }, [email, full_name, password, confirmPassword, validateEmail, validateFull_Name, validatePassword, validateConfirmPassword]);
 
   const setEmail = useCallback((value: string) => {
     setEmailState(value);
@@ -152,10 +153,10 @@ export function useAdminUserForm({ onComplete }: UseAdminUserFormProps): UseAdmi
     validateConfirmPassword(value);
   }, [validateConfirmPassword]);
 
-  const setFullName = useCallback((value: string) => {
-    setFullNameState(value);
-    if (errors.fullName) validateFullName(value);
-  }, [errors.fullName, validateFullName]);
+  const setFull_Name = useCallback((value: string) => {
+    setFull_NameState(value);
+    if (errors.full_name) validateFull_Name(value);
+  }, [errors.full_name, validateFull_Name]);
 
   const handleSubmit = useCallback(async (): Promise<void> => {
     if (!validateAllFields()) {
@@ -163,31 +164,31 @@ export function useAdminUserForm({ onComplete }: UseAdminUserFormProps): UseAdmi
     }
 
     setIsCreating(true);
-    
+
     try {
       // Simulate processing delay for better UX
       await new Promise(resolve => setTimeout(resolve, ADMIN_USER_CONFIG.PROCESSING_DELAY));
-      
+
       onComplete({
         email: email.trim(),
         password,
-        fullName: fullName.trim()
+        full_name: full_name.trim()
       });
     } catch (error) {
       logger.error('App', 'Error creating admin user:', error);
     } finally {
       setIsCreating(false);
     }
-  }, [email, password, fullName, validateAllFields, onComplete]);
+  }, [email, password, full_name, validateAllFields, onComplete]);
 
   const canProceed = Boolean(
-    email.trim() && 
-    fullName.trim() && 
-    password && 
-    confirmPassword && 
-    !errors.email && 
-    !errors.fullName && 
-    !errors.password && 
+    email.trim() &&
+    full_name.trim() &&
+    password &&
+    confirmPassword &&
+    !errors.email &&
+    !errors.full_name &&
+    !errors.password &&
     !errors.confirmPassword
   );
 
@@ -196,27 +197,27 @@ export function useAdminUserForm({ onComplete }: UseAdminUserFormProps): UseAdmi
     email,
     password,
     confirmPassword,
-    fullName,
-    
+    full_name,
+
     // Error state
     errors,
-    
+
     // Processing state
     isCreating,
-    
+
     // Form actions
     setEmail,
     setPassword,
     setConfirmPassword,
-    setFullName,
-    
+    setFull_Name,
+
     // Validation
     validateField,
     validateAllFields,
-    
+
     // Form submission
     handleSubmit,
-    
+
     // Computed state
     canProceed,
   };

@@ -6,7 +6,7 @@ import { DocumentCheckIcon } from '@heroicons/react/24/outline';
 
 interface SetupSummaryProps {
   userName: string;
-  adminUser: {email: string, password: string, fullName: string} | null;
+  adminUser: { email: string, password: string, full_name: string } | null;
   onComplete: () => void;
   onBack: () => void;
 }
@@ -35,7 +35,7 @@ export function SetupSummary({ userName, adminUser, onComplete, onBack }: SetupS
               <Box>
                 <Text fontSize="sm" fontWeight="medium" color="gray.700">Administrador:</Text>
                 <Text fontSize="sm" color="gray.600">
-                  {adminUser?.fullName || 'No configurado'} ({adminUser?.email || 'Sin email'})
+                  {adminUser?.full_name || 'No configurado'} ({adminUser?.email || 'Sin email'})
                 </Text>
               </Box>
               <Box>

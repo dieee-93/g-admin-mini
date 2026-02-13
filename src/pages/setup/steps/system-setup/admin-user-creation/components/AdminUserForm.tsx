@@ -8,28 +8,28 @@ import type { FormErrors } from '../config/constants';
 
 interface AdminUserFormProps {
   // Form values
-  fullName: string;
+  full_name: string;
   email: string;
   password: string;
   confirmPassword: string;
-  
+
   // Form errors
   errors: FormErrors;
-  
+
   // Form handlers
-  onFullNameChange: (value: string) => void;
+  onFull_NameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
   onPasswordChange: (value: string) => void;
   onConfirmPasswordChange: (value: string) => void;
 }
 
 export function AdminUserForm({
-  fullName,
+  full_name,
   email,
   password,
   confirmPassword,
   errors,
-  onFullNameChange,
+  onFull_NameChange,
   onEmailChange,
   onPasswordChange,
   onConfirmPasswordChange,
@@ -43,9 +43,9 @@ export function AdminUserForm({
           <InputField
             label={form.fullNameLabel}
             placeholder={form.fullNamePlaceholder}
-            value={fullName}
-            onChange={(e) => onFullNameChange(e.target.value)}
-            error={errors.fullName}
+            value={full_name}
+            onChange={(e) => onFull_NameChange(e.target.value)}
+            error={errors.full_name}
             required
           />
 

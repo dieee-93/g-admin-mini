@@ -11,7 +11,7 @@ export interface SupabaseCredentials {
 export interface AdminUserData {
   email: string;
   password: string;
-  fullName: string;
+  full_name: string;
 }
 
 interface SetupState {
@@ -109,29 +109,29 @@ export const useSetupStore = create<SetupStore>()(
         },
 
         jumpToStep: (groupIndex, subStepIndex = 0, force = false) => {
-            if (force || canProceedToStep(get(), groupIndex)) {
-                set({ currentGroup: groupIndex, currentSubStep: subStepIndex, timestamp: Date.now() }, false, 'jumpToStep');
-                if (force) {
-                    logger.info('App', `🚀 Force jumping to group ${groupIndex} (dev mode)`);
-                }
-            } else {
-                logger.warn('App', `Cannot jump to group ${groupIndex}, prerequisites not met.`);
+          if (force || canProceedToStep(get(), groupIndex)) {
+            set({ currentGroup: groupIndex, currentSubStep: subStepIndex, timestamp: Date.now() }, false, 'jumpToStep');
+            if (force) {
+              logger.info('App', `🚀 Force jumping to group ${groupIndex} (dev mode)`);
             }
+          } else {
+            logger.warn('App', `Cannot jump to group ${groupIndex}, prerequisites not met.`);
+          }
         },
 
         reset: () => set(initialState, false, 'reset'),
         fillWithTestData: () => set({
-            userName: 'Test User',
-            supabaseCredentials: {
-                url: 'https://test.supabase.co',
-                anonKey: 'test-anon-key'
-            },
-            adminUserData: {
-                email: 'test@test.com',
-                password: 'password',
-                fullName: 'Test Admin'
-            },
-            timestamp: Date.now(),
+          userName: 'Test User',
+          supabaseCredentials: {
+            url: 'https://test.supabase.co',
+            anonKey: 'test-anon-key'
+          },
+          adminUserData: {
+            email: 'test@test.com',
+            password: 'password',
+            full_name: 'Test Admin'
+          },
+          timestamp: Date.now(),
         }, false, 'fillWithTestData'),
       }),
       {

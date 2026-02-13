@@ -26,12 +26,12 @@ export function AdminUserCreationStep({ onComplete, onBack }: AdminUserCreationS
 
         {/* Form */}
         <AdminUserForm
-          fullName={form.fullName}
+          full_name={form.full_name}
           email={form.email}
           password={form.password}
           confirmPassword={form.confirmPassword}
           errors={form.errors}
-          onFullNameChange={form.setFullName}
+          onFull_NameChange={form.setFull_Name}
           onEmailChange={form.setEmail}
           onPasswordChange={form.setPassword}
           onConfirmPasswordChange={form.setConfirmPassword}

@@ -17,12 +17,12 @@ export const ADMIN_USER_CONFIG = {
       title: 'Crear Usuario Administrador',
       subtitle: 'Este será el usuario principal que administrará el sistema. Tendrá acceso completo a todas las funciones.'
     },
-    
+
     infoAlert: {
       title: 'Usuario Super Admin',
       description: 'Este usuario tendrá permisos completos para gestionar otros usuarios, configurar el sistema y acceder a todas las funcionalidades.'
     },
-    
+
     form: {
       fullNameLabel: 'Nombre completo',
       fullNamePlaceholder: 'Ej: Juan Pérez',
@@ -33,7 +33,7 @@ export const ADMIN_USER_CONFIG = {
       confirmPasswordLabel: 'Confirmar contraseña',
       confirmPasswordPlaceholder: 'Repetir contraseña',
     },
-    
+
     validation: {
       emailRequired: 'El email es requerido',
       emailInvalid: 'Formato de email inválido',
@@ -46,7 +46,7 @@ export const ADMIN_USER_CONFIG = {
       passwordNumber: 'La contraseña debe tener al menos un número',
       passwordsNoMatch: 'Las contraseñas no coinciden'
     },
-    
+
     requirements: {
       title: 'Requisitos de contraseña:',
       minLength: 'Mínimo 8 caracteres',
@@ -54,7 +54,7 @@ export const ADMIN_USER_CONFIG = {
       lowercase: 'Al menos una minúscula',
       number: 'Al menos un número'
     },
-    
+
     buttons: {
       back: '← Atrás',
       create: 'Crear Usuario Admin',
@@ -69,12 +69,12 @@ export const ADMIN_USER_CONFIG = {
 export interface AdminUserData {
   email: string;
   password: string;
-  fullName: string;
+  full_name: string;
 }
 
 export interface FormErrors {
   email: string;
-  fullName: string;
+  full_name: string;
   password: string;
   confirmPassword: string;
 }
