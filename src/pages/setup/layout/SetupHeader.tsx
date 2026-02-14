@@ -11,7 +11,7 @@ import {
   IconButton,
   Portal,
   Separator,
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import {
   CheckIcon,
   UserIcon,

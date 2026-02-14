@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Stack, Box, Progress } from '@chakra-ui/react';
+import { Container, Stack, Box, Progress } from '@/shared/ui';
 import { ServiceSelection } from './components/ServiceSelection';
 import { ProfessionalSelection } from './components/ProfessionalSelection';
 import { CalendarPicker } from './components/CalendarPicker';

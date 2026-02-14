@@ -20,8 +20,17 @@
  * @design PRODUCTS_FORM_PRODUCTION_SECTION.md
  */
 
-import { Stack, Switch, Text, HStack, SelectField, createListCollection, Alert, NumberField } from '@/shared/ui';
-import { Field } from '@chakra-ui/react';
+import {
+  Stack,
+  Switch,
+  Text,
+  HStack,
+  SelectField,
+  createListCollection,
+  Alert,
+  NumberField,
+  Field
+} from '@/shared/ui';
 import type { FormSectionProps, ProductionFields, OverheadConfig } from '../../types/productForm';
 import { DecimalUtils } from '@/lib/decimal';
 

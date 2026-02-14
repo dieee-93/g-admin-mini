@@ -1,6 +1,5 @@
 import React from 'react';
-import { VStack, HStack, Box } from '@chakra-ui/react';
-import { Button, Typography } from '@/shared/ui';
+import { VStack, HStack, Box, Button, Typography } from '@/shared/ui';
 import { SUPABASE_CONNECTION_CONFIG } from '../config/constants';
 
 interface ActionButtonsProps {

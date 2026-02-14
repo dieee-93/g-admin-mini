@@ -19,8 +19,17 @@
  * @design PRODUCTS_FORM_RECURRING_CONFIG.md
  */
 
-import { Stack, Input, Switch, Alert, SelectField, createListCollection, HStack, Textarea } from '@/shared/ui';
-import { Field } from '@chakra-ui/react';
+import {
+  Stack,
+  Input,
+  Switch,
+  Alert,
+  SelectField,
+  createListCollection,
+  HStack,
+  Textarea,
+  Field
+} from '@/shared/ui';
 import type { FormSectionProps, RecurringConfigFields } from '../../types/productForm';
 
 interface RecurringConfigSectionProps extends Omit<FormSectionProps, 'data' | 'onChange'> {

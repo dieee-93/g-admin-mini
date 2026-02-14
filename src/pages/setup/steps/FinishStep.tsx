@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Stack, Text, Button } from '@chakra-ui/react';
+import { Box, Stack, Text, Button } from '@/shared/ui';
 import { useSetupStore } from '../../../store/setupStore';
 import { useBusinessProfile, useCompleteSetup } from '@/lib/capabilities';
 import { logger } from '@/lib/logging';

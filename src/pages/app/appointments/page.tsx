@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Stack, Text, Box, Grid } from '@chakra-ui/react';
-import { Button, CardWrapper, Badge } from '@/shared/ui';
-import { Icon } from '@/shared/ui/Icon';
+import { Container, Stack, Text, Box, Grid, Button, CardWrapper, Badge, Icon } from '@/shared/ui';
 import {
   CalendarIcon,
   ClockIcon,

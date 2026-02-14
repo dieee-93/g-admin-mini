@@ -1,6 +1,5 @@
 import React from 'react';
-import { VStack, Box } from '@chakra-ui/react';
-import { Section } from '@/shared/ui';
+import { VStack, Box, Section } from '@/shared/ui';
 import { useSupabaseConnection } from './hooks/useSupabaseConnection';
 import { InstructionsSection } from './components/InstructionsSection';
 import { CredentialsForm } from './components/CredentialsForm';

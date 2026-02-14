@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import { Box, VStack, Stack, Text, Heading } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui/CardWrapper';
-import { Button } from '@/shared/ui/Button';
-import { InputField } from '@/shared/ui';
+import { Box, VStack, Stack, Text, Heading, CardWrapper, Button, InputField } from '@/shared/ui';
 import { CogIcon } from '@heroicons/react/24/outline';
 
 import { logger } from '@/lib/logging';

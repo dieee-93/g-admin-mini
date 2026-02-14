@@ -1,5 +1,5 @@
 import React from 'react';
-import { VStack, Box, Heading, Text } from '@chakra-ui/react';
+import { VStack, Box, Heading, Text } from '@/shared/ui';
 import { UserPlusIcon } from '@heroicons/react/24/outline';
 import { ADMIN_USER_CONFIG } from '../config/constants';
 

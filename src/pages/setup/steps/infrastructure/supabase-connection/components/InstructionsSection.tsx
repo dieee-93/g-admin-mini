@@ -1,6 +1,5 @@
 import React from 'react';
-import { VStack, HStack, Text, Badge } from '@chakra-ui/react';
-import { Section, Typography, Stack } from '@/shared/ui';
+import { VStack, HStack, Text, Badge, Section, Typography, Stack } from '@/shared/ui';
 import { SUPABASE_CONNECTION_CONFIG } from '../config/constants';
 
 export function InstructionsSection() {

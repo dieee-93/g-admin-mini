@@ -1,6 +1,5 @@
 import React from 'react';
-import { Stack } from '@chakra-ui/react';
-import { Button } from '@/shared/ui/Button';
+import { Stack, Button } from '@/shared/ui';
 import { ADMIN_USER_CONFIG } from '../config/constants';
 
 interface ActionButtonsProps {

@@ -20,8 +20,16 @@
  * @design PRODUCTS_FORM_DIGITAL_SECTIONS_SPEC.md
  */
 
-import { Stack, Input, Alert, SelectField, createListCollection, HStack, Checkbox } from '@/shared/ui';
-import { Field } from '@chakra-ui/react';
+import {
+  Stack,
+  Input,
+  Alert,
+  SelectField,
+  createListCollection,
+  HStack,
+  Checkbox,
+  Field
+} from '@/shared/ui';
 import type { FormSectionProps, DigitalDeliveryFields } from '../../types/productForm';
 
 interface DigitalDeliverySectionProps extends Omit<FormSectionProps, 'data' | 'onChange'> {

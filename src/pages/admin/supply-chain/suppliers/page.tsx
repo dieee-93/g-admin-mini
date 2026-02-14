@@ -24,9 +24,7 @@ import {
   Box,
   Flex,
   Stack,
-  Text
-} from '@chakra-ui/react';
-import {
+  Text,
   Alert,
   Button,
   Badge,

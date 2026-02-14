@@ -9,19 +9,14 @@ import {
   IconButton,
   Progress,
   Heading,
-  Alert
-} from '@chakra-ui/react';
-import {
-  EyeIcon,
-  EyeSlashIcon,
-  ShieldCheckIcon,
-  ArrowLeftIcon,
-  CogIcon,
-  ComputerDesktopIcon
-} from '@heroicons/react/24/outline';
-import { useAuth } from '@/contexts/AuthContext';
-import { useSmartRedirect } from '@/hooks';
-import { CardWrapper, Button, InputField, Typography, Stack, Badge } from '@/shared/ui';
+  Alert,
+  CardWrapper,
+  Button,
+  InputField,
+  Typography,
+  Stack,
+  Badge
+} from '@/shared/ui';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');

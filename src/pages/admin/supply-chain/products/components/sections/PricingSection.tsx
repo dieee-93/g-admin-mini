@@ -7,8 +7,19 @@
  * @design PRODUCTS_FORM_SECTIONS_SPEC.md - Section 6
  */
 
-import { Stack, Text, Box, HStack, Alert, CardWrapper, Switch, Button, NumberField } from '@/shared/ui';
-import { Field, Input } from '@chakra-ui/react';
+import {
+  Stack,
+  Text,
+  Box,
+  HStack,
+  Alert,
+  CardWrapper,
+  Switch,
+  Button,
+  NumberField,
+  Field,
+  Input
+} from '@/shared/ui';
 import type { FormSectionProps, PricingFields, ProductCostBreakdown } from '../../types/productForm';
 import {
   calculateProfitMargin,

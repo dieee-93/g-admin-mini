@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, VStack, Text } from '@chakra-ui/react';
+import { Box, VStack, Text } from '@/shared/ui';
 import { ADMIN_USER_CONFIG } from '../config/constants';
 
 interface PasswordRequirementsProps {

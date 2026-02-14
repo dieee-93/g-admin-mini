@@ -1,7 +1,5 @@
 import React from 'react';
-import { Box, VStack } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui/CardWrapper';
-import { InputField } from '@/shared/ui';
+import { Box, VStack, CardWrapper, InputField } from '@/shared/ui';
 import { ADMIN_USER_CONFIG } from '../config/constants';
 import { PasswordRequirements } from './PasswordRequirements';
 import type { FormErrors } from '../config/constants';

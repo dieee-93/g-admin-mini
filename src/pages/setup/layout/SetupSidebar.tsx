@@ -6,8 +6,8 @@ import {
   Flex,
   Text,
   Separator,
-} from '@chakra-ui/react';
-import { Icon } from '@/shared/ui';
+  Icon,
+} from '@/shared/ui';
 import {
   CheckIcon,
   InformationCircleIcon,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, Text, Progress } from '@chakra-ui/react';
+import { Box, Flex, Text, Progress } from '@/shared/ui';
 
 interface SetupProgressBarProps {
   progressPercentage: number;

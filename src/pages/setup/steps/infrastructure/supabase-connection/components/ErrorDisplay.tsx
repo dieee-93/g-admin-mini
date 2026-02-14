@@ -1,6 +1,5 @@
 import React from 'react';
-import { HStack, Badge } from '@chakra-ui/react';
-import { Section, Typography } from '@/shared/ui';
+import { HStack, Badge, Section, Typography } from '@/shared/ui';
 import { ANIMATION_CLASSES } from '../config/constants';
 
 interface ErrorDisplayProps {

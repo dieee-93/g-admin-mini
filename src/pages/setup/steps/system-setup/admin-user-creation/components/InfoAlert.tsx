@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Stack, Text } from '@chakra-ui/react';
+import { Box, Stack, Text } from '@/shared/ui';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { ADMIN_USER_CONFIG } from '../config/constants';
 

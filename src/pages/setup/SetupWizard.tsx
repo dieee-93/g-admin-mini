@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
+import { Box, Flex, Stack, Text, Button } from '@/shared/ui';
 import { SetupHeader } from './layout/SetupHeader';
 import { SetupSidebar } from './layout/SetupSidebar';
 import { SetupProgressBar } from './layout/SetupProgressBar';

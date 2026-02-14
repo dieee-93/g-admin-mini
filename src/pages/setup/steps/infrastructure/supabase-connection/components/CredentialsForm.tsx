@@ -1,6 +1,5 @@
 import React from 'react';
-import { VStack, Box, Code } from '@chakra-ui/react';
-import { FormSection, InputField } from '@/shared/ui';
+import { VStack, Box, Kbd, FormSection, InputField } from '@/shared/ui';
 import { SUPABASE_CONNECTION_CONFIG } from '../config/constants';
 
 interface CredentialsFormProps {
@@ -35,7 +34,7 @@ export function CredentialsForm({
             onChange={(e) => onUrlChange(e.target.value)}
             disabled={isConnecting}
             helperText={<>
-              Ejemplo: <Code fontSize="xs" bg="gray.100" px="1" py={0.5} borderRadius="sm">{form.urlExample}</Code>
+              Ejemplo: <Kbd fontSize="xs" bg="gray.100" px="1" py={0.5} borderRadius="sm">{form.urlExample}</Kbd>
             </>}
           />
         </Box>

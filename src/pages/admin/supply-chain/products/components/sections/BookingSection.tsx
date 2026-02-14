@@ -15,8 +15,7 @@
  * @design PRODUCTS_FORM_SECTIONS_SPEC.md - Section 4 (líneas 763-892)
  */
 
-import { Stack, Switch, Alert, Text, HStack, NumberField } from '@/shared/ui';
-import { Field } from '@chakra-ui/react';
+import { Stack, Switch, Alert, Text, HStack, NumberField, Field } from '@/shared/ui';
 import type { FormSectionProps, BookingFields } from '../../types/productForm';
 
 interface BookingSectionProps extends Omit<FormSectionProps, 'data' | 'onChange'> {

@@ -1,6 +1,5 @@
 import React from 'react';
-import { VStack, HStack, Badge, Text } from '@chakra-ui/react';
-import { Section, Stack } from '@/shared/ui';
+import { VStack, HStack, Badge, Text, Section, Stack } from '@/shared/ui';
 import { SUPABASE_CONNECTION_CONFIG, ANIMATION_CLASSES } from '../config/constants';
 
 export function WhatHappensNext() {
