@@ -5,9 +5,12 @@ import {
   Stack,
   Typography,
   Badge,
-  Button
+  Button,
+  Box,
+  Flex,
+  Progress,
+  Text
 } from '@/shared/ui';
-import { Box, Flex, Progress, Text } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 

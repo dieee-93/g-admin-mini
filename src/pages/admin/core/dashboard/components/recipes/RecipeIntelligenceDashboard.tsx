@@ -10,18 +10,10 @@ import {
   Alert,
   Button,
   Skeleton,
-  SimpleGrid
-} from '@chakra-ui/react';
-import { CircularProgress, CircularProgressValueText } from '@/shared/ui/CircularProgress';
-import {
-  ChartBarIcon,
-  ClockIcon,
-  FireIcon
-} from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
-import type { Recipe, RecipeWithCost } from '@/modules/recipe/types';
-import { fetchRecipesWithCosts } from '@/modules/recipe/services/recipeApi';
-import { CardWrapper } from '@/shared/ui';
+  SimpleGrid,
+  CardWrapper,
+  CircularProgress
+} from '@/shared/ui';
 
 import { logger } from '@/lib/logging';
 interface RecipeIntelligenceDashboardProps {

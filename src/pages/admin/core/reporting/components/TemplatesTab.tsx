@@ -3,7 +3,7 @@ import {
   HStack,
   SimpleGrid,
   Select,
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { TemplateCard } from './TemplateCard';
 import { type ReportTemplate } from '../types';
 import { CATEGORY_COLLECTION } from './constants/collections'; 

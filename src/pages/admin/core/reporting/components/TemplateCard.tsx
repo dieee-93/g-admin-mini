@@ -5,15 +5,9 @@ import {
   Badge,
   SimpleGrid,
   IconButton,
-} from '@chakra-ui/react';
-import {
-  CalendarIcon,
-  PlayIcon,
-  EyeIcon,
-  PencilIcon,
-  TrashIcon,
-} from '@heroicons/react/24/outline';
-import { CardWrapper, Button } from '@/shared/ui';
+  CardWrapper,
+  Button
+} from '@/shared/ui';
 import { type ReportTemplate } from '../types';
 
 interface TemplateCardProps {

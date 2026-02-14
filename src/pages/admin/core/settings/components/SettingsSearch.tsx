@@ -8,16 +8,12 @@ import {
   Icon,
   Badge,
   Button,
-  Separator
-} from '@/shared/ui';
-import { 
+  Separator,
   Text,
   Input,
-  InputGroup,
-  InputElement,
   Kbd,
   Portal
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { 
   MagnifyingGlassIcon,
   XMarkIcon,

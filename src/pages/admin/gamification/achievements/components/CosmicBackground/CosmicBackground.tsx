@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
-import { Box } from '@chakra-ui/react';
+import { Box } from '@/shared/ui';
 
 export const CosmicBackground: React.FC = () => {
   // Solo 15 estrellas para rendimiento óptimo

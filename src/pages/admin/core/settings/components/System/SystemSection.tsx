@@ -1,9 +1,8 @@
 // SystemSection.tsx - System Settings with Theme Configuration
 import React from 'react';
 import {
-  Stack, Typography, CardWrapper, Section, Badge, SimpleGrid, Icon
+  Stack, Typography, CardWrapper, Section, Badge, SimpleGrid, Icon, Button
 } from '@/shared/ui';
-import { Button as ChakraButton } from '@chakra-ui/react';
 import {
   PaintBrushIcon,
   ComputerDesktopIcon,
@@ -42,10 +41,10 @@ export const SystemSection: React.FC = () => {
                   Los cambios se aplican instantáneamente.
                 </Typography>
               </Stack>
-              <ChakraButton size="md" variant={'subtle'}>
+              <Button size="md" variant={'subtle'}>
                 <Icon icon={CogIcon} size="sm" />
                 Guardar Cambios
-              </ChakraButton>
+              </Button>
             </CardWrapper.Body>
           </CardWrapper>
 

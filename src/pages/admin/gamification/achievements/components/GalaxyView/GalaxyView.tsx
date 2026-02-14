@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Box, VStack, Text, HStack, Button } from '@chakra-ui/react';
+import { Box, VStack, Text, HStack, Button } from '@/shared/ui';
 import { ConstellationView } from '../ConstellationView';
 import { DOMAIN_METADATA } from '@/config/masteryAchievements';
 import type { DomainProgressSummary, UserAchievement, MasteryAchievementDefinition } from '../../types';

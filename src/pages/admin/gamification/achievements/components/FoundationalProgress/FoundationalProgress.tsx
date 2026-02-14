@@ -15,7 +15,7 @@ import {
   SimpleGrid,
   Badge,
   Progress
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 
 interface Milestone {
   id: string;

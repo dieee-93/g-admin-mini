@@ -1,5 +1,4 @@
-import { SimpleGrid, Text } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+import { SimpleGrid, Text, CardWrapper } from '@/shared/ui';
 
 interface ReportingSummaryProps {
   summary: {

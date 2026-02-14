@@ -15,7 +15,7 @@ import {
   Spinner,
   Icon,
   Button,
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import {
   DocumentTextIcon,
   ChevronRightIcon,

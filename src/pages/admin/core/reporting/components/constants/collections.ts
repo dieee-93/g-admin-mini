@@ -1,4 +1,4 @@
-import { createListCollection } from '@chakra-ui/react';
+import { createListCollection } from '@/shared/ui';
 
 // Collections
 export const CATEGORY_COLLECTION = createListCollection({

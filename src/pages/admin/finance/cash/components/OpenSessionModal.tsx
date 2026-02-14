@@ -4,8 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Dialog } from '@/shared/ui';
-import { Button, Stack, Input, Textarea, Text } from '@chakra-ui/react';
+import { Dialog, Button, Stack, Input, Textarea, Text } from '@/shared/ui';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { MoneyLocationWithAccount, OpenCashSessionInput } from '@/modules/accounting/types';
 import { formatCurrency } from '@/lib/decimal';

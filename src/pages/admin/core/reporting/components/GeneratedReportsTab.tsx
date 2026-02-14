@@ -4,14 +4,9 @@ import {
   Text,
   Badge,
   Progress,
-} from '@chakra-ui/react';
-import {
-  CalendarIcon,
-  ClockIcon,
-  ArrowDownTrayIcon,
-  ExclamationTriangleIcon,
-} from '@heroicons/react/24/outline';
-import { CardWrapper, Button } from '@/shared/ui';
+  CardWrapper,
+  Button
+} from '@/shared/ui';
 import { type GeneratedReport } from '../types';
 
 interface GeneratedReportsTabProps {

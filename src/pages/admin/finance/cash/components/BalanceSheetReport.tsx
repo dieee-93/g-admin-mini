@@ -4,7 +4,7 @@
  * Muestra Assets = Liabilities + Equity
  */
 
-import { Box, Heading, Stack, Table, Text } from '@chakra-ui/react';
+import { Box, Heading, Stack, Table, Text } from '@/shared/ui';
 import { formatCurrency } from '@/lib/decimal';
 import type { BalanceSheet } from '@/modules/accounting/types/reports';
 

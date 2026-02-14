@@ -15,7 +15,7 @@ import {
   SimpleGrid,
   Badge,
   Icon
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { DOMAIN_METADATA } from '@/config/masteryAchievements';
 import type { DomainProgressSummary } from '../../types';
 

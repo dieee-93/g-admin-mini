@@ -3,8 +3,8 @@ import {
   HStack,
   Text,
   Badge,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import { type ReportInsight, type ReportTemplate } from '../types';
 
 interface InsightsTabProps {
