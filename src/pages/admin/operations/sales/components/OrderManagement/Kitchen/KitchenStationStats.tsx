@@ -1,5 +1,4 @@
-import { Grid, VStack, Text, Badge } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+import { Grid, VStack, Text, Badge, CardWrapper } from '@/shared/ui';
 
 export interface StationStats {
   station: string;

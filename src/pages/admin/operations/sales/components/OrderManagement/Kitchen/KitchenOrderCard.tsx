@@ -6,9 +6,10 @@ import {
   Box,
   Progress,
   Alert,
-  Separator
-} from '@chakra-ui/react';
-import { CardWrapper, Button } from '@/shared/ui';
+  Separator,
+  CardWrapper,
+  Button
+} from '@/shared/ui';
 import {
   FireIcon,
   CheckCircleIcon,

@@ -4,8 +4,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Dialog, Alert } from '@/shared/ui';
-import { Button, Stack, Input, Textarea, Text, Box } from '@chakra-ui/react';
+import { Dialog, Alert, Button, Stack, Input, Textarea, Text, Box } from '@/shared/ui';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { CashSessionRow, CloseCashSessionInput } from '@/modules/accounting/types';
 import { DecimalUtils, formatCurrency } from '@/lib/decimal';

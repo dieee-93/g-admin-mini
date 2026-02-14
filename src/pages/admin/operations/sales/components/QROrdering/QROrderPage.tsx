@@ -14,15 +14,10 @@ import {
   Image,
   Tabs,
   IconButton,
-} from '@chakra-ui/react';
-import {
-  PlusIcon,
-  MinusIcon,
-  ShoppingCartIcon,
-  ClockIcon,
-  CheckCircleIcon
-} from '@heroicons/react/24/outline';
-import { Icon, InputField, CardWrapper } from '@/shared/ui';
+  Icon,
+  InputField,
+  CardWrapper
+} from '@/shared/ui';
 import { supabase } from '@/lib/supabase/client';
 import { notify } from '@/lib/notifications';
 import { QROrderConfirmation } from './QROrderConfirmation';

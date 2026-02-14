@@ -4,9 +4,9 @@ import {
   Text,
   Select,
   Button,
-  createListCollection
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  createListCollection,
+  CardWrapper
+} from '@/shared/ui';
 import { KITCHEN_STATIONS } from '../../../types';
 
 interface KitchenHeaderProps {

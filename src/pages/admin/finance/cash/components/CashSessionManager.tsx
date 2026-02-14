@@ -3,7 +3,7 @@
  * Componente principal para gestionar sesiones de caja
  */
 
-import { Box, Heading, Stack, Text, Button, Badge, Grid } from '@chakra-ui/react';
+import { Box, Heading, Stack, Text, Button, Badge, Grid } from '@/shared/ui';
 import { ClockIcon, BanknotesIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { formatCurrency } from '@/lib/decimal';
 import type { MoneyLocationWithAccount, CashSessionRow } from '@/modules/accounting/types';

@@ -3,10 +3,7 @@
  * Historial de sesiones de caja con filtros y exportación
  */
 
-import { Box, Heading, Stack, Table, Text, Badge } from '@chakra-ui/react';
-import { formatCurrency } from '@/lib/decimal';
-import type { SessionHistoryReport, SessionHistoryRow } from '@/modules/accounting/types/reports';
-import { Button } from '@/shared/ui';
+import { Box, Heading, Stack, Table, Text, Badge, Button } from '@/shared/ui';
 
 interface SessionHistoryTableProps {
   data: SessionHistoryReport | null;
